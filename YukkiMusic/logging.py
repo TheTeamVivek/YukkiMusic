@@ -29,6 +29,7 @@ logging.getLogger("pyrogram").setLevel(logging.ERROR)
 logging.getLogger("pytgcalls").setLevel(logging.ERROR)
 logging.getLogger("ntgcalls").setLevel(logging.ERROR)
 logging.getLogger("httpx").setLevel(logging.ERROR)
+logging.getLogger("ffmpeg").setLevel(logging.DEBUG)
 
 
 def LOGGER(name: str) -> logging.Logger:
