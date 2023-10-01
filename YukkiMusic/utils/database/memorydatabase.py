@@ -460,14 +460,12 @@ async def maintenance_on():
 
 # Audio Video Limit
 
-from pytgcalls.types.input_stream.quality import (VeryHighQualityAudio,
-                                                  VeryHighQualityVideo,
-                                                  HighQualityAudio,
-                                                  HighQualityVideo,
-                                                  LowQualityAudio,
-                                                  LowQualityVideo,
-                                                  MediumQualityAudio,
-                                                  MediumQualityVideo)
+from pytgcalls.types import (
+    AudioParameters, 
+    AudioQuality, 
+    VideoParameters, 
+    VideoQuality,
+)
 
 
 async def save_audio_bitrate(chat_id: int, bitrate: str):
@@ -481,7 +479,7 @@ async def save_video_bitrate(chat_id: int, bitrate: str):
 async def get_aud_bit_name(chat_id: int) -> str:
     mode = audio.get(chat_id)
     if not mode:
-        return "Very High"
+        return "STUDIO"
     return mode
 
 
@@ -489,38 +487,42 @@ async def get_vid_bit_name(chat_id: int) -> str:
     mode = video.get(chat_id)
     if not mode:
         if PRIVATE_BOT_MODE == str(True):
-            return "Very High"
+            return "FHD_1080p"
         else:
-            return "High"
+            return "HD_720p"
     return mode
 
 
 async def get_audio_bitrate(chat_id: int) -> str:
     mode = audio.get(chat_id)
     if not mode:
-        return VeryHighQualityAudio()
-    if str(mode) == "Very High":
-        return VeryHighQualityAudio()
-    elif str(mode) == "High":
-        return HighQualityAudio()
-    elif str(mode) == "Medium":
-        return MediumQualityAudio()
-    elif str(mode) == "Low":
-        return LowQualityAudio()
+        return AudioParameters.from_quality(AudioQuality.STUDIO)
+    if str(mode) == "STUDIO":
+        return AudioParameters.from_quality(AudioQuality.STUDIO)
+    elif str(mode) == "HIGH":
+        return AudioParameters.from_quality(AudioQuality.HIGH)
+    elif str(mode) == "MEDIUM":
+        return AudioParameters.from_quality(AudioQuality.MEDIUM)
+    elif str(mode) == "LOW":
+        return AudioParameters.from_quality(AudioQuality.LOW)
 
 
 async def get_video_bitrate(chat_id: int) -> str:
     mode = video.get(chat_id)
     if not mode:
         if PRIVATE_BOT_MODE == str(True):
-            return VeryHighQualityVideo()
+            return VideoParameters.from_quality(VideoQuality.FHD_1080p)
         else:
-            return HighQualityVideo()
-    if str(mode) == "Very High":
-        return VeryHighQualityVideo()
-    elif str(mode) == "High":
-        return HighQualityVideo()
-    elif str(mode) == "Medium":
-        return MediumQualityVideo()
-    elif str(mode) == "Low":
-        return LowQualityVideo()
+            return VideoParameters.from_quality(VideoQuality.HD_720p)
+    if str(mode) == "UHD_4K":
+        return VideoParameters.from_quality(VideoQuality.UHD_4K)
+    elif str(mode) == "QHD_2K":
+        return VideoParameters.from_quality(VideoQuality.QHD_2K)
+    elif str(mode) == "FHD_1080p":
+        return VideoParameters.from_quality(VideoQuality.FHD_1080p)
+    elif str(mode) == "HD_720p":
+        return VideoParameters.from_quality(VideoQuality.HD_720p)
+    elif str(mode) == "SD_480p":
+        return VideoParameters.from_quality(VideoQuality.SD_480p)
+    elif str(mode) == "SD_360p":
+        return VideoParameters.from_quality(VideoQuality.SD_360p)

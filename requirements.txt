@@ -12,7 +12,7 @@ ntgcalls
 pillow
 psutil
 pykeyboard
-py-tgcalls==1.0.0.dev5
+py-tgcalls==1.0.0.dev6
 pyrogram
 python-dotenv
 pyyaml
