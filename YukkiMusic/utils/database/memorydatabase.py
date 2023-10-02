@@ -464,7 +464,7 @@ from pytgcalls.types import (
     AudioParameters, 
     AudioQuality, 
     VideoParameters, 
-    VideoQuality,
+    VideoQuality
 )
 
 
