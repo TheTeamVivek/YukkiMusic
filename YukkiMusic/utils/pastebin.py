@@ -10,7 +10,7 @@
 
 import aiohttp
 
-BASE = "https://batbin.me/"
+BASE = "https://nekobin.com/"
 
 
 async def post(url: str, *args, **kwargs):

@@ -12,8 +12,6 @@ import os
 
 from config import autoclean
 
-
-
 async def auto_clean(popped):
     try:
         rem = popped["file"]
