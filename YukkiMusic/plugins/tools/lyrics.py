@@ -14,8 +14,11 @@ import string
 
 import lyricsgenius as lg
 from pyrogram import filters
-from pyrogram.types import (InlineKeyboardButton,
-                            InlineKeyboardMarkup, Message)
+from pyrogram.types import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup, 
+    Message,
+)
 
 from config import BANNED_USERS, lyrical
 from strings import get_command

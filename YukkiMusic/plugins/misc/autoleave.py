@@ -15,8 +15,11 @@ import config
 from pyrogram.enums import ChatType
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki, autoend
-from YukkiMusic.utils.database import (get_client, is_active_chat,
-                                       is_autoend)
+from YukkiMusic.utils.database import (
+    get_client, 
+    is_active_chat,
+    is_autoend,
+)
 
 
 async def auto_leave():
