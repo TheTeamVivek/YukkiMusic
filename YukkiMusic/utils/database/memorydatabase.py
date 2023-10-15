@@ -479,7 +479,7 @@ async def save_video_bitrate(chat_id: int, bitrate: str):
 async def get_aud_bit_name(chat_id: int) -> str:
     mode = audio.get(chat_id)
     if not mode:
-        return "STUDIO"
+        return "HIGH"
     return mode
 
 
@@ -487,7 +487,7 @@ async def get_vid_bit_name(chat_id: int) -> str:
     mode = video.get(chat_id)
     if not mode:
         if PRIVATE_BOT_MODE == str(True):
-            return "FHD_1080p"
+            return "HD_720p"
         else:
             return "HD_720p"
     return mode
