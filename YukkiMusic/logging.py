@@ -26,7 +26,7 @@ logging.basicConfig(
 )
 
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
-logging.getLogger("pytgcalls").setLevel(logging.INFO)
+logging.getLogger("pytgcalls").setLevel(logging.ERRORq1)
 logging.getLogger("ntgcalls").setLevel(logging.ERROR)
 logging.getLogger("httpx").setLevel(logging.ERROR)
 
