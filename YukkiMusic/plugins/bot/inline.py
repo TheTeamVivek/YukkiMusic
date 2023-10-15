@@ -8,11 +8,9 @@
 # All rights reserved.
 #
 
-from pyrogram.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    InlineQueryResultPhoto,
-)
+from pyrogram.types import (InlineKeyboardButton,
+                            InlineKeyboardMarkup,
+                            InlineQueryResultPhoto)
 from youtubesearchpython.__future__ import VideosSearch
 
 from config import BANNED_USERS, MUSIC_BOT_NAME

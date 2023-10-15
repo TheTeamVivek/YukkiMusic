@@ -22,11 +22,8 @@ from io import StringIO
 from time import time
 
 from pyrogram import filters
-from pyrogram.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup, 
-    Message,
-)
+from pyrogram.types import (InlineKeyboardButton,
+                            InlineKeyboardMarkup, Message)
 
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
