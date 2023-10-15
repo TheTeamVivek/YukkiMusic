@@ -22,4 +22,4 @@ spotipy
 tgcrypto
 youtube-search
 youtube-search-python
-yt-dlp
+yt-dlp==2023.10.7
