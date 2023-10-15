@@ -24,7 +24,7 @@ jobs:
       - name: lint with isort and black
         run: |
           isort .
-#          black --fast .
+          black .
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: 'pylint: auto fixes'
