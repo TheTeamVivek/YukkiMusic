@@ -582,7 +582,7 @@ class Call(PyTgCalls):
         @self.three.on_stream_end()
         @self.four.on_stream_end()
         @self.five.on_stream_end()
-        async def stream_end_handler1(client, update: Update):
+        async def stream_end_handler(client, update: Update):
             if not isinstance(update, StreamAudioEnded):
                 return
             await self.change_stream(client, update.chat_id)
