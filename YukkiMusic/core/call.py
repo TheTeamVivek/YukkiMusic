@@ -181,13 +181,13 @@ class Call(PyTgCalls):
                 file_path,
                 audio_parameters=audio_stream_quality,
                 video_parameters=video_stream_quality,
-                additional_ffmpeg_parameters=f"-ss {to_seek} -to {duration}",
+                additional_ffmpeg_parameters=f"-ss {to_seek} -atmid -to {duration}",
             )
             if mode == "video"
             else AudioPiped(
                 file_path,
                 audio_parameters=audio_stream_quality,
-                additional_ffmpeg_parameters=f"-ss {to_seek} -to {duration}",
+                additional_ffmpeg_parameters=f"-ss {to_seek} -atmid -to {duration}",
             )
         )
         await assistant.change_stream(chat_id, stream)
