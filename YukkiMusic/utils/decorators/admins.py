@@ -11,8 +11,9 @@
 from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from config import adminlist, SUDOERS
+from config import adminlist
 from strings import get_string
+from YukkiMusic.misc import SUDOERS
 from YukkiMusic import app
 from YukkiMusic.utils.database import (
     get_authuser_names,
