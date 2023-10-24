@@ -134,7 +134,7 @@ async def vardel_(client, message, _):
             return await message.reply_text(_["heroku_4"])
         else:
             await message.reply_text(_["heroku_7"].format(check_var))
-            os.system(f"kill -9 {os.getpid()} && bash start")
+            os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
 
 
 @app.on_message(filters.command(SETVAR_COMMAND) & SUDOERS)
@@ -163,7 +163,7 @@ async def set_var(client, message, _):
             await message.reply_text(_["heroku_9"].format(to_set))
         else:
             await message.reply_text(_["heroku_10"].format(to_set))
-        os.system(f"kill -9 {os.getpid()} && bash start")
+        os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
 
 
 @app.on_message(filters.command(USAGE_COMMAND) & SUDOERS)
@@ -319,7 +319,7 @@ async def update_(client, message, _):
             f"{nrs.text}\n\nBot was updated successfully! Now, wait for 1 - 2 mins until the bot reboots!"
         )
         os.system("pip3 install -r requirements.txt")
-        os.system(f"kill -9 {os.getpid()} && bash start")
+        os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
         exit()
 
 
@@ -349,4 +349,4 @@ async def restart_(_, message):
     await response.edit(
         "Reboot has been initiated successfully! Wait for 1 - 2 minutes until the bot restarts."
     )
-    os.system(f"kill -9 {os.getpid()} && bash start")
+    os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
