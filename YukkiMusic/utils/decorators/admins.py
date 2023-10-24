@@ -26,32 +26,32 @@ from YukkiMusic.utils.database import (
 )
 from YukkiMusic.utils.formatters import int_to_alpha
 
-def handle_maintenance_message(message):
+async def handle_maintenance_message(message):
     if not is_maintenance() and message.from_user.id not in SUDOERS:
         return message.reply_text("Bot is under maintenance. Please wait for some time...")
 
-def handle_command_deletion(message):
+async def handle_command_deletion(message):
     if is_commanddelete_on(message.chat.id):
         try:
             message.delete()
         except:
             pass
 
-def get_string_by_language(chat_id):
+async def get_string_by_language(chat_id):
     try:
         language = get_lang(chat_id)
         return get_string(language)
     except:
         return get_string("en")
 
-def handle_sender_chat(message):
+async def handle_sender_chat(message):
     if message.sender_chat:
         upl = InlineKeyboardMarkup([
             [InlineKeyboardButton(text="How to Fix this? ", callback_data="AnonymousAdmin")],
         ])
         return message.reply_text(get_string_by_language(message.chat.id)["general_4"], reply_markup=upl)
 
-def handle_cplay_command(message, chat_id):
+async def handle_cplay_command(message, chat_id):
     if message.command[0][0] == "c":
         chat_id = get_cmode(message.chat.id)
         if chat_id is None:
@@ -62,7 +62,7 @@ def handle_cplay_command(message, chat_id):
             return message.reply_text(get_string_by_language(message.chat.id)["cplay_4"])
     return chat_id
 
-def is_admin(user_id, chat_id):
+async def is_admin(user_id, chat_id):
     is_non_admin = is_nonadmin_chat(chat_id)
     if not is_non_admin:
         if user_id not in SUDOERS:
