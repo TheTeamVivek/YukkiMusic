@@ -22,8 +22,11 @@ from io import StringIO
 from time import time
 
 from pyrogram import filters
-from pyrogram.types import (InlineKeyboardButton,
-                            InlineKeyboardMarkup, Message)
+from pyrogram.types import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+)
 
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
@@ -52,7 +55,7 @@ async def edit_or_reply(msg: Message, **kwargs):
 async def executor(client, message):
     if len(message.command) < 2:
         return await edit_or_reply(
-            message, text="__Nigga Give me some command to execute.__"
+            message, text="__Nigga, give me some command to execute.__"
         )
     try:
         cmd = message.text.split(" ", maxsplit=1)[1]
@@ -92,7 +95,7 @@ async def executor(client, message):
                 [
                     InlineKeyboardButton(
                         text="⏳",
-                        callback_data=f"runtime {t2-t1} Seconds",
+                        callback_data=f"runtime {t2 - t1} Seconds",
                     )
                 ]
             ]
@@ -112,7 +115,7 @@ async def executor(client, message):
                 [
                     InlineKeyboardButton(
                         text="⏳",
-                        callback_data=f"runtime {round(t2-t1, 3)} Seconds",
+                        callback_data=f"runtime {round(t2 - t1, 3)} Seconds",
                     ),
                     InlineKeyboardButton(
                         text="🗑",
@@ -181,7 +184,7 @@ async def shellrunner(client, message):
                 await edit_or_reply(
                     message, text=f"**ERROR:**\n```{err}```"
                 )
-            output += f"**{code}**\n"
+            output += f"**{x}**\n"
             output += process.stdout.read()[:-1].decode("utf-8")
             output += "\n"
     else:
