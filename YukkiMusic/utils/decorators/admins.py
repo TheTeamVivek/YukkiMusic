@@ -112,19 +112,19 @@ def AdminActual(mystic):
             )
         if message.from_user.id not in SUDOERS and message.from_user.id not in OWNER_ID:
             try:
-                member = (
-                    await app.get_chat_member(
-                        message.chat.id, message.from_user.id
-                    )
-                )
-                if member and not member.privileges.can_manage_video_chats:
-                    return await message.reply(_["general_5"])
+                member = await app.get_chat_member(message.chat.id, message.from_user.id)
+                if member:
+                    if member.can_manage_video_chats:
+                        return await mystic(client, message, _)
+                    else:
+                        return await message.reply(_["general_5"])
+                else:
+                    return await message.reply("You are not a member of this chat.")
             except Exception as e:
                 return await message.reply(f"Error: {str(e)}")
-        return await mystic(client, message, _)
-
-    return wrapper
-
+        else:
+            return await mystic(client, message, _)
+          
 def ActualAdminCB(mystic):
     async def wrapper(client, CallbackQuery):
         if await is_maintenance() is False:
