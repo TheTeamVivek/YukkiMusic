@@ -114,9 +114,9 @@ def AdminActual(mystic):
             member = (
                 await app.get_chat_member(message.chat.id, message.from_user.id)
             ).privileges
-        except:
-            return
+        except AttributeError as e:
             
+            return await message.reply(_["general_5"])
         if not member.can_manage_video_chats:
             return await message.reply(_["general_5"])
         return await mystic(client, message, _)
@@ -149,7 +149,8 @@ def ActualAdminCB(mystic):
                         CallbackQuery.from_user.id,
                     )
                 ).privileges
-            except:
+            except AttributeError as e:
+                
                 return await CallbackQuery.answer(_["general_4"], show_alert=True)
             if not a.can_manage_video_chats:
                 if CallbackQuery.from_user.id not in SUDOERS:
