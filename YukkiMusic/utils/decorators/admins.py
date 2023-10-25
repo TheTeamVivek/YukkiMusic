@@ -8,19 +8,14 @@
 # All rights reserved.
 #
 
+# Import the necessary modules and variables
 from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-
-from config import adminlist, OWNER_ID
+from config import adminlist, OWNER_ID, SUDOERS
 from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import (get_authuser_names, get_cmode,
-                                   get_lang, is_active_chat,
-                                   is_commanddelete_on,
-                                   is_maintenance,
-                                   is_nonadmin_chat)
-
+from YukkiMusic.utils.database import (get_authuser_names, get_cmode, get_lang, is_active_chat, is_commanddelete_on, is_maintenance, is_nonadmin_chat)
 from ..formatters import int_to_alpha
 
 def AdminRightsCheck(mystic):
@@ -110,15 +105,17 @@ def AdminActual(mystic):
             return await message.reply_text(
                 _["general_4"], reply_markup=upl
             )
-        try:
-            member = (
-                await app.get_chat_member(message.chat.id, message.from_user.id)
-            ).privileges
-        except AttributeError as e:
-            
-            return await message.reply(_["general_5"])
-        if not member.can_manage_video_chats:
-            return await message.reply(_["general_5"])
+        if message.from_user.id not in SUDOERS and message.from_user.id not in OWNER_ID:
+            try:
+                member = (
+                    await app.get_chat_member(
+                        message.chat.id, message.from_user.id
+                    )
+                )
+                if member and not member.privileges.can_manage_video_chats:
+                    return await message.reply(_["general_5"])
+            except Exception as e:
+                return await message.reply(f"Error: {str(e)}")
         return await mystic(client, message, _)
 
     return wrapper
@@ -148,22 +145,24 @@ def ActualAdminCB(mystic):
                         CallbackQuery.message.chat.id,
                         CallbackQuery.from_user.id,
                     )
-                ).privileges
-            except AttributeError as e:
-                
-                return await CallbackQuery.answer(_["general_4"], show_alert=True)
-            if not a.can_manage_video_chats:
-                if CallbackQuery.from_user.id not in SUDOERS:
-                    token = await int_to_alpha(CallbackQuery.from_user.id)
-                    _check = await get_authuser_names(CallbackQuery.from_user.id)
-                    if token not in _check:
-                        try:
+                )
+                if a and not a.privileges.can_manage_video_chats:
+                    if CallbackQuery.from_user.id not in SUDOERS and CallbackQuery.from_user.id not in OWNER_ID:
+                        token = await int_to_alpha(
+                            CallbackQuery.from_user.id
+                        )
+                        _check = await get_authuser_names(
+                            CallbackQuery.from_user.id
+                        )
+                        if token not in _check:
                             return await CallbackQuery.answer(
-                                _["general_4"],
+                                _["general_5"],
                                 show_alert=True,
                             )
-                        except:
-                            return
+                elif a is None:
+                    return await CallbackQuery.answer("You are not a member of this chat.")
+            except Exception as e:
+                return await CallbackQuery.answer(f"Error: {str(e)}")
         return await mystic(client, CallbackQuery, _)
 
     return wrapper
