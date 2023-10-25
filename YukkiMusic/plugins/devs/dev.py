@@ -46,6 +46,12 @@ async def edit_or_reply(msg: Message, **kwargs):
     await func(**{k: v for k, v in kwargs.items() if k in spec})
 
 
+@app.on_edited_message(
+    filters.command("eval")
+    & SUDOERS
+    & ~filters.forwarded
+    & ~filters.via_bot
+)
 @app.on_message(
     filters.command("eval")
     & SUDOERS
@@ -154,6 +160,12 @@ async def forceclose_command(_, CallbackQuery):
         return
 
 
+@app.on_edited_message(
+    filters.command("sh")
+    & SUDOERS
+    & ~filters.forwarded
+    & ~filters.via_bot
+)
 @app.on_message(
     filters.command("sh")
     & SUDOERS

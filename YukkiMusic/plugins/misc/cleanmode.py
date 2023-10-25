@@ -12,7 +12,7 @@ import asyncio
 from datetime import datetime, timedelta
 
 from pyrogram import filters
-from pyrogram.enums import ChatMembersFilter
+from pyrogram.enums import ChatMembersFilter, ChatMemberStatus
 from pyrogram.errors import FloodWait
 from pyrogram.raw import types
 
@@ -271,7 +271,7 @@ async def auto_clean():
                         )
                     )
                     async for user in admins:
-                        if user.privileges.can_manage_video_chats:
+                        if user.status == ChatMemberStatus.ADMINISTRATOR:
                             adminlist[chat_id].append(user.user.id)
                     authusers = await get_authuser_names(chat_id)
                     for user in authusers:

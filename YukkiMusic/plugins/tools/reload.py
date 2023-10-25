@@ -11,7 +11,7 @@
 import asyncio
 
 from pyrogram import filters
-from pyrogram.enums import ChatMembersFilter
+from pyrogram.enums import ChatMembersFilter, ChatMemberStatus
 from pyrogram.types import CallbackQuery, Message
 
 from config import BANNED_USERS, MUSIC_BOT_NAME, adminlist, lyrical
@@ -44,7 +44,7 @@ async def reload_admin_cache(client, message: Message, _):
         authusers = await get_authuser_names(chat_id)
         adminlist[chat_id] = []
         async for user in admins:
-            if user.privileges.can_manage_video_chats:
+            if user.status == ChatMemberStatus.ADMINISTRATOR:
                 adminlist[chat_id].append(user.user.id)
         for user in authusers:
             user_id = await alpha_to_int(user)
