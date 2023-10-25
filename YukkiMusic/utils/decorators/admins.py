@@ -8,10 +8,9 @@
 # All rights reserved.
 #
 
-# Import the necessary modules and variables
 from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from config import adminlist, OWNER_ID, SUDOERS
+from config import adminlist, OWNER_ID
 from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
