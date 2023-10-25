@@ -111,13 +111,14 @@ def AdminActual(mystic):
                 _["general_4"], reply_markup=upl
             )
         try:
-                member = (
-                    await app.get_chat_member(message.chat.id, message.from_user.id)
-                ).privileges
-            except:
-                return
-            if not member.can_manage_video_chats:
-                return await message.reply(_["general_5"])
+            member = (
+                await app.get_chat_member(message.chat.id, message.from_user.id)
+            ).privileges
+        except:
+            return
+            
+        if not member.can_manage_video_chats:
+            return await message.reply(_["general_5"])
         return await mystic(client, message, _)
 
     return wrapper
