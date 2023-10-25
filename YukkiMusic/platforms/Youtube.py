@@ -152,7 +152,7 @@ class YouTubeAPI:
             "yt-dlp",
             "-g",
             "-f",
-            "bestvideo",
+            "bestvideo/best",
             f"{link}",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
