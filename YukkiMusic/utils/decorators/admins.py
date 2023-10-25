@@ -8,19 +8,27 @@
 # All rights reserved.
 #
 
-from pyrogram.enums import ChatType
+from pyrogram.enums import ChatType, ChatMemberStatus
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from config import adminlist, OWNER_ID
+from config import adminlist
 from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import (get_authuser_names, get_cmode, get_lang, is_active_chat, is_commanddelete_on, is_maintenance, is_nonadmin_chat)
+from YukkiMusic.utils.database import (
+    get_authuser_names, 
+    get_cmode, 
+    get_lang, 
+    is_active_chat, 
+    is_commanddelete_on, 
+    is_maintenance, 
+    is_nonadmin_chat,
+)
 from ..formatters import int_to_alpha
 
 def AdminRightsCheck(mystic):
     async def wrapper(client, message):
         if await is_maintenance() is False:
-            if message.from_user.id not in SUDOERS and message.from_user.id not in OWNER_ID:
+            if message.from_user.id not in SUDOERS:
                 return await message.reply_text(
                     "Bot is under maintenance. Please wait for some time..."
                 )
@@ -62,7 +70,7 @@ def AdminRightsCheck(mystic):
             return await message.reply_text(_["general_6"])
         is_non_admin = await is_nonadmin_chat(message.chat.id)
         if not is_non_admin:
-            if message.from_user.id not in SUDOERS and message.from_user.id not in OWNER_ID:
+            if message.from_user.id not in SUDOERS:
                 admins = adminlist.get(message.chat.id)
                 if not admins:
                     return await message.reply_text(_["admin_18"])
@@ -76,7 +84,7 @@ def AdminRightsCheck(mystic):
 def AdminActual(mystic):
     async def wrapper(client, message):
         if await is_maintenance() is False:
-            if message.from_user.id not in SUDOERS and message.from_user.id not in OWNER_ID:
+            if message.from_user.id not in SUDOERS:
                 return await message.reply_text(
                     "Bot is under maintenance. Please wait for some time..."
                 )
@@ -104,14 +112,14 @@ def AdminActual(mystic):
             return await message.reply_text(
                 _["general_4"], reply_markup=upl
             )
-        if message.from_user.id not in SUDOERS and message.from_user.id not in OWNER_ID:
+        if message.from_user.id not in SUDOERS:
             try:
                 member = (
                     await app.get_chat_member(
                         message.chat.id, message.from_user.id
                     )
                 )
-                if member and not member.privileges.can_manage_video_chats:
+                if not member.status == ChatMemberStatus.ADMINISTRATOR:
                     return await message.reply(_["general_5"])
             except Exception as e:
                 return await message.reply(f"Error: {str(e)}")
@@ -122,7 +130,7 @@ def AdminActual(mystic):
 def ActualAdminCB(mystic):
     async def wrapper(client, CallbackQuery):
         if await is_maintenance() is False:
-            if CallbackQuery.from_user.id not in SUDOERS and CallbackQuery.from_user.id not in OWNER_ID:
+            if CallbackQuery.from_user.id not in SUDOERS:
                 return await CallbackQuery.answer(
                     "Bot is under maintenance. Please wait for some time...",
                     show_alert=True,
@@ -145,8 +153,8 @@ def ActualAdminCB(mystic):
                         CallbackQuery.from_user.id,
                     )
                 )
-                if a and not a.privileges.can_manage_video_chats:
-                    if CallbackQuery.from_user.id not in SUDOERS and CallbackQuery.from_user.id not in OWNER_ID:
+                if not a.status == ChatMemberStatus.ADMINISTRATOR:
+                    if CallbackQuery.from_user.id not in SUDOERS:
                         token = await int_to_alpha(
                             CallbackQuery.from_user.id
                         )
