@@ -13,7 +13,7 @@ pillow
 psutil
 pykeyboard
 py-tgcalls
-pyrogram
+git+https://github.com/PyrogramMod/PyrogramMod/archive/refs/heads/main.zip
 python-dotenv
 pyyaml
 requests
