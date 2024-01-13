@@ -89,8 +89,9 @@ async def settings_back_markup(
 ):
     try:
         await CallbackQuery.answer()
-    except:
-        pass
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
     if CallbackQuery.message.chat.type == ChatType.PRIVATE:
         try:
             await app.resolve_peer(OWNER_ID[0])
@@ -98,15 +99,21 @@ async def settings_back_markup(
         except:
             OWNER = None
         buttons = private_panel(_, app.username, OWNER)
-        return await CallbackQuery.edit_message_text(
-            _["start_2"].format(MUSIC_BOT_NAME),
-            reply_markup=InlineKeyboardMarkup(buttons),
-        )
+        try:
+            await CallbackQuery.edit_message_text(
+                _["start_2"].format(MUSIC_BOT_NAME),
+                reply_markup=InlineKeyboardMarkup(buttons),
+            )
+        except MessageNotModified:
+            pass
     else:
         buttons = setting_markup(_)
-        return await CallbackQuery.edit_message_reply_markup(
-            reply_markup=InlineKeyboardMarkup(buttons)
-        )
+        try:
+            await CallbackQuery.edit_message_reply_markup(
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+        except MessageNotModified:
+            pass
 
 
 ## Audio and Video Quality
