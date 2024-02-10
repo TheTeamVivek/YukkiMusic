@@ -461,10 +461,8 @@ async def maintenance_on():
 # Audio Video Limit
 
 from pytgcalls.types import (
-    AudioParameters, 
-    AudioQuality, 
-    VideoParameters, 
-    VideoQuality
+    AudioQuality,
+    VideoQuality,
 )
 
 
@@ -496,33 +494,33 @@ async def get_vid_bit_name(chat_id: int) -> str:
 async def get_audio_bitrate(chat_id: int) -> str:
     mode = audio.get(chat_id)
     if not mode:
-        return AudioParameters.from_quality(AudioQuality.STUDIO)
+        return AudioQuality.STUDIO
     if str(mode) == "STUDIO":
-        return AudioParameters.from_quality(AudioQuality.STUDIO)
+        return AudioQuality.STUDIO
     elif str(mode) == "HIGH":
-        return AudioParameters.from_quality(AudioQuality.HIGH)
+        return AudioQuality.HIGH
     elif str(mode) == "MEDIUM":
-        return AudioParameters.from_quality(AudioQuality.MEDIUM)
+        return AudioQuality.MEDIUM
     elif str(mode) == "LOW":
-        return AudioParameters.from_quality(AudioQuality.LOW)
+        return AudioQuality.LOW
 
 
 async def get_video_bitrate(chat_id: int) -> str:
     mode = video.get(chat_id)
     if not mode:
         if PRIVATE_BOT_MODE == str(True):
-            return VideoParameters.from_quality(VideoQuality.FHD_1080p)
+            return VideoQuality.FHD_1080p
         else:
-            return VideoParameters.from_quality(VideoQuality.HD_720p)
+            return VideoQuality.HD_720p
     if str(mode) == "UHD_4K":
-        return VideoParameters.from_quality(VideoQuality.UHD_4K)
+        return VideoQuality.UHD_4K
     elif str(mode) == "QHD_2K":
-        return VideoParameters.from_quality(VideoQuality.QHD_2K)
+        return VideoQuality.QHD_2K
     elif str(mode) == "FHD_1080p":
-        return VideoParameters.from_quality(VideoQuality.FHD_1080p)
+        return VideoQuality.FHD_1080p
     elif str(mode) == "HD_720p":
-        return VideoParameters.from_quality(VideoQuality.HD_720p)
+        return VideoQuality.HD_720p
     elif str(mode) == "SD_480p":
-        return VideoParameters.from_quality(VideoQuality.SD_480p)
+        return VideoQuality.SD_480p
     elif str(mode) == "SD_360p":
-        return VideoParameters.from_quality(VideoQuality.SD_360p)
+        return VideoQuality.SD_360p

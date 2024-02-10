@@ -12,7 +12,7 @@ import asyncio
 from datetime import datetime, timedelta
 
 from pyrogram import filters
-from pyrogram.enums import ChatMembersFilter, ChatMemberStatus
+from pyrogram.enums import ChatMembersFilter
 from pyrogram.errors import FloodWait
 from pyrogram.raw import types
 
@@ -103,7 +103,7 @@ async def braodcast_message(client, message, _):
         for chat in schats:
             chats.append(int(chat["chat_id"]))
         for i in chats:
-            if i == -1001764725348:
+            if i == config.LOG_GROUP_ID:
                 continue
             try:
                 m = (
@@ -173,7 +173,7 @@ async def braodcast_message(client, message, _):
             sent = 0
             client = await get_client(num)
             async for dialog in client.get_dialogs():
-                if dialog.chat.id == -1001764725348:
+                if dialog.chat.id == config.LOG_GROUP_ID:
                     continue
                 try:
                     await client.forward_messages(
@@ -271,7 +271,7 @@ async def auto_clean():
                         )
                     )
                     async for user in admins:
-                        if user.status == ChatMemberStatus.ADMINISTRATOR:
+                        if not user.privileges.can_manage_video_chats:
                             adminlist[chat_id].append(user.user.id)
                     authusers = await get_authuser_names(chat_id)
                     for user in authusers:
