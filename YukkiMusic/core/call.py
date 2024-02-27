@@ -181,13 +181,13 @@ class Call(PyTgCalls):
                 file_path,
                 audio_parameters=audio_stream_quality,
                 video_parameters=video_stream_quality,
-                additional_ffmpeg_parameters=f"-ss {to_seek} -t {duration}",
+                ffmpeg_parameters=f"-ss {to_seek} -t {duration}",
             )
             if mode == "video"
             else MediaStream(
                 file_path,
                 audio_parameters=audio_stream_quality,
-                additional_ffmpeg_parameters=f"-ss {to_seek} -t {duration}",
+                ffmpeg_parameters=f"-ss {to_seek} -t {duration}",
             )
         )
         await assistant.change_stream(chat_id, stream)
@@ -210,7 +210,7 @@ class Call(PyTgCalls):
                 get = await app.get_chat_member(chat_id, userbot.id)
             except ChatAdminRequired:
                 raise AssistantErr(_["call_1"])
-            if get.status == ChatMemberStatus.BANNED or get.status == ChatMemberStatus.LEFT:
+            if get.status == ChatMemberStatus.BANNED or get.status == ChatMemberStatus.RESTRICTED:
                 raise AssistantErr(
                     _["call_2"].format(userbot.username, userbot.id)
                 )
