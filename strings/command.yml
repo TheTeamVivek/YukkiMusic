@@ -51,7 +51,7 @@ SKIP_COMMAND : ["skip", "cskip"]
 SHUFFLE_COMMAND : ["shuffle", "cshuffle"]
 LOOP_COMMAND : ["loop", "cloop"]
 SEEK_COMMAND : ["seek", "cseek", "seekback", "cseekback"]
-RESTART_COMMAND : ["restart"]
+RESTART_COMMAND : ["reboot"]
 
 # Sudo Users Commaands
 
