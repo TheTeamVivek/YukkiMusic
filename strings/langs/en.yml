@@ -247,36 +247,36 @@ stream_4 : "📡 **Started Streaming** 💡\n\n**🏷Title:** [{0}]({1})\n⌛️
 # Inline Buttons
 
 #General Buttons
-CLOSE_BUTTON  : "🗑 Close"
-CLOSEMENU_BUTTON  : "🗑 Close Menu"
-BACK_BUTTON : "⬅ Back"
-UNBAN_BUTTON : "🗑 Unban Assistant"
+CLOSE_BUTTON  : "🗑 ᴄʟᴏsᴇ"
+CLOSEMENU_BUTTON  : "🗑 ᴄʟᴏsᴇ ᴍᴇɴᴜ"
+BACK_BUTTON : "⬅ ʙᴀᴄᴋ"
+UNBAN_BUTTON : "🗑 ᴜɴʙᴀɴ ᴀssɪsᴛᴀɴᴛ"
 
 #Lyrics
-L_B_1 : "🚀 Checkout Lyrics Now"
+L_B_1 : "🚀 ᴄʜᴇᴄᴋᴏᴜᴛ ʟʏʀɪᴄs ɴᴏᴡ"
 
 # Start
-S_B_1 : "🗒 Commands"
-S_B_2 : "🔧 Settings"
-S_B_3 : "📨 Support"
-S_B_4 : "📨 Channel"
-S_B_5 : "✚ Add me to your Group"
-S_B_6 : "💡 Git Repo"
-S_B_7 : "👤 Bot Owner"
-S_B_8 : "🔎 How to Use? Commands Menu."
+S_B_1 : "🗒 Cᴏᴍᴍᴀɴᴅs"
+S_B_2 : "🔧 Sᴇᴛᴛɪɴɢs"
+S_B_3 : "📨 Sᴜᴘᴘᴏʀᴛ"
+S_B_4 : "📨 Cʜᴀɴɴᴇʟ"
+S_B_5 : "✚ Aᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ ✚"
+S_B_6 : "💡 Gɪᴛ ʀᴇᴘᴏ"
+S_B_7 : "👤 Dᴇᴠᴇʟᴏᴘᴇʀ"
+S_B_8 : "🔎 Hᴏᴡ Tᴏ Usᴇ? Cᴏᴍᴍᴀɴᴅ Mᴇɴᴜ"
 
 #Help 
-H_B_1 : "Admin Commands"
-H_B_2 : "Play Commands"
-H_B_3 : "Bot Commands"
-H_B_4 : "Extra Commands"
-H_B_5 : "Close Menu"
-H_B_6 : "SudoUser Commands"
+H_B_1 : "Aᴅᴍɪᴍ Cᴏᴍᴍᴀɴᴅs"
+H_B_2 : "Pʟᴀʏ Cᴏᴍᴍᴀɴᴅs"
+H_B_3 : "Bᴏᴛ Cᴏᴍᴍᴀɴᴅs"
+H_B_4 : "Exᴛʀᴀ Cᴏᴍᴍᴀɴᴅs"
+H_B_5 : "Cʟᴏsᴇ Mᴇɴᴜ"
+H_B_6 : "Dᴇᴠ Cᴏᴍᴍᴀɴᴅs"
 
 #PlayMode
-PM_B_1 : "DirectPlay"
-PM_B_2 : "InlineMarkup"
-PM_B_3 : "ChannelPlay"
+PM_B_1 : "Dɪʀᴇᴄᴛ Pʟᴀʏ"
+PM_B_2 : "IɴʟɪɴᴇMᴀʀᴋᴜᴘ"
+PM_B_3 : "CʜᴀɴɴᴇʟPʟᴀʏ"
 
 #Play
 P_B_1 : "🎵 Play Audio"
