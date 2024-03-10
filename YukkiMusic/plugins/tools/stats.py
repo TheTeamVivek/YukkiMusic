@@ -141,7 +141,7 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
         pass
     mystic = await CallbackQuery.edit_message_text(
         _["gstats_3"].format(
-            f"of {CallbackQuery.message.chat.title}"
+            f"ᴏғ {CallbackQuery.message.chat.title}"
             if what == "Here"
             else what
         )
