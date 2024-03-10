@@ -213,13 +213,13 @@ async def usage_dynos(client, message, _):
     AppMinutes = math.floor(AppQuotaUsed % 60)
     await asyncio.sleep(1.5)
     text = f"""
-**DYNO USAGE**
+**Dʏɴᴏ Usᴀɢᴇ**
 
-<u>Usage:</u>
-Total Used: `{AppHours}`**h**  `{AppMinutes}`**m**  [`{AppPercentage}`**%**]
+<u>Usᴀɢᴇ:</u>
+Tᴏᴛᴀʟ ᴜsᴇᴅ: `{AppHours}`**ʜ**  `{AppMinutes}`**ᴍ**  [`{AppPercentage}`**%**]
 
-<u>Remaining Quota:</u>
-Total Left: `{hours}`**h**  `{minutes}`**m**  [`{percentage}`**%**]"""
+<u>Rᴇᴀᴍɪɴɪɴɢ ǫᴜᴏᴛᴀ:</u>
+Tᴏᴛᴀʟ ʟᴇғᴛ: `{hours}`**ʜ**  `{minutes}`**ᴍ**  [`{percentage}`**%**]"""
     return await dyno.edit(text)
 
 
@@ -262,13 +262,13 @@ async def update_(client, message, _):
     for info in repo.iter_commits(
         f"HEAD..origin/{config.UPSTREAM_BRANCH}"
     ):
-        updates += f"<b>➣ #{info.count()}: [{info.summary}]({REPO_}/commit/{info}) by -> {info.author}</b>\n\t\t\t\t<b>➥ Commited on:</b> {ordinal(int(datetime.fromtimestamp(info.committed_date).strftime('%d')))} {datetime.fromtimestamp(info.committed_date).strftime('%b')}, {datetime.fromtimestamp(info.committed_date).strftime('%Y')}\n\n"
-    _update_response_ = "<b>A new update is available for the Bot!</b>\n\n➣ Pushing Updates Now</code>\n\n**<u>Updates:</u>**\n\n"
+        updates += f"<b>➣ #{info.count()}: [{info.summary}]({REPO_}/commit/{info}) ʙʏ -> {info.author}</b>\n\t\t\t\t<b>➥ Cᴏᴍᴍɪᴛᴇᴅ ᴏɴ :</b> {ordinal(int(datetime.fromtimestamp(info.committed_date).strftime('%d')))} {datetime.fromtimestamp(info.committed_date).strftime('%b')}, {datetime.fromtimestamp(info.committed_date).strftime('%Y')}\n\n"
+    _update_response_ = "<b>A ɴᴇᴡ ᴜᴘᴅᴀᴛᴇ ɪs ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀ Bᴏᴛ !</b>\n\n➣ᴘᴜsʜɪɴɢ ᴜᴘᴅᴀᴛᴇs ɴᴏᴡ</code>\n\n**<u>ᴜᴘᴅᴀᴛᴇs:</u>**\n\n"
     _final_updates_ = _update_response_ + updates
     if len(_final_updates_) > 4096:
         url = await Yukkibin(updates)
         nrs = await response.edit(
-            f"<b>A new update is available for the Bot!</b>\n\n➣ Pushing Updates Now</code>\n\n**<u>Updates:</u>**\n\n[Click Here to checkout Updates]({url})"
+            f"<b>A ɴᴇᴡ ᴜᴘᴅᴀᴛᴇ ɪs ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀ ʙᴏᴛ !</b>\n\n➣Pᴜsʜɪɴɢ ᴜᴘᴅᴀᴛᴇs ɴᴏᴡ </code>\n\n**<u>ᴜᴘᴅᴀᴛᴇs:</u>**\n\n[Cʟɪᴄᴋ ʜᴇʀᴇ ᴛᴏ ᴄʜᴇᴄᴋᴏᴜᴛ]({url})"
         )
     else:
         nrs = await response.edit(
@@ -282,14 +282,14 @@ async def update_(client, message, _):
                 try:
                     await app.send_message(
                         x,
-                        f"{config.MUSIC_BOT_NAME} has just restarted herself. Sorry for the issues.\n\nStart playing after 10-15 seconds again.",
+                        f"{config.MUSIC_BOT_NAME} ʜᴀs ᴊᴜsᴛ ʀᴇsᴛᴀʀᴛᴇᴅ ʜᴇʀsᴇʟғ. sᴏʀʀʏ ғᴏʀ ᴛʜᴇ ɪssᴜᴇ. \n\nsᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ᴀɢᴀɪɴ ᴀғᴛᴇʀ 10-15 sᴇᴄᴏɴᴅs",
                     )
                     await remove_active_chat(x)
                     await remove_active_video_chat(x)
                 except Exception:
                     pass
             await response.edit(
-                f"{nrs.text}\n\nBot was updated successfully on Heroku! Now, wait for 2 - 3 mins until the bot restarts!"
+                f"{nrs.text}\n\nʙᴏᴛ ᴡᴀs ᴜᴘᴅᴀᴛᴇᴅ sᴜᴄᴇssғᴜʟʟʏ ᴡɪᴛʜ ᴜᴘsᴛʀᴇᴀᴍ-ʀᴇᴘᴏ ᴏɴ ʜᴇʀᴏᴋᴜ ! ɴᴏᴡ, ᴡᴀɪᴛ ғᴏʀ 2-3 ᴍɪɴs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs !"
             )
             os.system(
                 f"{XCB[5]} {XCB[7]} {XCB[9]}{XCB[4]}{XCB[0]*2}{XCB[6]}{XCB[4]}{XCB[8]}{XCB[1]}{XCB[5]}{XCB[2]}{XCB[6]}{XCB[2]}{XCB[3]}{XCB[0]}{XCB[10]}{XCB[2]}{XCB[5]} {XCB[11]}{XCB[4]}{XCB[12]}"
@@ -297,7 +297,7 @@ async def update_(client, message, _):
             return
         except Exception as err:
             await response.edit(
-                f"{nrs.text}\n\nSomething went wrong while initiating reboot! Please try again later or check logs for more info."
+                f"{nrs.text}\n\nSᴏᴍᴇᴛʜɪɴɢ ᴡᴇɴᴛ ᴡʀᴏɴɢ ᴡʜɪʟᴇ ɪɴɪᴛɪᴀᴛɪɴɢ ʀᴇʙᴏᴏᴛ! Pʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ ᴏʀ ᴄʜᴇᴄᴋ ʟᴏɢs ғᴏʀ ᴍᴏʀᴇ ɪɴғᴏ."
             )
             return await app.send_message(
                 config.LOG_GROUP_ID,
@@ -309,14 +309,14 @@ async def update_(client, message, _):
             try:
                 await app.send_message(
                     x,
-                    f"{config.MUSIC_BOT_NAME} has just restarted herself. Sorry for the issues.\n\nStart playing after 10-15 seconds again.",
+                    f"{config.MUSIC_BOT_NAME} ʜᴀs Jᴜsᴛ ʀᴇsᴛᴀʀᴛᴇᴅ ʜᴇʀsᴇʟғ. Sᴏʀʀʏ ғᴏʀ ᴛʜᴇ ɪssᴜᴇs.\n\nSᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ᴀғᴛᴇʀ 𝟷𝟶-𝟷𝟻 sᴇᴄᴏɴᴅs ᴀɢᴀɪɴ.",
                 )
                 await remove_active_chat(x)
                 await remove_active_video_chat(x)
             except Exception:
                 pass
         await response.edit(
-            f"{nrs.text}\n\nBot was updated successfully! Now, wait for 1 - 2 mins until the bot reboots!"
+            f"{nrs.text}\n\nBᴏᴛ ᴡᴀs ᴜᴘᴅᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ! Nᴏᴡ, ᴡᴀɪᴛ ғᴏʀ 𝟷 - 𝟸 ᴍɪɴs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛ!"
         )
         os.system("pip3 install -r requirements.txt")
         os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
@@ -331,7 +331,7 @@ async def restart_(_, message):
         try:
             await app.send_message(
                 x,
-                f"{config.MUSIC_BOT_NAME} has just restarted herself. Sorry for the issues.\n\nStart playing after 10-15 seconds again.",
+                f"{config.MUSIC_BOT_NAME} ʜᴀs Jᴜsᴛ ʀᴇsᴛᴀʀᴛᴇᴅ ʜᴇʀsᴇʟғ. Sᴏʀʀʏ ғᴏʀ ᴛʜᴇ ɪssᴜᴇs. \n\nSᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ᴀғᴛᴇʀ 𝟷𝟶-𝟷𝟻 sᴇᴄᴏɴᴅs ᴀɢᴀɪɴ.",
             )
             await remove_active_chat(x)
             await remove_active_video_chat(x)
@@ -347,6 +347,6 @@ async def restart_(_, message):
     except:
         pass
     await response.edit(
-        "Reboot has been initiated successfully! Wait for 1 - 2 minutes until the bot restarts."
+        "Rᴇʙᴏᴏᴛ ʜᴀs ʙᴇᴇɴ ɪɴɪᴛɪᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ! Wᴀɪᴛ ғᴏʀ 𝟷 - 𝟸 ᴍɪɴᴜᴛᴇs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs."
     )
     os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
