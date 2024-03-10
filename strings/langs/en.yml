@@ -23,17 +23,18 @@ tg_1 : ʙᴏᴛ ɪs **ᴏᴠᴇʀʟᴏᴀᴅᴇᴅ** ᴡɪᴛʜ ʙʏ ᴅᴏᴡɴ
 tg_2 : "Fᴀɪʟᴇᴅ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ ᴛʜᴇ ᴍᴇᴅɪᴀ ғʀᴏᴍ ᴛᴇʟᴇɢʀᴀᴍ."
 
 # Core - Call.py
-call_1 : "Bot requires **Admin** Permission to invite assistant account to your channel."
-call_2 : "Assistant is banned in your group or channel, please unban.\n\n**Assistant Username:** @{0}\n**Assistant ID:** {1}"
-call_3 : "Exception Occured While Inviting Assistant Account to your chat.\n\n**Reason**: {0}"
-call_4 : "Bot requires **Invite Users Via Link** Permission to invite assistant account to your chat group."
-call_5 : "Assistant Account will be joining in 5 Seconds..Please Wait!"
-call_6 : "Assistant Account[{0}] Joined Successfully.\n\nStarting Music Now"
-call_7 : "**Harmful Admin Right Given **\n\nPlease remove **BAN USERS** rights from the bot."
-call_8 : "**Harmful Admin Right Given **\n\nPlease remove **ADD NEW ADMINS** rights from the bot."
-call_9 : "**Failed to switch Stream**\nPlease use /skip to change track again."
-call_10 : "Downloading Next Track from Playlist"
-call_11 : "Please add @{0} to your channel[ ID: {1}].\n\nBot is not able to get channel details."
+call_1 : "Bᴏᴛ ʀᴇǫᴜɪʀᴇs ** Aᴅᴍɪɴ's  Pᴇʀᴍɪssɪᴏɴ** ᴛᴏ ɪɴᴠɪᴛᴇ ᴀssɪsᴛᴀɴᴛ ᴀᴄᴄᴏᴜɴᴛ ᴛᴏ ʏᴏᴜʀ ᴄʜᴀɴɴᴇʟ."
+call_2 : "Assɪsᴛᴀɴᴛ ɪs ʙᴀɴɴᴇᴅ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ ᴏʀ ᴄʜᴀɴɴᴇʟ, ᴘʟᴇᴀsᴇ ᴜɴʙᴀɴ.\n\n**Assɪsᴛᴀɴᴛ Usᴇʀɴᴀᴍᴇ**: @{𝟶}\n**Assɪsᴛᴀɴᴛ ID**: {𝟷}"
+call_3 : "Exᴄᴇᴘᴛɪᴏɴ Oᴄᴄᴜʀᴇᴅ Wʜɪʟᴇ Iɴᴠɪᴛɪɴɢ Assɪsᴛᴀɴᴛ Aᴄᴄᴏᴜɴᴛ ᴛᴏ ʏᴏᴜʀ ᴄʜᴀᴛ.\n\n**Rᴇᴀsᴏɴ**: {𝟶}"
+call_4 : "Bᴏᴛ ʀᴇǫᴜɪʀᴇs **Iɴᴠɪᴛᴇ Usᴇʀs Vɪᴀ Lɪɴᴋ** Pᴇʀᴍɪssɪᴏɴ ᴛᴏ ɪɴᴠɪᴛᴇ ᴀssɪsᴛᴀɴᴛ ᴀᴄᴄᴏᴜɴᴛ ᴛᴏ ʏᴏᴜʀ ᴄʜᴀᴛ ɢʀᴏᴜᴘ."
+call_5 : "Assɪsᴛᴀɴᴛ Aᴄᴄᴏᴜɴᴛ ᴡɪʟʟ ʙᴇ Jᴏɪɴɪɴɢ ɪɴ 𝟻 Sᴇᴄᴏɴᴅs..Pʟᴇᴀsᴇ Wᴀɪᴛ!"
+call_6 : "Assɪsᴛᴀɴᴛ Aᴄᴄᴏᴜɴᴛ[{𝟶}] Jᴏɪɴᴇᴅ Sᴜᴄᴄᴇssғᴜʟʟʏ.\n\nSᴛᴀʀᴛɪɴɢ Mᴜsɪᴄ Nᴏᴡ"
+call_7 : "**Hᴀʀᴍғᴜʟ Aᴅᴍɪɴ Rɪɢʜᴛ Gɪᴠᴇɴ ** \n\nPʟᴇᴀsᴇ ʀᴇᴍᴏᴠᴇ **ʙᴀɴ ᴜsᴇʀ's** ʀɪɢʜᴛs ғʀᴏᴍ ᴛʜᴇ ʙᴏᴛ."
+call_8 : "**Hᴀʀᴍғᴜʟ Aᴅᴍɪɴ ** Rɪɢʜᴛ Gɪᴠᴇɴ \n\nPʟᴇᴀsᴇ ʀᴇᴍᴏᴠᴇ ADD **ɴᴇᴡ ᴀᴅᴍɪɴ** ʀɪɢʜᴛs ғʀᴏᴍ ᴛʜᴇ ʙᴏᴛ."
+call_9 : "**Fᴀɪʟᴇᴅ ᴛᴏ sᴡɪᴛᴄʜ Sᴛʀᴇᴀᴍ**\nPʟᴇᴀsᴇ ᴜsᴇ /skip ᴛᴏ ᴄʜᴀɴɢᴇ ᴛʀᴀᴄᴋ ᴀɢᴀɪɴ."
+call_10 : "Dᴏᴡɴʟᴏᴀᴅɪɴɢ Nᴇxᴛ Tʀᴀᴄᴋ ғʀᴏᴍ Pʟᴀʏʟɪsᴛ"
+call_11 : "Pʟᴇᴀsᴇ ᴀᴅᴅ @{𝟶} ᴛᴏ ʏᴏᴜʀ ᴄʜᴀɴɴᴇʟ[ ID: {𝟷}].\n\nBᴏᴛ ɪs ɴᴏᴛ ᴀʙʟᴇ ᴛᴏ ɢᴇᴛ ᴄʜᴀɴɴᴇʟ ᴅᴇᴛᴀɪʟs."
+
 
 # PLUGINS - Auth.py
 auth_1 : "You can only have 20 Users in your group's Authorised Users List (AUL)"
