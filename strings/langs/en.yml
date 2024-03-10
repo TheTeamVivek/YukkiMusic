@@ -11,12 +11,12 @@
 name : 🏴󠁧󠁢󠁥󠁮󠁧󠁿 English
 
 # General Strings
-general_1 : "Reply to a user's message or give username/user_id."
-general_2 : "Error! Wrong Usage of Command."
-general_3 : "Some **exception occured** while processing your query.\n\nException Type:- {0}"
-general_4 : "You're an anonymous admin in this chat group!\nRevert back to User Account From Admin Rights."
-general_5 : "You need to be admin with manage voice chat rights to perform this action."
-general_6 : "Bot isn't streaming on voice chat."
+general_1 : "Rᴇᴘʟʏ ᴛᴏ ᴀ ᴜsᴇʀ's ᴍᴇssᴀɢᴇ ᴏʀ ɢɪᴠᴇ ᴜsᴇʀɴᴀᴍᴇ/ᴜsᴇʀ_ɪᴅ."
+general_2 : "Eʀʀᴏʀ! Wʀᴏɴɢ Usᴀɢᴇ ᴏғ Cᴏᴍᴍᴀɴᴅ."
+general_3 : "Sᴏᴍᴇ ᴇxᴄᴇᴘᴛɪᴏɴ ᴏᴄᴄᴜʀᴇᴅ ᴡʜɪʟᴇ ᴘʀᴏᴄᴇssɪɴɢ ʏᴏᴜʀ ǫᴜᴇʀʏ.\n\nExᴄᴇᴘᴛɪᴏɴ Tʏᴘᴇ:- {𝟶}"
+general_4 : "Yᴏᴜ'ʀᴇ ᴀɴ ᴀɴᴏɴʏᴍᴏᴜs ᴀᴅᴍɪɴ ɪɴ ᴛʜɪs ᴄʜᴀᴛ ɢʀᴏᴜᴘ!\nRᴇᴠᴇʀᴛ ʙᴀᴄᴋ ᴛᴏ Usᴇʀ Aᴄᴄᴏᴜɴᴛ Fʀᴏᴍ Aᴅᴍɪɴ Rɪɢʜᴛs."
+general_5 : "Yᴏᴜ ɴᴇᴇᴅ ᴛᴏ ʙᴇ ᴀᴅᴍɪɴ ᴡɪᴛʜ ᴍᴀɴᴀɢᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ʀɪɢʜᴛs ᴛᴏ ᴘᴇʀғᴏʀᴍ ᴛʜɪs ᴀᴄᴛɪᴏɴ."
+general_6 : "Bᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ."
 
 # Classes - Telegram.py
 tg_1 : "Bot is **overloaded** with downloads right now.\n\n**Try After:** {0} (__expected time__)"
