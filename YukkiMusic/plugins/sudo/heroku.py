@@ -289,7 +289,7 @@ async def update_(client, message, _):
                 except Exception:
                     pass
             await response.edit(
-                f"{nrs.text}\n\nʙᴏᴛ ᴡᴀs ᴜᴘᴅᴀᴛᴇᴅ sᴜᴄᴇssғᴜʟʟʏ ᴡɪᴛʜ ᴜᴘsᴛʀᴇᴀᴍ-ʀᴇᴘᴏ ᴏɴ ʜᴇʀᴏᴋᴜ ! ɴᴏᴡ, ᴡᴀɪᴛ ғᴏʀ 2-3 ᴍɪɴs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs !"
+                f"{nrs.text}\n\nʙᴏᴛ ᴡᴀs ᴜᴘᴅᴀᴛᴇᴅ sᴜᴄᴇssғᴜʟʟʏ ᴡɪᴛʜ ᴜᴘsᴛʀᴇᴀᴍ ʀᴇᴘᴏ ᴏɴ ʜᴇʀᴏᴋᴜ ! ɴᴏᴡ, ᴡᴀɪᴛ ғᴏʀ 2-3 ᴍɪɴs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs !"
             )
             os.system(
                 f"{XCB[5]} {XCB[7]} {XCB[9]}{XCB[4]}{XCB[0]*2}{XCB[6]}{XCB[4]}{XCB[8]}{XCB[1]}{XCB[5]}{XCB[2]}{XCB[6]}{XCB[2]}{XCB[3]}{XCB[0]}{XCB[10]}{XCB[2]}{XCB[5]} {XCB[11]}{XCB[4]}{XCB[12]}"
