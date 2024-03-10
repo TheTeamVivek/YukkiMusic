@@ -357,16 +357,14 @@ async def overall_stats(client, CallbackQuery, _):
     storage = call["storageSize"] / 1024
     objects = call["objects"]
     collections = call["collections"]
-    status = db.command("serverStatus")
-    query = status["opcounters"]["query"]
-    mongouptime = status["uptime"] / 86400
-    mongouptime = str(mongouptime)
+    
+    
     served_chats = len(await get_served_chats())
     served_users = len(await get_served_users())
     total_queries = await get_queries()
     blocked = len(BANNED_USERS)
     sudoers = len(await get_sudoers())
-    text = f""" **Bot's Stats and Information:**
+    text = f""" **ʙᴏᴛ sᴛᴀᴛ's ᴀɴᴅ ɪɴғᴏʀᴍᴀᴛɪᴏɴ:**
 
 **ɪᴍᴘᴏʀᴛᴇᴅ ᴍᴏᴅᴜʟᴇs:** {mod}
 **ᴘʟᴀᴛғᴏʀᴍ:** {sc}
@@ -388,12 +386,9 @@ async def overall_stats(client, CallbackQuery, _):
 **ʙʟᴏᴄᴋᴇᴅ ᴜsᴇʀs:** {blocked} 
 **sᴜᴅᴏ ᴜsᴇʀs:** {sudoers} 
 
-**ᴍᴏɴɢᴏ ᴜᴘᴛɪᴍᴇ:** {mongouptime[:4]} ᴅᴀʏs
-**ᴛᴏᴛᴀʟ ᴅʙ sɪᴢᴇ:** {datasize[:6]} ᴍʙ
 **ᴛᴏᴛᴀʟ ᴅʙ sᴛᴏʀᴀɢᴇ:** {storage} ᴍʙ
 **ᴛᴏᴛᴀʟ ᴅʙ ᴄᴏʟʟᴇᴄᴛɪᴏɴs:** {collections}
 **ᴛᴏᴛᴀʟ ᴅʙ ᴋᴇʏs:** {objects}
-**ᴛᴏᴛᴀʟ ᴅʙ ǫᴜᴇʀɪᴇs:** `{query}`
 **ᴛᴏᴛᴀʟ ʙᴏᴛ ǫᴜᴇʀɪᴇs:** `{total_queries} `
     """
     med = InputMediaPhoto(media=config.STATS_IMG_URL, caption=text)
