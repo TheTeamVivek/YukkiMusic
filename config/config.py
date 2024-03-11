@@ -101,6 +101,7 @@ SUPPORT_GROUP = getenv(
     "SUPPORT_GROUP", "https://t.me/YukkiSupport"
 )  # Example:- https://t.me/YukkiSupport
 
+SUPPORT_GROUP_NAME = SUPPORT_GROUP.split("/")[-1]
 
 
 
