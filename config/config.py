@@ -130,7 +130,7 @@ AUTO_DOWNLOADS_CLEAR = getenv("AUTO_DOWNLOADS_CLEAR","True")
 
 #________________________________________________________________________________#
 # Set it True if you want to bot to suggest about bot commands to random chats of your bots.
-AUTO_SUGGESTION_MODE = getenv("AUTO_SUGGESTION_MODE","True")
+AUTO_SUGGESTION_MODE = getenv("AUTO_SUGGESTION_MODE",True)
 
 
 
