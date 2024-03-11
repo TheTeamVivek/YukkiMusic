@@ -6,11 +6,11 @@ from pytgcalls.exceptions import NoActiveGroupCall
 import config
 from config import BANNED_USERS
 from strings import get_command
-from AlexaMusic import app
-from AlexaMusic.core.call import Alexa
-from AlexaMusic.utils.decorators.play import PlayWrapper
-from AlexaMusic.utils.logger import play_logs
-from AlexaMusic.utils.stream.stream import stream
+from YukkiMusic import app
+from YukkiMusic.core.call import Alexa
+from YukkiMusic.utils.decorators.play import PlayWrapper
+from YukkiMusic.utils.logger import play_logs
+from YukkiMusic.utils.stream.stream import stream
 
 # Command
 STREAM_COMMAND = get_command("STREAM_COMMAND")
