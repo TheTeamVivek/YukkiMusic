@@ -124,8 +124,7 @@ AUTO_SUGGESTION_TIME = int(
 
 
 #________________________________________________________________________________#
-# Set it True if you want to delete downloads after the music playout ends from your downloads folder
-AUTO_DOWNLOADS_CLEAR = getenv("AUTO_DOWNLOADS_CLEAR","True")
+
 
 
 #________________________________________________________________________________#
