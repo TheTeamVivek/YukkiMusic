@@ -52,10 +52,6 @@ async def varsFunc(client, message):
         a_sug = "Yes"
     else:
         a_sug = "No"
-    if config.AUTO_DOWNLOADS_CLEAR:
-        down = "Yes"
-    else:
-        down = "No"
 
     if not config.GITHUB_REPO:
         git = "No"
@@ -108,7 +104,7 @@ async def varsFunc(client, message):
 `ASSISTANT_LEAVE_TIME` : **{auto_leave} seconds**
 `AUTO_SUGGESTION_MODE` :** {a_sug}**
 `AUTO_SUGGESTION_TIME` : **{auto_sug} seconds**
-`AUTO_DOWNLOADS_CLEAR` : **{down}**
+`AUTO_DOWNLOADS_CLEAR` : **Yes**
 `PRIVATE_BOT_MODE` : **{pvt}**
 `YOUTUBE_EDIT_SLEEP` : **{yt_sleep} seconds**
 `TELEGRAM_EDIT_SLEEP` :** {tg_sleep} seconds**
