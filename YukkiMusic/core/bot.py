@@ -34,9 +34,13 @@ class YukkiBot(Client):
         get_me = await self.get_me()
         self.username = get_me.username
         self.id = get_me.id
+        self.name = self.me.first_name + " " + (self.me.last_name or "")
+        self.mention = self.me.mention
+
+
         try:
             await self.send_message(
-                config.LOG_GROUP_ID, "ʙᴏᴛ sᴛᴀʀᴛᴇᴅ"
+                config.LOG_GROUP_ID,                 text=f"<u><b>» {self.mention} ʙᴏᴛ sᴛᴀʀᴛᴇᴅ :</b><u>\n\nɪᴅ : <code>{self.id}</code>\nɴᴀᴍᴇ : {self.name}\nᴜsᴇʀɴᴀᴍᴇ : @{self.username}",
             )
         except:
             LOGGER(__name__).error(
