@@ -102,6 +102,7 @@ SUPPORT_GROUP = getenv(
 )  # Example:- https://t.me/YukkiSupport
 
 SUPPORT_GROUP_NAME = SUPPORT_GROUP.split("/")[-1]
+SUPPORT_CHANNEL_NAME = SUPPORT_CHANNEL.split("/")[-1]
 
 
 
