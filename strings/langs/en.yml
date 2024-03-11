@@ -220,17 +220,17 @@ ping_2 : "{0} is working good with a ping of `{1}` ms.\n\nBot's uptime is {2} an
 
 
 # Song
-song_1 : "You can download Music or Video from YouTube only in private chat. Please start me in private chat."
-song_2 : "**Usage:**\n\n/song [Music Name] or [Youtube Link]"
-song_3 : "Live Link Detected. I am not able to download live youtube videos. "
-song_4 : "**🔗Title:**- {0}\n\nSelect the type in which you want to download."
-song_5 : "Not a valid Youtube Link"
-song_6 : "Getting Formats.. \n\nPlease Wait.."
-song_7 : "Failed to get available formats for the video. Please try any other track."
-song_8 : "Download Started\n\nDownloading speed could be slow. Please hold on.."
-song_9 : "Failed to download song from Youtube-DL\n\n**Reason:** {0}"
-song_10 : "Failed to upload on telegram from servers."
-song_11 : "Uploading Started\n\nUploading speed could be slow. Please hold on.."
+song_1 : "Yᴏᴜ ᴄᴀɴ ᴅᴏᴡɴʟᴏᴀᴅ Mᴜsɪᴄ ᴏʀ Vɪᴅᴇᴏ ғʀᴏᴍ YᴏᴜTᴜʙᴇ ᴏɴʟʏ ɪɴ ᴘʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ. Pʟᴇᴀsᴇ sᴛᴀʀᴛ ᴍᴇ ɪɴ ᴘʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ."
+song_2 : "**Usᴀɢᴇ**:\n\n/song  [Mᴜsɪᴄ Nᴀᴍᴇ] ᴏʀ [Yᴏᴜᴛᴜʙᴇ Lɪɴᴋ]"
+song_3 : "Lɪᴠᴇ Lɪɴᴋ Dᴇᴛᴇᴄᴛᴇᴅ. I ᴀᴍ ɴᴏᴛ ᴀʙʟᴇ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ ʟɪᴠᴇ ʏᴏᴜᴛᴜʙᴇ ᴠɪᴅᴇᴏs. "
+song_4 : "**🔗Tɪᴛʟᴇ**:- {0}\n\nSᴇʟᴇᴄᴛ ᴛʜᴇ ᴛʏᴘᴇ ɪɴ ᴡʜɪᴄʜ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ."
+song_5 : "Nᴏᴛ ᴀ ᴠᴀʟɪᴅ Yᴏᴜᴛᴜʙᴇ Lɪɴᴋ"
+song_6 : "Gᴇᴛᴛɪɴɢ Fᴏʀᴍᴀᴛs.. \n\nPʟᴇᴀsᴇ Wᴀɪᴛ.."
+song_7 : "Fᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀᴍᴀᴛs ғᴏʀ ᴛʜᴇ ᴠɪᴅᴇᴏ. Pʟᴇᴀsᴇ ᴛʀʏ ᴀɴʏ ᴏᴛʜᴇʀ ᴛʀᴀᴄᴋ."
+song_8 : "Dᴏᴡɴʟᴏᴀᴅ Sᴛᴀʀᴛᴇᴅ....\n\nDᴏᴡɴʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ ᴄᴏᴜʟᴅ ʙᴇ sʟᴏᴡ. Pʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ.."
+song_9 : "Fᴀɪʟᴇᴅ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ sᴏɴɢ ғʀᴏᴍ Yᴏᴜᴛᴜʙᴇ-DL\n\n**Rᴇᴀsᴏɴ**: {0}"
+song_10 : "Fᴀɪʟᴇᴅ ᴛᴏ ᴜᴘʟᴏᴀᴅ ᴏɴ ᴛᴇʟᴇɢʀᴀᴍ ғʀᴏᴍ sᴇʀᴠᴇʀs."
+song_11 : "Uᴘʟᴏᴀᴅɪɴɢ Sᴛᴀʀᴛᴇᴅ....\n\nUᴘʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ ᴄᴏᴜʟᴅ ʙᴇ sʟᴏᴡ. Pʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ.."
 
 # Tools - Queue
 queue_1 : "ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ.. ғᴇᴛᴄʜɪɴɢ ǫᴜᴇɪᴇ.."
