@@ -26,7 +26,7 @@ from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils import seconds_to_min, time_to_seconds
 from YukkiMusic.utils.channelplay import get_channeplayCB
 from YukkiMusic.utils.database import is_video_allowed
-from YukkiMusic.utils.database import is_served_user
+from YukkiMusic.utils.database import is_user_v
 from YukkiMusic.utils.decorators.language import languageCB
 from YukkiMusic.utils.decorators.play import PlayWrapper
 from YukkiMusic.utils.formatters import formats
@@ -58,7 +58,7 @@ async def play_commnd(
     url,
     fplay,
 ):
-    if not await is_served_user(message.from_user.id):
+    if not await is_user_v(message.from_user.id):
         await message.reply_text(
             text="ᴇʀʀᴏʀ, ʏᴏᴜ'ʀᴇ ɴᴏᴛ ᴀ ᴠᴇʀɪғɪᴇᴅ ᴜsᴇʀ.\nᴘʟᴇᴀsᴇ ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ ᴛᴏ ᴠᴇʀɪғʏ ʏᴏᴜʀsᴇʟғ.",
             reply_markup=InlineKeyboardMarkup(
