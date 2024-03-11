@@ -33,10 +33,9 @@ async def varsFunc(client, message):
     mystic = await message.reply_text(
         "ɢᴇᴛᴛɪɴɢ ʏᴏᴜʀ ᴄᴏɴғɪɢ..... ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ!"
     )
-    get_me = await app.get_me()
-    bot_name = self.me.first_name + " " + (self.me.last_name or "")
+    
     v_limit = await get_video_limit()
-    #bot_name = config.MUSIC_BOT_NAME
+    bot_name = config.MUSIC_BOT_NAME
     up_r = f"[Repo]({config.UPSTREAM_REPO})"
     up_b = config.UPSTREAM_BRANCH
     auto_leave = config.AUTO_LEAVE_ASSISTANT_TIME
