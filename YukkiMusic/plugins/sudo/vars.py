@@ -22,6 +22,7 @@ from YukkiMusic.utils.formatters import convert_bytes
 
 VARS_COMMAND = get_command("VARS_COMMAND")
 
+yukki_bot_instance = YukkiBot()
 username = yukki_bot_instance.username
 user_id = yukki_bot_instance.id
 name = yukki_bot_instance.name
