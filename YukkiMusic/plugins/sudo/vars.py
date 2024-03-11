@@ -84,22 +84,22 @@ async def varsFunc(client, message):
     owner_id = " ,".join(owners)
     tg_aud = convert_bytes(config.TG_AUDIO_FILESIZE_LIMIT)
     tg_vid = convert_bytes(config.TG_VIDEO_FILESIZE_LIMIT)
-    text = f"""**MUSIC BOT CONFIG:**
+    text = f"""**ᴍᴜsɪᴄ ʙᴏᴛ ᴄᴏɴғɪɢ:**
 
-**<u>Basic Vars:</u>**
+**<u>ʙᴀsɪᴄ ᴠᴀʀs:</u>**
 `MUSIC_BOT_NAME` : **{bot_name}**
 `DURATION_LIMIT` : **{play_duration} min**
 `SONG_DOWNLOAD_DURATION_LIMIT` :** {song} min**
 `OWNER_ID` : **{owner_id}**
     
-**<u>Custom Repo Vars:</u>**
+**<u>ᴄᴜsᴛᴏᴍ ʀᴇᴘᴏ ᴠᴀʀs:</u>**
 `UPSTREAM_REPO` : **{up_r}**
 `UPSTREAM_BRANCH` : **{up_b}**
 `GITHUB_REPO` :** {git}**
 `GIT_TOKEN `:** {token}**
 
 
-**<u>Bot Vars:</u>**
+**<u>ʙᴏᴛ ᴠᴀʀs:</u>**
 `AUTO_LEAVING_ASSISTANT` : **{ass}**
 `ASSISTANT_LEAVE_TIME` : **{auto_leave} seconds**
 `AUTO_SUGGESTION_MODE` :** {a_sug}**
@@ -113,15 +113,15 @@ async def varsFunc(client, message):
 `SERVER_PLAYLIST_LIMIT` :** {playlist_limit}**
 `PLAYLIST_FETCH_LIMIT` :** {fetch_playlist}**
 
-**<u>Spotify Vars:</u>**
+**<u>sᴘᴏᴛɪғʏ ᴠᴀʀs:</u>**
 `SPOTIFY_CLIENT_ID` :** {sotify}**
 `SPOTIFY_CLIENT_SECRET` : **{sotify}**
 
-**<u>Playsize Vars:</u>**
+**<u>ᴘʟᴀʏsɪᴢᴇ ᴠᴀʀs:</u>**
 `TG_AUDIO_FILESIZE_LIMIT` :** {tg_aud}**
 `TG_VIDEO_FILESIZE_LIMIT` :** {tg_vid}**
 
-**<u>URL Vars:</u>**
+**<u>ᴜʀʟ ᴠᴀʀs:</u>**
 `SUPPORT_CHANNEL` : **{s_c}**
 `SUPPORT_GROUP` : ** {s_g}**
 `START_IMG_URL` : ** {start}**
