@@ -25,7 +25,7 @@ VARS_COMMAND = get_command("VARS_COMMAND")
 @app.on_message(filters.command(VARS_COMMAND) & SUDOERS)
 async def varsFunc(client, message):
     mystic = await message.reply_text(
-        "Please wait.. Getting your config"
+        "ɢᴇᴛᴛɪɴɢ ʏᴏᴜʀ ᴄᴏɴғɪɢ..... ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ!"
     )
     v_limit = await get_video_limit()
     bot_name = config.MUSIC_BOT_NAME
