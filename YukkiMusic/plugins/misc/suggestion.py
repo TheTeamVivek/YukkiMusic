@@ -33,7 +33,7 @@ for item in get_string("en"):
 
 
 async def dont_do_this():
-    if config.AUTO_SUGGESTION_MODE == str(True):
+    if config.AUTO_SUGGESTION_MODE:
         while not await asyncio.sleep(LEAVE_TIME):
             try:
                 chats = []
