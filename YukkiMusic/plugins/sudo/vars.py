@@ -40,7 +40,7 @@ async def varsFunc(client, message):
     play_duration = config.DURATION_LIMIT_MIN
     cm = config.CLEANMODE_DELETE_MINS
     auto_sug = config.AUTO_SUGGESTION_TIME
-    if config.AUTO_LEAVING_ASSISTANT == str(True):
+    if config.AUTO_LEAVING_ASSISTANT:
         ass = "Yes"
     else:
         ass = "No"
