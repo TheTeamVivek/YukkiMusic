@@ -7,7 +7,7 @@ import config
 from config import BANNED_USERS
 from strings import get_command
 from YukkiMusic import app
-from YukkiMusic.core.call import Alexa
+from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.decorators.play import PlayWrapper
 from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
