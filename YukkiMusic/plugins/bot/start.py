@@ -18,7 +18,7 @@ from youtubesearchpython.__future__ import VideosSearch
 
 import config
 from config import BANNED_USERS
-from config.config import OWNER_ID
+from config.config import OWNER_ID, MUSIC_BOT_NAME
 from strings import get_command, get_string
 from YukkiMusic import Telegram, YouTube, app
 from YukkiMusic.misc import SUDOERS
@@ -47,6 +47,10 @@ async def start_comm(client, message: Message, _):
     await add_served_user(message.from_user.id)
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
+        if name == "verify":
+            await message.reply_text(f"ʜᴇʏ {message.from_user.first_name},\nᴛʜᴀɴᴋs ғᴏʀ ᴠᴇʀɪғʏɪɴɢ ʏᴏᴜʀsᴇʟғ ɪɴ {config.MUSIC_BOT_NAME}, ɴᴏᴡ ʏᴏᴜ ᴄᴀɴ ɢᴏ ʙᴀᴄᴋ ᴀɴᴅ sᴛᴀʀᴛ ᴜsɪɴɢ ᴍᴇ.")
+
+
         if name[0:4] == "help":
             keyboard = help_pannel(_)
             return await message.reply_text(
