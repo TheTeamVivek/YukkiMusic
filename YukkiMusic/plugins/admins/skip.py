@@ -57,11 +57,7 @@ async def skip(cli, message: Message, _, chat_id):
                                     _["admin_16"]
                                 )
                             if popped:
-                                if (
-                                    config.AUTO_DOWNLOADS_CLEAR
-                                    == str(True)
-                                ):
-                                    await auto_clean(popped)
+                                await auto_clean(popped)
                             if not check:
                                 try:
                                     await message.reply_text(
