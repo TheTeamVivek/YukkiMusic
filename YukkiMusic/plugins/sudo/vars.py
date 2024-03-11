@@ -13,7 +13,6 @@ import asyncio
 from pyrogram import filters
 
 import config
-from YukkiMusic.core.bot import YukkiBot
 from strings import get_command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
@@ -22,11 +21,12 @@ from YukkiMusic.utils.formatters import convert_bytes
 
 VARS_COMMAND = get_command("VARS_COMMAND")
 
-yukki_bot_instance = YukkiBot()
-username = yukki_bot_instance.username
-user_id = yukki_bot_instance.id
-name = yukki_bot_instance.name
-mention = yukki_bot_instance.mention
+get_me = await app.get_me()
+bot_username = get_me.username
+bot_id = get_me.id
+bot_name = self.me.first_name + " " + (self.me.last_name or "")
+self.mention = self.me.mention
+
 
 @app.on_message(filters.command(VARS_COMMAND) & SUDOERS)
 async def varsFunc(client, message):
@@ -35,7 +35,7 @@ async def varsFunc(client, message):
     )
     v_limit = await get_video_limit()
     #bot_name = config.MUSIC_BOT_NAME
-    bot_name = name
+    #bot_name = name
     up_r = f"[Repo]({config.UPSTREAM_REPO})"
     up_b = config.UPSTREAM_BRANCH
     auto_leave = config.AUTO_LEAVE_ASSISTANT_TIME
