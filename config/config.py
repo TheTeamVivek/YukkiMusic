@@ -119,7 +119,7 @@ AUTO_LEAVE_ASSISTANT_TIME = int(
 #________________________________________________________________________________#
 # Time after which bot will suggest random chats about bot commands.
 AUTO_SUGGESTION_TIME = int(
-    getenv("AUTO_SUGGESTION_TIME", "43200")
+    getenv("AUTO_SUGGESTION_TIME", "300")
 )  # Remember to give value in Seconds
 
 
