@@ -48,7 +48,7 @@ async def varsFunc(client, message):
         pvt = "Yes"
     else:
         pvt = "No"
-    if config.AUTO_SUGGESTION_MODE == str(True):
+    if config.AUTO_SUGGESTION_MODE:
         a_sug = "Yes"
     else:
         a_sug = "No"
