@@ -44,7 +44,7 @@ async def varsFunc(client, message):
         ass = "Yes"
     else:
         ass = "No"
-    if config.PRIVATE_BOT_MODE == str(True):
+    if config.PRIVATE_BOT_MODE:
         pvt = "Yes"
     else:
         pvt = "No"
@@ -52,7 +52,7 @@ async def varsFunc(client, message):
         a_sug = "Yes"
     else:
         a_sug = "No"
-    if config.AUTO_DOWNLOADS_CLEAR == str(True):
+    if config.AUTO_DOWNLOADS_CLEAR:
         down = "Yes"
     else:
         down = "No"
