@@ -64,7 +64,7 @@ async def varsFunc(client, message):
     if not config.SUPPORT_CHANNEL:
         s_c = "No"
     else:
-        s_c = f"[Channel]({config.SUPPORT_CHANNEL})"
+        s_c = f"[{config.SUPPORT_CHANNEL_NAME}]({config.SUPPORT_CHANNEL})"
     if not config.SUPPORT_GROUP:
         s_g = "No"
     else:
