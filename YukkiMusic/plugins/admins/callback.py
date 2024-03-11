@@ -13,7 +13,7 @@ import random
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
 
-from config import (AUTO_DOWNLOADS_CLEAR, BANNED_USERS,
+from config import (BANNED_USERS,
                     SOUNCLOUD_IMG_URL, STREAM_IMG_URL,
                     TELEGRAM_AUDIO_URL, TELEGRAM_VIDEO_URL, adminlist)
 from YukkiMusic import YouTube, app
