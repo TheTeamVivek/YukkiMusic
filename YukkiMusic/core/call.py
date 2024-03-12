@@ -9,7 +9,7 @@ from pyrogram.errors import (ChatAdminRequired,
                              UserNotParticipant)
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls
-from pytgcalls.exceptions import  TelegramServerError
+from ntgcalls import TelegramServerError
 from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
 from pytgcalls.exceptions import (AlreadyJoinedError,
                                   NoActiveGroupCall)
