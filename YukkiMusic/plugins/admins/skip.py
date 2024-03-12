@@ -56,8 +56,7 @@ async def skip(cli, message: Message, _, chat_id):
                                 return await message.reply_text(
                                     _["admin_16"]
                                 )
-                            if popped:
-                                await auto_clean(popped)
+                            await auto_clean(popped)
                             if not check:
                                 try:
                                     await message.reply_text(
