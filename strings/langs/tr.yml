@@ -1,5 +1,11 @@
 name : 🇹🇷 Turkish
-
+H_B_7 : "ʙʀᴏᴀᴅᴄᴀsᴛ"
+H_B_8 : "ᴘʟᴀʏʟɪsᴛ"
+H_B_9 : "ᴀᴜᴛʜ"
+H_B_10: "ᴀᴄᴛɪᴠᴇ ᴠᴄ"
+H_B_11: "ʙʟᴀᴄᴋʟɪsᴛ"
+H_B_12: "ɢʙᴀɴ"
+H_B_13: "ᴘʀɪᴠᴀᴛᴇ ʙᴏᴛ ᴍᴏᴅᴇ"
 # General Strings
 general_1 : "Bir kullanıcının mesajını yanıtlayın veya username/user_id verin."
 general_2 : "Hata! Komutun Yanlış Kullanımı."
