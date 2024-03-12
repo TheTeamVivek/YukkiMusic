@@ -85,14 +85,13 @@ admin_34 : "➻ Fᴀɪʟᴇᴅ ᴛᴏ sᴇᴇᴋ ᴛʜᴇ ᴄᴜʀʀᴇɴᴛ s�
 # Bot 
 
 # Start
-start_1 : "Thanks for having me in {0}.\n{1} is alive.\n\nFor any assistance or help, checkout our support group and channel."
-start_2 : "Hello, My name is {0}.\n\nI'm a telegram streaming bot with some useful features. Supporting platforms like Youtube, Spotify, Resso, AppleMusic , Soundcloud etc.\n\nFeel free to add me to your groups."
-start_3 : "Welcome To {0}\n\nI don't need any **admin permission** to work ( until asked for ).\n\nAssistant Username:- @{1}\nAssistant ID:- {2}"
-start_4 : "{0}'s Owner[{1}] has just joined your chat."
-start_5 : "A member of {0}'s Sudo User[{1}] has just joined your chat."
-start_6 : "❗️ **Supergroup Needed** ❗️\n\nPlease convert your **group** to **supergroup** and then add me back.\n\n**How to make supergroup?**\n✅ Make your group's chat history **visible** once."
-start_7 : "**Blacklisted Chat**\n\nYou're chat has been blacklisted by the Bot. Please ask any SudoUser to whitelist chat first. Check [Sudolist from here]({0})"
-
+start_1 : "Tʜᴀɴᴋs ғᴏʀ ʜᴀᴠɪɴɢ ᴍᴇ ɪɴ {0}.\ɴ{1} ɪs ᴀʟɪᴠᴇ.\n\nFᴏʀ ᴀɴʏ ᴀssɪsᴛᴀɴᴄᴇ ᴏʀ ʜᴇʟᴘ, ᴄʜᴇᴄᴋᴏᴜᴛ ᴏᴜʀ sᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ ᴀɴᴅ ᴄʜᴀɴɴᴇʟ."
+start_2 : "Hᴇʟʟᴏ, Mʏ ɴᴀᴍᴇ ɪs {0}.\n\nI'ᴍ ᴀ ᴛᴇʟᴇɢʀᴀᴍ sᴛʀᴇᴀᴍɪɴɢ ʙᴏᴛ ᴡɪᴛʜ sᴏᴍᴇ ᴜsᴇғᴜʟ ғᴇᴀᴛᴜʀᴇs. Sᴜᴘᴘᴏʀᴛɪɴɢ ᴘʟᴀᴛғᴏʀᴍs ʟɪᴋᴇ Yᴏᴜᴛᴜʙᴇ, Sᴘᴏᴛɪғʏ, Rᴇssᴏ, AᴘᴘʟᴇMᴜsɪᴄ , Sᴏᴜɴᴅᴄʟᴏᴜᴅ ᴇᴛᴄ.\ɴ\ɴFᴇᴇʟ ғʀᴇᴇ ᴛᴏ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘs."
+start_3 : "Wᴇʟᴄᴏᴍᴇ Tᴏ {0}\n\nI ᴅᴏɴ'ᴛ ɴᴇᴇᴅ ᴀɴʏ **ᴀᴅᴍɪɴ ᴘᴇʀᴍɪssɪᴏɴ** ᴛᴏ ᴡᴏʀᴋ ( ᴜɴᴛɪʟ ᴀsᴋᴇᴅ ғᴏʀ ).\n\nAssɪsᴛᴀɴᴛ Usᴇʀɴᴀᴍᴇ:- @{1}\nAssɪsᴛᴀɴᴛ ID:- {2}"
+start_4 : "{0}'s Oᴡɴᴇʀ[{1}] ʜᴀs Jᴜsᴛ Jᴏɪɴᴇᴅ ʏᴏᴜʀ ᴄʜᴀᴛ."
+start_5 : "A ᴍᴇᴍʙᴇʀ ᴏғ {0}'s Sᴜᴅᴏ Usᴇʀ[{1}] ʜᴀs Jᴜsᴛ Jᴏɪɴᴇᴅ ʏᴏᴜʀ ᴄʜᴀᴛ."
+start_6 : "❗️ **Sᴜᴘᴇʀɢʀᴏᴜᴘ Nᴇᴇᴅᴇᴅ** ❗️\n\nPʟᴇᴀsᴇ ᴄᴏɴᴠᴇʀᴛ ʏᴏᴜʀ **ɢʀᴏᴜᴘ** ᴛᴏ **sᴜᴘᴇʀɢʀᴏᴜᴘ** ᴀɴᴅ ᴛʜᴇɴ ᴀᴅᴅ ᴍᴇ ʙᴀᴄᴋ.\n\n**Hᴏᴡ ᴛᴏ ᴍᴀᴋᴇ sᴜᴘᴇʀɢʀᴏᴜᴘ**?\n✅ Mᴀᴋᴇ ʏᴏᴜʀ ɢʀᴏᴜᴘ's **ᴄʜᴀᴛ ʜɪsᴛᴏʀʏ ᴠɪsɪʙʟᴇ** ᴏɴᴄᴇ."
+start_7 : "**Bʟᴀᴄᴋʟɪsᴛᴇᴅ Cʜᴀᴛ**\n\nYᴏᴜ'ʀᴇ ᴄʜᴀᴛ ʜᴀs ʙᴇᴇɴ ʙʟᴀᴄᴋʟɪsᴛᴇᴅ ʙʏ ᴛʜᴇ Bᴏᴛ. Pʟᴇᴀsᴇ ᴀsᴋ ᴀɴʏ [SᴜᴅᴏUsᴇʀ]({0}) ᴛᴏ ᴡʜɪᴛᴇʟɪsᴛ ᴄʜᴀᴛ ғɪʀsᴛ"
 # Help
 help_1 : "Click on the buttons below for more information. If you're facing any problem in command you can contact my bot owner or ask in support chat.\n\nAll commands can be used with: /"
 help_2 : "Contact me in PM for help."
