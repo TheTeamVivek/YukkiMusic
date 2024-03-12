@@ -8,8 +8,9 @@ from pyrogram.errors import (ChatAdminRequired,
                              UserAlreadyParticipant,
                              UserNotParticipant)
 from pyrogram.types import InlineKeyboardMarkup
-from ntgcalls import TelegramServerError
 from pytgcalls import PyTgCalls
+from pytgcalls.exceptions import  TelegramServerError
+from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
 from pytgcalls.exceptions import (AlreadyJoinedError,
                                   NoActiveGroupCall)
 from pytgcalls.types import (JoinedGroupCallParticipant, 
