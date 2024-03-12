@@ -331,8 +331,7 @@ class Call(PyTgCalls):
             else:
                 loop = loop - 1
                 await set_loop(chat_id, loop)
-            if popped:
-                await auto_clean(popped)
+            await auto_clean(popped)
             if not check:
                 await _clear_(chat_id)
                 return await client.leave_group_call(chat_id)
