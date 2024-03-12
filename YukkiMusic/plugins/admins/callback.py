@@ -229,8 +229,7 @@ async def del_back_playlist(client, CallbackQuery, _):
         popped = None
         try:
             popped = check.pop(0)
-            if popped:
-                await auto_clean(popped)
+            await auto_clean(popped)
             if not check:
                 await CallbackQuery.edit_message_text(
                     f"Skipped by {mention}"
