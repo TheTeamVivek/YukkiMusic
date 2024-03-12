@@ -13,8 +13,8 @@ import platform
 from sys import version as pyver
 
 import psutil
-#from ntgcalls import __version__ as ngtgver
-from pytgcalls import __version__ as ngtgver
+from ntgcalls import __version__ as ngtgver
+
 
 from pyrogram import __version__ as pyrover
 from pyrogram import filters
