@@ -1,5 +1,5 @@
 import random
-from .utils.database import get_theme
+from YukkiMusic.utils.database import get_theme
 
 themes = [
     "alexa1",
