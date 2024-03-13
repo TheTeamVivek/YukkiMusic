@@ -126,7 +126,7 @@ def stream_markup(_, videoid, chat_id):
     return buttons
 
 
-def telegram_markup(_, chat_id):
+def telegram_markup(_,videoid, chat_id):
     buttons = [
 
           [
