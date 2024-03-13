@@ -10,13 +10,11 @@
 
 import random
 
-from pyrogram.types import InlineKeyboardButton
+import math
 
-#import math
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-#from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
-#from YukkiMusic.utils.formatters import time_to_seconds
+from YukkiMusic.utils.formatters import time_to_seconds
 
 selections = [
     "▁▄▂▇▄▅▄▅▃",
@@ -39,7 +37,8 @@ selections = [
 
 
 def stream_markup_timer(_, videoid, chat_id, played, dur):
-    bar = random.choice(selections)
+    
+
     buttons = [
         [
             InlineKeyboardButton(
