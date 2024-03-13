@@ -2,14 +2,14 @@ import random
 from YukkiMusic.utils.database import get_theme
 
 themes = [
-    "alexa1",
-    "alexa2",
-    "alexa3",
-    "alexa4",
-    "alexa5",
-    "alexa6",
-    "alexa7",
-    "alexa8",
+    "yukki1",
+    "yukki2",
+    "yukki3",
+    "yukki4",
+    "yukki5",
+    "yukki6",
+    "yukki7",
+    "yukki8",
 ]
 
 
