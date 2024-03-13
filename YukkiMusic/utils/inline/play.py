@@ -16,7 +16,7 @@ from pyrogram.types import InlineKeyboardButton
 
 #from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-#from AnonX.utils.formatters import time_to_seconds
+#from YukkiMusic.utils.formatters import time_to_seconds
 
 selections = [
     "▁▄▂▇▄▅▄▅▃",
