@@ -92,24 +92,24 @@ start_4 : "{0}'s Oᴡɴᴇʀ[{1}] ʜᴀs Jᴜsᴛ Jᴏɪɴᴇᴅ ʏᴏᴜʀ ᴄ�
 start_5 : "A ᴍᴇᴍʙᴇʀ ᴏғ {0}'s Sᴜᴅᴏ Usᴇʀ[{1}] ʜᴀs Jᴜsᴛ Jᴏɪɴᴇᴅ ʏᴏᴜʀ ᴄʜᴀᴛ."
 start_6 : "❗️ **Sᴜᴘᴇʀɢʀᴏᴜᴘ Nᴇᴇᴅᴇᴅ** ❗️\n\nPʟᴇᴀsᴇ ᴄᴏɴᴠᴇʀᴛ ʏᴏᴜʀ **ɢʀᴏᴜᴘ** ᴛᴏ **sᴜᴘᴇʀɢʀᴏᴜᴘ** ᴀɴᴅ ᴛʜᴇɴ ᴀᴅᴅ ᴍᴇ ʙᴀᴄᴋ.\n\n**Hᴏᴡ ᴛᴏ ᴍᴀᴋᴇ sᴜᴘᴇʀɢʀᴏᴜᴘ**?\n✅ Mᴀᴋᴇ ʏᴏᴜʀ ɢʀᴏᴜᴘ's **ᴄʜᴀᴛ ʜɪsᴛᴏʀʏ ᴠɪsɪʙʟᴇ** ᴏɴᴄᴇ."
 start_7 : "**Bʟᴀᴄᴋʟɪsᴛᴇᴅ Cʜᴀᴛ**\n\nYᴏᴜ'ʀᴇ ᴄʜᴀᴛ ʜᴀs ʙᴇᴇɴ ʙʟᴀᴄᴋʟɪsᴛᴇᴅ ʙʏ ᴛʜᴇ Bᴏᴛ. Pʟᴇᴀsᴇ ᴀsᴋ ᴀɴʏ [SᴜᴅᴏUsᴇʀ]({0}) ᴛᴏ ᴡʜɪᴛᴇʟɪsᴛ ᴄʜᴀᴛ ғɪʀsᴛ"
+
 # Help
-help_1 : "Click on the buttons below for more information. If you're facing any problem in command you can contact my bot owner or ask in support chat.\n\nAll commands can be used with: /"
-help_2 : "Contact me in PM for help."
+help_1 : "Cʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʙᴜᴛᴛᴏɴs ʙᴇʟᴏᴡ ғᴏʀ ᴍᴏʀᴇ ɪɴғᴏʀᴍᴀᴛɪᴏɴ. Iғ ʏᴏᴜ'ʀᴇ ғᴀᴄɪɴɢ ᴀɴʏ ᴘʀᴏʙʟᴇᴍ ɪɴ ᴄᴏᴍᴍᴀɴᴅ ʏᴏᴜ ᴄᴀɴ ᴄᴏɴᴛᴀᴄᴛ ᴍʏ ʙᴏᴛ ᴏᴡɴᴇʀ ᴏʀ ᴀsᴋ ɪɴ sᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ.\n\nAʟʟ ᴄᴏᴍᴍᴀɴᴅs ᴄᴀɴ ʙᴇ ᴜsᴇᴅ ᴡɪᴛʜ: /"
+help_2 : "Cᴏɴᴛᴀᴄᴛ ᴍᴇ ɪɴ PM ғᴏʀ ʜᴇʟᴘ."
 
-# Settings
-setting_1 : "⚙️ **Music Bot Settings**\n\n🖇**Group:** {0}\n🔖**Group ID:** `{1}`\n\n💡**Choose the function buttons from below which you want to edit or change.**"
-setting_3 : "⁉️ What is This?\n\n1) Direct: Plays search queries directly. Use -v to play videos in direct mode.\n\n2) Inline: Returns Inline Markup Buttons for choosing between video & audio."
-setting_4 : "⁉️ What is This?\n\n👥 Everyone: Anyone can use admin commands(skip, pause, resume etc) present in this group.\n\n🙍 Admin Only: Only admins and authorized users can use admin commands."
-setting_5 : "No Authorized Users Found\n\nYou can allow any non-admin to use my admin commands by /auth and delete by using /unauth"
-setting_9 : "⁉️ What is This?\n\nWhen activated, Bot will delete its message after {0} to make your chat clean and clear."
-setting_10 : "⁉️ What is This?\n\n1) Group: Plays music in the group where the command is given .\n\n2) Channel: Plays music in the channel you want. Set channel id via /channelplay"
-setting_11 : "⁉️ What is This?\n\n1) Everyone: Anyone present in this group can play music here.\n\n2) Admin Only: Only admins can play the music in this group."
-setting_12 : "❌ You've no channel id defined for channel mode. Please define with /channelplay."
-setting_13 : "Can't change play mode in active group call. Please stop the voice chat first with /stop."
-setting_14 : "⁉️ What is This?\n\nWhen activated, Bot will delete its executed commands (/play, /pause, /shuffle, /stop etc) immediately.\n\nBot will be requiring delete messages admin right for this to work properly."
-setting_15 : "Failed to resolve peer, Make sure you have added bot in your channel and promoted it as admin.\n\nTry setting /channelplay again.."
-setting_16 : "⁉️ What is This?\n\nWhen activated, Bot will suggest your chat in every 1-2 hour about bot commands (How to use them, which are the commands and many other things) randomly."
-
+# Sᴇᴛᴛɪɴɢs
+setting_1 : "⚙️ **Mᴜsɪᴄ Bᴏᴛ Sᴇᴛᴛɪɴɢs**\n\n🖇**Gʀᴏᴜᴘ:** {0}\n🔖**Gʀᴏᴜᴘ ID:** `{1}`\n\n💡**Cʜᴏᴏsᴇ ᴛʜᴇ ғᴜɴᴄᴛɪᴏɴ ʙᴜᴛᴛᴏɴs ғʀᴏᴍ ʙᴇʟᴏᴡ ᴡʜɪᴄʜ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴇᴅɪᴛ ᴏʀ ᴄʜᴀɴɢᴇ.**"
+setting_3 : "⁉️ Wʜᴀᴛ ɪs Tʜɪs?\n\n1) Dɪʀᴇᴄᴛ: Pʟᴀʏs sᴇᴀʀᴄʜ ᴏ̨ᴜᴇʀɪᴇs ᴅɪʀᴇᴄᴛʟʏ. Usᴇ -ᴠ ᴛᴏ ᴘʟᴀʏ ᴠɪᴅᴇᴏs ɪɴ ᴅɪʀᴇᴄᴛ ᴍᴏᴅᴇ.\n\n2) Iɴʟɪɴᴇ: Rᴇᴛᴜʀɴs Iɴʟɪɴᴇ Mᴀʀᴋᴜᴘ Bᴜᴛᴛᴏɴs ғᴏʀ ᴄʜᴏᴏsɪɴɢ ʙᴇᴛᴡᴇᴇɴ ᴠɪᴅᴇᴏ & ᴀᴜᴅɪᴏ."
+setting_4 : "⁉️ Wʜᴀᴛ ɪs Tʜɪs?\n\n👥 Eᴠᴇʀʏᴏɴᴇ: Aɴʏᴏɴᴇ ᴄᴀɴ ᴜsᴇ ᴀᴅᴍɪɴ ᴄᴏᴍᴍᴀɴᴅs(sᴋɪᴘ, ᴘᴀᴜsᴇ, ʀᴇsᴜᴍᴇ ᴇᴛᴄ) ᴘʀᴇsᴇɴᴛ ɪɴ ᴛʜɪs ɢʀᴏᴜᴘ.\n\n🙍 Aᴅᴍɪɴ Oɴʟʏ: Oɴʟʏ ᴀᴅᴍɪɴs ᴀɴᴅ ᴀᴜᴛʜᴏʀɪᴢᴇᴅ ᴜsᴇʀs ᴄᴀɴ ᴜsᴇ ᴀᴅᴍɪɴ ᴄᴏᴍᴍᴀɴᴅs."
+setting_5 : "Nᴏ Aᴜᴛʜᴏʀɪᴢᴇᴅ Usᴇʀs Fᴏᴜɴᴅ\n\nYᴏᴜ ᴄᴀɴ ᴀʟʟᴏᴡ ᴀɴʏ ɴᴏɴ-ᴀᴅᴍɪɴ ᴛᴏ ᴜsᴇ ᴍʏ ᴀᴅᴍɪɴ ᴄᴏᴍᴍᴀɴᴅs ʙʏ /auth ᴀɴᴅ ᴅᴇʟᴇᴛᴇ ʙʏ ᴜsɪɴɢ /unauth"
+setting_9 : "⁉️ Wʜᴀᴛ ɪs Tʜɪs?\n\nWʜᴇɴ ᴀᴄᴛɪᴠᴀᴛᴇᴅ, Bᴏᴛ ᴡɪʟʟ ᴅᴇʟᴇᴛᴇ ɪᴛs ᴍᴇssᴀɢᴇ ᴀғᴛᴇʀ {0} ᴛᴏ ᴍᴀᴋᴇ ʏᴏᴜʀ ᴄʜᴀᴛ ᴄʟᴇᴀɴ ᴀɴᴅ ᴄʟᴇᴀʀ."
+setting_10 : "⁉️ Wʜᴀᴛ ɪs Tʜɪs?\n\n1) Gʀᴏᴜᴘ: Pʟᴀʏs ᴍᴜsɪᴄ ɪɴ ᴛʜᴇ ɢʀᴏᴜᴘ ᴡʜᴇʀᴇ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅ ɪs ɢɪᴠᴇɴ .\n\n2) Cʜᴀɴɴᴇʟ: Pʟᴀʏs ᴍᴜsɪᴄ ɪɴ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ʏᴏᴜ ᴡᴀɴᴛ. Sᴇᴛ ᴄʜᴀɴɴᴇʟ ɪᴅ ᴠɪᴀ /channelplay"
+setting_11 : "⁉️ Wʜᴀᴛ ɪs Tʜɪs?\n\n1) Eᴠᴇʀʏᴏɴᴇ: Aɴʏᴏɴᴇ ᴘʀᴇsᴇɴᴛ ɪɴ ᴛʜɪs ɢʀᴏᴜᴘ ᴄᴀɴ ᴘʟᴀʏ ᴍᴜsɪᴄ ʜᴇʀᴇ.\n\n2) Aᴅᴍɪɴ Oɴʟʏ: Oɴʟʏ ᴀᴅᴍɪɴs ᴄᴀɴ ᴘʟᴀʏ ᴛʜᴇ ᴍᴜsɪᴄ ɪɴ ᴛʜɪs ɢʀᴏᴜᴘ."
+setting_12 : "❌ Yᴏᴜ'ᴠᴇ ɴᴏ ᴄʜᴀɴɴᴇʟ ɪᴅ ᴅᴇғɪɴᴇᴅ ғᴏʀ ᴄʜᴀɴɴᴇʟ ᴍᴏᴅᴇ. Pʟᴇᴀsᴇ ᴅᴇғɪɴᴇ ᴡɪᴛʜ /channelplay."
+setting_13 : "Cᴀɴ'ᴛ ᴄʜᴀɴɢᴇ ᴘʟᴀʏ ᴍᴏᴅᴇ ɪɴ ᴀᴄᴛɪᴠᴇ ɢʀᴏᴜᴘ ᴄᴀʟʟ. Pʟᴇᴀsᴇ sᴛᴏᴘ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ғɪʀsᴛ ᴡɪᴛʜ /stop."
+setting_14 : "⁉️ Wʜᴀᴛ ɪs Tʜɪs?\n\nWʜᴇɴ ᴀᴄᴛɪᴠᴀᴛᴇᴅ, Bᴏᴛ ᴡɪʟʟ ᴅᴇʟᴇᴛᴇ ɪᴛs ᴇxᴇᴄᴜᴛᴇᴅ ᴄᴏᴍᴍᴀɴᴅs (/play, /paise, /shuffle, /stop ᴇᴛᴄ) ɪᴍᴍᴇᴅɪᴀᴛᴇʟʏ.\n\nBᴏᴛ ᴡɪʟʟ ʙᴇ ʀᴇᴏ̨ᴜɪʀɪɴɢ ᴅᴇʟᴇᴛᴇ ᴍᴇssᴀɢᴇs ᴀᴅᴍɪɴ ʀɪɢʜᴛ ғᴏʀ ᴛʜɪs ᴛᴏ ᴡᴏʀᴋ ᴘʀᴏᴘᴇʀʟʏ."
+setting_15 : "Fᴀɪʟᴇᴅ ᴛᴏ ʀᴇsᴏʟᴠᴇ ᴘᴇᴇʀ, Mᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ ʜᴀᴠᴇ ᴀᴅᴅᴇᴅ ʙᴏᴛ ɪɴ ʏᴏᴜʀ ᴄʜᴀɴɴᴇʟ ᴀɴᴅ ᴘʀᴏᴍᴏᴛᴇᴅ ɪᴛ ᴀs ᴀᴅᴍɪɴ.\n\nTʀʏ sᴇᴛᴛɪɴɢ /channelplay ᴀɢᴀɪɴ.."
+setting_16 : "⁉️ Wʜᴀᴛ ɪs Tʜɪs?\n\nWʜᴇɴ ᴀᴄᴛɪᴠᴀᴛᴇᴅ, Bᴏᴛ ᴡɪʟʟ sᴜɢɢᴇsᴛ ʏᴏᴜʀ ᴄʜᴀᴛ ɪɴ ᴇᴠᴇʀʏ 1-2 ʜᴏᴜʀ ᴀʙᴏᴜᴛ ʙᴏᴛ ᴄᴏᴍᴍᴀɴᴅs (Hᴏᴡ ᴛᴏ ᴜsᴇ ᴛʜᴇᴍ, ᴡʜɪᴄʜ ᴀʀᴇ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅs ᴀɴᴅ ᴍᴀɴʏ ᴏᴛʜᴇʀ ᴛʜɪɴɢs) ʀᴀɴᴅᴏᴍʟʏ."
 
 set_cb_1 : "Getting Audio Quality Panel..."
 set_cb_2 : "Getting Video Quality Panel..."
