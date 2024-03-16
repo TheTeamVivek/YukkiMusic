@@ -11,7 +11,7 @@
 import asyncio
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic import YouTube, app
-from Bikash.Bgt import get_string
+from strings import get_string
 from pyrogram.enums import ChatMemberStatus
 from YukkiMusic.utils.exceptions import AssistantErr
 from YukkiMusic.utils.inline.playlist import botplaylist_markup
