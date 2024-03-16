@@ -162,7 +162,9 @@ def PlayWrapper(command):
                                 )
                             )
                     except ChatAdminRequired:
-                        raise AssistantErr(_["call_4"])
+                        await message.reply_text(
+                            _["call_4"]
+                        )
                     except Exception as e:
                         raise AssistantErr(e)
                     m = await app.send_message(
