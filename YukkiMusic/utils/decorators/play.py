@@ -143,7 +143,7 @@ def PlayWrapper(command):
                 except UserAlreadyParticipant:
                     pass
                 except Exception as e:
-                    raise AssistantErr(_["call_3"].format(e))
+                    raise AssistantErr(_["call_15"].format(e))
             else:
                 try:
                     try:
