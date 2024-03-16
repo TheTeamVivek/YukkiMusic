@@ -179,8 +179,8 @@ def PlayWrapper(command):
                 except UserAlreadyParticipant:
                     pass
                 except Exception as e:
-                    raise AssistantErr(_["call_3"].format(e))
-                    await message.reply_text(_["call_3"])
+                    raise AssistantErr(_["call_15"].format(e))
+                    await message.reply_text(_["call_15"])
 
         return await command(
             client,
