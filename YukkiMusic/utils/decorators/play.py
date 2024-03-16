@@ -23,6 +23,8 @@ from pyrogram.errors import ChatAdminRequired, UserAlreadyParticipant, UserNotPa
 from YukkiMusic.utils.database import get_cmode, get_lang, get_playmode, get_playtype, is_active_chat, is_commanddelete_on, is_served_private_chat
 from YukkiMusic.utils.database import add_active_chat, add_active_video_chat, get_assistant, get_audio_bitrate, get_lang, get_loop, get_video_bitrate, group_assistant, is_autoend, music_on, mute_off, remove_active_chat, remove_active_video_chat, set_loop
 
+links = {}
+
 def PlayWrapper(command):
     async def wrapper(client, message):
         if await is_maintenance() is False:
