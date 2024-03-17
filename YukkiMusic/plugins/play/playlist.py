@@ -32,7 +32,7 @@ from YukkiMusic.utils.stream.stream import stream
 # Command
 PLAYLIST_COMMAND = get_command("PLAYLIST_COMMAND")
 DELETEPLAYLIST_COMMAND = get_command("DELETEPLAYLIST_COMMAND")
-ADDPLAYLIST_COMMAND = get_commanf("ADDPLAYLIST_COMMAND")
+ADDPLAYLIST_COMMAND = get_command("ADDPLAYLIST_COMMAND")
 
 @app.on_message(
     filters.command(PLAYLIST_COMMAND)
