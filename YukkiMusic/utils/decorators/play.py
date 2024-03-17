@@ -168,7 +168,7 @@ def PlayWrapper(command):
                     except Exception as e:
                         raise AssistantErr(e)
                     m = await app.send_message(
-                        chat_id, _["call_3"]
+                        chat_id, _["call_16"]
                     )
                     if invitelink.startswith("https://t.me/+"):
                         invitelink = invitelink.replace(
