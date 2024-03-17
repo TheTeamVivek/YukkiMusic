@@ -257,7 +257,7 @@ async def add_playlist(client, message: Message, _):
         except Exception as e:
             pass
 
-@app.on_message(filters.command(["playplaylist"]) & ~BANNED_USERS)
+@app.on_message(filters.command(["playplaylist"]) & ~BANNED_USERS & filters.group)
 @languageCB
 async def play_playlist_command(client, message, _):
     mode = message.command[1] if len(message.command) > 1 else None
