@@ -1,4 +1,3 @@
-import stream
 import time
 import yt_dlp
 from strings import get_command
@@ -11,6 +10,7 @@ from YukkiMusic.utils.database import (delete_playlist, get_playlist,
                                        save_playlist)
 
 from YukkiMusic.utils.stream.stream import stream
+
 from YukkiMusic import Carbon, app
 
 ADDPLAYLIST_COMMAND = get_command("ADDPLAYLIST_COMMAND")
