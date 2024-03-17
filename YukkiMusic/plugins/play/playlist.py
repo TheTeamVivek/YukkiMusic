@@ -29,7 +29,7 @@ from YukkiMusic.utils.inline.playlist import (botplaylist_markup,
                                               get_playlist_markup,
                                               warning_markup)
 from YukkiMusic.utils.pastebin import Yukkibin
-from YukkiMusic.utils.stream.stream 
+from YukkiMusic.utils.stream.stream import stream
 
 
 # Command
