@@ -16,6 +16,8 @@ from pyrogram import filters
 from pyrogram.types import (InlineKeyboardButton,
                             InlineKeyboardMarkup, Message)
 
+from pyrogram.types import CallbackQuery
+
 from config import BANNED_USERS, SERVER_PLAYLIST_LIMIT
 from strings import get_command
 from YukkiMusic import Carbon, YouTube, app
