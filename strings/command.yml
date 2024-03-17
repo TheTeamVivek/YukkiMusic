@@ -30,6 +30,7 @@ STREAM_COMMAND : ["stream", "cstream", "streamforce"]
 #Playlists Command
 PLAYLIST_COMMAND : ["playlist"]
 DELETEPLAYLIST_COMMAND : ["deleteplaylist"]
+ADDPLAYLIST_COMMAND : ["addplaylist"]
 
 
 # Tools
