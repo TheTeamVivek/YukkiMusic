@@ -1,6 +1,7 @@
 import stream
 import time
 import yt_dlp
+from strings import get_command
 from youtube_search import YoutubeSearch
 from youtubesearchpython import VideosSearch
 from youtubesearchpython import SearchVideos
@@ -11,7 +12,7 @@ from YukkiMusic.utils.database import (delete_playlist, get_playlist,
 from YukkiMusic.utils.stream.stream 
 from YukkiMusic import Carbon, app
 
-
+ADDPLAYLIST_COMMAND = 
 @app.on_message(
     filters.command(ADDPLAYLIST_COMMAND)
     & ~BANNED_USERS
