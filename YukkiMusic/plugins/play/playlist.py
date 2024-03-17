@@ -188,10 +188,7 @@ async def del_plist_msg(client, message: Message, _):
     await get.edit_text(
         _["playlist_7"].format(count), reply_markup=keyboard
     )
-@app.on_callback_query(filters.regex("nothing_playlist") & ~BANNED_USERS)
-@languageCB
-async def add_playlist(client, CallbackQuery, _):
-    await CallbackQuery.answer("➻ ᴛᴏ ᴀᴅᴅ ᴀ sᴏɴɢ ɪɴ ʏᴏᴜʀ ᴘʟᴀʏʟɪsᴛ ᴊᴜsᴛ ᴛʏᴘᴇ /addplaylist (Here your song name)\n\n➥ ᴇxᴀᴍᴘʟᴇ » /addplaylist Blue Eyes Blue tyes.", show_alert=True)
+
 
 
 
