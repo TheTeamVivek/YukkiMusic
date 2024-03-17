@@ -72,12 +72,14 @@ async def check_playlist(client, message: Message, _):
     await message.reply_photo(
         carbon, caption=_["playlist_15"].format(link)
     )
+
+import json
 @app.on_message(
     filters.command(ADDPLAYLIST_COMMAND)
     & ~BANNED_USERS
 )
 @language
-async def add_playlist(client, message: Message, _):
+async def nothing_playlist(client, message: Message, _):
     if len(message.command) < 2:
         return await message.reply_text("**➻ ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴍᴇ ᴀ sᴏɴɢ ɴᴀᴍᴇ ᴏʀ sᴏɴɢ ʟɪɴᴋ ᴏʀ ʏᴏᴜᴛᴜʙᴇ ᴘʟᴀʏʟɪsᴛ ʟɪɴᴋ ᴀғᴛᴇʀ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅ..**\n\n**➥ ᴇxᴀᴍᴘʟᴇs:**\n\n▷ `/addplaylist Blue Eyes` (ᴘᴜᴛ ᴀ sᴘᴇᴄɪғɪᴄ sᴏɴɢ ɴᴀᴍᴇ)\n\n▷ /addplaylist [ʏᴏᴜᴛᴜʙᴇ ᴘʟᴀʏʟɪsᴛ ʟɪɴᴋ] (ᴛᴏ ᴀᴅᴅ ᴀʟʟ sᴏɴɢs ғʀᴏᴍ ᴀ ʏᴏᴜᴛᴜʙᴇ ᴘʟᴀʏʟɪsᴛ ɪɴ ʙᴏᴛ ᴘʟᴀʏʟɪsᴛ.)")
 
@@ -376,6 +378,11 @@ async def del_plist_msg(client, message: Message, _):
     await get.edit_text(
         _["playlist_7"].format(count), reply_markup=keyboard
     )
+@app.on_callback_query(filters.regex("nothing_playlist") & ~BANNED_USERS)
+@languageCB
+async def add_playlist(client, CallbackQuery, _):
+    await CallbackQuery.answer("➻ ᴛᴏ ᴀᴅᴅ ᴀ sᴏɴɢ ɪɴ ʏᴏᴜʀ ᴘʟᴀʏʟɪsᴛ ᴊᴜsᴛ ᴛʏᴘᴇ /addplaylist (Here your song name)\n\n➥ ᴇxᴀᴍᴘʟᴇ » /addplaylist Blue Eyes Blue tyes.", show_alert=True)
+
 
 
 @app.on_callback_query(filters.regex("play_playlist") & ~BANNED_USERS)
