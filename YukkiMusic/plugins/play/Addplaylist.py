@@ -12,7 +12,9 @@ from YukkiMusic.utils.database import (delete_playlist, get_playlist,
 from YukkiMusic.utils.stream.stream 
 from YukkiMusic import Carbon, app
 
-ADDPLAYLIST_COMMAND = 
+ADDPLAYLIST_COMMAND = get_command("ADDPLAYLIST_COMMAND")
+
+
 @app.on_message(
     filters.command(ADDPLAYLIST_COMMAND)
     & ~BANNED_USERS
