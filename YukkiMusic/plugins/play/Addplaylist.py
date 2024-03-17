@@ -1,3 +1,6 @@
+from pyrogram.types import CallbackQuery
+from pyrogram.types import (InlineKeyboardButton,
+                            InlineKeyboardMarkup, Message)
 from config import BANNED_USERS, SERVER_PLAYLIST_LIMIT
 from pyrogram import filters
 import time
