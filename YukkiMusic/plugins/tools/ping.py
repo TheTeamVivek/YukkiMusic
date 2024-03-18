@@ -40,6 +40,6 @@ async def ping_com(client, message: Message, _):
     UP, CPU, RAM, DISK = await bot_sys_stats()
     resp = (datetime.now() - start).microseconds / 1000
     await response.edit_text(
-        _["ping_2"].format(app.mention, resp, UP, DISK, CPU, RAM, pytgping, reply_markup=supp_markup(_),
-        )
+        _["ping_2"].format(app.mention, resp, UP, DISK, CPU, RAM, pytgping,
+        ),        reply_markup=supp_markup(_),
     )
