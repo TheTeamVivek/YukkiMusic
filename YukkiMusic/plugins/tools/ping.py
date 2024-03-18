@@ -19,7 +19,7 @@ from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils import bot_sys_stats
 from YukkiMusic.utils.decorators.language import language
-from YukkiMusic.utils.inline import supp_markup
+from AnonXMusic.utils.inline import supp_markup
 ### Commands
 PING_COMMAND = get_command("PING_COMMAND")
 
@@ -40,6 +40,6 @@ async def ping_com(client, message: Message, _):
     UP, CPU, RAM, DISK = await bot_sys_stats()
     resp = (datetime.now() - start).microseconds / 1000
     await response.edit_text(
-        _["ping_2"].format(app.mention, resp, UP, DISK, CPU, RAM, pytgping
+        _["ping_2"].format(app.mention, resp, UP, DISK, CPU, RAM, pytgping, reply_markup=supp_markup(_),
         )
     )
