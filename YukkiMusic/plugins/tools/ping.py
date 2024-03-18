@@ -32,7 +32,8 @@ PING_COMMAND = get_command("PING_COMMAND")
 async def ping_com(client, message: Message, _):
     response = await message.reply_photo(
         photo=PING_IMG_URL,
-        caption=_["ping_1"],
+        caption=_["ping_1"].format(app.mention),
+        
     )
     start = datetime.now()
     pytgping = await Yukki.ping()
