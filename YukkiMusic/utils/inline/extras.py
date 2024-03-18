@@ -10,7 +10,7 @@ def supp_markup(_):
         [
             [
                 InlineKeyboardButton(
-                    text=_["S_B_9"],
+                    text=_["S_B_3"],
                     url=SUPPORT_GROUP,
                 ),
             ]
