@@ -215,8 +215,8 @@ lyrics_3 : "❌ Failed to fetch lyrics😭.\n\n💡**Tried Searching For:** {0}"
 lyrics_4 : "Click on the button below and get searched lyrics to avoid long spam types lyrics search."
 
 #Ping
-ping_1 : "Pong!!!!"
-ping_2 : "{0} is working good with a ping of `{1}` ms.\n\nBot's uptime is {2} and has used a total of {3} server's storage. Cpu load is about {4} with a consumption of {5} Ram. Py-Tgcalls client is also having a good ping of `{6}` ms."
+ᴘɪɴɢ_1 : "ᴘᴏɴɢ!!!!"
+ᴘɪɴɢ_2 : "{0} ɪs ᴡᴏʀᴋɪɴɢ ɢᴏᴏᴅ ᴡɪᴛʜ ᴀ ᴘɪɴɢ ᴏғ `{1}` ᴍs.\n\nʙᴏᴛ's ᴜᴘᴛɪᴍᴇ ɪs {2} ᴀɴᴅ ʜᴀs ᴜsᴇᴅ ᴀ ᴛᴏᴛᴀʟ ᴏғ {3} sᴇʀᴠᴇʀ's sᴛᴏʀᴀɢᴇ. ᴄᴘᴜ ʟᴏᴀᴅ ɪs ᴀʙᴏᴜᴛ {4} ᴡɪᴛʜ ᴀ ᴄᴏɴsᴜᴍᴘᴛɪᴏɴ ᴏғ {5} ʀᴀᴍ. ᴘʏ-ᴛɢᴄᴀʟʟs ᴄʟɪᴇɴᴛ ɪs ᴀʟsᴏ ʜᴀᴠɪɴɢ ᴀ ɢᴏᴏᴅ ᴘɪɴɢ ᴏғ `{6}` ᴍs."
 
 
 # Song
