@@ -21,7 +21,7 @@ from YukkiMusic.utils.decorators.language import language, languageCB
 from YukkiMusic.utils.inline.playlist import (botplaylist_markup,
                                               get_playlist_markup,
                                               warning_markup)
-from YukkiMusic.utils.pastebin import ANNIEBIN
+from YukkiMusic.utils.pastebin import Yukkibin as ANNIEBIN
 import time
 import yt_dlp
 from youtube_search import YoutubeSearch
