@@ -36,11 +36,7 @@ def botplaylist_markup(_):
 
 def top_play_markup(_):
     buttons = [
-        [
-            InlineKeyboardButton(
-                text="𝐓𝐨𝐩 10 𝐏𝐥𝐚𝐲𝐋𝐢𝐬𝐭𝐬", callback_data="SERVERTOP"
-            )
-        ],
+        
        [
             InlineKeyboardButton(
                 text=_["PL_B_9"], callback_data="SERVERTOP global"
@@ -92,12 +88,8 @@ def get_playlist_markup(_):
 
 def top_play_markup(_):
     buttons = [
-         [
-            InlineKeyboardButton(
-                text="𝐓𝐨𝐩 10 𝐏𝐥𝐚𝐲𝐋𝐢𝐬𝐭𝐬", callback_data="SERVERTOP"
-            )
-        ],
-[
+         
+      [
             InlineKeyboardButton(
                 text=_["PL_B_9"], callback_data="SERVERTOP Global"
             )
