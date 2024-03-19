@@ -158,6 +158,53 @@ async def get_keyboard(_, user_id):
 
 @app.on_message(
     filters.command(DELETEPLAYLIST_COMMAND)
+    & filters.group
+    & ~BANNED_USERS
+)
+@language
+async def del_group_message(client, message: Message, _):
+    upl = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    text=_["PL_B_6"],
+                    url=f"https://t.me/{app.username}?start=delplaylists",
+                ),
+            ]
+        ]
+    )
+    await message.reply_text(_["playlist_6"], reply_markup=upl)
+
+
+async def get_keyboard(_, user_id):
+    keyboard = InlineKeyboard(row_width=5)
+    _playlist = await get_playlist_names(user_id)
+    count = len(_playlist)
+    for x in _playlist:
+        _note = await get_playlist(user_id, x)
+        title = _note["title"]
+        title = title.title()
+        keyboard.row(
+            InlineKeyboardButton(
+                text=title,
+                callback_data=f"del_playlist {x}",
+            )
+        )
+    keyboard.row(
+        InlineKeyboardButton(
+            text=_["PL_B_5"],
+            callback_data=f"delete_warning",
+        ),
+        InlineKeyboardButton(
+            text=_["CLOSE_BUTTON"], callback_data=f"close"
+        ),
+    )
+    return keyboard, count
+
+
+@app.on_message(
+    filters.command(DELETEPLAYLIST_COMMAND)
+    & filters.private
     & ~BANNED_USERS
 )
 @language
@@ -419,7 +466,7 @@ async def add_playlist(client, message: Message, _):
             return await message.reply_text(str(e))
             pass
     else:
-        from ANNIEMUSIC import YouTube
+        from YukkiMusic import YouTube
         # Add a specific song by name
         query = " ".join(message.command[1:])
         print(query)
@@ -515,52 +562,7 @@ async def del_plist(client, CallbackQuery, _):
 )
 
 
-@app.on_callback_query(filters.regex("recover_playlist") & ~BANNED_USERS)
-@languageCB
-async def add_playlist(client, CallbackQuery, _):
-    from YukkiMusic import YouTube
-    callback_data = CallbackQuery.data.strip()
-    videoid = callback_data.split(None, 1)[1]
-    user_id = CallbackQuery.from_user.id
-    _check = await get_playlist(user_id, videoid)
-    if _check:
-        try:
-            return await CallbackQuery.answer(
-                _["playlist_8"], show_alert=True
-            )
-        except:
-            return
-    _count = await get_playlist_names(user_id)
-    count = len(_count)
-    if count == SERVER_PLAYLIST_LIMIT:
-        try:
-            return await CallbackQuery.answer(
-                _["playlist_9"].format(SERVER_PLAYLIST_LIMIT),
-                show_alert=True,
-            )
-        except:
-            return
-    (
-        title,
-        duration_min,
-        duration_sec,
-        thumbnail,
-        vidid,
-    ) = await YouTube.details(videoid, True)
-    title = (title[:50]).title()
-    plist = {
-        "videoid": vidid,
-        "title": title,
-        "duration": duration_min,
-    }
-    await save_playlist(user_id, videoid, plist)
-    try:
-        title = (title[:30]).title()
-        return await CallbackQuery.edit_message_text(text="**➻ ʀᴇᴄᴏᴠᴇʀᴇᴅ sᴏɴɢ ɪɴ ʏᴏᴜʀ ᴘʟᴀʏʟɪsᴛ**\n\n**➥ Cʜᴇᴄᴋ Pʟᴀʏʟɪsᴛ ʙʏ /playlist**\n\n**➥ ᴅᴇʟᴇᴛᴇ ᴘʟᴀʏʟɪsᴛ ʙʏ » /delplaylist**\n\n**➥ ᴀɴᴅ ᴘʟᴀʏ ᴘʟᴀʏʟɪsᴛ ʙʏ » /play**"
-            
-        )
-    except:
-        return
+
 
 
 
