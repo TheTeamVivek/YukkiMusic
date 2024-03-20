@@ -393,7 +393,7 @@ async def add_playlist(client, message: Message, _):
             return await message.reply_text(f"Error: {e}")
 
         if not video_urls:
-            return await message.reply_text("**ɴᴏ sᴏɴɢs ғᴏᴜɴᴅ ɪɴ ᴛʜᴇ ᴘʟᴀʏʟɪsᴛ ʟɪɴᴋ .\n\n** ᴛʀʏ ᴏᴛʜᴇʀ ʏᴏᴜᴛᴜʙᴇ  ʟɪɴᴋ**")
+            return await message.reply_text("**ɴᴏ sᴏɴɢs ғᴏᴜɴᴅ ɪɴ ᴛʜᴇ ᴘʟᴀʏʟɪsᴛ ʟɪɴᴋ.**\n\n** ᴛʀʏ ᴏᴛʜᴇʀ ʏᴏᴜᴛᴜʙᴇ  ʟɪɴᴋ**")
 
         user_id = message.from_user.id
         for video_url in video_urls:
@@ -415,7 +415,7 @@ async def add_playlist(client, message: Message, _):
             await save_playlist(user_id, video_id, plist)
             
         await addin.delete()
-        return await message.reply_text(text="ᴀʟʟ sᴏɴɢs ʜᴀs ʙᴇᴇɴ ᴀᴅᴅᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ғʀᴏᴍ ʏᴏᴜʀ ʏᴏᴜᴛᴜʙᴇ ʟɪɴᴋ")
+        return await message.reply_text(text="**ᴀʟʟ sᴏɴɢs ʜᴀs ʙᴇᴇɴ ᴀᴅᴅᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ғʀᴏᴍ ʏᴏᴜʀ ʏᴏᴜᴛᴜʙᴇ ʟɪɴᴋ**")
         pass
     # Check if the provided input is a YouTube video link
     if "https://youtu.be" in query:
@@ -458,7 +458,7 @@ async def add_playlist(client, message: Message, _):
                 # Create inline keyboard with remove button
                 
                 await add.delete()
-                await message.reply_photo(thumbnail, caption="**ᴀᴅᴅᴇᴅ sᴏɴɢ ɪɴ ʏᴏᴜʀ ʙᴏᴛ ᴘʟᴀʏʟɪsᴛ")
+                await message.reply_photo(thumbnail, caption="**ᴀᴅᴅᴇᴅ sᴏɴɢ ɪɴ ʏᴏᴜʀ ʙᴏᴛ ᴘʟᴀʏʟɪsᴛ**")
             except Exception as e:
                 print(f"Error: {e}")
                 await message.reply_text(str(e))
@@ -513,10 +513,10 @@ async def add_playlist(client, message: Message, _):
             await save_playlist(user_id, videoid, plist)
 
             await m.delete()
-            await message.reply_photo(thumbnail, caption="**ᴀᴅᴅᴇᴅ sᴏɴɢ ɪɴ ʏᴏᴜʀ ʙᴏᴛ ᴘʟᴀʏʟɪsᴛ")
+            await message.reply_photo(thumbnail, caption="**ᴀᴅᴅᴇᴅ sᴏɴɢ ɪɴ ʏᴏᴜʀ ʙᴏᴛ ᴘʟᴀʏʟɪsᴛ**")
 
         except KeyError:
-            return await message.reply_text("ɪɴᴠᴀʟɪᴅ ᴅᴀᴛᴀ ғᴏʀᴍᴀᴛ ʀᴇᴄᴇɪᴠᴇᴅ.")
+            return await message.reply_text("**ɪɴᴠᴀʟɪᴅ ᴅᴀᴛᴀ ғᴏʀᴍᴀᴛ ʀᴇᴄᴇɪᴠᴇᴅ.**")
         except Exception as e:
             pass
 
