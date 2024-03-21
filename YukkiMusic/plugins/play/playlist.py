@@ -222,7 +222,6 @@ async def del_plist_msg(client, message: Message, _):
 
 @app.on_callback_query(filters.regex("play_playlist") & ~BANNED_USERS)
 @languageCB
-@PlayWrapper
 async def play_playlist(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     mode = callback_data.split(None, 1)[1]
@@ -272,7 +271,6 @@ async def play_playlist(client, CallbackQuery, _):
 
 @app.on_message(filters.command("playplaylist") & ~BANNED_USERS & filters.group)
 @languageCB
-@PlayWrapper
 async def play_playlist_command(client, message, _):
     mode = message.command[1] if len(message.command) > 1 else None
     user_id = message.from_user.id
