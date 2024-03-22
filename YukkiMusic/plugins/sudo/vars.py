@@ -67,7 +67,7 @@ async def varsFunc(client, message):
     if not config.START_IMG_URL:
         start = "No"
     else:
-        start = f"[Image]({config.START_IMG_URL})"
+        start = "Random"
     if not config.SUPPORT_CHANNEL:
         s_c = "No"
     else:
