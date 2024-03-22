@@ -199,9 +199,10 @@ async def start_comm(client, message: Message, _):
             OWNER = None
         out = private_panel(_, app.username, OWNER)
         if config.START_IMG_URL:
+           RANDOM_PHOTO = random.choice(config.START_IMG_URL)
             try:
                 await message.reply_photo(
-                    photo=config.START_IMG_URL,
+                    photo=RANDOM_PHOTO,
                     caption=_["start_2"].format(
                         config.MUSIC_BOT_NAME
                     ),
