@@ -5,7 +5,7 @@ import config
 from config import BANNED_USERS
 from strings import get_command
 from YukkiMusic import app
-from YukkiMusic.core.call import CUTE
+from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.decorators.play import PlayWrapper
 from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
@@ -32,7 +32,7 @@ async def stream_command(
             _["play_2"].format(channel) if channel else _["play_1"]
         )
         try:
-            await CUTE.stream_call(url)
+            await Yukki.stream_call(url)
         except NoActiveGroupCall:
             await mystic.edit_text(
                 "ᴛʜᴇʀᴇ's ᴀɴ ɪssᴜᴇ ᴡɪᴛʜ ᴛʜᴇ ʙᴏᴛ. ᴘʟᴇᴀsᴇ ʀᴇᴘᴏʀᴛ ɪᴛ ᴛᴏ ᴍʏ ᴏᴡɴᴇʀ ᴀɴᴅ ᴀsᴋ ᴛʜᴇᴍ ᴛᴏ ᴄʜᴇᴄᴋ ʟᴏɢɢᴇʀ ɢʀᴏᴜᴘ."
