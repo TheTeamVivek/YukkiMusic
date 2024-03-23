@@ -294,7 +294,7 @@ async def play_playlist_command(client, message, _):
         pass
     
     result = []
-    video = True if message.command[0] == "/vplayplaylist" else None
+    video = True if message.command[0].lower() == "vplayplaylist" else None
     
     mystic = await message.reply_text(_["play_1"])
     
