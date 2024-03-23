@@ -199,21 +199,20 @@ async def start_comm(client, message: Message, _):
             OWNER = None
         out = private_panel(_, app.username, OWNER)
         if config.START_IMG_URL:
-           RANDOM_PHOTO = random.choice(config.START_IMG_URL)
-            try:
+          try:
                 await message.reply_photo(
-                    photo=RANDOM_PHOTO,
+                    photo=START_IMG_URL,
                     caption=_["start_2"].format(
                         config.MUSIC_BOT_NAME
                     ),
                     reply_markup=InlineKeyboardMarkup(out),
                 )
             except:
-                await message.reply_text(
+              await message.reply_text(
                     _["start_2"].format(config.MUSIC_BOT_NAME),
                     reply_markup=InlineKeyboardMarkup(out),
                 )
-        else:
+          else:
             await message.reply_text(
                 _["start_2"].format(config.MUSIC_BOT_NAME),
                 reply_markup=InlineKeyboardMarkup(out),
