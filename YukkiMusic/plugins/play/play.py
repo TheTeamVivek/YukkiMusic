@@ -461,15 +461,11 @@ async def play_music(client, CallbackQuery, _):
     vidid, user_id, mode, cplay, fplay = callback_request.split("|")
     if CallbackQuery.from_user.id != int(user_id):
         try:
-            return await CallbackQuery.answer(
-                _["playcb_1"], show_alert=True
-            )
+            return await CallbackQuery.answer(_["playcb_1"], show_alert=True)
         except:
             return
     try:
-        chat_id, channel = await get_channeplayCB(
-            _, cplay, CallbackQuery
-        )
+        chat_id, channel = await get_channeplayCB(_, cplay, CallbackQuery)
     except:
         return
     user_name = CallbackQuery.from_user.first_name
@@ -489,9 +485,7 @@ async def play_music(client, CallbackQuery, _):
         duration_sec = time_to_seconds(details["duration_min"])
         if duration_sec > config.DURATION_LIMIT:
             return await mystic.edit_text(
-                _["play_6"].format(
-                    config.DURATION_LIMIT_MIN, details["duration_min"]
-                )
+                _["play_6"].format(config.DURATION_LIMIT_MIN, details["duration_min"])
             )
     else:
         buttons = livestream_markup(
@@ -523,13 +517,10 @@ async def play_music(client, CallbackQuery, _):
         )
     except Exception as e:
         ex_type = type(e).__name__
-        err = (
-            e
-            if ex_type == "AssistantErr"
-            else _["general_3"].format(ex_type)
-        )
+        err = e if ex_type == "AssistantErr" else _["general_3"].format(ex_type)
         return await mystic.edit_text(err)
     return await mystic.delete()
+
 
 @app.on_callback_query(filters.regex("AnonymousAdmin") & ~BANNED_USERS)
 async def anonymous_check(client, CallbackQuery):
@@ -540,9 +531,3 @@ async def anonymous_check(client, CallbackQuery):
         )
     except:
         return
-
-
-@app.on_callback_query(filters.regex("AlexaPlaylists") & ~BANNED_USERS)
-@languageCB
-async def play_playlists_command(client, CallbackQuery, _):
-    callback_dat
