@@ -14,7 +14,7 @@ from pyrogram.types import InlineKeyboardMarkup, InputMediaPhoto, Message
 from pytgcalls.exceptions import NoActiveGroupCall
 import config
 from YukkiMusic import Apple, Resso, SoundCloud, Spotify, Telegram, YouTube, app
-from YukkiMusic.core.call import CUTE
+from YukkiMusic.core.call import Yukki as CUTE
 from YukkiMusic.utils import seconds_to_min, time_to_seconds
 from YukkiMusic.utils.channelplay import get_channeplayCB
 from YukkiMusic.utils.database import is_video_allowed
