@@ -27,15 +27,16 @@ async def fkadress(_, message):
 
 
         fkinfo= f"""
-﹝⌬﹞**ɴᴀᴍᴇ** ⇢ {name}
-﹝⌬﹞**ɢᴇɴᴅᴇʀ** ⇢ {gender}
-﹝⌬﹞**ᴀᴅᴅʀᴇss** ⇢ {address}
-﹝⌬﹞**ᴄᴏᴜɴᴛʀʏ** ⇢ {country}
-﹝⌬﹞**ᴄɪᴛʏ** ⇢ {city}
-﹝⌬﹞**sᴛᴀᴛᴇ** ⇢ {state}
-﹝⌬﹞**ᴘᴏsᴛᴀʟ** ⇢ {postal}
-﹝⌬﹞**ᴇᴍᴀɪʟ** ⇢ {email}
-﹝⌬﹞**ᴘʜᴏɴᴇ** ⇢ {phone}
+**ɴᴀᴍᴇ** ⇢ `{name}`
+**ɢᴇɴᴅᴇʀ** ⇢ `{gender}`
+**ᴀᴅᴅʀᴇss** ⇢ `{address}`
+**ᴄᴏᴜɴᴛʀʏ** ⇢ `{country}`
+**ᴄɪᴛʏ** ⇢ `{city}`
+**ɢᴇɴᴅᴇʀ** ⇢ `{gender}`
+**sᴛᴀᴛᴇ** ⇢ `{state}`
+**ᴘᴏsᴛᴀʟ** ⇢ `{postal}`
+**ᴇᴍᴀɪʟ** ⇢ `{email}`
+**ᴘʜᴏɴᴇ** ⇢ `{phone}`
 
         """
 
