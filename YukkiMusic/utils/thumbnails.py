@@ -1,12 +1,3 @@
-#
-# Copyright (C) 2021-present by TeamYukki@Github, < https://github.com/TeamYukki >.
-#
-# This file is part of < https://github.com/TeamYukki/YukkiMusicBot > project,
-# and is released under the "GNU v3.0 License Agreement".
-# Please see < https://github.com/TeamYukki/YukkiMusicBot/blob/master/LICENSE >
-#
-# All rights reserved.
-#
 import os
 import re
 import textwrap
@@ -28,7 +19,16 @@ def changeImageSize(maxWidth, maxHeight, image):
     newImage = image.resize((newWidth, newHeight))
     return newImage
 
-
+def circle(img):
+    h, w = img.size
+    a = Image.new('L', [h, w], 0)
+    b = ImageDraw.Draw(a)
+    b.pieslice([(0, 0), (h, w)], 0, 360, fill=255, outline="white")
+    c = np.array(img)
+    d = np.array(a)
+    e = np.dstack((c, d))
+    return Image.fromarray(e)
+    
 def add_corners(im):
     bigsize = (im.size[0] * 3, im.size[1] * 3)
     mask = Image.new("L", bigsize, 0)
@@ -94,41 +94,21 @@ async def gen_thumb(videoid, user_id):
         x = f.resize((107, 107))
 
         youtube = Image.open(f"cache/thumb{videoid}.png")
+        cutex = Image.open(f"cache/thumb{videoid}.png")
         bg = Image.open(f"assets/YK/circle.png")
-        image1 = changeImageSize(1280, 720, youtube)
+        image1 = youtube.resize((1280, 720))
         image2 = image1.convert("RGBA")
         background = image2.filter(filter=ImageFilter.BoxBlur(30))
         enhancer = ImageEnhance.Brightness(background)
         background = enhancer.enhance(0.6)
-
-        image3 = changeImageSize(1280, 720, bg)
+        cute = circle(cutex).resize((393, 393))
+        background.paste(cute, (91, 176), mask=cute)  # kya pata work kr jaye 
+        image3 = bg.resize((1280, 720))
         image5 = image3.convert("RGBA")
-        Image.alpha_composite(background, image5).save(f"cache/temp{videoid}.png")
-
-        Xcenter = youtube.width / 2
-        Ycenter = youtube.height / 2
-        x1 = Xcenter - 250
-        y1 = Ycenter - 250
-        x2 = Xcenter + 250
-        y2 = Ycenter + 250
-        logo = youtube.crop((x1, y1, x2, y2))
-        logo.thumbnail((520, 520), Image.ANTIALIAS)
-        logo.save(f"cache/chop{videoid}.png")
-        if not os.path.isfile(f"cache/cropped{videoid}.png"):
-            im = Image.open(f"cache/chop{videoid}.png").convert("RGBA")
-            add_corners(im)
-            im.save(f"cache/cropped{videoid}.png")
-
-        crop_img = Image.open(f"cache/cropped{videoid}.png")
-        logo = crop_img.convert("RGBA")
-        logo.thumbnail((365, 365), Image.ANTIALIAS)
-        width = int((1280 - 365) / 2)
-        background = Image.open(f"cache/temp{videoid}.png")
-        background.paste(logo, (width + 2, 138), mask=logo)
-        background.paste(x, (710, 427), mask=x)
-        background.paste(image3, (0, 0), mask=image3)
-
-        draw = ImageDraw.Draw(background)
+        final_img = Image.alpha_composite(background, image5)
+        final_img.paste(x, (355, 395), mask=x)  # user photo
+        # Adding text
+        draw = ImageDraw.Draw(final_img)
         font = ImageFont.truetype("assets/YK/font2.ttf", 45)
         ImageFont.truetype("assets/YK/font2.ttf", 70)
         arial = ImageFont.truetype("assets/YK/font2.ttf", 30)
