@@ -21,13 +21,6 @@ from YukkiMusic.utils.formatters import convert_bytes
 
 VARS_COMMAND = get_command("VARS_COMMAND")
 
-"""get_me = await app.get_me()
-bot_username = get_me.username
-bot_id = get_me.id
-bot_name = self.me.first_name + " " + (self.me.last_name or "")
-self.mention = self.me.mention"""
-
-
 @app.on_message(filters.command(VARS_COMMAND) & SUDOERS)
 async def varsFunc(client, message):
     mystic = await message.reply_text(
@@ -67,7 +60,7 @@ async def varsFunc(client, message):
     if not config.START_IMG_URL:
         start = "No"
     else:
-        start = "Random"
+        start = "[YES]({config.START_IMG_URL})"
     if not config.SUPPORT_CHANNEL:
         s_c = "No"
     else:
