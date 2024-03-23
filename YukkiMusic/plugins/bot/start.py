@@ -9,7 +9,6 @@
 #
 
 import asyncio
-import random
 from pyrogram import filters
 from pyrogram.enums import ChatType, ParseMode
 from pyrogram.types import (InlineKeyboardButton,
@@ -18,7 +17,7 @@ from youtubesearchpython.__future__ import VideosSearch
 
 import config
 from config import BANNED_USERS
-from config.config import OWNER_ID, MUSIC_BOT_NAME
+from config.config import OWNER_ID
 from strings import get_command, get_string
 from YukkiMusic import Telegram, YouTube, app
 from YukkiMusic.misc import SUDOERS
@@ -49,7 +48,6 @@ async def start_comm(client, message: Message, _):
         name = message.text.split(None, 1)[1]
         if name == "verify":
             await message.reply_text(f"ʜᴇʏ {message.from_user.first_name},\nᴛʜᴀɴᴋs ғᴏʀ ᴠᴇʀɪғʏɪɴɢ ʏᴏᴜʀsᴇʟғ ɪɴ {config.MUSIC_BOT_NAME}, ɴᴏᴡ ʏᴏᴜ ᴄᴀɴ ɢᴏ ʙᴀᴄᴋ ᴀɴᴅ sᴛᴀʀᴛ ᴜsɪɴɢ ᴍᴇ.")
-
 
         if name[0:4] == "help":
             keyboard = help_pannel(_)
@@ -199,10 +197,9 @@ async def start_comm(client, message: Message, _):
             OWNER = None
         out = private_panel(_, app.username, OWNER)
         if config.START_IMG_URL:
-           RANDOM_PHOTO = random.choice(config.START_IMG_URL)
             try:
                 await message.reply_photo(
-                    photo=RANDOM_PHOTO,
+                    photo=config.START_IMG_URL,
                     caption=_["start_2"].format(
                         config.MUSIC_BOT_NAME
                     ),
