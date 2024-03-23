@@ -90,40 +90,47 @@ async def gen_thumb(videoid, user_id):
         d = np.array(a)
         e = np.dstack((c, d))
         f = Image.fromarray(e)
-        x = f.resize((167, 167))
+        x = f.resize((153, 153))
 
         youtube = Image.open(f"cache/thumb{videoid}.png")
         zyoutube = Image.open(f"cache/thumb{videoid}.png")
-        bg = Image.open(f"assets/YK/circle.png")
+        bg = Image.open(f"assets/ZSTREAM_adobe_express.png")
         image1 = youtube.resize((1280, 720))
         image2 = image1.convert("RGBA")
-        background = image2.filter(filter=ImageFilter.BoxBlur(30))
+        background = image2.filter(filter=ImageFilter.BoxBlur(16))
         enhancer = ImageEnhance.Brightness(background)
         background = enhancer.enhance(0.6)
-        y = circle(zyoutube).resize((393, 393))
-        background.paste(y, (91, 176), mask=y)  # Adjusted placement of YouTube circle image
+        y = circle(zyoutube).resize((474, 474))
+        background.paste(y, (49, 125), mask=y)  # Adjusted placement of YouTube circle image
         image3 = bg.resize((1280, 720))
         image5 = image3.convert("RGBA")
         result_img = Image.alpha_composite(background, image5)
-        result_img.paste(x, (355, 395), mask=x)  # Adjusted placement of user photo
+        result_img.paste(x, (353, 471), mask=x)  # Adjusted placement of user photo
         # Adding text to the thumbnail
         draw = ImageDraw.Draw(result_img)
-        font = ImageFont.truetype("assets/YK/font2.ttf", 52)
-        font2 = ImageFont.truetype("assets/YK/font2.ttf", 89)
+        font = ImageFont.truetype("assets/font2.ttf", 54)
+        font2 = ImageFont.truetype("assets/font2.ttf", 89)
         para = textwrap.wrap(title, width=32)
         try:
+            text_w, text_h = draw.textsize(f"NOW PLAYING", font=font2)
+            draw.text(
+                ((1680 - text_w) / 2, 75),
+                f"NOW PLAYING",
+                fill="white",
+                font=font2,
+            )
             if para[0]:
                 draw.text(
-                    (535, 235),
+                    (535, 255),
                     f"Title: {para[0]}",
                     fill="white",
                     stroke_width=1,
-                    stroke_fill="black",
+                    stroke_fill="white",
                     font=font,
                 )
             if para[1]:
                 draw.text(
-                    (535, 235),
+                    (535, 255),
                     f"Title: {para[1]}",
                     fill="white",
                     stroke_width=1,
@@ -134,20 +141,16 @@ async def gen_thumb(videoid, user_id):
             pass
         text_w, text_h = draw.textsize(f"Duration: {duration} Mins", font=font)
         draw.text(
-            ((1557 - text_w) / 2, 322),
+            ((1557 - text_w) / 2, 342),
             f"Duration: {duration} Mins",
             fill="white",
-            stroke_width=1,
-            stroke_fill="black",
             font=font,
         )
         text_a, text_b = draw.textsize(f"Views: {views}", font=font)
         draw.text(
-            ((1530 - text_a) / 2, 412),
+            ((1530 - text_a) / 2, 432),
             f"Views: {views} ",
             fill="white",
-            stroke_width=1,
-            stroke_fill="black",
             font=font,
         )
         try:
@@ -217,40 +220,47 @@ async def gen_qthumb(videoid, user_id):
         d = np.array(a)
         e = np.dstack((c, d))
         f = Image.fromarray(e)
-        x = f.resize((167, 167))
+        x = f.resize((153, 153))
 
         youtube = Image.open(f"cache/thumb{videoid}.png")
         zyoutube = Image.open(f"cache/thumb{videoid}.png")
-        bg = Image.open(f"assets/THUMB.png")
+        bg = Image.open(f"assets/ZSTREAM_adobe_express.png")
         image1 = youtube.resize((1280, 720))
         image2 = image1.convert("RGBA")
-        background = image2.filter(filter=ImageFilter.BoxBlur(30))
+        background = image2.filter(filter=ImageFilter.BoxBlur(16))
         enhancer = ImageEnhance.Brightness(background)
         background = enhancer.enhance(0.6)
-        y = circle(zyoutube).resize((393, 393))
-        background.paste(y, (91, 176), mask=y)  # Adjusted placement of YouTube circle image
+        y = circle(zyoutube).resize((473, 473))
+        background.paste(y, (49, 125), mask=y)  # Adjusted placement of YouTube circle image
         image3 = bg.resize((1280, 720))
         image5 = image3.convert("RGBA")
         result_img = Image.alpha_composite(background, image5)
-        result_img.paste(x, (355, 395), mask=x)   # Adjusted placement of user photo
+        result_img.paste(x, (353, 472), mask=x)  # Adjusted placement of user photo
         # Adding text to the thumbnail
         draw = ImageDraw.Draw(result_img)
-        font = ImageFont.truetype("assets/font2.ttf", 52)
-        font2 = ImageFont.truetype("assets/font2.ttf", 87)
+        font = ImageFont.truetype("assets/font2.ttf", 54)
+        font2 = ImageFont.truetype("assets/font2.ttf", 89)
         para = textwrap.wrap(title, width=32)
         try:
+            text_w, text_h = draw.textsize(f"ADDED TO QUEUE", font=font2)
+            draw.text(
+                ((1680 - text_w) / 2, 75),
+                f"ADDED TO QUEUE",
+                fill="white",
+                font=font2,
+            )
             if para[0]:
                 draw.text(
-                    (535, 235),
+                    (535, 255),
                     f"Title: {para[0]}",
                     fill="white",
                     stroke_width=1,
-                    stroke_fill="black",
+                    stroke_fill="white",
                     font=font,
                 )
             if para[1]:
                 draw.text(
-                    (535, 235),
+                    (535, 255),
                     f"Title: {para[1]}",
                     fill="white",
                     stroke_width=1,
@@ -261,20 +271,16 @@ async def gen_qthumb(videoid, user_id):
             pass
         text_w, text_h = draw.textsize(f"Duration: {duration} Mins", font=font)
         draw.text(
-            ((1557 - text_w) / 2, 322),
+            ((1557 - text_w) / 2, 342),
             f"Duration: {duration} Mins",
             fill="white",
-            stroke_width=1,
-            stroke_fill="black",
             font=font,
         )
         text_a, text_b = draw.textsize(f"Views: {views}", font=font)
         draw.text(
-            ((1530 - text_a) / 2, 412),
+            ((1530 - text_a) / 2, 432),
             f"Views: {views} ",
             fill="white",
-            stroke_width=1,
-            stroke_fill="black",
             font=font,
         )
         try:
