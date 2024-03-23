@@ -36,6 +36,7 @@ def add_corners(im):
     mask = mask.resize(im.size, Image.LANCZOS)
     mask = ImageChops.darker(mask, im.split()[-1])
     im.putalpha(mask)
+    return im  
 
 
 async def gen_thumb(videoid):
