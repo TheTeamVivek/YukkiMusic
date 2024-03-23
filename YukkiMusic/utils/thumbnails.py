@@ -38,9 +38,9 @@ def add_corners(im):
     im.putalpha(mask)
 
 
-async def gen_thumb(videoid, user_id):
-    if os.path.isfile(f"cache/{videoid}_{user_id}.png"):
-        return f"cache/{videoid}_{user_id}.png"
+async def gen_thumb(videoid):
+    if os.path.isfile(f"cache/{videoid}.png"):
+        return f"cache/{videoid}.png"
     url = f"https://www.youtube.com/watch?v={videoid}"
     try:
         results = VideosSearch(url, limit=1)
@@ -72,26 +72,7 @@ async def gen_thumb(videoid, user_id):
                     await f.write(await resp.read())
                     await f.close()
 
-        try:
-            wxy = await app.download_media(
-                (await app.get_users(user_id)).photo.big_file_id,
-                file_name=f"{user_id}.jpg",
-            )
-        except:
-            wxy = await app.download_media(
-                (await app.get_users(app.id)).photo.big_file_id,
-                file_name=f"{app.id}.jpg",
-            )
-
-        xy = Image.open(wxy)
-        a = Image.new("L", [640, 640], 0)
-        b = ImageDraw.Draw(a)
-        b.pieslice([(0, 0), (640, 640)], 0, 360, fill=255, outline="white")
-        c = np.array(xy)
-        d = np.array(a)
-        e = np.dstack((c, d))
-        f = Image.fromarray(e)
-        x = f.resize((107, 107))
+        
 
         youtube = Image.open(f"cache/thumb{videoid}.png")
         cutex = Image.open(f"cache/thumb{videoid}.png")
@@ -106,7 +87,7 @@ async def gen_thumb(videoid, user_id):
         image3 = bg.resize((1280, 720))
         image5 = image3.convert("RGBA")
         final_img = Image.alpha_composite(background, image5)
-        final_img.paste(x, (355, 395), mask=x)  # user photo
+        # user photo
         # Adding text
         draw = ImageDraw.Draw(final_img)
         font = ImageFont.truetype("assets/YK/font2.ttf", 45)
@@ -156,8 +137,8 @@ async def gen_thumb(videoid, user_id):
             os.remove(f"cache/thumb{videoid}.png")
         except:
             pass
-        background.save(f"cache/{videoid}_{user_id}.png")
-        return f"cache/{videoid}_{user_id}.png"
+        background.save(f"cache/{videoid}.png")
+        return f"cache/{videoid}.png"
     except Exception as e:
         LOGGER.error(e)
         return YOUTUBE_IMG_URL
