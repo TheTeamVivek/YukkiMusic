@@ -8,6 +8,7 @@
 # All rights reserved.
 #s
 
+
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, Message
 import config
@@ -49,8 +50,7 @@ async def skip(cli, message: Message, _, chat_id):
                             except:
                                 return await message.reply_text(_["admin_16"])
                             if popped:
-                                if config.AUTO_DOWNLOADS_CLEAR == str(True):
-                                    await auto_clean(popped)
+                                await auto_clean(popped)
                             if not check:
                                 try:
                                     await message.reply_text(
@@ -77,8 +77,7 @@ async def skip(cli, message: Message, _, chat_id):
         try:
             popped = check.pop(0)
             if popped:
-                if config.AUTO_DOWNLOADS_CLEAR == str(True):
-                    await auto_clean(popped)
+                await auto_clean(popped)
             if not check:
                 await message.reply_text(
                     _["admin_10"].format(message.from_user.first_name),
