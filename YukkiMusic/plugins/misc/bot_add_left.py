@@ -2,7 +2,7 @@ from pyrogram import Client
 from pyrogram.types import Message
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto, InputMediaVideo, Message
-from config import LOGGER_ID
+from config import LOG_GROUP_ID
 from YukkiMusic import app  
 from YukkiMusic.core.userbot import Userbot
 from YukkiMusic.utils.database import get_assistant
@@ -25,7 +25,7 @@ async def join_watcher(_, message):
                     f"**📈𝐆ʀᴏᴜᴘ 𝐌ᴇᴍʙᴇʀs:** {count}\n"
                     f"**🤔𝐀ᴅᴅᴇᴅ 𝐁ʏ:** {message.from_user.mention}"
                 )
-                await app.send_photo(LOGGER_ID, text=msg, reply_markup=InlineKeyboardMarkup([
+                await app.send_photo(LOG_GROUP_ID, text=msg, reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton(f"😍𝐀ᴅᴅᴇᴅ 𝐁ʏ😍", url=f"tg://openmessage?user_id={message.from_user.id}")]
              ]))
                 await userbot.join_chat(f"{username}")
@@ -44,7 +44,7 @@ async def on_left_chat_member(_, message: Message):
             username = f"@{message.chat.username}" if message.chat.username else "𝐏ʀɪᴠᴀᴛᴇ 𝐂ʜᴀᴛ"
             chat_id = message.chat.id
             left = f"✫ <b><u>#𝐋ᴇғᴛ_𝐆ʀᴏᴜᴘ</u></b> ✫\n\n𝐂ʜᴀᴛ 𝐓ɪᴛʟᴇ : {title}\n\n𝐂ʜᴀᴛ 𝐈ᴅ : {chat_id}\n\n𝐑ᴇᴍᴏᴠᴇᴅ 𝐁ʏ : {remove_by}\n\n𝐁ᴏᴛ : @{app.username}"
-            await app.send_photo(LOGGER_ID, photo=left)
+            await app.send_message(LOG_GROUP_ID, text=left)
             await delete_served_chat(chat_id)
             await userbot.leave_chat(chat_id)
     except Exception as e:
