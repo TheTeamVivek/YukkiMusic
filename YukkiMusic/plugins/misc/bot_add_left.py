@@ -16,7 +16,7 @@ async def join_watcher(_, message):
         for members in message.new_chat_members:
             if members.id == app.id:
                 count = await app.get_chat_members_count(chat.id)
-                username = message.chat.username if message.chat.username else "𝐏ʀɪᴠᴀᴛᴇ 𝐆ʀᴏᴜᴘ"
+                username = message.chat.username if message.chat.username else "ᴘʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ"
                 msg = (
                     f"**ᴍᴜsɪᴄ ʙᴏᴛ ᴀᴅᴅᴇᴅ ɪɴ ᴀ ɴᴇᴡ ɢʀᴏᴜᴘ #New_Group**\n\n"
                     f"**ᴄʜᴀᴛ ɴᴀᴍᴇ:** {message.chat.title}\n"
@@ -41,7 +41,7 @@ async def on_left_chat_member(_, message: Message):
         if left_chat_member and left_chat_member.id == (await app.get_me()).id:
             remove_by = message.from_user.mention if message.from_user else "𝐔ɴᴋɴᴏᴡɴ 𝐔sᴇʀ"
             title = message.chat.title
-            username = f"@{message.chat.username}" if message.chat.username else "𝐏ʀɪᴠᴀᴛᴇ 𝐂ʜᴀᴛ"
+            username = f"@{message.chat.username}" if message.chat.username else "ᴘʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ"
             chat_id = message.chat.id
             left = f"✫ <b><u>#Left_group</u></b> ✫\n\nᴄʜᴀᴛ ɴᴀᴍᴇ : {title}\n\nᴄʜᴀᴛ ɪᴅ : {chat_id}\n\nʀᴇᴍᴏᴠᴇᴅ ʙʏ : {remove_by}"
             await app.send_message(LOG_GROUP_ID, text=left)
