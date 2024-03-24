@@ -8,7 +8,7 @@ from YukkiMusic.core.userbot import Userbot
 from YukkiMusic.utils.database import get_assistant
 from YukkiMusic.utils.database import delete_served_chat
 
-@app.on_message(filters.new_chat_members, group=2)
+@app.on_message(filters.new_chat_members)
 async def join_watcher(_, message):    
     try:
         userbot = await get_assistant(message.chat.id)
@@ -18,15 +18,15 @@ async def join_watcher(_, message):
                 count = await app.get_chat_members_count(chat.id)
                 username = message.chat.username if message.chat.username else "𝐏ʀɪᴠᴀᴛᴇ 𝐆ʀᴏᴜᴘ"
                 msg = (
-                    f"**📝𝐌ᴜsɪᴄ 𝐁ᴏᴛ 𝐀ᴅᴅᴇᴅ 𝐈ɴ 𝐀 #𝐍ᴇᴡ_𝐆ʀᴏᴜᴘ**\n\n"
-                    f"**📌𝐂ʜᴀᴛ 𝐍ᴀᴍᴇ:** {message.chat.title}\n"
-                    f"**🍂𝐂ʜᴀᴛ 𝐈ᴅ:** {message.chat.id}\n"
-                    f"**🔐𝐂ʜᴀᴛ 𝐔sᴇʀɴᴀᴍᴇ:** @{username}\n"
-                    f"**📈𝐆ʀᴏᴜᴘ 𝐌ᴇᴍʙᴇʀs:** {count}\n"
-                    f"**🤔𝐀ᴅᴅᴇᴅ 𝐁ʏ:** {message.from_user.mention}"
+                    f"**ᴍᴜsɪᴄ ʙᴏᴛ ᴀᴅᴅᴇᴅ ɪɴ ᴀ ɴᴇᴡ ɢʀᴏᴜᴘ #New_Group**\n\n"
+                    f"**ᴄʜᴀᴛ ɴᴀᴍᴇ:** {message.chat.title}\n"
+                    f"**ᴄʜᴀᴛ ɪᴅ:** {message.chat.id}\n"
+                    f"**ᴄʜᴀᴛ ᴜsᴇʀɴᴀᴍᴇ:** @{username}\n"
+                    f"**ᴄʜᴀᴛ ᴍᴇᴍʙᴇʀ ᴄᴏᴜɴᴛ:** {count}\n"
+                    f"**ᴀᴅᴅᴇᴅ ʙʏ:** {message.from_user.mention}"
                 )
                 await app.send_photo(LOG_GROUP_ID, text=msg, reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton(f"😍𝐀ᴅᴅᴇᴅ 𝐁ʏ😍", url=f"tg://openmessage?user_id={message.from_user.id}")]
+                [InlineKeyboardButton(f"ᴀᴅᴅᴇᴅ ʙʏ", url=f"tg://openmessage?user_id={message.from_user.id}")]
              ]))
                 await userbot.join_chat(f"{username}")
     except Exception as e:
@@ -43,7 +43,7 @@ async def on_left_chat_member(_, message: Message):
             title = message.chat.title
             username = f"@{message.chat.username}" if message.chat.username else "𝐏ʀɪᴠᴀᴛᴇ 𝐂ʜᴀᴛ"
             chat_id = message.chat.id
-            left = f"✫ <b><u>#𝐋ᴇғᴛ_𝐆ʀᴏᴜᴘ</u></b> ✫\n\n𝐂ʜᴀᴛ 𝐓ɪᴛʟᴇ : {title}\n\n𝐂ʜᴀᴛ 𝐈ᴅ : {chat_id}\n\n𝐑ᴇᴍᴏᴠᴇᴅ 𝐁ʏ : {remove_by}\n\n𝐁ᴏᴛ : @{app.username}"
+            left = f"✫ <b><u>#Left_group</u></b> ✫\n\nᴄʜᴀᴛ ɴᴀᴍᴇ : {title}\n\nᴄʜᴀᴛ ɪᴅ : {chat_id}\n\nʀᴇᴍᴏᴠᴇᴅ ʙʏ : {remove_by}"
             await app.send_message(LOG_GROUP_ID, text=left)
             await delete_served_chat(chat_id)
             await userbot.leave_chat(chat_id)
