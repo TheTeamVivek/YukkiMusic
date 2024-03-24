@@ -1,6 +1,5 @@
 from typing import Dict, List, Union
-
-from Yukki import db
+from YukkiMusic.core.mongo import mongodb
 
 pmpermitdb = db.permit
 
