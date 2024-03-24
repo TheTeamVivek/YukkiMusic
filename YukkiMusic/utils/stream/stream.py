@@ -96,7 +96,7 @@ async def stream(
                     )
                 except:
                     raise AssistantErr(_["play_16"])
-                await CUTE.join_call(
+                await Yukki.join_call(
                     chat_id, original_chat_id, file_path, video=status, image=thumbnail
                 )
                 await put_queue(
@@ -129,7 +129,7 @@ async def stream(
         if count == 0:
             return
         else:
-            link = await CUTEbin(msg)
+            link = await Yukkibin(msg)
             lines = msg.count("\n")
             if lines >= 17:
                 car = os.linesep.join(msg.split(os.linesep)[:17])
@@ -182,7 +182,7 @@ async def stream(
         else:
             if not forceplay:
                 db[chat_id] = []
-            await CUTE.join_call(
+            await Yukki.join_call(
                 chat_id, original_chat_id, file_path, video=status, image=thumbnail
             )
             await put_queue(
@@ -239,7 +239,7 @@ async def stream(
         else:
             if not forceplay:
                 db[chat_id] = []
-            await CUTE.join_call(chat_id, original_chat_id, file_path, video=None)
+            await Yukki.join_call(chat_id, original_chat_id, file_path, video=None)
             await put_queue(
                 chat_id,
                 original_chat_id,
