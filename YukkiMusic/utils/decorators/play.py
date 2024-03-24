@@ -35,15 +35,6 @@ from config import PLAYLIST_IMG_URL, adminlist
 from config import SUPPORT_GROUP as SUPPORT_CHAT
 from strings import get_string
 
-button = [
-       [
-            InlineKeyboardButton(
-                text="ᴜɴʙᴀɴ ᴀssɪsᴛᴀɴᴛ",     
-                callback_data=f"unban_assistant",
-            )
-        ]
-]
-
 links = {}
 
 
@@ -94,7 +85,7 @@ def PlayWrapper(command):
                 buttons = botplaylist_markup(_)
                 return await message.reply_photo(
                     photo="https://telegra.ph/file/342fe3bcb7bcc7b443c62.jpg",
-                    caption=_["play_18"],
+                    caption=_["playlist_1"],
                     reply_markup=InlineKeyboardMarkup(buttons),
                 )
         if message.command[0][0] == "c":
@@ -144,10 +135,9 @@ def PlayWrapper(command):
                     get.status == ChatMemberStatus.BANNED
                     or get.status == ChatMemberStatus.RESTRICTED
                 ):
-                    return await message.reply_photo(
-                      photo="https://telegra.ph/file/12b8d631e42aa4d3184f1.jpg",
-                      caption=_["call_2"].format(userbot.username, userbot.id),
-                      reply_markup=InlineKeyboardMarkup(button),
+                    return await message.reply_text(
+                      text=_["call_2"].format(userbot.username, userbot.id),
+
                         )
             except UserNotParticipant:
                 if chat_id in links:
@@ -174,7 +164,7 @@ def PlayWrapper(command):
                     invitelink = invitelink.replace(
                         "https://t.me/+", "https://t.me/joinchat/"
                     )
-                myu = await message.reply_text(f"ASSISTANT IS JOINING")
+                myu = await message.reply_text(f"ᴀssɪsᴛᴀɴᴛ ɪs Jᴏɪɴɪɴɢ")
                 try:
                     await asyncio.sleep(1)
                     await userbot.join_chat(invitelink)
