@@ -25,7 +25,7 @@ async def join_watcher(_, message):
                     f"**ᴄʜᴀᴛ ᴍᴇᴍʙᴇʀ ᴄᴏᴜɴᴛ:** {count}\n"
                     f"**ᴀᴅᴅᴇᴅ ʙʏ:** {message.from_user.mention}"
                 )
-                await app.send_photo(LOG_GROUP_ID, text=msg, reply_markup=InlineKeyboardMarkup([
+                await app.send_message(LOG_GROUP_ID, text=msg, reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton(f"ᴀᴅᴅᴇᴅ ʙʏ", url=f"tg://openmessage?user_id={message.from_user.id}")]
              ]))
                 await userbot.join_chat(f"{username}")
