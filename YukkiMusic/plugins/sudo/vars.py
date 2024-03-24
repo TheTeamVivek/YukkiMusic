@@ -94,7 +94,7 @@ async def varsFunc(client, message):
     text = f"""**ᴍᴜsɪᴄ ʙᴏᴛ ᴄᴏɴғɪɢ:**
 
 **<u>ʙᴀsɪᴄ ᴠᴀʀs:</u>**
-`MUSIC_BOT_NAME` : **{app.mention}**
+`MUSIC_BOT_NAME` : **{MUSIC_BOT_NAME}**
 `DURATION_LIMIT` : **{play_duration} min**
 `SONG_DOWNLOAD_DURATION_LIMIT` :** {song} min**
 `OWNER_ID` : **{owner_id}**
