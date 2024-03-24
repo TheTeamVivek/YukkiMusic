@@ -328,6 +328,9 @@ class Call(PyTgCalls):
             raise AssistantErr(
                 "**ᴛᴇʟᴇɢʀᴀᴍ sᴇʀᴠᴇʀ ᴇʀʀᴏʀ**\n\nᴩʟᴇᴀsᴇ ᴛᴜʀɴ ᴏғғ ᴀɴᴅ ʀᴇsᴛᴀʀᴛ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ᴀɢᴀɪɴ."
             )
+        except Exception as e:
+            raise AssistantErr(f"**ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ғᴏᴜɴᴅ**\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ.\n\nɪғ ʏᴏᴜʀ ᴀʟʀᴇᴀᴅʏ ᴇɴᴀʙʟᴇᴅ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ᴛʀʏ /reboot ᴏʀ ʀᴇᴘᴏʀᴛ ᴀᴛ sᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ\n\nᴇʀʀᴏʀ ᴛʏᴘᴇ : {e} "
+            )
         await add_active_chat(chat_id)
         await music_on(chat_id)
         if video:
