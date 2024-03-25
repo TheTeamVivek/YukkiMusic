@@ -622,6 +622,12 @@ async def del_plist(client, CallbackQuery, _):
 @app.on_callback_query(filters.regex("add_playlist") & ~BANNED_USERS)
 @languageCB
 async def add_playlist(client, CallbackQuery, _):
+    try:
+        from YukkiMusic import YouTube
+    except ImportError as e:
+        print(f"ERROR {e}")
+        return
+
     callback_data = CallbackQuery.data.strip()
     videoid = callback_data.split(None, 1)[1]
     user_id = CallbackQuery.from_user.id
