@@ -77,13 +77,6 @@ async def delete_playlist(chat_id: int, name: str) -> bool:
 
 # Users
 
-async def is_user_v(user_id: int) -> bool:
-    user = await usersdb.find_one({"user_id": user_id})
-    if not user:
-        return False
-    return True
-
-
 
 async def is_served_user(user_id: int) -> bool:
     user = await usersdb.find_one({"user_id": user_id})
