@@ -13,7 +13,7 @@ from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
 from YukkiMusic.core.userbot import Userbot
 from YukkiMusic.misc import dbb, heroku, sudo
-
+from config import ASSISTANT_PREFIX
 from .logging import LOGGER
 
 # Directories
@@ -36,6 +36,8 @@ app = YukkiBot()
 
 # Assistant Client
 userbot = Userbot()
+#Assistant prefix 
+ASSISTANT_PREFIX = ASSISTANT_PREFIX
 
 from .platforms import *
 

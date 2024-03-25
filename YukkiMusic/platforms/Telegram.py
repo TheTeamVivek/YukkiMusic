@@ -18,7 +18,7 @@ from pyrogram.types import (InlineKeyboardButton,
                             InlineKeyboardMarkup, Voice)
 
 import config
-from config import MUSIC_BOT_NAME, lyrical
+from config import lyrical
 from YukkiMusic import app
 
 from ..utils.formatters import (convert_bytes, get_readable_time,
@@ -57,16 +57,16 @@ class TeleAPI:
             file_name = file.file_name
             if file_name is None:
                 file_name = (
-                    "Telegram Audio File"
+                    "ᴛᴇʟᴇɢʀᴀᴍ ᴀᴜᴅɪᴏ ғɪʟᴇ"
                     if audio
-                    else "Telegram Video File"
+                    else "ᴛᴇʟᴇɢʀᴀᴍ ᴠɪᴅᴇᴏ ғɪʟᴇ"
                 )
 
         except:
             file_name = (
-                "Telegram Audio File"
+                "ᴛᴇʟᴇɢʀᴀᴍ ᴀᴜᴅɪᴏ ғɪʟᴇ"
                 if audio
-                else "Telegram Video File"
+                else "ᴛᴇʟᴇɢʀᴀᴍ ᴠɪᴅᴇᴏ ғɪʟᴇ"
             )
         return file_name
 
@@ -129,7 +129,7 @@ class TeleAPI:
                     [
                         [
                             InlineKeyboardButton(
-                                text="🚦 Cancel Downloading",
+                                text="🚦 ᴄᴀɴᴄᴇʟ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ",
                                 callback_data="stop_downloading",
                             ),
                         ]
@@ -148,14 +148,14 @@ class TeleAPI:
                     completed_size = convert_bytes(current)
                     speed = convert_bytes(speed)
                     text = f"""
-**{MUSIC_BOT_NAME} Telegram Media Downloader**
+**{app.mention} ᴛᴇʟᴇɢʀᴀᴍ ᴍᴇᴅɪᴀ ᴅᴏᴡɴʟᴏᴀᴅᴇʀ**
 
-**Total FileSize:** {total_size}
-**Completed:** {completed_size} 
-**Percentage:** {percentage[:5]}%
+**ᴛᴏᴛᴀʟ ғɪʟᴇ sɪᴢᴇ:** {total_size}
+**ᴄᴏᴍᴘʟᴇᴛᴇᴅ:** {completed_size} 
+**ᴘᴇʀᴄᴇɴᴛᴀɢᴇ:** {percentage[:5]}%
 
-**Speed:** {speed}/s
-**ETA:** {eta}"""
+**sᴘᴇᴇᴅ:** {speed}/s
+**ᴇʟᴘᴀsᴇᴅ ᴛɪᴍᴇ:** {eta}"""
                     try:
                         await mystic.edit_text(text, reply_markup=upl)
                     except:
@@ -174,7 +174,7 @@ class TeleAPI:
                     progress=progress,
                 )
                 await mystic.edit_text(
-                    "Successfully Downloaded.. Processing file now"
+                    "sᴜᴄᴄᴇssғᴜʟʟʏ ᴅᴏᴡɴʟᴏᴀᴅᴇᴅ...\n ᴘʀᴏᴄᴇssɪɴɢ ғɪʟᴇ ɴᴏᴡ"
                 )
                 downloader.pop(message.id)
             except:
