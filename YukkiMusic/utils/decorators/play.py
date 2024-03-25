@@ -33,7 +33,7 @@ from YukkiMusic.utils.database import (
     is_commanddelete_on,
 )
 from YukkiMusic.utils.inline import botplaylist_markup
-from config import PLAYLIST_IMG_URL, adminlist
+from config import PLAYLIST_IMG_URL, PRIVATE_BOT_MODE, adminlist
 from config import SUPPORT_GROUP as SUPPORT_CHAT
 from strings import get_string
 
