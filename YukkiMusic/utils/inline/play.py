@@ -12,42 +12,38 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from YukkiMusic.utils.formatters import time_to_seconds
 
 ## After Edits with Timer Bar
-
-
 def stream_markup_timer(_, videoid, chat_id, played, dur):
     played_sec = time_to_seconds(played)
     duration_sec = time_to_seconds(dur)
     percentage = (played_sec / duration_sec) * 100
     om = math.floor(percentage)
     if 0 < om <= 10:
-        bar = "➽─────────────"
+        bar = "✄─·─·─·─·─·─·─·─·─·─"
     elif 10 < om < 20:
-        bar = "─➽────────────"
+        bar = "-ˋˏ-ˋˏ✄─·─·─·─·─·─·─·─·─"
     elif 20 <= om < 30:
-        bar = "──➽───────────"
+        bar = "-ˋˏ-ˋˏ-ˋˏ✄─·─·─·─·─·─·─·─·"
     elif 30 <= om < 40:
-        bar = "───➽──────────"
+        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ✄─·─·─·─·─·─·─"
     elif 40 <= om < 50:
-        bar = "─────➽────────"
+        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏˋˏ-ˋˏ✄─·─·─·─·─·─"
     elif 50 <= om < 60:
-        bar = "───────➽───────"
+        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˏˋˏ-ˋˏ-ˋˏ✄─·─·─·─·─"
     elif 60 <= om < 70:
-        bar = "────────➽─────"
+        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏˋˏ-ˋˏ-ˋˏ-ˋˏ✄─·─·─·─"
     elif 70 <= om < 80:
-        bar = "──────────➽───"
+        bar = "ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏˋˏ-ˋˏ✄─·─·─·"
     elif 80 <= om < 95:
-        bar = "────────────➽─"
+        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋ-ˋˏ-ˋˏ-ˋˏ-ˋˏˏ-ˋˏ-ˋˏ-ˋˏ✄─"
     else:
-        bar = "─────────────➽"
-
-
+        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋ-ˋˏ-ˋˏ-ˋˏ-ˋˏˏ-ˋˏ-ˋˏ-ˋˏ✄·"
     buttons = [
         [
             InlineKeyboardButton(
-                text=f"{dur} {bar} {played}",
+                text=f"{played} •{bar}• {dur}",
                 callback_data="GetTimer",
             )
-        ],        
+        ],             
                [
             InlineKeyboardButton(text="ᴀᴅᴅ ᴛᴏ ᴘʟᴀʏʟɪsᴛ", callback_data=f"add_playlist {videoid}"),
                  ],
@@ -76,40 +72,39 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
     ]
     return buttons
 
-
 def telegram_markup_timer(_, chat_id, played, dur):
     played_sec = time_to_seconds(played)
     duration_sec = time_to_seconds(dur)
     percentage = (played_sec / duration_sec) * 100
     om = math.floor(percentage)
     if 0 < om <= 10:
-        bar = "➽─────────────"
+        bar = "✄─·─·─·─·─·─·─·─·─·─"
     elif 10 < om < 20:
-        bar = "─➽────────────"
+        bar = "-ˋˏ-ˋˏ✄─·─·─·─·─·─·─·─·─"
     elif 20 <= om < 30:
-        bar = "──➽───────────"
+        bar = "-ˋˏ-ˋˏ-ˋˏ✄─·─·─·─·─·─·─·─·"
     elif 30 <= om < 40:
-        bar = "───➽──────────"
+        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ✄─·─·─·─·─·─·─"
     elif 40 <= om < 50:
-        bar = "─────➽────────"
+        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏˋˏ-ˋˏ✄─·─·─·─·─·─"
     elif 50 <= om < 60:
-        bar = "───────➽───────"
+        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˏˋˏ-ˋˏ-ˋˏ✄─·─·─·─·─"
     elif 60 <= om < 70:
-        bar = "────────➽─────"
+        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏˋˏ-ˋˏ-ˋˏ-ˋˏ✄─·─·─·─"
     elif 70 <= om < 80:
-        bar = "──────────➽───"
+        bar = "ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏˋˏ-ˋˏ✄─·─·─·"
     elif 80 <= om < 95:
-        bar = "────────────➽─"
+        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋ-ˋˏ-ˋˏ-ˋˏ-ˋˏˏ-ˋˏ-ˋˏ-ˋˏ✄─"
     else:
-        bar = "─────────────➽"
-
+        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋ-ˋˏ-ˋˏ-ˋˏ-ˋˏˏ-ˋˏ-ˋˏ-ˋˏ✄·"
     buttons = [
         [
             InlineKeyboardButton(
-                text=f"{dur} {bar} {played}",
+                text=f"{played} •{bar}• {dur}",
                 callback_data="GetTimer",
             )
         ],
+
           [
             InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
             InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
