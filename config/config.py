@@ -28,7 +28,9 @@ API_HASH = getenv("API_HASH")
 ## Get it from @Botfather in Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
 
+#________________________________________________________________________________#
 
+ASSISTANT_PREFIX = list(getenv("ASSISTANT_PREFIX", ".").split())
 
 #________________________________________________________________________________#
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
@@ -240,7 +242,6 @@ START_IMG_URL = getenv(
     "START_IMG_URL",
     "https://telegra.ph/file/91533956c91d0fd7c9f20.jpg",
 )
-
 PING_IMG_URL = getenv(
     "PING_IMG_URL",
     "https://telegra.ph/file/91533956c91d0fd7c9f20.jpg",
