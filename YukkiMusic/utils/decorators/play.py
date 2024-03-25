@@ -29,6 +29,8 @@ from YukkiMusic.utils.database import (
     get_playtype,
     is_active_chat,
     is_maintenance,
+    is_served_private_chat,
+    is_commanddelete_on,
 )
 from YukkiMusic.utils.inline import botplaylist_markup
 from config import PLAYLIST_IMG_URL, adminlist
@@ -53,7 +55,7 @@ def PlayWrapper(command):
                     ]
                 ]
             )
-            return await message.reply_text(_["general_3"], reply_markup=upl)
+            return await message.reply_text(_["general_4"], reply_markup=upl)
 
         if await is_maintenance() is False:
             if message.from_user.id not in SUDOERS:
@@ -61,11 +63,17 @@ def PlayWrapper(command):
                     text=f"{app.mention} ɪs ᴜɴᴅᴇʀ ᴍᴀɪɴᴛᴇɴᴀɴᴄᴇ, ᴠɪsɪᴛ <a href={SUPPORT_CHAT}>sᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ</a> ғᴏʀ ᴋɴᴏᴡɪɴɢ ᴛʜᴇ ʀᴇᴀsᴏɴ.",
                     disable_web_page_preview=True,
                 )
-
-        try:
-            await message.delete()
-        except:
-            pass
+        if PRIVATE_BOT_MODE == str(True):
+            if not await is_served_private_chat(message.chat.id):
+                await message.reply_text(
+                    "**ᴘʀɪᴠᴀᴛᴇ ᴍᴜsɪᴄ ʙᴏᴛ**\n\nᴏɴʟʏ ғᴏʀ ᴀᴜᴛʜᴏʀɪᴢᴇᴅ ᴄʜᴀᴛs ғʀᴏᴍ ᴛʜᴇ ᴏᴡɴᴇʀ. ᴀsᴋ ᴍʏ ᴏᴡɴᴇʀ ᴛᴏ ᴀʟʟᴏᴡ ʏᴏᴜʀ ᴄʜᴀᴛ ғɪʀsᴛ."
+                )
+                return await app.leave_chat(message.chat.id)
+        if await is_commanddelete_on(message.chat.id):
+            try:
+                await message.delete()
+            except:
+                pass
 
         audio_telegram = (
             (message.reply_to_message.audio or message.reply_to_message.voice)
@@ -81,7 +89,7 @@ def PlayWrapper(command):
         if audio_telegram is None and video_telegram is None and url is None:
             if len(message.command) < 2:
                 if "stream" in message.command:
-                    return await message.reply_text(_["str_1"])
+                    return await message.reply_text("ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴍ3ᴜ8 ʟɪɴᴋs ᴏʀ ɪɴᴅᴇx")
                 buttons = botplaylist_markup(_)
                 return await message.reply_photo(
                     photo=PLAYLIST_IMG_URL,
@@ -91,7 +99,7 @@ def PlayWrapper(command):
         if message.command[0][0] == "c":
             chat_id = await get_cmode(message.chat.id)
             if chat_id is None:
-                return await message.reply_text(_["setting_7"])
+                return await message.reply_text(_["setting_12"])
             try:
                 chat = await app.get_chat(chat_id)
             except:
@@ -106,7 +114,7 @@ def PlayWrapper(command):
             if message.from_user.id not in SUDOERS:
                 admins = adminlist.get(message.chat.id)
                 if not admins:
-                    return await message.reply_text(_["admin_13"])
+                    return await message.reply_text(_["admin_18"])
                 else:
                     if message.from_user.id not in admins:
                         return await message.reply_text(_["play_4"])
@@ -119,7 +127,7 @@ def PlayWrapper(command):
                 video = True if message.command[0][1] == "v" else None
         if message.command[0][-1] == "e":
             if not await is_active_chat(chat_id):
-                return await message.reply_text(_["play_16"])
+                return await message.reply_text(_["play_18"])
             fplay = True
         else:
             fplay = None
