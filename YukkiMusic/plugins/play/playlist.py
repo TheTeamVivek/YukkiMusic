@@ -8,6 +8,7 @@ from YukkiMusic.utils.database import (
     get_lang,
     is_banned_user,
     is_on_off,
+    get_assistant,
 )
 
 from pykeyboard import InlineKeyboard
