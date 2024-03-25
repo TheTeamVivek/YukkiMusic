@@ -21,21 +21,14 @@ from YukkiMusic.utils.formatters import convert_bytes
 
 VARS_COMMAND = get_command("VARS_COMMAND")
 
-"""get_me = await app.get_me()
-bot_username = get_me.username
-bot_id = get_me.id
-bot_name = self.me.first_name + " " + (self.me.last_name or "")
-self.mention = self.me.mention"""
-
-
 @app.on_message(filters.command(VARS_COMMAND) & SUDOERS)
 async def varsFunc(client, message):
     mystic = await message.reply_text(
         "ɢᴇᴛᴛɪɴɢ ʏᴏᴜʀ ᴄᴏɴғɪɢ..... ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ!"
     )
-    
+
     v_limit = await get_video_limit()
-    bot_name = config.MUSIC_BOT_NAME
+    bot_name = app.name
     up_r = f"[Repo]({config.UPSTREAM_REPO})"
     up_b = config.UPSTREAM_BRANCH
     auto_leave = config.AUTO_LEAVE_ASSISTANT_TIME
@@ -67,7 +60,7 @@ async def varsFunc(client, message):
     if not config.START_IMG_URL:
         start = "No"
     else:
-        start = "Random"
+        start = "[YES]({config.START_IMG_URL})"
     if not config.SUPPORT_CHANNEL:
         s_c = "No"
     else:
@@ -94,7 +87,7 @@ async def varsFunc(client, message):
     text = f"""**ᴍᴜsɪᴄ ʙᴏᴛ ᴄᴏɴғɪɢ:**
 
 **<u>ʙᴀsɪᴄ ᴠᴀʀs:</u>**
-`MUSIC_BOT_NAME` : **{MUSIC_BOT_NAME}**
+`MUSIC_BOT_NAME` : **{app.mention}**
 `DURATION_LIMIT` : **{play_duration} min**
 `SONG_DOWNLOAD_DURATION_LIMIT` :** {song} min**
 `OWNER_ID` : **{owner_id}**
