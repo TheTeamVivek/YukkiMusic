@@ -12,6 +12,7 @@ motor
 ntgcalls==1.0.7
 pillow==9.5.0
 psutil
+pytube
 pykeyboard
 py-tgcalls==1.2.2
 git+https://github.com/KurimuzonAkuma/pyrogram@dev
