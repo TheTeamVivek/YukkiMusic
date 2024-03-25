@@ -634,7 +634,6 @@ async def add_playlist(client, CallbackQuery, _):
     _check = await get_playlist(user_id, videoid)
     if _check:
         try:
-            from YukkiMusic import YouTube
             return await CallbackQuery.answer(
                 _["playlist_8"], show_alert=True
             )
