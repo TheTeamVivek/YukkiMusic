@@ -129,7 +129,7 @@ AUTO_SUGGESTION_TIME = int(
 
 
 # Set it True if you want to bot to suggest about bot commands to random chats of your bots.
-AUTO_SUGGESTION_MODE = getenv("AUTO_SUGGESTION_MODE",True)
+AUTO_SUGGESTION_MODE = getenv("AUTO_SUGGESTION_MODE",False)
 
 
 
