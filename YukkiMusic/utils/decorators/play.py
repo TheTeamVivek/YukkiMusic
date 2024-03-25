@@ -212,14 +212,3 @@ def PlayWrapper(command):
         )
 
     return wrapper
-
-
-@app.on_callback_query(filters.regex("unban_assistant"))
-async def unban_assistant(_, callback: CallbackQuery):
-    chat_id = callback.message.chat.id
-    userbot = await get_assistant(chat_id)
-    try:
-        await app.unban_chat_member(chat_id, userbot.id)
-        await callback.answer("Sᴜᴄᴄᴇssғᴜʟʏ ᴜɴʙᴀɴɴᴇᴅ Assɪsᴛᴀɴᴛ Nᴏᴡ sᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ Yᴏᴜʀ Mᴜsɪᴄ!", show_alert=True)
-    except Exception as e:
-        await callback.answer(f"Oʜ Aɴ Eʀʀᴏʀ Oᴄᴄᴜʀʀᴇᴅ 🥲 Pʟᴇᴀsᴇ Rᴇᴘᴏʀᴛ ɪᴛ ᴛᴏ ᴍʏ ᴏᴡɴᴇʀ : {e}", show_alert=True)
