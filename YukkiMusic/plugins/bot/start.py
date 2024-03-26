@@ -150,9 +150,9 @@ async def start_comm(client, message: Message, _):
                 link = result["link"]
                 published = result["publishedTime"]
             searched_text = f"""
-🔍__**Video Track Information**__
+🔍__**ᴠɪᴅᴇᴏ ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ**__
 
-❇️**Title:** {title}
+❇️**ᴛɪᴛʟᴇ:** {title}
 
 ⏳**ᴅᴜʀᴀᴛɪᴏɴ:** {duration} Mins
 👀**ᴠɪᴇᴡs:** `{views}`
@@ -207,12 +207,12 @@ async def start_comm(client, message: Message, _):
                 )
             except:
                 await message.reply_text(
-                    _["start_2"].format(config.MUSIC_BOT_NAME),
+                    _["start_2"].format(app.mention),
                     reply_markup=InlineKeyboardMarkup(out),
                 )
         else:
             await message.reply_text(
-                _["start_2"].format(config.MUSIC_BOT_NAME),
+                _["start_2"].format(app.mention),
                 reply_markup=InlineKeyboardMarkup(out),
             )
         if await is_on_off(config.LOG):
