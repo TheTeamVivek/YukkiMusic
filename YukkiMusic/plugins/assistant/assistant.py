@@ -16,6 +16,12 @@ from YukkiMusic.core.userbot import Userbot
 
 flood = {}
 
+ASS_CLI_1 = userbot.one
+ASS_CLI_2 = userbot.two
+ASS_CLI_3 = userbot.three
+ASS_CLI_4 = userbot.four
+ASS_CLI_5 = userbot.five
+
 @Client.on_message(
     filters.private
     & filters.incoming
@@ -200,7 +206,7 @@ async def eor(msg: Message, **kwargs):
     spec = getfullargspec(func.__wrapped__).args
     return await func(**{k: v for k, v in kwargs.items() if k in spec})
 
-"""async def vivek():
+async def vivek():
     await userbot.start()
 
-asyncio.create_task(vivek())"""
+asyncio.create_task(vivek())
