@@ -24,7 +24,7 @@ userbot = Userbot()
     & ~filters.me
     & ~filters.bot
     & ~filters.via_bot
-    & ~filters.user(SUDOERS)
+    & SUDOERS
 )
 async def awaiting_message(client, message):
     if await is_on_off(5):
