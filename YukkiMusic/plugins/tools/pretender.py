@@ -91,6 +91,7 @@ async def chk_usr(_, message: Message):
 
 
 @app.on_message(filters.group & filters.command("pretender") & ~filters.bot & ~filters.via_bot)
+@AdminRightsCheck
 async def set_mataa(_, message: Message):
     if len(message.command) == 1:
         return await message.reply("**ᴅᴇᴛᴇᴄᴛᴇᴅ ᴘʀᴇᴛᴇɴᴅᴇʀ ᴜsᴀɢᴇ:\n/pretender on|off**")
