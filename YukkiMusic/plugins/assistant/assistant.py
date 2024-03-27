@@ -204,4 +204,4 @@ async def eor(msg: Message, **kwargs):
 async def main():
     await userbot.start()
   
-asyncio.run(main())
+#asyncio.run(main())
