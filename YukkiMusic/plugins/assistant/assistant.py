@@ -204,4 +204,4 @@ async def eor(msg: Message, **kwargs):
 async def vivek():
     await userbot.start()
     
-asyncio.run(vivek())
+asyncio.create_task(vivek())
