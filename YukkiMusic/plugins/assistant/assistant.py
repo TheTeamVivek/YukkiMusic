@@ -17,7 +17,7 @@ from YukkiMusic.core.userbot import Userbot
 flood = {}
 userbot = Userbot()
 
-@Client.on_message(
+@userbot.on_message(
     filters.private
     & filters.incoming
     & ~filters.service
@@ -58,12 +58,12 @@ async def awaiting_message(client, message):
     )
 
 
-@Client.on_message(
+@userbot.on_message(
     filters.command("approve", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
     & ~filters.via_bot
 )
-@Client.on_message(
+@userbot.on_message(
     filters.command("approve", prefixes=ASSISTANT_PREFIX)
     & filters.user("me")
     & ~filters.via_bot
@@ -80,12 +80,12 @@ async def pm_approve(client, message):
     await eor(message, text="User is approved to pm")
 
 
-@Client.on_message(
+@userbot.on_message(
     filters.command("disapprove", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
     & ~filters.via_bot
 )
-@Client.on_message(
+@userbot.on_message(
     filters.command("disapprove", prefixes=ASSISTANT_PREFIX)
     & filters.user("me")
     & ~filters.via_bot
@@ -109,12 +109,12 @@ async def pm_disapprove(client, message):
     await eor(message, text="User is disapproved to pm")
 
 
-@Client.on_message(
+@userbot.on_message(
     filters.command("block", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
     & ~filters.via_bot
 )
-@Client.on_message(
+@userbot.on_message(
     filters.command("block", prefixes=ASSISTANT_PREFIX)
     & filters.user("me")
     & ~filters.via_bot
@@ -127,12 +127,12 @@ async def block_user_func(client, message):
     await client.block_user(user_id)
 
 
-@Client.on_message(
+@userbot.on_message(
     filters.command("unblock", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
     & ~filters.via_bot
 )
-@Client.on_message(
+@userbot.on_message(
     filters.command("unblock", prefixes=ASSISTANT_PREFIX)
     & filters.user("me")
     & ~filters.via_bot
@@ -147,12 +147,12 @@ async def unblock_user_func(client, message):
     await eor(message, text="Successfully Unblocked the user")
 
 
-@Client.on_message(
+@userbot.on_message(
     filters.command("pfp", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
     & ~filters.via_bot
 )
-@Client.on_message(
+@userbot.on_message(
     filters.command("pfp", prefixes=ASSISTANT_PREFIX)
     & filters.user("me")
     & ~filters.via_bot
@@ -168,12 +168,12 @@ async def set_pfp(client, message):
         await eor(message, text=e)
 
 
-@Client.on_message(
+@userbot.on_message(
     filters.command("bio", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
     & ~filters.via_bot
 )
-@Client.on_message(
+@userbot.on_message(
     filters.command("bio", prefixes=ASSISTANT_PREFIX)
     & filters.user("me")
     & ~filters.via_bot
@@ -203,5 +203,5 @@ async def eor(msg: Message, **kwargs):
 
 async def vivek():
     await userbot.start()
-    
+
 asyncio.create_task(vivek())
