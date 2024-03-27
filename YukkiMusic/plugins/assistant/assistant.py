@@ -6,7 +6,8 @@ from pyrogram.types import (CallbackQuery, InlineKeyboardButton,
                             InlineQueryResultPhoto, InputTextMessageContent,
                             Message)
 
-from YukkiMusic import SUDOERS, app
+from YukkiMusic import app
+from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (approve_pmpermit, disapprove_pmpermit, is_on_off,
                             is_pmpermit_approved)
 from config import ASSISTANT_PREFIX, LOG_GROUP_ID
