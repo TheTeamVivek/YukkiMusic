@@ -15,9 +15,8 @@ from config import ASSISTANT_PREFIX, LOG_GROUP_ID
 from YukkiMusic.core.userbot import Userbot
 
 flood = {}
-userbot = Userbot()
 
-@userbot.on_message(
+@Client.on_message(
     filters.private
     & filters.incoming
     & ~filters.service
@@ -29,7 +28,7 @@ userbot = Userbot()
 async def awaiting_message(client, message):
     if await is_on_off(5):
         try:
-            await client.forward_messages(
+            await userbot.forward_messages(
                 chat_id=LOG_GROUP_ID,
                 from_chat_id=message.from_user.id,
                 message_ids=message.message_id,
@@ -39,7 +38,7 @@ async def awaiting_message(client, message):
     user_id = message.from_user.id
     if await is_pmpermit_approved(user_id):
         return
-    async for m in client.iter_history(user_id, limit=6):
+    async for m in userbot.iter_history(user_id, limit=6):
         if m.reply_markup:
             await m.delete()
     if str(user_id) in flood:
@@ -48,22 +47,22 @@ async def awaiting_message(client, message):
         flood[str(user_id)] = 1
     if flood[str(user_id)] > 5:
         await message.reply_text("Spam Detected. User Blocked")
-        await client.send_message(
+        await userbot.send_message(
             LOG_GROUP_ID,
             f"**Spam Detect Block On Assistant**\n\n- **Blocked User:** {message.from_user.mention}\n- **User ID:** {message.from_user.id}",
         )
-        return await client.block_user(user_id)
+        return await userbot.block_user(user_id)
     await message.reply_text(
         f"Hello, I am {app.mention}'s Assistant.\n\nPlease dont spam here , else you'll get blocked.\nFor more Help start :- {app.mention}"
     )
 
 
-@userbot.on_message(
+@Client.on_message(
     filters.command("approve", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
     & ~filters.via_bot
 )
-@userbot.on_message(
+@Client.on_message(
     filters.command("approve", prefixes=ASSISTANT_PREFIX)
     & filters.user("me")
     & ~filters.via_bot
@@ -80,12 +79,12 @@ async def pm_approve(client, message):
     await eor(message, text="User is approved to pm")
 
 
-@userbot.on_message(
+@Client.on_message(
     filters.command("disapprove", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
     & ~filters.via_bot
 )
-@userbot.on_message(
+@Client.on_message(
     filters.command("disapprove", prefixes=ASSISTANT_PREFIX)
     & filters.user("me")
     & ~filters.via_bot
@@ -98,7 +97,7 @@ async def pm_disapprove(client, message):
     user_id = message.reply_to_message.from_user.id
     if not await is_pmpermit_approved(user_id):
         await eor(message, text="User is already disapproved to pm")
-        async for m in client.iter_history(user_id, limit=6):
+        async for m in userbot.iter_history(user_id, limit=6):
             if m.reply_markup:
                 try:
                     await m.delete()
@@ -109,12 +108,12 @@ async def pm_disapprove(client, message):
     await eor(message, text="User is disapproved to pm")
 
 
-@userbot.on_message(
+@Client.on_message(
     filters.command("block", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
     & ~filters.via_bot
 )
-@userbot.on_message(
+@Client.on_message(
     filters.command("block", prefixes=ASSISTANT_PREFIX)
     & filters.user("me")
     & ~filters.via_bot
@@ -124,15 +123,15 @@ async def block_user_func(client, message):
         return await eor(message, text="Reply to a user's message to block.")
     user_id = message.reply_to_message.from_user.id
     await eor(message, text="Successfully blocked the user")
-    await client.block_user(user_id)
+    await userbot.block_user(user_id)
 
 
-@userbot.on_message(
+@Client.on_message(
     filters.command("unblock", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
     & ~filters.via_bot
 )
-@userbot.on_message(
+@Client.on_message(
     filters.command("unblock", prefixes=ASSISTANT_PREFIX)
     & filters.user("me")
     & ~filters.via_bot
@@ -143,16 +142,16 @@ async def unblock_user_func(client, message):
             message, text="Reply to a user's message to unblock."
         )
     user_id = message.reply_to_message.from_user.id
-    await client.unblock_user(user_id)
+    await userbot.unblock_user(user_id)
     await eor(message, text="Successfully Unblocked the user")
 
 
-@userbot.on_message(
+@Client.on_message(
     filters.command("pfp", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
     & ~filters.via_bot
 )
-@userbot.on_message(
+@Client.on_message(
     filters.command("pfp", prefixes=ASSISTANT_PREFIX)
     & filters.user("me")
     & ~filters.via_bot
@@ -162,18 +161,18 @@ async def set_pfp(client, message):
         return await eor(message, text="Reply to a photo.")
     photo = await message.reply_to_message.download()
     try:
-        await client.set_profile_photo(photo=photo)
+        await userbot.set_profile_photo(photo=photo)
         await eor(message, text="Successfully Changed PFP.")
     except Exception as e:
         await eor(message, text=e)
 
 
-@userbot.on_message(
+@Client.on_message(
     filters.command("bio", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
     & ~filters.via_bot
 )
-@userbot.on_message(
+@Client.on_message(
     filters.command("bio", prefixes=ASSISTANT_PREFIX)
     & filters.user("me")
     & ~filters.via_bot
@@ -184,7 +183,7 @@ async def set_bio(client, message):
     elif len(message.command) > 1:
         bio = message.text.split(None, 1)[1]
         try:
-            await client.update_profile(bio=bio)
+            await userbot.update_profile(bio=bio)
             await eor(message, text="Changed Bio.")
         except Exception as e:
             await eor(message, text=e)
@@ -201,7 +200,7 @@ async def eor(msg: Message, **kwargs):
     spec = getfullargspec(func.__wrapped__).args
     return await func(**{k: v for k, v in kwargs.items() if k in spec})
 
-async def vivek():
+"""async def vivek():
     await userbot.start()
 
-asyncio.create_task(vivek())
+asyncio.create_task(vivek())"""
