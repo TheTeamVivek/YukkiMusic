@@ -15,6 +15,7 @@ from config import ASSISTANT_PREFIX, LOG_GROUP_ID
 from YukkiMusic.core.userbot import Userbot
 
 flood = {}
+userbot = Userbot()
 
 ASS_CLI_1 = userbot.one
 ASS_CLI_2 = userbot.two
