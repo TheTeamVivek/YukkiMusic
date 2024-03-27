@@ -64,7 +64,7 @@ userbot = CustomUserbot()
 
 @userbot.on_message(
     filters.command("approve", prefixes=ASSISTANT_PREFIX)
-    & filters.user(SUDOERS)
+    & SUDOERS
     & ~filters.via_bot
 )
 @userbot.on_message(
@@ -85,7 +85,7 @@ async def pm_approve(client, message):
 
 @userbot.on_message(
     filters.command("disapprove", prefixes=ASSISTANT_PREFIX)
-    & filters.user(SUDOERS)
+    & SUDOERS
     & ~filters.via_bot
 )
 @userbot.on_message(
@@ -113,7 +113,7 @@ async def pm_disapprove(client, message):
 
 @userbot.on_message(
     filters.command("block", prefixes=ASSISTANT_PREFIX)
-    & filters.user(SUDOERS)
+    & SUDOERS
     & ~filters.via_bot
 )
 @userbot.on_message(
@@ -130,7 +130,7 @@ async def block_user_func(client, message):
 
 @userbot.on_message(
     filters.command("unblock", prefixes=ASSISTANT_PREFIX)
-    & filters.user(SUDOERS)
+    & SUDOERS
     & ~filters.via_bot
 )
 @userbot.on_message(
@@ -149,7 +149,7 @@ async def unblock_user_func(client, message):
 
 @userbot.on_message(
     filters.command("pfp", prefixes=ASSISTANT_PREFIX)
-    & filters.user(SUDOERS)
+    & SUDOERS
     & ~filters.via_bot
 )
 @userbot.on_message(
@@ -169,7 +169,7 @@ async def set_pfp(client, message):
 
 @userbot.on_message(
     filters.command("bio", prefixes=ASSISTANT_PREFIX)
-    & filters.user(SUDOERS)
+    & SUDOERS
     & ~filters.via_bot
 )
 @userbot.on_message(
