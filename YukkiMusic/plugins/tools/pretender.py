@@ -4,7 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
 from pyrogram import filters
 from pyrogram.types import Message
 from YukkiMusic import app
-from YukkiMusic.utils.vip_ban import admin_filter
+from YukkiMusic.utils.decorators import AdminRightsCheck
 
 
 
@@ -90,7 +90,7 @@ async def chk_usr(_, message: Message):
         await message.reply_text(msg)
 
 
-@app.on_message(filters.group & filters.command("pretender") & ~filters.bot & ~filters.via_bot & admin_filter)
+@app.on_message(filters.group & filters.command("pretender") & ~filters.bot & ~filters.via_bot)
 async def set_mataa(_, message: Message):
     if len(message.command) == 1:
         return await message.reply("**ᴅᴇᴛᴇᴄᴛᴇᴅ ᴘʀᴇᴛᴇɴᴅᴇʀ ᴜsᴀɢᴇ:\n/pretender on|off**")
