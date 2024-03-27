@@ -11,7 +11,7 @@ from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (approve_pmpermit, disapprove_pmpermit, is_on_off,
                             is_pmpermit_approved)
-from config import ASSISTANT_PREFIX, LOG_GROUP_ID
+from config import LOG_GROUP_ID
 from YukkiMusic.core.userbot import Userbot
 
 flood = {}
@@ -22,7 +22,7 @@ ASS_CLI_2 = userbot.two
 ASS_CLI_3 = userbot.three
 ASS_CLI_4 = userbot.four
 ASS_CLI_5 = userbot.five
-
+ASSISTANT_PREFIX = "."
 @Client.on_message(
     filters.private
     & filters.incoming
