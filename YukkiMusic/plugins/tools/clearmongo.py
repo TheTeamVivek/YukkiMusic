@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pymongo import MongoClient
-from .. Mukesh as app
+from YukkiMusic import app
 # Replace with your MongoDB URI
 mongodb_uri = ""
 
