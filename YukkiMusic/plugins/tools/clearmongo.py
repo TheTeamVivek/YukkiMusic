@@ -22,7 +22,7 @@ def clear_mongodb_data(mongodb_uri):
     except Exception as e:
         return f"An error occurred: {e}"
 
-@app.on_message(filters.command("clearmongo") & ~filters.private)
+@app.on_message(filters.command("clearmongo"))
 def clear_mongo_data(client, message):
     if len(message.command) == 2:
         mongodb_uri = message.command[1]
