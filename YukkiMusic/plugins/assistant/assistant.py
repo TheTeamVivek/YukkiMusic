@@ -22,7 +22,7 @@ async def set_pfp(client, message):
         return await eor(message, text="Reply to a photo.")
     photo = await message.reply_to_message.download()
     try:
-        await userbot.one.set_profile_photo(photo=photo)
+        await userbot.set_profile_photo(photo=photo)
         await eor(message, text="Successfully Changed PFP.")
     except Exception as e:
         await eor(message, text=e)
@@ -38,7 +38,7 @@ async def set_bio(client, message):
     elif len(message.command) > 1:
         bio = message.text.split(None, 1)[1]
         try:
-            await userbot.one.update_profile(bio=bio)
+            await userbot.update_profile(bio=bio)
             await eor(message, text="Changed Bio.")
         except Exception as e:
             await eor(message, text=e)
