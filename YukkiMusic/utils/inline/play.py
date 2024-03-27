@@ -16,27 +16,27 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
     played_sec = time_to_seconds(played)
     duration_sec = time_to_seconds(dur)
     percentage = (played_sec / duration_sec) * 100
-    om = math.floor(percentage)
-    if 0 < om <= 10:
-        bar = "✄─·─·─·─·─·─·─·─·"
-    elif 10 < om < 20:
-        bar = "-ˋˏ-ˋˏ✄─·─·─·─·─·─·─"
-    elif 20 <= om < 30:
-        bar = "-ˋˏ-ˋˏ-ˋˏ✄─·─·─·─·─·─·"
-    elif 30 <= om < 40:
-        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ✄─·─·─·─·─"
-    elif 40 <= om < 50:
-        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏˋˏ-ˋˏ✄─·─·─·─"
-    elif 50 <= om < 60:
-        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˏˋˏ-ˋˏ-ˋˏ✄─·─·─·"
-    elif 60 <= om < 70:
-        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏˋˏ-ˋˏ-ˋˏ-ˋˏ✄─·─"
-    elif 70 <= om < 80:
-        bar = "ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏˋˏ-ˋˏ✄─·"
-    elif 80 <= om < 95:
-        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ✄─"
+    umm = math.floor(percentage)
+    if 0 < umm <= 10:
+        bar = "◉—————————"
+    elif 10 < umm < 20:
+        bar = "—◉————————"
+    elif 20 <= umm < 30:
+        bar = "——◉———————"
+    elif 30 <= umm < 40:
+        bar = "———◉——————"
+    elif 40 <= umm < 50:
+        bar = "————◉—————"
+    elif 50 <= umm < 60:
+        bar = "—————◉————"
+    elif 60 <= umm < 70:
+        bar = "——————◉———"
+    elif 70 <= umm < 80:
+        bar = "———————◉——"
+    elif 80 <= umm < 95:
+        bar = "————————◉—"
     else:
-        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ✄·"
+        bar = "—————————◉"
     buttons = [
         [
             InlineKeyboardButton(
@@ -76,27 +76,27 @@ def telegram_markup_timer(_, chat_id, played, dur):
     played_sec = time_to_seconds(played)
     duration_sec = time_to_seconds(dur)
     percentage = (played_sec / duration_sec) * 100
-    om = math.floor(percentage)
-    if 0 < om <= 10:
-        bar = "✄─·─·─·─·─·─·─·─·"
-    elif 10 < om < 20:
-        bar = "-ˋˏ-ˋˏ✄─·─·─·─·─·─·─"
-    elif 20 <= om < 30:
-        bar = "-ˋˏ-ˋˏ-ˋˏ✄─·─·─·─·─·─·"
-    elif 30 <= om < 40:
-        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ✄─·─·─·─·─"
-    elif 40 <= om < 50:
-        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏˋˏ-ˋˏ✄─·─·─·─"
-    elif 50 <= om < 60:
-        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˏˋˏ-ˋˏ-ˋˏ✄─·─·─"
-    elif 60 <= om < 70:
-        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏˋˏ-ˋˏ-ˋˏ-ˋˏ✄─·─"
-    elif 70 <= om < 80:
-        bar = "ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏˋˏ-ˋˏ✄─·"
-    elif 80 <= om < 95:
-        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋ-ˋˏ-ˋˏ-ˋˏˏ-ˋˏ-ˋˏ✄─"
+    umm = math.floor(percentage)
+    if 0 < umm <= 10:
+        bar = "◉—————————"
+    elif 10 < umm < 20:
+        bar = "—◉————————"
+    elif 20 <= umm < 30:
+        bar = "——◉———————"
+    elif 30 <= umm < 40:
+        bar = "———◉——————"
+    elif 40 <= umm < 50:
+        bar = "————◉—————"
+    elif 50 <= umm < 60:
+        bar = "—————◉————"
+    elif 60 <= umm < 70:
+        bar = "——————◉———"
+    elif 70 <= umm < 80:
+        bar = "———————◉——"
+    elif 80 <= umm < 95:
+        bar = "————————◉—"
     else:
-        bar = "-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋ-ˋˏ-ˋˏ-ˋˏ-ˋˏ-ˋˏ✄·"
+        bar = "—————————◉"
     buttons = [
         [
             InlineKeyboardButton(
