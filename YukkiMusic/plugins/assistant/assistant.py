@@ -17,26 +17,16 @@ ASSISTANT_PREFIX = "."
 async def set_pfp(client, message):
     from YukkiMusic.core.userbot import assistants
     if not message.reply_to_message or not message.reply_to_message.photo:
-        return await message.reply_text("Reply to a photo.")
-    
-    try:
-        for num in assistants:
-            assistant_client = await Client(num)
-            await assistant_client.start()
-            # Retrieve profile photos
-            profile_photos = await assistant_client.get_profile_photos("me")
-            # Delete each profile photo
-            for photo in profile_photos:
-                await assistant_client.delete_profile_photos(photo.file_id)
-            
-            photo = await message.reply_to_message.download()
-            await assistant_client.set_profile_photo(photo=InputPhoto(photo))
-            await message.reply_text("Successfully Changed PFP.")
-            os.remove(photo)
-            await assistant_client.stop()
-    
-    except Exception as e:
-        await message.reply_text(str(e))
+        return await eor(message, text="Reply to a photo.")
+    for num in assistants:
+          client = await get_client(num)
+          photo = await message.reply_to_message.download()
+          try:
+                await client.set_profile_photo(photo=photo)
+                await eor(message, text="Successfully Changed PFP.")
+                os.remove(photo)
+          except Exception as e:
+                  await eor(message, text=e)
 
 @app.on_message(
     filters.command("bio", prefixes=ASSISTANT_PREFIX)
