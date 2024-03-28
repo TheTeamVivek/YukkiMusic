@@ -11,15 +11,18 @@ ASSISTANT_PREFIX="."
 
 async def initialize_clients():
     from YukkiMusic.core.userbot import assistants
+    clients = []
     for num in assistants:
         client = await get_client(num)
-    return client
+        clients.append(client)
+    return clients
 
 async def main():
-    client = await initialize_clients()
-    return client
+    clients = await initialize_clients()
+    return clients
 
-@client.on_message(
+
+@clients.on_message(
     filters.command("setname", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
 )
