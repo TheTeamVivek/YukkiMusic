@@ -8,3 +8,18 @@ async def initialize_clients():
 async def main():
     client = await initialize_clients()
     return client
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+asyncio.create_task(main())
