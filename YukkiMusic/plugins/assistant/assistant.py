@@ -78,8 +78,11 @@ async def del_pfp(client, message):
           client = await get_client(num)
           photos = [p async for p in app.get_chat_photos("me")]
           try:
-              await client.delete_profile_photos(photos[0].file_id)
-              await eor(message, text="Successfully deleted  photo")
+              if photos:
+                  await client.delete_profile_photos(photos[0].file_id)
+                  await eor(message, text="Successfully deleted photo")
+              else:
+                  await eor(message, text="No profile photos found.")
           except Exception as e:
                   await eor(message, text=e)
                   
@@ -94,8 +97,11 @@ async def delall_pfp(client, message):
           client = await get_client(num)
           photos = [p async for p in app.get_chat_photos("me")]
           try:
-              await client.delete_profile_photos([p.file_id for p in photos[1:]])
-              await eor(message, text="Successfully deleted  photo")
+              if photos:
+                  await client.delete_profile_photos([p.file_id for p in photos[1:]])
+                  await eor(message, text="Successfully deleted photos")
+              else:
+                  await eor(message, text="No profile photos found.")
           except Exception as e:
                   await eor(message, text=e)
                   
