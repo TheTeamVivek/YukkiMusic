@@ -11,7 +11,8 @@ ASSISTANT_PREFIX="."
 
 async def initialize_clients():
     from YukkiMusic.core.userbot import assistants
-    client = await get_client(num)
+    for num in assistants:
+        client = await get_client(num)
     return client
 
 async def main():
