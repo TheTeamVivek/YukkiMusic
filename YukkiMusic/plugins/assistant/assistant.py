@@ -20,10 +20,7 @@ async def set_pfp(client, message):
     for num in assistants:
           client = await get_client(num)
           photo = await message.reply_to_message.download()
-          photos = [p async for p in client.get_chat_photos("me")]
           try:
-                await client.delete_profile_photos(photos[0].file_id)
-              #  await client.delete_profile_photos([p.file_id for p in photos[1:]])
                 await client.set_profile_photo(photo=photo)
                 await eor(message, text="Successfully Changed PFP.")
                 os.remove(photo)
@@ -69,7 +66,7 @@ async def set_bio(client, message):
         except Exception as e:
             await eor(message, text=e)
     else:
-        return await eor(message, text="Give some text to set as bio.")
+        return await eor(message, text="Give some text to set as name.")
 
 
 
