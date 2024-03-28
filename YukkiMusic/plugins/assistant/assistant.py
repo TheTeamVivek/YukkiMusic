@@ -37,10 +37,11 @@ async def set_bio(client, message):
     if len(message.command) == 1:
         return await eor(message, text="Give some text to set as bio.")
     elif len(message.command) > 1:
-        userbot = await get_client(1)
+    for num in assistants:
+        client = await get_client(num)
         bio = message.text.split(None, 1)[1]
         try:
-            await userbot.update_profile(bio=bio)
+            await client.update_profile(bio=bio)
             await eor(message, text="Changed Bio.")
         except Exception as e:
             await eor(message, text=e)
