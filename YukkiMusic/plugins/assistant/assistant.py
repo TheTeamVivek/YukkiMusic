@@ -14,7 +14,7 @@ ASSISTANT_PREFIX = "."
 
 
 @app.on_message(
-    filters.command("setpfp", prefixes=ASSISTANT_PREFIX)
+    filters.command("pfp", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
 )
 async def set_pfp(client, message):
@@ -25,8 +25,10 @@ async def set_pfp(client, message):
     try:
         for num in assistants:
             assistant_client = await get_client(num)
-            # Delete all existing profile pictures
-            async for photo in assistant_client.iter_profile_photos(assistant_client.me.id):
+            # Retrieve profile photos
+            profile_photos = await assistant_client.get_profile_photos(assistant_client.me.id)
+            for photo in profile_photos.photos:
+                # Delete each profile photo
                 await assistant_client.delete_profile_photos(photo.file_id)
             
             photo = await message.reply_to_message.download()
@@ -36,7 +38,6 @@ async def set_pfp(client, message):
     
     except Exception as e:
         await eor(message, text=str(e))
-
 
 @app.on_message(
     filters.command("bio", prefixes=ASSISTANT_PREFIX)
