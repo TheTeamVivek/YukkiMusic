@@ -1,5 +1,6 @@
 import os
 from inspect import getfullargspec
+from pyrogram.types import Message
 from pyrogram import Client, filters
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
