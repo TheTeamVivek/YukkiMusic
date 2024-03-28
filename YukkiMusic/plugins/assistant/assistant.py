@@ -127,7 +127,7 @@ async def unblock_user_func(client, message):
     await eor(message, text="Successfully Unblocked the user")
 
 
-@app.on_message(
+@Client.on_message(
     filters.command("pfp", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
 )
@@ -142,7 +142,7 @@ async def set_pfp(client, message):
         await eor(message, text=e)
 
 
-@app.on_message(
+@Client.on_message(
     filters.command("bio", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
 )
