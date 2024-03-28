@@ -1,4 +1,5 @@
 import os
+from inspect import getfullargspec
 from pyrogram import Client, filters
 from pyrogram.types import (CallbackQuery, InlineKeyboardButton,
                             InlineKeyboardMarkup, InlineQueryResultArticle,
