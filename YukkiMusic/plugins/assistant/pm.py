@@ -17,11 +17,7 @@ async def main():
     client = await initialize_clients()
     return client
 
-
-
-
-
-@app.on_message(
+@client.on_message(
     filters.command("setname", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
 )
@@ -40,9 +36,6 @@ async def set_bio(client, message):
             await eor(message, text=e)
     else:
         return await eor(message, text="Give some text to set as name.")
-
-
-
 
 
 async def eor(msg: Message, **kwargs):
