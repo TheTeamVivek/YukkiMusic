@@ -9,7 +9,7 @@ from YukkiMusic.utils.database import (
     is_banned_user,
     is_on_off,
 )
-
+from YukkiMusic.utils.database import get_assistant
 from pykeyboard import InlineKeyboard
 from pyrogram import filters
 from pyrogram.types import (InlineKeyboardButton, CallbackQuery,
