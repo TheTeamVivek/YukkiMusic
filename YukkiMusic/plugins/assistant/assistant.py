@@ -9,8 +9,7 @@ from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import get_client
 
-flood = {}
-userbot = Userbot()
+
 ASSISTANT_PREFIX = "."
 
 
