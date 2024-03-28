@@ -76,7 +76,7 @@ async def del_pfp(client, message):
     from YukkiMusic.core.userbot import assistants
     for num in assistants:
           client = await get_client(num)
-          photos = [p async for p in app.get_chat_photos("me")]
+          photos = [p async for p in client.get_chat_photos("me")]
           try:
               if photos:
                   await client.delete_profile_photos(photos[0].file_id)
@@ -95,7 +95,7 @@ async def delall_pfp(client, message):
     from YukkiMusic.core.userbot import assistants
     for num in assistants:
           client = await get_client(num)
-          photos = [p async for p in app.get_chat_photos("me")]
+          photos = [p async for p in client.get_chat_photos("me")]
           try:
               if photos:
                   await client.delete_profile_photos([p.file_id for p in photos[1:]])
