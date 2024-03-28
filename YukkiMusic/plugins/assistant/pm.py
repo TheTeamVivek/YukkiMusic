@@ -1,5 +1,5 @@
 import asyncio
-from YukkiMusic.core.userbot import assistants
+from YukkiMusic.utils.database import get_client
 from YukkiMusic.misc import SUDOERS
 from pyrogram import filters
 from pyrogram.types import Message
@@ -10,6 +10,7 @@ ASSISTANT_PREFIX="."
 
 
 async def initialize_clients():
+    from YukkiMusic.core.userbot import assistants
     client = await get_client(num)
     return client
 
