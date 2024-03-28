@@ -40,7 +40,7 @@ async def set_bio(client, message):
         return await eor(message, text="Give some text to set as bio.")
     elif len(message.command) > 1:
     	userbot = get_client(1)
-        bio = message.text.split(None, 1)[1]
+     bio = message.text.split(None, 1)[1]
         try:
             await userbot.update_profile(bio=bio)
             await eor(message, text="Changed Bio.")
