@@ -74,9 +74,10 @@ async def awaiting_message(client, message):
     )
 
   pass
-@ASS_CLI_1.on_message(filters.private)
-    async def handle_private_message_for_ass_cli_1(client, message):
 
+if ASS_CLI_1:
+    @ASS_CLI_1.on_message(filters.private)
+    async def handle_private_message_for_ass_cli_1(client, message):
         await awaiting_message(client, message)
 
 
