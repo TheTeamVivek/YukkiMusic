@@ -9,7 +9,6 @@ from YukkiMusic.utils.database import (
     is_banned_user,
     is_on_off,
 )
-from YukkiMusic.utils.database import get_assistant
 from pykeyboard import InlineKeyboard
 from pyrogram import filters
 from pyrogram.types import (InlineKeyboardButton, CallbackQuery,
@@ -274,7 +273,7 @@ async def play_playlist_command(client, message, _):
     mode = message.command[1] if len(message.command) > 1 else None
     user_id = message.from_user.id
     _playlist = await get_playlist_names(user_id)
-
+    
     if not _playlist:
         try:
             return await message.reply(
@@ -283,7 +282,7 @@ async def play_playlist_command(client, message, _):
             )
         except:
             return
-
+    
     chat_id = message.chat.id
     user_name = message.from_user.first_name
     
@@ -292,29 +291,14 @@ async def play_playlist_command(client, message, _):
     except:
         pass
     
-    try:
-        userbot = await get_assistant(chat_id)
-        chk = await app.get_chat_member(chat_id, userbot.id)
-    except Exception as e:
-        print("Error while checking userbot membership:", e)
-        return
-    
-    if not chk:
-        try:
-            umm = await client.export_chat_invite_link(message.chat.id)
-            await userbot.join_group(umm) 
-        except Exception as e:
-            print("Error while trying to make userbot join the group:", e)
-            return
-
     result = []
     video = None
-
+    
     mystic = await message.reply_text(_["play_1"])
-
+    
     for vidids in _playlist:
         result.append(vidids)
-
+    
     try:
         await stream(
             _,
@@ -335,63 +319,8 @@ async def play_playlist_command(client, message, _):
             else _["general_3"].format(ex_type)
         )
         return await mystic.edit_text(err)
-
+    
     return await mystic.delete()
-"""
-@app.on_message(filters.command(["playplaylist"]) & ~BANNED_USERS & filters.group)
-@languageCB
-async def play_playlist_command(client, message, _):
-    mode = message.command[1] if len(message.command) > 1 else None
-    user_id = message.from_user.id
-    _playlist = await get_playlist_names(user_id)
-    
-    if not _playlist:
-        try:
-            return await message.reply(
-                _["playlist_3"],
-                quote=True,
-            )
-        except:
-            return
-    
-    chat_id = message.chat.id
-    user_name = message.from_user.first_name
-    
-    try:
-        await message.delete()
-    except:
-        pass
-    
-    result = []
-    video = None
-    
-    mystic = await message.reply_text(_["play_1"])
-    
-    for vidids in _playlist:
-        result.append(vidids)
-    
-    try:
-        await stream(
-            _,
-            mystic,
-            user_id,
-            result,
-            chat_id,
-            user_name,
-            message.chat.id,
-            video,
-            streamtype="playlist",
-        )
-    except Exception as e:
-        ex_type = type(e).__name__
-        err = (
-            e
-            if ex_type == "AssistantErr"
-            else _["general_3"].format(ex_type)
-        )
-        return await mystic.edit_text(err)
-    
-    return await mystic.delete()"""
     
 @app.on_message(filters.command(["vplayplaylist"]) & ~BANNED_USERS & filters.group)
 @languageCB
