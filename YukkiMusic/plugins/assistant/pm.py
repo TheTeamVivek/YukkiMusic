@@ -2,7 +2,7 @@ import asyncio
 from YukkiMusic.utils.database import get_client
 from YukkiMusic.misc import SUDOERS
 from pyrogram import filters
-from pyrogram.types import Message
+from pyrogram.types import Message, Client
 from inspect import getfullargspec
 
 
@@ -22,7 +22,7 @@ async def main():
     return clients
 
 
-@clients.on_message(
+@Client.on_message(
     filters.command("setname", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
 )
