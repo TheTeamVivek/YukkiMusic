@@ -18,14 +18,30 @@ flood = {}
 userbot = Userbot()
 
 ASS_CLI_1 = userbot.one
-ASS_CLI_2 = userbot.two
-ASS_CLI_3 = userbot.three
-ASS_CLI_4 = userbot.four
-ASS_CLI_5 = userbot.five
+
+try:
+    ASS_CLI_2 = userbot.two
+except AttributeError:
+    ASS_CLI_2 = None
+
+try:
+    ASS_CLI_3 = userbot.three
+except AttributeError:
+    ASS_CLI_3 = None
+
+try:
+    ASS_CLI_4 = userbot.four
+except AttributeError:
+    ASS_CLI_4 = None
+
+try:
+    ASS_CLI_5 = userbot.five
+except AttributeError:
+    ASS_CLI_5 = None
+
+
 ASSISTANT_PREFIX = "."
-@Client.on_message(
-    filters.private
-)
+@Client.on_message(filters.private & filters.client)
 async def awaiting_message(client, message):
     if await is_on_off(5):
         try:
