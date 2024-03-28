@@ -72,7 +72,6 @@ async def awaiting_message(client, message):
     await message.reply_text(
         f"Hello, I am {app.mention}'s Assistant.\n\nPlease dont spam here , else you'll get blocked.\nFor more Help start :- {app.mention}"
     )
-  pass
 
 if ASS_CLI_1:
     @ASS_CLI_1.on_message(filters.private)
