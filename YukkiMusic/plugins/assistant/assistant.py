@@ -1,8 +1,6 @@
 import os
 from inspect import getfullargspec
 from pyrogram import Client, filters
-from pyrogram.types import InputPhoto
-
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import get_client
