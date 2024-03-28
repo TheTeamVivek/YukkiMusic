@@ -34,12 +34,13 @@ async def set_pfp(client, message):
     & SUDOERS
 )
 async def set_bio(client, message):
+    from YukkiMusic.core.userbot import assistants
     if len(message.command) == 1:
         return await eor(message, text="Give some text to set as bio.")
     elif len(message.command) > 1:
-    for num in assistants:
-        client = await get_client(num)
-        bio = message.text.split(None, 1)[1]
+        for num in assistants:
+            client = await get_client(num)
+            bio = message.text.split(None, 1)[1]
         try:
             await client.update_profile(bio=bio)
             await eor(message, text="Changed Bio.")
