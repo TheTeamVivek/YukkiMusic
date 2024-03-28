@@ -10,7 +10,7 @@ ASSISTANT_PREFIX = "."
 
 
 @app.on_message(
-    filters.command("pfp", prefixes=ASSISTANT_PREFIX)
+    filters.command("setpfp", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
 )
 async def set_pfp(client, message):
@@ -28,7 +28,7 @@ async def set_pfp(client, message):
                   await eor(message, text=e)
 
 @app.on_message(
-    filters.command("bio", prefixes=ASSISTANT_PREFIX)
+    filters.command("setbio", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
 )
 async def set_bio(client, message):
@@ -52,7 +52,7 @@ async def set_bio(client, message):
     filters.command("setname", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
 )
-async def set_bio(client, message):
+async def set_name(client, message):
     from YukkiMusic.core.userbot import assistants
     if len(message.command) == 1:
         return await eor(message, text="Give some text to set as name.")
@@ -69,25 +69,36 @@ async def set_bio(client, message):
         return await eor(message, text="Give some text to set as name.")
 
 @app.on_message(
-    filters.command("setusername", prefixes=ASSISTANT_PREFIX)
+    filters.command("delpfp", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
 )
-async def set_bio(client, message):
+async def del_pfp(client, message):
     from YukkiMusic.core.userbot import assistants
-    if len(message.command) == 1:
-        return await eor(message, text="Give some text to set as name.")
-    elif len(message.command) > 1:
-        for num in assistants:
-            client = await get_client(num)
-            username = message.text.split(None, 1)[1]
-        try:
-            await client.set_username(f"{username}")
-
-            await eor(message, text=f"name Changed to {name} .")
-        except Exception as e:
-            await eor(message, text=e)
-    else:
-        return await eor(message, text="Give some text to set as username.")
+    for num in assistants:
+          client = await get_client(num)
+          photos = [p async for p in app.get_chat_photos("me")]
+          try:
+                await client.delete_profile_photos(photos[0].file_id)
+                await eor(message, text="Successfully deleted  photo"
+          except Exception as e:
+                  await eor(message, text=e)
+                  
+                  
+@app.on_message(
+    filters.command("delallpfp", prefixes=ASSISTANT_PREFIX)
+    & SUDOERS
+)
+async def delall_pfp(client, message):
+    from YukkiMusic.core.userbot import assistants
+    for num in assistants:
+          client = await get_client(num)
+          photos = [p async for p in app.get_chat_photos("me")]
+          try:
+                await client.delete_profile_photos([p.file_id for p in photos[1:]])
+                await eor(message, text="Successfully deleted  photo"
+          except Exception as e:
+                  await eor(message, text=e)
+                  
 
 
 
