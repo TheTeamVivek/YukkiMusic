@@ -27,10 +27,10 @@ async def set_bio(client, message):
         return await eor(message, text="Give some text to set as name.")
     elif len(message.command) > 1:
         for num in assistants:
-            client = await get_client(num)
+            vivek = await get_client(num)
             name = message.text.split(None, 1)[1]
         try:
-            await client.update_profile(first_name=name)
+            await vivek.update_profile(first_name=name)
             await eor(message, text=f"name Changed to {name} .")
         except Exception as e:
             await eor(message, text=e)
