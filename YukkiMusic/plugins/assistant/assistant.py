@@ -41,7 +41,7 @@ except AttributeError:
 
 
 ASSISTANT_PREFIX = "."
-@Client.on_message(filters.private)
+@ASS_CLI_1.on_message(filters.private)
 async def awaiting_message(client, message):
     if await is_on_off(5):
         try:
