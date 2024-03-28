@@ -62,10 +62,10 @@ async def awaiting_message(client, message):
     filters.command("approve", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
 )
-#@Client.on_message(
+"""@Client.on_message(
     filters.command("approve", prefixes=ASSISTANT_PREFIX)
     & filters.user("me")
-)
+)"""
 async def pm_approve(client, message):
     if not message.reply_to_message:
         return await eor(
