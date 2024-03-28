@@ -72,8 +72,7 @@ async def awaiting_message(client, message):
     await message.reply_text(
         f"Hello, I am {app.mention}'s Assistant.\n\nPlease dont spam here , else you'll get blocked.\nFor more Help start :- {app.mention}"
     )
-
-   pass
+  pass
 
 if ASS_CLI_1:
     @ASS_CLI_1.on_message(filters.private)
@@ -83,7 +82,8 @@ if ASS_CLI_1:
 
 @Client.on_message(
     filters.command("approve", prefixes=ASSISTANT_PREFIX)
-    & SUDOERS
+    & SUDOERS
+
 )
 
 async def pm_approve(client, message):
@@ -100,7 +100,8 @@ async def pm_approve(client, message):
 
 @Client.on_message(
     filters.command("disapprove", prefixes=ASSISTANT_PREFIX)
-    & SUDOERS
+    & SUDOERS
+
 )
 
 async def pm_disapprove(client, message):
@@ -124,7 +125,8 @@ async def pm_disapprove(client, message):
 
 @Client.on_message(
     filters.command("block", prefixes=ASSISTANT_PREFIX)
-    & SUDOERS
+    & SUDOERS
+
 )
 
 async def block_user_func(client, message):
@@ -137,7 +139,8 @@ async def block_user_func(client, message):
 
 @Client.on_message(
     filters.command("unblock", prefixes=ASSISTANT_PREFIX)
-    & SUDOERS
+    & SUDOERS
+
 )
 
 async def unblock_user_func(client, message):
