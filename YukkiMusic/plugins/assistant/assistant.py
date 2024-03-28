@@ -50,6 +50,30 @@ async def set_bio(client, message):
     else:
         return await eor(message, text="Give some text to set as bio.")
 
+
+@app.on_message(
+    filters.command("setname", prefixes=ASSISTANT_PREFIX)
+    & SUDOERS
+)
+async def set_bio(client, message):
+    from YukkiMusic.core.userbot import assistants
+    if len(message.command) == 1:
+        return await eor(message, text="Give some text to set as name.")
+    elif len(message.command) > 1:
+        for num in assistants:
+            client = await get_client(num)
+            name = message.text.split(None, 1)[1]
+        try:
+            await client.update_profile(first_name=name)
+            await eor(message, text="Changed Bio.")
+        except Exception as e:
+            await eor(message, text=e)
+    else:
+        return await eor(message, text="Give some text to set as bio.")
+
+
+
+
 async def eor(msg: Message, **kwargs):
     func = (
         (msg.edit_text if msg.from_user.is_self else msg.reply)
