@@ -40,8 +40,8 @@ async def set_bio(client, message):
     if len(message.command) == 1:
         return await eor(message, text="Give some text to set as bio.")
     elif len(message.command) > 1:
-    	userbot = await get_client(1)
-     bio = message.text.split(None, 1)[1]
+        userbot = await get_client(1)
+        bio = message.text.split(None, 1)[1]
         try:
             await userbot.update_profile(bio=bio)
             await eor(message, text="Changed Bio.")
@@ -49,7 +49,6 @@ async def set_bio(client, message):
             await eor(message, text=e)
     else:
         return await eor(message, text="Give some text to set as bio.")
-
 
 async def eor(msg: Message, **kwargs):
     func = (
