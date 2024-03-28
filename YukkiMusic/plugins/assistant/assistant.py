@@ -1,10 +1,7 @@
 import os
 from inspect import getfullargspec
 from pyrogram import Client, filters
-from pyrogram.types import (CallbackQuery, InlineKeyboardButton,
-                            InlineKeyboardMarkup, InlineQueryResultArticle,
-                            InlineQueryResultPhoto, InputTextMessageContent,
-                            Message)
+from pyrogram.types import InputPhoto
 
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
@@ -20,26 +17,26 @@ ASSISTANT_PREFIX = "."
 async def set_pfp(client, message):
     from YukkiMusic.core.userbot import assistants
     if not message.reply_to_message or not message.reply_to_message.photo:
-        return await eor(message, text="Reply to a photo.")
+        return await message.reply_text("Reply to a photo.")
     
     try:
         for num in assistants:
-            assistant_client = await get_client(num)
-            # Retrieve the current user
-            me = await assistant_client.get_me()
+            assistant_client = await Client(num)
+            await assistant_client.start()
             # Retrieve profile photos
-            profile_photos = await assistant_client.get_profile_photos(user_id=me.id)
-            for photo in profile_photos.photos:
-                # Delete each profile photo
-                await assistant_client.delete_profile_photos(user_id=me.id, photo_ids=photo.file_id)
+            profile_photos = await assistant_client.get_profile_photos("me")
+            # Delete each profile photo
+            for photo in profile_photos:
+                await assistant_client.delete_profile_photos(photo.file_id)
             
             photo = await message.reply_to_message.download()
-            await assistant_client.set_profile_photo(photo=photo)
-            await eor(message, text="Successfully Changed PFP.")
+            await assistant_client.set_profile_photo(photo=InputPhoto(photo))
+            await message.reply_text("Successfully Changed PFP.")
             os.remove(photo)
+            await assistant_client.stop()
     
     except Exception as e:
-        await eor(message, text=str(e))
+        await message.reply_text(str(e))
 
 @app.on_message(
     filters.command("bio", prefixes=ASSISTANT_PREFIX)
