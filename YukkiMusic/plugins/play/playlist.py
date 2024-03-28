@@ -1,7 +1,7 @@
 import os
 import requests
 from random import randint
-from YukkiMusic.utils.decorators.checking import
+from YukkiMusic.utils.decorators.checking import UserbotWrapper
 from YukkiMusic.utils.database import (
     add_served_chat,
     add_served_user,
@@ -270,7 +270,8 @@ async def play_playlist(client, CallbackQuery, _):
     return await mystic.delete()
 
 @app.on_message(filters.command(["playplaylist"]) & ~BANNED_USERS & filters.group)
-@languageCB
+#@languageCB
+@UserbotWrapper
 async def play_playlist_command(client, message, _):
     mode = message.command[1] if len(message.command) > 1 else None
     user_id = message.from_user.id
