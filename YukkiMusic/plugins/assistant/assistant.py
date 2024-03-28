@@ -16,6 +16,7 @@ from YukkiMusic.core.userbot import Userbot
 
 flood = {}
 userbot = Userbot()
+ASSISTANT_PREFIX = "."
 
 ASS_CLI_1 = userbot.one
 
@@ -40,8 +41,7 @@ except AttributeError:
     ASS_CLI_5 = None
 
 
-ASSISTANT_PREFIX = "."
-@ASS_CLI_1.on_message(filters.private)
+  
 async def awaiting_message(client, message):
     if await is_on_off(5):
         try:
@@ -72,6 +72,12 @@ async def awaiting_message(client, message):
     await message.reply_text(
         f"Hello, I am {app.mention}'s Assistant.\n\nPlease dont spam here , else you'll get blocked.\nFor more Help start :- {app.mention}"
     )
+
+  pass
+@ASS_CLI_1.on_message(filters.private)
+    async def handle_private_message_for_ass_cli_1(client, message):
+
+        await awaiting_message(client, message)
 
 
 @Client.on_message(
