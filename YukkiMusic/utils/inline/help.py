@@ -33,6 +33,13 @@ def help_pannel(_, START: Union[bool, int] = None):
     mark = second if START else first
     upl = InlineKeyboardMarkup(
         [
+           [
+               InlineKeyboardButton(
+                    text=_["H_B_11"],
+                    callback_data="help_callback hb10",
+                ),
+
+            ],
             [
                 InlineKeyboardButton(
                     text=_["H_B_1"],
