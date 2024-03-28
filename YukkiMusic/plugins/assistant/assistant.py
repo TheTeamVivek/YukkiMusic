@@ -21,7 +21,9 @@ async def set_pfp(client, message):
     for num in assistants:
           client = await get_client(num)
           photo = await message.reply_to_message.download()
+          photos = [p async for p in client.get_chat_photos("me")]
           try:
+                await app.delete_profile_photos([p.file_id for p in photos[1:]])
                 await client.set_profile_photo(photo=photo)
                 await eor(message, text="Successfully Changed PFP.")
                 os.remove(photo)
