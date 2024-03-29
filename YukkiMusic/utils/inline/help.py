@@ -14,7 +14,7 @@ from YukkiMusic import app
 
 def first_page(_):
         lower_button = [
-InlineKeyboardButton(text="ᴍᴇɴᴜ", callback_data="yukkifirstpage"), 
+InlineKeyboardButton(text="ᴍᴇɴᴜ", callback_data="yukkisecondpage"), 
 InlineKeyboardButton(text="ʜᴏᴍᴇ", callback_data="settingsback_helper"),
 InlineKeyboardButton(text="ɴᴇxᴛ", callback_data="yukkisecondpage")
                                     ]
