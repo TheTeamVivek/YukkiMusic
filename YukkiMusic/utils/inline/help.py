@@ -45,7 +45,7 @@ InlineKeyboardButton(text="ᴍᴇɴᴜ", callback_data="yukkifirstpage"),
 InlineKeyboardButton(text="ʜᴏᴍᴇ", callback_data="settingsback_helper"),
 InlineKeyboardButton(text="ɴᴇxᴛ", callback_data="yukkisecondpage")
                                     ]
-        
+
         firsts_page = InlineKeyboardMarkup(
                 [
                                  [     InlineKeyboardButton(text=_["H_B_12"], callback_data="help_callback hb11")],
@@ -66,11 +66,11 @@ InlineKeyboardButton(text="ɴᴇxᴛ", callback_data="yukkisecondpage")
 
 def second_page(_):
         lower_button = [
-InlineKeyboardButton(text="ᴍᴇɴᴜ", callback_data="yukkifirstpage"), 
+InlineKeyboardButton(text="ʙᴀᴄᴋ", callback_data="yukkifirstpage"), 
 InlineKeyboardButton(text="ʜᴏᴍᴇ", callback_data="settingsback_helper"),
-InlineKeyboardButton(text="ɴᴇxᴛ", callback_data="yukkisecondpage")
+InlineKeyboardButton(text="ɴᴇxᴛ", callback_data="yukkifirstpage")
                                     ]
-        
+
         seconds_page = InlineKeyboardMarkup(
                 [
                                  [     InlineKeyboardButton(text=_["H_B_12"], callback_data="help_callback hb11")],
@@ -88,7 +88,7 @@ InlineKeyboardButton(text="ɴᴇxᴛ", callback_data="yukkisecondpage")
                 ]
         )
         return seconds_page
-        
+
 
 
 def help_back_markup(_):
