@@ -26,7 +26,7 @@ from YukkiMusic.utils.formatters import alpha_to_int
 
 ### Multi-Lang Commands
 RELOAD_COMMAND = get_command("RELOAD_COMMAND")
-RESTART_COMMAND = get_command("RESTART_COMMAND")
+REBOOT_COMMAND = get_command("REBOOT_COMMAND")
 
 
 @app.on_message(
