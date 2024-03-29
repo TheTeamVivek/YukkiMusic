@@ -9,9 +9,7 @@
 #
 
 from typing import Union
-
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-
 from YukkiMusic import app
 
 
@@ -20,32 +18,67 @@ def help_pannel(_, START: Union[bool, int] = None):
 
     second = [InlineKeyboardButton(text=_["BACK_BUTTON"], callback_data=f"settingsback_helper"),
                      InlineKeyboardButton( text=_["CLOSEMENU_BUTTON"], callback_data=f"close")]
-                     
+
     mark = second if START else first
-    
+
     upl = InlineKeyboardMarkup(
         [
 
-          [  InlineKeyboardButton(text=_["H_B_12"], callback_data="help_callback hb11")],
-
-
-               [ InlineKeyboardButton(text=_["H_B_1"], callback_data="help_callback hb1" ),      
+          [     InlineKeyboardButton(text=_["H_B_12"], callback_data="help_callback hb11")],
+         [    InlineKeyboardButton(text=_["H_B_1"], callback_data="help_callback hb1" ),      
                 InlineKeyboardButton(text=_["H_B_9"], callback_data="help_callback hb8" ),
                 InlineKeyboardButton(text=_["H_B_8"], callback_data="help_callback hb7")],
-
-
-                [InlineKeyboardButton(text=_["H_B_3"], callback_data="help_callback hb3"),
+         [    InlineKeyboardButton(text=_["H_B_3"], callback_data="help_callback hb3"),
                 InlineKeyboardButton(text=_["H_B_10"], callback_data="help_callback hb9"),
-                InlineKeyboardButton(text=_["H_B_7"], callback_data="help_callback hb6" )],
-
-                [InlineKeyboardButton(text=_["H_B_6"], callback_data="help_callback hb5" ),
+                InlineKeyboardButton(text=_["H_B_7"], callback_data="help_callback hb6"]
+          [    InlineKeyboardButton(text=_["H_B_6"], callback_data="help_callback hb5" ),
                 InlineKeyboardButton(text=_["H_B_4"], callback_data="help_callback hb4"),
                 InlineKeyboardButton(text=_["H_B_2"],callback_data="help_callback hb2")],
-                
                  [ InlineKeyboardButton(text=_["H_B_11"],callback_data="help_callback hb10"),],
                       mark, 
 ] )
     return upl
+
+def first_page(_):
+        lower_button = [InlineKeyboardButton(text="ᴍᴇɴᴜ", callback_data=f"settingsback_helper"), InlineKeyboardButton(text="ɴᴇxᴛ", callback_data=f"yukkisecondpage")]
+        firsts_page = InlineKeyboardMarkup(
+                [
+                                 [     InlineKeyboardButton(text=_["H_B_12"], callback_data="help_callback hb11")],
+         [    InlineKeyboardButton(text=_["H_B_1"], callback_data="help_callback hb1" ),      
+                InlineKeyboardButton(text=_["H_B_9"], callback_data="help_callback hb8" ),
+                InlineKeyboardButton(text=_["H_B_8"], callback_data="help_callback hb7")],
+         [    InlineKeyboardButton(text=_["H_B_3"], callback_data="help_callback hb3"),
+                InlineKeyboardButton(text=_["H_B_10"], callback_data="help_callback hb9"),
+                InlineKeyboardButton(text=_["H_B_7"], callback_data="help_callback hb6"]
+          [    InlineKeyboardButton(text=_["H_B_6"], callback_data="help_callback hb5" ),
+                InlineKeyboardButton(text=_["H_B_4"], callback_data="help_callback hb4"),
+                InlineKeyboardButton(text=_["H_B_2"],callback_data="help_callback hb2")],
+            [ InlineKeyboardButton(text=_["H_B_11"],callback_data="help_callback hb10"),],
+                        lower_button,
+                ]
+        )
+        return firsts_page
+
+def second_page(_):
+        lower_button = [InlineKeyboardButton(text="ᴍᴇɴᴜ", callback_data="settingsback_helper"), InlineKeyboardButton(text="ʙᴀᴄᴋ", callback_data="settingsback_helper"),InlineKeyboardButton(text="ɴᴇxᴛ", callback_data="yukkisecondpage")]
+        seconds_page = InlineKeyboardMarkup(
+                [
+                                 [     InlineKeyboardButton(text=_["H_B_12"], callback_data="help_callback hb11")],
+         [    InlineKeyboardButton(text=_["H_B_1"], callback_data="help_callback hb1" ),      
+                InlineKeyboardButton(text=_["H_B_9"], callback_data="help_callback hb8" ),
+                InlineKeyboardButton(text=_["H_B_8"], callback_data="help_callback hb7")],
+         [    InlineKeyboardButton(text=_["H_B_3"], callback_data="help_callback hb3"),
+                InlineKeyboardButton(text=_["H_B_10"], callback_data="help_callback hb9"),
+                InlineKeyboardButton(text=_["H_B_7"], callback_data="help_callback hb6"]
+          [    InlineKeyboardButton(text=_["H_B_6"], callback_data="help_callback hb5" ),
+                InlineKeyboardButton(text=_["H_B_4"], callback_data="help_callback hb4"),
+                InlineKeyboardButton(text=_["H_B_2"],callback_data="help_callback hb2")],
+            [ InlineKeyboardButton(text=_["H_B_11"],callback_data="help_callback hb10"),],
+                        lower_button,
+                ]
+        )
+        return seconds_page
+        
 
 
 def help_back_markup(_):
