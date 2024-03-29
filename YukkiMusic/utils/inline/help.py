@@ -40,7 +40,12 @@ def help_pannel(_, START: Union[bool, int] = None):
     return upl
 
 def first_page(_):
-        lower_button = [InlineKeyboardButton(text="ᴍᴇɴᴜ", callback_data=f"settingsback_helper"), InlineKeyboardButton(text="ɴᴇxᴛ", callback_data=f"yukkisecondpage")]
+        lower_button = [
+InlineKeyboardButton(text="ᴍᴇɴᴜ", callback_data="yukkifirstpage"), 
+InlineKeyboardButton(text="ʜᴏᴍᴇ", callback_data="settingsback_helper"),
+InlineKeyboardButton(text="ɴᴇxᴛ", callback_data="yukkisecondpage")
+                                    ]
+        
         firsts_page = InlineKeyboardMarkup(
                 [
                                  [     InlineKeyboardButton(text=_["H_B_12"], callback_data="help_callback hb11")],
@@ -60,7 +65,12 @@ def first_page(_):
         return firsts_page
 
 def second_page(_):
-        lower_button = [InlineKeyboardButton(text="ᴍᴇɴᴜ", callback_data="settingsback_helper"), InlineKeyboardButton(text="ʙᴀᴄᴋ", callback_data="settingsback_helper"),InlineKeyboardButton(text="ɴᴇxᴛ", callback_data="yukkisecondpage")]
+        lower_button = [
+InlineKeyboardButton(text="ᴍᴇɴᴜ", callback_data="yukkifirstpage"), 
+InlineKeyboardButton(text="ʜᴏᴍᴇ", callback_data="settingsback_helper"),
+InlineKeyboardButton(text="ɴᴇxᴛ", callback_data="yukkisecondpage")
+                                    ]
+        
         seconds_page = InlineKeyboardMarkup(
                 [
                                  [     InlineKeyboardButton(text=_["H_B_12"], callback_data="help_callback hb11")],
