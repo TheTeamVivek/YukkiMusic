@@ -40,7 +40,7 @@ DELVAR_COMMAND = get_command("DELVAR_COMMAND")
 SETVAR_COMMAND = get_command("SETVAR_COMMAND")
 USAGE_COMMAND = get_command("USAGE_COMMAND")
 UPDATE_COMMAND = get_command("UPDATE_COMMAND")
-REBOOT_COMMAND = get_command("REBOOT_COMMAND")
+RESTART_COMMAND = get_command("RESTART_COMMAND")
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -282,7 +282,7 @@ async def update_(client, message, _):
                 try:
                     await app.send_message(
                         x,
-                        f"{config.MUSIC_BOT_NAME} ʜᴀs ᴊᴜsᴛ ʀᴇsᴛᴀʀᴛᴇᴅ ʜᴇʀsᴇʟғ. sᴏʀʀʏ ғᴏʀ ᴛʜᴇ ɪssᴜᴇ. \n\nsᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ᴀɢᴀɪɴ ᴀғᴛᴇʀ 10-15 sᴇᴄᴏɴᴅs",
+                        f"{config.MUSIC_BOT_NAME} ʜᴀs ᴊᴜsᴛ ᴜᴘᴅᴀᴛᴇᴅ ʜᴇʀsᴇʟғ. sᴏʀʀʏ ғᴏʀ ᴛʜᴇ ɪssᴜᴇ. \n\nsᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ᴀɢᴀɪɴ ᴀғᴛᴇʀ 10-15 sᴇᴄᴏɴᴅs",
                     )
                     await remove_active_chat(x)
                     await remove_active_video_chat(x)
@@ -297,11 +297,11 @@ async def update_(client, message, _):
             return
         except Exception as err:
             await response.edit(
-                f"{nrs.text}\n\nSᴏᴍᴇᴛʜɪɴɢ ᴡᴇɴᴛ ᴡʀᴏɴɢ ᴡʜɪʟᴇ ɪɴɪᴛɪᴀᴛɪɴɢ ʀᴇʙᴏᴏᴛ! Pʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ ᴏʀ ᴄʜᴇᴄᴋ ʟᴏɢs ғᴏʀ ᴍᴏʀᴇ ɪɴғᴏ."
+                f"{nrs.text}\n\nSᴏᴍᴇᴛʜɪɴɢ ᴡᴇɴᴛ ᴡʀᴏɴɢ ᴡʜɪʟᴇ ɪɴɪᴛɪᴀᴛɪɴɢ ʀᴇsᴛᴀʀᴛ! Pʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ ᴏʀ ᴄʜᴇᴄᴋ ʟᴏɢs ғᴏʀ ᴍᴏʀᴇ ɪɴғᴏ."
             )
             return await app.send_message(
                 config.LOG_GROUP_ID,
-                f"AN EXCEPTION OCCURRED AT #UPDATER DUE TO: <code>{err}</code>",
+                f"ᴀɴ ᴇxᴄᴇᴘᴛɪᴏɴ ᴏᴄᴄᴜʀᴇᴅ ᴀᴛ  #UPDATER ᴅᴜᴇ ᴛᴏ : <code>{err}</code>",
             )
     else:
         served_chats = await get_active_chats()
@@ -309,7 +309,7 @@ async def update_(client, message, _):
             try:
                 await app.send_message(
                     x,
-                    f"{config.MUSIC_BOT_NAME} ʜᴀs Jᴜsᴛ ʀᴇsᴛᴀʀᴛᴇᴅ ʜᴇʀsᴇʟғ. Sᴏʀʀʏ ғᴏʀ ᴛʜᴇ ɪssᴜᴇs.\n\nSᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ᴀғᴛᴇʀ 𝟷𝟶-𝟷𝟻 sᴇᴄᴏɴᴅs ᴀɢᴀɪɴ.",
+                    f"{app.mention} ʜᴀs Jᴜsᴛ ᴜᴘᴅᴀᴛᴇᴅ ʜᴇʀsᴇʟғ. Sᴏʀʀʏ ғᴏʀ ᴛʜᴇ ɪssᴜᴇs.\n\nSᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ᴀғᴛᴇʀ 𝟷𝟶-𝟷𝟻 sᴇᴄᴏɴᴅs ᴀɢᴀɪɴ.",
                 )
                 await remove_active_chat(x)
                 await remove_active_video_chat(x)
@@ -323,9 +323,9 @@ async def update_(client, message, _):
         exit()
 
 
-@app.on_message(filters.command(REBOOT_COMMAND) & SUDOERS)
+@app.on_message(filters.command(RESTART_COMMAND) & SUDOERS)
 async def restart_(_, message):
-    response = await message.reply_text("Restarting....")
+    response = await message.reply_text("ʀᴇsᴛᴀʀᴛɪɴɢ....")
     served_chats = await get_active_chats()
     for x in served_chats:
         try:
@@ -347,6 +347,6 @@ async def restart_(_, message):
     except:
         pass
     await response.edit(
-        "Rᴇʙᴏᴏᴛ ʜᴀs ʙᴇᴇɴ ɪɴɪᴛɪᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ! Wᴀɪᴛ ғᴏʀ 𝟷 - 𝟸 ᴍɪɴᴜᴛᴇs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs."
+        "Rᴇsᴛᴀʀᴛ ʜᴀs ʙᴇᴇɴ ɪɴɪᴛɪᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ! Wᴀɪᴛ ғᴏʀ 𝟷 - 𝟸 ᴍɪɴᴜᴛᴇs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs."
     )
     os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
