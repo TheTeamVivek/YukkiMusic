@@ -32,7 +32,7 @@ async def set_pfp(client, message):
     for num in assistants:
         client = await get_client(num)
         try:
-            await set_function(media=media)
+            await set_function
             await eor(message, text="Successfully Changed PFP.")
         except Exception as e:
             await eor(message, text=str(e))
