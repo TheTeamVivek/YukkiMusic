@@ -57,7 +57,7 @@ async def reload_admin_cache(client, message: Message, _):
 
 
 @app.on_message(
-    filters.command(RESTART_COMMAND)
+    filters.command(REBOOT_COMMAND)
     & filters.group
     & ~BANNED_USERS
 )
