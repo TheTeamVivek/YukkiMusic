@@ -15,17 +15,30 @@ ASSISTANT_PREFIX = "."
 )
 async def set_pfp(client, message):
     from YukkiMusic.core.userbot import assistants
-    if not message.reply_to_message or not message.reply_to_message.photo:
-        return await eor(message, text="Reply to a photo.")
+    if not message.reply_to_message:
+        return await eor(message, text="Reply to a media.")
+
+    replied_message = message.reply_to_message
+
+    if replied_message.photo:
+        media = await replied_message.download(file_name="temp_photo.jpg")
+        set_function = client.set_profile_photo(photo=media)
+    elif replied_message.video:
+        media = await replied_message.download(file_name="temp_video.mp4")
+        set_function = client.set_profile_photo(video=media)
+    else:
+        return await eor(message, text="Reply to a photo or a video.")
+
     for num in assistants:
-          client = await get_client(num)
-          photo = await message.reply_to_message.download()
-          try:
-                await client.set_profile_photo(photo=photo)
-                await eor(message, text="Successfully Changed PFP.")
-                os.remove(photo)
-          except Exception as e:
-                  await eor(message, text=e)
+        client = await get_client(num)
+        try:
+            await set_function
+            await eor(message, text="Successfully Changed PFP.")
+        except Exception as e:
+            await eor(message, text=str(e))
+        finally:
+            os.remove(media)
+
 
 @app.on_message(
     filters.command("setbio", prefixes=ASSISTANT_PREFIX)
@@ -85,8 +98,8 @@ async def del_pfp(client, message):
                   await eor(message, text="No profile photos found.")
           except Exception as e:
                   await eor(message, text=e)
-                  
-                  
+
+
 @app.on_message(
     filters.command("delallpfp", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
@@ -104,7 +117,7 @@ async def delall_pfp(client, message):
                   await eor(message, text="No profile photos found.")
           except Exception as e:
                   await eor(message, text=e)
-                  
+
 
 
 
