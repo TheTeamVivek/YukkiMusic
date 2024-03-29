@@ -22,6 +22,7 @@ from YukkiMusic.utils import help_pannel
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
 from YukkiMusic.utils.decorators.language import (LanguageStart,
                                                   languageCB)
+from YukkiMusic.utils.inline.help import first_page, second_page
 from YukkiMusic.utils.inline.help import (help_back_markup,
                                           private_help_panel)
 
@@ -49,9 +50,9 @@ async def helper_private(
         chat_id = update.message.chat.id
         language = await get_lang(chat_id)
         _ = get_string(language)
-        keyboard = help_pannel(_, True)
+        keyboard = first_page(_)
         if update.message.photo:
-            
+
             await update.edit_message_text(
                 _["help_1"], reply_markup=keyboard
             )
@@ -68,7 +69,7 @@ async def helper_private(
                 pass
         language = await get_lang(chat_id)
         _ = get_string(language)
-        keyboard = help_pannel(_)
+        keyboard = first_page(_)
         await update.reply_photo(photo=START_IMG_URL,caption=_["help_1"], reply_markup=keyboard)
 
 
@@ -84,6 +85,24 @@ async def help_com_group(client, message: Message, _):
         _["help_2"], reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
+@app.on_callback_query(filters.regex("yukkisecondpage") & ~BANNED_USERS)
+@languageCB
+async def yukki_pages(client, CallbackQuery, _):
+    next_page = second_page(_)
+    try:
+        await CallbackQuery.message.edit_text(_["help_1"], reply_markup=next_page)
+        return
+    except:
+        return
+@app.on_callback_query(filters.regex("yukkifirstpage") & ~BANNED_USERS)
+@languageCB
+async def yukki_pages(client, CallbackQuery, _):
+    next_page = first_page(_)
+    try:
+        await CallbackQuery.message.edit_text(_["help_1"], reply_markup=next_page)
+        return
+    except:
+        return      
 
 @app.on_callback_query(filters.regex("help_callback") & ~BANNED_USERS)
 @languageCB
@@ -125,7 +144,7 @@ async def helper_cb(client, CallbackQuery, _):
         await CallbackQuery.edit_message_text(
             helpers.HELP_6, reply_markup=keyboard
         )
-    
+
     elif cb == "hb7":
         await CallbackQuery.edit_message_text(
             helpers.HELP_7, reply_markup=keyboard
@@ -146,4 +165,4 @@ async def helper_cb(client, CallbackQuery, _):
         await CallbackQuery.edit_message_text(
             helpers.HELP_11, reply_markup=keyboard
         )
-    
+        
