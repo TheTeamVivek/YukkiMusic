@@ -28,6 +28,25 @@ async def set_pfp(client, message):
                   await eor(message, text=e)
 
 @app.on_message(
+    filters.command("setvideopfp", prefixes=ASSISTANT_PREFIX)
+    & SUDOERS
+)
+async def set_pfp(client, message):
+    from YukkiMusic.core.userbot import assistants
+    if not message.reply_to_message or not message.reply_to_message.photo:
+        return await eor(message, text="Reply to a photo.")
+    for num in assistants:
+          client = await get_client(num)
+          video = await message.reply_to_message.download()
+          try:
+                await client.set_profile_photo(video=video)
+                await eor(message, text="Successfully Changed PFP.")
+                os.remove(video)
+          except Exception as e:
+                  await eor(message, text=e)
+
+
+@app.on_message(
     filters.command("setbio", prefixes=ASSISTANT_PREFIX)
     & SUDOERS
 )
