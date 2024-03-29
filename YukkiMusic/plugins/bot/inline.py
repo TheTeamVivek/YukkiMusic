@@ -13,7 +13,7 @@ from pyrogram.types import (InlineKeyboardButton,
                             InlineQueryResultPhoto)
 from youtubesearchpython.__future__ import VideosSearch
 
-from config import BANNED_USERS, MUSIC_BOT_NAME
+from config import BANNED_USERS
 from YukkiMusic import app
 from YukkiMusic.utils.inlinequery import answer
 
@@ -48,24 +48,24 @@ async def inline_query_handler(client, query):
                 [
                     [
                         InlineKeyboardButton(
-                            text="🎥 Watch on Youtube",
+                            text="🎥 ᴡᴀᴛᴄʜ ᴏɴ ʏᴏᴜᴛᴜʙᴇ",
                             url=link,
                         )
                     ],
                 ]
             )
             searched_text = f"""
-❇️**Title:** [{title}]({link})
+❇️**ᴛɪᴛʟᴇ:** [{title}]({link})
 
-⏳**Duration:** {duration} Mins
-👀**Views:** `{views}`
-⏰**Published Time:** {published}
-🎥**Channel Name:** {channel}
-📎**Channel Link:** [Visit From Here]({channellink})
+⏳**ᴅᴜʀᴀᴛɪᴏɴ:** {duration} Mins
+👀**ᴠɪᴇᴡs:** `{views}`
+⏰**ᴘᴜʙʟɪsʜᴇᴅ ᴛɪᴍᴇ:** {published}
+🎥**ᴄʜᴀɴɴᴇʟ ɴᴀᴍᴇ:** {channel}
+📎**ᴄʜᴀɴɴᴇʟ ʟɪɴᴋ:** [ᴠɪsɪᴛ ғʀᴏᴍ ʜᴇʀᴇ]({channellink})
 
-__Reply with /play on this searched message to stream it on voice chat.__
+__ʀᴇᴘʟʏ ᴡɪᴛʜ /play ᴏɴ ᴛʜɪs sᴇᴀʀᴄʜᴇᴅ ᴍᴇssᴀɢᴇ ᴛᴏ sᴛʀᴇᴀᴍ ɪᴛ ᴏɴ ᴠᴏɪᴄᴇᴄʜᴀᴛ.__
 
-⚡️ ** Inline Search By {MUSIC_BOT_NAME} **"""
+⚡️ ** ɪɴʟɪɴᴇ sᴇᴀʀᴄʜ ʙʏ {app.mention} **"""
             answers.append(
                 InlineQueryResultPhoto(
                     photo_url=thumbnail,

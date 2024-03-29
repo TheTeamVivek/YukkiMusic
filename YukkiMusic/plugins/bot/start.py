@@ -234,7 +234,7 @@ async def testbot(client, message: Message, _):
     out = start_pannel(_)
     return await message.reply_text(
         _["start_1"].format(
-            message.chat.title, config.MUSIC_BOT_NAME
+            message.chat.title, app.mention
         ),
         reply_markup=InlineKeyboardMarkup(out),
     )
@@ -274,7 +274,7 @@ async def welcome(client, message: Message):
                 out = start_pannel(_)
                 await message.reply_text(
                     _["start_3"].format(
-                        config.MUSIC_BOT_NAME,
+                        app.mention,
                         userbot.username,
                         userbot.id,
                     ),
@@ -283,13 +283,13 @@ async def welcome(client, message: Message):
             if member.id in config.OWNER_ID:
                 return await message.reply_text(
                     _["start_4"].format(
-                        config.MUSIC_BOT_NAME, member.mention
+                        app.mention, member.mention
                     )
                 )
             if member.id in SUDOERS:
                 return await message.reply_text(
                     _["start_5"].format(
-                        config.MUSIC_BOT_NAME, member.mention
+                        app.mention, member.mention
                     )
                 )
             return
