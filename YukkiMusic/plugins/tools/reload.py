@@ -26,7 +26,7 @@ from YukkiMusic.utils.formatters import alpha_to_int
 
 ### Multi-Lang Commands
 RELOAD_COMMAND = get_command("RELOAD_COMMAND")
-RESTART_COMMAND = get_command("RESTART_COMMAND")
+REBOOT_COMMAND = get_command("REBOOT_COMMAND")
 
 
 @app.on_message(
@@ -57,7 +57,7 @@ async def reload_admin_cache(client, message: Message, _):
 
 
 @app.on_message(
-    filters.command(RESTART_COMMAND)
+    filters.command(REBOOT_COMMAND)
     & filters.group
     & ~BANNED_USERS
 )
