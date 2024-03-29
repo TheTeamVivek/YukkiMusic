@@ -21,10 +21,10 @@ async def set_pfp(client, message):
     replied_message = message.reply_to_message
 
     if replied_message.photo:
-        media = await replied_message.download(file_name="temp_photo.jpg")
+        media = await replied_message.download()
         set_function = client.set_profile_photo(photo=media)
     elif replied_message.video:
-        media = await replied_message.download(file_name="temp_video.mp4")
+        media = await replied_message.download()
         set_function = client.set_profile_photo(video=media)
     else:
         return await eor(message, text="Reply to a photo or a video.")
