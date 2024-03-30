@@ -10,7 +10,9 @@ from YukkiMusic.utils.database import get_client
 
 @app.on_message(filters.command(["leaveall", "assleaveall"]) & filters.user(OWNER_ID))
 async def ass_leaveall(_, message: Message):
-    lear = await message.reply_text(f"» {ASS_MENTION} sᴛᴀʀᴛᴇᴅ ʟᴇᴀᴠɪɴɢ ᴄʜᴀᴛs...")
+    for num in assistants:
+          client = await get_client(num)
+    lear = await client.send_message(f"» sᴛᴀʀᴛᴇᴅ ʟᴇᴀᴠɪɴɢ ᴄʜᴀᴛs...")
     left = 0
     failed = 0
     chats = []
