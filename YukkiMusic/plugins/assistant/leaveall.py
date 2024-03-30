@@ -6,7 +6,7 @@ from pyrogram.types import Message
 
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic import app
-
+from YukkiMusic.utils.database import get_client
 
 @app.on_message(filters.command(["leaveall", "assleaveall"]) & filters.user(OWNER_ID))
 async def ass_leaveall(_, message: Message):
