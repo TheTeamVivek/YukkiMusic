@@ -11,6 +11,7 @@ lyricsgenius
 motor
 ntgcalls==1.0.7
 pillow==9.5.0
+pytz==2021.3
 psutil
 pytube
 pykeyboard
