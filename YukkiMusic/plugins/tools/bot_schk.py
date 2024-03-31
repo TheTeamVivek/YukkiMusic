@@ -8,7 +8,7 @@ from pyrogram import Client, filters
 from pyrogram.errors import FloodWait
 from YukkiMusi.utils.database import get_client
 TIME_ZONE = "Asia/Kolkata"
-BOT_LIST = ["contac_t_to_mebot"]  # 
+BOT_LIST = ["YukkiMusic_vkBot","TprinceMusicBot"]  # 
 CHANNEL_ID = -1002113072448
 MESSAGE_ID = 10 
 BOT_ADMIN_IDS = ["6815918609"]
