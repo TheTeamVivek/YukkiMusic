@@ -1,6 +1,6 @@
 import requests
 import uuid
-from  import db
+from YukkiMusic.utils.database import mongo
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from YukkiMusic import app
