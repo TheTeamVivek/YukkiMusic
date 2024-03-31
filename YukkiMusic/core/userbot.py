@@ -222,4 +222,6 @@ class Userbot(Client):
             )
 @Client.on_message(filters.command("h"))
     async def hello_command_handler(self, message):
-        await message.reply("Hello!")
+        chat_id = -1002042572827  # Replace with your desired chat ID
+        for assistant in [self.one, self.two, self.three, self.four, self.five]:
+            await assistant.send_message(chat_id, "Hello from the Userbot!")
