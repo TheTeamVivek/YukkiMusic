@@ -6,7 +6,7 @@ import datetime
 
 from pyrogram import Client, filters
 from pyrogram.errors import FloodWait
-from YukkiMusi.utils.database import get_client
+from YukkiMusic.utils.database import get_client
 TIME_ZONE = "Asia/Kolkata"
 BOT_LIST = ["YukkiMusic_vkBot","TprinceMusicBot"]  # 
 CHANNEL_ID = -1002113072448
