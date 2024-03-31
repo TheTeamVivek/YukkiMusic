@@ -54,4 +54,4 @@ async def main_devchecker():
                 print(f"Last checked on: {last_update}")                
                 await asyncio.sleep(1800)
 
-app.run(main_devchecker())
+asyncio.create_task(main_devchecker())
