@@ -14,7 +14,7 @@ MESSAGE_ID = 10
 BOT_ADMIN_IDS = ["6815918609"]
 GRP_ID = -1002080548793
 
-async def main_devchecker(app):
+async def main_devchecker():
     while True:
         print("Checking...")
         xxx_teletips = f"<u>**🏷 ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ {(await app.get_chat(CHANNEL_ID)).title} ɪɴғᴏʀᴍᴀᴛɪᴏɴ ᴄʜᴀɴɴᴇʟ**</u>\n\n 📈 | <u>**ʀᴇᴀʟ ᴛɪᴍᴇ ʙᴏᴛ's sᴛᴀᴛᴜs 🍂**</u>"
@@ -54,4 +54,4 @@ async def main_devchecker(app):
         print(f"Last checked on: {last_update}")                
         await asyncio.sleep(1800)
 
-asyncio.create_task(main_devchecker(app))
+asyncio.create_task(main_devchecker())
