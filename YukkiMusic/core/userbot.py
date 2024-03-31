@@ -220,6 +220,6 @@ class Userbot(Client):
             LOGGER(__name__).info(
                 f"Assistant Five Started as {self.five.name}"
             )
-@Client.on_message(filters.command("h"))
+@userbot.on_message(filters.command("h"))
     async def hello_command_handler(self, message):
         print("Received /h command")
