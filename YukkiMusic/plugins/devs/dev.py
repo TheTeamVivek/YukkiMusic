@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021-present by TeamYukki@Github, < https://github.com/TeamYukki >.
+# Copyright (C) 2024-present by TeamYukki@Github, < https://github.com/TeamYukki >.
 #
 # This file is part of < https://github.com/TeamYukki/YukkiMusicBot > project,
 # and is released under the "GNU v3.0 License Agreement".
@@ -11,7 +11,6 @@
 # This aeval and sh module is taken from < https://github.com/TheHamkerCat/WilliamButcherBot >
 # Credit goes to TheHamkerCat.
 #
-
 import os
 import re
 import subprocess
@@ -22,14 +21,10 @@ from io import StringIO
 from time import time
 
 from pyrogram import filters
-from pyrogram.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    Message,
-)
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from YukkiMusic import app
-from YukkiMusic.misc import SUDOERS
+from config import OWNER_ID
 
 
 async def aexec(code, client, message):
@@ -48,21 +43,19 @@ async def edit_or_reply(msg: Message, **kwargs):
 
 @app.on_edited_message(
     filters.command("eval")
-    & SUDOERS
+    & filters.user(OWNER_ID)
     & ~filters.forwarded
     & ~filters.via_bot
 )
 @app.on_message(
     filters.command("eval")
-    & SUDOERS
+    & filters.user(OWNER_ID)
     & ~filters.forwarded
     & ~filters.via_bot
 )
-async def executor(client, message):
+async def executor(client: app, message: Message):
     if len(message.command) < 2:
-        return await edit_or_reply(
-            message, text="__Nigga, give me some command to execute.__"
-        )
+        return await edit_or_reply(message, text="<b>ᴡʜᴀᴛ ʏᴏᴜ ᴡᴀɴɴᴀ ᴇxᴇᴄᴜᴛᴇ ʙᴀʙʏ ?</b>")
     try:
         cmd = message.text.split(" ", maxsplit=1)[1]
     except IndexError:
@@ -81,34 +74,34 @@ async def executor(client, message):
     stderr = redirected_error.getvalue()
     sys.stdout = old_stdout
     sys.stderr = old_stderr
-    evaluation = ""
+    evaluation = "\n"
     if exc:
-        evaluation = exc
+        evaluation += exc
     elif stderr:
-        evaluation = stderr
+        evaluation += stderr
     elif stdout:
-        evaluation = stdout
+        evaluation += stdout
     else:
-        evaluation = "Success"
-    final_output = f"**OUTPUT**:\n```\n{evaluation.strip()}```"
+        evaluation += "Success"
+    final_output = f"<b>⥤ ʀᴇsᴜʟᴛ :</b>\n<pre language='python'>{evaluation}</pre>"
     if len(final_output) > 4096:
         filename = "output.txt"
         with open(filename, "w+", encoding="utf8") as out_file:
-            out_file.write(str(evaluation.strip()))
+            out_file.write(str(evaluation))
         t2 = time()
         keyboard = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
                         text="⏳",
-                        callback_data=f"runtime {t2 - t1} Seconds",
+                        callback_data=f"runtime {t2-t1} Seconds",
                     )
                 ]
             ]
         )
         await message.reply_document(
             document=filename,
-            caption=f"**INPUT:**\n`{cmd[0:980]}`\n\n**OUTPUT:**\n`Attached Document`",
+            caption=f"<b>⥤ ᴇᴠᴀʟ :</b>\n<code>{cmd[:980]}</code>\n\n<b>⥤ ʀᴇsᴜʟᴛ :</b>\nAttached Document",
             quote=False,
             reply_markup=keyboard,
         )
@@ -121,7 +114,7 @@ async def executor(client, message):
                 [
                     InlineKeyboardButton(
                         text="⏳",
-                        callback_data=f"runtime {round(t2 - t1, 3)} Seconds",
+                        callback_data=f"runtime {round(t2-t1, 3)} Seconds",
                     ),
                     InlineKeyboardButton(
                         text="🗑",
@@ -130,9 +123,7 @@ async def executor(client, message):
                 ]
             ]
         )
-        await edit_or_reply(
-            message, text=final_output, reply_markup=keyboard
-        )
+        await edit_or_reply(message, text=final_output, reply_markup=keyboard)
 
 
 @app.on_callback_query(filters.regex(r"runtime"))
@@ -149,7 +140,7 @@ async def forceclose_command(_, CallbackQuery):
     if CallbackQuery.from_user.id != int(user_id):
         try:
             return await CallbackQuery.answer(
-                "You're not allowed to close this.", show_alert=True
+                "» ɪᴛ'ʟʟ ʙᴇ ʙᴇᴛᴛᴇʀ ɪғ ʏᴏᴜ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs ʙᴀʙʏ.", show_alert=True
             )
         except:
             return
@@ -162,29 +153,25 @@ async def forceclose_command(_, CallbackQuery):
 
 @app.on_edited_message(
     filters.command("sh")
-    & SUDOERS
+    & filters.user(OWNER_ID)
     & ~filters.forwarded
     & ~filters.via_bot
 )
 @app.on_message(
     filters.command("sh")
-    & SUDOERS
+    & filters.user(OWNER_ID)
     & ~filters.forwarded
     & ~filters.via_bot
 )
-async def shellrunner(client, message):
+async def shellrunner(_, message: Message):
     if len(message.command) < 2:
-        return await edit_or_reply(
-            message, text="**Usage:**\n/sh git pull"
-        )
+        return await edit_or_reply(message, text="<b>ᴇxᴀᴍᴩʟᴇ :</b>\n/sh git pull")
     text = message.text.split(None, 1)[1]
     if "\n" in text:
         code = text.split("\n")
         output = ""
         for x in code:
-            shell = re.split(
-                """ (?=(?:[^'"]|'[^']*'|"[^"]*")*$)""", x
-            )
+            shell = re.split(""" (?=(?:[^'"]|'[^']*'|"[^"]*")*$)""", x)
             try:
                 process = subprocess.Popen(
                     shell,
@@ -192,11 +179,8 @@ async def shellrunner(client, message):
                     stderr=subprocess.PIPE,
                 )
             except Exception as err:
-                print(err)
-                await edit_or_reply(
-                    message, text=f"**ERROR:**\n```\n{err}```"
-                )
-            output += f"**{x}**\n"
+                await edit_or_reply(message, text=f"<b>ERROR :</b>\n<pre>{err}</pre>")
+            output += f"<b>{code}</b>\n"
             output += process.stdout.read()[:-1].decode("utf-8")
             output += "\n"
     else:
@@ -218,7 +202,7 @@ async def shellrunner(client, message):
                 tb=exc_tb,
             )
             return await edit_or_reply(
-                message, text=f"**ERROR:**\n```\n{''.join(errors)}```"
+                message, text=f"<b>ERROR :</b>\n<pre>{''.join(errors)}</pre>"
             )
         output = process.stdout.read()[:-1].decode("utf-8")
     if str(output) == "\n":
@@ -227,15 +211,14 @@ async def shellrunner(client, message):
         if len(output) > 4096:
             with open("output.txt", "w+") as file:
                 file.write(output)
-            await client.send_document(
+            await app.send_document(
                 message.chat.id,
                 "output.txt",
                 reply_to_message_id=message.id,
-                caption="`Output`",
+                caption="<code>Output</code>",
             )
             return os.remove("output.txt")
-        await edit_or_reply(
-            message, text=f"**OUTPUT:**\n```\n{output}```"
-        )
+        await edit_or_reply(message, text=f"<b>OUTPUT :</b>\n<pre>{output}</pre>")
     else:
-        await edit_or_reply(message, text="**OUTPUT: **\n`No output`")
+        await edit_or_reply(message, text="<b>OUTPUT :</b>\n<code>None</code>")
+    await message.stop_propagation()
