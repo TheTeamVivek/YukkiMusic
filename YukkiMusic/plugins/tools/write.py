@@ -5,16 +5,13 @@ from YukkiMusic import app
 async def write_text(client, message):
     if message.reply_to_message:
         text = message.reply_to_message.text
-    elif len(message.command) < 2:
+    if len(message.command) < 2 or not message.command[1]:
         await message.reply_text("**Usage**:- `/write <your text>`")
         return
-    else:
-        text = " ".join(message.command[1:])
+    
+    text = " ".join(message.command[1:])
     
     photo_url = "https://apis.xditya.me/write?text=" + text
-    if not text.strip():
-        await message.reply_text("**Usage**:- `/write <your text>`")
-        return
     
     await app.send_photo(
         chat_id=message.chat.id,
