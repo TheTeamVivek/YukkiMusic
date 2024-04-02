@@ -23,6 +23,7 @@ requests
 speedtest-cli
 spotipy
 tgcrypto
+urllib3
 unidecode
 yt-dlp==2023.10.13
 git+https://github.com/alexmercerind/youtube-search-python@main
