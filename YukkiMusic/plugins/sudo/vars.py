@@ -64,10 +64,13 @@ async def varsFunc(client, message):
     if not config.SUPPORT_CHANNEL:
         s_c = "No"
     else:
+SUPPORT_CHANNEL_NAME = config.SUPPORT_CHANNEL.split("/")[-1]
         s_c = f"[{config.SUPPORT_CHANNEL_NAME}]({config.SUPPORT_CHANNEL})"
     if not config.SUPPORT_GROUP:
         s_g = "No"
     else:
+        
+SUPPORT_GROUP_NAME = config.SUPPORT_GROUP.split("/")[-1]
         s_g = f"[{config.SUPPORT_GROUP_NAME}]({config.SUPPORT_GROUP})"
     if not config.GIT_TOKEN:
         token = "No"
