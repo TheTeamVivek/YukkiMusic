@@ -30,7 +30,7 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 
 #________________________________________________________________________________#
 
-ASSISTANT_PREFIX = list(getenv("ASSISTANT_PREFIX", ".").split())
+ASSISTANT_PREFIX = getenv("ASSISTANT_PREFIX", ".")
 
 #________________________________________________________________________________#
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
@@ -49,7 +49,7 @@ DURATION_LIMIT_MIN = int(
 #________________________________________________________________________________#
 # Duration Limit for downloading Songs in MP3 or MP4 format from bot
 SONG_DOWNLOAD_DURATION = int(
-    getenv("SONG_DOWNLOAD_DURATION_LIMIT", "50000")
+    getenv("SONG_DOWNLOAD_DURATION_LIMIT", "500")
 )  # Remember to give value in Minutes
 
 
@@ -61,13 +61,13 @@ LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", ""))
 
 #________________________________________________________________________________#
 # A name for your Music bot.
-MUSIC_BOT_NAME = getenv("MUSIC_BOT_NAME")
+MUSIC_BOT_NAME = getenv("MUSIC_BOT_NAME","Mrr...prince")
 
 
 #________________________________________________________________________________#
 # Your User ID.
 OWNER_ID = list(
-    map(int, getenv("OWNER_ID", "").split())
+    map(int, getenv("OWNER_ID", "6815918609").split())
 )  # Input type must be interger
 
 
@@ -86,7 +86,7 @@ UPSTREAM_REPO = getenv(
     "UPSTREAM_REPO",
     "https://github.com/Vivekkumar0708/YukkiMusicFork",
 )
-UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH", "master")
+UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH", "dev")
 
 # GIT TOKEN ( if your edited repo is private)
 GIT_TOKEN = getenv("GIT_TOKEN", None)
@@ -97,11 +97,11 @@ GIT_TOKEN = getenv("GIT_TOKEN", None)
 #________________________________________________________________________________#
 # Only  Links formats are  accepted for this Var value.
 SUPPORT_CHANNEL = getenv(
-    "SUPPORT_CHANNEL", "https://t.me/TheYukki"
-)  # Example:- https://t.me/TheYukki
+    "SUPPORT_CHANNEL", "https://t.me/Quizess_prince"
+)  # Example:- https://t.me/Quizess_prince
 SUPPORT_GROUP = getenv(
-    "SUPPORT_GROUP", "https://t.me/YukkiSupport"
-)  # Example:- https://t.me/YukkiSupport
+    "SUPPORT_GROUP", "https://t.me/Quizess_prince"
+)  # Example:- https://t.me/Quizess_prince
 
 SUPPORT_GROUP_NAME = SUPPORT_GROUP.split("/")[-1]
 SUPPORT_CHANNEL_NAME = SUPPORT_CHANNEL.split("/")[-1]
@@ -123,7 +123,7 @@ AUTO_LEAVE_ASSISTANT_TIME = int(
 #________________________________________________________________________________#
 # Time after which bot will suggest random chats about bot commands.
 AUTO_SUGGESTION_TIME = int(
-    getenv("AUTO_SUGGESTION_TIME", "300")
+    getenv("AUTO_SUGGESTION_TIME", "3000")
 )  # Remember to give value in Seconds
 
 
@@ -199,7 +199,7 @@ TG_VIDEO_FILESIZE_LIMIT = int(
 #________________________________________________________________________________#
 # If you want your bot to setup the commands automatically in the bot's menu set it to true.
 # Refer to https://i.postimg.cc/Bbg3LQTG/image.png
-SET_CMDS = getenv("SET_CMDS", "True")
+SET_CMDS = getenv("SET_CMDS", "False")
 
 
 
