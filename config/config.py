@@ -103,11 +103,6 @@ SUPPORT_GROUP = getenv(
     "SUPPORT_GROUP", "https://t.me/Quizess_prince"
 )  # Example:- https://t.me/Quizess_prince
 
-SUPPORT_GROUP_NAME = SUPPORT_GROUP.split("/")[-1]
-SUPPORT_CHANNEL_NAME = SUPPORT_CHANNEL.split("/")[-1]
-
-
-
 #________________________________________________________________________________#
 # Set it in True if you want to leave your assistant after a certain amount of time. [Set time via AUTO_LEAVE_ASSISTANT_TIME]
 AUTO_LEAVING_ASSISTANT = getenv("AUTO_LEAVING_ASSISTANT", False)
