@@ -318,7 +318,7 @@ async def song_helper_cb(client, CallbackQuery, _):
 
         keyboard = InlineKeyboard()
 
-        # AVC Formats Only [ Alexa MUSIC BOT ]
+
 
         done = [160, 133, 134, 135, 136, 137, 298, 299, 264, 304, 266]
 
