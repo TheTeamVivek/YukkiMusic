@@ -1,5 +1,4 @@
 from pyrogram import Client, filters
-import requests
 from YukkiMusic import app 
 
 @app.on_message(filters.command(["write","note"]))
