@@ -15,15 +15,12 @@ import config
 from pyrogram.enums import ChatType
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki, autoend
-from YukkiMusic.utils.database import (get_client, is_active_chat,
-                                       is_autoend)
+from YukkiMusic.utils.database import get_client, is_active_chat, is_autoend
 
 
 async def auto_leave():
     if config.AUTO_LEAVING_ASSISTANT:
-        while not await asyncio.sleep(
-            config.AUTO_LEAVE_ASSISTANT_TIME
-        ):
+        while not await asyncio.sleep(config.AUTO_LEAVE_ASSISTANT_TIME):
             from YukkiMusic.core.userbot import assistants
 
             for num in assistants:
@@ -43,9 +40,7 @@ async def auto_leave():
                                     continue
                                 if not await is_active_chat(chat_id):
                                     try:
-                                        await client.leave_chat(
-                                            chat_id
-                                        )
+                                        await client.leave_chat(chat_id)
                                         left += 1
                                     except:
                                         continue

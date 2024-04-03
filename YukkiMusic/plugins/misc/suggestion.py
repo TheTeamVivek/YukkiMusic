@@ -16,10 +16,12 @@ import config
 from config import clean
 from strings import get_string
 from YukkiMusic import app
-from YukkiMusic.utils.database import (get_lang,
-                                       get_private_served_chats,
-                                       get_served_chats,
-                                       is_suggestion)
+from YukkiMusic.utils.database import (
+    get_lang,
+    get_private_served_chats,
+    get_served_chats,
+    is_suggestion,
+)
 
 LEAVE_TIME = config.AUTO_SUGGESTION_TIME
 
@@ -75,9 +77,7 @@ async def dont_do_this():
                         put = {
                             "msg_id": sent.id,
                             "timer_after": time_now
-                            + timedelta(
-                                minutes=config.CLEANMODE_DELETE_MINS
-                            ),
+                            + timedelta(minutes=config.CLEANMODE_DELETE_MINS),
                         }
                         clean[x].append(put)
                         send_to += 1

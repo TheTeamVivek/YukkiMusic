@@ -17,7 +17,7 @@ from pyrogram.errors import (
     UserNotParticipant,
 )
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from pyrogram import Client, filters 
+from pyrogram import Client, filters
 from YukkiMusic import YouTube, app
 from pyrogram.types import CallbackQuery
 from YukkiMusic.misc import SUDOERS
@@ -144,9 +144,8 @@ def PlayWrapper(command):
                     or get.status == ChatMemberStatus.RESTRICTED
                 ):
                     return await message.reply_text(
-                      text=_["call_2"].format(userbot.username, userbot.id),
-
-                        )
+                        text=_["call_2"].format(userbot.username, userbot.id),
+                    )
             except UserNotParticipant:
                 if chat_id in links:
                     invitelink = links[chat_id]
@@ -160,7 +159,9 @@ def PlayWrapper(command):
                     else:
                         try:
                             await client.get_chat_member(message.chat.id, "me")
-                            invitelink = await client.export_chat_invite_link(message.chat.id)
+                            invitelink = await client.export_chat_invite_link(
+                                message.chat.id
+                            )
                         except ChatAdminRequired:
                             return await message.reply_text(_["call_1"])
                         except Exception as e:

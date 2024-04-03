@@ -15,9 +15,7 @@ from config import BANNED_USERS
 from strings import get_command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import (blacklist_chat,
-                                       blacklisted_chats,
-                                       whitelist_chat)
+from YukkiMusic.utils.database import blacklist_chat, blacklisted_chats, whitelist_chat
 from YukkiMusic.utils.decorators.language import language
 
 # Commands
@@ -60,18 +58,14 @@ async def white_funciton(client, message: Message, _):
     await message.reply_text("sᴏᴍᴇᴛʜɪɴɢ ᴡʀᴏɴɢ ʜᴀᴘᴘᴇɴᴇᴅ.")
 
 
-@app.on_message(
-    filters.command(BLACKLISTEDCHAT_COMMAND) & ~BANNED_USERS
-)
+@app.on_message(filters.command(BLACKLISTEDCHAT_COMMAND) & ~BANNED_USERS)
 @language
 async def all_chats(client, message: Message, _):
     text = _["black_7"]
     j = 0
     for count, chat_id in enumerate(await blacklisted_chats(), 1):
         try:
-            title = (
-                await app.get_chat(chat_id)
-            ).title
+            title = (await app.get_chat(chat_id)).title
         except Exception:
             title = "ᴘʀɪᴠᴀᴛᴇ"
         j = 1

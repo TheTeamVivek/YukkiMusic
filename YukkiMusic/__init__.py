@@ -36,7 +36,7 @@ app = YukkiBot()
 
 # Assistant Client
 userbot = Userbot()
-#Assistant prefix 
+# Assistant prefix
 ASSISTANT_PREFIX = ASSISTANT_PREFIX
 
 from .platforms import *

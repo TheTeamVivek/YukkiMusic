@@ -1,5 +1,5 @@
 from pyrogram import filters, Client
-from YukkiMusic import app 
+from YukkiMusic import app
 
 
 # Define a handler for /id command
