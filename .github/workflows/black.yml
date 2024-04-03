@@ -38,7 +38,7 @@ jobs:
 
           commit-message: Format By @Vivekkumar07089
 
-          title: Format code.
+          title: Format code
 
           body: Automated code formatting.
 
