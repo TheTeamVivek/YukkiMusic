@@ -5,7 +5,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from YukkiMusic import app
 
 
-@Client.on_message(filters.private & filters.command(["font"]))
+@app.on_message(filters.private & filters.command(["font"]))
 async def style_buttons(c, m, cb=False):
     buttons = [
         [
@@ -44,7 +44,7 @@ async def style_buttons(c, m, cb=False):
             InlineKeyboardButton("S̑̈ȃ̈d̑̈", callback_data="style+sad"),
         ],
         [InlineKeyboardButton("Next ➡️", callback_data="nxt")],
-    ]
+    
     if not cb:
         if " " in m.text:
             title = m.text.split(" ", 1)[1]
@@ -60,7 +60,7 @@ async def style_buttons(c, m, cb=False):
         await m.message.edit_reply_markup(InlineKeyboardMarkup(buttons))
 
 
-@Client.on_callback_query(filters.regex("^nxt"))
+@app.on_callback_query(filters.regex("^nxt"))
 async def nxt(c, m):
     if m.data == "nxt":
         buttons = [
@@ -102,7 +102,7 @@ async def nxt(c, m):
         await style_buttons(c, m, cb=True)
 
 
-@Client.on_callback_query(filters.regex("^style"))
+@app.on_callback_query(filters.regex("^style"))
 async def style(c, m):
     await m.answer()
     cmd, style = m.data.split("+")
