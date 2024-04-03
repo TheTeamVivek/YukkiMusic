@@ -33,8 +33,7 @@ async def mute_admin(cli, message: Message, _, chat_id):
     await Yukki.mute_stream(chat_id)
     await message.reply_text(
         _["admin_6"].format(message.from_user.mention), disable_web_page_preview=True
-  )
-
+    )
 
 
 @app.on_message(filters.command(UNMUTE_COMMAND) & filters.group & ~BANNED_USERS)
@@ -48,4 +47,4 @@ async def unmute_admin(Client, message: Message, _, chat_id):
     await Yukki.unmute_stream(chat_id)
     await message.reply_text(
         _["admin_8"].format(message.from_user.mention), disable_web_page_preview=True
-        )
+    )

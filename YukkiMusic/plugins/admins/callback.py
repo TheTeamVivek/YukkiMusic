@@ -35,7 +35,13 @@ from YukkiMusic.utils.database import (
 )
 from YukkiMusic.utils.decorators.language import languageCB
 from YukkiMusic.utils.formatters import seconds_to_min
-from YukkiMusic.utils.inline.play import panel_markup_1, panel_markup_2, panel_markup_3, stream_markup, telegram_markup
+from YukkiMusic.utils.inline.play import (
+    panel_markup_1,
+    panel_markup_2,
+    panel_markup_3,
+    stream_markup,
+    telegram_markup,
+)
 from YukkiMusic.utils.stream.autoclear import auto_clean
 from YukkiMusic.utils.thumbnails import gen_thumb
 
@@ -43,6 +49,7 @@ from YukkiMusic.utils.thumbnails import gen_thumb
 wrong = {}
 downvote = {}
 downvoters = {}
+
 
 @app.on_callback_query(filters.regex("PanelMarkup") & ~BANNED_USERS)
 @languageCB
@@ -116,7 +123,6 @@ async def del_back_playlist(client, CallbackQuery, _):
         )
     except:
         return
-
 
 
 @app.on_callback_query(filters.regex("ADMIN") & ~BANNED_USERS)
@@ -317,9 +323,11 @@ async def del_back_playlist(client, CallbackQuery, _):
             if videoid == "telegram":
                 button = telegram_markup(_, chat_id)
                 run = await CallbackQuery.message.reply_photo(
-                    photo=TELEGRAM_AUDIO_URL
-                    if str(streamtype) == "audio"
-                    else TELEGRAM_VIDEO_URL,
+                    photo=(
+                        TELEGRAM_AUDIO_URL
+                        if str(streamtype) == "audio"
+                        else TELEGRAM_VIDEO_URL
+                    ),
                     caption=_["stream_3"].format(title, check[0]["dur"], user),
                     reply_markup=InlineKeyboardMarkup(button),
                 )
@@ -328,9 +336,11 @@ async def del_back_playlist(client, CallbackQuery, _):
             elif videoid == "soundcloud":
                 button = telegram_markup(_, chat_id)
                 run = await CallbackQuery.message.reply_photo(
-                    photo=SOUNCLOUD_IMG_URL
-                    if str(streamtype) == "audio"
-                    else TELEGRAM_VIDEO_URL,
+                    photo=(
+                        SOUNCLOUD_IMG_URL
+                        if str(streamtype) == "audio"
+                        else TELEGRAM_VIDEO_URL
+                    ),
                     caption=_["stream_3"].format(title, check[0]["dur"], user),
                     reply_markup=InlineKeyboardMarkup(button),
                 )

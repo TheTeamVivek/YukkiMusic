@@ -19,10 +19,7 @@ from pyrogram.errors import (
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls
 from ntgcalls import TelegramServerError
-from pytgcalls.exceptions import (
-    AlreadyJoinedError,
-    NoActiveGroupCall
-)
+from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
 from pytgcalls.types import (
     JoinedGroupCallParticipant,
     LeftGroupCallParticipant,
@@ -133,7 +130,6 @@ class Call(PyTgCalls):
     async def unmute_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.unmute_stream(chat_id)
-
 
     async def stop_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
@@ -330,7 +326,8 @@ class Call(PyTgCalls):
                 "**ᴛᴇʟᴇɢʀᴀᴍ sᴇʀᴠᴇʀ ᴇʀʀᴏʀ**\n\nᴩʟᴇᴀsᴇ ᴛᴜʀɴ ᴏғғ ᴀɴᴅ ʀᴇsᴛᴀʀᴛ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ᴀɢᴀɪɴ."
             )
         except Exception as e:
-            raise AssistantErr(f"**ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ғᴏᴜɴᴅ**\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ.\n\nɪғ ʏᴏᴜʀ ᴀʟʀᴇᴀᴅʏ ᴇɴᴀʙʟᴇᴅ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ᴛʀʏ /reboot ᴏʀ ʀᴇᴘᴏʀᴛ ᴀᴛ sᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ\n\nᴇʀʀᴏʀ ᴛʏᴘᴇ : {e} "
+            raise AssistantErr(
+                f"**ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ғᴏᴜɴᴅ**\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ.\n\nɪғ ʏᴏᴜʀ ᴀʟʀᴇᴀᴅʏ ᴇɴᴀʙʟᴇᴅ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ᴛʀʏ /reboot ᴏʀ ʀᴇᴘᴏʀᴛ ᴀᴛ sᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ\n\nᴇʀʀᴏʀ ᴛʏᴘᴇ : {e} "
             )
         await add_active_chat(chat_id)
         await music_on(chat_id)
@@ -554,9 +551,11 @@ class Call(PyTgCalls):
                     button = telegram_markup(_, chat_id)
                     run = await app.send_photo(
                         original_chat_id,
-                        photo=config.TELEGRAM_AUDIO_URL
-                        if str(streamtype) == "audio"
-                        else config.TELEGRAM_VIDEO_URL,
+                        photo=(
+                            config.TELEGRAM_AUDIO_URL
+                            if str(streamtype) == "audio"
+                            else config.TELEGRAM_VIDEO_URL
+                        ),
                         caption=_["stream_3"].format(title, check[0]["dur"], user),
                         reply_markup=InlineKeyboardMarkup(button),
                     )

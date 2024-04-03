@@ -11,8 +11,7 @@
 import asyncio
 from pyrogram import filters
 from pyrogram.enums import ChatType, ParseMode
-from pyrogram.types import (InlineKeyboardButton,
-                            InlineKeyboardMarkup, Message)
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
 
 import config
@@ -23,23 +22,24 @@ from YukkiMusic import Telegram, YouTube, app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.plugins.play.playlist import del_plist_msg
 from YukkiMusic.plugins.sudo.sudoers import sudoers_list
-from YukkiMusic.utils.database import (add_served_chat,
-                                       add_served_user,
-                                       blacklisted_chats,
-                                       get_assistant, get_lang,
-                                       get_userss, is_on_off,
-                                       is_served_private_chat)
+from YukkiMusic.utils.database import (
+    add_served_chat,
+    add_served_user,
+    blacklisted_chats,
+    get_assistant,
+    get_lang,
+    get_userss,
+    is_on_off,
+    is_served_private_chat,
+)
 from YukkiMusic.utils.decorators.language import LanguageStart
-from YukkiMusic.utils.inline import (help_pannel, private_panel,
-                                     start_pannel)
+from YukkiMusic.utils.inline import help_pannel, private_panel, start_pannel
 
 loop = asyncio.get_running_loop()
 
 
 @app.on_message(
-    filters.command(get_command("START_COMMAND"))
-    & filters.private
-    & ~BANNED_USERS
+    filters.command(get_command("START_COMMAND")) & filters.private & ~BANNED_USERS
 )
 @LanguageStart
 async def start_comm(client, message: Message, _):
@@ -47,18 +47,19 @@ async def start_comm(client, message: Message, _):
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
         if name == "verify":
-            await message.reply_text(f"ʜᴇʏ {message.from_user.first_name},\nᴛʜᴀɴᴋs ғᴏʀ ᴠᴇʀɪғʏɪɴɢ ʏᴏᴜʀsᴇʟғ ɪɴ {app.mention}, ɴᴏᴡ ʏᴏᴜ ᴄᴀɴ ɢᴏ ʙᴀᴄᴋ ᴀɴᴅ sᴛᴀʀᴛ ᴜsɪɴɢ ᴍᴇ.")
+            await message.reply_text(
+                f"ʜᴇʏ {message.from_user.first_name},\nᴛʜᴀɴᴋs ғᴏʀ ᴠᴇʀɪғʏɪɴɢ ʏᴏᴜʀsᴇʟғ ɪɴ {app.mention}, ɴᴏᴡ ʏᴏᴜ ᴄᴀɴ ɢᴏ ʙᴀᴄᴋ ᴀɴᴅ sᴛᴀʀᴛ ᴜsɪɴɢ ᴍᴇ."
+            )
 
         if name[0:4] == "help":
             keyboard = help_pannel(_)
-            return await message.reply_photo(photo=config.START_IMG_URL, caption= _["help_1"], reply_markup=keyboard
+            return await message.reply_photo(
+                photo=config.START_IMG_URL, caption=_["help_1"], reply_markup=keyboard
             )
         if name[0:4] == "song":
             return await message.reply_text(_["song_2"])
         if name[0:3] == "sta":
-            m = await message.reply_text(
-                "🔎 ғᴇᴛᴄʜɪɴɢ ʏᴏᴜʀ ᴘᴇʀsᴏɴᴀʟ sᴛᴀᴛs.!"
-            )
+            m = await message.reply_text("🔎 ғᴇᴛᴄʜɪɴɢ ʏᴏᴜʀ ᴘᴇʀsᴏɴᴀʟ sᴛᴀᴛs.!")
             stats = await get_userss(message.from_user.id)
             tot = len(stats)
             if not stats:
@@ -100,9 +101,7 @@ async def start_comm(client, message: Message, _):
                 return videoid, msg
 
             try:
-                videoid, msg = await loop.run_in_executor(
-                    None, get_stats
-                )
+                videoid, msg = await loop.run_in_executor(None, get_stats)
             except Exception as e:
                 print(e)
                 return
@@ -127,9 +126,7 @@ async def start_comm(client, message: Message, _):
             if lyrics:
                 return await Telegram.send_split_text(message, lyrics)
             else:
-                return await message.reply_text(
-                    "ғᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ʟʏʀɪᴄs."
-                )
+                return await message.reply_text("ғᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ʟʏʀɪᴄs.")
         if name[0:3] == "del":
             await del_plist_msg(client=client, message=message, _=_)
         if name[0:3] == "inf":
@@ -141,9 +138,7 @@ async def start_comm(client, message: Message, _):
                 title = result["title"]
                 duration = result["duration"]
                 views = result["viewCount"]["short"]
-                thumbnail = result["thumbnails"][0]["url"].split("?")[
-                    0
-                ]
+                thumbnail = result["thumbnails"][0]["url"].split("?")[0]
                 channellink = result["channel"]["link"]
                 channel = result["channel"]["name"]
                 link = result["link"]
@@ -164,12 +159,8 @@ async def start_comm(client, message: Message, _):
             key = InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton(
-                            text="🎥 ᴡᴀᴛᴄʜ ", url=f"{link}"
-                        ),
-                        InlineKeyboardButton(
-                            text="🔄 ᴄʟᴏsᴇ", callback_data="close"
-                        ),
+                        InlineKeyboardButton(text="🎥 ᴡᴀᴛᴄʜ ", url=f"{link}"),
+                        InlineKeyboardButton(text="🔄 ᴄʟᴏsᴇ", callback_data="close"),
                     ],
                 ]
             )
@@ -199,9 +190,7 @@ async def start_comm(client, message: Message, _):
             try:
                 await message.reply_photo(
                     photo=config.START_IMG_URL,
-                    caption=_["start_2"].format(
-                        app.mention
-                    ),
+                    caption=_["start_2"].format(app.mention),
                     reply_markup=InlineKeyboardMarkup(out),
                 )
             except:
@@ -224,17 +213,13 @@ async def start_comm(client, message: Message, _):
 
 
 @app.on_message(
-    filters.command(get_command("START_COMMAND"))
-    & filters.group
-    & ~BANNED_USERS
+    filters.command(get_command("START_COMMAND")) & filters.group & ~BANNED_USERS
 )
 @LanguageStart
 async def testbot(client, message: Message, _):
     out = start_pannel(_)
     return await message.reply_text(
-        _["start_1"].format(
-            message.chat.title, app.mention
-        ),
+        _["start_1"].format(message.chat.title, app.mention),
         reply_markup=InlineKeyboardMarkup(out),
     )
 
@@ -281,15 +266,11 @@ async def welcome(client, message: Message):
                 )
             if member.id in config.OWNER_ID:
                 return await message.reply_text(
-                    _["start_4"].format(
-                        app.mention, member.mention
-                    )
+                    _["start_4"].format(app.mention, member.mention)
                 )
             if member.id in SUDOERS:
                 return await message.reply_text(
-                    _["start_5"].format(
-                        app.mention, member.mention
-                    )
+                    _["start_5"].format(app.mention, member.mention)
                 )
             return
         except:

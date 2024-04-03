@@ -5,13 +5,15 @@ import re
 from YukkiMusic import app
 
 
-mongo_url_pattern = re.compile(r'mongodb(?:\+srv)?:\/\/[^\s]+')
+mongo_url_pattern = re.compile(r"mongodb(?:\+srv)?:\/\/[^\s]+")
 
 
 @app.on_message(filters.command("mongochk"))
 async def mongo_command(client, message: Message):
     if len(message.command) < 2:
-        await message.reply("ᴘʟᴇᴀsᴇ ᴇɴᴛᴇʀ ʏᴏᴜʀ ᴍᴏɴɢᴏᴅʙ ᴜʀʟ ᴀғᴛᴇʀ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅ  `/mongochk your_mongodb_url`")
+        await message.reply(
+            "ᴘʟᴇᴀsᴇ ᴇɴᴛᴇʀ ʏᴏᴜʀ ᴍᴏɴɢᴏᴅʙ ᴜʀʟ ᴀғᴛᴇʀ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅ  `/mongochk your_mongodb_url`"
+        )
         return
 
     mongo_url = message.command[1]

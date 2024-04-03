@@ -14,9 +14,12 @@ from pyrogram.types import Message
 from strings import get_command, get_string
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import (get_lang, is_maintenance,
-                                       maintenance_off,
-                                       maintenance_on)
+from YukkiMusic.utils.database import (
+    get_lang,
+    is_maintenance,
+    maintenance_off,
+    maintenance_on,
+)
 from YukkiMusic.utils.decorators.language import language
 
 # Commands
@@ -38,9 +41,7 @@ async def maintenance(client, message: Message):
     state = state.lower()
     if state == "enable":
         if await is_maintenance() is False:
-            await message.reply_text(
-                "ᴍᴀɪɴᴛᴇɴᴀɴᴄᴇ ᴍᴏᴅᴇ ɪs ᴀʟʀᴇᴀᴅʏ ᴇɴᴀʙʟᴇᴅ"
-            )
+            await message.reply_text("ᴍᴀɪɴᴛᴇɴᴀɴᴄᴇ ᴍᴏᴅᴇ ɪs ᴀʟʀᴇᴀᴅʏ ᴇɴᴀʙʟᴇᴅ")
         else:
             await maintenance_on()
             await message.reply_text(_["maint_2"])
@@ -49,8 +50,6 @@ async def maintenance(client, message: Message):
             await maintenance_off()
             await message.reply_text(_["maint_3"])
         else:
-            await message.reply_text(
-                "ᴍᴀɪɴᴛᴇɴᴀɴᴄᴇ ᴍᴏᴅᴇ ɪs ᴀʟʀᴇᴀᴅʏ ᴅɪsᴀʙʟᴇᴅ"
-            )
+            await message.reply_text("ᴍᴀɪɴᴛᴇɴᴀɴᴄᴇ ᴍᴏᴅᴇ ɪs ᴀʟʀᴇᴀᴅʏ ᴅɪsᴀʙʟᴇᴅ")
     else:
         await message.reply_text(usage)

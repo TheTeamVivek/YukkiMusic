@@ -14,6 +14,7 @@ from config.config import time_to_seconds
 from YukkiMusic.misc import db
 from typing import Union
 
+
 async def put_queue(
     chat_id,
     original_chat_id,
