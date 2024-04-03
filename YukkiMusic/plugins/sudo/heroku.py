@@ -337,3 +337,41 @@ async def restart_(_, message):
         "Rᴇsᴛᴀʀᴛ ʜᴀs ʙᴇᴇɴ ɪɴɪᴛɪᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ! Wᴀɪᴛ ғᴏʀ 𝟷 - 𝟸 ᴍɪɴᴜᴛᴇs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs."
     )
     os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
+
+
+@app.on_message(filters.command(["/git_pull"]) & SUDOERS)
+async def git_pull_(_, message):
+    response = await message.reply_text("Updating....")
+    served_chats = await get_active_chats()
+    for x in served_chats:
+        try:
+            await app.send_message(
+                x,
+                f"{app.mention} ʜᴀs Jᴜsᴛ ʀᴇsᴛᴀʀᴛᴇᴅ ʜᴇʀsᴇʟғ. Sᴏʀʀʏ ғᴏʀ ᴛʜᴇ ɪssᴜᴇs. \n\nSᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ᴀғᴛᴇʀ 𝟷𝟶-𝟷𝟻 sᴇᴄᴏɴᴅs ᴀɢᴀɪɴ.",
+            )
+            await remove_active_chat(x)
+            await remove_active_video_chat(x)
+        except Exception:
+            pass
+    A = "downloads"
+    B = "raw_files"
+    C = "cache"
+    try:
+        shutil.rmtree(A)
+        shutil.rmtree(B)
+        shutil.rmtree(C)
+    except:
+        pass
+     await response.edit(
+        "ʀᴜɴɴɪɴɢ ɢɪᴛ ᴘᴜʟʟ ....."
+    )
+    os.system("git stash &> /dev/null && git pull")
+    await response.edit(
+        "ɪsᴛᴀʟʟɪɴɢ ʀᴇᴄǫᴜɪʀᴍᴇɴᴛs.ᴛxᴛ...."
+    )
+    os.system("pip3 install -r requirements.txt")
+    await response.edit(
+        "ᴜᴘᴅᴀᴛᴇ ʜᴀs ʙᴇᴇɴ ɪɴɪᴛɪᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ! Wᴀɪᴛ ғᴏʀ 15-20 sᴇᴄᴏɴᴅs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs."
+    )
+    os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
+    
