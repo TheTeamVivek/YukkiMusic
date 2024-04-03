@@ -362,11 +362,6 @@ async def git_pull_(_, message):
         shutil.rmtree(C)
     except:
         pass
-    await response.edit("ʀᴜɴɴɪɴɢ ɢɪᴛ ᴘᴜʟʟ .....")
     os.system("git stash &> /dev/null && git pull")
-    await response.edit("ɪsᴛᴀʟʟɪɴɢ ʀᴇᴄǫᴜɪʀᴍᴇɴᴛs.ᴛxᴛ....")
     os.system("pip3 install -r requirements.txt")
-    await response.edit(
-        "ᴜᴘᴅᴀᴛᴇ ʜᴀs ʙᴇᴇɴ ɪɴɪᴛɪᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ! Wᴀɪᴛ ғᴏʀ 15-20 sᴇᴄᴏɴᴅs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs."
-    )
     os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
