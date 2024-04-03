@@ -1,5 +1,5 @@
 import os
-from image.font_string import Fonts
+from YukkiMusic.utils.font_string import Fonts
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from YukkiMusic import app
