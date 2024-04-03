@@ -347,7 +347,7 @@ async def git_pull_(_, message):
         try:
             await app.send_message(
                 x,
-                f"{app.mention} ʜᴀs Jᴜsᴛ ʀᴇsᴛᴀʀᴛᴇᴅ ʜᴇʀsᴇʟғ. Sᴏʀʀʏ ғᴏʀ ᴛʜᴇ ɪssᴜᴇs. \n\nSᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ᴀғᴛᴇʀ 𝟷𝟶-𝟷𝟻 sᴇᴄᴏɴᴅs ᴀɢᴀɪɴ.",
+                f"{app.mention} ʜᴀs Jᴜsᴛ ʀᴇsᴛᴀʀᴛᴇᴅ ʜᴇʀsᴇʟғ. Sᴏʀʀʏ ғᴏʀ ᴛʜᴇ ɪssᴜᴇs. \n\nSᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ᴀғᴛᴇʀ 𝟷𝟶-𝟷𝟽 sᴇᴄᴏɴᴅs ᴀɢᴀɪɴ.",
             )
             await remove_active_chat(x)
             await remove_active_video_chat(x)
@@ -362,7 +362,7 @@ async def git_pull_(_, message):
         shutil.rmtree(C)
     except:
         pass
-     await response.edit(
+    await response.edit(
         "ʀᴜɴɴɪɴɢ ɢɪᴛ ᴘᴜʟʟ ....."
     )
     os.system("git stash &> /dev/null && git pull")
@@ -374,4 +374,3 @@ async def git_pull_(_, message):
         "ᴜᴘᴅᴀᴛᴇ ʜᴀs ʙᴇᴇɴ ɪɴɪᴛɪᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ! Wᴀɪᴛ ғᴏʀ 15-20 sᴇᴄᴏɴᴅs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs."
     )
     os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
-    
