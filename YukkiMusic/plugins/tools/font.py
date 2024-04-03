@@ -45,6 +45,10 @@ async def style_buttons(c, m, cb=False):
         ],
         [InlineKeyboardButton("Next ➡️", callback_data="nxt")],
     
+
+
+
+]
     if not cb:
         if " " in m.text:
             title = m.text.split(" ", 1)[1]
