@@ -210,7 +210,7 @@ async def start_comm(client, message: Message, _):
             )
 
 
-@app.on_message(    filters.command(get_command(["start"]))
+@app.on_message(    filters.command(["start"])
     & filters.group
     & ~BANNED_USERS
 )
