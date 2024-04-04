@@ -95,3 +95,14 @@ def private_panel(_, BOT_USERNAME, OWNER: Union[bool, int] = None):
             )
     buttons.append([InlineKeyboardButton(text=_["ST_B_6"], callback_data="LG")])
     return buttons
+
+def alive_panel(_):
+    buttons = [
+        [
+            InlineKeyboardButton(
+                text="✿︎ ᴀᴅᴅ ᴍᴇ ✿︎", url=f"https://t.me/{app.username}?startgroup=true"
+            ),
+            InlineKeyboardButton(text=_["S_B_3"], url=config.SUPPORT_CHAT),
+        ],
+    ]
+    return buttons
