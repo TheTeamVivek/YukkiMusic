@@ -24,7 +24,7 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from YukkiMusic import app
-from config import OWNER_ID
+from YukkiMusic.misc import SUDOERS
 
 
 async def aexec(code, client, message):
@@ -42,16 +42,10 @@ async def edit_or_reply(msg: Message, **kwargs):
 
 
 @app.on_edited_message(
-    filters.command("eval")
-    & filters.user(OWNER_ID)
-    & ~filters.forwarded
-    & ~filters.via_bot
+    filters.command("eval") & SUDOERS & ~filters.forwarded & ~filters.via_bot
 )
 @app.on_message(
-    filters.command("eval")
-    & filters.user(OWNER_ID)
-    & ~filters.forwarded
-    & ~filters.via_bot
+    filters.command("eval") & SUDOERS & ~filters.forwarded & ~filters.via_bot
 )
 async def executor(client: app, message: Message):
     if len(message.command) < 2:
@@ -101,7 +95,7 @@ async def executor(client: app, message: Message):
         )
         await message.reply_document(
             document=filename,
-            caption=f"<b>⥤ ᴇᴠᴀʟ :</b>\n<code>{cmd[:980]}</code>\n\n<b>⥤ ʀᴇsᴜʟᴛ :</b>\nAttached Document",
+            caption=f"<b>⥤ ᴇᴠᴀʟ :</b>\n<code>{cmd[0:980]}</code>\n\n<b>⥤ ʀᴇsᴜʟᴛ :</b>\nAttached Document",
             quote=False,
             reply_markup=keyboard,
         )
@@ -152,17 +146,9 @@ async def forceclose_command(_, CallbackQuery):
 
 
 @app.on_edited_message(
-    filters.command("sh")
-    & filters.user(OWNER_ID)
-    & ~filters.forwarded
-    & ~filters.via_bot
+    filters.command("sh") & SUDOERS & ~filters.forwarded & ~filters.via_bot
 )
-@app.on_message(
-    filters.command("sh")
-    & filters.user(OWNER_ID)
-    & ~filters.forwarded
-    & ~filters.via_bot
-)
+@app.on_message(filters.command("sh") & SUDOERS & ~filters.forwarded & ~filters.via_bot)
 async def shellrunner(_, message: Message):
     if len(message.command) < 2:
         return await edit_or_reply(message, text="<b>ᴇxᴀᴍᴩʟᴇ :</b>\n/sh git pull")
