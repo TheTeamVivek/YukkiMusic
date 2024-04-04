@@ -5,8 +5,7 @@ from pyrogram import Client, filters
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import get_client
-
-ASSISTANT_PREFIX = "."
+from YukkiMusic import ASSISTANT_PREFIX
 
 
 @app.on_message(filters.command("setpfp", prefixes=ASSISTANT_PREFIX) & SUDOERS)
