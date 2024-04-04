@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021-present by TeamYukki@Github, < https://github.com/TeamYukki >.
+# Copyright (C) 2024-present by TeamYukki@Github, < https://github.com/TeamYukki >.
 #
 # This file is part of < https://github.com/TeamYukki/YukkiMusicBot > project,
 # and is released under the "GNU v3.0 License Agreement".
@@ -7,33 +7,31 @@
 #
 # All rights reserved.
 #
-
+import time 
+import config
 import asyncio
 from pyrogram import filters
 from pyrogram.enums import ChatType, ParseMode
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.types import (InlineKeyboardButton,
+                            InlineKeyboardMarkup, Message)
 from youtubesearchpython.__future__ import VideosSearch
-
-import config
 from config import BANNED_USERS
-from config.config import OWNER_ID
+from config.config import OWNER_ID, MUSIC_BOT_NAME
 from strings import get_command, get_string
 from YukkiMusic import Telegram, YouTube, app
 from YukkiMusic.misc import SUDOERS
+from YukkiMusic.misc import _boot_
+from YukkiMusic.utils.formatters import get_readable_time
 from YukkiMusic.plugins.play.playlist import del_plist_msg
 from YukkiMusic.plugins.sudo.sudoers import sudoers_list
-from YukkiMusic.utils.database import (
-    add_served_chat,
-    add_served_user,
-    blacklisted_chats,
-    get_assistant,
-    get_lang,
-    get_userss,
-    is_on_off,
-    is_served_private_chat,
-)
+from YukkiMusic.utils.database import (add_served_chat,
+                                       add_served_user,
+                                       blacklisted_chats,
+                                       get_assistant, get_lang,
+                                       get_userss, is_on_off,
+                                       is_served_private_chat)
 from YukkiMusic.utils.decorators.language import LanguageStart
-from YukkiMusic.utils.inline import help_pannel, private_panel, start_pannel
+from YukkiMusic.utils.inline import (help_pannel, alive_panel, private_panel, start_pannel)
 
 loop = asyncio.get_running_loop()
 
@@ -212,22 +210,25 @@ async def start_comm(client, message: Message, _):
             )
 
 
-@app.on_message(
-    filters.command(get_command("START_COMMAND")) & filters.group & ~BANNED_USERS
+@app.on_message(    filters.command(get_command(["start"]))
+    & filters.group
+    & ~BANNED_USERS
 )
 @LanguageStart
 async def testbot(client, message: Message, _):
-    out = start_pannel(_)
-    return await message.reply_text(
-        _["start_1"].format(message.chat.title, app.mention),
+    out = alive_panel(_)
+    uptime = int(time.time() - _boot_)
+    await message.reply_photo(
+        photo=config.START_IMG_URL,
+        caption=_["start_8"].format(app.mention, get_readable_time(uptime)),
         reply_markup=InlineKeyboardMarkup(out),
     )
+    return await add_served_chat(message.chat.id)
 
 
-welcome_group = 2
 
 
-@app.on_message(filters.new_chat_members, group=welcome_group)
+@app.on_message(filters.new_chat_members, group=-1)
 async def welcome(client, message: Message):
     chat_id = message.chat.id
     if config.PRIVATE_BOT_MODE == str(True):
