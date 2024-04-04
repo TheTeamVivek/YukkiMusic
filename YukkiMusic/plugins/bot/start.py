@@ -7,13 +7,12 @@
 #
 # All rights reserved.
 #
-import time 
+import time
 import config
 import asyncio
 from pyrogram import filters
 from pyrogram.enums import ChatType, ParseMode
-from pyrogram.types import (InlineKeyboardButton,
-                            InlineKeyboardMarkup, Message)
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
 from config import BANNED_USERS
 from config.config import OWNER_ID, MUSIC_BOT_NAME
@@ -24,14 +23,23 @@ from YukkiMusic.misc import _boot_
 from YukkiMusic.utils.formatters import get_readable_time
 from YukkiMusic.plugins.play.playlist import del_plist_msg
 from YukkiMusic.plugins.sudo.sudoers import sudoers_list
-from YukkiMusic.utils.database import (add_served_chat,
-                                       add_served_user,
-                                       blacklisted_chats,
-                                       get_assistant, get_lang,
-                                       get_userss, is_on_off,
-                                       is_served_private_chat)
+from YukkiMusic.utils.database import (
+    add_served_chat,
+    add_served_user,
+    blacklisted_chats,
+    get_assistant,
+    get_lang,
+    get_userss,
+    is_on_off,
+    is_served_private_chat,
+)
 from YukkiMusic.utils.decorators.language import LanguageStart
-from YukkiMusic.utils.inline import (help_pannel, alive_panel, private_panel, start_pannel)
+from YukkiMusic.utils.inline import (
+    help_pannel,
+    alive_panel,
+    private_panel,
+    start_pannel,
+)
 
 loop = asyncio.get_running_loop()
 
@@ -210,10 +218,7 @@ async def start_comm(client, message: Message, _):
             )
 
 
-@app.on_message(    filters.command(["start"])
-    & filters.group
-    & ~BANNED_USERS
-)
+@app.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
 @LanguageStart
 async def testbot(client, message: Message, _):
     out = alive_panel(_)
@@ -224,8 +229,6 @@ async def testbot(client, message: Message, _):
         reply_markup=InlineKeyboardMarkup(out),
     )
     return await add_served_chat(message.chat.id)
-
-
 
 
 @app.on_message(filters.new_chat_members, group=-1)
