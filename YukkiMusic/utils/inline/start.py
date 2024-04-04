@@ -102,7 +102,7 @@ def alive_panel(_):
             InlineKeyboardButton(
                 text="✿︎ ᴀᴅᴅ ᴍᴇ ✿︎", url=f"https://t.me/{app.username}?startgroup=true"
             ),
-            InlineKeyboardButton(text=_["S_B_3"], url=config.SUPPORT_CHAT),
+            InlineKeyboardButton(text=_["S_B_3"], url={SUPPORT_GROUP}),
         ],
     ]
     return buttons
