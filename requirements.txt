@@ -9,6 +9,7 @@ hachoir
 heroku3
 lyricsgenius
 motor
+MukeshApi
 ntgcalls==1.0.7
 pillow==9.5.0
 pytz==2021.3
