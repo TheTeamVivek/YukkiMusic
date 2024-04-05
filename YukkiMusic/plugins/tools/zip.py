@@ -7,11 +7,17 @@ from telethon.tl import functions
 
 from YukkiMusic import TEMP_DOWNLOAD_DIRECTORY
 from YukkiMusic import telethn as client
-from YukkiMusic.utils.events import register
+from YukkiMusic.events import register
 
+from datetime import datetime
+
+from hachoir.metadata import extractMetadata
+from hachoir.parser import createParser
+from telethon.tl.types import DocumentAttributeVideo
 
 async def is_register_admin(chat, user):
     if isinstance(chat, (types.InputPeerChannel, types.InputChannel)):
+
         return isinstance(
             (
                 await client(functions.channels.GetParticipantRequest(chat, user))
@@ -19,6 +25,7 @@ async def is_register_admin(chat, user):
             (types.ChannelParticipantAdmin, types.ChannelParticipantCreator),
         )
     if isinstance(chat, types.InputPeerChat):
+
         ui = await client.get_peer_id(user)
         ps = (
             await client(functions.messages.GetFullChatRequest(chat.chat_id))
@@ -36,16 +43,16 @@ async def _(event):
         return
 
     if not event.is_reply:
-        await event.reply("Reply to a file to compress it.")
+        await event.reply("ʀᴇᴘʟʏ ᴛᴏ ᴀ ғɪʟᴇ ᴛᴏ ᴄʀᴇᴀᴛᴇ ᴀ ᴢɪᴘ")
         return
     if event.is_group:
         if not (await is_register_admin(event.input_chat, event.message.sender_id)):
             await event.reply(
-                "Hey, you are not admin. You can't use this command, But you can use in my PM 🙂"
+                "sᴏʀʀʏ ᴅᴇᴀʀ! ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ ᴏғ ᴛʜᴇ ᴄʜᴀᴛ ʏᴏᴜ ᴄᴀɴ'ᴛ ᴜsᴇ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅ ʜᴇʀᴇ , ʙᴜᴛ ʏᴏᴜ ᴄᴀɴ ᴜsᴇ ɪᴛ ɪɴ ᴘᴍ🙂"
             )
             return
 
-    mone = await event.reply("⏳️ Please wait...")
+    mone = await event.reply("ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ....")
     if not os.path.isdir(TEMP_DOWNLOAD_DIRECTORY):
         os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
     if event.reply_to_msg_id:
@@ -78,11 +85,7 @@ def zipdir(path, ziph):
             os.remove(os.path.join(root, file))
 
 
-from datetime import datetime
 
-from hachoir.metadata import extractMetadata
-from hachoir.parser import createParser
-from telethon.tl.types import DocumentAttributeVideo
 
 extracted = TEMP_DOWNLOAD_DIRECTORY + "extracted/"
 thumb_image_path = TEMP_DOWNLOAD_DIRECTORY + "/thumb_image.jpg"
@@ -92,6 +95,7 @@ if not os.path.isdir(extracted):
 
 async def is_register_admin(chat, user):
     if isinstance(chat, (types.InputPeerChannel, types.InputChannel)):
+
         return isinstance(
             (
                 await client(functions.channels.GetParticipantRequest(chat, user))
@@ -99,6 +103,7 @@ async def is_register_admin(chat, user):
             (types.ChannelParticipantAdmin, types.ChannelParticipantCreator),
         )
     if isinstance(chat, types.InputPeerChat):
+
         ui = await client.get_peer_id(user)
         ps = (
             await client(functions.messages.GetFullChatRequest(chat.chat_id))
@@ -116,16 +121,16 @@ async def _(event):
         return
 
     if not event.is_reply:
-        await event.reply("Reply to a zip file.")
+        await event.reply("ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴢɪᴘ ғɪʟᴇ ᴛᴏ ᴜɴᴢɪᴘ")
         return
     if event.is_group:
         if not (await is_register_admin(event.input_chat, event.message.sender_id)):
             await event.reply(
-                "Hey, You are not admin. You can't use this command, But you can use in my PM 🙂"
+                "sᴏʀʀʏ ᴅᴇᴀʀ! ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ ᴏғ ᴛʜᴇ ᴄʜᴀᴛ ʏᴏᴜ ᴄᴀɴ'ᴛ ᴜsᴇ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅ ʜᴇʀᴇ , ʙᴜᴛ ʏᴏᴜ ᴄᴀɴ ᴜsᴇ ɪᴛ ɪɴ ᴘᴍ🙂"
             )
             return
 
-    mone = await event.reply("Processing...")
+    mone = await event.reply("ᴘʀᴏᴄᴇssɪɴɢ...")
     if not os.path.isdir(TEMP_DOWNLOAD_DIRECTORY):
         os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
     if event.reply_to_msg_id:
@@ -145,7 +150,7 @@ async def _(event):
         with zipfile.ZipFile(downloaded_file_name, "r") as zip_ref:
             zip_ref.extractall(extracted)
         filename = sorted(get_lst_of_files(extracted, []))
-        await event.reply("Unzipping now 😌")
+        await event.reply("ᴜɴᴢɪᴘᴘɪɴɢ ɴᴏᴡ 😌")
         for single_file in filename:
             if os.path.exists(single_file):
                 caption_rts = os.path.basename(single_file)
