@@ -7,7 +7,7 @@ from telethon.tl import functions
 
 from YukkiMusic import TEMP_DOWNLOAD_DIRECTORY
 from YukkiMusic import telethn as client
-from YukkiMusic.events import register
+from YukkiMusic.utils.events import register
 
 from datetime import datetime
 
