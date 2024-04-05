@@ -11,9 +11,9 @@ from YukkiMusic.utils.events import register
 async def _(event):
     reply = await event.get_reply_message()
     if not (reply and (reply.media)):
-        await event.reply("`Please reply to a sticker`")
+        await event.reply("ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ sᴛɪᴄᴋᴇʀ")
         return
-    kontol = await event.reply("`Processing tiny...`")
+    kontol = await event.reply("ᴘʀᴏᴄᴇssɪɴɢ...")
     ik = await tbot.download_media(reply)
     im1 = Image.open("assets/blank_background.png")
     if ik.endswith(".tgs"):
