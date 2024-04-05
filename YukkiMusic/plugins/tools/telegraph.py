@@ -77,7 +77,7 @@ async def _(event):
             end = datetime.now()
             ms = (end - start).seconds
             await event.reply(
-                f"ᴘᴀsᴛᴇᴅ ᴛᴏ [ᴛᴇʟᴇɢʀᴀᴘʜ](https://graph.org{}) in {} seconds.".format(
+                "ᴘᴀsᴛᴇᴅ ᴛᴏ [ᴛᴇʟᴇɢʀᴀᴘʜ](https://graph.org{}) in {} seconds.".format(
                     response["path"], ms
                 ),
                 link_preview=True,
