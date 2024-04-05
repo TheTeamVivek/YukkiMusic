@@ -13,13 +13,16 @@ import sys
 import logging
 from os import listdir, mkdir
 
+
 def dirr():
     assets_folder = "assets"
     downloads_folder = "downloads"
     cache_folder = "cache"
 
     if assets_folder not in listdir():
-        logging.warning(f"{assets_folder} Folder not Found. Please clone repository again.")
+        logging.warning(
+            f"{assets_folder} Folder not Found. Please clone repository again."
+        )
         sys.exit()
 
     for file in os.listdir():
@@ -33,6 +36,7 @@ def dirr():
         mkdir(cache_folder)
 
     logging.info("Directories Updated.")
+
 
 if __name__ == "__main__":
     dirr()

@@ -17,9 +17,7 @@ async def get_channeplayCB(_, command, CallbackQuery):
         chat_id = await get_cmode(CallbackQuery.message.chat.id)
         if chat_id is None:
             try:
-                return await CallbackQuery.answer(
-                    _["setting_12"], show_alert=True
-                )
+                return await CallbackQuery.answer(_["setting_12"], show_alert=True)
             except:
                 return
         try:
@@ -27,9 +25,7 @@ async def get_channeplayCB(_, command, CallbackQuery):
             channel = chat.title
         except:
             try:
-                return await CallbackQuery.answer(
-                    _["cplay_4"], show_alert=True
-                )
+                return await CallbackQuery.answer(_["cplay_4"], show_alert=True)
             except:
                 return
     else:

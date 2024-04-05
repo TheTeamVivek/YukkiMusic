@@ -41,4 +41,5 @@ async def leave_group(client: Client, message: Message):
             await message.reply(f"sᴏᴍᴇ ᴇxᴄᴇᴘᴛɪᴏɴ ᴡʜɪʟᴇ ʟᴇᴀᴠɪɴɢ \n {e}")
             return
     except ValueError:
+
         await message.reply("ɪɴᴠᴀʟɪᴅ ᴄʜᴀᴛ ɪᴅ")

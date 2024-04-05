@@ -172,9 +172,7 @@ async def stream(
             button = queue_markup(_, vidid, chat_id)
             run = await app.send_message(
                 original_chat_id,
-                _["queue_4"].format(
-                    position, title[:27], duration_min, user_name
-                ),
+                _["queue_4"].format(position, title[:27], duration_min, user_name),
                 reply_markup=InlineKeyboardMarkup(button),
             )
         else:
