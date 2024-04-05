@@ -124,4 +124,3 @@ async def stop_download(client, CallbackQuery: CallbackQuery, _):
             )
 
     await CallbackQuery.answer("ғᴀɪʟᴇᴅ ᴛᴏ ʀᴇᴄᴏɢɴɪsᴇ ᴛʜᴇ ʀᴜɴɴɪɴɢ ᴛᴀsᴋ", show_alert=True)
-

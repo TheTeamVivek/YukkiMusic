@@ -122,4 +122,3 @@ async def varsFunc(client, message):
     await asyncio.sleep(1)
 
     await mystic.edit_text(text)
-
