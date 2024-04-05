@@ -45,9 +45,11 @@ async def _(event):
                 end = datetime.now()
                 (end - start).seconds
                 os.remove(downloaded_file_name)
-                button = Button.url("ᴛᴇʟᴇɢʀᴀᴘʜ",f"https://graph.org{media_urls[0]}")
+                button = Button.url("ᴛᴇʟᴇɢʀᴀᴘʜ", f"https://graph.org{media_urls[0]}")
                 await h.edit(
-                    "ᴜᴘʟᴏᴀᴅᴇᴅ ᴛᴏ [ᴛᴇʟᴇɢʀᴀᴘʜ](https://graph.org{})".format(media_urls[0]),
+                    "ᴜᴘʟᴏᴀᴅᴇᴅ ᴛᴏ [ᴛᴇʟᴇɢʀᴀᴘʜ](https://graph.org{})".format(
+                        media_urls[0]
+                    ),
                     link_preview=True,
                     buttons=button,
                 )
@@ -87,4 +89,3 @@ async def _(event):
 def resize_image(image):
     im = Image.open(image)
     im.save(image, "PNG")
-

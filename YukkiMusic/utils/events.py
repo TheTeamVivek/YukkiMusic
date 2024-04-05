@@ -8,6 +8,7 @@ from telethon import events
 from YukkiMusic import telethn
 from YukkiMusic.core.mongo import mongodb
 
+
 def register(**args):
     """Registers a new message."""
     pattern = args.get("pattern", None)
@@ -24,4 +25,3 @@ def register(**args):
         return func
 
     return decorator
-
