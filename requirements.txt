@@ -11,6 +11,7 @@ lyricsgenius
 motor
 ntgcalls==1.0.7
 pillow==9.5.0
+telethon==1.33.1
 pytz
 psutil
 pytube
