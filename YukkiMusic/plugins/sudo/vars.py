@@ -7,7 +7,6 @@
 #
 # All rights reserved.
 #
-
 import asyncio
 
 from pyrogram import filters
@@ -21,14 +20,12 @@ from YukkiMusic.utils.formatters import convert_bytes
 
 VARS_COMMAND = get_command("VARS_COMMAND")
 
+
 @app.on_message(filters.command(VARS_COMMAND) & SUDOERS)
 async def varsFunc(client, message):
-    mystic = await message.reply_text(
-        "ɢᴇᴛᴛɪɴɢ ʏᴏᴜʀ ᴄᴏɴғɪɢ..... ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ!"
-    )
-
+    mystic = await message.reply_text("Please wait.. Getting your config")
     v_limit = await get_video_limit()
-    bot_name = app.name
+    bot_name = config.MUSIC_BOT_NAME
     up_r = f"[Repo]({config.UPSTREAM_REPO})"
     up_b = config.UPSTREAM_BRANCH
     auto_leave = config.AUTO_LEAVE_ASSISTANT_TIME
@@ -40,7 +37,7 @@ async def varsFunc(client, message):
     play_duration = config.DURATION_LIMIT_MIN
     cm = config.CLEANMODE_DELETE_MINS
     auto_sug = config.AUTO_SUGGESTION_TIME
-    if config.AUTO_LEAVING_ASSISTANT:
+    if config.AUTO_LEAVING_ASSISTANT == str(True):
         ass = "Yes"
     else:
         ass = "No"
@@ -48,7 +45,7 @@ async def varsFunc(client, message):
         pvt = "Yes"
     else:
         pvt = "No"
-    if config.AUTO_SUGGESTION_MODE:
+    if config.AUTO_SUGGESTION_MODE == str(True):
         a_sug = "Yes"
     else:
         a_sug = "No"
@@ -60,25 +57,20 @@ async def varsFunc(client, message):
     if not config.START_IMG_URL:
         start = "No"
     else:
-        start = "[YES]({config.START_IMG_URL})"
+        start = f"[Image]({config.START_IMG_URL})"
     if not config.SUPPORT_CHANNEL:
         s_c = "No"
     else:
-        SUPPORT_CHANNEL_NAME = config.SUPPORT_CHANNEL.split("/")[-1]
-        s_c = f"[{SUPPORT_CHANNEL_NAME}]({config.SUPPORT_CHANNEL})"
+        s_c = f"[Channel]({config.SUPPORT_CHANNEL})"
     if not config.SUPPORT_GROUP:
         s_g = "No"
-    else:  
-        SUPPORT_GROUP_NAME = config.SUPPORT_GROUP.split("/")[-1]
-        s_g = f"[{SUPPORT_GROUP_NAME}]({config.SUPPORT_GROUP})"
+    else:
+        s_g = f"[Group]({config.SUPPORT_GROUP})"
     if not config.GIT_TOKEN:
         token = "No"
     else:
         token = "Yes"
-    if (
-        not config.SPOTIFY_CLIENT_ID
-        and not config.SPOTIFY_CLIENT_SECRET
-    ):
+    if not config.SPOTIFY_CLIENT_ID and not config.SPOTIFY_CLIENT_SECRET:
         sotify = "No"
     else:
         sotify = "Yes"
@@ -86,27 +78,26 @@ async def varsFunc(client, message):
     owner_id = " ,".join(owners)
     tg_aud = convert_bytes(config.TG_AUDIO_FILESIZE_LIMIT)
     tg_vid = convert_bytes(config.TG_VIDEO_FILESIZE_LIMIT)
-    text = f"""**ᴍᴜsɪᴄ ʙᴏᴛ ᴄᴏɴғɪɢ:**
+    text = f"""**MUSIC BOT CONFIG:**
 
-**<u>ʙᴀsɪᴄ ᴠᴀʀs:</u>**
-`MUSIC_BOT_NAME` : **{app.mention}**
+**<u>Basic Vars:</u>**
+`MUSIC_BOT_NAME` : **{bot_name}**
 `DURATION_LIMIT` : **{play_duration} min**
 `SONG_DOWNLOAD_DURATION_LIMIT` :** {song} min**
 `OWNER_ID` : **{owner_id}**
     
-**<u>ᴄᴜsᴛᴏᴍ ʀᴇᴘᴏ ᴠᴀʀs:</u>**
+**<u>Custom Repo Vars:</u>**
 `UPSTREAM_REPO` : **{up_r}**
 `UPSTREAM_BRANCH` : **{up_b}**
 `GITHUB_REPO` :** {git}**
 `GIT_TOKEN `:** {token}**
 
 
-**<u>ʙᴏᴛ ᴠᴀʀs:</u>**
+**<u>Bot Vars:</u>**
 `AUTO_LEAVING_ASSISTANT` : **{ass}**
 `ASSISTANT_LEAVE_TIME` : **{auto_leave} seconds**
 `AUTO_SUGGESTION_MODE` :** {a_sug}**
 `AUTO_SUGGESTION_TIME` : **{auto_sug} seconds**
-`AUTO_DOWNLOADS_CLEAR` : **Yes**
 `PRIVATE_BOT_MODE` : **{pvt}**
 `YOUTUBE_EDIT_SLEEP` : **{yt_sleep} seconds**
 `TELEGRAM_EDIT_SLEEP` :** {tg_sleep} seconds**
@@ -115,18 +106,18 @@ async def varsFunc(client, message):
 `SERVER_PLAYLIST_LIMIT` :** {playlist_limit}**
 `PLAYLIST_FETCH_LIMIT` :** {fetch_playlist}**
 
-**<u>sᴘᴏᴛɪғʏ ᴠᴀʀs:</u>**
+**<u>Spotify Vars:</u>**
 `SPOTIFY_CLIENT_ID` :** {sotify}**
 `SPOTIFY_CLIENT_SECRET` : **{sotify}**
 
-**<u>ᴘʟᴀʏsɪᴢᴇ ᴠᴀʀs:</u>**
+**<u>Playsize Vars:</u>**
 `TG_AUDIO_FILESIZE_LIMIT` :** {tg_aud}**
 `TG_VIDEO_FILESIZE_LIMIT` :** {tg_vid}**
 
-**<u>ᴜʀʟ ᴠᴀʀs:</u>**
+**<u>URL Vars:</u>**
 `SUPPORT_CHANNEL` : **{s_c}**
 `SUPPORT_GROUP` : ** {s_g}**
 `START_IMG_URL` : ** {start}**
     """
     await asyncio.sleep(1)
-    await mystic.edit_text(f"{text}", disable_web_page_preview=True)
+    await mystic.edit_text(text)
