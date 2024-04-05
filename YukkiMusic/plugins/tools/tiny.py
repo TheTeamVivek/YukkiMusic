@@ -15,7 +15,7 @@ async def _(event):
         return
     kontol = await event.reply("`Processing tiny...`")
     ik = await tbot.download_media(reply)
-    im1 = Image.open("FallenRobot/resources/blank_background.png")
+    im1 = Image.open("assets/blank_background.png")
     if ik.endswith(".tgs"):
         await tbot.download_media(reply, "blank_background.tgs")
         os.system("lottie_convert.py blank_background.tgs json.json")
