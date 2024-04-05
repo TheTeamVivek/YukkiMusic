@@ -8,9 +8,6 @@ from telethon import events
 from YukkiMusic import telethn
 from YukkiMusic.core.mongo import mongodb
 
-gbanned = mongodb.gban
-
-
 def register(**args):
     """Registers a new message."""
     pattern = args.get("pattern", None)
