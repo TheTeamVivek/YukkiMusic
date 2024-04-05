@@ -8,10 +8,10 @@ from telegraph import Telegraph, exceptions, upload_file
 from YukkiMusic import telethn as tbot
 from YukkiMusic.utils.events import register
 
-KUMAR = "Vivek"
+Yukki = "Vivek"
 TMP_DOWNLOAD_DIRECTORY = "./"
 telegraph = Telegraph(domain="graph.org")
-r = telegraph.create_account(short_name=KUMAR)
+r = telegraph.create_account(short_name=Yukki)
 auth_url = r["auth_url"]
 
 
