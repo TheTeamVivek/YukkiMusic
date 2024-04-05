@@ -11,7 +11,7 @@ lyricsgenius
 motor
 ntgcalls==1.0.7
 pillow==9.5.0
-pytz==2021.3
+pytz
 psutil
 pytube
 pykeyboard
@@ -23,8 +23,9 @@ requests
 speedtest-cli
 spotipy
 tgcrypto
-urllib3
 unidecode
+urllib3
 yt-dlp==2023.10.13
 git+https://github.com/alexmercerind/youtube-search-python@main
 git+https://github.com/joetats/youtube_search@master
+uuid==1.30
