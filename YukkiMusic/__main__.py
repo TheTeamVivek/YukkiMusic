@@ -54,7 +54,6 @@ async def init():
     except:
         pass
     await app.start()
-    await telethn.start(bot_token=config.BOT_TOKEN)
     for all_module in ALL_MODULES:
         importlib.import_module("YukkiMusic.plugins" + all_module)
     LOGGER("Yukkimusic.plugins").info("Successfully Imported Modules ")
@@ -70,5 +69,6 @@ async def init():
 
 
 if __name__ == "__main__":
+    telethn.start(bot_token=config.BOT_TOKEN)
     loop.run_until_complete(init())
     LOGGER("YukkiMusic").info("Stopping Yukki Music Bot! GoodBye")
