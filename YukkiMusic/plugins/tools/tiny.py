@@ -4,7 +4,7 @@ import cv2
 from PIL import Image
 
 from YukkiMusic import telethn as tbot
-from YukkiMusic.events import register
+from YukkiMusic.utils.events import register
 
 
 @register(pattern="^/tiny ?(.*)")
