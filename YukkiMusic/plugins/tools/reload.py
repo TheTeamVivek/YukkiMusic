@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021-present by TeamYukki@Github, < https://github.com/TeamYukki >.
+# Copyright (C) 2024-present by TeamYukki@Github, < https://github.com/TeamYukki >.
 #
 # This file is part of < https://github.com/TeamYukki/YukkiMusicBot > project,
 # and is released under the "GNU v3.0 License Agreement".
@@ -20,8 +20,7 @@ from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import get_authuser_names, get_cmode
-from YukkiMusic.utils.decorators import (ActualAdminCB, AdminActual,
-                                         language)
+from YukkiMusic.utils.decorators import ActualAdminCB, AdminActual, language
 from YukkiMusic.utils.formatters import alpha_to_int
 
 ### Multi-Lang Commands
@@ -29,18 +28,12 @@ RELOAD_COMMAND = get_command("RELOAD_COMMAND")
 REBOOT_COMMAND = get_command("REBOOT_COMMAND")
 
 
-@app.on_message(
-    filters.command(RELOAD_COMMAND)
-    & filters.group
-    & ~BANNED_USERS
-)
+@app.on_message(filters.command(RELOAD_COMMAND) & filters.group & ~BANNED_USERS)
 @language
 async def reload_admin_cache(client, message: Message, _):
     try:
         chat_id = message.chat.id
-        admins = app.get_chat_members(
-            chat_id, filter=ChatMembersFilter.ADMINISTRATORS
-        )
+        admins = app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS)
         authusers = await get_authuser_names(chat_id)
         adminlist[chat_id] = []
         async for user in admins:
@@ -56,11 +49,7 @@ async def reload_admin_cache(client, message: Message, _):
         )
 
 
-@app.on_message(
-    filters.command(REBOOT_COMMAND)
-    & filters.group
-    & ~BANNED_USERS
-)
+@app.on_message(filters.command(REBOOT_COMMAND) & filters.group & ~BANNED_USERS)
 @AdminActual
 async def restartbot(client, message: Message, _):
     mystic = await message.reply_text(
@@ -83,9 +72,7 @@ async def restartbot(client, message: Message, _):
             await Yukki.stop_stream(chat_id)
         except:
             pass
-    return await mystic.edit_text(
-        "sᴜᴄᴇssғᴜʟʟʏ ʀᴇsᴛᴀʀᴛᴇᴅ. \nTʀʏ ᴘʟᴀʏɪɴɢ ɴᴏᴡ.."
-    )
+    return await mystic.edit_text("sᴜᴄᴇssғᴜʟʟʏ ʀᴇsᴛᴀʀᴛᴇᴅ. \nTʀʏ ᴘʟᴀʏɪɴɢ ɴᴏᴡ..")
 
 
 @app.on_callback_query(filters.regex("close") & ~BANNED_USERS)
@@ -106,9 +93,7 @@ async def close_menu(_, CallbackQuery):
         return
 
 
-@app.on_callback_query(
-    filters.regex("stop_downloading") & ~BANNED_USERS
-)
+@app.on_callback_query(filters.regex("stop_downloading") & ~BANNED_USERS)
 @ActualAdminCB
 async def stop_download(client, CallbackQuery: CallbackQuery, _):
     message_id = CallbackQuery.message.id
@@ -129,9 +114,7 @@ async def stop_download(client, CallbackQuery: CallbackQuery, _):
                 lyrical.pop(message_id)
             except:
                 pass
-            await CallbackQuery.answer(
-                "ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴄᴀɴᴄᴇʟʟᴇᴅ", show_alert=True
-            )
+            await CallbackQuery.answer("ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴄᴀɴᴄᴇʟʟᴇᴅ", show_alert=True)
             return await CallbackQuery.edit_message_text(
                 f"ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴄᴀɴᴄᴇʟʟᴇᴅ ʙʏ {CallbackQuery.from_user.mention}"
             )
@@ -139,6 +122,4 @@ async def stop_download(client, CallbackQuery: CallbackQuery, _):
             return await CallbackQuery.answer(
                 "ғᴀɪʟᴇᴅ ᴛᴏ sᴛᴏᴘ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ", show_alert=True
             )
-    await CallbackQuery.answer(
-        "ғᴀɪʟᴇᴅ ᴛᴏ ʀᴇᴄᴏɢɴɪsᴇ ᴛʜᴇ ʀᴜɴɴɪɴɢ ᴛᴀsᴋ", show_alert=True
-    )
+    await CallbackQuery.answer("ғᴀɪʟᴇᴅ ᴛᴏ ʀᴇᴄᴏɢɴɪsᴇ ᴛʜᴇ ʀᴜɴɴɪɴɢ ᴛᴀsᴋ", show_alert=True)
