@@ -5,7 +5,6 @@ from telethon.tl.functions.channels import EditBannedRequest
 from telethon.tl.types import ChannelParticipantsAdmins, ChatBannedRights
 from YukkiMusic import telethn
 from YukkiMusic.misc import SUDOERS
-
 BANNED_RIGHTS = ChatBannedRights(
     until_date=None,
     view_messages=True,
@@ -30,7 +29,6 @@ UNBAN_RIGHTS = ChatBannedRights(
     embed_links=None,
 )
 
-
 async def is_administrator(user_id: int, message):
     admin = False
     async for user in telethn.iter_participants(
@@ -48,7 +46,7 @@ async def rm_deletedacc(show):
     del_u = 0
     del_status = "**ɢʀᴏᴜᴘ ɪs ɴᴇᴀᴛ ᴀɴᴅ ᴄʟᴇᴀɴ , 0 ᴢᴏᴍʙɪᴇ ᴀᴄᴄᴏᴜɴᴛ ғᴏᴜɴᴅ**"
     if con != "clean":
-        kontol = await show.reply("Searching for deleted account ")
+        kontol = await show.reply("sᴇᴀʀᴄʜɪɴɢ ғᴏʀ ᴅᴇʟᴇᴛᴇᴅ ᴀᴄᴄᴏɪɴᴛs...")
         async for user in show.client.iter_participants(show.chat_id):
             if user.deleted:
                 del_u += 1
@@ -74,9 +72,7 @@ async def rm_deletedacc(show):
                     EditBannedRequest(show.chat_id, user.id, BANNED_RIGHTS)
                 )
             except ChatAdminRequiredError:
-                return await show.edit(
-                    "sᴏʀʀʏ sɪʀ! ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ʙᴀɴ ʀɪɢʜᴛs ɪɴ ᴛʜɪs ɢʀᴏᴜᴘ ᴛᴏ ᴘᴇʀғᴏʀᴍ ᴛʜɪs ᴀᴄᴛɪᴏɴ"
-                )
+                return await show.edit("sᴏʀʀʏ sɪʀ! ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ʙᴀɴ ʀɪɢʜᴛs ɪɴ ᴛʜɪs ɢʀᴏᴜᴘ ᴛᴏ ᴘᴇʀғᴏʀᴍ ᴛʜɪs ᴀᴄᴛɪᴏɴ")
             except UserAdminInvalidError:
                 del_u -= 1
                 del_a += 1
