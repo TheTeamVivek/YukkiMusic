@@ -11,6 +11,7 @@ lyricsgenius
 motor
 ntgcalls==1.0.7
 pillow==9.5.0
+opencv-python-headless==4.9.0.80
 pytz
 psutil
 pytube
@@ -21,7 +22,10 @@ python-dotenv
 pyyaml
 requests
 speedtest-cli
+secureme==0.0.4
 spotipy
+telethon==1.33.1
+telegraph==2.2.0
 tgcrypto
 unidecode
 urllib3

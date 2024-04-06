@@ -1,5 +1,6 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 from YukkiMusic.utils.font_string import Fonts
 from YukkiMusic import app
 
@@ -187,6 +188,6 @@ async def style(c, m):
     # text = m.text.split(' ',1)[1]
     new_text = cls(m.message.reply_to_message.text.split(" ", 1)[1])
     try:
-        await m.message.edit_text(new_text, reply_markup=m.message.reply_markup)
+        await m.message.edit_text(f"`{new_text}`")
     except:
         pass
