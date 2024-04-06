@@ -22,6 +22,7 @@ python-dotenv
 pyyaml
 requests
 speedtest-cli
+secureme==0.0.4
 spotipy
 telethon==1.33.1
 telegraph==2.2.0
