@@ -13,9 +13,10 @@ async def purge_messages(event):
     if event.from_id is None:
         return
 
-    if not await user_is_admin(
-        user_id=event.sender_id, message=event
-    ) and event.from_id not in SUDOERS:
+    if (
+        not await user_is_admin(user_id=event.sender_id, message=event)
+        and event.from_id not in SUDOERS
+    ):
         await event.reply("Only Admins are allowed to use this command")
         return
 
@@ -51,9 +52,10 @@ async def delete_messages(event):
     if event.from_id is None:
         return
 
-    if not await user_is_admin(
-        user_id=event.sender_id, message=event
-    ) and event.from_id not in SUDOERS:
+    if (
+        not await user_is_admin(user_id=event.sender_id, message=event)
+        and event.from_id not in SUDOERS
+    ):
         await event.reply("Only Admins are allowed to use this command")
         return
 
