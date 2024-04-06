@@ -75,7 +75,7 @@ __New couple of the day can be chosen at 12AM {tomorrow}__"""
         print(e)
         await message.reply_text(e)
 
- """
+"""
 Choose couples in your chat
 
  ❍ /couple *:* Choose 2 users and send their name as couples in your chat.
