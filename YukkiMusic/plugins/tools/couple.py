@@ -8,7 +8,6 @@ from YukkiMusic import app
 from YukkiMusic.utils.database import get_couple, save_couple
 
 
-
 # Date and time
 def dt():
     now = datetime.now()
@@ -75,8 +74,9 @@ __New couple of the day can be chosen at 12AM {tomorrow}__"""
         print(e)
         await message.reply_text(e)
 
+
 """
 Choose couples in your chat
 
  ❍ /couple *:* Choose 2 users and send their name as couples in your chat.
-"""
+"""
