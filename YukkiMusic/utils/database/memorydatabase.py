@@ -46,7 +46,8 @@ maintenance = []
 suggestion = {}
 autoend = {}
 
-#couple
+
+# couple
 async def _get_lovers(chat_id: int):
     lovers = await coupledb.find_one({"chat_id": chat_id})
     if lovers:
@@ -72,6 +73,7 @@ async def save_couple(chat_id: int, date: str, couple: dict):
         {"$set": {"couple": lovers}},
         upsert=True,
     )
+
 
 # Auto End Stream
 
