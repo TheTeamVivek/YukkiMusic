@@ -2,6 +2,7 @@ from telethon.tl.types import ChannelParticipantsAdmins
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic import telethn
 
+
 async def user_is_ban_protected(user_id: int, message):
     status = False
     if message.is_private or user_id in SUDOERS:
