@@ -17,6 +17,7 @@ psutil
 pytube
 pykeyboard
 py-tgcalls
+pydictionary==2.0.1
 git+https://github.com/KurimuzonAkuma/pyrogram@dev
 python-dotenv
 pyyaml
