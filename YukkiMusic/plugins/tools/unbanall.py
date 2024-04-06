@@ -17,8 +17,8 @@ from telethon.tl.types import (
 from YukkiMusic.logging import LOGGER
 from YukkiMusic.utils.events import register
 
-#BOT_ID = 5285688815
-#CMD_HELP = "/ !"
+# BOT_ID = 5285688815
+# CMD_HELP = "/ !"
 
 
 # ================================================
