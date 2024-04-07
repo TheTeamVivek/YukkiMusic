@@ -17,7 +17,7 @@ from YukkiMusic.utils.database import get_assistant, delete_served_chat
 
 @app.on_message(filters.command("leave") & SUDOERS)
 async def bot_assistant_leave(_, message):
-	if len(message.command) != 2:
+    if len(message.command) != 2:
         await message.reply_text("ɢɪᴠᴇ ᴍᴇ ᴀ ᴄʜᴀᴛɪᴅ ᴀғᴛᴇʀ /leave ᴛᴏ ʟᴇᴀᴠᴇ")
         return
 
@@ -32,8 +32,15 @@ async def bot_assistant_leave(_, message):
             return
 
         try:
-        	ass = await get_assistant(int(group_id))
+            ass = await get_assistant(int(group_id))
             lol = await message.reply(f"ʟᴇᴀᴠɪɴɢ ғʀᴏᴍ {chat.title}")
             await app.leave_chat(int(group_id))
             await delete_served_chat(int(group_id))
             await lol.edit(f"ʙᴏᴛ ʟᴇᴀᴠᴇᴅ ғʀᴏᴍ {chat.title}")
+            await ass.leave_chat(int(group_id))
+          
+        except Exception as e:
+            print(e)  # Handle or log the exception as per your requirement
+
+    except Exception as e:
+        print(e)  # Handle or log the exception as per your requirement
