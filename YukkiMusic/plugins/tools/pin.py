@@ -5,6 +5,7 @@ from pyrogram.types import Message
 from YukkiMusic import app
 from YukkiMusic.utils.filter import admin_filter
 
+
 @app.on_message(filters.command("pin") & admin_filter)
 async def pin(_, message):
     replied = message.reply_to_message
@@ -12,7 +13,7 @@ async def pin(_, message):
     chat_id = message.chat.id
     user_id = message.from_user.id
     name = message.from_user.mention
-    
+
     if message.chat.type == enums.ChatType.PRIVATE:
         await message.reply_text("**ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴡᴏʀᴋs ᴏɴʟʏ ᴏɴ ɢʀᴏᴜᴘs !**")
     elif not replied:
@@ -25,8 +26,9 @@ async def pin(_, message):
                 await message.reply_text(f"**ᴍᴇssᴀɢᴇ ᴘɪɴɴᴇᴅ!**")
             except Exception as e:
                 await message.reply_text(str(e))
-# ------------------------------------------------------------------------------- #
 
+
+# ------------------------------------------------------------------------------- #
 
 
 @app.on_message(filters.command("unpin") & admin_filter)
@@ -36,7 +38,7 @@ async def unpin(_, message):
     chat_id = message.chat.id
     user_id = message.from_user.id
     name = message.from_user.mention
-    
+
     if message.chat.type == enums.ChatType.PRIVATE:
         await message.reply_text("**ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴡᴏʀᴋs ᴏɴʟʏ ᴏɴ ɢʀᴏᴜᴘs !**")
     elif not replied:
@@ -56,7 +58,7 @@ async def unpin(_, message):
 async def unpin(_, message):
     chat_id = message.chat.id
     user_id = message.from_user.id
-    
+
     if message.chat.type == enums.ChatType.PRIVATE:
         await message.reply_text("**ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴡᴏʀᴋs ᴏɴʟʏ ᴏɴ ɢʀᴏᴜᴘs !**")
     else:
@@ -67,5 +69,3 @@ async def unpin(_, message):
                 await message.reply_text(f"**ᴀʟʟ ᴍᴇssᴀɢᴇ ᴜɴᴘɪɴɴᴇᴅ !**")
             except Exception as e:
                 await message.reply_text(str(e))
-                
-                
