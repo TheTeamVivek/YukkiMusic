@@ -65,7 +65,7 @@
       },
       "UPSTREAM_REPO": {
         "description": "If you dont know this, Leave as it is",
-        "value": "https://github.com/Pranav-Saraswat/Testing-Alpha",
+        "value": "https://github.com/Vivekkumar0708/YukkiMusicFork/tree/master",
         "required": true
       },
       "UPSTREAM_BRANCH": {
