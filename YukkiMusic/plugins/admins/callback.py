@@ -38,7 +38,7 @@ from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline.play import (
     panel_markup_1,
     panel_markup_2,
-    controler_markup
+    controler_markup,
     stream_markup,
     telegram_markup,
 )
