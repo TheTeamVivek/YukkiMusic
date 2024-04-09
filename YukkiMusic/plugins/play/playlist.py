@@ -35,9 +35,12 @@ from YukkiMusic.utils.inline.playlist import (
     get_playlist_markup,
     warning_markup,
 )
-from YukkiMusic.utils.database import (delete_playlist, get_playlist,
-                                       get_playlist_names,
-                                       save_playlist)
+from YukkiMusic.utils.database import (
+    delete_playlist,
+    get_playlist,
+    get_playlist_names,
+    save_playlist,
+)
 from YukkiMusic.utils.pastebin import Yukkibin
 import time
 import yt_dlp
@@ -45,6 +48,7 @@ from youtube_search import YoutubeSearch
 from youtubesearchpython import VideosSearch
 from youtubesearchpython import SearchVideos
 from YukkiMusic.utils.stream.stream import stream
+
 
 @app.on_message(filters.command(["playlist"]) & ~BANNED_USERS)
 @language
@@ -99,7 +103,9 @@ async def get_keyboard(_, user_id):
     return keyboard, count
 
 
-@app.on_message(filters.command(["deleteplaylist","delplaylist"]) & filters.group & ~BANNED_USERS)
+@app.on_message(
+    filters.command(["deleteplaylist", "delplaylist"]) & filters.group & ~BANNED_USERS
+)
 @language
 async def del_group_message(client, message: Message, _):
     upl = InlineKeyboardMarkup(
@@ -140,7 +146,7 @@ async def get_keyboard(_, user_id):
 
 
 @app.on_message(
-    filters.command(["deleteplaylist","delplaylist"]) & filters.private & ~BANNED_USERS
+    filters.command(["deleteplaylist", "delplaylist"]) & filters.private & ~BANNED_USERS
 )
 @language
 async def del_plist_msg(client, message: Message, _):
@@ -305,6 +311,7 @@ async def play_playlist_command(client, message, _):
 
 import json
 
+
 @app.on_message(filters.command(["addplaylist"]) & ~BANNED_USERS)
 @language
 async def add_playlist(client, message: Message, _):
@@ -351,7 +358,7 @@ async def add_playlist(client, message: Message, _):
             }
 
             await save_playlist(user_id, video_id, plist)
-        
+
         keyboardes = InlineKeyboardMarkup(
             [
                 [
@@ -364,7 +371,8 @@ async def add_playlist(client, message: Message, _):
         )
         await adding.delete()
         return await message.reply_text(
-            text="**ᴀʟʟ sᴏɴɢs ʜᴀs ʙᴇᴇɴ ᴀᴅᴅᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ғʀᴏᴍ ʏᴏᴜʀ ʏᴏᴜᴛᴜʙᴇ ᴘʟᴀʏʟɪsᴛ ʟɪɴᴋ**\n\n**➥ ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ʀᴇᴍᴏᴠᴇ ᴀɴʏ sᴏɴɢ ᴛʜᴇɴ ᴄʟɪᴄᴋ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ.**", reply_markup=keyboardes
+            text="**ᴀʟʟ sᴏɴɢs ʜᴀs ʙᴇᴇɴ ᴀᴅᴅᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ғʀᴏᴍ ʏᴏᴜʀ ʏᴏᴜᴛᴜʙᴇ ᴘʟᴀʏʟɪsᴛ ʟɪɴᴋ**\n\n**➥ ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ʀᴇᴍᴏᴠᴇ ᴀɴʏ sᴏɴɢ ᴛʜᴇɴ ᴄʟɪᴄᴋ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ.**",
+            reply_markup=keyboardes,
         )
         pass
     if "youtube.com/@" in query:
@@ -414,7 +422,8 @@ async def add_playlist(client, message: Message, _):
         )
         await addin.delete()
         return await message.reply_text(
-            text="**ᴀʟʟ sᴏɴɢs ʜᴀs ʙᴇᴇɴ ᴀᴅᴅᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ғʀᴏᴍ ʏᴏᴜʀ ʏᴏᴜᴛᴜʙᴇ ᴘʟᴀʏʟɪsᴛ ʟɪɴᴋ**\n\n**➥ ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ʀᴇᴍᴏᴠᴇ ᴀɴʏ sᴏɴɢ ᴛʜᴇɴ ᴄʟɪᴄᴋ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ.**", reply_markup=keyboardes
+            text="**ᴀʟʟ sᴏɴɢs ʜᴀs ʙᴇᴇɴ ᴀᴅᴅᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ғʀᴏᴍ ʏᴏᴜʀ ʏᴏᴜᴛᴜʙᴇ ᴘʟᴀʏʟɪsᴛ ʟɪɴᴋ**\n\n**➥ ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ʀᴇᴍᴏᴠᴇ ᴀɴʏ sᴏɴɢ ᴛʜᴇɴ ᴄʟɪᴄᴋ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ.**",
+            reply_markup=keyboardes,
         )
         pass
     # Check if the provided input is a YouTube video link
@@ -518,16 +527,21 @@ async def add_playlist(client, message: Message, _):
 
             await save_playlist(user_id, videoid, plist)
             keyboard = InlineKeyboardMarkup(
+                [
                     [
-                        [
-                            InlineKeyboardButton("๏ ʀᴇᴍᴏᴠᴇ ғʀᴏᴍ ᴘʟᴀʏʟɪsᴛ ๏", callback_data=f"remove_playlist {videoid}")
-                        ]
+                        InlineKeyboardButton(
+                            "๏ ʀᴇᴍᴏᴠᴇ ғʀᴏᴍ ᴘʟᴀʏʟɪsᴛ ๏",
+                            callback_data=f"remove_playlist {videoid}",
+                        )
                     ]
-                )
-                                
+                ]
+            )
+
             await m.delete()
             await message.reply_photo(
-                thumbnail, caption="**ᴀᴅᴅᴇᴅ sᴏɴɢ ɪɴ ʏᴏᴜʀ ʙᴏᴛ ᴘʟᴀʏʟɪsᴛ**", reply_markup=keyboard
+                thumbnail,
+                caption="**ᴀᴅᴅᴇᴅ sᴏɴɢ ɪɴ ʏᴏᴜʀ ʙᴏᴛ ᴘʟᴀʏʟɪsᴛ**",
+                reply_markup=keyboard,
             )
 
         except KeyError:
@@ -535,55 +549,51 @@ async def add_playlist(client, message: Message, _):
         except Exception as e:
             pass
 
+
 @app.on_callback_query(filters.regex("remove_playlist") & ~BANNED_USERS)
 @languageCB
 async def del_plist(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     videoid = callback_data.split(None, 1)[1]
     user_id = CallbackQuery.from_user.id
-    deleted = await delete_playlist(
-        CallbackQuery.from_user.id, videoid
-    )
+    deleted = await delete_playlist(CallbackQuery.from_user.id, videoid)
     if deleted:
         try:
-            await CallbackQuery.answer(
-                _["playlist_11"], show_alert=True
-            )
+            await CallbackQuery.answer(_["playlist_11"], show_alert=True)
         except:
             pass
     else:
         try:
-            return await CallbackQuery.answer(
-                _["playlist_12"], show_alert=True
-            )
+            return await CallbackQuery.answer(_["playlist_12"], show_alert=True)
         except:
             return
     keyboards = InlineKeyboardMarkup(
+        [
             [
-                [
-                    InlineKeyboardButton("๏ ʀᴇᴄᴏᴠᴇʀ ʏᴏᴜʀ sᴏɴɢ ๏", callback_data=f"recover_playlist {videoid}")
-                ]
+                InlineKeyboardButton(
+                    "๏ ʀᴇᴄᴏᴠᴇʀ ʏᴏᴜʀ sᴏɴɢ ๏", callback_data=f"recover_playlist {videoid}"
+                )
             ]
-        )
+        ]
+    )
     return await CallbackQuery.edit_message_text(
-    text="**➻ ʏᴏᴜʀ sᴏɴɢ ʜᴀs ʙᴇᴇɴ ᴅᴇʟᴇᴛᴇᴅ ғʀᴏᴍ ʏᴏᴜʀ ʙᴏᴛ ᴘʟᴀʏʟɪsᴛ**\n\n**➥ ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ʀᴇᴄᴏᴠᴇʀ ʏᴏᴜʀ sᴏɴɢ ɪɴ ʏᴏᴜʀ ᴘʟᴀʏʟɪsᴛ ᴛʜᴇɴ ᴄʟɪᴄᴋ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ**",
-    reply_markup=keyboards
-)
+        text="**➻ ʏᴏᴜʀ sᴏɴɢ ʜᴀs ʙᴇᴇɴ ᴅᴇʟᴇᴛᴇᴅ ғʀᴏᴍ ʏᴏᴜʀ ʙᴏᴛ ᴘʟᴀʏʟɪsᴛ**\n\n**➥ ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ʀᴇᴄᴏᴠᴇʀ ʏᴏᴜʀ sᴏɴɢ ɪɴ ʏᴏᴜʀ ᴘʟᴀʏʟɪsᴛ ᴛʜᴇɴ ᴄʟɪᴄᴋ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ**",
+        reply_markup=keyboards,
+    )
 
 
 @app.on_callback_query(filters.regex("recover_playlist") & ~BANNED_USERS)
 @languageCB
 async def add_playlist(client, CallbackQuery, _):
     from VIPMUSIC import YouTube
+
     callback_data = CallbackQuery.data.strip()
     videoid = callback_data.split(None, 1)[1]
     user_id = CallbackQuery.from_user.id
     _check = await get_playlist(user_id, videoid)
     if _check:
         try:
-            return await CallbackQuery.answer(
-                _["playlist_8"], show_alert=True
-            )
+            return await CallbackQuery.answer(_["playlist_8"], show_alert=True)
         except:
             return
     _count = await get_playlist_names(user_id)
@@ -612,10 +622,12 @@ async def add_playlist(client, CallbackQuery, _):
     await save_playlist(user_id, videoid, plist)
     try:
         title = (title[:30]).title()
-        return await CallbackQuery.edit_message_text(text="**➻ ʀᴇᴄᴏᴠᴇʀᴇᴅ sᴏɴɢ ɪɴ ʏᴏᴜʀ ᴘʟᴀʏʟɪsᴛ**"
+        return await CallbackQuery.edit_message_text(
+            text="**➻ ʀᴇᴄᴏᴠᴇʀᴇᴅ sᴏɴɢ ɪɴ ʏᴏᴜʀ ᴘʟᴀʏʟɪsᴛ**"
         )
     except:
         return
+
 
 @app.on_callback_query(filters.regex("remove_playlist") & ~BANNED_USERS)
 @languageCB
