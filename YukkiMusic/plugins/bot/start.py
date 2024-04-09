@@ -59,7 +59,7 @@ loop = asyncio.get_running_loop()
 @LanguageStart
 async def start_comm(client, message: Message, _):
     chat_id = message.chat.id
-    message_id = message.message.id
+    message_id = message.id
     await app.send_reaction(chat_id, message_id, emoji)
     await add_served_user(message.from_user.id)
     if len(message.text.split()) > 1:
