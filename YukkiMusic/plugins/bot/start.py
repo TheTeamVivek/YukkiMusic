@@ -137,12 +137,16 @@ async def start_comm(client, message: Message, _):
             keyboard = help_pannel(_)
             if config.START_IMG_URL:
                 await message.reply_photo(
-                    photo=config.START_IMG_URL, caption=_["help_1"], reply_markup=keyboard
+                    photo=config.START_IMG_URL,
+                    caption=_["help_1"],
+                    reply_markup=keyboard,
                 )
                 return await app.send_reaction(chat_id, message_id)
             else:
                 await message.reply_photo(
-                    photo=random.choice(PHOTO), caption=_["help_1"], reply_markup=keyboard
+                    photo=random.choice(PHOTO),
+                    caption=_["help_1"],
+                    reply_markup=keyboard,
                 )
                 return await app.send_reaction(chat_id, message_id)
         if name[0:4] == "song":
@@ -311,10 +315,10 @@ async def start_comm(client, message: Message, _):
                 )
         else:
             await message.reply_photo(
-                    photo=random.choice(PHOTO),
-                    caption=_["start_2"].format(app.mention),
-                    reply_markup=InlineKeyboardMarkup(out),
-                )
+                photo=random.choice(PHOTO),
+                caption=_["start_2"].format(app.mention),
+                reply_markup=InlineKeyboardMarkup(out),
+            )
         if await is_on_off(config.LOG):
             sender_id = message.from_user.id
             sender_name = message.from_user.first_name

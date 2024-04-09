@@ -220,10 +220,7 @@ autoclean = []
 # Images
 
 # multi photo for /start
-PHOTO = [
-    "https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg"
-
-]
+PHOTO = ["https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg"]
 
 
 START_IMG_URL = getenv(
