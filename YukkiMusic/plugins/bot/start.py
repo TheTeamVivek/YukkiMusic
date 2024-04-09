@@ -15,7 +15,7 @@ from pyrogram import filters
 from pyrogram.enums import ChatType, ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
-from config import BANNED_USERS
+from config import BANNED_USERS, PHOTO
 from config.config import OWNER_ID, MUSIC_BOT_NAME
 from strings import get_command, get_string
 from YukkiMusic import Telegram, YouTube, app
@@ -42,14 +42,6 @@ from YukkiMusic.utils.inline import (
     start_pannel,
 )
 
-PHOTO = [
-    "https://te.legra.ph/file/b8a0c1a00db3e57522b53.jpg",
-    "https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg",
-    "https://te.legra.ph/file/bb0ff85f2dd44070ea519.jpg",
-    "https://te.legra.ph/file/bd995b032b6bd263e2cc9.jpg",
-    "https://te.legra.ph/file/6298d377ad3eb46711644.jpg",
-    "https://te.legra.ph/file/e906c2def5afe8a9b9120.jpg",
-]
 
 emoji = [
     "👍",
