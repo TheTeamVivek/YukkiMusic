@@ -41,9 +41,6 @@ from youtubesearchpython import VideosSearch
 from youtubesearchpython import SearchVideos
 from YukkiMusic.utils.stream.stream import stream
 
-
-playlist = []
-
 @app.on_message(filters.command(["playlist"]) & ~BANNED_USERS)
 @language
 async def check_playlist(client, message: Message, _):
