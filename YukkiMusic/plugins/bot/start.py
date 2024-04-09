@@ -10,6 +10,7 @@
 import time
 import config
 import asyncio
+import random
 from pyrogram import filters
 from pyrogram.enums import ChatType, ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
@@ -41,11 +42,19 @@ from YukkiMusic.utils.inline import (
     start_pannel,
 )
 
+PHOTO = random.choice([
+"https://te.legra.ph/file/b8a0c1a00db3e57522b53.jpg",
+"https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg",
+"https://te.legra.ph/file/bb0ff85f2dd44070ea519.jpg",
+"https://te.legra.ph/file/bd995b032b6bd263e2cc9.jpg",
+"https://te.legra.ph/file/6298d377ad3eb46711644.jpg",
+"https://te.legra.ph/file/e906c2def5afe8a9b9120.jpg"
+])
+
+emoji =random.choice(["👍", "❤", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤", "‍🔥", "🌚", "🌭", "💯", "🤣", "⚡",  "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"])
 loop = asyncio.get_running_loop()
-
-
 @app.on_message(
-    filters.command(get_command("START_COMMAND")) & filters.private & ~BANNED_USERS
+    filters.command(["start"]) & filters.private & ~BANNED_USERS
 )
 @LanguageStart
 async def start_comm(client, message: Message, _):
@@ -119,6 +128,7 @@ async def start_comm(client, message: Message, _):
             await sudoers_list(client=client, message=message, _=_)
             if await is_on_off(config.LOG):
                 sender_id = message.from_user.id
+                sender_mention = message.from_user.mention
                 sender_name = message.from_user.first_name
                 return await app.send_message(
                     config.LOG_GROUP_ID,
@@ -192,6 +202,13 @@ async def start_comm(client, message: Message, _):
         except:
             OWNER = None
         out = private_panel(_, app.username, OWNER)
+        era = await message.reply_text(text=f"{message.from_user.first_name} जय श्री राधे कृष्णा जी, आपका {app.mention} में हार्दिक स्वागत है।")
+        await asyncio.sleep(0.1)
+        await era.edit(text="🇮🇳")
+        await asyncio.sleep(0.1)
+        await era.edit("__ᴍᴀᴅᴇ ɪɴ ɪɴᴅɪᴀ ᴀɴᴅ ᴛʜᴀɴᴋ's ᴛᴏ ʏᴜᴋᴋɪ ᴛᴇᴀᴍ__")
+        await asyncio.sleep(0.3)
+        await era.delete()
         if config.START_IMG_URL:
             try:
                 await message.reply_photo(
@@ -200,8 +217,9 @@ async def start_comm(client, message: Message, _):
                     reply_markup=InlineKeyboardMarkup(out),
                 )
             except:
-                await message.reply_text(
-                    _["start_2"].format(app.mention),
+                await message.reply_photo(
+                    photo=PHOTO,
+                    caption=_["start_2"].format(app.mention),
                     reply_markup=InlineKeyboardMarkup(out),
                 )
         else:
@@ -214,7 +232,7 @@ async def start_comm(client, message: Message, _):
             sender_name = message.from_user.first_name
             return await app.send_message(
                 config.LOG_GROUP_ID,
-                f"{message.from_user.mention} has just started Bot.\n\n**USER ID:** {sender_id}\n**USER NAME:** {sender_name}",
+                f"{sender_mention} ʜᴀs sᴛᴀʀᴛᴇᴅ ʙᴏᴛ. \n\n**ᴜsᴇʀ ɪᴅ :** {sender_id}\n**ᴜsᴇʀ ɴᴀᴍᴇ:** {sender_name}",
             )
 
 
@@ -237,7 +255,7 @@ async def welcome(client, message: Message):
     if config.PRIVATE_BOT_MODE == str(True):
         if not await is_served_private_chat(message.chat.id):
             await message.reply_text(
-                "**Private Music Bot**\n\nOnly for authorized chats from the owner. Ask my owner to allow your chat first."
+                "**ᴛʜɪs ʙᴏᴛ's ᴘʀɪᴠᴀᴛᴇ ᴍᴏᴅᴇ ʜᴀs ʙᴇᴇɴ ᴇɴᴀʙʟᴇᴅ ᴏɴʟʏ ᴍʏ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ɪғ ᴡᴀɴᴛ ᴛᴏ ᴜsᴇ ᴛʜɪs ɪɴ ʏᴏᴜʀ ᴄʜᴀᴛ sᴏ sᴀʏ ᴛᴏ ᴍʏ ᴏᴡɴᴇʀ ᴛᴏ ᴀᴜᴛʜᴏʀɪᴢᴇ ʏᴏᴜʀ ᴄʜᴀᴛ."
             )
             return await app.leave_chat(message.chat.id)
     else:
