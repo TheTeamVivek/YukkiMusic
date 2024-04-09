@@ -43,19 +43,90 @@ from YukkiMusic.utils.inline import (
 )
 
 PHOTO = [
-"https://te.legra.ph/file/b8a0c1a00db3e57522b53.jpg",
-"https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg",
-"https://te.legra.ph/file/bb0ff85f2dd44070ea519.jpg",
-"https://te.legra.ph/file/bd995b032b6bd263e2cc9.jpg",
-"https://te.legra.ph/file/6298d377ad3eb46711644.jpg",
-"https://te.legra.ph/file/e906c2def5afe8a9b9120.jpg"
+    "https://te.legra.ph/file/b8a0c1a00db3e57522b53.jpg",
+    "https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg",
+    "https://te.legra.ph/file/bb0ff85f2dd44070ea519.jpg",
+    "https://te.legra.ph/file/bd995b032b6bd263e2cc9.jpg",
+    "https://te.legra.ph/file/6298d377ad3eb46711644.jpg",
+    "https://te.legra.ph/file/e906c2def5afe8a9b9120.jpg",
 ]
 
-emoji =["👍", "❤", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤", "‍🔥", "🌚", "🌭", "💯", "🤣", "⚡",  "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"]
+emoji = [
+    "👍",
+    "❤",
+    "🔥",
+    "🥰",
+    "👏",
+    "😁",
+    "🤔",
+    "🤯",
+    "😱",
+    "😢",
+    "🎉",
+    "🤩",
+    "🤮",
+    "💩",
+    "🙏",
+    "👌",
+    "🕊",
+    "🤡",
+    "🥱",
+    "🥴",
+    "😍",
+    "🐳",
+    "❤",
+    "‍🔥",
+    "🌚",
+    "🌭",
+    "💯",
+    "🤣",
+    "⚡",
+    "🏆",
+    "💔",
+    "🤨",
+    "😐",
+    "🍓",
+    "🍾",
+    "💋",
+    "😈",
+    "😴",
+    "😭",
+    "🤓",
+    "👻",
+    "👨‍💻",
+    "👀",
+    "🎃",
+    "🙈",
+    "😇",
+    "😨",
+    "🤝",
+    "✍",
+    "🤗",
+    "🫡",
+    "🎅",
+    "🎄",
+    "☃",
+    "💅",
+    "🤪",
+    "🗿",
+    "🆒",
+    "💘",
+    "🙉",
+    "🦄",
+    "😘",
+    "💊",
+    "🙊",
+    "😎",
+    "👾",
+    "🤷‍♂",
+    "🤷",
+    "🤷‍♀",
+    "😡",
+]
 loop = asyncio.get_running_loop()
-@app.on_message(
-    filters.command(["start"]) & filters.private & ~BANNED_USERS
-)
+
+
+@app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
 async def start_comm(client, message: Message, _):
     chat_id = message.chat.id
@@ -205,7 +276,9 @@ async def start_comm(client, message: Message, _):
         except:
             OWNER = None
         out = private_panel(_, app.username, OWNER)
-        era = await message.reply_text(text=f"{message.from_user.first_name} जय श्री राधे कृष्णा जी, आपका {app.mention} में हार्दिक स्वागत है।")
+        era = await message.reply_text(
+            text=f"{message.from_user.first_name} जय श्री राधे कृष्णा जी, आपका {app.mention} में हार्दिक स्वागत है।"
+        )
         await asyncio.sleep(0.5)
         await era.edit(text="🇮🇳")
         await asyncio.sleep(0.5)
