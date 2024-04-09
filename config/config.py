@@ -58,9 +58,12 @@ LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", ""))
 # ________________________________________________________________________________#
 # A name for your Music bot.
 MUSIC_BOT_NAME = getenv("MUSIC_BOT_NAME", "Mrr...prince")
+________________________________________________________________________________#
 
+PROTECT_CONTENT = getenv("PROTECT_CONTENT", "True")
 
-# ________________________________________________________________________________#
+# Set it true for abody can't copy and forward bot messages
+________________________________________________________________________________#
 # Your User ID.
 OWNER_ID = list(
     map(int, getenv("OWNER_ID", "6815918609").split())
@@ -404,3 +407,8 @@ if TELEGRAM_VIDEO_URL:
                 "[ERROR] - Your TELEGRAM_VIDEO_URL url is wrong. Please ensure that it starts with https://"
             )
             sys.exit()
+
+if PROTECT_CONTENT:
+    PK = "True"
+else:
+    PK = "False"
