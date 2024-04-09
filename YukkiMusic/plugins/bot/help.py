@@ -49,7 +49,6 @@ async def helper_private(
         _ = get_string(language)
         keyboard = first_page(_)
         if update.message.photo:
-
             await update.edit_message_text(_["help_1"], reply_markup=keyboard)
         else:
             await update.edit_message_text(_["help_1"], reply_markup=keyboard)
@@ -67,17 +66,18 @@ async def helper_private(
             await update.reply_photo(
                 photo=START_IMG_URL, 
                 caption=_["help_1"],
-                PK, 
-                reply_markup=keyboard
+                reply_markup=keyboard,  # I don't know what I'm doing 
+                PK  # hehehehehehehhehe
             )
-                
+
         else:
             await update.reply_photo(
                 photo=random.choice(PHOTO), 
                 caption=_["help_1"],
-                PK,
-                reply_markup=keyboard
+                reply_markup=keyboard,  
+                PK  # after inline
             )
+
                 
 
 
