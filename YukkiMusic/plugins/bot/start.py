@@ -200,6 +200,7 @@ async def start_comm(client, message: Message, _):
             return
         if name[0:3] == "sud":
             await sudoers_list(client=client, message=message, _=_)
+            
             if await is_on_off(config.LOG):
                 sender_id = message.from_user.id
                 sender_mention = message.from_user.mention
@@ -281,9 +282,9 @@ async def start_comm(client, message: Message, _):
         )
         await asyncio.sleep(0.5)
         await era.edit(text="🇮🇳")
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.4)
         await era.edit("__ᴍᴀᴅᴇ ɪɴ ɪɴᴅɪᴀ ᴀɴᴅ ᴛʜᴀɴᴋ's ᴛᴏ ʏᴜᴋᴋɪ ᴛᴇᴀᴍ__")
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.4)
         await era.delete()
         await app.send_reaction(chat_id, message_id)
         if config.START_IMG_URL:
