@@ -131,6 +131,7 @@ async def start_comm(client, message: Message, _):
             await message.reply_text(
                 f"ʜᴇʏ {message.from_user.first_name},\nᴛʜᴀɴᴋs ғᴏʀ ᴠᴇʀɪғʏɪɴɢ ʏᴏᴜʀsᴇʟғ ɪɴ {app.mention}, ɴᴏᴡ ʏᴏᴜ ᴄᴀɴ ɢᴏ ʙᴀᴄᴋ ᴀɴᴅ sᴛᴀʀᴛ ᴜsɪɴɢ ᴍᴇ."
             )
+           return await app.send_reaction(chat_id, message_id)
 
         if name[0:4] == "help":
             keyboard = help_pannel(_)
@@ -138,7 +139,8 @@ async def start_comm(client, message: Message, _):
                 photo=config.START_IMG_URL, caption=_["help_1"], reply_markup=keyboard
             )
         if name[0:4] == "song":
-            return await message.reply_text(_["song_2"])
+            await message.reply_text(_["song_2"])
+            return await app.send_reaction(chat_id, message_id)
         if name[0:3] == "sta":
             m = await message.reply_text("🔎 ғᴇᴛᴄʜɪɴɢ ʏᴏᴜʀ ᴘᴇʀsᴏɴᴀʟ sᴛᴀᴛs.!")
             stats = await get_userss(message.from_user.id)
@@ -189,6 +191,7 @@ async def start_comm(client, message: Message, _):
             thumbnail = await YouTube.thumbnail(videoid, True)
             await m.delete()
             await message.reply_photo(photo=thumbnail, caption=msg)
+            await app.send_reaction(chat_id, message_id)
             return
         if name[0:3] == "sud":
             await sudoers_list(client=client, message=message, _=_)
