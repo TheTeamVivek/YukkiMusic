@@ -136,13 +136,15 @@ async def start_comm(client, message: Message, _):
         if name[0:4] == "help":
             keyboard = help_pannel(_)
             if config.START_IMG_URL:
-                return await message.reply_photo(
+                await message.reply_photo(
                     photo=config.START_IMG_URL, caption=_["help_1"], reply_markup=keyboard
                 )
+                return await app.send_reaction(chat_id, message_id)
             else:
-                return await message.reply_photo(
+                await message.reply_photo(
                     photo=random.choice(PHOTO), caption=_["help_1"], reply_markup=keyboard
                 )
+                return await app.send_reaction(chat_id, message_id)
         if name[0:4] == "song":
             await message.reply_text(_["song_2"])
             return await app.send_reaction(chat_id, message_id)
@@ -200,7 +202,8 @@ async def start_comm(client, message: Message, _):
             return
         if name[0:3] == "sud":
             await sudoers_list(client=client, message=message, _=_)
-            
+            await asyncio.sleep(1)
+            await app.send_reaction(chat_id, message_id)
             if await is_on_off(config.LOG):
                 sender_id = message.from_user.id
                 sender_mention = message.from_user.mention
@@ -215,11 +218,15 @@ async def start_comm(client, message: Message, _):
             lyrical = config.lyrical
             lyrics = lyrical.get(query)
             if lyrics:
-                return await Telegram.send_split_text(message, lyrics)
+                await Telegram.send_split_text(message, lyrics)
+                return await app.send_reaction(chat_id, message_id)
             else:
-                return await message.reply_text("ғᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ʟʏʀɪᴄs.")
+                await message.reply_text("ғᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ʟʏʀɪᴄs.")
+                return await app.send_reaction(chat_id, message_id)
         if name[0:3] == "del":
             await del_plist_msg(client=client, message=message, _=_)
+            await asyncio.sleep(1)
+            await app.send_reaction(chat_id, message_id)
         if name[0:3] == "inf":
             m = await message.reply_text("🔎 ғᴇᴛᴄʜɪɴɢ ɪɴғᴏ!")
             query = (str(name)).replace("info_", "", 1)
@@ -263,6 +270,8 @@ async def start_comm(client, message: Message, _):
                 parse_mode=ParseMode.MARKDOWN,
                 reply_markup=key,
             )
+            await asyncio.sleep(1)
+            await app.send_reaction(chat_id, message_id)
             if await is_on_off(config.LOG):
                 sender_id = message.from_user.id
                 sender_name = message.from_user.first_name
@@ -320,6 +329,9 @@ async def start_comm(client, message: Message, _):
 async def testbot(client, message: Message, _):
     out = alive_panel(_)
     uptime = int(time.time() - _boot_)
+    chat_id = message.chat.id
+    message_id = message.id
+    await app.send_reaction(chat_id, message_id, random.choice(emoji))
     await message.reply_photo(
         photo=config.START_IMG_URL,
         caption=_["start_8"].format(app.mention, get_readable_time(uptime)),
