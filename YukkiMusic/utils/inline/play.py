@@ -245,7 +245,7 @@ def slider_markup(_, videoid, user_id, query, query_type, channel, fplay):
 ## Cpanel Markup
 
 
-def controler_markup(_, vidid, chat_id, played, dur):
+def controler_markup(_, videoid, chat_id, played, dur):
     played_sec = time_to_seconds(played)
     duration_sec = time_to_seconds(dur)
     percentage = (played_sec / duration_sec) * 100
@@ -285,7 +285,7 @@ def controler_markup(_, vidid, chat_id, played, dur):
         [
             InlineKeyboardButton(
                 text="๏ ʜᴏᴍᴇ ๏",
-                callback_data=f"MainMarkup {vidid}|{chat_id}",
+                callback_data=f"MainMarkup {videoid}|{chat_id}",
             ),
         ],
     ]
