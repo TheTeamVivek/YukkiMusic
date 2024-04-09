@@ -25,6 +25,7 @@ playlistdb = mongodb.playlist
 blockeddb = mongodb.blockedusers
 privatedb = mongodb.privatechats
 
+playlist = []
 
 # Playlist
 
