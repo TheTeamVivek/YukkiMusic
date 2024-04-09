@@ -11,6 +11,7 @@
 from pyrogram import filters
 from pyrogram.types import Message
 
+from config import PK
 from strings import get_command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
@@ -26,7 +27,7 @@ ACTIVEVIDEO_COMMAND = get_command("ACTIVEVIDEO_COMMAND")
 
 @app.on_message(filters.command(ACTIVEVC_COMMAND) & SUDOERS)
 async def activevc(_, message: Message):
-    mystic = await message.reply_text("ɢᴇᴛᴛɪɴɢ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ....ᴘʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ",protect_content=True)
+    mystic = await message.reply_text("ɢᴇᴛᴛɪɴɢ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ....ᴘʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ",protect_content=PK)
     served_chats = await get_active_chats()
     text = ""
     j = 0
@@ -52,7 +53,7 @@ async def activevc(_, message: Message):
 
 @app.on_message(filters.command(ACTIVEVIDEO_COMMAND) & SUDOERS)
 async def activevi_(_, message: Message):
-    mystic = await message.reply_text("ɢᴇᴛᴛɪɴɢ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ....ᴘʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ",protect_content=True)
+    mystic = await message.reply_text("ɢᴇᴛᴛɪɴɢ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ....ᴘʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ",protect_content=PK)
     served_chats = await get_active_video_chats()
     text = ""
     j = 0
