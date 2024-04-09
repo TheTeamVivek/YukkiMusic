@@ -206,11 +206,11 @@ async def start_comm(client, message: Message, _):
             OWNER = None
         out = private_panel(_, app.username, OWNER)
         era = await message.reply_text(text=f"{message.from_user.first_name} जय श्री राधे कृष्णा जी, आपका {app.mention} में हार्दिक स्वागत है।")
-        await asyncio.sleep(0.4)
+        await asyncio.sleep(0.5)
         await era.edit(text="🇮🇳")
-        await asyncio.sleep(0.4)
+        await asyncio.sleep(0.5)
         await era.edit("__ᴍᴀᴅᴇ ɪɴ ɪɴᴅɪᴀ ᴀɴᴅ ᴛʜᴀɴᴋ's ᴛᴏ ʏᴜᴋᴋɪ ᴛᴇᴀᴍ__")
-        await asyncio.sleep(0.4)
+        await asyncio.sleep(0.5)
         await era.delete()
         await app.send_reaction(chat_id, message_id)
         if config.START_IMG_URL:
