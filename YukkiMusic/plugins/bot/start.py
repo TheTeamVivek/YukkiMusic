@@ -131,7 +131,7 @@ async def start_comm(client, message: Message, _):
             await message.reply_text(
                 f"ʜᴇʏ {message.from_user.first_name},\nᴛʜᴀɴᴋs ғᴏʀ ᴠᴇʀɪғʏɪɴɢ ʏᴏᴜʀsᴇʟғ ɪɴ {app.mention}, ɴᴏᴡ ʏᴏᴜ ᴄᴀɴ ɢᴏ ʙᴀᴄᴋ ᴀɴᴅ sᴛᴀʀᴛ ᴜsɪɴɢ ᴍᴇ."
             )
-           return await app.send_reaction(chat_id, message_id)
+            return await app.send_reaction(chat_id, message_id)
 
         if name[0:4] == "help":
             keyboard = help_pannel(_)
