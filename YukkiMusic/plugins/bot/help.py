@@ -27,6 +27,7 @@ from YukkiMusic.utils.inline.help import help_back_markup, private_help_panel
 ### Command
 HELP_COMMAND = get_command("HELP_COMMAND")
 
+
 @app.on_message(filters.command(HELP_COMMAND) & filters.private & ~BANNED_USERS)
 @app.on_callback_query(filters.regex("settings_back_helper") & ~BANNED_USERS)
 async def helper_private(
@@ -58,21 +59,17 @@ async def helper_private(
         keyboard = first_page(_)
         if START_IMG_URL:
             await update.reply_photo(
-                photo=START_IMG_URL, 
+                photo=START_IMG_URL,
                 caption=_["help_1"],
                 reply_markup=keyboard,
             )
 
         else:
             await update.reply_photo(
-                photo=random.choice(PHOTO), 
+                photo=random.choice(PHOTO),
                 caption=_["help_1"],
                 reply_markup=keyboard,
             )
-
-                
-
-
 
 
 @app.on_message(filters.command(HELP_COMMAND) & filters.group & ~BANNED_USERS)

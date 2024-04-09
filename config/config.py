@@ -58,12 +58,12 @@ LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", ""))
 # ________________________________________________________________________________#
 # A name for your Music bot.
 MUSIC_BOT_NAME = getenv("MUSIC_BOT_NAME", "Mrr...prince")
-#________________________________________________________________________________#
+# ________________________________________________________________________________#
 
 PROTECT_CONTENT = getenv("PROTECT_CONTENT", "True")
 
 # Set it true for abody can't copy and forward bot messages
-#________________________________________________________________________________#
+# ________________________________________________________________________________#
 # Your User ID.
 OWNER_ID = list(
     map(int, getenv("OWNER_ID", "6815918609").split())
