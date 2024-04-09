@@ -27,12 +27,6 @@ from YukkiMusic.utils.inline.help import help_back_markup, private_help_panel
 ### Command
 HELP_COMMAND = get_command("HELP_COMMAND")
 
-PROTECT_CONTENT = True
-if PROTECT_CONTENT:
-    PK = "True"
-else:
-    PK = "False"
-
 @app.on_message(filters.command(HELP_COMMAND) & filters.private & ~BANNED_USERS)
 @app.on_callback_query(filters.regex("settings_back_helper") & ~BANNED_USERS)
 async def helper_private(
