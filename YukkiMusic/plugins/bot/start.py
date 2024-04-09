@@ -42,7 +42,7 @@ from YukkiMusic.utils.inline import (
     start_pannel,
 )
 
-eva = [
+PHOTO = [
 "https://te.legra.ph/file/b8a0c1a00db3e57522b53.jpg",
 "https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg",
 "https://te.legra.ph/file/bb0ff85f2dd44070ea519.jpg",
@@ -51,9 +51,7 @@ eva = [
 "https://te.legra.ph/file/e906c2def5afe8a9b9120.jpg"
 ]
 
-emo =["👍", "❤", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤", "‍🔥", "🌚", "🌭", "💯", "🤣", "⚡",  "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"]
-emoji = random.choice(emo)
-PHOTO = random.choice(eva)
+emoji =["👍", "❤", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤", "‍🔥", "🌚", "🌭", "💯", "🤣", "⚡",  "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"]
 loop = asyncio.get_running_loop()
 @app.on_message(
     filters.command(["start"]) & filters.private & ~BANNED_USERS
@@ -62,7 +60,7 @@ loop = asyncio.get_running_loop()
 async def start_comm(client, message: Message, _):
     chat_id = message.chat.id
     message_id = message.id
-    await app.send_reaction(chat_id, message_id, emoji)
+    await app.send_reaction(chat_id, message_id, random.choice(emoji))
     await add_served_user(message.from_user.id)
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
@@ -224,7 +222,7 @@ async def start_comm(client, message: Message, _):
                 )
             except:
                 await message.reply_photo(
-                    photo=PHOTO,
+                    photo=random.choice(PHOTO),
                     caption=_["start_2"].format(app.mention),
                     reply_markup=InlineKeyboardMarkup(out),
                 )
