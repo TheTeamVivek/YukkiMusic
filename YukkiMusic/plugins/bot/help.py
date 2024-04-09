@@ -8,9 +8,9 @@
 # All rights reserved.
 #
 
-
+import random
 from typing import Union
-from config import START_IMG_URL
+from config import START_IMG_URL, PHOTO
 from pyrogram import filters, types
 from pyrogram.types import InlineKeyboardMarkup, Message
 
@@ -27,6 +27,11 @@ from YukkiMusic.utils.inline.help import help_back_markup, private_help_panel
 ### Command
 HELP_COMMAND = get_command("HELP_COMMAND")
 
+PROTECT_CONTENT = True
+if PROTECT_CONTENT:
+    PK = "protect_content=True"
+else:
+    PK = "protect_content=False"
 
 @app.on_message(filters.command(HELP_COMMAND) & filters.private & ~BANNED_USERS)
 @app.on_callback_query(filters.regex("settings_back_helper") & ~BANNED_USERS)
@@ -58,9 +63,19 @@ async def helper_private(
         language = await get_lang(chat_id)
         _ = get_string(language)
         keyboard = first_page(_)
-        await update.reply_photo(
-            photo=START_IMG_URL, caption=_["help_1"], reply_markup=keyboard
-        )
+        if config.START_IMG_URL:
+                await message.reply_photo(
+                    photo=config.START_IMG_URL, caption=_["help_1"],
+YK, reply_markup=keyboard
+                )
+                await update.send_reaction(chat_id, message_id)
+            else:
+                await message.reply_photo(
+                    photo=random.choice(PHOTO), caption=_["help_1"], reply_markup=keyboard
+                )
+                await update.send_reaction(chat_id, message_id)
+
+
 
 
 @app.on_message(filters.command(HELP_COMMAND) & filters.group & ~BANNED_USERS)
