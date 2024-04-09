@@ -64,16 +64,15 @@ async def helper_private(
         _ = get_string(language)
         keyboard = first_page(_)
         if config.START_IMG_URL:
-                await message.reply_photo(
-                    photo=config.START_IMG_URL, caption=_["help_1"],
-YK, reply_markup=keyboard
+                await update.reply_photo(
+                    photo=config.START_IMG_URL, caption=_["help_1"], reply_markup=keyboard
                 )
-                await update.send_reaction(chat_id, message_id)
+                
             else:
-                await message.reply_photo(
+                await update.reply_photo(
                     photo=random.choice(PHOTO), caption=_["help_1"], reply_markup=keyboard
                 )
-                await update.send_reaction(chat_id, message_id)
+                
 
 
 
