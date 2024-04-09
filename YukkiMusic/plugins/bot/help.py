@@ -29,9 +29,9 @@ HELP_COMMAND = get_command("HELP_COMMAND")
 
 PROTECT_CONTENT = True
 if PROTECT_CONTENT:
-    PK = "protect_content=True"
+    PK = "True"
 else:
-    PK = "protect_content=False"
+    PK = "False"
 
 @app.on_message(filters.command(HELP_COMMAND) & filters.private & ~BANNED_USERS)
 @app.on_callback_query(filters.regex("settings_back_helper") & ~BANNED_USERS)
@@ -66,8 +66,8 @@ async def helper_private(
             await update.reply_photo(
                 photo=START_IMG_URL, 
                 caption=_["help_1"],
-                reply_markup=keyboard,  # I don't know what I'm doing 
-                PK  # hehehehehehehhehe
+                reply_markup=keyboard
+                protect_content=PK
             )
 
         else:
@@ -75,7 +75,7 @@ async def helper_private(
                 photo=random.choice(PHOTO), 
                 caption=_["help_1"],
                 reply_markup=keyboard,  
-                PK  # after inline
+                protect_content=PK
             )
 
                 
