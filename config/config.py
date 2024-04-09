@@ -221,12 +221,8 @@ autoclean = []
 
 # multi photo for /start
 PHOTO = [
-    "https://te.legra.ph/file/b8a0c1a00db3e57522b53.jpg",
-    "https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg",
-    "https://te.legra.ph/file/bb0ff85f2dd44070ea519.jpg",
-    "https://te.legra.ph/file/bd995b032b6bd263e2cc9.jpg",
-    "https://te.legra.ph/file/6298d377ad3eb46711644.jpg",
-    "https://te.legra.ph/file/e906c2def5afe8a9b9120.jpg",
+    "https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg"
+
 ]
 
 
