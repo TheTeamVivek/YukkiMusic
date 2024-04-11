@@ -2,7 +2,7 @@ import os
 import shutil
 from os import listdir, mkdir
 from YukkiMusic import app
-from YukkiMusi.misc import SUDOERS
+from YukkiMusic.misc import SUDOERS
 @app.on_message(filters.command("clean") & SUDOERS)
 async def clean(_, message):
     A = await message.reply_text("ᴄʟᴇᴀɴɪɴɢ ᴛᴇᴍᴘ ᴅɪʀᴇᴄᴛᴏʀɪᴇs...")
