@@ -337,3 +337,58 @@ async def restart_(_, message):
         "Rᴇsᴛᴀʀᴛ ʜᴀs ʙᴇᴇɴ ɪɴɪᴛɪᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ! Wᴀɪᴛ ғᴏʀ 𝟷 - 𝟸 ᴍɪɴᴜᴛᴇs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs."
     )
     os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
+
+
+@app.on_message(filters.command(["git_pull"]) & SUDOERS)
+@language
+async def update_(client, message, _):
+    try:
+        repo = Repo()
+    except GitCommandError:
+        return await response.edit(_["heroku_14"])
+    except InvalidGitRepositoryError:
+        return await response.edit(_["heroku_15"])
+    to_exc = f"git fetch origin {config.UPSTREAM_BRANCH} &> /dev/null"
+    os.system(to_exc)
+    await asyncio.sleep(7)
+    verification = ""
+    REPO_ = repo.remotes.origin.url.split(".git")[0]  # main git repository
+    for checks in repo.iter_commits(f"HEAD..origin/{config.UPSTREAM_BRANCH}"):
+        verification = str(checks.count())
+    if verification == "":
+        return await response.edit("Bot is up-to-date!")
+    updates = ""
+    ordinal = lambda format: "%d%s" % (
+        format,
+        "tsnrhtdd"[(format // 10 % 10 != 1) * (format % 10 < 4) * format % 10 :: 4],
+    )
+    for info in repo.iter_commits(f"HEAD..origin/{config.UPSTREAM_BRANCH}"):
+        updates += f"<b>➣ #{info.count()}: [{info.summary}]({REPO_}/commit/{info}) ʙʏ -> {info.author}</b>\n\t\t\t\t<b>➥ Cᴏᴍᴍɪᴛᴇᴅ ᴏɴ :</b> {ordinal(int(datetime.fromtimestamp(info.committed_date).strftime('%d')))} {datetime.fromtimestamp(info.committed_date).strftime('%b')}, {datetime.fromtimestamp(info.committed_date).strftime('%Y')}\n\n"
+    _update_response_ = "<b>A ɴᴇᴡ ᴜᴘᴅᴀᴛᴇ ɪs ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀ Bᴏᴛ !</b>\n\n➣ᴘᴜsʜɪɴɢ ᴜᴘᴅᴀᴛᴇs ɴᴏᴡ</code>\n\n**<u>ᴜᴘᴅᴀᴛᴇs:</u>**\n\n"
+    _final_updates_ = _update_response_ + updates
+    if len(_final_updates_) > 4096:
+        url = await Yukkibin(updates)
+        nrs = await response.edit(
+            f"<b>A ɴᴇᴡ ᴜᴘᴅᴀᴛᴇ ɪs ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀ ʙᴏᴛ !</b>\n\n➣Pᴜsʜɪɴɢ ᴜᴘᴅᴀᴛᴇs ɴᴏᴡ </code>\n\n**<u>ᴜᴘᴅᴀᴛᴇs:</u>**\n\n[Cʟɪᴄᴋ ʜᴇʀᴇ ᴛᴏ ᴄʜᴇᴄᴋᴏᴜᴛ]({url})"
+        )
+    else:
+        nrs = await response.edit(_final_updates_, disable_web_page_preview=True)
+    os.system("git stash &> /dev/null && git pull")
+    served_chats = await get_active_chats()
+    for x in served_chats:
+        try:
+            await app.send_message(
+                x,
+                    f"{app.mention} ʜᴀs Jᴜsᴛ ᴜᴘᴅᴀᴛᴇᴅ ʜᴇʀsᴇʟғ. Sᴏʀʀʏ ғᴏʀ ᴛʜᴇ ɪssᴜᴇs.\n\nSᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ᴀғᴛᴇʀ 𝟷𝟶-𝟷𝟻 sᴇᴄᴏɴᴅs ᴀɢᴀɪɴ.",
+            )
+            await remove_active_chat(x)
+            await remove_active_video_chat(x)
+        except Exception:
+            pass
+    await response.edit(
+            f"{nrs.text}\n\nBᴏᴛ ᴡᴀs ᴜᴘᴅᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ! Nᴏᴡ, ᴡᴀɪᴛ ғᴏʀ 𝟷 - 𝟸 ᴍɪɴs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛ!"
+        )
+    os.system("pip3 install -r requirements.txt")
+    os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
+    exit()
+        
