@@ -9,13 +9,16 @@
 import os
 import re
 import textwrap
+
 import aiofiles
 import aiohttp
 import numpy as np
-from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 from youtubesearchpython.__future__ import VideosSearch
-from config import YOUTUBE_IMG_URL, MUSIC_BOT_NAME
+
+from config import MUSIC_BOT_NAME, YOUTUBE_IMG_URL
 from YukkiMusic import app
+
 
 def changeImageSize(maxWidth, maxHeight, image):
     widthRatio = maxWidth / image.size[0]
@@ -25,15 +28,17 @@ def changeImageSize(maxWidth, maxHeight, image):
     newImage = image.resize((newWidth, newHeight))
     return newImage
 
+
 def circle(img):
     h, w = img.size
-    a = Image.new('L', [h, w], 0)
+    a = Image.new("L", [h, w], 0)
     b = ImageDraw.Draw(a)
     b.pieslice([(0, 0), (h, w)], 0, 360, fill=255, outline="white")
     c = np.array(img)
     d = np.array(a)
     e = np.dstack((c, d))
     return Image.fromarray(e)
+
 
 async def gen_thumb(videoid):
     if os.path.isfile(f"cache/{videoid}.png"):
@@ -150,8 +155,8 @@ async def gen_thumb(videoid):
         return f"cache/{videoid}.png"
     except Exception:
         return YOUTUBE_IMG_URL
-        
-        
+
+
 async def gen_qthumb(videoid, user_id):
     if os.path.isfile(f"cache/{videoid}_{user_id}.png"):
         return f"cache/{videoid}_{user_id}.png"
@@ -216,7 +221,9 @@ async def gen_qthumb(videoid, user_id):
         enhancer = ImageEnhance.Brightness(background)
         background = enhancer.enhance(0.6)
         y = circle(zyoutube).resize((473, 473))
-        background.paste(y, (49, 125), mask=y)  # Adjusted placement of YouTube circle image
+        background.paste(
+            y, (49, 125), mask=y
+        )  # Adjusted placement of YouTube circle image
         image3 = bg.resize((1280, 720))
         image5 = image3.convert("RGBA")
         result_img = Image.alpha_composite(background, image5)
@@ -280,6 +287,3 @@ async def gen_qthumb(videoid, user_id):
     except Exception as e:
         print(e)
         return YOUTUBE_IMG_URL
-    
-
-    
