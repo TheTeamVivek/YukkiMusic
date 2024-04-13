@@ -1,6 +1,6 @@
 from pyrogram.types import Message
 from pyrogram.enums import ChatType, ChatMemberStatus
-
+from YukkiMusic.misc import SUDOERS
 
 async def admin_check(message: Message) -> bool:
     if not message.from_user:
@@ -13,6 +13,9 @@ async def admin_check(message: Message) -> bool:
         777000,  # Telegram Service Notifications
         1087968824,  # GroupAnonymousBot
     ]:
+        return True
+
+    if message.from_user.id in SUDOERS:
         return True
 
     client = message._client
