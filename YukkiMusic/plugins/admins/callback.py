@@ -212,6 +212,7 @@ async def del_back_playlist(client, CallbackQuery, _):
         await CallbackQuery.answer()
         await set_loop(chat_id, 3)
         await CallbackQuery.message.reply_text(_["admin_25"].format(mention, 3))
+
     elif command == "Shuffle":
         check = db.get(chat_id)
         if not check:
@@ -230,6 +231,54 @@ async def del_back_playlist(client, CallbackQuery, _):
         await CallbackQuery.message.reply_text(
             _["admin_23"].format(mention), disable_web_page_preview=True
         )
+    elif command == "Replay":
+        txt = f"➻ sᴛʀᴇᴀᴍ ʀᴇ-ᴘʟᴀʏᴇᴅ 🎄\n│ \n└ʙʏ : {mention} 🥀"
+        await CallbackQuery.answer()
+        queued = check[0]["file"]
+        title = (check[0]["title"]).title()
+        user = check[0]["by"]
+        duration = check[0]["dur"]
+        streamtype = check[0]["streamtype"]
+        videoid = check[0]["vidid"]
+        status = True if str(streamtype) == "video" else None
+        db[chat_id][0]["played"] = 0
+        exis = (check[0]).get("old_dur")
+        if exis:
+            db[chat_id][0]["dur"] = exis
+            db[chat_id][0]["seconds"] = check[0]["old_second"]
+            db[chat_id][0]["speed_path"] = None
+            db[chat_id][0]["speed"] = 1.0
+        if "live_" in queued:
+            n, link = await YouTube.video(videoid, True)
+            if n == 0:
+                return await CallbackQuery.message.reply_text(
+                    text=_["admin_11"].format(title),
+                )
+            try:
+                image = await YouTube.thumbnail(videoid, True)
+            except:
+                image = None
+            try:
+                await Yukki.skip_stream(chat_id, link, video=status, image=image)
+            except:
+                return await CallbackQuery.message.reply_text(_["call_9"])
+            button = stream_markup(_, videoid, chat_id)
+            img = await gen_thumb(videoid)
+            run = await CallbackQuery.message.reply_photo(
+                photo=img,
+                caption=_["stream_1"].format(
+                    f"https://t.me/{app.username}?start=info_{videoid}",
+                    title[:23],
+                    duration,
+                    user,
+                ),
+                reply_markup=InlineKeyboardMarkup(button),
+            )
+            db[chat_id][0]["mystic"] = run
+            db[chat_id][0]["markup"] = "tg"
+            await CallbackQuery.edit_message_text(txt)
+
+
     elif command == "Skip":
         check = db.get(chat_id)
         txt = f"» ᴛʀᴀᴄᴋ sᴋɪᴩᴩᴇᴅ ʙʏ {mention} !"
