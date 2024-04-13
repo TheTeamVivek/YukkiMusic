@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021-present by TeamYukki@Github, < https://github.com/TeamYukki >.
+# Copyright (C) 2024-present by TeamYukki@Github, < https://github.com/TeamYukki >.
 #
 # This file is part of < https://github.com/TeamYukki/YukkiMusicBot > project,
 # and is released under the "GNU v3.0 License Agreement".
@@ -10,24 +10,24 @@
 import os
 from random import randint
 from typing import Union
-
 from pyrogram.types import InlineKeyboardMarkup
-
 import config
 from YukkiMusic import Carbon, YouTube, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
+    add_active_chat,
     add_active_video_chat,
     is_active_chat,
     is_video_allowed,
+    music_on,
 )
 from YukkiMusic.utils.exceptions import AssistantErr
-from YukkiMusic.utils.inline.play import queue_markup, stream_markup, telegram_markup
+from YukkiMusic.utils.inline.play import stream_markup, queue_markup, telegram_markup
 from YukkiMusic.utils.inline.playlist import close_markup
 from YukkiMusic.utils.pastebin import Yukkibin
 from YukkiMusic.utils.stream.queue import put_queue, put_queue_index
-from YukkiMusic.utils.thumbnails import gen_thumb
+from YukkiMusic.utils.thumbnails import gen_thumb, gen_qthumb
 
 
 async def stream(
@@ -169,10 +169,14 @@ async def stream(
                 "video" if video else "audio",
             )
             position = len(db.get(chat_id)) - 1
+            qimg = await gen_qthumb(vidid, user_id)
             button = queue_markup(_, vidid, chat_id)
-            run = await app.send_message(
+            run = await app.send_photo(
                 original_chat_id,
-                _["queue_4"].format(position, title[:27], duration_min, user_name),
+                photo=qimg,
+                caption,= _["queue_4"].format(
+                    position, title[:27], duration_min, user_name
+                 ),
                 reply_markup=InlineKeyboardMarkup(button),
             )
         else:
