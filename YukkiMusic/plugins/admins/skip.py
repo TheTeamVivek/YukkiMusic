@@ -11,6 +11,7 @@
 
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, Message
+
 import config
 from config import BANNED_USERS
 from strings import get_command
@@ -99,8 +100,8 @@ async def skip(cli, message: Message, _, chat_id):
     queued = check[0]["file"]
     title = (check[0]["title"]).title()
     user = check[0]["by"]
-    theme = await check_theme(chat_id)
-    user_id = message.from_user.id
+    await check_theme(chat_id)
+    message.from_user.id
     streamtype = check[0]["streamtype"]
     videoid = check[0]["vidid"]
     duration_min = check[0]["dur"]

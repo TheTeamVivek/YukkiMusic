@@ -18,7 +18,7 @@ from pyrogram.types import (
     Message,
 )
 
-from config import BANNED_USERS, CLEANMODE_DELETE_MINS, MUSIC_BOT_NAME, OWNER_ID
+from config import BANNED_USERS, CLEANMODE_DELETE_MINS, OWNER_ID
 from strings import get_command
 from YukkiMusic import app
 from YukkiMusic.utils.database import (

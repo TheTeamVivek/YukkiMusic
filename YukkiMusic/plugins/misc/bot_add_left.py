@@ -1,18 +1,9 @@
-from pyrogram import Client
-from pyrogram.types import Message
 from pyrogram import filters
-from pyrogram.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    InputMediaPhoto,
-    InputMediaVideo,
-    Message,
-)
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+
 from config import LOG_GROUP_ID
 from YukkiMusic import app
-from YukkiMusic.core.userbot import Userbot
-from YukkiMusic.utils.database import get_assistant
-from YukkiMusic.utils.database import delete_served_chat
+from YukkiMusic.utils.database import delete_served_chat, get_assistant
 
 
 @app.on_message(filters.new_chat_members)

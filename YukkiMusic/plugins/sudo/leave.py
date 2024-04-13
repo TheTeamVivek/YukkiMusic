@@ -8,12 +8,11 @@
 # All rights reserved.
 #
 
-import asyncio
-from pyrogram import Client, filters
-from pyrogram.types import Message
+from pyrogram import filters
+
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import get_assistant, delete_served_chat
+from YukkiMusic.utils.database import delete_served_chat, get_assistant
 
 
 @app.on_message(filters.command("leave") & SUDOERS)

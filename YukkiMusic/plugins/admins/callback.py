@@ -9,8 +9,10 @@
 #
 
 import random
+
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
+
 from config import (
     BANNED_USERS,
     SOUNCLOUD_IMG_URL,
@@ -36,15 +38,14 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.decorators.language import languageCB
 from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline.play import (
+    controler_markup,
     panel_markup_1,
     panel_markup_2,
-    controler_markup,
     stream_markup,
     telegram_markup,
 )
 from YukkiMusic.utils.stream.autoclear import auto_clean
 from YukkiMusic.utils.thumbnails import gen_thumb
-
 
 wrong = {}
 downvote = {}
@@ -278,7 +279,6 @@ async def del_back_playlist(client, CallbackQuery, _):
             db[chat_id][0]["markup"] = "tg"
             await CallbackQuery.edit_message_text(txt)
 
-
     elif command == "Skip":
         check = db.get(chat_id)
         txt = f"» ᴛʀᴀᴄᴋ sᴋɪᴩᴩᴇᴅ ʙʏ {mention} !"
@@ -312,7 +312,7 @@ async def del_back_playlist(client, CallbackQuery, _):
         streamtype = check[0]["streamtype"]
         videoid = check[0]["vidid"]
         duration_min = check[0]["dur"]
-        user_id = CallbackQuery.message.from_user.id
+        CallbackQuery.message.from_user.id
         status = True if str(streamtype) == "video" else None
         db[chat_id][0]["played"] = 0
         if "live_" in queued:

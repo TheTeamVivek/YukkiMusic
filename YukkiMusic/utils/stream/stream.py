@@ -10,20 +10,20 @@
 import os
 from random import randint
 from typing import Union
+
 from pyrogram.types import InlineKeyboardMarkup
+
 import config
 from YukkiMusic import Carbon, YouTube, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
-    add_active_chat,
     add_active_video_chat,
     is_active_chat,
     is_video_allowed,
-    music_on,
 )
 from YukkiMusic.utils.exceptions import AssistantErr
-from YukkiMusic.utils.inline.play import stream_markup, queue_markup, telegram_markup
+from YukkiMusic.utils.inline.play import queue_markup, stream_markup, telegram_markup
 from YukkiMusic.utils.inline.playlist import close_markup
 from YukkiMusic.utils.pastebin import Yukkibin
 from YukkiMusic.utils.stream.queue import put_queue, put_queue_index

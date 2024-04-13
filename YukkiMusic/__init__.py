@@ -8,13 +8,15 @@
 # All rights reserved.
 #
 
+from telethon import TelegramClient
+
+import config
 from YukkiMusic.core.bot import YukkiBot
 from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
 from YukkiMusic.core.userbot import Userbot
 from YukkiMusic.misc import dbb, heroku, sudo
-from telethon import TelegramClient
-import config
+
 from .logging import LOGGER
 
 # Directories

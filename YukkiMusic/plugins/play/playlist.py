@@ -8,45 +8,29 @@
 # All rights reserved.
 #
 import os
-import requests
 from random import randint
-from YukkiMusic.utils.database import (
-    add_served_chat,
-    add_served_user,
-    blacklisted_chats,
-    get_lang,
-    is_banned_user,
-    is_on_off,
-)
+
+import requests
 from pykeyboard import InlineKeyboard
 from pyrogram import filters
-from pyrogram.types import (
-    InlineKeyboardButton,
-    CallbackQuery,
-    InlineKeyboardMarkup,
-    Message,
-)
-from YukkiMusic.utils import close_markup
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from youtube_search import YoutubeSearch
+
 from config import BANNED_USERS, SERVER_PLAYLIST_LIMIT
 from YukkiMusic import Carbon, app
-from YukkiMusic.utils.decorators.language import language, languageCB
-from YukkiMusic.utils.inline.playlist import (
-    botplaylist_markup,
-    get_playlist_markup,
-    warning_markup,
-)
 from YukkiMusic.utils.database import (
     delete_playlist,
     get_playlist,
     get_playlist_names,
     save_playlist,
 )
+from YukkiMusic.utils.decorators.language import language, languageCB
+from YukkiMusic.utils.inline.playlist import (
+    botplaylist_markup,
+    get_playlist_markup,
+    warning_markup,
+)
 from YukkiMusic.utils.pastebin import Yukkibin
-import time
-import yt_dlp
-from youtube_search import YoutubeSearch
-from youtubesearchpython import VideosSearch
-from youtubesearchpython import SearchVideos
 from YukkiMusic.utils.stream.stream import stream
 
 
@@ -208,7 +192,7 @@ async def play_playlist(client, CallbackQuery, _):
 @app.on_message(filters.command(["playplaylist"]) & ~BANNED_USERS & filters.group)
 @languageCB
 async def play_playlist_command(client, message, _):
-    mode = message.command[1] if len(message.command) > 1 else None
+    message.command[1] if len(message.command) > 1 else None
     user_id = message.from_user.id
     _playlist = await get_playlist_names(user_id)
 
@@ -260,7 +244,7 @@ async def play_playlist_command(client, message, _):
 @app.on_message(filters.command(["vplayplaylist"]) & ~BANNED_USERS & filters.group)
 @languageCB
 async def play_playlist_command(client, message, _):
-    mode = message.command[1] if len(message.command) > 1 else None
+    message.command[1] if len(message.command) > 1 else None
     user_id = message.from_user.id
     _playlist = await get_playlist_names(user_id)
 
@@ -309,9 +293,6 @@ async def play_playlist_command(client, message, _):
     return await mystic.delete()
 
 
-import json
-
-
 @app.on_message(filters.command(["addplaylist"]) & ~BANNED_USERS)
 @language
 async def add_playlist(client, message: Message, _):
@@ -326,8 +307,7 @@ async def add_playlist(client, message: Message, _):
     if "youtube.com/playlist" in query:
         adding = await message.reply_text("** ᴀᴅᴅɪɴɢ sᴏɴɢs ɪɴ ᴘʟᴀʏʟɪsᴛ ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ..**")
         try:
-            from pytube import Playlist
-            from pytube import YouTube
+            from pytube import Playlist, YouTube
 
             playlist = Playlist(query)
             video_urls = playlist.video_urls
@@ -374,13 +354,11 @@ async def add_playlist(client, message: Message, _):
             text="**ᴀʟʟ sᴏɴɢs ʜᴀs ʙᴇᴇɴ ᴀᴅᴅᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ғʀᴏᴍ ʏᴏᴜʀ ʏᴏᴜᴛᴜʙᴇ ᴘʟᴀʏʟɪsᴛ ʟɪɴᴋ**\n\n**➥ ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ʀᴇᴍᴏᴠᴇ ᴀɴʏ sᴏɴɢ ᴛʜᴇɴ ᴄʟɪᴄᴋ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ.**",
             reply_markup=keyboardes,
         )
-        pass
     if "youtube.com/@" in query:
         addin = await message.reply_text("**ᴀᴅᴅɪɴɢ sᴏɴɢs ɪɴ ᴘʟᴀʏʟɪsᴛ ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ..**")
         try:
             from pytube import YouTube
 
-            channel_username = query
             videos = YouTube_videos(f"{query}/videos")
             video_urls = [video["url"] for video in videos]
 
@@ -425,13 +403,11 @@ async def add_playlist(client, message: Message, _):
             text="**ᴀʟʟ sᴏɴɢs ʜᴀs ʙᴇᴇɴ ᴀᴅᴅᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ғʀᴏᴍ ʏᴏᴜʀ ʏᴏᴜᴛᴜʙᴇ ᴘʟᴀʏʟɪsᴛ ʟɪɴᴋ**\n\n**➥ ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ʀᴇᴍᴏᴠᴇ ᴀɴʏ sᴏɴɢ ᴛʜᴇɴ ᴄʟɪᴄᴋ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ.**",
             reply_markup=keyboardes,
         )
-        pass
     # Check if the provided input is a YouTube video link
     if "https://youtu.be" in query:
         try:
             add = await message.reply_text("**ᴀᴅᴅɪɴɢ sᴏɴɢs ɪɴ ᴘʟᴀʏʟɪsᴛ ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ..**")
-            from pytube import Playlist
-            from pytube import YouTube
+            from pytube import Playlist, YouTube
 
             # Extract video ID from the YouTube lin
             videoid = query.split("/")[-1].split("?")[0]
@@ -476,7 +452,6 @@ async def add_playlist(client, message: Message, _):
                 await message.reply_text(str(e))
         except Exception as e:
             return await message.reply_text(str(e))
-            pass
     else:
         from YukkiMusic import YouTube
 
@@ -495,8 +470,8 @@ async def add_playlist(client, message: Message, _):
             duration = results[0]["duration"]
             videoid = results[0]["id"]
             # Add these lines to define views and channel_name
-            views = results[0]["views"]
-            channel_name = results[0]["channel"]
+            results[0]["views"]
+            results[0]["channel"]
 
             user_id = message.from_user.id
             _check = await get_playlist(user_id, videoid)
@@ -546,7 +521,7 @@ async def add_playlist(client, message: Message, _):
 
         except KeyError:
             return await message.reply_text("**ɪɴᴠᴀʟɪᴅ ᴅᴀᴛᴀ ғᴏʀᴍᴀᴛ ʀᴇᴄᴇɪᴠᴇᴅ.**")
-        except Exception as e:
+        except Exception:
             pass
 
 
@@ -555,7 +530,7 @@ async def add_playlist(client, message: Message, _):
 async def del_plist(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     videoid = callback_data.split(None, 1)[1]
-    user_id = CallbackQuery.from_user.id
+    CallbackQuery.from_user.id
     deleted = await delete_playlist(CallbackQuery.from_user.id, videoid)
     if deleted:
         try:
@@ -634,7 +609,7 @@ async def add_playlist(client, CallbackQuery, _):
 async def del_plist(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     videoid = callback_data.split(None, 1)[1]
-    user_id = CallbackQuery.from_user.id
+    CallbackQuery.from_user.id
     deleted = await delete_playlist(CallbackQuery.from_user.id, videoid)
     if deleted:
         try:
@@ -706,7 +681,7 @@ async def add_playlist(client, CallbackQuery, _):
 @app.on_callback_query(filters.regex("del_playlist") & ~BANNED_USERS)
 @languageCB
 async def del_plist(client, CallbackQuery, _):
-    from YukkiMusic import YouTube
+    pass
 
     callback_data = CallbackQuery.data.strip()
     videoid = callback_data.split(None, 1)[1]
@@ -729,7 +704,7 @@ async def del_plist(client, CallbackQuery, _):
 @app.on_callback_query(filters.regex("delete_whole_playlist") & ~BANNED_USERS)
 @languageCB
 async def del_whole_playlist(client, CallbackQuery, _):
-    from YukkiMusic import YouTube
+    pass
 
     _playlist = await get_playlist_names(CallbackQuery.from_user.id)
     for x in _playlist:
@@ -756,7 +731,7 @@ async def get_playlist_playmode_(client, CallbackQuery, _):
 @app.on_callback_query(filters.regex("delete_warning") & ~BANNED_USERS)
 @languageCB
 async def delete_warning_message(client, CallbackQuery, _):
-    from YukkiMusic import YouTube
+    pass
 
     try:
         await CallbackQuery.answer()
@@ -769,7 +744,7 @@ async def delete_warning_message(client, CallbackQuery, _):
 @app.on_callback_query(filters.regex("home_play") & ~BANNED_USERS)
 @languageCB
 async def home_play_(client, CallbackQuery, _):
-    from YukkiMusic import YouTube
+    pass
 
     try:
         await CallbackQuery.answer()
@@ -784,7 +759,7 @@ async def home_play_(client, CallbackQuery, _):
 @app.on_callback_query(filters.regex("del_back_playlist") & ~BANNED_USERS)
 @languageCB
 async def del_back_playlist(client, CallbackQuery, _):
-    from YukkiMusic import YouTube
+    pass
 
     user_id = CallbackQuery.from_user.id
     _playlist = await get_playlist_names(user_id)

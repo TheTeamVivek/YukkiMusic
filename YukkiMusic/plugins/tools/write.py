@@ -1,6 +1,7 @@
 from urllib.parse import quote
 
-from pyrogram import Client, filters
+from pyrogram import filters
+
 from YukkiMusic import app
 
 

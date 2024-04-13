@@ -1,6 +1,7 @@
 from telethon.tl.types import ChannelParticipantsAdmins
-from YukkiMusic.misc import SUDOERS
+
 from YukkiMusic import telethn
+from YukkiMusic.misc import SUDOERS
 
 
 async def user_is_ban_protected(user_id: int, message):

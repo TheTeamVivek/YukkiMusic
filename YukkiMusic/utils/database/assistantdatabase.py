@@ -30,6 +30,7 @@ async def get_client(assistant: int):
     elif int(assistant) == 5:
         return userbot.five
 
+
 async def save_assistant(chat_id, number):
     number = int(number)
     await db.update_one(
@@ -37,7 +38,8 @@ async def save_assistant(chat_id, number):
         {"$set": {"assistant": number}},
         upsert=True,
     )
-    
+
+
 async def set_assistant(chat_id):
     from YukkiMusic.core.userbot import assistants
 

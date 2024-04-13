@@ -1,6 +1,4 @@
-from pyrogram import enums
-from pyrogram import filters
-from pyrogram.types import Message
+from pyrogram import enums, filters
 
 from YukkiMusic import app
 from YukkiMusic.utils.filter import admin_filter
@@ -9,10 +7,10 @@ from YukkiMusic.utils.filter import admin_filter
 @app.on_message(filters.command("pin") & admin_filter)
 async def pin(_, message):
     replied = message.reply_to_message
-    chat_title = message.chat.title
+    message.chat.title
     chat_id = message.chat.id
     user_id = message.from_user.id
-    name = message.from_user.mention
+    message.from_user.mention
 
     if message.chat.type == enums.ChatType.PRIVATE:
         await message.reply_text("**ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴡᴏʀᴋs ᴏɴʟʏ ᴏɴ ɢʀᴏᴜᴘs !**")
@@ -34,10 +32,10 @@ async def pin(_, message):
 @app.on_message(filters.command("unpin") & admin_filter)
 async def unpin(_, message):
     replied = message.reply_to_message
-    chat_title = message.chat.title
+    message.chat.title
     chat_id = message.chat.id
     user_id = message.from_user.id
-    name = message.from_user.mention
+    message.from_user.mention
 
     if message.chat.type == enums.ChatType.PRIVATE:
         await message.reply_text("**ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴡᴏʀᴋs ᴏɴʟʏ ᴏɴ ɢʀᴏᴜᴘs !**")

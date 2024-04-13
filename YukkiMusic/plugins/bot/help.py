@@ -10,20 +10,22 @@
 
 import random
 from typing import Union
-from config import START_IMG_URL
-from config import PHOTO
+
 from pyrogram import filters, types
 from pyrogram.types import InlineKeyboardMarkup, Message
 
-from config import BANNED_USERS
+from config import BANNED_USERS, PHOTO, START_IMG_URL
 from strings import get_command, get_string, helpers
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils import help_pannel
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
 from YukkiMusic.utils.decorators.language import LanguageStart, languageCB
-from YukkiMusic.utils.inline.help import first_page, second_page
-from YukkiMusic.utils.inline.help import help_back_markup, private_help_panel
+from YukkiMusic.utils.inline.help import (
+    first_page,
+    help_back_markup,
+    private_help_panel,
+    second_page,
+)
 
 ### Command
 HELP_COMMAND = get_command("HELP_COMMAND")

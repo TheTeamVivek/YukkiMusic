@@ -1,11 +1,10 @@
 import time
+
 from telethon import events
+
 from YukkiMusic import telethn
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.chatstatus import (
-    can_delete_messages,
-    user_is_admin,
-)
+from YukkiMusic.utils.chatstatus import can_delete_messages, user_is_admin
 
 
 async def purge_messages(event):

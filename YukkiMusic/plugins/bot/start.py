@@ -7,21 +7,21 @@
 #
 # All rights reserved.
 #
-import time
-import config
 import asyncio
 import random
+import time
+
 from pyrogram import filters
 from pyrogram.enums import ChatType, ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
+
+import config
 from config import BANNED_USERS, PHOTO
-from config.config import OWNER_ID, MUSIC_BOT_NAME
-from strings import get_command, get_string
+from config.config import OWNER_ID
+from strings import get_string
 from YukkiMusic import Telegram, YouTube, app
-from YukkiMusic.misc import SUDOERS
-from YukkiMusic.misc import _boot_
-from YukkiMusic.utils.formatters import get_readable_time
+from YukkiMusic.misc import SUDOERS, _boot_
 from YukkiMusic.plugins.play.playlist import del_plist_msg
 from YukkiMusic.plugins.sudo.sudoers import sudoers_list
 from YukkiMusic.utils.database import (
@@ -35,13 +35,13 @@ from YukkiMusic.utils.database import (
     is_served_private_chat,
 )
 from YukkiMusic.utils.decorators.language import LanguageStart
+from YukkiMusic.utils.formatters import get_readable_time
 from YukkiMusic.utils.inline import (
-    help_pannel,
     alive_panel,
+    help_pannel,
     private_panel,
     start_pannel,
 )
-
 
 emoji = [
     "👍",

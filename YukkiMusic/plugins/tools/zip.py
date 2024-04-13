@@ -1,19 +1,17 @@
 import os
 import time
 import zipfile
-
-from telethon import types
-from telethon.tl import functions
-
-from YukkiMusic import TEMP_DOWNLOAD_DIRECTORY
-from YukkiMusic import telethn as client
-from YukkiMusic.utils.events import register
-
 from datetime import datetime
 
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
+from telethon import types
+from telethon.tl import functions
 from telethon.tl.types import DocumentAttributeVideo
+
+from YukkiMusic import TEMP_DOWNLOAD_DIRECTORY
+from YukkiMusic import telethn as client
+from YukkiMusic.utils.events import register
 
 
 async def is_register_admin(chat, user):

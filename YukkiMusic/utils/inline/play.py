@@ -8,7 +8,9 @@
 # All rights reserved.
 #
 import math
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 from YukkiMusic.utils.formatters import time_to_seconds
 
 
@@ -18,21 +20,21 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
     percentage = (played_sec / duration_sec) * 100
     umm = math.floor(percentage)
     if 0 < umm <= 40:
-        bar = "◉——————————"
+        pass
     elif 10 < umm < 20:
-        bar = "—◉—————————"
+        pass
     elif 20 < umm < 30:
-        bar = "——◉————————"
+        pass
     elif 30 <= umm < 40:
-        bar = "———◉———————"
+        pass
     elif 40 <= umm < 50:
-        bar = "————◉——————"
+        pass
     elif 50 <= umm < 60:
-        bar = "——————◉————"
+        pass
     elif 50 <= umm < 70:
-        bar = "———————◉———"
+        pass
     else:
-        bar = "——————————◉"
+        pass
     buttons = [
         [
             InlineKeyboardButton(

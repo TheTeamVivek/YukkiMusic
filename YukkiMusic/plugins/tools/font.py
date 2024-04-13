@@ -1,8 +1,8 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from YukkiMusic.utils.font_string import Fonts
 from YukkiMusic import app
+from YukkiMusic.utils.font_string import Fonts
 
 
 @app.on_message(filters.command(["font", "fonts"]))
