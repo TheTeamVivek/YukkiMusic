@@ -175,7 +175,7 @@ async def del_back_playlist(client, CallbackQuery, _):
     except:
         if chat_id in checker:
             checker.remove(chat_id)
-        return await mystic.edit_text("» ғᴀɪʟᴇᴅ ᴛᴏ ᴄʜᴀɴɢᴇ ᴛʜᴇ sᴘᴇᴇᴅ ᴏғ ᴛʜᴇ ᴏɴɢᴏɪɴɢ sᴛʀᴇᴀᴍ."], reply_markup=close_markup(_))
+        return await mystic.edit_text("» ғᴀɪʟᴇᴅ ᴛᴏ ᴄʜᴀɴɢᴇ ᴛʜᴇ sᴘᴇᴇᴅ ᴏғ ᴛʜᴇ ᴏɴɢᴏɪɴɢ sᴛʀᴇᴀᴍ."), reply_markup=close_markup(_))
     if chat_id in checker:
         checker.remove(chat_id)
     await mystic.edit_text(
