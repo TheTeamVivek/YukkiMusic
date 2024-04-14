@@ -62,11 +62,10 @@ async def assis_set(_, message: Message):
 @app.on_message(filters.command("checkassistant") & filters.group & admin_filter)
 async def check_ass(_, message: Message):
     assistant = await get_assistant(message.chat.id)
-    DETAILS = f""" ʏᴏᴜʀ ᴄʜᴀᴛ's ᴀssɪsᴛᴀɴᴛ ᴅᴇᴛᴀɪʟs:
-		ᴀssɪsᴛᴀɴᴛ ɴᴀᴍᴇ :- {assistant.name}
-		ᴀssɪsᴛᴀɴᴛ ᴜsᴇʀɴᴀᴍᴇ :- {assistant.username}
-		ᴀssɪsᴛᴀɴᴛ ɪᴅ:- @{assistant.id}
-	"""
+    DETAILS = f"""Your chat's assistant details:
+                Assistant Name :- {assistant.name}
+                Assistant Username :- {assistant.username}
+                Assistant ID:- @{assistant.id}"""
     await message.reply_text(
-        DETAILS, disable_web_page_preview = True, protect_content=PK
+        DETAILS, disable_web_page_preview=True, protect_content=PK
     )
