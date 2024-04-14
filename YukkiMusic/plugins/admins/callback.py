@@ -234,6 +234,7 @@ async def del_back_playlist(client, CallbackQuery, _):
         )
     elif command == "Replay":
         txt = f"➻ sᴛʀᴇᴀᴍ ʀᴇ-ᴘʟᴀʏᴇᴅ 🎄\n│ \n└ʙʏ : {mention} 🥀"
+        check = db.get(chat_id)
         await CallbackQuery.answer()
         queued = check[0]["file"]
         title = (check[0]["title"]).title()
