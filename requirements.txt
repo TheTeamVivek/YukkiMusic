@@ -7,6 +7,7 @@ ffmpeg-python
 gitpython
 hachoir
 heroku3
+img2pdf
 lyricsgenius
 motor
 ntgcalls==1.1.2
