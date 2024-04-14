@@ -35,3 +35,13 @@ async def get_assistant_details():
 		
 	return msg
 	
+
+
+async def assistant():
+    from config import STRING1, STRING2, STRING3, STRING4, STRING5
+    filled_count = sum(1 for var in [STRING1, STRING2, STRING3, STRING4, STRING5] if var.strip())  # Count filled variables
+    if filled_count == 1:
+        
+        return True
+    else:
+        return False
