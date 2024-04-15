@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021-present by TeamYukki@Github, < https://github.com/TeamYukki >.
+# Copyright (C) 2024-present by TeamYukki@Github, < https://github.com/TeamYukki >.
 #
 # This file is part of < https://github.com/TeamYukki/YukkiMusicBot > project,
 # and is released under the "GNU v3.0 License Agreement".
@@ -9,55 +9,71 @@
 #
 
 import sys
-
 from pyrogram import Client
-
 import config
-
 from ..logging import LOGGER
+
 
 assistants = []
 assistantids = []
 
-
 class Userbot(Client):
     def __init__(self):
-        self.one = Client(
-            "YukkiString1",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING1),
-            no_updates=True,
-        )
-        self.two = Client(
-            "YukkiString2",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING2),
-            no_updates=True,
-        )
-        self.three = Client(
-            "YukkiString3",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING3),
-            no_updates=True,
-        )
-        self.four = Client(
-            "YukkiString4",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING4),
-            no_updates=True,
-        )
-        self.five = Client(
-            "YukkiString5",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING5),
-            no_updates=True,
-        )
-
+        if config.STRING1:
+            self.one = Client(
+                "YukkiString1",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING1),
+                no_updates=True,
+            )
+        else:
+        	self.one = None
+        
+        if config.STRING2:
+            self.two = Client(
+                "YukkiString2",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING2),
+                no_updates=True,
+            )
+        else:
+        	self.two = None
+        
+        if config.STRING3:
+            self.three = Client(
+                "YukkiString3",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING3),
+                no_updates=True,
+            )
+        else:
+        	self.three = None
+        
+        if config.STRING4:
+            self.four = Client(
+                "YukkiString4",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING4),
+                no_updates=True,
+            )
+        else:
+        	self.four = None
+        
+        if config.STRING5:
+            self.five = Client(
+                "YukkiString5",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING5),
+                no_updates=True,
+            )
+        else:
+        	self.five = None
+        
     async def start(self):
         LOGGER(__name__).info(f"Starting Assistant Clients")
         if config.STRING1:
