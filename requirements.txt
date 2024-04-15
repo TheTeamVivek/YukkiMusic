@@ -3,6 +3,7 @@ aiohttp
 asyncio
 numpy
 dnspython==2.3.0
+fuzzysearch
 ffmpeg-python
 gitpython
 hachoir
@@ -21,8 +22,10 @@ py-tgcalls==1.2.9
 pydictionary==2.0.1
 git+https://github.com/KurimuzonAkuma/pyrogram@dev
 python-dotenv
+python-arq
 pyyaml
 requests
+search-engine-parser
 speedtest-cli
 secureme==0.0.4
 spotipy
