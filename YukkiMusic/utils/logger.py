@@ -17,7 +17,7 @@ from config import LOG_GROUP_ID
 
 async def play_logs(message, streamtype):
     if await is_on_off(2):
-    	if message.chat.username:
+        if message.chat.username:
             chatusername = f"@{message.chat.username}"
         else:
             chatusername = "ᴘʀɪᴠᴀᴛᴇ ɢʀᴏᴜᴘ"
