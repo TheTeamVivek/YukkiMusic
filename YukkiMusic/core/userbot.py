@@ -28,7 +28,7 @@ class Userbot(Client):
                 no_updates=True,
             )
         else:
-            self.one = None
+        	self.one = None
         
         if config.STRING2:
             self.two = Client(
@@ -95,6 +95,7 @@ class Userbot(Client):
             get_me = await self.one.get_me()
             self.one.username = get_me.username
             self.one.id = get_me.id
+            self.one.mention = get_me.mention
             assistantids.append(get_me.id)
             if get_me.last_name:
                 self.one.name = get_me.first_name + " " + get_me.last_name
@@ -120,6 +121,7 @@ class Userbot(Client):
             get_me = await self.two.get_me()
             self.two.username = get_me.username
             self.two.id = get_me.id
+            self.two.mention = get_me.mention
             assistantids.append(get_me.id)
             if get_me.last_name:
                 self.two.name = get_me.first_name + " " + get_me.last_name
@@ -145,6 +147,7 @@ class Userbot(Client):
             get_me = await self.three.get_me()
             self.three.username = get_me.username
             self.three.id = get_me.id
+            self.three.mention = get_me.mention
             assistantids.append(get_me.id)
             if get_me.last_name:
                 self.three.name = get_me.first_name + " " + get_me.last_name
@@ -170,6 +173,7 @@ class Userbot(Client):
             get_me = await self.four.get_me()
             self.four.username = get_me.username
             self.four.id = get_me.id
+            self.four.mention = get_me.mention
             assistantids.append(get_me.id)
             if get_me.last_name:
                 self.four.name = get_me.first_name + " " + get_me.last_name
@@ -195,9 +199,27 @@ class Userbot(Client):
             get_me = await self.five.get_me()
             self.five.username = get_me.username
             self.five.id = get_me.id
+            self.five.mention = get_me.mention
             assistantids.append(get_me.id)
             if get_me.last_name:
                 self.five.name = get_me.first_name + " " + get_me.last_name
             else:
                 self.five.name = get_me.first_name
             LOGGER(__name__).info(f"Assistant Five Started as {self.five.name}")
+
+
+    async def stop(self):
+        LOGGER(__name__).info(f"Stopping Assistants...")
+        try:
+            if config.STRING1:
+                await self.one.stop()
+            if config.STRING2:
+                await self.two.stop()
+            if config.STRING3:
+                await self.three.stop()
+            if config.STRING4:
+                await self.four.stop()
+            if config.STRING5:
+                await self.five.stop()
+        except:
+            pass
