@@ -8,7 +8,7 @@ from pyrogram import filters
 from pytube import YouTube
 from requests import get
 
-from YukkiMusic import aiohttpsession
+from aiohttp import ClientSession
 from YukkiMusic import app, arq
 from YukkiMusic.utils.error import capture_err
 from YukkiMusic.utils.pastebin import Yukkibin
@@ -104,7 +104,7 @@ async def music(_, message):
 
 # Funtion To Download Song
 async def download_song(url):
-    async with aiohttpsession.get(url) as resp:
+    async with ClientSession().get(url) as resp:
         song = await resp.read()
     song = BytesIO(song)
     song.name = "a.mp3"
@@ -153,29 +153,3 @@ async def jssong(_, message):
     is_downloading = False
     song.close()
 
-
-# Lyrics
-
-
-@app.on_message(filters.command("lyri"))
-async def lyrics_func(_, message):
-    if len(message.command) < 2:
-        return await message.reply_text("**Usage:**\n/lyrics [QUERY]")
-    m = await message.reply_text("**Searching**")
-    query = message.text.strip().split(None, 1)[1]
-
-    resp = await arq.lyrics(query)
-
-    if not (resp.ok and resp.result):
-        return await m.edit("No lyrics found.")
-
-    song = resp.result[0]
-    song_name = song["song"]
-    artist = song["artist"]
-    lyrics = song["lyrics"]
-    msg = f"**{song_name}** | **{artist}**\n\n__{lyrics}__"
-
-    if len(msg) > 4095:
-        msg = await Yukkibin(msg)
-        msg = f"**LYRICS_TOO_LONG:** [URL]({msg})"
-    return await m.edit(msg)
