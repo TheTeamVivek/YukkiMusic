@@ -31,7 +31,40 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 
 ASSISTANT_PREFIX = getenv("ASSISTANT_PREFIX", ".")
 
+#
+
+#set True to enable autogcast set False or anything to disable it
+AUTO_GCAST = getenv("AUTO_GCAST", "True")
+ 
+ 
+#set time for auto gcast after this time interval bot do autogcast
+AUTO_GCAST_DELAY_TIME = getenv("AUTO_GCAST_DELAY_TIME", "10,800")
+ #defaults to 3 hours
+  
+#Auto gcast msg 
+AUTO_GCAST_MSG = f"""нєу, ɪ ᴀᴍ {app.mention}
+
+✰ I'ᴍ ᴀ ᴛᴇʟᴇɢʀᴀᴍ sᴛʀᴇᴀᴍɪɴɢ ʙᴏᴛ ᴡɪᴛʜ sᴏᴍᴇ ᴜsᴇғᴜʟ ғᴇᴀᴛᴜʀᴇs.
+
+Sᴜᴘᴘᴏʀᴛɪɴɢ ᴘʟᴀᴛғᴏʀᴍs :
+➪ ᴀᴘᴘʟᴇ
+➪ ʀᴇssᴏ
+➪ Sᴏᴜɴᴅᴄʟᴏᴜᴅ
+➪ Sᴘᴏᴛɪғʏ
+➪ ʏᴏᴜᴛᴜʙᴇ
+➪ ᴛᴇʟᴇɢʀᴀᴍ [ ᴀᴜᴅɪᴏ + ᴠɪᴅᴇᴏ ʟᴏᴄᴀʟ ғɪʟᴇ]
+
+✰ ᴀᴅs ғʀᴇᴇ ᴍᴜsɪᴄ ʙᴏᴛ ʙᴀsᴇᴅ ᴏɴ ʏᴜᴋᴋɪ's ʀᴇᴘᴏ ᴡɪᴛʜ ᴇxᴛʀᴀ ғᴇᴀᴛᴜʀᴇs ᴀɴᴅ ғɪxᴇᴅ ʙᴜɢ's
+
+✰ Fᴇᴇʟ ғʀᴇᴇ ᴛᴏ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘs."""
+
+
 # ________________________________________________________________________________#
+
+
+
+
+ ________________________________________________________________________________#
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
