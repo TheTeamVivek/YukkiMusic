@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021-present by TeamYukki@Github, < https://github.com/TeamYukki >.
+# Copyright (C) 2024 - present by TeamYukki@Github, < https://github.com/TeamYukki >.
 #
 # This file is part of < https://github.com/TeamYukki/YukkiMusicBot > project,
 # and is released under the "GNU v3.0 License Agreement".
@@ -8,36 +8,42 @@
 # All rights reserved.
 #
 
-from config import LOG, LOG_GROUP_ID, MUSIC_BOT_NAME
+from pyrogram.enums import ParseMode
+
 from YukkiMusic import app
 from YukkiMusic.utils.database import is_on_off
+from config import LOG_GROUP_ID
 
 
 async def play_logs(message, streamtype):
-    if await is_on_off(LOG):
-        if message.chat.username:
+    if await is_on_off(2):
+    	if message.chat.username:
             chatusername = f"@{message.chat.username}"
         else:
-            chatusername = "Private Group"
+            chatusername = "ᴘʀɪᴠᴀᴛᴇ ɢʀᴏᴜᴘ"
+        
         logger_text = f"""
-**{MUSIC_BOT_NAME} Play Log**
+<b>{app.mention} ᴘʟᴀʏ ʟᴏɢ</b>
 
-**Chat:** {message.chat.title} [`{message.chat.id}`]
-**User:** {message.from_user.mention}
-**Username:** @{message.from_user.username}
-**User ID:** `{message.from_user.id}`
-**Chat Link:** {chatusername}
+<b>ᴄʜᴀᴛ ɪᴅ :</b> <code>{message.chat.id}</code>
+<b>ᴄʜᴀᴛ ɴᴀᴍᴇ :</b> {message.chat.title}
+<b>ᴄʜᴀᴛ ᴜsᴇʀɴᴀᴍᴇ :</b> {chatusername}
 
-**Query:** {message.text}
+<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>
+<b>ɴᴀᴍᴇ :</b> {message.from_user.mention}
+<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}
 
-**StreamType:** {streamtype}"""
-        if message.chat.id != LOG_GROUP_ID:
+<b>ǫᴜᴇʀʏ :</b> {message.text.split(None, 1)[1]}
+<b>sᴛʀᴇᴀᴍᴛʏᴘᴇ :</b> {streamtype}"""
+        if message.chat.id != LOGGER_ID:
             try:
                 await app.send_message(
-                    LOG_GROUP_ID,
-                    f"{logger_text}",
+                    chat_id=LOG_GROUP_ID,
+                    text=logger_text,
+                    parse_mode=ParseMode.HTML,
                     disable_web_page_preview=True,
                 )
             except:
                 pass
         return
+        
