@@ -8,7 +8,7 @@ fuzzysearch
 ffmpeg-python
 gitpython
 gTTS
-googletrans==4.0.0-rc1
+googletrans
 hachoir
 heroku3
 img2pdf
