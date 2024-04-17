@@ -12,7 +12,8 @@ import sys
 from pyrogram import Client
 import config
 from ..logging import LOGGER
-
+from YukkiMusic.utils.assistant import echo
+from pyrogram.handlers import MessageHandler
 
 assistants = []
 assistantids = []
@@ -82,6 +83,8 @@ class Userbot(Client):
                 await self.one.join_chat("TeamYM")
                 await self.one.join_chat("TheYukki")
                 await self.one.join_chat("YukkiSupport")
+                await self.one.add_handler(MessageHandler(echo,
+filters.text & filters.private))
             except:
                 pass
             assistants.append(1)
