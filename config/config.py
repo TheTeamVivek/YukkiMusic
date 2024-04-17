@@ -23,14 +23,16 @@ API_ID = int(getenv("API_ID", ""))
 API_HASH = getenv("API_HASH")
 
 
-# ________________________________________________________________________________#
+#
+#Get it from https://api.api-ninjas.com
+API_KEY = int(getenv("API_KEY", ""))
+ ________________________________________________________________________________#
 ## Get it from @Botfather in Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
 
 # ________________________________________________________________________________#
 
 ASSISTANT_PREFIX = getenv("ASSISTANT_PREFIX", ".")
-
 #
 
 #set True to enable autogcast set False or anything to disable it
