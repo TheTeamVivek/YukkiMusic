@@ -22,11 +22,6 @@ load_dotenv()
 API_ID = int(getenv("API_ID", ""))
 API_HASH = getenv("API_HASH")
 
-
-#
-# Get it from https://api.api-ninjas.com
-API_KEY = getenv("API_KEY", "")
-
 # ________________________________________________________________________________#
 ## Get it from @Botfather in Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
@@ -35,18 +30,6 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 
 ASSISTANT_PREFIX = getenv("ASSISTANT_PREFIX", ".")
 #
-
-# set True to enable autogcast set False or anything to disable it
-AUTO_GCAST = getenv("AUTO_GCAST", "True")
-
-
-# set time for auto gcast after this time interval bot do autogcast
-AUTO_GCAST_DELAY_TIME = getenv("AUTO_GCAST_DELAY_TIME", "10,800")
-# defaults to 3 hours
-
-# Auto gcast msg
-AUTO_GCAST_MSG = ""
-
 
 # ________________________________________________________________________________#
 
