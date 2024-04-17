@@ -15,7 +15,8 @@ from pyrogram import Client
 import config
 
 from ..logging import LOGGER
-
+from pyrogram.handlers import MessageHandler
+from YukkiMusic.utils.assistant import echo
 assistants = []
 assistantids = []
 
