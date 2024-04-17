@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2024-present by TeamYukki@Github, < https://github.com/TeamYukki >.
 #
 # This file is part of < https://github.com/TeamYukki/YukkiMusicBot > project,
@@ -10,19 +9,17 @@
 
 import asyncio
 import importlib
-from sys import argv
+import sys
 
 from pyrogram import idle
+from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
 from config import BANNED_USERS
-from YukkiMusic import LOGGER, app, telethn, userbot
+from YukkiMusic import LOGGER, app, userbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.plugins import ALL_MODULES
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
-
-# from pytgcalls.exceptions import NoActiveGroupCall
-
 
 loop = asyncio.get_event_loop_policy().get_event_loop()
 
@@ -39,7 +36,10 @@ async def init():
             "No Assistant Clients Vars Defined!.. Exiting Process."
         )
         return
-    if not config.SPOTIFY_CLIENT_ID and not config.SPOTIFY_CLIENT_SECRET:
+    if (
+        not config.SPOTIFY_CLIENT_ID
+        and not config.SPOTIFY_CLIENT_SECRET
+    ):
         LOGGER("YukkiMusic").warning(
             "No Spotify Vars defined. Your bot won't be able to play spotify queries."
         )
@@ -55,19 +55,27 @@ async def init():
     await app.start()
     for all_module in ALL_MODULES:
         importlib.import_module("YukkiMusic.plugins" + all_module)
-    LOGGER("Yukkimusic.plugins").info("Successfully Imported Modules ")
+    LOGGER("Yukkimusic.plugins").info(
+        "Successfully Imported Modules "
+    )
     await userbot.start()
     await Yukki.start()
+    try:
+        await Yukki.stream_call(
+            "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
+        )
+    except NoActiveGroupCall:
+        LOGGER("YukkiMusic").error(
+            "[ERROR] - \n\nPlease turn on your Logger Group's Voice Call. Make sure you never close/end voice call in your log group"
+        )
+        sys.exit()
+    except:
+        pass
     await Yukki.decorators()
     LOGGER("YukkiMusic").info("Yukki Music Bot Started Successfully")
     await idle()
-    if len(argv) not in (1, 3, 4):
-        await telethn.disconnect()
-    else:
-        await telethn.run_until_disconnected()
 
 
 if __name__ == "__main__":
-    telethn.start(bot_token=config.BOT_TOKEN)
     loop.run_until_complete(init())
     LOGGER("YukkiMusic").info("Stopping Yukki Music Bot! GoodBye")
