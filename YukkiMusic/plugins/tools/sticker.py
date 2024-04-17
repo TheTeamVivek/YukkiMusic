@@ -14,11 +14,7 @@ from pyrogram.errors import (
     UserIsBlocked,
 )
 
-from pyrogram.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    Message
-)
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 import math
 
 from PIL import Image
@@ -36,8 +32,6 @@ MAX_STICKERS = (
 )
 SUPPORTED_TYPES = ["jpeg", "png", "webp"]
 STICKER_DIMENSIONS = (512, 512)
-
-
 
 
 async def get_sticker_set_by_name(
@@ -95,7 +89,8 @@ async def create_sticker(
     sticker: raw.base.InputDocument, emoji: str
 ) -> raw.base.InputStickerSetItem:
     return raw.types.InputStickerSetItem(document=sticker, emoji=emoji)
-    
+
+
 async def resize_file_to_sticker_size(file_path: str) -> str:
     im = Image.open(file_path)
     if (im.width, im.height) < STICKER_DIMENSIONS:
@@ -130,8 +125,7 @@ async def upload_document(
         raw.functions.messages.UploadMedia(
             peer=await client.resolve_peer(chat_id),
             media=raw.types.InputMediaUploadedDocument(
-                mime_type=client.guess_mime_type(file_path)
-                or "application/zip",
+                mime_type=client.guess_mime_type(file_path) or "application/zip",
                 file=await client.save_file(file_path),
                 attributes=[
                     raw.types.DocumentAttributeFilename(
@@ -157,7 +151,7 @@ async def get_document_from_file_id(
         access_hash=decoded.access_hash,
         file_reference=decoded.file_reference,
     )
-    
+
 
 @app.on_message(filters.command("stickerid"))
 @capture_err
@@ -204,19 +198,14 @@ async def kang(client, message: Message):
     if not message.reply_to_message:
         return await message.reply_text("Reply to a sticker/image to kang it.")
     if not message.from_user:
-        return await message.reply_text(
-            "You are anon admin, kang stickers in my pm."
-        )
+        return await message.reply_text("You are anon admin, kang stickers in my pm.")
     msg = await message.reply_text("Kanging Sticker..")
 
     # Find the proper emoji
     args = message.text.split()
     if len(args) > 1:
         sticker_emoji = str(args[1])
-    elif (
-        message.reply_to_message.sticker
-        and message.reply_to_message.sticker.emoji
-    ):
+    elif message.reply_to_message.sticker and message.reply_to_message.sticker.emoji:
         sticker_emoji = message.reply_to_message.sticker.emoji
     else:
         sticker_emoji = "🤔"
@@ -238,13 +227,9 @@ async def kang(client, message: Message):
             temp_file_path = await app.download_media(doc)
             image_type = imghdr.what(temp_file_path)
             if image_type not in SUPPORTED_TYPES:
-                return await msg.edit(
-                    "Format not supported! ({})".format(image_type)
-                )
+                return await msg.edit("Format not supported! ({})".format(image_type))
             try:
-                temp_file_path = await resize_file_to_sticker_size(
-                    temp_file_path
-                )
+                temp_file_path = await resize_file_to_sticker_size(temp_file_path)
             except OSError as e:
                 await msg.edit_text("Something wrong happened.")
                 raise Exception(
@@ -328,8 +313,6 @@ async def kang(client, message: Message):
         await message.reply_text("The sticker png dimensions are invalid.")
 
 
-
-
 __HELP__ = """
 /sticker_id
     To get FileID of a Sticker.
@@ -337,4 +320,3 @@ __HELP__ = """
     To get sticker as a photo and document.
 /kang
     To kang a Sticker or an Image."""
-    

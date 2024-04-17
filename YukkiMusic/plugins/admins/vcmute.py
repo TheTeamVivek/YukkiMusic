@@ -16,6 +16,7 @@ from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import is_muted, mute_on
 from YukkiMusic.utils.decorators import AdminRightsCheck
 
+
 @app.on_message(filters.command(["vcmute"]) & filters.group & ~BANNED_USERS)
 @AdminRightsCheck
 async def mute_admin(cli, message: Message, _, chat_id):

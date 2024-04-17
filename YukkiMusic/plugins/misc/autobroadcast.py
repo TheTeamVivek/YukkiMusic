@@ -31,7 +31,9 @@ Sᴜᴘᴘᴏʀᴛɪɴɢ ᴘʟᴀᴛғᴏʀᴍs :
 BUTTON = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton(f"᯽ 𝙺ɪᴅɴᴀᴘ 𝙼ᴇ ᯽", url=f"https://t.me/{app.username}?startgroup=true")
+            InlineKeyboardButton(
+                f"᯽ 𝙺ɪᴅɴᴀᴘ 𝙼ᴇ ᯽", url=f"https://t.me/{app.username}?startgroup=true"
+            )
         ]
     ]
 )
@@ -40,19 +42,21 @@ MSG = AUTO_GCAST_MSG if AUTO_GCAST_MSG else MESSAGE
 
 TEXT = """**ᴀᴜᴛᴏ ɢᴄᴀsᴛ ɪs ᴇɴᴀʙʟᴇᴅ sᴏ ᴀᴜᴛᴏ ɢᴄᴀsᴛ/ʙʀᴏᴀᴅᴄᴀsᴛ ɪs ᴅᴏɪɴ ɪɴ ᴀʟʟ  ᴄᴏɴᴛɪɴᴜᴏᴜsʟʏ ᴛᴏ ᴀʟʟ ᴜsᴇʀs. **\n**ɪᴛ ᴄᴀɴ ʙᴇ sᴛᴏᴘᴘᴇᴅ ʙʏ ᴘᴜᴛ ᴠᴀʀɪᴀʙʟᴇ [ᴀᴜᴛᴏ_ɢᴄᴀsᴛ = (ᴋᴇᴇᴘ ʙʟᴀɴᴋ & ᴀɴᴅ sᴇᴛ ᴛᴏ ғᴀʟsᴇ)]**"""
 
+
 async def send_notice():
     try:
         await app.send_message(LOGGER_ID, TEXT)
-    except :
+    except:
         pass
+
 
 async def send_message_to_users():
     try:
         users = await get_served_users()
 
         for i in users:
-            user_id = i.get('user_id')
-            if isinstance(user_id, int): 
+            user_id = i.get("user_id")
+            if isinstance(user_id, int):
                 try:
                     await app.send_message(user_id, text=MSG, reply_markup=BUTTON)
                 except FloodWait as e:
@@ -62,8 +66,9 @@ async def send_message_to_users():
     except:
         pass
 
+
 async def continuous_broadcast():
-    await send_notice() 
+    await send_notice()
     while True:
         try:
             await send_message_to_users()

@@ -40,18 +40,19 @@ def isArgInt(message: Message) -> list:
     except ValueError:
         return [False, 0]
 
+
 @app.on_message(filters.command("q") & ~filters.group & ~BANNED_USERS)
 async def song_commad_group(client, message: Message, _):
-	await message.reply_text("buddy you can use this command in my pm/dm")
+    await message.reply_text("buddy you can use this command in my pm/dm")
+
+
 @app.on_message(filters.command("q") & ~filters.private & ~BANNED_USERS)
 @capture_err
 async def quotly_func(client, message: Message):
     if not message.reply_to_message:
         return await message.reply_text("Reply to a message to quote it.")
     if not message.reply_to_message.text:
-        return await message.reply_text(
-            "Replied message has no text, can't quote it."
-        )
+        return await message.reply_text("Replied message has no text, can't quote it.")
     m = await message.reply_text("Quoting Messages")
     if len(message.command) < 2:
         messages = [message.reply_to_message]
@@ -91,9 +92,7 @@ async def quotly_func(client, message: Message):
             )
             messages = [reply_message]
     else:
-        return await m.edit(
-            "Incorrect argument, check quotly module in help section."
-        )
+        return await m.edit("Incorrect argument, check quotly module in help section.")
     try:
         if not message:
             return await m.edit("Something went wrong.")

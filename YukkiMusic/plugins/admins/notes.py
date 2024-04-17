@@ -27,6 +27,7 @@ from YukkiMusic.utils.functions import (
     get_data_and_name,
 )
 
+
 def extract_urls(reply_markup):
     urls = []
     if reply_markup.inline_keyboard:
@@ -42,6 +43,7 @@ def extract_urls(reply_markup):
                     urls.append((f"{name}", button.text, button.url))
     return urls
 
+
 async def eor(msg: Message, **kwargs):
     func = (
         (msg.edit_text if msg.from_user.is_self else msg.reply)
@@ -50,8 +52,8 @@ async def eor(msg: Message, **kwargs):
     )
     spec = getfullargspec(func.__wrapped__).args
     return await func(**{k: v for k, v in kwargs.items() if k in spec})
-    
-    
+
+
 @app.on_message(filters.command("save") & filters.group & ~BANNED_USERS)
 @adminsOnly("can_change_info")
 async def save_notee(_, message):
@@ -139,6 +141,7 @@ async def get_notes(_, message):
         msg += f"**-** `{note}`\n"
     await eor(message, text=msg)
 
+
 @app.on_message(filters.command("get") & filters.group & ~BANNED_USERS)
 @capture_err
 async def get_one_note(_, message):
@@ -169,12 +172,15 @@ async def get_one_note(_, message):
                 data, keyb = keyboard
     replied_message = message.reply_to_message
     if replied_message:
-        replied_user = replied_message.from_user if replied_message.from_user else replied_message.sender_chat
+        replied_user = (
+            replied_message.from_user
+            if replied_message.from_user
+            else replied_message.sender_chat
+        )
         if replied_user.id != from_user.id:
             message = replied_message
     await get_reply(message, type, file_id, data, keyb)
-    
-    
+
 
 @app.on_message(filters.regex(r"^#.+") & filters.text & filters.group & ~BANNED_USERS)
 @capture_err
@@ -204,7 +210,11 @@ async def get_one_note(_, message):
                 data, keyb = keyboard
     replied_message = message.reply_to_message
     if replied_message:
-        replied_user = replied_message.from_user if replied_message.from_user else replied_message.sender_chat
+        replied_user = (
+            replied_message.from_user
+            if replied_message.from_user
+            else replied_message.sender_chat
+        )
         if replied_user.id != from_user.id:
             message = replied_message
     await get_reply(message, type, file_id, data, keyb)
@@ -262,6 +272,7 @@ async def get_reply(message, type, file_id, data, keyb):
             reply_markup=keyb,
         )
 
+
 @app.on_message(filters.command("delete") & filters.group & ~BANNED_USERS)
 @adminsOnly("can_change_info")
 async def del_note(_, message):
@@ -290,9 +301,7 @@ async def delete_all(_, message):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton(
-                        "YES, DO IT", callback_data="delete_yes"
-                    ),
+                    InlineKeyboardButton("YES, DO IT", callback_data="delete_yes"),
                     InlineKeyboardButton("Cancel", callback_data="delete_no"),
                 ]
             ]

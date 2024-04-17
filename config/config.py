@@ -24,10 +24,10 @@ API_HASH = getenv("API_HASH")
 
 
 #
-#Get it from https://api.api-ninjas.com
+# Get it from https://api.api-ninjas.com
 API_KEY = getenv("API_KEY", "")
 
-#________________________________________________________________________________#
+# ________________________________________________________________________________#
 ## Get it from @Botfather in Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
 
@@ -36,24 +36,22 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 ASSISTANT_PREFIX = getenv("ASSISTANT_PREFIX", ".")
 #
 
-#set True to enable autogcast set False or anything to disable it
+# set True to enable autogcast set False or anything to disable it
 AUTO_GCAST = getenv("AUTO_GCAST", "True")
- 
- 
-#set time for auto gcast after this time interval bot do autogcast
+
+
+# set time for auto gcast after this time interval bot do autogcast
 AUTO_GCAST_DELAY_TIME = getenv("AUTO_GCAST_DELAY_TIME", "10,800")
- #defaults to 3 hours
-  
-#Auto gcast msg 
+# defaults to 3 hours
+
+# Auto gcast msg
 AUTO_GCAST_MSG = ""
 
 
 # ________________________________________________________________________________#
 
 
-
-
- #________________________________________________________________________________#
+# ________________________________________________________________________________#
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 

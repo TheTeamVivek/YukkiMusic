@@ -47,7 +47,8 @@ vlimit = []
 maintenance = []
 suggestion = {}
 autoend = {}
-
+
+
 async def get_notes_count() -> dict:
     chats_count = 0
     notes_count = 0
@@ -106,7 +107,6 @@ async def delete_note(chat_id: int, name: str) -> bool:
 
 async def deleteall_notes(chat_id: int):
     return await notesdb.delete_one({"chat_id": chat_id})
-
 
 
 # couple

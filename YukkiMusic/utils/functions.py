@@ -4,6 +4,7 @@ from re import findall
 from re import sub as re_sub
 from pyrogram.types import Message
 
+
 def extract_text_and_keyb(ikb, text: str, row_width: int = 2):
     keyboard = {}
     try:
@@ -55,19 +56,13 @@ async def get_data_and_name(replied_message, message):
     if len(text) > 1:
         name = text[0]
         data = text[1].strip()
-        if replied_message and (
-            replied_message.sticker or replied_message.video_note
-        ):
+        if replied_message and (replied_message.sticker or replied_message.video_note):
             data = None
     else:
-        if replied_message and (
-            replied_message.sticker or replied_message.video_note
-        ):
+        if replied_message and (replied_message.sticker or replied_message.video_note):
             data = None
         elif (
-            replied_message
-            and not replied_message.text
-            and not replied_message.caption
+            replied_message and not replied_message.text and not replied_message.caption
         ):
             data = None
         else:
@@ -85,8 +80,7 @@ async def get_data_and_name(replied_message, message):
                 if match == data:
                     data = None
     return data, name
-    
-    
+
 
 async def extract_user_and_reason(message, sender_chat=False):
     args = message.text.strip().split()
@@ -173,9 +167,10 @@ def get_file_id_from_message(
             return
         file_id = message.video.thumbs[0].file_id
     return file_id
-    
+
+
 async def time_converter(message: Message, time_value: str) -> datetime:
-    unit = ["m", "h", "d"] 
+    unit = ["m", "h", "d"]
     check_unit = "".join(list(filter(time_value[-1].lower().endswith, unit)))
     currunt_time = datetime.now()
     time_digit = time_value[:-1]
@@ -190,5 +185,3 @@ async def time_converter(message: Message, time_value: str) -> datetime:
     else:
         return await message.reply_text("Incorrect time specified.")
     return temp_time
-    
-    
