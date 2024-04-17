@@ -25,7 +25,7 @@ API_HASH = getenv("API_HASH")
 
 #
 #Get it from https://api.api-ninjas.com
-API_KEY = getenv("API_KEY", ""))
+API_KEY = getenv("API_KEY", "")
 
 #________________________________________________________________________________#
 ## Get it from @Botfather in Telegram.
