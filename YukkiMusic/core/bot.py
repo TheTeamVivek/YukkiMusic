@@ -34,7 +34,7 @@ class YukkiBot(Client):
         get_me = await self.get_me()
         self.username = get_me.username
         self.id = get_me.id
-        self.mention = get_me.mention
+        self.mention = self.me.mention
         try:
             await self.send_message(
                 config.LOG_GROUP_ID, "Bot Started"
