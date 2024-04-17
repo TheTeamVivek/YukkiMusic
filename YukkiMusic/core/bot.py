@@ -83,5 +83,5 @@ class YukkiBot(Client):
             self.name = get_me.first_name
         LOGGER(__name__).info(f"MusicBot Started as {self.name}")
 
-async def stop(self):
+    async def stop(self):
         await super().stop()
