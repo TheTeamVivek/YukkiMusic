@@ -7,12 +7,14 @@ from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import is_gbanned_user
 from YukkiMusic.utils.sections import section
+
 __MODULE__ = "Info"
 __HELP__ = """
 /info [USERNAME|ID] - Get info about a user.
 /chat_info [USERNAME|ID] - Get info about a chat.
 """
-    
+
+
 async def get_user_info(user, already=False):
     if not already:
         user = await app.get_users(user)
@@ -102,9 +104,7 @@ async def chat_info_func(_, message: Message):
     if len(splited) == 1:
         chat = message.chat.id
         if chat == message.from_user.id:
-            return await message.reply_text(
-                "**Usage:**/chat_info [USERNAME|ID]"
-            )
+            return await message.reply_text("**Usage:**/chat_info [USERNAME|ID]")
     else:
         chat = splited[1]
     try:

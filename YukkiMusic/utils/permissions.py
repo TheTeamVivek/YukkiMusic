@@ -7,6 +7,7 @@ from pyrogram.types import Message, ChatPrivileges
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 
+
 async def member_permissions(chat_id: int, user_id: int):
     perms = []
     member = (await app.get_chat_member(chat_id, user_id)).privileges
@@ -31,8 +32,8 @@ async def member_permissions(chat_id: int, user_id: int):
     if member.can_manage_video_chats:
         perms.append("can_manage_video_chats")
     return perms
-    
-    
+
+
 async def authorised(func, subFunc2, client, message, *args, **kwargs):
     chatID = message.chat.id
     try:
@@ -69,10 +70,7 @@ def adminsOnly(permission):
             chatID = message.chat.id
             if not message.from_user:
                 # For anonymous admins
-                if (
-                    message.sender_chat
-                    and message.sender_chat.id == message.chat.id
-                ):
+                if message.sender_chat and message.sender_chat.id == message.chat.id:
                     return await authorised(
                         func,
                         subFunc2,
@@ -87,9 +85,7 @@ def adminsOnly(permission):
             permissions = await member_permissions(chatID, userID)
             if userID not in SUDOERS and permission not in permissions:
                 return await unauthorised(message, permission, subFunc2)
-            return await authorised(
-                func, subFunc2, client, message, *args, **kwargs
-            )
+            return await authorised(func, subFunc2, client, message, *args, **kwargs)
 
         return subFunc2
 

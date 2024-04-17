@@ -30,9 +30,7 @@ def download_youtube_audio(arq_resp):
     performer = r.channel
 
     m, s = r.duration.split(":")
-    duration = int(
-        datetime.timedelta(minutes=int(m), seconds=int(s)).total_seconds()
-    )
+    duration = int(datetime.timedelta(minutes=int(m), seconds=int(s)).total_seconds())
 
     if duration > 1800:
         return
@@ -67,9 +65,7 @@ async def music(_, message):
             "Another download is in progress, try again after sometime."
         )
     is_downloading = True
-    m = await message.reply_text(
-        f"Downloading {url}", disable_web_page_preview=True
-    )
+    m = await message.reply_text(f"Downloading {url}", disable_web_page_preview=True)
     try:
         loop = get_running_loop()
         arq_resp = await arq.youtube(url)
@@ -152,4 +148,3 @@ async def jssong(_, message):
         return await m.edit(str(e))
     is_downloading = False
     song.close()
-

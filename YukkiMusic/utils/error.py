@@ -4,6 +4,7 @@ from pyrogram.errors.exceptions.forbidden_403 import ChatWriteForbidden
 from YukkiMusic import app
 from config import LOG_GROUP_ID
 
+
 def capture_err(func):
     @wraps(func)
     async def capture(client, message, *args, **kwargs):
@@ -27,4 +28,3 @@ def capture_err(func):
             raise err
 
     return capture
-    

@@ -9,4 +9,3 @@ from YukkiMusic.core.call import Yukki
 @app.on_message(filters.video_chat_ended, group=30)
 async def vc_close_open(_, message: Message):
     await Yukki.force_stop_stream(message.chat.id)
-

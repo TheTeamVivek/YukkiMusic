@@ -18,6 +18,7 @@ from pyrogram.handlers import MessageHandler
 assistants = []
 assistantids = []
 
+
 class Userbot(Client):
     def __init__(self):
         if config.STRING1:
@@ -29,8 +30,8 @@ class Userbot(Client):
                 no_updates=True,
             )
         else:
-        	self.one = None
-        
+            self.one = None
+
         if config.STRING2:
             self.two = Client(
                 "YukkiString2",
@@ -40,8 +41,8 @@ class Userbot(Client):
                 no_updates=True,
             )
         else:
-        	self.two = None
-        
+            self.two = None
+
         if config.STRING3:
             self.three = Client(
                 "YukkiString3",
@@ -51,8 +52,8 @@ class Userbot(Client):
                 no_updates=True,
             )
         else:
-        	self.three = None
-        
+            self.three = None
+
         if config.STRING4:
             self.four = Client(
                 "YukkiString4",
@@ -62,8 +63,8 @@ class Userbot(Client):
                 no_updates=True,
             )
         else:
-        	self.four = None
-        
+            self.four = None
+
         if config.STRING5:
             self.five = Client(
                 "YukkiString5",
@@ -73,8 +74,8 @@ class Userbot(Client):
                 no_updates=True,
             )
         else:
-        	self.five = None
-        
+            self.five = None
+
     async def start(self):
         LOGGER(__name__).info(f"Starting Assistant Clients")
         if config.STRING1:
@@ -83,8 +84,9 @@ class Userbot(Client):
                 await self.one.join_chat("TeamYM")
                 await self.one.join_chat("TheYukki")
                 await self.one.join_chat("YukkiSupport")
-                await self.one.add_handler(MessageHandler(echo,
-filters.text & filters.private))
+                await self.one.add_handler(
+                    MessageHandler(echo, filters.text & filters.private)
+                )
             except:
                 pass
             assistants.append(1)

@@ -10,6 +10,7 @@ from pyrogram.types import Message
 from YukkiMusic import app
 from config import BANNED_USERS
 
+
 def convert(text):
     audio = BytesIO()
     i = Translator().translate(text, dest="en")
@@ -20,7 +21,7 @@ def convert(text):
     return audio
 
 
-@app.on_message(filters.command("tts") & ~BANNED_USERS )
+@app.on_message(filters.command("tts") & ~BANNED_USERS)
 async def text_to_speech(_, message: Message):
     if not message.reply_to_message:
         return await message.reply_text("Reply to some text ffs.")

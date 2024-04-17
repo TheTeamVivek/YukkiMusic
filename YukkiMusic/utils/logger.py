@@ -21,7 +21,7 @@ async def play_logs(message, streamtype):
             chatusername = f"@{message.chat.username}"
         else:
             chatusername = "ᴘʀɪᴠᴀᴛᴇ ɢʀᴏᴜᴘ"
-        
+
         logger_text = f"""
 <b>{app.mention} ᴘʟᴀʏ ʟᴏɢ</b>
 
@@ -46,4 +46,3 @@ async def play_logs(message, streamtype):
             except:
                 pass
         return
-        

@@ -207,7 +207,7 @@ class Call(PyTgCalls):
             db[chat_id][0]["seconds"] = dur
             db[chat_id][0]["speed_path"] = out
             db[chat_id][0]["speed"] = speed
-            
+
     async def force_stop_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         try:
