@@ -67,8 +67,8 @@ async def continuous_broadcast():
     while True:
     	try:
             await send_message_to_users()
-        except:
-            pass
+            except:
+                pass
         await asyncio.sleep(AUTO_GCAST_DELAY_TIME)
         
 if AUTO_GCAST == str(True):
