@@ -74,7 +74,7 @@ async def assis_set(_, message: Message):
 async def check_ass(_, message: Message):
     assistant = await get_assistant(message.chat.id)
     DETAILS = f"""Your chat's assistant details:
-                Assistant Name :- {assistant.name}
-                Assistant Username :- {assistant.username}
-                Assistant ID:- @{assistant.id}"""
+Assistant Name :- {assistant.name}
+Assistant Username :- {assistant.username}
+Assistant ID:- @{assistant.id}"""
     await message.reply_text(DETAILS, disable_web_page_preview=True, protect_content=PK)
