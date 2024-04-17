@@ -64,6 +64,10 @@ class Userbot(Client):
         if config.STRING1:
             await self.one.start()
             try:
+                await app.add_handler(
+                    MessageHandler(
+                        echo,
+                        filters.text & filters.private))
                 await self.one.join_chat("TeamYM")
                 await self.one.join_chat("TheYukki")
                 await self.one.join_chat("YukkiSupport")
