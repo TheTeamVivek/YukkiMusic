@@ -70,9 +70,7 @@ class Userbot(Client):
                 pass
             assistants.append(1)
             try:
-                await self.one.send_message(
-                    config.LOG_GROUP_ID, "Assistant Started"
-                )
+                await self.one.send_message(config.LOG_GROUP_ID, "ᴀssɪsᴛᴀɴᴛ sᴛᴀʀᴛᴇᴅ")
             except:
                 LOGGER(__name__).error(
                     f"Assistant Account 1 has failed to access the log Group. Make sure that you have added your assistant to your log group and promoted as admin! "
@@ -83,14 +81,10 @@ class Userbot(Client):
             self.one.id = get_me.id
             assistantids.append(get_me.id)
             if get_me.last_name:
-                self.one.name = (
-                    get_me.first_name + " " + get_me.last_name
-                )
+                self.one.name = get_me.first_name + " " + get_me.last_name
             else:
                 self.one.name = get_me.first_name
-            LOGGER(__name__).info(
-                f"Assistant Started as {self.one.name}"
-            )
+            LOGGER(__name__).info(f"Assistant Started as {self.one.name}")
         if config.STRING2:
             await self.two.start()
             try:
@@ -101,9 +95,7 @@ class Userbot(Client):
                 pass
             assistants.append(2)
             try:
-                await self.two.send_message(
-                    config.LOG_GROUP_ID, "Assistant Started"
-                )
+                await self.two.send_message(config.LOG_GROUP_ID, "ᴀssɪsᴛᴀɴᴛ sᴛᴀʀᴛᴇᴅ")
             except:
                 LOGGER(__name__).error(
                     f"Assistant Account 2 has failed to access the log Group. Make sure that you have added your assistant to your log group and promoted as admin! "
@@ -114,14 +106,10 @@ class Userbot(Client):
             self.two.id = get_me.id
             assistantids.append(get_me.id)
             if get_me.last_name:
-                self.two.name = (
-                    get_me.first_name + " " + get_me.last_name
-                )
+                self.two.name = get_me.first_name + " " + get_me.last_name
             else:
                 self.two.name = get_me.first_name
-            LOGGER(__name__).info(
-                f"Assistant Two Started as {self.two.name}"
-            )
+            LOGGER(__name__).info(f"Assistant Two Started as {self.two.name}")
         if config.STRING3:
             await self.three.start()
             try:
@@ -132,9 +120,7 @@ class Userbot(Client):
                 pass
             assistants.append(3)
             try:
-                await self.three.send_message(
-                    config.LOG_GROUP_ID, "Assistant Started"
-                )
+                await self.three.send_message(config.LOG_GROUP_ID, "ᴀssɪsᴛᴀɴᴛ sᴛᴀʀᴛᴇᴅ")
             except:
                 LOGGER(__name__).error(
                     f"Assistant Account 3 has failed to access the log Group. Make sure that you have added your assistant to your log group and promoted as admin! "
@@ -145,14 +131,10 @@ class Userbot(Client):
             self.three.id = get_me.id
             assistantids.append(get_me.id)
             if get_me.last_name:
-                self.three.name = (
-                    get_me.first_name + " " + get_me.last_name
-                )
+                self.three.name = get_me.first_name + " " + get_me.last_name
             else:
                 self.three.name = get_me.first_name
-            LOGGER(__name__).info(
-                f"Assistant Three Started as {self.three.name}"
-            )
+            LOGGER(__name__).info(f"Assistant Three Started as {self.three.name}")
         if config.STRING4:
             await self.four.start()
             try:
@@ -163,9 +145,7 @@ class Userbot(Client):
                 pass
             assistants.append(4)
             try:
-                await self.four.send_message(
-                    config.LOG_GROUP_ID, "Assistant Started"
-                )
+                await self.four.send_message(config.LOG_GROUP_ID, "ᴀssɪsᴛᴀɴᴛ sᴛᴀʀᴛᴇᴅ")
             except:
                 LOGGER(__name__).error(
                     f"Assistant Account 4 has failed to access the log Group. Make sure that you have added your assistant to your log group and promoted as admin! "
@@ -176,14 +156,10 @@ class Userbot(Client):
             self.four.id = get_me.id
             assistantids.append(get_me.id)
             if get_me.last_name:
-                self.four.name = (
-                    get_me.first_name + " " + get_me.last_name
-                )
+                self.four.name = get_me.first_name + " " + get_me.last_name
             else:
                 self.four.name = get_me.first_name
-            LOGGER(__name__).info(
-                f"Assistant Four Started as {self.four.name}"
-            )
+            LOGGER(__name__).info(f"Assistant Four Started as {self.four.name}")
         if config.STRING5:
             await self.five.start()
             try:
@@ -194,9 +170,7 @@ class Userbot(Client):
                 pass
             assistants.append(5)
             try:
-                await self.five.send_message(
-                    config.LOG_GROUP_ID, "Assistant Started"
-                )
+                await self.five.send_message(config.LOG_GROUP_ID, "ᴀssɪsᴛᴀɴᴛ sᴛᴀʀᴛᴇᴅ")
             except:
                 LOGGER(__name__).error(
                     f"Assistant Account 5 has failed to access the log Group. Make sure that you have added your assistant to your log group and promoted as admin! "
@@ -207,11 +181,7 @@ class Userbot(Client):
             self.five.id = get_me.id
             assistantids.append(get_me.id)
             if get_me.last_name:
-                self.five.name = (
-                    get_me.first_name + " " + get_me.last_name
-                )
+                self.five.name = get_me.first_name + " " + get_me.last_name
             else:
                 self.five.name = get_me.first_name
-            LOGGER(__name__).info(
-                f"Assistant Five Started as {self.five.name}"
-            )
+            LOGGER(__name__).info(f"Assistant Five Started as {self.five.name}")
