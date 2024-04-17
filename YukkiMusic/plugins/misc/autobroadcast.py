@@ -55,8 +55,8 @@ async def send_message_to_users():
             if isinstance(user_id, int): 
                 try:
                     await app.send_message(user_id, text=MSG, reply_markup=BUTTON)
-                 except FloodWait as e:
-                     await asyncio.sleep(e.value)
+                except FloodWait as e:
+                    await asyncio.sleep(e.value)
                 except:
                     pass
     except:
