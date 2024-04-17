@@ -45,7 +45,7 @@ AUTO_GCAST_DELAY_TIME = getenv("AUTO_GCAST_DELAY_TIME", "10,800")
  #defaults to 3 hours
   
 #Auto gcast msg 
-AUTO_GCAST_MSG = f""
+AUTO_GCAST_MSG = ""
 
 
 # ________________________________________________________________________________#
