@@ -55,7 +55,7 @@ async def init():
     for all_module in ALL_MODULES:
         importlib.import_module("YukkiMusic.plugins" + all_module)
     LOGGER("Yukkimusic.plugins").info("Successfully Imported Modules ")
-await restart_bots()
+    await restart_bots()
     await userbot.start()
     await Yukki.start()
     try:
