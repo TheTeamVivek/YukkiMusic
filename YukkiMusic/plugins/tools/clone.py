@@ -117,6 +117,7 @@ async def restart_bots():
                 API_HASH,
                 bot_token=bot_token,
                 plugins=dict(root="YukkiMusic.cplugin"),
+            )
             await ai.start()
         except Exception as e:
             logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
