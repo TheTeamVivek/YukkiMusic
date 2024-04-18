@@ -8,7 +8,9 @@
 # All rights reserved.
 #
 import math
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 from YukkiMusic.utils.formatters import time_to_seconds
 
 

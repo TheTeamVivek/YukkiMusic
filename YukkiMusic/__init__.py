@@ -8,6 +8,8 @@
 # All rights reserved.
 #
 
+from aiohttp import ClientSession
+from Python_ARQ import ARQ
 from telethon import TelegramClient
 
 import config
@@ -16,9 +18,6 @@ from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
 from YukkiMusic.core.userbot import Userbot
 from YukkiMusic.misc import dbb, heroku, sudo
-from Python_ARQ import ARQ
-from aiohttp import ClientSession
-
 
 from .logging import LOGGER
 

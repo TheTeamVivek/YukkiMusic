@@ -2,7 +2,7 @@ from functools import wraps
 from traceback import format_exc as err
 
 from pyrogram.errors.exceptions.forbidden_403 import ChatWriteForbidden
-from pyrogram.types import Message, ChatPrivileges
+from pyrogram.types import Message
 
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS

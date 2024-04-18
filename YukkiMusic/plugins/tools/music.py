@@ -4,14 +4,13 @@ from asyncio import get_running_loop
 from functools import partial
 from io import BytesIO
 
+from aiohttp import ClientSession
 from pyrogram import filters
 from pytube import YouTube
 from requests import get
 
-from aiohttp import ClientSession
 from YukkiMusic import app, arq
 from YukkiMusic.utils.error import capture_err
-from YukkiMusic.utils.pastebin import Yukkibin
 
 __MODULE__ = "Music"
 __HELP__ = """

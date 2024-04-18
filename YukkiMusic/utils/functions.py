@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
-from random import randint
 from re import findall
 from re import sub as re_sub
+
 from pyrogram.types import Message
 
 

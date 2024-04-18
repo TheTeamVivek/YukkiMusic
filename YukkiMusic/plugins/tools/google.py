@@ -1,10 +1,10 @@
 import glob
 import io
 import os
+import random
 import re
 import urllib
 import urllib.request
-import random
 
 import bs4
 import requests

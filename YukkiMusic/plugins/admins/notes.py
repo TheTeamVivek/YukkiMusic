@@ -1,19 +1,11 @@
+from inspect import getfullargspec
 from re import findall
 
 from pyrogram import filters
-from pyrogram.types import (
-    CallbackQuery,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    Message,
-)
-from inspect import getfullargspec
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+
 from config import BANNED_USERS
 from YukkiMusic import app
-from YukkiMusic.utils.error import capture_err
-from YukkiMusic.utils.permissions import adminsOnly, member_permissions
-from YukkiMusic.utils.keyboard import ikb
-
 from YukkiMusic.utils.database import (
     delete_note,
     deleteall_notes,
@@ -21,11 +13,14 @@ from YukkiMusic.utils.database import (
     get_note_names,
     save_note,
 )
+from YukkiMusic.utils.error import capture_err
 from YukkiMusic.utils.functions import (
     check_format,
     extract_text_and_keyb,
     get_data_and_name,
 )
+from YukkiMusic.utils.keyboard import ikb
+from YukkiMusic.utils.permissions import adminsOnly, member_permissions
 
 
 def extract_urls(reply_markup):

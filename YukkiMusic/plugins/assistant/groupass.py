@@ -1,13 +1,12 @@
-from config import PK
 from pyrogram import filters
 from pyrogram.types import Message
 
+from config import PK
 from YukkiMusic import app
-from YukkiMusic.utils.database import get_assistant, save_assistant, set_assistant
-from YukkiMusic.misc import SUDOERS
 from YukkiMusic.core.userbot import assistants
+from YukkiMusic.utils.assistant import assistant, get_assistant_details
+from YukkiMusic.utils.database import get_assistant, save_assistant, set_assistant
 from YukkiMusic.utils.filter import admin_filter
-from YukkiMusic.utils.assistant import get_assistant_details, assistant
 
 
 @app.on_message(filters.command("changeassistant") & admin_filter)

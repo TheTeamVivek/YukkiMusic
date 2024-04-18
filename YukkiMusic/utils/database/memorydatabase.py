@@ -9,9 +9,10 @@
 #
 
 
+from typing import Dict, List, Union
+
 import config
 from config import PRIVATE_BOT_MODE
-from typing import Dict, List, Union
 from YukkiMusic.core.mongo import mongodb
 
 channeldb = mongodb.cplaymode

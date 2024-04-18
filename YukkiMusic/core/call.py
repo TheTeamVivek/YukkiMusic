@@ -10,6 +10,8 @@
 import asyncio
 from datetime import datetime, timedelta
 from typing import Union
+
+from ntgcalls import TelegramServerError
 from pyrogram import Client
 from pyrogram.errors import (
     ChatAdminRequired,
@@ -18,7 +20,6 @@ from pyrogram.errors import (
 )
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls
-from ntgcalls import TelegramServerError
 from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
 from pytgcalls.types import (
     JoinedGroupCallParticipant,
@@ -27,7 +28,9 @@ from pytgcalls.types import (
     Update,
 )
 from pytgcalls.types.stream import StreamAudioEnded
+
 import config
+from strings import get_string
 from YukkiMusic import LOGGER, YouTube, app
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
@@ -49,7 +52,6 @@ from YukkiMusic.utils.exceptions import AssistantErr
 from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
 from YukkiMusic.utils.stream.autoclear import auto_clean
 from YukkiMusic.utils.thumbnails import gen_thumb
-from strings import get_string
 
 autoend = {}
 counter = {}
@@ -382,7 +384,7 @@ class Call(PyTgCalls):
                     chat_id,
                     stream,
                 )
-            except Exception as e:
+            except Exception:
                 raise AssistantErr(
                     "**ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ғᴏᴜɴᴅ**\n\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ."
                 )
@@ -440,7 +442,7 @@ class Call(PyTgCalls):
             audio_stream_quality = await get_audio_bitrate(chat_id)
             video_stream_quality = await get_video_bitrate(chat_id)
             videoid = check[0]["vidid"]
-            userid = check[0].get("user_id")
+            check[0].get("user_id")
             check[0]["played"] = 0
             video = True if str(streamtype) == "video" else False
             if "live_" in queued:

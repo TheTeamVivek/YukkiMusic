@@ -1,5 +1,4 @@
-from pyrogram import enums
-from pyrogram import filters
+from pyrogram import enums, filters
 
 from YukkiMusic import app
 from YukkiMusic.utils.filter import admin_filter

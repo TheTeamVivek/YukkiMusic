@@ -4,9 +4,9 @@ from traceback import format_exc
 from pyrogram import filters
 from pyrogram.types import Message
 
+from config import BANNED_USERS
 from YukkiMusic import app, arq
 from YukkiMusic.utils.error import capture_err
-from config import BANNED_USERS
 
 __MODULE__ = "Quotly"
 __HELP__ = """
