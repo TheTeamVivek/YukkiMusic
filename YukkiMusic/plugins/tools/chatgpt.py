@@ -1,11 +1,11 @@
 import requests
-from pyrogram import filters, Client
+from pyrogram import filters
 from pyrogram.enums import ChatAction
 
 from YukkiMusic import app
 
 
-@Client.on_message(
+@app.on_message(
     filters.command(
         ["chatgpt", "ai", "ask"], prefixes=["+", ".", "/", "-", "?", "$", "#", "&"]
     )
