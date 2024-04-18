@@ -17,6 +17,7 @@ from ..logging import LOGGER
 assistants = []
 assistantids = []
 
+
 class Userbot(Client):
     def __init__(self):
         if config.STRING1:
@@ -26,11 +27,11 @@ class Userbot(Client):
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING1),
                 no_updates=True,
-                plugins = dict(root="YukkiMusic.plugins.assistant"),
+                plugins=dict(root="YukkiMusic.plugins.assistant"),
             )
         else:
-        	self.one = None
-        
+            self.one = None
+
         if config.STRING2:
             self.two = Client(
                 "YukkiString2",
@@ -38,11 +39,11 @@ class Userbot(Client):
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING2),
                 no_updates=True,
-                plugins = dict(root="YukkiMusic.plugins.assistant"),
+                plugins=dict(root="YukkiMusic.plugins.assistant"),
             )
         else:
-        	self.two = None
-        
+            self.two = None
+
         if config.STRING3:
             self.three = Client(
                 "YukkiString3",
@@ -50,11 +51,11 @@ class Userbot(Client):
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING3),
                 no_updates=True,
-                plugins = dict(root="YukkiMusic.plugins.assistant"),
+                plugins=dict(root="YukkiMusic.plugins.assistant"),
             )
         else:
-        	self.three = None
-        
+            self.three = None
+
         if config.STRING4:
             self.four = Client(
                 "YukkiString4",
@@ -62,11 +63,11 @@ class Userbot(Client):
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING4),
                 no_updates=True,
-                plugins = dict(root="YukkiMusic.plugins.assistant"),
+                plugins=dict(root="YukkiMusic.plugins.assistant"),
             )
         else:
-        	self.four = None
-        
+            self.four = None
+
         if config.STRING5:
             self.five = Client(
                 "YukkiString5",
@@ -74,11 +75,11 @@ class Userbot(Client):
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING5),
                 no_updates=True,
-                plugins = dict(root="YukkiMusic.plugins.assistant"),
+                plugins=dict(root="YukkiMusic.plugins.assistant"),
             )
         else:
-        	self.five = None
-        
+            self.five = None
+
     async def start(self):
         LOGGER(__name__).info(f"Starting Assistant Clients")
         if config.STRING1:

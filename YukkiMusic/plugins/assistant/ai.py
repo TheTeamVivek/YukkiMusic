@@ -2,10 +2,9 @@ import requests
 from pyrogram import filters, Client
 from pyrogram.enums import ChatAction
 
+
 @Client.on_message(
-    filters.command(
-        ["ais"], prefixes=["+", ".", "/", "-", "?", "$", "#", "&"]
-    )
+    filters.command(["ais"], prefixes=["+", ".", "/", "-", "?", "$", "#", "&"])
 )
 async def chatgpt_chat(bot, message):
     if len(message.command) < 2 and not message.reply_to_message:
