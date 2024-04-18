@@ -53,7 +53,7 @@ async def on_clone(client, message):
                     API_ID,
                     API_HASH,
                     bot_token=bot_token,
-                    plugins=dict(root="YukkiMusic.plugins.tools"),
+                    plugins=dict(root="YukkiMusic.cplugin"),
                 )
 
                 await ai.start()
@@ -116,8 +116,7 @@ async def restart_bots():
                 API_ID,
                 API_HASH,
                 bot_token=bot_token,
-                plugins=dict(root="YukkiMusic.plugins.tools"),
-            )
+                plugins=dict(root="YukkiMusic.cplugin"),
             await ai.start()
         except Exception as e:
             logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
