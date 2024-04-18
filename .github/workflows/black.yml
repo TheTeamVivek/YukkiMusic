@@ -18,7 +18,7 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           commit-message: Formate By @vivekkumar0708
-          title: Format code.
+          title: Format code
           body: Automated code formatting.
           labels: ⚫️ black
           branch: autofix
