@@ -27,7 +27,7 @@ class Userbot(Client):
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING1),
                 no_updates=True,
-                plugins=dict(root="YukkiMusic.plugins.assistant"),
+                plugins=dict(root="YukkiMusic.cplugin"),
             )
         else:
             self.one = None
