@@ -13,6 +13,7 @@ hachoir
 heroku3
 img2pdf
 lyricsgenius
+MukeshAPI
 motor
 ntgcalls==1.1.2
 pillow==9.5.0
