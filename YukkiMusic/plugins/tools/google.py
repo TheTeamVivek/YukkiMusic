@@ -31,7 +31,7 @@ user_agents = [
     "Mozilla/5.0 (Linux; Android 10; SM-G960U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.9999.99 Mobile Safari/537.36",
     "Mozilla/5.0 (iPad; CPU OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1",
 ]
-opener.addheaders = [("User-agent",random.choice(user_agents))]
+opener.addheaders = [("User-agent", random.choice(user_agents))]
 
 
 @register(pattern="^/google (.*)")
@@ -104,7 +104,7 @@ user_agents = [
     "Mozilla/5.0 (Linux; Android 10; SM-G960U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.9999.99 Mobile Safari/537.36",
     "Mozilla/5.0 (iPad; CPU OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1",
 ]
-opener.addheaders = [("User-agent",random.choice(user_agents))]
+opener.addheaders = [("User-agent", random.choice(user_agents))]
 
 
 @register(pattern=r"^/reverse|^/pp|^/grs(?: |$)(\d*)")
