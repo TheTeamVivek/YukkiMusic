@@ -78,15 +78,16 @@ async def on_clone(client, message):
     except Exception as e:
         logging.exception("Error while handling message.")
 
-
-@app.on_message(filters.command(["delcloned", "deletecloned"]) & filters.private)
+@app.on_message(filters.command(["deletecloned", "delcloned"]) & filters.private)
 async def delete_cloned_bot(client, message):
     try:
-        bot_token = re.findall(
-            r"\d[0-9]{8,10}:[0-9A-Za-z_-]{35}", message.text, re.IGNORECASE
-        )
-        bot_token = bot_token[0] if bot_token else None
-        bot_id = re.findall(r"\d[0-9]{8,10}", message.text)
+        # Extract bot token from the command parameters
+        command = message.text.split()
+        if len(command) != 2:
+            await message.reply_text("**⚠️ Please provide the bot token.**")
+            return
+
+        bot_token = command[1]
 
         mongo_collection = mongo_db.bots
 
@@ -94,16 +95,15 @@ async def delete_cloned_bot(client, message):
         if cloned_bot:
             mongo_collection.delete_one({"token": bot_token})
             await message.reply_text(
-                "**🤖 ᴛʜᴇ ᴄʟᴏɴᴇᴅ ʙᴏᴛ ʜᴀs ʙᴇᴇɴ ʀᴇᴍᴏᴠᴇᴅ ғʀᴏᴍ ᴛʜᴇ ʟɪsᴛ ᴀɴᴅ ɪᴛs ᴅᴇᴛᴀɪʟs ʜᴀᴠᴇ ʙᴇᴇɴ ʀᴇᴍᴏᴠᴇᴅ ғʀᴏᴍ ᴛʜᴇ ᴅᴀᴛᴀʙᴀsᴇ. ☠️**"
+                "**🤖 The cloned bot has been removed from the list and its details have been removed from the database. ☠️**"
             )
         else:
             await message.reply_text(
-                "**⚠️ ᴛʜᴇ ʙᴏᴛ ᴛᴏᴋᴇɴ ᴘʀᴏᴠɪᴅᴇᴅ ɪs ɴᴏᴛ ɪɴ ᴛʜᴇ ᴄʟᴏɴᴇᴅ ʟɪsᴛ.**"
+                "**⚠️ The provided bot token is not in the cloned list.**"
             )
     except Exception as e:
         logging.exception("Error while deleting cloned bot.")
         await message.reply_text("An error occurred while deleting the cloned bot.")
-
 
 async def restart_bots():
     logging.info("Restarting all bots........")
