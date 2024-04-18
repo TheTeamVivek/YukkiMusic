@@ -1,6 +1,7 @@
 from YukkiMusic.utils.database import get_client
 from YukkiMusic import app
 
+
 async def get_assistant_details():
     ms = ""
     msg = "ᴜsᴀsɢᴇ : /setassistant [ᴀssɪsᴛᴀɴᴛ ɴᴏ ] ᴛᴏ ᴄʜᴀɴɢᴇ ᴀɴᴅ sᴇᴛ ᴍᴀɴᴜᴀʟʟʏ ɢʀᴏᴜᴘ ᴀssɪsᴛᴀɴᴛ \n ʙᴇʟᴏᴡ sᴏᴍᴇ ᴀᴠᴀɪʟᴀʙʟᴇ ᴀssɪsᴛᴀɴᴛ ᴅᴇᴛᴀɪʟ's ᴏɴ ʙᴏᴛ sᴇʀᴠᴇʀ\n"
