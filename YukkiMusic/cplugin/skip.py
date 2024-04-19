@@ -19,7 +19,7 @@ from YukkiMusic import YouTube
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import get_loop
-from YukkiMusic.utils.decorators import AdminRightsCheck
+from YukkiMusic.utils.decorators import CAdminRightsCheck
 from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
 from YukkiMusic.utils.stream.autoclear import auto_clean
 from YukkiMusic.utils.thumbnails import gen_thumb
@@ -29,7 +29,7 @@ SKIP_COMMAND = get_command("SKIP_COMMAND")
 
 
 @Client.on_message(filters.command(SKIP_COMMAND) & filters.group & ~BANNED_USERS)
-@AdminRightsCheck
+@CAdminRightsCheck
 async def skip(cli, message: Message, _, chat_id):
 	me = await client.get_me()
     if not len(message.command) < 2:
