@@ -29,6 +29,7 @@ from pytgcalls.types import (
 from pytgcalls.types.stream import StreamAudioEnded
 import config
 from YukkiMusic import LOGGER, YouTube, app
+from YukkiMusic.utils.formatters import check_duration, seconds_to_min, speed_converter
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
     add_active_chat,
@@ -175,7 +176,7 @@ class Call(PyTgCalls):
                 pass
         else:
             out = file_path
-        dur = await asyncio.get_event_loop().run_in_executor(None, check_duration, out)
+        dur = await asyncio.get_event_loop_policy().get_event_loop().run_in_executor(None, check_duration, out)
         dur = int(dur)
         played, con_seconds = speed_converter(playing[0]["played"], speed)
         duration = seconds_to_min(dur)
