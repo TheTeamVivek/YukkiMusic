@@ -126,7 +126,7 @@ async def start_comm(client, message: Message, _):
             OWNER = OWNER_ID[0]
         except:
             OWNER = None
-        out = private_panel(_, client.username, OWNER)
+        out = private_panel(_, me.username, OWNER)
         era = await message.reply_text(
             text=f"{message.from_user.first_name} जय श्री राधे कृष्णा जी, आपका {me.mention} में हार्दिक स्वागत है।"
         )
