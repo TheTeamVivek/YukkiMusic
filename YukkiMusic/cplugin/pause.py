@@ -15,14 +15,14 @@ from config import BANNED_USERS
 from strings import get_command
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import is_music_playing, music_off
-from YukkiMusic.utils.decorators import AdminRightsCheck
+from YukkiMusic.utils.decorators import CAdminRightsCheck
 
 # Commands
 PAUSE_COMMAND = get_command("PAUSE_COMMAND")
 
 
 @Client.on_message(filters.command(PAUSE_COMMAND) & filters.group & ~BANNED_USERS)
-@AdminRightsCheck
+@CAdminRightsCheck
 async def pause_admin(cli, message: Message, _, chat_id):
     if not len(message.command) == 1:
         return await message.reply_text(_["general_2"])
