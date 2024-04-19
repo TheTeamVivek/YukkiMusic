@@ -15,7 +15,7 @@ from strings import get_command
 from YukkiMusic import YouTube
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
-from YukkiMusic.utils import AdminRightsCheck, seconds_to_min
+from YukkiMusic.utils import CAdminRightsCheck, seconds_to_min
 
 # Commands
 SEEK_COMMAND = get_command("SEEK_COMMAND")
