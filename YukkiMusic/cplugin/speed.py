@@ -81,7 +81,7 @@ def close_markup(_):
     & filters.group
     & ~BANNED_USERS
 )
-@AdminRightsCheck
+@CAdminRightsCheck
 async def playback(cli, message: Message, _, chat_id):
     playing = db.get(chat_id)
     if not playing:
