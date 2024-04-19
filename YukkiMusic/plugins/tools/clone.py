@@ -10,6 +10,8 @@ from pyrogram.errors.exceptions.bad_request_400 import (
 from config import API_ID, API_HASH
 from config import MONGO_DB_URI
 from YukkiMusic import app
+from YukkiMusic.utils.database import get_client
+from YukkiMusic.core.userbot import assistants
 from config import LOG_GROUP_ID
 
 mongo_client = MongoClient(MONGO_DB_URI)
@@ -59,6 +61,12 @@ async def on_clone(client, message):
 
                 await ai.start()
                 bot = await ai.get_me()
+                for num in assistants:
+                    userbot = await get_client(num)
+                try:
+                    await userbot.send_message(bot.id, "/start")
+                except Exception:
+                    pass
                 details = {
                     "bot_id": bot.id,
                     "is_bot": True,
