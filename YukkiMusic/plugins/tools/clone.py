@@ -123,3 +123,4 @@ async def restart_bots():
             await ai.start()
         except Exception as e:
             logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
+            mongo_db.bots.delete_one({"token": bot_token})
