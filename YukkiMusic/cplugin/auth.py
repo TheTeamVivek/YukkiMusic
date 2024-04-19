@@ -19,7 +19,7 @@ from YukkiMusic.utils.database import (
     get_authuser_names,
     save_authuser,
 )
-from YukkiMusic.utils.decorators import AdminActual, language
+from YukkiMusic.utils.decorators import CAdminActual, language
 from YukkiMusic.utils.formatters import int_to_alpha
 
 # Command
@@ -29,7 +29,7 @@ AUTHUSERS_COMMAND = get_command("AUTHUSERS_COMMAND")
 
 
 @Client.on_message(filters.command(AUTH_COMMAND) & filters.group & ~BANNED_USERS)
-@AdminActual
+@CAdminActual
 async def auth(client, message: Message, _):
     if not message.reply_to_message:
         if len(message.command) != 2:
@@ -91,7 +91,7 @@ async def auth(client, message: Message, _):
 
 
 @Client.on_message(filters.command(UNAUTH_COMMAND) & filters.group & ~BANNED_USERS)
-@AdminActual
+@CAdminActual
 async def unauthusers(client, message: Message, _):
     if not message.reply_to_message:
         if len(message.command) != 2:
