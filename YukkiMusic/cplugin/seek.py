@@ -22,7 +22,7 @@ SEEK_COMMAND = get_command("SEEK_COMMAND")
 
 
 @Client.on_message(filters.command(SEEK_COMMAND) & filters.group & ~BANNED_USERS)
-@AdminRightsCheck
+@CAdminRightsCheck
 async def seek_comm(cli, message: Message, _, chat_id):
     if len(message.command) == 1:
         return await message.reply_text(_["admin_28"])
