@@ -10,6 +10,7 @@ from pyrogram.errors.exceptions.bad_request_400 import (
 from config import API_ID, API_HASH
 from config import MONGO_DB_URI
 from YukkiMusic import app
+from config import LOG_GROUP_ID
 
 mongo_client = MongoClient(MONGO_DB_URI)
 mongo_db = mongo_client["Yukkicloned"]
