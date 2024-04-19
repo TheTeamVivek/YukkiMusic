@@ -15,7 +15,6 @@ from config import LOG_GROUP_ID
 
 
 async def play_logs(message, streamtype):
-    me = await client.get_me()
     if await is_on_off(2):
         if message.chat.username:
             chatusername = f"@{message.chat.username}"
@@ -23,7 +22,7 @@ async def play_logs(message, streamtype):
             chatusername = "ᴘʀɪᴠᴀᴛᴇ ɢʀᴏᴜᴘ"
 
         logger_text = f"""
-<b>{me.mention} ᴘʟᴀʏ ʟᴏɢ</b>
+<b>ᴘʟᴀʏ ʟᴏɢ</b>
 
 <b>ᴄʜᴀᴛ ɪᴅ :</b> <code>{message.chat.id}</code>
 <b>ᴄʜᴀᴛ ɴᴀᴍᴇ :</b> {message.chat.title}
