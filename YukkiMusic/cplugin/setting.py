@@ -43,7 +43,7 @@ from YukkiMusic.utils.database import (
     set_playmode,
     set_playtype,
 )
-from YukkiMusic.utils.decorators.admins import ActualAdminCB
+from YukkiMusic.utils.decorators.admins import CActualAdminCB
 from YukkiMusic.utils.decorators.language import language, languageCB
 from YukkiMusic.utils.inline.settings import (
     audio_quality_markup,
@@ -308,7 +308,7 @@ async def without_Admin_rights(client, CallbackQuery, _):
     )
     & ~BANNED_USERS
 )
-@ActualAdminCB
+@CActualAdminCB
 async def aud_vid_cb(client, CallbackQuery, _):
     command = CallbackQuery.matches[0].group(1)
     try:
@@ -358,7 +358,7 @@ async def aud_vid_cb(client, CallbackQuery, _):
     filters.regex(pattern=r"^(|MODECHANGE|CHANNELMODECHANGE|PLAYTYPECHANGE)$")
     & ~BANNED_USERS
 )
-@ActualAdminCB
+@CActualAdminCB
 async def playmode_ans(client, CallbackQuery, _):
     command = CallbackQuery.matches[0].group(1)
     if command == "CHANNELMODECHANGE":
@@ -436,7 +436,7 @@ async def playmode_ans(client, CallbackQuery, _):
 
 # Auth Users Settings
 @Client.on_callback_query(filters.regex(pattern=r"^(AUTH|AUTHLIST)$") & ~BANNED_USERS)
-@ActualAdminCB
+@CActualAdminCB
 async def authusers_mar(client, CallbackQuery, _):
     command = CallbackQuery.matches[0].group(1)
     if command == "AUTHLIST":
@@ -511,7 +511,7 @@ async def authusers_mar(client, CallbackQuery, _):
     filters.regex(pattern=r"^(CLEANMODE|COMMANDELMODE)$")
     & ~BANNED_USERS
 )
-@ActualAdminCB
+@CActualAdminCB
 async def cleanmode_mark(client, CallbackQuery, _):
     command = CallbackQuery.matches[0].group(1)
     try:
