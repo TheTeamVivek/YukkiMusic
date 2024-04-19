@@ -15,14 +15,14 @@ from config import BANNED_USERS
 from strings import get_command
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import is_music_playing, music_on
-from YukkiMusic.utils.decorators import AdminRightsCheck
+from YukkiMusic.utils.decorators import CAdminRightsCheck
 
 # Commands
 RESUME_COMMAND = get_command("RESUME_COMMAND")
 
 
 @Client.on_message(filters.command(RESUME_COMMAND) & filters.group & ~BANNED_USERS)
-@AdminRightsCheck
+@CAdminRightsCheck
 async def resume_com(cli, message: Message, _, chat_id):
     if not len(message.command) == 1:
         return await message.reply_text(_["general_2"])
