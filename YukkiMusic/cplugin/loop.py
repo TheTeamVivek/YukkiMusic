@@ -14,14 +14,14 @@ from pyrogram.types import Message
 from config import BANNED_USERS
 from strings import get_command
 from YukkiMusic.utils.database.memorydatabase import get_loop, set_loop
-from YukkiMusic.utils.decorators import AdminRightsCheck
+from YukkiMusic.utils.decorators import CAdminRightsCheck
 
 # Commands
 LOOP_COMMAND = get_command("LOOP_COMMAND")
 
 
 @Client.on_message(filters.command(LOOP_COMMAND) & filters.group & ~BANNED_USERS)
-@AdminRightsCheck
+@CAdminRightsCheck
 async def admins(cli, message: Message, _, chat_id):
     usage = _["admin_24"]
     if len(message.command) != 2:
