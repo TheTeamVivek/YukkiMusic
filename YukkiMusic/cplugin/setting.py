@@ -123,7 +123,7 @@ async def settings_cb(client, CallbackQuery, _):
 @Client.on_callback_query(filters.regex("settingsback_helper") & ~BANNED_USERS)
 @languageCB
 async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
-	me = await client.get_me()
+    me = await client.get_me()
     try:
         await CallbackQuery.answer()
     except Exception as e:
