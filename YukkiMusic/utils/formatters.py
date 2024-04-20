@@ -89,6 +89,7 @@ def seconds_to_min(seconds):
             return "00:{:02d}".format(s)
     return "-"
 
+
 def speed_converter(seconds, speed):
     if str(speed) == str("0.5"):
         seconds = seconds * 2
@@ -120,7 +121,8 @@ def speed_converter(seconds, speed):
             convert = "00:{:02d}".format(s)
             return convert, collect
     return "-"
-    
+
+
 def check_duration(file_path):
     command = [
         "ffprobe",
@@ -147,7 +149,7 @@ def check_duration(file_path):
                 return float(s["duration"])
 
     return "Unknown"
-    
+
 
 formats = [
     "webm",

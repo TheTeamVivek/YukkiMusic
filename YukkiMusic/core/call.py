@@ -176,7 +176,11 @@ class Call(PyTgCalls):
                 pass
         else:
             out = file_path
-        dur = await asyncio.get_event_loop_policy().get_event_loop().run_in_executor(None, check_duration, out)
+        dur = (
+            await asyncio.get_event_loop_policy()
+            .get_event_loop()
+            .run_in_executor(None, check_duration, out)
+        )
         dur = int(dur)
         played, con_seconds = speed_converter(playing[0]["played"], speed)
         duration = seconds_to_min(dur)
