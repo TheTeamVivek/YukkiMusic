@@ -234,18 +234,6 @@ def CPlayWrapper(command):
             )
             return await message.reply_text(_["general_4"], reply_markup=upl)
 
-        if await is_maintenance() is False:
-            if message.from_user.id not in SUDOERS:
-                return await message.reply_text(
-                    text=f"{me.mention} ɪs ᴜɴᴅᴇʀ ᴍᴀɪɴᴛᴇɴᴀɴᴄᴇ, ᴠɪsɪᴛ <a href={SUPPORT_CHAT}>sᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ</a> ғᴏʀ ᴋɴᴏᴡɪɴɢ ᴛʜᴇ ʀᴇᴀsᴏɴ.",
-                    disable_web_page_preview=True,
-                )
-        if PRIVATE_BOT_MODE == str(True):
-            if not await is_served_private_chat(message.chat.id):
-                await message.reply_text(
-                    "**ᴘʀɪᴠᴀᴛᴇ ᴍᴜsɪᴄ ʙᴏᴛ**\n\nᴏɴʟʏ ғᴏʀ ᴀᴜᴛʜᴏʀɪᴢᴇᴅ ᴄʜᴀᴛs ғʀᴏᴍ ᴛʜᴇ ᴏᴡɴᴇʀ. ᴀsᴋ ᴍʏ ᴏᴡɴᴇʀ ᴛᴏ ᴀʟʟᴏᴡ ʏᴏᴜʀ ᴄʜᴀᴛ ғɪʀsᴛ."
-                )
-                return await client.leave_chat(message.chat.id)
         if await is_commanddelete_on(message.chat.id):
             try:
                 await message.delete()
@@ -313,9 +301,13 @@ def CPlayWrapper(command):
             userbot = await get_assistant(message.chat.id)
             try:
                 try:
+                    await userbot.send_message(me.id, "/start")
+                    check_master = await client.get_chat_member(chat_id, app.id)
                     get = await client.get_chat_member(chat_id, userbot.id)
                 except ChatAdminRequired:
                     return await message.reply_text(_["call_1"])
+                if check_master.status in ["member", "administrator"]:
+                    return await client.leave_chat(chat_id)
                 if (
                     get.status == ChatMemberStatus.BANNED
                     or get.status == ChatMemberStatus.RESTRICTED
