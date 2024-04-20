@@ -52,11 +52,11 @@ async def on_clone(client, message):
             )
             try:
                 ai = Client(
-                    f"{bot_token}",
-                    API_ID,
-                    API_HASH,
-                    bot_token=bot_token,
-                    plugins=dict(root="YukkiMusic.cplugin"),
+                f"{bot_token}",
+                API_ID,
+                API_HASH,
+                bot_token=bot_token,
+                plugins=dict(root="YukkiMusic.cplugin"),
                 )
 
                 await ai.start()
@@ -67,6 +67,8 @@ async def on_clone(client, message):
                     await userbot.send_message(bot.id, "/start")
                 except Exception:
                     pass
+                except Exception as e:
+                    print("An error occurred:", e)
                 details = {
                     "bot_id": bot.id,
                     "is_bot": True,
