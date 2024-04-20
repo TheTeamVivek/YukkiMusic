@@ -14,7 +14,7 @@ from typing import Union
 from pyrogram.types import InlineKeyboardMarkup
 
 import config
-from YukkiMusic import Carbon, YouTube
+from YukkiMusic import Carbon, YouTube, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
@@ -27,7 +27,7 @@ from YukkiMusic.utils.inline.play import queue_markup, stream_markup, telegram_m
 from YukkiMusic.utils.inline.playlist import close_markup
 from YukkiMusic.utils.pastebin import Yukkibin
 from YukkiMusic.utils.stream.queue import put_queue, put_queue_index
-from YukkiMusic.utils.thumbnails import gen_qthumb, gen_thumb
+from YukkiMusic.utils.thumbnails import gen_thumb
 
 
 async def stream(
@@ -113,13 +113,12 @@ async def stream(
                 )
                 img = await gen_thumb(vidid)
                 button = stream_markup(_, vidid, chat_id)
-                me = await client.get_me()
                 run = await client.send_photo(
                     original_chat_id,
                     photo=img,
                     caption=_["stream_1"].format(
                         title[:27],
-                        f"https://t.me/{me.username}?start=info_{vidid}",
+                        f"https://t.me/{app.username}?start=info_{vidid}",
                         duration_min,
                         user_name,
                     ),
@@ -171,10 +170,9 @@ async def stream(
             )
             position = len(db.get(chat_id)) - 1
             button = queue_markup(_, vidid, chat_id)
-            run = await client.send_photo(
+            run = await client.send_message(
                 original_chat_id,
-                photo=f"https://img.youtube.com/vi/{vidid}/maxresdefault.jpg",
-                caption=_["queue_4"].format(
+                text =_["queue_4"].format(
                     position, title[:27], duration_min, user_name
                 ),
                 reply_markup=InlineKeyboardMarkup(button),
@@ -199,14 +197,13 @@ async def stream(
             )
             img = await gen_thumb(vidid)
             button = stream_markup(_, vidid, chat_id)
-            me = await client.get_me()
             try:
                 run = await client.send_photo(
                     original_chat_id,
                     photo=img,
                     caption=_["stream_1"].format(
                         title[:27],
-                        f"https://t.me/{me.username}?start=info_{vidid}",
+                        f"https://t.me/{app.username}?start=info_{vidid}",
                         duration_min,
                         user_name,
                     ),
@@ -363,13 +360,12 @@ async def stream(
             )
             img = await gen_thumb(vidid)
             button = telegram_markup(_, chat_id)
-            me = await client.get_me()
             run = await client.send_photo(
                 original_chat_id,
                 photo=img,
                 caption=_["stream_1"].format(
                     title[:27],
-                    f"https://t.me/{me.username}?start=info_{vidid}",
+                    f"https://t.me/{app.username}?start=info_{vidid}",
                     duration_min,
                     user_name,
                 ),
