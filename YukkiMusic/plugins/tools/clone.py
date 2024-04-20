@@ -52,11 +52,11 @@ async def on_clone(client, message):
             )
             try:
                 ai = Client(
-                f"{bot_token}",
-                API_ID,
-                API_HASH,
-                bot_token=bot_token,
-                plugins=dict(root="YukkiMusic.cplugin"),
+                    f"{bot_token}",
+                    API_ID,
+                    API_HASH,
+                    bot_token=bot_token,
+                    plugins=dict(root="YukkiMusic.cplugin"),
                 )
 
                 await ai.start()
@@ -93,7 +93,6 @@ async def on_clone(client, message):
 @app.on_message(filters.command(["deletecloned", "delcloned"]) & filters.private)
 async def delete_cloned_bot(client, message):
     try:
-        # Extract bot token from the command parameters
         command = message.text.split()
         if len(command) != 2:
             await message.reply_text("**⚠️ Please provide the bot token.**")
