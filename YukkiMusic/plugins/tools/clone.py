@@ -93,12 +93,11 @@ async def on_clone(client, message):
 @app.on_message(filters.command(["deletecloned", "delcloned"]) & filters.private)
 async def delete_cloned_bot(client, message):
     try:
-        command = message.text.split()
-        if len(command) != 2:
+        if len(message.command) < 2:
             await message.reply_text("**⚠️ Please provide the bot token.**")
             return
 
-        bot_token = command[1]
+        bot_token = " ".join(message.command[1:])
 
         mongo_collection = mongo_db.bots
 
