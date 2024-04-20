@@ -173,7 +173,7 @@ async def stream(
             button = queue_markup(_, vidid, chat_id)
             run = await client.send_photo(
                 original_chat_id,
-                photo=thumbnail,
+                photo=f"https://img.youtube.com/vi/{vidid}/maxresdefault.jpg",
                 caption=_["queue_4"].format(
                     position, title[:27], duration_min, user_name
                 ),
