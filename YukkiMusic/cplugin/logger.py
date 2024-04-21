@@ -8,7 +8,7 @@
 # All rights reserved.
 #
 
-from pyrogram inport Client
+from pyrogram import Client
 from YukkiMusic.utils.database import is_on_off
 from config import LOG_GROUP_ID
 
