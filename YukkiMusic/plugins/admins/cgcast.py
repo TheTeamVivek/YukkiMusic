@@ -11,7 +11,7 @@ from YukkiMusic.utils.database import (
     get_served_users,
 )
 from config import START_IMG_URL
-@app.on_message(filters.command(["gchats", "guser"]) & SUDOERS)
+@app.on_message(filters.command(["b"]) & SUDOERS)
 async def cgast(_, message: Message):
     query = f"""нєу, ɪ ᴀᴍ {app.mention}
 
