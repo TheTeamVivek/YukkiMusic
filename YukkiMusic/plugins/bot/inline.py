@@ -245,10 +245,6 @@ async def inline_query_handler(client, query):
             await client.answer_inline_query(
                 query.id, results=answerss, cache_time=3600
             )
-
-        elif text.split()[0] == "exec":
-            await execute_code(query)
-
         
     except Exception as e:
         e = traceback.format_exc()
