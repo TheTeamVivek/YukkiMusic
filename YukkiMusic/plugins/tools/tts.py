@@ -30,8 +30,7 @@ async def text_to_speech(_, message: Message):
     m = await message.reply_text("Processing")
     text = message.reply_to_message.text
     try:
-        audio = await asyncio.get_event_loop_policy()
-            .get_event_loop().run_in_executor(None, convert, text)
+        audio = await asyncio.get_event_loop_policy().get_event_loop().run_in_executor(None, convert, text)
         await message.reply_audio(audio)
         await m.delete()
         audio.close()
