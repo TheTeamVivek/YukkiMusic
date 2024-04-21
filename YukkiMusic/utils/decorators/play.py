@@ -298,6 +298,7 @@ def CPlayWrapper(command):
             fplay = None
 
         if not await is_active_chat(chat_id):
+            me = await client.get_me()
             userbot = await get_assistant(message.chat.id)
             try:
                 try:
