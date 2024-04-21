@@ -391,4 +391,5 @@ async def welcome(client, message: Message):
                 )
             return
         except:
+
             return
