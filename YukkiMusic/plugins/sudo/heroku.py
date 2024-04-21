@@ -350,7 +350,7 @@ async def updater_(client, message, _):
         await response.edit(f"{nrs.text}\n\n» ʙᴏᴛ ᴜᴩᴅᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ! ɴᴏᴡ ᴡᴀɪᴛ ғᴏʀ ғᴇᴡ ᴍɪɴᴜᴛᴇs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs")
     except:
         pass
-    os.system("pip3 install -r requirements.txt")
+    os.system("pip3 install --no-cache-dir -U -r requirements.txt")
     os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
     exit()
 
