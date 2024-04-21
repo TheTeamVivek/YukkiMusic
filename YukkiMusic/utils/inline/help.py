@@ -30,7 +30,7 @@ def first_page(_):
                 ),
                 InlineKeyboardButton(
                     text=_["H_B_13"], callback_data="help_callback hb12"
-                )
+                ),
             ],
             [
                 InlineKeyboardButton(
@@ -85,7 +85,6 @@ def second_page(_):
 
     seconds_page = InlineKeyboardMarkup(
         [
-
             lower_button,
         ]
     )
