@@ -41,7 +41,6 @@ keywords_list = [
     "wall",
     "tmdb",
     "lyrics",
-    "exec",
     "search",
     "tr",
     "ud",
@@ -593,72 +592,3 @@ async def image_func(answers, query):
     return answers
 
 
-async def execute_code(query):
-    text = query.query.strip()
-    offset = int((query.offset or 0))
-    answers = []
-    languages = (await arq.execute()).result
-    if len(text.split()) == 1:
-        answers = [
-            InlineQueryResultArticle(
-                title=lang,
-                input_message_content=InputTextMessageContent(lang),
-            )
-            for lang in languages
-        ][offset : offset + 25]
-        await query.answer(
-            next_offset=str(offset + 25),
-            results=answers,
-            cache_time=1,
-        )
-    elif len(text.split()) == 2:
-        text = text.split()[1].strip()
-        languages = list(
-            filter(
-                lambda x: find_near_matches(text, x, max_l_dist=1),
-                languages,
-            )
-        )
-        answers.extend(
-            [
-                InlineQueryResultArticle(
-                    title=lang,
-                    input_message_content=InputTextMessageContent(lang),
-                )
-                for lang in languages
-            ][:49]
-        )
-    else:
-        lang = text.split()[1]
-        code = text.split(None, 2)[2]
-        response = await arq.execute(lang, code)
-        if not response.ok:
-            answers.append(
-                InlineQueryResultArticle(
-                    title="Error",
-                    input_message_content=InputTextMessageContent(
-                        response.result
-                    ),
-                )
-            )
-        else:
-            res = response.result
-            stdout, stderr = escape(res.stdout), escape(res.stderr)
-            output = stdout or stderr
-            out = "STDOUT" if stdout else ("STDERR" if stderr else "No output")
-
-            msg = f"""
-**{lang.capitalize()}:**
-```{code}```
-
-**{out}:**
-```{output}```
-            """
-            answers.append(
-                InlineQueryResultArticle(
-                    title="Executed",
-                    description=output[:20],
-                    input_message_content=InputTextMessageContent(msg),
-                )
-            )
-    await query.answer(results=answers, cache_time=1)
