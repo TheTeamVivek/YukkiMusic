@@ -10,6 +10,8 @@
 
 import traceback
 from pyrogram import filters
+from pykeyboard import InlineKeyboard
+
 from YukkiMusic import app
 from YukkiMusic.utils.inline import *
 
