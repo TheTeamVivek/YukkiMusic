@@ -227,14 +227,14 @@ Tᴏᴛᴀʟ ʟᴇғᴛ: `{hours}`**ʜ**  `{minutes}`**ᴍ**  [`{percentage}`**%
 async def update_(client, message, _):
     if await is_heroku():
         if HAPP is None:
-            return await message.reply_text(_["herkou_1"])
-    response = await message.reply_text(_["herkou_13"])
+            return await message.reply_text(_["heroku_1"])
+    response = await message.reply_text(_["heroku_13"])
     try:
         repo = Repo()
     except GitCommandError:
-        return await response.edit(_["herkou_14"])
+        return await response.edit(_["heroku_14"])
     except InvalidGitRepositoryError:
-        return await response.edit(_["herkou_15"])
+        return await response.edit(_["heroku_15"])
     to_exc = f"git fetch origin {config.UPSTREAM_BRANCH} &> /dev/null"
     os.system(to_exc)
     await asyncio.sleep(7)
@@ -300,13 +300,13 @@ async def update_(client, message, _):
 @app.on_message(filters.command(["git_pull"]) & SUDOERS)
 @language
 async def updater_(client, message, _):
-    response = await message.reply_text(_["herkou_13"])
+    response = await message.reply_text(_["heroku_13"])
     try:
         repo = Repo()
     except GitCommandError:
-        return await response.edit(_["herkou_14"])
+        return await response.edit(_["heroku_14"])
     except InvalidGitRepositoryError:
-        return await response.edit(_["herkou_15"])
+        return await response.edit(_["heroku_15"])
     to_exc = f"git fetch origin {config.UPSTREAM_BRANCH} &> /dev/null"
     os.system(to_exc)
     await asyncio.sleep(7)
