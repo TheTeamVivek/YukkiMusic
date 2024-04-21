@@ -58,7 +58,6 @@ from YukkiMusic.utils.inline.start import private_panel
 SETTINGS_COMMAND = get_command("SETTINGS_COMMAND")
 
 
-
 def cleanmode_settings_markup(
     _,
     status: Union[bool, str] = None,
@@ -80,7 +79,6 @@ def cleanmode_settings_markup(
                 callback_data="COMMANDELMODE",
             ),
         ],
-
         [
             InlineKeyboardButton(
                 text=_["BACK_BUTTON"],
@@ -90,8 +88,7 @@ def cleanmode_settings_markup(
         ],
     ]
     return buttons
-    
-    
+
 
 @Client.on_message(filters.command(SETTINGS_COMMAND) & filters.group & ~BANNED_USERS)
 @language
@@ -151,6 +148,7 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
             )
         except MessageNotModified:
             pass
+
 
 ## Audio and Video Quality
 async def gen_buttons_aud(_, aud):
@@ -508,8 +506,7 @@ async def authusers_mar(client, CallbackQuery, _):
 
 
 @Client.on_callback_query(
-    filters.regex(pattern=r"^(CLEANMODE|COMMANDELMODE)$")
-    & ~BANNED_USERS
+    filters.regex(pattern=r"^(CLEANMODE|COMMANDELMODE)$") & ~BANNED_USERS
 )
 @CActualAdminCB
 async def cleanmode_mark(client, CallbackQuery, _):

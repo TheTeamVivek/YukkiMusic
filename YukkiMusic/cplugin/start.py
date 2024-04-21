@@ -56,7 +56,7 @@ async def start_comm(client, message: Message, _):
                     caption=_["help_1"],
                     reply_markup=keyboard,
                 )
-                
+
             else:
                 return await message.reply_photo(
                     photo=random.choice(PHOTO),
@@ -64,14 +64,14 @@ async def start_comm(client, message: Message, _):
                     reply_markup=keyboard,
                 )
         if name[0:4] == "song":
-            return await message.reply_text(_["song_2"])     
+            return await message.reply_text(_["song_2"])
         if name[0:3] == "lyr":
             query = (str(name)).replace("lyrics_", "", 1)
             lyrical = config.lyrical
             lyrics = lyrical.get(query)
             if lyrics:
                 return await Telegram.send_split_text(message, lyrics)
-                
+
             else:
                 return await message.reply_text("ғᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ʟʏʀɪᴄs.")
         if name[0:3] == "del":
@@ -151,26 +151,28 @@ async def start_comm(client, message: Message, _):
                 caption=_["start_2"].format(me.mention),
                 reply_markup=InlineKeyboardMarkup(out),
             )
-            
+
+
 @Client.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
 @LanguageStart
 async def testbot(client, message: Message, _):
     out = alive_panel(_)
     me = await client.get_me()
     uptime = int(time.time() - _boot_)
-    if config.START_IMG_URL: 	
+    if config.START_IMG_URL:
         return await message.reply_photo(
             photo=config.START_IMG_URL,
             caption=_["start_8"].format(me.mention, get_readable_time(uptime)),
             reply_markup=InlineKeyboardMarkup(out),
         )
     else:
-    	return await message.reply_photo(
+        return await message.reply_photo(
             photo=random.choice(PHOTO),
             caption=_["start_8"].format(me.mention, get_readable_time(uptime)),
             reply_markup=InlineKeyboardMarkup(out),
         )
-    
+
+
 @Client.on_message(filters.new_chat_members, group=-1)
 async def welcome(client, message: Message):
     chat_id = message.chat.id
@@ -190,10 +192,10 @@ async def welcome(client, message: Message):
                 userbot = await get_assistant(chat_id)
                 out = start_pannel(_)
                 try:
-                	await userbot.join_chat(chat_id)
+                    await userbot.join_chat(chat_id)
                 except Exception:
-                	pass
-                
+                    pass
+
                 await message.reply_text(
                     _["start_3"].format(
                         me.mention,
