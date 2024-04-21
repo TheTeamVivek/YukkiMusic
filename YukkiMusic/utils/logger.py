@@ -8,8 +8,6 @@
 # All rights reserved.
 #
 
-from pyrogram.enums import ParseMode
-
 from YukkiMusic import app
 from YukkiMusic.utils.database import is_on_off
 from config import LOG_GROUP_ID
@@ -40,9 +38,8 @@ async def play_logs(message, streamtype):
                 await app.send_message(
                     chat_id=LOG_GROUP_ID,
                     text=logger_text,
-                    parse_mode=ParseMode.HTML,
                     disable_web_page_preview=True,
                 )
-            except:
-                pass
+            except Exception as e:
+                print(e)
         return
