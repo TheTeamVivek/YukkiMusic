@@ -1,6 +1,6 @@
 import asyncio
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
