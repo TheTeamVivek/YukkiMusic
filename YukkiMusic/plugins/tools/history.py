@@ -44,7 +44,7 @@ async def sg(client: Client, message: Message):
         if stalk.text is None:
             continue
         if not stalk:
-            await message.reply("botnya ngambek")
+            await message.reply("The bot encountered an issue. Please try again later")
         elif stalk:
             await message.reply(f"{stalk.text}")
             break
