@@ -24,7 +24,6 @@ def setting_markup(_):
         ],
         [
             InlineKeyboardButton(text=_["ST_B_5"], callback_data="PM"),
-
         ],
         [
             InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
@@ -159,6 +158,7 @@ def video_quality_markup(
         ],
     ]
     return buttons
+
 
 def auth_users_markup(_, status: Union[bool, str] = None):
     buttons = [
