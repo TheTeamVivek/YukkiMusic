@@ -26,11 +26,10 @@ from YukkiMusic.utils.inline.help import (
     second_page,
 )
 
+
 @Client.on_message(filters.command(["help"]) & filters.private & ~BANNED_USERS)
 @Client.on_callback_query(filters.regex("settings_back_helper") & ~BANNED_USERS)
-async def helper_private(
-    client, update: Union[types.Message, types.CallbackQuery]
-):
+async def helper_private(client, update: Union[types.Message, types.CallbackQuery]):
     is_callback = isinstance(update, types.CallbackQuery)
     if is_callback:
         try:

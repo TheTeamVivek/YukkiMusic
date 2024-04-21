@@ -215,7 +215,6 @@ def PlayWrapper(command):
     return wrapper
 
 
-
 def CPlayWrapper(command):
     async def wrapper(client, message):
         me = await client.get_me()

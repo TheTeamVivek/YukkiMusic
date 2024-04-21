@@ -173,7 +173,6 @@ def ActualAdminCB(mystic):
     return wrapper
 
 
-
 def CAdminRightsCheck(mystic):
     async def wrapper(client, message):
         if await is_maintenance() is False:

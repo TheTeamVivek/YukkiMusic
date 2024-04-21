@@ -11,6 +11,8 @@ from YukkiMusic.utils.database import (
     get_served_users,
 )
 from config import START_IMG_URL
+
+
 @app.on_message(filters.command(["b"]) & SUDOERS)
 async def cgast(_, message: Message):
     query = f"""нєу, ɪ ᴀᴍ {app.mention}
@@ -44,7 +46,9 @@ Sᴜᴘᴘᴏʀᴛɪɴɢ ᴘʟᴀᴛғᴏʀᴍs :
         served_users.append(int(user["user_id"]))
     for i in served_users:
         try:
-            await app.send_photo(photo=START_IMG_URL,chat_id=i, text=query, reply_markup=BUTTON)
+            await app.send_photo(
+                photo=START_IMG_URL, chat_id=i, text=query, reply_markup=BUTTON
+            )
         except FloodWait as e:
             await asyncio.sleep(e.value)
         except:
