@@ -10,10 +10,9 @@
 
 import traceback
 from pyrogram import filters
-from pykeyboard import InlineKeyboard
 
 from YukkiMusic import app
-from YukkiMusic.utils.inline import *
+from YukkiMusic.utils.inlinequery import *
 
 __MODULE__ = "Inline"
 __HELP__ = f"""
