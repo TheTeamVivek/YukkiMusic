@@ -227,14 +227,14 @@ Tᴏᴛᴀʟ ʟᴇғᴛ: `{hours}`**ʜ**  `{minutes}`**ᴍ**  [`{percentage}`**%
 async def update_(client, message, _):
     if await is_heroku():
         if HAPP is None:
-            return await message.reply_text(_["server_2"])
-    response = await message.reply_text(_["server_3"])
+            return await message.reply_text(_["herkou_1"])
+    response = await message.reply_text(_["herkou_13"])
     try:
         repo = Repo()
     except GitCommandError:
-        return await response.edit(_["server_4"])
+        return await response.edit(_["herkou_14"])
     except InvalidGitRepositoryError:
-        return await response.edit(_["server_5"])
+        return await response.edit(_["herkou_15"])
     to_exc = f"git fetch origin {config.UPSTREAM_BRANCH} &> /dev/null"
     os.system(to_exc)
     await asyncio.sleep(7)
@@ -243,7 +243,7 @@ async def update_(client, message, _):
     for checks in repo.iter_commits(f"HEAD..origin/{config.UPSTREAM_BRANCH}"):
         verification = str(checks.count())
     if verification == "":
-        return await response.edit(_["server_6"])
+        return await response.edit(» ʙᴏᴛ ɪs ᴜᴘ-ᴛᴏ-ᴅᴀᴛᴇ.)
     ordinal = lambda format: "%d%s" % (
         format,
         "tsnrhtdd"[(format // 10 % 10 != 1) * (format % 10 < 4) * format % 10 :: 4],
@@ -255,7 +255,7 @@ async def update_(client, message, _):
     _update_response_ = "<b>ᴀ ɴᴇᴡ ᴜᴩᴅᴀᴛᴇ ɪs ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀ ᴛʜᴇ ʙᴏᴛ !</b>\n\n➣ ᴩᴜsʜɪɴɢ ᴜᴩᴅᴀᴛᴇs ɴᴏᴡ\n\n<b><u>ᴜᴩᴅᴀᴛᴇs:</u></b>\n\n"
     _final_updates_ = _update_response_ + updates
     if len(_final_updates_) > 4096:
-        url = await YukkiBin(updates)
+        url = await Yukkibin(updates)
         nrs = await response.edit(
             f"<b>ᴀ ɴᴇᴡ ᴜᴩᴅᴀᴛᴇ ɪs ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀ ᴛʜᴇ ʙᴏᴛ !</b>\n\n➣ ᴩᴜsʜɪɴɢ ᴜᴩᴅᴀᴛᴇs ɴᴏᴡ\n\n<u><b>ᴜᴩᴅᴀᴛᴇs :</b></u>\n\n<a href={url}>ᴄʜᴇᴄᴋ ᴜᴩᴅᴀᴛᴇs</a>"
         )
@@ -269,13 +269,13 @@ async def update_(client, message, _):
             try:
                 await app.send_message(
                     chat_id=int(x),
-                    text=_["server_8"].format(app.mention),
+                    text="{0} ɪs ᴜᴘᴅᴀᴛᴇᴅ ʜᴇʀsᴇʟғ\n\nʏᴏᴜ ᴄᴀɴ sᴛᴀʀᴛ ᴩʟᴀʏɪɴɢ ᴀɢᴀɪɴ ᴀғᴛᴇʀ 15-20 sᴇᴄᴏɴᴅs.".format(app.mention),
                 )
                 await remove_active_chat(x)
                 await remove_active_video_chat(x)
             except:
                 pass
-        await response.edit(f"{nrs.text}\n\n{_['server_7']}")
+        await response.edit(f"{nrs.text}\n\n» ʙᴏᴛ ᴜᴩᴅᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ! ɴᴏᴡ ᴡᴀɪᴛ ғᴏʀ ғᴇᴡ ᴍɪɴᴜᴛᴇs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs")
     except:
         pass
 
@@ -286,28 +286,27 @@ async def update_(client, message, _):
             )
             return
         except Exception as err:
-            await response.edit(f"{nrs.text}\n\n{_['server_9']}")
+            await response.edit(f"{nrs.text}\n\nsᴏᴍᴇᴛʜɪɴɢ ᴡᴇɴᴛ ᴡʀᴏɴɢ, ᴩʟᴇᴀsᴇ ᴄʜᴇᴄᴋ ʟᴏɢs.")
             return await app.send_message(
                 chat_id=config.LOGGER_ID,
-                text=_["server_10"].format(err),
+                text="ᴀɴ ᴇxᴄᴇᴩᴛɪᴏɴ ᴏᴄᴄᴜʀᴇᴅ ᴀᴛ #ᴜᴩᴅᴀᴛᴇʀ ᴅᴜᴇ ᴛᴏ : <code>{0}</code>".format(err),
             )
     else:
         os.system("pip3 install -r requirements.txt")
-        os.system(f"kill -9 {os.getpid()} && python3 -m AnonXMusic")
+        os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
         exit()
-
 
 
 @app.on_message(filters.command(["git_pull"]) & SUDOERS)
 @language
-async def update_(client, message, _):
-    response = await message.reply_text(_["server_3"])
+async def updater_(client, message, _):
+    response = await message.reply_text(_["herkou_13"])
     try:
         repo = Repo()
     except GitCommandError:
-        return await response.edit(_["server_4"])
+        return await response.edit(_["herkou_14"])
     except InvalidGitRepositoryError:
-        return await response.edit(_["server_5"])
+        return await response.edit(_["herkou_15"])
     to_exc = f"git fetch origin {config.UPSTREAM_BRANCH} &> /dev/null"
     os.system(to_exc)
     await asyncio.sleep(7)
@@ -316,7 +315,7 @@ async def update_(client, message, _):
     for checks in repo.iter_commits(f"HEAD..origin/{config.UPSTREAM_BRANCH}"):
         verification = str(checks.count())
     if verification == "":
-        return await response.edit(_["server_6"])
+        return await response.edit(» ʙᴏᴛ ɪs ᴜᴘ-ᴛᴏ-ᴅᴀᴛᴇ.)
     ordinal = lambda format: "%d%s" % (
         format,
         "tsnrhtdd"[(format // 10 % 10 != 1) * (format % 10 < 4) * format % 10 :: 4],
@@ -328,7 +327,7 @@ async def update_(client, message, _):
     _update_response_ = "<b>ᴀ ɴᴇᴡ ᴜᴩᴅᴀᴛᴇ ɪs ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀ ᴛʜᴇ ʙᴏᴛ !</b>\n\n➣ ᴩᴜsʜɪɴɢ ᴜᴩᴅᴀᴛᴇs ɴᴏᴡ\n\n<b><u>ᴜᴩᴅᴀᴛᴇs:</u></b>\n\n"
     _final_updates_ = _update_response_ + updates
     if len(_final_updates_) > 4096:
-        url = await YukkiBin(updates)
+        url = await Yukkibin(updates)
         nrs = await response.edit(
             f"<b>ᴀ ɴᴇᴡ ᴜᴩᴅᴀᴛᴇ ɪs ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀ ᴛʜᴇ ʙᴏᴛ !</b>\n\n➣ ᴩᴜsʜɪɴɢ ᴜᴩᴅᴀᴛᴇs ɴᴏᴡ\n\n<u><b>ᴜᴩᴅᴀᴛᴇs :</b></u>\n\n<a href={url}>ᴄʜᴇᴄᴋ ᴜᴩᴅᴀᴛᴇs</a>"
         )
@@ -342,18 +341,19 @@ async def update_(client, message, _):
             try:
                 await app.send_message(
                     chat_id=int(x),
-                    text=_["server_8"].format(app.mention),
+                    text="{0} ɪs ᴜᴘᴅᴀᴛᴇᴅ ʜᴇʀsᴇʟғ\n\nʏᴏᴜ ᴄᴀɴ sᴛᴀʀᴛ ᴩʟᴀʏɪɴɢ ᴀɢᴀɪɴ ᴀғᴛᴇʀ 15-20 sᴇᴄᴏɴᴅs.".format(app.mention),
                 )
                 await remove_active_chat(x)
                 await remove_active_video_chat(x)
             except:
                 pass
-        await response.edit(f"{nrs.text}\n\n{_['server_7']}")
+        await response.edit(f"{nrs.text}\n\n» ʙᴏᴛ ᴜᴩᴅᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ! ɴᴏᴡ ᴡᴀɪᴛ ғᴏʀ ғᴇᴡ ᴍɪɴᴜᴛᴇs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs")
     except:
         pass
     os.system("pip3 install -r requirements.txt")
     os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
     exit()
+
         
         
 @app.on_message(filters.command(["restart"]) & SUDOERS)
