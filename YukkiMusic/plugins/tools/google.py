@@ -64,6 +64,7 @@ async def _(event):
         "**Search Query:**\n`" + match + "`\n\n**Results:**\n" + msg, link_preview=False
     )
 
+
 async def ParseSauce(googleurl):
     """Parse/Scrape the HTML code for the info we want."""
 
