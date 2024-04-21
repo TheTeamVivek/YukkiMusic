@@ -1,10 +1,10 @@
 import requests
 from requests import get 
-from Bikash import app
+from YukkiMusic import app
 from pyrogram import filters
 from pyrogram.types import InputMediaPhoto
 
-@app.on_message(filters.command(["image", "img"], prefixes=["/", "!", "%", ",", "", ".", "@", "#"]))
+@app.on_message(filters.command(["image", "img"], prefixes=["/", "!","."]))
 async def pinterest(_, message):
      chat_id = message.chat.id
 
