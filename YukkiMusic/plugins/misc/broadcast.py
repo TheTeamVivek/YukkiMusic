@@ -38,6 +38,7 @@ from YukkiMusic.utils.formatters import alpha_to_int
 BROADCAST_COMMAND = get_command("BROADCAST_COMMAND")
 IS_BROADCASTING = False
 
+
 @app.on_message(filters.command(BROADCAST_COMMAND) & SUDOERS)
 @language
 async def braodcast_message(client, message, _):

@@ -7,6 +7,8 @@ from pyrogram.raw.functions.messages import DeleteHistory
 from YukkiMusic import app
 from YukkiMusic.core.userbot import assistants
 from YukkiMusic.utils.database import get_client
+
+
 @app.on_message(filters.command(["sg", "History"]))
 async def sg(client: Client, message: Message):
     if len(message.text.split()) < 2 and not message.reply_to_message:
@@ -16,7 +18,9 @@ async def sg(client: Client, message: Message):
     else:
         args = message.text.split()[1:]
         if not args:
-            return await message.reply("Please provide a username, ID, or reply to a message.")
+            return await message.reply(
+                "Please provide a username, ID, or reply to a message."
+            )
         args = args[0]
     lol = await message.reply("<code>Processing...</code>")
     if args:

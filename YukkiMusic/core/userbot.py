@@ -60,7 +60,6 @@ class Userbot(Client):
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING4),
                 no_updates=True,
-                
             )
         else:
             self.four = None
