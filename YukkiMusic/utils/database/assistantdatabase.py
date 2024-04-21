@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021-present by TeamYukki@Github, < https://github.com/TeamYukki >.
+# Copyright (C) 2024-present by TeamYukki@Github, < https://github.com/TeamYukki >.
 #
 # This file is part of < https://github.com/TeamYukki/YukkiMusicBot > project,
 # and is released under the "GNU v3.0 License Agreement".
@@ -29,6 +29,15 @@ async def get_client(assistant: int):
         return userbot.four
     elif int(assistant) == 5:
         return userbot.five
+
+
+async def save_assistant(chat_id, number):
+    number = int(number)
+    await db.update_one(
+        {"chat_id": chat_id},
+        {"$set": {"assistant": number}},
+        upsert=True,
+    )
 
 
 async def set_assistant(chat_id):

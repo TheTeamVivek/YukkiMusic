@@ -9,12 +9,14 @@
 #
 import os
 from inspect import getfullargspec
+
+from pyrogram import filters
 from pyrogram.types import Message
-from pyrogram import Client, filters
+
+from config import ASSISTANT_PREFIX
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import get_client
-from config import ASSISTANT_PREFIX
 
 
 @app.on_message(filters.command("setpfp", prefixes=ASSISTANT_PREFIX) & SUDOERS)

@@ -8,21 +8,24 @@
 # All rights reserved.
 #
 
-
+import random
 from typing import Union
-from config import START_IMG_URL
+
 from pyrogram import filters, types
 from pyrogram.types import InlineKeyboardMarkup, Message
 
-from config import BANNED_USERS
+from config import BANNED_USERS, PHOTO, START_IMG_URL
 from strings import get_command, get_string, helpers
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils import help_pannel
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
 from YukkiMusic.utils.decorators.language import LanguageStart, languageCB
-from YukkiMusic.utils.inline.help import first_page, second_page
-from YukkiMusic.utils.inline.help import help_back_markup, private_help_panel
+from YukkiMusic.utils.inline.help import (
+    first_page,
+    help_back_markup,
+    private_help_panel,
+    second_page,
+)
 
 ### Command
 HELP_COMMAND = get_command("HELP_COMMAND")
@@ -44,7 +47,6 @@ async def helper_private(
         _ = get_string(language)
         keyboard = first_page(_)
         if update.message.photo:
-
             await update.edit_message_text(_["help_1"], reply_markup=keyboard)
         else:
             await update.edit_message_text(_["help_1"], reply_markup=keyboard)
@@ -58,9 +60,19 @@ async def helper_private(
         language = await get_lang(chat_id)
         _ = get_string(language)
         keyboard = first_page(_)
-        await update.reply_photo(
-            photo=START_IMG_URL, caption=_["help_1"], reply_markup=keyboard
-        )
+        if START_IMG_URL:
+            await update.reply_photo(
+                photo=START_IMG_URL,
+                caption=_["help_1"],
+                reply_markup=keyboard,
+            )
+
+        else:
+            await update.reply_photo(
+                photo=random.choice(PHOTO),
+                caption=_["help_1"],
+                reply_markup=keyboard,
+            )
 
 
 @app.on_message(filters.command(HELP_COMMAND) & filters.group & ~BANNED_USERS)

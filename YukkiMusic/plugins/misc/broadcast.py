@@ -8,8 +8,8 @@
 # All rights reserved.
 #
 
+
 import asyncio
-from datetime import datetime, timedelta
 
 from pyrogram import filters
 from pyrogram.enums import ChatMembersFilter
@@ -29,8 +29,6 @@ from YukkiMusic.utils.database import (
     get_served_chats,
     get_served_users,
     get_user_top,
-    is_cleanmode_on,
-    set_queries,
     update_particular_top,
     update_user_top,
 )
@@ -38,39 +36,7 @@ from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.formatters import alpha_to_int
 
 BROADCAST_COMMAND = get_command("BROADCAST_COMMAND")
-AUTO_DELETE = config.CLEANMODE_DELETE_MINS
-AUTO_SLEEP = 5
 IS_BROADCASTING = False
-cleanmode_group = 15
-
-
-@app.on_raw_update(group=cleanmode_group)
-async def clean_mode(client, update, users, chats):
-    global IS_BROADCASTING
-    if IS_BROADCASTING:
-        return
-    try:
-        if not isinstance(update, types.UpdateReadChannelOutbox):
-            return
-    except:
-        return
-    if users:
-        return
-    if chats:
-        return
-    message_id = update.max_id
-    chat_id = int(f"-100{update.channel_id}")
-    if not await is_cleanmode_on(chat_id):
-        return
-    if chat_id not in clean:
-        clean[chat_id] = []
-    time_now = datetime.now()
-    put = {
-        "msg_id": message_id,
-        "timer_after": time_now + timedelta(minutes=AUTO_DELETE),
-    }
-    clean[chat_id].append(put)
-    await set_queries(1)
 
 
 @app.on_message(filters.command(BROADCAST_COMMAND) & SUDOERS)
@@ -204,7 +170,7 @@ async def braodcast_message(client, message, _):
 
 
 async def auto_clean():
-    while not await asyncio.sleep(AUTO_SLEEP):
+    while not await asyncio.sleep(10):
         try:
             for chat_id in chatstats:
                 for dic in chatstats[chat_id]:

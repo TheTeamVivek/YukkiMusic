@@ -1,4 +1,5 @@
 import secureme
+
 from YukkiMusic.utils.events import register
 
 

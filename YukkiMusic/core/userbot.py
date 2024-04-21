@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021-present by TeamYukki@Github, < https://github.com/TeamYukki >.
+# Copyright (C) 2024-present by TeamYukki@Github, < https://github.com/TeamYukki >.
 #
 # This file is part of < https://github.com/TeamYukki/YukkiMusicBot > project,
 # and is released under the "GNU v3.0 License Agreement".
@@ -9,12 +9,10 @@
 #
 
 import sys
-
 from pyrogram import Client
-
 import config
-
 from ..logging import LOGGER
+
 
 assistants = []
 assistantids = []
@@ -22,41 +20,60 @@ assistantids = []
 
 class Userbot(Client):
     def __init__(self):
-        self.one = Client(
-            "YukkiString1",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING1),
-            no_updates=True,
-        )
-        self.two = Client(
-            "YukkiString2",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING2),
-            no_updates=True,
-        )
-        self.three = Client(
-            "YukkiString3",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING3),
-            no_updates=True,
-        )
-        self.four = Client(
-            "YukkiString4",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING4),
-            no_updates=True,
-        )
-        self.five = Client(
-            "YukkiString5",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING5),
-            no_updates=True,
-        )
+        if config.STRING1:
+            self.one = Client(
+                "YukkiString1",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING1),
+                no_updates=True,
+            )
+        else:
+            self.one = None
+
+        if config.STRING2:
+            self.two = Client(
+                "YukkiString2",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING2),
+                no_updates=True,
+            )
+        else:
+            self.two = None
+
+        if config.STRING3:
+            self.three = Client(
+                "YukkiString3",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING3),
+                no_updates=True,
+            )
+        else:
+            self.three = None
+
+        if config.STRING4:
+            self.four = Client(
+                "YukkiString4",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING4),
+                no_updates=True,
+            )
+        else:
+            self.four = None
+
+        if config.STRING5:
+            self.five = Client(
+                "YukkiString5",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING5),
+                no_updates=True,
+            )
+        else:
+            self.five = None
 
     async def start(self):
         LOGGER(__name__).info(f"Starting Assistant Clients")
@@ -79,6 +96,7 @@ class Userbot(Client):
             get_me = await self.one.get_me()
             self.one.username = get_me.username
             self.one.id = get_me.id
+            self.one.mention = get_me.mention
             assistantids.append(get_me.id)
             if get_me.last_name:
                 self.one.name = get_me.first_name + " " + get_me.last_name
@@ -104,6 +122,7 @@ class Userbot(Client):
             get_me = await self.two.get_me()
             self.two.username = get_me.username
             self.two.id = get_me.id
+            self.two.mention = get_me.mention
             assistantids.append(get_me.id)
             if get_me.last_name:
                 self.two.name = get_me.first_name + " " + get_me.last_name
@@ -129,6 +148,7 @@ class Userbot(Client):
             get_me = await self.three.get_me()
             self.three.username = get_me.username
             self.three.id = get_me.id
+            self.three.mention = get_me.mention
             assistantids.append(get_me.id)
             if get_me.last_name:
                 self.three.name = get_me.first_name + " " + get_me.last_name
@@ -154,6 +174,7 @@ class Userbot(Client):
             get_me = await self.four.get_me()
             self.four.username = get_me.username
             self.four.id = get_me.id
+            self.four.mention = get_me.mention
             assistantids.append(get_me.id)
             if get_me.last_name:
                 self.four.name = get_me.first_name + " " + get_me.last_name
@@ -179,6 +200,7 @@ class Userbot(Client):
             get_me = await self.five.get_me()
             self.five.username = get_me.username
             self.five.id = get_me.id
+            self.five.mention = get_me.mention
             assistantids.append(get_me.id)
             if get_me.last_name:
                 self.five.name = get_me.first_name + " " + get_me.last_name

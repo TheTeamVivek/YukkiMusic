@@ -1,11 +1,12 @@
-from typing import Dict, List, Union
-from config import MONGO_DB_URI
+from typing import Dict, Union
+
 from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
 from pyrogram import filters
 from pyrogram.types import Message
+
+from config import MONGO_DB_URI
 from YukkiMusic import app
 from YukkiMusic.utils.filter import admin_filter
-
 
 mongo = MongoCli(MONGO_DB_URI).Rankings
 

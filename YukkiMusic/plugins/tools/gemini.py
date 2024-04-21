@@ -1,4 +1,4 @@
-"""import asyncio
+import asyncio
 import requests
 from pyrogram import filters
 from pyrogram.enums import ChatAction
@@ -33,4 +33,3 @@ async def gemini_handler(client, message):
         await message.reply_text(f"{x} ", quote=True)
     except requests.exceptions.RequestException as e:
         pass
-"""

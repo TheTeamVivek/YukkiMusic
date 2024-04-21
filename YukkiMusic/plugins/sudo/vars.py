@@ -35,8 +35,6 @@ async def varsFunc(client, message):
     fetch_playlist = config.PLAYLIST_FETCH_LIMIT
     song = config.SONG_DOWNLOAD_DURATION
     play_duration = config.DURATION_LIMIT_MIN
-    cm = config.CLEANMODE_DELETE_MINS
-    auto_sug = config.AUTO_SUGGESTION_TIME
     if config.AUTO_LEAVING_ASSISTANT == str(True):
         ass = "Yes"
     else:
@@ -45,11 +43,6 @@ async def varsFunc(client, message):
         pvt = "Yes"
     else:
         pvt = "No"
-    if config.AUTO_SUGGESTION_MODE == str(True):
-        a_sug = "Yes"
-    else:
-        a_sug = "No"
-
     if not config.GITHUB_REPO:
         git = "No"
     else:
@@ -96,12 +89,9 @@ async def varsFunc(client, message):
 **<u>Bot Vars:</u>**
 `AUTO_LEAVING_ASSISTANT` : **{ass}**
 `ASSISTANT_LEAVE_TIME` : **{auto_leave} seconds**
-`AUTO_SUGGESTION_MODE` :** {a_sug}**
-`AUTO_SUGGESTION_TIME` : **{auto_sug} seconds**
 `PRIVATE_BOT_MODE` : **{pvt}**
 `YOUTUBE_EDIT_SLEEP` : **{yt_sleep} seconds**
 `TELEGRAM_EDIT_SLEEP` :** {tg_sleep} seconds**
-`CLEANMODE_MINS` : **{cm} mins**
 `VIDEO_STREAM_LIMIT` : **{v_limit} chats**
 `SERVER_PLAYLIST_LIMIT` :** {playlist_limit}**
 `PLAYLIST_FETCH_LIMIT` :** {fetch_playlist}**

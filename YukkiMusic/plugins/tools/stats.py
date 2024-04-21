@@ -14,8 +14,6 @@ from sys import version as pyver
 
 import psutil
 from ntgcalls import __version__ as ngtgver
-
-
 from pyrogram import __version__ as pyrover
 from pyrogram import filters
 from pyrogram.errors import MessageIdInvalid
@@ -265,7 +263,6 @@ async def overall_stats(client, CallbackQuery, _):
         ass = "Yes"
     else:
         ass = "No"
-    cm = config.CLEANMODE_DELETE_MINS
     text = f"""**ʙᴏᴛ's sᴛᴀᴛs ᴀɴᴅ ɪɴғᴏʀᴍᴀᴛɪᴏɴ:**
 
 **ɪᴍᴘᴏʀᴛᴇᴅ ᴍᴏᴅᴜʟᴇs:** {mod}
@@ -277,7 +274,6 @@ async def overall_stats(client, CallbackQuery, _):
 **ᴛᴏᴛᴀʟ ǫᴜᴇʀɪᴇs:** {total_queries} 
 **ᴛᴏᴛᴀʟ ᴀssɪsᴛᴀɴᴛs:** {assistant}
 **ᴀᴜᴛᴏ ʟᴇᴀᴠɪɴɢ ᴀssɪsᴛᴀɴᴛ:** {ass}
-**ᴄʟᴇᴀɴᴍᴏᴅᴇ ᴅᴜʀᴀᴛɪᴏɴ:** {cm} ᴍɪɴs
 
 **ᴘʟᴀʏ ᴅᴜʀᴀᴛɪᴏɴ ʟɪᴍɪᴛ:** {play_duration} ᴍɪɴs
 **sᴏɴɢ ᴅᴏᴡɴʟᴏᴀᴅ ʟɪᴍɪᴛ:** {song} ᴍɪɴs

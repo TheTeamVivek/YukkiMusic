@@ -22,7 +22,6 @@ load_dotenv()
 API_ID = int(getenv("API_ID", ""))
 API_HASH = getenv("API_HASH")
 
-
 # ________________________________________________________________________________#
 ## Get it from @Botfather in Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
@@ -30,6 +29,10 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 # ________________________________________________________________________________#
 
 ASSISTANT_PREFIX = getenv("ASSISTANT_PREFIX", ".")
+#
+
+# ________________________________________________________________________________#
+
 
 # ________________________________________________________________________________#
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
@@ -58,8 +61,11 @@ LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", ""))
 # ________________________________________________________________________________#
 # A name for your Music bot.
 MUSIC_BOT_NAME = getenv("MUSIC_BOT_NAME", "Mrr...prince")
+# ________________________________________________________________________________#
 
+PROTECT_CONTENT = getenv("PROTECT_CONTENT", "True")
 
+# Set it true for abody can't copy and forward bot messages
 # ________________________________________________________________________________#
 # Your User ID.
 OWNER_ID = list(
@@ -218,9 +224,14 @@ autoclean = []
 
 
 # Images
+
+# multi photo for /start
+PHOTO = ["https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg"]
+
+
 START_IMG_URL = getenv(
     "START_IMG_URL",
-    "https://graph.org//file/d43ff4db1503f4089b6c6.jpg",
+    "",
 )
 PING_IMG_URL = getenv(
     "PING_IMG_URL",
@@ -399,3 +410,8 @@ if TELEGRAM_VIDEO_URL:
                 "[ERROR] - Your TELEGRAM_VIDEO_URL url is wrong. Please ensure that it starts with https://"
             )
             sys.exit()
+
+if PROTECT_CONTENT:
+    PK = "True"
+else:
+    PK = "False"

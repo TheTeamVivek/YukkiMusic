@@ -8,13 +8,18 @@
 # All rights reserved.
 #
 
+from telethon import TelegramClient
+
+import config
 from YukkiMusic.core.bot import YukkiBot
 from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
 from YukkiMusic.core.userbot import Userbot
 from YukkiMusic.misc import dbb, heroku, sudo
-from telethon import TelegramClient
-import config
+from Python_ARQ import ARQ
+from aiohttp import ClientSession
+
+
 from .logging import LOGGER
 
 # Directories
@@ -66,3 +71,7 @@ TOKEN = config.BOT_TOKEN
 WORKERS = 8
 
 telethn = TelegramClient("YukkiMusic", API_ID, API_HASH)
+
+aiohttpsession = ClientSession()
+
+arq = ARQ("https://arq.hamker.dev", "EIWSFG-STIEHP-LOVWTE-AWSKKP-ARQ", aiohttpsession)

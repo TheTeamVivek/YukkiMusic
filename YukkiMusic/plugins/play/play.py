@@ -9,10 +9,14 @@
 #
 import random
 import string
+
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InputMediaPhoto, Message
 from pytgcalls.exceptions import NoActiveGroupCall
+
 import config
+from config import BANNED_USERS, lyrical
+from strings import get_command
 from YukkiMusic import Apple, Resso, SoundCloud, Spotify, Telegram, YouTube, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils import seconds_to_min, time_to_seconds
@@ -30,9 +34,6 @@ from YukkiMusic.utils.inline.play import (
 from YukkiMusic.utils.inline.playlist import botplaylist_markup
 from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
-from config import BANNED_USERS, lyrical
-from strings import get_command
-from YukkiMusic.utils.database import is_served_user
 
 # Command
 PLAY_COMMAND = get_command("PLAY_COMMAND")
@@ -281,7 +282,7 @@ async def play_commnd(
         elif await Resso.valid(url):
             try:
                 details, track_id = await Resso.track(url)
-            except Exception as e:
+            except Exception:
                 return await mystic.edit_text(_["play_3"])
             streamtype = "youtube"
             img = details["thumb"]

@@ -8,12 +8,15 @@
 # All rights reserved.
 #
 import asyncio
+
 from pyrogram.types import InlineKeyboardMarkup
+
 from strings import get_string
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import get_active_chats, get_lang, is_music_playing
 from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline import stream_markup_timer, telegram_markup_timer
+
 from ..admins.callback import wrong
 
 checker = {}
@@ -41,7 +44,7 @@ asyncio.create_task(timer())
 
 
 async def markup_timer():
-    while not await asyncio.sleep(15):
+    while not await asyncio.sleep(2):
         active_chats = await get_active_chats()
         for chat_id in active_chats:
             try:

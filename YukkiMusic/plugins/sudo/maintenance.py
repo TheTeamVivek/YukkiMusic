@@ -20,7 +20,6 @@ from YukkiMusic.utils.database import (
     maintenance_off,
     maintenance_on,
 )
-from YukkiMusic.utils.decorators.language import language
 
 # Commands
 MAINTENANCE_COMMAND = get_command("MAINTENANCE_COMMAND")

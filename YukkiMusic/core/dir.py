@@ -8,9 +8,9 @@
 # All rights reserved.
 #
 
+import logging
 import os
 import sys
-import logging
 from os import listdir, mkdir
 
 
