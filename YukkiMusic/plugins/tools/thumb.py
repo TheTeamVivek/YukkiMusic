@@ -20,13 +20,13 @@ def extract_video_id(url):
 @app.on_message(filters.command(["getthumb","genthumb","thumb","thumbnail"], prefixes="/"))
 async def get_thumbnail_command(client, message):
     if len(message.command) < 2:
-    return await message.reply_text("ᴘʀᴏᴠɪᴅᴇ ᴍᴇ ᴀ ʏᴛ ᴠɪᴅᴇᴏᴜʀʟ ᴀғᴛᴇʀ ᴄᴏᴍᴍᴀɴᴅ ᴛᴏ ɢᴇᴛ ᴛʜᴜᴍʙɴᴀɪʟ")
+        return await message.reply_text("ᴘʀᴏᴠɪᴅᴇ ᴍᴇ ᴀ ʏᴛ ᴠɪᴅᴇᴏᴜʀʟ ᴀғᴛᴇʀ ᴄᴏᴍᴍᴀɴᴅ ᴛᴏ ɢᴇᴛ ᴛʜᴜᴍʙɴᴀɪʟ")
     try:
-        a= await message.reply_text("ᴘʀᴏᴄᴇssɪɴɢ...")
+        a = await message.reply_text("ᴘʀᴏᴄᴇssɪɴɢ...")
         url = message.text.split(" ")[1]
         video_id = extract_video_id(url)
         if not video_id:
-            await message.reply("Please provide a valid YouTube link.")
+            await message.reply("ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ᴠᴀʟɪᴅ ʏᴏᴜᴛᴜʙᴇ ʟɪɴᴋ.")
             return
         video_title = get_video_title(video_id)
         query = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
