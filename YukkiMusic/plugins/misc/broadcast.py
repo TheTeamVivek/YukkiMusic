@@ -170,7 +170,7 @@ async def braodcast_message(client, message, _):
 
 
 async def auto_clean():
-    while not await asyncio.sleep(AUTO_SLEEP):
+    while not await asyncio.sleep(10):
         try:
             for chat_id in chatstats:
                 for dic in chatstats[chat_id]:
