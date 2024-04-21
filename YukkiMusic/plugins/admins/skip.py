@@ -100,8 +100,7 @@ async def skip(cli, message: Message, _, chat_id):
     queued = check[0]["file"]
     title = (check[0]["title"]).title()
     user = check[0]["by"]
-    await check_theme(chat_id)
-    message.from_user.id
+    user_id = message.from_user.id
     streamtype = check[0]["streamtype"]
     videoid = check[0]["vidid"]
     duration_min = check[0]["dur"]
