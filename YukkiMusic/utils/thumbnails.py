@@ -217,7 +217,7 @@ async def gen_qthumb(videoid, user_id):
         bg = Image.open(f"assets/ZSTREAM_adobe_express.png")
         image1 = youtube.resize((1280, 720))
         image2 = image1.convert("RGBA")
-        background = image2.filter(filter=ImageFilter.BoxBlur(14))
+        background = image2.filter(filter=ImageFilter.BoxBlur(16))
         enhancer = ImageEnhance.Brightness(background)
         background = enhancer.enhance(0.6)
         y = circle(zyoutube).resize((473, 473))
@@ -236,7 +236,7 @@ async def gen_qthumb(videoid, user_id):
         try:
             text_w, text_h = draw.textsize(f"ADDED TO QUEUE", font=font2)
             draw.text(
-                ((1630 - text_w) / 2, 75),
+                ((1680 - text_w) / 2, 75),
                 f"ADDED TO QUEUE",
                 fill="white",
                 font=font2,
