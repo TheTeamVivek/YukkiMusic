@@ -210,7 +210,7 @@ async def gen_qthumb(videoid):
         background.paste(logo, (50, 100))
         draw = ImageDraw.Draw(background)
         font = ImageFont.truetype("assets/font2.ttf", 40)
-        font2 = ImageFont.truetype("assets/font2.ttf", 70)
+        font2 = ImageFont.truetype("assets/font2.ttf", 67)
         arial = ImageFont.truetype("assets/font2.ttf", 30)
         name_font = ImageFont.truetype("assets/font.ttf", 30)
         para = textwrap.wrap(title, width=32)
@@ -218,7 +218,7 @@ async def gen_qthumb(videoid):
         draw.text((5, 5), f"{MUSIC_BOT_NAME}", fill="white", font=name_font)
         draw.text(
             (600, 150),
-            "NOW PLAYING",
+            "ADDED TO QUEUE",
             fill="white",
             stroke_width=2,
             stroke_fill="white",
