@@ -11,7 +11,7 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from config import BANNED_USERS
-from YukkiMusic.core.call import Yukki
+from YukkiMusic.core.gcall import Yukki
 from YukkiMusic.utils.database import is_muted, mute_on
 from YukkiMusic.utils.decorators import CAdminRightsCheck
 
