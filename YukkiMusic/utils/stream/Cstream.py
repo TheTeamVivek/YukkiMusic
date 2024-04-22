@@ -12,7 +12,7 @@ from random import randint
 from typing import Union
 
 from pyrogram.types import InlineKeyboardMarkup
-
+from pyrogram import Client
 import config
 from YukkiMusic import Carbon, YouTube
 from YukkiMusic.core.call import Yukki
@@ -112,8 +112,8 @@ async def stream(
                     forceplay=forceplay,
                 )
                 img = await gen_thumb(vidid)
-                button = stream_markup(_, vidid, chat_id)
                 me = await client.get_me()
+                button = stream_markup(_, vidid, chat_id)
                 run = await client.send_photo(
                     original_chat_id,
                     photo=img,
@@ -170,10 +170,11 @@ async def stream(
                 "video" if video else "audio",
             )
             position = len(db.get(chat_id)) - 1
+            qimg = await gen_qthumb(vidid)
             button = queue_markup(_, vidid, chat_id)
             run = await client.send_photo(
                 original_chat_id,
-                photo=f"https://img.youtube.com/vi/{vidid}/maxresdefault.jpg",
+                photo=qimg,
                 caption=_["queue_4"].format(
                     position, title[:27], duration_min, user_name
                 ),
@@ -198,8 +199,8 @@ async def stream(
                 forceplay=forceplay,
             )
             img = await gen_thumb(vidid)
-            button = stream_markup(_, vidid, chat_id)
             me = await client.get_me()
+            button = stream_markup(_, vidid, chat_id)
             try:
                 run = await client.send_photo(
                     original_chat_id,
@@ -362,8 +363,8 @@ async def stream(
                 forceplay=forceplay,
             )
             img = await gen_thumb(vidid)
-            button = telegram_markup(_, chat_id)
             me = await client.get_me()
+            button = telegram_markup(_, chat_id)
             run = await client.send_photo(
                 original_chat_id,
                 photo=img,
