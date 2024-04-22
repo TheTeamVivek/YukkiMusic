@@ -316,7 +316,9 @@ class Call(PyTgCalls):
                         try:
                             invitelink = chat.invite_link
                             if invitelink is None:
-                                invitelink = await client.export_chat_invite_link(chat_id)
+                                invitelink = await client.export_chat_invite_link(
+                                    chat_id
+                                )
                         except:
                             invitelink = await client.export_chat_invite_link(chat_id)
                     except ChatAdminRequired:
