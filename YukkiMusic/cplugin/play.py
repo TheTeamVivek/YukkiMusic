@@ -18,7 +18,7 @@ import config
 from config import BANNED_USERS, lyrical
 from strings import get_command
 from YukkiMusic import Apple, Resso, SoundCloud, Spotify, Telegram, YouTube
-from YukkiMusic.core.call import Yukki
+from YukkiMusic.core.gcall import Yukki
 from YukkiMusic.utils import seconds_to_min, time_to_seconds
 from YukkiMusic.utils.channelplay import get_channeplayCB
 from YukkiMusic.utils.database import is_video_allowed
