@@ -130,10 +130,10 @@ async def restart_bots():
             bot = await ai.get_me()
             for num in assistants:
                 userbot = await get_client(num)
-            try:
-                await userbot.send_message(bot.username, "/start")
-            except Exception as e:
-                logging.exception(f"Error  {e}")
+                try:
+                    await userbot.send_message(bot.username, "/start")
+                except Exception as e:
+                    logging.exception(f"Error  {e}")
         except Exception as e:
             logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
             mongo_db.bots.delete_one({"token": bot_token})
