@@ -217,7 +217,7 @@ async def gen_qthumb(videoid, user_id):
         bg = Image.open(f"assets/ZSTREAM_adobe_express.png")
         image1 = youtube.resize((1280, 720))
         image2 = image1.convert("RGBA")
-        background = image2.filter(filter=ImageFilter.BoxBlur(16))
+        background = image2.filter(filter=ImageFilter.BoxBlur(14))
         enhancer = ImageEnhance.Brightness(background)
         background = enhancer.enhance(0.6)
         y = circle(zyoutube).resize((473, 473))
