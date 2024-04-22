@@ -231,7 +231,7 @@ async def gen_qthumb(videoid, user_id):
         # Adding text to the thumbnail
         draw = ImageDraw.Draw(result_img)
         font = ImageFont.truetype("assets/font2.ttf", 54)
-        font2 = ImageFont.truetype("assets/font2.ttf", 89)
+        font2 = ImageFont.truetype("assets/font2.ttf", 65)
         para = textwrap.wrap(title, width=32)
         try:
             text_w, text_h = draw.textsize(f"ADDED TO QUEUE", font=font2)
