@@ -301,12 +301,9 @@ def CPlayWrapper(command):
             userbot = await get_assistant(message.chat.id)
             try:
                 try:
-                    ab = await userbot.resolve_peer(me.username)
-                    await userbot.send_message(ab.user_id, "/start")
-                    ba = await client.resolve_peer(app.username)
-                    ca = await client.resolve_peer(userbot.username)
-                    check_master = await client.get_chat_member(chat_id, ba)
-                    get = await client.get_chat_member(chat_id, ca)
+                    await userbot.send_message(me.username, "/start")
+                    check_master = await client.get_chat_member(chat_id, app.username)
+                    get = await client.get_chat_member(chat_id, userbot.username)
                 except ChatAdminRequired:
                     return await message.reply_text(_["call_1"])
                 if check_master.status in ["member", "administrator"]:
