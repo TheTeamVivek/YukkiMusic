@@ -31,7 +31,7 @@ SKIP_COMMAND = get_command("SKIP_COMMAND")
 @Client.on_message(filters.command(SKIP_COMMAND) & filters.group & ~BANNED_USERS)
 @CAdminRightsCheck
 async def skip(cli, message: Message, _, chat_id):
-    me = await client.get_me()
+    me = await cli.get_me()
     if not len(message.command) < 2:
         loop = await get_loop(chat_id)
         if loop != 0:
