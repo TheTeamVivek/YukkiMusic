@@ -22,7 +22,7 @@ from config import (
     adminlist,
 )
 from YukkiMusic import YouTube
-from YukkiMusic.core.call import Yukki
+from YukkiMusic.core.gcall import Yukki
 from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils.database import (
     is_active_chat,
