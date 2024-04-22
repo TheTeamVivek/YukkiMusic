@@ -236,7 +236,7 @@ async def gen_qthumb(videoid, user_id):
         try:
             text_w, text_h = draw.textsize(f"ADDED TO QUEUE", font=font2)
             draw.text(
-                ((1680 - text_w) / 2, 75),
+                ((1660 - text_w) / 2, 75),
                 f"ADDED TO QUEUE",
                 fill="white",
                 font=font2,
