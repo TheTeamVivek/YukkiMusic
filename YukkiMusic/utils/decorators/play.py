@@ -301,7 +301,11 @@ def CPlayWrapper(command):
             userbot = await get_assistant(message.chat.id)
             try:
                 try:
-                    ckc = message.chat.username if message.chat.username else message.chat.id
+                    ckc = (
+                        message.chat.username
+                        if message.chat.username
+                        else message.chat.id
+                    )
                     check_master = await client.get_chat_member(ckc, app.username)
                     get = await client.get_chat_member(chat_id, userbot.username)
                 except ChatAdminRequired:
