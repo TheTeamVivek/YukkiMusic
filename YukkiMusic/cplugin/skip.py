@@ -16,7 +16,7 @@ import config
 from config import BANNED_USERS
 from strings import get_command
 from YukkiMusic import YouTube
-from YukkiMusic.core.call import Yukki
+from YukkiMusic.core.gcall import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import get_loop
 from YukkiMusic.utils.decorators import CAdminRightsCheck
