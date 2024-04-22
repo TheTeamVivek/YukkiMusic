@@ -64,7 +64,7 @@ async def on_clone(client, message):
                 for num in assistants:
                     userbot = await get_client(num)
                 try:
-                    await userbot.send_message(bot.id, "/start")
+                    await userbot.send_message(bot.username, "/start")
                 except Exception:
                     pass
                 except Exception as e:
@@ -84,7 +84,7 @@ async def on_clone(client, message):
             except BaseException as e:
                 logging.exception("Error while cloning bot.")
                 await msg.edit_text(
-                    f"⚠️ <b>Bot Error:</b>\n\n<code>{e}</code>\n\n**Kindly forward this message to @hhhhhvivek to get assistance.**"
+                    f"⚠️ <b>Bot Error:</b>\n\n<code>{e}</code>\n\n**Kindly forward this message to @vivek_zone to get assistance.**"
                 )
     except Exception as e:
         logging.exception("Error while handling message.")
@@ -127,6 +127,13 @@ async def restart_bots():
                 plugins=dict(root="YukkiMusic.cplugin"),
             )
             await ai.start()
+            bot = await ai.get_me()
+            for num in assistants:
+                userbot = await get_client(num)
+            try:
+                await userbot.send_message(bot.username, "/start")
+            except Exception:
+                pass
         except Exception as e:
             logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
             mongo_db.bots.delete_one({"token": bot_token})
