@@ -32,4 +32,4 @@ async def handle_new_member(client, member):
             output = io.BytesIO()
             background.save(output, format="JPEG")
             output.seek(0)
-            await client.send_photo(member.chat.id
+            await client.send_photo(member.chat.id, output)
