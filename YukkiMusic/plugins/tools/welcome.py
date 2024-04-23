@@ -36,7 +36,7 @@ async def handle_new_member(client, member):
         draw = ImageDraw.Draw(background)
 
         # Define the font for the text
-        font = ImageFont.truetype("", 15)
+        font = ImageFont.truetype("assets/font2.ttf", 15)
 
         # Define the text to be added
         text = f"{member.name}\nID: {member.id}\nUSERNAME: @{member.username}"
