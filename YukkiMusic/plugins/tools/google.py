@@ -1,4 +1,5 @@
 import urllib
+import re
 import urllib.request
 import random
 
