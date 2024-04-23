@@ -4,12 +4,11 @@ from PIL import Image, ImageDraw, ImageFont
 from YukkiMusic import app
 from pyrogram.types import ChatMemberUpdated
 
-
 @app.on_chat_member_updated(filters.group, group=-3)
 async def handle_new_member(client, member):
     background = Image.open("assets/welcome.jpg")
 
-    if member.new_chat_member.status == "member":
+    if member.new_chat_member and member.new_chat_member.status == "member":
         photo = member.new_chat_member.user.photo
         if photo:
             photo_down = await client.download_media(photo)
