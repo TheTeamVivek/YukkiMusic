@@ -57,7 +57,3 @@ async def handle_new_member(client, member):
 
         # Send the new image to the group
         await client.send_photo(member.group.id, output)
-
-
-# Run the bot
-app.run()
