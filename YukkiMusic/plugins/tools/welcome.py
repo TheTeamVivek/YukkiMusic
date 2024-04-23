@@ -4,15 +4,22 @@ from PIL import Image, ImageDraw, ImageFont
 from YukkiMusic import app
 from pyrogram.types import ChatMemberUpdated
 
+
 @app.on_chat_member_updated(filters.group, group=-3)
 async def handle_member_update(client, member):
     if member.new_chat_member and member.new_chat_member.status == "member":
         await send_welcome_message(member.new_chat_member)
 
+
 @app.on_chat_member_updated(filters.group, group=-3)
 async def handle_member_rejoin(client, member):
-    if member.new_chat_member and member.new_chat_member.status == "member" and member.new_chat_member.user.id == app.id:
+    if (
+        member.new_chat_member
+        and member.new_chat_member.status == "member"
+        and member.new_chat_member.user.id == app.id
+    ):
         await send_welcome_message(member.new_chat_member)
+
 
 async def send_welcome_message(new_member):
     background = Image.open("assets/welcome.jpg")
