@@ -3,6 +3,7 @@ import io
 from PIL import Image, ImageDraw, ImageFont
 from YukkiMusic import app
 
+
 # Define the on_member_added event
 @app.on_member_added()
 async def handle_new_member(client, member):
@@ -26,7 +27,10 @@ async def handle_new_member(client, member):
         circle = Image.new("L", (100, 100), 0)
         draw = ImageDraw.Draw(circle)
         draw.ellipse((0, 0, 100, 100), fill=255)
-        image = image.point(lambda x: min(x, 255) if circle.getpixel((x, y)) > 128 else 0, (0, 0, 100, 100))
+        image = image.point(
+            lambda x: min(x, 255) if circle.getpixel((x, y)) > 128 else 0,
+            (0, 0, 100, 100),
+        )
 
         # Create a drawing context
         draw = ImageDraw.Draw(background)
@@ -53,6 +57,7 @@ async def handle_new_member(client, member):
 
         # Send the new image to the group
         await client.send_photo(member.group.id, output)
+
 
 # Run the bot
 app.run()
