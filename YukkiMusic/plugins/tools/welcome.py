@@ -2,10 +2,10 @@ from pyrogram import filters
 import io
 from PIL import Image, ImageDraw, ImageFont
 from YukkiMusic import app
-
+from pyrogram.types import ChatMemberUpdated
 
 # Define the on_member_added event
-@app.on_member_added()
+@app.on_chat_member_updated(filters.group, group=-3)
 async def handle_new_member(client, member):
     # Open the background image
     background = Image.open("assets/welcome.jpg")
