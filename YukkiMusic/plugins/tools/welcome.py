@@ -5,7 +5,7 @@ from YukkiMusic import app
 from pyrogram.types import ChatMemberUpdated
 
 
-@app.on_chat_member_updated(filters.group, group=-3)
+@app.on_chat_member_updated(filters.group)
 async def handle_new_member(client, member):
     background = Image.open("assets/welcome.jpg")
 
