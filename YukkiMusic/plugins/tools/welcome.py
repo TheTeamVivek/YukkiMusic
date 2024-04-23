@@ -12,7 +12,7 @@ async def handle_new_member(client, member):
     if member.new_chat_member and member.new_chat_member.status == "member":
         photo = member.new_chat_member.user.photo
         if photo:
-            photo_down = await client.download_media(photo)
+            photo_down = await app.download_media(photo)
             image = Image.open(io.BytesIO(photo_down))
             image = image.resize((100, 100))
             image = image.convert("RGB")
@@ -33,4 +33,4 @@ async def handle_new_member(client, member):
             output = io.BytesIO()
             background.save(output, format="JPEG")
             output.seek(0)
-            await client.send_photo(member.chat.id, output)
+            await app.send_photo(member.chat.id, output)
