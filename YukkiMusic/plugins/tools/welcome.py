@@ -8,7 +8,7 @@ from YukkiMusic import app
 @app.on_member_added()
 async def handle_new_member(client, member):
     # Open the background image
-    background = Image.open()
+    background = Image.open("assets/welcome.jpg")
 
     # Get the user's profile photo
     photo = member.photo
