@@ -189,13 +189,13 @@ async def play_playlist(client, CallbackQuery, _):
     return await mystic.delete()
 
 
-@app.on_message(filters.command(["playplaylist"]) & ~BANNED_USERS & filters.group)
+
+@app.on_message(filters.command(["playplaylist","vplayplaylist"]) & ~BANNED_USERS & filters.group)
 @languageCB
 async def play_playlist_command(client, message, _):
-    message.command[1] if len(message.command) > 1 else None
+    mode = message.command[0][0]
     user_id = message.from_user.id
     _playlist = await get_playlist_names(user_id)
-
     if not _playlist:
         try:
             return await message.reply(
@@ -214,60 +214,7 @@ async def play_playlist_command(client, message, _):
         pass
 
     result = []
-    video = None
-
-    mystic = await message.reply_text(_["play_1"])
-
-    for vidids in _playlist:
-        result.append(vidids)
-
-    try:
-        await stream(
-            _,
-            mystic,
-            user_id,
-            result,
-            chat_id,
-            user_name,
-            message.chat.id,
-            video,
-            streamtype="playlist",
-        )
-    except Exception as e:
-        ex_type = type(e).__name__
-        err = e if ex_type == "AssistantErr" else _["general_3"].format(ex_type)
-        return await mystic.edit_text(err)
-
-    return await mystic.delete()
-
-
-@app.on_message(filters.command(["vplayplaylist"]) & ~BANNED_USERS & filters.group)
-@languageCB
-async def play_playlist_command(client, message, _):
-    message.command[1] if len(message.command) > 1 else None
-    user_id = message.from_user.id
-    _playlist = await get_playlist_names(user_id)
-
-    if not _playlist:
-        try:
-            return await message.reply(
-                _["playlist_3"],
-                quote=True,
-            )
-        except:
-            return
-
-    chat_id = message.chat.id
-    user_name = message.from_user.first_name
-
-    try:
-        await message.delete()
-    except:
-        pass
-
-    result = []
-    video = True
-
+    video = True if mode == "v" else None
     mystic = await message.reply_text(_["play_1"])
 
     for vidids in _playlist:
