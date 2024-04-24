@@ -189,8 +189,9 @@ async def play_playlist(client, CallbackQuery, _):
     return await mystic.delete()
 
 
-
-@app.on_message(filters.command(["playplaylist","vplayplaylist"]) & ~BANNED_USERS & filters.group)
+@app.on_message(
+    filters.command(["playplaylist", "vplayplaylist"]) & ~BANNED_USERS & filters.group
+)
 @languageCB
 async def play_playlist_command(client, message, _):
     mode = message.command[0][0]
