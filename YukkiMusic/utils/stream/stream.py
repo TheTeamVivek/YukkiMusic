@@ -140,7 +140,7 @@ async def stream(
             return await app.send_photo(
                 original_chat_id,
                 photo=carbon,
-                caption=_["playlist_18"].format(position, link),
+                caption=_["playlist_18"].format(link, position),
                 reply_markup=upl,
             )
     elif streamtype == "youtube":
