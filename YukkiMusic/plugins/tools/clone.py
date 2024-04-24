@@ -1,4 +1,4 @@
-import re
+"""import re
 import logging
 from pymongo import MongoClient
 from pyrogram import Client, filters
@@ -137,3 +137,6 @@ async def restart_bots():
         except Exception as e:
             logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
             mongo_db.bots.delete_one({"token": bot_token})
+"""
+
+#clone has been shutting down for some time
