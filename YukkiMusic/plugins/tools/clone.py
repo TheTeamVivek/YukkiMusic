@@ -139,4 +139,4 @@ async def restart_bots():
             mongo_db.bots.delete_one({"token": bot_token})
 """
 
-#clone has been shutting down for some time
+# clone has been shutting down for some time
