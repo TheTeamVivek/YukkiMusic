@@ -8,9 +8,6 @@
 # All rights reserved.
 
 
-
-
-
 async def gen_thumb(videoid):
     try:
         url = f"https://img.youtube.com/vi/{videoid}/maxresdefault.jpg"
