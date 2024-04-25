@@ -10,12 +10,14 @@
 from YukkiMusic import app
 from config import YOUTUBE_IMG_URL
 
+
 async def gen_thumb(videoid):
     try:
         url = f"https://img.youtube.com/vi/{videoid}/maxresdefault.jpg"
         return url
     except Exception:
         return YOUTUBE_IMG_URL
+
 
 async def gen_qthumb(videoid):
     try:
