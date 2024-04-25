@@ -144,6 +144,10 @@ class Call(PyTgCalls):
         assistant = await group_assistant(self, chat_id)
         await assistant.change_volume_call(chat_id, volume)
 
+    async def get_participant(self, chat_id: int):
+        assistant = await group_assistant(self, chat_id)
+        await assistant.get_participants(chat_id)
+
     async def speedup_stream(self, chat_id: int, file_path, speed, playing):
         assistant = await group_assistant(self, chat_id)
         if str(speed) != str("1.0"):
