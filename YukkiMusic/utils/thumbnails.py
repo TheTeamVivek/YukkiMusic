@@ -279,4 +279,4 @@ async def gen_thumb(videoid):
         url = f"https://img.youtube.com/vi/{videoid}/maxresdefault.jpg"
         return url
     except Exception:
-        YOUTUBE_IMG_URL
+        return YOUTUBE_IMG_URL
