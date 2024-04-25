@@ -15,6 +15,7 @@ async def gen_thumb(videoid):
     except Exception:
         return YOUTUBE_IMG_URL
 
+
 async def gen_qthumb(videoid):
     try:
         url = f"https://img.youtube.com/vi/{videoid}/maxresdefault.jpg"
