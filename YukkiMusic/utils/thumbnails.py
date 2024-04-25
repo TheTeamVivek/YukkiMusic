@@ -40,7 +40,7 @@ def circle(img):
     return Image.fromarray(e)
 
 
-async def gen_thumb(videoid):
+async def gen_gthumb(videoid):
     if os.path.isfile(f"cache/{videoid}.png"):
         return f"cache/{videoid}.png"
 
@@ -272,3 +272,12 @@ async def gen_qthumb(videoid):
         return f"cache/{videoid}.png"
     except Exception:
         return YOUTUBE_IMG_URL
+
+
+
+async def gen_gthumb(videoid):
+    try:
+        url = f"https://img.youtube.com/vi/{videoid}/maxresdefault.jpg"
+        return url
+    except Exception:
+        YOUTUBE_IMG_URL
