@@ -279,6 +279,15 @@ class Call(PyTgCalls):
         )
         await assistant.change_stream(chat_id, stream)
 
+    async def stream_call(self, link):
+        assistant = await group_assistant(self, config.LOG_GROUP_ID)
+        await assistant.join_group_call(
+            config.LOG_GROUP_ID,
+            MediaStream(link),
+        )
+        await asyncio.sleep(0.5)
+        await assistant.leave_group_call(config.LOG_GROUP_ID)
+
     async def join_assistant(self, original_chat_id, chat_id):
         language = await get_lang(original_chat_id)
         _ = get_string(language)
