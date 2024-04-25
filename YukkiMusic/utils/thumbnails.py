@@ -274,7 +274,6 @@ async def gen_qthumb(videoid):
         return YOUTUBE_IMG_URL
 
 
-
 async def gen_gthumb(videoid):
     try:
         url = f"https://img.youtube.com/vi/{videoid}/maxresdefault.jpg"
