@@ -324,13 +324,18 @@ async def testbot(client, message: Message, _):
     out = alive_panel(_)
     uptime = int(time.time() - _boot_)
     chat_id = message.chat.id
-    message_id = message.id
-    await app.send_reaction(chat_id, message_id, random.choice(emoji))
-    await message.reply_photo(
-        photo=config.START_IMG_URL,
-        caption=_["start_8"].format(app.mention, get_readable_time(uptime)),
-        reply_markup=InlineKeyboardMarkup(out),
-    )
+    if config.START_IMG_URL:
+        await message.reply_photo(
+            photo=config.START_IMG_URL,
+            caption=_["start_8"].format(app.mention, get_readable_time(uptime)),
+            reply_markup=InlineKeyboardMarkup(out),
+        )
+    else:
+        await message.reply_photo(
+            photo=random.choice(PHOTO),
+            caption=_["start_8"].format(app.mention, get_readable_time(uptime)),
+            reply_markup=InlineKeyboardMarkup(out),
+        )
     return await add_served_chat(message.chat.id)
 
 
