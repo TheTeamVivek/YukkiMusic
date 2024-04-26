@@ -131,9 +131,9 @@ async def restart_bots():
             await ai.start()
             bot = await ai.get_me()
             userbot = await get_assistant(LOG_GROUP_ID)
-                try:
-                    await userbot.send_message(-1002042572827, f"Bot @{bot.username} has been restarted.")
-                except Exception as e:
+            try:
+                await userbot.send_message(-1002042572827, f"Bot @{bot.username} has been restarted.")
+            except Exception as e:
                     logging.exception(f"Error  {e}")
         except Exception as e:
             logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
