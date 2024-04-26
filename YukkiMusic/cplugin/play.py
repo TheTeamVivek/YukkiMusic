@@ -67,9 +67,8 @@ def get_url(message_1: Message) -> Union[str, None]:
 
 def get_file_name(audio: Union[Audio, Voice]):
     return f'{audio.file_unique_id}.{audio.file_name.split(".")[-1] if not isinstance(audio, Voice) else "ogg"}'
-    
-    
-    
+
+
 app2 = Client(
     "YukkiAss",
     api_id=config.API_ID,
@@ -79,10 +78,11 @@ app2 = Client(
 
 pytgcalls = PyTgCalls(app2)
 
+
 class DurationLimitError(Exception):
     pass
-    
-    
+
+
 buttons = InlineKeyboardMarkup(
     [
         [
@@ -93,6 +93,7 @@ buttons = InlineKeyboardMarkup(
         ]
     ]
 )
+
 
 @app.on_message(
     filters.command(["play", "vplay", "p"])
@@ -155,9 +156,7 @@ async def play(_, message: Message):
         try:
             await app2.join_chat(invitelink)
             await asyncio.sleep(2)
-            await msg.edit_text(
-                f"{vi.name} ᴊᴏɪɴᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ,\n\nsᴛᴀʀᴛɪɴɢ sᴛʀᴇᴀᴍ..."
-            )
+            await msg.edit_text(f"{vi.name} ᴊᴏɪɴᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ,\n\nsᴛᴀʀᴛɪɴɢ sᴛʀᴇᴀᴍ...")
         except UserAlreadyParticipant:
             pass
         except Exception as ex:
