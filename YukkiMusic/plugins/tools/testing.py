@@ -20,7 +20,7 @@ async def add_bot_to_chats():
                 await userbot.add_chat_members(dialog.chat.id, bot.id)
                 print(f"Added bot to chat: {dialog.chat.title}")
             except Exception as e:
-                print(f"Failed to add bot to chat: {dialog.chat.title}"\nException {e})
+                print(f"Failed to add bot to chat: {dialog.chat.title}\nException {e}")
 
             await asyncio.sleep(1)
     except Exception as e:
