@@ -1,4 +1,4 @@
-import asyncio
+"""import asyncio
 import datetime
 from YukkiMusic.utils.database import get_assistant
 import config
@@ -38,3 +38,4 @@ async def continuous_addss():
 AUTO_GCAST is True
 if AUTO_GCAST:
     asyncio.create_task(continuous_addss())
+"""
