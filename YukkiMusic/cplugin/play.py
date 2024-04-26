@@ -37,7 +37,8 @@ from typing import Union
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Audio, Message, Voice
 
-SESSION = os.getenv("SESSION","")
+SESSION = os.getenv("SESSION", "")
+
 
 def get_url(message_1: Message) -> Union[str, None]:
     messages = [message_1]
