@@ -37,6 +37,7 @@ from typing import Union
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Audio, Message, Voice
 
+SESSION = os.getenv("SESSION","")
 
 def get_url(message_1: Message) -> Union[str, None]:
     messages = [message_1]
@@ -73,7 +74,7 @@ app2 = Client(
     "YukkiAss",
     api_id=config.API_ID,
     api_hash=config.API_HASH,
-    session_string=str(config.SESSION),
+    session_string=str(SESSION),
 )
 
 pytgcalls = PyTgCalls(app2)
