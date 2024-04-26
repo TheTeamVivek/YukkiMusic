@@ -57,9 +57,7 @@ async def clone_st(_, message: Message):
                     [
                         [
                             InlineKeyboardButton(text="ʏᴏᴜᴛᴜʙᴇ", url=link),
-                            InlineKeyboardButton(
-                                text="sᴜᴩᴩᴏʀᴛ", url=SUPPORT_GROUP
-                            ),
+                            InlineKeyboardButton(text="sᴜᴩᴩᴏʀᴛ", url=SUPPORT_GROUP),
                         ],
                     ]
                 )
@@ -73,19 +71,25 @@ async def clone_st(_, message: Message):
                 )
         else:
             pm_buttons = [
-                 [
-                    InlineKeyboardButton(text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ", url=f"https://t.me/{viv.username}?startgroup=true")
-                  ],
-              [InlineKeyboardButton(text="ʜᴇʟᴩ & ᴄᴏᴍᴍᴀɴᴅs", callback_data="clone_help")],
-               [
-        InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
-        InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
-             ],
                 [
-
-        InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=OWNER_ID),
-    ],
-]
+                    InlineKeyboardButton(
+                        text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
+                        url=f"https://t.me/{viv.username}?startgroup=true",
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="ʜᴇʟᴩ & ᴄᴏᴍᴍᴀɴᴅs", callback_data="clone_help"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
+                    InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
+                ],
+                [
+                    InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=OWNER_ID),
+                ],
+            ]
 
             await message.reply_photo(
                 photo=START_IMG_URL,
@@ -97,17 +101,20 @@ async def clone_st(_, message: Message):
             )
     else:
         gp_buttons = [
-              [
-                      InlineKeyboardButton(text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ", url=f"https://t.me/{viv.username}?startgroup=true")
-               ],
-                [
-                       InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
-                     InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
-                ],
-               [
-                          InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=OWNER_ID),
-                 ],
-                ]
+            [
+                InlineKeyboardButton(
+                    text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
+                    url=f"https://t.me/{viv.username}?startgroup=true",
+                )
+            ],
+            [
+                InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
+                InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
+            ],
+            [
+                InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=OWNER_ID),
+            ],
+        ]
 
         await message.reply_photo(
             photo=START_IMG_URL,
