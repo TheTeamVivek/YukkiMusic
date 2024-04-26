@@ -23,7 +23,7 @@ START_TEXT = """
 @Client.on_message(filters.command(["start"]) & ~filters.forwarded)
 @Client.on_edited_message(filters.command(["start"]) & ~filters.forwarded)
 async def clone_st(_, message: Message):
-	viv = await client.get_me()
+    viv = await client.get_me()
     if message.chat.type == ChatType.PRIVATE:
         if len(message.text.split()) > 1:
             cmd = message.text.split(None, 1)[1]
