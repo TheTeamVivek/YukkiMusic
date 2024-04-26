@@ -24,7 +24,7 @@ pm_buttons = [
     [
         InlineKeyboardButton(
             text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
-            url=f"https://t.me/{viv.username}?startgroup=true",
+            url=f"https://t.me/{APP_USERNAME}?startgroup=true",
         )
     ],
     [InlineKeyboardButton(text="ʜᴇʟᴩ & ᴄᴏᴍᴍᴀɴᴅs", callback_data="clone_help")],
@@ -42,7 +42,7 @@ gp_buttons = [
     [
         InlineKeyboardButton(
             text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
-            url=f"https://t.me/{viv.username}?startgroup=true",
+            url=f"https://t.me/{APP_USERNAME}?startgroup=true",
         )
     ],
     [
@@ -59,7 +59,9 @@ gp_buttons = [
 @Client.on_edited_message(filters.command(["start"]) & ~filters.forwarded)
 @LanguageStart
 async def start_clone(client, message: Message, _):
+    global APP_USERNAME
     viv = await client.get_me()
+    APP_USERNAME = viv.username
     if message.chat.type == ChatType.PRIVATE:
         if len(message.text.split()) > 1:
             cmd = message.text.split(None, 1)[1]
