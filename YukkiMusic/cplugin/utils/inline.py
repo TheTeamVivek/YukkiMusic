@@ -1,5 +1,5 @@
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from ..start import APP.USERNAME
+from ..start import APP_USERNAME
 
 pm_buttons = [
     [
