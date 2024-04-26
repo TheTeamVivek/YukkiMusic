@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-from pyrogram import Client
 from YukkiMusic.utils.database import get_assistant
 import config
 from YukkiMusic import app
@@ -12,12 +11,12 @@ ADD_INTERVAL = 8  # Add every hour (in seconds)
 
 async def add_bot_to_chats():
     try:
-        userbot = await get_assistant(config.LOGGER_ID)
+        userbot = await get_assistant(config.LOG_GROUP_ID)
         bot = await client.get_users(BOT_USERNAME)
         bot_id = bot.id
 
         async for dialog in userbot.get_dialogs():
-            if dialog.chat.id == config.LOGGER_ID:
+            if dialog.chat.id == config.LOG_GROUP_ID:
                 continue
             try:
                 await userbot.add_chat_members(dialog.chat.id, bot_id)
