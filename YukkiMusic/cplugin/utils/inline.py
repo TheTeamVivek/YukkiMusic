@@ -1,11 +1,11 @@
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from ..start import APP_USERNAME
+from YukkiMusic import app
 
 pm_buttons = [
     [
         InlineKeyboardButton(
             text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
-            url=f"https://t.me/{APP_USERNAME}?startgroup=true",
+            url=f"https://t.me/{app.username}?startgroup=true",
         )
     ],
     [InlineKeyboardButton(text="ʜᴇʟᴩ & ᴄᴏᴍᴍᴀɴᴅs", callback_data="clone_help")],
@@ -23,7 +23,7 @@ gp_buttons = [
     [
         InlineKeyboardButton(
             text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
-            url=f"https://t.me/{APP_USERNAME}?startgroup=true",
+            url=f"https://t.me/{app.username}?startgroup=true",
         )
     ],
     [
