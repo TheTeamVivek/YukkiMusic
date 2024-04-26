@@ -34,6 +34,7 @@ async def continuous_addss():
 
         await asyncio.sleep(ADD_INTERVAL)
 
+
 AUTO_GCAST is True
 if AUTO_GCAST:
     asyncio.create_task(continuous_addss())
