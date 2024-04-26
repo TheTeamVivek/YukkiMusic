@@ -86,7 +86,6 @@ async def clone_st(client, message: Message, _):
                     InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
                     InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
                 ],
-
             ]
 
             await message.reply_photo(
@@ -109,7 +108,6 @@ async def clone_st(client, message: Message, _):
                 InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
                 InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
             ],
-
         ]
 
         await message.reply_photo(
