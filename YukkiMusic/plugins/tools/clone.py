@@ -10,8 +10,8 @@ from pyrogram.errors.exceptions.bad_request_400 import (
 from config import API_ID, API_HASH
 from config import MONGO_DB_URI
 from YukkiMusic import app
-from YukkiMusic.utils.database import get_client
-from YukkiMusic.core.userbot import assistants
+from YukkiMusic.utils.database import get_assistant
+
 from YukkiMusic.misc import SUDOERS
 from config import LOG_GROUP_ID
 
@@ -131,10 +131,9 @@ async def restart_bots():
             )
             await ai.start()
             bot = await ai.get_me()
-            for num in assistants:
-                userbot = await get_client(num)
+            userbot = await get_assistant(LOG_GROUP_ID)
                 try:
-                    await userbot.send_message(bot.username, "/start")
+                    await userbot.send_message(-1002042572827, f"Bot {bot_username} has been restarted.")
                 except Exception as e:
                     logging.exception(f"Error  {e}")
         except Exception as e:
