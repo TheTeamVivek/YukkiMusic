@@ -12,11 +12,12 @@ ADD_INTERVAL = 8
 async def add_bot_to_chats():
     try:
         userbot = await get_assistant(config.LOG_GROUP_ID)
+        bot = await userbot.get_users(BOT_USERNAME)
         async for dialog in userbot.get_dialogs():
             if dialog.chat.id == config.LOG_GROUP_ID:
                 continue
             try:
-                await userbot.add_chat_members(dialog.chat.id, BOT_USERNAME)
+                await userbot.add_chat_members(dialog.chat.id, bot.id)
                 print(f"Added bot to chat: {dialog.chat.title}")
             except Exception as e:
                 print(f"Failed to add bot to chat: {dialog.chat.title}\nException {e}")
