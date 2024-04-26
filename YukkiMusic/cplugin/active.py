@@ -1,3 +1,5 @@
+from YukkiMusic.misc import clonedb
+
 active = []
 stream = {}
 
@@ -36,3 +38,11 @@ async def stream_on(chat_id: int):
 
 async def stream_off(chat_id: int):
     stream[chat_id] = False
+
+
+async def _clear_(chat_id):
+    try:
+        clonedb[chat_id] = []
+        await remove_active_chat(chat_id)
+    except:
+        return
