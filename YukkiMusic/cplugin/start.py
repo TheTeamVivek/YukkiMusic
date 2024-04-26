@@ -4,7 +4,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
 from config import *
 from YukkiMusic.utils.decorators.language import LanguageStart
-
+from YukkiMusic.cplugin.utils.inline import gp_buttons, pm_buttons
 PM_START_TEXT = """
 ʜᴇʏ {0}, 🥀
 ๏ ᴛʜɪs ɪs** {1} !
@@ -19,41 +19,6 @@ START_TEXT = """
 ──────────────────
 ➻ ғᴏʀ ɢᴇᴛᴛɪɴɢ ʜᴇʟᴘ ᴀʙᴏᴜᴛ ᴍᴇ ᴏʀ ɪғ ʏᴏᴜ ᴡᴀɴɴᴀ ᴀsᴋ sᴏᴍᴇᴛʜɪɴɢ ʏᴏᴜ ᴄᴀɴ ᴊᴏɪɴ ᴍʏ [sᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ]({3}).
 """
-
-pm_buttons = [
-    [
-        InlineKeyboardButton(
-            text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
-            url=f"https://t.me/{APP_USERNAME}?startgroup=true",
-        )
-    ],
-    [InlineKeyboardButton(text="ʜᴇʟᴩ & ᴄᴏᴍᴍᴀɴᴅs", callback_data="clone_help")],
-    [
-        InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
-        InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
-    ],
-    [
-        InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=OWNER_ID),
-    ],
-]
-
-
-gp_buttons = [
-    [
-        InlineKeyboardButton(
-            text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
-            url=f"https://t.me/{APP_USERNAME}?startgroup=true",
-        )
-    ],
-    [
-        InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
-        InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
-    ],
-    [
-        InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=OWNER_ID),
-    ],
-]
-
 
 @Client.on_message(filters.command(["start"]) & ~filters.forwarded)
 @Client.on_edited_message(filters.command(["start"]) & ~filters.forwarded)
