@@ -4,7 +4,6 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
 from config import *
 from YukkiMusic.utils.decorators.language import LanguageStart
-from .start import APP_USERNAME
 
 PM_START_TEXT = """
 ʜᴇʏ {0}, 🥀
