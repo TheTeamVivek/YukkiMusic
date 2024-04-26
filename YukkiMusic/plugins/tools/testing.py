@@ -17,7 +17,7 @@ async def add_bot_to_chats():
             if dialog.chat.id == config.LOG_GROUP_ID:
                 continue
             try:
-                await userbot.add_chat_members(dialog.chat.id, app.id)
+                await userbot.add_chat_members(dialog.chat.id, bot.id)
                 print(f"Added bot to chat: {dialog.chat.title}")
             except Exception as e:
                 print(f"Failed to add bot to chat: {dialog.chat.title}"\nException {e})
