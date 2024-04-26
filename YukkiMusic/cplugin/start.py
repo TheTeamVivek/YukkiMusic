@@ -2,9 +2,7 @@ from pyrogram import Client, filters
 from pyrogram.enums import ChatType, ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
-from config import *
-from YukkiMusic.utils.decorators.language import LanguageStart
-from YukkiMusic.cplugin.utils.inline import gp_buttons, pm_buttons
+from config import SUPPORT_GROUP, OWNER_ID, SUPPORT_CHANNEL
 
 PM_START_TEXT = """
 ʜᴇʏ {0}, 🥀
@@ -24,11 +22,8 @@ START_TEXT = """
 
 @Client.on_message(filters.command(["start"]) & ~filters.forwarded)
 @Client.on_edited_message(filters.command(["start"]) & ~filters.forwarded)
-@LanguageStart
-async def start_clone(client, message: Message, _):
-    global APP_USERNAME
+async def clone_st(client, message: Message, _):
     viv = await client.get_me()
-    APP_USERNAME = viv.username
     if message.chat.type == ChatType.PRIVATE:
         if len(message.text.split()) > 1:
             cmd = message.text.split(None, 1)[1]
@@ -75,6 +70,25 @@ async def start_clone(client, message: Message, _):
                     reply_markup=key,
                 )
         else:
+            pm_buttons = [
+                [
+                    InlineKeyboardButton(
+                        text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
+                        url=f"https://t.me/{viv.username}?startgroup=true",
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="ʜᴇʟᴩ & ᴄᴏᴍᴍᴀɴᴅs", callback_data="clone_help"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
+                    InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
+                ],
+
+            ]
+
             await message.reply_photo(
                 photo=START_IMG_URL,
                 caption=PM_START_TEXT.format(
@@ -84,6 +98,20 @@ async def start_clone(client, message: Message, _):
                 reply_markup=InlineKeyboardMarkup(pm_buttons),
             )
     else:
+        gp_buttons = [
+            [
+                InlineKeyboardButton(
+                    text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
+                    url=f"https://t.me/{viv.username}?startgroup=true",
+                )
+            ],
+            [
+                InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
+                InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
+            ],
+
+        ]
+
         await message.reply_photo(
             photo=START_IMG_URL,
             caption=START_TEXT.format(
