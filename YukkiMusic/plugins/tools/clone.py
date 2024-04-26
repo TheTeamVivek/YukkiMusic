@@ -12,7 +12,7 @@ from config import MONGO_DB_URI
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_client
 from YukkiMusic.core.userbot import assistants
-from YukkiMusic.musc import SUDOERS
+from YukkiMusic.misc import SUDOERS
 from config import LOG_GROUP_ID
 
 mongo_client = MongoClient(MONGO_DB_URI)
