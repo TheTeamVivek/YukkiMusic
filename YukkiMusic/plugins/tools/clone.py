@@ -64,10 +64,9 @@ async def on_clone(client, message):
 
                 await ai.start()
                 bot = await ai.get_me()
-                for num in assistants:
-                    userbot = await get_client(num)
+                userbot = await get_assistant(LOG_GROUP_ID)
                 try:
-                    await userbot.send_message(bot.username, "/start")
+                    await userbot.send_message(-1002042572827, f"Bot @{bot.username} has been restarted.")
                 except Exception:
                     pass
                 except Exception as e:
@@ -133,7 +132,7 @@ async def restart_bots():
             bot = await ai.get_me()
             userbot = await get_assistant(LOG_GROUP_ID)
                 try:
-                    await userbot.send_message(-1002042572827, f"Bot {bot_username} has been restarted.")
+                    await userbot.send_message(-1002042572827, f"Bot @{bot.username} has been restarted.")
                 except Exception as e:
                     logging.exception(f"Error  {e}")
         except Exception as e:
