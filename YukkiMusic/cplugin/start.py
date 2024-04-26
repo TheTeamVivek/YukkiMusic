@@ -33,7 +33,6 @@ pm_buttons = [
         InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
     ],
     [
-
         InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=OWNER_ID),
     ],
 ]
@@ -51,11 +50,9 @@ gp_buttons = [
         InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
     ],
     [
-
         InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=OWNER_ID),
     ],
 ]
-
 
 
 @Client.on_message(filters.command(["start"]) & ~filters.forwarded)
