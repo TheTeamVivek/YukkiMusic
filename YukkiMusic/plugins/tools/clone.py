@@ -1,4 +1,4 @@
-"""import re
+import re
 import logging
 from pymongo import MongoClient
 from pyrogram import Client, filters
@@ -12,6 +12,7 @@ from config import MONGO_DB_URI
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_client
 from YukkiMusic.core.userbot import assistants
+from YukkiMusic.musc import SUDOERS
 from config import LOG_GROUP_ID
 
 mongo_client = MongoClient(MONGO_DB_URI)
@@ -19,14 +20,14 @@ mongo_db = mongo_client["Yukkicloned"]
 mongo_collection = mongo_db["Yukkiclone"]
 
 
-@app.on_message(filters.command("clone") & filters.private)
+@app.on_message(filters.command("clone") & filters.private & SUDOERS)
 async def clone_txt(client, message):
     await message.reply_text(
         f"<b>ʜᴇʟʟᴏ {message.from_user.mention} 👋 </b>\n\n1) sᴇɴᴅ <code>/newbot</code> ᴛᴏ @BotFather\n2) ɢɪᴠᴇ ᴀ ɴᴀᴍᴇ ꜰᴏʀ ʏᴏᴜʀ ʙᴏᴛ.\n3) ɢɪᴠᴇ ᴀ ᴜɴɪǫᴜᴇ ᴜsᴇʀɴᴀᴍᴇ.\n4) ᴛʜᴇɴ ʏᴏᴜ ᴡɪʟʟ ɢᴇᴛ ᴀ ᴍᴇssᴀɢᴇ ᴡɪᴛʜ ʏᴏᴜʀ ʙᴏᴛ ᴛᴏᴋᴇɴ.\n5) ꜰᴏʀᴡᴀʀᴅ ᴛʜᴀᴛ ᴍᴇssᴀɢᴇ ᴛᴏ ᴍᴇ.\n\nᴛʜᴇɴ ɪ ᴀᴍ ᴛʀʏ ᴛᴏ ᴄʀᴇᴀᴛᴇ ᴀ ᴄᴏᴘʏ ʙᴏᴛ ᴏғ ᴍᴇ ғᴏʀ ʏᴏᴜ ᴏɴʟʏ 😌"
     )
 
 
-@app.on_message((filters.regex(r"\d[0-9]{8,10}:[0-9A-Za-z_-]{35}")) & filters.private)
+@app.on_message((filters.regex(r"\d[0-9]{8,10}:[0-9A-Za-z_-]{35}")) & filters.private & SUDOERS)
 async def on_clone(client, message):
     try:
         user_id = message.from_user.id
@@ -137,6 +138,5 @@ async def restart_bots():
         except Exception as e:
             logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
             mongo_db.bots.delete_one({"token": bot_token})
-"""
 
-# clone has been shutting down for some time
+#clone features only gor sudoers because this is in testing
