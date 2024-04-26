@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 from pyrogram.enums import ChatType, ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
-from config import SUPPORT_GROUP, OWNER_ID, SUPPORT_CHANNEL, START_IMG_URL
+from config *
 from YukkiMusic.utils.decorators.language import LanguageStart
 
 PM_START_TEXT = """
@@ -19,6 +19,43 @@ START_TEXT = """
 ──────────────────
 ➻ ғᴏʀ ɢᴇᴛᴛɪɴɢ ʜᴇʟᴘ ᴀʙᴏᴜᴛ ᴍᴇ ᴏʀ ɪғ ʏᴏᴜ ᴡᴀɴɴᴀ ᴀsᴋ sᴏᴍᴇᴛʜɪɴɢ ʏᴏᴜ ᴄᴀɴ ᴊᴏɪɴ ᴍʏ [sᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ]({3}).
 """
+
+pm_buttons = [
+    [
+        InlineKeyboardButton(
+            text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
+            url=f"https://t.me/{viv.username}?startgroup=true",
+        )
+    ],
+    [InlineKeyboardButton(text="ʜᴇʟᴩ & ᴄᴏᴍᴍᴀɴᴅs", callback_data="clone_help")],
+    [
+        InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
+        InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
+    ],
+    [
+
+        InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=OWNER_ID),
+    ],
+]
+
+
+gp_buttons = [
+    [
+        InlineKeyboardButton(
+            text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
+            url=f"https://t.me/{viv.username}?startgroup=true",
+        )
+    ],
+    [
+        InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
+        InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
+    ],
+    [
+
+        InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=OWNER_ID),
+    ],
+]
+
 
 
 @Client.on_message(filters.command(["start"]) & ~filters.forwarded)
@@ -72,27 +109,6 @@ async def start_clone(client, message: Message, _):
                     reply_markup=key,
                 )
         else:
-            pm_buttons = [
-                [
-                    InlineKeyboardButton(
-                        text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
-                        url=f"https://t.me/{viv.username}?startgroup=true",
-                    )
-                ],
-                [
-                    InlineKeyboardButton(
-                        text="ʜᴇʟᴩ & ᴄᴏᴍᴍᴀɴᴅs", callback_data="clone_help"
-                    )
-                ],
-                [
-                    InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
-                    InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
-                ],
-                [
-                    InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=OWNER_ID),
-                ],
-            ]
-
             await message.reply_photo(
                 photo=START_IMG_URL,
                 caption=PM_START_TEXT.format(
@@ -102,22 +118,6 @@ async def start_clone(client, message: Message, _):
                 reply_markup=InlineKeyboardMarkup(pm_buttons),
             )
     else:
-        gp_buttons = [
-            [
-                InlineKeyboardButton(
-                    text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
-                    url=f"https://t.me/{viv.username}?startgroup=true",
-                )
-            ],
-            [
-                InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
-                InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
-            ],
-            [
-                InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=OWNER_ID),
-            ],
-        ]
-
         await message.reply_photo(
             photo=START_IMG_URL,
             caption=START_TEXT.format(
