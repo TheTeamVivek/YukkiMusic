@@ -27,7 +27,9 @@ async def clone_txt(client, message):
     )
 
 
-@app.on_message((filters.regex(r"\d[0-9]{8,10}:[0-9A-Za-z_-]{35}")) & filters.private & SUDOERS)
+@app.on_message(
+    (filters.regex(r"\d[0-9]{8,10}:[0-9A-Za-z_-]{35}")) & filters.private & SUDOERS
+)
 async def on_clone(client, message):
     try:
         user_id = message.from_user.id
@@ -139,4 +141,5 @@ async def restart_bots():
             logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
             mongo_db.bots.delete_one({"token": bot_token})
 
-#clone features only gor sudoers because this is in testing
+
+# clone features only gor sudoers because this is in testing
