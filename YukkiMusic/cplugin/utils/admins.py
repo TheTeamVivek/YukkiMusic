@@ -6,7 +6,8 @@ from pyrogram.types import CallbackQuery, Message
 
 from YukkiMusic.misc import SUDOERS
 
-from ..active import is_active_chat
+from YukkiMusic.cplugin.active import is_active_chat
+
 
 
 def admin_check(func: Callable) -> Callable:
