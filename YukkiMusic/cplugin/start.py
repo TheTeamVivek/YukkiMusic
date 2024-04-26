@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 from pyrogram.enums import ChatType, ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
-from config import SUPPORT_GROUP, OWNER_ID, SUPPORT_CHANNEL
+from config import SUPPORT_GROUP, OWNER_ID, SUPPORT_CHANNEL, START_IMG_URL
 from YukkiMusic.utils.decorators.language import LanguageStart
 
 PM_START_TEXT = """
