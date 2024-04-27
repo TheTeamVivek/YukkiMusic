@@ -29,8 +29,8 @@ import config
 from config import DURATION_LIMIT_MIN
 from YukkiMusic import LOGGER
 from YukkiMusic.misc import clonedb
-from YukkiMusic.cplugin.queue import put
-from YukkiMusic.cplugin.active import add_active_chat, is_active_chat, stream_on
+from YukkiMusic.cplugin.utils import put
+from YukkiMusic.cplugin.utils import add_active_chat, is_active_chat, stream_on
 from YukkiMusic.utils.downloaders import audio_dl
 from YukkiMusic.utils.thumbnails import gen_qthumb, gen_thumb
 from typing import Union
