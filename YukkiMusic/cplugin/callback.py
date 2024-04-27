@@ -248,11 +248,9 @@ async def home_fallen(client, query: CallbackQuery):
         ]
 
         await query.edit_message_text(
-            viv = await client.get_me()
-            h = viv.mention
             text=PM_START_TEXT.format(
                 query.from_user.first_name,
-                h,
+                vi.mention,
             ),
             reply_markup=InlineKeyboardMarkup(pm_buttons),
         )
