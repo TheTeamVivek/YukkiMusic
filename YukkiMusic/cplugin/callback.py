@@ -179,9 +179,10 @@ async def help_menu(client, query: CallbackQuery):
                 ],
             ],
         )
+        help_markup = InlineKeyboardMarkup(helpmenu)
         await query.edit_message_text(
             text=f"๏ ʜᴇʏ {query.from_user.first_name}, 🥀\n\nᴘʟᴇᴀsᴇ ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ғᴏʀ ᴡʜɪᴄʜ ʏᴏᴜ ᴡᴀɴɴᴀ ɢᴇᴛ ʜᴇʟᴘ.",
-            reply_markup=InlineKeyboardMarkup(helpmenu),
+            reply_markup=InlineKeyboardMarkup(help_markup),
         )
     except Exception as e:
         logging.exception(e)
