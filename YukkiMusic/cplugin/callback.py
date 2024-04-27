@@ -131,7 +131,7 @@ async def admin_cbs(client, query: CallbackQuery, _):
                     stream,
                 )
             except Exception as ex:
-                LOGGER.error(ex)
+                print(ex)
                 await _clear_(query.message.chat.id)
                 return await pytgcalls.leave_group_call(query.message.chat.id)
 
@@ -182,7 +182,7 @@ async def help_menu(client, query: CallbackQuery):
             reply_markup=InlineKeyboardMarkup(helpmenu),
         )
     except Exception as e:
-        LOGGER.error(e)
+        print(e)
         return
 
 
