@@ -3,7 +3,7 @@ from pyrogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardBu
 from pytgcalls.types import MediaStream, AudioQuality
 
 from config import *
-from YukkiMusic import LOGGER
+import logging
 from YukkiMusic.misc import clonedb
 from YukkiMusic.utils.thumbnails import gen_thumb
 from .utils import (
@@ -131,7 +131,7 @@ async def admin_cbs(client, query: CallbackQuery, _):
                     stream,
                 )
             except Exception as ex:
-                print(ex)
+                logging.exception(ex)
                 await _clear_(query.message.chat.id)
                 return await pytgcalls.leave_group_call(query.message.chat.id)
 
@@ -182,7 +182,7 @@ async def help_menu(client, query: CallbackQuery):
             reply_markup=InlineKeyboardMarkup(helpmenu),
         )
     except Exception as e:
-        print(e)
+        logging.exception(e)
         return
 
 
