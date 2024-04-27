@@ -207,3 +207,7 @@ class Userbot(Client):
             else:
                 self.five.name = get_me.first_name
             LOGGER(__name__).info(f"Assistant Five Started as {self.five.name}")
+
+    @userbot.one.on_message(filters.command("start"))
+    async def start_command(self, client, message):
+        await message.reply("Hello! I am alive.")
