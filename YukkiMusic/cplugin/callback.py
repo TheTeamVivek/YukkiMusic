@@ -209,17 +209,11 @@ async def open_hmenu(client, query: CallbackQuery):
         pass
 
     if cb == "help":
-        await query.edit_message_text(
-            HELP_TEXT.format(h), reply_markup=keyboard
-        )
+        await query.edit_message_text(HELP_TEXT.format(h), reply_markup=keyboard)
     elif cb == "sudo":
-        await query.edit_message_text(
-            HELP_SUDO.format(h), reply_markup=keyboard
-        )
+        await query.edit_message_text(HELP_SUDO.format(h), reply_markup=keyboard)
     elif cb == "owner":
-        await query.edit_message_text(
-            HELP_DEV.format(h), reply_markup=keyboard
-        )
+        await query.edit_message_text(HELP_DEV.format(h), reply_markup=keyboard)
 
 
 @Client.on_callback_query(filters.regex("clone_home"))
