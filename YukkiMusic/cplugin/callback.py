@@ -6,7 +6,17 @@ from config import *
 from YukkiMusic import LOGGER
 from YukkiMusic.misc import clonedb
 from YukkiMusic.utils.thumbnails import gen_thumb
-from .utils import admin_check_cb, stream_off, stream_on, is_streaming, _clear_, HELP_TEXT, PM_START_TEXT, HELP_DEV, HELP_SUDO
+from .utils import (
+    admin_check_cb,
+    stream_off,
+    stream_on,
+    is_streaming,
+    _clear_,
+    HELP_TEXT,
+    PM_START_TEXT,
+    HELP_DEV,
+    HELP_SUDO,
+)
 from .play import pytgcalls
 
 
@@ -134,9 +144,10 @@ async def admin_cbs(_, query: CallbackQuery):
                         InlineKeyboardButton(text="▷", callback_data="resume_cb"),
                         InlineKeyboardButton(text="II", callback_data="pause_cb"),
                         InlineKeyboardButton(text="‣‣I", callback_data="skip_cb"),
-                        InlineKeyboardButton(text="▢", callback_data="end_cb")]
+                        InlineKeyboardButton(text="▢", callback_data="end_cb"),
+                    ]
                 ]
-        )
+            )
         vi = await client.get_me()
         return await query.message.reply_photo(
             photo=img,
@@ -156,9 +167,7 @@ async def help_menu(_, query: CallbackQuery):
         await query.edit_message_text(
             text=f"๏ ʜᴇʏ {query.from_user.first_name}, 🥀\n\nᴘʟᴇᴀsᴇ ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ғᴏʀ ᴡʜɪᴄʜ ʏᴏᴜ ᴡᴀɴɴᴀ ɢᴇᴛ ʜᴇʟᴘ.",
             helpmenu=[
-                [
-                    InlineKeyboardButton(text="ᴇᴠᴇʀʏᴏɴᴇ", callback_data="clone_cb help")
-                ],
+                [InlineKeyboardButton(text="ᴇᴠᴇʀʏᴏɴᴇ", callback_data="clone_cb help")],
                 [
                     InlineKeyboardButton(text="sᴜᴅᴏ", callback_data="clone_cb sudo"),
                     InlineKeyboardButton(text="ᴏᴡɴᴇʀ", callback_data="clone_cb owner"),
@@ -195,11 +204,17 @@ async def open_hmenu(_, query: CallbackQuery):
         pass
 
     if cb == "help":
-        await query.edit_message_text(HELP_TEXT.format(vi.mention), reply_markup=keyboard)
+        await query.edit_message_text(
+            HELP_TEXT.format(vi.mention), reply_markup=keyboard
+        )
     elif cb == "sudo":
-        await query.edit_message_text(HELP_SUDO.format(vi.mention), reply_markup=keyboard)
+        await query.edit_message_text(
+            HELP_SUDO.format(vi.mention), reply_markup=keyboard
+        )
     elif cb == "owner":
-        await query.edit_message_text(HELP_DEV.format(vi.mention), reply_markup=keyboard)
+        await query.edit_message_text(
+            HELP_DEV.format(vi.mention), reply_markup=keyboard
+        )
 
 
 @app.on_callback_query(filters.regex("clone_home"))
@@ -211,7 +226,12 @@ async def home_fallen(_, query: CallbackQuery):
     try:
         vi = await client.get_me()
         pm_buttons = [
-            [InlineKeyboardButton(text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ", url=f"https://t.me/{vi.username}?startgroup=true")],
+            [
+                InlineKeyboardButton(
+                    text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
+                    url=f"https://t.me/{vi.username}?startgroup=true",
+                )
+            ],
             [InlineKeyboardButton(text="ʜᴇʟᴩ & ᴄᴏᴍᴍᴀɴᴅs", callback_data="fallen_help")],
             [
                 InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=config.SUPPORT_CHANNEL),
