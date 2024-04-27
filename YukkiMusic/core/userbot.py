@@ -81,7 +81,9 @@ class Userbot(Client):
         LOGGER(__name__).info(f"Starting Assistant Clients")
         if config.STRING1:
             await self.one.start()
-            await self.one.add_handler(MessageHandler(echo, filters.text & filters.private))
+            await self.one.add_handler(
+                MessageHandler(echo, filters.text & filters.private)
+            )
             try:
                 await self.one.join_chat("TeamYM")
                 await self.one.join_chat("TheYukki")
