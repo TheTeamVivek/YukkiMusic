@@ -59,8 +59,8 @@ async def admin_cbs(_, query: CallbackQuery):
         await stream_on(query.message.chat.id)
         await pytgcalls.resume_stream(query.message.chat.id)
         close_key = InlineKeyboardMarkup(
-                            [[InlineKeyboardButton(text="✯ ᴄʟᴏsᴇ ✯", callback_data="close")]]
-       )
+            [[InlineKeyboardButton(text="✯ ᴄʟᴏsᴇ ✯", callback_data="close")]]
+        )
         await query.message.reply_text(
             text=f"➻ sᴛʀᴇᴀᴍ ʀᴇsᴜᴍᴇᴅ 💫\n│ \n└ʙʏ : {query.from_user.mention} 🥀",
             reply_markup=close_key,
@@ -129,21 +129,21 @@ async def admin_cbs(_, query: CallbackQuery):
                 reply_markup=close_key,
             )
             buttons = InlineKeyboardMarkup(
-               [
+                [
                     [
-                       InlineKeyboardButton(text="▷", callback_data="resume_cb"),
-                       InlineKeyboardButton(text="II", callback_data="pause_cb"),
-                       InlineKeyboardButton(text="‣‣I", callback_data="skip_cb"),
-                       InlineKeyboardButton(text="▢", callback_data="end_cb"),
-                  ]
+                        InlineKeyboardButton(text="▷", callback_data="resume_cb"),
+                        InlineKeyboardButton(text="II", callback_data="pause_cb"),
+                        InlineKeyboardButton(text="‣‣I", callback_data="skip_cb"),
+                        InlineKeyboardButton(text="▢", callback_data="end_cb")]
                 ]
-           )
-            vi = await client.get_me()
-            return await query.message.reply_photo(
-                photo=img,
-                caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{vi.username}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
-                reply_markup=buttons,
-            )
+        )
+        vi = await client.get_me()
+        return await query.message.reply_photo(
+            photo=img,
+            caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{vi.username}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
+            reply_markup=buttons,
+        )
+
 
 @app.on_callback_query(filters.regex("clone_help"))
 async def help_menu(_, query: CallbackQuery):
@@ -155,21 +155,19 @@ async def help_menu(_, query: CallbackQuery):
     try:
         await query.edit_message_text(
             text=f"๏ ʜᴇʏ {query.from_user.first_name}, 🥀\n\nᴘʟᴇᴀsᴇ ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ғᴏʀ ᴡʜɪᴄʜ ʏᴏᴜ ᴡᴀɴɴᴀ ɢᴇᴛ ʜᴇʟᴘ.",
-            helpmenu = [
-                 [
-                   InlineKeyboardButton(text="ᴇᴠᴇʀʏᴏɴᴇ", callback_data="clone_cb help")
-                 ],
-                 [
-                     InlineKeyboardButton(text="sᴜᴅᴏ", callback_data="clone_cb sudo"),
-                     InlineKeyboardButton(text="ᴏᴡɴᴇʀ", callback_data="clone_cb owner"),
-                  ],
-                 [
-                      InlineKeyboardButton(text="ʙᴀᴄᴋ", callback_data="clone_home"),
-                      InlineKeyboardButton(text="ᴄʟᴏsᴇ", callback_data="close"),
-                  ],
-            ]
-
-
+            helpmenu=[
+                [
+                    InlineKeyboardButton(text="ᴇᴠᴇʀʏᴏɴᴇ", callback_data="clone_cb help")
+                ],
+                [
+                    InlineKeyboardButton(text="sᴜᴅᴏ", callback_data="clone_cb sudo"),
+                    InlineKeyboardButton(text="ᴏᴡɴᴇʀ", callback_data="clone_cb owner"),
+                ],
+                [
+                    InlineKeyboardButton(text="ʙᴀᴄᴋ", callback_data="clone_home"),
+                    InlineKeyboardButton(text="ᴄʟᴏsᴇ", callback_data="close"),
+                ],
+            ],
             reply_markup=InlineKeyboardMarkup(helpmenu),
         )
     except Exception as e:
@@ -183,12 +181,12 @@ async def open_hmenu(_, query: CallbackQuery):
     vi = client.get_me()
     cb = callback_data.split(None, 1)[1]
     help_back = [
-                 [InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP)],
-              [
-                  InlineKeyboardButton(text="ʙᴀᴄᴋ", callback_data="clone_help"),
-                  InlineKeyboardButton(text="ᴄʟᴏsᴇ", callback_data="close"),
-               ],
-   ]
+        [InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP)],
+        [
+            InlineKeyboardButton(text="ʙᴀᴄᴋ", callback_data="clone_help"),
+            InlineKeyboardButton(text="ᴄʟᴏsᴇ", callback_data="close"),
+        ],
+    ]
     keyboard = InlineKeyboardMarkup(help_back)
 
     try:
@@ -211,22 +209,17 @@ async def home_fallen(_, query: CallbackQuery):
     except:
         pass
     try:
-    	vi = await client.get_me()
-    	pm_buttons = [
-           [
-                InlineKeyboardButton(
-                 text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
-                  url=f"https://t.me/{vi.username}?startgroup=true",
-               )
-           ],
-             [InlineKeyboardButton(text="ʜᴇʟᴩ & ᴄᴏᴍᴍᴀɴᴅs", callback_data="fallen_help")],
+        vi = await client.get_me()
+        pm_buttons = [
+            [InlineKeyboardButton(text="ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ", url=f"https://t.me/{vi.username}?startgroup=true")],
+            [InlineKeyboardButton(text="ʜᴇʟᴩ & ᴄᴏᴍᴍᴀɴᴅs", callback_data="fallen_help")],
             [
-            InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=config.SUPPORT_CHANNEL),
-            InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=config.SUPPORT_CHAT),
+                InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=config.SUPPORT_CHANNEL),
+                InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=config.SUPPORT_CHAT),
             ],
-          [
-              InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=config.OWNER_ID),
-             ],
+            [
+                InlineKeyboardButton(text="🥀 ᴅᴇᴠᴇʟᴏᴩᴇʀ 🥀", user_id=config.OWNER_ID),
+            ],
         ]
 
         await query.edit_message_text(
