@@ -12,7 +12,8 @@ import sys
 from pyrogram import Client
 import config
 from ..logging import LOGGER
-
+from pyrogram.handlers import MessageHandler
+from pyrogram.dispatcher import Dispatcher
 
 assistants = []
 assistantids = []
@@ -28,6 +29,7 @@ class Userbot(Client):
                 session_string=str(config.STRING1),
                 no_updates=True,
             )
+            self.add_dispatcher(self.one)
         else:
             self.one = None
 
@@ -39,6 +41,7 @@ class Userbot(Client):
                 session_string=str(config.STRING2),
                 no_updates=True,
             )
+            self.add_dispatcher(self.two)
         else:
             self.two = None
 
@@ -50,6 +53,7 @@ class Userbot(Client):
                 session_string=str(config.STRING3),
                 no_updates=True,
             )
+            self.add_dispatcher(self.three)
         else:
             self.three = None
 
@@ -61,6 +65,7 @@ class Userbot(Client):
                 session_string=str(config.STRING4),
                 no_updates=True,
             )
+            self.add_dispatcher(self.four)
         else:
             self.four = None
 
@@ -72,8 +77,12 @@ class Userbot(Client):
                 session_string=str(config.STRING5),
                 no_updates=True,
             )
+            self.add_dispatcher(self.five)
         else:
             self.five = None
+
+    def add_dispatcher(self, client):
+        client.dispatcher = client.add_handler()
 
     async def start(self):
         LOGGER(__name__).info(f"Starting Assistant Clients")
