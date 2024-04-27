@@ -166,9 +166,7 @@ async def help_menu(client, query: CallbackQuery):
         pass
 
     try:
-        await query.edit_message_text(
-            text=f"๏ ʜᴇʏ {query.from_user.first_name}, 🥀\n\nᴘʟᴇᴀsᴇ ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ғᴏʀ ᴡʜɪᴄʜ ʏᴏᴜ ᴡᴀɴɴᴀ ɢᴇᴛ ʜᴇʟᴘ.",
-            helpmenu=[
+        helpmenu=[
                 [InlineKeyboardButton(text="ᴇᴠᴇʀʏᴏɴᴇ", callback_data="clone_cb help")],
                 [
                     InlineKeyboardButton(text="sᴜᴅᴏ", callback_data="clone_cb sudo"),
@@ -178,7 +176,9 @@ async def help_menu(client, query: CallbackQuery):
                     InlineKeyboardButton(text="ʙᴀᴄᴋ", callback_data="clone_home"),
                     InlineKeyboardButton(text="ᴄʟᴏsᴇ", callback_data="close"),
                 ],
-            ],
+        ],
+        await query.edit_message_text(
+            text=f"๏ ʜᴇʏ {query.from_user.first_name}, 🥀\n\nᴘʟᴇᴀsᴇ ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ғᴏʀ ᴡʜɪᴄʜ ʏᴏᴜ ᴡᴀɴɴᴀ ɢᴇᴛ ʜᴇʟᴘ.",
             reply_markup=InlineKeyboardMarkup(helpmenu),
         )
     except Exception as e:
