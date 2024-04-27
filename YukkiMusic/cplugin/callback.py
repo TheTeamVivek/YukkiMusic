@@ -1,5 +1,5 @@
 from pyrogram import Client, filters
-from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
+from pyrogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from pytgcalls.types import MediaStream, AudioQuality
 
 from config import *
