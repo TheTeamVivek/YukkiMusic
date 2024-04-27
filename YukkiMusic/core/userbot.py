@@ -16,7 +16,8 @@ from ..logging import LOGGER
 assistants = []
 assistantids = []
 
-#जय श्री राम प्रभु अगर ये युक्ति काम कर गया तो मैं तो यह से ये वाक्य नहीं हटाउॅगा
+# जय श्री राम प्रभु अगर ये युक्ति काम कर गया तो मैं तो यह से ये वाक्य नहीं हटाउॅगा
+
 
 class Userbot(Client):
     def __init__(self):
@@ -25,10 +26,10 @@ class Userbot(Client):
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_name="yukki_session",
-            bot_token=config.BOT_TOKEN
+            bot_token=config.BOT_TOKEN,
         )
         self.dispatcher = self.add_handler()
-        
+
         if config.STRING1:
             self.one = Client(
                 "YukkiString1",
@@ -83,7 +84,7 @@ class Userbot(Client):
             )
         else:
             self.five = None
-            
+
     async def start(self):
         await super().start()
         if self.one:
