@@ -51,7 +51,9 @@ async def forceclose_command(client, CallbackQuery):
         pass
 
 
-@Client.on_callback_query(filters.regex(pattern=r"^(resume_cb|pause_cb|skip_cb|end_cb)$"))
+@Client.on_callback_query(
+    filters.regex(pattern=r"^(resume_cb|pause_cb|skip_cb|end_cb)$")
+)
 @admin_check_cb
 async def admin_cbs(client, query: CallbackQuery, _):
     try:
