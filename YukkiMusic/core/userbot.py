@@ -9,9 +9,7 @@
 #
 
 import sys
-from pyrogram import Client, filters
-from pyrogram.handlers import MessageHandler
-from YukkiMusic.utils.testing import echo
+from pyrogram import Client
 import config
 from ..logging import LOGGER
 
@@ -81,9 +79,6 @@ class Userbot(Client):
         LOGGER(__name__).info(f"Starting Assistant Clients")
         if config.STRING1:
             await self.one.start()
-            await self.one.add_handler(
-                MessageHandler(echo, filters.text & filters.private)
-            )
             try:
                 await self.one.join_chat("TeamYM")
                 await self.one.join_chat("TheYukki")
