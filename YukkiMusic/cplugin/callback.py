@@ -11,12 +11,12 @@ from .utils import (
     stream_off,
     stream_on,
     is_streaming,
-    _clear_,
     HELP_TEXT,
     PM_START_TEXT,
     HELP_DEV,
     HELP_SUDO,
 )
+from .utils.active import _clear_
 from .play import pytgcalls
 
 
