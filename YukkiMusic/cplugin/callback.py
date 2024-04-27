@@ -181,7 +181,7 @@ async def help_menu(client, query: CallbackQuery):
         )
         await query.edit_message_text(
             text=f"๏ ʜᴇʏ {query.from_user.first_name}, 🥀\n\nᴘʟᴇᴀsᴇ ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ғᴏʀ ᴡʜɪᴄʜ ʏᴏᴜ ᴡᴀɴɴᴀ ɢᴇᴛ ʜᴇʟᴘ.",
-            reply_markup=helpmenu),
+            reply_markup=helpmenu,
         )
     except Exception as e:
         logging.exception(e)
