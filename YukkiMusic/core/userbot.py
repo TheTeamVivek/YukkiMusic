@@ -16,7 +16,8 @@ from ..logging import LOGGER
 assistants = []
 assistantids = []
 
-#जय श्री राम प्रभु अगर ये युक्ति काम कर गया तो मैं तो यह से ये वाक्य नहीं हटाउॅगा
+#जय श्री राम प्रभु अगर ये युक्ति काम कर गया तो मैं तो यह से ये वाक्य नहीं हटाउॅगा।
+
 class Userbot(Client):
     def __init__(self):
         super().__init__(
@@ -74,6 +75,7 @@ class Userbot(Client):
             )
         else:
             self.five = None
+    )
             
     async def start(self):
         await super().start()
