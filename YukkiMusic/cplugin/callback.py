@@ -180,7 +180,7 @@ async def help_menu(client, query: CallbackQuery):
             ],
         )
         await query.edit_message_text(
-            text=f"๏ ʜᴇʏ {query.from_user.first_name}, 🥀\n\nᴘʟᴇᴀsᴇ ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ғᴏʀ ᴡʜɪᴄʜ ʏᴏᴜ ᴡᴀɴɴᴀ ɢᴇᴛ ʜᴇʟᴘ.",
+            text=f"๏ ʜᴇʏ {query.from_user.mention}, 🥀\n\nᴘʟᴇᴀsᴇ ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ғᴏʀ ᴡʜɪᴄʜ ʏᴏᴜ ᴡᴀɴɴᴀ ɢᴇᴛ ʜᴇʟᴘ.",
             reply_markup=helpmenu,
         )
     except Exception as e:
@@ -191,7 +191,6 @@ async def help_menu(client, query: CallbackQuery):
 @Client.on_callback_query(filters.regex("clone_cb"))
 async def open_hmenu(client, query: CallbackQuery):
     callback_data = query.data.strip()
-    vi = client.get_me()
     cb = callback_data.split(None, 1)[1]
     help_back = [
         [InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP)],
@@ -208,16 +207,22 @@ async def open_hmenu(client, query: CallbackQuery):
         pass
 
     if cb == "help":
+        vi = client.get_me()
+        h = vi.mention
         await query.edit_message_text(
-            HELP_TEXT.format(vi.mention), reply_markup=keyboard
+            HELP_TEXT.format(h), reply_markup=keyboard
         )
     elif cb == "sudo":
+        vi = client.get_me()
+        h = vi.mention
         await query.edit_message_text(
-            HELP_SUDO.format(vi.mention), reply_markup=keyboard
+            HELP_SUDO.format(h), reply_markup=keyboard
         )
     elif cb == "owner":
+        vi = client.get_me()
+        h = vi.mention
         await query.edit_message_text(
-            HELP_DEV.format(vi.mention), reply_markup=keyboard
+            HELP_DEV.format(h), reply_markup=keyboard
         )
 
 
@@ -247,9 +252,11 @@ async def home_fallen(client, query: CallbackQuery):
         ]
 
         await query.edit_message_text(
+            viv = client.get_me()
+            h = viv.mention
             text=PM_START_TEXT.format(
                 query.from_user.first_name,
-                vi.mention,
+                h,
             ),
             reply_markup=InlineKeyboardMarkup(pm_buttons),
         )
