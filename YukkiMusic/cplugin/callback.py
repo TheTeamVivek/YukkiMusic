@@ -245,5 +245,6 @@ async def home_fallen(client, query: CallbackQuery):
             ),
             reply_markup=InlineKeyboardMarkup(pm_buttons),
         )
-    except:
-        pass
+    except Exception as e:
+        logging.exception(e)
+        return
