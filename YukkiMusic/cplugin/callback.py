@@ -20,8 +20,8 @@ from .utils.active import _clear_
 from .play import pytgcalls
 
 
-@app.on_callback_query(filters.regex("forceclose"))
-async def close_(_, CallbackQuery):
+@Client.on_callback_query(filters.regex("forceclose"))
+async def close_(client, CallbackQuery):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
     query, user_id = callback_request.split("|")
@@ -39,8 +39,8 @@ async def close_(_, CallbackQuery):
         return
 
 
-@app.on_callback_query(filters.regex("close"))
-async def forceclose_command(_, CallbackQuery):
+@Client.on_callback_query(filters.regex("close"))
+async def forceclose_command(client, CallbackQuery):
     try:
         await CallbackQuery.message.delete()
     except:
@@ -51,9 +51,9 @@ async def forceclose_command(_, CallbackQuery):
         pass
 
 
-@app.on_callback_query(filters.regex(pattern=r"^(resume_cb|pause_cb|skip_cb|end_cb)$"))
+@Client.on_callback_query(filters.regex(pattern=r"^(resume_cb|pause_cb|skip_cb|end_cb)$"))
 @admin_check_cb
-async def admin_cbs(_, query: CallbackQuery):
+async def admin_cbs(client, query: CallbackQuery, _):
     try:
         await query.answer()
     except:
@@ -156,8 +156,8 @@ async def admin_cbs(_, query: CallbackQuery):
         )
 
 
-@app.on_callback_query(filters.regex("clone_help"))
-async def help_menu(_, query: CallbackQuery):
+@Client.on_callback_query(filters.regex("clone_help"))
+async def help_menu(client, query: CallbackQuery):
     try:
         await query.answer()
     except:
@@ -184,8 +184,8 @@ async def help_menu(_, query: CallbackQuery):
         return
 
 
-@app.on_callback_query(filters.regex("clone_cb"))
-async def open_hmenu(_, query: CallbackQuery):
+@Client.on_callback_query(filters.regex("clone_cb"))
+async def open_hmenu(client, query: CallbackQuery):
     callback_data = query.data.strip()
     vi = client.get_me()
     cb = callback_data.split(None, 1)[1]
@@ -217,8 +217,8 @@ async def open_hmenu(_, query: CallbackQuery):
         )
 
 
-@app.on_callback_query(filters.regex("clone_home"))
-async def home_fallen(_, query: CallbackQuery):
+@Client.on_callback_query(filters.regex("clone_home"))
+async def home_fallen(client, query: CallbackQuery):
     try:
         await query.answer()
     except:
