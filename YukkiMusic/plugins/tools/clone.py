@@ -88,7 +88,7 @@ async def on_clone(client, message):
             except BaseException as e:
                 logging.exception("Error while cloning bot.")
                 await msg.edit_text(
-                    f"⚠️ <b>Bot Error:</b>\n\n<code>{e}</code>\n\n**Kindly forward this message to @viv_zone to get assistance.**"
+                    f"⚠️ <b>ᴇʀʀᴏʀ:</b>\n\n<code>{e}</code>\n\n**ᴋɪɴᴅʟʏ ғᴏᴡᴀʀᴅ ᴛʜɪs ᴍᴇssᴀɢᴇ ᴛᴏ @viv_zone ᴛᴏ ɢᴇᴛ ᴀssɪsᴛᴀɴᴄᴇ**"
                 )
     except Exception as e:
         logging.exception("Error while handling message.")
