@@ -207,19 +207,19 @@ async def open_hmenu(client, query: CallbackQuery):
         pass
 
     if cb == "help":
-        vi = client.get_me()
+        vi = await client.get_me()
         h = vi.mention
         await query.edit_message_text(
             HELP_TEXT.format(h), reply_markup=keyboard
         )
     elif cb == "sudo":
-        vi = client.get_me()
+        vi = await client.get_me()
         h = vi.mention
         await query.edit_message_text(
             HELP_SUDO.format(h), reply_markup=keyboard
         )
     elif cb == "owner":
-        vi = client.get_me()
+        vi = await client.get_me()
         h = vi.mention
         await query.edit_message_text(
             HELP_DEV.format(h), reply_markup=keyboard
@@ -252,7 +252,7 @@ async def home_fallen(client, query: CallbackQuery):
         ]
 
         await query.edit_message_text(
-            viv = client.get_me()
+            viv = await client.get_me()
             h = viv.mention
             text=PM_START_TEXT.format(
                 query.from_user.first_name,
