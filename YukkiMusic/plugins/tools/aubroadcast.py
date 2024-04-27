@@ -6,7 +6,7 @@ from config import LOG_GROUP_ID as LOGGER_ID
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-AUTO_GCAST ="True"
+AUTO_GCAST = "True"
 
 MESSAGES = f"""‣  тнιѕ ιѕ {app.mention}
  
@@ -16,7 +16,10 @@ MESSAGES = f"""‣  тнιѕ ιѕ {app.mention}
 BUTTONS = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton("α∂∂ ʏᴜᴋᴋɪ ιи уσυʀ ɢʀσυρ", url=f"https://t.me/{app.username}?startgroup=true")
+            InlineKeyboardButton(
+                "α∂∂ ʏᴜᴋᴋɪ ιи уσυʀ ɢʀσυρ",
+                url=f"https://t.me/{app.username}?startgroup=true",
+            )
         ]
     ]
 )
@@ -30,23 +33,25 @@ async def send_text_once():
     except Exception as e:
         pass
 
+
 async def send_message_to_chats():
     try:
         chats = await get_served_chats()
 
         for chat_info in chats:
-            chat_id = chat_info.get('chat_id')
-            if isinstance(chat_id, int): 
+            chat_id = chat_info.get("chat_id")
+            if isinstance(chat_id, int):
                 try:
                     await app.send_message(chat_id, photo=caption, reply_markup=BUTTONS)
-                    await asyncio.sleep(10) 
+                    await asyncio.sleep(10)
                 except Exception as e:
-                    pass 
+                    pass
     except Exception as e:
         pass
 
+
 async def continuous_broadcast():
-    await send_text_once() 
+    await send_text_once()
 
     while True:
         if AUTO_GCAST:
@@ -56,5 +61,6 @@ async def continuous_broadcast():
                 pass
         await asyncio.sleep(43200)
 
-if AUTO_GCAST:  
+
+if AUTO_GCAST:
     asyncio.create_task(continuous_broadcast())
