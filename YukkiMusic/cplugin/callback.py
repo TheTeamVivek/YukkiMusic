@@ -192,6 +192,8 @@ async def help_menu(client, query: CallbackQuery):
 async def open_hmenu(client, query: CallbackQuery):
     callback_data = query.data.strip()
     cb = callback_data.split(None, 1)[1]
+    vi = await client.get_me()
+    h = vi.mention
     help_back = [
         [InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP)],
         [
@@ -207,20 +209,14 @@ async def open_hmenu(client, query: CallbackQuery):
         pass
 
     if cb == "help":
-        vi = await client.get_me()
-        h = vi.mention
         await query.edit_message_text(
             HELP_TEXT.format(h), reply_markup=keyboard
         )
     elif cb == "sudo":
-        vi = await client.get_me()
-        h = vi.mention
         await query.edit_message_text(
             HELP_SUDO.format(h), reply_markup=keyboard
         )
     elif cb == "owner":
-        vi = await client.get_me()
-        h = vi.mention
         await query.edit_message_text(
             HELP_DEV.format(h), reply_markup=keyboard
         )
