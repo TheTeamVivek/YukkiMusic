@@ -111,6 +111,8 @@ async def play(client, message: Message):
     msg = await message.reply_text("» ᴘʀᴏᴄᴇssɪɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
     vi = await app2.get_me()
     viv = await client.get_me()
+    global BOT_USERNAME
+    BOT_USERNAME = viv.username
     try:
         await message.delete()
     except:
