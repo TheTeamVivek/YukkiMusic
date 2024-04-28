@@ -25,9 +25,7 @@ def first_page(_):
     firsts_page = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton(
-                    text=_["H_B_12"], callback_data="music"
-                ),
+                InlineKeyboardButton(text=_["H_B_12"], callback_data="music"),
             ],
             [
                 InlineKeyboardButton(
