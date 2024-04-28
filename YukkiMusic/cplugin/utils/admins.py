@@ -44,7 +44,7 @@ def admin_check_cb(func: Callable) -> Callable:
             )
 
         if query.from_user.id in SUDOERS:
-            return await func(client, _, query)
+            return await func(client, query, _)
 
         try:
             check = await client.get_chat_member(
