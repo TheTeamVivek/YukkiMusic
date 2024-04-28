@@ -37,14 +37,14 @@ def admin_check(func: Callable) -> Callable:
 
 
 def admin_check_cb(func: Callable) -> Callable:
-    async def cb_non_admin(_, query: CallbackQuery):
+    async def cb_non_admin(client, _, query: CallbackQuery):
         if not await is_active_chat(query.message.chat.id):
             return await query.answer(
                 "ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.", show_alert=True
             )
 
         if query.from_user.id in SUDOERS:
-            return await func(_, query)
+            return await func(client, _, query)
 
         try:
             check = await client.get_chat_member(
@@ -62,7 +62,7 @@ def admin_check_cb(func: Callable) -> Callable:
             await client.get_chat_member(query.message.chat.id, query.from_user.id)
         ).privileges
         if admin.can_manage_video_chats:
-            return await func(_, query)
+            return await func(client, _, query)
         else:
             return await query.answer(
                 "» ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ᴍᴀɴᴀɢᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛs, ᴘʟᴇᴀsᴇ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs.",
