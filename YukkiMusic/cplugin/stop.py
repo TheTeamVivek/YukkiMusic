@@ -5,6 +5,7 @@ from .play import pytgcalls
 from .utils import admin_check
 from .utils.active import _clear_
 
+
 @Client.on_message(filters.command(["stop", "end"]) & filters.group)
 @admin_check
 async def stop_str(client, message: Message, _):
