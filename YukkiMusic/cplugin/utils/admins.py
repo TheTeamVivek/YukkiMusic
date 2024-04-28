@@ -8,6 +8,7 @@ from YukkiMusic.misc import SUDOERS
 
 from .active import is_active_chat
 
+
 def admin_check(func: Callable) -> Callable:
     async def non_admin(_, message: Message):
         if not await is_active_chat(message.chat.id):
@@ -33,7 +34,6 @@ def admin_check(func: Callable) -> Callable:
             )
 
     return non_admin
-
 
 
 def admin_check_cb(func: Callable) -> Callable:
