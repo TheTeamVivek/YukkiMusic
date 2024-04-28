@@ -8,7 +8,7 @@ from .utils.active import _clear_
 from YukkiMusic.utils.thumbnails import gen_thumb
 from YukkiMusic.misc import clonedb
 
-BOT_USERNAME = a
+BOT_USERNAME = "vk_zone"
 
 
 @Client.on_message(filters.command(["skip", "next"]) & filters.group)
