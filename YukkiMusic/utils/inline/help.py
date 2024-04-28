@@ -26,7 +26,7 @@ def first_page(_):
         [
             [
                 InlineKeyboardButton(
-                    text=_["H_B_12"], callback_data="help_callback hb11"
+                    text=_["H_B_12"], callback_data="music"
                 ),
             ],
             [
