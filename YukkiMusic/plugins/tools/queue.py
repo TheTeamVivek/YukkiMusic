@@ -13,6 +13,7 @@ import os
 
 from pyrogram import filters
 from pyrogram.errors import FloodWait
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
 
 import config
