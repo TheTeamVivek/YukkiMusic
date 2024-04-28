@@ -39,7 +39,7 @@ from pyrogram.types import Audio, Message, Voice
 from YukkiMusic.utils.database import get_assistant
 from YukkiMusic import Yukki
 
-#SESSION = os.getenv("SESSION", "")
+# SESSION = os.getenv("SESSION", "")
 
 
 def get_url(message_1: Message) -> Union[str, None]:
@@ -80,8 +80,9 @@ def get_file_name(audio: Union[Audio, Voice]):
     session_string=str(SESSION),
 )
 """
-#pytgcalls = PyTgCalls(app2)
-pytgcalls= Yukki.one
+# pytgcalls = PyTgCalls(app2)
+pytgcalls = Yukki.one
+
 
 class DurationLimitError(Exception):
     pass
