@@ -58,11 +58,10 @@ async def forceclose_command(client, CallbackQuery):
     filters.regex(pattern=r"^(resume_cb|pause_cb|skip_cb|end_cb)$")
 )
 async def admin_cbs(client, query: CallbackQuery):
-    if not await is_active_chat(message.chat.id):
-        return await message.reply_text("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
-
     user_id = query.from_user.id
     chat_id = query.message.chat.id
+    if not await is_active_chat(chat_id):
+        return await message.reply_text("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
     check = await client.get_chat_member(chat_id, user_id)
     if (
         check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]
