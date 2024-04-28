@@ -37,7 +37,7 @@ from typing import Union
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Audio, Message, Voice
 from YukkiMusic.utils.database import get_assistant
-from YukkiMusic import Yukki
+from YukkiMusic import Yukki, userbot
 
 # SESSION = os.getenv("SESSION", "")
 
@@ -82,7 +82,7 @@ def get_file_name(audio: Union[Audio, Voice]):
 """
 # pytgcalls = PyTgCalls(app2)
 pytgcalls = Yukki.one
-
+app2 = userbot.one
 
 class DurationLimitError(Exception):
     pass
