@@ -84,6 +84,7 @@ def get_file_name(audio: Union[Audio, Voice]):
 pytgcalls = Yukki.one
 app2 = userbot.one
 
+
 class DurationLimitError(Exception):
     pass
 
