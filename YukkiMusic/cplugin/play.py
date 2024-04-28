@@ -259,7 +259,7 @@ async def play(client, message: Message):
             message.from_user.id,
         )
         position = len(clonedb.get(message.chat.id))
-        qimg = await gen_qthumb(videoid, message.from_user.id)
+        qimg = await gen_qthumb(videoid)
         await message.reply_photo(
             photo=qimg,
             caption=f"**➻ ᴀᴅᴅᴇᴅ ᴛᴏ ᴏ̨ᴜᴇᴜᴇ ᴀᴛ {position}**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{viv.username}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {ruser}",
@@ -286,7 +286,7 @@ async def play(client, message: Message):
                 f"» {viv.mention} ᴀssɪsᴛᴀɴᴛ ɪs ᴍᴜᴛᴇᴅ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ,\n\nᴘʟᴇᴀsᴇ ᴜɴᴍᴜᴛᴇ {vi.mention} ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ ᴀɴᴅ ᴛʀʏ ᴘʟᴀʏɪɴɢ ᴀɢᴀɪɴ."
             )
 
-        imgt = await gen_thumb(videoid, message.from_user.id)
+        imgt = await gen_thumb(videoid)
         await stream_on(message.chat.id)
         await add_active_chat(message.chat.id)
         await message.reply_photo(
