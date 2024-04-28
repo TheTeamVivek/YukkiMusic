@@ -8,32 +8,32 @@ from YukkiMusic.misc import SUDOERS
 
 from .active import is_active_chat
 
-
 def admin_check(func: Callable) -> Callable:
-    async def non_admin(client, message: Message, _):
+    async def non_admin(_, message: Message):
         if not await is_active_chat(message.chat.id):
             return await message.reply_text("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
 
         if message.from_user.id in SUDOERS:
-            return await func(client, message, _)
+            return await func(_, message)
 
-        check = await client.get_chat_member(message.chat.id, message.from_user.id)
+        check = await app.get_chat_member(message.chat.id, message.from_user.id)
         if check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]:
             return await message.reply_text(
                 "» ʏᴏᴜ'ʀᴇ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ ʙᴀʙʏ, ᴘʟᴇᴀsᴇ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs."
             )
 
         admin = (
-            await client.get_chat_member(message.chat.id, message.from_user.id)
+            await app.get_chat_member(message.chat.id, message.from_user.id)
         ).privileges
         if admin.can_manage_video_chats:
-            return await func(client, message, _)
+            return await func(_, message)
         else:
             return await message.reply_text(
                 "» ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ᴍᴀɴᴀɢᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛs, ᴘʟᴇᴀsᴇ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs."
             )
 
     return non_admin
+
 
 
 def admin_check_cb(func: Callable) -> Callable:
