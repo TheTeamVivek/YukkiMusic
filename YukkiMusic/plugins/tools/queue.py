@@ -153,19 +153,24 @@ async def quite_timer(client, CallbackQuery: CallbackQuery):
         await CallbackQuery.answer()
     except:
         pass
+
+
 @app.on_callback_query(filters.regex("music") & ~BANNED_USERS)
 async def nothing(client, CallbackQuery: CallbackQuery):
     try:
         await CallbackQuery.answer("ʜᴇʀᴇ ᴀʀᴇ ᴄᴏᴍᴍᴀᴍᴅs ᴏɴʏ ғᴏʀ ᴍᴜsɪᴄ", show_alert=True)
     except:
         pass
+
+
 @app.on_callback_query(filters.regex("managment") & ~BANNED_USERS)
 async def nothing(client, CallbackQuery: CallbackQuery):
     try:
-        await CallbackQuery.answer("ʙᴇʟᴏᴡ ᴀʀᴇ ᴄᴏᴍᴍᴀᴍᴅs ғᴏʀ ᴍᴀɴᴀɢᴍᴇɴᴛ ᴏʀ sᴏᴍᴇ ᴄᴜᴛᴇ ғᴇᴀᴜᴛʀᴇs ", show_alert=True)
+        await CallbackQuery.answer(
+            "ʙᴇʟᴏᴡ ᴀʀᴇ ᴄᴏᴍᴍᴀᴍᴅs ғᴏʀ ᴍᴀɴᴀɢᴍᴇɴᴛ ᴏʀ sᴏᴍᴇ ᴄᴜᴛᴇ ғᴇᴀᴜᴛʀᴇs ", show_alert=True
+        )
     except:
         pass
-
 
 
 @app.on_callback_query(filters.regex("GetQueued") & ~BANNED_USERS)
