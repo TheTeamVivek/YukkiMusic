@@ -108,7 +108,7 @@ buttons = InlineKeyboardMarkup(
     & ~filters.forwarded
     & ~filters.via_bot
 )
-async def play(_, message: Message):
+async def play(client, message: Message):
     msg = await message.reply_text("» ᴘʀᴏᴄᴇssɪɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
     vi = await app2.get_me()
     viv = await client.get_me()
