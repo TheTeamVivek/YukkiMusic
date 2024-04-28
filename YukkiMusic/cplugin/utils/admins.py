@@ -27,7 +27,7 @@ def admin_check(func: Callable) -> Callable:
             await client.get_chat_member(message.chat.id, message.from_user.id)
         ).privileges
         if admin.can_manage_video_chats:
-            return await func(_, message)
+            return await func(client, message, _)
         else:
             return await message.reply_text(
                 "» ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ᴍᴀɴᴀɢᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛs, ᴘʟᴇᴀsᴇ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs."
