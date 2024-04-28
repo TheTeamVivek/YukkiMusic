@@ -47,7 +47,9 @@ def admin_check_cb(func: Callable) -> Callable:
             return await func(_, query)
 
         try:
-            check = await client.get_chat_member(query.message.chat.id, query.from_user.id)
+            check = await client.get_chat_member(
+                query.message.chat.id, query.from_user.id
+            )
         except:
             return
         if check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]:
