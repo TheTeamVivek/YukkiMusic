@@ -29,9 +29,9 @@ async def put(
         "req": ruser,
         "user_id": user_id,
     }
-    get = fallendb.get(chat_id)
+    get = clonedb.get(chat_id)
     if get:
-        fallendb[chat_id].append(put_f)
+        clonedb[chat_id].append(put_f)
     else:
-        fallendb[chat_id] = []
-        fallendb[chat_id].append(put_f)
+        clonedb[chat_id] = []
+        clonedb[chat_id].append(put_f)
