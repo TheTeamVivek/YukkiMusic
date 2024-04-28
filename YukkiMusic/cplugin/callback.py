@@ -61,7 +61,7 @@ async def admin_cbs(client, query: CallbackQuery):
     user_id = query.from_user.id
     chat_id = query.message.chat.id
     if not await is_active_chat(chat_id):
-        return await message.reply_text("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
+        return await query.answer("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.", show_alert=True)
     check = await client.get_chat_member(chat_id, user_id)
     if (
         check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]
