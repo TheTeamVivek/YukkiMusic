@@ -119,7 +119,7 @@ async def play(client, message: Message):
 
     try:
         try:
-            get = await Client.get_chat_member(message.chat.id, vi.username)
+            get = await client.get_chat_member(message.chat.id, vi.username)
         except ChatAdminRequired:
             return await msg.edit_text(
                 f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {viv.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}."
