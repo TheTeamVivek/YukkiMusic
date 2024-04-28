@@ -62,7 +62,7 @@ def admin_check_cb(func: Callable) -> Callable:
             await client.get_chat_member(query.message.chat.id, query.from_user.id)
         ).privileges
         if admin.can_manage_video_chats:
-            return await func(client, _, query)
+            return await func(client, query, _)
         else:
             return await query.answer(
                 "» ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ᴍᴀɴᴀɢᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛs, ᴘʟᴇᴀsᴇ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs.",
