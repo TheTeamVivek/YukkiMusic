@@ -37,7 +37,7 @@ def admin_check(func: Callable) -> Callable:
 
 
 def admin_check_cb(func: Callable) -> Callable:
-    async def admin_cbs(client, query: CallbackQuery, _) -> Callable:
+    async def cb_non_admin(client, query: CallbackQuery, _) -> Callable:
         if not await is_active_chat(query.message.chat.id):
             return await query.answer(
                 "ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.", show_alert=True
