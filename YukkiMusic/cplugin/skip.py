@@ -7,9 +7,10 @@ from .utils import admin_check, buttons
 from .utils.active import _clear_
 from YukkiMusic.utils.thumbnails import gen_thumb
 from YukkiMusic.misc import clonedb
-from YukkiMusic import app 
+from YukkiMusic import app
 
 BOT_USERNAME = app.username
+
 
 @Client.on_message(filters.command(["skip", "next"]) & filters.group)
 @admin_check
