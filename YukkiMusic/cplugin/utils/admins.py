@@ -10,12 +10,12 @@ from .active import is_active_chat
 
 
 def admin_check(func: Callable) -> Callable:
-    async def non_admin(_, message: Message):
+    async def non_admin(client, message: Message, _):
         if not await is_active_chat(message.chat.id):
             return await message.reply_text("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
 
         if message.from_user.id in SUDOERS:
-            return await func(_, message)
+            return await func(client, message, _)
 
         check = await client.get_chat_member(message.chat.id, message.from_user.id)
         if check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]:
