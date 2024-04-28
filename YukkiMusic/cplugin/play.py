@@ -37,7 +37,8 @@ from typing import Union
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Audio, Message, Voice
 from YukkiMusic.utils.database import get_assistant
-from YukkiMusic import Yukki, userbot
+from YukkiMusic import userbot
+from YukkiMusic.core.call import Yukki
 
 # SESSION = os.getenv("SESSION", "")
 
