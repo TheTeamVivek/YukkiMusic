@@ -54,21 +54,21 @@ async def forceclose_command(client, CallbackQuery):
         pass
 
 
-
 @Client.on_callback_query(
     filters.regex(pattern=r"^(resume_cb|pause_cb|skip_cb|end_cb)$")
 )
 async def admin_cbs(client, query: CallbackQuery):
     if not await is_active_chat(message.chat.id):
         return await message.reply_text("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
-        
+
     user_id = query.from_user.id
     chat_id = query.message.chat.id
     check = await client.get_chat_member(chat_id, user_id)
-    if check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR] or user_id not in SUDOERS :
-    	return await query.answer(
-                "sᴏʀʀʏ? ᴏɴʟʏ ᴀᴅᴍɪɴ ᴄᴀɴ ᴅᴏ ᴛʜɪs", show_alert=True
-        )
+    if (
+        check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]
+        or user_id not in SUDOERS
+    ):
+        return await query.answer("sᴏʀʀʏ? ᴏɴʟʏ ᴀᴅᴍɪɴ ᴄᴀɴ ᴅᴏ ᴛʜɪs", show_alert=True)
     try:
         await query.answer()
     except:
@@ -169,6 +169,7 @@ async def admin_cbs(client, query: CallbackQuery):
             caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{vi.username}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
             reply_markup=buttons,
         )
+
 
 @Client.on_callback_query(filters.regex("clone_help"))
 async def help_menu(client, query: CallbackQuery):
