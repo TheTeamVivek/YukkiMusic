@@ -111,7 +111,7 @@ buttons = InlineKeyboardMarkup(
 async def play(_, message: Message):
     msg = await message.reply_text("» ᴘʀᴏᴄᴇssɪɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
     vi = await app2.get_me()
-    viv = await Client.get_me()
+    viv = await client.get_me()
     try:
         await message.delete()
     except:
