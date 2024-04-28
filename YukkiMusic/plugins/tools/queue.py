@@ -156,7 +156,6 @@ async def quite_timer(client, CallbackQuery: CallbackQuery):
         pass
 
 
-
 @app.on_callback_query(filters.regex("music") & ~BANNED_USERS)
 async def nothing(client, CallbackQuery: CallbackQuery):
     upl = InlineKeyboardMarkup(
@@ -171,12 +170,13 @@ async def nothing(client, CallbackQuery: CallbackQuery):
     )
     try:
         if CallbackQuery.from_user.id not in SUDOERS:
-            return await CallbackQuery.answer("ʜᴇʀᴇ ᴀʀᴇ ᴄᴏᴍᴍᴀᴍᴅs ᴏɴʏ ғᴏʀ ᴍᴜsɪᴄ", show_alert=True)
+            return await CallbackQuery.answer(
+                "ʜᴇʀᴇ ᴀʀᴇ ᴄᴏᴍᴍᴀᴍᴅs ᴏɴʏ ғᴏʀ ᴍᴜsɪᴄ", show_alert=True
+            )
         else:
             await CallbackQuery.edit_message_text(helpers.HELP_11, reply_markup=upl)
     except Exception:
-    	pass
-        
+        pass
 
 
 @app.on_callback_query(filters.regex("managment") & ~BANNED_USERS)
