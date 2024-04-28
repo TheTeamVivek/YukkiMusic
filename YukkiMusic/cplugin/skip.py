@@ -2,12 +2,13 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from pytgcalls.types import MediaStream, AudioQuality
 
-from .play import BOT_USERNAME, pytgcalls
+from .play import pytgcalls
 from .utils import admin_check, buttons
 from .utils.active import _clear_
 from YukkiMusic.utils.thumbnails import gen_thumb
 from YukkiMusic.misc import clonedb
 
+BOT_USERNAME = Client.me.username
 
 @Client.on_message(filters.command(["skip", "next"]) & filters.group)
 @admin_check
