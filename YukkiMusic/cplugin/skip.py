@@ -10,6 +10,7 @@ from YukkiMusic.misc import clonedb
 
 BOT_USERNAME = Client.me.username
 
+
 @Client.on_message(filters.command(["skip", "next"]) & filters.group)
 @admin_check
 async def skip_str(_, message: Message):
