@@ -1,7 +1,7 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-from .play import app, pytgcalls
+from .play import pytgcalls
 from .utils import _clear_, admin_check, close_key
 
 
