@@ -1,19 +1,17 @@
 from pyrogram import Client
 from pyrogram import filters
-
 import requests
 from YukkiMusic import app
 
-
 @app.on_message(filters.command("im", prefixes="/"))
 async def download_instagram_video(client, message):
-    if len(message.command) < 3:
+    if len(message.command) < 2:
         await message.reply_text(
             "Please provide the Instagram video URL after the command."
         )
         return
 
-    url = message.command[1]
+    url = message.text.split()[1]
     api_url = (
         f"https://nodejs-1xn1lcfy3-jobians.vercel.app/v2/downloader/instagram?url={url}"
     )
