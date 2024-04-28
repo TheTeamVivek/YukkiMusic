@@ -7,9 +7,9 @@
 #
 # All rights reserved.
 #
-
 import asyncio
 import os
+import logging
 
 from pyrogram import Client, filters
 from pyrogram.enums import ChatMemberStatus
@@ -27,7 +27,6 @@ from youtube_search import YoutubeSearch
 
 import config
 from config import DURATION_LIMIT_MIN
-from YukkiMusic import LOGGER
 from YukkiMusic.misc import clonedb
 from YukkiMusic.cplugin.utils import put
 from YukkiMusic.cplugin.utils import add_active_chat, is_active_chat, stream_on
@@ -144,10 +143,10 @@ async def play(client, message: Message):
             try:
                 await app2.resolve_peer(invitelink)
             except Exception as ex:
-                LOGGER.error(ex)
+                logging.exception(ex)
         else:
             try:
-                invitelink = await Client.export_chat_invite_link(message.chat.id)
+                invitelink = await client.export_chat_invite_link(message.chat.id)
             except ChatAdminRequired:
                 return await msg.edit_text(
                     f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {viv.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}."
@@ -236,7 +235,7 @@ async def play(client, message: Message):
                 secmul *= 60
 
         except Exception as e:
-            LOGGER.error(str(e))
+            logging.exception(str(e))
             return await msg.edit("» ғᴀɪʟᴇᴅ ᴛᴏ ᴘʀᴏᴄᴇss ᴏ̨ᴜᴇʀʏ, ᴛʀʏ ᴘʟᴀʏɪɴɢ ᴀɢᴀɪɴ...")
 
         if (dur / 60) > DURATION_LIMIT_MIN:
