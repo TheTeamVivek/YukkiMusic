@@ -7,7 +7,7 @@
 #
 # All rights reserved.
 #
-
+import logging
 import asyncio
 import os
 
@@ -175,8 +175,8 @@ async def nothing(client, CallbackQuery: CallbackQuery):
             )
         else:
             await CallbackQuery.edit_message_text(helpers.HELP_11, reply_markup=upl)
-    except Exception:
-        pass
+    except Exception as e:
+        logging.exception(e)
 
 
 @app.on_callback_query(filters.regex("managment") & ~BANNED_USERS)
