@@ -34,8 +34,7 @@ async def on_clone(client, message):
         )
         bot_token = bot_token[0] if bot_token else None
         bot_id = re.findall(r"\d[0-9]{8,10}", message.text)
-        cursor = clonebotdb.find()
-        bots = await cursor.to_list(length=None)
+        bots = list(clonebotdb.find())
         bot_tokens = None
 
         for bot in bots:
@@ -130,8 +129,7 @@ async def delete_cloned_bot(client, message):
 async def restart_bots():
     global CLONES
     logging.info("Restarting all bots........")
-    cursor = clonebotdb.find()
-    bots = await cursor.to_list(length=None)  # Retrieve all documents from the cursor
+    bots = list(clonebotdb.find())
     for bot in bots:
         bot_token = bot["token"]
         try:
