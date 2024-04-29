@@ -6,7 +6,7 @@ from .utils import admin_check, close_key, is_streaming, stream_off, is_active_c
 from YukkiMusic.misc import SUDOERS
 
 
-@Client.on_message(filters.command(["pause"]) & filters.group)
+@Client.on_message(filters.command(["pause","resume"]) & filters.group)
 async def pause_str(client, message: Message):
     try:
         await message.delete()
@@ -41,3 +41,4 @@ async def pause_str(client, message: Message):
         return await message.reply_text(
             text=f"➻ sᴛʀᴇᴀᴍ ᴩᴀᴜsᴇᴅ 🥺\n└ʙʏ : {message.from_user.mention} 🥀",
         )
+    elif message.text.lower() == "/resume":
