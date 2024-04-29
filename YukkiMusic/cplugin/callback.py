@@ -151,7 +151,7 @@ async def admin_cbs(client, query: CallbackQuery):
                 await query.edit_message_text(
                     text=f"➻ sᴛʀᴇᴀᴍ sᴋɪᴩᴩᴇᴅ 🥺\n└ʙʏ : {query.from_user.mention} 🥀",
                 )
-                
+
             vi = await client.get_me()
             return await query.message.reply_photo(
                 photo=img,
