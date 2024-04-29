@@ -13,7 +13,7 @@ async def welcome(client: Client, message: Message):
          return await client.leave_chat(message.chat.id)
     a = await client.get_chat_member(message.chat.id, i.id)
     if a.status != ChatMemberStatus.ADMINISTRATOR:
-    await message.reply_text("ᴘʟᴇᴀsᴇ ᴍᴀᴋᴇ ᴍᴇ ᴀɴ ᴀᴅᴍɪɴ ᴡɪᴛʜ **ɪɴᴠɪᴛᴇ ᴜsᴇʀ** ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ᴘʟᴀʏ ᴍᴜsɪᴄ")
+        await message.reply_text("ᴘʟᴇᴀsᴇ ᴍᴀᴋᴇ ᴍᴇ ᴀɴ ᴀᴅᴍɪɴ ᴡɪᴛʜ **ɪɴᴠɪᴛᴇ ᴜsᴇʀ** ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ᴘʟᴀʏ ᴍᴜsɪᴄ")
         return await client.leave_chat(message.chat.id)
     try:
         b = await client.get_chat_member(message.chat.id, BOTID)
