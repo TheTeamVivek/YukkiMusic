@@ -5,6 +5,7 @@ from YukkiMusic import app
 
 BOT_ID = app.id
 
+
 @Client.on_message(filters.new_chat_members)
 @Client.on_message(filters.new_chat_members, group=-1)
 async def welcome(client: Client, message: Message):
@@ -34,16 +35,24 @@ async def welcome(client: Client, message: Message):
     except Exception:
         pass
 
+
 @Client.on_message(filters.video_chat_started, group=20)
 @Client.on_message(filters.video_chat_ended, group=30)
 @Client.on_message(filters.new_chat_members)
 @Client.on_message()
 async def leave(client: Client, message: Message):
-	try:
-		chat_members = client.get_chat_members(message.chat.id)
-	except Exception:
-		pass
-	if message.from_user and message.from_user.id == BOT_ID or message.from_user and message.from_user.id == CLONES:
-		await client.send_message(message.chat.id, "My Friend bot aur master bot is here so I can't stay here anymore thankyou")
-		await client.leave_chat(message.chat.id)
-	
+    try:
+        chat_members = client.get_chat_members(message.chat.id)
+    except Exception:
+        pass
+    if (
+        message.from_user
+        and message.from_user.id == BOT_ID
+        or message.from_user
+        and message.from_user.id == CLONES
+    ):
+        await client.send_message(
+            message.chat.id,
+            "My Friend bot aur master bot is here so I can't stay here anymore thankyou",
+        )
+        await client.leave_chat(message.chat.id)
