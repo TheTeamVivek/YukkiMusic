@@ -55,11 +55,9 @@ async def pause_str(client, message: Message):
             return await message.reply_text(
                 "ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ᴘᴀᴜsᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?"
             )
-            try:
-                await stream_on(message.chat.id)
-                await pytgcalls.resume_stream(message.chat.id)
-                return await message.reply_text(
-                    text=f"➻ sᴛʀᴇᴀᴍ ʀᴇsᴜᴍᴇᴅ 💫\n│ \n└ʙʏ : {message.from_user.mention} 🥀",
-                )
-            except Exception as e:
-                logging.exception(e)
+        await stream_on(message.chat.id)
+        await pytgcalls.resume_stream(message.chat.id)
+        return await message.reply_text(
+            text=f"➻ sᴛʀᴇᴀᴍ ʀᴇsᴜᴍᴇᴅ 💫\n│ \n└ʙʏ : {message.from_user.mention} 🥀",
+        )
+
