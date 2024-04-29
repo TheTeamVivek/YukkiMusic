@@ -149,10 +149,8 @@ async def restart_bots():
         except (AccessTokenExpired, AccessTokenInvalid):
             mongo_db.bots.delete_one({"token": bot_token})
 
-
         except Exception as e:
             logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
-
 
 
 # clone features only for sudoers because this is in development
