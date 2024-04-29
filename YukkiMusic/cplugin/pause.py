@@ -13,7 +13,7 @@ from .utils import (
 from YukkiMusic.misc import SUDOERS
 
 
-@Client.on_message(filters.command(["pause", "resume"]) & filters.group)
+@Client.on_message(filters.command(["pause","resume"]) & filters.group)
 async def pause_str(client, message: Message):
     try:
         await message.delete()
