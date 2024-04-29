@@ -12,12 +12,12 @@
 import config
 from config import PRIVATE_BOT_MODE
 from typing import Dict, List, Union
-from YukkiMusic.core.mongo import mongodb
+from YukkiMusic.core.mongo import mongodb, pymongodb
 
 channeldb = mongodb.cplaymode
 commanddb = mongodb.commands
 cleandb = mongodb.cleanmode
-clonebotdb = mongodb.clonebotdb
+clonebotdb = pymongodb.clonebotdb
 playmodedb = mongodb.playmode
 playtypedb = mongodb.playtypedb
 langdb = mongodb.language
