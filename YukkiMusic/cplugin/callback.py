@@ -5,7 +5,7 @@ from pytgcalls.types import MediaStream, AudioQuality
 
 from config import *
 import logging
-from YukkiMusic.misc import clonedb
+from .misc import clonedb
 from YukkiMusic.utils.thumbnails import gen_thumb
 from .utils import (
     admin_check_cb,
@@ -25,7 +25,7 @@ from YukkiMusic.misc import SUDOERS
 from .utils.active import _clear_
 from .utils.inline import close_key
 from .play import pytgcalls
-
+from .misc import clonedb
 
 @Client.on_callback_query(filters.regex("forceclose"))
 async def close_(client, CallbackQuery):
