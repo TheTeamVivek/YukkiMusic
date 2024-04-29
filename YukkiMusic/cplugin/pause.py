@@ -2,11 +2,18 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from pyrogram.enums import ChatMemberStatus
 from .play import pytgcalls
-from .utils import admin_check, close_key, is_streaming, stream_off, stream_on, is_active_chat
+from .utils import (
+    admin_check,
+    close_key,
+    is_streaming,
+    stream_off,
+    stream_on,
+    is_active_chat,
+)
 from YukkiMusic.misc import SUDOERS
 
 
-@Client.on_message(filters.command(["pause","resume"]) & filters.group)
+@Client.on_message(filters.command(["pause", "resume"]) & filters.group)
 async def pause_str(client, message: Message):
     try:
         await message.delete()
@@ -43,10 +50,10 @@ async def pause_str(client, message: Message):
         )
     elif message.text.lower() == "/resume":
 
-
-
         if await is_streaming(message.chat.id):
-            return await message.reply_text("ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ᴘᴀᴜsᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?")
+            return await message.reply_text(
+                "ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ᴘᴀᴜsᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?"
+            )
             await stream_on(message.chat.id)
             await pytgcalls.resume_stream(message.chat.id)
             return await message.reply_text(
