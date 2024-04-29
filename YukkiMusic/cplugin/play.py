@@ -88,19 +88,6 @@ app2 = userbot.one
 class DurationLimitError(Exception):
     pass
 
-
-buttons = InlineKeyboardMarkup(
-    [
-        [
-            InlineKeyboardButton(text="▷", callback_data="resume_cb"),
-            InlineKeyboardButton(text="II", callback_data="pause_cb"),
-            InlineKeyboardButton(text="‣‣I", callback_data="skip_cb"),
-            InlineKeyboardButton(text="▢", callback_data="end_cb"),
-        ]
-    ]
-)
-
-
 @Client.on_message(
     filters.command(["play", "vplay", "p"])
     & filters.group
@@ -126,16 +113,6 @@ async def play(client, message: Message):
                 f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {viv.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}."
             )
         if get.status == ChatMemberStatus.BANNED:
-            unban_butt = InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton(
-                            text=f"ᴜɴʙᴀɴ {vi.name}",
-                            callback_data=f"unban_assistant {message.chat.id}|{vi.id}",
-                        ),
-                    ]
-                ]
-            )
             return await msg.edit_text(
                 text=f"» {viv.mention} ᴀssɪsᴛᴀɴᴛ ɪs ʙᴀɴɴᴇᴅ ɪɴ {message.chat.title}\n\n𖢵 ɪᴅ : `{vi.id}`\n𖢵 ɴᴀᴍᴇ : {vi.mention}\n𖢵 ᴜsᴇʀɴᴀᴍᴇ : @{vi.username}\n\nᴘʟᴇᴀsᴇ ᴜɴʙᴀɴ ᴛʜᴇ ᴀssɪsᴛᴀɴᴛ ᴀɴᴅ ᴘʟᴀʏ ᴀɢᴀɪɴ...",
             )
@@ -265,7 +242,6 @@ async def play(client, message: Message):
         await message.reply_photo(
             photo=qimg,
             caption=f"**➻ ᴀᴅᴅᴇᴅ ᴛᴏ ᴏ̨ᴜᴇᴜᴇ ᴀᴛ {position}**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{viv.username}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {ruser}",
-            reply_markup=buttons,
         )
     else:
         stream = MediaStream(file_path, audio_parameters=AudioQuality.HIGH)
@@ -294,7 +270,6 @@ async def play(client, message: Message):
         await message.reply_photo(
             photo=imgt,
             caption=f"**✮ 𝐒ʈᴧʀʈ𝛆ɗ 𝐒ʈʀ𝛆ɑɱɩŋʛ ✮**\n\n**✮ 𝐓ɩttɭ𝛆 ✮** [{title[:27]}](https://t.me/{viv.username}?start=info_{videoid})\n**✬ 𝐃ʋɽɑʈɩσŋ ✮** `{duration}` ᴍɪɴ\n**✭ 𝐁ɣ ✮** {ruser}",
-            reply_markup=buttons,
         )
 
     return await msg.delete()
