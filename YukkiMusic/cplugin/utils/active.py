@@ -1,4 +1,4 @@
-from ..misc import clonedb
+from ...misc import clonedb
 
 active = []
 stream = {}
