@@ -5,6 +5,7 @@ from .play import pytgcalls
 from .utils import admin_check, close_key, is_streaming, stream_off, is_active_chat
 from YukkiMusic.misc import SUDOERS
 
+
 @Client.on_message(filters.command(["pause"]) & filters.group)
 async def pause_str(client, message: Message):
     try:
