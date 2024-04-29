@@ -60,4 +60,3 @@ async def pause_str(client, message: Message):
         return await message.reply_text(
             text=f"➻ sᴛʀᴇᴀᴍ ʀᴇsᴜᴍᴇᴅ 💫\n│ \n└ʙʏ : {message.from_user.mention} 🥀",
         )
-
