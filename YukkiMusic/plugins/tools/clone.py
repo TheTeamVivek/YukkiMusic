@@ -11,6 +11,7 @@ from config import API_ID, API_HASH
 from config import MONGO_DB_URI
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_assistant
+from YukkiMusic.core.mongo import mongodb
 
 from YukkiMusic.misc import SUDOERS
 from config import LOG_GROUP_ID
