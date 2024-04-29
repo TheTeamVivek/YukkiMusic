@@ -59,69 +59,71 @@ async def forceclose_command(client, CallbackQuery):
     filters.regex(pattern=r"^(resume_cb|pause_cb|skip_cb|end_cb)$")
 )
 async def admin_cbs(client, query: CallbackQuery):
-    user_id = query.from_user.id
-    chat_id = query.message.chat.id
-    if not await is_active_chat(chat_id):
-        return await query.answer("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.", show_alert=True)
-    check = await client.get_chat_member(chat_id, user_id)
-    if (
-        check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]
-        or user_id not in SUDOERS
-    ):
-        return await query.answer("sᴏʀʀʏ? ᴏɴʟʏ ᴀᴅᴍɪɴ ᴄᴀɴ ᴅᴏ ᴛʜɪs", show_alert=True)
     try:
-        await query.answer()
-    except:
-        pass
-
-    data = query.matches[0].group(1)
-
-    if data == "resume_cb":
-        if await is_streaming(query.message.chat.id):
-            return await query.answer(
-                "ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ᴘᴀᴜsᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?", show_alert=True
-            )
-        await stream_on(query.message.chat.id)
-        await pytgcalls.resume_stream(query.message.chat.id)
-        await query.message.reply_text(
-            text=f"➻ sᴛʀᴇᴀᴍ ʀᴇsᴜᴍᴇᴅ 💫\n│ \n└ʙʏ : {query.from_user.mention} 🥀",
-            reply_markup=close_key,
-        )
-
-    elif data == "pause_cb":
-        if not await is_streaming(query.message.chat.id):
-            return await query.answer(
-                "ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ʀᴇsᴜᴍᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?", show_alert=True
-            )
-        await stream_off(query.message.chat.id)
-        await pytgcalls.pause_stream(query.message.chat.id)
-        await query.message.reply_text(
-            text=f"➻ sᴛʀᴇᴀᴍ ᴩᴀᴜsᴇᴅ 🥺 └ʙʏ : {query.from_user.mention} 🥀",
-        )
-
-    elif data == "end_cb":
+        user_id = query.from_user.id
+        chat_id = query.message.chat.id
+        if not await is_active_chat(chat_id):
+            return await query.answer("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.", show_alert=True)
+        check = await client.get_chat_member(chat_id, user_id)
+        if (
+            check.status not in     [ChatMemberStatus.OWNER,     ChatMemberStatus.ADMINISTRATOR]
+            or user_id not in SUDOERS
+        ):
+            return await query.answer("sᴏʀʀʏ? ᴏɴʟʏ ᴀᴅᴍɪɴ ᴄᴀɴ ᴅᴏ ᴛʜɪs", show_alert=True)
         try:
-            await _clear_(query.message.chat.id)
-            await pytgcalls.leave_group_call(query.message.chat.id)
+            await query.answer()
         except:
             pass
-        await query.message.reply_text(
-            text=f"➻ sᴛʀᴇᴀᴍ ᴇɴᴅᴇᴅ/sᴛᴏᴩᴩᴇᴅ ❄ └ʙʏ : {query.from_user.mention} 🥀",
-        )
-        await query.message.delete()
 
-    elif data == "skip_cb":
-        get = clonedb.get(query.message.chat.id)
-        if not get:
+        data = query.matches[0].group(1)
+
+        if data == "resume_cb":
+            if await is_streaming(query.message.chat.id):
+                return await query.answer(
+                    "ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ᴘᴀᴜsᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?", show_alert=True
+                )
+            await stream_on(query.message.chat.id)
+            await pytgcalls.resume_stream(query.message.chat.id)
+            await query.message.reply_text(
+                text=f"➻ sᴛʀᴇᴀᴍ ʀᴇsᴜᴍᴇᴅ 💫\n│ \n└ʙʏ : {query.from_user.mention} 🥀",
+            )
+
+        elif data == "pause_cb":
+            if not await is_streaming(query.message.chat.id):
+                return await query.answer(
+                    "ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ʀᴇsᴜᴍᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?", show_alert=True
+                )
+            await stream_off(query.message.chat.id)
+            await pytgcalls.pause_stream(query.message.chat.id)
+            await query.message.reply_text(
+                text=f"➻ sᴛʀᴇᴀᴍ ᴩᴀᴜsᴇᴅ 🥺 └ʙʏ : {query.from_user.mention} 🥀",
+            )
+
+        elif data == "end_cb":
             try:
                 await _clear_(query.message.chat.id)
                 await pytgcalls.leave_group_call(query.message.chat.id)
-                await query.message.reply_text(
-                    text=f"➻ sᴛʀᴇᴀᴍ sᴋɪᴩᴩᴇᴅ 🥺 └ʙʏ : {query.from_user.mention} 🥀\n**» ɴᴏ ᴍᴏʀᴇ ǫᴜᴇᴜᴇᴅ ᴛʀᴀᴄᴋs ɪɴ** {query.message.chat.title}, **ʟᴇᴀᴠɪɴɢ ᴠɪᴅᴇᴏᴄʜᴀᴛ.**",
-                )
-                return await query.message.delete()
             except:
-                return
+                pass
+            await query.message.reply_text(
+                text=f"➻ sᴛʀᴇᴀᴍ ᴇɴᴅᴇᴅ/sᴛᴏᴩᴩᴇᴅ ❄ └ʙʏ : {query.from_user.mention} 🥀",
+            )
+            await query.message.delete()
+
+        elif data == "skip_cb":
+            get = clonedb.get(query.message.chat.id)
+            if not get:
+                try:
+                    await _clear_(query.message.chat.id)
+                    await pytgcalls.leave_group_call(query.message.chat.id)
+                    await query.message.reply_text(
+                        text=f"➻ sᴛʀᴇᴀᴍ sᴋɪᴩᴩᴇᴅ 🥺 └ʙʏ : {query.from_user.mention} 🥀\n**» ɴᴏ ᴍᴏʀᴇ ǫᴜᴇᴜᴇᴅ ᴛʀᴀᴄᴋs ɪɴ** {query.message.chat.title}, **ʟᴇᴀᴠɪɴɢ ᴠɪᴅᴇᴏᴄʜᴀᴛ.**",
+                    )
+                    return await query.message.delete()
+                except:
+                    return
+            except Exception as e:
+                logging.exception(e)
         else:
             title = get[0]["title"]
             duration = get[0]["duration"]
