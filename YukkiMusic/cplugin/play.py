@@ -38,6 +38,7 @@ from pyrogram.types import Audio, Message, Voice
 from YukkiMusic.utils.database import get_assistant
 from YukkiMusic import userbot
 from YukkiMusic.core.call import Yukki
+from .utils.inline import close_key
 
 # SESSION = os.getenv("SESSION", "")
 
