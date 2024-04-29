@@ -35,9 +35,9 @@ async def pause_str(client, message: Message):
         return await message.reply_text(
             "ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ʀᴇsᴜᴍᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?"
         )
-
-    await pytgcalls.pause_stream(message.chat.id)
-    await stream_off(message.chat.id)
-    return await message.reply_text(
-        text=f"➻ sᴛʀᴇᴀᴍ ᴩᴀᴜsᴇᴅ 🥺\n└ʙʏ : {message.from_user.mention} 🥀",
-    )
+    if message.text.lower() == "/pause":
+        await pytgcalls.pause_stream(message.chat.id)
+        await stream_off(message.chat.id)
+        return await message.reply_text(
+            text=f"➻ sᴛʀᴇᴀᴍ ᴩᴀᴜsᴇᴅ 🥺\n└ʙʏ : {message.from_user.mention} 🥀",
+        )
