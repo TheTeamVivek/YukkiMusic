@@ -13,14 +13,14 @@ async def welcome(client: Client, message: Message):
          return await client.leave_chat(message.chat.id)
     a = await client.get_chat_member(message.chat.id, i.id)
     if a.status != ChatMemberStatus.ADMINISTRATOR:
-    	await message.reply_text("ᴘʟᴇᴀsᴇ ᴍᴀᴋᴇ ᴍᴇ ᴀɴ ᴀᴅᴍɪɴ ᴡɪᴛʜ **ɪɴᴠɪᴛᴇ ᴜsᴇʀ** ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ᴘʟᴀʏ ᴍᴜsɪᴄ")
+    await message.reply_text("ᴘʟᴇᴀsᴇ ᴍᴀᴋᴇ ᴍᴇ ᴀɴ ᴀᴅᴍɪɴ ᴡɪᴛʜ **ɪɴᴠɪᴛᴇ ᴜsᴇʀ** ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ᴘʟᴀʏ ᴍᴜsɪᴄ")
         return await client.leave_chat(message.chat.id)
     try:
         b = await client.get_chat_member(message.chat.id, BOTID)
         if (
             b.status in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.MEMBER]
         ):
-        	await message.reply_text("sᴏʀʀʏ! ᴍʏ ᴍᴀsᴛᴇʀ ʙᴏᴛ ɪs ᴀʟʀᴇᴀᴅʏ ʜᴇʀᴇ sᴏ ɪ ᴀᴍ ʟᴇᴀᴠᴇɪɴɢ")
+        await message.reply_text("sᴏʀʀʏ! ᴍʏ ᴍᴀsᴛᴇʀ ʙᴏᴛ ɪs ᴀʟʀᴇᴀᴅʏ ʜᴇʀᴇ sᴏ ɪ ᴀᴍ ʟᴇᴀᴠᴇɪɴɢ")
         return await client.leave_chat(message.chat.id)
     except Exception:
         pass
