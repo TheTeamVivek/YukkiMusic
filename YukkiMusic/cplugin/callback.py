@@ -122,8 +122,6 @@ async def admin_cbs(client, query: CallbackQuery):
                     return await query.message.delete()
                 except:
                     return
-    except Exception as e:
-        logging.exception(e)
             else:
                 title = get[0]["title"]
                 duration = get[0]["duration"]
@@ -165,6 +163,8 @@ async def admin_cbs(client, query: CallbackQuery):
                 reply_markup=buttons,
             )
 
+    except Exception as e:
+        logging.exception(e)
 
 @Client.on_callback_query(filters.regex("clone_help"))
 async def help_menu(client, query: CallbackQuery):
