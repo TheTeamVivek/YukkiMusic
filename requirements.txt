@@ -22,7 +22,7 @@ pytz
 psutil
 pytube
 pykeyboard
-py-tgcalls==1.2.2
+py-tgcalls==1.2.9
 #git+https://github.com/KurimuzonAkuma/pyrogram@dev
 pyrofork
 python-dotenv
