@@ -15,7 +15,8 @@ img2pdf
 lyricsgenius
 MukeshAPI
 motor
-ntgcalls==1.1.2
+#ntgcalls==1.1.2
+ntgcalls==1.2.0
 pillow==9.5.0
 opencv-python-headless==4.9.0.80
 pytz
