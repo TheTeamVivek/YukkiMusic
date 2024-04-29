@@ -11,7 +11,9 @@ from YukkiMusic import app
 from YukkiMusic.utils.database import get_assistant, clonebotdb
 from YukkiMusic.misc import SUDOERS
 from config import LOG_GROUP_ID
+
 CLONES = set()
+
 
 @app.on_message(filters.command("clone") & filters.private & SUDOERS)
 async def clone_txt(client, message):
@@ -92,6 +94,7 @@ async def on_clone(client, message):
     except Exception as e:
         logging.exception("Error while handling message.")
 
+
 @app.on_message(filters.command(["deletecloned", "delcloned"]) & filters.private)
 async def delete_cloned_bot(client, message):
     BOT_TOKEN_PATTERN = r"^\d+:[\w-]+$"
@@ -101,9 +104,11 @@ async def delete_cloned_bot(client, message):
             return
 
         bot_token = " ".join(message.command[1:])
-        
+
         if not re.match(BOT_TOKEN_PATTERN, bot_token):
-            await message.reply_text("**⚠️ The provided text is not a valid bot token.**")
+            await message.reply_text(
+                "**⚠️ The provided text is not a valid bot token.**"
+            )
             return
 
         cloned_bot = clonebotdb.find_one({"token": bot_token})
