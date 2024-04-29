@@ -1,4 +1,4 @@
-from ...misc import clonedb
+from YukkiMusic.misc import clonedb
 
 active = []
 stream = {}
