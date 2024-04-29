@@ -12,7 +12,7 @@ async def pause_str(client, message: Message):
     except:
         pass
     if not await is_active_chat(message.chat.id):
-            return await message.reply_text("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
+        return await message.reply_text("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
     check = await client.get_chat_member(message.chat.id, message.from_user.id)
 
     if check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR] or message.from_user.id not in SUDOERS::
