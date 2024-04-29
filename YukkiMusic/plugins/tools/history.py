@@ -1,5 +1,7 @@
 import asyncio
 import random
+import re
+import logging
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from pyrogram.raw.functions.messages import DeleteHistory
