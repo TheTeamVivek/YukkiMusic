@@ -20,6 +20,7 @@ from .utils import (
 from YukkiMusic.misc import SUDOERS
 from .utils.active import _clear_
 from .utils.active import is_active_chat
+from .utils.inline import close_key
 from .play import pytgcalls
 
 
@@ -82,9 +83,6 @@ async def admin_cbs(client, query: CallbackQuery):
             )
         await stream_on(query.message.chat.id)
         await pytgcalls.resume_stream(query.message.chat.id)
-        close_key = InlineKeyboardMarkup(
-            [[InlineKeyboardButton(text="✯ ᴄʟᴏsᴇ ✯", callback_data="close")]]
-        )
         await query.message.reply_text(
             text=f"➻ sᴛʀᴇᴀᴍ ʀᴇsᴜᴍᴇᴅ 💫\n│ \n└ʙʏ : {query.from_user.mention} 🥀",
             reply_markup=close_key,
