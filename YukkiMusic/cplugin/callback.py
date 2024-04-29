@@ -5,7 +5,6 @@ from pytgcalls.types import MediaStream, AudioQuality
 
 from config import *
 import logging
-from .misc import clonedb
 from YukkiMusic.utils.thumbnails import gen_thumb
 from .utils import (
     admin_check_cb,
