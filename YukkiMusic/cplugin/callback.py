@@ -26,6 +26,7 @@ from .utils.inline import close_key
 from .play import pytgcalls
 from .misc import clonedb
 
+
 @Client.on_callback_query(filters.regex("forceclose"))
 async def close_(client, CallbackQuery):
     callback_data = CallbackQuery.data.strip()
