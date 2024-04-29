@@ -124,46 +124,46 @@ async def admin_cbs(client, query: CallbackQuery):
                     return
     except Exception as e:
         logging.exception(e)
-        else:
-            title = get[0]["title"]
-            duration = get[0]["duration"]
-            videoid = get[0]["videoid"]
-            file_path = get[0]["file_path"]
-            req_by = get[0]["req"]
-            user_id = get[0]["user_id"]
-            get.pop(0)
+            else:
+                title = get[0]["title"]
+                duration = get[0]["duration"]
+                videoid = get[0]["videoid"]
+                file_path = get[0]["file_path"]
+                req_by = get[0]["req"]
+                user_id = get[0]["user_id"]
+                get.pop(0)
 
-            stream = MediaStream(file_path, audio_parameters=AudioQuality.HIGH)
-            try:
-                await pytgcalls.change_stream(
-                    query.message.chat.id,
-                    stream,
+                stream = MediaStream(file_path, audio_parameters=AudioQuality.HIGH)
+                try:
+                    await pytgcalls.change_stream(
+                        query.message.chat.id,
+                        stream,
+                    )
+                except Exception as ex:
+                    logging.exception(ex)
+                    await _clear_(query.message.chat.id)
+                    return await pytgcalls.leave_group_call(query.message.chat.id)
+
+                img = await gen_thumb(videoid)
+                await query.edit_message_text(
+                    text=f"➻ sᴛʀᴇᴀᴍ sᴋɪᴩᴩᴇᴅ 🥺\n└ʙʏ : {query.from_user.mention} 🥀",
                 )
-            except Exception as ex:
-                logging.exception(ex)
-                await _clear_(query.message.chat.id)
-                return await pytgcalls.leave_group_call(query.message.chat.id)
-
-            img = await gen_thumb(videoid)
-            await query.edit_message_text(
-                text=f"➻ sᴛʀᴇᴀᴍ sᴋɪᴩᴩᴇᴅ 🥺\n└ʙʏ : {query.from_user.mention} 🥀",
-            )
-            buttons = InlineKeyboardMarkup(
-                [
+                buttons =     InlineKeyboardMarkup(
                     [
-                        InlineKeyboardButton(text="▷", callback_data="resume_cb"),
-                        InlineKeyboardButton(text="II", callback_data="pause_cb"),
-                        InlineKeyboardButton(text="‣‣I", callback_data="skip_cb"),
-                        InlineKeyboardButton(text="▢", callback_data="end_cb"),
+                        [
+                                InlineKeyboardButton(text="▷", callback_data="resume_cb"),
+                            InlineKeyboardButton(text="II", callback_data="pause_cb"),
+                            InlineKeyboardButton(text="‣‣I", callback_data="skip_cb"),
+                            InlineKeyboardButton(text="▢", callback_data="end_cb"),
+                        ]
                     ]
-                ]
+                )
+            vi = await client.get_me()
+            return await query.message.reply_photo(
+                photo=img,
+                caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{vi.username}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
+                reply_markup=buttons,
             )
-        vi = await client.get_me()
-        return await query.message.reply_photo(
-            photo=img,
-            caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{vi.username}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
-            reply_markup=buttons,
-        )
 
 
 @Client.on_callback_query(filters.regex("clone_help"))
