@@ -20,7 +20,6 @@ from YukkiMusic.core.mongo import pymongodb
 from .logging import LOGGER
 
 SUDOERS = filters.user()
-clonedb = None
 
 HAPP = None
 _boot_ = time.time()
