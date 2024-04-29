@@ -7,7 +7,7 @@ BOTID = app.id
 
 @Client.on_message(filters.new_chat_members, group=-1)
 async def welcome(client: Client, message: Message):
-	i = await client.get_me()
+    i = await client.get_me()
     if chat_type != ChatType.SUPERGROUP:
         await message.reply_text("ᴘʟᴇᴀsᴇ ᴄᴏɴᴠᴇʀᴛ ʏᴏᴜʀ ɢʀᴏᴜᴘ ᴛᴏ ᴀ sᴜᴘᴇʀɢʀᴏᴜᴘ ᴏʀ ᴍᴀᴋᴇ ʏᴏᴜʀ ɢʀᴏᴜᴘ ʜɪsᴛᴏʀʏ ᴠɪɪsɪʙʟᴇ sᴏ ɪ ᴡᴏʀᴋ ᴘᴇʀғᴇᴄᴛʟʏ")
         return await client.leave_chat(message.chat.id)
