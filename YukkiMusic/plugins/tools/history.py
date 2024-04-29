@@ -60,7 +60,6 @@ async def sg(client: Client, message: Message):
     await lol.delete()
 
 
-
 @app.on_message(filters.command(["truecaller"]))
 async def sg(client: Client, message: Message):
     if len(message.text.split()) < 2 and not message.reply_to_message:
@@ -70,9 +69,11 @@ async def sg(client: Client, message: Message):
     else:
         input = " ".join(message.command[1:])
 
-    if not re.match(r'^\+[1-9]\d{1,14}$', args):
-        return await message.reply_text("Please provide a valid phone number including country code.")
-        
+    if not re.match(r"^\+[1-9]\d{1,14}$", args):
+        return await message.reply_text(
+            "Please provide a valid phone number including country code."
+        )
+
     lol = await message.reply("<code>Processing...</code>")
     tr = ["@TrueCaller_Z_Bot"]
     cli = random.choice(assistants)
