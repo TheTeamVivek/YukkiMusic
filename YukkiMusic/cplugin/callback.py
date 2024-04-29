@@ -122,8 +122,8 @@ async def admin_cbs(client, query: CallbackQuery):
                     return await query.message.delete()
                 except:
                     return
-            except Exception as e:
-                logging.exception(e)
+    except Exception as e:
+        logging.exception(e)
         else:
             title = get[0]["title"]
             duration = get[0]["duration"]
