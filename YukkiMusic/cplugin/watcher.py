@@ -41,10 +41,6 @@ async def welcome(client: Client, message: Message):
 @Client.on_message(filters.new_chat_members)
 @Client.on_message()
 async def leave(client: Client, message: Message):
-    try:
-        chat_members = client.get_chat_members(message.chat.id)
-    except Exception:
-        pass
     if (
         message.from_user
         and message.from_user.id == BOT_ID
