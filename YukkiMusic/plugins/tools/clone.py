@@ -122,7 +122,7 @@ async def delete_cloned_bot(client, message):
 
 
 async def restart_bots():
-	global CLONES
+    global CLONES
     logging.info("Restarting all bots........")
     bots = list(clonebotdb.find())
     for bot in bots:
