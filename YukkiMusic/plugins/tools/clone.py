@@ -67,10 +67,10 @@ async def on_clone(client, message):
                 await ai.start()
                 bot = await ai.get_me()
                 if bot.id not in CLONES:
-                try:
-                    CLONES.add(bot.id)
-                except Exception:
-                    pass
+                    try:
+                        CLONES.add(bot.id)
+                    except Exception:
+                        pass
                 userbot = await get_assistant(LOG_GROUP_ID)
                 try:
                     await userbot.send_message(
