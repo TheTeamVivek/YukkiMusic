@@ -32,6 +32,13 @@ async def is_streaming(chat_id: int) -> bool:
     return run
 
 
+async def iss_streaming(chat_id: int) -> bool:
+    run = stream.get(chat_id)
+    if not run:
+        return False
+    return True
+
+
 async def stream_on(chat_id: int):
     stream[chat_id] = True
 
