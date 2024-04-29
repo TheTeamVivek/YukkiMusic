@@ -63,10 +63,12 @@ async def admin_cbs(client, query: CallbackQuery):
         user_id = query.from_user.id
         chat_id = query.message.chat.id
         if not await is_active_chat(chat_id):
-            return await query.answer("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.", show_alert=True)
+            return await query.answer(
+                "ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.", show_alert=True
+            )
         check = await client.get_chat_member(chat_id, user_id)
         if (
-            check.status not in     [ChatMemberStatus.OWNER,     ChatMemberStatus.ADMINISTRATOR]
+            check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]
             or user_id not in SUDOERS
         ):
             return await query.answer("sᴏʀʀʏ? ᴏɴʟʏ ᴀᴅᴍɪɴ ᴄᴀɴ ᴅᴏ ᴛʜɪs", show_alert=True)
@@ -146,10 +148,10 @@ async def admin_cbs(client, query: CallbackQuery):
                 await query.edit_message_text(
                     text=f"➻ sᴛʀᴇᴀᴍ sᴋɪᴩᴩᴇᴅ 🥺\n└ʙʏ : {query.from_user.mention} 🥀",
                 )
-                buttons =     InlineKeyboardMarkup(
+                buttons = InlineKeyboardMarkup(
                     [
                         [
-                                InlineKeyboardButton(text="▷", callback_data="resume_cb"),
+                            InlineKeyboardButton(text="▷", callback_data="resume_cb"),
                             InlineKeyboardButton(text="II", callback_data="pause_cb"),
                             InlineKeyboardButton(text="‣‣I", callback_data="skip_cb"),
                             InlineKeyboardButton(text="▢", callback_data="end_cb"),
@@ -165,6 +167,7 @@ async def admin_cbs(client, query: CallbackQuery):
 
     except Exception as e:
         logging.exception(e)
+
 
 @Client.on_callback_query(filters.regex("clone_help"))
 async def help_menu(client, query: CallbackQuery):
