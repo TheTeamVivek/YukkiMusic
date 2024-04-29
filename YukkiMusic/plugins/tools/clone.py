@@ -19,6 +19,7 @@ mongo_client = MongoClient(MONGO_DB_URI)
 mongo_db = mongo_client["Yukkicloned"]
 mongo_collection = mongo_db["Yukkiclone"]
 
+CLONES = set()
 
 @app.on_message(filters.command("clone") & filters.private & SUDOERS)
 async def clone_txt(client, message):
@@ -31,6 +32,7 @@ async def clone_txt(client, message):
     (filters.regex(r"\d[0-9]{8,10}:[0-9A-Za-z_-]{35}")) & filters.private & SUDOERS
 )
 async def on_clone(client, message):
+    global CLONES
     try:
         user_id = message.from_user.id
         bot_token = re.findall(
@@ -64,6 +66,11 @@ async def on_clone(client, message):
 
                 await ai.start()
                 bot = await ai.get_me()
+                if bot.id not in CLONES:
+                try:
+                    CLONES.add(bot.id)
+                except Exception:
+                    pass
                 userbot = await get_assistant(LOG_GROUP_ID)
                 try:
                     await userbot.send_message(
@@ -96,6 +103,7 @@ async def on_clone(client, message):
 
 @app.on_message(filters.command(["deletecloned", "delcloned"]) & filters.private)
 async def delete_cloned_bot(client, message):
+    global CLONES
     try:
         if len(message.command) < 2:
             await message.reply_text("**⚠️ Please provide the bot token.**")
@@ -132,6 +140,11 @@ async def restart_bots():
             )
             await ai.start()
             bot = await ai.get_me()
+            if bot.id not in CLONES:
+                try:
+                    CLONES.add(bot.id)
+                except Exception:
+                    pass
         except Exception as e:
             logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
             mongo_db.bots.delete_one({"token": bot_token})
