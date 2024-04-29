@@ -88,6 +88,7 @@ app2 = userbot.one
 class DurationLimitError(Exception):
     pass
 
+
 @Client.on_message(
     filters.command(["play", "vplay", "p"])
     & filters.group
