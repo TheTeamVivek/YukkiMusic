@@ -38,7 +38,7 @@ telegraph==2.2.0
 tgcrypto
 unidecode
 urllib3
-yt-dlp==2023.10.13
+yt-dlp
 youtube-search-python
 youtube_search
 uuid==1.30
