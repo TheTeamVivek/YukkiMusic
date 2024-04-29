@@ -129,7 +129,8 @@ async def delete_cloned_bot(client, message):
 async def restart_bots():
     global CLONES
     logging.info("Restarting all bots........")
-    bots = list(clonebotdb.find())
+    cursor = clonebotdb.find()
+    bots = await cursor.to_list(length=None)  # Retrieve all documents from the cursor
     for bot in bots:
         bot_token = bot["token"]
         try:
