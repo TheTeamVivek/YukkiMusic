@@ -17,8 +17,9 @@ from .utils import (
 from .utils.active import (
     is_active_chat,
     is_streaming,
-    stream_on
-    stream_off
+    iss_streaming,
+    stream_on,
+    stream_off,
 )
 from YukkiMusic.misc import SUDOERS
 from .utils.active import _clear_
@@ -82,7 +83,7 @@ async def admin_cbs(client, query: CallbackQuery):
         data = query.matches[0].group(1)
 
         if data == "resume_cb":
-            if await is_streaming(query.message.chat.id):
+            if await iss_streaming(query.message.chat.id):
                 return await query.answer(
                     "ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ᴘᴀᴜsᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?", show_alert=True
                 )
