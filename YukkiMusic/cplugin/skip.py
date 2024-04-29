@@ -3,7 +3,7 @@ from pyrogram.types import Message
 from pytgcalls.types import MediaStream, AudioQuality
 
 from .play import pytgcalls
-from .utils import admin_check, buttons
+from .utils import admin_check
 from .utils.active import _clear_
 from YukkiMusic.utils.thumbnails import gen_thumb
 from YukkiMusic.misc import clonedb
@@ -55,5 +55,4 @@ async def skip_str(_, message: Message):
         return await message.reply_photo(
             photo=img,
             caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{BOT_USERNAME}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
-            reply_markup=buttons,
         )
