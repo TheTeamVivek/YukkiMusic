@@ -151,21 +151,12 @@ async def admin_cbs(client, query: CallbackQuery):
                 await query.edit_message_text(
                     text=f"➻ sᴛʀᴇᴀᴍ sᴋɪᴩᴩᴇᴅ 🥺\n└ʙʏ : {query.from_user.mention} 🥀",
                 )
-                buttons = InlineKeyboardMarkup(
-                    [
-                        [
-                            InlineKeyboardButton(text="▷", callback_data="resume_cb"),
-                            InlineKeyboardButton(text="II", callback_data="pause_cb"),
-                            InlineKeyboardButton(text="‣‣I", callback_data="skip_cb"),
-                            InlineKeyboardButton(text="▢", callback_data="end_cb"),
-                        ]
-                    ]
-                )
+                
             vi = await client.get_me()
             return await query.message.reply_photo(
                 photo=img,
-                caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{vi.username}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
-                reply_markup=buttons,
+                caption=f"**✮ 𝐒ʈᴧʀʈ𝛆ɗ 𝐒ʈʀ𝛆ɑɱɩŋʛ ✮**\n\n**✮ 𝐓ɩttɭ𝛆 ✮** [{title[:27]}](https://t.me/{vi.username}?start=info_{videoid})\n‣ **✬ 𝐃ʋɽɑʈɩσŋ ✮** `{duration}` ᴍɪɴ\n**✭ 𝐁ɣ ✮** {req_by}",
+                reply_markup=close_key,
             )
 
     except Exception as e:
