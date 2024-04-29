@@ -1,6 +1,5 @@
 import re
 import logging
-from pymongo import MongoClient
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from pyrogram.errors.exceptions.bad_request_400 import (
@@ -8,20 +7,11 @@ from pyrogram.errors.exceptions.bad_request_400 import (
     AccessTokenInvalid,
 )
 from config import API_ID, API_HASH
-from config import MONGO_DB_URI
 from YukkiMusic import app
-from YukkiMusic.utils.database import get_assistant
-from YukkiMusic.core.mongo import mongodb
-
+from YukkiMusic.utils.database import get_assistant, clonebotdb
 from YukkiMusic.misc import SUDOERS
 from config import LOG_GROUP_ID
-
-mongo_client = MongoClient(MONGO_DB_URI)
-mongo_db = mongo_client["Yukkicloned"]
-mongo_collection = mongo_db["Yukkiclone"]
-
 CLONES = set()
-
 
 @app.on_message(filters.command("clone") & filters.private & SUDOERS)
 async def clone_txt(client, message):
@@ -42,7 +32,7 @@ async def on_clone(client, message):
         )
         bot_token = bot_token[0] if bot_token else None
         bot_id = re.findall(r"\d[0-9]{8,10}", message.text)
-        bots = list(mongo_db.bots.find())
+        bots = list(clonebotdb.find())
         bot_tokens = None
 
         for bot in bots:
@@ -76,7 +66,7 @@ async def on_clone(client, message):
                 userbot = await get_assistant(LOG_GROUP_ID)
                 try:
                     await userbot.send_message(
-                        -1002042572827, f"Bot @{bot.username} has been restarted."
+                        LOG_GROUP_ID, f"Bot @{bot.username} has been restarted."
                     )
                 except Exception:
                     pass
@@ -90,7 +80,7 @@ async def on_clone(client, message):
                     "token": bot_token,
                     "username": bot.username,
                 }
-                mongo_db.bots.insert_one(details)
+                clonebotdb.insert_one(details)
                 await msg.edit_text(
                     f"<b>sᴜᴄᴄᴇssғᴜʟʟʏ ᴄʟᴏɴᴇᴅ ʏᴏᴜʀ ʙᴏᴛ: @{bot.username}.</b>"
                 )
@@ -102,19 +92,23 @@ async def on_clone(client, message):
     except Exception as e:
         logging.exception("Error while handling message.")
 
-
 @app.on_message(filters.command(["deletecloned", "delcloned"]) & filters.private)
 async def delete_cloned_bot(client, message):
-    global CLONES
+    BOT_TOKEN_PATTERN = r"^\d+:[\w-]+$"
     try:
         if len(message.command) < 2:
             await message.reply_text("**⚠️ Please provide the bot token.**")
             return
 
         bot_token = " ".join(message.command[1:])
-        cloned_bot = mongo_db.bots.find_one({"token": bot_token})
+        
+        if not re.match(BOT_TOKEN_PATTERN, bot_token):
+            await message.reply_text("**⚠️ The provided text is not a valid bot token.**")
+            return
+
+        cloned_bot = clonebotdb.find_one({"token": bot_token})
         if cloned_bot:
-            mongo_db.bots.delete_one({"token": bot_token})
+            clonebotdb.delete_one({"token": bot_token})
             await message.reply_text(
                 "**🤖 The cloned bot has been removed from the list and its details have been removed from the database. ☠️**"
             )
@@ -128,8 +122,9 @@ async def delete_cloned_bot(client, message):
 
 
 async def restart_bots():
+	global CLONES
     logging.info("Restarting all bots........")
-    bots = list(mongo_db.bots.find())
+    bots = list(clonebotdb.find())
     for bot in bots:
         bot_token = bot["token"]
         try:
@@ -148,9 +143,6 @@ async def restart_bots():
                 except Exception:
                     pass
         except (AccessTokenExpired, AccessTokenInvalid):
-            mongo_db.bots.delete_one({"token": bot_token})
+            clonebotdb.delete_one({"token": bot_token})
         except Exception as e:
             logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
-
-
-# clone features only for sudoers because this is in development
