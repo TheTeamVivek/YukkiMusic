@@ -151,4 +151,4 @@ async def restart_bots():
             mongo_db.bots.delete_one({"token": bot_token})
 
 
-# clone features only gor sudoers because this is in testing
+# clone features only for sudoers because this is in testing
