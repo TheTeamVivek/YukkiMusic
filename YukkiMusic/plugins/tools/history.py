@@ -69,7 +69,7 @@ async def sg(client: Client, message: Message):
     else:
         input = " ".join(message.command[1:])
 
-    if not re.match(r"^\+[1-9]\d{1,14}$", args):
+    if not re.match(r"^\+[1-9]\d{1,14}$", input):
         return await message.reply_text(
             "Please provide a valid phone number including country code."
         )
