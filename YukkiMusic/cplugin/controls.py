@@ -7,6 +7,7 @@ from pyrogram.types import Message
 from pyrogram.enums import ChatMemberStatus
 from .play import pytgcalls
 from .utils import (
+    admin_check,
     close_key,
     is_streaming,
     stream_off,
@@ -21,19 +22,18 @@ from YukkiMusic.misc import clonedb
 
 @Client.on_message(filters.command(["pause", "resume", "end", "stop"]) & filters.group)
 async def pause_str(client, message: Message):
-    id = await client.get_me()
     try:
         await message.delete()
     except:
         pass
-    if not await is_active_chat(message.chat.id, id.id):
+    if not await is_active_chat(message.chat.id):
         return await message.reply_text("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
     check = await client.get_chat_member(message.chat.id, message.from_user.id)
 
     if (
         check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]
-    ) or message.from_user.id not in SUDOERS:
-
+        or message.from_user.id not in SUDOERS
+    ):
         return await message.reply_text(
             "» ʏᴏᴜ'ʀᴇ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ ʙᴀʙʏ, ᴘʟᴇᴀsᴇ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs."
         )
@@ -46,29 +46,29 @@ async def pause_str(client, message: Message):
             "» ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ᴍᴀɴᴀɢᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛs, ᴘʟᴇᴀsᴇ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs."
         )
     if message.text.lower() == "/pause":
-        if not await is_streaming(message.chat.id, id.id):
+        if not await is_streaming(message.chat.id):
             return await message.reply_text(
                 "ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ʀᴇsᴜᴍᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?"
             )
         await pytgcalls.pause_stream(message.chat.id)
-        await stream_off(message.chat.id, id.id)
+        await stream_off(message.chat.id)
         return await message.reply_text(
             text=f"➻ sᴛʀᴇᴀᴍ ᴩᴀᴜsᴇᴅ 🥺\n└ʙʏ : {message.from_user.mention} 🥀",
         )
     elif message.text.lower() == "/resume":
 
-        if await is_streaming(message.chat.id, id.id):
+        if await is_streaming(message.chat.id):
             return await message.reply_text(
                 "ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ᴘᴀᴜsᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?"
             )
-        await stream_on(message.chat.id, id.id)
+        await stream_on(message.chat.id)
         await pytgcalls.resume_stream(message.chat.id)
         return await message.reply_text(
             text=f"➻ sᴛʀᴇᴀᴍ ʀᴇsᴜᴍᴇᴅ 💫\n│ \n└ʙʏ : {message.from_user.mention} 🥀",
         )
     elif message.text.lower() == "/end" or message.text.lower() == "/stop":
         try:
-            await _clear_(message.chat.id, id.id)
+            await _clear_(message.chat.id)
             await pytgcalls.leave_group_call(message.chat.id)
         except:
             pass
@@ -85,14 +85,14 @@ async def skip_str(client: Client, message: Message):
         await message.delete()
     except:
         pass
-    if not await is_active_chat(message.chat.id, i.id):
+    if not await is_active_chat(message.chat.id):
         return await message.reply_text("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
     check = await client.get_chat_member(message.chat.id, message.from_user.id)
 
     if (
         check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]
-    ) or message.from_user.id not in SUDOERS:
-
+        or message.from_user.id not in SUDOERS
+    ):
         return await message.reply_text(
             "» ʏᴏᴜ'ʀᴇ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ ʙᴀʙʏ, ᴘʟᴇᴀsᴇ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs."
         )
@@ -104,10 +104,10 @@ async def skip_str(client: Client, message: Message):
         return await message.reply_text(
             "» ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ᴍᴀɴᴀɢᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛs, ᴘʟᴇᴀsᴇ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs."
         )
-    get = clonedb.get((message.chat.id, i.id))
+    get = clonedb.get(message.chat.id)
     if not get:
         try:
-            await _clear_(message.chat.id, i.id)
+            await _clear_(message.chat.id)
             await pytgcalls.leave_group_call(message.chat.id)
             await message.reply_text(
                 text=f"➻ sᴛʀᴇᴀᴍ sᴋɪᴩᴩᴇᴅ 🥺\n│ \n└ʙʏ : {message.from_user.mention} 🥀\n\n**» ɴᴏ ᴍᴏʀᴇ ǫᴜᴇᴜᴇᴅ ᴛʀᴀᴄᴋs ɪɴ** {message.chat.title}, **ʟᴇᴀᴠɪɴɢ ᴠɪᴅᴇᴏᴄʜᴀᴛ.**",
@@ -130,7 +130,7 @@ async def skip_str(client: Client, message: Message):
                 stream,
             )
         except:
-            await _clear_(message.chat.id, i.id)
+            await _clear_(message.chat.id)
             return await pytgcalls.leave_group_call(message.chat.id)
 
         await message.reply_text(
