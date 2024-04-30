@@ -2,7 +2,7 @@ import time
 from datetime import datetime
 
 import psutil
-from pyrogram import filters
+from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from config import SUPPORT_GROUP
@@ -11,8 +11,8 @@ from YukkiMusic.utils import get_readable_time
 
 
 @Client.on_message(filters.command("ping"))
-async def ping_fallen(_, message: Message):
-	i = await client.get_me()
+async def ping_fallen(client: Client, message: Message):
+    i = await client.get_me()
     hmm = await message.reply_photo(
         photo=config.PING_IMG, caption=f"{i.mention} ɪs ᴘɪɴɢɪɴɢ..."
     )
