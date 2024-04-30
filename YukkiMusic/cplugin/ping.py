@@ -11,7 +11,7 @@ from YukkiMusic.utils import get_readable_time
 
 
 @Client.on_message(filters.command("ping"))
-async def ping_fallen(client: Client, message: Message):
+async def ping_clone(client: Client, message: Message):
     i = await client.get_me()
     hmm = await message.reply_photo(
         photo=config.PING_IMG, caption=f"{i.mention} ɪs ᴘɪɴɢɪɴɢ..."
