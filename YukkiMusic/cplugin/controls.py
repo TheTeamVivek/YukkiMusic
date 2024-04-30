@@ -62,7 +62,7 @@ async def pause_str(client, message: Message):
                 "ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ᴘᴀᴜsᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?"
             )
         await stream_on(message.chat.id, id.id)
-        await pytgcalls.resume_stream(message.chat.id, id.id)
+        await pytgcalls.resume_stream(message.chat.id)
         return await message.reply_text(
             text=f"➻ sᴛʀᴇᴀᴍ ʀᴇsᴜᴍᴇᴅ 💫\n│ \n└ʙʏ : {message.from_user.mention} 🥀",
         )
