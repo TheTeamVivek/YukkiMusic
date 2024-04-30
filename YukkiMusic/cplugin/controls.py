@@ -77,10 +77,6 @@ async def pause_str(client, message: Message):
             text=f"➻ **sᴛʀᴇᴀᴍ ᴇɴᴅᴇᴅ/sᴛᴏᴩᴩᴇᴅ** ❄\n│ \n└ʙʏ : {message.from_user.mention} 🥀",
         )
 
-
-BOT_USERNAME = app.username
-
-
 @Client.on_message(filters.command(["skip", "next"]) & filters.group)
 async def skip_str(client: Client, message: Message):
     i = await client.get_me()
