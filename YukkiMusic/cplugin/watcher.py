@@ -4,7 +4,7 @@ from pyrogram.types import Message
 from pyrogram.enums import ChatMemberStatus, ChatType
 from YukkiMusic import app
 from YukkiMusic.plugins.tools.clone import CLONES
-frim .utils.active import _clear_
+from .utils.active import _clear_
 from .play import pytgcalls
 
 BOT_ID = app.id
