@@ -47,6 +47,7 @@ async def welcome(client: Client, message: Message):
     except Exception:
         pass
 
+
 @Client.on_message(filters.new_chat_members)
 @Client.on_message()
 async def leave(client: Client, message: Message):
@@ -61,6 +62,3 @@ async def leave(client: Client, message: Message):
             "My Friend bot aur master bot is here so I can't stay here anymore thankyou",
         )
         await client.leave_chat(message.chat.id)
-
-
-
