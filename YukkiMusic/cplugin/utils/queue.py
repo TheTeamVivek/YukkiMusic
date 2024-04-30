@@ -14,6 +14,7 @@ from YukkiMusic.misc import clonedb
 
 async def put(
     chat_id,
+    bot_id,
     title,
     duration,
     videoid,
@@ -29,9 +30,9 @@ async def put(
         "req": ruser,
         "user_id": user_id,
     }
-    get = clonedb.get(chat_id)
+    key = (chat_id, bot_id)
+    get = clonedb.get(key)
     if get:
-        clonedb[chat_id].append(put_f)
+        clonedb[key].append(put_f)
     else:
-        clonedb[chat_id] = []
-        clonedb[chat_id].append(put_f)
+        clonedb[key] = [put_f]
