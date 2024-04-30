@@ -15,7 +15,7 @@ from .utils.active import _clear_
 from YukkiMusic.misc import SUDOERS
 
 
-@Client.on_message(filters.command(["pause", "resume","end","stop"]) & filters.group)
+@Client.on_message(filters.command(["pause", "resume", "end", "stop"]) & filters.group)
 async def pause_str(client, message: Message):
     try:
         await message.delete()
