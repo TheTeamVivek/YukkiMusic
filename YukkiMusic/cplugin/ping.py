@@ -5,7 +5,7 @@ import psutil
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from config import SUPPORT_GROUP
+from config import SUPPORT_GROUP, PING_IMG_URL
 from .utils import StartTime
 from YukkiMusic.utils import get_readable_time
 
@@ -14,7 +14,7 @@ from YukkiMusic.utils import get_readable_time
 async def ping_clone(client: Client, message: Message):
     i = await client.get_me()
     hmm = await message.reply_photo(
-        photo=config.PING_IMG, caption=f"{i.mention} ɪs ᴘɪɴɢɪɴɢ..."
+        photo=PING_IMG_URL, caption=f"{i.mention} ɪs ᴘɪɴɢɪɴɢ..."
     )
     upt = int(time.time() - StartTime)
     cpu = psutil.cpu_percent(interval=0.5)
