@@ -30,7 +30,10 @@ async def pause_str(client, message: Message):
         return await message.reply_text("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
     check = await client.get_chat_member(message.chat.id, message.from_user.id)
 
-    if check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR] or message.from_user.id not in SUDOERS:
+    if (
+        check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]
+        or message.from_user.id not in SUDOERS
+    ):
 
         return await message.reply_text(
             "» ʏᴏᴜ'ʀᴇ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ ʙᴀʙʏ, ᴘʟᴇᴀsᴇ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs."
@@ -87,7 +90,10 @@ async def skip_str(client: Client, message: Message):
         return await message.reply_text("ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
     check = await client.get_chat_member(message.chat.id, message.from_user.id)
 
-    if check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR] or message.from_user.id not in SUDOERS:
+    if (
+        check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]
+        or message.from_user.id not in SUDOERS
+    ):
 
         return await message.reply_text(
             "» ʏᴏᴜ'ʀᴇ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ ʙᴀʙʏ, ᴘʟᴇᴀsᴇ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs."
