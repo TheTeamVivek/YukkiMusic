@@ -15,3 +15,13 @@ async def welcome(_, message: Message):
         await pytgcalls.leave_group_call(message.chat.id)
     except:
         pass
+
+
+@pytgcalls.on_left()
+@pytgcalls.on_kicked()
+@pytgcalls.on_closed_voice_chat()
+async def swr_handler(_, chat_id: int):
+    try:
+        await _clear_(chat_id)
+    except:
+        pass
