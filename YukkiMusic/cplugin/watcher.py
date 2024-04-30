@@ -3,8 +3,19 @@ from pyrogram.types import Message
 from pyrogram.enums import ChatMemberStatus, ChatType
 from YukkiMusic import app
 from YukkiMusic.plugins.tools.clone import CLONES
+from .play import pytgcalls
 
 BOT_ID = app.id
+
+
+@Client.on_message(filters.video_chat_started, group=welcome)
+@app.on_message(filters.video_chat_ended, group=close)
+async def welcome(client, message: Message, _):
+    try:
+        await _clear_(message.chat.id)
+        await pytgcalls.leave_group_call(message.chat.id)
+    except:
+        pass
 
 
 @Client.on_message(filters.new_chat_members)
@@ -36,9 +47,6 @@ async def welcome(client: Client, message: Message):
     except Exception:
         pass
 
-
-@Client.on_message(filters.video_chat_started, group=20)
-@Client.on_message(filters.video_chat_ended, group=30)
 @Client.on_message(filters.new_chat_members)
 @Client.on_message()
 async def leave(client: Client, message: Message):
@@ -53,3 +61,6 @@ async def leave(client: Client, message: Message):
             "My Friend bot aur master bot is here so I can't stay here anymore thankyou",
         )
         await client.leave_chat(message.chat.id)
+
+
+
