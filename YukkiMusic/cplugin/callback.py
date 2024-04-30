@@ -107,8 +107,8 @@ async def admin_cbs(client, query: CallbackQuery):
             try:
                 await _clear_(query.message.chat.id, i.id)
                 await pytgcalls.leave_group_call(query.message.chat.id)
-            except:
-                pass
+            except Exception as e:
+                logging.exception(e)
             await query.message.reply_text(
                 text=f"➻ sᴛʀᴇᴀᴍ ᴇɴᴅᴇᴅ/sᴛᴏᴩᴩᴇᴅ ❄ └ʙʏ : {query.from_user.mention} 🥀",
             )
@@ -124,8 +124,8 @@ async def admin_cbs(client, query: CallbackQuery):
                         text=f"➻ sᴛʀᴇᴀᴍ sᴋɪᴩᴩᴇᴅ 🥺 └ʙʏ : {query.from_user.mention} 🥀\n**» ɴᴏ ᴍᴏʀᴇ ǫᴜᴇᴜᴇᴅ ᴛʀᴀᴄᴋs ɪɴ** {query.message.chat.title}, **ʟᴇᴀᴠɪɴɢ ᴠɪᴅᴇᴏᴄʜᴀᴛ.**",
                     )
                     return await query.message.delete()
-                except:
-                    return
+                except Exception as e:
+                	logging.exception(e)
             else:
                 title = get[0]["title"]
                 duration = get[0]["duration"]
