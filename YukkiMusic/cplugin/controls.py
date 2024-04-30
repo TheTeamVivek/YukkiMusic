@@ -91,7 +91,7 @@ async def skip_str(client: Client, message: Message):
 
     if (
         check.status not in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]
-        or message.from_user.id not in SUDOERS
+        and message.from_user.id not in SUDOERS
     ):
         return await message.reply_text(
             "» ʏᴏᴜ'ʀᴇ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ ʙᴀʙʏ, ᴘʟᴇᴀsᴇ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs."
