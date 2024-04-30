@@ -11,10 +11,11 @@ from .utils import (
     stream_on,
     is_active_chat,
 )
+from .utils.active import _clear_
 from YukkiMusic.misc import SUDOERS
 
 
-@Client.on_message(filters.command(["pause", "resume"]) & filters.group)
+@Client.on_message(filters.command(["pause", "resume","end","stop"]) & filters.group)
 async def pause_str(client, message: Message):
     try:
         await message.delete()
@@ -59,4 +60,14 @@ async def pause_str(client, message: Message):
         await pytgcalls.resume_stream(message.chat.id)
         return await message.reply_text(
             text=f"➻ sᴛʀᴇᴀᴍ ʀᴇsᴜᴍᴇᴅ 💫\n│ \n└ʙʏ : {message.from_user.mention} 🥀",
+        )
+    elif message.text.lower() == "/end" or message.text.lower() == "/stop":
+        try:
+            await _clear_(message.chat.id)
+            await pytgcalls.leave_group_call(message.chat.id)
+        except:
+            pass
+
+        return await message.reply_text(
+            text=f"➻ **sᴛʀᴇᴀᴍ ᴇɴᴅᴇᴅ/sᴛᴏᴩᴩᴇᴅ** ❄\n│ \n└ʙʏ : {message.from_user.mention} 🥀",
         )
