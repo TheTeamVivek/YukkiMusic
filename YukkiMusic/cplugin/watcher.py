@@ -12,7 +12,7 @@ close = 30
 
 @Client.on_message(filters.video_chat_started, group=welcome)
 @Client.on_message(filters.video_chat_ended, group=close)
-async def welcome(client, message: Message, _):
+async def welcome(client: Client, message: Message, _):
     i = await client.get_me()
     try:
         await _clear_(message.chat.id, i.id)
