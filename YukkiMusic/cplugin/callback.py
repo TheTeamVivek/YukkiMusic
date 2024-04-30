@@ -115,7 +115,7 @@ async def admin_cbs(client, query: CallbackQuery):
             await query.message.delete()
 
         elif data == "skip_cb":
-            get = clonedb.get(query.message.chat.id, i.id)
+            get = clonedb.get((query.message.chat.id, i.id))
             if not get:
                 try:
                     await _clear_(query.message.chat.id, i.id)
