@@ -9,10 +9,11 @@ BOT_ID = app.id
 
 
 @Client.on_message(filters.video_chat_started, group=welcome)
-@app.on_message(filters.video_chat_ended, group=close)
+@Client.on_message(filters.video_chat_ended, group=close)
 async def welcome(client, message: Message, _):
+    i = await client.get_me()
     try:
-        await _clear_(message.chat.id)
+        await _clear_(message.chat.id, i.id)
         await pytgcalls.leave_group_call(message.chat.id)
     except:
         pass
