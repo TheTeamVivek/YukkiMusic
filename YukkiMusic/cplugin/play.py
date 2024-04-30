@@ -230,10 +230,9 @@ async def play(client, message: Message):
         videoid = videoid
     except:
         videoid = "fuckitstgaudio"
-    if await is_active_chat(message.chat.id, viv.id):
+    if await is_active_chat(message.chat.id):
         await put(
             message.chat.id,
-            viv.id,
             title,
             duration,
             videoid,
@@ -241,7 +240,7 @@ async def play(client, message: Message):
             ruser,
             message.from_user.id,
         )
-        position = len(clonedb.get((message.chat.id, viv.id), []))
+        position = len(clonedb.get(message.chat.id))
         qimg = await gen_qthumb(videoid)
         await message.reply_photo(
             photo=qimg,
@@ -272,8 +271,8 @@ async def play(client, message: Message):
             logging.exception(e)
 
         imgt = await gen_thumb(videoid)
-        await stream_on(message.chat.id, viv.id)
-        await add_active_chat(message.chat.id, viv.id)
+        await stream_on(message.chat.id)
+        await add_active_chat(message.chat.id)
         await message.reply_photo(
             photo=imgt,
             caption=f"**✮ 𝐒ʈᴧʀʈ𝛆ɗ 𝐒ʈʀ𝛆ɑɱɩŋʛ ✮**\n\n**✮ 𝐓ɩttɭ𝛆 ✮** [{title[:27]}](https://t.me/{viv.username}?start=info_{videoid})\n**✬ 𝐃ʋɽɑʈɩσŋ ✮** `{duration}` ᴍɪɴ\n**✭ 𝐁ɣ ✮** {ruser}",
