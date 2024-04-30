@@ -143,7 +143,9 @@ async def play(client, message: Message):
         try:
             await app2.join_chat(invitelink)
             await asyncio.sleep(2)
-            await msg.edit_text(f"{vi.mention} ᴊᴏɪɴᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ,\n\nsᴛᴀʀᴛɪɴɢ sᴛʀᴇᴀᴍ...")
+            await msg.edit_text(
+                f"{vi.mention} ᴊᴏɪɴᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ,\n\nsᴛᴀʀᴛɪɴɢ sᴛʀᴇᴀᴍ..."
+            )
         except UserAlreadyParticipant:
             pass
         except Exception as ex:
