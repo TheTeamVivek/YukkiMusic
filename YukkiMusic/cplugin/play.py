@@ -100,7 +100,6 @@ async def play(client, message: Message):
     msg = await message.reply_text("» ᴘʀᴏᴄᴇssɪɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
     vi = await app2.get_me()
     viv = await client.get_me()
-    global BOT_USERNAME
     BOT_USERNAME = viv.username
     try:
         await message.delete()
@@ -144,7 +143,7 @@ async def play(client, message: Message):
         try:
             await app2.join_chat(invitelink)
             await asyncio.sleep(2)
-            await msg.edit_text(f"{vi.name} ᴊᴏɪɴᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ,\n\nsᴛᴀʀᴛɪɴɢ sᴛʀᴇᴀᴍ...")
+            await msg.edit_text(f"{vi.mention} ᴊᴏɪɴᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ,\n\nsᴛᴀʀᴛɪɴɢ sᴛʀᴇᴀᴍ...")
         except UserAlreadyParticipant:
             pass
         except Exception as ex:
