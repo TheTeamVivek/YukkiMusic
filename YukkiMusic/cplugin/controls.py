@@ -104,7 +104,7 @@ async def skip_str(client: Client, message: Message):
         return await message.reply_text(
             "» ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ᴍᴀɴᴀɢᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛs, ᴘʟᴇᴀsᴇ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs."
         )
-    get = clonedb.get(message.chat.id, i.id)
+    get = clonedb.get((message.chat.id, i.id))
     if not get:
         try:
             await _clear_(message.chat.id, i.id)
