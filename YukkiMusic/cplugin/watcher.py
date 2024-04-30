@@ -6,7 +6,8 @@ from YukkiMusic.plugins.tools.clone import CLONES
 from .play import pytgcalls
 
 BOT_ID = app.id
-
+welcome = 20
+close = 30
 
 @Client.on_message(filters.video_chat_started, group=welcome)
 @Client.on_message(filters.video_chat_ended, group=close)
