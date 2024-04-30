@@ -45,7 +45,7 @@ async def leave(client: Client, message: Message):
         message.from_user
         and message.from_user.id == BOT_ID
         or message.from_user
-        and message.from_user.id == CLONES
+        and message.from_user.id in CLONES
     ):
         await client.send_message(
             message.chat.id,
