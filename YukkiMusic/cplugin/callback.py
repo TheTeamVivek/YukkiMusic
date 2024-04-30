@@ -61,7 +61,7 @@ async def forceclose_command(client, CallbackQuery):
 )
 async def admin_cbs(client, query: CallbackQuery):
     try:
-    	i = await client.get_me()
+        i = await client.get_me()
         user_id = query.from_user.id
         chat_id = query.message.chat.id
         if not await is_active_chat(chat_id, i.id):
