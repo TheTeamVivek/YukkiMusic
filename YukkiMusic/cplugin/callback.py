@@ -7,6 +7,7 @@ from config import *
 import logging
 from YukkiMusic.utils.thumbnails import gen_thumb
 from .utils import (
+    admin_check_cb,
     HELP_TEXT,
     PM_START_TEXT,
     HELP_DEV,
@@ -15,6 +16,7 @@ from .utils import (
 from .utils.active import (
     is_active_chat,
     is_streaming,
+    iss_streaming,
     stream_on,
     stream_off,
 )
@@ -61,10 +63,9 @@ async def forceclose_command(client, CallbackQuery):
 )
 async def admin_cbs(client, query: CallbackQuery):
     try:
-        i = await client.get_me()
         user_id = query.from_user.id
         chat_id = query.message.chat.id
-        if not await is_active_chat(chat_id, i.id):
+        if not await is_active_chat(chat_id):
             return await query.answer(
                 "ʙᴏᴛ ɪsɴ'ᴛ sᴛʀᴇᴀᴍɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.", show_alert=True
             )
@@ -82,22 +83,22 @@ async def admin_cbs(client, query: CallbackQuery):
         data = query.matches[0].group(1)
 
         if data == "resume_cb":
-            if await is_streaming(query.message.chat.id, i.id):
+            if await iss_streaming(query.message.chat.id):
                 return await query.answer(
                     "ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ᴘᴀᴜsᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?", show_alert=True
                 )
-            await stream_on(query.message.chat.id, i.id)
+            await stream_on(query.message.chat.id)
             await pytgcalls.resume_stream(query.message.chat.id)
             await query.message.reply_text(
                 text=f"➻ sᴛʀᴇᴀᴍ ʀᴇsᴜᴍᴇᴅ 💫\n│ \n└ʙʏ : {query.from_user.mention} 🥀",
             )
 
         elif data == "pause_cb":
-            if not await is_streaming(query.message.chat.id, i.id):
+            if not await is_streaming(query.message.chat.id):
                 return await query.answer(
                     "ᴅɪᴅ ʏᴏᴜ ʀᴇᴍᴇᴍʙᴇʀ ᴛʜᴀᴛ ʏᴏᴜ ʀᴇsᴜᴍᴇᴅ ᴛʜᴇ sᴛʀᴇᴀᴍ ?", show_alert=True
                 )
-            await stream_off(query.message.chat.id, i.id)
+            await stream_off(query.message.chat.id)
             await pytgcalls.pause_stream(query.message.chat.id)
             await query.message.reply_text(
                 text=f"➻ sᴛʀᴇᴀᴍ ᴩᴀᴜsᴇᴅ 🥺 └ʙʏ : {query.from_user.mention} 🥀",
@@ -105,27 +106,27 @@ async def admin_cbs(client, query: CallbackQuery):
 
         elif data == "end_cb":
             try:
-                await _clear_(query.message.chat.id, i.id)
+                await _clear_(query.message.chat.id)
                 await pytgcalls.leave_group_call(query.message.chat.id)
-            except Exception as e:
-                logging.exception(e)
+            except:
+                pass
             await query.message.reply_text(
                 text=f"➻ sᴛʀᴇᴀᴍ ᴇɴᴅᴇᴅ/sᴛᴏᴩᴩᴇᴅ ❄ └ʙʏ : {query.from_user.mention} 🥀",
             )
             await query.message.delete()
 
         elif data == "skip_cb":
-            get = clonedb.get((query.message.chat.id, i.id))
+            get = clonedb.get(query.message.chat.id)
             if not get:
                 try:
-                    await _clear_(query.message.chat.id, i.id)
+                    await _clear_(query.message.chat.id)
                     await pytgcalls.leave_group_call(query.message.chat.id)
                     await query.message.reply_text(
                         text=f"➻ sᴛʀᴇᴀᴍ sᴋɪᴩᴩᴇᴅ 🥺 └ʙʏ : {query.from_user.mention} 🥀\n**» ɴᴏ ᴍᴏʀᴇ ǫᴜᴇᴜᴇᴅ ᴛʀᴀᴄᴋs ɪɴ** {query.message.chat.title}, **ʟᴇᴀᴠɪɴɢ ᴠɪᴅᴇᴏᴄʜᴀᴛ.**",
                     )
                     return await query.message.delete()
-                except Exception as e:
-                    logging.exception(e)
+                except:
+                    return
             else:
                 title = get[0]["title"]
                 duration = get[0]["duration"]
@@ -143,16 +144,18 @@ async def admin_cbs(client, query: CallbackQuery):
                     )
                 except Exception as ex:
                     logging.exception(ex)
-                    await _clear_(query.message.chat.id, i.id)
+                    await _clear_(query.message.chat.id)
                     return await pytgcalls.leave_group_call(query.message.chat.id)
 
                 img = await gen_thumb(videoid)
                 await query.edit_message_text(
                     text=f"➻ sᴛʀᴇᴀᴍ sᴋɪᴩᴩᴇᴅ 🥺\n└ʙʏ : {query.from_user.mention} 🥀",
                 )
+
+            vi = await client.get_me()
             return await query.message.reply_photo(
                 photo=img,
-                caption=f"**✮ 𝐒ʈᴧʀʈ𝛆ɗ 𝐒ʈʀ𝛆ɑɱɩŋʛ ✮**\n\n**✮ 𝐓ɩttɭ𝛆 ✮** [{title[:27]}](https://t.me/{i.username}?start=info_{videoid})\n‣ **✬ 𝐃ʋɽɑʈɩσŋ ✮** `{duration}` ᴍɪɴ\n**✭ 𝐁ɣ ✮** {req_by}",
+                caption=f"**✮ 𝐒ʈᴧʀʈ𝛆ɗ 𝐒ʈʀ𝛆ɑɱɩŋʛ ✮**\n\n**✮ 𝐓ɩttɭ𝛆 ✮** [{title[:27]}](https://t.me/{vi.username}?start=info_{videoid})\n‣ **✬ 𝐃ʋɽɑʈɩσŋ ✮** `{duration}` ᴍɪɴ\n**✭ 𝐁ɣ ✮** {req_by}",
                 reply_markup=close_key,
             )
 
