@@ -8,6 +8,7 @@ async def add_active_chat(chat_id: int, bot_id: int):
     if chat_id not in active:
         active.append((chat_id, bot_id))
 
+
 async def get_active_chats(bot_id: int) -> list:
     return [chat_id for chat_id, active_bot_id in active if active_bot_id == bot_id]
 
