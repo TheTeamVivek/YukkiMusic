@@ -21,6 +21,7 @@ async def welcome(_, message: Message):
     except:
         pass
 
+
 @pytgcalls.on_left()
 @pytgcalls.on_closed_voice_chat()
 @pytgcalls.on_kicked()
@@ -29,6 +30,7 @@ async def handler(_, update: Update):
         await _clear_(update.chat_id)
     except Exception as e:
         logging.exception(e)
+
 
 @pytgcalls.on_stream_end()
 async def on_stream_end(pytgcalls, update: Update):
