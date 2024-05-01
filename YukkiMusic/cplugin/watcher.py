@@ -1,5 +1,8 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
+from pytgcalls import filters as call_filters
+import logging
+from pytgcalls.types import Update, ChatUpdate
 from .utils.active import _clear_
 from .play import pytgcalls
 
@@ -17,11 +20,10 @@ async def welcome(_, message: Message):
         pass
 
 
-@pytgcalls.on_left()
-@pytgcalls.on_kicked()
-@pytgcalls.on_closed_voice_chat()
-async def swr_handler(_, chat_id: int):
+@pytgcalls.on_update(call_filters.chat_update(ChatUpdate.Status.LEFT_CALL))
+@pytgcalls.on_update(call_filters.stream_end)
+async def handler(client: PyTgCalls, update: Update):
     try:
-        await _clear_(chat_id)
-    except:
-        pass
+        await _clear_(update.chat_id)
+    except Exception as e:
+        logging.exception(e)
