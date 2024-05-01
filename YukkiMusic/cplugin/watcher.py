@@ -27,7 +27,8 @@ async def welcome(_, message: Message):
 @pytgcalls.on_kicked()
 async def handler(_, update: Update):
     try:
-        await _clear_(update.chat_id)
+        chat_id = update.chat_id
+        await _clear_(chat_id)
     except Exception as e:
         logging.exception(e)
 
