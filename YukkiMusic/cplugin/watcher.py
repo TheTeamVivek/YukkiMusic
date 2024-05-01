@@ -22,7 +22,9 @@ async def welcome(_, message: Message):
     except:
         pass
 
-client=Client
+
+client = Client
+
 
 @pytgcalls.on_left()
 @pytgcalls.on_kicked()
