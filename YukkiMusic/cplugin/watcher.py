@@ -22,6 +22,7 @@ async def welcome(_, message: Message):
     except:
         pass
 
+client=Client
 
 @pytgcalls.on_left()
 @pytgcalls.on_kicked()
@@ -45,7 +46,7 @@ async def on_stream_end(pytgcalls, update: Update):
         except:
             return
     else:
-        process = await Client.send_message(
+        process = await client.send_message(
             chat_id=chat_id,
             text="» ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ɴᴇxᴛ ᴛʀᴀᴄᴋ ғʀᴏᴍ ᴏ̨ᴜᴇᴜᴇ...",
         )
@@ -70,7 +71,7 @@ async def on_stream_end(pytgcalls, update: Update):
 
         img = await gen_thumb(videoid)
         await process.delete()
-        await Client.send_photo(
+        await client.send_photo(
             chat_id=chat_id,
             photo=img,
             caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{BOT_USERNAME}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
