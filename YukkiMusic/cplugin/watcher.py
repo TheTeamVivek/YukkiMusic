@@ -7,6 +7,7 @@ from YukkiMusic.misc import clonedb
 from .utils.active import _clear_
 from .play import pytgcalls
 from YukkiMusic.plugins.tools.clone import ai
+
 welcome = 20
 close = 30
 
@@ -21,6 +22,7 @@ async def welcome(_, message: Message):
         await pytgcalls.leave_group_call(message.chat.id)
     except:
         pass
+
 
 @pytgcalls.on_left()
 @pytgcalls.on_kicked()
