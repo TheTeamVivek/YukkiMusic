@@ -19,10 +19,13 @@ async def welcome(_, message: Message):
     except:
         pass
 
-
+@pytgcalls.on_stream_end()
+@pytgcalls.on_left()
+@pytgcalls.on_closed_voice_chat()
+@pytgcalls.on_kicked()
 @pytgcalls.on_update(call_filters.chat_update(ChatUpdate.Status.LEFT_CALL))
 @pytgcalls.on_update(call_filters.stream_end)
-async def handler(client: pytgcalls, update: Update):
+async def handler(_, update: Update):
     try:
         await _clear_(update.chat_id)
     except Exception as e:
