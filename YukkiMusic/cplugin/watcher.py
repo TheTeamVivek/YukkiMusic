@@ -3,6 +3,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from pytgcalls.types import MediaStream, AudioQuality, Update
 from YukkiMusic.utils.thumbnails import gen_thumb
+from YukkiMusic.misc import clonedb
 from .utils.active import _clear_
 from .play import pytgcalls
 
