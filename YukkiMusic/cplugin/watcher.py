@@ -16,6 +16,8 @@ close = 30
 @Client.on_message(filters.video_chat_ended, group=close)
 async def welcome(_, message: Message):
     try:
+        global BOT_USERNAME
+        BOT_USERNAME = (await app.get_me()).username
         await _clear_(message.chat.id)
         await pytgcalls.leave_group_call(message.chat.id)
     except:
@@ -73,5 +75,5 @@ async def on_stream_end(pytgcalls, update: Update):
         await Client.send_photo(
             chat_id=chat_id,
             photo=img,
-            caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{i.username}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
+            caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{BOT_USERNAME}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
         )
