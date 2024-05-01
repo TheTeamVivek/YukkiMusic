@@ -70,7 +70,7 @@
       },
       "UPSTREAM_BRANCH": {
         "description": "Upstream Repo's Branch Name",
-        "value": "dev",
+        "value": "master",
         "required": true
       }
     },
