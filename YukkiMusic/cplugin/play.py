@@ -97,7 +97,7 @@ class DurationLimitError(Exception):
     & ~filters.via_bot
 )
 async def play(client, message: Message):
-    msg = await message.reply_text("» ᴘʀᴏᴄᴇssɪɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
+    msg = await message.reply_text("» sᴇᴀʀᴄʜɪɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
     vi = await app2.get_me()
     viv = await client.get_me()
     BOT_USERNAME = viv.username
@@ -202,7 +202,7 @@ async def play(client, message: Message):
     else:
         if len(message.command) < 2:
             return await msg.edit_text("» ᴡʜᴀᴛ ᴅᴏ ʏᴏᴜ ᴡᴀɴɴᴀ ᴘʟᴀʏ ʙᴀʙʏ ?")
-        await msg.edit_text("🔎")
+        await msg.edit_text("» ᴘʀᴏᴄᴇssɪɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
         query = message.text.split(None, 1)[1]
         try:
             results = YoutubeSearch(query, max_results=1).to_dict()
