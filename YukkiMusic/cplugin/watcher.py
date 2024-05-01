@@ -22,7 +22,7 @@ async def welcome(_, message: Message):
 
 @pytgcalls.on_update(call_filters.chat_update(ChatUpdate.Status.LEFT_CALL))
 @pytgcalls.on_update(call_filters.stream_end)
-async def handler(client: PyTgCalls, update: Update):
+async def handler(client: pytgcalls, update: Update):
     try:
         await _clear_(update.chat_id)
     except Exception as e:
