@@ -1,8 +1,7 @@
+import logging
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from pytgcalls import filters as call_filters
-import logging
-from pytgcalls.types import Update, ChatUpdate
+from pytgcalls.types import Update
 from .utils.active import _clear_
 from .play import pytgcalls
 
@@ -23,8 +22,6 @@ async def welcome(_, message: Message):
 @pytgcalls.on_left()
 @pytgcalls.on_closed_voice_chat()
 @pytgcalls.on_kicked()
-@pytgcalls.on_update(call_filters.chat_update(ChatUpdate.Status.LEFT_CALL))
-@pytgcalls.on_update(call_filters.stream_end)
 async def handler(_, update: Update):
     try:
         await _clear_(update.chat_id)
