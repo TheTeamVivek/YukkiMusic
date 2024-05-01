@@ -6,7 +6,7 @@ from YukkiMusic.utils.thumbnails import gen_thumb
 from YukkiMusic.misc import clonedb
 from .utils.active import _clear_
 from .play import pytgcalls
-
+from YukkiMusic.plugins.tools.clone import ai
 welcome = 20
 close = 30
 
@@ -21,10 +21,6 @@ async def welcome(_, message: Message):
         await pytgcalls.leave_group_call(message.chat.id)
     except:
         pass
-
-
-client = Client
-
 
 @pytgcalls.on_left()
 @pytgcalls.on_kicked()
@@ -48,7 +44,7 @@ async def on_stream_end(pytgcalls, update: Update):
         except:
             return
     else:
-        process = await client.send_message(
+        process = await ai.send_message(
             chat_id=chat_id,
             text="» ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ɴᴇxᴛ ᴛʀᴀᴄᴋ ғʀᴏᴍ ᴏ̨ᴜᴇᴜᴇ...",
         )
@@ -73,7 +69,7 @@ async def on_stream_end(pytgcalls, update: Update):
 
         img = await gen_thumb(videoid)
         await process.delete()
-        await client.send_photo(
+        await ai.send_photo(
             chat_id=chat_id,
             photo=img,
             caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{BOT_USERNAME}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
