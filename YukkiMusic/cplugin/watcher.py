@@ -25,8 +25,8 @@ async def welcome(_, message: Message):
 
 
 @pytgcalls.on_left()
-@pytgcalls.on_closed_voice_chat()
 @pytgcalls.on_kicked()
+@pytgcalls.on_closed_voice_chat()
 async def handler(_, update: Update):
     try:
         chat_id = update.chat_id
@@ -38,7 +38,6 @@ async def handler(_, update: Update):
 @pytgcalls.on_stream_end()
 async def on_stream_end(pytgcalls, update: Update):
     chat_id = update.chat_id
-    i = await Client.get_me()
     get = clonedb.get(chat_id)
     if not get:
         try:
