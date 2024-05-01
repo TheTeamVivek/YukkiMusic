@@ -70,7 +70,7 @@ async def on_stream_end(pytgcalls, update: Update):
 
         img = await gen_thumb(videoid)
         await process.delete()
-        await app.send_photo(
+        await Client.send_photo(
             chat_id=chat_id,
             photo=img,
             caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{i.username}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
