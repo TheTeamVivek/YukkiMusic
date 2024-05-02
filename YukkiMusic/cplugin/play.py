@@ -248,8 +248,8 @@ async def play(client, message: Message):
     except:
         videoid = "fuckitstgaudio"
     if await is_active_chat(message.chat.id):
-        check = clonedb.get(message.chat.id)
-        if len(check) > 2:
+        position = len(clonedb.get(message.chat.id))
+        if position > 2:
             return await client.send_message(
                 chat_id,
                 f"ʟᴏᴏᴋꜱ ʟɪᴋᴇ ʏᴏᴜ ᴀʀᴇ ꜱᴘᴀᴍᴍɪɴɢ ᴀʟʀᴇᴀᴅʏ ꜱᴏɴɢꜱ ɪɴ Qᴜᴇᴜᴇ ᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ ᴛᴏ ꜰɪɴɪꜱʜ ᴛʜᴇᴍ ꜰɪʀꜱᴛ ᴇʟꜱᴇ ᴜꜱᴇ /end.",
@@ -263,7 +263,6 @@ async def play(client, message: Message):
             ruser,
             message.from_user.id,
         )
-        position = len(clonedb.get(message.chat.id))
         qimg = await gen_qthumb(videoid)
         await message.reply_photo(
             photo=qimg,
