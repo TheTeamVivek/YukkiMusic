@@ -195,7 +195,7 @@ async def play(client, message: Message):
             if not os.path.isfile(os.path.join("downloads", file_name))
             else f"downloads/{file_name}"
         )
-
+    duration = None
     elif url:
         try:
             results = YoutubeSearch(url, max_results=1).to_dict()
@@ -313,6 +313,8 @@ async def play(client, message: Message):
         await asyncio.sleep(d)
         chat_id = message.chat.id
         get = clonedb.get(chat_id)
+        if get:
+            e = get[0]["duration"]
         if not get:
             try:
                 await _clear_(chat_id)
@@ -351,10 +353,12 @@ async def play(client, message: Message):
                 caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{BOT_USERNAME}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
             )
 
-        e = await dtos(duration)
+        e = await dtos(a)
         await asyncio.sleep(e)
         chat_id = message.chat.id
         get = clonedb.get(chat_id)
+        if get:
+            d = get[0]["duration"]
         if not get:
             try:
                 await _clear_(chat_id)
@@ -392,10 +396,13 @@ async def play(client, message: Message):
                 photo=img,
                 caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{BOT_USERNAME}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
             )
-        f = await dtos(duration)
+        f = await dtos(d)
         await asyncio.sleep(f)
         chat_id = message.chat.id
         get = clonedb.get(chat_id)
+        if get:
+            d = get[0]["duration"]
+            
         if not get:
             try:
                 await _clear_(chat_id)
@@ -437,6 +444,8 @@ async def play(client, message: Message):
         await asyncio.sleep(dtos)
         chat_id = message.chat.id
         get = clonedb.get(chat_id)
+        if get:
+            d = get[0]["duration"]
         if not get:
             try:
                 await _clear_(chat_id)
@@ -474,10 +483,12 @@ async def play(client, message: Message):
                 photo=img,
                 caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{BOT_USERNAME}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
             )
-        g = await dtos(duration)
+        g = await dtos(d)
         await asyncio.sleep(g)
         chat_id = message.chat.id
         get = clonedb.get(chat_id)
+        if get:
+            d = get[0]["duration"]
         if not get:
             try:
                 await _clear_(chat_id)
@@ -515,8 +526,8 @@ async def play(client, message: Message):
                 photo=img,
                 caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{BOT_USERNAME}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
             )
-        h = await dtos(duration)
-        await asyncio.sleep(h)
+        hi = await dtos(d)
+        await asyncio.sleep(hi)
         chat_id = message.chat.id
         get = clonedb.get(chat_id)
         if not get:
