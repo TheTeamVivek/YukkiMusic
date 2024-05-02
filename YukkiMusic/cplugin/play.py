@@ -196,7 +196,7 @@ async def play(client, message: Message):
             if not os.path.isfile(os.path.join("downloads", file_name))
             else f"downloads/{file_name}"
         )
-    
+
     elif url:
         try:
             results = YoutubeSearch(url, max_results=1).to_dict()
@@ -403,7 +403,7 @@ async def play(client, message: Message):
         get = clonedb.get(chat_id)
         if get:
             d = get[0]["duration"]
-            
+
         if not get:
             try:
                 await _clear_(chat_id)
