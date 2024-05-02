@@ -24,6 +24,7 @@ from ntgcalls import TelegramServerError
 from pytgcalls.exceptions import NoActiveGroupCall, UnMuteNeeded
 from pytgcalls.types import MediaStream, AudioQuality
 from youtube_search import YoutubeSearch
+from datetime import datetime
 
 import config
 from config import DURATION_LIMIT_MIN
@@ -68,6 +69,15 @@ def get_url(message_1: Message) -> Union[str, None]:
         return None
 
     return text[offset : offset + length]
+
+async def dtos(duration):
+    if ':' in duration:
+        time_format = "%H:%M:%S" if duration.count(':') == 2 else "%M:%S"
+        duration_datetime = datetime.strptime(duration, time_format)
+        duration_seconds = (duration_datetime.hour * 3600) + (duration_datetime.minute * 60) + duration_datetime.second
+    else:    
+        raise ValueError("Invalid duration format")
+    return duration_seconds
 
 
 def get_file_name(audio: Union[Audio, Voice]):
