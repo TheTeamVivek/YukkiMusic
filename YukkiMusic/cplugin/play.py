@@ -441,8 +441,8 @@ async def play(client, message: Message):
                 photo=img,
                 caption=f"**➻ sᴛᴀʀᴛᴇᴅ sᴛʀᴇᴀᴍɪɴɢ**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{BOT_USERNAME}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {req_by}",
             )
-        dtos = await dtos(duration)
-        await asyncio.sleep(dtos)
+        hos = await dtos(duration)
+        await asyncio.sleep(hos)
         chat_id = message.chat.id
         get = clonedb.get(chat_id)
         if get:
