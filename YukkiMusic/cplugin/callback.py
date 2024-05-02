@@ -69,7 +69,6 @@ async def help_menu(client, query: CallbackQuery):
         helpmenu = InlineKeyboardMarkup(
             [
                 [InlineKeyboardButton(text="ᴇᴠᴇʀʏᴏɴᴇ", callback_data="clone_cb help")],
-
                 [
                     InlineKeyboardButton(text="ʙᴀᴄᴋ", callback_data="clone_home"),
                     InlineKeyboardButton(text="ᴄʟᴏsᴇ", callback_data="close"),
