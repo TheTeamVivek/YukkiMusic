@@ -10,6 +10,12 @@ async def is_active_chat(chat_id: int) -> bool:
     else:
         return True
 
+async def iss_active_chat(chat_id: int) -> bool:
+    if chat_id not in active:
+        return False
+    else:
+        return True
+
 
 async def add_active_chat(chat_id: int):
     if chat_id not in active:
