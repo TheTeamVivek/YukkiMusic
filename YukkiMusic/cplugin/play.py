@@ -231,7 +231,9 @@ async def play(client, message: Message):
     except:
         videoid = "fuckitstgaudio"
     if await is_active_chat(message.chat.id):
-        return await msg.edit_text("sᴏʀʀʏ ᴅᴇᴀʀ ʏᴏᴜ ᴀʀᴇ ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ᴀ sᴏɴɢ. ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴘʟᴀʏ ᴀɴᴏᴛʜᴇʀ ᴛʜᴇ ᴜsᴇ /skip")
+        return await msg.edit_text(
+            "sᴏʀʀʏ ᴅᴇᴀʀ ʏᴏᴜ ᴀʀᴇ ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ᴀ sᴏɴɢ. ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴘʟᴀʏ ᴀɴᴏᴛʜᴇʀ ᴛʜᴇ ᴜsᴇ /skip"
+        )
     else:
         stream = MediaStream(file_path, audio_parameters=AudioQuality.HIGH)
         try:
