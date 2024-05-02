@@ -69,10 +69,7 @@ async def help_menu(client, query: CallbackQuery):
         helpmenu = InlineKeyboardMarkup(
             [
                 [InlineKeyboardButton(text="ᴇᴠᴇʀʏᴏɴᴇ", callback_data="clone_cb help")],
-                [
-                    InlineKeyboardButton(text="sᴜᴅᴏ", callback_data="clone_cb sudo"),
-                    InlineKeyboardButton(text="ᴏᴡɴᴇʀ", callback_data="clone_cb owner"),
-                ],
+
                 [
                     InlineKeyboardButton(text="ʙᴀᴄᴋ", callback_data="clone_home"),
                     InlineKeyboardButton(text="ᴄʟᴏsᴇ", callback_data="close"),
@@ -110,10 +107,6 @@ async def open_hmenu(client, query: CallbackQuery):
 
     if cb == "help":
         await query.edit_message_text(HELP_TEXT.format(h), reply_markup=keyboard)
-    elif cb == "sudo":
-        await query.edit_message_text(HELP_SUDO.format(h), reply_markup=keyboard)
-    elif cb == "owner":
-        await query.edit_message_text(HELP_DEV.format(h), reply_markup=keyboard)
 
 
 @Client.on_callback_query(filters.regex("clone_home"))
