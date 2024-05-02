@@ -250,7 +250,6 @@ async def play(client, message: Message):
         videoid = "fuckitstgaudio"
     if await is_active_chat(message.chat.id):
         queue = clonedb.get(message.chat.id)
-        position = len(queue)
         if not queue is None:
             if position > 2:
                 return await client.send_message(
@@ -266,6 +265,7 @@ async def play(client, message: Message):
             ruser,
             message.from_user.id,
         )
+        position = len(queue)
         qimg = await gen_qthumb(videoid)
         await message.reply_photo(
             photo=qimg,
