@@ -248,7 +248,7 @@ async def play(client, message: Message):
     except:
         videoid = "fuckitstgaudio"
     if await is_active_chat(message.chat.id):
-        check = clonedb.get(chat_id)
+        check = clonedb.get(message.chat.id)
         if len(check) > 2:
             return await client.send_message(
                 chat_id,
@@ -307,6 +307,7 @@ async def play(client, message: Message):
             caption=f"**✮ 𝐒ʈᴧʀʈ𝛆ɗ 𝐒ʈʀ𝛆ɑɱɩŋʛ ✮**\n\n**✮ 𝐓ɩttɭ𝛆 ✮** [{title[:27]}](https://t.me/{viv.username}?start=info_{videoid})\n**✬ 𝐃ʋɽɑʈɩσŋ ✮** `{duration}` ᴍɪɴ\n**✭ 𝐁ɣ ✮** {ruser}",
             reply_markup=close_key,
         )
+        await msg.delete()
         dtos = await dtos(duration)
         await asyncio.sleep(dtos)
         chat_id = message.chat.id
