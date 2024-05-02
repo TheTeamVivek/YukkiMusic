@@ -40,6 +40,7 @@ from YukkiMusic.utils.database import get_assistant
 from YukkiMusic import userbot
 from YukkiMusic.core.call import Yukki
 from .utils.inline import close_key
+from .utils.active import __clear__
 
 # SESSION = os.getenv("SESSION", "")
 
