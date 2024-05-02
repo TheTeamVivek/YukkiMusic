@@ -23,7 +23,7 @@ from YukkiMusic.core.call import Yukki
 from YukkiMusic.plugins import ALL_MODULES
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
-from YukkiMusic.plugins.tools.clone import restart_bots
+#from YukkiMusic.plugins.tools.clone import restart_bots
 
 loop = asyncio.get_event_loop_policy().get_event_loop()
 
@@ -57,7 +57,7 @@ async def init():
     for all_module in ALL_MODULES:
         importlib.import_module("YukkiMusic.plugins" + all_module)
     LOGGER("Yukkimusic.plugins").info("Successfully Imported Modules ")
-    await restart_bots()
+    #await restart_bots()
     await userbot.start()
     await Yukki.start()
     try:
