@@ -98,6 +98,8 @@ class DurationLimitError(Exception):
 )
 async def play(client, message: Message):
     msg = await message.reply_text("» sᴇᴀʀᴄʜɪɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
+    if len(message.command) < 2:
+        return await msg.edit_text("» ᴡʜᴀᴛ ᴅᴏ ʏᴏᴜ ᴡᴀɴɴᴀ ᴘʟᴀʏ ʙᴀʙʏ ?")
     vi = await app2.get_me()
     viv = await client.get_me()
     BOT_USERNAME = viv.username
