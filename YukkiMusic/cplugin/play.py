@@ -231,22 +231,7 @@ async def play(client, message: Message):
     except:
         videoid = "fuckitstgaudio"
     if await is_active_chat(message.chat.id):
-        await put(
-            message.chat.id,
-            title,
-            duration,
-            videoid,
-            file_path,
-            ruser,
-            message.from_user.id,
-        )
-        position = len(clonedb.get(message.chat.id))
-        qimg = await gen_qthumb(videoid)
-        await message.reply_photo(
-            photo=qimg,
-            caption=f"**➻ ᴀᴅᴅᴇᴅ ᴛᴏ ᴏ̨ᴜᴇᴜᴇ ᴀᴛ {position}**\n\n‣ **ᴛɪᴛʟᴇ :** [{title[:27]}](https://t.me/{viv.username}?start=info_{videoid})\n‣ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}` ᴍɪɴᴜᴛᴇs\n‣ **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {ruser}",
-            reply_markup=close_key,
-        )
+        return await msg.edit_text("sᴏʀʀʏ ᴅᴇᴀʀ ʏᴏᴜ ᴀʀᴇ ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ᴀ sᴏɴɢ. ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴘʟᴀʏ ᴀɴᴏᴛʜᴇʀ ᴛʜᴇ ᴜsᴇ /skip")
     else:
         stream = MediaStream(file_path, audio_parameters=AudioQuality.HIGH)
         try:
