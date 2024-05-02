@@ -181,6 +181,7 @@ async def play(client, message: Message):
         else None
     )
     url = get_url(message)
+    duration = None
     if audio:
         if round(audio.duration / 60) > DURATION_LIMIT_MIN:
             raise DurationLimitError(
@@ -195,7 +196,7 @@ async def play(client, message: Message):
             if not os.path.isfile(os.path.join("downloads", file_name))
             else f"downloads/{file_name}"
         )
-    duration = None
+    
     elif url:
         try:
             results = YoutubeSearch(url, max_results=1).to_dict()
