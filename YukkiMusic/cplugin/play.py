@@ -251,10 +251,11 @@ async def play(client, message: Message):
     if await is_active_chat(message.chat.id):
         queue = clonedb.get(message.chat.id)
         if not queue is None:
+            position = len(queue)
             if position > 2:
                 return await client.send_message(
                     chat_id,
-                    f"ʟᴏᴏᴋꜱ ʟɪᴋᴇ ʏᴏᴜ ᴀʀᴇ ꜱᴘᴀᴍᴍɪɴɢ ᴀʟʀᴇᴀᴅʏ ꜱᴏɴɢꜱ ɪɴ Qᴜᴇᴜᴇ ᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ ᴛᴏ ꜰɪɴɪꜱʜ ᴛʜᴇᴍ ꜰɪʀꜱᴛ ᴇʟꜱᴇ ᴜꜱᴇ /end.",
+                    f"ʟᴏᴏᴋꜱ ʟɪᴋᴇ ʏᴏᴜ ᴀʀᴇ ꜱᴘᴀᴍᴍɪɴɢ ᴀʟʀᴇᴀᴅʏ 5 ꜱᴏɴɢꜱ ɪɴ Qᴜᴇᴜᴇ ᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ ᴛᴏ ꜰɪɴɪꜱʜ ᴛʜᴇᴍ ꜰɪʀꜱᴛ ᴇʟꜱᴇ ᴜꜱᴇ /end.",
                 )
         await put(
             message.chat.id,
@@ -265,7 +266,7 @@ async def play(client, message: Message):
             ruser,
             message.from_user.id,
         )
-        position = len(queue)
+        position = len(clonedb.get(message.chat.id))
         qimg = await gen_qthumb(videoid)
         await message.reply_photo(
             photo=qimg,
