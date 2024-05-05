@@ -1,4 +1,4 @@
-"""import re
+import re
 import logging
 from pyrogram import Client, filters
 from pyrogram.types import Message
@@ -151,4 +151,3 @@ async def restart_bots():
             clonebotdb.delete_one({"token": bot_token})
         except Exception as e:
             logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
-"""
