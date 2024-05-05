@@ -14,10 +14,25 @@ import logging
 from ntgcalls import TelegramServerError
 from pyrogram import Client, filters
 from pyrogram.enums import ChatMemberStatus, MessageEntityType
-from pyrogram.errors import ChatAdminRequired, UserAlreadyParticipant, UserNotParticipant
+from pyrogram.errors import (
+    ChatAdminRequired,
+    UserAlreadyParticipant,
+    UserNotParticipant,
+)
 from pytgcalls import PyTgCalls
-from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, Audio, Voice
-from pytgcalls.exceptions import NoActiveGroupCall, UnMuteNeeded, NotInGroupCallError, AlreadyJoinedError
+from pyrogram.types import (
+    Message,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Audio,
+    Voice,
+)
+from pytgcalls.exceptions import (
+    NoActiveGroupCall,
+    UnMuteNeeded,
+    NotInGroupCallError,
+    AlreadyJoinedError,
+)
 from pytgcalls.types import MediaStream, AudioQuality
 from youtube_search import YoutubeSearch
 from datetime import datetime
@@ -38,6 +53,7 @@ from YukkiMusic import userbot
 from YukkiMusic.core.call import Yukki
 from .utils.inline import close_key
 from .utils.active import _clear_
+
 
 def get_url(message_1: Message) -> Union[str, None]:
     messages = [message_1]
@@ -63,19 +79,27 @@ def get_url(message_1: Message) -> Union[str, None]:
     if offset in (None,):
         return None
 
-    return text[offset:offset + length]
+    return text[offset : offset + length]
+
 
 def get_file_name(audio: Union[Audio, Voice]):
     return f'{audio.file_unique_id}.{audio.file_name.split(".")[-1] if not isinstance(audio, Voice) else "ogg"}'
 
+
 pytgcalls = Yukki.one
 app2 = userbot.one
+
 
 class DurationLimitError(Exception):
     pass
 
 
-@Client.on_message(filters.command(["play", "vplay", "p"]) & filters.group & ~filters.forwarded & ~filters.via_bot)
+@Client.on_message(
+    filters.command(["play", "vplay", "p"])
+    & filters.group
+    & ~filters.forwarded
+    & ~filters.via_bot
+)
 async def play(client, message: Message):
     msg = await message.reply_text("» sᴇᴀʀᴄʜɪɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
     if len(message.command) < 2:
@@ -92,7 +116,9 @@ async def play(client, message: Message):
         try:
             get = await client.get_chat_member(message.chat.id, vi.username)
         except ChatAdminRequired:
-            return await msg.edit_text(f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {viv.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.")
+            return await msg.edit_text(
+                f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {viv.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}."
+            )
         if get.status == ChatMemberStatus.BANNED:
             return await msg.edit_text(
                 text=f"» {viv.mention} ᴀssɪsᴛᴀɴᴛ ɪs ʙᴀɴɴᴇᴅ ɪɴ {message.chat.title}\n\n𖢵 ɪᴅ : `{vi.id}`\n𖢵 ɴᴀᴍᴇ : {vi.mention}\n𖢵 ᴜsᴇʀɴᴀᴍᴇ : @{vi.username}\n\nᴘʟᴇᴀsᴇ ᴜɴʙᴀɴ ᴛʜᴇ ᴀssɪsᴛᴀɴᴛ ᴀɴᴅ ᴘʟᴀʏ ᴀɢᴀɪɴ...",
@@ -108,9 +134,13 @@ async def play(client, message: Message):
             try:
                 invitelink = await client.export_chat_invite_link(message.chat.id)
             except ChatAdminRequired:
-                return await msg.edit_text(f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {viv.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.")
+                return await msg.edit_text(
+                    f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {viv.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}."
+                )
             except Exception as ex:
-                return await msg.edit_text(f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {viv.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`")
+                return await msg.edit_text(
+                    f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {viv.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
+                )
         if invitelink.startswith("https://t.me/+"):
             invitelink = invitelink.replace("https://t.me/+", "https://t.me/joinchat/")
         anon = await msg.edit_text(
@@ -134,16 +164,26 @@ async def play(client, message: Message):
             pass
 
     ruser = message.from_user.first_name
-    audio = ((message.reply_to_message.audio or message.reply_to_message.voice) if message.reply_to_message else None)
+    audio = (
+        (message.reply_to_message.audio or message.reply_to_message.voice)
+        if message.reply_to_message
+        else None
+    )
     url = get_url(message)
     duration = None
     if audio:
         if round(audio.duration / 60) > DURATION_LIMIT_MIN:
-            raise DurationLimitError(f"» sᴏʀʀʏ ʙᴀʙʏ, ᴛʀᴀᴄᴋ ʟᴏɴɢᴇʀ ᴛʜᴀɴ  {DURATION_LIMIT_MIN} ᴍɪɴᴜᴛᴇs ᴀʀᴇ ɴᴏᴛ ᴀʟʟᴏᴡᴇᴅ ᴛᴏ ᴘʟᴀʏ ᴏɴ {viv.mention}.")
+            raise DurationLimitError(
+                f"» sᴏʀʀʏ ʙᴀʙʏ, ᴛʀᴀᴄᴋ ʟᴏɴɢᴇʀ ᴛʜᴀɴ  {DURATION_LIMIT_MIN} ᴍɪɴᴜᴛᴇs ᴀʀᴇ ɴᴏᴛ ᴀʟʟᴏᴡᴇᴅ ᴛᴏ ᴘʟᴀʏ ᴏɴ {viv.mention}."
+            )
         file_name = get_file_name(audio)
         title = file_name
         duration = round(audio.duration / 60)
-        file_path = (await message.reply_to_message.download(file_name) if not os.path.isfile(os.path.join("downloads", file_name)) else f"downloads/{file_name}")
+        file_path = (
+            await message.reply_to_message.download(file_name)
+            if not os.path.isfile(os.path.join("downloads", file_name))
+            else f"downloads/{file_name}"
+        )
     elif url:
         try:
             results = YoutubeSearch(url, max_results=1).to_dict()
@@ -247,7 +287,7 @@ async def play(client, message: Message):
                 reply_markup=close_key,
             )
             await msg.delete()
-            
+
         except Exception as e:
             await _clear_(message.chat.id)
             await pytgcalls.leave_group_call(message.chat.id)
@@ -259,7 +299,7 @@ async def play(client, message: Message):
                 return await msg.edit_text(
                     f"sᴏᴍᴇ ᴇxᴄᴇᴘᴛɪᴏɴ ᴏᴄᴄᴜʀᴇᴅ ᴡʜᴇɴ ᴘʀᴏᴄᴇssɪɴɢ\n {e}"
                 )
-        
+
     else:
         stream = MediaStream(file_path, audio_parameters=AudioQuality.HIGH)
         try:
