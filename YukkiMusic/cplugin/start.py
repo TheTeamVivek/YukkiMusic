@@ -2,7 +2,6 @@ from pyrogram import Client, filters
 from pyrogram.enums import ChatType, ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
-from YukkiMusic.utils.decorators.language import LanguageStart
 from config import SUPPORT_GROUP, OWNER_ID, SUPPORT_CHANNEL, START_IMG_URL
 
 PM_START_TEXT = """
@@ -23,7 +22,6 @@ START_TEXT = """
 
 @Client.on_message(filters.command(["start"]) & ~filters.forwarded)
 @Client.on_edited_message(filters.command(["start"]) & ~filters.forwarded)
-@LanguageStart
 async def clone_st(client, message: Message, _):
     viv = await client.get_me()
     if message.chat.type == ChatType.PRIVATE:
