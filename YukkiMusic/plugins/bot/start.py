@@ -53,12 +53,6 @@ async def start_comm(client, message: Message, _):
     await add_served_user(message.from_user.id)
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
-        if name == "verify":
-            await message.reply_text(
-                f"ʜᴇʏ {message.from_user.first_name},\nᴛʜᴀɴᴋs ғᴏʀ ᴠᴇʀɪғʏɪɴɢ ʏᴏᴜʀsᴇʟғ ɪɴ {app.mention}, ɴᴏᴡ ʏᴏᴜ ᴄᴀɴ ɢᴏ ʙᴀᴄᴋ ᴀɴᴅ sᴛᴀʀᴛ ᴜsɪɴɢ ᴍᴇ."
-            )
-            return await app.send_reaction(chat_id, message_id)
-
         if name[0:4] == "help":
             keyboard = help_pannel(_)
             if config.START_IMG_URL:
@@ -148,11 +142,10 @@ async def start_comm(client, message: Message, _):
                 return
             else:
                 await message.reply_text("ғᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ʟʏʀɪᴄs.")
-                return await app.send_reaction(chat_id, message_id)
+                return
         if name[0:3] == "del":
             await del_plist_msg(client=client, message=message, _=_)
             await asyncio.sleep(1)
-            await app.send_reaction(chat_id, message_id)
         if name[0:3] == "inf":
             m = await message.reply_text("🔎 ғᴇᴛᴄʜɪɴɢ ɪɴғᴏ!")
             query = (str(name)).replace("info_", "", 1)
