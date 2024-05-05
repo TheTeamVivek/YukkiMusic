@@ -43,78 +43,6 @@ from YukkiMusic.utils.inline import (
     start_pannel,
 )
 
-emoji = [
-    "👍",
-    "❤",
-    "🔥",
-    "🥰",
-    "👏",
-    "😁",
-    "🤔",
-    "🤯",
-    "😱",
-    "😢",
-    "🎉",
-    "🤩",
-    "🤮",
-    "💩",
-    "🙏",
-    "👌",
-    "🕊",
-    "🤡",
-    "🥱",
-    "🥴",
-    "😍",
-    "🐳",
-    "❤",
-    "‍🔥",
-    "🌚",
-    "🌭",
-    "💯",
-    "🤣",
-    "⚡",
-    "🏆",
-    "💔",
-    "🤨",
-    "😐",
-    "🍓",
-    "🍾",
-    "💋",
-    "😈",
-    "😴",
-    "😭",
-    "🤓",
-    "👻",
-    "👨‍💻",
-    "👀",
-    "🎃",
-    "🙈",
-    "😇",
-    "😨",
-    "🤝",
-    "✍",
-    "🤗",
-    "🫡",
-    "🎅",
-    "🎄",
-    "☃",
-    "💅",
-    "🤪",
-    "🗿",
-    "🆒",
-    "💘",
-    "🙉",
-    "🦄",
-    "😘",
-    "💊",
-    "🙊",
-    "😎",
-    "👾",
-    "🤷‍♂",
-    "🤷",
-    "🤷‍♀",
-    "😡",
-]
 loop = asyncio.get_running_loop()
 
 
@@ -122,8 +50,6 @@ loop = asyncio.get_running_loop()
 @LanguageStart
 async def start_comm(client, message: Message, _):
     chat_id = message.chat.id
-    message_id = message.id
-    await app.send_reaction(chat_id, message_id, random.choice(emoji))
     await add_served_user(message.from_user.id)
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
@@ -136,22 +62,20 @@ async def start_comm(client, message: Message, _):
         if name[0:4] == "help":
             keyboard = help_pannel(_)
             if config.START_IMG_URL:
-                await message.reply_photo(
+                return await message.reply_photo(
                     photo=config.START_IMG_URL,
                     caption=_["help_1"],
                     reply_markup=keyboard,
                 )
-                return await app.send_reaction(chat_id, message_id)
             else:
-                await message.reply_photo(
+                return await message.reply_photo(
                     photo=random.choice(PHOTO),
                     caption=_["help_1"],
                     reply_markup=keyboard,
                 )
-                return await app.send_reaction(chat_id, message_id)
         if name[0:4] == "song":
             await message.reply_text(_["song_2"])
-            return await app.send_reaction(chat_id, message_id)
+            return
         if name[0:3] == "sta":
             m = await message.reply_text("🔎 ғᴇᴛᴄʜɪɴɢ ʏᴏᴜʀ ᴘᴇʀsᴏɴᴀʟ sᴛᴀᴛs.!")
             stats = await get_userss(message.from_user.id)
@@ -202,12 +126,10 @@ async def start_comm(client, message: Message, _):
             thumbnail = await YouTube.thumbnail(videoid, True)
             await m.delete()
             await message.reply_photo(photo=thumbnail, caption=msg)
-            await app.send_reaction(chat_id, message_id)
             return
         if name[0:3] == "sud":
             await sudoers_list(client=client, message=message, _=_)
             await asyncio.sleep(1)
-            await app.send_reaction(chat_id, message_id)
             if await is_on_off(config.LOG):
                 sender_id = message.from_user.id
                 sender_mention = message.from_user.mention
@@ -223,7 +145,7 @@ async def start_comm(client, message: Message, _):
             lyrics = lyrical.get(query)
             if lyrics:
                 await Telegram.send_split_text(message, lyrics)
-                return await app.send_reaction(chat_id, message_id)
+                return
             else:
                 await message.reply_text("ғᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ʟʏʀɪᴄs.")
                 return await app.send_reaction(chat_id, message_id)
@@ -274,7 +196,6 @@ async def start_comm(client, message: Message, _):
                 reply_markup=key,
             )
             await asyncio.sleep(1)
-            await app.send_reaction(chat_id, message_id)
             if await is_on_off(config.LOG):
                 sender_id = message.from_user.id
                 sender_name = message.from_user.first_name
@@ -289,7 +210,6 @@ async def start_comm(client, message: Message, _):
         except:
             OWNER = None
         out = private_panel(_, app.username, OWNER)
-        await app.send_reaction(chat_id, message_id)
         if config.START_IMG_URL:
             try:
                 await message.reply_photo(
