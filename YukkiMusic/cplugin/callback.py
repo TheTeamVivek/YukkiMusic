@@ -7,7 +7,6 @@ from config import *
 import logging
 from YukkiMusic.utils.thumbnails import gen_thumb
 from .utils import (
-    admin_check_cb,
     HELP_TEXT,
     PM_START_TEXT,
     HELP_DEV,
