@@ -1,14 +1,28 @@
 from pyrogram import filters
-
 from YukkiMusic import app
 
-
-# Define a handler for /id command
-@app.on_message(filters.command("i", prefixes="/"))
+@app.on_message(filters.command("id"))
 async def get_id(client, message):
-    # Check if the message is sent in a group
-    if message.chat.type == "group" or message.chat.type == "supergroup":
-        await message.reply_text(f"The ID of this group is: {message.chat.id}")
-    # Check if the message is sent in a private chat
-    elif message.chat.type == "private":
-        await message.reply_text(f"Your ID is: {message.from_user.id}")
+    try:
+
+        if (not message.reply_to_message) and (message.chat):
+            await message.reply(f"User {message.from_user.first_name}'s ID is <code>{message.from_user.id }</code>.\nThis chat's ID is: <code>{message.chat.id}</code>.") 
+
+        elif not message.reply_to_message:
+            await message.reply(f"User {message.from_user.first_name}'s ID is <code>{message.from_user.id }</code>.") 
+
+        elif message.reply_to_message.forward_from_chat:
+            await message.reply(f"The forwarded {str(message.reply_to_message.forward_from_chat.type)[9:].lower()}, {message.reply_to_message.forward_from_chat.title} has an ID of <code>{message.reply_to_message.forward_from_chat.id}</code>.") 
+
+        elif message.reply_to_message.forward_from:
+            await message.reply(f"The forwarded user, {message.reply_to_message.forward_from.first_name} has an ID of <code>{message.reply_to_message.forward_from.id   }</code>.")
+
+        elif message.reply_to_message.forward_sender_name:
+            await message.reply("Sorry, i never seen that's user message or user do i am unable to fetch id")
+
+        else:
+            await message.reply(f"User {message.reply_to_message.from_user.first_name}'s ID is <code>{message.reply_to_message.from_user.id}</code>.")   
+
+    except Exception:
+            await message.reply("An error occured while getting the ID.")
+
