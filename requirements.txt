@@ -38,6 +38,8 @@ tgcrypto
 unidecode
 urllib3
 yt-dlp==2023.10.13
-youtube-search-python
-youtube_search
+#youtube-search-python
+#youtube_search
+git+https://github.com/alexmercerind/youtube-search-python@main
+git+https://github.com/joetats/youtube_search@master
 uuid==1.30
