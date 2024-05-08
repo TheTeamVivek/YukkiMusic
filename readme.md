@@ -21,6 +21,7 @@
 - Get your [Necessary Variables](https://github.com/vivekkumar0708/YukkiMusicFork/blob/master/sample.env)
 - Upgrade and Update by :
 `sudo apt-get update && sudo apt-get upgrade -y`
+- Clone git clone https://github.com/Vivekkumar-IN/YukkiMusic && cd YukkiMusic
 - Setup by : `bash setup`
 - Install tmux to keep running your bot when you close the terminal by :
 `sudo apt install tmux && tmux`
