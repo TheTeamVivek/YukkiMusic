@@ -223,7 +223,7 @@ async def play(client, message: Message):
 
         except Exception as e:
             logging.exception(str(e))
-            return await msg.edit("» ғᴀɪʟᴇᴅ ᴛᴏ ᴘʀᴏᴄᴇss ᴏ̨ᴜᴇʀʏ, ᴛʀʏ ᴘʟᴀʏɪɴɢ ᴀɢᴀɪɴ...")
+            return await msg.edit(f"» ғᴀɪʟᴇᴅ ᴛᴏ ᴘʀᴏᴄᴇss ᴏ̨ᴜᴇʀʏ, ᴛʀʏ ᴘʟᴀʏɪɴɢ ᴀɢᴀɪɴ...\n{e}")
 
         if (dur / 60) > DURATION_LIMIT_MIN:
             return await msg.edit(
