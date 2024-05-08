@@ -24,6 +24,7 @@ pytube
 pykeyboard
 py-tgcalls==1.2.9
 git+https://github.com/KurimuzonAkuma/pyrogram@dev
+pyrogram==2.0.101
 python-dotenv
 python-arq
 pyyaml
