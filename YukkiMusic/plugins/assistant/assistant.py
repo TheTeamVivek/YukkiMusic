@@ -43,7 +43,7 @@ async def set_pfp(client, message):
         if message.reply_to_message.video:
             try:
                 await client.set_profile_photo(video=photo)
-                await eor(message, text="Successfully Changed PFP.")                
+                await eor(message, text="Successfully Changed PFP.")
                 os.remove(photo)
             except Exception as e:
                 await eor(message, text=e)
