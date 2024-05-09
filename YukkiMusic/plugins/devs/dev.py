@@ -45,7 +45,7 @@ async def edit_or_reply(msg: Message, **kwargs):
     filters.command(["ev", "eval"]) & SUDOERS & ~filters.forwarded & ~filters.via_bot
 )
 @app.on_message(
-    filters.command(["ev,"eval"]) & SUDOERS & ~filters.forwarded & ~filters.via_bot
+    filters.command(["ev","eval"]) & SUDOERS & ~filters.forwarded & ~filters.via_bot
 )
 async def executor(client: app, message: Message):
     if len(message.command) < 2:
