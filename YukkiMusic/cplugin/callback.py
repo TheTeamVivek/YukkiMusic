@@ -75,15 +75,6 @@ async def help_menu(client, query: CallbackQuery):
         pass
 
     try:
-        helpmenu = InlineKeyboardMarkup(
-            [
-                [InlineKeyboardButton(text="ᴘʟᴀʏ", callback_data="clone_cb help")],
-                [
-                    InlineKeyboardButton(text="ʙᴀᴄᴋ", callback_data="clone_home"),
-                    InlineKeyboardButton(text="ᴄʟᴏsᴇ", callback_data="close"),
-                ],
-            ],
-        )
         await query.edit_message_text(
             text=f"๏ ʜᴇʏ {query.from_user.mention}, 🥀\n\nᴘʟᴇᴀsᴇ ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ғᴏʀ ᴡʜɪᴄʜ ʏᴏᴜ ᴡᴀɴɴᴀ ɢᴇᴛ ʜᴇʟᴘ.",
             reply_markup=helpmenu,
@@ -113,7 +104,7 @@ async def open_hmenu(client, query: CallbackQuery):
     except:
         pass
 
-    if cb == "help":
+    if cb == "play":
         await query.edit_message_text(HELP_TEXT.format(h), reply_markup=keyboard)
 
 
