@@ -101,7 +101,7 @@ class DurationLimitError(Exception):
     & ~filters.via_bot
 )
 async def play(client, message: Message):
-    msg = await message.reply_text("» sᴇᴀʀᴄʜɪɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
+    msg = await message.reply_text("🔎")
     if len(message.command) < 2:
         return await msg.edit_text("» ᴡʜᴀᴛ ᴅᴏ ʏᴏᴜ ᴡᴀɴɴᴀ ᴘʟᴀʏ ʙᴀʙʏ ?")
     vi = await app2.get_me()
