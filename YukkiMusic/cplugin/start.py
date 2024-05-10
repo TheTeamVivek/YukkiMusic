@@ -98,7 +98,8 @@ async def clone_st(client, message: Message):
                 ],
                 [
                     InlineKeyboardButton(
-                        text=" Dᴇᴠᴇʟᴏᴘᴇʀ ", url=f"tg://openmessage?user_id={choice(OWNER_ID)}"
+                        text=" Dᴇᴠᴇʟᴏᴘᴇʀ ",
+                        url=f"tg://openmessage?user_id={choice(OWNER_ID)}",
                     ),
                 ],
             ]
