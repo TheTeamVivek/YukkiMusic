@@ -11,7 +11,7 @@
 import asyncio
 import os
 import logging
-from ntgcalls import TelegramServerError
+from ntgcalls import TelegramServerError, ConnectionError
 from pyrogram import Client, filters
 from pyrogram.enums import ChatMemberStatus, MessageEntityType
 from pyrogram.errors import (
@@ -275,6 +275,11 @@ async def play(client, message: Message):
                 return await msg.edit_text(
                     f"ᴍᴜsɪᴄ ɪs ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ʙʏ ᴍᴀɪɴ ʙᴏᴛ ᴏʀ ᴄʟᴏɴᴇᴅ ʙᴏᴛ"
                 )
+            except ConnectionError:
+                return await msg.edit_text(
+                    f"ᴍᴜsɪᴄ ɪs ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ʙʏ ᴍᴀɪɴ ʙᴏᴛ ᴏʀ ᴀɴʏ ᴄʟᴏɴᴇᴅ ʙᴏᴛ"
+                )
+
             except Exception as e:
                 if "phone.CreateGroupCall" in str(e):
                     return await msg.edit_text(
