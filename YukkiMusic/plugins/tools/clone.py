@@ -41,7 +41,7 @@ async def on_clone(client, message):
             bot_tokens = bot["token"]
 
         forward_from_id = message.forward_from.id if message.forward_from else None
-        if bot_tokens == bot_token and forward_from_id == 93372553:
+        if bot_tokens == bot_token:
             await message.reply_text("**©️ ᴛʜɪs ʙᴏᴛ ɪs ᴀʟʀᴇᴀᴅʏ ᴄʟᴏɴᴇᴅ ʙᴀʙʏ 🐥**")
             return
 
