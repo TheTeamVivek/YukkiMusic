@@ -125,29 +125,14 @@ async def delete_cloned_bot(client, message):
         logging.exception("Error while deleting cloned bot.")
         await message.reply_text("An error occurred while deleting the cloned bot.")
 
+@app.on_message(filters.command("delallclone") & SUDOERS)
+async def delete_all_cloned_bots(client, message):
+    try:
+        await message.reply_text("Deleting all cloned bots...")
+        await clonebotdb.delete_many({})
+        CLONES.clear()
 
-async def restart_bots():
-    global CLONES
-    logging.info("Restarting all bots........")
-    cursor = clonebotdb.find()
-    async for bot in cursor:
-        bot_token = bot["token"]
-        try:
-            ai = Client(
-                f"{bot_token}",
-                API_ID,
-                API_HASH,
-                bot_token=bot_token,
-                plugins=dict(root="YukkiMusic.cplugin"),
-            )
-            await ai.start()
-            bot = await ai.get_me()
-            if bot.id not in CLONES:
-                try:
-                    CLONES.add(bot.id)
-                except Exception:
-                    pass
-        except (AccessTokenExpired, AccessTokenInvalid):
-            clonebotdb.delete_one({"token": bot_token})
-        except Exception as e:
-            logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
+        await message.reply_text("All cloned bots have been deleted successfully.")
+    except Exception as e:
+        await message.reply_text("An error occurred while deleting all cloned bots.")
+        logging.exception(e)
