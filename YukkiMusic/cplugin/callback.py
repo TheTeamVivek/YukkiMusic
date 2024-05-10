@@ -137,7 +137,7 @@ async def home_fallen(client, query: CallbackQuery):
                 InlineKeyboardButton(text=" sᴜᴩᴩᴏʀᴛ ", url=SUPPORT_GROUP),
             ],
            [
-                InlineKeyboardButton(text=" Dᴇᴠᴇʟᴏᴘᴇʀ ", url=f"https://t.me/{OWNER_ID}),
+                InlineKeyboardButton(text=" Dᴇᴠᴇʟᴏᴘᴇʀ ", url=f"https://t.me/{OWNER_ID}"),
 
             ],
 
