@@ -311,7 +311,7 @@ class Call(PyTgCalls):
                 except:
                     raise AssistantErr(
                         _["call_2"].format(
-                            config.MUSIC_BOT_NAME,
+                            app.mention,
                             userbot.id,
                             userbot.mention,
                             userbot.username,
