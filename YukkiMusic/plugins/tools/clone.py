@@ -37,7 +37,7 @@ async def on_clone(client, message):
         bots = clonebotdb.find()
         bot_tokens = None
 
-        for bot in bots:
+        async for bot in bots:
             bot_tokens = bot["token"]
 
         forward_from_id = message.forward_from.id if message.forward_from else None
