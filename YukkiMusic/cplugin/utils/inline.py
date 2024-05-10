@@ -3,7 +3,8 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 helpmenu = InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton(text="ᴘʟᴀʏ", callback_data="clone_cb play")
+                [InlineKeyboardButton(text="ᴘʟᴀʏ", callback_data="clone_cb play"),
+
 InlineKeyboardButton(text="ᴛᴇʟᴇɢʀᴀᴘʜ", callback_data="clone_cb telegraph")],
                 [
                     InlineKeyboardButton(text="ʙᴀᴄᴋ", callback_data="clone_home"),
