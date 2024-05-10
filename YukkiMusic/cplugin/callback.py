@@ -23,6 +23,7 @@ from .utils import (
     HELP_SUDO,
     helpmenu,
 )
+from .utils.dossier import *
 from .utils.active import (
     is_active_chat,
     is_streaming,
