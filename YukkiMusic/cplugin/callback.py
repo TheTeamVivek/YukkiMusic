@@ -11,6 +11,7 @@ from pyrogram import Client, filters
 from pyrogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ChatMemberStatus
 from pytgcalls.types import MediaStream, AudioQuality
+from random import choice
 
 from config import *
 import logging
@@ -138,7 +139,7 @@ async def home_fallen(client, query: CallbackQuery):
             ],
             [
                 InlineKeyboardButton(
-                    text=" Dᴇᴠᴇʟᴏᴘᴇʀ ", url=f"tg://openmessage?user_id={OWNER_ID}"
+                    text=" Dᴇᴠᴇʟᴏᴘᴇʀ ", url=f"tg://openmessage?user_id={choice(OWNER_ID)}"
                 ),
             ],
         ]
