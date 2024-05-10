@@ -1,5 +1,5 @@
-from YukkiMusic.core.mongo import mongodb, pymongodb
-from typing import Dict, List, Union
+from YukkiMusic.core.mongo import mongodb
+from random import choice
 from config import OWNER_ID
 
 cloneownerdb = mongodb.cloneownerdb
@@ -16,4 +16,4 @@ async def get_clonebot_owner(bot_id):
     if result:
         return result.get("user_id")
     else:
-        return OWNER_ID
+        return choice(OWNER_ID)
