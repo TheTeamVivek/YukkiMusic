@@ -21,6 +21,7 @@ from .utils import (
     PM_START_TEXT,
     HELP_DEV,
     HELP_SUDO,
+    helpmenu,
 )
 from .utils.active import (
     is_active_chat,
