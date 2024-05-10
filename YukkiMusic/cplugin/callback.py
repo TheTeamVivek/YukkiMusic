@@ -139,7 +139,8 @@ async def home_fallen(client, query: CallbackQuery):
             ],
             [
                 InlineKeyboardButton(
-                    text=" Dᴇᴠᴇʟᴏᴘᴇʀ ", url=f"tg://openmessage?user_id={choice(OWNER_ID)}"
+                    text=" Dᴇᴠᴇʟᴏᴘᴇʀ ",
+                    url=f"tg://openmessage?user_id={choice(OWNER_ID)}",
                 ),
             ],
         ]
