@@ -422,9 +422,7 @@ class Call(PyTgCalls):
                     "**» ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ғᴏᴜɴᴅ.**\n\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ."
                 )
             else:
-                raise AssistantErr(
-                f"Exception : {e}"
-                )
+                raise AssistantErr(f"Exception : {e}")
         await add_active_chat(chat_id)
         await music_on(chat_id)
         if video:
