@@ -92,9 +92,13 @@ async def clone_st(client, message: Message):
                     )
                 ],
                 [
-                    InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
-                    InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
+                    InlineKeyboardButton(text=" ᴄʜᴀɴɴᴇʟ ", url=SUPPORT_CHANNEL),
+                    InlineKeyboardButton(text=" sᴜᴩᴩᴏʀᴛ ", url=SUPPORT_GROUP),
                 ],
+              [
+                InlineKeyboardButton(text=" Dᴇᴠᴇʟᴏᴘᴇʀ ", url=f"https://t.me/{OWNER_ID}"),
+
+            ]
             ]
 
             await message.reply_photo(
