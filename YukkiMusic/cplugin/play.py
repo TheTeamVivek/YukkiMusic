@@ -272,7 +272,9 @@ async def play(client, message: Message):
                     f"» {viv.mention} ᴀssɪsᴛᴀɴᴛ ɪs ᴍᴜᴛᴇᴅ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ,\n\nᴘʟᴇᴀsᴇ ᴜɴᴍᴜᴛᴇ {vi.mention} ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ ᴀɴᴅ ᴛʀʏ ᴘʟᴀʏɪɴɢ ᴀɢᴀɪɴ."
                 )
             except AlreadyJoinedError:
-                return await msg.edit_text(f"ᴍᴜsɪᴄ ɪs ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ʙʏ ᴍᴀɪɴ ʙᴏᴛ ᴏʀ ᴄʟᴏɴᴇᴅ ʙᴏᴛ")
+                return await msg.edit_text(
+                    f"ᴍᴜsɪᴄ ɪs ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ʙʏ ᴍᴀɪɴ ʙᴏᴛ ᴏʀ ᴄʟᴏɴᴇᴅ ʙᴏᴛ"
+                )
             except Exception as e:
                 if "phone.CreateGroupCall" in str(e):
                     return await msg.edit_text(
