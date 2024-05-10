@@ -76,7 +76,7 @@ async def help_menu(client, query: CallbackQuery):
     try:
         helpmenu = InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton(text="ᴇᴠᴇʀʏᴏɴᴇ", callback_data="clone_cb help")],
+                [InlineKeyboardButton(text="ᴘʟᴀʏ", callback_data="clone_cb help")],
                 [
                     InlineKeyboardButton(text="ʙᴀᴄᴋ", callback_data="clone_home"),
                     InlineKeyboardButton(text="ᴄʟᴏsᴇ", callback_data="close"),
@@ -133,9 +133,16 @@ async def home_fallen(client, query: CallbackQuery):
             ],
             [InlineKeyboardButton(text="ʜᴇʟᴩ & ᴄᴏᴍᴍᴀɴᴅs", callback_data="clone_help")],
             [
-                InlineKeyboardButton(text="❄ ᴄʜᴀɴɴᴇʟ ❄", url=SUPPORT_CHANNEL),
-                InlineKeyboardButton(text="✨ sᴜᴩᴩᴏʀᴛ ✨", url=SUPPORT_GROUP),
+                InlineKeyboardButton(text=" ᴄʜᴀɴɴᴇʟ ", url=SUPPORT_CHANNEL),
+                InlineKeyboardButton(text=" sᴜᴩᴩᴏʀᴛ ", url=SUPPORT_GROUP),
             ],
+           [
+                InlineKeyboardButton(text=" Dᴇᴠᴇʟᴏᴘᴇʀ ", url=f"https://t.me/{OWNER_ID}),
+
+            ],
+
+  
+
         ]
 
         await query.edit_message_text(
