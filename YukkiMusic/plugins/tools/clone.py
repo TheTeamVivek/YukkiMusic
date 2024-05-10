@@ -129,8 +129,8 @@ async def delete_cloned_bot(client, message):
 async def restart_bots():
     global CLONES
     logging.info("Restarting all bots........")
-    bots = list(clonebotdb.find())
-    for bot in bots:
+    cursor = clonebotdb.find()
+    async for bot in cursor:
         bot_token = bot["token"]
         try:
             ai = Client(
