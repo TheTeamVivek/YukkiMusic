@@ -34,7 +34,7 @@ async def on_clone(client, message):
         )
         bot_token = bot_token[0] if bot_token else None
         bot_id = re.findall(r"\d[0-9]{8,10}", message.text)
-        bots = list(clonebotdb.find())
+        bots = clonebotdb.find()
         bot_tokens = None
 
         for bot in bots:
