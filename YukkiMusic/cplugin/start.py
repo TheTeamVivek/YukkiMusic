@@ -10,6 +10,7 @@
 from pyrogram import Client, filters
 from pyrogram.enums import ChatType, ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from random import choice
 from youtubesearchpython.__future__ import VideosSearch
 from config import SUPPORT_GROUP, OWNER_ID, SUPPORT_CHANNEL, START_IMG_URL
 
@@ -97,7 +98,7 @@ async def clone_st(client, message: Message):
                 ],
                 [
                     InlineKeyboardButton(
-                        text=" Dᴇᴠᴇʟᴏᴘᴇʀ ", url=f"tg://openmessage?user_id={OWNER_ID}"
+                        text=" Dᴇᴠᴇʟᴏᴘᴇʀ ", url=f"tg://openmessage?user_id={choice(OWNER_ID)}"
                     ),
                 ],
             ]
