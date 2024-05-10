@@ -99,7 +99,7 @@ async def ping_com(client, message: Message, _):
         if DUR == "Unknown"
         else "\nᴄʟɪᴄᴋ ᴏɴ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴡʜᴏʟʀ ǫᴜᴇᴜᴇᴅ ʟɪsᴛ."
     )
-    cap = f"""**{config.MUSIC_BOT_NAME} ᴘʟᴀʏᴇʀ**
+    cap = f"""**{app.mention} ᴘʟᴀʏᴇʀ**
 
 🎥**ᴘʟᴀʏɪɴɢ:** {title}
 
@@ -282,7 +282,7 @@ async def queue_back(client, CallbackQuery: CallbackQuery, _):
         if DUR == "Unknown"
         else "\nᴄʟɪᴄᴋ ᴏɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ ᴛᴏ ɢᴇᴛ ᴡʜᴏʟᴇ ǫᴜᴇᴜᴇᴅ ʟɪsᴛ."
     )
-    cap = f"""**{config.MUSIC_BOT_NAME} ᴘʟᴀʏᴇʀ**
+    cap = f"""**{app.mention} ᴘʟᴀʏᴇʀ**
 
 🎥**ᴘʟᴀʏɪɴɢ:** {title}
 
