@@ -11,7 +11,7 @@
 import asyncio
 import os
 import logging
-from ntgcalls import TelegramServerError, ConnectionError
+from ntgcalls import TelegramServerError
 from pyrogram import Client, filters
 from pyrogram.enums import ChatMemberStatus, MessageEntityType
 from pyrogram.errors import (
@@ -273,10 +273,6 @@ async def play(client, message: Message):
                 )
             except AlreadyJoinedError:
                 return await msg.edit_text(
-                    f"ᴍᴜsɪᴄ ɪs ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ʙʏ ᴍᴀɪɴ ʙᴏᴛ ᴏʀ ᴄʟᴏɴᴇᴅ ʙᴏᴛ"
-                )
-            except ConnectionError:
-                return await msg.edit_text(
                     f"ᴍᴜsɪᴄ ɪs ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ʙʏ ᴍᴀɪɴ ʙᴏᴛ ᴏʀ ᴀɴʏ ᴄʟᴏɴᴇᴅ ʙᴏᴛ"
                 )
 
@@ -285,6 +281,15 @@ async def play(client, message: Message):
                     return await msg.edit_text(
                         "**» ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ғᴏᴜɴᴅ.**\n\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ."
                     )
+                if "Connection cannot be initialized more than once" in str(e):
+                    return await msg.edit_text(
+                    f"ᴍᴜsɪᴄ ɪs ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ʙʏ ᴍᴀɪɴ ʙᴏᴛ ᴏʀ ᴀɴʏ ᴄʟᴏɴᴇᴅ ʙᴏᴛ"
+                )
+                if "Already joined into group call" in str(e):
+                    return await msg.edit_text(
+                    f"ᴍᴜsɪᴄ ɪs ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ʙʏ ᴍᴀɪɴ ʙᴏᴛ ᴏʀ ᴀɴʏ ᴄʟᴏɴᴇᴅ ʙᴏᴛ"
+                )
+
                 else:
                     return await msg.edit_text(
                         f"sᴏᴍᴇ ᴇxᴄᴇᴘᴛɪᴏɴ ᴏᴄᴄᴜʀᴇᴅ ᴡʜᴇɴ ᴘʀᴏᴄᴇssɪɴɢ\n {e}"
