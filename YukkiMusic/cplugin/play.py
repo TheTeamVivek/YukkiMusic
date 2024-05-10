@@ -283,12 +283,12 @@ async def play(client, message: Message):
                     )
                 if "Connection cannot be initialized more than once" in str(e):
                     return await msg.edit_text(
-                    f"ᴍᴜsɪᴄ ɪs ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ʙʏ ᴍᴀɪɴ ʙᴏᴛ ᴏʀ ᴀɴʏ ᴄʟᴏɴᴇᴅ ʙᴏᴛ"
-                )
+                        f"ᴍᴜsɪᴄ ɪs ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ʙʏ ᴍᴀɪɴ ʙᴏᴛ ᴏʀ ᴀɴʏ ᴄʟᴏɴᴇᴅ ʙᴏᴛ"
+                    )
                 if "Already joined into group call" in str(e):
                     return await msg.edit_text(
-                    f"ᴍᴜsɪᴄ ɪs ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ʙʏ ᴍᴀɪɴ ʙᴏᴛ ᴏʀ ᴀɴʏ ᴄʟᴏɴᴇᴅ ʙᴏᴛ"
-                )
+                        f"ᴍᴜsɪᴄ ɪs ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏɪɴɢ ʙʏ ᴍᴀɪɴ ʙᴏᴛ ᴏʀ ᴀɴʏ ᴄʟᴏɴᴇᴅ ʙᴏᴛ"
+                    )
 
                 else:
                     return await msg.edit_text(
