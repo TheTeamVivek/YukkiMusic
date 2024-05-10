@@ -58,7 +58,7 @@ async def pause_str(client, message: Message):
         await pytgcalls.pause_stream(message.chat.id)
         await stream_off(message.chat.id)
         return await message.reply_text(
-            text=f"➻ sᴛʀᴇᴀᴍ ᴩᴀᴜsᴇᴅ 🥺\n└ʙʏ : {message.from_user.mention} 🥀",
+            text=f"➻ sᴛʀᴇᴀᴍ ᴩᴀᴜsᴇᴅ 🥺 ʙʏ : {message.from_user.mention} 🥀",
         )
     elif message.text.lower() == "/resume":
 
@@ -69,7 +69,7 @@ async def pause_str(client, message: Message):
         await stream_on(message.chat.id)
         await pytgcalls.resume_stream(message.chat.id)
         return await message.reply_text(
-            text=f"➻ sᴛʀᴇᴀᴍ ʀᴇsᴜᴍᴇᴅ 💫\n│ \n└ʙʏ : {message.from_user.mention} 🥀",
+            text=f"➻ sᴛʀᴇᴀᴍ ʀᴇsᴜᴍᴇᴅ ʙʏ : {message.from_user.mention} 🥀",
         )
     elif message.text.lower() == "/end" or message.text.lower() == "/stop":
         try:
@@ -79,5 +79,5 @@ async def pause_str(client, message: Message):
             pass
 
         return await message.reply_text(
-            text=f"➻ **sᴛʀᴇᴀᴍ ᴇɴᴅᴇᴅ/sᴛᴏᴩᴩᴇᴅ** ❄\n│ \n└ʙʏ : {message.from_user.mention} 🥀",
+            text=f"➻ **sᴛʀᴇᴀᴍ ᴇɴᴅᴇᴅ/sᴛᴏᴩᴩᴇᴅ** ❄ ʙʏ : {message.from_user.mention} 🥀",
         )
