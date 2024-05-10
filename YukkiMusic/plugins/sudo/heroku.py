@@ -304,7 +304,7 @@ async def update_(client, message, _):
                 ),
             )
     else:
-        os.system("pip3 install -r requirements.txt")
+        os.system("pip3 install --no-cache-dir -U -r requirements.txt")
         os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
         exit()
 
