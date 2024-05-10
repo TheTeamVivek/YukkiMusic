@@ -97,7 +97,7 @@ async def clone_st(client, message: Message):
                 ],
                 [
                     InlineKeyboardButton(
-                        text=" Dᴇᴠᴇʟᴏᴘᴇʀ ", url=f"https://t.me/{OWNER_ID}"
+                        text=" Dᴇᴠᴇʟᴏᴘᴇʀ ", url=f"tg://openmessage?user_id={OWNER_ID}"
                     ),
                 ],
             ]
