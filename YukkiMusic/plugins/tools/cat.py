@@ -3,6 +3,7 @@ from pyrogram import filters
 from pyrogram.types import Message
 from YukkiMusic import app
 
+
 @app.on_message(filters.command("cat"))
 async def cat(c, m: Message):
     r = requests.get("https://api.thecatapi.com/v1/images/search")
