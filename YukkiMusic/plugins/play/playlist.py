@@ -241,6 +241,7 @@ async def play_playlist_command(client, message, _):
 
     return await mystic.delete()
 
+
 @app.on_callback_query(filters.regex("play_cplaylist") & ~BANNED_USERS)
 @languageCB
 async def play_playlist(client, CallbackQuery, _):
