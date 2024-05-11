@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021-present by TeamYukki@Github, < https://github.com/TeamYukki >.
+# Copyright (C) 2024-present by TeamYukki@Github, < https://github.com/TeamYukki >.
 #
 # This file is part of < https://github.com/TeamYukki/YukkiMusicBot > project,
 # and is released under the "GNU v3.0 License Agreement".
@@ -21,7 +21,7 @@ def botplaylist_markup(_):
         ],
         [
             InlineKeyboardButton(
-                text=_["PL_B_12"], callback_data="get_playlist_playmode"
+                text=_["PL_B_12"], callback_data="get_cplaylist_playmode"
             ),
         ],
         [
@@ -52,6 +52,19 @@ def get_playlist_markup(_):
         [
             InlineKeyboardButton(text=_["P_B_1"], callback_data="play_playlist a"),
             InlineKeyboardButton(text=_["P_B_2"], callback_data="play_playlist v"),
+        ],
+        [
+            InlineKeyboardButton(text=_["BACK_BUTTON"], callback_data="home_play"),
+            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
+        ],
+    ]
+    return buttons
+
+def get_cplaylist_markup(_):
+    buttons = [
+        [
+            InlineKeyboardButton(text=_["P_B_1"], callback_data="play_cplaylist a"),
+            InlineKeyboardButton(text=_["P_B_2"], callback_data="play_cplaylist v"),
         ],
         [
             InlineKeyboardButton(text=_["BACK_BUTTON"], callback_data="home_play"),
