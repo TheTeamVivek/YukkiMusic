@@ -14,6 +14,7 @@ close_keyboard = InlineKeyboardMarkup(
     ]
 )
 
+
 @app.on_message(filters.command(["dogs", "dog"]) & ~BANNED_USERS)
 async def dog(c, m: Message):
     r = requests.get("https://random.dog/woof.json")
@@ -21,9 +22,7 @@ async def dog(c, m: Message):
         data = r.json()
         dog_url = data["url"]
         if dog_url.endswith(".gif"):
-            await m.reply_animation(
-                dog_url, reply_markup=close_keyboard
-            )
+            await m.reply_animation(dog_url, reply_markup=close_keyboard)
         else:
             await m.reply_photo(dog_url, reply_markup=close_keyboard)
     else:
