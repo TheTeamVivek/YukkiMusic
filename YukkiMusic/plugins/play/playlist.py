@@ -724,6 +724,7 @@ async def add_playlist(client, CallbackQuery, _):
     except:
         return
 
+
 @app.on_callback_query(filters.regex("cadd_playlist") & ~BANNED_USERS)
 @languageCB
 async def add_playlist(client, CallbackQuery, _):
@@ -739,7 +740,9 @@ async def add_playlist(client, CallbackQuery, _):
     _check = await get_playlist(user_id, videoid)
     if _check:
         try:
-            return await CallbackQuery.answer("ᴛʜɪs ᴛʀᴀᴄᴋ ɪs  ᴀʟʀᴇᴀᴅʏ ᴀᴅᴅᴇᴅ ɪɴ ɢʀᴏᴜᴘ ᴘʟᴀʏʟɪsᴛ", show_alert=True)
+            return await CallbackQuery.answer(
+                "ᴛʜɪs ᴛʀᴀᴄᴋ ɪs  ᴀʟʀᴇᴀᴅʏ ᴀᴅᴅᴇᴅ ɪɴ ɢʀᴏᴜᴘ ᴘʟᴀʏʟɪsᴛ", show_alert=True
+            )
         except:
             return
     _count = await get_playlist_names(CallbackQuery.message.chat.id)
@@ -773,8 +776,6 @@ async def add_playlist(client, CallbackQuery, _):
         )
     except:
         return
-
-
 
 
 @app.on_callback_query(filters.regex("del_playlist") & ~BANNED_USERS)
