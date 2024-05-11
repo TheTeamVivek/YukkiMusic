@@ -60,6 +60,7 @@ def get_playlist_markup(_):
     ]
     return buttons
 
+
 def get_cplaylist_markup(_):
     buttons = [
         [
