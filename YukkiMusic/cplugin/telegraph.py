@@ -4,6 +4,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telegraph import upload_file
 from YukkiMusic import app
 
+
 @Client.on_message(filters.command(["tgm", "telegraph", "tl"]))
 async def get_link_group(client, message):
     if not message.reply_to_message:
@@ -19,7 +20,9 @@ async def get_link_group(client, message):
 
         try:
             location = "cache"
-            local_path = await message.reply_to_message.download(location, progress=progress)
+            local_path = await message.reply_to_message.download(
+                location, progress=progress
+            )
             # Rename the downloaded file to vname
             new_path = os.path.join(location, vname)
             os.rename(local_path, new_path)
