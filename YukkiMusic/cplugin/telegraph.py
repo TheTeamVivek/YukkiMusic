@@ -1,13 +1,12 @@
 import os
-import logging
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telegraph import upload_file
+from YukkiMusic import app
 
 
-@Client.on_message(filters.command(["tgm"]))
-@Client.on_message(filters.command(["telegraph"]))
-async def get_link_group(client: Client, message):
+@Client.on_message(filters.command(["tgm", "telegraph", "tl"]))
+async def get_link_group(client, message):
     if not message.reply_to_message:
         return await message.reply_text(
             "ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴍᴇᴅɪᴀ ᴛᴏ ᴜᴘʟᴏᴀᴅ ᴏɴ ᴛᴇʟᴇɢʀᴀᴘʜ"
@@ -19,7 +18,7 @@ async def get_link_group(client: Client, message):
             await text.edit_text(f"📥 ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ... {current * 100 / total:.1f}%")
 
         try:
-            location = f"downloads"
+            location = f"cache"
             local_path = await message.reply_to_message.download(
                 location, progress=progress
             )
@@ -43,10 +42,5 @@ async def get_link_group(client: Client, message):
             await text.edit_text(f"❌ |ғɪʟᴇ ᴜᴘʟᴏᴀᴅ ғᴀɪʟᴇᴅ \n\n<i>ʀᴇᴀsᴏɴ: {e}</i>")
             os.remove(local_path)
             return
-    except Exception as e:
-        logging.exception(e)
-
-
-@Client.on_message(filters.command(["tgt"]))
-async def get_link_group(client, message):
-    await message.reply_text("Coming soon.....")
+    except Exception:
+        pass
