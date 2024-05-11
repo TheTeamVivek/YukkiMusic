@@ -21,7 +21,7 @@ async def get_link_group(client, message):
         try:
             location = f"cache"
             local_path = await message.reply_to_message.download(
-                location, file_name=f"{vname}", progress=progress
+                location, progress=progress
             )
             await text.edit_text("📤 ᴜᴘʟᴏᴀᴅɪɴɢ ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ...")
             upload_path = upload_file(local_path)
