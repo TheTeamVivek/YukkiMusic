@@ -1,4 +1,5 @@
 import os
+from asyncio import sleep
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telegraph import upload_file
@@ -23,7 +24,6 @@ async def get_link_group(client, message):
             local_path = await message.reply_to_message.download(
                 location, progress=progress
             )
-            # Rename the downloaded file to vname
             new_path = os.path.join(location, vname)
             os.rename(local_path, new_path)
             await text.edit_text("📤 ᴜᴘʟᴏᴀᴅɪɴɢ ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ...")
@@ -41,10 +41,12 @@ async def get_link_group(client, message):
                     ]
                 ),
             )
-            os.remove(new_path)  # Remove the renamed file after uploading
+            sleep(2)
+            os.remove(new_path)
         except Exception as e:
             await text.edit_text(f"❌ |ғɪʟᴇ ᴜᴘʟᴏᴀᴅ ғᴀɪʟᴇᴅ \n\n<i>ʀᴇᴀsᴏɴ: {e}</i>")
+            sleep(2)
             os.remove(new_path)
             return
     except Exception:
-        pass  # Handle exceptions as needed
+        pass
