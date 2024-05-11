@@ -1,6 +1,7 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from YukkiMusic import app 
+from YukkiMusic import app
+
 
 @app.on_message(filters.command(["dice", "ludo"]))
 async def dice(c, m: Message):
