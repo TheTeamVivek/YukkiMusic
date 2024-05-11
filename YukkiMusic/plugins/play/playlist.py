@@ -241,6 +241,103 @@ async def play_playlist_command(client, message, _):
 
     return await mystic.delete()
 
+@app.on_callback_query(filters.regex("play_cplaylist") & ~BANNED_USERS)
+@languageCB
+async def play_playlist(client, CallbackQuery, _):
+    callback_data = CallbackQuery.data.strip()
+    mode = callback_data.split(None, 1)[1]
+    user_id = CallbackQuery.from_user.id
+    _playlist = await get_playlist_names(CallbackQuery.chat.id)
+    if not _playlist:
+        try:
+            return await CallbackQuery.answer(
+                _["playlist_3"],
+                show_alert=True,
+            )
+        except:
+            return
+    chat_id = CallbackQuery.message.chat.id
+    user_name = CallbackQuery.from_user.first_name
+    await CallbackQuery.message.delete()
+    result = []
+    try:
+        await CallbackQuery.answer()
+    except:
+        pass
+    video = True if mode == "v" else None
+    mystic = await CallbackQuery.message.reply_text(_["play_1"])
+    for vidids in _playlist:
+        result.append(vidids)
+    try:
+        await stream(
+            _,
+            mystic,
+            user_id,
+            result,
+            chat_id,
+            user_name,
+            CallbackQuery.message.chat.id,
+            video,
+            streamtype="playlist",
+        )
+    except Exception as e:
+        ex_type = type(e).__name__
+        err = e if ex_type == "AssistantErr" else _["general_3"].format(ex_type)
+        return await mystic.edit_text(err)
+    return await mystic.delete()
+
+
+@app.on_message(
+    filters.command(["playgplaylist", vplaygplaylist"]) & ~BANNED_USERS & filters.group
+)
+@languageCB
+async def play_playlist_command(client, message, _):
+    mode = message.command[0][0]
+    user_id = message.from_user.id
+    _playlist = await get_playlist_names(message.chat.id)
+    if not _playlist:
+        try:
+            return await message.reply(
+                _["playlist_3"],
+                quote=True,
+            )
+        except:
+            return
+
+    chat_id = message.chat.id
+    user_name = message.from_user.first_name
+
+    try:
+        await message.delete()
+    except:
+        pass
+
+    result = []
+    video = True if mode == "v" else None
+    mystic = await message.reply_text(_["play_1"])
+
+    for vidids in _playlist:
+        result.append(vidids)
+
+    try:
+        await stream(
+            _,
+            mystic,
+            user_id,
+            result,
+            chat_id,
+            user_name,
+            message.chat.id,
+            video,
+            streamtype="playlist",
+        )
+    except Exception as e:
+        ex_type = type(e).__name__
+        err = e if ex_type == "AssistantErr" else _["general_3"].format(ex_type)
+        return await mystic.edit_text(err)
+
+    return await mystic.delete()
+
 
 @app.on_message(filters.command(["addplaylist"]) & ~BANNED_USERS)
 @language
