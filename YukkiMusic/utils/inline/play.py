@@ -42,10 +42,10 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
         ],
         [
             InlineKeyboardButton(
-                text="ᴀᴅᴅ ᴛᴏ ᴘʟᴀʏʟɪsᴛ", callback_data=f"add_playlist {videoid}"
+                text="✚ ᴘʟᴀʏʟɪsᴛ ✚", callback_data=f"add_playlist {videoid}"
             ),
             InlineKeyboardButton(
-                text="ᴀᴅᴅ ᴛᴏ ᴘʟᴀʏʟɪsᴛ", callback_data=f"cadd_playlist {videoid}"
+                text="✚ ɢʀᴏᴜᴘ ᴘʟᴀʏʟɪsᴛ ✚", callback_data=f"cadd_playlist {videoid}"
             ),
         ],
         [
