@@ -23,7 +23,7 @@ async def dog(c, m: Message):
         cat_url = data[0]["url"]
         if cat_url.endswith(".gif"):
             await m.reply_animation(
-                cat_url, caption="meow", reply_markup=close_keyboard
+                cat_url, reply_markup=close_keyboard
             )
         else:
             await m.reply_photo(cat_url, reply_markup=close_keyboard)
