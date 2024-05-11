@@ -741,7 +741,8 @@ async def add_playlist(client, CallbackQuery, _):
     if _check:
         try:
             return await CallbackQuery.answer(
-                "ᴀʟʀᴇᴀᴅʏ ᴇxɪsᴛs\n\nᴛʜɪs ᴛʀᴀᴄᴋ ᴇxɪsᴛs ɪɴ ɢʀᴏᴜᴘ ᴘʟᴀʏʟɪsᴛ.", show_alert=True
+                "ᴀʟʀᴇᴀᴅʏ ᴇxɪsᴛs\n\nᴛʜɪs ᴛʀᴀᴄᴋ ᴇxɪsᴛs ɪɴ ɢʀᴏᴜᴘ ᴘʟᴀʏʟɪsᴛ.",
+                show_alert=True,
             )
         except:
             return
@@ -822,9 +823,6 @@ async def del_plist(client, CallbackQuery, _):
             return
     keyboard, count = await get_keyboard(_, CallbackQuery.message.chat.id)
     return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
-
-
-
 
 
 @app.on_callback_query(filters.regex("delete_whole_playlist") & ~BANNED_USERS)
