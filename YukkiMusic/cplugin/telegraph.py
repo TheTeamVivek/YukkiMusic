@@ -23,6 +23,8 @@ async def get_link_group(client, message):
             local_path = await message.reply_to_message.download(
                 location, progress=progress
             )
+            new_path = os.path.join(location, vname)
+            os.rename(local_path, new_path)
             await text.edit_text("📤 ᴜᴘʟᴏᴀᴅɪɴɢ ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ...")
             upload_path = upload_file(local_path)
             await text.edit_text(
