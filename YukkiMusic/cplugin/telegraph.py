@@ -1,4 +1,5 @@
 import os
+import logging
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telegraph import upload_file
@@ -41,8 +42,8 @@ async def get_link_group(client, message):
             await text.edit_text(f"❌ |ғɪʟᴇ ᴜᴘʟᴏᴀᴅ ғᴀɪʟᴇᴅ \n\n<i>ʀᴇᴀsᴏɴ: {e}</i>")
             os.remove(local_path)
             return
-    except Exception:
-        pass
+    except Exception as e:
+        logging.exception(e)
 
 
 @Client.on_message(filters.command(["tgt"]))
