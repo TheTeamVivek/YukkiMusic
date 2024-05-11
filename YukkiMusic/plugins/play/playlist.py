@@ -675,6 +675,7 @@ async def get_playlist_playmode_(client, CallbackQuery, _):
         reply_markup=InlineKeyboardMarkup(buttons)
     )
 
+
 @app.on_callback_query(filters.regex("get_cplaylist_playmode") & ~BANNED_USERS)
 @languageCB
 async def get_playlist_playmode_(client, CallbackQuery, _):
@@ -686,8 +687,6 @@ async def get_playlist_playmode_(client, CallbackQuery, _):
     return await CallbackQuery.edit_message_reply_markup(
         reply_markup=InlineKeyboardMarkup(buttons)
     )
-
-
 
 
 @app.on_callback_query(filters.regex("delete_warning") & ~BANNED_USERS)
