@@ -8,6 +8,7 @@
 #
 
 import asyncio
+import uvloop
 import importlib
 import sys
 from sys import argv
@@ -82,5 +83,6 @@ async def init():
 
 if __name__ == "__main__":
     telethn.start(bot_token=config.BOT_TOKEN)
+    uvloop.install()
     loop.run_until_complete(init())
     LOGGER("YukkiMusic").info("Stopping Yukki Music Bot! GoodBye")
