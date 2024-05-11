@@ -248,11 +248,11 @@ async def play_playlist(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     mode = callback_data.split(None, 1)[1]
     user_id = CallbackQuery.from_user.id
-    _playlist = await get_playlist_names(CallbackQuery.chat.id)
+    _playlist = await get_playlist_names(CallbackQuery.message.chat.id)
     if not _playlist:
         try:
             return await CallbackQuery.answer(
-                _["playlist_3"],
+                "playlist_3",
                 show_alert=True,
             )
         except:
