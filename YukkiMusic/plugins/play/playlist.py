@@ -741,7 +741,7 @@ async def add_playlist(client, CallbackQuery, _):
     if _check:
         try:
             return await CallbackQuery.answer(
-                "ᴛʜɪs ᴛʀᴀᴄᴋ ɪs  ᴀʟʀᴇᴀᴅʏ ᴀᴅᴅᴇᴅ ɪɴ ɢʀᴏᴜᴘ ᴘʟᴀʏʟɪsᴛ", show_alert=True
+                "ᴀʟʀᴇᴀᴅʏ ᴇxɪsᴛs\n\nᴛʜɪs ᴛʀᴀᴄᴋ ᴇxɪsᴛs ɪɴ ɢʀᴏᴜᴘ ᴘʟᴀʏʟɪsᴛ.", show_alert=True
             )
         except:
             return
@@ -799,6 +799,32 @@ async def del_plist(client, CallbackQuery, _):
             return
     keyboard, count = await get_keyboard(_, user_id)
     return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
+
+
+@app.on_callback_query(filters.regex("del_playlist") & ~BANNED_USERS)
+@languageCB
+async def del_plist(client, CallbackQuery, _):
+    pass
+
+    callback_data = CallbackQuery.data.strip()
+    videoid = callback_data.split(None, 1)[1]
+    user_id = CallbackQuery.from_user.id
+    deleted = await delete_playlist(CallbackQuery.message.chat.id, videoid)
+    if deleted:
+        try:
+            await CallbackQuery.answer(_["playlist_11"], show_alert=True)
+        except:
+            pass
+    else:
+        try:
+            return await CallbackQuery.answer(_["playlist_12"], show_alert=True)
+        except:
+            return
+    keyboard, count = await get_keyboard(_, CallbackQuery.message.chat.id)
+    return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
+
+
+
 
 
 @app.on_callback_query(filters.regex("delete_whole_playlist") & ~BANNED_USERS)
