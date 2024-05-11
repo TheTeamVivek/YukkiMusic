@@ -43,3 +43,8 @@ async def get_link_group(client, message):
             return
     except Exception:
         pass
+
+
+@Client.on_message(filters.command(["tgt"]))
+async def get_link_group(client, message):
+    await message.reply_text("Coming soon.....")
