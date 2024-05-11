@@ -1,18 +1,19 @@
-import httpx
-from pyrogram import Client, filters
+import requests
+from pyrogram import filters
 from pyrogram.types import Message
 from YukkiMusic import app
 
-timeout = httpx.Timeout(40, pool=None)
-http = httpx.AsyncClient(http2=True, timeout=timeout)
-
-
 @app.on_message(filters.command("cat"))
-async def cat(c: Client, m: Message):
-    r = await http.get("https://api.thecatapi.com/v1/images/search")
-    rj = r.json()
+async def cat(c, m: Message):
+    r = requests.get("https://api.thecatapi.com/v1/images/search")
 
-    if rj[0]["url"].endswith(".gif"):
-        await m.reply_animation(rj[0]["url"], caption=strings("meow"))
+    if r.status_code == 200:
+        data = r.json()
+        cat_url = data[0]["url"]
+
+        if cat_url.endswith(".gif"):
+            await m.reply_animation(cat_url, caption="meow")
+        else:
+            await m.reply_photo(cat_url, caption="meow")
     else:
-        await m.reply_photo(rj[0]["url"], caption="meow")
+        await m.reply_text("Failed to fetch cat picture 🙀")
