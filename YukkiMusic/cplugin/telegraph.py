@@ -5,7 +5,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telegraph import upload_file
 
 
-@Client.on_message(filters.command(["tgm","telegraph","tl"]))
+@Client.on_message(filters.command(["tgm", "telegraph", "tl"]))
 async def get_link_group(client: Client, message):
     if not message.reply_to_message:
         return await message.reply_text(
