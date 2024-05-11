@@ -108,6 +108,8 @@ async def open_hmenu(client, query: CallbackQuery):
 
     if cb == "play":
         await query.edit_message_text(HELP_TEXT.format(h), reply_markup=keyboard)
+    if cb == "telegraph":
+        await query.edit_message_text(TELEGRAPH, reply_markup=keyboard)
 
 
 @Client.on_callback_query(filters.regex("clone_home"))
