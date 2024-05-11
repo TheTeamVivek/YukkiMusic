@@ -802,7 +802,7 @@ async def del_plist(client, CallbackQuery, _):
     return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
 
 
-@app.on_callback_query(filters.regex("del_playlist") & ~BANNED_USERS)
+@app.on_callback_query(filters.regex("del_cplaylist") & ~BANNED_USERS)
 @languageCB
 async def del_plist(client, CallbackQuery, _):
     pass
