@@ -23,7 +23,9 @@ def botplaylist_markup(_):
             InlineKeyboardButton(text=_["PL_B_8"], callback_data="get_top_playlists"),
         ],
         [
-            InlineKeyboardButton(text=_["PL_B_4"], callback_data="get_cplaylist_playmode"),
+            InlineKeyboardButton(
+                text=_["PL_B_4"], callback_data="get_cplaylist_playmode"
+            ),
         ],
         [
             InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
