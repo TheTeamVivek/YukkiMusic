@@ -19,8 +19,6 @@ from YukkiMusic.utils.thumbnails import gen_thumb
 from .utils import (
     HELP_TEXT,
     PM_START_TEXT,
-    HELP_DEV,
-    HELP_SUDO,
     helpmenu,
 )
 from .utils.dossier import *
