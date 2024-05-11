@@ -4,7 +4,6 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telegraph import upload_file
 from YukkiMusic import app
 
-
 @Client.on_message(filters.command(["tgm", "telegraph", "tl"]))
 async def get_link_group(client, message):
     if not message.reply_to_message:
@@ -19,14 +18,13 @@ async def get_link_group(client, message):
             await text.edit_text(f"📥 ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ... {current * 100 / total:.1f}%")
 
         try:
-            location = f"cache"
-            local_path = await message.reply_to_message.download(
-                location, progress=progress
-            )
+            location = "cache"
+            local_path = await message.reply_to_message.download(location, progress=progress)
+            # Rename the downloaded file to vname
             new_path = os.path.join(location, vname)
             os.rename(local_path, new_path)
             await text.edit_text("📤 ᴜᴘʟᴏᴀᴅɪɴɢ ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ...")
-            upload_path = upload_file(local_path)
+            upload_path = upload_file(new_path)
             await text.edit_text(
                 f"🌐 | [ᴛᴇʟᴇɢʀᴀᴘʜ ʟɪɴᴋ](https://telegra.ph{upload_path[0]})",
                 reply_markup=InlineKeyboardMarkup(
@@ -40,10 +38,10 @@ async def get_link_group(client, message):
                     ]
                 ),
             )
-            os.remove(local_path)
+            os.remove(new_path)  # Remove the renamed file after uploading
         except Exception as e:
             await text.edit_text(f"❌ |ғɪʟᴇ ᴜᴘʟᴏᴀᴅ ғᴀɪʟᴇᴅ \n\n<i>ʀᴇᴀsᴏɴ: {e}</i>")
-            os.remove(local_path)
+            os.remove(new_path)
             return
     except Exception:
-        pass
+        pass  # Handle exceptions as needed
