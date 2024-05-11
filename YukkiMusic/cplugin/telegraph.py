@@ -12,6 +12,7 @@ async def get_link_group(client, message):
             "ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴍᴇᴅɪᴀ ᴛᴏ ᴜᴘʟᴏᴀᴅ ᴏɴ ᴛᴇʟᴇɢʀᴀᴘʜ"
         )
     try:
+        vname = (await client.get_me()).username
         text = await message.reply("ᴘʀᴏᴄᴇssɪɴɢ...")
 
         async def progress(current, total):
@@ -20,7 +21,7 @@ async def get_link_group(client, message):
         try:
             location = f"cache"
             local_path = await message.reply_to_message.download(
-                location, progress=progress
+                location, file_name=f"{vname}", progress=progress
             )
             await text.edit_text("📤 ᴜᴘʟᴏᴀᴅɪɴɢ ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ...")
             upload_path = upload_file(local_path)
