@@ -6,6 +6,7 @@ from YukkiMusic import app
 timeout = httpx.Timeout(40, pool=None)
 http = httpx.AsyncClient(http2=True, timeout=timeout)
 
+
 @app.on_message(filters.command("cat"))
 async def cat(c: Client, m: Message):
     r = await http.get("https://api.thecatapi.com/v1/images/search")
