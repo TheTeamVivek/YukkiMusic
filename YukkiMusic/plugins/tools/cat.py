@@ -38,5 +38,5 @@ async def cat(c, m: CallbackQuery):
         data = r.json()
         cat_url = data[0]["url"]
     await m.edit_message_media(
-        InputMediaPhoto(media=cat_url, caption="Meow", reply_markup=close_keyboard)
+        InputMediaPhoto(media=cat_url, caption="Meow), reply_markup=close_keyboard
     )
