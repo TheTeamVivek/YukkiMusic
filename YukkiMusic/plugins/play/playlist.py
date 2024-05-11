@@ -252,7 +252,7 @@ async def play_playlist(client, CallbackQuery, _):
     if not _playlist:
         try:
             return await CallbackQuery.answer(
-                "playlist_3",
+                _["playlist_19"],
                 show_alert=True,
             )
         except:
