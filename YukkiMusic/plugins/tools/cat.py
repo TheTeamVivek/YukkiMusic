@@ -32,11 +32,18 @@ async def cat(c, m: Message):
 
 
 @app.on_callback_query(filters.regex("refresh_cat") & ~BANNED_USERS)
-async def cat(c, m: CallbackQuery):
+async def refresh_cat(c, m: CallbackQuery):
     r = requests.get("https://api.thecatapi.com/v1/images/search")
     if r.status_code == 200:
         data = r.json()
         cat_url = data[0]["url"]
-    await m.edit_message_media(
-        InputMediaPhoto(media=cat_url, caption="Meow"), reply_markup=close_keyboard
-    )
+        if cat_url.endswith(".gif"):
+            await m.edit_message_animation(
+                cat_url, caption="meow", reply_markup=close_keyboard
+            )
+        else:
+            await m.edit_message_media(
+                InputMediaPhoto(media=cat_url, caption="meow"), reply_markup=close_keyboard
+            )
+    else:
+        await m.edit_message_text("Failed to refresh cat picture 🙀")
