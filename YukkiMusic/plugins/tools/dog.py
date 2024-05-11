@@ -15,7 +15,7 @@ close_keyboard = InlineKeyboardMarkup(
 )
 
 
-@app.on_message(filters.command(["dogs","dog"]) & ~BANNED_USERS)
+@app.on_message(filters.command(["dogs", "dog"]) & ~BANNED_USERS)
 async def dog(c, m: Message):
     r = requests.get("https://random.dog/woof.json")
     if r.status_code == 200:
@@ -38,9 +38,7 @@ async def refresh_cat(c, m: CallbackQuery):
         data = r.json()
         cat_url = data[0]["url"]
         if cat_url.endswith(".gif"):
-            await m.edit_message_animation(
-                cat_url, reply_markup=close_keyboard
-            )
+            await m.edit_message_animation(cat_url, reply_markup=close_keyboard)
         else:
             await m.edit_message_media(
                 InputMediaPhoto(media=cat_url),
