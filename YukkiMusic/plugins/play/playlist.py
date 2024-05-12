@@ -221,7 +221,13 @@ async def play_playlist(client, CallbackQuery, _):
                     CallbackQuery.message.chat.id, userbot.id
                 )
             except Exception as e:
-                return await CallbackQuery.message.reply_text(
+                if "messages.HideChatJoinRequest" in str(e):
+                    return await CallbackQuery.answer(
+                        f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.",
+                        show_alert=True,
+                    )
+                else:
+                    return await CallbackQuery.message.reply_text(
                     f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.\n\nʀᴇᴀsᴏɴ :{e}"
                 )
         except Exception as ex:
