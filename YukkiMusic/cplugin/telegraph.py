@@ -6,9 +6,7 @@ from telegraph import upload_file
 from YukkiMusic import app
 
 
-@Client.on_message(filters.command("tl") & filters.private)
-@Client.on_message(filters.command("telegraph") & filters.private)
-@Client.on_message(filters.command("tgm") & filters.private)
+@Client.on_message(filters.command(["tl","telegraph","tgm") & filters.private)
 async def get_link_group(client, message):
     if not message.reply_to_message:
         return await message.reply_text(
@@ -52,12 +50,6 @@ async def get_link_group(client, message):
             return
     except Exception:
         pass
-
-
-@Client.on_message(filters.command(["tgm", "telegraph", "tl"]) & filters.group)
-async def get_link_group(client, message):
-    await message.reply_text("Use this command in boy pm/dm")
-
 
 @Client.on_message(filters.command(["tgt"]))
 async def get_link_group(client, message):
