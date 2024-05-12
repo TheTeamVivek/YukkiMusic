@@ -6,7 +6,7 @@ from telegraph import upload_file
 from YukkiMusic import app
 
 
-@Client.on_message(filters.command(["tgm", "telegraph", "tl"]))
+@Client.on_message(filters.command(["tgm", "telegraph", "tl"]) & filters.private)
 async def get_link_group(client, message):
     if not message.reply_to_message:
         return await message.reply_text(
