@@ -159,7 +159,9 @@ async def play_playlist(client, CallbackQuery, _):
     try:
         try:
             userbot = await get_assistant(CallbackQuery.message.chat.id)
-            get = await app.get_chat_member(CallbackQuery.message.chat.id, userbot.username)
+            get = await app.get_chat_member(
+                CallbackQuery.message.chat.id, userbot.username
+            )
         except ChatAdminRequired:
             return await CallbackQuery.answer(
                 f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.",
@@ -179,7 +181,9 @@ async def play_playlist(client, CallbackQuery, _):
                 logging.exception(ex)
         else:
             try:
-                invitelink = await client.export_chat_invite_link(CallbackQuery.message.chat.id)
+                invitelink = await client.export_chat_invite_link(
+                    CallbackQuery.message.chat.id
+                )
             except ChatAdminRequired:
                 return await CallbackQuery.answer(
                     f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.",
@@ -187,7 +191,9 @@ async def play_playlist(client, CallbackQuery, _):
                 )
             except InviteRequestSent:
                 try:
-                    await app.approve_chat_join_request(CallbackQuery.message.chat.id, userbot.id)
+                    await app.approve_chat_join_request(
+                        CallbackQuery.message.chat.id, userbot.id
+                    )
                 except Exception as e:
                     return await CallbackQuery.message.reply_text(
                         f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.\n\nʀᴇᴀsᴏɴ :{ex}"
@@ -217,7 +223,9 @@ async def play_playlist(client, CallbackQuery, _):
             pass
         except InviteRequestSent:
             try:
-                await app.approve_chat_join_request(CallbackQuery.message.chat.id, userbot.id)
+                await app.approve_chat_join_request(
+                    CallbackQuery.message.chat.id, userbot.id
+                )
             except Exception as e:
                 return await CallbackQuery.message.reply_text(
                     f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.\n\nʀᴇᴀsᴏɴ :{ex}"
