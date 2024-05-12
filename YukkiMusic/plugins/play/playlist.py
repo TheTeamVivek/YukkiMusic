@@ -238,7 +238,12 @@ async def play_playlist_command(client, message, _):
                         f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
                     )
             except Exception as ex:
-                return await msg.edit_text(
+                if "channels.JoinChannel" in str(ex):
+                    return await msg.edit_text(
+                    f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}."
+                )
+                else:
+                    return await msg.edit_text(
                     f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
                 )
         if invitelink.startswith("https://t.me/+"):
@@ -262,9 +267,15 @@ async def play_playlist_command(client, message, _):
                     f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
                 )
         except Exception as ex:
-            return await msg.edit_text(
-                f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
-            )
+            if "channels.JoinChannel" in str(ex):
+                    return await msg.edit_text(
+                    f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}."
+                )
+                else:
+                    return await msg.edit_text(
+                    f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
+                )
+
         try:
             await userbot.resolve_peer(invitelink)
         except:
