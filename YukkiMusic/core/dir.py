@@ -26,7 +26,7 @@ def dirr():
         sys.exit()
 
     for file in os.listdir():
-        if file.endswith(".jpg") or file.endswith(".jpeg"):
+        if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith(".mp3"):
             os.remove(file)
 
     if downloads_folder not in listdir():
