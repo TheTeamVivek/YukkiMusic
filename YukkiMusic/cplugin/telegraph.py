@@ -2,12 +2,15 @@ import os
 from asyncio import sleep
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.enums import ChatType
 from telegraph import upload_file
 from YukkiMusic import app
 
 
 @Client.on_message(filters.command(["tl","telegraph","tgm"))
 async def get_link_group(client, message):
+    if not message.chat.type == ChatType.PRIVATE:
+        return await message.reply_text("Please use this command in private")
     if not message.reply_to_message:
         return await message.reply_text(
             "ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴍᴇᴅɪᴀ ᴛᴏ ᴜᴘʟᴏᴀᴅ ᴏɴ ᴛᴇʟᴇɢʀᴀᴘʜ"
