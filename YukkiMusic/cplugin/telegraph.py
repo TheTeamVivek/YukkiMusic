@@ -52,7 +52,7 @@ async def get_link_group(client, message):
         pass
 
 
-@Client.on_message(filters.command(["tgm", "telegraph", "tl"]) & filters.group)
+@Client.on_message(filters.command(["tgm", "telegraph", "tl"]) & filters.private)
 async def get_link_group(client, message):
     await message.reply_text("Use this command in boy pm/dm")
 
