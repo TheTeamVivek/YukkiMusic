@@ -18,6 +18,7 @@ from pyrogram.errors import (
     InviteRequestSent,
     UserNotParticipant,
 )
+from pyrogram.enums import ChatMemberStatus this 
 from YukkiMusic.utils.database import get_assistant
 
 from config import BANNED_USERS
