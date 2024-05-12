@@ -195,6 +195,58 @@ async def play_playlist(client, CallbackQuery, _):
 )
 @languageCB
 async def play_playlist_command(client, message, _):
+    try:
+        try:
+            userbot = await get_assistant(message.chat.id)
+            get = await app.get_chat_member(message.chat.id, userbot.username)
+        except ChatAdminRequired:
+            return await msg.edit_text(
+                f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}."
+            )
+        if get.status == ChatMemberStatus.BANNED:
+            return await msg.edit_text(
+                text=f"» {userbot.mention} ᴀssɪsᴛᴀɴᴛ ɪs ʙᴀɴɴᴇᴅ ɪɴ {message.chat.title}\n\n𖢵 ɪᴅ : `{userbot.id}`\n𖢵 ɴᴀᴍᴇ : {userbot.mention}\n𖢵 ᴜsᴇʀɴᴀᴍᴇ : @{userbot.username}\n\nᴘʟᴇᴀsᴇ ᴜɴʙᴀɴ ᴛʜᴇ ᴀssɪsᴛᴀɴᴛ ᴀɴᴅ ᴘʟᴀʏ ᴀɢᴀɪɴ...",
+            )
+    except UserNotParticipant:
+        if message.chat.username:
+            invitelink = message.chat.username
+            try:
+                await userbot.resolve_peer(invitelink)
+            except Exception as ex:
+                logging.exception(ex)
+        else:
+            try:
+                invitelink = await client.export_chat_invite_link(message.chat.id)
+            except ChatAdminRequired:
+                return await msg.edit_text(
+                    f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {viv.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}."
+                )
+            except Exception as ex:
+                return await msg.edit_text(
+                    f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {viv.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
+                )
+        if invitelink.startswith("https://t.me/+"):
+            invitelink = invitelink.replace("https://t.me/+", "https://t.me/joinchat/")
+        anon = await msg.edit_text(
+            f"ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...\n\nɪɴᴠɪᴛɪɴɢ {vi.mention} ᴛᴏ {message.chat.title}."
+        )
+        try:
+            await userbot.join_chat(invitelink)
+            await asyncio.sleep(2)
+            await msg.edit_text(
+                f"{userbot.mention} ᴊᴏɪɴᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ,\n\nsᴛᴀʀᴛɪɴɢ sᴛʀᴇᴀᴍ..."
+            )
+        except UserAlreadyParticipant:
+            pass
+        except Exception as ex:
+            return await msg.edit_text(
+                f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {viv.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
+            )
+        try:
+            await userbot.resolve_peer(invitelink)
+        except:
+            pass
+
     mode = message.command[0][0]
     user_id = message.from_user.id
     _playlist = await get_playlist_names(user_id)
