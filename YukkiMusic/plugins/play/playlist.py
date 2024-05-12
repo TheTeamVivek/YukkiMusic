@@ -169,7 +169,7 @@ async def play_playlist(client, CallbackQuery, _):
             )
         if get.status == ChatMemberStatus.BANNED:
             return await CallbackQuery.answer(
-                text=f"» {userbot.mention} ᴀssɪsᴛᴀɴᴛ ɪs ʙᴀɴɴᴇᴅ ɪɴ {CallbackQuery.message.chat.title}\n\n𖢵 ɪᴅ : {userbot.id}\n𖢵 ɴᴀᴍᴇ : {userbot.mention}\n𖢵 ᴜsᴇʀɴᴀᴍᴇ : @{userbot.username}\n\nᴘʟᴇᴀsᴇ ᴜɴʙᴀɴ ᴛʜᴇ ᴀssɪsᴛᴀɴᴛ ᴀɴᴅ ᴘʟᴀʏ ᴀɢᴀɪɴ...",
+                text=f"»ᴀssɪsᴛᴀɴᴛ ɪs ʙᴀɴɴᴇᴅ ɪɴ {CallbackQuery.message.chat.title}",
                 show_alert=True,
             )
     except UserNotParticipant:
@@ -210,15 +210,9 @@ async def play_playlist(client, CallbackQuery, _):
                     )
         if invitelink.startswith("https://t.me/+"):
             invitelink = invitelink.replace("https://t.me/+", "https://t.me/joinchat/")
-        anon = await msg.edit_text(
-            f"ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...\n\nɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴛᴏ {CallbackQuery.message.chat.title}."
-        )
         try:
             await userbot.join_chat(invitelink)
             await asyncio.sleep(2)
-            await msg.edit_text(
-                f"{userbot.mention} ᴊᴏɪɴᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ,\n\nsᴛᴀʀᴛɪɴɢ sᴛʀᴇᴀᴍ..."
-            )
         except UserAlreadyParticipant:
             pass
         except InviteRequestSent:
