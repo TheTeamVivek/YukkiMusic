@@ -38,8 +38,8 @@ async def ping_com(client, message: Message, _):
     resp = (datetime.now() - start).microseconds / 1000
     await response.edit_text(
         _["ping_2"].format(
-            app.mention,
             resp,
+            app.mention,
             UP,
             DISK,
             CPU,
