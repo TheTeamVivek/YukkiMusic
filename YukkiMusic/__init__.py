@@ -60,4 +60,3 @@ telethn = TelegramClient("YukkiMusic", API_ID, API_HASH)
 
 aiohttpsession = ClientSession()
 
-arq = ARQ("https://arq.hamker.dev", "EIWSFG-STIEHP-LOVWTE-AWSKKP-ARQ", aiohttpsession)
