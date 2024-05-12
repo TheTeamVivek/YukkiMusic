@@ -250,6 +250,7 @@ def isArgInt(txt) -> list:
 
 @app.on_message(filters.command(["q", "r"]) & filters.reply)
 async def msg_quotly_cmd(self: app, ctx: Message):
+    ww = await ctx.reply_text("ᴡᴀɪᴛ ᴀ sᴇᴄᴏɴᴅ......")
     is_reply = False
     if ctx.command[0].endswith("r"):
         is_reply = True
@@ -257,6 +258,7 @@ async def msg_quotly_cmd(self: app, ctx: Message):
         check_arg = isArgInt(ctx.command[1])
         if check_arg[0]:
             if check_arg[1] < 2 or check_arg[1] > 10:
+                await ww.delete()
                 return await ctx.reply_msg("Invalid range", del_in=6)
             try:
                 messages = [
@@ -277,8 +279,10 @@ async def msg_quotly_cmd(self: app, ctx: Message):
                 make_quotly = await pyrogram_to_quotly(messages, is_reply=is_reply)
                 bio_sticker = BytesIO(make_quotly)
                 bio_sticker.name = "misskatyquote_sticker.webp"
+                await ww.delete()
                 return await ctx.reply_sticker(bio_sticker)
             except Exception:
+                await ww.delete()
                 return await ctx.reply_msg("🤷🏻‍♂️")
     try:
         messages_one = await self.get_messages(
@@ -286,11 +290,14 @@ async def msg_quotly_cmd(self: app, ctx: Message):
         )
         messages = [messages_one]
     except Exception:
+        await ww.delete()
         return await ctx.reply_msg("🤷🏻‍♂️")
     try:
         make_quotly = await pyrogram_to_quotly(messages, is_reply=is_reply)
         bio_sticker = BytesIO(make_quotly)
         bio_sticker.name = "misskatyquote_sticker.webp"
+        await ww.delete()
         return await ctx.reply_sticker(bio_sticker)
     except Exception as e:
+        await ww.delete()
         return await ctx.reply_msg(f"ERROR: {e}")
