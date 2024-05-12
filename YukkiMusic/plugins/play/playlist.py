@@ -269,7 +269,7 @@ async def play_playlist_command(client, message, _):
             await userbot.resolve_peer(invitelink)
         except:
             pass
-
+    await msg.delete()
     mode = message.command[0][0]
     user_id = message.from_user.id
     _playlist = await get_playlist_names(user_id)
