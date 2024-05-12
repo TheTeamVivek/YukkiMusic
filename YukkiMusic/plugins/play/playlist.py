@@ -839,7 +839,9 @@ async def del_whole_playlist(client, CallbackQuery, _):
     return await CallbackQuery.edit_message_text(_["playlist_13"])
 
 
-@app.on_callback_query(filters.regex(["get_playlist_playmode","get_cplaylist_playmode"]) & ~BANNED_USERS)
+@app.on_callback_query(
+    filters.regex(["get_playlist_playmode", "get_cplaylist_playmode"]) & ~BANNED_USERS
+)
 @languageCB
 async def get_playlist_playmode_(client, CallbackQuery, _):
     try:
@@ -849,13 +851,13 @@ async def get_playlist_playmode_(client, CallbackQuery, _):
     if CallbackQuery.data.startswith("get_playlist_playmode"):
         buttons = get_playlist_markup(_)
         return await CallbackQuery.edit_message_reply_markup(
-            reply_markup=InlineKeyboardMarkup(buttons   ) 
-     )
+            reply_markup=InlineKeyboardMarkup(buttons)
+        )
     if CallbackQuery.data.startswith("get_cplaylist_playmode"):
         buttons = get_playlist_markup(_)
         return await CallbackQuery.edit_message_reply_markup(
-            reply_markup=InlineKeyboardMarkup(buttons   )
-     )
+            reply_markup=InlineKeyboardMarkup(buttons)
+        )
 
 
 """
@@ -871,6 +873,7 @@ async def get_playlist_playmode_(client, CallbackQuery, _):
         reply_markup=InlineKeyboardMarkup(buttons)
     )
 """
+
 
 @app.on_callback_query(filters.regex("delete_warning") & ~BANNED_USERS)
 @languageCB
