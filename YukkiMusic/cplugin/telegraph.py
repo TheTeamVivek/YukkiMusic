@@ -3,7 +3,7 @@ from telegraph import upload_file
 from pyrogram import Client, filters
 
 
-@Client.on_message(filters.command(["tgamh"]))
+@Client.on_message(filters.command(["tgm","telegraph"]))
 def ul(_, message):
     reply = message.reply_to_message
     if not reply:
