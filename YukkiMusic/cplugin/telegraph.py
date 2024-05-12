@@ -50,3 +50,11 @@ async def get_link_group(client, message):
             return
     except Exception:
         pass
+
+@Client.on_message(filters.command(["tgm", "telegraph", "tl"]) & filters.group)
+async def get_link_group(client, message):
+    await message.reply_text("Use this command in boy pm/dm")
+
+@Client.on_message(filters.command(["tgt"]) & filters.group)
+async def get_link_group(client, message):
+    await message.reply_text("coming soon.....")
