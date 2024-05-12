@@ -146,7 +146,8 @@ class Call(PyTgCalls):
 
     async def get_participant(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
-        await assistant.get_participants(chat_id)
+        participant = await assistant.get_participants(chat_id)
+        return participant
 
     async def speedup_stream(self, chat_id: int, file_path, speed, playing):
         assistant = await group_assistant(self, chat_id)
