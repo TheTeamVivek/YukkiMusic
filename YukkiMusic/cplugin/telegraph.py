@@ -3,7 +3,8 @@ from telegraph import upload_file
 from pyrogram import Client, filters
 from YukkiMusic import app
 
-@Client.on_message(filters.command(["tgm","tgt"]))
+
+@Client.on_message(filters.command(["tgm", "tgt"]))
 def ul(_, message):
     reply = message.reply_to_message
     if reply.media:
@@ -13,7 +14,7 @@ def ul(_, message):
         for x in fk:
             url = "https://telegra.ph" + x
 
-        i.edit(f' 🇾ᴏᴜʀ🇹ᴇʟᴇɢʀᴀᴘʜ {url}')
+        i.edit(f" 🇾ᴏᴜʀ🇹ᴇʟᴇɢʀᴀᴘʜ {url}")
         os.remove(path)
     else:
         message.reply("Reply to a media")
