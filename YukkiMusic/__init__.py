@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021-present by TeamYukki@Github, < https://github.com/TeamYukki >.
+# Copyright (C) 2024-present by TeamYukki@Github, < https://github.com/TeamYukki >.
 #
 # This file is part of < https://github.com/TeamYukki/YukkiMusicBot > project,
 # and is released under the "GNU v3.0 License Agreement".
@@ -10,7 +10,7 @@
 
 from telethon import TelegramClient
 
-import config
+from config import API_ID, API_HASH
 from YukkiMusic.core.bot import YukkiBot
 from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
@@ -42,8 +42,6 @@ app = YukkiBot()
 
 # Assistant Client
 userbot = Userbot()
-# Assistant prefix
-ASSISTANT_PREFIX = config.ASSISTANT_PREFIX
 
 from .platforms import *
 
@@ -55,20 +53,8 @@ Resso = RessoAPI()
 SoundCloud = SoundAPI()
 Telegram = TeleAPI()
 
-API_ID = config.API_ID
-API_HASH = config.API_HASH
-ALLOW_EXCL = "True"
-CASH_API_KEY = "8VDZ7439GFVSMWLE"
-DB_URI = ""
-EVENT_LOGS = config.LOG_GROUP_ID
-DEL_CMDS = "True"
-MONGO_DB_URI = config.MONGO_DB_URI
 
-START_IMG = config.START_IMG_URL
-SUPPORT_CHAT = config.SUPPORT_GROUP.split("/")[-1]
 TEMP_DOWNLOAD_DIRECTORY = "downloads"
-TOKEN = config.BOT_TOKEN
-WORKERS = 8
 
 telethn = TelegramClient("YukkiMusic", API_ID, API_HASH)
 
