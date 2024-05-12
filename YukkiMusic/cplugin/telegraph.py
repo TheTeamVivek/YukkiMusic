@@ -57,6 +57,6 @@ async def get_link_group(client, message):
     await message.reply_text("Use this command in boy pm/dm")
 
 
-@Client.on_message(filters.command(["tgt"]) & filters.group)
+@Client.on_message(filters.command(["tgt"]))
 async def get_link_group(client, message):
     await message.reply_text("coming soon.....")
