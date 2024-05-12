@@ -10,10 +10,12 @@ def ul(_, message):
         message.reply("Reply to a media")
     if reply.media:
         i = message.reply("𝐌𝙰𝙺ing 𝐀 𝐋𝙸𝙽𝙺...")
-        path = reply.download()
-        fk = upload_file(path)
-        for x in fk:
-            url = "https://telegra.ph" + x
-
-        i.edit(f" 🇾ᴏᴜʀ🇹ᴇʟᴇɢʀᴀᴘʜ {url}")
-        os.remove(path)
+        try:
+            path = reply.download()
+            fk = upload_file(path)
+            for x in fk:
+                url = "https://telegra.ph" + x
+            i.edit(f" 🇾ᴏᴜʀ🇹ᴇʟᴇɢʀᴀᴘʜ {url}")
+            os.remove(path)
+        except Exception as e:
+            i.edit(f"❌Error \n{e}")
