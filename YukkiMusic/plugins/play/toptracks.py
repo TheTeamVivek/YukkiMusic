@@ -153,8 +153,6 @@ async def server_to_play(client, CallbackQuery, _):
         except:
             pass
 
-
-
     chat_id = CallbackQuery.message.chat.id
     user_name = CallbackQuery.from_user.first_name
     try:
