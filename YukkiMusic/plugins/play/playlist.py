@@ -8,6 +8,7 @@
 # All rights reserved.
 #
 import os
+import logging
 from random import randint
 
 import requests
