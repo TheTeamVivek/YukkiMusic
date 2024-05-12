@@ -1,9 +1,8 @@
 import os
 from telegraph import upload_file
 from pyrogram import Client, filters
-from YukkiMusic import app
 
-@app.on_message(filters.command(["tgamh"]))
+@Client.on_message(filters.command(["tgamh"]))
 def ul(_, message):
     reply = message.reply_to_message
     if not reply:
