@@ -859,6 +859,7 @@ async def get_playlist_playmode_(client, CallbackQuery, _):
             reply_markup=InlineKeyboardMarkup(buttons)
         )
 
+
 @app.on_callback_query(filters.regex("delete_warning") & ~BANNED_USERS)
 @languageCB
 async def delete_warning_message(client, CallbackQuery, _):
