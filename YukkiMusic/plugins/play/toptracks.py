@@ -12,6 +12,13 @@ import asyncio
 
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup
+from pyrogram.errors import (
+    ChatAdminRequired,
+    UserAlreadyParticipant,
+    InviteRequestSent,
+    UserNotParticipant,
+)
+from YukkiMusic.utils.database import get_assistant
 
 from config import BANNED_USERS
 from YukkiMusic import app
