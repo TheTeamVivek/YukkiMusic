@@ -159,55 +159,53 @@ async def play_playlist(client, CallbackQuery, _):
     try:
         try:
             userbot = await get_assistant(CallbackQuery.message.chat.id)
-            get = await app.get_chat_member(
-                CallbackQuery.message.chat.id, userbot.username
-            )
+            get = await app.get_chat_member(CallbackQuery.message.chat.id, userbot.username)
         except ChatAdminRequired:
             return await CallbackQuery.answer(
-                f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.",
+                f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.",
                 show_alert=True,
             )
         if get.status == ChatMemberStatus.BANNED:
             return await CallbackQuery.answer(
-                text=f"» {userbot.mention} ᴀssɪsᴛᴀɴᴛ ɪs ʙᴀɴɴᴇᴅ ɪɴ {message.chat.title}\n\n𖢵 ɪᴅ : {userbot.id}\n𖢵 ɴᴀᴍᴇ : {userbot.mention}\n𖢵 ᴜsᴇʀɴᴀᴍᴇ : @{userbot.username}\n\nᴘʟᴇᴀsᴇ ᴜɴʙᴀɴ ᴛʜᴇ ᴀssɪsᴛᴀɴᴛ ᴀɴᴅ ᴘʟᴀʏ ᴀɢᴀɪɴ...",
+                text=f"» {userbot.mention} ᴀssɪsᴛᴀɴᴛ ɪs ʙᴀɴɴᴇᴅ ɪɴ {CallbackQuery.message.chat.title}\n\n𖢵 ɪᴅ : {userbot.id}\n𖢵 ɴᴀᴍᴇ : {userbot.mention}\n𖢵 ᴜsᴇʀɴᴀᴍᴇ : @{userbot.username}\n\nᴘʟᴇᴀsᴇ ᴜɴʙᴀɴ ᴛʜᴇ ᴀssɪsᴛᴀɴᴛ ᴀɴᴅ ᴘʟᴀʏ ᴀɢᴀɪɴ...",
                 show_alert=True,
             )
     except UserNotParticipant:
-        if message.chat.username:
-            invitelink = message.chat.username
+        if CallbackQuery.message.chat.username:
+            invitelink = CallbackQuery.message.chat.username
             try:
                 await userbot.resolve_peer(invitelink)
             except Exception as ex:
                 logging.exception(ex)
         else:
             try:
-                invitelink = await client.export_chat_invite_link(message.chat.id)
+                invitelink = await client.export_chat_invite_link(CallbackQuery.message.chat.id)
             except ChatAdminRequired:
                 return await CallbackQuery.answer(
-                    f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.",
+                    f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.",
                     show_alert=True,
                 )
             except InviteRequestSent:
                 try:
-                    await app.approve_chat_join_request(message.chat.id, userbot.id)
+                    await app.approve_chat_join_request(CallbackQuery.message.chat.id, userbot.id)
                 except Exception as e:
                     return await CallbackQuery.message.reply_text(
-                        f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\nʀᴇᴀsᴏɴ :{ex}"
+                        f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.\n\nʀᴇᴀsᴏɴ :{ex}"
                     )
             except Exception as ex:
                 if "channels.JoinChannel" in str(ex) or "Username not found" in str(ex):
                     return await CallbackQuery.answer(
-                        f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.",
+                        f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.",
                         show_alert=True,
                     )
                 else:
                     return await CallbackQuery.message.reply_text(
-                        f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
+                        f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
                     )
         if invitelink.startswith("https://t.me/+"):
             invitelink = invitelink.replace("https://t.me/+", "https://t.me/joinchat/")
         anon = await msg.edit_text(
-            f"ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...\n\nɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴛᴏ {message.chat.title}."
+            f"ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...\n\nɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴛᴏ {CallbackQuery.message.chat.title}."
         )
         try:
             await userbot.join_chat(invitelink)
@@ -219,20 +217,20 @@ async def play_playlist(client, CallbackQuery, _):
             pass
         except InviteRequestSent:
             try:
-                await app.approve_chat_join_request(message.chat.id, userbot.id)
+                await app.approve_chat_join_request(CallbackQuery.message.chat.id, userbot.id)
             except Exception as e:
                 return await CallbackQuery.message.reply_text(
-                    f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\nʀᴇᴀsᴏɴ :{ex}"
+                    f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.\n\nʀᴇᴀsᴏɴ :{ex}"
                 )
         except Exception as ex:
             if "channels.JoinChannel" in str(ex) or "Username not found" in str(ex):
                 return await CallbackQuery.answer(
-                    f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.",
+                    f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.",
                     show_alert=True,
                 )
             else:
                 return await CallbackQuery.message.reply_text(
-                    f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\nʀᴇᴀsᴏɴ : {ex}"
+                    f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {CallbackQuery.message.chat.title}.\n\nʀᴇᴀsᴏɴ : {ex}"
                 )
 
         try:
