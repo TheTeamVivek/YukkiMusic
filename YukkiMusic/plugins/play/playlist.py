@@ -14,6 +14,12 @@ import requests
 from pykeyboard import InlineKeyboard
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.enums import ChatMemberStatus
+from pyrogram.errors import (
+    ChatAdminRequired,
+    UserAlreadyParticipant,
+    UserNotParticipant,
+)
 from youtube_search import YoutubeSearch
 
 from config import BANNED_USERS, SERVER_PLAYLIST_LIMIT
