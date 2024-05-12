@@ -202,6 +202,7 @@ async def play_playlist(client, CallbackQuery, _):
 )
 @languageCB
 async def play_playlist_command(client, message, _):
+    msg = await message.reply_text("ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ ᴀ ᴍᴏᴍᴇɴᴛ")
     try:
         try:
             userbot = await get_assistant(message.chat.id)
