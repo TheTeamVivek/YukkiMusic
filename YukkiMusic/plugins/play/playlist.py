@@ -29,6 +29,7 @@ from YukkiMusic.utils.database import (
     get_playlist,
     get_playlist_names,
     save_playlist,
+    get_assistant,
 )
 from YukkiMusic.utils.decorators.language import language, languageCB
 from YukkiMusic.utils.inline.playlist import (
