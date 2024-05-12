@@ -2,6 +2,7 @@ import os
 from telegraph import upload_file
 from pyrogram import Client, filters
 
+
 @Client.on_message(filters.command(["tgamh"]))
 def ul(_, message):
     reply = message.reply_to_message
@@ -14,5 +15,5 @@ def ul(_, message):
         for x in fk:
             url = "https://telegra.ph" + x
 
-        i.edit(f' 🇾ᴏᴜʀ🇹ᴇʟᴇɢʀᴀᴘʜ {url}')
+        i.edit(f" 🇾ᴏᴜʀ🇹ᴇʟᴇɢʀᴀᴘʜ {url}")
         os.remove(path)
