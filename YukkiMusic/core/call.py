@@ -18,7 +18,7 @@ from pyrogram.errors import (
     UserNotParticipant,
 )
 from pyrogram.types import InlineKeyboardMarkup
-from pytgcalls import PyTgCalls
+from pytgcalls import PyTgCalls, filters
 from ntgcalls import TelegramServerError
 from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
 from pytgcalls.types import (
