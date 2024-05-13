@@ -9,6 +9,7 @@ ffmpeg-python
 gitpython
 gTTS
 googletrans
+googlesearch-python
 hachoir
 heroku3
 img2pdf
