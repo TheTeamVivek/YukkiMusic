@@ -297,7 +297,7 @@ async def play(client, message: Message):
 
         except Exception as e:
             await _clear_(message.chat.id)
-            await pytgcalls.leave_group_call(message.chat.id)
+            await pytgcalls.leave_call(message.chat.id)
             if "phone.CreateGroupCall" in str(e):
                 return await msg.edit_text(
                     "**» ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ғᴏᴜɴᴅ.**\n\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ."
