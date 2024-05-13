@@ -240,7 +240,7 @@ async def play(client, message: Message):
     if await is_active_chat(message.chat.id):
         stream = MediaStream(file_path, audio_parameters=AudioQuality.HIGH)
         try:
-            await pytgcalls.change_stream(
+            await pytgcalls.play(
                 message.chat.id,
                 stream,
             )
@@ -254,7 +254,7 @@ async def play(client, message: Message):
         except NotInCallError:
             stream = MediaStream(file_path, audio_parameters=AudioQuality.HIGH)
             try:
-                await pytgcalls.join_group_call(
+                await pytgcalls.play(
                     message.chat.id,
                     stream,
                 )
@@ -310,7 +310,7 @@ async def play(client, message: Message):
     else:
         stream = MediaStream(file_path, audio_parameters=AudioQuality.HIGH)
         try:
-            await pytgcalls.join_group_call(
+            await pytgcalls.play(
                 message.chat.id,
                 stream,
             )
