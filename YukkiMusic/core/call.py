@@ -744,9 +744,9 @@ class Call(PyTgCalls):
         @self.four.on_participants_change()
         @self.five.on_participants_change()
         async def participants_change_handler(client, update: Update):
-            if not isinstance(update, GroupCallParticipant.Action.JOINED) and not isinstance(
-                update, GroupCallParticipant.Action.LEFT
-            ):
+            if not isinstance(
+                update, GroupCallParticipant.Action.JOINED
+            ) and not isinstance(update, GroupCallParticipant.Action.LEFT):
                 return
             chat_id = update.chat_id
             users = counter.get(chat_id)
