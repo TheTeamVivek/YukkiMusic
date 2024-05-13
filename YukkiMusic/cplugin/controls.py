@@ -74,7 +74,7 @@ async def pause_str(client, message: Message):
     elif message.text.lower() == "/end" or message.text.lower() == "/stop":
         try:
             await _clear_(message.chat.id)
-            await pytgcalls.leave_group_call(message.chat.id)
+            await pytgcalls.leave_call(message.chat.id)
         except:
             pass
 
