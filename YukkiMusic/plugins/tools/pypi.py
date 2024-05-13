@@ -1,7 +1,8 @@
 import requests
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from YukkiMusic import app 
+from YukkiMusic import app
+
 
 def get_pypi_info(package_name):
     try:
@@ -16,6 +17,7 @@ def get_pypi_info(package_name):
         print(f"Error fetching PyPI information: {e}")
         return None
 
+
 @app.on_message(filters.command("pypi", prefixes="/"))
 async def pypi_info_command(client, message):
     try:
@@ -23,16 +25,24 @@ async def pypi_info_command(client, message):
         pypi_info = get_pypi_info(package_name)
 
         if pypi_info:
-            info_message = f"ᴅᴇᴀʀ {message.from_user.mention} \n " \
-                           f"ʜᴇʀᴇ ɪs ʏᴏᴜʀ ᴘᴀᴋᴀɢᴇ ᴅᴇᴛᴀɪʟs \n\n " \
-                           f"ᴘᴀᴋᴀɢᴇ ɴᴀᴍᴇ ➪ {pypi_info['info']['name']}\n\n" \
-                           f"ʟᴀᴛᴇsᴛ ᴠᴇʀsɪᴏɴ ➪ {pypi_info['info']['version']}\n\n" \
-                           f"ᴅᴇsᴄʀɪᴘᴛɪᴏɴ ➪ {pypi_info['info']['summary']}\n\n" \
-                           f"ᴘʀᴏJᴇᴄᴛ ᴜʀʟ ➪ {pypi_info['info']['project_urls']['Homepage']}"
-            close_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text="〆 ᴄʟᴏsᴇ 〆", callback_data="close")]])
+            info_message = (
+                f"ᴅᴇᴀʀ {message.from_user.mention} \n "
+                f"ʜᴇʀᴇ ɪs ʏᴏᴜʀ ᴘᴀᴋᴀɢᴇ ᴅᴇᴛᴀɪʟs \n\n "
+                f"ᴘᴀᴋᴀɢᴇ ɴᴀᴍᴇ ➪ {pypi_info['info']['name']}\n\n"
+                f"ʟᴀᴛᴇsᴛ ᴠᴇʀsɪᴏɴ ➪ {pypi_info['info']['version']}\n\n"
+                f"ᴅᴇsᴄʀɪᴘᴛɪᴏɴ ➪ {pypi_info['info']['summary']}\n\n"
+                f"ᴘʀᴏJᴇᴄᴛ ᴜʀʟ ➪ {pypi_info['info']['project_urls']['Homepage']}"
+            )
+            close_markup = InlineKeyboardMarkup(
+                [[InlineKeyboardButton(text="〆 ᴄʟᴏsᴇ 〆", callback_data="close")]]
+            )
             await message.reply_text(info_message, reply_markup=close_markup)
         else:
-            await message.reply_text(f"Package '{package_name}' not found \n please dont try again later .")
+            await message.reply_text(
+                f"Package '{package_name}' not found \n please dont try again later ."
+            )
 
     except IndexError:
-        await message.reply_text("Please provide a package name after the /pypi command.")
+        await message.reply_text(
+            "Please provide a package name after the /pypi command."
+        )
