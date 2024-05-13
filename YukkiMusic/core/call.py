@@ -20,7 +20,7 @@ from pyrogram.errors import (
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls, filters
 from ntgcalls import TelegramServerError
-from pytgcalls.types import ChatUpdate
+from pytgcalls.types import ChatUpdate, GroupCallParticipant
 from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
 from pytgcalls.types import (
     GroupCallParticipant,
@@ -730,11 +730,11 @@ class Call(PyTgCalls):
                 return
             await self.change_stream(client, update.chat_id)
 
-        @self.one.on_participants_change()
-        @self.two.on_participants_change()
-        @self.three.on_participants_change()
-        @self.four.on_participants_change()
-        @self.five.on_participants_change()
+        @self.one.on_update(filters.chat_update(GroupCallParticipant.ACTION.JOINED | GroupCallParticipant.ACTION.LEFT))
+        @self.two.on_update(filters.chat_update(GroupCallParticipant.ACTION.JOINED | GroupCallParticipant.ACTION.LEFT))
+        @self.three.on_update(filters.chat_update(GroupCallParticipant.ACTION.JOINED | GroupCallParticipant.ACTION.LEFT))
+        @self.four.on_update(filters.chat_update(GroupCallParticipant.ACTION.JOINED | GroupCallParticipant.ACTION.LEFT))
+        @self.five.on_update(filters.chat_update(GroupCallParticipant.ACTION.JOINED | GroupCallParticipant.ACTION.LEFT))
         async def participants_change_handler(client, update: Update):
             if not isinstance(
                 update, GroupCallParticipant.Action.JOINED
