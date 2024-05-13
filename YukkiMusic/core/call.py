@@ -21,8 +21,7 @@ from pytgcalls import PyTgCalls
 from ntgcalls import TelegramServerError
 from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
 from pytgcalls.types import (
-    JoinedGroupCallParticipant,
-    LeftGroupCallParticipant,
+    GroupCallParticipant,
     MediaStream,
     Update,
 )
@@ -745,8 +744,8 @@ class Call(PyTgCalls):
         @self.four.on_participants_change()
         @self.five.on_participants_change()
         async def participants_change_handler(client, update: Update):
-            if not isinstance(update, JoinedGroupCallParticipant) and not isinstance(
-                update, LeftGroupCallParticipant
+            if not isinstance(update, GroupCallParticipant.Action.JOINED) and not isinstance(
+                update, GroupCallParticipant.Action.LEFT
             ):
                 return
             chat_id = update.chat_id
@@ -764,7 +763,7 @@ class Call(PyTgCalls):
             else:
                 final = (
                     users + 1
-                    if isinstance(update, JoinedGroupCallParticipant)
+                    if isinstance(update, GroupCallParticipant.Action.JOINED)
                     else users - 1
                 )
                 counter[chat_id] = final
