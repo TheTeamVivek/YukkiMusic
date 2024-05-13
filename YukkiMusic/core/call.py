@@ -20,7 +20,8 @@ from pyrogram.errors import (
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls, filters
 from ntgcalls import TelegramServerError
-from pytgcalls.types import ChatUpdate, GroupCallParticipant
+from pytgcalls.types import ChatUpdate
+from pytgcalls.types.GroupCallParticipant.Action import JOINED, LEFT
 from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
 from pytgcalls.types import (
     GroupCallParticipant,
@@ -732,27 +733,27 @@ class Call(PyTgCalls):
 
         @self.one.on_update(
             filters.chat_update(
-                GroupCallParticipant.ACTION.JOINED | GroupCallParticipant.ACTION.LEFT
+                JOINED | LEFT
             )
         )
         @self.two.on_update(
             filters.chat_update(
-                GroupCallParticipant.ACTION.JOINED | GroupCallParticipant.ACTION.LEFT
+                JOINED | LEFT
             )
         )
         @self.three.on_update(
             filters.chat_update(
-                GroupCallParticipant.ACTION.JOINED | GroupCallParticipant.ACTION.LEFT
+                JOINED | LEFT
             )
         )
         @self.four.on_update(
             filters.chat_update(
-                GroupCallParticipant.ACTION.JOINED | GroupCallParticipant.ACTION.LEFT
+                JOINED | LEFT
             )
         )
         @self.five.on_update(
             filters.chat_update(
-                GroupCallParticipant.ACTION.JOINED | GroupCallParticipant.ACTION.LEFT
+                JOINED | LEFT
             )
         )
         async def participants_change_handler(client, update: Update):
