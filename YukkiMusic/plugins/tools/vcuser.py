@@ -1,7 +1,7 @@
 from pytgcalls.exceptions import GroupCallNotFound
 from pyrogram import filters
 from YukkiMusic.core.call import Yukki
-from YukkiMusic app
+from YukkiMusic import app
 
 @app.on_message(filters.command("vcuser"))
 async def get_vc_users(client, message):
