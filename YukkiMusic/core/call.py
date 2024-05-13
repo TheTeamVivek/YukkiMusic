@@ -731,31 +731,11 @@ class Call(PyTgCalls):
                 return
             await self.change_stream(client, update.chat_id)
 
-        @self.one.on_update(
-            filters.chat_update(
-                JOINED | LEFT
-            )
-        )
-        @self.two.on_update(
-            filters.chat_update(
-                JOINED | LEFT
-            )
-        )
-        @self.three.on_update(
-            filters.chat_update(
-                JOINED | LEFT
-            )
-        )
-        @self.four.on_update(
-            filters.chat_update(
-                JOINED | LEFT
-            )
-        )
-        @self.five.on_update(
-            filters.chat_update(
-                JOINED | LEFT
-            )
-        )
+        @self.one.on_update(filters.chat_update(JOINED | LEFT))
+        @self.two.on_update(filters.chat_update(JOINED | LEFT))
+        @self.three.on_update(filters.chat_update(JOINED | LEFT))
+        @self.four.on_update(filters.chat_update(JOINED | LEFT))
+        @self.five.on_update(filters.chat_update(JOINED | LEFT))
         async def participants_change_handler(client, update: Update):
             if not isinstance(
                 update, GroupCallParticipant.Action.JOINED
