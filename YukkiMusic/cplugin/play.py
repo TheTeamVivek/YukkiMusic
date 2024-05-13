@@ -30,7 +30,7 @@ from pyrogram.types import (
 from pytgcalls.exceptions import (
     NoActiveGroupCall,
     UnMuteNeeded,
-    NotInGroupCallError,
+    NotInCallError,
     AlreadyJoinedError,
 )
 from pytgcalls.types import MediaStream, AudioQuality
@@ -251,7 +251,7 @@ async def play(client, message: Message):
                 reply_markup=close_key,
             )
             await msg.delete()
-        except NotInGroupCallError:
+        except NotInCallError:
             stream = MediaStream(file_path, audio_parameters=AudioQuality.HIGH)
             try:
                 await pytgcalls.join_group_call(
