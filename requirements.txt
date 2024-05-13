@@ -33,7 +33,6 @@ spotipy
 telethon==1.33.1
 telegraph==2.2.0
 tgcrypto
-unidecode
 urllib3
 yt-dlp==2023.10.13
 #youtube-search-python
