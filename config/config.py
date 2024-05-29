@@ -74,6 +74,9 @@ OWNER_ID = list(
 )  # Input type must be interger
 
 
+
+RADIO_URL = getenv("RADIO_URL", "")
+
 # ________________________________________________________________________________#
 # Get it from http://dashboard.heroku.com/account
 HEROKU_API_KEY = getenv("HEROKU_API_KEY")
