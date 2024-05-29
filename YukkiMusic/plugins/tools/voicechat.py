@@ -61,8 +61,9 @@ async def endvc(client, message: Message):
     except Exception as e:
         if "'NoneType' object has no attribute 'write'" in str(e):
             await hell.edit_text("vc is already off baby")
-        logging.exception(e)
-        await hell.edit_text(e)
+        else:
+            logging.exception(e)
+            await hell.edit_text(e)
 
 
 @app.on_message(filters.command("vclink"))
