@@ -121,7 +121,7 @@ async def vcmembers(client, message: Message):
             users.append(participant.peer.user_id)
         for i in users:
             b = await app.get_users(i)
-            text += f"[{b.first_name}](tg://user?id={b.id if not b.last_name else b.first_name+ " " +b.last_name})\n"
+            text += f"[{b.first_name + (' ' + b.last_name if b.last_name else '')}](tg://user?id={b.id})\n"
 
         await hell.edit_text(text)
     except ChatAdminRequired:
