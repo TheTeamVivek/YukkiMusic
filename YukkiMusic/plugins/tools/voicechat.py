@@ -77,7 +77,7 @@ async def vclink(client, message: Message):
 
     try:
         full_chat: base.messages.ChatFull = await userbot.invoke(
-            GetFullChannel(channel=(await client.resolve_peer(message.chat.id)))
+            GetFullChannel(channel=(await userbot.resolve_peer(message.chat.id)))
         )
 
         invite: base.phone.ExportedGroupCallInvite = await userbot.invoke(
@@ -100,7 +100,7 @@ async def vcmembers(client, message: Message):
 
     try:
         full_chat: base.messages.ChatFull = await userbot.invoke(
-            GetFullChannel(channel=(await client.resolve_peer(message.chat.id)))
+            GetFullChannel(channel=(await userbot.resolve_peer(message.chat.id)))
         )
         participants: base.phone.GroupParticipants = await userbot.invoke(
             GetGroupParticipants(
