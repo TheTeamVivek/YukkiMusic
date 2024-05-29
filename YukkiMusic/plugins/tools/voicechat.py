@@ -60,7 +60,7 @@ async def endvc(client, message: Message):
         )
     except Exception as e:
         logging.exception(e)
-        await hell.edit_text(str(e))
+        await hell.edit_text(e)
 
 
 @app.on_message(filters.command("vclink"))
@@ -82,7 +82,7 @@ async def vclink(client, message: Message):
         )
     except Exception as e:
         logging.exception(e)
-        await hell.edit_text(str(e))
+        await hell.edit_text(e)
 
 
 @app.on_message(filters.command("vcmembers"))
@@ -114,7 +114,7 @@ async def vcmembers(client, message: Message):
         )
     except Exception as e:
         logging.exception(e)
-        await hell.edit_text(str(e))
+        await hell.edit_text(e)
 
 
 __MODULE__ = "Vᴏɪᴄᴇᴄʜᴀᴛ"
