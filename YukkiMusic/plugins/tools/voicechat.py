@@ -16,7 +16,7 @@ from YukkiMusic.utils.database import get_assistant
 
 
 @app.on_message(filters.command("startvc"))
-async def startvc(client: Client, message: Message):
+async def startvc(client, message: Message):
 
     call_name = message.text.split(maxsplit=1)[1] if len(message.command) > 1 else " VC"
     hell = await message.reply_text("Starting Voice Chat...")
@@ -37,7 +37,7 @@ async def startvc(client: Client, message: Message):
 
 
 @app.on_message(filters.command("endvc"))
-async def endvc(client: Client, message: Message):
+async def endvc(client, message: Message):
     hell = await message.reply_text("Ending Voice Chat...")
     userbot = await get_assistant(message.chat.id)
 
@@ -52,7 +52,7 @@ async def endvc(client: Client, message: Message):
 
 
 @app.on_message(filters.command("vclink"))
-async def vclink(client: Client, message: Message):
+async def vclink(client, message: Message):
     hell = await message.reply_text("Getting Voice Chat link...")
 
     try:
@@ -69,7 +69,7 @@ async def vclink(client: Client, message: Message):
 
 
 @app.on_message(filters.command("vcmembers"))
-async def vcmembers(client: Client, message: Message):
+async def vcmembers(client, message: Message):
     hell = await message.reply_text("Getting Voice Chat members...")
 
     try:
