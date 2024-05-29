@@ -63,8 +63,8 @@ async def endvc(client, message: Message):
             await hell.edit_text("vc is already off baby")
         elif "phone.DiscardGroupCall" in str(e):
             await hell.edit_text(
-            "Give Manage vc power To My Assistant instead to use this Command"
-        )
+                "Give Manage vc power To My Assistant instead to use this Command"
+            )
         else:
             logging.exception(e)
             await hell.edit_text(e)
