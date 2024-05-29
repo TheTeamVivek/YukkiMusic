@@ -116,8 +116,12 @@ async def vcmembers(client, message: Message):
         )
         count = participants.count
         text = f"Total Voice Chat Members: {count}\n\n"
+        users=[]
         for participant in participants.participants:
-            text += f"{participant.peer}"
+            users.append(participant.peer.user_id)
+        for i in users:
+            b = await app.get_users(i)
+            text += f"[{b.first_name}]({})
 
         await hell.edit_text(text)
     except ChatAdminRequired:
