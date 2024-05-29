@@ -1,5 +1,5 @@
 import uuid
-
+import logging 
 from pyrogram import filters
 from pyrogram.raw import base
 from pyrogram.raw.functions.channels import GetFullChannel
@@ -33,6 +33,7 @@ async def startvc(client, message: Message):
 
         await hell.edit_text("Voice Chat started!")
     except Exception as e:
+        logging.exception(e)
         await hell.edit_text(str(e))
 
 
@@ -48,6 +49,7 @@ async def endvc(client, message: Message):
         await userbot.invoke(DiscardGroupCall(call=full_chat.full_chat.call))
         await hell.edit_text("Voice Chat ended!")
     except Exception as e:
+        logging.exception(e)
         await hell.edit_text(str(e))
 
 
@@ -65,6 +67,7 @@ async def vclink(client, message: Message):
         )
         await hell.edit_text(f"Voice Chat Link: {invite.link}")
     except Exception as e:
+        logging.exception(e)
         await hell.edit_text(str(e))
 
 
@@ -92,6 +95,7 @@ async def vcmembers(client, message: Message):
 
         await hell.edit_text(text)
     except Exception as e:
+        logging.exception(e)
         await hell.edit_text(str(e))
 
 
