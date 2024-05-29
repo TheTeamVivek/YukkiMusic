@@ -94,7 +94,7 @@ async def vclink(client, message: Message):
         else:
             logging.exception(e)
             await hell.edit_text(e)
- 
+
 
 @app.on_message(filters.command("vcmembers"))
 async def vcmembers(client, message: Message):
