@@ -59,6 +59,8 @@ async def endvc(client, message: Message):
             "Give me Manage vc power To My Assistant instead to use this Command"
         )
     except Exception as e:
+        if "'NoneType' object has no attribute 'write'" in str(e):
+            await hell.edit_text("vc is already off baby")
         logging.exception(e)
         await hell.edit_text(e)
 
