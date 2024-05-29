@@ -1,4 +1,5 @@
 import uuid
+
 from pyrogram import filters
 from pyrogram.raw import base
 from pyrogram.raw.functions.channels import GetFullChannel
@@ -9,8 +10,9 @@ from pyrogram.raw.functions.phone import (
     GetGroupParticipants,
 )
 from pyrogram.types import Message
-from YukkiMusic.utils.database import get_assistant
+
 from YukkiMusic import app
+from YukkiMusic.utils.database import get_assistant
 
 
 @app.on_message(filters.command("startvc"))
@@ -92,7 +94,8 @@ async def vcmembers(client: Client, message: Message):
     except Exception as e:
         await hell.edit_text(str(e))
 
-__MODULE__ ="Vᴏɪᴄᴇᴄʜᴀᴛ"
+
+__MODULE__ = "Vᴏɪᴄᴇᴄʜᴀᴛ"
 __HELP__ = """
 /startvc - sᴛᴀʀᴛ ᴛʜᴇ ᴠᴄ [ᴍᴀᴋᴇ sᴜʀᴇ Assɪsɪᴛᴀɴᴛ ɪs ᴀɴ ᴀᴅᴍɪɴ ᴡɪᴛʜ ᴍᴀɴᴀɢᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴘᴇʀᴍɪssɪᴏɴ]
 /vcend - Eɴᴅ ᴛʜᴇ ᴠᴄ [ᴍᴀᴋᴇ sᴜʀᴇ Assɪsɪᴛᴀɴᴛ ɪs ᴀɴ ᴀᴅᴍɪɴ ᴡɪᴛʜ ᴍᴀɴᴀɢᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴘᴇʀᴍɪssɪᴏɴ]
