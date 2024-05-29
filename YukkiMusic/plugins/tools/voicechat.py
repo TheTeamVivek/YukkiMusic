@@ -89,9 +89,12 @@ async def vclink(client, message: Message):
             "Give me Manage vc power To My Assistant instead to use this Command"
         )
     except Exception as e:
-        logging.exception(e)
-        await hell.edit_text(e)
-
+        if "'NoneType' object has no attribute 'write'" in str(e):
+            await hell.edit_text("vc is  off baby")
+        else:
+            logging.exception(e)
+            await hell.edit_text(e)
+ 
 
 @app.on_message(filters.command("vcmembers"))
 async def vcmembers(client, message: Message):
@@ -113,17 +116,21 @@ async def vcmembers(client, message: Message):
         )
         count = participants.count
         text = f"Total Voice Chat Members: {count}\n\n"
+        users = []
         for participant in participants.participants:
-            text += f"• {participant.peer.mention}\n"
+            users.append(participant.peer.id)
 
-        await hell.edit_text(text)
+        await hell.edit_text(users)
     except ChatAdminRequired:
         await hell.edit_text(
             "Give me Manage vc power To My Assistant instead to use this Command"
         )
     except Exception as e:
-        logging.exception(e)
-        await hell.edit_text(e)
+        if "'NoneType' object has no attribute 'write'" in str(e):
+            await hell.edit_text("vc is  off baby")
+        else:
+            logging.exception(e)
+            await hell.edit_text(e)
 
 
 __MODULE__ = "Vᴏɪᴄᴇᴄʜᴀᴛ"
