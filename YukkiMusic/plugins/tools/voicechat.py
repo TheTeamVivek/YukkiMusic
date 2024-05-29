@@ -36,7 +36,7 @@ async def startvc(client, message: Message):
         await hell.edit_text("Voice Chat started!")
     except ChatAdminRequired:
         await hell.edit_text(
-            "Give me Manage vc power To My Assistant instead to use this Command"
+            "Give Manage vc power To My Assistant instead to use this Command"
         )
     except Exception as e:
         logging.exception(e)
@@ -61,6 +61,10 @@ async def endvc(client, message: Message):
     except Exception as e:
         if "'NoneType' object has no attribute 'write'" in str(e):
             await hell.edit_text("vc is already off baby")
+        elif "phone.DiscardGroupCall" in str(e):
+            await hell.edit_text(
+            "Give Manage vc power To My Assistant instead to use this Command"
+        )
         else:
             logging.exception(e)
             await hell.edit_text(e)
@@ -68,6 +72,7 @@ async def endvc(client, message: Message):
 
 @app.on_message(filters.command("vclink"))
 async def vclink(client, message: Message):
+    userbot = await get_assistant(message.chat.id)
     hell = await message.reply_text("Getting Voice Chat link...")
 
     try:
@@ -90,6 +95,7 @@ async def vclink(client, message: Message):
 
 @app.on_message(filters.command("vcmembers"))
 async def vcmembers(client, message: Message):
+    userbot = await get_assistant(message.chat.id)
     hell = await message.reply_text("Getting Voice Chat members...")
 
     try:
@@ -108,7 +114,7 @@ async def vcmembers(client, message: Message):
         count = participants.count
         text = f"Total Voice Chat Members: {count}\n\n"
         for participant in participants.participants:
-            text += f"• {participant.peer.user_id}\n"
+            text += f"• {participant.peer.mention}\n"
 
         await hell.edit_text(text)
     except ChatAdminRequired:
