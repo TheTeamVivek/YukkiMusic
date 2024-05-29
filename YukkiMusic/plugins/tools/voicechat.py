@@ -119,7 +119,7 @@ async def vcmembers(client, message: Message):
         for participant in participants.participants:
             text += f"{participant.peer}"
 
-        await hell.edit_text(users)
+        await hell.edit_text(text)
     except ChatAdminRequired:
         await hell.edit_text(
             "Give me Manage vc power To My Assistant instead to use this Command"
