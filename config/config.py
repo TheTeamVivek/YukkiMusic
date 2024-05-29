@@ -74,7 +74,7 @@ OWNER_ID = list(
 )  # Input type must be interger
 
 
-RADIO_URL = getenv("RADIO_URL", "")
+RADIO_URL = getenv("RADIO_URL", "http://peridot.streamguys.com:7150/Mirchi")
 
 # ________________________________________________________________________________#
 # Get it from http://dashboard.heroku.com/account
