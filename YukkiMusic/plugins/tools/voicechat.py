@@ -88,10 +88,6 @@ async def vclink(client, message: Message):
         await hell.edit_text(
             "Give me Manage vc power To My Assistant instead to use this Command"
         )
-    except ChatAdminRequired:
-        await hell.edit_text(
-            "Give Manage vc power To My Assistant instead to use this Command"
-        )
     except Exception as e:
         logging.exception(e)
         await hell.edit_text(e)
