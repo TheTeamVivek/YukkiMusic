@@ -116,7 +116,7 @@ async def vcmembers(client, message: Message):
         )
         count = participants.count
         text = f"Total Voice Chat Members: {count}\n\n"
-        users=[]
+        users = []
         for participant in participants.participants:
             users.append(participant.peer.user_id)
         for i in users:
