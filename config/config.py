@@ -74,7 +74,7 @@ OWNER_ID = list(
 )  # Input type must be interger
 
 
-RADIO_URL = getenv("RADIO_URL", ""https://www.youtube.com/live/eu191hR_LEc?si=T-9QYD548jd0Mogp"")
+RADIO_URL = getenv("RADIO_URL", "https://www.youtube.com/live/eu191hR_LEc?si=T-9QYD548jd0Mogp")
 
 #http://peridot.streamguys.com:7150/Mirchi
 # ________________________________________________________________________________#
