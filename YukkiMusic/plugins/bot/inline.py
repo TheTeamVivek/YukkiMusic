@@ -13,6 +13,7 @@ from pyrogram.types import (
     InlineKeyboardMarkup,
     InlineQueryResultPhoto,
 )
+import logging
 from youtubesearchpython.__future__ import VideosSearch
 
 from config import BANNED_USERS, START_IMG_URL
@@ -41,7 +42,7 @@ async def inline_query_handler(client, query):
         try:
             await client.answer_inline_query(query.id, results=answer, cache_time=10)
         except Exception as e:
-            print(str(e))
+            logging.exception(e)
 
     elif text.strip() == "":
         try:
