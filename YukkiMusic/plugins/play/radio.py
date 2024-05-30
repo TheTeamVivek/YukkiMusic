@@ -4,6 +4,7 @@ from pyrogram.types import Message
 from config import BANNED_USERS, RADIO_URL, adminlist
 from strings import get_string
 from YukkiMusic import app
+from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
     get_cmode,
     get_lang,
