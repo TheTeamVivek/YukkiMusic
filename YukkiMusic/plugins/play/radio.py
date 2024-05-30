@@ -16,7 +16,9 @@ from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
 
 
-@app.on_message(filters.command(["radio","cradio","vradio"]) & filters.group & ~BANNED_USERS)
+@app.on_message(
+    filters.command(["radio", "cradio", "vradio"]) & filters.group & ~BANNED_USERS
+)
 async def radio(
     client,
     message: Message,
