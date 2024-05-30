@@ -71,6 +71,7 @@ def paginate_modules(page_n, module_dict, prefix, chat=None, closebutton="True")
            ]
 
        return pairs
+
     else:
         if not chat:
             modules = sorted(
