@@ -75,9 +75,12 @@ async def help_com_group(client, message: Message, _):
     await message.reply_text(_["help_2"], reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def help_parser(name, keyboard=None):
+async def help_parser(name, keyboard=None, closebutton="True"):
     if not keyboard:
-        keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help"))
+        if closebutton=="True":
+            keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help"))
+            keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help",closebutton="False"))
+        else:
     return (
         f"""ʜᴇʟʟᴏ {name},
 
