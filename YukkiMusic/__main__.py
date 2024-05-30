@@ -14,16 +14,12 @@ from pyrogram import idle
 
 import config
 from config import BANNED_USERS
-from YukkiMusic import LOGGER, app, telethn, userbot
+from YukkiMusic import LOGGER, app, telethn, userbot, HELPABLE
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.plugins import ALL_MODULES
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
-HELPABLE = {}
-
-
 async def init():
-    global HELPABLE
     if (
         not config.STRING1
         and not config.STRING2
