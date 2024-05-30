@@ -37,7 +37,7 @@ async def inline_query_handler(client, query):
                 thumb_url=START_IMG_URL,
                 description=f"🥀 Open Help Menu ...",
                 caption=text,
-                reply_markup=InlineKeyboardMarkup(keyboard),
+                reply_markup=keyboard,
             )
         )
         try:
