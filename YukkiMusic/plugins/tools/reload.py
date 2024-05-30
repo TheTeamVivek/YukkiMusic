@@ -84,7 +84,7 @@ async def close_menu(_, CallbackQuery):
         try:
             await app.delete_messages(
                 chat_id=CallbackQuery.message.chat.id,
-                message_ids=CallbackQuery.message.id
+                message_ids=CallbackQuery.message.id,
             )
         except:
             return
