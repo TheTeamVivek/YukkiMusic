@@ -25,16 +25,11 @@ from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
 
 RADIO_URL = {
-    "Capital_FM": "http://media-ice.musicradio.com/CapitalMP3?.mp3&listening-from-radio-garden=1616312105154",
+    "Capital FM": "http://media-ice.musicradio.com/CapitalMP3?.mp3&listening-from-radio-garden=1616312105154",
     "English": "https://hls-01-regions.emgsound.ru/11_msk/playlist.m3u8",
     "Air Bilaspur": "http://air.pc.cdn.bitgravity.com/air/live/pbaudio110/playlist.m3u8",
     "Air Raipur": "http://air.pc.cdn.bitgravity.com/air/live/pbaudio118/playlist.m3u8",
-    "e": e,
-    "f": f,
-    "g": g,
-    "h": h,
-    "i": i,
-    "j": j,
+    "Radio Today": "http://stream.zenolive.com/8wv4d8g4344tv",
 }
 
 
