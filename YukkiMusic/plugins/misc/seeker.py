@@ -103,7 +103,7 @@ asyncio.create_task(markup_timer())
 
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from config import LOGGER_ID
+from config import LOG_GROUP_ID
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_served_users
 
@@ -136,7 +136,7 @@ TEXT = """ᴀᴜᴛᴏ ɢᴄᴀsᴛ ɪs ᴇɴᴀʙʟᴇᴅ sᴏ ᴀᴜᴛᴏ ɢ�
 
 async def send_text_once():
     try:
-        await app.send_message(LOGGER_ID, TEXT)
+        await app.send_message(LOG_GROUP_ID, TEXT)
     except Exception as e:
         pass
 
