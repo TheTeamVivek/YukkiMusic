@@ -19,7 +19,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from config import BANNED_USERS, PHOTO, START_IMG_URL
 from strings import get_command, get_string, helpers
 from YukkiMusic import app
-from YukkiMusic.__main__ import HELPABLE
+from YukkiMusic import HELPABLE
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
 from YukkiMusic.utils.decorators.language import LanguageStart, languageCB
@@ -154,7 +154,7 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from YukkiMusic import app
-from YukkiMusic.__main__ import HELPABLE
+from YukkiMusic import HELPABLE
 from YukkiMusic.utils.inlinefunction import paginate_modules
 
 
