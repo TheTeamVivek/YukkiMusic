@@ -148,6 +148,12 @@ async def helper_cb(client, CallbackQuery, _):
     except Exception as e:
         logging.exception(e)
 
+from pyrogram import filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+from YukkiMusic.utils.inlinefunction import paginate_modules
+from YukkiMusic.__main__ import HELPABLE
+
 
 async def help_parser(name, keyboard=None):
     if not keyboard:
@@ -168,12 +174,12 @@ async def help_parser(name, keyboard=None):
 @app.on_callback_query(filters.regex("shikharbro"))
 async def shikhar(_, CallbackQuery):
     text, keyboard = await help_parser(CallbackQuery.from_user.mention)
+    print("DEBUG: Callback data:", keyboard.inline_keyboard)  # Debugging print
     await CallbackQuery.message.edit(text, reply_markup=keyboard)
 
 
 @app.on_callback_query(filters.regex(r"help_(.*?)"))
-@LanguageStart
-async def help_button(client, query, _):
+async def help_button(client, query):
     home_match = re.match(r"help_home\((.+?)\)", query.data)
     mod_match = re.match(r"help_module\((.+?),(.+?)\)", query.data)
     prev_match = re.match(r"help_prev\((.+?)\)", query.data)
@@ -197,12 +203,6 @@ async def help_button(client, query, _):
             )
             + HELPABLE[module].__HELP__
         )
-        try:
-            await app.resolve_peer(OWNER_ID[0])
-            OWNER = OWNER_ID[0]
-        except:
-            OWNER = None
-        out = private_panel(_, app.username, OWNER)
 
         key = InlineKeyboardMarkup(
             [
@@ -214,6 +214,8 @@ async def help_button(client, query, _):
                 ],
             ]
         )
+
+        print("DEBUG: Callback data:", key.inline_keyboard)  # Debugging print
 
         await query.message.edit(
             text=text,
@@ -269,4 +271,4 @@ async def help_button(client, query, _):
             disable_web_page_preview=True,
         )
 
-    return await client.answer_callback_query(query.id)
+    await client.answer_callback_query(query.id)
