@@ -13,7 +13,7 @@ from YukkiMusic.utils.stream.stream import stream
 @app.on_message(
     filters.command(["radio", "cradio", "vradio"]) & filters.group & ~BANNED_USERS
 )
-async def radio(client, message: Message ):
+async def radio(client, message: Message):
     language = await get_lang(message.chat.id)
     _ = get_string(language)
     playmode = await get_playmode(message.chat.id)
