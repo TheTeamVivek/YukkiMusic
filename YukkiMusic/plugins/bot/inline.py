@@ -30,7 +30,7 @@ async def inline_query_handler(client, query):
     answers = []
     umm = []
     if text.strip() == "help_menu":
-        text, keyboard = await help_parser(query.from_user.mention)
+        text, keyboard = await help_parser(query.from_user.mention, closebutton="False")
         umm.append(
             InlineQueryResultPhoto(
                 photo_url=START_IMG_URL,
