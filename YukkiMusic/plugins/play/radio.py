@@ -1,7 +1,7 @@
 from pyrogram import filters
 from pyrogram.types import Message
 
-from config import BANNED_USERS, RADIO_URL, adminlist
+from config import BANNED_USERS, adminlist
 from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
@@ -73,7 +73,7 @@ async def radio(
             _,
             mystic,
             message.from_user.id,
-            #RADIO_URL,
+            # RADIO_URL,
             "https://www.youtube.com/live/eu191hR_LEc?si=T-9QYD548jd0Mogp",
             chat_id,
             message.from_user.first_name,
