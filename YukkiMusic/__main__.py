@@ -66,6 +66,7 @@ async def init():
     else:
         await telethn.run_until_disconnected()
 
+
 if __name__ == "__main__":
     telethn.start(bot_token=config.BOT_TOKEN)
     loop.run_until_complete(init())
