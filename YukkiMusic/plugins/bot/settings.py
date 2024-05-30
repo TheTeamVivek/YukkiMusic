@@ -95,8 +95,8 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
             buttons = private_panel(_, app.username, OWNER)
             try:
                 await CallbackQuery.edit_message_text(
-                _["start_2"].format(app.mention),
-                reply_markup=InlineKeyboardMarkup(buttons),
+                    _["start_2"].format(app.mention),
+                    reply_markup=InlineKeyboardMarkup(buttons),
                 )
             except MessageNotModified:
                 pass
@@ -104,7 +104,7 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
             buttons = setting_markup(_)
             try:
                 await CallbackQuery.edit_message_reply_markup(
-                reply_markup=InlineKeyboardMarkup(buttons)
+                    reply_markup=InlineKeyboardMarkup(buttons)
                 )
             except MessageNotModified:
                 pass
@@ -120,9 +120,10 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
             await CallbackQuery.edit_message_text(
                 _["start_2"].format(app.mention),
                 reply_markup=InlineKeyboardMarkup(buttons),
-                )
+            )
         except MessageNotModified:
             pass
+
 
 ## Audio and Video Quality
 async def gen_buttons_aud(_, aud):
