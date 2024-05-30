@@ -98,7 +98,7 @@ async def help_button(client, query):
     back_match = re.match(r"help_back\((\d+)\)", query.data)
     create_match = re.match(r"help_create", query.data)
 
-    top_text = f"""ʜᴇʟʟᴏ {query.from_user.first_name},
+    top_text = f"""ʜᴇʟʟᴏ {query.from_user.mention},
 
 ᴄʟɪᴄᴋ ᴏɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴs ғᴏʀ ᴍᴏʀᴇ ɪɴғᴏʀᴍᴀᴛɪᴏɴ.
 
