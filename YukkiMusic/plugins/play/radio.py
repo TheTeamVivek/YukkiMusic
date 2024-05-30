@@ -33,9 +33,7 @@ RADIO_STATION = {
 }
 
 
-@app.on_message(
-    filters.command(["radio", "cradio"]) & filters.group & ~BANNED_USERS
-)
+@app.on_message(filters.command(["radio", "cradio"]) & filters.group & ~BANNED_USERS)
 async def radio(client, message: Message):
     msg = await message.reply_text("ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ ᴀ ᴍᴏᴍᴇɴᴛ....")
     try:
@@ -166,4 +164,6 @@ async def radio(client, message: Message):
         return await play_logs(message, streamtype="M3u8 or Index Link")
     else:
         valid_stations = ", ".join(RADIO_STATION.keys())
-        await message.reply(f"Invalid station name. Only these stations can be played: {valid_stations}")
+        await message.reply(
+            f"Invalid station name. Only these stations can be played: {valid_stations}"
+        )
