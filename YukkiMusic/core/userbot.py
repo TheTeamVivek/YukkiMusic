@@ -23,47 +23,44 @@ assistantids = []
 class Userbot(Client):
     def __init__(self):
         self.one = Client(
-                "YukkiString1",
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                session_string=str(config.STRING1),
-                workdir="datafiles",
-            )
+            "YukkiString1",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING1),
+            workdir="datafiles",
+        )
 
         self.two = Client(
-                "YukkiString2",
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                session_string=str(config.STRING2),
-                workdir="datafiles",
-            )
+            "YukkiString2",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING2),
+            workdir="datafiles",
+        )
 
         self.three = Client(
-                "YukkiString3",
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                session_string=str(config.STRING3),
-                workdir="datafiles",
-            )
-
-
+            "YukkiString3",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING3),
+            workdir="datafiles",
+        )
 
         self.four = Client(
-                "YukkiString4",
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                session_string=str(config.STRING4),
-                workdir="datafiles",
-            )
-
+            "YukkiString4",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING4),
+            workdir="datafiles",
+        )
 
         self.five = Client(
-                "YukkiString5",
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                session_string=str(config.STRING5),
-                workdir="datafiles",
-            )
+            "YukkiString5",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING5),
+            workdir="datafiles",
+        )
 
     async def start(self):
         LOGGER(__name__).info(f"Starting Assistant Clients")
