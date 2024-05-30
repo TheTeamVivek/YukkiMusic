@@ -29,6 +29,16 @@ from YukkiMusic.utils.inline.help import (
     private_help_panel,
 )
 from YukkiMusic.utils.inlinefunction import paginate_modules
+import re
+
+from pyrogram import filters
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+from YukkiMusic import HELPABLE, app
+from YukkiMusic.utils.inlinefunction import paginate_modules
+
+
+
 
 ### Command
 HELP_COMMAND = get_command("HELP_COMMAND")
@@ -48,8 +58,8 @@ async def helper_private(
         chat_id = update.message.chat.id
         language = await get_lang(chat_id)
         _ = get_string(language)
-        keyboard = help_mark
-        await update.edit_message_text(_["help_1"], reply_markup=keyboard)
+        text, keyboard = await help_parser(update.from_user.mention)
+        await update.edit_message_text(text, reply_markup=keyboard)
     else:
         chat_id = update.chat.id
         if await is_commanddelete_on(update.chat.id):
@@ -59,11 +69,11 @@ async def helper_private(
                 pass
         language = await get_lang(chat_id)
         _ = get_string(language)
-        keyboard = help_mark
+        text, keyboard = await help_parser(CallbackQuery.from_user.mention)
         if START_IMG_URL:
             await update.reply_photo(
                 photo=START_IMG_URL,
-                caption=_["help_1"],
+                caption=text,
                 reply_markup=keyboard,
             )
 
@@ -82,78 +92,7 @@ async def help_com_group(client, message: Message, _):
     await message.reply_text(_["help_2"], reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-@app.on_callback_query(filters.regex("only_music_help") & ~BANNED_USERS)
-@languageCB
-async def yukki_pages(client, CallbackQuery, _):
-    keyboard = help_pannel(_)
-    try:
-        await CallbackQuery.message.edit_text(_["help_1"], reply_markup=keyboard)
-        return
-    except:
-        return
-
-
-@app.on_callback_query(filters.regex("helpcallback") & ~BANNED_USERS)
-@languageCB
-async def helper_cb(client, CallbackQuery, _):
-    callback_data = CallbackQuery.data.strip()
-    cb = callback_data.split(None, 1)[1]
-    keyboard = help_back_markup(_)
-    try:
-        if cb == "hb5":
-            if CallbackQuery.from_user.id not in SUDOERS:
-                return await CallbackQuery.answer(
-                    "ᴏɴʟʏ ғᴏʀ sᴜᴅᴏ ᴜsᴇʀ's", show_alert=True
-                )
-            else:
-                await CallbackQuery.edit_message_text(
-                    helpers.HELP_5, reply_markup=keyboard
-                )
-                return await CallbackQuery.answer()
-        try:
-            await CallbackQuery.answer()
-        except:
-            pass
-        if cb == "hb1":
-            await CallbackQuery.edit_message_text(helpers.HELP_1, reply_markup=keyboard)
-        elif cb == "hb2":
-            await CallbackQuery.edit_message_text(helpers.HELP_2, reply_markup=keyboard)
-        elif cb == "hb3":
-            await CallbackQuery.edit_message_text(helpers.HELP_3, reply_markup=keyboard)
-        elif cb == "hb4":
-            await CallbackQuery.edit_message_text(helpers.HELP_4, reply_markup=keyboard)
-        elif cb == "hb6":
-            await CallbackQuery.edit_message_text(helpers.HELP_6, reply_markup=keyboard)
-
-        elif cb == "hb7":
-            await CallbackQuery.edit_message_text(helpers.HELP_7, reply_markup=keyboard)
-        elif cb == "hb8":
-            await CallbackQuery.edit_message_text(helpers.HELP_8, reply_markup=keyboard)
-        elif cb == "hb9":
-            await CallbackQuery.edit_message_text(helpers.HELP_9, reply_markup=keyboard)
-        elif cb == "hb10":
-            await CallbackQuery.edit_message_text(
-                helpers.HELP_10, reply_markup=keyboard
-            )
-        elif cb == "hb11":
-            await CallbackQuery.edit_message_text(
-                helpers.HELP_11, reply_markup=keyboard
-            )
-        elif cb == "hb12":
-            await CallbackQuery.edit_message_text(
-                helpers.HELP_12, reply_markup=keyboard
-            )
-    except Exception as e:
-        logging.exception(e)
-
-
-import re
-
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-
-from YukkiMusic import HELPABLE, app
-from YukkiMusic.utils.inlinefunction import paginate_modules
+ 
 
 
 async def help_parser(name, keyboard=None):
@@ -168,13 +107,6 @@ async def help_parser(name, keyboard=None):
 """,
         keyboard,
     )
-
-
-@app.on_callback_query(filters.regex("shikharbro"))
-async def shikhar(_, CallbackQuery):
-    text, keyboard = await help_parser(CallbackQuery.from_user.mention)
-    await CallbackQuery.message.edit(text, reply_markup=keyboard)
-
 
 @app.on_callback_query(filters.regex(r"help_(.*?)"))
 async def help_button(client, query):
