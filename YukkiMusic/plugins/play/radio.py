@@ -17,7 +17,7 @@ from YukkiMusic.utils.stream.stream import stream
 
 
 @app.on_message(
-    filters.command(["radio", "cradio", "vradio", "playforce"])
+    filters.command(["radio", "cradio", "vradio"])
     & filters.group
     & ~BANNED_USERS
 )
@@ -56,12 +56,8 @@ async def radio(
     else:
         if "-v" in message.text:
             video = True
-
-    fplay = None
-    if message.command[0][-1] == "e":
-        if not await is_active_chat(chat_id):
-            return await message.reply_text(_["play_18"])
-        fplay = True
+        else:
+            video = None
 
     mystic = await message.reply_text(
         _["play_2"].format(channel) if channel else _["play_1"]
@@ -74,7 +70,7 @@ async def radio(
             # RADIO_URL,
             "https://www.youtube.com/live/eu191hR_LEc?si=T-9QYD548jd0Mogp",
             chat_id,
-            message.from_user.first_name,
+            message.from_user.mention,
             message.chat.id,
             video=video,
             streamtype="index",
