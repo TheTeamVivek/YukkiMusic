@@ -1,19 +1,5 @@
-from pyrogram import filters
-from pyrogram.types import Message
-
-from config import BANNED_USERS, RADIO_URL, adminlist
-from strings import get_string
-from YukkiMusic import app
-from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import get_cmode, get_lang, get_playmode, get_playtype
-from YukkiMusic.utils.logger import play_logs
-from YukkiMusic.utils.stream.stream import stream
 import logging
-import os
-from random import randint
 
-import requests
-from pykeyboard import InlineKeyboard
 from pyrogram import filters
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import (
@@ -22,26 +8,22 @@ from pyrogram.errors import (
     UserAlreadyParticipant,
     UserNotParticipant,
 )
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
-from youtube_search import YoutubeSearch
+from pyrogram.types import Message
 
-from config import BANNED_USERS, SERVER_PLAYLIST_LIMIT
-from YukkiMusic import Carbon, app
+from config import BANNED_USERS, RADIO_URL, adminlist
+from strings import get_string
+from YukkiMusic import app
+from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
-    delete_playlist,
     get_assistant,
-    get_playlist,
-    get_playlist_names,
-    save_playlist,
+    get_cmode,
+    get_lang,
+    get_playmode,
+    get_playtype,
 )
-from YukkiMusic.utils.decorators.language import language, languageCB
-from YukkiMusic.utils.inline.playlist import (
-    botplaylist_markup,
-    get_cplaylist_markup,
-    get_playlist_markup,
-    warning_markup,
-)
-from YukkiMusic.utils.pastebin import Yukkibin
+from YukkiMusic.utils.logger import play_logs
+from YukkiMusic.utils.stream.stream import stream
+
 
 @app.on_message(
     filters.command(["radio", "cradio", "vradio"]) & filters.group & ~BANNED_USERS
