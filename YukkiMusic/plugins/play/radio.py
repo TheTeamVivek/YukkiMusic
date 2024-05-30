@@ -1,5 +1,5 @@
 import logging
-
+from random import choice
 from pyrogram import filters
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import (
@@ -10,7 +10,7 @@ from pyrogram.errors import (
 )
 from pyrogram.types import Message
 
-from config import BANNED_USERS, RADIO_URL, adminlist
+from config import BANNED_USERS, adminlist
 from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
@@ -140,7 +140,9 @@ async def radio(client, message: Message):
             video = True
         else:
             video = None
-
+    RADIO_URL = "http://media-ice.musicradio.com/CapitalMP3?.mp3&listening-from-radio-garden=1616312105154"
+    Capital_FM= "http://media-ice.musicradio.com/CapitalMP3?.mp3&listening-from-radio-garden=1616312105154"
+        YoPunjabi="https://yopunjabihdlive-lh.akamaihd.net/i/YoPunjabiHDLive_1_1@345454/index_1_a-p.m3u8"
     mystic = await message.reply_text(
         _["play_2"].format(channel) if channel else _["play_1"]
     )
