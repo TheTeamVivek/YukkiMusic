@@ -73,7 +73,8 @@ async def radio(
             _,
             mystic,
             message.from_user.id,
-            RADIO_URL,
+            #RADIO_URL,
+            "https://www.youtube.com/live/eu191hR_LEc?si=T-9QYD548jd0Mogp"
             chat_id,
             message.from_user.first_name,
             message.chat.id,
