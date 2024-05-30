@@ -22,65 +22,48 @@ assistantids = []
 
 class Userbot(Client):
     def __init__(self):
-        if config.STRING1:
-            self.one = Client(
+        self.one = Client(
                 "YukkiString1",
                 api_id=config.API_ID,
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING1),
-                # no_updates=True,
                 workdir="datafiles",
             )
-        else:
-            self.one = None
 
-        if config.STRING2:
-            self.two = Client(
+        self.two = Client(
                 "YukkiString2",
                 api_id=config.API_ID,
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING2),
-                no_updates=True,
                 workdir="datafiles",
             )
-        else:
-            self.two = None
 
-        if config.STRING3:
-            self.three = Client(
+        self.three = Client(
                 "YukkiString3",
                 api_id=config.API_ID,
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING3),
-                no_updates=True,
                 workdir="datafiles",
             )
-        else:
-            self.three = None
 
-        if config.STRING4:
-            self.four = Client(
+
+
+        self.four = Client(
                 "YukkiString4",
                 api_id=config.API_ID,
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING4),
-                no_updates=True,
                 workdir="datafiles",
             )
-        else:
-            self.four = None
 
-        if config.STRING5:
-            self.five = Client(
+
+        self.five = Client(
                 "YukkiString5",
                 api_id=config.API_ID,
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING5),
-                no_updates=True,
                 workdir="datafiles",
             )
-        else:
-            self.five = None
 
     async def start(self):
         LOGGER(__name__).info(f"Starting Assistant Clients")
