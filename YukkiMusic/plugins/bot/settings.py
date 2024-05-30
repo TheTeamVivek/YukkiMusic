@@ -120,13 +120,12 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
         buttons = private_panel(_, app.username, OWNER)
         try:
             await client.edit_inline_text(
-inline_message_id=query.inline_message_id,
+                inline_message_id=query.inline_message_id,
                 text=_["start_2"].format(app.mention),
                 reply_markup=InlineKeyboardMarkup(buttons),
             )
         except MessageNotModified:
             pass
-
 
 
 ## Audio and Video Quality
