@@ -163,7 +163,5 @@ async def radio(client, message: Message):
             return await mystic.edit_text(err)
         return await play_logs(message, streamtype="M3u8 or Index Link")
     else:
-        valid_stations = ", ".join(RADIO_STATION.keys())
-        await message.reply(
-            f"Invalid station name. Only these stations can be played: {valid_stations}"
-        )
+        valid_stations = "\n".join([f"`{name}`" for name in RADIO_URL.keys()])
+        await message.reply(f"Invalid station name. Only these stations can be played:\n{valid_stations}")
