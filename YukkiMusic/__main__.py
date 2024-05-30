@@ -9,7 +9,9 @@
 import asyncio
 import importlib
 from sys import argv
+
 from pyrogram import idle
+
 import config
 from config import BANNED_USERS
 from YukkiMusic import LOGGER, app, telethn, userbot
@@ -19,6 +21,7 @@ from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
 loop = asyncio.get_event_loop_policy().get_event_loop()
 HELPABLE = {}
+
 
 async def init():
     global HELPABLE
@@ -46,7 +49,7 @@ async def init():
             BANNED_USERS.add(user_id)
     except Exception as e:
         LOGGER("YukkiMusic").error(f"Error fetching banned users: {e}")
-    
+
     await app.start()
 
     for all_module in ALL_MODULES:
@@ -65,6 +68,7 @@ async def init():
         await telethn.disconnect()
     else:
         await telethn.run_until_disconnected()
+
 
 if __name__ == "__main__":
     telethn.start(bot_token=config.BOT_TOKEN)
