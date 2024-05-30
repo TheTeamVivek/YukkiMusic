@@ -88,6 +88,7 @@ async def help_parser(name, keyboard=None):
         keyboard,
     )
 
+
 @app.on_callback_query(filters.regex(r"help_(.*?)"))
 async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuery]):
     home_match = re.match(r"help_home\((.+?)\)", query.data)
