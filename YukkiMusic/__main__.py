@@ -18,11 +18,7 @@ from YukkiMusic import LOGGER, app, telethn, userbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.plugins import ALL_MODULES
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
-
-loop = asyncio.get_event_loop_policy().get_event_loop()
 HELPABLE = {}
-
-
 async def init():
     global HELPABLE
     if (
@@ -72,5 +68,5 @@ async def init():
 
 if __name__ == "__main__":
     telethn.start(bot_token=config.BOT_TOKEN)
-    loop.run_until_complete(init())
+    asyncio.get_event_loop_policy().get_event_loop().run_until_complete(init())
     LOGGER("YukkiMusic").info("Stopping Yukki Music Bot! GoodBye")
