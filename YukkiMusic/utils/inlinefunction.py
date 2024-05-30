@@ -43,13 +43,13 @@ def paginate_modules(page_n, module_dict, prefix, chat=None, closebutton="True")
             ]
         )
 
-    pairs = [modules[i: i + NUM_COLUMNS] for i in range(0, len(modules), NUM_COLUMNS)]
+    pairs = [modules[i : i + NUM_COLUMNS] for i in range(0, len(modules), NUM_COLUMNS)]
 
     max_num_pages = ceil(len(pairs) / COLUMN_SIZE) if len(pairs) > 0 else 1
     modulo_page = page_n % max_num_pages
 
     if len(pairs) > COLUMN_SIZE:
-        pairs = pairs[modulo_page * COLUMN_SIZE: COLUMN_SIZE * (modulo_page + 1)]
+        pairs = pairs[modulo_page * COLUMN_SIZE : COLUMN_SIZE * (modulo_page + 1)]
         navigation_buttons = [
             EqInlineKeyboardButton(
                 "❮",
@@ -65,11 +65,14 @@ def paginate_modules(page_n, module_dict, prefix, chat=None, closebutton="True")
         ]
 
         if closebutton == "True":
-            navigation_buttons.insert(1, EqInlineKeyboardButton(
-                "Bᴀᴄᴋ",
-                callback_data="settingsback_helper",
-            ))
+            navigation_buttons.insert(
+                1,
+                EqInlineKeyboardButton(
+                    "Bᴀᴄᴋ",
+                    callback_data="settingsback_helper",
+                ),
+            )
 
         pairs.append(navigation_buttons)
-    
+
     return pairs
