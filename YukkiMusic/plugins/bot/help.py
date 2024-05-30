@@ -178,7 +178,7 @@ async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuer
 
         await client.answer_callback_query(query.id)
 
-    elif isinstance(query, types.InlineQuery)::
+    elif isinstance(query, types.InlineQuery):
         if mod_match:
             module = mod_match.group(1)
             prev_page_num = int(mod_match.group(2))
@@ -245,5 +245,3 @@ async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuer
                 reply_markup=keyboard,
                 disable_web_page_preview=True,
             )
-
-        await client.answer_callback_query(query.id)
