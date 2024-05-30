@@ -15,7 +15,7 @@ from pyrogram.types import (
 )
 from youtubesearchpython.__future__ import VideosSearch
 
-from config import BANNED_USERS
+from config import BANNED_USERS, START_IMG_URL
 from YukkiMusic import app
 from YukkiMusic.utils.inlinequery import answer
 
@@ -26,18 +26,24 @@ from .help import help_parser
 async def inline_query_handler(client, query):
     text = query.query.strip().lower()
     answers = []
-    thumb_image = "https://telegra.ph/file/027283ee9defebc3298b8.png"
-    text, keyboard = await help_parser(query.from_user.mention)
-    answer.append(
-        InlineQueryResultPhoto(
-            photo_url=f"{thumb_image}",
-            title="🥀 Help Menu ✨",
-            thumb_url=f"{thumb_image}",
-            description=f"🥀 Open Help Menu ...",
-            caption=text,
-            reply_markup=InlineKeyboardMarkup(keyboard),
+    if text.strip() == "-help":
+        text, keyboard = await help_parser(query.from_user.mention)
+        answer.append(
+            InlineQueryResultPhoto(
+                photo_url=START_IMG_URL,
+                title="🥀 Help Menu ✨",
+                thumb_url=f"{thumb_image}",
+                description=f"🥀 Open Help Menu ...",
+                caption=text,
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
         )
-    )
+        try:
+            await app.answer_inline_query(
+                query.id, results=answer, cache_time=10
+            )
+        except Exception as e:
+            print(str(e))
 
     if text.strip() == "":
         try:
