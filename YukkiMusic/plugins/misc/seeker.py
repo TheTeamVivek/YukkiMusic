@@ -101,12 +101,11 @@ async def markup_timer():
 asyncio.create_task(markup_timer())
 
 
+from pyrogram.errors import FloodWait
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from config import LOG_GROUP_ID
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_served_users
-from pyrogram.errors import FloodWait
 
 START_IMG_URLS = "https://graph.org/file/497d715b03115857db6d8.jpg"
 
@@ -125,13 +124,14 @@ BUTTONS = InlineKeyboardMarkup(
     ]
 )
 
+
 async def send_message_to_chats():
     try:
         chats = await get_served_users()
 
         for chat_info in chats:
             chat_id = chat_info.get("chat_id")
-            if isinstance(chat_id, int):  
+            if isinstance(chat_id, int):
                 try:
                     await app.send_photo(
                         chat_id,
@@ -154,5 +154,6 @@ async def continuous_broadcast():
         except Exception as e:
             pass
     await asyncio.sleep(3600)
+
 
 asyncio.create_task(continuous_broadcast())
