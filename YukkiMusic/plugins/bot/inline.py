@@ -26,7 +26,7 @@ from .help import help_parser
 async def inline_query_handler(client, query):
     text = query.query.strip().lower()
     answers = []
-    if text.strip() == "-help":
+    if query.query.startswith("help_menu"):
         text, keyboard = await help_parser(query.from_user.mention)
         answer.append(
             InlineQueryResultPhoto(
