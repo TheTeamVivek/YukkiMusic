@@ -39,9 +39,7 @@ async def inline_query_handler(client, query):
             )
         )
         try:
-            await app.answer_inline_query(
-                query.id, results=answer, cache_time=10
-            )
+            await app.answer_inline_query(query.id, results=answer, cache_time=10)
         except Exception as e:
             print(str(e))
 
