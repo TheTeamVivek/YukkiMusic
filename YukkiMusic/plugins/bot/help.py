@@ -104,7 +104,7 @@ async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuer
 
 ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅs sᴛᴀʀᴛs ᴡɪᴛʜ :-  /
 """
-    is_callback = isinstance(update, types.CallbackQuery)
+    is_callback = isinstance(query, types.CallbackQuery)
     if is_callback:
         if mod_match:
             module = mod_match.group(1)
