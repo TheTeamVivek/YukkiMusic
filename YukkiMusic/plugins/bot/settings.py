@@ -110,6 +110,8 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
                 pass
 
     except Exception:
+        if not query.inline_message_id:
+            return
         try:
             await app.resolve_peer(OWNER_ID[0])
             OWNER = OWNER_ID[0]
@@ -117,12 +119,14 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
             OWNER = None
         buttons = private_panel(_, app.username, OWNER)
         try:
-            await CallbackQuery.edit_message_text(
-                _["start_2"].format(app.mention),
+            await client.edit_inline_text(
+inline_message_id=query.inline_message_id,
+                text=_["start_2"].format(app.mention),
                 reply_markup=InlineKeyboardMarkup(buttons),
             )
         except MessageNotModified:
             pass
+
 
 
 ## Audio and Video Quality
