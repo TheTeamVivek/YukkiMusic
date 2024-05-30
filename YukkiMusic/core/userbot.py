@@ -28,6 +28,7 @@ class Userbot(Client):
             api_hash=config.API_HASH,
             session_string=str(config.STRING1),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
+            no_updates=False
             workdir="datafiles",
         )
 
