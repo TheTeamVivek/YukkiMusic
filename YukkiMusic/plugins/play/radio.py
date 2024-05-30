@@ -5,21 +5,13 @@ from config import BANNED_USERS, adminlist
 from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import (
-    get_cmode,
-    get_lang,
-    get_playmode,
-    get_playtype,
-    is_active_chat,
-)
+from YukkiMusic.utils.database import get_cmode, get_lang, get_playmode, get_playtype
 from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
 
 
 @app.on_message(
-    filters.command(["radio", "cradio", "vradio"])
-    & filters.group
-    & ~BANNED_USERS
+    filters.command(["radio", "cradio", "vradio"]) & filters.group & ~BANNED_USERS
 )
 async def radio(
     client,
