@@ -108,7 +108,7 @@ from YukkiMusic import app
 from YukkiMusic.utils.database import get_served_users
 from config import LOGGER_ID
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-if app.username == "YukkiMusic_vkBot"
+if app.username == "YukkiMusic_vkBot":
     AUTO_GCASTS = True
     AUTO_GCAST = True
 else:
