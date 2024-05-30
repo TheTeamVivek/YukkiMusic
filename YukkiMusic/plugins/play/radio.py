@@ -1,5 +1,5 @@
 import logging
-from random import choice
+
 from pyrogram import filters
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import (
@@ -141,7 +141,7 @@ async def radio(client, message: Message):
         else:
             video = None
     RADIO_URL = "http://media-ice.musicradio.com/CapitalMP3?.mp3&listening-from-radio-garden=1616312105154"
-    Capital_FM= "http://media-ice.musicradio.com/CapitalMP3?.mp3&listening-from-radio-garden=1616312105154"
+    Capital_FM = "http://media-ice.musicradio.com/CapitalMP3?.mp3&listening-from-radio-garden=1616312105154"
     mystic = await message.reply_text(
         _["play_2"].format(channel) if channel else _["play_1"]
     )
