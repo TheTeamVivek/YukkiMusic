@@ -147,36 +147,30 @@ async def helper_cb(client, CallbackQuery, _):
     except Exception as e:
         logging.exception(e)
 
-
+import re
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-
-from YukkiMusic.__main__ import HELPABLE
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from YukkiMusic import app
 from YukkiMusic.utils.inlinefunction import paginate_modules
-
+from YukkiMusic.__main__ import HELPABLE
 
 async def help_parser(name, keyboard=None):
     if not keyboard:
         keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help"))
     return (
-        """ʜᴇʟʟᴏ {first_name},
+        f"""ʜᴇʟʟᴏ {name},
 
 ᴄʟɪᴄᴋ ᴏɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴs ғᴏʀ ᴍᴏʀᴇ ɪɴғᴏʀᴍᴀᴛɪᴏɴ.
 
 ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅs sᴛᴀʀᴛs ᴡɪᴛʜ :-  /
-""".format(
-            first_name=name
-        ),
+""",
         keyboard,
     )
-
 
 @app.on_callback_query(filters.regex("shikharbro"))
 async def shikhar(_, CallbackQuery):
     text, keyboard = await help_parser(CallbackQuery.from_user.mention)
-    print("DEBUG: Callback data:", keyboard.inline_keyboard)  # Debugging print
     await CallbackQuery.message.edit(text, reply_markup=keyboard)
-
 
 @app.on_callback_query(filters.regex(r"help_(.*?)"))
 async def help_button(client, query):
@@ -198,9 +192,7 @@ async def help_button(client, query):
         module = mod_match.group(1)
         prev_page_num = int(mod_match.group(2))
         text = (
-            "{} **{}**:\n".format(
-                "**ʜᴇʀᴇ ɪs ᴛʜᴇ ʜᴇʟᴘ ғᴏʀ**", HELPABLE[module].__MODULE__
-            )
+            f"**ʜᴇʀᴇ ɪs ᴛʜᴇ ʜᴇʟᴘ ғᴏʀ** {HELPABLE[module].__MODULE__}:\n"
             + HELPABLE[module].__HELP__
         )
 
@@ -214,8 +206,6 @@ async def help_button(client, query):
                 ],
             ]
         )
-
-        print("DEBUG: Callback data:", key.inline_keyboard)  # Debugging print
 
         await query.message.edit(
             text=text,
@@ -233,8 +223,6 @@ async def help_button(client, query):
 
     elif prev_match:
         curr_page = int(prev_match.group(1))
-        if curr_page < 0:
-            curr_page = max_num_pages - 1
         await query.message.edit(
             text=top_text,
             reply_markup=InlineKeyboardMarkup(
