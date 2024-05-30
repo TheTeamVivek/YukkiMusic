@@ -88,9 +88,8 @@ async def help_parser(name, keyboard=None):
         keyboard,
     )
 
-
 @app.on_callback_query(filters.regex(r"help_(.*?)"))
-async def help_button(client, query):
+async def help_button(client, query: types.CallbackQuery):
     home_match = re.match(r"help_home\((.+?)\)", query.data)
     mod_match = re.match(r"help_module\((.+?),(.+?)\)", query.data)
     prev_match = re.match(r"help_prev\((.+?)\)", query.data)
@@ -124,11 +123,19 @@ async def help_button(client, query):
             ]
         )
 
-        await query.message.edit(
-            text=text,
-            reply_markup=key,
-            disable_web_page_preview=True,
-        )
+        if query.inline_message_id:
+            await client.edit_inline_text(
+                inline_message_id=query.inline_message_id,
+                text=text,
+                reply_markup=key,
+                disable_web_page_preview=True,
+            )
+        else:
+            await query.message.edit(
+                text=text,
+                reply_markup=key,
+                disable_web_page_preview=True,
+            )
 
     elif home_match:
         await app.send_message(
@@ -140,40 +147,78 @@ async def help_button(client, query):
 
     elif prev_match:
         curr_page = int(prev_match.group(1))
-        await query.message.edit(
-            text=top_text,
-            reply_markup=InlineKeyboardMarkup(
-                paginate_modules(curr_page, HELPABLE, "help")
-            ),
-            disable_web_page_preview=True,
-        )
+        if query.inline_message_id:
+            await client.edit_inline_text(
+                inline_message_id=query.inline_message_id,
+                text=top_text,
+                reply_markup=InlineKeyboardMarkup(
+                    paginate_modules(curr_page, HELPABLE, "help")
+                ),
+                disable_web_page_preview=True,
+            )
+        else:
+            await query.message.edit(
+                text=top_text,
+                reply_markup=InlineKeyboardMarkup(
+                    paginate_modules(curr_page, HELPABLE, "help")
+                ),
+                disable_web_page_preview=True,
+            )
 
     elif next_match:
         next_page = int(next_match.group(1))
-        await query.message.edit(
-            text=top_text,
-            reply_markup=InlineKeyboardMarkup(
-                paginate_modules(next_page, HELPABLE, "help")
-            ),
-            disable_web_page_preview=True,
-        )
+        if query.inline_message_id:
+            await client.edit_inline_text(
+                inline_message_id=query.inline_message_id,
+                text=top_text,
+                reply_markup=InlineKeyboardMarkup(
+                    paginate_modules(next_page, HELPABLE, "help")
+                ),
+                disable_web_page_preview=True,
+            )
+        else:
+            await query.message.edit(
+                text=top_text,
+                reply_markup=InlineKeyboardMarkup(
+                    paginate_modules(next_page, HELPABLE, "help")
+                ),
+                disable_web_page_preview=True,
+            )
 
     elif back_match:
         prev_page_num = int(back_match.group(1))
-        await query.message.edit(
-            text=top_text,
-            reply_markup=InlineKeyboardMarkup(
-                paginate_modules(prev_page_num, HELPABLE, "help")
-            ),
-            disable_web_page_preview=True,
-        )
+        if query.inline_message_id:
+            await client.edit_inline_text(
+                inline_message_id=query.inline_message_id,
+                text=top_text,
+                reply_markup=InlineKeyboardMarkup(
+                    paginate_modules(prev_page_num, HELPABLE, "help")
+                ),
+                disable_web_page_preview=True,
+            )
+        else:
+            await query.message.edit(
+                text=top_text,
+                reply_markup=InlineKeyboardMarkup(
+                    paginate_modules(prev_page_num, HELPABLE, "help")
+                ),
+                disable_web_page_preview=True,
+            )
 
     elif create_match:
         text, keyboard = await help_parser(query)
-        await query.message.edit(
-            text=text,
-            reply_markup=keyboard,
-            disable_web_page_preview=True,
-        )
+        if query.inline_message_id:
+            await client.edit_inline_text(
+                inline_message_id=query.inline_message_id,
+                text=text,
+                reply_markup=keyboard,
+                disable_web_page_preview=True,
+            )
+        else:
+            await query.message.edit(
+                text=text,
+                reply_markup=keyboard,
+                disable_web_page_preview=True,
+            )
 
     await client.answer_callback_query(query.id)
