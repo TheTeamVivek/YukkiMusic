@@ -30,10 +30,10 @@ def paginate_modules(page_n, module_dict, prefix, chat=None, closebutton="True")
                 )
                 for x in module_dict.values()
             ]
-        )
+            )
         else:
             modules = sorted(
-            [
+                [
                 EqInlineKeyboardButton(
                     x.__MODULE__,
                     callback_data="{}_module({},{},{})".format(
@@ -41,8 +41,8 @@ def paginate_modules(page_n, module_dict, prefix, chat=None, closebutton="True")
                     ),
                 )
                 for x in module_dict.values()
-            ]
-        )
+                ]
+            )
 
         pairs = [modules[i : i + NUM_COLUMNS] for i in range(0, len(modules), NUM_COLUMNS)]
 
@@ -68,7 +68,7 @@ def paginate_modules(page_n, module_dict, prefix, chat=None, closebutton="True")
                     callback_data="{}_next({})".format(prefix, modulo_page + 1),
                 ),
             )
-           ]
+               ]
 
        return pairs
 
