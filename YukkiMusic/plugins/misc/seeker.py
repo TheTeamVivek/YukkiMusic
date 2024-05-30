@@ -121,7 +121,7 @@ MESSAGES = f"""‣  тнιѕ ιѕ {app.mention}
 
 
 BUTTONS = InlineKeyboardMarkup(
-    [[InlineKeyboardButton("𝙰𝚍𝚍 𝙼𝚎", url=f"https://t.me/YukkiSongBot?startgroup=true")]]
+    [[InlineKeyboardButton("𝙰𝚍𝚍 𝙼𝚎", url=f"https://t.me/YukkiMusic_vkBot?startgroup=true")]]
 )
 
 
