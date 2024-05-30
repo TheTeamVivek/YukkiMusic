@@ -18,14 +18,14 @@ from youtubesearchpython.__future__ import VideosSearch
 from config import BANNED_USERS
 from YukkiMusic import app
 from YukkiMusic.utils.inlinequery import answer
-
+from .help import help_parser
 
 @app.on_inline_query(~BANNED_USERS)
 async def inline_query_handler(client, query):
     text = query.query.strip().lower()
     answers = []
-        """thumb_image = "https://telegra.ph/file/027283ee9defebc3298b8.png"
-    text, button = help_parser(
+    thumb_image = "https://telegra.ph/file/027283ee9defebc3298b8.png"
+    text, keyboard = await help_parser(query.from_user.mention)
     answer.append(
         InlineQueryResultPhoto(
             photo_url=f"{thumb_image}",
@@ -34,10 +34,10 @@ async def inline_query_handler(client, query):
             description=f"🥀 Open Help Menu ...",
             caption=text
             ,
-            reply_markup=InlineKeyboardMarkup(button),
+            reply_markup=InlineKeyboardMarkup(keyboard),
         )
     )
-   """
+
     if text.strip() == "":
         try:
             await client.answer_inline_query(query.id, results=answer, cache_time=10)
