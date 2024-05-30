@@ -110,71 +110,71 @@ async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuer
             module = mod_match.group(1)
             prev_page_num = int(mod_match.group(2))
             text = (
-            f"**ʜᴇʀᴇ ɪs ᴛʜᴇ ʜᴇʟᴘ ғᴏʀ** {HELPABLE[module].__MODULE__}:\n"
-            + HELPABLE[module].__HELP__
+                f"**ʜᴇʀᴇ ɪs ᴛʜᴇ ʜᴇʟᴘ ғᴏʀ** {HELPABLE[module].__MODULE__}:\n"
+                + HELPABLE[module].__HELP__
             )
 
             key = InlineKeyboardMarkup(
-            [
                 [
-                    InlineKeyboardButton(
-                        text="↪️ Back", callback_data=f"help_back({prev_page_num})"
-                    ),
-                    InlineKeyboardButton(text="🔄 Close", callback_data="close"),
-                ],
+                    [
+                        InlineKeyboardButton(
+                            text="↪️ Back", callback_data=f"help_back({prev_page_num})"
+                        ),
+                        InlineKeyboardButton(text="🔄 Close", callback_data="close"),
+                    ],
                 ]
             )
 
             await query.message.edit(
-            text=text,
-            reply_markup=key,
-            disable_web_page_preview=True,
+                text=text,
+                reply_markup=key,
+                disable_web_page_preview=True,
             )
 
         elif home_match:
             await app.send_message(
-            query.from_user.id,
-            text=home_text_pm,
-            reply_markup=InlineKeyboardMarkup(out),
+                query.from_user.id,
+                text=home_text_pm,
+                reply_markup=InlineKeyboardMarkup(out),
             )
             await query.message.delete()
 
         elif prev_match:
             curr_page = int(prev_match.group(1))
             await query.message.edit(
-            text=top_text,
-            reply_markup=InlineKeyboardMarkup(
-                paginate_modules(curr_page, HELPABLE, "help")
+                text=top_text,
+                reply_markup=InlineKeyboardMarkup(
+                    paginate_modules(curr_page, HELPABLE, "help")
                 ),
-            disable_web_page_preview=True,
+                disable_web_page_preview=True,
             )
 
         elif next_match:
             next_page = int(next_match.group(1))
             await query.message.edit(
-            text=top_text,
-            reply_markup=InlineKeyboardMarkup(
-                paginate_modules(next_page, HELPABLE, "help")
-            ),
-            disable_web_page_preview=True,
+                text=top_text,
+                reply_markup=InlineKeyboardMarkup(
+                    paginate_modules(next_page, HELPABLE, "help")
+                ),
+                disable_web_page_preview=True,
             )
 
         elif back_match:
             prev_page_num = int(back_match.group(1))
             await query.message.edit(
-            text=top_text,
-            reply_markup=InlineKeyboardMarkup(
-                paginate_modules(prev_page_num, HELPABLE, "help")
-            ),
-             disable_web_page_preview=True,
-        )
+                text=top_text,
+                reply_markup=InlineKeyboardMarkup(
+                    paginate_modules(prev_page_num, HELPABLE, "help")
+                ),
+                disable_web_page_preview=True,
+            )
 
         elif create_match:
             text, keyboard = await help_parser(query)
             await query.message.edit(
-            text=text,
-            reply_markup=keyboard,
-            disable_web_page_preview=True,
+                text=text,
+                reply_markup=keyboard,
+                disable_web_page_preview=True,
             )
 
         await client.answer_callback_query(query.id)
@@ -184,67 +184,67 @@ async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuer
             module = mod_match.group(1)
             prev_page_num = int(mod_match.group(2))
             text = (
-            f"**ʜᴇʀᴇ ɪs ᴛʜᴇ ʜᴇʟᴘ ғᴏʀ** {HELPABLE[module].__MODULE__}:\n"
-            + HELPABLE[module].__HELP__
+                f"**ʜᴇʀᴇ ɪs ᴛʜᴇ ʜᴇʟᴘ ғᴏʀ** {HELPABLE[module].__MODULE__}:\n"
+                + HELPABLE[module].__HELP__
             )
 
             key = InlineKeyboardMarkup(
-            [
                 [
-                    InlineKeyboardButton(
-                        text="↪️ Back", callback_data=f"help_back({prev_page_num})"
-                    ),
-                    InlineKeyboardButton(text="🔄 Close", callback_data="close"),
-                ],
+                    [
+                        InlineKeyboardButton(
+                            text="↪️ Back", callback_data=f"help_back({prev_page_num})"
+                        ),
+                        InlineKeyboardButton(text="🔄 Close", callback_data="close"),
+                    ],
                 ]
             )
             await query.edit_inline_text(
-               query.inline_message_id,
-               text=text,
-               reply_markup=key,
-               disable_web_page_preview=True,
+                query.inline_message_id,
+                text=text,
+                reply_markup=key,
+                disable_web_page_preview=True,
             )
 
         elif prev_match:
             curr_page = int(prev_match.group(1))
             await query.edit_inline_text(
-            query.inline_message_id,
-            text=top_text,
-            reply_markup=InlineKeyboardMarkup(
-                paginate_modules(curr_page, HELPABLE, "help")
+                query.inline_message_id,
+                text=top_text,
+                reply_markup=InlineKeyboardMarkup(
+                    paginate_modules(curr_page, HELPABLE, "help")
                 ),
-            disable_web_page_preview=True,
+                disable_web_page_preview=True,
             )
 
         elif next_match:
             next_page = int(next_match.group(1))
             await query.edit_inline_text(
-            query.inline_message_id,
-            text=top_text,
-            reply_markup=InlineKeyboardMarkup(
-                paginate_modules(next_page, HELPABLE, "help")
-            ),
-            disable_web_page_preview=True,
+                query.inline_message_id,
+                text=top_text,
+                reply_markup=InlineKeyboardMarkup(
+                    paginate_modules(next_page, HELPABLE, "help")
+                ),
+                disable_web_page_preview=True,
             )
 
         elif back_match:
             prev_page_num = int(back_match.group(1))
             await query.edit_inline_text(
-            query.inline_message_id,
-            text=top_text,
-            reply_markup=InlineKeyboardMarkup(
-                paginate_modules(prev_page_num, HELPABLE, "help")
-            ),
-             disable_web_page_preview=True,
-        )
+                query.inline_message_id,
+                text=top_text,
+                reply_markup=InlineKeyboardMarkup(
+                    paginate_modules(prev_page_num, HELPABLE, "help")
+                ),
+                disable_web_page_preview=True,
+            )
 
         elif create_match:
             text, keyboard = await help_parser(query)
             await query.edit_inline_text(
-             query.inline_message_id,
-            text=text,
-            reply_markup=keyboard,
-            disable_web_page_preview=True,
+                query.inline_message_id,
+                text=text,
+                reply_markup=keyboard,
+                disable_web_page_preview=True,
             )
 
         await client.answer_callback_query(query.id)
