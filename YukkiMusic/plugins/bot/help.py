@@ -147,12 +147,16 @@ async def helper_cb(client, CallbackQuery, _):
     except Exception as e:
         logging.exception(e)
 
+
 import re
+
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 from YukkiMusic import app
-from YukkiMusic.utils.inlinefunction import paginate_modules
 from YukkiMusic.__main__ import HELPABLE
+from YukkiMusic.utils.inlinefunction import paginate_modules
+
 
 async def help_parser(name, keyboard=None):
     if not keyboard:
@@ -167,10 +171,12 @@ async def help_parser(name, keyboard=None):
         keyboard,
     )
 
+
 @app.on_callback_query(filters.regex("shikharbro"))
 async def shikhar(_, CallbackQuery):
     text, keyboard = await help_parser(CallbackQuery.from_user.mention)
     await CallbackQuery.message.edit(text, reply_markup=keyboard)
+
 
 @app.on_callback_query(filters.regex(r"help_(.*?)"))
 async def help_button(client, query):
