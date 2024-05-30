@@ -106,13 +106,8 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from config import LOG_GROUP_ID
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_served_users
+from pyrogram.errors import FloodWait
 
-if app.username == "YukkiMusic_vkBot":
-    AUTO_GCASTS = True
-    AUTO_GCAST = True
-else:
-    AUTO_GCASTS = False
-    AUTO_GCAST = False
 START_IMG_URLS = "https://graph.org/file/497d715b03115857db6d8.jpg"
 
 MESSAGES = f"""‣  тнιѕ ιѕ {app.mention}
@@ -130,24 +125,13 @@ BUTTONS = InlineKeyboardMarkup(
     ]
 )
 
-
-TEXT = """ᴀᴜᴛᴏ ɢᴄᴀsᴛ ɪs ᴇɴᴀʙʟᴇᴅ sᴏ ᴀᴜᴛᴏ ɢᴄᴀsᴛ/ʙʀᴏᴀᴅᴄᴀsᴛ ɪs ᴅᴏɪɴ ɪɴ ᴀʟʟ ᴄʜᴀᴛs ᴄᴏɴᴛɪɴᴜᴏᴜsʟʏ. \nɪᴛ ᴄᴀɴ ʙᴇ sᴛᴏᴘᴘᴇᴅ ʙʏ ᴘᴜᴛ ᴠᴀʀɪᴀʙʟᴇ [ᴀᴜᴛᴏ_ɢᴄᴀsᴛ = (ᴋᴇᴇᴘ ʙʟᴀɴᴋ & ᴅᴏɴᴛ ᴡʀɪᴛᴇ ᴀɴʏᴛʜɪɴɢ)]"""
-
-
-async def send_text_once():
-    try:
-        await app.send_message(LOG_GROUP_ID, TEXT)
-    except Exception as e:
-        pass
-
-
 async def send_message_to_chats():
     try:
         chats = await get_served_users()
 
         for chat_info in chats:
             chat_id = chat_info.get("chat_id")
-            if isinstance(chat_id, int):  # Check if chat_id is an integer
+            if isinstance(chat_id, int):  
                 try:
                     await app.send_photo(
                         chat_id,
@@ -155,29 +139,20 @@ async def send_message_to_chats():
                         caption=MESSAGES,
                         reply_markup=BUTTONS,
                     )
-                    await asyncio.sleep(
-                        20
-                    )  # Sleep for 100 second between sending messages
-                except Exception as e:
-                    pass  # Do nothing if an error occurs while sending message
-    except Exception as e:
-        pass  # Do nothing if an error occurs while fetching served chats
+                except FloodWait as e:
+                    await asyncio.sleep(e.value)
+                except Exception:
+                    pass
+    except Exception:
+        pass
 
 
 async def continuous_broadcast():
-    await send_text_once()  # Send TEXT once when bot starts
-
     while True:
-        if AUTO_GCAST:
-            try:
-                await send_message_to_chats()
-            except Exception as e:
-                pass
+        try:
+            await send_message_to_chats()
+        except Exception as e:
+            pass
+    await asyncio.sleep(3600)
 
-        # Wait for 100000 seconds before next broadcast
-        await asyncio.sleep(3600)
-
-
-# Start the continuous broadcast loop if AUTO_GCAST is True
-if AUTO_GCAST:
-    asyncio.create_task(continuous_broadcast())
+asyncio.create_task(continuous_broadcast())
