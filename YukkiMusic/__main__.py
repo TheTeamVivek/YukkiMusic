@@ -19,8 +19,6 @@ from YukkiMusic.core.call import Yukki
 from YukkiMusic.plugins import ALL_MODULES
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
-# from YukkiMusic.plugins.tools.clone import restart_bots
-
 loop = asyncio.get_event_loop_policy().get_event_loop()
 HELPABLE = {}
 
@@ -58,7 +56,6 @@ async def init():
             if hasattr(imported_module, "__HELP__") and imported_module.__HELP__:
                 HELPABLE[imported_module.__MODULE__.lower()] = imported_module
     LOGGER("Yukkimusic.plugins").info("Successfully Imported Modules ")
-    # await restart_bots()
     await userbot.start()
     await Yukki.start()
     await Yukki.decorators()
@@ -68,7 +65,6 @@ async def init():
         await telethn.disconnect()
     else:
         await telethn.run_until_disconnected()
-
 
 if __name__ == "__main__":
     telethn.start(bot_token=config.BOT_TOKEN)
