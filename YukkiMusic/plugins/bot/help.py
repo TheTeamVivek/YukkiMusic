@@ -52,7 +52,7 @@ async def helper_private(
                 pass
         language = await get_lang(chat_id)
         _ = get_string(language)
-        text, keyboard = await help_parser(CallbackQuery.from_user.mention)
+        text, keyboard = await help_parser(update.from_user.mention)
         if START_IMG_URL:
             await update.reply_photo(
                 photo=START_IMG_URL,
