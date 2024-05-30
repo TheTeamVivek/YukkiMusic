@@ -16,9 +16,7 @@ from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
 
 
-@app.on_message(
-    filters.command(["radio", "cradio", "vradio"]) & filters.group & ~BANNED_USERS
-)
+@app.on_message(filters.command(["radio", "cradio", "vradio"]) & filters.group & ~BANNED_USERS)
 async def radio(
     client,
     message: Message,
@@ -47,17 +45,22 @@ async def radio(
     else:
         chat_id = message.chat.id
         channel = None
+
+    # Initialize 'video' to avoid UnboundLocalError
+    video = False
     if message.command[0][0] == "v":
         video = True
     else:
         if "-v" in message.text:
             video = True
+
+    # Initialize 'fplay' to avoid UnboundLocalError
+    fplay = False
     if message.command[0][-1] == "e":
         if not await is_active_chat(chat_id):
             return await message.reply_text(_["play_18"])
         fplay = True
-    else:
-        fplay = None
+
     mystic = await message.reply_text(
         _["play_2"].format(channel) if channel else _["play_1"]
     )
