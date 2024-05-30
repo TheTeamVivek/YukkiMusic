@@ -20,6 +20,8 @@ async def radio(
     client,
     message: Message,
 ):
+    language = await get_lang(message.chat.id)
+    _ = get_string(language)
     playmode = await get_playmode(message.chat.id)
     playty = await get_playtype(message.chat.id)
     if playty != "Everyone":
@@ -30,8 +32,6 @@ async def radio(
             else:
                 if message.from_user.id not in admins:
                     return await message.reply_text(_["play_4"])
-    language = await get_lang(message.chat.id)
-    _ = get_string(language)
     if message.command[0][0] == "c":
         chat_id = await get_cmode(message.chat.id)
         if chat_id is None:
