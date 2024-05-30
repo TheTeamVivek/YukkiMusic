@@ -142,7 +142,6 @@ async def radio(client, message: Message):
             video = None
     RADIO_URL = "http://media-ice.musicradio.com/CapitalMP3?.mp3&listening-from-radio-garden=1616312105154"
     Capital_FM= "http://media-ice.musicradio.com/CapitalMP3?.mp3&listening-from-radio-garden=1616312105154"
-        YoPunjabi="https://yopunjabihdlive-lh.akamaihd.net/i/YoPunjabiHDLive_1_1@345454/index_1_a-p.m3u8"
     mystic = await message.reply_text(
         _["play_2"].format(channel) if channel else _["play_1"]
     )
