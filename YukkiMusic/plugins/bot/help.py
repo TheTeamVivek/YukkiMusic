@@ -266,4 +266,3 @@ async def help_button(client, query, _):
         )
 
     return await client.answer_callback_query(query.id)
-
