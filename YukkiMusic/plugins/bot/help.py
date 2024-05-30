@@ -90,7 +90,7 @@ async def help_parser(name, keyboard=None):
 
 
 @app.on_callback_query(filters.regex(r"help_(.*?)"))
-async def help_button(client, query):
+async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuery]):
     home_match = re.match(r"help_home\((.+?)\)", query.data)
     mod_match = re.match(r"help_module\((.+?),(.+?)\)", query.data)
     prev_match = re.match(r"help_prev\((.+?)\)", query.data)
