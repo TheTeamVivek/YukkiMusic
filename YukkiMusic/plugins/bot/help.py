@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 
-import logging
 import random
 import re
 from typing import Union
@@ -17,28 +16,12 @@ from pyrogram import filters, types
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from config import BANNED_USERS, PHOTO, START_IMG_URL
-from strings import get_command, get_string, helpers
+from strings import get_command, get_string
 from YukkiMusic import HELPABLE, app
-from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
-from YukkiMusic.utils.decorators.language import LanguageStart, languageCB
-from YukkiMusic.utils.inline.help import (
-    help_back_markup,
-    help_mark,
-    help_pannel,
-    private_help_panel,
-)
+from YukkiMusic.utils.decorators.language import LanguageStart
+from YukkiMusic.utils.inline.help import private_help_panel
 from YukkiMusic.utils.inlinefunction import paginate_modules
-import re
-
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-
-from YukkiMusic import HELPABLE, app
-from YukkiMusic.utils.inlinefunction import paginate_modules
-
-
-
 
 ### Command
 HELP_COMMAND = get_command("HELP_COMMAND")
@@ -92,9 +75,6 @@ async def help_com_group(client, message: Message, _):
     await message.reply_text(_["help_2"], reply_markup=InlineKeyboardMarkup(keyboard))
 
 
- 
-
-
 async def help_parser(name, keyboard=None):
     if not keyboard:
         keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help"))
@@ -107,6 +87,7 @@ async def help_parser(name, keyboard=None):
 """,
         keyboard,
     )
+
 
 @app.on_callback_query(filters.regex(r"help_(.*?)"))
 async def help_button(client, query):
