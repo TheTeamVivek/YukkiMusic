@@ -41,7 +41,9 @@ async def inline_query_handler(client, query):
             )
         )
         try:
-            return await client.answer_inline_query(query.id, results=answer, cache_time=10)
+            return await client.answer_inline_query(
+                query.id, results=answer, cache_time=10
+            )
         except Exception as e:
             logging.exception(e)
             return
