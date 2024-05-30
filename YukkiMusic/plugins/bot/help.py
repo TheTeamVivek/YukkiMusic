@@ -88,7 +88,6 @@ async def help_parser(name, keyboard=None):
         keyboard,
     )
 
-
 @app.on_callback_query(filters.regex(r"help_(.*?)"))
 async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuery]):
     home_match = re.match(r"help_home\((.+?)\)", query.data)
@@ -125,7 +124,7 @@ async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuer
         )
 
         if query.inline_message_id:
-            await query.edit_inline_text(
+            await client.edit_inline_text(
                 inline_message_id=query.inline_message_id,
                 text=text,
                 reply_markup=key,
@@ -139,16 +138,16 @@ async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuer
             )
 
     elif home_match:
-        await app.send_message(
+        await client.send_message(
             query.from_user.id,
-            text=home_text_pm,
+            text=top_text,
             reply_markup=InlineKeyboardMarkup(out),
         )
 
     elif prev_match:
         curr_page = int(prev_match.group(1))
         if query.inline_message_id:
-            await query.edit_inline_text(
+            await client.edit_inline_text(
                 inline_message_id=query.inline_message_id,
                 text=top_text,
                 reply_markup=InlineKeyboardMarkup(
@@ -168,7 +167,7 @@ async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuer
     elif next_match:
         next_page = int(next_match.group(1))
         if query.inline_message_id:
-            await query.edit_inline_text(
+            await client.edit_inline_text(
                 inline_message_id=query.inline_message_id,
                 text=top_text,
                 reply_markup=InlineKeyboardMarkup(
@@ -188,7 +187,7 @@ async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuer
     elif back_match:
         prev_page_num = int(back_match.group(1))
         if query.inline_message_id:
-            await query.edit_inline_text(
+            await client.edit_inline_text(
                 inline_message_id=query.inline_message_id,
                 text=top_text,
                 reply_markup=InlineKeyboardMarkup(
@@ -208,7 +207,7 @@ async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuer
     elif create_match:
         text, keyboard = await help_parser(query)
         if query.inline_message_id:
-            await query.edit_inline_text(
+            await client.edit_inline_text(
                 inline_message_id=query.inline_message_id,
                 text=text,
                 reply_markup=keyboard,
