@@ -17,7 +17,7 @@ class EqInlineKeyboardButton(InlineKeyboardButton):
         return self.text > other.text
 
 
-def paginate_modules(page_n, module_dict, prefix, chat=None):
+def paginate_modules(page_n, module_dict, prefix, chat=None, closebutton="True"):
     if not chat:
         modules = sorted(
             [
@@ -58,10 +58,11 @@ def paginate_modules(page_n, module_dict, prefix, chat=None):
                         modulo_page - 1 if modulo_page > 0 else max_num_pages - 1,
                     ),
                 ),
-                EqInlineKeyboardButton(
-                    "Bᴀᴄᴋ",
+                if closebutton=="True":
+                    EqInlineKeyboardButton(
+                        "Bᴀᴄᴋ",
                     callback_data="settingsback_helper",
-                ),
+                    ),
                 EqInlineKeyboardButton(
                     "❯",
                     callback_data="{}_next({})".format(prefix, modulo_page + 1),
