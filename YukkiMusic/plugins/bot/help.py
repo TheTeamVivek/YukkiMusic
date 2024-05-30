@@ -10,6 +10,7 @@
 
 import logging
 import random
+import re
 from typing import Union
 
 from pyrogram import filters, types
@@ -21,6 +22,7 @@ from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
 from YukkiMusic.utils.decorators.language import LanguageStart, languageCB
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from YukkiMusic.utils.inline.help import (
     help_back_markup,
     help_mark,
@@ -28,6 +30,11 @@ from YukkiMusic.utils.inline.help import (
     private_help_panel,
 )
 
+from config import BANNED_USERS, OWNER_ID
+from YukkiMusic.utils.decorators.language import LanguageStart
+from YukkiMusic.utils.inline import private_panel
+from YukkiMusic.utils.inlinefunction import paginate_modules
+from YukkiMusic.__main__ import HELPABLE
 ### Command
 HELP_COMMAND = get_command("HELP_COMMAND")
 
