@@ -33,7 +33,11 @@ RADIO_STATION = {
 }
 
 
-@app.on_message(filters.command(["radioplayforce","radio", "cradio"]) & filters.group & ~BANNED_USERS)
+@app.on_message(
+    filters.command(["radioplayforce", "radio", "cradio"])
+    & filters.group
+    & ~BANNED_USERS
+)
 async def radio(client, message: Message):
     msg = await message.reply_text("ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ ᴀ ᴍᴏᴍᴇɴᴛ....")
     try:
