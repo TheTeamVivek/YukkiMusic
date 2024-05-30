@@ -33,11 +33,11 @@ async def inline_query_handler(client, query):
             thumb_url=f"{thumb_image}",
             description=f"🥀 Open Help Menu ...",
             caption=text
-            """,
+            ,
             reply_markup=InlineKeyboardMarkup(button),
         )
     )
-"""
+   """
     if text.strip() == "":
         try:
             await client.answer_inline_query(query.id, results=answer, cache_time=10)
