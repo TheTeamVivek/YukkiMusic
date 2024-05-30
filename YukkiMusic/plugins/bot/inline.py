@@ -43,7 +43,7 @@ async def inline_query_handler(client, query):
         except Exception as e:
             print(str(e))
 
-    if text.strip() == "":
+    elif text.strip() == "":
         try:
             await client.answer_inline_query(query.id, results=answer, cache_time=10)
         except:
