@@ -18,7 +18,9 @@ from youtubesearchpython.__future__ import VideosSearch
 from config import BANNED_USERS
 from YukkiMusic import app
 from YukkiMusic.utils.inlinequery import answer
+
 from .help import help_parser
+
 
 @app.on_inline_query(~BANNED_USERS)
 async def inline_query_handler(client, query):
@@ -32,8 +34,7 @@ async def inline_query_handler(client, query):
             title="🥀 Help Menu ✨",
             thumb_url=f"{thumb_image}",
             description=f"🥀 Open Help Menu ...",
-            caption=text
-            ,
+            caption=text,
             reply_markup=InlineKeyboardMarkup(keyboard),
         )
     )
