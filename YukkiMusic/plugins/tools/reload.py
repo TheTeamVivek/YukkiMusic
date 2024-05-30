@@ -9,7 +9,7 @@
 #
 
 import asyncio
-
+import logging 
 from pyrogram import filters
 from pyrogram.enums import ChatMembersFilter
 from pyrogram.types import CallbackQuery, Message
@@ -80,13 +80,15 @@ async def close_menu(_, CallbackQuery):
     try:
         await CallbackQuery.message.delete()
         await CallbackQuery.answer()
-    except:
+    except Exception as e:
+        logging.exception(e)
         try:
             await app.delete_messages(
                 chat_id=CallbackQuery.message.chat.id,
                 message_ids=CallbackQuery.message.id,
             )
-        except:
+        except Exception as e:
+            logging.exception(e)
             return
 
 
