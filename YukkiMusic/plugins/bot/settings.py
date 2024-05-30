@@ -85,8 +85,6 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
         await CallbackQuery.answer()
     except Exception as e:
         print(f"An error occurred: {e}")
-    if CallbackQuery.message.chat is None:
-        await CallbackQuery.message.delete()
     if CallbackQuery.message.chat.type == ChatType.PRIVATE:
         try:
             await app.resolve_peer(OWNER_ID[0])
