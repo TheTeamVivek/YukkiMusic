@@ -132,7 +132,7 @@ async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuer
             )
 
         elif home_match:
-        await app.send_message(
+            await app.send_message(
             query.from_user.id,
             text=home_text_pm,
             reply_markup=InlineKeyboardMarkup(out),
@@ -141,7 +141,7 @@ async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuer
 
         elif prev_match:
             curr_page = int(prev_match.group(1))
-        await query.message.edit(
+            await query.message.edit(
             text=top_text,
             reply_markup=InlineKeyboardMarkup(
                 paginate_modules(curr_page, HELPABLE, "help")
@@ -207,7 +207,7 @@ async def help_button(client, query: Union[types.InlineQuery, types.CallbackQuer
 
         elif prev_match:
             curr_page = int(prev_match.group(1))
-        await query.edit_inline_text(
+            await query.edit_inline_text(
             query.inline_message_id,
             text=top_text,
             reply_markup=InlineKeyboardMarkup(
