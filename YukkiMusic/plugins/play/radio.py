@@ -8,12 +8,123 @@ from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import get_cmode, get_lang, get_playmode, get_playtype
 from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
+import logging
+import os
+from random import randint
 
+import requests
+from pykeyboard import InlineKeyboard
+from pyrogram import filters
+from pyrogram.enums import ChatMemberStatus
+from pyrogram.errors import (
+    ChatAdminRequired,
+    InviteRequestSent,
+    UserAlreadyParticipant,
+    UserNotParticipant,
+)
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from youtube_search import YoutubeSearch
+
+from config import BANNED_USERS, SERVER_PLAYLIST_LIMIT
+from YukkiMusic import Carbon, app
+from YukkiMusic.utils.database import (
+    delete_playlist,
+    get_assistant,
+    get_playlist,
+    get_playlist_names,
+    save_playlist,
+)
+from YukkiMusic.utils.decorators.language import language, languageCB
+from YukkiMusic.utils.inline.playlist import (
+    botplaylist_markup,
+    get_cplaylist_markup,
+    get_playlist_markup,
+    warning_markup,
+)
+from YukkiMusic.utils.pastebin import Yukkibin
 
 @app.on_message(
     filters.command(["radio", "cradio", "vradio"]) & filters.group & ~BANNED_USERS
 )
 async def radio(client, message: Message):
+    msg = await message.reply_text("ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ ᴀ ᴍᴏᴍᴇɴᴛ....")
+    try:
+        try:
+            userbot = await get_assistant(message.chat.id)
+            get = await app.get_chat_member(message.chat.id, userbot.id)
+        except ChatAdminRequired:
+            return await msg.edit_text(
+                f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}."
+            )
+        if get.status == ChatMemberStatus.BANNED:
+            return await msg.edit_text(
+                text=f"» {userbot.mention} ᴀssɪsᴛᴀɴᴛ ɪs ʙᴀɴɴᴇᴅ ɪɴ {message.chat.title}\n\n𖢵 ɪᴅ : `{userbot.id}`\n𖢵 ɴᴀᴍᴇ : {userbot.mention}\n𖢵 ᴜsᴇʀɴᴀᴍᴇ : @{userbot.username}\n\nᴘʟᴇᴀsᴇ ᴜɴʙᴀɴ ᴛʜᴇ ᴀssɪsᴛᴀɴᴛ ᴀɴᴅ ᴘʟᴀʏ ᴀɢᴀɪɴ...",
+            )
+    except UserNotParticipant:
+        if message.chat.username:
+            invitelink = message.chat.username
+            try:
+                await userbot.resolve_peer(invitelink)
+            except Exception as ex:
+                logging.exception(ex)
+        else:
+            try:
+                invitelink = await client.export_chat_invite_link(message.chat.id)
+            except ChatAdminRequired:
+                return await msg.edit_text(
+                    f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}."
+                )
+            except InviteRequestSent:
+                try:
+                    await app.approve_chat_join_request(message.chat.id, userbot.id)
+                except Exception as e:
+                    return await msg.edit(
+                        f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
+                    )
+            except Exception as ex:
+                if "channels.JoinChannel" in str(ex) or "Username not found" in str(ex):
+                    return await msg.edit_text(
+                        f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}."
+                    )
+                else:
+                    return await msg.edit_text(
+                        f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
+                    )
+        if invitelink.startswith("https://t.me/+"):
+            invitelink = invitelink.replace("https://t.me/+", "https://t.me/joinchat/")
+        anon = await msg.edit_text(
+            f"ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...\n\nɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴛᴏ {message.chat.title}."
+        )
+        try:
+            await userbot.join_chat(invitelink)
+            await asyncio.sleep(2)
+            await msg.edit_text(
+                f"{userbot.mention} ᴊᴏɪɴᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ,\n\nsᴛᴀʀᴛɪɴɢ sᴛʀᴇᴀᴍ..."
+            )
+        except UserAlreadyParticipant:
+            pass
+        except InviteRequestSent:
+            try:
+                await app.approve_chat_join_request(message.chat.id, userbot.id)
+            except Exception as e:
+                return await msg.edit(
+                    f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
+                )
+        except Exception as ex:
+            if "channels.JoinChannel" in str(ex) or "Username not found" in str(ex):
+                return await msg.edit_text(
+                    f"» ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴs ᴛᴏ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ғᴏʀ ɪɴᴠɪᴛɪɴɢ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}."
+                )
+            else:
+                return await msg.edit_text(
+                    f"ғᴀɪʟᴇᴅ ᴛᴏ ɪɴᴠɪᴛᴇ {userbot.mention} ᴀssɪsᴛᴀɴᴛ ᴛᴏ {message.chat.title}.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
+                )
+
+        try:
+            await userbot.resolve_peer(invitelink)
+        except:
+            pass
+    await msg.delete()
     language = await get_lang(message.chat.id)
     _ = get_string(language)
     playmode = await get_playmode(message.chat.id)
