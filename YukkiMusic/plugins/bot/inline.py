@@ -8,12 +8,13 @@
 # All rights reserved.
 #
 
+import logging
+
 from pyrogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InlineQueryResultPhoto,
 )
-import logging
 from youtubesearchpython.__future__ import VideosSearch
 
 from config import BANNED_USERS, START_IMG_URL
