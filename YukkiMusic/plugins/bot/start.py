@@ -37,8 +37,8 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.decorators.language import LanguageStart
 from YukkiMusic.utils.formatters import get_readable_time
 from YukkiMusic.utils.functions import MARKDOWN, WELCOMEHELP
-from YukkiMusic.utils.inline import alive_panel, help_mark, private_panel, start_pannel
-
+from YukkiMusic.utils.inline import alive_panel, private_panel, start_pannel
+from .help import help_parser
 loop = asyncio.get_running_loop()
 
 
@@ -51,10 +51,11 @@ async def start_comm(client, message: Message, _):
         name = message.text.split(None, 1)[1]
         if name[0:4] == "help":
             if config.START_IMG_URL:
+                text, keyboard = await help_parser(message.from_user.mention)
                 return await message.reply_photo(
                     photo=START_IMG_URL,
-                    caption=_["help_1"],
-                    reply_markup=help_mark,
+                    caption=text,
+                    reply_markup=keyboard,
                 )
             else:
                 return await message.reply_photo(
