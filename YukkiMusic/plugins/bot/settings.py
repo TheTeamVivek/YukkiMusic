@@ -87,27 +87,42 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
         print(f"An error occurred: {e}")
     if CallbackQuery.message.chat.type == ChatType.PRIVATE:
         try:
-            await app.resolve_peer(OWNER_ID[0])
-            OWNER = OWNER_ID[0]
-        except:
-            OWNER = None
-        buttons = private_panel(_, app.username, OWNER)
-        try:
-            await CallbackQuery.edit_message_text(
+            try:
+                await app.resolve_peer(OWNER_ID[0])
+                OWNER = OWNER_ID[0]
+            except:
+                OWNER = None
+            buttons = private_panel(_, app.username, OWNER)
+            try:
+                await CallbackQuery.edit_message_text(
                 _["start_2"].format(app.mention),
                 reply_markup=InlineKeyboardMarkup(buttons),
-            )
-        except MessageNotModified:
-            pass
-    else:
-        buttons = setting_markup(_)
-        try:
-            await CallbackQuery.edit_message_reply_markup(
+                )
+            except MessageNotModified:
+                pass
+        else:
+            buttons = setting_markup(_)
+            try:
+                await CallbackQuery.edit_message_reply_markup(
                 reply_markup=InlineKeyboardMarkup(buttons)
-            )
-        except MessageNotModified:
-            pass
+                )
+            except MessageNotModified:
+                pass
 
+        except Exception:
+            try:
+                await app.resolve_peer(OWNER_ID[0])
+                OWNER = OWNER_ID[0]
+            except:
+                OWNER = None
+            buttons = private_panel(_, app.username, OWNER)
+            try:
+                await CallbackQuery.edit_message_text(
+                _["start_2"].format(app.mention),
+                reply_markup=InlineKeyboardMarkup(buttons),
+                )
+            except MessageNotModified:
+                pass
 
 ## Audio and Video Quality
 async def gen_buttons_aud(_, aud):
