@@ -39,6 +39,7 @@ class Userbot(Client):
             session_string=str(config.STRING2),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
             workdir="datafiles",
+            no_updates=False,
         )
 
         self.three = Client(
@@ -48,6 +49,7 @@ class Userbot(Client):
             session_string=str(config.STRING3),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
             workdir="datafiles",
+            no_updates=False,
         )
 
         self.four = Client(
@@ -57,6 +59,7 @@ class Userbot(Client):
             session_string=str(config.STRING4),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
             workdir="datafiles",
+            no_updates=False,
         )
 
         self.five = Client(
@@ -66,6 +69,7 @@ class Userbot(Client):
             session_string=str(config.STRING5),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
             workdir="datafiles",
+            no_updates=False,
         )
 
     async def start(self):
