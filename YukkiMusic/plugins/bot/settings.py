@@ -109,20 +109,20 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
             except MessageNotModified:
                 pass
 
-        except Exception:
-            try:
-                await app.resolve_peer(OWNER_ID[0])
-                OWNER = OWNER_ID[0]
-            except:
-                OWNER = None
-            buttons = private_panel(_, app.username, OWNER)
-            try:
-                await CallbackQuery.edit_message_text(
+    except Exception:
+        try:
+            await app.resolve_peer(OWNER_ID[0])
+            OWNER = OWNER_ID[0]
+        except:
+            OWNER = None
+        buttons = private_panel(_, app.username, OWNER)
+        try:
+            await CallbackQuery.edit_message_text(
                 _["start_2"].format(app.mention),
                 reply_markup=InlineKeyboardMarkup(buttons),
                 )
-            except MessageNotModified:
-                pass
+        except MessageNotModified:
+            pass
 
 ## Audio and Video Quality
 async def gen_buttons_aud(_, aud):
