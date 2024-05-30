@@ -1,7 +1,7 @@
 from pyrogram import filters
 from pyrogram.types import Message
 
-from config import BANNED_USERS, adminlist
+from config import BANNED_USERS, adminlist, RADIO_URL
 from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
