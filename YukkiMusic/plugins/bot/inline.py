@@ -28,9 +28,10 @@ from .help import help_parser
 async def inline_query_handler(client, query):
     text = query.query.strip().lower()
     answers = []
+    umm = []
     if text.strip() == "help_menu":
         text, keyboard = await help_parser(query.from_user.mention)
-        answer.append(
+        umm.append(
             InlineQueryResultPhoto(
                 photo_url=START_IMG_URL,
                 title="🥀 Help Menu ✨",
@@ -41,9 +42,10 @@ async def inline_query_handler(client, query):
             )
         )
         try:
-            return await client.answer_inline_query(
-                query.id, results=answer, cache_time=10
+            await client.answer_inline_query(
+                query.id, results=umm, cache_time=10
             )
+            return
         except Exception as e:
             logging.exception(e)
             return
