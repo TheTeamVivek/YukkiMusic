@@ -24,6 +24,20 @@ from YukkiMusic.utils.inlinequery import answer
 async def inline_query_handler(client, query):
     text = query.query.strip().lower()
     answers = []
+        """thumb_image = "https://telegra.ph/file/027283ee9defebc3298b8.png"
+    text, button = help_parser(
+    answer.append(
+        InlineQueryResultPhoto(
+            photo_url=f"{thumb_image}",
+            title="🥀 Help Menu ✨",
+            thumb_url=f"{thumb_image}",
+            description=f"🥀 Open Help Menu ...",
+            caption=text
+            """,
+            reply_markup=InlineKeyboardMarkup(button),
+        )
+    )
+"""
     if text.strip() == "":
         try:
             await client.answer_inline_query(query.id, results=answer, cache_time=10)
