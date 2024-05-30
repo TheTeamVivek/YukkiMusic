@@ -17,7 +17,9 @@ from YukkiMusic.utils.stream.stream import stream
 
 
 @app.on_message(
-    filters.command(["radio", "cradio", "vradio","playforceradio"]) & filters.group & ~BANNED_USERS
+    filters.command(["radio", "cradio", "vradio", "playforceradio"])
+    & filters.group
+    & ~BANNED_USERS
 )
 async def radio(
     client,
