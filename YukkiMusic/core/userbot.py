@@ -20,7 +20,7 @@ assistants = []
 assistantids = []
 clients = []
 
-if config.STRING:
+if config.STRING1:
     A1 = Client(
         "YukkiString1",
         api_id=config.API_ID,
