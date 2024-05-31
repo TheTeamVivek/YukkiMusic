@@ -7,7 +7,7 @@ from config import BANNED_USERS
     filters.command(["help"])
     & filters.private
     & ~BANNED_USERS
-)))
+)
 
 async def inline_help_menu(client, message):
     try:
@@ -31,6 +31,6 @@ async def inline_help_menu(client, message):
     filters.command(["ping"])
     & filters.private
     & ~BANNED_USERS
-)))
+)
 async def ping(c, m):
     await m.reply_text("I am alive")
