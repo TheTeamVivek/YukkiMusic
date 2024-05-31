@@ -29,6 +29,8 @@ if config.STRING1:
         # plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A1)
+else:
+    A1 = None
 if config.STRING2:
     A2 = Client(
         "YukkiString2",
@@ -38,6 +40,8 @@ if config.STRING2:
         # plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A2)
+else:
+    A2 = None
 if config.STRING3:
     A3 = Client(
         "YukkiString3",
@@ -47,7 +51,8 @@ if config.STRING3:
         # plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A3)
-
+else:
+    A3 = None
 if config.STRING4:
     A4 = Client(
         "YukkiString4",
@@ -58,6 +63,8 @@ if config.STRING4:
     )
     clients.append(A4)
 
+else:
+    A4 = None
 if config.STRING5:
     A5 = Client(
         "YukkiString5",
@@ -68,6 +75,8 @@ if config.STRING5:
     )
     clients.append(A5)
 
+else:
+    A5 = None
 
 class Userbot(Client):
     def __init__(self):
