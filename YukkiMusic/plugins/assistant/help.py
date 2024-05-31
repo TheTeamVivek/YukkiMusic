@@ -22,3 +22,8 @@ async def inline_help_menu(client: Client, message):
             pass
     except Exception as e:
         logging.exception(e)
+
+
+@Client.on_message(filters.command(["ping"], prefixes=[".", ""]))
+async def ping(c, m):
+    await m.reply_text("I am alive")
