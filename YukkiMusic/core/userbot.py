@@ -20,64 +20,60 @@ assistants = []
 assistantids = []
 
 
-
 A1 = Client(
-            "YukkiString1",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING1),
-            plugins=dict(root="YukkiMusic.assistant"),
-            workdir="datafiles",
-            no_updates=False,
-            ipv6=True,
-        )
+    "YukkiString1",
+    api_id=config.API_ID,
+    api_hash=config.API_HASH,
+    session_string=str(config.STRING1),
+    plugins=dict(root="YukkiMusic.assistant"),
+    workdir="datafiles",
+    no_updates=False,
+    ipv6=True,
+)
 
 A2 = Client(
-            "YukkiString2",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING2),
-            plugins=dict(root="YukkiMusic.assistant"),
-            workdir="datafiles",
-            no_updates=False,
-            ipv6=True,
-        )
+    "YukkiString2",
+    api_id=config.API_ID,
+    api_hash=config.API_HASH,
+    session_string=str(config.STRING2),
+    plugins=dict(root="YukkiMusic.assistant"),
+    workdir="datafiles",
+    no_updates=False,
+    ipv6=True,
+)
 
 A3 = Client(
-            "YukkiString3",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING3),
-            plugins=dict(root="YukkiMusic.plugins.assistant"),
-            workdir="datafiles",
-            no_updates=False,
-            ipv6=True,
+    "YukkiString3",
+    api_id=config.API_ID,
+    api_hash=config.API_HASH,
+    session_string=str(config.STRING3),
+    plugins=dict(root="YukkiMusic.plugins.assistant"),
+    workdir="datafiles",
+    no_updates=False,
+    ipv6=True,
 )
 
 A4 = Client(
-            "YukkiString4",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING4),
-            plugins=dict(root="YukkiMusic.plugins.assistant"),
-            workdir="datafiles",
-            no_updates=False,
-            ipv6=True,
- )
-
-A5 = Client(
-            "YukkiString5",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING5),
-            plugins=dict(root="YukkiMusic.plugins.assistant"),
-            workdir="datafiles",
-            no_updates=False,
-            ipv6=True,
+    "YukkiString4",
+    api_id=config.API_ID,
+    api_hash=config.API_HASH,
+    session_string=str(config.STRING4),
+    plugins=dict(root="YukkiMusic.plugins.assistant"),
+    workdir="datafiles",
+    no_updates=False,
+    ipv6=True,
 )
 
-
-
+A5 = Client(
+    "YukkiString5",
+    api_id=config.API_ID,
+    api_hash=config.API_HASH,
+    session_string=str(config.STRING5),
+    plugins=dict(root="YukkiMusic.plugins.assistant"),
+    workdir="datafiles",
+    no_updates=False,
+    ipv6=True,
+)
 
 
 class Userbot(Client):
@@ -87,7 +83,7 @@ class Userbot(Client):
         self.three = A3
         self.four = A4
         self.five = A5
-        
+
     async def start(self):
         LOGGER(__name__).info(f"Starting Assistant Clients")
         if config.STRING1:
