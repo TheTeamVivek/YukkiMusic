@@ -10,7 +10,7 @@
 
 import sys
 
-from pyrogram import Client, filters
+from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 
 import config
@@ -232,6 +232,7 @@ class AllClients:
                 handler = MessageHandler(func, filters=fltrs)
                 client.add_handler(handler)
             return func
+
         return decorator
 
 
