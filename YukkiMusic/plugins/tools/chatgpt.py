@@ -1,9 +1,9 @@
 import requests
 from pyrogram import filters
-from pyrogram.enums import ChatAction
+from YUKKI import api
 
 from YukkiMusic import app
-from YUKKI import api
+
 
 @app.on_message(
     filters.command(
@@ -24,8 +24,8 @@ async def chatgpt_chat(bot, message):
 
     try:
         results = api().chatgpt(user_input)
-        if results['success']:
-            await message.reply_text(results['results'])
+        if results["success"]:
+            await message.reply_text(results["results"])
     except requests.exceptions.RequestException as e:
         pass
 
