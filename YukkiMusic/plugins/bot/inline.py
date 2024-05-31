@@ -28,27 +28,7 @@ from .help import help_parser
 async def inline_query_handler(client, query):
     text = query.query.strip().lower()
     answers = []
-    umm = []
-    if text.strip() == "help_menu":
-        text, keyboard = await help_parser(query.from_user.mention, closebutton="True")
-        umm.append(
-            InlineQueryResultPhoto(
-                photo_url=START_IMG_URL,
-                title="🥀 Help Menu ✨",
-                thumb_url=START_IMG_URL,
-                description=f"🥀 Open Help Menu ...",
-                caption=text,
-                reply_markup=keyboard,
-            )
-        )
-        try:
-            await client.answer_inline_query(query.id, results=umm, cache_time=10)
-            return
-        except Exception as e:
-            logging.exception(e)
-            return
-
-    elif text.strip() == "":
+    if text.strip() == "":
         try:
             await client.answer_inline_query(query.id, results=answer, cache_time=10)
         except:
