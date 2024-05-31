@@ -47,7 +47,7 @@ async def init():
         pass
 
     await app.start()
-    await userbot.start()
+    #await userbot.start()
     for all_module in ALL_MODULES:
         imported_module = importlib.import_module(f"YukkiMusic.plugins" + all_module)
         if hasattr(imported_module, "__MODULE__") and imported_module.__MODULE__:
@@ -55,7 +55,7 @@ async def init():
                 HELPABLE[imported_module.__MODULE__.lower()] = imported_module
 
     LOGGER("YukkiMusic.plugins").info("Successfully Imported Modules ")
-    # await userbot.start()
+    await userbot.start()
     await Yukki.start()
     await Yukki.decorators()
     LOGGER("YukkiMusic").info("Yukki Music Bot Started Successfully")
