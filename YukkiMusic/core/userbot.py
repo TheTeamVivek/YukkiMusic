@@ -10,8 +10,8 @@
 
 import sys
 
-from pyrogram import Client
-from pyrogram import filters 
+from pyrogram import Client, filters
+
 import config
 
 from ..logging import LOGGER
