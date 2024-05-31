@@ -109,6 +109,7 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
         except MessageNotModified:
             pass
 
+
 ## Audio and Video Quality
 async def gen_buttons_aud(_, aud):
     if aud == "STUDIO":
