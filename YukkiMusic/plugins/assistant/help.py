@@ -2,8 +2,6 @@ import logging
 
 from YukkiMusic import app
 
-from .. import register_all_clients
-
 
 @register_all_clients(["help"])
 async def inline_help_menu(client, message):
