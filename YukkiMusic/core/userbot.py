@@ -11,7 +11,7 @@
 import sys
 
 from pyrogram import Client
-
+from pyrogram import filters 
 import config
 
 from ..logging import LOGGER
