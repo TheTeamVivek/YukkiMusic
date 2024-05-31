@@ -3,14 +3,14 @@ from pyrogram import filters
 from config import BANNED_USERS
 from pyrogram.types InlineKeyboardMarkup, InlineKeyboardButton
 
-"""from asyncio.exceptions import TimeoutError
+#from asyncio.exceptions import TimeoutError
 
-try:
-    Api_id =  await message.ask("give me you api_id",timeout=2)
-    Api_hash =  await message.ask("give me you api_hash")
-    print(Api_hash.text)
-    print(Api_id.text)
-except TimeoutError as e:"""
+#try:
+   # Api_id =  await message.ask("give me you api_id",timeout=2)
+    #Api_hash =  await message.ask("give me you api_hash")
+    #print(Api_hash.text)
+    #print(Api_id.text)
+#except TimeoutError as e:
 
 
 from config import BANNED_USERS
