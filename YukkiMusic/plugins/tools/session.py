@@ -1,7 +1,6 @@
 from pyrogram import filters
-
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from config import BANNED_USERS
-from pyrogram.types InlineKeyboardMarkup, InlineKeyboardButton
 
 #from asyncio.exceptions import TimeoutError
 
@@ -11,10 +10,6 @@ from pyrogram.types InlineKeyboardMarkup, InlineKeyboardButton
     #print(Api_hash.text)
     #print(Api_id.text)
 #except TimeoutError as e:
-
-
-from config import BANNED_USERS
-from YukkiMusic import app
 
 keyboard = InlineKeyboardMarkup(
     [
