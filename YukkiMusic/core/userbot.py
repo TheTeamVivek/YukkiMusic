@@ -225,12 +225,13 @@ class AllClients:
     def __init__(self, clients):
         self.clients = clients
 
-    def on_message(self, command_filter):
+    def on_message(self, *fltrs):
         def decorator(func):
             for client in self.clients:
-                client.on_message(command_filter)(func)
+                client.add_handler(
+                    filters.message_handler(func, filters=fltrs)
+                )
             return func
-
         return decorator
 
 
