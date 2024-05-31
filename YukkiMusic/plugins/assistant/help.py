@@ -7,7 +7,7 @@ from YukkiMusic import app
 
 
 @Client.on_message(filters.command(["help"]))
-async def inline_help_menu(client, message):
+async def inline_help_menu(client: Client, message):
     try:
         bot_results = await client.get_inline_bot_results(
             f"@{app.username}", "help_menu"
