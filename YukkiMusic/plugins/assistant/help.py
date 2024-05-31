@@ -1,11 +1,10 @@
 import logging
-
 from pyrogram import Client, filters
-
+from .. import all
 from YukkiMusic import app
 
 
-@Client.on_message(filters.command(["help"]))
+@all.on_message(filters.command(["help"]))
 async def inline_help_menu(client: Client, message):
     try:
         bot_results = await client.get_inline_bot_results(
@@ -24,6 +23,6 @@ async def inline_help_menu(client: Client, message):
         logging.exception(e)
 
 
-@Client.on_message(filters.command(["ping"]))
+@all.on_message(filters.command(["ping"]))
 async def ping(c, m):
     await m.reply_text("I am alive")
