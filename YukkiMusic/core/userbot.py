@@ -20,53 +20,74 @@ assistants = []
 assistantids = []
 
 
-class Userbot(Client):
-    def __init__(self):
-        self.one = Client(
+
+A1 = Client(
             "YukkiString1",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_string=str(config.STRING1),
             plugins=dict(root="YukkiMusic.assistant"),
-            # workdir="datafiles",
+            workdir="datafiles",
+            no_updates=False,
+            ipv6=True,
         )
 
-        self.two = Client(
+A2 = Client(
             "YukkiString2",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_string=str(config.STRING2),
             plugins=dict(root="YukkiMusic.assistant"),
-            # workdir="datafiles",
+            workdir="datafiles",
+            no_updates=False,
+            ipv6=True,
         )
 
-        self.three = Client(
+A3 = Client(
             "YukkiString3",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_string=str(config.STRING3),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
-            # workdir="datafiles",
-        )
+            workdir="datafiles",
+            no_updates=False,
+            ipv6=True,
+)
 
-        self.four = Client(
+A4 = Client(
             "YukkiString4",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_string=str(config.STRING4),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
-            # workdir="datafiles",
-        )
+            workdir="datafiles",
+            no_updates=False,
+            ipv6=True,
+ )
 
-        self.five = Client(
+A5 = Client(
             "YukkiString5",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_string=str(config.STRING5),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
-            # workdir="datafiles",
-        )
+            workdir="datafiles",
+            no_updates=False,
+            ipv6=True,
+)
 
+
+
+
+
+class Userbot(Client):
+    def __init__(self):
+        self.one = A1
+        self.two = A2
+        self.three = A3
+        self.four = A4
+        self.five = A5
+        
     async def start(self):
         LOGGER(__name__).info(f"Starting Assistant Clients")
         if config.STRING1:
