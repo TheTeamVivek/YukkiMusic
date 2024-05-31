@@ -11,6 +11,7 @@
 import sys
 
 from pyrogram import Client, filters
+from pyrogram.handlers import MessageHandler
 
 import config
 
@@ -228,9 +229,9 @@ class AllClients:
     def on_message(self, *fltrs):
         def decorator(func):
             for client in self.clients:
-                client.add_handler(filters.message_handler(func, filters=fltrs))
+                handler = MessageHandler(func, filters=fltrs)
+                client.add_handler(handler)
             return func
-
         return decorator
 
 
