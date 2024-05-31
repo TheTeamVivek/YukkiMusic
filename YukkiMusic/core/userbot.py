@@ -28,6 +28,7 @@ class Userbot(Client):
             session_string=str(config.STRING1),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
             workdir="datafiles",
+            no_updates=False,
         )
 
         self.two = Client(
