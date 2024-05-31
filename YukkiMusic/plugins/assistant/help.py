@@ -6,7 +6,7 @@ from config import BANNED_USERS
 from YukkiMusic import app
 
 
-@Client.on_message(filters.command(["help"]) & filters.private & ~BANNED_USERS)
+@Client.on_message(filters.command(["help"]))
 async def inline_help_menu(client, message):
     try:
         bot_results = await client.get_inline_bot_results(
