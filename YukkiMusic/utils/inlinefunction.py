@@ -17,7 +17,7 @@ class EqInlineKeyboardButton(InlineKeyboardButton):
         return self.text > other.text
 
 
-def paginate_modules(page_n, module_dict, prefix, chat=None, closebutton=None):
+def paginate_modules(page_n, module_dict, prefix, chat=None):
     if not chat:
         modules = sorted(
             [
@@ -49,30 +49,24 @@ def paginate_modules(page_n, module_dict, prefix, chat=None, closebutton=None):
     modulo_page = page_n % max_num_pages
 
     if len(pairs) > COLUMN_SIZE:
-        pairs = pairs[modulo_page * COLUMN_SIZE : COLUMN_SIZE * (modulo_page + 1)]
-        navigation_buttons = [
-            EqInlineKeyboardButton(
-                "❮",
-                callback_data="{}_prev({})".format(
-                    prefix,
-                    modulo_page - 1 if modulo_page > 0 else max_num_pages - 1,
+        pairs = pairs[modulo_page * COLUMN_SIZE : COLUMN_SIZE * (modulo_page + 1)] + [
+            (
+                EqInlineKeyboardButton(
+                    "❮",
+                    callback_data="{}_prev({})".format(
+                        prefix,
+                        modulo_page - 1 if modulo_page > 0 else max_num_pages - 1,
+                    ),
                 ),
-            ),
-            EqInlineKeyboardButton(
-                "❯",
-                callback_data="{}_next({})".format(prefix, modulo_page + 1),
-            ),
-        ]
-
-        if closebutton is None:
-            navigation_buttons.insert(
-                1,
                 EqInlineKeyboardButton(
                     "Bᴀᴄᴋ",
                     callback_data="settingsback_helper",
                 ),
+                EqInlineKeyboardButton(
+                    "❯",
+                    callback_data="{}_next({})".format(prefix, modulo_page + 1),
+                ),
             )
-
-        pairs.append(navigation_buttons)
+        ]
 
     return pairs
