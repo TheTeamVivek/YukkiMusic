@@ -7,7 +7,7 @@ from YukkiMusic import app
 
 
 @Client.on_message(
-    filters.command(["help"], prefixes=[".", ""]) & ~filters.group & ~BANNED_USERS
+    filters.command(["help"], prefixes=[".", ""]) & ~filters.group
 )
 async def inline_help_menu(client: Client, message):
     try:
