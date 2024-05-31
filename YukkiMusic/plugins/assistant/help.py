@@ -1,11 +1,10 @@
 import logging
-
+from config import BANNED_USERS
 from pyrogram import Client, filters
-
 from YukkiMusic import app
 
 
-@Client.on_message(filters.command(["help"], prefixes=["."]) & filters.private)
+@Client.on_message(filters.command(["help"], prefixes=["."])& filters.private & ~BANNED_USERS)
 async def inline_help_menu(client: Client, message):
     try:
         bot_results = await client.get_inline_bot_results(
