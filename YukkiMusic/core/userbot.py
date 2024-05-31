@@ -21,51 +21,52 @@ assistantids = []
 clients = []
 if config.STRING:
     A1 = Client(
-       "YukkiString1",
-       api_id=config.API_ID,
-       api_hash=config.API_HASH,
-       session_string=str(config.STRING1),
-         plugins=dict(root="YukkiMusic.plugins.assistant"),
-     )
+        "YukkiString1",
+        api_id=config.API_ID,
+        api_hash=config.API_HASH,
+        session_string=str(config.STRING1),
+        plugins=dict(root="YukkiMusic.plugins.assistant"),
+    )
     clients.append(A1)
 if config.STRING2:
     A2 = Client(
-    "YukkiString2",
-    api_id=config.API_ID,
-    api_hash=config.API_HASH,
-    session_string=str(config.STRING2),
-    plugins=dict(root="YukkiMusic.plugins.assistant"),
+        "YukkiString2",
+        api_id=config.API_ID,
+        api_hash=config.API_HASH,
+        session_string=str(config.STRING2),
+        plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A2)
 if config.STRING3:
     A3 = Client(
-    "YukkiString3",
-    api_id=config.API_ID,
-    api_hash=config.API_HASH,
-    session_string=str(config.STRING3),
-    plugins=dict(root="YukkiMusic.plugins.assistant"),
+        "YukkiString3",
+        api_id=config.API_ID,
+        api_hash=config.API_HASH,
+        session_string=str(config.STRING3),
+        plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A3)
 
 if config.STRING4:
     A4 = Client(
-    "YukkiString4",
-    api_id=config.API_ID,
-    api_hash=config.API_HASH,
-    session_string=str(config.STRING4),
-    plugins=dict(root="YukkiMusic.plugins.assistant"),
+        "YukkiString4",
+        api_id=config.API_ID,
+        api_hash=config.API_HASH,
+        session_string=str(config.STRING4),
+        plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A4)
 
 if config.STRING5:
     A5 = Client(
-    "YukkiString5",
-    api_id=config.API_ID,
-    api_hash=config.API_HASH,
-    session_string=str(config.STRING5),
-    plugins=dict(root="YukkiMusic.plugins.assistant"),
+        "YukkiString5",
+        api_id=config.API_ID,
+        api_hash=config.API_HASH,
+        session_string=str(config.STRING5),
+        plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A5)
+
 
 class Userbot(Client):
     def __init__(self):
