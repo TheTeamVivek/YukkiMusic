@@ -81,7 +81,7 @@ async def help_parser(name, keyboard=None, closebutton=None):
             keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help"))
         else:
             keyboard = InlineKeyboardMarkup(
-                paginate_modules(0, HELPABLE, "help", closebutton="False")
+                paginate_modules(0, HELPABLE, "help", closebutton="True")
             )
     return (
         f"""ʜᴇʟʟᴏ {name},
