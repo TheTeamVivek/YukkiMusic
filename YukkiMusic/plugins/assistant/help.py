@@ -1,4 +1,4 @@
-'''import logging
+"""import logging
 
 from pyrogram import Client, filters
 
@@ -26,4 +26,4 @@ async def inline_help_menu(client: Client, message):
 
 @Client.on_message(filters.command(["ping"], prefixes=[".", ""]))
 async def ping(c, m):
-    await m.reply_text("I am alive")'''
+    await m.reply_text("I am alive")"""
