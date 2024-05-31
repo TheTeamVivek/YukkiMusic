@@ -38,7 +38,10 @@ async def helper_private(
             await update.answer()
         except:
             pass
-        chat_id = update.message.chat.id
+        try:
+            chat_id = update.message.chat.id
+        except Exception:
+            chat_id = update.from_user.id
         language = await get_lang(chat_id)
         _ = get_string(language)
         text, keyboard = await help_parser(update.from_user.mention)
