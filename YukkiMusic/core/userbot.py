@@ -221,7 +221,6 @@ class Userbot(Client):
             LOGGER(__name__).info(f"Assistant Five Started as {self.five.name}")
 
 
-
 class AllClients:
     def __init__(self, clients):
         self.clients = clients
@@ -231,6 +230,8 @@ class AllClients:
             for client in self.clients:
                 client.on_message(command_filter)(func)
             return func
+
         return decorator
+
 
 all = AllClients(clients)
