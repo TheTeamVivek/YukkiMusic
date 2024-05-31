@@ -7,11 +7,9 @@
 #
 # All rights reserved.
 #
-
 import sys
 
 from pyrogram import Client
-from pyrogram.handlers import MessageHandler
 
 import config
 
@@ -19,74 +17,54 @@ from ..logging import LOGGER
 
 assistants = []
 assistantids = []
-clients = []
-
-if config.STRING1:
-    A1 = Client(
-        "YukkiString1",
-        api_id=config.API_ID,
-        api_hash=config.API_HASH,
-        session_string=str(config.STRING1),
-        # plugins=dict(root="YukkiMusic.plugins.assistant"),
-    )
-    clients.append(A1)
-else:
-    A1 = None
-if config.STRING2:
-    A2 = Client(
-        "YukkiString2",
-        api_id=config.API_ID,
-        api_hash=config.API_HASH,
-        session_string=str(config.STRING2),
-        # plugins=dict(root="YukkiMusic.plugins.assistant"),
-    )
-    clients.append(A2)
-else:
-    A2 = None
-if config.STRING3:
-    A3 = Client(
-        "YukkiString3",
-        api_id=config.API_ID,
-        api_hash=config.API_HASH,
-        session_string=str(config.STRING3),
-        # plugins=dict(root="YukkiMusic.plugins.assistant"),
-    )
-    clients.append(A3)
-else:
-    A3 = None
-if config.STRING4:
-    A4 = Client(
-        "YukkiString4",
-        api_id=config.API_ID,
-        api_hash=config.API_HASH,
-        session_string=str(config.STRING4),
-        # plugins=dict(root="YukkiMusic.plugins.assistant"),
-    )
-    clients.append(A4)
-
-else:
-    A4 = None
-if config.STRING5:
-    A5 = Client(
-        "YukkiString5",
-        api_id=config.API_ID,
-        api_hash=config.API_HASH,
-        session_string=str(config.STRING5),
-        # plugins=dict(root="YukkiMusic.plugins.assistant"),
-    )
-    clients.append(A5)
-
-else:
-    A5 = None
 
 
 class Userbot(Client):
     def __init__(self):
-        self.one = A1
-        self.two = A2
-        self.three = A3
-        self.four = A4
-        self.five = A5
+        self.one = Client(
+            "YukkiString1",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING1),
+            plugins=dict(root="YukkiMusic.plugins.assistant"),
+            workdir="datafiles",
+        )
+
+        self.two = Client(
+            "YukkiString2",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING2),
+            workdir="datafiles",
+            no_updates=True,
+        )
+
+        self.three = Client(
+            "YukkiString3",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING3),
+            workdir="datafiles",
+            no_updates=True,
+        )
+
+        self.four = Client(
+            "YukkiString4",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING4),
+            workdir="datafiles",
+            no_updates=True,
+        )
+
+        self.five = Client(
+            "YukkiString5",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING5),
+            workdir="datafiles",
+            no_updates=True,
+        )
 
     async def start(self):
         LOGGER(__name__).info(f"Starting Assistant Clients")
@@ -220,20 +198,3 @@ class Userbot(Client):
             else:
                 self.five.name = get_me.first_name
             LOGGER(__name__).info(f"Assistant Five Started as {self.five.name}")
-
-
-class AllClients:
-    def __init__(self, clients):
-        self.clients = clients
-
-    def on_message(self, *fltrs):
-        def decorator(func):
-            for client in self.clients:
-                handler = MessageHandler(func, filters=fltrs)
-                client.add_handler(handler)
-            return func
-
-        return decorator
-
-
-all = AllClients(clients)
