@@ -228,7 +228,6 @@ class AllClients:
 
     def on_message(self, *fltrs):
         def decorator(func):
-            from pyrogram import filters
             for client in self.clients:
                 handler = MessageHandler(func, filters=fltrs)
                 client.add_handler(handler)
