@@ -1,6 +1,6 @@
 import logging
 
-from pyrogram import Client, filters
+from pyrogram import Client
 
 from YukkiMusic import app
 
