@@ -36,7 +36,7 @@ keyboard = InlineKeyboardMarkup(
 
 
 @app.on_message(filters.command("session") & ~BANNED_USERS)
-async def cat(c, m):
+async def session(c, m):
     await m.reply_text(
         "ᴄʜᴏᴏsᴇ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ ᴛᴏ ɢᴇɴᴇʀᴀᴛᴇ sᴛʀɪɴɢ sᴇssɪᴏɴ", reply_markup=keyboard
     )
