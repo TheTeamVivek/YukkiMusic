@@ -226,6 +226,7 @@ class AllClients:
         self.clients = clients
 
     def on_message(self, *filters):
+        from pyrogram import filters
         def decorator(func):
             for client in self.clients:
                 client.add_handler(client.on_message(filters=filters)(func))
