@@ -10,7 +10,7 @@
 
 import sys
 
-from pyrogram import Client
+from pyrogram import Client, filters
 
 import config
 
@@ -19,13 +19,14 @@ from ..logging import LOGGER
 assistants = []
 assistantids = []
 clients = []
+
 if config.STRING:
     A1 = Client(
         "YukkiString1",
         api_id=config.API_ID,
         api_hash=config.API_HASH,
         session_string=str(config.STRING1),
-        plugins=dict(root="YukkiMusic.plugins.assistant"),
+        #plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A1)
 if config.STRING2:
@@ -34,7 +35,7 @@ if config.STRING2:
         api_id=config.API_ID,
         api_hash=config.API_HASH,
         session_string=str(config.STRING2),
-        plugins=dict(root="YukkiMusic.plugins.assistant"),
+        #plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A2)
 if config.STRING3:
@@ -43,7 +44,7 @@ if config.STRING3:
         api_id=config.API_ID,
         api_hash=config.API_HASH,
         session_string=str(config.STRING3),
-        plugins=dict(root="YukkiMusic.plugins.assistant"),
+        #plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A3)
 
@@ -53,7 +54,7 @@ if config.STRING4:
         api_id=config.API_ID,
         api_hash=config.API_HASH,
         session_string=str(config.STRING4),
-        plugins=dict(root="YukkiMusic.plugins.assistant"),
+        #plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A4)
 
@@ -63,7 +64,7 @@ if config.STRING5:
         api_id=config.API_ID,
         api_hash=config.API_HASH,
         session_string=str(config.STRING5),
-        plugins=dict(root="YukkiMusic.plugins.assistant"),
+        #plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A5)
 
@@ -208,3 +209,20 @@ class Userbot(Client):
             else:
                 self.five.name = get_me.first_name
             LOGGER(__name__).info(f"Assistant Five Started as {self.five.name}")
+
+
+class AllClients:
+    def __init__(self, clients):
+        self.clients = clients
+
+    def on_message(self, *filters):
+        def decorator(func):
+            for client in self.clients:
+                client.add_handler(
+                    client.on_message(filters=filters)(func)
+                )
+            return func
+        return decorator
+
+all = AllClients(clients)
+
