@@ -228,10 +228,9 @@ class AllClients:
     def on_message(self, *fltrs):
         def decorator(func):
             for client in self.clients:
-                client.add_handler(
-                    filters.message_handler(func, filters=fltrs)
-                )
+                client.add_handler(filters.message_handler(func, filters=fltrs))
             return func
+
         return decorator
 
 
