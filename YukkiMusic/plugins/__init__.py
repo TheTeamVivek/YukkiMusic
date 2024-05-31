@@ -11,8 +11,6 @@
 import glob
 from os.path import dirname, isfile
 
-from YukkiMusic.utils.filter import register_all_clients
-
 
 def __list_all_modules():
     work_dir = dirname(__file__)
