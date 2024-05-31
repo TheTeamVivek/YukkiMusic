@@ -10,7 +10,7 @@
 
 import glob
 from os.path import dirname, isfile
-
+from YukkiMusic.core.userbot import all
 
 def __list_all_modules():
     work_dir = dirname(__file__)
