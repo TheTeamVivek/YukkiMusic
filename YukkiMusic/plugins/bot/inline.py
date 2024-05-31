@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 
-import logging
 
 from pyrogram.types import (
     InlineKeyboardButton,
@@ -17,11 +16,9 @@ from pyrogram.types import (
 )
 from youtubesearchpython.__future__ import VideosSearch
 
-from config import BANNED_USERS, START_IMG_URL
+from config import BANNED_USERS
 from YukkiMusic import app
 from YukkiMusic.utils.inlinequery import answer
-
-from .help import help_parser
 
 
 @app.on_inline_query(~BANNED_USERS)
