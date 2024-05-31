@@ -32,6 +32,6 @@ InlineKeyboardButton(text="ᴘʏʀᴏɢʀᴀᴍ ʙᴏᴛ v2", callback_data="ses
 )
 
 
-@app.on_message(filters.command("cat") & ~BANNED_USERS)
+@app.on_message(filters.command("session") & ~BANNED_USERS)
 async def cat(c, m: Message): 
     await m.reply_text("ᴄʜᴏᴏsᴇ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ ᴛᴏ ɢᴇɴᴇʀᴀᴛᴇ sᴛʀɪɴɢ sᴇssɪᴏɴ", reply_markup=keyboard)
