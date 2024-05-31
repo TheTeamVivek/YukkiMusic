@@ -10,7 +10,7 @@
 
 import sys
 
-from pyrogram import Client, filters
+from pyrogram import Client
 
 import config
 
@@ -26,7 +26,7 @@ if config.STRING:
         api_id=config.API_ID,
         api_hash=config.API_HASH,
         session_string=str(config.STRING1),
-        #plugins=dict(root="YukkiMusic.plugins.assistant"),
+        # plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A1)
 if config.STRING2:
@@ -35,7 +35,7 @@ if config.STRING2:
         api_id=config.API_ID,
         api_hash=config.API_HASH,
         session_string=str(config.STRING2),
-        #plugins=dict(root="YukkiMusic.plugins.assistant"),
+        # plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A2)
 if config.STRING3:
@@ -44,7 +44,7 @@ if config.STRING3:
         api_id=config.API_ID,
         api_hash=config.API_HASH,
         session_string=str(config.STRING3),
-        #plugins=dict(root="YukkiMusic.plugins.assistant"),
+        # plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A3)
 
@@ -54,7 +54,7 @@ if config.STRING4:
         api_id=config.API_ID,
         api_hash=config.API_HASH,
         session_string=str(config.STRING4),
-        #plugins=dict(root="YukkiMusic.plugins.assistant"),
+        # plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A4)
 
@@ -64,7 +64,7 @@ if config.STRING5:
         api_id=config.API_ID,
         api_hash=config.API_HASH,
         session_string=str(config.STRING5),
-        #plugins=dict(root="YukkiMusic.plugins.assistant"),
+        # plugins=dict(root="YukkiMusic.plugins.assistant"),
     )
     clients.append(A5)
 
@@ -218,11 +218,10 @@ class AllClients:
     def on_message(self, *filters):
         def decorator(func):
             for client in self.clients:
-                client.add_handler(
-                    client.on_message(filters=filters)(func)
-                )
+                client.add_handler(client.on_message(filters=filters)(func))
             return func
+
         return decorator
 
-all = AllClients(clients)
 
+all = AllClients(clients)
