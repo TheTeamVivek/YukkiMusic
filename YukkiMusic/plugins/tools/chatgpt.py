@@ -3,7 +3,7 @@ from pyrogram import filters
 from pyrogram.enums import ChatAction
 
 from YukkiMusic import app
-
+from YUKKI import api
 
 @app.on_message(
     filters.command(
@@ -23,15 +23,9 @@ async def chatgpt_chat(bot, message):
         user_input = " ".join(message.command[1:])
 
     try:
-        response = requests.get(
-            f"https://chatgpt.apinepdev.workers.dev/?question={user_input}"
-        )
-        if response.status_code == 200:
-            await bot.send_chat_action(message.chat.id, ChatAction.TYPING)
-            result = response.json()["answer"]
-            await message.reply_text(f"{result}", quote=True)
-        else:
-            pass
+        results = api().chatgpt(user_input)
+        if results['success']:
+            await message.reply_text(results['results'])
     except requests.exceptions.RequestException as e:
         pass
 
