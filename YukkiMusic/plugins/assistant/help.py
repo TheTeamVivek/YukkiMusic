@@ -1,14 +1,12 @@
 import logging
-from pyrogram import filters, Client
-from YukkiMusic import app
+
+from pyrogram import Client, filters
+
 from config import BANNED_USERS
+from YukkiMusic import app
 
-@Client.on_message(
-    filters.command(["help"])
-    & filters.private
-    & ~BANNED_USERS
-)
 
+@Client.on_message(filters.command(["help"]) & filters.private & ~BANNED_USERS)
 async def inline_help_menu(client, message):
     try:
         bot_results = await client.get_inline_bot_results(
@@ -27,10 +25,6 @@ async def inline_help_menu(client, message):
         logging.exception(e)
 
 
-@Client.on_message(
-    filters.command(["ping"])
-    & filters.private
-    & ~BANNED_USERS
-)
+@Client.on_message(filters.command(["ping"]) & filters.private & ~BANNED_USERS)
 async def ping(c, m):
     await m.reply_text("I am alive")

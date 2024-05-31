@@ -1,7 +1,5 @@
-import pyrogram.handlers
 from pyrogram import filters
 
-from YukkiMusic.core.userbot import clients
 from YukkiMusic.utils.admin_check import admin_check
 
 
