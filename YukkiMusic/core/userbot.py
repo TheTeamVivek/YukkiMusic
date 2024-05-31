@@ -28,7 +28,6 @@ A1 = Client(
     plugins=dict(root="YukkiMusic.assistant"),
     workdir="datafiles",
     no_updates=False,
-    ipv6=True,
 )
 
 A2 = Client(
@@ -39,7 +38,6 @@ A2 = Client(
     plugins=dict(root="YukkiMusic.assistant"),
     workdir="datafiles",
     no_updates=False,
-    ipv6=True,
 )
 
 A3 = Client(
@@ -50,7 +48,6 @@ A3 = Client(
     plugins=dict(root="YukkiMusic.plugins.assistant"),
     workdir="datafiles",
     no_updates=False,
-    ipv6=True,
 )
 
 A4 = Client(
@@ -61,7 +58,6 @@ A4 = Client(
     plugins=dict(root="YukkiMusic.plugins.assistant"),
     workdir="datafiles",
     no_updates=False,
-    ipv6=True,
 )
 
 A5 = Client(
@@ -72,7 +68,6 @@ A5 = Client(
     plugins=dict(root="YukkiMusic.plugins.assistant"),
     workdir="datafiles",
     no_updates=False,
-    ipv6=True,
 )
 
 
