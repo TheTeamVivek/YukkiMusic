@@ -221,19 +221,16 @@ class Userbot(Client):
             LOGGER(__name__).info(f"Assistant Five Started as {self.five.name}")
 
 
+
 class AllClients:
     def __init__(self, clients):
         self.clients = clients
 
-    def on_message(self, *filters):
-        from pyrogram import filters
-
+    def on_message(self, command_filter):
         def decorator(func):
             for client in self.clients:
-                client.add_handler(client.on_message(filters=filters)(func))
+                client.on_message(command_filter)(func)
             return func
-
         return decorator
-
 
 all = AllClients(clients)
