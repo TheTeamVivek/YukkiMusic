@@ -1,7 +1,5 @@
 import logging
 
-from pyrogram import Client
-
 from YukkiMusic import app
 
 from .. import register_all_clients
