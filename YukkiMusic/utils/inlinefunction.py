@@ -64,7 +64,7 @@ def paginate_modules(page_n, module_dict, prefix, chat=None, closebutton=None):
             ),
         ]
 
-        if closebutton == "True":
+        if closebutton is None:
             navigation_buttons.insert(
                 1,
                 EqInlineKeyboardButton(
