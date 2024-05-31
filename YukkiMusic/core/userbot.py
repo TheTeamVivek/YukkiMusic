@@ -28,7 +28,7 @@ class Userbot(Client):
             api_hash=config.API_HASH,
             session_string=str(config.STRING1),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
-            workdir="datafiles",
+            #workdir="datafiles",
         )
 
         self.two = Client(
@@ -37,7 +37,7 @@ class Userbot(Client):
             api_hash=config.API_HASH,
             session_string=str(config.STRING2),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
-            workdir="datafiles",
+            #workdir="datafiles",
         )
 
         self.three = Client(
@@ -46,7 +46,7 @@ class Userbot(Client):
             api_hash=config.API_HASH,
             session_string=str(config.STRING3),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
-            workdir="datafiles",
+            #workdir="datafiles",
         )
 
         self.four = Client(
@@ -55,7 +55,7 @@ class Userbot(Client):
             api_hash=config.API_HASH,
             session_string=str(config.STRING4),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
-            workdir="datafiles",
+           # workdir="datafiles",
         )
 
         self.five = Client(
@@ -64,7 +64,7 @@ class Userbot(Client):
             api_hash=config.API_HASH,
             session_string=str(config.STRING5),
             plugins=dict(root="YukkiMusic.plugins.assistant"),
-            workdir="datafiles",
+            #workdir="datafiles",
         )
 
     async def start(self):
