@@ -26,8 +26,6 @@ A1 = Client(
     api_hash=config.API_HASH,
     session_string=str(config.STRING1),
     plugins=dict(root="YukkiMusic.assistant"),
-    workdir="datafiles",
-    no_updates=False,
 )
 
 A2 = Client(
@@ -36,8 +34,6 @@ A2 = Client(
     api_hash=config.API_HASH,
     session_string=str(config.STRING2),
     plugins=dict(root="YukkiMusic.assistant"),
-    workdir="datafiles",
-    no_updates=False,
 )
 
 A3 = Client(
@@ -46,8 +42,6 @@ A3 = Client(
     api_hash=config.API_HASH,
     session_string=str(config.STRING3),
     plugins=dict(root="YukkiMusic.plugins.assistant"),
-    workdir="datafiles",
-    no_updates=False,
 )
 
 A4 = Client(
@@ -56,8 +50,6 @@ A4 = Client(
     api_hash=config.API_HASH,
     session_string=str(config.STRING4),
     plugins=dict(root="YukkiMusic.plugins.assistant"),
-    workdir="datafiles",
-    no_updates=False,
 )
 
 A5 = Client(
@@ -66,8 +58,6 @@ A5 = Client(
     api_hash=config.API_HASH,
     session_string=str(config.STRING5),
     plugins=dict(root="YukkiMusic.plugins.assistant"),
-    workdir="datafiles",
-    no_updates=False,
 )
 
 
