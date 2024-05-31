@@ -1,5 +1,6 @@
 import requests
 from pyrogram import filters
+from config import BANNED_USERS
 """from asyncio.exceptions import TimeoutError
 
 try:
@@ -33,5 +34,5 @@ InlineKeyboardButton(text="ᴘʏʀᴏɢʀᴀᴍ ʙᴏᴛ v2", callback_data="ses
 
 
 @app.on_message(filters.command("session") & ~BANNED_USERS)
-async def cat(c, m: Message): 
+async def cat(c, m): 
     await m.reply_text("ᴄʜᴏᴏsᴇ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ ᴛᴏ ɢᴇɴᴇʀᴀᴛᴇ sᴛʀɪɴɢ sᴇssɪᴏɴ", reply_markup=keyboard)
