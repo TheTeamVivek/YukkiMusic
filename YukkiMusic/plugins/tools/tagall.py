@@ -220,43 +220,32 @@ async def atag_all_useres(_, message):
 async def admintag_with_reporting(client, message):
     if not message.from_user:
         return
-
+    
     chat_id = message.chat.id
     from_user_id = message.from_user.id
-    admins = [
-        admin.user.id
-        async for admin in client.get_chat_members(
-            chat_id, filter=ChatMembersFilter.ADMINISTRATORS
-        )
-    ]
+    admins = [admin.user.id async for admin in client.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS)]
 
     if from_user_id in admins:
         return await tag_all_admins(client, message)
-
+    
     if len(message.text.split()) <= 1 and not message.reply_to_message:
         return await message.reply_text("Reply to a message to report that user.")
-
+    
     reply = message.reply_to_message or message
     reply_user_id = reply.from_user.id if reply.from_user else reply.sender_chat.id
     linked_chat = (await client.get_chat(chat_id)).linked_chat
 
-    if (
-        reply_user_id in admins
-        or reply_user_id == chat_id
-        or reply_user_id == linked_chat.id
-    ):
-        return await message.reply_text(
-            "Do you know that the user you are replying to is an admin?"
-        )
-
-    user_mention = reply.from_user.mention
+    if reply_user_id in admins or reply_user_id == chat_id or (linked_chat and reply_user_id == linked_chat.id):
+        return await message.reply_text("Do you know that the user you are replying to is an admin?")
+    
+    user_mention = reply.from_user.mention if reply.from_user else "the user"
     text = f"Reported {user_mention} to admins!."
 
     for admin in admins:
         admin_member = await client.get_chat_member(chat_id, admin)
         if not admin_member.user.is_bot and not admin_member.user.is_deleted:
             text += f"[\u2063](tg://user?id={admin})"
-
+    
     await reply.reply_text(text)
 
 
