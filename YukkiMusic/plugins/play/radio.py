@@ -34,6 +34,7 @@ RADIO_STATION = {
     "YouTube": "https://www.youtube.com/live/eu191hR_LEc?si=T-9QYD548jd0Mogp",
 }
 
+valid_stations = "\n".join([f"{name}" for name in RADIO_STATION.keys()])
 
 @app.on_message(
     filters.command(["radioplayforce", "radio", "cradio"])
@@ -169,7 +170,11 @@ async def radio(client, message: Message):
             return await mystic.edit_text(err)
         return await play_logs(message, streamtype="M3u8 or Index Link")
     else:
-        valid_stations = "\n".join([f"`{name}`" for name in RADIO_STATION.keys()])
         await message.reply(
-            f"Invalid station name. Only these stations can be played:\n{valid_stations}"
+            f"ɢɪᴠᴇ ᴍᴇ ᴀ sᴛᴀᴛɪᴏɴ ɴᴀᴍᴇ ᴛᴏ ᴘʟᴀʏ ʀᴀᴅɪᴏ\nʙᴇʟᴏᴡ ᴀʀᴇ sᴏᴍᴇ sᴛᴀᴛɪᴏɴ ɴᴀᴍᴇ:\n{valid_stations}"
         )
+
+__MODULE__ = "Rᴀᴅɪᴏ"
+__HELP__ = f"\n/radio [sᴛᴀᴛɪᴏɴ ɴᴀᴍᴇ] - ᴛᴏ ᴘʟᴀʏ ʀᴀᴅɪᴏ ɪɴ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ\nʙᴇʟᴏᴡ ᴀʀᴇ sᴏᴍᴇ sᴛᴀᴛɪᴏɴ ɴᴀᴍᴇ:\n{valid_stations}"
+
+
