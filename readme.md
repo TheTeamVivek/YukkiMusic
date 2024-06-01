@@ -11,7 +11,6 @@
 * Loop, Seek, Shuffle, Specific Skip, Playlists etc support
 * Only English Language support
 
-</details>
 <details>
   <summary> Deployment</summary>
 
