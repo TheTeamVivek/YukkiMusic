@@ -156,6 +156,9 @@ soundcloud.
 
 </details>
 
+<details>
+  <summary> 🏷 Support / Assistance</summary>
+
 # 🏷 Support / Assistance
 
 Reach out to the maintainer at one of the following places:
@@ -171,6 +174,11 @@ If you want to say **thank you** or/and support active development of YukkiMusic
 - Write interesting articles about the project on [Dev.to](https://dev.to/), [Medium](https://medium.com/) or your personal blog.
 
 Together, we can make **YukkiMusicBot** better!
+
+</details>
+
+<details>
+  <summary> 📑 Acknowledgement / Credits</summary>
 
 # 📑 Acknowledgement / Credits
 
@@ -189,3 +197,5 @@ Special thanks to these amazing projects/people which/who help power Yukki Music
 </p>
 
 - <b> _sᴩᴇᴄɪᴀʟ ᴛʜᴀɴᴋs ᴛᴏ [ᴛᴇᴀᴍ ʏᴜᴋᴋɪ](https://github.com/TeamYukki) ғᴏʀ [ʏᴜᴋᴋɪ ᴍᴜsɪᴄ ʙᴏᴛ](https://github.com/TeamYukki/YukkiMusicBot)_ </b>
+
+</details>
