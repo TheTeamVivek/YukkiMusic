@@ -226,9 +226,9 @@ async def admintag_with_reporting(_, message):
     ):
         admins.append(i.user.id)
 
-    if message.from_user.id admins:
+    if message.from_user.id in admins:
         return await tag_all_admins(_, message)
-    if not message.from_user.id admins:
+    if message.from_user.id not in admins:
         if not message.reply_to_message:
             return await message.reply_text("Reply to a message to report that user.")
         reply_id = reply.from_user.id
