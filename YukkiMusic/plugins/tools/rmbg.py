@@ -60,6 +60,7 @@ async def rmbg(bot, message):
         os.remove(y)
         return os.remove(photo)
 
+
 __MODULE__ = "ᴇᴅɪᴛᴏʀ"
 __HELP__ = """
 /rmbg | /bgremove [ʀᴇᴘʟʏ ᴛᴏ ɪᴍᴀɢᴇ] - Tᴏ ʀᴇᴍᴏᴠᴇ ʙᴀᴄᴋɢʀᴏᴜɴᴅ ᴏғ ɪᴍᴀɢᴇ
