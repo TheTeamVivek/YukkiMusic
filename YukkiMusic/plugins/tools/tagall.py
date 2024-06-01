@@ -125,7 +125,7 @@ async def tag_all_admins(_, message):
             SPAM_CHATS.append(message.chat.id)
             usernum = 0
             usertxt = ""
-            async for m in app.get_chat_members(message.chat.id):
+            async for m in app.get_chat_members(message.chat.id,filter=ChatMembersFilter.ADMINISTRATORS):
                 if message.chat.id not in SPAM_CHATS:
                     break
                 usernum += 1
