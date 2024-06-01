@@ -1,5 +1,5 @@
 from pyrogram import filters
-from YUKKI import api
+from TheApi import api
 
 from YukkiMusic import app
 
@@ -16,7 +16,7 @@ async def write(client, message):
         )
     nan = await message.reply_text("Pʀᴏᴄᴇssɪɴɢ...")
     try:
-        img = api().write(txt)
+        img = api.write(txt)
         await message.reply_photo(img)
         await nan.delete()
     except Exception as e:
