@@ -37,7 +37,7 @@ async def tag_all_users(_, message):
                     break
                 usernum += 1
                 usertxt += f"[{m.user.first_name}](tg://user?id={m.user.id})"
-                if usernum == 7:
+                if usernum == 14:
                     await app.send_message(
                         message.chat.id,
                         f"{replied.text}\n\n{usertxt}",
@@ -64,7 +64,7 @@ async def tag_all_users(_, message):
                     break
                 usernum += 1
                 usertxt += f"[{m.user.first_name}](tg://user?id={m.user.id})"
-                if usernum == 7:
+                if usernum == 14:
                     await app.send_message(
                         message.chat.id,
                         f"{text}\n{usertxt}",
@@ -104,7 +104,7 @@ async def tag_all_admins(_, message):
                     break
                 usernum += 1
                 usertxt += f"[{m.user.first_name}](tg://user?id={m.user.id})"
-                if usernum == 7:
+                if usernum == 14:
                     await app.send_message(
                         message.chat.id,
                         f"{replied.text}\n\n usertxt",
@@ -131,7 +131,7 @@ async def tag_all_admins(_, message):
                     break
                 usernum += 1
                 usertxt += f"[{m.user.first_name}](tg://user?id={m.user.id})"
-                if usernum == 7:
+                if usernum == 14:
                     await app.send_message(
                         message.chat.id,
                         f"{text}\n{usertxt}",
@@ -175,7 +175,7 @@ async def atag_all_useres(_, message):
                 break
             usernum += 1
             usertxt += f"[{m.user.first_name}](tg://openmessage?user_id={m.user.id})"
-            if usernum == 7:
+            if usernum == 14:
                 await userbot.send_message(
                     message.chat.id,
                     f"{replied.text}\n\n{usertxt}",
@@ -200,7 +200,7 @@ async def atag_all_useres(_, message):
             usernum += 1
             usertxt += f'<a href="tg://openmessage?user_id={m.user.id}">{m.user.first_name}</a>'
 
-            if usernum == 7:
+            if usernum == 14:
                 await userbot.send_message(
                     message.chat.id, f"{text}\n{usertxt}", disable_web_page_preview=True
                 )
@@ -215,8 +215,7 @@ async def atag_all_useres(_, message):
 
 @app.on_message(
     filters.command(["admin", "admins"], prefixes=["/", "@"])
-    & admin_filter
-    & ~filters.private
+    & filters.group
 )
 async def admintag_with_reporting(_, message):
     if message.from_user is None:
