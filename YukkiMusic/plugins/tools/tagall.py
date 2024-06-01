@@ -240,9 +240,7 @@ async def admintag_with_reporting(client, message):
     reply_user_id = reply.from_user.id if reply.from_user else reply.sender_chat.id
     linked_chat = (await client.get_chat(chat_id)).linked_chat
     if reply_user_id == app.id:
-        return await message.reply_text(
-            "Why would I report myself?"
-        )
+        return await message.reply_text("Why would I report myself?")
     if (
         reply_user_id in admins
         or reply_user_id == chat_id
