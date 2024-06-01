@@ -1,10 +1,12 @@
 from pyrogram import filters
 
-from YukkiMusic import app
-from YukkiMusic.utils.permissions import adminsOnly
-from YukkiMusic.core.mongo import mongodb
 from config import BANNED_USERS
+from YukkiMusic import app
+from YukkiMusic.core.mongo import mongodb
+from YukkiMusic.utils.permissions import adminsOnly
+
 antiservicedb = mongodb.antiservice
+
 
 async def is_antiservice_on(chat_id: int) -> bool:
     chat = await antiservicedb.find_one({"chat_id": chat_id})
@@ -25,15 +27,15 @@ async def antiservice_off(chat_id: int):
     if not is_antiservice:
         return
     return await antiservicedb.insert_one({"chat_id": chat_id})
-    
 
-@app.on_message(filters.command(["antiservice", "cleanmode"]) & ~filters.private & ~BANNED_USERS)
+
+@app.on_message(
+    filters.command(["antiservice", "cleanmode"]) & ~filters.private & ~BANNED_USERS
+)
 @adminsOnly("can_change_info")
 async def anti_service(_, message):
     if len(message.command) != 2:
-        return await message.reply_text(
-            "Usᴀɢᴇ: /antiservice [enable | disable]"
-        )
+        return await message.reply_text("Usᴀɢᴇ: /antiservice [enable | disable]")
     status = message.text.split(None, 1)[1].strip()
     status = status.lower()
     chat_id = message.chat.id
@@ -48,9 +50,7 @@ async def anti_service(_, message):
             "**Dɪsᴀʙʟᴇᴅ AɴᴛɪSᴇʀᴠɪᴄᴇ Sʏsᴛᴇᴍ.**\n I ᴡᴏɴ'ᴛ Bᴇ Dᴇʟᴇᴛɪɴɢ Sᴇʀᴠɪᴄᴇ Mᴇssᴀɢᴇ ғʀᴏᴍ Nᴏᴡ ᴏɴ."
         )
     else:
-        await message.reply_text(
-            "Unknown Suffix, Use /antiservice [enable|disable]"
-        )
+        await message.reply_text("Unknown Suffix, Use /antiservice [enable|disable]")
 
 
 @app.on_message(filters.service, group=11)
@@ -61,6 +61,7 @@ async def delete_service(_, message):
             return await message.delete()
     except Exception:
         pass
+
 
 __MODULE__ = "AɴᴛɪSᴇʀᴠɪᴄᴇ"
 __HELP__ = """
