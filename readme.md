@@ -2,7 +2,7 @@
 <img
  src="https://telegra.ph/file/c0e014ff34f34d1056627.png" align="right" width="200" height="200"/>
 
-# Yukki Music Bot <img src="https://img.shields.io/github/v/release/Vivekkumar0708/YukkiMusicFork?color=black&logo=github&logoColor=black&style=social" alt="RELEASE">
+# Yukki Music Bot <img src="https://img.shields.io/github/v/release/Vivekkumar-IN/YukkiMusic?color=black&logo=github&logoColor=black&style=social" alt="RELEASE">
 
 [Yukki Music Bot](https://github.com/TeamYukki/YukkiMusicBot) is a Powerful Telegram Music+Video Bot written in Python using Pyrogram, Telethon and Py-Tgcalls by which you can stream songs, video and even live streams in your group calls via various sources.
 
@@ -164,7 +164,7 @@ Reach out to the maintainer at one of the following places:
 
 - [GitHub Issues](https://github.com/Vivekkumar-IN/YukkiMusic/issues/new?assignees=&labels=question&template=SUPPORT_QUESTION.md&title=support%3A+)
 - Contact  [Telegram profile](https://t.me/vivekkumar07089)
-- [Telegram Support](https://t.me/vk_zone)
+- [Telegram Support](tg://openmessage?user_id=6815918609)
 
 If you want to say **thank you** or/and support active development of YukkiMusicBot:
 
