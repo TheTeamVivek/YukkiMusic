@@ -106,7 +106,7 @@ async def tag_all_admins(_, message):
                 if usernum == 14:
                     await app.send_message(
                         message.chat.id,
-                        f"{replied.text}\n\n usertxt",
+                        f"{replied.text}\n\n {usertxt}",
                         disable_web_page_preview=True,
                     )
                     await asyncio.sleep(1)
