@@ -36,6 +36,7 @@ RADIO_STATION = {
 
 valid_stations = "\n".join([f"{name}" for name in RADIO_STATION.keys()])
 
+
 @app.on_message(
     filters.command(["radioplayforce", "radio", "cradio"])
     & filters.group
@@ -174,7 +175,6 @@ async def radio(client, message: Message):
             f"ɢɪᴠᴇ ᴍᴇ ᴀ sᴛᴀᴛɪᴏɴ ɴᴀᴍᴇ ᴛᴏ ᴘʟᴀʏ ʀᴀᴅɪᴏ\nʙᴇʟᴏᴡ ᴀʀᴇ sᴏᴍᴇ sᴛᴀᴛɪᴏɴ ɴᴀᴍᴇ:\n{valid_stations}"
         )
 
+
 __MODULE__ = "Rᴀᴅɪᴏ"
 __HELP__ = f"\n/radio [sᴛᴀᴛɪᴏɴ ɴᴀᴍᴇ] - ᴛᴏ ᴘʟᴀʏ ʀᴀᴅɪᴏ ɪɴ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ\nʙᴇʟᴏᴡ ᴀʀᴇ sᴏᴍᴇ sᴛᴀᴛɪᴏɴ ɴᴀᴍᴇ:\n{valid_stations}"
-
-
