@@ -181,8 +181,6 @@ Together, we can make **YukkiMusicBot** better!
 
 # 📑 Acknowledgement / Credits
 
-Special thanks to these amazing projects/people which/who help power Yukki Music Bot:
-
 <h3 align="center">
     ─「 ᴄʀᴇᴅɪᴛs 」─
 </h3>
