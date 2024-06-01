@@ -11,6 +11,7 @@
     "telegram-bot",
     "pyrogram"
     ],
+    
     "stack": "container",
     "env": {
       "API_ID": {
