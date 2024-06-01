@@ -2,13 +2,13 @@ from pyrogram import filters
 
 from config import LOG_GROUP_ID
 from YukkiMusic import api, app
-
+from YUKKI import api as aapi
 
 @app.on_message(filters.command("advice"))
 async def advice(_, message):
     A = await message.reply_text("...")
-    res = await api.advice()
-    await A.edit(b["advice"])
+    res = aapi().advice()
+    await A.edit(res["results"])
 
 
 @app.on_message(filters.command("astronomical"))
