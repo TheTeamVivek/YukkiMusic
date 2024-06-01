@@ -1,5 +1,5 @@
 from pyrogram import filters
-
+from asyncio import sleep 
 from config import BANNED_USERS
 from YukkiMusic import app
 from YukkiMusic.core.mongo import mongodb
@@ -59,6 +59,7 @@ async def delete_service(_, message):
     try:
         if await is_antiservice_on(chat_id):
             return await message.delete()
+            sleep(300)
     except Exception:
         pass
 
