@@ -227,7 +227,7 @@ async def admintag_with_reporting(_, message):
     if message.from_user.id in admins:
         return await tag_all_admins(_, message)
     if message.from_user.id not in admins:
-        if not message.reply_to_message:
+        if len(message.text.split()) <= 1 and not message.reply_to_message:
             return await message.reply_text("Reply to a message to report that user.")
         reply_id = reply.from_user.id
         reply = message.reply_to_message if message.reply_to_message else message
@@ -298,6 +298,8 @@ __HELP__ = """
 
 
 /admins Oʀ @admins [ᴛᴇxᴛ] ᴏʀ [ʀᴇᴘʟʏ ᴛᴏ ᴀɴʏ ᴍᴇssᴀɢᴇ] ᴛᴏ ᴛᴀɢ ᴀʟʟ ᴀᴅᴍɪɴ's ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ
+
+
 
 /cancel Oʀ @cancel |  /offmention Oʀ @offmention | /mentionoff Oʀ @mentionoff | /cancelall Oʀ @cancelall - ᴛᴏ sᴛᴏᴘ ʀᴜɴɴɪɴɢ ᴀɴʏ ᴛᴀɢ ᴘʀᴏᴄᴇss
 
