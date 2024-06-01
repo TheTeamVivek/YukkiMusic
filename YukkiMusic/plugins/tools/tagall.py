@@ -219,7 +219,6 @@ async def atag_all_useres(_, message):
 async def admintag_with_reporting(_, message):
     if message.from_user is None:
         return
-    adam = adminlist.get(message.chat.id)
     admins = []
     async for i in app.get_chat_members(
         chat_id=message.chat.id, filter=ChatMembersFilter.ADMINISTRATORS
@@ -235,7 +234,7 @@ async def admintag_with_reporting(_, message):
         reply = message.reply_to_message if message.reply_to_message else message
         linked_chat = (await app.get_chat(message.chat.id)).linked_chat
         if (
-            reply_id in adam
+            reply_id in admins
             or reply_id == message.chat.id
             or reply_id == linked_chat.id
         ):
