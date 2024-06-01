@@ -9,6 +9,8 @@
 * Loop, Seek, Shuffle, Specific Skip, Playlists etc support
 * Only English Language support
 
+<details>
+  <summary> Deployment</summary>
 
 ## 🚀 Heroku Deployment
 
@@ -26,7 +28,7 @@
 - Finally run the bot by :
 `python3 -m YukkiMusic`
 - For getting out from tmux session : Press `Ctrl+b` and then `d`<br>
-
+</details>
 
 
 <details>
