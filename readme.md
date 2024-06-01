@@ -37,7 +37,7 @@
 
   Get to know about all these vars in depth from our Docs. [Read Now from Here](https://notreallyshikhar.gitbook.io/yukkimusicbot/config-vars/available-vars)
 
-  ##Mandatory Vars
+  ## Mandatory Vars
 
   - These are the minimum required vars need to setup to make Yukki Music Bot functional.
 
