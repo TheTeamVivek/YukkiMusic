@@ -214,8 +214,7 @@ async def atag_all_useres(_, message):
 
 
 @app.on_message(
-    filters.command(["admin", "admins"], prefixes=["/", "@"])
-    & filters.group
+    filters.command(["admin", "admins"], prefixes=["/", "@"]) & filters.group
 )
 async def admintag_with_reporting(_, message):
     if message.from_user is None:
