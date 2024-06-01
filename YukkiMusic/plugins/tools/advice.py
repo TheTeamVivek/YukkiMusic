@@ -1,8 +1,9 @@
 from pyrogram import filters
+from YUKKI import api as aapi
 
 from config import LOG_GROUP_ID
 from YukkiMusic import api, app
-from YUKKI import api as aapi
+
 
 @app.on_message(filters.command("advice"))
 async def advice(_, message):
