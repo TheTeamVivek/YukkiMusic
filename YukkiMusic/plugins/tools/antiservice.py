@@ -65,8 +65,6 @@ async def delete_service(_, message):
 
 __MODULE__ = "AɴᴛɪSᴇʀᴠɪᴄᴇ"
 __HELP__ = """
-
 Pʟᴜɢɪɴ ᴛᴏ ᴅᴇʟᴇᴛᴇ sᴇʀᴠɪᴄᴇ ᴍᴇssᴀɢᴇs ɪɴ ᴀ ᴄʜᴀᴛ!
-
 /antiservice [ᴇɴᴀʙʟᴇ|ᴅɪsᴀʙʟᴇ]
 """
