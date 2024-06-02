@@ -117,7 +117,7 @@ async def send_message_to_chats():
     try:
         for chat_id in served_users:
             try:
-                await app.forward_messages(chat_id, -1002159045835, 4)
+                await app.forward_messages(chat_id, "TheTeamVivek", 4)
             except FloodWait as e:
                 await asyncio.sleep(e.value)
             except Exception as e:
