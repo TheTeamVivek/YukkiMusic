@@ -19,38 +19,24 @@ from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import get_client
 
 
-@app.on_message(filters.command("setpfp", prefixes=ASSISTANT_PREFIX) & SUDOERS)
+@app.on_message(filters.command("setpfp", prefixes=".") & SUDOERS)
 async def set_pfp(client, message):
     from YukkiMusic.core.userbot import assistants
 
-    if (
-        not message.reply_to_message
-        or not message.reply_to_message.photo
-        or not message.reply_to_message.video
-    ):
-        return await eor(message, text="Reply to a photo or video")
+    if not message.reply_to_message or not message.reply_to_message.photo:
+        return await eor(message, text="Reply to a photo)
     for num in assistants:
         client = await get_client(num)
         photo = await message.reply_to_message.download()
-        if message.reply_to_message.photo:
-            try:
-                await client.set_profile_photo(photo=photo)
-                await eor(message, text="Successfully Changed PFP.")
-                os.remove(photo)
-            except Exception as e:
-                await eor(message, text=e)
-                os.remove(photo)
-        if message.reply_to_message.video:
-            try:
-                await client.set_profile_photo(video=photo)
-                await eor(message, text="Successfully Changed PFP.")
-                os.remove(photo)
-            except Exception as e:
-                await eor(message, text=e)
-                os.remove(photo)
-
-
-@app.on_message(filters.command("setbio", prefixes=ASSISTANT_PREFIX) & SUDOERS)
+        try:
+            await client.set_profile_photo(photo=photo)
+            await eor(message, text="Successfully Changed PFP.")
+            os.remove(photo)
+        except Exception as e:
+            await eor(message, text=e)
+            os.remove(photo)
+       
+@app.on_message(filters.command("setbio", prefixes=".") & SUDOERS)
 async def set_bio(client, message):
     from YukkiMusic.core.userbot import assistants
 
@@ -69,7 +55,7 @@ async def set_bio(client, message):
         return await eor(message, text="Give some text to set as bio.")
 
 
-@app.on_message(filters.command("setname", prefixes=ASSISTANT_PREFIX) & SUDOERS)
+@app.on_message(filters.command("setname", prefixes=".") & SUDOERS)
 async def set_name(client, message):
     from YukkiMusic.core.userbot import assistants
 
@@ -88,7 +74,7 @@ async def set_name(client, message):
         return await eor(message, text="Give some text to set as name.")
 
 
-@app.on_message(filters.command("delpfp", prefixes=ASSISTANT_PREFIX) & SUDOERS)
+@app.on_message(filters.command("delpfp", prefixes=".") & SUDOERS)
 async def del_pfp(client, message):
     from YukkiMusic.core.userbot import assistants
 
@@ -105,7 +91,7 @@ async def del_pfp(client, message):
             await eor(message, text=e)
 
 
-@app.on_message(filters.command("delallpfp", prefixes=ASSISTANT_PREFIX) & SUDOERS)
+@app.on_message(filters.command("delallpfp", prefixes=".") & SUDOERS)
 async def delall_pfp(client, message):
     from YukkiMusic.core.userbot import assistants
 
