@@ -12,6 +12,7 @@ import asyncio
 from pyrogram.errors import FloodWait
 from pyrogram.types import InlineKeyboardMarkup
 
+from config import LOG_GROUP_ID
 from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.misc import db
@@ -23,7 +24,7 @@ from YukkiMusic.utils.database import (
 )
 from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline import stream_markup_timer, telegram_markup_timer
-from config import LOG_GROUP_ID
+
 from ..admins.callback import wrong
 
 checker = {}
