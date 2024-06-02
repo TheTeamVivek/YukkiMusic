@@ -238,8 +238,7 @@ class Call(PyTgCalls):
                     await app.unban_chat_member(chat_id, userbot.id)
                 except:
                     raise AssistantErr(
-                        _["call_2"].format(
-                            config.MUSIC_BOT_NAME,
+                        _["call_2"].format(app.mention,
                             userbot.id,
                             userbot.mention,
                             userbot.username,
@@ -276,7 +275,7 @@ class Call(PyTgCalls):
                         )
                     await asyncio.sleep(1)
                     await userbot.join_chat(invitelink)
-                    await m.edit_text(_["call_6"].format(config.MUSIC_BOT_NAME))
+                    await m.edit_text(_["call_6"].format(app.mention))
                 except UserAlreadyParticipant:
                     pass
                 except Exception as e:
