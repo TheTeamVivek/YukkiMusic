@@ -24,7 +24,7 @@ async def set_pfp(client, message):
     from YukkiMusic.core.userbot import assistants
 
     if not message.reply_to_message or not message.reply_to_message.photo:
-        return await eor(message, text="Reply to a photo)
+        return await eor(message, text="Reply to a photo")
     for num in assistants:
         client = await get_client(num)
         photo = await message.reply_to_message.download()
