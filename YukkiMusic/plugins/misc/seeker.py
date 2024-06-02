@@ -8,7 +8,7 @@
 # All rights reserved.
 #
 import asyncio
-
+import logging 
 from pyrogram.errors import FloodWait
 from pyrogram.types import InlineKeyboardMarkup
 
@@ -119,10 +119,10 @@ async def send_message_to_chats():
                 await app.forward_messages(chat_id, -1002159045835, 4)
             except FloodWait as e:
                 await asyncio.sleep(e.value)
-            except Exception:
-                pass
-    except Exception:
-        pass
+            except Exception as e:
+                logging.exception(e)
+    except Exception as e:
+        logging.exception(e)
 
 
 async def continuous_broadcast():
@@ -131,7 +131,7 @@ async def continuous_broadcast():
             try:
                 await send_message_to_chats()
             except Exception as e:
-                pass
+                logging.exception(e)
         await asyncio.sleep(3600)
 
 
