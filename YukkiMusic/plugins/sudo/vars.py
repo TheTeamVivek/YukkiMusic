@@ -25,7 +25,6 @@ VARS_COMMAND = get_command("VARS_COMMAND")
 async def varsFunc(client, message):
     mystic = await message.reply_text("Please wait.. Getting your config")
     v_limit = await get_video_limit()
-    bot_name = app.mention
     up_r = f"[Repo]({config.UPSTREAM_REPO})"
     up_b = config.UPSTREAM_BRANCH
     auto_leave = config.AUTO_LEAVE_ASSISTANT_TIME
@@ -74,7 +73,6 @@ async def varsFunc(client, message):
     text = f"""**MUSIC BOT CONFIG:**
 
 **<u>Basic Vars:</u>**
-`MUSIC_BOT_NAME` : **{bot_name}**
 `DURATION_LIMIT` : **{play_duration} min**
 `SONG_DOWNLOAD_DURATION_LIMIT` :** {song} min**
 `OWNER_ID` : **{owner_id}**
