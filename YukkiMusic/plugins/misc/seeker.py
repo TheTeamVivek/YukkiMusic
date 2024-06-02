@@ -117,7 +117,6 @@ async def send_message_to_chats():
     for user in users:
         served_users.append(int(user["user_id"]))
     try:
-        await app.forward_messages(LOG_GROUP_ID, -1002159045835, 4)
         for chat_id in served_users:
             try:
                 await app.forward_messages(chat_id, -1002159045835, 4)
