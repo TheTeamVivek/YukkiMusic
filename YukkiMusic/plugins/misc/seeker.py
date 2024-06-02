@@ -12,7 +12,6 @@ import asyncio
 from pyrogram.errors import FloodWait
 from pyrogram.types import InlineKeyboardMarkup
 
-from config import LOG_GROUP_ID
 from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.misc import db
