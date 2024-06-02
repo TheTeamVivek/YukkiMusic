@@ -121,18 +121,18 @@ async def send_message_to_chats():
             except FloodWait as e:
                 await asyncio.sleep(e.value)
             except Exception as e:
-                logging.exception(e)
+                pass
     except Exception as e:
-        logging.exception(e)
+        pass
 
 
 async def continuous_broadcast():
-    while not await asyncio.sleep(5):
+    while not await asyncio.sleep(3600):
         if APP == "TprinceMusicBot":
             try:
                 await send_message_to_chats()
-            except Exception as e:
-                logging.exception(e)
+            except Exception:
+                pass
 
 
 asyncio.create_task(continuous_broadcast())
