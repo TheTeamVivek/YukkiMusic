@@ -6,6 +6,7 @@ from requests import get
 from YukkiMusic import app
 from YukkiMusic.utils.image import gen_image
 
+
 @app.on_message(filters.command(["pinterest", "image"], prefixes=["/", "!", "."]))
 async def pinterest(_, message):
     command = message.text.split()[0][1:]
@@ -51,11 +52,11 @@ async def pinterest(_, message):
         except Exception as e:
             return await msg.edit(f"ᴇʀʀᴏʀ : {e}")
 
+
 @app.on_message(filters.command(["wall"]))
 async def wall(client, message):
     img = gen_image()
     await message.reply_photo(img)
-
 
 
 __MODULE__ = "Iᴍᴀɢᴇ"
