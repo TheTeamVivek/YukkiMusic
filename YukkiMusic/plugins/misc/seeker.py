@@ -21,6 +21,7 @@ from YukkiMusic.utils.database import (
     is_music_playing,
 )
 from YukkiMusic.utils.formatters import seconds_to_min
+from YukkiMusic import app
 from YukkiMusic.utils.inline import stream_markup_timer, telegram_markup_timer
 
 from ..admins.callback import wrong
