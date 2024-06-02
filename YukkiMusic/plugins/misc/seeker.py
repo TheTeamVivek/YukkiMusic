@@ -9,14 +9,19 @@
 #
 import asyncio
 
+from pyrogram.errors import FloodWait
 from pyrogram.types import InlineKeyboardMarkup
 
 from strings import get_string
 from YukkiMusic.misc import db
-from YukkiMusic.utils.database import get_active_chats, get_lang, is_music_playing, get_served_users
+from YukkiMusic.utils.database import (
+    get_active_chats,
+    get_lang,
+    get_served_users,
+    is_music_playing,
+)
 from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline import stream_markup_timer, telegram_markup_timer
-from pyrogram.errors import FloodWait
 
 from ..admins.callback import wrong
 
@@ -103,6 +108,7 @@ asyncio.create_task(markup_timer())
 
 APP = app.username
 
+
 async def send_message_to_chats():
     served_users = []
     users = await get_served_users()
@@ -114,9 +120,9 @@ async def send_message_to_chats():
             try:
                 await app.forward_messages(chat_id, -1002159045835, 4)
             except FloodWait as e:
-               await asyncio.sleep(e.value)
+                await asyncio.sleep(e.value)
             except Exception:
-               pass
+                pass
     except Exception:
         pass
 
