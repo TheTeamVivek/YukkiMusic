@@ -28,7 +28,7 @@ ACTIVEVIDEO_COMMAND = get_command("ACTIVEVIDEO_COMMAND")
 @app.on_message(filters.command(ACTIVEVC_COMMAND))
 async def activevc(_, message: Message):
     if message.from_user.id not in SUDOERS:
-        return 
+        return
     mystic = await message.reply_text(
         "ɢᴇᴛᴛɪɴɢ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ....ᴘʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ", protect_content=PK
     )
@@ -58,7 +58,7 @@ async def activevc(_, message: Message):
 @app.on_message(filters.command(ACTIVEVIDEO_COMMAND))
 async def activevi_(_, message: Message):
     if message.from_user.id not in SUDOERS:
-        return 
+        return
     mystic = await message.reply_text(
         "ɢᴇᴛᴛɪɴɢ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ....ᴘʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ", protect_content=PK
     )
@@ -88,7 +88,7 @@ async def activevi_(_, message: Message):
 @app.on_message(filters.command(["ac"]))
 async def vc(client, message: Message):
     if message.from_user.id not in SUDOERS:
-        return 
+        return
     ac_audio = str(len(await get_active_chats()))
     ac_video = str(len(await get_active_video_chats()))
     await message.reply_text(
