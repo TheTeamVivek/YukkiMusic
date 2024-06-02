@@ -48,13 +48,11 @@
 
   1. `API_ID` : Get it from my.telegram.org 
   2. `API_HASH`  : Get it from my.telegram.org 
-  3. `ASSISTANT_PREFIX` : Set the prefix that you want to use as assistant's command defaults to `.` 
-  4. `BOT_TOKEN` : Get it from [@Botfather](http://t.me/BotFather) in Telegram
-  5. `MONGO_DB_URI` : Get mongo db [from here.](https://notreallyshikhar.gitbook.io/yukkimusicbot/deployment/mongodb)
-  6. `LOG_GROUP_ID` : You'll need a Private Group ID for this. Supergroup Needed with id starting from -100 
-  7. `MUSIC_BOT_NAME` : A name for your Music bot.
-  8. `OWNER_ID` : Your Owner ID for managing your bot.
-  9. `STRING_SESSION` : Pyrogram Session Needed, Generate string from [@YukkiStringBot](http://t.me/YukkiStringBot) in Telegram.
+  3. `BOT_TOKEN` : Get it from [@Botfather](http://t.me/BotFather) in Telegram
+  4. `MONGO_DB_URI` : Get mongo db [from here.](https://notreallyshikhar.gitbook.io/yukkimusicbot/deployment/mongodb)
+  5. `LOG_GROUP_ID` : You'll need a Private Group ID for this. Supergroup Needed with id starting from -100 
+  6. `OWNER_ID` : Your Owner ID for managing your bot.
+  7. `STRING_SESSION` : Pyrogram Session Needed, Generate string from [@YukkiStringBot](http://t.me/YukkiStringBot) in Telegram.
 
 
   ## Non-Mandatory Vars
