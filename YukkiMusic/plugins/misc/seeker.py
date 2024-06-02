@@ -13,6 +13,7 @@ from pyrogram.errors import FloodWait
 from pyrogram.types import InlineKeyboardMarkup
 
 from strings import get_string
+from YukkiMusic import app
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
     get_active_chats,
@@ -21,7 +22,6 @@ from YukkiMusic.utils.database import (
     is_music_playing,
 )
 from YukkiMusic.utils.formatters import seconds_to_min
-from YukkiMusic import app
 from YukkiMusic.utils.inline import stream_markup_timer, telegram_markup_timer
 
 from ..admins.callback import wrong
