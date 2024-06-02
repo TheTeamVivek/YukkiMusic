@@ -100,7 +100,7 @@ async def authorized(client, message: Message, _):
             return await m.edit(text)
 
 
-__MODULE__ = "Prɪᴠᴀᴛᴇ ʙᴏᴛ"
+__MODULE__ = "Prɪᴠᴀᴛᴇ"
 __HELP__ = """
       ⚡️<u>Pʀɪᴠᴀᴛᴇ Bᴏᴛ Fᴜɴᴄᴛɪᴏɴ:</u>
 /authorize [CHAT_ID] - Aʟʟᴏᴡ ᴀ ᴄʜᴀᴛ ғᴏʀ ᴜsɪɴɢ ʏᴏᴜʀ ʙᴏᴛ.
