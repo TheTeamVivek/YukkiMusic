@@ -8,18 +8,17 @@ from YukkiMusic import app
 
 
 @app.on_message(filters.command(["wall", "wallpaper"]))
-async def wall(_, message: Message):
-    "ғɪxᴇᴅ ᴡᴀʟʟ ʙʏ ᴍᴜᴋᴇsʜ"
+async def wall(_, message: Message):
     try:
         text = message.text.split(None, 1)[1]
     except IndexError:
         text = None
     if not text:
         return await message.reply_text("`Please give some query to search.`")
-    m = await message.reply_text("`Searching for wallpapers...`")
+    m = await message.reply_text("sᴇᴀʀᴄʜɪɴɢ...")
     try:
-        url = requests.get(f"https://api.safone.me/wall?query={text}").json()["results"]
-        ran = random.randint(0, 3)
+        url = requests.get(f"https://api.safone.dev/wall?query={text}").json()["results"]
+        ran = random.randint(0, 7)
         await message.reply_photo(
             photo=url[ran]["imageUrl"],
             caption=f"🥀 **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {message.from_user.mention}",
