@@ -13,7 +13,6 @@ from inspect import getfullargspec
 from pyrogram import filters
 from pyrogram.types import Message
 
-from config import ASSISTANT_PREFIX
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import get_client
@@ -35,7 +34,8 @@ async def set_pfp(client, message):
         except Exception as e:
             await eor(message, text=e)
             os.remove(photo)
-       
+
+
 @app.on_message(filters.command("setbio", prefixes=".") & SUDOERS)
 async def set_bio(client, message):
     from YukkiMusic.core.userbot import assistants
