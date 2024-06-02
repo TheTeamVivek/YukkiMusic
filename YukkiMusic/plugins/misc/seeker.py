@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 import asyncio
-import logging
 
 from pyrogram.errors import FloodWait
 from pyrogram.types import InlineKeyboardMarkup
