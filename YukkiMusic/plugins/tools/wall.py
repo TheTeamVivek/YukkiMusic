@@ -8,7 +8,8 @@ from YukkiMusic import app
 
 
 @app.on_message(filters.command(["wall", "wallpaper"]))
-async def wall(_, message: Message):
+async def wall(_, message: Message):
+
     try:
         text = message.text.split(None, 1)[1]
     except IndexError:
@@ -17,7 +18,9 @@ async def wall(_, message: Message):
         return await message.reply_text("`Please give some query to search.`")
     m = await message.reply_text("sᴇᴀʀᴄʜɪɴɢ...")
     try:
-        url = requests.get(f"https://api.safone.dev/wall?query={text}").json()["results"]
+        url = requests.get(f"https://api.safone.dev/wall?query={text}").json()[
+            "results"
+        ]
         ran = random.randint(0, 7)
         await message.reply_photo(
             photo=url[ran]["imageUrl"],
