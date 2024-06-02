@@ -53,7 +53,7 @@ async def pinterest(_, message):
             return await msg.edit(f"ᴇʀʀᴏʀ : {e}")
 
 
-@app.on_message(filters.command(["rimage","randomimage"]))
+@app.on_message(filters.command(["rimage", "randomimage"]))
 async def wall(client, message):
     img = gen_image()
     await message.reply_photo(img)
