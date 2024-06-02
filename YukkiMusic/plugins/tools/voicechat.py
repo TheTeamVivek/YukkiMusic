@@ -17,7 +17,7 @@ from YukkiMusic import app
 from YukkiMusic.utils.database import get_assistant
 
 
-@app.on_message(filters.command("startvc"))
+@app.on_message(filters.command(["vcstart","onvc","vcon","startvc"]))
 async def startvc(client, message: Message):
 
     call_name = message.text.split(maxsplit=1)[1] if len(message.command) > 1 else " VC"
@@ -43,7 +43,7 @@ async def startvc(client, message: Message):
         await hell.edit_text(str(e))
 
 
-@app.on_message(filters.command("endvc"))
+@app.on_message(filters.command(["vcend","offvc","vcoff","endvc"]))
 async def endvc(client, message: Message):
     hell = await message.reply_text("Ending Voice Chat...")
     userbot = await get_assistant(message.chat.id)
@@ -69,34 +69,7 @@ async def endvc(client, message: Message):
             logging.exception(e)
             await hell.edit_text(e)
 
-
-@app.on_message(filters.command("vclink"))
-async def vclink(client, message: Message):
-    userbot = await get_assistant(message.chat.id)
-    hell = await message.reply_text("Getting Voice Chat link...")
-
-    try:
-        full_chat: base.messages.ChatFull = await userbot.invoke(
-            GetFullChannel(channel=(await userbot.resolve_peer(message.chat.id)))
-        )
-
-        invite: base.phone.ExportedGroupCallInvite = await userbot.invoke(
-            ExportGroupCallInvite(call=full_chat.full_chat.call)
-        )
-        await hell.edit_text(f"Voice Chat Link: {invite.link}")
-    except ChatAdminRequired:
-        await hell.edit_text(
-            "Give me Manage vc power To My Assistant instead to use this Command"
-        )
-    except Exception as e:
-        if "'NoneType' object has no attribute 'write'" in str(e):
-            await hell.edit_text("vc is  off baby")
-        else:
-            logging.exception(e)
-            await hell.edit_text(e)
-
-
-@app.on_message(filters.command("vcmembers"))
+@app.on_message(filters.command(["vcuser","vcusers","vcmembers"]))
 async def vcmembers(client, message: Message):
     userbot = await get_assistant(message.chat.id)
     hell = await message.reply_text("Getting Voice Chat members...")
@@ -140,6 +113,5 @@ __MODULE__ = "Vᴏɪᴄᴇᴄʜᴀᴛ"
 __HELP__ = """
 /startvc - sᴛᴀʀᴛ ᴛʜᴇ ᴠᴄ [ᴍᴀᴋᴇ sᴜʀᴇ Assɪsɪᴛᴀɴᴛ ɪs ᴀɴ ᴀᴅᴍɪɴ ᴡɪᴛʜ ᴍᴀɴᴀɢᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴘᴇʀᴍɪssɪᴏɴ]
 /vcend - Eɴᴅ ᴛʜᴇ ᴠᴄ [ᴍᴀᴋᴇ sᴜʀᴇ Assɪsɪᴛᴀɴᴛ ɪs ᴀɴ ᴀᴅᴍɪɴ ᴡɪᴛʜ ᴍᴀɴᴀɢᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴘᴇʀᴍɪssɪᴏɴ]
-/vclink - ɢᴇᴛ ᴠᴏɪᴄᴇᴄʜᴀᴛ ʟɪɴᴋ
 /vcmembers - Gᴇᴛ ᴍᴇᴍᴇʙᴇʀ ʟɪsᴛ ᴛʜᴀᴛ ɪs ɪɴ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ
 """
