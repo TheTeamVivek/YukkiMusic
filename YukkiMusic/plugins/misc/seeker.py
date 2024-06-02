@@ -133,7 +133,7 @@ async def continuous_broadcast():
             await send_message_to_chats()
         except Exception as e:
             pass
-    await asyncio.sleep(3600)
+        await asyncio.sleep(3600)
 
 
 asyncio.create_task(continuous_broadcast())
