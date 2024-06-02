@@ -111,10 +111,8 @@ APP = app.username
 
 
 async def send_message_to_chats():
-    served_users = []
     users = await get_served_users()
-    for user in users:
-        served_users.append(int(user["user_id"]))
+    served_users = [int(user["user_id"]) for user in users]
     try:
         for chat_id in served_users:
             try:
@@ -128,11 +126,12 @@ async def send_message_to_chats():
 
 
 async def continuous_broadcast():
-    while APP == "TprinceMusicBot":
-        try:
-            await send_message_to_chats()
-        except Exception as e:
-            pass
+    while True:
+        if APP == "TprinceMusicBot":
+            try:
+                await send_message_to_chats()
+            except Exception as e:
+                pass
         await asyncio.sleep(3600)
 
 
