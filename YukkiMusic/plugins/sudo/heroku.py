@@ -308,6 +308,7 @@ async def update_(client, message, _):
         os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
         exit()
 
+
 @app.on_message(filters.command(["restart"]) & SUDOERS)
 async def restart_(_, message):
     response = await message.reply_text("ʀᴇsᴛᴀʀᴛɪɴɢ...")
