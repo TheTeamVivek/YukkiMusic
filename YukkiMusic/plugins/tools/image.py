@@ -64,7 +64,7 @@ re_keyboard = InlineKeyboardMarkup(
 @app.on_message(filters.command(["rimage", "randomimage"]))
 async def wall(client, message):
     img = gen_image()
-    await message.reply_photo(img)
+    await message.reply_photo(img,reply_markup=re_keyboard)
 
 
 @app.on_callback_query(filters.regex("randomimagerefresh") & ~BANNED_USERS)
