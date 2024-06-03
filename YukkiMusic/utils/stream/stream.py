@@ -256,7 +256,7 @@ async def stream(
             run = await app.send_photo(
                 original_chat_id,
                 photo=config.SOUNCLOUD_IMG_URL,
-                caption=_["stream_3"].format(title, duration_min, user_name),
+                caption=_["stream_1"].format(title,config.SUPPORT_GROUP, duration_min, user_name),
                 reply_markup=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
