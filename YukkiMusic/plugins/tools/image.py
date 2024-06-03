@@ -1,6 +1,11 @@
 from bing_image_urls import bing_image_urls
 from pyrogram import filters
-from pyrogram.types import CallbackQuery, InputMediaPhoto, InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import (
+    CallbackQuery,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    InputMediaPhoto,
+)
 from requests import get
 
 from config import BANNED_USERS
