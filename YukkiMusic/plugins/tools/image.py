@@ -2,12 +2,12 @@ from bing_image_urls import bing_image_urls
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, InputMediaPhoto
 from requests import get
-
+from config import BANNED_USERS
 from YukkiMusic import app
 from YukkiMusic.utils.image import gen_image
 
 
-@app.on_message(filters.command(["pinterest", "image"], prefixes=["/", "!", "."]))
+@app.on_message(filters.command(["pinterest", "image"], prefixes=["/", "!", "."]) & ~BANNED_USERS)
 async def pinterest(_, message):
     command = message.text.split()[0][1:]
     chat_id = message.chat.id
@@ -61,7 +61,7 @@ re_keyboard = InlineKeyboardMarkup(
 )
 
 
-@app.on_message(filters.command(["rimage", "randomimage"]))
+@app.on_message(filters.command(["rimage", "randomimage"]) & ~BANNED_USERS)
 async def wall(client, message):
     img = gen_image()
     await message.reply_photo(img, reply_markup=re_keyboard)
