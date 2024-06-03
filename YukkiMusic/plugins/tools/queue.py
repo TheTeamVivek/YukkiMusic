@@ -31,7 +31,7 @@ basic = {}
 
 def get_image(videoid):
     try:
-        url = f"https://img.youtube.com/vi/{videoid}/maxresdefault.jpg"
+        url = f"https://img.youtube.com/vi/{videoid}/hqdefault.jpg"
         return url
     except Exception:
         return config.YOUTUBE_IMG_URL
