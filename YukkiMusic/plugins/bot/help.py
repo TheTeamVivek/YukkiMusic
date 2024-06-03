@@ -61,7 +61,7 @@ async def helper_private(
 
         else:
             await update.reply_photo(
-                photo=random.choice(PHOTO),
+                photo=START_IMG_URL,
                 caption=_["help_1"],
                 reply_markup=keyboard,
             )
