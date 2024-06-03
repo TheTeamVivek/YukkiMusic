@@ -173,7 +173,7 @@ def PlayWrapper(command):
                     invitelink = invitelink.replace(
                         "https://t.me/+", "https://t.me/joinchat/"
                     )
-                myu = await message.reply_text(f"ᴀssɪsᴛᴀɴᴛ ɪs Jᴏɪɴɪɴɢ")
+                myu = await message.reply_text(_["call_5"])
                 try:
                     await asyncio.sleep(1)
                     await userbot.join_chat(invitelink)
@@ -185,7 +185,7 @@ def PlayWrapper(command):
                             _["call_3"].format(type(e).__name__)
                         )
                     await asyncio.sleep(3)
-                    await myu.edit(_["call_5"].format(app.mention))
+                    await myu.edit(_["call_6"].format(app.mention))
                 except UserAlreadyParticipant:
                     pass
                 except Exception as e:
