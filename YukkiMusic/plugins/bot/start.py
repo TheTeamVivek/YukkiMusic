@@ -9,7 +9,6 @@
 #
 import asyncio
 import time
-from random import choice
 
 from pyrogram import filters
 from pyrogram.enums import ChatType, ParseMode
@@ -17,7 +16,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
 
 import config
-from config import BANNED_USERS, PHOTO, START_IMG_URL
+from config import BANNED_USERS, START_IMG_URL
 from config.config import OWNER_ID
 from strings import get_string
 from YukkiMusic import Telegram, YouTube, app
@@ -60,9 +59,8 @@ async def start_comm(client, message: Message, _):
                     reply_markup=keyboard,
                 )
             else:
-                return await message.reply_photo(
-                    photo=choice(PHOTO),
-                    caption=_["help_1"],
+                return await message.reply_text(
+                    text=_["help_1"],
                     reply_markup=keyboard,
                 )
         if name[0:4] == "song":
@@ -222,15 +220,13 @@ async def start_comm(client, message: Message, _):
                     reply_markup=InlineKeyboardMarkup(out),
                 )
             except:
-                await message.reply_photo(
-                    photo=choice(PHOTO),
-                    caption=_["start_2"].format(app.mention),
+                await message.reply_text(
+                    text=_["start_2"].format(app.mention),
                     reply_markup=InlineKeyboardMarkup(out),
                 )
         else:
-            await message.reply_photo(
-                photo=choice(PHOTO),
-                caption=_["start_2"].format(app.mention),
+            await message.reply_text(
+                text=_["start_2"].format(app.mention),
                 reply_markup=InlineKeyboardMarkup(out),
             )
         if await is_on_off(config.LOG):
@@ -255,9 +251,8 @@ async def testbot(client, message: Message, _):
             reply_markup=InlineKeyboardMarkup(out),
         )
     else:
-        await message.reply_photo(
-            photo=choice(PHOTO),
-            caption=_["start_8"].format(app.mention, get_readable_time(uptime)),
+        await message.reply_text(
+            text=_["start_8"].format(app.mention, get_readable_time(uptime)),
             reply_markup=InlineKeyboardMarkup(out),
         )
     return await add_served_chat(message.chat.id)
