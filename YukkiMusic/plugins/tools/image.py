@@ -1,6 +1,6 @@
 from bing_image_urls import bing_image_urls
 from pyrogram import filters
-from pyrogram.types import InputMediaPhoto, CallbackQuery
+from pyrogram.types import CallbackQuery, InputMediaPhoto
 from requests import get
 
 from YukkiMusic import app
@@ -66,6 +66,7 @@ async def wall(client, message):
     img = gen_image()
     await message.reply_photo(img)
 
+
 @app.on_callback_query(filters.regex("randomimagerefresh") & ~BANNED_USERS)
 async def refresh_cat(c, m: CallbackQuery):
 
@@ -73,8 +74,6 @@ async def refresh_cat(c, m: CallbackQuery):
         InputMediaPhoto(media=cat_url),
         reply_markup=re_keyboard,
     )
-
-
 
 
 __MODULE__ = "Iᴍᴀɢᴇ"
