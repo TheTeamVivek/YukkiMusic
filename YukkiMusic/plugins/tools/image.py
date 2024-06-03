@@ -1,6 +1,6 @@
 from bing_image_urls import bing_image_urls
 from pyrogram import filters
-from pyrogram.types import InputMediaPhoto
+from pyrogram.types import InputMediaPhoto, CallbackQuery
 from requests import get
 
 from YukkiMusic import app
@@ -53,10 +53,28 @@ async def pinterest(_, message):
             return await msg.edit(f"ᴇʀʀᴏʀ : {e}")
 
 
+re_keyboard = InlineKeyboardMarkup(
+    [
+        [InlineKeyboardButton(text="Rᴇғʀᴇsʜ", callback_data="randomimagerefresh")],
+        [InlineKeyboardButton(text="〆 ᴄʟᴏsᴇ 〆", callback_data="close")],
+    ]
+)
+
+
 @app.on_message(filters.command(["rimage", "randomimage"]))
 async def wall(client, message):
     img = gen_image()
     await message.reply_photo(img)
+
+@app.on_callback_query(filters.regex("randomimagerefresh") & ~BANNED_USERS)
+async def refresh_cat(c, m: CallbackQuery):
+
+    await m.edit_message_media(
+        InputMediaPhoto(media=cat_url),
+        reply_markup=re_keyboard,
+    )
+
+
 
 
 __MODULE__ = "Iᴍᴀɢᴇ"
