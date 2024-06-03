@@ -9,7 +9,6 @@
 
 from youtubesearchpython.__future__ import VideosSearch
 
-from config import YOUTUBE_IMG_URL
 
 # Function to get thumbnail by video ID
 async def gen_thumb(videoid):
