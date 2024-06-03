@@ -17,7 +17,7 @@ lyricsgenius
 lexica-api
 MukeshAPI
 motor
-pillow==9.5.0
+pillow==10.3.0
 pyfiglet
 opencv-python-headless==4.9.0.80
 profanity
