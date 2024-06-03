@@ -37,7 +37,7 @@ RADIO_STATION = {
 
 }
 
-valid_stations = "\n".join([f"`{name}`" for name in RADIO_STATION.keys()])
+valid_stations = "\n".join([f"`{name}`" for name in sorted(RADIO_STATION.keys())])
 
 
 @app.on_message(
