@@ -77,9 +77,9 @@ async def wall(client, message):
 
 @app.on_callback_query(filters.regex("randomimagerefresh") & ~BANNED_USERS)
 async def refresh_cat(c, m: CallbackQuery):
-
+    img = gen_image()
     await m.edit_message_media(
-        InputMediaPhoto(media=cat_url),
+        InputMediaPhoto(media=img),
         reply_markup=re_keyboard,
     )
 
