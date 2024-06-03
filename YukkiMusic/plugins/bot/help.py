@@ -7,14 +7,13 @@
 #
 # All rights reserved.
 #
-import random
 import re
 from typing import Union
 
 from pyrogram import filters, types
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from config import BANNED_USERS, PHOTO, START_IMG_URL
+from config import BANNED_USERS, START_IMG_URL
 from strings import get_command, get_string
 from YukkiMusic import HELPABLE, app
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
@@ -60,9 +59,8 @@ async def helper_private(
             )
 
         else:
-            await update.reply_photo(
-                photo=START_IMG_URL,
-                caption=_["help_1"],
+            await update.reply_text(
+                text=_["help_1"],
                 reply_markup=keyboard,
             )
 
