@@ -45,4 +45,4 @@ git+https://github.com/alexmercerind/youtube-search-python@main
 git+https://github.com/joetats/youtube_search@master
 uuid==1.30
 SafoneAPI
-git+https://github.com/Vivekkumar-IN/External-Plugins@main
+https://github.com/Vivekkumar-IN/TheApi
