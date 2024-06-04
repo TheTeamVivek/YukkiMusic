@@ -181,7 +181,7 @@ async def skip(cli, message: Message, _, chat_id):
                     if str(streamtype) == "audio"
                     else config.TELEGRAM_VIDEO_URL
                 ),
-                caption=_["stream_3"].format(title, check[0]["dur"], user),
+                caption=_["stream_1"].format(title,config.SUPPORT_GROUP, check[0]["dur"], user),
                 reply_markup=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
@@ -194,7 +194,7 @@ async def skip(cli, message: Message, _, chat_id):
                     if str(streamtype) == "audio"
                     else config.TELEGRAM_VIDEO_URL
                 ),
-                caption=_["stream_3"].format(title, check[0]["dur"], user),
+                caption=_["stream_1"].format(title,config.SUPPORT_GROUP, check[0]["dur"], user),
                 reply_markup=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
