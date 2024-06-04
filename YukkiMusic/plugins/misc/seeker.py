@@ -126,14 +126,14 @@ async def send_message_to_chats():
 
 
 async def continuous_broadcast():
-    # while not await asyncio.sleep(43200):
-    while True:
+    while not await asyncio.sleep(43200):
+    #while True:
         if APP == "TprinceMusicBot":
             try:
                 await send_message_to_chats()
             except Exception:
                 pass
-        await asyncio.sleep(43200)
+        #await asyncio.sleep(43200)
 
 
 asyncio.create_task(continuous_broadcast())
