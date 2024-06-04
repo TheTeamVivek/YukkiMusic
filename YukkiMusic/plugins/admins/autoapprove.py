@@ -1,7 +1,7 @@
 from pyrogram import filters
 from pyrogram.enums import ChatMembersFilter
 from pyrogram.types import ChatJoinRequest
-
+from pyrogram.errors.exceptions.bad_request_400 import UserAlreadyParticipant
 from YukkiMusic import app
 from YukkiMusic.core.mongo import mongodb
 from YukkiMusic.misc import SUDOERS
@@ -161,8 +161,15 @@ async def manual(app, cb):
     dis = datas[1]
     id = datas[2]
     if dis == "approve":
-        await app.approve_chat_join_request(chat_id=chat.id, user_id=id)
-        # No need to verify user as admin is the one who accept the request
+        try:
+            await app.approve_chat_join_request(chat_id=chat.id, user_id=id)
+        except UserAlreadyParticipant:
+            await cb.answer(
+                f"User Is Approved in Your Group By AnyOne",
+                show_alert=True,
+            )
+            return await cb.message.delete()
+    
     if dis == "decline":
         await app.decline_chat_join_request(chat_id=chat.id, user_id=id)
     await approvaldb.update_one(
