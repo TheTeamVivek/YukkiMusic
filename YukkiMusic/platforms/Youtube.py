@@ -12,6 +12,7 @@ import asyncio
 import os
 import re
 from typing import Union
+import config
 
 import yt_dlp
 from pyrogram.enums import MessageEntityType
