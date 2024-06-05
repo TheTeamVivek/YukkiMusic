@@ -61,7 +61,6 @@ async def delete_service(_, message):
     try:
         if await is_antiservice_on(chat_id):
             return await message.delete()
-            sleep(300)
     except Exception:
         pass
 
