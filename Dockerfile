@@ -5,6 +5,6 @@ RUN apt-get update -y && apt-get upgrade -y \
     && rm -rf /var/lib/apt/lists/*
 COPY . /app/
 WORKDIR /app/
-RUN python -m pip install --no-cache-dir --upgrade pip yt-dlp
+RUN python -m pip install --no-cache-dir --upgrade pip
 RUN pip3 install --no-cache-dir --upgrade --requirement requirements.txt
 CMD python3 -m YukkiMusic
