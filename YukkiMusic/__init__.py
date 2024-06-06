@@ -54,4 +54,3 @@ HELPABLE = {}
 
 TEMP_DOWNLOAD_DIRECTORY = "downloads"
 
-telethn = TelegramClient("YukkiMusic", API_ID, API_HASH)
