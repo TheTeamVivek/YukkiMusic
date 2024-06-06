@@ -28,6 +28,8 @@ class Userbot(Client):
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING1),
                 workdir="datafiles",
+                no_updates=False,
+                plugins=dict(root="YukkiMusic.plugins.ASSITANT"),
             )
             if config.STRING1
             else None
@@ -40,6 +42,8 @@ class Userbot(Client):
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING2),
                 workdir="datafiles",
+                no_updates=False,
+                plugins=dict(root="YukkiMusic.plugins.ASSITANT"),
             )
             if config.STRING2
             else None
@@ -52,6 +56,8 @@ class Userbot(Client):
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING3),
                 workdir="datafiles",
+                no_updates=False,
+                plugins=dict(root="YukkiMusic.plugins.ASSITANT"),
             )
             if config.STRING3
             else None
@@ -64,6 +70,8 @@ class Userbot(Client):
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING4),
                 workdir="datafiles",
+                no_updates=False,
+                plugins=dict(root="YukkiMusic.plugins.ASSITANT"),
             )
             if config.STRING4
             else None
@@ -76,6 +84,8 @@ class Userbot(Client):
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING5),
                 workdir="datafiles",
+                no_updates=False,
+                plugins=dict(root="YukkiMusic.plugins.ASSITANT"),
             )
             if config.STRING5
             else None
