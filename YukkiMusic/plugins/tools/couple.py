@@ -13,16 +13,12 @@ from YukkiMusic import app
 
 todaydate = datetime.now(pytz.timezone('Asia/Kolkata')).strftime("%Y-%m-%d")
 
-def clean(directory="downloads/"):
+def clean(directory="downloads/", cid):
     files = os.listdir(directory)
     for file in files:
-    if file.startswith("couple_"):
-        parts = file.split("_")
-        file_date = parts[1]
-        cid = parts[2].split(".")[0]
-        if file_date != todaydate:
-            os.remove(os.path.join(directory, file))
-
+    if file.startswith(f"couple_{indian_date}_{cid}"):
+        continue
+    os.remove(os.path.join(directory, file))
 
 @app.on_message(
     filters.command(
