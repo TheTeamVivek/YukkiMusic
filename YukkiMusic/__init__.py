@@ -10,7 +10,6 @@
 
 from SafoneAPI import SafoneAPI
 
-from config import API_HASH, API_ID
 from YukkiMusic.core.bot import YukkiBot
 from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
