@@ -19,7 +19,6 @@ MukeshAPI
 motor
 pillow==9.5.0
 pyfiglet
-opencv-python-headless==4.9.0.80
 pytz
 psutil
 pytube
@@ -33,8 +32,7 @@ requests
 speedtest-cli
 secureme==0.0.4
 spotipy
-telethon==1.33.1
-telegraph==2.2.0
+telegraph
 tgcrypto
 urllib3
 yt-dlp
