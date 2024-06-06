@@ -34,7 +34,7 @@ ADDPLAYLIST_COMMAND : ["addplaylist"]
 
 
 # Tools
-QUEUE_COMMAND : ["queue","cqueue","playing", "cplaying"]
+QUEUE_COMMAND : ["queue","cqueue"]
 SONG_COMMAND : ["song", "video"]
 LYRICS_COMMAND : ["lyrics"]
 
