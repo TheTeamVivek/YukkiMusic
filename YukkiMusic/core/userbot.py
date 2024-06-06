@@ -9,7 +9,7 @@
 #
 import sys
 
-from pyrogram import Client
+from pyrogram import Client, filters, handlers
 
 import config
 
@@ -21,49 +21,69 @@ assistantids = []
 
 class Userbot(Client):
     def __init__(self):
-        self.one = Client(
-            "YukkiString1",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING1),
-            workdir="datafiles",
-            no_updates=True,
+        self.one = (
+            Client(
+                "YukkiString1",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING1),
+                workdir="datafiles",
+                no_updates=True,
+            )
+            if config.STRING1
+            else None
         )
 
-        self.two = Client(
-            "YukkiString2",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING2),
-            workdir="datafiles",
-            no_updates=True,
+        self.two = (
+            Client(
+                "YukkiString2",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING2),
+                workdir="datafiles",
+                no_updates=True,
+            )
+            if config.STRING2
+            else None
         )
 
-        self.three = Client(
-            "YukkiString3",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING3),
-            workdir="datafiles",
-            no_updates=True,
+        self.three = (
+            Client(
+                "YukkiString3",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING3),
+                workdir="datafiles",
+                no_updates=True,
+            )
+            if config.STRING3
+            else None
         )
 
-        self.four = Client(
-            "YukkiString4",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING4),
-            workdir="datafiles",
-            no_updates=True,
+        self.four = (
+            Client(
+                "YukkiString4",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING4),
+                workdir="datafiles",
+                no_updates=True,
+            )
+            if config.STRING4
+            else None
         )
 
-        self.five = Client(
-            "YukkiString5",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING5),
-            workdir="datafiles",
-            no_updates=True,
+        self.five = (
+            Client(
+                "YukkiString5",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING5),
+                workdir="datafiles",
+                no_updates=True,
+            )
+            if config.STRING5
+            else None
         )
 
     async def start(self):
@@ -83,7 +103,7 @@ class Userbot(Client):
                 LOGGER(__name__).error(
                     f"Assistant Account 1 has failed to access the log Group. Make sure that you have added your assistant to your log group and promoted as admin! "
                 )
-            # sys.exit()
+            sys.exit()
             get_me = await self.one.get_me()
             self.one.username = get_me.username
             self.one.id = get_me.id
@@ -198,3 +218,15 @@ class Userbot(Client):
             else:
                 self.five.name = get_me.first_name
             LOGGER(__name__).info(f"Assistant Five Started as {self.five.name}")
+
+    def add_handler(self, handler, filter=filters.all):
+        if self.one:
+            self.one.add_handler(handlers.MessageHandler(handler, filter))
+        if self.two:
+            self.two.add_handler(handlers.MessageHandler(handler, filter))
+        if self.three:
+            self.three.add_handler(handlers.MessageHandler(handler, filter))
+        if self.four:
+            self.four.add_handler(handlers.MessageHandler(handler, filter))
+        if self.five:
+            self.five.add_handler(handlers.MessageHandler(handler, filter))
