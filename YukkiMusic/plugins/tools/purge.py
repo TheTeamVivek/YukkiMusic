@@ -52,7 +52,7 @@ async def purge(app: app, msg: Message):
     await msg.reply_text("**ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴍᴇssᴀɢᴇ ᴛᴏ sᴛᴀʀᴛ ᴘᴜʀɢᴇ !**")
     return
 
- @app.on_message(filters.command("del"))
+@app.on_message(filters.command("del"))
 @adminsOnly("can_delete_messages") 
 async def del_msg(app: app, msg: Message):
     if msg.chat.type != ChatType.SUPERGROUP:
