@@ -223,15 +223,3 @@ class Userbot(Client):
             else:
                 self.five.name = get_me.first_name
             LOGGER(__name__).info(f"Assistant Five Started as {self.five.name}")
-
-    def add_handler(self, handler, filter=filters.all):
-        if self.one:
-            self.one.add_handler(handlers.MessageHandler(handler, filter))
-        if self.two:
-            self.two.add_handler(handlers.MessageHandler(handler, filter))
-        if self.three:
-            self.three.add_handler(handlers.MessageHandler(handler, filter))
-        if self.four:
-            self.four.add_handler(handlers.MessageHandler(handler, filter))
-        if self.five:
-            self.five.add_handler(handlers.MessageHandler(handler, filter))
