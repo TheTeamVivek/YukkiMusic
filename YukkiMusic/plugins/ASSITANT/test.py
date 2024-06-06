@@ -5,4 +5,7 @@ async def start(client:Client, message):
     await message.reply_text("yeah")
 
 
-userbot.add_handler(start, filters.command(["start"], prefixes=["."]))
+start_command_filter = filters.command("start", prefixes=["."])
+
+userbot.add_handler(start, start_command_filter)
+
