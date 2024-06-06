@@ -104,7 +104,7 @@ async def couples(app, message):
         img.paste(img1, (125, 196), img1)
         img.paste(img2, (780, 196), img2)
 
-        img.save(f"couple_{todaydate}_{cid}.png")
+        img.save(f"downloads/couple_{todaydate}_{cid}.png")
 
         TXT = f"""
 **ᴛᴏᴅᴀʏ's sᴇʟᴇᴄᴛᴇᴅ ᴄᴏᴜᴘʟᴇs 🌺 :
@@ -115,7 +115,7 @@ async def couples(app, message):
 """
         await app.send_chat_action(message.chat.id, ChatAction.UPLOAD_PHOTO)
         await message.reply_photo(
-            f"couple_{todaydate}_{cid}.png",
+            f"downloads/couple_{todaydate}_{cid}.png",
             caption=TXT,
             reply_markup=InlineKeyboardMarkup(
                 [[InlineKeyboardButton(text="ᴍʏ ᴄᴜᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ 🌋", user_id=OWNER)]]
