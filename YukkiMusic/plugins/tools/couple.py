@@ -31,6 +31,12 @@ async def couples(app, message):
     if message.chat.type == ChatType.PRIVATE:
         return await message.reply_text("ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ɪs ᴏɴʟʏ ғᴏʀ ɢʀᴏᴜᴘs.")
     try:
+        await app.resolve_peer(OWNER_ID[0])
+        OWNER = OWNER_ID[0]
+    except:
+        OWNER = f"tg://openmessage?user_id={OWNER_ID[0]}"
+
+    try:
         msg = await message.reply_text("❣️")
         files = os.listdir("downloads/")
         is_photo_sent = False
@@ -74,12 +80,6 @@ async def couples(app, message):
             p2 = await app.download_media(photo2.big_file_id, file_name="pfp1.png")
         except Exception:
             p2 = "assets/upic.png"
-        try:
-            await app.resolve_peer(OWNER_ID[0])
-            OWNER = OWNER_ID[0]
-        except:
-            OWNER = f"tg://openmessage?user_id={OWNER_ID[0]}"
-
         img1 = Image.open(f"{p1}")
         img2 = Image.open(f"{p2}")
 
