@@ -49,8 +49,4 @@ async def assistant():
     if filled_count == 1:
         return True
     else:
-        return False
-
-
-async def echo(client, message):
-    await message.reply_text(f"hello ji i am a assistant of @{app.username}")
+        return False
