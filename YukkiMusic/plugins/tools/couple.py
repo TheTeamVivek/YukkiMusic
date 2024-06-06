@@ -32,6 +32,18 @@ async def couples(app, message):
         return await message.reply_text("ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ɪs ᴏɴʟʏ ғᴏʀ ɢʀᴏᴜᴘs.")
     try:
         msg = await message.reply_text("❣️")
+        files = os.listdir("downloads/")
+        for file in files:
+            if file.startswith(f"couple_{todaydate}_{cid}"):
+                await message.reply_photo(
+            file,
+            caption="**ᴛᴏᴅᴀʏ's sᴇʟᴇᴄᴛᴇᴅ ᴄᴏᴜᴘʟᴇs 🌺**",
+            reply_markup=InlineKeyboardMarkup(
+                [[InlineKeyboardButton(text="ᴍʏ ᴄᴜᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ 🌋", user_id=OWNER)]]
+            ),
+        )
+
+
         list_of_users = []
 
         async for i in app.get_chat_members(message.chat.id, limit=50):
