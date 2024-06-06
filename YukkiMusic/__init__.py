@@ -9,7 +9,6 @@
 #
 
 from SafoneAPI import SafoneAPI
-from telethon import TelegramClient
 
 from config import API_HASH, API_ID
 from YukkiMusic.core.bot import YukkiBot
