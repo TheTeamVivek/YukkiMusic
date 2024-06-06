@@ -1,83 +1,72 @@
-import time
+from asyncio import sleep
 
-from telethon import events
+from pyrogram import filters
+from pyrogram.enums import ChatType
+from pyrogram.errors import MessageDeleteForbidden, RPCError
+from pyrogram.types import Message
 
-from YukkiMusic import telethn
-from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.chatstatus import can_delete_messages, user_is_admin
+from YukkiMusic import app
+from YukkiMusic.utils.permissions import adminsOnly
 
+@app.on_message(filters.command("purge") )
+@adminsOnly("can_delete_messages") 
+async def purge(app: app, msg: Message):
 
-async def purge_messages(event):
-    start = time.perf_counter()
-    if event.from_id is None:
+    if msg.chat.type != ChatType.SUPERGROUP:
+        await msg.reply_text(
+            text="**ɪ ᴄᴀɴ'ᴛ ᴘᴜʀɢᴇ ᴍᴇssᴀɢᴇs ɪɴ ᴀ ʙᴀsɪᴄ ɢʀᴏᴜᴘ ᴍᴀᴋᴇ sᴜᴘᴇʀ ɢʀᴏᴜᴘ.**"
+        )
         return
 
-    if (
-        not await user_is_admin(user_id=event.sender_id, message=event)
-        and event.from_id not in SUDOERS
-    ):
-        await event.reply("Only Admins are allowed to use this command")
+    if msg.reply_to_message:
+        message_ids = list(range(msg.reply_to_message.id, msg.id))
+
+        def divide_chunks(l: list, n: int = 100):
+            for i in range(0, len(l), n):
+                yield l[i : i + n]
+
+        m_list = list(divide_chunks(message_ids))
+
+        try:
+            for plist in m_list:
+                await app.delete_messages(
+                    chat_id=msg.chat.id, message_ids=plist, revoke=True
+                )
+
+            await msg.delete()
+        except MessageDeleteForbidden:
+            await msg.reply_text(
+                text="**ɪ ᴄᴀɴ'ᴛ ᴅᴇʟᴇᴛᴇ ᴀʟʟ ᴍᴇssᴀɢᴇs. ᴛʜᴇ ᴍᴇssᴀɢᴇs ᴍᴀʏ ʙᴇ ᴛᴏᴏ ᴏʟᴅ, ɪ ᴍɪɢʜᴛ ɴᴏᴛ ʜᴀᴠᴇ ᴅᴇʟᴇᴛᴇ ʀɪɢʜᴛs, ᴏʀ ᴛʜɪs ᴍɪɢʜᴛ ɴᴏᴛ ʙᴇ ᴀ sᴜᴘᴇʀɢʀᴏᴜᴘ.**"
+            )
+            return
+
+        except RPCError as ef:
+            await msg.reply_text(
+                text=f"**sᴏᴍᴇ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀᴇᴅ, ʀᴇᴘᴏʀᴛ ɪᴛ ᴜsɪɴɢ** `/bug`<b>ᴇʀʀᴏʀ:</b> <code>{ef}</code>"
+            )
+        count_del_msg = len(message_ids)
+        sumit = await msg.reply_text(text=f"ᴅᴇʟᴇᴛᴇᴅ <i>{count_del_msg}</i> ᴍᴇssᴀɢᴇs")
+        await sleep(3)
+        await sumit.delete()
         return
+    await msg.reply_text("**ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴍᴇssᴀɢᴇ ᴛᴏ sᴛᴀʀᴛ ᴘᴜʀɢᴇ !**")
+    return
 
-    if not await can_delete_messages(message=event):
-        await event.reply("Can't seem to purge the message")
+ @app.on_message(filters.command("del"))
+@adminsOnly("can_delete_messages") 
+async def del_msg(app: app, msg: Message):
+    if msg.chat.type != ChatType.SUPERGROUP:
+        await msg.reply_text(
+            text="**ɪ ᴄᴀɴ'ᴛ ᴘᴜʀɢᴇ ᴍᴇssᴀɢᴇs ɪɴ ᴀ ʙᴀsɪᴄ ɢʀᴏᴜᴘ ᴍᴀᴋᴇ sᴜᴘᴇʀ ɢʀᴏᴜᴘ.**"
+        )
         return
-
-    reply_msg = await event.get_reply_message()
-    if not reply_msg:
-        await event.reply("Reply to a message to select where to start purging from.")
+    if msg.reply_to_message:
+        await msg.delete()
+        await app.delete_messages(
+            chat_id=msg.chat.id,
+            message_ids=msg.reply_to_message.id,
+            revoke=True,
+        )
+    else:
+        await msg.reply_text(text="**ᴡʜᴀᴛ ᴅᴏ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴇʟᴇᴛᴇ.**")
         return
-    messages = []
-    message_id = reply_msg.id
-    delete_to = event.message.id
-
-    messages.append(event.reply_to_msg_id)
-    for msg_id in range(message_id, delete_to + 1):
-        messages.append(msg_id)
-        if len(messages) == 100:
-            await event.client.delete_messages(event.chat_id, messages)
-            messages = []
-
-    try:
-        await event.client.delete_messages(event.chat_id, messages)
-    except:
-        pass
-    time_ = time.perf_counter() - start
-    text = f"`Purged Successfully in {time_:0.2f} Seconds.`"
-    await event.respond(text, parse_mode="markdown")
-
-
-async def delete_messages(event):
-    if event.from_id is None:
-        return
-
-    if (
-        not await user_is_admin(user_id=event.sender_id, message=event)
-        and event.from_id not in SUDOERS
-    ):
-        await event.reply("Only Admins are allowed to use this command")
-        return
-
-    if not await can_delete_messages(message=event):
-        await event.reply("Can't seem to delete this?")
-        return
-
-    message = await event.get_reply_message()
-    if not message:
-        await event.reply("Whadya want to delete?")
-        return
-    chat = await event.get_input_chat()
-    del_message = [message, event.message]
-    await event.client.delete_messages(chat, del_message)
-
-
-"""
- ❍ /del*:* deletes the message you replied to
- ❍ /purge*:* deletes all messages between this and the replied to message.
-"""
-
-PURGE_HANDLER = purge_messages, events.NewMessage(pattern="^[!/]purge$")
-DEL_HANDLER = delete_messages, events.NewMessage(pattern="^[!/]del$")
-
-telethn.add_event_handler(*PURGE_HANDLER)
-telethn.add_event_handler(*DEL_HANDLER)
