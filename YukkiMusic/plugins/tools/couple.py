@@ -54,6 +54,7 @@ async def couples(app, message):
                 break
         
         if is_photo_sent:
+           await msg.delete()
            return
         list_of_users = []
 
