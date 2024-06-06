@@ -13,7 +13,7 @@ from YukkiMusic import app
 
 todaydate = datetime.now(pytz.timezone('Asia/Kolkata')).strftime("%Y-%m-%d")
 
-def clean(directory="downloads/", cid):
+def clean(cid, directory="downloads/"):
     files = os.listdir(directory)
     for file in files:
         if file.startswith(f"couple_{todaydate}_{cid}"):
