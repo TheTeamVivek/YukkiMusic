@@ -33,17 +33,22 @@ async def couples(app, message):
     try:
         msg = await message.reply_text("❣️")
         files = os.listdir("downloads/")
+        is_photo_sent = False
         for file in files:
             if file.startswith(f"couple_{todaydate}_{cid}"):
+                
                 await message.reply_photo(
                     file,
                     caption="**ᴛᴏᴅᴀʏ's sᴇʟᴇᴄᴛᴇᴅ ᴄᴏᴜᴘʟᴇs 🌺**",
                     reply_markup=InlineKeyboardMarkup(
                 [[InlineKeyboardButton(text="ᴍʏ ᴄᴜᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ 🌋", user_id=OWNER)]]
-                    ),
-            )
-
-
+                        ),
+                )
+                is_photo_sent = True
+                break
+        
+        if is_photo_sent:
+           return
         list_of_users = []
 
         async for i in app.get_chat_members(message.chat.id, limit=50):
@@ -117,7 +122,17 @@ async def couples(app, message):
             ),
         )
         await msg.delete()
-        clean()
+        clean(cid=cid)
+        try:
+            os.remove(pfp1.png)
+            os.remove(pfp.png)
+        except Exception:
+            pass
     except Exception as e:
         print(str(e))
-        clean()
+        clean(cid=cid)
+        try:
+            os.remove(pfp1.png)
+            os.remove(pfp.png)
+        except Exception:
+            pass
