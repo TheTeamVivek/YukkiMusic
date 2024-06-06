@@ -28,7 +28,6 @@ logging.getLogger("pytgcalls").setLevel(logging.ERROR)
 logging.getLogger("pymongo").setLevel(logging.ERROR)
 logging.getLogger("ntgcalls").setLevel(logging.ERROR)
 logging.getLogger("httpx").setLevel(logging.ERROR)
-logging.getLogger("telethon").setLevel(logging.ERROR)
 
 
 def LOGGER(name: str) -> logging.Logger:
