@@ -36,12 +36,12 @@ async def couples(app, message):
         for file in files:
             if file.startswith(f"couple_{todaydate}_{cid}"):
                 await message.reply_photo(
-            file,
-            caption="**ᴛᴏᴅᴀʏ's sᴇʟᴇᴄᴛᴇᴅ ᴄᴏᴜᴘʟᴇs 🌺**",
-            reply_markup=InlineKeyboardMarkup(
+                    file,
+                    caption="**ᴛᴏᴅᴀʏ's sᴇʟᴇᴄᴛᴇᴅ ᴄᴏᴜᴘʟᴇs 🌺**",
+                    reply_markup=InlineKeyboardMarkup(
                 [[InlineKeyboardButton(text="ᴍʏ ᴄᴜᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ 🌋", user_id=OWNER)]]
-            ),
-        )
+                    ),
+            )
 
 
         list_of_users = []
