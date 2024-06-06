@@ -165,13 +165,20 @@ async def manual(app, cb):
             await app.approve_chat_join_request(chat_id=chat.id, user_id=id)
         except UserAlreadyParticipant:
             await cb.answer(
-                f"User Is Approved in Your Group By AnyOne",
+                "Usᴇʀ Is Aᴘᴘʀᴏᴠᴇᴅ ɪɴ Yᴏᴜʀ Gʀᴏᴜᴘ Bʏ AɴʏOɴᴇ",
                 show_alert=True,
             )
             return await cb.message.delete()
     
     if dis == "decline":
-        await app.decline_chat_join_request(chat_id=chat.id, user_id=id)
+        try:
+            await app.decline_chat_join_request(chat_id=chat.id, user_id=id)
+        except UserAlreadyParticipant:
+            await cb.answer(
+                "Usᴇʀ Is Aᴘᴘʀᴏᴠᴇᴅ ɪɴ Yᴏᴜʀ Gʀᴏᴜᴘ Bʏ AɴʏOɴᴇ",
+                show_alert=True,
+            )
+
     await approvaldb.update_one(
         {"chat_id": chat.id},
         {"$pull": {"pending_users": int(id)}},
