@@ -103,7 +103,7 @@ class Userbot(Client):
                 LOGGER(__name__).error(
                     f"Assistant Account 1 has failed to access the log Group. Make sure that you have added your assistant to your log group and promoted as admin! "
                 )
-            sys.exit()
+                sys.exit()
             get_me = await self.one.get_me()
             self.one.username = get_me.username
             self.one.id = get_me.id
