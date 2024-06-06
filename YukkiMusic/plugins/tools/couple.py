@@ -16,10 +16,13 @@ todaydate = datetime.now(pytz.timezone('Asia/Kolkata')).strftime("%Y-%m-%d")
 def clean(directory="downloads/"):
     files = os.listdir(directory)
     for file in files:
-        if file.startswith("couple_"):
-            file_date = file.split("_")[1].split(".")[0]
-            if file_date != todaydate:
-                os.remove(os.path.join(directory, file))
+    if file.startswith("couple_"):
+        parts = file.split("_")
+        file_date = parts[1]
+        cid = parts[2].split(".")[0]
+        if file_date != todaydate:
+            os.remove(os.path.join(directory, file))
+
 
 @app.on_message(
     filters.command(
@@ -88,7 +91,7 @@ async def couples(app, message):
         img.paste(img1, (125, 196), img1)
         img.paste(img2, (780, 196), img2)
 
-        img.save(f"couple_{todaydate}.png")
+        img.save(f"couple_{todaydate}_{cid}.png")
 
         TXT = f"""
 **ᴛᴏᴅᴀʏ's sᴇʟᴇᴄᴛᴇᴅ ᴄᴏᴜᴘʟᴇs 🌺 :
@@ -99,7 +102,7 @@ async def couples(app, message):
 """
         await app.send_chat_action(message.chat.id, ChatAction.UPLOAD_PHOTO)
         await message.reply_photo(
-            f"couple_{todaydate}.png",
+            f"couple_{todaydate}_{cid}.png",
             caption=TXT,
             reply_markup=InlineKeyboardMarkup(
                 [[InlineKeyboardButton(text="ᴍʏ ᴄᴜᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ 🌋", user_id=OWNER)]]
