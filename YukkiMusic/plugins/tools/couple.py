@@ -1,7 +1,5 @@
 import os
 import random
-import pytz
-from datetime import datetime
 
 from PIL import Image, ImageDraw
 from pyrogram import filters
@@ -11,14 +9,6 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from config import OWNER_ID
 from YukkiMusic import app
 
-todaydate = datetime.now(pytz.timezone('Asia/Kolkata')).strftime("%Y-%m-%d")
-
-def clean(cid, directory="downloads/"):
-    files = os.listdir(directory)
-    for file in files:
-        if file.startswith(f"couple_{todaydate}_{cid}"):
-            continue
-        os.remove(os.path.join(directory, file))
 
 @app.on_message(
     filters.command(
@@ -31,31 +21,7 @@ async def couples(app, message):
     if message.chat.type == ChatType.PRIVATE:
         return await message.reply_text("ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ɪs ᴏɴʟʏ ғᴏʀ ɢʀᴏᴜᴘs.")
     try:
-        await app.resolve_peer(OWNER_ID[0])
-        OWNER = OWNER_ID[0]
-    except:
-        OWNER = f"tg://openmessage?user_id={OWNER_ID[0]}"
-
-    try:
         msg = await message.reply_text("❣️")
-        files = os.listdir("downloads/")
-        is_photo_sent = False
-        for file in files:
-            if file.startswith(f"couple_{todaydate}_{cid}"):
-                
-                await message.reply_photo(
-                    file,
-                    caption="**ᴛᴏᴅᴀʏ's sᴇʟᴇᴄᴛᴇᴅ ᴄᴏᴜᴘʟᴇs 🌺**",
-                    reply_markup=InlineKeyboardMarkup(
-                [[InlineKeyboardButton(text="ᴍʏ ᴄᴜᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ 🌋", user_id=OWNER)]]
-                        ),
-                )
-                is_photo_sent = True
-                break
-        
-        if is_photo_sent:
-           await msg.delete()
-           return
         list_of_users = []
 
         async for i in app.get_chat_members(message.chat.id, limit=50):
@@ -81,6 +47,12 @@ async def couples(app, message):
             p2 = await app.download_media(photo2.big_file_id, file_name="pfp1.png")
         except Exception:
             p2 = "assets/upic.png"
+        try:
+            await app.resolve_peer(OWNER_ID[0])
+            OWNER = OWNER_ID[0]
+        except:
+            OWNER = f"tg://openmessage?user_id={OWNER_ID[0]}"
+
         img1 = Image.open(f"{p1}")
         img2 = Image.open(f"{p2}")
 
@@ -105,7 +77,7 @@ async def couples(app, message):
         img.paste(img1, (125, 196), img1)
         img.paste(img2, (780, 196), img2)
 
-        img.save(f"downloads/couple_{todaydate}_{cid}.png")
+        img.save(f"test_{cid}.png")
 
         TXT = f"""
 **ᴛᴏᴅᴀʏ's sᴇʟᴇᴄᴛᴇᴅ ᴄᴏᴜᴘʟᴇs 🌺 :
@@ -116,24 +88,24 @@ async def couples(app, message):
 """
         await app.send_chat_action(message.chat.id, ChatAction.UPLOAD_PHOTO)
         await message.reply_photo(
-            f"downloads/couple_{todaydate}_{cid}.png",
+            f"test_{cid}.png",
             caption=TXT,
             reply_markup=InlineKeyboardMarkup(
                 [[InlineKeyboardButton(text="ᴍʏ ᴄᴜᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ 🌋", user_id=OWNER)]]
             ),
         )
         await msg.delete()
-        clean(cid=cid)
         try:
-            os.remove(pfp1.png)
-            os.remove(pfp.png)
+            os.remove(f"./downloads/pfp1.png")
+            os.remove(f"./downloads/pfp2.png")
+            os.remove(f"test_{cid}.png")
         except Exception:
             pass
     except Exception as e:
         print(str(e))
-        clean(cid=cid)
-        try:
-            os.remove(pfp1.png)
-            os.remove(pfp.png)
-        except Exception:
-            pass
+    try:
+        os.remove(f"./downloads/pfp1.png")
+        os.remove(f"./downloads/pfp2.png")
+        os.remove(f"test_{cid}.png")
+    except Exception:
+        pass
