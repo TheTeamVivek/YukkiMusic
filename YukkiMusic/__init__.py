@@ -52,5 +52,3 @@ SoundCloud = SoundAPI()
 Telegram = TeleAPI()
 HELPABLE = {}
 
-TEMP_DOWNLOAD_DIRECTORY = "downloads"
-
