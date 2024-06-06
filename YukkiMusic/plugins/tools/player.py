@@ -1,4 +1,5 @@
 from pyrogram import filters
+from pyrogram.types import Message
 
 from YukkiMusic import app
 from YukkiMusic.misc import db
