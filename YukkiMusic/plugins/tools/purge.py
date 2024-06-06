@@ -8,7 +8,7 @@ from pyrogram.types import Message
 from YukkiMusic import app
 from YukkiMusic.utils.permissions import adminsOnly
 
-@app.on_message(filters.command("purge") )
+@app.on_message(filters.command("purge") & filters.group)
 @adminsOnly("can_delete_messages") 
 async def purge(app: app, msg: Message):
 
