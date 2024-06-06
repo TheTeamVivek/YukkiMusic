@@ -8,13 +8,12 @@
 #
 import asyncio
 import importlib
-from sys import argv
 
 from pyrogram import idle
 
 import config
 from config import BANNED_USERS
-from YukkiMusic import HELPABLE, LOGGER, app, telethn, userbot
+from YukkiMusic import HELPABLE, LOGGER, app, userbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.plugins import ALL_MODULES
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
@@ -59,13 +58,7 @@ async def init():
     await Yukki.decorators()
     LOGGER("YukkiMusic").info("Yukki Music Bot Started Successfully")
     await idle()
-    if len(argv) not in (1, 3, 4):
-        await telethn.disconnect()
-    else:
-        await telethn.run_until_disconnected()
-
 
 if __name__ == "__main__":
-    telethn.start(bot_token=config.BOT_TOKEN)
     asyncio.get_event_loop_policy().get_event_loop().run_until_complete(init())
     LOGGER("YukkiMusic").info("Stopping Yukki Music Bot! GoodBye")
