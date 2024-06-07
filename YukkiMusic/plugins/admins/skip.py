@@ -112,7 +112,7 @@ async def skip(cli, message: Message, _, chat_id):
         try:
             await Yukki.skip_stream(chat_id, link, video=status)
         except Exception:
-            return await message.reply_text(_["call_9"])
+            return await message.reply_text(_["call_7"])
         button = telegram_markup(_, chat_id)
         img = await gen_thumb(videoid)
         run = await message.reply_photo(
@@ -135,11 +135,11 @@ async def skip(cli, message: Message, _, chat_id):
                 video=status,
             )
         except:
-            return await mystic.edit_text(_["call_9"])
+            return await mystic.edit_text(_["call_7"])
         try:
             await Yukki.skip_stream(chat_id, file_path, video=status)
         except Exception:
-            return await mystic.edit_text(_["call_9"])
+            return await mystic.edit_text(_["call_7"])
         button = stream_markup(_, videoid, chat_id)
         img = await gen_thumb(videoid)
         run = await message.reply_photo(
@@ -159,7 +159,7 @@ async def skip(cli, message: Message, _, chat_id):
         try:
             await Yukki.skip_stream(chat_id, videoid, video=status)
         except Exception:
-            return await message.reply_text(_["call_9"])
+            return await message.reply_text(_["call_7"])
         button = telegram_markup(_, chat_id)
         run = await message.reply_photo(
             photo=config.STREAM_IMG_URL,
@@ -172,7 +172,7 @@ async def skip(cli, message: Message, _, chat_id):
         try:
             await Yukki.skip_stream(chat_id, queued, video=status)
         except Exception:
-            return await message.reply_text(_["call_9"])
+            return await message.reply_text(_["call_7"])
         if videoid == "telegram":
             button = telegram_markup(_, chat_id)
             run = await message.reply_photo(
