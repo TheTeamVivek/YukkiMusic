@@ -47,7 +47,23 @@ DURATION_LIMIT_MIN = int(
 )  # Remember to give value in Minutes
 
 
+#
 # ________________________________________________________________________________#
+
+# Fill True if you want to load extra plugins 
+
+EXTRA_PLUGINS = getenv(
+    "EXTRA_PLUGINS",
+    "True",
+)
+
+# Fill here the external plugins repo where plugins that you want to load
+
+EXTRA_PLUGINS_REPO = getenv(
+    "EXTERNAL_PLUGINS",
+    "https://github.com/Vivekkumar-IN/ExtraPlugin",
+)
+ #________________________________________________________________________________#
 # Duration Limit for downloading Songs in MP3 or MP4 format from bot
 SONG_DOWNLOAD_DURATION = int(
     getenv("SONG_DOWNLOAD_DURATION_LIMIT", "500")
