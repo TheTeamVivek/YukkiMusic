@@ -18,7 +18,6 @@ from YukkiMusic.core.mongo import mongodb, pymongodb
 channeldb = mongodb.cplaymode
 commanddb = mongodb.commands
 cleandb = mongodb.cleanmode
-clonebotdb = pymongodb.clonebotdb
 playmodedb = mongodb.playmode
 playtypedb = mongodb.playtypedb
 langdb = mongodb.language
