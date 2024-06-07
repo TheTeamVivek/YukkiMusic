@@ -111,43 +111,7 @@ async def delete_note(chat_id: int, name: str) -> bool:
 async def deleteall_notes(chat_id: int):
     return await notesdb.delete_one({"chat_id": chat_id})
 
-
-async def _get_lovers(cid: int):
-    lovers = await coupledb.find_one({"chat_id": cid})
-    if lovers:
-        lovers = lovers["couple"]
-    else:
-        lovers = {}
-    return lovers
-
-
-async def _get_image(cid: int):
-    lovers = await coupledb.find_one({"chat_id": cid})
-    if lovers:
-        lovers = lovers["img"]
-    else:
-        lovers = {}
-    return lovers
-
-
-async def get_couple(cid: int, date: str):
-    lovers = await _get_lovers(cid)
-    if date in lovers:
-        return lovers[date]
-    else:
-        return False
-
-
-async def save_couple(cid: int, date: str, couple: dict, img: str):
-    lovers = await _get_lovers(cid)
-    lovers[date] = couple
-    await coupledb.update_one(
-        {"chat_id": cid},
-        {"$set": {"couple": lovers, "img": img}},
-        upsert=True,
-    )
-
-
+ 
 async def get_welcome(chat_id: int) -> (str, str, str):
     data = await welcomedb.find_one({"chat_id": chat_id})
     if not data:
@@ -206,36 +170,6 @@ async def autoend_off():
     user = await autoenddb.find_one({"chat_id": chat_id})
     if user:
         return await autoenddb.delete_one({"chat_id": chat_id})
-
-
-# SUGGESTION
-
-
-async def is_suggestion(chat_id: int) -> bool:
-    mode = suggestion.get(chat_id)
-    if not mode:
-        user = await suggdb.find_one({"chat_id": chat_id})
-        if not user:
-            suggestion[chat_id] = True
-            return True
-        suggestion[chat_id] = False
-        return False
-    return mode
-
-
-async def suggestion_on(chat_id: int):
-    suggestion[chat_id] = True
-    user = await suggdb.find_one({"chat_id": chat_id})
-    if user:
-        return await suggdb.delete_one({"chat_id": chat_id})
-
-
-async def suggestion_off(chat_id: int):
-    suggestion[chat_id] = False
-    user = await suggdb.find_one({"chat_id": chat_id})
-    if not user:
-        return await suggdb.insert_one({"chat_id": chat_id})
-
 
 # LOOP PLAY
 async def get_loop(chat_id: int) -> int:
