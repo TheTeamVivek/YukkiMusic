@@ -288,7 +288,7 @@ async def welcome(client, message: Message):
                 userbot = await get_assistant(message.chat.id)
                 out = start_pannel(_)
                 await message.reply_text(
-                    _["start_3"].format(
+                    _["start_2"].format(
                         app.mention,
                         userbot.username,
                         userbot.id,
