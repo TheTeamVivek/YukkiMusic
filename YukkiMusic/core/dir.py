@@ -19,6 +19,7 @@ def dirr():
     downloads_folder = "downloads"
     cache_folder = "cache"
     workdir = "datafiles"
+    externalrepopath = "plugins"
 
     if assets_folder not in listdir():
         logging.warning(
@@ -27,7 +28,7 @@ def dirr():
         sys.exit()
 
     for file in os.listdir():
-        if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith(".mp3"):
+        if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith(".mp3") or file.endswith(".png"):
             os.remove(file)
 
     if downloads_folder not in listdir():
@@ -42,6 +43,9 @@ def dirr():
     if workdir in listdir():
         shutil.rmtree(workdir)
         mkdir(workdir)
+    if externalrepopath in listdir():
+        shutil.rmtree(externalrepopath)
+
     logging.info("Directories Updated.")
 
 
