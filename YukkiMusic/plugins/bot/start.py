@@ -247,12 +247,12 @@ async def testbot(client, message: Message, _):
     if config.START_IMG_URL:
         await message.reply_photo(
             photo=config.START_IMG_URL,
-            caption=_["start_8"].format(app.mention, get_readable_time(uptime)),
+            caption=_["start_7"].format(app.mention, get_readable_time(uptime)),
             reply_markup=InlineKeyboardMarkup(out),
         )
     else:
         await message.reply_text(
-            text=_["start_8"].format(app.mention, get_readable_time(uptime)),
+            text=_["start_7"].format(app.mention, get_readable_time(uptime)),
             reply_markup=InlineKeyboardMarkup(out),
         )
     return await add_served_chat(message.chat.id)
