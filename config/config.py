@@ -61,7 +61,7 @@ EXTRA_PLUGINS = getenv(
 
 EXTRA_PLUGINS_REPO = getenv(
     "EXTERNAL_PLUGINS",
-    "https://github.com/Vivekkumar-IN/ExtraPlugin",
+    "https://github.com/TheTeamVivek/ExtraPlugin",
 )
  #________________________________________________________________________________#
 # Duration Limit for downloading Songs in MP3 or MP4 format from bot
