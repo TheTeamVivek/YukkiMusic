@@ -173,11 +173,12 @@ async def manual(app, cb):
     if dis == "decline":
         try:
             await app.decline_chat_join_request(chat_id=chat.id, user_id=id)
-        except UserAlreadyParticipant:
-            await cb.answer(
-                "Usᴇʀ Is Aᴘᴘʀᴏᴠᴇᴅ ɪɴ Yᴏᴜʀ Gʀᴏᴜᴘ Bʏ AɴʏOɴᴇ",
-                show_alert=True,
-            )
+        except Exception as e:
+            if "messages.HideChatJoinRequest" in str(e):
+                await cb.answer(
+                    "Usᴇʀ Is Aᴘᴘʀᴏᴠᴇᴅ ɪɴ Yᴏᴜʀ Gʀᴏᴜᴘ Bʏ AɴʏOɴᴇ",
+                    show_alert=True,
+                )
 
     await approvaldb.update_one(
         {"chat_id": chat.id},
