@@ -410,7 +410,7 @@ class Call(PyTgCalls):
                 if n == 0:
                     return await app.send_message(
                         original_chat_id,
-                        text=_["call_9"],
+                        text=_["call_7"],
                     )
                 if video:
                     stream = MediaStream(
@@ -440,7 +440,7 @@ class Call(PyTgCalls):
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
-                        text=_["call_9"],
+                        text=_["call_7"],
                     )
                 img = await gen_thumb(videoid)
                 button = telegram_markup(_, chat_id)
@@ -468,7 +468,7 @@ class Call(PyTgCalls):
                     )
                 except:
                     return await mystic.edit_text(
-                        _["call_9"], disable_web_page_preview=True
+                        _["call_7"], disable_web_page_preview=True
                     )
                 if video:
                     stream = MediaStream(
@@ -498,7 +498,7 @@ class Call(PyTgCalls):
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
-                        text=_["call_9"],
+                        text=_["call_7"],
                     )
                 img = await gen_thumb(videoid)
                 button = stream_markup(_, videoid, chat_id)
@@ -531,7 +531,7 @@ class Call(PyTgCalls):
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
-                        text=_["call_9"],
+                        text=_["call_7"],
                     )
                 button = telegram_markup(_, chat_id)
                 run = await app.send_photo(
@@ -576,7 +576,7 @@ class Call(PyTgCalls):
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
-                        text=_["call_9"],
+                        text=_["call_7"],
                     )
                 if videoid == "telegram":
                     button = telegram_markup(_, chat_id)
