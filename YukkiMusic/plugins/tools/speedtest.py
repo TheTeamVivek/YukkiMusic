@@ -1,9 +1,9 @@
 #
-# Copyright (C) 2021-present by TeamYukki@Github, < https://github.com/TeamYukki >.
+# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
-# This file is part of < https://github.com/TeamYukki/YukkiMusicBot > project,
+# This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the "GNU v3.0 License Agreement".
-# Please see < https://github.com/TeamYukki/YukkiMusicBot/blob/master/LICENSE >
+# Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
 #
@@ -12,7 +12,7 @@ import asyncio
 
 import speedtest
 from pyrogram import filters
-
+from YukkiMusic.misc import SUDOERS 
 from strings import get_command
 from YukkiMusic import app
 
@@ -36,7 +36,7 @@ def testspeed(m):
     return result
 
 
-@app.on_message(filters.command(SPEEDTEST_COMMAND))
+@app.on_message(filters.command(SPEEDTEST_COMMAND) & SUDOERS)
 async def speedtest_function(client, message):
     m = await message.reply_text("ʀᴜɴɴɪɴɢ sᴘᴇᴇᴅᴛᴇsᴛ")
     loop = asyncio.get_event_loop_policy().get_event_loop()
