@@ -276,7 +276,7 @@ async def welcome(client, message: Message):
             if member.id == app.id:
                 chat_type = message.chat.type
                 if chat_type != ChatType.SUPERGROUP:
-                    await message.reply_text(_["start_6"])
+                    await message.reply_text(_["start_5"])
                     return await app.leave_chat(message.chat.id)
                 if chat_id in await blacklisted_chats():
                     await message.reply_text(
