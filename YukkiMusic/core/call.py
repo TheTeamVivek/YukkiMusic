@@ -458,7 +458,7 @@ class Call(PyTgCalls):
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
             elif "vid_" in queued:
-                mystic = await app.send_message(original_chat_id, _["call_10"])
+                mystic = await app.send_message(original_chat_id, _["call_8"])
                 try:
                     file_path, direct = await YouTube.download(
                         videoid,
