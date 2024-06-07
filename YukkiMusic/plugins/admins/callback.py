@@ -178,7 +178,7 @@ async def del_back_playlist(client, CallbackQuery, _):
             try:
                 await Yukki.skip_stream(chat_id, link, video=status)
             except Exception:
-                return await CallbackQuery.message.reply_text(_["call_9"])
+                return await CallbackQuery.message.reply_text(_["call_7"])
             button = telegram_markup(_, chat_id)
             img = await gen_thumb(videoid)
             run = await CallbackQuery.message.reply_photo(
@@ -204,11 +204,11 @@ async def del_back_playlist(client, CallbackQuery, _):
                     video=status,
                 )
             except:
-                return await mystic.edit_text(_["call_9"])
+                return await mystic.edit_text(_["call_7"])
             try:
                 await Yukki.skip_stream(chat_id, file_path, video=status)
             except Exception:
-                return await mystic.edit_text(_["call_9"])
+                return await mystic.edit_text(_["call_7"])
             button = stream_markup(_, videoid, chat_id)
             img = await gen_thumb(videoid)
             run = await CallbackQuery.message.reply_photo(
@@ -229,7 +229,7 @@ async def del_back_playlist(client, CallbackQuery, _):
             try:
                 await Yukki.skip_stream(chat_id, videoid, video=status)
             except Exception:
-                return await CallbackQuery.message.reply_text(_["call_9"])
+                return await CallbackQuery.message.reply_text(_["call_7"])
             button = telegram_markup(_, chat_id)
             run = await CallbackQuery.message.reply_photo(
                 photo=STREAM_IMG_URL,
@@ -243,7 +243,7 @@ async def del_back_playlist(client, CallbackQuery, _):
             try:
                 await Yukki.skip_stream(chat_id, queued, video=status)
             except Exception:
-                return await CallbackQuery.message.reply_text(_["call_9"])
+                return await CallbackQuery.message.reply_text(_["call_7"])
             if videoid == "telegram":
                 button = telegram_markup(_, chat_id)
                 run = await CallbackQuery.message.reply_photo(
