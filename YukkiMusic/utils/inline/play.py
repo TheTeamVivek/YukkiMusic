@@ -44,7 +44,7 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
         ],
         [
             InlineKeyboardButton(
-                text="ᴀᴅᴅ ᴛᴏ ᴘʟᴀʏʟɪsᴛ", callback_data=f"add_playlist {videoid}"
+                text="_["P_B_7"]", callback_data=f"add_playlist {videoid}"
             ),
         ],
         [
@@ -54,9 +54,9 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
             InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
         ],
         [
-            InlineKeyboardButton(text="ᴍᴜᴛᴇ", callback_data=f"ADMIN Mute|{chat_id}"),
+            InlineKeyboardButton(text="_["P_B_5"]", callback_data=f"ADMIN Mute|{chat_id}"),
             InlineKeyboardButton(
-                text="ᴜɴᴍᴜᴛᴇ", callback_data=f"ADMIN Unmute|{chat_id}"
+                text="_["P_B_6"]", callback_data=f"ADMIN Unmute|{chat_id}"
             ),
         ],
         [InlineKeyboardButton(text=_["CLOSEMENU_BUTTON"], callback_data="close")],
@@ -68,7 +68,7 @@ def stream_markup(_, videoid, chat_id):
     buttons = [
         [
             InlineKeyboardButton(
-                text="ᴀᴅᴅ ᴛᴏ ᴘʟᴀʏʟɪsᴛ", callback_data=f"add_playlist {videoid}"
+                text="_["P_B_7"]", callback_data=f"add_playlist {videoid}"
             ),
         ],
         [
@@ -78,9 +78,9 @@ def stream_markup(_, videoid, chat_id):
             InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
         ],
         [
-            InlineKeyboardButton(text="ᴍᴜᴛᴇ", callback_data=f"ADMIN Mute|{chat_id}"),
+            InlineKeyboardButton(text="_["P_B_5"]", callback_data=f"ADMIN Mute|{chat_id}"),
             InlineKeyboardButton(
-                text="ᴜɴᴍᴜᴛᴇ", callback_data=f"ADMIN Unmute|{chat_id}"
+                text="_["P_B_6"]", callback_data=f"ADMIN Unmute|{chat_id}"
             ),
         ],
         [InlineKeyboardButton(text=_["CLOSEMENU_BUTTON"], callback_data="close")],
@@ -123,9 +123,9 @@ def telegram_markup_timer(_, chat_id, played, dur):
             InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
         ],
         [
-            InlineKeyboardButton(text="ᴍᴜᴛᴇ", callback_data=f"ADMIN Mute|{chat_id}"),
+            InlineKeyboardButton(text="_["P_B_5"]", callback_data=f"ADMIN Mute|{chat_id}"),
             InlineKeyboardButton(
-                text="ᴜɴᴍᴜᴛᴇ", callback_data=f"ADMIN Unmute|{chat_id}"
+                text="_["P_B_6"]", callback_data=f"ADMIN Unmute|{chat_id}"
             ),
         ],
         [
@@ -144,9 +144,9 @@ def telegram_markup(_, chat_id):
             InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
         ],
         [
-            InlineKeyboardButton(text="ᴍᴜᴛᴇ", callback_data=f"ADMIN Mute|{chat_id}"),
+            InlineKeyboardButton(text="_["P_B_5"]", callback_data=f"ADMIN Mute|{chat_id}"),
             InlineKeyboardButton(
-                text="ᴜɴᴍᴜᴛᴇ", callback_data=f"ADMIN Unmute|{chat_id}"
+                text="_["P_B_6"]", callback_data=f"ADMIN Unmute|{chat_id}"
             ),
         ],
         [
