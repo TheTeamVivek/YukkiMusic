@@ -7,27 +7,6 @@
 #
 # All rights reserved.
 #
-'''
-import glob
-from os.path import dirname, isfile
-
-
-def __list_all_modules():
-    work_dir = dirname(__file__)
-    mod_paths = glob.glob(work_dir + "/*/*.py")
-
-    all_modules = [
-        (((f.replace(work_dir, "")).replace("/", "."))[:-3])
-        for f in mod_paths
-        if isfile(f) and f.endswith(".py") and not f.endswith("__init__.py")
-    ]
-
-    return all_modules
-
-
-ALL_MODULES = sorted(__list_all_modules())
-__all__ = ALL_MODULES + ["ALL_MODULES"]
-'''
 
 import glob
 import os
@@ -39,8 +18,12 @@ from config import EXTRA_PLUGINS, EXTRA_PLUGINS_REPO
 
 ROOT_DIR = abspath(join(dirname(__file__), '..', '..'))
 EXTERNAL_REPO_PATH = join(ROOT_DIR, 'plugins')
+# plugins is a folder in extrenal plugins repo where all plugins stored
+
 
 extra_plugins_enabled = EXTRA_PLUGINS.lower() == "true"
+# if EXTRA_PLUGINS = True then extra plugins will be loaded
+
 
 if extra_plugins_enabled:
 
