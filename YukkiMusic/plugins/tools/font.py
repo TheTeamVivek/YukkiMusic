@@ -1,13 +1,19 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
+from pyrogram.types import CallbackQuery, Message
+from typing import Union
 from YukkiMusic import app
 from YukkiMusic.utils.font_string import Fonts
 
 
 @app.on_message(filters.command(["font", "fonts"]))
-async def style_buttons(c, m, cb=False):
-    text = m.text.split(" ", 1)[1]
+async def style_buttons(c, m:Union[Message, CallbackQuery], cb=False):
+    if isinstance(update, Message)
+        text = m.text.split(" ", 1)[1]
+    elif isinstance(update, CallbackQuery)
+        text = m.data.split(" ", 1)[1]
+
     buttons = [
         [
             InlineKeyboardButton("𝚃𝚢𝚙𝚎𝚠𝚛𝚒𝚝𝚎𝚛", callback_data="style+typewriter"),
