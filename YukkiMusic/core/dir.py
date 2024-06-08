@@ -12,14 +12,13 @@ import os
 import shutil
 import sys
 from os import listdir, mkdir
-
+from config import EXTRA_PLUGINS_FOLDER
 
 def dirr():
     assets_folder = "assets"
     downloads_folder = "downloads"
     cache_folder = "cache"
     workdir = "datafiles"
-    externalrepopath = "plugins"
 
     if assets_folder not in listdir():
         logging.warning(
@@ -43,8 +42,8 @@ def dirr():
     if workdir in listdir():
         shutil.rmtree(workdir)
         mkdir(workdir)
-    if externalrepopath in listdir():
-        shutil.rmtree(externalrepopath)
+    if EXTRA_PLUGINS_FOLDER in listdir():
+        shutil.rmtree(EXTRA_PLUGINS_FOLDER)
 
     logging.info("Directories Updated.")
 
