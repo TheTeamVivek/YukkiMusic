@@ -59,7 +59,7 @@ EXTRA_PLUGINS = getenv(
 
 
 EXTRA_PLUGINS_REPO = getenv(
-    "EXTERNAL_PLUGINS",
+    "EXTRA_PLUGINS_REPO",
     "https://github.com/TheTeamVivek/ExtraPlugin",
 )
 # Fill here the external plugins repo where plugins that you want to load
@@ -68,8 +68,6 @@ EXTRA_PLUGINS_REPO = getenv(
 EXTRA_PLUGINS_FOLDER = getenv("EXTRA_PLUGINS_FOLDER", "plugins")
 
 # Your folder name in your extra plugins repo where all plugins stored
-
-
  #________________________________________________________________________________#
 # Duration Limit for downloading Songs in MP3 or MP4 format from bot
 SONG_DOWNLOAD_DURATION = int(
