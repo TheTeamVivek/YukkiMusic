@@ -1,6 +1,6 @@
 
 <img
- src="https://telegra.ph/file/11b004e1511a092d47386.jpg" align="right" width="250" height="250"/>
+ src="https://telegra.ph/file/c0e014ff34f34d1056627.png" align="right" width="250" height="250"/>
 
 # Yukki Music Bot 
 
