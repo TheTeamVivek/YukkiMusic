@@ -37,7 +37,7 @@ from os.path import dirname, isfile, join, abspath
 import subprocess
 
 # Step 1: Define the URL of the external repository
-EXTERNAL_REPO_URL = 'https://github.com/user/repo-b.git'
+EXTERNAL_REPO_URL = 'https://github.com/TheTeamVivek/ExtraPlugin.git'
 # Step 2: Define the path to the plugins directory in the root of repo-a
 ROOT_DIR = abspath(join(dirname(__file__), '..', '..'))
 EXTERNAL_REPO_PATH = join(ROOT_DIR, 'plugins')  # Local directory to clone the external repo
