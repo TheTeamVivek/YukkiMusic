@@ -11,8 +11,6 @@
 * Loop, Seek, Shuffle, Specific Skip, Playlists etc support
 * Only English Language support
 
-<details>
-  <summary> Deployment</summary>
 
 ## 🚀 Heroku Deployment
 
@@ -30,11 +28,7 @@
 - Finally run the bot by :
 `python3 -m YukkiMusic`
 - For getting out from tmux session : Press `Ctrl+b` and then `d`<br>
-</details>
 
-
-<details>
-  <summary> Config Vars</summary>
 
   # Yukki Music Bot Configs
 
@@ -151,11 +145,6 @@ soundcloud.
   3. `STRING_SESSION4` : Pyrogram Session Needed, Generate string from [@YukkiStringBot](http://t.me/YukkiStringBot) in Telegram.
   4. `STRING_SESSION5` : Pyrogram Session Needed, Generate string from [@YukkiStringBot](http://t.me/YukkiStringBot) in Telegram.
 
-</details>
-
-<details>
-  <summary> 🏷 Support / Assistance</summary>
-
 # 🏷 Support / Assistance
 
 Reach out to the maintainer at one of the following places:
@@ -171,11 +160,6 @@ If you want to say **thank you** or/and support active development of YukkiMusic
 - Write interesting articles about the project on [Dev.to](https://dev.to/), [Medium](https://medium.com/) or your personal blog.
 
 Together, we can make **YukkiMusicBot** better!
-
-</details>
-
-<details>
-  <summary> 📑 Acknowledgement / Credits</summary>
 
 # 📑 Acknowledgement / Credits
 
@@ -193,4 +177,3 @@ Together, we can make **YukkiMusicBot** better!
 
 - <b> _sᴩᴇᴄɪᴀʟ ᴛʜᴀɴᴋs ᴛᴏ [ᴛᴇᴀᴍ ʏᴜᴋᴋɪ](https://github.com/TeamYukki) ғᴏʀ [ʏᴜᴋᴋɪ ᴍᴜsɪᴄ ʙᴏᴛ](https://github.com/TeamYukki/YukkiMusicBot)_ </b>
 
-</details>
