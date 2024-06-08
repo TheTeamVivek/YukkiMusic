@@ -1,13 +1,10 @@
 aiofiles
 aiohttp
 asyncio
-bing-image-urls # this for in image module for searching images from bing
 dnspython==2.3.0
 ffmpeg-python
 gitpython
 gTTS
-googletrans
-google_play_scraper #for playstore app search 
 hachoir
 httpx[http2]
 heroku3
