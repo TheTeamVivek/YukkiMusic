@@ -29,32 +29,36 @@ ALL_MODULES = sorted(__list_all_modules())
 __all__ = ALL_MODULES + ["ALL_MODULES"]
 '''
 
-
 import glob
 import os
 import importlib
 from os.path import dirname, isfile, join, abspath
 import subprocess
+from config import EXTRA_PLUGINS, EXTRA_PLUGINS_REPO
 
-# Step 1: Define the URL of the external repository
-EXTERNAL_REPO_URL = 'https://github.com/TheTeamVivek/ExtraPlugin.git'
-# Step 2: Define the path to the plugins directory in the root of repo-a
+
 ROOT_DIR = abspath(join(dirname(__file__), '..', '..'))
-EXTERNAL_REPO_PATH = join(ROOT_DIR, 'plugins')  # Local directory to clone the external repo
+EXTERNAL_REPO_PATH = join(ROOT_DIR, 'plugins')
 
-# Step 3: Clone the external repository if not already cloned
-if not os.path.exists(EXTERNAL_REPO_PATH):
-    subprocess.run(['git', 'clone', EXTERNAL_REPO_URL, EXTERNAL_REPO_PATH])
+extra_plugins_enabled = EXTRA_PLUGINS.lower() == "true"
 
-# Step 4: Install requirements if requirements.txt exists in the plugins directory
-requirements_path = join(EXTERNAL_REPO_PATH, 'requirements.txt')
-if os.path.isfile(requirements_path):
-    subprocess.run(['pip', 'install', '-r', requirements_path])
+if extra_plugins_enabled:
+
+    if not os.path.exists(EXTERNAL_REPO_PATH):
+        subprocess.run(['git', 'clone', EXTRA_PLUGINS_REPO, EXTERNAL_REPO_PATH])
+
+    requirements_path = join(EXTERNAL_REPO_PATH, 'requirements.txt')
+    if os.path.isfile(requirements_path):
+        subprocess.run(['pip', 'install', '-r', requirements_path])
 
 def __list_all_modules():
-    # Define directories to search for plugins
+
     main_repo_plugins_dir = dirname(__file__)
-    work_dirs = [main_repo_plugins_dir, EXTERNAL_REPO_PATH]
+    work_dirs = [main_repo_plugins_dir]
+
+    if extra_plugins_enabled:
+        work_dirs.append(EXTERNAL_REPO_PATH)
+
     all_modules = []
 
     for work_dir in work_dirs:
