@@ -9,9 +9,9 @@ from YukkiMusic.utils.font_string import Fonts
 
 @app.on_message(filters.command(["font", "fonts"]))
 async def style_buttons(c, m:Union[Message, CallbackQuery], cb=False):
-    if isinstance(update, Message)
+    if isinstance(update, Message):
         text = m.text.split(" ", 1)[1]
-    elif isinstance(update, CallbackQuery)
+    elif isinstance(update, CallbackQuery):
         text = m.data.split(" ", 1)[1]
 
     buttons = [
