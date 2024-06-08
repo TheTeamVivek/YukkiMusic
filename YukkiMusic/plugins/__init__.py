@@ -7,35 +7,30 @@
 #
 # All rights reserved.
 #
-
 import glob
 import os
 import importlib
 from os.path import dirname, isfile, join, abspath
 import subprocess
-from config import EXTRA_PLUGINS, EXTRA_PLUGINS_REPO
-
+from config import EXTRA_PLUGINS, EXTRA_PLUGINS_REPO, EXTRA_PLUGINS_FOLDER
 
 ROOT_DIR = abspath(join(dirname(__file__), '..', '..'))
-EXTERNAL_REPO_PATH = join(ROOT_DIR, 'plugins')
-# plugins is a folder in extrenal plugins repo where all plugins stored
-
+EXTERNAL_REPO_PATH = join(ROOT_DIR, EXTRA_PLUGINS_FOLDER)  # Local directory to clone the external repo
 
 extra_plugins_enabled = EXTRA_PLUGINS.lower() == "true"
-# if EXTRA_PLUGINS = True then extra plugins will be loaded
-
 
 if extra_plugins_enabled:
-
+    # Clone the external repository if not already cloned
     if not os.path.exists(EXTERNAL_REPO_PATH):
         subprocess.run(['git', 'clone', EXTRA_PLUGINS_REPO, EXTERNAL_REPO_PATH])
 
+    # Install requirements if requirements.txt exists in the external plugins directory
     requirements_path = join(EXTERNAL_REPO_PATH, 'requirements.txt')
     if os.path.isfile(requirements_path):
         subprocess.run(['pip', 'install', '-r', requirements_path])
 
 def __list_all_modules():
-
+    # Define directories to search for plugins
     main_repo_plugins_dir = dirname(__file__)
     work_dirs = [main_repo_plugins_dir]
 
@@ -49,7 +44,7 @@ def __list_all_modules():
         mod_paths += glob.glob(join(work_dir, "*/*.py"))
         
         modules = [
-            (((f.replace(main_repo_plugins_dir, "YukkiMusic.plugins")).replace(EXTERNAL_REPO_PATH, "plugins")).replace(os.sep, "."))[:-3]
+            (((f.replace(main_repo_plugins_dir, "YukkiMusic.plugins")).replace(EXTERNAL_REPO_PATH, EXTRA_PLUGINS_FOLDER)).replace(os.sep, "."))[:-3]
             for f in mod_paths
             if isfile(f) and f.endswith(".py") and not f.endswith("__init__.py")
         ]
