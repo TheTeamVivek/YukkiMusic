@@ -7,7 +7,6 @@ ffmpeg-python
 gitpython
 gTTS
 googletrans
-googlesearch-python
 google_play_scraper #for playstore app search 
 hachoir
 httpx[http2]
@@ -18,7 +17,6 @@ lexica-api
 MukeshAPI
 motor
 pillow==9.5.0
-pyfiglet
 pytz
 psutil
 pytube
