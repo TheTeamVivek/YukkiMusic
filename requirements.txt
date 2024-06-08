@@ -8,7 +8,6 @@ gTTS
 hachoir
 httpx[http2]
 heroku3
-img2pdf
 lyricsgenius
 lexica-api
 MukeshAPI
