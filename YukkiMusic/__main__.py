@@ -46,8 +46,8 @@ async def init():
     except Exception:
         pass
 
-    await app.start()
-    await userbot.start()
+    #await app.start()
+   # await userbot.start()
 
     for all_module in ALL_MODULES:
         imported_module = importlib.import_module(all_module)
