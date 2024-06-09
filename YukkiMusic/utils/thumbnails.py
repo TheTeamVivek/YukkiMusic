@@ -11,9 +11,6 @@
 from config import YOUTUBE_IMG_URL
 from youtubesearchpython.__future__ import VideosSearch
 
-
-
-
 async def gen_thumb(videoid):
     try:
         results = VideosSearch(videoid, limit=1)
@@ -25,7 +22,6 @@ async def gen_thumb(videoid):
             return YOUTUBE_IMG_URL
     except Exception as e:
         return YOUTUBE_IMG_URL
-
 
 async def gen_qthumb(videoid):
     try:
