@@ -39,6 +39,8 @@ app = YukkiBot()
 # Assistant Client
 userbot = Userbot()
 
+app.start()
+userbot.start()
 from .platforms import *
 
 YouTube = YouTubeAPI()
