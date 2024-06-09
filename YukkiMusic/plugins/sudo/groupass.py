@@ -11,7 +11,6 @@
 from pyrogram import filters
 from pyrogram.types import Message
 
-from config import PK
 from YukkiMusic import app
 from YukkiMusic.core.userbot import assistants
 from YukkiMusic.utils.assistant import assistant, get_assistant_details
@@ -41,7 +40,7 @@ async def assis_change(_, message: Message):
         await b.join_chat(message.chat.id)
     except:
         pass
-    await message.reply_text(DETAILS, disable_web_page_preview=True, protect_content=PK)
+    await message.reply_text(DETAILS, disable_web_page_preview=True)
 
 
 @app.on_message(filters.command("setassistant") & admin_filter)
@@ -59,7 +58,7 @@ async def assis_set(_, message: Message):
     query = message.text.split(None, 1)[1].strip()
     if query not in assistants:
         return await message.reply_text(
-            usage, disable_web_page_preview=True, protect_content=PK
+            usage, disable_web_page_preview=True
         )
     a = await get_assistant(message.chat.id)
     try:
@@ -76,7 +75,7 @@ async def assis_set(_, message: Message):
                    ᴀssɪsᴛᴀɴᴛ ɴᴀᴍᴇ :- {a.name}
                    ᴀssɪsᴛᴀɴᴛ ᴜsᴇʀɴᴀᴍᴇ :- {a.username}
                    ᴀssɪsᴛᴀɴᴛ ɪᴅ:- @{a.id}"""
-    await message.reply_text(DETAILS, disable_web_page_preview=True, protect_content=PK)
+    await message.reply_text(DETAILS, disable_web_page_preview=True)
 
 
 @app.on_message(filters.command("checkassistant") & filters.group & admin_filter)
@@ -86,15 +85,5 @@ async def check_ass(_, message: Message):
 Assistant Name :- {assistant.name}
 Assistant Username :- {assistant.username}
 Assistant ID:- @{assistant.id}"""
-    await message.reply_text(DETAILS, disable_web_page_preview=True, protect_content=PK)
+    await message.reply_text(DETAILS, disable_web_page_preview=True)
 
-
-__MODULE__ = "Gᴀssɪsᴛᴀɴᴛ"
-__HELP__ = """<u> ɢʀᴏᴜᴘ ᴀssɪsᴛᴀɴᴛ's ᴄᴏᴍᴍᴀɴᴅ:</u>
-
-/checkassistant - ᴄʜᴇᴄᴋ ᴅᴇᴛᴀɪʟs ᴏғ ʏᴏᴜʀ ɢʀᴏᴜᴘ ᴀssɪsᴛᴀɴᴛ
-
-/setassistant - ᴄʜᴀɴɢᴇ ᴀssɪsᴛᴀɴᴛ ᴛᴏ sᴘᴇᴄɪғɪᴄ ᴀssɪsᴛᴀɴᴛ ғᴏʀ ʏᴏᴜʀ ɢʀᴏᴜᴘ
-
-/changeassistant - ᴄʜᴀɴɢᴇ ʏᴏᴜʀ ɢʀᴏᴜᴘ ᴀssɪsᴛᴀɴᴛ ᴛᴏ ʀᴀɴᴅᴏᴍ ᴀᴠᴀɪʟᴀʙʟᴇ ᴀssɪsᴛᴀɴᴛ ɪɴ ʙᴏᴛ sᴇʀᴠᴇʀ's
-"""
