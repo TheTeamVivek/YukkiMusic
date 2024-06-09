@@ -34,3 +34,20 @@ async def gen_qthumb(vidid):
         return thumbnail
     except Exception as e:
         return YOUTUBE_IMG_URL
+
+
+# Function to get thumbnail by video ID
+async def q(videoid):
+    try:
+        # Search for the video using video ID
+        results = VideosSearch(videoid, limit=1)
+        search_results = await results.next()
+        
+        # Extract the thumbnail URL
+        if "result" in search_results and search_results["result"]:
+            thumbnail = search_results["result"][0]["thumbnails"][0]["url"].split("?")[0]
+            return thumbnail
+        else:
+            return YOUTUBE_IMG_URL
+    except Exception as e:
+        return YOUTUBE_IMG_URL
