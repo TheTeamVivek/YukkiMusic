@@ -14,6 +14,7 @@ import logging
 from os.path import dirname, isfile, join, abspath
 import subprocess
 from config import EXTRA_PLUGINS, EXTRA_PLUGINS_REPO, EXTRA_PLUGINS_FOLDER
+from YukkiMusic import LOGGER
 
 ROOT_DIR = abspath(join(dirname(__file__), '..', '..'))
 EXTERNAL_REPO_PATH = join(ROOT_DIR, EXTRA_PLUGINS_FOLDER)
@@ -48,6 +49,7 @@ def __list_all_modules():
     work_dirs = [main_repo_plugins_dir]
 
     if extra_plugins_enabled:
+        LOGGER(__name__).info(f"Loading Extra Plugins from {EXTRA_PLUGINS_REPO}")
         work_dirs.append(EXTERNAL_REPO_PATH)
 
     all_modules = []
