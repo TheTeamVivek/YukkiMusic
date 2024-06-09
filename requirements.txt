@@ -6,7 +6,7 @@ ffmpeg-python
 gitpython
 gTTS
 hachoir
-httpx[http2]
+httpx<0.24.0; extra == 'http2'
 heroku3
 lyricsgenius
 lexica-api
