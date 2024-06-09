@@ -7,7 +7,7 @@
 #
 # All rights reserved.
 #
-
+from config import YOUTUBE_IMG_URL
 from youtubesearchpython.__future__ import VideosSearch
 
 
@@ -21,7 +21,7 @@ async def gen_thumb(videoid):
             thumbnail = result["thumbnails"][0]["url"].split("?")[0]
         return thumbnail
     except Exception as e:
-        return config.YOUTUBE_IMG_URL
+        return YOUTUBE_IMG_URL
 
 
 async def gen_qthumb(vidid):
@@ -33,4 +33,4 @@ async def gen_qthumb(vidid):
             thumbnail = result["thumbnails"][0]["url"].split("?")[0]
         return thumbnail
     except Exception as e:
-        return config.YOUTUBE_IMG_URL
+        return YOUTUBE_IMG_URL
