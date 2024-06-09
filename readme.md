@@ -30,7 +30,7 @@
 - For getting out from tmux session : Press `Ctrl+b` and then `d`<br>
 
 
-# Yukki Music Bot Configs
+# Yukki Music Configs
 
 Config vars are basically the variables which configure or modify bot to function, which are the basic necessities of plugins or code to work. You have to set the proper mandatory vars to make it functional and to start the basic feature of bot.
 
