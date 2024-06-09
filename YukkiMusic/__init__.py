@@ -9,7 +9,7 @@
 
 
 from SafoneAPI import SafoneAPI
-
+import asyncio
 from YukkiMusic.core.bot import YukkiBot
 from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
@@ -39,8 +39,6 @@ app = YukkiBot()
 # Assistant Client
 userbot = Userbot()
 
-app.start()
-userbot.start()
 from .platforms import *
 
 YouTube = YouTubeAPI()
@@ -52,3 +50,10 @@ SoundCloud = SoundAPI()
 Telegram = TeleAPI()
 HELPABLE = {}
 
+
+async def init():
+    await app.start()
+    await userbot.start()
+
+
+asyncio.get_event_loop_policy().get_event_loop().run_until_complete(init())
