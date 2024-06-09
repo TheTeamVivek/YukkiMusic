@@ -7,8 +7,10 @@
 #
 # All rights reserved.
 
+import sqlite3
 import asyncio
 import importlib
+import subprocess
 
 from pyrogram import idle
 
@@ -18,7 +20,7 @@ from YukkiMusic import HELPABLE, LOGGER, app, userbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.plugins import ALL_MODULES
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
-from YukkiMusic.core.bot import restart
+from YukkiMusic.core.bot import restart, NAME
 
 async def init():
     if (
@@ -45,8 +47,12 @@ async def init():
             BANNED_USERS.add(user_id)
     except Exception:
         pass
-
-    await app.start()
+    try:
+        await app.start()
+    except sqlite3.OperationalError as e:
+        if str(e) == "database is locked" and os.name == "posix":
+            LOGGER("YukkiMusic").info("Session file is locked. Trying to kill blocking process...")
+            
 
     for all_module in ALL_MODULES:
         imported_module = importlib.import_module(all_module)
