@@ -15,7 +15,7 @@ from YukkiMusic.core.userbot import assistants
 from YukkiMusic.utils.assistant import assistant, get_assistant_details
 from YukkiMusic.utils.database import get_assistant, save_assistant, set_assistant
 from YukkiMusic.utils.filter import admin_filter
-
+from config import LOG_GROUP_ID
 
 @app.on_message(filters.command("changeassistant") & admin_filter)
 async def assis_change(_, message: Message):
@@ -29,10 +29,11 @@ async def assis_change(_, message: Message):
         return await message.reply_text(usage)
     a = await get_assistant(message.chat.id)
     DETAILS = f"ʏᴏᴜʀ ᴄʜᴀᴛ's ᴀssɪsᴛᴀɴᴛ ʜᴀs ʙᴇᴇɴ ᴄʜᴀɴɢᴇᴅ ғʀᴏᴍ [{a.name}](https://t.me/{a.username}) "
-    try:
-        await a.leave_chat(message.chat.id)
-    except:
-        pass
+    if not message.chat.id == LOG_GROUP_ID:
+        try:
+            await a.leave_chat(message.chat.id)
+        except:
+            pass
     b = await set_assistant(message.chat.id)
     DETAILS += f"ᴛᴏ [{b.name}](https://t.me/{b.username})"
     try:
