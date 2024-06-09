@@ -173,7 +173,7 @@ Together, we can make **YukkiMusicBot** better!
 <a href="https://github.com/AnonymousX1025"> <img src="https://img.shields.io/badge/Anonymous-black?style=for-the-badge&logo=github" alt="Anonymous" /> </a>
 <a href="https://github.com/NotReallyShikhar"> <img src="https://img.shields.io/badge/Shikhar-black?style=for-the-badge&logo=github" alt="Shikhar" /> </a>
 <a href="https://github.com/TheHamkerCat"> <img src="https://img.shields.io/badge/TheHamkerCat-black?style=for-the-badge&logo=github" alt="TheHamkerCat" /> </a>
-<a href="https://github.com/Pranav-Saraswat/YukkiMusicFork"> <img src="https://img.shields.io/badge/Pranav-Saraswat-black?style=for-the-badge&logo=github" alt="Pranav-Saraswat" /> </a>
+<a href="https://github.com/Pranav-Saraswat"> <img src="https://img.shields.io/badge/Pranav-Saraswat-black?style=for-the-badge&logo=github" alt="Pranav-Saraswat" /> </a>
 </p>
 
 - <b> _sᴩᴇᴄɪᴀʟ ᴛʜᴀɴᴋs ᴛᴏ [ᴛᴇᴀᴍ ʏᴜᴋᴋɪ](https://github.com/TeamYukki) ғᴏʀ [ʏᴜᴋᴋɪ ᴍᴜsɪᴄ ʙᴏᴛ](https://github.com/TeamYukki/YukkiMusicBot)_ </b>
