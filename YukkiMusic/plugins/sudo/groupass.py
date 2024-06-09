@@ -53,7 +53,7 @@ async def assis_set(_, message: Message):
     usage = await get_assistant_details()
     if len(message.command) != 2:
         return await message.reply_text(
-            usage, disable_web_page_preview=True, protect_content=PK
+            usage, disable_web_page_preview=True
         )
     query = message.text.split(None, 1)[1].strip()
     if query not in assistants:
