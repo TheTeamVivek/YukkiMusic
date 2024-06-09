@@ -14,18 +14,15 @@ from pyrogram import filters
 from pyrogram.types import Message
 
 from config import BANNED_USERS, PING_IMG_URL
-from strings import get_command
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils import bot_sys_stats
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline import supp_markup
 
-### Commands
-PING_COMMAND = get_command("PING_COMMAND")
 
 
-@app.on_message(filters.command(PING_COMMAND) & ~BANNED_USERS & filters.group)
+@app.on_message(filters.command(["ping","alive"]) & ~BANNED_USERS & filters.group)
 @language
 async def ping_com(client, message: Message, _):
     response = await message.reply_photo(
