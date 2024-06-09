@@ -28,7 +28,7 @@ class Userbot(Client):
                 api_hash=config.API_HASH,
                 session_string=str(config.STRING1),
                 workdir="datafiles",
-                no_updates=True,
+                no_updates=False,
             )
             if config.STRING1
             else None
