@@ -4,13 +4,11 @@ asyncio
 dnspython==2.3.0
 ffmpeg-python
 gitpython
-gTTS
 hachoir
 httpx<0.24.0; extra == 'http2'
 heroku3
 lyricsgenius
 lexica-api
-MukeshAPI
 motor
 pillow==9.5.0
 pytz
@@ -24,9 +22,7 @@ python-dotenv
 pyyaml
 requests
 speedtest-cli
-secureme==0.0.4
 spotipy
-telegraph
 tgcrypto
 urllib3
 yt-dlp
