@@ -9,6 +9,7 @@
 #
 
 import sys
+import os
 from pyrogram import Client
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.types import BotCommand
@@ -82,3 +83,8 @@ class YukkiBot(Client):
         else:
             self.name = get_me.first_name
         LOGGER(__name__).info(f"MusicBot Started as {self.name}")
+
+
+
+def restart() -> None:
+    os.execvp(sys.executable, [sys.executable, "-m", "YukkiMusic"])
