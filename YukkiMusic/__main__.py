@@ -52,7 +52,7 @@ async def init():
             if hasattr(imported_module, "__HELP__") and imported_module.__HELP__:
                 HELPABLE[imported_module.__MODULE__.lower()] = imported_module
 
-    LOGGER("YukkiMusic.plugins").info("Successfully Imported Modules ")
+    LOGGER("YukkiMusic.plugins").info("Successfully Imported All Modules ")
     await userbot.start()
     await Yukki.start()
     await Yukki.decorators()
