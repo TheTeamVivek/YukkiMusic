@@ -42,8 +42,8 @@ if extra_plugins_enabled:
     # Check if utils folder exists in the external repo
     utils_path = join(EXTERNAL_REPO_PATH, 'utils')
     if os.path.isdir(utils_path):
-        # Add the external plugins path to sys.path if utils folder exists
-        sys.path.append(EXTERNAL_REPO_PATH)
+        # Add the utils folder path to sys.path if it exists
+        sys.path.append(utils_path)
 
     # Install requirements if requirements.txt exists in the external plugins directory
     requirements_path = join(EXTERNAL_REPO_PATH, 'requirements.txt')
