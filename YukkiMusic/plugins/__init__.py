@@ -17,7 +17,7 @@ import sys
 from config import EXTRA_PLUGINS, EXTRA_PLUGINS_REPO, EXTRA_PLUGINS_FOLDER
 from YukkiMusic import LOGGER
 
-logger = logging.getLogger(__name__)
+logger = LOGGER(__name__)
 
 # Define the path to the external plugins directory in the root of repo-a
 ROOT_DIR = abspath(join(dirname(__file__), '..', '..'))
