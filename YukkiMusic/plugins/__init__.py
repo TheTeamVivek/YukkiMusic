@@ -25,7 +25,7 @@ if EXTRA_PLUGINS_FOLDER in os.listdir():
     shutil.rmtree(EXTRA_PLUGINS_FOLDER)
     logger.info("extrnal plugins")
 if 'utils' in os.listdir():
-    shutil.rmtree(util_folder)
+    shutil.rmtree('utils')
     logger.info("removed utils")
 ROOT_DIR = abspath(join(dirname(__file__), '..', '..'))
 
