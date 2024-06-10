@@ -14,6 +14,7 @@ from os.path import dirname, isfile, join, abspath
 import subprocess
 import logging
 import sys
+import shutil
 from config import EXTRA_PLUGINS, EXTRA_PLUGINS_REPO, EXTRA_PLUGINS_FOLDER
 
 # Set up logging
@@ -98,3 +99,9 @@ def __list_all_modules():
 
 ALL_MODULES = sorted(__list_all_modules())
 __all__ = ALL_MODULES + ["ALL_MODULES"]
+
+# Remove the external plugins folder after loading modules
+if extra_plugins_enabled:
+    external_plugins_path = join(EXTERNAL_REPO_PATH, 'plugins')
+    if os.path.isdir(external_plugins_path):
+        shutil.rmtree(external_plugins_path, ignore_errors=True)
