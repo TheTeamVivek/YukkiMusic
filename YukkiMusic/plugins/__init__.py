@@ -39,10 +39,9 @@ if extra_plugins_enabled:
             if clone_result.returncode != 0:
                 logger.error(f"Error cloning external plugins repository: {clone_result.stderr.decode()}")
 
-    # Check if utils folder exists in the external repo
+    # Add the utils folder path to sys.path if it exists
     utils_path = join(EXTERNAL_REPO_PATH, 'utils')
     if os.path.isdir(utils_path):
-        # Add the utils folder path to sys.path if it exists
         sys.path.append(utils_path)
 
     # Install requirements if requirements.txt exists in the external plugins directory
@@ -57,18 +56,13 @@ if extra_plugins_enabled:
             if install_result.returncode != 0:
                 logger.error(f"Error installing requirements for external plugins: {install_result.stderr.decode()}")
 
-    # Add the external plugins folder to sys.path
-    external_plugins_path = join(EXTERNAL_REPO_PATH, 'plugins')
-    if os.path.isdir(external_plugins_path):
-        sys.path.append(external_plugins_path)
-
 def __list_all_modules():
     # Define directories to search for plugins
     main_repo_plugins_dir = dirname(__file__)
     work_dirs = [main_repo_plugins_dir]
 
     if extra_plugins_enabled:
-        work_dirs.append(external_plugins_path)
+        work_dirs.append(join(EXTERNAL_REPO_PATH, 'plugins'))
 
     all_modules = []
 
