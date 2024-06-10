@@ -10,19 +10,25 @@
 import glob
 import os
 import importlib
-import logging
 from os.path import dirname, isfile, join, abspath
 import subprocess
+import logging
+import sys
 from config import EXTRA_PLUGINS, EXTRA_PLUGINS_REPO, EXTRA_PLUGINS_FOLDER
-from YukkiMusic import LOGGER
 
+# Set up logging
+logging.basicConfig(level=logging.ERROR)
+logger = logging.getLogger(__name__)
+
+# Define the path to the external plugins directory in the root of repo-a
 ROOT_DIR = abspath(join(dirname(__file__), '..', '..'))
-EXTERNAL_REPO_PATH = join(ROOT_DIR, EXTRA_PLUGINS_FOLDER)
+EXTERNAL_REPO_PATH = join(ROOT_DIR, EXTRA_PLUGINS_FOLDER)  # Local directory to clone the external repo
 
 # Convert EXTRA_PLUGINS to a boolean
 extra_plugins_enabled = EXTRA_PLUGINS.lower() == "true"
 
 if extra_plugins_enabled:
+    # Clone the external repository if not already cloned
     if not os.path.exists(EXTERNAL_REPO_PATH):
         with open(os.devnull, 'w') as devnull:
             clone_result = subprocess.run(
@@ -31,8 +37,15 @@ if extra_plugins_enabled:
                 stderr=subprocess.PIPE
             )
             if clone_result.returncode != 0:
-                logging.exception(clone_result.stderr.decode())
+                logger.error(f"Error cloning external plugins repository: {clone_result.stderr.decode()}")
 
+    # Check if utils folder exists in the external repo
+    utils_path = join(EXTERNAL_REPO_PATH, 'utils')
+    if os.path.isdir(utils_path):
+        # Add the utils folder path to sys.path if it exists
+        sys.path.append(utils_path)
+
+    # Install requirements if requirements.txt exists in the external plugins directory
     requirements_path = join(EXTERNAL_REPO_PATH, 'requirements.txt')
     if os.path.isfile(requirements_path):
         with open(os.devnull, 'w') as devnull:
@@ -42,14 +55,14 @@ if extra_plugins_enabled:
                 stderr=subprocess.PIPE
             )
             if install_result.returncode != 0:
-                logging.exception(install_result.stderr.decode())
+                logger.error(f"Error installing requirements for external plugins: {install_result.stderr.decode()}")
 
 def __list_all_modules():
+    # Define directories to search for plugins
     main_repo_plugins_dir = dirname(__file__)
     work_dirs = [main_repo_plugins_dir]
 
     if extra_plugins_enabled:
-        LOGGER(__name__).info(f"Loading Extra Plugins from {EXTRA_PLUGINS_REPO}")
         work_dirs.append(EXTERNAL_REPO_PATH)
 
     all_modules = []
