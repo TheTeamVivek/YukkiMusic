@@ -51,6 +51,8 @@ if extra_plugins_enabled:
         # Add the utils folder path to sys.path if it exists
         sys.path.append(str(utils_path))
         logger.info(f"Added {utils_path} to sys.path")
+        # Log the contents of the utils directory
+        logger.debug(f"Contents of utils directory: {os.listdir(utils_path)}")
     else:
         logger.error(f"utils directory not found in {EXTERNAL_REPO_PATH}")
 
