@@ -12,13 +12,11 @@ import os
 import shutil
 import sys
 from os import listdir, mkdir
-from config import EXTRA_PLUGINS_FOLDER
 
 def dirr():
     assets_folder = "assets"
     downloads_folder = "downloads"
     cache_folder = "cache"
-    util_folder = "utils"
     workdir = "datafiles"
 
     if assets_folder not in listdir():
@@ -43,11 +41,6 @@ def dirr():
     if workdir in listdir():
         shutil.rmtree(workdir)
         mkdir(workdir)
-    
-    if EXTRA_PLUGINS_FOLDER in listdir():
-        shutil.rmtree(EXTRA_PLUGINS_FOLDER)
-    if util_folder in listdir():
-        shutil.rmtree(util_folder)
 
     logging.info("Directories Updated.")
 
