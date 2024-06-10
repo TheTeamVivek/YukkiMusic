@@ -39,10 +39,27 @@ if extra_plugins_enabled:
             if clone_result.returncode != 0:
                 logger.error(f"Error cloning external plugins repository: {clone_result.stderr.decode()}")
 
+    # Move utils folder from the external repo to the root of the main repo if it exists
+    utils_source_path = join(EXTERNAL_REPO_PATH, 'utils')
+    utils_target_path = join(ROOT_DIR, 'utils')
+    if os.path.isdir(utils_source_path):
+        if not os.path.exists(utils_target_path):
+            os.rename(utils_source_path, utils_target_path)
+        else:
+            # Merge the utils folder if it already exists
+            for root, dirs, files in os.walk(utils_source_path):
+                relative_path = os.path.relpath(root, utils_source_path)
+                target_dir = os.path.join(utils_target_path, relative_path)
+                os.makedirs(target_dir, exist_ok=True)
+                for file in files:
+                    source_file = os.path.join(root, file)
+                    target_file = os.path.join(target_dir, file)
+                    if not os.path.exists(target_file):
+                        os.rename(source_file, target_file)
+
     # Add the utils folder path to sys.path if it exists
-    utils_path = join(EXTERNAL_REPO_PATH, 'utils')
-    if os.path.isdir(utils_path):
-        sys.path.append(utils_path)
+    if os.path.isdir(utils_target_path):
+        sys.path.append(utils_target_path)
 
     # Install requirements if requirements.txt exists in the external plugins directory
     requirements_path = join(EXTERNAL_REPO_PATH, 'requirements.txt')
