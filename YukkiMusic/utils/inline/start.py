@@ -80,12 +80,21 @@ def private_panel(_, BOT_USERNAME, OWNER: Union[bool, int] = None):
             ]
         )
     else:
-        if GITHUB_REPO:
-            buttons.append(
-                [
-                    InlineKeyboardButton(text=_["S_B_6"], url=f"{GITHUB_REPO}"),
-                ]
-            )
+        if app.username == TprinceMusicBot:
+            if GITHUB_REPO:
+                buttons.append(
+                    [
+                        InlineKeyboardButton(text=_["S_B_6"], callback_data="source_code"),
+                    ]
+                )
+        else:
+            if GITHUB_REPO:
+                buttons.append(
+                    [
+                        InlineKeyboardButton(text=_["S_B_6"], url=f"{GITHUB_REPO}"),
+                    ]
+                )
+
         if OWNER:
             buttons.append(
                 [
