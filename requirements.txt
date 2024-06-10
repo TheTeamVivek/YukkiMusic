@@ -15,6 +15,7 @@ pykeyboard
 py-tgcalls==1.2.9
 ntgcalls==1.1.2
 pyrogram==2.0.106
+pyromod==1.5
 python-dotenv
 pyyaml
 requests
