@@ -15,20 +15,17 @@ import subprocess
 import logging
 import sys
 from config import EXTRA_PLUGINS, EXTRA_PLUGINS_REPO, EXTRA_PLUGINS_FOLDER
+from YukkiMusic import LOGGER
 
-# Set up logging
-logging.basicConfig(level=logging.ERROR)
-logger = logging.getLogger(__name__)
+logger = LOGGER(__name__)
 
-# Define the path to the external plugins directory in the root of repo-a
 ROOT_DIR = abspath(join(dirname(__file__), '..', '..'))
-EXTERNAL_REPO_PATH = join(ROOT_DIR, EXTRA_PLUGINS_FOLDER)  # Local directory to clone the external repo
 
-# Convert EXTRA_PLUGINS to a boolean
+EXTERNAL_REPO_PATH = join(ROOT_DIR, EXTRA_PLUGINS_FOLDER)
+
 extra_plugins_enabled = EXTRA_PLUGINS.lower() == "true"
 
 if extra_plugins_enabled:
-    # Clone the external repository if not already cloned
     if not os.path.exists(EXTERNAL_REPO_PATH):
         with open(os.devnull, 'w') as devnull:
             clone_result = subprocess.run(
@@ -39,14 +36,12 @@ if extra_plugins_enabled:
             if clone_result.returncode != 0:
                 logger.error(f"Error cloning external plugins repository: {clone_result.stderr.decode()}")
 
-    # Move utils folder from the external repo to the root of the main repo if it exists
     utils_source_path = join(EXTERNAL_REPO_PATH, 'utils')
     utils_target_path = join(ROOT_DIR, 'utils')
     if os.path.isdir(utils_source_path):
         if not os.path.exists(utils_target_path):
             os.rename(utils_source_path, utils_target_path)
         else:
-            # Merge the utils folder if it already exists
             for root, dirs, files in os.walk(utils_source_path):
                 relative_path = os.path.relpath(root, utils_source_path)
                 target_dir = os.path.join(utils_target_path, relative_path)
@@ -57,11 +52,9 @@ if extra_plugins_enabled:
                     if not os.path.exists(target_file):
                         os.rename(source_file, target_file)
 
-    # Add the utils folder path to sys.path if it exists
     if os.path.isdir(utils_target_path):
         sys.path.append(utils_target_path)
 
-    # Install requirements if requirements.txt exists in the external plugins directory
     requirements_path = join(EXTERNAL_REPO_PATH, 'requirements.txt')
     if os.path.isfile(requirements_path):
         with open(os.devnull, 'w') as devnull:
@@ -74,7 +67,6 @@ if extra_plugins_enabled:
                 logger.error(f"Error installing requirements for external plugins: {install_result.stderr.decode()}")
 
 def __list_all_modules():
-    # Define directories to search for plugins
     main_repo_plugins_dir = dirname(__file__)
     work_dirs = [main_repo_plugins_dir]
 
