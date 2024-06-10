@@ -23,10 +23,8 @@ logger = LOGGER(__name__)
 
 if EXTRA_PLUGINS_FOLDER in os.listdir():
     shutil.rmtree(EXTRA_PLUGINS_FOLDER)
-    logger.info("extrnal plugins")
 if 'utils' in os.listdir():
     shutil.rmtree('utils')
-    logger.info("removed utils")
 ROOT_DIR = abspath(join(dirname(__file__), '..', '..'))
 
 EXTERNAL_REPO_PATH = join(ROOT_DIR, EXTRA_PLUGINS_FOLDER)
@@ -79,7 +77,7 @@ def __list_all_modules():
     work_dirs = [main_repo_plugins_dir]
 
     if extra_plugins_enabled:
-        logger.info("loading external plugins")
+        logger.info(f"loading extra plugins from {EXTRA_PLUGINS_REPO}")
         work_dirs.append(join(EXTERNAL_REPO_PATH, 'plugins'))
 
     all_modules = []
