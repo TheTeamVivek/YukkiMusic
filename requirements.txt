@@ -5,7 +5,6 @@ dnspython==2.3.0
 ffmpeg-python
 gitpython
 hachoir
-#httpx<0.24.0; extra == 'http2'
 heroku3
 lyricsgenius
 motor
