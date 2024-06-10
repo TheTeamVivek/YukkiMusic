@@ -10,65 +10,89 @@
 import glob
 import os
 import importlib
-from os.path import dirname, isfile, join, abspath
+from pathlib import Path
 import subprocess
 import logging
 import sys
 from config import EXTRA_PLUGINS, EXTRA_PLUGINS_REPO, EXTRA_PLUGINS_FOLDER
-from YukkiMusic import LOGGER
 
-logger = LOGGER(__name__)
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)  # Set to DEBUG for more detailed logs
+logger = logging.getLogger(__name__)
 
-ROOT_DIR = abspath(join(dirname(__file__), '..', '..'))
-EXTERNAL_REPO_PATH = join(ROOT_DIR, EXTRA_PLUGINS_FOLDER)
+# Define the path to the external plugins directory in the root of repo-a
+ROOT_DIR = Path(__file__).resolve().parents[2]
+EXTERNAL_REPO_PATH = ROOT_DIR / EXTRA_PLUGINS_FOLDER  # Local directory to clone the external repo
 
 # Convert EXTRA_PLUGINS to a boolean
 extra_plugins_enabled = EXTRA_PLUGINS.lower() == "true"
 
 if extra_plugins_enabled:
-    if not os.path.exists(EXTERNAL_REPO_PATH):
+    # Clone the external repository if not already cloned
+    if not EXTERNAL_REPO_PATH.exists():
         with open(os.devnull, 'w') as devnull:
             clone_result = subprocess.run(
-                ['git', 'clone', EXTRA_PLUGINS_REPO, EXTERNAL_REPO_PATH],
+                ['git', 'clone', EXTRA_PLUGINS_REPO, str(EXTERNAL_REPO_PATH)],
                 stdout=devnull,
                 stderr=subprocess.PIPE
             )
             if clone_result.returncode != 0:
                 logger.error(f"Error cloning external plugins repository: {clone_result.stderr.decode()}")
+            else:
+                logger.info(f"Successfully cloned {EXTRA_PLUGINS_REPO} into {EXTERNAL_REPO_PATH}")
 
-    utils_path = join(EXTERNAL_REPO_PATH, 'utils')
-    if os.path.isdir(utils_path):
-        sys.path.append(utils_path)
+    # Log the directory structure after cloning
+    for path in EXTERNAL_REPO_PATH.rglob('*'):
+        logger.debug(f"Cloned file/folder: {path}")
 
-    requirements_path = join(EXTERNAL_REPO_PATH, 'requirements.txt')
-    if os.path.isfile(requirements_path):
+    # Check if utils folder exists in the external repo
+    utils_path = EXTERNAL_REPO_PATH / 'utils'
+    if utils_path.is_dir():
+        # Add the utils folder path to sys.path if it exists
+        sys.path.append(str(utils_path))
+        logger.info(f"Added {utils_path} to sys.path")
+    else:
+        logger.error(f"utils directory not found in {EXTERNAL_REPO_PATH}")
+
+    # Install requirements if requirements.txt exists in the external plugins directory
+    requirements_path = EXTERNAL_REPO_PATH / 'requirements.txt'
+    if requirements_path.is_file():
         with open(os.devnull, 'w') as devnull:
             install_result = subprocess.run(
-                ['pip', 'install', '-r', requirements_path],
+                ['pip', 'install', '-r', str(requirements_path)],
                 stdout=devnull,
                 stderr=subprocess.PIPE
             )
             if install_result.returncode != 0:
                 logger.error(f"Error installing requirements for external plugins: {install_result.stderr.decode()}")
+            else:
+                logger.info(f"Successfully installed requirements from {requirements_path}")
+
+# Test import to check if utils can be imported
+try:
+    import utils.capture_err
+    logger.info("Successfully imported utils.capture_err")
+except ImportError as e:
+    logger.error(f"Error importing utils: {e}")
 
 def __list_all_modules():
-    main_repo_plugins_dir = dirname(__file__)
+    # Define directories to search for plugins
+    main_repo_plugins_dir = Path(__file__).parent
     work_dirs = [main_repo_plugins_dir]
 
     if extra_plugins_enabled:
-        logger.info(f"Loading Extra Plugins from {EXTRA_PLUGINS_REPO}")
         work_dirs.append(EXTERNAL_REPO_PATH)
 
     all_modules = []
 
     for work_dir in work_dirs:
-        mod_paths = glob.glob(join(work_dir, "*.py"))
-        mod_paths += glob.glob(join(work_dir, "*/*.py"))
+        mod_paths = glob.glob(str(work_dir / "*.py"))
+        mod_paths += glob.glob(str(work_dir / "*/*.py"))
         
         modules = [
-            (((f.replace(main_repo_plugins_dir, "YukkiMusic.plugins")).replace(EXTERNAL_REPO_PATH, EXTRA_PLUGINS_FOLDER)).replace(os.sep, "."))[:-3]
+            (((f.replace(str(main_repo_plugins_dir), "YukkiMusic.plugins")).replace(str(EXTERNAL_REPO_PATH), EXTRA_PLUGINS_FOLDER)).replace(os.sep, "."))[:-3]
             for f in mod_paths
-            if isfile(f) and f.endswith(".py") and not f.endswith("__init__.py")
+            if Path(f).is_file() and f.endswith(".py") and not f.endswith("__init__.py")
         ]
         all_modules.extend(modules)
 
@@ -76,3 +100,6 @@ def __list_all_modules():
 
 ALL_MODULES = sorted(__list_all_modules())
 __all__ = ALL_MODULES + ["ALL_MODULES"]
+
+# Additional debug log to print sys.path
+logger.debug(f"sys.path: {sys.path}")
