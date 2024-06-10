@@ -57,13 +57,18 @@ if extra_plugins_enabled:
             if install_result.returncode != 0:
                 logger.error(f"Error installing requirements for external plugins: {install_result.stderr.decode()}")
 
+    # Add the external plugins folder to sys.path
+    external_plugins_path = join(EXTERNAL_REPO_PATH, 'plugins')
+    if os.path.isdir(external_plugins_path):
+        sys.path.append(external_plugins_path)
+
 def __list_all_modules():
     # Define directories to search for plugins
     main_repo_plugins_dir = dirname(__file__)
     work_dirs = [main_repo_plugins_dir]
 
     if extra_plugins_enabled:
-        work_dirs.append(join(EXTERNAL_REPO_PATH, 'plugins'))
+        work_dirs.append(external_plugins_path)
 
     all_modules = []
 
