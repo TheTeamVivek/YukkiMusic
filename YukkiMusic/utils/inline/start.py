@@ -73,7 +73,7 @@ def private_panel(_, BOT_USERNAME, OWNER: Union[bool, int] = None):
         ]
     )
     if GITHUB_REPO and OWNER:
-        if app.username == TprinceMusicBot:
+        if app.username == "TprinceMusicBot":
             buttons.append(
                 [
                     InlineKeyboardButton(text=_["S_B_7"], user_id=OWNER),
@@ -88,7 +88,7 @@ def private_panel(_, BOT_USERNAME, OWNER: Union[bool, int] = None):
                 ]
             )
     else:
-        if app.username == TprinceMusicBot:
+        if app.username == "TprinceMusicBot":
             if GITHUB_REPO:
                 buttons.append(
                     [
