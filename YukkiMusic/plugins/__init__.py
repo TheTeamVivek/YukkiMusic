@@ -88,17 +88,21 @@ def __list_all_modules():
         mod_paths = glob.glob(join(work_dir, "*.py"))
         mod_paths += glob.glob(join(work_dir, "*/*.py"))
         
-        modules = [
-            (((f.replace(main_repo_plugins_dir, "YukkiMusic.plugins")).replace(EXTERNAL_REPO_PATH, EXTRA_PLUGINS_FOLDER)).replace(os.sep, "."))[:-3]
-            for f in mod_paths
-            if isfile(f) and f.endswith(".py") and not f.endswith("__init__.py")
-        ]
-        all_modules.extend(modules)
+        for f in mod_paths:
+            # Construct the module name based on the file path
+            module_name = f.replace(main_repo_plugins_dir, "YukkiMusic.plugins").replace(EXTERNAL_REPO_PATH, EXTRA_PLUGINS_FOLDER).replace(os.sep, ".")[:-3]
+
+            if isfile(f) and f.endswith(".py") and not f.endswith("__init__.py"):
+                all_modules.append(module_name)
 
     return all_modules
 
 ALL_MODULES = sorted(__list_all_modules())
 __all__ = ALL_MODULES + ["ALL_MODULES"]
+
+# Import all modules
+for all_module in ALL_MODULES:
+    imported_module = importlib.import_module(all_module)
 
 # Remove the external plugins folder after loading modules
 if extra_plugins_enabled:
