@@ -9,7 +9,6 @@ heroku3
 lyricsgenius
 motor
 pillow==9.5.0
-pytz
 psutil
 pytube
 pykeyboard
