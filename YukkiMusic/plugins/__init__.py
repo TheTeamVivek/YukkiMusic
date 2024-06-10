@@ -14,7 +14,6 @@ from os.path import dirname, isfile, join, abspath
 import subprocess
 import logging
 import sys
-import shutil
 from config import EXTRA_PLUGINS, EXTRA_PLUGINS_REPO, EXTRA_PLUGINS_FOLDER
 
 # Set up logging
@@ -88,24 +87,14 @@ def __list_all_modules():
         mod_paths = glob.glob(join(work_dir, "*.py"))
         mod_paths += glob.glob(join(work_dir, "*/*.py"))
         
-        for f in mod_paths:
-            # Construct the module name based on the file path
-            module_name = f.replace(main_repo_plugins_dir, "YukkiMusic.plugins").replace(EXTERNAL_REPO_PATH, EXTRA_PLUGINS_FOLDER).replace(os.sep, ".")[:-3]
-
-            if isfile(f) and f.endswith(".py") and not f.endswith("__init__.py"):
-                all_modules.append(module_name)
+        modules = [
+            (((f.replace(main_repo_plugins_dir, "YukkiMusic.plugins")).replace(EXTERNAL_REPO_PATH, EXTRA_PLUGINS_FOLDER)).replace(os.sep, "."))[:-3]
+            for f in mod_paths
+            if isfile(f) and f.endswith(".py") and not f.endswith("__init__.py")
+        ]
+        all_modules.extend(modules)
 
     return all_modules
 
 ALL_MODULES = sorted(__list_all_modules())
 __all__ = ALL_MODULES + ["ALL_MODULES"]
-
-# Import all modules
-for all_module in ALL_MODULES:
-    imported_module = importlib.import_module(all_module)
-
-# Remove the external plugins folder after loading modules
-if extra_plugins_enabled:
-    external_plugins_path = join(EXTERNAL_REPO_PATH, 'plugins')
-    if os.path.isdir(external_plugins_path):
-        shutil.rmtree(external_plugins_path, ignore_errors=True)
