@@ -12,7 +12,7 @@ import os
 from pyrogram import Client
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.types import BotCommand
-
+from pyromod import listen
 import config
 
 from ..logging import LOGGER
