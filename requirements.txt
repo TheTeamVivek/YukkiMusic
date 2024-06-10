@@ -8,7 +8,6 @@ hachoir
 httpx<0.24.0; extra == 'http2'
 heroku3
 lyricsgenius
-lexica-api
 motor
 pillow==9.5.0
 pytz
