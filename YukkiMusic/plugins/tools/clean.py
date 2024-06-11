@@ -3,11 +3,10 @@ import shutil
 
 from pyrogram import filters
 
-from YukkiMusic import app, userbot
+from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 
 
-@userbot.one.on_message(filters.command("clean") & SUDOERS)
 @app.on_message(filters.command("clean") & SUDOERS)
 async def clean(_, message):
     A = await message.reply_text("ᴄʟᴇᴀɴɪɴɢ ᴛᴇᴍᴘ ᴅɪʀᴇᴄᴛᴏʀɪᴇs...")
