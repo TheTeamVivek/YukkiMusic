@@ -17,6 +17,7 @@ from config import BANNED_USERS
 from YukkiMusic import HELPABLE, LOGGER, app, userbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.plugins import ALL_MODULES
+from YukkiMusic.Userbot import USERBOT_MODULES
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
 async def init():
@@ -54,6 +55,8 @@ async def init():
 
     LOGGER("YukkiMusic.plugins").info("Successfully Imported All Modules ")
     await userbot.start()
+    for all_module in USERBOT_MODULES:
+        importlib.import_module(all_module)
     await Yukki.start()
     await Yukki.decorators()
     LOGGER("YukkiMusic").info("Yukki Music Bot Started Successfully")
