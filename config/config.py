@@ -1,4 +1,4 @@
-#
+p#
 # Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
@@ -213,7 +213,7 @@ SET_CMDS = getenv("SET_CMDS", "False")
 
 # ________________________________________________________________________________#
 # You'll need a Pyrogram String Session for these vars. Generate String from our session generator bot @YukkiStringBot
-STRING1 = getenv("STRING_SESSION", "BQGE6pYAxTl498Yvvq8wLGXI4028L3VHS3O8tAj3TcXW0i1xijnjDZZoI_3EsP7MH4Xk7jM2PVaVIE_4xpL5Ebc9k2epCU7wDVWu6IATQxHT3-fdBQVcqO8IEDNaEeraYTaKDDdZvr1EhHRfonL42Lv592gQMAiGD6PEVctfZCQvWF5LNLhD94hchyTqIykfSQfzLCpI60gqcib-4t86rQwrtfUWbFDy4c9wV_6x-4J94UJ6y8Auy_U2Eadu190hMFbw66cQY-UuR0WuAl35tAdJGAF9bYpJZQ2jMs-OgU_WfwFte4DaCDBkku1HLrJmjrKYL9dOTb6-NUmE5vi8fDcGZLEbOwAAAAG9yrjjAQ")
+STRING1 = getenv("STRING_SESSION", None)
 STRING2 = getenv("STRING_SESSION2", None)
 STRING3 = getenv("STRING_SESSION3", None)
 STRING4 = getenv("STRING_SESSION4", None)
