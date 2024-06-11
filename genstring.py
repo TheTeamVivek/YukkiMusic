@@ -23,7 +23,10 @@ async def main():
     await i.start()
     ss = await i.export_session_string()
     xx = f"HERE IS YOUR STRING SESSION, COPY IT, DON'T SHARE!!\n\n`{ss}`\n\n STRING GENERATED"
-    await i.send_message("me", xx)
+    try:
+        await i.send_message("me", xx)
+    except:
+        pass
     print("\nHERE IS YOUR STRING SESSION, COPY IT, DON'T SHARE!!\n")
     print(f"\n{ss}\n")
     print("\n STRING GENERATED\n")
