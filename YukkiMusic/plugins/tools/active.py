@@ -12,18 +12,17 @@ from pyrogram.types import Message
 
 from config import PK
 from strings import get_command
-from YukkiMusic import app
+from YukkiMusic import app, userbot
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database.memorydatabase import (
     get_active_chats,
     get_active_video_chats,
 )
-from YukkiMusic.utils.filter import cmd
 # Commands
 ACTIVEVC_COMMAND = get_command("ACTIVEVC_COMMAND")
 ACTIVEVIDEO_COMMAND = get_command("ACTIVEVIDEO_COMMAND")
 
-@cmd((ACTIVEVC_COMMAND) , SUDOERS)
+@userbot.one.on_message(filters.command(ACTIVEVC_COMMAND) & SUDOERS)
 @app.on_message(filters.command(ACTIVEVC_COMMAND) & SUDOERS)
 async def activevc(_, message: Message):
     mystic = await message.reply_text(
