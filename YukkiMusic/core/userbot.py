@@ -17,7 +17,7 @@ from ..logging import LOGGER
 
 assistants = []
 assistantids = []
-
+clients = []
 
 class Userbot(Client):
     def __init__(self):
@@ -64,6 +64,7 @@ class Userbot(Client):
             except:
                 pass
             assistants.append(1)
+            clients.append(self.one)
             try:
                 await self.one.send_message(
                     config.LOG_GROUP_ID, "Assistant Started"
@@ -97,6 +98,7 @@ class Userbot(Client):
             except:
                 pass
             assistants.append(2)
+            clients.append(self.two)
             try:
                 await self.two.send_message(
                     config.LOG_GROUP_ID, "Assistant Started"
@@ -130,6 +132,7 @@ class Userbot(Client):
             except:
                 pass
             assistants.append(3)
+            clients.append(self.three)
             try:
                 await self.three.send_message(
                     config.LOG_GROUP_ID, "Assistant Started"
@@ -163,6 +166,7 @@ class Userbot(Client):
             except:
                 pass
             assistants.append(4)
+            clients.append(self.four)
             try:
                 await self.four.send_message(
                     config.LOG_GROUP_ID, "Assistant Started"
@@ -196,6 +200,7 @@ class Userbot(Client):
             except:
                 pass
             assistants.append(5)
+            clients.append(self.five)
             try:
                 await self.five.send_message(
                     config.LOG_GROUP_ID, "Assistant Started"
