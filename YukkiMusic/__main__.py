@@ -57,7 +57,6 @@ async def init():
     await userbot.start()
     for all_module in USERBOT_MODULES:
         importlib.import_module("YukkiMusic.Userbot" + all_module)
-    LOGGER("YukkiMusic.Userbot").info("Successfully Imported USERBOT_MODULES ")
     await Yukki.start()
     await Yukki.decorators()
     LOGGER("YukkiMusic").info("Yukki Music Bot Started Successfully")
