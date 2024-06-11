@@ -1,4 +1,3 @@
-from pyrogram import filters
 from .. import userbot_command
 
 @userbot_command("start")
