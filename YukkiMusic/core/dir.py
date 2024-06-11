@@ -17,7 +17,6 @@ def dirr():
     assets_folder = "assets"
     downloads_folder = "downloads"
     cache_folder = "cache"
-    workdir = "datafiles"
 
     if assets_folder not in listdir():
         logging.warning(
@@ -34,13 +33,6 @@ def dirr():
 
     if cache_folder not in listdir():
         mkdir(cache_folder)
-
-    if workdir not in listdir():
-        mkdir(workdir)
-
-    if workdir in listdir():
-        shutil.rmtree(workdir)
-        mkdir(workdir)
 
     logging.info("Directories Updated.")
 
