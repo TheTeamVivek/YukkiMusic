@@ -29,7 +29,7 @@ autoenddb = mongodb.autoend
 coupledb = mongodb.couple
 notesdb = mongodb.notes
 welcomedb = mongodb.welcome
-filtersdb = db.filters
+filtersdb = mongodb.filters
 
 # Shifting to memory [ mongo sucks often]
 loop = {}
