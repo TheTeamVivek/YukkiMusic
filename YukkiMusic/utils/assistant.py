@@ -90,4 +90,4 @@ def userbot_on_cmd(commands, other_filters=None):
 
 # @userbot_on_cmd(["ckv"], SUDOERS)
 # async def clean(client, message):
-   # await message.reply_text("Cleaning in progress...")
+   # await message.reply_text("working...")
