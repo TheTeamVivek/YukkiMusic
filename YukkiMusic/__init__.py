@@ -14,7 +14,7 @@ from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
 from YukkiMusic.core.userbot import Userbot
 from YukkiMusic.misc import dbb, heroku, sudo
-from YukkiMusic.utils.filters import userbot_on_cmd
+from YukkiMusic.utils.filter import userbot_on_cmd
 
 cmd = userbot_on_cmd
 
