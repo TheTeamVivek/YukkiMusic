@@ -23,7 +23,7 @@ from YukkiMusic.utils.filter import cmd
 ACTIVEVC_COMMAND = get_command("ACTIVEVC_COMMAND")
 ACTIVEVIDEO_COMMAND = get_command("ACTIVEVIDEO_COMMAND")
 
-@cmd((ACTIVEVC_COMMAND) & SUDOERS)
+@cmd((ACTIVEVC_COMMAND) , SUDOERS)
 @app.on_message(filters.command(ACTIVEVC_COMMAND) & SUDOERS)
 async def activevc(_, message: Message):
     mystic = await message.reply_text(
