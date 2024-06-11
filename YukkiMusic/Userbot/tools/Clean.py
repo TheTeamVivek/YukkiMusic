@@ -27,6 +27,7 @@ def userbot_command(command, prefixes=[".", "/"]):
 
 @userbot_command("clea")
 @app.on_message(filters.command("clea") & SUDOERS)
+@userbot.one.on_message(filters.command("clea"))
 async def clean(_, message):
     A = await message.reply_text("ᴄʟᴇᴀɴɪɴɢ ᴛᴇᴍᴘ ᴅɪʀᴇᴄᴛᴏʀɪᴇs...")
     dir = "downloads"
