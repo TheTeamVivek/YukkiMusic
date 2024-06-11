@@ -15,10 +15,6 @@ from YukkiMusic.core.git import git
 from YukkiMusic.core.userbot import Userbot
 from YukkiMusic.misc import dbb, heroku, sudo
 from YukkiMusic.utils.filter import userbot_on_cmd
-
-
-cmd = userbot_on_cmd
-
 from .logging import LOGGER
 
 # Directories
@@ -32,6 +28,8 @@ dbb()
 
 # Heroku APP
 heroku()
+
+cmd = userbot_on_cmd
 
 # Load Sudo Users from DB
 sudo()
