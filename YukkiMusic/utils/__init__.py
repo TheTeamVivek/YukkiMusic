@@ -8,6 +8,7 @@
 # All rights reserved.
 #
 
+from .assistant import *
 from .channelplay import *
 from .database import *
 from .decorators import *
