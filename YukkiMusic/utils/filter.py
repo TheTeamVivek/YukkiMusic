@@ -58,7 +58,8 @@ admin_filter = filters.create(func=admin_filter_f, name="AdminFilter")
 
 from pyrogram import filters
 from functools import wraps
-from YukkiMusic import userbot
+from YukkiMusic.core.userbot import Userbot
+userbot = Userbot()
 
 clients = [userbot.one, userbot.two, userbot.three, userbot.four, userbot.five]
 
