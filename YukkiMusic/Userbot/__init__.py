@@ -1,6 +1,22 @@
 import glob
 from os.path import dirname, isfile
+from functools import wraps
+from pyrogram.handlers import MessageHandler
+from pyrogram import filters
 
+def userbot_command(command, prefixes=["."]):
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(client, message):
+            return await func(client, message)
+
+        for userbot_client in [userbot.one, userbot.two, userbot.three, userbot.four, userbot.five]:
+            if userbot_client:
+                userbot_client.add_handler(
+                    MessageHandler(wrapper, filters.command(command, prefixes=prefixes))
+                )
+        return wrapper
+    return decorator
 
 def __list_all_modules():
     work_dir = dirname(__file__)
