@@ -63,7 +63,7 @@ userbot = Userbot()
 
 clients = [userbot.one, userbot.two, userbot.three, userbot.four, userbot.five]
 
-def userbot_on_cmd(commands, other_filters=None):
+def cmd(commands, other_filters=None):
     def decorator(func):
         @wraps(func)
         async def wrapper(client, message, *args, **kwargs):
