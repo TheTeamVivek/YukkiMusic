@@ -5,29 +5,13 @@ from pyrogram import filters
 
 from YukkiMusic import app, userbot
 from YukkiMusic.misc import SUDOERS
-from functools import wraps
-from pyrogram.handlers import MessageHandler
 from pyrogram import filters
 
-def userbot_command(command, prefixes=["."]):
-    def decorator(func):
-        @wraps(func)
-        async def wrapper(client, message):
-            return await func(client, message)
-        
-        for userbot_client in [userbot.one, userbot.two, userbot.three, userbot.four, userbot.five]:
-            if userbot_client:
-                userbot_client.add_handler(
-                    MessageHandler(wrapper, filters.command(command, prefixes=prefixes))
-                )
-        return wrapper
-    return decorator
+def commandx(commands: Union[str, List[str]]):
+    return filters.command(commands, ['.', '!'])
 
 
-
-@userbot_command("clea")
-@app.on_message(filters.command("clea") & SUDOERS)
-@userbot.one.on_message(filters.command("clea"))
+@userbot.one.on_message(commandx("clea"))
 async def clean(_, message):
     A = await message.reply_text("ᴄʟᴇᴀɴɪɴɢ ᴛᴇᴍᴘ ᴅɪʀᴇᴄᴛᴏʀɪᴇs...")
     dir = "downloads"
