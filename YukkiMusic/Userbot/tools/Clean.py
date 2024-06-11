@@ -1,10 +1,8 @@
-import os
-import shutil
+from pyrogram import filters
+from .. import userbot_command
 
-from pyrogram import filters
-from typing import Union, List
-from YukkiMusic import app, userbot
-from YukkiMusic.misc import SUDOERS
-from pyrogram import filters
+@userbot_command("start")
+async def start(_ ,m):
+    await m.reply_text("i am working")
 
  
