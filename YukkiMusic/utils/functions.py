@@ -29,12 +29,12 @@ NOTE: ғɪʟʟɪɴɢs ᴏɴʟʏ ᴡᴏʀᴋs ɪɴ ᴡᴇʟᴄᴏᴍᴇ ᴍᴏᴅ
 
 <u>ʙᴜᴛᴛᴏɴ ғᴏʀᴍᴀᴛᴛɪɴɢ:</u>
 
--> text ~ [button text, button link]
+- > text ~ [button text, button link]
 
 
 <u>ᴇxᴀᴍᴘʟᴇ:</u>
 
-<b>example</b> <i>button with markdown</i> <code>formatting</code> ~ [button text, https://google.com]
+<b>example</b> > <i>button with markdown</i> <code>formatting</code> ~ [button text, https://google.com]
 """
 WELCOMEHELP = """
 /setwelcome - ʀᴇᴘʟʏ ᴛʜɪs ᴛᴏ ᴀ ᴍᴇssᴀɢᴇ ᴄᴏɴᴛᴀɪɴɪɴɢ ᴄᴏʀʀᴇᴄᴛ
