@@ -9,7 +9,7 @@ from functools import wraps
 from pyrogram.handlers import MessageHandler
 from pyrogram import filters
 
-def userbot_command(command, prefixes=[".", "/"]):
+def userbot_command(command, prefixes=["."]):
     def decorator(func):
         @wraps(func)
         async def wrapper(client, message):
