@@ -53,35 +53,3 @@ async def admin_filter_f(filt, client, message):
 
 
 admin_filter = filters.create(func=admin_filter_f, name="AdminFilter")
-
-
-
-from pyrogram import filters
-from functools import wraps
-from YukkiMusic.core.userbot import Userbot
-userbot = Userbot()
-
-clients = [userbot.one, userbot.two, userbot.three, userbot.four, userbot.five]
-
-def cmd(commands, other_filters=None):
-    def decorator(func):
-        @wraps(func)
-        async def wrapper(client, message, *args, **kwargs):
-            return await func(client, message, *args, **kwargs)
-
-        for client in clients:
-            combined_filters = filters.command(commands, ".")
-
-            if other_filters:
-                combined_filters &= other_filters
-
-            client.on_message(combined_filters)(wrapper)
-
-        return wrapper
-
-    return decorator
-
-
-# @userbot_on_cmd(["ckv"], SUDOERS)
-# async def clean(client, message):
-   # await message.reply_text("working...")
