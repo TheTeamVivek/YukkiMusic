@@ -59,4 +59,35 @@ async def assistant():
     if filled_count == 1:
         return True
     else:
-        return False
+        return False
+
+
+
+from pyrogram import filters
+from functools import wraps
+from YukkiMusic import userbot
+
+clients = [userbot.one, userbot.two, userbot.three, userbot.four, userbot.five]
+
+def userbot_on_cmd(commands, other_filters=None):
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(client, message, *args, **kwargs):
+            return await func(client, message, *args, **kwargs)
+
+        for client in clients:
+            combined_filters = filters.command(commands, ".")
+            
+            if other_filters:
+                combined_filters &= other_filters
+
+            client.on_message(combined_filters)(wrapper)
+
+        return wrapper
+
+    return decorator
+
+
+# @userbot_on_cmd(["ckv"], SUDOERS)
+# async def clean(client, message):
+   # await message.reply_text("Cleaning in progress...")
