@@ -152,7 +152,7 @@ async def authusers(client, message: Message, _):
 
 
 __MODULE__ = "Auᴛʜ"
-__HELP__ = """✅<u>Aᴜᴛʜ Usᴇʀs:</u>
+__HELP__ = """<b><u>Aᴜᴛʜ Usᴇʀs:</u></b>
 Aᴜᴛʜ Usᴇʀs ᴄᴀɴ ᴜsᴇ ᴀᴅᴍɪɴ ᴄᴏᴍᴍᴀɴᴅs ᴡɪᴛʜᴏᴜᴛ ᴀᴅᴍɪɴ ʀɪɢʜᴛs ɪɴ ʏᴏᴜʀ ᴄʜᴀᴛ.
 
 /auth [Usᴇʀɴᴀᴍᴇ] - Aᴅᴅ ᴀ ᴜsᴇʀ ᴛᴏ AUTH LIST ᴏғ ᴛʜᴇ ɢʀᴏᴜᴘ.
