@@ -22,7 +22,6 @@ MARKDOWN = """
 
 <b><u>NOTE:</u></b> ғɪʟʟɪɴɢs ᴏɴʟʏ ᴡᴏʀᴋs ɪɴ ᴡᴇʟᴄᴏᴍᴇ ᴍᴏᴅᴜʟᴇ.
 
-
 <u>sᴜᴘᴘᴏʀᴛᴇᴅ ғᴏʀᴍᴀᴛᴛɪɴɢ:</u>
 
 <code>**Bold**</code> : ᴛʜɪs ᴡɪʟʟ sʜᴏᴡ ᴀs <b>Bold</b> ᴛᴇxᴛ.
@@ -60,11 +59,9 @@ WELCOMEHELP = """
 
 ᴛʜᴇ ғᴏʀᴍᴀᴛ sʜᴏᴜʟᴅ ʙᴇ sᴏᴍᴇᴛʜɪɴɢ ʟɪᴋᴇ ʙᴇʟᴏᴡ.
 
-```
-
-
+```python
 {GROUPNAME} - ɢʀᴏᴜᴘ's ɴᴀᴍᴇ
-{NAME} - ᴜsᴇʀ ɴᴀᴍᴇ
+{NAME} - ᴜsᴇʀ ғɪʀsᴛ ɴᴀᴍᴇ + sᴜʀɴᴀᴍᴇ
 {ID} - ᴜsᴇʀ ɪᴅ
 {FIRSTNAME} - ᴜsᴇʀ ғɪʀsᴛ ɴᴀᴍᴇ 
 {SURNAME} - ɪғ ᴜsᴇʀ ʜᴀs sᴜʀɴᴀᴍᴇ sᴏ ᴛʜɪs ᴡɪʟʟ sʜᴏᴡ sᴜʀɴᴀᴍᴇ ᴇʟsᴇ ɴᴏᴛʜɪɴɢ
@@ -78,8 +75,7 @@ WELCOMEHELP = """
 ~ #This separater (~) should be there between text and buttons, remove this comment also
 
 button=[Duck, https://duckduckgo.com]
-button2=[Github, https://github.com]
-```
+button2=[Github, https://github.com]```
 
 <b>NOTES -></b>
 
