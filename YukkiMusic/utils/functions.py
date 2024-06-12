@@ -29,12 +29,13 @@ NOTE: ғɪʟʟɪɴɢs ᴏɴʟʏ ᴡᴏʀᴋs ɪɴ ᴡᴇʟᴄᴏᴍᴇ ᴍᴏᴅ
 
 <u>ʙᴜᴛᴛᴏɴ ғᴏʀᴍᴀᴛᴛɪɴɢ:</u>
 
-- > text ~ [button text, button link]
+- > <blockquote>text ~ [button text, button link]</blockquote>
 
 
 <u>ᴇxᴀᴍᴘʟᴇ:</u>
 
-<b>example</b>  <i>button with markdown</i> <code>formatting</code> ~ [button text, https://google.com]
+<b>example</b>  
+<blockquote><i>button with markdown</i> <code>formatting</code> ~ [button text, https://google.com]</blockquote>
 """
 WELCOMEHELP = """
 /setwelcome - ʀᴇᴘʟʏ ᴛʜɪs ᴛᴏ ᴀ ᴍᴇssᴀɢᴇ ᴄᴏɴᴛᴀɪɴɪɴɢ ᴄᴏʀʀᴇᴄᴛ
