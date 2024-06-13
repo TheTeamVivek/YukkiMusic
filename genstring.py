@@ -18,7 +18,6 @@ API_HASH = input("\nEnter Your API_HASH:\n > ")
 print("\n\n Enter Phone number when asked.\n\n")
 
 i = c("yukkistring", in_memory=True, api_id=API_ID, api_hash=API_HASH)
-
 async def main():
     await i.start()
     ss = await i.export_session_string()
