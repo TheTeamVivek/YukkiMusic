@@ -16,6 +16,7 @@ from YukkiMusic.core.call import Yukki
 from YukkiMusic.plugins import ALL_MODULES
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
+
 async def init():
     if (
         not config.STRING1
@@ -44,7 +45,7 @@ async def init():
     await app.start()
     for all_module in ALL_MODULES:
         imported_module = importlib.import_module(all_module)
-    
+
         if hasattr(imported_module, "__MODULE__") and imported_module.__MODULE__:
             if hasattr(imported_module, "__HELP__") and imported_module.__HELP__:
                 HELPABLE[imported_module.__MODULE__.lower()] = imported_module
@@ -55,6 +56,7 @@ async def init():
     await Yukki.decorators()
     LOGGER("YukkiMusic").info("Yukki Music Bot Started Successfully")
     await idle()
+
 
 if __name__ == "__main__":
     asyncio.get_event_loop_policy().get_event_loop().run_until_complete(init())

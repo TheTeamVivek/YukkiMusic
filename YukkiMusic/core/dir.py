@@ -9,9 +9,9 @@
 #
 import logging
 import os
-import shutil
 import sys
 from os import listdir, mkdir
+
 
 def dirr():
     assets_folder = "assets"
@@ -25,7 +25,12 @@ def dirr():
         sys.exit()
 
     for file in os.listdir():
-        if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith(".mp3") or file.endswith(".png"):
+        if (
+            file.endswith(".jpg")
+            or file.endswith(".jpeg")
+            or file.endswith(".mp3")
+            or file.endswith(".png")
+        ):
             os.remove(file)
 
     if downloads_folder not in listdir():

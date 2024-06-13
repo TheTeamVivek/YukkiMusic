@@ -587,7 +587,9 @@ class Call(PyTgCalls):
                             if str(streamtype) == "audio"
                             else config.TELEGRAM_VIDEO_URL
                         ),
-                        caption=_["stream_1"].format(title, config.SUPPORT_GROUP, check[0]["dur"], user),
+                        caption=_["stream_1"].format(
+                            title, config.SUPPORT_GROUP, check[0]["dur"], user
+                        ),
                         reply_markup=InlineKeyboardMarkup(button),
                     )
                     db[chat_id][0]["mystic"] = run
@@ -597,7 +599,9 @@ class Call(PyTgCalls):
                     run = await app.send_photo(
                         original_chat_id,
                         photo=config.SOUNCLOUD_IMG_URL,
-                        caption=_["stream_1"].format(title, config.SUPPORT_GROUP, check[0]["dur"], user),
+                        caption=_["stream_1"].format(
+                            title, config.SUPPORT_GROUP, check[0]["dur"], user
+                        ),
                         reply_markup=InlineKeyboardMarkup(button),
                     )
                     db[chat_id][0]["mystic"] = run

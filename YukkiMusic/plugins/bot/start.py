@@ -212,7 +212,9 @@ async def start_comm(client, message: Message, _):
         except:
             OWNER = None
         out = private_panel(_, app.username, OWNER)
-        await message.reply_sticker("CAACAgUAAx0Ceb8wGwABAUYwZmrY4JcAATWf0qU6QTm85tLqkWNGAAL5CQACjkHJVlFIYMw9a39IHgQ")
+        await message.reply_sticker(
+            "CAACAgUAAx0Ceb8wGwABAUYwZmrY4JcAATWf0qU6QTm85tLqkWNGAAL5CQACjkHJVlFIYMw9a39IHgQ"
+        )
         if config.START_IMG_URL:
             try:
                 await message.reply_photo(
