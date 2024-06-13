@@ -175,33 +175,23 @@ async def delete_note(chat_id: int, name: str) -> bool:
 async def deleteall_notes(chat_id: int):
     return await notesdb.delete_one({"chat_id": chat_id})
 
+
 async def set_private_note(chat_id, private_note):
     await notesdb.update_one(
-        {
-            'chat_id': chat_id
-        },
-        {
-            "$set": {
-                'private_note': private_note
-            }
-        },
-        upsert=True
-                              )
+        {"chat_id": chat_id}, {"$set": {"private_note": private_note}}, upsert=True
+    )
+
 
 async def is_pnote_on(chat_id) -> bool:
-    GetNoteData = await notesdb.find_one(
-        {
-                'chat_id': chat_id
-            }
-        )
+    GetNoteData = await notesdb.find_one({"chat_id": chat_id})
     if not GetNoteData == None:
-        if 'private_note' in GetNoteData:
-            private_note = GetNoteData['private_note']
+        if "private_note" in GetNoteData:
+            private_note = GetNoteData["private_note"]
             return private_note
         else:
-            return False 
-    else: 
-        return False 
+            return False
+    else:
+        return False
 
 
 async def get_welcome(chat_id: int) -> (str, str, str):
