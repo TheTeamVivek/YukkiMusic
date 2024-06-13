@@ -5,7 +5,7 @@
 # and is released under the MIT License.
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
-# All rights reserved.
+# All rights reserved
 
 import os
 import sys
