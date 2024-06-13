@@ -16,7 +16,6 @@ import yaml
 languages = {}
 commands = {}
 
-
 languages_present = {}
 
 
