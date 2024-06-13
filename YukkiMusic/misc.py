@@ -24,7 +24,6 @@ SUDOERS = filters.user()
 HAPP = None
 _boot_ = time.time()
 
-
 def is_heroku():
     return "heroku" in socket.getfqdn()
 
