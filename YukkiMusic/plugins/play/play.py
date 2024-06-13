@@ -52,7 +52,7 @@ PLAY_COMMAND = get_command("PLAY_COMMAND")
             "cplayforce",
             "cvplayforce",
         ],
-        prefixes=["/", "!", "%", ",", "", ".", "@", "#"],
+        prefixes=["/", "!", "%", ",", ".", "@", "#"],
     )
     & filters.group
     & ~BANNED_USERS
