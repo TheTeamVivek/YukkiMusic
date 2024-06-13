@@ -13,7 +13,7 @@ from typing import Dict, List, Union
 
 import config
 from config import PRIVATE_BOT_MODE
-from YukkiMusic.core.mongo import mongodb, pymongodb
+from YukkiMusic.core.mongo import mongodb
 
 channeldb = mongodb.cplaymode
 commanddb = mongodb.commands
@@ -50,7 +50,6 @@ vlimit = []
 maintenance = []
 suggestion = {}
 autoend = {}
-
 
 
 async def get_filters_count() -> dict:
@@ -117,7 +116,6 @@ async def deleteall_filters(chat_id: int):
     return await filtersdb.delete_one({"chat_id": chat_id})
 
 
-
 async def get_notes_count() -> dict:
     chats_count = 0
     notes_count = 0
@@ -177,7 +175,7 @@ async def delete_note(chat_id: int, name: str) -> bool:
 async def deleteall_notes(chat_id: int):
     return await notesdb.delete_one({"chat_id": chat_id})
 
- 
+
 async def get_welcome(chat_id: int) -> (str, str, str):
     data = await welcomedb.find_one({"chat_id": chat_id})
     if not data:
@@ -236,6 +234,7 @@ async def autoend_off():
     user = await autoenddb.find_one({"chat_id": chat_id})
     if user:
         return await autoenddb.delete_one({"chat_id": chat_id})
+
 
 # LOOP PLAY
 async def get_loop(chat_id: int) -> int:

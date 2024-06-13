@@ -17,6 +17,7 @@ from YukkiMusic.utils.database import get_assistant, save_assistant, set_assista
 from YukkiMusic.utils.filter import admin_filter
 from config import LOG_GROUP_ID
 
+
 @app.on_message(filters.command("changeassistant") & admin_filter)
 async def assis_change(_, message: Message):
     avt = await assistant()
@@ -52,14 +53,10 @@ async def assis_set(_, message: Message):
         )
     usage = await get_assistant_details()
     if len(message.command) != 2:
-        return await message.reply_text(
-            usage, disable_web_page_preview=True
-        )
+        return await message.reply_text(usage, disable_web_page_preview=True)
     query = message.text.split(None, 1)[1].strip()
     if query not in assistants:
-        return await message.reply_text(
-            usage, disable_web_page_preview=True
-        )
+        return await message.reply_text(usage, disable_web_page_preview=True)
     a = await get_assistant(message.chat.id)
     try:
         await a.leave_chat(message.chat.id)
@@ -86,4 +83,3 @@ Assistant Name :- {assistant.name}
 Assistant Username :- {assistant.username}
 Assistant ID:- @{assistant.id}"""
     await message.reply_text(DETAILS, disable_web_page_preview=True)
-

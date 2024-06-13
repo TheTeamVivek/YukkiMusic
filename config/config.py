@@ -15,7 +15,6 @@ from dotenv import load_dotenv
 from pyrogram import filters
 
 
-
 load_dotenv()
 # ________________________________________________________________________________#
 # Get it from my.telegram.org
@@ -56,8 +55,7 @@ EXTRA_PLUGINS = getenv(
     "True",
 )
 
-# Fill True if you want to load extra plugins 
-
+# Fill True if you want to load extra plugins
 
 
 EXTRA_PLUGINS_REPO = getenv(
@@ -70,7 +68,7 @@ EXTRA_PLUGINS_REPO = getenv(
 EXTRA_PLUGINS_FOLDER = getenv("EXTRA_PLUGINS_FOLDER", "plugins")
 
 # Your folder name in your extra plugins repo where all plugins stored
- #________________________________________________________________________________#
+# ________________________________________________________________________________#
 # Duration Limit for downloading Songs in MP3 or MP4 format from bot
 SONG_DOWNLOAD_DURATION = int(
     getenv("SONG_DOWNLOAD_DURATION_LIMIT", "500")
@@ -159,9 +157,7 @@ TELEGRAM_DOWNLOAD_EDIT_SLEEP = int(getenv("TELEGRAM_EDIT_SLEEP", "5"))
 
 
 # ________________________________________________________________________________## Your Github Repo.. Will be shown on /start Command
-GITHUB_REPO = getenv(
-    "GITHUB_REPO", "https://github.com/TeamYukki/YukkiMusicBot"
-)
+GITHUB_REPO = getenv("GITHUB_REPO", "https://github.com/TeamYukki/YukkiMusicBot")
 
 
 # ________________________________________________________________________________#

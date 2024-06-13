@@ -18,9 +18,11 @@ from YukkiMusic.utils.database.memorydatabase import (
     get_active_chats,
     get_active_video_chats,
 )
+
 # Commands
 ACTIVEVC_COMMAND = get_command("ACTIVEVC_COMMAND")
 ACTIVEVIDEO_COMMAND = get_command("ACTIVEVIDEO_COMMAND")
+
 
 @app.on_message(filters.command(ACTIVEVC_COMMAND) & SUDOERS)
 async def activevc(_, message: Message):
