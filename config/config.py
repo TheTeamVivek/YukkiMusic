@@ -7,7 +7,6 @@
 #
 # All rights reserved.
 
-
 import sys
 from os import getenv
 
