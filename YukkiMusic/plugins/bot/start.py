@@ -9,6 +9,7 @@
 #
 import asyncio
 import time
+import logging 
 
 from pyrogram import filters
 from pyrogram.enums import ChatType, ParseMode
@@ -79,8 +80,11 @@ async def start_comm(client, message: Message, _):
                 disable_web_page_preview=True,
             )
         if name.startswith("note_"):
-            Gchat_id, text = name.split("_", 1)
-            await send_notes(message, Gchat_id, text, pm=True)
+            try:
+                Gchat_id, text = name.split("_", 1)
+                await send_notes(message, Gchat_id, text, pm=True)
+           except Exception as e:
+               logging.exception(e)
 
         if name[0:3] == "sta":
             m = await message.reply_text("🔎 ғᴇᴛᴄʜɪɴɢ ʏᴏᴜʀ ᴘᴇʀsᴏɴᴀʟ sᴛᴀᴛs.!")
