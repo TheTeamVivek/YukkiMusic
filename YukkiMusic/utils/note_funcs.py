@@ -4,16 +4,18 @@ from YukkiMusic.utils.database import is_pnote_on, get_note
 from YukkiMusic.utils.keyboard import ikb
 from YukkiMusic.utils.functions import extract_text_and_keyb
 
+
 async def send_notes(message: Message, chat_id, text, pm=False):
     if not text:
         return
 
     if not pm and await is_pnote_on(chat_id):
         url = f"http://t.me/{app.username}?start=note_{chat_id}_{text}"
-        button = InlineKeyboardMarkup([[InlineKeyboardButton(text='Click me!', url=url)]])
+        button = InlineKeyboardMarkup(
+            [[InlineKeyboardButton(text="Click me!", url=url)]]
+        )
         return await message.reply(
-            text=f"Tap here to view '{text}' in your private chat.",
-            reply_markup=button
+            text=f"Tap here to view '{text}' in your private chat.", reply_markup=button
         )
 
     _note = await get_note(chat_id, text)
@@ -37,10 +39,14 @@ async def send_notes(message: Message, chat_id, text, pm=False):
         if "{FIRSTNAME}" in data:
             data = data.replace("{FIRSTNAME}", message.from_user.first_name)
         if "{SURNAME}" in data:
-            sname = message.from_user.last_name if message.from_user.last_name else "None"
+            sname = (
+                message.from_user.last_name if message.from_user.last_name else "None"
+            )
             data = data.replace("{SURNAME}", sname)
         if "{USERNAME}" in data:
-            susername = message.from_user.username if message.from_user.username else "None"
+            susername = (
+                message.from_user.username if message.from_user.username else "None"
+            )
             data = data.replace("{USERNAME}", susername)
         if "{DATE}" in data:
             DATE = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -117,5 +123,3 @@ async def send_notes(message: Message, chat_id, text, pm=False):
             caption=data,
             reply_markup=keyb,
         )
-
-
