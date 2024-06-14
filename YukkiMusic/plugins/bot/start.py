@@ -86,8 +86,8 @@ async def start_comm(client, message: Message, _):
                     Gchat_id,
                     text,
                 ) = name.split("_", 2)
-                logging.info(f"{text} {Gchat_id}")
-                await send_notes(message, Gchat_id, text, pm=True)
+                logging.info(f"{Gchat_id} {text}")
+                await send_notes(message, Gchat_id, text)
             except Exception as e:
                 logging.exception(e)
 
