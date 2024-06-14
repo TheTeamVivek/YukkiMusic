@@ -13,7 +13,6 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 from config import BANNED_USERS
-from strings import get_command
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import (
@@ -31,7 +30,9 @@ from strings import get_string
 from YukkiMusic.misc import SUDOERS
 
 
-@app.on_message(filters.command(["stop", "end", "cstop", "cend"]) & filters.group & ~BANNED_USERS)
+@app.on_message(
+    filters.command(["stop", "end", "cstop", "cend"]) & filters.group & ~BANNED_USERS
+)
 async def stop_music(cli, message: Message):
     if await is_maintenance() is False:
         if message.from_user.id not in SUDOERS:
