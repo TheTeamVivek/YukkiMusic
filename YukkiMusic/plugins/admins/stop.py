@@ -90,9 +90,9 @@ async def stop_music(cli, message: Message):
         await message.reply_text(_["admin_9"].format(message.from_user.mention))
     else:
         if not message.command[0][0] == c:
-        filter = " ".join(message.command[1:])
-        deleted = await delete_filter(message.chat.id, filter)
-        if deleted:
-            await message.reply_text(f"**ᴅᴇʟᴇᴛᴇᴅ ғɪʟᴛᴇʀ {name}.**")
-        else:
-            await message.reply_text("**ɴᴏ sᴜᴄʜ ғɪʟᴛᴇʀ.**")
+            filter = " ".join(message.command[1:])
+            deleted = await delete_filter(message.chat.id, filter)
+            if deleted:
+                await message.reply_text(f"**ᴅᴇʟᴇᴛᴇᴅ ғɪʟᴛᴇʀ {name}.**")
+            else:
+                await message.reply_text("**ɴᴏ sᴜᴄʜ ғɪʟᴛᴇʀ.**")
