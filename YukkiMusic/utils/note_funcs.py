@@ -1,4 +1,5 @@
 import base64
+import json
 from pyrogram.types import Message
 from re import findall
 import datetime
@@ -8,9 +9,9 @@ from YukkiMusic import app
 
 
 async def send_notes(message: Message, chat_id, text):
-    decoded_name_bytes = base64.urlsafe_b64decode(text.encode("utf-8"))
-    decoded_name_json = decoded_name_bytes.decode("utf-8")
-    _note = decoded_name_bytes.decode("utf-8")
+    decoded_name_bytes = base64.urlsafe_b64decode(text.encode('utf-8'))
+    decoded_name_json = decoded_name_bytes.decode('utf-8')
+    _note = json.loads(decoded_name_json)
 
     if not _note:
         return await message.reply_text(
