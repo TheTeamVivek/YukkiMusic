@@ -10,8 +10,8 @@ from YukkiMusic import app
 
 
 async def send_notes(message: Message, chat_id, text):
-    compressed_name = base64.urlsafe_b64decode(text.encode('utf-8'))
-    decoded_name_json = gzip.decompress(compressed_name).decode('utf-8')
+    compressed_name = base64.urlsafe_b64decode(text.encode("utf-8"))
+    decoded_name_json = gzip.decompress(compressed_name).decode("utf-8")
     _note = json.loads(decoded_name_json)
 
     if not _note:
