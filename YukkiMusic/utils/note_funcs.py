@@ -1,7 +1,7 @@
 from pyrogram.types import Message
 from re import findall
 import datetime
-from YukkiMusic.utils.database import is_pnote_on, get_note
+from YukkiMusic.utils.database import get_note
 from YukkiMusic.utils.keyboard import ikb
 from YukkiMusic.utils.functions import extract_text_and_keyb
 from YukkiMusic import app
