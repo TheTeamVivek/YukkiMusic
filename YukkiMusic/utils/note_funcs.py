@@ -1,19 +1,13 @@
-import gzip
-import base64
-import json
 from pyrogram.types import Message
 from re import findall
 import datetime
 from YukkiMusic.utils.keyboard import ikb
 from YukkiMusic.utils.functions import extract_text_and_keyb
 from YukkiMusic import app
-
+from YukkiMusic.utils.database import get_note
 
 async def send_notes(message: Message, chat_id, text):
-    compressed_name = base64.urlsafe_b64decode(text.encode("utf-8"))
-    decoded_name_json = gzip.decompress(compressed_name).decode("utf-8")
-    _note = json.loads(decoded_name_json)
-
+    _note = get_note(text)
     if not _note:
         return await message.reply_text(
             f"no {_note} found in {chat_id} and notes name is {text}"
