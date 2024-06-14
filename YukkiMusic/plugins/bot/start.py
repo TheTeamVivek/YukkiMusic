@@ -80,9 +80,16 @@ async def start_comm(client, message: Message, _):
                 disable_web_page_preview=True,
             )
         if name.startswith("note_"):
-            upsy = name.split("_", 1)[1]
-            logging.info(upsy)
-            await send_notes(upsy)
+            try:
+                (
+                    _,
+                    Gchat_id,
+                    text,
+                ) = name.split("_", 2)
+                logging.info(f"{Gchat_id} {text}")
+                await send_notes(message, Gchat_id, text)
+            except Exception as e:
+                logging.exception(e)
 
         if name[0:3] == "sta":
             m = await message.reply_text("🔎 ғᴇᴛᴄʜɪɴɢ ʏᴏᴜʀ ᴘᴇʀsᴏɴᴀʟ sᴛᴀᴛs.!")
