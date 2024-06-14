@@ -79,7 +79,7 @@ async def start_comm(client, message: Message, _):
                 disable_web_page_preview=True,
             )
         if name.startswith("note_"):
-            Gchat_id, text = args.split("_", 1)
+            Gchat_id, text = name.split("_", 1)
             await send_notes(message, Gchat_id, text, pm=True)
 
         if name[0:3] == "sta":
