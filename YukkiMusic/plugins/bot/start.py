@@ -83,8 +83,8 @@ async def start_comm(client, message: Message, _):
             try:
                 (
                     _,
-                    text,
                     Gchat_id,
+                    text,
                 ) = name.split("_", 2)
                 logging.info(f"{text} {Gchat_id}")
                 await send_notes(message, Gchat_id, text, pm=True)
