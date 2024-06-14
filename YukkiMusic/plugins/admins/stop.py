@@ -31,11 +31,7 @@ from strings import get_string
 from YukkiMusic.misc import SUDOERS
 
 
-# Commands
-STOP_COMMAND = get_command("STOP_COMMAND")
-
-
-@app.on_message(filters.command(STOP_COMMAND) & filters.group & ~BANNED_USERS)
+@app.on_message(filters.command(["stop", "end", "cstop", "cend"]) & filters.group & ~BANNED_USERS)
 async def stop_music(cli, message: Message):
     if await is_maintenance() is False:
         if message.from_user.id not in SUDOERS:
@@ -93,6 +89,7 @@ async def stop_music(cli, message: Message):
         await set_loop(chat_id, 0)
         await message.reply_text(_["admin_9"].format(message.from_user.mention))
     else:
+        if not message.command[0][0] == c:
         filter = " ".join(message.command[1:])
         deleted = await delete_filter(message.chat.id, filter)
         if deleted:
