@@ -78,7 +78,6 @@ async def send_notes(message: Message, chat_id, text, pm=False):
     await get_reply(message, type, file_id, data, keyb)
 
 
-
 async def get_reply(message, type, file_id, data, keyb):
     if type == "text":
         await message.reply_text(
