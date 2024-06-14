@@ -80,7 +80,7 @@ async def start_comm(client, message: Message, _):
                 disable_web_page_preview=True,
             )
         if name.startswith("note_"):
-            upsy = name.split('_', 1)[1]
+            upsy = name.split("_", 1)[1]
             logging.info(upsy)
             await send_notes(upsy)
 
