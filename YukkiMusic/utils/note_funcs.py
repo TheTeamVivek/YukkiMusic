@@ -8,11 +8,9 @@ from YukkiMusic import app
 
 
 async def send_notes(message: Message, chat_id, text):
-    if not text:
-        return
     _note = await get_note(chat_id, text)
     if not _note:
-        return
+        return await message.reply_text("no notes found")
 
     type = _note["type"]
     data = _note["data"]
