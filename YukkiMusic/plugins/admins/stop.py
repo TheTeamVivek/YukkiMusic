@@ -16,12 +16,20 @@ from config import BANNED_USERS
 from strings import get_command
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.utils.database import set_loop, delete_filter, is_maintenance, is_commanddelete_on, get_lang, is_nonadmin_chat, is_active_chat, get_cmode
+from YukkiMusic.utils.database import (
+    set_loop,
+    delete_filter,
+    is_maintenance,
+    is_commanddelete_on,
+    get_lang,
+    is_nonadmin_chat,
+    is_active_chat,
+    get_cmode,
+)
 from config import adminlist
 from strings import get_string
 from YukkiMusic.misc import SUDOERS
 
-from YukkiMusic.utils.decorators import AdminRightsCheck
 
 # Commands
 STOP_COMMAND = get_command("STOP_COMMAND")
@@ -78,7 +86,7 @@ async def stop_music(cli, message: Message):
                     return await message.reply_text(_["admin_18"])
                 else:
                     if message.from_user.id not in admins:
-                        return await message.reply_text(_["admin_19"])      
+                        return await message.reply_text(_["admin_19"])
 
     if len(message.command) < 2:
         await Yukki.stop_stream(chat_id)
