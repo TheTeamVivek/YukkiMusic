@@ -97,7 +97,7 @@ async def sudoers_list(client, message: Message, _):
         return await mystic.edit_text(msg)
 
 
-__MODULE__ = "Blᴀᴄᴋʟɪsᴛ"
+__MODULE__ = "B-ʟɪsᴛ"
 __HELP__ = """⚠️<u>Bʟᴀᴄᴋʟɪsᴛ Cʜᴀᴛ Fᴜɴᴄᴛɪᴏɴ:</u>
 /blacklistchat [CHAT_ID] - Bʟᴀᴄᴋʟɪsᴛ ᴀɴʏ ᴄʜᴀᴛ ғʀᴏᴍ ᴜsɪɴɢ Mᴜsɪᴄ Bᴏᴛ
 /whitelistchat [CHAT_ID] - Wʜɪᴛᴇʟɪsᴛ ᴀɴʏ ʙʟᴀᴄᴋʟɪsᴛᴇᴅ ᴄʜᴀᴛ ғʀᴏᴍ ᴜsɪɴɢ Mᴜsɪᴄ Bᴏᴛ
