@@ -82,6 +82,7 @@ async def start_comm(client, message: Message, _):
         if name.startswith("note_"):
             try:
                 Gchat_id, text = name.split("_", 1)
+                logging.info(text Gchat_id)
                 await send_notes(message, Gchat_id, text, pm=True)
             except Exception as e:
                 logging.exception(e)
