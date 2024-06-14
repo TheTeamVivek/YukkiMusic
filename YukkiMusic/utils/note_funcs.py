@@ -8,7 +8,7 @@ from YukkiMusic.utils.database import get_note
 
 
 async def send_notes(message: Message, chat_id, text):
-    _note = get_note(chat_id, text)
+    _note = await get_note(chat_id, text)
     if not _note:
         return await message.reply_text(
             f"no {_note} found in {chat_id} and notes name is {text}"
