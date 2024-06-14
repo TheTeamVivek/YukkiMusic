@@ -40,7 +40,7 @@ async def stop_music(cli, message: Message):
                 "Bot is under maintenance. Please wait for some time..."
             )
     if not len(message.command) < 2:
-        if not message.command[0][0] == c:
+        if not message.command[0][0] == "c":
             filter = " ".join(message.command[1:])
             deleted = await delete_filter(message.chat.id, filter)
             if deleted:
