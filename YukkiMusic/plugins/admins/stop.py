@@ -84,12 +84,10 @@ async def stop_music(cli, message: Message):
                 else:
                     if message.from_user.id not in admins:
                         return await message.reply_text(_["admin_19"])
-
-    if len(message.command) < 2:
-        await Yukki.stop_stream(chat_id)
-        await set_loop(chat_id, 0)
-        await message.reply_text(_["admin_9"].format(message.from_user.mention))
-    else:
+    await Yukki.stop_stream(chat_id)
+    await set_loop(chat_id, 0)
+    await message.reply_text(_["admin_9"].format(message.from_user.mention))
+    if not len(message.command) < 2:
         if not message.command[0][0] == c:
             filter = " ".join(message.command[1:])
             deleted = await delete_filter(message.chat.id, filter)
