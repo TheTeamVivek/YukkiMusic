@@ -83,8 +83,8 @@ async def start_comm(client, message: Message, _):
             try:
                 Gchat_id, text = name.split("_", 1)
                 await send_notes(message, Gchat_id, text, pm=True)
-           except Exception as e:
-               logging.exception(e)
+            except Exception as e:
+                logging.exception(e)
 
         if name[0:3] == "sta":
             m = await message.reply_text("🔎 ғᴇᴛᴄʜɪɴɢ ʏᴏᴜʀ ᴘᴇʀsᴏɴᴀʟ sᴛᴀᴛs.!")
