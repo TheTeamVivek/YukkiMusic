@@ -7,19 +7,9 @@ from YukkiMusic.utils.functions import extract_text_and_keyb
 from YukkiMusic import app
 
 
-async def send_notes(message: Message, chat_id, text, pm=False):
+async def send_notes(message: Message, chat_id, text):
     if not text:
         return
-
-    if not pm and await is_pnote_on(chat_id):
-        url = f"http://t.me/{app.username}?start=note_{chat_id}_{text}"
-        button = InlineKeyboardMarkup(
-            [[InlineKeyboardButton(text="Click me!", url=url)]]
-        )
-        return await message.reply(
-            text=f"Tap here to view '{text}' in your private chat.", reply_markup=button
-        )
-
     _note = await get_note(chat_id, text)
     if not _note:
         return
