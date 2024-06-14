@@ -25,6 +25,7 @@ from YukkiMusic.utils.database import (
     is_active_chat,
     get_cmode,
 )
+
 from config import adminlist
 from strings import get_string
 from YukkiMusic.misc import SUDOERS
@@ -44,7 +45,7 @@ async def stop_music(cli, message: Message):
             filter = " ".join(message.command[1:])
             deleted = await delete_filter(message.chat.id, filter)
             if deleted:
-                await message.reply_text(f"**ᴅᴇʟᴇᴛᴇᴅ ғɪʟᴛᴇʀ {name}.**")
+                await message.reply_text(f"**ᴅᴇʟᴇᴛᴇᴅ ғɪʟᴛᴇʀ {filter}.**")
             else:
                 await message.reply_text("**ɴᴏ sᴜᴄʜ ғɪʟᴛᴇʀ.**")
 
