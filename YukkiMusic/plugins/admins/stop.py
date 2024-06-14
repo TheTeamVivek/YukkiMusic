@@ -27,6 +27,7 @@ from YukkiMusic.utils.database import (
 )
 
 from config import adminlist
+from YukkiMusic.plugins import extra_plugins_enabled
 from strings import get_string
 from YukkiMusic.misc import SUDOERS
 
@@ -41,13 +42,14 @@ async def stop_music(cli, message: Message):
                 "Bot is under maintenance. Please wait for some time..."
             )
     if not len(message.command) < 2:
-        if not message.command[0][0] == "c":
-            filter = " ".join(message.command[1:])
-            deleted = await delete_filter(message.chat.id, filter)
-            if deleted:
-                await message.reply_text(f"**ᴅᴇʟᴇᴛᴇᴅ ғɪʟᴛᴇʀ {filter}.**")
-            else:
-                await message.reply_text("**ɴᴏ sᴜᴄʜ ғɪʟᴛᴇʀ.**")
+        if extra_plugins_enabled:
+            if not message.command[0][0] == "c":
+                filter = " ".join(message.command[1:])
+                deleted = await delete_filter(message.chat.id, filter)
+                if deleted:
+                    await message.reply_text(f"**ᴅᴇʟᴇᴛᴇᴅ ғɪʟᴛᴇʀ {filter}.**")
+                else:
+                    await message.reply_text("**ɴᴏ sᴜᴄʜ ғɪʟᴛᴇʀ.**")
 
     if await is_commanddelete_on(message.chat.id):
         try:
