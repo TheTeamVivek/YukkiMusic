@@ -6,6 +6,7 @@ from YukkiMusic.utils.functions import extract_text_and_keyb
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_note
 
+
 async def send_notes(message: Message, chat_id, text):
     _note = get_note(text)
     if not _note:
