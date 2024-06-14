@@ -1,3 +1,4 @@
+import gzip
 import base64
 import json
 from pyrogram.types import Message
