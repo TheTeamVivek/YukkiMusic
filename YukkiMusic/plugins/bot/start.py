@@ -81,7 +81,7 @@ async def start_comm(client, message: Message, _):
         if name.startswith("note_"):
             Gchat_id, text = args.split("_", 1)
             await send_notes(message, Gchat_id, text, pm=True)
-            
+
         if name[0:3] == "sta":
             m = await message.reply_text("🔎 ғᴇᴛᴄʜɪɴɢ ʏᴏᴜʀ ᴘᴇʀsᴏɴᴀʟ sᴛᴀᴛs.!")
             stats = await get_userss(message.from_user.id)
