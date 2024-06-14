@@ -39,6 +39,15 @@ async def stop_music(cli, message: Message):
             return await message.reply_text(
                 "Bot is under maintenance. Please wait for some time..."
             )
+    if not len(message.command) < 2:
+        if not message.command[0][0] == c:
+            filter = " ".join(message.command[1:])
+            deleted = await delete_filter(message.chat.id, filter)
+            if deleted:
+                await message.reply_text(f"**ᴅᴇʟᴇᴛᴇᴅ ғɪʟᴛᴇʀ {name}.**")
+            else:
+                await message.reply_text("**ɴᴏ sᴜᴄʜ ғɪʟᴛᴇʀ.**")
+
     if await is_commanddelete_on(message.chat.id):
         try:
             await message.delete()
@@ -87,11 +96,3 @@ async def stop_music(cli, message: Message):
     await Yukki.stop_stream(chat_id)
     await set_loop(chat_id, 0)
     await message.reply_text(_["admin_9"].format(message.from_user.mention))
-    if not len(message.command) < 2:
-        if not message.command[0][0] == c:
-            filter = " ".join(message.command[1:])
-            deleted = await delete_filter(message.chat.id, filter)
-            if deleted:
-                await message.reply_text(f"**ᴅᴇʟᴇᴛᴇᴅ ғɪʟᴛᴇʀ {name}.**")
-            else:
-                await message.reply_text("**ɴᴏ sᴜᴄʜ ғɪʟᴛᴇʀ.**")
