@@ -16,11 +16,11 @@ py-tgcalls==1.2.9
 ntgcalls==1.1.2
 python-dotenv
 pyyaml
-requests==2.32.2
+requests
 speedtest-cli
 spotipy
 tgcrypto
-urllib3==1.25.11
+urllib3==1.26.17
 git+https://github.com/KurimuzonAkuma/pyrogram@dev
 git+https://github.com/yt-dlp/yt-dlp
 git+https://github.com/alexmercerind/youtube-search-python@main
