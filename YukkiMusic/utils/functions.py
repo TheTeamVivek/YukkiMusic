@@ -3,6 +3,7 @@ from re import findall
 from re import sub as re_sub
 from pyrogram import errors
 from pyrogram.types import Message
+from pyrogram.enums import MessageEntityType
 
 MARKDOWN = """
 ʀᴇᴀᴅ ᴛʜᴇ ʙᴇʟᴏᴡ ᴛᴇxᴛ ᴄᴀʀᴇғᴜʟʟʏ ᴛᴏ ғɪɴᴅ ᴏᴜᴛ ʜᴏᴡ ғᴏʀᴍᴀᴛᴛɪɴɢ ᴡᴏʀᴋs!
@@ -166,6 +167,35 @@ async def get_data_and_name(replied_message, message):
                 if match == data:
                     data = None
     return data, name
+
+async def extract_userid(message, text: str):
+    """
+    NOT TO BE USED OUTSIDE THIS FILE
+    """
+
+    def is_int(text: str):
+        try:
+            int(text)
+        except ValueError:
+            return False
+        return True
+
+    text = text.strip()
+
+    if is_int(text):
+        return int(text)
+
+    entities = message.entities
+    app = message._client
+    if len(entities) < 2:
+        return (await app.get_users(text)).id
+    entity = entities[1]
+    if entity.type == MessageEntityType.MENTION:
+        return (await app.get_users(text)).id
+    if entity.type == MessageEntityType.TEXT_MENTION:
+        return entity.user.id
+    return None
+
 
 
 async def extract_user_and_reason(message, sender_chat=False):
