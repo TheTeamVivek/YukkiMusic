@@ -190,6 +190,7 @@ class Userbot(Client):
             else:
                 self.five.name = get_me.first_name
             LOGGER(__name__).info(f"Assistant Five Started as {self.five.name}")
+
     def on_cmd(self, command, *additional_filters):
         def decorator(func):
             combined_filter = filters.command(command)
@@ -206,4 +207,5 @@ class Userbot(Client):
             if config.STRING5:
                 self.five.add_handler(MessageHandler(func, combined_filter))
             return func
+
         return decorator
