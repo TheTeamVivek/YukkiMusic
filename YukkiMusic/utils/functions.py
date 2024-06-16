@@ -168,6 +168,7 @@ async def get_data_and_name(replied_message, message):
                     data = None
     return data, name
 
+
 async def extract_userid(message, text: str):
     """
     NOT TO BE USED OUTSIDE THIS FILE
@@ -195,7 +196,6 @@ async def extract_userid(message, text: str):
     if entity.type == MessageEntityType.TEXT_MENTION:
         return entity.user.id
     return None
-
 
 
 async def extract_user_and_reason(message, sender_chat=False):
