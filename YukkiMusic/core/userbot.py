@@ -9,8 +9,7 @@
 #
 import sys
 
-from pyrogram import Client, filters
-from pyrogram.handlers import MessageHandler
+from pyrogram import Client
 
 import config
 
