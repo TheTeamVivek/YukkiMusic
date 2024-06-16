@@ -2,8 +2,9 @@ import os
 import shutil
 
 from pyrogram import filters
+from pyrogram.handlers import MessageHandler
 
-from YukkiMusic import app
+from YukkiMusic import app, userbot
 from YukkiMusic.misc import SUDOERS
 
 
@@ -17,3 +18,9 @@ async def clean(_, message):
     os.mkdir(dir)
     os.mkdir(dir1)
     await A.edit("ᴛᴇᴍᴘ ᴅɪʀᴇᴄᴛᴏʀɪᴇs ᴀʀᴇ ᴄʟᴇᴀɴᴇᴅ")
+
+
+userbot.one.add_handler(
+    MessageHandler(
+        clean,
+        filters.command("clean") & SUDOERS))
