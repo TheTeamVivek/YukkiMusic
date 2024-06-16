@@ -9,7 +9,8 @@
 #
 import sys
 
-from pyrogram import Client
+from pyrogram import Client, filters
+from pyrogram.handlers import MessageHandler
 
 import config
 
@@ -189,3 +190,20 @@ class Userbot(Client):
             else:
                 self.five.name = get_me.first_name
             LOGGER(__name__).info(f"Assistant Five Started as {self.five.name}")
+    def on_cmd(self, command, *additional_filters):
+        def decorator(func):
+            combined_filter = filters.command(command)
+            for f in additional_filters:
+                combined_filter &= f
+            if config.STRING1:
+                self.one.add_handler(MessageHandler(func, combined_filter))
+            if config.STRING2:
+                self.two.add_handler(MessageHandler(func, combined_filter))
+            if config.STRING3:
+                self.three.add_handler(MessageHandler(func, combined_filter))
+            if config.STRING4:
+                self.four.add_handler(MessageHandler(func, combined_filter))
+            if config.STRING5:
+                self.five.add_handler(MessageHandler(func, combined_filter))
+            return func
+        return decorator
