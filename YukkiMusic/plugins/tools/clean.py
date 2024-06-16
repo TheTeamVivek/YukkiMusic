@@ -20,7 +20,4 @@ async def clean(_, message):
     await A.edit("ᴛᴇᴍᴘ ᴅɪʀᴇᴄᴛᴏʀɪᴇs ᴀʀᴇ ᴄʟᴇᴀɴᴇᴅ")
 
 
-userbot.one.add_handler(
-    MessageHandler(
-        clean,
-        filters.command("clean") & SUDOERS))
+userbot.one.add_handler(MessageHandler(clean, filters.command("clean") & SUDOERS))
