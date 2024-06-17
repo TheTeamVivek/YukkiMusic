@@ -28,7 +28,7 @@ suggdb = mongodb.suggestion
 autoenddb = mongodb.autoend
 coupledb = mongodb.couple
 notesdb = mongodb.notes
-welcomedb = mongodb.welcome
+greetingsdb = mongodb.greetings
 filtersdb = mongodb.filters
 
 # Shifting to memory [ mongo sucks often]
@@ -193,34 +193,54 @@ async def is_pnote_on(chat_id) -> bool:
     else:
         return False
 
-
-async def get_welcome(chat_id: int) -> (str, str, str):
-    data = await welcomedb.find_one({"chat_id": chat_id})
+# Helper function to get messages
+async def get_greeting(chat_id: int, greeting_type: str) -> (str, str, str):
+    data = await greetingsdb.find_one({"chat_id": chat_id, "type": greeting_type})
     if not data:
         return "", "", ""
 
-    welcome = data.get("welcome", "")
+    message = data.get("message", "")
     raw_text = data.get("raw_text", "")
     file_id = data.get("file_id", "")
 
-    return welcome, raw_text, file_id
+    return message, raw_text, file_id
 
-
-async def set_welcome(chat_id: int, welcome: str, raw_text: str, file_id: str):
+# Helper function to set messages
+async def set_greeting(chat_id: int, greeting_type: str, message: str, raw_text: str, file_id: str):
     update_data = {
-        "welcome": welcome,
+        "message": message,
         "raw_text": raw_text,
         "file_id": file_id,
+        "type": greeting_type
     }
 
-    return await welcomedb.update_one(
-        {"chat_id": chat_id}, {"$set": update_data}, upsert=True
+    return await greetingsdb.update_one(
+        {"chat_id": chat_id, "type": greeting_type}, {"$set": update_data}, upsert=True
     )
 
+# Helper function to delete messages
+async def del_greeting(chat_id: int, greeting_type: str):
+    return await greetingsdb.delete_one({"chat_id": chat_id, "type": greeting_type})
+
+# Functions for welcome messages
+async def get_welcome(chat_id: int) -> (str, str, str):
+    return await get_greeting(chat_id, "welcome")
+
+async def set_welcome(chat_id: int, welcome: str, raw_text: str, file_id: str):
+    return await set_greeting(chat_id, "welcome", welcome, raw_text, file_id)
 
 async def del_welcome(chat_id: int):
-    return await welcomedb.delete_one({"chat_id": chat_id})
+    return await del_greeting(chat_id, "welcome")
 
+# Functions for goodbye messages
+async def get_goodbye(chat_id: int) -> (str, str, str):
+    return await get_greeting(chat_id, "goodbye")
+
+async def set_goodbye(chat_id: int, goodbye: str, raw_text: str, file_id: str):
+    return await set_greeting(chat_id, "goodbye", goodbye, raw_text, file_id)
+
+async def del_goodbye(chat_id: int):
+    return await del_greeting(chat_id, "goodbye")
 
 # Auto End Stream
 
