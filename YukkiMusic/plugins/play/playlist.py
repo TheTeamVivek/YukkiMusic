@@ -7,8 +7,9 @@
 #
 # All rights reserved.
 #
-import logging
 import os
+import asyncio
+import logging
 from random import randint
 
 import requests
