@@ -9,7 +9,7 @@
 #
 from pyrogram import filters
 from pyrogram.types import Message
-
+from config import LOG_GROUP_ID
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 
@@ -22,5 +22,6 @@ async def force_stop_stream(_, message: Message):
         if message.left_chat_member and not message.left_chat_member is None:
             if message.left_chat_member.id == (await get_assistant(message.chat.id)).id:
                 return await Yukki.force_stop_stream(message.chat.id)
-
-    await Yukki.force_stop_stream(message.chat.id)
+        await Yukki.force_stop_stream(message.chat.id)
+    except Exception as e:
+        await app.send_message(LOG_GROUP_ID ,f"error in wathcher.py error is {e}")
