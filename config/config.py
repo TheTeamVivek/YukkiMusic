@@ -38,7 +38,6 @@ DURATION_LIMIT_MIN = int(
 )  # Remember to give value in Minutes
 
 
-
 EXTRA_PLUGINS = getenv(
     "EXTRA_PLUGINS",
     "True",
@@ -59,17 +58,14 @@ EXTRA_PLUGINS_FOLDER = getenv("EXTRA_PLUGINS_FOLDER", "plugins")
 # Your folder name in your extra plugins repo where all plugins stored
 
 
-
 # Duration Limit for downloading Songs in MP3 or MP4 format from bot
 SONG_DOWNLOAD_DURATION = int(
     getenv("SONG_DOWNLOAD_DURATION_LIMIT", "500")
 )  # Remember to give value in Minutes
 
 
-
 # You'll need a Private Group ID for this.
 LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", ""))
-
 
 
 # Your User ID.
@@ -83,7 +79,6 @@ HEROKU_API_KEY = getenv("HEROKU_API_KEY")
 
 # You have to Enter the app name which you gave to identify your  Music Bot in Heroku.
 HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
-
 
 
 # For customized or modified Repository
@@ -151,7 +146,6 @@ SERVER_PLAYLIST_LIMIT = int(getenv("SERVER_PLAYLIST_LIMIT", "50"))
 PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", "50"))
 
 
-
 # Telegram audio  and video file size limit
 
 TG_AUDIO_FILESIZE_LIMIT = int(
@@ -163,7 +157,6 @@ TG_VIDEO_FILESIZE_LIMIT = int(
 )  # Remember to give value in bytes
 
 # Chceckout https://www.gbmb.org/mb-to-bytes  for converting mb to bytes
-
 
 
 # If you want your bot to setup the commands automatically in the bot's menu set it to true.
@@ -179,14 +172,12 @@ STRING4 = getenv("STRING_SESSION4", None)
 STRING5 = getenv("STRING_SESSION5", None)
 
 
-
-
-#  __     ___    _ _  ___  _______   __  __ _    _  _____ _____ _____ 
-#  \ \   / / |  | | |/ / |/ /_   _| |  \/  | |  | |/ ____|_   _/ ____| 
-#   \ \_/ /| |  | | ' /| ' /  | |   | \  / | |  | | (___   | || |      
-#    \   / | |  | |  < |  <   | |   | |\/| | |  | |\___ \  | || |      
-#     | |  | |__| | . \| . \ _| |_  | |  | | |__| |____) |_| || |____  
-#     |_|   \____/|_|\_\_|\_\_____| |_|  |_|\____/|_____/|_____\_____| 
+#  __     ___    _ _  ___  _______   __  __ _    _  _____ _____ _____
+#  \ \   / / |  | | |/ / |/ /_   _| |  \/  | |  | |/ ____|_   _/ ____|
+#   \ \_/ /| |  | | ' /| ' /  | |   | \  / | |  | | (___   | || |
+#    \   / | |  | |  < |  <   | |   | |\/| | |  | |\___ \  | || |
+#     | |  | |__| | . \| . \ _| |_  | |  | | |__| |____) |_| || |____
+#     |_|   \____/|_|\_\_|\_\_____| |_|  |_|\____/|_____/|_____\_____|
 
 
 ### DONT TOUCH or EDIT codes after this line
