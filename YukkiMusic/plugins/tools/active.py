@@ -25,9 +25,7 @@ ACTIVEVIDEO_COMMAND = get_command("ACTIVEVIDEO_COMMAND")
 
 @app.on_message(filters.command(ACTIVEVC_COMMAND) & SUDOERS)
 async def activevc(_, message: Message):
-    mystic = await message.reply_text(
-        "ɢᴇᴛᴛɪɴɢ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ....ᴘʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ"
-    )
+    mystic = await message.reply_text("ɢᴇᴛᴛɪɴɢ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ....ᴘʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ")
     served_chats = await get_active_chats()
     text = ""
     j = 0
@@ -53,9 +51,7 @@ async def activevc(_, message: Message):
 
 @app.on_message(filters.command(ACTIVEVIDEO_COMMAND) & SUDOERS)
 async def activevi_(_, message: Message):
-    mystic = await message.reply_text(
-        "ɢᴇᴛᴛɪɴɢ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ....ᴘʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ"
-    )
+    mystic = await message.reply_text("ɢᴇᴛᴛɪɴɢ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ....ᴘʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ")
     served_chats = await get_active_video_chats()
     text = ""
     j = 0
