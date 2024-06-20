@@ -31,5 +31,5 @@ jobs:
             commit_options: "--no-verify"
             repository: .
             commit_user_name: VivekKumar-IN
-            commit_user_email: VivekKumar-IN@users.noreply.github.com
-            commit_author: VivekKumar-IN <VivekKumar-IN@users.noreply.github.com>
+            commit_user_email: 167422483+Vivekkumar-IN@users.noreply.github.com
+            commit_author: VivekKumar-IN <167422483+Vivekkumar-IN@users.noreply.github.com>
