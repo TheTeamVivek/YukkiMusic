@@ -224,9 +224,6 @@ async def start_comm(client, message: Message, _):
         except:
             OWNER = None
         out = private_panel(_, app.username, OWNER)
-        b = await message.reply_sticker(
-            "CAACAgUAAx0Ceb8wGwABAUYwZmrY4JcAATWf0qU6QTm85tLqkWNGAAL5CQACjkHJVlFIYMw9a39IHgQ"
-        )
         if config.START_IMG_URL:
             try:
                 await message.reply_photo(
@@ -244,7 +241,6 @@ async def start_comm(client, message: Message, _):
                 text=_["start_1"].format(app.mention),
                 reply_markup=InlineKeyboardMarkup(out),
             )
-        await b.delete()
         if await is_on_off(config.LOG):
             sender_id = message.from_user.id
             sender_name = message.from_user.first_name
