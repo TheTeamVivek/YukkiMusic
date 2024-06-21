@@ -70,10 +70,16 @@ async def assis_set(_, message: Message):
         await b.join_chat(message.chat.id)
     except:
         pass
-    await message.reply_text("**Yᴏᴜʀ ᴄʜᴀᴛ's ɴᴇᴡ ᴀssɪsᴛᴀɴᴛ ᴅᴇᴛᴀɪʟs:**\nAssɪsᴛᴀɴᴛ Nᴀᴍᴇ :- {b.name}\nUsᴇʀɴᴀᴍᴇ :- @{b.username}\nID:- {b.id}", disable_web_page_preview=True)
+    await message.reply_text(
+        "**Yᴏᴜʀ ᴄʜᴀᴛ's ɴᴇᴡ ᴀssɪsᴛᴀɴᴛ ᴅᴇᴛᴀɪʟs:**\nAssɪsᴛᴀɴᴛ Nᴀᴍᴇ :- {b.name}\nUsᴇʀɴᴀᴍᴇ :- @{b.username}\nID:- {b.id}",
+        disable_web_page_preview=True,
+    )
 
 
 @app.on_message(filters.command("checkassistant") & filters.group & admin_filter)
 async def check_ass(_, message: Message):
     a = await get_assistant(message.chat.id)
-    await message.reply_text("**Yᴏᴜʀ ᴄʜᴀᴛ's ᴀssɪsᴛᴀɴᴛ ᴅᴇᴛᴀɪʟs:**\nAssɪsᴛᴀɴᴛ Nᴀᴍᴇ :- {a.name}\nAssɪsᴛᴀɴᴛ\nUsᴇʀɴᴀᴍᴇ :- @{a.username}\nAssɪsᴛᴀɴᴛ ID:- {a.id}", disable_web_page_preview=True)
+    await message.reply_text(
+        "**Yᴏᴜʀ ᴄʜᴀᴛ's ᴀssɪsᴛᴀɴᴛ ᴅᴇᴛᴀɪʟs:**\nAssɪsᴛᴀɴᴛ Nᴀᴍᴇ :- {a.name}\nAssɪsᴛᴀɴᴛ\nUsᴇʀɴᴀᴍᴇ :- @{a.username}\nAssɪsᴛᴀɴᴛ ID:- {a.id}",
+        disable_web_page_preview=True,
+    )
