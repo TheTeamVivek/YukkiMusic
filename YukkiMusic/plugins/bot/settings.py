@@ -23,12 +23,18 @@ from YukkiMusic import app
 from YukkiMusic.utils.database import (
     add_nonadmin_chat,
     get_aud_bit_name,
+    cleanmode_off,
+    cleanmode_on,
+    commanddelete_off,
+    commanddelete_on,
     get_authuser,
     get_authuser_names,
     get_playmode,
     get_playtype,
     get_vid_bit_name,
     is_nonadmin_chat,
+    is_cleanmode_on,
+    is_commanddelete_on,
     remove_nonadmin_chat,
     save_audio_bitrate,
     save_video_bitrate,
@@ -40,6 +46,7 @@ from YukkiMusic.utils.decorators.language import language, languageCB
 from YukkiMusic.utils.inline.settings import (
     audio_quality_markup,
     auth_users_markup,
+    cleanmode_settings_markup,
     playmode_users_markup,
     setting_markup,
     video_quality_markup,
@@ -188,6 +195,22 @@ async def without_Admin_rights(client, CallbackQuery, _):
             return await CallbackQuery.answer(_["setting_16"], show_alert=True)
         except:
             return
+    if command == "CM":
+        try:
+            await CallbackQuery.answer(_["set_cb_5"], show_alert=True)
+        except:
+            pass
+        sta = None
+        cle = None
+        if await is_cleanmode_on(CallbackQuery.message.chat.id):
+            cle = True
+        if await is_commanddelete_on(CallbackQuery.message.chat.id):
+            sta = True
+        sug = None
+        if await is_suggestion(CallbackQuery.message.chat.id):
+            sug = True
+        buttons = cleanmode_settings_markup(_, status=cle, dels=sta, sug=sug)
+
     if command == "AQ":
         try:
             await CallbackQuery.answer(_["set_cb_1"], show_alert=True)
@@ -293,7 +316,68 @@ async def aud_vid_cb(client, CallbackQuery, _):
         )
     except MessageNotModified:
         return
-
+@app.on_callback_query(
+    filters.regex(pattern=r"^(CLEANMODE|COMMANDELMODE|SUGGESTIONCHANGE)$")
+    & ~BANNED_USERS
+)
+@ActualAdminCB
+async def cleanmode_mark(client, CallbackQuery, _):
+    command = CallbackQuery.matches[0].group(1)
+    try:
+        await CallbackQuery.answer(_["set_cb_6"], show_alert=True)
+    except:
+        pass
+    if command == "CLEANMODE":
+        sta = None
+        if await is_commanddelete_on(CallbackQuery.message.chat.id):
+            sta = True
+        sug = None
+        if await is_suggestion(CallbackQuery.message.chat.id):
+            sug = True
+        cle = None
+        if await is_cleanmode_on(CallbackQuery.message.chat.id):
+            await cleanmode_off(CallbackQuery.message.chat.id)
+        else:
+            await cleanmode_on(CallbackQuery.message.chat.id)
+            cle = True
+        buttons = cleanmode_settings_markup(_, status=cle, dels=sta, sug=sug)
+        return await CallbackQuery.edit_message_reply_markup(
+            reply_markup=InlineKeyboardMarkup(buttons)
+        )
+    if command == "COMMANDELMODE":
+        cle = None
+        sta = None
+        if await is_cleanmode_on(CallbackQuery.message.chat.id):
+            cle = True
+        sug = None
+        if await is_suggestion(CallbackQuery.message.chat.id):
+            sug = True
+        if await is_commanddelete_on(CallbackQuery.message.chat.id):
+            await commanddelete_off(CallbackQuery.message.chat.id)
+        else:
+            await commanddelete_on(CallbackQuery.message.chat.id)
+            sta = True
+        buttons = cleanmode_settings_markup(_, status=cle, dels=sta, sug=sug)
+    if command == "SUGGESTIONCHANGE":
+        cle = None
+        sta = None
+        if await is_cleanmode_on(CallbackQuery.message.chat.id):
+            cle = True
+        if await is_commanddelete_on(CallbackQuery.message.chat.id):
+            sta = True
+        if await is_suggestion(CallbackQuery.message.chat.id):
+            await suggestion_off(CallbackQuery.message.chat.id)
+            sug = False
+        else:
+            await suggestion_on(CallbackQuery.message.chat.id)
+            sug = True
+        buttons = cleanmode_settings_markup(_, status=cle, dels=sta, sug=sug)
+    try:
+        return await CallbackQuery.edit_message_reply_markup(
+            reply_markup=InlineKeyboardMarkup(buttons)
+        )
+    except MessageNotModified:
+        return
 
 # Play Mode Settings
 @app.on_callback_query(
