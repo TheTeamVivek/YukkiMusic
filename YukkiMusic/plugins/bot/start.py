@@ -52,11 +52,11 @@ async def start_comm(client, message: Message, _):
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
         if name[0:4] == "help":
-            text, keyboard = await help_parser(message.from_user.mention)
+            keyboard = await help_parser(message.from_user.mention)
             if config.START_IMG_URL:
                 return await message.reply_photo(
                     photo=START_IMG_URL,
-                    caption=text,
+                    caption=_["help_1"],
                     reply_markup=keyboard,
                 )
             else:
