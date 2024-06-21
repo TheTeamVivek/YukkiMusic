@@ -12,7 +12,10 @@ from pyrogram.types import Message
 
 from YukkiMusic import app
 from YukkiMusic.core.userbot import assistants
-from YukkiMusic.utils.assistant import is_avl_assistant as assistant, get_assistant_details
+from YukkiMusic.utils.assistant import (
+    is_avl_assistant as assistant,
+    get_assistant_details,
+)
 from YukkiMusic.utils.database import get_assistant, save_assistant, set_assistant
 from YukkiMusic.utils.filter import admin_filter
 from config import LOG_GROUP_ID
