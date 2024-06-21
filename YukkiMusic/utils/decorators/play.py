@@ -181,7 +181,7 @@ def PlayWrapper(command):
                     try:
                         await app.approve_chat_join_request(chat_id, userbot.id)
                     except Exception as e:
-                        return await message.reply_text(
+                        return await myu.edit(
                             _["call_3"].format(type(e).__name__)
                         )
                     await asyncio.sleep(1)
@@ -189,11 +189,15 @@ def PlayWrapper(command):
                 except UserAlreadyParticipant:
                     pass
                 except Exception as e:
-                    return await message.reply_text(
+                    return await myu.edit(
                         _["call_3"].format(type(e).__name__)
                     )
 
                 links[chat_id] = invitelink
+                try:
+                    await myu.delete()
+                except Exception:
+                    pass
 
                 try:
                     await userbot.resolve_peer(chat_id)
