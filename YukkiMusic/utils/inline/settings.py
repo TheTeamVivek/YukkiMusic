@@ -165,7 +165,6 @@ def cleanmode_settings_markup(
     _,
     status: Union[bool, str] = None,
     dels: Union[bool, str] = None,
-    sug: Union[bool, str] = None,
 ):
     buttons = [
         [
@@ -182,13 +181,7 @@ def cleanmode_settings_markup(
                 callback_data="COMMANDELMODE",
             ),
         ],
-        [
-            InlineKeyboardButton(text=_["ST_B_31"], callback_data="SUGGANSWER"),
-            InlineKeyboardButton(
-                text=_["ST_B_18"] if sug == True else _["ST_B_19"],
-                callback_data="SUGGESTIONCHANGE",
-            ),
-        ],
+        
         [
             InlineKeyboardButton(
                 text=_["BACK_BUTTON"],
