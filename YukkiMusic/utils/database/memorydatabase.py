@@ -390,11 +390,13 @@ async def remove_active_video_chat(chat_id: int):
 CLEANMODE_DB = os.path.join(config.TEMP_DB_FOLDER, "cleanmode.json")
 COMMAND_DB = os.path.join(config.TEMP_DB_FOLDER, "command.json")
 
+
 def load_cleanmode():
     if os.path.exists(CLEANMODE_DB):
         with open(CLEANMODE_DB, "r") as file:
             return json.load(file)
     return []
+
 
 def load_command():
     if os.path.exists(COMMAND_DB):
@@ -402,41 +404,52 @@ def load_command():
             return json.load(file)
     return []
 
+
 def save_cleanmode():
     with open(CLEANMODE_DB, "w") as file:
         json.dump(cleanmode, file)
+
 
 def save_command():
     with open(COMMAND_DB, "w") as file:
         json.dump(command, file)
 
+
 cleanmode = load_cleanmode()
 command = load_command()
+
+
 async def is_cleanmode_on(chat_id: int) -> bool:
     return chat_id not in cleanmode
+
 
 async def cleanmode_off(chat_id: int):
     if chat_id not in cleanmode:
         cleanmode.append(chat_id)
         save_cleanmode()
 
+
 async def cleanmode_on(chat_id: int):
     if chat_id in cleanmode:
         cleanmode.remove(chat_id)
         save_cleanmode()
 
+
 async def is_commanddelete_on(chat_id: int) -> bool:
     return chat_id not in command
+
 
 async def commanddelete_off(chat_id: int):
     if chat_id not in command:
         command.append(chat_id)
         save_command()
 
+
 async def commanddelete_on(chat_id: int):
     if chat_id in command:
         command.remove(chat_id)
         save_command()
+
 
 # Non Admin Chat
 async def check_nonadmin_chat(chat_id: int) -> bool:
