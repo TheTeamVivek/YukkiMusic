@@ -25,7 +25,6 @@ langdb = mongodb.language
 authdb = mongodb.adminauth
 videodb = mongodb.yukkivideocalls
 onoffdb = mongodb.onoffper
-suggdb = mongodb.suggestion
 autoenddb = mongodb.autoend
 coupledb = mongodb.couple
 notesdb = mongodb.notes
@@ -46,7 +45,6 @@ activevideo = []
 nonadmin = {}
 vlimit = []
 maintenance = []
-suggestion = {}
 autoend = {}
 greeting_message = {"welcome": {}, "goodbye": {}}
 
