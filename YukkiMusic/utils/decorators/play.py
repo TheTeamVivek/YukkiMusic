@@ -181,17 +181,13 @@ def PlayWrapper(command):
                     try:
                         await app.approve_chat_join_request(chat_id, userbot.id)
                     except Exception as e:
-                        return await myu.edit(
-                            _["call_3"].format(type(e).__name__)
-                        )
+                        return await myu.edit(_["call_3"].format(type(e).__name__))
                     await asyncio.sleep(1)
                     await myu.edit(_["call_6"].format(app.mention))
                 except UserAlreadyParticipant:
                     pass
                 except Exception as e:
-                    return await myu.edit(
-                        _["call_3"].format(type(e).__name__)
-                    )
+                    return await myu.edit(_["call_3"].format(type(e).__name__))
 
                 links[chat_id] = invitelink
                 try:
