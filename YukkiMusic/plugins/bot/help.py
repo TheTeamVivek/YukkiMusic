@@ -39,8 +39,8 @@ async def helper_private(
         chat_id = update.message.chat.id
         language = await get_lang(chat_id)
         _ = get_string(language)
-        text, keyboard = await help_parser(update.from_user.mention)
-        await update.edit_message_text(text, reply_markup=keyboard)
+        keyboard = await help_parser(update.from_user.mention)
+        await update.edit_message_text(_["help_1"], reply_markup=keyboard)
     else:
         chat_id = update.chat.id
         if await is_commanddelete_on(update.chat.id):
@@ -50,11 +50,11 @@ async def helper_private(
                 pass
         language = await get_lang(chat_id)
         _ = get_string(language)
-        text, keyboard = await help_parser(update.from_user.mention)
+        keyboard = await help_parser(update.from_user.mention)
         if START_IMG_URL:
             await update.reply_photo(
                 photo=START_IMG_URL,
-                caption=text,
+                caption=_["help_1"],
                 reply_markup=keyboard,
             )
 
@@ -75,15 +75,7 @@ async def help_com_group(client, message: Message, _):
 async def help_parser(name, keyboard=None):
     if not keyboard:
         keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help"))
-    return (
-        f"""ʜᴇʟʟᴏ {name},
-
-ᴄʟɪᴄᴋ ᴏɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴs ғᴏʀ ᴍᴏʀᴇ ɪɴғᴏʀᴍᴀᴛɪᴏɴ.
-
-ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅs sᴛᴀʀᴛs ᴡɪᴛʜ :-  /
-""",
-        keyboard,
-    )
+    return keyboard
 
 
 @app.on_callback_query(filters.regex(r"help_(.*?)"))
