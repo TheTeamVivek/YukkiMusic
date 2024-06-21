@@ -390,8 +390,8 @@ async def remove_active_video_chat(chat_id: int):
 # Delete command mode
 
 # Define file paths
-CLEANMODE_DB = os.path.join(DB_FOLDER, "cleanmode.json")
-COMMAND_DB = os.path.join(DB_FOLDER, "command.json")
+CLEANMODE_DB = os.path.join(config.TEMP_DB_FOLDER, "cleanmode.json")
+COMMAND_DB = os.path.join(config.TEMP_DB_FOLDER, "command.json")
 
 
 def load_cleanmode():
@@ -608,18 +608,42 @@ async def maintenance_on():
 
 
 # Audio Video Limit
-
-
 from pytgcalls.types import AudioQuality, VideoQuality
 
 
+
+AUDIO_FILE = os.path.join(config.TEMP_DB_FOLDER, "audio.json")
+VIDEO_FILE = os.path.join(config.TEMP_DB_FOLDER, "video.json")
+
+def load_audio():
+    if os.path.exists(AUDIO_FILE):
+        with open(AUDIO_FILE, "r") as file:
+            return json.load(file)
+    return {}
+
+def load_video():
+    if os.path.exists(VIDEO_FILE):
+        with open(VIDEO_FILE, "r") as file:
+            return json.load(file)
+    return {}
+def save_audio():
+    with open(AUDIO_FILE, "w") as file:
+        json.dump(audio, file)
+
+def save_video():
+    with open(VIDEO_FILE, "w") as file:
+        json.dump(video, file)
+
+audio = load_audio()
+video = load_video()
+
 async def save_audio_bitrate(chat_id: int, bitrate: str):
     audio[chat_id] = bitrate
-
+    save_audio()
 
 async def save_video_bitrate(chat_id: int, bitrate: str):
     video[chat_id] = bitrate
-
+    save_video()
 
 async def get_aud_bit_name(chat_id: int) -> str:
     mode = audio.get(chat_id)
@@ -627,16 +651,11 @@ async def get_aud_bit_name(chat_id: int) -> str:
         return "HIGH"
     return mode
 
-
 async def get_vid_bit_name(chat_id: int) -> str:
     mode = video.get(chat_id)
     if not mode:
-        if PRIVATE_BOT_MODE == str(True):
-            return "HD_720p"
-        else:
-            return "HD_720p"
+        return "HD_720p"
     return mode
-
 
 async def get_audio_bitrate(chat_id: int) -> str:
     mode = audio.get(chat_id)
@@ -651,14 +670,10 @@ async def get_audio_bitrate(chat_id: int) -> str:
     elif str(mode) == "LOW":
         return AudioQuality.LOW
 
-
 async def get_video_bitrate(chat_id: int) -> str:
     mode = video.get(chat_id)
     if not mode:
-        if PRIVATE_BOT_MODE == str(True):
-            return VideoQuality.SD_480p
-        else:
-            return VideoQuality.SD_480p
+        return VideoQuality.SD_480p
     if str(mode) == "UHD_4K":
         return VideoQuality.UHD_4K
     elif str(mode) == "QHD_2K":
