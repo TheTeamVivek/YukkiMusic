@@ -86,13 +86,9 @@ async def help_button(client, query):
     next_match = re.match(r"help_next\((.+?)\)", query.data)
     back_match = re.match(r"help_back\((\d+)\)", query.data)
     create_match = re.match(r"help_create", query.data)
-
-    top_text = f"""ʜᴇʟʟᴏ {query.from_user.mention},
-
-ᴄʟɪᴄᴋ ᴏɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴs ғᴏʀ ᴍᴏʀᴇ ɪɴғᴏʀᴍᴀᴛɪᴏɴ.
-
-ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅs sᴛᴀʀᴛs ᴡɪᴛʜ :-  /
-"""
+    language = await get_lang(query.message.chat.id)
+    _ = get_string(language)
+    top_text = _["help_1"]
 
     if mod_match:
         module = mod_match.group(1)
