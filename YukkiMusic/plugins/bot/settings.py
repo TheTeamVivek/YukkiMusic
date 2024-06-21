@@ -150,7 +150,7 @@ async def gen_buttons_vid(_, aud):
 
 @app.on_callback_query(
     filters.regex(
-        pattern=r"^(SEARCHANSWER|PLAYMODEANSWER|PLAYTYPEANSWER|AUTHANSWER|CMANSWER|COMMANDANSWER|SUGGANSWER|CM|AQ|VQ|PM|AU)$"
+        pattern=r"^(SEARCHANSWER|PLAYMODEANSWER|PLAYTYPEANSWER|AUTHANSWER|CMANSWER|COMMANDANSWER|CM|AQ|VQ|PM|AU)$"
     )
     & ~BANNED_USERS
 )
@@ -188,11 +188,6 @@ async def without_Admin_rights(client, CallbackQuery, _):
     if command == "COMMANDANSWER":
         try:
             return await CallbackQuery.answer(_["setting_14"], show_alert=True)
-        except:
-            return
-    if command == "SUGGANSWER":
-        try:
-            return await CallbackQuery.answer(_["setting_16"], show_alert=True)
         except:
             return
     if command == "CM":
