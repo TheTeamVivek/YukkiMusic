@@ -26,7 +26,6 @@ authdb = mongodb.adminauth
 videodb = mongodb.yukkivideocalls
 onoffdb = mongodb.onoffper
 autoenddb = mongodb.autoend
-coupledb = mongodb.couple
 notesdb = mongodb.notes
 filtersdb = mongodb.filters
 
