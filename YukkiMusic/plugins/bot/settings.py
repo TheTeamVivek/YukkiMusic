@@ -316,8 +316,7 @@ async def aud_vid_cb(client, CallbackQuery, _):
 
 
 @app.on_callback_query(
-    filters.regex(pattern=r"^(CLEANMODE|COMMANDELMODE)$")
-    & ~BANNED_USERS
+    filters.regex(pattern=r"^(CLEANMODE|COMMANDELMODE)$") & ~BANNED_USERS
 )
 @ActualAdminCB
 async def cleanmode_mark(client, CallbackQuery, _):
