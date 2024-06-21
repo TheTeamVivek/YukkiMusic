@@ -13,7 +13,6 @@ import json
 from typing import Dict, List, Union
 
 import config
-from config import PRIVATE_BOT_MODE
 from YukkiMusic.core.mongo import mongodb
 
 channeldb = mongodb.cplaymode
@@ -611,9 +610,9 @@ async def maintenance_on():
 from pytgcalls.types import AudioQuality, VideoQuality
 
 
-
 AUDIO_FILE = os.path.join(config.TEMP_DB_FOLDER, "audio.json")
 VIDEO_FILE = os.path.join(config.TEMP_DB_FOLDER, "video.json")
+
 
 def load_audio():
     if os.path.exists(AUDIO_FILE):
@@ -621,29 +620,37 @@ def load_audio():
             return json.load(file)
     return {}
 
+
 def load_video():
     if os.path.exists(VIDEO_FILE):
         with open(VIDEO_FILE, "r") as file:
             return json.load(file)
     return {}
+
+
 def save_audio():
     with open(AUDIO_FILE, "w") as file:
         json.dump(audio, file)
+
 
 def save_video():
     with open(VIDEO_FILE, "w") as file:
         json.dump(video, file)
 
+
 audio = load_audio()
 video = load_video()
+
 
 async def save_audio_bitrate(chat_id: int, bitrate: str):
     audio[chat_id] = bitrate
     save_audio()
 
+
 async def save_video_bitrate(chat_id: int, bitrate: str):
     video[chat_id] = bitrate
     save_video()
+
 
 async def get_aud_bit_name(chat_id: int) -> str:
     mode = audio.get(chat_id)
@@ -651,11 +658,13 @@ async def get_aud_bit_name(chat_id: int) -> str:
         return "HIGH"
     return mode
 
+
 async def get_vid_bit_name(chat_id: int) -> str:
     mode = video.get(chat_id)
     if not mode:
         return "HD_720p"
     return mode
+
 
 async def get_audio_bitrate(chat_id: int) -> str:
     mode = audio.get(chat_id)
@@ -669,6 +678,7 @@ async def get_audio_bitrate(chat_id: int) -> str:
         return AudioQuality.MEDIUM
     elif str(mode) == "LOW":
         return AudioQuality.LOW
+
 
 async def get_video_bitrate(chat_id: int) -> str:
     mode = video.get(chat_id)
