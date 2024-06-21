@@ -181,7 +181,6 @@ def cleanmode_settings_markup(
                 callback_data="COMMANDELMODE",
             ),
         ],
-        
         [
             InlineKeyboardButton(
                 text=_["BACK_BUTTON"],
