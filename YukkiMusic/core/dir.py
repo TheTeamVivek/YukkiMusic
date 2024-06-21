@@ -13,6 +13,7 @@ import sys
 from os import listdir, mkdir
 from config import TEMP_DB_FOLDER
 
+
 def dirr():
     assets_folder = "assets"
     downloads_folder = "downloads"
