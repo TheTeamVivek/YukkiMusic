@@ -11,7 +11,7 @@ import logging
 import os
 import sys
 from os import listdir, mkdir
-
+from config import TEMP_DB_FOLDER
 
 def dirr():
     assets_folder = "assets"
@@ -38,6 +38,9 @@ def dirr():
 
     if cache_folder not in listdir():
         mkdir(cache_folder)
+
+    if TEMP_DB_FOLDER not in listdir():
+        mkdir(TEMP_DB_FOLDER)
 
     logging.info("Directories Updated.")
 
