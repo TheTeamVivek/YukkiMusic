@@ -316,6 +316,8 @@ async def aud_vid_cb(client, CallbackQuery, _):
         )
     except MessageNotModified:
         return
+
+
 @app.on_callback_query(
     filters.regex(pattern=r"^(CLEANMODE|COMMANDELMODE|SUGGESTIONCHANGE)$")
     & ~BANNED_USERS
@@ -378,6 +380,7 @@ async def cleanmode_mark(client, CallbackQuery, _):
         )
     except MessageNotModified:
         return
+
 
 # Play Mode Settings
 @app.on_callback_query(
