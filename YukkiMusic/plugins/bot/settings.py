@@ -206,10 +206,7 @@ async def without_Admin_rights(client, CallbackQuery, _):
             cle = True
         if await is_commanddelete_on(CallbackQuery.message.chat.id):
             sta = True
-        sug = None
-        if await is_suggestion(CallbackQuery.message.chat.id):
-            sug = True
-        buttons = cleanmode_settings_markup(_, status=cle, dels=sta, sug=sug)
+        buttons = cleanmode_settings_markup(_, status=cle, dels=sta)
 
     if command == "AQ":
         try:
@@ -319,7 +316,7 @@ async def aud_vid_cb(client, CallbackQuery, _):
 
 
 @app.on_callback_query(
-    filters.regex(pattern=r"^(CLEANMODE|COMMANDELMODE|SUGGESTIONCHANGE)$")
+    filters.regex(pattern=r"^(CLEANMODE|COMMANDELMODE)$")
     & ~BANNED_USERS
 )
 @ActualAdminCB
@@ -333,16 +330,13 @@ async def cleanmode_mark(client, CallbackQuery, _):
         sta = None
         if await is_commanddelete_on(CallbackQuery.message.chat.id):
             sta = True
-        sug = None
-        if await is_suggestion(CallbackQuery.message.chat.id):
-            sug = True
         cle = None
         if await is_cleanmode_on(CallbackQuery.message.chat.id):
             await cleanmode_off(CallbackQuery.message.chat.id)
         else:
             await cleanmode_on(CallbackQuery.message.chat.id)
             cle = True
-        buttons = cleanmode_settings_markup(_, status=cle, dels=sta, sug=sug)
+        buttons = cleanmode_settings_markup(_, status=cle, dels=sta)
         return await CallbackQuery.edit_message_reply_markup(
             reply_markup=InlineKeyboardMarkup(buttons)
         )
