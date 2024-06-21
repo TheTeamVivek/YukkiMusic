@@ -49,8 +49,7 @@ async def assis_change(_, message: Message):
 
 @app.on_message(filters.command("setassistant") & admin_filter)
 async def assis_set(_, message: Message):
-    avt = await assistant()
-    if avt == True:
+    if await assistant():
         return await message.reply_text(
             "sᴏʀʀʏ sɪʀ! ɪɴ ʙᴏᴛ sᴇʀᴠᴇʀ ᴏɴʟʏ ᴏɴᴇ ᴀssɪsᴛᴀɴᴛ ᴀᴠᴀɪʟᴀʙʟᴇ ᴛʜᴇʀᴇғᴏʀᴇ ʏᴏᴜ ᴄᴀɴ'ᴛ ᴄʜᴀɴɢᴇ ᴀssɪsᴛᴀɴᴛ"
         )
@@ -71,18 +70,10 @@ async def assis_set(_, message: Message):
         await b.join_chat(message.chat.id)
     except:
         pass
-    DETAILS = f""" ʏᴏᴜʀ ᴄʜᴀᴛ's  ɴᴇᴡ ᴀssɪsᴛᴀɴᴛ ᴅᴇᴛᴀɪʟs:
-                   ᴀssɪsᴛᴀɴᴛ ɴᴀᴍᴇ :- {a.name}
-                   ᴀssɪsᴛᴀɴᴛ ᴜsᴇʀɴᴀᴍᴇ :- {a.username}
-                   ᴀssɪsᴛᴀɴᴛ ɪᴅ:- @{a.id}"""
-    await message.reply_text(DETAILS, disable_web_page_preview=True)
+    await message.reply_text("**Yᴏᴜʀ ᴄʜᴀᴛ's ɴᴇᴡ ᴀssɪsᴛᴀɴᴛ ᴅᴇᴛᴀɪʟs:**\nAssɪsᴛᴀɴᴛ Nᴀᴍᴇ :- {b.name}\nUsᴇʀɴᴀᴍᴇ :- @{b.username}\nID:- {b.id}", disable_web_page_preview=True)
 
 
 @app.on_message(filters.command("checkassistant") & filters.group & admin_filter)
 async def check_ass(_, message: Message):
-    assistant = await get_assistant(message.chat.id)
-    DETAILS = f"""Your chat's assistant details:
-Assistant Name :- {assistant.name}
-Assistant Username :- {assistant.username}
-Assistant ID:- @{assistant.id}"""
-    await message.reply_text(DETAILS, disable_web_page_preview=True)
+    a = await get_assistant(message.chat.id)
+    await message.reply_text("**Yᴏᴜʀ ᴄʜᴀᴛ's ᴀssɪsᴛᴀɴᴛ ᴅᴇᴛᴀɪʟs:**\nAssɪsᴛᴀɴᴛ Nᴀᴍᴇ :- {a.name}\nAssɪsᴛᴀɴᴛ\nUsᴇʀɴᴀᴍᴇ :- @{a.username}\nAssɪsᴛᴀɴᴛ ID:- {a.id}", disable_web_page_preview=True)
