@@ -397,6 +397,7 @@ def load_cleanmode():
             return json.load(file)
     return []
 
+
 def load_command():
     if os.path.exists(COMMAND_DB):
         with open(COMMAND_DB, "r") as file:
@@ -408,9 +409,11 @@ def save_cleanmode():
     with open(CLEANMODE_DB, "w") as file:
         json.dump(cleanmode, file, indent=4)
 
+
 def save_command():
     with open(COMMAND_DB, "w") as file:
         json.dump(command, file, indent=4)
+
 
 cleanmode = load_cleanmode()
 command = load_command()
@@ -419,11 +422,13 @@ command = load_command()
 async def is_cleanmode_on(chat_id: int) -> bool:
     return str(chat_id) not in cleanmode
 
+
 async def cleanmode_off(chat_id: int):
     chat_id_str = str(chat_id)
     if chat_id_str not in cleanmode:
         cleanmode.append(chat_id_str)
         save_cleanmode()
+
 
 async def cleanmode_on(chat_id: int):
     chat_id_str = str(chat_id)
@@ -435,11 +440,13 @@ async def cleanmode_on(chat_id: int):
 async def is_commanddelete_on(chat_id: int) -> bool:
     return str(chat_id) not in command
 
+
 async def commanddelete_off(chat_id: int):
     chat_id_str = str(chat_id)
     if chat_id_str not in command:
         command.append(chat_id_str)
         save_command()
+
 
 async def commanddelete_on(chat_id: int):
     chat_id_str = str(chat_id)
@@ -598,32 +605,40 @@ from pytgcalls.types import AudioQuality, VideoQuality
 AUDIO_FILE = os.path.join(config.TEMP_DB_FOLDER, "audio.json")
 VIDEO_FILE = os.path.join(config.TEMP_DB_FOLDER, "video.json")
 
+
 def load_data(file_path):
     if os.path.exists(file_path):
         with open(file_path, "r") as file:
             return json.load(file)
     return {}
 
+
 def save_data(file_path, data):
     with open(file_path, "w") as file:
         json.dump(data, file, indent=4)
 
+
 audio = load_data(AUDIO_FILE)
 video = load_data(VIDEO_FILE)
+
 
 async def save_audio_bitrate(chat_id: int, bitrate: str):
     audio[str(chat_id)] = bitrate
     save_data(AUDIO_FILE, audio)
 
+
 async def save_video_bitrate(chat_id: int, bitrate: str):
     video[str(chat_id)] = bitrate
     save_data(VIDEO_FILE, video)
 
+
 async def get_aud_bit_name(chat_id: int) -> str:
     return audio.get(str(chat_id), "HIGH")
 
+
 async def get_vid_bit_name(chat_id: int) -> str:
     return video.get(str(chat_id), "HD_720p")
+
 
 async def get_audio_bitrate(chat_id: int) -> str:
     mode = audio.get(str(chat_id), "MEDIUM")
@@ -634,8 +649,11 @@ async def get_audio_bitrate(chat_id: int) -> str:
         "LOW": AudioQuality.LOW,
     }.get(mode, AudioQuality.MEDIUM)
 
+
 async def get_video_bitrate(chat_id: int) -> str:
-    mode = video.get(str(chat_id), "SD_480p")  # Ensure chat_id is a string for JSON compatibility
+    mode = video.get(
+        str(chat_id), "SD_480p"
+    )  # Ensure chat_id is a string for JSON compatibility
     return {
         "UHD_4K": VideoQuality.UHD_4K,
         "QHD_2K": VideoQuality.QHD_2K,
