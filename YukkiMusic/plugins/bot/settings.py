@@ -339,15 +339,12 @@ async def cleanmode_mark(client, CallbackQuery, _):
         sta = None
         if await is_cleanmode_on(CallbackQuery.message.chat.id):
             cle = True
-        sug = None
-        if await is_suggestion(CallbackQuery.message.chat.id):
-            sug = True
         if await is_commanddelete_on(CallbackQuery.message.chat.id):
             await commanddelete_off(CallbackQuery.message.chat.id)
         else:
             await commanddelete_on(CallbackQuery.message.chat.id)
             sta = True
-        buttons = cleanmode_settings_markup(_, status=cle, dels=sta, sug=sug)
+        buttons = cleanmode_settings_markup(_, status=cle, dels=sta)
     try:
         return await CallbackQuery.edit_message_reply_markup(
             reply_markup=InlineKeyboardMarkup(buttons)
