@@ -44,7 +44,7 @@ class YukkiBot(Client):
             LOGGER(__name__).error(
                 "Bot has failed to access the log Group. Make sure that you have added your bot to your log channel and promoted as admin!"
             )
-            sys.exit()
+            #sys.exit()
         if config.SET_CMDS:
             try:
                 await self.set_bot_commands(
