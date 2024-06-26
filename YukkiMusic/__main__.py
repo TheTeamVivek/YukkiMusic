@@ -51,8 +51,9 @@ async def init():
                 if imported_module.__MODULE__.lower() not in HELPABLE:
                     HELPABLE[imported_module.__MODULE__.lower()] = imported_module
                 else:
-                    raise Exception("Can't have two modules with the same name! Please change one")
-        
+                    raise Exception(
+                        "Can't have two modules with the same name! Please change one"
+                    )
 
     LOGGER("YukkiMusic.plugins").info("Successfully Imported All Modules ")
     await userbot.start()
