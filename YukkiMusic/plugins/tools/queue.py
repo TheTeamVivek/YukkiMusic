@@ -197,9 +197,13 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
         if "🏷" in msg:
             msg = msg.replace("🏷", "")
         link = await Yukkibin(msg)
-        med = InputMediaPhoto(media=link, caption=_["queue_3"].format(link))
-        await CallbackQuery.edit_message_media(media=med, reply_markup=buttons)
+        await CallbackQuery.edit_message_text(_["queue_3"].format(link), reply_markup=buttons)
     else:
+        if len(msg) > 700:
+            link = await Yukkibin(msg)
+            await asyncio.sleep(1)
+            return await CallbackQuery.edit_message_text(_["queue_3"].format(link), reply_markup=buttons)
+
         await asyncio.sleep(1)
         return await CallbackQuery.edit_message_text(msg, reply_markup=buttons)
 
