@@ -22,7 +22,7 @@ from YukkiMusic.utils.decorators import ActualAdminCB, language, languageCB
 
 
 def lanuages_keyboard(_):
-    keyboard = InlineKeyboard(row_width=3)
+    keyboard = InlineKeyboard(row_width=2)
     keyboard.add(
         *[
             (
