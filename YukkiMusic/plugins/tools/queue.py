@@ -195,7 +195,13 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
             await asyncio.sleep(1)
             return await CallbackQuery.edit_message_text(msg, reply_markup=buttons)
         if "🏷" in msg:
-            msg = msg.replace("🏷", "").replace("ᴄᴜʀʀᴇɴᴛ ᴘʟᴀʏɪɴɢ", "Current Playling").replace("ᴛɪᴛʟᴇ", "Title").replace("ᴅᴜʀᴀᴛɪᴏɴ", "Duration").replace("ʙʏ", "By")
+            msg = (
+                msg.replace("🏷", "")
+                .replace("ᴄᴜʀʀᴇɴᴛ ᴘʟᴀʏɪɴɢ", "Current Playling")
+                .replace("ᴛɪᴛʟᴇ", "Title")
+                .replace("ᴅᴜʀᴀᴛɪᴏɴ", "Duration")
+                .replace("ʙʏ", "By")
+            )
 
         link = await Yukkibin(msg)
         await CallbackQuery.edit_message_text(
