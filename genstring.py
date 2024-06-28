@@ -21,10 +21,10 @@ i = c("yukkistring", in_memory=True, api_id=API_ID, api_hash=API_HASH)
 async def main():
     await i.start()
     ss = await i.export_session_string()
-    xx = f"HERE IS YOUR STRING SESSION, COPY IT, DON'T SHARE!!\n\n`{ss}`\n\n STRING GENERATED"
     print("\nHERE IS YOUR STRING SESSION, COPY IT, DON'T SHARE!!\n")
     print(f"\n{ss}\n")
     print("\n STRING GENERATED\n")
+    xx = f"HERE IS YOUR STRING SESSION, COPY IT, DON'T SHARE!!\n\n`{ss}`\n\n STRING GENERATED"
     try:
         await i.send_message("me", xx)
     except BaseException:
