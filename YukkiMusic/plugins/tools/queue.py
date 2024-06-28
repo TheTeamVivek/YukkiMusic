@@ -194,14 +194,17 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
         if len(msg) < 700:
             await asyncio.sleep(1)
             return await CallbackQuery.edit_message_text(msg, reply_markup=buttons)
+
         if "🏷" in msg:
-            msg = (
-                msg.replace("🏷", "")
-                .replace("ᴄᴜʀʀᴇɴᴛ ᴘʟᴀʏɪɴɢ", "Current Playling")
-                .replace("ᴛɪᴛʟᴇ", "Title")
-                .replace("ᴅᴜʀᴀᴛɪᴏɴ", "Duration")
-                .replace("ʙʏ", "By")
-            )
+            msg = msg.replace("🏷", "")
+        if "ᴄᴜʀʀᴇɴᴛ ᴘʟᴀʏɪɴɢ" in msg:
+            msg = msg.replace("ᴄᴜʀʀᴇɴᴛ ᴘʟᴀʏɪɴɢ", "Current Playling")
+        if "ᴛɪᴛʟᴇ" in msg:
+            msg = msg.replace("ᴛɪᴛʟᴇ", "Title")
+        if "ᴅᴜʀᴀᴛɪᴏɴ" in msg:
+            msg = msg.replace("ᴅᴜʀᴀᴛɪᴏɴ", "Duration")
+        if "ʙʏ" in msg:
+            msg = msg.replace("ʙʏ", "By")
 
         link = await Yukkibin(msg)
         await CallbackQuery.edit_message_text(
@@ -210,13 +213,16 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
     else:
         if len(msg) > 700:
             if "🏷" in msg:
-                msg = (
-                    msg.replace("🏷", "")
-                    .replace("ᴄᴜʀʀᴇɴᴛ ᴘʟᴀʏɪɴɢ", "Current Playling")
-                    .replace("ᴛɪᴛʟᴇ", "Title")
-                    .replace("ᴅᴜʀᴀᴛɪᴏɴ", "Duration")
-                    .replace("ʙʏ", "By")
-                )
+                msg = msg.replace("🏷", "")
+            if "ᴄᴜʀʀᴇɴᴛ ᴘʟᴀʏɪɴɢ" in msg:
+                msg = msg.replace("ᴄᴜʀʀᴇɴᴛ ᴘʟᴀʏɪɴɢ", "Current Playling")
+            if "ᴛɪᴛʟᴇ" in msg:
+                msg = msg.replace("ᴛɪᴛʟᴇ", "Title")
+            if "ᴅᴜʀᴀᴛɪᴏɴ" in msg:
+                msg = msg.replace("ᴅᴜʀᴀᴛɪᴏɴ", "Duration")
+            if "ʙʏ" in msg:
+                msg = msg.replace("ʙʏ", "By")
+
             link = await Yukkibin(msg)
             await asyncio.sleep(1)
             return await CallbackQuery.edit_message_text(
