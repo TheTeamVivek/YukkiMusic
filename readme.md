@@ -29,7 +29,7 @@
 
 
 # Yukki Music Configs
- [Checkout This Readme For Config Vars](https://github.com/TheTeamVivek/YukkiMusic/blob/master/config/README.md)
+ [Checkout Here For Config Vars](https://github.com/TheTeamVivek/YukkiMusic/blob/master/config/README.md)
 # 🏷 Support / Assistance
 
 Reach out to the maintainer at one of the following places:
