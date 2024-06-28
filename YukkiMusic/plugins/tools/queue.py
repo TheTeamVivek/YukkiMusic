@@ -209,6 +209,14 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
         )
     else:
         if len(msg) > 700:
+            if "🏷" in msg:
+                msg = (
+                    msg.replace("🏷", "")
+                    .replace("ᴄᴜʀʀᴇɴᴛ ᴘʟᴀʏɪɴɢ", "Current Playling")
+                    .replace("ᴛɪᴛʟᴇ", "Title")
+                    .replace("ᴅᴜʀᴀᴛɪᴏɴ", "Duration")
+                    .replace("ʙʏ", "By")
+                )
             link = await Yukkibin(msg)
             await asyncio.sleep(1)
             return await CallbackQuery.edit_message_text(
