@@ -237,7 +237,7 @@ class YouTubeAPI:
         thumbnail = result[query_type]["thumbnails"][0]["url"].split("?")[0]
         return title, duration_min, thumbnail, vidid
 
-    '''async def download(
+    """async def download(
         self,
         link: str,
         mystic,
@@ -354,7 +354,7 @@ class YouTubeAPI:
         else:
             direct = True
             downloaded_file = await loop.run_in_executor(None, audio_dl)
-        return downloaded_file, direct'''
+        return downloaded_file, direct"""
 
     async def download(
         self,
@@ -480,4 +480,3 @@ class YouTubeAPI:
             direct = True
             downloaded_file = await loop.run_in_executor(None, audio_dl)
         return downloaded_file, direct
-
