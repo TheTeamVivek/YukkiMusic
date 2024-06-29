@@ -7,13 +7,13 @@
 #
 # All rights reserved.
 
-from config import LOG_GROUP_ID
+from config import LOG_GROUP_ID, LOG
 from YukkiMusic import app
 from YukkiMusic.utils.database import is_on_off
 
 
 async def play_logs(message, streamtype):
-    if await is_on_off(2):
+    if await is_on_off(LOG):
         if message.chat.username:
             chatusername = f"@{message.chat.username}"
         else:
