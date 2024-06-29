@@ -11,14 +11,16 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from config import LOG_GROUP_ID
+from config import LOG_GROUP_ID, LOG
 from YukkiMusic import app
-from YukkiMusic.utils.database import delete_served_chat, get_assistant
+from YukkiMusic.utils.database import delete_served_chat, get_assistant, is_on_off
 
 
 @app.on_message(filters.new_chat_members)
 async def join_watcher(_, message):
     try:
+        if not await is_on_off(LOG):
+            return
         userbot = await get_assistant(message.chat.id)
         chat = message.chat
         for members in message.new_chat_members:
@@ -57,6 +59,8 @@ async def join_watcher(_, message):
 @app.on_message(filters.left_chat_member)
 async def on_left_chat_member(_, message: Message):
     try:
+        if not await is_on_off(LOG):
+            return
         userbot = await get_assistant(message.chat.id)
 
         left_chat_member = message.left_chat_member
