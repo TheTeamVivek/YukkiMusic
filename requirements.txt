@@ -7,7 +7,7 @@ ffmpeg-python
 gitpython
 hachoir
 heroku3
-#lyricsgenius
+lyricsgenius
 motor
 pillow==9.5.0
 psutil
@@ -23,7 +23,7 @@ spotipy
 tgcrypto
 urllib3
 git+https://github.com/KurimuzonAkuma/pyrogram@dev
-yt-dlp==2024.4.9
+yt-dlp==2024.5.26
 #git+https://github.com/yt-dlp/yt-dlp
 git+https://github.com/alexmercerind/youtube-search-python@main
 git+https://github.com/joetats/youtube_search@master
