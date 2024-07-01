@@ -16,6 +16,7 @@ from ntgcalls import __version__ as ngtgver
 from pyrogram import __version__ as pyrover
 from pyrogram import filters
 from pyrogram.errors import MessageIdInvalid
+from pyrogram.errors import FloodWait
 from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
 from pytgcalls.__version__ import __version__ as pytgver
 
@@ -113,12 +114,15 @@ async def gstats_global(client, message: Message, _):
     title = title.title()
     final = f"ᴛᴏᴘ ᴍᴏsᴛ ᴘʟᴀʏᴇᴅ ᴛʀᴀᴄᴋ's ᴏɴ ʙᴏᴛ {app.mention}\n\n**ᴛɪᴛʟᴇ:** {title}\n\nᴘʟᴀʏᴇᴅ** {co} **ᴛɪᴍᴇs"
     upl = get_stats_markup(_, True if message.from_user.id in SUDOERS else False)
-    await app.send_photo(
-        message.chat.id,
-        photo=thumbnail,
-        caption=final,
-        reply_markup=upl,
-    )
+    try:
+        await app.send_photo(
+            message.chat.id,
+            photo=thumbnail,
+            caption=final,
+            reply_markup=upl,
+        )
+    except FloodWait as e:
+        asyncio.sleep(e.value)
     await mystic.delete()
 
 
