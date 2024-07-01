@@ -39,6 +39,7 @@ CLEANMODE_DELETE_MINS = int(
 
 
 # Custom max audio(music) duration for voice chat. set DURATION_LIMIT in variables with your own time(mins), Default to 60 mins.
+
 DURATION_LIMIT_MIN = int(
     getenv("DURATION_LIMIT", "50000")
 )  # Remember to give value in Minutes
@@ -46,7 +47,7 @@ DURATION_LIMIT_MIN = int(
 
 EXTRA_PLUGINS = getenv(
     "EXTRA_PLUGINS",
-    "True",
+    "False",
 )
 
 # Fill True if you want to load extra plugins
@@ -111,11 +112,11 @@ SUPPORT_GROUP = getenv(
 
 
 # Set it in True if you want to leave your assistant after a certain amount of time. [Set time via AUTO_LEAVE_ASSISTANT_TIME]
-AUTO_LEAVING_ASSISTANT = getenv("AUTO_LEAVING_ASSISTANT", False)
+AUTO_LEAVING_ASSISTANT = getenv("AUTO_LEAVING_ASSISTANT", True)
 
 # Time after which you're assistant account will leave chats automatically.
 AUTO_LEAVE_ASSISTANT_TIME = int(
-    getenv("ASSISTANT_LEAVE_TIME", "50000")
+    getenv("ASSISTANT_LEAVE_TIME", "60")
 )  # Remember to give value in Seconds
 
 
@@ -142,7 +143,7 @@ SPOTIFY_CLIENT_SECRET = getenv(
 
 
 # Maximum number of video calls allowed on bot. You can later set it via /set_video_limit on telegram
-VIDEO_STREAM_LIMIT = int(getenv("VIDEO_STREAM_LIMIT", "5"))
+VIDEO_STREAM_LIMIT = int(getenv("VIDEO_STREAM_LIMIT", "999"))
 
 
 # Maximum Limit Allowed for users to save playlists on bot's server
@@ -192,7 +193,6 @@ YTDOWNLOADER = 1
 LOG = 2
 LOG_FILE_NAME = "Yukkilogs.txt"
 TEMP_DB_FOLDER = "tempdb"
-# this is for storing some datas as json files in this folder
 adminlist = {}
 lyrical = {}
 chatstats = {}
