@@ -9,34 +9,66 @@
 #
 
 import asyncio
+from datetime import datetime, timedelta
 
 from pyrogram import filters
 from pyrogram.enums import ChatMembersFilter
 from pyrogram.errors import FloodWait
+from pyrogram.raw import types
 
 import config
 from config import adminlist, chatstats, clean, userstats
 from strings import get_command
-from YukkiMusic import app
-from YukkiMusic.utils.database import (
-    get_active_chats,
-    get_authuser_names,
-    get_client,
-    get_particular_top,
-    get_served_chats,
-    get_served_users,
-    get_user_top,
-    update_particular_top,
-    update_user_top,
-)
+from YukkiMusic import app, userbot
+from YukkiMusic.misc import SUDOERS
+from YukkiMusic.utils.database import (get_active_chats,
+                                       get_authuser_names, get_client,
+                                       get_particular_top,
+                                       get_served_chats,
+                                       get_served_users, get_user_top,
+                                       is_cleanmode_on, set_queries,
+                                       update_particular_top,
+                                       update_user_top)
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.formatters import alpha_to_int
 
 BROADCAST_COMMAND = get_command("BROADCAST_COMMAND")
+AUTO_DELETE = config.CLEANMODE_DELETE_MINS
+AUTO_SLEEP = 5
 IS_BROADCASTING = False
+cleanmode_group = 15
 
 
-@app.on_message(filters.command(BROADCAST_COMMAND) & filters.user(config.OWNER_ID))
+@app.on_raw_update(group=cleanmode_group)
+async def clean_mode(client, update, users, chats):
+    global IS_BROADCASTING
+    if IS_BROADCASTING:
+        return
+    try:
+        if not isinstance(update, types.UpdateReadChannelOutbox):
+            return
+    except:
+        return
+    if users:
+        return
+    if chats:
+        return
+    message_id = update.max_id
+    chat_id = int(f"-100{update.channel_id}")
+    if not await is_cleanmode_on(chat_id):
+        return
+    if chat_id not in clean:
+        clean[chat_id] = []
+    time_now = datetime.now()
+    put = {
+        "msg_id": message_id,
+        "timer_after": time_now + timedelta(minutes=AUTO_DELETE),
+    }
+    clean[chat_id].append(put)
+    await set_queries(1)
+
+
+@app.on_message(filters.command(BROADCAST_COMMAND) & SUDOERS)
 @language
 async def braodcast_message(client, message, _):
     global IS_BROADCASTING
@@ -144,10 +176,10 @@ async def braodcast_message(client, message, _):
                 if dialog.chat.id == config.LOG_GROUP_ID:
                     continue
                 try:
-                    (
-                        await client.forward_messages(dialog.chat.id, y, x)
-                        if message.reply_to_message
-                        else await client.send_message(dialog.chat.id, text=query)
+                    await client.forward_messages(
+                        dialog.chat.id, y, x
+                    ) if message.reply_to_message else await client.send_message(
+                        dialog.chat.id, text=query
                     )
                     sent += 1
                 except FloodWait as e:
@@ -167,7 +199,7 @@ async def braodcast_message(client, message, _):
 
 
 async def auto_clean():
-    while not await asyncio.sleep(10):
+    while not await asyncio.sleep(AUTO_SLEEP):
         try:
             for chat_id in chatstats:
                 for dic in chatstats[chat_id]:
@@ -179,11 +211,15 @@ async def auto_clean():
                         spot = spot["spot"]
                         next_spot = spot + 1
                         new_spot = {"spot": next_spot, "title": title}
-                        await update_particular_top(chat_id, vidid, new_spot)
+                        await update_particular_top(
+                            chat_id, vidid, new_spot
+                        )
                     else:
                         next_spot = 1
                         new_spot = {"spot": next_spot, "title": title}
-                        await update_particular_top(chat_id, vidid, new_spot)
+                        await update_particular_top(
+                            chat_id, vidid, new_spot
+                        )
             for user_id in userstats:
                 for dic in userstats[user_id]:
                     vidid = dic["vidid"]
@@ -194,11 +230,15 @@ async def auto_clean():
                         spot = spot["spot"]
                         next_spot = spot + 1
                         new_spot = {"spot": next_spot, "title": title}
-                        await update_user_top(user_id, vidid, new_spot)
+                        await update_user_top(
+                            user_id, vidid, new_spot
+                        )
                     else:
                         next_spot = 1
                         new_spot = {"spot": next_spot, "title": title}
-                        await update_user_top(user_id, vidid, new_spot)
+                        await update_user_top(
+                            user_id, vidid, new_spot
+                        )
         except:
             continue
         try:
@@ -208,7 +248,9 @@ async def auto_clean():
                 for x in clean[chat_id]:
                     if datetime.now() > x["timer_after"]:
                         try:
-                            await app.delete_messages(chat_id, x["msg_id"])
+                            await app.delete_messages(
+                                chat_id, x["msg_id"]
+                            )
                         except FloodWait as e:
                             await asyncio.sleep(e.value)
                         except:
@@ -222,8 +264,11 @@ async def auto_clean():
             for chat_id in served_chats:
                 if chat_id not in adminlist:
                     adminlist[chat_id] = []
-                    admins = app.get_chat_members(
-                        chat_id, filter=ChatMembersFilter.ADMINISTRATORS
+                    admins = (
+                        app.get_chat_members(
+                            chat_id, 
+                            filter=ChatMembersFilter.ADMINISTRATORS
+                        )
                     )
                     async for user in admins:
                         if user.privileges.can_manage_video_chats:
@@ -237,20 +282,3 @@ async def auto_clean():
 
 
 asyncio.create_task(auto_clean())
-
-
-__MODULE__ = "G-ᴄᴀsᴛ"
-__HELP__ = """🍒 **<u>ʙʀᴏᴀᴅᴄᴀsᴛ ғᴇᴀᴛᴜʀᴇ</u>** [ᴏɴʟʏ ғᴏʀ sᴜᴅᴏᴇʀs] :
-
-/broadcast [ᴍᴇssᴀɢᴇ ᴏʀ ʀᴇᴩʟʏ ᴛᴏ ᴀ ᴍᴇssᴀɢᴇ] » ʙʀᴏᴀᴅᴄᴀsᴛ ᴀ ᴍᴇssᴀɢᴇ ᴛᴏ sᴇʀᴠᴇᴅ ᴄʜᴀᴛs ᴏғ ᴛʜᴇ ʙᴏᴛ.
-
-<u>ʙʀᴏᴀᴅᴄᴀsᴛɪɴɢ ᴍᴏᴅᴇs:</u>
-**-pin** » ᴩɪɴs ʏᴏᴜʀ ʙʀᴏᴀᴅᴄᴀsᴛᴇᴅ ᴍᴇssᴀɢᴇs ɪɴ sᴇʀᴠᴇᴅ ᴄʜᴀᴛs.
-**-pinloud** » ᴩɪɴs ʏᴏᴜʀ ʙʀᴏᴀᴅᴄᴀsᴛᴇᴅ ᴍᴇssᴀɢᴇ ɪɴ sᴇʀᴠᴇᴅ ᴄʜᴀᴛs ᴀɴᴅ sᴇɴᴅ ɴᴏᴛɪғɪᴄᴀᴛɪᴏɴ ᴛᴏ ᴛʜᴇ ᴍᴇᴍʙᴇʀs.
-**-user** » ʙʀᴏᴀᴅᴄᴀsᴛs ᴛʜᴇ ᴍᴇssᴀɢᴇ ᴛᴏ ᴛʜᴇ ᴜsᴇʀs ᴡʜᴏ ʜᴀᴠᴇ sᴛᴀʀᴛᴇᴅ ʏᴏᴜʀ ʙᴏᴛ.
-**-assistant** » ʙʀᴏᴀᴅᴄᴀsᴛ ʏᴏᴜʀ ᴍᴇssᴀɢᴇ ғʀᴏᴍ ᴛʜᴇ ᴀssɪᴛᴀɴᴛ ᴀᴄᴄᴏᴜɴᴛ ᴏғ ᴛʜᴇ ʙᴏᴛ.
-**-nobot** » ғᴏʀᴄᴇs ᴛʜᴇ ʙᴏᴛ ᴛᴏ ɴᴏᴛ ʙʀᴏᴀᴅᴄᴀsᴛ ᴛʜᴇ ᴍᴇssᴀɢᴇ..
-
-> **ᴇxᴀᴍᴩʟᴇ:** `/broadcast -user -assistant -pin ᴛᴇsᴛɪɴɢ ʙʀᴏᴀᴅᴄᴀsᴛ`
-
-"""
