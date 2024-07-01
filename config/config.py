@@ -204,19 +204,11 @@ autoclean = []
 
 # Images
 
-
-PHOTO = list(
-    filter(
-        None,
-        getenv("PHOTO_LINKS", "").split(),
-    )
-)
-
-
 START_IMG_URL = getenv(
     "START_IMG_URL",
     "https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg",
 )
+
 PING_IMG_URL = getenv(
     "PING_IMG_URL",
     "https://telegra.ph/file/91533956c91d0fd7c9f20.jpg",
