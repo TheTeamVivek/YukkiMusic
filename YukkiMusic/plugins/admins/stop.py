@@ -56,14 +56,14 @@ async def stop_music(cli, message: Message):
             await message.delete()
         except:
             pass
-        try:
-            language = await get_lang(message.chat.id)
-            _ = get_string(language)
-        except:
-            _ = get_string("en")
+    try:
+        language = await get_lang(message.chat.id)
+        _ = get_string(language)
+    except:
+        _ = get_string("en")
 
-        if message.sender_chat:
-            upl = InlineKeyboardMarkup(
+    if message.sender_chat:
+        upl = InlineKeyboardMarkup(
                 [
                     [
                         InlineKeyboardButton(
@@ -73,29 +73,29 @@ async def stop_music(cli, message: Message):
                     ]
                 ]
             )
-            return await message.reply_text(_["general_4"], reply_markup=upl)
+        return await message.reply_text(_["general_4"], reply_markup=upl)
 
-        if message.command[0][0] == "c":
-            chat_id = await get_cmode(message.chat.id)
-            if chat_id is None:
-                return await message.reply_text(_["setting_12"])
-            try:
-                await app.get_chat(chat_id)
-            except:
-                return await message.reply_text(_["cplay_4"])
-        else:
-            chat_id = message.chat.id
-        if not await is_active_chat(chat_id):
-            return await message.reply_text(_["general_6"])
-        is_non_admin = await is_nonadmin_chat(message.chat.id)
-        if not is_non_admin:
-            if message.from_user.id not in SUDOERS:
-                admins = adminlist.get(message.chat.id)
-                if not admins:
-                    return await message.reply_text(_["admin_18"])
-                else:
-                    if message.from_user.id not in admins:
-                        return await message.reply_text(_["admin_19"])
+    if message.command[0][0] == "c":
+        chat_id = await get_cmode(message.chat.id)
+        if chat_id is None:
+            return await message.reply_text(_["setting_12"])
+        try:
+             await app.get_chat(chat_id)
+        except:
+            return await message.reply_text(_["cplay_4"])
+    else:
+        chat_id = message.chat.id
+    if not await is_active_chat(chat_id):
+        return await message.reply_text(_["general_6"])
+    is_non_admin = await is_nonadmin_chat(message.chat.id)
+    if not is_non_admin:
+        if message.from_user.id not in SUDOERS:
+            admins = adminlist.get(message.chat.id)
+            if not admins:
+                return await message.reply_text(_["admin_18"])
+            else:
+                if message.from_user.id not in admins:
+                    return await message.reply_text(_["admin_19"])
     await Yukki.stop_stream(chat_id)
     await set_loop(chat_id, 0)
     await message.reply_text(_["admin_9"].format(message.from_user.mention))
