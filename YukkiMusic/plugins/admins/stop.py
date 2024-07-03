@@ -64,15 +64,15 @@ async def stop_music(cli, message: Message):
 
     if message.sender_chat:
         upl = InlineKeyboardMarkup(
+            [
                 [
-                    [
-                        InlineKeyboardButton(
-                            text="How to Fix this? ",
-                            callback_data="AnonymousAdmin",
-                        ),
-                    ]
+                    InlineKeyboardButton(
+                        text="How to Fix this? ",
+                        callback_data="AnonymousAdmin",
+                    ),
                 ]
-            )
+            ]
+        )
         return await message.reply_text(_["general_4"], reply_markup=upl)
 
     if message.command[0][0] == "c":
@@ -80,7 +80,7 @@ async def stop_music(cli, message: Message):
         if chat_id is None:
             return await message.reply_text(_["setting_12"])
         try:
-             await app.get_chat(chat_id)
+            await app.get_chat(chat_id)
         except:
             return await message.reply_text(_["cplay_4"])
     else:
