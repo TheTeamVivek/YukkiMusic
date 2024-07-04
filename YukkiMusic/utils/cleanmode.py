@@ -11,4 +11,4 @@ async def protect_message(chat_id, message_id):
 
 async def send_message(chat_id, text):
     message = await app.send_message(chat_id, text)
-    await protect_message(chat_id, message.message_id)
+    await protect_message(chat_id, message.id)
