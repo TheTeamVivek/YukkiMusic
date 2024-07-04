@@ -15,6 +15,7 @@ from YukkiMusic.core.git import git
 from YukkiMusic.core.userbot import Userbot
 from YukkiMusic.misc import dbb, heroku, sudo
 from .logging import LOGGER
+from YukkiMusic.plugins.misc.cleanmode import send_message
 
 # Directories
 dirr()
