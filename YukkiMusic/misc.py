@@ -16,7 +16,7 @@ from pyrogram import filters
 
 import config
 from YukkiMusic.core.mongo import pymongodb
-
+from YukkiMusic import app
 from .logging import LOGGER
 
 SUDOERS = filters.user()
