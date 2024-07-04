@@ -16,6 +16,8 @@ from pyrogram import filters
 
 import config
 from YukkiMusic.core.mongo import pymongodb
+from YukkiMusic.core.bot import YukkiBot
+
 from .logging import LOGGER
 
 SUDOERS = filters.user()
@@ -100,5 +102,5 @@ async def protect_message(chat_id, message_id):
 
 
 async def send_message(chat_id, text):
-    message = await app.send_message(chat_id, text)
+    message = await YukkiBot().send_message(chat_id, text)
     await protect_message(chat_id, message.message_id)
