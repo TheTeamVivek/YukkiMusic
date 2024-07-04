@@ -7,7 +7,6 @@
 #
 # All rights reserved.
 
-
 import logging
 from functools import wraps
 from traceback import format_exc as err
@@ -62,12 +61,18 @@ async def authorised(func, subFunc2, client, message, *args, **kwargs):
     return subFunc2
 
 
-async def unauthorised(message: Message, permission, subFunc2):
+async def unauthorised(message: Message, permission, subFunc2, bot_lacking_permission=False):
     chatID = message.chat.id
-    text = (
-        "You don't have the required permission to perform this action."
-        + f"\n**Permission:** __{permission}__"
-    )
+    if bot_lacking_permission:
+        text = (
+            "I don't have the required permission to perform this action."
+            + f"\n**Permission:** __{permission}__"
+        )
+    else:
+        text = (
+            "You don't have the required permission to perform this action."
+            + f"\n**Permission:** __{permission}__"
+        )
     try:
         await message.reply_text(text)
     except ChatWriteForbidden:
@@ -90,7 +95,7 @@ def adminsOnly(permission):
             # Check if the bot has the required permission
             bot_perms = await bot_permissions(chatID)
             if permission not in bot_perms:
-                return await unauthorised(message, permission, subFunc2)
+                return await unauthorised(message, permission, subFunc2, bot_lacking_permission=True)
 
             if not message.from_user:
                 # For anonymous admins
