@@ -10,7 +10,21 @@
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from YukkiMusic import app
+from config import SUPPORT_GROUP
 
+
+def support_group_markup(_):
+    upl = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    text=_["S_B_3"],
+                    url=SUPPORT_GROUP,
+                ),
+            ]
+        ]
+    )
+    return upl
 
 def help_back_markup(_):
     upl = InlineKeyboardMarkup(
