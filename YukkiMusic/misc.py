@@ -20,6 +20,7 @@ from YukkiMusic.core.mongo import pymongodb
 from .logging import LOGGER
 
 SUDOERS = filters.user()
+protected_messages = {}
 
 HAPP = None
 _boot_ = time.time()
@@ -91,3 +92,13 @@ def heroku():
                 LOGGER(__name__).warning(
                     f"Please make sure your Heroku API Key and Your App name are configured correctly in the heroku."
                 )
+
+async def protect_message(chat_id, message_id):
+    if chat_id not in protected_messages:
+        protected_messages[chat_id] = []
+    protected_messages[chat_id].append(message_id)
+
+
+async def send_message(chat_id, text):
+    message = await app.send_message(chat_id, text)
+    await protect_message(chat_id, message.message_id)
