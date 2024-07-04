@@ -61,7 +61,9 @@ async def authorised(func, subFunc2, client, message, *args, **kwargs):
     return subFunc2
 
 
-async def unauthorised(message: Message, permission, subFunc2, bot_lacking_permission=False):
+async def unauthorised(
+    message: Message, permission, subFunc2, bot_lacking_permission=False
+):
     chatID = message.chat.id
     if bot_lacking_permission:
         text = (
@@ -95,7 +97,9 @@ def adminsOnly(permission):
             # Check if the bot has the required permission
             bot_perms = await bot_permissions(chatID)
             if permission not in bot_perms:
-                return await unauthorised(message, permission, subFunc2, bot_lacking_permission=True)
+                return await unauthorised(
+                    message, permission, subFunc2, bot_lacking_permission=True
+                )
 
             if not message.from_user:
                 # For anonymous admins
