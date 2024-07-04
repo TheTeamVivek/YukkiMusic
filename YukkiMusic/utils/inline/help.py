@@ -26,6 +26,7 @@ def support_group_markup(_):
     )
     return upl
 
+
 def help_back_markup(_):
     upl = InlineKeyboardMarkup(
         [
