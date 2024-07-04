@@ -1,4 +1,5 @@
 from YukkiMusic import app
+
 protected_messages = {}
 
 
