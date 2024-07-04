@@ -7,6 +7,7 @@
 #
 # All rights reserved.
 
+
 import logging
 from functools import wraps
 from traceback import format_exc as err
@@ -74,11 +75,23 @@ async def unauthorised(message: Message, permission, subFunc2):
     return subFunc2
 
 
+async def bot_permissions(chat_id: int):
+    perms = []
+    bot_id = (await app.get_me()).id
+    return await member_permissions(chat_id, bot_id)
+
+
 def adminsOnly(permission):
     def subFunc(func):
         @wraps(func)
         async def subFunc2(client, message: Message, *args, **kwargs):
             chatID = message.chat.id
+
+            # Check if the bot has the required permission
+            bot_perms = await bot_permissions(chatID)
+            if permission not in bot_perms:
+                return await unauthorised(message, permission, subFunc2)
+
             if not message.from_user:
                 # For anonymous admins
                 if message.sender_chat and message.sender_chat.id == message.chat.id:
@@ -91,6 +104,7 @@ def adminsOnly(permission):
                         **kwargs,
                     )
                 return await unauthorised(message, permission, subFunc2)
+
             # For admins and sudo users
             userID = message.from_user.id
             permissions = await member_permissions(chatID, userID)
