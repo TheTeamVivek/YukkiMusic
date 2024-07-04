@@ -93,6 +93,7 @@ def heroku():
                     f"Please make sure your Heroku API Key and Your App name are configured correctly in the heroku."
                 )
 
+
 async def protect_message(chat_id, message_id):
     if chat_id not in protected_messages:
         protected_messages[chat_id] = []
