@@ -55,6 +55,7 @@ async def send_message(chat_id, text):
     message = await app.send_message(chat_id, text)
     await protect_message(chat_id, message.message_id)
 
+
 @app.on_raw_update(group=cleanmode_group)
 async def clean_mode(client, update, users, chats):
     global IS_BROADCASTING
@@ -213,6 +214,7 @@ async def braodcast_message(client, message, _):
             pass
     IS_BROADCASTING = False
 
+
 async def auto_clean():
     while not await asyncio.sleep(AUTO_SLEEP):
         try:
@@ -255,7 +257,10 @@ async def auto_clean():
                 for x in clean[chat_id]:
                     if datetime.now() > x["timer_after"]:
                         # Skip deletion if the message is protected
-                        if chat_id in protected_messages and x["msg_id"] in protected_messages[chat_id]:
+                        if (
+                            chat_id in protected_messages
+                            and x["msg_id"] in protected_messages[chat_id]
+                        ):
                             continue
                         try:
                             await app.delete_messages(chat_id, x["msg_id"])
