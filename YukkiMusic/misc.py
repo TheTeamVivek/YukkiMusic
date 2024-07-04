@@ -16,12 +16,11 @@ from pyrogram import filters
 
 import config
 from YukkiMusic.core.mongo import pymongodb
-from YukkiMusic.core.bot import YukkiBot
 
 from .logging import LOGGER
 
 SUDOERS = filters.user()
-protected_messages = {}
+
 
 HAPP = None
 _boot_ = time.time()
@@ -95,12 +94,3 @@ def heroku():
                 )
 
 
-async def protect_message(chat_id, message_id):
-    if chat_id not in protected_messages:
-        protected_messages[chat_id] = []
-    protected_messages[chat_id].append(message_id)
-
-
-async def send_message(chat_id, text):
-    message = await YukkiBot().send_message(chat_id, text)
-    await protect_message(chat_id, message.message_id)
