@@ -36,25 +36,13 @@ from YukkiMusic.utils.database import (
 )
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.formatters import alpha_to_int
+from YukkiMusic.misc import protected_messages
 
 BROADCAST_COMMAND = get_command("BROADCAST_COMMAND")
 AUTO_DELETE = config.CLEANMODE_DELETE_MINS
 AUTO_SLEEP = 5
 IS_BROADCASTING = False
 cleanmode_group = 15
-protected_messages = {}
-
-
-async def protect_message(chat_id, message_id):
-    if chat_id not in protected_messages:
-        protected_messages[chat_id] = []
-    protected_messages[chat_id].append(message_id)
-
-
-async def send_message(chat_id, text):
-    message = await app.send_message(chat_id, text)
-    await protect_message(chat_id, message.message_id)
-
 
 @app.on_raw_update(group=cleanmode_group)
 async def clean_mode(client, update, users, chats):
