@@ -36,7 +36,7 @@ Reach out to the maintainer at one of the following places:
 
 - [GitHub Issues](https://github.com/TheTeamVivek/YukkiMusic/issues/new?assignees=&labels=question&template=SUPPORT_QUESTION.md&title=support%3A+)
 - Contact  [Telegram profile](https://t.me/vivekkumar07089)
-- [Telegram Support](https://t.me/vk_zone)
+- [Telegram Support](https://t.me/TheTeamVk)
 
 If you want to say **thank you** or/and support active development of YukkiMusicBot:
 
@@ -49,7 +49,7 @@ Together, we can make **YukkiMusicBot** better!
 # 📑 Acknowledgement / Credits
 
 <h3 align="center">
-    ─「 ᴄʀᴇᴅɪᴛs 」─
+    ─「 Credits 」─
 </h3>
 
 <p align="center">
@@ -61,5 +61,5 @@ Together, we can make **YukkiMusicBot** better!
 <a href="https://github.com/Pranav-Saraswat"> <img src="https://img.shields.io/badge/PranavSaraswat-black?style=for-the-badge&logo=github" alt="PranavSaraswat" /> </a>
 </p>
 
-- <b> _sᴩᴇᴄɪᴀʟ ᴛʜᴀɴᴋs ᴛᴏ [ᴛᴇᴀᴍ ʏᴜᴋᴋɪ](https://github.com/TeamYukki) ғᴏʀ [ʏᴜᴋᴋɪ ᴍᴜsɪᴄ ʙᴏᴛ](https://github.com/TeamYukki/YukkiMusicBot)_ </b>
+- <b> _Special Thanks To [Team Yukki](https://github.com/TeamYukki) ғᴏʀ [YukkiMusicBot](https://github.com/TeamYukki/YukkiMusicBot)_ </b>
 
