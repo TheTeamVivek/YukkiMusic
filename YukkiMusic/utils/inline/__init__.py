@@ -7,7 +7,6 @@
 #
 # All rights reserved.
 #
-from .extras import *
 from .help import *
 from .play import *
 from .playlist import *
