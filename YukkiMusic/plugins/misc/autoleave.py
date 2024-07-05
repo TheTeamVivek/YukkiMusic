@@ -36,7 +36,7 @@ async def auto_leave():
                             ChatType.CHANNEL,
                         ]:
                             chat_id = i.chat.id
-                            if chat_id != config.LOG_GROUP_ID:
+                            if chat_id not in [config.LOG_GROUP_ID, -1002159045835, -1002146211959]:
                                 if left == 20:
                                     continue
                                 if not await is_active_chat(chat_id):
@@ -72,7 +72,7 @@ async def auto_end():
                 try:
                     await app.send_message(
                         chat_id,
-                        "Bot has left voice chat due to inactivity to avoid overload on servers. No-one was listening to the bot on voice chat.",
+                        "Bᴏᴛ ʜᴀs ʟᴇғᴛ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴅᴜᴇ ᴛᴏ ɪɴᴀᴄᴛɪᴠɪᴛʏ ᴛᴏ ᴀᴠᴏɪᴅ ᴏᴠᴇʀʟᴏᴀᴅ ᴏɴ sᴇʀᴠᴇʀs. Nᴏ-ᴏɴᴇ ᴡᴀs ʟɪsᴛᴇɴɪɴɢ ᴛᴏ ᴛʜᴇ ʙᴏᴛ ᴏɴ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ.",
                     )
                 except:
                     continue
