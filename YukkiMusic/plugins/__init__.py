@@ -82,7 +82,7 @@ def __list_all_modules():
     work_dirs = [main_repo_plugins_dir]
 
     if extra_plugins_enabled:
-        logger.info(f"loading extra plugins from {EXTRA_PLUGINS_REPO}")
+        logger.info("Loading Extra Plugins")
         work_dirs.append(join(EXTERNAL_REPO_PATH, "plugins"))
 
     all_modules = []
