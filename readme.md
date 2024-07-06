@@ -44,7 +44,7 @@ If you want to say **thank you** or/and support active development of YukkiMusic
 - Fork the [Repo](https://github.com/TheTeamVivek/YukkiMusic) :)
 - Write interesting articles about the project on [Dev.to](https://dev.to/), [Medium](https://medium.com/) or your personal blog.
 
-Together, we can make **YukkiMusicBot** better!
+Together, we can make **YukkiMusic** better!
 
 # 📑 Acknowledgement / Credits
 
