@@ -29,13 +29,13 @@ answer.extend(
             title="ᴍᴜᴛᴇ sᴛʀᴇᴀᴍ",
             description=f"ᴍᴜᴛᴇ ᴛʜᴇ ᴏɴɢᴏɪɴɢ sᴏɴɢ ᴏɴ ᴠᴏɪᴄᴇᴄʜᴀᴛ",
             thumb_url="https://telegra.ph/file/66516f2976cb6d87e20f9.png",
-            input_message_content=InputTextMessageContent("/mute"),
+            input_message_content=InputTextMessageContent("/vcmute"),
         ),
         InlineQueryResultArticle(
             title="ᴜɴᴍᴜᴛᴇ sᴛʀᴇᴀᴍ",
             description=f"ᴜɴᴍᴜᴛᴇ ᴛʜᴇ ᴏɴɢᴏɪɴɢ sᴏɴɢ ᴏɴ ᴠᴏɪᴄᴇᴄʜᴀᴛ",
             thumb_url="https://telegra.ph/file/3078794f9341ffd582e18.png",
-            input_message_content=InputTextMessageContent("/unmute"),
+            input_message_content=InputTextMessageContent("/vcunmute"),
         ),
         InlineQueryResultArticle(
             title="sᴋɪᴘ sᴛʀᴇᴀᴍ",
