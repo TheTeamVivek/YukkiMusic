@@ -17,6 +17,7 @@ from pyrogram.errors import (
     ChatAdminRequired,
     UserAlreadyParticipant,
     UserNotParticipant,
+    FloodWait,
 )
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls
@@ -609,17 +610,20 @@ class Call(PyTgCalls):
                 else:
                     img = await gen_thumb(videoid)
                     button = stream_markup(_, videoid, chat_id)
-                    run = await app.send_photo(
-                        original_chat_id,
-                        photo=img,
+                    try:
+                        run = await app.send_photo(
+                            original_chat_id,
+                            photo=img,
                         caption=_["stream_1"].format(
-                            title[:27],
-                            f"https://t.me/{app.username}?start=info_{videoid}",
-                            check[0]["dur"],
-                            user,
-                        ),
-                        reply_markup=InlineKeyboardMarkup(button),
-                    )
+                                title[:27],
+                                f"https://t.me/{app.username}?start=info_{videoid}",
+                                check[0]["dur"],
+                                user,
+                            ),
+                            reply_markup=InlineKeyboardMarkup(button),
+                        )
+                    except FloodWait as e:
+                        await asyncio.sleep(e.value)
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "stream"
 
