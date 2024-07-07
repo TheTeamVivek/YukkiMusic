@@ -9,7 +9,6 @@
 #
 import asyncio
 import time
-import logging
 
 from pyrogram import filters
 from pyrogram.enums import ChatType, ParseMode
