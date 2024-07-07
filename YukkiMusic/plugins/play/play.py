@@ -408,7 +408,7 @@ async def play_commnd(
             try:
                 return await mystic.edit_text(err)
             except FloodWait as e:
-                asyncio.sleep(e.value)
+                await asyncio.sleep(e.value)
         await mystic.delete()
         return await play_logs(message, streamtype=streamtype)
     else:
