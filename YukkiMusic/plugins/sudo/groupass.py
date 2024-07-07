@@ -81,7 +81,7 @@ async def assis_set(client, message: Message, _):
 
 @app.on_message(filters.command("checkassistant") & filters.group & ~BANNED_USERS)
 @AdminActual
-async def check_ass(_, message: Message):
+async def check_ass(client, message: Message, _):
     a = await get_assistant(message.chat.id)
     await message.reply_text(
         "**Yᴏᴜʀ ᴄʜᴀᴛ's ᴀssɪsᴛᴀɴᴛ ᴅᴇᴛᴀɪʟs:**\nAssɪsᴛᴀɴᴛ Nᴀᴍᴇ :- {a.name}\nAssɪsᴛᴀɴᴛ\nUsᴇʀɴᴀᴍᴇ :- @{a.username}\nAssɪsᴛᴀɴᴛ ID:- {a.id}",
