@@ -25,7 +25,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-
+from YukkiMusic.utils.cleanmode import protect_message
 
 async def aexec(code, client, message):
     exec(
@@ -39,6 +39,8 @@ async def edit_or_reply(msg: Message, **kwargs):
     func = msg.edit_text if msg.from_user.is_self else msg.reply
     spec = getfullargspec(func.__wrapped__).args
     await func(**{k: v for k, v in kwargs.items() if k in spec})
+    await protect_message(msg.chat.id, msg.id)
+
 
 
 @app.on_edited_message(
