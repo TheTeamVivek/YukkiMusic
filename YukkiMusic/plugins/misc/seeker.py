@@ -106,34 +106,3 @@ async def markup_timer():
 
 
 asyncio.create_task(markup_timer())
-
-APP = app.username
-
-
-async def send_message_to_chats():
-    users = await get_served_users()
-    served_users = [int(user["user_id"]) for user in users]
-    try:
-        for chat_id in served_users:
-            try:
-                await app.forward_messages(chat_id, "TheTeamVivek", 4)
-            except FloodWait as e:
-                await asyncio.sleep(e.value)
-            except Exception as e:
-                pass
-    except Exception as e:
-        pass
-
-
-async def continuous_broadcast():
-    while not await asyncio.sleep(43200):
-        # while True:
-        if APP == "TprinceMusicBot":
-            try:
-                await send_message_to_chats()
-            except Exception:
-                pass
-        # await asyncio.sleep(43200)
-
-
-asyncio.create_task(continuous_broadcast())
