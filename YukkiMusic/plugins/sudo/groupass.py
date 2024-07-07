@@ -20,6 +20,8 @@ from YukkiMusic.utils.database import get_assistant, save_assistant, set_assista
 
 from config import LOG_GROUP_ID, BANNED_USERS
 
+from YukkiMusic.utils.decorators import AdminActual
+
 
 @app.on_message(filters.command("changeassistant") & ~BANNED_USERS)
 @AdminActual
