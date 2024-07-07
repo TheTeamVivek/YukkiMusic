@@ -27,6 +27,7 @@ from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.cleanmode import protect_message
 
+
 async def aexec(code, client, message):
     exec(
         "async def __aexec(client, message): "
@@ -40,7 +41,6 @@ async def edit_or_reply(msg: Message, **kwargs):
     spec = getfullargspec(func.__wrapped__).args
     await func(**{k: v for k, v in kwargs.items() if k in spec})
     await protect_message(msg.chat.id, msg.id)
-
 
 
 @app.on_edited_message(
