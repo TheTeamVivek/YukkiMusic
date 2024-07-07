@@ -17,14 +17,15 @@ from YukkiMusic.utils.assistant import (
     get_assistant_details,
 )
 from YukkiMusic.utils.database import get_assistant, save_assistant, set_assistant
-from YukkiMusic.utils.filter import admin_filter
-from config import LOG_GROUP_ID
+
+from config import LOG_GROUP_ID, BANNED_USERS
 
 
-@app.on_message(filters.command("changeassistant") & admin_filter)
-async def assis_change(_, message: Message):
-    avt = await assistant()
-    if avt == True:
+
+@app.on_message(filters.command("changeassistant") & ~BANNED_USERS)
+@AdminActual
+async def assis_change(client, message: Message, _):
+    if await assistant() == True:
         return await message.reply_text(
             "sᴏʀʀʏ sɪʀ! ɪɴ ʙᴏᴛ sᴇʀᴠᴇʀ ᴏɴʟʏ ᴏɴʀ ᴀssɪsᴛᴀɴᴛ ᴀᴠᴀɪʟᴀʙʟᴇ ᴛʜᴇʀᴇғᴏʀᴇ ʏᴏᴜ ᴄᴀɴᴛ ᴄʜᴀɴɢᴇ ᴀssɪsᴛᴀɴᴛ"
         )
@@ -47,8 +48,9 @@ async def assis_change(_, message: Message):
     await message.reply_text(DETAILS, disable_web_page_preview=True)
 
 
-@app.on_message(filters.command("setassistant") & admin_filter)
-async def assis_set(_, message: Message):
+@app.on_message(filters.command("setassistant") & ~BANNED_USERS)
+@AdminActual
+async def assis_set(client, message: Message, _):
     if await assistant():
         return await message.reply_text(
             "sᴏʀʀʏ sɪʀ! ɪɴ ʙᴏᴛ sᴇʀᴠᴇʀ ᴏɴʟʏ ᴏɴᴇ ᴀssɪsᴛᴀɴᴛ ᴀᴠᴀɪʟᴀʙʟᴇ ᴛʜᴇʀᴇғᴏʀᴇ ʏᴏᴜ ᴄᴀɴ'ᴛ ᴄʜᴀɴɢᴇ ᴀssɪsᴛᴀɴᴛ"
@@ -76,7 +78,8 @@ async def assis_set(_, message: Message):
     )
 
 
-@app.on_message(filters.command("checkassistant") & filters.group & admin_filter)
+@app.on_message(filters.command("checkassistant") & filters.group & ~BANNED_USERS)
+@AdminActual
 async def check_ass(_, message: Message):
     a = await get_assistant(message.chat.id)
     await message.reply_text(
