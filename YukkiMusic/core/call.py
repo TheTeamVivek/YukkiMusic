@@ -614,7 +614,7 @@ class Call(PyTgCalls):
                         run = await app.send_photo(
                             original_chat_id,
                             photo=img,
-                        caption=_["stream_1"].format(
+                            caption=_["stream_1"].format(
                                 title[:27],
                                 f"https://t.me/{app.username}?start=info_{videoid}",
                                 check[0]["dur"],
