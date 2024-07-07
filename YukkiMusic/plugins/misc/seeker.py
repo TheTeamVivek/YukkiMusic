@@ -9,16 +9,13 @@
 #
 import asyncio
 
-from pyrogram.errors import FloodWait
 from pyrogram.types import InlineKeyboardMarkup
 
 from strings import get_string
-from YukkiMusic import app
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
     get_active_chats,
     get_lang,
-    get_served_users,
     is_music_playing,
 )
 from YukkiMusic.utils.formatters import seconds_to_min
