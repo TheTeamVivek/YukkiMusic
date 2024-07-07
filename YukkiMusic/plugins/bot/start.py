@@ -38,7 +38,6 @@ from YukkiMusic.utils.decorators.language import LanguageStart
 from YukkiMusic.utils.formatters import get_readable_time
 from YukkiMusic.utils.functions import MARKDOWN, WELCOMEHELP
 from YukkiMusic.utils.inline import alive_panel, private_panel, start_pannel
-from YukkiMusic.utils.note_funcs import send_notes
 from .help import help_parser
 
 loop = asyncio.get_running_loop()
@@ -79,18 +78,6 @@ async def start_comm(client, message: Message, _):
                 parse_mode=ParseMode.HTML,
                 disable_web_page_preview=True,
             )
-        if name.startswith("note_"):
-            try:
-                (
-                    _,
-                    Gchat_id,
-                    text,
-                ) = name.split("_", 2)
-                logging.info(f"{Gchat_id} {text}")
-                await send_notes(message, Gchat_id, text)
-            except Exception as e:
-                logging.exception(e)
-
         if name[0:3] == "sta":
             m = await message.reply_text("🔎 ғᴇᴛᴄʜɪɴɢ ʏᴏᴜʀ ᴘᴇʀsᴏɴᴀʟ sᴛᴀᴛs.!")
             stats = await get_userss(message.from_user.id)
