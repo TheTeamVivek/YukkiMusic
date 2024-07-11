@@ -97,7 +97,6 @@ def paginate_modules(page_n, module_dict, prefix, chat=None):
                     "Bᴀᴄᴋ",
                     callback_data="settingsback_helper",
                 ),
-                EqInlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close"),
             ]
         )
 
@@ -173,7 +172,7 @@ async def help_button(client, query):
         module = mod_match.group(1)
         prev_page_num = int(mod_match.group(2))
         text = (
-            f"**ʜᴇʀᴇ ɪs ᴛʜᴇ ʜᴇʟᴘ ғᴏʀ** {HELPABLE[module].__MODULE__}:\n"
+            f"<b><u>Hᴇʀᴇ Is Tʜᴇ Hᴇʟᴘ Fᴏʀ {HELPABLE[module].__MODULE__}:</u></b>\n"
             + HELPABLE[module].__HELP__
         )
 
@@ -233,9 +232,9 @@ async def help_button(client, query):
         )
 
     elif create_match:
-        text, keyboard = await help_parser(query)
+        keyboard = await help_parser()
         await query.message.edit(
-            text=text,
+            text=top_text,
             reply_markup=keyboard,
             disable_web_page_preview=True,
         )
