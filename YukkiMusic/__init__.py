@@ -7,8 +7,6 @@
 #
 # All rights reserved.
 
-
-from SafoneAPI import SafoneAPI
 from YukkiMusic.core.bot import YukkiBot
 from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
@@ -30,7 +28,6 @@ heroku()
 
 # Load Sudo Users from DB
 sudo()
-api = SafoneAPI()
 # Bot Client
 app = YukkiBot()
 
