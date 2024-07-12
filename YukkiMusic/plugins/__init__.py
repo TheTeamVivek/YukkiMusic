@@ -24,10 +24,10 @@ logger = LOGGER(__name__)
 
 if EXTRA_PLUGINS_FOLDER in os.listdir():
     shutil.rmtree(EXTRA_PLUGINS_FOLDER)
-    
+
 if "utils" in os.listdir():
     shutil.rmtree("utils")
-    
+
 ROOT_DIR = abspath(join(dirname(__file__), "..", ".."))
 
 EXTERNAL_REPO_PATH = join(ROOT_DIR, EXTRA_PLUGINS_FOLDER)
