@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024 by AnonymousX888@Github, < https://github.com/AnonymousX888 >.
 #
 # This file is part of < https://github.com/hakutakaid/YukkiMusicFork > project,
 # and is released under the "GNU v3.0 License Agreement".

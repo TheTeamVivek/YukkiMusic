@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024 by AnonymousX888@Github, < https://github.com/AnonymousX888 >.
 #
 # This file is part of < https://github.com/hakutakaid/YukkiMusicFork > project,
 # and is released under the MIT License.
@@ -55,7 +55,7 @@ EXTRA_PLUGINS = getenv(
 
 EXTRA_PLUGINS_REPO = getenv(
     "EXTRA_PLUGINS_REPO",
-    "https://github.com/TheTeamVivek/ExtraPlugin",
+    "https://github.com/AnonymousX888/ExtraPlugin",
 )
 # Fill here the external plugins repo where plugins that you want to load
 
@@ -104,11 +104,11 @@ GIT_TOKEN = getenv(
 
 # Only  Links formats are  accepted for this Var value.
 SUPPORT_CHANNEL = getenv(
-    "SUPPORT_CHANNEL", "https://t.me/TheTeamVivek"
-)  # Example:- https://t.me/TheTeamVivek
+    "SUPPORT_CHANNEL", "https://t.me/AnonymousX888"
+)  # Example:- https://t.me/AnonymousX888
 SUPPORT_GROUP = getenv(
-    "SUPPORT_GROUP", "https://t.me/TheTeamVk"
-)  # Example:- https://t.me/TheTeamVk
+    "SUPPORT_GROUP", "https://t.me/LogUbotX"
+)  # Example:- https://t.me/LogUbotX
 
 
 # Set it in True if you want to leave your assistant after a certain amount of time. [Set time via AUTO_LEAVE_ASSISTANT_TIME]
