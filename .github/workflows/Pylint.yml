@@ -22,7 +22,7 @@ jobs:
         run: |
           autoflake --in-place --recursive --remove-all-unused-imports --ignore-init-module-imports .
 
-      - name: lint with black
+      - name: Lint with black
         run: |
           black .
       - uses: stefanzweifel/git-auto-commit-action@v4
@@ -30,6 +30,6 @@ jobs:
             commit_message: "Pylint: Auto Fixes"
             commit_options: "--no-verify"
             repository: .
-            commit_user_name: VivekKumar-IN
-            commit_user_email: 167422483+Vivekkumar-IN@users.noreply.github.com
-            commit_author: VivekKumar-IN <167422483+Vivekkumar-IN@users.noreply.github.com>
+            commit_user_name: "github-actions[bot]"
+            commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+            commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
