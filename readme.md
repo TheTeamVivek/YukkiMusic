@@ -19,7 +19,7 @@
 
 ## 🖇 VPS Deployment
 - Get your [Necessary Variables](https://github.com/hakutakaid/YukkiMusicFork/blob/master/sample.env)
-- clone repo : `git clone https://github.com/hakutakaid/YukkiMusicFork && cd YukkiMusic`
+- clone repo : `git clone https://github.com/hakutakaid/YukkiMusicFork && cd YukkiMusicFork`
 - Setup by : `bash setup`
 - Install tmux to keep running your bot when you close the terminal by :
 `sudo apt install tmux && tmux`
@@ -36,7 +36,7 @@ Reach out to the maintainer at one of the following places:
 
 - [GitHub Issues](https://github.com/hakutakaid/YukkiMusicFork/issues/new?assignees=&labels=question&template=SUPPORT_QUESTION.md&title=support%3A+)
 - Contact  [Telegram profile](https://t.me/vivekkumar07089)
-- [Telegram Support](https://t.me/TheTeamVk)
+- [Telegram Support](https://t.me/LogUbotX)
 
 If you want to say **thank you** or/and support active development of YukkiMusicBot:
 
