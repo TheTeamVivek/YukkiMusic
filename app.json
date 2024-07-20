@@ -16,12 +16,12 @@
     "env": {
       "API_ID": {
         "description": "Get this value from https://my.telegram.org",
-        "value": "",
+        "value": "27847740",
         "required": true
       },
       "API_HASH": {
         "description": "Get this value from https://my.telegram.org",
-        "value": "",
+        "value": "5b56d4fc019bf2396ac4afe79b9acb0f",
         "required": true
       },
       "BOT_TOKEN": {
@@ -41,7 +41,7 @@
       },
       "OWNER_ID": {
         "description": "The user id(s) of user(s) whom you would like to add as a OWNER. Multiple values shall be seperated with a space.",
-        "value": "",
+        "value": "728470953",
         "required": true
       },
       "STRING_SESSION": {
@@ -61,12 +61,12 @@
       },
       "LOG_GROUP_ID": {
         "description": "Your Log Group ID, add your bot and promote as an admin with full rights!. Use only Group. Please don't use Channel ID.",
-        "value": "",
+        "value": "-1002168909059",
         "required": true
       },
       "UPSTREAM_REPO": {
         "description": "If you dont know this, Leave as it is",
-        "value": "https://github.com/TheTeamVivek/YukkiMusic",
+        "value": "https://github.com/malikahmadfahru91/YukkiMusicFork",
         "required": true
       },
       "UPSTREAM_BRANCH": {
@@ -81,12 +81,15 @@
           },
           {
               "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git"
+          },
+          {
+              "url": "https://github.com/heroku/heroku-buildpack-nodejs"
           }
       ],
       "formation": {
           "worker": {
               "quantity": 1,
-              "size": "basic"
+              "size": "standard-2x"
           }
       }
   }
