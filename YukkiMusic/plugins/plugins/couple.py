@@ -9,7 +9,7 @@ from telegraph import upload_file
 from PIL import Image, ImageDraw
 import requests
 
-from utils import get_image, get_couple, save_couple
+from YukkiMusic.plugins.utils import get_image, get_couple, save_couple
 from YukkiMusic import app
 
 
