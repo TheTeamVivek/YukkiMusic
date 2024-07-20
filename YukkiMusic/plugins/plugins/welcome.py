@@ -16,7 +16,7 @@ from YukkiMusic.misc import SUDOERS
 from .notes import extract_urls
 from YukkiMusic.utils.database import is_gbanned_user
 
-from utils import (
+from YukkiMusic.plugins.utils import (
     del_welcome,
     get_welcome,
     set_welcome,
