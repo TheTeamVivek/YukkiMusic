@@ -27,3 +27,14 @@ git+https://github.com/yt-dlp/yt-dlp
 git+https://github.com/alexmercerind/youtube-search-python@main
 git+https://github.com/joetats/youtube_search@master
 SafoneAPI
+bing-image-urls
+gTTS
+googlesearch-python
+httpx[http2]
+pyfiglet
+lexica-api
+MukeshAPI
+nekos.py
+telegraph
+uuid
+git+https://github.com/Vivekkumar-IN/TheApi@main

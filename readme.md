@@ -14,12 +14,12 @@
 
 <h4>Click the button below to deploy Yukki Music Bot on Heroku!</h4>    
 <h4>If You show any error like failed to app Creation Then fork and deploy </h4>
-<a href="https://dashboard.heroku.com/new?template=https://github.com/malikahmadfahru91/YukkiMusicFork"><img src="https://img.shields.io/badge/Deploy%20To%20Heroku-red?style=for-the-badge&logo=heroku" width="200""/></a>
+<a href="https://dashboard.heroku.com/new?template=https://github.com/hakutakaid/YukkiMusicFork.git"><img src="https://img.shields.io/badge/Deploy%20To%20Heroku-red?style=for-the-badge&logo=heroku" width="200""/></a>
 
 
 ## 🖇 VPS Deployment
-- Get your [Necessary Variables](https://github.com/TheTeamVivek/YukkiMusic/blob/master/sample.env)
-- clone repo : `git clone https://github.com/TheTeamVivek/YukkiMusic && cd YukkiMusic`
+- Get your [Necessary Variables](https://github.com/hakutakaid/YukkiMusicFork/blob/master/sample.env)
+- clone repo : `git clone https://github.com/hakutakaid/YukkiMusicFork && cd YukkiMusic`
 - Setup by : `bash setup`
 - Install tmux to keep running your bot when you close the terminal by :
 `sudo apt install tmux && tmux`
@@ -29,19 +29,19 @@
 
 
 # Yukki Music Configs
- [Checkout Here For Config Vars](https://github.com/TheTeamVivek/YukkiMusic/blob/master/config/README.md)
+ [Checkout Here For Config Vars](https://github.com/hakutakaid/YukkiMusicFork/blob/master/config/README.md)
 # 🏷 Support / Assistance
 
 Reach out to the maintainer at one of the following places:
 
-- [GitHub Issues](https://github.com/TheTeamVivek/YukkiMusic/issues/new?assignees=&labels=question&template=SUPPORT_QUESTION.md&title=support%3A+)
+- [GitHub Issues](https://github.com/hakutakaid/YukkiMusicFork/issues/new?assignees=&labels=question&template=SUPPORT_QUESTION.md&title=support%3A+)
 - Contact  [Telegram profile](https://t.me/vivekkumar07089)
 - [Telegram Support](https://t.me/TheTeamVk)
 
 If you want to say **thank you** or/and support active development of YukkiMusicBot:
 
 - Add a [GitHub Star](https://github.com/TeamYukki/YukkiMusicBot) to the project.
-- Fork the [Repo](https://github.com/TheTeamVivek/YukkiMusic) :)
+- Fork the [Repo](https://github.com/hakutakaid/YukkiMusicFork) :)
 - Write interesting articles about the project on [Dev.to](https://dev.to/), [Medium](https://medium.com/) or your personal blog.
 
 Together, we can make **YukkiMusic** better!

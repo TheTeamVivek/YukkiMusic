@@ -29,11 +29,6 @@
         "value": "",
         "required": true
       },
-      "EXTRA_PLUGINS": {
-        "description": "if You want to load extra plugins with music plugins so fill True  if you don't want to load extra plugins so Fill False",
-        "value": "True",
-        "required": false
-      },
       "MONGO_DB_URI": {
         "description": "Get a mongodb url from https://cloud.mongodb.com . You can leave it blank if you want , bot will use Yukki's database for you.",
         "value": "",
