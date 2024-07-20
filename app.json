@@ -61,7 +61,7 @@
       },
       "UPSTREAM_REPO": {
         "description": "If you dont know this, Leave as it is",
-        "value": "https://github.com/malikahmadfahru91/YukkiMusicFork",
+        "value": "https://github.com/hakutakaid/YukkiMusicFork",
         "required": true
       },
       "UPSTREAM_BRANCH": {
