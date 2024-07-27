@@ -143,9 +143,12 @@ def PlayWrapper(command):
                     get.status == ChatMemberStatus.BANNED
                     or get.status == ChatMemberStatus.RESTRICTED
                 ):
-                    return await message.reply_text(
-                        text=_["call_2"].format(userbot.username, userbot.id),
-                    )
+                    try:
+                        await app.unban_chat_member(chat_id, userbot.id)
+                    except:
+                        return await message.reply_text(
+                            text=_["call_2"].format(userbot.username, userbot.id),
+                        )
             except UserNotParticipant:
                 if chat_id in links:
                     invitelink = links[chat_id]
