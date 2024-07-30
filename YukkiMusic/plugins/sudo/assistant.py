@@ -118,8 +118,7 @@ async def eor(msg: Message, **kwargs):
     return await func(**{k: v for k, v in kwargs.items() if k in spec})
 
 
-__MODULE__ = "Assɪsᴛᴀɴᴛ"
-__HELP__ = """
+"""
 
 <u> ᴀssɪsᴛᴀɴᴛ's ᴄᴏᴍᴍᴀɴᴅ:</u>
 .setpfp - ʀᴇᴘʟʏ ɪɴ ᴘʜᴏᴛᴏ ᴛᴏ sᴇᴛ ᴀʟʟ ʙᴏᴛ ᴀssɪsᴛᴀɴᴛ ᴘʀᴏғɪʟᴇ ᴘɪᴄᴛᴜʀᴇ [ᴏɴʟʏ ᴘʜᴏᴛᴏ] [ᴏɴʟʏ ғᴏʀ sᴜᴅᴏ ᴜsᴇʀ]
