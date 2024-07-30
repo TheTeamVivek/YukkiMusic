@@ -98,12 +98,3 @@ async def authorized(client, message: Message, _):
         else:
             text = f"{text} {msg}"
             return await m.edit(text)
-
-
-__MODULE__ = "P-ʙᴏᴛ"
-__HELP__ = """
-      ⚡️<u>Pʀɪᴠᴀᴛᴇ Bᴏᴛ Fᴜɴᴄᴛɪᴏɴ:</u>
-/authorize [CHAT_ID] - Aʟʟᴏᴡ ᴀ ᴄʜᴀᴛ ғᴏʀ ᴜsɪɴɢ ʏᴏᴜʀ ʙᴏᴛ.
-/unauthorize[CHAT_ID] - Dɪsᴀʟʟᴏᴡ ᴀ ᴄʜᴀᴛ ғʀᴏᴍ ᴜsɪɴɢ ʏᴏᴜʀ ʙᴏᴛ.
-/authorized - Cʜᴇᴄᴋ ᴀʟʟ ᴀʟʟᴏᴡᴇᴅ ᴄʜᴀᴛs ᴏғ ʏᴏᴜʀ ʙᴏᴛ.
-"""
