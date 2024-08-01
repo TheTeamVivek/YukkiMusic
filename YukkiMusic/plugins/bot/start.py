@@ -37,7 +37,7 @@ from YukkiMusic.utils.decorators.language import LanguageStart
 from YukkiMusic.utils.formatters import get_readable_time
 from YukkiMusic.utils.functions import MARKDOWN, WELCOMEHELP
 from YukkiMusic.utils.inline import alive_panel, private_panel, start_pannel
-from .help import help_parser
+from .help import paginate_modules
 
 loop = asyncio.get_running_loop()
 
@@ -50,7 +50,7 @@ async def start_comm(client, message: Message, _):
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
         if name[0:4] == "help":
-            keyboard = await help_parser(message.from_user.mention)
+            keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help", close=True))
             if config.START_IMG_URL:
                 return await message.reply_photo(
                     photo=START_IMG_URL,
