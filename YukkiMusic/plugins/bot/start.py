@@ -50,7 +50,9 @@ async def start_comm(client, message: Message, _):
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
         if name[0:4] == "help":
-            keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help", close=True))
+            keyboard = InlineKeyboardMarkup(
+                paginate_modules(0, HELPABLE, "help", close=True)
+            )
             if config.START_IMG_URL:
                 return await message.reply_photo(
                     photo=START_IMG_URL,
