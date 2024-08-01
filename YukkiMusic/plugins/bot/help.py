@@ -24,8 +24,8 @@ from YukkiMusic.utils.inline.help import private_help_panel
 ### Command
 HELP_COMMAND = get_command("HELP_COMMAND")
 
-COLUMN_SIZE = 4  # Controls the button number of height
-NUM_COLUMNS = 3  # Controls the button number of width
+COLUMN_SIZE = 4  # number of  button height
+NUM_COLUMNS = 3  # number of button width
 
 
 class EqInlineKeyboardButton(InlineKeyboardButton):
@@ -39,7 +39,7 @@ class EqInlineKeyboardButton(InlineKeyboardButton):
         return self.text > other.text
 
 
-def paginate_modules(page_n, module_dict, prefix, chat=None):
+def paginate_modules(page_n, module_dict, prefix, chat=None, close: bool = False):
     if not chat:
         modules = sorted(
             [
@@ -81,8 +81,8 @@ def paginate_modules(page_n, module_dict, prefix, chat=None):
                     ),
                 ),
                 EqInlineKeyboardButton(
-                    "Bᴀᴄᴋ",
-                    callback_data="settingsback_helper",
+                    "ᴄʟᴏsᴇ" if close else "Bᴀᴄᴋ",
+                    callback_data="close" if close else "settingsback_helper",
                 ),
                 EqInlineKeyboardButton(
                     "❯",
@@ -94,8 +94,8 @@ def paginate_modules(page_n, module_dict, prefix, chat=None):
         pairs.append(
             [
                 EqInlineKeyboardButton(
-                    "Bᴀᴄᴋ",
-                    callback_data="settingsback_helper",
+                    "ᴄʟᴏsᴇ" if close else "Bᴀᴄᴋ",
+                    callback_data="close" if close else "settingsback_helper",
                 ),
             ]
         )
@@ -117,7 +117,7 @@ async def helper_private(
         chat_id = update.message.chat.id
         language = await get_lang(chat_id)
         _ = get_string(language)
-        keyboard = await help_parser(update.from_user.mention)
+        keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help"))
         await update.edit_message_text(_["help_1"], reply_markup=keyboard)
     else:
         chat_id = update.chat.id
@@ -128,7 +128,7 @@ async def helper_private(
                 pass
         language = await get_lang(chat_id)
         _ = get_string(language)
-        keyboard = await help_parser(update.from_user.mention)
+        keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help", close=True))
         if START_IMG_URL:
             await update.reply_photo(
                 photo=START_IMG_URL,
@@ -180,9 +180,9 @@ async def help_button(client, query):
             [
                 [
                     InlineKeyboardButton(
-                        text="↪️ Back", callback_data=f"help_back({prev_page_num})"
+                        text="↪️ ʙᴀᴄᴋ", callback_data=f"help_back({prev_page_num})"
                     ),
-                    InlineKeyboardButton(text="🔄 Close", callback_data="close"),
+                    InlineKeyboardButton(text="🔄 ᴄʟᴏsᴇ", callback_data="close"),
                 ],
             ]
         )
