@@ -19,7 +19,7 @@ import config
 from config import BANNED_USERS, START_IMG_URL
 from config.config import OWNER_ID
 from strings import get_string
-from YukkiMusic import Telegram, YouTube, app
+from YukkiMusic import Telegram, YouTube, app, HELPABLE
 from YukkiMusic.misc import SUDOERS, _boot_
 from YukkiMusic.plugins.play.playlist import del_plist_msg
 from YukkiMusic.plugins.sudo.sudoers import sudoers_list
