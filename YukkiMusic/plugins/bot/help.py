@@ -234,7 +234,8 @@ async def help_button(client, query):
         )
 
     elif create_match:
-        keyboard = await help_parser()
+        keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help"))
+
         await query.message.edit(
             text=top_text,
             reply_markup=keyboard,
