@@ -12,6 +12,7 @@ import aiohttp
 import requests
 import os
 import re
+import config
 from typing import Union
 
 import yt_dlp
@@ -19,8 +20,8 @@ from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
 from youtubesearchpython.__future__ import VideosSearch
 
-from VIPMUSIC.utils.database import is_on_off
-from VIPMUSIC.utils.formatters import time_to_seconds
+from YukkiMusic.utils.database import is_on_off
+from YukkiMusic.utils.formatters import time_to_seconds
 
 
 async def shell_cmd(cmd):
