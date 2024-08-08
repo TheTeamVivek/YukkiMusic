@@ -43,4 +43,5 @@ Apple = AppleAPI()
 Resso = RessoAPI()
 SoundCloud = SoundAPI()
 Telegram = TeleAPI()
+YTB = YTM()
 HELPABLE = {}
