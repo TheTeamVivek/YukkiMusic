@@ -22,7 +22,7 @@ from config import (
     adminlist,
     SUPPORT_GROUP,
 )
-from YukkiMusic import YouTube, app
+from YukkiMusic import YouTube, app, YTB
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils.database import (
