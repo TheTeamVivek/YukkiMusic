@@ -12,7 +12,6 @@ import aiohttp
 import requests
 import os
 import re
-import config
 from typing import Union
 
 import yt_dlp
