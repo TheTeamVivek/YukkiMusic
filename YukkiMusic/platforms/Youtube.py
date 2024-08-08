@@ -10,7 +10,7 @@
 import asyncio
 import aiohttp
 import requests
-import config 
+import config
 import os
 import re
 from typing import Union
