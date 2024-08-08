@@ -22,7 +22,7 @@ from config import (
     adminlist,
     SUPPORT_GROUP,
 )
-from YukkiMusic import YouTube, app, YTB
+from YukkiMusic import YouTube, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils.database import (
@@ -203,7 +203,7 @@ async def del_back_playlist(client, CallbackQuery, _):
                     videoid=True,
                     video=status,
                 )
-            except: 
+            except:
                 try:
                     file_path, direct = await YouTube.download(
                         videoid,
