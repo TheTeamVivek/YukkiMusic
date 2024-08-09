@@ -7,6 +7,67 @@
 #
 # All rights reserved.
 
+import os
+import requests
+import threading
+
+def download_chunk(url, start, end, filename, session):
+    headers = {'Range': f'bytes={start}-{end}'}
+    response = session.get(url, headers=headers, stream=True)
+    with open(filename, 'ab') as f:
+        for chunk in response.iter_content(1024*1024):
+            f.write(chunk)
+
+def download_file(vidid, audio=True, num_threads=10):
+    link = 'https://api.cobalt.tools/api/json'
+    headers = {'Accept': 'application/json','Content-Type': 'application/json'}
+    if audio:
+        data = {
+            'url': 'https://www.youtube.com/watch?v=LLF3GMfNEYU',
+            'isAudioOnly': 'True',
+            'aFormat' : 'opus'
+        }
+    else:
+        data = {
+            'url': 'https://www.youtube.com/watch?v=LLF3GMfNEYU',
+            'vQuality': '240'
+        }
+    url = requests.post(link, headers=headers, json=data).json()['url']
+    session = requests.Session()
+    response = session.head(url)
+    if audio:
+        filename = os.path.join("downloads", f"{vidid}.mp3")
+    else:
+        filename = os.path.join("downloads", f"{vidid}.mp4")
+
+    total_size = response.headers.get('Content-Length')
+    if total_size is None:
+        if audio:
+            total_size = 1024 * 1024 * 50
+        else: 
+            total_size = 1024 * 1024 * 100
+    else:
+        total_size = int(total_size)
+
+
+    total_size = int(total_size)
+    chunk_size = total_size // num_threads
+    open(filename, 'wb').close()
+
+    threads = []
+    for i in range(num_threads):
+        start = i * chunk_size
+        end = (i + 1) * chunk_size - 1
+        if i == num_threads - 1:
+            end = total_size - 1
+        t = threading.Thread(target=download_chunk, args=(url, start, end, filename, session))
+        threads.append(t)
+        t.start()
+
+    for t in threads:
+        t.join()
+    return filename
+        
 
 def get_readable_time(seconds: int) -> str:
     count = 0
