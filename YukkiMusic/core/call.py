@@ -33,7 +33,7 @@ from pytgcalls.types.stream import StreamAudioEnded
 
 import config
 from strings import get_string
-from YukkiMusic import LOGGER, YouTube, app, YTB
+from YukkiMusic import LOGGER, YouTube, app
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
     add_active_chat,
@@ -472,15 +472,7 @@ class Call(PyTgCalls):
                         video=True if str(streamtype) == "video" else False,
                     )
                 except:
-                    try:
-                        file_path, direct = await YTB.download(
-                            videoid,
-                            mystic,
-                            videoid=True,
-                            video=True if str(streamtype) == "video" else False,
-                        )
-                    except:
-                        return await mystic.edit_text(
+                    return await mystic.edit_text(
                             _["call_7"], disable_web_page_preview=True
                         )
                 if video:
