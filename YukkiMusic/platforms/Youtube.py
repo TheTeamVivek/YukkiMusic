@@ -8,8 +8,6 @@
 # All rights reserved.
 #
 import asyncio
-import aiohttp
-import requests
 import config
 import random
 import os
