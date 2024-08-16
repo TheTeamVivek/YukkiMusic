@@ -22,7 +22,7 @@ from config import (
     adminlist,
     SUPPORT_GROUP,
 )
-from YukkiMusic import YouTube, app, YTB
+from YukkiMusic import YouTube, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils.database import (
@@ -204,15 +204,7 @@ async def del_back_playlist(client, CallbackQuery, _):
                     video=status,
                 )
             except:
-                try:
-                    file_path, direct = await YTB.download(
-                        videoid,
-                        mystic,
-                        videoid=True,
-                        video=status,
-                    )
-                except:
-                    return await mystic.edit_text(_["call_7"])
+                return await mystic.edit_text(_["call_7"])
             try:
                 await Yukki.skip_stream(chat_id, file_path, video=status)
             except Exception:
