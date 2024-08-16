@@ -15,7 +15,7 @@ from typing import Union
 from pyrogram.types import InlineKeyboardMarkup
 
 import config
-from YukkiMusic import Carbon, YouTube, YTB, app
+from YukkiMusic import Carbon, YouTube, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
@@ -96,12 +96,7 @@ async def stream(
                         vidid, mystic, video=status, videoid=True
                     )
                 except:
-                    try:
-                        file_path, direct = await YTB.download(
-                            vidid, mystic, video=status, videoid=True
-                        )
-                    except:
-                        raise AssistantErr(_["play_16"])
+                    raise AssistantErr(_["play_16"])
                 await Yukki.join_call(
                     chat_id, original_chat_id, file_path, video=status, image=thumbnail
                 )
@@ -161,12 +156,7 @@ async def stream(
                 vidid, mystic, videoid=True, video=status
             )
         except:
-            try:
-                file_path, direct = await YTB.download(
-                    vidid, mystic, videoid=True, video=status
-                )
-            except:
-                raise AssistantErr(_["play_16"])
+            raise AssistantErr(_["play_16"])
         if await is_active_chat(chat_id):
             await put_queue(
                 chat_id,
