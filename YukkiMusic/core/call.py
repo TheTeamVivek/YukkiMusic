@@ -473,8 +473,8 @@ class Call(PyTgCalls):
                     )
                 except:
                     return await mystic.edit_text(
-                            _["call_7"], disable_web_page_preview=True
-                        )
+                        _["call_7"], disable_web_page_preview=True
+                    )
                 if video:
                     stream = MediaStream(
                         file_path,
