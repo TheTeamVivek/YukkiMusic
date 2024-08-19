@@ -22,6 +22,8 @@ speedtest-cli
 spotipy
 tgcrypto
 urllib3
+flask
+gunicorn==20.1.0
 git+https://github.com/KurimuzonAkuma/pyrogram@dev
 git+https://github.com/yt-dlp/yt-dlp
 git+https://github.com/alexmercerind/youtube-search-python@main
