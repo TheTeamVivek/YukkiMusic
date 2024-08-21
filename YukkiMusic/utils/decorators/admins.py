@@ -23,7 +23,6 @@ from YukkiMusic.utils.database import (
     is_commanddelete_on,
     is_maintenance,
     is_nonadmin_chat,
-    set_bot_client,
 )
 
 from ..formatters import int_to_alpha
