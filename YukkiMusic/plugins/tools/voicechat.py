@@ -8,7 +8,10 @@ from config import LOG_GROUP_ID
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_assistant
 
-@app.on_message(filters.command(["vcuser" , "vcusers", "vcmember", "vcmembers"]) & filters.admin)
+
+@app.on_message(
+    filters.command(["vcuser", "vcusers", "vcmember", "vcmembers"]) & filters.admin
+)
 async def vc_members(client, message):
     msg = await message.reply_text("**Rᴀdhᴇ rᴀdhᴇ**\n\nᴩlᴇᴀsᴇ wᴀiᴛ.......")
     userbot = await get_assistant(message.chat.id)
@@ -18,7 +21,9 @@ async def vc_members(client, message):
         )
 
         if not full_chat.full_chat.call:
-            return await msg.edit("**Rᴀdhᴇ rᴀdhᴇ**\n\nOᴏᴩs, iᴛ lᴏᴏᴋs liᴋᴇ Vᴏiᴄᴇ ᴄhᴀᴛ is ᴏff")
+            return await msg.edit(
+                "**Rᴀdhᴇ rᴀdhᴇ**\n\nOᴏᴩs, iᴛ lᴏᴏᴋs liᴋᴇ Vᴏiᴄᴇ ᴄhᴀᴛ is ᴏff"
+            )
 
         access_hash = full_chat.full_chat.call.access_hash
         ids = full_chat.full_chat.call.id
@@ -38,7 +43,9 @@ async def vc_members(client, message):
         users = result.participants
 
         if not users:
-            return await msg.edit("**Rᴀdhᴇ rᴀdhᴇ**\n\nThᴇrᴇ ᴀrᴇ nᴏ ʍᴇʍʙᴇrs in ᴛhᴇ vᴏiᴄᴇ ᴄhᴀᴛ ᴄurrᴇnᴛly.")
+            return await msg.edit(
+                "**Rᴀdhᴇ rᴀdhᴇ**\n\nThᴇrᴇ ᴀrᴇ nᴏ ʍᴇʍʙᴇrs in ᴛhᴇ vᴏiᴄᴇ ᴄhᴀᴛ ᴄurrᴇnᴛly."
+            )
 
         mg = "**Rᴀdhᴇ rᴀdhᴇ**\n\n"
         for user in users:
