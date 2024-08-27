@@ -7,7 +7,7 @@ from pyrogram.raw.types import InputGroupCall, InputPeerChat
 from config import LOG_GROUP_ID
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_assistant
-
+from YukkiMusic.utils import Yukkibin
 
 @app.on_message(
     filters.command(["vcuser", "vcusers", "vcmember", "vcmembers"]) & filters.admin
@@ -90,7 +90,11 @@ async def vc_members(client, message):
     **Is Muᴛᴇd By Adʍin** : {is_muted}\n\n"""
 
         if mg != "**Rᴀdhᴇ rᴀdhᴇ**\n\n":
-            await msg.edit(mg)
+            if len(mg) < 4000:
+                await msg.edit(mg)
+            else:
+                link = await Yukkibin(mg)
+                await msg.edit(f"[Yᴏu ᴄᴀn ᴄhᴇᴄᴋ ᴀll dᴇᴛᴀils ᴏf vᴏiᴄᴇᴄhᴀᴛ ʍᴇʍᴇʙᴇrs frᴏʍ hᴇrᴇ]({link})", disable_web_page_preview=True)
         else:
             await msg.edit("**Rᴀdhᴇ rᴀdhᴇ**\nNᴏ Mᴇʍʙᴇrs fᴏund in vᴏiᴄᴇᴄhᴀᴛ")
 
