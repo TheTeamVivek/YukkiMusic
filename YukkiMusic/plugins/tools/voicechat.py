@@ -9,6 +9,7 @@ from YukkiMusic import app
 from YukkiMusic.utils.database import get_assistant
 from YukkiMusic.utils import Yukkibin
 
+
 @app.on_message(
     filters.command(["vcuser", "vcusers", "vcmember", "vcmembers"]) & filters.admin
 )
@@ -94,7 +95,10 @@ async def vc_members(client, message):
                 await msg.edit(mg)
             else:
                 link = await Yukkibin(mg)
-                await msg.edit(f"[Yᴏu ᴄᴀn ᴄhᴇᴄᴋ ᴀll dᴇᴛᴀils ᴏf vᴏiᴄᴇᴄhᴀᴛ ʍᴇʍᴇʙᴇrs frᴏʍ hᴇrᴇ]({link})", disable_web_page_preview=True)
+                await msg.edit(
+                    f"[Yᴏu ᴄᴀn ᴄhᴇᴄᴋ ᴀll dᴇᴛᴀils ᴏf vᴏiᴄᴇᴄhᴀᴛ ʍᴇʍᴇʙᴇrs frᴏʍ hᴇrᴇ]({link})",
+                    disable_web_page_preview=True,
+                )
         else:
             await msg.edit("**Rᴀdhᴇ rᴀdhᴇ**\nNᴏ Mᴇʍʙᴇrs fᴏund in vᴏiᴄᴇᴄhᴀᴛ")
 
