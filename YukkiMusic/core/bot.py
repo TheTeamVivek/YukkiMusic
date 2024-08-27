@@ -11,7 +11,12 @@
 import sys
 from pyrogram import Client
 from pyrogram.enums import ChatMemberStatus
-from pyrogram.types import BotCommand
+from pyrogram.types import (
+    BotCommand,
+    BotCommandScopeAllPrivateChats,
+    BotCommandScopeAllGroupChats,
+    BotCommandScopeAllChatAdministrators,
+)
 import config
 
 from ..logging import LOGGER
@@ -47,11 +52,23 @@ class YukkiBot(Client):
             # sys.exit()
         if config.SET_CMDS == str(True):
             try:
+
                 await self.set_bot_commands(
-                    [
+                    commands=[
                         BotCommand("start", "sᴛᴀʀᴛ ᴛʜᴇ ʙᴏᴛ"),
                         BotCommand("help", "ɢᴇᴛ ᴛʜᴇ ʜᴇʟᴘ ᴍᴇɴᴜ"),
-                        BotCommand("ping", "ᴄʜᴇᴄᴋ ʙᴏᴛ ɪs ᴀʟɪᴠᴇ ᴏʀ ᴅᴇᴀᴅ"),
+                        BotCommand("ping", "ᴄʜᴇᴄᴋ ʙᴏᴛ ɪs ᴀʟɪᴠᴇ ᴏʀ ᴅᴇᴀᴅ"),          
+                    ],
+                    scope=BotCommandScopeAllPrivateChats()
+               )
+                await self.set_bot_commands(
+                    commands=[
+                        BotCommand("play", "sᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ʀᴇǫᴜᴇᴛᴇᴅ sᴏɴɢ"),          
+                    ],
+                    scope=BotCommandScopeAllGroupChats()
+                )
+                await self.set_bot_commands(
+                    commands=[ 
                         BotCommand("play", "sᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ʀᴇǫᴜᴇᴛᴇᴅ sᴏɴɢ"),
                         BotCommand("skip", "ᴍᴏᴠᴇ ᴛᴏ ɴᴇxᴛ ᴛʀᴀᴄᴋ ɪɴ ǫᴜᴇᴜᴇ"),
                         BotCommand("pause", "ᴘʟᴀᴜsᴇ ᴛʜᴇ ᴄᴜʀʀᴇɴᴛ ᴘʟᴀʏɪɴɢ sᴏɴɢ"),
@@ -66,7 +83,9 @@ class YukkiBot(Client):
                             "settings",
                             "Oᴘᴇɴ ᴛʜᴇ sᴇᴛᴛɪɴɢs ᴏғ ᴛʜᴇ ᴍᴜsɪᴄ ʙᴏᴛ ғᴏʀ ʏᴏᴜʀ ᴄʜᴀᴛ.",
                         ),
-                    ]
+                    ],
+                    scope=BotCommandScopeAllChatAdministrators()
+                    
                 )
             except:
                 pass
