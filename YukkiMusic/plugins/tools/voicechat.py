@@ -8,7 +8,7 @@ from config import LOG_GROUP_ID
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_assistant
 
-@app.on_message(filters.command(["vcuser" , "vcusers", "vcmember", "vcmembers") & filters.admin)
+@app.on_message(filters.command(["vcuser" , "vcusers", "vcmember", "vcmembers"]) & filters.admin)
 async def vc_members(client, message):
     msg = await message.reply_text("**Rᴀdhᴇ rᴀdhᴇ**\n\nᴩlᴇᴀsᴇ wᴀiᴛ.......")
     userbot = await get_assistant(message.chat.id)
