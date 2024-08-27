@@ -57,18 +57,18 @@ class YukkiBot(Client):
                     commands=[
                         BotCommand("start", "sᴛᴀʀᴛ ᴛʜᴇ ʙᴏᴛ"),
                         BotCommand("help", "ɢᴇᴛ ᴛʜᴇ ʜᴇʟᴘ ᴍᴇɴᴜ"),
-                        BotCommand("ping", "ᴄʜᴇᴄᴋ ʙᴏᴛ ɪs ᴀʟɪᴠᴇ ᴏʀ ᴅᴇᴀᴅ"),          
+                        BotCommand("ping", "ᴄʜᴇᴄᴋ ʙᴏᴛ ɪs ᴀʟɪᴠᴇ ᴏʀ ᴅᴇᴀᴅ"),
                     ],
-                    scope=BotCommandScopeAllPrivateChats()
-               )
-                await self.set_bot_commands(
-                    commands=[
-                        BotCommand("play", "sᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ʀᴇǫᴜᴇᴛᴇᴅ sᴏɴɢ"),          
-                    ],
-                    scope=BotCommandScopeAllGroupChats()
+                    scope=BotCommandScopeAllPrivateChats(),
                 )
                 await self.set_bot_commands(
-                    commands=[ 
+                    commands=[
+                        BotCommand("play", "sᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ʀᴇǫᴜᴇᴛᴇᴅ sᴏɴɢ"),
+                    ],
+                    scope=BotCommandScopeAllGroupChats(),
+                )
+                await self.set_bot_commands(
+                    commands=[
                         BotCommand("play", "sᴛᴀʀᴛ ᴘʟᴀʏɪɴɢ ʀᴇǫᴜᴇᴛᴇᴅ sᴏɴɢ"),
                         BotCommand("skip", "ᴍᴏᴠᴇ ᴛᴏ ɴᴇxᴛ ᴛʀᴀᴄᴋ ɪɴ ǫᴜᴇᴜᴇ"),
                         BotCommand("pause", "ᴘʟᴀᴜsᴇ ᴛʜᴇ ᴄᴜʀʀᴇɴᴛ ᴘʟᴀʏɪɴɢ sᴏɴɢ"),
@@ -84,8 +84,7 @@ class YukkiBot(Client):
                             "Oᴘᴇɴ ᴛʜᴇ sᴇᴛᴛɪɴɢs ᴏғ ᴛʜᴇ ᴍᴜsɪᴄ ʙᴏᴛ ғᴏʀ ʏᴏᴜʀ ᴄʜᴀᴛ.",
                         ),
                     ],
-                    scope=BotCommandScopeAllChatAdministrators()
-                    
+                    scope=BotCommandScopeAllChatAdministrators(),
                 )
             except:
                 pass
