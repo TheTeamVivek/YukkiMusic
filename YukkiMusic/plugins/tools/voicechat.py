@@ -49,7 +49,7 @@ async def vc_members(client, message):
                 is_speaking,
                 is_left,
             )
-        if len(mg) < 4000:
+        if len(TEXT) < 4000:
             await msg.edit(TEXT or _["V_C_3"])
         else:
             link = await Yukkibin(TEXT)
