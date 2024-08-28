@@ -39,7 +39,7 @@ async def vc_members(client, message):
                     title = (await client.get_users(chat_id)).mention
                 except:
                     title = m.chat.first_name
-            
+
             TEXT += _["V_C_2"].format(
                 title,
                 chat_id,
