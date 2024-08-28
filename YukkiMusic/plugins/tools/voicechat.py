@@ -51,7 +51,7 @@ async def vc_members(client, message):
                 is_speaking,
                 is_left,
             )
-            TEXT += "\n"
+            TEXT += "\n\n"
         if len(TEXT) < 4000:
             await msg.edit(TEXT or _["V_C_3"])
         else:
