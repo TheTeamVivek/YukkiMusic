@@ -52,7 +52,7 @@ async def init():
                     HELPABLE[imported_module.__MODULE__.lower()] = imported_module
                 else:
                     raise Exception(
-                        f"Can't have two modules with name! '{imported_module.__MODULE__}' Please Change One"
+                        f"Can't have two modules with name! '{imported_module} {imported_module.__MODULE__}' Please Change One"
                     )
 
     LOGGER("YukkiMusic.plugins").info("Successfully Imported All Modules ")
