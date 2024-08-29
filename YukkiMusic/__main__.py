@@ -50,7 +50,7 @@ async def init():
             if hasattr(imported_module, "__HELP__") and imported_module.__HELP__:
                 if imported_module.__MODULE__.lower() not in HELPABLE:
                     HELPABLE[imported_module.__MODULE__.lower()] = imported_module
-                    LOGGER("YukkiMusic").info(f"Sucessfully loaded {imported_module} {imported_module.__MODULE__}"(
+                    LOGGER("YukkiMusic").info(f"Sucessfully loaded {imported_module} {imported_module.__MODULE__}")
                 else:
                     raise Exception(
                         f"Can't have two modules with name! '{imported_module} {imported_module.__MODULE__}' Please Change One"
