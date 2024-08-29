@@ -53,10 +53,10 @@ async def api_download(vidid, video=False):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
     }
     if video:
-        path = os.path.join("downloada", f"{vidid}.mp4")
+        path = os.path.join("downloads", f"{vidid}.mp4")
         data = {"url": f"https://www.youtube.com/watch?v={vidid}", "vQuality": "480"}
     else:
-        path = os.path.join("downloada", f"{vidid}.m4a")
+        path = os.path.join("downloads", f"{vidid}.m4a")
         data = {
             "url": f"https://www.youtube.com/watch?v={vidid}",
             "isAudioOnly": "True",
