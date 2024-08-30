@@ -81,9 +81,11 @@ OWNER_ID = list(
 )  # Input type must be interger
 
 
-# make your bots privacy from telegra.ph and put your url here 
+# make your bots privacy from telegra.ph and put your url here
 
-PRIVACY_LINK = getenv("PRIVACY_LINK", "https://telegra.ph/Privacy-Policy-for-YukkiMusic-08-30")
+PRIVACY_LINK = getenv(
+    "PRIVACY_LINK", "https://telegra.ph/Privacy-Policy-for-YukkiMusic-08-30"
+)
 
 
 # Get it from http://dashboard.heroku.com/account

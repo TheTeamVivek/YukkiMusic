@@ -1,4 +1,4 @@
-from pyrogram import Client, filters
+from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from pyrogram.enums import ParseMode
 from YukkiMusic import app
@@ -12,20 +12,15 @@ Your privacy is important to us. To learn more about how we collect, use, and pr
 If you have any questions or concerns, feel free to reach out to our [Support Team]({config.SUPPORT_GROUP}).
 """
 
+
 @app.on_message(filters.command("privacy"))
 async def privacy(client, message: Message):
     keyboard = InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(
-                    "View Privacy Policy", url=config.PRIVACY_LINK
-                )
-            ]
-        ]
+        [[InlineKeyboardButton("View Privacy Policy", url=config.PRIVACY_LINK)]]
     )
     await message.reply_text(
-        TEXT, 
-        reply_markup=keyboard, 
-        parse_mode=ParseMode.MARKDOWN, 
-        disable_web_page_preview=True
+        TEXT,
+        reply_markup=keyboard,
+        parse_mode=ParseMode.MARKDOWN,
+        disable_web_page_preview=True,
     )
