@@ -7,6 +7,9 @@
 #
 # All rights reserved.
 import asyncio
+import uvloop
+uvloop.install()
+
 import importlib
 from pyrogram import idle
 import config
