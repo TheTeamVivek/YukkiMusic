@@ -7,6 +7,11 @@
 #
 # All rights reserved.
 #
+import uvloop
+import asyncio
+
+uvloop.install()
+
 
 import sys
 from pyrogram import Client
