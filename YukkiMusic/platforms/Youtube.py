@@ -10,7 +10,6 @@
 import httpx
 import asyncio
 import random
-import requests
 import os
 import re
 from typing import Union
