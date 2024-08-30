@@ -6,22 +6,12 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-import uvloop
 import asyncio
-
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-
-uvloop.install()
-
 import importlib
 from pyrogram import idle
 import config
 from config import BANNED_USERS
 from YukkiMusic import HELPABLE, LOGGER, app, userbot
-LOGGER("YukkiMusic").info(
-            "uvloop configured "
-        )
-
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.plugins import ALL_MODULES
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
@@ -68,5 +58,7 @@ async def init():
 
 
 if __name__ == "__main__":
+    import uvloop
+    uvloop.install()
     asyncio.get_event_loop_policy().get_event_loop().run_until_complete(init())
     LOGGER("YukkiMusic").info("Stopping YukkiMusic! GoodBye")
