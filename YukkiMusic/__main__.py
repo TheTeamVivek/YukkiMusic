@@ -6,8 +6,11 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-import asyncio
 import uvloop
+import asyncio
+
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
 uvloop.install()
 
 import importlib
