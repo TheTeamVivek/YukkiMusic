@@ -12,7 +12,7 @@ import asyncio
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 uvloop.install()
-LOGGER("YukkiMusic").error(
+LOGGER("YukkiMusic").info(
             "uvloop configured "
         )
 import importlib
