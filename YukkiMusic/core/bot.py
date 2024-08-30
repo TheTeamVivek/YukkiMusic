@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 import uvloop
-import asyncio
 
 uvloop.install()
 
