@@ -12,7 +12,9 @@ import asyncio
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 uvloop.install()
-
+LOGGER("YukkiMusic").error(
+            "uvloop configured "
+        )
 import importlib
 from pyrogram import idle
 import config
