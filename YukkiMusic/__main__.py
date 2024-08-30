@@ -12,14 +12,16 @@ import asyncio
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 uvloop.install()
-LOGGER("YukkiMusic").info(
-            "uvloop configured "
-        )
+
 import importlib
 from pyrogram import idle
 import config
 from config import BANNED_USERS
 from YukkiMusic import HELPABLE, LOGGER, app, userbot
+LOGGER("YukkiMusic").info(
+            "uvloop configured "
+        )
+
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.plugins import ALL_MODULES
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
