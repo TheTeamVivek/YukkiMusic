@@ -64,7 +64,6 @@ async def api_download(vidid, video=False):
             "aFormat": "best",
         }
 
-    
     response = await httpx.post(API, headers=headers, json=data)
     results = response.json()["url"]
 
