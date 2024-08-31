@@ -8,28 +8,18 @@
 # All rights reserved.
 #
 from pyrogram import filters
-from pyrogram.types import Message
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-
-from config import BANNED_USERS
+from config import BANNED_USERS, adminlist
+from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.utils.database import (
-    set_loop,
-    delete_filter,
-    is_maintenance,
-    is_commanddelete_on,
-    get_lang,
-    is_nonadmin_chat,
-    is_active_chat,
-    get_cmode,
-)
-
-from config import adminlist
-from YukkiMusic.plugins import extra_plugins_enabled
-from strings import get_string
 from YukkiMusic.misc import SUDOERS
+from YukkiMusic.plugins import extra_plugins_enabled
+from YukkiMusic.utils.database import (delete_filter, get_cmode, get_lang,
+                                       is_active_chat, is_commanddelete_on,
+                                       is_maintenance, is_nonadmin_chat,
+                                       set_loop)
 
 
 @app.on_message(

@@ -8,8 +8,9 @@
 # All rights reserved.
 
 import os
-import requests
 import threading
+
+import requests
 
 
 def download_chunk(url, start, end, filename, session):

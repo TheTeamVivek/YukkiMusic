@@ -11,9 +11,10 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from config import LOG_GROUP_ID, LOG
+from config import LOG, LOG_GROUP_ID
 from YukkiMusic import app
-from YukkiMusic.utils.database import delete_served_chat, get_assistant, is_on_off
+from YukkiMusic.utils.database import (delete_served_chat, get_assistant,
+                                       is_on_off)
 
 
 @app.on_message(filters.new_chat_members)

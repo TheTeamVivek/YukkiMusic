@@ -13,14 +13,13 @@ uvloop.install()
 
 
 import sys
+
 from pyrogram import Client
 from pyrogram.enums import ChatMemberStatus
-from pyrogram.types import (
-    BotCommand,
-    BotCommandScopeAllPrivateChats,
-    BotCommandScopeAllGroupChats,
-    BotCommandScopeAllChatAdministrators,
-)
+from pyrogram.types import (BotCommand, BotCommandScopeAllChatAdministrators,
+                            BotCommandScopeAllGroupChats,
+                            BotCommandScopeAllPrivateChats)
+
 import config
 
 from ..logging import LOGGER
