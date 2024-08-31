@@ -80,7 +80,7 @@ async def vc(client, message: Message):
     ac_audio = str(len(await get_active_chats()))
 
     await message.reply_text(
-        f"✫ <b><u>ᴀᴄᴛɪᴠᴇ ᴄʜᴀᴛs ɪɴғᴏ: {ac_audio}</u></b> : {ac_audio}"
+        f"✫ <b><u>ᴀᴄᴛɪᴠᴇ ᴄʜᴀᴛs ɪɴғᴏ: {ac_audio}</u></b>"
     )
 
 
