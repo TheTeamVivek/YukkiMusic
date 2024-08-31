@@ -52,20 +52,7 @@ async def is_heroku():
 
 
 async def paste_neko(code: str):
-    try:
-        async with aiohttp.ClientSession(
-            connector=aiohttp.TCPConnector(ssl=False)
-        ) as session:
-            async with session.post(
-                "https://nekobin.com/api/documents",
-                json={"content": code},
-            ) as paste:
-                paste.raise_for_status()
-                result = await paste.json()
-    except Exception:
-        return await Yukkibin(code)
-    else:
-        return f"nekobin.com/{result['result']['key']}.py"
+    return await Yukkibin(code)
 
 
 @app.on_message(
