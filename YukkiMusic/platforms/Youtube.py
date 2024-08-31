@@ -52,7 +52,6 @@ async def api_download(vidid, video=False):
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
     }
-
     if video:
         path = os.path.join("downloads", f"{vidid}.mp4")
         data = {"url": f"https://www.youtube.com/watch?v={vidid}", "vQuality": "480"}
@@ -61,16 +60,14 @@ async def api_download(vidid, video=False):
         data = {
             "url": f"https://www.youtube.com/watch?v={vidid}",
             "isAudioOnly": "True",
-            "aFormat": "best",
+            "aFormat": "mp3",
         }
-
-    response = await httpx.post(API, headers=headers, json=data)
+    response = httpx.post(API, headers=headers, json=data)
     results = response.json()["url"]
 
     cmd = f"yt-dlp '{results}' -o '{path}'"
-    await shell_cmd(cmd)
+    a = await shell_cmd(cmd)
     return path
-
 
 class YouTubeAPI:
     def __init__(self):
