@@ -21,6 +21,9 @@ from youtubesearchpython.__future__ import VideosSearch
 
 from YukkiMusic.utils.formatters import time_to_seconds
 
+from YukkiMusic.logging import LOGGER 
+
+log = LOGGER(__name__)
 
 def cookies():
     cookie_dir = "YukkiMusic/utils/cookies"
@@ -44,7 +47,6 @@ async def shell_cmd(cmd):
             return errorz.decode("utf-8")
     return out.decode("utf-8")
 
-
 async def api_download(vidid, video=False):
     API = "https://api.cobalt.tools/api/json"
     headers = {
@@ -52,6 +54,7 @@ async def api_download(vidid, video=False):
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
     }
+
     if video:
         path = os.path.join("downloads", f"{vidid}.mp4")
         data = {"url": f"https://www.youtube.com/watch?v={vidid}", "vQuality": "480"}
@@ -60,15 +63,27 @@ async def api_download(vidid, video=False):
         data = {
             "url": f"https://www.youtube.com/watch?v={vidid}",
             "isAudioOnly": "True",
-            "aFormat": "mp3",
+            "aFormat": "best",
         }
-    response = httpx.post(API, headers=headers, json=data)
-    results = response.json()["url"]
+
+    async with httpx.AsyncClient(http2=True) as client:
+        try:
+            response = await client.post(API, headers=headers, json=data)
+            response.raise_for_status()
+            results = response.json()["url"]
+        except httpx.RequestError as e:
+            log.error(f"An error occurred while requesting: {e}")
+            return None
+        except httpx.HTTPStatusError as e:
+            log.error(f"HTTP error occurred: {e}")
+            return None
+        except Exception as e:
+            log.error(f"An unexpected error occurred: {e}")
+            return None
 
     cmd = f"yt-dlp '{results}' -o '{path}'"
-    a = await shell_cmd(cmd)
+    await shell_cmd(cmd)
     return path
-
 
 class YouTubeAPI:
     def __init__(self):
