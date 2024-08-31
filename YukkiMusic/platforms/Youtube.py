@@ -53,7 +53,6 @@ async def api_download(vidid, video=False):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
     }
 
-
     if video:
         path = os.path.join("downloads", f"{vidid}.mp4")
         data = {"url": f"https://www.youtube.com/watch?v={vidid}", "vQuality": "480"}
@@ -85,6 +84,8 @@ async def api_download(vidid, video=False):
     else:
         print(f"Failed to download the file to {path}")
         return None
+
+
 class YouTubeAPI:
     def __init__(self):
         self.base = "https://www.youtube.com/watch?v="
