@@ -14,8 +14,12 @@ from pyrogram.types import Message
 from config import BANNED_USERS, adminlist
 from strings import get_command
 from YukkiMusic import app
-from YukkiMusic.utils.database import (delete_authuser, get_authuser,
-                                       get_authuser_names, save_authuser)
+from YukkiMusic.utils.database import (
+    delete_authuser,
+    get_authuser,
+    get_authuser_names,
+    save_authuser,
+)
 from YukkiMusic.utils.decorators import AdminActual, language
 from YukkiMusic.utils.formatters import int_to_alpha
 
