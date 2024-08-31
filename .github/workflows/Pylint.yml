@@ -25,7 +25,7 @@ jobs:
       - name: Lint with black
         run: |
           black .
-      - name: Lint with black
+      - name: Lint with Isort
         run: |
           isort .
       - uses: stefanzweifel/git-auto-commit-action@v4
