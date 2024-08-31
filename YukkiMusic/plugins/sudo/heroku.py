@@ -8,6 +8,7 @@
 # All rights reserved.
 #
 import asyncio
+import aiohttp
 import math
 import os
 import shutil
@@ -49,6 +50,20 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 async def is_heroku():
     return "heroku" in socket.getfqdn()
 
+async def paste_neko(code: str):
+    try:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+            async with session.post(
+                "https://nekobin.com/api/documents",
+                json={"content": code},
+            ) as paste:
+                paste.raise_for_status()
+                result = await paste.json()
+    except Exception:
+        return await dpaste(code=code)
+    else:
+        return f"nekobin.com/{result['result']['key']}.py"
+
 
 @app.on_message(
     filters.command(["log", "logs", "get_log", "getlog", "get_logs", "getlogs"])
@@ -74,7 +89,10 @@ async def log_(client, message, _):
                     NUMB = 100
                 for x in lines[-NUMB:]:
                     data += x
-                link = await Yukkibin(data)
+                try:
+                    link = await paste_neko(data)
+                except Exception:
+                    link = await Yukkibin(data)
                 return await message.reply_text(link)
             else:
                 return await message.reply_text(_["heroku_2"])
