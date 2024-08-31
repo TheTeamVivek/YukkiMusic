@@ -53,6 +53,7 @@ async def api_download(vidid, video=False):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
     }
 
+
     if video:
         path = os.path.join("downloads", f"{vidid}.mp4")
         data = {"url": f"https://www.youtube.com/watch?v={vidid}", "vQuality": "480"}
@@ -64,19 +65,26 @@ async def api_download(vidid, video=False):
             "aFormat": "opus",
         }
 
-    async with httpx.AsyncClient(http2=True) as client:
-        response = await client.post(API, headers=headers, json=data)
-        response.raise_for_status()
-        results = response.json()["url"]
+    try:
+        async with httpx.AsyncClient(http2=True) as client:
+            response = await client.post(API, headers=headers, json=data)
+            response.raise_for_status()
+
+            results = response.json().get("url")
+            if not results:
+                raise ValueError("No download URL found in the response")
+
+    except (httpx.RequestError, httpx.HTTPStatusError, ValueError) as e:
+        return None
 
     cmd = f"yt-dlp '{results}' -o '{path}'"
     await shell_cmd(cmd)
+
     if os.path.isfile(path):
         return path
     else:
+        print(f"Failed to download the file to {path}")
         return None
-
-
 class YouTubeAPI:
     def __init__(self):
         self.base = "https://www.youtube.com/watch?v="
