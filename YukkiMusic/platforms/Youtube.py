@@ -22,7 +22,6 @@ from youtubesearchpython.__future__ import VideosSearch
 from YukkiMusic.utils.formatters import time_to_seconds
 
 
-
 def cookies():
     cookie_dir = "YukkiMusic/utils/cookies"
     cookies_files = [f for f in os.listdir(cookie_dir) if f.endswith(".txt")]
