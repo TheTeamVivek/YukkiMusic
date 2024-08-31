@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 import asyncio
-import aiohttp
 import math
 import os
 import shutil
