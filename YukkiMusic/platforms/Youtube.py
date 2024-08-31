@@ -69,6 +69,7 @@ async def api_download(vidid, video=False):
     a = await shell_cmd(cmd)
     return path
 
+
 class YouTubeAPI:
     def __init__(self):
         self.base = "https://www.youtube.com/watch?v="
