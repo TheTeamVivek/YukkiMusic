@@ -1,8 +1,9 @@
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from pyrogram.enums import ParseMode
-from YukkiMusic import app
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+
 import config
+from YukkiMusic import app
 
 TEXT = f"""
 🔒 **Privacy Policy for {app.mention} !**

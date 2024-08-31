@@ -15,8 +15,7 @@ import psutil
 from ntgcalls import __version__ as ngtgver
 from pyrogram import __version__ as pyrover
 from pyrogram import filters
-from pyrogram.errors import MessageIdInvalid
-from pyrogram.errors import FloodWait
+from pyrogram.errors import FloodWait, MessageIdInvalid
 from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
 from pytgcalls.__version__ import __version__ as pytgver
 
@@ -27,25 +26,15 @@ from YukkiMusic import YouTube, app
 from YukkiMusic.core.userbot import assistants
 from YukkiMusic.misc import SUDOERS, pymongodb
 from YukkiMusic.plugins import ALL_MODULES
-from YukkiMusic.utils.database import (
-    get_global_tops,
-    get_particulars,
-    get_queries,
-    get_served_chats,
-    get_served_users,
-    get_sudoers,
-    get_top_chats,
-    get_topp_users,
-)
+from YukkiMusic.utils.database import (get_global_tops, get_particulars,
+                                       get_queries, get_served_chats,
+                                       get_served_users, get_sudoers,
+                                       get_top_chats, get_topp_users)
 from YukkiMusic.utils.decorators.language import language, languageCB
-from YukkiMusic.utils.inline.stats import (
-    back_stats_buttons,
-    back_stats_markup,
-    get_stats_markup,
-    overallback_stats_markup,
-    stats_buttons,
-    top_ten_stats_markup,
-)
+from YukkiMusic.utils.inline.stats import (back_stats_buttons,
+                                           back_stats_markup, get_stats_markup,
+                                           overallback_stats_markup,
+                                           stats_buttons, top_ten_stats_markup)
 
 loop = asyncio.get_running_loop()
 

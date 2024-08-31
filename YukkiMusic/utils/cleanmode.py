@@ -1,5 +1,5 @@
-from YukkiMusic import app
 from config import LOG_GROUP_ID
+from YukkiMusic import app
 
 protected_messages = {}
 

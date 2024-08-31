@@ -7,40 +7,30 @@
 #
 # All rights reserved.
 #
-import os
 import asyncio
 import logging
+import os
 from random import randint
 
 import requests
 from pykeyboard import InlineKeyboard
 from pyrogram import filters
 from pyrogram.enums import ChatMemberStatus
-from pyrogram.errors import (
-    ChatAdminRequired,
-    InviteRequestSent,
-    UserAlreadyParticipant,
-    UserNotParticipant,
-)
+from pyrogram.errors import (ChatAdminRequired, InviteRequestSent,
+                             UserAlreadyParticipant, UserNotParticipant)
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
 
 from config import BANNED_USERS, SERVER_PLAYLIST_LIMIT
 from YukkiMusic import Carbon, app
-from YukkiMusic.utils.database import (
-    delete_playlist,
-    get_assistant,
-    get_playlist,
-    get_playlist_names,
-    save_playlist,
-)
+from YukkiMusic.utils.database import (delete_playlist, get_assistant,
+                                       get_playlist, get_playlist_names,
+                                       save_playlist)
 from YukkiMusic.utils.decorators.language import language, languageCB
-from YukkiMusic.utils.inline.playlist import (
-    botplaylist_markup,
-    get_cplaylist_markup,
-    get_playlist_markup,
-    warning_markup,
-)
+from YukkiMusic.utils.inline.playlist import (botplaylist_markup,
+                                              get_cplaylist_markup,
+                                              get_playlist_markup,
+                                              warning_markup)
 from YukkiMusic.utils.pastebin import Yukkibin
 from YukkiMusic.utils.stream.stream import stream
 

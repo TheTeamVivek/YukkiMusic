@@ -8,8 +8,8 @@
 # All rights reserved.
 #
 
-import os
 import json
+import os
 from typing import Dict, List, Union
 
 import config
@@ -596,7 +596,6 @@ async def maintenance_on():
 
 # Audio Video Limit
 from pytgcalls.types import AudioQuality, VideoQuality
-
 
 AUDIO_FILE = os.path.join(config.TEMP_DB_FOLDER, "audio.json")
 VIDEO_FILE = os.path.join(config.TEMP_DB_FOLDER, "video.json")

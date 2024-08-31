@@ -8,8 +8,9 @@
 # All rights reserved.
 #
 
-from config import YOUTUBE_IMG_URL
 from youtubesearchpython.__future__ import VideosSearch
+
+from config import YOUTUBE_IMG_URL
 
 
 async def gen_thumb(videoid):
