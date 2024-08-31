@@ -61,7 +61,7 @@ async def api_download(vidid, video=False):
         data = {
             "url": f"https://www.youtube.com/watch?v={vidid}",
             "isAudioOnly": "True",
-            "aFormat": "best",
+            "aFormat": "opus",
         }
 
     async with httpx.AsyncClient(http2=True) as client:
