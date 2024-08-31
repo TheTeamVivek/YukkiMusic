@@ -63,7 +63,7 @@ async def paste_neko(code: str):
                 paste.raise_for_status()
                 result = await paste.json()
     except Exception:
-        return await dpaste(code=code)
+        return await Yukkibin(code)
     else:
         return f"nekobin.com/{result['result']['key']}.py"
 
@@ -92,10 +92,7 @@ async def log_(client, message, _):
                     NUMB = 100
                 for x in lines[-NUMB:]:
                     data += x
-                try:
-                    link = await paste_neko(data)
-                except:
-                    link = await Yukkibin(data)
+                link = await paste_neko(data)
                 return await message.reply_text(link)
             else:
                 return await message.reply_text(_["heroku_2"])
