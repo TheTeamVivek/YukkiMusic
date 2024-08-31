@@ -64,17 +64,9 @@ async def api_download(vidid, video=False):
             "aFormat": "best",
         }
 
-    async with httpx.AsyncClient(http2=True) as client:
-        try:
-            response = await client.post(API, headers=headers, json=data)
-            response.raise_for_status()
-            results = response.json()["url"]
-        except httpx.RequestError as e:
-            return None
-        except httpx.HTTPStatusError as e:
-            return None
-        except Exception as e:
-            return None
+    
+    response = await httpx.post(API, headers=headers, json=data)
+    results = response.json()["url"]
 
     cmd = f"yt-dlp '{results}' -o '{path}'"
     await shell_cmd(cmd)
