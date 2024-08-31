@@ -78,9 +78,9 @@ async def activevi_(_, message: Message):
 @app.on_message(filters.command(["ac"]) & SUDOERS)
 async def vc(client, message: Message):
     ac_audio = str(len(await get_active_chats()))
-    ac_video = str(len(await get_active_video_chats()))
+
     await message.reply_text(
-        f"✫ <b><u>ᴀᴄᴛɪᴠᴇ ᴄʜᴀᴛs ɪɴғᴏ</u></b> :\n\nᴠᴏɪᴄᴇ : {ac_audio}\nᴠɪᴅᴇᴏ  : {ac_video}"
+        f"✫ <b><u>ᴀᴄᴛɪᴠᴇ ᴄʜᴀᴛs ɪɴғᴏ: {ac_audio}</u></b> : {ac_audio}"
     )
 
 
