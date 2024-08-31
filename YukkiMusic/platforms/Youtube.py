@@ -13,7 +13,7 @@ import random
 import re
 from typing import Union
 
-import requests
+import httpx
 import yt_dlp
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
@@ -44,7 +44,6 @@ async def shell_cmd(cmd):
             return errorz.decode("utf-8")
     return out.decode("utf-8")
 
-
 async def api_download(vidid, video=False):
     API = "https://api.cobalt.tools/api/json"
     headers = {
@@ -52,6 +51,7 @@ async def api_download(vidid, video=False):
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
     }
+
     if video:
         path = os.path.join("downloads", f"{vidid}.mp4")
         data = {"url": f"https://www.youtube.com/watch?v={vidid}", "vQuality": "480"}
@@ -60,14 +60,21 @@ async def api_download(vidid, video=False):
         data = {
             "url": f"https://www.youtube.com/watch?v={vidid}",
             "isAudioOnly": "True",
-            "aFormat": "mp3",
+            "aFormat": "best",
         }
-    response = requests.post(API, headers=headers, json=data)
-    results = response.json()["url"]
+
+    async with httpx.AsyncClient(http2=True) as client:
+        response = await client.post(API, headers=headers, json=data)
+        response.raise_for_status()
+        results = response.json()["url"]
 
     cmd = f"yt-dlp '{results}' -o '{path}'"
-    a = await shell_cmd(cmd)
-    return path
+    await shell_cmd(cmd)
+    if os.path.isfile(path):
+        return path
+    else:
+        return None
+
 
 
 class YouTubeAPI:
