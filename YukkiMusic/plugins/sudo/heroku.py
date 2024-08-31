@@ -94,7 +94,7 @@ async def log_(client, message, _):
                     data += x
                 try:
                     link = await paste_neko(data)
-                except Exception:
+                except:
                     link = await Yukkibin(data)
                 return await message.reply_text(link)
             else:
