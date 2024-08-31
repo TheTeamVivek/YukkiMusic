@@ -44,6 +44,7 @@ async def shell_cmd(cmd):
             return errorz.decode("utf-8")
     return out.decode("utf-8")
 
+
 async def api_download(vidid, video=False):
     API = "https://api.cobalt.tools/api/json"
     headers = {
@@ -74,7 +75,6 @@ async def api_download(vidid, video=False):
         return path
     else:
         return None
-
 
 
 class YouTubeAPI:
