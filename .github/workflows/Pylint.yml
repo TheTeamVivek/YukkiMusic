@@ -22,12 +22,12 @@ jobs:
         run: |
           autoflake --in-place --recursive --remove-all-unused-imports --ignore-init-module-imports .
 
-      - name: Lint with black
-        run: |
-          black .
-      - name: Lint with Isort
+      - name: Lint with Isort 
         run: |
           isort .
+      - name: Lint with Black
+        run: |
+          black .
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
             commit_message: "Auto Fixes"
