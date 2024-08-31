@@ -21,9 +21,10 @@ from youtubesearchpython.__future__ import VideosSearch
 
 from YukkiMusic.utils.formatters import time_to_seconds
 
-from YukkiMusic.logging import LOGGER 
+from YukkiMusic.logging import LOGGER
 
 log = LOGGER(__name__)
+
 
 def cookies():
     cookie_dir = "YukkiMusic/utils/cookies"
@@ -46,6 +47,7 @@ async def shell_cmd(cmd):
         else:
             return errorz.decode("utf-8")
     return out.decode("utf-8")
+
 
 async def api_download(vidid, video=False):
     API = "https://api.cobalt.tools/api/json"
@@ -84,6 +86,7 @@ async def api_download(vidid, video=False):
     cmd = f"yt-dlp '{results}' -o '{path}'"
     await shell_cmd(cmd)
     return path
+
 
 class YouTubeAPI:
     def __init__(self):
