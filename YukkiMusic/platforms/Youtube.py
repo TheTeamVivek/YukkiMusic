@@ -21,9 +21,6 @@ from youtubesearchpython.__future__ import VideosSearch
 
 from YukkiMusic.utils.formatters import time_to_seconds
 
-from YukkiMusic.logging import LOGGER
-
-log = LOGGER(__name__)
 
 
 def cookies():
@@ -74,13 +71,10 @@ async def api_download(vidid, video=False):
             response.raise_for_status()
             results = response.json()["url"]
         except httpx.RequestError as e:
-            log.error(f"An error occurred while requesting: {e}")
             return None
         except httpx.HTTPStatusError as e:
-            log.error(f"HTTP error occurred: {e}")
             return None
         except Exception as e:
-            log.error(f"An unexpected error occurred: {e}")
             return None
 
     cmd = f"yt-dlp '{results}' -o '{path}'"
