@@ -15,8 +15,7 @@ from YukkiMusic import app
 from YukkiMusic.core.userbot import assistants
 from YukkiMusic.utils.assistant import get_assistant_details
 from YukkiMusic.utils.assistant import is_avl_assistant as assistant
-from YukkiMusic.utils.database import (get_assistant, save_assistant,
-                                       set_assistant)
+from YukkiMusic.utils.database import get_assistant, save_assistant, set_assistant
 from YukkiMusic.utils.decorators import AdminActual
 
 

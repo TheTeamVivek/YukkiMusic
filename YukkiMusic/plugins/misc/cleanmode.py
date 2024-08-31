@@ -22,12 +22,19 @@ from strings import get_command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.cleanmode import protected_messages
-from YukkiMusic.utils.database import (get_active_chats, get_authuser_names,
-                                       get_client, get_particular_top,
-                                       get_served_chats, get_served_users,
-                                       get_user_top, is_cleanmode_on,
-                                       set_queries, update_particular_top,
-                                       update_user_top)
+from YukkiMusic.utils.database import (
+    get_active_chats,
+    get_authuser_names,
+    get_client,
+    get_particular_top,
+    get_served_chats,
+    get_served_users,
+    get_user_top,
+    is_cleanmode_on,
+    set_queries,
+    update_particular_top,
+    update_user_top,
+)
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.formatters import alpha_to_int
 

@@ -16,10 +16,16 @@ from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.plugins import extra_plugins_enabled
-from YukkiMusic.utils.database import (delete_filter, get_cmode, get_lang,
-                                       is_active_chat, is_commanddelete_on,
-                                       is_maintenance, is_nonadmin_chat,
-                                       set_loop)
+from YukkiMusic.utils.database import (
+    delete_filter,
+    get_cmode,
+    get_lang,
+    is_active_chat,
+    is_commanddelete_on,
+    is_maintenance,
+    is_nonadmin_chat,
+    set_loop,
+)
 
 
 @app.on_message(
