@@ -60,8 +60,9 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
             InlineKeyboardButton(
                 text=_["P_B_6"], callback_data=f"ADMIN Unmute|{chat_id}"
             ),
-        ],"""
-        [InlineKeyboardButton(text=_["CLOSEMENU_BUTTON"], callback_data="close")],
+        ],"""[
+            InlineKeyboardButton(text=_["CLOSEMENU_BUTTON"], callback_data="close")
+        ],
     ]
     return buttons
 
@@ -86,8 +87,9 @@ def stream_markup(_, videoid, chat_id):
             InlineKeyboardButton(
                 text=_["P_B_6"], callback_data=f"ADMIN Unmute|{chat_id}"
             ),
-        ],"""
-        [InlineKeyboardButton(text=_["CLOSEMENU_BUTTON"], callback_data="close")],
+        ],"""[
+            InlineKeyboardButton(text=_["CLOSEMENU_BUTTON"], callback_data="close")
+        ],
     ]
     return buttons
 
@@ -133,8 +135,7 @@ def telegram_markup_timer(_, chat_id, played, dur):
             InlineKeyboardButton(
                 text=_["P_B_6"], callback_data=f"ADMIN Unmute|{chat_id}"
             ),
-        ],"""
-        [
+        ],"""[
             InlineKeyboardButton(text=_["CLOSEMENU_BUTTON"], callback_data="close"),
         ],
     ]
@@ -156,8 +157,7 @@ def telegram_markup(_, chat_id):
             InlineKeyboardButton(
                 text=_["P_B_6"], callback_data=f"ADMIN Unmute|{chat_id}"
             ),
-        ],"""
-        [
+        ],"""[
             InlineKeyboardButton(text=_["CLOSEMENU_BUTTON"], callback_data="close"),
         ],
     ]
