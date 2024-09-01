@@ -143,14 +143,6 @@ class Call(PyTgCalls):
         except:
             pass
 
-    async def set_volume(self, chat_id: int, volume: int):
-        assistant = await group_assistant(self, chat_id)
-        await assistant.change_volume_call(chat_id, volume)
-
-    async def get_participant(self, chat_id: int):
-        assistant = await group_assistant(self, chat_id)
-        await assistant.get_participants(chat_id)
-
     async def force_stop_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         try:
