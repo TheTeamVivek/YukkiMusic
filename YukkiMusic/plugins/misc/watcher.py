@@ -24,5 +24,5 @@ async def force_stop_stream(_, message: Message):
             if message.left_chat_member.id == (await get_assistant(message.chat.id)).id:
                 return await Yukki.force_stop_stream(message.chat.id)
         await Yukki.force_stop_stream(message.chat.id)
-    except Exception as e:
-        await app.send_message(LOG_GROUP_ID, f"error in wathcher.py error is {e}")
+    except Exception:
+        pass
