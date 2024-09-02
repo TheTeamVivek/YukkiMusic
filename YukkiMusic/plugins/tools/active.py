@@ -79,7 +79,7 @@ async def activevi_(_, message: Message):
 async def vc(client, message: Message):
     ac_audio = str(len(await get_active_chats()))
 
-    await message.reply_text(f"✫ <b><u>ᴀᴄᴛɪᴠᴇ ᴄʜᴀᴛs ɪɴғᴏ: {ac_audio}</u></b>")
+    await message.reply_text(f"ᴀᴄᴛɪᴠᴇ ᴄʜᴀᴛs ɪɴғᴏ: {ac_audio}")
 
 
 __MODULE__ = "Acᴛɪᴠᴇ"
