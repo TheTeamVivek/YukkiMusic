@@ -19,9 +19,8 @@ from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
 from youtubesearchpython.__future__ import VideosSearch
 
-from YukkiMusic.utils.formatters import time_to_seconds
 from YukkiMusic.utils.exceptions import DownloadError
-
+from YukkiMusic.utils.formatters import time_to_seconds
 
 
 def cookies():
@@ -45,6 +44,7 @@ async def shell_cmd(cmd):
         else:
             return errorz.decode("utf-8")
     return out.decode("utf-8")
+
 
 async def api_download(vidid, video=False):
     API = "https://api.cobalt.tools/api/json"
@@ -89,7 +89,9 @@ async def api_download(vidid, video=False):
             continue
 
     if not success:
-        raise DownloadError("The song has not been downloaded yet, possibly due to an API error.")
+        raise DownloadError(
+            "The song has not been downloaded yet, possibly due to an API error."
+        )
 
     return path
 

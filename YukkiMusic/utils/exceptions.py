@@ -16,4 +16,3 @@ class AssistantErr(Exception):
 
 class DownloadError(Exception):
     """Custom exception for download failures."""
-    pass
