@@ -20,6 +20,8 @@ from pyrogram.types import Message
 from youtubesearchpython.__future__ import VideosSearch
 
 from YukkiMusic.utils.formatters import time_to_seconds
+from YukkiMusic.utils.exceptions import DownloadError
+
 
 
 def cookies():
@@ -36,7 +38,7 @@ async def shell_cmd(cmd):
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    out, er rorz = await proc.communicate()
+    out, errorz = await proc.communicate()
     if errorz:
         if "unavailable videos are hidden" in (errorz.decode("utf-8")).lower():
             return out.decode("utf-8")
@@ -51,11 +53,12 @@ async def api_download(vidid, video=False):
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
     }
+
     if video:
         path = os.path.join("downloads", f"{vidid}.mp4")
         data = {"url": f"https://www.youtube.com/watch?v={vidid}", "vQuality": "480"}
     else:
-        path = os.path.join("downloads", f"{vidid}.m4a")}
+        path = os.path.join("downloads", f"{vidid}.m4a")
         data = {
             "url": f"https://www.youtube.com/watch?v={vidid}",
             "isAudioOnly": "True",
@@ -85,7 +88,10 @@ async def api_download(vidid, video=False):
         except (httpx.RequestError, httpx.HTTPStatusError, ValueError):
             continue
 
-    return path if success else None
+    if not success:
+        raise DownloadError("The song has not been downloaded yet, possibly due to an API error.")
+
+    return path
 
 
 class YouTubeAPI:
