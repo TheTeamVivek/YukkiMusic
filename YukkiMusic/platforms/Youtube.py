@@ -36,14 +36,13 @@ async def shell_cmd(cmd):
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    out, errorz = await proc.communicate()
+    out, er rorz = await proc.communicate()
     if errorz:
         if "unavailable videos are hidden" in (errorz.decode("utf-8")).lower():
             return out.decode("utf-8")
         else:
             return errorz.decode("utf-8")
     return out.decode("utf-8")
-
 
 async def api_download(vidid, video=False):
     API = "https://api.cobalt.tools/api/json"
@@ -52,38 +51,41 @@ async def api_download(vidid, video=False):
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
     }
-
     if video:
         path = os.path.join("downloads", f"{vidid}.mp4")
         data = {"url": f"https://www.youtube.com/watch?v={vidid}", "vQuality": "480"}
     else:
-        path = os.path.join("downloads", f"{vidid}.m4a")
+        path = os.path.join("downloads", f"{vidid}.m4a")}
         data = {
             "url": f"https://www.youtube.com/watch?v={vidid}",
             "isAudioOnly": "True",
             "aFormat": "opus",
         }
 
-    try:
-        async with httpx.AsyncClient(http2=True) as client:
-            response = await client.post(API, headers=headers, json=data)
-            response.raise_for_status()
+    max_retries = 2  # Maximum number of attempts
+    success = False
 
-            results = response.json().get("url")
-            if not results:
-                raise ValueError("No download URL found in the response")
+    for attempt in range(max_retries):
+        try:
+            async with httpx.AsyncClient(http2=True) as client:
+                response = await client.post(API, headers=headers, json=data)
+                response.raise_for_status()
 
-    except (httpx.RequestError, httpx.HTTPStatusError, ValueError) as e:
-        return None
+                results = response.json().get("url")
+                if not results:
+                    raise ValueError("No download URL found in the response")
 
-    cmd = f"yt-dlp '{results}' -o '{path}'"
-    await shell_cmd(cmd)
+                cmd = f"yt-dlp '{results}' -o '{path}'"
+                await shell_cmd(cmd)
 
-    if os.path.isfile(path):
-        return path
-    else:
-        print(f"Failed to download the file to {path}")
-        return None
+                if os.path.isfile(path):
+                    success = True
+                    break
+
+        except (httpx.RequestError, httpx.HTTPStatusError, ValueError):
+            continue
+
+    return path if success else None
 
 
 class YouTubeAPI:
