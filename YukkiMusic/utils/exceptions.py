@@ -16,5 +16,6 @@ class AssistantErr(Exception):
 
 class DownloadError(Exception):
     """Custom exception for download failures."""
+
     def __init__(self, errr: str):
         super().__init__(errr)
