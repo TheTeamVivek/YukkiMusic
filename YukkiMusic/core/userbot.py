@@ -25,18 +25,21 @@ class Userbot(Client):
             "YukkiString1",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
+            in_memory=True,
             session_string=str(config.STRING1),
         )
         self.two = Client(
             "YukkiString2",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
+            in_memory=True,
             session_string=str(config.STRING2),
         )
         self.three = Client(
             "YukkiString3",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
+            in_memory=True,
             session_string=str(config.STRING3),
         )
         self.four = Client(
@@ -44,11 +47,13 @@ class Userbot(Client):
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_string=str(config.STRING4),
+            in_memory=True,
         )
         self.five = Client(
             "YukkiString5",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
+            in_memory=True,
             session_string=str(config.STRING5),
         )
 
