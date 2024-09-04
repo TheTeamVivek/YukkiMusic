@@ -9,12 +9,12 @@
 #
 
 import asyncio
-import httpx
 import os
 import time
 from datetime import datetime, timedelta
 from typing import Union
 
+import httpx
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Voice
 
 import config
@@ -103,7 +103,7 @@ class TeleAPI:
                     content_type = response.headers.get("Content-Type", "")
                     if (
                         "application/vnd.apple.mpegurl" in content_type
-                    or "application/x-mpegURL" in content_type
+                        or "application/x-mpegURL" in content_type
                     ):
                         return True
                     if url.endswith(".m3u8") or url.endswith(".index"):
