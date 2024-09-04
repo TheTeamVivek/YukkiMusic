@@ -95,7 +95,7 @@ class TeleAPI:
             file_name = os.path.join(os.path.realpath("downloads"), file_name)
         return file_name
 
-    async def is_streamable_url(url: str) -> bool:
+    async def is_streamable_url(self, url: str) -> bool:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(url, timeout=5)
