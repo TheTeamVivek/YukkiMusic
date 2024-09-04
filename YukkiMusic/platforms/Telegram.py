@@ -9,6 +9,7 @@
 #
 
 import asyncio
+import httpx
 import os
 import time
 from datetime import datetime, timedelta
@@ -93,6 +94,23 @@ class TeleAPI:
                 file_name = video.file_unique_id + "." + "mp4"
             file_name = os.path.join(os.path.realpath("downloads"), file_name)
         return file_name
+
+    async def is_streamable_url(url: str) -> bool:
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, timeout=5)
+                if response.status_code == 200:
+                    content_type = response.headers.get("Content-Type", "")
+                    if (
+                        "application/vnd.apple.mpegurl" in content_type
+                    or "application/x-mpegURL" in content_type
+                    ):
+                        return True
+                    if url.endswith(".m3u8") or url.endswith(".index"):
+                        return True
+        except httpx.RequestError:
+            pass
+        return False
 
     async def download(self, _, message, mystic, fname):
         left_time = {}
