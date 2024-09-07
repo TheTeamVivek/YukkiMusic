@@ -127,10 +127,10 @@ async def api_download(vidid, video=False):
 
 async def download(videoid, video=False):
     try:
-        path = await download_a(videoid, video)
+        path = await api_download(videoid, video)
         return path
     except Exception as e:
-        logging.error(f"Error with Invidious API, falling back to secondary API: {e}")
+        
         path = await api_download(videoid, video)
         return path
 
