@@ -8,11 +8,11 @@
 # All rights reserved.
 #
 import asyncio
+import logging
 import os
 import random
 import re
 from typing import Union
-import logging
 
 import httpx
 import yt_dlp
@@ -46,15 +46,16 @@ async def shell_cmd(cmd):
             return errorz.decode("utf-8")
     return out.decode("utf-8")
 
+
 async def download_a(videoid, video: bool = False):
     url = f"https://invidious.jing.rocks/api/v1/videos/{videoid}"
-    
+
     async with httpx.AsyncClient(http2=True) as client:
         response = await client.get(url)
-    
+
     response_data = response.json()
     formats = response_data.get("adaptiveFormats", [])
-    
+
     download_url = None
     path = None
 
@@ -83,6 +84,7 @@ async def download_a(videoid, video: bool = False):
         return path
     else:
         raise Exception(f"Download failed for video: {videoid}")
+
 
 async def api_download(vidid, video=False):
     API = "https://api.cobalt.tools/api/json"
@@ -122,6 +124,7 @@ async def api_download(vidid, video=False):
     except (httpx.RequestError, httpx.HTTPStatusError, ValueError) as e:
         raise DownloadError(f"Download failed due to an API error: {str(e)}")
 
+
 async def download(videoid, video=False):
     try:
         path = await download_a(videoid, video)
@@ -130,6 +133,7 @@ async def download(videoid, video=False):
         logging.error(f"Error with Invidious API, falling back to secondary API: {e}")
         path = await api_download(videoid, video)
         return path
+
 
 class YouTubeAPI:
     def __init__(self):
