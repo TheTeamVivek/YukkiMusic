@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 import asyncio
-import logging
 import os
 import random
 import re
@@ -130,7 +129,7 @@ async def download(videoid, video=False):
         path = await api_download(videoid, video)
         return path
     except Exception as e:
-        
+
         path = await api_download(videoid, video)
         return path
 
