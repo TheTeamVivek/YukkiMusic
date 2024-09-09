@@ -27,24 +27,31 @@
 `python3 -m YukkiMusic`
 - For getting out from tmux session : Press `Ctrl+b` and then `d`<br>
 
+# 🎶 Yukki Music Configurations
 
-# Yukki Music Configs
- [Checkout Here For Config Vars](https://github.com/TheTeamVivek/YukkiMusic/blob/master/config/README.md)
-# 🏷 Support / Assistance
+To get started with configuring Yukki Music, check out the detailed instructions [here](https://github.com/TheTeamVivek/YukkiMusic/blob/master/config/README.md).
 
-Reach out to the maintainer at one of the following places:
+---
 
-- [GitHub Issues](https://github.com/TheTeamVivek/YukkiMusic/issues/new?assignees=&labels=question&template=SUPPORT_QUESTION.md&title=support%3A+)
-- Contact  [Telegram profile](https://t.me/vivekkumar07089)
-- [Telegram Support](https://t.me/TheTeamVk)
+# 🏷 Need Support or Assistance?
 
-If you want to say **thank you** or/and support active development of YukkiMusicBot:
+If you need help or have any questions, feel free to reach out through any of these channels:
 
-- Add a [GitHub Star](https://github.com/TeamYukki/YukkiMusicBot) to the project.
-- Fork the [Repo](https://github.com/TheTeamVivek/YukkiMusic) :)
-- Write interesting articles about the project on [Dev.to](https://dev.to/), [Medium](https://medium.com/) or your personal blog.
+- [GitHub Issues](https://github.com/TheTeamVivek/YukkiMusic/issues/new?assignees=&labels=question&template=SUPPORT_QUESTION.md&title=support%3A+): Open a support question on GitHub.
+- [Telegram Profile](https://t.me/vivekkumar07089): Directly contact the maintainer.
+- [Telegram Support Group](https://t.me/TheTeamVk): Join our support group for live assistance.
 
-Together, we can make **YukkiMusic** better!
+---
+
+# ❤️ Show Your Support
+
+If you'd like to say **thank you** or support the ongoing development of YukkiMusicBot, you can:
+
+- ⭐ [Star the Project](https://github.com/TeamYukki/YukkiMusicBot) on GitHub.
+- 🍴 [Fork the Repository](https://github.com/TheTeamVivek/YukkiMusic) and contribute.
+- 📝 Write articles or tutorials on [Dev.to](https://dev.to/), [Medium](https://medium.com/), or your personal blog to share your experience.
+
+Together, we can make **YukkiMusic** even better!
 
 # 📑 Acknowledgements / Credits
 
