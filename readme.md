@@ -2,20 +2,24 @@
 
 # Yukki Music Bot <img src="https://img.shields.io/github/v/release/TeamYukki/YukkiMusicBot?color=black&logo=github&logoColor=black&style=social" alt="RELEASE">
 
-[Yukki Music Bot](https://github.com/TeamYukki/YukkiMusicBot) is a Powerful Telegram Music+Video Bot written in Python using Pyrogram and Py-Tgcalls by which you can stream songs, video and even live streams in your group calls via various sources.
+[Yukki Music Bot](https://github.com/TeamYukki/YukkiMusicBot) is a powerful Telegram Music + Video Bot written in Python, using Pyrogram and Py-Tgcalls. You can stream songs, videos, and even live streams in your group calls from multiple sources.
 
-* Youtube, Soundcloud, Apple Music, Spotify, Resso, Live Streams and Telegram Audios & Videos support.
-* Written from scratch, making it stable and less crashes with attractive thumbnails.
-* Loop, Seek, Shuffle, Specific Skip, Playlists etc support
+### 🎵 Key Features
+- **Supports multiple platforms**: YouTube, SoundCloud, Apple Music, Spotify, Resso, Live Streams, Telegram Audios, and Videos.
+- **Stable and lightweight**: Written from scratch to minimize crashes, with attractive thumbnails.
+- **Advanced controls**: Loop, Seek, Shuffle, Specific Skip, Playlists, and more.
 
-
+---
 
 ## 🚀 Heroku Deployment
 
-<h4>Click the button below to deploy Yukki Music Bot on Heroku!</h4>    
-<h4>If You show any error like failed to app Creation Then fork and deploy </h4>
-<a href="https://dashboard.heroku.com/new?template=https://github.com/TheTeamVivek/YukkiMusic"><img src="https://img.shields.io/badge/Deploy%20To%20Heroku-red?style=for-the-badge&logo=heroku" width="200""/></a>
+Click the button below to easily deploy **Yukki Music Bot** on Heroku!
 
+> If you encounter an error during app creation, try forking the repository first.
+
+<a href="https://dashboard.heroku.com/new?template=https://github.com/TheTeamVivek/YukkiMusic"><img src="https://img.shields.io/badge/Deploy%20To%20Heroku-red?style=for-the-badge&logo=heroku" width="200"/></a>
+
+---
 
 ## 🖇 VPS Deployment
 - Get your [Necessary Variables](https://github.com/TheTeamVivek/YukkiMusic/blob/master/sample.env)
