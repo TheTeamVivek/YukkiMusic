@@ -45,6 +45,8 @@ Click the button below to easily deploy **Yukki Music Bot** on Heroku!
 6. **Detach from tmux session**
    Press `Ctrl+b`, then `d` to exit the tmux session without stopping the bot.
 
+___
+
 # 🎶 Yukki Music Configurations
 
 To get started with configuring Yukki Music, check out the detailed instructions [here](https://github.com/TheTeamVivek/YukkiMusic/blob/master/config/README.md).
