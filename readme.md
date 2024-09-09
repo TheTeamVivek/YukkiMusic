@@ -80,7 +80,7 @@ If you'd like to say **thank you** or support the ongoing development of YukkiMu
 
 - ⭐ [Star the Project](https://github.com/TeamYukki/YukkiMusicBot) on GitHub.
 - 🍴 [Fork the Repository](https://github.com/TheTeamVivek/YukkiMusic) and contribute.
-- 📝 Write articles or tutorials on [Dev.to](https://dev.to/), [Medium](https://medium.com/), or your personal blog to share your experience.
+- 📝 Share your experience with tutorials or articles on [Dev.to](https://dev.to/), [Medium](https://medium.com/), or your personal blog to share your experience.
 
 Together, we can make **YukkiMusic** even better!
 
