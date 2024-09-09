@@ -5,9 +5,16 @@
 [Yukki Music Bot](https://github.com/TeamYukki/YukkiMusicBot) is a powerful Telegram Music + Video Bot written in Python, using Pyrogram and Py-Tgcalls. You can stream songs, videos, and even live streams in your group calls from multiple sources.
 
 ### 🎵 Key Features
-- **Supports multiple platforms**: YouTube, SoundCloud, Apple Music, Spotify, Resso, Live Streams, Telegram Audios, and Videos.
-- **Stable and lightweight**: Written from scratch to minimize crashes, with attractive thumbnails.
-- **Advanced controls**: Loop, Seek, Shuffle, Specific Skip, Playlists, and more.
+- **Supports Multiple Platforms:** YouTube, SoundCloud, Apple Music, Spotify, Resso, Live Streams, Telegram Audios, and Videos.
+
+- **Stable and Lightweight:** Built from scratch for enhanced stability, minimizing crashes, and comes with sleek thumbnails.
+
+- **Advanced Controls:** Loop, Seek, Shuffle, Specific Skip, Playlists, and more.
+
+- **Intuitive Interface:** Optimized for simplicity and smooth operation in both private and group chats.
+
+- **High-Quality Streaming:** Ensures the best possible audio and video quality.
+
 
 ---
 
