@@ -46,20 +46,21 @@ If you want to say **thank you** or/and support active development of YukkiMusic
 
 Together, we can make **YukkiMusic** better!
 
-# 📑 Acknowledgement / Credits
+# 📑 Acknowledgements / Credits
 
-Special thanks to these amazing projects/people which/who help power Prime Music Bot:
+A heartfelt thanks to the following incredible projects and individuals, without whom Prime Music Bot wouldn't be possible:
 
-- [Pyrogram](https://github.com/pyrogram/pyrogram)
-- [Py-Tgcalls](https://github.com/pytgcalls/pytgcalls)
-- [Shikhar](https://github.com/NotReallyShikhar)
-- [TheHamkerCat](ttps://github.com/TheHamkerCat)
-- [Pranav Saraswat](https://github.com/Pranav-Saraswat)
 - [CallsMusic Team](https://github.com/Callsmusic)
-- [TheHamkerCat](https://github.com/TheHamkerCat)
 - [Charon Baglari](https://github.com/XCBv021)
+- [Pranav Saraswat](https://github.com/Pranav-Saraswat)
+- [Py-Tgcalls](https://github.com/pytgcalls/pytgcalls)
+- [Pyrogram (Original)](https://github.com/pyrogram/pyrogram)
+- [Pyrogram (Fork)](https://github.com/KurimuzonAkuma/pyrogram)
+- [Shikhar](https://github.com/NotReallyShikhar)
+- [TheHamkerCat](https://github.com/TheHamkerCat)
 
+---
 
+### Special Thanks
 
-- <b> _Special Thanks To [Team Yukki](https://github.com/TeamYukki) ғᴏʀ [YukkiMusicBot](https://github.com/TeamYukki/YukkiMusicBot)_ </b>
-
+A huge shout-out to [Team Yukki](https://github.com/TeamYukki) for their inspiring work on [YukkiMusicBot](https://github.com/TeamYukki/YukkiMusicBot). Your contributions have been invaluable!
