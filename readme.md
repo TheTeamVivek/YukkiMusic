@@ -48,18 +48,21 @@ Together, we can make **YukkiMusic** better!
 
 # 📑 Acknowledgement / Credits
 
-<h3 align="center">
-    ─「 Credits 」─
-</h3>
+Special thanks to these amazing projects/people which/who help power Prime Music Bot:
 
-<p align="center">
-<a href="https://github.com/pyrogram/pyrogram"> <img src="https://img.shields.io/badge/Pyrogram-black?style=for-the-badge&logo=github" alt="Pyrogram" /> </a>
-<a href="https://github.com/pytgcalls/pytgcalls"> <img src="https://img.shields.io/badge/PyTgCalls-black?style=for-the-badge&logo=github" alt="Pytgcalls" /> </a>
-<a href="https://github.com/AnonymousX1025"> <img src="https://img.shields.io/badge/Anonymous-black?style=for-the-badge&logo=github" alt="Anonymous" /> </a>
-<a href="https://github.com/NotReallyShikhar"> <img src="https://img.shields.io/badge/Shikhar-black?style=for-the-badge&logo=github" alt="Shikhar" /> </a>
-<a href="https://github.com/TheHamkerCat"> <img src="https://img.shields.io/badge/TheHamkerCat-black?style=for-the-badge&logo=github" alt="TheHamkerCat" /> </a>
-<a href="https://github.com/Pranav-Saraswat"> <img src="https://img.shields.io/badge/PranavSaraswat-black?style=for-the-badge&logo=github" alt="PranavSaraswat" /> </a>
-</p>
+- [Pyrogram](https://github.com/pyrogram/pyrogram)
+- [Py-Tgcalls](https://github.com/pytgcalls/pytgcalls)
+- [Shikhar](https://github.com/NotReallyShikhar)
+
+- [TheHamkerCat](ttps://github.com/TheHamkerCat)
+
+- [Pranav Saraswat](https://github.com/Pranav-Saraswat)
+
+- [CallsMusic Team](https://github.com/Callsmusic)
+- [TheHamkerCat](https://github.com/TheHamkerCat)
+- [Charon Baglari](https://github.com/XCBv021)
+
+
 
 - <b> _Special Thanks To [Team Yukki](https://github.com/TeamYukki) ғᴏʀ [YukkiMusicBot](https://github.com/TeamYukki/YukkiMusicBot)_ </b>
 
