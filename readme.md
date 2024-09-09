@@ -20,16 +20,30 @@ Click the button below to easily deploy **Yukki Music Bot** on Heroku!
 <a href="https://dashboard.heroku.com/new?template=https://github.com/TheTeamVivek/YukkiMusic"><img src="https://img.shields.io/badge/Deploy%20To%20Heroku-red?style=for-the-badge&logo=heroku" width="200"/></a>
 
 ---
+## 🖇️ VPS Deployment Guide
 
-## 🖇 VPS Deployment
-- Get your [Necessary Variables](https://github.com/TheTeamVivek/YukkiMusic/blob/master/sample.env)
-- clone repo : `git clone https://github.com/TheTeamVivek/YukkiMusic && cd YukkiMusic`
-- Setup by : `bash setup`
-- Install tmux to keep running your bot when you close the terminal by :
-`sudo apt install tmux && tmux`
-- Finally run the bot by :
-`python3 -m YukkiMusic`
-- For getting out from tmux session : Press `Ctrl+b` and then `d`<br>
+1. **Get the Required Variables**  
+   Download the [Necessary Variables](https://github.com/TheTeamVivek/YukkiMusic/blob/master/sample.env) for your setup.
+
+2. **Clone the Repository**
+   ```bash
+   git clone https://github.com/TheTeamVivek/YukkiMusic && cd YukkiMusic```
+
+3. **Run the setup**
+   ```bash
+   bash setup```
+
+4. **Install tmux**
+   To keep your bot running after you close the terminal:
+   ```bash
+   sudo apt install tmux && tmux```
+
+5. **Run the Bot**
+   ```bash
+   python3 -m YukkiMusic```
+
+6. **Detach from tmux session**
+   Press `Ctrl+b`, then `d` to exit the tmux session without stopping the bot.
 
 # 🎶 Yukki Music Configurations
 
