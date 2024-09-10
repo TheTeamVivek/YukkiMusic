@@ -2,7 +2,7 @@
 
 # Yukki Music <img src="https://img.shields.io/github/v/release/TeamYukki/YukkiMusicBot?color=black&logo=github&logoColor=black&style=social" alt="RELEASE">
 
-[Yukki Music Bot](https://github.com/TeamYukki/YukkiMusicBot) is a powerful Telegram Music + Video Bot written in Python, using Pyrogram and Py-Tgcalls. You can stream songs, videos, and even live streams in your group calls from multiple sources.
+[Yukki Music](https://github.com/TeamYukki/YukkiMusicBot) is a powerful Telegram Music + Video Bot written in Python, using Pyrogram and Py-Tgcalls. You can stream songs, videos, and even live streams in your group calls from multiple sources.
 
 ### 🎵 Key Features
 - **Supports Multiple Platforms:** YouTube, SoundCloud, Apple Music, Spotify, Resso, Live Streams, Telegram Audios, and Videos.
