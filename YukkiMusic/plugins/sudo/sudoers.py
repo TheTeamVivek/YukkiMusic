@@ -119,7 +119,7 @@ async def sudoers_list(client, message: Message, _):
                     smex += 1
                     text += _["sudo_6"]
                 count += 1
-                text += f"{count}➤ {user_name} ({user_id})\n"
+                text += f"{count}➤ {user} ({user_id})\n"
             except Exception:
                 continue
     if not text:
