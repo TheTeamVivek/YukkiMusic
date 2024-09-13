@@ -161,7 +161,6 @@ def PlayWrapper(command):
                             pass
                     else:
                         try:
-                            await client.get_chat_member(message.chat.id, "me")
                             invitelink = await client.export_chat_invite_link(
                                 message.chat.id
                             )
