@@ -10,7 +10,6 @@
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
-
 def botplaylist_markup(_):
     buttons = [
         [
@@ -26,6 +25,7 @@ def botplaylist_markup(_):
         ],
     ]
     return buttons
+
 
 def top_play_markup(_):
     buttons = [
