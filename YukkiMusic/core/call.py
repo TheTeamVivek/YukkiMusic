@@ -13,13 +13,7 @@ from typing import Union
 
 from ntgcalls import TelegramServerError
 from pyrogram import Client
-from pyrogram.enums import ChatMemberStatus
-from pyrogram.errors import (
-    ChatAdminRequired,
-    FloodWait,
-    UserAlreadyParticipant,
-    UserNotParticipant,
-)
+from pyrogram.errors import FloodWait
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls, filters
 from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
@@ -39,7 +33,6 @@ from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
     add_active_chat,
     add_active_video_chat,
-    get_assistant,
     get_audio_bitrate,
     get_lang,
     get_loop,
