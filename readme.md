@@ -1,4 +1,4 @@
-<img src="https://envs.sh/qhM.jpg" align="right" width="200" height="512"/>
+<img src="https://envs.sh/qhM.jpg" align="right" width="200" height="160"/>
 
 # Yukki Music <img src="https://img.shields.io/github/v/release/TeamYukki/YukkiMusicBot?color=black&logo=github&logoColor=black&style=social" alt="RELEASE">
 
