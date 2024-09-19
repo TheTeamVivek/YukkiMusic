@@ -67,7 +67,10 @@ admin_31 : "Verilen yüksek süre nedeniyle bot arama yapamıyor. Daha düşük 
 admin_32 : "➻ Lütfen bekleyin... Akış aranıyor."
 admin_33 : "➻ Akış başarıyla {0} dakikaya arandı."
 admin_34 : "➻ Mevcut akışı arama başarısız oldu."
+admin_35 : "**Asistan** hâlâ **{}** sonra sessizde. Müzik durduruluyor..."
+admin_36 : "**🔔 Bildiri:**\n> Eğer **yardımcı** sesli sohbette **{}** süresince **sessiz** kalırsa, **müzik** **durdurulacak ⏸️**. Lütfen yardımcının **gerekli olduğunda** **sessiz** olmadığından emin olun 🔊. **Teşekkürler! 🙏**"
 
+# bot
 start_1 : "нєу, ɪ ᴀᴍ {0} 🥀.\n\n➻ Ben bazı yararlı özelliklere sahip bir Telegram akış botuyum.\n\nDesteklenen platformlar: YouTube, Spotify, SoundCloud vb.\n\n๏ Beni gruplarınıza eklemekten çekinmeyin."
 start_2 : "ʜᴇʏ,\n  ᴛʜɪs ɪs {0}\n\nHızlı ve güçlü bir müzik oynatma botu, bazı harika özelliklere sahip.\n\nAsistan kullanıcı adı:- @{1}\nAsistan ID:- {2}"
 start_3 : "{0} sahibi {1} sohbetinize katıldı."
