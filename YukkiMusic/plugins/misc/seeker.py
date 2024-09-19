@@ -7,22 +7,27 @@
 #
 # All rights reserved.
 #
-import time
 import asyncio
+import time
 
 from pyrogram.types import InlineKeyboardMarkup
 
+from config import MUTE_WARNING_TIME
 from strings import get_string
 from YukkiMusic import app
-from YukkiMusic.misc import db
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.utils.database import get_active_chats, get_lang, is_music_playing, get_assistant, set_loop
+from YukkiMusic.misc import db
+from YukkiMusic.utils.database import (
+    get_active_chats,
+    get_assistant,
+    get_lang,
+    is_music_playing,
+    set_loop,
+)
 from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline import stream_markup_timer, telegram_markup_timer
-from config import MUTE_WARNING_TIME
 
 from ..admins.callback import wrong
-
 
 checker = {}
 mute_warnings = {}
@@ -31,6 +36,7 @@ if MUTE_WARNING_TIME < 60:
     t = f"{MUTE_WARNING_TIME} seconds"
 else:
     t = time.strftime("%M:%S minutes", time.gmtime(MUTE_WARNING_TIME))
+
 
 async def timer():
     while not await asyncio.sleep(1):
@@ -83,6 +89,7 @@ async def process_mute_warnings():
                 except:
                     mute_warnings.pop(chat_id, None)
 
+
 async def markup_timer():
     while not await asyncio.sleep(2):
         active_chats = await get_active_chats()
@@ -134,7 +141,11 @@ async def markup_timer():
 
                     if is_muted:
                         ab = await app.send_message(chat_id, _["admin_36"].format(t))
-                        mute_warnings[chat_id] = {"timestamp": time.time(), "_": _, "msg_id": ab.id}
+                        mute_warnings[chat_id] = {
+                            "timestamp": time.time(),
+                            "_": _,
+                            "msg_id": ab.id,
+                        }
 
                 except:
                     continue
@@ -164,6 +175,7 @@ async def markup_timer():
 
             except:
                 continue
+
 
 asyncio.create_task(markup_timer())
 asyncio.create_task(process_mute_warnings())
