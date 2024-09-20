@@ -86,7 +86,7 @@ Together, we can make **YukkiMusic** even better!
 
 # 📑 Acknowledgements / Credits
 
-A heartfelt thanks to the following incredible projects and individuals, without whom Prime Music Bot wouldn't be possible:
+A heartfelt thanks to the following incredible projects and peoples, without whom YukkiMusic wouldn't be possible:
 
 - [CallsMusic Team](https://github.com/Callsmusic)
 - [Charon Baglari](https://github.com/XCBv021)
