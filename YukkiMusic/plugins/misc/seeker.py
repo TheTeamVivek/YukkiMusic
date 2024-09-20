@@ -67,10 +67,6 @@ async def process_mute_warnings():
             if time.time() - details["timestamp"] >= MUTE_WARNING_TIME:
                 _ = details["_"]
                 try:
-                    await app.delete_messages(chat_id, details["msg_id"])
-                except:
-                    pass
-                try:
                     userbot = await get_assistant(chat_id)
                     members = []
                     async for member in userbot.get_call_members(chat_id):
@@ -147,11 +143,9 @@ async def markup_timer():
                     is_muted = bool(m.is_muted and not m.can_self_unmute)
 
                     if is_muted:
-                        ab = await app.send_message(chat_id, _["admin_36"].format(t))
                         mute_warnings[chat_id] = {
                             "timestamp": time.time(),
                             "_": _,
-                            "msg_id": ab.id,
                         }
 
                 except:
