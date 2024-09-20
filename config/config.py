@@ -73,7 +73,7 @@ LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", ""))
 
 # Fill in seconds if assistant is muted in voice chat assistant will leave  voice chat after the MUTE_WARNING_TIME
 
-MUTE_WARNING_TIME = int(getenv("MUTE_WARNING_TIME", 30))
+MUTE_WARNING_TIME = int(getenv("MUTE_WARNING_TIME", 100))
 
 
 # Your User ID.
