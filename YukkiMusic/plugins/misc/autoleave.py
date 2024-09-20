@@ -9,14 +9,21 @@
 #
 
 import asyncio
-from datetime import datetime
 
 from pyrogram.enums import ChatType
 
 import config
 from YukkiMusic import app
-from YukkiMusic.core.call import Yukki, autoend
-from YukkiMusic.utils.database import get_client, is_active_chat, is_autoend
+from YukkiMusic.core.call import Yukki
+from YukkiMusic.utils.database import (
+    get_assistant,
+    get_client,
+    is_active_chat,
+    is_autoend,
+    set_loop,
+)
+
+from .seeker import autoend
 
 
 async def auto_leave():
@@ -53,24 +60,37 @@ async def auto_leave():
                     pass
 
 
-asyncio.create_task(auto_leave())
-
-
 async def auto_end():
-    while not await asyncio.sleep(5):
+    while not await asyncio.sleep(30):
         if not await is_autoend():
             continue
         for chat_id in autoend:
-            timer = autoend.get(chat_id)
-            if not timer:
-                continue
-            if datetime.now() > timer:
-                if not await is_active_chat(chat_id):
-                    autoend[chat_id] = {}
-                    continue
-                autoend[chat_id] = {}
+            count = autoend.get(chat_id)
+            if not count or count == 0:
                 try:
                     await Yukki.stop_stream(chat_id)
+                    await set_loop(chat_id, 0)
+                    continue
+                except:
+                    continue
+            if not await is_active_chat(chat_id):
+                continue
+            userbot = await get_assistant(chat_id)
+            members = []
+            async for member in userbot.get_call_members(chat_id):
+                if member is None:
+                    try:
+                        await Yukki.stop_stream(chat_id)
+                        await set_loop(chat_id, 0)
+                        continue
+                    except:
+                        continue
+                members.append(member)
+
+            if len(members) in [0, 1]:
+                try:
+                    await Yukki.stop_stream(chat_id)
+                    await set_loop(chat_id, 0)
                 except:
                     continue
                 try:
@@ -82,4 +102,5 @@ async def auto_end():
                     continue
 
 
+asyncio.create_task(auto_leave())
 asyncio.create_task(auto_end())
