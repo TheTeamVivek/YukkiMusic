@@ -29,6 +29,7 @@ from YukkiMusic.utils.inline import stream_markup_timer, telegram_markup_timer
 
 from ..admins.callback import wrong
 
+autoend = {}
 checker = {}
 mute_warnings = {}
 
@@ -77,8 +78,11 @@ async def process_mute_warnings():
                             continue
                         members.append(member)
 
+                    autoend[chat_id] = len(members)
                     m = next((m for m in members if m.chat.id == userbot.id), None)
-                    is_muted = bool(m.is_muted and not m.can_self_unmute) if m else True
+                    if m is None:
+                        continue
+                    is_muted = bool(m.is_muted and not m.can_self_unmute)
 
                     if is_muted:
                         await Yukki.stop_stream(chat_id)
@@ -136,8 +140,11 @@ async def markup_timer():
                         await set_loop(chat_id, 0)
                         continue
 
+                    autoend[chat_id] = len(members)
                     m = next((m for m in members if m.chat.id == userbot.id), None)
-                    is_muted = bool(m.is_muted and not m.can_self_unmute) if m else True
+                    if m is None:
+                        continue
+                    is_muted = bool(m.is_muted and not m.can_self_unmute)
 
                     if is_muted:
                         ab = await app.send_message(chat_id, _["admin_36"].format(t))
