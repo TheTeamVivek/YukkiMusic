@@ -12,7 +12,7 @@ from pyrogram.types import Message
 
 from strings import get_command
 from YukkiMusic import app
-from YukkiMusic.misc import db, SUDOERS
+from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils.database.memorydatabase import (
     get_active_chats,
     get_active_video_chats,
@@ -24,11 +24,13 @@ from YukkiMusic.utils.database.memorydatabase import (
 ACTIVEVC_COMMAND = get_command("ACTIVEVC_COMMAND")
 ACTIVEVIDEO_COMMAND = get_command("ACTIVEVIDEO_COMMAND")
 
+
 # Function for removing the Active voice and video chat also clear the db dictionary for the chat
 async def _clear_(chat_id):
     db[chat_id] = []
     await remove_active_video_chat(chat_id)
     await remove_active_chat(chat_id)
+
 
 @app.on_message(filters.command(ACTIVEVC_COMMAND) & SUDOERS)
 async def activevc(_, message: Message):
