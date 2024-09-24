@@ -9,7 +9,7 @@
 #
 from pyrogram import filters
 from pyrogram.types import Message
-
+from pyrogram.errors import ChannelInvalid
 from strings import get_command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS, db
@@ -47,7 +47,7 @@ async def activevc(_, message: Message):
             else:
                 text += f"<b>{j + 1}. {title}</b> [`{x}`]\n"
             j += 1
-        except Exception:
+        except ChannelInvalid:
             await _clear_(x)
             continue
     if not text:
@@ -74,7 +74,7 @@ async def activevi_(_, message: Message):
             else:
                 text += f"<b>{j + 1}. {title}</b> [`{x}`]\n"
             j += 1
-        except Exception:
+        except ChannelInvalid:
             await _clear_(x)
             continue
     if not text:
