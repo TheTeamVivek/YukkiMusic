@@ -14,7 +14,7 @@ from os import listdir, mkdir
 
 from config import TEMP_DB_FOLDER
 
-# remove all files on startup  that contains these extentions 
+# remove all files on startup  that contains these extentions
 files = [
     ".jpg",
     ".jpeg",
@@ -26,6 +26,7 @@ files = [
     ".session",
     ".session-journal",
 ]
+
 
 def dirr():
     assets_folder = "assets"
