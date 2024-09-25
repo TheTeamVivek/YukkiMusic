@@ -23,6 +23,7 @@ from config import SUPPORT_GROUP as SUPPORT_CHAT
 from config import adminlist
 from strings import get_string
 from YukkiMusic import YouTube, app
+from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
     get_assistant,
@@ -108,6 +109,15 @@ def PlayWrapper(command):
         else:
             chat_id = message.chat.id
             channel = None
+        try:
+            is_call_active = (await app.get_chat(chat_id)).is_call_active
+            if not is_call_active:
+                return await message.reply_text(
+                    f"**» ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ғᴏᴜɴᴅ.**\n\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ."
+                )
+        except Exception:
+            pass
+
         playmode = await get_playmode(message.chat.id)
         playty = await get_playtype(message.chat.id)
         if playty != "Everyone":
@@ -199,6 +209,18 @@ def PlayWrapper(command):
 
                 try:
                     await userbot.resolve_peer(chat_id)
+                except:
+                    pass
+                try:
+                    call_participants_id = [
+                        member.chat.id
+                        async for member in userbot.get_call_members(chat_id)
+                    ]
+                    if await is_active_chat(chat_id) and (
+                        not call_participants_id
+                        or userbot.id not in call_participants_id
+                    ):
+                        await Yukki.stop_stream(chat_id)
                 except:
                     pass
 

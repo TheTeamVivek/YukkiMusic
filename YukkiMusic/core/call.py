@@ -12,8 +12,9 @@ from typing import Union
 
 from ntgcalls import TelegramServerError
 from pyrogram import Client
+from pyrogram import filters as pyro_filter
 from pyrogram.errors import FloodWait
-from pyrogram.types import InlineKeyboardMarkup
+from pyrogram.types import InlineKeyboardMarkup, Message
 from pytgcalls import PyTgCalls, filters
 from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
 from pytgcalls.types import (
@@ -31,6 +32,7 @@ from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
     add_active_chat,
     add_active_video_chat,
+    get_assistant,
     get_audio_bitrate,
     get_lang,
     get_loop,
@@ -51,6 +53,7 @@ async def _clear_(chat_id):
     db[chat_id] = []
     await remove_active_video_chat(chat_id)
     await remove_active_chat(chat_id)
+    await set_loop(chat_id, 0)
 
 
 class Call(PyTgCalls):
@@ -580,6 +583,53 @@ class Call(PyTgCalls):
         async def stream_end_handler(client, update: Update):
             if isinstance(update, (StreamVideoEnded, StreamAudioEnded)):
                 await self.change_stream(client, update.chat_id)
+
+        @self.one.mtproto_client.on_message(
+            (
+                pyro_filter.video_chat_started
+                | pyro_filter.video_chat_ended
+                | pyro_filter.left_chat_member
+            )
+        )
+        @self.two.mtproto_client.on_message(
+            (
+                pyro_filter.video_chat_started
+                | pyro_filter.video_chat_ended
+                | pyro_filter.left_chat_member
+            )
+        )
+        @self.three.mtproto_client.on_message(
+            (
+                pyro_filter.video_chat_started
+                | pyro_filter.video_chat_ended
+                | pyro_filter.left_chat_member
+            )
+        )
+        @self.four.mtproto_client.on_message(
+            (
+                pyro_filter.video_chat_started
+                | pyro_filter.video_chat_ended
+                | pyro_filter.left_chat_member
+            )
+        )
+        @self.five.mtproto_client.on_message(
+            (
+                pyro_filter.video_chat_started
+                | pyro_filter.video_chat_ended
+                | pyro_filter.left_chat_member
+            )
+        )
+        async def watcher_ass(_, message: Message):
+            try:
+                if message.left_chat_member and not message.left_chat_member is None:
+                    if (
+                        message.left_chat_member.id
+                        == (await get_assistant(message.chat.id)).id
+                    ):
+                        return await self.stop_stream(message.chat.id)
+                await self.stop_stream(message.chat.id)
+            except Exception:
+                pass
 
 
 Yukki = Call()
