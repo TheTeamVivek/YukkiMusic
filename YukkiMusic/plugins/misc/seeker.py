@@ -10,8 +10,8 @@
 import asyncio
 import time
 
-from pyrogram.types import InlineKeyboardMarkup
 from pyrogram.enums import ChatType
+from pyrogram.types import InlineKeyboardMarkup
 
 from config import MUTE_WARNING_TIME
 from strings import get_string
@@ -21,10 +21,10 @@ from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
     get_active_chats,
     get_assistant,
+    get_cmode,
     get_lang,
     is_music_playing,
     set_loop,
-    get_cmode,
 )
 from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline import stream_markup_timer, telegram_markup_timer
@@ -35,9 +35,10 @@ autoend = {}
 checker = {}
 mute_warnings = {}
 
+
 async def send_warning(chat_id, text):
     chat = await app.get_chat(chat_id)
-    
+
     if chat.type == ChatType.CHANNEL:
         cmode_chat_id = await get_cmode(chat_id)
         if cmode_chat_id:
@@ -46,7 +47,6 @@ async def send_warning(chat_id, text):
                 await app.send_message(cmode_chat_id, text)
     else:
         await app.send_message(chat_id, text)
-
 
 
 if MUTE_WARNING_TIME < 60:
@@ -71,9 +71,6 @@ async def timer():
             if duration == 0:
                 continue
             db[chat_id][0]["played"] += 1
-
-
-asyncio.create_task(timer())
 
 
 async def process_mute_warnings():
@@ -194,5 +191,6 @@ async def markup_timer():
                 continue
 
 
+asyncio.create_task(timer())
 asyncio.create_task(markup_timer())
 asyncio.create_task(process_mute_warnings())

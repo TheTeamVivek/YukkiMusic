@@ -51,6 +51,7 @@ async def _clear_(chat_id):
     db[chat_id] = []
     await remove_active_video_chat(chat_id)
     await remove_active_chat(chat_id)
+    await set_loop(chat_id, 0)
 
 
 class Call(PyTgCalls):
@@ -569,8 +570,9 @@ class Call(PyTgCalls):
         @self.three.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
         @self.four.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
         @self.five.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
-        async def stream_services_handler(_, chat_id: int):
-            await self.stop_stream(chat_id)
+        async def stream_services_handler(client, update):
+            await _clear_(update.chat_id)
+            await client.leave_call(update.chat_id)
 
         @self.one.on_update(filters.stream_end)
         @self.two.on_update(filters.stream_end)

@@ -46,45 +46,6 @@ async def shell_cmd(cmd):
     return out.decode("utf-8")
 
 
-async def download_a(videoid, video: bool = False):
-    url = f"https://invidious.jing.rocks/api/v1/videos/{videoid}"
-
-    async with httpx.AsyncClient(http2=True) as client:
-        response = await client.get(url)
-
-    response_data = response.json()
-    formats = response_data.get("adaptiveFormats", [])
-
-    download_url = None
-    path = None
-
-    if video:
-        path = os.path.join("downloads", f"{videoid}.mp4")
-        formats = response_data.get("formatStreams", [])
-        for fmt in formats:
-            download_url = fmt.get("url")
-            if download_url:
-                break
-    else:
-        path = os.path.join("downloads", f"{videoid}.m4a")
-        for fmt in formats:
-            if fmt.get("audioQuality") == "AUDIO_QUALITY_MEDIUM":
-                download_url = fmt.get("url")
-                if download_url:
-                    break
-
-    if not download_url:
-        raise ValueError("No suitable format found")
-
-    command = f'yt-dlp -o "{path}" "{download_url}"'
-    await shell_cmd(command)
-
-    if os.path.isfile(path):
-        return path
-    else:
-        raise Exception(f"Download failed for video: {videoid}")
-
-
 async def api_download(vidid, video=False):
     API = "https://api.cobalt.tools/api/json"
     headers = {
