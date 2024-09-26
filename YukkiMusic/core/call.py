@@ -572,7 +572,7 @@ class Call(PyTgCalls):
         @self.five.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
         async def stream_services_handler(client, update):
             await _clear_(update.chat_id)
-            await client.leave_call(update.chat_id)
+            await self.stop_stream(update.chat_id)
 
         @self.one.on_update(filters.stream_end)
         @self.two.on_update(filters.stream_end)
