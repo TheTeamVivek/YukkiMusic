@@ -142,7 +142,17 @@ def PlayWrapper(command):
         else:
             fplay = None
 
-        if not await is_active_chat(chat_id):
+        if await is_active_chat(chat_id):
+            userbot = await get_assistant(message.chat.id)
+            # Getting all members id that in voicechat
+            call_participants_id = [
+                member.chat.id async for member in userbot.get_call_members(chat_id)
+            ]
+            # Checking if assistant id not in list so clear queues and remove active voice chat and process
+            if userbot.id not in call_participants_id:
+                await Yukki.stop_stream(chat_id)
+            
+        else:
             userbot = await get_assistant(message.chat.id)
             try:
                 try:
@@ -211,15 +221,6 @@ def PlayWrapper(command):
                     await userbot.resolve_peer(chat_id)
                 except:
                     pass
-
-        userbot = await get_assistant(message.chat.id)
-        # Getting all members id that in voicechat
-        call_participants_id = [
-            member.chat.id async for member in userbot.get_call_members(chat_id)
-        ]
-        # Checking if assistant id not in list so clear queues and remove active voice chat and process
-        if await is_active_chat(chat_id) and userbot.id not in call_participants_id:
-            await Yukki.stop_stream(chat_id)
 
         return await command(
             client,
