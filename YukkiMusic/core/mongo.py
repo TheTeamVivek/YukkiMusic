@@ -18,6 +18,8 @@ from ..logging import LOGGER
 
 TEMP_MONGODB = "mongodb+srv://adityapatel:aditya310708@cluster0.esldbqp.mongodb.net/?retryWrites=true&w=majority"
 
+DB_NAME = "Yukki"
+
 
 if config.MONGO_DB_URI is None:
     LOGGER(__name__).warning(
@@ -40,5 +42,5 @@ if config.MONGO_DB_URI is None:
 else:
     _mongo_async_ = _mongo_client_(config.MONGO_DB_URI)
     _mongo_sync_ = MongoClient(config.MONGO_DB_URI)
-    mongodb = _mongo_async_.Yukki
-    pymongodb = _mongo_sync_.Yukki
+    mongodb = _mongo_async_[DB_NAME]
+    pymongodb = _mongo_sync_[DB_NAME]
