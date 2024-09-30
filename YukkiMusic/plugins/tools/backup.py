@@ -16,7 +16,7 @@ from YukkiMusic.core.mongo import DB_NAME
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from config MONGO_DB_URI, OWNER_ID
+from config import MONGO_DB_URI, OWNER_ID
 
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -38,7 +38,7 @@ async def ex_port(db, db_name):
         documents = await collection.find().to_list(length=None)
         data[collection_name] = documents
 
-    file_path = f"cache/{db_name}_backup.txt"
+    file_path = os.path.join("cache", f"{db_name}_backup.txt")
     with open(file_path, "w") as backup_file:
         json.dump(data, backup_file, indent=4, cls=CustomJSONEncoder)
 
@@ -131,6 +131,7 @@ async def import_database(client, message):
         )
 
     mystic = await message.reply_text("Dᴏᴡɴʟᴏᴀᴅɪɴɢ...")
+
     async def progress(current, total):
         try:
             await mystic.edit_text(f"ᴅᴏᴡɴʟᴏᴀᴅᴇᴅ... {current * 100 / total:.1f}%")
@@ -142,15 +143,11 @@ async def import_database(client, message):
     try:
         with open(file_path, "r") as backup_file:
             data = json.load(backup_file)
-    except (json.JSONDecodeError, IOError) as e:
-        return await edit_or_reply(
-            mystic, "Iɴᴠᴀʟɪᴅ ᴇxᴘᴏʀᴛᴇᴅ ᴅᴀᴛᴀ. Pʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ᴠᴀʟɪᴅ MᴏɴɢᴏDB ᴇxᴘᴏʀᴛ."
-        )
+    except (json.JSONDecodeError, IOError):
+        return await edit_or_reply(mystic, "Iɴᴠᴀʟɪᴅ ᴇxᴘᴏʀᴛᴇᴅ ᴅᴀᴛᴀ. Pʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ᴠᴀʟɪᴅ MᴏɴɢᴏDB ᴇxᴘᴏʀᴛ.")
 
     if not isinstance(data, dict):
-        return await edit_or_reply(
-            mystic, "Iɴᴠᴀʟɪᴅ ᴅᴀᴛᴀ ғᴏʀᴍᴀᴛ. Pʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ᴠᴀʟɪᴅ MᴏɴɢᴏDB ᴇxᴘᴏʀᴛ."
-        )
+        return await edit_or_reply(mystic, "Iɴᴠᴀʟɪᴅ ᴅᴀᴛᴀ ғᴏʀᴍᴀᴛ. Pʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ᴠᴀʟɪᴅ MᴏɴɢᴏDB ᴇxᴘᴏʀᴛ.")
 
     _mongo_async_ = AsyncIOMotorClient(MONGO_DB_URI)
     databases = await _mongo_async_.list_database_names()
@@ -163,18 +160,14 @@ async def import_database(client, message):
 
     try:
         for collection_name, documents in data.items():
-            mystic = await edit_or_reply(
-                mystic, f"Iᴍᴘᴏʀᴛɪɴɢ...\n ᴄᴏʟʟᴇᴄᴛɪᴏɴ {collection_name}."
-            )
-            collection = db[collection_name]
             if documents:
+                mystic = await edit_or_reply(mystic, f"Iᴍᴘᴏʀᴛɪɴɢ...\n ᴄᴏʟʟᴇᴄᴛɪᴏɴ {collection_name}.")
+                collection = db[collection_name]
                 await collection.insert_many(documents)
         await edit_or_reply(mystic, "Dᴀᴛᴀ sᴜᴄᴄᴇssғᴜʟʟʏ ɪᴍᴘᴏʀᴛᴇᴅ.")
     except Exception as e:
         await edit_or_reply(mystic, f"Eʀʀᴏʀ ᴅᴜʀɪɴɢ ɪᴍᴘᴏʀᴛ: {e}. Rᴏʟʟɪɴɢ ʙᴀᴄᴋ ᴄʜᴀɴɢᴇs.")
         await drop_db(_mongo_async_, DB_NAME)
 
-    try:
+    if os.path.exists(file_path):
         os.remove(file_path)
-    except:
-        pass
