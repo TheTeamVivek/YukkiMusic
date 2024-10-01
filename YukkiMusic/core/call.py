@@ -217,7 +217,7 @@ class Call(PyTgCalls):
         assistant = await group_assistant(self, chat_id)
         audio_stream_quality = await get_audio_bitrate(chat_id)
         video_stream_quality = await get_video_bitrate(chat_id)
-        config = GroupCallConfig(auto_start=False)
+        call_config = GroupCallConfig(auto_start=False)
         if video:
             stream = MediaStream(
                 link,
@@ -246,7 +246,7 @@ class Call(PyTgCalls):
             await assistant.play(
                 chat_id=chat_id,
                 stream=stream,
-                config=config,
+                config=call_config,
             )
         except NoActiveGroupCall:
             raise AssistantErr(
