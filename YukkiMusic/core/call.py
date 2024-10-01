@@ -18,12 +18,12 @@ from pytgcalls import PyTgCalls, filters
 from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
 from pytgcalls.types import (
     ChatUpdate,
+    GroupCallConfig,
     MediaStream,
     StreamAudioEnded,
     StreamVideoEnded,
     Update,
 )
-
 import config
 from strings import get_string
 from YukkiMusic import LOGGER, YouTube, app
@@ -217,6 +217,7 @@ class Call(PyTgCalls):
         assistant = await group_assistant(self, chat_id)
         audio_stream_quality = await get_audio_bitrate(chat_id)
         video_stream_quality = await get_video_bitrate(chat_id)
+        config = GroupCallConfig(auto_start=False)
         if video:
             stream = MediaStream(
                 link,
@@ -243,19 +244,14 @@ class Call(PyTgCalls):
                 )
         try:
             await assistant.play(
-                chat_id,
-                stream,
+                chat_id=chat_id,
+                stream=stream,
+                config=config,
             )
         except NoActiveGroupCall:
-            try:
-                await assistant.play(
-                    chat_id,
-                    stream,
-                )
-            except Exception:
-                raise AssistantErr(
-                    "**ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ғᴏᴜɴᴅ**\n\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ."
-                )
+            raise AssistantErr(
+                "**ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ғᴏᴜɴᴅ**\n\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ."
+            )
 
         except AlreadyJoinedError:
             raise AssistantErr(
@@ -267,15 +263,9 @@ class Call(PyTgCalls):
             )
         except Exception as e:
             if "phone.CreateGroupCall" in str(e):
-                try:
-                    await assistant.play(
-                        chat_id,
-                        stream,
-                    )
-                except Exception:
-                    raise AssistantErr(
-                        f"**» ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ғᴏᴜɴᴅ.**\n\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ."
-                    )
+                raise AssistantErr(
+                    f"**» ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ғᴏᴜɴᴅ.**\n\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ."
+                )
             else:
                 raise AssistantErr(e)
 
