@@ -6,6 +6,7 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
+import sys
 import asyncio
 import importlib
 
@@ -21,13 +22,7 @@ from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
 
 async def init():
-    if (
-        not config.STRING1
-        and not config.STRING2
-        and not config.STRING3
-        and not config.STRING4
-        and not config.STRING5
-    ):
+    if len(config.STRING_SESSIONS) == 0:
         LOGGER("YukkiMusic").error(
             "No Assistant Clients Vars Defined!.. Exiting Process."
         )
@@ -55,6 +50,7 @@ async def init():
     LOGGER("YukkiMusic.plugins").info("Successfully Imported All Modules ")
     await userbot.start()
     await Yukki.start()
+    LOGGER("YukkiMusic").info("Assistant Started Sucessfully")
     try:
         await Yukki.stream_call(
             "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
@@ -63,15 +59,13 @@ async def init():
         LOGGER("YukkiMusic").error(
             "Please ensure the voice call in your log group is active."
         )
-        sys.exit()
-    except Exception as e:
-        if "phone.CreateGroupCall" in str(e):
-            LOGGER("YukkiMusic").error(e)
-            sys.exit()
+        #sys.exit()
 
     await Yukki.decorators()
     LOGGER("YukkiMusic").info("YukkiMusic Started Successfully")
     await idle()
+    await app.stop()
+    await userbot.stop()
 
 
 if __name__ == "__main__":
