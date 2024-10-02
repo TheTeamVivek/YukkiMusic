@@ -13,32 +13,44 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from YukkiMusic.utils.formatters import time_to_seconds
 
+def get_progress_bar(percentage):
+    umm = math.floor(percentage)
+    
+    if 0 < umm <= 10:
+        return "▰▱▱▱▱▱▱▱▱"
+    elif 10 < umm <= 20:
+        return "▰▰▱▱▱▱▱▱▱"
+    elif 20 < umm <= 30:
+        return "▰▰▰▱▱▱▱▱▱"
+    elif 30 < umm <= 40:
+        return "▰▰▰▰▱▱▱▱▱"
+    elif 40 < umm <= 50:
+        return "▰▰▰▰▰▱▱▱▱"
+    elif 50 < umm <= 60:
+        return "▰▰▰▰▰▰▱▱▱"
+    elif 60 < umm <= 70:
+        return "▰▰▰▰▰▰▰▱▱"
+    elif 70 < umm <= 80:
+        return "▰▰▰▰▰▰▰▰▱"
+    elif 80 < umm <= 90:
+        return "▰▰▰▰▰▰▰▰▰"
+    elif 90 < umm <= 100:
+        return "▰▰▰▰▰▰▰▰▰▰"
+    else:
+        return "▱▱▱▱▱▱▱▱▱"
 
 def stream_markup_timer(_, videoid, chat_id, played, dur):
     played_sec = time_to_seconds(played)
     duration_sec = time_to_seconds(dur)
     percentage = (played_sec / duration_sec) * 100
-    umm = math.floor(percentage)
-    if 0 < umm <= 40:
-        bar = "◉——————————"
-    elif 10 < umm < 20:
-        bar = "—◉—————————"
-    elif 20 < umm < 30:
-        bar = "——◉————————"
-    elif 30 <= umm < 40:
-        bar = "———◉———————"
-    elif 40 <= umm < 50:
-        bar = "————◉——————"
-    elif 50 <= umm < 60:
-        bar = "——————◉————"
-    elif 50 <= umm < 70:
-        bar = "———————◉———"
-    else:
-        bar = "——————————◉"
+
+    bar = get_progress_bar(percentage) # using for getting the bar
+    
+
     buttons = [
         [
             InlineKeyboardButton(
-                text=f"{played} •{bar}• {dur}",
+                text=f"{played} {bar} {dur}",
                 callback_data="GetTimer",
             )
         ],
@@ -75,32 +87,17 @@ def stream_markup(_, videoid, chat_id):
     ]
     return buttons
 
-
 def telegram_markup_timer(_, chat_id, played, dur):
     played_sec = time_to_seconds(played)
     duration_sec = time_to_seconds(dur)
     percentage = (played_sec / duration_sec) * 100
-    umm = math.floor(percentage)
-    if 0 < umm <= 40:
-        bar = "◉——————————"
-    elif 10 < umm < 20:
-        bar = "—◉—————————"
-    elif 20 < umm < 30:
-        bar = "——◉————————"
-    elif 30 <= umm < 40:
-        bar = "———◉———————"
-    elif 40 <= umm < 50:
-        bar = "————◉——————"
-    elif 50 <= umm < 60:
-        bar = "——————◉————"
-    elif 50 <= umm < 70:
-        bar = "———————◉———"
-    else:
-        bar = "——————————◉"
+
+    bar = get_progress_bar(percentage) # using for getting the bar
+    
     buttons = [
         [
             InlineKeyboardButton(
-                text=f"{played} •{bar}• {dur}",
+                text=f"{played} {bar} {dur}",
                 callback_data="GetTimer",
             )
         ],
@@ -115,6 +112,7 @@ def telegram_markup_timer(_, chat_id, played, dur):
         ],
     ]
     return buttons
+
 
 
 def telegram_markup(_, chat_id):
