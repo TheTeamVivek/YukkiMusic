@@ -13,9 +13,10 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from YukkiMusic.utils.formatters import time_to_seconds
 
+
 def get_progress_bar(percentage):
     umm = math.floor(percentage)
-    
+
     if 0 < umm <= 10:
         return "▰▱▱▱▱▱▱▱▱"
     elif 10 < umm <= 20:
@@ -39,13 +40,13 @@ def get_progress_bar(percentage):
     else:
         return "▱▱▱▱▱▱▱▱▱"
 
+
 def stream_markup_timer(_, videoid, chat_id, played, dur):
     played_sec = time_to_seconds(played)
     duration_sec = time_to_seconds(dur)
     percentage = (played_sec / duration_sec) * 100
 
-    bar = get_progress_bar(percentage) # using for getting the bar
-    
+    bar = get_progress_bar(percentage)  # using for getting the bar
 
     buttons = [
         [
@@ -87,13 +88,14 @@ def stream_markup(_, videoid, chat_id):
     ]
     return buttons
 
+
 def telegram_markup_timer(_, chat_id, played, dur):
     played_sec = time_to_seconds(played)
     duration_sec = time_to_seconds(dur)
     percentage = (played_sec / duration_sec) * 100
 
-    bar = get_progress_bar(percentage) # using for getting the bar
-    
+    bar = get_progress_bar(percentage)  # using for getting the bar
+
     buttons = [
         [
             InlineKeyboardButton(
@@ -112,7 +114,6 @@ def telegram_markup_timer(_, chat_id, played, dur):
         ],
     ]
     return buttons
-
 
 
 def telegram_markup(_, chat_id):

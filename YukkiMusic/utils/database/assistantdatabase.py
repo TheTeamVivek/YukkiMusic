@@ -90,6 +90,7 @@ async def set_calls_assistant(chat_id):
     )
     return ran_assistant
 
+
 async def group_assistant(self, chat_id: int) -> PyTgCalls:
     from YukkiMusic.core.userbot import assistants
 

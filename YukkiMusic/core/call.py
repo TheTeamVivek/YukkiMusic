@@ -130,11 +130,7 @@ class Call:
                 )
             else:
                 stream = MediaStream(link, audio_parameters=audio_stream_quality)
-        await assistant.play(
-            chat_id,
-            stream,
-            config=call_config
-        )
+        await assistant.play(chat_id, stream, config=call_config)
 
     async def seek_stream(self, chat_id, file_path, to_seek, duration, mode):
         assistant = await group_assistant(self, chat_id)
@@ -504,13 +500,10 @@ class Call:
             LOGGER(__name__).error("No active clients for ping calculation.")
             return "No active clients"
 
-
     async def start(self):
         """Starts all PyTgCalls instances for the existing userbot clients."""
         LOGGER(__name__).info(f"Starting PyTgCall Clients")
         await asyncio.gather(*[c.start() for c in self.calls])
-
-
 
     async def decorators(self):
         for call in self.calls:
@@ -523,7 +516,6 @@ class Call:
             async def stream_end_handler(client, update: Update):
                 if isinstance(update, (StreamVideoEnded, StreamAudioEnded)):
                     await self.change_stream(client, update.chat_id)
-
 
 
 Yukki = Call()

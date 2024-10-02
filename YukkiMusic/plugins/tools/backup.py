@@ -28,7 +28,6 @@ class CustomJSONEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-
 async def ex_port(db, db_name):
     data = {}
     collections = await db.list_collection_names()
@@ -61,10 +60,11 @@ async def edit_or_reply(mystic, text):
         pass
     return await app.send_message(mystic.chat.id, disable_web_page_preview=True)
 
+
 @app.on_message(filters.command("export") & ~BANNED_USERS)
 async def export_database(client, message):
     if message.from_user.id not in OWNER_ID:
-        return 
+        return
     if MONGO_DB_URI is None:
         return await message.reply_text(
             "**Dᴜᴇ ᴛᴏ ʙᴏᴛ's ᴘʀɪᴠᴀᴄʏ ɪssᴜᴇs, ʏᴏᴜ ᴄᴀɴ'ᴛ ɪᴍᴘᴏʀᴛ/ᴇxᴘᴏʀᴛ ᴍᴏɴɢᴏ ᴅᴀᴛᴀ ᴡʜᴇɴ ʏᴏᴜ'ʀᴇ ᴜsɪɴɢ Yᴜᴋᴋɪ's Dᴀᴛᴀʙᴀsᴇ.\n\n Pʟᴇᴀsᴇ ғɪʟʟ ʏᴏᴜʀ MONGO_DB_URI ɪɴ ʏᴏᴜʀ ᴠᴀʀs ᴛᴏ ᴜsᴇ ᴛʜɪs ғᴇᴀᴛᴜʀᴇ**"
@@ -76,12 +76,12 @@ async def export_database(client, message):
     for db_name in databases:
         if db_name in ["local", "admin", DB_NAME]:
             continue
-        
+
         db = _mongo_async_[db_name]
         mystic = await edit_or_reply(
             mystic, f"Fᴏᴜɴᴅ ᴅᴀᴛᴀ ᴏғ {db_name} ᴅᴀᴛᴀʙᴀsᴇ. Uᴘʟᴏᴀᴅɪɴɢ ᴀɴᴅ ᴅᴇʟᴇᴛɪɴɢ..."
         )
-        
+
         file_path = await ex_port(db, db_name)
         try:
 
@@ -94,16 +94,19 @@ async def export_database(client, message):
             await drop_db(_mongo_async_, db_name)
         except OperationFailure:
             mystic = await edit_or_reply(
-            mystic, f"ɪɴ ʏᴏᴜʀ ᴍᴏɴɢᴏᴅʙ ᴅᴇʟᴇᴛɪɴɢ ᴅᴀᴛᴀʙsᴇ ɪs ɴᴏᴛ ᴀʟʟᴏᴡᴇᴅ sᴏ ɪ ᴄᴀɴ'ᴛ ᴅᴇʟᴇᴛᴇ ᴛʜᴇ {db_name} ᴅᴀᴛᴀʙᴀsᴇ"
-        )
-        
+                mystic,
+                f"ɪɴ ʏᴏᴜʀ ᴍᴏɴɢᴏᴅʙ ᴅᴇʟᴇᴛɪɴɢ ᴅᴀᴛᴀʙsᴇ ɪs ɴᴏᴛ ᴀʟʟᴏᴡᴇᴅ sᴏ ɪ ᴄᴀɴ'ᴛ ᴅᴇʟᴇᴛᴇ ᴛʜᴇ {db_name} ᴅᴀᴛᴀʙᴀsᴇ",
+            )
+
         try:
             os.remove(file_path)
         except:
             pass
 
     db = _mongo_async_[DB_NAME]
-    mystic = await edit_or_reply(mystic, f"ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...\nNᴏᴡ ᴇxᴘᴏʀᴛɪɴɢ ᴅᴀᴛᴀ ᴏғ ᴛʜᴇ ʙᴏᴛ")
+    mystic = await edit_or_reply(
+        mystic, f"ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...\nNᴏᴡ ᴇxᴘᴏʀᴛɪɴɢ ᴅᴀᴛᴀ ᴏғ ᴛʜᴇ ʙᴏᴛ"
+    )
 
     async def progress(current, total):
         try:
@@ -121,14 +124,14 @@ async def export_database(client, message):
         )
     except FloodWait as e:
         await asyncio.sleep(e.value)
-    
+
     await mystic.delete()
 
 
 @app.on_message(filters.command("import") & ~BANNED_USERS)
 async def import_database(client, message):
     if message.from_user.id not in OWNER_ID:
-        return 
+        return
     if MONGO_DB_URI is None:
         return await message.reply_text(
             "**Dᴜᴇ ᴛᴏ ʙᴏᴛ's ᴘʀɪᴠᴀᴄʏ ɪssᴜᴇs, ʏᴏᴜ ᴄᴀɴ'ᴛ ɪᴍᴘᴏʀᴛ/ᴇxᴘᴏʀᴛ ᴍᴏɴɢᴏ ᴅᴀᴛᴀ ᴡʜᴇɴ ʏᴏᴜ'ʀᴇ ᴜsɪɴɢ Yᴜᴋᴋɪ's Dᴀᴛᴀʙᴀsᴇ.\n\n Pʟᴇᴀsᴇ ғɪʟʟ ʏᴏᴜʀ MONGO_DB_URI ɪɴ ʏᴏᴜʀ ᴠᴀʀs ᴛᴏ ᴜsᴇ ᴛʜɪs ғᴇᴀᴛᴜʀᴇ**"
@@ -153,10 +156,14 @@ async def import_database(client, message):
         with open(file_path, "r") as backup_file:
             data = json.load(backup_file)
     except (json.JSONDecodeError, IOError):
-        return await edit_or_reply(mystic, "Iɴᴠᴀʟɪᴅ ᴇxᴘᴏʀᴛᴇᴅ ᴅᴀᴛᴀ. Pʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ᴠᴀʟɪᴅ MᴏɴɢᴏDB ᴇxᴘᴏʀᴛ.")
+        return await edit_or_reply(
+            mystic, "Iɴᴠᴀʟɪᴅ ᴇxᴘᴏʀᴛᴇᴅ ᴅᴀᴛᴀ. Pʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ᴠᴀʟɪᴅ MᴏɴɢᴏDB ᴇxᴘᴏʀᴛ."
+        )
 
     if not isinstance(data, dict):
-        return await edit_or_reply(mystic, "Iɴᴠᴀʟɪᴅ ᴅᴀᴛᴀ ғᴏʀᴍᴀᴛ. Pʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ᴠᴀʟɪᴅ MᴏɴɢᴏDB ᴇxᴘᴏʀᴛ.")
+        return await edit_or_reply(
+            mystic, "Iɴᴠᴀʟɪᴅ ᴅᴀᴛᴀ ғᴏʀᴍᴀᴛ. Pʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ᴠᴀʟɪᴅ MᴏɴɢᴏDB ᴇxᴘᴏʀᴛ."
+        )
 
     _mongo_async_ = AsyncIOMotorClient(MONGO_DB_URI)
     databases = await _mongo_async_.list_database_names()
@@ -170,7 +177,9 @@ async def import_database(client, message):
     try:
         for collection_name, documents in data.items():
             if documents:
-                mystic = await edit_or_reply(mystic, f"Iᴍᴘᴏʀᴛɪɴɢ...\n ᴄᴏʟʟᴇᴄᴛɪᴏɴ {collection_name}.")
+                mystic = await edit_or_reply(
+                    mystic, f"Iᴍᴘᴏʀᴛɪɴɢ...\n ᴄᴏʟʟᴇᴄᴛɪᴏɴ {collection_name}."
+                )
                 collection = db[collection_name]
                 await collection.insert_many(documents)
         await edit_or_reply(mystic, "Dᴀᴛᴀ sᴜᴄᴄᴇssғᴜʟʟʏ ɪᴍᴘᴏʀᴛᴇᴅ.")

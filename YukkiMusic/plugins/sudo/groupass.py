@@ -13,12 +13,18 @@ from pyrogram.types import Message
 from config import BANNED_USERS, LOG_GROUP_ID
 from YukkiMusic import app, userbot
 from YukkiMusic.core.userbot import assistants
-from YukkiMusic.utils.database import get_assistant, save_assistant, set_assistant, get_client
+from YukkiMusic.utils.database import (
+    get_assistant,
+    save_assistant,
+    set_assistant,
+    get_client,
+)
 from YukkiMusic.utils.decorators import AdminActual
 from YukkiMusic.core.userbot import assistants
 
+
 async def get_assistant_details():
-    
+
     msg = "**ᴜsᴀsɢᴇ** : /setassistant [ᴀssɪsᴛᴀɴᴛ ɴᴏ ] ᴛᴏ ᴄʜᴀɴɢᴇ ᴀɴᴅ sᴇᴛ ᴍᴀɴᴜᴀʟʟʏ ɢʀᴏᴜᴘ ᴀssɪsᴛᴀɴᴛ \n ʙᴇʟᴏᴡ sᴏᴍᴇ ᴀᴠᴀɪʟᴀʙʟᴇ ᴀssɪsᴛᴀɴᴛ ᴅᴇᴛᴀɪʟ's\n"
     for cnt in assistants:
         try:
