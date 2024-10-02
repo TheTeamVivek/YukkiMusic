@@ -26,7 +26,7 @@ from pytgcalls.types import (
 )
 import config
 from strings import get_string
-from YukkiMusic import LOGGER, YouTube, app
+from YukkiMusic import LOGGER, YouTube, app, userbot
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
     add_active_chat,
@@ -54,58 +54,16 @@ async def _clear_(chat_id):
     await set_loop(chat_id, 0)
 
 
-class Call(PyTgCalls):
+class Call:
     def __init__(self):
-        self.userbot1 = Client(
-            name="YukkiString1",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING1),
-        )
-        self.one = PyTgCalls(
-            self.userbot1,
-            cache_duration=100,
-        )
-        self.userbot2 = Client(
-            name="YukkiString2",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING2),
-        )
-        self.two = PyTgCalls(
-            self.userbot2,
-            cache_duration=100,
-        )
-        self.userbot3 = Client(
-            name="YukkiString3",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING3),
-        )
-        self.three = PyTgCalls(
-            self.userbot3,
-            cache_duration=100,
-        )
-        self.userbot4 = Client(
-            name="YukkiString4",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING4),
-        )
-        self.four = PyTgCalls(
-            self.userbot4,
-            cache_duration=100,
-        )
-        self.userbot5 = Client(
-            name="YukkiString5",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING5),
-        )
-        self.five = PyTgCalls(
-            self.userbot5,
-            cache_duration=100,
-        )
+        self.calls = []
+
+        for client in userbot.clients:
+            pycall = PyTgCalls(
+                client,
+                cache_duration=100,
+            )
+            self.calls.append(pycall)
 
     async def pause_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
@@ -155,6 +113,7 @@ class Call(PyTgCalls):
         assistant = await group_assistant(self, chat_id)
         audio_stream_quality = await get_audio_bitrate(chat_id)
         video_stream_quality = await get_video_bitrate(chat_id)
+        call_config = GroupCallConfig(auto_start=False)
         if video:
             stream = MediaStream(
                 link,
@@ -174,12 +133,14 @@ class Call(PyTgCalls):
         await assistant.play(
             chat_id,
             stream,
+            config=call_config
         )
 
     async def seek_stream(self, chat_id, file_path, to_seek, duration, mode):
         assistant = await group_assistant(self, chat_id)
         audio_stream_quality = await get_audio_bitrate(chat_id)
         video_stream_quality = await get_video_bitrate(chat_id)
+        call_config = GroupCallConfig(auto_start=False)
         stream = (
             MediaStream(
                 file_path,
@@ -195,13 +156,15 @@ class Call(PyTgCalls):
                 video_flags=MediaStream.Flags.IGNORE,
             )
         )
-        await assistant.play(chat_id, stream)
+        await assistant.play(chat_id, stream, config=call_config)
 
     async def stream_call(self, link):
         assistant = await group_assistant(self, config.LOG_GROUP_ID)
+        call_config = GroupCallConfig(auto_start=False)
         await assistant.play(
             config.LOG_GROUP_ID,
             MediaStream(link),
+            config=call_config,
         )
         await asyncio.sleep(0.5)
         await assistant.leave_call(config.LOG_GROUP_ID)
@@ -309,6 +272,7 @@ class Call(PyTgCalls):
             userid = check[0].get("user_id")
             check[0]["played"] = 0
             video = True if str(streamtype) == "video" else False
+            call_config = GroupCallConfig(auto_start=False)
             if "live_" in queued:
                 n, link = await YouTube.video(videoid, True)
                 if n == 0:
@@ -340,7 +304,7 @@ class Call(PyTgCalls):
                             audio_parameters=audio_stream_quality,
                         )
                 try:
-                    await client.play(chat_id, stream)
+                    await client.play(chat_id, stream, config=call_config)
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
@@ -398,8 +362,8 @@ class Call(PyTgCalls):
                             audio_parameters=audio_stream_quality,
                         )
                 try:
-                    await client.play(chat_id, stream)
-                except Exception:
+                    await client.play(chat_id, stream, config=call_config)
+                except:
                     return await app.send_message(
                         original_chat_id,
                         text=_["call_7"],
@@ -431,7 +395,7 @@ class Call(PyTgCalls):
                     else MediaStream(videoid, audio_parameters=audio_stream_quality)
                 )
                 try:
-                    await client.play(chat_id, stream)
+                    await client.play(chat_id, stream, config=call_config)
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
@@ -476,7 +440,7 @@ class Call(PyTgCalls):
                             audio_parameters=audio_stream_quality,
                         )
                 try:
-                    await client.play(chat_id, stream)
+                    await client.play(chat_id, stream, config=call_config)
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
@@ -532,49 +496,34 @@ class Call(PyTgCalls):
 
     async def ping(self):
         pings = []
-        if config.STRING1:
-            pings.append(self.one.ping)
-        if config.STRING2:
-            pings.append(self.two.ping)
-        if config.STRING3:
-            pings.append(self.three.ping)
-        if config.STRING4:
-            pings.append(self.four.ping)
-        if config.STRING5:
-            pings.append(self.five.ping)
-        return str(round(sum(pings) / len(pings), 3))
+        for call in self.calls:
+            pings.append(call.ping)
+        if pings:
+            return str(round(sum(pings) / len(pings), 3))
+        else:
+            LOGGER(__name__).error("No active clients for ping calculation.")
+            return "No active clients"
+
 
     async def start(self):
-        LOGGER(__name__).info("Starting PyTgCalls Client\n")
-        if config.STRING1:
-            await self.one.start()
-        if config.STRING2:
-            await self.two.start()
-        if config.STRING3:
-            await self.three.start()
-        if config.STRING4:
-            await self.four.start()
-        if config.STRING5:
-            await self.five.start()
+        """Starts all PyTgCalls instances for the existing userbot clients."""
+        LOGGER(__name__).info(f"Starting PyTgCall Clients")
+        await asyncio.gather(*[c.start() for c in self.calls])
+
+
 
     async def decorators(self):
-        @self.one.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
-        @self.two.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
-        @self.three.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
-        @self.four.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
-        @self.five.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
-        async def stream_services_handler(client, update):
-            await _clear_(update.chat_id)
-            await self.stop_stream(update.chat_id)
+        for call in self.calls:
 
-        @self.one.on_update(filters.stream_end)
-        @self.two.on_update(filters.stream_end)
-        @self.three.on_update(filters.stream_end)
-        @self.four.on_update(filters.stream_end)
-        @self.five.on_update(filters.stream_end)
-        async def stream_end_handler(client, update: Update):
-            if isinstance(update, (StreamVideoEnded, StreamAudioEnded)):
-                await self.change_stream(client, update.chat_id)
+            @call.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
+            async def stream_services_handler(client, update):
+                await self.stop_stream(update.chat_id)
+
+            @call.on_update(filters.stream_end)
+            async def stream_end_handler(client, update: Update):
+                if isinstance(update, (StreamVideoEnded, StreamAudioEnded)):
+                    await self.change_stream(client, update.chat_id)
+
 
 
 Yukki = Call()

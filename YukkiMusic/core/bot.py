@@ -109,3 +109,7 @@ class YukkiBot(Client):
         else:
             self.name = get_me.first_name
         LOGGER(__name__).info(f"MusicBot Started as {self.name}")
+
+    async def stop(self):
+        await super().stop()
+

@@ -16,7 +16,7 @@ from YukkiMusic.core.mongo import DB_NAME
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from config import MONGO_DB_URI, OWNER_ID
+from config import BANNED_USERS, MONGO_DB_URI, OWNER_ID
 
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -61,10 +61,14 @@ async def edit_or_reply(mystic, text):
         pass
     return await app.send_message(mystic.chat.id, disable_web_page_preview=True)
 
-@app.on_message(filters.command("export"))
+@app.on_message(filters.command("export") & ~BANNED_USERS)
 async def export_database(client, message):
     if message.from_user.id not in OWNER_ID:
         return 
+    if MONGO_DB_URI is None:
+        return await message.reply_text(
+            "**Dᴜᴇ ᴛᴏ ʙᴏᴛ's ᴘʀɪᴠᴀᴄʏ ɪssᴜᴇs, ʏᴏᴜ ᴄᴀɴ'ᴛ ɪᴍᴘᴏʀᴛ/ᴇxᴘᴏʀᴛ ᴍᴏɴɢᴏ ᴅᴀᴛᴀ ᴡʜᴇɴ ʏᴏᴜ'ʀᴇ ᴜsɪɴɢ Yᴜᴋᴋɪ's Dᴀᴛᴀʙᴀsᴇ.\n\n Pʟᴇᴀsᴇ ғɪʟʟ ʏᴏᴜʀ MONGO_DB_URI ɪɴ ʏᴏᴜʀ ᴠᴀʀs ᴛᴏ ᴜsᴇ ᴛʜɪs ғᴇᴀᴛᴜʀᴇ**"
+        )
     mystic = await message.reply_text("Exᴘᴏʀᴛɪɴɢ Dᴀᴛᴀ ғʀᴏᴍ MᴏɴɢᴏDB...")
     _mongo_async_ = AsyncIOMotorClient(MONGO_DB_URI)
     databases = await _mongo_async_.list_database_names()
@@ -121,10 +125,15 @@ async def export_database(client, message):
     await mystic.delete()
 
 
-@app.on_message(filters.command("import"))
+@app.on_message(filters.command("import") & ~BANNED_USERS)
 async def import_database(client, message):
     if message.from_user.id not in OWNER_ID:
         return 
+    if MONGO_DB_URI is None:
+        return await message.reply_text(
+            "**Dᴜᴇ ᴛᴏ ʙᴏᴛ's ᴘʀɪᴠᴀᴄʏ ɪssᴜᴇs, ʏᴏᴜ ᴄᴀɴ'ᴛ ɪᴍᴘᴏʀᴛ/ᴇxᴘᴏʀᴛ ᴍᴏɴɢᴏ ᴅᴀᴛᴀ ᴡʜᴇɴ ʏᴏᴜ'ʀᴇ ᴜsɪɴɢ Yᴜᴋᴋɪ's Dᴀᴛᴀʙᴀsᴇ.\n\n Pʟᴇᴀsᴇ ғɪʟʟ ʏᴏᴜʀ MONGO_DB_URI ɪɴ ʏᴏᴜʀ ᴠᴀʀs ᴛᴏ ᴜsᴇ ᴛʜɪs ғᴇᴀᴛᴜʀᴇ**"
+        )
+
     if not message.reply_to_message or not message.reply_to_message.document:
         return await message.reply_text(
             "Yᴏᴜ ɴᴇᴇᴅ ᴛᴏ ʀᴇᴘʟʏ ᴛᴏ ᴀɴ ᴇxᴘᴏʀᴛ ғɪʟᴇ ᴛᴏ ɪᴍᴘᴏʀᴛ ɪᴛ."
