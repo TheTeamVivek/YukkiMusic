@@ -18,6 +18,7 @@ from YukkiMusic.misc import SUDOERS
 assistants = []
 assistantids = []
 
+
 class Userbot(Client):
     def __init__(self):
         self.clients = []
@@ -27,8 +28,8 @@ class Userbot(Client):
 
             client = Client(
                 f"YukkiString{i}",
-                api_id=config.API_ID,   
-                    api_hash=config.API_HASH,
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
                 in_memory=True,
                 session_string=session.strip(),
             )
@@ -47,7 +48,7 @@ class Userbot(Client):
 
             assistants.append(index)  # Mark the assistant as active
 
-            await client.send_message(config.LOG_GROUP_ID,  "Assistant Started")
+            await client.send_message(config.LOG_GROUP_ID, "Assistant Started")
 
             get_me = await client.get_me()
             client.username = get_me.username
@@ -57,7 +58,9 @@ class Userbot(Client):
             client.name = f"{get_me.first_name} {get_me.last_name or ''}".strip()
 
         except Exception as e:
-            LOGGER(__name__).error(f"Assistant Account {index} failed with error: {str(e)}.")
+            LOGGER(__name__).error(
+                f"Assistant Account {index} failed with error: {str(e)}."
+            )
             sys.exit(1)
 
     async def start(self):
@@ -65,7 +68,7 @@ class Userbot(Client):
         for i, client in enumerate(self.clients, start=1):
             task = self._start(client, i)
             tasks.append(task)
-        await asyncio.gather(*tasks)         
+        await asyncio.gather(*tasks)
 
     async def stop(self):
         """Gracefully stop all clients."""

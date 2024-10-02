@@ -102,6 +102,7 @@ async def process_mute_warnings():
                 except:
                     mute_warnings.pop(chat_id, None)
 
+
 async def markup_timer():
 
     while not await asyncio.sleep(2):
@@ -197,11 +198,8 @@ async def markup_timer():
                     if is_muted:
 
                         mute_warnings[chat_id] = {
-
                             "timestamp": time.time(),
-
                             "_": _,
-
                         }
 
                 except Exception:
@@ -211,47 +209,31 @@ async def markup_timer():
             try:
 
                 buttons = (
-
                     stream_markup_timer(
-
                         _,
-
                         playing[0]["vidid"],
-
                         chat_id,
-
                         seconds_to_min(playing[0]["played"]),
-
                         playing[0]["dur"],
-
                     )
-
                     if markup == "stream"
-
                     else telegram_markup_timer(
-
                         _,
-
                         chat_id,
-
                         seconds_to_min(playing[0]["played"]),
-
                         playing[0]["dur"],
-
                     )
-
                 )
 
                 await mystic.edit_reply_markup(
-
                     reply_markup=InlineKeyboardMarkup(buttons)
-
                 )
 
             except Exception:
 
                 continue
-                
+
+
 asyncio.create_task(timer())
 asyncio.create_task(markup_timer())
 asyncio.create_task(process_mute_warnings())

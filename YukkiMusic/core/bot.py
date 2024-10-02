@@ -112,4 +112,3 @@ class YukkiBot(Client):
 
     async def stop(self):
         await super().stop()
-
