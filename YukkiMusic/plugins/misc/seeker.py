@@ -12,6 +12,7 @@ import time
 
 from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardMarkup
+from datetime import datetime, timedelta
 
 from config import MUTE_WARNING_TIME
 from strings import get_string
@@ -29,9 +30,9 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline import stream_markup_timer, telegram_markup_timer
 
+from .autoleave import autoend
 from ..admins.callback import wrong
 
-autoend = {}
 checker = {}
 mute_warnings = {}
 
@@ -87,7 +88,7 @@ async def process_mute_warnings():
                             continue
                         members.append(member)
 
-                    autoend[chat_id] = len(members)
+
                     m = next((m for m in members if m.chat.id == userbot.id), None)
                     if m is None:
                         continue
@@ -104,110 +105,61 @@ async def process_mute_warnings():
 
 
 async def markup_timer():
-
     while not await asyncio.sleep(2):
-
         active_chats = await get_active_chats()
-
         for chat_id in active_chats:
-
             if not await is_music_playing(chat_id):
-
                 continue
-
             playing = db.get(chat_id)
-
             if not playing:
-
                 continue
-
             duration_seconds = int(playing[0]["seconds"])
-
             if duration_seconds == 0:
-
                 continue
-
             try:
-
                 mystic = playing[0]["mystic"]
-
                 markup = playing[0]["markup"]
-
             except:
-
                 continue
-
             try:
-
                 check = wrong[chat_id][mystic.message_id]
-
                 if check is False:
-
                     continue
-
             except:
-
                 pass
-
             try:
-
                 language = await get_lang(chat_id)
-
                 _ = get_string(language)
-
             except:
-
                 _ = get_string("en")
-
             is_muted = False
-
             if not chat_id in mute_warnings:
-
                 try:
-
                     userbot = await get_assistant(chat_id)
-
                     members = []
-
                     async for member in userbot.get_call_members(chat_id):
-
                         if member is None:
-
                             continue
-
                         members.append(member)
-
                     if not members:
-
                         await Yukki.stop_stream(chat_id)
-
                         await set_loop(chat_id, 0)
-
                         continue
-
-                    autoend[chat_id] = len(members)
-
+                    autoend[chat_id] = datetime.now() + timedelta(seconds=30)
                     m = next((m for m in members if m.chat.id == userbot.id), None)
-
                     if m is None:
-
                         continue
-
                     is_muted = bool(m.is_muted and not m.can_self_unmute)
-
                     if is_muted:
-
                         mute_warnings[chat_id] = {
                             "timestamp": time.time(),
                             "_": _,
                         }
 
                 except Exception:
-
                     pass
 
             try:
-
                 buttons = (
                     stream_markup_timer(
                         _,
@@ -230,7 +182,6 @@ async def markup_timer():
                 )
 
             except Exception:
-
                 continue
 
 
