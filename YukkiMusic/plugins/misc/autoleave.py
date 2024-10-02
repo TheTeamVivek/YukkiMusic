@@ -23,8 +23,8 @@ from YukkiMusic.utils.database import (
     set_loop,
 )
 
-from .seeker import autoend
 
+autoend = {}
 
 async def auto_leave():
     if config.AUTO_LEAVING_ASSISTANT == str(True):
@@ -61,45 +61,37 @@ async def auto_leave():
 
 
 async def auto_end():
-    while not await asyncio.sleep(30):
-        if not await is_autoend():
-            continue
-        for chat_id in autoend:
-            count = autoend.get(chat_id)
-            if not count or count == 0:
-                try:
-                    await Yukki.stop_stream(chat_id)
-                    await set_loop(chat_id, 0)
+    while True:
+        await asyncio.sleep(5)
+        for chat_id, timer in list(autoend.items()):
+            if datetime.now() > timer:
+                if not await is_active_chat(chat_id):
+                    autoend.pop(chat_id)  
                     continue
-                except:
-                    continue
-            if not await is_active_chat(chat_id):
-                continue
-            userbot = await get_assistant(chat_id)
-            members = []
-            async for member in userbot.get_call_members(chat_id):
-                if member is None:
+
+                userbot = await get_assistant(chat_id)
+                members = []
+
+                async for member in userbot.get_call_members(chat_id):
+                    if member is None:
+                        continue
+                    members.append(member)
+
+                if len(members) in [0, 1]:
                     try:
                         await Yukki.stop_stream(chat_id)
-                        await set_loop(chat_id, 0)
-                        continue
-                    except:
-                        continue
-                members.append(member)
+                    except Exception:
+                        pass
 
-            if len(members) in [0, 1]:
-                try:
-                    await Yukki.stop_stream(chat_id)
-                    await set_loop(chat_id, 0)
-                except:
-                    continue
-                try:
-                    await app.send_message(
-                        chat_id,
-                        "Bᴏᴛ ʜᴀs ʟᴇғᴛ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴅᴜᴇ ᴛᴏ ɪɴᴀᴄᴛɪᴠɪᴛʏ ᴛᴏ ᴀᴠᴏɪᴅ ᴏᴠᴇʀʟᴏᴀᴅ ᴏɴ sᴇʀᴠᴇʀs. Nᴏ-ᴏɴᴇ ᴡᴀs ʟɪsᴛᴇɴɪɴɢ ᴛᴏ ᴛʜᴇ ʙᴏᴛ ᴏɴ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ.",
-                    )
-                except:
-                    continue
+                    try:
+                        await app.send_message(
+                            chat_id,
+                            "ʙᴏᴛ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ ᴄʟᴇᴀʀᴇᴅ ᴛʜᴇ ǫᴜᴇᴜᴇ ᴀɴᴅ ʟᴇғᴛ ᴠɪᴅᴇᴏᴄʜᴀᴛ ʙᴇᴄᴀᴜsᴇ ɴᴏ ᴏɴᴇ ᴡᴀs ʟɪsᴛᴇɴɪɴɢ sᴏɴɢs ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.",
+                        )
+                    except Exception:
+                        pass
+
+                autoend.pop(chat_id)
 
 
 asyncio.create_task(auto_leave())
