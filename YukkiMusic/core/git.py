@@ -11,16 +11,12 @@
 import asyncio
 import shlex
 from typing import Tuple
-
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
-
 import config
-
 from ..logging import LOGGER
 
 loop = asyncio.get_event_loop_policy().get_event_loop()
-
 
 def install_req(cmd: str) -> Tuple[str, str, int, int]:
     async def install_requirements():
@@ -49,6 +45,7 @@ def git():
         UPSTREAM_REPO = f"https://{GIT_USERNAME}:{config.GIT_TOKEN}@{TEMP_REPO}"
     else:
         UPSTREAM_REPO = config.UPSTREAM_REPO
+
     try:
         repo = Repo()
         LOGGER(__name__).info(f"Git Client Found [VPS DEPLOYER]")
@@ -77,9 +74,21 @@ def git():
 
     nrs = repo.remote("origin")
     nrs.fetch(config.UPSTREAM_BRANCH)
+    
+    requirements_file = "requirements.txt"
+    diff_index = repo.head.commit.diff('FETCH_HEAD')
+
+    requirements_updated = any(
+        diff.a_path == requirements_file or diff.b_path == requirements_file
+        for diff in diff_index
+    )
+
     try:
         nrs.pull(config.UPSTREAM_BRANCH)
     except GitCommandError:
         repo.git.reset("--hard", "FETCH_HEAD")
-    install_req("pip3 install --no-cache-dir -r requirements.txt")
+
+    if requirements_updated:
+        install_req("pip3 install --no-cache-dir -r requirements.txt")
+    
     LOGGER(__name__).info(f"Fetched Updates from: {REPO_LINK}")
