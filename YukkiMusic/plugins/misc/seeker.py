@@ -58,7 +58,7 @@ async def leave_if_muted():
     while True:
         await asyncio.sleep(2)
         for chat_id, details in list(muted.items()):
-            if time.time() - details["timestamp"] >= 120:
+            if time.time() - details["timestamp"] >= 60:
                 _ = details["_"]
                 try:
                     userbot = await get_assistant(chat_id)
