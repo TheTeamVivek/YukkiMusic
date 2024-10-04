@@ -37,19 +37,6 @@ checker = {}
 mute_warnings = {}
 
 
-async def send_warning(chat_id, text):
-    chat = await app.get_chat(chat_id)
-
-    if chat.type == ChatType.CHANNEL:
-        cmode_chat_id = await get_cmode(chat_id)
-        if cmode_chat_id:
-            chat = await app.get_chat(cmode_chat_id)
-            if chat.type != ChatType.CHANNEL:
-                await app.send_message(cmode_chat_id, text)
-    else:
-        await app.send_message(chat_id, text)
-
-
 if MUTE_WARNING_TIME < 60:
     t = f"{MUTE_WARNING_TIME} seconds"
 else:
@@ -74,7 +61,7 @@ async def timer():
             db[chat_id][0]["played"] += 1
 
 
-async def process_mute_warnings():
+async def leave_if_muted():
     while True:
         await asyncio.sleep(2)
         for chat_id, details in list(mute_warnings.items()):
@@ -97,7 +84,7 @@ async def process_mute_warnings():
                     if is_muted:
                         await Yukki.stop_stream(chat_id)
                         await set_loop(chat_id, 0)
-                        await send_warning(chat_id, _["admin_35"].format(t))
+
 
                     mute_warnings.pop(chat_id, None)
                 except:
@@ -187,4 +174,4 @@ async def markup_timer():
 
 asyncio.create_task(timer())
 asyncio.create_task(markup_timer())
-asyncio.create_task(process_mute_warnings())
+asyncio.create_task(leave_if_muted())
