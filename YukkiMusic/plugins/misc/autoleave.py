@@ -85,7 +85,7 @@ async def auto_end():
                         continue
                     members.append(member)
 
-                if len(members) in <= 1:
+                if len(members) <= 1:
                     try:
                         await Yukki.stop_stream(chat_id)
                     except Exception:
