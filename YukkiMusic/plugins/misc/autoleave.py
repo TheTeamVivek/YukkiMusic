@@ -74,7 +74,7 @@ async def auto_end():
         for chat_id, timer in list(autoend.items()):
             if datetime.now() > timer:
                 if not await is_active_chat(chat_id):
-                    autoend.pop(chat_id)  
+                    del autoend[chat_id]  
                     continue
 
                 userbot = await get_assistant(chat_id)
@@ -85,7 +85,7 @@ async def auto_end():
                         continue
                     members.append(member)
 
-                if len(members) in [0, 1]:
+                if len(members) in <= 1:
                     try:
                         await Yukki.stop_stream(chat_id)
                     except Exception:
@@ -99,7 +99,7 @@ async def auto_end():
                     except Exception:
                         pass
 
-                autoend.pop(chat_id)
+                del autoend[chat_id]
 
 
 asyncio.create_task(auto_leave())
