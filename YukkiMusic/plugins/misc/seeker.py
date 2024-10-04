@@ -80,7 +80,7 @@ async def leave_if_muted():
 
                     del muted[chat_id]
                 except:
-                	del muted[chat_id]
+                    del muted[chat_id]
 
 
 async def markup_timer():
@@ -101,7 +101,7 @@ async def markup_timer():
             except:
                 continue
             try:
-                check = wrong[chat_id][mystic.message_id]
+                check = wrong[chat_id][mystic.id]
                 if check is False:
                     continue
             except:
