@@ -14,7 +14,6 @@ from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardMarkup
 from datetime import datetime, timedelta
 
-from config import MUTE_WARNING_TIME
 from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
@@ -34,13 +33,7 @@ from .autoleave import autoend
 from ..admins.callback import wrong
 
 checker = {}
-mute_warnings = {}
-
-
-if MUTE_WARNING_TIME < 60:
-    t = f"{MUTE_WARNING_TIME} seconds"
-else:
-    t = time.strftime("%M:%S minutes", time.gmtime(MUTE_WARNING_TIME))
+muted = {}
 
 
 async def timer():
@@ -64,8 +57,8 @@ async def timer():
 async def leave_if_muted():
     while True:
         await asyncio.sleep(2)
-        for chat_id, details in list(mute_warnings.items()):
-            if time.time() - details["timestamp"] >= MUTE_WARNING_TIME:
+        for chat_id, details in list(muted.items()):
+            if time.time() - details["timestamp"] >= 120:
                 _ = details["_"]
                 try:
                     userbot = await get_assistant(chat_id)
@@ -85,10 +78,9 @@ async def leave_if_muted():
                         await Yukki.stop_stream(chat_id)
                         await set_loop(chat_id, 0)
 
-
-                    mute_warnings.pop(chat_id, None)
+                    del muted[chat_id]
                 except:
-                    mute_warnings.pop(chat_id, None)
+                	del muted[chat_id]
 
 
 async def markup_timer():
@@ -120,7 +112,7 @@ async def markup_timer():
             except:
                 _ = get_string("en")
             is_muted = False
-            if not chat_id in mute_warnings:
+            if not chat_id in muted:
                 try:
                     userbot = await get_assistant(chat_id)
                     members = []
@@ -138,7 +130,7 @@ async def markup_timer():
                         continue
                     is_muted = bool(m.is_muted and not m.can_self_unmute)
                     if is_muted:
-                        mute_warnings[chat_id] = {
+                        muted[chat_id] = {
                             "timestamp": time.time(),
                             "_": _,
                         }
