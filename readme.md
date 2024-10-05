@@ -68,7 +68,7 @@ To get started with configuring Yukki Music, check out the detailed instructions
 
 If you need help or have any questions, feel free to reach out through any of these channels:
 
-- [GitHub Issues](https://github.com/TheTeamVivek/YukkiMusic/issues/new?assignees=&labels=question&title=support%3A+): Open a support question on GitHub.
+- [GitHub Issues](https://github.com/TheTeamVivek/YukkiMusic/issues/new?assignees=&labels=question&title=support%3A+&body=%23+Support+Question): Open a support question on GitHub.
 - [Telegram Profile](https://t.me/vivekkumar07089): Directly contact the maintainer.
 - [Telegram Support Group](https://t.me/TheTeamVk): Join our support group for live assistance.
 
