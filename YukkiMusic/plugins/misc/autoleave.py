@@ -71,7 +71,7 @@ async def auto_leave():
 async def auto_end():
     while True:
         await asyncio.sleep(30)
-        if not await is_autoend:
+        if not await is_autoend():
             continue 
         for chat_id, timer in list(autoend.items()):
             if datetime.now() > timer:
