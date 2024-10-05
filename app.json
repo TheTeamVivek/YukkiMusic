@@ -44,8 +44,8 @@
         "value": "",
         "required": true
       },
-      "STRING_SESSION": {
-        "description": "A Pyrogram String Session. One Assistant is Compulsory.",
+      "STRING_SESSIONS": {
+        "description": "A Pyrogram String Session. One Assistant is Compulsory. You Can Fill Multiple String Session Seperating With (,) comma",
         "value": "",
         "required": true
       },
