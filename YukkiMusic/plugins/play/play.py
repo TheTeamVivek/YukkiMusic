@@ -309,7 +309,7 @@ async def play_commnd(
             return await mystic.delete()
         else:
             if not await Telegram.is_streamable_url(url):
-                return await mystic.edit_tex(
+                return await mystic.edit_text(
                     "ᴏᴏᴘs ɪ ᴅᴏɴ'ᴛ Tʜɪɴᴋ ᴛʜᴀᴛ ɪᴛ ɪs ᴀ sᴛʀᴇᴀᴍᴀʙʟᴇ ᴜʀʟ"
                 )
             await mystic.edit_text(_["str_2"])
