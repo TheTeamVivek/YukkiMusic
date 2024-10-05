@@ -113,23 +113,25 @@ class Call:
         audio_stream_quality = await get_audio_bitrate(chat_id)
         video_stream_quality = await get_video_bitrate(chat_id)
         call_config = GroupCallConfig(auto_start=False)
+        
         if video:
             stream = MediaStream(
                 link,
                 audio_parameters=audio_stream_quality,
                 video_parameters=video_stream_quality,
             )
+        elif image and config.PRIVATE_BOT_MODE == str(True):
+            stream = MediaStream(
+                link,
+                image,
+                audio_parameters=audio_stream_quality,
+                video_parameters=video_stream_quality,
+            )
         else:
-            if image and config.PRIVATE_BOT_MODE == str(True):
-                stream = MediaStream(
-                    link,
-                    image,
-                    audio_parameters=audio_stream_quality,
-                    video_parameters=video_stream_quality,
-                )
-            else:
-                stream = MediaStream(link, audio_parameters=audio_stream_quality)
+            stream = MediaStream(link, audio_parameters=audio_stream_quality)
+        
         await assistant.play(chat_id, stream, config=call_config)
+
 
     async def seek_stream(self, chat_id, file_path, to_seek, duration, mode):
         assistant = await group_assistant(self, chat_id)
