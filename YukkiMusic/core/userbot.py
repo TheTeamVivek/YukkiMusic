@@ -8,12 +8,10 @@
 # All rights reserved.
 #
 import asyncio
-import os
 import sys
-from pyrogram import Client, filters
+from pyrogram import Client
 from ..logging import LOGGER
 import config
-from YukkiMusic.misc import SUDOERS
 
 assistants = []
 assistantids = []

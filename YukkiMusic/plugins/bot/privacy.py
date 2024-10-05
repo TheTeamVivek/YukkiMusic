@@ -3,7 +3,11 @@ from pyrogram.enums import ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 import config
+from strings import get_command
+
 from YukkiMusic import app
+
+PRIVACY_COMMAND = get_command("PRIVACY_COMMAND")
 
 TEXT = f"""
 🔒 **Privacy Policy for {app.mention} !**
@@ -14,7 +18,7 @@ If you have any questions or concerns, feel free to reach out to our [Support Te
 """
 
 
-@app.on_message(filters.command("privacy"))
+@app.on_message(filters.command(PRIVACY_COMMAND))
 async def privacy(client, message: Message):
     keyboard = InlineKeyboardMarkup(
         [[InlineKeyboardButton("View Privacy Policy", url=config.PRIVACY_LINK)]]

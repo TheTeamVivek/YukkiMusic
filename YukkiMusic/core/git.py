@@ -18,6 +18,7 @@ from ..logging import LOGGER
 
 loop = asyncio.get_event_loop_policy().get_event_loop()
 
+
 def install_req(cmd: str) -> Tuple[str, str, int, int]:
     async def install_requirements():
         args = shlex.split(cmd)
@@ -74,9 +75,9 @@ def git():
 
     nrs = repo.remote("origin")
     nrs.fetch(config.UPSTREAM_BRANCH)
-    
+
     requirements_file = "requirements.txt"
-    diff_index = repo.head.commit.diff('FETCH_HEAD')
+    diff_index = repo.head.commit.diff("FETCH_HEAD")
 
     requirements_updated = any(
         diff.a_path == requirements_file or diff.b_path == requirements_file
@@ -90,5 +91,5 @@ def git():
 
     if requirements_updated:
         install_req("pip3 install --no-cache-dir -r requirements.txt")
-    
+
     LOGGER(__name__).info(f"Fetched Updates from: {REPO_LINK}")

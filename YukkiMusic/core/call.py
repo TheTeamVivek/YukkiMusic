@@ -11,7 +11,6 @@ import asyncio
 from typing import Union
 
 from ntgcalls import TelegramServerError
-from pyrogram import Client
 from pyrogram.errors import FloodWait
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls, filters
