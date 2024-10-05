@@ -113,7 +113,6 @@ class Call:
         audio_stream_quality = await get_audio_bitrate(chat_id)
         video_stream_quality = await get_video_bitrate(chat_id)
         call_config = GroupCallConfig(auto_start=False)
-        
         if video:
             stream = MediaStream(
                 link,
@@ -122,16 +121,15 @@ class Call:
             )
         elif image and config.PRIVATE_BOT_MODE == str(True):
             stream = MediaStream(
-                link,
                 image,
+                audio_path=link,
                 audio_parameters=audio_stream_quality,
                 video_parameters=video_stream_quality,
             )
         else:
             stream = MediaStream(link, audio_parameters=audio_stream_quality)
-        
-        await assistant.play(chat_id, stream, config=call_config)
 
+        await assistant.play(chat_id, stream, config=call_config)
 
     async def seek_stream(self, chat_id, file_path, to_seek, duration, mode):
         assistant = await group_assistant(self, chat_id)
@@ -166,7 +164,6 @@ class Call:
         await asyncio.sleep(0.5)
         await assistant.leave_call(config.LOG_GROUP_ID)
 
-
     async def join_call(
         self,
         chat_id: int,
@@ -179,7 +176,6 @@ class Call:
         audio_stream_quality = await get_audio_bitrate(chat_id)
         video_stream_quality = await get_video_bitrate(chat_id)
         call_config = GroupCallConfig(auto_start=False)
-
         if video:
             stream = MediaStream(
                 link,
@@ -188,8 +184,8 @@ class Call:
             )
         elif image and config.PRIVATE_BOT_MODE == str(True):
             stream = MediaStream(
-                link,
                 image,
+                audio_path=link,
                 audio_parameters=audio_stream_quality,
                 video_parameters=video_stream_quality,
             )
@@ -206,6 +202,7 @@ class Call:
             raise AssistantErr(
                 "**ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ғᴏᴜɴᴅ**\n\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ."
             )
+
         except AlreadyJoinedError:
             raise AssistantErr(
                 "**ᴀssɪsᴛᴀɴᴛ ᴀʟʀᴇᴀᴅʏ ɪɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ**\n\nᴍᴜsɪᴄ ʙᴏᴛ sʏsᴛᴇᴍs ᴅᴇᴛᴇᴄᴛᴇᴅ ᴛʜᴀᴛ ᴀssɪᴛᴀɴᴛ ɪs ᴀʟʀᴇᴀᴅʏ ɪɴ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ, ɪғ ᴛʜɪs ᴩʀᴏʙʟᴇᴍ ᴄᴏɴᴛɪɴᴜᴇs ʀᴇsᴛᴀʀᴛ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ᴀɴᴅ ᴛʀʏ ᴀɢᴀɪɴ."
@@ -214,6 +211,13 @@ class Call:
             raise AssistantErr(
                 "**ᴛᴇʟᴇɢʀᴀᴍ sᴇʀᴠᴇʀ ᴇʀʀᴏʀ**\n\nᴩʟᴇᴀsᴇ ᴛᴜʀɴ ᴏғғ ᴀɴᴅ ʀᴇsᴛᴀʀᴛ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ᴀɢᴀɪɴ."
             )
+        except Exception as e:
+            if "phone.CreateGroupCall" in str(e):
+                raise AssistantErr(
+                    f"**» ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ғᴏᴜɴᴅ.**\n\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ."
+                )
+            else:
+                raise AssistantErr(e)
 
         await add_active_chat(chat_id)
         await music_on(chat_id)
@@ -276,8 +280,8 @@ class Call:
                         image = None
                     if image and config.PRIVATE_BOT_MODE == str(True):
                         stream = MediaStream(
-                            link,
                             image,
+                            audio_path=link,
                             audio_parameters=audio_stream_quality,
                             video_parameters=video_stream_quality,
                         )
@@ -334,8 +338,8 @@ class Call:
                         image = None
                     if image and config.PRIVATE_BOT_MODE == str(True):
                         stream = MediaStream(
-                            file_path,
                             image,
+                            audio_path=file_path,
                             audio_parameters=audio_stream_quality,
                             video_parameters=video_stream_quality,
                         )
@@ -412,8 +416,8 @@ class Call:
                 else:
                     if image and config.PRIVATE_BOT_MODE == str(True):
                         stream = MediaStream(
-                            queued,
                             image,
+                            audio_path=queued,
                             audio_parameters=audio_stream_quality,
                             video_parameters=video_stream_quality,
                         )
