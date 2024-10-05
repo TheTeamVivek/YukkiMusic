@@ -20,6 +20,7 @@ from YukkiMusic.utils.database import (
     get_assistant,
     get_client,
     is_active_chat,
+    is_autoend,
 )
 
 
@@ -69,7 +70,9 @@ async def auto_leave():
 
 async def auto_end():
     while True:
-        await asyncio.sleep(5)
+        await asyncio.sleep(30)
+        if not await is_autoend:
+            continue 
         for chat_id, timer in list(autoend.items()):
             if datetime.now() > timer:
                 if not await is_active_chat(chat_id):
