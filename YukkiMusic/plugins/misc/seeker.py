@@ -10,18 +10,15 @@
 import asyncio
 import time
 
-from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardMarkup
 from datetime import datetime, timedelta
 
 from strings import get_string
-from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
     get_active_chats,
     get_assistant,
-    get_cmode,
     get_lang,
     is_music_playing,
     set_loop,
@@ -67,7 +64,6 @@ async def leave_if_muted():
                         if member is None:
                             continue
                         members.append(member)
-
 
                     m = next((m for m in members if m.chat.id == userbot.id), None)
                     if m is None:

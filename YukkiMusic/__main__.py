@@ -59,7 +59,7 @@ async def init():
         LOGGER("YukkiMusic").error(
             "Please ensure the voice call in your log group is active."
         )
-        # sys.exit()
+        sys.exit()
 
     await Yukki.decorators()
     LOGGER("YukkiMusic").info("YukkiMusic Started Successfully")

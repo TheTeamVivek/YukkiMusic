@@ -11,7 +11,6 @@ from pyrogram.errors import FloodWait
 from pyrogram import filters
 
 from YukkiMusic import app
-from YukkiMusic.misc import SUDOERS
 from YukkiMusic.core.mongo import DB_NAME
 
 from motor.motor_asyncio import AsyncIOMotorClient

@@ -54,20 +54,6 @@ def get_playlist_markup(_):
     return buttons
 
 
-def get_cplaylist_markup(_):
-    buttons = [
-        [
-            InlineKeyboardButton(text=_["P_B_1"], callback_data="play_cplaylist a"),
-            InlineKeyboardButton(text=_["P_B_2"], callback_data="play_cplaylist v"),
-        ],
-        [
-            InlineKeyboardButton(text=_["BACK_BUTTON"], callback_data="home_play"),
-            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
-        ],
-    ]
-    return buttons
-
-
 def top_play_markup(_):
     buttons = [
         [InlineKeyboardButton(text=_["PL_B_9"], callback_data="SERVERTOP Global")],

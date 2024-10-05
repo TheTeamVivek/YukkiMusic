@@ -11,7 +11,8 @@
 # Commands in Every Language
 
 # Bot Commands
-PING_COMMAND : ["ping"]
+PING_COMMAND : ["ping", "alive"]
+PRIVACY_COMMAND : ["privacy"]
 START_COMMAND : ["start"]
 HELP_COMMAND : ["help"]
 SETTINGS_COMMAND : ["settings", "setting"]
@@ -28,8 +29,12 @@ STREAM_COMMAND : ["stream", "cstream", "streamforce"]
 
 #Playlists Command
 PLAYLIST_COMMAND : ["playlist"]
-DELETEPLAYLIST_COMMAND : ["deleteplaylist"]
-ADDPLAYLIST_COMMAND : ["addplaylist"]
+
+PLAY_PLAYLIST_COMMAND : ["playplaylist", "vplayplaylist"]
+
+DELETE_PLAYLIST_COMMAND : ["deleteplaylist", "delplaylist"]
+
+ADD_PLAYLIST_COMMAND : ["addplaylist"]
 
 
 # Tools
@@ -61,7 +66,7 @@ DELSUDO_COMMAND : ["delsudo"]
 SUDOUSERS_COMMAND : ["sudolist"]
 
 #Broadcast 
-BROADCAST_COMMAND : ["broadcast"]
+BROADCAST_COMMAND : ["broadcast", "gcast"]
 
 #Blacklist chat
 BLACKLISTCHAT_COMMAND : ["blacklistchat"]
@@ -77,16 +82,16 @@ MAINTENANCE_COMMAND : ["maintenance"]
 LOGGER_COMMAND : ["logger"]
 
 #Heroku
-GETLOG_COMMAND : ["get_log"]
-GETVAR_COMMAND : ["get_var"]
-DELVAR_COMMAND : ["del_var"]
-SETVAR_COMMAND : ["set_var"]
+GETLOG_COMMAND : ["log", "logs", "get_log", "getlog", "get_logs", "getlogs"]
+GETVAR_COMMAND : ["get_var", "getvar"]
+DELVAR_COMMAND : ["del_var", "delvar"]
+SETVAR_COMMAND : ["set_var", "setvar"]
 USAGE_COMMAND : ["usage"]
 VARS_COMMAND : ["vars", "config"]
 
 
 #Basic Bot Commands
-UPDATE_COMMAND : ["update","gitpull"]
+UPDATE_COMMAND : ["update","gitpull", "up"]
 RESTART_COMMAND : ["restart"]
 AUTOEND_COMMAND : ["autoend"]
 

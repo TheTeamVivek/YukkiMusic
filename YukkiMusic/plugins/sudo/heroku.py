@@ -54,10 +54,7 @@ async def paste_neko(code: str):
     return await Yukkibin(code)
 
 
-@app.on_message(
-    filters.command(["log", "logs", "get_log", "getlog", "get_logs", "getlogs"])
-    & SUDOERS
-)
+@app.on_message(filters.command(GETLOG_COMMAND) & SUDOERS)
 @language
 async def log_(client, message, _):
     try:
@@ -229,7 +226,7 @@ Tᴏᴛᴀʟ ʟᴇғᴛ: `{hours}`**ʜ**  `{minutes}`**ᴍ**  [`{percentage}`**%
     return await dyno.edit(text)
 
 
-@app.on_message(filters.command(["update", "gitpull", "up"]) & SUDOERS)
+@app.on_message(filters.command(UPDATE_COMMAND) & SUDOERS)
 @language
 async def update_(client, message, _):
     if await is_heroku():
@@ -316,7 +313,7 @@ async def update_(client, message, _):
         exit()
 
 
-@app.on_message(filters.command(["restart"]) & SUDOERS)
+@app.on_message(filters.command(RESTART_COMMAND) & SUDOERS)
 async def restart_(_, message):
     response = await message.reply_text("ʀᴇsᴛᴀʀᴛɪɴɢ...")
     ac_chats = await get_active_chats()

@@ -19,6 +19,8 @@ import config
 from config import BANNED_USERS, START_IMG_URL
 from config.config import OWNER_ID
 from strings import get_string
+from strings import get_command
+
 from YukkiMusic import HELPABLE, Telegram, YouTube, app
 from YukkiMusic.misc import SUDOERS, _boot_
 from YukkiMusic.plugins.play.playlist import del_plist_msg
@@ -42,8 +44,10 @@ from .help import paginate_modules
 
 loop = asyncio.get_running_loop()
 
+START_COMMAND = get_command("START_COMMAND")
 
-@app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
+
+@app.on_message(filters.command(START_COMMAND) & filters.private & ~BANNED_USERS)
 @LanguageStart
 async def start_comm(client, message: Message, _):
     chat_id = message.chat.id
@@ -239,7 +243,7 @@ async def start_comm(client, message: Message, _):
             )
 
 
-@app.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
+@app.on_message(filters.command(START_COMMAND) & filters.group & ~BANNED_USERS)
 @LanguageStart
 async def testbot(client, message: Message, _):
     out = alive_panel(_)

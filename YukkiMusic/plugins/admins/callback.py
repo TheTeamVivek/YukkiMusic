@@ -43,7 +43,7 @@ from YukkiMusic.utils.inline.play import (
     panel_markup_3,
     stream_markup,
     telegram_markup,
-    stream_markup
+    stream_markup,
 )
 
 from YukkiMusic.utils.stream.autoclear import auto_clean
@@ -52,7 +52,6 @@ from YukkiMusic.utils.thumbnails import gen_thumb
 wrong = {}
 downvote = {}
 downvoters = {}
-
 
 
 @app.on_callback_query(filters.regex("PanelMarkup") & ~BANNED_USERS)
