@@ -119,10 +119,17 @@ async def markup_timer():
                 try:
                     userbot = await get_assistant(chat_id)
                     members = []
-                    async for member in userbot.get_call_members(chat_id):
-                        if member is None:
-                            continue
-                        members.append(member)
+                    try:
+                        async for member in userbot.get_call_members(chat_id):
+                            if member is None:
+                                continue
+                            members.append(member)
+                    except ValueError:
+                        try:
+                            await Yukki.stop_stream(chat_id)
+                        except Exception:
+                            pass
+                        continue   
                     if not members:
                         await Yukki.stop_stream(chat_id)
                         await set_loop(chat_id, 0)
