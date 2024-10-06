@@ -48,6 +48,11 @@ async def skip(cli, message: Message, _, chat_id):
                             popped = None
                             try:
                                 popped = check.pop(0)
+                                if popped.get("mystic"):
+                                    try:
+                                        await popped.get("mystic").delete()
+                                    except Exception:
+                                        pass
                             except:
                                 return await message.reply_text(_["admin_16"])
                             if popped:
@@ -79,6 +84,11 @@ async def skip(cli, message: Message, _, chat_id):
             popped = check.pop(0)
             if popped:
                 await auto_clean(popped)
+                if popped.get("mystic"):
+                    try:
+                        await popped.get("mystic").delete()
+                    except Exception:
+                        pass
             if not check:
                 await message.reply_text(
                     _["admin_10"].format(message.from_user.first_name),
@@ -196,6 +206,17 @@ async def skip(cli, message: Message, _, chat_id):
                     if str(streamtype) == "audio"
                     else config.TELEGRAM_VIDEO_URL
                 ),
+                caption=_["stream_1"].format(
+                    title, config.SUPPORT_GROUP, check[0]["dur"], user
+                ),
+                reply_markup=InlineKeyboardMarkup(button),
+            )
+            db[chat_id][0]["mystic"] = run
+            db[chat_id][0]["markup"] = "tg"
+        elif "saavn" in videoid:
+            button = telegram_markup(_, chat_id)
+            run = await message.reply_photo(
+                photo=check[0]["thumb"],
                 caption=_["stream_1"].format(
                     title, config.SUPPORT_GROUP, check[0]["dur"], user
                 ),

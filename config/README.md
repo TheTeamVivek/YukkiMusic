@@ -13,8 +13,8 @@ Config vars are basically the variables which configure or modify bot to functio
 3. `BOT_TOKEN` : Get it from [@Botfather](http://t.me/BotFather) in Telegram
 4. `MONGO_DB_URI` : Get mongo db [from here.](https://notreallyshikhar.gitbook.io/yukkimusicbot/deployment/mongodb)
 5. `LOG_GROUP_ID` : You'll need a Private Group ID for this. Supergroup Needed with id starting from -100 
-6. `OWNER_ID` : Your Owner ID for managing your bot.
-7. `STRING_SESSION` : Pyrogram Session Needed, Generate string from [@YukkiStringBot](http://t.me/YukkiStringBot) in Telegram.
+6. `OWNER_ID` : Your Owner ID for managing your bot., muktiple ids can be seperated by commas.
+7. `STRING_SESSIONS`: Pyrogram v2 session strings for multiple assistants, separated by commas.
 
 
 ## Non-Mandatory Vars
@@ -48,10 +48,8 @@ Config vars are basically the variables which configure or modify bot to functio
 3. `TELEGRAM_EDIT_SLEEP` : Time sleep duration For Telegram Downloader. Default to 5 seconds
 4. `AUTO_LEAVING_ASSISTANT` : Set it in `True` if you want to leave your assistant after a certain amount of time.
 5. `ASSISTANT_LEAVE_TIME` : Time after which your assistant account will leave served chats automatically. Default to 5400 seconds, i.e 90 Mins
-6. `AUTO_DOWNLOADS_CLEAR` : Set it `True` if you want to delete downloads after the music playout ends. 
-7. `AUTO_SUGGESTION_MODE` : Set it `True` if you want to bot to suggest about bot commands to random chats of your bots. 
-9. `AUTO_SUGGESTION_TIME` : Time after which your bot will suggest random 1/10 chats of your served chats about bot commands. Default to 5400 seconds, i.e 90 Mins
-10. `SET_CMDS` : Set it to `True` if you want your bot to set the commands for chat menu automatically. [Reference](https://i.postimg.cc/Bbg3LQTG/image.png)
+
+6. `SET_CMDS` : Set it to `True` if you want your bot to set the commands for chat menu automatically. [Reference](https://i.postimg.cc/Bbg3LQTG/image.png)
 
 ## Spotify Vars
 
@@ -107,9 +105,6 @@ Config vars are basically the variables which configure or modify bot to functio
 
 ## Multi Assistant Mode
 
-- You can use upto 5 Assistant Clients ( allowing your bot to atleast work in 2000-2500 chats at a time )
+- Supports unlimited assistant clients.
 
-1. `STRING_SESSION2` : Pyrogram Session Needed, Generate string from [@YukkiStringBot](http://t.me/YukkiStringBot) in Telegram.
-2. `STRING_SESSION3` : Pyrogram Session Needed, Generate string from [@YukkiStringBot](http://t.me/YukkiStringBot) in Telegram.
-3. `STRING_SESSION4` : Pyrogram Session Needed, Generate string from [@YukkiStringBot](http://t.me/YukkiStringBot) in Telegram.
-4. `STRING_SESSION5` : Pyrogram Session Needed, Generate string from [@YukkiStringBot](http://t.me/YukkiStringBot) in Telegram.
+`STRING_SESSIONS`: Add multiple Pyrogram v2 string sessions, separated by commas.

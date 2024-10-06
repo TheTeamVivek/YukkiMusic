@@ -11,9 +11,7 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from config import BANNED_USERS, adminlist
-from strings import get_command
-
-from strings import get_string
+from strings import get_command, get_string
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS
@@ -36,9 +34,7 @@ STOP_COMMAND = get_command("STOP_COMMAND")
 async def stop_music(cli, message: Message):
     if await is_maintenance() is False:
         if message.from_user.id not in SUDOERS:
-            return await message.reply_text(
-                "Bot is under maintenance. Please wait for some time..."
-            )
+            return
     if not len(message.command) < 2:
         if extra_plugins_enabled:
             if not message.command[0][0] == "c" and not message.command[0][0] == "e":
@@ -94,6 +90,12 @@ async def stop_music(cli, message: Message):
             else:
                 if message.from_user.id not in admins:
                     return await message.reply_text(_["admin_19"])
+    try:
+        check = db.get(chat_id)
+        if check[0].get("mystic"):
+            await check[0].get("mystic").delete()
+    except Exception:
+        pass
     await Yukki.stop_stream(chat_id)
     await set_loop(chat_id, 0)
     await message.reply_text(_["admin_9"].format(message.from_user.mention))

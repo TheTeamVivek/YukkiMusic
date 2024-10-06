@@ -11,9 +11,12 @@
 import asyncio
 import shlex
 from typing import Tuple
+
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
+
 import config
+
 from ..logging import LOGGER
 
 loop = asyncio.get_event_loop_policy().get_event_loop()

@@ -11,7 +11,6 @@ import asyncio
 from typing import Union
 
 from ntgcalls import TelegramServerError
-from pyrogram.errors import FloodWait
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls, filters
 from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
@@ -23,6 +22,7 @@ from pytgcalls.types import (
     StreamVideoEnded,
     Update,
 )
+
 import config
 from strings import get_string
 from YukkiMusic import LOGGER, YouTube, app, userbot
@@ -45,13 +45,14 @@ from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
 from YukkiMusic.utils.stream.autoclear import auto_clean
 from YukkiMusic.utils.thumbnails import gen_thumb
 
-
 async def _clear_(chat_id):
+    popped = db.pop(chat_id, None)
+    if popped:
+        await auto_clean(popped)
     db[chat_id] = []
     await remove_active_video_chat(chat_id)
     await remove_active_chat(chat_id)
     await set_loop(chat_id, 0)
-
 
 class Call:
     def __init__(self):
@@ -200,16 +201,16 @@ class Call:
             )
         except NoActiveGroupCall:
             raise AssistantErr(
-                "**ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ғᴏᴜɴᴅ**\n\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ."
+                "**No active video chat found **\n\nPlease make sure you started the voicechat."
             )
 
         except AlreadyJoinedError:
             raise AssistantErr(
-                "**ᴀssɪsᴛᴀɴᴛ ᴀʟʀᴇᴀᴅʏ ɪɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ**\n\nᴍᴜsɪᴄ ʙᴏᴛ sʏsᴛᴇᴍs ᴅᴇᴛᴇᴄᴛᴇᴅ ᴛʜᴀᴛ ᴀssɪᴛᴀɴᴛ ɪs ᴀʟʀᴇᴀᴅʏ ɪɴ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ, ɪғ ᴛʜɪs ᴩʀᴏʙʟᴇᴍ ᴄᴏɴᴛɪɴᴜᴇs ʀᴇsᴛᴀʀᴛ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ᴀɴᴅ ᴛʀʏ ᴀɢᴀɪɴ."
+                "**ASSISTANT IS ALREADY IN VOICECHAT **\n\nMusic bot system detected that assistant is already in the voicechat, if the problem continues restart the videochat and try again."
             )
         except TelegramServerError:
             raise AssistantErr(
-                "**ᴛᴇʟᴇɢʀᴀᴍ sᴇʀᴠᴇʀ ᴇʀʀᴏʀ**\n\nᴩʟᴇᴀsᴇ ᴛᴜʀɴ ᴏғғ ᴀɴᴅ ʀᴇsᴛᴀʀᴛ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ᴀɢᴀɪɴ."
+                "**TELEGRAM SERVER ERROR**\n\nPlease restart Your voicechat."
             )
         await add_active_chat(chat_id)
         await music_on(chat_id)
@@ -228,6 +229,11 @@ class Call:
                 await set_loop(chat_id, loop)
             if popped:
                 await auto_clean(popped)
+                if popped.get("mystic"):
+                    try:
+                        await popped.get("mystic").delete()
+                    except Exception:
+                        pass
             if not check:
                 await _clear_(chat_id)
                 return await client.leave_call(chat_id)
@@ -453,23 +459,32 @@ class Call:
                     )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "tg"
+                elif "saavn" in videoid:
+                    button = telegram_markup(_, chat_id)
+                    run = await app.send_photo(
+                        original_chat_id,
+                        photo=check[0]["thumb"],
+                        caption=_["stream_1"].format(
+                            title, config.SUPPORT_GROUP, check[0]["dur"], user
+                        ),
+                        reply_markup=InlineKeyboardMarkup(button),
+                    )
+                    db[chat_id][0]["mystic"] = run
+                    db[chat_id][0]["markup"] = "tg"
                 else:
                     img = await gen_thumb(videoid)
                     button = stream_markup(_, videoid, chat_id)
-                    try:
-                        run = await app.send_photo(
-                            original_chat_id,
-                            photo=img,
-                            caption=_["stream_1"].format(
-                                title[:27],
-                                f"https://t.me/{app.username}?start=info_{videoid}",
-                                check[0]["dur"],
-                                user,
-                            ),
-                            reply_markup=InlineKeyboardMarkup(button),
-                        )
-                    except FloodWait as e:
-                        await asyncio.sleep(e.value)
+                    run = await app.send_photo(
+                        original_chat_id,
+                        photo=img,
+                        caption=_["stream_1"].format(
+                            title[:27],
+                            f"https://t.me/{app.username}?start=info_{videoid}",
+                            check[0]["dur"],
+                            user,
+                        ),
+                        reply_markup=InlineKeyboardMarkup(button),
+                    )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "stream"
 

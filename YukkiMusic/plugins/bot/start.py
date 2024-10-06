@@ -18,9 +18,7 @@ from youtubesearchpython.__future__ import VideosSearch
 import config
 from config import BANNED_USERS, START_IMG_URL
 from config.config import OWNER_ID
-from strings import get_string
-from strings import get_command
-
+from strings import command, get_command, get_string
 from YukkiMusic import HELPABLE, Telegram, YouTube, app
 from YukkiMusic.misc import SUDOERS, _boot_
 from YukkiMusic.plugins.play.playlist import del_plist_msg
@@ -38,7 +36,7 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.decorators.language import LanguageStart
 from YukkiMusic.utils.formatters import get_readable_time
 from YukkiMusic.utils.functions import MARKDOWN, WELCOMEHELP
-from YukkiMusic.utils.inline import alive_panel, private_panel, start_pannel
+from YukkiMusic.utils.inline import private_panel, start_pannel
 
 from .help import paginate_modules
 
@@ -246,20 +244,10 @@ async def start_comm(client, message: Message, _):
 @app.on_message(filters.command(START_COMMAND) & filters.group & ~BANNED_USERS)
 @LanguageStart
 async def testbot(client, message: Message, _):
-    out = alive_panel(_)
     uptime = int(time.time() - _boot_)
     chat_id = message.chat.id
-    if config.START_IMG_URL:
-        await message.reply_photo(
-            photo=config.START_IMG_URL,
-            caption=_["start_7"].format(app.mention, get_readable_time(uptime)),
-            reply_markup=InlineKeyboardMarkup(out),
-        )
-    else:
-        await message.reply_text(
-            text=_["start_7"].format(app.mention, get_readable_time(uptime)),
-            reply_markup=InlineKeyboardMarkup(out),
-        )
+    await message.reply_text(_["start_7"].format(get_readable_time(uptime)))
+
     return await add_served_chat(message.chat.id)
 
 
@@ -314,27 +302,25 @@ async def welcome(client, message: Message):
             return
 
 
-__MODULE__ = "Boᴛ"
+__MODULE__ = "Bot"
 __HELP__ = f"""
-<b>✦ c sᴛᴀɴᴅs ғᴏʀ ᴄʜᴀɴɴᴇʟ ᴘʟᴀʏ.</b>
+<b>✦ c stands for channel play.</b>
 
-<b>★ /stats</b> - Gᴇᴛ Tᴏᴘ 𝟷𝟶 Tʀᴀᴄᴋs Gʟᴏʙᴀʟ Sᴛᴀᴛs, Tᴏᴘ 𝟷𝟶 Usᴇʀs ᴏғ ʙᴏᴛ, Tᴏᴘ 𝟷𝟶 Cʜᴀᴛs ᴏɴ ʙᴏᴛ, Tᴏᴘ 𝟷𝟶 Pʟᴀʏᴇᴅ ɪɴ ᴀ ᴄʜᴀᴛ ᴇᴛᴄ ᴇᴛᴄ.
+<b>★ {command("STATS_COMMAND")}</b> - Get Top 10 Tracks Global Stats, Top 10 Users of Bot, Top 10 Chats on Bot, Top 10 Played in a chat, etc.
 
-<b>★ /sudolist</b> - Cʜᴇᴄᴋ Sᴜᴅᴏ Usᴇʀs ᴏғ Bᴏᴛ
+<b>★ {command("SUDOUSERS_COMMAND")}</b> - Check Sudo users of the bot.
 
-<b>★ /lyrics [Mᴜsɪᴄ Nᴀᴍᴇ]</b> - Sᴇᴀʀᴄʜᴇs Lʏʀɪᴄs ғᴏʀ ᴛʜᴇ ᴘᴀʀᴛɪᴄᴜʟᴀʀ Mᴜsɪᴄ ᴏɴ ᴡᴇʙ.
+<b>★ {command("LYRICS_COMMAND")} [Music Name]</b> - Search lyrics for the particular music on the web.
 
-<b>★ /song [Tʀᴀᴄᴋ Nᴀᴍᴇ] ᴏʀ [YT Lɪɴᴋ]</b> - Dᴏᴡɴʟᴏᴀᴅ ᴀɴʏ ᴛʀᴀᴄᴋ ғʀᴏᴍ ʏᴏᴜᴛᴜʙᴇ ɪɴ ᴍᴘ𝟹 ᴏʀ ᴍᴘ𝟺 ғᴏʀᴍᴀᴛs.
+<b>★ {command("SONG_COMMAND")} [Track Name] or [YT Link]</b> - Download any track from YouTube in MP3 or MP4 formats.
 
-<b>★ /player</b> - Gᴇᴛ ᴀ ɪɴᴛᴇʀᴀᴄᴛɪᴠᴇ Pʟᴀʏɪɴɢ Pᴀɴᴇʟ.
+<b>★ {command("QUEUE_COMMAND")}</b> - Check the queue list of music.
 
-<b>★ /queue ᴏʀ /cqueue</b> - Cʜᴇᴄᴋ Qᴜᴇᴜᴇ Lɪsᴛ ᴏғ Mᴜsɪᴄ.
-
-    <u><b>⚡️Pʀɪᴠᴀᴛᴇ Bᴏᴛ:</b></u>
+    <u><b>⚡️Private Bot:</b></u>
       
-<b>✧ /authorize [CHAT_ID]</b> - Aʟʟᴏᴡ ᴀ ᴄʜᴀᴛ ғᴏʀ ᴜsɪɴɢ ʏᴏᴜʀ ʙᴏᴛ.
+<b>✧ {command("AUTHORIZE_COMMAND")} [CHAT_ID]</b> - Allow a chat to use your bot.
 
-<b>✧ /unauthorize[CHAT_ID]</b> - Dɪsᴀʟʟᴏᴡ ᴀ ᴄʜᴀᴛ ғʀᴏᴍ ᴜsɪɴɢ ʏᴏᴜʀ ʙᴏᴛ.
+<b>✧ {command("UNAUTHORIZE_COMMAND")} [CHAT_ID]</b> - Disallow a chat from using your bot.
 
-<b>✧ /authorized</b> - Cʜᴇᴄᴋ ᴀʟʟ ᴀʟʟᴏᴡᴇᴅ ᴄʜᴀᴛs ᴏғ ʏᴏᴜʀ ʙᴏᴛ.
+<b>✧ {command("AUTHORIZED_COMMAND")}</b> - Check all allowed chats of your bot.
 """

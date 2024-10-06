@@ -21,16 +21,23 @@ import urllib3
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
 from pyrogram import filters
+from pyrogram.types import Message
+from pyrogram.enums import ChatType
 
 import config
-from strings import get_command
+from config import BANNED_USERS
+from strings import get_command, get_string
 from YukkiMusic import app
-from YukkiMusic.misc import HAPP, SUDOERS, XCB
+from YukkiMusic.core.call import Yukki
+from YukkiMusic.misc import HAPP, SUDOERS, XCB, db
 from YukkiMusic.utils.database import (
     get_active_chats,
+    get_cmode,
+    get_lang,
     remove_active_chat,
     remove_active_video_chat,
 )
+from YukkiMusic.utils.decorators import AdminActual, language
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.pastebin import Yukkibin
 
@@ -42,6 +49,7 @@ SETVAR_COMMAND = get_command("SETVAR_COMMAND")
 USAGE_COMMAND = get_command("USAGE_COMMAND")
 UPDATE_COMMAND = get_command("UPDATE_COMMAND")
 RESTART_COMMAND = get_command("RESTART_COMMAND")
+REBOOT_COMMAND = get_command("REBOOT_COMMAND")
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -216,13 +224,13 @@ async def usage_dynos(client, message, _):
     AppMinutes = math.floor(AppQuotaUsed % 60)
     await asyncio.sleep(1.5)
     text = f"""
-**Dʏɴᴏ Usᴀɢᴇ**
+**Dyno usage**
 
-<u>Usᴀɢᴇ:</u>
-Tᴏᴛᴀʟ ᴜsᴇᴅ: `{AppHours}`**ʜ**  `{AppMinutes}`**ᴍ**  [`{AppPercentage}`**%**]
+<u>Usage:</u>
+Total used: `{AppHours}`**h**  `{AppMinutes}`**m**  [`{AppPercentage}`**%**]
 
-<u>Rᴇᴀᴍɪɴɪɴɢ ǫᴜᴏᴛᴀ:</u>
-Tᴏᴛᴀʟ ʟᴇғᴛ: `{hours}`**ʜ**  `{minutes}`**ᴍ**  [`{percentage}`**%**]"""
+<u>Remaining Quota</u>
+Total Left: `{hours}`**h**  `{minutes}`**m**  [`{percentage}`**%**]"""
     return await dyno.edit(text)
 
 
@@ -247,22 +255,22 @@ async def update_(client, message, _):
     for checks in repo.iter_commits(f"HEAD..origin/{config.UPSTREAM_BRANCH}"):
         verification = str(checks.count())
     if verification == "":
-        return await response.edit("» ʙᴏᴛ ɪs ᴜᴘ-ᴛᴏ-ᴅᴀᴛᴇ.")
+        return await response.edit("Bot is up to date")
     ordinal = lambda format: "%d%s" % (
         format,
         "tsnrhtdd"[(format // 10 % 10 != 1) * (format % 10 < 4) * format % 10 :: 4],
     )
     updates = "".join(
-        f"<b>➣ #{info.count()}: <a href={REPO_}/commit/{info}>{info.summary}</a> ʙʏ -> {info.author}</b>\n\t\t\t\t<b>➥ ᴄᴏᴍᴍɪᴛᴇᴅ ᴏɴ :</b> {ordinal(int(datetime.fromtimestamp(info.committed_date).strftime('%d')))} {datetime.fromtimestamp(info.committed_date).strftime('%b')}, {datetime.fromtimestamp(info.committed_date).strftime('%Y')}\n\n"
+        f"<b>➣ #{info.count()}: <a href={REPO_}/commit/{info}>{info.summary}</a> By -> {info.author}</b>\n\t\t\t\t<b>➥ Commited On:</b> {ordinal(int(datetime.fromtimestamp(info.committed_date).strftime('%d')))} {datetime.fromtimestamp(info.committed_date).strftime('%b')}, {datetime.fromtimestamp(info.committed_date).strftime('%Y')}\n\n"
         for info in repo.iter_commits(f"HEAD..origin/{config.UPSTREAM_BRANCH}")
     )
-    _update_response_ = "**ᴀ ɴᴇᴡ ᴜᴩᴅᴀᴛᴇ ɪs ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀ ᴛʜᴇ ʙᴏᴛ !**\n\n➣ ᴩᴜsʜɪɴɢ ᴜᴩᴅᴀᴛᴇs ɴᴏᴡ\n\n__**ᴜᴩᴅᴀᴛᴇs:**__\n"
+    _update_response_ = "**A new upadte is available for the Bot! **\n\n➣ Pushing upadtes Now\n\n__**Updates:**__\n"
     _final_updates_ = f"{_update_response_} {updates}"
 
     if len(_final_updates_) > 4096:
         url = await Yukkibin(updates)
         nrs = await response.edit(
-            f"**ᴀ ɴᴇᴡ ᴜᴩᴅᴀᴛᴇ ɪs ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀ ᴛʜᴇ ʙᴏᴛ !**\n\n➣ ᴩᴜsʜɪɴɢ ᴜᴩᴅᴀᴛᴇs ɴᴏᴡ\n\n__**ᴜᴩᴅᴀᴛᴇs :**__\n\n[ᴄʜᴇᴄᴋ ᴜᴩᴅᴀᴛᴇs]({url})",
+            f"**A new upadte is available for the Bot!**\n\n➣ Pushing upadtes Now\n\n__**Updates:**__\n\n[Check Upadtes]({url})",
             disable_web_page_preview=True,
         )
     else:
@@ -275,7 +283,7 @@ async def update_(client, message, _):
             try:
                 await app.send_message(
                     chat_id=int(x),
-                    text="{0} ɪs ᴜᴘᴅᴀᴛᴇᴅ ʜᴇʀsᴇʟғ\n\nʏᴏᴜ ᴄᴀɴ sᴛᴀʀᴛ ᴩʟᴀʏɪɴɢ ᴀɢᴀɪɴ ᴀғᴛᴇʀ 15-20 sᴇᴄᴏɴᴅs.".format(
+                    text="{0} Is upadted herself\n\nYou can start playing after 15-20 Seconds".format(
                         app.mention
                     ),
                 )
@@ -285,7 +293,7 @@ async def update_(client, message, _):
                 pass
         await response.edit(
             _final_updates_
-            + f"» ʙᴏᴛ ᴜᴩᴅᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ! ɴᴏᴡ ᴡᴀɪᴛ ғᴏʀ ғᴇᴡ ᴍɪɴᴜᴛᴇs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ ʀᴇsᴛᴀʀᴛs",
+            + f"» Bot Upadted Sucessfully Now wait until the bot starts",
             disable_web_page_preview=True,
         )
     except:
@@ -299,11 +307,11 @@ async def update_(client, message, _):
             return
         except Exception as err:
             await response.edit(
-                f"{nrs.text}\n\nsᴏᴍᴇᴛʜɪɴɢ ᴡᴇɴᴛ ᴡʀᴏɴɢ, ᴩʟᴇᴀsᴇ ᴄʜᴇᴄᴋ ʟᴏɢs."
+                f"{nrs.text}\n\nSomething went wrong, Please check logs"
             )
             return await app.send_message(
                 chat_id=config.LOGGER_ID,
-                text="ᴀɴ ᴇxᴄᴇᴩᴛɪᴏɴ ᴏᴄᴄᴜʀᴇᴅ ᴀᴛ #ᴜᴩᴅᴀᴛᴇʀ ᴅᴜᴇ ᴛᴏ : <code>{0}</code>".format(
+                text="An exception occurred #updater due to : <code>{0}</code>".format(
                     err
                 ),
             )
@@ -313,15 +321,45 @@ async def update_(client, message, _):
         exit()
 
 
-@app.on_message(filters.command(RESTART_COMMAND) & SUDOERS)
-async def restart_(_, message):
-    response = await message.reply_text("ʀᴇsᴛᴀʀᴛɪɴɢ...")
+@app.on_message(filters.command(REBOOT_COMMAND) & filters.group & ~BANNED_USERS)
+@AdminActual
+async def reboot(client, message: Message, _):
+    mystic = await message.reply_text(
+        f"Please Wait... \nRebooting{app.mention} For Your Chat."
+    )
+    await asyncio.sleep(1)
+    try:
+        db[message.chat.id] = []
+        await Yukki.stop_stream(message.chat.id)
+    except:
+        pass
+    chat_id = await get_cmode(message.chat.id)
+    if chat_id:
+        try:
+            await app.get_chat(chat_id)
+        except:
+            pass
+        try:
+            db[chat_id] = []
+            await Yukki.stop_stream(chat_id)
+        except:
+            pass
+    return await mystic.edit_text("Sucessfully Restarted \nTry playing Now..")
+
+
+@app.on_message(filters.command(RESTART_COMMAND) & ~BANNED_USERS)
+async def restart_(client, message):
+    if message.from_user and not message.from_user.id in SUDOERS:
+        if message.chat.type not in [ChatType.GROUP, ChatType.SUPERGROUP]:
+            return
+        return await reboot(client, message)
+    response = await message.reply_text("Restarting...")
     ac_chats = await get_active_chats()
     for x in ac_chats:
         try:
             await app.send_message(
                 chat_id=int(x),
-                text=f"{app.mention} ɪs ʀᴇsᴛᴀʀᴛɪɴɢ...\n\nʏᴏᴜ ᴄᴀɴ sᴛᴀʀᴛ ᴩʟᴀʏɪɴɢ ᴀɢᴀɪɴ ᴀғᴛᴇʀ 15-20 sᴇᴄᴏɴᴅs.",
+                text=f"{app.mention} Is restarting...\n\nYou can start playing after 15-20 seconds",
             )
             await remove_active_chat(x)
             await remove_active_video_chat(x)
@@ -335,6 +373,6 @@ async def restart_(_, message):
     except:
         pass
     await response.edit_text(
-        "» ʀᴇsᴛᴀʀᴛ ᴘʀᴏᴄᴇss sᴛᴀʀᴛᴇᴅ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ ғᴏʀ ғᴇᴡ sᴇᴄᴏɴᴅs ᴜɴᴛɪʟ ᴛʜᴇ ʙᴏᴛ sᴛᴀʀᴛs..."
+        "Restart process started, please wait for few seconds until the bot starts..."
     )
     os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")

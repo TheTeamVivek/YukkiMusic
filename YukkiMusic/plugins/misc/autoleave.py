@@ -9,20 +9,21 @@
 #
 
 import asyncio
-
-from pyrogram.enums import ChatType
 from datetime import datetime
 
+from pyrogram.enums import ChatType
+
 import config
+from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import (
     get_assistant,
     get_client,
+    get_lang,
     is_active_chat,
     is_autoend,
 )
-
 
 autoend = {}
 
@@ -72,7 +73,7 @@ async def auto_end():
     while True:
         await asyncio.sleep(30)
         if not await is_autoend():
-            continue 
+            continue
         for chat_id, timer in list(autoend.items()):
             if datetime.now() > timer:
                 if not await is_active_chat(chat_id):
@@ -81,7 +82,7 @@ async def auto_end():
 
                 userbot = await get_assistant(chat_id)
                 members = []
-         
+
                 try:
                     async for member in userbot.get_call_members(chat_id):
                         if member is None:
@@ -100,9 +101,14 @@ async def auto_end():
                         pass
 
                     try:
+                        language = await get_lang(message.chat.id)
+                        language = get_string(language)
+                    except:
+                        language = get_string("en")
+                    try:
                         await app.send_message(
                             chat_id,
-                            "ʙᴏᴛ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ ᴄʟᴇᴀʀᴇᴅ ᴛʜᴇ ǫᴜᴇᴜᴇ ᴀɴᴅ ʟᴇғᴛ ᴠɪᴅᴇᴏᴄʜᴀᴛ ʙᴇᴄᴀᴜsᴇ ɴᴏ ᴏɴᴇ ᴡᴀs ʟɪsᴛᴇɴɪɴɢ sᴏɴɢs ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.",
+                            language["misc_1"],
                         )
                     except Exception:
                         pass
@@ -110,5 +116,5 @@ async def auto_end():
                 del autoend[chat_id]
 
 
-asyncio.create_task(auto_leave())
-asyncio.create_task(auto_end())
+asyncio.create_task(auto_leave(), name="autoleave")
+asyncio.create_task(auto_end(), name="autoend")

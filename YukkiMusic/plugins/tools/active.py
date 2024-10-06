@@ -11,7 +11,7 @@ from pyrogram import filters
 from pyrogram.errors import ChannelInvalid
 from pyrogram.types import Message
 
-from strings import get_command
+from strings import command, get_command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils.database.memorydatabase import (
@@ -24,6 +24,7 @@ from YukkiMusic.utils.database.memorydatabase import (
 # Commands
 ACTIVEVC_COMMAND = get_command("ACTIVEVC_COMMAND")
 ACTIVEVIDEO_COMMAND = get_command("ACTIVEVIDEO_COMMAND")
+AC_COMMAND = get_command("AC_COMMAND")
 
 
 # Function for removing the Active voice and video chat also clear the db dictionary for the chat
@@ -35,7 +36,7 @@ async def _clear_(chat_id):
 
 @app.on_message(filters.command(ACTIVEVC_COMMAND) & SUDOERS)
 async def activevc(_, message: Message):
-    mystic = await message.reply_text("ɢᴇᴛᴛɪɴɢ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ....ᴘʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ")
+    mystic = await message.reply_text("Getting Active Voicechats....\nPlease hold on")
     served_chats = await get_active_chats()
     text = ""
     j = 0
@@ -52,17 +53,17 @@ async def activevc(_, message: Message):
             await _clear_(x)
             continue
     if not text:
-        await mystic.edit_text("ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ's")
+        await mystic.edit_text("No active Chats Found")
     else:
         await mystic.edit_text(
-            f"**ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ's:-**\n\n{text}",
+            f"**Active Voice Chat's:-**\n\n{text}",
             disable_web_page_preview=True,
         )
 
 
 @app.on_message(filters.command(ACTIVEVIDEO_COMMAND) & SUDOERS)
 async def activevi_(_, message: Message):
-    mystic = await message.reply_text("ɢᴇᴛᴛɪɴɢ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ....ᴘʟᴇᴀsᴇ ʜᴏʟᴅ ᴏɴ")
+    mystic = await message.reply_text("Getting Active Voicechats....\nPlease hold on")
     served_chats = await get_active_video_chats()
     text = ""
     j = 0
@@ -79,28 +80,27 @@ async def activevi_(_, message: Message):
             await _clear_(x)
             continue
     if not text:
-        await mystic.edit_text("ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ's")
+        await mystic.edit_text("No active Chats Found")
     else:
         await mystic.edit_text(
-            f"**ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ's:-**\n\n{text}",
+            f"**Active Video Chat's:-**\n\n{text}",
             disable_web_page_preview=True,
         )
 
 
-@app.on_message(filters.command(["ac"]) & SUDOERS)
+@app.on_message(filters.command(AC_COMMAND) & SUDOERS)
 async def vc(client, message: Message):
     ac_audio = str(len(await get_active_chats()))
+    await message.reply_text(f"Active Chats info: {ac_audio}")
 
-    await message.reply_text(f"ᴀᴄᴛɪᴠᴇ ᴄʜᴀᴛs ɪɴғᴏ: {ac_audio}")
 
+__MODULE__ = "Active"
+__HELP__ = f"""
+<b>✧ {command("AC_COMMAND")}</b> - Check active voice chats on the bot.
 
-__MODULE__ = "Acᴛɪᴠᴇ"
-__HELP__ = """
-<b>✧ /ac</b> - Cʜᴇᴄᴋ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛs ᴏɴ ʙᴏᴛ.
+<b>✧ {command("ACTIVEVC_COMMAND")}</b> - Check active voice and video calls on the bot.
 
-<b>✧ /activevoice</b> - Cʜᴇᴄᴋ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛs ᴀɴᴅ ᴠɪᴅᴇᴏ ᴄᴀʟʟs ᴏɴ ʙᴏᴛ.
+<b>✧ {command("ACTIVEVIDEO_COMMAND")}</b> - Check active video calls on the bot.
 
-<b>✧ /activevideo</b> - Cʜᴇᴄᴋ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏ ᴄᴀʟʟs ᴏɴ ʙᴏᴛ.
-
-<b>✧ /stats</b> - Cʜᴇᴄᴋ Bᴏᴛs Sᴛᴀᴛs
+<b>✧ {command("STATS_COMMAND")}</b> - Check bot stats.
 """

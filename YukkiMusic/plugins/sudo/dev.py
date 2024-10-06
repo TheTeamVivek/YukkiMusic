@@ -11,6 +11,7 @@
 # This aeval and sh module is taken from < https://github.com/TheHamkerCat/WilliamButcherBot >
 # Credit goes to TheHamkerCat.
 #
+
 import os
 import re
 import subprocess
@@ -23,9 +24,9 @@ from time import time
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
+from strings import get_command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.cleanmode import protect_message
 
 
 async def aexec(code, client, message):
@@ -40,7 +41,6 @@ async def edit_or_reply(msg: Message, **kwargs):
     func = msg.edit_text if msg.from_user.is_self else msg.reply
     spec = getfullargspec(func.__wrapped__).args
     await func(**{k: v for k, v in kwargs.items() if k in spec})
-    await protect_message(msg.chat.id, msg.id)
 
 
 @app.on_edited_message(
@@ -51,7 +51,7 @@ async def edit_or_reply(msg: Message, **kwargs):
 )
 async def executor(client: app, message: Message):
     if len(message.command) < 2:
-        return await edit_or_reply(message, text="<b>ᴡʜᴀᴛ ʏᴏᴜ ᴡᴀɴɴᴀ ᴇxᴇᴄᴜᴛᴇ ʙᴀʙʏ ?</b>")
+        return await edit_or_reply(message, text="<b>Give me something to exceute</b>")
     try:
         cmd = message.text.split(" ", maxsplit=1)[1]
     except IndexError:
@@ -79,7 +79,7 @@ async def executor(client: app, message: Message):
         evaluation += stdout
     else:
         evaluation += "Success"
-    final_output = f"<b>⥤ ʀᴇsᴜʟᴛ :</b>\n<pre language='python'>{evaluation}</pre>"
+    final_output = f"<b>RESULTS:</b>\n<pre language='python'>{evaluation}</pre>"
     if len(final_output) > 4096:
         filename = "output.txt"
         with open(filename, "w+", encoding="utf8") as out_file:
@@ -97,7 +97,7 @@ async def executor(client: app, message: Message):
         )
         await message.reply_document(
             document=filename,
-            caption=f"<b>⥤ ᴇᴠᴀʟ :</b>\n<code>{cmd[0:980]}</code>\n\n<b>⥤ ʀᴇsᴜʟᴛ :</b>\nAttached Document",
+            caption=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
             quote=False,
             reply_markup=keyboard,
         )
@@ -136,7 +136,7 @@ async def forceclose_command(_, CallbackQuery):
     if CallbackQuery.from_user.id != int(user_id):
         try:
             return await CallbackQuery.answer(
-                "» ɪᴛ'ʟʟ ʙᴇ ʙᴇᴛᴛᴇʀ ɪғ ʏᴏᴜ sᴛᴀʏ ɪɴ ʏᴏᴜʀ ʟɪᴍɪᴛs ʙᴀʙʏ.", show_alert=True
+                "This is not for you stay away from here", show_alert=True
             )
         except:
             return
@@ -153,7 +153,9 @@ async def forceclose_command(_, CallbackQuery):
 @app.on_message(filters.command("sh") & SUDOERS & ~filters.forwarded & ~filters.via_bot)
 async def shellrunner(_, message: Message):
     if len(message.command) < 2:
-        return await edit_or_reply(message, text="<b>ᴇxᴀᴍᴩʟᴇ :</b>\n/sh git pull")
+        return await edit_or_reply(
+            message, text="<b>Give some commamds like:</b>\n/sh git pull"
+        )
     text = message.text.split(None, 1)[1]
     if "\n" in text:
         code = text.split("\n")
@@ -213,28 +215,33 @@ async def shellrunner(_, message: Message):
     await message.stop_propagation()
 
 
-__MODULE__ = "Deᴠ"
-__HELP__ = """
-🔰<b><u>Aᴅᴅ Aɴᴅ Rᴇᴍᴏᴠᴇ Sᴜᴅᴏ Usᴇʀ's:</u></b>
+def command(cmd: str):
+    cmds = " ".join([f"/{c}" for c in get_command(cmd)])
+    return cmds
 
-★ <b>/addsudo [Usᴇʀɴᴀᴍᴇ ᴏʀ Rᴇᴘʟʏ ᴛᴏ ᴀ ᴜsᴇʀ]</b>
-★ <b>/delsudo [Usᴇʀɴᴀᴍᴇ ᴏʀ Rᴇᴘʟʏ ᴛᴏ ᴀ ᴜsᴇʀ]</b>
 
-🛃<b><u>Hᴇʀᴏᴋᴜ:</u></b>
+__MODULE__ = "Dev"
+__HELP__ = f"""
+<b><u>Add and remove sudoers:</u></b>
 
-★ <b>/usage</b> - Dʏɴᴏ Usᴀɢᴇ.
-★ <b>/get_var</b> - Gᴇᴛ ᴀ ᴄᴏɴғɪɢ ᴠᴀʀ ғʀᴏᴍ Hᴇʀᴏᴋᴜ ᴏʀ .env
-★ <b>/del_var</b> - Dᴇʟᴇᴛᴇ ᴀɴʏ ᴠᴀʀ ᴏɴ Hᴇʀᴏᴋᴜ ᴏʀ .ᴇɴᴠ.
-★ <b>/set_var [Vᴀʀ Nᴀᴍᴇ] [Vᴀʟᴜᴇ]</b> - Sᴇᴛ ᴀ Vᴀʀ ᴏʀ Uᴘᴅᴀᴛᴇ ᴀ Vᴀʀ ᴏɴ ʜᴇʀᴏᴋᴜ ᴏʀ .ᴇɴᴠ. Sᴇᴘᴇʀᴀᴛᴇ Vᴀʀ ᴀɴᴅ ɪᴛs Vᴀʟᴜᴇ ᴡɪᴛʜ ᴀ sᴘᴀᴄᴇ.
+<b>{command("ADDSUDO_COMMAND")} [Username or reply to a user] - Add sudo in your bot</b>
+<b>{command("DELSUDO_COMMAND")} [Username or userid or reply to a user] - Remove from bot sudoers</b>
+<b>{command("SUDOUSERS_COMMAND")} - Get a list of all sudoers</b>
 
-🤖<b><u>Bᴏᴛ Cᴏᴍᴍᴀɴᴅs:</u></b>
+<b><u>Heroku:</u></b>
 
-★ <b>/restart</b> - Rᴇsᴛᴀʀᴛ ʏᴏᴜʀ Bᴏᴛ. 
-★ <b>/update , /gitpull</b> - Uᴘᴅᴀᴛᴇ Bᴏᴛ.
-★ <b>/speedtest</b> - Cʜᴇᴄᴋ sᴇʀᴠᴇʀ sᴘᴇᴇᴅs
-★ <b>/maintenance [ᴇɴᴀʙʟᴇ / ᴅɪsᴀʙʟᴇ]</b>
-★ <b>/logger [ᴇɴᴀʙʟᴇ / ᴅɪsᴀʙʟᴇ]</b> - Bᴏᴛ ʟᴏɢs ᴛʜᴇ sᴇᴀʀᴄʜᴇᴅ ǫᴜᴇʀɪᴇs ɪɴ ʟᴏɢɢᴇʀ ɢʀᴏᴜᴘ.
-★ <b>/get_log [Nᴜᴍʙᴇʀ ᴏғ Lɪɴᴇs]</b> - Gᴇᴛ ʟᴏɢ ᴏғ ʏᴏᴜʀ ʙᴏᴛ ғʀᴏᴍ ʜᴇʀᴏᴋᴜ ᴏʀ ᴠᴘs. Wᴏʀᴋs ғᴏʀ ʙᴏᴛʜ.
-★ <b>/autoend [ᴇɴᴀʙʟᴇ|ᴅɪsᴀʙʟᴇ]</b> - Eɴᴀʙʟᴇ Aᴜᴛᴏ sᴛʀᴇᴀᴍ ᴇɴᴅ ᴀғᴛᴇʀ 𝟹 ᴍɪɴs ɪғ ɴᴏ ᴏɴᴇ ɪs ʟɪsᴛᴇɴɪɴɢ.
+<b>{command("USAGE_COMMAND")}</b> - Dyno usage
+<b>{command("GETVAR_COMMAND")} [Var Name]</b> - Get a config var from vars
+<b>{command("DELVAR_COMMAND")} [Var Name]</b> - Delete a var from vars
+<b>{command("SETVAR_COMMAND")} [Var Name] [Value]</b> - Add or update a var. Separate var and its value with a space
 
+<b><u>Bot command:</u></b>
+
+<b>{command("RESTART_COMMAND")}</b> - Restart the bot (SUDOERS only)
+<b>{command("UPDATE_COMMAND")}</b> - Update the bot
+<b>{command("SPEEDTEST_COMMAND")}</b> - Check server speeds
+<b>{command("MAINTENANCE_COMMAND")} [enable / disable]</b> - Toggle bot maintenance mode
+<b>{command("LOGGER_COMMAND")} [enable / disable]</b> - Toggle bot logging of searched queries to log group
+<b>{command("GETLOG_COMMAND")} [Number of lines]</b> - Get logs from server
+<b>{command("AUTOEND_COMMAND")} [enable / disable]</b> - Automatically end the stream after 30s if no one is listening to songs
 """

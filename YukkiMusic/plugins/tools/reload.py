@@ -8,25 +8,20 @@
 # All rights reserved.
 #
 
-import asyncio
-import logging
 
 from pyrogram import filters
 from pyrogram.enums import ChatMembersFilter
-from pyrogram.types import CallbackQuery, Message
+from pyrogram.types import Message
 
-from config import BANNED_USERS, adminlist, lyrical
+from config import BANNED_USERS, adminlist
 from strings import get_command
 from YukkiMusic import app
-from YukkiMusic.core.call import Yukki
-from YukkiMusic.misc import db
-from YukkiMusic.utils.database import get_authuser_names, get_cmode
-from YukkiMusic.utils.decorators import ActualAdminCB, AdminActual, language
+from YukkiMusic.utils.database import get_authuser_names
+from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.formatters import alpha_to_int
 
 ### Multi-Lang Commands
 RELOAD_COMMAND = get_command("RELOAD_COMMAND")
-REBOOT_COMMAND = get_command("REBOOT_COMMAND")
 
 
 @app.on_message(filters.command(RELOAD_COMMAND) & filters.group & ~BANNED_USERS)
@@ -46,90 +41,5 @@ async def reload_admin_cache(client, message: Message, _):
         await message.reply_text(_["admin_20"])
     except:
         await message.reply_text(
-            "ғᴀɪʟᴇᴅ ᴛᴏ ʀᴇʟᴏᴀᴅ ᴀᴅᴍɪɴᴄᴀᴄʜᴇ  ᴍᴀᴋᴇ sᴜʀᴇ ʙᴏᴛ ɪs ᴀɴ ᴀᴅᴍɪɴ ɪɴ ʏᴏᴜʀ ᴄʜᴀᴛ."
+            "Failed to reload admincache make sure bot is an admin in your chat"
         )
-
-
-@app.on_message(filters.command(REBOOT_COMMAND) & filters.group & ~BANNED_USERS)
-@AdminActual
-async def restartbot(client, message: Message, _):
-    mystic = await message.reply_text(
-        f"ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ .. \nʀᴇʙᴏᴏᴛɪɴɢ {app.mention} ғᴏʀ ʏᴏᴜʀ ᴄʜᴀᴛ.."
-    )
-    await asyncio.sleep(1)
-    try:
-        db[message.chat.id] = []
-        await Yukki.stop_stream(message.chat.id)
-    except:
-        pass
-    chat_id = await get_cmode(message.chat.id)
-    if chat_id:
-        try:
-            await app.get_chat(chat_id)
-        except:
-            pass
-        try:
-            db[chat_id] = []
-            await Yukki.stop_stream(chat_id)
-        except:
-            pass
-    return await mystic.edit_text("sᴜᴄᴇssғᴜʟʟʏ ʀᴇsᴛᴀʀᴛᴇᴅ. \nTʀʏ ᴘʟᴀʏɪɴɢ ɴᴏᴡ..")
-
-
-@app.on_callback_query(filters.regex("close") & ~BANNED_USERS)
-async def close_menu(_, CallbackQuery):
-    try:
-        await CallbackQuery.message.delete()
-        await CallbackQuery.answer()
-    except Exception as e:
-        logging.exception(e)
-        try:
-            await app.delete_messages(
-                chat_id=CallbackQuery.message.chat.id,
-                message_ids=CallbackQuery.message.id,
-            )
-        except Exception as e:
-            logging.exception(e)
-            return
-
-
-@app.on_callback_query(filters.regex("close") & ~BANNED_USERS)
-async def close_menu(_, CallbackQuery):
-    try:
-        await CallbackQuery.message.delete()
-        await CallbackQuery.answer()
-    except:
-        return
-
-
-@app.on_callback_query(filters.regex("stop_downloading") & ~BANNED_USERS)
-@ActualAdminCB
-async def stop_download(client, CallbackQuery: CallbackQuery, _):
-    message_id = CallbackQuery.message.id
-    task = lyrical.get(message_id)
-    if not task:
-        return await CallbackQuery.answer(
-            "ᴅᴏᴡɴʟᴏᴀᴅ ᴀʟʀᴇᴀᴅʏ ᴄᴏᴍᴘʟᴇᴛᴇᴅ..", show_alert=True
-        )
-    if task.done() or task.cancelled():
-        return await CallbackQuery.answer(
-            "Downloading already Completed or Cancelled.",
-            show_alert=True,
-        )
-    if not task.done():
-        try:
-            task.cancel()
-            try:
-                lyrical.pop(message_id)
-            except:
-                pass
-            await CallbackQuery.answer("ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴄᴀɴᴄᴇʟʟᴇᴅ", show_alert=True)
-            return await CallbackQuery.edit_message_text(
-                f"ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴄᴀɴᴄᴇʟʟᴇᴅ ʙʏ {CallbackQuery.from_user.mention}"
-            )
-        except:
-            return await CallbackQuery.answer(
-                "ғᴀɪʟᴇᴅ ᴛᴏ sᴛᴏᴘ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ", show_alert=True
-            )
-
-    await CallbackQuery.answer("ғᴀɪʟᴇᴅ ᴛᴏ ʀᴇᴄᴏɢɴɪsᴇ ᴛʜᴇ ʀᴜɴɴɪɴɢ ᴛᴀsᴋ", show_alert=True)

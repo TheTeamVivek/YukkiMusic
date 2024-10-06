@@ -40,7 +40,7 @@ async def maintenance(client, message: Message):
     state = state.lower()
     if state == "enable":
         if await is_maintenance() is False:
-            await message.reply_text("ᴍᴀɪɴᴛᴇɴᴀɴᴄᴇ ᴍᴏᴅᴇ ɪs ᴀʟʀᴇᴀᴅʏ ᴇɴᴀʙʟᴇᴅ")
+            await message.reply_text(_["maint_6"])
         else:
             await maintenance_on()
             await message.reply_text(_["maint_2"])
@@ -49,6 +49,6 @@ async def maintenance(client, message: Message):
             await maintenance_off()
             await message.reply_text(_["maint_3"])
         else:
-            await message.reply_text("ᴍᴀɪɴᴛᴇɴᴀɴᴄᴇ ᴍᴏᴅᴇ ɪs ᴀʟʀᴇᴀᴅʏ ᴅɪsᴀʙʟᴇᴅ")
+            await message.reply_text(_["maint_5"])
     else:
         await message.reply_text(usage)

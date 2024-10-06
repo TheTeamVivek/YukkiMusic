@@ -12,7 +12,7 @@ from pyrogram import filters
 from pyrogram.types import Message
 
 from config import BANNED_USERS, adminlist
-from strings import get_command
+from strings import command, get_command
 from YukkiMusic import app
 from YukkiMusic.utils.database import (
     delete_authuser,
@@ -151,14 +151,13 @@ async def authusers(client, message: Message, _):
         await message.reply_text(text)
 
 
-__MODULE__ = "Auᴛʜ"
-__HELP__ = """
+__MODULE__ = "Auth"
+__HELP__ = f"""
+<b>Auth Users can use Admin commands without admin rights in your chat.</b>
 
-<b>Aᴜᴛʜ Usᴇʀs ᴄᴀɴ ᴜsᴇ ᴀᴅᴍɪɴ ᴄᴏᴍᴍᴀɴᴅs ᴡɪᴛʜᴏᴜᴛ ᴀᴅᴍɪɴ ʀɪɢʜᴛs ɪɴ ʏᴏᴜʀ ᴄʜᴀᴛ.</b>
+<b>✧ {command("AUTH_COMMAND")}</b> [Username] - Add a user to AUTH LIST of the Group.
 
-<b>✧ /auth</b> [Usᴇʀɴᴀᴍᴇ] - Aᴅᴅ ᴀ ᴜsᴇʀ ᴛᴏ AUTH LIST ᴏғ ᴛʜᴇ ɢʀᴏᴜᴘ.
+<b>✧ {command("UNAUTH_COMMAND")}</b> [Username] - Remove a user from AUTH LIST of the group.
 
-<b>✧ /unauth</b> [Usᴇʀɴᴀᴍᴇ] - Rᴇᴍᴏᴠᴇ ᴀ ᴜsᴇʀ ғʀᴏᴍ AUTH LIST ᴏғ ᴛʜᴇ ɢʀᴏᴜᴘ.
-
-<b>✧ /authusers</b> - Cʜᴇᴄᴋ AUTH LIST ᴏғ ᴛʜᴇ ɢʀᴏᴜᴘ.
+<b>✧ {command("AUTHUSERS_COMMAND")}</b> - Check AUTH LIST of the Group.
 """
