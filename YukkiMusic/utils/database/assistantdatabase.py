@@ -9,6 +9,7 @@
 #
 
 import random
+
 from pytgcalls import PyTgCalls
 
 from YukkiMusic import userbot
@@ -21,7 +22,7 @@ assistantdict = {}
 
 async def get_client(assistant: int):
     clients = userbot.clients
-    if 1 <= assistant <= 5:
+    if 1 <= assistant <= len(userbot.clients):
         return clients[assistant - 1]
     return None
 
@@ -40,13 +41,23 @@ async def save_assistant(chat_id, number):
 async def set_assistant(chat_id):
     from YukkiMusic.core.userbot import assistants
 
-    ran_assistant = random.choice(assistants)
+    dbassistant = await db.find_one({"chat_id": chat_id})
+    current_assistant = dbassistant["assistant"] if dbassistant else None
+
+    available_assistants = [assi for assi in assistants if assi != current_assistant]
+
+    if len(available_assistants) <= 1:
+        ran_assistant = random.choice(assistants)
+    else:
+        ran_assistant = random.choice(available_assistants)
+
     assistantdict[chat_id] = ran_assistant
     await db.update_one(
         {"chat_id": chat_id},
         {"$set": {"assistant": ran_assistant}},
         upsert=True,
     )
+
     userbot = await get_client(ran_assistant)
     return userbot
 

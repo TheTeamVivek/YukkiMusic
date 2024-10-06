@@ -11,6 +11,7 @@ import asyncio
 
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import (
+    ChannelsTooMuch,
     ChatAdminRequired,
     InviteRequestSent,
     UserAlreadyParticipant,
@@ -24,6 +25,7 @@ from config import adminlist
 from strings import get_string
 from YukkiMusic import YouTube, app
 from YukkiMusic.core.call import Yukki
+from YukkiMusic.core.userbot import assistants
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
     get_assistant,
@@ -35,10 +37,74 @@ from YukkiMusic.utils.database import (
     is_commanddelete_on,
     is_maintenance,
     is_served_private_chat,
+    set_assistant,
 )
 from YukkiMusic.utils.inline import botplaylist_markup
 
 links = {}
+
+
+async def join_chat(message, chat_id, _, myu, attempts=1):
+    max_attempts = len(assistants) - 1  # Set the maximum number of attempts
+    userbot = await get_assistant(chat_id)
+
+    if chat_id in links:
+        invitelink = links[chat_id]
+    else:
+        if message.chat.username:
+            invitelink = message.chat.username
+            try:
+                await userbot.resolve_peer(invitelink)
+            except:
+                pass
+        else:
+            try:
+                invitelink = await app.export_chat_invite_link(message.chat.id)
+            except ChatAdminRequired:
+                return await myu.edit(_["call_1"])
+            except Exception as e:
+                return await myu.edit(_["call_3"].format(app.mention, type(e).__name__))
+
+        if invitelink.startswith("https://t.me/+"):
+            invitelink = invitelink.replace("https://t.me/+", "https://t.me/joinchat/")
+        links[chat_id] = invitelink
+
+    try:
+        await asyncio.sleep(1)
+        await userbot.join_chat(invitelink)
+    except InviteRequestSent:
+        try:
+            await app.approve_chat_join_request(chat_id, userbot.id)
+        except Exception as e:
+            return await myu.edit(_["call_3"].format(type(e).__name__))
+        await asyncio.sleep(1)
+        await myu.edit(_["call_6"].format(app.mention))
+    except UserAlreadyParticipant:
+        pass
+    except ChannelsTooMuch:
+        if attempts <= max_attempts:
+            userbot = await set_assistant(chat_id)
+            return await join_chat(message, chat_id, _, myu, attempts + 1)
+        else:
+            return await myu.edit(_["call_9"].format(SUPPORT_CHAT))
+    except FloodWait as e:
+        time = e.value
+        if time < 20:
+            await asyncio.sleep(time)
+            return await join_chat(message, chat_id, _, myu, attempts + 1)
+        else:
+            if attempts <= max_attempts:
+                userbot = await set_assistant(chat_id)
+                return await join_chat(message, chat_id, _, myu, attempts + 1)
+
+            return await myu.edit(_["call_10"].format(time))
+    except Exception as e:
+        return await myu.edit(_["call_3"].format(type(e).__name__))
+
+    try:
+        await myu.delete()
+    except:
+        pass
 
 
 def PlayWrapper(command):
@@ -50,7 +116,7 @@ def PlayWrapper(command):
                 [
                     [
                         InlineKeyboardButton(
-                            text="ʜᴏᴡ ᴛᴏ ғɪx ?",
+                            text="How to Fix ?",
                             callback_data="AnonymousAdmin",
                         ),
                     ]
@@ -60,14 +126,12 @@ def PlayWrapper(command):
 
         if await is_maintenance() is False:
             if message.from_user.id not in SUDOERS:
-                return await message.reply_text(
-                    text=f"{app.mention} ɪs ᴜɴᴅᴇʀ ᴍᴀɪɴᴛᴇɴᴀɴᴄᴇ, ᴠɪsɪᴛ <a href={SUPPORT_CHAT}>sᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ</a> ғᴏʀ ᴋɴᴏᴡɪɴɢ ᴛʜᴇ ʀᴇᴀsᴏɴ.",
-                    disable_web_page_preview=True,
-                )
+                return
+
         if PRIVATE_BOT_MODE == str(True):
             if not await is_served_private_chat(message.chat.id):
                 await message.reply_text(
-                    "**ᴘʀɪᴠᴀᴛᴇ ᴍᴜsɪᴄ ʙᴏᴛ**\n\nᴏɴʟʏ ғᴏʀ ᴀᴜᴛʜᴏʀɪᴢᴇᴅ ᴄʜᴀᴛs ғʀᴏᴍ ᴛʜᴇ ᴏᴡɴᴇʀ. ᴀsᴋ ᴍʏ ᴏᴡɴᴇʀ ᴛᴏ ᴀʟʟᴏᴡ ʏᴏᴜʀ ᴄʜᴀᴛ ғɪʀsᴛ."
+                    "**PRIVATE MUSIC BOT**\n\nOnly For Authorized chats from the owner ask my owner to allow your chat first."
                 )
                 return await app.leave_chat(message.chat.id)
         if await is_commanddelete_on(message.chat.id):
@@ -113,7 +177,7 @@ def PlayWrapper(command):
             is_call_active = (await app.get_chat(chat_id)).is_call_active
             if not is_call_active:
                 return await message.reply_text(
-                    f"**» ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ ғᴏᴜɴᴅ.**\n\nᴩʟᴇᴀsᴇ ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ᴠɪᴅᴇᴏᴄʜᴀᴛ."
+                    "**No active video chat found **\n\nPlease make sure you started the voicechat."
                 )
         except Exception:
             pass
@@ -170,57 +234,8 @@ def PlayWrapper(command):
                             text=_["call_2"].format(userbot.username, userbot.id),
                         )
             except UserNotParticipant:
-                if chat_id in links:
-                    invitelink = links[chat_id]
-                else:
-                    if message.chat.username:
-                        invitelink = message.chat.username
-                        try:
-                            await userbot.resolve_peer(invitelink)
-                        except:
-                            pass
-                    else:
-                        try:
-                            invitelink = await client.export_chat_invite_link(
-                                message.chat.id
-                            )
-                        except ChatAdminRequired:
-                            return await message.reply_text(_["call_1"])
-                        except Exception as e:
-                            return await message.reply_text(
-                                _["call_3"].format(app.mention, type(e).__name__)
-                            )
-
-                if invitelink.startswith("https://t.me/+"):
-                    invitelink = invitelink.replace(
-                        "https://t.me/+", "https://t.me/joinchat/"
-                    )
                 myu = await message.reply_text(_["call_5"])
-                try:
-                    await asyncio.sleep(1)
-                    await userbot.join_chat(invitelink)
-                except InviteRequestSent:
-                    try:
-                        await app.approve_chat_join_request(chat_id, userbot.id)
-                    except Exception as e:
-                        return await myu.edit(_["call_3"].format(type(e).__name__))
-                    await asyncio.sleep(1)
-                    await myu.edit(_["call_6"].format(app.mention))
-                except UserAlreadyParticipant:
-                    pass
-                except Exception as e:
-                    return await myu.edit(_["call_3"].format(type(e).__name__))
-
-                links[chat_id] = invitelink
-                try:
-                    await myu.delete()
-                except Exception:
-                    pass
-
-                try:
-                    await userbot.resolve_peer(chat_id)
-                except:
-                    pass
+                await join_chat(message, chat_id, _, myu)
 
         return await command(
             client,

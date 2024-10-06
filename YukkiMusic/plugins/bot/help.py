@@ -81,7 +81,7 @@ def paginate_modules(page_n, module_dict, prefix, chat=None, close: bool = False
                     ),
                 ),
                 EqInlineKeyboardButton(
-                    "ᴄʟᴏsᴇ" if close else "Bᴀᴄᴋ",
+                    "close" if close else "Back",
                     callback_data="close" if close else "settingsback_helper",
                 ),
                 EqInlineKeyboardButton(
@@ -94,7 +94,7 @@ def paginate_modules(page_n, module_dict, prefix, chat=None, close: bool = False
         pairs.append(
             [
                 EqInlineKeyboardButton(
-                    "ᴄʟᴏsᴇ" if close else "Bᴀᴄᴋ",
+                    "close" if close else "Back",
                     callback_data="close" if close else "settingsback_helper",
                 ),
             ]
@@ -166,15 +166,18 @@ async def help_button(client, query):
     next_match = re.match(r"help_next\((.+?)\)", query.data)
     back_match = re.match(r"help_back\((\d+)\)", query.data)
     create_match = re.match(r"help_create", query.data)
-    language = await get_lang(query.message.chat.id)
-    _ = get_string(language)
+    try:
+        language = await get_lang(query.message.chat.id)
+        _ = get_string(language)
+    except:
+        _ = get_string("en")
     top_text = _["help_1"]
 
     if mod_match:
         module = mod_match.group(1)
         prev_page_num = int(mod_match.group(2))
         text = (
-            f"<b><u>Hᴇʀᴇ Is Tʜᴇ Hᴇʟᴘ Fᴏʀ {HELPABLE[module].__MODULE__}:</u></b>\n"
+            f"<b><u>Here is the help for {HELPABLE[module].__MODULE__}:</u></b>\n"
             + HELPABLE[module].__HELP__
         )
 
@@ -182,9 +185,9 @@ async def help_button(client, query):
             [
                 [
                     InlineKeyboardButton(
-                        text="↪️ ʙᴀᴄᴋ", callback_data=f"help_back({prev_page_num})"
+                        text="↪️ Back", callback_data=f"help_back({prev_page_num})"
                     ),
-                    InlineKeyboardButton(text="🔄 ᴄʟᴏsᴇ", callback_data="close"),
+                    InlineKeyboardButton(text="🔄 close", callback_data="close"),
                 ],
             ]
         )

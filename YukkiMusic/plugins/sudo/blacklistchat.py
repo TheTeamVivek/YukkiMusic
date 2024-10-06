@@ -54,7 +54,7 @@ async def white_funciton(client, message: Message, _):
     whitelisted = await whitelist_chat(chat_id)
     if whitelisted:
         return await message.reply_text(_["black_6"])
-    await message.reply_text("sᴏᴍᴇᴛʜɪɴɢ ᴡʀᴏɴɢ ʜᴀᴘᴘᴇɴᴇᴅ.")
+    await message.reply_text("Something wrong happened")
 
 
 @app.on_message(filters.command(BLACKLISTEDCHAT_COMMAND) & ~BANNED_USERS)
@@ -66,7 +66,7 @@ async def all_chats(client, message: Message, _):
         try:
             title = (await app.get_chat(chat_id)).title
         except Exception:
-            title = "ᴘʀɪᴠᴀᴛᴇ"
+            title = "Private"
         j = 1
         text += f"**{count}. {title}** [`{chat_id}`]\n"
     if j == 0:

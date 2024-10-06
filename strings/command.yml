@@ -38,7 +38,7 @@ ADD_PLAYLIST_COMMAND : ["addplaylist"]
 
 
 # Tools
-QUEUE_COMMAND : ["queue","cqueue"]
+QUEUE_COMMAND : ["queue","cqueue","cplayer", "playing", "cplaying", "player"]
 SONG_COMMAND : ["song", "video"]
 LYRICS_COMMAND : ["lyrics"]
 
@@ -111,6 +111,7 @@ SPEEDTEST_COMMAND : ["speedtest"]
 #Voice chat commands
 ACTIVEVC_COMMAND : ["activevoice","activevc"]
 ACTIVEVIDEO_COMMAND : ["activevideo","activevd"]
+AC_COMMAND: ["ac"]
 
 #Gban Commands
 GBAN_COMMAND : ["gban"]

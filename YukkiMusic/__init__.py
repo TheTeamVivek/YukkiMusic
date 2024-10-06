@@ -40,6 +40,7 @@ from .platforms import *
 YouTube = YouTubeAPI()
 Carbon = CarbonAPI()
 Spotify = SpotifyAPI()
+Saavn = SaavnAPI()
 Apple = AppleAPI()
 Resso = RessoAPI()
 SoundCloud = SoundAPI()

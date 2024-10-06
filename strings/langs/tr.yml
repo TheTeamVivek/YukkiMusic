@@ -21,6 +21,8 @@ call_5 : "Asistan hesabı 5 saniye içinde katılacak, lütfen bekleyin..."
 call_6 : "{0} asistan hesabı başarıyla katıldı.\n\nŞimdi müzik başlatılıyor"
 call_7 : "**Akış değiştirme başarısız oldu**\nLütfen parçayı değiştirmek için /skip kullanın."
 call_8 : "Çalma listesinden sonraki parçayı indiriyor...."
+call_9 : "Asistan çok fazla sohbete katıldı, bu yüzden buraya katılamıyor.\nBu sorunu çözmek ve bildirmek için [Destek Grubu]({0}) ile iletişime geçin."
+call_10: "Asistan, katılma/ayrılma nedeniyle FloodWait'te, lütfen {0} saniye bekleyin"
 
 # PLUGINS - Auth.py
 auth_1 : "Grubunuzun yetkili kullanıcılar listesinde (aul) sadece 20 kullanıcı olabilir."
@@ -75,7 +77,7 @@ start_3 : "{0} sahibi {1} sohbetinize katıldı."
 start_4 : "{0} sudo kullanıcısı {1} sohbetinize katıldı."
 start_5 : "🦸 **SÜPERGRUP GEREKLİ** 🦸\n\nLütfen grubunuzu süpergrup'a dönüştürün ve ardından beni tekrar ekleyin.\n\n**Süpergrup nasıl yapılır?**\n🥱 Grubunuzun sohbet geçmişini bir kez görünür yapın."
 start_6 : "**KARA LİSTEDEKİ SOHBET**\n\nBu sohbet, botu kullanmak için kara listede. Sohbetinizi beyaz listeye almak için bir sudo kullanıcısına başvurun, sudo kullanıcıları [liste]({0})."
-start_7 : "{0} hayatta bebek.\n\n<b>✫ Çalışma Süresi :</b> {1}"
+start_7: "Heya :) **{0}**'den beri hayattayım"
 
 # Yardım
 help_1 : "Daha fazla bilgi için aşağıdaki düğmelere tıklayın. Herhangi bir sorunla karşılaşıyorsanız, destek sohbetinde sorabilirsiniz.\n\nTüm komutlar şu şekilde kullanılabilir: /"
@@ -148,9 +150,10 @@ play_15: "**Canlı Yayın Tespit Edildi**\n\nSistemler, bağlantınızı canlı 
 play_16: "Parça detaylarını almak başarısız oldu, belki bu parça YouTube'da yaş kısıtlaması nedeniyle mevcut değildir. Başka bir parça çalmayı deneyin."
 play_17: "Bu tür Spotify sorgularını çalamıyorum!\n\nYalnızca Spotify parçalarını, albümleri, sanatçıları ve çalma listelerini çalabilirim."
 play_18: "**Aktif Sesli Sohbet Yok**\n\nZorunlu oynatma için, aktif bir sesli sohbet bulunmalıdır."
+play_19: "Bu akış yapılabilir bir URL olduğunu düşünmüyorum. Eğer bunun akış yapılabilir bir URL olduğunu düşünüyorsanız, lütfen /stream <url> kullanın."
 
 
-
+#playlist
 playlist_1: "**Kullanım:** /play [Müzik Adı veya YouTube Linki veya Sesinize Yanıt Verin]\n\nBot'un sunucusundaki çalma listesini çalmak istiyorsanız! Aşağıdaki düğmeye basın."
 playlist_2: "Çalma listeniz alınıyor... Lütfen bekleyin!"
 playlist_3: "Bot'un sunucusunda çalma listeniz yok."
@@ -170,6 +173,21 @@ playlist_16: "Sıralı çalma listesi:"
 playlist_17: "Sıralı Pozisyon -"
 playlist_18: "[Tüm sıralı çalma listesini kontrol et]({0})\n\nSon sıralı pozisyon: **{1}**"
 playlist_19: "Grubun bot'un sunucularında çalma listesi yok"
+playlist_20: "🎵 Şarkı çalma listenize eklendi!"
+playlist_21: "⏳ Şarkı çalma listenize ekleniyor...."
+playlist_22: "🔗 Lütfen çalma listenize eklemek için bir YouTube şarkı/playlist URL'si veya şarkı adı sağlayın."
+playlist_23: "🗑️ Çalma listenizden tüm şarkılar silindi."
+playlist_24: "🪄 Şarkı çalma listenizden silindi."
+playlist_25: "⏱️ Lütfen bekleyin\n🗑️ Çalma listeniz siliniyor...."
+
+
+saavn_1: "😞 Üzgünüm! Şu anda bot Saavn Podcast URL'sini oynatamıyor."
+
+
+#misc
+
+misc_1: "🤖 Bot otomatik olarak kuyruğu temizledi ve sesli sohbetten ayrıldı çünkü kimse sesli sohbette şarkı dinlemiyordu."
+
 
 #Playmode
 playmode_1: "Oynatma modunu seçin [{0}] içinde hangi modu kullanmak istediğinizi."
@@ -371,6 +389,10 @@ vid_4 : "Video çağrıları devre dışı bırakıldı."
 maint_1 : "**KULLANIM:**\n/maintenance [enable|disable]"
 maint_2 : "Bakım modu etkinleştirildi."
 maint_3 : "Bakım modu devre dışı bırakıldı."
+maint_4: "🛠️ Bot bakımda. Sebebi öğrenmek için desteği ziyaret edin."
+maint_5: "Bakım Modu zaten devre dışı."
+maint_6: "Bakım Modu zaten etkin."
+ 
 
 # Log
 log_1 : "**KULLANIM:**\n/logger [enable|disable]"
@@ -388,7 +410,8 @@ broad_3 : "**Yardımcı Yayın:\n\n"
 broad_4 : "Yardımcı {0} {1} sohbette yayın yaptı.\n"
 broad_5 : "**KULLANIM**:\n/broadcast [MESAJ] veya [Bir Mesaja Yanıtla]"
 broad_6 : "Lütfen yayına verecek bazı metinler sağlayın."
-broad_7 : "**{0} KULLANICISINA YAYINLANAN MESAJ.**"
+broad_7 : "**{0} kullanıcıya {1} sabitlenmiş ile bottan başarıyla yayınlandı.**"
+
 
 #Heroku
 heroku_1 : "Lütfen **HEROKU API ANAHTARI** ve **UYGULAMA ADI** bilgilerinizin Heroku'da doğru şekilde yapılandırıldığından emin olun."

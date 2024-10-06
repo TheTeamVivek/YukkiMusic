@@ -26,6 +26,7 @@ async def put_queue(
     vidid,
     user_id,
     stream,
+    thumb: str = None,
     forceplay: Union[bool, str] = None,
 ):
     title = title.title()
@@ -43,6 +44,7 @@ async def put_queue(
         "vidid": vidid,
         "seconds": duration_in_seconds,
         "played": 0,
+        "thumb": thumb,
     }
     if forceplay:
         if check := db.get(chat_id):
@@ -53,7 +55,8 @@ async def put_queue(
     else:
         db[chat_id].append(put)
     autoclean.append(file)
-    vidid = "telegram" if vidid == "soundcloud" else vidid
+    vidid = "telegram" if vidid == "soundcloud" or vidid == "saavn" in vidid else vidid
+
     to_append = {"vidid": vidid, "title": title}
     if chat_id not in chatstats:
         chatstats[chat_id] = []

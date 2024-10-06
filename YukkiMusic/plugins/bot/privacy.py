@@ -4,7 +4,6 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 import config
 from strings import get_command
-
 from YukkiMusic import app
 
 PRIVACY_COMMAND = get_command("PRIVACY_COMMAND")

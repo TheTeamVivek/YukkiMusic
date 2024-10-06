@@ -12,10 +12,9 @@ import platform
 from sys import version as pyver
 
 import psutil
-from ntgcalls import __version__ as ngtgver
 from pyrogram import __version__ as pyrover
 from pyrogram import filters
-from pyrogram.errors import FloodWait, MessageIdInvalid
+from pyrogram.errors import MessageIdInvalid
 from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
 from pytgcalls.__version__ import __version__ as pytgver
 
@@ -111,17 +110,14 @@ async def gstats_global(client, message: Message, _):
         vidid,
     ) = await YouTube.details(videoid, True)
     title = title.title()
-    final = f"ᴛᴏᴘ ᴍᴏsᴛ ᴘʟᴀʏᴇᴅ ᴛʀᴀᴄᴋ's ᴏɴ ʙᴏᴛ {app.mention}\n\n**ᴛɪᴛʟᴇ:** {title}\n\nᴘʟᴀʏᴇᴅ** {co} **ᴛɪᴍᴇs"
+    final = f"Top played Tracks on  {app.mention}\n\n**Title:** {title}\n\nPlayed** {co} **times"
     upl = get_stats_markup(_, True if message.from_user.id in SUDOERS else False)
-    try:
-        await app.send_photo(
-            message.chat.id,
-            photo=thumbnail,
-            caption=final,
-            reply_markup=upl,
-        )
-    except FloodWait as e:
-        asyncio.sleep(e.value)
+    await app.send_photo(
+        message.chat.id,
+        photo=thumbnail,
+        caption=final,
+        reply_markup=upl,
+    )
     await mystic.delete()
 
 
@@ -180,9 +176,9 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
                 details = stats.get(items)
                 title = (details["title"][:35]).title()
                 if items == "telegram":
-                    msg += f"🔗[ᴛᴇʟᴇɢʀᴀᴍ ғɪʟᴇs ᴀɴᴅ ᴀᴜᴅɪᴏs](https://t.me/telegram) ** ᴘʟᴀʏᴇᴅ {count} ᴛɪᴍᴇs**\n\n"
+                    msg += f"🔗[TelegramVideos and media's](https://t.me/telegram) ** Played {count} Times**\n\n"
                 else:
-                    msg += f"🔗 [{title}](https://www.youtube.com/watch?v={items}) ** ᴘʟᴀʏᴇᴅ {count} ᴛɪᴍᴇs**\n\n"
+                    msg += f"🔗 [{title}](https://www.youtube.com/watch?v={items}) ** Played {count} Times**\n\n"
 
             temp = (
                 _["gstats_4"].format(
@@ -220,7 +216,7 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
             except:
                 continue
             limit += 1
-            msg += f"🔗`{extract}` ᴘʟᴀʏᴇᴅ {count} ᴛɪᴍᴇs ᴏɴ ʙᴏᴛ.\n\n"
+            msg += f"🔗`{extract}` Played {count} Times on bot.\n\n"
         temp = (
             _["gstats_5"].format(limit, app.mention)
             if what == "Chats"
@@ -265,22 +261,22 @@ async def overall_stats(client, CallbackQuery, _):
         ass = "Yes"
     else:
         ass = "No"
-    text = f"""**ʙᴏᴛ's sᴛᴀᴛs ᴀɴᴅ ɪɴғᴏʀᴍᴀᴛɪᴏɴ:**
+    text = f"""**Bot's Stats and information:**
 
-**ɪᴍᴘᴏʀᴛᴇᴅ ᴍᴏᴅᴜʟᴇs:** {mod}
-**sᴇʀᴠᴇᴅ ᴄʜᴀᴛs:** {served_chats} 
-**sᴇʀᴠᴇᴅ ᴜsᴇʀs:** {served_users} 
-**ʙʟᴏᴄᴋᴇᴅ ᴜsᴇʀs:** {blocked} 
-**sᴜᴅᴏ ᴜsᴇʀs:** {sudoers} 
+**Imported Modules:** {mod}
+**Served chats:** {served_chats} 
+**Served Users:** {served_users} 
+**Blocked Users:** {blocked} 
+**Sudo Users:** {sudoers} 
     
-**ᴛᴏᴛᴀʟ ǫᴜᴇʀɪᴇs:** {total_queries} 
-**ᴛᴏᴛᴀʟ ᴀssɪsᴛᴀɴᴛs:** {assistant}
-**ᴀᴜᴛᴏ ʟᴇᴀᴠɪɴɢ ᴀssɪsᴛᴀɴᴛ:** {ass}
+**Total Queries:** {total_queries} 
+**Total Assistant:** {assistant}
+**Auto Leaving Assistsant:** {ass}
 
-**ᴘʟᴀʏ ᴅᴜʀᴀᴛɪᴏɴ ʟɪᴍɪᴛ:** {play_duration} ᴍɪɴs
-**sᴏɴɢ ᴅᴏᴡɴʟᴏᴀᴅ ʟɪᴍɪᴛ:** {song} ᴍɪɴs
-**ʙᴏᴛ's sᴇʀᴠᴇʀ ᴘʟᴀʏʟɪsᴛ ʟɪᴍɪᴛ:** {playlist_limit}
-**ᴘʟᴀʏʟɪsᴛ ᴘʟᴀʏ ʟɪᴍɪᴛ:** {fetch_playlist}"""
+**Play Duration Limit:** {play_duration} ᴍɪɴs
+**Song Download Limit:** {song} ᴍɪɴs
+**Bot's Server Playlist Limit:** {playlist_limit}
+**Playlist Play Limit:** {fetch_playlist}"""
     med = InputMediaPhoto(media=config.STATS_IMG_URL, caption=text)
     try:
         await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
@@ -339,32 +335,31 @@ async def overall_stats(client, CallbackQuery, _):
     total_queries = await get_queries()
     blocked = len(BANNED_USERS)
     sudoers = len(await get_sudoers())
-    text = f""" **ʙᴏᴛ sᴛᴀᴛ's ᴀɴᴅ ɪɴғᴏʀᴍᴀᴛɪᴏɴ:**
+    text = f""" **Bot Stats and information:**
 
-**ɪᴍᴘᴏʀᴛᴇᴅ ᴍᴏᴅᴜʟᴇs:** {mod}
-**ᴘʟᴀᴛғᴏʀᴍ:** {sc}
-**ʀᴀᴍ:** {ram}
-**ᴘʜʏsɪᴄᴀʟ ᴄᴏʀᴇs:** {p_core}
-**ᴛᴏᴛᴀʟ ᴄᴏʀᴇs:** {t_core}
-**ᴄᴘᴜ ғʀᴇǫᴜᴇɴᴄʏ:** {cpu_freq}
+**Imported modules:** {mod}
+**Platform:** {sc}
+**Ram:** {ram}
+**Physical Cores:** {p_core}
+**Total Cores:** {t_core}
+**Cpu frequency:** {cpu_freq}
 
-**ᴘʏᴛʜᴏɴ ᴠᴇʀsɪᴏɴ :** {pyver.split()[0]}
-**ᴘʏʀᴏɢʀᴀᴍ ᴠᴇʀsɪᴏɴ :** {pyrover}
-**Pʏ-TɢCᴀʟʟs ᴠᴇʀsɪᴏɴ :** {pytgver}
-**N-Tɢᴄᴀʟʟs ᴠᴇʀsɪᴏɴ :** {ngtgver}
-**ᴀᴠᴀɪʟᴀʙʟᴇ sᴛᴏʀᴀɢᴇ :** {total[:4]} ɢiʙ
-**sᴛᴏʀᴀɢᴇ ᴜsᴇᴅ:** {used[:4]} ɢiʙ
-**sᴛᴏʀᴀɢᴇ ʟᴇғᴛ:** {free[:4]} ɢiʙ
+**Python Version:** {pyver.split()[0]}
+**Pyrogram Version:** {pyrover}
+**Py-tgcalls Version:** {pytgver}
+**Total Storage:** {total[:4]} ɢiʙ
+**Storage Used:** {used[:4]} ɢiʙ
+**Storage Left:** {free[:4]} ɢiʙ
 
-**sᴇʀᴠᴇᴅ ᴄʜᴀᴛs:** {served_chats} 
-**sᴇʀᴠᴇᴅ ᴜsᴇʀs:** {served_users} 
-**ʙʟᴏᴄᴋᴇᴅ ᴜsᴇʀs:** {blocked} 
-**sᴜᴅᴏ ᴜsᴇʀs:** {sudoers} 
+**Served chats:** {served_chats} 
+**Served users:** {served_users} 
+**Blocked users:** {blocked} 
+**Sudo users:** {sudoers} 
 
-**ᴛᴏᴛᴀʟ ᴅʙ sᴛᴏʀᴀɢᴇ:** {storage} ᴍʙ
-**ᴛᴏᴛᴀʟ ᴅʙ ᴄᴏʟʟᴇᴄᴛɪᴏɴs:** {collections}
-**ᴛᴏᴛᴀʟ ᴅʙ ᴋᴇʏs:** {objects}
-**ᴛᴏᴛᴀʟ ʙᴏᴛ ǫᴜᴇʀɪᴇs:** `{total_queries} `
+**Total DB Storage:** {storage} ᴍʙ
+**Total DB Collection:** {collections}
+**Total DB Keys:** {objects}
+**Total Bot Queries:** `{total_queries} `
     """
     med = InputMediaPhoto(media=config.STATS_IMG_URL, caption=text)
     try:

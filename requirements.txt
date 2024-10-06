@@ -1,16 +1,12 @@
-aiofiles
 aiohttp
 asyncio
 beautifulsoup4
 dnspython
 ffmpeg-python
 gitpython
-hachoir
 heroku3
-httpx[http2]
 lyricsgenius
 motor
-pillow==9.5.0
 psutil
 pytube
 pykeyboard
@@ -29,3 +25,4 @@ youtube-search
 youtube-search-python
 yt-dlp
 git+https://github.com/KurimuzonAkuma/pyrogram@dev
+git+https://github.com/Vivekkumar-IN/yt-dlp-youtube-oauth2
