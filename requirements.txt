@@ -14,7 +14,7 @@ pillow==9.5.0
 psutil
 pytube
 pykeyboard
-py-tgcalls
+py-tgcalls==2.0.4
 python-dotenv
 pyyaml
 requests
@@ -27,5 +27,5 @@ flask
 gunicorn
 youtube-search
 youtube-search-python
+yt-dlp
 git+https://github.com/KurimuzonAkuma/pyrogram@dev
-git+https://github.com/yt-dlp/yt-dlp
