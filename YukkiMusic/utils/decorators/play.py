@@ -13,6 +13,7 @@ from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import (
     ChannelsTooMuch,
     ChatAdminRequired,
+    FloodWait,
     InviteRequestSent,
     UserAlreadyParticipant,
     UserNotParticipant,
