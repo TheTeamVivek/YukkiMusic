@@ -16,7 +16,11 @@ import sys
 
 from pyrogram import Client
 from pyrogram.enums import ChatMemberStatus
-from pyrogram.errors import FloodWait
+from pyrogram.errors import (
+    ChatSendPhotosForbidden,
+    ChatWriteForbidden,
+    FloodWait,
+)
 from pyrogram.types import (
     BotCommand,
     BotCommandScopeAllChatAdministrators,
@@ -61,6 +65,11 @@ class YukkiBot(Client):
             await asyncio.sleep(time)
             if time < 25:
                 return await self.send_message(self, *args, **kwargs)
+        except ChatWriteForbidden:
+            chat_id = kwargs.get("chat_id") or args[0]
+            if chat_id:
+                await self.leave_chat(chat_id)
+                
 
     async def send_photo(self, *args, **kwargs):
         try:
@@ -70,6 +79,11 @@ class YukkiBot(Client):
             await asyncio.sleep(time)
             if time < 25:
                 return await self.send_photo(self, *args, **kwargs)
+        except ChatSendPhotosForbidden:
+            chat_id = kwargs.get("chat_id") or args[0]
+            if chat_id:
+                await self.send_message(chat_id, "I don't have the right to send photos in this chat, leaving now..")
+                await self.leave_chat(chat_id)
 
     async def start(self):
         await super().start()
