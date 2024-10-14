@@ -74,11 +74,14 @@ async def on_bot_kicked(_, message: Message):
                 f"@{message.chat.username}" if message.chat.username else "ᴘʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ"
             )
             chat_id = message.chat.id
-            left = f""" Bot was Removed in {title} #Left_group
-            **Chat Name**: {title}
-            **Chat Id**: {chat_id}
-            **Chat Username**:** {username}
-            **Removed By**: {remove_by}"""
+            left = (
+                f"Bot was Removed in {title} #Left_group\n"
+                f"**Chat Name**: {title}\n"
+                f"**Chat Id**: {chat_id}\n"
+                f"**Chat Username**: {username}\n"
+                f"**Removed By**: {remove_by}"
+            )
+
             await app.send_message(
                 LOG_GROUP_ID,
                 text=left,
