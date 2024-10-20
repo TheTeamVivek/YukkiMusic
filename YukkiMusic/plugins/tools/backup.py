@@ -159,12 +159,6 @@ async def import_database(client, message):
         )
 
     _mongo_async_ = AsyncIOMotorClient(MONGO_DB_URI)
-    databases = await _mongo_async_.list_database_names()
-
-    if DB_NAME in databases:
-        mystic = await edit_or_reply(mystic, "Existing data found deleting...")
-        await drop_db(_mongo_async_, DB_NAME)
-
     db = _mongo_async_[DB_NAME]
 
     try:
@@ -174,11 +168,15 @@ async def import_database(client, message):
                     mystic, f"Importing...\nCollection {collection_name}."
                 )
                 collection = db[collection_name]
-                await collection.insert_many(documents)
+
+                for document in documents:
+                    await collection.replace_one(
+                        {"_id": document["_id"]}, document, upsert=True
+                    )
+
         await edit_or_reply(mystic, "Data successfully imported from replied file")
     except Exception as e:
         await edit_or_reply(mystic, f"Error during import {e}\nRolling back changes")
-        await drop_db(_mongo_async_, DB_NAME)
 
     if os.path.exists(file_path):
         os.remove(file_path)
