@@ -25,6 +25,7 @@ from pyrogram.types import (
 from config import BANNED_USERS, SONG_DOWNLOAD_DURATION, SONG_DOWNLOAD_DURATION_LIMIT
 from strings import get_command
 from YukkiMusic import YouTube, app
+from YukkiMusic.platforms.Youtube import get_ytdl_options
 from YukkiMusic.utils.decorators.language import language, languageCB
 from YukkiMusic.utils.formatters import convert_bytes
 from YukkiMusic.utils.inline.song import song_markup
@@ -313,7 +314,7 @@ async def song_download_cb(client, CallbackQuery, _):
 
     yturl = f"https://www.youtube.com/watch?v={vidid}"
 
-    with yt_dlp.YoutubeDL({"quiet": True}) as ytdl:
+    with yt_dlp.YoutubeDL(get_ytdl_options({"quiet": True})) as ytdl:
 
         x = ytdl.extract_info(yturl, download=False)
 
