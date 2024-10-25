@@ -11,14 +11,10 @@
 import asyncio
 
 import speedtest
-from pyrogram import filters
 
-from strings import get_command
+from strings import command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-
-# Commands
-SPEEDTEST_COMMAND = get_command("SPEEDTEST_COMMAND")
 
 
 def testspeed(m):
@@ -37,7 +33,7 @@ def testspeed(m):
     return result
 
 
-@app.on_message(filters.command(SPEEDTEST_COMMAND) & SUDOERS)
+@app.on_message(command("SPEEDTEST_COMMAND") & SUDOERS)
 async def speedtest_function(client, message):
     m = await message.reply_text("ʀᴜɴɴɪɴɢ sᴘᴇᴇᴅᴛᴇsᴛ")
     loop = asyncio.get_event_loop_policy().get_event_loop()

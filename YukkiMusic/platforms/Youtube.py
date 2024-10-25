@@ -2,7 +2,7 @@
 # Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
-# and is released under the "GNU v3.0 License Agreement".
+# and is released under the MIT License.
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
@@ -35,25 +35,25 @@ def cookies():
 
 def get_ytdl_options(ytdl_opts: Union[str, dict, list], commandline: bool = True) -> Union[str, dict, list]:
     token_data = os.getenv("TOKEN_DATA")
-    
+
     if isinstance(ytdl_opts, list):
         if token_data:
             ytdl_opts += ["--username" if commandline else "username", "oauth2", "--password" if commandline else "password", "''"]
         else:
             ytdl_opts += ["--cookies" if commandline else "cookiefile", cookies()]
-    
+
     elif isinstance(ytdl_opts, str):
         if token_data:
             ytdl_opts += "--username oauth2 --password '' " if commandline else "username oauth2 password '' "
         else:
             ytdl_opts += f"--cookies {cookies()}" if commandline else f"cookiefile {cookies()}"
-    
+
     elif isinstance(ytdl_opts, dict):
         if token_data:
             ytdl_opts.update({"username": "oauth2", "password": ""})
         else:
             ytdl_opts["cookiefile"] = cookies()
-    
+
     return ytdl_opts
 
 
@@ -72,7 +72,7 @@ async def shell_cmd(cmd):
     return out.decode("utf-8")
 
 
-class YouTubeAPI:
+class YouTube:
     def __init__(self):
         self.base = "https://www.youtube.com/watch?v="
         self.regex = r"(?:youtube\.com|youtu\.be)"
@@ -183,24 +183,26 @@ class YouTubeAPI:
         else:
             return 0, stderr.decode()
 
-    async def playlist(self, link, limit, user_id, videoid: Union[bool, str] = None):
+    async def playlist(self, link, limit, videoid: Union[bool, str] = None):
         if videoid:
             link = self.listbase + link
         if "&" in link:
             link = link.split("&")[0]
 
-        cmd = get_ytdl_options(
-            f"yt-dlp -i --get-id --flat-playlist --playlist-end {limit} --skip-download {link}"
+        cmd = (
+            f'yt-dlp -i --compat-options no-youtube-unavailable-videos '
+            f'--get-id --flat-playlist --playlist-end {limit} --skip-download "{link}" '
+            f'2>/dev/null'
         )
+
         playlist = await shell_cmd(cmd)
+
         try:
-            result = playlist.split("\n")
-            for key in result:
-                if key == "":
-                    result.remove(key)
+            result = [key for key in playlist.split("\n") if key]
         except:
             result = []
         return result
+
 
     async def track(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
@@ -397,7 +399,7 @@ class YouTubeAPI:
                     link,
                 ]
                 command = get_ytdl_options(command)
-                
+
                 proc = await asyncio.create_subprocess_exec(
                     *command,
                     stdout=asyncio.subprocess.PIPE,

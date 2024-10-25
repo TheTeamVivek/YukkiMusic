@@ -12,17 +12,14 @@ from pyrogram import filters
 from pyrogram.types import Message
 
 from config import BANNED_USERS
-from strings import get_command
+from strings import command
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import is_music_playing, music_on
 from YukkiMusic.utils.decorators import AdminRightsCheck
 
-# Commands
-RESUME_COMMAND = get_command("RESUME_COMMAND")
 
-
-@app.on_message(filters.command(RESUME_COMMAND) & filters.group & ~BANNED_USERS)
+@app.on_message(command("RESUME_COMMAND") & filters.group & ~BANNED_USERS)
 @AdminRightsCheck
 async def resume_com(cli, message: Message, _, chat_id):
     if not len(message.command) == 1:

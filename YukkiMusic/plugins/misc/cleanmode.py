@@ -18,7 +18,7 @@ from pyrogram.raw import types
 
 import config
 from config import adminlist, chatstats, clean, userstats
-from strings import command, get_command
+from strings import command
 from YukkiMusic import app
 from YukkiMusic.utils.database import (
     get_active_chats,
@@ -36,7 +36,6 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.formatters import alpha_to_int
 
-BROADCAST_COMMAND = get_command("BROADCAST_COMMAND")
 AUTO_DELETE = config.CLEANMODE_DELETE_MINS
 AUTO_SLEEP = 5
 IS_BROADCASTING = False
@@ -72,7 +71,7 @@ async def clean_mode(client, update, users, chats):
     await set_queries(1)
 
 
-@app.on_message(filters.command(BROADCAST_COMMAND) & filters.user(config.OWNER_ID))
+@app.on_message(command("BROADCAST_COMMAND") & filters.user(config.OWNER_ID))
 @language
 async def braodcast_message(client, message, _):
     global IS_BROADCASTING
@@ -290,20 +289,3 @@ async def auto_clean():
 
 
 asyncio.create_task(auto_clean())
-__MODULE__ = "G cast"
-__HELP__ = f"""
-<b>{command("BROADCAST_COMMAND")} [Message or Reply to any message]</b> » Broadcast a message to served chats of bot
-<u>Broadcasting Modes:</u>
-
-<b><code>-pin</code></b> » Pins your broadcasted message in served chats
-
-<b><code>-pinloud</code></b> » Pins your broadcasted message in served chats and send notification to the memebers
-
-<b><code>-user</code></b> » Broadcast the message to who has Started your bot [ You can also pin message just use `pin` or `-pinloud`
-
-<b><code>-assistant</code></b> » Broadcast Your message through all Assistant Of bot
-
-<b><code>-nobot</code></b> » Forces that **bot** don't broadcast the message [ Useful when you Don't want to broadcast the message to groups]
-
-> <b>Example:</b> <code>/broadcast -user -assistant -pin Testing broadcast</code>
-"""

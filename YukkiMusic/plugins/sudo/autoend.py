@@ -7,18 +7,14 @@
 #
 # All rights reserved.
 #
-from pyrogram import filters
 
-from strings import get_command
+from strings import command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import autoend_off, autoend_on
 
-# Commands
-AUTOEND_COMMAND = get_command("AUTOEND_COMMAND")
 
-
-@app.on_message(filters.command(AUTOEND_COMMAND) & SUDOERS)
+@app.on_message(command("AUTOEND_COMMAND") & SUDOERS)
 async def auto_end_stream(client, message):
     usage = "**ᴜsᴀɢᴇ:**\n\n/autoend [enable|disable]"
     if len(message.command) != 2:

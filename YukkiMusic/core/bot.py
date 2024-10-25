@@ -2,7 +2,7 @@
 # Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
-# and is released under the "GNU v3.0 License Agreement".
+# and is released under the MIT License.
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
@@ -69,7 +69,6 @@ class YukkiBot(Client):
             chat_id = kwargs.get("chat_id") or args[0]
             if chat_id:
                 await self.leave_chat(chat_id)
-                
 
     async def send_photo(self, *args, **kwargs):
         try:
@@ -82,7 +81,10 @@ class YukkiBot(Client):
         except ChatSendPhotosForbidden:
             chat_id = kwargs.get("chat_id") or args[0]
             if chat_id:
-                await self.send_message(chat_id, "I don't have the right to send photos in this chat, leaving now..")
+                await self.send_message(
+                    chat_id,
+                    "I don't have the right to send photos in this chat, leaving now..",
+                )
                 await self.leave_chat(chat_id)
 
     async def start(self):

@@ -17,8 +17,8 @@ from pyrogram.errors import ChatAdminRequired, UserNotParticipant
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from config import BANNED_USERS, SERVER_PLAYLIST_LIMIT
-from strings import get_command
-from YukkiMusic import Carbon, YouTube, app
+from strings import command
+from YukkiMusic import Platform, app
 from YukkiMusic.utils.database import (
     delete_playlist,
     get_assistant,
@@ -27,18 +27,13 @@ from YukkiMusic.utils.database import (
     save_playlist,
 )
 from YukkiMusic.utils.decorators import language, languageCB
-from YukkiMusic.utils.decorators.play import botplaylist_markup, join_chat
+from YukkiMusic.utils.decorators.play import botplaylist_markup
 from YukkiMusic.utils.inline.playlist import get_playlist_markup, warning_markup
 from YukkiMusic.utils.pastebin import Yukkibin
 from YukkiMusic.utils.stream.stream import stream
 
-ADD_PLAYLIST_COMMAND = get_command("ADD_PLAYLIST_COMMAND")
-PLAY_PLAYLIST_COMMAND = get_command("PLAY_PLAYLIST_COMMAND")
-PLAYLIST_COMMAND = get_command("PLAYLIST_COMMAND")
-DELETE_PLAYLIST_COMMAND = get_command("DELETE_PLAYLIST_COMMAND")
 
-
-@app.on_message(filters.command(PLAYLIST_COMMAND) & ~BANNED_USERS)
+@app.on_message(command("PLAYLIST_COMMAND") & ~BANNED_USERS)
 @language
 async def check_playlist(client, message: Message, _):
     _playlist = await get_playlist_names(message.from_user.id)
@@ -62,7 +57,7 @@ async def check_playlist(client, message: Message, _):
         car = os.linesep.join(msg.split(os.linesep)[:17])
     else:
         car = msg
-    carbon = await Carbon.generate(car, randint(100, 10000000000))
+    carbon = await Platform.carbon.generate(car, randint(100, 10000000000))
     await get.delete()
     await message.reply_photo(carbon, caption=_["playlist_15"].format(link))
 
@@ -91,9 +86,7 @@ async def get_keyboard(_, user_id):
     return keyboard, count
 
 
-@app.on_message(
-    filters.command(DELETE_PLAYLIST_COMMAND) & filters.group & ~BANNED_USERS
-)
+@app.on_message(command("DELETE_PLAYLIST_COMMAND") & filters.group & ~BANNED_USERS)
 @language
 async def del_group_message(client, message: Message, _):
     upl = InlineKeyboardMarkup(
@@ -133,9 +126,7 @@ async def get_keyboard(_, user_id):
     return keyboard, count
 
 
-@app.on_message(
-    filters.command(DELETE_PLAYLIST_COMMAND) & filters.private & ~BANNED_USERS
-)
+@app.on_message(command("DELETE_PLAYLIST_COMMAND") & filters.private & ~BANNED_USERS)
 @language
 async def del_plist_msg(client, message: Message, _):
     _playlist = await get_playlist_names(message.from_user.id)
@@ -150,21 +141,6 @@ async def del_plist_msg(client, message: Message, _):
 @app.on_callback_query(filters.regex("play_playlist") & ~BANNED_USERS)
 @languageCB
 async def play_playlist(client, CallbackQuery, _):
-    message = CallbackQuery.message
-    userbot = await get_assistant(message.chat.id)
-    try:
-        try:
-            get = await app.get_chat_member(CallbackQuery.message.chat.id, userbot.id)
-        except ChatAdminRequired:
-            return await msg.edit(
-                _["call_1"],
-            )
-        if get.status == ChatMemberStatus.BANNED:
-            return await msg.edit(_["call_2"])
-    except UserNotParticipant:
-        msg = await message.reply_text("🥀")
-        await join_chat(message, message.chat.id, _, msg)
-
     callback_data = CallbackQuery.data.strip()
     mode = callback_data.split(None, 1)[1]
     user_id = CallbackQuery.from_user.id
@@ -208,30 +184,9 @@ async def play_playlist(client, CallbackQuery, _):
     return await mystic.delete()
 
 
-@app.on_message(filters.command(PLAY_PLAYLIST_COMMAND) & ~BANNED_USERS & filters.group)
+@app.on_message(command("PLAY_PLAYLIST_COMMAND") & ~BANNED_USERS & filters.group)
 @languageCB
 async def play_playlist_command(client, message, _):
-    try:
-        try:
-            userbot = await get_assistant(message.chat.id)
-            get = await app.get_chat_member(message.chat.id, userbot.id)
-        except ChatAdminRequired:
-            return await msg.edit_text(_["call_1"])
-        if (
-            get.status == ChatMemberStatus.BANNED
-            or get.status == ChatMemberStatus.RESTRICTED
-        ):
-            try:
-                await app.unban_chat_member(chat_id, userbot.id)
-            except:
-                return await msg.edit_text(
-                    text=_["call_2"].format(userbot.username, userbot.id),
-                )
-            await join_chat(message, message.chat.id, _, msg)
-    except UserNotParticipant:
-        msg = await message.reply_text("🥀")
-        await join_chat(message, message.chat.id, _, msg)
-
     mode = message.command[0][0]
     user_id = message.from_user.id
     _playlist = await get_playlist_names(user_id)
@@ -331,7 +286,7 @@ async def add_playlist(client, message: Message, _):
 
             m = await message.reply(_["playlist_21"])
             title, duration_min, duration_sec, thumbnail, videoid = (
-                await YouTube.details(videoid, True)
+                await Platform.youtube.details(videoid, True)
             )
             title = (title[:50]).title()
             plist = {
@@ -371,27 +326,6 @@ async def del_plist(client, CallbackQuery, _):
     return await CallbackQuery.edit_message_text(text=_["playlist_23"])
 
 
-@app.on_callback_query(filters.regex("remove_playlist") & ~BANNED_USERS)
-@languageCB
-async def del_plist(client, CallbackQuery, _):
-    callback_data = CallbackQuery.data.strip()
-    videoid = callback_data.split(None, 1)[1]
-    CallbackQuery.from_user.id
-    deleted = await delete_playlist(CallbackQuery.from_user.id, videoid)
-    if deleted:
-        try:
-            await CallbackQuery.answer(_["playlist_11"], show_alert=True)
-        except:
-            pass
-    else:
-        try:
-            return await CallbackQuery.answer(_["playlist_12"], show_alert=True)
-        except:
-            return
-
-    return await CallbackQuery.edit_message_text(text=_["playlist"])
-
-
 @app.on_callback_query(filters.regex("add_playlist") & ~BANNED_USERS)
 @languageCB
 async def add_playlist(client, CallbackQuery, _):
@@ -420,7 +354,7 @@ async def add_playlist(client, CallbackQuery, _):
         duration_sec,
         thumbnail,
         vidid,
-    ) = await YouTube.details(videoid, True)
+    ) = await Platform.youtube.details(videoid, True)
     title = (title[:50]).title()
     plist = {
         "videoid": vidid,
@@ -526,17 +460,3 @@ async def del_back_playlist(client, CallbackQuery, _):
     return await CallbackQuery.edit_message_text(
         _["playlist_7"].format(count), reply_markup=keyboard
     )
-
-
-__MODULE__ = "P List"
-__HELP__ = """
-<b>/playlist</b> - Check Your whole playlist on bot Server
-
-<b>/delplaylist</b> - Delete any song from your saved playlist 
-
-<b>/playplaylist</b> - Start playing your saved playlist in **audio**
-
-<b>/vplayplaylist</b> - Start playing your playlist in **video**
- 
-"""
-# b>/addplaylist</b> - [yt-link] or [yt playlist link] or [song name ] Too Add in your playlist

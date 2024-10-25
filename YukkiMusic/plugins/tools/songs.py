@@ -23,19 +23,15 @@ from pyrogram.types import (
 )
 
 from config import BANNED_USERS, SONG_DOWNLOAD_DURATION, SONG_DOWNLOAD_DURATION_LIMIT
-from strings import get_command
-from YukkiMusic import YouTube, app
+from strings import command
+from YukkiMusic import Platform, app
 from YukkiMusic.platforms.Youtube import get_ytdl_options
 from YukkiMusic.utils.decorators.language import language, languageCB
 from YukkiMusic.utils.formatters import convert_bytes
 from YukkiMusic.utils.inline.song import song_markup
 
-# Command
 
-SONG_COMMAND = get_command("SONG_COMMAND")
-
-
-@app.on_message(filters.command(SONG_COMMAND) & filters.group & ~BANNED_USERS)
+@app.on_message(command("SONG_COMMAND") & filters.group & ~BANNED_USERS)
 @language
 async def song_commad_group(client, message: Message, _):
 
@@ -56,17 +52,17 @@ async def song_commad_group(client, message: Message, _):
 # Song Module
 
 
-@app.on_message(filters.command(SONG_COMMAND) & filters.private & ~BANNED_USERS)
+@app.on_message(command("SONG_COMMAND") & filters.private & ~BANNED_USERS)
 @language
 async def song_commad_private(client, message: Message, _):
 
     await message.delete()
 
-    url = await YouTube.url(message)
+    url = await Platform.youtube.url(message)
 
     if url:
 
-        if not await YouTube.exists(url):
+        if not await Platform.youtube.exists(url):
 
             return await message.reply_text(_["song_5"])
 
@@ -78,7 +74,7 @@ async def song_commad_private(client, message: Message, _):
             duration_sec,
             thumbnail,
             vidid,
-        ) = await YouTube.details(url)
+        ) = await Platform.youtube.details(url)
 
         if str(duration_min) == "None":
 
@@ -118,7 +114,7 @@ async def song_commad_private(client, message: Message, _):
             duration_sec,
             thumbnail,
             vidid,
-        ) = await YouTube.details(query)
+        ) = await Platform.youtube.details(query)
 
     except:
 
@@ -184,7 +180,7 @@ async def song_helper_cb(client, CallbackQuery, _):
 
         try:
 
-            formats_available, link = await YouTube.formats(vidid, True)
+            formats_available, link = await Platform.youtube.formats(vidid, True)
 
         except:
 
@@ -239,7 +235,7 @@ async def song_helper_cb(client, CallbackQuery, _):
 
         try:
 
-            formats_available, link = await YouTube.formats(vidid, True)
+            formats_available, link = await Platform.youtube.formats(vidid, True)
 
         except Exception as e:
 
@@ -336,7 +332,7 @@ async def song_download_cb(client, CallbackQuery, _):
 
         try:
 
-            file_path = await YouTube.download(
+            file_path = await Platform.youtube.download(
                 yturl,
                 mystic,
                 songvideo=True,
@@ -381,7 +377,7 @@ async def song_download_cb(client, CallbackQuery, _):
 
         try:
 
-            filename = await YouTube.download(
+            filename = await Platform.youtube.download(
                 yturl,
                 mystic,
                 songaudio=True,

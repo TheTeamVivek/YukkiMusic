@@ -10,6 +10,7 @@ import re
 import sys
 from os import getenv
 
+
 from dotenv import load_dotenv
 from pyrogram import filters
 
@@ -76,14 +77,6 @@ LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", ""))
 OWNER_ID = list(
     map(int, getenv("OWNER_ID", "6815918609").split())
 )  # Input type must be interger
-
-
-# make your bots privacy from telegra.ph and put your url here
-
-PRIVACY_LINK = getenv(
-    "PRIVACY_LINK", "https://telegra.ph/Privacy-Policy-for-YukkiMusic-08-30"
-)
-
 
 # Get it from http://dashboard.heroku.com/account
 HEROKU_API_KEY = getenv("HEROKU_API_KEY")

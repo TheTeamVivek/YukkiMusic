@@ -14,8 +14,8 @@ from pyrogram.types import InlineKeyboardMarkup, Message
 
 import config
 from config import BANNED_USERS
-from strings import get_command
-from YukkiMusic import YouTube, app
+from strings import command
+from YukkiMusic import Platform, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import get_loop
@@ -24,11 +24,8 @@ from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
 from YukkiMusic.utils.stream.autoclear import auto_clean
 from YukkiMusic.utils.thumbnails import gen_thumb
 
-# Commands
-SKIP_COMMAND = get_command("SKIP_COMMAND")
 
-
-@app.on_message(filters.command(SKIP_COMMAND) & filters.group & ~BANNED_USERS)
+@app.on_message(command("SKIP_COMMAND") & filters.group & ~BANNED_USERS)
 @AdminRightsCheck
 async def skip(cli, message: Message, _, chat_id):
     if not len(message.command) < 2:
@@ -116,7 +113,7 @@ async def skip(cli, message: Message, _, chat_id):
     duration_min = check[0]["dur"]
     status = True if str(streamtype) == "video" else None
     if "live_" in queued:
-        n, link = await YouTube.video(videoid, True)
+        n, link = await Platform.youtube.video(videoid, True)
         if n == 0:
             return await message.reply_text(_["admin_11"].format(title))
         try:
@@ -138,7 +135,7 @@ async def skip(cli, message: Message, _, chat_id):
     elif "vid_" in queued:
         mystic = await message.reply_text(_["call_8"], disable_web_page_preview=True)
         try:
-            file_path, direct = await YouTube.download(
+            file_path, direct = await Platform.youtube.download(
                 videoid,
                 mystic,
                 videoid=True,
@@ -215,11 +212,11 @@ async def skip(cli, message: Message, _, chat_id):
             db[chat_id][0]["markup"] = "tg"
         elif "saavn" in videoid:
             button = telegram_markup(_, chat_id)
+            url = check[0]["url"]
+            details = await Platform.saavn.info(url)
             run = await message.reply_photo(
-                photo=check[0]["thumb"],
-                caption=_["stream_1"].format(
-                    title, config.SUPPORT_GROUP, check[0]["dur"], user
-                ),
+                photo=details["thumb"],
+                caption=_["stream_1"].format(title, url, check[0]["dur"], user),
                 reply_markup=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run

@@ -8,23 +8,17 @@
 # All rights reserved.
 #
 
-from pyrogram import filters
 from pyrogram.types import Message
 
 from config import BANNED_USERS
-from strings import command, get_command
+from strings import command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import add_gban_user, remove_gban_user
 from YukkiMusic.utils.decorators.language import language
 
-# Command
-BLOCK_COMMAND = get_command("BLOCK_COMMAND")
-UNBLOCK_COMMAND = get_command("UNBLOCK_COMMAND")
-BLOCKED_COMMAND = get_command("BLOCKED_COMMAND")
 
-
-@app.on_message(filters.command(BLOCK_COMMAND) & SUDOERS)
+@app.on_message(command("BLOCK_COMMAND") & SUDOERS)
 @language
 async def useradd(client, message: Message, _):
     if not message.reply_to_message:
@@ -51,7 +45,7 @@ async def useradd(client, message: Message, _):
     )
 
 
-@app.on_message(filters.command(UNBLOCK_COMMAND) & SUDOERS)
+@app.on_message(command("UNBLOCK_COMMAND") & SUDOERS)
 @language
 async def userdel(client, message: Message, _):
     if not message.reply_to_message:
@@ -75,7 +69,7 @@ async def userdel(client, message: Message, _):
     await message.reply_text(_["block_4"])
 
 
-@app.on_message(filters.command(BLOCKED_COMMAND) & SUDOERS)
+@app.on_message(command("BLOCKED_COMMAND") & SUDOERS)
 @language
 async def sudoers_list(client, message: Message, _):
     if not BANNED_USERS:
@@ -95,19 +89,3 @@ async def sudoers_list(client, message: Message, _):
         return await mystic.edit_text(_["block_5"])
     else:
         return await mystic.edit_text(msg)
-
-
-__MODULE__ = "B-list"
-__HELP__ = f"""
-<b>✧ {command("BLACKLISTCHAT_COMMAND")}</b> [chat ID] - Blacklist any chat from using the Music Bot.
-<b>✧ {command("WHITELISTCHAT_COMMAND")}</b> [chat ID] - Whitelist any blacklisted chat from using the Music Bot.
-<b>✧ {command("BLACKLISTEDCHAT_COMMAND")}</b> - Check all blocked chats.
-
-<b>✧ {command("BLOCK_COMMAND")}</b> [Username or reply to a user] - Prevents a user from using bot commands.
-<b>✧ {command("UNBLOCK_COMMAND")}</b> [Username or reply to a user] - Remove a user from the bot's blocked list.
-<b>✧ {command("BLOCKED_COMMAND")}</b> - Check the list of blocked users.
-
-<b>✧ {command("GBAN_COMMAND")}</b> [Username or reply to a user] - Gban a user from all served chats and stop them from using your bot.
-<b>✧ {command("UNGBAN_COMMAND")}</b> [Username or reply to a user] - Remove a user from the bot's gban list and allow them to use your bot.
-<b>✧ {command("GBANNED_COMMAND")}</b> - Check the list of gban users.
-"""

@@ -1,0 +1,116 @@
+#
+# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+#
+# This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
+# and is released under the MIT License.
+# Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
+#
+# All rights reserved.
+
+
+# Türkçe Dilinde Komutlar
+
+# Bot Komutları
+PING_COMMAND : ["ping", "alive", "aalive"]
+PRIVACY_COMMAND : ["privacy"]
+START_COMMAND : ["baslat"]
+HELP_COMMAND : [ "yardim", "yardım"]
+SETTINGS_COMMAND : ["ayarlar", "ayar"]
+RELOAD_COMMAND : ["admincache", "reload"]
+GSTATS_COMMAND : ["gstats"]
+STATS_COMMAND : ["stats"]
+LANGUAGE_COMMAND : ["lang", "language", "langs", "dil", "diller"]
+
+# Oynatma Komutları
+PLAY_COMMAND : ["play", "vplay", "cplay", "cvplay", "playforce", "vplayforce", "cplayforce", "cvplayforce", "oynat", "voynat", "coynat"]
+PLAYMODE_COMMAND : ["playmode", "oynatmamodu"]
+CHANNELPLAY_COMMAND : ["channelplay"]
+STREAM_COMMAND : ["stream", "cstream", "streamforce", "cstreamforce"]
+
+#Çalma Listeleri Komutu
+PLAYLIST_COMMAND : ["oynatmalistesi"]
+PLAY_PLAYLIST_COMMAND : ["playplaylist", "vplayplaylist"]
+DELETE_PLAYLIST_COMMAND : ["oynatmalistesinisil"]
+ADD_PLAYLIST_COMMAND : ["oekle"]
+
+
+# Araçlar
+QUEUE_COMMAND : ["csira", "sira"]
+SONG_COMMAND : [ "sarki", "muzik", "indir"]
+LYRICS_COMMAND : ["sarkisozu"]
+
+
+# Yönetici Komutları
+AUTH_COMMAND : ["yetki", "yetkiver"]
+UNAUTH_COMMAND : [ "yetkial"]
+AUTHUSERS_COMMAND : ["yetkililer"]
+PAUSE_COMMAND : ["duraklat", "cduraklat","kduraklat"]
+RESUME_COMMAND : ["devam","cdevam", "kdevam"]
+MUTE_COMMAND : ["sustur", "csustur", "ksustur"]
+UNMUTE_COMMAND : ["unmute", "cunmute"]
+STOP_COMMAND : ["durdur", "cdurdur", "kdurdur"]
+SKIP_COMMAND : ["atla", "catla","katla"]
+SHUFFLE_COMMAND : ["ckaristir", "ckaristir", "karistir"]
+LOOP_COMMAND : ["cdongu", "dongu"]
+SEEK_COMMAND : ["seek", "cseek"]
+SEEK_BACK_COMMAND : ["ilerisar", "cilerisar", "gerisar"]
+REBOOT_COMMAND : ["yenidenbaslat"]
+
+# Sudo Kullanıcıları Şikayetleri
+
+# sudo komutu
+ADDSUDO_COMMAND : ["sudoekle"]
+DELSUDO_COMMAND : [ "sudosil"]
+SUDOUSERS_COMMAND : ["sudolistesi"]
+
+#Yayın 
+BROADCAST_COMMAND : ["reklam", "duyuru"]
+
+#Kara liste sohbeti
+BLACKLISTCHAT_COMMAND : [ "grupyasakla"]
+WHITELISTCHAT_COMMAND : ["grupyasakkaldir"]
+BLACKLISTEDCHAT_COMMAND : ["yasakligruplar"]
+
+#Görüntülü Aramalar Komutu
+VIDEOLIMIT_COMMAND : ["set_video_limit"]
+VIDEOMODE_COMMAND : ["videomode"]
+
+#Bakım
+MAINTENANCE_COMMAND : [ "bakimmodu", "bakim"]
+LOGGER_COMMAND : ["logger"]
+
+#Heroku
+GETLOG_COMMAND : ["log"]
+GETVAR_COMMAND : ["get_var", "getvar"]
+DELVAR_COMMAND : ["del_var", "delvar"]
+SETVAR_COMMAND : ["setvar"]
+USAGE_COMMAND : ["kullanim"]
+
+
+#Temel Bot Komutları
+UPDATE_COMMAND : ["guncelle"]
+RESTART_COMMAND : ["restart"]
+AUTOEND_COMMAND : ["autoend"]
+
+#Özel Bot Modu
+AUTHORIZE_COMMAND : ["authorize"]
+UNAUTHORIZE_COMMAND : ["unauthorize"]
+AUTHORIZED_COMMAND : ["authorized"]
+
+#Kullanıcıları Engelle Komutu
+BLOCK_COMMAND : ["yasakla"]
+UNBLOCK_COMMAND : ["yasakkaldir"]
+BLOCKED_COMMAND : ["yasaklilar"]
+
+#HIZ TESTİ
+SPEEDTEST_COMMAND : ["speed", "hiztesti"]
+
+#Sesli sohbet komutları
+ACTIVEVC_COMMAND : ["activevc", "aktifses"]
+ACTIVEVIDEO_COMMAND : ["activevd", "aktifvideo"]
+AC_COMMAND: ["ac"]
+
+#Gban Commands
+GBAN_COMMAND : ["gban"]
+UNGBAN_COMMAND : ["ungban"]
+GBANNED_COMMAND : ["gbannedusers", "gbanlist"]

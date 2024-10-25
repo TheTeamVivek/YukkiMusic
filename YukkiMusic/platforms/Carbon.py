@@ -2,7 +2,7 @@
 # Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
-# and is released under the "GNU v3.0 License Agreement".
+# and is released under the MIT License.
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
@@ -15,8 +15,7 @@ import aiohttp
 from aiohttp import client_exceptions
 
 
-class UnableToFetchCarbon(Exception):
-    pass
+from YukkiMusic.utils.exceptions import UnableToFetchCarbon
 
 
 themes = [
@@ -77,7 +76,7 @@ colour = [
 ]
 
 
-class CarbonAPI:
+class Carbon:
     def __init__(self):
         self.language = "auto"
         self.drop_shadow = True

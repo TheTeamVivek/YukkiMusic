@@ -7,24 +7,17 @@
 #
 # All rights reserved.
 #
-from pyrogram import filters
 from pyrogram.types import Message
 
 from config import BANNED_USERS
-from strings import get_command
+from strings import command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import blacklist_chat, blacklisted_chats, whitelist_chat
 from YukkiMusic.utils.decorators.language import language
 
-# Commands
 
-BLACKLISTCHAT_COMMAND = get_command("BLACKLISTCHAT_COMMAND")
-WHITELISTCHAT_COMMAND = get_command("WHITELISTCHAT_COMMAND")
-BLACKLISTEDCHAT_COMMAND = get_command("BLACKLISTEDCHAT_COMMAND")
-
-
-@app.on_message(filters.command(BLACKLISTCHAT_COMMAND) & SUDOERS)
+@app.on_message(command("BLACKLISTCHAT_COMMAND") & SUDOERS)
 @language
 async def blacklist_chat_func(client, message: Message, _):
     if len(message.command) != 2:
@@ -43,7 +36,7 @@ async def blacklist_chat_func(client, message: Message, _):
         pass
 
 
-@app.on_message(filters.command(WHITELISTCHAT_COMMAND) & SUDOERS)
+@app.on_message(command("WHITELISTCHAT_COMMAND") & SUDOERS)
 @language
 async def white_funciton(client, message: Message, _):
     if len(message.command) != 2:
@@ -57,7 +50,7 @@ async def white_funciton(client, message: Message, _):
     await message.reply_text("Something wrong happened")
 
 
-@app.on_message(filters.command(BLACKLISTEDCHAT_COMMAND) & ~BANNED_USERS)
+@app.on_message(command("BLACKLISTEDCHAT_COMMAND") & ~BANNED_USERS)
 @language
 async def all_chats(client, message: Message, _):
     text = _["black_7"]

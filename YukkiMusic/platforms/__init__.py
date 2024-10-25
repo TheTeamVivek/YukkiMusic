@@ -2,17 +2,29 @@
 # Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
-# and is released under the "GNU v3.0 License Agreement".
+# and is released under the MIT License.
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
 #
 
-from .Apple import AppleAPI
-from .Carbon import CarbonAPI
-from .JioSavan import SaavnAPI
-from .Resso import RessoAPI
-from .Soundcloud import SoundAPI
-from .Spotify import SpotifyAPI
-from .Telegram import TeleAPI
-from .Youtube import YouTubeAPI
+from .Apple import Apple
+from .Carbon import Carbon
+from .JioSavan import Saavn
+from .Resso import Resso
+from .Soundcloud import SoundCloud
+from .Spotify import Spotify
+from .Telegram import Telegram
+from .Youtube import YouTube
+
+
+class PlaTForms:
+    def __init__(self):
+        self.apple = Apple()
+        self.carbon = Carbon()
+        self.saavn = Saavn()
+        self.resso = Resso()
+        self.soundcloud = SoundCloud()
+        self.spotify = Spotify()
+        self.telegram = Telegram()
+        self.youtube = YouTube()

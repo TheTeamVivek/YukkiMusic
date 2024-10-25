@@ -6,9 +6,7 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-import asyncio
 import importlib
-import sys
 
 from pyrogram import idle
 from pytgcalls.exceptions import NoActiveGroupCall
@@ -22,10 +20,6 @@ from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
 
 async def init():
-    if sys.version_info < (3, 9):
-        LOGGER("YukkiMusic").error("YukkiMusic is optimized for Python 3.9 or higher. Exiting...")
-        sys.exit(1)
-
     if len(config.STRING_SESSIONS) == 0:
         LOGGER("YukkiMusic").error(
             "No Assistant Clients Vars Defined!.. Exiting Process."
@@ -73,5 +67,5 @@ async def init():
 
 
 if __name__ == "__main__":
-    asyncio.get_event_loop_policy().get_event_loop().run_until_complete(init())
+    app.run(init())
     LOGGER("YukkiMusic").info("Stopping YukkiMusic! GoodBye")

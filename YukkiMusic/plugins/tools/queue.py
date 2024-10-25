@@ -16,16 +16,13 @@ from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
 
 import config
 from config import BANNED_USERS
-from strings import get_command
-from YukkiMusic import app
+from strings import command
+from YukkiMusic import app, Platform
 from YukkiMusic.misc import db
 from YukkiMusic.utils import Yukkibin, get_channeplayCB, seconds_to_min
 from YukkiMusic.utils.database import get_cmode, is_active_chat, is_music_playing
 from YukkiMusic.utils.decorators.language import language, languageCB
 from YukkiMusic.utils.inline.queue import queue_back_markup, queue_markup
-
-###Commands
-QUEUE_COMMAND = get_command("QUEUE_COMMAND")
 
 basic = {}
 
@@ -49,7 +46,7 @@ def get_duration(playing):
         return "Inline"
 
 
-@app.on_message(filters.command(QUEUE_COMMAND) & filters.group & ~BANNED_USERS)
+@app.on_message(command("QUEUE_COMMAND") & filters.group & ~BANNED_USERS)
 @language
 async def ping_com(client, message: Message, _):
     if message.command[0][0] == "c":
@@ -91,7 +88,8 @@ async def ping_com(client, message: Message, _):
         elif videoid == "soundcloud":
             IMAGE = config.SOUNCLOUD_IMG_URL
         elif "saavn" in videoid:
-            IMAGE = got[0].get("thumb") or config.TELEGRAM_AUDIO_URL
+            details = await Platform.saavn.info(got[0]["url"])
+            IMAGE = details["thumb"]
         else:
             IMAGE = get_image(videoid)
     send = (
@@ -254,7 +252,8 @@ async def queue_back(client, CallbackQuery: CallbackQuery, _):
         elif videoid == "soundcloud":
             IMAGE = config.SOUNCLOUD_IMG_URL
         elif "saavn" in videoid:
-            IMAGE = got[0].get("thumb") or config.TELEGRAM_AUDIO_URL
+            details = await Platform.saavn.info(got[0]["url"])
+            IMAGE = details["thumb"]
         else:
             IMAGE = get_image(videoid)
     send = (

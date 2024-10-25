@@ -11,17 +11,15 @@ from pyrogram import filters
 from pyrogram.types import Message
 
 from config import BANNED_USERS
-from strings import get_command
-from YukkiMusic import YouTube, app
+from strings import command
+from YukkiMusic import Platform, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.utils import AdminRightsCheck, seconds_to_min
 
-# Commands
-SEEK_COMMAND = get_command("SEEK_COMMAND")
 
 
-@app.on_message(filters.command(SEEK_COMMAND) & filters.group & ~BANNED_USERS)
+@app.on_message(command(["SEEK_COMMAND", "SEEK_BACK_COMMAND"]) & filters.group & ~BANNED_USERS)
 @AdminRightsCheck
 async def seek_comm(cli, message: Message, _, chat_id):
     if len(message.command) == 1:
@@ -55,7 +53,7 @@ async def seek_comm(cli, message: Message, _, chat_id):
         to_seek = duration_played + duration_to_skip + 1
     mystic = await message.reply_text(_["admin_32"])
     if "vid_" in file_path:
-        n, file_path = await YouTube.video(playing[0]["vidid"], True)
+        n, file_path = await Platform.youtube.video(playing[0]["vidid"], True)
         if n == 0:
             return await message.reply_text(_["admin_30"])
     try:

@@ -23,7 +23,6 @@ from YukkiMusic.utils.database import (
     get_userss,
 )
 from YukkiMusic.utils.decorators import languageCB
-from YukkiMusic.utils.decorators.play import join_chat
 from YukkiMusic.utils.inline.playlist import (
     botplaylist_markup,
     failed_top_markup,
@@ -63,27 +62,6 @@ async def get_topz_playlists(client, CallbackQuery, _):
 @app.on_callback_query(filters.regex("SERVERTOP") & ~BANNED_USERS)
 @languageCB
 async def server_to_play(client, CallbackQuery, _):
-    message = CallbackQuery.message
-    userbot = await get_assistant(CallbackQuery.message.chat.id)
-    try:
-        try:
-            get = await app.get_chat_member(CallbackQuery.message.chat.id, userbot.id)
-        except ChatAdminRequired:
-            return await myu.edit(
-                _["call_1"],
-                show_alert=True,
-            )
-        if get.status == ChatMemberStatus.BANNED:
-            try:
-                await app.unban_chat_member(chat_id, userbot.id)
-            except:
-                return await myu.edit(
-                    text=_["call_2"].format(userbot.username, userbot.id),
-                )
-    except UserNotParticipant:
-        myu = await message.reply_text("❣️")
-        await join_chat(message, message.chat.id, _, myu)
-
     chat_id = CallbackQuery.message.chat.id
     user_name = CallbackQuery.from_user.first_name
     try:

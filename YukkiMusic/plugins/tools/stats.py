@@ -20,8 +20,8 @@ from pytgcalls.__version__ import __version__ as pytgver
 
 import config
 from config import BANNED_USERS
-from strings import get_command
-from YukkiMusic import YouTube, app
+from strings import command
+from YukkiMusic import Platform, app
 from YukkiMusic.core.userbot import assistants
 from YukkiMusic.misc import SUDOERS, pymongodb
 from YukkiMusic.plugins import ALL_MODULES
@@ -47,12 +47,8 @@ from YukkiMusic.utils.inline.stats import (
 
 loop = asyncio.get_running_loop()
 
-# Commands
-GSTATS_COMMAND = get_command("GSTATS_COMMAND")
-STATS_COMMAND = get_command("STATS_COMMAND")
 
-
-@app.on_message(filters.command(STATS_COMMAND) & ~BANNED_USERS)
+@app.on_message(command("STATS_COMMAND") & ~BANNED_USERS)
 @language
 async def stats_global(client, message: Message, _):
     upl = stats_buttons(_, True if message.from_user.id in SUDOERS else False)
@@ -63,7 +59,7 @@ async def stats_global(client, message: Message, _):
     )
 
 
-@app.on_message(filters.command(GSTATS_COMMAND) & ~BANNED_USERS)
+@app.on_message(command("GSTATS_COMMAND") & ~BANNED_USERS)
 @language
 async def gstats_global(client, message: Message, _):
     mystic = await message.reply_text(_["gstats_1"])
@@ -108,7 +104,7 @@ async def gstats_global(client, message: Message, _):
         duration_sec,
         thumbnail,
         vidid,
-    ) = await YouTube.details(videoid, True)
+    ) = await Platform.youtube.details(videoid, True)
     title = title.title()
     final = f"Top played Tracks on  {app.mention}\n\n**Title:** {title}\n\nPlayed** {co} **times"
     upl = get_stats_markup(_, True if message.from_user.id in SUDOERS else False)

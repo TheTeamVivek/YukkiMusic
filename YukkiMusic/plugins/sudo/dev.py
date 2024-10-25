@@ -24,7 +24,6 @@ from time import time
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from strings import get_command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 
@@ -35,7 +34,7 @@ async def aexec(code, client, message):
         "async def __aexec(client, message): "
         + "".join(f"\n {a}" for a in code.split("\n")),
         globals(),
-        local_vars
+        local_vars,
     )
     __aexec_func = local_vars["__aexec"]
     return await __aexec_func(client, message)
@@ -217,35 +216,3 @@ async def shellrunner(_, message: Message):
         await edit_or_reply(message, text="<b>OUTPUT :</b>\n<code>None</code>")
 
     await message.stop_propagation()
-
-
-def command(cmd: str):
-    cmds = " ".join([f"/{c}" for c in get_command(cmd)])
-    return cmds
-
-
-__MODULE__ = "Dev"
-__HELP__ = f"""
-<b><u>Add and remove sudoers:</u></b>
-
-<b>{command("ADDSUDO_COMMAND")} [Username or reply to a user] - Add sudo in your bot</b>
-<b>{command("DELSUDO_COMMAND")} [Username or userid or reply to a user] - Remove from bot sudoers</b>
-<b>{command("SUDOUSERS_COMMAND")} - Get a list of all sudoers</b>
-
-<b><u>Heroku:</u></b>
-
-<b>{command("USAGE_COMMAND")}</b> - Dyno usage
-<b>{command("GETVAR_COMMAND")} [Var Name]</b> - Get a config var from vars
-<b>{command("DELVAR_COMMAND")} [Var Name]</b> - Delete a var from vars
-<b>{command("SETVAR_COMMAND")} [Var Name] [Value]</b> - Add or update a var. Separate var and its value with a space
-
-<b><u>Bot command:</u></b>
-
-<b>{command("RESTART_COMMAND")}</b> - Restart the bot (SUDOERS only)
-<b>{command("UPDATE_COMMAND")}</b> - Update the bot
-<b>{command("SPEEDTEST_COMMAND")}</b> - Check server speeds
-<b>{command("MAINTENANCE_COMMAND")} [enable / disable]</b> - Toggle bot maintenance mode
-<b>{command("LOGGER_COMMAND")} [enable / disable]</b> - Toggle bot logging of searched queries to log group
-<b>{command("GETLOG_COMMAND")} [Number of lines]</b> - Get logs from server
-<b>{command("AUTOEND_COMMAND")} [enable / disable]</b> - Automatically end the stream after 30s if no one is listening to songs
-"""
