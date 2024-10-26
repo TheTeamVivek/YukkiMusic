@@ -6,8 +6,6 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 
-RUN rm -rf /app/*
-
 COPY . /app/
 WORKDIR /app/
 
