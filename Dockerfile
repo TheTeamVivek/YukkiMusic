@@ -5,8 +5,12 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+
+RUN rm -rf /app/*
+
 COPY . /app/
 WORKDIR /app/
+
 RUN pip3 install --no-cache-dir --upgrade pip setuptools \
  && pip3 install --no-cache-dir -U -r requirements.txt
 
