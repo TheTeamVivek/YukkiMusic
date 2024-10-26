@@ -22,6 +22,10 @@ from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
 
 async def init():
+    if sys.version_info < (3, 9):
+        LOGGER("YukkiMusic").error("YukkiMusic is optimized for Python 3.9 or higher. Exiting...")
+        sys.exit(1)
+
     if len(config.STRING_SESSIONS) == 0:
         LOGGER("YukkiMusic").error(
             "No Assistant Clients Vars Defined!.. Exiting Process."
