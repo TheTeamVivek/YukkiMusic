@@ -122,7 +122,7 @@ async def play_commnd(
                     err = e
                 else:
                     err = _["general_3"].format(ex_type)
-                    LOGGER(__name__).error(f"{ex_type} {e}")
+                    LOGGER(__name__).error("An error occurred", exc_info=True)
                 return await mystic.edit_text(err)
             return await mystic.delete()
         return
@@ -171,7 +171,7 @@ async def play_commnd(
                 if ex_type == "AssistantErr":
                     err = e
                 else:
-                    LOGGER(__name__).error(f"{ex_type} {e}")
+                    LOGGER(__name__).error("An error occurred", exc_info=True)
                     err = _["general_3"].format(ex_type)
                 return await mystic.edit_text(err)
             return await mystic.delete()
@@ -300,7 +300,7 @@ async def play_commnd(
                     file_path, details = await Saavn.download(url)
                 except Exception as e:
                     ex_type = type(e).__name__
-                    LOGGER(__name__).error(f"{ex_type} {e}")
+                    LOGGER(__name__).error("An error occurred", exc_info=True)
                     return await mystic.edit_text(_["play_3"])
                 duration_sec = details["duration_sec"]
                 streamtype = "saavn_track"
@@ -320,7 +320,7 @@ async def play_commnd(
                     streamtype = "saavn_playlist"
                 except Exception as e:
                     ex_type = type(e).__name__
-                    LOGGER(__name__).error(f"{ex_type} {e}")
+                    LOGGER(__name__).error("An error occurred", exc_info=True)
                     return await mystic.edit_text(_["play_3"])
 
                 if len(details) == 0:
@@ -343,7 +343,7 @@ async def play_commnd(
                     err = e
                 else:
                     err = _["general_3"].format(ex_type)
-                    LOGGER(__name__).error(f"{ex_type} {e}")
+                    LOGGER(__name__).error("An error occurred", exc_info=True)
                 return await mystic.edit_text(err)
             return await mystic.delete()
 
@@ -377,7 +377,7 @@ async def play_commnd(
                 if ex_type == "AssistantErr":
                     err = e
                 else:
-                    LOGGER(__name__).error(f"{ex_type} {e}")
+                    LOGGER(__name__).error("An error occurred", exc_info=True)
                     err = _["general_3"].format(ex_type)
                 return await mystic.edit_text(err)
             return await mystic.delete()
@@ -404,7 +404,7 @@ async def play_commnd(
                 if ex_type == "AssistantErr":
                     err = e
                 else:
-                    LOGGER(__name__).error(f"{ex_type} {e}")
+                    LOGGER(__name__).error("An error occurred", exc_info=True)
                     err = _["general_3"].format(ex_type)
                 return await mystic.edit_text(err)
             return await play_logs(message, streamtype="M3u8 or Index Link")
@@ -466,7 +466,7 @@ async def play_commnd(
             if ex_type == "AssistantErr":
                 err = e
             else:
-                LOGGER(__name__).error(f"{ex_type} {e}")
+                LOGGER(__name__).error("An error occurred", exc_info=True)
 
                 err = _["general_3"].format(ex_type)
             return await mystic.edit_text(err)
