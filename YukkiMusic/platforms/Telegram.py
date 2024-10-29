@@ -188,7 +188,7 @@ class TeleAPI:
                 await mystic.edit_text(
                     "sᴜᴄᴄᴇssғᴜʟʟʏ ᴅᴏᴡɴʟᴏᴀᴅᴇᴅ...\n ᴘʀᴏᴄᴇssɪɴɢ ғɪʟᴇ ɴᴏᴡ"
                 )
-                downloader.pop(message.id)
+                downloader.pop(message.id, None)
             except:
                 await mystic.edit_text(_["tg_2"])
 
