@@ -9,7 +9,6 @@ motor
 psutil
 pytube
 pykeyboard
-pyrotgfork>=2.1.33.12
 py-tgcalls==2.0.4
 python-dotenv
 PyTgCrypto>=1.2.7
@@ -24,4 +23,5 @@ gunicorn
 youtube-search
 youtube-search-python
 yt-dlp
+git+https://github.com/KurimuzonAkuma/pyrogram@dev
 git+https://github.com/Vivekkumar-IN/yt-dlp-youtube-oauth2
