@@ -11,7 +11,7 @@ pytube
 pykeyboard
 py-tgcalls==2.0.4
 python-dotenv
-PyTgCrypto>=1.2.7
+PyTgCrypto
 pyyaml
 requests
 speedtest-cli
