@@ -21,7 +21,7 @@ async def gen_thumb(videoid):
             thumbnail = result["thumbnails"][0]["url"].split("?")[0]
         return thumbnail
     except Exception as e:
-        return YOUTUBE_IMG_URL
+        return f"https://img.youtube.com/vi/{videoid}/maxresdefault.jpg"
 
 
 async def gen_qthumb(vidid):
@@ -32,4 +32,5 @@ async def gen_qthumb(vidid):
             thumbnail = result["thumbnails"][0]["url"].split("?")[0]
         return thumbnail
     except Exception as e:
-        return YOUTUBE_IMG_URL
+        return f"https://img.youtube.com/vi/{videoid}/maxresdefault.jpg"
+
