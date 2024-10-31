@@ -209,21 +209,13 @@ class YouTubeAPI:
             link = self.base + link
         if "&" in link:
             link = link.split("&")[0]
-
-        ydl_opts = {
-            'quiet': True,
-            'skip_download': True,
-            'format': 'best',
-        }
-
-        with YoutubeDL(get_ytdl_options(ydl_opts)) as ydl:
-            info = ydl.extract_info(link, download=False)
-            title = info.get("title")
-            duration_min = info.get("duration") // 60 if info.get("duration") else None # Convert duration to minutes if it exists, else set to None for livestreams
-            vidid = info.get("id")
-            yturl = info.get("webpage_url")
-            thumbnail = info.get("thumbnail")
-
+        results = VideosSearch(link, limit=1)
+        for result in (await results.next())["result"]:
+            title = result["title"]
+            duration_min = result["duration"]
+            vidid = result["id"]
+            yturl = result["link"]
+            thumbnail = result["thumbnails"][0]["url"].split("?")[0]
         track_details = {
             "title": title,
             "link": yturl,
