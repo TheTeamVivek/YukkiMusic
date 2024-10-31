@@ -43,6 +43,9 @@ class YukkiBot(Client):
             api_hash=config.API_HASH,
             bot_token=config.BOT_TOKEN,
             in_memory=True,
+            sleep_threshold=240,
+            max_concurrent_transmissions=5,
+            workers=50,
         )
 
     async def edit_message_text(self, *args, **kwargs):
