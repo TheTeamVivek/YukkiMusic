@@ -2,7 +2,7 @@
 # Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
-# and is released under the "GNU v3.0 License Agreement".
+# and is released under the MIT License.
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
@@ -14,17 +14,14 @@ from pyrogram.enums import ChatMembersFilter
 from pyrogram.types import Message
 
 from config import BANNED_USERS, adminlist
-from strings import get_command
+from strings import command
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_authuser_names
 from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.formatters import alpha_to_int
 
-### Multi-Lang Commands
-RELOAD_COMMAND = get_command("RELOAD_COMMAND")
 
-
-@app.on_message(filters.command(RELOAD_COMMAND) & filters.group & ~BANNED_USERS)
+@app.on_message(command("RELOAD_COMMAND") & filters.group & ~BANNED_USERS)
 @language
 async def reload_admin_cache(client, message: Message, _):
     try:

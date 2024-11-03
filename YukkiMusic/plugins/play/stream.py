@@ -14,18 +14,15 @@ from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
 from config import BANNED_USERS
-from strings import get_command
+from strings import command
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.decorators.play import PlayWrapper
 from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
 
-# Command
-STREAM_COMMAND = get_command("STREAM_COMMAND")
 
-
-@app.on_message(filters.command(STREAM_COMMAND) & filters.group & ~BANNED_USERS)
+@app.on_message(command("STREAM_COMMAND") & filters.group & ~BANNED_USERS)
 @PlayWrapper
 async def stream_command(
     client,

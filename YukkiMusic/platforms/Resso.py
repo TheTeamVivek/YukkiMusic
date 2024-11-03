@@ -2,7 +2,7 @@
 # Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
-# and is released under the "GNU v3.0 License Agreement".
+# and is released under the MIT License.
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 from youtubesearchpython.__future__ import VideosSearch
 
 
-class RessoAPI:
+class Resso:
     def __init__(self):
         self.regex = r"^(https:\/\/m.resso.com\/)(.*)$"
         self.base = "https://m.resso.com/"

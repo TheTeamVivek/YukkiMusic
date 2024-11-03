@@ -13,7 +13,7 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, Message
 
 from config import BANNED_USERS
-from strings import get_command, get_string, languages_present
+from strings import get_string, languages_present, command
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_lang, set_lang
 from YukkiMusic.utils.decorators import ActualAdminCB, language, languageCB
@@ -44,10 +44,7 @@ def lanuages_keyboard(_):
     return keyboard
 
 
-LANGUAGE_COMMAND = get_command("LANGUAGE_COMMAND")
-
-
-@app.on_message(filters.command(LANGUAGE_COMMAND) & filters.group & ~BANNED_USERS)
+@app.on_message(command("LANGUAGE_COMMAND") & filters.group & ~BANNED_USERS)
 @language
 async def langs_command(client, message: Message, _):
     keyboard = lanuages_keyboard(_)

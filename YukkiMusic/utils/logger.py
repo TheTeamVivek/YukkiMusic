@@ -6,7 +6,6 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-
 from config import LOG, LOG_GROUP_ID
 from YukkiMusic import app
 from YukkiMusic.utils.database import is_on_off
@@ -17,21 +16,21 @@ async def play_logs(message, streamtype):
         if message.chat.username:
             chatusername = f"@{message.chat.username}"
         else:
-            chatusername = "ᴘʀɪᴠᴀᴛᴇ ɢʀᴏᴜᴘ"
+            chatusername = "Private Group"
 
         logger_text = f"""
-**{app.mention} ᴘʟᴀʏ ʟᴏɢ**
+**{app.mention} Play Log**
 
-**ᴄʜᴀᴛ ɪᴅ :** `{message.chat.id}`
-**ᴄʜᴀᴛ ɴᴀᴍᴇ :** {message.chat.title}
-**ᴄʜᴀᴛ ᴜsᴇʀɴᴀᴍᴇ :** {chatusername}
+**Chat ID:** `{message.chat.id}`
+**Chat Name:** {message.chat.title}
+**Chat Username:** {chatusername}
 
-**ᴜsᴇʀ ɪᴅ :** `{message.from_user.id}`
-**ɴᴀᴍᴇ :** {message.from_user.mention}
-**ᴜsᴇʀɴᴀᴍᴇ :** @{message.from_user.username}
+**User ID:** `{message.from_user.id}`
+**Name:** {message.from_user.mention}
+**Username:** @{message.from_user.username}
 
-**ǫᴜᴇʀʏ :** {message.text.split(None, 1)[1]}
-**sᴛʀᴇᴀᴍᴛʏᴘᴇ :** {streamtype}"""
+**Query:** {message.text.split(None, 1)[1]}
+**Stream Type:** {streamtype}"""
         if message.chat.id != LOG_GROUP_ID:
             try:
                 await app.send_message(
@@ -39,6 +38,6 @@ async def play_logs(message, streamtype):
                     text=logger_text,
                     disable_web_page_preview=True,
                 )
-            except Exception as e:
-                print(e)
+            except Exception:
+                pass
         return

@@ -15,7 +15,7 @@ from typing import Union
 from pyrogram.types import InlineKeyboardMarkup
 
 import config
-from YukkiMusic import Carbon, Saavn, YouTube, app
+from YukkiMusic import Platform, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
@@ -64,7 +64,7 @@ async def stream(
                     duration_sec,
                     thumbnail,
                     vidid,
-                ) = await YouTube.details(search, False if spotify else True)
+                ) = await Platform.youtube.details(search, False if spotify else True)
             except:
                 continue
             if str(duration_min) == "None":
@@ -92,7 +92,7 @@ async def stream(
                     db[chat_id] = []
                 status = True if video else None
                 try:
-                    file_path, direct = await YouTube.download(
+                    file_path, direct = await Platform.youtube.download(
                         vidid, mystic, video=status, videoid=True
                     )
                 except:
@@ -136,7 +136,7 @@ async def stream(
                 car = os.linesep.join(msg.split(os.linesep)[:17])
             else:
                 car = msg
-            carbon = await Carbon.generate(car, randint(100, 10000000))
+            carbon = await Platform.carbon.generate(car, randint(100, 10000000))
             upl = close_markup(_)
             return await app.send_photo(
                 original_chat_id,
@@ -153,7 +153,7 @@ async def stream(
         thumbnail = result["thumb"]
         status = True if video else None
         try:
-            file_path, direct = await YouTube.download(
+            file_path, direct = await Platform.youtube.download(
                 vidid, mystic, videoid=True, video=status
             )
         except:
@@ -200,22 +200,20 @@ async def stream(
             )
             img = await gen_thumb(vidid)
             button = stream_markup(_, vidid, chat_id)
-            try:
-                run = await app.send_photo(
-                    original_chat_id,
-                    photo=img,
-                    caption=_["stream_1"].format(
-                        title[:27],
-                        f"https://t.me/{app.username}?start=info_{vidid}",
-                        duration_min,
-                        user_name,
-                    ),
-                    reply_markup=InlineKeyboardMarkup(button),
-                )
-                db[chat_id][0]["mystic"] = run
-                db[chat_id][0]["markup"] = "stream"
-            except Exception as ex:
-                print(ex)
+            run = await app.send_photo(
+                original_chat_id,
+                photo=img,
+                caption=_["stream_1"].format(
+                    title[:27],
+                    f"https://t.me/{app.username}?start=info_{vidid}",
+                    duration_min,
+                    user_name,
+                ),
+                reply_markup=InlineKeyboardMarkup(button),
+            )
+            db[chat_id][0]["mystic"] = run
+            db[chat_id][0]["markup"] = "stream"
+
     elif "saavn" in streamtype:
         if streamtype == "saavn_track":
             if result["duration_sec"] == 0:
@@ -236,7 +234,7 @@ async def stream(
                     streamtype,
                     user_id,
                     "audio",
-                    thumb=thumb,
+                    url=link,
                 )
                 position = len(db.get(chat_id)) - 1
                 await app.send_photo(
@@ -262,7 +260,7 @@ async def stream(
                     user_id,
                     "audio",
                     forceplay=forceplay,
-                    thumb=thumb,
+                    url=link,
                 )
                 button = telegram_markup(_, chat_id)
                 run = await app.send_photo(
@@ -275,6 +273,7 @@ async def stream(
                 )
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
+
         elif streamtype == "saavn_playlist":
             msg = f"{_['playlist_16']}\n\n"
             count = 0
@@ -286,7 +285,7 @@ async def stream(
                 duration_sec = search["duration_sec"]
                 link = search["url"]
                 thumb = search["thumb"]
-                file_path, n = await Saavn.download(link)
+                file_path, n = await Platform.saavn.download(link)
                 if await is_active_chat(chat_id):
                     await put_queue(
                         chat_id,
@@ -298,7 +297,7 @@ async def stream(
                         streamtype,
                         user_id,
                         "audio",
-                        thumb=thumb,
+                        url=link,
                     )
                     position = len(db.get(chat_id)) - 1
                     count += 1
@@ -323,7 +322,7 @@ async def stream(
                         user_id,
                         "audio",
                         forceplay=forceplay,
-                        thumb=thumb,
+                        url=link,
                     )
                     button = telegram_markup(_, chat_id)
                     run = await app.send_photo(
@@ -345,7 +344,7 @@ async def stream(
                     car = os.linesep.join(msg.split(os.linesep)[:17])
                 else:
                     car = msg
-                carbon = await Carbon.generate(car, randint(100, 10000000))
+                carbon = await Platform.carbon.generate(car, randint(100, 10000000))
                 upl = close_markup(_)
                 return await app.send_photo(
                     original_chat_id,
@@ -479,7 +478,7 @@ async def stream(
         else:
             if not forceplay:
                 db[chat_id] = []
-            n, file_path = await YouTube.video(link)
+            n, file_path = await Platform.youtube.video(link)
             if n == 0:
                 raise AssistantErr(_["str_3"])
             await Yukki.join_call(
