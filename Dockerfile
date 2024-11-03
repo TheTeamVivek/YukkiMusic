@@ -8,6 +8,7 @@ RUN apt-get update && \
 WORKDIR /app
 
 COPY requirements.txt ./
+
 RUN pip3 install --no-cache-dir --upgrade pip setuptools && \
     pip3 install --no-cache-dir -r requirements.txt && \
     rm -rf ~/.cache/pip

@@ -18,10 +18,9 @@ from pytgcalls.types import (
     ChatUpdate,
     GroupCallConfig,
     MediaStream,
-    StreamAudioEnded,
-    StreamVideoEnded,
     Update,
 )
+from pytgcalls.types.stream import StreamAudioEnded
 
 import config
 from strings import get_string
@@ -618,8 +617,9 @@ class Call:
 
             @call.on_update(filters.stream_end)
             async def stream_end_handler(client, update: Update):
-                if isinstance(update, (StreamVideoEnded, StreamAudioEnded)):
-                    await self.change_stream(client, update.chat_id)
+                if not isinstance(update, StreamAudioEnded):
+                    return
+                await self.change_stream(client, update.chat_id)
 
 
 Yukki = Call()
