@@ -1,0 +1,128 @@
+Auth: |
+  <b>Auth Users can use Admin commands without admin rights in your chat.</b>
+
+  <b>✧ {0}</b> [Username] - Add a user to AUTH LIST of the Group.
+
+  <b>✧ {1}</b> [Username] - Remove a user from AUTH LIST of the group.
+
+  <b>✧ {2}</b> - Check AUTH LIST of the Group.
+
+Admin: |
+  <b>c stands for channel play</b>
+
+  <b>✧ {0}</b> - Pause the playing music.
+  <b>✧ {1}</b> - Resume the paused music.
+  <b>✧ {2}</b> - Mute the playing music.
+  <b>✧ {3}</b> - Unmute the muted music.
+  <b>✧ {4}</b> - Skip the current playing music.
+  <b>✧ {5}</b> - Stop the playing music.
+  <b>✧ {6}</b> - Randomly shuffle the queued playlist/songs.
+  <b>✧ {7}</b> - Forward seek the music.
+  <b>✧ {8}</b> - Backward seek the music to your duration.
+  <b>✧ {9}</b> - Reboot bot for your chat.
+
+  <b>✧ {4}</b> [Number (Example: 3)] - Skip music to a specific number. Example: <b>/skip 3</b> will skip to the third queued music and will ignore 1 and 2 in the queue.
+
+  <b>✧ {10}</b> [Enable/Disable] or [Number between 1-10] - When activated, the bot will loop the current music 1-10 times in voice chat. Default loop value is 10 times.
+
+
+Active: |
+  <b>✧ {0}</b> - Check active voice chats on the bot.
+
+  <b>✧ {1}</b> - Check active voice and video calls on the bot.
+
+  <b>✧ {2}</b> - Check active video calls on the bot.
+
+  <b>✧ {3}</b> - Check bot stats.
+
+Play: |
+  <b>✧ {0}</b> - Bot will start playing your given query on voice chat or stream live links on voice chats.
+
+  <b>✧ {1}</b> - Force Play stops the current playing track on voice chat and starts playing the searched track instantly without disturbing/clearing the queue.
+
+  <b>✧ {2}</b> - Connect channel to a group and stream music on channel's voice chat from your group.
+
+  <b>✧ {3}</b> - Stream a URL that you believe is direct or m3u8 that can't be played by /play.
+
+G-cast: |
+  <b>{0} [Message or Reply to any message]</b> » Broadcast a message to served chats of bot
+  <u>Broadcasting Modes:</u>
+
+  <b><code>-pin</code></b> » Pins your broadcasted message in served chats
+
+  <b><code>-pinloud</code></b> » Pins your broadcasted message in served chats and sends notification to the members
+
+  <b><code>-user</code></b> » Broadcast the message to users who have started your bot [You can also pin the message by adding `-pin` or `-pinloud`]
+
+  <b><code>-assistant</code></b> » Broadcast your message through all assistants of the bot
+
+  <b><code>-nobot</code></b> » Ensures that the **bot** doesn't broadcast the message [Useful when you don't want to broadcast the message to groups]
+
+  > <b>Example:</b> <code>/{0} -user -assistant -pin Testing broadcast</code>
+
+
+Bot: |
+  <b>★ {0}</b> - Get Top 10 Tracks Global Stats, Top 10 Users of Bot, Top 10 Chats on Bot, Top 10 Played in a chat, etc.
+
+  <b>★ {1}</b> - Check Sudo users of the bot.
+
+  <b>★ {2} [Music Name]</b> - Search lyrics for the particular music on the web.
+
+  <b>★ {3} [Track Name] or [YT Link]</b> - Download any track from YouTube in MP3 or MP4 formats.
+
+  <b>★ {4}</b> - Check the queue list of music.
+
+  <u><b>⚡️Private Bot:</b></u>
+      
+  <b>✧ {5} [CHAT_ID]</b> - Allow a chat to use your bot.
+
+  <b>✧ {6} [CHAT_ID]</b> - Disallow a chat from using your bot.
+
+  <b>✧ {7}</b> - Check all allowed chats of your bot.
+
+
+P-List: |
+  <b>{0}</b> - Check your whole playlist on the bot server
+
+  <b>{1}</b> - Delete any song from your saved playlist 
+
+  <b>{2}</b> - Start playing your saved playlist in **audio**
+
+  <b>{3}</b> - Start playing your playlist in **video**
+
+B-list: |
+  <b>✧ {0}</b> [chat ID] - Blacklist any chat from using the Music Bot.
+  <b>✧ {1}</b> [chat ID] - Whitelist any blacklisted chat from using the Music Bot.
+  <b>✧ {2}</b> - Check all blocked chats.
+
+  <b>✧ {3}</b> [Username or reply to a user] - Prevents a user from using bot commands.
+  <b>✧ {4}</b> [Username or reply to a user] - Remove a user from the bot's blocked list.
+  <b>✧ {5}</b> - Check the list of blocked users.
+
+  <b>✧ {6}</b> [Username or reply to a user] - Gban a user from all served chats and stop them from using your bot.
+  <b>✧ {7}</b> [Username or reply to a user] - Remove a user from the bot's gban list and allow them to use your bot.
+  <b>✧ {8}</b> - Check the list of gban users.
+
+Dev: |
+  <b><u>Add and remove sudoers:</u></b>
+
+  <b>{0} [Username or reply to a user] - Add sudo in your bot</b>
+  <b>{1} [Username or userid or reply to a user] - Remove from bot sudoers</b>
+  <b>{2} - Get a list of all sudoers</b>
+
+  <b><u>Heroku:</u></b>
+
+  <b>{3}</b> - Dyno usage
+  <b>{4} [Var Name]</b> - Get a config var from vars
+  <b>{5} [Var Name]</b> - Delete a var from vars
+  <b>{6} [Var Name] [Value]</b> - Add or update a var. Separate var and its value with a space
+
+  <b><u>Bot command:</u></b>
+
+  <b>{7}</b> - Restart the bot (SUDOERS only)
+  <b>{8}</b> - Update the bot
+  <b>{9}</b> - Check server speeds
+  <b>{10} [enable / disable]</b> - Toggle bot maintenance mode
+  <b>{11} [enable / disable]</b> - Toggle bot logging of searched queries to log group
+  <b>{12} [Number of lines]</b> - Get logs from server
+  <b>{13} [enable / disable]</b> - Automatically end the stream after 30s if no one is listening to songs

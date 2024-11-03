@@ -8,10 +8,10 @@
 # All rights reserved.
 
 
-# Commands in Every Language
+# Commands in English Language
 
 # Bot Commands
-PING_COMMAND : ["ping", "alive"]
+PING_COMMAND : ["ping", "alive", "aalive"]
 PRIVACY_COMMAND : ["privacy"]
 START_COMMAND : ["start"]
 HELP_COMMAND : ["help"]
@@ -25,15 +25,12 @@ LANGUAGE_COMMAND : ["lang", "language", "langs"]
 PLAY_COMMAND : ["play", "vplay", "cplay", "cvplay", "playforce", "vplayforce", "cplayforce", "cvplayforce"]
 PLAYMODE_COMMAND : ["playmode"]
 CHANNELPLAY_COMMAND : ["channelplay"]
-STREAM_COMMAND : ["stream", "cstream", "streamforce"]
+STREAM_COMMAND : ["stream", "cstream", "streamforce", "cstreamforce"]
 
 #Playlists Command
 PLAYLIST_COMMAND : ["playlist"]
-
 PLAY_PLAYLIST_COMMAND : ["playplaylist", "vplayplaylist"]
-
 DELETE_PLAYLIST_COMMAND : ["deleteplaylist", "delplaylist"]
-
 ADD_PLAYLIST_COMMAND : ["addplaylist"]
 
 
@@ -49,13 +46,14 @@ UNAUTH_COMMAND : ["unauth"]
 AUTHUSERS_COMMAND : ["authusers"]
 PAUSE_COMMAND : ["pause", "cpause"]
 RESUME_COMMAND : ["resume", "cresume"]
-MUTE_COMMAND : ["mute", "cmute"]
+MUTE_COMMAND : ["cmute", "mute"]
 UNMUTE_COMMAND : ["unmute", "cunmute"]
 STOP_COMMAND : ["stop", "end", "cstop", "cend"]
 SKIP_COMMAND : ["skip", "cskip"]
 SHUFFLE_COMMAND : ["shuffle", "cshuffle"]
 LOOP_COMMAND : ["loop", "cloop"]
-SEEK_COMMAND : ["seek", "cseek", "seekback", "cseekback"]
+SEEK_COMMAND : ["seek", "cseek"]
+SEEK_BACK_COMMAND : ["seekback", "cseekback"]
 REBOOT_COMMAND : ["reboot"]
 
 # Sudo Users Commaands
@@ -87,7 +85,6 @@ GETVAR_COMMAND : ["get_var", "getvar"]
 DELVAR_COMMAND : ["del_var", "delvar"]
 SETVAR_COMMAND : ["set_var", "setvar"]
 USAGE_COMMAND : ["usage"]
-VARS_COMMAND : ["vars", "config"]
 
 
 #Basic Bot Commands

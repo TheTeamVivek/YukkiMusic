@@ -10,7 +10,6 @@
 
 from youtubesearchpython.__future__ import VideosSearch
 
-from config import YOUTUBE_IMG_URL
 
 
 async def gen_thumb(videoid):
@@ -33,4 +32,3 @@ async def gen_qthumb(vidid):
         return thumbnail
     except Exception as e:
         return f"https://img.youtube.com/vi/{videoid}/maxresdefault.jpg"
-

@@ -8,10 +8,9 @@
 # All rights reserved.
 #
 
-from pyrogram import filters
 from pyrogram.types import Message
 
-from strings import get_command, get_string
+from strings import get_string, command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
@@ -21,11 +20,8 @@ from YukkiMusic.utils.database import (
     maintenance_on,
 )
 
-# Commands
-MAINTENANCE_COMMAND = get_command("MAINTENANCE_COMMAND")
 
-
-@app.on_message(filters.command(MAINTENANCE_COMMAND) & SUDOERS)
+@app.on_message(command("MAINTENANCE_COMMAND") & SUDOERS)
 async def maintenance(client, message: Message):
     try:
         language = await get_lang(message.chat.id)

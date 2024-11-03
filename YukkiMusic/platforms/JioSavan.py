@@ -6,7 +6,7 @@ import yt_dlp
 from config import seconds_to_time
 
 
-class SaavnAPI:
+class Saavn:
     def __init__(self):
         pass
 
@@ -60,6 +60,31 @@ class SaavnAPI:
             return song_info
 
         return await loop.run_in_executor(None, play_list)
+
+    async def info(self, url):
+        loop = asyncio.get_running_loop()
+        clean_url = self.clean_url(url)
+
+        def get_info():
+            ydl_opts = {
+                "format": "bestaudio/best",
+                "geo_bypass": True,
+                "nocheckcertificate": True,
+                "quiet": True,
+                "no_warnings": True,
+            }
+
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(clean_url, download=False)
+                return {
+                    "title": info["title"],
+                    "duration_sec": info.get("duration", 0),
+                    "duration_min": seconds_to_time(info.get("duration", 0)),
+                    "thumb": info.get("thumbnail", None),
+                    "url": self.clean_url(info["url"]),
+                }
+
+        return await loop.run_in_executor(None, get_info)
 
     async def download(self, url):
         loop = asyncio.get_running_loop()

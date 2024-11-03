@@ -1,0 +1,113 @@
+#
+# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+#
+# This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
+# and is released under the MIT License.
+# Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
+#
+# All rights reserved.
+
+
+# Commands in Arabic Language
+
+# Bot Commands
+
+PING_COMMAND : ["بينج", "بنج"]
+PRIVACY_COMMAND: ["الخصوصية"]
+START_COMMAND : ["تفعيل", "ميوزك"]
+HELP_COMMAND : ["مساعده"]
+SETTINGS_COMMAND : ["اعدادات", "الاعدادت", "اعدادات", "الاعدادات"]
+RELOAD_COMMAND : ["ريلود"]
+GSTATS_COMMAND : ["الاحصائيات", "احصائيات"]
+STATS_COMMAND: ["إحصائيات"]
+LANGUAGE_COMMAND : ["لغه", "اللغه"]
+
+# Play Commands
+PLAY_COMMAND : ["تشغيل", "شغل"]
+PLAYMODE_COMMAND : ["وضع تشغيل", "المصرحين"]
+CHANNELPLAY_COMMAND : ["ربط قناة"]
+STREAM_COMMAND : ["لايف"]
+
+# Playlists Command
+PLAYLIST_COMMAND : ["قائمة التشغيل"]
+PLAY_PLAYLIST_COMMAND : ["شغل قائمتي", "تشغيل قائمة التشغيل", "تشغيل قائمتي", "تشغيل القائمة"]
+DELETE_PLAYLIST_COMMAND : ["حذف قائمة التشغيل"]
+ADD_PLAYLIST_COMMAND : ["اضافة لقائمة التشغيل"]
+
+# Tools
+QUEUE_COMMAND: ["قائمة الانتظار", "قائمة", "تشغيل", "تشغيل الآن", "تشغيل قائمة", "قائمة التشغيل"]
+SONG_COMMAND : ["تنزيل", "بحث", "يوت"]
+LYRICS_COMMAND : ["كلمات"]
+
+# Admin Commands
+AUTH_COMMAND : ["رفع ادمن"]
+UNAUTH_COMMAND : ["تنزيل ادمن"]
+AUTHUSERS_COMMAND : ["الادمنيه"]
+PAUSE_COMMAND : ["وقف"]
+RESUME_COMMAND : ["كمل", "كملي"]
+MUTE_COMMAND : ["اسكت"]
+UNMUTE_COMMAND : ["اتكلم"]
+STOP_COMMAND : ["ايقاف", "انهاء"]
+SKIP_COMMAND : ["تخطي"]
+SHUFFLE_COMMAND : ["خلط"]
+LOOP_COMMAND : ["تكرار"]
+SEEK_COMMAND : ["تقديم"]
+SEEK_BACK_COMMAND : ["ارجع_الى_الخلف", "بحث_الى_الخلف"]
+REBOOT_COMMAND : ["اعاده تشغيل"]
+
+# Sudo Users Commands
+ADDSUDO_COMMAND : ["رفع مطور"]
+DELSUDO_COMMAND : ["تنزيل مطور"]
+SUDOUSERS_COMMAND : ["المطورين"]
+
+# Broadcast
+BROADCAST_COMMAND : ["اذاعة"]
+
+# Blacklist chat
+BLACKLISTCHAT_COMMAND : ["المجموعات المحظورة"]
+WHITELISTCHAT_COMMAND : ["المجموعات المسموحة"]
+BLACKLISTEDCHAT_COMMAND : ["المجموعات المحظورة حاليا"]
+
+# Maintenance
+MAINTENANCE_COMMAND : ["الصيانة"]
+LOGGER_COMMAND : ["السجل"]
+
+# Heroku
+GETLOG_COMMAND : ["سجل"]
+GETVAR_COMMAND : ["جلب فار"]
+DELVAR_COMMAND : ["حذف فار"]
+SETVAR_COMMAND : ["تعيين فار"]
+USAGE_COMMAND : ["الاستخدام"]
+
+
+# Basic Bot Commands
+UPDATE_COMMAND : ["تحديث"]
+RESTART_COMMAND : ["اعاده تشغيل"]
+AUTOEND_COMMAND: ["الإيقاف التلقائي"]
+
+# Private Bot Mode
+AUTHORIZE_COMMAND : ["سماح"]
+UNAUTHORIZE_COMMAND : ["رفض"]
+AUTHORIZED_COMMAND : ["المسوحين"]
+
+# Block Users Command
+BLOCK_COMMAND : ["حظر"]
+UNBLOCK_COMMAND : ["الغاء حظر"]
+BLOCKED_COMMAND : ["المحظورين"]
+
+# Speed Test
+SPEEDTEST_COMMAND : ["السرعة"]
+
+# Video Calls Command
+VIDEOLIMIT_COMMAND: ["تحديد حد الفيديو"]
+VIDEOMODE_COMMAND: ["وضع الفيديو"]
+
+# Voice Chat Commands
+ACTIVEVC_COMMAND : ["المكالمات النشطة"]
+ACTIVEVIDEO_COMMAND : ["مكالمات الفديو النشطة"]
+AC_COMMAND: ["تبريد"]
+
+# Gban Commands
+GBAN_COMMAND : ["حظر عام"]
+UNGBAN_COMMAND : ["الغاء حظر عام"]
+GBANNED_COMMAND : ["المحظورين عام"]

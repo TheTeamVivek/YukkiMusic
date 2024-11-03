@@ -18,8 +18,8 @@ from youtubesearchpython.__future__ import VideosSearch
 import config
 from config import BANNED_USERS, START_IMG_URL
 from config.config import OWNER_ID
-from strings import command, get_command, get_string
-from YukkiMusic import HELPABLE, Telegram, YouTube, app
+from strings import command, get_string
+from YukkiMusic import Platform, app
 from YukkiMusic.misc import SUDOERS, _boot_
 from YukkiMusic.plugins.play.playlist import del_plist_msg
 from YukkiMusic.plugins.sudo.sudoers import sudoers_list
@@ -42,10 +42,8 @@ from .help import paginate_modules
 
 loop = asyncio.get_running_loop()
 
-START_COMMAND = get_command("START_COMMAND")
 
-
-@app.on_message(filters.command(START_COMMAND) & filters.private & ~BANNED_USERS)
+@app.on_message(command("START_COMMAND") & filters.private & ~BANNED_USERS)
 @LanguageStart
 async def start_comm(client, message: Message, _):
     chat_id = message.chat.id
@@ -53,9 +51,8 @@ async def start_comm(client, message: Message, _):
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
         if name[0:4] == "help":
-            keyboard = InlineKeyboardMarkup(
-                paginate_modules(0, HELPABLE, close=True)
-            )
+            keyboard = await paginate_modules(0, chat_id, close=True)
+
             if config.START_IMG_URL:
                 return await message.reply_photo(
                     photo=START_IMG_URL,
@@ -83,7 +80,7 @@ async def start_comm(client, message: Message, _):
                 disable_web_page_preview=True,
             )
         if name[0:3] == "sta":
-            m = await message.reply_text("🔎 ғᴇᴛᴄʜɪɴɢ ʏᴏᴜʀ ᴘᴇʀsᴏɴᴀʟ sᴛᴀᴛs.!")
+            m = await message.reply_text("🔎 Fetching Your personal stats.!")
             stats = await get_userss(message.from_user.id)
             tot = len(stats)
             if not stats:
@@ -118,9 +115,9 @@ async def start_comm(client, message: Message, _):
                     details = stats.get(vidid)
                     title = (details["title"][:35]).title()
                     if vidid == "telegram":
-                        msg += f"🔗[ᴛᴇʟᴇɢʀᴀᴍ ғɪʟᴇs ᴀɴᴅ ᴀᴜᴅɪᴏs]({config.SUPPORT_GROUP}) ** played {count} ᴛɪᴍᴇs**\n\n"
+                        msg += f"🔗[Telegram Files and Audio]({config.SUPPORT_GROUP}) ** played {count} Times**\n\n"
                     else:
-                        msg += f"🔗 [{title}](https://www.youtube.com/watch?v={vidid}) ** played {count} times**\n\n"
+                        msg += f"🔗 [{title}](https://www.youtube.com/watch?v={vidid}) ** played {count} Times**\n\n"
                 msg = _["ustats_2"].format(tot, tota, limit) + msg
                 return videoid, msg
 
@@ -129,7 +126,7 @@ async def start_comm(client, message: Message, _):
             except Exception as e:
                 print(e)
                 return
-            thumbnail = await YouTube.thumbnail(videoid, True)
+            thumbnail = await Platform.youtube.thumbnail(videoid, True)
             await m.delete()
             await message.reply_photo(photo=thumbnail, caption=msg)
             return
@@ -142,7 +139,7 @@ async def start_comm(client, message: Message, _):
                 sender_name = message.from_user.first_name
                 return await app.send_message(
                     config.LOG_GROUP_ID,
-                    f"{message.from_user.mention} ʜᴀs ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <code>sᴜᴅᴏʟɪsᴛ </code>\n\n**ᴜsᴇʀ ɪᴅ :** {sender_id}\n**ᴜsᴇʀ ɴᴀᴍᴇ:** {sender_name}",
+                    f"{message.from_user.mention} Has just started bot to check <code>Sudolist </code>\n\n**User Id:** {sender_id}\n**User Name:** {sender_name}",
                 )
             return
         if name[0:3] == "lyr":
@@ -150,16 +147,16 @@ async def start_comm(client, message: Message, _):
             lyrical = config.lyrical
             lyrics = lyrical.get(query)
             if lyrics:
-                await Telegram.send_split_text(message, lyrics)
+                await Platform.telegram.send_split_text(message, lyrics)
                 return
             else:
-                await message.reply_text("ғᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ʟʏʀɪᴄs.")
+                await message.reply_text("Failed to get lyrics ")
                 return
         if name[0:3] == "del":
             await del_plist_msg(client=client, message=message, _=_)
             await asyncio.sleep(1)
         if name[0:3] == "inf":
-            m = await message.reply_text("🔎 ғᴇᴛᴄʜɪɴɢ ɪɴғᴏ!")
+            m = await message.reply_text("🔎 Fetching info..")
             query = (str(name)).replace("info_", "", 1)
             query = f"https://www.youtube.com/watch?v={query}"
             results = VideosSearch(query, limit=1)
@@ -173,22 +170,22 @@ async def start_comm(client, message: Message, _):
                 link = result["link"]
                 published = result["publishedTime"]
             searched_text = f"""
-🔍__**ᴠɪᴅᴇᴏ ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ**__
+🔍__**Video track information **__
 
-❇️**ᴛɪᴛʟᴇ:** {title}
+❇️**Title:** {title}
 
-⏳**ᴅᴜʀᴀᴛɪᴏɴ:** {duration} Mins
-👀**ᴠɪᴇᴡs:** `{views}`
-⏰**ᴘᴜʙʟɪsʜᴇᴅ ᴛɪᴍᴇ:** {published}
-🎥**ᴄʜᴀɴɴᴇʟ ɴᴀᴍᴇ:** {channel}
-📎**ᴄʜᴀɴɴᴇʟ ʟɪɴᴋ:** [ᴠɪsɪᴛ ғʀᴏᴍ ʜᴇʀᴇ]({channellink})
-🔗**ᴠɪᴅᴇᴏ ʟɪɴᴋ:** [ʟɪɴᴋ]({link})
+⏳**Duration:** {duration} Mins
+👀**Views:** `{views}`
+⏰**Published times:** {published}
+🎥**Channel Name:** {channel}
+📎**Channel Link:** [Visit from here]({channellink})
+🔗**Videp linl:** [Link]({link})
 """
             key = InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton(text="🎥 ᴡᴀᴛᴄʜ ", url=f"{link}"),
-                        InlineKeyboardButton(text="🔄 ᴄʟᴏsᴇ", callback_data="close"),
+                        InlineKeyboardButton(text="🎥 Watch ", url=f"{link}"),
+                        InlineKeyboardButton(text="🔄 Close", callback_data="close"),
                     ],
                 ]
             )
@@ -206,7 +203,7 @@ async def start_comm(client, message: Message, _):
                 sender_name = message.from_user.first_name
                 return await app.send_message(
                     config.LOG_GROUP_ID,
-                    f"{message.from_user.mention} ʜᴀs ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ<code> ᴠɪᴅᴇᴏ ɪɴғᴏʀᴍᴀᴛɪᴏɴ </code>\n\n**ᴜsᴇʀ ɪᴅ:** {sender_id}\n**ᴜsᴇʀ ɴᴀᴍᴇ** {sender_name}",
+                    f"{message.from_user.mention} Has just started bot ot check <code> Video information  </code>\n\n**User Id:** {sender_id}\n**User Name** {sender_name}",
                 )
     else:
         try:
@@ -237,11 +234,11 @@ async def start_comm(client, message: Message, _):
             sender_name = message.from_user.first_name
             return await app.send_message(
                 config.LOG_GROUP_ID,
-                f"{message.from_user.mention} ʜᴀs sᴛᴀʀᴛᴇᴅ ʙᴏᴛ. \n\n**ᴜsᴇʀ ɪᴅ :** {sender_id}\n**ᴜsᴇʀ ɴᴀᴍᴇ:** {sender_name}",
+                f"{message.from_user.mention} Has started bot. \n\n**User id :** {sender_id}\n**User name:** {sender_name}",
             )
 
 
-@app.on_message(filters.command(START_COMMAND) & filters.group & ~BANNED_USERS)
+@app.on_message(command("START_COMMAND") & filters.group & ~BANNED_USERS)
 @LanguageStart
 async def testbot(client, message: Message, _):
     uptime = int(time.time() - _boot_)
@@ -257,7 +254,7 @@ async def welcome(client, message: Message):
     if config.PRIVATE_BOT_MODE == str(True):
         if not await is_served_private_chat(message.chat.id):
             await message.reply_text(
-                "**ᴛʜɪs ʙᴏᴛ's ᴘʀɪᴠᴀᴛᴇ ᴍᴏᴅᴇ ʜᴀs ʙᴇᴇɴ ᴇɴᴀʙʟᴇᴅ ᴏɴʟʏ ᴍʏ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ɪғ ᴡᴀɴᴛ ᴛᴏ ᴜsᴇ ᴛʜɪs ɪɴ ʏᴏᴜʀ ᴄʜᴀᴛ sᴏ sᴀʏ ᴛᴏ ᴍʏ ᴏᴡɴᴇʀ ᴛᴏ ᴀᴜᴛʜᴏʀɪᴢᴇ ʏᴏᴜʀ ᴄʜᴀᴛ."
+                "This Bot's private mode has been enabled only my owner can use this if want to use in your chat so say my Owner to authorize your chat."
             )
             return await app.leave_chat(message.chat.id)
     else:
@@ -300,27 +297,3 @@ async def welcome(client, message: Message):
         except:
 
             return
-
-
-__MODULE__ = "Bot"
-__HELP__ = f"""
-<b>✦ c stands for channel play.</b>
-
-<b>★ {command("STATS_COMMAND")}</b> - Get Top 10 Tracks Global Stats, Top 10 Users of Bot, Top 10 Chats on Bot, Top 10 Played in a chat, etc.
-
-<b>★ {command("SUDOUSERS_COMMAND")}</b> - Check Sudo users of the bot.
-
-<b>★ {command("LYRICS_COMMAND")} [Music Name]</b> - Search lyrics for the particular music on the web.
-
-<b>★ {command("SONG_COMMAND")} [Track Name] or [YT Link]</b> - Download any track from YouTube in MP3 or MP4 formats.
-
-<b>★ {command("QUEUE_COMMAND")}</b> - Check the queue list of music.
-
-    <u><b>⚡️Private Bot:</b></u>
-      
-<b>✧ {command("AUTHORIZE_COMMAND")} [CHAT_ID]</b> - Allow a chat to use your bot.
-
-<b>✧ {command("UNAUTHORIZE_COMMAND")} [CHAT_ID]</b> - Disallow a chat from using your bot.
-
-<b>✧ {command("AUTHORIZED_COMMAND")}</b> - Check all allowed chats of your bot.
-"""

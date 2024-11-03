@@ -27,6 +27,8 @@ logging.getLogger("pyrogram").setLevel(logging.ERROR)
 logging.getLogger("pytgcalls").setLevel(logging.ERROR)
 logging.getLogger("pymongo").setLevel(logging.ERROR)
 logging.getLogger("httpx").setLevel(logging.ERROR)
+logging.getLogger("werkzeug").setLevel(logging.ERROR)
+
 
 # Setting ntgcalls logger level and disabling propagation
 ntgcalls_logger = logging.getLogger("ntgcalls")

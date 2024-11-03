@@ -18,7 +18,7 @@ from pyrogram.types import (
 )
 
 from config import BANNED_USERS, CLEANMODE_DELETE_MINS, OWNER_ID
-from strings import get_command
+from strings import command
 from YukkiMusic import app
 from YukkiMusic.utils.database import (
     add_nonadmin_chat,
@@ -53,11 +53,8 @@ from YukkiMusic.utils.inline.settings import (
 )
 from YukkiMusic.utils.inline.start import private_panel
 
-### Command
-SETTINGS_COMMAND = get_command("SETTINGS_COMMAND")
 
-
-@app.on_message(filters.command(SETTINGS_COMMAND) & filters.group & ~BANNED_USERS)
+@app.on_message(command("SETTINGS_COMMAND") & filters.group & ~BANNED_USERS)
 @language
 async def settings_mar(client, message: Message, _):
     buttons = setting_markup(_)

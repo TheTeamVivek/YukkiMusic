@@ -101,7 +101,8 @@ async def add_served_user(user_id: int):
 
 
 async def delete_served_user(user_id: int):
-    await usersdb.delete_one({"user_id": user_id})
+    if not await is_served_user(user_id):
+        await usersdb.delete_one({"user_id": user_id})
 
 
 # Served Chats
@@ -381,6 +382,11 @@ async def get_userss(chat_id: int) -> Dict[str, int]:
     if not ids:
         return {}
     return ids["vidid"]
+
+
+async def delete_userss(chat_id: int) -> bool:
+    result = await userdb.delete_one({"chat_id": chat_id})
+    return result.deleted_count > 0
 
 
 async def get_user_top(chat_id: int, name: str) -> Union[bool, dict]:

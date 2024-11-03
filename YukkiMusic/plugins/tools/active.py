@@ -7,11 +7,10 @@
 #
 # All rights reserved.
 #
-from pyrogram import filters
 from pyrogram.errors import ChannelInvalid
 from pyrogram.types import Message
 
-from strings import command, get_command
+from strings import command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils.database.memorydatabase import (
@@ -21,11 +20,6 @@ from YukkiMusic.utils.database.memorydatabase import (
     remove_active_video_chat,
 )
 
-# Commands
-ACTIVEVC_COMMAND = get_command("ACTIVEVC_COMMAND")
-ACTIVEVIDEO_COMMAND = get_command("ACTIVEVIDEO_COMMAND")
-AC_COMMAND = get_command("AC_COMMAND")
-
 
 # Function for removing the Active voice and video chat also clear the db dictionary for the chat
 async def _clear_(chat_id):
@@ -34,7 +28,7 @@ async def _clear_(chat_id):
     await remove_active_chat(chat_id)
 
 
-@app.on_message(filters.command(ACTIVEVC_COMMAND) & SUDOERS)
+@app.on_message(command("ACTIVEVC_COMMAND") & SUDOERS)
 async def activevc(_, message: Message):
     mystic = await message.reply_text("Getting Active Voicechats....\nPlease hold on")
     served_chats = await get_active_chats()
@@ -61,7 +55,7 @@ async def activevc(_, message: Message):
         )
 
 
-@app.on_message(filters.command(ACTIVEVIDEO_COMMAND) & SUDOERS)
+@app.on_message(command("ACTIVEVIDEO_COMMAND") & SUDOERS)
 async def activevi_(_, message: Message):
     mystic = await message.reply_text("Getting Active Voicechats....\nPlease hold on")
     served_chats = await get_active_video_chats()
@@ -88,19 +82,7 @@ async def activevi_(_, message: Message):
         )
 
 
-@app.on_message(filters.command(AC_COMMAND) & SUDOERS)
+@app.on_message(command("AC_COMMAND") & SUDOERS)
 async def vc(client, message: Message):
     ac_audio = str(len(await get_active_chats()))
     await message.reply_text(f"Active Chats info: {ac_audio}")
-
-
-__MODULE__ = "Active"
-__HELP__ = f"""
-<b>✧ {command("AC_COMMAND")}</b> - Check active voice chats on the bot.
-
-<b>✧ {command("ACTIVEVC_COMMAND")}</b> - Check active voice and video calls on the bot.
-
-<b>✧ {command("ACTIVEVIDEO_COMMAND")}</b> - Check active video calls on the bot.
-
-<b>✧ {command("STATS_COMMAND")}</b> - Check bot stats.
-"""
