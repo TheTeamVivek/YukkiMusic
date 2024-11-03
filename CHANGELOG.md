@@ -6,7 +6,7 @@ All notable changes to YukkiMusic will be documented in this file.
 
 ### Added
 - Added Multiple Languages Support for commands
-- Multiple languag suport for bot Helpmenu [ Only for primary plugins Not for External Plugins ]
+- Multiple language support for bot Help Menu [ Only for primary plugins Not for External Plugins ]
 - All can be used without prefix [ Except English commands ]
 - User can Request her data and can Delete [ Except: Chat, Banned Users, Blacklist Chats]
 - PRIVACY.md For YukkiMusic
