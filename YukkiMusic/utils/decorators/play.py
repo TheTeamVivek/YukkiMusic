@@ -135,9 +135,11 @@ def PlayWrapper(command):
             # Getting all members id that in voicechat
             call_participants_id = [
                 member.chat.id async for member in userbot.get_call_members(chat_id)
+                if member.chat
             ]
             # Checking if assistant id not in list so clear queues and remove active voice chat and process
-            if userbot.id not in call_participants_id:
+
+            if (not call_participants_id or userbot.id not in call_participants_id):
                 await Yukki.stop_stream(chat_id)
 
         return await command(

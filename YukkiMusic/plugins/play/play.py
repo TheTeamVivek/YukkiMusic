@@ -288,7 +288,7 @@ async def play_commnd(
                     file_path, details = await Platform.saavn.download(url)
                 except Exception as e:
                     ex_type = type(e).__name__
-                    LOGGER(__name__).error(f"{ex_type} {e}")
+                    LOGGER(__name__).error("An error occurred", exc_info=True)
                     return await mystic.edit_text(_["play_3"])
                 duration_sec = details["duration_sec"]
                 streamtype = "saavn_track"
@@ -308,7 +308,7 @@ async def play_commnd(
                     streamtype = "saavn_playlist"
                 except Exception as e:
                     ex_type = type(e).__name__
-                    LOGGER(__name__).error(f"{ex_type} {e}")
+                    LOGGER(__name__).error("An error occurred", exc_info=True)
                     return await mystic.edit_text(_["play_3"])
 
                 if len(details) == 0:

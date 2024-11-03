@@ -187,7 +187,7 @@ class Telegram:
                 await mystic.edit_text(
                     "Sucessfully Downloaded\n Processing File Now..."
                 )
-                downloader.pop(message.id)
+                downloader.pop(message.id, None)
             except:
                 await mystic.edit_text(_["tg_2"])
 

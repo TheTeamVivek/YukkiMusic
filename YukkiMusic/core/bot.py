@@ -20,6 +20,7 @@ from pyrogram.errors import (
     ChatSendPhotosForbidden,
     ChatWriteForbidden,
     FloodWait,
+    MessageIdInvalid,
 )
 from pyrogram.types import (
     BotCommand,
@@ -42,6 +43,9 @@ class YukkiBot(Client):
             api_hash=config.API_HASH,
             bot_token=config.BOT_TOKEN,
             in_memory=True,
+            sleep_threshold=240,
+            max_concurrent_transmissions=5,
+            workers=50,
         )
 
     async def edit_message_text(self, *args, **kwargs):
@@ -52,6 +56,8 @@ class YukkiBot(Client):
             await asyncio.sleep(time)
             if time < 25:
                 return await self.edit_message_text(self, *args, **kwargs)
+        except MessageIdInvalid:
+            pass
 
     async def send_message(self, *args, **kwargs):
         if kwargs.get("send_direct", False):
