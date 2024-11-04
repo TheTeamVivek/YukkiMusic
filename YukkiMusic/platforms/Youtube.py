@@ -221,6 +221,8 @@ class YouTube:
             link = self.base + link
         if "&" in link:
             link = link.split("&")[0]
+        if (link.startswith("http://") or link.startswith("https://")):
+            return await self._track(link)
         try:
             results = VideosSearch(link, limit=1)
             for result in (await results.next())["result"]:
@@ -254,7 +256,7 @@ class YouTube:
                 "title": details["title"],
                 "link": details["url"],
                 "vidid": details["id"],
-                "duration_min": seconds_to_min(details["duration"]),
+                "duration_min": seconds_to_min(details["duration"]) if details["duration"] != 0 else None,
                 "thumb": details["thumbnails"][0]["url"],
             }
             return info, details["id"]
