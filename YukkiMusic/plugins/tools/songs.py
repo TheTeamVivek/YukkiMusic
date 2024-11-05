@@ -25,7 +25,7 @@ from pyrogram.types import (
 from config import BANNED_USERS, SONG_DOWNLOAD_DURATION, SONG_DOWNLOAD_DURATION_LIMIT
 from strings import command
 from YukkiMusic import Platform, app
-from YukkiMusic.platforms.Youtube import get_ytdl_options
+from YukkiMusic.platforms.Youtube import cookies
 from YukkiMusic.utils.decorators.language import language, languageCB
 from YukkiMusic.utils.formatters import convert_bytes
 from YukkiMusic.utils.inline.song import song_markup
@@ -245,7 +245,7 @@ async def song_helper_cb(client, CallbackQuery, _):
 
         keyboard = InlineKeyboard()
 
-        # AVC Formats Only [ Alexa MUSIC BOT ]
+        # AVC Formats Only
 
         done = [160, 133, 134, 135, 136, 137, 298, 299, 264, 304, 266]
 
@@ -310,7 +310,7 @@ async def song_download_cb(client, CallbackQuery, _):
 
     yturl = f"https://www.youtube.com/watch?v={vidid}"
 
-    with yt_dlp.YoutubeDL(get_ytdl_options({"quiet": True})) as ytdl:
+    with yt_dlp.YoutubeDL({"quiet": True, "cookiefile": f"{cookies()}"}) as ytdl:
 
         x = ytdl.extract_info(yturl, download=False)
 

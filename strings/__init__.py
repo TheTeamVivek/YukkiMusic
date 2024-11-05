@@ -16,9 +16,12 @@ from typing import Dict, List, Union
 from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram import Client
+from pyrogram.enums import ChatType
+
+from YukkiMusic.misc import SUDOERS
 
 
-from YukkiMusic.utils.database import get_lang
+from YukkiMusic.utils.database import get_lang, is_maintenance
 
 languages = {}
 commands = {}
@@ -107,6 +110,19 @@ def command(
 ):
     async def func(flt, client: Client, message: Message):
         lang_code = await get_lang(message.chat.id)
+        try:
+            _ = get_string(lang_code)
+        except:
+            _ = get_string("en")
+
+        if not await is_maintenance():
+            if (
+                message.from_user and message.from_user.id not in SUDOERS
+            ) or not message.from_user:
+                if message.chat.type == ChatType.PRIVATE:
+                    await message.reply_text(_["maint_4"])
+                    return False
+                return False
 
         if isinstance(commands, str):
             commands_list = [commands]

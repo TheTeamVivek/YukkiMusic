@@ -80,7 +80,7 @@ async def markup_panel(client, CallbackQuery: CallbackQuery, _):
 
 @app.on_callback_query(filters.regex("MainMarkup") & ~BANNED_USERS)
 @languageCB
-async def del_back_playlist(client, CallbackQuery, _):
+async def main_markup_(client, CallbackQuery, _):
     await CallbackQuery.answer()
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
@@ -103,7 +103,7 @@ async def del_back_playlist(client, CallbackQuery, _):
 
 @app.on_callback_query(filters.regex("Pages") & ~BANNED_USERS)
 @languageCB
-async def del_back_playlist(client, CallbackQuery, _):
+async def pages_markup(client, CallbackQuery, _):
     await CallbackQuery.answer()
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
@@ -134,7 +134,7 @@ async def del_back_playlist(client, CallbackQuery, _):
 
 @app.on_callback_query(filters.regex("ADMIN") & ~BANNED_USERS)
 @languageCB
-async def del_back_playlist(client, CallbackQuery, _):
+async def admin_callback(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
     command, chat = callback_request.split("|")
@@ -223,37 +223,33 @@ async def del_back_playlist(client, CallbackQuery, _):
         await CallbackQuery.message.reply_text(
             _["admin_23"].format(mention), disable_web_page_preview=True
         )
-
-    elif command == "Skip":
+    elif command in ["Skip", "Replay"]:
         check = db.get(chat_id)
-        txt = f"» Track skipped by {mention} !"
-        popped = None
-        try:
-            popped = check.pop(0)
-            if popped:
-                await auto_clean(popped)
-            if not check:
-                await CallbackQuery.edit_message_text(
-                    f"» Track skipped by  {mention} !"
-                )
-                await CallbackQuery.message.reply_text(
-                    _["admin_10"].format(mention), disable_web_page_preview=True
-                )
-                try:
-                    return await Yukki.stop_stream(chat_id)
-                except:
-                    return
-        except:
+        txt = f"» Track {command.lower()}ed by {mention} !"
+
+        if command == "Skip":
             try:
-                await CallbackQuery.edit_message_text(
-                    f"» Track skipped by  {mention} !"
-                )
+                popped = check.pop(0)
+                if popped:
+                    await auto_clean(popped)
+                if not check:
+                    await CallbackQuery.edit_message_text(txt)
+                    await CallbackQuery.message.reply_text(
+                        _["admin_10"].format(mention), disable_web_page_preview=True
+                    )
+                    try:
+                        return await Yukki.stop_stream(chat_id)
+                    except Exception:
+                        return
+            except Exception:
+                await CallbackQuery.edit_message_text(txt)
                 await CallbackQuery.message.reply_text(
                     _["admin_10"].format(mention), disable_web_page_preview=True
                 )
                 return await Yukki.stop_stream(chat_id)
-            except:
-                return
+        elif command == "Replay":
+            db[chat_id][0]["played"] = 0
+
         await CallbackQuery.answer()
         queued = check[0]["file"]
         title = (check[0]["title"]).title()
@@ -533,7 +529,7 @@ async def anonymous_check(client, CallbackQuery):
 
 @app.on_callback_query(filters.regex("YukkiPlaylists") & ~BANNED_USERS)
 @languageCB
-async def play_playlists_command(client, CallbackQuery, _):
+async def play_playlists_cb(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
     (

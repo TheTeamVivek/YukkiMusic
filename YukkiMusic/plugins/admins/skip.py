@@ -215,7 +215,7 @@ async def skip(cli, message: Message, _, chat_id):
             url = check[0]["url"]
             details = await Platform.saavn.info(url)
             run = await message.reply_photo(
-                photo=details["thumb"],
+                photo=details["thumb"] or config.TELEGRAM_AUDIO_URL,
                 caption=_["stream_1"].format(title, url, check[0]["dur"], user),
                 reply_markup=InlineKeyboardMarkup(button),
             )

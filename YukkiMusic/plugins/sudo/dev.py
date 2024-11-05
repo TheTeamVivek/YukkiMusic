@@ -27,7 +27,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 
-## -------- end of required imports to run this script 
+## -------- end of required imports to run this script
 
 ## ------ Below are some optional Imports you can remove it if is imported  you don't need to import it when using eval command
 
@@ -37,7 +37,7 @@ from pyrogram.raw.types import *
 from YukkiMusic import userbot
 from YukkiMusic.core.call import Yukki
 
-## end 
+## end
 
 
 async def aexec(code, client, message):

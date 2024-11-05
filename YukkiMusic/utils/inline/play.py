@@ -265,6 +265,11 @@ def panel_markup_1(_, videoid, chat_id):
         ],
         [
             InlineKeyboardButton(
+                text="🔁 Replay ", callback_data=f"ADMIN Replay|{chat_id}"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
                 text="◀️",
                 callback_data=f"Pages Back|0|{videoid}|{chat_id}",
             ),

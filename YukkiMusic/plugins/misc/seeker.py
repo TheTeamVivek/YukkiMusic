@@ -61,7 +61,9 @@ async def leave_if_muted():
                     userbot = await get_assistant(chat_id)
                     members = []
                     try:
-                        async for member in userbot.get_call_members(chat_id):
+                        async for member in userbot.load_group_call_participants(
+                            chat_id
+                        ):
                             if member is None:
                                 continue
                             members.append(member)
@@ -72,10 +74,12 @@ async def leave_if_muted():
                             pass
                         continue
 
-                    m = next((m for m in members if m.chat.id == userbot.id), None)
+                    m = next(
+                        (m for m in members if m.participant.id == userbot.id), None
+                    )
                     if m is None:
                         continue
-                    is_muted = bool(m.is_muted and not m.can_self_unmute)
+                    is_muted = bool(m.is_muted_for_all_users and not m.can_unmute_self)
 
                     if is_muted:
                         await Yukki.stop_stream(chat_id)
@@ -111,7 +115,7 @@ async def markup_timer():
                 userbot = await get_assistant(chat_id)
                 members = []
                 try:
-                    async for member in userbot.get_call_members(chat_id):
+                    async for member in userbot.load_group_call_participants(chat_id):
                         if member is None:
                             continue
                         members.append(member)
@@ -130,11 +134,11 @@ async def markup_timer():
                 if len(members) <= 1 and chat_id not in autoend:
                     autoend[chat_id] = datetime.now() + timedelta(seconds=30)
 
-                m = next((m for m in members if m.chat.id == userbot.id), None)
+                m = next((m for m in members if m.participant.id == userbot.id), None)
                 if m is None:
                     continue
 
-                is_muted = bool(m.is_muted and not m.can_self_unmute)
+                is_muted = bool(m.is_muted_for_all_users and not m.can_unmute_self)
                 if is_muted:
 
                     if chat_id not in muted:
