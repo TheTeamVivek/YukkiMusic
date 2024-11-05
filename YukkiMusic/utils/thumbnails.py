@@ -11,7 +11,6 @@
 from youtubesearchpython.__future__ import VideosSearch
 
 
-
 async def gen_thumb(videoid):
     try:
         query = f"https://www.youtube.com/watch?v={videoid}"

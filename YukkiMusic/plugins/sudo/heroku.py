@@ -54,30 +54,36 @@ async def paste_neko(code: str):
 @app.on_message(command("GETLOG_COMMAND") & SUDOERS)
 @language
 async def log_(client, message, _):
+    async def _get_log():
+        log = open(config.LOG_FILE_NAME)
+        lines = log.readlines()
+        log.close()
+        data = ""
+        try:
+            NUMB = int(message.text.split(None, 1)[1])
+        except:
+            NUMB = 100
+        for x in lines[-NUMB:]:
+            data += x
+        link = await Yukkibin(data)
+        return link
+
     try:
         if await is_heroku():
             if HAPP is None:
+                if os.path.exists(config.LOG_FILE_NAME):
+                    return await message.reply_text(await _get_log())
                 return await message.reply_text(_["heroku_1"])
             data = HAPP.get_log()
             link = await Yukkibin(data)
             return await message.reply_text(link)
         else:
             if os.path.exists(config.LOG_FILE_NAME):
-                log = open(config.LOG_FILE_NAME)
-                lines = log.readlines()
-                data = ""
-                try:
-                    NUMB = int(message.text.split(None, 1)[1])
-                except:
-                    NUMB = 100
-                for x in lines[-NUMB:]:
-                    data += x
-                link = await paste_neko(data)
+                link = await _get_log()
                 return await message.reply_text(link)
             else:
                 return await message.reply_text(_["heroku_2"])
-    except Exception as e:
-        print(e)
+    except Exception:
         await message.reply_text(_["heroku_2"])
 
 
