@@ -23,7 +23,7 @@ LANGUAGE_COMMAND : ["زمان", "زمانەکان"]
 
 # Play Commands
 PLAY_COMMAND : ["پەخشکردنی", "لێدانی", "پلەی", "کارکردنی", "پەخشکردن"]
-PLAYMODE_COMMAND : ["دۆخی لێدان", "دۆخی کارکردن"]
+PLAYMODE_COMMAND : ["دۆخی لێدان", "دۆخی کارکردن", "دۆخی پەخشکردن"]
 CHANNELPLAY_COMMAND : ["گرێدانی کەناڵ"]
 STREAM_COMMAND : ["تەوژم", "لایڤ"]
 
