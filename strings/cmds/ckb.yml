@@ -1,0 +1,116 @@
+#
+# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+#
+# This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
+# and is released under the MIT License.
+# Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
+#
+# All rights reserved.
+
+
+# Commands in kurdish Language
+
+# Bot Commands
+PING_COMMAND : ["پینگ"]
+PRIVACY_COMMAND : ["تایبەتمەندییەتی"]
+START_COMMAND : ["دەستپێکردن", "چالاککردن"]
+HELP_COMMAND : ["یارمەتی", "فەرمانەکان"]
+SETTINGS_COMMAND : ["ڕێکخستنەکان", "ڕێکخستن"]
+RELOAD_COMMAND : ["نوێکردنەوەی ئەدمین", "ڕیلۆد"]
+GSTATS_COMMAND : ["ئاماری گشتی", "ئامارەکان"]
+STATS_COMMAND : ["ئامار"]
+LANGUAGE_COMMAND : ["زمان", "زمانەکان"]
+
+# Play Commands
+PLAY_COMMAND : ["پەخشکردنی", "لێدانی", "پلەی", "کارکردنی", "پەخشکردن"]
+PLAYMODE_COMMAND : ["دۆخی لێدان", "دۆخی کارکردن", "دۆخی پەخشکردن"]
+CHANNELPLAY_COMMAND : ["گرێدانی کەناڵ"]
+STREAM_COMMAND : ["تەوژم", "لایڤ"]
+
+#Playlists Command
+PLAYLIST_COMMAND : ["لیستی پەخشکردن", "لیستی گۆرانی"]
+PLAY_PLAYLIST_COMMAND : ["لێدانی لیست", "لێدانی لیستەکەم", "لێدانی لیستی گۆرانی", "پلەی لیستی گۆرانی", "پەخشکردنی لیستی پەخشکردن"]
+DELETE_PLAYLIST_COMMAND : ["سرینەوەی لیستی پەخشکردن", "سڕینەوەی لیستی پەخشکردن"]
+ADD_PLAYLIST_COMMAND : ["زیادکردنی لیستی گۆرانی", "زیادکردنی لیستی پەخشکردن"]
+
+
+# Tools
+QUEUE_COMMAND : ["ڕیزکراو" ,"لێدراو" ,"لیستی چاوەڕوانی", "لێدراوەکان", "پەخشکراو"]
+SONG_COMMAND : ["گۆرانی", "ڤیدیۆ", "داگرتن"]
+LYRICS_COMMAND : ["ژێرنووس"]
+
+
+# Admin Commands
+AUTH_COMMAND : ["زیادکردنی ئەدمین"]
+UNAUTH_COMMAND : ["لادانی ئەدمین"]
+AUTHUSERS_COMMAND : ["ئەدمینەکان"]
+PAUSE_COMMAND : ["وەستانی کاتی", "وسبە"]
+RESUME_COMMAND : ["دەستپێکردنەوە"]
+MUTE_COMMAND : ["بێدەنگکردن"]
+UNMUTE_COMMAND : ["لادانی بێدەنگی"]
+STOP_COMMAND : ["وەستان", "ڕاگرتن"]
+SKIP_COMMAND : ["دواتر", "تێپەڕاندن", "سکیپ"]
+SHUFFLE_COMMAND : ["تیکەڵکردن"]
+LOOP_COMMAND : ["دووبارەکردنەوە"]
+SEEK_COMMAND : ["گەڕان"]
+SEEK_BACK_COMMAND : ["گەڕانەوە"]
+REBOOT_COMMAND : ["ڕێستارت"]
+
+# Sudo Users Commaands
+
+# Sudo Command
+ADDSUDO_COMMAND : ["زیادکردنی گەشەپێدەر"]
+DELSUDO_COMMAND : ["لادانی گەشەپێدەر"]
+SUDOUSERS_COMMAND : ["گەشەپێدەرەکان"]
+
+#Broadcast 
+BROADCAST_COMMAND : ["ناردن", "ڕێکلام", "پەخش", "ناردنی"]
+
+#Blacklist chat
+BLACKLISTCHAT_COMMAND : ["بلۆککردنی گرووپ"]
+WHITELISTCHAT_COMMAND : ["لادانی بلۆکی گرووپ"]
+BLACKLISTEDCHAT_COMMAND : ["گرووپە بلۆککراوەکان"]
+
+# Video Calls Command
+VIDEOLIMIT_COMMAND : ["دانانی سنووری ڤیدیۆ"]
+VIDEOMODE_COMMAND : ["دۆخی ڤیدیۆ"]
+
+#Mantenance
+MAINTENANCE_COMMAND : ["چاککردنەوە"]
+LOGGER_COMMAND : ["تۆمارکردن"]
+
+#Heroku
+GETLOG_COMMAND : ["لۆگ", "لۆگەکان", "هێنانی لۆگ"]
+GETVAR_COMMAND : ["ڤارەکان", "هێنانی ڤار"]
+DELVAR_COMMAND : ["سرینەوەی ڤار", "سڕینەوەی ڤار"]
+SETVAR_COMMAND : ["دانانی_ڤار", "دانانی ڤار"]
+USAGE_COMMAND : ["بەکارهێنان"]
+
+
+#Basic Bot Commands
+UPDATE_COMMAND : ["نوێکردنەوە", "up"]
+RESTART_COMMAND : ["دووبارە دەستپێکردنەوە"]
+AUTOEND_COMMAND : ["وەستانی خۆکار"]
+
+#Private Bot Mode
+AUTHORIZE_COMMAND : ["ڕێگەپێدان"]
+UNAUTHORIZE_COMMAND : ["لادانی ڕێگەپێدان"]
+AUTHORIZED_COMMAND : ["ڕێگەپێدراوەکان"]
+
+#Block Users Command
+BLOCK_COMMAND : ["بلۆک", "بلۆککردن"]
+UNBLOCK_COMMAND : ["لادانی بلۆک"]
+BLOCKED_COMMAND : ["بلۆککراوەکان"]
+
+#sPEEDTEST
+SPEEDTEST_COMMAND : ["پشکنینی خێرای", "پشکنینی خێرایی"]
+
+#Voice chat commands
+ACTIVEVC_COMMAND : ["پەیوەندی چالاک","پەیوەندی دەنگی چالاک"]
+ACTIVEVIDEO_COMMAND : ["پەیوەندی ڤ چالاک","پەیوەندی ڤیدیۆی چالاک"]
+AC_COMMAND: ["پەیوەندییە چالاکەکان"]
+
+#Gban Commands
+GBAN_COMMAND : ["دەرکردنی گشتی"]
+UNGBAN_COMMAND : ["لادانی دەرکردنی گشتی"]
+GBANNED_COMMAND : ["دەرکراوەکان"]
