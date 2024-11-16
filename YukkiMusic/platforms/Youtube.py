@@ -318,13 +318,6 @@ class YouTube:
                 "no_warnings": True,
                 "cookiefile": f"{cookies()}",
                 "prefer_ffmpeg": True,
-                "postprocessors": [
-                    {
-                        "key": "FFmpegExtractAudio",
-                        "preferredcodec": "mp3",
-                        "preferredquality": "192",
-                    }
-                ],
             }
 
             x = YoutubeDL(ydl_optssx)
@@ -344,6 +337,7 @@ class YouTube:
                 "nocheckcertificate": True,
                 "quiet": True,
                 "no_warnings": True,
+                "prefer_ffmpeg": True,
                 "cookiefile": f"{cookies()}",
             }
 
