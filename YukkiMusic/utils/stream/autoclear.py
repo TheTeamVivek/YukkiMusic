@@ -10,10 +10,12 @@
 
 import os
 from config import autoclean
+from YukkiMusic.utils.decorators import asyncify
 
 
-async def auto_clean(popped):
-    async def _auto_clean(popped_item):
+@asyncify
+def auto_clean(popped):
+    def _auto_clean(popped_item):
         try:
             rem = popped_item["file"]
             autoclean.remove(rem)
@@ -28,9 +30,9 @@ async def auto_clean(popped):
             pass
 
     if isinstance(popped, dict):
-        await _auto_clean(popped)
+        _auto_clean(popped)
     elif isinstance(popped, list):
         for pop in popped:
-            await _auto_clean(pop)
+            _auto_clean(pop)
     else:
         raise ValueError("Expected popped to be a dict or list.")
