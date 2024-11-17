@@ -191,7 +191,7 @@ class YukkiBot(Client):
                     ),
                 )
                 await self.set_bot_commands(
-                    owner_commands, scope=BotCommandScopeChat(chat_id=owner_id)
+                    private_commands + owner_commands, scope=BotCommandScopeChat(chat_id=owner_id)
                 )
             except Exception as e:
                 LOGGER(__name__).warning(
