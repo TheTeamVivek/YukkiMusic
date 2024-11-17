@@ -22,5 +22,6 @@ flask
 gunicorn
 youtube-search-python
 yt-dlp
+git+https://github.com/KurimuzonAkuma/pyrogram
 git+https://github.com/Vivekkumar-IN/pykeyboard
 git+https://github.com/TelegramPlayGround/pyrogram-tgcrypto
