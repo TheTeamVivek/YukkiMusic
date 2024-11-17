@@ -205,7 +205,7 @@ async def helper_private(
     if is_callback:
         try:
             await update.answer()
-        except:
+        except Exception:
             pass
         chat_id = update.message.chat.id
         language = await get_lang(chat_id)
@@ -217,7 +217,7 @@ async def helper_private(
         if await is_commanddelete_on(update.chat.id):
             try:
                 await update.delete()
-            except:
+            except Exception:
                 pass
         language = await get_lang(chat_id)
         _ = get_string(language)
@@ -254,7 +254,7 @@ async def help_button(client, query):
         _ = get_string(language)
         helpers_dict = helpers.get(language, helpers.get("en"))
 
-    except:
+    except Exception:
         _ = get_string("en")
         helpers_dict = helpers.get("en", {})
 

@@ -51,7 +51,7 @@ async def edit_or_reply(mystic, text):
         return await mystic.edit_text(text, disable_web_page_preview=True)
     try:
         await mystic.delete()
-    except:
+    except Exception:
         pass
     return await app.send_message(mystic.chat.id, disable_web_page_preview=True)
 
@@ -95,7 +95,7 @@ async def export_database(client, message):
             )
         try:
             os.remove(file_path)
-        except:
+        except Exception:
             pass
 
     db = _mongo_async_[DB_NAME]

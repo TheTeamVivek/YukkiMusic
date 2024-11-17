@@ -116,7 +116,7 @@ async def song_commad_private(client, message: Message, _):
             vidid,
         ) = await Platform.youtube.details(query)
 
-    except:
+    except Exception:
 
         return await mystic.edit_text(_["play_3"])
 
@@ -172,7 +172,7 @@ async def song_helper_cb(client, CallbackQuery, _):
 
         await CallbackQuery.answer(_["song_6"], show_alert=True)
 
-    except:
+    except Exception:
 
         pass
 
@@ -182,7 +182,7 @@ async def song_helper_cb(client, CallbackQuery, _):
 
             formats_available, link = await Platform.youtube.formats(vidid, True)
 
-        except:
+        except Exception:
 
             return await CallbackQuery.edit_message_text(_["song_7"])
 
@@ -296,7 +296,7 @@ async def song_download_cb(client, CallbackQuery, _):
 
         await CallbackQuery.answer("ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...")
 
-    except:
+    except Exception:
 
         pass
 

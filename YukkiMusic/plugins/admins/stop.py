@@ -46,12 +46,12 @@ async def stop_music(cli, message: Message):
     if await is_commanddelete_on(message.chat.id):
         try:
             await message.delete()
-        except:
+        except Exception:
             pass
     try:
         language = await get_lang(message.chat.id)
         _ = get_string(language)
-    except:
+    except Exception:
         _ = get_string("en")
 
     if message.sender_chat:
@@ -73,7 +73,7 @@ async def stop_music(cli, message: Message):
             return await message.reply_text(_["setting_12"])
         try:
             await app.get_chat(chat_id)
-        except:
+        except Exception:
             return await message.reply_text(_["cplay_4"])
     else:
         chat_id = message.chat.id

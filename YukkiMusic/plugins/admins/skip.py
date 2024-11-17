@@ -50,7 +50,7 @@ async def skip(cli, message: Message, _, chat_id):
                                         await popped.get("mystic").delete()
                                     except Exception:
                                         pass
-                            except:
+                            except Exception:
                                 return await message.reply_text(_["admin_16"])
                             if popped:
                                 await auto_clean(popped)
@@ -63,7 +63,7 @@ async def skip(cli, message: Message, _, chat_id):
                                         disable_web_page_preview=True,
                                     )
                                     await Yukki.stop_stream(chat_id)
-                                except:
+                                except Exception:
                                     return
                                 break
                     else:
@@ -93,16 +93,16 @@ async def skip(cli, message: Message, _, chat_id):
                 )
                 try:
                     return await Yukki.stop_stream(chat_id)
-                except:
+                except Exception:
                     return
-        except:
+        except Exception:
             try:
                 await message.reply_text(
                     _["admin_10"].format(message.from_user.first_name),
                     disable_web_page_preview=True,
                 )
                 return await Yukki.stop_stream(chat_id)
-            except:
+            except Exception:
                 return
     queued = check[0]["file"]
     title = (check[0]["title"]).title()
@@ -141,7 +141,7 @@ async def skip(cli, message: Message, _, chat_id):
                 videoid=True,
                 video=status,
             )
-        except:
+        except Exception:
             return await mystic.edit_text(_["call_7"])
         try:
             await Yukki.skip_stream(chat_id, file_path, video=status)

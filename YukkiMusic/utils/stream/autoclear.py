@@ -24,9 +24,9 @@ def auto_clean(popped):
                 if "vid_" not in rem and "live_" not in rem and "index_" not in rem:
                     try:
                         os.remove(rem)
-                    except:
+                    except Exception:
                         pass
-        except:
+        except Exception:
             pass
 
     if isinstance(popped, dict):

@@ -153,12 +153,12 @@ async def forceclose_command(_, CallbackQuery):
             return await CallbackQuery.answer(
                 "This is not for you stay away from here", show_alert=True
             )
-        except:
+        except Exception:
             return
     await CallbackQuery.message.delete()
     try:
         await CallbackQuery.answer()
-    except:
+    except Exception:
         return
 
 

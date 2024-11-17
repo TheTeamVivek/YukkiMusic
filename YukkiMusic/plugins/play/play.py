@@ -124,7 +124,7 @@ async def play_commnd(
                     return await mystic.edit_text(
                         _["play_8"].format(f"{' | '.join(formats)}")
                     )
-            except:
+            except Exception:
                 return await mystic.edit_text(
                     _["play_8"].format(f"{' | '.join(formats)}")
                 )

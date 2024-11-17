@@ -54,14 +54,14 @@ class Telegram:
             file_name = file.file_name
             if file_name is None:
                 file_name = "Telagram audio file" if audio else "Telagram video file"
-        except:
+        except Exception:
             file_name = "Telagram audio file" if audio else "Telagram video file"
         return file_name
 
     async def get_duration(self, file):
         try:
             dur = seconds_to_min(file.duration)
-        except:
+        except Exception:
             dur = "Unknown"
         return dur
 
@@ -81,7 +81,7 @@ class Telegram:
                         else "ogg"
                     )
                 )
-            except:
+            except Exception:
                 file_name = audio.file_unique_id + "." + ".ogg"
             file_name = os.path.join(os.path.realpath("downloads"), file_name)
         if video:
@@ -89,7 +89,7 @@ class Telegram:
                 file_name = (
                     video.file_unique_id + "." + (video.file_name.split(".")[-1])
                 )
-            except:
+            except Exception:
                 file_name = video.file_unique_id + "." + "mp4"
             file_name = os.path.join(os.path.realpath("downloads"), file_name)
         return file_name
@@ -169,7 +169,7 @@ class Telegram:
 **Elapsed Time:** {eta}"""
                     try:
                         await mystic.edit_text(text, reply_markup=upl)
-                    except:
+                    except Exception:
                         pass
                     left_time[message.id] = datetime.now() + timedelta(
                         seconds=self.sleep
@@ -188,7 +188,7 @@ class Telegram:
                     "Sucessfully Downloaded\n Processing File Now..."
                 )
                 downloader.pop(message.id, None)
-            except:
+            except Exception:
                 await mystic.edit_text(_["tg_2"])
 
         if len(downloader) > 10:
@@ -198,7 +198,7 @@ class Telegram:
             try:
                 low = min(timers)
                 eta = get_readable_time(low)
-            except:
+            except Exception:
                 eta = "Unknown"
             await mystic.edit_text(_["tg_1"].format(eta))
             return False

@@ -112,7 +112,7 @@ def command(
         lang_code = await get_lang(message.chat.id)
         try:
             _ = get_string(lang_code)
-        except:
+        except Exception:
             _ = get_string("en")
 
         if not await is_maintenance():

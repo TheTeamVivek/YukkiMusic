@@ -27,7 +27,7 @@ async def inline_query_handler(client, query):
     if text.strip() == "":
         try:
             await client.answer_inline_query(query.id, results=answer, cache_time=10)
-        except:
+        except Exception:
             return
     else:
         a = VideosSearch(text, limit=20)
@@ -76,5 +76,5 @@ __ʀᴇᴘʟʏ ᴡɪᴛʜ /play ᴏɴ ᴛʜɪs sᴇᴀʀᴄʜᴇᴅ ᴍᴇssᴀ�
             )
         try:
             return await client.answer_inline_query(query.id, results=answers)
-        except:
+        except Exception:
             return

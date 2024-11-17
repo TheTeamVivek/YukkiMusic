@@ -71,7 +71,7 @@ async def markup_panel(client, CallbackQuery: CallbackQuery, _):
         await CallbackQuery.edit_message_reply_markup(
             reply_markup=InlineKeyboardMarkup(buttons)
         )
-    except:
+    except Exception:
         return
     if chat_id not in wrong:
         wrong[chat_id] = {}
@@ -94,7 +94,7 @@ async def main_markup_(client, CallbackQuery, _):
         await CallbackQuery.edit_message_reply_markup(
             reply_markup=InlineKeyboardMarkup(buttons)
         )
-    except:
+    except Exception:
         return
     if chat_id not in wrong:
         wrong[chat_id] = {}
@@ -128,7 +128,7 @@ async def pages_markup(client, CallbackQuery, _):
         await CallbackQuery.edit_message_reply_markup(
             reply_markup=InlineKeyboardMarkup(buttons)
         )
-    except:
+    except Exception:
         return
 
 
@@ -211,7 +211,7 @@ async def admin_callback(client, CallbackQuery, _):
             return await CallbackQuery.answer(_["admin_21"], show_alert=True)
         try:
             popped = check.pop(0)
-        except:
+        except Exception:
             return await CallbackQuery.answer(_["admin_22"], show_alert=True)
         check = db.get(chat_id)
         if not check:
@@ -293,7 +293,7 @@ async def admin_callback(client, CallbackQuery, _):
                     videoid=True,
                     video=status,
                 )
-            except:
+            except Exception:
                 return await mystic.edit_text(_["call_7"])
             try:
                 await Yukki.skip_stream(chat_id, file_path, video=status)
@@ -437,7 +437,7 @@ async def admin_callback(client, CallbackQuery, _):
                 duration,
                 playing[0]["streamtype"],
             )
-        except:
+        except Exception:
             return await mystic.edit_text(_["admin_34"])
         if int(command) in [1, 3]:
             db[chat_id][0]["played"] -= duration_to_skip
@@ -456,17 +456,17 @@ async def play_music(client, CallbackQuery, _):
     if CallbackQuery.from_user.id != int(user_id):
         try:
             return await CallbackQuery.answer(_["playcb_1"], show_alert=True)
-        except:
+        except Exception:
             return
     try:
         chat_id, channel = await get_channeplayCB(_, cplay, CallbackQuery)
-    except:
+    except Exception:
         return
     user_name = CallbackQuery.from_user.first_name
     try:
         await CallbackQuery.message.delete()
         await CallbackQuery.answer()
-    except:
+    except Exception:
         pass
     mystic = await CallbackQuery.message.reply_text(
         _["play_2"].format(channel) if channel else _["play_1"]
@@ -523,7 +523,7 @@ async def anonymous_check(client, CallbackQuery):
             "You are an anonymous admin\nRevert back to user to use me",
             show_alert=True,
         )
-    except:
+    except Exception:
         return
 
 
@@ -543,17 +543,17 @@ async def play_playlists_cb(client, CallbackQuery, _):
     if CallbackQuery.from_user.id != int(user_id):
         try:
             return await CallbackQuery.answer(_["playcb_1"], show_alert=True)
-        except:
+        except Exception:
             return
     try:
         chat_id, channel = await get_channeplayCB(_, cplay, CallbackQuery)
-    except:
+    except Exception:
         return
     user_name = CallbackQuery.from_user.first_name
     await CallbackQuery.message.delete()
     try:
         await CallbackQuery.answer()
-    except:
+    except Exception:
         pass
     mystic = await CallbackQuery.message.reply_text(
         _["play_2"].format(channel) if channel else _["play_1"]
@@ -629,7 +629,7 @@ async def slider_queries(client, CallbackQuery, _):
     if CallbackQuery.from_user.id != int(user_id):
         try:
             return await CallbackQuery.answer(_["playcb_1"], show_alert=True)
-        except:
+        except Exception:
             return
     what = str(what)
     rtype = int(rtype)
@@ -640,7 +640,7 @@ async def slider_queries(client, CallbackQuery, _):
             query_type = int(rtype + 1)
         try:
             await CallbackQuery.answer(_["playcb_2"])
-        except:
+        except Exception:
             pass
         title, duration_min, thumbnail, vidid = await Platform.youtube.slider(
             query, query_type
@@ -663,7 +663,7 @@ async def slider_queries(client, CallbackQuery, _):
             query_type = int(rtype - 1)
         try:
             await CallbackQuery.answer(_["playcb_2"])
-        except:
+        except Exception:
             pass
         title, duration_min, thumbnail, vidid = await Platform.youtube.slider(
             query, query_type
@@ -686,7 +686,7 @@ async def close_menu(_, CallbackQuery):
     try:
         await CallbackQuery.message.delete()
         await CallbackQuery.answer()
-    except:
+    except Exception:
         return
 
 
@@ -709,13 +709,13 @@ async def stop_download(client, CallbackQuery: CallbackQuery, _):
             task.cancel()
             try:
                 lyrical.pop(message_id)
-            except:
+            except Exception:
                 pass
             await CallbackQuery.answer("Downloading Cancelled", show_alert=True)
             return await CallbackQuery.edit_message_text(
                 f"Downloading cancelled by {CallbackQuery.from_user.mention}"
             )
-        except:
+        except Exception:
             return await CallbackQuery.answer(
                 "Failed to stop downloading", show_alert=True
             )

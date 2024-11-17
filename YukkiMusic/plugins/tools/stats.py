@@ -126,7 +126,7 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
     upl = back_stats_markup(_)
     try:
         await CallbackQuery.answer()
-    except:
+    except Exception:
         pass
     mystic = await CallbackQuery.edit_message_text(
         _["gstats_3"].format(
@@ -209,7 +209,7 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
                 if extract is None:
                     continue
                 await asyncio.sleep(0.5)
-            except:
+            except Exception:
                 continue
             limit += 1
             msg += f"🔗`{extract}` Played {count} Times on bot.\n\n"
@@ -239,7 +239,7 @@ async def overall_stats(client, CallbackQuery, _):
         upl = back_stats_buttons(_)
     try:
         await CallbackQuery.answer()
-    except:
+    except Exception:
         pass
     await CallbackQuery.edit_message_text(_["gstats_8"])
     served_chats = len(await get_served_chats())
@@ -295,7 +295,7 @@ async def overall_stats(client, CallbackQuery, _):
         upl = back_stats_buttons(_)
     try:
         await CallbackQuery.answer()
-    except:
+    except Exception:
         pass
     await CallbackQuery.edit_message_text(_["gstats_8"])
     sc = platform.system()
@@ -308,7 +308,7 @@ async def overall_stats(client, CallbackQuery, _):
             cpu_freq = f"{round(cpu_freq / 1000, 2)}GHz"
         else:
             cpu_freq = f"{round(cpu_freq, 2)}MHz"
-    except:
+    except Exception:
         cpu_freq = "Unable to Fetch"
     hdd = psutil.disk_usage("/")
     total = hdd.total / (1024.0**3)
@@ -373,7 +373,7 @@ async def overall_stats(client, CallbackQuery, _):
 async def back_buttons(client, CallbackQuery, _):
     try:
         await CallbackQuery.answer()
-    except:
+    except Exception:
         pass
     command = CallbackQuery.matches[0].group(1)
     if command == "TOPMARKUPGET":

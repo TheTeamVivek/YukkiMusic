@@ -209,7 +209,7 @@ async def start_comm(client, message: Message, _):
         try:
             await app.resolve_peer(OWNER_ID[0])
             OWNER = OWNER_ID[0]
-        except:
+        except Exception:
             OWNER = None
         out = private_panel(_, app.username, OWNER)
         if config.START_IMG_URL:
@@ -219,7 +219,7 @@ async def start_comm(client, message: Message, _):
                     caption=_["start_1"].format(app.mention),
                     reply_markup=InlineKeyboardMarkup(out),
                 )
-            except:
+            except Exception:
                 await message.reply_text(
                     text=_["start_1"].format(app.mention),
                     reply_markup=InlineKeyboardMarkup(out),
@@ -294,6 +294,6 @@ async def welcome(client, message: Message):
                     _["start_4"].format(app.mention, member.mention)
                 )
             return
-        except:
+        except Exception:
 
             return

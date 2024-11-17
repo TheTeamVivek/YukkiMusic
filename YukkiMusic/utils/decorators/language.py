@@ -19,7 +19,7 @@ def language(mystic):
         try:
             language = await get_lang(message.chat.id)
             language = get_string(language)
-        except:
+        except Exception:
             language = get_string("en")
         if not await is_maintenance():
             if message.from_user.id not in SUDOERS:
@@ -29,7 +29,7 @@ def language(mystic):
         if await is_commanddelete_on(message.chat.id):
             try:
                 await message.delete()
-            except:
+            except Exception:
                 pass
         return await mystic(_, message, language)
 
@@ -41,7 +41,7 @@ def languageCB(mystic):
         try:
             language = await get_lang(CallbackQuery.message.chat.id)
             language = get_string(language)
-        except:
+        except Exception:
             language = get_string("en")
         if not await is_maintenance():
             if CallbackQuery.from_user.id not in SUDOERS:
@@ -62,7 +62,7 @@ def LanguageStart(mystic):
         try:
             language = await get_lang(message.chat.id)
             language = get_string(language)
-        except:
+        except Exception:
             language = get_string("en")
         return await mystic(_, message, language)
 

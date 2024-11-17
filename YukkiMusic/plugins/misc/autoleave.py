@@ -54,9 +54,9 @@ async def auto_leave():
                                 try:
                                     await client.leave_chat(chat_id)
                                     left += 1
-                                except:
+                                except Exception:
                                     continue
-            except:
+            except Exception:
                 pass
 
         if config.AUTO_LEAVING_ASSISTANT == str(True):
@@ -101,7 +101,7 @@ async def auto_end():
                     try:
                         language = await get_lang(message.chat.id)
                         language = get_string(language)
-                    except:
+                    except Exception:
                         language = get_string("en")
                     try:
                         await app.send_message(

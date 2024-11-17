@@ -263,7 +263,7 @@ async def export_user_data(_, cq):
         try:
             await cq.message.delete()
             os.remove(file_path)
-        except:
+        except Exception:
             pass
 
 

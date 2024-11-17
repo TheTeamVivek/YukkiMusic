@@ -32,7 +32,7 @@ async def authorize(client, message: Message, _):
         return await message.reply_text(_["pbot_1"])
     try:
         chat_id = int(message.text.strip().split()[1])
-    except:
+    except Exception:
         return await message.reply_text(_["pbot_7"])
     if not await is_served_private_chat(chat_id):
         await add_private_chat(chat_id)
@@ -50,7 +50,7 @@ async def unauthorize(client, message: Message, _):
         return await message.reply_text(_["pbot_2"])
     try:
         chat_id = int(message.text.strip().split()[1])
-    except:
+    except Exception:
         return await message.reply_text(_["pbot_7"])
     if not await is_served_private_chat(chat_id):
         return await message.reply_text(_["pbot_6"])

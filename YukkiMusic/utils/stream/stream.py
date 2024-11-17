@@ -65,7 +65,7 @@ async def stream(
                     thumbnail,
                     vidid,
                 ) = await Platform.youtube.details(search, False if spotify else True)
-            except:
+            except Exception:
                 continue
             if str(duration_min) == "None":
                 continue
@@ -95,7 +95,7 @@ async def stream(
                     file_path, direct = await Platform.youtube.download(
                         vidid, mystic, video=status, videoid=True
                     )
-                except:
+                except Exception:
                     raise AssistantErr(_["play_16"])
                 await Yukki.join_call(
                     chat_id, original_chat_id, file_path, video=status, image=thumbnail
@@ -156,7 +156,7 @@ async def stream(
             file_path, direct = await Platform.youtube.download(
                 vidid, mystic, videoid=True, video=status
             )
-        except:
+        except Exception:
             raise AssistantErr(_["play_16"])
         if await is_active_chat(chat_id):
             await put_queue(
