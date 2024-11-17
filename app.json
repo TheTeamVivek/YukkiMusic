@@ -6,10 +6,10 @@
     "python3",
     "telegram",
     "bot",
-    "Yukki",
-    "YukkiMusicBot",
+    "YukkiMusic",
     "telegram-bot",
-    "pyrogram"
+    "pyrogram",
+    "py-tgcalls"
     ],
     
     "stack": "container",
@@ -28,6 +28,11 @@
         "description": "A Bot's token Get it from Botfather",
         "value": "",
         "required": true
+      },
+      "COOKIE_LINK": {
+        "description": "You can paste your cookies to https://batbin.me, save them, and get a link to paste here",
+        "value": "",
+        "required": false
       },
       "EXTRA_PLUGINS": {
         "description": "if You want to load extra plugins with music plugins so fill True  if you don't want to load extra plugins so Fill False",
