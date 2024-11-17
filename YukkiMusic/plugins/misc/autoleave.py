@@ -81,7 +81,7 @@ async def auto_end():
                 members = []
 
                 try:
-                    async for member in userbot.load_group_call_participants(chat_id):
+                    async for member in userbot.get_call_members(chat_id):
                         if member is None:
                             continue
                         members.append(member)
