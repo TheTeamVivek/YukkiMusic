@@ -9,7 +9,6 @@ lyricsgenius
 motor
 psutil
 pytube
-pyrotgfork
 py-tgcalls
 python-dotenv
 pyyaml
