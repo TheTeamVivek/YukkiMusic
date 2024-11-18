@@ -409,7 +409,7 @@ class YouTube:
                     "yt-dlp",
                     "-g",
                     "-f",
-                    "best[height<=?720][width<=?1280]",
+                    "best",
                     f"--cookies {cookies()}",
                     link,
                 ]
@@ -427,7 +427,6 @@ class YouTube:
                 else:
                     downloaded_file = await loop.run_in_executor(None, video_dl)
                     direct = True
-        else:
         else:
             direct = True
             downloaded_file = await loop.run_in_executor(None, audio_dl)
