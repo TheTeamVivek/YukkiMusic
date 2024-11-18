@@ -425,7 +425,9 @@ class YouTube:
                     downloaded_file = stdout.decode().split("\n")[0]
                     direct = None
                 else:
-                    return
+                    downloaded_file = await loop.run_in_executor(None, video_dl)
+                    direct = True
+        else:
         else:
             direct = True
             downloaded_file = await loop.run_in_executor(None, audio_dl)
