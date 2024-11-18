@@ -30,4 +30,4 @@ async def gen_qthumb(vidid):
             thumbnail = result["thumbnails"][0]["url"].split("?")[0]
         return thumbnail
     except Exception as e:
-        return f"https://img.youtube.com/vi/{videoid}/maxresdefault.jpg"
+        return f"https://img.youtube.com/vi/{vidid}/maxresdefault.jpg"
