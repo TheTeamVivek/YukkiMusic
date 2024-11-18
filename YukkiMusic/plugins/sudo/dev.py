@@ -14,8 +14,8 @@
 
 import os
 import re
-import subprocess
 import sys
+import asyncio
 import traceback
 from inspect import getfullargspec
 from io import StringIO
@@ -169,62 +169,60 @@ async def forceclose_command(_, CallbackQuery):
 async def shellrunner(_, message: Message):
     if len(message.command) < 2:
         return await edit_or_reply(
-            message, text="<b>Give some commamds like:</b>\n/sh git pull"
+            message, text="<b>Give some commands like:</b>\n/sh git pull"
         )
+
     text = message.text.split(None, 1)[1]
-    if "\n" in text:
-        code = text.split("\n")
-        output = ""
-        for x in code:
-            shell = re.split(""" (?=(?:[^'"]|'[^']*'|"[^"]*")*$)""", x)
-            try:
-                process = subprocess.Popen(
-                    shell,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
-            except Exception as err:
-                await edit_or_reply(message, text=f"<b>ERROR :</b>\n<pre>{err}</pre>")
-            output += f"<b>{code}</b>\n"
-            output += process.stdout.read()[:-1].decode("utf-8")
-            output += "\n"
-    else:
-        shell = re.split(""" (?=(?:[^'"]|'[^']*'|"[^"]*")*$)""", text)
-        for a in range(len(shell)):
-            shell[a] = shell[a].replace('"', "")
+    output = ""
+
+    async def run_command(command):
         try:
-            process = subprocess.Popen(
-                shell,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+            process = await asyncio.create_subprocess_shell(
+                command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
             )
+            stdout, stderr = await process.communicate()
+            return stdout.decode().strip(), stderr.decode().strip()
         except Exception as err:
-            print(err)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             errors = traceback.format_exception(
                 etype=exc_type,
                 value=exc_obj,
                 tb=exc_tb,
             )
-            return await edit_or_reply(
-                message, text=f"<b>ERROR :</b>\n<pre>{''.join(errors)}</pre>"
-            )
-        output = process.stdout.read()[:-1].decode("utf-8")
-    if str(output) == "\n":
-        output = None
-    if output:
-        if len(output) > 4096:
-            with open("output.txt", "w+") as file:
-                file.write(output)
-            await app.send_document(
-                message.chat.id,
-                "output.txt",
-                reply_to_message_id=message.id,
-                caption="<code>Output</code>",
-            )
-            return os.remove("output.txt")
-        await edit_or_reply(message, text=f"<b>OUTPUT :</b>\n<pre>{output}</pre>")
+            return None, ''.join(errors)
+
+    if "\n" in text:
+        commands = text.split("\n")
+        for cmd in commands:
+            stdout, stderr = await run_command(cmd)
+            output += f"<b>Command:</b> {cmd}\n"
+            if stdout:
+                output += f"<b>Output:</b>\n<pre>{stdout}</pre>\n"
+            if stderr:
+                output += f"<b>Error:</b>\n<pre>{stderr}</pre>\n"
     else:
-        await edit_or_reply(message, text="<b>OUTPUT :</b>\n<code>None</code>")
+        stdout, stderr = await run_command(text)
+        if stdout:
+            output += f"<b>Output:</b>\n<pre>{stdout}</pre>\n"
+        if stderr:
+            output += f"<b>Error:</b>\n<pre>{stderr}</pre>\n"
+
+    if not output.strip():
+        output = "<b>OUTPUT :</b>\n<code>None</code>"
+
+    if len(output) > 4096:
+        with open("output.txt", "w+") as file:
+            file.write(output)
+        await app.send_document(
+            message.chat.id,
+            "output.txt",
+            reply_to_message_id=message.id,
+            caption="<code>Output</code>",
+        )
+        os.remove("output.txt")
+    else:
+        await edit_or_reply(message, text=output)
 
     await message.stop_propagation()
