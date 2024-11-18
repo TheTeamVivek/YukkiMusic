@@ -22,8 +22,6 @@ files = [
     ".mp4",
     ".webm",
     ".png",
-    ".session",
-    ".session-journal",
 ]
 
 
