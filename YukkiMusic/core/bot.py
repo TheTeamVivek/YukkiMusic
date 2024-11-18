@@ -113,7 +113,7 @@ class YukkiBot(Client):
                 "Bot failed to access the log group. Ensure the bot is added and promoted as admin."
             )
             LOGGER(__name__).error("Error details:", exc_info=True)
-            sys.exit()
+            # sys.exit()
 
         if config.SET_CMDS == str(True):
             try:
