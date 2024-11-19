@@ -28,7 +28,7 @@ Get started quickly by deploying to Heroku with just one click:
 
   - Keep the Bot Running with tmux: `tmux`
 
-To exit the **tmux session** without stopping the bot, press `Ctrl+b|, then `d`.
+To exit the **tmux session** without stopping the bot, press `Ctrl+b`, then `d`.
 
 
 ## ⚙️ Configuration
