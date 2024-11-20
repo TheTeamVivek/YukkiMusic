@@ -50,7 +50,7 @@ class Userbot(Client):
                     await client.send_message(config.LOG_GROUP_ID, "Assistant Started")
                 except Exception:
                     LOGGER(__name__).error(
-                    f"Assistant Account {index} has failed to send message in Loggroup Make sure you have added assistsant in Loggroup."
+                        f"Assistant Account {index} has failed to send message in Loggroup Make sure you have added assistsant in Loggroup."
                     )
                     sys.exit(1)
 
