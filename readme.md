@@ -18,7 +18,11 @@ Get started quickly by deploying to Heroku with just one click:
 
 ### 🖥️ VPS Deployment Guide
 
-  - Update and Install Dependencies: `sudo apt update && sudo apt upgrade -y && sudo apt install -y ffmpeg git python3-pip tmux nano`
+  - Update and Install Dependencies: `sudo apt update && sudo apt upgrade -y && sudo apt install -y ffmpeg git python3-pip python3-venv tmux nano`
+
+  - Create the Virtual Environment: `python3 -m venv .venv`
+
+  - Activate Virtual Env: `source .venv/bin/activate`
 
   - Clone the Repository: `git clone https://github.com/TheTeamVivek/YukkiMusic && cd YukkiMusic`
 
