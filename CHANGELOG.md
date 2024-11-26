@@ -6,7 +6,6 @@ All notable changes to YukkiMusic will be documented in this file.
 ## [v1.3] - 2024-11-15
 
 ### Added
-- Introduced the `COOKIE_LINK` variable for pasting cookies in the `batbin` link.
 - Added the `asyncify` decorator to convert synchronous functions to asynchronous.
 - Added the `OWNER` command that will show in the log group or bot PM/DM.
 
