@@ -31,10 +31,6 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
-# You can paste your cookies to https://batbin.me, save them, and get a link to paste here
-COOKIE_LINK = getenv("COOKIE_LINK", None)
-
-
 CLEANMODE_DELETE_MINS = int(
     getenv("CLEANMODE_MINS", "5")
 )  # Remember to give value in Seconds

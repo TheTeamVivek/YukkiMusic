@@ -8,16 +8,12 @@
 # All rights reserved.
 
 from YukkiMusic.core.bot import YukkiBot
-from YukkiMusic.core.cookies import save_cookies
 from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
 from YukkiMusic.core.userbot import Userbot
 from YukkiMusic.misc import dbb, heroku, sudo
 
 from .logging import LOGGER
-
-# Save cookies in txt
-save_cookies()
 
 # Directories
 dirr()
