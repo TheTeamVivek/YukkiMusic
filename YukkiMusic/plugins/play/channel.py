@@ -9,8 +9,12 @@
 #
 
 from pyrogram import filters
-from pyrogram.enums import ChatMembersFilter, ChatMemberStatus, ChatType
+
 from pyrogram.types import Message
+
+from pyrogram.enums import ChatMembersFilter, ChatMemberStatus, ChatType
+
+from pyrogram.errors import ChatAdminRequired
 
 from config import BANNED_USERS
 from strings import command
@@ -53,10 +57,14 @@ async def playmode_(client, message: Message, _):
             )
         except Exception:
             return await message.reply_text(_["cplay_4"])
-        async for users in admins:
-            if users.status == ChatMemberStatus.OWNER:
-                creatorusername = users.user.username
-                creatorid = users.user.id
+        try:
+            async for users in admins:
+                if users.status == ChatMemberStatus.OWNER:
+                    creatorusername = users.user.username
+                    creatorid = users.user.id
+        except ChatAdminRequired:
+            return await message.reply_text(_["cplay_4"])
+
         if creatorid != message.from_user.id:
             return await message.reply_text(
                 _["cplay_6"].format(chat.title, creatorusername)
