@@ -145,8 +145,8 @@ def PlayWrapper(command):
 
                 if not call_participants_id or userbot.id not in call_participants_id:
                     await Yukki.stop_stream(chat_id)
-                except ChannelPrivate:
-                    pass 
+            except ChannelPrivate:
+                pass 
 
         return await command(
             client,
