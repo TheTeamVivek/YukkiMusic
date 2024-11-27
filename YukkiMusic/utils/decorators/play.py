@@ -10,6 +10,8 @@
 
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
+from pyrogram.errors import ChannelPrivate
+
 from config import PLAYLIST_IMG_URL, PRIVATE_BOT_MODE
 from config import adminlist
 from strings import get_string
@@ -133,15 +135,18 @@ def PlayWrapper(command):
         if await is_active_chat(chat_id):
             userbot = await get_assistant(message.chat.id)
             # Getting all members id that in voicechat
-            call_participants_id = [
-                member.chat.id
-                async for member in userbot.get_call_members(chat_id)
-                if member.chat
-            ]
-            # Checking if assistant id not in list so clear queues and remove active voice chat and process
+            try:
+                call_participants_id = [
+                    member.chat.id
+                    async for member in userbot.get_call_members(chat_id)
+                    if member.chat
+                ]
+                # Checking if assistant id not in list so clear queues and remove active voice chat and process
 
-            if not call_participants_id or userbot.id not in call_participants_id:
-                await Yukki.stop_stream(chat_id)
+                if not call_participants_id or userbot.id not in call_participants_id:
+                    await Yukki.stop_stream(chat_id)
+                except ChannelPrivate:
+                    pass 
 
         return await command(
             client,
