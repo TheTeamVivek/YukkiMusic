@@ -17,15 +17,20 @@ from pyrogram.enums import ChatMembersFilter, ChatMemberStatus, ChatType
 from pyrogram.errors import ChatAdminRequired
 
 from config import BANNED_USERS
-from strings import command
+from strings import command, get_command
 from YukkiMusic import app
-from YukkiMusic.utils.database import set_cmode
+from YukkiMusic.utils.database import get_lang, set_cmode
 from YukkiMusic.utils.decorators.admins import AdminActual
 
 
 @app.on_message(command("CHANNELPLAY_COMMAND") & filters.group & ~BANNED_USERS)
 @AdminActual
 async def playmode_(client, message: Message, _):
+    try:
+        lang_code = await get_lang(message.chat.id)
+        CHANNELPLAY_COMMAND = get_command(lang_code)["CHANNELPLAY_COMMAND"]
+    except Exception:
+        CHANNELPLAY_COMMAND = get_command("en")["CHANNELPLAY_COMMAND"]
     if len(message.command) < 2:
         return await message.reply_text(
             _["cplay_1"].format(message.chat.title, CHANNELPLAY_COMMAND[0])
