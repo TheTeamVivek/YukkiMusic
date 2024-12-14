@@ -103,7 +103,7 @@ async def sudoers_list(client, message: Message, _):
             count += 1
         except Exception:
             continue
-        text += f"{count}➤ {user}\n"
+        text += f"{count}➤ {user} (`{x}`)\n"
     smex = 0
     for user_id in SUDOERS:
         if user_id not in OWNER_ID:
@@ -114,7 +114,7 @@ async def sudoers_list(client, message: Message, _):
                     smex += 1
                     text += _["sudo_6"]
                 count += 1
-                text += f"{count}➤ {user} ({user_id})\n"
+                text += f"{count}➤ {user} (`{user_id}`)\n"
             except Exception:
                 continue
     if not text:
