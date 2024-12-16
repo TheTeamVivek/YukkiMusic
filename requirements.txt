@@ -5,6 +5,7 @@ dnspython
 ffmpeg-python
 gitpython
 heroku3
+httpx[http2]==0.26.0
 lyricsgenius
 motor
 psutil
@@ -15,6 +16,7 @@ pyyaml
 requests
 speedtest-cli
 spotipy
+TgCrypto>=1.2.5
 urllib3
 uvloop
 flask
@@ -23,4 +25,3 @@ youtube-search-python
 yt-dlp
 git+https://github.com/KurimuzonAkuma/pyrogram
 git+https://github.com/Vivekkumar-IN/pykeyboard
-git+https://github.com/TelegramPlayGround/pyrogram-tgcrypto
