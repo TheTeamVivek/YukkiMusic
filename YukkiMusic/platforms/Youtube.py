@@ -24,7 +24,6 @@ from YukkiMusic.utils.database import is_on_off
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
-USE_COOKIES_ONLY = False
 
 def cookies():
     folder_path = f"{os.getcwd()}/cookies"
@@ -292,7 +291,7 @@ class YouTube:
         vidid = result[query_type]["id"]
         thumbnail = result[query_type]["thumbnails"][0]["url"].split("?")[0]
         return title, duration_min, thumbnail, vidid
-
+        
     async def download(
         self,
         link: str,
@@ -305,12 +304,7 @@ class YouTube:
         title: Union[bool, str] = None,
     ) -> str:
         if videoid:
-            vidid = link
             link = self.base + link
-        else:
-            pattern = r"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/|v\/|live_stream\?stream_id=|(?:\/|\?|&)v=)?([^&\n]+)"
-            match = re.search(pattern, link)
-            vidid = match.group(1)
 
         @asyncify
         def audio_dl():
@@ -405,37 +399,11 @@ class YouTube:
             file_path = x.prepare_filename(info)
             return file_path
 
-        @asyncify
-        def download_with_api():
-            ydl_optssx = {
-                "outtmpl": "downloads/%(id)s.%(ext)s",
-                "nocheckcertificate": True,
-                "quiet": True,
-                "no_warnings": True,
-                "nooverwrites": False,
-                "continuedl": True,
-            }
-
-            url = f"https://sapi.okflix.top/tube/stream/{vidid}.mp3"
-            
-            try:
-                with YoutubeDL(ydl_optssx) as ydl:
-                    info = ydl.extract_info(url)
-                    file_path = ydl.prepare_filename(info)
-                    return file_path
-            except Exception:
-                return None
-
         if songvideo:
             return await song_video_dl()
 
         elif songaudio:
-            if USE_COOKIES_ONLY:
-                return await song_audio_dl()
-            fpath = await download_with_api()
-            if not fpath:
-                fpath = await song_audio_dl()
-            return fpath
+            return await song_audio_dl()
 
         elif video:
             if await is_on_off(config.YTDOWNLOADER):
@@ -466,11 +434,8 @@ class YouTube:
                     direct = True
         else:
             direct = True
-            if USE_COOKIES_ONLY:
-                downloaded_file = await audio_dl()
-            else:
-                downloaded_file = await download_with_api()
-                if not downloaded_file:
-                    downloaded_file = await audio_dl()
+            downloaded_file = await audio_dl()
 
         return downloaded_file, direct
+            
+      
