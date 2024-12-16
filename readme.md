@@ -56,7 +56,7 @@ We're here to support you through multiple channels:
 
 - [**📝 Open a GitHub Issue**](https://github.com/TheTeamVivek/YukkiMusic/issues/new?assignees=&labels=question&title=support%3A+&body=%23+Support+Question)
 
-- [**💬 Contact Maintainer**](https://t.me/vivekkumar_in)
+- [**💬 Contact Us**](https://t.me/TheTeamVk)
 
 - [**👥 Join Support Group**](https://t.me/TheTeamVk)
 
