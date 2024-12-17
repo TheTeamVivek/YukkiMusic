@@ -11,7 +11,7 @@ import uvloop
 
 uvloop.install()
 
-
+import asyncio
 import sys
 
 from pyrogram import Client
