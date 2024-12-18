@@ -637,4 +637,13 @@ class Call:
                 await self.change_stream(client, update.chat_id)
 
 
+    def __getattr__(self, name):
+        if not self.calls:
+            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+        first_call = self.calls[0]
+        if hasattr(first_call, name):
+            return getattr(first_call, name)
+        raise AttributeError(f"'{type(first_call).__name__}' object has no attribute '{name}'")
+
+
 Yukki = Call()

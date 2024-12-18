@@ -23,9 +23,9 @@ assistantids = []
 class Userbot(Client):
     def __init__(self):
         self.clients = []
-        session_strings = config.STRING_SESSIONS
+        self.sessions = config.STRING_SESSIONS
 
-        for i, session in enumerate(session_strings, start=1):
+        for i, session in enumerate(self.sessions, start=1):
 
             client = Client(
                 f"YukkiString{i}",
@@ -78,3 +78,11 @@ class Userbot(Client):
         """Gracefully stop all clients."""
         tasks = [client.stop() for client in self.clients]
         await asyncio.gather(*tasks)
+    
+    def __getattr__(self, name):
+        if not self.clients:
+            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+        first_client = self.clients[0]
+        if hasattr(first_client, name):
+            return getattr(first_client, name)
+        raise AttributeError(f"'{type(first_client).__name__}' object has no attribute '{name}'")
