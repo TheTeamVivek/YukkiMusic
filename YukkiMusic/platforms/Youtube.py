@@ -27,11 +27,13 @@ from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
 def cookies():
     folder_path = f"{os.getcwd()}/cookies"
-    txt_files = glob.glob(os.path.join(folder_path, "*.txt"))
+    txt_files = [file for file in os.listdir(folder_path) if file.endswith(".txt")]
     if not txt_files:
-        raise FileNotFoundError("No .txt files found in the specified folder.")
+        raise FileNotFoundError("No Cookies found in cookies directory make sure your cookies file written  .txt file")
     cookie_txt_file = random.choice(txt_files)
-    return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
+    cookie_txt_file = os.path.join(folder_path, cookie_txt_file)
+    return cookie_txt_file
+    # return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
 
 
 async def shell_cmd(cmd):
@@ -144,10 +146,11 @@ class YouTube:
             link = link.split("&")[0]
         cmd = [
             "yt-dlp",
+            f"--cookies",
+            cookies(),
             "-g",
             "-f",
             "best[height<=?720][width<=?1280]",
-            f"--cookies {cookies()}",
             f"{link}",
         ]
         proc = await asyncio.create_subprocess_exec(
@@ -214,7 +217,7 @@ class YouTube:
             "noplaylist": True,
             "quiet": True,
             "extract_flat": "in_playlist",
-            "cookiefile": f"{cookies()}",
+            "cookiefile": f"'{cookies()}'",
         }
         with YoutubeDL(options) as ydl:
             info_dict = ydl.extract_info(f"ytsearch: {q}", download=False)
@@ -241,7 +244,7 @@ class YouTube:
 
         ytdl_opts = {
             "quiet": True,
-            "cookiefile": f"{cookies()}",
+            "cookiefile": f"'{cookies()}'",
         }
 
         ydl = YoutubeDL(ytdl_opts)
@@ -316,7 +319,7 @@ class YouTube:
                 "nocheckcertificate": True,
                 "quiet": True,
                 "no_warnings": True,
-                "cookiefile": f"{cookies()}",
+                "cookiefile": f"'{cookies()}'",
                 "prefer_ffmpeg": True,
             }
 
@@ -339,7 +342,7 @@ class YouTube:
                 "quiet": True,
                 "no_warnings": True,
                 "prefer_ffmpeg": True,
-                "cookiefile": f"{cookies()}",
+                "cookiefile": f"'{cookies()}'",
             }
 
             x = YoutubeDL(ydl_optssx)
@@ -364,7 +367,7 @@ class YouTube:
                 "no_warnings": True,
                 "prefer_ffmpeg": True,
                 "merge_output_format": "mp4",
-                "cookiefile": f"{cookies()}",
+                "cookiefile": f"'{cookies()}'",
             }
 
             x = YoutubeDL(ydl_optssx)
@@ -391,7 +394,7 @@ class YouTube:
                         "preferredquality": "192",
                     }
                 ],
-                "cookiefile": f"{cookies()}",
+                "cookiefile": f"'{cookies()}'",
             }
 
             x = YoutubeDL(ydl_optssx)
@@ -412,10 +415,11 @@ class YouTube:
             else:
                 command = [
                     "yt-dlp",
+                    f"--cookies",
+                    cookies(),
                     "-g",
                     "-f",
                     "best",
-                    f"--cookies {cookies()}",
                     link,
                 ]
 
