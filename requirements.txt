@@ -6,6 +6,7 @@ ffmpeg-python
 gitpython
 heroku3
 httpx[http2]==0.27.2
+kurigram==2.1.35
 lyricsgenius
 motor
 psutil
@@ -23,5 +24,4 @@ flask
 gunicorn
 youtube-search-python
 yt-dlp
-git+https://github.com/KurimuzonAkuma/pyrogram
 git+https://github.com/Vivekkumar-IN/pykeyboard
