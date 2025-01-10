@@ -11,7 +11,7 @@
 # Türkçe Dilinde Komutlar
 
 # Bot Komutları
-PING_COMMAND : ["ping", "alive", "aalive"]
+PING_COMMAND : ["ping"]
 PRIVACY_COMMAND : ["privacy"]
 START_COMMAND : ["baslat"]
 HELP_COMMAND : [ "yardim", "yardım"]
@@ -19,19 +19,19 @@ SETTINGS_COMMAND : ["ayarlar", "ayar"]
 RELOAD_COMMAND : ["admincache", "reload"]
 GSTATS_COMMAND : ["gstats"]
 STATS_COMMAND : ["stats"]
-LANGUAGE_COMMAND : ["lang", "language", "langs", "dil", "diller"]
+LANGUAGE_COMMAND : ["dil", "diller"]
 
 # Oynatma Komutları
-PLAY_COMMAND : ["play", "vplay", "cplay", "cvplay", "playforce", "vplayforce", "cplayforce", "cvplayforce", "oynat", "voynat", "coynat"]
-PLAYMODE_COMMAND : ["playmode", "oynatmamodu"]
-CHANNELPLAY_COMMAND : ["channelplay"]
-STREAM_COMMAND : ["stream", "cstream", "streamforce", "cstreamforce"]
+PLAY_COMMAND : ["oynat", "voynat", "coynat"]
+PLAYMODE_COMMAND : ["oynatmamodu"]
+CHANNELPLAY_COMMAND : ["kanaloynat"]
+STREAM_COMMAND : ["stream", "cstream"]
 
 #Çalma Listeleri Komutu
 PLAYLIST_COMMAND : ["oynatmalistesi"]
-PLAY_PLAYLIST_COMMAND : ["playplaylist", "vplayplaylist"]
+PLAY_PLAYLIST_COMMAND : ["oynatmalistesinioynat", "voynatmalistesinioynat"]
 DELETE_PLAYLIST_COMMAND : ["oynatmalistesinisil"]
-ADD_PLAYLIST_COMMAND : ["oekle"]
+ADD_PLAYLIST_COMMAND : ["pekle"]
 
 
 # Araçlar
@@ -52,8 +52,8 @@ STOP_COMMAND : ["durdur", "cdurdur", "kdurdur"]
 SKIP_COMMAND : ["atla", "catla","katla"]
 SHUFFLE_COMMAND : ["ckaristir", "ckaristir", "karistir"]
 LOOP_COMMAND : ["cdongu", "dongu"]
-SEEK_COMMAND : ["seek", "cseek"]
-SEEK_BACK_COMMAND : ["ilerisar", "cilerisar", "gerisar"]
+SEEK_COMMAND : ["sar", "csar"]
+SEEK_BACK_COMMAND : ["ilerisar", "gerisar", "cilerisar", "cgerisar"]
 REBOOT_COMMAND : ["yenidenbaslat"]
 
 # Sudo Kullanıcıları Şikayetleri
@@ -103,11 +103,11 @@ UNBLOCK_COMMAND : ["yasakkaldir"]
 BLOCKED_COMMAND : ["yasaklilar"]
 
 #HIZ TESTİ
-SPEEDTEST_COMMAND : ["speed", "hiztesti"]
+SPEEDTEST_COMMAND : ["hiztesti"]
 
 #Sesli sohbet komutları
-ACTIVEVC_COMMAND : ["activevc", "aktifses"]
-ACTIVEVIDEO_COMMAND : ["activevd", "aktifvideo"]
+ACTIVEVC_COMMAND : ["aktifses"]
+ACTIVEVIDEO_COMMAND : ["aktifvideo"]
 AC_COMMAND: ["ac"]
 
 #Gban Commands
