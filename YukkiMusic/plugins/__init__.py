@@ -17,26 +17,18 @@ import subprocess
 import sys
 from os.path import abspath, dirname, isfile, join
 
-from config import EXTRA_PLUGINS, EXTRA_PLUGINS_FOLDER, EXTRA_PLUGINS_REPO
 from YukkiMusic import LOGGER
+from config import EXTRA_PLUGINS, EXTRA_PLUGINS_FOLDER, EXTRA_PLUGINS_REPO
 
 logger = LOGGER(__name__)
 
-
-if EXTRA_PLUGINS_FOLDER in os.listdir():
-    shutil.rmtree(EXTRA_PLUGINS_FOLDER)
-
-if "utils" in os.listdir():
-    shutil.rmtree("utils")
-
 ROOT_DIR = abspath(join(dirname(__file__), "..", ".."))
-
 EXTERNAL_REPO_PATH = join(ROOT_DIR, EXTRA_PLUGINS_FOLDER)
-
 extra_plugins_enabled = EXTRA_PLUGINS.lower() == "true"
 
 if extra_plugins_enabled:
     if not os.path.exists(EXTERNAL_REPO_PATH):
+        logger.info("Cloning external plugins repository for the first time...")
         with open(os.devnull, "w") as devnull:
             clone_result = subprocess.run(
                 ["git", "clone", EXTRA_PLUGINS_REPO, EXTERNAL_REPO_PATH],
@@ -47,7 +39,28 @@ if extra_plugins_enabled:
                 logger.error(
                     f"Error cloning external plugins repository: {clone_result.stderr.decode()}"
                 )
-
+                logger.info(
+                    "External plugins repository is private or inaccessible. Using previously saved plugins if available."
+                )
+                if not os.path.exists(EXTERNAL_REPO_PATH):
+                    logger.critical(
+                        "No previously saved external plugins found. Exiting."
+                    )
+                    sys.exit(1)
+    else:
+        logger.info("External plugins repository already exists. Pulling updates...")
+        with open(os.devnull, "w") as devnull:
+            pull_result = subprocess.run(
+                ["git", "-C", EXTERNAL_REPO_PATH, "pull"],
+                stdout=devnull,
+                stderr=subprocess.PIPE,
+            )
+            if pull_result.returncode != 0:
+                logger.error(
+                    f"Error pulling updates from external plugins repository: {pull_result.stderr.decode()}"
+                )
+                logger.info("Using the previously saved plugins without updates.")
+    # Copy utils folder if exists
     utils_source_path = join(EXTERNAL_REPO_PATH, "utils")
     utils_target_path = join(ROOT_DIR, "utils")
     if os.path.isdir(utils_source_path):
@@ -67,6 +80,7 @@ if extra_plugins_enabled:
     if os.path.isdir(utils_target_path):
         sys.path.append(utils_target_path)
 
+    # Install requirements if present
     requirements_path = join(EXTERNAL_REPO_PATH, "requirements.txt")
     if os.path.isfile(requirements_path):
         with open(os.devnull, "w") as devnull:
