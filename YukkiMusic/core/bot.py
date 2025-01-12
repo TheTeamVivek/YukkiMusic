@@ -35,7 +35,6 @@ from pyrogram.errors import (
     ChatSendMediaForbidden,
     ChatSendPhotosForbidden,
     ChatWriteForbidden,
-    StopPropagation,
 )
 from pyrogram.handlers import MessageHandler
 
