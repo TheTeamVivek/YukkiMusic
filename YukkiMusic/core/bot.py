@@ -14,27 +14,38 @@ uvloop.install()
 import asyncio
 import sys
 
-from pyrogram import Client
+import traceback
+from datetime import datetime
+from functools import wraps
+
+from pyrogram import Client, filters, StopPropagation
 from pyrogram.enums import ChatMemberStatus
-from pyrogram.types import BotCommand
-from pyrogram.types import BotCommandScopeAllChatAdministrators
-from pyrogram.types import BotCommandScopeAllGroupChats
-from pyrogram.types import BotCommandScopeAllPrivateChats
-from pyrogram.types import BotCommandScopeChat
-from pyrogram.types import BotCommandScopeChatMember
-from pyrogram.errors import ChatSendPhotosForbidden
-from pyrogram.errors import ChatWriteForbidden
-from pyrogram.errors import FloodWait
-from pyrogram.errors import MessageIdInvalid
+from pyrogram.types import (
+    BotCommand,
+    BotCommandScopeAllChatAdministrators,
+    BotCommandScopeAllGroupChats,
+    BotCommandScopeAllPrivateChats,
+    BotCommandScopeChat,
+    BotCommandScopeChatMember,
+)
+from pyrogram.errors import (
+    FloodWait,
+    MessageNotModified,
+    MessageIdInvalid,
+    ChatSendMediaForbidden,
+    ChatSendPhotosForbidden,
+    ChatWriteForbidden,
+    StopPropagation,
+)
+from pyrogram.handlers import MessageHandler
 
 import config
 
 from ..logging import LOGGER
 
-
 class YukkiBot(Client):
     def __init__(self):
-        LOGGER(__name__).info(f"Starting Bot")
+        LOGGER(__name__).info("Starting Bot...")
         super().__init__(
             "YukkiMusic",
             api_id=config.API_ID,
@@ -45,51 +56,58 @@ class YukkiBot(Client):
             workers=50,
         )
 
-    async def edit_message_text(self, *args, **kwargs):
-        try:
-            return await super().edit_message_text(*args, **kwargs)
-        except FloodWait as e:
-            time = int(e.value)
-            await asyncio.sleep(time)
-            if time < 25:
-                return await self.edit_message_text(self, *args, **kwargs)
-        except MessageIdInvalid:
-            pass
+    
+    def on_message(self, filters=None, group=0):
+        def decorator(func):
+            @wraps(func)
+            async def wrapper(client, message):
+                try:
+                    await func(client, message)
+                except FloodWait as e:
+                    LOGGER(__name__).warning(f"FloodWait: Sleeping for {e.value} seconds.")
+                    await asyncio.sleep(e.value)
+                except (
+                    ChatWriteForbidden,
+                    ChatSendMediaForbidden,
+                    ChatSendPhotosForbidden,
+                    MessageNotModified,
+                    MessageIdInvalid,
+                ):
+                    pass 
+                except StopPropagation:
+                    raise
+                except Exception as e:
+                    date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    user_id = message.from_user.id if message.from_user else "Unknown"
+                    chat_id = message.chat.id if message.chat else "Unknown"
+                    chat_username = f"@{message.chat.username}" if message.chat.username else "Private Group"
+                    command = (
+                        " ".join(message.command)
+                        if hasattr(message, "command")
+                        else message.text
+                    )
+                    error_trace = traceback.format_exc()
+                    error_message = (
+                        f"**Error:** {type(e).__name__}\n"
+                        f"**Date:** {date_time}\n"
+                        f"**Chat ID:** {chat_id}\n"
+                        f"**Chat Username:** {chat_username}\n"
+                        f"**User ID:** {user_id}\n"
+                        f"**Command/Text:** {command}\n"
+                        f"**Traceback:**\n{error_trace}"
+                    )
+                    await self.send_message(config.LOG_GROUP_ID, error_message)
+                    try:
+                        await self.send_message(config.OWNER_ID[0], error_message)
+                    except Exception:
+                        pass
 
-    async def send_message(self, *args, **kwargs):
-        if kwargs.get("send_direct", False):
-            kwargs.pop("send_direct", None)
-            return await super().send_message(*args, **kwargs)
+            handler = MessageHandler(wrapper, filters)
+            self.add_handler(handler, group)
+            return func
 
-        try:
-            return await super().send_message(*args, **kwargs)
-        except FloodWait as e:
-            time = int(e.value)
-            await asyncio.sleep(time)
-            if time < 25:
-                return await self.send_message(self, *args, **kwargs)
-        except ChatWriteForbidden:
-            chat_id = kwargs.get("chat_id") or args[0]
-            if chat_id:
-                await self.leave_chat(chat_id)
-
-    async def send_photo(self, *args, **kwargs):
-        try:
-            return await super().send_photo(*args, **kwargs)
-        except FloodWait as e:
-            time = int(e.value)
-            await asyncio.sleep(time)
-            if time < 25:
-                return await self.send_photo(self, *args, **kwargs)
-        except ChatSendPhotosForbidden:
-            chat_id = kwargs.get("chat_id") or args[0]
-            if chat_id:
-                await self.send_message(
-                    chat_id,
-                    "I don't have the right to send photos in this chat, leaving now..",
-                )
-                await self.leave_chat(chat_id)
-
+        return decorator
+        
     async def start(self):
         await super().start()
         get_me = await self.get_me()
