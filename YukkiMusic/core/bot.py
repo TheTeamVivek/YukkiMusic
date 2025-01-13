@@ -237,8 +237,8 @@ class YukkiBot(Client):
             spec.loader.exec_module(module)
             self.loaded_plug_counts += 1
         except Exception as e:
-            LOGGER(__name__).error(f"\n", exc_info=True)
-            exit()
+            LOGGER(__name__).error(f"Failed to load {module_path}: {e}", exc_info=True)
+            return None
 
         return module
 
