@@ -57,6 +57,7 @@ class YukkiBot(Client):
             max_concurrent_transmissions=5,
             workers=50,
         )
+        self.loaded_plug_counts = 0
 
     
     def on_message(self, filters=None, group=0):
@@ -244,6 +245,7 @@ class YukkiBot(Client):
 
         try:
             spec.loader.exec_module(module)
+            self.loaded_plug_counts += 1
         except Exception as e:
             LOGGER(__name__).error(f"Failed to load {module_path}: {e}", exc_info=True)
             return None
