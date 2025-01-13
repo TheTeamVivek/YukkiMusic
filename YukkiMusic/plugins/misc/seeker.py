@@ -26,8 +26,8 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline import stream_markup_timer, telegram_markup_timer
 
-from ..admins.callback import wrong
-from .autoleave import autoend
+from YukkiMusic.plugins.admins.callback import wrong
+from YukkiMusic.plugins.misc.autoleave import autoend
 
 checker = {}
 muted = {}
