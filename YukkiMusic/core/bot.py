@@ -270,3 +270,19 @@ class YukkiBot(Client):
                     file_path = os.path.join(root, file)
                     mod = self.load_plugin(file_path, base_dir, utils)
                     yield mod
+
+    async def run_shell_command(self, command: list):
+        process = await asyncio.create_subprocess_exec(
+            *command,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+
+        stdout, stderr = await process.communicate()
+
+        return {
+            "returncode": process.returncode,
+            "stdout": stdout.decode().strip(),
+            "stderr": stderr.decode().strip(),
+        }
+    
