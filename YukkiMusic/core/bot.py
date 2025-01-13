@@ -244,21 +244,20 @@ class YukkiBot(Client):
 
     def load_plugins_from(self, base_folder: str):
         base_dir = os.path.abspath(base_folder)
-        utils_path = os.path.join(base_dir, "utils")
+        utils_path = os.path.join(base_dir, "utils.py")
         utils = None
 
-        if os.path.exists(utils_path):
+        if os.path.exists(utils_path) and os.path.isfile(utils_path):
             try:
-                if os.path.isdir(utils_path) or utils_path.endswith(".py"):
-                    spec = importlib.util.spec_from_file_location("utils", utils_path)
-                    utils = importlib.util.module_from_spec(spec)
-                    spec.loader.exec_module(utils)
+                spec = importlib.util.spec_from_file_location("utils", utils_path)
+                utils = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(utils)
             except Exception as e:
                 LOGGER(__name__).error(f"Failed to load 'utils' module: {e}", exc_info = True)
 
         for root, _, files in os.walk(base_dir):
             for file in files:
-                if file.endswith(".py"):
+                if file.endswith(".py") not file == "utils.py":
                     file_path = os.path.join(root, file)
                     mod = self.load_plugin(file_path, base_dir, utils)
                     yield mod
