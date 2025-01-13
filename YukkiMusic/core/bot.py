@@ -138,6 +138,16 @@ class YukkiBot(Client):
             except Exception as e:
                 LOGGER(__name__).warning("Failed to set commands:", exc_info=True)
 
+
+        try:
+            a = await self.get_chat_member(config.LOG_GROUP_ID, "me")
+            if a.status != ChatMemberStatus.ADMINISTRATOR:
+                LOGGER(__name__).error("Please promote bot as admin in logger group")
+                exit()
+        except Exception:
+            pass
+        LOGGER(__name__).info(f"MusicBot started as {self.name}")
+
     async def _set_default_commands(self):
         private_commands = [
             BotCommand("start", "Start the bot"),
@@ -211,14 +221,3 @@ class YukkiBot(Client):
                 )
             except Exception:
                 pass
-
-        else:
-            pass
-        try:
-            a = await self.get_chat_member(config.LOG_GROUP_ID, self.id)
-            if a.status != ChatMemberStatus.ADMINISTRATOR:
-                LOGGER(__name__).error("Please promote bot as admin in logger group")
-                sys.exit()
-        except Exception:
-            pass
-        LOGGER(__name__).info(f"MusicBot started as {self.name}")
