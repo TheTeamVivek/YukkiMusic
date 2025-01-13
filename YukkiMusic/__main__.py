@@ -15,7 +15,7 @@ import config
 from config import BANNED_USERS
 from YukkiMusic import HELPABLE, LOGGER, app, userbot
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.plugins import ALL_MODULES
+# from YukkiMusic.plugins import ALL_MODULES
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
 
@@ -39,12 +39,10 @@ async def init():
     except Exception:
         pass
     await app.start()
-    for all_module in ALL_MODULES:
-        imported_module = importlib.import_module(all_module)
-
-        if hasattr(imported_module, "__MODULE__") and imported_module.__MODULE__:
-            if hasattr(imported_module, "__HELP__") and imported_module.__HELP__:
-                HELPABLE[imported_module.__MODULE__.lower()] = imported_module
+    for mod in app.load_plugins_from("YukkiMusic/plugins"):
+    if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
+        if hasattr(mod, "__HELP__") and mod.__HELP__:
+            HELPABLE[mod.__MODULE__.lower()] = mod
     LOGGER("YukkiMusic.plugins").info("Successfully Imported All Modules ")
     await userbot.start()
     await Yukki.start()
