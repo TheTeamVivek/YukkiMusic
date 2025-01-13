@@ -257,7 +257,7 @@ class YukkiBot(Client):
 
         for root, _, files in os.walk(base_dir):
             for file in files:
-                if file.endswith(".py") not file == "utils.py":
+                if file.endswith(".py") and not file == "utils.py":
                     file_path = os.path.join(root, file)
                     mod = self.load_plugin(file_path, base_dir, utils)
                     yield mod
