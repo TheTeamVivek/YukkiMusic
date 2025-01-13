@@ -24,7 +24,6 @@ from strings import command
 from YukkiMusic import Platform, app
 from YukkiMusic.core.userbot import assistants
 from YukkiMusic.misc import SUDOERS, pymongodb
-from YukkiMusic.plugins import ALL_MODULES
 from YukkiMusic.utils.database import (
     get_global_tops,
     get_particulars,
@@ -247,7 +246,7 @@ async def overall_stats(client, CallbackQuery, _):
     total_queries = await get_queries()
     blocked = len(BANNED_USERS)
     sudoers = len(SUDOERS)
-    mod = len(ALL_MODULES)
+    mod = int(app.loaded_plug_counts)
     assistant = len(assistants)
     playlist_limit = config.SERVER_PLAYLIST_LIMIT
     fetch_playlist = config.PLAYLIST_FETCH_LIMIT
@@ -317,7 +316,7 @@ async def overall_stats(client, CallbackQuery, _):
     used = str(used)
     free = hdd.free / (1024.0**3)
     free = str(free)
-    mod = len(ALL_MODULES)
+    mod = int(app.loaded_plug_counts)
     db = pymongodb
     call = db.command("dbstats")
     datasize = call["dataSize"] / 1024
