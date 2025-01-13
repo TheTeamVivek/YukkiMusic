@@ -238,7 +238,7 @@ class YukkiBot(Client):
             self.loaded_plug_counts += 1
         except Exception as e:
             LOGGER(__name__).error(f"Failed to load {module_path}: {e}", exc_info=True)
-            return None
+            exit()
 
         return module
 
