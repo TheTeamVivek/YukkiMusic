@@ -46,20 +46,12 @@ import config
 from ..logging import LOGGER
 
 class YukkiBot(Client):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         LOGGER(__name__).info("Starting Bot...")
-        super().__init__(
-            "YukkiMusic",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            bot_token=config.BOT_TOKEN,
-            sleep_threshold=240,
-            max_concurrent_transmissions=5,
-            workers=50,
-        )
+        
+        super().__init__(*args, **kwargs)
         self.loaded_plug_counts = 0
 
-    
     def on_message(self, filters=None, group=0):
         def decorator(func):
             @wraps(func)
@@ -76,7 +68,7 @@ class YukkiBot(Client):
                     MessageNotModified,
                     MessageIdInvalid,
                 ):
-                    pass 
+                    pass
                 except StopPropagation:
                     raise
                 except Exception as e:
@@ -110,7 +102,7 @@ class YukkiBot(Client):
             return func
 
         return decorator
-        
+
     async def start(self):
         await super().start()
         get_me = await self.get_me()
@@ -134,14 +126,12 @@ class YukkiBot(Client):
                 "Bot failed to access the log group. Ensure the bot is added and promoted as admin."
             )
             LOGGER(__name__).error("Error details:", exc_info=True)
-            # sys.exit()
-
+            # exit()
         if config.SET_CMDS == str(True):
             try:
                 await self._set_default_commands()
             except Exception as e:
                 LOGGER(__name__).warning("Failed to set commands:", exc_info=True)
-
 
         try:
             a = await self.get_chat_member(config.LOG_GROUP_ID, "me")
@@ -287,4 +277,3 @@ class YukkiBot(Client):
             "stdout": stdout.decode().strip() if stdout else None,
             "stderr": stderr.decode().strip() if stderr else None,
         }
-    
