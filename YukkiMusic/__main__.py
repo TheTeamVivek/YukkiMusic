@@ -46,22 +46,22 @@ async def init():
                 HELPABLE[mod.__MODULE__.lower()] = mod
 
     if config.EXTRA_PLUGINS:
-        if not os.path.exists("xtraplugins"):
-            result = await app.run_shell_command(["git", "clone", config.EXTRA_PLUGINS_REPO, "xtraplugins"])
-            if result["returncode"] != 0:
-                logger.error(f"Error cloning extra plugins: {result['stderr']}")
-                exit()
-        else:
+        if os.path.exists("xtraplugins"):
             result = await app.run_shell_command(["git", "-C", "xtraplugins", "pull"])
             if result["returncode"] != 0:
                 logger.error(f"Error pulling updates for extra plugins: {result['stderr']}")
                 exit()
+        else:
+            result = await app.run_shell_command(["git", "clone", config.EXTRA_PLUGINS_REPO, "xtraplugins"])
+            if result["returncode"] != 0:
+                logger.error(f"Error cloning extra plugins: {result['stderr']}")
+                exit()
             
-            req = os.path.join("xtraplugins", "requirements.txt")
-            if os.path.exists(req):
-                result = await app.run_shell_command(["pip", "install", "-r", req])
-                if result["returncode"] != 0:
-                    logger.error(f"Error installing requirements: {result['stderr']}")
+        req = os.path.join("xtraplugins", "requirements.txt")
+        if os.path.exists(req):
+            result = await app.run_shell_command(["pip", "install", "-r", req])
+            if result["returncode"] != 0:
+                logger.error(f"Error installing requirements: {result['stderr']}")
                     
         for mod in app.load_plugins_from("xtraplugins"):
             if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
