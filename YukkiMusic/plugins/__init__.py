@@ -24,7 +24,8 @@ logger = LOGGER(__name__)
 
 ROOT_DIR = abspath(join(dirname(__file__), "..", ".."))
 EXTERNAL_REPO_PATH = join(ROOT_DIR, EXTRA_PLUGINS_FOLDER)
-extra_plugins_enabled = EXTRA_PLUGINS.lower() == "true"
+# extra_plugins_enabled = EXTRA_PLUGINS.lower() == "true"
+extra_plugins_enabled = False
 
 if extra_plugins_enabled:
     if not os.path.exists(EXTERNAL_REPO_PATH):
