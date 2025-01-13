@@ -282,7 +282,7 @@ class YukkiBot(Client):
 
         return {
             "returncode": process.returncode,
-            "stdout": stdout.decode().strip(),
-            "stderr": stderr.decode().strip(),
+            "stdout": stdout.decode().strip() if stdout else None,
+            "stderr": stderr.decode().strip() if stderr else None,
         }
     
