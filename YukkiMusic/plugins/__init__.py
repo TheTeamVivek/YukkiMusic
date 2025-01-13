@@ -18,7 +18,9 @@ import sys
 from os.path import abspath, dirname, isfile, join
 
 from YukkiMusic import LOGGER
-from config import EXTRA_PLUGINS, EXTRA_PLUGINS_FOLDER, EXTRA_PLUGINS_REPO
+from config import EXTRA_PLUGINS, EXTRA_PLUGINS_REPO
+
+EXTRA_PLUGINS_FOLDER = "xtraplugins"
 
 logger = LOGGER(__name__)
 
