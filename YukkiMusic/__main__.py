@@ -6,6 +6,7 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
+import os
 import importlib
 
 from pyrogram import idle
@@ -15,18 +16,18 @@ import config
 from config import BANNED_USERS
 from YukkiMusic import HELPABLE, LOGGER, app, userbot
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.plugins import ALL_MODULES
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
+logger = LOGGER("YukkiMusic")
 
 async def init():
     if len(config.STRING_SESSIONS) == 0:
-        LOGGER("YukkiMusic").error(
+        logger.error(
             "No Assistant Clients Vars Defined!.. Exiting Process."
         )
         return
     if not config.SPOTIFY_CLIENT_ID and not config.SPOTIFY_CLIENT_SECRET:
-        LOGGER("YukkiMusic").warning(
+        logger.warning(
             "No Spotify Vars defined. Your bot won't be able to play spotify queries."
         )
     try:
@@ -39,12 +40,34 @@ async def init():
     except Exception:
         pass
     await app.start()
-    for all_module in ALL_MODULES:
-        imported_module = importlib.import_module(all_module)
+    for mod in app.load_plugins_from("YukkiMusic/plugins"):
+        if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
+            if hasattr(mod, "__HELP__") and mod.__HELP__:
+                HELPABLE[mod.__MODULE__.lower()] = mod
 
-        if hasattr(imported_module, "__MODULE__") and imported_module.__MODULE__:
-            if hasattr(imported_module, "__HELP__") and imported_module.__HELP__:
-                HELPABLE[imported_module.__MODULE__.lower()] = imported_module
+    if config.EXTRA_PLUGINS:
+        if os.path.exists("xtraplugins"):
+            result = await app.run_shell_command(["git", "-C", "xtraplugins", "pull"])
+            if result["returncode"] != 0:
+                logger.error(f"Error pulling updates for extra plugins: {result['stderr']}")
+                exit()
+        else:
+            result = await app.run_shell_command(["git", "clone", config.EXTRA_PLUGINS_REPO, "xtraplugins"])
+            if result["returncode"] != 0:
+                logger.error(f"Error cloning extra plugins: {result['stderr']}")
+                exit()
+            
+        req = os.path.join("xtraplugins", "requirements.txt")
+        if os.path.exists(req):
+            result = await app.run_shell_command(["pip", "install", "-r", req])
+            if result["returncode"] != 0:
+                logger.error(f"Error installing requirements: {result['stderr']}")
+                    
+        for mod in app.load_plugins_from("xtraplugins"):
+            if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
+                if hasattr(mod, "__HELP__") and mod.__HELP__:
+                    HELPABLE[mod.__MODULE__.lower()] = mod
+
     LOGGER("YukkiMusic.plugins").info("Successfully Imported All Modules ")
     await userbot.start()
     await Yukki.start()

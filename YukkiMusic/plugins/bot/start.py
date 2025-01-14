@@ -38,7 +38,7 @@ from YukkiMusic.utils.formatters import get_readable_time
 from YukkiMusic.utils.functions import MARKDOWN, WELCOMEHELP
 from YukkiMusic.utils.inline import private_panel, start_pannel
 
-from .help import paginate_modules
+from YukkiMusic.plugins.bot.help import paginate_modules
 
 loop = asyncio.get_running_loop()
 

@@ -9,9 +9,20 @@
 #
 import asyncio
 import sys
+import traceback
+from datetime import datetime
+from functools import wraps
 
-from pyrogram import Client
-from pyrogram.errors import ChatWriteForbidden
+from pyrogram import Client, StopPropagation
+from pyrogram.errors import (
+    FloodWait,
+    MessageNotModified,
+    MessageIdInvalid,
+    ChatSendMediaForbidden,
+    ChatSendPhotosForbidden,
+    ChatWriteForbidden,
+)
+from pyrogram.handlers import MessageHandler
 import config
 
 from ..logging import LOGGER
@@ -23,22 +34,14 @@ assistantids = []
 class Userbot(Client):
     def __init__(self):
         self.clients = []
-        self.sessions = config.STRING_SESSIONS
+        self.handlers = []
 
-        for i, session in enumerate(self.sessions, start=1):
-
-            client = Client(
-                f"YukkiString{i}",
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                in_memory=True,
-                no_updates=True,
-                session_string=session.strip(),
-            )
-            self.clients.append(client)
+    def add(self, *args, **kwargs):
+        """Add a new client to the Userbot."""
+        self.clients.append(Client(*args, **kwargs))
 
     async def _start(self, client, index):
-        LOGGER(__name__).info("Starting Assistant Clients")
+        LOGGER(__name__).info(f"Starting Assistant Client {index}")
         try:
             await client.start()
             assistants.append(index)
@@ -50,7 +53,8 @@ class Userbot(Client):
                     await client.send_message(config.LOG_GROUP_ID, "Assistant Started")
                 except Exception:
                     LOGGER(__name__).error(
-                        f"Assistant Account {index} has failed to send message in Loggroup Make sure you have added assistsant in Loggroup."
+                        f"Assistant Account {index} failed to send message in log group. "
+                        f"Ensure the assistant is added to the log group."
                     )
                     sys.exit(1)
 
@@ -61,28 +65,75 @@ class Userbot(Client):
             assistantids.append(get_me.id)
             client.name = f"{get_me.first_name} {get_me.last_name or ''}".strip()
 
+            # Add stored handlers to the client
+            for handler, group in self.handlers:
+                client.add_handler(handler, group)
+
         except Exception as e:
             LOGGER(__name__).error(
-                f"Assistant Account {index} failed with error: {str(e)}."
+                f"Assistant Account {index} failed with error: {str(e)}. Exiting..."
             )
             sys.exit(1)
 
     async def start(self):
-        tasks = []  # List to hold start tasks
-        for i, client in enumerate(self.clients, start=1):
-            task = self._start(client, i)
-            tasks.append(task)
+        """Start all clients."""
+        tasks = [self._start(client, i) for i, client in enumerate(self.clients, start=1)]
         await asyncio.gather(*tasks)
 
     async def stop(self):
         """Gracefully stop all clients."""
         tasks = [client.stop() for client in self.clients]
         await asyncio.gather(*tasks)
-    
-    def __getattr__(self, name):
-        if not self.clients:
-            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
-        first_client = self.clients[0]
-        if hasattr(first_client, name):
-            return getattr(first_client, name)
-        raise AttributeError(f"'{type(first_client).__name__}' object has no attribute '{name}'")
+
+    def on_message(self, filters=None, group=0): # on_message decirator for future Userbot Plugins
+        """Decorator for handling messages with error handling."""
+        def decorator(func):
+            @wraps(func)
+            async def wrapper(client, message):
+                try:
+                    await func(client, message)
+                except FloodWait as e:
+                    LOGGER(__name__).warning(f"FloodWait: Sleeping for {e.value} seconds.")
+                    await asyncio.sleep(e.value)
+                except (
+                    ChatWriteForbidden,
+                    ChatSendMediaForbidden,
+                    ChatSendPhotosForbidden,
+                    MessageNotModified,
+                    MessageIdInvalid,
+                ):
+                    pass
+                except StopPropagation:
+                    raise
+                except Exception as e:
+                    # Detailed error logging
+                    date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    user_id = message.from_user.id if message.from_user else "Unknown"
+                    chat_id = message.chat.id if message.chat else "Unknown"
+                    chat_username = f"@{message.chat.username}" if message.chat.username else "Private Group"
+                    command = (
+                        " ".join(message.command)
+                        if hasattr(message, "command")
+                        else message.text
+                    )
+                    error_trace = traceback.format_exc()
+                    error_message = (
+                        f"**Error:** {type(e).__name__}\n"
+                        f"**Date:** {date_time}\n"
+                        f"**Chat ID:** {chat_id}\n"
+                        f"**Chat Username:** {chat_username}\n"
+                        f"**User ID:** {user_id}\n"
+                        f"**Command/Text:** {command}\n"
+                        f"**Traceback:**\n{error_trace}"
+                    )
+                    await client.send_message(config.LOG_GROUP_ID, error_message)
+                    try:
+                        await client.send_message(config.OWNER_ID[0], error_message)
+                    except Exception:
+                        pass
+
+            handler = MessageHandler(wrapper, filters)
+            self.handlers.append((handler, group))
+            return func
+
+        return decorator

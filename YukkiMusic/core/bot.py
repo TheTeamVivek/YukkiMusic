@@ -14,6 +14,9 @@ uvloop.install()
 import asyncio
 import sys
 
+import os
+import importlib.util
+
 import traceback
 from datetime import datetime
 from functools import wraps
@@ -43,19 +46,12 @@ import config
 from ..logging import LOGGER
 
 class YukkiBot(Client):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         LOGGER(__name__).info("Starting Bot...")
-        super().__init__(
-            "YukkiMusic",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            bot_token=config.BOT_TOKEN,
-            sleep_threshold=240,
-            max_concurrent_transmissions=5,
-            workers=50,
-        )
+        
+        super().__init__(*args, **kwargs)
+        self.loaded_plug_counts = 0
 
-    
     def on_message(self, filters=None, group=0):
         def decorator(func):
             @wraps(func)
@@ -72,7 +68,7 @@ class YukkiBot(Client):
                     MessageNotModified,
                     MessageIdInvalid,
                 ):
-                    pass 
+                    pass
                 except StopPropagation:
                     raise
                 except Exception as e:
@@ -106,7 +102,7 @@ class YukkiBot(Client):
             return func
 
         return decorator
-        
+
     async def start(self):
         await super().start()
         get_me = await self.get_me()
@@ -130,14 +126,12 @@ class YukkiBot(Client):
                 "Bot failed to access the log group. Ensure the bot is added and promoted as admin."
             )
             LOGGER(__name__).error("Error details:", exc_info=True)
-            # sys.exit()
-
+            # exit()
         if config.SET_CMDS == str(True):
             try:
                 await self._set_default_commands()
             except Exception as e:
                 LOGGER(__name__).warning("Failed to set commands:", exc_info=True)
-
 
         try:
             a = await self.get_chat_member(config.LOG_GROUP_ID, "me")
@@ -221,3 +215,64 @@ class YukkiBot(Client):
                 )
             except Exception:
                 pass
+                
+    def load_plugin(self, file_path: str, base_dir: str, utils=None):
+        file_name = os.path.basename(file_path)
+        module_name, ext = os.path.splitext(file_name)
+        if module_name.startswith("__") or ext != ".py":
+            return None
+
+        relative_path = os.path.relpath(file_path, base_dir).replace(os.sep, ".")
+        module_path = f"{os.path.basename(base_dir)}.{relative_path[:-3]}"
+
+        spec = importlib.util.spec_from_file_location(module_path, file_path)
+        module = importlib.util.module_from_spec(spec)
+        module.logger = LOGGER(module_path)
+        module.app = self
+
+        if utils:
+            module.utils = utils
+
+        try:
+            spec.loader.exec_module(module)
+            self.loaded_plug_counts += 1
+        except Exception as e:
+            LOGGER(__name__).error(f"Failed to load {module_path}: {e}\n\n", exc_info=True)
+            exit()
+
+        return module
+
+    def load_plugins_from(self, base_folder: str):
+        base_dir = os.path.abspath(base_folder)
+        utils_path = os.path.join(base_dir, "utils.py")
+        utils = None
+
+        if os.path.exists(utils_path) and os.path.isfile(utils_path):
+            try:
+                spec = importlib.util.spec_from_file_location("utils", utils_path)
+                utils = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(utils)
+            except Exception as e:
+                LOGGER(__name__).error(f"Failed to load 'utils' module: {e}", exc_info = True)
+
+        for root, _, files in os.walk(base_dir):
+            for file in files:
+                if file.endswith(".py") and not file == "utils.py":
+                    file_path = os.path.join(root, file)
+                    mod = self.load_plugin(file_path, base_dir, utils)
+                    yield mod
+
+    async def run_shell_command(self, command: list):
+        process = await asyncio.create_subprocess_exec(
+            *command,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+
+        stdout, stderr = await process.communicate()
+
+        return {
+            "returncode": process.returncode,
+            "stdout": stdout.decode().strip() if stdout else None,
+            "stderr": stderr.decode().strip() if stderr else None,
+        }

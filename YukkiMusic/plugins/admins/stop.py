@@ -10,12 +10,11 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from config import BANNED_USERS, adminlist
+from config import BANNED_USERS, adminlist, EXTRA_PLUGINS
 from strings import get_string, command
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.plugins import extra_plugins_enabled
 from YukkiMusic.utils.database import (
     delete_filter,
     get_cmode,
@@ -34,7 +33,7 @@ async def stop_music(cli, message: Message):
         if message.from_user.id not in SUDOERS:
             return
     if not len(message.command) < 2:
-        if extra_plugins_enabled:
+        if EXTRA_PLUGINS:
             if not message.command[0][0] == "c" and not message.command[0][0] == "e":
                 filter = " ".join(message.command[1:])
                 deleted = await delete_filter(message.chat.id, filter)
