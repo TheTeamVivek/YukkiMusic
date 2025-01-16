@@ -14,6 +14,7 @@ import random
 import asyncio
 from typing import Union
 
+from async_lru import alru_cache
 from yt_dlp import YoutubeDL
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
@@ -92,6 +93,7 @@ class YouTube:
             return None
         return text[offset : offset + length]
 
+    @alru_cache(maxsize=None)
     async def details(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -109,6 +111,7 @@ class YouTube:
                 duration_sec = int(time_to_seconds(duration_min))
         return title, duration_min, duration_sec, thumbnail, vidid
 
+    @alru_cache(maxsize=None)
     async def title(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -119,6 +122,7 @@ class YouTube:
             title = result["title"]
         return title
 
+    @alru_cache(maxsize=None)
     async def duration(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -129,6 +133,7 @@ class YouTube:
             duration = result["duration"]
         return duration
 
+    @alru_cache(maxsize=None)
     async def thumbnail(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -164,6 +169,7 @@ class YouTube:
         else:
             return 0, stderr.decode()
 
+    @alru_cache(maxsize=None)
     async def playlist(self, link, limit, videoid: Union[bool, str] = None):
         if videoid:
             link = self.listbase + link
@@ -184,6 +190,7 @@ class YouTube:
             result = []
         return result
 
+    @alru_cache(maxsize=None)
     async def track(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -235,6 +242,7 @@ class YouTube:
             }
             return info, details["id"]
 
+    @alru_cache(maxsize=None)
     @asyncify
     def formats(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
@@ -277,6 +285,7 @@ class YouTube:
                     )
         return formats_available, link
 
+    @alru_cache(maxsize=None)
     async def slider(
         self,
         link: str,
