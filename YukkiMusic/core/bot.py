@@ -12,7 +12,6 @@ import uvloop
 uvloop.install()
 
 import asyncio
-import sys
 
 import os
 import importlib.util
@@ -21,7 +20,7 @@ import traceback
 from datetime import datetime
 from functools import wraps
 
-from pyrogram import Client, filters, StopPropagation
+from pyrogram import Client, StopPropagation, errors
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.types import (
     BotCommand,
@@ -121,12 +120,12 @@ class YukkiBot(Client):
                     f"Username : @{self.username}"
                 ),
             )
-        except Exception as e:
+        except (errors.ChannelInvalid, errors.PeerIdInvalid):
             LOGGER(__name__).error(
                 "Bot failed to access the log group. Ensure the bot is added and promoted as admin."
             )
             LOGGER(__name__).error("Error details:", exc_info=True)
-            # exit()
+            exit()
         if config.SET_CMDS == str(True):
             try:
                 await self._set_default_commands()
