@@ -228,6 +228,7 @@ class YukkiBot(Client):
         module = importlib.util.module_from_spec(spec)
         module.logger = LOGGER(module_path)
         module.app = self
+        module.Config = config
 
         if utils:
             module.utils = utils
