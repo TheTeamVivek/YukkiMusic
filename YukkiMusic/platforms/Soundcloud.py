@@ -9,6 +9,7 @@
 #
 
 from os import path
+from typing import Union
 
 from yt_dlp import YoutubeDL
 
@@ -30,7 +31,7 @@ class SoundCloud:
         return "soundcloud" in link
 
     @asyncify
-    def download(self, url: str) -> dict | bool:
+    def download(self, url: str) -> Union[dict, bool]:
         d = YoutubeDL(self.opts)
         try:
             info = d.extract_info(url)
