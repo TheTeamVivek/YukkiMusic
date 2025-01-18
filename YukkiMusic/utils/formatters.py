@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -23,8 +23,9 @@ def get_readable_time(seconds: int) -> str:
             break
         time_list.append(int(result))
         seconds = int(remainder)
-    for i in range(len(time_list)):
-        time_list[i] = str(time_list[i]) + time_suffix_list[i]
+    for i, time_str in enumerate(time_list):
+        time_list[i] = str(time_str) + time_suffix_list[i]
+
     if len(time_list) == 4:
         ping_time += time_list.pop() + ", "
     time_list.reverse()
@@ -42,7 +43,7 @@ def convert_bytes(size: float) -> str:
     while size > power:
         size /= power
         t_n += 1
-    return "{:.2f} {}B".format(size, power_dict[t_n])
+    return f"{size:.2f} {power_dict[t_n]}B"
 
 
 async def int_to_alpha(user_id: int) -> str:
@@ -70,22 +71,24 @@ def time_to_seconds(time):
 
 
 def seconds_to_min(seconds):
-    if seconds is not None:
-        seconds = int(seconds)
-        d, h, m, s = (
-            seconds // (3600 * 24),
-            seconds // 3600 % 24,
-            seconds % 3600 // 60,
-            seconds % 3600 % 60,
-        )
-        if d > 0:
-            return "{:02d}:{:02d}:{:02d}:{:02d}".format(d, h, m, s)
-        elif h > 0:
-            return "{:02d}:{:02d}:{:02d}".format(h, m, s)
-        elif m > 0:
-            return "{:02d}:{:02d}".format(m, s)
-        elif s > 0:
-            return "00:{:02d}".format(s)
+    if seconds is None:
+        return "-"
+    seconds = int(seconds)
+    d, h, m, s = (
+        seconds // (3600 * 24),
+        seconds // 3600 % 24,
+        seconds % 3600 // 60,
+        seconds % 3600 % 60,
+    )
+    time_parts = [
+        (d > 0, f"{d:02d}:{h:02d}:{m:02d}:{s:02d}"),
+        (h > 0, f"{h:02d}:{m:02d}:{s:02d}"),
+        (m > 0, f"{m:02d}:{s:02d}"),
+        (s > 0, f"00:{s:02d}"),
+    ]
+    for condition, result in time_parts:
+        if condition:
+            return result
     return "-"
 
 

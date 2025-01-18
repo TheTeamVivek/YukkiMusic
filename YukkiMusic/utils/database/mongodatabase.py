@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 
-from typing import Dict, List, Union
 
 from YukkiMusic.core.mongo import mongodb
 
@@ -30,21 +29,21 @@ playlist = []
 # Playlist
 
 
-async def _get_playlists(chat_id: int) -> Dict[str, int]:
+async def _get_playlists(chat_id: int) -> dict[str, int]:
     _notes = await playlistdb.find_one({"chat_id": chat_id})
     if not _notes:
         return {}
     return _notes["notes"]
 
 
-async def get_playlist_names(chat_id: int) -> List[str]:
+async def get_playlist_names(chat_id: int) -> list[str]:
     _notes = []
     for note in await _get_playlists(chat_id):
         _notes.append(note)
     return _notes
 
 
-async def get_playlist(chat_id: int, name: str) -> Union[bool, dict]:
+async def get_playlist(chat_id: int, name: str) -> bool | dict:
     name = name
     _notes = await _get_playlists(chat_id)
     if name in _notes:
@@ -191,21 +190,21 @@ async def remove_private_chat(chat_id: int):
 # Auth Users DB
 
 
-async def _get_authusers(chat_id: int) -> Dict[str, int]:
+async def _get_authusers(chat_id: int) -> dict[str, int]:
     _notes = await authuserdb.find_one({"chat_id": chat_id})
     if not _notes:
         return {}
     return _notes["notes"]
 
 
-async def get_authuser_names(chat_id: int) -> List[str]:
+async def get_authuser_names(chat_id: int) -> list[str]:
     _notes = []
     for note in await _get_authusers(chat_id):
         _notes.append(note)
     return _notes
 
 
-async def get_authuser(chat_id: int, name: str) -> Union[bool, dict]:
+async def get_authuser(chat_id: int, name: str) -> bool | dict:
     name = name
     _notes = await _get_authusers(chat_id)
     if name in _notes:
@@ -353,14 +352,14 @@ async def get_global_tops() -> dict:
     return results
 
 
-async def get_particulars(chat_id: int) -> Dict[str, int]:
+async def get_particulars(chat_id: int) -> dict[str, int]:
     ids = await chattopdb.find_one({"chat_id": chat_id})
     if not ids:
         return {}
     return ids["vidid"]
 
 
-async def get_particular_top(chat_id: int, name: str) -> Union[bool, dict]:
+async def get_particular_top(chat_id: int, name: str) -> bool | dict:
     ids = await get_particulars(chat_id)
     if name in ids:
         return ids[name]
@@ -377,7 +376,7 @@ async def update_particular_top(chat_id: int, name: str, vidid: dict):
 # Top User DB
 
 
-async def get_userss(chat_id: int) -> Dict[str, int]:
+async def get_userss(chat_id: int) -> dict[str, int]:
     ids = await userdb.find_one({"chat_id": chat_id})
     if not ids:
         return {}
@@ -389,7 +388,7 @@ async def delete_userss(chat_id: int) -> bool:
     return result.deleted_count > 0
 
 
-async def get_user_top(chat_id: int, name: str) -> Union[bool, dict]:
+async def get_user_top(chat_id: int, name: str) -> bool | dict:
     ids = await get_userss(chat_id)
     if name in ids:
         return ids[name]

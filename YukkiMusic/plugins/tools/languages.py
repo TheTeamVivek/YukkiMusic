@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -13,10 +13,10 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, Message
 
 from config import BANNED_USERS
-from strings import get_string, languages_present, command
+from strings import command, get_string, languages_present
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_lang, set_lang
-from YukkiMusic.utils.decorators import ActualAdminCB, language, languageCB
+from YukkiMusic.utils.decorators import actual_admin_cb, language, language
 
 # Languages Available
 
@@ -27,11 +27,11 @@ def lanuages_keyboard(_):
         *[
             (
                 InlineKeyboardButton(
-                    text=languages_present[i],
-                    callback_data=f"languages:{i}",
+                    text=value,
+                    callback_data=f"languages:{key}",
                 )
             )
-            for i in languages_present
+            for key, value in languages_present.items()
         ]
     )
     keyboard.row(
@@ -55,7 +55,7 @@ async def langs_command(client, message: Message, _):
 
 
 @app.on_callback_query(filters.regex("LG") & ~BANNED_USERS)
-@languageCB
+@language
 async def lanuagecb(client, CallbackQuery, _):
     try:
         await CallbackQuery.answer()
@@ -66,7 +66,7 @@ async def lanuagecb(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex(r"languages:(.*?)") & ~BANNED_USERS)
-@ActualAdminCB
+@actual_admin_cb
 async def language_markup(client, CallbackQuery, _):
     langauge = (CallbackQuery.data).split(":")[1]
     old = await get_lang(CallbackQuery.message.chat.id)

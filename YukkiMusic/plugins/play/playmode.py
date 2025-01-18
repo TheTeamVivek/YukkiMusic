@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -14,7 +14,11 @@ from pyrogram.types import InlineKeyboardMarkup, Message
 from config import BANNED_USERS
 from strings import command
 from YukkiMusic import app
-from YukkiMusic.utils.database import get_playmode, get_playtype, is_nonadmin_chat
+from YukkiMusic.utils.database import (
+    get_playmode,
+    get_playtype,
+    is_nonadmin_chat,
+)
 from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.inline.settings import playmode_users_markup
 

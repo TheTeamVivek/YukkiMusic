@@ -1,5 +1,11 @@
 # 🎵 **YukkiMusic** 🎶
 
+> [!CAUTION]
+> Please use the **`master` branch** for stable performance. The **`dev` branch** is under active development and may contain bugs or errors.
+
+> Currently, we are converting the bot from **Kurigram to Telethon**, reediting platform usage, and performing a full core rewrite. For a stable experience, stick to the master branch.
+
+
 [**YukkiMusic**](https://github.com/TheTeamVivek/YukkiMusic) is an enhanced version of the original [**YukkiMusicBot**](https://github.com/TeamYukki/YukkiMusicBot), optimized for high-quality music streaming in Telegram voice chats. Built with Python and Pyrogram. 🚀
 
 ## ⭐ Support the Original
@@ -75,4 +81,8 @@ Together, we can make [**YukkiMusic**](https://github.com/TheTeamVivek/YukkiMusi
 
 ## 🙏 Special Thanks
 
-A heartfelt thanks to [**Team Yukki**](https://github.com/TeamYukki) for creating the amazing  [**YukkiMusicBot**](https://github.com/TeamYukki/YukkiMusicBot) that inspired this project!
+A heartfelt thanks to [**Team Yukki**](https://github.com/TeamYukki) for creating the original [**YukkiMusicBot**](https://github.com/TeamYukki/YukkiMusicBot), which, although now inactive, served as the foundation for this project.  
+
+A special thanks to [**Pranav-Saraswat**](https://github.com/Pranav-Saraswat) for forking and reviving it as [**YukkiMusicFork**](https://github.com/Pranav-Saraswat/YukkiMusicFork), making the bot functional again. However, **YukkiMusicFork** has since been deleted by Pranav.  
+
+Our current project, [**YukkiMusic**](https://github.com/TheTeamVivek/YukkiMusic), is an imported and further improved version of the now-deleted **YukkiMusicFork**.

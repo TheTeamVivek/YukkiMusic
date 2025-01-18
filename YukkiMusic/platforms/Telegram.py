@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -12,14 +12,20 @@ import asyncio
 import os
 import time
 from datetime import datetime, timedelta
-from typing import Union
 
 import aiohttp
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Voice
+from pyrogram.enums import MessageEntityType
+from pyrogram.types import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+    Voice,
+)
 
 import config
 from config import lyrical
 from YukkiMusic import app
+from YukkiMusic.utils.decorators import asyncify
 
 from ..utils.formatters import convert_bytes, get_readable_time, seconds_to_min
 
@@ -30,6 +36,31 @@ class Telegram:
     def __init__(self):
         self.chars_limit = 4096
         self.sleep = config.TELEGRAM_DOWNLOAD_EDIT_SLEEP
+
+    @asyncify
+    def url(self, message_1: Message) -> str | None:
+        messages = [message_1]
+        if message_1.reply_to_message:
+            messages.append(message_1.reply_to_message)
+        text = ""
+        offset = None
+        length = None
+        for message in messages:
+            if offset:
+                break
+            if message.entities:
+                for entity in message.entities:
+                    if entity.type == MessageEntityType.URL:
+                        text = message.text or message.caption
+                        offset, length = entity.offset, entity.length
+                        break
+            elif message.caption_entities:
+                for entity in message.caption_entities:
+                    if entity.type == MessageEntityType.TEXT_LINK:
+                        return entity.url
+        if offset in (None,):
+            return None
+        return text[offset : offset + length]
 
     async def send_split_text(self, message, string):
         n = self.chars_limit
@@ -45,11 +76,11 @@ class Telegram:
         if message.chat.username:
             link = f"https://t.me/{message.chat.username}/{message.reply_to_message.id}"
         else:
-            xf = str((message.chat.id))[4:]
+            xf = str(message.chat.id)[4:]
             link = f"https://t.me/c/{xf}/{message.reply_to_message.id}"
         return link
 
-    async def get_filename(self, file, audio: Union[bool, str] = None):
+    async def get_filename(self, file, audio: bool | str = None):
         try:
             file_name = file.file_name
             if file_name is None:
@@ -67,8 +98,8 @@ class Telegram:
 
     async def get_filepath(
         self,
-        audio: Union[bool, str] = None,
-        video: Union[bool, str] = None,
+        audio: bool | str = None,
+        video: bool | str = None,
     ):
         if audio:
             try:

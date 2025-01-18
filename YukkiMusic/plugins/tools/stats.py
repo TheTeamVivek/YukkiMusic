@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -34,7 +34,7 @@ from YukkiMusic.utils.database import (
     get_top_chats,
     get_topp_users,
 )
-from YukkiMusic.utils.decorators.language import language, languageCB
+from YukkiMusic.utils.decorators.language import language, language
 from YukkiMusic.utils.inline.stats import (
     back_stats_buttons,
     back_stats_markup,
@@ -117,7 +117,7 @@ async def gstats_global(client, message: Message, _):
 
 
 @app.on_callback_query(filters.regex("GetStatsNow") & ~BANNED_USERS)
-@languageCB
+@language
 async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
     chat_id = CallbackQuery.message.chat.id
     callback_data = CallbackQuery.data.strip()
@@ -228,7 +228,7 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("TopOverall") & ~BANNED_USERS)
-@languageCB
+@language
 async def overall_stats(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     what = callback_data.split(None, 1)[1]
@@ -282,7 +282,7 @@ async def overall_stats(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("bot_stats_sudo"))
-@languageCB
+@language
 async def overall_stats(client, CallbackQuery, _):
     if CallbackQuery.from_user.id not in SUDOERS:
         return await CallbackQuery.answer("ᴏɴʟʏ ғᴏʀ sᴜᴅᴏ ᴜsᴇʀ's", show_alert=True)
@@ -368,7 +368,7 @@ async def overall_stats(client, CallbackQuery, _):
 @app.on_callback_query(
     filters.regex(pattern=r"^(TOPMARKUPGET|GETSTATS|GlobalStats)$") & ~BANNED_USERS
 )
-@languageCB
+@language
 async def back_buttons(client, CallbackQuery, _):
     try:
         await CallbackQuery.answer()

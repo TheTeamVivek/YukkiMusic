@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -7,21 +7,26 @@
 #
 # All rights reserved.
 #
-import uvloop
-
-uvloop.install()
-
 import asyncio
-
-import os
 import importlib.util
-
+import os
+import sys
 import traceback
 from datetime import datetime
 from functools import wraps
 
+import uvloop
 from pyrogram import Client, StopPropagation, errors
 from pyrogram.enums import ChatMemberStatus
+from pyrogram.errors import (
+    ChatSendMediaForbidden,
+    ChatSendPhotosForbidden,
+    ChatWriteForbidden,
+    FloodWait,
+    MessageIdInvalid,
+    MessageNotModified,
+)
+from pyrogram.handlers import MessageHandler
 from pyrogram.types import (
     BotCommand,
     BotCommandScopeAllChatAdministrators,
@@ -30,26 +35,25 @@ from pyrogram.types import (
     BotCommandScopeChat,
     BotCommandScopeChatMember,
 )
-from pyrogram.errors import (
-    FloodWait,
-    MessageNotModified,
-    MessageIdInvalid,
-    ChatSendMediaForbidden,
-    ChatSendPhotosForbidden,
-    ChatWriteForbidden,
-)
-from pyrogram.handlers import MessageHandler
 
 import config
+from YukkiMusic.utils.decorators.asyncify import asyncify
 
-from ..logging import LOGGER
+from ..logging import logger
+
+uvloop.install()
+
 
 class YukkiBot(Client):
     def __init__(self, *args, **kwargs):
-        LOGGER(__name__).info("Starting Bot...")
-        
+        logger(__name__).info("Starting Bot...")
+
         super().__init__(*args, **kwargs)
-        self.loaded_plug_counts = 0
+        self.loaded_plug_counts: int = 0
+        self.name: str = None
+        self.username: str = None
+        self.mention: str = None
+        self.id: int = None
 
     def on_message(self, filters=None, group=0):
         def decorator(func):
@@ -58,7 +62,9 @@ class YukkiBot(Client):
                 try:
                     await func(client, message)
                 except FloodWait as e:
-                    LOGGER(__name__).warning(f"FloodWait: Sleeping for {e.value} seconds.")
+                    logger(__name__).warning(
+                        "FloodWait: Sleeping for %d seconds.", e.value
+                    )
                     await asyncio.sleep(e.value)
                 except (
                     ChatWriteForbidden,
@@ -74,7 +80,11 @@ class YukkiBot(Client):
                     date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     user_id = message.from_user.id if message.from_user else "Unknown"
                     chat_id = message.chat.id if message.chat else "Unknown"
-                    chat_username = f"@{message.chat.username}" if message.chat.username else "Private Group"
+                    chat_username = (
+                        f"@{message.chat.username}"
+                        if message.chat.username
+                        else "Private Group"
+                    )
                     command = (
                         " ".join(message.command)
                         if hasattr(message, "command")
@@ -121,25 +131,25 @@ class YukkiBot(Client):
                 ),
             )
         except (errors.ChannelInvalid, errors.PeerIdInvalid):
-            LOGGER(__name__).error(
+            logger(__name__).error(
                 "Bot failed to access the log group. Ensure the bot is added and promoted as admin."
             )
-            LOGGER(__name__).error("Error details:", exc_info=True)
-            exit()
+            logger(__name__).error("Error details:", exc_info=True)
+            sys.exit()
         if config.SET_CMDS == str(True):
             try:
                 await self._set_default_commands()
-            except Exception as e:
-                LOGGER(__name__).warning("Failed to set commands:", exc_info=True)
+            except Exception:
+                logger(__name__).warning("Failed to set commands:", exc_info=True)
 
         try:
             a = await self.get_chat_member(config.LOG_GROUP_ID, "me")
             if a.status != ChatMemberStatus.ADMINISTRATOR:
-                LOGGER(__name__).error("Please promote bot as admin in logger group")
-                exit()
+                logger(__name__).error("Please promote bot as admin in logger group")
+                sys.exit()
         except Exception:
             pass
-        LOGGER(__name__).info(f"MusicBot started as {self.name}")
+        logger(__name__).info("MusicBot started as %s", self.name)
 
     async def _set_default_commands(self):
         private_commands = [
@@ -210,39 +220,37 @@ class YukkiBot(Client):
                     ),
                 )
                 await self.set_bot_commands(
-                    private_commands + owner_commands, scope=BotCommandScopeChat(chat_id=owner_id)
+                    private_commands + owner_commands,
+                    scope=BotCommandScopeChat(chat_id=owner_id),
                 )
             except Exception:
                 pass
-                
-    def load_plugin(self, file_path: str, base_dir: str, utils=None):
-        file_name = os.path.basename(file_path)
-        module_name, ext = os.path.splitext(file_name)
-        if module_name.startswith("__") or ext != ".py":
-            return None
 
+    @asyncify
+    def load_plugin(self, file_path: str, base_dir: str, attrs: dict):
         relative_path = os.path.relpath(file_path, base_dir).replace(os.sep, ".")
         module_path = f"{os.path.basename(base_dir)}.{relative_path[:-3]}"
 
         spec = importlib.util.spec_from_file_location(module_path, file_path)
         module = importlib.util.module_from_spec(spec)
-        module.logger = LOGGER(module_path)
+        module.logger = logger(module_path)
         module.app = self
         module.Config = config
-
-        if utils:
-            module.utils = utils
+        for name, attr in attrs.items():
+            setattr(module, name, attr)
 
         try:
             spec.loader.exec_module(module)
             self.loaded_plug_counts += 1
         except Exception as e:
-            LOGGER(__name__).error(f"Failed to load {module_path}: {e}\n\n", exc_info=True)
-            exit()
+            logger(__name__).error(
+                "Failed to load %s: %s\n\n", module_path, e, exc_info=True
+            )
+            sys.exit()
 
         return module
 
-    def load_plugins_from(self, base_folder: str):
+    async def load_plugins_from(self, base_folder: str, attrs: dict):
         base_dir = os.path.abspath(base_folder)
         utils_path = os.path.join(base_dir, "utils.py")
         utils = None
@@ -253,13 +261,21 @@ class YukkiBot(Client):
                 utils = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(utils)
             except Exception as e:
-                LOGGER(__name__).error(f"Failed to load 'utils' module: {e}", exc_info = True)
+                logger(__name__).error(
+                    "Failed to load 'utils' module: %s", e, exc_info=True
+                )
 
+        if utils:
+            attrs["utils"] = utils
         for root, _, files in os.walk(base_dir):
             for file in files:
-                if file.endswith(".py") and not file == "utils.py":
+                if (
+                    file.endswith(".py")
+                    and not file == "utils.py"
+                    or not file.startswith("__")
+                ):
                     file_path = os.path.join(root, file)
-                    mod = self.load_plugin(file_path, base_dir, utils)
+                    mod = await self.load_plugin(file_path, base_dir, attrs)
                     yield mod
 
     async def run_shell_command(self, command: list):

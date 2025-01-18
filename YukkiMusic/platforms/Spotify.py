@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -11,14 +11,17 @@
 import re
 
 import spotipy
+from async_lru import alru_cache
 from spotipy.oauth2 import SpotifyClientCredentials
 from youtubesearchpython.__future__ import VideosSearch
 
 import config
 from YukkiMusic.utils.decorators import asyncify
 
+from .base import Base
 
-class Spotify:
+
+class Spotify(Base):
     def __init__(self):
         self.regex = r"^(https:\/\/open.spotify.com\/)(.*)$"
         self.client_id = config.SPOTIFY_CLIENT_ID
@@ -34,11 +37,9 @@ class Spotify:
             self.spotify = None
 
     async def valid(self, link: str):
-        if re.search(self.regex, link):
-            return True
-        else:
-            return False
+        return bool(re.search(self.regex, link))
 
+    @alru_cache(maxsize=None)
     async def track(self, link: str):
         track = self.spotify.track(link)
         info = track["name"]
@@ -62,6 +63,7 @@ class Spotify:
         }
         return track_details, vidid
 
+    @alru_cache(maxsize=None)
     @asyncify
     def playlist(self, url: str) -> tuple:
         playlist = self.spotify.playlist(url)
@@ -77,6 +79,7 @@ class Spotify:
             results.append(info)
         return results, playlist_id
 
+    @alru_cache(maxsize=None)
     @asyncify
     def album(self, url: str) -> tuple:
         album = self.spotify.album(url)
@@ -91,6 +94,7 @@ class Spotify:
             results.append(info)
         return results, album_id
 
+    @alru_cache(maxsize=None)
     @asyncify
     def artist(self, url: str) -> tuple:
         artist_info = self.spotify.artist(url)

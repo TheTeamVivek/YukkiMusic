@@ -1,7 +1,7 @@
-asyncio
 async-lru
 aiohttp
 beautifulsoup4
+decorator
 dnspython
 ffmpeg-python
 gitpython
@@ -26,3 +26,10 @@ gunicorn
 youtube-search-python
 yt-dlp
 git+https://github.com/Vivekkumar-IN/pykeyboard
+
+# Telethon Req
+
+cryptg # For faster Telethon like 
+Telethon
+pillow # Not used just for telethon image compression to dimensions errors 
+hachoir # for Telethon image processing

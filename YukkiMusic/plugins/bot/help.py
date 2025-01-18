@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -8,19 +8,18 @@
 # All rights reserved.
 #
 
-import re
 import logging
+import re
 from math import ceil
-from typing import Union
 
 from pyrogram import filters, types
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from config import BANNED_USERS, START_IMG_URL
-from strings import get_string, command, helpers, get_command
+from strings import command, get_command, get_string, helpers
 from YukkiMusic import HELPABLE, app
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
-from YukkiMusic.utils.decorators.language import LanguageStart
+from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline.help import private_help_panel
 
 COLUMN_SIZE = 4  # Number of button height
@@ -175,7 +174,7 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
         ),
         EqInlineKeyboardButton(
             "❯",
-            callback_data="help_next({},{})".format(modulo_page + 1, int(close)),
+            callback_data=f"help_next({modulo_page + 1},{int(close)})",
         ),
     ]
 
@@ -198,9 +197,7 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
 
 @app.on_message(command("HELP_COMMAND") & filters.private & ~BANNED_USERS)
 @app.on_callback_query(filters.regex("settings_back_helper") & ~BANNED_USERS)
-async def helper_private(
-    client: app, update: Union[types.Message, types.CallbackQuery]
-):
+async def helper_private(client: app, update: types.Message | types.CallbackQuery):
     is_callback = isinstance(update, types.CallbackQuery)
     if is_callback:
         try:
@@ -236,7 +233,7 @@ async def helper_private(
 
 
 @app.on_message(command("HELP_COMMAND") & filters.group & ~BANNED_USERS)
-@LanguageStart
+@language(no_check=True)
 async def help_com_group(client, message: Message, _):
     keyboard = private_help_panel(_)
     await message.reply_text(_["help_2"], reply_markup=InlineKeyboardMarkup(keyboard))

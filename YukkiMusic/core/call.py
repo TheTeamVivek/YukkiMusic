@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -8,9 +8,14 @@
 # All rights reserved.
 #
 import asyncio
-from typing import Union
 
 from ntgcalls import TelegramServerError
+from pyrogram.errors import (
+    ChannelsTooMuch,
+    FloodWait,
+    InviteRequestSent,
+    UserAlreadyParticipant,
+)
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls, filters
 from pytgcalls.exceptions import AlreadyJoinedError
@@ -18,17 +23,24 @@ from pytgcalls.types import (
     ChatUpdate,
     GroupCallConfig,
     MediaStream,
+    StreamAudioEnded,
     Update,
 )
-from pytgcalls.types import StreamAudioEnded
+from telethon.errors import ChatAdminRequiredError
+from telethon.tl.functions.messages import (
+    ExportChatInviteRequest,
+    HideChatJoinRequestRequest,
+)
 
 import config
 from strings import get_string
-from YukkiMusic import LOGGER, Platform, app, userbot
+from YukkiMusic import Platform, app, logger, tbot, userbot
+from YukkiMusic.core.userbot import assistants
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
     add_active_chat,
     add_active_video_chat,
+    get_assistant,
     get_audio_bitrate,
     get_lang,
     get_loop,
@@ -37,6 +49,7 @@ from YukkiMusic.utils.database import (
     music_on,
     remove_active_chat,
     remove_active_video_chat,
+    set_assistant,
     set_loop,
 )
 from YukkiMusic.utils.exceptions import AssistantErr
@@ -44,20 +57,7 @@ from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
 from YukkiMusic.utils.stream.autoclear import auto_clean
 from YukkiMusic.utils.thumbnails import gen_thumb
 
-from pyrogram.errors import (
-    ChannelsTooMuch,
-    ChatAdminRequired,
-    FloodWait,
-    InviteRequestSent,
-    UserAlreadyParticipant,
-)
-
-from YukkiMusic.core.userbot import assistants
-from YukkiMusic.utils.database import (
-    get_assistant,
-    get_lang,
-    set_assistant,
-)
+from .enum import PlaybackState
 
 links = {}
 
@@ -74,14 +74,25 @@ async def _clear_(chat_id):
 
 class Call:
     def __init__(self):
-        self.calls = []
-
-        for client in userbot.clients:
-            pycall = PyTgCalls(
+        self.calls: dict[int, PlaybackState] = {}
+        self.clients = [
+            PyTgCalls(
                 client,
                 cache_duration=100,
             )
-            self.calls.append(pycall)
+            for client in userbot.clients
+        ]
+
+    async def is_active_chat(self, chat_id: int) -> bool:
+        return bool(chat_id in self.calls)
+
+    async def add_active_chat(self, chat_id: int):
+        if chat_id not in self.calls:
+            self.calls[chat_id] = PlaybackState.PLAYING
+
+    async def remove_active_chat(self, chat_id: int):
+        if chat_id in self.calls:
+            del self.calls[chat_id]
 
     async def pause_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
@@ -125,8 +136,8 @@ class Call:
         self,
         chat_id: int,
         link: str,
-        video: Union[bool, str] = None,
-        image: Union[bool, str] = None,
+        video: bool | str = None,
+        image: bool | str = None,
     ):
         assistant = await group_assistant(self, chat_id)
         audio_stream_quality = await get_audio_bitrate(chat_id)
@@ -189,36 +200,39 @@ class Call:
 
     async def join_chat(self, chat_id, attempts=1):
         max_attempts = len(assistants) - 1
-        userbot = await get_assistant(chat_id)
+        assistant = await get_assistant(chat_id)
         try:
             language = await get_lang(chat_id)
             _ = get_string(language)
         except Exception:
             _ = get_string("en")
         try:
-            chat = await app.get_chat(chat_id)
-        except ChatAdminRequired:
-            raise AssistantErr(_["call_1"])
+            chat = await tbot.get_entity(chat_id)
+        except ChatAdminRequiredError as e:
+            raise AssistantErr(_["call_1"]) from e
         except Exception as e:
-            raise AssistantErr(_["call_3"].format(app.mention, type(e).__name__))
+            raise AssistantErr(_["call_3"].format(app.mention, type(e).__name__)) from e
         if chat_id in links:
             invitelink = links[chat_id]
         else:
-            if chat.username:
+            if hasattr(chat, "username") and chat.username:
                 invitelink = chat.username
                 try:
-                    await userbot.resolve_peer(invitelink)
+                    await assistant.resolve_peer(invitelink)
                 except Exception:
                     pass
             else:
                 try:
-                    invitelink = await app.export_chat_invite_link(chat_id)
-                except ChatAdminRequired:
-                    raise AssistantErr(_["call_1"])
+                    invitelink = await tbot(
+                        ExportChatInviteRequest(chat_id, legacy_revoke_permanent=True)
+                    )
+                    invitelink = invitelink.link
+                except ChatAdminRequiredError as e:
+                    raise AssistantErr(_["call_1"]) from e
                 except Exception as e:
                     raise AssistantErr(
                         _["call_3"].format(app.mention, type(e).__name__)
-                    )
+                    ) from e
 
             if invitelink.startswith("https://t.me/+"):
                 invitelink = invitelink.replace(
@@ -228,46 +242,44 @@ class Call:
 
         try:
             await asyncio.sleep(1)
-            await userbot.join_chat(invitelink)
+            await assistant.join_chat(invitelink)
         except InviteRequestSent:
             try:
-                await app.approve_chat_join_request(chat_id, userbot.id)
+                await tbot(HideChatJoinRequestRequest(chat_id, userbot.id))
             except Exception as e:
-                raise AssistantErr(_["call_3"].format(type(e).__name__))
+                raise AssistantErr(_["call_3"].format(type(e).__name__)) from e
             await asyncio.sleep(1)
             raise AssistantErr(_["call_6"].format(app.mention))
         except UserAlreadyParticipant:
             pass
-        except ChannelsTooMuch:
+        except ChannelsTooMuch as e:
             if attempts <= max_attempts:
                 attempts += 1
                 userbot = await set_assistant(chat_id)
                 return await self.join_chat(chat_id, attempts)
-            else:
-                raise AssistantErr(_["call_9"].format(config.SUPPORT_GROUP))
+            raise AssistantErr(_["call_9"].format(config.SUPPORT_GROUP)) from e
         except FloodWait as e:
             time = e.value
             if time < 20:
                 await asyncio.sleep(time)
                 attempts += 1
                 return await self.join_chat(chat_id, attempts)
-            else:
-                if attempts <= max_attempts:
-                    attempts += 1
-                    userbot = await set_assistant(chat_id)
-                    return await self.join_chat(chat_id, attempts)
+            if attempts <= max_attempts:
+                attempts += 1
+                userbot = await set_assistant(chat_id)
+                return await self.join_chat(chat_id, attempts)
 
-                raise AssistantErr(_["call_10"].format(time))
+            raise AssistantErr(_["call_10"].format(time)) from e
         except Exception as e:
-            raise AssistantErr(_["call_3"].format(type(e).__name__))
+            raise AssistantErr(_["call_3"].format(type(e).__name__)) from e
 
     async def join_call(
         self,
         chat_id: int,
-        original_chat_id: int,
+        original_chat_id: int,  # TODO remove it and make compatible
         link,
-        video: Union[bool, str] = None,
-        image: Union[bool, str] = None,
+        video: bool | str = None,
+        image: bool | str = None,
     ):
         assistant = await group_assistant(self, chat_id)
         audio_stream_quality = await get_audio_bitrate(chat_id)
@@ -309,17 +321,22 @@ class Call:
                 )
             except Exception as e:
                 raise AssistantErr(
-                    "**No Active Voice Chat Found**\n\nPlease make sure group's voice chat is enabled. If already enabled, please end it and start fresh voice chat again and if the problem continues, try /restart"
-                )
+                    "**No Active Voice Chat Found**\n\n"
+                    "Please make sure group's voice chat is enabled. "
+                    "If already enabled, please end it and start fresh voice chat again "
+                    "and if the problem continues, try /restart"
+                ) from e
 
-        except AlreadyJoinedError:
+        except AlreadyJoinedError as e:
             raise AssistantErr(
-                "**ASSISTANT IS ALREADY IN VOICECHAT **\n\nMusic bot system detected that assistant is already in the voicechat, if the problem continues restart the videochat and try again."
-            )
-        except TelegramServerError:
+                "**ASSISTANT IS ALREADY IN VOICECHAT **\n\n"
+                "Music bot system detected that assistant is already in the voicechat, "
+                "if the problem continues restart the videochat and try again."
+            ) from e
+        except TelegramServerError as e:
             raise AssistantErr(
-                "**TELEGRAM SERVER ERROR**\n\nPlease restart Your voicechat."
-            )
+                "**TELEGRAM SERVER ERROR**\n\n" "Please restart Your voicechat."
+            ) from e
         await add_active_chat(chat_id)
         await music_on(chat_id)
         if video:
@@ -609,41 +626,33 @@ class Call:
                     db[chat_id][0]["markup"] = "stream"
 
     async def ping(self):
-        pings = []
-        for call in self.calls:
-            pings.append(call.ping)
+        pings = [client.ping for client in self.clients]
         if pings:
             return str(round(sum(pings) / len(pings), 3))
         else:
-            LOGGER(__name__).error("No active clients for ping calculation.")
+            logger(__name__).error("No active clients for ping calculation.")
             return "No active clients"
 
     async def start(self):
         """Starts all PyTgCalls instances for the existing userbot clients."""
-        LOGGER(__name__).info(f"Starting PyTgCall Clients")
-        await asyncio.gather(*[c.start() for c in self.calls])
+        logger(__name__).info("Starting PyTgCall Clients")
+        await asyncio.gather(*[client.start() for client in self.clients])
+
+    async def stop(self):
+        await asyncio.gather(*[self.stop_stream(chat_id) for chat_id in self.calls])
 
     async def decorators(self):
-        for call in self.calls:
+        for client in self.clients:
 
-            @call.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
+            @client.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
             async def stream_services_handler(client, update):
                 await self.stop_stream(update.chat_id)
 
-            @call.on_update(filters.stream_end)
+            @client.on_update(filters.stream_end)
             async def stream_end_handler(client, update: Update):
                 if not isinstance(update, StreamAudioEnded):
                     return
                 await self.change_stream(client, update.chat_id)
-
-
-    def __getattr__(self, name):
-        if not self.calls:
-            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
-        first_call = self.calls[0]
-        if hasattr(first_call, name):
-            return getattr(first_call, name)
-        raise AttributeError(f"'{type(first_call).__name__}' object has no attribute '{name}'")
 
 
 Yukki = Call()

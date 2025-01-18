@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -19,7 +19,7 @@ from YukkiMusic.utils.database import (
     get_particulars,
     get_userss,
 )
-from YukkiMusic.utils.decorators import languageCB
+from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.inline.playlist import (
     botplaylist_markup,
     failed_top_markup,
@@ -31,7 +31,7 @@ loop = asyncio.get_running_loop()
 
 
 @app.on_callback_query(filters.regex("get_playmarkup") & ~BANNED_USERS)
-@languageCB
+@language
 async def get_play_markup(client, CallbackQuery, _):
     try:
         await CallbackQuery.answer()
@@ -44,7 +44,7 @@ async def get_play_markup(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("get_top_playlists") & ~BANNED_USERS)
-@languageCB
+@language
 async def get_topz_playlists(client, CallbackQuery, _):
     try:
         await CallbackQuery.answer()
@@ -57,7 +57,7 @@ async def get_topz_playlists(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("SERVERTOP") & ~BANNED_USERS)
-@languageCB
+@language
 async def server_to_play(client, CallbackQuery, _):
     chat_id = CallbackQuery.message.chat.id
     user_name = CallbackQuery.from_user.first_name

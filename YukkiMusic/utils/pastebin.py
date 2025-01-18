@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -21,7 +21,7 @@ async def post(url: str, *args, **kwargs):
         return data
 
 
-async def Yukkibin(text):
+async def paste(text):  # TODO make the function name in snake_case
     resp = await post(f"{BASE}api/v2/paste", data=text)
     if not resp["success"]:
         return

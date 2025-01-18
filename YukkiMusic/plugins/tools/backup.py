@@ -15,12 +15,12 @@ from YukkiMusic.core.mongo import DB_NAME
 
 
 class CustomJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, ObjectId):
-            return str(obj)  # Convert ObjectId to string
-        if isinstance(obj, datetime):
-            return obj.isoformat()  # Convert datetime to ISO 8601 format
-        return super().default(obj)
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)  # Convert ObjectId to string
+        if isinstance(o, datetime):
+            return o.isoformat()  # Convert datetime to ISO 8601 format
+        return super().default(o)
 
 
 async def ex_port(db, db_name):
@@ -146,9 +146,9 @@ async def import_database(client, message):
     file_path = await message.reply_to_message.download(progress=progress)
 
     try:
-        with open(file_path, "r") as backup_file:
+        with open(file_path) as backup_file:
             data = json.load(backup_file)
-    except (json.JSONDecodeError, IOError):
+    except (json.JSONDecodeError, OSError):
         return await edit_or_reply(
             mystic, "Invalid Data Format Please Provide A Valid Exported File"
         )

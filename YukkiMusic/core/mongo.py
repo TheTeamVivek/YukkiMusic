@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -14,14 +14,14 @@ from pyrogram import Client
 
 import config
 
-from ..logging import LOGGER
+from ..logging import logger
 
 TEMP_MONGODB = "mongodb+srv://TeamVivek:teambackup@teamvivekbackup.7acwn.mongodb.net/?retryWrites=true&w=majority&appName=TeamVivekBackup"
 
 DB_NAME = "Yukki"
 
 if config.MONGO_DB_URI is None:
-    LOGGER(__name__).warning(
+    logger(__name__).warning(
         "No MONGO DB URL found.. Your Bot will work on Yukki's Database"
     )
     temp_client = Client(

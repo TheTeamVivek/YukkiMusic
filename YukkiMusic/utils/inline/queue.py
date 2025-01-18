@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -7,24 +7,23 @@
 #
 # All rights reserved.
 #
-from typing import Union
 
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 def queue_markup(
     _,
-    DURATION,
-    CPLAY,
+    duration,
+    cplay,
     videoid,
-    played: Union[bool, int] = None,
-    dur: Union[bool, int] = None,
+    played: bool | int = None,
+    dur: bool | int = None,
 ):
     not_dur = [
         [
             InlineKeyboardButton(
                 text=_["QU_B_1"],
-                callback_data=f"GetQueued {CPLAY}|{videoid}",
+                callback_data=f"GetQueued {cplay}|{videoid}",
             ),
             InlineKeyboardButton(
                 text=_["CLOSEMENU_BUTTON"],
@@ -42,7 +41,7 @@ def queue_markup(
         [
             InlineKeyboardButton(
                 text=_["QU_B_1"],
-                callback_data=f"GetQueued {CPLAY}|{videoid}",
+                callback_data=f"GetQueued {cplay}|{videoid}",
             ),
             InlineKeyboardButton(
                 text=_["CLOSEMENU_BUTTON"],
@@ -50,17 +49,17 @@ def queue_markup(
             ),
         ],
     ]
-    upl = InlineKeyboardMarkup(not_dur if DURATION == "Unknown" else dur)
+    upl = InlineKeyboardMarkup(not_dur if duration == "Unknown" else dur)
     return upl
 
 
-def queue_back_markup(_, CPLAY):
+def queue_back_markup(_, cplay):
     upl = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
                     text=_["BACK_BUTTON"],
-                    callback_data=f"queue_back_timer {CPLAY}",
+                    callback_data=f"queue_back_timer {cplay}",
                 ),
                 InlineKeyboardButton(
                     text=_["CLOSE_BUTTON"],

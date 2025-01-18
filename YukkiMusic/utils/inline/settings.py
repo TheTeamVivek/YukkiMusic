@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -7,7 +7,6 @@
 #
 # All rights reserved.
 #
-from typing import Union
 
 from pyrogram.types import InlineKeyboardButton
 
@@ -35,23 +34,23 @@ def setting_markup(_):
 
 def audio_quality_markup(
     _,
-    LOW: Union[bool, str] = None,
-    MEDIUM: Union[bool, str] = None,
-    HIGH: Union[bool, str] = None,
-    STUDIO: Union[bool, str] = None,
+    low: bool | str = None,
+    medium: bool | str = None,
+    high: bool | str = None,
+    studio: bool | str = None,
 ):
     buttons = [
         [
             InlineKeyboardButton(
                 text=(
-                    _["ST_B_8"].format("✅") if LOW == True else _["ST_B_8"].format("")
+                    _["ST_B_8"].format("✅") if low is True else _["ST_B_8"].format("")
                 ),
                 callback_data="LOW",
             ),
             InlineKeyboardButton(
                 text=(
                     _["ST_B_9"].format("✅")
-                    if MEDIUM == True
+                    if medium is True
                     else _["ST_B_9"].format("")
                 ),
                 callback_data="MEDIUM",
@@ -61,7 +60,7 @@ def audio_quality_markup(
             InlineKeyboardButton(
                 text=(
                     _["ST_B_10"].format("✅")
-                    if HIGH == True
+                    if high is True
                     else _["ST_B_10"].format("")
                 ),
                 callback_data="HIGH",
@@ -69,7 +68,7 @@ def audio_quality_markup(
             InlineKeyboardButton(
                 text=(
                     _["ST_B_11"].format("✅")
-                    if STUDIO == True
+                    if studio is True
                     else _["ST_B_11"].format("")
                 ),
                 callback_data="STUDIO",
@@ -88,19 +87,19 @@ def audio_quality_markup(
 
 def video_quality_markup(
     _,
-    SD_360p: Union[bool, str] = None,
-    SD_480p: Union[bool, str] = None,
-    HD_720p: Union[bool, str] = None,
-    FHD_1080p: Union[bool, str] = None,
-    QHD_2K: Union[bool, str] = None,
-    UHD_4K: Union[bool, str] = None,
+    sd_360p: bool | str = None,
+    sd_480p: bool | str = None,
+    hd_720p: bool | str = None,
+    fhd_1080p: bool | str = None,
+    qhd_2k: bool | str = None,
+    uhd_4k: bool | str = None,
 ):
     buttons = [
         [
             InlineKeyboardButton(
                 text=(
                     _["ST_B_12"].format("✅")
-                    if SD_360p == True
+                    if sd_360p is True
                     else _["ST_B_12"].format("")
                 ),
                 callback_data="SD_360p",
@@ -108,7 +107,7 @@ def video_quality_markup(
             InlineKeyboardButton(
                 text=(
                     _["ST_B_13"].format("✅")
-                    if SD_480p == True
+                    if sd_480p is True
                     else _["ST_B_13"].format("")
                 ),
                 callback_data="SD_480p",
@@ -118,7 +117,7 @@ def video_quality_markup(
             InlineKeyboardButton(
                 text=(
                     _["ST_B_14"].format("✅")
-                    if HD_720p == True
+                    if hd_720p is True
                     else _["ST_B_14"].format("")
                 ),
                 callback_data="HD_720p",
@@ -126,7 +125,7 @@ def video_quality_markup(
             InlineKeyboardButton(
                 text=(
                     _["ST_B_15"].format("✅")
-                    if FHD_1080p == True
+                    if fhd_1080p is True
                     else _["ST_B_15"].format("")
                 ),
                 callback_data="FHD_1080p",
@@ -136,7 +135,7 @@ def video_quality_markup(
             InlineKeyboardButton(
                 text=(
                     _["ST_B_16"].format("✅")
-                    if QHD_2K == True
+                    if qhd_2k is True
                     else _["ST_B_16"].format("")
                 ),
                 callback_data="QHD_2K",
@@ -144,7 +143,7 @@ def video_quality_markup(
             InlineKeyboardButton(
                 text=(
                     _["ST_B_17"].format("✅")
-                    if UHD_4K == True
+                    if uhd_4k is True
                     else _["ST_B_17"].format("")
                 ),
                 callback_data="UHD_4K",
@@ -163,21 +162,21 @@ def video_quality_markup(
 
 def cleanmode_settings_markup(
     _,
-    status: Union[bool, str] = None,
-    dels: Union[bool, str] = None,
+    status: bool | str = None,
+    dels: bool | str = None,
 ):
     buttons = [
         [
             InlineKeyboardButton(text=_["ST_B_7"], callback_data="CMANSWER"),
             InlineKeyboardButton(
-                text=_["ST_B_18"] if status == True else _["ST_B_19"],
+                text=_["ST_B_18"] if status is True else _["ST_B_19"],
                 callback_data="CLEANMODE",
             ),
         ],
         [
             InlineKeyboardButton(text=_["ST_B_30"], callback_data="COMMANDANSWER"),
             InlineKeyboardButton(
-                text=_["ST_B_18"] if dels == True else _["ST_B_19"],
+                text=_["ST_B_18"] if dels is True else _["ST_B_19"],
                 callback_data="COMMANDELMODE",
             ),
         ],
@@ -192,12 +191,12 @@ def cleanmode_settings_markup(
     return buttons
 
 
-def auth_users_markup(_, status: Union[bool, str] = None):
+def auth_users_markup(_, status: bool | str = None):
     buttons = [
         [
             InlineKeyboardButton(text=_["ST_B_3"], callback_data="AUTHANSWER"),
             InlineKeyboardButton(
-                text=_["ST_B_20"] if status == True else _["ST_B_21"],
+                text=_["ST_B_20"] if status is True else _["ST_B_21"],
                 callback_data="AUTH",
             ),
         ],
@@ -217,29 +216,29 @@ def auth_users_markup(_, status: Union[bool, str] = None):
 
 def playmode_users_markup(
     _,
-    Direct: Union[bool, str] = None,
-    Group: Union[bool, str] = None,
-    Playtype: Union[bool, str] = None,
+    direct: bool | str = None,
+    group: bool | str = None,
+    playtype: bool | str = None,
 ):
     buttons = [
         [
             InlineKeyboardButton(text=_["ST_B_23"], callback_data="SEARCHANSWER"),
             InlineKeyboardButton(
-                text=_["ST_B_24"] if Direct == True else _["ST_B_25"],
+                text=_["ST_B_24"] if direct is True else _["ST_B_25"],
                 callback_data="MODECHANGE",
             ),
         ],
         [
             InlineKeyboardButton(text=_["ST_B_26"], callback_data="AUTHANSWER"),
             InlineKeyboardButton(
-                text=_["ST_B_20"] if Group == True else _["ST_B_21"],
+                text=_["ST_B_20"] if group is True else _["ST_B_21"],
                 callback_data="CHANNELMODECHANGE",
             ),
         ],
         [
             InlineKeyboardButton(text=_["ST_B_29"], callback_data="PLAYTYPEANSWER"),
             InlineKeyboardButton(
-                text=_["ST_B_20"] if Playtype == True else _["ST_B_21"],
+                text=_["ST_B_20"] if playtype is True else _["ST_B_21"],
                 callback_data="PLAYTYPECHANGE",
             ),
         ],

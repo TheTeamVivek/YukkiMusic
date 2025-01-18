@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -16,11 +16,11 @@ from strings import command
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import is_music_playing, music_off
-from YukkiMusic.utils.decorators import AdminRightsCheck
+from YukkiMusic.utils.decorators import admin_rights_check
 
 
 @app.on_message(command("PAUSE_COMMAND") & filters.group & ~BANNED_USERS)
-@AdminRightsCheck
+@admin_rights_check
 async def pause_admin(cli, message: Message, _, chat_id):
     if not len(message.command) == 1:
         return await message.reply_text(_["general_2"])

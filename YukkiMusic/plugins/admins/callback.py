@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -27,7 +27,7 @@ from YukkiMusic import Platform, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils import seconds_to_min, time_to_seconds
-from YukkiMusic.utils.channelplay import get_channeplayCB
+from YukkiMusic.utils.channelplay import get_channeplay_cb
 from YukkiMusic.utils.database import (
     is_active_chat,
     is_music_playing,
@@ -39,8 +39,8 @@ from YukkiMusic.utils.database import (
     mute_on,
     set_loop,
 )
-from YukkiMusic.utils.decorators import ActualAdminCB
-from YukkiMusic.utils.decorators.language import languageCB
+from YukkiMusic.utils.decorators import actual_admin_cb
+from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline.play import (
     livestream_markup,
@@ -59,7 +59,7 @@ wrong = {}
 
 
 @app.on_callback_query(filters.regex("PanelMarkup") & ~BANNED_USERS)
-@languageCB
+@language
 async def markup_panel(client, CallbackQuery: CallbackQuery, _):
     await CallbackQuery.answer()
     callback_data = CallbackQuery.data.strip()
@@ -79,7 +79,7 @@ async def markup_panel(client, CallbackQuery: CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("MainMarkup") & ~BANNED_USERS)
-@languageCB
+@language
 async def main_markup_(client, CallbackQuery, _):
     await CallbackQuery.answer()
     callback_data = CallbackQuery.data.strip()
@@ -102,7 +102,7 @@ async def main_markup_(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("Pages") & ~BANNED_USERS)
-@languageCB
+@language
 async def pages_markup(client, CallbackQuery, _):
     await CallbackQuery.answer()
     callback_data = CallbackQuery.data.strip()
@@ -133,7 +133,7 @@ async def pages_markup(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("ADMIN") & ~BANNED_USERS)
-@languageCB
+@language
 async def admin_callback(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
@@ -448,7 +448,7 @@ async def admin_callback(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("MusicStream") & ~BANNED_USERS)
-@languageCB
+@language
 async def play_music(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
@@ -459,7 +459,7 @@ async def play_music(client, CallbackQuery, _):
         except Exception:
             return
     try:
-        chat_id, channel = await get_channeplayCB(_, cplay, CallbackQuery)
+        chat_id, channel = await get_channeplay_cb(_, cplay, CallbackQuery)
     except Exception:
         return
     user_name = CallbackQuery.from_user.first_name
@@ -528,7 +528,7 @@ async def anonymous_check(client, CallbackQuery):
 
 
 @app.on_callback_query(filters.regex("YukkiPlaylists") & ~BANNED_USERS)
-@languageCB
+@language
 async def play_playlists_cb(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
@@ -546,7 +546,7 @@ async def play_playlists_cb(client, CallbackQuery, _):
         except Exception:
             return
     try:
-        chat_id, channel = await get_channeplayCB(_, cplay, CallbackQuery)
+        chat_id, channel = await get_channeplay_cb(_, cplay, CallbackQuery)
     except Exception:
         return
     user_name = CallbackQuery.from_user.first_name
@@ -614,7 +614,7 @@ async def play_playlists_cb(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("slider") & ~BANNED_USERS)
-@languageCB
+@language
 async def slider_queries(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
@@ -691,7 +691,7 @@ async def close_menu(_, CallbackQuery):
 
 
 @app.on_callback_query(filters.regex("stop_downloading") & ~BANNED_USERS)
-@ActualAdminCB
+@actual_admin_cb
 async def stop_download(client, CallbackQuery: CallbackQuery, _):
     message_id = CallbackQuery.message.id
     task = lyrical.get(message_id)

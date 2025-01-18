@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -9,7 +9,6 @@
 import re
 import sys
 from os import getenv
-
 
 from dotenv import load_dotenv
 from pyrogram import filters
@@ -30,6 +29,9 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
+
+# paste a batbin url of pasted cookies
+COOKIE_LINK = getenv("COOKIE_LINK", None)
 
 CLEANMODE_DELETE_MINS = int(
     getenv("CLEANMODE_MINS", "5")

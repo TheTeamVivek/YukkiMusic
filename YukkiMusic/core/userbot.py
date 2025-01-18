@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -15,17 +15,18 @@ from functools import wraps
 
 from pyrogram import Client, StopPropagation
 from pyrogram.errors import (
-    FloodWait,
-    MessageNotModified,
-    MessageIdInvalid,
     ChatSendMediaForbidden,
     ChatSendPhotosForbidden,
     ChatWriteForbidden,
+    FloodWait,
+    MessageIdInvalid,
+    MessageNotModified,
 )
 from pyrogram.handlers import MessageHandler
+
 import config
 
-from ..logging import LOGGER
+from ..logging import logger
 
 assistants = []
 assistantids = []
@@ -33,15 +34,19 @@ assistantids = []
 
 class Userbot(Client):
     def __init__(self):
-        self.clients = []
+        self.clients = [
+            Client(
+                f"YukkiString_{i}",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=session.strip(),
+            )
+            for i, session in enumerate(config.STRING_SESSIONS, start=1)
+        ]
         self.handlers = []
 
-    def add(self, *args, **kwargs):
-        """Add a new client to the Userbot."""
-        self.clients.append(Client(*args, **kwargs))
-
     async def _start(self, client, index):
-        LOGGER(__name__).info(f"Starting Assistant Client {index}")
+        logger(__name__).info("Starting Assistant Client %d", index)
         try:
             await client.start()
             assistants.append(index)
@@ -52,9 +57,10 @@ class Userbot(Client):
                     await client.join_chat(config.LOG_GROUP_ID)
                     await client.send_message(config.LOG_GROUP_ID, "Assistant Started")
                 except Exception:
-                    LOGGER(__name__).error(
-                        f"Assistant Account {index} failed to send message in log group. "
-                        f"Ensure the assistant is added to the log group."
+                    logger(__name__).error(
+                        "Assistant Account %d failed to send message in log group. "
+                        "Ensure the assistant is added to the log group.",
+                        index,
                     )
                     sys.exit(1)
 
@@ -70,14 +76,16 @@ class Userbot(Client):
                 client.add_handler(handler, group)
 
         except Exception as e:
-            LOGGER(__name__).error(
-                f"Assistant Account {index} failed with error: {str(e)}. Exiting..."
+            logger(__name__).error(
+                "Assistant Account {index} failed with error: %s xiting...", e
             )
             sys.exit(1)
 
     async def start(self):
         """Start all clients."""
-        tasks = [self._start(client, i) for i, client in enumerate(self.clients, start=1)]
+        tasks = [
+            self._start(client, i) for i, client in enumerate(self.clients, start=1)
+        ]
         await asyncio.gather(*tasks)
 
     async def stop(self):
@@ -85,15 +93,20 @@ class Userbot(Client):
         tasks = [client.stop() for client in self.clients]
         await asyncio.gather(*tasks)
 
-    def on_message(self, filters=None, group=0): # on_message decirator for future Userbot Plugins
+    def on_message(
+        self, filters=None, group=0
+    ):  # on_message decirator for future Userbot Plugins
         """Decorator for handling messages with error handling."""
+
         def decorator(func):
             @wraps(func)
             async def wrapper(client, message):
                 try:
                     await func(client, message)
                 except FloodWait as e:
-                    LOGGER(__name__).warning(f"FloodWait: Sleeping for {e.value} seconds.")
+                    logger(__name__).warning(
+                        "FloodWait: Sleeping for %d seconds.", e.value
+                    )
                     await asyncio.sleep(e.value)
                 except (
                     ChatWriteForbidden,
@@ -110,7 +123,11 @@ class Userbot(Client):
                     date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     user_id = message.from_user.id if message.from_user else "Unknown"
                     chat_id = message.chat.id if message.chat else "Unknown"
-                    chat_username = f"@{message.chat.username}" if message.chat.username else "Private Group"
+                    chat_username = (
+                        f"@{message.chat.username}"
+                        if message.chat.username
+                        else "Private Group"
+                    )
                     command = (
                         " ".join(message.command)
                         if hasattr(message, "command")

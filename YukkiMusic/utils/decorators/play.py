@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -8,12 +8,10 @@
 # All rights reserved.
 #
 
+from pyrogram.errors import ChannelPrivate
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from pyrogram.errors import ChannelPrivate
-
-from config import PLAYLIST_IMG_URL, PRIVATE_BOT_MODE
-from config import adminlist
+from config import PLAYLIST_IMG_URL, PRIVATE_BOT_MODE, adminlist
 from strings import get_string
 from YukkiMusic import Platform, app
 from YukkiMusic.core.call import Yukki
@@ -34,7 +32,7 @@ from YukkiMusic.utils.inline import botplaylist_markup
 links = {}
 
 
-def PlayWrapper(command):
+def play_wrapper(command):
     async def wrapper(client, message):
         language = await get_lang(message.chat.id)
         _ = get_string(language)
@@ -58,7 +56,9 @@ def PlayWrapper(command):
         if PRIVATE_BOT_MODE == str(True):
             if not await is_served_private_chat(message.chat.id):
                 await message.reply_text(
-                    "**PRIVATE MUSIC BOT**\n\nOnly For Authorized chats from the owner ask my owner to allow your chat first."
+                    "**PRIVATE MUSIC BOT**\n\n"
+                    "Only For Authorized chats from the owner"
+                    "ask my owner to allow your chat first."
                 )
                 return await app.leave_chat(message.chat.id)
         if await is_commanddelete_on(message.chat.id):
@@ -77,7 +77,7 @@ def PlayWrapper(command):
             if message.reply_to_message
             else None
         )
-        url = await Platform.youtube.url(message)
+        url = await Platform.telegram.url(message)
         if audio_telegram is None and video_telegram is None and url is None:
             if len(message.command) < 2:
                 if "stream" in message.command:
@@ -141,12 +141,13 @@ def PlayWrapper(command):
                     async for member in userbot.get_call_members(chat_id)
                     if member.chat
                 ]
-                # Checking if assistant id not in list so clear queues and remove active voice chat and process
+                # Checking if assistant id not in list
+                # so clear queues and remove active voice chat and process
 
                 if not call_participants_id or userbot.id not in call_participants_id:
                     await Yukki.stop_stream(chat_id)
             except ChannelPrivate:
-                pass 
+                pass
 
         return await command(
             client,

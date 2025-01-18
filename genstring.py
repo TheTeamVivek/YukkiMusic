@@ -1,12 +1,11 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-
 
 import asyncio
 
@@ -24,7 +23,12 @@ async def main():
     print("\nHERE IS YOUR STRING SESSION, COPY IT, DON'T SHARE!!\n")
     print(f"\n{ss}\n")
     print("\n STRING GENERATED\n")
-    xx = f"HERE IS YOUR STRING SESSION, COPY IT, DON'T SHARE!!\n\n`{ss}`\n\n STRING GENERATED"
+
+    xx = (
+        f"HERE IS YOUR STRING SESSION, COPY IT, DON'T SHARE!!\n\n"
+        f"`{ss}`\n\n"
+        " STRING GENERATED"
+    )
     try:
         await i.send_message("me", xx)
     except Exception:

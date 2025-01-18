@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -12,7 +12,7 @@ from pyrogram import filters
 from pyrogram.types import Message
 
 from config import BANNED_USERS, adminlist
-from strings import command, command
+from strings import command
 from YukkiMusic import app
 from YukkiMusic.utils.database import (
     delete_authuser,
@@ -20,12 +20,12 @@ from YukkiMusic.utils.database import (
     get_authuser_names,
     save_authuser,
 )
-from YukkiMusic.utils.decorators import AdminActual, language
+from YukkiMusic.utils.decorators import admin_actual, language
 from YukkiMusic.utils.formatters import int_to_alpha
 
 
 @app.on_message(command("AUTH_COMMAND") & filters.group & ~BANNED_USERS)
-@AdminActual
+@admin_actual
 async def auth(client, message: Message, _):
     if not message.reply_to_message:
         if len(message.command) != 2:
@@ -87,7 +87,7 @@ async def auth(client, message: Message, _):
 
 
 @app.on_message(command("UNAUTH_COMMAND") & filters.group & ~BANNED_USERS)
-@AdminActual
+@admin_actual
 async def unauthusers(client, message: Message, _):
     if not message.reply_to_message:
         if len(message.command) != 2:

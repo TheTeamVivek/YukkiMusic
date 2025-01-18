@@ -6,6 +6,8 @@ from pyrogram import errors
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
 
+from YukkiMusic import app
+
 MARKDOWN = """
 ʀᴇᴀᴅ ᴛʜᴇ ʙᴇʟᴏᴡ ᴛᴇxᴛ ᴄᴀʀᴇғᴜʟʟʏ ᴛᴏ ғɪɴᴅ ᴏᴜᴛ ʜᴏᴡ ғᴏʀᴍᴀᴛᴛɪɴɢ ᴡᴏʀᴋs!
 
@@ -119,22 +121,22 @@ def extract_text_and_keyb(ikb, text: str, row_width: int = 2):
             keyboard[btn_txt] = btn_url
         keyboard = ikb(keyboard, row_width)
     except Exception:
-        return
+        return None
     return text, keyboard
 
 
 async def check_format(ikb, raw_text: str):
     keyb = findall(r"\[.+\,.+\]", raw_text)
-    if keyb and not "~" in raw_text:
+    if keyb and "~" not in raw_text:
         raw_text = raw_text.replace("button=", "\n~\nbutton=")
         return raw_text
+
     if "~" in raw_text and keyb:
         if not extract_text_and_keyb(ikb, raw_text):
             return ""
-        else:
-            return raw_text
-    else:
         return raw_text
+
+    return raw_text
 
 
 async def get_data_and_name(replied_message, message):
@@ -188,7 +190,6 @@ async def extract_userid(message, text: str):
         return int(text)
 
     entities = message.entities
-    app = message._client
     if len(entities) < 2:
         return (await app.get_users(text)).id
     entity = entities[1]
@@ -250,39 +251,32 @@ async def extract_user(message):
 def get_file_id_from_message(
     message,
     max_file_size=3145728,
-    mime_types=["image/png", "image/jpeg"],
+    mime_types=None,
 ):
+    def is_valid_file(document):
+        return document.file_size <= max_file_size and (
+            mime_types is None or document.mime_type in mime_types
+        )
+
+    if mime_types is None:
+        mime_types = ["image/png", "image/jpeg"]
+
     file_id = None
-    if message.document:
-        if int(message.document.file_size) > max_file_size:
-            return
 
-        mime_type = message.document.mime_type
-
-        if mime_types and mime_type not in mime_types:
-            return
+    if message.document and is_valid_file(message.document):
         file_id = message.document.file_id
-
-    if message.sticker:
-        if message.sticker.is_animated:
-            if not message.sticker.thumbs:
-                return
+    elif message.sticker:
+        if message.sticker.is_animated and message.sticker.thumbs:
             file_id = message.sticker.thumbs[0].file_id
-        else:
+        elif not message.sticker.is_animated:
             file_id = message.sticker.file_id
-
-    if message.photo:
+    elif message.photo:
         file_id = message.photo.file_id
-
-    if message.animation:
-        if not message.animation.thumbs:
-            return
+    elif message.animation and message.animation.thumbs:
         file_id = message.animation.thumbs[0].file_id
-
-    if message.video:
-        if not message.video.thumbs:
-            return
+    elif message.video and message.video.thumbs:
         file_id = message.video.thumbs[0].file_id
+
     return file_id
 
 

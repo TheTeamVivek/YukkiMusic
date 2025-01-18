@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -41,8 +41,8 @@ from YukkiMusic.utils.database import (
     set_playmode,
     set_playtype,
 )
-from YukkiMusic.utils.decorators.admins import ActualAdminCB
-from YukkiMusic.utils.decorators.language import language, languageCB
+from YukkiMusic.utils.decorators.admins import actual_admin_cb
+from YukkiMusic.utils.decorators.language import language, language
 from YukkiMusic.utils.inline.settings import (
     audio_quality_markup,
     auth_users_markup,
@@ -65,7 +65,7 @@ async def settings_mar(client, message: Message, _):
 
 
 @app.on_callback_query(filters.regex("settings_helper") & ~BANNED_USERS)
-@languageCB
+@language
 async def settings_cb(client, CallbackQuery, _):
     try:
         await CallbackQuery.answer(_["set_cb_8"])
@@ -82,7 +82,7 @@ async def settings_cb(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("settingsback_helper") & ~BANNED_USERS)
-@languageCB
+@language
 async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
     try:
         await CallbackQuery.answer()
@@ -151,7 +151,7 @@ async def gen_buttons_vid(_, aud):
     )
     & ~BANNED_USERS
 )
-@languageCB
+@language
 async def without_Admin_rights(client, CallbackQuery, _):
     command = CallbackQuery.matches[0].group(1)
     if command == "SEARCHANSWER":
@@ -262,7 +262,7 @@ async def without_Admin_rights(client, CallbackQuery, _):
     )
     & ~BANNED_USERS
 )
-@ActualAdminCB
+@actual_admin_cb
 async def aud_vid_cb(client, CallbackQuery, _):
     command = CallbackQuery.matches[0].group(1)
     try:
@@ -310,7 +310,7 @@ async def aud_vid_cb(client, CallbackQuery, _):
 @app.on_callback_query(
     filters.regex(pattern=r"^(CLEANMODE|COMMANDELMODE)$") & ~BANNED_USERS
 )
-@ActualAdminCB
+@actual_admin_cb
 async def cleanmode_mark(client, CallbackQuery, _):
     command = CallbackQuery.matches[0].group(1)
     try:
@@ -355,7 +355,7 @@ async def cleanmode_mark(client, CallbackQuery, _):
     filters.regex(pattern=r"^(|MODECHANGE|CHANNELMODECHANGE|PLAYTYPECHANGE)$")
     & ~BANNED_USERS
 )
-@ActualAdminCB
+@actual_admin_cb
 async def playmode_ans(client, CallbackQuery, _):
     command = CallbackQuery.matches[0].group(1)
     if command == "CHANNELMODECHANGE":
@@ -433,7 +433,7 @@ async def playmode_ans(client, CallbackQuery, _):
 
 # Auth Users Settings
 @app.on_callback_query(filters.regex(pattern=r"^(AUTH|AUTHLIST)$") & ~BANNED_USERS)
-@ActualAdminCB
+@actual_admin_cb
 async def authusers_mar(client, CallbackQuery, _):
     command = CallbackQuery.matches[0].group(1)
     if command == "AUTHLIST":

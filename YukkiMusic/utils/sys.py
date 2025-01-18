@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -18,8 +18,8 @@ from .formatters import get_readable_time
 
 async def bot_sys_stats():
     bot_uptime = int(time.time() - _boot_)
-    UP = f"{get_readable_time(bot_uptime)}"
-    CPU = f"{psutil.cpu_percent(interval=0.5)}%"
-    RAM = f"{psutil.virtual_memory().percent}%"
-    DISK = f"{psutil.disk_usage('/').percent}%"
-    return UP, CPU, RAM, DISK
+    read_able_uptime = f"{get_readable_time(bot_uptime)}"
+    cpu = f"{psutil.cpu_percent(interval=0.5)}%"
+    ram = f"{psutil.virtual_memory().percent}%"
+    disk = f"{psutil.disk_usage('/').percent}%"
+    return read_able_uptime, cpu, ram, disk

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -21,8 +21,8 @@ import urllib3
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
 from pyrogram import filters
-from pyrogram.types import Message
 from pyrogram.enums import ChatType
+from pyrogram.types import Message
 
 import config
 from config import BANNED_USERS
@@ -36,9 +36,9 @@ from YukkiMusic.utils.database import (
     remove_active_chat,
     remove_active_video_chat,
 )
-from YukkiMusic.utils.decorators import AdminActual, language
+from YukkiMusic.utils.decorators import admin_actual, language
 from YukkiMusic.utils.decorators.language import language
-from YukkiMusic.utils.pastebin import Yukkibin
+from YukkiMusic.utils.pastebin import paste
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -48,7 +48,7 @@ async def is_heroku():
 
 
 async def paste_neko(code: str):
-    return await Yukkibin(code)
+    return await paste(code)
 
 
 @app.on_message(command("GETLOG_COMMAND") & SUDOERS)
@@ -60,12 +60,12 @@ async def log_(client, message, _):
         log.close()
         data = ""
         try:
-            NUMB = int(message.text.split(None, 1)[1])
+            num = int(message.text.split(None, 1)[1])
         except Exception:
-            NUMB = 100
-        for x in lines[-NUMB:]:
+            num = 100
+        for x in lines[-num:]:
             data += x
-        link = await Yukkibin(data)
+        link = await paste(data)
         return link
 
     try:
@@ -75,7 +75,7 @@ async def log_(client, message, _):
                     return await message.reply_text(await _get_log())
                 return await message.reply_text(_["heroku_1"])
             data = HAPP.get_log()
-            link = await Yukkibin(data)
+            link = await paste(data)
             return await message.reply_text(link)
         else:
             if os.path.exists(config.LOG_FILE_NAME):
@@ -182,15 +182,15 @@ async def usage_dynos(client, message, _):
     else:
         return await message.reply_text(_["heroku_11"])
     dyno = await message.reply_text(_["heroku_12"])
-    Heroku = heroku3.from_key(config.HEROKU_API_KEY)
-    account_id = Heroku.account().id
-    useragent = (
+    heroku = heroku3.from_key(config.HEROKU_API_KEY)
+    account_id = heroku.account().id
+    user_agent = (
         "Mozilla/5.0 (Linux; Android 10; SM-G975F) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/80.0.3987.149 Mobile Safari/537.36"
     )
     headers = {
-        "User-Agent": useragent,
+        "User-Agent": user_agent,
         "Authorization": f"Bearer {config.HEROKU_API_KEY}",
         "Accept": "application/vnd.heroku+json; version=3.account-quotas",
     }
@@ -206,23 +206,23 @@ async def usage_dynos(client, message, _):
     minutes_remaining = remaining_quota / 60
     hours = math.floor(minutes_remaining / 60)
     minutes = math.floor(minutes_remaining % 60)
-    App = result["apps"]
+    app = result["apps"]
     try:
-        App[0]["quota_used"]
+        app[0]["quota_used"]
     except IndexError:
-        AppQuotaUsed = 0
-        AppPercentage = 0
+        app_quota_used = 0
+        app_percentage = 0
     else:
-        AppQuotaUsed = App[0]["quota_used"] / 60
-        AppPercentage = math.floor(App[0]["quota_used"] * 100 / quota)
-    AppHours = math.floor(AppQuotaUsed / 60)
-    AppMinutes = math.floor(AppQuotaUsed % 60)
+        app_quota_used = app[0]["quota_used"] / 60
+        app_percentage = math.floor(app[0]["quota_used"] * 100 / quota)
+    app_hours = math.floor(app_quota_used / 60)
+    app_minutes = math.floor(app_quota_used % 60)
     await asyncio.sleep(1.5)
     text = f"""
 **Dyno usage**
 
 <u>Usage:</u>
-Total used: `{AppHours}`**h**  `{AppMinutes}`**m**  [`{AppPercentage}`**%**]
+Total used: `{app_hours}`**h**  `{app_minutes}`**m**  [`{app_percentage}`**%**]
 
 <u>Remaining Quota</u>
 Total Left: `{hours}`**h**  `{minutes}`**m**  [`{percentage}`**%**]"""
@@ -251,21 +251,31 @@ async def update_(client, message, _):
         verification = str(checks.count())
     if verification == "":
         return await response.edit("Bot is up to date")
-    ordinal = lambda format: "%d%s" % (
-        format,
-        "tsnrhtdd"[(format // 10 % 10 != 1) * (format % 10 < 4) * format % 10 :: 4],
-    )
+
+    def ordinal(num):
+        suffix = "tsnrhtdd"[(num // 10 % 10 != 1) * (num % 10 < 4) * num % 10 :: 4]
+        return f"{num}{suffix}"
+
     updates = "".join(
-        f"<b>➣ #{info.count()}: <a href={REPO_}/commit/{info}>{info.summary}</a> By -> {info.author}</b>\n\t\t\t\t<b>➥ Commited On:</b> {ordinal(int(datetime.fromtimestamp(info.committed_date).strftime('%d')))} {datetime.fromtimestamp(info.committed_date).strftime('%b')}, {datetime.fromtimestamp(info.committed_date).strftime('%Y')}\n\n"
+        f"<b>➣ #{info.count()}: "
+        f"<a href={REPO_}/commit/{info}>{info.summary}</a> By -> {info.author}</b>\n"
+        f"\t\t\t\t<b>➥ Commited On:</b> {ordinal(int(datetime.fromtimestamp(info.committed_date).strftime('%d')))} "
+        f"{datetime.fromtimestamp(info.committed_date).strftime('%b')}, "
+        f"{datetime.fromtimestamp(info.committed_date).strftime('%Y')}\n\n"
         for info in repo.iter_commits(f"HEAD..origin/{config.UPSTREAM_BRANCH}")
     )
-    _update_response_ = "**A new upadte is available for the Bot! **\n\n➣ Pushing upadtes Now\n\n__**Updates:**__\n"
+
+    _update_response_ = (
+        "**A new upadte is available for the Bot!**\n\n"
+        "➣ Pushing upadtes Now\n\n__**Updates:**__\n"
+    )
     _final_updates_ = f"{_update_response_} {updates}"
 
     if len(_final_updates_) > 4096:
-        url = await Yukkibin(updates)
+        url = await paste(updates)
         nrs = await response.edit(
-            f"**A new upadte is available for the Bot!**\n\n➣ Pushing upadtes Now\n\n__**Updates:**__\n\n[Check Upadtes]({url})",
+            f"**A new upadte is available for the Bot!**\n\n"
+            f"➣ Pushing upadtes Now\n\n__**Updates:**__\n\n[Check Upadtes]({url})",
             disable_web_page_preview=True,
         )
     else:
@@ -278,9 +288,8 @@ async def update_(client, message, _):
             try:
                 await app.send_message(
                     chat_id=int(x),
-                    text="{0} Is upadted herself\n\nYou can start playing after 15-20 Seconds".format(
-                        app.mention
-                    ),
+                    text=f"{app.mention} Is upadted herself\n\n"
+                    "You can start playing after 15-20 Seconds",
                 )
                 await remove_active_chat(x)
                 await remove_active_video_chat(x)
@@ -306,7 +315,7 @@ async def update_(client, message, _):
             )
             return await app.send_message(
                 chat_id=config.LOGGER_ID,
-                text="An exception occurred #updater due to : <code>{0}</code>".format(
+                text="An exception occurred #updater due to : <code>{}</code>".format(
                     err
                 ),
             )
@@ -317,7 +326,7 @@ async def update_(client, message, _):
 
 
 @app.on_message(command("REBOOT_COMMAND") & filters.group & ~BANNED_USERS)
-@AdminActual
+@admin_actual
 async def reboot(client, message: Message, _):
     mystic = await message.reply_text(
         f"Please Wait... \nRebooting{app.mention} For Your Chat."

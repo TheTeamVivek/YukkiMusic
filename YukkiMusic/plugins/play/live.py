@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -12,13 +12,13 @@ from pyrogram import filters
 
 from config import BANNED_USERS
 from YukkiMusic import Platform, app
-from YukkiMusic.utils.channelplay import get_channeplayCB
-from YukkiMusic.utils.decorators.language import languageCB
+from YukkiMusic.utils.channelplay import get_channeplay_cb
+from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.stream.stream import stream
 
 
 @app.on_callback_query(filters.regex("LiveStream") & ~BANNED_USERS)
-@languageCB
+@language
 async def play_live_stream(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
@@ -29,7 +29,7 @@ async def play_live_stream(client, CallbackQuery, _):
         except Exception:
             return
     try:
-        chat_id, channel = await get_channeplayCB(_, cplay, CallbackQuery)
+        chat_id, channel = await get_channeplay_cb(_, cplay, CallbackQuery)
     except Exception:
         return
     video = True if mode == "v" else None

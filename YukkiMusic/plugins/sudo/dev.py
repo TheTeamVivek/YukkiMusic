@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -12,10 +12,9 @@
 # Credit goes to TheHamkerCat.
 #
 
-import os
-import re
-import sys
 import asyncio
+import os
+import sys
 import traceback
 from inspect import getfullargspec
 from io import StringIO
@@ -31,11 +30,6 @@ from YukkiMusic.misc import SUDOERS
 
 ## ------ Below are some optional Imports you can remove it if is imported  you don't need to import it when using eval command
 
-from pyrogram.raw.functions import *
-from pyrogram.raw.types import *
-
-from YukkiMusic import userbot
-from YukkiMusic.core.call import Yukki
 
 ## end
 
@@ -191,7 +185,7 @@ async def shellrunner(_, message: Message):
                 value=exc_obj,
                 tb=exc_tb,
             )
-            return None, ''.join(errors)
+            return None, "".join(errors)
 
     if "\n" in text:
         commands = text.split("\n")

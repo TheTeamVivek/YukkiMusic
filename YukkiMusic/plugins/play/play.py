@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -17,10 +17,10 @@ from pyrogram.types import InlineKeyboardMarkup, Message
 import config
 from config import BANNED_USERS, lyrical
 from strings import command
-from YukkiMusic import app, LOGGER, Platform
+from YukkiMusic import Platform, app, logger
 from YukkiMusic.utils import seconds_to_min, time_to_seconds
 from YukkiMusic.utils.database import is_video_allowed
-from YukkiMusic.utils.decorators.play import PlayWrapper
+from YukkiMusic.utils.decorators.play import play_wrapper
 from YukkiMusic.utils.formatters import formats
 from YukkiMusic.utils.inline.play import (
     livestream_markup,
@@ -41,7 +41,7 @@ from YukkiMusic.utils.stream.stream import stream
     & filters.group
     & ~BANNED_USERS
 )
-@PlayWrapper
+@play_wrapper
 async def play_commnd(
     client,
     message: Message,
@@ -110,7 +110,7 @@ async def play_commnd(
                     err = e
                 else:
                     err = _["general_3"].format(ex_type)
-                    LOGGER(__name__).error("An error occurred", exc_info=True)
+                    logger(__name__).error("An error occurred", exc_info=True)
                 return await mystic.edit_text(err)
             return await mystic.delete()
         return
@@ -159,13 +159,13 @@ async def play_commnd(
                 if ex_type == "AssistantErr":
                     err = e
                 else:
-                    LOGGER(__name__).error("An error occurred", exc_info=True)
+                    logger(__name__).error("An error occurred", exc_info=True)
                     err = _["general_3"].format(ex_type)
                 return await mystic.edit_text(err)
             return await mystic.delete()
         return
     elif url:
-        if await Platform.youtube.exists(url):
+        if await Platform.youtube.valid(url):
             if "playlist" in url:
                 try:
                     details = await Platform.youtube.playlist(
@@ -287,7 +287,7 @@ async def play_commnd(
                     file_path, details = await Platform.saavn.download(url)
                 except Exception as e:
                     ex_type = type(e).__name__
-                    LOGGER(__name__).error("An error occurred", exc_info=True)
+                    logger(__name__).error("An error occurred", exc_info=True)
                     return await mystic.edit_text(_["play_3"])
                 duration_sec = details["duration_sec"]
                 streamtype = "saavn_track"
@@ -307,7 +307,7 @@ async def play_commnd(
                     streamtype = "saavn_playlist"
                 except Exception as e:
                     ex_type = type(e).__name__
-                    LOGGER(__name__).error("An error occurred", exc_info=True)
+                    logger(__name__).error("An error occurred", exc_info=True)
                     return await mystic.edit_text(_["play_3"])
 
                 if len(details) == 0:
@@ -330,7 +330,7 @@ async def play_commnd(
                     err = e
                 else:
                     err = _["general_3"].format(ex_type)
-                    LOGGER(__name__).error("An error occurred", exc_info=True)
+                    logger(__name__).error("An error occurred", exc_info=True)
                 return await mystic.edit_text(err)
             return await mystic.delete()
 
@@ -364,7 +364,7 @@ async def play_commnd(
                 if ex_type == "AssistantErr":
                     err = e
                 else:
-                    LOGGER(__name__).error("An error occurred", exc_info=True)
+                    logger(__name__).error("An error occurred", exc_info=True)
                     err = _["general_3"].format(ex_type)
                 return await mystic.edit_text(err)
             return await mystic.delete()
@@ -391,7 +391,7 @@ async def play_commnd(
                 if ex_type == "AssistantErr":
                     err = e
                 else:
-                    LOGGER(__name__).error("An error occurred", exc_info=True)
+                    logger(__name__).error("An error occurred", exc_info=True)
                     err = _["general_3"].format(ex_type)
                 return await mystic.edit_text(err)
             return await play_logs(message, streamtype="M3u8 or Index Link")
@@ -453,7 +453,7 @@ async def play_commnd(
             if ex_type == "AssistantErr":
                 err = e
             else:
-                LOGGER(__name__).error("An error occurred", exc_info=True)
+                logger(__name__).error("An error occurred", exc_info=True)
 
                 err = _["general_3"].format(ex_type)
             return await mystic.edit_text(err)

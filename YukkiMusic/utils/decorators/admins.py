@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -28,7 +28,7 @@ from YukkiMusic.utils.database import (
 from ..formatters import int_to_alpha
 
 
-def AdminRightsCheck(mystic):
+def admin_rights_check(mystic):
     async def wrapper(client, message):
         if not await is_maintenance():
             if message.from_user.id not in SUDOERS:
@@ -81,7 +81,7 @@ def AdminRightsCheck(mystic):
     return wrapper
 
 
-def AdminActual(mystic):
+def admin_actual(mystic):
     async def wrapper(client, message):
         if not await is_maintenance():
             if message.from_user.id not in SUDOERS:
@@ -118,7 +118,10 @@ def AdminActual(mystic):
                     message.chat.id, message.from_user.id
                 )
 
-                if member.status not in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER] or (
+                if member.status not in [
+                    ChatMemberStatus.ADMINISTRATOR,
+                    ChatMemberStatus.OWNER,
+                ] or (
                     member.privileges is None
                     or not member.privileges.can_manage_video_chats
                 ):
@@ -133,47 +136,47 @@ def AdminActual(mystic):
     return wrapper
 
 
-def ActualAdminCB(mystic):
-    async def wrapper(client, CallbackQuery):
+def actual_admin_cb(mystic):
+    async def wrapper(client, query: Callbackquery):
         try:
-            language = await get_lang(CallbackQuery.message.chat.id)
+            language = await get_lang(query.message.chat.id)
             _ = get_string(language)
         except Exception:
             _ = get_string("en")
 
         if not await is_maintenance():
-            if CallbackQuery.from_user.id not in SUDOERS:
-                return await CallbackQuery.answer(
+            if query.from_user.id not in SUDOERS:
+                return await query.answer(
                     _["maint_4"],
                     show_alert=True,
                 )
 
-        if CallbackQuery.message.chat.type == ChatType.PRIVATE:
-            return await mystic(client, CallbackQuery, _)
+        if query.message.chat.type == ChatType.PRIVATE:
+            return await mystic(client, query, _)
 
-        is_non_admin = await is_nonadmin_chat(CallbackQuery.message.chat.id)
+        is_non_admin = await is_nonadmin_chat(query.message.chat.id)
         if not is_non_admin:
             try:
                 a = await app.get_chat_member(
-                    CallbackQuery.message.chat.id,
-                    CallbackQuery.from_user.id,
+                    query.message.chat.id,
+                    query.from_user.id,
                 )
 
                 if a is None or (
                     a.privileges is None or not a.privileges.can_manage_video_chats
                 ):
-                    if CallbackQuery.from_user.id not in SUDOERS:
-                        token = await int_to_alpha(CallbackQuery.from_user.id)
-                        _check = await get_authuser_names(CallbackQuery.from_user.id)
+                    if query.from_user.id not in SUDOERS:
+                        token = await int_to_alpha(query.from_user.id)
+                        _check = await get_authuser_names(query.from_user.id)
                         if token not in _check:
-                            return await CallbackQuery.answer(
+                            return await query.answer(
                                 _["general_5"],
                                 show_alert=True,
                             )
 
             except Exception as e:
-                return await CallbackQuery.answer(f"Error: {str(e)}")
+                return await query.answer(f"Error: {str(e)}")
 
-        return await mystic(client, CallbackQuery, _)
+        return await mystic(client, query, _)
 
     return wrapper

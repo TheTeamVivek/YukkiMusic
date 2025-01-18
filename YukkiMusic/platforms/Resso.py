@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -9,25 +9,25 @@
 #
 
 import re
-from typing import Union
 
 import aiohttp
+from async_lru import alru_cache
 from bs4 import BeautifulSoup
 from youtubesearchpython.__future__ import VideosSearch
 
+from .base import Base
 
-class Resso:
+
+class Resso(Base):
     def __init__(self):
         self.regex = r"^(https:\/\/m.resso.com\/)(.*)$"
         self.base = "https://m.resso.com/"
 
     async def valid(self, link: str):
-        if re.search(self.regex, link):
-            return True
-        else:
-            return False
+        return bool(re.search(self.regex, link))
 
-    async def track(self, url, playid: Union[bool, str] = None):
+    @alru_cache(maxsize=None)
+    async def track(self, url, playid: bool | str = None):
         if playid:
             url = self.base + url
         async with aiohttp.ClientSession() as session:

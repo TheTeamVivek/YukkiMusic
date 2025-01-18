@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -23,10 +23,13 @@ from YukkiMusic.utils.database import (
     get_playlist_names,
     save_playlist,
 )
-from YukkiMusic.utils.decorators import language, languageCB
+from YukkiMusic.utils.decorators import language, language
 from YukkiMusic.utils.decorators.play import botplaylist_markup
-from YukkiMusic.utils.inline.playlist import get_playlist_markup, warning_markup
-from YukkiMusic.utils.pastebin import Yukkibin
+from YukkiMusic.utils.inline.playlist import (
+    get_playlist_markup,
+    warning_markup,
+)
+from YukkiMusic.utils.pastebin import paste
 from YukkiMusic.utils.stream.stream import stream
 
 
@@ -48,7 +51,7 @@ async def check_playlist(client, message: Message, _):
         count += 1
         msg += f"\n\n{count}- {title[:70]}\n"
         msg += _["playlist_5"].format(duration)
-    link = await Yukkibin(msg)
+    link = await paste(msg)
     lines = msg.count("\n")
     if lines >= 17:
         car = os.linesep.join(msg.split(os.linesep)[:17])
@@ -136,7 +139,7 @@ async def del_plist_msg(client, message: Message, _):
 
 
 @app.on_callback_query(filters.regex("play_playlist") & ~BANNED_USERS)
-@languageCB
+@language
 async def play_playlist(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     mode = callback_data.split(None, 1)[1]
@@ -182,7 +185,7 @@ async def play_playlist(client, CallbackQuery, _):
 
 
 @app.on_message(command("PLAY_PLAYLIST_COMMAND") & ~BANNED_USERS & filters.group)
-@languageCB
+@language
 async def play_playlist_command(client, message, _):
     mode = message.command[0][0]
     user_id = message.from_user.id
@@ -304,7 +307,7 @@ async def add_playlist(client, message: Message, _):
 
 
 @app.on_callback_query(filters.regex("remove_playlist") & ~BANNED_USERS)
-@languageCB
+@language
 async def del_plist(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     videoid = callback_data.split(None, 1)[1]
@@ -324,7 +327,7 @@ async def del_plist(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("add_playlist") & ~BANNED_USERS)
-@languageCB
+@language
 async def add_playlist(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     videoid = callback_data.split(None, 1)[1]
@@ -369,7 +372,7 @@ async def add_playlist(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("del_playlist") & ~BANNED_USERS)
-@languageCB
+@language
 async def del_plist(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     videoid = callback_data.split(None, 1)[1]
@@ -390,7 +393,7 @@ async def del_plist(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("delete_whole_playlist") & ~BANNED_USERS)
-@languageCB
+@language
 async def del_whole_playlist(client, CallbackQuery, _):
     _playlist = await get_playlist_names(CallbackQuery.from_user.id)
     for x in _playlist:
@@ -400,7 +403,7 @@ async def del_whole_playlist(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("get_playlist_playmode") & ~BANNED_USERS)
-@languageCB
+@language
 async def get_playlist_playmode_(client, CallbackQuery, _):
     try:
         await CallbackQuery.answer()
@@ -413,7 +416,7 @@ async def get_playlist_playmode_(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("home_play") & ~BANNED_USERS)
-@languageCB
+@language
 async def home_play_(client, CallbackQuery, _):
     pass
 
@@ -428,7 +431,7 @@ async def home_play_(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("delete_warning") & ~BANNED_USERS)
-@languageCB
+@language
 async def delete_warning_message(client, CallbackQuery, _):
     try:
         await CallbackQuery.answer()
@@ -439,7 +442,7 @@ async def delete_warning_message(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("del_back_playlist") & ~BANNED_USERS)
-@languageCB
+@language
 async def del_back_playlist(client, CallbackQuery, _):
     user_id = CallbackQuery.from_user.id
     _playlist = await get_playlist_names(user_id)

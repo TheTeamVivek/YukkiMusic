@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -9,26 +9,24 @@
 #
 
 import os
+
 import yt_dlp
+from async_lru import alru_cache
 
 from config import seconds_to_time
 from YukkiMusic.utils.decorators import asyncify
 
+from .base import Base
 
-class Saavn:
-    def __init__(self):
-        pass
 
-    @staticmethod
-    async def valid(url: str) -> bool:
-        return "jiosaavn.com" in url
+class Saavn(Base):
+    async def valid(self, link: str) -> bool:
+        return "jiosaavn.com" in link
 
-    @staticmethod
-    async def is_song(url: str) -> bool:
+    async def is_song(self, url: str) -> bool:
         return "song" in url and not "/featured/" in url and "/album/" not in url
 
-    @staticmethod
-    async def is_playlist(url: str) -> bool:
+    async def is_playlist(self, url: str) -> bool:
         return "/featured/" in url or "/album" in url
 
     def clean_url(self, url: str) -> str:
@@ -36,6 +34,7 @@ class Saavn:
             url = url.split("#")[0]
         return url
 
+    @alru_cache(maxsize=None)
     @asyncify
     def playlist(self, url, limit):
         clean_url = self.clean_url(url)
@@ -66,6 +65,7 @@ class Saavn:
                 pass
         return song_info
 
+    @alru_cache(maxsize=None)
     @asyncify
     def info(self, url):
         clean_url = self.clean_url(url)

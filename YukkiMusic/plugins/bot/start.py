@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -21,6 +21,7 @@ from config.config import OWNER_ID
 from strings import command, get_string
 from YukkiMusic import Platform, app
 from YukkiMusic.misc import SUDOERS, _boot_
+from YukkiMusic.plugins.bot.help import paginate_modules
 from YukkiMusic.plugins.play.playlist import del_plist_msg
 from YukkiMusic.plugins.sudo.sudoers import sudoers_list
 from YukkiMusic.utils.database import (
@@ -33,18 +34,16 @@ from YukkiMusic.utils.database import (
     is_on_off,
     is_served_private_chat,
 )
-from YukkiMusic.utils.decorators.language import LanguageStart
+from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.formatters import get_readable_time
 from YukkiMusic.utils.functions import MARKDOWN, WELCOMEHELP
 from YukkiMusic.utils.inline import private_panel, start_pannel
-
-from YukkiMusic.plugins.bot.help import paginate_modules
 
 loop = asyncio.get_running_loop()
 
 
 @app.on_message(command("START_COMMAND") & filters.private & ~BANNED_USERS)
-@LanguageStart
+@language(no_check=True)
 async def start_comm(client, message: Message, _):
     chat_id = message.chat.id
     await add_served_user(message.from_user.id)
@@ -239,7 +238,7 @@ async def start_comm(client, message: Message, _):
 
 
 @app.on_message(command("START_COMMAND") & filters.group & ~BANNED_USERS)
-@LanguageStart
+@language(no_check=True)
 async def testbot(client, message: Message, _):
     uptime = int(time.time() - _boot_)
     chat_id = message.chat.id
@@ -295,5 +294,4 @@ async def welcome(client, message: Message):
                 )
             return
         except Exception:
-
             return

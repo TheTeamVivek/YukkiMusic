@@ -1,20 +1,23 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
+from telethon import TelegramClient
 
+import config
 from YukkiMusic.core.bot import YukkiBot
 from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
+from YukkiMusic.core.telethon import TelethonClient
 from YukkiMusic.core.userbot import Userbot
-from YukkiMusic.misc import dbb, heroku, sudo
+from YukkiMusic.misc import SUDOERS, heroku, sudo
 
-from .logging import LOGGER
-import config
+from .logging import logger
+from .platforms import PlatForms
 
 # Pyrogram Client
 
@@ -28,15 +31,13 @@ app = YukkiBot(
     workers=50,
 )
 
+tbot = TelethonClient(
+    "YukkiMusic",
+    api_id=config.API_ID,
+    api_hash=config.API_HASH,
+    flood_sleep_threshold=240,
+)
 userbot = Userbot()
-
-for i, session in enumerate(config.STRING_SESSIONS, start=1):
-    userbot.add(
-        f"YukkiString{i}",
-        api_id=config.API_ID,
-        api_hash=config.API_HASH,
-        session_string=session.strip(),
-    )
 
 # Directories
 dirr()
@@ -44,17 +45,11 @@ dirr()
 # Check Git Updates
 git()
 
-# Initialize Memory DB
-dbb()
-
 # Heroku APP
 heroku()
 
 # Load Sudo Users from DB
-sudo()
+SUDOERS = sudo()
 
-
-from .platforms import PlaTForms
-
-Platform = PlaTForms()
+Platform = PlatForms()
 HELPABLE = {}

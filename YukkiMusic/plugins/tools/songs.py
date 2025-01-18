@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -22,11 +22,15 @@ from pyrogram.types import (
     Message,
 )
 
-from config import BANNED_USERS, SONG_DOWNLOAD_DURATION, SONG_DOWNLOAD_DURATION_LIMIT
+from config import (
+    BANNED_USERS,
+    SONG_DOWNLOAD_DURATION,
+    SONG_DOWNLOAD_DURATION_LIMIT,
+)
 from strings import command
 from YukkiMusic import Platform, app
 from YukkiMusic.platforms.Youtube import cookies
-from YukkiMusic.utils.decorators.language import language, languageCB
+from YukkiMusic.utils.decorators.language import language, language
 from YukkiMusic.utils.formatters import convert_bytes
 from YukkiMusic.utils.inline.song import song_markup
 
@@ -58,11 +62,11 @@ async def song_commad_private(client, message: Message, _):
 
     await message.delete()
 
-    url = await Platform.youtube.url(message)
+    url = await Platform.telegram.url(message)
 
     if url:
 
-        if not await Platform.youtube.exists(url):
+        if not await Platform.youtube.valid(url):
 
             return await message.reply_text(_["song_5"])
 
@@ -142,7 +146,7 @@ async def song_commad_private(client, message: Message, _):
 
 
 @app.on_callback_query(filters.regex(pattern=r"song_back") & ~BANNED_USERS)
-@languageCB
+@language
 async def songs_back_helper(client, CallbackQuery, _):
 
     callback_data = CallbackQuery.data.strip()
@@ -159,7 +163,7 @@ async def songs_back_helper(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex(pattern=r"song_helper") & ~BANNED_USERS)
-@languageCB
+@language
 async def song_helper_cb(client, CallbackQuery, _):
 
     callback_data = CallbackQuery.data.strip()
@@ -289,7 +293,7 @@ async def song_helper_cb(client, CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex(pattern=r"song_download") & ~BANNED_USERS)
-@languageCB
+@language
 async def song_download_cb(client, CallbackQuery, _):
 
     try:
@@ -316,7 +320,7 @@ async def song_download_cb(client, CallbackQuery, _):
 
     title = (x["title"]).title()
 
-    title = re.sub("\W+", " ", title)
+    title = re.sub(r"\W+", " ", title)
 
     thumb_image_path = await CallbackQuery.message.download()
 

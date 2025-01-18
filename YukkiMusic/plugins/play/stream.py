@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -17,13 +17,13 @@ from config import BANNED_USERS
 from strings import command
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.utils.decorators.play import PlayWrapper
+from YukkiMusic.utils.decorators.play import play_wrapper
 from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
 
 
 @app.on_message(command("STREAM_COMMAND") & filters.group & ~BANNED_USERS)
-@PlayWrapper
+@play_wrapper
 async def stream_command(
     client,
     message: Message,

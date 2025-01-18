@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -8,8 +8,6 @@
 # All rights reserved.
 #
 
-
-from typing import Union
 
 from config import autoclean, chatstats, userstats
 from config.config import time_to_seconds
@@ -27,7 +25,7 @@ async def put_queue(
     user_id,
     stream,
     url: str = None,
-    forceplay: Union[bool, str] = None,
+    forceplay: bool | str = None,
 ):
     title = title.title()
     try:
@@ -76,7 +74,7 @@ async def put_queue_index(
     user,
     vidid,
     stream,
-    forceplay: Union[bool, str] = None,
+    forceplay: bool | str = None,
 ):
     put = {
         "title": title,

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -9,15 +9,16 @@
 #
 
 from os import path
-from typing import Union
 
 from yt_dlp import YoutubeDL
 
-from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.decorators import asyncify
+from YukkiMusic.utils.formatters import seconds_to_min
+
+from .base import Base
 
 
-class SoundCloud:
+class SoundCloud(Base):
     def __init__(self):
         self.opts = {
             "outtmpl": "downloads/%(id)s.%(ext)s",
@@ -31,7 +32,7 @@ class SoundCloud:
         return "soundcloud" in link
 
     @asyncify
-    def download(self, url: str) -> Union[dict, bool]:
+    def download(self, url: str) -> dict | bool:
         with YoutubeDL(self.opts):
             try:
                 info = d.extract_info(url)

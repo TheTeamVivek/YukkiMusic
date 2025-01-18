@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -17,11 +17,15 @@ from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
 import config
 from config import BANNED_USERS
 from strings import command
-from YukkiMusic import app, Platform
+from YukkiMusic import Platform, app
 from YukkiMusic.misc import db
-from YukkiMusic.utils import Yukkibin, get_channeplayCB, seconds_to_min
-from YukkiMusic.utils.database import get_cmode, is_active_chat, is_music_playing
-from YukkiMusic.utils.decorators.language import language, languageCB
+from YukkiMusic.utils import get_channeplay_cb, paste, seconds_to_min
+from YukkiMusic.utils.database import (
+    get_cmode,
+    is_active_chat,
+    is_music_playing,
+)
+from YukkiMusic.utils.decorators.language import language, language
 from YukkiMusic.utils.inline.queue import queue_back_markup, queue_markup
 
 basic = {}
@@ -73,25 +77,25 @@ async def ping_com(client, message: Message, _):
     type = (got[0]["streamtype"]).title()
     DUR = get_duration(got)
     if "live_" in file:
-        IMAGE = get_image(videoid)
+        image = get_image(videoid)
     elif "vid_" in file:
-        IMAGE = get_image(videoid)
+        image = get_image(videoid)
     elif "index_" in file:
-        IMAGE = config.STREAM_IMG_URL
+        image = config.STREAM_IMG_URL
     else:
         if videoid == "telegram":
-            IMAGE = (
+            image = (
                 config.TELEGRAM_AUDIO_URL
                 if type == "Audio"
                 else config.TELEGRAM_VIDEO_URL
             )
         elif videoid == "soundcloud":
-            IMAGE = config.SOUNCLOUD_IMG_URL
+            image = config.SOUNCLOUD_IMG_URL
         elif "saavn" in videoid:
             details = await Platform.saavn.info(got[0]["url"])
-            IMAGE = details["thumb"]
+            image = details["thumb"]
         else:
-            IMAGE = get_image(videoid)
+            image = get_image(videoid)
     send = (
         "**⌛️ Duration:** Unknown duration limit\n\nClick on below button to get whole queued list"
         if DUR == "Unknown"
@@ -117,7 +121,7 @@ async def ping_com(client, message: Message, _):
         )
     )
     basic[videoid] = True
-    mystic = await message.reply_photo(IMAGE, caption=cap, reply_markup=upl)
+    mystic = await message.reply_photo(image, caption=cap, reply_markup=upl)
     if DUR != "Unknown":
         try:
             while db[chat_id][0]["vidid"] == videoid:
@@ -156,13 +160,13 @@ async def quite_timer(client, CallbackQuery: CallbackQuery):
 
 
 @app.on_callback_query(filters.regex("GetQueued") & ~BANNED_USERS)
-@languageCB
+@language
 async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
     what, videoid = callback_request.split("|")
     try:
-        chat_id, channel = await get_channeplayCB(_, what, CallbackQuery)
+        chat_id, channel = await get_channeplay_cb(_, what, CallbackQuery)
     except Exception:
         return
     if not await is_active_chat(chat_id):
@@ -197,7 +201,7 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
 
         if "🏷" in msg:
             msg = msg.replace("🏷", "")
-        link = await Yukkibin(msg)
+        link = await paste(msg)
         await CallbackQuery.edit_message_text(
             _["queue_3"].format(link), reply_markup=buttons
         )
@@ -205,7 +209,7 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
         if len(msg) > 700:
             if "🏷" in msg:
                 msg = msg.replace("🏷", "")
-            link = await Yukkibin(msg)
+            link = await paste(msg)
             await asyncio.sleep(1)
             return await CallbackQuery.edit_message_text(
                 _["queue_3"].format(link), reply_markup=buttons
@@ -216,12 +220,12 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
 
 
 @app.on_callback_query(filters.regex("queue_back_timer") & ~BANNED_USERS)
-@languageCB
+@language
 async def queue_back(client, CallbackQuery: CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     cplay = callback_data.split(None, 1)[1]
     try:
-        chat_id, channel = await get_channeplayCB(_, cplay, CallbackQuery)
+        chat_id, channel = await get_channeplay_cb(_, cplay, CallbackQuery)
     except Exception:
         return
     if not await is_active_chat(chat_id):
@@ -237,25 +241,25 @@ async def queue_back(client, CallbackQuery: CallbackQuery, _):
     type = (got[0]["streamtype"]).title()
     DUR = get_duration(got)
     if "live_" in file:
-        IMAGE = get_image(videoid)
+        image = get_image(videoid)
     elif "vid_" in file:
-        IMAGE = get_image(videoid)
+        image = get_image(videoid)
     elif "index_" in file:
-        IMAGE = config.STREAM_IMG_URL
+        image = config.STREAM_IMG_URL
     else:
         if videoid == "telegram":
-            IMAGE = (
+            image = (
                 config.TELEGRAM_AUDIO_URL
                 if type == "Audio"
                 else config.TELEGRAM_VIDEO_URL
             )
         elif videoid == "soundcloud":
-            IMAGE = config.SOUNCLOUD_IMG_URL
+            image = config.SOUNCLOUD_IMG_URL
         elif "saavn" in videoid:
             details = await Platform.saavn.info(got[0]["url"])
-            IMAGE = details["thumb"]
+            image = details["thumb"]
         else:
-            IMAGE = get_image(videoid)
+            image = get_image(videoid)
     send = (
         "**⌛️ Duration:** Unknown duration limit\n\nClick on below button to get whole queued list"
         if DUR == "Unknown"
@@ -282,7 +286,7 @@ async def queue_back(client, CallbackQuery: CallbackQuery, _):
     )
     basic[videoid] = True
 
-    med = InputMediaPhoto(media=IMAGE, caption=cap)
+    med = InputMediaPhoto(media=image, caption=cap)
     mystic = await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
     if DUR != "Unknown":
         try:

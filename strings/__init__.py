@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -7,20 +7,17 @@
 #
 # All rights reserved
 
-import re
 import os
+import re
 import sys
-import yaml
 from typing import Dict, List, Union
 
-from pyrogram import filters
-from pyrogram.types import Message
-from pyrogram import Client
+import yaml
+from pyrogram import Client, filters
 from pyrogram.enums import ChatType
+from pyrogram.types import Message
 
 from YukkiMusic.misc import SUDOERS
-
-
 from YukkiMusic.utils.database import get_lang, is_maintenance
 
 languages = {}
@@ -30,11 +27,11 @@ languages_present = {}
 
 
 def load_yaml_file(file_path: str) -> dict:
-    with open(file_path, "r", encoding="utf8") as file:
+    with open(file_path, encoding="utf8") as file:
         return yaml.safe_load(file)
 
 
-def get_command(lang: str = "en") -> Union[str, List[str]]:
+def get_command(lang: str = "en") -> str | list[str]:
     if lang not in commands:
         lang = "en"
     return commands[lang]
@@ -104,8 +101,8 @@ if not commands:
 
 
 def command(
-    commands: Union[str, List[str]],
-    prefixes: Union[str, List[str], None] = "/",
+    commands: str | list[str],
+    prefixes: str | list[str] | None = "/",
     case_sensitive: bool = False,
 ):
     async def func(flt, client: Client, message: Message):

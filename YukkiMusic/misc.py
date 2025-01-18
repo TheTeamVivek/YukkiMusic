@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -17,11 +17,11 @@ from pyrogram import filters
 import config
 from YukkiMusic.core.mongo import pymongodb
 
-from .logging import LOGGER
+from .logging import logger
 
 SUDOERS = filters.user()
 
-
+db = {}
 HAPP = None
 _boot_ = time.time()
 
@@ -47,46 +47,42 @@ XCB = [
 ]
 
 
-def dbb():
-    global db
-    db = {}
-    LOGGER(__name__).info(f"Database Initialized.")
-
-
 def sudo():
-    global SUDOERS
-    OWNER = config.OWNER_ID
+    sudoers = filters.user()
+    owner = config.OWNER_ID
     if config.MONGO_DB_URI is None:
-        for user_id in OWNER:
-            SUDOERS.add(user_id)
+        for user_id in owner:
+            sudoers.add(user_id)
     else:
         sudoersdb = pymongodb.sudoers
-        sudoers = sudoersdb.find_one({"sudo": "sudo"})
-        sudoers = [] if not sudoers else sudoers["sudoers"]
-        for user_id in OWNER:
-            SUDOERS.add(user_id)
-            if user_id not in sudoers:
-                sudoers.append(user_id)
+        db_sudoers = sudoersdb.find_one({"sudo": "sudo"})
+        db_sudoers = [] if not db_sudoers else db_sudoers["sudoers"]
+        for user_id in owner:
+            sudoers.add(user_id)
+            if user_id not in db_sudoers:
+                db_sudoers.append(user_id)
                 sudoersdb.update_one(
                     {"sudo": "sudo"},
-                    {"$set": {"sudoers": sudoers}},
+                    {"$set": {"sudoers": db_sudoers}},
                     upsert=True,
                 )
-        if sudoers:
-            for x in sudoers:
-                SUDOERS.add(x)
-    LOGGER(__name__).info(f"Sudoers Loaded.")
+        if db_sudoers:
+            for x in db_sudoers:
+                sudoers.add(x)
+    logger(__name__).info("Sudoers Loaded.")
+    return sudoers
 
 
 def heroku():
     global HAPP
-    if is_heroku:
+    if is_heroku():
         if config.HEROKU_API_KEY and config.HEROKU_APP_NAME:
             try:
-                Heroku = heroku3.from_key(config.HEROKU_API_KEY)
-                HAPP = Heroku.app(config.HEROKU_APP_NAME)
-                LOGGER(__name__).info(f"Heroku App Configured")
+                heroku = heroku3.from_key(config.HEROKU_API_KEY)
+                HAPP = heroku.app(config.HEROKU_APP_NAME)
+                logger(__name__).info("Heroku App Configured")
             except Exception:
-                LOGGER(__name__).warning(
-                    f"Please make sure your Heroku API Key and Your App name are configured correctly in the heroku."
+                logger(__name__).warning(
+                    "Please make sure your Heroku API Key and "
+                    "Your App name are configured correctly in the heroku."
                 )

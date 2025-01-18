@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -7,7 +7,7 @@
 #
 # All rights reserved.
 from config import LOG, LOG_GROUP_ID
-from YukkiMusic import app
+from YukkiMusic import tbot
 from YukkiMusic.utils.database import is_on_off
 
 
@@ -19,7 +19,7 @@ async def play_logs(message, streamtype):
             chatusername = "Private Group"
 
         logger_text = f"""
-**{app.mention} Play Log**
+**{tbot.mention} Play Log**
 
 **Chat ID:** `{message.chat.id}`
 **Chat Name:** {message.chat.title}
@@ -33,10 +33,10 @@ async def play_logs(message, streamtype):
 **Stream Type:** {streamtype}"""
         if message.chat.id != LOG_GROUP_ID:
             try:
-                await app.send_message(
-                    chat_id=LOG_GROUP_ID,
-                    text=logger_text,
-                    disable_web_page_preview=True,
+                await tbot.send_message(
+                    entity=LOG_GROUP_ID,
+                    message=logger_text,
+                    link_preview=False,
                 )
             except Exception:
                 pass

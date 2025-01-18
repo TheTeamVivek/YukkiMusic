@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -10,7 +10,6 @@
 
 import os
 from random import randint
-from typing import Union
 
 from pyrogram.types import InlineKeyboardMarkup
 
@@ -26,7 +25,7 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.exceptions import AssistantErr
 from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
 from YukkiMusic.utils.inline.playlist import close_markup
-from YukkiMusic.utils.pastebin import Yukkibin
+from YukkiMusic.utils.pastebin import paste
 from YukkiMusic.utils.stream.queue import put_queue, put_queue_index
 from YukkiMusic.utils.thumbnails import gen_qthumb, gen_thumb
 
@@ -39,10 +38,10 @@ async def stream(
     chat_id,
     user_name,
     original_chat_id,
-    video: Union[bool, str] = None,
-    streamtype: Union[bool, str] = None,
-    spotify: Union[bool, str] = None,
-    forceplay: Union[bool, str] = None,
+    video: bool | str = None,
+    streamtype: bool | str = None,
+    spotify: bool | str = None,
+    forceplay: bool | str = None,
 ):
     if not result:
         return
@@ -130,7 +129,7 @@ async def stream(
         if count == 0:
             return
         else:
-            link = await Yukkibin(msg)
+            link = await paste(msg)
             lines = msg.count("\n")
             if lines >= 17:
                 car = os.linesep.join(msg.split(os.linesep)[:17])
@@ -338,7 +337,7 @@ async def stream(
             if count == 0:
                 return
             else:
-                link = await Yukkibin(msg)
+                link = await paste(msg)
                 lines = msg.count("\n")
                 if lines >= 17:
                     car = os.linesep.join(msg.split(os.linesep)[:17])

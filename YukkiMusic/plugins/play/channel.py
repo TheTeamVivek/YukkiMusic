@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -9,22 +9,19 @@
 #
 
 from pyrogram import filters
-
-from pyrogram.types import Message
-
 from pyrogram.enums import ChatMembersFilter, ChatMemberStatus, ChatType
-
 from pyrogram.errors import ChatAdminRequired
+from pyrogram.types import Message
 
 from config import BANNED_USERS
 from strings import command, get_command
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_lang, set_cmode
-from YukkiMusic.utils.decorators.admins import AdminActual
+from YukkiMusic.utils.decorators.admins import admin_actual
 
 
 @app.on_message(command("CHANNELPLAY_COMMAND") & filters.group & ~BANNED_USERS)
-@AdminActual
+@admin_actual
 async def playmode_(client, message: Message, _):
     try:
         lang_code = await get_lang(message.chat.id)

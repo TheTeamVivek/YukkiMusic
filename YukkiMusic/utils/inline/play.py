@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+# Copyright (C) 2024-2025-2025-2025-2025-2025-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
@@ -46,12 +46,12 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
     duration_sec = time_to_seconds(dur)
     percentage = (played_sec / duration_sec) * 100
 
-    bar = get_progress_bar(percentage)  # using for getting the bar
+    status_bar = get_progress_bar(percentage)  # using for getting the bar
 
     buttons = [
         [
             InlineKeyboardButton(
-                text=f"{played} {bar} {dur}",
+                text=f"{played} {status_bar} {dur}",
                 callback_data="GetTimer",
             )
         ],
@@ -102,12 +102,12 @@ def telegram_markup_timer(_, chat_id, played, dur):
     duration_sec = time_to_seconds(dur)
     percentage = (played_sec / duration_sec) * 100
 
-    bar = get_progress_bar(percentage)  # using for getting the bar
+    status_bar = get_progress_bar(percentage)  # using for getting the bar
 
     buttons = [
         [
             InlineKeyboardButton(
-                text=f"{played} {bar} {dur}",
+                text=f"{played} {status_bar} {dur}",
                 callback_data="GetTimer",
             )
         ],
