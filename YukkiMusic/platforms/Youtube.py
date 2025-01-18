@@ -332,13 +332,13 @@ class YouTube:
                 "prefer_ffmpeg": True,
             }
 
-            x = YoutubeDL(ydl_optssx)
-            info = x.extract_info(link, False)
-            xyz = os.path.join("downloads", f"{info['id']}.{info['ext']}")
-            if os.path.exists(xyz):
+            with YoutubeDL(ydl_optssx) as x:
+                info = x.extract_info(link, False)
+                xyz = os.path.join("downloads", f"{info['id']}.{info['ext']}")
+                if os.path.exists(xyz):
+                    return xyz
+                x.download([link])
                 return xyz
-            x.download([link])
-            return xyz
 
         @asyncify
         def video_dl():
@@ -354,13 +354,13 @@ class YouTube:
                 "cookiefile": f"{cookies()}",
             }
 
-            x = YoutubeDL(ydl_optssx)
-            info = x.extract_info(link, False)
-            xyz = os.path.join("downloads", f"{info['id']}.{info['ext']}")
-            if os.path.exists(xyz):
+            with YoutubeDL(ydl_optssx) as x:
+                info = x.extract_info(link, False)
+                xyz = os.path.join("downloads", f"{info['id']}.{info['ext']}")
+                if os.path.exists(xyz):
+                    return xyz
+                x.download([link])
                 return xyz
-            x.download([link])
-            return xyz
 
         @asyncify
         def song_video_dl():
@@ -379,10 +379,10 @@ class YouTube:
                 "cookiefile": f"{cookies()}",
             }
 
-            x = YoutubeDL(ydl_optssx)
-            info = x.extract_info(link)
-            file_path = x.prepare_filename(info)
-            return file_path
+            with YoutubeDL(ydl_optssx) as x:
+                info = x.extract_info(link)
+                file_path = x.prepare_filename(info)
+                return file_path
 
         @asyncify
         def song_audio_dl():
@@ -406,10 +406,10 @@ class YouTube:
                 "cookiefile": f"{cookies()}",
             }
 
-            x = YoutubeDL(ydl_optssx)
-            info = x.extract_info(link)
-            file_path = x.prepare_filename(info)
-            return file_path
+            with YoutubeDL(ydl_optssx) as x:
+                info = x.extract_info(link)
+                file_path = x.prepare_filename(info)
+                return file_path
 
         if songvideo:
             return await song_video_dl()
