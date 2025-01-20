@@ -61,7 +61,7 @@ heroku()
 sudo()
 
 
-from .platforms import PlaTForms
+from .platforms import PlatForms
 
-Platform = PlaTForms()
+Platform = PlatForms()
 HELPABLE = {}
