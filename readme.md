@@ -1,5 +1,9 @@
 # 🎵 **YukkiMusic** 🎶
 
+## This is dev verison of YukkiMusic
+- Future upadte will pushed in this branch
+- We are trying to convert the bot client from Pyrogram to Telethon [ Both Pyrogram and Telethon Client Will be used while while bot not converted in Telethon ]
+
 [**YukkiMusic**](https://github.com/TheTeamVivek/YukkiMusic) is an enhanced version of the original [**YukkiMusicBot**](https://github.com/TeamYukki/YukkiMusicBot), optimized for high-quality music streaming in Telegram voice chats. Built with Python and Pyrogram. 🚀
 
 ## ⭐ Support the Original
