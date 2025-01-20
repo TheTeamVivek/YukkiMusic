@@ -6,6 +6,7 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
+from telethon import TelegramClient
 
 from YukkiMusic.core.bot import YukkiBot
 from YukkiMusic.core.dir import dirr
@@ -28,6 +29,12 @@ app = YukkiBot(
     workers=50,
 )
 
+tbot = TelegramClient(
+    "YukkiMusic",
+    api_id=config.API_ID,
+    api_hash=config.API_HASH,
+    flood_sleep_threshold=240,
+)
 userbot = Userbot()
 
 for i, session in enumerate(config.STRING_SESSIONS, start=1):
