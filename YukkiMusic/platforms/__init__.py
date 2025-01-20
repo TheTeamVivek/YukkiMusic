@@ -28,7 +28,7 @@ class SourceType(Enum):
     YOUTUBE = auto()
     
     
-class PlaTForms:
+class PlatForms:
     def __init__(self):
         self.apple = Apple()
         self.carbon = Carbon()
