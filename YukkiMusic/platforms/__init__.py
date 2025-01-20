@@ -38,7 +38,21 @@ class PlaTForms:
         self.spotify = Spotify()
         self.telegram = Telegram()
         self.youtube = YouTube()
-        
+
+    async def valid(*args, **kwargs) -> SourceType:
+        if await self.apple.valid(*args, **kwargs):
+            return SourceType.APPLE
+        elif await self.saavn.valid(*args, **kwargs):
+            return SourceType.SAAVN
+        elif await self.resso.valid(*args, **kwargs):
+            return SourceType.RESSO
+        elif await self.soundcloud.valid(*args, **kwargs):
+            return SourceType.SOUNDCLOUD
+        elif await self.spotify.valid(*args, **kwargs):
+            return SourceType.SPOTIFY
+        elif await self.youtube.exists(*args, **kwargs):
+            return SourceType.YOUTUBE
+            
     async def info(type: SourceType, *, **kwargs) -> dict: # todo implement all classes and there info function in this function using SourceType and **kwargs
         pass
         
