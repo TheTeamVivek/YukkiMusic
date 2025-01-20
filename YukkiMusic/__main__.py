@@ -14,7 +14,7 @@ from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
 from config import BANNED_USERS
-from YukkiMusic import HELPABLE, LOGGER, app, userbot
+from YukkiMusic import HELPABLE, LOGGER, app, userbot, tbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
@@ -40,8 +40,9 @@ async def init():
     except Exception:
         pass
     await app.start()
+    await tbot.start(bot_token=config.BOT_TOKEN)
     attrs = {"userbot": userbot}
-    for mod in app.load_plugins_from("YukkiMusic/plugins", attrs):
+    async for mod in app.load_plugins_from("YukkiMusic/plugins", attrs):
         if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
             if hasattr(mod, "__HELP__") and mod.__HELP__:
                 HELPABLE[mod.__MODULE__.lower()] = mod
@@ -64,7 +65,7 @@ async def init():
             if result["returncode"] != 0:
                 logger.error(f"Error installing requirements: {result['stderr']}")
                     
-        for mod in app.load_plugins_from("xtraplugins", attrs):
+        async for mod in app.load_plugins_from("xtraplugins", attrs):
             if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
                 if hasattr(mod, "__HELP__") and mod.__HELP__:
                     HELPABLE[mod.__MODULE__.lower()] = mod
@@ -85,11 +86,12 @@ async def init():
 
     await Yukki.decorators()
     LOGGER("YukkiMusic").info("YukkiMusic Started Successfully")
-    await idle()
-    await app.stop()
-    await userbot.stop()
+    # await idle()
+    # await app.stop()
+    # await userbot.stop()
 
 
 if __name__ == "__main__":
     app.run(init())
+    tbot.run_until_disconnected()
     LOGGER("YukkiMusic").info("Stopping YukkiMusic! GoodBye")
