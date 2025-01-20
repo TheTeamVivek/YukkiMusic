@@ -41,7 +41,7 @@ async def init():
         pass
     await app.start()
     await tbot.start(bot_token=config.BOT_TOKEN)
-    attrs = {"userbot": userbot}
+    attrs = {"userbot": userbot, "bot": tbot}
     async for mod in app.load_plugins_from("YukkiMusic/plugins", attrs):
         if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
             if hasattr(mod, "__HELP__") and mod.__HELP__:
