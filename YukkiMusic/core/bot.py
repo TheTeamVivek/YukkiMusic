@@ -42,6 +42,7 @@ from pyrogram.handlers import MessageHandler
 
 import config
 
+from YukkiMusic.utils.decorators.asyncify import asyncify
 from ..logging import LOGGER
 
 class YukkiBot(Client):
@@ -214,13 +215,10 @@ class YukkiBot(Client):
                 )
             except Exception:
                 pass
-                
+
+    @asyncify
     def load_plugin(self, file_path: str, base_dir: str, attrs: dict):
         file_name = os.path.basename(file_path)
-        module_name, ext = os.path.splitext(file_name)
-        if module_name.startswith("__") or ext != ".py":
-            return None
-
         relative_path = os.path.relpath(file_path, base_dir).replace(os.sep, ".")
         module_path = f"{os.path.basename(base_dir)}.{relative_path[:-3]}"
 
@@ -241,7 +239,7 @@ class YukkiBot(Client):
 
         return module
 
-    def load_plugins_from(self, base_folder: str, attrs: dict):
+    async def load_plugins_from(self, base_folder: str, attrs: dict):
         base_dir = os.path.abspath(base_folder)
         utils_path = os.path.join(base_dir, "utils.py")
         utils = None
@@ -258,9 +256,9 @@ class YukkiBot(Client):
             attrs["utils"] = utils
         for root, _, files in os.walk(base_dir):
             for file in files:
-                if file.endswith(".py") and not file == "utils.py":
+                if file.endswith(".py") and not file == "utils.py" or not file.startswith("__"):
                     file_path = os.path.join(root, file)
-                    mod = self.load_plugin(file_path, base_dir, attrs)
+                    mod = await self.load_plugin(file_path, base_dir, attrs)
                     yield mod
 
     async def run_shell_command(self, command: list):
