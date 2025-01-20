@@ -61,7 +61,7 @@ SONG_DOWNLOAD_DURATION = int(
 )  # Remember to give value in Minutes
 
 
-# You'll need a Private Group ID for this.
+# You'll need a username without '@' for this.
 LOG_GROUP_ID = getenv("LOG_GROUP_ID", "")
 
 
