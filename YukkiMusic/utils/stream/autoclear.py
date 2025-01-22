@@ -32,7 +32,7 @@ def auto_clean(popped):
     if isinstance(popped, dict):
         _auto_clean(popped)
     elif isinstance(popped, list):
-        for pop in popped.keys():
+        for pop in popped:
             _auto_clean(pop)
     else:
         raise ValueError("Expected popped to be a dict or list.")
