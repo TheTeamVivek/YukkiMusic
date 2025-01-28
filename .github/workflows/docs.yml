@@ -30,17 +30,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r docs/requirements.txt
+          cd .github/docs
+          pip install -r requirements.txt
 
       - name: Build documentation
         run: |
-          cd docs
           make html
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: docs/build/html
+          folder: .github/docs/build/html
           single-commit: true
           git-config-name: "github-actions[bot]"
           git-config-email: "41898282+github-actions[bot]@users.noreply.github.com"
