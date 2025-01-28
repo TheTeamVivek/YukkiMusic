@@ -5,6 +5,7 @@ on:
     paths:
     - "**.py"
     - "**.rst"
+    - "**.html"
     - ".github/workflows/docs.yml"
   workflow_dispatch:
 
