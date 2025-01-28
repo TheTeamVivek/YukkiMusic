@@ -11,7 +11,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../.."))
 
-project = "YukkiMusic"
+project = "🎵 YukkiMusic"
 copyright = "2024-2025, TheTeamVivek"
 author = "TheTeamVivek"
 
@@ -44,3 +44,4 @@ napoleon_use_rtype = False
 napoleon_use_param = True
 html_static_path = ["_static"]
 html_extra_path = ["_templates"]
+html_favicon = html_static_path[0] + "/TheTeamVivek.ico"
