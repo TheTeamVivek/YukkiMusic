@@ -44,6 +44,3 @@ jobs:
 
       - name: Delete old workflow run
         uses: Viyomx/test-action@main
-        with:
-          workflow_name: 'Build Docs'
-          keep_minimum_runs: 0
