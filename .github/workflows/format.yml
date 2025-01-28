@@ -57,6 +57,3 @@ jobs:
 
       - name: Delete old workflow run
         uses: Viyomx/test-action@main
-        with:
-          workflow_name: 'Format Codes'
-          keep_minimum_runs: 6
