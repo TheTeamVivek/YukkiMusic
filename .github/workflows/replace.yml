@@ -36,6 +36,3 @@ jobs:
 
       - name: Delete old workflow run
         uses: Viyomx/test-action@main
-        with:
-          workflow_name: 'Replace'
-          keep_minimum_runs: 0
