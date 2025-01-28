@@ -33,7 +33,7 @@ Added
 - Multiple language support for bot Help Menu (Only for primary plugins, not for external plugins).
 - All commands can be used without prefix (Except English commands).
 - Users can request their data and delete it (Except: Chat, Banned Users, Blacklist Chats).
-- ``PRIVACY.md`` for YukkiMusic.
+- Added ``PRIVACY.md`` for YukkiMusic.
 
 Changed
 ^^^^^^^
