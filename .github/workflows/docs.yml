@@ -1,4 +1,4 @@
-name: build docs
+name: Build Docs
 
 on:
   push:
@@ -45,3 +45,12 @@ jobs:
           git-config-name: "github-actions[bot]"
           git-config-email: "41898282+github-actions[bot]@users.noreply.github.com"
           commit-message: "Deploy to gh-pages"
+
+      - name: Delete old workflow run
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 6
+          delete_workflow_pattern: "Build Docs"
