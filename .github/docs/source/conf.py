@@ -9,10 +9,10 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(".github/docs"))
+sys.path.insert(0, os.path.abspath("../.."))
 
 project = "YukkiMusic"
-copyright = "2025, TheTeamVivek"
+copyright = "2024-2025, TheTeamVivek"
 author = "TheTeamVivek"
 
 # -- General configuration ---------------------------------------------------
