@@ -43,3 +43,4 @@ napoleon_include_special_with_doc = False
 napoleon_use_rtype = False
 napoleon_use_param = True
 html_static_path = ["_static"]
+html_extra_path = ["_templates"]
