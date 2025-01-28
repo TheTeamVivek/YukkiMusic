@@ -47,7 +47,7 @@ jobs:
           commit-message: "Deploy to gh-pages"
 
       - name: Delete old workflow run
-        uses: Viyomx/test-action@v1
+        uses: Viyomx/test-action@main
         with:
           workflow_name: 'Build Docs'
-          maximum_delete: 3
+          keep_minimum_runs: 0
