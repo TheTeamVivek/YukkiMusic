@@ -1,5 +1,5 @@
-YukkiMusic Changelog
-====================
+Changelog
+=========
 
 All notable changes to YukkiMusic will be documented in this file.
 
