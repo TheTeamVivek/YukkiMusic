@@ -42,7 +42,7 @@ from YukkiMusic.utils.database import (
     set_playtype,
 )
 from YukkiMusic.utils.decorators.admins import actual_admin_cb
-from YukkiMusic.utils.decorators.language import language, language
+from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline.settings import (
     audio_quality_markup,
     auth_users_markup,

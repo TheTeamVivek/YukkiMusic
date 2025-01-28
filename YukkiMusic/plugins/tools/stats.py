@@ -34,7 +34,7 @@ from YukkiMusic.utils.database import (
     get_top_chats,
     get_topp_users,
 )
-from YukkiMusic.utils.decorators.language import language, language
+from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline.stats import (
     back_stats_buttons,
     back_stats_markup,

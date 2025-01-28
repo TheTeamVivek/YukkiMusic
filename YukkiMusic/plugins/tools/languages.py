@@ -16,7 +16,7 @@ from config import BANNED_USERS
 from strings import command, get_string, languages_present
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_lang, set_lang
-from YukkiMusic.utils.decorators import actual_admin_cb, language, language
+from YukkiMusic.utils.decorators import actual_admin_cb, language
 
 # Languages Available
 

@@ -6,9 +6,9 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'YukkiMusic'
-copyright = '2025, TheTeamVivek'
-author = 'TheTeamVivek'
+project = "YukkiMusic"
+copyright = "2025, TheTeamVivek"
+author = "TheTeamVivek"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -21,9 +21,8 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
 ]
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = []
-
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -38,4 +37,4 @@ html_theme_options = {
 napoleon_include_special_with_doc = False
 napoleon_use_rtype = False
 napoleon_use_param = True
-html_static_path = ['_static']
+html_static_path = ["_static"]

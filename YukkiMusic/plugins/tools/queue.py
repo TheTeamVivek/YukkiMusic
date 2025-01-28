@@ -25,7 +25,7 @@ from YukkiMusic.utils.database import (
     is_active_chat,
     is_music_playing,
 )
-from YukkiMusic.utils.decorators.language import language, language
+from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline.queue import queue_back_markup, queue_markup
 
 basic = {}

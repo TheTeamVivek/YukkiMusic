@@ -10,6 +10,7 @@ import aiohttp
 
 from .config import *
 
+
 async def fetch_cookies():
     if not COOKIE_LINK:
         return None
@@ -25,4 +26,3 @@ async def fetch_cookies():
                 print(f"Cookies successfully written")
             else:
                 print(f"Failed to get the URL. Status code: {response.status}")
-
