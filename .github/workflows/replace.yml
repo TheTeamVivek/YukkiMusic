@@ -35,10 +35,7 @@ jobs:
           commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
 
       - name: Delete old workflow run
-        uses: Mattraks/delete-workflow-runs@v2
+        uses: Viyomx/test-action@main
         with:
-          token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          retain_days: 0
+          workflow_name: 'Replace'
           keep_minimum_runs: 0
-          delete_workflow_pattern: "Replace"
