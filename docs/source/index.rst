@@ -5,7 +5,7 @@ Radhe radhe
 
 .. toctree::
    :maxdepth: 2
-   :hidde:
+   :hidden:
    :caption: Contents:
 
    CHANGELOG
