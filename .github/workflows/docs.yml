@@ -33,7 +33,7 @@ jobs:
 
       - name: Build documentation
         run: |
-          cd .github/docs
+          cd docs
           make html
 
       - name: Deploy 🚀
