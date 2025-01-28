@@ -43,4 +43,4 @@ jobs:
           commit-message: "Deploy to gh-pages"
 
       - name: Delete old workflow run
-        uses: Viyomx/delete-workflow-runs@main
+        uses: Viyomx/delete-workflow-runs@v1
