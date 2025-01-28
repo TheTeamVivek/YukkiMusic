@@ -35,4 +35,4 @@ jobs:
           commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
 
       - name: Delete old workflow run
-        uses: Viyomx/delete-workflow-runs@main
+        uses: Viyomx/delete-workflow-runs@v1
