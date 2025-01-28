@@ -10,12 +10,14 @@ The MIT License is a permissive free software license that allows for reuse with
 
 You are allowed to:
 -------------------
+
 - Use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software.  
 - Allow others to do the same, subject to the same conditions.  
 - Include the copyright notice and this permission notice in all copies or substantial portions of the Software.  
 
 You may not:
 ------------
+
 - Use the Software in a way that violates the law.  
 - Use the Software to infringe on any intellectual property rights.  
 - Hold the authors or copyright holders liable for any damages or claims related to the Software.
