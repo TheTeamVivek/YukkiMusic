@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r .github/docs/requirements.txt
-          pip install jsbeautifier
+          pip install jsbeautifier html5-print
 
       - name: Build documentation
         run: |
@@ -36,6 +36,7 @@ jobs:
           make html
           find . -name "*.js" -not -path "./.git/*" -exec js-beautify --indent-size 2 -o {} {} \;
           find . -name "*.css" -not -path "./.git/*" -exec js-beautify --indent-size 2 -o {} {} \;
+          find . -name "*.html" -not -path "./.git/*" -exec html5-print -o {} {} \;
 
 
 
