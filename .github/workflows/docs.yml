@@ -37,7 +37,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: .github/docs/build/html
-          single-commit: true
+         # single-commit: true
           git-config-name: "github-actions[bot]"
           git-config-email: "41898282+github-actions[bot]@users.noreply.github.com"
           commit-message: "Deploy to gh-pages"
