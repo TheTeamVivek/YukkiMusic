@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r .github/docs/requirements.txt
-          pip install jsbeautifier html5print
+          pip install jsbeautifier html5print slimit
 
       - name: Build documentation
         run: |
