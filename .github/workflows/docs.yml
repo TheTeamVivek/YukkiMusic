@@ -35,6 +35,9 @@ jobs:
           cd .github/docs
           make html
           find . -name "*.js" -not -path "./.git/*" -exec js-beautify -o {} {} \;
+          find . -name "*.html" -not -path "./.git/*" -exec js-beautify -o {} {} \;
+          find . -name "*.css" -not -path "./.git/*" -exec js-beautify -o {} {} \;
+
 
 
       - name: Deploy 🚀
