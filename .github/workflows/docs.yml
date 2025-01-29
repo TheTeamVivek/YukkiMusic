@@ -28,16 +28,12 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r .github/docs/requirements.txt
-          pip install jsbeautifier html5print slimit
 
       - name: Build documentation
         run: |
           cd .github/docs
           make html
-          find . -name "*.js" -not -path "./.git/*" -exec js-beautify --indent-size 2 -o {} {} \;
-          find . -name "*.css" -not -path "./.git/*" -exec js-beautify --indent-size 2 -o {} {} \;
-          find . -name "*.html" -not -path "./.git/*" -exec html5-print -o {} {} \;
-
+          find . \( -name "*.js" -or -name "*.css" \) -not -path "./.git/*" -exec js-beautify --indent-size 2 -o {} {} \;
 
 
       - name: Deploy 🚀
