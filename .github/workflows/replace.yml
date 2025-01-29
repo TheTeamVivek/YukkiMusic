@@ -1,5 +1,4 @@
 name: Replace
-
 on:
   push:
     paths:
