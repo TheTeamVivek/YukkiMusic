@@ -44,5 +44,4 @@ napoleon_use_rtype = False
 napoleon_use_param = True
 html_static_path = ["_static"]
 html_extra_path = ["_templates"]
-html_css_files = ["custom.css"]
 html_favicon = html_static_path[0] + "/TheTeamVivek.ico"
