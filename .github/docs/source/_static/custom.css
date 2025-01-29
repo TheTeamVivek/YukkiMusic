@@ -1,0 +1,3 @@
+.rst-footer .rst-footer-buttons + hr + div {
+    display: none;
+}
