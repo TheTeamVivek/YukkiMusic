@@ -15,7 +15,7 @@ Contents:
 About YukkiMusic
 ----------------
 
-YukkiMusic is an enhanced version of the original `**YukkiMusicBot** <https://github.com/TeamYukki/YukkiMusicBot>`_, with enhancements and stability improvements. This project is actively maintained to ensure a smooth and feature-rich music experience in Telegram group calls.
+`YukkiMusic <https://github.com/TheTeamVivek/YukkiMusic>`_ is an enhanced version of the original `YukkiMusicBot <https://github.com/TeamYukki/YukkiMusicBot>`_, with enhancements and stability improvements. This project is actively maintained to ensure a smooth and feature-rich music experience in Telegram group calls.
 
 For setup, commands, and contributions, check the respective sections.
 
