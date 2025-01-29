@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - ".github/workflows/replace.yml"
-
 jobs:
   replace-text:
     runs-on: ubuntu-latest
