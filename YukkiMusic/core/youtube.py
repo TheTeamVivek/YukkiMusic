@@ -39,6 +39,7 @@ class Track:
                 if type == SongType.AUDIO
                 else "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])"
             ),
+            "continuedl": True,
             "outtmpl": "downloads/%(id)s.%(ext)s",
             "geo_bypass": True,
             "noplaylist": True,
