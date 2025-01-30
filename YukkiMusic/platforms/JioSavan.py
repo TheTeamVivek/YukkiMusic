@@ -17,19 +17,19 @@ from config import seconds_to_time
 from YukkiMusic.utils.decorators import asyncify
 
 from .base import PlatformBase
-
+from ..core.youtube import Track
 
 class Saavn(PlatformBase):
     async def valid(self, link: str) -> bool:
         return "jiosaavn.com" in link
 
-    async def is_song(self, url: str) -> bool:
+    async def is_song(self, url: str) -> bool: #TODO remove this function
         return "song" in url and not "/featured/" in url and "/album/" not in url
 
     async def is_playlist(self, url: str) -> bool:
-        return "/featured/" in url or "/album" in url
+        return "/featured/" in url or "/album" in url #TODO Remove this function
 
-    def clean_url(self, url: str) -> str:
+    def clean_url(self, url: str) -> str: 
         if "#" in url:
             url = url.split("#")[0]
         return url
@@ -67,8 +67,8 @@ class Saavn(PlatformBase):
 
     @alru_cache(maxsize=None)
     @asyncify
-    def info(self, url):
-        clean_url = self.clean_url(url)
+    def track(self, url):
+        url = self.clean_url(url)
         ydl_opts = {
             "format": "bestaudio/best",
             "geo_bypass": True,
@@ -79,13 +79,12 @@ class Saavn(PlatformBase):
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(clean_url, download=False)
-            return {
-                "title": info["title"],
-                "duration_sec": info.get("duration", 0),
-                "duration_min": seconds_to_time(info.get("duration", 0)),
-                "thumb": info.get("thumbnail", None),
-                "url": self.clean_url(info["url"]),
-            }
+            return Track(
+                title = info["title"],
+                link = self.clean_url(info["url"])
+                duration_sec = info.get("duration", 0),
+                thumb = info.get("thumbnail", None),
+            )
 
     @asyncify
     def download(self, url):
