@@ -20,7 +20,7 @@ class Track:
     duration_sec: int | None = field(default=None)
 
     def __post_init__(self):
-        if "&" in self.link:
+        if "&" in self.link and (link.startswith("http://") or link.startswith("https://")):
             self.link = self.link.split("&")[0]
         if self.duration_min is not None and self.duration_sec is None:
             self.duration_sec = time_to_seconds(self.duration_min)
