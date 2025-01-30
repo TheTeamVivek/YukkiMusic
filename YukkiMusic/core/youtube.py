@@ -13,7 +13,6 @@ from .enum import SongType
 @dataclass
 class Track:
     title: str
-    vidid: str
     link: str
     thumb: str
     duration_min: int | None = field(default=None)
@@ -73,7 +72,6 @@ class YouTube:
             for result in (await results.next())["result"]:
                 return Track(
                     title=result["title"],
-                    vidid=result["id"],
                     link=result["link"],
                     duration_min=(
                         int(result["duration"]) if result["duration"] else None
@@ -102,7 +100,6 @@ class YouTube:
 
             return Track(
                 title=details["title"],
-                vidid=details["id"],
                 link=details["url"],
                 duration_sec=details["duration"] if details["duration"] != 0 else None,
                 thumb=details["thumbnails"][0]["url"],
