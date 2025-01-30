@@ -9,6 +9,7 @@
 #
 
 import re
+from typing import List
 
 from async_lru import alru_cache
 from bs4 import BeautifulSoup
@@ -30,17 +31,16 @@ class Apple(PlatformBase):
     async def track(self, url: str) -> Track | bool:
         html = await Request.get_text(url)
         soup = BeautifulSoup(html, "html.parser")
-        search = None
+        song_name = None
         for tag in soup.find_all("meta"):
             if tag.get("property", None) == "og:title":
-                search = tag.get("content", None)
-        if search is None:
+                song_name = tag.get("content", None)
+        if song_name is None:
             return False
-        youtube = YouTube(search)
-        return await youtube.search()
+        return await YouTube.search(song_name)
 
     @alru_cache(maxsize=None)
-    async def playlist(self, url, playid: bool | str = None):
+    async def playlist(self, url, playid: bool | str = None) -> List[Track]:
         if playid:
             url = self.base + url
         playlist_id = url.split("playlist/")[1]
@@ -56,5 +56,5 @@ class Apple(PlatformBase):
                 )
             except Exception:
                 xx = ((item["content"]).split("album/")[1]).split("/")[0]
-            results.append(xx)
+            results.append(await YouTube.search(xx))
         return results, playlist_id
