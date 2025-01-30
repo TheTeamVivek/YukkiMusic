@@ -7,13 +7,10 @@
 #
 # All rights reserved.
 #
-
-
-import yt_dlp
+from yt_dlp YoutubeDL
 from async_lru import alru_cache
 
 from YukkiMusic.utils.decorators import asyncify
-
 from ..core.youtube import Track
 from .base import PlatformBase
 
@@ -23,7 +20,7 @@ class Saavn(PlatformBase):
         return "jiosaavn.com" in link
 
     async def is_song(self, url: str) -> bool:  # TODO remove this function
-        return "song" in url and not "/featured/" in url and "/album/" not in url
+        return "song" in url and "/featured/" not in url and "/album/" not in url
 
     async def is_playlist(self, url: str) -> bool:
         return "/featured/" in url or "/album" in url  # TODO Remove this function
@@ -44,20 +41,20 @@ class Saavn(PlatformBase):
         }
         tracks = []
         count = 0
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        with YoutubeDL(ydl_opts) as ydl:
             try:
                 playlist_info = ydl.extract_info(url, download=False)
                 for entry in playlist_info["entries"]:
                     if count == limit:
                         break
                     duration_sec = entry.get("duration", 0)
-                    x = Track(
+                    track = Track(
                         title=entry["title"],
                         duration_sec=duration_sec,
                         thumb=entry.get("thumbnail", ""),
                         link=self.clean_url(entry["url"]),
                     )
-                    tracks.append(x)
+                    tracks.append(track)
                     count += 1
             except Exception:
                 pass
@@ -75,11 +72,11 @@ class Saavn(PlatformBase):
             "no_warnings": True,
         }
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        with YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             return Track(
-                title=info["title"],
-                link=self.clean_url(info["url"]),
-                duration_sec=info.get("duration", 0),
-                thumb=info.get("thumbnail", None),
+                    title=info["title"],
+                    link=self.clean_url(info["url"]),
+                    duration_sec=info.get("duration", 0),
+                    thumb=info.get("thumbnail", None),
             )
