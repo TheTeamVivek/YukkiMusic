@@ -26,7 +26,7 @@ class Track:
             
     async def download(
         self,
-        type: SongType = SongType.AUDIO
+        type: SongType = SongType.AUDIO,
         options: dict | None = None,
     ):
         ytdl_opts = {
