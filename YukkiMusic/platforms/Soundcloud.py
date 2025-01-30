@@ -15,10 +15,10 @@ from yt_dlp import YoutubeDL
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import seconds_to_min
 
-from .base import Base
+from .base import PlatformBase
 
 
-class SoundCloud(Base):
+class SoundCloud(PlatformBase):
     def __init__(self):
         self.opts = {
             "outtmpl": "downloads/%(id)s.%(ext)s",

@@ -16,10 +16,10 @@ from async_lru import alru_cache
 from config import seconds_to_time
 from YukkiMusic.utils.decorators import asyncify
 
-from .base import Base
+from .base import PlatformBase
 
 
-class Saavn(Base):
+class Saavn(PlatformBase):
     async def valid(self, link: str) -> bool:
         return "jiosaavn.com" in link
 

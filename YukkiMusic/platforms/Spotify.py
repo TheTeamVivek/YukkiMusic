@@ -18,10 +18,10 @@ from youtubesearchpython.__future__ import VideosSearch
 import config
 from YukkiMusic.utils.decorators import asyncify
 
-from .base import Base
+from .base import PlatformBase
 
 
-class Spotify(Base):
+class Spotify(PlatformBase):
     def __init__(self):
         self.regex = r"^(https:\/\/open.spotify.com\/)(.*)$"
         self.client_id = config.SPOTIFY_CLIENT_ID

@@ -15,10 +15,10 @@ from async_lru import alru_cache
 from bs4 import BeautifulSoup
 from youtubesearchpython.__future__ import VideosSearch
 
-from .base import Base
+from .base import PlatformBase
 
 
-class Resso(Base):
+class Resso(PlatformBase):
     def __init__(self):
         self.regex = r"^(https:\/\/m.resso.com\/)(.*)$"
         self.base = "https://m.resso.com/"

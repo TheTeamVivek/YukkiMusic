@@ -21,7 +21,7 @@ from YukkiMusic.utils.database import is_on_off
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
-from .base import Base
+from .base import PlatformBase
 
 
 def cookies():
@@ -57,7 +57,7 @@ async def shell_cmd(cmd):
     return out.decode("utf-8")
 
 
-class YouTube(Base):
+class YouTube(PlatformBase):
     def __init__(self):
         self.base = "https://www.youtube.com/watch?v="
         self.regex = r"(?:youtube\.com|youtu\.be)"
