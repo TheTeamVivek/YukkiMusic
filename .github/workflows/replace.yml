@@ -13,8 +13,8 @@ jobs:
 
       - name: Replace text
         run: |
-          FIND_TEXT="Base"
-          REPLACE_TEXT="PlatformBase"
+          FIND_TEXT="2024-2025-2025-2025-2025-2025-2025"
+          REPLACE_TEXT="2024-2025"
 
           find . -type d -name ".git" -prune -o -type f -name "*.py" \
             -exec sed -i "s/\b$FIND_TEXT\b/$REPLACE_TEXT/g" {} +
