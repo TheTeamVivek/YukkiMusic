@@ -44,6 +44,7 @@ class Track:
             "noplaylist": True,
             "nocheckcertificate": True,
             "quiet": True,
+            "retries": 3,
             "no_warnings": True,
             "cookiefile": cookies(),
         }
