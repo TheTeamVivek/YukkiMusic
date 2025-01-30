@@ -23,25 +23,6 @@ from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
 from .base import PlatformBase
 
-
-def cookies():
-    folder_path = os.path.join(os.getcwd(), "config", "cookies")
-    if not os.path.exists(folder_path):
-        raise FileNotFoundError(
-            f"The folder '{folder_path}' does not exist. Make sure your cookies folder in config/ "
-        )
-
-    txt_files = [file for file in os.listdir(folder_path) if file.endswith(".txt")]
-    if not txt_files:
-        raise FileNotFoundError(
-            "No cookies found in the 'cookies' directory. Make sure your cookies are saved as .txt files."
-        )
-
-    random_cookie = random.choice(txt_files)
-    cookie_path = os.path.join(folder_path, random_cookie)
-    return cookie_path
-
-
 async def shell_cmd(cmd):
     proc = await asyncio.create_subprocess_shell(
         cmd,
