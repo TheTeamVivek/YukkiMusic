@@ -3,23 +3,8 @@ from abc import ABC, abstractmethod
 from YukkiMusic.utils.formatters import time_to_seconds
 
 
-class PlatformBase(ABC):
-
-    @abstractmethod
-    async def valid(self, link: str) -> bool:
-        """
-        Validates whether the given URL matches the expected format for this service.
-
-        Args:
-            url (str): The URL to validate.
-
-        Returns:
-            bool: True if the URL is valid for this service, False otherwise.
-        """
-
-
 class TrackDetails:
-    def __init__(self, track_info: dict):
+    def __init__(self, track_info: dict, type):
         self.title = track_info.get("title")
         self.link = track_info.get("link")
         self.vidid = track_info.get("vidid")
@@ -45,3 +30,19 @@ class TrackDetails:
                 "thumb": self.thumb,
             }
         )
+
+
+
+class PlatformBase(ABC):
+
+    @abstractmethod
+    async def valid(self, link: str) -> bool:
+        """
+        Validates whether the given URL matches the expected format for this service.
+
+        Args:
+            url (str): The URL to validate.
+
+        Returns:
+            bool: True if the URL is valid for this service, False otherwise.
+        """
