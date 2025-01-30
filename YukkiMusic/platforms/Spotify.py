@@ -19,7 +19,7 @@ import config
 from YukkiMusic.utils.decorators import asyncify
 
 from .base import PlatformBase
-
+from ..core.youtube import YouTube, Track
 
 class Spotify(PlatformBase):
     def __init__(self):
@@ -40,32 +40,17 @@ class Spotify(PlatformBase):
         return bool(re.search(self.regex, link))
 
     @alru_cache(maxsize=None)
-    async def track(self, link: str):
+    async def track(self, link: str) -> Track:
         track = self.spotify.track(link)
         info = track["name"]
         for artist in track["artists"]:
             fetched = f' {artist["name"]}'
             if "Various Artists" not in fetched:
                 info += fetched
-        results = VideosSearch(info, limit=1)
-        for result in (await results.next())["result"]:
-            ytlink = result["link"]
-            title = result["title"]
-            vidid = result["id"]
-            duration_min = result["duration"]
-            thumbnail = result["thumbnails"][0]["url"].split("?")[0]
-        track_details = {
-            "title": title,
-            "link": ytlink,
-            "vidid": vidid,
-            "duration_min": duration_min,
-            "thumb": thumbnail,
-        }
-        return track_details, vidid
+        return await YouTube.search(info)
 
     @alru_cache(maxsize=None)
-    @asyncify
-    def playlist(self, url: str) -> tuple:
+    async def playlist(self, url: str) -> tuple:
         playlist = self.spotify.playlist(url)
         playlist_id = playlist["id"]
         results = []
@@ -76,12 +61,12 @@ class Spotify(PlatformBase):
                 fetched = f' {artist["name"]}'
                 if "Various Artists" not in fetched:
                     info += fetched
+            info = await YouTube.search(info)
             results.append(info)
         return results, playlist_id
 
     @alru_cache(maxsize=None)
-    @asyncify
-    def album(self, url: str) -> tuple:
+    async def album(self, url: str) -> tuple:
         album = self.spotify.album(url)
         album_id = album["id"]
         results = []
@@ -91,12 +76,12 @@ class Spotify(PlatformBase):
                 fetched = f' {artist["name"]}'
                 if "Various Artists" not in fetched:
                     info += fetched
+            info = await YouTube.search(info)
             results.append(info)
         return results, album_id
 
     @alru_cache(maxsize=None)
-    @asyncify
-    def artist(self, url: str) -> tuple:
+    async def artist(self, url: str) -> tuple:
         artist_info = self.spotify.artist(url)
         artist_id = artist_info["id"]
         results = []
@@ -107,5 +92,6 @@ class Spotify(PlatformBase):
                 fetched = f' {artist["name"]}'
                 if "Various Artists" not in fetched:
                     info += fetched
+            info = await YouTube.search(info)
             results.append(info)
         return results, artist_id
