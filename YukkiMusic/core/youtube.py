@@ -1,11 +1,12 @@
 from dataclasses import dataclass, field
-import asyncio
+
+from youtubesearchpython.__future__ import VideosSearch
+from yt_dlp import YoutubeDL
 
 from config import cookies
-from yt_dlp import YoutubeDL
-from youtubesearchpython.__future__ import VideosSearch
-from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 from YukkiMusic.decorators.asyncify import asyncify
+from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
+
 
 @dataclass
 class Track:
@@ -22,6 +23,7 @@ class Track:
         elif self.duration_sec is not None and self.duration_min is None:
             self.duration_min = seconds_to_min(self.duration_sec)
 
+
 class YouTube:
     def __init__(self, query):
         self.query = query
@@ -34,9 +36,9 @@ class YouTube:
                     title=result["title"],
                     vidid=result["id"],
                     link=result["link"],
-                    duration_min=int(result["duration"])
-                    if result["duration"]
-                    else None,
+                    duration_min=(
+                        int(result["duration"]) if result["duration"] else None
+                    ),
                     duration_sec=None,
                     thumb=result["thumbnails"][0]["url"].split("?")[0],
                 )
