@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from YukkiMusic.utils.formatters import time_to_seconds
 
 from ..core.enum import SourceType
-
+from ..core.youtube import Track
 
 class TrackDetails:
     def __init__(self, track_info: dict, type: SourceType):
@@ -35,3 +35,7 @@ class PlatformBase(ABC):
         Returns:
             bool: True if the URL is valid for this service, False otherwise.
         """
+
+    @abstractmethod
+    async def track(self, url: str) -> Track:
+        pass
