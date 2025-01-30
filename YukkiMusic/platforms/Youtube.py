@@ -9,7 +9,6 @@
 #
 import asyncio
 import os
-import random
 import re
 
 from async_lru import alru_cache
@@ -17,12 +16,13 @@ from youtubesearchpython.__future__ import VideosSearch
 from yt_dlp import YoutubeDL
 
 import config
-from config import cookies 
+from config import cookies
 from YukkiMusic.utils.database import is_on_off
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
 from .base import PlatformBase
+
 
 async def shell_cmd(cmd):
     proc = await asyncio.create_subprocess_shell(
