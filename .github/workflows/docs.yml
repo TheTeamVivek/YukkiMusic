@@ -33,8 +33,6 @@ jobs:
         run: |
           cd .github/docs
           make html
-          find . \( -name "*.js" -or -name "*.css" \) -not -path "./.git/*" -exec js-beautify --indent-size 2 -o {} {} \;
-
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
