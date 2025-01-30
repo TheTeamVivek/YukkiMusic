@@ -9,6 +9,7 @@ from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
 from .enum import SongType
 
+
 @dataclass
 class Track:
     title: str
@@ -23,14 +24,18 @@ class Track:
             self.duration_sec = time_to_seconds(self.duration_min)
         elif self.duration_sec is not None and self.duration_min is None:
             self.duration_min = seconds_to_min(self.duration_sec)
-            
+
     async def download(
         self,
         type: SongType = SongType.AUDIO,
         options: dict | None = None,
     ):
         ytdl_opts = {
-            "format": "bestaudio/best" if type == SongType.AUDIO else "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])",
+            "format": (
+                "bestaudio/best"
+                if type == SongType.AUDIO
+                else "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])"
+            ),
             "outtmpl": "downloads/%(id)s.%(ext)s",
             "geo_bypass": True,
             "noplaylist": True,
@@ -43,8 +48,10 @@ class Track:
             if isinstance(options, dict):
                 ytdl_opts.update(options)
             else:
-                raise Exception(f"Expected 'options' to be a dict but got {type(ytdl_opts).__name__}")
-                
+                raise Exception(
+                    f"Expected 'options' to be a dict but got {type(ytdl_opts).__name__}"
+                )
+
         with YoutubeDL(ytdl_opts) as ydl:
             info = ydl.extract_info(self.link, False)
             file_path = os.path.join("downloads", f"{info['id']}.{info['ext']}")
@@ -52,6 +59,7 @@ class Track:
                 return file_path
             ydl.download([self.link])
             return file_path
+
 
 class YouTube:
     def __init__(self, query):
