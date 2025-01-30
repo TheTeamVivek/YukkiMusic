@@ -1,0 +1,2 @@
+class YouTube:
+    pass
