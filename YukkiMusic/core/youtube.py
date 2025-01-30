@@ -66,7 +66,8 @@ class Track:
 
 
 class YouTube:
-    async def search(self, query) -> Track:
+    @staticmethod
+    async def search(query) -> Track:
         try:
             results = VideosSearch(query, limit=1)
             for result in (await results.next())["result"]:
@@ -83,7 +84,8 @@ class YouTube:
             return await self._search_yt_dlp(query)
 
     @asyncify
-    def _search_yt_dlp(self, query) -> Track:
+    @staticmethod
+    def _search_yt_dlp(query) -> Track:
         options = {
             "format": "best",
             "noplaylist": True,
