@@ -13,13 +13,12 @@ import re
 import spotipy
 from async_lru import alru_cache
 from spotipy.oauth2 import SpotifyClientCredentials
-from youtubesearchpython.__future__ import VideosSearch
 
 import config
-from YukkiMusic.utils.decorators import asyncify
 
+from ..core.youtube import Track, YouTube
 from .base import PlatformBase
-from ..core.youtube import YouTube, Track
+
 
 class Spotify(PlatformBase):
     def __init__(self):
