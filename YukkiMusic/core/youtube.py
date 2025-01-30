@@ -66,12 +66,9 @@ class Track:
 
 
 class YouTube:
-    def __init__(self, query):
-        self.query = query
-
-    async def search(self) -> Track:
+    async def search(self, query) -> Track:
         try:
-            results = VideosSearch(self.query, limit=1)
+            results = VideosSearch(query, limit=1)
             for result in (await results.next())["result"]:
                 return Track(
                     title=result["title"],
@@ -83,10 +80,10 @@ class YouTube:
                     thumb=result["thumbnails"][0]["url"].split("?")[0],
                 )
         except Exception:
-            return await self._search_yt_dlp()
+            return await self._search_yt_dlp(query)
 
     @asyncify
-    def _search_yt_dlp(self) -> Track:
+    def _search_yt_dlp(self, query) -> Track:
         options = {
             "format": "best",
             "noplaylist": True,
@@ -96,7 +93,7 @@ class YouTube:
         }
 
         with YoutubeDL(options) as ydl:
-            info_dict = ydl.extract_info(f"ytsearch: {self.query}", download=False)
+            info_dict = ydl.extract_info(f"ytsearch: {query}", download=False)
             details = info_dict.get("entries", [None])[0]
             if not details:
                 raise ValueError("No results found.")
