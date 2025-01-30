@@ -15,6 +15,7 @@ from async_lru import alru_cache
 from bs4 import BeautifulSoup
 from youtubesearchpython.__future__ import VideosSearch
 
+from ..core.request import Request
 from .base import PlatformBase
 
 
@@ -28,11 +29,7 @@ class Apple(PlatformBase):
 
     @alru_cache(maxsize=None)
     async def track(self, url: str):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                if response.status != 200:
-                    return False
-                html = await response.text()
+        html = await Request.get_text(url)
         soup = BeautifulSoup(html, "html.parser")
         search = None
         for tag in soup.find_all("meta"):
@@ -61,11 +58,8 @@ class Apple(PlatformBase):
         if playid:
             url = self.base + url
         playlist_id = url.split("playlist/")[1]
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                if response.status != 200:
-                    return False
-                html = await response.text()
+        
+        html = await Request.get_text(url)
         soup = BeautifulSoup(html, "html.parser")
         applelinks = soup.find_all("meta", attrs={"property": "music:song"})
         results = []
