@@ -83,14 +83,3 @@ class Saavn(PlatformBase):
                 duration_sec=info.get("duration", 0),
                 thumb=info.get("thumbnail", None),
             )
-
-    @asyncify
-    def download(self, url):
-        ydl_opts = {
-            "geo_bypass": True,
-            "nocheckcertificate": True,
-            "quiet": True,
-            "no_warnings": True,
-            "nooverwrites": False,
-            "continuedl": True,
-        }
