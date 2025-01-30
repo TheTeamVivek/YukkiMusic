@@ -7,7 +7,7 @@
 #
 # All rights reserved.
 #
-from yt_dlp YoutubeDL
+from yt_dlp import YoutubeDL
 from async_lru import alru_cache
 
 from YukkiMusic.utils.decorators import asyncify
