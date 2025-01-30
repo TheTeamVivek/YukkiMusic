@@ -78,7 +78,7 @@ class Saavn(PlatformBase):
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(clean_url, download=False)
+            info = ydl.extract_info(url, download=False)
             return Track(
                 title = info["title"],
                 link = self.clean_url(info["url"])
