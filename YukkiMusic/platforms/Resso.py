@@ -10,13 +10,13 @@
 
 import re
 
-import aiohttp
 from async_lru import alru_cache
 from bs4 import BeautifulSoup
 from youtubesearchpython.__future__ import VideosSearch
 
-from .base import PlatformBase
 from ..core.request import Request
+from .base import PlatformBase
+
 
 class Resso(PlatformBase):
     def __init__(self):
