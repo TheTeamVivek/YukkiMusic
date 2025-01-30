@@ -10,7 +10,6 @@
 
 import re
 
-import aiohttp
 from async_lru import alru_cache
 from bs4 import BeautifulSoup
 from youtubesearchpython.__future__ import VideosSearch
@@ -58,7 +57,7 @@ class Apple(PlatformBase):
         if playid:
             url = self.base + url
         playlist_id = url.split("playlist/")[1]
-        
+
         html = await Request.get_text(url)
         soup = BeautifulSoup(html, "html.parser")
         applelinks = soup.find_all("meta", attrs={"property": "music:song"})
