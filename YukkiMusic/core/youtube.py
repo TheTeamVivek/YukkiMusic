@@ -7,6 +7,7 @@ from config import cookies
 from YukkiMusic.decorators.asyncify import asyncify
 from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
+from .enum import SongType
 
 @dataclass
 class Track:
@@ -22,7 +23,35 @@ class Track:
             self.duration_sec = time_to_seconds(self.duration_min)
         elif self.duration_sec is not None and self.duration_min is None:
             self.duration_min = seconds_to_min(self.duration_sec)
-
+            
+    async def download(
+        self,
+        type: SongType = SongType.AUDIO
+        options: dict | None = None,
+    ):
+        ytdl_opts = {
+            "format": "bestaudio/best" if type == SongType.AUDIO else "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])"
+            "outtmpl": "downloads/%(id)s.%(ext)s",
+            "geo_bypass": True,
+            "noplaylist": True,
+            "nocheckcertificate": True,
+            "quiet": True,
+            "no_warnings": True,
+            "cookiefile": cookies(),
+        }
+        if options is not None:
+            if isinstance(options, dict):
+                ytdl_opts.update(options)
+            else:
+                raise Exception(f"Expected 'options' to be a dict but got {type(ytdl_opts).__name__}")
+                
+        with YoutubeDL(ytdl_opts) as ydl:
+            info = ydl.extract_info(self.link, False)
+            file_path = os.path.join("downloads", f"{info['id']}.{info['ext']}")
+            if os.path.exists(file_path):
+                return file_path
+            ydl.download([self.link])
+            return file_path
 
 class YouTube:
     def __init__(self, query):
@@ -39,7 +68,6 @@ class YouTube:
                     duration_min=(
                         int(result["duration"]) if result["duration"] else None
                     ),
-                    duration_sec=None,
                     thumb=result["thumbnails"][0]["url"].split("?")[0],
                 )
         except Exception:
@@ -65,7 +93,6 @@ class YouTube:
                 title=details["title"],
                 vidid=details["id"],
                 link=details["url"],
-                duration_min=None,
                 duration_sec=details["duration"] if details["duration"] != 0 else None,
                 thumb=details["thumbnails"][0]["url"],
             )
