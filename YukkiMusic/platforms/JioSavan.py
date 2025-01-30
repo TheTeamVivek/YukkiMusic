@@ -7,10 +7,11 @@
 #
 # All rights reserved.
 #
-from yt_dlp import YoutubeDL
 from async_lru import alru_cache
+from yt_dlp import YoutubeDL
 
 from YukkiMusic.utils.decorators import asyncify
+
 from ..core.youtube import Track
 from .base import PlatformBase
 
@@ -75,8 +76,8 @@ class Saavn(PlatformBase):
         with YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             return Track(
-                    title=info["title"],
-                    link=self.clean_url(info["url"]),
-                    duration_sec=info.get("duration", 0),
-                    thumb=info.get("thumbnail", None),
+                title=info["title"],
+                link=self.clean_url(info["url"]),
+                duration_sec=info.get("duration", 0),
+                thumb=info.get("thumbnail", None),
             )
