@@ -30,7 +30,7 @@ class Track:
         options: dict | None = None,
     ):
         ytdl_opts = {
-            "format": "bestaudio/best" if type == SongType.AUDIO else "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])"
+            "format": "bestaudio/best" if type == SongType.AUDIO else "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])",
             "outtmpl": "downloads/%(id)s.%(ext)s",
             "geo_bypass": True,
             "noplaylist": True,
