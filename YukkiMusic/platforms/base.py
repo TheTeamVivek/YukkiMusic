@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
 
-from YukkiMusic.utils.formatters import time_to_seconds
-
-from ..core.enum import SourceType
 from ..core.youtube import Track
+
 
 class PlatformBase(ABC):
 
