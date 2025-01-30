@@ -2,9 +2,10 @@ from abc import ABC, abstractmethod
 
 from YukkiMusic.utils.formatters import time_to_seconds
 
+from ..core.enum import SourceType 
 
 class TrackDetails:
-    def __init__(self, track_info: dict, type):
+    def __init__(self, track_info: dict, type: SourceType):
         self.title = track_info.get("title")
         self.link = track_info.get("link")
         self.vidid = track_info.get("vidid")
@@ -17,20 +18,7 @@ class TrackDetails:
                 self.duration_sec = time_to_seconds(self.duration_min)
         except ValueError:
             self.duration_sec = 0
-
-    def __repr__(self):
-        return str(
-            {
-                "_": self.__class__.__name__,
-                "title": self.title,
-                "link": self.link,
-                "vidid": self.vidid,
-                "duration_min": self.duration_min,
-                "duration_sec": self.duration_sec,
-                "thumb": self.thumb,
-            }
-        )
-
+        self.type = type
 
 class PlatformBase(ABC):
 
