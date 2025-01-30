@@ -10,8 +10,8 @@ class PlaybackState(Enum):
 
 
 class SongType(Enum):
-    TRACK = auto()
-    PLAYLIST = auto()
+    VIDEO = auto()
+    AUDIO = auto()
 
 
 class SourceType(Enum):
