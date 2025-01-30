@@ -36,34 +36,33 @@ class Saavn(PlatformBase):
 
     @alru_cache(maxsize=None)
     @asyncify
-    def playlist(self, url, limit):
-        clean_url = self.clean_url(url)
+    def playlist(self, url, limit) -> list[Track]:
+        url = self.clean_url(url)
         ydl_opts = {
             "extract_flat": True,
             "force_generic_extractor": True,
             "quiet": True,
         }
-        song_info = []
+        tracks = []
         count = 0
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             try:
-                playlist_info = ydl.extract_info(clean_url, download=False)
+                playlist_info = ydl.extract_info(url, download=False)
                 for entry in playlist_info["entries"]:
                     if count == limit:
                         break
                     duration_sec = entry.get("duration", 0)
-                    info = {
-                        "title": entry["title"],
-                        "duration_sec": duration_sec,
-                        "duration_min": seconds_to_time(duration_sec),
-                        "thumb": entry.get("thumbnail", ""),
-                        "url": self.clean_url(entry["url"]),
-                    }
-                    song_info.append(info)
+                    x = Track(
+                        title = entry["title"],
+                        duration_sec =  duration_sec,
+                        thumb =  entry.get("thumbnail", ""),
+                        link = self.clean_url(entry["url"]),
+                    )
+                    tracks.append(x)
                     count += 1
             except Exception:
                 pass
-        return song_info
+        return tracks
 
     @alru_cache(maxsize=None)
     @asyncify
@@ -88,39 +87,11 @@ class Saavn(PlatformBase):
 
     @asyncify
     def download(self, url):
-        clean_url = self.clean_url(url)
         ydl_opts = {
-            "format": "bestaudio/best",
-            "outtmpl": "downloads/%(id)s.%(ext)s",
             "geo_bypass": True,
             "nocheckcertificate": True,
             "quiet": True,
             "no_warnings": True,
-            "retries": 3,
             "nooverwrites": False,
             "continuedl": True,
         }
-
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(clean_url, download=False)
-            file_path = os.path.join("downloads", f"{info['id']}.{info['ext']}")
-
-            if os.path.exists(file_path):
-                return file_path, {
-                    "title": info["title"],
-                    "duration_sec": info.get("duration", 0),
-                    "duration_min": seconds_to_time(info.get("duration", 0)),
-                    "thumb": info.get("thumbnail", None),
-                    "url": self.clean_url(info["url"]),
-                    "filepath": file_path,
-                }
-
-            ydl.download([clean_url])
-            return file_path, {
-                "title": info["title"],
-                "duration_sec": info.get("duration", 0),
-                "duration_min": seconds_to_time(info.get("duration", 0)),
-                "thumb": info.get("thumbnail", None),
-                "url": self.clean_url(info["url"]),
-                "filepath": file_path,
-            }
