@@ -32,7 +32,6 @@ class TrackDetails:
         )
 
 
-
 class PlatformBase(ABC):
 
     @abstractmethod
