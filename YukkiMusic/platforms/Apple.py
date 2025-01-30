@@ -12,10 +12,9 @@ import re
 
 from async_lru import alru_cache
 from bs4 import BeautifulSoup
-from youtubesearchpython.__future__ import VideosSearch
 
 from ..core.request import Request
-from ..core.youtube import YouTube, Track
+from ..core.youtube import Track, YouTube
 from .base import PlatformBase
 
 
@@ -28,7 +27,7 @@ class Apple(PlatformBase):
         return bool(re.search(self.regex, link))
 
     @alru_cache(maxsize=None)
-    async def track(self, url: str) -> Track| bool:
+    async def track(self, url: str) -> Track | bool:
         html = await Request.get_text(url)
         soup = BeautifulSoup(html, "html.parser")
         search = None
@@ -39,7 +38,6 @@ class Apple(PlatformBase):
             return False
         youtube = YouTube(search)
         return await youtube.search()
-        
 
     @alru_cache(maxsize=None)
     async def playlist(self, url, playid: bool | str = None):
