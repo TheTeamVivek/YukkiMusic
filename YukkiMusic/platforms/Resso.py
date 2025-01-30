@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 from youtubesearchpython.__future__ import VideosSearch
 
 from .base import PlatformBase
-
+from ..core.request import Request
 
 class Resso(PlatformBase):
     def __init__(self):
@@ -30,11 +30,7 @@ class Resso(PlatformBase):
     async def track(self, url, playid: bool | str = None):
         if playid:
             url = self.base + url
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                if response.status != 200:
-                    return False
-                html = await response.text()
+        html = await Request.get_text(url)
         soup = BeautifulSoup(html, "html.parser")
         for tag in soup.find_all("meta"):
             if tag.get("property", None) == "og:title":
