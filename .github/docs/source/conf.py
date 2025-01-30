@@ -38,7 +38,7 @@ html_theme = "sphinx_rtd_theme"
 html_theme_options = {
     "navigation_with_keys": True,
 }
-
+html_show_source = False
 napoleon_include_special_with_doc = False
 napoleon_use_rtype = False
 napoleon_use_param = True
