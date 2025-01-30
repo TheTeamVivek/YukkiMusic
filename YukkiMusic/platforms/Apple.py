@@ -9,7 +9,6 @@
 #
 
 import re
-from typing import List
 
 from async_lru import alru_cache
 from bs4 import BeautifulSoup
@@ -40,7 +39,7 @@ class Apple(PlatformBase):
         return await YouTube.search(song_name)
 
     @alru_cache(maxsize=None)
-    async def playlist(self, url, playid: bool | str = None) -> List[Track]:
+    async def playlist(self, url, playid: bool | str = None) -> list[Track]:
         if playid:
             url = self.base + url
         playlist_id = url.split("playlist/")[1]
