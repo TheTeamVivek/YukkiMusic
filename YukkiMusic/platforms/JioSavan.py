@@ -80,7 +80,7 @@ class Saavn(PlatformBase):
             info = ydl.extract_info(url, download=False)
             return Track(
                 title = info["title"],
-                link = self.clean_url(info["url"])
+                link = self.clean_url(info["url"]),
                 duration_sec = info.get("duration", 0),
                 thumb = info.get("thumbnail", None),
             )
