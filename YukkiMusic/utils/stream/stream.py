@@ -63,7 +63,7 @@ async def stream(
                     duration_sec,
                     thumbnail,
                     vidid,
-                ) = await Platform.youtube.details(search, False if spotify else True)
+                ) = await Platform.youtube.track(search, False if spotify else True)
             except Exception:
                 continue
             if str(duration_min) == "None":

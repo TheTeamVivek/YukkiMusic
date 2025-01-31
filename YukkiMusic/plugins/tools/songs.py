@@ -78,7 +78,7 @@ async def song_commad_private(client, message: Message, _):
             duration_sec,
             thumbnail,
             vidid,
-        ) = await Platform.youtube.details(url)
+        ) = await Platform.youtube.track(url)
 
         if str(duration_min) == "None":
 
@@ -118,7 +118,7 @@ async def song_commad_private(client, message: Message, _):
             duration_sec,
             thumbnail,
             vidid,
-        ) = await Platform.youtube.details(query)
+        ) = await Platform.youtube.track(query)
 
     except Exception:
 

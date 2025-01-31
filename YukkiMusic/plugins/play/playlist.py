@@ -286,7 +286,7 @@ async def add_playlist(client, message: Message, _):
 
             m = await message.reply(_["playlist_21"])
             title, duration_min, duration_sec, thumbnail, videoid = (
-                await Platform.youtube.details(videoid, True)
+                await Platform.youtube.track(videoid, True)
             )
             title = (title[:50]).title()
             plist = {
@@ -354,7 +354,7 @@ async def add_playlist(client, CallbackQuery, _):
         duration_sec,
         thumbnail,
         vidid,
-    ) = await Platform.youtube.details(videoid, True)
+    ) = await Platform.youtube.track(videoid, True)
     title = (title[:50]).title()
     plist = {
         "videoid": vidid,
