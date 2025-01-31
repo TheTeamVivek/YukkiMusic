@@ -69,28 +69,6 @@ class YouTube(PlatformBase):
         return title, duration_min, duration_sec, thumbnail, vidid
 
     @alru_cache(maxsize=None)
-    async def title(self, link: str, videoid: bool | str = None):
-        if videoid:
-            link = self.base + link
-        if "&" in link:
-            link = link.split("&")[0]
-        results = VideosSearch(link, limit=1)
-        for result in (await results.next())["result"]:
-            title = result["title"]
-        return title
-
-    @alru_cache(maxsize=None)
-    async def duration(self, link: str, videoid: bool | str = None):
-        if videoid:
-            link = self.base + link
-        if "&" in link:
-            link = link.split("&")[0]
-        results = VideosSearch(link, limit=1)
-        for result in (await results.next())["result"]:
-            duration = result["duration"]
-        return duration
-
-    @alru_cache(maxsize=None)
     async def thumbnail(self, link: str, videoid: bool | str = None):
         if videoid:
             link = self.base + link
