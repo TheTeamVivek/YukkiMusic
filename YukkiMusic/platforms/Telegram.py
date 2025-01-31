@@ -34,7 +34,7 @@ downloader = {}
 
 class Telegram:
     def __init__(self):
-        self.chars_limit = 4096
+        self.chars_limit = 4094
         self.sleep = config.TELEGRAM_DOWNLOAD_EDIT_SLEEP
 
     @asyncify
