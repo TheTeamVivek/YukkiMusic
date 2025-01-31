@@ -16,8 +16,10 @@ class Track:
     title: str
     link: str
     thumb: str
+    download_url: str | None = field(default=None)
     duration_min: int | None = field(default=None)
     duration_sec: int | None = field(default=None)
+    file_path: str | None = field(default=None)
 
     def __post_init__(self):
         if "&" in self.link and (
@@ -58,13 +60,15 @@ class Track:
                 raise Exception(
                     f"Expected 'options' to be a dict but got {type(ytdl_opts).__name__}"
                 )
-
+        url = self.download_url if self.download_url else self.link
         with YoutubeDL(ytdl_opts) as ydl:
-            info = ydl.extract_info(self.link, False)
+            info = ydl.extract_info(url, False)
             file_path = os.path.join("downloads", f"{info['id']}.{info['ext']}")
             if os.path.exists(file_path):
+                self.file_path = file_path
                 return file_path
-            ydl.download([self.link])
+            ydl.download([url])
+            self.file_path = file_path
             return file_path
 
 
