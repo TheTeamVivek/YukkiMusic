@@ -82,6 +82,7 @@ class YouTube:
                 return Track(
                     title=result["title"],
                     link=result["link"],
+                    download_url=result["link"],
                     duration_min=(
                         int(result["duration"]) if result["duration"] else None
                     ),
@@ -111,6 +112,7 @@ class YouTube:
             return Track(
                 title=details["title"],
                 link=details["url"],
+                download_url=details["url"],
                 duration_sec=details["duration"] if details["duration"] != 0 else None,
                 thumb=details["thumbnails"][0]["url"],
             )
