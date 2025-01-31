@@ -1,6 +1,8 @@
 import re
+import asyncio
 from functools import wraps
 
+from typing import Any, Callable
 from telethon import TelegramClient, events
 from telethon.errors import UserNotParticipantError
 from telethon.tl.functions.channels import (
@@ -28,6 +30,12 @@ from telethon.tl.types import (
 
 
 class TelethonClient(TelegramClient):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__lock = asyncio.Lock()
+        self.__tasks = []
+
+
     async def create_mention(self, user: User, html: bool = False) -> str:
         user_name = f"{user.first_name} {user.last_name or ''}".strip()
         user_id = user.id
@@ -80,14 +88,15 @@ class TelethonClient(TelegramClient):
         else:
             raise ValueError(f'The chat_id "{chat_id}" belongs to a user')
 
-    async def start(self, *arg, **kwarg):
-        await self.start(*arg, **kwarg)
+    async def start(self, *args, **kwargs):
+        await super.start(*args, **kwargs)
         me = await self.get_me()
         self.me = me
         self.id = me.id
         self.username = me.username
         self.mention = self.create_mention(me)
         self.name = f"{me.first_name} {me.last_name or ''}".strip()
+        asyncio.create_task(self.__task_runner())
 
     def on_message(self, command, **kwargs):
         def decorator(function):
@@ -109,3 +118,18 @@ class TelethonClient(TelegramClient):
             return wrapper
 
         return decorator
+
+    async def __task_runner(self):
+        while True:
+            async with self.__lock:
+                if not self.__tasks:
+                    return
+                tasks = [func(*args, **kwargs) for func, args, kwargs in self.__tasks]
+                self.__tasks.clear()
+
+            await asyncio.gather(*tasks)
+            await asyncio.sleep(0.2)
+
+    async def add_task(self, func: Callable[..., Any], *args, **kwargs):
+        async with self.__lock:
+            self.__tasks.append((func, args, kwargs))
