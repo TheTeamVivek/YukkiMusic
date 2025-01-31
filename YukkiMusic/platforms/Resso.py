@@ -45,11 +45,11 @@ class Resso(PlatformBase):
             return
         track = await YouTube.search(title)
         return Track(
-            title = track.title,
-            link = url,
-            thumb = track.thumb,
-            download_url = track.download_url,
-            duration_min = track.duration_min,
-            duration_sec = track.duration_sec,
-            file_path = track.file_path,
+            title=track.title,
+            link=url,
+            thumb=track.thumb,
+            download_url=track.download_url,
+            duration_min=track.duration_min,
+            duration_sec=track.duration_sec,
+            file_path=track.file_path,
         )
