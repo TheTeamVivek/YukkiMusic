@@ -13,6 +13,7 @@ from yt_dlp import YoutubeDL
 from YukkiMusic.utils.decorators import asyncify
 
 from ..core.youtube import Track
+from ..core.request import Request
 from .base import PlatformBase
 
 
@@ -81,3 +82,13 @@ class Saavn(PlatformBase):
                 duration_sec=info.get("duration", 0),
                 thumb=info.get("thumbnail", None),
             )
+
+@alru_cache(maxsize=None)
+async def search(self, query: str) -> Track:
+    url = "https://saavn.dev/api/search/songs"
+    result = await Request.get_json(
+        url, params={"query": query, "limit": 1}
+    )
+    if result.get("success"):
+        info = result["results"][0]
+        return await self.track(info["url"])
