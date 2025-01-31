@@ -1,8 +1,9 @@
-import re
 import asyncio
+import re
+from collections.abc import Callable
 from functools import wraps
+from typing import Any
 
-from typing import Any, Callable
 from telethon import TelegramClient, events
 from telethon.errors import UserNotParticipantError
 from telethon.tl.functions.channels import (
@@ -34,7 +35,6 @@ class TelethonClient(TelegramClient):
         super().__init__(*args, **kwargs)
         self.__lock = asyncio.Lock()
         self.__tasks = []
-
 
     async def create_mention(self, user: User, html: bool = False) -> str:
         user_name = f"{user.first_name} {user.last_name or ''}".strip()
