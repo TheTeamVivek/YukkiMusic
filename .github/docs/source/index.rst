@@ -11,6 +11,8 @@ Contents:
    :caption: Additional Resources
 
    CHANGELOG
+   PRIVACY
+   LICENSE
 
 About YukkiMusic
 ----------------
