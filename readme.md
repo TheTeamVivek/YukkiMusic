@@ -1,7 +1,7 @@
 # 🎵 **YukkiMusic** 🎶
 
 > [!CAUTION]
-> Please use the **`master` branch** for stable performance. The **`dev` branch** is under active development and may contain bugs or errors.
+> Please use the **`master` branch** for stable performance. The **`dev` branch** is under active development and may contain a lot of bugs or errors.
 
 > Currently, we are converting the bot from **Kurigram to Telethon**, reediting platform usage, and performing a full core rewrite. For a stable experience, stick to the master branch.
 
