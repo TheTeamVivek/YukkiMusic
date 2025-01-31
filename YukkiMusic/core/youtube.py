@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 
+from async_lru import alru_cache
+
 from youtubesearchpython.__future__ import VideosSearch
 from yt_dlp import YoutubeDL
 
@@ -68,6 +70,7 @@ class Track:
 
 
 class YouTube:
+    @alru_cache(max_size=None)
     @staticmethod
     async def search(query) -> Track:
         try:
@@ -84,6 +87,7 @@ class YouTube:
         except Exception:
             return await YouTube.search_yt_dlp(query)
 
+    @alru_cache(max_size=None)
     @asyncify
     @staticmethod
     def search_yt_dlp(query) -> Track:
