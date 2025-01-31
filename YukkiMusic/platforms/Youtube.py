@@ -140,14 +140,7 @@ class YouTube(PlatformBase):
                     continue
                 if "dash" not in str(format["format"]).lower():
                     try:
-                        format["format"]
-                        format["filesize"]
-                        format["format_id"]
-                        format["ext"]
-                        format["format_note"]
-                    except KeyError:
-                        continue
-                    formats_available.append(
+                        formats_available.append(
                         {
                             "format": format["format"],
                             "filesize": format["filesize"],
@@ -156,7 +149,9 @@ class YouTube(PlatformBase):
                             "format_note": format["format_note"],
                             "yturl": link,
                         }
-                    )
+                        )
+                    except KeyError:
+                        continue
         return formats_available, link
 
     @alru_cache(maxsize=None)
