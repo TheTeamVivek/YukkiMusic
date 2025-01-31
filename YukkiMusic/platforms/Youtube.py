@@ -141,14 +141,14 @@ class YouTube(PlatformBase):
                 if "dash" not in str(format["format"]).lower():
                     try:
                         formats_available.append(
-                        {
-                            "format": format["format"],
-                            "filesize": format["filesize"],
-                            "format_id": format["format_id"],
-                            "ext": format["ext"],
-                            "format_note": format["format_note"],
-                            "yturl": link,
-                        }
+                            {
+                                "format": format["format"],
+                                "filesize": format["filesize"],
+                                "format_id": format["format_id"],
+                                "ext": format["ext"],
+                                "format_note": format["format_note"],
+                                "yturl": link,
+                            }
                         )
                     except KeyError:
                         continue
