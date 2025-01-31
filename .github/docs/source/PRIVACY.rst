@@ -139,9 +139,9 @@ The bot includes:
 -----------------------
 
 For privacy-related questions or concerns:
-- `Support Group <https://t.me/TheTeamVk>`_
-- `Updates Channel <https://t.me/TheTeamVivek>`_
-- `GitHub <https://github.com/TheTeamVivek/YukkiMusic>`_
+- Contact at `Support Group <https://t.me/TheTeamVk>`_
+- Contact at `Updates Channel <https://t.me/TheTeamVivek>`_
+- Contact at `GitHub <https://github.com/TheTeamVivek/YukkiMusic>`_
 
 13. Compliance
 ---------------
