@@ -79,6 +79,7 @@ class TelethonClient(TelegramClient):
                     return participant, status
         else:
             raise ValueError(f'The chat_id "{chat_id}" belongs to a user')
+
     async def start(self, *arg, **kwarg):
         await self.start(*arg, **kwarg)
         me = await self.get_me()
@@ -87,7 +88,7 @@ class TelethonClient(TelegramClient):
         self.username = me.username
         self.mention = self.create_mention(me)
         self.name = f"{me.first_name} {me.last_name or ''}".strip()
-        
+
     def on_message(self, command, **kwargs):
         def decorator(function):
             @wraps(function)
@@ -96,11 +97,15 @@ class TelethonClient(TelegramClient):
                 command = [command] if isinstance(command, str) else command
                 # command = get_command(command, "en") #todo
                 command = [re.escape(cmd) for cmd in command]
-                command = '|'.join(command)
+                command = "|".join(command)
                 username = re.escape(self.username)
-                pattern = re.compile(rf"^(?:/)?({command})(?:@{username})?(?:\s|$)", re.IGNORECASE)
+                pattern = re.compile(
+                    rf"^(?:/)?({command})(?:@{username})?(?:\s|$)", re.IGNORECASE
+                )
                 kwargs["pattern"] = pattern
                 await function(event)
+
             self.add_event_handler(wrapper, events.NewMessage(**kwargs))
             return wrapper
+
         return decorator
