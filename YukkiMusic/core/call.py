@@ -97,24 +97,29 @@ class Call:
     async def pause_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.pause_stream(chat_id)
+        self.calls[chat_id] = PlayType.PAUSED
 
     async def resume_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.resume_stream(chat_id)
+        self.calls[chat_id] = PlayType.PLAYING
 
     async def mute_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.mute_stream(chat_id)
+        self.calls[chat_id] = PlayType.MUTED
 
     async def unmute_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.unmute_stream(chat_id)
+        self.calls[chat_id] = PlayType.PLAYING
 
     async def stop_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         try:
             await _clear_(chat_id)
             await assistant.leave_call(chat_id)
+            del self.calls[chat_id]
         except Exception:
             pass
 
