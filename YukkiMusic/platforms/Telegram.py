@@ -38,7 +38,7 @@ class Telegram:
         self.sleep = config.TELEGRAM_DOWNLOAD_EDIT_SLEEP
 
     @asyncify
-    def url(self, message_1: Message) -> str | None:
+    def get_url_from_message(self, message_1: Message) -> str | None:
         messages = [message_1]
         if message_1.reply_to_message:
             messages.append(message_1.reply_to_message)
