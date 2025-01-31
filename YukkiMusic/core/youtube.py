@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 
 from async_lru import alru_cache
-
 from youtubesearchpython.__future__ import VideosSearch
 from yt_dlp import YoutubeDL
 
