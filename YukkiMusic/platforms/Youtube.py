@@ -19,10 +19,10 @@ import config
 from config import cookies
 from YukkiMusic.utils.database import is_on_off
 from YukkiMusic.utils.decorators import asyncify
-from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
-from .base import PlatformBase
 from ..core.youtube import YouTube as Ytb
+from .base import PlatformBase
+
 
 async def shell_cmd(cmd):
     proc = await asyncio.create_subprocess_shell(
