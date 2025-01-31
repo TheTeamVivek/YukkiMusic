@@ -1,5 +1,8 @@
 import asyncio
 import re
+import traceback
+from datetime import datetime
+
 from collections.abc import Callable
 from functools import wraps
 from typing import Any
@@ -29,6 +32,9 @@ from telethon.tl.types import (
     User,
 )
 
+from ..logging import logger
+
+log = logger(__name__)
 
 class TelethonClient(TelegramClient):
     def __init__(self, *args, **kwargs):
@@ -88,6 +94,23 @@ class TelethonClient(TelegramClient):
         else:
             raise ValueError(f'The chat_id "{chat_id}" belongs to a user')
 
+    async def handle_exception(self, exc: Exception): # TODO Make it more brief
+        date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        error_trace = traceback.format_exc()
+
+        error_message = (
+            f"**Error:** {type(exc).__name__}\n"
+            f"**Date:** {date_time}\n"
+            f"**Traceback:**\n{error_trace}"
+        )
+
+        await self.send_message(config.LOG_GROUP_ID, error_message)
+
+        try:
+            await self.send_message(config.OWNER_ID[0], error_message)
+        except Exception:
+            pass
+        log.error(error_trace) 
     async def start(self, *args, **kwargs):
         await super.start(*args, **kwargs)
         me = await self.get_me()
