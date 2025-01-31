@@ -27,12 +27,12 @@ jobs:
       #      ${{ runner.os }}-pip-formatting-tools-
 
       - name: Install Formatting Tools
-        run: pip install autoflake isort black pyupgrade pylint
+        run: pip install --upgrade autoflake isort black pyupgrade pylint
 
       - name: Format
         run: |
           find . -name "*.py" -exec pyupgrade --py310-plus {} \;
-          isort --include-trailing-comma --multi-line=3 .
+          isort --trailing-comma --multi-line=3 .
 
           autoflake --in-place --recursive --remove-all-unused-imports --ignore-init-module-imports .
           black .
