@@ -5,7 +5,6 @@ class PlayType(Enum):
     PLAYING = auto()  # Actively playing
     PAUSED = auto()  # Paused
     MUTED = auto()  # Muted
-    UNMUTED = auto()  # Unmuted
     SPEEDUPED = auto()  # Playing at a faster speed
 
 
