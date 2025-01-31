@@ -31,6 +31,10 @@ class Track:
         elif self.duration_sec is not None and self.duration_min is None:
             self.duration_min = seconds_to_min(self.duration_sec)
 
+    @property
+    def is_exists(self):
+        return bool(os.path.exists(self.file_path))
+        
     @asyncify
     def download(
         self,
