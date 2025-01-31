@@ -36,7 +36,7 @@ jobs:
 
           autoflake --in-place --recursive --remove-all-unused-imports --ignore-init-module-imports .
           black .
-          isort --include-trailing-comma --multi-line=3 .
+          isort --trailing-comma --multi-line=3 .
 
      # - name: Peps Warnings
      #   run: |
