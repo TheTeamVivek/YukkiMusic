@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
 
-class PlaybackState(Enum):
+class PlayType(Enum):
     PLAYING = auto()  # Actively playing
     PAUSED = auto()  # Paused
     MUTED = auto()  # Muted
