@@ -4,7 +4,7 @@ Configuration
 Environment Setup
 -----------------
   
-Here's an Example Sample.env
+Here's an Example `sample.env`
 
 .. code-block:: bash
   
@@ -29,8 +29,8 @@ Here's an Example Sample.env
    - **BOT_TOKEN**: The bot token you get from `BotFather <https://core.telegram.org/bots#botfather>`_.
    - **MONGO_DB_URI**: The MongoDB connection string for your database.
    - **LOG_GROUP_ID**: The ID of the group to which logs should be sent (set to `0` if no logs are needed).
-   - **OWNER_ID**: The ID of the bot owner.
-   - **STRING_SESSIONS**: Your session string (usually generated via a method like Pyrogram) or You can generate from `Telegram Tools <https://telegram.tools/session-string-generator#pyrogram>`_ And make sure you environment is Production Don't use Test.
+   - **OWNER_ID**: The  User ID That will treated as the Owner of the bot, Multiple Id can be separated with a space.
+   - **STRING_SESSIONS**: Your session string (usually generated via a method like Pyrogram) or You can generate from `Telegram Tools <https://telegram.tools/session-string-generator#pyrogram>`_ And make sure you environment is **Production** don't use **Test**.
 
 You also can fill these belows Available Vars 
 
@@ -45,16 +45,16 @@ Mandatory Vars
 ^^^^^^^^^^^^^^
 
 - API_ID & API_HASH
-   - Go to my.telegram.org then Enter your Phone Number with your country code.
+   - Go to `my.telegram.org <https://my.telegram.org/auth>`_ then Enter your Phone Number with your country code.
 
    - After, you are logged in click on API Development Tools.
 
-   - Enter Anything as App name and App short name, Enter my.telegram.org in url section
+   - Enter Anything as App name and App short name, Enter `my.telegram.org` in url section
 
    - That’s it, You'll get your API_ID and API_HASH.
 
 - BOT_TOKEN
-   Get it from @Botfather in Telegram
+   Get token of the bot from the ` @Botfather <https://t.me/Botfather>`_ in Telegram
 
 - LOG_GROUP_ID
    .. note::
@@ -62,9 +62,9 @@ Mandatory Vars
       You'll need a Group for this. 
 
       Remember to add your Music Bot , Assistant Accounts and Logger Id in Group and Promote them Admin with Full Rights.
-   - Add @MissRose_Bot in your Group from Add Member > Search "@MissRose_Bot" and then Add.
+   - Add `@MissRose_Bot <https://t.me/MissRose_Bot>`_ in your Group from Add Member > Search `@MissRose_Bot` and then Add.
 
-   - After added, Just type "/id" in the chat.
+   - After added, Just type `/id` in the chat.
 
    - You'll get the ID of your group.
 
@@ -85,12 +85,20 @@ Mandatory Vars
 - STRING_SESSIONS
    A list of Pyrogram String Session seperated with comma "," of a Telegram Account which will be joining Group Calls for streaming.
 
-   Your session string (usually generated via a method like Pyrogram) or You can generate from `Telegram Tools <https://telegram.tools/session-string-generator#pyrogram>`_ And make sure you environment is Production Don't use Test.
+   Your session string (usually generated via a method like Pyrogram) or You can generate from `Telegram Tools <https://telegram.tools/session-string-generator#pyrogram>`_ And make sure you environment is **Production** donn't use **Test**.
 
-   .. code-block:: console
+   .. code-block:: bash
          :caption: Example of Multiple String Sessions
 
           STRING_SESSIONS = string1,  string2, string3,  string4
 
-   Like this as your mood you can add multiple String sessions of Your assistant
+   Like this as your mood you can add multiple String sessions of Your assistant for multiple Assistsant.
+
+- MONGO_DB_URI
+       Not a mandatory var, but yes kind off.
+   .. note::
+
+      Yukki no longer requires MONGO DB as mandatory. Leave it blank and bot will use Yukki’s database for your bot. Seperate database and Easy to use.
+
+      To maintain bot’s privacy you wont be able to manage sudoers.  Bot will create an separate collection for you and no other bot's database will clash with it.
 
