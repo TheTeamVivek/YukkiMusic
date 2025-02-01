@@ -195,10 +195,7 @@ autoclean = []
 
 # Images
 
-START_IMG_URL = getenv(
-    "START_IMG_URL",
-    None
-)
+START_IMG_URL = getenv("START_IMG_URL", None)
 
 PING_IMG_URL = getenv(
     "PING_IMG_URL",
@@ -290,16 +287,26 @@ _DEFAULTS = {
     "STREAM_IMG_URL": "assets/Stream.jpeg",
 }
 
-_REQUIRED_URLS = ["EXTRA_PLUGINS_REPO", "SUPPORT_CHANNEL", "SUPPORT_GROUP", "UPSTREAM_REPO", "GITHUB_REPO"]
+_REQUIRED_URLS = [
+    "EXTRA_PLUGINS_REPO",
+    "SUPPORT_CHANNEL",
+    "SUPPORT_GROUP",
+    "UPSTREAM_REPO",
+    "GITHUB_REPO",
+]
 
 for var_name, default_url in _DEFAULTS.items():
     url = globals().get(var_name)
     if url and url != default_url and not re.match(r"^https?://", url):
-        print(f"[ERROR] - Your {var_name} URL is incorrect. Please ensure it starts with https://")
+        print(
+            f"[ERROR] - Your {var_name} URL is incorrect. Please ensure it starts with https://"
+        )
         sys.exit()
 
 for var_name in _REQUIRED_URLS:
     url = globals().get(var_name)
     if url and not re.match(r"^https?://", url):
-        print(f"[ERROR] - Your {var_name} URL is incorrect. Please ensure it starts with https://")
+        print(
+            f"[ERROR] - Your {var_name} URL is incorrect. Please ensure it starts with https://"
+        )
         sys.exit()
