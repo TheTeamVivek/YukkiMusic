@@ -57,5 +57,5 @@ autodoc_member_order = "groupwise"
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 
 redirects = {
-    "config/*": "config.html",
+    "chk": "https://docs.python.org/3",
 }
