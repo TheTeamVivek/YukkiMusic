@@ -1,5 +1,5 @@
-YukkiMusic Configuration
-========================
+Configuration
+=============
 
 Environment Setup
 -----------------
