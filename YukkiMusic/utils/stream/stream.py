@@ -9,6 +9,7 @@
 #
 
 import os
+import asyncio 
 from random import randint
 
 from pyrogram.types import InlineKeyboardMarkup, Message
@@ -57,11 +58,10 @@ async def stream(
     if isinstance(result, tracks): # TODO YouTube Playlist returns list of vidid but other remains list of song name 
         msg = f"{_['playlist_16']}\n\n"
         count = 0
-        try:
-            r = await asyncio.gather(*[track.download() for track in tracks[:config.PLAYLIST_FETCH_LIMIT]], return_exceptions=True) #TODO: We Need to make the track.download compatible with m3u8 support
-            for res in r:
-                if isinstance(res, Exception):
-                    pass # TODO use app.report_error for reporting for logger group or all owners and logs all log needed to create that function
+        r = await asyncio.gather(*[track.download() for track in tracks[:config.PLAYLIST_FETCH_LIMIT]], return_exceptions=True) #TODO: We Need to make the track.download compatible with m3u8 support
+        for res in r:
+            if isinstance(res, Exception):
+                pass # TODO use app.report_error for reporting for logger group or all owners and logs all log needed to create that function
         for search in result:
            # try:
            #     (
