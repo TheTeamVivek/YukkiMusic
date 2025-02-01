@@ -23,6 +23,6 @@ urllib3
 uvloop
 flask
 gunicorn
-yt-dlp
+yt-dlp==2025.1.15
 https://github.com/KSKOP69/youtube-search-python/archive/ksk.zip
 git+https://github.com/Vivekkumar-IN/pykeyboard
