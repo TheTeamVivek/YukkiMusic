@@ -36,7 +36,7 @@ async def stream(
     mystic: Message,
     user_id: int,
   #  result,
-    tracks: Track | list[Track] # Replacement of result
+    tracks: Track | list[Track], # Replacement of result
     chat_id: int,
     user_name, # TODO Remove user_name if user_id belongs to same user
     original_chat_id,
@@ -54,7 +54,7 @@ async def stream(
     if forceplay:
         await Yukki.force_stop_stream(chat_id)
    # if streamtype == "playlist":
-     if isinstance(result, tracks) # TODO YouTube Playlist returns list of vidid but other remains list of song name 
+     if isinstance(result, tracks): # TODO YouTube Playlist returns list of vidid but other remains list of song name 
         msg = f"{_['playlist_16']}\n\n"
         count = 0
         try:
