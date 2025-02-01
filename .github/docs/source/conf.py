@@ -25,6 +25,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
+    "sphinx.ext.intersphinx",
 ]
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -51,3 +52,7 @@ napoleon_use_rtype = False
 napoleon_use_param = True
 
 autodoc_member_order = "groupwise"
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None)
+}
