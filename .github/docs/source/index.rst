@@ -1,14 +1,11 @@
-Welcome to YukkiMusic's Documentation!
-======================================
+Welcome to YukkiMusic
+=====================
 
-.. danger::
+.. warning::
 
    The documentation is still under development. Please be aware of potential changes and incomplete information.
 
 `YukkiMusic <https://github.com/TheTeamVivek/YukkiMusic>`_ is an advanced Telegram music bot optimized for high-quality music streaming in Telegram voice chats. Built with Python, Pyrogram, and PyTgCalls, it provides a seamless music experience with support for various sources like YouTube, Spotify, SoundCloud, and more.
-
-Contents:
----------
 
 .. toctree::
    :maxdepth: 2
