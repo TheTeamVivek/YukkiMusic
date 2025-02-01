@@ -45,7 +45,6 @@ Mandatory Vars
 ^^^^^^^^^^^^^^
 
 - API_ID & API_HASH
-
    - Go to my.telegram.org then Enter your Phone Number with your country code.
 
    - After, you are logged in click on API Development Tools.
@@ -55,7 +54,6 @@ Mandatory Vars
    - That’s it, You'll get your API_ID and API_HASH.
 
 - BOT_TOKEN
-
    Get it from @Botfather in Telegram
 
 - LOG_GROUP_ID
@@ -71,7 +69,6 @@ Mandatory Vars
    - You'll get the ID of your group.
 
 - OWNER_ID
-
    .. note::
 
       Value must be an integer like 0123456789
@@ -83,4 +80,17 @@ Mandatory Vars
 
           OWNER_ID = 1234567890 2345617890 8790654321 6578012347
 
-Your user id (not username) Get it by using command /id on the Group in the reply to your message where Rose Bot was added.
+   Your user id (not username) Get it by using command /id on the Group in the reply to your message where Rose Bot was added.
+
+- STRING_SESSIONS
+   A list of Pyrogram String Session seperated with comma "," of a Telegram Account which will be joining Group Calls for streaming.
+
+   Your session string (usually generated via a method like Pyrogram) or You can generate from `Telegram Tools <https://telegram.tools/session-string-generator#pyrogram>`_ And make sure you environment is Production Don't use Test.
+
+   .. code-block:: console
+         :caption: Example of Multiple String Sessions
+
+          STRING_SESSIONS = string1,  string2, string3,  string4
+
+   Like this as your mood you can add multiple String sessions of Your assistant
+
