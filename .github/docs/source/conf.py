@@ -53,6 +53,4 @@ napoleon_use_param = True
 
 autodoc_member_order = "groupwise"
 
-intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None)
-}
+intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
