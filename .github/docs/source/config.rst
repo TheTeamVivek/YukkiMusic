@@ -54,7 +54,7 @@ Mandatory Vars
    - That’s it, You'll get your API_ID and API_HASH.
 
 - BOT_TOKEN
-   Get token of the bot from the ` @Botfather <https://t.me/Botfather>`_ in Telegram
+   Get token of the bot from the `@Botfather <https://t.me/Botfather>`_ in Telegram
 
 - LOG_GROUP_ID
    .. note::
@@ -62,9 +62,9 @@ Mandatory Vars
       You'll need a Group for this. 
 
       Remember to add your Music Bot , Assistant Accounts and Logger Id in Group and Promote them Admin with Full Rights.
-   - Add `@MissRose_Bot <https://t.me/MissRose_Bot>`_ in your Group from Add Member > Search `@MissRose_Bot` and then Add.
+   - Add `@MissRose_Bot <https://t.me/MissRose_Bot>`_ in your Group from Add Member > Search ``@MissRose_Bot`` and then Add.
 
-   - After added, Just type `/id` in the chat.
+   - After added, Just type ``/id`` in the chat.
 
    - You'll get the ID of your group.
 
