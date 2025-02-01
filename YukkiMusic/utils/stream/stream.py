@@ -8,15 +8,17 @@
 # All rights reserved.
 #
 
+import asyncio
 import os
-import asyncio 
 from random import randint
 
 from pyrogram.types import InlineKeyboardMarkup, Message
 
 import config
-from YukkiMusic import Platform, app, LOGGER
+from YukkiMusic import Platform, app
 from YukkiMusic.core.call import Yukki
+from YukkiMusic.core.enum import SongType
+from YukkiMusic.core.youtube import Track
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
     add_active_video_chat,
@@ -30,22 +32,21 @@ from YukkiMusic.utils.pastebin import paste
 from YukkiMusic.utils.stream.queue import put_queue, put_queue_index
 from YukkiMusic.utils.thumbnails import gen_qthumb, gen_thumb
 
-from YukkiMusic.core.youtube import Track
-from YukkiMusic.core.enum import SongType
+
 async def stream(
-    _, # TODO remove this from argument and get the lang of the chatid under this function
+    _,  # TODO remove this from argument and get the lang of the chatid under this function
     mystic: Message,
     user_id: int,
-  #  result,
-    tracks: Track | list[Track], # Replacement of result
+    #  result,
+    tracks: Track | list[Track],  # Replacement of result
     chat_id: int,
-    user_name, # TODO Remove user_name if user_id belongs to same user
+    user_name,  # TODO Remove user_name if user_id belongs to same user
     original_chat_id,
-  #  video: bool | str = None,
-    type: SongType = SongType.AUDIO, #TODO rename video with  this type
-  #  streamtype: bool | str = None, #TODO remove this Beacuse this was not used
-  # spotify: bool | str = None, # Since the tracks are is already and instance of Track so we don't need to this Beacuse the Tracks is already Contains all result of Song
-    forceplay: bool | str = None, # Can Be Renamed with force
+    #  video: bool | str = None,
+    type: SongType = SongType.AUDIO,  # TODO rename video with  this type
+    #  streamtype: bool | str = None, #TODO remove this Beacuse this was not used
+    # spotify: bool | str = None, # Since the tracks are is already and instance of Track so we don't need to this Beacuse the Tracks is already Contains all result of Song
+    forceplay: bool | str = None,  # Can Be Renamed with force
 ):
     if not result:
         return
@@ -54,25 +55,30 @@ async def stream(
             raise AssistantErr(_["play_7"])
     if forceplay:
         await Yukki.force_stop_stream(chat_id)
-   # if streamtype == "playlist":
-    if isinstance(result, tracks): # TODO YouTube Playlist returns list of vidid but other remains list of song name 
+    # if streamtype == "playlist":
+    if isinstance(
+        result, tracks
+    ):  # TODO YouTube Playlist returns list of vidid but other remains list of song name
         msg = f"{_['playlist_16']}\n\n"
         count = 0
-        r = await asyncio.gather(*[track.download() for track in tracks[:config.PLAYLIST_FETCH_LIMIT]], return_exceptions=True) #TODO: We Need to make the track.download compatible with m3u8 support
+        r = await asyncio.gather(
+            *[track.download() for track in tracks[: config.PLAYLIST_FETCH_LIMIT]],
+            return_exceptions=True,
+        )  # TODO: We Need to make the track.download compatible with m3u8 support
         for res in r:
             if isinstance(res, Exception):
-                pass # TODO use app.report_error for reporting for logger group or all owners and logs all log needed to create that function
+                pass  # TODO use app.report_error for reporting for logger group or all owners and logs all log needed to create that function
         for search in result:
-           # try:
-           #     (
-           #         title,
-           #         duration_min,
-           #         duration_sec,
-           #         thumbnail, #TDOO REMOVE THIS ALL AND USE tracks
-           #         vidid,
-           #     ) = await Platform.youtube.track(search, False if spotify else True)
-           # except Exception:
-           #     continue
+            # try:
+            #     (
+            #         title,
+            #         duration_min,
+            #         duration_sec,
+            #         thumbnail, #TDOO REMOVE THIS ALL AND USE tracks
+            #         vidid,
+            #     ) = await Platform.youtube.track(search, False if spotify else True)
+            # except Exception:
+            #     continue
             if str(duration_min) == "None":
                 continue
             if duration_sec > config.DURATION_LIMIT:
@@ -82,7 +88,7 @@ async def stream(
                     chat_id,
                     original_chat_id,
                     f"vid_{vidid}",
-                    title, #TODO put all Track insted track name
+                    title,  # TODO put all Track insted track name
                     duration_min,
                     user_name,
                     vidid,
@@ -103,7 +109,7 @@ async def stream(
                     )
                 except Exception:
                     raise AssistantErr(_["play_16"])
-                await Yukki.join_call( #MAYBE: The join_call didn't require the original_chat_id remive it 
+                await Yukki.join_call(  # MAYBE: The join_call didn't require the original_chat_id remive it
                     chat_id, original_chat_id, file_path, video=status, image=thumbnail
                 )
                 await put_queue(
@@ -118,9 +124,11 @@ async def stream(
                     "video" if video else "audio",
                     forceplay=forceplay,
                 )
-                img = await gen_thumb(vidid) # TODO Remove Thumbnail Support Or Add multiple Theme support can be off or changed by any command
+                img = await gen_thumb(
+                    vidid
+                )  # TODO Remove Thumbnail Support Or Add multiple Theme support can be off or changed by any command
                 button = stream_markup(_, vidid, chat_id)
-                run = await app.send_photo( # TDDO Put this at the end and outside function
+                run = await app.send_photo(  # TDDO Put this at the end and outside function
                     original_chat_id,
                     photo=img,
                     caption=_["stream_1"].format(
@@ -142,7 +150,9 @@ async def stream(
                 car = os.linesep.join(msg.split(os.linesep)[:17])
             else:
                 car = msg
-            carbon = await Platform.carbon.generate(car, randint(100, 10000000)) # GUESS WHAT: Remove Carbon from platforms
+            carbon = await Platform.carbon.generate(
+                car, randint(100, 10000000)
+            )  # GUESS WHAT: Remove Carbon from platforms
             upl = close_markup(_)
             return await app.send_photo(
                 original_chat_id,
@@ -151,7 +161,9 @@ async def stream(
                 reply_markup=upl,
             )
 
-    elif streamtype == "youtube": # No Need for streamttpe Beacuse all tracks of every platform return same type and has all same attr
+    elif (
+        streamtype == "youtube"
+    ):  # No Need for streamttpe Beacuse all tracks of every platform return same type and has all same attr
         link = result["link"]
         vidid = result["vidid"]
         title = (result["title"]).title()
@@ -192,7 +204,7 @@ async def stream(
             await Yukki.join_call(
                 chat_id, original_chat_id, file_path, video=status, image=thumbnail
             )
-            await put_queue( # We Can simplify the put_queue or the db[chat_id] with a Queue Class
+            await put_queue(  # We Can simplify the put_queue or the db[chat_id] with a Queue Class
                 chat_id,
                 original_chat_id,
                 file_path if direct else f"vid_{vidid}",
@@ -570,5 +582,6 @@ async def stream(
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
             await mystic.delete()
+
 
 # AND LAST: The if await is_active_chat was repeating many times in many conditions Short the usage and the branch or the stream

@@ -1,11 +1,9 @@
 import asyncio
-import re
 import inspect
+import re
 import traceback
-from datetime import datetime
-
 from collections.abc import Callable
-from functools import wraps
+from datetime import datetime
 from typing import Any
 
 from telethon import TelegramClient, events
@@ -37,6 +35,7 @@ from ..logging import logger
 
 log = logger(__name__)
 
+
 class TelethonClient(TelegramClient):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -49,7 +48,7 @@ class TelethonClient(TelegramClient):
         else:
             r = await asyncio.to_thread(func, *args, **kwargs)
         return r
-        
+
     async def create_mention(self, user: User, html: bool = False) -> str:
         user_name = f"{user.first_name} {user.last_name or ''}".strip()
         user_id = user.id
@@ -102,7 +101,7 @@ class TelethonClient(TelegramClient):
         else:
             raise ValueError(f'The chat_id "{chat_id}" belongs to a user')
 
-    async def handle_exception(self, exc: Exception): # TODO Make it more brief
+    async def handle_exception(self, exc: Exception):  # TODO Make it more brief
         date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         error_trace = traceback.format_exc()
 
@@ -118,8 +117,8 @@ class TelethonClient(TelegramClient):
             await self.send_message(config.OWNER_ID[0], error_message)
         except Exception:
             pass
-        log.error(error_trace) 
-        
+        log.error(error_trace)
+
     async def start(self, *args, **kwargs):
         await super.start(*args, **kwargs)
         me = await self.get_me()
@@ -134,6 +133,7 @@ class TelethonClient(TelegramClient):
         def decorator(function):
             kwargs["incoming"] = kwargs.get("incoming", True)
             func = kwargs.get("func")
+
             async def wrapper(event):
                 if func and not await self.run_coro(func, event):
                     return False
@@ -147,6 +147,7 @@ class TelethonClient(TelegramClient):
                     rf"^(?:/)?({command})(?:@{username})?(?:\s|$)", re.IGNORECASE
                 )
                 return bool(re.match(pattern, event.text))
+
             kwargs["func"] = wrapper
             kwargs.pop("pattern", None)
 
@@ -160,7 +161,10 @@ class TelethonClient(TelegramClient):
             async with self.__lock:
                 if not self.__tasks:
                     return
-                tasks = [self.run_coro(func, *args, **kwargs) for func, args, kwargs in self.__tasks]
+                tasks = [
+                    self.run_coro(func, *args, **kwargs)
+                    for func, args, kwargs in self.__tasks
+                ]
                 self.__tasks.clear()
 
             await asyncio.gather(*tasks)
