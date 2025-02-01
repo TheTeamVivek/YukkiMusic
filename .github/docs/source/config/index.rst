@@ -32,6 +32,8 @@ Here's an Example Sample.env
    - **OWNER_ID**: The ID of the bot owner.
    - **STRING_SESSIONS**: Your session string (usually generated via a method like Pyrogram) or You can generate from `Telegram Tools <https://telegram.tools/session-string-generator#pyrogram>`_ And make sure you environment is Production Don't use Test.
 
+You also can fill these belows Available Vars 
+
 Available Vars
 --------------
 
@@ -39,88 +41,46 @@ Here is a List of all Available Vars of `YukkiMusic <https://github.com/TheTeamV
 
 Config vars are basically the variables which configure or modify bot to function, which are the basic necessities of plugins or code to work. You have to set the proper mandatory vars to make it functional and to start the basic feature of bot.
 
-1. API_HASH 
+Mandatory Vars
+^^^^^^^^^^^^^^
 
-2. API_ID 
+- API_ID & API_HASH
 
-3. ASSISTANT_LEAVE_TIME 
+   - Go to my.telegram.org then Enter your Phone Number with your country code.
 
-4. AUTO_LEAVING_ASSISTANT 
+   - After, you are logged in click on API Development Tools.
 
-5. BOT_TOKEN 
+   - Enter Anything as App name and App short name, Enter my.telegram.org in url section
 
-6. CLEANMODE_MINS 
+   - That’s it, You'll get your API_ID and API_HASH.
 
-7. DURATION_LIMIT 
+- BOT_TOKEN
 
-8. GIT_TOKEN 
+   Get it from @Botfather in Telegram
 
-9. GITHUB_REPO 
+- LOG_GROUP_ID
+   .. note::
 
-10. GLOBAL_IMG_URL 
+      You'll need a Group for this. 
 
-11. HEROKU_API_KEY 
+      Remember to add your Music Bot , Assistant Accounts and Logger Id in Group and Promote them Admin with Full Rights.
+   - Add @MissRose_Bot in your Group from Add Member > Search "@MissRose_Bot" and then Add.
 
-12. HEROKU_APP_NAME 
+   - After added, Just type "/id" in the chat.
 
-13. LOG_GROUP_ID 
+   - You'll get the ID of your group.
 
-14. MONGO_DB_URI 
+- OWNER_ID
 
-15. OWNER_ID 
+   .. note::
 
-16. PING_IMG_URL 
+      Value must be an integer like 0123456789
 
-17. PLAYLIST_FETCH_LIMIT 
+      You can add multiple userid seperated with a Space
 
-18. PLAYLIST_IMG_URL 
+      .. code-block:: bash
+         :caption: Example of Multiple Userid
 
-19. PRIVATE_BOT_MODE 
+          OWNER_ID = 1234567890 2345617890 8790654321 6578012347
 
-20. SERVER_PLAYLIST_LIMIT 
-
-21. SONG_DOWNLOAD_DURATION_LIMIT 
-
-22. SOUNCLOUD_IMG_URL 
-
-23. SPOTIFY_ALBUM_IMG_URL 
-
-24. SPOTIFY_ARTIST_IMG_URL 
-
-25. SPOTIFY_CLIENT_ID 
-
-26. SPOTIFY_CLIENT_SECRET 
-
-27. SPOTIFY_PLAYLIST_IMG_URL 
-
-28. START_IMG_URL 
-
-29. STATS_IMG_URL 
-
-30. STREAM_IMG_URL 
-
-31. STRING_SESSIONS
-
-32. SUPPORT_CHANNEL 
-
-33. SUPPORT_GROUP 
-
-34. TELEGRAM_AUDIO_URL 
-
-35. TELEGRAM_EDIT_SLEEP 
-
-36. TELEGRAM_VIDEO_URL 
-
-37. TG_AUDIO_FILESIZE_LIMIT 
-
-38. TG_VIDEO_FILESIZE_LIMIT 
-
-39. UPSTREAM_BRANCH 
-
-40. UPSTREAM_REPO 
-
-41. VIDEO_STREAM_LIMIT 
-
-42. YOUTUBE_EDIT_SLEEP 
-
-42. YOUTUBE_IMG_URL
+Your user id (not username) Get it by using command /id on the Group in the reply to your message where Rose Bot was added.
