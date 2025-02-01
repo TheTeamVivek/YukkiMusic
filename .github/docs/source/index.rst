@@ -12,6 +12,12 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
+   :caption: Getting Started
+
+   config
+
+.. toctree::
+   :maxdepth: 2
    :caption: Additional Resources
 
    CHANGELOG
