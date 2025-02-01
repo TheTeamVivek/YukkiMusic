@@ -54,7 +54,7 @@ async def stream(
     if forceplay:
         await Yukki.force_stop_stream(chat_id)
    # if streamtype == "playlist":
-     if isinstance(result, tracks): # TODO YouTube Playlist returns list of vidid but other remains list of song name 
+    if isinstance(result, tracks): # TODO YouTube Playlist returns list of vidid but other remains list of song name 
         msg = f"{_['playlist_16']}\n\n"
         count = 0
         try:
