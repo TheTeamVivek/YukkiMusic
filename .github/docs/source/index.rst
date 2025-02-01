@@ -14,7 +14,7 @@ Contents:
    :maxdepth: 2
    :caption: Getting Started
 
-   config/index
+   config
 
 .. toctree::
    :maxdepth: 2
