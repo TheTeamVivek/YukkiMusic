@@ -5,7 +5,7 @@ Environment Setup
 -----------------
   
 Here's an Example Sample.env
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. code-block:: bash
   
    API_ID = 
@@ -23,13 +23,14 @@ Here's an Example Sample.env
 
 
 - **Fill in the necessary variables in your .env :**
-  - **API_ID**: The API ID obtained from `Telegram <https://my.telegram.org/auth>`_.
-  - **API_HASH**: The API hash obtained from `Telegram <https://my.telegram.org/auth>`_.
-  - **BOT_TOKEN**: The bot token you get from `BotFather <https://core.telegram.org/bots#botfather>`_.
-  - **MONGO_DB_URI**: The MongoDB connection string for your database.
-  - **LOG_GROUP_ID**: The ID of the group to which logs should be sent (set to `0` if no logs are needed).
-  - **OWNER_ID**: The ID of the bot owner.
-  - **STRING_SESSIONS**: Your session string (usually generated via a method like Pyrogram) or You can generate from `Telegram Tools <https://telegram.tools/session-string-generator#pyrogram>`_ And make sure you environment is Production Don't use Test.
+
+   - **API_ID**: The API ID obtained from `Telegram <https://my.telegram.org/auth>`_.
+   - **API_HASH**: The API hash obtained from `Telegram <https://my.telegram.org/auth>`_.
+   - **BOT_TOKEN**: The bot token you get from `BotFather <https://core.telegram.org/bots#botfather>`_.
+   - **MONGO_DB_URI**: The MongoDB connection string for your database.
+   - **LOG_GROUP_ID**: The ID of the group to which logs should be sent (set to `0` if no logs are needed).
+   - **OWNER_ID**: The ID of the bot owner.
+   - **STRING_SESSIONS**: Your session string (usually generated via a method like Pyrogram) or You can generate from `Telegram Tools <https://telegram.tools/session-string-generator#pyrogram>`_ And make sure you environment is Production Don't use Test.
 
 Available Vars
 --------------
