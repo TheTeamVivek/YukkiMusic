@@ -1,5 +1,6 @@
 import asyncio
 import re
+import inspect
 import traceback
 from datetime import datetime
 
@@ -42,6 +43,13 @@ class TelethonClient(TelegramClient):
         self.__lock = asyncio.Lock()
         self.__tasks = []
 
+    async def run_coro(self, func: Callable, *args, **kwargs):
+        if inspect.iscoroutinefunction(func):
+            r = await func(*args, **kwrags)
+        else:
+            r = await asyncio.to_thread(func, *args, **kwargs)
+        return r
+        
     async def create_mention(self, user: User, html: bool = False) -> str:
         user_name = f"{user.first_name} {user.last_name or ''}".strip()
         user_id = user.id
@@ -111,6 +119,7 @@ class TelethonClient(TelegramClient):
         except Exception:
             pass
         log.error(error_trace) 
+        
     async def start(self, *args, **kwargs):
         await super.start(*args, **kwargs)
         me = await self.get_me()
@@ -123,10 +132,13 @@ class TelethonClient(TelegramClient):
 
     def on_message(self, command, **kwargs):
         def decorator(function):
-            @wraps(function)
+            kwargs["incoming"] = kwargs.get("incoming", True)
+            func = kwargs.get("func")
             async def wrapper(event):
-                kwargs["incoming"] = kwargs.get("incoming") or True
-                command = [command] if isinstance(command, str) else command
+                if func and not await self.run_coro(func, event):
+                    return False
+                if isinstance(command, str):
+                    command = [command]
                 # command = get_command(command, "en") #todo
                 command = [re.escape(cmd) for cmd in command]
                 command = "|".join(command)
@@ -134,11 +146,12 @@ class TelethonClient(TelegramClient):
                 pattern = re.compile(
                     rf"^(?:/)?({command})(?:@{username})?(?:\s|$)", re.IGNORECASE
                 )
-                kwargs["pattern"] = pattern
-                await function(event)
+                return bool(re.match(pattern, event.text))
+            kwargs["func"] = wrapper
+            kwargs.pop("pattern", None)
 
-            self.add_event_handler(wrapper, events.NewMessage(**kwargs))
-            return wrapper
+            self.add_event_handler(function, events.NewMessage(**kwargs))
+            return function
 
         return decorator
 
@@ -147,7 +160,7 @@ class TelethonClient(TelegramClient):
             async with self.__lock:
                 if not self.__tasks:
                     return
-                tasks = [func(*args, **kwargs) for func, args, kwargs in self.__tasks]
+                tasks = [self.run_coro(func, *args, **kwargs) for func, args, kwargs in self.__tasks]
                 self.__tasks.clear()
 
             await asyncio.gather(*tasks)
