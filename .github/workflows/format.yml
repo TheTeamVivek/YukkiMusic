@@ -33,7 +33,7 @@ jobs:
         run: |
           find . -name "*.py" -exec pyupgrade --py310-plus {} \;
           black .
-          autoflake --in-place --recursive --remove-all-unused-imports --ignore-init-module-imports .
+          autoflake --in-place --recursive --remove-all-unused-imports --ignore-init-module-imports --verbose .
           isort --trailing-comma --multi-line=3 .
 
      # - name: Peps Warnings
