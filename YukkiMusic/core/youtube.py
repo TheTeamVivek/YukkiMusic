@@ -6,7 +6,7 @@ from yt_dlp import YoutubeDL
 
 from config import cookies
 from YukkiMusic.decorators.asyncify import asyncify
-from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
+from YukkiMusic.utils.formatters import time_to_seconds
 
 from .enum import SongType
 
@@ -16,7 +16,7 @@ class Track:
     title: str
     link: str
     thumb: str
-    duration: int # duration in Seconds
+    duration: int  # duration in Seconds
     download_url: str | None = field(default=None)
     file_path: str | None = field(default=None)
 
@@ -82,9 +82,7 @@ class YouTube:
                     title=result["title"],
                     link=result["link"],
                     download_url=result["link"],
-                    duration=(
-                        time_to_seconds(result["duration"])
-                    ),
+                    duration=(time_to_seconds(result["duration"])),
                     thumb=result["thumbnails"][0]["url"].split("?")[0],
                 )
         except Exception:
