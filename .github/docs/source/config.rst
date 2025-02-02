@@ -103,11 +103,13 @@ Mandatory Vars
       To maintain bot’s privacy you wont be able to manage sudoers.  Bot will create an separate collection for you and no other bot's database will clash with it.
 
 - COOKIE_LINK
-   This is **not a mandatory** variable, but it is necessary for the bot to play songs perfectly due to YouTube verification.  
+   .. note::
 
-   Without cookies, the bot may be unable to download songs.  
+      This is **not a mandatory** variable, but it is necessary for the bot to play songs perfectly due to YouTube verification.  
 
-   **How to obtain and use cookies:**  
+      Without cookies, the bot may be unable to download songs.  
+
+   **How to obtain COOKIE_LINK:**  
 
    1. Get your YouTube cookies.  
 
