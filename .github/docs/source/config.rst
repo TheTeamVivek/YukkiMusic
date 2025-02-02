@@ -132,3 +132,7 @@ Mandatory Vars
    3. Paste your cookies inside the file.  
 
    This ensures smooth song playback without verification issues.  
+
+   .. seealso::
+  
+      Don't know how to get cookies? See :doc:`cookies` This properly
