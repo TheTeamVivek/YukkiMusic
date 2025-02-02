@@ -59,7 +59,7 @@ Mandatory Vars
 - LOG_GROUP_ID
    .. note::
 
-      You'll need a Group for this. 
+      You'll need a **Group** for this. 
 
       Remember to add your Music Bot , Assistant Accounts and Logger Id in Group and Promote them Admin with Full Rights.
    - Add `@MissRose_Bot <https://t.me/MissRose_Bot>`_ in your Group from Add Member > Search ``@MissRose_Bot`` and then Add.
@@ -102,3 +102,22 @@ Mandatory Vars
 
       To maintain bot’s privacy you wont be able to manage sudoers.  Bot will create an separate collection for you and no other bot's database will clash with it.
 
+- COOKIE_LINK
+   This is **not a mandatory** variable, but it is necessary for the bot to play songs perfectly due to YouTube verification.  
+
+   Without cookies, the bot may be unable to download songs.  
+
+   **How to obtain and use cookies:**  
+   1. Get your YouTube cookies.  
+   2. Go to [batbin.me](https://batbin.me).  
+   3. Paste your cookies and tap on **Save**.  
+   4. Copy the generated URL.  
+   5. Set `COOKIE_LINK` with this URL.  
+
+   **Alternative Method:**  
+   If you don't want to use a URL, you can manually add cookies:  
+   1. Navigate to `config/cookies/`.  
+   2. Create a `.txt` file.  
+   3. Paste your cookies inside the file.  
+
+   This ensures smooth song playback without verification issues.  
