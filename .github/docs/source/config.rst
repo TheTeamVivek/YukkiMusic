@@ -136,3 +136,9 @@ Mandatory Vars
    .. seealso::
   
       Don't know how to get cookies? See :doc:`cookies` This properly
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+
+   cookies
