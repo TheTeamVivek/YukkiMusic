@@ -464,54 +464,53 @@ gban_9: "**✅ Unbanned successfully on BOT database\n\nUnbanned **{0}** in **{1
 gban_10: "🚫 No one is gbanned."
 gban_11: "⏳ Getting gbanned users list..."
 
-
 Auth: |
     <b>Auth Users can use Admin commands without admin rights in your chat.</b>
     
-    <b>✧ /{AUTH_COMMAND}</b> [Username] - Add a user to AUTH LIST of the Group.
+    <b>✧ {AUTH_COMMAND}</b> [Username] - Add a user to AUTH LIST of the Group.
     
-    <b>✧ /{UNAUTH_COMMAND}</b> [Username] - Remove a user from AUTH LIST of the group.
+    <b>✧ {UNAUTH_COMMAND}</b> [Username] - Remove a user from AUTH LIST of the group.
     
-    <b>✧ /{AUTHUSERS_COMMAND}</b> - Check AUTH LIST of the Group.
+    <b>✧ {AUTHUSERS_COMMAND}</b> - Check AUTH LIST of the Group.
 
 Admin: |
     <b>c stands for channel play</b>
     
-    <b>✧ /{PAUSE_COMMAND}</b> - Pause the playing music.
-    <b>✧ /{RESUME_COMMAND}</b> - Resume the paused music.
-    <b>✧ /{MUTE_COMMAND}</b> - Mute the playing music.
-    <b>✧ /{UNMUTE_COMMAND}</b> - Unmute the muted music.
-    <b>✧ /{SKIP_COMMAND}</b> - Skip the current playing music.
-    <b>✧ /{STOP_COMMAND}</b> - Stop the playing music.
-    <b>✧ /{SHUFFLE_COMMAND}</b> - Randomly shuffle the queued playlist/songs.
-    <b>✧ /{SEEK_COMMAND}</b> - Forward seek the music.
-    <b>✧ /{SEEK_BACK_COMMAND}</b> - Backward seek the music to your duration.
-    <b>✧ /{REBOOT_COMMAND}</b> - Reboot bot for your chat.
+    <b>✧ {PAUSE_COMMAND}</b> - Pause the playing music.
+    <b>✧ {RESUME_COMMAND}</b> - Resume the paused music.
+    <b>✧ {MUTE_COMMAND}</b> - Mute the playing music.
+    <b>✧ {UNMUTE_COMMAND}</b> - Unmute the muted music.
+    <b>✧ {SKIP_COMMAND}</b> - Skip the current playing music.
+    <b>✧ {STOP_COMMAND}</b> - Stop the playing music.
+    <b>✧ {SHUFFLE_COMMAND}</b> - Randomly shuffle the queued playlist/songs.
+    <b>✧ {SEEK_COMMAND}</b> - Forward seek the music.
+    <b>✧ {SEEK_BACK_COMMAND}</b> - Backward seek the music to your duration.
+    <b>✧ {REBOOT_COMMAND}</b> - Reboot bot for your chat.
     
-    <b>✧ /{SKIP_COMMAND}</b> [Number (Example: 3)] - Skip music to a specific number. Example: <b>/skip 3</b> will skip to the third queued music and will ignore 1 and 2 in the queue.
+    <b>✧ {SKIP_COMMAND}</b> [Number (Example: 3)] - Skip music to a specific number. Example: <b>/skip 3</b> will skip to the third queued music and will ignore 1 and 2 in the queue.
     
-    <b>✧ /{LOOP_COMMAND}</b> [Enable/Disable] or [Number between 1-10] - When activated, the bot will loop the current music 1-10 times in voice chat. Default loop value is 10 times.
+    <b>✧ {LOOP_COMMAND}</b> [Enable/Disable] or [Number between 1-10] - When activated, the bot will loop the current music 1-10 times in voice chat. Default loop value is 10 times.
 
 Active: |
-    <b>✧ /{ACTIVEVC_COMMAND}</b> - Check active voice chats on the bot.
+    <b>✧ {ACTIVEVC_COMMAND}</b> - Check active voice chats on the bot.
     
-    <b>✧ /{ACTIVEVIDEO_COMMAND}</b> - Check active voice and video calls on the bot.
+    <b>✧ {ACTIVEVIDEO_COMMAND}</b> - Check active voice and video calls on the bot.
     
-    <b>✧ /{AC_COMMAND}</b> - Check active video calls on the bot.
+    <b>✧ {AC_COMMAND}</b> - Check active video calls on the bot.
     
-    <b>✧ /{STATS_COMMAND}</b> - Check bot stats.
+    <b>✧ {STATS_COMMAND}</b> - Check bot stats.
 
 Play: |
-    <b>✧ /{PLAY_COMMAND}</b> - Bot will start playing your given query on voice chat or stream live links on voice chats.
+    <b>✧ {PLAY_COMMAND}</b> - Bot will start playing your given query on voice chat or stream live links on voice chats.
     
-    <b>✧ /{PLAYMODE_COMMAND}</b> - Force Play stops the current playing track on voice chat and starts playing the searched track instantly without disturbing/clearing the queue.
+    <b>✧ {PLAYMODE_COMMAND}</b> - Force Play stops the current playing track on voice chat and starts playing the searched track instantly without disturbing/clearing the queue.
     
-    <b>✧ /{CHANNELPLAY_COMMAND}</b> - Connect channel to a group and stream music on channel's voice chat from your group.
+    <b>✧ {CHANNELPLAY_COMMAND}</b> - Connect channel to a group and stream music on channel's voice chat from your group.
     
-    <b>✧ /{STREAM_COMMAND}</b> - Stream a URL that you believe is direct or m3u8 that can't be played by /play.
+    <b>✧ {STREAM_COMMAND}</b> - Stream a URL that you believe is direct or m3u8 that can't be played by /play.
 
 G-cast: |
-    <b>/{BROADCAST_COMMAND} [Message or Reply to any message]</b> » Broadcast a message to served chats of bot
+    <b>{BROADCAST_COMMAND} [Message or Reply to any message]</b> » Broadcast a message to served chats of bot
     <u>Broadcasting Modes:</u>
     
     <b><code>-pin</code></b> » Pins your broadcasted message in served chats
@@ -524,72 +523,72 @@ G-cast: |
     
     <b><code>-nobot</code></b> » Ensures that the **bot** doesn't broadcast the message [Useful when you don't want to broadcast the message to groups]
     
-    > <b>Example:</b> <code>//{BROADCAST_COMMAND} -user -assistant -pin Testing broadcast</code>
+    > <b>Example:</b> <code>/{BROADCAST_COMMAND} -user -assistant -pin Testing broadcast</code>
 
 Bot: |
-    <b>★ /{GSTATS_COMMAND}</b> - Get Top 10 Tracks Global Stats, Top 10 Users of Bot, Top 10 Chats on Bot, Top 10 Played in a chat, etc.
+    <b>★ {GSTATS_COMMAND}</b> - Get Top 10 Tracks Global Stats, Top 10 Users of Bot, Top 10 Chats on Bot, Top 10 Played in a chat, etc.
     
-    <b>★ /{SUDOUSERS_COMMAND}</b> - Check Sudo users of the bot.
+    <b>★ {SUDOUSERS_COMMAND}</b> - Check Sudo users of the bot.
     
-    <b>★ /{LYRICS_COMMAND} [Music Name]</b> - Search lyrics for the particular music on the web.
+    <b>★ {LYRICS_COMMAND} [Music Name]</b> - Search lyrics for the particular music on the web.
     
-    <b>★ /{SONG_COMMAND} [Track Name] or [YT Link]</b> - Download any track from YouTube in MP3 or MP4 formats.
+    <b>★ {SONG_COMMAND} [Track Name] or [YT Link]</b> - Download any track from YouTube in MP3 or MP4 formats.
     
-    <b>★ /{QUEUE_COMMAND}</b> - Check the queue list of music.
+    <b>★ {QUEUE_COMMAND}</b> - Check the queue list of music.
     
     <u><b>⚡️Private Bot:</b></u>
         
-    <b>✧ /{AUTHORIZE_COMMAND} [CHAT_ID]</b> - Allow a chat to use your bot.
+    <b>✧ {AUTHORIZE_COMMAND} [CHAT_ID]</b> - Allow a chat to use your bot.
     
-    <b>✧ /{UNAUTHORIZE_COMMAND} [CHAT_ID]</b> - Disallow a chat from using your bot.
+    <b>✧ {UNAUTHORIZE_COMMAND} [CHAT_ID]</b> - Disallow a chat from using your bot.
     
-    <b>✧ /{AUTHORIZED_COMMAND}</b> - Check all allowed chats of your bot.
+    <b>✧ {AUTHORIZED_COMMAND}</b> - Check all allowed chats of your bot.
 
 P-List: |
-    <b>/{PLAYLIST_COMMAND}</b> - Check your whole playlist on the bot server
+    <b>{PLAYLIST_COMMAND}</b> - Check your whole playlist on the bot server
     
-    <b>/{DELETE_PLAYLIST_COMMAND}</b> - Delete any song from your saved playlist 
+    <b>{DELETE_PLAYLIST_COMMAND}</b> - Delete any song from your saved playlist 
     
-    <b>/{PLAY_PLAYLIST_COMMAND}</b> - Start playing your saved playlist in **audio**
+    <b>{PLAY_PLAYLIST_COMMAND}</b> - Start playing your saved playlist in **audio**
     
-    <b>/{PLAY_PLAYLIST_COMMAND}</b> - Start playing your playlist in **video**
+    <b>{PLAY_PLAYLIST_COMMAND}</b> - Start playing your playlist in **video**
 
 B-list: |
-    <b>✧ /{BLACKLISTCHAT_COMMAND}</b> [chat ID] - Blacklist any chat from using the Music Bot.
-    <b>✧ /{WHITELISTCHAT_COMMAND}</b> [chat ID] - Whitelist any blacklisted chat from using the Music Bot.
-    <b>✧ /{BLACKLISTEDCHAT_COMMAND}</b> - Check all blocked chats.
+    <b>✧ {BLACKLISTCHAT_COMMAND}</b> [chat ID] - Blacklist any chat from using the Music Bot.
+    <b>✧ {WHITELISTCHAT_COMMAND}</b> [chat ID] - Whitelist any blacklisted chat from using the Music Bot.
+    <b>✧ {BLACKLISTEDCHAT_COMMAND}</b> - Check all blocked chats.
     
-    <b>✧ /{BLOCK_COMMAND}</b> [Username or reply to a user] - Prevents a user from using bot commands.
-    <b>✧ /{UNBLOCK_COMMAND}</b> [Username or reply to a user] - Remove a user from the bot's blocked list.
-    <b>✧ /{BLOCKED_COMMAND}</b> - Check the list of blocked users.
+    <b>✧ {BLOCK_COMMAND}</b> [Username or reply to a user] - Prevents a user from using bot commands.
+    <b>✧ {UNBLOCK_COMMAND}</b> [Username or reply to a user] - Remove a user from the bot's blocked list.
+    <b>✧ {BLOCKED_COMMAND}</b> - Check the list of blocked users.
     
-    <b>✧ /{GBAN_COMMAND}</b> [Username or reply to a user] - Gban a user from all served chats and stop them from using your bot.
-    <b>✧ /{UNGBAN_COMMAND}</b> [Username or reply to a user] - Remove a user from the bot's gban list and allow them to use your bot.
-    <b>✧ /{GBANNED_COMMAND}</b> - Check the list of gban users.
+    <b>✧ {GBAN_COMMAND}</b> [Username or reply to a user] - Gban a user from all served chats and stop them from using your bot.
+    <b>✧ {UNGBAN_COMMAND}</b> [Username or reply to a user] - Remove a user from the bot's gban list and allow them to use your bot.
+    <b>✧ {GBANNED_COMMAND}</b> - Check the list of gban users.
 
 Dev: |
     <b><u>Add and remove sudoers:</u></b>
     
-    <b>/{ADDSUDO_COMMAND} [Username or reply to a user] - Add sudo in your bot</b>
-    <b>/{DELSUDO_COMMAND} [Username or userid or reply to a user] - Remove from bot sudoers</b>
-    <b>/{SUDOUSERS_COMMAND} - Get a list of all sudoers</b>
+    <b>{ADDSUDO_COMMAND} [Username or reply to a user] - Add sudo in your bot</b>
+    <b>{DELSUDO_COMMAND} [Username or userid or reply to a user] - Remove from bot sudoers</b>
+    <b>{SUDOUSERS_COMMAND} - Get a list of all sudoers</b>
     
     <b><u>Heroku:</u></b>
     
-    <b>/{USAGE_COMMAND}</b> - Dyno usage
-    <b>/{GETVAR_COMMAND} [Var Name]</b> - Get a config var from vars
-    <b>/{DELVAR_COMMAND} [Var Name]</b> - Delete a var from vars
-    <b>/{SETVAR_COMMAND} [Var Name] [Value]</b> - Add or update a var. Separate var and its value with a space
+    <b>{USAGE_COMMAND}</b> - Dyno usage
+    <b>{GETVAR_COMMAND} [Var Name]</b> - Get a config var from vars
+    <b>{DELVAR_COMMAND} [Var Name]</b> - Delete a var from vars
+    <b>{SETVAR_COMMAND} [Var Name] [Value]</b> - Add or update a var. Separate var and its value with a space
     
     <b><u>Bot command:</u></b>
     
-    <b>/{RESTART_COMMAND}</b> - Restart the bot (SUDOERS only)
-    <b>/{UPDATE_COMMAND}</b> - Update the bot
-    <b>/{SPEEDTEST_COMMAND}</b> - Check server speeds
-    <b>/{MAINTENANCE_COMMAND} [enable / disable]</b> - Toggle bot maintenance mode
-    <b>/{LOGGER_COMMAND} [enable / disable]</b> - Toggle bot logging of searched queries to log group
-    <b>/{GETLOG_COMMAND} [Number of lines]</b> - Get logs from server
-    <b>/{AUTOEND_COMMAND} [enable / disable]</b> - Automatically end the stream after 30s if no one is listening to songs
+    <b>{RESTART_COMMAND}</b> - Restart the bot (SUDOERS only)
+    <b>{UPDATE_COMMAND}</b> - Update the bot
+    <b>{SPEEDTEST_COMMAND}</b> - Check server speeds
+    <b>{MAINTENANCE_COMMAND} [enable / disable]</b> - Toggle bot maintenance mode
+    <b>{LOGGER_COMMAND} [enable / disable]</b> - Toggle bot logging of searched queries to log group
+    <b>{GETLOG_COMMAND} [Number of lines]</b> - Get logs from server
+    <b>{AUTOEND_COMMAND} [enable / disable]</b> - Automatically end the stream after 30s if no one is listening to songs
 
 
 # Bot Commands
