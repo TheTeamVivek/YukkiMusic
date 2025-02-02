@@ -22,8 +22,7 @@ Here's an Example of ``sample.env``
       cp sample.env .env
 
 
-- **Fill in the necessary variables in your ``.env`` :**
-
+- Fill in the necessary variables in your ``.env`` :
    - **API_ID**: The API ID obtained from `Telegram <https://my.telegram.org/auth>`_.
    - **API_HASH**: The API hash obtained from `Telegram <https://my.telegram.org/auth>`_.
    - **BOT_TOKEN**: The bot token you get from `BotFather <https://core.telegram.org/bots#botfather>`_.
