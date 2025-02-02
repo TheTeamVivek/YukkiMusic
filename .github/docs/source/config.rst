@@ -24,7 +24,7 @@ Here's an Example of ``sample.env``
 
 - **Fill in the necessary variables in your ``.env`` :**
 
-   - **API_ID**: The API ID obtained from **`Telegram <https://my.telegram.org/auth>`_.**
+   - **API_ID**: The API ID obtained from `Telegram <https://my.telegram.org/auth>`_.
    - **API_HASH**: The API hash obtained from `Telegram <https://my.telegram.org/auth>`_.
    - **BOT_TOKEN**: The bot token you get from `BotFather <https://core.telegram.org/bots#botfather>`_.
    - **MONGO_DB_URI**: The MongoDB connection string for your database.
@@ -136,6 +136,7 @@ Mandatory Vars
    .. seealso::
   
       Don't know how to get cookies? See :doc:`cookies` This properly
+
 
 .. toctree::
    :maxdepth: 2
