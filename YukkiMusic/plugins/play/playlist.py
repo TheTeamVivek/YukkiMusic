@@ -17,12 +17,18 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from config import BANNED_USERS, SERVER_PLAYLIST_LIMIT
 from strings import command
 from YukkiMusic import Platform, app
-from YukkiMusic.utils.database import (delete_playlist, get_playlist,
-                                       get_playlist_names, save_playlist,)
+from YukkiMusic.utils.database import (
+    delete_playlist,
+    get_playlist,
+    get_playlist_names,
+    save_playlist,
+)
 from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.decorators.play import botplaylist_markup
-from YukkiMusic.utils.inline.playlist import (get_playlist_markup,
-                                              warning_markup,)
+from YukkiMusic.utils.inline.playlist import (
+    get_playlist_markup,
+    warning_markup,
+)
 from YukkiMusic.utils.pastebin import paste
 from YukkiMusic.utils.stream.stream import stream
 

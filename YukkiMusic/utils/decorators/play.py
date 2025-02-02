@@ -16,10 +16,17 @@ from strings import get_string
 from YukkiMusic import Platform, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import (get_assistant, get_cmode, get_lang,
-                                       get_playmode, get_playtype,
-                                       is_active_chat, is_commanddelete_on,
-                                       is_maintenance, is_served_private_chat,)
+from YukkiMusic.utils.database import (
+    get_assistant,
+    get_cmode,
+    get_lang,
+    get_playmode,
+    get_playtype,
+    is_active_chat,
+    is_commanddelete_on,
+    is_maintenance,
+    is_served_private_chat,
+)
 from YukkiMusic.utils.inline import botplaylist_markup
 
 links = {}

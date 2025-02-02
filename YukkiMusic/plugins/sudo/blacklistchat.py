@@ -13,8 +13,11 @@ from config import BANNED_USERS
 from strings import command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import (blacklist_chat, blacklisted_chats,
-                                       whitelist_chat,)
+from YukkiMusic.utils.database import (
+    blacklist_chat,
+    blacklisted_chats,
+    whitelist_chat,
+)
 from YukkiMusic.utils.decorators.language import language
 
 

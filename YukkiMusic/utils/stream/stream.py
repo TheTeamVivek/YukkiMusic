@@ -20,8 +20,11 @@ from YukkiMusic.core.call import Yukki
 from YukkiMusic.core.enum import SongType
 from YukkiMusic.core.youtube import Track
 from YukkiMusic.misc import db
-from YukkiMusic.utils.database import (add_active_video_chat, is_active_chat,
-                                       is_video_allowed,)
+from YukkiMusic.utils.database import (
+    add_active_video_chat,
+    is_active_chat,
+    is_video_allowed,
+)
 from YukkiMusic.utils.exceptions import AssistantErr
 from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
 from YukkiMusic.utils.inline.playlist import close_markup

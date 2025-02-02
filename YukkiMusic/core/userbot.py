@@ -14,9 +14,14 @@ from datetime import datetime
 from functools import wraps
 
 from pyrogram import Client, StopPropagation
-from pyrogram.errors import (ChatSendMediaForbidden, ChatSendPhotosForbidden,
-                             ChatWriteForbidden, FloodWait, MessageIdInvalid,
-                             MessageNotModified,)
+from pyrogram.errors import (
+    ChatSendMediaForbidden,
+    ChatSendPhotosForbidden,
+    ChatWriteForbidden,
+    FloodWait,
+    MessageIdInvalid,
+    MessageNotModified,
+)
 from pyrogram.handlers import MessageHandler
 
 import config

@@ -14,8 +14,11 @@ from strings import command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils.database.memorydatabase import (
-    get_active_chats, get_active_video_chats, remove_active_chat,
-    remove_active_video_chat,)
+    get_active_chats,
+    get_active_video_chats,
+    remove_active_chat,
+    remove_active_video_chat,
+)
 
 
 # Function for removing the Active voice and video chat also clear the db dictionary for the chat

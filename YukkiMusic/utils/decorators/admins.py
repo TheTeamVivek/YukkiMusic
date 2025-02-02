@@ -15,9 +15,15 @@ from config import adminlist
 from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import (get_authuser_names, get_cmode, get_lang,
-                                       is_active_chat, is_commanddelete_on,
-                                       is_maintenance, is_nonadmin_chat,)
+from YukkiMusic.utils.database import (
+    get_authuser_names,
+    get_cmode,
+    get_lang,
+    is_active_chat,
+    is_commanddelete_on,
+    is_maintenance,
+    is_nonadmin_chat,
+)
 
 from ..formatters import int_to_alpha
 
