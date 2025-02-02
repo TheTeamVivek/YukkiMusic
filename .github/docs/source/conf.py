@@ -27,6 +27,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx.ext.intersphinx",
     "sphinx_reredirects",
+    "sphinx.ext.autosectionlabel"
 ]
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -59,3 +60,5 @@ intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 redirects = {
     "chk": "https://docs.python.org/3",
 }
+
+autosectionlabel_prefix_document = True
