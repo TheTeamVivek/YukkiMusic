@@ -34,6 +34,7 @@ jobs:
           find . -name "*.py" -exec pyupgrade --py310-plus {} \;
           isort --trailing-comma --multi-line=3 .
 
+          isort --trailing-comma --multi-line=3 .
           autoflake --in-place --recursive --remove-all-unused-imports --ignore-init-module-imports .
           black .
           isort --trailing-comma --multi-line=3 .
