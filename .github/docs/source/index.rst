@@ -9,6 +9,12 @@ Welcome to YukkiMusic
 
 .. toctree::
    :maxdepth: 2
+   :caption: About Us
+
+   contributors
+
+.. toctree::
+   :maxdepth: 2
    :caption: Getting Started
 
    config
