@@ -57,7 +57,7 @@ Mandatory Vars
    Get token of the bot from the `@Botfather <https://t.me/Botfather>`_ in Telegram
 
 - LOG_GROUP_ID
-   .. note::
+   .. important::
 
       You'll need a **Group** for this. 
 
@@ -103,7 +103,7 @@ Mandatory Vars
       To maintain bot’s privacy you wont be able to manage sudoers.  Bot will create an separate collection for you and no other bot's database will clash with it.
 
 - COOKIE_LINK
-   .. note::
+   .. important::
 
       This is **not a mandatory** variable, but it is necessary for the bot to play songs perfectly due to YouTube verification.  
 
