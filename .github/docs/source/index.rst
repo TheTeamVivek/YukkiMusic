@@ -54,11 +54,8 @@ A special thanks to `Pranav-Saraswat <https://github.com/Pranav-Saraswat>`_ for 
 
 Our current project, `YukkiMusic <https://github.com/TheTeamVivek/YukkiMusic>`_, is an imported and further improved version of the now-deleted **YukkiMusicFork**.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: About Us
-
-   contributors
+Table of Contents
+=================
 
 .. toctree::
    :maxdepth: 2
@@ -70,6 +67,7 @@ Our current project, `YukkiMusic <https://github.com/TheTeamVivek/YukkiMusic>`_,
    :maxdepth: 2
    :caption: Additional Resources
 
+   contributors
    CHANGELOG
    PRIVACY
    LICENSE
