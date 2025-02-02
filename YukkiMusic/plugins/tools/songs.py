@@ -14,19 +14,11 @@ import re
 import yt_dlp
 from pykeyboard import InlineKeyboard
 from pyrogram import enums, filters
-from pyrogram.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    InputMediaAudio,
-    InputMediaVideo,
-    Message,
-)
+from pyrogram.types import (InlineKeyboardButton, InlineKeyboardMarkup,
+                            InputMediaAudio, InputMediaVideo, Message,)
 
-from config import (
-    BANNED_USERS,
-    SONG_DOWNLOAD_DURATION,
-    SONG_DOWNLOAD_DURATION_LIMIT,
-)
+from config import (BANNED_USERS, SONG_DOWNLOAD_DURATION,
+                    SONG_DOWNLOAD_DURATION_LIMIT,)
 from strings import command
 from YukkiMusic import Platform, app
 from YukkiMusic.platforms.Youtube import cookies

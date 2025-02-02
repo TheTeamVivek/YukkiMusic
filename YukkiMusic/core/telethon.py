@@ -8,28 +8,16 @@ from typing import Any
 
 from telethon import TelegramClient, events
 from telethon.errors import UserNotParticipantError
-from telethon.tl.functions.channels import (
-    GetParticipantRequest,
-    LeaveChannelRequest,
-)
-from telethon.tl.functions.messages import (
-    DeleteChatUserRequest,
-    GetFullChatRequest,
-)
-from telethon.tl.types import (
-    ChannelParticipant,
-    ChannelParticipantAdmin,
-    ChannelParticipantBanned,
-    ChannelParticipantCreator,
-    ChannelParticipantLeft,
-    ChannelParticipantSelf,
-    InputPeerChannel,
-    InputPeerChat,
-    InputUserSelf,
-    PeerChannel,
-    PeerChat,
-    User,
-)
+from telethon.tl.functions.channels import (GetParticipantRequest,
+                                            LeaveChannelRequest,)
+from telethon.tl.functions.messages import (DeleteChatUserRequest,
+                                            GetFullChatRequest,)
+from telethon.tl.types import (ChannelParticipant, ChannelParticipantAdmin,
+                               ChannelParticipantBanned,
+                               ChannelParticipantCreator,
+                               ChannelParticipantLeft, ChannelParticipantSelf,
+                               InputPeerChannel, InputPeerChat, InputUserSelf,
+                               PeerChannel, PeerChat, User,)
 
 from ..logging import logger
 

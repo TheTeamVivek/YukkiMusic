@@ -15,12 +15,8 @@ from datetime import datetime, timedelta
 
 import aiohttp
 from pyrogram.enums import MessageEntityType
-from pyrogram.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    Message,
-    Voice,
-)
+from pyrogram.types import (InlineKeyboardButton, InlineKeyboardMarkup,
+                            Message, Voice,)
 
 import config
 from config import lyrical

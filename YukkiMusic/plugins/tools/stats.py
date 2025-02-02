@@ -24,25 +24,14 @@ from strings import command
 from YukkiMusic import Platform, app
 from YukkiMusic.core.userbot import assistants
 from YukkiMusic.misc import SUDOERS, pymongodb
-from YukkiMusic.utils.database import (
-    get_global_tops,
-    get_particulars,
-    get_queries,
-    get_served_chats,
-    get_served_users,
-    get_sudoers,
-    get_top_chats,
-    get_topp_users,
-)
+from YukkiMusic.utils.database import (get_global_tops, get_particulars,
+                                       get_queries, get_served_chats,
+                                       get_served_users, get_sudoers,
+                                       get_top_chats, get_topp_users,)
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline.stats import (
-    back_stats_buttons,
-    back_stats_markup,
-    get_stats_markup,
-    overallback_stats_markup,
-    stats_buttons,
-    top_ten_stats_markup,
-)
+    back_stats_buttons, back_stats_markup, get_stats_markup,
+    overallback_stats_markup, stats_buttons, top_ten_stats_markup,)
 
 loop = asyncio.get_running_loop()
 

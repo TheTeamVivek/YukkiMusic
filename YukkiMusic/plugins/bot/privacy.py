@@ -10,16 +10,10 @@ from config import BANNED_USERS
 from strings import command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import (
-    authuserdb,
-    delete_playlist,
-    delete_served_user,
-    get_playlist,
-    get_playlist_names,
-    get_userss,
-    is_banned_user,
-    remove_sudo,
-)
+from YukkiMusic.utils.database import (authuserdb, delete_playlist,
+                                       delete_served_user, get_playlist,
+                                       get_playlist_names, get_userss,
+                                       is_banned_user, remove_sudo,)
 
 TEXT = f"""
 🔒 **Privacy Policy for {app.mention} !**

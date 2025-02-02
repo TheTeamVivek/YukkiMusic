@@ -13,44 +13,24 @@ from pyrogram import filters
 from pyrogram.types import CallbackQuery, InlineKeyboardMarkup, InputMediaPhoto
 
 import config
-from config import (
-    BANNED_USERS,
-    SOUNCLOUD_IMG_URL,
-    STREAM_IMG_URL,
-    SUPPORT_GROUP,
-    TELEGRAM_AUDIO_URL,
-    TELEGRAM_VIDEO_URL,
-    adminlist,
-    lyrical,
-)
+from config import (BANNED_USERS, SOUNCLOUD_IMG_URL, STREAM_IMG_URL,
+                    SUPPORT_GROUP, TELEGRAM_AUDIO_URL, TELEGRAM_VIDEO_URL,
+                    adminlist, lyrical,)
 from YukkiMusic import Platform, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils import seconds_to_min, time_to_seconds
 from YukkiMusic.utils.channelplay import get_channeplay_cb
-from YukkiMusic.utils.database import (
-    is_active_chat,
-    is_music_playing,
-    is_muted,
-    is_nonadmin_chat,
-    music_off,
-    music_on,
-    mute_off,
-    mute_on,
-    set_loop,
-)
+from YukkiMusic.utils.database import (is_active_chat, is_music_playing,
+                                       is_muted, is_nonadmin_chat, music_off,
+                                       music_on, mute_off, mute_on, set_loop,)
 from YukkiMusic.utils.decorators import actual_admin_cb
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.formatters import seconds_to_min
-from YukkiMusic.utils.inline.play import (
-    livestream_markup,
-    panel_markup_1,
-    panel_markup_2,
-    panel_markup_3,
-    slider_markup,
-    stream_markup,
-    telegram_markup,
-)
+from YukkiMusic.utils.inline.play import (livestream_markup, panel_markup_1,
+                                          panel_markup_2, panel_markup_3,
+                                          slider_markup, stream_markup,
+                                          telegram_markup,)
 from YukkiMusic.utils.stream.autoclear import auto_clean
 from YukkiMusic.utils.stream.stream import stream
 from YukkiMusic.utils.thumbnails import gen_thumb

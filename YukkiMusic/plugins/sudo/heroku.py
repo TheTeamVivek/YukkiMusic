@@ -30,12 +30,9 @@ from strings import command
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import HAPP, SUDOERS, XCB, db
-from YukkiMusic.utils.database import (
-    get_active_chats,
-    get_cmode,
-    remove_active_chat,
-    remove_active_video_chat,
-)
+from YukkiMusic.utils.database import (get_active_chats, get_cmode,
+                                       remove_active_chat,
+                                       remove_active_video_chat,)
 from YukkiMusic.utils.decorators import admin_actual, language
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.pastebin import paste

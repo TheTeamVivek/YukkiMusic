@@ -10,47 +10,30 @@
 from pyrogram import filters
 from pyrogram.enums import ChatType
 from pyrogram.errors import MessageNotModified
-from pyrogram.types import (
-    CallbackQuery,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    Message,
-)
+from pyrogram.types import (CallbackQuery, InlineKeyboardButton,
+                            InlineKeyboardMarkup, Message,)
 
 from config import BANNED_USERS, CLEANMODE_DELETE_MINS, OWNER_ID
 from strings import command
 from YukkiMusic import app
-from YukkiMusic.utils.database import (
-    add_nonadmin_chat,
-    cleanmode_off,
-    cleanmode_on,
-    commanddelete_off,
-    commanddelete_on,
-    get_aud_bit_name,
-    get_authuser,
-    get_authuser_names,
-    get_playmode,
-    get_playtype,
-    get_vid_bit_name,
-    is_cleanmode_on,
-    is_commanddelete_on,
-    is_nonadmin_chat,
-    remove_nonadmin_chat,
-    save_audio_bitrate,
-    save_video_bitrate,
-    set_playmode,
-    set_playtype,
-)
+from YukkiMusic.utils.database import (add_nonadmin_chat, cleanmode_off,
+                                       cleanmode_on, commanddelete_off,
+                                       commanddelete_on, get_aud_bit_name,
+                                       get_authuser, get_authuser_names,
+                                       get_playmode, get_playtype,
+                                       get_vid_bit_name, is_cleanmode_on,
+                                       is_commanddelete_on, is_nonadmin_chat,
+                                       remove_nonadmin_chat,
+                                       save_audio_bitrate, save_video_bitrate,
+                                       set_playmode, set_playtype,)
 from YukkiMusic.utils.decorators.admins import actual_admin_cb
 from YukkiMusic.utils.decorators.language import language
-from YukkiMusic.utils.inline.settings import (
-    audio_quality_markup,
-    auth_users_markup,
-    cleanmode_settings_markup,
-    playmode_users_markup,
-    setting_markup,
-    video_quality_markup,
-)
+from YukkiMusic.utils.inline.settings import (audio_quality_markup,
+                                              auth_users_markup,
+                                              cleanmode_settings_markup,
+                                              playmode_users_markup,
+                                              setting_markup,
+                                              video_quality_markup,)
 from YukkiMusic.utils.inline.start import private_panel
 
 
