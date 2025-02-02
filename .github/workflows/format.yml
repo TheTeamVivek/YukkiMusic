@@ -32,11 +32,8 @@ jobs:
       - name: Format
         run: |
           find . -name "*.py" -exec pyupgrade --py310-plus {} \;
-          isort --trailing-comma --multi-line=3 .
-
-          isort --trailing-comma --multi-line=3 .
-          autoflake --in-place --recursive --remove-all-unused-imports --ignore-init-module-imports .
           black .
+          autoflake --in-place --recursive --remove-all-unused-imports --ignore-init-module-imports .
           isort --trailing-comma --multi-line=3 .
 
      # - name: Peps Warnings
