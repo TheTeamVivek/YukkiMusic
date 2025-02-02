@@ -82,7 +82,11 @@ class YouTube:
                     title=result["title"],
                     link=result["link"],
                     download_url=result["link"],
-                    duration=(time_to_seconds(result["duration"]) if result["duration"] is not None else 0),
+                    duration=(
+                        time_to_seconds(result["duration"])
+                        if result["duration"] is not None
+                        else 0
+                    ),
                     thumb=result["thumbnails"][0]["url"].split("?")[0],
                 )
         except Exception:
