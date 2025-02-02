@@ -4,7 +4,7 @@ Configuration
 Environment Setup
 -----------------
   
-Here's an Example `sample.env`
+Here's an Example of ``sample.env``
 
 .. code-block:: bash
   
@@ -16,13 +16,13 @@ Here's an Example `sample.env`
    OWNER_ID = 
    STRING_SESSIONS = 
   
-- Copy the `example.env` file to `.env`
+- Copy the ``example.env`` file to ``.env``
    .. code-block:: bash
 
       cp sample.env .env
 
 
-- **Fill in the necessary variables in your .env :**
+- **Fill in the necessary variables in your ``.env`` :**
 
    - **API_ID**: The API ID obtained from `Telegram <https://my.telegram.org/auth>`_.
    - **API_HASH**: The API hash obtained from `Telegram <https://my.telegram.org/auth>`_.
