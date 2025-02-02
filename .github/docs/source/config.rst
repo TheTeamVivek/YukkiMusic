@@ -108,16 +108,25 @@ Mandatory Vars
    Without cookies, the bot may be unable to download songs.  
 
    **How to obtain and use cookies:**  
+
    1. Get your YouTube cookies.  
+
    2. Go to `batbin.me <https://batbin.me>`_.
+
    3. Paste your cookies and tap on **Save**.  
+
    4. Copy the generated URL.  
+
    5. Set ``COOKIE_LINK`` with this URL.  
 
    **Alternative Method:**  
+
    If you don't want to use a URL, you can manually add cookies:  
+
    1. Navigate to `config/cookies/ <https://github.com/TheTeamVivek/YukkiMusic/tree/dev/config/cookies>`_.  
+
    2. Create a ``.txt`` file.  
+
    3. Paste your cookies inside the file.  
 
    This ensures smooth song playback without verification issues.  
