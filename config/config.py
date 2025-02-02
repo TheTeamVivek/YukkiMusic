@@ -18,7 +18,7 @@ load_dotenv()
 
 # Get it from my.telegram.org
 
-API_ID = int(getenv("API_ID", ""))
+API_ID = int(getenv("API_ID", 0))
 
 API_HASH = getenv("API_HASH")
 
@@ -34,7 +34,7 @@ MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 COOKIE_LINK = getenv("COOKIE_LINK", None)
 
 CLEANMODE_DELETE_MINS = int(
-    getenv("CLEANMODE_MINS", "5")
+    getenv("CLEANMODE_MINS", 5)
 )  # Remember to give value in Seconds
 
 
@@ -45,7 +45,7 @@ DURATION_LIMIT_MIN = int(
 )  # Remember to give value in Minutes
 
 
-EXTRA_PLUGINS = getenv("EXTRA_PLUGINS", True)
+EXTRA_PLUGINS = getenv("EXTRA_PLUGINS", False)
 
 # Fill False if you Don't want to load extra plugins
 
@@ -95,10 +95,10 @@ GIT_TOKEN = getenv(
 
 # Only  Links formats are  accepted for this Var value.
 SUPPORT_CHANNEL = getenv(
-    "SUPPORT_CHANNEL", "https://t.me/TheTeamVivek"
+    "SUPPORT_CHANNEL", None
 )  # Example:- https://t.me/TheTeamVivek
 SUPPORT_GROUP = getenv(
-    "SUPPORT_GROUP", "https://t.me/TheTeamVk"
+    "SUPPORT_GROUP", None
 )  # Example:- https://t.me/TheTeamVk
 
 
@@ -123,7 +123,7 @@ TELEGRAM_DOWNLOAD_EDIT_SLEEP = int(getenv("TELEGRAM_EDIT_SLEEP", "5"))
 
 
 # Your Github Repo.. Will be shown on /start Command
-GITHUB_REPO = getenv("GITHUB_REPO", "https://github.com/TheTeamVivek/YukkiMusic")
+GITHUB_REPO = getenv("GITHUB_REPO", None)
 
 
 # Spotify Client.. Get it from https://developer.spotify.com/dashboard
@@ -134,7 +134,7 @@ SPOTIFY_CLIENT_SECRET = getenv(
 
 
 # Maximum number of video calls allowed on bot. You can later set it via /set_video_limit on telegram
-VIDEO_STREAM_LIMIT = int(getenv("VIDEO_STREAM_LIMIT", "999"))
+VIDEO_STREAM_LIMIT = int(getenv("VIDEO_STREAM_LIMIT", "2"))
 
 
 # Maximum Limit Allowed for users to save playlists on bot's server
@@ -162,8 +162,8 @@ TG_VIDEO_FILESIZE_LIMIT = int(
 SET_CMDS = getenv("SET_CMDS", "False")
 
 
-# You'll need a Pyrogram String Session for these vars. Generate String from our session generator bot @YukkiStringBot
-# Get the environment variable with a default value of an empty string
+# You'll need a Pyrogram String Session for these vars. Generate String from telegram.tools
+
 raw_sessions = getenv("STRING_SESSIONS")
 
 # Split the sessions only if raw_sessions is not empty
