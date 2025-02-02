@@ -12,7 +12,7 @@ import asyncio
 import os
 from random import randint
 
-from pyrogram.types import InlineKeyboardMarkup, Message
+from pyrogram.types import InlineKeyboardMarkup, Message, User
 
 import config
 from YukkiMusic import Platform, app
@@ -36,7 +36,7 @@ from YukkiMusic.utils.thumbnails import gen_qthumb, gen_thumb
 async def stream(
     _,  # TODO remove this from argument and get the lang of the chatid under this function
     mystic: Message,
-    user_id: int,
+    user_id: User,
     #  result,
     tracks: Track | list[Track],  # Replacement of result
     chat_id: int,
