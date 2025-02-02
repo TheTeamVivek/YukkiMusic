@@ -65,5 +65,5 @@ html_context = {
     "github_user": "TheTeamVivek",
     "github_repo": "YukkiMusic",
     "github_version": "dev",
-    "conf_py_path": ".github/docs/source/",
+    "conf_py_path": "/.github/docs/source/",
 }
