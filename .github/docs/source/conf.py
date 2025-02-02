@@ -59,3 +59,11 @@ intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 redirects = {
     "chk": "https://docs.python.org/3",
 }
+
+html_context = {
+    "display_github": True,
+    "github_user": "TheTeamVivek",
+    "github_repo": "YukkiMusic",
+    "github_version": "dev",
+    "conf_py_path": ".github/docs/source/",
+}
