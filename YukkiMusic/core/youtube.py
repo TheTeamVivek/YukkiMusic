@@ -16,9 +16,8 @@ class Track:
     title: str
     link: str
     thumb: str
+    duration: int # duration in Seconds
     download_url: str | None = field(default=None)
-    duration_min: int | None = field(default=None)
-    duration_sec: int | None = field(default=None)
     file_path: str | None = field(default=None)
 
     def __post_init__(self):
@@ -26,10 +25,6 @@ class Track:
             link.startswith("http://") or link.startswith("https://")
         ):
             self.link = self.link.split("&")[0]
-        if self.duration_min is not None and self.duration_sec is None:
-            self.duration_sec = time_to_seconds(self.duration_min)
-        elif self.duration_sec is not None and self.duration_min is None:
-            self.duration_min = seconds_to_min(self.duration_sec)
 
     @property
     def is_exists(self):
@@ -87,8 +82,8 @@ class YouTube:
                     title=result["title"],
                     link=result["link"],
                     download_url=result["link"],
-                    duration_min=(
-                        int(result["duration"]) if result["duration"] else None
+                    duration=(
+                        time_to_seconds(result["duration"])
                     ),
                     thumb=result["thumbnails"][0]["url"].split("?")[0],
                 )
@@ -117,6 +112,6 @@ class YouTube:
                 title=details["title"],
                 link=details["url"],
                 download_url=details["url"],
-                duration_sec=details["duration"] if details["duration"] != 0 else None,
+                duration=details["duration"],
                 thumb=details["thumbnails"][0]["url"],
             )
