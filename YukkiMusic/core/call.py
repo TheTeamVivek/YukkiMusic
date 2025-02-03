@@ -57,7 +57,7 @@ from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
 from YukkiMusic.utils.stream.autoclear import auto_clean
 from YukkiMusic.utils.thumbnails import gen_thumb
 
-from .enum import PlayType
+from .enum import PlayType, SongType
 
 links = {}
 
@@ -74,7 +74,7 @@ async def _clear_(chat_id):
 
 class Call:
     def __init__(self):
-        self.calls: dict[int, PlayType] = {}
+        self.calls: dict[int, dict[str, SongType | PlayType]] = {}
         self.clients = [
             PyTgCalls(
                 client,
