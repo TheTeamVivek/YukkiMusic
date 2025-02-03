@@ -9,27 +9,27 @@
 #
 
 
-from YukkiMusic import app
+from YukkiMusic import tbot
 from YukkiMusic.utils.database import get_cmode
 
 
-async def get_channeplay_cb(_, command, query):
+async def get_channeplay_cb(_, command, event):
     if command == "c":
-        chat_id = await get_cmode(query.message.chat.id)
+        chat_id = await get_cmode(event.chat_id)
         if chat_id is None:
             try:
-                return await query.answer(_["setting_12"], show_alert=True)
+                return await event.answer(_["setting_12"], alert=True)
             except Exception:
                 return
         try:
-            chat = await app.get_chat(chat_id)
+            chat = await event.client.entity(chat_id)
             channel = chat.title
         except Exception:
             try:
-                return await query.answer(_["cplay_4"], show_alert=True)
+                return await event.answer(_["cplay_4"], alert=True)
             except Exception:
                 return
     else:
-        chat_id = query.message.chat.id
+        chat_id = event.chat_id
         channel = None
     return chat_id, channel
