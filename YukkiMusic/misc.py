@@ -7,7 +7,6 @@
 #
 # All rights reserved.
 
-import os 
 import socket
 import time
 
