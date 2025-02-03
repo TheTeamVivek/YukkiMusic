@@ -9,6 +9,7 @@
 #
 from telethon import Button
 
+
 def botplaylist_markup(_):
     buttons = [
         [
@@ -80,35 +81,35 @@ def failed_top_markup(_):
 
 
 def warning_markup(_):
-    upl =  [
-            [
-                Button.inline(
-                    text=_["PL_B_7"],
-                    data="delete_whole_playlist",
-                ),
-            ],
-            [
-                Button.inline(
-                    text=_["BACK_BUTTON"],
-                    data="del_back_playlist",
-                ),
-                Button.inline(
-                    text=_["CLOSE_BUTTON"],
-                    data="close",
-                ),
-            ],
-        ]
-   
+    upl = [
+        [
+            Button.inline(
+                text=_["PL_B_7"],
+                data="delete_whole_playlist",
+            ),
+        ],
+        [
+            Button.inline(
+                text=_["BACK_BUTTON"],
+                data="del_back_playlist",
+            ),
+            Button.inline(
+                text=_["CLOSE_BUTTON"],
+                data="close",
+            ),
+        ],
+    ]
+
     return upl
 
 
 def close_markup(_):
     upl = [
-            [
-                Button.inline(
-                    text=_["CLOSE_BUTTON"],
-                    data="close",
-                ),
-            ]
+        [
+            Button.inline(
+                text=_["CLOSE_BUTTON"],
+                data="close",
+            ),
         ]
+    ]
     return upl
