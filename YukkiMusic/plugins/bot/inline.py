@@ -7,26 +7,34 @@
 #
 # All rights reserved.
 #
-
 from pyrogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InlineQueryResultPhoto,
 )
+from YukkiMusic import tbot
+from uuid import uuid4
+from telethon import events 
+from telethon.tl.types import InputBotInlineResult
+from telethon.tl.types import InputWebDocument
+from telethon.tl.types import DocumentAttributeImageSize
+from telethon.tl.types import InputBotInlineMessageMediaAuto
 from youtubesearchpython.__future__ import VideosSearch
 
+from telethon.tl.types import ReplyInlineMarkup
+from telethon.tl.types import KeyboardButtonUrl
 from config import BANNED_USERS
 from YukkiMusic import app
 from YukkiMusic.utils.inlinequery import answer
 
 
-@app.on_inline_query(~BANNED_USERS)
-async def inline_query_handler(client, query):
-    text = query.query.strip().lower()
+@tbot.on(events.InlineQuery(users = list(BANNED_USERS), blacklist_users = True)
+async def inline_query_handler(event):
+    text = event.query.query.strip().lower()
     answers = []
     if text.strip() == "":
         try:
-            await client.answer_inline_query(query.id, results=answer, cache_time=10)
+            await event.answer( results=answer, cache_time=10)
         except Exception:
             return
     else:
@@ -42,10 +50,10 @@ async def inline_query_handler(client, query):
             link = result[x]["link"]
             published = result[x]["publishedTime"]
             description = f"{views} | {duration} Mins | {channel}  | {published}"
-            buttons = InlineKeyboardMarkup(
+            buttons = ReplyInlineMarkup(
                 [
                     [
-                        InlineKeyboardButton(
+                        KeyboardButtonUrl(
                             text="🎥 ᴡᴀᴛᴄʜ ᴏɴ ʏᴏᴜᴛᴜʙᴇ",
                             url=link,
                         )
@@ -64,17 +72,29 @@ async def inline_query_handler(client, query):
 __ʀᴇᴘʟʏ ᴡɪᴛʜ /play ᴏɴ ᴛʜɪs sᴇᴀʀᴄʜᴇᴅ ᴍᴇssᴀɢᴇ ᴛᴏ sᴛʀᴇᴀᴍ ɪᴛ ᴏɴ ᴠᴏɪᴄᴇᴄʜᴀᴛ.__
 
 ⚡️ ** ɪɴʟɪɴᴇ sᴇᴀʀᴄʜ ʙʏ {app.mention} **"""
+            photo = InputWebDocument(
+                        url=thumbnail,
+                        size=0,
+                        mime_type="image/jpeg",
+                        attributes=[
+                            DocumentAttributeImageSize(
+                                w=0,
+                                h=0
+                             )
+                         ]
+            msg, entities = tbot._parse_message_text(searched_text, ())
             answers.append(
-                InlineQueryResultPhoto(
-                    photo_url=thumbnail,
-                    title=title,
-                    thumb_url=thumbnail,
+                InputBotInlineResult(
+                    id = str(uuid4()),
+                    type="photo",
+                    title=title, 
+                    content=photo,
+                    thumb=photo,
                     description=description,
-                    caption=searched_text,
-                    reply_markup=buttons,
+                    send_message = InputBotInlineMessageMediaAuto(message=msg, entities=entities, reply_markup=buttons)
                 )
             )
         try:
-            return await client.answer_inline_query(query.id, results=answers)
+            return await event.answer(results=answers)
         except Exception:
             return
