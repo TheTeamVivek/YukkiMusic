@@ -21,7 +21,7 @@ async def get_channeplay_cb(_, command, event):
             except Exception:
                 return
         try:
-            chat = await event.client.entity(chat_id)
+            chat = await event.client.get_entity(chat_id)
             channel = chat.title
         except Exception:
             try:
