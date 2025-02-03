@@ -8,9 +8,7 @@
 # All rights reserved.
 #
 from decorator import decorator
-from pyrogram.enums import ChatType
-from pyrogram.types import CallbackQuery, Message
-
+from telethon.tl.types import User
 from strings import get_string
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
@@ -23,37 +21,31 @@ from YukkiMusic.utils.database import (
 @decorator
 async def language(
     func,
-    client,
-    update: Message | CallbackQuery,
-    no_check: bool = False,  # no_check this is used in start for let don't check about maintnece
+    event,
+    no_check = False
 ):
-    is_message = isinstance(update, Message)
-
+    chat = await event.get_chat()
     try:
-        chat_id = update.chat.id if is_message else update.message.chat.id
-        user_id = update.from_user.id if is_message else update.from_user.id
-        chat_type = update.chat.type if is_message else update.message.chat.type
-
-        language = await get_lang(chat_id)
+        language = await get_lang(chat.id)
         language = get_string(language)
     except Exception:
         language = get_string("en")
 
     if no_check:
-        return await func(client, update, language)
+        return await func(event, language)
 
     if not await is_maintenance():
-        if user_id not in SUDOERS:
-            if chat_type == ChatType.PRIVATE:
-                if is_message:
-                    return await update.reply_text(language["maint_4"])
-                return await update.answer(language["maint_4"], show_alert=True)
+        if event.sender_id not in SUDOERS:
+            if isinstance(chat, User):
+                if event.message:
+                    return await event.reply(language["maint_4"])
+                return await event.answer(language["maint_4"], alert=True)
             return
 
-    if is_message and await is_commanddelete_on(chat_id):
+    if event.message and await is_commanddelete_on(chat.id):
         try:
             await update.delete()
         except Exception:
             pass
 
-    return await func(client, update, language)
+    return await func(event, language)
