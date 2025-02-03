@@ -28,7 +28,7 @@ from YukkiMusic import app
 from YukkiMusic.utils.inlinequery import answer
 
 
-@tbot.on(events.InlineQuery(users = list(BANNED_USERS), blacklist_users = True)
+@tbot.on(events.InlineQuery(users = list(BANNED_USERS), blacklist_users = True))
 async def inline_query_handler(event):
     text = event.query.query.strip().lower()
     answers = []
