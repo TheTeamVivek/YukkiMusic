@@ -10,12 +10,12 @@
 
 import re
 
-from async_lru import alru_cache
 from bs4 import BeautifulSoup
+from async_lru import alru_cache
 
+from .base import PlatformBase
 from ..core.request import Request
 from ..core.youtube import Track, YouTube
-from .base import PlatformBase
 
 
 class Apple(PlatformBase):

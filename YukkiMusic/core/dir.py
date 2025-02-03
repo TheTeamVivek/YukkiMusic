@@ -7,11 +7,12 @@
 #
 # All rights reserved.
 #
-import logging
 import os
-from os import listdir, mkdir
+import logging
+from os import mkdir, listdir
 
 from config import TEMP_DB_FOLDER
+
 
 # remove all files on startup  that contains these extentions
 files = [

@@ -1,5 +1,6 @@
 import json
 
+
 with open("pylint_warnings.json") as file:
     pylint_data = json.load(file)
 

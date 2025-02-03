@@ -1,37 +1,38 @@
+import re
 import asyncio
 import inspect
-import re
 import traceback
-from collections.abc import Callable
-from datetime import datetime
 from typing import Any
+from datetime import datetime
+from collections.abc import Callable
 
 from telethon import TelegramClient, events
 from telethon.errors import UserNotParticipantError
-from telethon.tl.functions.channels import (
-    GetParticipantRequest,
-    LeaveChannelRequest,
-)
-from telethon.tl.functions.messages import (
-    DeleteChatUserRequest,
-    GetFullChatRequest,
-)
 from telethon.tl.types import (
+    User,
+    PeerChat,
+    PeerChannel,
+    InputPeerChat,
+    InputUserSelf,
+    InputPeerChannel,
     ChannelParticipant,
+    ChannelParticipantLeft,
+    ChannelParticipantSelf,
     ChannelParticipantAdmin,
     ChannelParticipantBanned,
     ChannelParticipantCreator,
-    ChannelParticipantLeft,
-    ChannelParticipantSelf,
-    InputPeerChannel,
-    InputPeerChat,
-    InputUserSelf,
-    PeerChannel,
-    PeerChat,
-    User,
+)
+from telethon.tl.functions.channels import (
+    LeaveChannelRequest,
+    GetParticipantRequest,
+)
+from telethon.tl.functions.messages import (
+    GetFullChatRequest,
+    DeleteChatUserRequest,
 )
 
 from ..logging import logger
+
 
 log = logger(__name__)
 

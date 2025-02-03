@@ -1,9 +1,9 @@
-import json
 import os
+import json
 from datetime import datetime
 
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 
 import config
 from config import BANNED_USERS
@@ -12,14 +12,15 @@ from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
     authuserdb,
+    get_userss,
+    remove_sudo,
+    get_playlist,
+    is_banned_user,
     delete_playlist,
     delete_served_user,
-    get_playlist,
     get_playlist_names,
-    get_userss,
-    is_banned_user,
-    remove_sudo,
 )
+
 
 TEXT = f"""
 🔒 **Privacy Policy for {app.mention} !**

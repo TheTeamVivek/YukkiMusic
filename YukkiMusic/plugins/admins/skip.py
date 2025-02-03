@@ -10,19 +10,19 @@
 
 
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardMarkup, Message
+from pyrogram.types import Message, InlineKeyboardMarkup
 
 import config
 from config import BANNED_USERS
 from strings import command
 from YukkiMusic import Platform, app
-from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
+from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import get_loop
 from YukkiMusic.utils.decorators import admin_rights_check
+from YukkiMusic.utils.thumbnails import gen_thumb
 from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
 from YukkiMusic.utils.stream.autoclear import auto_clean
-from YukkiMusic.utils.thumbnails import gen_thumb
 
 
 @app.on_message(command("SKIP_COMMAND") & filters.group & ~BANNED_USERS)

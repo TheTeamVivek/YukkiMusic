@@ -9,7 +9,7 @@
 #
 
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardMarkup, Message
+from pyrogram.types import Message, InlineKeyboardMarkup
 
 from config import BANNED_USERS
 from strings import command

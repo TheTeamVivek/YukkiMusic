@@ -1,12 +1,12 @@
-from dataclasses import dataclass, field
+from dataclasses import field, dataclass
 
+from yt_dlp import YoutubeDL
 from async_lru import alru_cache
 from youtubesearchpython.__future__ import VideosSearch
-from yt_dlp import YoutubeDL
 
 from config import cookies
-from YukkiMusic.decorators.asyncify import asyncify
 from YukkiMusic.utils.formatters import time_to_seconds
+from YukkiMusic.decorators.asyncify import asyncify
 
 from .enum import SongType
 

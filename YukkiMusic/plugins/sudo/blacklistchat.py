@@ -15,8 +15,8 @@ from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
     blacklist_chat,
-    blacklisted_chats,
     whitelist_chat,
+    blacklisted_chats,
 )
 from YukkiMusic.utils.decorators.language import language
 

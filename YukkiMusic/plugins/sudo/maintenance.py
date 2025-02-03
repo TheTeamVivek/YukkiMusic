@@ -16,8 +16,8 @@ from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
     get_lang,
     is_maintenance,
-    maintenance_off,
     maintenance_on,
+    maintenance_off,
 )
 
 

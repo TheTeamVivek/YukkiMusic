@@ -11,7 +11,7 @@
 from pyrogram import filters
 from pyrogram.types import Message
 
-from config import BANNED_USERS, MONGO_DB_URI, OWNER_ID
+from config import OWNER_ID, BANNED_USERS, MONGO_DB_URI
 from strings import command
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS

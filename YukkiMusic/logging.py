@@ -13,6 +13,7 @@ from logging.handlers import RotatingFileHandler
 
 from config import LOG_FILE_NAME
 
+
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s - %(levelname)s] - %(name)s - %(message)s",

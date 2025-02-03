@@ -16,8 +16,8 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 import config
 
-from ..core.youtube import Track, YouTube
 from .base import PlatformBase
+from ..core.youtube import Track, YouTube
 
 
 class Spotify(PlatformBase):

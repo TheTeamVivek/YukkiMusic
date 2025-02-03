@@ -10,23 +10,23 @@
 import asyncio
 
 from ntgcalls import TelegramServerError
+from pytgcalls import PyTgCalls, filters
+from pyrogram.types import InlineKeyboardMarkup
 from pyrogram.errors import (
-    ChannelsTooMuch,
     FloodWait,
+    ChannelsTooMuch,
     InviteRequestSent,
     UserAlreadyParticipant,
 )
-from pyrogram.types import InlineKeyboardMarkup
-from pytgcalls import PyTgCalls, filters
-from pytgcalls.exceptions import AlreadyJoinedError
 from pytgcalls.types import (
-    ChatUpdate,
-    GroupCallConfig,
-    MediaStream,
-    StreamAudioEnded,
     Update,
+    ChatUpdate,
+    MediaStream,
+    GroupCallConfig,
+    StreamAudioEnded,
 )
 from telethon.errors import ChatAdminRequiredError
+from pytgcalls.exceptions import AlreadyJoinedError
 from telethon.tl.functions.messages import (
     ExportChatInviteRequest,
     HideChatJoinRequestRequest,
@@ -34,30 +34,31 @@ from telethon.tl.functions.messages import (
 
 import config
 from strings import get_string
-from YukkiMusic import Platform, app, logger, tbot, userbot
-from YukkiMusic.core.userbot import assistants
+from YukkiMusic import Platform, app, tbot, logger, userbot
 from YukkiMusic.misc import db
+from YukkiMusic.core.userbot import assistants
 from YukkiMusic.utils.database import (
-    add_active_chat,
-    add_active_video_chat,
-    get_assistant,
-    get_audio_bitrate,
     get_lang,
     get_loop,
-    get_video_bitrate,
-    group_assistant,
     music_on,
-    remove_active_chat,
-    remove_active_video_chat,
-    set_assistant,
     set_loop,
+    get_assistant,
+    set_assistant,
+    add_active_chat,
+    group_assistant,
+    get_audio_bitrate,
+    get_video_bitrate,
+    remove_active_chat,
+    add_active_video_chat,
+    remove_active_video_chat,
 )
 from YukkiMusic.utils.exceptions import AssistantErr
+from YukkiMusic.utils.thumbnails import gen_thumb
 from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
 from YukkiMusic.utils.stream.autoclear import auto_clean
-from YukkiMusic.utils.thumbnails import gen_thumb
 
 from .enum import PlayType
+
 
 links = {}
 

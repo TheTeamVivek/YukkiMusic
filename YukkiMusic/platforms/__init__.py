@@ -7,15 +7,15 @@
 #
 # All rights reserved.
 #
-from ..core.enum import SongType, SourceType
 from .Apple import Apple
-from .Carbon import Carbon
-from .JioSavan import Saavn
 from .Resso import Resso
-from .Soundcloud import SoundCloud
+from .Carbon import Carbon
 from .Spotify import Spotify
-from .Telegram import Telegram
 from .Youtube import YouTube
+from .JioSavan import Saavn
+from .Telegram import Telegram
+from ..core.enum import SongType, SourceType
+from .Soundcloud import SoundCloud
 
 
 class PlatForms:

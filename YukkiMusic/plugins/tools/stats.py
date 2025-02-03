@@ -12,37 +12,38 @@ import platform
 from sys import version as pyver
 
 import psutil
-from pyrogram import __version__ as pyrover
 from pyrogram import filters
+from pyrogram import __version__ as pyrover
+from pyrogram.types import Message, CallbackQuery, InputMediaPhoto
 from pyrogram.errors import MessageIdInvalid
-from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
 from pytgcalls.__version__ import __version__ as pytgver
 
 import config
 from config import BANNED_USERS
 from strings import command
 from YukkiMusic import Platform, app
-from YukkiMusic.core.userbot import assistants
 from YukkiMusic.misc import SUDOERS, pymongodb
+from YukkiMusic.core.userbot import assistants
 from YukkiMusic.utils.database import (
-    get_global_tops,
-    get_particulars,
     get_queries,
-    get_served_chats,
-    get_served_users,
     get_sudoers,
     get_top_chats,
     get_topp_users,
+    get_global_tops,
+    get_particulars,
+    get_served_chats,
+    get_served_users,
+)
+from YukkiMusic.utils.inline.stats import (
+    stats_buttons,
+    get_stats_markup,
+    back_stats_markup,
+    back_stats_buttons,
+    top_ten_stats_markup,
+    overallback_stats_markup,
 )
 from YukkiMusic.utils.decorators.language import language
-from YukkiMusic.utils.inline.stats import (
-    back_stats_buttons,
-    back_stats_markup,
-    get_stats_markup,
-    overallback_stats_markup,
-    stats_buttons,
-    top_ten_stats_markup,
-)
+
 
 loop = asyncio.get_running_loop()
 
