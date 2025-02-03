@@ -45,13 +45,13 @@ jobs:
           find . -name "*.py" -exec pyupgrade --py310-plus {} \;
 
  
-     # - name: Peps Warnings
-     #   run: |
-     #     pylint -j 18 --exit-zero --output-format=json --indent-string="    " --reports=no . > pylint_warnings.json
+      - name: Peps Warnings
+        run: |
+          pylint -j 18 --exit-zero --output-format=json --indent-string="    " --reports=no . > pylint_warnings.json
 
-     # - name: Sort the files
-     #   run: |
-     #     python .github/sort_pylint_warnings.py
+      - name: Sort the files
+        run: |
+          python .github/sort_pylint_warnings.py
      
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
