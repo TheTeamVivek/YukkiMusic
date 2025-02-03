@@ -9,18 +9,18 @@ from decorator import decorator
 @decorator
 def asyncify(
     func,
-    executor: type[Executor] | None = None,
+    executor: Executor | None = None,
     max_workers: int | None = None,
     *args: Any,
     **kwargs: Any
 ):
     async def run():
-        loop = asyncio.get_running_loop()
         pfunc = partial(func, *args, **kwargs)
 
         if executor is None:
-            return await loop.run_in_executor(None, pfunc)
+            return await asyncio.to_thread(pfunc)
         else:
+            loop = asyncio.get_running_loop()
             with executor(max_workers=max_workers) as exec:
                 return await loop.run_in_executor(exec, pfunc)
 
