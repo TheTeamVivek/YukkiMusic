@@ -4,6 +4,7 @@ import re
 import traceback
 from collections.abc import Callable
 from datetime import datetime
+from string import get_string
 from typing import Any
 
 from telethon import TelegramClient, events
@@ -32,7 +33,6 @@ from telethon.tl.types import (
 )
 
 from YukkiMusic.utils.database import get_lang
-from string import get_string
 
 from ..logging import logger
 
