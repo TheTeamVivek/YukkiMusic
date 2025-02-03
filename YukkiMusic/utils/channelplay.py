@@ -9,7 +9,6 @@
 #
 
 
-from YukkiMusic import tbot
 from YukkiMusic.utils.database import get_cmode
 
 
