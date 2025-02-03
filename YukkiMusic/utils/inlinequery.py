@@ -7,70 +7,91 @@
 #
 # All rights reserved.
 
-from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent
+from telethon.tl.types import InputBotInlineResult
+from telethon.tl.types import InputBotInlineMessageText
+from telethon.tl.types import InputWebDocument
+from telethon.tl.types import DocumentAttributeImageSize
+from uuid import uuid4
 
+def article(title, description, thumb_url, input_message_content):
+    return InputBotInlineResult(
+        id=str(uuid4()),
+        type="article",
+        send_message=InputBotInlineMessageText(message=input_message_content),
+        title=title,
+        description=description,
+        thumb=InputWebDocument(
+            url=thumb_url,
+            size=0,
+            mime_type="image/jpeg",
+            attributes=[DocumentAttributeImageSize(w=0, h=0)],
+        )
+    )
+    
 answer = []
 
 answer.extend(
     [
-        InlineQueryResultArticle(
-            title="ᴘᴀᴜsᴇ sᴛʀᴇᴀᴍ",
-            description="ᴘᴀᴜsᴇ ᴛʜᴇ ᴄᴜʀʀᴇɴᴛ ᴘʟᴀʏɪɴɢ sᴏɴɢ ᴏɴ ᴠᴏɪᴄᴇᴄʜᴀᴛ.",
+        article(
+            title="Pause Stream",
+            description="Pause the current playing song on voice chat.",
             thumb_url="https://telegra.ph/file/c0a1c789def7b93f13745.png",
-            input_message_content=InputTextMessageContent("/pause"),
+            input_message_content="/pause",
         ),
-        InlineQueryResultArticle(
-            title="ʀᴇsᴜᴍᴇ sᴛʀᴇᴀᴍ",
-            description="ʀᴇsᴜᴍᴇ ᴛʜᴇ ᴘᴀᴜsᴇᴅ sᴏɴɢ ᴏɴ ᴠᴏɪᴄᴇᴄʜᴀᴛ.",
+        article(
+            title="Resume Stream",
+            description="Resume the paused song on voice chat.",
             thumb_url="https://telegra.ph/file/02d1b7f967ca11404455a.png",
-            input_message_content=InputTextMessageContent("/resume"),
+            input_message_content="/resume",
         ),
-        InlineQueryResultArticle(
-            title="ᴍᴜᴛᴇ sᴛʀᴇᴀᴍ",
-            description="ᴍᴜᴛᴇ ᴛʜᴇ ᴏɴɢᴏɪɴɢ sᴏɴɢ ᴏɴ ᴠᴏɪᴄᴇᴄʜᴀᴛ",
+        article(
+            title="Mute Stream",
+            description="Mute the ongoing song on voice chat.",
             thumb_url="https://telegra.ph/file/66516f2976cb6d87e20f9.png",
-            input_message_content=InputTextMessageContent("/vcmute"),
+            input_message_content="/vcmute",
         ),
-        InlineQueryResultArticle(
-            title="ᴜɴᴍᴜᴛᴇ sᴛʀᴇᴀᴍ",
-            description="ᴜɴᴍᴜᴛᴇ ᴛʜᴇ ᴏɴɢᴏɪɴɢ sᴏɴɢ ᴏɴ ᴠᴏɪᴄᴇᴄʜᴀᴛ",
+        article(
+            title="Unmute Stream",
+            description="Unmute the ongoing song on voice chat.",
             thumb_url="https://telegra.ph/file/3078794f9341ffd582e18.png",
-            input_message_content=InputTextMessageContent("/vcunmute"),
+            input_message_content="/vcunmute",
         ),
-        InlineQueryResultArticle(
-            title="sᴋɪᴘ sᴛʀᴇᴀᴍ",
+        article(
+            title="Skip Stream",
             description=(
-                "sᴋɪᴘ ᴛᴏ ɴᴇxᴛ ᴛʀᴀᴄᴋ. | sᴋɪᴘ ᴛᴏ ɴᴇxᴛ ᴛʀᴀᴄᴋ. | "
-                "ғᴏʀ sᴘᴇᴄɪғɪᴄ ᴛʀᴀᴄᴋ ɴᴜᴍʙᴇʀ: /skip [number] "
+                "Skip to next track. | Skip to next track. | "
+                "For specific track number: /skip [number]"
             ),
             thumb_url="https://telegra.ph/file/98b88e52bc625903c7a2f.png",
-            input_message_content=InputTextMessageContent("/skip"),
+            input_message_content="/skip",
         ),
-        InlineQueryResultArticle(
-            title="ᴇɴᴅ sᴛʀᴇᴀᴍ",
-            description="sᴛᴏᴘ ᴛʜᴇ ᴏɴɢᴏɪɴɢ sᴏɴɢ ᴏɴ ɢʀᴏᴜᴘ ᴠᴏɪᴄᴇᴄʜᴀᴛ.",
+        article(
+            title="End Stream",
+            description="Stop the ongoing song on group voice chat.",
             thumb_url="https://telegra.ph/file/d2eb03211baaba8838cc4.png",
-            input_message_content=InputTextMessageContent("/stop"),
+            input_message_content="/stop",
         ),
-        InlineQueryResultArticle(
-            title="sʜᴜғғʟᴇ sᴛʀᴇᴀᴍ",
-            description="sʜᴜғғʟᴇ ᴛʜᴇ ǫᴜᴇᴜᴇᴅ ᴛʀᴀᴄᴋs ʟɪsᴛ.",
+        article(
+            title="Shuffle Stream",
+            description="Shuffle the queued tracks list.",
             thumb_url="https://telegra.ph/file/7f6aac5c6e27d41a4a269.png",
-            input_message_content=InputTextMessageContent("/shuffle"),
+            input_message_content="/shuffle",
         ),
-        InlineQueryResultArticle(
-            title="sᴇᴇᴋ sᴛʀᴇᴀᴍ",
-            description="sᴇᴇᴋ ᴛʜᴇ ᴏɴɢᴏɪɴɢ sᴛʀᴇᴀᴍ ᴛᴏ ᴀ sᴘᴇᴄɪғɪᴄ ᴅᴜʀᴀᴛɪᴏɴ.",
+        article(
+            title="Seek Stream",
+            description="Seek the ongoing stream to a specific duration.",
             thumb_url="https://telegra.ph/file/cd25ec6f046aa8003cfee.png",
-            input_message_content=InputTextMessageContent("/seek 10"),
+            input_message_content="/seek 10",
         ),
-        InlineQueryResultArticle(
-            title="ʟᴏᴏᴘ sᴛʀᴇᴀᴍ",
+        article(
+            title="Loop Stream",
             description=(
-                "ʟᴏᴏᴘ ᴛʜᴇ ᴄᴜʀʀᴇɴᴛ ᴘʟᴀʏɪɴɢ ᴍᴜsɪᴄ. " "ᴜsᴀsɢᴇ: /loop [enable|disable])"
+                "Loop the current playing music. Usage: /loop [enable|disable]"
             ),
             thumb_url="https://telegra.ph/file/081c20ce2074ea3e9b952.png",
-            input_message_content=InputTextMessageContent("/loop 3"),
+            input_message_content="/loop 3",
         ),
     ]
 )
+
+# The 'answer' list now contains all the articles with the generated id.
