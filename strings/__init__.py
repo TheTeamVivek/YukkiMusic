@@ -8,17 +8,9 @@
 # All rights reserved
 
 import os
-import re
 import sys
-from typing import Dict, List, Union
 
 import yaml
-from pyrogram import Client, filters
-from pyrogram.enums import ChatType
-from pyrogram.types import Message
-
-from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import get_lang, is_maintenance
 
 languages = {}
 languages_present = {}
@@ -55,9 +47,3 @@ for filename in os.listdir(r"./strings/langs/"):
                 "There is an issue with the language file. Please report it to TheTeamvk at @TheTeamvk on Telegram"
             )
             sys.exit()
-
-if not commands:
-    print(
-        "There's a problem loading the command files. Please report it to TheTeamVivek at @TheTeamVivek on Telegram"
-    )
-    sys.exit()
