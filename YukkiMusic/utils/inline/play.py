@@ -9,7 +9,7 @@
 #
 import math
 
-from pyrogram.types import InlineKeyboardButton
+from telethon import Button
 
 from YukkiMusic.utils.formatters import time_to_seconds
 
@@ -50,27 +50,27 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
 
     buttons = [
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text=f"{played} {status_bar} {dur}",
-                callback_data="GetTimer",
+                data="GetTimer",
             )
         ],
         [
-            InlineKeyboardButton(
-                text=_["P_B_7"], callback_data=f"add_playlist {videoid}"
+            Button.inline(
+                text=_["P_B_7"], data=f"add_playlist {videoid}"
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["PL_B_3"],
-                callback_data=f"PanelMarkup {videoid}|{chat_id}",
+                data=f"PanelMarkup {videoid}|{chat_id}",
             ),
         ],
         [
-            InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
-            InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
-            InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
-            InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
+            Button.inline(text="▷", data=f"ADMIN Resume|{chat_id}"),
+            Button.inline(text="II", data=f"ADMIN Pause|{chat_id}"),
+            Button.inline(text="‣‣I", data=f"ADMIN Skip|{chat_id}"),
+            Button.inline(text="▢", data=f"ADMIN Stop|{chat_id}"),
         ],
-        [InlineKeyboardButton(text=_["CLOSEMENU_BUTTON"], callback_data="close")],
+        [Button.inline(text=_["CLOSEMENU_BUTTON"], data="close")],
     ]
     return buttons
 
@@ -78,21 +78,21 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
 def stream_markup(_, videoid, chat_id):
     buttons = [
         [
-            InlineKeyboardButton(
-                text=_["P_B_7"], callback_data=f"add_playlist {videoid}"
+            Button.inline(
+                text=_["P_B_7"], data=f"add_playlist {videoid}"
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["PL_B_3"],
-                callback_data=f"PanelMarkup None|{chat_id}",
+                data=f"PanelMarkup None|{chat_id}",
             ),
         ],
         [
-            InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
-            InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
-            InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
-            InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
+            Button.inline(text="▷", data=f"ADMIN Resume|{chat_id}"),
+            Button.inline(text="II", data=f"ADMIN Pause|{chat_id}"),
+            Button.inline(text="‣‣I", data=f"ADMIN Skip|{chat_id}"),
+            Button.inline(text="▢", data=f"ADMIN Stop|{chat_id}"),
         ],
-        [InlineKeyboardButton(text=_["CLOSEMENU_BUTTON"], callback_data="close")],
+        [Button.inline(text=_["CLOSEMENU_BUTTON"], data="close")],
     ]
     return buttons
 
@@ -106,25 +106,25 @@ def telegram_markup_timer(_, chat_id, played, dur):
 
     buttons = [
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text=f"{played} {status_bar} {dur}",
-                callback_data="GetTimer",
+                data="GetTimer",
             )
         ],
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["PL_B_3"],
-                callback_data=f"PanelMarkup None|{chat_id}",
+                data=f"PanelMarkup None|{chat_id}",
             ),
         ],
         [
-            InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
-            InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
-            InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
-            InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
+            Button.inline(text="▷", data=f"ADMIN Resume|{chat_id}"),
+            Button.inline(text="II", data=f"ADMIN Pause|{chat_id}"),
+            Button.inline(text="‣‣I", data=f"ADMIN Skip|{chat_id}"),
+            Button.inline(text="▢", data=f"ADMIN Stop|{chat_id}"),
         ],
         [
-            InlineKeyboardButton(text=_["CLOSEMENU_BUTTON"], callback_data="close"),
+            Button.inline(text=_["CLOSEMENU_BUTTON"], data="close"),
         ],
     ]
     return buttons
@@ -133,19 +133,19 @@ def telegram_markup_timer(_, chat_id, played, dur):
 def telegram_markup(_, chat_id):
     buttons = [
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["PL_B_3"],
-                callback_data=f"PanelMarkup None|{chat_id}",
+                data=f"PanelMarkup None|{chat_id}",
             ),
         ],
         [
-            InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
-            InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
-            InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
-            InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
+            Button.inline(text="▷", data=f"ADMIN Resume|{chat_id}"),
+            Button.inline(text="II", data=f"ADMIN Pause|{chat_id}"),
+            Button.inline(text="‣‣I", data=f"ADMIN Skip|{chat_id}"),
+            Button.inline(text="▢", data=f"ADMIN Stop|{chat_id}"),
         ],
         [
-            InlineKeyboardButton(text=_["CLOSEMENU_BUTTON"], callback_data="close"),
+            Button.inline(text=_["CLOSEMENU_BUTTON"], data="close"),
         ],
     ]
     return buttons
@@ -157,18 +157,18 @@ def telegram_markup(_, chat_id):
 def track_markup(_, videoid, user_id, channel, fplay):
     buttons = [
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["P_B_1"],
-                callback_data=f"MusicStream {videoid}|{user_id}|a|{channel}|{fplay}",
+                data=f"MusicStream {videoid}|{user_id}|a|{channel}|{fplay}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["P_B_2"],
-                callback_data=f"MusicStream {videoid}|{user_id}|v|{channel}|{fplay}",
+                data=f"MusicStream {videoid}|{user_id}|v|{channel}|{fplay}",
             ),
         ],
         [
-            InlineKeyboardButton(
-                text=_["CLOSE_BUTTON"], callback_data=f"forceclose {videoid}|{user_id}"
+            Button.inline(
+                text=_["CLOSE_BUTTON"], data=f"forceclose {videoid}|{user_id}"
             )
         ],
     ]
@@ -178,18 +178,18 @@ def track_markup(_, videoid, user_id, channel, fplay):
 def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
     buttons = [
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["P_B_1"],
-                callback_data=f"YukkiPlaylists {videoid}|{user_id}|{ptype}|a|{channel}|{fplay}",
+                data=f"YukkiPlaylists {videoid}|{user_id}|{ptype}|a|{channel}|{fplay}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["P_B_2"],
-                callback_data=f"YukkiPlaylists {videoid}|{user_id}|{ptype}|v|{channel}|{fplay}",
+                data=f"YukkiPlaylists {videoid}|{user_id}|{ptype}|v|{channel}|{fplay}",
             ),
         ],
         [
-            InlineKeyboardButton(
-                text=_["CLOSE_BUTTON"], callback_data=f"forceclose {videoid}|{user_id}"
+            Button.inline(
+                text=_["CLOSE_BUTTON"], data=f"forceclose {videoid}|{user_id}"
             ),
         ],
     ]
@@ -202,13 +202,13 @@ def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
 def livestream_markup(_, videoid, user_id, mode, channel, fplay):
     buttons = [
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["P_B_3"],
-                callback_data=f"LiveStream {videoid}|{user_id}|{mode}|{channel}|{fplay}",
+                data=f"LiveStream {videoid}|{user_id}|{mode}|{channel}|{fplay}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["CLOSEMENU_BUTTON"],
-                callback_data=f"forceclose {videoid}|{user_id}",
+                data=f"forceclose {videoid}|{user_id}",
             ),
         ],
     ]
@@ -222,26 +222,26 @@ def slider_markup(_, videoid, user_id, query, query_type, channel, fplay):
     query = f"{query[:20]}"
     buttons = [
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["P_B_1"],
-                callback_data=f"MusicStream {videoid}|{user_id}|a|{channel}|{fplay}",
+                data=f"MusicStream {videoid}|{user_id}|a|{channel}|{fplay}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["P_B_2"],
-                callback_data=f"MusicStream {videoid}|{user_id}|v|{channel}|{fplay}",
+                data=f"MusicStream {videoid}|{user_id}|v|{channel}|{fplay}",
             ),
         ],
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text="❮",
-                callback_data=f"slider B|{query_type}|{query}|{user_id}|{channel}|{fplay}",
+                data=f"slider B|{query_type}|{query}|{user_id}|{channel}|{fplay}",
             ),
-            InlineKeyboardButton(
-                text=_["CLOSE_BUTTON"], callback_data=f"forceclose {query}|{user_id}"
+            Button.inline(
+                text=_["CLOSE_BUTTON"], data=f"forceclose {query}|{user_id}"
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text="❯",
-                callback_data=f"slider F|{query_type}|{query}|{user_id}|{channel}|{fplay}",
+                data=f"slider F|{query_type}|{query}|{user_id}|{channel}|{fplay}",
             ),
         ],
     ]
@@ -251,35 +251,35 @@ def slider_markup(_, videoid, user_id, query, query_type, channel, fplay):
 def panel_markup_1(_, videoid, chat_id):
     buttons = [
         [
-            InlineKeyboardButton(
-                text="⏸ Pause", callback_data=f"ADMIN Pause|{chat_id}"
+            Button.inline(
+                text="⏸ Pause", data=f"ADMIN Pause|{chat_id}"
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text="▶️ Resume",
-                callback_data=f"ADMIN Resume|{chat_id}",
+                data=f"ADMIN Resume|{chat_id}",
             ),
         ],
         [
-            InlineKeyboardButton(text="⏯ Skip", callback_data=f"ADMIN Skip|{chat_id}"),
-            InlineKeyboardButton(text="⏹ Stop", callback_data=f"ADMIN Stop|{chat_id}"),
+            Button.inline(text="⏯ Skip", data=f"ADMIN Skip|{chat_id}"),
+            Button.inline(text="⏹ Stop", data=f"ADMIN Stop|{chat_id}"),
         ],
         [
-            InlineKeyboardButton(
-                text="🔁 Replay ", callback_data=f"ADMIN Replay|{chat_id}"
+            Button.inline(
+                text="🔁 Replay ", data=f"ADMIN Replay|{chat_id}"
             ),
         ],
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text="◀️",
-                callback_data=f"Pages Back|0|{videoid}|{chat_id}",
+                data=f"Pages Back|0|{videoid}|{chat_id}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text="🔙 Back",
-                callback_data=f"MainMarkup {videoid}|{chat_id}",
+                data=f"MainMarkup {videoid}|{chat_id}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text="▶️",
-                callback_data=f"Pages Forw|0|{videoid}|{chat_id}",
+                data=f"Pages Forw|0|{videoid}|{chat_id}",
             ),
         ],
     ]
@@ -289,31 +289,31 @@ def panel_markup_1(_, videoid, chat_id):
 def panel_markup_2(_, videoid, chat_id):
     buttons = [
         [
-            InlineKeyboardButton(text="🔇 Mute", callback_data=f"ADMIN Mute|{chat_id}"),
-            InlineKeyboardButton(
+            Button.inline(text="🔇 Mute", data=f"ADMIN Mute|{chat_id}"),
+            Button.inline(
                 text="🔊 Unmute",
-                callback_data=f"ADMIN Unmute|{chat_id}",
+                data=f"ADMIN Unmute|{chat_id}",
             ),
         ],
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text="🔀 Shuffle",
-                callback_data=f"ADMIN Shuffle|{chat_id}",
+                data=f"ADMIN Shuffle|{chat_id}",
             ),
-            InlineKeyboardButton(text="🔁 Loop", callback_data=f"ADMIN Loop|{chat_id}"),
+            Button.inline(text="🔁 Loop", data=f"ADMIN Loop|{chat_id}"),
         ],
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text="◀️",
-                callback_data=f"Pages Back|1|{videoid}|{chat_id}",
+                data=f"Pages Back|1|{videoid}|{chat_id}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text="🔙 Back",
-                callback_data=f"MainMarkup {videoid}|{chat_id}",
+                data=f"MainMarkup {videoid}|{chat_id}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text="▶️",
-                callback_data=f"Pages Forw|1|{videoid}|{chat_id}",
+                data=f"Pages Forw|1|{videoid}|{chat_id}",
             ),
         ],
     ]
@@ -323,37 +323,37 @@ def panel_markup_2(_, videoid, chat_id):
 def panel_markup_3(_, videoid, chat_id):
     buttons = [
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text="⏮ 10 seconds",
-                callback_data=f"ADMIN 1|{chat_id}",
+                data=f"ADMIN 1|{chat_id}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text="⏭ 10 seconds",
-                callback_data=f"ADMIN 2|{chat_id}",
+                data=f"ADMIN 2|{chat_id}",
             ),
         ],
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text="⏮ 30 seconds",
-                callback_data=f"ADMIN 3|{chat_id}",
+                data=f"ADMIN 3|{chat_id}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text="⏭ 30 seconds",
-                callback_data=f"ADMIN 4|{chat_id}",
+                data=f"ADMIN 4|{chat_id}",
             ),
         ],
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text="◀️",
-                callback_data=f"Pages Back|2|{videoid}|{chat_id}",
+                data=f"Pages Back|2|{videoid}|{chat_id}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text="🔙 Back",
-                callback_data=f"MainMarkup {videoid}|{chat_id}",
+                data=f"MainMarkup {videoid}|{chat_id}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text="▶️",
-                callback_data=f"Pages Forw|2|{videoid}|{chat_id}",
+                data=f"Pages Forw|2|{videoid}|{chat_id}",
             ),
         ],
     ]
