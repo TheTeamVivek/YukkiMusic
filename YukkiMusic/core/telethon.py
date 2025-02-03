@@ -30,6 +30,7 @@ from telethon.tl.types import (
     PeerChat,
     User,
 )
+from YukkiMusic.utils.database import get_lang
 
 from ..logging import logger
 
@@ -134,21 +135,26 @@ class TelethonClient(TelegramClient):
             kwargs["incoming"] = kwargs.get("incoming", True)
             func = kwargs.get("func")
 
-            async def wrapper(event):
+            async def custom_func(event):
                 if func and not await self.run_coro(func, event):
                     return False
                 if isinstance(command, str):
                     command = [command]
-                # command = get_command(command, "en") #todo
-                command = [re.escape(cmd) for cmd in command]
-                command = "|".join(command)
+                try:
+                    lang = await get_lang(event.chat_id)
+                    string = get_string(lang)
+                except Exception:
+                    string = get_string(lang)
+
+                command = [string[cmd] for cmd in command]
+                command = "|".join([re.escape(cmd) for cmd in command])
                 username = re.escape(self.username)
                 pattern = re.compile(
                     rf"^(?:/)?({command})(?:@{username})?(?:\s|$)", re.IGNORECASE
                 )
                 return bool(re.match(pattern, event.text))
 
-            kwargs["func"] = wrapper
+            kwargs["func"] = custom_func
             kwargs.pop("pattern", None)
 
             self.add_event_handler(function, events.NewMessage(**kwargs))
