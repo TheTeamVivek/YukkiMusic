@@ -7,16 +7,14 @@
 #
 # All rights reserved.
 
-from telethon.tl.types import InputBotInlineResult
-from telethon.tl.types import InputBotInlineMessageText
-from telethon.tl.types import InputWebDocument
-from telethon.tl.types import DocumentAttributeImageSize
-from uuid import uuid4
+
+from telethon.tl.custom.inlinebuilder import InlineBuilder
+from telethon.tl.types import DocumentAttributeImageSize, InputWebDocument
 
 from YukkiMusic import tbot
-from telethon.tl.custom.inlinebuilder import InlineBuilder
 
 builder = InlineBuilder(tbot)
+
 
 def thumb(url):
     return InputWebDocument(
@@ -25,7 +23,8 @@ def thumb(url):
         mime_type="image/jpeg",
         attributes=[DocumentAttributeImageSize(w=0, h=0)],
     )
-    
+
+
 answer = []
 
 answer.extend(
@@ -84,8 +83,7 @@ answer.extend(
         builder.article(
             title="Loop Stream",
             description=(
-                "Loop the current playing music. "
-                "Usage: /loop [enable|disable]"
+                "Loop the current playing music. " "Usage: /loop [enable|disable]"
             ),
             thumb=thumb("https://telegra.ph/file/081c20ce2074ea3e9b952.png"),
             text="/loop 3",
