@@ -7,23 +7,22 @@
 #
 # All rights reserved.
 #
-from pyrogram.types import InlineKeyboardButton
-
+from telethon import Button
 
 def song_markup(_, vidid):
     buttons = [
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["SG_B_2"],
-                callback_data=f"song_helper audio|{vidid}",
+                data=f"song_helper audio|{vidid}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["SG_B_3"],
-                callback_data=f"song_helper video|{vidid}",
+                data=f"song_helper video|{vidid}",
             ),
         ],
         [
-            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
+            Button.inline(text=_["CLOSE_BUTTON"], data="close"),
         ],
     ]
     return buttons
