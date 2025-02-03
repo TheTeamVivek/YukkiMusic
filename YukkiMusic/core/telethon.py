@@ -104,7 +104,7 @@ class TelethonClient(TelegramClient):
         else:
             raise ValueError(f'The chat_id "{chat_id}" belongs to a user')
 
-    async def handle_exception(self, exc: Exception):  # TODO Make it more brief
+    async def handle_error(self, exc: Exception):  # TODO Make it more brief
         date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         error_trace = traceback.format_exc()
 
