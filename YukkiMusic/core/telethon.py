@@ -32,6 +32,7 @@ from telethon.tl.types import (
 )
 
 from YukkiMusic.utils.database import get_lang
+from string import get_string
 
 from ..logging import logger
 
