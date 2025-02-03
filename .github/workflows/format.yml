@@ -31,7 +31,7 @@ jobs:
              pip install --upgrade pip
              pip install autoflake isort black pyupgrade pylint
 
-      - name: Clean Imports
+      - name: format codes
         run: |
           isort .
           autoflake --in-place --recursive --remove-all-unused-imports --ignore-init-module-imports .
