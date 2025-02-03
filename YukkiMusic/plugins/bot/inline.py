@@ -81,7 +81,7 @@ __ʀᴇᴘʟʏ ᴡɪᴛʜ /play ᴏɴ ᴛʜɪs sᴇᴀʀᴄʜᴇᴅ ᴍᴇssᴀ�
                                 w=0,
                                 h=0
                              )
-                         ]
+                         ])
             msg, entities = tbot._parse_message_text(searched_text, ())
             answers.append(
                 InputBotInlineResult(
