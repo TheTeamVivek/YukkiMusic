@@ -13,6 +13,7 @@ from telethon import Button
 from config import GITHUB_REPO, SUPPORT_CHANNEL, SUPPORT_GROUP
 from YukkiMusic import app
 
+
 def start_pannel(_):
     buttons = [
         [
@@ -32,20 +33,14 @@ def start_pannel(_):
         )
     else:
         if SUPPORT_CHANNEL:
-            buttons.append(
-                [Button.url(text=_["S_B_4"], url=f"{SUPPORT_CHANNEL}")]
-            )
+            buttons.append([Button.url(text=_["S_B_4"], url=f"{SUPPORT_CHANNEL}")])
         if SUPPORT_GROUP:
-            buttons.append(
-                [Button.url(text=_["S_B_3"], url=f"{SUPPORT_GROUP}")]
-            )
+            buttons.append([Button.url(text=_["S_B_3"], url=f"{SUPPORT_GROUP}")])
     return buttons
 
 
-def private_panel(_,  owner: bool | int = None):
-    buttons = [
-        [Button.inline(text=_["S_B_8"], data="settings_back_helper")]
-    ]
+def private_panel(_, owner: bool | int = None):
+    buttons = [[Button.inline(text=_["S_B_8"], data="settings_back_helper")]]
     if SUPPORT_CHANNEL and SUPPORT_GROUP:
         buttons.append(
             [
@@ -55,13 +50,9 @@ def private_panel(_,  owner: bool | int = None):
         )
     else:
         if SUPPORT_CHANNEL:
-            buttons.append(
-                [Button.url(text=_["S_B_4"], url=f"{SUPPORT_CHANNEL}")]
-            )
+            buttons.append([Button.url(text=_["S_B_4"], url=f"{SUPPORT_CHANNEL}")])
         if SUPPORT_GROUP:
-            buttons.append(
-                [Button.url(text=_["S_B_3"], url=f"{SUPPORT_GROUP}")]
-            )
+            buttons.append([Button.url(text=_["S_B_3"], url=f"{SUPPORT_GROUP}")])
     buttons.append(
         [
             Button.url(
