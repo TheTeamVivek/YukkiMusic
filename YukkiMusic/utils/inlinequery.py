@@ -7,11 +7,15 @@
 #
 # All rights reserved.
 
-from telethon.tl.types import InputBotInlineResult
-from telethon.tl.types import InputBotInlineMessageText
-from telethon.tl.types import InputWebDocument
-from telethon.tl.types import DocumentAttributeImageSize
 from uuid import uuid4
+
+from telethon.tl.types import (
+    DocumentAttributeImageSize,
+    InputBotInlineMessageText,
+    InputBotInlineResult,
+    InputWebDocument,
+)
+
 
 def article(title, description, thumb_url, input_message_content):
     return InputBotInlineResult(
@@ -25,9 +29,10 @@ def article(title, description, thumb_url, input_message_content):
             size=0,
             mime_type="image/jpeg",
             attributes=[DocumentAttributeImageSize(w=0, h=0)],
-        )
+        ),
     )
-    
+
+
 answer = []
 
 answer.extend(
