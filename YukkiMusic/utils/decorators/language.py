@@ -9,6 +9,7 @@
 #
 from decorator import decorator
 from telethon.tl.types import User
+
 from strings import get_string
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
@@ -19,11 +20,7 @@ from YukkiMusic.utils.database import (
 
 
 @decorator
-async def language(
-    func,
-    event,
-    no_check = False
-):
+async def language(func, event, no_check=False):
     chat = await event.get_chat()
     try:
         language = await get_lang(chat.id)
