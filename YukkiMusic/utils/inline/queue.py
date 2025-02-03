@@ -8,8 +8,7 @@
 # All rights reserved.
 #
 
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-
+from telethon import Button
 
 def queue_markup(
     _,
@@ -21,31 +20,31 @@ def queue_markup(
 ):
     not_dur = [
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["QU_B_1"],
-                callback_data=f"GetQueued {cplay}|{videoid}",
+                data=f"GetQueued {cplay}|{videoid}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["CLOSEMENU_BUTTON"],
-                callback_data="close",
+                data="close",
             ),
         ]
     ]
     dur = [
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["QU_B_2"].format(played, dur),
-                callback_data="GetTimer",
+                data="GetTimer",
             )
         ],
         [
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["QU_B_1"],
-                callback_data=f"GetQueued {cplay}|{videoid}",
+                data=f"GetQueued {cplay}|{videoid}",
             ),
-            InlineKeyboardButton(
+            Button.inline(
                 text=_["CLOSEMENU_BUTTON"],
-                callback_data="close",
+                data="close",
             ),
         ],
     ]
@@ -54,18 +53,16 @@ def queue_markup(
 
 
 def queue_back_markup(_, cplay):
-    upl = InlineKeyboardMarkup(
-        [
+    upl =   [
             [
-                InlineKeyboardButton(
+                Button.inline(
                     text=_["BACK_BUTTON"],
-                    callback_data=f"queue_back_timer {cplay}",
+                    data=f"queue_back_timer {cplay}",
                 ),
-                InlineKeyboardButton(
+                Button.inline(
                     text=_["CLOSE_BUTTON"],
-                    callback_data="close",
+                    data="close",
                 ),
             ]
         ]
-    )
     return upl
