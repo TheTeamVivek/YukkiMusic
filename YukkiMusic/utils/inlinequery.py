@@ -93,5 +93,3 @@ answer.extend(
         ),
     ]
 )
-
-# The 'answer' list now contains all the articles with the generated id.
