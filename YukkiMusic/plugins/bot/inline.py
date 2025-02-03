@@ -7,34 +7,31 @@
 #
 # All rights reserved.
 #
-from pyrogram.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    InlineQueryResultPhoto,
-)
-from YukkiMusic import tbot
 from uuid import uuid4
-from telethon import events 
-from telethon.tl.types import InputBotInlineResult
-from telethon.tl.types import InputWebDocument
-from telethon.tl.types import DocumentAttributeImageSize
-from telethon.tl.types import InputBotInlineMessageMediaAuto
+
+from telethon import events
+from telethon.tl.types import (
+    DocumentAttributeImageSize,
+    InputBotInlineMessageMediaAuto,
+    InputBotInlineResult,
+    InputWebDocument,
+    KeyboardButtonUrl,
+    ReplyInlineMarkup,
+)
 from youtubesearchpython.__future__ import VideosSearch
 
-from telethon.tl.types import ReplyInlineMarkup
-from telethon.tl.types import KeyboardButtonUrl
 from config import BANNED_USERS
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.utils.inlinequery import answer
 
 
-@tbot.on(events.InlineQuery(users = list(BANNED_USERS), blacklist_users = True))
+@tbot.on(events.InlineQuery(users=list(BANNED_USERS), blacklist_users=True))
 async def inline_query_handler(event):
     text = event.query.query.strip().lower()
     answers = []
     if text.strip() == "":
         try:
-            await event.answer( results=answer, cache_time=10)
+            await event.answer(results=answer, cache_time=10)
         except Exception:
             return
     else:
@@ -73,25 +70,23 @@ __ʀᴇᴘʟʏ ᴡɪᴛʜ /play ᴏɴ ᴛʜɪs sᴇᴀʀᴄʜᴇᴅ ᴍᴇssᴀ�
 
 ⚡️ ** ɪɴʟɪɴᴇ sᴇᴀʀᴄʜ ʙʏ {app.mention} **"""
             photo = InputWebDocument(
-                        url=thumbnail,
-                        size=0,
-                        mime_type="image/jpeg",
-                        attributes=[
-                            DocumentAttributeImageSize(
-                                w=0,
-                                h=0
-                             )
-                         ])
+                url=thumbnail,
+                size=0,
+                mime_type="image/jpeg",
+                attributes=[DocumentAttributeImageSize(w=0, h=0)],
+            )
             msg, entities = tbot._parse_message_text(searched_text, ())
             answers.append(
                 InputBotInlineResult(
-                    id = str(uuid4()),
+                    id=str(uuid4()),
                     type="photo",
-                    title=title, 
+                    title=title,
                     content=photo,
                     thumb=photo,
                     description=description,
-                    send_message = InputBotInlineMessageMediaAuto(message=msg, entities=entities, reply_markup=buttons)
+                    send_message=InputBotInlineMessageMediaAuto(
+                        message=msg, entities=entities, reply_markup=buttons
+                    ),
                 )
             )
         try:
