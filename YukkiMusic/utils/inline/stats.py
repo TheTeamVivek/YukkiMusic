@@ -14,33 +14,33 @@ from YukkiMusic import tbot
 
 def back_stats_markup(_):
     upl = [
-            [
-                Button.inline(
-                    text=_["BACK_BUTTON"],
-                    data="TOPMARKUPGET",
-                ),
-                Button.inline(
-                    text=_["CLOSE_BUTTON"],
-                    data="close",
-                ),
-            ],
-        ]
+        [
+            Button.inline(
+                text=_["BACK_BUTTON"],
+                data="TOPMARKUPGET",
+            ),
+            Button.inline(
+                text=_["CLOSE_BUTTON"],
+                data="close",
+            ),
+        ],
+    ]
     return upl
 
 
 def overallback_stats_markup(_):
-    upl =  [
-            [
-                Button.inline(
-                    text=_["BACK_BUTTON"],
-                    data="GlobalStats",
-                ),
-                Button.inline(
-                    text=_["CLOSE_BUTTON"],
-                    data="close",
-                ),
-            ],
-        ]
+    upl = [
+        [
+            Button.inline(
+                text=_["BACK_BUTTON"],
+                data="GlobalStats",
+            ),
+            Button.inline(
+                text=_["CLOSE_BUTTON"],
+                data="close",
+            ),
+        ],
+    ]
     return upl
 
 
@@ -62,24 +62,24 @@ def get_stats_markup(_, status):
         ),
     ]
     upl = [
-            [
-                Button.inline(
-                    text=_["SA_B_7"],
-                    data="TOPMARKUPGET",
-                )
-            ],
-            [
-                Button.inline(
-                    text=_["SA_B_6"],
-                    url=f"https://t.me/{tbot.username}?start=stats",
-                ),
-                Button.inline(
-                    text=_["SA_B_5"],
-                    data="TopOverall g",
-                ),
-            ],
-            sudo if status else not_sudo,
-        ]
+        [
+            Button.inline(
+                text=_["SA_B_7"],
+                data="TOPMARKUPGET",
+            )
+        ],
+        [
+            Button.inline(
+                text=_["SA_B_6"],
+                url=f"https://t.me/{tbot.username}?start=stats",
+            ),
+            Button.inline(
+                text=_["SA_B_5"],
+                data="TopOverall g",
+            ),
+        ],
+        sudo if status else not_sudo,
+    ]
     return upl
 
 
@@ -100,65 +100,65 @@ def stats_buttons(_, status):
             data="TopOverall s",
         ),
     ]
-    upl =  [
-            sudo if status else not_sudo,
-            [
-                Button.inline(
-                    text=_["CLOSE_BUTTON"],
-                    data="close",
-                ),
-            ],
-        ]
+    upl = [
+        sudo if status else not_sudo,
+        [
+            Button.inline(
+                text=_["CLOSE_BUTTON"],
+                data="close",
+            ),
+        ],
+    ]
     return upl
 
 
 def back_stats_buttons(_):
     upl = [
-            [
-                Button.inline(
-                    text=_["BACK_BUTTON"],
-                    data="GETSTATS",
-                ),
-                Button.inline(
-                    text=_["CLOSE_BUTTON"],
-                    data="close",
-                ),
-            ],
-        ]
+        [
+            Button.inline(
+                text=_["BACK_BUTTON"],
+                data="GETSTATS",
+            ),
+            Button.inline(
+                text=_["CLOSE_BUTTON"],
+                data="close",
+            ),
+        ],
+    ]
     return upl
 
 
 def top_ten_stats_markup(_):
     upl = [
-            [
-                Button.inline(
-                    text=_["SA_B_2"],
-                    data="GetStatsNow Tracks",
-                ),
-                Button.inline(
-                    text=_["SA_B_1"],
-                    data="GetStatsNow Chats",
-                ),
-            ],
-            [
-                Button.inline(
-                    text=_["SA_B_3"],
-                    data="GetStatsNow Users",
-                ),
-                Button.inline(
-                    text=_["SA_B_4"],
-                    data="GetStatsNow Here",
-                ),
-            ],
-            [
-                Button.inline(
-                    text=_["BACK_BUTTON"],
-                    data="GlobalStats",
-                ),
-                Button.inline(
-                    text=_["CLOSE_BUTTON"],
-                    data="close",
-                ),
-            ],
-        ]
+        [
+            Button.inline(
+                text=_["SA_B_2"],
+                data="GetStatsNow Tracks",
+            ),
+            Button.inline(
+                text=_["SA_B_1"],
+                data="GetStatsNow Chats",
+            ),
+        ],
+        [
+            Button.inline(
+                text=_["SA_B_3"],
+                data="GetStatsNow Users",
+            ),
+            Button.inline(
+                text=_["SA_B_4"],
+                data="GetStatsNow Here",
+            ),
+        ],
+        [
+            Button.inline(
+                text=_["BACK_BUTTON"],
+                data="GlobalStats",
+            ),
+            Button.inline(
+                text=_["CLOSE_BUTTON"],
+                data="close",
+            ),
+        ],
+    ]
     return upl
