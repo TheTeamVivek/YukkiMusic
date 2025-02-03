@@ -10,6 +10,7 @@
 
 from telethon import Button
 
+
 def queue_markup(
     _,
     duration,
@@ -53,16 +54,16 @@ def queue_markup(
 
 
 def queue_back_markup(_, cplay):
-    upl =   [
-            [
-                Button.inline(
-                    text=_["BACK_BUTTON"],
-                    data=f"queue_back_timer {cplay}",
-                ),
-                Button.inline(
-                    text=_["CLOSE_BUTTON"],
-                    data="close",
-                ),
-            ]
+    upl = [
+        [
+            Button.inline(
+                text=_["BACK_BUTTON"],
+                data=f"queue_back_timer {cplay}",
+            ),
+            Button.inline(
+                text=_["CLOSE_BUTTON"],
+                data="close",
+            ),
         ]
+    ]
     return upl
