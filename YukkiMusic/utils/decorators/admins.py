@@ -149,7 +149,7 @@ def actual_admin_cb(mystic):
         if event.is_private:
             return await mystic(event, _)
 
-        is_non_admin = await is_nonadmin_chat(query.event.chat_id)
+        is_non_admin = await is_nonadmin_chat(event.chat_id)
         if not is_non_admin:
             try:
                 member, status = await tbot.get_chat_member(
