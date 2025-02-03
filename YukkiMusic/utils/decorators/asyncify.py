@@ -1,7 +1,7 @@
 import asyncio
-from typing import Any
-from functools import partial
 from concurrent.futures import Executor
+from functools import partial
+from typing import Any
 
 from decorator import decorator
 

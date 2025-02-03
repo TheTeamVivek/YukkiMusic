@@ -11,7 +11,6 @@
 
 from YukkiMusic.core.mongo import mongodb
 
-
 queriesdb = mongodb.queries
 userdb = mongodb.userstats
 chattopdb = mongodb.chatstats

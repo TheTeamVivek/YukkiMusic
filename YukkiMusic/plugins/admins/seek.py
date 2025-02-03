@@ -13,9 +13,9 @@ from pyrogram.types import Message
 from config import BANNED_USERS
 from strings import command
 from YukkiMusic import Platform, app
-from YukkiMusic.misc import db
-from YukkiMusic.utils import seconds_to_min, admin_rights_check
 from YukkiMusic.core.call import Yukki
+from YukkiMusic.misc import db
+from YukkiMusic.utils import admin_rights_check, seconds_to_min
 
 
 @app.on_message(

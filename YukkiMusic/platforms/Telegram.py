@@ -8,18 +8,18 @@
 # All rights reserved.
 #
 
+import asyncio
 import os
 import time
-import asyncio
 from datetime import datetime, timedelta
 
 import aiohttp
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import (
-    Voice,
-    Message,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    Message,
+    Voice,
 )
 
 import config
@@ -27,8 +27,7 @@ from config import lyrical
 from YukkiMusic import app
 from YukkiMusic.utils.decorators import asyncify
 
-from ..utils.formatters import convert_bytes, seconds_to_min, get_readable_time
-
+from ..utils.formatters import convert_bytes, get_readable_time, seconds_to_min
 
 downloader = {}
 

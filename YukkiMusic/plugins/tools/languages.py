@@ -8,16 +8,15 @@
 # All rights reserved.
 #
 
-from pyrogram import filters
 from pykeyboard import InlineKeyboard
-from pyrogram.types import Message, InlineKeyboardButton
+from pyrogram import filters
+from pyrogram.types import InlineKeyboardButton, Message
 
 from config import BANNED_USERS
 from strings import command, get_string, languages_present
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_lang, set_lang
-from YukkiMusic.utils.decorators import language, actual_admin_cb
-
+from YukkiMusic.utils.decorators import actual_admin_cb, language
 
 # Languages Available
 

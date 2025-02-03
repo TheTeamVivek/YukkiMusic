@@ -7,8 +7,8 @@
 #
 # All rights reserved.
 
-import shlex
 import asyncio
+import shlex
 
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
@@ -16,7 +16,6 @@ from git.exc import GitCommandError, InvalidGitRepositoryError
 import config
 
 from ..logging import logger
-
 
 loop = asyncio.get_event_loop_policy().get_event_loop()
 

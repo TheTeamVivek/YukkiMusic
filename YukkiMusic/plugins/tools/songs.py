@@ -12,14 +12,14 @@ import os
 import re
 
 import yt_dlp
-from pyrogram import enums, filters
 from pykeyboard import InlineKeyboard
+from pyrogram import enums, filters
 from pyrogram.types import (
-    Message,
-    InputMediaAudio,
-    InputMediaVideo,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    InputMediaAudio,
+    InputMediaVideo,
+    Message,
 )
 
 from config import (
@@ -29,10 +29,10 @@ from config import (
 )
 from strings import command
 from YukkiMusic import Platform, app
-from YukkiMusic.utils.formatters import convert_bytes
 from YukkiMusic.platforms.Youtube import cookies
-from YukkiMusic.utils.inline.song import song_markup
 from YukkiMusic.utils.decorators.language import language
+from YukkiMusic.utils.formatters import convert_bytes
+from YukkiMusic.utils.inline.song import song_markup
 
 
 @app.on_message(command("SONG_COMMAND") & filters.group & ~BANNED_USERS)

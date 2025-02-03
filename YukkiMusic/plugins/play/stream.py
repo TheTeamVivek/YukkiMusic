@@ -17,9 +17,9 @@ from config import BANNED_USERS
 from strings import command
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
+from YukkiMusic.utils.decorators.play import play_wrapper
 from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
-from YukkiMusic.utils.decorators.play import play_wrapper
 
 
 @app.on_message(command("STREAM_COMMAND") & filters.group & ~BANNED_USERS)

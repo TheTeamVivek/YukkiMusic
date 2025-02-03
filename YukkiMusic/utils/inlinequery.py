@@ -7,8 +7,7 @@
 #
 # All rights reserved.
 
-from pyrogram.types import InputTextMessageContent, InlineQueryResultArticle
-
+from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent
 
 answer = []
 

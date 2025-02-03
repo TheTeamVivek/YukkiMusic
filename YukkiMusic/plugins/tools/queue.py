@@ -11,23 +11,22 @@
 import asyncio
 
 from pyrogram import filters
-from pyrogram.types import Message, CallbackQuery, InputMediaPhoto
 from pyrogram.errors import FloodWait
+from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
 
 import config
 from config import BANNED_USERS
 from strings import command
 from YukkiMusic import Platform, app
 from YukkiMusic.misc import db
-from YukkiMusic.utils import paste, seconds_to_min, get_channeplay_cb
+from YukkiMusic.utils import get_channeplay_cb, paste, seconds_to_min
 from YukkiMusic.utils.database import (
     get_cmode,
     is_active_chat,
     is_music_playing,
 )
-from YukkiMusic.utils.inline.queue import queue_markup, queue_back_markup
 from YukkiMusic.utils.decorators.language import language
-
+from YukkiMusic.utils.inline.queue import queue_back_markup, queue_markup
 
 basic = {}
 

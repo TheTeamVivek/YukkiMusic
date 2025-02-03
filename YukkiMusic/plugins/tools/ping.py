@@ -14,10 +14,10 @@ from pyrogram.types import Message
 from config import BANNED_USERS, PING_IMG_URL
 from strings import command
 from YukkiMusic import app
-from YukkiMusic.utils import bot_sys_stats
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.utils.inline import support_group_markup
+from YukkiMusic.utils import bot_sys_stats
 from YukkiMusic.utils.decorators.language import language
+from YukkiMusic.utils.inline import support_group_markup
 
 
 @app.on_message(command("PING_COMMAND") & ~BANNED_USERS)

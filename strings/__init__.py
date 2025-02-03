@@ -20,7 +20,6 @@ from pyrogram.types import Message
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import get_lang, is_maintenance
 
-
 languages = {}
 languages_present = {}
 

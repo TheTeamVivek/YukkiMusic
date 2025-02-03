@@ -15,12 +15,12 @@ from config import BANNED_USERS, adminlist
 from strings import command
 from YukkiMusic import app
 from YukkiMusic.utils.database import (
-    get_authuser,
-    save_authuser,
     delete_authuser,
+    get_authuser,
     get_authuser_names,
+    save_authuser,
 )
-from YukkiMusic.utils.decorators import language, admin_actual
+from YukkiMusic.utils.decorators import admin_actual, language
 from YukkiMusic.utils.formatters import int_to_alpha
 
 

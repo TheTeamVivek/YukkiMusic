@@ -14,8 +14,8 @@ from pyrogram.types import Message
 from config import BANNED_USERS
 from strings import command
 from YukkiMusic import app
-from YukkiMusic.utils.decorators import admin_rights_check
 from YukkiMusic.utils.database.memorydatabase import get_loop, set_loop
+from YukkiMusic.utils.decorators import admin_rights_check
 
 
 @app.on_message(command("LOOP_COMMAND") & filters.group & ~BANNED_USERS)

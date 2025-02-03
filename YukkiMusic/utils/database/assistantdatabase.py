@@ -16,7 +16,6 @@ from YukkiMusic import userbot
 from YukkiMusic.core.mongo import mongodb
 from YukkiMusic.core.userbot import assistants
 
-
 db = mongodb.assistants
 
 assistantdict = {}

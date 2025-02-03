@@ -18,13 +18,12 @@ from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import (
-    get_lang,
-    get_client,
-    is_autoend,
     get_assistant,
+    get_client,
+    get_lang,
     is_active_chat,
+    is_autoend,
 )
-
 
 autoend = {}
 

@@ -12,8 +12,8 @@ from yt_dlp import YoutubeDL
 
 from YukkiMusic.utils.decorators import asyncify
 
-from .base import PlatformBase
 from ..core.youtube import Track
+from .base import PlatformBase
 
 
 class SoundCloud(PlatformBase):
