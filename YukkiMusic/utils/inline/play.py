@@ -56,9 +56,7 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
             )
         ],
         [
-            Button.inline(
-                text=_["P_B_7"], data=f"add_playlist {videoid}"
-            ),
+            Button.inline(text=_["P_B_7"], data=f"add_playlist {videoid}"),
             Button.inline(
                 text=_["PL_B_3"],
                 data=f"PanelMarkup {videoid}|{chat_id}",
@@ -78,9 +76,7 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
 def stream_markup(_, videoid, chat_id):
     buttons = [
         [
-            Button.inline(
-                text=_["P_B_7"], data=f"add_playlist {videoid}"
-            ),
+            Button.inline(text=_["P_B_7"], data=f"add_playlist {videoid}"),
             Button.inline(
                 text=_["PL_B_3"],
                 data=f"PanelMarkup None|{chat_id}",
@@ -166,11 +162,7 @@ def track_markup(_, videoid, user_id, channel, fplay):
                 data=f"MusicStream {videoid}|{user_id}|v|{channel}|{fplay}",
             ),
         ],
-        [
-            Button.inline(
-                text=_["CLOSE_BUTTON"], data=f"forceclose {videoid}|{user_id}"
-            )
-        ],
+        [Button.inline(text=_["CLOSE_BUTTON"], data=f"forceclose {videoid}|{user_id}")],
     ]
     return buttons
 
@@ -236,9 +228,7 @@ def slider_markup(_, videoid, user_id, query, query_type, channel, fplay):
                 text="❮",
                 data=f"slider B|{query_type}|{query}|{user_id}|{channel}|{fplay}",
             ),
-            Button.inline(
-                text=_["CLOSE_BUTTON"], data=f"forceclose {query}|{user_id}"
-            ),
+            Button.inline(text=_["CLOSE_BUTTON"], data=f"forceclose {query}|{user_id}"),
             Button.inline(
                 text="❯",
                 data=f"slider F|{query_type}|{query}|{user_id}|{channel}|{fplay}",
@@ -251,9 +241,7 @@ def slider_markup(_, videoid, user_id, query, query_type, channel, fplay):
 def panel_markup_1(_, videoid, chat_id):
     buttons = [
         [
-            Button.inline(
-                text="⏸ Pause", data=f"ADMIN Pause|{chat_id}"
-            ),
+            Button.inline(text="⏸ Pause", data=f"ADMIN Pause|{chat_id}"),
             Button.inline(
                 text="▶️ Resume",
                 data=f"ADMIN Resume|{chat_id}",
@@ -264,9 +252,7 @@ def panel_markup_1(_, videoid, chat_id):
             Button.inline(text="⏹ Stop", data=f"ADMIN Stop|{chat_id}"),
         ],
         [
-            Button.inline(
-                text="🔁 Replay ", data=f"ADMIN Replay|{chat_id}"
-            ),
+            Button.inline(text="🔁 Replay ", data=f"ADMIN Replay|{chat_id}"),
         ],
         [
             Button.inline(
