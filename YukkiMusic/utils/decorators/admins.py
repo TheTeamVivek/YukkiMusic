@@ -44,14 +44,14 @@ def admin_rights_check(mystic):
         except Exception:
             _ = get_string("en")
         if not isinstance(event.message.from_id, PeerUser):
-            upl =  [
-                    [
-                        Button.inline(
-                            text="How to Fix this? ",
-                            data="AnonymousAdmin",
-                        ),
-                    ]
+            upl = [
+                [
+                    Button.inline(
+                        text="How to Fix this? ",
+                        data="AnonymousAdmin",
+                    ),
                 ]
+            ]
             return await event.reply(_["general_4"], buttons=upl)
         if event.text.split()[0][0] == "c":
             chat_id = await get_cmode(event.chat_id)
@@ -98,14 +98,14 @@ def admin_actual(mystic):
             _ = get_string("en")
 
         if isinstance(event.message.from_id, PeerUser):
-            upl =  [
-                    [
-                        Button.inline(
-                            text="How to Fix this?",
-                            data="AnonymousAdmin",
-                        ),
-                    ]
+            upl = [
+                [
+                    Button.inline(
+                        text="How to Fix this?",
+                        data="AnonymousAdmin",
+                    ),
                 ]
+            ]
             return await event.reply(_["general_4"], buttons=upl)
 
         if event.sender_id not in SUDOERS:
@@ -118,8 +118,7 @@ def admin_actual(mystic):
                     "ADMIN",
                     "OWNER",
                 ] or (
-                    member.admin_rights is None
-                    or not member.admin_rights.manage_call
+                    member.admin_rights is None or not member.admin_rights.manage_call
                 ):
 
                     return await event.reply(_["general_5"])
@@ -162,8 +161,7 @@ def actual_admin_cb(mystic):
                     "ADMIN",
                     "OWNER",
                 ] or (
-                    member.admin_rights is None
-                    or not member.admin_rights.manage_call
+                    member.admin_rights is None or not member.admin_rights.manage_call
                 ):
                     if event.sender_id not in SUDOERS:
                         token = await int_to_alpha(event.sender_id)
