@@ -23,9 +23,8 @@ load_dotenv()
 #     |_|   \____/|_|\_\_|\_\_____| |_|  |_|\____/|_____/|_____\_____|
 
 
-# To know what each variable does, 
+# To know what each variable does,
 # check out https://theteamvivek.github.io/YukkiMusic/config.html).
-
 
 
 # Necessary Variables
@@ -58,8 +57,8 @@ STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions 
 # Optional But Needed [ You Can Skip ]
 # ------------------------------------
 
-# Your cookies pasted link on batbin.me you xan skip 
-#if you are adding cookies manually in. config/cookies dir
+# Your cookies pasted link on batbin.me you xan skip
+# if you are adding cookies manually in. config/cookies dir
 COOKIE_LINK = getenv("COOKIE_LINK", None)
 
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
