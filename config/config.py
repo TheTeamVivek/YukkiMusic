@@ -15,6 +15,22 @@ from pyrogram import filters
 
 load_dotenv()
 
+#  __     ___    _ _  ___  _______   __  __ _    _  _____ _____ _____
+#  \ \   / / |  | | |/ / |/ /_   _| |  \/  | |  | |/ ____|_   _/ ____|
+#   \ \_/ /| |  | | ' /| ' /  | |   | \  / | |  | | (___   | || |
+#    \   / | |  | |  < |  <   | |   | |\/| | |  | |\___ \  | || |
+#     | |  | |__| | . \| . \ _| |_  | |  | | |__| |____) |_| || |____
+#     |_|   \____/|_|\_\_|\_\_____| |_|  |_|\____/|_____/|_____\_____|
+
+
+# To know what each variable does, 
+# check out https://theteamvivek.github.io/YukkiMusic/config.html).
+
+
+
+# Necessary Variables
+# -------------------
+
 
 # Get it from my.telegram.org
 
@@ -22,28 +38,54 @@ API_ID = int(getenv("API_ID", 0))
 
 API_HASH = getenv("API_HASH")
 
-
 ## Get it from @Botfather in Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
 
+# You'll need a Private Group ID for this.
+LOG_GROUP_ID = getenv("LOG_GROUP_ID", "")
+
+# Your User ID.
+OWNER_ID = list(
+    map(int, getenv("OWNER_ID", "6815918609").split())
+)  # Input type must be interger, Replace 6815918609 it to your own id
+
+# You'll need a Pyrogram String Session for these vars. Generate String from telegram.tools
+
+raw_sessions = getenv("STRING_SESSIONS")
+
+# Split the sessions only if raw_sessions is not empty
+STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions else []
+# Optional But Needed [ You Can Skip ]
+# ------------------------------------
+
+# Your cookies pasted link on batbin.me you xan skip 
+#if you are adding cookies manually in. config/cookies dir
+COOKIE_LINK = getenv("COOKIE_LINK", None)
 
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
+# -------------- |
+# Fully Optional |
+# -------------- |
 
-# paste a batbin url of pasted cookies
-COOKIE_LINK = getenv("COOKIE_LINK", None)
+
+# Set it in True if you want to leave your assistant after a certain amount of time. [Set time via AUTO_LEAVE_ASSISTANT_TIME]
+AUTO_LEAVING_ASSISTANT = getenv("AUTO_LEAVING_ASSISTANT", False)
+
+# Time after which you're assistant account will leave chats automatically.
+AUTO_LEAVE_ASSISTANT_TIME = int(
+    getenv("ASSISTANT_LEAVE_TIME", 5800)
+)  # Remember to give value in Seconds
 
 CLEANMODE_DELETE_MINS = int(
     getenv("CLEANMODE_MINS", 5)
 )  # Remember to give value in Seconds
-
 
 # Custom max audio(music) duration for voice chat. set DURATION_LIMIT in variables with your own time(mins), Default to 60 mins.
 
 DURATION_LIMIT_MIN = int(
     getenv("DURATION_LIMIT", "300")
 )  # Remember to give value in Minutes
-
 
 EXTRA_PLUGINS = getenv("EXTRA_PLUGINS", False)
 
@@ -56,21 +98,14 @@ EXTRA_PLUGINS_REPO = getenv(
 )
 # Fill here the external plugins repo where plugins that you want to load
 
+# Your Github Repo.. Will be shown on /start Command
+GITHUB_REPO = getenv("GITHUB_REPO", None)
 
-# Duration Limit for downloading Songs in MP3 or MP4 format from bot
-SONG_DOWNLOAD_DURATION = int(
-    getenv("SONG_DOWNLOAD_DURATION_LIMIT", "90")
-)  # Remember to give value in Minutes
-
-
-# You'll need a Private Group ID for this.
-LOG_GROUP_ID = getenv("LOG_GROUP_ID", "")
-
-
-# Your User ID.
-OWNER_ID = list(
-    map(int, getenv("OWNER_ID", "6815918609").split())
-)  # Input type must be interger
+# GIT TOKEN ( if your edited repo is private
+GIT_TOKEN = getenv(
+    "GIT_TOKEN",
+    "",
+)
 
 # Get it from http://dashboard.heroku.com/account
 HEROKU_API_KEY = getenv("HEROKU_API_KEY")
@@ -78,41 +113,23 @@ HEROKU_API_KEY = getenv("HEROKU_API_KEY")
 # You have to Enter the app name which you gave to identify your  Music Bot in Heroku.
 HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
 
-
-# For customized or modified Repository
-UPSTREAM_REPO = getenv(
-    "UPSTREAM_REPO",
-    "https://github.com/TheTeamVivek/YukkiMusic",
-)
-UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH", "master")
-
-# GIT TOKEN ( if your edited repo is private)
-GIT_TOKEN = getenv(
-    "GIT_TOKEN",
-    "",
-)
-
-
-# Only  Links formats are  accepted for this Var value.
-SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", None)  # Example:- https://t.me/TheTeamVivek
-SUPPORT_GROUP = getenv("SUPPORT_GROUP", None)  # Example:- https://t.me/TheTeamVk
-
-
-# Set it in True if you want to leave your assistant after a certain amount of time. [Set time via AUTO_LEAVE_ASSISTANT_TIME]
-AUTO_LEAVING_ASSISTANT = getenv("AUTO_LEAVING_ASSISTANT", False)
-
-# Time after which you're assistant account will leave chats automatically.
-AUTO_LEAVE_ASSISTANT_TIME = int(
-    getenv("ASSISTANT_LEAVE_TIME", 5800)
-)  # Remember to give value in Seconds
-
+# MaximuM limit for fetching playlist's track from youtube, spotify, apple links.
+PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", "25"))
 
 # Set it true if you want your bot to be private only [You'll need to allow CHAT_ID via /authorize command then only your bot will play music in that chat.]
 PRIVATE_BOT_MODE = getenv("PRIVATE_BOT_MODE", "False")
 
-# Your Github Repo.. Will be shown on /start Command
-GITHUB_REPO = getenv("GITHUB_REPO", None)
+# If you want your bot to setup the commands automatically in the bot's menu set it to true.
+# Refer to https://i.postimg.cc/Bbg3LQTG/image.png
+SET_CMDS = getenv("SET_CMDS", "False")
 
+# Maximum Limit Allowed for users to save playlists on bot's server
+SERVER_PLAYLIST_LIMIT = int(getenv("SERVER_PLAYLIST_LIMIT", "25"))
+
+# Duration Limit for downloading Songs in MP3 or MP4 format from bot
+SONG_DOWNLOAD_DURATION = int(
+    getenv("SONG_DOWNLOAD_DURATION_LIMIT", "90")
+)  # Remember to give value in Minutes
 
 # Spotify Client.. Get it from https://developer.spotify.com/dashboard
 SPOTIFY_CLIENT_ID = getenv("SPOTIFY_CLIENT_ID", "19609edb1b9f4ed7be0c8c1342039362")
@@ -120,16 +137,9 @@ SPOTIFY_CLIENT_SECRET = getenv(
     "SPOTIFY_CLIENT_SECRET", "409e31d3ddd64af08cfcc3b0f064fcbe"
 )
 
-
-# Maximum number of video calls allowed on bot. You can later set it via /set_video_limit on telegram
-VIDEO_STREAM_LIMIT = int(getenv("VIDEO_STREAM_LIMIT", "10"))
-
-
-# Maximum Limit Allowed for users to save playlists on bot's server
-SERVER_PLAYLIST_LIMIT = int(getenv("SERVER_PLAYLIST_LIMIT", "25"))
-
-# MaximuM limit for fetching playlist's track from youtube, spotify, apple links.
-PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", "25"))
+# Only  Links formats are  accepted for this Var value.
+SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", None)  # Example:- https://t.me/TheTeamVivek
+SUPPORT_GROUP = getenv("SUPPORT_GROUP", None)  # Example:- https://t.me/TheTeamVk
 
 
 # Telegram audio  and video file size limit
@@ -145,41 +155,15 @@ TG_VIDEO_FILESIZE_LIMIT = int(
 # Chceckout https://www.gbmb.org/mb-to-bytes  for converting mb to bytes
 
 
-# If you want your bot to setup the commands automatically in the bot's menu set it to true.
-# Refer to https://i.postimg.cc/Bbg3LQTG/image.png
-SET_CMDS = getenv("SET_CMDS", "False")
+# For customized or modified Repository
+UPSTREAM_REPO = getenv(
+    "UPSTREAM_REPO",
+    "https://github.com/TheTeamVivek/YukkiMusic",
+)
+UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH", "master")
 
-
-# You'll need a Pyrogram String Session for these vars. Generate String from telegram.tools
-
-raw_sessions = getenv("STRING_SESSIONS")
-
-# Split the sessions only if raw_sessions is not empty
-STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions else []
-
-
-#  __     ___    _ _  ___  _______   __  __ _    _  _____ _____ _____
-#  \ \   / / |  | | |/ / |/ /_   _| |  \/  | |  | |/ ____|_   _/ ____|
-#   \ \_/ /| |  | | ' /| ' /  | |   | \  / | |  | | (___   | || |
-#    \   / | |  | |  < |  <   | |   | |\/| | |  | |\___ \  | || |
-#     | |  | |__| | . \| . \ _| |_  | |  | | |__| |____) |_| || |____
-#     |_|   \____/|_|\_\_|\_\_____| |_|  |_|\____/|_____/|_____\_____|
-
-
-### DONT TOUCH or EDIT codes after this line
-BANNED_USERS = filters.user()
-YTDOWNLOADER = 1
-LOG = 2
-LOG_FILE_NAME = "logs.txt"
-TEMP_DB_FOLDER = "tempdb"
-adminlist = {}
-lyrical = {}
-chatstats = {}
-userstats = {}
-clean = {}
-
-autoclean = []
-
+# Maximum number of video calls allowed on bot. You can later set it via /set_video_limit on telegram
+VIDEO_STREAM_LIMIT = int(getenv("VIDEO_STREAM_LIMIT", "10"))
 
 # Images
 
@@ -244,6 +228,21 @@ SPOTIFY_PLAYLIST_IMG_URL = getenv(
     "SPOTIFY_PLAYLIST_IMG_URL",
     "assets/SpotifyPlaylist.jpeg",
 )
+
+
+### DONT TOUCH or EDIT codes after this line
+
+BANNED_USERS = filters.user()
+YTDOWNLOADER = 1
+LOG = 2
+LOG_FILE_NAME = "logs.txt"
+TEMP_DB_FOLDER = "tempdb"
+adminlist = {}
+lyrical = {}
+chatstats = {}
+userstats = {}
+clean = {}
+autoclean = []
 
 
 def time_to_seconds(time):
