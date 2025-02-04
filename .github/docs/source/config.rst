@@ -151,8 +151,12 @@ Optional Variables
       You can use this mode, it enhances your bot's performance 
 
    Set it in **True** if you want to leave your assistant after a certain amount of time.. Default to **False**.
+
+.. _ASSISTANT_LEAVE_TIME:
+
 - ASSISTANT_LEAVE_TIME
    Adding...
+
 .. toctree::
    :maxdepth: 2
    :hidden:
