@@ -44,9 +44,10 @@ async def stream(
     original_chat_id,
     #  video: bool | str = None,
     type: SongType = SongType.AUDIO,  # TODO rename video with  this type
-    #  streamtype: bool | str = None, #TODO remove this Beacuse this was not used
+    #  streamtype: bool | str = None, #TODO remove this Beacuse Track didn't want all tracks instance are same
+
     # spotify: bool | str = None, # Since the tracks are is already and instance of Track so we don't need to this Beacuse the Tracks is already Contains all result of Song
-    forceplay: bool | str = None,  # Can Be Renamed with force
+    forceplay: bool | None = None,
 ):
     if not result:
         return
@@ -57,8 +58,9 @@ async def stream(
         await Yukki.force_stop_stream(chat_id)
     # if streamtype == "playlist":
     if isinstance(
-        result, tracks
-    ):  # TODO YouTube Playlist returns list of vidid but other remains list of song name
+        tracks, list
+    ):  # TODO If YouTube Playlist returns list of vidid but other returns list of song name and can be list of Track
+
         msg = f"{_['playlist_16']}\n\n"
         count = 0
         r = await asyncio.gather(
