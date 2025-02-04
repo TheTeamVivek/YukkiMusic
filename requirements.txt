@@ -10,6 +10,7 @@ httpx[http2]
 kurigram==2.1.37
 lyricsgenius
 motor
+pykeyboard2
 psutil
 pytube
 py-tgcalls
@@ -25,4 +26,3 @@ flask
 gunicorn
 yt-dlp==2025.1.15
 https://github.com/KSKOP69/youtube-search-python/archive/ksk.zip
-git+https://github.com/Vivekkumar-IN/pykeyboard
