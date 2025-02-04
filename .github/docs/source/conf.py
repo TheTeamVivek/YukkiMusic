@@ -27,6 +27,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx.ext.intersphinx",
     "sphinx_reredirects",
+    "sphinx.ext.autosectionlabel",
 ]
 templates_path = ["_templates"]
 exclude_patterns = []
