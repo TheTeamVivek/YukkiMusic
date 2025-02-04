@@ -26,7 +26,7 @@ load_dotenv()
 # To know what each variable does,
 # check out https://theteamvivek.github.io/YukkiMusic/config.html).
 
-
+# -------------------
 # Necessary Variables
 # -------------------
 
@@ -54,6 +54,8 @@ raw_sessions = getenv("STRING_SESSIONS")
 
 # Split the sessions only if raw_sessions is not empty
 STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions else []
+
+# ------------------------------------
 # Optional But Needed [ You Can Skip ]
 # ------------------------------------
 
@@ -63,6 +65,8 @@ COOKIE_LINK = getenv("COOKIE_LINK", None)
 
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
+
+
 # -------------- |
 # Fully Optional |
 # -------------- |
