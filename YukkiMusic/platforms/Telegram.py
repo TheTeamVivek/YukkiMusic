@@ -22,7 +22,6 @@ from pyrogram.types import (
     Voice,
 )
 
-import config
 from config import lyrical
 from YukkiMusic import app
 from YukkiMusic.utils.decorators import asyncify
