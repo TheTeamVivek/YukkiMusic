@@ -45,7 +45,6 @@ async def stream(
     #  video: bool | str = None,
     type: SongType = SongType.AUDIO,  # TODO rename video with  this type
     #  streamtype: bool | str = None, #TODO remove this Beacuse Track didn't want all tracks instance are same
-
     # spotify: bool | str = None, # Since the tracks are is already and instance of Track so we don't need to this Beacuse the Tracks is already Contains all result of Song
     forceplay: bool | None = None,
 ):
