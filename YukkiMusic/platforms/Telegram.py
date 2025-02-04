@@ -35,7 +35,7 @@ downloader = {}
 class Telegram:
     def __init__(self):
         self.chars_limit = 4094
-        self.sleep = config.TELEGRAM_DOWNLOAD_EDIT_SLEEP
+        self.sleep = 3
 
     @asyncify
     def get_url_from_message(self, message_1: Message) -> str | None:
