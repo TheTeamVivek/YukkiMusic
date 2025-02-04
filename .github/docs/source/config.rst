@@ -40,7 +40,7 @@ Here is a List of all Available Vars of `YukkiMusic <https://github.com/TheTeamV
 
 Config vars are basically the variables which configure or modify bot to function, which are the basic necessities of plugins or code to work. You have to set the proper mandatory vars to make it functional and to start the basic feature of bot.
 
-Mandatory Vars
+Necessary Vars
 ^^^^^^^^^^^^^^
 
 - API_ID & API_HASH
@@ -94,7 +94,7 @@ Mandatory Vars
    Like this as your mood you can add multiple String sessions of Your assistant for multiple Assistsant.
 
 - MONGO_DB_URI
-       Not a mandatory var, but yes kind off.
+       Not a Necessary var, but yes kind off.
    .. note::
 
       Yukki no longer requires MONGO DB as mandatory. Leave it blank and bot will use Yukki’s database for your bot. Seperate database and Easy to use.
@@ -104,7 +104,7 @@ Mandatory Vars
 - COOKIE_LINK
    .. important::
 
-      This is **not a mandatory** variable, but it is necessary for the bot to play songs perfectly due to YouTube verification.  
+      This is **not a Necessary** variable, but it is necessary for the bot to play songs perfectly due to YouTube verification.  
 
       Without cookies, the bot may be unable to download songs.  
 
@@ -136,6 +136,21 @@ Mandatory Vars
   
       Don't know how to get cookies? See :doc:`cookies` This properly
 
+
+Optional Variables
+^^^^^^^^^^^^^^^^^^
+
+- AUTO_LEAVING_ASSISTANT
+   .. admonition:: What is This?
+      :class: hint
+
+      Yukki has a feature called auto assistant leaving.
+
+      It leaves assistant accounts from all chats after a certain amount of time. You can set that time via ASSISTANT_LEAVE_TIME
+
+      You can use this mode, it enhances your bot's performance 
+
+   Set it in **True** if you want to leave your assistant after a certain amount of time.. Default to **False**.
 
 .. toctree::
    :maxdepth: 2
