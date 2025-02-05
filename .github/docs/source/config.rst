@@ -22,6 +22,12 @@ Here's an Example of ``sample.env``
       cp sample.env .env
 
 
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+
+   cookies
+
 - Fill in the necessary variables in your ``.env`` :
    - **API_ID**: The API ID obtained from `Telegram <https://my.telegram.org/auth>`_.
    - **API_HASH**: The API hash obtained from `Telegram <https://my.telegram.org/auth>`_.
@@ -168,8 +174,20 @@ Optional Variables
 
       To Use this feature, use :ref:`AUTO_LEAVING_ASSISTANT<auto_leaving_assistant>`. Set it to ``True`` to enable automatic leaving. When set to ``False``, the assistant will remain in served chats indefinitely.
 
-.. toctree::
-   :maxdepth: 2
-   :hidden:
+- CLEANMODE_MINS
+   .. admonition:: What is This?
+      :class: hint
 
-   cookies
+      Cleanmode, that helps Bot can deletes its old messages automatically  in the group after a set period. You can configure the duration here.
+
+   Time (in minutes) after which bot will delete its old messages from chats. **Default to 5 Mins.**
+
+- DURATION_LIMIT_MIN
+   .. admonition:: What is This?
+      :class: hint
+
+      When a user plays any music from youtube , apple , spotify or any platform , it gets downloaded on the bot.  You can restrict users of your bot to play upto a maximum limit of audio duration. 
+
+For example : If ``DURATION_LIMIT`` is 60 mins, so if a user tries to play a movie of 2-3 hours you're bot won't play that.
+
+   Custom max audio(music) duration for voice chat. Default to 60 mins.
