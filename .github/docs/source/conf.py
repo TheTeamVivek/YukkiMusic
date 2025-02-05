@@ -48,7 +48,7 @@ html_static_path = ["_static"]
 html_extra_path = ["_templates"]
 html_favicon = html_static_path[0] + "/TheTeamVivek.ico"
 html_js_files = [
-    'remove_footer.js',
+    "remove_footer.js",
 ]
 
 napoleon_include_special_with_doc = False
