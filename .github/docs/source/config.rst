@@ -140,6 +140,8 @@ Necessary Vars
 Optional Variables
 ^^^^^^^^^^^^^^^^^^
 
+.. _auto_leaving_assistant:
+
 - AUTO_LEAVING_ASSISTANT
    .. admonition:: What is This?
       :class: hint
@@ -156,6 +158,8 @@ Optional Variables
 
 - ASSISTANT_LEAVE_TIME
    Time after which your assistant account will leave served chats automatically. Default to ``1800`` seconds, i.e 30 Mins
+
+   To Use this feature, use :ref:`AUTO_LEAVING_ASSISTANT<auto_leaving_assistant>`. Set it to ``True`` to enable automatic leaving. When set to ``False``, the assistant will remain in served chats indefinitely.
 
 .. toctree::
    :maxdepth: 2
