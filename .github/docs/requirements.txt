@@ -2,4 +2,5 @@ sphinx
 sphinx-rtd-theme
 sphinx-copybutton
 sphinx-reredirects
-sphinx-rtd-dark-mode
+
+git+https://github.com/ViYomX/sphinx_rtd_dark_mode
