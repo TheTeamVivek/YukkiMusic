@@ -1,7 +1,6 @@
 Configuration
 =============
 
-
 Environment Setup
 -----------------
   
