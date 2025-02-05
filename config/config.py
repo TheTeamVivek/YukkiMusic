@@ -81,7 +81,7 @@ AUTO_LEAVE_ASSISTANT_TIME = int(
 )  # Remember to give value in Seconds
 
 CLEANMODE_DELETE_MINS = int(
-    getenv("CLEANMODE_MINS", 5) #TODO MAKE the env or local variable name same
+    getenv("CLEANMODE_MINS", 5)  # TODO MAKE the env or local variable name same
 )  # Remember to give value in Seconds
 
 # Custom max audio(music) duration for voice chat. set DURATION_LIMIT in variables with your own time(mins), Default to 60 mins.
