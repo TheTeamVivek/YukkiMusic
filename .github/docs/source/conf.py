@@ -47,7 +47,7 @@ html_copy_source = False
 html_static_path = ["_static"]
 html_extra_path = ["_templates"]
 html_favicon = html_static_path[0] + "/TheTeamVivek.ico"
-html_js_files = ["remove-footer.js"]
+html_js_files = ["remove_footer.js"]
 
 html_show_sphinx = False
 
