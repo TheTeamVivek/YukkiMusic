@@ -10,7 +10,8 @@ httpx[http2]
 kurigram==2.1.37
 lyricsgenius
 motor
-pykeyboard2
+# pykeyboard2
+pykeyboard
 psutil
 pytube
 py-tgcalls
