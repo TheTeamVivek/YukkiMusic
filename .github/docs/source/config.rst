@@ -188,6 +188,6 @@ Optional Variables
 
       When a user plays any music from youtube , apple , spotify or any platform , it gets downloaded on the bot.  You can restrict users of your bot to play upto a maximum limit of audio duration. 
 
-For example : If ``DURATION_LIMIT`` is 60 mins, so if a user tries to play a movie of 2-3 hours you're bot won't play that.
+      For example : If ``DURATION_LIMIT`` is 60 mins, so if a user tries to play a movie of 2-3 hours you're bot won't play that.
 
    Custom max audio(music) duration for voice chat. Default to 60 mins.
