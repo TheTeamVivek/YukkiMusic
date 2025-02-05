@@ -28,6 +28,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx_reredirects",
     #  "sphinx.ext.autosectionlabel",
+    "sphinx_rtd_dark_mode"
 ]
 templates_path = ["_templates"]
 exclude_patterns = []
