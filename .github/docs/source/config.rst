@@ -93,7 +93,8 @@ Necessary Vars
 
    Like this as your mood you can add multiple String sessions of Your assistant for multiple Assistsant.
 
-.. _Optiona_Variables_recommended
+.. _Optiona_Variables_recommended:
+
 Optional Variables [ Recommended ]
 --------------------------------
 
