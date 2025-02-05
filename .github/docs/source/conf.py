@@ -70,4 +70,5 @@ html_context = {
     "github_repo": "YukkiMusic",
     "github_version": "dev",
     "conf_py_path": "/.github/docs/source/",
+    "copyright": '© Copyright 2024-2025, <a href="https://github.com/TheTeamVivek" target="_blank">TheTeamVivek</a>.'
 }
