@@ -31,14 +31,14 @@ Here's an Example of ``sample.env``
    - **OWNER_ID**: The  User ID That will treated as the Owner of the bot, Multiple Id can be separated with a space.
    - **STRING_SESSIONS**: Your session string (usually generated via a method like Pyrogram) or You can generate from `Telegram Tools <https://telegram.tools/session-string-generator#pyrogram>`_ And make sure you environment is **Production** don't use **Test**.
 
-You also can fill these belows Available Vars 
+You also can fill these :ref:`Optinal  Vars<Optiona_Variables_recommended>`
 
 Available Vars
 --------------
 
 Here is a List of all Available Vars of `YukkiMusic <https://github.com/TheTeamVivek/YukkiMusic>`_.
 
-Config vars are basically the variables which configure or modify bot to function, which are the basic necessities of plugins or code to work. You have to set the proper mandatory vars to make it functional and to start the basic feature of bot.
+Config vars are basically the variables which configure or modify bot to function, which are the basic necessities of plugins or code to work. You have to set the proper Necessary vars to make it functional and to start the basic feature of bot.
 
 Necessary Vars
 ^^^^^^^^^^^^^^
@@ -92,6 +92,10 @@ Necessary Vars
           STRING_SESSIONS = string1,  string2, string3,  string4
 
    Like this as your mood you can add multiple String sessions of Your assistant for multiple Assistsant.
+
+.. _Optiona_Variables_recommended
+Optional Variables [ Recommended ]
+--------------------------------
 
 - MONGO_DB_URI
        Not a Necessary var, but yes kind off.
@@ -159,7 +163,9 @@ Optional Variables
 - ASSISTANT_LEAVE_TIME
    Time after which your assistant account will leave served chats automatically. Default to ``1800`` seconds, i.e 30 Mins
 
-   To Use this feature, use :ref:`AUTO_LEAVING_ASSISTANT<auto_leaving_assistant>`. Set it to ``True`` to enable automatic leaving. When set to ``False``, the assistant will remain in served chats indefinitely.
+   .. note::
+
+      To Use this feature, use :ref:`AUTO_LEAVING_ASSISTANT<auto_leaving_assistant>`. Set it to ``True`` to enable automatic leaving. When set to ``False``, the assistant will remain in served chats indefinitely.
 
 .. toctree::
    :maxdepth: 2
