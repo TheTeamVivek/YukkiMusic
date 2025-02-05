@@ -146,16 +146,16 @@ Optional Variables
 
       Yukki has a feature called auto assistant leaving.
 
-      It leaves assistant accounts from all chats after a certain amount of time. You can set that time :ref:`auto_leave_time` and :ref:`ASSISTANT_LEAVE_TIME<auto_leave_time>`
+      It leaves assistant accounts from all chats after a certain amount of time. You can set that time via  :ref:`ASSISTANT_LEAVE_TIME<assistant_leave_time>`
 
       You can use this mode, it enhances your bot's performance 
 
    Set it in **True** if you want to leave your assistant after a certain amount of time.. Default to **False**.
 
-.. _auto_leave_time:
+.. _assistant_leave_time:
 
 - ASSISTANT_LEAVE_TIME
-   Adding...
+   Time after which your assistant account will leave served chats automatically. Default to ``1800`` seconds, i.e 30 Mins
 
 .. toctree::
    :maxdepth: 2
