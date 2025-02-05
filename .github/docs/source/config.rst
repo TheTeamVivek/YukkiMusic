@@ -96,7 +96,7 @@ Necessary Vars
 .. _Optiona_Variables_recommended:
 
 Optional Variables [ Recommended ]
---------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - MONGO_DB_URI
        Not a Necessary var, but yes kind off.
