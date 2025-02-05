@@ -2,3 +2,4 @@ sphinx
 sphinx-rtd-theme
 sphinx-copybutton
 sphinx-reredirects
+sphinx-rtd-dark-mode
