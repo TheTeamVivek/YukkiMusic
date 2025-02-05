@@ -46,7 +46,8 @@ html_copy_source = False
 html_static_path = ["_static"]
 html_extra_path = ["_templates"]
 html_favicon = html_static_path[0] + "/TheTeamVivek.ico"
-# html_css_files = ["rtd_dark.css"]
+html_css_files = ["custom.css"]
+
 
 html_show_sphinx = False
 
