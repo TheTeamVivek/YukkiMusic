@@ -87,7 +87,7 @@ CLEANMODE_DELETE_MINS = int(
 # Custom max audio(music) duration for voice chat. set DURATION_LIMIT in variables with your own time(mins), Default to 60 mins.
 
 DURATION_LIMIT_MIN = int(
-    getenv("DURATION_LIMIT", "300")
+    getenv("DURATION_LIMIT", 60)
 )  # Remember to give value in Minutes
 
 EXTRA_PLUGINS = getenv("EXTRA_PLUGINS", False)
