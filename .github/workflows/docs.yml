@@ -6,6 +6,7 @@ on:
     - "**.rst"
     - "**.html"
     - "**.css"
+    - "**.js"
     - ".github/workflows/docs.yml"
   workflow_dispatch:
 
