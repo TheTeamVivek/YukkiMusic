@@ -8,8 +8,6 @@
 # All rights reserved.
 #
 
-import json
-import os
 
 from pytgcalls.types import AudioQuality, VideoQuality
 
@@ -247,6 +245,7 @@ async def remove_active_video_chat(chat_id: int):
 
 # Delete command mode
 
+
 async def is_cleanmode_on(chat_id: int) -> bool:
     return chat_id not in cleanmode
 
@@ -271,6 +270,7 @@ async def commanddelete_off(chat_id: int):
 async def commanddelete_on(chat_id: int):
     if chat_id in command:
         command.remove(chat_id)
+
 
 # Non Admin Chat
 async def check_nonadmin_chat(chat_id: int) -> bool:
@@ -413,6 +413,7 @@ async def maintenance_on():
     if is_on:
         return
     return await onoffdb.insert_one({"on_off": 1})
+
 
 async def save_audio_bitrate(chat_id: int, bitrate: str):
     audio[chat_id] = bitrate
