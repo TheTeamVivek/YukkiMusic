@@ -9,8 +9,8 @@
 #
 import asyncio
 import re
-
 from typing import Union
+
 from async_lru import alru_cache
 from youtubesearchpython.__future__ import VideosSearch
 from yt_dlp import YoutubeDL
@@ -123,7 +123,7 @@ class YouTube(YouTubeBase, PlatformBase):
         return formats_available, link
 
     @alru_cache(maxsize=None)
-    async def playlist(self, link, limit, videoid: Union[bool, str] = None):
+    async def playlist(self, link, limit, videoid: bool | str = None):
         if videoid:
             link = self.listbase + link
         if "&" in link:
