@@ -3,10 +3,10 @@ import inspect
 import re
 import traceback
 from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import datetime
 from string import get_string
 from typing import Any
-from dataclasses import dataclass
 
 from telethon import TelegramClient, events
 from telethon.errors import UserNotParticipantError
@@ -39,11 +39,13 @@ from ..logging import logger
 
 log = logger(__name__)
 
+
 @dataclass
 class ShellCommandResult:
     returncode: int
     stdout: str
     stderr: str
+
 
 class TelethonClient(TelegramClient):
     def __init__(self, *args, **kwargs):
