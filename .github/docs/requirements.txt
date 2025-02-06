@@ -4,4 +4,4 @@ sphinx-copybutton
 sphinx-reredirects
 
 git+https://github.com/ViYomX/sphinx_rtd_dark_mode
-aiohhtp
+aiohttp
