@@ -190,7 +190,7 @@ class TelethonClient(TelegramClient):
         async with self.__lock:
             self.__tasks.append((func, args, kwargs))
 
-    async def run_shell_command(self, command: list):
+    async def execute_command(self, command: list):
         process = await asyncio.create_subprocess_exec(
             *command,
             stdout=asyncio.subprocess.PIPE,
