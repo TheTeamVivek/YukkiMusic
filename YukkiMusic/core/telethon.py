@@ -6,6 +6,7 @@ from collections.abc import Callable
 from datetime import datetime
 from string import get_string
 from typing import Any
+from dataclasses import dataclass
 
 from telethon import TelegramClient, events
 from telethon.errors import UserNotParticipantError
@@ -38,6 +39,11 @@ from ..logging import logger
 
 log = logger(__name__)
 
+@dataclass
+class ShellCommandResult:
+    returncode: int
+    stdout: str
+    stderr: str
 
 class TelethonClient(TelegramClient):
     def __init__(self, *args, **kwargs):
@@ -181,3 +187,18 @@ class TelethonClient(TelegramClient):
     async def add_task(self, func: Callable[..., Any], *args, **kwargs):
         async with self.__lock:
             self.__tasks.append((func, args, kwargs))
+
+    async def run_shell_command(self, command: list):
+        process = await asyncio.create_subprocess_exec(
+            *command,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+
+        stdout, stderr = await process.communicate()
+
+        return ShellCommandResult(
+            returncode=process.returncode,
+            stdout=stdout.decode().strip() if stdout else None,
+            stderr=stderr.decode().strip() if stderr else None,
+        )
