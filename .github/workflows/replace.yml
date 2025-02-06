@@ -19,6 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pytubefix
+          python .github/t.py
 
       - name: Replace text
         run: |
@@ -27,16 +28,6 @@ jobs:
 
           find . -type d -name ".git" -prune -o -type f -name "*.py" \
             -exec sed -i "s/\b$FIND_TEXT\b/$REPLACE_TEXT/g" {} +
-
-         # find . -type d -name ".git" -prune -o -type f -name "*.py" \
-         #   -exec sed -i "s/\blanguage_start\b/language(no_check=True)/g" {} +
-          python -C "from pytubefix import YouTube
-from pytubefix.cli import on_progress
-
-url = "url"
-
-yt = YouTube(url, on_progress_callback=on_progress)
-print(yt.title)"
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
