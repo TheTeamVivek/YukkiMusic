@@ -11,7 +11,6 @@ import asyncio
 import re
 
 from async_lru import alru_cache
-from youtubesearchpython.__future__ import VideosSearch
 from yt_dlp import YoutubeDL
 
 from config import cookies
