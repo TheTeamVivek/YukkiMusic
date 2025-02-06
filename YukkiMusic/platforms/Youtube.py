@@ -8,16 +8,13 @@
 # All rights reserved.
 #
 import asyncio
-import os
 import re
 
 from async_lru import alru_cache
 from youtubesearchpython.__future__ import VideosSearch
 from yt_dlp import YoutubeDL
 
-import config
 from config import cookies
-from YukkiMusic.utils.database import is_on_off
 from YukkiMusic.utils.decorators import asyncify
 
 from ..core.youtube import YouTube as YouTubeBase
