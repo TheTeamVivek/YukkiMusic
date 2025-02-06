@@ -90,12 +90,12 @@ class YouTube:
                     thumb=result["thumbnails"][0]["url"].split("?")[0],
                 )
         except Exception:
-            return await YouTube.search_yt_dlp(query)
+            return await YouTube.search_from_ytdlp(query)
 
     @alru_cache(max_size=None)
     @asyncify
     @staticmethod
-    def search_yt_dlp(query) -> Track:
+    def search_from_ytdlp(query) -> Track:
         options = {
             "format": "best",
             "noplaylist": True,
