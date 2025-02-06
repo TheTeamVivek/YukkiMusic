@@ -9,7 +9,6 @@
 #
 import asyncio
 import re
-from typing import Union
 
 from async_lru import alru_cache
 from youtubesearchpython.__future__ import VideosSearch
