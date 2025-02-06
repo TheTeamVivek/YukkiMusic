@@ -19,7 +19,6 @@ from config import cookies
 from YukkiMusic.utils.decorators import asyncify
 
 from ..core.youtube import YouTube as YouTubeBase
-from .base import PlatformBase
 
 
 async def shell_cmd(cmd):
@@ -37,8 +36,9 @@ async def shell_cmd(cmd):
     return out.decode("utf-8")
 
 
-class YouTube(YouTubeBase, PlatformBase):
+class YouTube(YouTubeBase):
     def __init__(self):
+        super.__init__()
         self.base = "https://www.youtube.com/watch?v="
         self.regex = r"(?:youtube\.com|youtu\.be)"
         self.status = "https://www.youtube.com/oembed?url="
