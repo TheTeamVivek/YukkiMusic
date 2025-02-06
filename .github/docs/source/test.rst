@@ -6,6 +6,12 @@ Radhe Radhe
 -----------
 
 
-.. automodule:: telethon.events
+.. automodule:: telethon.events.NewMessage
     :members:
     :undoc-members:
+
+.. automodule:: telethon.events.NewMessage
+    :members:
+
+
+.. automodule:: telethon.events.NewMessage
