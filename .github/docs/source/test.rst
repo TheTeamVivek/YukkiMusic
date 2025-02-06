@@ -6,7 +6,5 @@ Radhe Radhe
 -----------
 
 
-.. automodule:: telethon.client.telegrambaseclient
+.. automodule:: telethon.events
     :members:
-    :undoc-members:
-    :show-inheritance:
