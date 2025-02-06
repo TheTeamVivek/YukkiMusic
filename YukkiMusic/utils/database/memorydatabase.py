@@ -251,7 +251,8 @@ async def is_cleanmode_on(chat_id: int) -> bool:
 
 
 async def cleanmode_off(chat_id: int):
-    cleanmode.append(chat_id)
+    if chat_id in cleanmode:
+        cleanmode.append(chat_id)
 
 
 async def cleanmode_on(chat_id: int):
@@ -264,7 +265,8 @@ async def is_commanddelete_on(chat_id: int) -> bool:
 
 
 async def commanddelete_off(chat_id: int):
-    command.append(chat_id)
+    if chat_id in cleanmode:
+        command.append(chat_id)
 
 
 async def commanddelete_on(chat_id: int):
