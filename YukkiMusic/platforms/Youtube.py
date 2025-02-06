@@ -53,10 +53,8 @@ class YouTube(YouTubeBase):
             link = self.base + link
         if "&" in link:
             link = link.split("&")[0]
-        results = VideosSearch(link, limit=1)
-        for result in (await results.next())["result"]:
-            thumbnail = result["thumbnails"][0]["url"].split("?")[0]
-        return thumbnail
+        results = await self.search(link)
+        return results.thumb
 
     async def video(self, link: str, videoid: bool | str = None):
         if videoid:
