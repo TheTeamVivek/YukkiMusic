@@ -117,24 +117,3 @@ class YouTube:
                 duration=details["duration"],
                 thumb=details["thumbnails"][0]["url"],
             )
-
-    @alru_cache(maxsize=None)
-    async def playlist(self, link, limit, videoid: bool | None = None):
-        if videoid:
-            link = f"https://youtube.com/playlist?list={link}"
-        if "&" in link:
-            link = link.split("&")[0]
-
-        cmd = (
-            f"yt-dlp -i --compat-options no-youtube-unavailable-videos "
-            f'--get-id --flat-playlist --playlist-end {limit} --skip-download "{link}" '
-            f"2>/dev/null"
-        )
-
-        playlist = await tbot.execute(cmd)
-
-        try:
-            result = [key for key in playlist.stdout.split("\n") if key]
-        except Exception:
-            result = []
-        return result
