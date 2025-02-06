@@ -6,7 +6,7 @@ Radhe Radhe
 -----------
 
 
-.. automodule:: YukkiMusic.core.request.Request
+.. automodule:: telethon.client.telegramclient
     :members:
     :undoc-members:
     :show-inheritance:
