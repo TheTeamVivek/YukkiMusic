@@ -138,3 +138,6 @@ class YouTube(YouTubeBase):
         except Exception:
             result = []
         return result
+
+    async def track(self, *a, **k):
+        return await self.search(*a, **k)
