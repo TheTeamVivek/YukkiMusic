@@ -3,10 +3,7 @@ on:
   push:
     paths:
     - "**.py"
-    - "**.rst"
-    - "**.html"
-    - "**.css"
-    - "**.js"
+    - ".github/docs/**"
     - ".github/workflows/docs.yml"
   workflow_dispatch:
 
