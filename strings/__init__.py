@@ -44,6 +44,6 @@ for filename in os.listdir(r"./strings/langs/"):
             languages_present[language_name] = languages[language_name]["name"]
         except KeyError:
             print(
-                "There is an issue with the language file. Please report it to TheTeamvk at @TheTeamvk on Telegram"
+                "There is an issue with the language file. Please report it to Repo owner"
             )
             sys.exit()
