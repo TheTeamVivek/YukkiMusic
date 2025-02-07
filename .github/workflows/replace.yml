@@ -18,9 +18,10 @@ jobs:
 
           find . -type d -name ".git" -prune -o -type f -name "*.py" \
             -exec sed -i "s/\b$FIND_TEXT\b/$REPLACE_TEXT/g" {} +
-          find . -type d -name ".git" -prune -o \( -type f \( -name "*.py" -o -name "*.yml" \) \) \
-            -exec sed -i -e "s/\bP-List\b/PList/g" -e "s/\bG-cast\b/Gcast/g" -e "s/\bB-list\b/BList/g" {} +
-
+          
+          find . -type d \( -name ".git" -o -path "./.github/*" \) -prune -o \
+          \( -type f \( -name "*.py" -o -name "*.yml" \) \) \
+          -exec sed -i -e "s/\bP-List\b/PList/g" -e "s/\bG-cast\b/Gcast/g" -e "s/\bB-list\b/BList/g" {} +
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
