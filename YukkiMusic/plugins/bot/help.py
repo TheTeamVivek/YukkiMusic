@@ -77,7 +77,7 @@ async def format_helper_text(lng, helper_key: str, text: str) -> str:
             _cmd("CHANNELPLAY_COMMAND"),
             _cmd("STREAM_COMMAND"),
         )
-    elif helper_key == "G-cast":
+    elif helper_key == "Gcast":
         return text.format(_cmd("BROADCAST_COMMAND"))
     elif helper_key == "Bot":
         return text.format(
@@ -90,7 +90,7 @@ async def format_helper_text(lng, helper_key: str, text: str) -> str:
             _cmd("UNAUTHORIZE_COMMAND"),
             _cmd("AUTHORIZED_COMMAND"),
         )
-    elif helper_key == "P-List":
+    elif helper_key == "PList":
         return text.format(
             _cmd("PLAYLIST_COMMAND"),
             _cmd("DELETE_PLAYLIST_COMMAND"),
