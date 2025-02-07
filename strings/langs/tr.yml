@@ -491,7 +491,7 @@ Play: |
     <b>✧ {CHANNELPLAY_COMMAND}</b> - Bir kanalı bir gruba bağlayın ve grubunuzdan kanalın sesli sohbetinde müzik yayınlayın.
     <b>✧ {STREAM_COMMAND}</b> - Doğrudan veya m3u8 olduğunu düşündüğünüz ve /play ile çalınamayan bir URL yayınlayın.
 
-G-cast: |
+Gcast: |
     <b>{BROADCAST_COMMAND} [Mesaj veya herhangi bir mesaja yanıt]</b> » Botun hizmet verdiği sohbetlere bir mesaj yayınlayın
     <u>Yayın Modları:</u>
     <b><code>-pin</code></b> » Yayınlanan mesajı hizmet verilen sohbetlerde sabitleyin
@@ -512,13 +512,13 @@ Bot: |
     <b>✧ {UNAUTHORIZE_COMMAND} [CHAT_ID]</b> - Bir sohbetin botunuzu kullanmasını engelleyin.
     <b>✧ {AUTHORIZED_COMMAND}</b> - Botunuzu kullanmasına izin verilen tüm sohbetleri kontrol edin.
 
-P-List: |
+PList: |
     <b>{PLAYLIST_COMMAND}</b> - Bot sunucusunda tüm oynatma listenizi kontrol edin
     <b>{DELETE_PLAYLIST_COMMAND}</b> - Kaydedilmiş oynatma listenizden herhangi bir şarkıyı silin
     <b>{PLAY_PLAYLIST_COMMAND}</b> - Kaydedilmiş oynatma listenizi **ses** olarak çalmaya başlayın
     <b>{PLAY_PLAYLIST_COMMAND}</b> - Oynatma listenizi **video** olarak çalmaya başlayın
 
-B-list: |
+BList: |
     <b>✧ {BLACKLISTCHAT_COMMAND}</b> [chat ID] - Herhangi bir sohbeti Müzik Botunu kullanmaktan engelleyin.
     <b>✧ {WHITELISTCHAT_COMMAND}</b> [chat ID] - Kara listeye alınan herhangi bir sohbetin Müzik Botunu kullanmasına izin verin.
     <b>✧ {BLACKLISTEDCHAT_COMMAND}</b> - Engellenen tüm sohbetleri kontrol edin.

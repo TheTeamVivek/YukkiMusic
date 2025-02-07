@@ -509,7 +509,7 @@ Play: |
     
     <b>✧ {STREAM_COMMAND}</b> - Stream a URL that you believe is direct or m3u8 that can't be played by /play.
 
-G-cast: |
+Gcast: |
     <b>{BROADCAST_COMMAND} [Message or Reply to any message]</b> » Broadcast a message to served chats of bot
     <u>Broadcasting Modes:</u>
     
@@ -544,7 +544,7 @@ Bot: |
     
     <b>✧ {AUTHORIZED_COMMAND}</b> - Check all allowed chats of your bot.
 
-P-List: |
+PList: |
     <b>{PLAYLIST_COMMAND}</b> - Check your whole playlist on the bot server
     
     <b>{DELETE_PLAYLIST_COMMAND}</b> - Delete any song from your saved playlist 
@@ -553,7 +553,7 @@ P-List: |
     
     <b>{PLAY_PLAYLIST_COMMAND}</b> - Start playing your playlist in **video**
 
-B-list: |
+BList: |
     <b>✧ {BLACKLISTCHAT_COMMAND}</b> [chat ID] - Blacklist any chat from using the Music Bot.
     <b>✧ {WHITELISTCHAT_COMMAND}</b> [chat ID] - Whitelist any blacklisted chat from using the Music Bot.
     <b>✧ {BLACKLISTEDCHAT_COMMAND}</b> - Check all blocked chats.

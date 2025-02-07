@@ -97,7 +97,7 @@ async def format_helper_text(lng, helper_key: str, text: str) -> str:
             _cmd("PLAY_PLAYLIST_COMMAND"),
             _cmd("PLAY_PLAYLIST_COMMAND"),
         )
-    elif helper_key == "B-list":
+    elif helper_key == "BList":
         return text.format(
             _cmd("BLACKLISTCHAT_COMMAND"),
             _cmd("WHITELISTCHAT_COMMAND"),

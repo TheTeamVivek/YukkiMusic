@@ -493,7 +493,7 @@ Play: |
     <b>✧ {CHANNELPLAY_COMMAND}</b> - ربط القناة بمجموعة وبث الموسيقى على دردشة القناة الصوتية من مجموعتك.
     <b>✧ {STREAM_COMMAND}</b> - بث URL الذي تعتقد أنه مباشر أو m3u8 لا يمكن تشغيله بواسطة /play.
 
-G-cast: |
+Gcast: |
     <b>{BROADCAST_COMMAND} [رسالة أو الرد على أي رسالة]</b> » بث رسالة إلى الدردشات المقدمة من البوت
     <u>أوضاع البث:</u>
     <b><code>-pin</code></b> » تثبيت الرسالة المذاعة في الدردشات المقدمة
@@ -514,13 +514,13 @@ Bot: |
     <b>✧ {UNAUTHORIZE_COMMAND} [CHAT_ID]</b> - منع الدردشة من استخدام البوت.
     <b>✧ {AUTHORIZED_COMMAND}</b> - التحقق من جميع الدردشات المسموح بها لاستخدام البوت.
 
-P-List: |
+PList: |
     <b>{PLAYLIST_COMMAND}</b> - تحقق من قائمة التشغيل الكاملة الخاصة بك على خادم البوت
     <b>{DELETE_PLAYLIST_COMMAND}</b> - حذف أي أغنية من قائمة التشغيل المحفوظة
     <b>{PLAY_PLAYLIST_COMMAND}</b> - بدء تشغيل قائمة التشغيل المحفوظة الخاصة بك بالصوت
     <b>{PLAY_PLAYLIST_COMMAND}</b> - بدء تشغيل قائمة التشغيل الخاصة بك بالفيديو
 
-B-list: |
+BList: |
     <b>✧ {BLACKLISTCHAT_COMMAND}</b> [chat ID] - منع أي دردشة من استخدام بوت الموسيقى.
     <b>✧ {WHITELISTCHAT_COMMAND}</b> [chat ID] - السماح لأي دردشة محظورة باستخدام بوت الموسيقى.
     <b>✧ {BLACKLISTEDCHAT_COMMAND}</b> - التحقق من جميع الدردشات المحظورة.
