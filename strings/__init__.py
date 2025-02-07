@@ -17,6 +17,7 @@ languages_present = {}
 
 helpers_key = []
 
+
 def load_yaml_file(file_path: str) -> dict:
     with open(file_path, encoding="utf8") as file:
         return yaml.safe_load(file)
