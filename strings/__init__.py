@@ -15,7 +15,7 @@ import yaml
 languages = {}
 languages_present = {}
 
-helpers_key = [G-cast, Dev, B-list, P-List, Bot]
+helpers_key = [G - cast, Dev, B - list, P - List, Bot]
 
 
 def load_yaml_file(file_path: str) -> dict:
