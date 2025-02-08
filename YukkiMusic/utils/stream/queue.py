@@ -9,10 +9,10 @@
 #
 
 
-from config import autoclean, chatstats, userstats
-from config import time_to_seconds
+from config import autoclean, chatstats, time_to_seconds, userstats
+from YukkiMusic.core.youtube import Track  # noqa
 from YukkiMusic.misc import db
-from YukkiMusic.core.youtube import Track # noqa
+
 
 async def put_queue(
     chat_id,
@@ -27,13 +27,13 @@ async def put_queue(
     url: str = None,
     forceplay: bool | str = None,
 ):
-# async def put_queue(
-#     chat_id,
-#     original_chat_id,
-#     user_id,
-#     track: Track,
-#     forceplay: bool | str = None,
-# ):
+    # async def put_queue(
+    #     chat_id,
+    #     original_chat_id,
+    #     user_id,
+    #     track: Track,
+    #     forceplay: bool | str = None,
+    # ):
 
     title = title.title()
     try:
@@ -84,13 +84,13 @@ async def put_queue_index(
     stream,
     forceplay: bool | str = None,
 ):
-# async def put_queue(
-#     chat_id,
-#     original_chat_id,
-#     user_id,
-#     track: Track,
-#     forceplay: bool | str = None,
-# ):
+    # async def put_queue(
+    #     chat_id,
+    #     original_chat_id,
+    #     user_id,
+    #     track: Track,
+    #     forceplay: bool | str = None,
+    # ):
     put = {
         "title": title,
         "dur": duration,
