@@ -83,43 +83,29 @@ class Call:
             for client in userbot.clients
         ]
 
-    async def is_active_chat(self, chat_id: int) -> bool:
-        return bool(chat_id in self.calls)
-
-    async def add_active_chat(self, chat_id: int):
-        if chat_id not in self.calls:
-            self.calls[chat_id] = PlayType.PLAYING
-
-    async def remove_active_chat(self, chat_id: int):
-        if chat_id in self.calls:
-            del self.calls[chat_id]
-
     async def pause_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.pause_stream(chat_id)
-        self.calls[chat_id] = PlayType.PAUSED
+
+    
 
     async def resume_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.resume_stream(chat_id)
-        self.calls[chat_id] = PlayType.PLAYING
 
     async def mute_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.mute_stream(chat_id)
-        self.calls[chat_id] = PlayType.MUTED
 
     async def unmute_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.unmute_stream(chat_id)
-        self.calls[chat_id] = PlayType.PLAYING
 
     async def stop_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         try:
             await _clear_(chat_id)
             await assistant.leave_call(chat_id)
-            del self.calls[chat_id]
         except Exception:
             pass
 
@@ -422,22 +408,22 @@ class Call:
                 try:
                     await client.play(chat_id, stream, config=call_config)
                 except Exception:
-                    return await app.send_message(
+                    return await tbot.send_message(
                         original_chat_id,
-                        text=_["call_7"],
+                        message=_["call_7"],
                     )
                 img = await gen_thumb(videoid)
                 button = telegram_markup(_, chat_id)
-                run = await app.send_photo(
+                run = await tbot.send_file(
                     original_chat_id,
-                    photo=img,
+                    file=img,
                     caption=_["stream_1"].format(
                         title[:27],
                         f"https://t.me/{app.username}?start=info_{videoid}",
                         check[0]["dur"],
                         user,
                     ),
-                    reply_markup=InlineKeyboardMarkup(button),
+                    buttons=button,
                 )
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
@@ -629,8 +615,9 @@ class Call:
                     )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "stream"
-
-    async def ping(self):
+                    # TODO: TOO MANY BRANCHES CLEANUP
+   
+   async def ping(self):
         pings = [client.ping for client in self.clients]
         if pings:
             return str(round(sum(pings) / len(pings), 3))
