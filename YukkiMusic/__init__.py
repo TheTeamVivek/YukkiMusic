@@ -14,7 +14,7 @@ from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
 from YukkiMusic.core.telethon import TelethonClient
 from YukkiMusic.core.userbot import Userbot
-from YukkiMusic.misc import SUDOERS, heroku, sudo
+from YukkiMusic.misc import heroku, sudo
 
 from .logging import logger
 from .platforms import PlatForms
