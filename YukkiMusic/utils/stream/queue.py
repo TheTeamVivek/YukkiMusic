@@ -10,9 +10,9 @@
 
 
 from config import autoclean, chatstats, userstats
-from config.config import time_to_seconds
+from config import time_to_seconds
 from YukkiMusic.misc import db
-
+from YukkiMusic.core.youtube import Track # noqa
 
 async def put_queue(
     chat_id,
@@ -27,6 +27,14 @@ async def put_queue(
     url: str = None,
     forceplay: bool | str = None,
 ):
+# async def put_queue(
+#     chat_id,
+#     original_chat_id,
+#     user_id,
+#     track: Track,
+#     forceplay: bool | str = None,
+# ):
+
     title = title.title()
     try:
         duration_in_seconds = time_to_seconds(duration) - 3
@@ -76,6 +84,13 @@ async def put_queue_index(
     stream,
     forceplay: bool | str = None,
 ):
+# async def put_queue(
+#     chat_id,
+#     original_chat_id,
+#     user_id,
+#     track: Track,
+#     forceplay: bool | str = None,
+# ):
     put = {
         "title": title,
         "dur": duration,
