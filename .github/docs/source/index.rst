@@ -65,11 +65,21 @@ Table of Contents
 
 .. toctree::
    :maxdepth: 2
+   :caption: FAQ
+
+   faq/cookies
+
+.. toctree::
+   :maxdepth: 2
    :caption: Additional Resources
 
    contributors
    CHANGELOG
    PRIVACY
    LICENSE
+
+.. toctree::
+   :maxdepth: 2
+   :caption: FAQ
 
 Happy Streaming! 🎶
