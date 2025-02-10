@@ -617,13 +617,12 @@ class Call:
                     db[chat_id][0]["markup"] = "stream"
                     # TODO: TOO MANY BRANCHES CLEANUP
    
-   async def ping(self):
+    async def ping(self):
         pings = [client.ping for client in self.clients]
         if pings:
             return str(round(sum(pings) / len(pings), 3))
-        else:
-            logger(__name__).error("No active clients for ping calculation.")
-            return "No active clients"
+        logger(__name__).error("No active clients for ping calculation.")
+        raise ValueError("No active clients")
 
     async def start(self):
         """Starts all PyTgCalls instances for the existing userbot clients."""
