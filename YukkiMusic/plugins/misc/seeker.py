@@ -51,38 +51,36 @@ async def timer():
 
 
 async def leave_if_muted():
-    while True:
-        await asyncio.sleep(2)
-        for chat_id, details in list(muted.items()):
-            if time.time() - details["timestamp"] >= 60:
-                _ = details["_"]
+    await asyncio.sleep(2)
+    for chat_id, details in list(muted.items()):
+        if time.time() - details["timestamp"] >= 60:
+            _ = details["_"]
+            try:
+                userbot = await get_assistant(chat_id)
+                members = []
                 try:
-                    userbot = await get_assistant(chat_id)
-                    members = []
-                    try:
-                        async for member in userbot.get_call_members(chat_id):
-                            if member is None:
-                                continue
+                    async for member in userbot.get_call_members(chat_id):
+                        if member is not None:
                             members.append(member)
-                    except ValueError:
-                        try:
-                            await Yukki.stop_stream(chat_id)
-                        except Exception:
-                            pass
-                        continue
-
-                    m = next((m for m in members if m.chat.id == userbot.id), None)
-                    if m is None:
-                        continue
-                    is_muted = bool(m.is_muted and not m.can_self_unmute)
-
-                    if is_muted:
+                except ValueError:
+                    try:
                         await Yukki.stop_stream(chat_id)
-                        await set_loop(chat_id, 0)
+                    except Exception:
+                        pass
+                    continue
 
-                    del muted[chat_id]
-                except Exception:
-                    del muted[chat_id]
+                m = next((m for m in members if m.chat.id == userbot.id), None)
+                if m is None:
+                    continue
+                is_muted = bool(m.is_muted and not m.can_self_unmute)
+
+                if is_muted:
+                    await Yukki.stop_stream(chat_id)
+                    await set_loop(chat_id, 0)
+
+                del muted[chat_id]
+            except Exception:
+                del muted[chat_id]
 
 
 async def markup_timer():
@@ -189,4 +187,3 @@ async def markup_timer():
 
 asyncio.create_task(timer(), name="timer")
 asyncio.create_task(markup_timer(), name="markup_timer")
-asyncio.create_task(leave_if_muted(), name="leave_if_muted")
