@@ -87,8 +87,6 @@ class Call:
         assistant = await group_assistant(self, chat_id)
         await assistant.pause_stream(chat_id)
 
-    
-
     async def resume_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.resume_stream(chat_id)
@@ -616,7 +614,7 @@ class Call:
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "stream"
                     # TODO: TOO MANY BRANCHES CLEANUP
-   
+
     async def ping(self):
         pings = [client.ping for client in self.clients]
         if pings:
