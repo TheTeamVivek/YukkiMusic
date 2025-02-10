@@ -21,13 +21,6 @@ Here's an Example of ``sample.env``
 
       cp sample.env .env
 
-
-.. toctree::
-   :maxdepth: 2
-   :hidden:
-
-   cookies
-
 - Fill in the necessary variables in your ``.env`` :
    - **API_ID**: The API ID obtained from `Telegram <https://my.telegram.org/auth>`_.
    - **API_HASH**: The API hash obtained from `Telegram <https://my.telegram.org/auth>`_.
@@ -101,7 +94,7 @@ Necessary Vars
 
 .. _Optiona_Variables_recommended:
 
-Optional Variables [ Recommended ]
+Optional Variables But  Recommended
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - MONGO_DB_URI
@@ -145,7 +138,7 @@ Optional Variables [ Recommended ]
 
    .. seealso::
   
-      Don't know how to get cookies? See :doc:`cookies` This properly
+      Don't know how to get cookies? See :doc:`faq/cookies` This properly
 
 
 Optional Variables
