@@ -183,7 +183,10 @@ class TelethonClient(TelegramClient):
                 ]
                 self.__tasks.clear()
 
-            await asyncio.gather(*tasks)
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            for r in results:
+                if isinstance(r, Exception):  # Check if the result is an exception
+                    await self.handle_error(r) # Log the error traceback and inform to OWNER
             await asyncio.sleep(0.2)
 
     async def add_task(self, func: Callable[..., Any], *args, **kwargs):
