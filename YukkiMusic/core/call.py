@@ -83,21 +83,37 @@ class Call:
             for client in userbot.clients
         ]
 
+    def _update_status(self, chat_id: int, track_type: SongType = None, state: PlayType = None):
+        if chat_id not in self.calls:
+            self.calls[chat_id] = {}
+
+        if track_type is not None:
+            self.calls[chat_id]["type"] = track_type
+
+        if state is not None:
+            self.calls[chat_id]["state"] = state
+    
     async def pause_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.pause_stream(chat_id)
+        self._update_status(chat_id, state=PlayType.PAUSED)
 
     async def resume_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.resume_stream(chat_id)
+        self._update_status(chat_id, state=PlayType.PLAYING)
 
     async def mute_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.mute_stream(chat_id)
+        self._update_status(chat_id, state=PlayType.MUTED)
+        
 
     async def unmute_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.unmute_stream(chat_id)
+        self._update_status(chat_id, state=PlayType.PLAYING)
+        
 
     async def stop_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
@@ -106,6 +122,11 @@ class Call:
             await assistant.leave_call(chat_id)
         except Exception:
             pass
+        finally:
+            try:
+                del self.calls[chat_id]
+            except Exception:
+                pass
 
     async def force_stop_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
@@ -128,10 +149,8 @@ class Call:
         video: bool | str = None,
         image: bool | str = None,
     ):
-        assistant = await group_assistant(self, chat_id)
         audio_stream_quality = await get_audio_bitrate(chat_id)
         video_stream_quality = await get_video_bitrate(chat_id)
-        call_config = GroupCallConfig(auto_start=False)
         if video:
             stream = MediaStream(
                 link,
@@ -152,13 +171,11 @@ class Call:
                 video_flags=MediaStream.Flags.IGNORE,
             )
 
-        await assistant.play(chat_id, stream, config=call_config)
+        await self.play(chat_id, stream)
 
     async def seek_stream(self, chat_id, file_path, to_seek, duration, mode):
-        assistant = await group_assistant(self, chat_id)
         audio_stream_quality = await get_audio_bitrate(chat_id)
         video_stream_quality = await get_video_bitrate(chat_id)
-        call_config = GroupCallConfig(auto_start=False)
         stream = (
             MediaStream(
                 file_path,
@@ -174,15 +191,12 @@ class Call:
                 video_flags=MediaStream.Flags.IGNORE,
             )
         )
-        await assistant.play(chat_id, stream, config=call_config)
+        await self.play(chat_id, stream)
 
     async def stream_call(self, link):
-        assistant = await group_assistant(self, config.LOG_GROUP_ID)
-        call_config = GroupCallConfig(auto_start=False)
-        await assistant.play(
+        await self.play(
             config.LOG_GROUP_ID,
             MediaStream(link),
-            config=call_config,
         )
         await asyncio.sleep(0.5)
         await assistant.leave_call(config.LOG_GROUP_ID)
@@ -262,6 +276,14 @@ class Call:
         except Exception as e:
             raise AssistantErr(_["call_3"].format(type(e).__name__)) from e
 
+    async def play(self, chat_id, stream = None, config = None, group: bool = True):
+        assistant = await group_assistant(self, chat_id)
+        if group and config is None:
+            config = GroupCallConfig(auto_start=False)
+        await assistant.play(chat_id, stream=stream, config=config)
+        # self._update_status(chat_id, state=PlayType.PLAYING)
+        
+        
     async def join_call(
         self,
         chat_id: int,
@@ -270,10 +292,8 @@ class Call:
         video: bool | str = None,
         image: bool | str = None,
     ):
-        assistant = await group_assistant(self, chat_id)
         audio_stream_quality = await get_audio_bitrate(chat_id)
         video_stream_quality = await get_video_bitrate(chat_id)
-        call_config = GroupCallConfig(auto_start=False)
         if video:
             stream = MediaStream(
                 link,
@@ -295,18 +315,16 @@ class Call:
             )
 
         try:
-            await assistant.play(
+            await self.play(
                 chat_id=chat_id,
                 stream=stream,
-                config=call_config,
             )
         except Exception:
             await self.join_chat(chat_id)
             try:
-                await assistant.play(
+                await self.play(
                     chat_id=chat_id,
                     stream=stream,
-                    config=call_config,
                 )
             except Exception as e:
                 raise AssistantErr(
@@ -331,7 +349,7 @@ class Call:
         if video:
             await add_active_video_chat(chat_id)
 
-    async def change_stream(self, client, chat_id):
+    async def change_stream(self, chat_id):
         check = db.get(chat_id)
         popped = None
         loop = await get_loop(chat_id)
@@ -349,12 +367,10 @@ class Call:
                     except Exception:
                         pass
             if not check:
-                await _clear_(chat_id)
-                return await client.leave_call(chat_id)
+                return await self.stop_stream(chat_id)
         except Exception:
             try:
-                await _clear_(chat_id)
-                return await client.leave_call(chat_id)
+                return await self.stop_stream(chat_id)
             except Exception:
                 return
         else:
@@ -371,7 +387,6 @@ class Call:
             userid = check[0].get("user_id")
             check[0]["played"] = 0
             video = True if str(streamtype) == "video" else False
-            call_config = GroupCallConfig(auto_start=False)
             if "live_" in queued:
                 n, link = await Platform.youtube.video(videoid, True)
                 if n == 0:
@@ -404,7 +419,7 @@ class Call:
                             video_flags=MediaStream.Flags.IGNORE,
                         )
                 try:
-                    await client.play(chat_id, stream, config=call_config)
+                    await self.play(chat_id, stream)
                 except Exception:
                     return await tbot.send_message(
                         original_chat_id,
@@ -463,7 +478,7 @@ class Call:
                             video_flags=MediaStream.Flags.IGNORE,
                         )
                 try:
-                    await client.play(chat_id, stream, config=call_config)
+                    await self.play(chat_id, stream)
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
@@ -500,7 +515,7 @@ class Call:
                     )
                 )
                 try:
-                    await client.play(chat_id, stream, config=call_config)
+                    await self.play(chat_id, stream)
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
@@ -552,7 +567,7 @@ class Call:
                             video_flags=MediaStream.Flags.IGNORE,
                         )
                 try:
-                    await client.play(chat_id, stream, config=call_config)
+                    await self.play(chat_id, stream)
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
@@ -626,6 +641,7 @@ class Call:
         """Starts all PyTgCalls instances for the existing userbot clients."""
         logger(__name__).info("Starting PyTgCall Clients")
         await asyncio.gather(*[client.start() for client in self.clients])
+        await self.decorators()
 
     async def stop(self):
         await asyncio.gather(*[self.stop_stream(chat_id) for chat_id in self.calls])
@@ -641,7 +657,7 @@ class Call:
             async def stream_end_handler(client, update: Update):
                 if not isinstance(update, StreamAudioEnded):
                     return
-                await self.change_stream(client, update.chat_id)
+                await self.change_stream(update.chat_id)
 
 
 Yukki = Call()
