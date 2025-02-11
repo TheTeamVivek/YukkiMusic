@@ -139,7 +139,7 @@ class TelethonClient(TelegramClient):
         self.mention = self.create_mention(me)
         self.name = f"{me.first_name} {me.last_name or ''}".strip()
         asyncio.create_task(self.__task_runner())
-        
+
     def on_message(self, command, **kwargs):
         def decorator(function):
             kwargs["incoming"] = kwargs.get("incoming", True)
@@ -167,7 +167,8 @@ class TelethonClient(TelegramClient):
                 username = re.escape(user.username) if user and user.username else ""
 
                 pattern = re.compile(
-                    rf"^(?:/)?({command_pattern})(?:@{username})?(?:\s|$)", re.IGNORECASE
+                    rf"^(?:/)?({command_pattern})(?:@{username})?(?:\s|$)",
+                    re.IGNORECASE,
                 )
 
                 return bool(re.match(pattern, event.text))
