@@ -83,7 +83,9 @@ class Call:
             for client in userbot.clients
         ]
 
-    def _update_status(self, chat_id: int, track_type: SongType = None, state: PlayType = None):
+    def _update_status(
+        self, chat_id: int, track_type: SongType = None, state: PlayType = None
+    ):
         if chat_id not in self.calls:
             self.calls[chat_id] = {}
 
@@ -92,7 +94,7 @@ class Call:
 
         if state is not None:
             self.calls[chat_id]["state"] = state
-    
+
     async def pause_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.pause_stream(chat_id)
@@ -107,13 +109,11 @@ class Call:
         assistant = await group_assistant(self, chat_id)
         await assistant.mute_stream(chat_id)
         self._update_status(chat_id, state=PlayType.MUTED)
-        
 
     async def unmute_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.unmute_stream(chat_id)
         self._update_status(chat_id, state=PlayType.PLAYING)
-        
 
     async def stop_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
@@ -276,14 +276,13 @@ class Call:
         except Exception as e:
             raise AssistantErr(_["call_3"].format(type(e).__name__)) from e
 
-    async def play(self, chat_id, stream = None, config = None, group: bool = True):
+    async def play(self, chat_id, stream=None, config=None, group: bool = True):
         assistant = await group_assistant(self, chat_id)
         if group and config is None:
             config = GroupCallConfig(auto_start=False)
         await assistant.play(chat_id, stream=stream, config=config)
         # self._update_status(chat_id, state=PlayType.PLAYING)
-        
-        
+
     async def join_call(
         self,
         chat_id: int,
