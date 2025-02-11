@@ -27,8 +27,6 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
     "sphinx.ext.intersphinx",
-    "sphinx_reredirects",
-    "sphinx_rtd_dark_mode",
 ]
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -60,10 +58,6 @@ napoleon_use_param = True
 autodoc_member_order = "groupwise"
 
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
-
-redirects = {
-    "chk": "https://docs.python.org/3",
-}
 
 html_context = {
     "display_github": True,
