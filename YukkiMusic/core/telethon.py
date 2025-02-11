@@ -139,7 +139,7 @@ class TelethonClient(TelegramClient):
         self.mention = self.create_mention(me)
         self.name = f"{me.first_name} {me.last_name or ''}".strip()
         asyncio.create_task(self.__task_runner())
-
+        
     def on_message(self, command, **kwargs):
         def decorator(function):
             kwargs["incoming"] = kwargs.get("incoming", True)
@@ -148,20 +148,28 @@ class TelethonClient(TelegramClient):
             async def custom_func(event):
                 if func and not await self.run_coro(func, event):
                     return False
+
                 if isinstance(command, str):
-                    command = [command]
+                    command_list = [command]
+                else:
+                    command_list = command
+
                 try:
                     lang = await get_lang(event.chat_id)
                     string = get_string(lang)
                 except Exception:
                     string = get_string(lang)
 
-                command = [string[cmd] for cmd in command]
-                command = "|".join([re.escape(cmd) for cmd in command])
-                username = re.escape(self.username)
+                command_list = [string[cmd] for cmd in command_list]
+                command_pattern = "|".join([re.escape(cmd) for cmd in command_list])
+
+                user = await event.client.get_me()
+                username = re.escape(user.username) if user and user.username else ""
+
                 pattern = re.compile(
-                    rf"^(?:/)?({command})(?:@{username})?(?:\s|$)", re.IGNORECASE
+                    rf"^(?:/)?({command_pattern})(?:@{username})?(?:\s|$)", re.IGNORECASE
                 )
+
                 return bool(re.match(pattern, event.text))
 
             kwargs["func"] = custom_func
