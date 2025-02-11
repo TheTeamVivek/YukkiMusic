@@ -24,7 +24,7 @@ async def _clear_(chat_id):
     await remove_active_chat(chat_id)
 
 
-@tbot.on_message(command="ACTIVEVC_COMMAND" , from_users=list(SUDOERS))
+@tbot.on_message(command="ACTIVEVC_COMMAND", from_users=list(SUDOERS))
 async def active_audio(event):
     mystic = await event.reply("Getting Active Voicechats....\nPlease hold on")
     served_chats = await get_active_chats()
@@ -35,12 +35,14 @@ async def active_audio(event):
             chat = await tbot.get_entity(x)
             title = chat.title
             if getattr(chat, "username"):
-                text += f"**{j + 1}.**  [{title}](https://t.me/{chat.username})[`{x}`]\n"
+                text += (
+                    f"**{j + 1}.**  [{title}](https://t.me/{chat.username})[`{x}`]\n"
+                )
             else:
                 text += f"**{j + 1}. {title}** [`{x}`]\n"
             j += 1
         except ValueError as e:
-            await tbot.handle_error(e) # Just for verifying the error
+            await tbot.handle_error(e)  # Just for verifying the error
             # await _clear_(x)
             continue
     if not text:
@@ -52,7 +54,7 @@ async def active_audio(event):
         )
 
 
-@tbot.on_message(command="ACTIVEVIDEO_COMMAND" , from_users=list(SUDOERS))
+@tbot.on_message(command="ACTIVEVIDEO_COMMAND", from_users=list(SUDOERS))
 async def active_video(event):
     mystic = await event.reply("Getting Active Voicechats....\nPlease hold on")
     served_chats = await get_active_video_chats()
@@ -68,7 +70,7 @@ async def active_video(event):
                 text += f"**{j + 1}. {title}** [`{x}`]\n"
             j += 1
         except ValueError:
-          #  await _clear_(x)
+            #  await _clear_(x)
             continue
     if not text:
         await mystic.edit("No active Chats Found")
@@ -79,7 +81,7 @@ async def active_video(event):
         )
 
 
-@tbot.on_message(command="AC_COMMAND" , from_users=list(SUDOERS))
+@tbot.on_message(command="AC_COMMAND", from_users=list(SUDOERS))
 async def ac_counts(event):
     ac_audio = len(await get_active_chats())
     ac_video = len(await get_active_video_chats())
