@@ -39,6 +39,7 @@ async def init():
         pass
     await app.start()
     await tbot.start(bot_token=config.BOT_TOKEN)
+    
     attrs = {"userbot": userbot, "bot": tbot}
     async for mod in app.load_plugins_from("YukkiMusic/plugins", attrs):
         if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
@@ -48,7 +49,7 @@ async def init():
     if config.EXTRA_PLUGINS:
         if os.path.exists("xtraplugins"):
             result = await app.run_shell_command(["git", "-C", "xtraplugins", "pull"])
-            if result["returncode"] != 0:
+            if result.returncode != 0:
                 logger.error(
                     "Error pulling updates for extra plugins:\n %s", result["stderr"]
                 )
@@ -58,14 +59,14 @@ async def init():
             result = await app.run_shell_command(
                 ["git", "clone", config.EXTRA_PLUGINS_REPO, "xtraplugins"]
             )
-            if result["returncode"] != 0:
+            if result.returncode != 0:
                 logger.error("Error cloning extra plugins:\n%s", result["stderr"])
                 sys.exit()
 
         req = os.path.join("xtraplugins", "requirements.txt")
         if os.path.exists(req):
             result = await app.run_shell_command(["pip", "install", "-r", req])
-            if result["returncode"] != 0:
+            if result.returncode != 0:
                 logger.error("Error installing requirements:\n %s", result["stderr"])
 
         async for mod in app.load_plugins_from("xtraplugins", attrs):
@@ -87,12 +88,10 @@ async def init():
             "Please ensure the voice call in your log group is active."
         )
         sys.exit()
-
-    await Yukki.decorators()
     logger("YukkiMusic").info("YukkiMusic Started Successfully")
-    # await idle()
-    # await app.stop()
-    # await userbot.stop()
+    tbot.run_until_disconnected()
+    await app.stop()
+    await userbot.stop()
 
 
 if __name__ == "__main__":
