@@ -13,25 +13,25 @@ from pyrogram.types import Message
 
 from config import BANNED_USERS, PING_IMG_URL
 from strings import command
-from YukkiMusic import app
+from YukkiMusic import tbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils import bot_sys_stats
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline import support_group_markup
 
 
-@app.on_message(command("PING_COMMAND") & ~BANNED_USERS)
+@tbot.on_message(command="PING_COMMAND", func = lambda e: e.sender_id not in BANNED_USERS)
 @language
-async def ping_com(client, message: Message, _):
-    response = await message.reply_photo(
-        photo=PING_IMG_URL,
-        caption=_["ping_1"].format(app.mention),
+async def ping_com(event, _):
+    response = await event.reply(
+        file=PING_IMG_URL,
+        message=_["ping_1"].format(app.mention),
     )
     start = datetime.now()
     pytgping = await Yukki.ping()
     UP, CPU, RAM, DISK = await bot_sys_stats()
     resp = (datetime.now() - start).microseconds / 1000
-    await response.edit_text(
+    await response.edit(
         _["ping_2"].format(
             resp,
             app.mention,
@@ -41,5 +41,5 @@ async def ping_com(client, message: Message, _):
             DISK,
             pytgping,
         ),
-        reply_markup=support_group_markup(_),
+        buttons=support_group_markup(_),
     )
