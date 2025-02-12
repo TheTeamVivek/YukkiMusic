@@ -8,11 +8,9 @@
 # All rights reserved.
 #
 
-import asyncio
 
 from speedtest import Speedtest
 
-from strings import command
 from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS
 
@@ -34,7 +32,7 @@ async def run_speedtest(m):
     return result
 
 
-@tbot.on_message(command="SPEEDTEST_COMMAND", from_users = list(SUDOERS))
+@tbot.on_message(command="SPEEDTEST_COMMAND", from_users=list(SUDOERS))
 async def speedtest_function(event):
     m = await event.reply("Running Speedtest...")
     result = await run_speedtest(m)
@@ -51,8 +49,5 @@ async def speedtest_function(event):
 **Sponsor:** {result['server']['sponsor']}
 **Latency:** {result['server']['latency']}  
 **Ping :** {result['ping']}"""
-        await event.respond(
-            file=result["share"], message=output
-        )
+        await event.respond(file=result["share"], message=output)
         await m.delete()
- 
