@@ -184,3 +184,11 @@ Optional Variables
       For example : If ``DURATION_LIMIT`` is 60 mins, so if a user tries to play a movie of 2-3 hours you're bot won't play that.
 
    Custom max audio(music) duration for voice chat. Default to 60 mins.
+
+- EXTRA_PLUGINS
+   .. admonition:: What is This?
+      :class: hint
+
+      This variable controls whether extra plugins should be loaded by the bot.
+
+   Set ``True`` to enable the extra plugin s, (default: ``False``).
