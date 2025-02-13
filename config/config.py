@@ -64,7 +64,7 @@ STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions 
 # manually in config/cookies dir
 COOKIE_LINK = getenv("COOKIE_LINK", None)
 
-# Database to save your chats and stats... 
+# Database to save your chats and stats...
 # Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
@@ -86,7 +86,6 @@ AUTO_LEAVE_ASSISTANT_TIME = int(
 
 CLEANMODE_DELETE_MINS = int(
     getenv("CLEANMODE_MINS", "5")  #  TODO MAKE the env or local variable name same
-        
 )  # Remember to give value in Seconds
 
 # Custom max audio(music) duration for voice chat.
@@ -127,7 +126,7 @@ HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
 # MaximuM limit for fetching playlist's track from youtube, spotify, apple links.
 PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", "25"))
 
-# Set it true if you want your bot to be private only 
+# Set it true if you want your bot to be private only
 # [You'll need to allow CHAT_ID via /authorize command then only your bot will play music in that chat.]
 PRIVATE_BOT_MODE = is_true(getenv("PRIVATE_BOT_MODE", "False"))
 
