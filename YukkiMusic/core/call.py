@@ -366,12 +366,14 @@ class Call:
                     except Exception:
                         pass
             if not check:
-                return await self.stop_stream(chat_id)
+                await self.stop_stream(chat_id)
+                return
         except Exception:
             try:
-                return await self.stop_stream(chat_id)
+                await self.stop_stream(chat_id)
             except Exception:
-                return
+                pass
+            return
         else:
             queued = check[0]["file"]
             language = await get_lang(chat_id)
@@ -649,11 +651,11 @@ class Call:
         for client in self.clients:
 
             @client.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
-            async def stream_services_handler(client, update):
+            async def stream_services_handler(client, update): # pylint: disable=unused-argument
                 await self.stop_stream(update.chat_id)
 
             @client.on_update(filters.stream_end)
-            async def stream_end_handler(client, update: Update):
+            async def stream_end_handler(client, update: Update): # pylint: disable=unused-argument
                 if not isinstance(update, StreamAudioEnded):
                     return
                 await self.change_stream(update.chat_id)
