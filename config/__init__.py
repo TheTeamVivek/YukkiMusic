@@ -18,15 +18,15 @@ async def fetch_cookies():
     if not COOKIE_LINK:
         return None
     paste_id = COOKIE_LINK.split("/")[-1]
-    url = f"https://batbin.me/raw/{paste_id}"
+    raw_url = f"https://batbin.me/raw/{paste_id}"
     async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
+        async with session.get(raw_url) as response:
             if response.status == 200:
                 raw_content = await response.text()
-                with open("config/cookies/cookies.txt", "w") as file:
+                with open("config/cookies/cookies.txt", "w", encoding="utf-8") as file:
                     file.write(raw_content)
 
-                print(f"Cookies successfully written")
+                print("Cookies successfully written")
             else:
                 print(f"Failed to get the URL. Status code: {response.status}")
 
@@ -41,7 +41,8 @@ def cookies():
     txt_files = [file for file in os.listdir(folder_path) if file.endswith(".txt")]
     if not txt_files:
         raise FileNotFoundError(
-            "No cookies found in the 'cookies' directory. Make sure your cookies are saved as .txt files."
+            "No cookies found in the 'cookies' directory."
+            "Make sure your cookies are saved as .txt files."
         )
 
     random_cookie = random.choice(txt_files)
