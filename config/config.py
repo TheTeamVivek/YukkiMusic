@@ -18,9 +18,10 @@ load_dotenv()
 
 TRUE_VALUES = ("true", "1", "yes")
 
+
 def is_true(value: str) -> bool:
     return value.lower() in TRUE_VALUES
-    
+
 
 # To know what each variable does,
 # check out https://theteamvivek.github.io/YukkiMusic/config.html).
@@ -58,7 +59,7 @@ STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions 
 # Optional But Needed [ You Can Skip ]
 # ------------------------------------
 
-# Your cookies pasted link on batbin.me 
+# Your cookies pasted link on batbin.me
 # you can skip if you are adding cookies
 # manually in config/cookies dir
 COOKIE_LINK = getenv("COOKIE_LINK", None)
@@ -72,11 +73,11 @@ MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 # -------------- |
 
 
-# Set it in True if you want to leave your assistant after 
+# Set it in True if you want to leave your assistant after
 # a certain amount of time. [Set time via AUTO_LEAVE_ASSISTANT_TIME]
 AUTO_LEAVING_ASSISTANT = is_true(getenv("AUTO_LEAVING_ASSISTANT", "False"))
 
-# Time after which you're assistant account 
+# Time after which you're assistant account
 # will leave chats automatically.
 AUTO_LEAVE_ASSISTANT_TIME = int(
     getenv("ASSISTANT_LEAVE_TIME", "1800")
@@ -87,7 +88,7 @@ CLEANMODE_DELETE_MINS = int(
 )  # Remember to give value in Seconds
 
 # Custom max audio(music) duration for voice chat.
-# set DURATION_LIMIT in variables with your own time(mins), 
+# set DURATION_LIMIT in variables with your own time(mins),
 # Default to 60 mins.
 
 DURATION_LIMIT_MIN = int(
@@ -117,7 +118,7 @@ GIT_TOKEN = getenv(
 # Get it from http://dashboard.heroku.com/account
 HEROKU_API_KEY = getenv("HEROKU_API_KEY")
 
-# You have to Enter the app name 
+# You have to Enter the app name
 # which you gave to identify your  Music Bot in Heroku.
 HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
 
