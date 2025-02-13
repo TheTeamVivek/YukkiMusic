@@ -75,8 +75,8 @@ def heroku():
     if is_heroku():
         if config.HEROKU_API_KEY and config.HEROKU_APP_NAME:
             try:
-                heroku = heroku3.from_key(config.HEROKU_API_KEY)
-                HAPP = heroku.app(config.HEROKU_APP_NAME)
+                heroku_cl = heroku3.from_key(config.HEROKU_API_KEY)
+                HAPP = heroku_cl.app(config.HEROKU_APP_NAME)
                 logger(__name__).info("Heroku App Configured")
             except Exception:
                 logger(__name__).warning(
