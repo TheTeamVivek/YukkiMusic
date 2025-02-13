@@ -21,7 +21,7 @@ async def post(url: str, *args, **kwargs):
         return data
 
 
-async def paste(text):  # TODO make the function name in snake_case
+async def paste(text):
     resp = await post(f"{BASE}api/v2/paste", data=text)
     if not resp["success"]:
         return
