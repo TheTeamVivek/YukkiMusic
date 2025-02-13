@@ -204,7 +204,7 @@ class YukkiBot(Client):
             admin_commands, scope=BotCommandScopeAllChatAdministrators()
         )
 
-        LOG_GROUP_ID = (
+        logger_id = (
             f"@{config.LOG_GROUP_ID}"
             if isinstance(config.LOG_GROUP_ID, str)
             and not config.LOG_GROUP_ID.startswith("@")
@@ -216,7 +216,7 @@ class YukkiBot(Client):
                 await self.set_bot_commands(
                     owner_commands,
                     scope=BotCommandScopeChatMember(
-                        chat_id=LOG_GROUP_ID, user_id=owner_id
+                        chat_id=logger_id, user_id=owner_id
                     ),
                 )
                 await self.set_bot_commands(
