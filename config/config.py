@@ -6,6 +6,7 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
+
 import re
 import sys
 from os import getenv
@@ -15,13 +16,11 @@ from pyrogram import filters
 
 load_dotenv()
 
-#  __     ___    _ _  ___  _______   __  __ _    _  _____ _____ _____
-#  \ \   / / |  | | |/ / |/ /_   _| |  \/  | |  | |/ ____|_   _/ ____|
-#   \ \_/ /| |  | | ' /| ' /  | |   | \  / | |  | | (___   | || |
-#    \   / | |  | |  < |  <   | |   | |\/| | |  | |\___ \  | || |
-#     | |  | |__| | . \| . \ _| |_  | |  | | |__| |____) |_| || |____
-#     |_|   \____/|_|\_\_|\_\_____| |_|  |_|\____/|_____/|_____\_____|
+TRUE_VALUES = ("true", "1", "yes")
 
+def is_true(value: str) -> bool:
+    return value.lower() in TRUE_VALUES
+    
 
 # To know what each variable does,
 # check out https://theteamvivek.github.io/YukkiMusic/config.html).
@@ -33,7 +32,7 @@ load_dotenv()
 
 # Get it from my.telegram.org
 
-API_ID = int(getenv("API_ID", 0))
+API_ID = int(getenv("API_ID", "0"))
 
 API_HASH = getenv("API_HASH")
 
@@ -59,8 +58,9 @@ STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions 
 # Optional But Needed [ You Can Skip ]
 # ------------------------------------
 
-# Your cookies pasted link on batbin.me you xan skip
-# if you are adding cookies manually in. config/cookies dir
+# Your cookies pasted link on batbin.me 
+# you can skip if you are adding cookies
+# manually in config/cookies dir
 COOKIE_LINK = getenv("COOKIE_LINK", None)
 
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
@@ -72,25 +72,29 @@ MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 # -------------- |
 
 
-# Set it in True if you want to leave your assistant after a certain amount of time. [Set time via AUTO_LEAVE_ASSISTANT_TIME]
-AUTO_LEAVING_ASSISTANT = getenv("AUTO_LEAVING_ASSISTANT", False)
+# Set it in True if you want to leave your assistant after 
+# a certain amount of time. [Set time via AUTO_LEAVE_ASSISTANT_TIME]
+AUTO_LEAVING_ASSISTANT = is_true(getenv("AUTO_LEAVING_ASSISTANT", "False"))
 
-# Time after which you're assistant account will leave chats automatically.
+# Time after which you're assistant account 
+# will leave chats automatically.
 AUTO_LEAVE_ASSISTANT_TIME = int(
-    getenv("ASSISTANT_LEAVE_TIME", 1800)
+    getenv("ASSISTANT_LEAVE_TIME", "1800")
 )  # Remember to give value in Seconds
 
 CLEANMODE_DELETE_MINS = int(
-    getenv("CLEANMODE_MINS", 5)  # TODO MAKE the env or local variable name same
+    getenv("CLEANMODE_MINS", "5")  # TODO MAKE the env or local variable name same
 )  # Remember to give value in Seconds
 
-# Custom max audio(music) duration for voice chat. set DURATION_LIMIT in variables with your own time(mins), Default to 60 mins.
+# Custom max audio(music) duration for voice chat.
+# set DURATION_LIMIT in variables with your own time(mins), 
+# Default to 60 mins.
 
 DURATION_LIMIT_MIN = int(
-    getenv("DURATION_LIMIT", 60)
+    getenv("DURATION_LIMIT", "60")
 )  # Remember to give value in Minutes
 
-EXTRA_PLUGINS = getenv("EXTRA_PLUGINS", False)
+EXTRA_PLUGINS = is_true(getenv("EXTRA_PLUGINS", "False"))
 
 # Fill False if you Don't want to load extra plugins
 
@@ -113,18 +117,19 @@ GIT_TOKEN = getenv(
 # Get it from http://dashboard.heroku.com/account
 HEROKU_API_KEY = getenv("HEROKU_API_KEY")
 
-# You have to Enter the app name which you gave to identify your  Music Bot in Heroku.
+# You have to Enter the app name 
+# which you gave to identify your  Music Bot in Heroku.
 HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
 
 # MaximuM limit for fetching playlist's track from youtube, spotify, apple links.
 PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", "25"))
 
 # Set it true if you want your bot to be private only [You'll need to allow CHAT_ID via /authorize command then only your bot will play music in that chat.]
-PRIVATE_BOT_MODE = getenv("PRIVATE_BOT_MODE", "False")
+PRIVATE_BOT_MODE = is_true(getenv("PRIVATE_BOT_MODE", "False"))
 
 # If you want your bot to setup the commands automatically in the bot's menu set it to true.
 # Refer to https://i.postimg.cc/Bbg3LQTG/image.png
-SET_CMDS = getenv("SET_CMDS", "False")
+SET_CMDS = is_true(getenv("SET_CMDS", "False"))
 
 # Maximum Limit Allowed for users to save playlists on bot's server
 SERVER_PLAYLIST_LIMIT = int(getenv("SERVER_PLAYLIST_LIMIT", "25"))
