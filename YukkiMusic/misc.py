@@ -58,15 +58,14 @@ else:
         if user_id not in db_sudoers:
             db_sudoers.append(user_id)
             sudoersdb.update_one(
-                    {"sudo": "sudo"},
-                    {"$set": {"sudoers": db_sudoers}},
-                    upsert=True,
-                )
+                {"sudo": "sudo"},
+                {"$set": {"sudoers": db_sudoers}},
+                upsert=True,
+            )
     if db_sudoers:
         for x in db_sudoers:
             SUDOERS.add(x)
 logger(__name__).info("Sudoers Loaded.")
-
 
 
 if is_heroku():
