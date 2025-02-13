@@ -10,7 +10,6 @@
 import os
 import re
 import sys
-
 import yaml
 
 languages = {}
@@ -42,9 +41,9 @@ def replace_helpers(text: str, lang_data: dict) -> str:
     if not isinstance(text, str):
         return text
 
-    for key in helpers_key:
-        pattern = rf"\{{\s*{re.escape(key)}\s*\}}"
-        text = re.sub(pattern, lang_data.get(key, key), text)
+    for helper_key in helpers_key:
+        pattern = rf"\{{\s*{re.escape(helper_key)}\s*\}}"
+        text = re.sub(pattern, lang_data.get(helper_key, helper_key), text)
 
     return text
 
@@ -53,14 +52,13 @@ def update_helpers(data: dict):
     if not isinstance(data, dict):
         return data
 
-    for key, value in data.items():
+    for dict_key, value in data.items():
         if isinstance(value, dict):
-            data[key] = update_helpers(value)
+            data[dict_key] = update_helpers(value)
         elif isinstance(value, str):
-            data[key] = replace_helpers(value, data)
+            data[dict_key] = replace_helpers(value, data)
 
     return data
-
 
 if "en" not in languages:
     languages["en"] = load_yaml(r"./strings/langs/en.yml")
