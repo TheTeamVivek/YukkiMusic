@@ -10,6 +10,7 @@
 import os
 import re
 import sys
+
 import yaml
 
 languages = {}
@@ -59,6 +60,7 @@ def update_helpers(data: dict):
             data[dict_key] = replace_helpers(value, data)
 
     return data
+
 
 if "en" not in languages:
     languages["en"] = load_yaml(r"./strings/langs/en.yml")
