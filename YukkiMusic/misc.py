@@ -44,42 +44,39 @@ XCB = [
 ]
 
 
-def sudo():
-    sudoers = filters.user()
-    owner = config.OWNER_ID
-    if config.MONGO_DB_URI is None:
-        for user_id in owner:
-            sudoers.add(user_id)
-    else:
-        sudoersdb = pymongodb.sudoers
-        db_sudoers = sudoersdb.find_one({"sudo": "sudo"})
-        db_sudoers = [] if not db_sudoers else db_sudoers["sudoers"]
-        for user_id in owner:
-            sudoers.add(user_id)
-            if user_id not in db_sudoers:
-                db_sudoers.append(user_id)
-                sudoersdb.update_one(
+SUDOERS = filters.user()
+owner = config.OWNER_ID
+if config.MONGO_DB_URI is None:
+    for user_id in config.OWNER_ID:
+        SUDOERS.add(user_id)
+else:
+    sudoersdb = pymongodb.sudoers
+    db_sudoers = sudoersdb.find_one({"sudo": "sudo"})
+    db_sudoers = [] if not db_sudoers else db_sudoers["sudoers"]
+    for user_id in owner:
+        SUDOERS.add(user_id)
+        if user_id not in db_sudoers:
+            db_sudoers.append(user_id)
+            sudoersdb.update_one(
                     {"sudo": "sudo"},
                     {"$set": {"sudoers": db_sudoers}},
                     upsert=True,
                 )
-        if db_sudoers:
-            for x in db_sudoers:
-                sudoers.add(x)
-    logger(__name__).info("Sudoers Loaded.")
-    return sudoers
+    if db_sudoers:
+        for x in db_sudoers:
+            SUDOERS.add(x)
+logger(__name__).info("Sudoers Loaded.")
 
 
-def heroku():
-    global HAPP
-    if is_heroku():
-        if config.HEROKU_API_KEY and config.HEROKU_APP_NAME:
-            try:
-                heroku_cl = heroku3.from_key(config.HEROKU_API_KEY)
-                HAPP = heroku_cl.app(config.HEROKU_APP_NAME)
-                logger(__name__).info("Heroku App Configured")
-            except Exception:
-                logger(__name__).warning(
-                    "Please make sure your Heroku API Key and "
-                    "Your App name are configured correctly in the heroku."
-                )
+
+if is_heroku():
+    if config.HEROKU_API_KEY and config.HEROKU_APP_NAME:
+        try:
+            heroku_cl = heroku3.from_key(config.HEROKU_API_KEY)
+            HAPP = heroku_cl.app(config.HEROKU_APP_NAME)
+            logger(__name__).info("Heroku App Configured")
+        except Exception:
+            logger(__name__).warning(
+                "Please make sure your Heroku API Key and "
+                "Your App name are configured correctly in the heroku."
+            )
