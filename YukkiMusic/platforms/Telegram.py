@@ -230,7 +230,7 @@ class Telegram:
                 eta = get_readable_time(low)
             except Exception:
                 eta = "Unknown"
-            await mystic.edit_text(_["tg_1"].format(eta))
+            await mystic.edit_text(_["OVERLOAD_WAIT_MSG"].format(eta))
             return False
 
         task = asyncio.create_task(down_load(), name=f"download_{message.chat.id}")

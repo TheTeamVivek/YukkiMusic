@@ -9,7 +9,7 @@ general_5 : "Bu işlemi gerçekleştirmek için **video sohbeti yönet** haklar�
 general_6 : "Bot şu anda video sohbetinde yayın yapmıyor."
 
 # Classes - Telegram.py
-tg_1 : "Bot şu anda **indirmelerle aşırı yüklü**.\n\n**Tekrar deneyin:** {0} (__beklenen zaman__)"
+OVERLOAD_WAIT_MSG : "Bot şu anda **indirmelerle aşırı yüklü**.\n\n**Tekrar deneyin:** {0} (__beklenen zaman__)"
 tg_2 : "Telegram'dan medyayı indirme başarısız oldu."
 
 # Core - Call.py
