@@ -13,8 +13,8 @@ jobs:
 
       - name: Replace text
         run: |
-          FIND_TEXT="tg_2"
-          REPLACE_TEXT="DOWNLOAD_FAILED_MSG"
+          FIND_TEXT="general_3"
+          REPLACE_TEXT="ERROR_OCCURRED_MSG"
 
           #find . -type d -name ".git" -prune -o -type f -name "*.py" \
           #  -exec sed -i "s/\b$FIND_TEXT\b/$REPLACE_TEXT/g" {} +
