@@ -52,7 +52,7 @@ def admin_rights_check(mystic):
                     ),
                 ]
             ]
-            return await event.reply(_["general_4"], buttons=upl)
+            return await event.reply(_["ANONYMOUS_ADMIN"], buttons=upl)
         if event.text.split()[0][0] == "c":
             chat_id = await get_cmode(event.chat_id)
             if chat_id is None:
@@ -64,7 +64,7 @@ def admin_rights_check(mystic):
         else:
             chat_id = event.chat_id
         if not await is_active_chat(chat_id):
-            return await event.reply(_["general_6"])
+            return await event.reply(_["NO_ACTIVE_VIDEO_STREAM"])
         is_non_admin = await is_nonadmin_chat(event.chat_id)
         if not is_non_admin:
             if event.sender_id not in SUDOERS:
@@ -106,7 +106,7 @@ def admin_actual(mystic):
                     ),
                 ]
             ]
-            return await event.reply(_["general_4"], buttons=upl)
+            return await event.reply(_["ANONYMOUS_ADMIN"], buttons=upl)
 
         if event.sender_id not in SUDOERS:
             try:
@@ -121,7 +121,7 @@ def admin_actual(mystic):
                     member.admin_rights is None or not member.admin_rights.manage_call
                 ):
 
-                    return await event.reply(_["general_5"])
+                    return await event.reply(_["PERMISSION_REQUIRED"])
 
             except Exception as e:
                 return await event.reply(f"Error: {str(e)}")
@@ -168,7 +168,7 @@ def actual_admin_cb(mystic):
                         _check = await get_authuser_names(event.sender_id)
                         if token not in _check:
                             return await query.answer(
-                                _["general_5"],
+                                _["PERMISSION_REQUIRED"],
                                 alert=True,
                             )
 

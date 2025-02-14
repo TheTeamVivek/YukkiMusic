@@ -1,12 +1,12 @@
 name : 🏴󠁧󠁢󠁥󠁮󠁧󠁿 English
 
 # General Strings
-general_1 : "🔄 Reply to a user's message or give username/user_id."
-general_2 : "❌ Error! Wrong usage of command."
+USER_IDENTIFIER_REQUIRED : "🔄 Reply to a user's message or give username/user_id."
+COMMAND_USAGE_ERROR : "❌ Error! Wrong usage of command."
 ERROR_OCCURRED_MSG : "⚠️ Some **exception occurred** while processing your query.\n\nException type: {0}"
-general_4 : "👤 You're an anonymous admin in this chat group!\nRevert back to user account for admin rights."
-general_5 : "🔑 You need to be an admin with **manage video chat** rights to perform this action."
-general_6 : "📺 Bot isn't streaming on video chat."
+ANONYMOUS_ADMIN : "👤 You're an anonymous admin in this chat group!\nRevert back to user account for admin rights."
+PERMISSION_REQUIRED : "🔑 You need to be an admin with **manage video chat** rights to perform this action."
+NO_ACTIVE_VIDEO_STREAM : "📺 Bot isn't streaming on video chat."
 
 # Classes - Telegram.py
 OVERLOAD_WAIT_MSG : "⚠️ Bot is **overloaded** with downloads right now.\n\n**Try after:** {0} (__expected time__)"

@@ -1,12 +1,12 @@
 name: 🇹🇷 Turkish
 
 # General Strings
-general_1 : "Bir kullanıcının mesajına yanıt verin veya kullanıcı adı/kullanıcı kimliği girin."
-general_2 : "Hata! Komut yanlış kullanıldı."
+USER_IDENTIFIER_REQUIRED : "Bir kullanıcının mesajına yanıt verin veya kullanıcı adı/kullanıcı kimliği girin."
+COMMAND_USAGE_ERROR : "Hata! Komut yanlış kullanıldı."
 ERROR_OCCURRED_MSG : "Sorgunuzu işlerken bir **istisna oluştu**.\n\nİstisna türü: {0}"
-general_4 : "Bu sohbet grubunda anonim bir yöneticisiniz!\nYönetici hakları için kullanıcı hesabına geri dönün."
-general_5 : "Bu işlemi gerçekleştirmek için **video sohbeti yönet** haklarına sahip yönetici olmanız gerekir."
-general_6 : "Bot şu anda video sohbetinde yayın yapmıyor."
+ANONYMOUS_ADMIN : "Bu sohbet grubunda anonim bir yöneticisiniz!\nYönetici hakları için kullanıcı hesabına geri dönün."
+PERMISSION_REQUIRED : "Bu işlemi gerçekleştirmek için **video sohbeti yönet** haklarına sahip yönetici olmanız gerekir."
+NO_ACTIVE_VIDEO_STREAM : "Bot şu anda video sohbetinde yayın yapmıyor."
 
 # Classes - Telegram.py
 OVERLOAD_WAIT_MSG : "Bot şu anda **indirmelerle aşırı yüklü**.\n\n**Tekrar deneyin:** {0} (__beklenen zaman__)"

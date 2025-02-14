@@ -34,7 +34,7 @@ from YukkiMusic.utils.decorators.language import language
 async def gbanuser(client, message: Message, _):
     if not message.reply_to_message:
         if len(message.command) != 2:
-            return await message.reply_text(_["general_1"])
+            return await message.reply_text(_["USER_IDENTIFIER_REQUIRED"])
         user = message.text.split(None, 1)[1]
         user = await app.get_users(user)
         user_id = user.id
@@ -79,7 +79,7 @@ async def gbanuser(client, message: Message, _):
 async def gungabn(client, message: Message, _):
     if not message.reply_to_message:
         if len(message.command) != 2:
-            return await message.reply_text(_["general_1"])
+            return await message.reply_text(_["USER_IDENTIFIER_REQUIRED"])
         user = message.text.split(None, 1)[1]
         user = await app.get_users(user)
         user_id = user.id

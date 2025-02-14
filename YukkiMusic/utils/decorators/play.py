@@ -47,7 +47,7 @@ def play_wrapper(command):
                     ]
                 ]
             )
-            return await message.reply_text(_["general_4"], reply_markup=upl)
+            return await message.reply_text(_["ANONYMOUS_ADMIN"], reply_markup=upl)
 
         if await is_maintenance() is False:
             if message.from_user.id not in SUDOERS:

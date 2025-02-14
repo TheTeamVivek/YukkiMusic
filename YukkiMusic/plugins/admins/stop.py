@@ -64,7 +64,7 @@ async def stop_music(cli, message: Message):
                 ]
             ]
         )
-        return await message.reply_text(_["general_4"], reply_markup=upl)
+        return await message.reply_text(_["ANONYMOUS_ADMIN"], reply_markup=upl)
 
     if message.command[0][0] == "c":
         chat_id = await get_cmode(message.chat.id)
@@ -77,7 +77,7 @@ async def stop_music(cli, message: Message):
     else:
         chat_id = message.chat.id
     if not await is_active_chat(chat_id):
-        return await message.reply_text(_["general_6"])
+        return await message.reply_text(_["NO_ACTIVE_VIDEO_STREAM"])
     is_non_admin = await is_nonadmin_chat(message.chat.id)
     if not is_non_admin:
         if message.from_user.id not in SUDOERS:

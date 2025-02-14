@@ -23,7 +23,7 @@ from YukkiMusic.utils.decorators import admin_rights_check
 @admin_rights_check
 async def pause_admin(cli, message: Message, _, chat_id):
     if not len(message.command) == 1:
-        return await message.reply_text(_["general_2"])
+        return await message.reply_text(_["COMMAND_USAGE_ERROR"])
     if not await is_music_playing(chat_id):
         return await message.reply_text(_["admin_1"])
     await music_off(chat_id)

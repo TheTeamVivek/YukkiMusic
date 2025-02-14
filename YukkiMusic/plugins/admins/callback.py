@@ -140,7 +140,7 @@ async def admin_callback(client, CallbackQuery, _):
     command, chat = callback_request.split("|")
     chat_id = int(chat)
     if not await is_active_chat(chat_id):
-        return await CallbackQuery.answer(_["general_6"], show_alert=True)
+        return await CallbackQuery.answer(_["NO_ACTIVE_VIDEO_STREAM"], show_alert=True)
     mention = CallbackQuery.from_user.mention
     is_non_admin = await is_nonadmin_chat(CallbackQuery.message.chat.id)
     if not is_non_admin:
