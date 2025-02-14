@@ -10,7 +10,7 @@ general_6 : "📺 Bot isn't streaming on video chat."
 
 # Classes - Telegram.py
 OVERLOAD_WAIT_MSG : "⚠️ Bot is **overloaded** with downloads right now.\n\n**Try after:** {0} (__expected time__)"
-tg_2 : "❌ Failed to download the media from Telegram."
+DOWNLOAD_FAILED_MSG : "❌ Failed to download the media from Telegram."
 
 # Core - Call.py
 call_1 : "🤖 Bot requires **admin** permission to invite assistant account to your channel."

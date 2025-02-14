@@ -10,7 +10,7 @@ general_6 : "Bot şu anda video sohbetinde yayın yapmıyor."
 
 # Classes - Telegram.py
 OVERLOAD_WAIT_MSG : "Bot şu anda **indirmelerle aşırı yüklü**.\n\n**Tekrar deneyin:** {0} (__beklenen zaman__)"
-tg_2 : "Telegram'dan medyayı indirme başarısız oldu."
+DOWNLOAD_FAILED_MSG : "Telegram'dan medyayı indirme başarısız oldu."
 
 # Core - Call.py
 call_1 : "Bot, asistan hesabını kanalınıza davet etmek için **yönetici** iznine ihtiyaç duyar."
