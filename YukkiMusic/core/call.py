@@ -212,9 +212,9 @@ class Call:
         try:
             chat = await tbot.get_entity(chat_id)
         except ChatAdminRequiredError as e:
-            raise AssistantErr(_["call_1"]) from e
+            raise AssistantErr(_["BOT_ADMIN_REQUIRED"]) from e
         except Exception as e:
-            raise AssistantErr(_["call_3"].format(app.mention, type(e).__name__)) from e
+            raise AssistantErr(_["ASSISTANT_INVITE_EXCEPTION"].format(app.mention, type(e).__name__)) from e
         if chat_id in links:
             invitelink = links[chat_id]
         else:
@@ -231,10 +231,10 @@ class Call:
                     )
                     invitelink = invitelink.link
                 except ChatAdminRequiredError as e:
-                    raise AssistantErr(_["call_1"]) from e
+                    raise AssistantErr(_["BOT_ADMIN_REQUIRED"]) from e
                 except Exception as e:
                     raise AssistantErr(
-                        _["call_3"].format(app.mention, type(e).__name__)
+                        _["ASSISTANT_INVITE_EXCEPTION"].format(app.mention, type(e).__name__)
                     ) from e
 
             if invitelink.startswith("https://t.me/+"):
@@ -250,9 +250,9 @@ class Call:
             try:
                 await tbot(HideChatJoinRequestRequest(chat_id, userbot.id))
             except Exception as e:
-                raise AssistantErr(_["call_3"].format(type(e).__name__)) from e
+                raise AssistantErr(_["ASSISTANT_INVITE_EXCEPTION"].format(type(e).__name__)) from e
             await asyncio.sleep(1)
-            raise AssistantErr(_["call_6"].format(app.mention))
+            raise AssistantErr(_["ASSISTANT_JOIN_SUCCESS"].format(app.mention))
         except UserAlreadyParticipant:
             pass
         except ChannelsTooMuch as e:
@@ -260,7 +260,7 @@ class Call:
                 attempts += 1
                 userbot = await set_assistant(chat_id)
                 return await self.join_chat(chat_id, attempts)
-            raise AssistantErr(_["call_9"].format(config.SUPPORT_GROUP)) from e
+            raise AssistantErr(_["ASSISTANT_TOO_MANY_CHATS"].format(config.SUPPORT_GROUP)) from e
         except FloodWait as e:
             time = e.value
             if time < 20:
@@ -272,9 +272,9 @@ class Call:
                 userbot = await set_assistant(chat_id)
                 return await self.join_chat(chat_id, attempts)
 
-            raise AssistantErr(_["call_10"].format(time)) from e
+            raise AssistantErr(_["ASSISTANT_FLOOD_WAIT"].format(time)) from e
         except Exception as e:
-            raise AssistantErr(_["call_3"].format(type(e).__name__)) from e
+            raise AssistantErr(_["ASSISTANT_INVITE_EXCEPTION"].format(type(e).__name__)) from e
 
     async def play(self, chat_id, stream=None, config=None, group: bool = True):
         assistant = await group_assistant(self, chat_id)
@@ -393,7 +393,7 @@ class Call:
                 if n == 0:
                     return await app.send_message(
                         original_chat_id,
-                        text=_["call_7"],
+                        text=_["STREAM_SWITCH_FAILED"],
                     )
                 if video:
                     stream = MediaStream(
@@ -424,7 +424,7 @@ class Call:
                 except Exception:
                     return await tbot.send_message(
                         original_chat_id,
-                        message=_["call_7"],
+                        message=_["STREAM_SWITCH_FAILED"],
                     )
                 img = await gen_thumb(videoid)
                 button = telegram_markup(_, chat_id)
@@ -442,7 +442,7 @@ class Call:
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
             elif "vid_" in queued:
-                mystic = await app.send_message(original_chat_id, _["call_8"])
+                mystic = await app.send_message(original_chat_id, _["DOWNLOADING_NEXT_TRACK"])
                 try:
                     file_path, direct = await Platform.youtube.download(
                         videoid,
@@ -452,7 +452,7 @@ class Call:
                     )
                 except Exception:
                     return await mystic.edit_text(
-                        _["call_7"], disable_web_page_preview=True
+                        _["STREAM_SWITCH_FAILED"], disable_web_page_preview=True
                     )
                 if video:
                     stream = MediaStream(
@@ -483,7 +483,7 @@ class Call:
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
-                        text=_["call_7"],
+                        text=_["STREAM_SWITCH_FAILED"],
                     )
                 img = await gen_thumb(videoid)
                 button = stream_markup(_, videoid, chat_id)
@@ -520,7 +520,7 @@ class Call:
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
-                        text=_["call_7"],
+                        text=_["STREAM_SWITCH_FAILED"],
                     )
                 button = telegram_markup(_, chat_id)
                 run = await app.send_photo(
@@ -572,7 +572,7 @@ class Call:
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
-                        text=_["call_7"],
+                        text=_["STREAM_SWITCH_FAILED"],
                     )
                 if videoid == "telegram":
                     button = telegram_markup(_, chat_id)

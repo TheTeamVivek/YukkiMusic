@@ -268,7 +268,7 @@ async def admin_callback(client, CallbackQuery, _):
             try:
                 await Yukki.skip_stream(chat_id, link, video=status)
             except Exception:
-                return await CallbackQuery.message.reply_text(_["call_7"])
+                return await CallbackQuery.message.reply_text(_["STREAM_SWITCH_FAILED"])
             button = telegram_markup(_, chat_id)
             img = await gen_thumb(videoid)
             run = await CallbackQuery.message.reply_photo(
@@ -284,7 +284,7 @@ async def admin_callback(client, CallbackQuery, _):
             await CallbackQuery.edit_message_text(txt)
         elif "vid_" in queued:
             mystic = await CallbackQuery.message.reply_text(
-                _["call_8"], disable_web_page_preview=True
+                _["DOWNLOADING_NEXT_TRACK"], disable_web_page_preview=True
             )
             try:
                 file_path, direct = await Platform.youtube.download(
@@ -294,11 +294,11 @@ async def admin_callback(client, CallbackQuery, _):
                     video=status,
                 )
             except Exception:
-                return await mystic.edit_text(_["call_7"])
+                return await mystic.edit_text(_["STREAM_SWITCH_FAILED"])
             try:
                 await Yukki.skip_stream(chat_id, file_path, video=status)
             except Exception:
-                return await mystic.edit_text(_["call_7"])
+                return await mystic.edit_text(_["STREAM_SWITCH_FAILED"])
             button = stream_markup(_, videoid, chat_id)
             img = await gen_thumb(videoid)
             run = await CallbackQuery.message.reply_photo(
@@ -319,7 +319,7 @@ async def admin_callback(client, CallbackQuery, _):
             try:
                 await Yukki.skip_stream(chat_id, videoid, video=status)
             except Exception:
-                return await CallbackQuery.message.reply_text(_["call_7"])
+                return await CallbackQuery.message.reply_text(_["STREAM_SWITCH_FAILED"])
             button = telegram_markup(_, chat_id)
             run = await CallbackQuery.message.reply_photo(
                 photo=STREAM_IMG_URL,
@@ -333,7 +333,7 @@ async def admin_callback(client, CallbackQuery, _):
             try:
                 await Yukki.skip_stream(chat_id, queued, video=status)
             except Exception:
-                return await CallbackQuery.message.reply_text(_["call_7"])
+                return await CallbackQuery.message.reply_text(_["STREAM_SWITCH_FAILED"])
             if videoid == "telegram":
                 button = telegram_markup(_, chat_id)
                 run = await CallbackQuery.message.reply_photo(

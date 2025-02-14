@@ -13,16 +13,16 @@ OVERLOAD_WAIT_MSG : "Bot şu anda **indirmelerle aşırı yüklü**.\n\n**Tekrar
 DOWNLOAD_FAILED_MSG : "Telegram'dan medyayı indirme başarısız oldu."
 
 # Core - Call.py
-call_1 : "Bot, asistan hesabını kanalınıza davet etmek için **yönetici** iznine ihtiyaç duyar."
-call_2 : "Asistan grubunuzda veya kanalınızda yasaklanmış\nLütfen yasağı kaldırın ve şarkıyı tekrar çalın\n\n**Asistan kullanıcı adı:** @{0}\n**Asistan kimliği:** {1}"
-call_3 : "Asistan hesabını davet ederken bir istisna oluştu.\n\n**Sebep**: {0}"
-call_4 : "Bot, asistan hesabını sohbet grubunuza davet etmek için **kullanıcıları bağlantı ile davet et** iznine ihtiyaç duyar."
-call_5 : "Asistan hesabı 5 saniye içinde katılacak, lütfen bekleyin..."
-call_6 : "{0} asistan hesabı başarıyla katıldı.\n\nŞimdi müzik başlatılıyor"
-call_7 : "**Akış değiştirme başarısız oldu**\nLütfen parçayı değiştirmek için /skip kullanın."
-call_8 : "Çalma listesinden sonraki parçayı indiriyor...."
-call_9 : "Asistan çok fazla sohbete katıldı, bu yüzden buraya katılamıyor.\nBu sorunu çözmek ve bildirmek için [Destek Grubu]({0}) ile iletişime geçin."
-call_10: "Asistan, katılma/ayrılma nedeniyle FloodWait'te, lütfen {0} saniye bekleyin"
+BOT_ADMIN_REQUIRED : "Bot, asistan hesabını kanalınıza davet etmek için **yönetici** iznine ihtiyaç duyar."
+ASSISTANT_BANNED : "Asistan grubunuzda veya kanalınızda yasaklanmış\nLütfen yasağı kaldırın ve şarkıyı tekrar çalın\n\n**Asistan kullanıcı adı:** @{0}\n**Asistan kimliği:** {1}"
+ASSISTANT_INVITE_EXCEPTION : "Asistan hesabını davet ederken bir istisna oluştu.\n\n**Sebep**: {0}"
+INVITE_PERMISSION_REQUIRED : "Bot, asistan hesabını sohbet grubunuza davet etmek için **kullanıcıları bağlantı ile davet et** iznine ihtiyaç duyar."
+ASSISTANT_JOINING_WAIT : "Asistan hesabı 5 saniye içinde katılacak, lütfen bekleyin..."
+ASSISTANT_JOIN_SUCCESS : "{0} asistan hesabı başarıyla katıldı.\n\nŞimdi müzik başlatılıyor"
+STREAM_SWITCH_FAILED : "**Akış değiştirme başarısız oldu**\nLütfen parçayı değiştirmek için /skip kullanın."
+DOWNLOADING_NEXT_TRACK : "Çalma listesinden sonraki parçayı indiriyor...."
+ASSISTANT_TOO_MANY_CHATS : "Asistan çok fazla sohbete katıldı, bu yüzden buraya katılamıyor.\nBu sorunu çözmek ve bildirmek için [Destek Grubu]({0}) ile iletişime geçin."
+ASSISTANT_FLOOD_WAIT: "Asistan, katılma/ayrılma nedeniyle FloodWait'te, lütfen {0} saniye bekleyin"
 
 # PLUGINS - Auth.py
 auth_1 : "Grubunuzun yetkili kullanıcılar listesinde (aul) sadece 20 kullanıcı olabilir."

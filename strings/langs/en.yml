@@ -13,16 +13,16 @@ OVERLOAD_WAIT_MSG : "⚠️ Bot is **overloaded** with downloads right now.\n\n*
 DOWNLOAD_FAILED_MSG : "❌ Failed to download the media from Telegram."
 
 # Core - Call.py
-call_1 : "🤖 Bot requires **admin** permission to invite assistant account to your channel."
-call_2 : "🚫 Assistant is banned in your group or channel.\nPlease unban and play song again\n\n**Assistant username:** @{0}\n**Assistant ID:** {1}"
-call_3 : "❗ Exception occurred while inviting assistant account to your.\n\n**Reason**: {0}"
-call_4 : "🔗 Bot requires **invite users via link** permission to invite assistant account to your chat group."
-call_5 : "⏳ Assistant account will be joining in 5 seconds, please wait..."
-call_6 : "✅ Assistant account of {0} joined successfully.\n\nStarting music now."
-call_7 : "❌ **Failed to switch stream**\nPlease use /skip to change track again."
-call_8 : "📥 Downloading next track from playlist...."
-call_9 : "📉 Assistant is joined too many chats, therefore assistant can't join here\nContact [Support Group]({0}) to fix and inform this problem."
-call_10: "⏳ Assistant is on FloodWait due to join/leave please wait {0} seconds."
+BOT_ADMIN_REQUIRED : "🤖 Bot requires **admin** permission to invite assistant account to your channel."
+ASSISTANT_BANNED : "🚫 Assistant is banned in your group or channel.\nPlease unban and play song again\n\n**Assistant username:** @{0}\n**Assistant ID:** {1}"
+ASSISTANT_INVITE_EXCEPTION : "❗ Exception occurred while inviting assistant account to your.\n\n**Reason**: {0}"
+INVITE_PERMISSION_REQUIRED : "🔗 Bot requires **invite users via link** permission to invite assistant account to your chat group."
+ASSISTANT_JOINING_WAIT : "⏳ Assistant account will be joining in 5 seconds, please wait..."
+ASSISTANT_JOIN_SUCCESS : "✅ Assistant account of {0} joined successfully.\n\nStarting music now."
+STREAM_SWITCH_FAILED : "❌ **Failed to switch stream**\nPlease use /skip to change track again."
+DOWNLOADING_NEXT_TRACK : "📥 Downloading next track from playlist...."
+ASSISTANT_TOO_MANY_CHATS : "📉 Assistant is joined too many chats, therefore assistant can't join here\nContact [Support Group]({0}) to fix and inform this problem."
+ASSISTANT_FLOOD_WAIT: "⏳ Assistant is on FloodWait due to join/leave please wait {0} seconds."
 
 # PLUGINS - Auth.py
 auth_1 : "🔒 You can only have 20 users in your group's authorized users list (aul)."
