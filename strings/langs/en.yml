@@ -25,14 +25,14 @@ ASSISTANT_TOO_MANY_CHATS : "📉 Assistant is joined too many chats, therefore a
 ASSISTANT_FLOOD_WAIT: "⏳ Assistant is on FloodWait due to join/leave please wait {0} seconds."
 
 # PLUGINS - Auth.py
-auth_1 : "🔒 You can only have 20 users in your group's authorized users list (aul)."
-auth_2 : "✅ Added to authorized users list of your group."
-auth_3 : "⚠️ Already in the authorized users list."
-auth_4 : "❌ Removed from authorized users list of this group."
-auth_5 : "🚫 Targeted user is not an authorized user."
-auth_6 : "🔄 Fetching authorized users...please wait!"
-auth_7 : "**Authorized users list[aul]:**\n\n"
-auth_8 : "┗ Added by:-"
+MAX_AUTHORIZED_USERS : "🔒 You can only have 20 users in your group's authorized users list (aul)."
+AUTHORIZED_USER_ADDED : "✅ Added to authorized users list of your group."
+USER_ALREADY_AUTHORIZED : "⚠️ Already in the authorized users list."
+AUTHORIZED_USER_REMOVED : "❌ Removed from authorized users list of this group."
+USER_NOT_AUTHORIZED : "🚫 Targeted user is not an authorized user."
+FETCHING_AUTHORIZED_USERS : "🔄 Fetching authorized users...please wait!"
+AUTHORIZED_USERS_LIST : "**Authorized users list[aul]:**\n\n"
+AUTHORIZED_BY : "┗ Added by:-"
 
 # PLUGINS - Admins
 admin_1 : "🎶➻ Music is already paused!"

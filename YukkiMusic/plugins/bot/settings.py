@@ -449,8 +449,8 @@ async def authusers_mar(client, CallbackQuery, _):
             except Exception:
                 pass
             j = 0
-            await CallbackQuery.edit_message_text(_["auth_6"])
-            msg = _["auth_7"]
+            await CallbackQuery.edit_message_text(_["FETCHING_AUTHORIZED_USERS"])
+            msg = _["AUTHORIZED_USERS_LIST"]
             for note in _authusers:
                 _note = await get_authuser(CallbackQuery.message.chat.id, note)
                 user_id = _note["auth_user_id"]
@@ -463,7 +463,7 @@ async def authusers_mar(client, CallbackQuery, _):
                 except Exception:
                     continue
                 msg += f"{j}➤ {user}[`{user_id}`]\n"
-                msg += f"   {_['auth_8']} {admin_name}[`{admin_id}`]\n\n"
+                msg += f"   {_['AUTHORIZED_BY']} {admin_name}[`{admin_id}`]\n\n"
             upl = InlineKeyboardMarkup(
                 [
                     [

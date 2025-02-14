@@ -25,14 +25,14 @@ ASSISTANT_TOO_MANY_CHATS : "Asistan çok fazla sohbete katıldı, bu yüzden bur
 ASSISTANT_FLOOD_WAIT: "Asistan, katılma/ayrılma nedeniyle FloodWait'te, lütfen {0} saniye bekleyin"
 
 # PLUGINS - Auth.py
-auth_1 : "Grubunuzun yetkili kullanıcılar listesinde (aul) sadece 20 kullanıcı olabilir."
-auth_2 : "Grubunuzun yetkili kullanıcılar listesine eklendi."
-auth_3 : "Zaten yetkili kullanıcılar listesinde."
-auth_4 : "Bu grubun yetkili kullanıcılar listesinden çıkarıldı."
-auth_5 : "Hedef kullanıcı yetkili bir kullanıcı değil."
-auth_6 : "Yetkili kullanıcılar getiriliyor... Lütfen bekleyin!"
-auth_7 : "**Yetkili kullanıcılar listesi[aul]:**\n\n"
-auth_8 : "┗ Ekleyen:-"
+MAX_AUTHORIZED_USERS : "Grubunuzun yetkili kullanıcılar listesinde (aul) sadece 20 kullanıcı olabilir."
+AUTHORIZED_USER_ADDED : "Grubunuzun yetkili kullanıcılar listesine eklendi."
+USER_ALREADY_AUTHORIZED : "Zaten yetkili kullanıcılar listesinde."
+AUTHORIZED_USER_REMOVED : "Bu grubun yetkili kullanıcılar listesinden çıkarıldı."
+USER_NOT_AUTHORIZED : "Hedef kullanıcı yetkili bir kullanıcı değil."
+FETCHING_AUTHORIZED_USERS : "Yetkili kullanıcılar getiriliyor... Lütfen bekleyin!"
+AUTHORIZED_USERS_LIST : "**Yetkili kullanıcılar listesi[aul]:**\n\n"
+AUTHORIZED_BY : "┗ Ekleyen:-"
 
 # PLUGINS - Admins
 admin_1 : "➻ Müzik zaten duraklatılmış!"

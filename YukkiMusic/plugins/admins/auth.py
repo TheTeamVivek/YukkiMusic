@@ -41,7 +41,7 @@ async def auth(client, message: Message, _):
         _check = await get_authuser_names(message.chat.id)
         count = len(_check)
         if int(count) == 20:
-            return await message.reply_text(_["auth_1"])
+            return await message.reply_text(_["MAX_AUTHORIZED_USERS"])
         if token not in _check:
             assis = {
                 "auth_user_id": user.id,
@@ -54,9 +54,9 @@ async def auth(client, message: Message, _):
                 if user.id not in get:
                     get.append(user.id)
             await save_authuser(message.chat.id, token, assis)
-            return await message.reply_text(_["auth_2"])
+            return await message.reply_text(_["AUTHORIZED_USER_ADDED"])
         else:
-            await message.reply_text(_["auth_3"])
+            await message.reply_text(_["USER_ALREADY_AUTHORIZED"])
         return
     from_user_id = message.from_user.id
     user_id = message.reply_to_message.from_user.id
@@ -68,7 +68,7 @@ async def auth(client, message: Message, _):
     for smex in _check:
         count += 1
     if int(count) == 20:
-        return await message.reply_text(_["auth_1"])
+        return await message.reply_text(_["MAX_AUTHORIZED_USERS"])
     if token not in _check:
         assis = {
             "auth_user_id": user_id,
@@ -81,9 +81,9 @@ async def auth(client, message: Message, _):
             if user_id not in get:
                 get.append(user_id)
         await save_authuser(message.chat.id, token, assis)
-        return await message.reply_text(_["auth_2"])
+        return await message.reply_text(_["AUTHORIZED_USER_ADDED"])
     else:
-        await message.reply_text(_["auth_3"])
+        await message.reply_text(_["USER_ALREADY_AUTHORIZED"])
 
 
 @app.on_message(command("UNAUTH_COMMAND") & filters.group & ~BANNED_USERS)
@@ -103,9 +103,9 @@ async def unauthusers(client, message: Message, _):
             if user.id in get:
                 get.remove(user.id)
         if deleted:
-            return await message.reply_text(_["auth_4"])
+            return await message.reply_text(_["AUTHORIZED_USER_REMOVED"])
         else:
-            return await message.reply_text(_["auth_5"])
+            return await message.reply_text(_["USER_NOT_AUTHORIZED"])
     user_id = message.reply_to_message.from_user.id
     token = await int_to_alpha(user_id)
     deleted = await delete_authuser(message.chat.id, token)
@@ -114,9 +114,9 @@ async def unauthusers(client, message: Message, _):
         if user_id in get:
             get.remove(user_id)
     if deleted:
-        return await message.reply_text(_["auth_4"])
+        return await message.reply_text(_["AUTHORIZED_USER_REMOVED"])
     else:
-        return await message.reply_text(_["auth_5"])
+        return await message.reply_text(_["USER_NOT_AUTHORIZED"])
 
 
 @app.on_message(command("AUTHUSERS_COMMAND") & filters.group & ~BANNED_USERS)
@@ -127,8 +127,8 @@ async def authusers(client, message: Message, _):
         return await message.reply_text(_["setting_5"])
     else:
         j = 0
-        mystic = await message.reply_text(_["auth_6"])
-        text = _["auth_7"]
+        mystic = await message.reply_text(_["FETCHING_AUTHORIZED_USERS"])
+        text = _["AUTHORIZED_USERS_LIST"]
         for note in _playlist:
             _note = await get_authuser(message.chat.id, note)
             user_id = _note["auth_user_id"]
@@ -141,6 +141,6 @@ async def authusers(client, message: Message, _):
             except Exception:
                 continue
             text += f"{j}➤ {user}[`{user_id}`]\n"
-            text += f"   {_['auth_8']} {admin_name}[`{admin_id}`]\n\n"
+            text += f"   {_['AUTHORIZED_BY']} {admin_name}[`{admin_id}`]\n\n"
         await mystic.delete()
         await message.reply_text(text)
