@@ -15,12 +15,18 @@ jobs:
         shell: bash
         run: |
           declare -A replacements=(
-            ["general_4"]="ANONYMOUS_ADMIN"
-            ["general_5"]="PERMISSION_REQUIRED"
-            ["general_6"]="NO_ACTIVE_VIDEO_STREAM"
-            ["general_1"]="USER_IDENTIFIER_REQUIRED"
-            ["general_2"]="COMMAND_USAGE_ERROR"
+            ["call_1"]="BOT_ADMIN_REQUIRED"
+            ["call_2"]="ASSISTANT_BANNED"
+            ["call_3"]="ASSISTANT_INVITE_EXCEPTION"
+            ["call_4"]="INVITE_PERMISSION_REQUIRED"
+            ["call_5"]="ASSISTANT_JOINING_WAIT"
+            ["call_6"]="ASSISTANT_JOIN_SUCCESS"
+            ["call_7"]="STREAM_SWITCH_FAILED"
+            ["call_8"]="DOWNLOADING_NEXT_TRACK"
+            ["call_9"]="ASSISTANT_TOO_MANY_CHATS"
+            ["call_10"]="ASSISTANT_FLOOD_WAIT"
           )
+
 
           for key in "${!replacements[@]}"; do
             find . -type d \( -name ".git" -o -path "./.github/*" \) -prune -o \
