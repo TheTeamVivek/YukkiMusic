@@ -15,17 +15,16 @@ jobs:
         shell: bash
         run: |
           declare -A replacements=(
-            ["call_1"]="BOT_ADMIN_REQUIRED"
-            ["call_2"]="ASSISTANT_BANNED"
-            ["call_3"]="ASSISTANT_INVITE_EXCEPTION"
-            ["call_4"]="INVITE_PERMISSION_REQUIRED"
-            ["call_5"]="ASSISTANT_JOINING_WAIT"
-            ["call_6"]="ASSISTANT_JOIN_SUCCESS"
-            ["call_7"]="STREAM_SWITCH_FAILED"
-            ["call_8"]="DOWNLOADING_NEXT_TRACK"
-            ["call_9"]="ASSISTANT_TOO_MANY_CHATS"
-            ["call_10"]="ASSISTANT_FLOOD_WAIT"
+            ["auth_1"]="MAX_AUTHORIZED_USERS"
+            ["auth_2"]="AUTHORIZED_USER_ADDED"
+            ["auth_3"]="USER_ALREADY_AUTHORIZED"
+            ["auth_4"]="AUTHORIZED_USER_REMOVED"
+            ["auth_5"]="USER_NOT_AUTHORIZED"
+            ["auth_6"]="FETCHING_AUTHORIZED_USERS"
+            ["auth_7"]="AUTHORIZED_USERS_LIST"
+            ["auth_8"]="AUTHORIZED_BY"
           )
+
 
 
           for key in "${!replacements[@]}"; do
