@@ -129,6 +129,8 @@ async def server_to_play(client, CallbackQuery, _):
         )
     except Exception as e:
         ex_type = type(e).__name__
-        err = e if ex_type == "AssistantErr" else _["ERROR_OCCURRED_MSG"].format(ex_type)
+        err = (
+            e if ex_type == "AssistantErr" else _["ERROR_OCCURRED_MSG"].format(ex_type)
+        )
         return await mystic.edit_text(err)
     return await mystic.delete()

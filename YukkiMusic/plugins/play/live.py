@@ -63,7 +63,11 @@ async def play_live_stream(client, CallbackQuery, _):
             )
         except Exception as e:
             ex_type = type(e).__name__
-            err = e if ex_type == "AssistantErr" else _["ERROR_OCCURRED_MSG"].format(ex_type)
+            err = (
+                e
+                if ex_type == "AssistantErr"
+                else _["ERROR_OCCURRED_MSG"].format(ex_type)
+            )
             return await mystic.edit_text(err)
     else:
         return await mystic.edit_text("Not a live stream")
