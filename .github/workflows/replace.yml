@@ -12,18 +12,21 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Replace text
+        shell: bash
         run: |
-         declare -A replacements=(
-           ["general_4"]="ANONYMOUS_ADMIN"
-           ["general_5"]="PERMISSION_REQUIRED"
-           ["general_6"]="NO_ACTIVE_VIDEO_STREAM"
-           ["general_1"]="USER_IDENTIFIER_REQUIRED"
-           ["general_2"]="COMMAND_USAGE_ERROR"
-         )
+          declare -A replacements=(
+            ["general_4"]="ANONYMOUS_ADMIN"
+            ["general_5"]="PERMISSION_REQUIRED"
+            ["general_6"]="NO_ACTIVE_VIDEO_STREAM"
+            ["general_1"]="USER_IDENTIFIER_REQUIRED"
+            ["general_2"]="COMMAND_USAGE_ERROR"
+          )
 
-         find . -type d \( -name ".git" -o -path "./.github/*" \) -prune -o \
-         \( -type f \( -name "*.py" -o -name "*.yml" \) \) \
-         -exec sed -i $(printf ' -e "s/\\b%s\\b/%s/g"' "${!replacements[@]}" "${replacements[@]}") {} +
+          for key in "${!replacements[@]}"; do
+            find . -type d \( -name ".git" -o -path "./.github/*" \) -prune -o \
+            \( -type f \( -name "*.py" -o -name "*.yml" \) \) \
+            -exec sed -i "s/\b$key\b/${replacements[$key]}/g" {} +
+          done
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
