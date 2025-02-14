@@ -13,15 +13,17 @@ jobs:
 
       - name: Replace text
         run: |
-          FIND_TEXT="general_3"
-          REPLACE_TEXT="ERROR_OCCURRED_MSG"
+         declare -A replacements=(
+           ["general_4"]="ANONYMOUS_ADMIN"
+           ["general_5"]="PERMISSION_REQUIRED"
+           ["general_6"]="NO_ACTIVE_VIDEO_STREAM"
+           ["general_1"]="USER_IDENTIFIER_REQUIRED"
+           ["general_2"]="COMMAND_USAGE_ERROR"
+         )
 
-          #find . -type d -name ".git" -prune -o -type f -name "*.py" \
-          #  -exec sed -i "s/\b$FIND_TEXT\b/$REPLACE_TEXT/g" {} +
-          
-          find . -type d \( -name ".git" -o -path "./.github/*" \) -prune -o \
-          \( -type f \( -name "*.py" -o -name "*.yml" \) \) \
-          -exec sed -i -e "s/\b$FIND_TEXT\b/$REPLACE_TEXT/g" -e "s/\bG-cast\b/Gcast/g" -e "s/\bB-list\b/BList/g" {} +
+         find . -type d \( -name ".git" -o -path "./.github/*" \) -prune -o \
+         \( -type f \( -name "*.py" -o -name "*.yml" \) \) \
+         -exec sed -i $(printf ' -e "s/\\b%s\\b/%s/g"' "${!replacements[@]}" "${replacements[@]}") {} +
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
