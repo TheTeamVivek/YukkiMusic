@@ -217,7 +217,7 @@ async def export_user_data(_, cq):
             playlist = await get_playlist(user_id, name)
             if playlist:
                 user_data["playlists"][name] = playlist
-    except Exception as e:
+    except Exception:
         pass
     user_data = {
         k: (

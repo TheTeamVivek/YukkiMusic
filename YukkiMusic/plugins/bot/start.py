@@ -134,7 +134,7 @@ async def start_comm(client, message: Message, _):
             await asyncio.sleep(1)
             if await is_on_off(config.LOG):
                 sender_id = message.from_user.id
-                sender_mention = message.from_user.mention
+                message.from_user.mention
                 sender_name = message.from_user.first_name
                 return await app.send_message(
                     config.LOG_GROUP_ID,
@@ -241,7 +241,7 @@ async def start_comm(client, message: Message, _):
 @language(no_check=True)
 async def testbot(client, message: Message, _):
     uptime = int(time.time() - _boot_)
-    chat_id = message.chat.id
+    message.chat.id
     await message.reply_text(_["start_7"].format(get_readable_time(uptime)))
 
     return await add_served_chat(message.chat.id)

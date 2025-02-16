@@ -107,7 +107,7 @@ async def skip(cli, message: Message, _, chat_id):
     queued = check[0]["file"]
     title = (check[0]["title"]).title()
     user = check[0]["by"]
-    user_id = message.from_user.id
+    message.from_user.id
     streamtype = check[0]["streamtype"]
     videoid = check[0]["vidid"]
     duration_min = check[0]["dur"]
@@ -133,7 +133,9 @@ async def skip(cli, message: Message, _, chat_id):
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "tg"
     elif "vid_" in queued:
-        mystic = await message.reply_text(_["DOWNLOADING_NEXT_TRACK"], disable_web_page_preview=True)
+        mystic = await message.reply_text(
+            _["DOWNLOADING_NEXT_TRACK"], disable_web_page_preview=True
+        )
         try:
             file_path, direct = await Platform.youtube.download(
                 videoid,

@@ -178,7 +178,7 @@ async def shellrunner(_, message: Message):
             )
             stdout, stderr = await process.communicate()
             return stdout.decode().strip(), stderr.decode().strip()
-        except Exception as err:
+        except Exception:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             errors = traceback.format_exception(
                 etype=exc_type,

@@ -301,7 +301,7 @@ async def stream(
                     continue
                 title = search["title"]
                 duration_min = search["duration_min"]
-                duration_sec = search["duration_sec"]
+                search["duration_sec"]
                 link = search["url"]
                 thumb = search["thumb"]
                 file_path, n = await Platform.saavn.download(link)

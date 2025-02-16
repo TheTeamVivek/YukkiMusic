@@ -214,7 +214,9 @@ class Call:
         except ChatAdminRequiredError as e:
             raise AssistantErr(_["BOT_ADMIN_REQUIRED"]) from e
         except Exception as e:
-            raise AssistantErr(_["ASSISTANT_INVITE_EXCEPTION"].format(app.mention, type(e).__name__)) from e
+            raise AssistantErr(
+                _["ASSISTANT_INVITE_EXCEPTION"].format(app.mention, type(e).__name__)
+            ) from e
         if chat_id in links:
             invitelink = links[chat_id]
         else:
@@ -234,7 +236,9 @@ class Call:
                     raise AssistantErr(_["BOT_ADMIN_REQUIRED"]) from e
                 except Exception as e:
                     raise AssistantErr(
-                        _["ASSISTANT_INVITE_EXCEPTION"].format(app.mention, type(e).__name__)
+                        _["ASSISTANT_INVITE_EXCEPTION"].format(
+                            app.mention, type(e).__name__
+                        )
                     ) from e
 
             if invitelink.startswith("https://t.me/+"):
@@ -250,7 +254,9 @@ class Call:
             try:
                 await tbot(HideChatJoinRequestRequest(chat_id, userbot.id))
             except Exception as e:
-                raise AssistantErr(_["ASSISTANT_INVITE_EXCEPTION"].format(type(e).__name__)) from e
+                raise AssistantErr(
+                    _["ASSISTANT_INVITE_EXCEPTION"].format(type(e).__name__)
+                ) from e
             await asyncio.sleep(1)
             raise AssistantErr(_["ASSISTANT_JOIN_SUCCESS"].format(app.mention))
         except UserAlreadyParticipant:
@@ -258,9 +264,11 @@ class Call:
         except ChannelsTooMuch as e:
             if attempts <= max_attempts:
                 attempts += 1
-                userbot = await set_assistant(chat_id)
+                await set_assistant(chat_id)
                 return await self.join_chat(chat_id, attempts)
-            raise AssistantErr(_["ASSISTANT_TOO_MANY_CHATS"].format(config.SUPPORT_GROUP)) from e
+            raise AssistantErr(
+                _["ASSISTANT_TOO_MANY_CHATS"].format(config.SUPPORT_GROUP)
+            ) from e
         except FloodWait as e:
             time = e.value
             if time < 20:
@@ -269,12 +277,14 @@ class Call:
                 return await self.join_chat(chat_id, attempts)
             if attempts <= max_attempts:
                 attempts += 1
-                userbot = await set_assistant(chat_id)
+                await set_assistant(chat_id)
                 return await self.join_chat(chat_id, attempts)
 
             raise AssistantErr(_["ASSISTANT_FLOOD_WAIT"].format(time)) from e
         except Exception as e:
-            raise AssistantErr(_["ASSISTANT_INVITE_EXCEPTION"].format(type(e).__name__)) from e
+            raise AssistantErr(
+                _["ASSISTANT_INVITE_EXCEPTION"].format(type(e).__name__)
+            ) from e
 
     async def play(self, chat_id, stream=None, config=None, group: bool = True):
         assistant = await group_assistant(self, chat_id)
@@ -385,7 +395,7 @@ class Call:
             audio_stream_quality = await get_audio_bitrate(chat_id)
             video_stream_quality = await get_video_bitrate(chat_id)
             videoid = check[0]["vidid"]
-            userid = check[0].get("user_id")
+            check[0].get("user_id")
             check[0]["played"] = 0
             video = True if str(streamtype) == "video" else False
             if "live_" in queued:
@@ -442,7 +452,9 @@ class Call:
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
             elif "vid_" in queued:
-                mystic = await app.send_message(original_chat_id, _["DOWNLOADING_NEXT_TRACK"])
+                mystic = await app.send_message(
+                    original_chat_id, _["DOWNLOADING_NEXT_TRACK"]
+                )
                 try:
                     file_path, direct = await Platform.youtube.download(
                         videoid,
