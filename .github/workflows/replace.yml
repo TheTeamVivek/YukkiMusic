@@ -15,14 +15,7 @@ jobs:
         shell: bash
         run: |
           declare -A replacements=(
-            ["auth_1"]="MAX_AUTHORIZED_USERS"
-            ["auth_2"]="AUTHORIZED_USER_ADDED"
-            ["auth_3"]="USER_ALREADY_AUTHORIZED"
-            ["auth_4"]="AUTHORIZED_USER_REMOVED"
-            ["auth_5"]="USER_NOT_AUTHORIZED"
-            ["auth_6"]="FETCHING_AUTHORIZED_USERS"
-            ["auth_7"]="AUTHORIZED_USERS_LIST"
-            ["auth_8"]="AUTHORIZED_BY"
+            ["disable_web_page_preview=True"]="link_preview=False"
           )
 
 
