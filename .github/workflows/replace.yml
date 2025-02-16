@@ -15,7 +15,7 @@ jobs:
         shell: bash
         run: |
           declare -A replacements=(
-            ["disable_web_page_preview=True"]="link_preview=False"
+            ["reply_markup"]="buttons"
           )
 
 
