@@ -61,15 +61,10 @@ class Telegram:
             return None
         return text[offset : offset + length]
 
-    async def send_split_text(self, message, string):
-        n = self.chars_limit
-        out = [(string[i : i + n]) for i in range(0, len(string), n)]
-        j = 0
-        for x in out:
-            if j <= 2:
-                j += 1
-                await message.reply_text(x)
-        return True
+    async def split_text(self, string, limit: int | None = None):
+        limit = limit if limit is not None else 4095
+        for i in range(0, len(string), limit):
+            yield string[i : i + limit]
 
     async def get_link(self, message):
         if message.chat.username:
@@ -222,9 +217,7 @@ class Telegram:
                 await mystic.edit_text(_["DOWNLOAD_FAILED_MSG"])
 
         if len(downloader) > 10:
-            timers = []
-            for x in downloader:
-                timers.append(downloader[x])
+            timers = list(downloader.values())
             try:
                 low = min(timers)
                 eta = get_readable_time(low)
