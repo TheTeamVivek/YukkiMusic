@@ -208,7 +208,7 @@ async def helper_private(client: app, update: types.Message | types.CallbackQuer
         language = await get_lang(chat_id)
         _ = get_string(language)
         keyboard = await paginate_modules(0, chat_id, close=False)
-        await update.edit_message_text(_["help_1"], reply_markup=keyboard)
+        await update.edit_message_text(_["help_1"], buttons=keyboard)
     else:
         chat_id = update.chat.id
         if await is_commanddelete_on(update.chat.id):
@@ -223,12 +223,12 @@ async def helper_private(client: app, update: types.Message | types.CallbackQuer
             await update.reply_photo(
                 photo=START_IMG_URL,
                 caption=_["help_1"],
-                reply_markup=keyboard,
+                buttons=keyboard,
             )
         else:
             await update.reply_text(
                 text=_["help_1"],
-                reply_markup=keyboard,
+                buttons=keyboard,
             )
 
 
@@ -236,7 +236,7 @@ async def helper_private(client: app, update: types.Message | types.CallbackQuer
 @language(no_check=True)
 async def help_com_group(client, message: Message, _):
     keyboard = private_help_panel(_)
-    await message.reply_text(_["help_2"], reply_markup=InlineKeyboardMarkup(keyboard))
+    await message.reply_text(_["help_2"], buttons=InlineKeyboardMarkup(keyboard))
 
 
 @app.on_callback_query(filters.regex(r"help_(.*?)"))
@@ -278,7 +278,7 @@ async def help_button(client, query):
         )
         await query.message.edit(
             text=text,
-            reply_markup=key,
+            buttons=key,
             link_preview=False,
         )
     elif prev_match:
@@ -286,7 +286,7 @@ async def help_button(client, query):
         close = bool(int(prev_match.group(2)))
         await query.message.edit(
             text=top_text,
-            reply_markup=await paginate_modules(
+            buttons=await paginate_modules(
                 curr_page, query.message.chat.id, close=close
             ),
             link_preview=False,
@@ -296,7 +296,7 @@ async def help_button(client, query):
         close = bool(int(next_match.group(2)))
         await query.message.edit(
             text=top_text,
-            reply_markup=await paginate_modules(
+            buttons=await paginate_modules(
                 next_page, query.message.chat.id, close=close
             ),
             link_preview=False,
@@ -320,7 +320,7 @@ async def help_button(client, query):
         try:
             await query.message.edit(
                 text=f"<b>{helper_key}:</b>\n{formatted_text}",
-                reply_markup=key,
+                buttons=key,
                 link_preview=False,
             )
         except Exception as e:

@@ -64,7 +64,7 @@ async def stop_music(cli, message: Message):
                 ]
             ]
         )
-        return await message.reply_text(_["ANONYMOUS_ADMIN"], reply_markup=upl)
+        return await message.reply_text(_["ANONYMOUS_ADMIN"], buttons=upl)
 
     if message.command[0][0] == "c":
         chat_id = await get_cmode(message.chat.id)

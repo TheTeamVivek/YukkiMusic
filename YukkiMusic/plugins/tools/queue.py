@@ -121,7 +121,7 @@ async def ping_com(client, message: Message, _):
         )
     )
     basic[videoid] = True
-    mystic = await message.reply_photo(image, caption=cap, reply_markup=upl)
+    mystic = await message.reply_photo(image, caption=cap, buttons=upl)
     if DUR != "Unknown":
         try:
             while db[chat_id][0]["vidid"] == videoid:
@@ -138,7 +138,7 @@ async def ping_com(client, message: Message, _):
                                     seconds_to_min(db[chat_id][0]["played"]),
                                     db[chat_id][0]["dur"],
                                 )
-                                await mystic.edit_reply_markup(reply_markup=buttons)
+                                await mystic.edit_reply_markup(buttons=buttons)
                             except FloodWait:
                                 pass
                         else:
@@ -197,13 +197,13 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
     if "Queued" in msg:
         if len(msg) < 700:
             await asyncio.sleep(1)
-            return await CallbackQuery.edit_message_text(msg, reply_markup=buttons)
+            return await CallbackQuery.edit_message_text(msg, buttons=buttons)
 
         if "🏷" in msg:
             msg = msg.replace("🏷", "")
         link = await paste(msg)
         await CallbackQuery.edit_message_text(
-            _["queue_3"].format(link), reply_markup=buttons
+            _["queue_3"].format(link), buttons=buttons
         )
     else:
         if len(msg) > 700:
@@ -212,11 +212,11 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
             link = await paste(msg)
             await asyncio.sleep(1)
             return await CallbackQuery.edit_message_text(
-                _["queue_3"].format(link), reply_markup=buttons
+                _["queue_3"].format(link), buttons=buttons
             )
 
         await asyncio.sleep(1)
-        return await CallbackQuery.edit_message_text(msg, reply_markup=buttons)
+        return await CallbackQuery.edit_message_text(msg, buttons=buttons)
 
 
 @app.on_callback_query(filters.regex("queue_back_timer") & ~BANNED_USERS)
@@ -287,7 +287,7 @@ async def queue_back(client, CallbackQuery: CallbackQuery, _):
     basic[videoid] = True
 
     med = InputMediaPhoto(media=image, caption=cap)
-    mystic = await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+    mystic = await CallbackQuery.edit_message_media(media=med, buttons=upl)
     if DUR != "Unknown":
         try:
             while db[chat_id][0]["vidid"] == videoid:
@@ -304,7 +304,7 @@ async def queue_back(client, CallbackQuery: CallbackQuery, _):
                                     seconds_to_min(db[chat_id][0]["played"]),
                                     db[chat_id][0]["dur"],
                                 )
-                                await mystic.edit_reply_markup(reply_markup=buttons)
+                                await mystic.edit_reply_markup(buttons=buttons)
                             except FloodWait:
                                 pass
                         else:

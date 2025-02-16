@@ -50,7 +50,7 @@ async def song_commad_group(client, message: Message, _):
         ]
     )
 
-    await message.reply_text(_["song_1"], reply_markup=upl)
+    await message.reply_text(_["song_1"], buttons=upl)
 
 
 # Song Module
@@ -97,7 +97,7 @@ async def song_commad_private(client, message: Message, _):
         return await message.reply_photo(
             thumbnail,
             caption=_["song_4"].format(title),
-            reply_markup=InlineKeyboardMarkup(buttons),
+            buttons=InlineKeyboardMarkup(buttons),
         )
 
     else:
@@ -141,7 +141,7 @@ async def song_commad_private(client, message: Message, _):
     return await message.reply_photo(
         thumbnail,
         caption=_["song_4"].format(title),
-        reply_markup=InlineKeyboardMarkup(buttons),
+        buttons=InlineKeyboardMarkup(buttons),
     )
 
 
@@ -158,7 +158,7 @@ async def songs_back_helper(client, CallbackQuery, _):
     buttons = song_markup(_, vidid)
 
     return await CallbackQuery.edit_message_reply_markup(
-        reply_markup=InlineKeyboardMarkup(buttons)
+        buttons=InlineKeyboardMarkup(buttons)
     )
 
 
@@ -233,7 +233,7 @@ async def song_helper_cb(client, CallbackQuery, _):
             InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data=f"close"),
         )
 
-        return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
+        return await CallbackQuery.edit_message_reply_markup(buttons=keyboard)
 
     else:
 
@@ -286,7 +286,7 @@ async def song_helper_cb(client, CallbackQuery, _):
             InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data=f"close"),
         )
 
-        return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
+        return await CallbackQuery.edit_message_reply_markup(buttons=keyboard)
 
 
 # Downloading Songs Here

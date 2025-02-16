@@ -138,7 +138,7 @@ async def stream(
                         duration_min,
                         user_name,
                     ),
-                    reply_markup=InlineKeyboardMarkup(button),
+                    buttons=InlineKeyboardMarkup(button),
                 )
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "stream"
@@ -159,7 +159,7 @@ async def stream(
                 original_chat_id,
                 photo=carbon,
                 caption=_["playlist_18"].format(link, position),
-                reply_markup=upl,
+                buttons=upl,
             )
 
     elif (
@@ -197,7 +197,7 @@ async def stream(
                 caption=_["queue_4"].format(
                     position, title[:27], duration_min, user_name
                 ),
-                reply_markup=close_markup(_),
+                buttons=close_markup(_),
             )
         else:
             if not forceplay:
@@ -228,7 +228,7 @@ async def stream(
                     duration_min,
                     user_name,
                 ),
-                reply_markup=InlineKeyboardMarkup(button),
+                buttons=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "stream"
@@ -262,7 +262,7 @@ async def stream(
                     caption=_["queue_4"].format(
                         position, title[:30], duration_min, user_name
                     ),
-                    reply_markup=close_markup(_),
+                    buttons=close_markup(_),
                 )
             else:
                 if not forceplay:
@@ -288,7 +288,7 @@ async def stream(
                     caption=_["stream_1"].format(
                         title, config.SUPPORT_GROUP, duration_min, user_name
                     ),
-                    reply_markup=InlineKeyboardMarkup(button),
+                    buttons=InlineKeyboardMarkup(button),
                 )
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
@@ -350,7 +350,7 @@ async def stream(
                         caption=_["stream_1"].format(
                             title, link, duration_min, user_name
                         ),
-                        reply_markup=InlineKeyboardMarkup(button),
+                        buttons=InlineKeyboardMarkup(button),
                     )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "tg"
@@ -369,7 +369,7 @@ async def stream(
                     original_chat_id,
                     photo=carbon,
                     caption=_["playlist_18"].format(link, position),
-                    reply_markup=upl,
+                    buttons=upl,
                 )
 
     elif streamtype == "soundcloud":
@@ -416,7 +416,7 @@ async def stream(
                 caption=_["stream_1"].format(
                     title, config.SUPPORT_GROUP, duration_min, user_name
                 ),
-                reply_markup=InlineKeyboardMarkup(button),
+                buttons=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
@@ -466,7 +466,7 @@ async def stream(
                 original_chat_id,
                 photo=config.TELEGRAM_VIDEO_URL if video else config.TELEGRAM_AUDIO_URL,
                 caption=_["stream_1"].format(title, link, duration_min, user_name),
-                reply_markup=InlineKeyboardMarkup(button),
+                buttons=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
@@ -530,7 +530,7 @@ async def stream(
                     duration_min,
                     user_name,
                 ),
-                reply_markup=InlineKeyboardMarkup(button),
+                buttons=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
@@ -578,7 +578,7 @@ async def stream(
                 original_chat_id,
                 photo=config.STREAM_IMG_URL,
                 caption=_["stream_2"].format(user_name),
-                reply_markup=InlineKeyboardMarkup(button),
+                buttons=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"

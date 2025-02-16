@@ -400,7 +400,7 @@ async def play_commnd(
             buttons = botplaylist_markup(_)
             return await mystic.edit_text(
                 _["playlist_1"],
-                reply_markup=InlineKeyboardMarkup(buttons),
+                buttons=InlineKeyboardMarkup(buttons),
             )
         slider = True
         query = message.text.split(None, 1)[1]
@@ -432,7 +432,7 @@ async def play_commnd(
             )
             return await mystic.edit_text(
                 _["play_15"],
-                reply_markup=InlineKeyboardMarkup(buttons),
+                buttons=InlineKeyboardMarkup(buttons),
             )
         try:
             await stream(
@@ -477,7 +477,7 @@ async def play_commnd(
             await message.reply_photo(
                 photo=img,
                 caption=cap,
-                reply_markup=InlineKeyboardMarkup(buttons),
+                buttons=InlineKeyboardMarkup(buttons),
             )
             return await play_logs(message, streamtype=f"Playlist : {plist_type}")
         else:
@@ -498,7 +498,7 @@ async def play_commnd(
                         details["title"].title(),
                         details["duration_min"],
                     ),
-                    reply_markup=InlineKeyboardMarkup(buttons),
+                    buttons=InlineKeyboardMarkup(buttons),
                 )
                 return await play_logs(message, streamtype=f"Searched on Youtube")
             else:
@@ -513,6 +513,6 @@ async def play_commnd(
                 await message.reply_photo(
                     photo=img,
                     caption=cap,
-                    reply_markup=InlineKeyboardMarkup(buttons),
+                    buttons=InlineKeyboardMarkup(buttons),
                 )
                 return await play_logs(message, streamtype=f"URL Searched Inline")

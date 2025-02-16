@@ -126,7 +126,7 @@ async def privacy_menu(client, message: Message):
             [InlineKeyboardButton("Close", callback_data="close")],
         ]
     )
-    await message.reply_text(TEXT, reply_markup=keyboard, link_preview=False)
+    await message.reply_text(TEXT, buttons=keyboard, link_preview=False)
 
 
 @app.on_callback_query(filters.regex("show_privacy_sections") & ~BANNED_USERS)
@@ -147,7 +147,7 @@ async def show_privacy_sections(client, callback_query):
     )
     await callback_query.edit_message_text(
         f"{TEXT}\n\nSelect a section to learn more:",
-        reply_markup=keyboard,
+        buttons=keyboard,
         link_preview=False,
     )
 
@@ -175,7 +175,7 @@ async def privacy_section_callback(client, callback_query):
             ]
         )
         return await callback_query.edit_message_text(
-            TEXT, reply_markup=keyboard, link_preview=False
+            TEXT, buttons=keyboard, link_preview=False
         )
 
     if section in PRIVACY_SECTIONS:
@@ -188,7 +188,7 @@ async def privacy_section_callback(client, callback_query):
             ]
         )
         await callback_query.edit_message_text(
-            PRIVACY_SECTIONS[section], reply_markup=keyboard
+            PRIVACY_SECTIONS[section], buttons=keyboard
         )
 
 
@@ -272,7 +272,7 @@ async def export_user_data(_, cq):
 async def retrieve_data(_, cq):
     await cq.message.edit(
         "Are you sure you want to delete your data?",
-        reply_markup=InlineKeyboardMarkup(
+        buttons=InlineKeyboardMarkup(
             [
                 [InlineKeyboardButton("Yes", callback_data="confirm_delete_data")],
                 [InlineKeyboardButton("No", callback_data="privacy_back")],

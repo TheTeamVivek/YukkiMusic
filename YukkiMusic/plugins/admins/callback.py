@@ -69,7 +69,7 @@ async def markup_panel(client, CallbackQuery: CallbackQuery, _):
     buttons = panel_markup_1(_, videoid, chat_id)
     try:
         await CallbackQuery.edit_message_reply_markup(
-            reply_markup=InlineKeyboardMarkup(buttons)
+            buttons=InlineKeyboardMarkup(buttons)
         )
     except Exception:
         return
@@ -92,7 +92,7 @@ async def main_markup_(client, CallbackQuery, _):
     chat_id = CallbackQuery.message.chat.id
     try:
         await CallbackQuery.edit_message_reply_markup(
-            reply_markup=InlineKeyboardMarkup(buttons)
+            buttons=InlineKeyboardMarkup(buttons)
         )
     except Exception:
         return
@@ -126,7 +126,7 @@ async def pages_markup(client, CallbackQuery, _):
             buttons = panel_markup_3(_, videoid, chat_id)
     try:
         await CallbackQuery.edit_message_reply_markup(
-            reply_markup=InlineKeyboardMarkup(buttons)
+            buttons=InlineKeyboardMarkup(buttons)
         )
     except Exception:
         return
@@ -277,7 +277,7 @@ async def admin_callback(client, CallbackQuery, _):
                     user,
                     f"https://t.me/{app.username}?start=info_{videoid}",
                 ),
-                reply_markup=InlineKeyboardMarkup(button),
+                buttons=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
@@ -309,7 +309,7 @@ async def admin_callback(client, CallbackQuery, _):
                     duration_min,
                     user,
                 ),
-                reply_markup=InlineKeyboardMarkup(button),
+                buttons=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "stream"
@@ -324,7 +324,7 @@ async def admin_callback(client, CallbackQuery, _):
             run = await CallbackQuery.message.reply_photo(
                 photo=STREAM_IMG_URL,
                 caption=_["stream_2"].format(user),
-                reply_markup=InlineKeyboardMarkup(button),
+                buttons=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
@@ -345,7 +345,7 @@ async def admin_callback(client, CallbackQuery, _):
                     caption=_["stream_1"].format(
                         title, SUPPORT_GROUP, check[0]["dur"], user
                     ),
-                    reply_markup=InlineKeyboardMarkup(button),
+                    buttons=InlineKeyboardMarkup(button),
                 )
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
@@ -360,7 +360,7 @@ async def admin_callback(client, CallbackQuery, _):
                     caption=_["stream_1"].format(
                         title, SUPPORT_GROUP, check[0]["dur"], user
                     ),
-                    reply_markup=InlineKeyboardMarkup(button),
+                    buttons=InlineKeyboardMarkup(button),
                 )
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
@@ -371,7 +371,7 @@ async def admin_callback(client, CallbackQuery, _):
                 run = await CallbackQuery.message.reply_photo(
                     photo=details["thumb"],
                     caption=_["stream_1"].format(title, url, check[0]["dur"], user),
-                    reply_markup=InlineKeyboardMarkup(button),
+                    buttons=InlineKeyboardMarkup(button),
                 )
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
@@ -386,7 +386,7 @@ async def admin_callback(client, CallbackQuery, _):
                         duration_min,
                         user,
                     ),
-                    reply_markup=InlineKeyboardMarkup(button),
+                    buttons=InlineKeyboardMarkup(button),
                 )
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "stream"
@@ -492,7 +492,7 @@ async def play_music(client, CallbackQuery, _):
         )
         return await mystic.edit_text(
             _["play_15"],
-            reply_markup=InlineKeyboardMarkup(buttons),
+            buttons=InlineKeyboardMarkup(buttons),
         )
     video = True if mode == "v" else None
     ffplay = True if fplay == "f" else None
@@ -658,7 +658,7 @@ async def slider_queries(client, CallbackQuery, _):
             ),
         )
         return await CallbackQuery.edit_message_media(
-            media=med, reply_markup=InlineKeyboardMarkup(buttons)
+            media=med, buttons=InlineKeyboardMarkup(buttons)
         )
     if what == "B":
         if rtype == 0:
@@ -681,7 +681,7 @@ async def slider_queries(client, CallbackQuery, _):
             ),
         )
         return await CallbackQuery.edit_message_media(
-            media=med, reply_markup=InlineKeyboardMarkup(buttons)
+            media=med, buttons=InlineKeyboardMarkup(buttons)
         )
 
 

@@ -56,12 +56,12 @@ async def start_comm(client, message: Message, _):
                 return await message.reply_photo(
                     photo=START_IMG_URL,
                     caption=_["help_1"],
-                    reply_markup=keyboard,
+                    buttons=keyboard,
                 )
             else:
                 return await message.reply_text(
                     text=_["help_1"],
-                    reply_markup=keyboard,
+                    buttons=keyboard,
                 )
         if name[0:4] == "song":
             await message.reply_text(_["song_2"])
@@ -195,7 +195,7 @@ async def start_comm(client, message: Message, _):
                 photo=thumbnail,
                 caption=searched_text,
                 parse_mode=ParseMode.MARKDOWN,
-                reply_markup=key,
+                buttons=key,
             )
             await asyncio.sleep(1)
             if await is_on_off(config.LOG):
@@ -217,17 +217,17 @@ async def start_comm(client, message: Message, _):
                 await message.reply_photo(
                     photo=config.START_IMG_URL,
                     caption=_["start_1"].format(app.mention),
-                    reply_markup=InlineKeyboardMarkup(out),
+                    buttons=InlineKeyboardMarkup(out),
                 )
             except Exception:
                 await message.reply_text(
                     text=_["start_1"].format(app.mention),
-                    reply_markup=InlineKeyboardMarkup(out),
+                    buttons=InlineKeyboardMarkup(out),
                 )
         else:
             await message.reply_text(
                 text=_["start_1"].format(app.mention),
-                reply_markup=InlineKeyboardMarkup(out),
+                buttons=InlineKeyboardMarkup(out),
             )
         if await is_on_off(config.LOG):
             sender_id = message.from_user.id
@@ -283,7 +283,7 @@ async def welcome(client, message: Message):
                         userbot.username,
                         userbot.id,
                     ),
-                    reply_markup=InlineKeyboardMarkup(out),
+                    buttons=InlineKeyboardMarkup(out),
                 )
             if member.id in config.OWNER_ID:
                 return await message.reply_text(

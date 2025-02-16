@@ -44,5 +44,5 @@ async def playmode_(client, message: Message, _):
     buttons = playmode_users_markup(_, Direct, Group, Playtype)
     response = await message.reply_text(
         _["playmode_1"].format(message.chat.title),
-        reply_markup=InlineKeyboardMarkup(buttons),
+        buttons=InlineKeyboardMarkup(buttons),
     )

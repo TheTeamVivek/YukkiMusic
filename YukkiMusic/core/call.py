@@ -509,7 +509,7 @@ class Call:
                         check[0]["dur"],
                         user,
                     ),
-                    reply_markup=InlineKeyboardMarkup(button),
+                    buttons=InlineKeyboardMarkup(button),
                 )
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "stream"
@@ -539,7 +539,7 @@ class Call:
                     original_chat_id,
                     photo=config.STREAM_IMG_URL,
                     caption=_["stream_2"].format(user),
-                    reply_markup=InlineKeyboardMarkup(button),
+                    buttons=InlineKeyboardMarkup(button),
                 )
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
@@ -598,7 +598,7 @@ class Call:
                         caption=_["stream_1"].format(
                             title, config.SUPPORT_GROUP, check[0]["dur"], user
                         ),
-                        reply_markup=InlineKeyboardMarkup(button),
+                        buttons=InlineKeyboardMarkup(button),
                     )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "tg"
@@ -610,7 +610,7 @@ class Call:
                         caption=_["stream_1"].format(
                             title, config.SUPPORT_GROUP, check[0]["dur"], user
                         ),
-                        reply_markup=InlineKeyboardMarkup(button),
+                        buttons=InlineKeyboardMarkup(button),
                     )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "tg"
@@ -620,7 +620,7 @@ class Call:
                         original_chat_id,
                         photo=image,
                         caption=_["stream_1"].format(title, url, check[0]["dur"], user),
-                        reply_markup=InlineKeyboardMarkup(button),
+                        buttons=InlineKeyboardMarkup(button),
                     )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "tg"
@@ -637,7 +637,7 @@ class Call:
                             check[0]["dur"],
                             user,
                         ),
-                        reply_markup=InlineKeyboardMarkup(button),
+                        buttons=InlineKeyboardMarkup(button),
                     )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "stream"

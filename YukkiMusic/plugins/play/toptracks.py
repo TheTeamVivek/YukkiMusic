@@ -39,7 +39,7 @@ async def get_play_markup(client, CallbackQuery, _):
         pass
     buttons = botplaylist_markup(_)
     return await CallbackQuery.edit_message_reply_markup(
-        reply_markup=InlineKeyboardMarkup(buttons)
+        buttons=InlineKeyboardMarkup(buttons)
     )
 
 
@@ -52,7 +52,7 @@ async def get_topz_playlists(client, CallbackQuery, _):
         pass
     buttons = top_play_markup(_)
     return await CallbackQuery.edit_message_reply_markup(
-        reply_markup=InlineKeyboardMarkup(buttons)
+        buttons=InlineKeyboardMarkup(buttons)
     )
 
 
@@ -81,7 +81,7 @@ async def server_to_play(client, CallbackQuery, _):
     elif what == "Personal":
         stats = await get_userss(CallbackQuery.from_user.id)
     if not stats:
-        return await mystic.edit(_["tracks_2"].format(what), reply_markup=upl)
+        return await mystic.edit(_["tracks_2"].format(what), buttons=upl)
 
     def get_stats():
         results = {}
@@ -96,7 +96,7 @@ async def server_to_play(client, CallbackQuery, _):
                 )
             )
         if not results:
-            return mystic.edit(_["tracks_2"].format(what), reply_markup=upl)
+            return mystic.edit(_["tracks_2"].format(what), buttons=upl)
         details = []
         limit = 0
         for vidid, count in list_arranged.items():
@@ -107,7 +107,7 @@ async def server_to_play(client, CallbackQuery, _):
             limit += 1
             details.append(vidid)
         if not details:
-            return mystic.edit(_["tracks_2"].format(what), reply_markup=upl)
+            return mystic.edit(_["tracks_2"].format(what), buttons=upl)
         return details
 
     try:

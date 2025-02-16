@@ -44,7 +44,7 @@ async def on_bot_added(_, message):
                 await app.send_message(
                     LOG_GROUP_ID,
                     text=msg,
-                    reply_markup=InlineKeyboardMarkup(
+                    buttons=InlineKeyboardMarkup(
                         [
                             [
                                 InlineKeyboardButton(
@@ -89,7 +89,7 @@ async def on_bot_kicked(_, message: Message):
             await app.send_message(
                 LOG_GROUP_ID,
                 text=left,
-                reply_markup=InlineKeyboardMarkup(
+                buttons=InlineKeyboardMarkup(
                     [
                         [
                             InlineKeyboardButton(

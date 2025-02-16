@@ -54,7 +54,7 @@ async def stats_global(client, message: Message, _):
     await message.reply_photo(
         photo=config.STATS_IMG_URL,
         caption=_["gstats_11"].format(app.mention),
-        reply_markup=upl,
+        buttons=upl,
     )
 
 
@@ -111,7 +111,7 @@ async def gstats_global(client, message: Message, _):
         message.chat.id,
         photo=thumbnail,
         caption=final,
-        reply_markup=upl,
+        buttons=upl,
     )
     await mystic.delete()
 
@@ -142,7 +142,7 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
         stats = await get_particulars(chat_id)
     if not stats:
         await asyncio.sleep(1)
-        return await mystic.edit(_["gstats_2"], reply_markup=upl)
+        return await mystic.edit(_["gstats_2"], buttons=upl)
     queries = await get_queries()
 
     def get_stats():
@@ -158,7 +158,7 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
                 )
             )
         if not results:
-            return mystic.edit(_["gstats_2"], reply_markup=upl)
+            return mystic.edit(_["gstats_2"], buttons=upl)
         msg = ""
         limit = 0
         total_count = 0
@@ -220,10 +220,10 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
         msg = temp + msg
     med = InputMediaPhoto(media=config.GLOBAL_IMG_URL, caption=msg)
     try:
-        await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+        await CallbackQuery.edit_message_media(media=med, buttons=upl)
     except MessageIdInvalid:
         await CallbackQuery.message.reply_photo(
-            photo=config.GLOBAL_IMG_URL, caption=msg, reply_markup=upl
+            photo=config.GLOBAL_IMG_URL, caption=msg, buttons=upl
         )
 
 
@@ -274,10 +274,10 @@ async def overall_stats(client, CallbackQuery, _):
 **Playlist Play Limit:** {fetch_playlist}"""
     med = InputMediaPhoto(media=config.STATS_IMG_URL, caption=text)
     try:
-        await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+        await CallbackQuery.edit_message_media(media=med, buttons=upl)
     except MessageIdInvalid:
         await CallbackQuery.message.reply_photo(
-            photo=config.STATS_IMG_URL, caption=text, reply_markup=upl
+            photo=config.STATS_IMG_URL, caption=text, buttons=upl
         )
 
 
@@ -358,10 +358,10 @@ async def overall_stats(client, CallbackQuery, _):
     """
     med = InputMediaPhoto(media=config.STATS_IMG_URL, caption=text)
     try:
-        await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+        await CallbackQuery.edit_message_media(media=med, buttons=upl)
     except MessageIdInvalid:
         await CallbackQuery.message.reply_photo(
-            photo=config.STATS_IMG_URL, caption=text, reply_markup=upl
+            photo=config.STATS_IMG_URL, caption=text, buttons=upl
         )
 
 
@@ -382,12 +382,12 @@ async def back_buttons(client, CallbackQuery, _):
             caption=_["gstats_9"],
         )
         try:
-            await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+            await CallbackQuery.edit_message_media(media=med, buttons=upl)
         except MessageIdInvalid:
             await CallbackQuery.message.reply_photo(
                 photo=config.GLOBAL_IMG_URL,
                 caption=_["gstats_9"],
-                reply_markup=upl,
+                buttons=upl,
             )
     if command == "GlobalStats":
         upl = get_stats_markup(
@@ -399,12 +399,12 @@ async def back_buttons(client, CallbackQuery, _):
             caption=_["gstats_10"].format(app.mention),
         )
         try:
-            await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+            await CallbackQuery.edit_message_media(media=med, buttons=upl)
         except MessageIdInvalid:
             await CallbackQuery.message.reply_photo(
                 photo=config.GLOBAL_IMG_URL,
                 caption=_["gstats_10"].format(app.mention),
-                reply_markup=upl,
+                buttons=upl,
             )
     if command == "GETSTATS":
         upl = stats_buttons(
@@ -416,10 +416,10 @@ async def back_buttons(client, CallbackQuery, _):
             caption=_["gstats_11"].format(app.mention),
         )
         try:
-            await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+            await CallbackQuery.edit_message_media(media=med, buttons=upl)
         except MessageIdInvalid:
             await CallbackQuery.message.reply_photo(
                 photo=config.STATS_IMG_URL,
                 caption=_["gstats_11"].format(app.mention),
-                reply_markup=upl,
+                buttons=upl,
             )

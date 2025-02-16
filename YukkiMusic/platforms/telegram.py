@@ -193,7 +193,7 @@ class Telegram:
 **Speed:** {speed}/s
 **Elapsed Time:** {eta}"""
                     try:
-                        await mystic.edit_text(text, reply_markup=upl)
+                        await mystic.edit_text(text, buttons=upl)
                     except Exception:
                         pass
                     left_time[message.id] = datetime.now() + timedelta(

@@ -178,7 +178,7 @@ async def markup_timer():
                 )
 
                 await mystic.edit_reply_markup(
-                    reply_markup=InlineKeyboardMarkup(buttons)
+                    buttons=InlineKeyboardMarkup(buttons)
                 )
 
             except Exception:

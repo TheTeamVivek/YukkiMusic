@@ -50,7 +50,7 @@ async def langs_command(client, message: Message, _):
     keyboard = lanuages_keyboard(_)
     await message.reply_text(
         _["setting_1"].format(message.chat.title, message.chat.id),
-        reply_markup=keyboard,
+        buttons=keyboard,
     )
 
 
@@ -62,7 +62,7 @@ async def lanuagecb(client, CallbackQuery, _):
     except Exception:
         pass
     keyboard = lanuages_keyboard(_)
-    return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
+    return await CallbackQuery.edit_message_reply_markup(buttons=keyboard)
 
 
 @app.on_callback_query(filters.regex(r"languages:(.*?)") & ~BANNED_USERS)
@@ -86,4 +86,4 @@ async def language_markup(client, CallbackQuery, _):
         )
     await set_lang(CallbackQuery.message.chat.id, langauge)
     keyboard = lanuages_keyboard(_)
-    return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
+    return await CallbackQuery.edit_message_reply_markup(buttons=keyboard)

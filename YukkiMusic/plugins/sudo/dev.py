@@ -108,7 +108,7 @@ async def executor(client: app, message: Message):
             document=filename,
             caption=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
             quote=False,
-            reply_markup=keyboard,
+            buttons=keyboard,
         )
         await message.delete()
         os.remove(filename)
@@ -128,7 +128,7 @@ async def executor(client: app, message: Message):
                 ]
             ]
         )
-        await edit_or_reply(message, text=final_output, reply_markup=keyboard)
+        await edit_or_reply(message, text=final_output, buttons=keyboard)
 
 
 @app.on_callback_query(filters.regex(r"runtime"))

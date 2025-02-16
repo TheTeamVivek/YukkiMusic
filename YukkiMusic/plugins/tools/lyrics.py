@@ -59,5 +59,5 @@ async def lrsearch(client, message: Message, _):
             ]
         ]
     )
-    await m.edit(_["lyrics_4"], reply_markup=upl)
+    await m.edit(_["lyrics_4"], buttons=upl)
 """

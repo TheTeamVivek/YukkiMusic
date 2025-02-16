@@ -96,7 +96,7 @@ async def del_group_message(client, message: Message, _):
             ]
         ]
     )
-    await message.reply_text(_["playlist_6"], reply_markup=upl)
+    await message.reply_text(_["playlist_6"], buttons=upl)
 
 
 async def get_keyboard(_, user_id):
@@ -132,7 +132,7 @@ async def del_plist_msg(client, message: Message, _):
     else:
         return await message.reply_text(_["playlist_3"])
     keyboard, count = await get_keyboard(_, message.from_user.id)
-    await get.edit_text(_["playlist_7"].format(count), reply_markup=keyboard)
+    await get.edit_text(_["playlist_7"].format(count), buttons=keyboard)
 
 
 @app.on_callback_query(filters.regex("play_playlist") & ~BANNED_USERS)
@@ -390,7 +390,7 @@ async def del_plist(client, CallbackQuery, _):
         except Exception:
             return
     keyboard, count = await get_keyboard(_, user_id)
-    return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
+    return await CallbackQuery.edit_message_reply_markup(buttons=keyboard)
 
 
 @app.on_callback_query(filters.regex("delete_whole_playlist") & ~BANNED_USERS)
@@ -412,7 +412,7 @@ async def get_playlist_playmode_(client, CallbackQuery, _):
         pass
     buttons = get_playlist_markup(_)
     await CallbackQuery.edit_message_reply_markup(
-        reply_markup=InlineKeyboardMarkup(buttons)
+        buttons=InlineKeyboardMarkup(buttons)
     )
 
 
@@ -427,7 +427,7 @@ async def home_play_(client, CallbackQuery, _):
         pass
     buttons = botplaylist_markup(_)
     return await CallbackQuery.edit_message_reply_markup(
-        reply_markup=InlineKeyboardMarkup(buttons)
+        buttons=InlineKeyboardMarkup(buttons)
     )
 
 
@@ -439,7 +439,7 @@ async def delete_warning_message(client, CallbackQuery, _):
     except Exception:
         pass
     upl = warning_markup(_)
-    return await CallbackQuery.edit_message_text(_["playlist_14"], reply_markup=upl)
+    return await CallbackQuery.edit_message_text(_["playlist_14"], buttons=upl)
 
 
 @app.on_callback_query(filters.regex("del_back_playlist") & ~BANNED_USERS)
@@ -459,5 +459,5 @@ async def del_back_playlist(client, CallbackQuery, _):
             return
     keyboard, count = await get_keyboard(_, user_id)
     return await CallbackQuery.edit_message_text(
-        _["playlist_7"].format(count), reply_markup=keyboard
+        _["playlist_7"].format(count), buttons=keyboard
     )

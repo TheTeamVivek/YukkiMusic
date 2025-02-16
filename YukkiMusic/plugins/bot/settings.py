@@ -60,7 +60,7 @@ async def settings_mar(client, message: Message, _):
     buttons = setting_markup(_)
     await message.reply_text(
         _["setting_1"].format(message.chat.title, message.chat.id),
-        reply_markup=InlineKeyboardMarkup(buttons),
+        buttons=InlineKeyboardMarkup(buttons),
     )
 
 
@@ -77,7 +77,7 @@ async def settings_cb(client, CallbackQuery, _):
             CallbackQuery.message.chat.title,
             CallbackQuery.message.chat.id,
         ),
-        reply_markup=InlineKeyboardMarkup(buttons),
+        buttons=InlineKeyboardMarkup(buttons),
     )
 
 
@@ -99,7 +99,7 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
         try:
             await CallbackQuery.edit_message_text(
                 _["start_1"].format(app.mention),
-                reply_markup=InlineKeyboardMarkup(buttons),
+                buttons=InlineKeyboardMarkup(buttons),
             )
         except MessageNotModified:
             pass
@@ -107,7 +107,7 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
         buttons = setting_markup(_)
         try:
             await CallbackQuery.edit_message_reply_markup(
-                reply_markup=InlineKeyboardMarkup(buttons)
+                buttons=InlineKeyboardMarkup(buttons)
             )
         except MessageNotModified:
             pass
@@ -247,7 +247,7 @@ async def without_Admin_rights(client, CallbackQuery, _):
             buttons = auth_users_markup(_)
     try:
         return await CallbackQuery.edit_message_reply_markup(
-            reply_markup=InlineKeyboardMarkup(buttons)
+            buttons=InlineKeyboardMarkup(buttons)
         )
     except MessageNotModified:
         return
@@ -301,7 +301,7 @@ async def aud_vid_cb(client, CallbackQuery, _):
         buttons = video_quality_markup(_, UHD_4K=True)
     try:
         return await CallbackQuery.edit_message_reply_markup(
-            reply_markup=InlineKeyboardMarkup(buttons)
+            buttons=InlineKeyboardMarkup(buttons)
         )
     except MessageNotModified:
         return
@@ -329,7 +329,7 @@ async def cleanmode_mark(client, CallbackQuery, _):
             cle = True
         buttons = cleanmode_settings_markup(_, status=cle, dels=sta)
         return await CallbackQuery.edit_message_reply_markup(
-            reply_markup=InlineKeyboardMarkup(buttons)
+            buttons=InlineKeyboardMarkup(buttons)
         )
     if command == "COMMANDELMODE":
         cle = None
@@ -344,7 +344,7 @@ async def cleanmode_mark(client, CallbackQuery, _):
         buttons = cleanmode_settings_markup(_, status=cle, dels=sta)
     try:
         return await CallbackQuery.edit_message_reply_markup(
-            reply_markup=InlineKeyboardMarkup(buttons)
+            buttons=InlineKeyboardMarkup(buttons)
         )
     except MessageNotModified:
         return
@@ -425,7 +425,7 @@ async def playmode_ans(client, CallbackQuery, _):
         buttons = playmode_users_markup(_, Direct, Group, Playtype)
     try:
         return await CallbackQuery.edit_message_reply_markup(
-            reply_markup=InlineKeyboardMarkup(buttons)
+            buttons=InlineKeyboardMarkup(buttons)
         )
     except MessageNotModified:
         return
@@ -478,7 +478,7 @@ async def authusers_mar(client, CallbackQuery, _):
                 ]
             )
             try:
-                return await CallbackQuery.edit_message_text(msg, reply_markup=upl)
+                return await CallbackQuery.edit_message_text(msg, buttons=upl)
             except MessageNotModified:
                 return
     try:
@@ -495,7 +495,7 @@ async def authusers_mar(client, CallbackQuery, _):
             buttons = auth_users_markup(_, True)
     try:
         return await CallbackQuery.edit_message_reply_markup(
-            reply_markup=InlineKeyboardMarkup(buttons)
+            buttons=InlineKeyboardMarkup(buttons)
         )
     except MessageNotModified:
         return

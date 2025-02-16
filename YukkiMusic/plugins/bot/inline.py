@@ -85,7 +85,7 @@ __ʀᴇᴘʟʏ ᴡɪᴛʜ /play ᴏɴ ᴛʜɪs sᴇᴀʀᴄʜᴇᴅ ᴍᴇssᴀ�
                     thumb=photo,
                     description=description,
                     send_message=InputBotInlineMessageMediaAuto(
-                        message=msg, entities=entities, reply_markup=buttons
+                        message=msg, entities=entities, buttons=buttons
                     ),
                 )
             )

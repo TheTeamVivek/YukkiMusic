@@ -47,7 +47,7 @@ def play_wrapper(command):
                     ]
                 ]
             )
-            return await message.reply_text(_["ANONYMOUS_ADMIN"], reply_markup=upl)
+            return await message.reply_text(_["ANONYMOUS_ADMIN"], buttons=upl)
 
         if await is_maintenance() is False:
             if message.from_user.id not in SUDOERS:
@@ -86,7 +86,7 @@ def play_wrapper(command):
                 return await message.reply_photo(
                     photo=PLAYLIST_IMG_URL,
                     caption=_["playlist_1"],
-                    reply_markup=InlineKeyboardMarkup(buttons),
+                    buttons=InlineKeyboardMarkup(buttons),
                 )
         if message.command[0][0] == "c":
             chat_id = await get_cmode(message.chat.id)
