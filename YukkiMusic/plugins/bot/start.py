@@ -147,7 +147,7 @@ async def start_comm(client, message: Message, _):
             lyrics = lyrical.get(query)
             if lyrics:
                 async for chunk_msg in Platform.telegram.split_text(lyrics):
-                    await message.reply_text(chunk)
+                    await message.reply_text(chunk_msg)
                 return
             else:
                 await message.reply_text("Failed to get lyrics ")
