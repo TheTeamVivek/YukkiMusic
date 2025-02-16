@@ -158,7 +158,7 @@ async def admin_callback(client, CallbackQuery, _):
         await music_off(chat_id)
         await Yukki.pause_stream(chat_id)
         await CallbackQuery.message.reply_text(
-            _["admin_2"].format(mention), disable_web_page_preview=True
+            _["admin_2"].format(mention), link_preview=False
         )
     elif command == "Resume":
         if await is_music_playing(chat_id):
@@ -167,7 +167,7 @@ async def admin_callback(client, CallbackQuery, _):
         await music_on(chat_id)
         await Yukki.resume_stream(chat_id)
         await CallbackQuery.message.reply_text(
-            _["admin_4"].format(mention), disable_web_page_preview=True
+            _["admin_4"].format(mention), link_preview=False
         )
     elif command == "Stop" or command == "End":
         try:
@@ -180,7 +180,7 @@ async def admin_callback(client, CallbackQuery, _):
         await Yukki.stop_stream(chat_id)
         await set_loop(chat_id, 0)
         await CallbackQuery.message.reply_text(
-            _["admin_9"].format(mention), disable_web_page_preview=True
+            _["admin_9"].format(mention), link_preview=False
         )
     elif command == "Mute":
         if await is_muted(chat_id):
@@ -189,7 +189,7 @@ async def admin_callback(client, CallbackQuery, _):
         await mute_on(chat_id)
         await Yukki.mute_stream(chat_id)
         await CallbackQuery.message.reply_text(
-            _["admin_6"].format(mention), disable_web_page_preview=True
+            _["admin_6"].format(mention), link_preview=False
         )
     elif command == "Unmute":
         if not await is_muted(chat_id):
@@ -198,7 +198,7 @@ async def admin_callback(client, CallbackQuery, _):
         await mute_off(chat_id)
         await Yukki.unmute_stream(chat_id)
         await CallbackQuery.message.reply_text(
-            _["admin_8"].format(mention), disable_web_page_preview=True
+            _["admin_8"].format(mention), link_preview=False
         )
     elif command == "Loop":
         await CallbackQuery.answer()
@@ -221,7 +221,7 @@ async def admin_callback(client, CallbackQuery, _):
         random.shuffle(check)
         check.insert(0, popped)
         await CallbackQuery.message.reply_text(
-            _["admin_23"].format(mention), disable_web_page_preview=True
+            _["admin_23"].format(mention), link_preview=False
         )
     elif command in ["Skip", "Replay"]:
         check = db.get(chat_id)
@@ -235,7 +235,7 @@ async def admin_callback(client, CallbackQuery, _):
                 if not check:
                     await CallbackQuery.edit_message_text(txt)
                     await CallbackQuery.message.reply_text(
-                        _["admin_10"].format(mention), disable_web_page_preview=True
+                        _["admin_10"].format(mention), link_preview=False
                     )
                     try:
                         return await Yukki.stop_stream(chat_id)
@@ -244,7 +244,7 @@ async def admin_callback(client, CallbackQuery, _):
             except Exception:
                 await CallbackQuery.edit_message_text(txt)
                 await CallbackQuery.message.reply_text(
-                    _["admin_10"].format(mention), disable_web_page_preview=True
+                    _["admin_10"].format(mention), link_preview=False
                 )
                 return await Yukki.stop_stream(chat_id)
         elif command == "Replay":
@@ -284,7 +284,7 @@ async def admin_callback(client, CallbackQuery, _):
             await CallbackQuery.edit_message_text(txt)
         elif "vid_" in queued:
             mystic = await CallbackQuery.message.reply_text(
-                _["DOWNLOADING_NEXT_TRACK"], disable_web_page_preview=True
+                _["DOWNLOADING_NEXT_TRACK"], link_preview=False
             )
             try:
                 file_path, direct = await Platform.youtube.download(

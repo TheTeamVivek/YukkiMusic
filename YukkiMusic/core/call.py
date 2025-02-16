@@ -464,7 +464,7 @@ class Call:
                     )
                 except Exception:
                     return await mystic.edit_text(
-                        _["STREAM_SWITCH_FAILED"], disable_web_page_preview=True
+                        _["STREAM_SWITCH_FAILED"], link_preview=False
                     )
                 if video:
                     stream = MediaStream(

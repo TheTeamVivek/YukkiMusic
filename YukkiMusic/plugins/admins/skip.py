@@ -60,7 +60,7 @@ async def skip(cli, message: Message, _, chat_id):
                                         _["admin_10"].format(
                                             message.from_user.first_name
                                         ),
-                                        disable_web_page_preview=True,
+                                        link_preview=False,
                                     )
                                     await Yukki.stop_stream(chat_id)
                                 except Exception:
@@ -89,7 +89,7 @@ async def skip(cli, message: Message, _, chat_id):
             if not check:
                 await message.reply_text(
                     _["admin_10"].format(message.from_user.first_name),
-                    disable_web_page_preview=True,
+                    link_preview=False,
                 )
                 try:
                     return await Yukki.stop_stream(chat_id)
@@ -99,7 +99,7 @@ async def skip(cli, message: Message, _, chat_id):
             try:
                 await message.reply_text(
                     _["admin_10"].format(message.from_user.first_name),
-                    disable_web_page_preview=True,
+                    link_preview=False,
                 )
                 return await Yukki.stop_stream(chat_id)
             except Exception:
@@ -134,7 +134,7 @@ async def skip(cli, message: Message, _, chat_id):
         db[chat_id][0]["markup"] = "tg"
     elif "vid_" in queued:
         mystic = await message.reply_text(
-            _["DOWNLOADING_NEXT_TRACK"], disable_web_page_preview=True
+            _["DOWNLOADING_NEXT_TRACK"], link_preview=False
         )
         try:
             file_path, direct = await Platform.youtube.download(

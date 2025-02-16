@@ -279,7 +279,7 @@ async def help_button(client, query):
         await query.message.edit(
             text=text,
             reply_markup=key,
-            disable_web_page_preview=True,
+            link_preview=False,
         )
     elif prev_match:
         curr_page = int(prev_match.group(1))
@@ -289,7 +289,7 @@ async def help_button(client, query):
             reply_markup=await paginate_modules(
                 curr_page, query.message.chat.id, close=close
             ),
-            disable_web_page_preview=True,
+            link_preview=False,
         )
     elif next_match:
         next_page = int(next_match.group(1))
@@ -299,7 +299,7 @@ async def help_button(client, query):
             reply_markup=await paginate_modules(
                 next_page, query.message.chat.id, close=close
             ),
-            disable_web_page_preview=True,
+            link_preview=False,
         )
     elif helper_match:
         helper_key = helper_match.group(1)
@@ -321,7 +321,7 @@ async def help_button(client, query):
             await query.message.edit(
                 text=f"<b>{helper_key}:</b>\n{formatted_text}",
                 reply_markup=key,
-                disable_web_page_preview=True,
+                link_preview=False,
             )
         except Exception as e:
             logging.exception(e)

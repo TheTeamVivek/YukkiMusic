@@ -276,10 +276,10 @@ async def update_(client, message, _):
         nrs = await response.edit(
             f"**A new upadte is available for the Bot!**\n\n"
             f"➣ Pushing upadtes Now\n\n__**Updates:**__\n\n[Check Upadtes]({url})",
-            disable_web_page_preview=True,
+            link_preview=False,
         )
     else:
-        nrs = await response.edit(_final_updates_, disable_web_page_preview=True)
+        nrs = await response.edit(_final_updates_, link_preview=False)
     os.system("git stash &> /dev/null && git pull")
 
     try:
@@ -298,7 +298,7 @@ async def update_(client, message, _):
         await response.edit(
             _final_updates_
             + f"» Bot Upadted Sucessfully Now wait until the bot starts",
-            disable_web_page_preview=True,
+            link_preview=False,
         )
     except Exception:
         pass

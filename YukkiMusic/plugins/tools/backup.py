@@ -45,15 +45,15 @@ async def drop_db(client, db_name):
 
 async def edit_or_reply(mystic, text):
     try:
-        return await mystic.edit_text(text, disable_web_page_preview=True)
+        return await mystic.edit_text(text, link_preview=False)
     except FloodWait as e:
         await asyncio.sleep(e.value)
-        return await mystic.edit_text(text, disable_web_page_preview=True)
+        return await mystic.edit_text(text, link_preview=False)
     try:
         await mystic.delete()
     except Exception:
         pass
-    return await app.send_message(mystic.chat.id, disable_web_page_preview=True)
+    return await app.send_message(mystic.chat.id, link_preview=False)
 
 
 @app.on_message(filters.command("export") & ~BANNED_USERS)
