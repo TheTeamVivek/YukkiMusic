@@ -197,12 +197,12 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
     if "Queued" in msg:
         if len(msg) < 700:
             await asyncio.sleep(1)
-            return await CallbackQuery.edit_message_text(msg, buttons=buttons)
+            return await CallbackQuery.edit(msg, buttons=buttons)
 
         if "🏷" in msg:
             msg = msg.replace("🏷", "")
         link = await paste(msg)
-        await CallbackQuery.edit_message_text(
+        await CallbackQuery.edit(
             _["queue_3"].format(link), buttons=buttons
         )
     else:
@@ -211,12 +211,12 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
                 msg = msg.replace("🏷", "")
             link = await paste(msg)
             await asyncio.sleep(1)
-            return await CallbackQuery.edit_message_text(
+            return await CallbackQuery.edit(
                 _["queue_3"].format(link), buttons=buttons
             )
 
         await asyncio.sleep(1)
-        return await CallbackQuery.edit_message_text(msg, buttons=buttons)
+        return await CallbackQuery.edit(msg, buttons=buttons)
 
 
 @app.on_callback_query(filters.regex("queue_back_timer") & ~BANNED_USERS)

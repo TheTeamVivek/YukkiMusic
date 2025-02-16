@@ -233,7 +233,7 @@ async def admin_callback(client, CallbackQuery, _):
                 if popped:
                     await auto_clean(popped)
                 if not check:
-                    await CallbackQuery.edit_message_text(txt)
+                    await CallbackQuery.edit(txt)
                     await CallbackQuery.message.reply_text(
                         _["admin_10"].format(mention), link_preview=False
                     )
@@ -242,7 +242,7 @@ async def admin_callback(client, CallbackQuery, _):
                     except Exception:
                         return
             except Exception:
-                await CallbackQuery.edit_message_text(txt)
+                await CallbackQuery.edit(txt)
                 await CallbackQuery.message.reply_text(
                     _["admin_10"].format(mention), link_preview=False
                 )
@@ -281,7 +281,7 @@ async def admin_callback(client, CallbackQuery, _):
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
-            await CallbackQuery.edit_message_text(txt)
+            await CallbackQuery.edit(txt)
         elif "vid_" in queued:
             mystic = await CallbackQuery.message.reply_text(
                 _["DOWNLOADING_NEXT_TRACK"], link_preview=False
@@ -313,7 +313,7 @@ async def admin_callback(client, CallbackQuery, _):
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "stream"
-            await CallbackQuery.edit_message_text(txt)
+            await CallbackQuery.edit(txt)
             await mystic.delete()
         elif "index_" in queued:
             try:
@@ -328,7 +328,7 @@ async def admin_callback(client, CallbackQuery, _):
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
-            await CallbackQuery.edit_message_text(txt)
+            await CallbackQuery.edit(txt)
         else:
             try:
                 await Yukki.skip_stream(chat_id, queued, video=status)
@@ -390,7 +390,7 @@ async def admin_callback(client, CallbackQuery, _):
                 )
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "stream"
-            await CallbackQuery.edit_message_text(txt)
+            await CallbackQuery.edit(txt)
     else:
         playing = db.get(chat_id)
         if not playing:
@@ -716,7 +716,7 @@ async def stop_download(client, CallbackQuery: CallbackQuery, _):
             except Exception:
                 pass
             await CallbackQuery.answer("Downloading Cancelled", show_alert=True)
-            return await CallbackQuery.edit_message_text(
+            return await CallbackQuery.edit(
                 f"Downloading cancelled by {CallbackQuery.from_user.mention}"
             )
         except Exception:

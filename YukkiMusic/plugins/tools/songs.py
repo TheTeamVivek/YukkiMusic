@@ -188,7 +188,7 @@ async def song_helper_cb(client, CallbackQuery, _):
 
         except Exception:
 
-            return await CallbackQuery.edit_message_text(_["song_7"])
+            return await CallbackQuery.edit(_["song_7"])
 
         keyboard = InlineKeyboard()
 
@@ -245,7 +245,7 @@ async def song_helper_cb(client, CallbackQuery, _):
 
             print(e)
 
-            return await CallbackQuery.edit_message_text(_["song_7"])
+            return await CallbackQuery.edit(_["song_7"])
 
         keyboard = InlineKeyboard()
 
@@ -310,7 +310,7 @@ async def song_download_cb(client, CallbackQuery, _):
 
     stype, format_id, vidid = callback_request.split("|")
 
-    mystic = await CallbackQuery.edit_message_text(_["song_8"])
+    mystic = await CallbackQuery.edit(_["song_8"])
 
     yturl = f"https://www.youtube.com/watch?v={vidid}"
 

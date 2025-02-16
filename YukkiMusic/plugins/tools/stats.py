@@ -127,7 +127,7 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
         await CallbackQuery.answer()
     except Exception:
         pass
-    mystic = await CallbackQuery.edit_message_text(
+    mystic = await CallbackQuery.edit(
         _["gstats_3"].format(
             f"ᴏғ {CallbackQuery.message.chat.title}" if what == "Here" else what
         )
@@ -240,7 +240,7 @@ async def overall_stats(client, CallbackQuery, _):
         await CallbackQuery.answer()
     except Exception:
         pass
-    await CallbackQuery.edit_message_text(_["gstats_8"])
+    await CallbackQuery.edit(_["gstats_8"])
     served_chats = len(await get_served_chats())
     served_users = len(await get_served_users())
     total_queries = await get_queries()
@@ -296,7 +296,7 @@ async def overall_stats(client, CallbackQuery, _):
         await CallbackQuery.answer()
     except Exception:
         pass
-    await CallbackQuery.edit_message_text(_["gstats_8"])
+    await CallbackQuery.edit(_["gstats_8"])
     sc = platform.system()
     p_core = psutil.cpu_count(logical=False)
     t_core = psutil.cpu_count(logical=True)

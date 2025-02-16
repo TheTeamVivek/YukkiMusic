@@ -208,7 +208,7 @@ async def helper_private(client: app, update: types.Message | types.CallbackQuer
         language = await get_lang(chat_id)
         _ = get_string(language)
         keyboard = await paginate_modules(0, chat_id, close=False)
-        await update.edit_message_text(_["help_1"], buttons=keyboard)
+        await update.edit(_["help_1"], buttons=keyboard)
     else:
         chat_id = update.chat.id
         if await is_commanddelete_on(update.chat.id):

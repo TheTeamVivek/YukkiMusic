@@ -145,7 +145,7 @@ async def show_privacy_sections(client, callback_query):
             ],
         ]
     )
-    await callback_query.edit_message_text(
+    await callback_query.edit(
         f"{TEXT}\n\nSelect a section to learn more:",
         buttons=keyboard,
         link_preview=False,
@@ -174,7 +174,7 @@ async def privacy_section_callback(client, callback_query):
                 [InlineKeyboardButton("Close", callback_data="close")],
             ]
         )
-        return await callback_query.edit_message_text(
+        return await callback_query.edit(
             TEXT, buttons=keyboard, link_preview=False
         )
 
@@ -187,7 +187,7 @@ async def privacy_section_callback(client, callback_query):
                 ],
             ]
         )
-        await callback_query.edit_message_text(
+        await callback_query.edit(
             PRIVACY_SECTIONS[section], buttons=keyboard
         )
 
@@ -305,4 +305,4 @@ async def delete_user_data(_, cq):
         pass
 
     await delete_userss(user_id)
-    await cq.edit_message_text("Your data has been deleted from the bot.")
+    await cq.edit("Your data has been deleted from the bot.")

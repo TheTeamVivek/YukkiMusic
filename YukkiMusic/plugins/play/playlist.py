@@ -324,7 +324,7 @@ async def del_plist(client, CallbackQuery, _):
         except Exception:
             return
 
-    return await CallbackQuery.edit_message_text(text=_["playlist_23"])
+    return await CallbackQuery.edit(text=_["playlist_23"])
 
 
 @app.on_callback_query(filters.regex("add_playlist") & ~BANNED_USERS)
@@ -400,7 +400,7 @@ async def del_whole_playlist(client, CallbackQuery, _):
     for x in _playlist:
         await CallbackQuery.answer(_["playlist_25"], show_alert=True)
         await delete_playlist(CallbackQuery.from_user.id, x)
-    return await CallbackQuery.edit_message_text(_["playlist_13"])
+    return await CallbackQuery.edit(_["playlist_13"])
 
 
 @app.on_callback_query(filters.regex("get_playlist_playmode") & ~BANNED_USERS)
@@ -439,7 +439,7 @@ async def delete_warning_message(client, CallbackQuery, _):
     except Exception:
         pass
     upl = warning_markup(_)
-    return await CallbackQuery.edit_message_text(_["playlist_14"], buttons=upl)
+    return await CallbackQuery.edit(_["playlist_14"], buttons=upl)
 
 
 @app.on_callback_query(filters.regex("del_back_playlist") & ~BANNED_USERS)
@@ -458,6 +458,6 @@ async def del_back_playlist(client, CallbackQuery, _):
         except Exception:
             return
     keyboard, count = await get_keyboard(_, user_id)
-    return await CallbackQuery.edit_message_text(
+    return await CallbackQuery.edit(
         _["playlist_7"].format(count), buttons=keyboard
     )

@@ -72,7 +72,7 @@ async def settings_cb(client, CallbackQuery, _):
     except Exception:
         pass
     buttons = setting_markup(_)
-    return await CallbackQuery.edit_message_text(
+    return await CallbackQuery.edit(
         _["setting_1"].format(
             CallbackQuery.message.chat.title,
             CallbackQuery.message.chat.id,
@@ -97,7 +97,7 @@ async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
             OWNER = None
         buttons = private_panel(_, OWNER)
         try:
-            await CallbackQuery.edit_message_text(
+            await CallbackQuery.edit(
                 _["start_1"].format(app.mention),
                 buttons=InlineKeyboardMarkup(buttons),
             )
@@ -449,7 +449,7 @@ async def authusers_mar(client, CallbackQuery, _):
             except Exception:
                 pass
             j = 0
-            await CallbackQuery.edit_message_text(_["FETCHING_AUTHORIZED_USERS"])
+            await CallbackQuery.edit(_["FETCHING_AUTHORIZED_USERS"])
             msg = _["AUTHORIZED_USERS_LIST"]
             for note in _authusers:
                 _note = await get_authuser(CallbackQuery.message.chat.id, note)
@@ -478,7 +478,7 @@ async def authusers_mar(client, CallbackQuery, _):
                 ]
             )
             try:
-                return await CallbackQuery.edit_message_text(msg, buttons=upl)
+                return await CallbackQuery.edit(msg, buttons=upl)
             except MessageNotModified:
                 return
     try:
