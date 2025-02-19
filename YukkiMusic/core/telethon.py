@@ -147,7 +147,6 @@ class TelethonClient(TelegramClient):
 
         return decorator
 
-
     async def __task_runner(self):
         while True:
             async with self.__lock:
