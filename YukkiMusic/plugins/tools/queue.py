@@ -202,18 +202,14 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
         if "🏷" in msg:
             msg = msg.replace("🏷", "")
         link = await paste(msg)
-        await CallbackQuery.edit(
-            _["queue_3"].format(link), buttons=buttons
-        )
+        await CallbackQuery.edit(_["queue_3"].format(link), buttons=buttons)
     else:
         if len(msg) > 700:
             if "🏷" in msg:
                 msg = msg.replace("🏷", "")
             link = await paste(msg)
             await asyncio.sleep(1)
-            return await CallbackQuery.edit(
-                _["queue_3"].format(link), buttons=buttons
-            )
+            return await CallbackQuery.edit(_["queue_3"].format(link), buttons=buttons)
 
         await asyncio.sleep(1)
         return await CallbackQuery.edit(msg, buttons=buttons)

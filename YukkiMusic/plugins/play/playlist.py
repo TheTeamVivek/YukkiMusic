@@ -411,9 +411,7 @@ async def get_playlist_playmode_(client, CallbackQuery, _):
     except Exception:
         pass
     buttons = get_playlist_markup(_)
-    await CallbackQuery.edit_message_reply_markup(
-        buttons=InlineKeyboardMarkup(buttons)
-    )
+    await CallbackQuery.edit_message_reply_markup(buttons=InlineKeyboardMarkup(buttons))
 
 
 @app.on_callback_query(filters.regex("home_play") & ~BANNED_USERS)
@@ -458,6 +456,4 @@ async def del_back_playlist(client, CallbackQuery, _):
         except Exception:
             return
     keyboard, count = await get_keyboard(_, user_id)
-    return await CallbackQuery.edit(
-        _["playlist_7"].format(count), buttons=keyboard
-    )
+    return await CallbackQuery.edit(_["playlist_7"].format(count), buttons=keyboard)

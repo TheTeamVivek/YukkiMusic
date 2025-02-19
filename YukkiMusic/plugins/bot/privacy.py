@@ -174,9 +174,7 @@ async def privacy_section_callback(client, callback_query):
                 [InlineKeyboardButton("Close", callback_data="close")],
             ]
         )
-        return await callback_query.edit(
-            TEXT, buttons=keyboard, link_preview=False
-        )
+        return await callback_query.edit(TEXT, buttons=keyboard, link_preview=False)
 
     if section in PRIVACY_SECTIONS:
         keyboard = InlineKeyboardMarkup(
@@ -187,9 +185,7 @@ async def privacy_section_callback(client, callback_query):
                 ],
             ]
         )
-        await callback_query.edit(
-            PRIVACY_SECTIONS[section], buttons=keyboard
-        )
+        await callback_query.edit(PRIVACY_SECTIONS[section], buttons=keyboard)
 
 
 @app.on_callback_query(filters.regex("retrieve_data"))
