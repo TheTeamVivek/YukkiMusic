@@ -9,7 +9,7 @@
 #
 from YukkiMusic import tbot
 from YukkiMusic.core import filters
-from YukkiMusic.misc import SUDOERS, db
+from YukkiMusic.misc import db
 from YukkiMusic.utils.database.memorydatabase import (
     get_active_chats,
     get_active_video_chats,
@@ -89,8 +89,7 @@ async def active_video(event):
 
 
 @tbot.on_message(
-    filters.command("AC_COMMAND", use_strings=True)
-    & filters.user(list(BANNED_USERS))
+    filters.command("AC_COMMAND", use_strings=True) & filters.user(list(BANNED_USERS))
 )
 async def ac_counts(event):
     ac_audio = len(await get_active_chats())
