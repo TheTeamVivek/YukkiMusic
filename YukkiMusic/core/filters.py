@@ -1,8 +1,8 @@
-import re
 import asyncio
 import inspect
-
+import re
 from string import get_string
+
 
 class Combinator:
     def __init__(self, func):
