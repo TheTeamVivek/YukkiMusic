@@ -64,6 +64,21 @@ async def channel(event):
 
     return False
 
+@wrap
+def user(user_id: int | list):
+    """Decorator to check if the sender is a specific user or in a list of users."""
+    if not isinstance(user_id, (int, list)):
+        raise TypeError("user_id must be an int or a list of ints")
+
+    async def func(event):
+        sender_id = getattr(event, "sender_id", False)
+        if not sender_id:
+            return False
+
+        return sender_id == user_id if isinstance(user_id, int) else sender_id in user_id
+
+    return func
+
 
 @wrap
 def command(commands, use_strings=False):
