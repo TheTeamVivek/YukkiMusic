@@ -1,4 +1,3 @@
-import asyncio
 import inspect
 import re
 from string import get_string
