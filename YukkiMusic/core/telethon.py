@@ -41,7 +41,7 @@ log = logger(__name__)
 
 
 @dataclass
-class ShellCommandResult:
+class ShellRunResult:
     returncode: int
     stdout: str
     stderr: str
@@ -206,7 +206,7 @@ class TelethonClient(TelegramClient):
         async with self.__lock:
             self.__tasks.append((func, args, kwargs))
 
-    async def execute_command(self, command: list):
+    async def run(self, command: list):
         process = await asyncio.create_subprocess_exec(
             *command,
             stdout=asyncio.subprocess.PIPE,
@@ -215,7 +215,7 @@ class TelethonClient(TelegramClient):
 
         stdout, stderr = await process.communicate()
 
-        return ShellCommandResult(
+        return ShellRunResult(
             returncode=process.returncode,
             stdout=stdout.decode().strip() if stdout else None,
             stderr=stderr.decode().strip() if stderr else None,
