@@ -1,11 +1,9 @@
 import asyncio
 import inspect
-import re
 import traceback
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
-from string import get_string
 from typing import Any
 
 from telethon import TelegramClient, events
@@ -32,8 +30,6 @@ from telethon.tl.types import (
     PeerChat,
     User,
 )
-
-from YukkiMusic.utils.database import get_lang
 
 from ..logging import logger
 
@@ -147,6 +143,7 @@ class TelethonClient(TelegramClient):
         def decorator(function):
             self.add_event_handler(function, events.NewMessage(*args, **kwargs))
             return function
+
         return decorator
 
     async def __task_runner(self):
