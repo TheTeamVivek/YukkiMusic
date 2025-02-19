@@ -44,12 +44,12 @@ def private(event):
 
 
 @wrap
-def command(commands, use_string=False):
+def command(commands, use_strings=False):
     if isinstance(commands, str):
         commands = [commands]
 
     async def func(event):
-        if use_string:
+        if use_strings:
             try:
                 lang = await get_lang(event.chat_id)
                 string = get_string(lang)
