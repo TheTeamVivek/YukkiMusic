@@ -15,7 +15,7 @@ class Combinator:
     async def __call__(self, event):
         if inspect.iscoroutinefunction(self.func):
             return await self.func(event)
-        return await asyncio.to_thread(self.func, event)
+        return self.func(event)
 
     def __and__(self, other):
         async def and_func(event):
