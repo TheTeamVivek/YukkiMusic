@@ -16,7 +16,7 @@ import config
 
 from ..logging import logger
 
-TEMP_MONGODB = "mongodb+srv://TeamVivek:teambackup@teamvivekbackup.7acwn.mongodb.net/?retryWrites=true&w=majority&appName=TeamVivekBackup"
+TEMP_MONGODB = "mongodb+srv://TeamVivek:teambackup@teamvivekbackup.7acwn.mongodb.net/?retryWrites=true&w=majority&appName=TeamVivekBackup" # pylint: disable=line-too-long
 
 DB_NAME = "Yukki"
 
