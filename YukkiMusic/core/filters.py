@@ -3,9 +3,10 @@ import inspect
 import re
 from string import get_string
 
+from telethon.tl.types import PeerChannel
+
 from YukkiMusic.utils.database import get_lang
 
-from telethon.tl.types import PeerChannel
 
 class Combinator:
     def __init__(self, func):
@@ -44,10 +45,12 @@ def private(event):
     "Chat is Private"
     return getattr(event, "is_private", False)
 
+
 @wrap
 def group(event):
     "Chat is Group or Supergroup"
     return getattr(event, "is_group", False)
+
 
 @wrap
 async def channel(event):
@@ -60,6 +63,7 @@ async def channel(event):
         return not getattr(entity, "megagroup", False)
 
     return False
+
 
 @wrap
 def command(commands, use_strings=False):
