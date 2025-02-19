@@ -18,19 +18,17 @@ from .Telegram import Telegram
 from .Youtube import YouTube
 
 
-class PlatForms:
-    def __init__(self):
-        self.apple = Apple()
-        self.carbon = Carbon()
-        self.saavn = Saavn()
-        self.resso = Resso()
-        self.soundcloud = SoundCloud()
-        self.spotify = Spotify()
-        self.telegram = Telegram()
-        self.youtube = YouTube()
+apple = Apple()
+carbon = Carbon()
+saavn = Saavn()
+resso = Resso()
+soundcloud = SoundCloud()
+spotify = Spotify()
+telegram = Telegram()
+youtube = YouTube()
 
-    async def valid(url: str) -> SourceType:
-        services = [
+async def valid(url: str) -> SourceType:
+    services = [
             (self.apple, SourceType.APPLE),
             (self.saavn, SourceType.SAAVN),
             (self.resso, SourceType.RESSO),
@@ -39,18 +37,13 @@ class PlatForms:
             (self.youtube, SourceType.YOUTUBE),
         ]
 
-        for service, source_type in services:
-            if await service.valid(url):
-                return source_type
+    for service, source_type in services:
+        if await service.valid(url):
+            return source_type
 
-    async def info(
+async def info(
         type: SourceType, **kwargs
     ) -> (
         dict
     ):  # todo implement all classes and there info function in this function using SourceType and **kwargs
-        pass
-
-    async def download(
-        type: SourceType, **kwargs
-    ) -> dict:  # todo implement all downlod methdos in this download
-        pass
+    pass
