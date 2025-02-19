@@ -1,6 +1,8 @@
+import re
 import asyncio
 import inspect
 
+from string import get_string
 
 class Combinator:
     def __init__(self, func):
@@ -37,3 +39,35 @@ def wrap(func):
 @wrap
 def private(event):
     return getattr(event, "is_private", False)
+
+
+@wrap
+def command(commands, use_string=False):
+    if isinstance(commands, str):
+        commands = [commands]
+
+    async def func(event):
+        if use_string:
+            try:
+                lang = await get_lang(event.chat_id)
+                string = get_string(lang)
+            except Exception:
+                string = get_string("en")
+
+            command_list = [string.get(cmd, cmd) for cmd in commands]
+        else:
+            command_list = commands
+
+        command_pattern = "|".join([re.escape(cmd) for cmd in command_list])
+
+        user = await event.client.get_me()
+        username = re.escape(user.username) if user and user.username else ""
+
+        pattern = re.compile(
+            rf"^(?:/)?({command_pattern})(?:@{username})?(?:\s|$)",
+            re.IGNORECASE,
+        )
+
+        return bool(re.match(pattern, event.text))
+
+    return func
