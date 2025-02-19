@@ -16,7 +16,6 @@ from YukkiMusic.core.telethon import TelethonClient
 from YukkiMusic.core.userbot import Userbot
 
 from .logging import logger
-from .platforms import PlatForms
 
 # Pyrogram Client
 
@@ -44,5 +43,4 @@ dirr()
 # Check Git Updates
 git()
 
-Platform = PlatForms()
 HELPABLE = {}
