@@ -138,13 +138,15 @@ class TelethonClient(TelegramClient):
         # pylint: enable=attribute-defined-outside-init
         asyncio.create_task(self.__task_runner())
 
-    def on_message(self, *args, **kwargs):
-
+    def on_message(self, func=None, *args, **kwargs):
         def decorator(function):
+            if func is not None:
+                kwargs["func"] = func
             self.add_event_handler(function, events.NewMessage(*args, **kwargs))
             return function
 
         return decorator
+
 
     async def __task_runner(self):
         while True:
