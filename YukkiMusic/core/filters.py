@@ -67,7 +67,7 @@ async def channel(event):
 
 @wrap
 def user(user_id: int | list):
-    """Decorator to check if the sender is a specific user or in a list of users."""
+    """Check if the sender is a specific user or in a list of users."""
     if not isinstance(user_id, (int, list)):
         raise TypeError("user_id must be an int or a list of ints")
 
