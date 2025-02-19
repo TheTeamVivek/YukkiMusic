@@ -142,45 +142,11 @@ class TelethonClient(TelegramClient):
         # pylint: enable=attribute-defined-outside-init
         asyncio.create_task(self.__task_runner())
 
-    def on_message(self, command, **kwargs):
+    def on_message(self, *args, **kwargs):
+
         def decorator(function):
-            kwargs["incoming"] = kwargs.get("incoming", True)
-            func = kwargs.get("func")
-
-            async def custom_func(event):
-                if func and not await self.run_coro(func, event):
-                    return False
-
-                if isinstance(command, str):
-                    command_list = [command]
-                else:
-                    command_list = command
-
-                try:
-                    lang = await get_lang(event.chat_id)
-                    string = get_string(lang)
-                except Exception:
-                    string = get_string(lang)
-
-                command_list = [string[cmd] for cmd in command_list]
-                command_pattern = "|".join([re.escape(cmd) for cmd in command_list])
-
-                user = await event.client.get_me()
-                username = re.escape(user.username) if user and user.username else ""
-
-                pattern = re.compile(
-                    rf"^(?:/)?({command_pattern})(?:@{username})?(?:\s|$)",
-                    re.IGNORECASE,
-                )
-
-                return bool(re.match(pattern, event.text))
-
-            kwargs["func"] = custom_func
-            kwargs.pop("pattern", None)
-
-            self.add_event_handler(function, events.NewMessage(**kwargs))
+            self.add_event_handler(function, events.NewMessage(*args, **kwargs))
             return function
-
         return decorator
 
     async def __task_runner(self):
