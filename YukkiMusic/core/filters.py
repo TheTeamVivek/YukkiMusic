@@ -64,6 +64,7 @@ async def channel(event):
 
     return False
 
+
 @wrap
 def user(user_id: int | list):
     """Decorator to check if the sender is a specific user or in a list of users."""
@@ -75,7 +76,9 @@ def user(user_id: int | list):
         if not sender_id:
             return False
 
-        return sender_id == user_id if isinstance(user_id, int) else sender_id in user_id
+        return (
+            sender_id == user_id if isinstance(user_id, int) else sender_id in user_id
+        )
 
     return func
 
