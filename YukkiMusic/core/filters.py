@@ -5,6 +5,7 @@ from string import get_string
 
 from YukkiMusic.utils.database import get_lang
 
+from telethon.tl.types import PeerChannel
 
 class Combinator:
     def __init__(self, func):
@@ -40,8 +41,25 @@ def wrap(func):
 
 @wrap
 def private(event):
+    "Chat is Private"
     return getattr(event, "is_private", False)
 
+@wrap
+def group(event):
+    "Chat is Group or Supergroup"
+    return getattr(event, "is_group", False)
+
+@wrap
+async def channel(event):
+    """Check if the chat is a Channel (not a Mega Group)."""
+    msg = getattr(event, "message", None)
+    peer = getattr(msg, "peer_id", None) if msg else None
+
+    if isinstance(peer, PeerChannel):
+        entity = await event.client.get_entity(peer)
+        return not getattr(entity, "megagroup", False)
+
+    return False
 
 @wrap
 def command(commands, use_strings=False):
