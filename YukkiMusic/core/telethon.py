@@ -133,11 +133,13 @@ class TelethonClient(TelegramClient):
     async def start(self, *args, **kwargs):
         await super.start(*args, **kwargs)
         me = await self.get_me()
+        # pylint: disable=attribute-defined-outside-init
         self.me = me
         self.id = me.id
         self.username = me.username
         self.mention = self.create_mention(me)
         self.name = f"{me.first_name} {me.last_name or ''}".strip()
+        # pylint: enable=attribute-defined-outside-init
         asyncio.create_task(self.__task_runner())
 
     def on_message(self, command, **kwargs):
