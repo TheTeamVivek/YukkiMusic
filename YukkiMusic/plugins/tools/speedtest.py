@@ -34,7 +34,7 @@ async def run_speedtest(m):
 
 
 @tbot.on_message(
-    filters.command("SPEEDTEST_COMMAND", use_strings=True), from_users=list(SUDOERS)
+    filters.command("SPEEDTEST_COMMAND", use_strings=True) & filters.user(list(SUDOERS))
 )
 async def speedtest_function(event):
     m = await event.reply("Running Speedtest...")
