@@ -13,7 +13,7 @@ from pyrogram.types import Message
 
 from config import BANNED_USERS, adminlist
 from strings import command
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.utils.database import (
     delete_authuser,
     get_authuser,
@@ -119,23 +119,23 @@ async def unauthusers(client, message: Message, _):
         return await message.reply_text(_["USER_NOT_AUTHORIZED"])
 
 
-@app.on_message(command("AUTHUSERS_COMMAND") & filters.group & ~BANNED_USERS)
+@tbot.on_message(flt.command("AUTHUSERS_COMMAND") & flt.group & ~flt.user(BANNED_USERS))
 @language
-async def authusers(client, message: Message, _):
-    _playlist = await get_authuser_names(message.chat.id)
+async def authusers(event, _):
+    _playlist = await get_authuser_names(event.chat_id)
     if not _playlist:
-        return await message.reply_text(_["setting_5"])
+        return await event.reply(_["setting_5"])
     else:
         j = 0
-        mystic = await message.reply_text(_["FETCHING_AUTHORIZED_USERS"])
+        mystic = await event.reply(_["FETCHING_AUTHORIZED_USERS"])
         text = _["AUTHORIZED_USERS_LIST"]
         for note in _playlist:
-            _note = await get_authuser(message.chat.id, note)
+            _note = await get_authuser(event.chat_id, note)
             user_id = _note["auth_user_id"]
             admin_id = _note["admin_id"]
             admin_name = _note["admin_name"]
             try:
-                user = await app.get_users(user_id)
+                user = await app.get_entity(user_id)
                 user = user.first_name
                 j += 1
             except Exception:
@@ -143,4 +143,4 @@ async def authusers(client, message: Message, _):
             text += f"{j}➤ {user}[`{user_id}`]\n"
             text += f"   {_['AUTHORIZED_BY']} {admin_name}[`{admin_id}`]\n\n"
         await mystic.delete()
-        await message.reply_text(text)
+        await event.reply(text)
