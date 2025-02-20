@@ -2,8 +2,8 @@ import inspect
 import re
 from string import get_string
 
-from telethon.tl.types import PeerChannel
-from telethon.tl.types import User
+from telethon.tl.types import PeerChannel, User
+
 from YukkiMusic.utils.database import get_lang
 
 
@@ -67,9 +67,10 @@ async def channel(event):
 @wrap
 def user(users):
     """Check if the sender is a specific user"""
+
     async def check_user(event):
         if not getattr(event, "sender_id", False):
-            return False 
+            return False
         sender = await event.get_sender()
 
         if not isinstance(sender, User):
