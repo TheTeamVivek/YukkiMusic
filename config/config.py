@@ -16,6 +16,7 @@ from pyrogram import filters
 
 load_dotenv()
 
+
 def is_true(value: str) -> bool:
     return value.lower() in ["true", "1", "yes"]
 
@@ -268,7 +269,9 @@ DURATION_LIMIT = int(time_to_seconds(f"{DURATION_LIMIT_MIN}:00"))
 SONG_DOWNLOAD_DURATION_LIMIT = int(time_to_seconds(f"{SONG_DOWNLOAD_DURATION}:00"))
 
 if not STRING_SESSIONS:
-    print("Oops You need fill at least one Pyrogram session to run this bot, Exiting...")
+    print(
+        "Oops You need fill at least one Pyrogram session to run this bot, Exiting..."
+    )
     sys.exit()
 
 _DEFAULTS = {
@@ -309,5 +312,3 @@ for var_name in _REQUIRED_URLS:
             f"[ERROR] - Your {var_name} URL is incorrect. Please ensure it starts with https://"
         )
         sys.exit()
-
-
