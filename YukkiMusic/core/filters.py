@@ -3,7 +3,7 @@ import re
 from string import get_string
 
 from telethon.tl.types import PeerChannel
-
+from telethon.tl.types import User
 from YukkiMusic.utils.database import get_lang
 
 
@@ -65,21 +65,37 @@ async def channel(event):
 
 
 @wrap
-def user(user_id: int | list):
-    """Check if the sender is a specific user or in a list of users."""
-    if not isinstance(user_id, (int, list)):
-        raise TypeError("user_id must be an int or a list of ints")
+def user(users):
+"""Check if the sender is a specific user"""
+    async def check_user(event):
+        sender = await event.get_sender()
 
-    async def func(event):
-        sender_id = getattr(event, "sender_id", False)
-        if not sender_id:
+        if not isinstance(sender, User):
             return False
 
-        return (
-            sender_id == user_id if isinstance(user_id, int) else sender_id in user_id
-        )
+        user_id = sender.id
+        username = sender.username.lower() if sender.username else None
 
-    return func
+        if isinstance(users, (int, str)):
+            users_set = {users}
+        else:
+            users_set = set(users)
+
+        users = set()
+        for user in users_set:
+            if isinstance(user, int):
+                users.add(user)
+            else:
+                users.add(str(user).lower().lstrip("@"))
+
+        if "me" in users or "self" in users:
+            users.add(event.client.me.id)
+            if event.client.me.username:
+                users.add(event.client.me.username.lower())
+
+        return user_id in users or (username in users if username else False)
+
+    return check_user
 
 
 @wrap
