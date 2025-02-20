@@ -242,7 +242,7 @@ SPOTIFY_PLAYLIST_IMG_URL = getenv(
 
 ### DONT TOUCH or EDIT codes after this line
 
-BANNED_USERS = filters.user()
+BANNED_USERS = set()
 YTDOWNLOADER = 1
 LOG = 2
 LOG_FILE_NAME = "logs.txt"
