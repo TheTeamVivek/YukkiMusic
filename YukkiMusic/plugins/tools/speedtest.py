@@ -12,7 +12,6 @@
 from speedtest import Speedtest
 
 from YukkiMusic import tbot
-from YukkiMusic.core import filters
 from YukkiMusic.misc import SUDOERS
 
 
