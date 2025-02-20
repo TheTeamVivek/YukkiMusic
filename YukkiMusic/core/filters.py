@@ -68,7 +68,7 @@ async def channel(event):
 def user(users):
     """Check if the sender is a specific user"""
     async def check_user(event):
-        if not getattr(event, "sender_id", False)
+        if not getattr(event, "sender_id", False):
             return False 
         sender = await event.get_sender()
 
