@@ -15,13 +15,14 @@ from pyrogram.types import Message
 
 from config import BANNED_USERS, adminlist
 from strings import command
-from YukkiMusic import app
+from YukkiMusic import tbot
+from YukkiMusic.core.filters import command, user, group
 from YukkiMusic.utils.database import get_authuser_names
 from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.formatters import alpha_to_int
 
 
-@app.on_message(command("RELOAD_COMMAND") & filters.group & ~BANNED_USERS)
+@app.on_message(command("RELOAD_COMMAND", use_strings=True) & group & ~user(BANNED_USERS))
 @language
 async def reload_admin_cache(client, message: Message, _):
     try:
