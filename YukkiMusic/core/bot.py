@@ -40,7 +40,7 @@ import config
 from YukkiMusic.utils.decorators.asyncify import asyncify
 
 from ..logging import logger
-
+from . import filters as telethon_filters
 uvloop.install()
 
 
@@ -236,6 +236,7 @@ class YukkiBot(Client):
         module.logger = logger(module_path)
         module.app = self
         module.Config = config
+        mod.flt = telethon_filters
         for name, attr in attrs.items():
             setattr(module, name, attr)
 
