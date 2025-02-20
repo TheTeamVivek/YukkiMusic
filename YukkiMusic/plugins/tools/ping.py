@@ -19,8 +19,8 @@ from YukkiMusic.utils.inline import support_group_markup
 
 
 @tbot.on_message(
-    filters.command("PING_COMMAND", use_strings=True)
-    & ~filters.user(list(BANNED_USERS))
+    flt.command("PING_COMMAND", use_strings=True)
+    & ~flt.user(list(BANNED_USERS))
 )
 @language
 async def ping_com(event, _):
