@@ -24,11 +24,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd .github/docs
-          pip install -r requirements.txt
+          pip install -r .github/docs/requirements.txt
 
       - name: Build documentation
         run: |
+          cd .github/docs
           make html
 
       - name: Deploy 🚀
