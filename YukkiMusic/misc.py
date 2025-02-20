@@ -44,8 +44,8 @@ XCB = [
 ]
 
 
-SUDOERS = filters.user()
-owner = config.OWNER_ID
+SUDOERS = set()
+
 if config.MONGO_DB_URI is None:
     for user_id in config.OWNER_ID:
         SUDOERS.add(user_id)
@@ -53,7 +53,7 @@ else:
     sudoersdb = pymongodb.sudoers
     db_sudoers = sudoersdb.find_one({"sudo": "sudo"})
     db_sudoers = [] if not db_sudoers else db_sudoers["sudoers"]
-    for user_id in owner:
+    for user_id in config.OWNER_ID:
         SUDOERS.add(user_id)
         if user_id not in db_sudoers:
             db_sudoers.append(user_id)
