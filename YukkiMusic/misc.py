@@ -11,7 +11,6 @@ import socket
 import time
 
 import heroku3
-from pyrogram import filters
 
 import config
 from YukkiMusic.core.mongo import pymongodb
