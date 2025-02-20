@@ -26,8 +26,8 @@ async def _clear_(chat_id):
 
 
 @tbot.on_message(
-    filters.command("ACTIVEVC_COMMAND", use_strings=True)
-    & filters.user(list(BANNED_USERS))
+    flt.command("ACTIVEVC_COMMAND", use_strings=True)
+    & flt.user(list(BANNED_USERS))
 )
 async def active_audio(event):
     mystic = await event.reply("Getting Active Voicechats....\nPlease hold on")
@@ -59,8 +59,8 @@ async def active_audio(event):
 
 
 @tbot.on_message(
-    filters.command("ACTIVEVIDEO_COMMAND", use_strings=True)
-    & filters.user(list(BANNED_USERS))
+    flt.command("ACTIVEVIDEO_COMMAND", use_strings=True)
+    & flt.user(list(BANNED_USERS))
 )
 async def active_video(event):
     mystic = await event.reply("Getting Active Voicechats....\nPlease hold on")
@@ -89,7 +89,7 @@ async def active_video(event):
 
 
 @tbot.on_message(
-    filters.command("AC_COMMAND", use_strings=True) & filters.user(list(BANNED_USERS))
+    flt.command("AC_COMMAND", use_strings=True) & flt.user(list(BANNED_USERS))
 )
 async def ac_counts(event):
     ac_audio = len(await get_active_chats())
