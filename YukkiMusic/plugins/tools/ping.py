@@ -11,7 +11,6 @@ from datetime import datetime
 
 from config import BANNED_USERS, PING_IMG_URL
 from YukkiMusic import tbot
-from YukkiMusic.core import filters
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils import bot_sys_stats
 from YukkiMusic.utils.decorators.language import language
@@ -19,8 +18,7 @@ from YukkiMusic.utils.inline import support_group_markup
 
 
 @tbot.on_message(
-    flt.command("PING_COMMAND", use_strings=True)
-    & ~flt.user(list(BANNED_USERS))
+    flt.command("PING_COMMAND", use_strings=True) & ~flt.user(list(BANNED_USERS))
 )
 @language
 async def ping_com(event, _):
