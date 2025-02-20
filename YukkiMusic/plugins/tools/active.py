@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 from YukkiMusic import tbot
-from YukkiMusic.core import filters
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database.memorydatabase import (
     get_active_chats,
@@ -26,8 +25,7 @@ async def _clear_(chat_id):
 
 
 @tbot.on_message(
-    flt.command("ACTIVEVC_COMMAND", use_strings=True)
-    & flt.user(list(BANNED_USERS))
+    flt.command("ACTIVEVC_COMMAND", use_strings=True) & flt.user(list(BANNED_USERS))
 )
 async def active_audio(event):
     mystic = await event.reply("Getting Active Voicechats....\nPlease hold on")
@@ -59,8 +57,7 @@ async def active_audio(event):
 
 
 @tbot.on_message(
-    flt.command("ACTIVEVIDEO_COMMAND", use_strings=True)
-    & flt.user(list(BANNED_USERS))
+    flt.command("ACTIVEVIDEO_COMMAND", use_strings=True) & flt.user(list(BANNED_USERS))
 )
 async def active_video(event):
     mystic = await event.reply("Getting Active Voicechats....\nPlease hold on")
