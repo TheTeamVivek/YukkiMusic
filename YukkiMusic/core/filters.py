@@ -25,6 +25,7 @@ class Combinator:
     def __invert__(self):
         return Combinator(lambda event: not (await self(event)))
 
+
 def wrap(func):
     return Combinator(func)
 
