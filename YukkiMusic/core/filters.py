@@ -17,23 +17,13 @@ class Combinator:
         return self.func(event)
 
     def __and__(self, other):
-        async def and_func(event):
-            return (await self(event)) and (await other(event))
-
-        return Combinator(and_func)
+        return Combinator(lambda event: (await self(event)) and (await other(event)))
 
     def __or__(self, other):
-        async def or_func(event):
-            return (await self(event)) or (await other(event))
-
-        return Combinator(or_func)
+        return Combinator(lambda event: (await self(event)) or (await other(event)))
 
     def __invert__(self):
-        async def not_func(event):
-            return not (await self(event))
-
-        return Combinator(not_func)
-
+        return Combinator(lambda event: not (await self(event)))
 
 def wrap(func):
     return Combinator(func)
