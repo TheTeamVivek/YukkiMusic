@@ -106,4 +106,4 @@ def search_from_ytdlp(query):
             download_url= details["url"],
             duration= details["duration"],
             thumb= details["thumbnails"][0]["url"],
-        }
+        )
