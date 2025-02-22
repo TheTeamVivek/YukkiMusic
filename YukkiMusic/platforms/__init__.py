@@ -8,14 +8,14 @@
 # All rights reserved.
 #
 from ..core.enum import SongType, SourceType
-from .Apple import Apple
-from .Carbon import Carbon
-from .JioSavan import Saavn
-from .Resso import Resso
-from .Soundcloud import SoundCloud
-from .Spotify import Spotify
-from .Telegram import Telegram
-from .Youtube import YouTube
+from .apple import Apple
+from . import carbon
+from .savan import Saavn
+from .resso import Resso
+from .soundcloud import SoundCloud
+from .spotify import Spotify
+from .telegram import Telegram
+from .youtube import YouTube
 
 apple = Apple()
 carbon = Carbon()
@@ -29,12 +29,12 @@ youtube = YouTube()
 
 async def valid(url: str) -> SourceType:
     services = [
-        (self.apple, SourceType.APPLE),
-        (self.saavn, SourceType.SAAVN),
-        (self.resso, SourceType.RESSO),
-        (self.soundcloud, SourceType.SOUNDCLOUD),
-        (self.spotify, SourceType.SPOTIFY),
-        (self.youtube, SourceType.YOUTUBE),
+        (apple, SourceType.APPLE),
+        (saavn, SourceType.SAAVN),
+        (resso, SourceType.RESSO),
+        (soundcloud, SourceType.SOUNDCLOUD),
+        (spotify, SourceType.SPOTIFY),
+        (youtube, SourceType.YOUTUBE),
     ]
 
     for service, source_type in services:
