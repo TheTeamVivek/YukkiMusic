@@ -12,8 +12,6 @@ import re
 
 import spotipy
 from async_lru import alru_cache
-from spotipy.oauth2 import SpotifyClientCredentials
-
 import config
 
 from ..core.youtube import Track, YouTube
@@ -26,7 +24,7 @@ class Spotify(PlatformBase):
         self.client_id = config.SPOTIFY_CLIENT_ID
         self.client_secret = config.SPOTIFY_CLIENT_SECRET
         if config.SPOTIFY_CLIENT_ID and config.SPOTIFY_CLIENT_SECRET:
-            self.client_credentials_manager = SpotifyClientCredentials(
+            self.client_credentials_manager = spotipy.oauth2.SpotifyClientCredentials(
                 self.client_id, self.client_secret
             )
             self.spotify = spotipy.Spotify(
@@ -46,7 +44,9 @@ class Spotify(PlatformBase):
             fetched = f' {artist["name"]}'
             if "Various Artists" not in fetched:
                 info += fetched
-        return await YouTube.search(info)
+        t = await search(info)
+        t.link = link
+        return t
 
     @alru_cache(maxsize=None)
     async def playlist(self, url: str) -> tuple:
@@ -60,7 +60,8 @@ class Spotify(PlatformBase):
                 fetched = f' {artist["name"]}'
                 if "Various Artists" not in fetched:
                     info += fetched
-            info = await YouTube.search(info)
+            info = await search(info)
+            info.link = url
             results.append(info)
         return results, playlist_id
 
@@ -75,7 +76,8 @@ class Spotify(PlatformBase):
                 fetched = f' {artist["name"]}'
                 if "Various Artists" not in fetched:
                     info += fetched
-            info = await YouTube.search(info)
+            info = await search(info)
+            info.link = url
             results.append(info)
         return results, album_id
 
@@ -91,6 +93,7 @@ class Spotify(PlatformBase):
                 fetched = f' {artist["name"]}'
                 if "Various Artists" not in fetched:
                     info += fetched
-            info = await YouTube.search(info)
+            info = await search(info)
+            info.link = url
             results.append(info)
         return results, artist_id
