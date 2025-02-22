@@ -20,12 +20,6 @@ class Track:
     download_url: str | None = field(default=None)
     file_path: str | None = field(default=None)
 
-    def __post_init__(self):
-        if "&" in self.link and (
-            link.startswith("http://") or link.startswith("https://")
-        ):
-            self.link = self.link.split("&")[0]
-
     @property
     def is_exists(self):
         return bool(os.path.exists(self.file_path))
