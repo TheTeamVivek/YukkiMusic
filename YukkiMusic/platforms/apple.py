@@ -14,13 +14,13 @@ from async_lru import alru_cache
 from bs4 import BeautifulSoup
 
 from ..core.request import Request
-from ..core.youtube import Track, YouTube
+from ..core.youtube import search, Track
 from .base import PlatformBase
 
 
 class Apple(PlatformBase):
     def __init__(self):
-        self.regex = r"^(https:\/\/music.apple.com\/)(.*)$"
+        self.regex = re.compile("^(https:\/\/music.apple.com\/)(.*)$")
         self.base = "https://music.apple.com/in/playlist/"
 
     async def valid(self, link: str):
@@ -36,7 +36,7 @@ class Apple(PlatformBase):
                 song_name = tag.get("content", None)
         if song_name is None:
             return False
-        return await YouTube.search(song_name)
+        return await search(song_name)
 
     @alru_cache(maxsize=None)
     async def playlist(self, url, playid: bool | str = None) -> list[Track]:
@@ -55,5 +55,5 @@ class Apple(PlatformBase):
                 )
             except Exception:
                 xx = ((item["content"]).split("album/")[1]).split("/")[0]
-            results.append(await YouTube.search(xx))
+            results.append(await search(xx))
         return results, playlist_id
