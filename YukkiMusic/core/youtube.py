@@ -100,10 +100,10 @@ def search_from_ytdlp(query):
         if not details:
             raise ValueError("No results found.")
 
-        return {
-            "title": details["title"],
-            "link": details["url"],
-            "download_url": details["url"],
-            "duration": details["duration"],
-            "thumb": details["thumbnails"][0]["url"],
+        return Track(
+            title=details["title"],
+            link=details["url"],
+            download_url= details["url"],
+            duration= details["duration"],
+            thumb= details["thumbnails"][0]["url"],
         }
