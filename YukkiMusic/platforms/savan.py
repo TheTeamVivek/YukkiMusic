@@ -52,7 +52,7 @@ class Saavn(PlatformBase):
                     duration_sec = entry.get("duration", 0)
                     track = Track(
                         title=entry["title"],
-                        duration_sec=duration_sec,
+                        duration=duration_sec,
                         thumb=entry.get("thumbnail", ""),
                         link=self.clean_url(entry["url"]),
                     )
@@ -79,7 +79,7 @@ class Saavn(PlatformBase):
             return Track(
                 title=info["title"],
                 link=self.clean_url(info["url"]),
-                duration_sec=info.get("duration", 0),
+                duration=info.get("duration", 0),
                 thumb=info.get("thumbnail", None),
             )
 
