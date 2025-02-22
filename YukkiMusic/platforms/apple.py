@@ -14,13 +14,13 @@ from async_lru import alru_cache
 from bs4 import BeautifulSoup
 
 from ..core.request import Request
-from ..core.youtube import search, Track
+from ..core.youtube import Track, search
 from .base import PlatformBase
 
 
 class Apple(PlatformBase):
     def __init__(self):
-        self.regex = re.compile("^(https:\/\/music.apple.com\/)(.*)$")
+        self.regex = re.compile(r"^(https:\/\/music.apple.com\/)(.*)$")
         self.base = "https://music.apple.com/in/playlist/"
 
     async def valid(self, link: str):
