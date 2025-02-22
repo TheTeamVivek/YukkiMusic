@@ -13,22 +13,14 @@ import random
 from os.path import realpath
 
 from YukkiMusic.core.request import Request
+import string
 
-
-class Carbon:
-    def __init__(self):
-        self.language = "auto"
-        self.drop_shadow = True
-        self.drop_shadow_blur = "68px"
-        self.drop_shadow_offset = "20px"
-        self.font_family = "JetBrains Mono"
-        self.width_adjustment = True
-        self.watermark = False
-        self.themes = [
+themes = [
             "3024-night",
             "a11y-dark",
             "blackboard",
             "base16-dark",
+             "base16-light",
             "base16-light",
             "cobalt",
             "duotone-dark",
@@ -55,7 +47,7 @@ class Carbon:
             "yeti",
             "zenburn",
         ]
-        self.colour = [
+colour = [
             "#FF0000",
             "#FF5733",
             "#FFFF00",
@@ -80,25 +72,19 @@ class Carbon:
             "#808080",
         ]
 
-    async def generate(self, text: str, user_id):
-        params = {
+async def generate(text: str):
+    params = {
             "code": text,
-            "backgroundColor": random.choice(self.colour),
-            "theme": random.choice(self.themes),
-            "dropShadow": self.drop_shadow,
-            "dropShadowOffsetY": self.drop_shadow_offset,
-            "dropShadowBlurRadius": self.drop_shadow_blur,
-            "fontFamily": self.font_family,
-            "language": self.language,
-            "watermark": self.watermark,
-            "widthAdjustment": self.width_adjustment,
+            "backgroundColor": random.choice(colour),
+            "theme": random.choice(themes),
+            "fontFamily": "JetBrains Mono",
         }
 
-        resp = await Request.post_raw(
+    resp = await Request.post_raw(
             "https://carbonara.solopov.dev/api/cook",
             data=json.dumps(params),
             headers={"Content-Type": "application/json"},
         )
-        with open(f"cache/carbon{user_id}.jpg", "wb") as f:
-            f.write(resp)
-        return realpath(f.name)
+    with open(f"cache/carbon{''.join(random.choices(string.ascii_letters + string.digits, k=length))}.jpg", "wb") as f:
+        f.write(resp)
+    return realpath(f.name)
