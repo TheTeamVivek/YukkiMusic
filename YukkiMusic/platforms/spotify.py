@@ -12,9 +12,10 @@ import re
 
 import spotipy
 from async_lru import alru_cache
+
 import config
 
-from ..core.youtube import Track, YouTube
+from ..core.youtube import Track
 from .base import PlatformBase
 
 
