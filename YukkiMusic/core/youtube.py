@@ -65,49 +65,45 @@ class Track:
             return file_path
 
 
-class YouTube:
-    @alru_cache(max_size=None)
-    @staticmethod
-    async def search(query) -> Track:
-        try:
-            results = VideosSearch(query, limit=1)
-            for result in (await results.next())["result"]:
-                return Track(
-                    title=result["title"],
-                    link=result["link"],
-                    download_url=result["link"],
-                    duration=(
-                        time_to_seconds(result["duration"])
-                        if result["duration"] is not None
-                        else 0
-                    ),
-                    thumb=result["thumbnails"][0]["url"].split("?")[0],
-                )
-        except Exception:
-            return await YouTube.search_from_ytdlp(query)
+@alru_cache(maxsize=None)
+async def search(query):
+    try:
+        results = VideosSearch(query, limit=1)
+        for result in (await results.next())["result"]:
+            return {
+                "title": result["title"],
+                "link": result["link"],
+                "download_url": result["link"],
+                "duration": (
+                    time_to_seconds(result["duration"]) if result["duration"] else 0
+                ),
+                "thumb": result["thumbnails"][0]["url"].split("?")[0],
+            }
+    except Exception:
+        return await search_from_ytdlp(query)
 
-    @alru_cache(max_size=None)
-    @asyncify
-    @staticmethod
-    def search_from_ytdlp(query) -> Track:
-        options = {
-            "format": "best",
-            "noplaylist": True,
-            "quiet": True,
-            "extract_flat": "in_playlist",
-            "cookiefile": cookies(),
+
+@alru_cache(maxsize=None)
+@asyncify
+def search_from_ytdlp(query):
+    options = {
+        "format": "best",
+        "noplaylist": True,
+        "quiet": True,
+        "extract_flat": "in_playlist",
+        "cookiefile": cookies(),
+    }
+
+    with YoutubeDL(options) as ydl:
+        info_dict = ydl.extract_info(f"ytsearch: {query}", download=False)
+        details = info_dict.get("entries", [None])[0]
+        if not details:
+            raise ValueError("No results found.")
+
+        return {
+            "title": details["title"],
+            "link": details["url"],
+            "download_url": details["url"],
+            "duration": details["duration"],
+            "thumb": details["thumbnails"][0]["url"],
         }
-
-        with YoutubeDL(options) as ydl:
-            info_dict = ydl.extract_info(f"ytsearch: {query}", download=False)
-            details = info_dict.get("entries", [None])[0]
-            if not details:
-                raise ValueError("No results found.")
-
-            return Track(
-                title=details["title"],
-                link=details["url"],
-                download_url=details["url"],
-                duration=details["duration"],
-                thumb=details["thumbnails"][0]["url"],
-            )
