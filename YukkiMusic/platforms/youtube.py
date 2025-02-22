@@ -119,7 +119,7 @@ class YouTube(YouTubeBase):
         return formats_available, link
 
     @alru_cache(maxsize=None)
-    async def playlist(self, link, limit, videoid: bool | str = None):
+    async def playlist(self, link, limit, videoid: bool | str = None)-> None | list[Track]:
         if videoid:
             link = self.listbase + link
         if "&" in link:
@@ -134,10 +134,10 @@ class YouTube(YouTubeBase):
         playlist = await shell_cmd(cmd)
 
         try:
-            result = [key for key in playlist.split("\n") if key]
+            result = [await search(self.base+key) for key in playlist.split("\n") if key]
         except Exception:
-            result = []
+            result = None
         return result
 
-    async def track(self, *a, **k):
-        return await self.search(*a, **k)
+    async def track(self, url: str):
+        return await search(url)
