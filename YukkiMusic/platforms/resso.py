@@ -14,7 +14,7 @@ from async_lru import alru_cache
 from bs4 import BeautifulSoup
 
 from ..core.request import Request
-from ..core.youtube import Track, YouTube
+from ..core.youtube import Track, search
 from .base import PlatformBase
 
 
@@ -43,6 +43,6 @@ class Resso(PlatformBase):
                     pass
         if des == "":
             return
-        track = await YouTube.search(title)
+        track = await search(title)
         track.link = url
         return track
