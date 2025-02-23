@@ -1,9 +1,8 @@
 import inspect
 import re
+from strings import get_string
 
 from telethon.tl.types import PeerChannel, User
-
-from strings import get_string
 from YukkiMusic.utils.database import get_lang
 
 
@@ -12,18 +11,22 @@ class Combinator:
         self.func = func
 
     async def __call__(self, event):
-        if inspect.iscoroutinefunction(self.func):
-            return await self.func(event)
-        return self.func(event)
+        return await self.func(event) if inspect.iscoroutinefunction(self.func) else self.func(event)
 
     def __and__(self, other):
-        return Combinator(lambda event: (await self(event)) and (await other(event)))
+        async def combined(event):
+            return (await self(event)) and (await other(event))
+        return Combinator(combined)
 
     def __or__(self, other):
-        return Combinator(lambda event: (await self(event)) or (await other(event)))
+        async def combined(event):
+            return (await self(event)) or (await other(event))
+        return Combinator(combined)
 
     def __invert__(self):
-        return Combinator(lambda event: not (await self(event)))
+        async def inverted(event):
+            return not (await self(event))
+        return Combinator(inverted)
 
 
 def wrap(func):
@@ -32,13 +35,13 @@ def wrap(func):
 
 @wrap
 def private(event):
-    "Chat is Private"
+    """Check if the chat is private."""
     return getattr(event, "is_private", False)
 
 
 @wrap
 def group(event):
-    "Chat is Group or Supergroup"
+    """Check if the chat is a group or supergroup."""
     return getattr(event, "is_group", False)
 
 
@@ -57,11 +60,16 @@ async def channel(event):
 
 @wrap
 def user(users):
-    """Check if the sender is a specific user"""
+    """Check if the sender is a specific user."""
+
+    if isinstance(users, (int, str)):
+        users = {users}
+    else:
+        users = set(users)
+
+    normalized_users = {str(user).lower().lstrip("@") if isinstance(user, str) else user for user in users}
 
     async def check_user(event):
-        if not getattr(event, "sender_id", False):
-            return False
         sender = await event.get_sender()
 
         if not isinstance(sender, User):
@@ -70,24 +78,10 @@ def user(users):
         user_id = sender.id
         username = sender.username.lower() if sender.username else None
 
-        if isinstance(users, (int, str)):
-            users_set = {users}
-        else:
-            users_set = set(users)
+        if "me" in normalized_users or "self" in normalized_users:
+            normalized_users.update({event.client.me.id, event.client.me.username.lower()} if event.client.me.username else {event.client.me.id})
 
-        users = set()
-        for user in users_set:
-            if isinstance(user, int):
-                users.add(user)
-            else:
-                users.add(str(user).lower().lstrip("@"))
-
-        if "me" in users or "self" in users:
-            users.add(event.client.me.id)
-            if event.client.me.username:
-                users.add(event.client.me.username.lower())
-
-        return user_id in users or (username in users if username else False)
+        return user_id in normalized_users or (username in normalized_users if username else False)
 
     return check_user
 
@@ -98,6 +92,13 @@ def command(commands, use_strings=False):
         commands = [commands]
 
     async def func(event):
+        text = event.text.lstrip()
+        if not text:
+            return False
+
+        user = await event.client.get_me()
+        username = user.username.lower() if user and user.username else ""
+
         if use_strings:
             try:
                 lang = await get_lang(event.chat_id)
@@ -105,20 +106,12 @@ def command(commands, use_strings=False):
             except Exception:
                 string = get_string("en")
 
-            command_list = [string.get(cmd, cmd) for cmd in commands]
+            command_list = {string.get(cmd, cmd) for cmd in commands}
         else:
-            command_list = commands
+            command_list = set(commands)
 
-        command_pattern = "|".join([re.escape(cmd) for cmd in command_list])
+        pattern = rf"^(?:/)?({'|'.join(map(re.escape, command_list))})(?:@{re.escape(username)})?(?:\s|$)"
 
-        user = await event.client.get_me()
-        username = re.escape(user.username) if user and user.username else ""
-
-        pattern = re.compile(
-            rf"^(?:/)?({command_pattern})(?:@{username})?(?:\s|$)",
-            re.IGNORECASE,
-        )
-
-        return bool(re.match(pattern, event.text))
+        return bool(re.match(pattern, text))
 
     return func
