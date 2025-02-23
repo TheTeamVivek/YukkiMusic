@@ -24,24 +24,24 @@ from YukkiMusic.utils.decorators import admin_actual, language
 from YukkiMusic.utils.formatters import int_to_alpha
 
 
-@app.on_message(command("AUTH_COMMAND") & filters.group & ~BANNED_USERS)
+@tbot.on_message(flt.command("AUTH_COMMAND") & flt.group & ~flt.user(BANNED_USERS))
 @admin_actual
-async def auth(client, message: Message, _):
-    if not message.reply_to_message:
-        if len(message.command) != 2:
-            return await message.reply_text(_["USER_IDENTIFIER_REQUIRED"])
-        user = message.text.split(None, 1)[1]
+async def auth(event _):
+    await event.get_sender()
+    if not event.reply_to:
+        if len(event.text.split()) != 2:
+            return await event.reply(_["USER_IDENTIFIER_REQUIRED"])
+        user = event.text.split(None, 1)[1]
         if "@" in user:
             user = user.replace("@", "")
-        user = await app.get_users(user)
-        user_id = message.from_user.id
+        user = await app.get_entity(user)
         token = await int_to_alpha(user.id)
-        from_user_name = message.from_user.first_name
-        from_user_id = message.from_user.id
-        _check = await get_authuser_names(message.chat.id)
+        from_user_name = event.sender.first_name
+        from_user_id = event.sender.id
+        _check = await get_authuser_names(event.chat_id)
         count = len(_check)
         if int(count) == 20:
-            return await message.reply_text(_["MAX_AUTHORIZED_USERS"])
+            return await event.reply(_["MAX_AUTHORIZED_USERS"])
         if token not in _check:
             assis = {
                 "auth_user_id": user.id,
@@ -49,26 +49,28 @@ async def auth(client, message: Message, _):
                 "admin_id": from_user_id,
                 "admin_name": from_user_name,
             }
-            get = adminlist.get(message.chat.id)
+            get = adminlist.get(event.chat_id)
             if get:
                 if user.id not in get:
                     get.append(user.id)
-            await save_authuser(message.chat.id, token, assis)
-            return await message.reply_text(_["AUTHORIZED_USER_ADDED"])
+            await save_authuser(event.chat_id, token, assis)
+            return await event.reply(_["AUTHORIZED_USER_ADDED"])
         else:
-            await message.reply_text(_["USER_ALREADY_AUTHORIZED"])
+            await event.reply(_["USER_ALREADY_AUTHORIZED"])
         return
-    from_user_id = message.from_user.id
-    user_id = message.reply_to_message.from_user.id
-    user_name = message.reply_to_message.from_user.first_name
+    replied_msg = await event.get_reply_message()
+    from_user_id = event.sender_id
+    user = await replied_msg.get_sender()
+    user_id = user.id
+    user_name = user.first_name
     token = await int_to_alpha(user_id)
-    from_user_name = message.from_user.first_name
-    _check = await get_authuser_names(message.chat.id)
+    from_user_name = event.sender.first_name
+    _check = await get_authuser_names(event.chat_id)
     count = 0
     for smex in _check:
         count += 1
     if int(count) == 20:
-        return await message.reply_text(_["MAX_AUTHORIZED_USERS"])
+        return await event.reply(_["MAX_AUTHORIZED_USERS"])
     if token not in _check:
         assis = {
             "auth_user_id": user_id,
@@ -76,47 +78,49 @@ async def auth(client, message: Message, _):
             "admin_id": from_user_id,
             "admin_name": from_user_name,
         }
-        get = adminlist.get(message.chat.id)
+        get = adminlist.get(event.chat_id)
         if get:
             if user_id not in get:
                 get.append(user_id)
-        await save_authuser(message.chat.id, token, assis)
-        return await message.reply_text(_["AUTHORIZED_USER_ADDED"])
+        await save_authuser(event.chat_id, token, assis)
+        return await event.reply(_["AUTHORIZED_USER_ADDED"])
     else:
-        await message.reply_text(_["USER_ALREADY_AUTHORIZED"])
+        await event.reply(_["USER_ALREADY_AUTHORIZED"])
 
 
-@app.on_message(command("UNAUTH_COMMAND") & filters.group & ~BANNED_USERS)
+@tbot.on_message(flt.command("UNAUTH_COMMAND") & flt.group & ~flt.(BANNED_USERS))
 @admin_actual
-async def unauthusers(client, message: Message, _):
-    if not message.reply_to_message:
-        if len(message.command) != 2:
-            return await message.reply_text(_["USER_IDENTIFIER_REQUIRED"])
-        user = message.text.split(None, 1)[1]
+async def unauthusers(event, _):
+    if not event.reply_to:
+        if len(event.text.split()) != 2:
+            return await event.reply(_["USER_IDENTIFIER_REQUIRED"])
+        user = event.text.split(None, 1)[1]
         if "@" in user:
             user = user.replace("@", "")
-        user = await app.get_users(user)
+        user = await app.get_entity(user)
         token = await int_to_alpha(user.id)
-        deleted = await delete_authuser(message.chat.id, token)
-        get = adminlist.get(message.chat.id)
+        deleted = await delete_authuser(event.chat_id, token)
+        get = adminlist.get(event.chat_id)
         if get:
             if user.id in get:
                 get.remove(user.id)
         if deleted:
-            return await message.reply_text(_["AUTHORIZED_USER_REMOVED"])
+            return await event.reply(_["AUTHORIZED_USER_REMOVED"])
         else:
-            return await message.reply_text(_["USER_NOT_AUTHORIZED"])
-    user_id = message.reply_to_message.from_user.id
+            return await event.reply(_["USER_NOT_AUTHORIZED"])
+    r_msg = await event.get_reply_message()
+    r_user = await r_msg.get_sender()
+    user_id = r_user.id
     token = await int_to_alpha(user_id)
-    deleted = await delete_authuser(message.chat.id, token)
-    get = adminlist.get(message.chat.id)
+    deleted = await delete_authuser(event.chat_id, token)
+    get = adminlist.get(event.chat_id)
     if get:
         if user_id in get:
             get.remove(user_id)
     if deleted:
-        return await message.reply_text(_["AUTHORIZED_USER_REMOVED"])
+        return await event.reply(_["AUTHORIZED_USER_REMOVED"])
     else:
-        return await message.reply_text(_["USER_NOT_AUTHORIZED"])
+        return await event.reply(_["USER_NOT_AUTHORIZED"])
 
 
 @tbot.on_message(flt.command("AUTHUSERS_COMMAND") & flt.group & ~flt.user(BANNED_USERS))
