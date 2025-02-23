@@ -1,6 +1,6 @@
 import inspect
 import re
-from string import get_string
+from strings import get_string
 
 from telethon.tl.types import PeerChannel, User
 
