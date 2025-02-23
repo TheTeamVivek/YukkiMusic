@@ -8,16 +8,16 @@
 # All rights reserved.
 #
 
-from pyrogram import filters
-from pyrogram.types import Message
 
 from config import BANNED_USERS
-from strings import command
-from YukkiMusic import app, tbot
+from YukkiMusic import tbot
 from YukkiMusic.utils.database.memorydatabase import get_loop, set_loop
 from YukkiMusic.utils.decorators import admin_rights_check
 
-@tbot.on_message(flt.command("LOOP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
+
+@tbot.on_message(
+    flt.command("LOOP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+)
 @admin_rights_check
 async def admins(event, _, chat_id):
     usage = _["admin_24"]
@@ -41,9 +41,7 @@ async def admins(event, _, chat_id):
             return await event.reply(_["admin_26"])
     elif state.lower() == "enable":
         await set_loop(chat_id, 10)
-        return await event.reply(
-            _["admin_25"].format(event.sender.first_name, 10)
-        )
+        return await event.reply(_["admin_25"].format(event.sender.first_name, 10))
     elif state.lower() == "disable":
         await set_loop(chat_id, 0)
         return await event.reply(_["admin_27"])
