@@ -26,7 +26,7 @@ from YukkiMusic.utils.formatters import int_to_alpha
 
 @tbot.on_message(flt.command("AUTH_COMMAND") & flt.group & ~flt.user(BANNED_USERS))
 @admin_actual
-async def auth(event _):
+async def auth(event, _):
     await event.get_sender()
     if not event.reply_to:
         if len(event.text.split()) != 2:
