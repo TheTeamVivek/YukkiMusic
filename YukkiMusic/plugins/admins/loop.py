@@ -13,18 +13,18 @@ from pyrogram.types import Message
 
 from config import BANNED_USERS
 from strings import command
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.utils.database.memorydatabase import get_loop, set_loop
 from YukkiMusic.utils.decorators import admin_rights_check
 
-
-@app.on_message(command("LOOP_COMMAND") & filters.group & ~BANNED_USERS)
+@tbot.on_message(flt.command("LOOP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
 @admin_rights_check
-async def admins(cli, message: Message, _, chat_id):
+async def admins(event, _, chat_id):
     usage = _["admin_24"]
-    if len(message.command) != 2:
-        return await message.reply_text(usage)
-    state = message.text.split(None, 1)[1].strip()
+    if len(event.text.split()) != 2:
+        return await event.reply(usage)
+    state = event.text.split(None, 1)[1].strip()
+    await event.get_sender()
     if state.isnumeric():
         state = int(state)
         if 1 <= state <= 10:
@@ -34,18 +34,18 @@ async def admins(cli, message: Message, _, chat_id):
             if int(state) > 10:
                 state = 10
             await set_loop(chat_id, state)
-            return await message.reply_text(
-                _["admin_25"].format(message.from_user.first_name, state)
+            return await event.reply(
+                _["admin_25"].format(event.sender.first_name, state)
             )
         else:
-            return await message.reply_text(_["admin_26"])
+            return await event.reply(_["admin_26"])
     elif state.lower() == "enable":
         await set_loop(chat_id, 10)
-        return await message.reply_text(
-            _["admin_25"].format(message.from_user.first_name, 10)
+        return await event.reply(
+            _["admin_25"].format(event.sender.first_name, 10)
         )
     elif state.lower() == "disable":
         await set_loop(chat_id, 0)
-        return await message.reply_text(_["admin_27"])
+        return await event.reply(_["admin_27"])
     else:
-        return await message.reply_text(usage)
+        return await event.reply(usage)
