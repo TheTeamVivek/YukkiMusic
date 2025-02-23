@@ -1,8 +1,9 @@
 import inspect
 import re
-from strings import get_string
 
 from telethon.tl.types import PeerChannel, User
+
+from strings import get_string
 from YukkiMusic.utils.database import get_lang
 
 
@@ -11,21 +12,28 @@ class Combinator:
         self.func = func
 
     async def __call__(self, event):
-        return await self.func(event) if inspect.iscoroutinefunction(self.func) else self.func(event)
+        return (
+            await self.func(event)
+            if inspect.iscoroutinefunction(self.func)
+            else self.func(event)
+        )
 
     def __and__(self, other):
         async def combined(event):
             return (await self(event)) and (await other(event))
+
         return Combinator(combined)
 
     def __or__(self, other):
         async def combined(event):
             return (await self(event)) or (await other(event))
+
         return Combinator(combined)
 
     def __invert__(self):
         async def inverted(event):
             return not (await self(event))
+
         return Combinator(inverted)
 
 
@@ -67,7 +75,10 @@ def user(users):
     else:
         users = set(users)
 
-    normalized_users = {str(user).lower().lstrip("@") if isinstance(user, str) else user for user in users}
+    normalized_users = {
+        str(user).lower().lstrip("@") if isinstance(user, str) else user
+        for user in users
+    }
 
     async def check_user(event):
         sender = await event.get_sender()
@@ -79,9 +90,15 @@ def user(users):
         username = sender.username.lower() if sender.username else None
 
         if "me" in normalized_users or "self" in normalized_users:
-            normalized_users.update({event.client.me.id, event.client.me.username.lower()} if event.client.me.username else {event.client.me.id})
+            normalized_users.update(
+                {event.client.me.id, event.client.me.username.lower()}
+                if event.client.me.username
+                else {event.client.me.id}
+            )
 
-        return user_id in normalized_users or (username in normalized_users if username else False)
+        return user_id in normalized_users or (
+            username in normalized_users if username else False
+        )
 
     return check_user
 
