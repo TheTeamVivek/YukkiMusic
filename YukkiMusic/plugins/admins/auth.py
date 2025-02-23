@@ -88,7 +88,7 @@ async def auth(event, _):
         await event.reply(_["USER_ALREADY_AUTHORIZED"])
 
 
-@tbot.on_message(flt.command("UNAUTH_COMMAND") & flt.group & ~flt.(BANNED_USERS))
+@tbot.on_message(flt.command("UNAUTH_COMMAND") & flt.group & ~flt.user(BANNED_USERS))
 @admin_actual
 async def unauthusers(event, _):
     if not event.reply_to:
