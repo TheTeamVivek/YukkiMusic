@@ -8,11 +8,8 @@
 # All rights reserved.
 #
 
-from pyrogram import filters
-from pyrogram.types import Message
 
 from config import BANNED_USERS, adminlist
-from strings import command
 from YukkiMusic import app, tbot
 from YukkiMusic.utils.database import (
     delete_authuser,
