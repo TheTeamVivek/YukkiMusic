@@ -1,9 +1,9 @@
 import inspect
 import re
-from strings import get_string
 
 from telethon.tl.types import PeerChannel, User
 
+from strings import get_string
 from YukkiMusic.utils.database import get_lang
 
 
