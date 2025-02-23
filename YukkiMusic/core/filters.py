@@ -82,7 +82,8 @@ def user(users):
 
     async def check_user(event):
         sender = await event.get_sender()
-
+        if sender is None:
+            return False
         if not isinstance(sender, User):
             return False
 
