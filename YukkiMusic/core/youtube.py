@@ -61,7 +61,7 @@ class Track:
                     raise Exception(
                         f"Expected 'options' to be a dict but got {type(options).__name__}"
                     )
-                @asyncify
+            @asyncify
             def _download():
                 with YoutubeDL(ytdl_opts) as ydl:
                     info = ydl.extract_info(url, False)
