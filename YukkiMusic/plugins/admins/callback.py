@@ -9,7 +9,6 @@
 #
 import random
 
-from pyrogram.types import CallbackQuery
 from telethon import events
 
 import config
