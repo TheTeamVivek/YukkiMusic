@@ -13,19 +13,19 @@ from pyrogram.types import Message
 
 from config import BANNED_USERS
 from strings import command
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import is_music_playing, music_on
 from YukkiMusic.utils.decorators import admin_rights_check
 
 
-@app.on_message(command("RESUME_COMMAND") & filters.group & ~BANNED_USERS)
+@tbot.on_message(flt.command("RESUME_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
 @admin_rights_check
-async def resume_com(cli, message: Message, _, chat_id):
-    if not len(message.command) == 1:
-        return await message.reply_text(_["COMMAND_USAGE_ERROR"])
+async def resume_com(event, _, chat_id):
+    if not len(event.text.split()) == 1:
+        return await event.reply(_["COMMAND_USAGE_ERROR"])
     if await is_music_playing(chat_id):
-        return await message.reply_text(_["admin_3"])
+        return await event.reply(_["admin_3"])
     await music_on(chat_id)
     await Yukki.resume_stream(chat_id)
-    await message.reply_text(_["admin_4"].format(message.from_user.mention))
+    await event.reply(_["admin_4"].format(await tbot.create_mention(await event.get_sender())))
