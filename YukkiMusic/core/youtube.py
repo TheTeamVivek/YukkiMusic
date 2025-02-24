@@ -103,11 +103,11 @@ def search_from_ytdlp(query):
         return Track(
             title=details["title"],
             link=(
-                details["url"].split("&")[0]
-                if "&" in details["url"]
-                else details["url"]
+                details["webpage_url"].split("&")[0]
+                if "&" in details["webpage_url"]
+                else details["webpage_url"]
             ),
-            download_url=details["url"],
+            download_url=details["webpage_url"],
             duration=details["duration"],
             thumb=details["thumbnails"][0]["url"],
         )
