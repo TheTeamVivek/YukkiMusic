@@ -523,7 +523,7 @@ async def play_playlists_cb(event, _):
         except Exception:
             return
     try:
-        chat_id, channel = await get_channeplay_cb(_, cplay, CallbackQuery)
+        chat_id, channel = await get_channeplay_cb(_, cplay, event)
     except Exception:
         return
     user_name = sender.first_name
