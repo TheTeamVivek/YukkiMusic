@@ -1,18 +1,16 @@
-import os
 import asyncio
+import os
 from dataclasses import dataclass, field
 
 from async_lru import alru_cache
 from youtubesearchpython.__future__ import VideosSearch
 from yt_dlp import YoutubeDL
 
-from config import cookies
+from config import YTDOWNLOADER, cookies
 from YukkiMusic.decorators.asyncify import asyncify
+from YukkiMusic.utils.database import is_on_off
 from YukkiMusic.utils.formatters import time_to_seconds
 
-from .enum import SongType
-from config import YTDOWNLOADER
-from YukkiMusic.utils.database import is_on_off
 
 @dataclass
 class Track:
@@ -60,11 +58,15 @@ class Track:
                 if isinstance(options, dict):
                     ytdl_opts.update(options)
                 else:
-                    raise Exception(f"Expected 'options' to be a dict but got {type(options).__name__}")
+                    raise Exception(
+                        f"Expected 'options' to be a dict but got {type(options).__name__}"
+                    )
 
             with YoutubeDL(ytdl_opts) as ydl:
                 info = ydl.extract_info(url, False)
-                self.file_path = os.path.join("downloads", f"{info['id']}.{info['ext']}")
+                self.file_path = os.path.join(
+                    "downloads", f"{info['id']}.{info['ext']}"
+                )
 
                 if not os.path.exists(self.file_path):
                     ydl.download([url])
@@ -72,7 +74,7 @@ class Track:
                 return self.file_path
 
         else:
-            format_code = "bestaudio/best" if audio else "b" # Keep "b" not "best"
+            format_code = "bestaudio/best" if audio else "b"  # Keep "b" not "best"
             command = f'yt-dlp -g -f "{format_code}" {"--cookies cookies/cookies.txt" if self.is_youtube else ""} "{url}"'
 
             process = await asyncio.create_subprocess_shell(
@@ -86,10 +88,13 @@ class Track:
                 self.streamable_url = stdout.decode().strip()
                 return self.streamable_url
             else:
-                raise Exception(f"Failed to get streamable URL: {stderr.decode().strip()}")
+                raise Exception(
+                    f"Failed to get streamable URL: {stderr.decode().strip()}"
+                )
 
     async def __call__(self, audio: bool = True):
         return self.file_path or self.streamable_url or await self.download(audio)
+
 
 @alru_cache(maxsize=None)
 async def search(query):
