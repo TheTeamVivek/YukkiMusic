@@ -9,8 +9,8 @@
 #
 import random
 
+from pyrogram.types import CallbackQuery
 from telethon import events
-from pyrogram.types import CallbackQuery, InlineKeyboardMarkup, InputMediaPhoto
 
 import config
 from config import (
@@ -23,7 +23,7 @@ from config import (
     adminlist,
     lyrical,
 )
-from YukkiMusic import Platform, app, tbot
+from YukkiMusic import Platform, tbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils import seconds_to_min, time_to_seconds
@@ -58,7 +58,7 @@ from YukkiMusic.utils.thumbnails import gen_thumb
 wrong = {}
 
 
-@tbot.on(events.CallbackQuery("PanelMarkup" , func=~flt.user(BANNED_USERS)))
+@tbot.on(events.CallbackQuery("PanelMarkup", func=~flt.user(BANNED_USERS)))
 @language
 async def markup_panel(event, _):
     await event.answer()
@@ -68,9 +68,7 @@ async def markup_panel(event, _):
     chat_id = event.chat_id
     buttons = panel_markup_1(_, videoid, chat_id)
     try:
-        await event.edit(
-            buttons=buttons
-        )
+        await event.edit(buttons=buttons)
     except Exception:
         return
     if chat_id not in wrong:
@@ -91,9 +89,7 @@ async def main_markup_(event, _):
         buttons = stream_markup(_, videoid, chat_id)
     chat_id = event.chat_id
     try:
-        await event.edit(
-            buttons=buttons
-        )
+        await event.edit(buttons=buttons)
     except Exception:
         return
     if chat_id not in wrong:
@@ -101,7 +97,7 @@ async def main_markup_(event, _):
     wrong[chat_id][event.message_id] = True
 
 
-@tbot.on(events.CallbackQuery("Pages" , func=~flt.user(BANNED_USERS)))
+@tbot.on(events.CallbackQuery("Pages", func=~flt.user(BANNED_USERS)))
 @language
 async def pages_markup(event, _):
     await event.answer()
@@ -125,9 +121,7 @@ async def pages_markup(event, _):
         if pages == 0:
             buttons = panel_markup_3(_, videoid, chat_id)
     try:
-        await event.edit(
-            buttons=buttons
-        )
+        await event.edit(buttons=buttons)
     except Exception:
         return
 
@@ -158,18 +152,14 @@ async def admin_callback(event, _):
         await event.answer()
         await music_off(chat_id)
         await Yukki.pause_stream(chat_id)
-        await event.reply(
-            _["admin_2"].format(mention), link_preview=False
-        )
+        await event.reply(_["admin_2"].format(mention), link_preview=False)
     elif command == "Resume":
         if await is_music_playing(chat_id):
             return await event.answer(_["admin_3"], alert=True)
         await event.answer()
         await music_on(chat_id)
         await Yukki.resume_stream(chat_id)
-        await event.reply(
-            _["admin_4"].format(mention), link_preview=False
-        )
+        await event.reply(_["admin_4"].format(mention), link_preview=False)
     elif command == "Stop" or command == "End":
         try:
             check = db.get(chat_id)
@@ -180,27 +170,21 @@ async def admin_callback(event, _):
         await event.answer()
         await Yukki.stop_stream(chat_id)
         await set_loop(chat_id, 0)
-        await event.reply(
-            _["admin_9"].format(mention), link_preview=False
-        )
+        await event.reply(_["admin_9"].format(mention), link_preview=False)
     elif command == "Mute":
         if await is_muted(chat_id):
             return await event.answer(_["admin_5"], alert=True)
         await event.answer()
         await mute_on(chat_id)
         await Yukki.mute_stream(chat_id)
-        await event.reply(
-            _["admin_6"].format(mention), link_preview=False
-        )
+        await event.reply(_["admin_6"].format(mention), link_preview=False)
     elif command == "Unmute":
         if not await is_muted(chat_id):
             return await event.answer(_["admin_7"], alert=True)
         await event.answer()
         await mute_off(chat_id)
         await Yukki.unmute_stream(chat_id)
-        await event.reply(
-            _["admin_8"].format(mention), link_preview=False
-        )
+        await event.reply(_["admin_8"].format(mention), link_preview=False)
     elif command == "Loop":
         await event.answer()
         await set_loop(chat_id, 3)
@@ -221,9 +205,7 @@ async def admin_callback(event, _):
         await event.answer()
         random.shuffle(check)
         check.insert(0, popped)
-        await event.reply(
-            _["admin_23"].format(mention), link_preview=False
-        )
+        await event.reply(_["admin_23"].format(mention), link_preview=False)
     elif command in ["Skip", "Replay"]:
         check = db.get(chat_id)
         txt = f"» Track {command.lower()}ed by {mention} !"
@@ -235,18 +217,14 @@ async def admin_callback(event, _):
                     await auto_clean(popped)
                 if not check:
                     await event.edit(txt)
-                    await event.reply(
-                        _["admin_10"].format(mention), link_preview=False
-                    )
+                    await event.reply(_["admin_10"].format(mention), link_preview=False)
                     try:
                         return await Yukki.stop_stream(chat_id)
                     except Exception:
                         return
             except Exception:
                 await event.edit(txt)
-                await event.reply(
-                    _["admin_10"].format(mention), link_preview=False
-                )
+                await event.reply(_["admin_10"].format(mention), link_preview=False)
                 return await Yukki.stop_stream(chat_id)
         elif command == "Replay":
             db[chat_id][0]["played"] = 0
@@ -263,9 +241,7 @@ async def admin_callback(event, _):
         if "live_" in queued:
             n, link = await Platform.youtube.video(videoid, True)
             if n == 0:
-                return await event.reply(
-                    _["admin_11"].format(title)
-                )
+                return await event.reply(_["admin_11"].format(title))
             try:
                 await Yukki.skip_stream(chat_id, link, video=status)
             except Exception:
@@ -284,9 +260,7 @@ async def admin_callback(event, _):
             db[chat_id][0]["markup"] = "tg"
             await event.edit(txt)
         elif "vid_" in queued:
-            mystic = await event.reply(
-                _["DOWNLOADING_NEXT_TRACK"], link_preview=False
-            )
+            mystic = await event.reply(_["DOWNLOADING_NEXT_TRACK"], link_preview=False)
             try:
                 file_path, direct = await Platform.youtube.download(
                     videoid,
@@ -448,7 +422,7 @@ async def admin_callback(event, _):
         await mystic.edit(f"{string}\n\nChanges Done by: {mention} !")
 
 
-@tbot.on(events.CallbackQuery("MusicStream" , func=~flt.user(BANNED_USERS)))
+@tbot.on(events.CallbackQuery("MusicStream", func=~flt.user(BANNED_USERS)))
 @language
 async def play_music(event, _):
     callback_data = event.data.decode("utf-8").strip()
@@ -470,9 +444,7 @@ async def play_music(event, _):
         await event.answer()
     except Exception:
         pass
-    mystic = await event.reply(
-        _["play_2"].format(channel) if channel else _["play_1"]
-    )
+    mystic = await event.reply(_["play_2"].format(channel) if channel else _["play_1"])
     try:
         details, track_id = await Platform.youtube.track(vidid, True)
     except Exception:
@@ -520,7 +492,7 @@ async def play_music(event, _):
     return await mystic.delete()
 
 
-@tbot.on(events.CallbackQuery("AnonymousAdmin" , func=~flt.user(BANNED_USERS)))
+@tbot.on(events.CallbackQuery("AnonymousAdmin", func=~flt.user(BANNED_USERS)))
 async def anonymous_check(event):
     try:
         await event.answer(
@@ -531,7 +503,7 @@ async def anonymous_check(event):
         return
 
 
-@tbot.on(events.CallbackQuery("YukkiPlaylists" , func=~flt.user(BANNED_USERS)))
+@tbot.on(events.CallbackQuery("YukkiPlaylists", func=~flt.user(BANNED_USERS)))
 @language
 async def play_playlists_cb(event, _):
     callback_data = event.data.decode("utf-8").strip()
@@ -560,9 +532,7 @@ async def play_playlists_cb(event, _):
         await event.answer()
     except Exception:
         pass
-    mystic = await event.reply(
-        _["play_2"].format(channel) if channel else _["play_1"]
-    )
+    mystic = await event.reply(_["play_2"].format(channel) if channel else _["play_1"])
     videoid = lyrical.get(videoid)
     video = True if mode == "v" else None
     ffplay = True if fplay == "f" else None
@@ -620,7 +590,7 @@ async def play_playlists_cb(event, _):
     return await mystic.delete()
 
 
-@tbot.on(events.CallbackQuery("slider" , func=~flt.user(BANNED_USERS)))
+@tbot.on(events.CallbackQuery("slider", func=~flt.user(BANNED_USERS)))
 @language
 async def slider_queries(event, _):
     callback_data = event.data.decode("utf-8").strip()
@@ -652,14 +622,15 @@ async def slider_queries(event, _):
             pass
         title, duration_min, thumbnail, vidid = await Platform.youtube.slider(
             query, query_type
-        ) # todo use youtube.track
+        )  # todo use youtube.track
         buttons = slider_markup(_, vidid, user_id, query, query_type, cplay, fplay)
         return await event.edit(
             text=_["play_11"].format(
                 title.title(),
                 duration_min,
             ),
-           file=thumbnail, buttons=buttons
+            file=thumbnail,
+            buttons=buttons,
         )
     if what == "B":
         if rtype == 0:
@@ -680,11 +651,11 @@ async def slider_queries(event, _):
                 duration_min,
             ),
             file=thumbnail,
-          buttons=buttons
+            buttons=buttons,
         )
 
 
-@tbot.on(events.CallbackQuery("close" , func=~flt.user(BANNED_USERS)))
+@tbot.on(events.CallbackQuery("close", func=~flt.user(BANNED_USERS)))
 async def close_menu(event):
     try:
         await event.delete()
@@ -693,15 +664,13 @@ async def close_menu(event):
         return
 
 
-@tbot.on(events.CallbackQuery("stop_downloading" , func=~flt.user(BANNED_USERS)))
+@tbot.on(events.CallbackQuery("stop_downloading", func=~flt.user(BANNED_USERS)))
 @actual_admin_cb
 async def stop_download(event, _):
     message_id = event.message_id
     task = lyrical.get(message_id)
     if not task:
-        return await event.answer(
-            "Download Already Completed..", alert=True
-        )
+        return await event.answer("Download Already Completed..", alert=True)
     if task.done() or task.cancelled():
         return await event.answer(
             "Downloading already Completed or Cancelled.",
@@ -719,8 +688,6 @@ async def stop_download(event, _):
                 f"Downloading cancelled by {await tbot.create_mention(await event.get_sender())}"
             )
         except Exception:
-            return await event.answer(
-                "Failed to stop downloading", alert=True
-            )
+            return await event.answer("Failed to stop downloading", alert=True)
 
     await event.answer("Failed to Recognise Task", alert=True)
