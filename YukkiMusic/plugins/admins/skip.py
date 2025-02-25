@@ -8,13 +8,10 @@
 # All rights reserved.
 #
 
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardMarkup, Message
 
 import config
 from config import BANNED_USERS
-from strings import command
-from YukkiMusic import Platform, app
+from YukkiMusic import Platform
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import get_loop
@@ -24,7 +21,9 @@ from YukkiMusic.utils.stream.autoclear import auto_clean
 from YukkiMusic.utils.thumbnails import gen_thumb
 
 
-@tbot.on_message(flt.command("SKIP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
+@tbot.on_message(
+    flt.command("SKIP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+)
 @admin_rights_check
 async def skip(event, _, chat_id):
     mention = await tbot.create_mention(await event.get_sender())
@@ -57,9 +56,7 @@ async def skip(event, _, chat_id):
                             if not check:
                                 try:
                                     await event.reply(
-                                        _["admin_10"].format(
-                                            mention
-                                        ),
+                                        _["admin_10"].format(mention),
                                         link_preview=False,
                                     )
                                     await Yukki.stop_stream(chat_id)
@@ -132,9 +129,7 @@ async def skip(event, _, chat_id):
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "tg"
     elif "vid_" in queued:
-        mystic = await event.reply(
-            _["DOWNLOADING_NEXT_TRACK"], link_preview=False
-        )
+        mystic = await event.reply(_["DOWNLOADING_NEXT_TRACK"], link_preview=False)
         try:
             file_path, direct = await Platform.youtube.download(
                 videoid,
