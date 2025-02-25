@@ -464,7 +464,7 @@ gban_9: "**✅ Unbanned successfully on BOT database\n\nUnbanned **{0}** in **{1
 gban_10: "🚫 No one is gbanned."
 gban_11: "⏳ Getting gbanned users list..."
 
-Auth: |
+AUTH_HELPER: |
     <b>Auth Users can use Admin commands without admin rights in your chat.</b>
     
     <b>✧ {AUTH_COMMAND}</b> [Username] - Add a user to AUTH LIST of the Group.
@@ -473,7 +473,7 @@ Auth: |
     
     <b>✧ {AUTHUSERS_COMMAND}</b> - Check AUTH LIST of the Group.
 
-Admin: |
+ADMIN_HELPER: |
     <b>c stands for channel play</b>
     
     <b>✧ {PAUSE_COMMAND}</b> - Pause the playing music.
@@ -491,7 +491,7 @@ Admin: |
     
     <b>✧ {LOOP_COMMAND}</b> [Enable/Disable] or [Number between 1-10] - When activated, the bot will loop the current music 1-10 times in voice chat. Default loop value is 10 times.
 
-Active: |
+ACTIVE_HELPER: |
     <b>✧ {ACTIVEVC_COMMAND}</b> - Check active voice chats on the bot.
     
     <b>✧ {ACTIVEVIDEO_COMMAND}</b> - Check active voice and video calls on the bot.
@@ -500,7 +500,7 @@ Active: |
     
     <b>✧ {STATS_COMMAND}</b> - Check bot stats.
 
-Play: |
+PLAY_HELPER: |
     <b>✧ {PLAY_COMMAND}</b> - Bot will start playing your given query on voice chat or stream live links on voice chats.
     
     <b>✧ {PLAYMODE_COMMAND}</b> - Force Play stops the current playing track on voice chat and starts playing the searched track instantly without disturbing/clearing the queue.
@@ -509,7 +509,7 @@ Play: |
     
     <b>✧ {STREAM_COMMAND}</b> - Stream a URL that you believe is direct or m3u8 that can't be played by /play.
 
-Gcast: |
+GCAST_HELPER: |
     <b>{BROADCAST_COMMAND} [Message or Reply to any message]</b> » Broadcast a message to served chats of bot
     <u>Broadcasting Modes:</u>
     
@@ -525,7 +525,7 @@ Gcast: |
     
     > <b>Example:</b> <code>/{BROADCAST_COMMAND} -user -assistant -pin Testing broadcast</code>
 
-Bot: |
+BOT_HELPER: |
     <b>★ {GSTATS_COMMAND}</b> - Get Top 10 Tracks Global Stats, Top 10 Users of Bot, Top 10 Chats on Bot, Top 10 Played in a chat, etc.
     
     <b>★ {SUDOUSERS_COMMAND}</b> - Check Sudo users of the bot.
@@ -544,7 +544,7 @@ Bot: |
     
     <b>✧ {AUTHORIZED_COMMAND}</b> - Check all allowed chats of your bot.
 
-PList: |
+PLIST_HELPER: |
     <b>{PLAYLIST_COMMAND}</b> - Check your whole playlist on the bot server
     
     <b>{DELETE_PLAYLIST_COMMAND}</b> - Delete any song from your saved playlist 
@@ -566,7 +566,7 @@ BList: |
     <b>✧ {UNGBAN_COMMAND}</b> [Username or reply to a user] - Remove a user from the bot's gban list and allow them to use your bot.
     <b>✧ {GBANNED_COMMAND}</b> - Check the list of gban users.
 
-Dev: |
+DEV_HELPER: |
     <b><u>Add and remove sudoers:</u></b>
     
     <b>{ADDSUDO_COMMAND} [Username or reply to a user] - Add sudo in your bot</b>
