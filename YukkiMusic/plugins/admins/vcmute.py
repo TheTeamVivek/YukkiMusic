@@ -8,12 +8,10 @@
 # All rights reserved.
 #
 
-from pyrogram import filters
 from pyrogram.types import Message
 
 from config import BANNED_USERS
-from strings import command
-from YukkiMusic import app, tbot
+from YukkiMusic import tbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import is_muted, mute_off, mute_on
 from YukkiMusic.utils.decorators import admin_rights_check
@@ -28,10 +26,8 @@ async def mute_admin(event, _, chat_id):
         return await event.reply(_["admin_5"], link_preview=False)
     await mute_on(chat_id)
     await Yukki.mute_stream(chat_id)
-    mention= await tbot.create_mention(await event.get_sender())
-    await event.reply(
-        _["admin_6"].format(mention), link_preview=False
-    )
+    mention = await tbot.create_mention(await event.get_sender())
+    await event.reply(_["admin_6"].format(mention), link_preview=False)
 
 
 @tbot.on_message(flt.command("UNMUTE_COMMAND") & flt.group & ~flt.user(BANNED_USERS))
@@ -43,7 +39,5 @@ async def unmute_admin(Client, message: Message, _, chat_id):
         return await event.reply(_["admin_7"], link_preview=False)
     await mute_off(chat_id)
     await Yukki.unmute_stream(chat_id)
-    mention= await tbot.create_mention(await event.get_sender())
-    await event.reply(
-        _["admin_8"].format(mention), link_preview=False
-    )
+    mention = await tbot.create_mention(await event.get_sender())
+    await event.reply(_["admin_8"].format(mention), link_preview=False)
