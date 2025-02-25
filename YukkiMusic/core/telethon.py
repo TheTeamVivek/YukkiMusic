@@ -142,6 +142,7 @@ class TelethonClient(TelegramClient):
         def decorator(function):
             if func is not None:
                 kwargs["func"] = func
+            kwargs["incoming"] = kwargs.get("incoming", True)
             self.add_event_handler(function, events.NewMessage(*args, **kwargs))
             return function
 
