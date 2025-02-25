@@ -72,7 +72,7 @@ async def stop_music(event):
         if chat_id is None:
             return await event.reply(_["setting_12"])
         try:
-            await app.get_entity(chat_id)
+            await tbot.get_entity(chat_id)
         except Exception:
             return await event.reply(_["cplay_4"])
     else:
