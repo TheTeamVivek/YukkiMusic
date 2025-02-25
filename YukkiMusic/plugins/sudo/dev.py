@@ -12,9 +12,10 @@
 # Credit goes to TheHamkerCat.
 #
 
-import asyncio
 import os
+import re
 import sys
+import asyncio
 import traceback
 from inspect import getfullargspec
 from io import StringIO
@@ -30,6 +31,11 @@ from YukkiMusic.misc import SUDOERS
 
 ## ------ Below are some optional Imports you can remove it if is imported  you don't need to import it when using eval command
 
+from pyrogram.raw.functions import *
+from pyrogram.raw.types import *
+
+from YukkiMusic import userbot
+from YukkiMusic.core.call import Yukki
 
 ## end
 
@@ -53,7 +59,7 @@ async def aexec(code, client, message):
 )
 async def executor(client: app, message: Message):
     if len(message.command) < 2:
-        return await message.reply(text="<b>Give me something to exceute</b>")
+        return await message.reply( text="<b>Give me something to exceute</b>")
     try:
         cmd = message.text.split(" ", maxsplit=1)[1]
     except IndexError:
@@ -101,7 +107,7 @@ async def executor(client: app, message: Message):
             document=filename,
             caption=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
             quote=False,
-            buttons=keyboard,
+            reply_markup=keyboard,
         )
         await message.delete()
         os.remove(filename)
@@ -121,7 +127,7 @@ async def executor(client: app, message: Message):
                 ]
             ]
         )
-        await message.reply(text=final_output, buttons=keyboard)
+        await message.reply( text=final_output, reply_markup=keyboard)
 
 
 @app.on_callback_query(filters.regex(r"runtime"))
@@ -171,14 +177,14 @@ async def shellrunner(_, message: Message):
             )
             stdout, stderr = await process.communicate()
             return stdout.decode().strip(), stderr.decode().strip()
-        except Exception:
+        except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             errors = traceback.format_exception(
                 etype=exc_type,
                 value=exc_obj,
                 tb=exc_tb,
             )
-            return None, "".join(errors)
+            return None, ''.join(errors)
 
     if "\n" in text:
         commands = text.split("\n")
@@ -210,6 +216,6 @@ async def shellrunner(_, message: Message):
         )
         os.remove("output.txt")
     else:
-        await message.reply(text=output)
+        await message.reply( text=output)
 
     await message.stop_propagation()
