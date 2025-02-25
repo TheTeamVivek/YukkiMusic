@@ -17,7 +17,6 @@ import asyncio
 import os
 import sys
 import traceback
-from inspect import getfullargspec
 from io import StringIO
 from time import time
 
@@ -45,6 +44,7 @@ async def aexec(code, client, message):
     )
     __aexec_func = local_vars["__aexec"]
     return await __aexec_func(client, message)
+
 
 @app.on_edited_message(
     filters.command(["ev", "eval"]) & SUDOERS & ~filters.forwarded & ~filters.via_bot
