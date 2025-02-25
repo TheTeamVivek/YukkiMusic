@@ -11,25 +11,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Replace text
+      - name: Replace
         shell: bash
         run: |
           declare -A replacements=(
-            ["edit_message_text"]="edit"
+            ["Active"]="ACTIVE_HELPER"
+            ["Admin"]="ADMIN_HELPER"
+            ["Auth"]="AUTH_HELPER"
+            ["Blist"]="BLIST_HELPER"
+            ["Bot"]="BOT_HELPER"
+            ["Dev"]="DEV_HELPER"
+            ["Gcast"]="GCAST_HELPER"
+            ["PList"]="PLIST_HELPER"
+            ["Play"]="PLAY_HELPER"
           )
-
-
 
           for key in "${!replacements[@]}"; do
             find . -type d \( -name ".git" -o -path "./.github/*" \) -prune -o \
-            \( -type f \( -name "*.py" -o -name "*.yml" \) \) \
-            -exec sed -i "s/\b$key\b/${replacements[$key]}/g" {} +
+            -type f -name "*.yml" \
+            -exec sed -i -E "s/^(\s*)$key(\s*:) /\1${replacements[$key]}\2 /g" {} +
           done
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Replace text in Python files"
+          commit_message: "Replace"
           commit_options: "--no-verify"
           repository: .
           commit_user_name: "github-actions[bot]"
