@@ -12,6 +12,7 @@
 # Credit goes to TheHamkerCat.
 #
 
+
 import asyncio
 import os
 import sys
@@ -45,13 +46,6 @@ async def aexec(code, client, message):
     __aexec_func = local_vars["__aexec"]
     return await __aexec_func(client, message)
 
-
-async def edit_or_reply(msg: Message, **kwargs):
-    func = msg.edit_text if msg.from_user.is_self else msg.reply
-    spec = getfullargspec(func.__wrapped__).args
-    await func(**{k: v for k, v in kwargs.items() if k in spec})
-
-
 @app.on_edited_message(
     filters.command(["ev", "eval"]) & SUDOERS & ~filters.forwarded & ~filters.via_bot
 )
@@ -60,7 +54,7 @@ async def edit_or_reply(msg: Message, **kwargs):
 )
 async def executor(client: app, message: Message):
     if len(message.command) < 2:
-        return await edit_or_reply(message, text="<b>Give me something to exceute</b>")
+        return await message.reply(text="<b>Give me something to exceute</b>")
     try:
         cmd = message.text.split(" ", maxsplit=1)[1]
     except IndexError:
@@ -128,7 +122,7 @@ async def executor(client: app, message: Message):
                 ]
             ]
         )
-        await edit_or_reply(message, text=final_output, buttons=keyboard)
+        await message.reply(text=final_output, buttons=keyboard)
 
 
 @app.on_callback_query(filters.regex(r"runtime"))
@@ -217,6 +211,6 @@ async def shellrunner(_, message: Message):
         )
         os.remove("output.txt")
     else:
-        await edit_or_reply(message, text=output)
+        await message.reply(text=output)
 
     await message.stop_propagation()
