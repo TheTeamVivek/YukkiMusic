@@ -24,7 +24,7 @@ from YukkiMusic.utils import admin_rights_check, seconds_to_min
 )
 @admin_rights_check
 async def seek_comm(event, _, chat_id):
-	comm = event.text.split().
+    comm = event.text.split().
     if len(comm) == 1:
         return await event.reply(_["admin_28"])
     query = event.text.split(None, 1)[1].strip()
