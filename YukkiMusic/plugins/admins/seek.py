@@ -9,14 +9,14 @@
 #
 
 from config import BANNED_USERS
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.platforms import youtube
 from YukkiMusic.utils import admin_rights_check, seconds_to_min
 
 
-@app.on_message(
+@tbot.on_message(
     flt.command(["SEEK_COMMAND", "SEEK_BACK_COMMAND"], True)
     & flt.group
     & ~flt.user(BANNED_USERS)
@@ -53,7 +53,7 @@ async def seek_comm(event, _, chat_id):
                 _["admin_31"].format(seconds_to_min(duration_played), duration)
             )
         to_seek = duration_played + duration_to_skip + 1
-    await event.reply(_["admin_32"])
+    mystic = await event.reply(_["admin_32"])
     if "vid_" in file_path:
         n, file_path = await youtube.video(playing[0]["vidid"], True)
         if n == 0:
@@ -67,9 +67,9 @@ async def seek_comm(event, _, chat_id):
             playing[0]["streamtype"],
         )
     except Exception:
-        return await event.edit(_["admin_34"])
+        return await mystic.edit(_["admin_34"])
     if message.command[0][-2] == "c":
         db[chat_id][0]["played"] -= duration_to_skip
     else:
         db[chat_id][0]["played"] += duration_to_skip
-    await event.edit(_["admin_33"].format(seconds_to_min(to_seek)))
+    await mystic.edit(_["admin_33"].format(seconds_to_min(to_seek)))
