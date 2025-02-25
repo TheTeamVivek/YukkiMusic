@@ -9,7 +9,7 @@
 #
 
 from config import BANNED_USERS
-from YukkiMusic import app, tbot
+from YukkiMusic import tbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.platforms import youtube
