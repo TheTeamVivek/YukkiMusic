@@ -32,7 +32,7 @@ async def mute_admin(event, _, chat_id):
 
 @tbot.on_message(flt.command("UNMUTE_COMMAND") & flt.group & ~flt.user(BANNED_USERS))
 @admin_rights_check
-async def unmute_admin(Client, message: Message, _, chat_id):
+async def unmute_admin(event, _, chat_id):
     if not len(event.text.split()) == 1 or event.reply_to:
         return
     if not await is_muted(chat_id):
