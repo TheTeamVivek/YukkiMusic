@@ -7,12 +7,11 @@
 #
 # All rights reserved.
 #
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from telethon import Button
 from telethon.tl.types import PeerUser
+
 from config import BANNED_USERS, EXTRA_PLUGINS, adminlist
-from strings import command, get_string
+from strings import get_string
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS
@@ -28,7 +27,9 @@ from YukkiMusic.utils.database import (
 )
 
 
-@tbot.on_message(flt.command("STOP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
+@tbot.on_message(
+    flt.command("STOP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+)
 async def stop_music(event):
     if await is_maintenance() is False:
         if event.sender_id not in SUDOERS:
@@ -56,14 +57,14 @@ async def stop_music(event):
         _ = get_string("en")
 
     if not isinstance(event.message.from_id, PeerUser):
-        upl =  [
-                [
-                    Button.inline(
-                        text="How to Fix this? ",
-                        data="AnonymousAdmin",
-                    ),
-                ]
+        upl = [
+            [
+                Button.inline(
+                    text="How to Fix this? ",
+                    data="AnonymousAdmin",
+                ),
             ]
+        ]
         return await event.reply(_["ANONYMOUS_ADMIN"], buttons=upl)
 
     if comm[0][1] == "c":
