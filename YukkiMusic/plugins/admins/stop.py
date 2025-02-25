@@ -9,7 +9,8 @@
 #
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
-
+from telethon import Button
+from telethon.tl.types import PeerUser
 from config import BANNED_USERS, EXTRA_PLUGINS, adminlist
 from strings import command, get_string
 from YukkiMusic import app
@@ -27,66 +28,65 @@ from YukkiMusic.utils.database import (
 )
 
 
-@app.on_message(command("STOP_COMMAND") & filters.group & ~BANNED_USERS)
-async def stop_music(cli, message: Message):
+@tbot.on_message(flt.command("STOP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
+async def stop_music(event):
     if await is_maintenance() is False:
-        if message.from_user.id not in SUDOERS:
+        if event.sender_id not in SUDOERS:
             return
-    if not len(message.command) < 2:
+    comm = event.text.split()
+    if not len(comm) < 2:
         if EXTRA_PLUGINS:
-            if not message.command[0][0] == "c" and not message.command[0][0] == "e":
-                filter = " ".join(message.command[1:])
-                deleted = await delete_filter(message.chat.id, filter)
+            if not comm[0][1] == "c" and not comm[0][1] == "e":
+                filter = " ".join(comm[1:])
+                deleted = await delete_filter(event.chat_id, filter)
                 if deleted:
-                    return await message.reply_text(f"**ᴅᴇʟᴇᴛᴇᴅ ғɪʟᴛᴇʀ {filter}.**")
+                    return await event.reply(f"**ᴅᴇʟᴇᴛᴇᴅ ғɪʟᴛᴇʀ {filter}.**")
                 else:
-                    return await message.reply_text("**ɴᴏ sᴜᴄʜ ғɪʟᴛᴇʀ.**")
+                    return await event.reply("**ɴᴏ sᴜᴄʜ ғɪʟᴛᴇʀ.**")
 
-    if await is_commanddelete_on(message.chat.id):
+    if await is_commanddelete_on(event.chat_id):
         try:
-            await message.delete()
+            await event.delete()
         except Exception:
             pass
     try:
-        language = await get_lang(message.chat.id)
+        language = await get_lang(event.chat_id)
         _ = get_string(language)
     except Exception:
         _ = get_string("en")
 
-    if message.sender_chat:
-        upl = InlineKeyboardMarkup(
-            [
+    if not isinstance(event.message.from_id, PeerUser):
+        upl =  [
                 [
-                    InlineKeyboardButton(
+                    Button.inline(
                         text="How to Fix this? ",
-                        callback_data="AnonymousAdmin",
+                        data="AnonymousAdmin",
                     ),
                 ]
             ]
-        )
-        return await message.reply_text(_["ANONYMOUS_ADMIN"], buttons=upl)
+        return await event.reply(_["ANONYMOUS_ADMIN"], buttons=upl)
 
-    if message.command[0][0] == "c":
-        chat_id = await get_cmode(message.chat.id)
+    if comm[0][1] == "c":
+        chat_id = await get_cmode(event.chat_id)
         if chat_id is None:
-            return await message.reply_text(_["setting_12"])
+            return await event.reply(_["setting_12"])
         try:
-            await app.get_chat(chat_id)
+            await app.get_entity(chat_id)
         except Exception:
-            return await message.reply_text(_["cplay_4"])
+            return await event.reply(_["cplay_4"])
     else:
-        chat_id = message.chat.id
+        chat_id = event.chat_id
     if not await is_active_chat(chat_id):
-        return await message.reply_text(_["NO_ACTIVE_VIDEO_STREAM"])
-    is_non_admin = await is_nonadmin_chat(message.chat.id)
+        return await event.reply(_["NO_ACTIVE_VIDEO_STREAM"])
+    is_non_admin = await is_nonadmin_chat(event.chat_id)
     if not is_non_admin:
-        if message.from_user.id not in SUDOERS:
-            admins = adminlist.get(message.chat.id)
+        if event.sender_id not in SUDOERS:
+            admins = adminlist.get(event.chat_id)
             if not admins:
-                return await message.reply_text(_["admin_18"])
+                return await event.reply(_["admin_18"])
             else:
-                if message.from_user.id not in admins:
-                    return await message.reply_text(_["admin_19"])
+                if event.sender_id not in admins:
+                    return await event.reply(_["admin_19"])
     try:
         check = db.get(chat_id)
         if check[0].get("mystic"):
@@ -95,4 +95,5 @@ async def stop_music(cli, message: Message):
         pass
     await Yukki.stop_stream(chat_id)
     await set_loop(chat_id, 0)
-    await message.reply_text(_["admin_9"].format(message.from_user.mention))
+    mention = await tbot.create_mention(await event.get_sender())
+    await event.reply(_["admin_9"].format(mention))
