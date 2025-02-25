@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 
-
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, Message
 
@@ -25,14 +24,15 @@ from YukkiMusic.utils.stream.autoclear import auto_clean
 from YukkiMusic.utils.thumbnails import gen_thumb
 
 
-@app.on_message(command("SKIP_COMMAND") & filters.group & ~BANNED_USERS)
+@tbot.on_message(flt.command("SKIP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
 @admin_rights_check
-async def skip(cli, message: Message, _, chat_id):
-    if not len(message.command) < 2:
+async def skip(event, _, chat_id):
+    mention = await tbot.create_mention(await event.get_sender())
+    if not len(event.text.split()) < 2:
         loop = await get_loop(chat_id)
         if loop != 0:
-            return await message.reply_text(_["admin_12"])
-        state = message.text.split(None, 1)[1].strip()
+            return await event.reply(_["admin_12"])
+        state = event.text.split(None, 1)[1].strip()
         if state.isnumeric():
             state = int(state)
             check = db.get(chat_id)
@@ -51,14 +51,14 @@ async def skip(cli, message: Message, _, chat_id):
                                     except Exception:
                                         pass
                             except Exception:
-                                return await message.reply_text(_["admin_16"])
+                                return await event.reply(_["admin_16"])
                             if popped:
                                 await auto_clean(popped)
                             if not check:
                                 try:
-                                    await message.reply_text(
+                                    await event.reply(
                                         _["admin_10"].format(
-                                            message.from_user.first_name
+                                            mention
                                         ),
                                         link_preview=False,
                                     )
@@ -67,13 +67,13 @@ async def skip(cli, message: Message, _, chat_id):
                                     return
                                 break
                     else:
-                        return await message.reply_text(_["admin_15"].format(count))
+                        return await event.reply(_["admin_15"].format(count))
                 else:
-                    return await message.reply_text(_["admin_14"])
+                    return await event.reply(_["admin_14"])
             else:
-                return await message.reply_text(_["queue_2"])
+                return await event.reply(_["queue_2"])
         else:
-            return await message.reply_text(_["admin_13"])
+            return await event.reply(_["admin_13"])
     else:
         check = db.get(chat_id)
         popped = None
@@ -87,8 +87,8 @@ async def skip(cli, message: Message, _, chat_id):
                     except Exception:
                         pass
             if not check:
-                await message.reply_text(
-                    _["admin_10"].format(message.from_user.first_name),
+                await event.reply(
+                    _["admin_10"].format(mention),
                     link_preview=False,
                 )
                 try:
@@ -97,8 +97,8 @@ async def skip(cli, message: Message, _, chat_id):
                     return
         except Exception:
             try:
-                await message.reply_text(
-                    _["admin_10"].format(message.from_user.first_name),
+                await event.reply(
+                    _["admin_10"].format(mention),
                     link_preview=False,
                 )
                 return await Yukki.stop_stream(chat_id)
@@ -107,7 +107,6 @@ async def skip(cli, message: Message, _, chat_id):
     queued = check[0]["file"]
     title = (check[0]["title"]).title()
     user = check[0]["by"]
-    message.from_user.id
     streamtype = check[0]["streamtype"]
     videoid = check[0]["vidid"]
     duration_min = check[0]["dur"]
@@ -115,25 +114,25 @@ async def skip(cli, message: Message, _, chat_id):
     if "live_" in queued:
         n, link = await Platform.youtube.video(videoid, True)
         if n == 0:
-            return await message.reply_text(_["admin_11"].format(title))
+            return await event.reply(_["admin_11"].format(title))
         try:
             await Yukki.skip_stream(chat_id, link, video=status)
         except Exception:
-            return await message.reply_text(_["STREAM_SWITCH_FAILED"])
+            return await event.reply(_["STREAM_SWITCH_FAILED"])
         button = telegram_markup(_, chat_id)
         img = await gen_thumb(videoid)
-        run = await message.reply_photo(
-            photo=img,
-            caption=_["stream_1"].format(
+        run = await event.reply(
+            file=img,
+            text=_["stream_1"].format(
                 user,
-                f"https://t.me/{app.username}?start=info_{videoid}",
+                f"https://t.me/{tbot.username}?start=info_{videoid}",
             ),
-            buttons=InlineKeyboardMarkup(button),
+            buttons=button,
         )
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "tg"
     elif "vid_" in queued:
-        mystic = await message.reply_text(
+        mystic = await event.reply(
             _["DOWNLOADING_NEXT_TRACK"], link_preview=False
         )
         try:
@@ -144,22 +143,22 @@ async def skip(cli, message: Message, _, chat_id):
                 video=status,
             )
         except Exception:
-            return await mystic.edit_text(_["STREAM_SWITCH_FAILED"])
+            return await mystic.edit(_["STREAM_SWITCH_FAILED"])
         try:
             await Yukki.skip_stream(chat_id, file_path, video=status)
         except Exception:
-            return await mystic.edit_text(_["STREAM_SWITCH_FAILED"])
+            return await mystic.edit(_["STREAM_SWITCH_FAILED"])
         button = stream_markup(_, videoid, chat_id)
         img = await gen_thumb(videoid)
-        run = await message.reply_photo(
-            photo=img,
-            caption=_["stream_1"].format(
+        run = await event.reply(
+            file=img,
+            text=_["stream_1"].format(
                 title[:27],
-                f"https://t.me/{app.username}?start=info_{videoid}",
+                f"https://t.me/{tbot.username}?start=info_{videoid}",
                 duration_min,
                 user,
             ),
-            buttons=InlineKeyboardMarkup(button),
+            buttons=button,
         )
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "stream"
@@ -168,12 +167,12 @@ async def skip(cli, message: Message, _, chat_id):
         try:
             await Yukki.skip_stream(chat_id, videoid, video=status)
         except Exception:
-            return await message.reply_text(_["STREAM_SWITCH_FAILED"])
+            return await event.reply(_["STREAM_SWITCH_FAILED"])
         button = telegram_markup(_, chat_id)
-        run = await message.reply_photo(
-            photo=config.STREAM_IMG_URL,
-            caption=_["stream_2"].format(user),
-            buttons=InlineKeyboardMarkup(button),
+        run = await event.reply(
+            file=config.STREAM_IMG_URL,
+            text=_["stream_2"].format(user),
+            buttons=button,
         )
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "tg"
@@ -181,34 +180,34 @@ async def skip(cli, message: Message, _, chat_id):
         try:
             await Yukki.skip_stream(chat_id, queued, video=status)
         except Exception:
-            return await message.reply_text(_["STREAM_SWITCH_FAILED"])
+            return await event.reply(_["STREAM_SWITCH_FAILED"])
         if videoid == "telegram":
             button = telegram_markup(_, chat_id)
-            run = await message.reply_photo(
-                photo=(
+            run = await event.reply(
+                file=(
                     config.TELEGRAM_AUDIO_URL
                     if str(streamtype) == "audio"
                     else config.TELEGRAM_VIDEO_URL
                 ),
-                caption=_["stream_1"].format(
+                text=_["stream_1"].format(
                     title, config.SUPPORT_GROUP, check[0]["dur"], user
                 ),
-                buttons=InlineKeyboardMarkup(button),
+                buttons=button,
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
         elif videoid == "soundcloud":
             button = telegram_markup(_, chat_id)
-            run = await message.reply_photo(
-                photo=(
+            run = await event.reply(
+                file=(
                     config.SOUNCLOUD_IMG_URL
                     if str(streamtype) == "audio"
                     else config.TELEGRAM_VIDEO_URL
                 ),
-                caption=_["stream_1"].format(
+                text=_["stream_1"].format(
                     title, config.SUPPORT_GROUP, check[0]["dur"], user
                 ),
-                buttons=InlineKeyboardMarkup(button),
+                buttons=button,
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
@@ -216,25 +215,25 @@ async def skip(cli, message: Message, _, chat_id):
             button = telegram_markup(_, chat_id)
             url = check[0]["url"]
             details = await Platform.saavn.info(url)
-            run = await message.reply_photo(
-                photo=details["thumb"] or config.TELEGRAM_AUDIO_URL,
-                caption=_["stream_1"].format(title, url, check[0]["dur"], user),
-                buttons=InlineKeyboardMarkup(button),
+            run = await event.reply(
+                file=details["thumb"] or config.TELEGRAM_AUDIO_URL,
+                text=_["stream_1"].format(title, url, check[0]["dur"], user),
+                buttons=button,
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
         else:
             button = stream_markup(_, videoid, chat_id)
             img = await gen_thumb(videoid)
-            run = await message.reply_photo(
-                photo=img,
-                caption=_["stream_1"].format(
+            run = await event.reply(
+                file=img,
+                text=_["stream_1"].format(
                     title[:27],
-                    f"https://t.me/{app.username}?start=info_{videoid}",
+                    f"https://t.me/{tbot.username}?start=info_{videoid}",
                     duration_min,
                     user,
                 ),
-                buttons=InlineKeyboardMarkup(button),
+                buttons=button,
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "stream"
