@@ -10,23 +10,10 @@
 import os
 import re
 import sys
-
 import yaml
 
 languages = {}
 languages_present = {}
-
-helpers_key = [
-    "Active",
-    "Admin",
-    "Auth",
-    "Blist",
-    "Bot",
-    "Dev",
-    "Gcast",
-    "PList",
-    "Play",
-]
 
 
 def load_yaml(file_path: str) -> dict:
@@ -38,15 +25,13 @@ def get_string(lang: str):
     return languages[lang]
 
 
-def replace_helpers(text: str, lang_data: dict) -> str:
+def replace_placeholders(text: str, lang_data: dict) -> str:
     if not isinstance(text, str):
         return text
 
-    for helper_key in helpers_key:
-        pattern = rf"\{{\s*{re.escape(helper_key)}\s*\}}"
-        text = re.sub(pattern, lang_data.get(helper_key, helper_key), text)
-
-    return text
+    # Replace all {somekeys} in text with lang_data.get("somekeys", "{somekeys}")
+    pattern = re.compile(r"\{(\w+)\}")
+    return pattern.sub(lambda m: lang_data.get(m.group(1), m.group(0)), text)
 
 
 def update_helpers(data: dict):
@@ -56,8 +41,8 @@ def update_helpers(data: dict):
     for dict_key, value in data.items():
         if isinstance(value, dict):
             data[dict_key] = update_helpers(value)
-        elif isinstance(value, str):
-            data[dict_key] = replace_helpers(value, data)
+        elif isinstance(value, str) and dict_key.endswith("_HELPER"):
+            data[dict_key] = replace_placeholders(value, data)
 
     return data
 
