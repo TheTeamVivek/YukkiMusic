@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 
-from pyrogram.types import Message
 
 from config import BANNED_USERS
 from YukkiMusic import tbot
