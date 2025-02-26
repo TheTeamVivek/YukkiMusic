@@ -55,10 +55,10 @@ class TelethonClient(TelegramClient):
                 r = await func(*args, **kwrags)
             else:
                 r = await asyncio.to_thread(func, *args, **kwargs)
-            return r
-         except Exception:
-             if err:
-                raise
+                return r
+        except Exception ase:
+            if err:
+            raise e
 
     async def create_mention(self, user: User, html: bool = False) -> str:
         user_name = f"{user.first_name} {user.last_name or ''}".strip()
