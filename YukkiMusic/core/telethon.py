@@ -33,6 +33,18 @@ from telethon.tl.types import (
 
 from ..logging import logger
 
+from functools import wraps
+from telethon.errors import (
+    ChatSendMediaForbiddenError,
+    ChatSendPhotosForbiddenError,
+    ChatWriteForbiddenError,
+    FloodWaitError,
+    MessageIdInvalidError,
+    MessageNotModifiedError,
+  
+)
+from ..logging import logger
+
 log = logger(__name__)
 
 
@@ -55,7 +67,7 @@ class TelethonClient(TelegramClient):
                 r = await func(*args, **kwrags)
             else:
                 r = await asyncio.to_thread(func, *args, **kwargs)
-                return r
+            return r
         except Exception ase:
             if err:
             raise e
@@ -144,14 +156,38 @@ class TelethonClient(TelegramClient):
 
     def on_message(self, func=None, *args, **kwargs):
         def decorator(function):
+        	@wraps(function)
+            async def wrapper(event):
+                try:
+                    return await function(event)
+                except FloodWaitError as e:
+                    log.warning(
+                        "FloodWait: Sleeping for %d seconds.", e.value
+                    )
+                    await asyncio.sleep(e.value)
+                except (
+                    ChatWriteForbiddenError,
+                    ChatSendMediaForbiddenError,
+                    ChatSendPhotosForbiddenError,
+                    MessageNotModifiedError,
+                    MessageIdInvalidError,
+                ) as e:
+                    if isinstance(e, ChatWriteForbiddenError):
+                        await self.run_coro(func=self.leave_chat, event.chat_id, err=False) # using for disable errors
+                    
+                except events.StopPropagation as e:
+                    raise events.StopPropagation from e
+                    
+                except Exception as e:
+                	await self.handle_error(e)
+                
             if func is not None:
                 kwargs["func"] = func
             kwargs["incoming"] = kwargs.get("incoming", True)
-            self.add_event_handler(function, events.NewMessage(*args, **kwargs))
-            return function
+            self.add_event_handler(wrapper, events.NewMessage(*args, **kwargs))
+            return wrapper
 
         return decorator
-
     async def __task_runner(self):
         while True:
             async with self.__lock:
