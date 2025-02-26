@@ -14,7 +14,7 @@ from math import ceil
 
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from telethon import events
+from telethon import events, Button
 
 from config import BANNED_USERS, START_IMG_URL
 from strings import get_string, helpers
@@ -27,26 +27,26 @@ COLUMN_SIZE = 4  # Number of button height
 NUM_COLUMNS = 3  # Number of button width
 
 
+async def paginate_modules(page_n, 
 async def paginate_modules(page_n, chat_id: int, close: bool = False):
-    language = await get_lang(chat_id)
-    helpers_dict = helpers.get(language, helpers.get("en", {}))
+    lang = await get_lang(chat_id)
+    string = get_string(lang)
 
-    all_buttons = [
-        EqInlineKeyboardButton(
-            text=helper_key,
-            callback_data=f"help_helper({helper_key},{page_n},{int(close)})",
-        )
-        for helper_key in helpers_dict
-    ] + [
-        EqInlineKeyboardButton(
+    helper_buttons = [
+        Button.inline(helper_key.replace("_HELPER", "").lower(), data=f"help_helper:{helper_key}:{page_n}:{int(close)}")
+        for helper_key in string.keys()
+        if helper_key.endswith("_HELPER")
+    ]
+
+    module_buttons = [
+        Button.inline(
             x.__MODULE__,
-            callback_data="help_module({},{},{})".format(
-                x.__MODULE__.lower(), page_n, int(close)
-            ),
+            data=f"help_module:{x.__MODULE__.lower()}:{page_n}:{int(close)}",
         )
         for x in HELPABLE.values()
     ]
 
+    all_buttons = helper_buttons + module_buttons
     pairs = [
         all_buttons[i : i + NUM_COLUMNS]
         for i in range(0, len(all_buttons), NUM_COLUMNS)
@@ -55,21 +55,9 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
     modulo_page = page_n % max_num_pages
 
     navigation_buttons = [
-        EqInlineKeyboardButton(
-            "❮",
-            callback_data="help_prev({},{})".format(
-                modulo_page - 1 if modulo_page > 0 else max_num_pages - 1,
-                int(close),
-            ),
-        ),
-        EqInlineKeyboardButton(
-            "close" if close else "Back",
-            callback_data="close" if close else "settingsback_helper",
-        ),
-        EqInlineKeyboardButton(
-            "❯",
-            callback_data=f"help_next({modulo_page + 1},{int(close)})",
-        ),
+        Button.inline("❮", data=f"help_prev:{modulo_page - 1 if modulo_page > 0 else max_num_pages - 1}:{int(close)}"),
+        Button.inline(string["CLOSE_BUTTON"] if close else string["CLOSE_BUTTON"], data="close" if close else "settings_back_helper"),
+        Button.inline("❯", data=f"help_next:{modulo_page + 1}:{int(close)}"),
     ]
 
     if len(pairs) > COLUMN_SIZE:
@@ -77,16 +65,9 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
             navigation_buttons
         ]
     else:
-        pairs.append(
-            [
-                EqInlineKeyboardButton(
-                    "close" if close else "Back",
-                    callback_data="close" if close else "settingsback_helper",
-                )
-            ]
-        )
+        pairs.append([navigation_buttons[1]])
 
-    return InlineKeyboardMarkup(pairs)
+    return pairs
 
 
 @tbot.on_message(
@@ -136,91 +117,60 @@ async def help_com_group(event, _):
     await event.reply(_["help_2"], buttons=keyboard)
 
 
-@app.on_callback_query(filters.regex(r"help_(.*?)"))
-async def help_button(client, query):
-    mod_match = re.match(r"help_module\((.+?),(.+?),(\d+)\)", query.data)
-    prev_match = re.match(r"help_prev\((.+?),(\d+)\)", query.data)
-    next_match = re.match(r"help_next\((.+?),(\d+)\)", query.data)
-    helper_match = re.match(r"help_helper\((.+?),(.+?),(\d+)\)", query.data)
+@tbot.on(events.CallbackQuery(pattern=r"^help_(.+)"))
+async def help_button(event):
+    pattern_match = event.pattern_match.group(1)
+    lang = await get_lang(event.chat_id)
+    string = get_string(lang)
+        
+    if pattern_match.startswith("module"):
+        _, module, prev_page_num, close = pattern_match.split(":")
+        close = bool(int(close))
+        text = f"<b><u>Here is the help for {HELPABLE[module].__MODULE__}:</u></b>\n" + HELPABLE[module].__HELP__
 
-    try:
-        language = await get_lang(query.message.chat.id)
-        _ = get_string(language)
-        helpers_dict = helpers.get(language, helpers.get("en"))
+        buttons = [[
+            Button.inline(string["BACK_BUTTON"], data=f"help_prev:{prev_page_num}:{int(close)}"),
+            Button.inline(string["CLOSE_BUTTON"], data="close"),
+        ]]
 
-    except Exception:
-        _ = get_string("en")
-        helpers_dict = helpers.get("en", {})
+        await event.edit(text, buttons=buttons, link_preview=False)
 
-    top_text = _["help_1"]
+    elif pattern_match.startswith("prev"):
+        _, curr_page, close = pattern_match.split(":")
+        close = bool(int(close))
+        chat_id = event.chat_id
 
-    if mod_match:
-        module = mod_match.group(1)
-        prev_page_num = int(mod_match.group(2))
-        close = bool(int(mod_match.group(3)))
-        text = (
-            f"<b><u>Here is the help for {HELPABLE[module].__MODULE__}:</u></b>\n"
-            + HELPABLE[module].__HELP__
-        )
-        key = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton(
-                        text="↪️ Back",
-                        callback_data=f"help_prev({prev_page_num},{int(close)})",
-                    ),
-                    InlineKeyboardButton(text="🔄 Close", callback_data="close"),
-                ],
-            ]
-        )
-        await query.message.edit(
-            text=text,
-            buttons=key,
-            link_preview=False,
-        )
-    elif prev_match:
-        curr_page = int(prev_match.group(1))
-        close = bool(int(prev_match.group(2)))
-        await query.message.edit(
-            text=top_text,
-            buttons=await paginate_modules(
-                curr_page, query.message.chat.id, close=close
-            ),
-            link_preview=False,
-        )
-    elif next_match:
-        next_page = int(next_match.group(1))
-        close = bool(int(next_match.group(2)))
-        await query.message.edit(
-            text=top_text,
-            buttons=await paginate_modules(
-                next_page, query.message.chat.id, close=close
-            ),
-            link_preview=False,
-        )
-    elif helper_match:
-        helper_key = helper_match.group(1)
-        page_n = int(helper_match.group(2))
-        close = bool(int(helper_match.group(3)))
-        helpers_dict.get(helper_key, None)
-        formatted_text = _["helper_key"]
-        key = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton(
-                        text="↪️ Back", callback_data=f"help_prev({page_n},{int(close)})"
-                    ),
-                    InlineKeyboardButton(text="🔄 Close", callback_data="close"),
-                ]
-            ]
-        )
+        keyboard = await paginate_modules(int(curr_page), chat_id, close=close)
+        lang = await get_lang(chat_id)
+        string = get_string(lang)
+
+        await event.edit(string["help_1"], buttons=keyboard, link_preview=False)
+
+    elif pattern_match.startswith("next"):
+        _, next_page, close = pattern_match.split(":")
+        close = bool(int(close))
+        chat_id = event.chat_id
+
+        keyboard = await paginate_modules(int(next_page), chat_id, close=close)
+        lang = await get_lang(chat_id)
+        string = get_string(lang)
+
+        await event.edit(string["help_1"], buttons=keyboard, link_preview=False)
+
+    elif pattern_match.startswith("helper"):
+        _, helper_key, page_n, close = pattern_match.split(":")
+        close = bool(int(close))
+        helper_key = helper_key.upper() + "_HELPER"
+        text = string.get(helper_key, f"No help available for {helper_key}.")
+
+        buttons = [[
+            Button.inline(string["BACK_BUTTON"], data=f"help_prev:{page_n}:{int(close)}"),
+            Button.inline(string["CLOSE_BUTTON"], data="close"),
+        ]]
+
         try:
-            await query.message.edit(
-                text=f"<b>{helper_key}:</b>\n{formatted_text}",
-                buttons=key,
-                link_preview=False,
-            )
+            await event.edit(f"<b>{helper_key}:</b>\n{text}", buttons=buttons, link_preview=False)
         except Exception as e:
             logging.exception(e)
 
-    await client.answer_callback_query(query.id)
+    await event.answer()
