@@ -7,19 +7,10 @@
 #
 # All rights reserved.
 #
-from pyrogram import filters
-from pyrogram.enums import ChatType
 from pyrogram.errors import MessageNotModified
-from pyrogram.types import (
-    CallbackQuery,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    Message,
-)
-from telethon import events, Button
+from telethon import Button, events
 
 from config import BANNED_USERS, CLEANMODE_DELETE_MINS, OWNER_ID
-from strings import command
 from YukkiMusic import app
 from YukkiMusic.utils.database import (
     add_nonadmin_chat,
@@ -55,7 +46,9 @@ from YukkiMusic.utils.inline.settings import (
 from YukkiMusic.utils.inline.start import private_panel
 
 
-@tbot.on_message(flt.command("SETTINGS_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
+@tbot.on_message(
+    flt.command("SETTINGS_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+)
 @language
 async def settings_mar(event, _):
     buttons = setting_markup(_)
@@ -64,6 +57,7 @@ async def settings_mar(event, _):
         _["setting_1"].format(chat.title, chat.id),
         buttons=buttons,
     )
+
 
 @tbot.on(events.CallbackQuery(pattern="settings_helper", func=~flt.user(BANNED_USERS)))
 @language
@@ -75,7 +69,7 @@ async def settings_cb(event, _):
     chat = await event.get_chat()
     buttons = setting_markup(_)
     return await event.edit(
-       text= _["setting_1"].format(
+        text=_["setting_1"].format(
             chat.title,
             event.chat_id,
         ),
@@ -83,12 +77,14 @@ async def settings_cb(event, _):
     )
 
 
-@tbot.on(events.CallbackQuery(pattern="settingsback_helper", func=~flt.user(BANNED_USERS)))
+@tbot.on(
+    events.CallbackQuery(pattern="settingsback_helper", func=~flt.user(BANNED_USERS))
+)
 @language
 async def settings_back_markup(event, _):
     try:
         await event.answer()
-    except Exception as e:
+    except Exception:
         pass
 
     if event.is_private:
@@ -99,15 +95,13 @@ async def settings_back_markup(event, _):
             OWNER = None
         buttons = private_panel(_, OWNER)
         await event.edit(
-                _["start_1"].format(app.mention),
-                buttons=buttons,
-            )
+            _["start_1"].format(app.mention),
+            buttons=buttons,
+        )
     else:
         buttons = setting_markup(_)
         try:
-            await event.edit(
-                buttons=buttons
-            )
+            await event.edit(buttons=buttons)
         except MessageNotModified:
             pass
 
@@ -144,7 +138,12 @@ async def gen_buttons_vid(_, aud):
 # without admin rights
 
 
-@tbot.on(events.CallbackQuery(pattern=r"^(SEARCHANSWER|PLAYMODEANSWER|PLAYTYPEANSWER|AUTHANSWER|CMANSWER|COMMANDANSWER|CM|AQ|VQ|PM|AU)$", func=~flt.user(BANNED_USERS)))
+@tbot.on(
+    events.CallbackQuery(
+        pattern=r"^(SEARCHANSWER|PLAYMODEANSWER|PLAYTYPEANSWER|AUTHANSWER|CMANSWER|COMMANDANSWER|CM|AQ|VQ|PM|AU)$",
+        func=~flt.user(BANNED_USERS),
+    )
+)
 @language
 async def without_Admin_rights(event, _):
     command = event.pattern_match.group(0)
@@ -239,15 +238,18 @@ async def without_Admin_rights(event, _):
             buttons = auth_users_markup(_, True)
         else:
             buttons = auth_users_markup(_)
-        return await event.edit(
-            buttons=buttons
-        )
+        return await event.edit(buttons=buttons)
 
 
 # Audio Video Quality
 
 
-@tbot.on(events.CallbackQuery(pattern=r"^(LOW|MEDIUM|HIGH|STUDIO|SD_360p|SD_480p|HD_720p|FHD_1080p|QHD_2K|UHD_4K)$", func=~flt.user(BANNED_USERS)))
+@tbot.on(
+    events.CallbackQuery(
+        pattern=r"^(LOW|MEDIUM|HIGH|STUDIO|SD_360p|SD_480p|HD_720p|FHD_1080p|QHD_2K|UHD_4K)$",
+        func=~flt.user(BANNED_USERS),
+    )
+)
 @actual_admin_cb
 async def aud_vid_cb(event, _):
     command = event.pattern_match.group(0)
@@ -285,12 +287,14 @@ async def aud_vid_cb(event, _):
     if command == "UHD_4K":
         await save_video_bitrate(event.chat_id, "UHD_4K")
         buttons = video_quality_markup(_, UHD_4K=True)
-    return await event.edit(
-            buttons=buttons
-        )
+    return await event.edit(buttons=buttons)
 
 
-@tbot.on(events.CallbackQuery(pattern=r"^(CLEANMODE|COMMANDELMODE)$", func=~flt.user(BANNED_USERS)))
+@tbot.on(
+    events.CallbackQuery(
+        pattern=r"^(CLEANMODE|COMMANDELMODE)$", func=~flt.user(BANNED_USERS)
+    )
+)
 @actual_admin_cb
 async def cleanmode_mark(event, _):
     command = event.pattern_match.group(0)
@@ -309,9 +313,7 @@ async def cleanmode_mark(event, _):
             await cleanmode_on(event.chat_id)
             cle = True
         buttons = cleanmode_settings_markup(_, status=cle, dels=sta)
-        return await event.edit(
-            buttons=buttons
-        )
+        return await event.edit(buttons=buttons)
     if command == "COMMANDELMODE":
         cle = None
         sta = None
@@ -323,13 +325,16 @@ async def cleanmode_mark(event, _):
             await commanddelete_on(event.chat_id)
             sta = True
         buttons = cleanmode_settings_markup(_, status=cle, dels=sta)
-    return await event.edit(
-            buttons=buttons
-        )
+    return await event.edit(buttons=buttons)
 
 
 # Play Mode Settings
-@tbot.on(events.CallbackQuery(pattern=r"^(|MODECHANGE|CHANNELMODECHANGE|PLAYTYPECHANGE)$", func=~flt.user(BANNED_USERS)))
+@tbot.on(
+    events.CallbackQuery(
+        pattern=r"^(|MODECHANGE|CHANNELMODECHANGE|PLAYTYPECHANGE)$",
+        func=~flt.user(BANNED_USERS),
+    )
+)
 @actual_admin_cb
 async def playmode_ans(event, _):
     command = event.pattern_match.group(0)
@@ -398,13 +403,13 @@ async def playmode_ans(event, _):
         else:
             Group = None
         buttons = playmode_users_markup(_, Direct, Group, Playtype)
-    return await event.edit(
-            buttons=buttons
-        )
+    return await event.edit(buttons=buttons)
 
 
 # Auth Users Settings
-@tbot.on(events.CallbackQuery(pattern=r"^(AUTH|AUTHLIST)$", func=~flt.user(BANNED_USERS)))
+@tbot.on(
+    events.CallbackQuery(pattern=r"^(AUTH|AUTHLIST)$", func=~flt.user(BANNED_USERS))
+)
 @actual_admin_cb
 async def authusers_mar(event, _):
     command = event.pattern_match.group(0)
@@ -436,17 +441,15 @@ async def authusers_mar(event, _):
                     continue
                 msg += f"{j}➤ {user}[`{user_id}`]\n"
                 msg += f"   {_['AUTHORIZED_BY']} {admin_name}[`{admin_id}`]\n\n"
-            upl =  [
-                    [
-                        Button.inline(
-                            text=_["BACK_BUTTON"], data=f"AU"
-                        ),
-                        Button.inline(
-                            text=_["CLOSE_BUTTON"],
-                            data=f"close",
-                        ),
-                    ]
+            upl = [
+                [
+                    Button.inline(text=_["BACK_BUTTON"], data=f"AU"),
+                    Button.inline(
+                        text=_["CLOSE_BUTTON"],
+                        data=f"close",
+                    ),
                 ]
+            ]
             try:
                 return await event.edit(msg, buttons=upl)
             except MessageNotModified:
@@ -463,6 +466,4 @@ async def authusers_mar(event, _):
         else:
             await remove_nonadmin_chat(event.chat_id)
             buttons = auth_users_markup(_, True)
-    return await event.edit(
-            buttons=buttons
-        )
+    return await event.edit(buttons=buttons)
