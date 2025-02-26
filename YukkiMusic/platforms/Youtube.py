@@ -18,7 +18,7 @@ from async_lru import alru_cache
 from yt_dlp import YoutubeDL
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
-from youtubesearchpython.__future__ import VideosSearch
+from py_yt import VideosSearch
 
 import config
 from YukkiMusic.utils.database import is_on_off

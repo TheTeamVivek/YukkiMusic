@@ -8,7 +8,7 @@
 # All rights reserved.
 #
 
-from youtubesearchpython.__future__ import VideosSearch
+from py_yt import VideosSearch
 
 
 async def gen_thumb(videoid):
