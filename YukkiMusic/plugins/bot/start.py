@@ -134,7 +134,7 @@ async def start_comm(event, _):
             await sudoers_list(client=event.client, message=event, _=_)
             await asyncio.sleep(1)
             if await is_on_off(config.LOG):
-            	sender = await event.get_sender()
+                sender = await event.get_sender()
                 sender_id = sender.id
                 sender_name = sender.first_name
                 return await tbot.send_message(
@@ -196,7 +196,7 @@ async def start_comm(event, _):
             )
             await asyncio.sleep(1)
             if await is_on_off(config.LOG):
-            	sender = await event.get_sender()
+                sender = await event.get_sender()
                 sender_id = event.sender_id
                 sender_name = sender.first_name
                 return await tbot.send_message(
