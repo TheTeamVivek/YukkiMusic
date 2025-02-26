@@ -12,19 +12,20 @@ import logging
 import re
 from math import ceil
 
-from pyrogram import filters, types
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram import filters
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from telethon import events
 
 from config import BANNED_USERS, START_IMG_URL
-from strings import command, get_command, get_string, helpers
+from strings import get_string, helpers
 from YukkiMusic import HELPABLE, app
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline.help import private_help_panel
 
-from telethon import events
 COLUMN_SIZE = 4  # Number of button height
 NUM_COLUMNS = 3  # Number of button width
+
 
 async def paginate_modules(page_n, chat_id: int, close: bool = False):
     language = await get_lang(chat_id)
@@ -87,8 +88,13 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
 
     return InlineKeyboardMarkup(pairs)
 
-@tbot.on_message(flt.command("HELP_COMMAND", True) & flt.private & ~flt.user(BANNED_USERS))
-@tbot.on(events.CallbackQuery(pattern="settings_back_helper", func = ~flt.user(BANNED_USERS)))
+
+@tbot.on_message(
+    flt.command("HELP_COMMAND", True) & flt.private & ~flt.user(BANNED_USERS)
+)
+@tbot.on(
+    events.CallbackQuery(pattern="settings_back_helper", func=~flt.user(BANNED_USERS))
+)
 async def helper_private(event):
     is_callback = hasattr(event, "data")
     chat_id = event.chat_id
@@ -121,7 +127,9 @@ async def helper_private(event):
             )
 
 
-@tbot.on_message(flt.command("HELP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
+@tbot.on_message(
+    flt.command("HELP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+)
 @language(no_check=True)
 async def help_com_group(event, _):
     keyboard = private_help_panel(_)
@@ -194,7 +202,7 @@ async def help_button(client, query):
         helper_key = helper_match.group(1)
         page_n = int(helper_match.group(2))
         close = bool(int(helper_match.group(3)))
-        raw_text = helpers_dict.get(helper_key, None)
+        helpers_dict.get(helper_key, None)
         formatted_text = _["helper_key"]
         key = InlineKeyboardMarkup(
             [
