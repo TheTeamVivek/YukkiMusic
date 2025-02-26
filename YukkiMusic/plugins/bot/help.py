@@ -22,127 +22,21 @@ from YukkiMusic.utils.database import get_lang, is_commanddelete_on
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline.help import private_help_panel
 
+from telethon import events
 COLUMN_SIZE = 4  # Number of button height
 NUM_COLUMNS = 3  # Number of button width
-
-
-class EqInlineKeyboardButton(InlineKeyboardButton):
-    def __eq__(self, other):
-        return self.text == other.text
-
-    def __lt__(self, other):
-        return self.text < other.text
-
-    def __gt__(self, other):
-        return self.text > other.text
-
-
-async def format_helper_text(lng, helper_key: str, text: str) -> str:
-    if not text:
-        return ""
-    _ = get_command(lng)
-
-    def _cmd(key):
-        return " ".join(f"/{cmd}" for cmd in _[key])
-
-    if helper_key == "Auth":
-        return text.format(
-            _cmd("AUTH_COMMAND"), _cmd("UNAUTH_COMMAND"), _cmd("AUTHUSERS_COMMAND")
-        )
-    elif helper_key == "Admin":
-        return text.format(
-            _cmd("PAUSE_COMMAND"),
-            _cmd("RESUME_COMMAND"),
-            _cmd("MUTE_COMMAND"),
-            _cmd("UNMUTE_COMMAND"),
-            _cmd("SKIP_COMMAND"),
-            _cmd("STOP_COMMAND"),
-            _cmd("SHUFFLE_COMMAND"),
-            _cmd("SEEK_COMMAND"),
-            _cmd("SEEK_BACK_COMMAND"),
-            _cmd("REBOOT_COMMAND"),
-            _cmd("LOOP_COMMAND"),
-        )
-    elif helper_key == "Active":
-        return text.format(
-            _cmd("ACTIVEVC_COMMAND"),
-            _cmd("ACTIVEVIDEO_COMMAND"),
-            _cmd("AC_COMMAND"),
-            _cmd("STATS_COMMAND"),
-        )
-    elif helper_key == "Play":
-        return text.format(
-            _cmd("PLAY_COMMAND"),
-            _cmd("PLAYMODE_COMMAND"),
-            _cmd("CHANNELPLAY_COMMAND"),
-            _cmd("STREAM_COMMAND"),
-        )
-    elif helper_key == "Gcast":
-        return text.format(_cmd("BROADCAST_COMMAND"))
-    elif helper_key == "Bot":
-        return text.format(
-            _cmd("GSTATS_COMMAND"),
-            _cmd("SUDOUSERS_COMMAND"),
-            _cmd("LYRICS_COMMAND"),
-            _cmd("SONG_COMMAND"),
-            _cmd("QUEUE_COMMAND"),
-            _cmd("AUTHORIZE_COMMAND"),
-            _cmd("UNAUTHORIZE_COMMAND"),
-            _cmd("AUTHORIZED_COMMAND"),
-        )
-    elif helper_key == "PList":
-        return text.format(
-            _cmd("PLAYLIST_COMMAND"),
-            _cmd("DELETE_PLAYLIST_COMMAND"),
-            _cmd("PLAY_PLAYLIST_COMMAND"),
-            _cmd("PLAY_PLAYLIST_COMMAND"),
-        )
-    elif helper_key == "BList":
-        return text.format(
-            _cmd("BLACKLISTCHAT_COMMAND"),
-            _cmd("WHITELISTCHAT_COMMAND"),
-            _cmd("BLACKLISTEDCHAT_COMMAND"),
-            _cmd("BLOCK_COMMAND"),
-            _cmd("UNBLOCK_COMMAND"),
-            _cmd("BLOCKED_COMMAND"),
-            _cmd("GBAN_COMMAND"),
-            _cmd("UNGBAN_COMMAND"),
-            _cmd("GBANNED_COMMAND"),
-        )
-    elif helper_key == "Dev":
-        return text.format(
-            _cmd("ADDSUDO_COMMAND"),
-            _cmd("DELSUDO_COMMAND"),
-            _cmd("SUDOUSERS_COMMAND"),
-            _cmd("USAGE_COMMAND"),
-            _cmd("GETVAR_COMMAND"),
-            _cmd("DELVAR_COMMAND"),
-            _cmd("SETVAR_COMMAND"),
-            _cmd("RESTART_COMMAND"),
-            _cmd("UPDATE_COMMAND"),
-            _cmd("SPEEDTEST_COMMAND"),
-            _cmd("MAINTENANCE_COMMAND"),
-            _cmd("LOGGER_COMMAND"),
-            _cmd("GETLOG_COMMAND"),
-            _cmd("AUTOEND_COMMAND"),
-        )
-    else:
-        return text
-
 
 async def paginate_modules(page_n, chat_id: int, close: bool = False):
     language = await get_lang(chat_id)
     helpers_dict = helpers.get(language, helpers.get("en", {}))
 
-    helper_buttons = [
+    all_buttons = [
         EqInlineKeyboardButton(
             text=helper_key,
             callback_data=f"help_helper({helper_key},{page_n},{int(close)})",
         )
         for helper_key in helpers_dict
-    ]
-
-    module_buttons = [
+    ] + [
         EqInlineKeyboardButton(
             x.__MODULE__,
             callback_data="help_module({},{},{})".format(
@@ -152,7 +46,6 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
         for x in HELPABLE.values()
     ]
 
-    all_buttons = helper_buttons + module_buttons
     pairs = [
         all_buttons[i : i + NUM_COLUMNS]
         for i in range(0, len(all_buttons), NUM_COLUMNS)
@@ -194,49 +87,45 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
 
     return InlineKeyboardMarkup(pairs)
 
-
-@app.on_message(command("HELP_COMMAND") & filters.private & ~BANNED_USERS)
-@app.on_callback_query(filters.regex("settings_back_helper") & ~BANNED_USERS)
-async def helper_private(client: app, update: types.Message | types.CallbackQuery):
-    is_callback = isinstance(update, types.CallbackQuery)
+@tbot.on_message(flt.command("HELP_COMMAND", True) & flt.private & ~flt.user(BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="settings_back_helper", func = ~flt.user(BANNED_USERS)))
+async def helper_private(event):
+    is_callback = hasattr(event, "data")
+    chat_id = event.chat_id
+    language = await get_lang(chat_id)
+    _ = get_string(language)
     if is_callback:
         try:
-            await update.answer()
+            await event.answer()
         except Exception:
             pass
-        chat_id = update.message.chat.id
-        language = await get_lang(chat_id)
-        _ = get_string(language)
         keyboard = await paginate_modules(0, chat_id, close=False)
-        await update.edit(_["help_1"], buttons=keyboard)
+        await event.edit(_["help_1"], buttons=keyboard)
     else:
-        chat_id = update.chat.id
-        if await is_commanddelete_on(update.chat.id):
+        if await is_commanddelete_on(chat_id):
             try:
-                await update.delete()
+                await event.delete()
             except Exception:
                 pass
-        language = await get_lang(chat_id)
-        _ = get_string(language)
         keyboard = await paginate_modules(0, chat_id, close=True)
         if START_IMG_URL:
-            await update.reply_photo(
-                photo=START_IMG_URL,
-                caption=_["help_1"],
+            await event.respond(
+                file=START_IMG_URL,
+                message=_["help_1"],
                 buttons=keyboard,
             )
         else:
-            await update.reply_text(
-                text=_["help_1"],
+            await event.respond(
+                message=_["help_1"],
                 buttons=keyboard,
             )
 
 
-@app.on_message(command("HELP_COMMAND") & filters.group & ~BANNED_USERS)
+@tbot.on_message(flt.command("HELP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
 @language(no_check=True)
-async def help_com_group(client, message: Message, _):
+async def help_com_group(event, _):
     keyboard = private_help_panel(_)
-    await message.reply_text(_["help_2"], buttons=InlineKeyboardMarkup(keyboard))
+    await event.reply(_["help_2"], buttons=keyboard)
 
 
 @app.on_callback_query(filters.regex(r"help_(.*?)"))
@@ -306,7 +195,7 @@ async def help_button(client, query):
         page_n = int(helper_match.group(2))
         close = bool(int(helper_match.group(3)))
         raw_text = helpers_dict.get(helper_key, None)
-        formatted_text = await format_helper_text(language, helper_key, raw_text)
+        formatted_text = _["helper_key"]
         key = InlineKeyboardMarkup(
             [
                 [
