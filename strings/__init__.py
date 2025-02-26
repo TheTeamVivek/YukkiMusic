@@ -38,7 +38,9 @@ def replace_placeholders(text: str, lang_data: dict) -> str:
         return text
 
     pattern = re.compile(r"\{(\w+)\}")
-    return pattern.sub(lambda m: format_value(lang_data.get(m.group(1), m.group(0))), text)
+    return pattern.sub(
+        lambda m: format_value(lang_data.get(m.group(1), m.group(0))), text
+    )
 
 
 def update_helpers(data: dict):
