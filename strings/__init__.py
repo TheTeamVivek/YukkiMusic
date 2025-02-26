@@ -26,13 +26,19 @@ def get_string(lang: str):
     return languages[lang]
 
 
+def format_value(value):
+    """Formats value as a string, joining lists with a '/' prefix."""
+    if isinstance(value, list):
+        return " ".join(f"/{cmd}" for cmd in value)
+    return value
+
+
 def replace_placeholders(text: str, lang_data: dict) -> str:
     if not isinstance(text, str):
         return text
 
-    # Replace all {somekeys} in text with lang_data.get("somekeys", "{somekeys}")
     pattern = re.compile(r"\{(\w+)\}")
-    return pattern.sub(lambda m: lang_data.get(m.group(1), m.group(0)), text)
+    return pattern.sub(lambda m: format_value(lang_data.get(m.group(1), m.group(0))), text)
 
 
 def update_helpers(data: dict):
