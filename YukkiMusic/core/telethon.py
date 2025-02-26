@@ -68,7 +68,7 @@ class TelethonClient(TelegramClient):
             else:
                 r = await asyncio.to_thread(func, *args, **kwargs)
             return r
-        except Exception ase:
+        except Exception as e:
             if err:
             raise e
 
