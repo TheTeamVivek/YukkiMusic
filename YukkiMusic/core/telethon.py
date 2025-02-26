@@ -156,7 +156,7 @@ class TelethonClient(TelegramClient):
 
     def on_message(self, func=None, *args, **kwargs):
         def decorator(function):
-        	@wraps(function)
+            @wraps(function)
             async def wrapper(event):
                 try:
                     return await function(event)
