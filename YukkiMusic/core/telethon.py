@@ -61,16 +61,16 @@ class TelethonClient(TelegramClient):
         self.__lock = asyncio.Lock()
         self.__tasks = []
 
-    async def run_coro(self, func: Callable, *args, **kwargs, err: bool=True):
+    async def run_coro(self, func: Callable, *args, **kwargs, err: bool = True):
         try:
             if inspect.iscoroutinefunction(func):
-                r = await func(*args, **kwrags)
+                r = await func(*args, **kwargs)
             else:
                 r = await asyncio.to_thread(func, *args, **kwargs)
             return r
         except Exception as e:
             if err:
-            raise e
+                raise e
 
     async def create_mention(self, user: User, html: bool = False) -> str:
         user_name = f"{user.first_name} {user.last_name or ''}".strip()
