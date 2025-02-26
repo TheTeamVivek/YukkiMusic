@@ -61,7 +61,7 @@ class TelethonClient(TelegramClient):
         self.__lock = asyncio.Lock()
         self.__tasks = []
 
-    async def run_coro(self, func: Callable, *args, **kwargs, err: bool = True):
+    async def run_coro(self, func: Callable, err: bool = True, *args, **kwargs):
         try:
             if inspect.iscoroutinefunction(func):
                 r = await func(*args, **kwargs)
