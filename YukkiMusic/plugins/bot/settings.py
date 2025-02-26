@@ -329,7 +329,7 @@ async def cleanmode_mark(event, _):
 
 
 # Play Mode Settings
-@tbot.on(events.CallbackQuery(pattern=pattern=r"^(|MODECHANGE|CHANNELMODECHANGE|PLAYTYPECHANGE)$", func=~flt.user(BANNED_USERS)))
+@tbot.on(events.CallbackQuery(pattern=r"^(|MODECHANGE|CHANNELMODECHANGE|PLAYTYPECHANGE)$", func=~flt.user(BANNED_USERS)))
 @actual_admin_cb
 async def playmode_ans(event, _):
     command = event.pattern_match.group(0)
