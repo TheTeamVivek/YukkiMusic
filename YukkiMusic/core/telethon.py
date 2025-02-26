@@ -173,7 +173,7 @@ class TelethonClient(TelegramClient):
                     MessageIdInvalidError,
                 ) as e:
                     if isinstance(e, ChatWriteForbiddenError):
-                        await self.run_coro(func=self.leave_chat, event.chat_id, err=False) # using for disable errors
+                        await self.run_coro(event.chat_id, func=self.leave_chat, err=False) # using for disable errors
                     
                 except events.StopPropagation as e:
                     raise events.StopPropagation from e
