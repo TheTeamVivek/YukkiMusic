@@ -4,10 +4,19 @@ import traceback
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
+from functools import wraps
 from typing import Any
 
 from telethon import TelegramClient, events
-from telethon.errors import UserNotParticipantError
+from telethon.errors import (
+    ChatSendMediaForbiddenError,
+    ChatSendPhotosForbiddenError,
+    ChatWriteForbiddenError,
+    FloodWaitError,
+    MessageIdInvalidError,
+    MessageNotModifiedError,
+    UserNotParticipantError,
+)
 from telethon.tl.functions.channels import (
     GetParticipantRequest,
     LeaveChannelRequest,
@@ -31,18 +40,6 @@ from telethon.tl.types import (
     User,
 )
 
-from ..logging import logger
-
-from functools import wraps
-from telethon.errors import (
-    ChatSendMediaForbiddenError,
-    ChatSendPhotosForbiddenError,
-    ChatWriteForbiddenError,
-    FloodWaitError,
-    MessageIdInvalidError,
-    MessageNotModifiedError,
-  
-)
 from ..logging import logger
 
 log = logger(__name__)
@@ -161,9 +158,7 @@ class TelethonClient(TelegramClient):
                 try:
                     return await function(event)
                 except FloodWaitError as e:
-                    log.warning(
-                        "FloodWait: Sleeping for %d seconds.", e.value
-                    )
+                    log.warning("FloodWait: Sleeping for %d seconds.", e.value)
                     await asyncio.sleep(e.value)
                 except (
                     ChatWriteForbiddenError,
@@ -173,14 +168,16 @@ class TelethonClient(TelegramClient):
                     MessageIdInvalidError,
                 ) as e:
                     if isinstance(e, ChatWriteForbiddenError):
-                        await self.run_coro(event.chat_id, func=self.leave_chat, err=False) # using for disable errors
-                    
+                        await self.run_coro(
+                            event.chat_id, func=self.leave_chat, err=False
+                        )  # using for disable errors
+
                 except events.StopPropagation as e:
                     raise events.StopPropagation from e
-                    
+
                 except Exception as e:
-                	await self.handle_error(e)
-                
+                    await self.handle_error(e)
+
             if func is not None:
                 kwargs["func"] = func
             kwargs["incoming"] = kwargs.get("incoming", True)
@@ -188,6 +185,7 @@ class TelethonClient(TelegramClient):
             return wrapper
 
         return decorator
+
     async def __task_runner(self):
         while True:
             async with self.__lock:
