@@ -9,16 +9,13 @@
 #
 
 import logging
-import re
 from math import ceil
 
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from telethon import events, Button
+from telethon import Button, events
 
 from config import BANNED_USERS, START_IMG_URL
-from strings import get_string, helpers
-from YukkiMusic import HELPABLE, app
+from strings import get_string
+from YukkiMusic import HELPABLE
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline.help import private_help_panel
@@ -32,7 +29,10 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
     string = get_string(lang)
 
     helper_buttons = [
-        Button.inline(helper_key.replace("_HELPER", "").lower(), data=f"help_helper:{helper_key}:{page_n}:{int(close)}")
+        Button.inline(
+            helper_key.replace("_HELPER", "").lower(),
+            data=f"help_helper:{helper_key}:{page_n}:{int(close)}",
+        )
         for helper_key in string.keys()
         if helper_key.endswith("_HELPER")
     ]
@@ -54,8 +54,14 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
     modulo_page = page_n % max_num_pages
 
     navigation_buttons = [
-        Button.inline("❮", data=f"help_prev:{modulo_page - 1 if modulo_page > 0 else max_num_pages - 1}:{int(close)}"),
-        Button.inline(string["CLOSE_BUTTON"] if close else string["CLOSE_BUTTON"], data="close" if close else "settings_back_helper"),
+        Button.inline(
+            "❮",
+            data=f"help_prev:{modulo_page - 1 if modulo_page > 0 else max_num_pages - 1}:{int(close)}",
+        ),
+        Button.inline(
+            string["CLOSE_BUTTON"] if close else string["CLOSE_BUTTON"],
+            data="close" if close else "settings_back_helper",
+        ),
         Button.inline("❯", data=f"help_next:{modulo_page + 1}:{int(close)}"),
     ]
 
@@ -121,16 +127,24 @@ async def help_button(event):
     pattern_match = event.pattern_match.group(1)
     lang = await get_lang(event.chat_id)
     string = get_string(lang)
-        
+
     if pattern_match.startswith("module"):
         _, module, prev_page_num, close = pattern_match.split(":")
         close = bool(int(close))
-        text = f"<b><u>Here is the help for {HELPABLE[module].__MODULE__}:</u></b>\n" + HELPABLE[module].__HELP__
+        text = (
+            f"<b><u>Here is the help for {HELPABLE[module].__MODULE__}:</u></b>\n"
+            + HELPABLE[module].__HELP__
+        )
 
-        buttons = [[
-            Button.inline(string["BACK_BUTTON"], data=f"help_prev:{prev_page_num}:{int(close)}"),
-            Button.inline(string["CLOSE_BUTTON"], data="close"),
-        ]]
+        buttons = [
+            [
+                Button.inline(
+                    string["BACK_BUTTON"],
+                    data=f"help_prev:{prev_page_num}:{int(close)}",
+                ),
+                Button.inline(string["CLOSE_BUTTON"], data="close"),
+            ]
+        ]
 
         await event.edit(text, buttons=buttons, link_preview=False)
 
@@ -162,13 +176,19 @@ async def help_button(event):
         helper_key = helper_key.upper() + "_HELPER"
         text = string.get(helper_key, f"No help available for {helper_key}.")
 
-        buttons = [[
-            Button.inline(string["BACK_BUTTON"], data=f"help_prev:{page_n}:{int(close)}"),
-            Button.inline(string["CLOSE_BUTTON"], data="close"),
-        ]]
+        buttons = [
+            [
+                Button.inline(
+                    string["BACK_BUTTON"], data=f"help_prev:{page_n}:{int(close)}"
+                ),
+                Button.inline(string["CLOSE_BUTTON"], data="close"),
+            ]
+        ]
 
         try:
-            await event.edit(f"<b>{helper_key}:</b>\n{text}", buttons=buttons, link_preview=False)
+            await event.edit(
+                f"<b>{helper_key}:</b>\n{text}", buttons=buttons, link_preview=False
+            )
         except Exception as e:
             logging.exception(e)
 
