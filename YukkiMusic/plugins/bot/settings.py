@@ -7,11 +7,11 @@
 #
 # All rights reserved.
 #
-from pyrogram.errors import MessageNotModified
+from telethon.errors import MessageNotModifiedError
 from telethon import Button, events
 
 from config import BANNED_USERS, CLEANMODE_DELETE_MINS, OWNER_ID
-from YukkiMusic import app
+from YukkiMusic import tbot
 from YukkiMusic.utils.database import (
     add_nonadmin_chat,
     cleanmode_off,
@@ -89,21 +89,18 @@ async def settings_back_markup(event, _):
 
     if event.is_private:
         try:
-            await app.get_entity(OWNER_ID[0])
+            await tbot.get_entity(OWNER_ID[0])
             OWNER = OWNER_ID[0]
         except Exception:
             OWNER = None
         buttons = private_panel(_, OWNER)
         await event.edit(
-            _["start_1"].format(app.mention),
+            _["start_1"].format(tbot.mention),
             buttons=buttons,
         )
     else:
         buttons = setting_markup(_)
-        try:
-            await event.edit(buttons=buttons)
-        except MessageNotModified:
-            pass
+        await event.edit(buttons=buttons)
 
 
 ## Audio and Video Quality
@@ -452,7 +449,7 @@ async def authusers_mar(event, _):
             ]
             try:
                 return await event.edit(msg, buttons=upl)
-            except MessageNotModified:
+            except MessageNotModifiedError:
                 return
     try:
         await event.answer(_["set_cb_6"], alert=True)
