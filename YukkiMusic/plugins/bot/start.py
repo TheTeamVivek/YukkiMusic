@@ -11,18 +11,18 @@ import asyncio
 import time
 
 from pyrogram import filters
-from pyrogram.enums import ChatType, ParseMode
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.enums import ChatType
+from pyrogram.types import Message
+from telethon import Button
 from youtubesearchpython.__future__ import VideosSearch
 
-from telethon import Button, events
 import config
 from config import BANNED_USERS, START_IMG_URL
 from config.config import OWNER_ID
-from strings import command, get_string
-from YukkiMusic import Platform, tbot
-from YukkiMusic.platforms import youtube, telegram
+from strings import get_string
+from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS, _boot_
+from YukkiMusic.platforms import telegram, youtube
 from YukkiMusic.plugins.bot.help import paginate_modules
 from YukkiMusic.plugins.play.playlist import del_plist_msg
 from YukkiMusic.plugins.sudo.sudoers import sudoers_list
@@ -44,7 +44,9 @@ from YukkiMusic.utils.inline import private_panel, start_pannel
 loop = asyncio.get_running_loop()
 
 
-@tbot.on_message(flt.command("START_COMMAND", True) & flt.private & ~flt.user(BANNED_USERS))
+@tbot.on_message(
+    flt.command("START_COMMAND", True) & flt.private & ~flt.user(BANNED_USERS)
+)
 @language(no_check=True)
 async def start_comm(event, _):
     chat_id = event.chat_id
@@ -124,7 +126,7 @@ async def start_comm(event, _):
 
             try:
                 videoid, msg = await loop.run_in_executor(None, get_stats)
-            except Exception as e:
+            except Exception:
                 return
             thumbnail = await youtube.thumbnail(videoid, True)
             await m.delete()
@@ -182,12 +184,12 @@ async def start_comm(event, _):
 📎**Channel Link:** [Visit from here]({channellink})
 🔗**Videp linl:** [Link]({link})
 """
-            key =   [
-                    [
-                        Button.url(text="🎥 Watch ", url=f"{link}"),
-                        Button.inline(text="🔄 Close", data="close"),
-                    ],
-                ]
+            key = [
+                [
+                    Button.url(text="🎥 Watch ", url=f"{link}"),
+                    Button.inline(text="🔄 Close", data="close"),
+                ],
+            ]
             await m.delete()
             await event.respond(
                 file=thumbnail,
@@ -237,15 +239,17 @@ async def start_comm(event, _):
             )
 
 
-@tbot.on_message(flt.command("START_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
+@tbot.on_message(
+    flt.command("START_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+)
 @language(no_check=True)
-async def testbot(event , _):
+async def testbot(event, _):
     uptime = int(time.time() - _boot_)
     await event.reply(_["start_7"].format(get_readable_time(uptime)))
     return await add_served_chat(event.chat_id)
 
 
-@tbot.on_message(filters.new_chat_members, group=-1) # Not completed yet
+@tbot.on_message(filters.new_chat_members, group=-1)  # Not completed yet
 async def welcome(client, message: Message):
     chat_id = event.chat_id
     if config.PRIVATE_BOT_MODE == str(True):
