@@ -27,7 +27,6 @@ COLUMN_SIZE = 4  # Number of button height
 NUM_COLUMNS = 3  # Number of button width
 
 
-async def paginate_modules(page_n, 
 async def paginate_modules(page_n, chat_id: int, close: bool = False):
     lang = await get_lang(chat_id)
     string = get_string(lang)
