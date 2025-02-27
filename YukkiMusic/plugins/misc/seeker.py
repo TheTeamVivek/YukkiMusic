@@ -11,8 +11,6 @@ import asyncio
 import time
 from datetime import datetime, timedelta
 
-from pyrogram.types import InlineKeyboardMarkup
-
 from strings import get_string
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
