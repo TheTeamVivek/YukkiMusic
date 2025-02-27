@@ -11,8 +11,8 @@
 import random
 from telethon import events, Button
 from YukkiMusic import tbot
-from config import LOG_GROUP_ID
-from YukkiMusic.utils.database import delete_served_chat
+from config import LOG_GROUP_ID, LOG
+from YukkiMusic.utils.database import delete_served_chat, get_assistant, is_on_off
 
 join_msgs = [
     "✨ **New Home Unlocked!** ✨\n\n"
@@ -67,44 +67,57 @@ async def on_chat_action(event):
     username = f"@{chat.username}" if chat.username else "Private Chat"
     chat_title = chat.title
     chat_id = chat.id
-    member_count =  chat.participants_count
+    member_count = chat.participants_count
+    userbot = await get_assistant(chat.id)
+
     if event.user_added:
         for user in event.users:
-        	added_by = await event.get_added_by()
-            added_by = f"**{await tbot.create_mention(added_by)}**"
-            msg = random.choice(join_msgs).format(
-                chat_title=chat_title,
-                chat_id=chat_id,
-                username=username,
-                member_count=member_count,
-                added_by=added_by,
-            )
+            if user.id == tbot.id:
+                added_by = await event.get_added_by()
+                added_by = f"**{await tbot.create_mention(added_by)}**"
+                msg = random.choice(join_msgs).format(
+                    chat_title=chat_title,
+                    chat_id=chat_id,
+                    username=username,
+                    member_count=member_count,
+                    added_by=added_by,
+                )
 
-            await tbot.send_message(
-                LOG_GROUP_ID,
-                msg,
-                buttons=[[Button.url(f"🔍 View {chat_title}", f"https://t.me/{chat.username}")]] if chat.username else None
-            )
+                if await is_on_off(LOG):
+                    await tbot.send_message(
+                        LOG_GROUP_ID,
+                        msg,
+                        buttons=[[Button.url(f"🔍 View {chat_title}", f"https://t.me/{chat.username}")]] if chat.username else None
+                    )
+
+                if chat.username:
+                    await userbot.join_chat(chat.username)
 
     elif event.user_left:
         for user in event.users:
-        	rby = await event.get_kicked_by()
-            removed_by = (
-                f"**{await tbot.create_mention(rby)}**"
-                if rby
-                else "Unknown User"
-            )
-            msg = random.choice(leave_msgs).format(
-                chat_title=chat_title,
-                chat_id=chat_id,
-                username=username,
-                removed_by=removed_by,
-            )
+            if user.id == tbot.id:
+                removed_by = await event.get_kicked_by()
+                removed_by = (
+                    f"**{await tbot.create_mention(removed_by)}**"
+                    if removed_by else "Unknown User"
+                )
+                msg = random.choice(leave_msgs).format(
+                    chat_title=chat_title,
+                    chat_id=chat_id,
+                    username=username,
+                    removed_by=removed_by,
+                )
 
-            await tbot.send_message(
-                LOG_GROUP_ID,
-                msg,
-                buttons=[[Button.url(f"🔍 View {chat_title}", f"https://t.me/{chat.username}")]] if chat.username else None
-            )
+                if await is_on_off(LOG):
+                    await tbot.send_message(
+                        LOG_GROUP_ID,
+                        msg,
+                        buttons=[[Button.url(f"🔍 View {chat_title}", f"https://t.me/{chat.username}")]] if chat.username else None
+                    )
 
-            await delete_served_chat(chat_id)
+                if userbot:
+                    await userbot.leave_chat(chat.id)
+                
+                await delete_served_chat(chat_id)
+
+# Kindly Not usinf try except because i want to see errors that is it working correctly or not
