@@ -61,11 +61,6 @@ class Telegram:
             return None
         return text[offset : offset + length]
 
-    async def split_text(self, string, limit: int | None = None):
-        limit = limit if limit is not None else 4095
-        for i in range(0, len(string), limit):
-            yield string[i : i + limit]
-
     async def get_link(self, message):
         if message.chat.username:
             link = f"https://t.me/{message.chat.username}/{message.reply_to_message.id}"
