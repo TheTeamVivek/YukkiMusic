@@ -15,6 +15,8 @@ from pyrogram.enums import ChatType
 from pyrogram.types import Message
 from telethon import Button, utils
 from telethon.extensions import markdown
+
+from telethon.tl.types import Chat, Channel
 from youtubesearchpython.__future__ import VideosSearch
 
 import config
