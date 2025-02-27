@@ -82,7 +82,9 @@ ASSISTANT_LEAVE_TIME = int(
 )  # Remember to give value in Seconds
 
 CLEANMODE_DELETE_TIME = int(
-    getenv("CLEANMODE_DELETE_TIME", "5")  #  TODO MAKE the env or local variable name same
+    getenv(
+        "CLEANMODE_DELETE_TIME", "5"
+    )  #  TODO MAKE the env or local variable name same
 )  # Remember to give value in Minutes
 
 # Custom max audio(music) duration for voice chat.
