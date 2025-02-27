@@ -72,12 +72,12 @@ MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
 
 # Set it in True if you want to leave your assistant after
-# a certain amount of time. [Set time via AUTO_LEAVE_ASSISTANT_TIME]
+# a certain amount of time. [Set time via ASSISTANT_LEAVE_TIME]
 AUTO_LEAVING_ASSISTANT = is_true(getenv("AUTO_LEAVING_ASSISTANT", "False"))
 
 # Time after which you're assistant account
 # will leave chats automatically.
-AUTO_LEAVE_ASSISTANT_TIME = int(
+ASSISTANT_LEAVE_TIME = int(
     getenv("ASSISTANT_LEAVE_TIME", "1800")
 )  # Remember to give value in Seconds
 

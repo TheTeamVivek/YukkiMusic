@@ -64,7 +64,7 @@ async def auto_leave():
     await asyncio.gather(*tasks)
 
     next_run["auto_leave"] = datetime.utcnow() + timedelta(
-        seconds=config.AUTO_LEAVE_ASSISTANT_TIME
+        seconds=config.ASSISTANT_LEAVE_TIME
     )
 
 
