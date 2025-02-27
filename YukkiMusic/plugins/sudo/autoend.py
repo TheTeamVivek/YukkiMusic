@@ -8,15 +8,11 @@
 # All rights reserved.
 #
 
-from strings import command
-from YukkiMusic import app, tbot
-from YukkiMusic.misc import SUDOERS
+from YukkiMusic import tbot
 from YukkiMusic.utils.database import autoend_off, autoend_on
 
 
-@tbot.on_message(
-    flt.command("AUTOEND_COMMAND", True) & flt.user(BANNED_USERS)
-)
+@tbot.on_message(flt.command("AUTOEND_COMMAND", True) & flt.user(BANNED_USERS))
 async def auto_end_stream(event):
     usage = "**Usage:**\n\n/autoend [enable|disable]"
     if len(event.text.split()) != 2:
