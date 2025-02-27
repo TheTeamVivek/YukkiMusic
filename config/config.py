@@ -33,7 +33,7 @@ MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
 CLEANMODE_DELETE_MINS = int(
     getenv("CLEANMODE_MINS", "5")
-)  # Remember to give value in Seconds
+)  # Remember to give value in Minute
 
 
 # Custom max audio(music) duration for voice chat. set DURATION_LIMIT in variables with your own time(mins), Default to 60 mins.
