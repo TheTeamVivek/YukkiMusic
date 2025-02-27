@@ -24,12 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r .github/docs/requirements.txt
-
-      - name: Build documentation
-        run: |
-          cd .github/docs
-          make html
+          mkdir .github/docs/build/html
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
