@@ -251,51 +251,64 @@ async def testbot(event, _):
     return await add_served_chat(event.chat_id)
 
 
-@tbot.on_message(filters.new_chat_members, group=-1)  # Not completed yet
-async def welcome(client, message: Message):
+
+@tbot.on(events.ChatAction(func=flt.new_chat_members))  
+async def welcome(event):
     chat_id = event.chat_id
-    if config.PRIVATE_BOT_MODE == str(True):
-        if not await is_served_private_chat(event.chat_id):
+    chat = await event.get_chat()
+
+    if isinstance(chat, Channel) and not chat.megagroup:
+        return  
+
+    if config.PRIVATE_BOT_MODE:
+        if not await is_served_private_chat(chat_id):
             await event.reply(
-                "This Bot's private mode has been enabled only my owner can use this if want to use in your chat so say my Owner to authorize your chat."
+                "This Bot's private mode has been enabled. Only my owner can use this. "
+                "If you want to use it in your chat, ask my Owner to authorize your chat."
             )
-            return await tbot.leave_chat(event.chat_id)
+            return await tbot.leave_chat(chat_id)
     else:
         await add_served_chat(chat_id)
-    for member in message.new_chat_members:
-        try:
-            language = await get_lang(event.chat_id)
-            _ = get_string(language)
-            if member.id == tbot.id:
-                chat_type = message.chat.type
-                if chat_type != ChatType.SUPERGROUP:
-                    await event.reply(_["start_5"])
-                    return await tbot.leave_chat(event.chat_id)
-                if chat_id in await blacklisted_chats():
-                    await event.reply(
-                        _["start_6"].format(
-                            f"https://t.me/{tbot.username}?start=sudolist"
-                        )
-                    )
-                    return await tbot.leave_chat(chat_id)
-                userbot = await get_assistant(event.chat_id)
-                out = start_pannel(_)
+        language = await get_lang(chat_id)
+        _ = get_string(language)
+
+        if isinstance(chat, Chat):
+            await event.reply(_["start_5"])
+            return await tbot.leave_chat(chat_id)
+
+    for user in event.users:
+        if user.id == tbot.id:
+            if chat_id in await blacklisted_chats():
                 await event.reply(
-                    _["start_2"].format(
-                        tbot.mention,
-                        userbot.username,
-                        userbot.id,
-                    ),
-                    buttons=out,
+                    _["start_6"].format(
+                        f"https://t.me/{tbot.username}?start=sudolist"
+                    )
                 )
-            if member.id in config.OWNER_ID:
-                return await event.reply(
-                    _["start_3"].format(tbot.mention, member.mention)
-                )
-            if member.id in SUDOERS:
-                return await event.reply(
-                    _["start_4"].format(tbot.mention, member.mention)
-                )
-            return
-        except Exception:
-            return
+                return await tbot.leave_chat(chat_id)
+
+            userbot = await get_assistant(chat_id)
+            out = start_pannel(_)
+            await event.reply(
+                _["start_2"].format(
+                    tbot.mention,
+                    userbot.username,
+                    userbot.id,
+                ),
+                buttons=out,
+            )
+            continue  
+
+        mention = await tbot.create_mention(user)
+
+        if user.id in config.OWNER_ID:
+            await event.reply(
+                _["start_3"].format(tbot.mention, mention)
+            )
+
+        elif user.id in SUDOERS:
+            await event.reply(
+                _["start_4"].format(tbot.mention, mention)
+            )
+
+        else: # We can add check about the user is banned on bot and try to kick from the chat
+            pass
