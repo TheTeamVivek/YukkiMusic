@@ -14,8 +14,9 @@ jobs:
       - name: Replace text
         shell: bash
         run: |
-          declare -A replacements=(
-            ["AUTO_LEAVE_ASSISTANT_TIME"]="ASSISTANT_LEAVE_TIME"
+           declare -A replacements=(
+            ["CLEANMODE_DELETE_MINS"]="CLEANMODE_DELETE_TIME"
+            ["CLEANMODE_MINS"]="CLEANMODE_DELETE_TIME"
           )
 
           for key in "${!replacements[@]}"; do
