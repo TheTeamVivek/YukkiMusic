@@ -20,9 +20,6 @@ def is_true(value: str) -> bool:
     return value.lower() in ["true", "yes"]
 
 
-# To know what each variable does,
-# check out https://theteamvivek.github.io/YukkiMusic/config.html).
-
 # -------------------
 # Necessary Variables
 # -------------------
