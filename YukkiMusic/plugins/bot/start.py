@@ -13,7 +13,8 @@ import time
 from pyrogram import filters
 from pyrogram.enums import ChatType
 from pyrogram.types import Message
-from telethon import Button
+from telethon import Button, utils
+from telethon.extensions import markdown
 from youtubesearchpython.__future__ import VideosSearch
 
 import config
@@ -22,7 +23,7 @@ from config.config import OWNER_ID
 from strings import get_string
 from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS, _boot_
-from YukkiMusic.platforms import telegram, youtube
+from YukkiMusic.platforms import youtube
 from YukkiMusic.plugins.bot.help import paginate_modules
 from YukkiMusic.plugins.play.playlist import del_plist_msg
 from YukkiMusic.plugins.sudo.sudoers import sudoers_list
@@ -41,8 +42,6 @@ from YukkiMusic.utils.formatters import get_readable_time
 from YukkiMusic.utils.functions import MARKDOWN, WELCOMEHELP
 from YukkiMusic.utils.inline import private_panel, start_pannel
 
-from telethon import utils
-from telethon.extensions import markdown
 loop = asyncio.get_running_loop()
 
 
