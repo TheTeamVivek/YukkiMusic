@@ -10,13 +10,9 @@
 import asyncio
 import time
 
-from pyrogram import filters
-from pyrogram.enums import ChatType
-from pyrogram.types import Message
 from telethon import Button, utils
 from telethon.extensions import markdown
-
-from telethon.tl.types import Chat, Channel
+from telethon.tl.types import Channel, Chat
 from youtubesearchpython.__future__ import VideosSearch
 
 import config
@@ -253,14 +249,13 @@ async def testbot(event, _):
     return await add_served_chat(event.chat_id)
 
 
-
-@tbot.on(events.ChatAction(func=flt.new_chat_members))  
+@tbot.on(events.ChatAction(func=flt.new_chat_members))
 async def welcome(event):
     chat_id = event.chat_id
     chat = await event.get_chat()
 
     if isinstance(chat, Channel) and not chat.megagroup:
-        return  
+        return
 
     if config.PRIVATE_BOT_MODE:
         if not await is_served_private_chat(chat_id):
@@ -282,9 +277,7 @@ async def welcome(event):
         if user.id == tbot.id:
             if chat_id in await blacklisted_chats():
                 await event.reply(
-                    _["start_6"].format(
-                        f"https://t.me/{tbot.username}?start=sudolist"
-                    )
+                    _["start_6"].format(f"https://t.me/{tbot.username}?start=sudolist")
                 )
                 return await tbot.leave_chat(chat_id)
 
@@ -298,19 +291,15 @@ async def welcome(event):
                 ),
                 buttons=out,
             )
-            continue  
+            continue
 
         mention = await tbot.create_mention(user)
 
         if user.id in config.OWNER_ID:
-            await event.reply(
-                _["start_3"].format(tbot.mention, mention)
-            )
+            await event.reply(_["start_3"].format(tbot.mention, mention))
 
         elif user.id in SUDOERS:
-            await event.reply(
-                _["start_4"].format(tbot.mention, mention)
-            )
+            await event.reply(_["start_4"].format(tbot.mention, mention))
 
-        else: # We can add check about the user is banned on bot and try to kick from the chat
+        else:  # We can add check about the user is banned on bot and try to kick from the chat
             pass
