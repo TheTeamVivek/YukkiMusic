@@ -14,20 +14,22 @@ from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import autoend_off, autoend_on
 
 
-@app.on_message(command("AUTOEND_COMMAND") & SUDOERS)
-async def auto_end_stream(client, message):
-    usage = "**ᴜsᴀɢᴇ:**\n\n/autoend [enable|disable]"
-    if len(message.command) != 2:
-        return await message.reply_text(usage)
-    state = message.text.split(None, 1)[1].strip()
+@tbot.on_message(
+    flt.command("AUTOEND_COMMAND", True) & flt.user(BANNED_USERS)
+)
+async def auto_end_stream(event):
+    usage = "**Usage:**\n\n/autoend [enable|disable]"
+    if len(event.text.split()) != 2:
+        return await event.reply(usage)
+    state = event.text.split(None, 1)[1].strip()
     state = state.lower()
     if state == "enable":
         await autoend_on()
-        await message.reply_text(
+        await event.reply(
             "Auto End enabled.\n\nBot will leave voicechat automatically after 30 secinds if one is listening song with a warning message.."
         )
     elif state == "disable":
         await autoend_off()
-        await message.reply_text("Autoend disabled")
+        await event.reply("Autoend disabled")
     else:
-        await message.reply_text(usage)
+        await event.reply(usage)
