@@ -36,7 +36,7 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.formatters import alpha_to_int
 
-AUTO_DELETE = config.CLEANMODE_DELETE_MINS
+AUTO_DELETE = config.CLEANMODE_DELETE_TIME
 AUTO_SLEEP = 5
 IS_BROADCASTING = False
 cleanmode_group = 15

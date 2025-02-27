@@ -10,7 +10,7 @@
 from telethon import Button, events
 from telethon.errors import MessageNotModifiedError
 
-from config import BANNED_USERS, CLEANMODE_DELETE_MINS, OWNER_ID
+from config import BANNED_USERS, CLEANMODE_DELETE_TIME, OWNER_ID
 from YukkiMusic import tbot
 from YukkiMusic.utils.database import (
     add_nonadmin_chat,
@@ -167,7 +167,7 @@ async def without_Admin_rights(event, _):
     if command == "CMANSWER":
         try:
             return await event.answer(
-                _["setting_9"].format(CLEANMODE_DELETE_MINS),
+                _["setting_9"].format(CLEANMODE_DELETE_TIME),
                 alert=True,
             )
         except Exception:
