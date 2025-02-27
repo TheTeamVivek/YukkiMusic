@@ -5,7 +5,6 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 from functools import wraps
-from typing import Any
 
 from telethon import TelegramClient, events
 from telethon.errors import (
@@ -182,7 +181,6 @@ class TelethonClient(TelegramClient):
             return wrapper
 
         return decorator
-
 
     async def run(self, command: list):
         process = await asyncio.create_subprocess_exec(
