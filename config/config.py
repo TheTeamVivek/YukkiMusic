@@ -17,7 +17,7 @@ load_dotenv()
 
 
 def is_true(value: str) -> bool:
-    return value.lower() in ["true", "1", "yes"]
+    return value.lower() in ["true", "yes"]
 
 
 # To know what each variable does,
