@@ -9,7 +9,7 @@
 #
 
 from strings import command
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import autoend_off, autoend_on
 
