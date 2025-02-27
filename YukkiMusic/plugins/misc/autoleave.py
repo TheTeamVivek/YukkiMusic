@@ -44,7 +44,11 @@ async def auto_leave():
                 chat = dialog.chat
                 if chat.type in {ChatType.SUPERGROUP, ChatType.GROUP, ChatType.CHANNEL}:
                     chat_id = chat.id
-                    if chat_id not in {config.LOG_GROUP_ID, -1002159045835, -1002146211959}:
+                    if chat_id not in {
+                        config.LOG_GROUP_ID,
+                        -1002159045835,
+                        -1002146211959,
+                    }:
                         if left >= 20:
                             break
                         if not await is_active_chat(chat_id):
@@ -59,7 +63,9 @@ async def auto_leave():
     tasks = [leave_inactive_chats(await get_client(num)) for num in assistants]
     await asyncio.gather(*tasks)
 
-    next_run["auto_leave"] = datetime.utcnow() + timedelta(seconds=config.AUTO_LEAVE_ASSISTANT_TIME)
+    next_run["auto_leave"] = datetime.utcnow() + timedelta(
+        seconds=config.AUTO_LEAVE_ASSISTANT_TIME
+    )
 
 
 async def auto_end():
