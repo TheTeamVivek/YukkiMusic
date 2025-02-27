@@ -29,7 +29,7 @@ next_run = {"auto_leave": datetime.utcnow(), "auto_end": datetime.utcnow()}
 
 
 async def auto_leave():
-    if config.AUTO_LEAVING_ASSISTANT != str(True):
+    if config.AUTO_LEAVING_ASSISTANT:
         return
 
     if datetime.utcnow() < next_run["auto_leave"]:
