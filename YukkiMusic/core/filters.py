@@ -42,9 +42,10 @@ def wrap(func):
 
 
 @wrap
-def new_chat_members(event): # May be only useable in events.ChatAction
+def new_chat_members(event):  # May be only useable in events.ChatAction
     "Member is joined or added in chat"
     return getattr(event, "user_added", False) or getattr(event, "user_joined", False)
+
 
 @wrap
 def private(event):
