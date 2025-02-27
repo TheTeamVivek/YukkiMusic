@@ -41,6 +41,8 @@ from YukkiMusic.utils.formatters import get_readable_time
 from YukkiMusic.utils.functions import MARKDOWN, WELCOMEHELP
 from YukkiMusic.utils.inline import private_panel, start_pannel
 
+from telethon import utils
+from telethon.extensions import markdown
 loop = asyncio.get_running_loop()
 
 
@@ -149,8 +151,9 @@ async def start_comm(event, _):
             lyrical = config.lyrical
             lyrics = lyrical.get(query)
             if lyrics:
-                async for chunk_msg in telegram.split_text(lyrics):
-                    await event.reply(chunk_msg)
+                text, entities = markdown.parse(lyrics)
+                for text, entities in utils.split_text(text, entities):
+                    await event.reply(text, formatting_entities=entities)
                 return
             else:
                 await event.reply("Failed to get lyrics ")
