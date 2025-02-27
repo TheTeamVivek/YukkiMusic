@@ -55,8 +55,6 @@ class ShellRunResult:
 class TelethonClient(TelegramClient):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.__lock = asyncio.Lock()
-        self.__tasks = []
 
     async def run_coro(self, func: Callable, err: bool = True, *args, **kwargs):
         try:
@@ -149,7 +147,6 @@ class TelethonClient(TelegramClient):
         self.mention = self.create_mention(me)
         self.name = f"{me.first_name} {me.last_name or ''}".strip()
         # pylint: enable=attribute-defined-outside-init
-        asyncio.create_task(self.__task_runner())
 
     def on_message(self, func=None, *args, **kwargs):
         def decorator(function):
@@ -186,28 +183,6 @@ class TelethonClient(TelegramClient):
 
         return decorator
 
-    async def __task_runner(self):
-        while True:
-            async with self.__lock:
-                if not self.__tasks:
-                    return
-                tasks = [
-                    self.run_coro(func, *args, **kwargs)
-                    for func, args, kwargs in self.__tasks
-                ]
-                self.__tasks.clear()
-
-            results = await asyncio.gather(*tasks, return_exceptions=True)
-            for r in results:
-                if isinstance(r, Exception):  # Check if the result is an exception
-                    await self.handle_error(
-                        r
-                    )  # Log the error traceback and inform to OWNER
-            await asyncio.sleep(0.2)
-
-    async def add_task(self, func: Callable[..., Any], *args, **kwargs):
-        async with self.__lock:
-            self.__tasks.append((func, args, kwargs))
 
     async def run(self, command: list):
         process = await asyncio.create_subprocess_exec(
