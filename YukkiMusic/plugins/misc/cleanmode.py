@@ -78,7 +78,7 @@ async def clean_mode(event):
 async def braodcast_message(event, _):
     global IS_BROADCASTING
     if event.is_reply:
-    	r_msg = await event.get_reply_message()
+        r_msg = await event.get_reply_message()
         x = r_msg.id
     else:
         if len(event.text.split()) < 2:
