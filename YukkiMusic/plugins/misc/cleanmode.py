@@ -76,7 +76,6 @@ async def braodcast_message(event, _):
     global IS_BROADCASTING
     if event.is_reply:
         r_msg = await event.get_reply_message()
-        r_msg.id
     else:
         if len(event.text.split()) < 2:
             return await event.reply(_["broad_5"])
@@ -113,7 +112,7 @@ async def braodcast_message(event, _):
                 m = (
                     await r_msg.forward_to(chat_id)
                     if event.is_reply
-                    else await app.send_message(chat_id, query)
+                    else await tbot.send_message(chat_id, query)
                 )
                 if "-pin" in event.text:
                     try:
@@ -148,7 +147,7 @@ async def braodcast_message(event, _):
                 m = (
                     await r_msg.forward_to(user_id)
                     if event.is_reply
-                    else await app.send_message(user_id, query)
+                    else await tbot.send_message(user_id, query)
                 )
                 if "-pin" in event.text:
                     try:
