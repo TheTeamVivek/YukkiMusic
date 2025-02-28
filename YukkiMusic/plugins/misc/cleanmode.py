@@ -16,10 +16,13 @@ from pyrogram.enums import ChatMembersFilter
 from pyrogram.errors import FloodWait
 from pyrogram.raw import types
 
+from telethon import events
+from telethon.tl.types import UpdateReadChannelOutbox
+from telethon.tl.types import ChannelParticipantsAdmins
 import config
 from config import adminlist, chatstats, clean, userstats
 from strings import command
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.utils.database import (
     get_active_chats,
     get_authuser_names,
@@ -41,27 +44,27 @@ AUTO_SLEEP = 5
 IS_BROADCASTING = False
 cleanmode_group = 15
 
-
-@app.on_raw_update(group=cleanmode_group)
-async def clean_mode(client, update, users, chats):
+@tbot.on(events.Raw(types=UpdateReadChannelOutbox))
+async def clean_mode(event):
     global IS_BROADCASTING
     if IS_BROADCASTING:
         return
-    try:
-        if not isinstance(update, types.UpdateReadChannelOutbox):
-            return
-    except Exception:
+    logger.info(update.stringify())
+    update = event
+    if hasattr(event, "users") and event.users:
         return
-    if users:
+    if hasattr(event, "chats") and event.chats:
         return
-    if chats:
-        return
+
     message_id = update.max_id
     chat_id = int(f"-100{update.channel_id}")
+
     if not await is_cleanmode_on(chat_id):
         return
+
     if chat_id not in clean:
         clean[chat_id] = []
+
     time_now = datetime.now()
     put = {
         "msg_id": message_id,
@@ -69,19 +72,18 @@ async def clean_mode(client, update, users, chats):
     }
     clean[chat_id].append(put)
     await set_queries(1)
-
-
-@app.on_message(command("BROADCAST_COMMAND") & filters.user(config.OWNER_ID))
+    
+@tbot.on_message(flt.command("BROADCAST_COMMAND", True) & flt.user(config.OWNER_ID))
 @language
-async def braodcast_message(client, message, _):
+async def braodcast_message(event, _):
     global IS_BROADCASTING
-    if message.reply_to_message:
-        x = message.reply_to_message.id
-        y = message.chat.id
+    if event.is_reply:
+    	r_msg = await event.get_reply_message()
+        x = r_msg.id
     else:
-        if len(message.command) < 2:
-            return await message.reply_text(_["broad_5"])
-        query = message.text.split(None, 1)[1]
+        if len(event.text.split()) < 2:
+            return await event.reply(_["broad_5"])
+        query = event.text.split(None, 1)[1]
 
         if "-nobot" in query:
             query = query.replace("-nobot", "")
@@ -94,36 +96,27 @@ async def braodcast_message(client, message, _):
         if "-user" in query:
             query = query.replace("-user", "")
         if query == "":
-            return await message.reply_text(_["broad_6"])
+            return await event.reply(_["broad_6"])
 
     IS_BROADCASTING = True
 
     # Bot broadcast inside chats
-    if "-nobot" not in message.text:
+    if "-nobot" not in event.text:
         sent = 0
         pin = 0
-        chats = []
         schats = await get_served_chats()
-        for chat in schats:
-            chats.append(int(chat["chat_id"]))
-        for i in chats:
-            if i == config.LOG_GROUP_ID:
-                continue
+        chats = [int(chat["chat_id"]) for chat in schats if int(chat["chat_id"]) != config.LOG_GROUP_ID]
+
+        for chat_id in chats:
             try:
                 m = (
-                    await app.forward_messages(i, y, x)
-                    if message.reply_to_message
-                    else await app.send_message(i, text=query)
+                    await r_msg.forward_to(chat_id)
+                    if event.is_reply
+                    else await app.send_message(chat_id, query)
                 )
-                if "-pin" in message.text:
+                if "-pin" in event.text:
                     try:
-                        await m.pin(disable_notification=True)
-                        pin += 1
-                    except Exception:
-                        continue
-                elif "-pinloud" in message.text:
-                    try:
-                        await m.pin(disable_notification=False)
+                        await m.pin(notify="-pinloud" in event.text)
                         pin += 1
                     except Exception:
                         continue
@@ -136,34 +129,29 @@ async def braodcast_message(client, message, _):
             except Exception:
                 continue
         try:
-            await message.reply_text(_["broad_1"].format(sent, pin))
+            await event.reply(_["broad_1"].format(sent, pin))
         except Exception:
             pass
 
     # Bot broadcasting to users
-    if "-user" in message.text:
+    if "-user" in event.text:
         susr = 0
         pin = 0
         served_users = []
         susers = await get_served_users()
-        for user in susers:
-            served_users.append(int(user["user_id"]))
-        for i in served_users:
+        served_users = [int(user["user_id"]) for user in susers]
+
+        for user_id in served_users:
+
             try:
                 m = (
-                    await app.forward_messages(i, y, x)
-                    if message.reply_to_message
-                    else await app.send_message(i, text=query)
+                    await r_msg.forward_to(user_id)
+                    if event.is_reply
+                    else await app.send_message(user_id, query)
                 )
-                if "-pin" in message.text:
+                if "-pin" in event.text:
                     try:
-                        await m.pin(both_sides=True, disable_notification=True)
-                        pin += 1
-                    except Exception:
-                        continue
-                elif "-pinloud" in message.text:
-                    try:
-                        await m.pin(both_sides=True, disable_notification=False)
+                        await m.pin(notify="-pinloud" in event.text)
                         pin += 1
                     except Exception:
                         continue
@@ -176,13 +164,13 @@ async def braodcast_message(client, message, _):
             except Exception:
                 pass
         try:
-            await message.reply_text(_["broad_7"].format(susr, pin))
+            await event.reply(_["broad_7"].format(susr, pin))
         except Exception:
             pass
 
     # Bot broadcasting by assistant
-    if "-assistant" in message.text:
-        aw = await message.reply_text(_["broad_2"])
+    if "-assistant" in event.text:
+        aw = await event.reply(_["broad_2"])
         text = _["broad_3"]
         from YukkiMusic.core.userbot import assistants
 
@@ -197,7 +185,7 @@ async def braodcast_message(client, message, _):
                     continue
                 try:
                     (
-                        await client.forward_messages(dialog.chat.id, y, x)
+                        await client.forward_messages(dialog.chat.id, event.chat_id, r_msg.id)
                         if message.reply_to_message
                         else await client.send_message(dialog.chat.id, text=query)
                     )
@@ -207,8 +195,8 @@ async def braodcast_message(client, message, _):
                     if flood_time > 200:
                         continue
                     await asyncio.sleep(flood_time)
-                except Exception as e:
-                    print(e)
+                except Exception:
+                    pass
                     continue
             text += _["broad_4"].format(num, sent)
         try:
@@ -260,7 +248,7 @@ async def auto_clean():
                 for x in clean[chat_id]:
                     if datetime.now() > x["timer_after"]:
                         try:
-                            await app.delete_messages(chat_id, x["msg_id"])
+                            await tbot.delete_messages(chat_id, x["msg_id"])
                         except FloodWait as e:
                             await asyncio.sleep(e.value)
                         except Exception:
@@ -274,12 +262,11 @@ async def auto_clean():
             for chat_id in served_chats:
                 if chat_id not in adminlist:
                     adminlist[chat_id] = []
-                    admins = app.get_chat_members(
-                        chat_id, filter=ChatMembersFilter.ADMINISTRATORS
-                    )
-                    async for user in admins:
-                        if user.privileges.can_manage_video_chats:
-                            adminlist[chat_id].append(user.user.id)
+                    async for user in tbot.iter_participants(
+                        chat_id, filter=ChannelParticipantsAdmins
+                    ):
+                        if (await tbot.get_permissions(chat_id, user)).manage_call:
+                            adminlist[chat_id].append(user.id)
                     authusers = await get_authuser_names(chat_id)
                     for user in authusers:
                         user_id = await alpha_to_int(user)
