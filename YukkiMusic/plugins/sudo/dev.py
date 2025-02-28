@@ -38,7 +38,7 @@ async def aexec(code, event):
     __aexec_func = local_vars["__aexec"]
     return await __aexec_func(event)
 
-@tbot.on(events.MessageEdited(func=func = flt.command(["ev", "eval"]) & flt.user(SUDOERS) & ~filters.forwarded))
+@tbot.on(events.MessageEdited(func = flt.command(["ev", "eval"]) & flt.user(SUDOERS) & ~flt.forwarded))
 @tbot.on_message(flt.command(["ev", "eval"]) & flt.user(SUDOERS) & ~flt.forwarded)
 async def executor(event):
     if len(event.text.split()) < 2:
