@@ -9,8 +9,9 @@
 #
 
 from YukkiMusic import tbot
-from YukkiMusic.utils.database import autoend_off, autoend_on
 from YukkiMusic.misc import SUDOERS
+from YukkiMusic.utils.database import autoend_off, autoend_on
+
 
 @tbot.on_message(flt.command("AUTOEND_COMMAND", True) & flt.user(SUDOERS))
 async def auto_end_stream(event):
