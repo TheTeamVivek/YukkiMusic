@@ -32,7 +32,7 @@ async def blacklist_chat_func(event, _):
     else:
         await event.reply("Something wrong happened.")
     try:
-        await app.leave_chat(chat_id)
+        await tbot.leave_chat(chat_id)
     except Exception:
         pass
 
