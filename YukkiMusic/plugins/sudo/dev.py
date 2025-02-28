@@ -11,17 +11,13 @@
 # This aeval and sh module is taken from < https://github.com/TheHamkerCat/WilliamButcherBot >
 # Credit goes to TheHamkerCat.
 #
-import asyncio
 import os
 import sys
 import traceback
 from io import StringIO
 from time import time
 
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
-
-from telethon import events, Button
+from telethon import Button, events
 
 from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS
@@ -30,15 +26,19 @@ from YukkiMusic.misc import SUDOERS
 async def aexec(code, event):
     local_vars = {}
     exec(
-        "async def __aexec(event): "
-        + "".join(f"\n {a}" for a in code.split("\n")),
+        "async def __aexec(event): " + "".join(f"\n {a}" for a in code.split("\n")),
         globals(),
         local_vars,
     )
     __aexec_func = local_vars["__aexec"]
     return await __aexec_func(event)
 
-@tbot.on(events.MessageEdited(func = flt.command(["ev", "eval"]) & flt.user(SUDOERS) & ~flt.forwarded))
+
+@tbot.on(
+    events.MessageEdited(
+        func=flt.command(["ev", "eval"]) & flt.user(SUDOERS) & ~flt.forwarded
+    )
+)
 @tbot.on_message(flt.command(["ev", "eval"]) & flt.user(SUDOERS) & ~flt.forwarded)
 async def executor(event):
     if len(event.text.split()) < 2:
@@ -77,14 +77,14 @@ async def executor(event):
             out_file.write(str(evaluation))
         t2 = time()
         keyboard = [
-                [
-                    Button.inline(
-                        text="⏳",
-                        data=f"runtime {t2-t1} Seconds",
-                    )
-                ]
+            [
+                Button.inline(
+                    text="⏳",
+                    data=f"runtime {t2-t1} Seconds",
+                )
             ]
-        
+        ]
+
         await event.reply(
             file=filename,
             message=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
@@ -94,24 +94,25 @@ async def executor(event):
         os.remove(filename)
     else:
         t2 = time()
-        keyboard =   [
-                [
-                    Button.inline(
-                        text="⏳",
-                        data=f"runtime {round(t2-t1, 3)} Seconds",
-                    ),
-                    Button.inline(
-                        text="🗑",
-                        data=f"forceclose abc|{event.sender_id}",
-                    ),
-                ]
+        keyboard = [
+            [
+                Button.inline(
+                    text="⏳",
+                    data=f"runtime {round(t2-t1, 3)} Seconds",
+                ),
+                Button.inline(
+                    text="🗑",
+                    data=f"forceclose abc|{event.sender_id}",
+                ),
             ]
+        ]
         await event.reply(message=final_output, buttons=keyboard, parse_mode="HTML")
         raise events.StopPropagation
 
+
 @tbot.on(events.CallbackQuery(pattern="runtime"))
 async def runtime_func_cq(event):
-    data =  event.data.decode("utf-8")
+    data = event.data.decode("utf-8")
     runtime = data.split(None, 1)[1]
     await event.answer(runtime, alert=True)
 
@@ -134,13 +135,14 @@ async def forceclose_command(event):
     except Exception:
         return
 
-@tbot.on(events.MessageEdited(func = flt.command("sh") & flt.user(SUDOERS) & ~flt.forwarded))
+
+@tbot.on(
+    events.MessageEdited(func=flt.command("sh") & flt.user(SUDOERS) & ~flt.forwarded)
+)
 @tbot.on_message(flt.command("sh") & flt.user(SUDOERS) & ~flt.forwarded)
 async def shellrunner(event):
     if len(event.text.split()) < 2:
-        return await event.reply(
-            "**Give some commands like:**\n/sh git pull"
-        )
+        return await event.reply("**Give some commands like:**\n/sh git pull")
 
     text = event.text.split(None, 1)[1]
     output = ""
@@ -155,7 +157,7 @@ async def shellrunner(event):
             if r.stderr:
                 output += f"<b>Error:</b>\n<pre>{r.stderr}</pre>\n"
     else:
-        r= await tbot.run(text)
+        r = await tbot.run(text)
         if r.stdout:
             output += f"<b>Output:</b>\n<pre>{r.stdout}</pre>\n"
         if r.stderr:
