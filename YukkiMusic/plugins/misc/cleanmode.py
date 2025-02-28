@@ -201,7 +201,7 @@ async def braodcast_message(event, _):
                     continue
             text += _["broad_4"].format(num, sent)
         try:
-            await aw.edit_text(text)
+            await aw.edit(text)
         except Exception:
             pass
     IS_BROADCASTING = False
