@@ -23,24 +23,24 @@ from YukkiMusic.utils.decorators.language import language
 async def useradd(client, message: Message, _):
     if not message.reply_to_message:
         if len(message.command) != 2:
-            return await message.reply(_["USER_IDENTIFIER_REQUIRED"])
+            return await event.reply(_["USER_IDENTIFIER_REQUIRED"])
         user = message.text.split(None, 1)[1]
         if "@" in user:
             user = user.replace("@", "")
         user = await app.get_users(user)
         if user.id in BANNED_USERS:
-            return await message.reply(_["block_1"].format(user.mention))
+            return await event.reply(_["block_1"].format(user.mention))
         await add_gban_user(user.id)
         BANNED_USERS.add(user.id)
-        await message.reply(_["block_2"].format(user.mention))
+        await event.reply(_["block_2"].format(user.mention))
         return
     if message.reply_to_message.from_user.id in BANNED_USERS:
-        return await message.reply(
+        return await event.reply(
             _["block_1"].format(message.reply_to_message.from_user.mention)
         )
     await add_gban_user(message.reply_to_message.from_user.id)
     BANNED_USERS.add(message.reply_to_message.from_user.id)
-    await message.reply(_["block_2"].format(message.reply_to_message.from_user.mention))
+    await event.reply(_["block_2"].format(message.reply_to_message.from_user.mention))
 
 
 @app.on_message(command("UNBLOCK_COMMAND") & SUDOERS)
@@ -48,31 +48,31 @@ async def useradd(client, message: Message, _):
 async def userdel(client, message: Message, _):
     if not message.reply_to_message:
         if len(message.command) != 2:
-            return await message.reply(_["USER_IDENTIFIER_REQUIRED"])
+            return await event.reply(_["USER_IDENTIFIER_REQUIRED"])
         user = message.text.split(None, 1)[1]
         if "@" in user:
             user = user.replace("@", "")
         user = await app.get_users(user)
         if user.id not in BANNED_USERS:
-            return await message.reply(_["block_3"])
+            return await event.reply(_["block_3"])
         await remove_gban_user(user.id)
         BANNED_USERS.remove(user.id)
-        await message.reply(_["block_4"])
+        await event.reply(_["block_4"])
         return
     user_id = message.reply_to_message.from_user.id
     if user_id not in BANNED_USERS:
-        return await message.reply(_["block_3"])
+        return await event.reply(_["block_3"])
     await remove_gban_user(user_id)
     BANNED_USERS.remove(user_id)
-    await message.reply(_["block_4"])
+    await event.reply(_["block_4"])
 
 
 @app.on_message(command("BLOCKED_COMMAND") & SUDOERS)
 @language
 async def sudoers_list(client, message: Message, _):
     if not BANNED_USERS:
-        return await message.reply(_["block_5"])
-    mystic = await message.reply(_["block_6"])
+        return await event.reply(_["block_5"])
+    mystic = await event.reply(_["block_6"])
     msg = _["block_7"]
     count = 0
     for users in BANNED_USERS:

@@ -39,7 +39,7 @@ async def play_live_stream(client, CallbackQuery, _):
         await CallbackQuery.answer()
     except Exception:
         pass
-    mystic = await CallbackQuery.message.reply(
+    mystic = await CallbackQuery.event.reply(
         _["play_2"].format(channel) if channel else _["play_1"]
     )
     try:

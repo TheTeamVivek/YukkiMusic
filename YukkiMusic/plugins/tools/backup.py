@@ -61,10 +61,10 @@ async def export_database(client, message):
     if message.from_user.id not in OWNER_ID:
         return
     if MONGO_DB_URI is None:
-        return await message.reply(
+        return await event.reply(
             "**Due to some privacy Issue, You can't Import/Export when you are using Yukki Database\n\n Please Fill Your MONGO_DB_URI in vars to use this features**"
         )
-    mystic = await message.reply("Exporting Your mongodatabase...")
+    mystic = await event.reply("Exporting Your mongodatabase...")
     _mongo_async_ = AsyncIOMotorClient(MONGO_DB_URI)
     databases = await _mongo_async_.list_database_names()
 
@@ -126,14 +126,14 @@ async def import_database(client, message):
     if message.from_user.id not in OWNER_ID:
         return
     if MONGO_DB_URI is None:
-        return await message.reply(
+        return await event.reply(
             "**Due to some privacy Issue, You can't Import/Export when you are using Yukki Database\n\n Please Fill Your MONGO_DB_URI in vars to use this features**"
         )
 
     if not message.reply_to_message or not message.reply_to_message.document:
-        return await message.reply("You need to reply an exported file to import it.")
+        return await event.reply("You need to reply an exported file to import it.")
 
-    mystic = await message.reply("Downloading...")
+    mystic = await event.reply("Downloading...")
 
     async def progress(current, total):
         try:

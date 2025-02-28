@@ -48,7 +48,7 @@ def lanuages_keyboard(_):
 @language
 async def langs_command(client, message: Message, _):
     keyboard = lanuages_keyboard(_)
-    await message.reply(
+    await event.reply(
         _["setting_1"].format(message.chat.title, message.chat.id),
         buttons=keyboard,
     )

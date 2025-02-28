@@ -35,9 +35,9 @@ from YukkiMusic.utils.stream.stream import stream
 async def check_playlist(client, message: Message, _):
     _playlist = await get_playlist_names(message.from_user.id)
     if _playlist:
-        get = await message.reply(_["playlist_2"])
+        get = await event.reply(_["playlist_2"])
     else:
-        return await message.reply(_["playlist_3"])
+        return await event.reply(_["playlist_3"])
     msg = _["playlist_4"]
     count = 0
     for ptlist in _playlist:
@@ -96,7 +96,7 @@ async def del_group_message(client, message: Message, _):
             ]
         ]
     )
-    await message.reply(_["playlist_6"], buttons=upl)
+    await event.reply(_["playlist_6"], buttons=upl)
 
 
 async def get_keyboard(_, user_id):
@@ -128,9 +128,9 @@ async def get_keyboard(_, user_id):
 async def del_plist_msg(client, message: Message, _):
     _playlist = await get_playlist_names(message.from_user.id)
     if _playlist:
-        get = await message.reply(_["playlist_2"])
+        get = await event.reply(_["playlist_2"])
     else:
-        return await message.reply(_["playlist_3"])
+        return await event.reply(_["playlist_3"])
     keyboard, count = await get_keyboard(_, message.from_user.id)
     await get.edit(_["playlist_7"].format(count), buttons=keyboard)
 
@@ -159,7 +159,7 @@ async def play_playlist(client, CallbackQuery, _):
     except Exception:
         pass
     video = True if mode == "v" else None
-    mystic = await CallbackQuery.message.reply(_["play_1"])
+    mystic = await CallbackQuery.event.reply(_["play_1"])
     for vidids in _playlist:
         result.append(vidids)
     try:
@@ -191,7 +191,7 @@ async def play_playlist_command(client, message, _):
     _playlist = await get_playlist_names(user_id)
     if not _playlist:
         try:
-            return await message.reply(
+            return await event.reply(
                 _["playlist_3"],
                 quote=True,
             )
@@ -208,7 +208,7 @@ async def play_playlist_command(client, message, _):
 
     result = []
     video = True if mode == "v" else None
-    mystic = await message.reply(_["play_1"])
+    mystic = await event.reply(_["play_1"])
 
     for vidids in _playlist:
         result.append(vidids)
@@ -240,11 +240,11 @@ async def play_playlist_command(client, message, _):
 @language
 async def add_playlist(client, message: Message, _):
     if len(message.command) < 2:
-        return await message.reply(_["playlist_22"])
+        return await event.reply(_["playlist_22"])
     query = message.command[1]
 
     if "youtube.com/playlist" in query:
-        adding = await message.reply(_["playlist_21"])
+        adding = await event.reply(_["playlist_21"])
         try:
             results = Playlist(url)
             for video in results.videos:
@@ -258,20 +258,20 @@ async def add_playlist(client, message: Message, _):
                     await save_playlist(user_id, video["id"], video_info)
 
         except Exception as e:
-            return await message.reply(
+            return await event.reply(
                 f"Looking like not a valid youtube playlist url or\nPlaylist created by YouTube Not Supported"
             )
 
         user_id = message.from_user.id
         await adding.delete()
-        return await message.reply(_["playlist_20"])
+        return await event.reply(_["playlist_20"])
     else:
         try:
             user_id = message.from_user.id
             _check = await get_playlist(user_id, videoid)
             if _check:
                 try:
-                    return await message.reply(_["playlist_8"])
+                    return await event.reply(_["playlist_8"])
                 except KeyError:
                     pass
 
@@ -279,13 +279,13 @@ async def add_playlist(client, message: Message, _):
             count = len(_count)
             if count == SERVER_PLAYLIST_LIMIT:
                 try:
-                    return await message.reply(
+                    return await event.reply(
                         _["playlist_9"].format(SERVER_PLAYLIST_LIMIT)
                     )
                 except KeyError:
                     pass
 
-            m = await message.reply(_["playlist_21"])
+            m = await event.reply(_["playlist_21"])
             title, duration_min, duration_sec, thumbnail, videoid = (
                 await Platform.youtube.track(videoid, True)
             )
@@ -301,7 +301,7 @@ async def add_playlist(client, message: Message, _):
             await message.reply_photo(thumbnail, caption=_["playlist_20"])
 
         except KeyError:
-            return await message.reply("**Something wrong happens **")
+            return await event.reply("**Something wrong happens **")
         except Exception:
             pass
 """

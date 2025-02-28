@@ -27,44 +27,44 @@ from YukkiMusic.utils.decorators.language import language
 @language
 async def authorize(client, message: Message, _):
     if config.PRIVATE_BOT_MODE != str(True):
-        return await message.reply(_["pbot_12"])
+        return await event.reply(_["pbot_12"])
     if len(message.command) != 2:
-        return await message.reply(_["pbot_1"])
+        return await event.reply(_["pbot_1"])
     try:
         chat_id = int(message.text.strip().split()[1])
     except Exception:
-        return await message.reply(_["pbot_7"])
+        return await event.reply(_["pbot_7"])
     if not await is_served_private_chat(chat_id):
         await add_private_chat(chat_id)
-        await message.reply(_["pbot_3"])
+        await event.reply(_["pbot_3"])
     else:
-        await message.reply(_["pbot_5"])
+        await event.reply(_["pbot_5"])
 
 
 @app.on_message(command("UNAUTHORIZE_COMMAND") & SUDOERS)
 @language
 async def unauthorize(client, message: Message, _):
     if config.PRIVATE_BOT_MODE != str(True):
-        return await message.reply(_["pbot_12"])
+        return await event.reply(_["pbot_12"])
     if len(message.command) != 2:
-        return await message.reply(_["pbot_2"])
+        return await event.reply(_["pbot_2"])
     try:
         chat_id = int(message.text.strip().split()[1])
     except Exception:
-        return await message.reply(_["pbot_7"])
+        return await event.reply(_["pbot_7"])
     if not await is_served_private_chat(chat_id):
-        return await message.reply(_["pbot_6"])
+        return await event.reply(_["pbot_6"])
     else:
         await remove_private_chat(chat_id)
-        return await message.reply(_["pbot_4"])
+        return await event.reply(_["pbot_4"])
 
 
 @app.on_message(command("AUTHORIZED_COMMAND") & SUDOERS)
 @language
 async def authorized(client, message: Message, _):
     if config.PRIVATE_BOT_MODE != str(True):
-        return await message.reply(_["pbot_12"])
-    m = await message.reply(_["pbot_8"])
+        return await event.reply(_["pbot_12"])
+    m = await event.reply(_["pbot_8"])
     served_chats = []
     text = _["pbot_9"]
     chats = await get_private_served_chats()

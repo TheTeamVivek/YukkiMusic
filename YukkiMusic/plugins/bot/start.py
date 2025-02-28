@@ -70,13 +70,13 @@ async def start_comm(event, _):
             await event.reply(_["song_2"])
             return
         if name == "mkdwn_help":
-            await message.reply(
+            await event.reply(
                 MARKDOWN,
                 parse_mode="HTML",
                 link_preview=False,
             )
         if name == "greetings":
-            await message.reply(
+            await event.reply(
                 WELCOMEHELP,
                 parse_mode="HTML",
                 link_preview=False,

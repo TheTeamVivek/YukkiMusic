@@ -61,7 +61,7 @@ async def stats_global(client, message: Message, _):
 @app.on_message(command("GSTATS_COMMAND") & ~BANNED_USERS)
 @language
 async def gstats_global(client, message: Message, _):
-    mystic = await message.reply(_["gstats_1"])
+    mystic = await event.reply(_["gstats_1"])
     stats = await get_global_tops()
     if not stats:
         await asyncio.sleep(1)

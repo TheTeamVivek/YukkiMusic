@@ -36,7 +36,7 @@ async def stream_command(
     fplay,
 ):
     if url:
-        mystic = await message.reply(
+        mystic = await event.reply(
             _["play_2"].format(channel) if channel else _["play_1"]
         )
         try:
@@ -74,4 +74,4 @@ async def stream_command(
             return await mystic.edit(err)
         return await play_logs(message, streamtype="M3u8 or Index Link")
     else:
-        await message.reply(_["str_1"])
+        await event.reply(_["str_1"])

@@ -56,20 +56,20 @@ async def ping_com(client, message: Message, _):
     if message.command[0][0] == "c":
         chat_id = await get_cmode(message.chat.id)
         if chat_id is None:
-            return await message.reply(_["setting_12"])
+            return await event.reply(_["setting_12"])
         try:
             await app.get_chat(chat_id)
         except Exception:
-            return await message.reply(_["cplay_4"])
+            return await event.reply(_["cplay_4"])
         cplay = True
     else:
         chat_id = message.chat.id
         cplay = False
     if not await is_active_chat(chat_id):
-        return await message.reply(_["NO_ACTIVE_VIDEO_STREAM"])
+        return await event.reply(_["NO_ACTIVE_VIDEO_STREAM"])
     got = db.get(chat_id)
     if not got:
-        return await message.reply(_["queue_2"])
+        return await event.reply(_["queue_2"])
     file = got[0]["file"]
     videoid = got[0]["vidid"]
     user = got[0]["by"]

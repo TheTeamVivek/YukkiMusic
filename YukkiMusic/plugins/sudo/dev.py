@@ -54,7 +54,7 @@ async def aexec(code, client, message):
 )
 async def executor(client: app, message: Message):
     if len(message.command) < 2:
-        return await message.reply(text="<b>Give me something to exceute</b>")
+        return await event.reply(text="<b>Give me something to exceute</b>")
     try:
         cmd = message.text.split(" ", maxsplit=1)[1]
     except IndexError:
@@ -122,7 +122,7 @@ async def executor(client: app, message: Message):
                 ]
             ]
         )
-        await message.reply(text=final_output, buttons=keyboard)
+        await event.reply(text=final_output, buttons=keyboard)
 
 
 @app.on_callback_query(filters.regex(r"runtime"))
@@ -211,6 +211,6 @@ async def shellrunner(_, message: Message):
         )
         os.remove("output.txt")
     else:
-        await message.reply(text=output)
+        await event.reply(text=output)
 
     await message.stop_propagation()

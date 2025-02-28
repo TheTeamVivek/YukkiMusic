@@ -37,8 +37,8 @@ async def reload_admin_cache(client, message: Message, _):
         for user in authusers:
             user_id = await alpha_to_int(user)
             adminlist[chat_id].append(user_id)
-        await message.reply(_["admin_20"])
+        await event.reply(_["admin_20"])
     except Exception:
-        await message.reply(
+        await event.reply(
             "Failed to reload admincache make sure bot is an admin in your chat"
         )

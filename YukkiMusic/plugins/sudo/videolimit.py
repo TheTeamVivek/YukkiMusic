@@ -22,18 +22,18 @@ from YukkiMusic.utils.decorators.language import language
 async def set_video_limit_kid(client, message: Message, _):
     if len(message.command) != 2:
         usage = _["vid_1"]
-        return await message.reply(usage)
+        return await event.reply(usage)
     message.chat.id
     state = message.text.split(None, 1)[1].strip()
     if state.lower() == "disable":
         limit = 0
         await set_video_limit(limit)
-        return await message.reply(_["vid_4"])
+        return await event.reply(_["vid_4"])
     if state.isnumeric():
         limit = int(state)
         await set_video_limit(limit)
         if limit == 0:
-            return await message.reply(_["vid_4"])
-        await message.reply(_["vid_3"].format(limit))
+            return await event.reply(_["vid_4"])
+        await event.reply(_["vid_3"].format(limit))
     else:
-        return await message.reply(_["vid_2"])
+        return await event.reply(_["vid_2"])
