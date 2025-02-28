@@ -17,13 +17,13 @@ from YukkiMusic.utils.database import add_off, add_on
 from YukkiMusic.utils.decorators.language import language
 
 
-@app.on_message(command("LOGGER_COMMAND") & SUDOERS)
+@tbot.on_message(flt.command("LOGGER_COMMAND", True) & flt.user(SUDOERS))
 @language
-async def logger(client, message, _):
+async def logger(event, _):
     usage = _["log_1"]
-    if len(message.command) != 2:
+    if len(event.text.split()) != 2:
         return await event.reply(usage)
-    state = message.text.split(None, 1)[1].strip()
+    state = event.text.split(None, 1)[1].strip()
     state = state.lower()
     if state == "enable":
         await add_on(config.LOG)
