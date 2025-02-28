@@ -15,7 +15,7 @@ jobs:
         shell: bash
         run: |
           declare -A replacements=(
-            [".edit_text"]=".edit"
+            ["message.reply"]="event.reply"
             ["CLEANMODE_MINS"]="CLEANMODE_DELETE_TIME"
           )
 
