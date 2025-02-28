@@ -15,7 +15,7 @@ jobs:
         shell: bash
         run: |
           declare -A replacements=(
-            [".reply_text"]=".reply"
+            [".edit_text"]=".edit"
             ["CLEANMODE_MINS"]="CLEANMODE_DELETE_TIME"
           )
 
@@ -28,7 +28,7 @@ jobs:
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Replace text in Python files"
+          commit_message: "Replace"
           commit_options: "--no-verify"
           repository: .
           commit_user_name: "github-actions[bot]"
