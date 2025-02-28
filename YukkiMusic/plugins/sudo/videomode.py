@@ -23,14 +23,14 @@ from YukkiMusic.utils.decorators.language import language
 async def videoloaymode(client, message: Message, _):
     usage = _["vidmode_1"]
     if len(message.command) != 2:
-        return await message.reply_text(usage)
+        return await message.reply(usage)
     state = message.text.split(None, 1)[1].strip()
     state = state.lower()
     if state == "download":
         await add_on(config.YTDOWNLOADER)
-        await message.reply_text(_["vidmode_2"])
+        await message.reply(_["vidmode_2"])
     elif state == "m3u8":
         await add_off(config.YTDOWNLOADER)
-        await message.reply_text(_["vidmode_3"])
+        await message.reply(_["vidmode_3"])
     else:
-        await message.reply_text(usage)
+        await message.reply(usage)

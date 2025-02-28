@@ -50,7 +50,7 @@ async def song_commad_group(client, message: Message, _):
         ]
     )
 
-    await message.reply_text(_["song_1"], buttons=upl)
+    await message.reply(_["song_1"], buttons=upl)
 
 
 # Song Module
@@ -68,9 +68,9 @@ async def song_commad_private(client, message: Message, _):
 
         if not await Platform.youtube.valid(url):
 
-            return await message.reply_text(_["song_5"])
+            return await message.reply(_["song_5"])
 
-        mystic = await message.reply_text(_["play_1"])
+        mystic = await message.reply(_["play_1"])
 
         (
             title,
@@ -104,9 +104,9 @@ async def song_commad_private(client, message: Message, _):
 
         if len(message.command) < 2:
 
-            return await message.reply_text(_["song_2"])
+            return await message.reply(_["song_2"])
 
-    mystic = await message.reply_text(_["play_1"])
+    mystic = await message.reply(_["play_1"])
 
     query = message.text.split(None, 1)[1]
 

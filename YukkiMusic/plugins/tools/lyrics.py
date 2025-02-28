@@ -38,9 +38,9 @@ y.verbose = False
 @language
 async def lrsearch(client, message: Message, _):
     if len(message.command) < 2:
-        return await message.reply_text(_["lyrics_1"])
+        return await message.reply(_["lyrics_1"])
     title = message.text.split(None, 1)[1]
-    m = await message.reply_text(_["lyrics_2"])
+    m = await message.reply(_["lyrics_2"])
     S = y.search_song(title, get_full_info=False)
     if S is None:
         return await m.edit(_["lyrics_3"].format(title))

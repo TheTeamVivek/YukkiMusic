@@ -30,21 +30,21 @@ async def maintenance(client, message: Message):
         _ = get_string("en")
     usage = _["maint_1"]
     if len(message.command) != 2:
-        return await message.reply_text(usage)
+        return await message.reply(usage)
     message.chat.id
     state = message.text.split(None, 1)[1].strip()
     state = state.lower()
     if state == "enable":
         if await is_maintenance() is False:
-            await message.reply_text(_["maint_6"])
+            await message.reply(_["maint_6"])
         else:
             await maintenance_on()
-            await message.reply_text(_["maint_2"])
+            await message.reply(_["maint_2"])
     elif state == "disable":
         if await is_maintenance() is False:
             await maintenance_off()
-            await message.reply_text(_["maint_3"])
+            await message.reply(_["maint_3"])
         else:
-            await message.reply_text(_["maint_5"])
+            await message.reply(_["maint_5"])
     else:
-        await message.reply_text(usage)
+        await message.reply(usage)

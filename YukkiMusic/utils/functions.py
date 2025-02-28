@@ -286,7 +286,7 @@ async def time_converter(message: Message, time_value: str) -> datetime:
     currunt_time = datetime.now()
     time_digit = time_value[:-1]
     if not time_digit.isdigit():
-        return await message.reply_text("Incorrect time specified")
+        return await message.reply("Incorrect time specified")
     if check_unit == "m":
         temp_time = currunt_time + timedelta(minutes=int(time_digit))
     elif check_unit == "h":
@@ -294,5 +294,5 @@ async def time_converter(message: Message, time_value: str) -> datetime:
     elif check_unit == "d":
         temp_time = currunt_time + timedelta(days=int(time_digit))
     else:
-        return await message.reply_text("Incorrect time specified.")
+        return await message.reply("Incorrect time specified.")
     return temp_time
