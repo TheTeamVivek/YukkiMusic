@@ -9,6 +9,7 @@
 #
 
 from config import BANNED_USERS
+from YukkiMusic.misc import SUDOERS
 from YukkiMusic import tbot
 from YukkiMusic.utils.database import (
     blacklist_chat,
@@ -18,7 +19,7 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.decorators.language import language
 
 
-@tbot.on_message(flt.command("BLACKLISTCHAT_COMMAND", True) & flt.user(BANNED_USERS))
+@tbot.on_message(flt.command("BLACKLISTCHAT_COMMAND", True) & flt.user(SUDOERS))
 @language
 async def blacklist_chat_func(event, _):
     if len(event.text.split()) != 2:
@@ -37,7 +38,7 @@ async def blacklist_chat_func(event, _):
         pass
 
 
-@tbot.on_message(flt.command("WHITELISTCHAT_COMMAND", True) & flt.user(BANNED_USERS))
+@tbot.on_message(flt.command("WHITELISTCHAT_COMMAND", True) & flt.user(SUDOERS))
 @language
 async def white_funciton(event, _):
     if len(event.text.split()) != 2:
@@ -51,7 +52,7 @@ async def white_funciton(event, _):
     await event.reply("Something wrong happened")
 
 
-@tbot.on_message(flt.command("BLACKLISTEDCHAT_COMMAND", True) & flt.user(BANNED_USERS))
+@tbot.on_message(flt.command("BLACKLISTEDCHAT_COMMAND", True) & ~flt.user(BANNED_USERS))
 @language
 async def all_chats(event, _):
     text = _["black_7"]
