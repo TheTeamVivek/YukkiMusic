@@ -12,78 +12,79 @@ from pyrogram.types import Message
 
 from config import BANNED_USERS
 from strings import command
-from YukkiMusic import app
+from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import add_gban_user, remove_gban_user
 from YukkiMusic.utils.decorators.language import language
 
 
-@app.on_message(command("BLOCK_COMMAND") & SUDOERS)
+@tbot.on_message(flt.command("BLOCK_COMMAND", True) & flt.user(BANNED_USERS))
 @language
-async def useradd(client, message: Message, _):
-    if not message.reply_to_message:
-        if len(message.command) != 2:
+async def useradd(event, _):
+    if not event.is_reply:
+        if len(event.text.split()) != 2:
             return await event.reply(_["USER_IDENTIFIER_REQUIRED"])
-        user = message.text.split(None, 1)[1]
+        user = event.text.split(None, 1)[1]
         if "@" in user:
             user = user.replace("@", "")
-        user = await app.get_users(user)
+        user = await tbot.get_entity(user)
+        mention= await tbot.create_mention(user)
         if user.id in BANNED_USERS:
-            return await event.reply(_["block_1"].format(user.mention))
+            return await event.reply(_["block_1"].format(mention))
         await add_gban_user(user.id)
         BANNED_USERS.add(user.id)
-        await event.reply(_["block_2"].format(user.mention))
+        await event.reply(_["block_2"].format(mention))
         return
-    if message.reply_to_message.from_user.id in BANNED_USERS:
+    reply = await tbot.get_reply_message()
+    mention=await tbot.create_mention(await reply.get_sender())
+    if reply.sender_id in BANNED_USERS:
         return await event.reply(
-            _["block_1"].format(message.reply_to_message.from_user.mention)
+            _["block_1"].format(mention)
         )
-    await add_gban_user(message.reply_to_message.from_user.id)
-    BANNED_USERS.add(message.reply_to_message.from_user.id)
-    await event.reply(_["block_2"].format(message.reply_to_message.from_user.mention))
+    await add_gban_user(reply.sender_id)
+    BANNED_USERS.add(reply.sender_id)
+    await event.reply(_["block_2"].format(mention))
 
 
-@app.on_message(command("UNBLOCK_COMMAND") & SUDOERS)
+@tbot.on_message(flt.command("UNBLOCK_COMMAND", True) & flt.user(BANNED_USERS))
 @language
-async def userdel(client, message: Message, _):
-    if not message.reply_to_message:
-        if len(message.command) != 2:
+async def userdel(event, _):
+    if not event.is_reply:
+        if len(event.text.split()) != 2:
             return await event.reply(_["USER_IDENTIFIER_REQUIRED"])
         user = message.text.split(None, 1)[1]
         if "@" in user:
             user = user.replace("@", "")
-        user = await app.get_users(user)
+        user = await tbot.get_entity(user)
         if user.id not in BANNED_USERS:
             return await event.reply(_["block_3"])
         await remove_gban_user(user.id)
         BANNED_USERS.remove(user.id)
         await event.reply(_["block_4"])
         return
-    user_id = message.reply_to_message.from_user.id
+    reply = await tbot.get_reply_message()
+    user_id = reply.sender_id
     if user_id not in BANNED_USERS:
         return await event.reply(_["block_3"])
     await remove_gban_user(user_id)
     BANNED_USERS.remove(user_id)
     await event.reply(_["block_4"])
 
-
-@app.on_message(command("BLOCKED_COMMAND") & SUDOERS)
+@tbot.on_message(flt.command("BLOCKED_COMMAND", True) & ~flt.user(BANNED_USERS))
 @language
-async def sudoers_list(client, message: Message, _):
+async def sudoers_list(event, _):
     if not BANNED_USERS:
         return await event.reply(_["block_5"])
+
     mystic = await event.reply(_["block_6"])
     msg = _["block_7"]
-    count = 0
-    for users in BANNED_USERS:
+
+    for count, user_id in enumerate(BANNED_USERS, start=1):
         try:
-            user = await app.get_users(users)
-            user = user.first_name if not user.mention else user.mention
-            count += 1
+            user = await tbot.get_entity(user_id)
+            mention = await tbot.create_mention(user)
         except Exception:
             continue
-        msg += f"{count}➤ {user}\n"
-    if count == 0:
-        return await mystic.edit(_["block_5"])
-    else:
-        return await mystic.edit(msg)
+        msg += f"{count}➤ {mention} ({user.id})\n"
+
+    return await mystic.edit(msg if count else _["block_5"])
