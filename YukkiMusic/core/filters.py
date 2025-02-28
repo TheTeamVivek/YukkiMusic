@@ -40,9 +40,11 @@ class Combinator:
 def wrap(func):
     return Combinator(func)
 
+
 @wrap
 def forwarded(e):
     return bool(getattr(e, "forward", None))
+
 
 @wrap
 def new_chat_members(event):  # May be only useable in events.ChatAction
