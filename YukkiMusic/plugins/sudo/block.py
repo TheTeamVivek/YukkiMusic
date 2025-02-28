@@ -8,14 +8,14 @@
 # All rights reserved.
 #
 
-
+from YukkiMusic.misc import SUDOERS
 from config import BANNED_USERS
 from YukkiMusic import tbot
 from YukkiMusic.utils.database import add_gban_user, remove_gban_user
 from YukkiMusic.utils.decorators.language import language
 
 
-@tbot.on_message(flt.command("BLOCK_COMMAND", True) & flt.user(BANNED_USERS))
+@tbot.on_message(flt.command("BLOCK_COMMAND", True) & flt.user(SUDOERS))
 @language
 async def useradd(event, _):
     if not event.is_reply:
@@ -41,7 +41,7 @@ async def useradd(event, _):
     await event.reply(_["block_2"].format(mention))
 
 
-@tbot.on_message(flt.command("UNBLOCK_COMMAND", True) & flt.user(BANNED_USERS))
+@tbot.on_message(flt.command("UNBLOCK_COMMAND", True) & flt.user(SUDOERS))
 @language
 async def userdel(event, _):
     if not event.is_reply:
