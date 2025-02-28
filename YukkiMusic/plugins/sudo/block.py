@@ -84,6 +84,6 @@ async def sudoers_list(client, message: Message, _):
             continue
         msg += f"{count}➤ {user}\n"
     if count == 0:
-        return await mystic.edit_text(_["block_5"])
+        return await mystic.edit(_["block_5"])
     else:
-        return await mystic.edit_text(msg)
+        return await mystic.edit(msg)

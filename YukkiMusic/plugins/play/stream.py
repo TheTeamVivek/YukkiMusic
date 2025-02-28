@@ -42,16 +42,16 @@ async def stream_command(
         try:
             await Yukki.stream_call(url)
         except NoActiveGroupCall:
-            await mystic.edit_text(
+            await mystic.edit(
                 "There's an issue with the bot. please report it to my Owner and ask them to check logger group"
             )
             text = "Please Turn on voice chat.. Bot is unable to stream urls.."
             return await app.send_message(config.LOG_GROUP_ID, text)
         except Exception as e:
-            return await mystic.edit_text(
+            return await mystic.edit(
                 _["ERROR_OCCURRED_MSG"].format(type(e).__name__)
             )
-        await mystic.edit_text(_["str_2"])
+        await mystic.edit(_["str_2"])
         try:
             await stream(
                 _,
@@ -71,7 +71,7 @@ async def stream_command(
                 if ex_type == "AssistantErr"
                 else _["ERROR_OCCURRED_MSG"].format(ex_type)
             )
-            return await mystic.edit_text(err)
+            return await mystic.edit(err)
         return await play_logs(message, streamtype="M3u8 or Index Link")
     else:
         await message.reply(_["str_1"])

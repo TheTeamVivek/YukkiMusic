@@ -82,11 +82,11 @@ async def song_commad_private(client, message: Message, _):
 
         if str(duration_min) == "None":
 
-            return await mystic.edit_text(_["song_3"])
+            return await mystic.edit(_["song_3"])
 
         if int(duration_sec) > SONG_DOWNLOAD_DURATION_LIMIT:
 
-            return await mystic.edit_text(
+            return await mystic.edit(
                 _["play_4"].format(SONG_DOWNLOAD_DURATION, duration_min)
             )
 
@@ -122,15 +122,15 @@ async def song_commad_private(client, message: Message, _):
 
     except Exception:
 
-        return await mystic.edit_text(_["play_3"])
+        return await mystic.edit(_["play_3"])
 
     if str(duration_min) == "None":
 
-        return await mystic.edit_text(_["song_3"])
+        return await mystic.edit(_["song_3"])
 
     if int(duration_sec) > SONG_DOWNLOAD_DURATION_LIMIT:
 
-        return await mystic.edit_text(
+        return await mystic.edit(
             _["play_6"].format(SONG_DOWNLOAD_DURATION, duration_min)
         )
 
@@ -346,7 +346,7 @@ async def song_download_cb(client, CallbackQuery, _):
 
         except Exception as e:
 
-            return await mystic.edit_text(_["song_9"].format(e))
+            return await mystic.edit(_["song_9"].format(e))
 
         med = InputMediaVideo(
             media=file_path,
@@ -358,7 +358,7 @@ async def song_download_cb(client, CallbackQuery, _):
             supports_streaming=True,
         )
 
-        await mystic.edit_text(_["song_11"])
+        await mystic.edit(_["song_11"])
 
         await app.send_chat_action(
             chat_id=CallbackQuery.message.chat.id,
@@ -373,7 +373,7 @@ async def song_download_cb(client, CallbackQuery, _):
 
             print(e)
 
-            return await mystic.edit_text(_["song_10"])
+            return await mystic.edit(_["song_10"])
 
         os.remove(file_path)
 
@@ -391,7 +391,7 @@ async def song_download_cb(client, CallbackQuery, _):
 
         except Exception as e:
 
-            return await mystic.edit_text(_["song_9"].format(e))
+            return await mystic.edit(_["song_9"].format(e))
 
         med = InputMediaAudio(
             media=filename,
@@ -401,7 +401,7 @@ async def song_download_cb(client, CallbackQuery, _):
             performer=x["uploader"],
         )
 
-        await mystic.edit_text(_["song_11"])
+        await mystic.edit(_["song_11"])
 
         await app.send_chat_action(
             chat_id=CallbackQuery.message.chat.id,
@@ -416,6 +416,6 @@ async def song_download_cb(client, CallbackQuery, _):
 
             print(e)
 
-            return await mystic.edit_text(_["song_10"])
+            return await mystic.edit(_["song_10"])
 
         os.remove(filename)

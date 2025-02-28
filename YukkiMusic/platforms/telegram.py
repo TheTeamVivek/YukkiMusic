@@ -188,7 +188,7 @@ class Telegram:
 **Speed:** {speed}/s
 **Elapsed Time:** {eta}"""
                     try:
-                        await mystic.edit_text(text, buttons=upl)
+                        await mystic.edit(text, buttons=upl)
                     except Exception:
                         pass
                     left_time[message.id] = datetime.now() + timedelta(
@@ -204,12 +204,12 @@ class Telegram:
                     file_name=fname,
                     progress=progress,
                 )
-                await mystic.edit_text(
+                await mystic.edit(
                     "Sucessfully Downloaded\n Processing File Now..."
                 )
                 downloader.pop(message.id, None)
             except Exception:
-                await mystic.edit_text(_["DOWNLOAD_FAILED_MSG"])
+                await mystic.edit(_["DOWNLOAD_FAILED_MSG"])
 
         if len(downloader) > 10:
             timers = list(downloader.values())
@@ -218,7 +218,7 @@ class Telegram:
                 eta = get_readable_time(low)
             except Exception:
                 eta = "Unknown"
-            await mystic.edit_text(_["OVERLOAD_WAIT_MSG"].format(eta))
+            await mystic.edit(_["OVERLOAD_WAIT_MSG"].format(eta))
             return False
 
         task = asyncio.create_task(down_load(), name=f"download_{message.chat.id}")

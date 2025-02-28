@@ -45,7 +45,7 @@ async def play_live_stream(client, CallbackQuery, _):
     try:
         details, track_id = await Platform.youtube.track(vidid, True)
     except Exception:
-        return await mystic.edit_text(_["play_3"])
+        return await mystic.edit(_["play_3"])
     ffplay = True if fplay == "f" else None
     if not details["duration_min"]:
         try:
@@ -68,7 +68,7 @@ async def play_live_stream(client, CallbackQuery, _):
                 if ex_type == "AssistantErr"
                 else _["ERROR_OCCURRED_MSG"].format(ex_type)
             )
-            return await mystic.edit_text(err)
+            return await mystic.edit(err)
     else:
-        return await mystic.edit_text("Not a live stream")
+        return await mystic.edit("Not a live stream")
     await mystic.delete()

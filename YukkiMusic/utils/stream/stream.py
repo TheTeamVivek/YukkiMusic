@@ -550,7 +550,7 @@ async def stream(
                 "video" if video else "audio",
             )
             position = len(db.get(chat_id)) - 1
-            await mystic.edit_text(
+            await mystic.edit(
                 _["queue_4"].format(position, title[:30], duration_min, user_name)
             )
         else:

@@ -132,7 +132,7 @@ async def del_plist_msg(client, message: Message, _):
     else:
         return await message.reply(_["playlist_3"])
     keyboard, count = await get_keyboard(_, message.from_user.id)
-    await get.edit_text(_["playlist_7"].format(count), buttons=keyboard)
+    await get.edit(_["playlist_7"].format(count), buttons=keyboard)
 
 
 @app.on_callback_query(filters.regex("play_playlist") & ~BANNED_USERS)
@@ -179,7 +179,7 @@ async def play_playlist(client, CallbackQuery, _):
         err = (
             e if ex_type == "AssistantErr" else _["ERROR_OCCURRED_MSG"].format(ex_type)
         )
-        return await mystic.edit_text(err)
+        return await mystic.edit(err)
     return await mystic.delete()
 
 
@@ -230,7 +230,7 @@ async def play_playlist_command(client, message, _):
         err = (
             e if ex_type == "AssistantErr" else _["ERROR_OCCURRED_MSG"].format(ex_type)
         )
-        return await mystic.edit_text(err)
+        return await mystic.edit(err)
 
     return await mystic.delete()
 

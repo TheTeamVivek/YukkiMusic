@@ -346,7 +346,7 @@ async def reboot(client, message: Message, _):
             await Yukki.stop_stream(chat_id)
         except Exception:
             pass
-    return await mystic.edit_text("Sucessfully Restarted \nTry playing Now..")
+    return await mystic.edit("Sucessfully Restarted \nTry playing Now..")
 
 
 @app.on_message(command("RESTART_COMMAND") & ~BANNED_USERS)
@@ -374,7 +374,7 @@ async def restart_(client, message):
         shutil.rmtree("cache")
     except Exception:
         pass
-    await response.edit_text(
+    await response.edit(
         "Restart process started, please wait for few seconds until the bot starts..."
     )
     os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")

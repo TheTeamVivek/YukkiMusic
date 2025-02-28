@@ -463,7 +463,7 @@ class Call:
                         video=True if str(streamtype) == "video" else False,
                     )
                 except Exception:
-                    return await mystic.edit_text(
+                    return await mystic.edit(
                         _["STREAM_SWITCH_FAILED"], link_preview=False
                     )
                 if video:

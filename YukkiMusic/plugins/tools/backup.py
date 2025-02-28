@@ -45,10 +45,10 @@ async def drop_db(client, db_name):
 
 async def edit_or_reply(mystic, text):
     try:
-        return await mystic.edit_text(text, link_preview=False)
+        return await mystic.edit(text, link_preview=False)
     except FloodWait as e:
         await asyncio.sleep(e.value)
-        return await mystic.edit_text(text, link_preview=False)
+        return await mystic.edit(text, link_preview=False)
     try:
         await mystic.delete()
     except Exception:
@@ -103,7 +103,7 @@ async def export_database(client, message):
 
     async def progress(current, total):
         try:
-            await mystic.edit_text(f"Uploading.... {current * 100 / total:.1f}%")
+            await mystic.edit(f"Uploading.... {current * 100 / total:.1f}%")
         except FloodWait as e:
             await asyncio.sleep(e.value)
 
@@ -137,7 +137,7 @@ async def import_database(client, message):
 
     async def progress(current, total):
         try:
-            await mystic.edit_text(f"Downloading... {current * 100 / total:.1f}%")
+            await mystic.edit(f"Downloading... {current * 100 / total:.1f}%")
         except FloodWait as w:
             await asyncio.sleep(w.value)
 
