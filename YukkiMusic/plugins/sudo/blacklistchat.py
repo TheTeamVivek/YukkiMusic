@@ -9,8 +9,8 @@
 #
 
 from config import BANNED_USERS
-from YukkiMusic.misc import SUDOERS
 from YukkiMusic import tbot
+from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
     blacklist_chat,
     blacklisted_chats,
