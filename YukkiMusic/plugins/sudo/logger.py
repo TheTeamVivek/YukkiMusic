@@ -7,8 +7,6 @@
 #
 # All rights reserved.
 #
-
-
 import config
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import add_off, add_on
