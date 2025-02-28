@@ -17,7 +17,7 @@ from telethon.tl.types import ChannelParticipantsAdmins, UpdateReadChannelOutbox
 
 import config
 from config import adminlist, chatstats, clean, userstats
-from YukkiMusic import app, tbot
+from YukkiMusic import tbot
 from YukkiMusic.utils.database import (
     get_active_chats,
     get_authuser_names,
