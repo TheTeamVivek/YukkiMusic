@@ -9,7 +9,7 @@
 #
 
 from config import BANNED_USERS
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.utils.database import (
     blacklist_chat,
     blacklisted_chats,
@@ -58,7 +58,7 @@ async def all_chats(event, _):
     j = 0
     for count, chat_id in enumerate(await blacklisted_chats(), 1):
         try:
-            title = (await app.entity(chat_id)).title
+            title = (await tbot.get_entity(chat_id)).title
         except Exception:
             title = "Private"
         j = 1
