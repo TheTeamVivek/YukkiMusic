@@ -11,17 +11,12 @@
 import asyncio
 from datetime import datetime, timedelta
 
-from pyrogram import filters
-from pyrogram.enums import ChatMembersFilter
 from pyrogram.errors import FloodWait
-from pyrogram.raw import types
-
 from telethon import events
-from telethon.tl.types import UpdateReadChannelOutbox
-from telethon.tl.types import ChannelParticipantsAdmins
+from telethon.tl.types import ChannelParticipantsAdmins, UpdateReadChannelOutbox
+
 import config
 from config import adminlist, chatstats, clean, userstats
-from strings import command
 from YukkiMusic import app, tbot
 from YukkiMusic.utils.database import (
     get_active_chats,
@@ -43,6 +38,7 @@ AUTO_DELETE = config.CLEANMODE_DELETE_TIME
 AUTO_SLEEP = 5
 IS_BROADCASTING = False
 cleanmode_group = 15
+
 
 @tbot.on(events.Raw(types=UpdateReadChannelOutbox))
 async def clean_mode(event):
@@ -72,14 +68,15 @@ async def clean_mode(event):
     }
     clean[chat_id].append(put)
     await set_queries(1)
-    
+
+
 @tbot.on_message(flt.command("BROADCAST_COMMAND", True) & flt.user(config.OWNER_ID))
 @language
 async def braodcast_message(event, _):
     global IS_BROADCASTING
     if event.is_reply:
         r_msg = await event.get_reply_message()
-        x = r_msg.id
+        r_msg.id
     else:
         if len(event.text.split()) < 2:
             return await event.reply(_["broad_5"])
@@ -105,7 +102,11 @@ async def braodcast_message(event, _):
         sent = 0
         pin = 0
         schats = await get_served_chats()
-        chats = [int(chat["chat_id"]) for chat in schats if int(chat["chat_id"]) != config.LOG_GROUP_ID]
+        chats = [
+            int(chat["chat_id"])
+            for chat in schats
+            if int(chat["chat_id"]) != config.LOG_GROUP_ID
+        ]
 
         for chat_id in chats:
             try:
@@ -185,7 +186,9 @@ async def braodcast_message(event, _):
                     continue
                 try:
                     (
-                        await client.forward_messages(dialog.chat.id, event.chat_id, r_msg.id)
+                        await client.forward_messages(
+                            dialog.chat.id, event.chat_id, r_msg.id
+                        )
                         if message.reply_to_message
                         else await client.send_message(dialog.chat.id, text=query)
                     )
@@ -196,7 +199,6 @@ async def braodcast_message(event, _):
                         continue
                     await asyncio.sleep(flood_time)
                 except Exception:
-                    pass
                     continue
             text += _["broad_4"].format(num, sent)
         try:
