@@ -11,8 +11,6 @@
 # This aeval and sh module is taken from < https://github.com/TheHamkerCat/WilliamButcherBot >
 # Credit goes to TheHamkerCat.
 #
-
-
 import asyncio
 import os
 import sys
@@ -23,42 +21,32 @@ from time import time
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from YukkiMusic import app
+from telethon import events, Button
+
+from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS
 
-## -------- end of required imports to run this script
 
-## ------ Below are some optional Imports you can remove it if is imported  you don't need to import it when using eval command
-
-
-## end
-
-
-async def aexec(code, client, message):
+async def aexec(code, event):
     local_vars = {}
     exec(
-        "async def __aexec(client, message): "
+        "async def __aexec(event): "
         + "".join(f"\n {a}" for a in code.split("\n")),
         globals(),
         local_vars,
     )
     __aexec_func = local_vars["__aexec"]
-    return await __aexec_func(client, message)
+    return await __aexec_func(event)
 
-
-@app.on_edited_message(
-    filters.command(["ev", "eval"]) & SUDOERS & ~filters.forwarded & ~filters.via_bot
-)
-@app.on_message(
-    filters.command(["ev", "eval"]) & SUDOERS & ~filters.forwarded & ~filters.via_bot
-)
-async def executor(client: app, message: Message):
-    if len(message.command) < 2:
-        return await event.reply(text="<b>Give me something to exceute</b>")
+@tbot.on(events.MessageEdited(func=func = flt.command(["ev", "eval"]) & flt.user(SUDOERS) & ~filters.forwarded))
+@tbot.on_message(flt.command(["ev", "eval"]) & flt.user(SUDOERS) & ~flt.forwarded)
+async def executor(event):
+    if len(event.text.split()) < 2:
+        return await event.reply("**Give me something to exceute**")
     try:
-        cmd = message.text.split(" ", maxsplit=1)[1]
+        cmd = event.text.split(" ", maxsplit=1)[1]
     except IndexError:
-        return await message.delete()
+        return await event.delete()
     t1 = time()
     old_stderr = sys.stderr
     old_stdout = sys.stdout
@@ -66,7 +54,7 @@ async def executor(client: app, message: Message):
     redirected_error = sys.stderr = StringIO()
     stdout, stderr, exc = None, None, None
     try:
-        await aexec(cmd, client, message)
+        await aexec(cmd, event)
     except Exception:
         exc = traceback.format_exc()
     stdout = redirected_output.getvalue()
@@ -88,129 +76,103 @@ async def executor(client: app, message: Message):
         with open(filename, "w+", encoding="utf8") as out_file:
             out_file.write(str(evaluation))
         t2 = time()
-        keyboard = InlineKeyboardMarkup(
-            [
+        keyboard = [
                 [
-                    InlineKeyboardButton(
+                    Button.inline(
                         text="⏳",
-                        callback_data=f"runtime {t2-t1} Seconds",
+                        data=f"runtime {t2-t1} Seconds",
                     )
                 ]
             ]
-        )
-        await message.reply_document(
-            document=filename,
-            caption=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
-            quote=False,
+        
+        await event.reply(
+            file=filename,
+            message=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
             buttons=keyboard,
         )
-        await message.delete()
+        await event.delete()
         os.remove(filename)
     else:
         t2 = time()
-        keyboard = InlineKeyboardMarkup(
-            [
+        keyboard =   [
                 [
-                    InlineKeyboardButton(
+                    Button.inline(
                         text="⏳",
-                        callback_data=f"runtime {round(t2-t1, 3)} Seconds",
+                        data=f"runtime {round(t2-t1, 3)} Seconds",
                     ),
-                    InlineKeyboardButton(
+                    Button.inline(
                         text="🗑",
-                        callback_data=f"forceclose abc|{message.from_user.id}",
+                        data=f"forceclose abc|{event.sender_id}",
                     ),
                 ]
             ]
-        )
-        await event.reply(text=final_output, buttons=keyboard)
+        await event.reply(message=final_output, buttons=keyboard, parse_mode="HTML")
+        raise events.StopPropagation
+
+@tbot.on(events.CallbackQuery(pattern="runtime"))
+async def runtime_func_cq(event):
+    data =  event.data.decode("utf-8")
+    runtime = data.split(None, 1)[1]
+    await event.answer(runtime, alert=True)
 
 
-@app.on_callback_query(filters.regex(r"runtime"))
-async def runtime_func_cq(_, cq):
-    runtime = cq.data.split(None, 1)[1]
-    await cq.answer(runtime, show_alert=True)
-
-
-@app.on_callback_query(filters.regex("forceclose"))
-async def forceclose_command(_, CallbackQuery):
-    callback_data = CallbackQuery.data.strip()
+@tbot.on(events.CallbackQuery(pattern="forceclose"))
+async def forceclose_command(event):
+    callback_data = event.data.decode("utf-8").strip()
     callback_request = callback_data.split(None, 1)[1]
     query, user_id = callback_request.split("|")
-    if CallbackQuery.from_user.id != int(user_id):
+    if event.sender_id != int(user_id):
         try:
-            return await CallbackQuery.answer(
-                "This is not for you stay away from here", show_alert=True
+            return await event.answer(
+                "This is not for you stay away from here", alert=True
             )
         except Exception:
             return
-    await CallbackQuery.message.delete()
+    await event.delete()
     try:
-        await CallbackQuery.answer()
+        await event.answer()
     except Exception:
         return
 
-
-@app.on_edited_message(
-    filters.command("sh") & SUDOERS & ~filters.forwarded & ~filters.via_bot
-)
-@app.on_message(filters.command("sh") & SUDOERS & ~filters.forwarded & ~filters.via_bot)
-async def shellrunner(_, message: Message):
-    if len(message.command) < 2:
-        return await edit_or_reply(
-            message, text="<b>Give some commands like:</b>\n/sh git pull"
+@tbot.on(events.MessageEdited(func = flt.command("sh") & flt.user(SUDOERS) & ~flt.forwarded))
+@tbot.on_message(flt.command("sh") & flt.user(SUDOERS) & ~flt.forwarded)
+async def shellrunner(event):
+    if len(event.text.split()) < 2:
+        return await event.reply(
+            "**Give some commands like:**\n/sh git pull"
         )
 
-    text = message.text.split(None, 1)[1]
+    text = event.text.split(None, 1)[1]
     output = ""
-
-    async def run_command(command):
-        try:
-            process = await asyncio.create_subprocess_shell(
-                command,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            stdout, stderr = await process.communicate()
-            return stdout.decode().strip(), stderr.decode().strip()
-        except Exception:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            errors = traceback.format_exception(
-                etype=exc_type,
-                value=exc_obj,
-                tb=exc_tb,
-            )
-            return None, "".join(errors)
 
     if "\n" in text:
         commands = text.split("\n")
         for cmd in commands:
-            stdout, stderr = await run_command(cmd)
+            r = await tbot.run(cmd)
             output += f"<b>Command:</b> {cmd}\n"
-            if stdout:
-                output += f"<b>Output:</b>\n<pre>{stdout}</pre>\n"
-            if stderr:
-                output += f"<b>Error:</b>\n<pre>{stderr}</pre>\n"
+            if r.stdout:
+                output += f"<b>Output:</b>\n<pre>{r.stdout}</pre>\n"
+            if r.stderr:
+                output += f"<b>Error:</b>\n<pre>{r.stderr}</pre>\n"
     else:
-        stdout, stderr = await run_command(text)
-        if stdout:
-            output += f"<b>Output:</b>\n<pre>{stdout}</pre>\n"
-        if stderr:
-            output += f"<b>Error:</b>\n<pre>{stderr}</pre>\n"
+        r= await tbot.run(text)
+        if r.stdout:
+            output += f"<b>Output:</b>\n<pre>{r.stdout}</pre>\n"
+        if r.stderr:
+            output += f"<b>Error:</b>\n<pre>{r.stderr}</pre>\n"
 
     if not output.strip():
         output = "<b>OUTPUT :</b>\n<code>None</code>"
 
     if len(output) > 4096:
-        with open("output.txt", "w+") as file:
+        with open("output.txt", "w") as file:
             file.write(output)
-        await app.send_document(
-            message.chat.id,
-            "output.txt",
-            reply_to_message_id=message.id,
-            caption="<code>Output</code>",
+        await event.reply(
+            file="output.txt",
+            message="<code>Output</code>",
         )
         os.remove("output.txt")
     else:
-        await event.reply(text=output)
+        await event.reply(output, parse_mode="HTML")
 
-    await message.stop_propagation()
+    raise events.StopPropagation
