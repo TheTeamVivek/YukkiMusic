@@ -21,52 +21,52 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.decorators.language import language
 
 
-@app.on_message(command("BLACKLISTCHAT_COMMAND") & SUDOERS)
+@tbot.on_message(flt.command("BLACKLISTCHAT_COMMAND", True) & flt.user(BANNED_USERS))
 @language
-async def blacklist_chat_func(client, message: Message, _):
-    if len(message.command) != 2:
-        return await message.reply(_["black_1"])
+async def blacklist_chat_func(event, _):
+    if len(event.text.split()) != 2:
+        return await event.reply(_["black_1"])
     chat_id = int(message.text.strip().split()[1])
     if chat_id in await blacklisted_chats():
-        return await message.reply(_["black_2"])
+        return await event.reply(_["black_2"])
     blacklisted = await blacklist_chat(chat_id)
     if blacklisted:
-        await message.reply(_["black_3"])
+        await event.reply(_["black_3"])
     else:
-        await message.reply("sᴏᴍᴇᴛʜɪɴɢ ᴡʀᴏɴɢ ʜᴀᴘᴘᴇɴᴇᴅ.")
+        await event.reply("Something wrong happened.")
     try:
         await app.leave_chat(chat_id)
     except Exception:
         pass
 
 
-@app.on_message(command("WHITELISTCHAT_COMMAND") & SUDOERS)
+@tbot.on_message(flt.command("WHITELISTCHAT_COMMAND", True) & flt.user(BANNED_USERS))
 @language
-async def white_funciton(client, message: Message, _):
-    if len(message.command) != 2:
-        return await message.reply(_["black_4"])
-    chat_id = int(message.text.strip().split()[1])
+async def white_funciton(event, _):
+    if len(event.text.split()) != 2:
+        return await event.reply(_["black_4"])
+    chat_id = int(event.text.strip().split()[1])
     if chat_id not in await blacklisted_chats():
-        return await message.reply(_["black_5"])
+        return await event.reply(_["black_5"])
     whitelisted = await whitelist_chat(chat_id)
     if whitelisted:
-        return await message.reply(_["black_6"])
-    await message.reply("Something wrong happened")
+        return await event.reply(_["black_6"])
+    await event.reply("Something wrong happened")
 
 
-@app.on_message(command("BLACKLISTEDCHAT_COMMAND") & ~BANNED_USERS)
+@tbot.on_message(flt.command("BLACKLISTEDCHAT_COMMAND", True) & flt.user(BANNED_USERS))
 @language
-async def all_chats(client, message: Message, _):
+async def all_chats(event, _):
     text = _["black_7"]
     j = 0
     for count, chat_id in enumerate(await blacklisted_chats(), 1):
         try:
-            title = (await app.get_chat(chat_id)).title
+            title = (await app.entity(chat_id)).title
         except Exception:
             title = "Private"
         j = 1
         text += f"**{count}. {title}** [`{chat_id}`]\n"
     if j == 0:
-        await message.reply(_["black_8"])
+        await event.reply(_["black_8"])
     else:
-        await message.reply(text)
+        await event.reply(text)
