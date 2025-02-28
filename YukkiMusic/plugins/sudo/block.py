@@ -8,9 +8,9 @@
 # All rights reserved.
 #
 
-from YukkiMusic.misc import SUDOERS
 from config import BANNED_USERS
 from YukkiMusic import tbot
+from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import add_gban_user, remove_gban_user
 from YukkiMusic.utils.decorators.language import language
 
