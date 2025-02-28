@@ -53,9 +53,7 @@ async def play_commnd(
     url,
     fplay,
 ):
-    mystic = await event.reply(
-        _["play_2"].format(channel) if channel else _["play_1"]
-    )
+    mystic = await event.reply(_["play_2"].format(channel) if channel else _["play_1"])
     plist_id = None
     slider = None
     plist_type = None
@@ -125,9 +123,7 @@ async def play_commnd(
                         _["play_8"].format(f"{' | '.join(formats)}")
                     )
             except Exception:
-                return await mystic.edit(
-                    _["play_8"].format(f"{' | '.join(formats)}")
-                )
+                return await mystic.edit(_["play_8"].format(f"{' | '.join(formats)}"))
         if video_telegram.file_size > config.TG_VIDEO_FILESIZE_LIMIT:
             return await mystic.edit(_["play_9"])
         file_path = await Platform.telegram.get_filepath(video=video_telegram)

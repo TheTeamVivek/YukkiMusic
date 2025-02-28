@@ -8,12 +8,9 @@
 # All rights reserved.
 #
 
-from pyrogram.types import Message
 
 from config import BANNED_USERS
-from strings import command
 from YukkiMusic import tbot
-from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import add_gban_user, remove_gban_user
 from YukkiMusic.utils.decorators.language import language
 
@@ -28,7 +25,7 @@ async def useradd(event, _):
         if "@" in user:
             user = user.replace("@", "")
         user = await tbot.get_entity(user)
-        mention= await tbot.create_mention(user)
+        mention = await tbot.create_mention(user)
         if user.id in BANNED_USERS:
             return await event.reply(_["block_1"].format(mention))
         await add_gban_user(user.id)
@@ -36,11 +33,9 @@ async def useradd(event, _):
         await event.reply(_["block_2"].format(mention))
         return
     reply = await tbot.get_reply_message()
-    mention=await tbot.create_mention(await reply.get_sender())
+    mention = await tbot.create_mention(await reply.get_sender())
     if reply.sender_id in BANNED_USERS:
-        return await event.reply(
-            _["block_1"].format(mention)
-        )
+        return await event.reply(_["block_1"].format(mention))
     await add_gban_user(reply.sender_id)
     BANNED_USERS.add(reply.sender_id)
     await event.reply(_["block_2"].format(mention))
@@ -69,6 +64,7 @@ async def userdel(event, _):
     await remove_gban_user(user_id)
     BANNED_USERS.remove(user_id)
     await event.reply(_["block_4"])
+
 
 @tbot.on_message(flt.command("BLOCKED_COMMAND", True) & ~flt.user(BANNED_USERS))
 @language

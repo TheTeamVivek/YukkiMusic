@@ -204,9 +204,7 @@ class Telegram:
                     file_name=fname,
                     progress=progress,
                 )
-                await mystic.edit(
-                    "Sucessfully Downloaded\n Processing File Now..."
-                )
+                await mystic.edit("Sucessfully Downloaded\n Processing File Now...")
                 downloader.pop(message.id, None)
             except Exception:
                 await mystic.edit(_["DOWNLOAD_FAILED_MSG"])
