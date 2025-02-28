@@ -68,8 +68,6 @@ async def playmode_(client, message: Message, _):
             return await message.reply(_["cplay_4"])
 
         if creatorid != message.from_user.id:
-            return await message.reply(
-                _["cplay_6"].format(chat.title, creatorusername)
-            )
+            return await message.reply(_["cplay_6"].format(chat.title, creatorusername))
         await set_cmode(message.chat.id, chat.id)
         return await message.reply(_["cplay_3"].format(chat.title, chat.id))

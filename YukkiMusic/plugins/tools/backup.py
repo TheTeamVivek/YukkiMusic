@@ -131,9 +131,7 @@ async def import_database(client, message):
         )
 
     if not message.reply_to_message or not message.reply_to_message.document:
-        return await message.reply(
-            "You need to reply an exported file to import it."
-        )
+        return await message.reply("You need to reply an exported file to import it.")
 
     mystic = await message.reply("Downloading...")
 

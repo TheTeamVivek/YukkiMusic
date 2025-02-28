@@ -40,9 +40,7 @@ async def useradd(client, message: Message, _):
         )
     await add_gban_user(message.reply_to_message.from_user.id)
     BANNED_USERS.add(message.reply_to_message.from_user.id)
-    await message.reply(
-        _["block_2"].format(message.reply_to_message.from_user.mention)
-    )
+    await message.reply(_["block_2"].format(message.reply_to_message.from_user.mention))
 
 
 @app.on_message(command("UNBLOCK_COMMAND") & SUDOERS)

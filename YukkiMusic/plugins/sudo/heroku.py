@@ -99,9 +99,7 @@ async def varget_(client, message, _):
             return await message.reply(_["heroku_1"])
         heroku_config = HAPP.config()
         if check_var in heroku_config:
-            return await message.reply(
-                f"**{check_var}:** `{heroku_config[check_var]}`"
-            )
+            return await message.reply(f"**{check_var}:** `{heroku_config[check_var]}`")
         else:
             return await message.reply(_["heroku_4"])
     else:
