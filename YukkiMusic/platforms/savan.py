@@ -54,7 +54,7 @@ class Saavn(PlatformBase):
                         title=entry["title"],
                         duration=duration_sec,
                         thumb=entry.get("thumbnail", ""),
-                        link=self.clean_url(entry["url"]),
+                        link=entry["webpage_url"],
                     )
                     tracks.append(track)
                     count += 1
@@ -78,7 +78,7 @@ class Saavn(PlatformBase):
             info = ydl.extract_info(url, download=False)
             return Track(
                 title=info["title"],
-                link=self.clean_url(info["url"]),
+                link=info["webpage_url"],
                 duration=info.get("duration", 0),
                 thumb=info.get("thumbnail", None),
             )
