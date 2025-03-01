@@ -11,10 +11,8 @@
 import asyncio
 
 from telethon.errors import FloodWaitError
-from pyrogram.types import Message
 
 from config import BANNED_USERS
-from strings import command
 from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils import get_readable_time
@@ -38,11 +36,11 @@ async def gbanuser(event, _):
         user = event.text.split(None, 1)[1]
         user = await tbot.get_entity(user)
         user_id = user.id
-        mention  = await tbot.create_mention(user)
+        mention = await tbot.create_mention(user)
     else:
         rmsg = await event.get_reply_message()
         user_id = rmsg.sender_id
-        mention  = await tbot.create_mention(user_id)
+        mention = await tbot.create_mention(user_id)
     if user_id == event.sender_id:
         return await event.reply(_["gban_1"])
     elif user_id == tbot.id:
@@ -84,11 +82,11 @@ async def gungabn(event, _):
         user = event.text.split(None, 1)[1]
         user = await tbot.get_entity(user)
         user_id = user.id
-        mention  = await tbot.create_mention(user)
+        mention = await tbot.create_mention(user)
     else:
         rmsg = await event.get_reply_message()
         user_id = rmsg.sender_id
-        mention  = await tbot.create_mention(user_id)
+        mention = await tbot.create_mention(user_id)
     is_gbanned = await is_banned_user(user_id)
     if not is_gbanned:
         return await event.reply(_["gban_7"].format(mention))
@@ -129,7 +127,7 @@ async def gbanned_list(event, _):
         count += 1
         try:
             user = await tbot.get_entity(user_id)
-            mention  = await tbot.create_mention(user)
+            await tbot.create_mention(user)
             msg += f"{count}➤ {user}\n"
         except Exception:
             msg += f"{count}➤ [Unfetched User]{user_id}\n"
