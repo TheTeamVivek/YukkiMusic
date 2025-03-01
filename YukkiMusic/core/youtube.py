@@ -25,7 +25,6 @@ class Track:
     by: str | None = None  # None but required
     download_url: str | None = None
 
-    
     vidid: str | None = None
     file_path: str | None = None
     streamable_url: str | None = None
