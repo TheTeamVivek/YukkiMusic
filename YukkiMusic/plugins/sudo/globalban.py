@@ -40,7 +40,7 @@ async def gbanuser(event, _):
         user_id = user.id
         mention  = await tbot.create_mention(user)
     else:
-    	rmsg = await event.get_reply_message()
+        rmsg = await event.get_reply_message()
         user_id = rmsg.sender_id
         mention  = await tbot.create_mention(user_id)
     if user_id == event.sender_id:
