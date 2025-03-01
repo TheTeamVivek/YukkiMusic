@@ -1,4 +1,4 @@
-import asyncio
+import asyncio, re
 import os
 from dataclasses import dataclass
 
@@ -18,10 +18,20 @@ class Track:
     link: str
     thumb: str
     duration: int  # duration in seconds
+    streamtype
     by: str | None = None  # None but required
+    vidid: str | None = None
     download_url: str | None = None
     file_path: str | None = None
     streamable_url: str | None = None
+
+    def __post_init__(self):
+        if self.is_youtube:
+            pattern = r"(?:v=|\/)([0-9A-Za-z_-]{11})"
+            match = re.search(pattern, self.link)
+            self.vidid = match.group(1) if match else None
+        else:
+            self.vidid = self.streamtype.value
 
     @property
     def is_exists(self):
