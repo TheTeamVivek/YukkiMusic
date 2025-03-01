@@ -8,15 +8,13 @@
 # All rights reserved.
 #
 
-from pyrogram import filters
-from pyrogram.types import Message
 
 from config import BANNED_USERS, MONGO_DB_URI, OWNER_ID
-from strings import command
-from YukkiMusic import app,tbot
+from YukkiMusic import app, tbot
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import add_sudo, remove_sudo
 from YukkiMusic.utils.decorators.language import language
+
 
 @tbot.on_message(flt.command("ADDSUDO_COMMAND", True) & flt.user(OWNER_ID))
 @language
@@ -44,17 +42,13 @@ async def useradd(event, _):
         return
     rmsg = await event.get_reply_message()
     user_id = rmsg.sender_id
-    mention= await tbot.create_mention(user_id)
+    mention = await tbot.create_mention(user_id)
     if rmsg.sender_id in SUDOERS:
-        return await event.reply(
-            _["sudo_1"].format(mention)
-        )
+        return await event.reply(_["sudo_1"].format(mention))
     added = await add_sudo(user_id)
     if added:
         SUDOERS.add(user_id)
-        await event.reply(
-            _["sudo_2"].format(mention)
-        )
+        await event.reply(_["sudo_2"].format(mention))
     else:
         await event.reply("Something wrong happened")
     return
