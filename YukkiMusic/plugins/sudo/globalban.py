@@ -127,7 +127,7 @@ async def gbanned_list(event, _):
         count += 1
         try:
             user = await tbot.get_entity(user_id)
-            user =await tbot.create_mention(user)
+            user = await tbot.create_mention(user)
             msg += f"{count}➤ {user}\n"
         except Exception:
             msg += f"{count}➤ [Unfetched User]{user_id}\n"
