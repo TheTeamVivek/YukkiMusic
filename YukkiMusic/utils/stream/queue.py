@@ -32,7 +32,8 @@ async def put_queue(
     #     original_chat_id,
     #     user_id,
     #     track: Track,
-    #     forceplay: bool | str = None,
+    #     video: bool = False
+    #     forceplay: bool | None = None,
     # ):
 
     title = title.title()
