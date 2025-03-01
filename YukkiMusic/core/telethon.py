@@ -66,7 +66,9 @@ class TelethonClient(TelegramClient):
             if err:
                 raise e
 
-    async def create_mention(self, user: User, html: bool = False) -> str:
+    async def create_mention(self, user: User | int, html: bool = False) -> str:
+        if isinstance(user, int):
+            user = await self.get_entity(user)
         user_name = f"{user.first_name} {user.last_name or ''}".strip()
         user_id = user.id
         if html:
