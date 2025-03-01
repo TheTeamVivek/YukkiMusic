@@ -13,13 +13,14 @@ from YukkiMusic.utils.database import is_on_off
 from YukkiMusic.utils.formatters import time_to_seconds
 
 
+from .enum import SourceType
 @dataclass
 class Track:
     title: str
     link: str
     thumb: str
     duration: int  # duration in seconds
-    streamtype
+    streamtype: SourceType
     by: str | None = None  # None but required
     vidid: str | None = None
     download_url: str | None = None
