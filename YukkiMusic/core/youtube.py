@@ -29,6 +29,7 @@ class Track:
     def __post_init__(self):
         if self.is_youtube:
             pattern = r"(?:v=|\/)([0-9A-Za-z_-]{11})"
+            url = self.download_url if self.download_url else self.link
             match = re.search(pattern, self.link)
             self.vidid = match.group(1) if match else None
         else:
