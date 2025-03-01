@@ -11,20 +11,19 @@
 from pyrogram.types import Message
 
 from strings import command
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import set_video_limit
 from YukkiMusic.utils.decorators.language import language
 
 
-@app.on_message(command("VIDEOLIMIT_COMMAND") & SUDOERS)
+@app.on_message(flt.command("VIDEOLIMIT_COMMAND", True) & flt.user(SUDOERS))
 @language
-async def set_video_limit_kid(client, message: Message, _):
-    if len(message.command) != 2:
+async def set_video_limit_kid(event, _):
+    if len(event.text.split()) != 2:
         usage = _["vid_1"]
         return await event.reply(usage)
-    message.chat.id
-    state = message.text.split(None, 1)[1].strip()
+    state = event.text.split(None, 1)[1].strip()
     if state.lower() == "disable":
         limit = 0
         await set_video_limit(limit)
