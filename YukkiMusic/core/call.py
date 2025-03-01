@@ -296,7 +296,6 @@ class Call:
     async def join_call(
         self,
         chat_id: int,
-        original_chat_id: int,  # TODO remove it and make compatible
         link,
         video: bool | str = None,
         image: bool | str = None,
