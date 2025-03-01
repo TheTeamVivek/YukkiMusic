@@ -9,9 +9,10 @@
 #
 import asyncio
 import math
-import os, sys
+import os
 import shutil
 import socket
+import sys
 from datetime import datetime
 
 import dotenv
@@ -20,16 +21,13 @@ import requests
 import urllib3
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
-from pyrogram import filters
-from pyrogram.enums import ChatType
-from pyrogram.types import Message
 
 import config
 from config import BANNED_USERS
-from strings import command
-from YukkiMusic import app, tbot
+from YukkiMusic import tbot
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.misc import HAPP, SUDOERS, XCB, db
+from YukkiMusic.misc import HAPP, SUDOERS, db
+from YukkiMusic.utils import pastebin
 from YukkiMusic.utils.database import (
     get_active_chats,
     get_cmode,
@@ -38,13 +36,13 @@ from YukkiMusic.utils.database import (
 )
 from YukkiMusic.utils.decorators import admin_actual, language
 from YukkiMusic.utils.decorators.language import language
-from YukkiMusic.utils import pastebin
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 async def is_heroku():
     return "heroku" in socket.getfqdn()
+
 
 @tbot.on_message(flt.command("GETLOG_COMMAND", True) & flt.user(SUDOERS))
 @language
@@ -53,7 +51,11 @@ async def log_(event, _):
         try:
             with open(config.LOG_FILE_NAME) as log:
                 lines = log.readlines()
-            num = int(event.text.split(None, 1)[1]) if len(event.text.split()) > 1 else 100
+            num = (
+                int(event.text.split(None, 1)[1])
+                if len(event.text.split()) > 1
+                else 100
+            )
             return await pastebin.paste("".join(lines[-num:]))
         except Exception:
             return None
@@ -71,10 +73,11 @@ async def log_(event, _):
         if link:
             return await event.reply(link)
         return await event.reply(_["heroku_2"])
-    
+
     except Exception:
         await event.reply(_["heroku_2"])
-        
+
+
 @tbot.on_message(flt.command("GETVAR_COMMAND", True) & flt.user(SUDOERS))
 @language
 async def varget_(event, _):
@@ -314,7 +317,9 @@ async def update_(event, _):
         sys.exit()
 
 
-@tbot.on_message(flt.command("REBOOT_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
+@tbot.on_message(
+    flt.command("REBOOT_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+)
 @admin_actual
 async def reboot(event, _):
     mystic = await event.reply(
@@ -334,6 +339,7 @@ async def reboot(event, _):
         except Exception:
             pass
     return await mystic.edit("Sucessfully Restarted \nTry playing Now..")
+
 
 @tbot.on_message(flt.command("RESTART_COMMAND", True) & ~flt.user(BANNED_USERS))
 async def restart_(event):
