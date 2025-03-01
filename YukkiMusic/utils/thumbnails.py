@@ -9,7 +9,6 @@
 #
 
 from async_lru import alru_cache
-from youtubesearchpython.__future__ import VideosSearch
 
 
 @alru_cache(maxsize=None)
