@@ -8,7 +8,7 @@
 # All rights reserved.
 #
 from config import BANNED_USERS, MONGO_DB_URI, OWNER_ID
-from YukkiMusic import app, tbot
+from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import add_sudo, remove_sudo
 from YukkiMusic.utils.decorators.language import language
