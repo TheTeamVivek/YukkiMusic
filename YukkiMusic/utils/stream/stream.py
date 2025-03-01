@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 
-import asyncio
 import os
 from random import randint
 
@@ -17,7 +16,6 @@ from pyrogram.types import InlineKeyboardMarkup, Message, User
 import config
 from YukkiMusic import Platform, app
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.core.enum import SongType
 from YukkiMusic.core.youtube import Track
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
@@ -55,14 +53,12 @@ async def stream(
     if forceplay:
         await Yukki.force_stop_stream(chat_id)
     # if streamtype == "playlist":
-    if isinstance(
-        tracks, list
-    ):
+    if isinstance(tracks, list):
 
         msg = f"{_['playlist_16']}\n\n"
         count = 0
         tracks = tracks[: config.PLAYLIST_FETCH_LIMIT]
-            
+
         for search in result:
             # try:
             #     (

@@ -1,6 +1,6 @@
 import asyncio
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from async_lru import alru_cache
 from youtubesearchpython.__future__ import VideosSearch
@@ -18,7 +18,7 @@ class Track:
     link: str
     thumb: str
     duration: int  # duration in seconds
-    by: str | None = None # None but required
+    by: str | None = None  # None but required
     download_url: str | None = None
     file_path: str | None = None
     streamable_url: str | None = None
