@@ -23,8 +23,10 @@ class Track:
     duration: int  # duration in seconds
     streamtype: SourceType
     by: str | None = None  # None but required
-    vidid: str | None = None
     download_url: str | None = None
+
+    
+    vidid: str | None = None
     file_path: str | None = None
     streamable_url: str | None = None
 
