@@ -16,14 +16,8 @@ from telethon.errors import (
     MessageNotModifiedError,
     UserNotParticipantError,
 )
-from telethon.tl.functions.channels import (
-    GetParticipantRequest,
-    LeaveChannelRequest,
-)
-from telethon.tl.functions.messages import (
-    DeleteChatUserRequest,
-    GetFullChatRequest,
-)
+from telethon.tl.functions.channels import GetParticipantRequest
+from telethon.tl.functions.messages import GetFullChatRequest
 from telethon.tl.types import (
     ChannelParticipant,
     ChannelParticipantAdmin,
@@ -33,9 +27,6 @@ from telethon.tl.types import (
     ChannelParticipantSelf,
     InputPeerChannel,
     InputPeerChat,
-    InputUserSelf,
-    PeerChannel,
-    PeerChat,
     User,
 )
 
@@ -76,7 +67,7 @@ class TelethonClient(TelegramClient):
         return f"[{user_name}](tg://user?id={user_id})"
 
     async def leave_chat(self, chat):
-        await self.kick_participant(chat, 'me')
+        await self.kick_participant(chat, "me")
 
     async def get_chat_member(
         self,
