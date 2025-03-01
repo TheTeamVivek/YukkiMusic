@@ -11,7 +11,7 @@
 from pyrogram.types import Message
 
 from strings import command, get_string
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
     get_lang,
@@ -21,18 +21,17 @@ from YukkiMusic.utils.database import (
 )
 
 
-@app.on_message(command("MAINTENANCE_COMMAND") & SUDOERS)
-async def maintenance(client, message: Message):
+@tbot.on_message(flt.command("MAINTENANCE_COMMAND", True) & flt.user(SUDOERS))
+async def maintenance(event):
     try:
-        language = await get_lang(message.chat.id)
+        language = await get_lang(event.chat_id)
         _ = get_string(language)
     except Exception:
         _ = get_string("en")
     usage = _["maint_1"]
-    if len(message.command) != 2:
+    if len(event.text.split()) != 2:
         return await event.reply(usage)
-    message.chat.id
-    state = message.text.split(None, 1)[1].strip()
+    state = event.message.text.split(None, 1)[1].strip()
     state = state.lower()
     if state == "enable":
         if await is_maintenance() is False:
