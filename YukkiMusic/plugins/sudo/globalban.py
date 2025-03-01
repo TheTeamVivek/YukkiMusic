@@ -10,12 +10,12 @@
 
 import asyncio
 
-from pyrogram.errors import FloodWait
+from telethon.errors import FloodWaitError
 from pyrogram.types import Message
 
 from config import BANNED_USERS
 from strings import command
-from YukkiMusic import app
+from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils import get_readable_time
 from YukkiMusic.utils.database import (
@@ -29,22 +29,23 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.decorators.language import language
 
 
-@app.on_message(command("GBAN_COMMAND") & SUDOERS)
+@tbot.on_message(flt.command("GBAN_COMMAND", True) & flt.user(SUDOERS))
 @language
-async def gbanuser(client, message: Message, _):
-    if not message.reply_to_message:
-        if len(message.command) != 2:
+async def gbanuser(event, _):
+    if not event.is_reply:
+        if len(event.text.split()) != 2:
             return await event.reply(_["USER_IDENTIFIER_REQUIRED"])
-        user = message.text.split(None, 1)[1]
-        user = await app.get_users(user)
+        user = event.text.split(None, 1)[1]
+        user = await tbot.get_entity(user)
         user_id = user.id
-        mention = user.mention
+        mention  = await tbot.create_mention(user)
     else:
-        user_id = message.reply_to_message.from_user.id
-        mention = message.reply_to_message.from_user.mention
-    if user_id == message.from_user.id:
+    	rmsg = await event.get_reply_message()
+        user_id = rmsg.sender_id
+        mention  = await tbot.create_mention(user_id)
+    if user_id == event.sender_id:
         return await event.reply(_["gban_1"])
-    elif user_id == app.id:
+    elif user_id == tbot.id:
         return await event.reply(_["gban_2"])
     elif user_id in SUDOERS:
         return await event.reply(_["gban_3"])
@@ -63,10 +64,10 @@ async def gbanuser(client, message: Message, _):
     number_of_chats = 0
     for chat_id in served_chats:
         try:
-            await app.ban_chat_member(chat_id, user_id)
+            await tbot.edit_permissions(chat_id, user_id, view_messages=False)
             number_of_chats += 1
-        except FloodWait as e:
-            await asyncio.sleep(int(e.value))
+        except FloodWaitError as e:
+            await asyncio.sleep(int(e.seconds))
         except Exception:
             pass
     await add_banned_user(user_id)
@@ -74,19 +75,20 @@ async def gbanuser(client, message: Message, _):
     await mystic.delete()
 
 
-@app.on_message(command("UNGBAN_COMMAND") & SUDOERS)
+@tbot.on_message(flt.command("UNGBAN_COMMAND", True) & flt.user(SUDOERS))
 @language
-async def gungabn(client, message: Message, _):
-    if not message.reply_to_message:
-        if len(message.command) != 2:
+async def gungabn(event, _):
+    if not event.is_reply:
+        if len(event.text.split()) != 2:
             return await event.reply(_["USER_IDENTIFIER_REQUIRED"])
-        user = message.text.split(None, 1)[1]
-        user = await app.get_users(user)
+        user = event.text.split(None, 1)[1]
+        user = await tbot.get_entity(user)
         user_id = user.id
-        mention = user.mention
+        mention  = await tbot.create_mention(user)
     else:
-        user_id = message.reply_to_message.from_user.id
-        mention = message.reply_to_message.from_user.mention
+        rmsg = await event.get_reply_message()
+        user_id = rmsg.sender_id
+        mention  = await tbot.create_mention(user_id)
     is_gbanned = await is_banned_user(user_id)
     if not is_gbanned:
         return await event.reply(_["gban_7"].format(mention))
@@ -102,10 +104,10 @@ async def gungabn(client, message: Message, _):
     number_of_chats = 0
     for chat_id in served_chats:
         try:
-            await app.unban_chat_member(chat_id, user_id)
+            await tbot.edit_permissions(chat_id, user_id, view_messages=True)
             number_of_chats += 1
-        except FloodWait as e:
-            await asyncio.sleep(int(e.value))
+        except FloodWaitError as e:
+            await asyncio.sleep(int(e.seconds))
         except Exception:
             pass
     await remove_banned_user(user_id)
@@ -113,9 +115,9 @@ async def gungabn(client, message: Message, _):
     await mystic.delete()
 
 
-@app.on_message(command("GBANNED_COMMAND") & SUDOERS)
+@tbot.on_message(flt.command("GBANNED_COMMAND", True) & flt.user(SUDOERS))
 @language
-async def gbanned_list(client, message: Message, _):
+async def gbanned_list(event, _):
     counts = await get_banned_count()
     if counts == 0:
         return await event.reply(_["gban_10"])
@@ -126,8 +128,8 @@ async def gbanned_list(client, message: Message, _):
     for user_id in users:
         count += 1
         try:
-            user = await app.get_users(user_id)
-            user = user.first_name if not user.mention else user.mention
+            user = await tbot.get_entity(user_id)
+            mention  = await tbot.create_mention(user)
             msg += f"{count}➤ {user}\n"
         except Exception:
             msg += f"{count}➤ [Unfetched User]{user_id}\n"
