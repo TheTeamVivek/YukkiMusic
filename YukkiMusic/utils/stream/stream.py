@@ -58,17 +58,12 @@ async def stream(
     # if streamtype == "playlist":
     if isinstance(
         tracks, list
-    ):  # TODO If YouTube Playlist returns list of vidid but other returns list of song name and can be list of Track
+    ):
 
         msg = f"{_['playlist_16']}\n\n"
         count = 0
-        r = await asyncio.gather(
-            *[track.download() for track in tracks[: config.PLAYLIST_FETCH_LIMIT]],
-            return_exceptions=True,
-        )  # TODO: We Need to make the track.download compatible with m3u8 support
-        for res in r:
-            if isinstance(res, Exception):
-                pass  # TODO use app.report_error for reporting for logger group or all owners and logs all log needed to create that function
+        tracks = tracks[: config.PLAYLIST_FETCH_LIMIT]],
+            
         for search in result:
             # try:
             #     (
