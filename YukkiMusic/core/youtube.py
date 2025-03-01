@@ -18,9 +18,10 @@ class Track:
     link: str
     thumb: str
     duration: int  # duration in seconds
-    download_url: str | None = field(default=None)
-    file_path: str | None = field(default=None)
-    streamable_url: str | None = field(default=None)
+    by: str | None = None # None but required
+    download_url: str | None = None
+    file_path: str | None = None
+    streamable_url: str | None = None
 
     @property
     def is_exists(self):
