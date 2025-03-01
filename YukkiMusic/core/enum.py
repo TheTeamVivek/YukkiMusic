@@ -5,7 +5,6 @@ class PlayType(Enum):
     PLAYING = auto()  # Actively playing
     PAUSED = auto()  # Paused
     MUTED = auto()  # Muted
-    SPEEDUPED = auto()  # Playing at a faster speed
 
 
 class SongType(Enum):
@@ -14,10 +13,10 @@ class SongType(Enum):
 
 
 class SourceType(Enum):
-    APPLE = auto()
-    RESSO = auto()
-    SAAVN = auto()
-    SOUNDCLOUD = auto()
-    SPOTIFY = auto()
-    TELEGRAM = auto()
-    YOUTUBE = auto()
+    APPLE = "Apple"
+    RESSO = "Resson"
+    SAAVN = "JioSaavn"
+    SOUNDCLOUD = "Soundcloud"
+    SPOTIFY = "Spotify"
+    TELEGRAM = "Telegram"
+    YOUTUBE = "YouTube"
