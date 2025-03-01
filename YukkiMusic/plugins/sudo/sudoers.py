@@ -7,8 +7,6 @@
 #
 # All rights reserved.
 #
-
-
 from config import BANNED_USERS, MONGO_DB_URI, OWNER_ID
 from YukkiMusic import app, tbot
 from YukkiMusic.misc import SUDOERS
@@ -29,7 +27,7 @@ async def useradd(event, _):
         user = event.text.split(None, 1)[1]
         if "@" in user:
             user = user.replace("@", "")
-        user = await app.get_entity(user)
+        user = await tbot.get_entity(user)
         mention = await tbot.create_mention(user)
         if user.id in SUDOERS:
             return await event.reply(_["sudo_1"].format(mention))
@@ -67,7 +65,7 @@ async def userdel(event, _):
         user = event.text.split(None, 1)[1]
         if "@" in user:
             user = user.replace("@", "")
-        user = await app.get_entity(user)
+        user = await tbot.get_entity(user)
         if user.id not in SUDOERS:
             return await event.reply(_["sudo_3"])
         removed = await remove_sudo(user.id)
@@ -96,7 +94,7 @@ async def sudoers_list(event, _):
     count = 0
     for x in OWNER_ID:
         try:
-            user = await app.get_entity(x)
+            user = await tbot.get_entity(x)
             user = await tbot.create_mention(user)
             count += 1
         except Exception:
@@ -106,7 +104,7 @@ async def sudoers_list(event, _):
     for user_id in SUDOERS:
         if user_id not in OWNER_ID:
             try:
-                user = await app.get_entity(user_id)
+                user = await tbot.get_entity(user_id)
                 user = await tbot.create_mention(user)
                 if smex == 0:
                     smex += 1
