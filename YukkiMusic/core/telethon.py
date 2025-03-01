@@ -75,12 +75,8 @@ class TelethonClient(TelegramClient):
             return f'<a href="tg://user?id={user_id}">{user_name}</a>'
         return f"[{user_name}](tg://user?id={user_id})"
 
-    async def leave_chat(self, chat_id):
-        entity = await self.get_entity(chat_id)
-        if isinstance(entity, PeerChannel):
-            await self(LeaveChannelRequest(entity))
-        elif isinstance(entity, PeerChat):
-            await self(DeleteChatUserRequest(entity.id, InputUserSelf()))
+    async def leave_chat(self, chat):
+        await self.kick_participant(chat, 'me')
 
     async def get_chat_member(
         self,
