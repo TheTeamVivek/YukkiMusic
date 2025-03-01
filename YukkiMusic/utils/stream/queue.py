@@ -9,8 +9,8 @@
 #
 
 
-from config import autoclean, chatstats, time_to_seconds, userstats
-from YukkiMusic.core.youtube import Track 
+from config import autoclean, chatstats, userstats
+from YukkiMusic.core.youtube import Track
 from YukkiMusic.misc import db
 
 
