@@ -24,6 +24,8 @@ _boot_ = time.time()
 
 def is_heroku():
     return "heroku" in socket.getfqdn()
+
+
 SUDOERS = set()
 
 if config.MONGO_DB_URI is None:
