@@ -12,7 +12,7 @@ from pyrogram.types import Message
 
 import config
 from strings import command
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
     add_private_chat,
@@ -23,15 +23,15 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.decorators.language import language
 
 
-@app.on_message(command("AUTHORIZE_COMMAND") & SUDOERS)
+@tbot.on_message(flt.command("AUTHORIZE_COMMAND", True) & flt.user(SUDOERS))
 @language
-async def authorize(client, message: Message, _):
-    if config.PRIVATE_BOT_MODE != str(True):
+async def authorize(event, _):
+    if not config.PRIVATE_BOT_MODE:
         return await event.reply(_["pbot_12"])
-    if len(message.command) != 2:
+    if len(event.text.split()) != 2:
         return await event.reply(_["pbot_1"])
     try:
-        chat_id = int(message.text.strip().split()[1])
+        chat_id = int(event.text.strip().split()[1])
     except Exception:
         return await event.reply(_["pbot_7"])
     if not await is_served_private_chat(chat_id):
@@ -41,15 +41,15 @@ async def authorize(client, message: Message, _):
         await event.reply(_["pbot_5"])
 
 
-@app.on_message(command("UNAUTHORIZE_COMMAND") & SUDOERS)
+@tbot.on_message(flt.command("UNAUTHORIZE_COMMAND", True) & flt.user(SUDOERS))
 @language
-async def unauthorize(client, message: Message, _):
-    if config.PRIVATE_BOT_MODE != str(True):
+async def unauthorize(event, _):
+    if not config.PRIVATE_BOT_MODE:
         return await event.reply(_["pbot_12"])
-    if len(message.command) != 2:
+    if len(event.text.split()) != 2:
         return await event.reply(_["pbot_2"])
     try:
-        chat_id = int(message.text.strip().split()[1])
+        chat_id = int(event.text.strip().split()[1])
     except Exception:
         return await event.reply(_["pbot_7"])
     if not await is_served_private_chat(chat_id):
@@ -59,10 +59,10 @@ async def unauthorize(client, message: Message, _):
         return await event.reply(_["pbot_4"])
 
 
-@app.on_message(command("AUTHORIZED_COMMAND") & SUDOERS)
+@tbot.on_message(flt.command("AUTHORIZED_COMMAND", True) & flt.user(SUDOERS))
 @language
-async def authorized(client, message: Message, _):
-    if config.PRIVATE_BOT_MODE != str(True):
+async def authorized(event, _):
+    if not config.PRIVATE_BOT_MODE:
         return await event.reply(_["pbot_12"])
     m = await event.reply(_["pbot_8"])
     served_chats = []
@@ -75,7 +75,7 @@ async def authorized(client, message: Message, _):
     msg = _["pbot_13"]
     for served_chat in served_chats:
         try:
-            title = (await app.get_chat(served_chat)).title
+            title = (await app.get_entity(served_chat)).title
             count += 1
             text += f"{count}:- {title[:15]} [{served_chat}]\n"
         except Exception:
