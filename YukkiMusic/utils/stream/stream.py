@@ -61,7 +61,7 @@ async def stream(
 
         msg = f"{_['playlist_16']}\n\n"
         count = 0
-        tracks = tracks[: config.PLAYLIST_FETCH_LIMIT]]
+        tracks = tracks[: config.PLAYLIST_FETCH_LIMIT]
             
         for search in result:
             # try:
