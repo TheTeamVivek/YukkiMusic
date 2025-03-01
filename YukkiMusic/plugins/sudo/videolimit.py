@@ -15,7 +15,7 @@ from YukkiMusic.utils.database import set_video_limit
 from YukkiMusic.utils.decorators.language import language
 
 
-@app.on_message(flt.command("VIDEOLIMIT_COMMAND", True) & flt.user(SUDOERS))
+@tbot.on_message(flt.command("VIDEOLIMIT_COMMAND", True) & flt.user(SUDOERS))
 @language
 async def set_video_limit_kid(event, _):
     if len(event.text.split()) != 2:
