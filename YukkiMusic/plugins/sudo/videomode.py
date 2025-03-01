@@ -8,11 +8,9 @@
 # All rights reserved.
 #
 
-from pyrogram.types import Message
 
 import config
-from strings import command
-from YukkiMusic import app, tbot
+from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import add_off, add_on
 from YukkiMusic.utils.decorators.language import language

@@ -9,7 +9,6 @@
 #
 
 
-from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import set_video_limit
 from YukkiMusic.utils.decorators.language import language
