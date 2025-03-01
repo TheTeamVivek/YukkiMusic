@@ -25,7 +25,9 @@ class Track:
     by: str | None = None  # None but required
     download_url: str | None = None
 
-    is_live: bool | None = None # if True and duration or title is None it Means index or m3u8 playback else Normal live 
+    is_live: bool | None = (
+        None  # if True and duration or title is None it Means index or m3u8 playback else Normal live
+    )
     vidid: str | None = None
     file_path: str | None = None
     streamable_url: str | None = None
