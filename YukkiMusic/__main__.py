@@ -41,6 +41,7 @@ async def init():
             BANNED_USERS.add(user_id)
     except Exception:
         pass
+    await config.fetch_cookies()
     await app.start()
     for mod in app.load_plugins_from("YukkiMusic/plugins"):
         if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
