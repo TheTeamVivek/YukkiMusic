@@ -25,16 +25,14 @@ from YukkiMusic.utils.database import is_on_off
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
-
 def cookies():
     folder_path = f"{os.getcwd()}/cookies"
-    txt_files = [file for file in os.listdir(folder_path) if file.endswith(".txt")]
+    txt_files = glob.glob(os.path.join(folder_path, '*.txt'))
     if not txt_files:
-        raise FileNotFoundError("No Cookies found in cookies directory make sure your cookies file written  .txt file")
+        raise FileNotFoundError("No .txt files found in the specified folder.")
     cookie_txt_file = random.choice(txt_files)
-    cookie_txt_file = os.path.join(folder_path, cookie_txt_file)
-    return cookie_txt_file
-    # return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
+
+    return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
 
 
 async def shell_cmd(cmd):
