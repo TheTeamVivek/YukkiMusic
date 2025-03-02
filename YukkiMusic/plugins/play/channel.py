@@ -8,22 +8,19 @@
 # All rights reserved.
 #
 
-from pyrogram import filters
-from pyrogram.enums import ChatMembersFilter, ChatMemberStatus, ChatType
-from pyrogram.errors import ChatAdminRequired
-from pyrogram.types import Message
-
-from config import BANNED_USERS
-from strings import command, get_command
-from YukkiMusic import tbot
-from YukkiMusic.utils.database import get_lang, set_cmode
-from YukkiMusic.utils.decorators.admins import admin_actual
 
 from telethon.tl.functions.channels import GetFullChannelRequest
 from telethon.tl.types import Channel
-from telethon.tl.types import ChannelParticipantsAdmins
-from telethon.tl.types import ChannelParticipantCreator
-@tbot.on_message(flt.command("CHANNELPLAY_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
+
+from config import BANNED_USERS
+from YukkiMusic import tbot
+from YukkiMusic.utils.database import set_cmode
+from YukkiMusic.utils.decorators.admins import admin_actual
+
+
+@tbot.on_message(
+    flt.command("CHANNELPLAY_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+)
 @admin_actual
 async def playmode_(language, _):
     chat = await event.get_chat()
@@ -35,7 +32,7 @@ async def playmode_(language, _):
     if (str(query)).lower() == "disable":
         await set_cmode(event.chat_id, None)
         return await event.reply("Channel Play Disabled")
-        
+
     elif str(query) == "linked":
         chat = (await tbot(GetFullChannelRequest(channel=chat.id))).full_chat
         if chat.linked_chat_id:
@@ -59,7 +56,7 @@ async def playmode_(language, _):
         else:
             return await event.reply(_["cplay_5"])
         try:
-        	creator, status = await tbot.get_chat_member(chat.id, event.sender_id)
+            creator, status = await tbot.get_chat_member(chat.id, event.sender_id)
         except Exception:
             return await event.reply(_["cplay_4"])
 
