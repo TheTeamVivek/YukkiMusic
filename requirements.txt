@@ -26,3 +26,4 @@ flask
 gunicorn
 yt-dlp
 py-yt-search>=0.2
+youtube-search-python==1.6.6
