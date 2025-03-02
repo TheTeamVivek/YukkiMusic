@@ -47,7 +47,7 @@ DURATION_LIMIT_MIN = int(
 )  # Remember to give value in Minutes
 
 
-EXTRA_PLUGINS = getenv("EXTRA_PLUGINS", True)
+EXTRA_PLUGINS = getenv("EXTRA_PLUGINS", False)
 
 # Fill False if you Don't want to load extra plugins
 
@@ -84,7 +84,7 @@ HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
 # For customized or modified Repository
 UPSTREAM_REPO = getenv(
     "UPSTREAM_REPO",
-    "https://github.com/TheTeamVivek/YukkiMusic",
+    "https://github.com/Vivekkumar-in/YukkiMusic",
 )
 UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH", "master")
 
@@ -125,7 +125,7 @@ TELEGRAM_DOWNLOAD_EDIT_SLEEP = int(getenv("TELEGRAM_EDIT_SLEEP", "5"))
 
 
 # Your Github Repo.. Will be shown on /start Command
-GITHUB_REPO = getenv("GITHUB_REPO", "https://github.com/Vivekkumar-IN/YukkiMusic")
+GITHUB_REPO = getenv("GITHUB_REPO", "https://github.com/TheTeamVivek/YukkiMusic")
 
 
 # Spotify Client.. Get it from https://developer.spotify.com/dashboard
