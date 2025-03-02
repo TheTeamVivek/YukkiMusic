@@ -26,10 +26,10 @@ from telethon.tl.types import ChannelParticipantCreator
 @tbot.on_message(flt.command("CHANNELPLAY_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
 @admin_actual
 async def playmode_(language, _):
-	chat = await event.get_chat()
+    chat = await event.get_chat()
     if len(event.message.text.split()) < 2:
         return await event.reply(
-            _["cplay_1"].format(chat.title, _["CHANNELPLAY_COMMAND"][0])
+            _["cplay_1"].format(chat.title, _["CHANNELPLAY_COMMAND"])
         )
     query = event.message.text.split(None, 2)[1].lower().strip()
     if (str(query)).lower() == "disable":
