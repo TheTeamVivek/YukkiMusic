@@ -7,6 +7,7 @@
 #
 # All rights reserved.
 import os
+import asyncio
 import importlib
 
 from pyrogram import idle
@@ -19,6 +20,7 @@ from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
 logger = LOGGER("YukkiMusic")
+loop = asyncio.get_event_loop()
 
 async def init():
     if len(config.STRING_SESSIONS) == 0:
@@ -90,5 +92,5 @@ async def init():
 
 
 if __name__ == "__main__":
-    app.run(init())
+    loop.run_until_complete(init())
     LOGGER("YukkiMusic").info("Stopping YukkiMusic! GoodBye")
