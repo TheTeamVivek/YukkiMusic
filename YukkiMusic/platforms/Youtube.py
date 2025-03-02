@@ -26,14 +26,11 @@ from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
 def cookies():
-    folder_path = f"{os.getcwd()}/cookies"
-    txt_files = glob.glob(os.path.join(folder_path, '*.txt'))
-    if not txt_files:
-        raise FileNotFoundError("No .txt files found in the specified folder.")
-    cookie_txt_file = random.choice(txt_files)
+    cookie_dir = "cookies"
+    cookies_files = [f for f in os.listdir(cookie_dir) if f.endswith(".txt")]
 
-    return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
-
+    cookie_file = os.path.join(cookie_dir, cookies_files[0])
+    return cookie_file
 
 async def shell_cmd(cmd):
     proc = await asyncio.create_subprocess_shell(
