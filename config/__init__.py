@@ -7,7 +7,8 @@
 #
 # All rights reserved.
 
-import aiohttp, logging
+import logging
+import requests
 from .config import *
 
 
@@ -17,13 +18,9 @@ async def fetch_cookies():
         return None
     paste_id = COOKIE_LINK.split("/")[-1]
     raw_url = f"https://batbin.me/raw/{paste_id}"
-    async with aiohttp.ClientSession() as session:
-        async with session.get(raw_url) as response:
-            if response.status == 200:
-                raw_content = await response.text()
-                with open("cookies/cookies.txt", "w", encoding="utf-8") as file:
-                    file.write(raw_content)
+    response = requests.get(url)
+    raw_content = response.text
+    with open("cookies/cookies.txt", "w", encoding="utf-8") as file:
+        file.write(raw_content)
 
-                logging.info(f"Cookies successfully written: {raw_url}")
-            else:
-                logging.info(f"Failed to get the URL. Status code: {response.status}")
+        logging.info(f"Cookies successfully written: {raw_url}")
