@@ -7,9 +7,6 @@
 #
 # All rights reserved.
 #
-
-import asyncio
-
 import speedtest
 
 from strings import command
@@ -17,27 +14,26 @@ from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 
 
-def testspeed(m):
+async def testspeed(m):
     try:
         test = speedtest.Speedtest()
         test.get_best_server()
-        m = m.edit("⇆ Running Download Speedtest ...")
+        m = await m.edit("⇆ Running Download Speedtest ...")
         test.download()
-        m = m.edit("⇆ Running Upload SpeedTest...")
+        m = await m.edit("⇆ Running Upload SpeedTest...")
         test.upload()
         test.results.share()
         result = test.results.dict()
-        m = m.edit("↻ Sharing SpeedTest results")
+        m = await m.edit("↻ Sharing SpeedTest results")
     except Exception as e:
-        return m.edit(e)
+        return await m.edit(e)
     return result
 
 
 @app.on_message(command("SPEEDTEST_COMMAND") & SUDOERS)
 async def speedtest_function(client, message):
     m = await message.reply_text("ʀᴜɴɴɪɴɢ sᴘᴇᴇᴅᴛᴇsᴛ")
-    loop = asyncio.get_event_loop_policy().get_event_loop()
-    result = await loop.run_in_executor(None, testspeed, m)
+    result = await testspeed(m)
     output = f"""**Speedtest Results**
     
 <u>**Client:**</u>
