@@ -21,7 +21,7 @@ async def fetch_cookies():
         async with session.get(raw_url) as response:
             if response.status == 200:
                 raw_content = await response.text()
-                with open("config/cookies/cookies.txt", "w", encoding="utf-8") as file:
+                with open("cookies/cookies.txt", "w", encoding="utf-8") as file:
                     file.write(raw_content)
 
                 print("Cookies successfully written")
