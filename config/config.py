@@ -27,6 +27,10 @@ API_HASH = getenv("API_HASH")
 ## Get it from @Botfather in Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
 
+# Your cookies pasted link on batbin.me
+# you can skip if you are adding cookies
+# manually in cookies dir
+COOKIE_LINK = getenv("COOKIE_LINK", None)
 
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
