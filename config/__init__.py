@@ -7,7 +7,7 @@
 #
 # All rights reserved.
 
-import aiohttp
+import aiohttp, logging
 from .config import *
 
 
@@ -24,6 +24,6 @@ async def fetch_cookies():
                 with open("cookies/cookies.txt", "w", encoding="utf-8") as file:
                     file.write(raw_content)
 
-                print("Cookies successfully written")
+                logging.info(f"Cookies successfully written: {raw_url}")
             else:
-                print(f"Failed to get the URL. Status code: {response.status}")
+                logging.info(f"Failed to get the URL. Status code: {response.status}")
