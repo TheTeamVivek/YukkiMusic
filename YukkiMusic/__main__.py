@@ -7,18 +7,20 @@
 #
 # All rights reserved.
 import os
+import asyncio
 import importlib
 
 from pyrogram import idle
 from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
-from config import BANNED_USERS, fetch_cookies
+from config import BANNED_USERS
 from YukkiMusic import HELPABLE, LOGGER, app, userbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
 logger = LOGGER("YukkiMusic")
+loop = asyncio.get_event_loop()
 
 async def init():
     if len(config.STRING_SESSIONS) == 0:
@@ -39,7 +41,6 @@ async def init():
             BANNED_USERS.add(user_id)
     except Exception:
         pass
-    await fetch_cookies()
     await app.start()
     for mod in app.load_plugins_from("YukkiMusic/plugins"):
         if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
@@ -57,13 +58,13 @@ async def init():
             if result["returncode"] != 0:
                 logger.error(f"Error cloning extra plugins: {result['stderr']}")
                 exit()
-            
+
         req = os.path.join("xtraplugins", "requirements.txt")
         if os.path.exists(req):
             result = await app.run_shell_command(["pip", "install", "-r", req])
             if result["returncode"] != 0:
                 logger.error(f"Error installing requirements: {result['stderr']}")
-                    
+
         for mod in app.load_plugins_from("xtraplugins"):
             if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
                 if hasattr(mod, "__HELP__") and mod.__HELP__:
@@ -91,5 +92,5 @@ async def init():
 
 
 if __name__ == "__main__":
-    app.run(init())
+    loop.run_until_complete(init())
     LOGGER("YukkiMusic").info("Stopping YukkiMusic! GoodBye")
