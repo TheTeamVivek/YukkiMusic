@@ -15,8 +15,8 @@ jobs:
         shell: bash
         run: |
           declare -A replacements=(
-            ["message.reply"]="event.reply"
-            ["CLEANMODE_MINS"]="CLEANMODE_DELETE_TIME"
+            ["message.chat.id"]="event.chat_id"
+            ["message.from_user.id"]="event.sender_id"
           )
 
           for key in "${!replacements[@]}"; do
