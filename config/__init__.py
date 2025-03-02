@@ -18,7 +18,7 @@ async def fetch_cookies():
         return None
     paste_id = COOKIE_LINK.split("/")[-1]
     raw_url = f"https://batbin.me/raw/{paste_id}"
-    response = requests.get(url)
+    response = requests.get(raw_url)
     raw_content = response.text
     with open("cookies/cookies.txt", "w", encoding="utf-8") as file:
         file.write(raw_content)
