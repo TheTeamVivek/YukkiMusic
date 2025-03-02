@@ -22,7 +22,7 @@ class Track:
     thumb: str
     duration: int  # duration in seconds
     streamtype: SourceType
-    video: bool # The song is audio or video 
+    video: bool  # The song is audio or video
     by: str | None = None  # None but required
     download_url: str | None = (
         None  # If provided directly used to download instead self.link
@@ -71,8 +71,9 @@ class Track:
         if await is_on_off(YTDOWNLOADER):
             ytdl_opts = {
                 "format": (
- "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])"
-                if self.video else "bestaudio/best"
+                    "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])"
+                    if self.video
+                    else "bestaudio/best"
                 ),
                 "continuedl": True,
                 "outtmpl": "downloads/%(id)s.%(ext)s",
@@ -111,7 +112,7 @@ class Track:
             return await _download()
 
         else:
-            format_code ="b" if self.video else  "bestaudio/best"   # Keep "b" not "best"
+            format_code = "b" if self.video else "bestaudio/best"  # Keep "b" not "best"
             command = f'yt-dlp -g -f "{format_code}" {"--cookies " + cookies() if self.is_youtube else ""} "{url}"'
             process = await asyncio.create_subprocess_shell(
                 command,
