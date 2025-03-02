@@ -23,33 +23,45 @@ class Track:
     duration: int  # duration in seconds
     streamtype: SourceType
     by: str | None = None  # None but required
-    download_url: str | None = None
+    download_url: str | None = None # If provided directly used to download instead self.link
 
-    is_live: bool | None = (
-        None  # if True and duration or title is None it Means index or m3u8 playback else Normal live
-    )
+    is_live: bool | None = None
     vidid: str | None = None
     file_path: str | None = None
-    streamable_url: str | None = None
 
     def __post_init__(self):
         if self.is_youtube:
             pattern = r"(?:v=|\/)([0-9A-Za-z_-]{11})"
             url = self.download_url if self.download_url else self.link
-            match = re.search(pattern, url)
-            self.vidid = match.group(1) if match else None
+            p_match = re.search(pattern, url)
+            self.vidid = p_match.group(1)
         else:
             self.vidid = self.streamtype.value
 
-    @property
-    def is_exists(self):
-        return bool(self.file_path and os.path.exists(self.file_path))
+    async def is_exists(self):
+        exists = False
+
+        if self.file_path:
+            if await is_on_off(YTDOWNLOADER):
+                exists = os.path.exists(self.file_path)
+            else:
+                exists = len(self.file_path) > 30
+
+        return exists
 
     @property
     def is_youtube(self) -> bool:
         url = self.download_url if self.download_url else self.link
         return "youtube.com" in url or "youtu.be" in url
 
+    @property
+    def is_telegram(self) -> bool:
+        return self.streamtype == SourceType.TELEGRAM
+
+    @property
+    def is_m3u8(self) -> bool:
+        return bool(self.is_live and self.title is None and self.duration is None)
+    
     async def download(self, audio: bool = True, options: dict | None = None):
         url = self.download_url if self.download_url else self.link
 
@@ -71,7 +83,7 @@ class Track:
             }
 
             if self.is_youtube:
-                ytdl_opts["cookiefile"] = "cookies/cookies.txt"
+                ytdl_opts["cookiefile"] = cookies()
 
             if options:
                 if isinstance(options, dict):
@@ -98,8 +110,7 @@ class Track:
 
         else:
             format_code = "bestaudio/best" if audio else "b"  # Keep "b" not "best"
-            command = f'yt-dlp -g -f "{format_code}" {"--cookies cookies/cookies.txt" if self.is_youtube else ""} "{url}"'
-
+            command = f'yt-dlp -g -f "{format_code}" {"--cookies " + cookies() if self.is_youtube else ""} "{url}"'
             process = await asyncio.create_subprocess_shell(
                 command,
                 stdout=asyncio.subprocess.PIPE,
@@ -108,16 +119,13 @@ class Track:
             stdout, stderr = await process.communicate()
 
             if stdout:
-                self.streamable_url = stdout.decode().strip()
-                return self.streamable_url
+                self.file_path = stdout.decode().strip()
+                return self.file_path
             else:
-                raise Exception(
-                    f"Failed to get streamable URL: {stderr.decode().strip()}"
-                )
+                raise Exception(f"Failed to get file path: {stderr.decode().strip()}")
 
     async def __call__(self, audio: bool = True):
-        return self.file_path or self.streamable_url or await self.download(audio)
-
+        return self.file_path or await self.download(audio)
 
 @alru_cache(maxsize=None)
 async def search(query):
