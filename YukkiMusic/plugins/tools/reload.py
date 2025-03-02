@@ -27,7 +27,7 @@ from YukkiMusic.utils.formatters import alpha_to_int
 @language
 async def reload_admin_cache(client, message: Message, _):
     try:
-        chat_id = message.chat.id
+        chat_id = event.chat_id
         admins = app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS)
         authusers = await get_authuser_names(chat_id)
         adminlist[chat_id] = []

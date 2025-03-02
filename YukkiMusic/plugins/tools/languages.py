@@ -49,7 +49,7 @@ def lanuages_keyboard(_):
 async def langs_command(client, message: Message, _):
     keyboard = lanuages_keyboard(_)
     await event.reply(
-        _["setting_1"].format(message.chat.title, message.chat.id),
+        _["setting_1"].format(message.chat.title, event.chat_id),
         buttons=keyboard,
     )
 
@@ -69,7 +69,7 @@ async def lanuagecb(client, CallbackQuery, _):
 @actual_admin_cb
 async def language_markup(client, CallbackQuery, _):
     langauge = (CallbackQuery.data).split(":")[1]
-    old = await get_lang(CallbackQuery.message.chat.id)
+    old = await get_lang(CallbackQuery.event.chat_id)
     if str(old) == str(langauge):
         return await CallbackQuery.answer(
             "You are already using same language", show_alert=True
@@ -84,6 +84,6 @@ async def language_markup(client, CallbackQuery, _):
             "Failed to change language or language in under Upadte",
             show_alert=True,
         )
-    await set_lang(CallbackQuery.message.chat.id, langauge)
+    await set_lang(CallbackQuery.event.chat_id, langauge)
     keyboard = lanuages_keyboard(_)
     return await CallbackQuery.edit_message_reply_markup(buttons=keyboard)

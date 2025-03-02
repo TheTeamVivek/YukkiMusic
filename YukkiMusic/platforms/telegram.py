@@ -65,7 +65,7 @@ class Telegram:
         if message.chat.username:
             link = f"https://t.me/{message.chat.username}/{message.reply_to_message.id}"
         else:
-            xf = str(message.chat.id)[4:]
+            xf = str(event.chat_id)[4:]
             link = f"https://t.me/c/{xf}/{message.reply_to_message.id}"
         return link
 
@@ -219,7 +219,7 @@ class Telegram:
             await mystic.edit(_["OVERLOAD_WAIT_MSG"].format(eta))
             return False
 
-        task = asyncio.create_task(down_load(), name=f"download_{message.chat.id}")
+        task = asyncio.create_task(down_load(), name=f"download_{event.chat_id}")
         lyrical[mystic.id] = task
         await task
         downloaded = downloader.get(message.id)

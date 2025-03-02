@@ -33,7 +33,7 @@ from YukkiMusic.utils.stream.stream import stream
 @app.on_message(command("PLAYLIST_COMMAND") & ~BANNED_USERS)
 @language
 async def check_playlist(client, message: Message, _):
-    _playlist = await get_playlist_names(message.from_user.id)
+    _playlist = await get_playlist_names(event.sender_id)
     if _playlist:
         get = await event.reply(_["playlist_2"])
     else:
@@ -41,7 +41,7 @@ async def check_playlist(client, message: Message, _):
     msg = _["playlist_4"]
     count = 0
     for ptlist in _playlist:
-        _note = await get_playlist(message.from_user.id, ptlist)
+        _note = await get_playlist(event.sender_id, ptlist)
         title = _note["title"]
         title = title.title()
         duration = _note["duration"]
@@ -126,12 +126,12 @@ async def get_keyboard(_, user_id):
 @app.on_message(command("DELETE_PLAYLIST_COMMAND") & filters.private & ~BANNED_USERS)
 @language
 async def del_plist_msg(client, message: Message, _):
-    _playlist = await get_playlist_names(message.from_user.id)
+    _playlist = await get_playlist_names(event.sender_id)
     if _playlist:
         get = await event.reply(_["playlist_2"])
     else:
         return await event.reply(_["playlist_3"])
-    keyboard, count = await get_keyboard(_, message.from_user.id)
+    keyboard, count = await get_keyboard(_, event.sender_id)
     await get.edit(_["playlist_7"].format(count), buttons=keyboard)
 
 
@@ -150,7 +150,7 @@ async def play_playlist(client, CallbackQuery, _):
             )
         except Exception:
             return
-    chat_id = CallbackQuery.message.chat.id
+    chat_id = CallbackQuery.event.chat_id
     user_name = CallbackQuery.from_user.first_name
     await CallbackQuery.message.delete()
     result = []
@@ -170,7 +170,7 @@ async def play_playlist(client, CallbackQuery, _):
             result,
             chat_id,
             user_name,
-            CallbackQuery.message.chat.id,
+            CallbackQuery.event.chat_id,
             video,
             streamtype="playlist",
         )
@@ -187,7 +187,7 @@ async def play_playlist(client, CallbackQuery, _):
 @language
 async def play_playlist_command(client, message, _):
     mode = message.command[0][0]
-    user_id = message.from_user.id
+    user_id = event.sender_id
     _playlist = await get_playlist_names(user_id)
     if not _playlist:
         try:
@@ -198,7 +198,7 @@ async def play_playlist_command(client, message, _):
         except Exception:
             return
 
-    chat_id = message.chat.id
+    chat_id = event.chat_id
     user_name = message.from_user.first_name
 
     try:
@@ -221,7 +221,7 @@ async def play_playlist_command(client, message, _):
             result,
             chat_id,
             user_name,
-            message.chat.id,
+            event.chat_id,
             video,
             streamtype="playlist",
         )
@@ -254,7 +254,7 @@ async def add_playlist(client, message: Message, _):
                         "title": video["title"],
                         "duration": video["duration"],
                     }
-                    user_id = message.from_user.id
+                    user_id = event.sender_id
                     await save_playlist(user_id, video["id"], video_info)
 
         except Exception as e:
@@ -262,12 +262,12 @@ async def add_playlist(client, message: Message, _):
                 f"Looking like not a valid youtube playlist url or\nPlaylist created by YouTube Not Supported"
             )
 
-        user_id = message.from_user.id
+        user_id = event.sender_id
         await adding.delete()
         return await event.reply(_["playlist_20"])
     else:
         try:
-            user_id = message.from_user.id
+            user_id = event.sender_id
             _check = await get_playlist(user_id, videoid)
             if _check:
                 try:

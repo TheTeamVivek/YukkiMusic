@@ -361,7 +361,7 @@ async def song_download_cb(client, CallbackQuery, _):
         await mystic.edit(_["song_11"])
 
         await app.send_chat_action(
-            chat_id=CallbackQuery.message.chat.id,
+            chat_id=CallbackQuery.event.chat_id,
             action=enums.ChatAction.UPLOAD_VIDEO,
         )
 
@@ -404,7 +404,7 @@ async def song_download_cb(client, CallbackQuery, _):
         await mystic.edit(_["song_11"])
 
         await app.send_chat_action(
-            chat_id=CallbackQuery.message.chat.id,
+            chat_id=CallbackQuery.event.chat_id,
             action=enums.ChatAction.UPLOAD_AUDIO,
         )
 

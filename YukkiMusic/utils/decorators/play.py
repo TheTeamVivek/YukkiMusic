@@ -34,7 +34,7 @@ links = {}
 
 def play_wrapper(command):
     async def wrapper(client, message):
-        language = await get_lang(message.chat.id)
+        language = await get_lang(event.chat_id)
         _ = get_string(language)
         if message.sender_chat:
             upl = InlineKeyboardMarkup(
@@ -50,18 +50,18 @@ def play_wrapper(command):
             return await event.reply(_["ANONYMOUS_ADMIN"], buttons=upl)
 
         if await is_maintenance() is False:
-            if message.from_user.id not in SUDOERS:
+            if event.sender_id not in SUDOERS:
                 return
 
         if PRIVATE_BOT_MODE == str(True):
-            if not await is_served_private_chat(message.chat.id):
+            if not await is_served_private_chat(event.chat_id):
                 await event.reply(
                     "**PRIVATE MUSIC BOT**\n\n"
                     "Only For Authorized chats from the owner"
                     "ask my owner to allow your chat first."
                 )
-                return await app.leave_chat(message.chat.id)
-        if await is_commanddelete_on(message.chat.id):
+                return await app.leave_chat(event.chat_id)
+        if await is_commanddelete_on(event.chat_id):
             try:
                 await message.delete()
             except Exception:
@@ -89,7 +89,7 @@ def play_wrapper(command):
                     buttons=InlineKeyboardMarkup(buttons),
                 )
         if message.command[0][0] == "c":
-            chat_id = await get_cmode(message.chat.id)
+            chat_id = await get_cmode(event.chat_id)
             if chat_id is None:
                 return await event.reply(_["setting_12"])
             try:
@@ -98,7 +98,7 @@ def play_wrapper(command):
                 return await event.reply(_["cplay_4"])
             channel = chat.title
         else:
-            chat_id = message.chat.id
+            chat_id = event.chat_id
             channel = None
         try:
             is_call_active = (await app.get_chat(chat_id)).is_call_active
@@ -109,15 +109,15 @@ def play_wrapper(command):
         except Exception:
             pass
 
-        playmode = await get_playmode(message.chat.id)
-        playty = await get_playtype(message.chat.id)
+        playmode = await get_playmode(event.chat_id)
+        playty = await get_playtype(event.chat_id)
         if playty != "Everyone":
-            if message.from_user.id not in SUDOERS:
-                admins = adminlist.get(message.chat.id)
+            if event.sender_id not in SUDOERS:
+                admins = adminlist.get(event.chat_id)
                 if not admins:
                     return await event.reply(_["admin_18"])
                 else:
-                    if message.from_user.id not in admins:
+                    if event.sender_id not in admins:
                         return await event.reply(_["play_4"])
         if message.command[0][0] == "v":
             video = True
@@ -133,7 +133,7 @@ def play_wrapper(command):
         else:
             fplay = None
         if await is_active_chat(chat_id):
-            userbot = await get_assistant(message.chat.id)
+            userbot = await get_assistant(event.chat_id)
             # Getting all members id that in voicechat
             try:
                 call_participants_id = [

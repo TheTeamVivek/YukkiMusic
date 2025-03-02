@@ -50,7 +50,7 @@ loop = asyncio.get_running_loop()
 @app.on_message(command("STATS_COMMAND") & ~BANNED_USERS)
 @language
 async def stats_global(client, message: Message, _):
-    upl = stats_buttons(_, True if message.from_user.id in SUDOERS else False)
+    upl = stats_buttons(_, True if event.sender_id in SUDOERS else False)
     await message.reply_photo(
         photo=config.STATS_IMG_URL,
         caption=_["gstats_11"].format(app.mention),
@@ -106,9 +106,9 @@ async def gstats_global(client, message: Message, _):
     ) = await Platform.youtube.track(videoid, True)
     title = title.title()
     final = f"Top played Tracks on  {app.mention}\n\n**Title:** {title}\n\nPlayed** {co} **times"
-    upl = get_stats_markup(_, True if message.from_user.id in SUDOERS else False)
+    upl = get_stats_markup(_, True if event.sender_id in SUDOERS else False)
     await app.send_photo(
-        message.chat.id,
+        event.chat_id,
         photo=thumbnail,
         caption=final,
         buttons=upl,
@@ -119,7 +119,7 @@ async def gstats_global(client, message: Message, _):
 @app.on_callback_query(filters.regex("GetStatsNow") & ~BANNED_USERS)
 @language
 async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
-    chat_id = CallbackQuery.message.chat.id
+    chat_id = CallbackQuery.event.chat_id
     callback_data = CallbackQuery.data.strip()
     what = callback_data.split(None, 1)[1]
     upl = back_stats_markup(_)

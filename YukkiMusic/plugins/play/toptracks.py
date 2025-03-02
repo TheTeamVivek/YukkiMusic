@@ -59,7 +59,7 @@ async def get_topz_playlists(client, CallbackQuery, _):
 @app.on_callback_query(filters.regex("SERVERTOP") & ~BANNED_USERS)
 @language
 async def server_to_play(client, CallbackQuery, _):
-    chat_id = CallbackQuery.message.chat.id
+    chat_id = CallbackQuery.event.chat_id
     user_name = CallbackQuery.from_user.first_name
     try:
         await CallbackQuery.answer()
@@ -123,7 +123,7 @@ async def server_to_play(client, CallbackQuery, _):
             details,
             chat_id,
             user_name,
-            CallbackQuery.message.chat.id,
+            CallbackQuery.event.chat_id,
             video=False,
             streamtype="playlist",
         )

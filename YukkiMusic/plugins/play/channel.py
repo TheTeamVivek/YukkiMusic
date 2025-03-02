@@ -24,7 +24,7 @@ from YukkiMusic.utils.decorators.admins import admin_actual
 @admin_actual
 async def playmode_(client, message: Message, _):
     try:
-        lang_code = await get_lang(message.chat.id)
+        lang_code = await get_lang(event.chat_id)
         CHANNELPLAY_COMMAND = get_command(lang_code)["CHANNELPLAY_COMMAND"]
     except Exception:
         CHANNELPLAY_COMMAND = get_command("en")["CHANNELPLAY_COMMAND"]
@@ -34,13 +34,13 @@ async def playmode_(client, message: Message, _):
         )
     query = message.text.split(None, 2)[1].lower().strip()
     if (str(query)).lower() == "disable":
-        await set_cmode(message.chat.id, None)
+        await set_cmode(event.chat_id, None)
         return await event.reply("Channel Play Disabled")
     elif str(query) == "linked":
-        chat = await app.get_chat(message.chat.id)
+        chat = await app.get_chat(event.chat_id)
         if chat.linked_chat:
             chat_id = chat.linked_chat.id
-            await set_cmode(message.chat.id, chat_id)
+            await set_cmode(event.chat_id, chat_id)
             return await event.reply(
                 _["cplay_3"].format(chat.linked_chat.title, chat.linked_chat.id)
             )
@@ -67,7 +67,7 @@ async def playmode_(client, message: Message, _):
         except ChatAdminRequired:
             return await event.reply(_["cplay_4"])
 
-        if creatorid != message.from_user.id:
+        if creatorid != event.sender_id:
             return await event.reply(_["cplay_6"].format(chat.title, creatorusername))
-        await set_cmode(message.chat.id, chat.id)
+        await set_cmode(event.chat_id, chat.id)
         return await event.reply(_["cplay_3"].format(chat.title, chat.id))

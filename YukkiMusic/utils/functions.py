@@ -213,7 +213,7 @@ async def extract_user_and_reason(message, sender_chat=False):
             if not reply.from_user:
                 if (
                     reply.sender_chat
-                    and reply.sender_chat != message.chat.id
+                    and reply.sender_chat != event.chat_id
                     and sender_chat
                 ):
                     id_ = reply.sender_chat.id

@@ -21,17 +21,17 @@ async def play_logs(message, streamtype):
         logger_text = f"""
 **{tbot.mention} Play Log**
 
-**Chat ID:** `{message.chat.id}`
+**Chat ID:** `{event.chat_id}`
 **Chat Name:** {message.chat.title}
 **Chat Username:** {chatusername}
 
-**User ID:** `{message.from_user.id}`
+**User ID:** `{event.sender_id}`
 **Name:** {message.from_user.mention}
 **Username:** @{message.from_user.username}
 
 **Query:** {message.text.split(None, 1)[1]}
 **Stream Type:** {streamtype}"""
-        if message.chat.id != LOG_GROUP_ID:
+        if event.chat_id != LOG_GROUP_ID:
             try:
                 await tbot.send_message(
                     entity=LOG_GROUP_ID,

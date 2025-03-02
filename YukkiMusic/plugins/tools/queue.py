@@ -54,7 +54,7 @@ def get_duration(playing):
 @language
 async def ping_com(client, message: Message, _):
     if message.command[0][0] == "c":
-        chat_id = await get_cmode(message.chat.id)
+        chat_id = await get_cmode(event.chat_id)
         if chat_id is None:
             return await event.reply(_["setting_12"])
         try:
@@ -63,7 +63,7 @@ async def ping_com(client, message: Message, _):
             return await event.reply(_["cplay_4"])
         cplay = True
     else:
-        chat_id = message.chat.id
+        chat_id = event.chat_id
         cplay = False
     if not await is_active_chat(chat_id):
         return await event.reply(_["NO_ACTIVE_VIDEO_STREAM"])

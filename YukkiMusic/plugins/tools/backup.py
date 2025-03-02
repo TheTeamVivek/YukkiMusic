@@ -58,7 +58,7 @@ async def edit_or_reply(mystic, text):
 
 @app.on_message(filters.command("export") & ~BANNED_USERS)
 async def export_database(client, message):
-    if message.from_user.id not in OWNER_ID:
+    if event.sender_id not in OWNER_ID:
         return
     if MONGO_DB_URI is None:
         return await event.reply(
@@ -82,7 +82,7 @@ async def export_database(client, message):
         try:
 
             await app.send_document(
-                message.chat.id, file_path, caption=f"MᴏɴɢᴏDB ʙᴀᴄᴋᴜᴘ ᴅᴀᴛᴀ ғᴏʀ {db_name}"
+                event.chat_id, file_path, caption=f"MᴏɴɢᴏDB ʙᴀᴄᴋᴜᴘ ᴅᴀᴛᴀ ғᴏʀ {db_name}"
             )
         except FloodWait as e:
             await asyncio.sleep(e.value)
@@ -110,7 +110,7 @@ async def export_database(client, message):
     file_path = await ex_port(db, DB_NAME)
     try:
         await app.send_document(
-            message.chat.id,
+            event.chat_id,
             file_path,
             caption=f"Mongo Backup of {app.mention}. You can import This in a new mongodb instance by replying /import",
             progress=progress,
@@ -123,7 +123,7 @@ async def export_database(client, message):
 
 @app.on_message(filters.command("import") & ~BANNED_USERS)
 async def import_database(client, message):
-    if message.from_user.id not in OWNER_ID:
+    if event.sender_id not in OWNER_ID:
         return
     if MONGO_DB_URI is None:
         return await event.reply(

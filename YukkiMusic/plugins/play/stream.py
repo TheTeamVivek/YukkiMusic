@@ -54,11 +54,11 @@ async def stream_command(
             await stream(
                 _,
                 mystic,
-                message.from_user.id,
+                event.sender_id,
                 url,
                 chat_id,
                 message.from_user.first_name,
-                message.chat.id,
+                event.chat_id,
                 video=True,
                 streamtype="index",
             )

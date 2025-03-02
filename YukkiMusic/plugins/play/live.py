@@ -56,7 +56,7 @@ async def play_live_stream(client, CallbackQuery, _):
                 details,
                 chat_id,
                 user_name,
-                CallbackQuery.message.chat.id,
+                CallbackQuery.event.chat_id,
                 video,
                 streamtype="live",
                 forceplay=ffplay,

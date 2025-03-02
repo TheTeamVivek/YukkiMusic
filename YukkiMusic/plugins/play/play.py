@@ -58,7 +58,7 @@ async def play_commnd(
     slider = None
     plist_type = None
     spotify = None
-    user_id = message.from_user.id
+    user_id = event.sender_id
     user_name = message.from_user.mention
     audio_telegram = (
         (message.reply_to_message.audio or message.reply_to_message.voice)
@@ -98,7 +98,7 @@ async def play_commnd(
                     details,
                     chat_id,
                     user_name,
-                    message.chat.id,
+                    event.chat_id,
                     streamtype="telegram",
                     forceplay=fplay,
                 )
@@ -113,7 +113,7 @@ async def play_commnd(
             return await mystic.delete()
         return
     elif video_telegram:
-        if not await is_video_allowed(message.chat.id):
+        if not await is_video_allowed(event.chat_id):
             return await mystic.edit(_["play_3"])
         if message.reply_to_message.document:
             try:
@@ -145,7 +145,7 @@ async def play_commnd(
                     details,
                     chat_id,
                     user_name,
-                    message.chat.id,
+                    event.chat_id,
                     video=True,
                     streamtype="telegram",
                     forceplay=fplay,
@@ -316,7 +316,7 @@ async def play_commnd(
                     details,
                     chat_id,
                     user_name,
-                    message.chat.id,
+                    event.chat_id,
                     streamtype=streamtype,
                     forceplay=fplay,
                 )
@@ -351,7 +351,7 @@ async def play_commnd(
                     details,
                     chat_id,
                     user_name,
-                    message.chat.id,
+                    event.chat_id,
                     streamtype="soundcloud",
                     forceplay=fplay,
                 )
@@ -373,11 +373,11 @@ async def play_commnd(
                 await stream(
                     _,
                     mystic,
-                    message.from_user.id,
+                    event.sender_id,
                     url,
                     chat_id,
                     message.from_user.first_name,
-                    message.chat.id,
+                    event.chat_id,
                     video=video,
                     streamtype="index",
                     forceplay=fplay,
@@ -438,7 +438,7 @@ async def play_commnd(
                 details,
                 chat_id,
                 user_name,
-                message.chat.id,
+                event.chat_id,
                 video=video,
                 streamtype=streamtype,
                 spotify=spotify,
@@ -464,7 +464,7 @@ async def play_commnd(
             buttons = playlist_markup(
                 _,
                 ran_hash,
-                message.from_user.id,
+                event.sender_id,
                 plist_type,
                 "c" if channel else "g",
                 "f" if fplay else "d",
@@ -481,7 +481,7 @@ async def play_commnd(
                 buttons = slider_markup(
                     _,
                     track_id,
-                    message.from_user.id,
+                    event.sender_id,
                     query,
                     0,
                     "c" if channel else "g",
@@ -501,7 +501,7 @@ async def play_commnd(
                 buttons = track_markup(
                     _,
                     track_id,
-                    message.from_user.id,
+                    event.sender_id,
                     "c" if channel else "g",
                     "f" if fplay else "d",
                 )

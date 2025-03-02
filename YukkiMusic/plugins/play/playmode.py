@@ -26,17 +26,17 @@ from YukkiMusic.utils.inline.settings import playmode_users_markup
 @app.on_message(command("PLAYMODE_COMMAND") & filters.group & ~BANNED_USERS)
 @language
 async def playmode_(client, message: Message, _):
-    playmode = await get_playmode(message.chat.id)
+    playmode = await get_playmode(event.chat_id)
     if playmode == "Direct":
         Direct = True
     else:
         Direct = None
-    is_non_admin = await is_nonadmin_chat(message.chat.id)
+    is_non_admin = await is_nonadmin_chat(event.chat_id)
     if not is_non_admin:
         Group = True
     else:
         Group = None
-    playty = await get_playtype(message.chat.id)
+    playty = await get_playtype(event.chat_id)
     if playty == "Everyone":
         Playtype = None
     else:
