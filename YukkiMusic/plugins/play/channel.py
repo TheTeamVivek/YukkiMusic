@@ -40,6 +40,7 @@ async def playmode_(language, _):
         chat = (await tbot(GetFullChannelRequest(channel=chat.id))).full_chat
         if chat.linked_chat_id:
             chat_id = chat.linked_chat_id
+            chat_id = int(f"-100{chat_id}")
             linked_chat = await tbot.get_entity(chat_id)
             await set_cmode(event.chat_id, chat_id)
             return await event.reply(
@@ -53,10 +54,10 @@ async def playmode_(language, _):
         except Exception:
             return await event.reply(_["cplay_4"])
         if isinstance(chat, Channel):
-        	if chat.megagroup
+            if chat.megagroup:
                 return await event.reply(_["cplay_5"])
         else:
-        	return await event.reply(_["cplay_5"])
+            return await event.reply(_["cplay_5"])
         try:
         	creator, status = await tbot.get_chat_member(chat.id, event.sender_id)
         except Exception:
