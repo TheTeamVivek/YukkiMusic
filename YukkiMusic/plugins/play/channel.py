@@ -15,59 +15,54 @@ from pyrogram.types import Message
 
 from config import BANNED_USERS
 from strings import command, get_command
-from YukkiMusic import app
+from YukkiMusic import tbot
 from YukkiMusic.utils.database import get_lang, set_cmode
 from YukkiMusic.utils.decorators.admins import admin_actual
 
-
-@app.on_message(command("CHANNELPLAY_COMMAND") & filters.group & ~BANNED_USERS)
+from telethon.tl.functions.channels import GetFullChannelRequest
+from telethon.tl.types import Channel
+from telethon.tl.types import ChannelParticipantsAdmins
+from telethon.tl.types import ChannelParticipantCreator
+@tbot.on_message(flt.command("CHANNELPLAY_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS))
 @admin_actual
-async def playmode_(client, message: Message, _):
-    try:
-        lang_code = await get_lang(event.chat_id)
-        CHANNELPLAY_COMMAND = get_command(lang_code)["CHANNELPLAY_COMMAND"]
-    except Exception:
-        CHANNELPLAY_COMMAND = get_command("en")["CHANNELPLAY_COMMAND"]
-    if len(message.command) < 2:
+async def playmode_(language, _):
+	chat = await event.get_chat()
+    if len(event.message.text.split()) < 2:
         return await event.reply(
-            _["cplay_1"].format(message.chat.title, CHANNELPLAY_COMMAND[0])
+            _["cplay_1"].format(chat.title, _["CHANNELPLAY_COMMAND"][0])
         )
-    query = message.text.split(None, 2)[1].lower().strip()
+    query = event.message.text.split(None, 2)[1].lower().strip()
     if (str(query)).lower() == "disable":
         await set_cmode(event.chat_id, None)
         return await event.reply("Channel Play Disabled")
+        
     elif str(query) == "linked":
-        chat = await app.get_chat(event.chat_id)
-        if chat.linked_chat:
-            chat_id = chat.linked_chat.id
+        chat = (await tbot(GetFullChannelRequest(channel=chat.id))).full_chat
+        if chat.linked_chat_id:
+            chat_id = chat.linked_chat_id
+            linked_chat = await tbot.get_entity(chat_id)
             await set_cmode(event.chat_id, chat_id)
             return await event.reply(
-                _["cplay_3"].format(chat.linked_chat.title, chat.linked_chat.id)
+                _["cplay_3"].format(linked_chat.title, linked_chat.id)
             )
         else:
             return await event.reply(_["cplay_2"])
     else:
         try:
-            chat = await app.get_chat(query)
+            chat = await tbot.get_entity(query)
         except Exception:
             return await event.reply(_["cplay_4"])
-        if chat.type != ChatType.CHANNEL:
-            return await event.reply(_["cplay_5"])
+        if isinstance(chat, Channel):
+        	if chat.megagroup
+                return await event.reply(_["cplay_5"])
+        else:
+        	return await event.reply(_["cplay_5"])
         try:
-            admins = app.get_chat_members(
-                chat.id, filter=ChatMembersFilter.ADMINISTRATORS
-            )
+        	creator, status = await tbot.get_chat_member(chat.id, event.sender_id)
         except Exception:
-            return await event.reply(_["cplay_4"])
-        try:
-            async for users in admins:
-                if users.status == ChatMemberStatus.OWNER:
-                    creatorusername = users.user.username
-                    creatorid = users.user.id
-        except ChatAdminRequired:
             return await event.reply(_["cplay_4"])
 
-        if creatorid != event.sender_id:
-            return await event.reply(_["cplay_6"].format(chat.title, creatorusername))
+        if status != "OWNER":
+            return await event.reply(_["cplay_6"].format(chat.title, creator.username))
         await set_cmode(event.chat_id, chat.id)
         return await event.reply(_["cplay_3"].format(chat.title, chat.id))
