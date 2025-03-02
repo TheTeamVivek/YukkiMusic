@@ -23,7 +23,9 @@ class Track:
     duration: int  # duration in seconds
     streamtype: SourceType
     by: str | None = None  # None but required
-    download_url: str | None = None # If provided directly used to download instead self.link
+    download_url: str | None = (
+        None  # If provided directly used to download instead self.link
+    )
 
     is_live: bool | None = None
     vidid: str | None = None
@@ -61,7 +63,7 @@ class Track:
     @property
     def is_m3u8(self) -> bool:
         return bool(self.is_live and self.title is None and self.duration is None)
-    
+
     async def download(self, audio: bool = True, options: dict | None = None):
         url = self.download_url if self.download_url else self.link
 
@@ -126,6 +128,7 @@ class Track:
 
     async def __call__(self, audio: bool = True):
         return self.file_path or await self.download(audio)
+
 
 @alru_cache(maxsize=None)
 async def search(query):
