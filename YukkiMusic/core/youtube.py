@@ -136,15 +136,17 @@ async def search(query):
     try:
         results = VideosSearch(query, limit=1)
         for result in (await results.next())["result"]:
-            return {
-                "title": result["title"],
-                "link": result["link"],
-                "download_url": result["link"],
-                "duration": (
+            return Track(
+                title= result["title"],
+                link= result["link"],
+                download_url = result["link"],
+                duration =(
                     time_to_seconds(result["duration"]) if result["duration"] else 0
                 ),
-                "thumb": result["thumbnails"][0]["url"].split("?")[0],
-            }
+                thumb = result["thumbnails"][0]["url"].split("?")[0],
+                streamtype=None,
+                video=None
+            )
     except Exception:
         return await search_from_ytdlp(query)
 
@@ -176,4 +178,6 @@ def search_from_ytdlp(query):
             download_url=details["webpage_url"],
             duration=details["duration"],
             thumb=details["thumbnails"][0]["url"],
+            streamtype=None,
+            video=None
         )
