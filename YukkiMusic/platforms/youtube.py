@@ -135,13 +135,18 @@ class YouTube(YouTubeBase):
 
         playlist = await shell_cmd(cmd)
 
+        result = []
         try:
-            result = [
-                await search(self.base + key) for key in playlist.split("\n") if key
-            ]
+            for key in playlist.split("\n"):
+                if key:
+                    t = await search(self.base + key)
+                    t.streamtype = SourceType.YOUTUBE
+                    result.append(t)
         except Exception:
-            result = None
+            pass
         return result
 
     async def track(self, url: str):
-        return await search(url)
+        t = await search(url)
+        t.streamtype = SourceType.YOUTUBE
+        return t
