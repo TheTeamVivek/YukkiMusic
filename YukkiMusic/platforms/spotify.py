@@ -15,7 +15,7 @@ from async_lru import alru_cache
 
 import config
 
-from ..core.youtube import Track
+from ..core.youtube import SourceType, Track
 from .base import PlatformBase
 
 
@@ -47,6 +47,7 @@ class Spotify(PlatformBase):
                 info += fetched
         t = await search(info)
         t.link = link
+        t.streamtype = SourceType.SPOTIFY
         return t
 
     @alru_cache(maxsize=None)
@@ -63,6 +64,7 @@ class Spotify(PlatformBase):
                     info += fetched
             info = await search(info)
             info.link = url
+            info.streamtype = SourceType.SPOTIFY
             results.append(info)
         return results, playlist_id
 
@@ -79,6 +81,7 @@ class Spotify(PlatformBase):
                     info += fetched
             info = await search(info)
             info.link = url
+            info.streamtype = SourceType.SPOTIFY
             results.append(info)
         return results, album_id
 
@@ -96,5 +99,6 @@ class Spotify(PlatformBase):
                     info += fetched
             info = await search(info)
             info.link = url
+            info.streamtype = SourceType.SPOTIFY
             results.append(info)
         return results, artist_id
