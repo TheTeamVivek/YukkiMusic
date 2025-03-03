@@ -13,7 +13,7 @@ from yt_dlp import YoutubeDL
 from YukkiMusic.utils.decorators import asyncify
 
 from ..core.request import Request
-from ..core.youtube import Track
+from ..core.youtube import SourceType, Track
 from .base import PlatformBase
 
 
@@ -53,7 +53,7 @@ class Saavn(PlatformBase):
                     track = Track(
                         title=entry["title"],
                         duration=duration_sec,
-                        thumb=entry.get("thumbnail", ""),
+                        thumb=entry.get("thumbnail", None),
                         link=entry["webpage_url"],
                     )
                     tracks.append(track)
