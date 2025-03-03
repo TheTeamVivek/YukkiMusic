@@ -15,17 +15,14 @@ from datetime import datetime, timedelta
 
 import aiohttp
 from pyrogram.enums import MessageEntityType
+from pyrogram.file_id import FileId, FileType, FileUniqueId, FileUniqueType
 from pyrogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     Message,
     Voice,
 )
-
-from datetime import datetime
 from telethon.tl import types
-from pyrogram.file_id import FileId, FileType, FileUniqueId, FileUniqueType
-
 
 from config import lyrical
 from YukkiMusic import app
@@ -119,28 +116,38 @@ class Telegram:
             file_name = os.path.join(os.path.realpath("downloads"), file_name)
         return file_name
 
-    def get_pyro_fileid(self, document: types.Document): # using Pyrogram for getting file_id with Telethon raw upadte
+    def get_pyro_fileid(
+        self, document: types.Document
+    ):  # using Pyrogram for getting file_id with Telethon raw upadte
         attributes = {type(attr): attr for attr in document.attributes}
 
-        if not any(attr in attributes for attr in (types.DocumentAttributeAudio, types.DocumentAttributeVideo)):
+        if not any(
+            attr in attributes
+            for attr in (types.DocumentAttributeAudio, types.DocumentAttributeVideo)
+        ):
             return None
 
-        file_name = getattr(attributes.get(types.DocumentAttributeFilename), "file_name", None) or \
-                    f"audio_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.mp3"
+        file_name = (
+            getattr(attributes.get(types.DocumentAttributeFilename), "file_name", None)
+            or f"audio_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.mp3"
+        )
 
-        file_type = FileType.AUDIO if types.DocumentAttributeAudio in attributes else FileType.VIDEO
+        file_type = (
+            FileType.AUDIO
+            if types.DocumentAttributeAudio in attributes
+            else FileType.VIDEO
+        )
 
         file_id = FileId(
             file_type=file_type,
             dc_id=document.dc_id,
             media_id=document.id,
             access_hash=document.access_hash,
-            file_reference=document.file_reference
+            file_reference=document.file_reference,
         ).encode()
 
         file_unique_id = FileUniqueId(
-            file_unique_type=FileUniqueType.DOCUMENT,
-            media_id=document.id
+            file_unique_type=FileUniqueType.DOCUMENT, media_id=document.id
         ).encode()
 
         return file_id, file_unique_id
