@@ -13,7 +13,7 @@ from yt_dlp import YoutubeDL
 from YukkiMusic.utils.decorators import asyncify
 
 from ..core.request import Request
-from ..core.youtube import SourceType, Track
+from ..core.youtube import Track
 from .base import PlatformBase
 
 
