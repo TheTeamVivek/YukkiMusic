@@ -75,20 +75,16 @@ class YukkiBot(Client):
                     user_id = message.from_user.id if message.from_user else "Unknown"
                     chat_id = message.chat.id if message.chat else "Unknown"
                     chat_username = f"@{message.chat.username}" if message.chat.username else "Private Group"
-                    command = (
-                        " ".join(message.command)
-                        if hasattr(message, "command")
-                        else message.text
-                    )
+                    command = message.text
                     error_trace = traceback.format_exc()
                     error_message = (
-                        f"**Error:** {type(e).__name__}\n"
-                        f"**Date:** {date_time}\n"
-                        f"**Chat ID:** {chat_id}\n"
-                        f"**Chat Username:** {chat_username}\n"
-                        f"**User ID:** {user_id}\n"
-                        f"**Command/Text:** {command}\n"
-                        f"**Traceback:**\n{error_trace}"
+                        f"<b>Error:</b> {type(e).__name__}\n"
+                        f"<b>Date:</b> {date_time}\n"
+                        f"<b>Chat ID:</b> {chat_id}\n"
+                        f"<b>Chat Username:</b> {chat_username}\n"
+                        f"<b>User ID:</b> {user_id}\n"
+                        f"<b>Command/Text:</b>\n<pre><code class=\"language-python\">{command}</code></pre>\n"
+                        f"<b>Traceback:</b>\n<pre><code class=\"language-python\">{error_trace}</code></pre>"
                     )
                     await self.send_message(config.LOG_GROUP_ID, error_message)
                     try:
