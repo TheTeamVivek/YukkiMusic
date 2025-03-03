@@ -56,7 +56,7 @@ class Saavn(PlatformBase):
                         thumb=entry.get("thumbnail", None),
                         link=entry["webpage_url"],
                         video=False,
-                        streamtype=SourceType.SAAVN
+                        streamtype=SourceType.SAAVN,
                     )
                     tracks.append(track)
                     count += 1
@@ -84,7 +84,7 @@ class Saavn(PlatformBase):
                 duration=info.get("duration", 0),
                 thumb=info.get("thumbnail", None),
                 video=False,
-                streamtype=SourceType.SAAVN
+                streamtype=SourceType.SAAVN,
             )
 
 
