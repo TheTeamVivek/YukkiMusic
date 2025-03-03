@@ -14,7 +14,7 @@ from async_lru import alru_cache
 from bs4 import BeautifulSoup
 
 from ..core.request import Request
-from ..core.youtube import Track, search, SourceType
+from ..core.youtube import SourceType, Track, search
 from .base import PlatformBase
 
 
