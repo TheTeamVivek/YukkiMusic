@@ -28,7 +28,7 @@ class Track:
         None  # If provided directly used to download instead self.link
     )
 
-    is_live: bool  = False
+    is_live: bool = False
     vidid: str | None = None
     file_path: str | None = None
 
