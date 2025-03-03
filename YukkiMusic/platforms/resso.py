@@ -14,7 +14,7 @@ from async_lru import alru_cache
 from bs4 import BeautifulSoup
 
 from ..core.request import Request
-from ..core.youtube import Track, search
+from ..core.youtube import Track, search, SourceType
 from .base import PlatformBase
 
 
@@ -45,4 +45,5 @@ class Resso(PlatformBase):
             return
         track = await search(title)
         track.link = url
+        track.streamtype = SourceType.RESSO
         return track
