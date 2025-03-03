@@ -12,7 +12,7 @@ from yt_dlp import YoutubeDL
 
 from YukkiMusic.utils.decorators import asyncify
 
-from ..core.youtube import Track
+from ..core.youtube import SourceType, Track
 from .base import PlatformBase
 
 
@@ -41,4 +41,6 @@ class SoundCloud(PlatformBase):
                 duration_sec=["duration"],
                 link=url,
                 thumb=info["thumbnails"][0]["url"] if info.get("thumbnails") else None,
+                video=False,
+                streamtype=SourceType.SOUNDCLOUD,
             )
