@@ -14,7 +14,7 @@ from async_lru import alru_cache
 from bs4 import BeautifulSoup
 
 from ..core.request import Request
-from ..core.youtube import Track, search
+from ..core.youtube import Track, search, SourceType
 from .base import PlatformBase
 
 
@@ -36,7 +36,9 @@ class Apple(PlatformBase):
                 song_name = tag.get("content", None)
         if song_name is None:
             return False
-        return await search(song_name)
+        t = await search(song_name)
+        t.streamtype = SourceType.APPLE
+        return t
 
     @alru_cache(maxsize=None)
     async def playlist(self, url, playid: bool | str = None) -> list[Track]:
@@ -55,5 +57,7 @@ class Apple(PlatformBase):
                 )
             except Exception:
                 xx = ((item["content"]).split("album/")[1]).split("/")[0]
-            results.append(await search(xx))
+            t = await search(xx)
+            t.streamtype = SourceType.APPLE
+            results.append(t)
         return results, playlist_id
