@@ -16,7 +16,8 @@ from yt_dlp import YoutubeDL
 from config import cookies
 from YukkiMusic.utils.decorators import asyncify
 
-from ..core.youtube import YouTube as YouTubeBase, SourceType
+from ..core.youtube import SourceType
+from ..core.youtube import YouTube as YouTubeBase
 
 
 async def shell_cmd(cmd):
