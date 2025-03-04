@@ -132,12 +132,13 @@ async def search(query):
     try:
         results = VideosSearch(query, limit=1)
         for result in (await results.next())["result"]:
+            duration = result.get("duration")
             return Track(
                 title=result["title"],
                 link=result["link"],
                 download_url=result["link"],
                 duration=(
-                    time_to_seconds(result["duration"]) if result["duration"] else 0
+                    time_to_seconds(duration) if duration else 0
                 ),
                 thumb=result["thumbnails"][0]["url"].split("?")[0],
                 streamtype=None,
