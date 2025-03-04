@@ -137,9 +137,7 @@ async def search(query):
                 title=result["title"],
                 link=result["link"],
                 download_url=result["link"],
-                duration=(
-                    time_to_seconds(duration) if duration else 0
-                ),
+                duration=(time_to_seconds(duration) if duration else 0),
                 thumb=result["thumbnails"][0]["url"].split("?")[0],
                 streamtype=None,
                 video=None,
