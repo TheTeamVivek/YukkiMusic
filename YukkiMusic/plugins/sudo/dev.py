@@ -161,8 +161,7 @@ async def forceclose_command(_, CallbackQuery):
 @app.on_message(filters.command("sh") & SUDOERS & ~filters.forwarded & ~filters.via_bot)
 async def shellrunner(_, message: Message):
     if len(message.command) < 2:
-        return await edit_or_reply(
-            message, text="<b>Give some commands like:</b>\n/sh git pull"
+        return await message.reply(text="<b>Give some commands like:</b>\n/sh git pull"
         )
 
     text = message.text.split(None, 1)[1]
