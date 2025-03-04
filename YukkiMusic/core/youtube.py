@@ -58,10 +58,6 @@ class Track:
         return "youtube.com" in url or "youtu.be" in url
 
     @property
-    def is_telegram(self) -> bool:
-        return self.streamtype == SourceType.TELEGRAM
-
-    @property
     def is_m3u8(self) -> bool:
         return bool(self.is_live and self.title is None and self.duration is None)
 
