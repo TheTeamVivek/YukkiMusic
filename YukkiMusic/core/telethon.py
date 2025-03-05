@@ -16,6 +16,7 @@ from telethon.errors import (
     MessageNotModifiedError,
     UserNotParticipantError,
 )
+from telethon.tl import types
 from telethon.tl.functions.bots import SetBotCommandsRequest
 from telethon.tl.functions.channels import GetParticipantRequest
 from telethon.tl.functions.messages import GetFullChatRequest
