@@ -27,14 +27,6 @@ from pyrogram.errors import (
     MessageNotModified,
 )
 from pyrogram.handlers import MessageHandler
-from pyrogram.types import (
-    BotCommand,
-    BotCommandScopeAllChatAdministrators,
-    BotCommandScopeAllGroupChats,
-    BotCommandScopeAllPrivateChats,
-    BotCommandScopeChat,
-    BotCommandScopeChatMember,
-)
 
 import config
 from YukkiMusic.utils.decorators.asyncify import asyncify
