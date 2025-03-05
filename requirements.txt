@@ -7,7 +7,7 @@ ffmpeg-python
 gitpython
 heroku3
 httpx[http2]
-kurigram==2.1.39
+kurigram==2.1.38
 lyricsgenius
 motor
 pykeyboard2
