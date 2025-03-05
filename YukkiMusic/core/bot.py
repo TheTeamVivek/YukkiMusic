@@ -137,11 +137,6 @@ class YukkiBot(Client):
             )
             logger(__name__).error("Error details:", exc_info=True)
             sys.exit()
-        if config.SET_CMDS == str(True):
-            try:
-                await self._set_default_commands()
-            except Exception:
-                logger(__name__).warning("Failed to set commands:", exc_info=True)
 
         try:
             a = await self.get_chat_member(config.LOG_GROUP_ID, "me")
@@ -151,81 +146,6 @@ class YukkiBot(Client):
         except Exception:
             pass
         logger(__name__).info("MusicBot started as %s", self.name)
-
-    async def _set_default_commands(self):
-        private_commands = [
-            BotCommand("start", "Start the bot"),
-            BotCommand("help", "Get the help menu"),
-            BotCommand("ping", "Check if the bot is alive or dead"),
-        ]
-        group_commands = [BotCommand("play", "Start playing requested song")]
-        admin_commands = [
-            BotCommand("play", "Start playing requested song"),
-            BotCommand("skip", "Move to next track in queue"),
-            BotCommand("pause", "Pause the current playing song"),
-            BotCommand("resume", "Resume the paused song"),
-            BotCommand("end", "Clear the queue and leave voice chat"),
-            BotCommand("shuffle", "Randomly shuffle the queued playlist"),
-            BotCommand("playmode", "Change the default playmode for your chat"),
-            BotCommand("settings", "Open bot settings for your chat"),
-        ]
-        owner_commands = [
-            BotCommand("update", "Update the bot"),
-            BotCommand("restart", "Restart the bot"),
-            BotCommand("logs", "Get logs"),
-            BotCommand("export", "Export all data of mongodb"),
-            BotCommand("import", "Import all data in mongodb"),
-            BotCommand("addsudo", "Add a user as a sudoer"),
-            BotCommand("delsudo", "Remove a user from sudoers"),
-            BotCommand("sudolist", "List all sudo users"),
-            BotCommand("log", "Get the bot logs"),
-            BotCommand("getvar", "Get a specific environment variable"),
-            BotCommand("delvar", "Delete a specific environment variable"),
-            BotCommand("setvar", "Set a specific environment variable"),
-            BotCommand("usage", "Get dyno usage information"),
-            BotCommand("maintenance", "Enable or disable maintenance mode"),
-            BotCommand("logger", "Enable or disable logging"),
-            BotCommand("block", "Block a user"),
-            BotCommand("unblock", "Unblock a user"),
-            BotCommand("blacklist", "Blacklist a chat"),
-            BotCommand("whitelist", "Whitelist a chat"),
-            BotCommand("blacklisted", "List all blacklisted chats"),
-            BotCommand("autoend", "Enable or disable auto end for streams"),
-            BotCommand("reboot", "Reboot the bot"),
-            BotCommand("restart", "Restart the bot"),
-        ]
-
-        await self.set_bot_commands(
-            private_commands, scope=BotCommandScopeAllPrivateChats()
-        )
-        await self.set_bot_commands(
-            group_commands, scope=BotCommandScopeAllGroupChats()
-        )
-        await self.set_bot_commands(
-            admin_commands, scope=BotCommandScopeAllChatAdministrators()
-        )
-
-        logger_id = (
-            f"@{config.LOG_GROUP_ID}"
-            if isinstance(config.LOG_GROUP_ID, str)
-            and not config.LOG_GROUP_ID.startswith("@")
-            else config.LOG_GROUP_ID
-        )
-
-        for owner_id in config.OWNER_ID:
-            try:
-                await self.set_bot_commands(
-                    owner_commands,
-                    scope=BotCommandScopeChatMember(
-                        chat_id=logger_id, user_id=owner_id
-                    ),
-                )
-                await self.set_bot_commands(
-                    private_commands + owner_commands,
-                    scope=BotCommandScopeChat(chat_id=owner_id),
-                )
-            except Exception:
-                pass
 
     @asyncify
     def load_plugin(self, file_path: str, base_dir: str, attrs: dict):
