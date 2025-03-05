@@ -33,7 +33,7 @@ from telethon.tl.types import (
 )
 
 from ..logging import logger
-
+import config
 log = logger(__name__)
 
 
@@ -137,6 +137,12 @@ class TelethonClient(TelegramClient):
         self.mention = self.create_mention(me)
         self.name = f"{me.first_name} {me.last_name or ''}".strip()
         # pylint: enable=attribute-defined-outside-init
+
+        if config.SET_CMDS:
+            try:
+                await self._set_default_commands()
+            except Exception:
+                log.warning("Failed to set commands:", exc_info=True)
 
     def on_message(self, func=None, *args, **kwargs):
         def decorator(function):
