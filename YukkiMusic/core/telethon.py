@@ -16,6 +16,7 @@ from telethon.errors import (
     MessageNotModifiedError,
     UserNotParticipantError,
 )
+from telethon.tl.functions.bots import SetBotCommandsRequest
 from telethon.tl.functions.channels import GetParticipantRequest
 from telethon.tl.functions.messages import GetFullChatRequest
 from telethon.tl.types import (
@@ -29,8 +30,6 @@ from telethon.tl.types import (
     InputPeerChat,
     User,
 )
-from telethon.tl.functions.bots import SetBotCommandsRequest
-from telethon.tl.types import BotCommand
 
 from ..logging import logger
 
@@ -188,7 +187,6 @@ class TelethonClient(TelegramClient):
             stderr=stderr.decode().strip() if stderr else None,
         )
 
-
     async def _set_default_commands(self):
         private_commands = [
             types.BotCommand("start", "Start the bot"),
@@ -235,9 +233,7 @@ class TelethonClient(TelegramClient):
         await self.set_bot_commands(
             private_commands, scope=types.BotCommandScopeUsers()
         )
-        await self.set_bot_commands(
-            group_commands, scope=types.BotCommandScopeChats()
-        )
+        await self.set_bot_commands(group_commands, scope=types.BotCommandScopeChats())
         await self.set_bot_commands(
             admin_commands, scope=types.BotCommandScopeChatAdmins()
         )
@@ -263,10 +259,12 @@ class TelethonClient(TelegramClient):
                 )
             except Exception:
                 pass
-                
+
     async def set_bot_commands(self, commands: list[types.BotCommand], scope):
-    	return await self(SetBotCommandsRequest(
-            scope=scope,
-            lang_code='en',
-            commands=commands,
-        ))
+        return await self(
+            SetBotCommandsRequest(
+                scope=scope,
+                lang_code="en",
+                commands=commands,
+            )
+        )
