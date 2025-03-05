@@ -64,10 +64,6 @@ SONG_DOWNLOAD_DURATION = int(
 # You'll need a Group ID or USERNAME for this.
 LOG_GROUP_ID = getenv("LOG_GROUP_ID", "").strip()
 
-# Check if it's a numeric ID (Telegram group/channel IDs start with -100)
-if LOG_GROUP_ID.lstrip("-").isdigit():
-    LOG_GROUP_ID = int(LOG_GROUP_ID)
-
 # Your User ID.
 OWNER_ID = list(
     map(int, getenv("OWNER_ID", "6815918609").split())
@@ -276,6 +272,10 @@ def seconds_to_time(seconds):
 DURATION_LIMIT = int(time_to_seconds(f"{DURATION_LIMIT_MIN}:00"))
 SONG_DOWNLOAD_DURATION_LIMIT = int(time_to_seconds(f"{SONG_DOWNLOAD_DURATION}:00"))
 
+# Check if LOG_GROUP_ID is a numeric ID 
+if LOG_GROUP_ID.isdigit():
+    LOG_GROUP_ID = int(LOG_GROUP_ID)
+    
 if SUPPORT_CHANNEL:
     if not re.match("(?:http|https)://", SUPPORT_CHANNEL):
         print(
