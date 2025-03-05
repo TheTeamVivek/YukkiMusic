@@ -32,8 +32,10 @@ from telethon.tl.types import (
     User,
 )
 
-from ..logging import logger
 import config
+
+from ..logging import logger
+
 log = logger(__name__)
 
 
