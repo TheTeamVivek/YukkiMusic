@@ -29,6 +29,8 @@ from telethon.tl.types import (
     InputPeerChat,
     User,
 )
+from telethon.tl.functions.bots import SetBotCommandsRequest
+from telethon.tl.types import BotCommand
 
 from ..logging import logger
 
@@ -185,3 +187,86 @@ class TelethonClient(TelegramClient):
             stdout=stdout.decode().strip() if stdout else None,
             stderr=stderr.decode().strip() if stderr else None,
         )
+
+
+    async def _set_default_commands(self):
+        private_commands = [
+            types.BotCommand("start", "Start the bot"),
+            types.BotCommand("help", "Get the help menu"),
+            types.BotCommand("ping", "Check if the bot is alive or dead"),
+        ]
+        group_commands = [types.BotCommand("play", "Start playing requested song")]
+        admin_commands = [
+            types.BotCommand("play", "Start playing requested song"),
+            types.BotCommand("skip", "Move to next track in queue"),
+            types.BotCommand("pause", "Pause the current playing song"),
+            types.BotCommand("resume", "Resume the paused song"),
+            types.BotCommand("end", "Clear the queue and leave voice chat"),
+            types.BotCommand("shuffle", "Randomly shuffle the queued playlist"),
+            types.BotCommand("playmode", "Change the default playmode for your chat"),
+            types.BotCommand("settings", "Open bot settings for your chat"),
+        ]
+        owner_commands = [
+            types.BotCommand("update", "Update the bot"),
+            types.BotCommand("restart", "Restart the bot"),
+            types.BotCommand("logs", "Get logs"),
+            types.BotCommand("export", "Export all data of mongodb"),
+            types.BotCommand("import", "Import all data in mongodb"),
+            types.BotCommand("addsudo", "Add a user as a sudoer"),
+            types.BotCommand("delsudo", "Remove a user from sudoers"),
+            types.BotCommand("sudolist", "List all sudo users"),
+            types.BotCommand("log", "Get the bot logs"),
+            types.BotCommand("getvar", "Get a specific environment variable"),
+            types.BotCommand("delvar", "Delete a specific environment variable"),
+            types.BotCommand("setvar", "Set a specific environment variable"),
+            types.BotCommand("usage", "Get dyno usage information"),
+            types.BotCommand("maintenance", "Enable or disable maintenance mode"),
+            types.BotCommand("logger", "Enable or disable logging"),
+            types.BotCommand("block", "Block a user"),
+            types.BotCommand("unblock", "Unblock a user"),
+            types.BotCommand("blacklist", "Blacklist a chat"),
+            types.BotCommand("whitelist", "Whitelist a chat"),
+            types.BotCommand("blacklisted", "List all blacklisted chats"),
+            types.BotCommand("autoend", "Enable or disable auto end for streams"),
+            types.BotCommand("reboot", "Reboot the bot"),
+            types.BotCommand("restart", "Restart the bot"),
+        ]
+
+        await self.set_bot_commands(
+            private_commands, scope=types.BotCommandScopeUsers()
+        )
+        await self.set_bot_commands(
+            group_commands, scope=types.BotCommandScopeChats()
+        )
+        await self.set_bot_commands(
+            admin_commands, scope=types.BotCommandScopeChatAdmins()
+        )
+
+        logger_id = (
+            f"@{config.LOG_GROUP_ID}"
+            if isinstance(config.LOG_GROUP_ID, str)
+            and not config.LOG_GROUP_ID.startswith("@")
+            else config.LOG_GROUP_ID
+        )
+
+        for owner_id in config.OWNER_ID:
+            try:
+                await self.set_bot_commands(
+                    owner_commands,
+                    scope=types.BotCommandScopePeerUser(
+                        peer=logger_id, user_id=owner_id
+                    ),
+                )
+                await self.set_bot_commands(
+                    private_commands + owner_commands,
+                    scope=types.BotCommandScopePeer(peer=owner_id),
+                )
+            except Exception:
+                pass
+                
+    async def set_bot_commands(self, commands: list[types.BotCommand], scope):
+    	return await self(SetBotCommandsRequest(
+            scope=scope,
+            lang_code='en',
+            commands=commands,
+        ))
