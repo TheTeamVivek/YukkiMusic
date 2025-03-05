@@ -61,9 +61,12 @@ SONG_DOWNLOAD_DURATION = int(
 )  # Remember to give value in Minutes
 
 
-# You'll need a Group ID for this.
-LOG_GROUP_ID = getenv("LOG_GROUP_ID", "")
+# You'll need a Group ID or USERNAME for this.
+LOG_GROUP_ID = getenv("LOG_GROUP_ID", "").strip()
 
+# Check if it's a numeric ID (Telegram group/channel IDs start with -100)
+if LOG_GROUP_ID.lstrip("-").isdigit():
+    LOG_GROUP_ID = int(LOG_GROUP_ID)
 
 # Your User ID.
 OWNER_ID = list(
