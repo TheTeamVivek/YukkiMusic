@@ -30,14 +30,6 @@ app = YukkiBot(
 
 userbot = Userbot()
 
-for i, session in enumerate(config.STRING_SESSIONS, start=1):
-    userbot.add(
-        f"YukkiString{i}",
-        api_id=config.API_ID,
-        api_hash=config.API_HASH,
-        session_string=session.strip(),
-    )
-
 # Directories
 dirr()
 
