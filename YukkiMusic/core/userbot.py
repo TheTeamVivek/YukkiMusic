@@ -34,12 +34,16 @@ assistantids = []
 
 class Userbot(Client):
     def __init__(self):
-        self.clients = []
+        self.clients = [
+            Client(
+                f"YukkiString_{i}",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=session.strip(),
+            )
+            for i, session in enumerate(config.STRING_SESSIONS, start=1)
+        ]
         self.handlers = []
-
-    def add(self, *args, **kwargs):
-        """Add a new client to the Userbot."""
-        self.clients.append(Client(*args, **kwargs))
 
     async def _start(self, client, index):
         LOGGER(__name__).info(f"Starting Assistant Client {index}")
