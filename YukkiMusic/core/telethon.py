@@ -1,3 +1,13 @@
+#
+# Copyright (C) 2024-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+#
+# This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
+# and is released under the MIT License.
+# Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
+#
+# All rights reserved.
+#
+
 import asyncio
 import inspect
 import traceback
@@ -7,31 +17,7 @@ from datetime import datetime
 from functools import wraps
 
 from telethon import TelegramClient, errors, events
-from telethon.errors import (
-    ChatSendMediaForbiddenError,
-    ChatSendPhotosForbiddenError,
-    ChatWriteForbiddenError,
-    FloodWaitError,
-    MessageIdInvalidError,
-    MessageNotModifiedError,
-    UserNotParticipantError,
-)
-from telethon.tl import types
-from telethon.tl.functions.bots import SetBotCommandsRequest
-from telethon.tl.functions.channels import GetParticipantRequest
-from telethon.tl.functions.messages import GetFullChatRequest
-from telethon.tl.types import (
-    ChannelParticipant,
-    ChannelParticipantAdmin,
-    ChannelParticipantBanned,
-    ChannelParticipantCreator,
-    ChannelParticipantLeft,
-    ChannelParticipantSelf,
-    InputPeerChannel,
-    InputPeerChat,
-    User,
-)
-
+from telethon.tl import types, functions
 import config
 
 from ..logging import logger
@@ -102,7 +88,7 @@ class TelethonClient(TelegramClient):
             if err:
                 raise e
 
-    async def create_mention(self, user: User | int, html: bool = False) -> str:
+    async def create_mention(self, user: types.User | int, html: bool = False) -> str:
         if isinstance(user, int):
             user = await self.get_entity(user)
         user_name = f"{user.first_name} {user.last_name or ''}".strip()
@@ -123,16 +109,16 @@ class TelethonClient(TelegramClient):
         user = await self.get_entity(user_id)
 
         status_map = {
-            "BANNED": ChannelParticipantBanned,
-            "LEFTED": ChannelParticipantLeft,
-            "OWNER": ChannelParticipantCreator,
-            "ADMIN": ChannelParticipantAdmin,
-            "SELF": ChannelParticipantSelf,
-            "MEMBER": ChannelParticipant,
+            "BANNED": types.ChannelParticipantBanned,
+            "LEFTED": types.ChannelParticipantLeft,
+            "OWNER": types.ChannelParticipantCreator,
+            "ADMIN": types.ChannelParticipantAdmin,
+            "SELF": types.ChannelParticipantSelf,
+            "MEMBER": types.ChannelParticipant,
         }
 
-        if isinstance(chat, InputPeerChat):
-            r = await self(GetFullChatRequest(chat_id=chat.chat_id))
+        if isinstance(chat, types.InputPeerChat):
+            r = await self(functions.messages.GetFullChatRequest(chat_id=chat.chat_id))
 
             members = getattr(r.full_chat.participants, "participants", [])
 
@@ -141,10 +127,10 @@ class TelethonClient(TelegramClient):
                     for status, cls in status_map.items():
                         if isinstance(member, cls):
                             return member, status
-                    raise UserNotParticipantError
+                    raise errors.UserNotParticipantError
 
-        elif isinstance(chat, InputPeerChannel):
-            r = await self(GetParticipantRequest(channel=chat, participant=user))
+        elif isinstance(chat, types.InputPeerChannel):
+            r = await self(functions.channels.GetParticipantRequest(channel=chat, participant=user))
             participant = r.participant
             for status, cls in status_map.items():
                 if isinstance(participant, cls):
@@ -176,17 +162,17 @@ class TelethonClient(TelegramClient):
             async def wrapper(event):
                 try:
                     return await function(event)
-                except FloodWaitError as e:
+                except errors.FloodWaitError as e:
                     log.warning("FloodWait: Sleeping for %d seconds.", e.value)
                     await asyncio.sleep(e.value)
                 except (
-                    ChatWriteForbiddenError,
-                    ChatSendMediaForbiddenError,
-                    ChatSendPhotosForbiddenError,
-                    MessageNotModifiedError,
-                    MessageIdInvalidError,
+                    errors.ChatWriteForbiddenError,
+                    errors.ChatSendMediaForbiddenError,
+                    errors.ChatSendPhotosForbiddenError,
+                    errors.MessageNotModifiedError,
+                    errors.MessageIdInvalidError,
                 ) as e:
-                    if isinstance(e, ChatWriteForbiddenError):
+                    if isinstance(e, errors.ChatWriteForbiddenError):
                         await self.run_coro(
                             event.chat_id, func=self.leave_chat, err=False
                         )  # using for disable errors
@@ -295,7 +281,7 @@ class TelethonClient(TelegramClient):
 
     async def set_bot_commands(self, commands: list[types.BotCommand], scope):
         return await self(
-            SetBotCommandsRequest(
+            functions.bots.SetBotCommandsRequest(
                 scope=scope,
                 lang_code="en",
                 commands=commands,
