@@ -17,7 +17,8 @@ from datetime import datetime
 from functools import wraps
 
 from telethon import TelegramClient, errors, events
-from telethon.tl import types, functions
+from telethon.tl import functions, types
+
 import config
 
 from ..logging import logger
@@ -130,7 +131,9 @@ class TelethonClient(TelegramClient):
                     raise errors.UserNotParticipantError
 
         elif isinstance(chat, types.InputPeerChannel):
-            r = await self(functions.channels.GetParticipantRequest(channel=chat, participant=user))
+            r = await self(
+                functions.channels.GetParticipantRequest(channel=chat, participant=user)
+            )
             participant = r.participant
             for status, cls in status_map.items():
                 if isinstance(participant, cls):
