@@ -105,40 +105,6 @@ class YukkiBot(Client):
 
         return decorator
 
-    async def start(self):
-        await super().start()
-        get_me = await self.get_me()
-        self.username = get_me.username
-        self.id = get_me.id
-        self.name = f"{get_me.first_name} {get_me.last_name or ''}"
-        self.mention = get_me.mention
-
-        try:
-            await self.send_message(
-                config.LOG_GROUP_ID,
-                text=(
-                    f"<u><b>{self.mention} Bot Started :</b></u>\n\n"
-                    f"Id : <code>{self.id}</code>\n"
-                    f"Name : {self.name}\n"
-                    f"Username : @{self.username}"
-                ),
-            )
-        except (errors.ChannelInvalid, errors.PeerIdInvalid):
-            logger(__name__).error(
-                "Bot failed to access the log group. Ensure the bot is added and promoted as admin."
-            )
-            logger(__name__).error("Error details:", exc_info=True)
-            sys.exit()
-
-        try:
-            a = await self.get_chat_member(config.LOG_GROUP_ID, "me")
-            if a.status != ChatMemberStatus.ADMINISTRATOR:
-                logger(__name__).error("Please promote bot as admin in logger group")
-                sys.exit()
-        except Exception:
-            pass
-        logger(__name__).info("MusicBot started as %s", self.name)
-
     @asyncify
     def load_plugin(self, file_path: str, base_dir: str, attrs: dict):
         relative_path = os.path.relpath(file_path, base_dir).replace(os.sep, ".")
