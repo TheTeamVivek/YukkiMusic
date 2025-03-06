@@ -16,6 +16,8 @@ from pyrogram.types import InlineKeyboardMarkup
 from strings import get_string
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
+from YukkiMusic.plugins.admins.callback import wrong
+from YukkiMusic.plugins.misc.autoleave import autoend
 from YukkiMusic.utils.database import (
     get_active_chats,
     get_assistant,
@@ -25,9 +27,6 @@ from YukkiMusic.utils.database import (
 )
 from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline import stream_markup_timer, telegram_markup_timer
-
-from YukkiMusic.plugins.admins.callback import wrong
-from YukkiMusic.plugins.misc.autoleave import autoend
 
 checker = {}
 muted = {}
@@ -61,9 +60,7 @@ async def leave_if_muted():
                     userbot = await get_assistant(chat_id)
                     members = []
                     try:
-                        async for member in userbot.get_call_members(
-                            chat_id
-                        ):
+                        async for member in userbot.get_call_members(chat_id):
                             if member is None:
                                 continue
                             members.append(member)
@@ -74,9 +71,7 @@ async def leave_if_muted():
                             pass
                         continue
 
-                    m = next(
-                        (m for m in members if m.chat.id == userbot.id), None
-                    )
+                    m = next((m for m in members if m.chat.id == userbot.id), None)
                     if m is None:
                         continue
                     is_muted = bool(m.is_muted and not m.can_self_unmute)

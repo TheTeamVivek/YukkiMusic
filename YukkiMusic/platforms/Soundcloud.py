@@ -13,8 +13,8 @@ from typing import Union
 
 from yt_dlp import YoutubeDL
 
-from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.decorators import asyncify
+from YukkiMusic.utils.formatters import seconds_to_min
 
 
 class SoundCloud:

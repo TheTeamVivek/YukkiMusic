@@ -10,7 +10,7 @@
 
 from pyrogram.types import Message
 
-from strings import get_string, command
+from strings import command, get_string
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (

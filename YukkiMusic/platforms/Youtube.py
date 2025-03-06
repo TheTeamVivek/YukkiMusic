@@ -7,18 +7,17 @@
 #
 # All rights reserved.
 #
-import os
-import re
-import glob
-import random
 import asyncio
+import os
+import random
+import re
 from typing import Union
 
 from async_lru import alru_cache
-from yt_dlp import YoutubeDL
+from py_yt import VideosSearch
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
-from py_yt import VideosSearch
+from yt_dlp import YoutubeDL
 
 import config
 from YukkiMusic.utils.database import is_on_off
@@ -30,7 +29,9 @@ def cookies():
     folder_path = f"{os.getcwd()}/cookies"
     txt_files = [file for file in os.listdir(folder_path) if file.endswith(".txt")]
     if not txt_files:
-        raise FileNotFoundError("No Cookies found in cookies directory make sure your cookies file written  .txt file")
+        raise FileNotFoundError(
+            "No Cookies found in cookies directory make sure your cookies file written  .txt file"
+        )
     cookie_txt_file = random.choice(txt_files)
     cookie_txt_file = os.path.join(folder_path, cookie_txt_file)
     return cookie_txt_file
@@ -303,7 +304,7 @@ class YouTube:
         vidid = result[query_type]["id"]
         thumbnail = result[query_type]["thumbnails"][0]["url"].split("?")[0]
         return title, duration_min, thumbnail, vidid
-        
+
     async def download(
         self,
         link: str,
@@ -450,5 +451,3 @@ class YouTube:
             downloaded_file = await audio_dl()
 
         return downloaded_file, direct
-            
-      

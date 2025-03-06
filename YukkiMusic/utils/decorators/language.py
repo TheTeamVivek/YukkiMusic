@@ -11,7 +11,11 @@ from pyrogram.enums import ChatType
 
 from strings import get_string
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import get_lang, is_commanddelete_on, is_maintenance
+from YukkiMusic.utils.database import (
+    get_lang,
+    is_commanddelete_on,
+    is_maintenance,
+)
 
 
 def language(mystic):

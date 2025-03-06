@@ -25,7 +25,10 @@ from YukkiMusic.utils.database import (
 )
 from YukkiMusic.utils.decorators import language, languageCB
 from YukkiMusic.utils.decorators.play import botplaylist_markup
-from YukkiMusic.utils.inline.playlist import get_playlist_markup, warning_markup
+from YukkiMusic.utils.inline.playlist import (
+    get_playlist_markup,
+    warning_markup,
+)
 from YukkiMusic.utils.pastebin import Yukkibin
 from YukkiMusic.utils.stream.stream import stream
 

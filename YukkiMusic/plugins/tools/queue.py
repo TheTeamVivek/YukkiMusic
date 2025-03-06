@@ -17,10 +17,14 @@ from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
 import config
 from config import BANNED_USERS
 from strings import command
-from YukkiMusic import app, Platform
+from YukkiMusic import Platform, app
 from YukkiMusic.misc import db
 from YukkiMusic.utils import Yukkibin, get_channeplayCB, seconds_to_min
-from YukkiMusic.utils.database import get_cmode, is_active_chat, is_music_playing
+from YukkiMusic.utils.database import (
+    get_cmode,
+    is_active_chat,
+    is_music_playing,
+)
 from YukkiMusic.utils.decorators.language import language, languageCB
 from YukkiMusic.utils.inline.queue import queue_back_markup, queue_markup
 

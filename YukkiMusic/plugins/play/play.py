@@ -17,7 +17,7 @@ from pyrogram.types import InlineKeyboardMarkup, Message
 import config
 from config import BANNED_USERS, lyrical
 from strings import command
-from YukkiMusic import app, LOGGER, Platform
+from YukkiMusic import LOGGER, Platform, app
 from YukkiMusic.utils import seconds_to_min, time_to_seconds
 from YukkiMusic.utils.database import is_video_allowed
 from YukkiMusic.utils.decorators.play import PlayWrapper

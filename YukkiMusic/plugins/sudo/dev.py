@@ -12,30 +12,28 @@
 # Credit goes to TheHamkerCat.
 #
 
+import asyncio
 import os
 import re
 import sys
-import asyncio
 import traceback
 from inspect import getfullargspec
 from io import StringIO
 from time import time
 
 from pyrogram import filters
+from pyrogram.raw.functions import *
+from pyrogram.raw.types import *
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from YukkiMusic import app
+from YukkiMusic import app, userbot
+from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS
 
 ## -------- end of required imports to run this script
 
 ## ------ Below are some optional Imports you can remove it if is imported  you don't need to import it when using eval command
 
-from pyrogram.raw.functions import *
-from pyrogram.raw.types import *
-
-from YukkiMusic import userbot
-from YukkiMusic.core.call import Yukki
 
 ## end
 
@@ -51,6 +49,7 @@ async def aexec(code, client, message):
     __aexec_func = local_vars["__aexec"]
     return await __aexec_func(client, message)
 
+
 @app.on_edited_message(
     filters.command(["ev", "eval"]) & SUDOERS & ~filters.forwarded & ~filters.via_bot
 )
@@ -59,7 +58,7 @@ async def aexec(code, client, message):
 )
 async def executor(client: app, message: Message):
     if len(message.command) < 2:
-        return await message.reply( text="<b>Give me something to exceute</b>")
+        return await message.reply(text="<b>Give me something to exceute</b>")
     try:
         cmd = message.text.split(" ", maxsplit=1)[1]
     except IndexError:
@@ -127,7 +126,7 @@ async def executor(client: app, message: Message):
                 ]
             ]
         )
-        await message.reply( text=final_output, reply_markup=keyboard)
+        await message.reply(text=final_output, reply_markup=keyboard)
 
 
 @app.on_callback_query(filters.regex(r"runtime"))
@@ -161,8 +160,7 @@ async def forceclose_command(_, CallbackQuery):
 @app.on_message(filters.command("sh") & SUDOERS & ~filters.forwarded & ~filters.via_bot)
 async def shellrunner(_, message: Message):
     if len(message.command) < 2:
-        return await message.reply("<b>Give some commands like:</b>\n/sh git pull"
-        )
+        return await message.reply("<b>Give some commands like:</b>\n/sh git pull")
 
     text = message.text.split(None, 1)[1]
     output = ""
@@ -183,7 +181,7 @@ async def shellrunner(_, message: Message):
                 value=exc_obj,
                 tb=exc_tb,
             )
-            return None, ''.join(errors)
+            return None, "".join(errors)
 
     if "\n" in text:
         commands = text.split("\n")

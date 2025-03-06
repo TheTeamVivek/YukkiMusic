@@ -6,9 +6,8 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-import os
 import asyncio
-import importlib
+import os
 
 from pyrogram import idle
 from pytgcalls.exceptions import NoActiveGroupCall
@@ -22,11 +21,10 @@ from YukkiMusic.utils.database import get_banned_users, get_gbanned
 logger = LOGGER("YukkiMusic")
 loop = asyncio.get_event_loop()
 
+
 async def init():
     if len(config.STRING_SESSIONS) == 0:
-        logger.error(
-            "No Assistant Clients Vars Defined!.. Exiting Process."
-        )
+        logger.error("No Assistant Clients Vars Defined!.. Exiting Process.")
         return
     if not config.SPOTIFY_CLIENT_ID and not config.SPOTIFY_CLIENT_SECRET:
         logger.warning(
@@ -51,20 +49,24 @@ async def init():
         if os.path.exists("xtraplugins"):
             result = await app.run_shell_command(["git", "-C", "xtraplugins", "pull"])
             if result["returncode"] != 0:
-                logger.error(f"Error pulling updates for extra plugins: {result['stderr']}")
+                logger.error(
+                    f"Error pulling updates for extra plugins: {result['stderr']}"
+                )
                 exit()
         else:
-            result = await app.run_shell_command(["git", "clone", config.EXTRA_PLUGINS_REPO, "xtraplugins"])
+            result = await app.run_shell_command(
+                ["git", "clone", config.EXTRA_PLUGINS_REPO, "xtraplugins"]
+            )
             if result["returncode"] != 0:
                 logger.error(f"Error cloning extra plugins: {result['stderr']}")
                 exit()
-            
+
         req = os.path.join("xtraplugins", "requirements.txt")
         if os.path.exists(req):
             result = await app.run_shell_command(["pip", "install", "-r", req])
             if result["returncode"] != 0:
                 logger.error(f"Error installing requirements: {result['stderr']}")
-                    
+
         for mod in app.load_plugins_from("xtraplugins"):
             if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
                 if hasattr(mod, "__HELP__") and mod.__HELP__:

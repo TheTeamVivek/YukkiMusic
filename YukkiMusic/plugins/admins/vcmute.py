@@ -11,9 +11,8 @@
 from pyrogram import filters
 from pyrogram.types import Message
 
-from strings import command
-
 from config import BANNED_USERS
+from strings import command
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import is_muted, mute_off, mute_on

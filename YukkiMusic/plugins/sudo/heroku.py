@@ -21,8 +21,8 @@ import urllib3
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
 from pyrogram import filters
-from pyrogram.types import Message
 from pyrogram.enums import ChatType
+from pyrogram.types import Message
 
 import config
 from config import BANNED_USERS

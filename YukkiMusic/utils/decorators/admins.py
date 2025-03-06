@@ -118,7 +118,10 @@ def AdminActual(mystic):
                     message.chat.id, message.from_user.id
                 )
 
-                if member.status not in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER] or (
+                if member.status not in [
+                    ChatMemberStatus.ADMINISTRATOR,
+                    ChatMemberStatus.OWNER,
+                ] or (
                     member.privileges is None
                     or not member.privileges.can_manage_video_chats
                 ):

@@ -11,8 +11,8 @@
 import re
 
 import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
 from py_yt import VideosSearch
+from spotipy.oauth2 import SpotifyClientCredentials
 
 import config
 from YukkiMusic.utils.decorators import asyncify

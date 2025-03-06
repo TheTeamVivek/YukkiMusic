@@ -10,7 +10,6 @@ import re
 import sys
 from os import getenv
 
-
 from dotenv import load_dotenv
 from pyrogram import filters
 
@@ -272,10 +271,10 @@ def seconds_to_time(seconds):
 DURATION_LIMIT = int(time_to_seconds(f"{DURATION_LIMIT_MIN}:00"))
 SONG_DOWNLOAD_DURATION_LIMIT = int(time_to_seconds(f"{SONG_DOWNLOAD_DURATION}:00"))
 
-# Check if LOG_GROUP_ID is a numeric ID 
+# Check if LOG_GROUP_ID is a numeric ID
 if LOG_GROUP_ID.lstrip("-").isdigit():
     LOG_GROUP_ID = int(LOG_GROUP_ID)
-    
+
 if SUPPORT_CHANNEL:
     if not re.match("(?:http|https)://", SUPPORT_CHANNEL):
         print(

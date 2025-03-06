@@ -11,6 +11,13 @@ import asyncio
 from typing import Union
 
 from ntgcalls import TelegramServerError
+from pyrogram.errors import (
+    ChannelsTooMuch,
+    ChatAdminRequired,
+    FloodWait,
+    InviteRequestSent,
+    UserAlreadyParticipant,
+)
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls, filters
 from pytgcalls.exceptions import AlreadyJoinedError
@@ -18,17 +25,19 @@ from pytgcalls.types import (
     ChatUpdate,
     GroupCallConfig,
     MediaStream,
+    StreamAudioEnded,
     Update,
 )
-from pytgcalls.types import StreamAudioEnded
 
 import config
 from strings import get_string
 from YukkiMusic import LOGGER, Platform, app, userbot
+from YukkiMusic.core.userbot import assistants
 from YukkiMusic.misc import db
 from YukkiMusic.utils.database import (
     add_active_chat,
     add_active_video_chat,
+    get_assistant,
     get_audio_bitrate,
     get_lang,
     get_loop,
@@ -37,27 +46,13 @@ from YukkiMusic.utils.database import (
     music_on,
     remove_active_chat,
     remove_active_video_chat,
+    set_assistant,
     set_loop,
 )
 from YukkiMusic.utils.exceptions import AssistantErr
 from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
 from YukkiMusic.utils.stream.autoclear import auto_clean
 from YukkiMusic.utils.thumbnails import gen_thumb
-
-from pyrogram.errors import (
-    ChannelsTooMuch,
-    ChatAdminRequired,
-    FloodWait,
-    InviteRequestSent,
-    UserAlreadyParticipant,
-)
-
-from YukkiMusic.core.userbot import assistants
-from YukkiMusic.utils.database import (
-    get_assistant,
-    get_lang,
-    set_assistant,
-)
 
 links = {}
 
@@ -636,14 +631,17 @@ class Call:
                     return
                 await self.change_stream(client, update.chat_id)
 
-
     def __getattr__(self, name):
         if not self.calls:
-            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+            raise AttributeError(
+                f"'{type(self).__name__}' object has no attribute '{name}'"
+            )
         first_call = self.calls[0]
         if hasattr(first_call, name):
             return getattr(first_call, name)
-        raise AttributeError(f"'{type(first_call).__name__}' object has no attribute '{name}'")
+        raise AttributeError(
+            f"'{type(first_call).__name__}' object has no attribute '{name}'"
+        )
 
 
 Yukki = Call()
