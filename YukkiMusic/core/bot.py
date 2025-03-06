@@ -16,8 +16,7 @@ from datetime import datetime
 from functools import wraps
 
 import uvloop
-from pyrogram import Client, StopPropagation, errors
-from pyrogram.enums import ChatMemberStatus
+from pyrogram import Client, StopPropagation
 from pyrogram.errors import (
     ChatSendMediaForbidden,
     ChatSendPhotosForbidden,
