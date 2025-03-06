@@ -51,7 +51,7 @@ class TelethonClient(TelegramClient):
         super().__init__(*args, **kwargs)
 
     async def start(self, *args, **kwargs):
-        await super.start(*args, **kwargs)
+        await super().start(*args, **kwargs)
         me = await self.get_me()
         # pylint: disable=attribute-defined-outside-init
         self.me = me
