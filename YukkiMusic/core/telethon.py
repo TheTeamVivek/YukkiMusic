@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import wraps
 
-from telethon import TelegramClient, events
+from telethon import TelegramClient, events, errors
 from telethon.errors import (
     ChatSendMediaForbiddenError,
     ChatSendPhotosForbiddenError,
@@ -49,6 +49,48 @@ class ShellRunResult:
 class TelethonClient(TelegramClient):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+    async def start(self, *args, **kwargs):
+        await super.start(*args, **kwargs)
+        me = await self.get_me()
+        # pylint: disable=attribute-defined-outside-init
+        self.me = me
+        self.id = me.id
+        self.name = f"{me.first_name} {me.last_name or ''}".strip()
+        self.username = me.username
+        self.mention = f"[{self.name}](tg://user?id={self.id})"
+        # pylint: enable=attribute-defined-outside-init
+        try:
+            await self.send_message(
+                entity=config.LOG_GROUP_ID,
+                message=(
+                    f"<u><b>{self.mention} Bot Started :</b></u>\n\n"
+                    f"Id : <code>{self.id}</code>\n"
+                    f"Name : {self.name}\n"
+                    f"Username : @{self.username}"
+                ),
+                parse_mode="HTML",
+            )
+        except (errors.ChatIdInvalidError, errors.ChatAdminRequiredError, errors.ChatIdInvalidError):
+            log.error(
+                "Bot failed to access the log group. Ensure the bot is added and promoted as admin."
+            )
+            sys.exit()
+
+        try:
+            _, status = await self.get_chat_member(config.LOG_GROUP_ID, "me")
+            if status != "ADMIN":
+                log.error("Please promote bot as admin in logger group")
+                sys.exit()
+        except Exception:
+            pass
+        log.info("MusicBot started as %s", self.name)
+        if config.SET_CMDS:
+            try:
+                await self._set_default_commands()
+            except Exception:
+                log.warning("Failed to set commands")
 
     async def run_coro(self, func: Callable, err: bool = True, *args, **kwargs):
         try:
@@ -128,23 +170,6 @@ class TelethonClient(TelegramClient):
         except Exception:
             pass
         log.error(error_trace)
-
-    async def start(self, *args, **kwargs):
-        await super.start(*args, **kwargs)
-        me = await self.get_me()
-        # pylint: disable=attribute-defined-outside-init
-        self.me = me
-        self.id = me.id
-        self.username = me.username
-        self.mention = self.create_mention(me)
-        self.name = f"{me.first_name} {me.last_name or ''}".strip()
-        # pylint: enable=attribute-defined-outside-init
-
-        if config.SET_CMDS:
-            try:
-                await self._set_default_commands()
-            except Exception:
-                log.warning("Failed to set commands:", exc_info=True)
 
     def on_message(self, func=None, *args, **kwargs):
         def decorator(function):
