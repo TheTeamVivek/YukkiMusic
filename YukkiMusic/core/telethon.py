@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import wraps
 
-from telethon import TelegramClient, events, errors
+from telethon import TelegramClient, errors, events
 from telethon.errors import (
     ChatSendMediaForbiddenError,
     ChatSendPhotosForbiddenError,
@@ -50,7 +50,6 @@ class TelethonClient(TelegramClient):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-
     async def start(self, *args, **kwargs):
         await super.start(*args, **kwargs)
         me = await self.get_me()
@@ -72,7 +71,7 @@ class TelethonClient(TelegramClient):
                 ),
                 parse_mode="HTML",
             )
-        except (errors.ChatIdInvalidError, errors.ChatAdminRequiredError, errors.ChatIdInvalidError):
+        except (errors.ChatIdInvalidError, errors.ChatAdminRequiredError):
             log.error(
                 "Bot failed to access the log group. Ensure the bot is added and promoted as admin."
             )
