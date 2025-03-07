@@ -88,8 +88,8 @@ class YukkiBot(Client):
                         f"<b>Chat ID:</b> {chat_id}\n"
                         f"<b>Chat Username:</b> {chat_username}\n"
                         f"<b>User ID:</b> {user_id}\n"
-                        f'<b>Command/Text:</b>\n<pre><code class="language-python">{command}</code></pre>\n'
-                        f'<b>Traceback:</b>\n<pre><code class="language-python">{error_trace}</code></pre>'
+                        f"<b>Command/Text:</b>\n<pre language='python'><code>{command}</code></pre>\n\n"
+                        f"<b>Traceback:</b>\n<pre language='python'><code>{error_trace}</code></pre>"
                     )
                     await self.send_message(config.LOG_GROUP_ID, error_message)
                     try:
