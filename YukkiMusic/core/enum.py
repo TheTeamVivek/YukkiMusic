@@ -6,6 +6,7 @@ class PlayType(Enum):
     PAUSED = auto()  # Paused
     MUTED = auto()  # Muted
 
+
 class SourceType(Enum):
     APPLE = "Apple"
     RESSO = "Resson"
