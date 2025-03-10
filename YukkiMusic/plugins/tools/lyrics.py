@@ -7,22 +7,16 @@
 #
 # All rights reserved.
 #
-r"""
 import random
 import re
 import string
 
 import lyricsgenius as lg
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from telethon import Button
 
 from config import BANNED_USERS, lyrical
-from strings import get_command
-from YukkiMusic import app
+from YukkiMusic import tbot
 from YukkiMusic.utils.decorators.language import language
-
-###Commands
-LYRICS_COMMAND = get_command("LYRICS_COMMAND")
 
 api_key = "Vd9FvPMOKWfsKJNG9RbZnItaTNIRFzVyyXFdrGHONVsGqHcHBoj3AI3sIlNuqzuf0ZNG8uLcF9wAd5DXBBnUzA"
 y = lg.Genius(
@@ -33,31 +27,29 @@ y = lg.Genius(
 )
 y.verbose = False
 
-
-@app.on_message(filters.command(LYRICS_COMMAND) & ~BANNED_USERS)
+@tbot.on_message(
+    flt.command("LYRICS_COMMAND", True) & ~flt.user(BANNED_USERS)
+)
 @language
-async def lrsearch(client, message: Message, _):
-    if len(message.command) < 2:
+async def lrsearch(event, _):
+    if len(event.text.split()) < 2:
         return await event.reply(_["lyrics_1"])
-    title = message.text.split(None, 1)[1]
-    m = await event.reply(_["lyrics_2"])
-    S = y.search_song(title, get_full_info=False)
-    if S is None:
-        return await m.edit(_["lyrics_3"].format(title))
+    title = event.message.text.split(None, 1)[1]
+    mystic = await event.reply(_["lyrics_2"])
+    song = y.search_song(title, get_full_info=False)
+    if song is None:
+        return await mystic.edit(_["lyrics_3"].format(title))
     ran_hash = "".join(random.choices(string.ascii_uppercase + string.digits, k=10))
-    lyric = S.lyrics
+    lyric = song.lyrics
     if "Embed" in lyric:
         lyric = re.sub(r"\d*Embed", "", lyric)
     lyrical[ran_hash] = lyric
-    upl = InlineKeyboardMarkup(
-        [
+    upl =  [
             [
-                InlineKeyboardButton(
+                Button.inline(
                     text=_["L_B_1"],
-                    url=f"https://t.me/{app.username}?start=lyrics_{ran_hash}",
+                    url=f"https://t.me/{tbot.username}?start=lyrics_{ran_hash}",
                 ),
             ]
         ]
-    )
-    await m.edit(_["lyrics_4"], buttons=upl)
-"""
+    await mystic.edit(_["lyrics_4"], buttons=upl)
