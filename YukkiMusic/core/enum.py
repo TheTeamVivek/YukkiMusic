@@ -2,15 +2,9 @@ from enum import Enum, auto
 
 
 class PlayType(Enum):
-    PLAYING = auto()  # Actively playing
+    PLAYING = auto()  # playing
     PAUSED = auto()  # Paused
     MUTED = auto()  # Muted
-
-
-class SongType(Enum):
-    VIDEO = auto()
-    AUDIO = auto()
-
 
 class SourceType(Enum):
     APPLE = "Apple"
