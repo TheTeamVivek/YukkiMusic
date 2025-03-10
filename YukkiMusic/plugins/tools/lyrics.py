@@ -27,9 +27,8 @@ y = lg.Genius(
 )
 y.verbose = False
 
-@tbot.on_message(
-    flt.command("LYRICS_COMMAND", True) & ~flt.user(BANNED_USERS)
-)
+
+@tbot.on_message(flt.command("LYRICS_COMMAND", True) & ~flt.user(BANNED_USERS))
 @language
 async def lrsearch(event, _):
     if len(event.text.split()) < 2:
@@ -44,12 +43,12 @@ async def lrsearch(event, _):
     if "Embed" in lyric:
         lyric = re.sub(r"\d*Embed", "", lyric)
     lyrical[ran_hash] = lyric
-    upl =  [
-            [
-                Button.inline(
-                    text=_["L_B_1"],
-                    url=f"https://t.me/{tbot.username}?start=lyrics_{ran_hash}",
-                ),
-            ]
+    upl = [
+        [
+            Button.inline(
+                text=_["L_B_1"],
+                url=f"https://t.me/{tbot.username}?start=lyrics_{ran_hash}",
+            ),
         ]
+    ]
     await mystic.edit(_["lyrics_4"], buttons=upl)
