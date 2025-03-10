@@ -26,7 +26,6 @@ def get_string(lang: str):
     return languages.get(lang, "en")
 
 
-
 def format_value(value):
     """Formats value as a string, joining lists with a '/' prefix."""
     if isinstance(value, list):
