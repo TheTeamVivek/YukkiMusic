@@ -23,7 +23,8 @@ def load_yaml(file_path: str) -> dict:
 
 
 def get_string(lang: str):
-    return languages[lang]
+    return languages.get(lang, "en")
+
 
 
 def format_value(value):
