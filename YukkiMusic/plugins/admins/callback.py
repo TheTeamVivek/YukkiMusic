@@ -484,9 +484,7 @@ async def play_music(event, _):
         )
     except Exception as e:
         ex_type = type(e).__name__
-        err = (
-            e if ex_type == "AssistantErr" else _["general_3"].format(ex_type)
-        )
+        err = e if ex_type == "AssistantErr" else _["general_3"].format(ex_type)
         return await mystic.edit(err)
     return await mystic.delete()
 
@@ -582,9 +580,7 @@ async def play_playlists_cb(event, _):
         )
     except Exception as e:
         ex_type = type(e).__name__
-        err = (
-            e if ex_type == "AssistantErr" else _["general_3"].format(ex_type)
-        )
+        err = e if ex_type == "AssistantErr" else _["general_3"].format(ex_type)
         return await mystic.edit(err)
     return await mystic.delete()
 

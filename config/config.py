@@ -27,7 +27,6 @@ def is_true(value: str) -> bool:
 ##########################################################################
 
 
-
 # Get it from my.telegram.org
 
 API_ID = int(getenv("API_ID", "0"))
@@ -53,13 +52,11 @@ raw_sessions = getenv("STRING_SESSIONS")
 STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions else []
 
 
-
 ############################################################################
 #                   #                                   #               #
 #####################     OPTIONAL [ BUT REQUIRED ]     ####################
 #                   #                                   #               #
 ############################################################################
-
 
 
 # Your cookies pasted link on batbin.me
@@ -70,7 +67,6 @@ COOKIE_LINK = getenv("COOKIE_LINK", None)
 # Database to save your chats and stats...
 # Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
-
 
 
 #################################################################
@@ -92,9 +88,7 @@ ASSISTANT_LEAVE_TIME = int(
 
 
 CLEANMODE_DELETE_TIME = int(
-    getenv(
-        "CLEANMODE_DELETE_TIME", "5"
-    )
+    getenv("CLEANMODE_DELETE_TIME", "5")
 )  # Remember to give value in Minutes
 
 # Custom max audio(music) duration for voice chat.
@@ -158,7 +152,7 @@ SPOTIFY_CLIENT_SECRET = getenv(
 )
 
 # Only  Links formats are  accepted for this Var value.
-SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", None) # Example:- https://t.me/TheYukki
+SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", None)  # Example:- https://t.me/TheYukki
 SUPPORT_GROUP = getenv("SUPPORT_GROUP", None)  # Example:- https://t.me/YukkiSupport
 
 
@@ -253,10 +247,13 @@ SPOTIFY_PLAYLIST_IMG_URL = getenv(
 
 ### DONT TOUCH or EDIT codes after this line
 
+
 def _user():
     from YukkiMusic.core.filters import User
+
     return User()
-    
+
+
 BANNED_USERS = _user()
 YTDOWNLOADER = 1
 LOG = 2
@@ -311,7 +308,11 @@ _DEFAULTS = {
 
 for name, default in _DEFAULTS.items():
     var = globals().get(name)
-    if (var and default is not None) and var != default and not re.match(r"^https?://", var):
+    if (
+        (var and default is not None)
+        and var != default
+        and not re.match(r"^https?://", var)
+    ):
         print(
             f"[ERROR] - Your {name} URL is incorrect. Please ensure it starts with https://"
         )
