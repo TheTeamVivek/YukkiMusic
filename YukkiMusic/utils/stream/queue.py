@@ -19,8 +19,7 @@ async def put_queue(
     original_chat_id,
     user_id,
     track: Track,
-    is_index: bool = False,
-    forceplay: bool | None = None,
+    forceplay: bool  = False,
 ):
 
     track.title = track.title.title()
@@ -37,11 +36,10 @@ async def put_queue(
             db[chat_id].append(put)
     else:
         db[chat_id].append(put)
-    autoclean.append(
-        track.file_path
-    )  # Since in queue the track is not downloaded so what to do
-
-    if is_index is None:
+    if not track.is_m3u8:    
+        autoclean.append(
+            track.file_path
+        )  # Since in queue the track is not downloaded so what to do
         vidid = track.vidid if track.is_youtube else track.vidid.value
 
         to_append = {"vidid": vidid, "title": title}
