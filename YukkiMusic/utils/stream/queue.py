@@ -19,7 +19,7 @@ async def put_queue(
     original_chat_id,
     user_id,
     track: Track,
-    forceplay: bool  = False,
+    forceplay: bool = False,
 ):
 
     track.title = track.title.title()
@@ -36,7 +36,7 @@ async def put_queue(
             db[chat_id].append(put)
     else:
         db[chat_id].append(put)
-    if not track.is_m3u8:    
+    if not track.is_m3u8:
         autoclean.append(
             track.file_path
         )  # Since in queue the track is not downloaded so what to do
