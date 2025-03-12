@@ -23,7 +23,7 @@ class Track:
     duration: int  # duration in seconds
     streamtype: SourceType
     video: bool  # The song is audio or video
-    #by: str | None = None  # None but required
+    # by: str | None = None  # None but required
     download_url: str | None = (
         None  # If provided directly used to download instead self.link
     )
@@ -38,10 +38,18 @@ class Track:
             url = self.download_url if self.download_url else self.link
             p_match = re.search(pattern, url)
             self.vidid = p_match.group(1)
-        self.title = self.title.title() if self.title is not None else None   
-        if not self.duration and self.is_live is None: # WHEN is_live is not None it means the track is live or not live means no need to check it
-            if self.streamtype in [SourceType.APPLE, SourceType.RESSO, SourceType.SPOTIFY, SourceType.YOUTUBE, None]: # NONE BEACUSE IN THESE PLATFORMS THE streamtype and been provided by later
-                self.is_live = True #MAY BE I DON'T KNOW CORRECTLY
+        self.title = self.title.title() if self.title is not None else None
+        if (
+            not self.duration and self.is_live is None
+        ):  # WHEN is_live is not None it means the track is live or not live means no need to check it
+            if self.streamtype in [
+                SourceType.APPLE,
+                SourceType.RESSO,
+                SourceType.SPOTIFY,
+                SourceType.YOUTUBE,
+                None,
+            ]:  # NONE BEACUSE IN THESE PLATFORMS THE streamtype and been provided by later
+                self.is_live = True  # MAY BE I DON'T KNOW CORRECTLY
 
     async def is_exists(self):
         exists = False
@@ -50,7 +58,9 @@ class Track:
             if await is_on_off(YTDOWNLOADER):
                 exists = os.path.exists(self.file_path)
             else:
-                exists = len(self.file_path) > 30 # FOR m3u8 URLS for m3u8 download mode
+                exists = (
+                    len(self.file_path) > 30
+                )  # FOR m3u8 URLS for m3u8 download mode
 
         return exists
 
@@ -62,12 +72,14 @@ class Track:
     @property
     def is_m3u8(self) -> bool:
         return bool(self.is_live and not self.is_youtube)
-        #return bool(self.is_live and not self.title and not self.duration)
+        # return bool(self.is_live and not self.title and not self.duration)
 
     async def download(self, options: dict | None = None):
         url = self.download_url if self.download_url else self.link
-        
-        if self.file_path is not None and await self.is_exists(): # THIS CONDITION FOR TELEGRAM FILES
+
+        if (
+            self.file_path is not None and await self.is_exists()
+        ):  # THIS CONDITION FOR TELEGRAM FILES
             return self.file_path
         if await is_on_off(YTDOWNLOADER) and not self.is_live:
             ytdl_opts = {
@@ -142,7 +154,9 @@ async def search(query):
                 title=result["title"],
                 link=result["link"],
                 download_url=result["link"],
-                duration=(time_to_seconds(duration) if str(duration) != "None" else 0), #TODO: CHECK THAT THE YOUTBE SEARCH PYTHON RETUNS DURATION IS None or "None"
+                duration=(
+                    time_to_seconds(duration) if str(duration) != "None" else 0
+                ),  # TODO: CHECK THAT THE YOUTBE SEARCH PYTHON RETUNS DURATION IS None or "None"
                 thumb=result["thumbnails"][0]["url"].split("?")[0],
                 streamtype=None,
                 video=None,
@@ -163,7 +177,9 @@ def search_from_ytdlp(query):
     }
 
     with YoutubeDL(options) as ydl:
-        info_dict = ydl.extract_info(f"ytsearch: {query}", download=False) #TODO: THIS CAN RETURN SEARCH RESULT OF A CHANNEL FIX IT
+        info_dict = ydl.extract_info(
+            f"ytsearch: {query}", download=False
+        )  # TODO: THIS CAN RETURN SEARCH RESULT OF A CHANNEL FIX IT
         details = info_dict.get("entries", [None])[0]
         if not details:
             raise ValueError("No results found.")
