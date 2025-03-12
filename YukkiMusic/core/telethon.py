@@ -175,6 +175,7 @@ class TelethonClient(TelegramClient):
                     errors.MessageNotModifiedError,
                     errors.MessageIdInvalidError,
                 ) as e:
+                    pass
                   #  if isinstance(e, errors.ChatWriteForbiddenError):
                   #      await self.run_coro(
                   #          event.chat_id, func=self.leave_chat, err=False
