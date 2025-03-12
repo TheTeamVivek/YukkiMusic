@@ -39,27 +39,25 @@ class Telegram:
         self.sleep = 3
 
     @asyncify
-    def get_url_from_message(self, message_1: Message) -> str | None:
-        messages = [message_1]
-        if message_1.reply_to_message:
-            messages.append(message_1.reply_to_message)
+    def get_url_from_message(self, event) -> str | None:
+        messages = [event.message]
+        if event.is_reply:
+            messages.append(await event.get_reply_message())
         text = ""
         offset = None
         length = None
         for message in messages:
             if offset:
                 break
-            if message.entities:
+            if message.:
                 for entity in message.entities:
-                    if entity.type == MessageEntityType.URL:
-                        text = message.text or message.caption
+                    if isistance(entity, types.MessageEntityUrl):
+                        text = message.text
                         offset, length = entity.offset, entity.length
                         break
-            elif message.caption_entities:
-                for entity in message.caption_entities:
-                    if entity.type == MessageEntityType.TEXT_LINK:
+                    elif isistance(entity, types.MessageEntityTextUrl):
                         return entity.url
-        if offset in (None,):
+        if offset is None:
             return None
         return text[offset : offset + length]
 
@@ -245,7 +243,7 @@ class Telegram:
                 await mystic.edit("Sucessfully Downloaded\n Processing File Now...")
                 downloader.pop(message.id, None)
             except Exception:
-                await mystic.edit(_["tg_2"])
+                await mystic.edit(_["DOWNLOAD_FAILED_MSG"])
 
         if len(downloader) > 10:
             timers = list(downloader.values())
@@ -254,7 +252,7 @@ class Telegram:
                 eta = get_readable_time(low)
             except Exception:
                 eta = "Unknown"
-            await mystic.edit(_["tg_1"].format(eta))
+            await mystic.edit(_["OVERLOAD_WAIT_MSG"].format(eta))
             return False
 
         task = asyncio.create_task(down_load(), name=f"download_{event.chat_id}")
