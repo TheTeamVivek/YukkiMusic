@@ -21,7 +21,7 @@ logger = logger("YukkiMusic")
 
 
 async def init():
-    if len(config.STRING_SESSIONS) == 0:
+    if not config.STRING_SESSIONS:
         logger.error("No Assistant Clients Vars Defined!.. Exiting Process.")
         return
     if not config.SPOTIFY_CLIENT_ID and not config.SPOTIFY_CLIENT_SECRET:
@@ -40,11 +40,8 @@ async def init():
     await app.start()
     await tbot.start(bot_token=config.BOT_TOKEN)
 
-    attrs = {"userbot": userbot, "bot": tbot}
-    async for mod in app.load_plugins_from("YukkiMusic/plugins", attrs):
-        if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
-            if hasattr(mod, "__HELP__") and mod.__HELP__:
-                HELPABLE[mod.__MODULE__.lower()] = mod
+    attrs = {"userbot": userbot, "tbot": tbot}
+    await app.load_plugins_from("YukkiMusic/plugins")
 
     if config.EXTRA_PLUGINS:
         if os.path.exists("xtraplugins"):
@@ -53,7 +50,6 @@ async def init():
                 logger.error(
                     "Error pulling updates for extra plugins:\n %s", result["stderr"]
                 )
-
                 sys.exit()
         else:
             result = await app.run_shell_command(
@@ -68,33 +64,30 @@ async def init():
             result = await app.run_shell_command(["pip", "install", "-r", req])
             if result.returncode != 0:
                 logger.error("Error installing requirements:\n %s", result["stderr"])
+                
+        await app.load_plugins_from("xtraplugins", attrs)
 
-        async for mod in app.load_plugins_from("xtraplugins", attrs):
-            if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
-                if hasattr(mod, "__HELP__") and mod.__HELP__:
-                    HELPABLE[mod.__MODULE__.lower()] = mod
-
-    logger("YukkiMusic.plugins").info("Successfully Imported All Modules ")
+    logger.info("Successfully Imported All Modules ")
     await fetch_cookies()
     await userbot.start()
     await Yukki.start()
-    logger("YukkiMusic").info("Assistant Started Sucessfully")
+    logger.info("Assistant Started Sucessfully")
     try:
         await Yukki.stream_call(
             "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
         )
     except NoActiveGroupCall:
-        logger("YukkiMusic").error(
+        logger.error(
             "Please ensure the voice call in your log group is active."
         )
         sys.exit()
-    logger("YukkiMusic").info("YukkiMusic Started Successfully")
+    logger.info("YukkiMusic Started Successfully")
     tbot.run_until_disconnected()
     await app.stop()
     await userbot.stop()
+    await Yukki.stop()
 
 
 if __name__ == "__main__":
     app.run(init())
-    tbot.run_until_disconnected()
-    logger("YukkiMusic").info("Stopping YukkiMusic! GoodBye")
+    logger.info("Stopping YukkiMusic! GoodBye")
