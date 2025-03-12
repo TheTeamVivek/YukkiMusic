@@ -297,7 +297,7 @@ class Call:
         self,
         chat_id: int,
         file_path,
-        video: bool  = False,
+        video: bool = False,
         image: bool | str = None,
     ):
         audio_stream_quality = await get_audio_bitrate(chat_id)
