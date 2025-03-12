@@ -1,48 +1,65 @@
+
+import asyncio
 import inspect
 import re
-
+from typing import Callable
 from telethon.tl.types import PeerChannel, User
 
 from strings import get_string
 from YukkiMusic.utils.database import get_lang
 
 
-class Combinator:
-    def __init__(self, func):
+class Filter:
+    def __init__(self, func: Callable = None):
         self.func = func
 
     async def __call__(self, event):
-        return (
-            await self.func(event)
-            if inspect.iscoroutinefunction(self.func)
-            else self.func(event)
-        )
+        if self.func is not None:
+            return (
+                await self.func(event)
+                if inspect.iscoroutinefunction(self.func)
+                else await asyncio.to_thread(self.func(event))
+            )
+        return False            
 
     def __and__(self, other):
-        async def combined(event):
-            return (await self(event)) and (await other(event))
+        "And Filter"
+        async def and_filter(event):
+            x = await self(event)
+            y = await other(event)
+            if not x:
+                return False
+            return x and y
 
-        return Combinator(combined)
+        return Filter(and_filter)
 
     def __or__(self, other):
-        async def combined(event):
-            return (await self(event)) or (await other(event))
+        "Or Filter"
+        async def or_filter(event):
+            x = await self(event)
+            y = await other(event)
+            if x:
+            	return True
+            return x or y
 
-        return Combinator(combined)
+        return Filter(or_filter)
 
     def __invert__(self):
-        async def inverted(event):
+        "Invert Filter"
+        async def invert_filter(event):
             return not (await self(event))
 
-        return Combinator(inverted)
+        return Filter(invert_filter)
 
 
 def wrap(func):
-    return Combinator(func)
+    "wrap the function by Filter"
+    return Filter(func=func)
 
 
 @wrap
 def forwarded(e):
+    "Message is forwarded"
     return bool(getattr(e, "forward", None))
 
 
@@ -66,7 +83,7 @@ def group(event):
 
 @wrap
 async def channel(event):
-    """Check if the chat is a Channel (not a Mega Group)."""
+    """Check if the chat is a Channel (not a MegaGroup)."""
     msg = getattr(event, "message", None)
     peer = getattr(msg, "peer_id", None) if msg else None
 
@@ -75,72 +92,49 @@ async def channel(event):
         return not getattr(entity, "megagroup", False)
 
     return False
-
-
-@wrap
-def user(users):
+   
+class User(set, Filter):
     """Check if the sender is a specific user."""
+    def __init__(self, users: int | str | list[int, str] | None = None):
+        users = [] if users is None else users if isinstance(users, list) else [users]
 
-    if isinstance(users, (int, str)):
-        users = {users}
-    else:
-        users = set(users)
-
-    normalized_users = {
-        str(user).lower().lstrip("@") if isinstance(user, str) else user
-        for user in users
-    }
-
-    async def check_user(event):
-        sender = await event.get_sender()
-        if sender is None:
-            return False
-        if not isinstance(sender, User):
-            return False
-
-        user_id = sender.id
-        username = sender.username.lower() if sender.username else None
-
-        if "me" in normalized_users or "self" in normalized_users:
-            normalized_users.update(
-                {event.client.me.id, event.client.me.username.lower()}
-                if event.client.me.username
-                else {event.client.me.id}
-            )
-
-        return user_id in normalized_users or (
-            username in normalized_users if username else False
+        super().__init__(
+            "me" if u in ["me", "self"]
+            else u.lower().strip("@") if isinstance(u, str)
+            else u for u in users
         )
 
-    return check_user
-
+    async def func(self, event):
+        sender = await event.get_sender()
+        return (isinstance(sender, User)
+                and (sender.id in self
+                     or (sender.username
+                         and sender.username.lower() in self)
+                     or ("me" in self
+                         and sender.is_self)))
 
 @wrap
 def command(commands, use_strings=False):
+    "Check if the message startswith the provided command"
     if isinstance(commands, str):
         commands = [commands]
 
     async def func(event):
-        text = event.text.lstrip()
+        text = event.text
         if not text:
             return False
 
-        user = await event.client.get_me()
-        username = user.username.lower() if user and user.username else ""
+        username = event.client.username.lower() # Because this event.client is Bot client so username can't be None
 
         if use_strings:
-            try:
-                lang = await get_lang(event.chat_id)
-                string = get_string(lang)
-            except Exception:
-                string = get_string("en")
+            lang = await get_lang(event.chat_id)
+            lang = get_string(lang)
 
-            command_list = {string.get(cmd, cmd) for cmd in commands}
-        else:
-            command_list = set(commands)
+            commands = {lang.get(cmd, cmd) for cmd in commands} # Get the command from string if use_strings is True if the command is not found on string so use the command
+        commands = {cmd.lower() for cmd in commands}
+        command_pattern = '|'.join(map(re.escape, commands))
+        pattern = rf"^(?:/)?({command_pattern})(?:@{re.escape(username)})?(?:\s|$)"
 
-        pattern = rf"^(?:/)?({'|'.join(map(re.escape, command_list))})(?:@{re.escape(username)})?(?:\s|$)"
-
-        return bool(re.match(pattern, text))
+        return bool(re.match(pattern, text, flags=re.IGNORECASE))
 
     return func
