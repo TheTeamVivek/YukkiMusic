@@ -20,9 +20,12 @@ def is_true(value: str) -> bool:
     return value.lower() in ["true", "yes"]
 
 
-# -------------------
-# Necessary Variables
-# -------------------
+##########################################################################
+#                   #                                 #                  #
+#####################     [ NECESSARY VARIABLES ]     ####################
+#                   #                                 #                  #
+##########################################################################
+
 
 
 # Get it from my.telegram.org
@@ -35,7 +38,7 @@ API_HASH = getenv("API_HASH")
 BOT_TOKEN = getenv("BOT_TOKEN")
 
 # You'll need a Private Group ID for this.
-LOG_GROUP_ID = getenv("LOG_GROUP_ID", "")
+LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", 0))
 
 # Your User ID.
 OWNER_ID = list(
@@ -49,9 +52,15 @@ raw_sessions = getenv("STRING_SESSIONS")
 # Split the sessions only if raw_sessions is not empty
 STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions else []
 
-# ------------------------------------
-# Optional But Needed [ You Can Skip ]
-# ------------------------------------
+
+
+############################################################################
+#                   #                                   #               #
+#####################     OPTIONAL [ BUT REQUIRED ]     ####################
+#                   #                                   #               #
+############################################################################
+
+
 
 # Your cookies pasted link on batbin.me
 # you can skip if you are adding cookies
@@ -63,9 +72,12 @@ COOKIE_LINK = getenv("COOKIE_LINK", None)
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
 
-# -------------- |
-# Fully Optional |
-# -------------- |
+
+#################################################################
+#                   #                        #                  #
+#####################     FULLY OPTIONAL     ####################
+#                   #                        #                  #
+#################################################################
 
 
 # Set it in True if you want to leave your assistant after
@@ -78,10 +90,11 @@ ASSISTANT_LEAVE_TIME = int(
     getenv("ASSISTANT_LEAVE_TIME", "1800")
 )  # Remember to give value in Seconds
 
+
 CLEANMODE_DELETE_TIME = int(
     getenv(
         "CLEANMODE_DELETE_TIME", "5"
-    )  #  TODO MAKE the env or local variable name same
+    )
 )  # Remember to give value in Minutes
 
 # Custom max audio(music) duration for voice chat.
@@ -119,7 +132,7 @@ HEROKU_API_KEY = getenv("HEROKU_API_KEY")
 # which you gave to identify your  Music Bot in Heroku.
 HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
 
-# MaximuM limit for fetching playlist's track from youtube, spotify, apple links.
+# MaximuM limit for fetching playlist's track from youtube, spotify, apple and other valids links.
 PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", "25"))
 
 # Set it true if you want your bot to be private only
@@ -145,8 +158,8 @@ SPOTIFY_CLIENT_SECRET = getenv(
 )
 
 # Only  Links formats are  accepted for this Var value.
-SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", None)  # Example:- https://t.me/TheTeamVivek
-SUPPORT_GROUP = getenv("SUPPORT_GROUP", None)  # Example:- https://t.me/TheTeamVk
+SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", None) # Example:- https://t.me/TheYukki
+SUPPORT_GROUP = getenv("SUPPORT_GROUP", None)  # Example:- https://t.me/YukkiSupport
 
 
 # Telegram audio  and video file size limit
@@ -224,23 +237,27 @@ YOUTUBE_IMG_URL = getenv(
 
 SPOTIFY_ARTIST_IMG_URL = getenv(
     "SPOTIFY_ARTIST_IMG_URL",
-    "assets/SpotifyArtist.jpeg",
+    "assets/Spotify.jpeg",
 )
 
 SPOTIFY_ALBUM_IMG_URL = getenv(
     "SPOTIFY_ALBUM_IMG_URL",
-    "assets/SpotifyAlbum.jpeg",
+    "assets/Spotify.jpeg",
 )
 
 SPOTIFY_PLAYLIST_IMG_URL = getenv(
     "SPOTIFY_PLAYLIST_IMG_URL",
-    "assets/SpotifyPlaylist.jpeg",
+    "assets/Spotify.jpeg",
 )
 
 
 ### DONT TOUCH or EDIT codes after this line
 
-BANNED_USERS = set()
+def _user():
+    from YukkiMusic.core.filters import User
+    return User()
+    
+BANNED_USERS = _user()
 YTDOWNLOADER = 1
 LOG = 2
 LOG_FILE_NAME = "logs.txt"
@@ -268,7 +285,7 @@ SONG_DOWNLOAD_DURATION_LIMIT = int(time_to_seconds(f"{SONG_DOWNLOAD_DURATION}:00
 
 if not STRING_SESSIONS:
     print(
-        "Oops You need fill at least one Pyrogram session to run this bot, Exiting..."
+        "Oops! You need to fill at least one Pyrogram session to run this bot, Exiting..."
     )
     sys.exit()
 
@@ -281,32 +298,28 @@ _DEFAULTS = {
     "TELEGRAM_VIDEO_URL": "assets/Video.jpeg",
     "YOUTUBE_IMG_URL": "assets/Youtube.jpeg",
     "SOUNCLOUD_IMG_URL": "assets/Soundcloud.jpeg",
-    "SPOTIFY_ALBUM_IMG_URL": "assets/SpotifyAlbum.jpeg",
-    "SPOTIFY_ARTIST_IMG_URL": "assets/SpotifyArtist.jpeg",
-    "SPOTIFY_PLAYLIST_IMG_URL": "assets/SpotifyPlaylist.jpeg",
+    "SPOTIFY_ALBUM_IMG_URL": "assets/Spotify.jpeg",
+    "SPOTIFY_ARTIST_IMG_URL": "assets/Spotify.jpeg",
+    "SPOTIFY_PLAYLIST_IMG_URL": "assets/Spotify.jpeg",
     "STREAM_IMG_URL": "assets/Stream.jpeg",
+    "EXTRA_PLUGINS_REPO": None,
+    "SUPPORT_CHANNEL": None,
+    "SUPPORT_GROUP": None,
+    "UPSTREAM_REPO": None,
+    "GITHUB_REPO": None,
 }
 
-_REQUIRED_URLS = [
-    "EXTRA_PLUGINS_REPO",
-    "SUPPORT_CHANNEL",
-    "SUPPORT_GROUP",
-    "UPSTREAM_REPO",
-    "GITHUB_REPO",
-]
-
-for var_name, default_url in _DEFAULTS.items():
-    url = globals().get(var_name)
-    if url and url != default_url and not re.match(r"^https?://", url):
+for name, default in _DEFAULTS.items():
+    var = globals().get(name)
+    if (var and default is not None) and var != default and not re.match(r"^https?://", var):
         print(
-            f"[ERROR] - Your {var_name} URL is incorrect. Please ensure it starts with https://"
+            f"[ERROR] - Your {name} URL is incorrect. Please ensure it starts with https://"
         )
         sys.exit()
-
-for var_name in _REQUIRED_URLS:
-    url = globals().get(var_name)
-    if url and not re.match(r"^https?://", url):
-        print(
-            f"[ERROR] - Your {var_name} URL is incorrect. Please ensure it starts with https://"
-        )
-        sys.exit()
+    elif default is None:
+        var = globals().get(name)
+        if var and not re.match(r"^https?://", var):
+            print(
+                f"[ERROR] - Your {var_name} URL is incorrect. Please ensure it starts with https://"
+            )
+            sys.exit()
