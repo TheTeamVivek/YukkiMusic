@@ -1,8 +1,8 @@
-
 import asyncio
 import inspect
 import re
-from typing import Callable
+from collections.abc import Callable
+
 from telethon.tl.types import PeerChannel, User
 
 from strings import get_string
@@ -20,10 +20,11 @@ class Filter:
                 if inspect.iscoroutinefunction(self.func)
                 else await asyncio.to_thread(self.func(event))
             )
-        return False            
+        return False
 
     def __and__(self, other):
         "And Filter"
+
         async def and_filter(event):
             x = await self(event)
             y = await other(event)
@@ -35,17 +36,19 @@ class Filter:
 
     def __or__(self, other):
         "Or Filter"
+
         async def or_filter(event):
             x = await self(event)
             y = await other(event)
             if x:
-            	return True
+                return True
             return x or y
 
         return Filter(or_filter)
 
     def __invert__(self):
         "Invert Filter"
+
         async def invert_filter(event):
             return not (await self(event))
 
@@ -92,26 +95,31 @@ async def channel(event):
         return not getattr(entity, "megagroup", False)
 
     return False
-   
+
+
 class User(set, Filter):
     """Check if the sender is a specific user."""
+
     def __init__(self, users: int | str | list[int, str] | None = None):
         users = [] if users is None else users if isinstance(users, list) else [users]
 
         super().__init__(
-            "me" if u in ["me", "self"]
-            else u.lower().strip("@") if isinstance(u, str)
-            else u for u in users
+            (
+                "me"
+                if u in ["me", "self"]
+                else u.lower().strip("@") if isinstance(u, str) else u
+            )
+            for u in users
         )
 
     async def func(self, event):
         sender = await event.get_sender()
-        return (isinstance(sender, User)
-                and (sender.id in self
-                     or (sender.username
-                         and sender.username.lower() in self)
-                     or ("me" in self
-                         and sender.is_self)))
+        return isinstance(sender, User) and (
+            sender.id in self
+            or (sender.username and sender.username.lower() in self)
+            or ("me" in self and sender.is_self)
+        )
+
 
 @wrap
 def command(commands, use_strings=False):
@@ -124,15 +132,19 @@ def command(commands, use_strings=False):
         if not text:
             return False
 
-        username = event.client.username.lower() # Because this event.client is Bot client so username can't be None
+        username = (
+            event.client.username.lower()
+        )  # Because this event.client is Bot client so username can't be None
 
         if use_strings:
             lang = await get_lang(event.chat_id)
             lang = get_string(lang)
 
-            commands = {lang.get(cmd, cmd) for cmd in commands} # Get the command from string if use_strings is True if the command is not found on string so use the command
+            commands = {
+                lang.get(cmd, cmd) for cmd in commands
+            }  # Get the command from string if use_strings is True if the command is not found on string so use the command
         commands = {cmd.lower() for cmd in commands}
-        command_pattern = '|'.join(map(re.escape, commands))
+        command_pattern = "|".join(map(re.escape, commands))
         pattern = rf"^(?:/)?({command_pattern})(?:@{re.escape(username)})?(?:\s|$)"
 
         return bool(re.match(pattern, text, flags=re.IGNORECASE))
