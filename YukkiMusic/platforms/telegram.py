@@ -49,7 +49,7 @@ class Telegram:
         for message in messages:
             if offset:
                 break
-            if message.:
+            if message.entities:
                 for entity in message.entities:
                     if isistance(entity, types.MessageEntityUrl):
                         text = message.text
