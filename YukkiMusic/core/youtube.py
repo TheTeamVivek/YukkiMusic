@@ -23,7 +23,7 @@ class Track:
     duration: int  # duration in seconds
     streamtype: SourceType
     video: bool  # The song is audio or video
-    by: str | None = None  # None but required
+    #by: str | None = None  # None but required
     download_url: str | None = (
         None  # If provided directly used to download instead self.link
     )
@@ -40,6 +40,9 @@ class Track:
             self.vidid = p_match.group(1)
         else:
             self.vidid = self.streamtype.value
+        if not self.duration and not self.is_live: # WHEN is_live is False and duration also then check is live
+            if self.streamtype in [SourceType.APPLE, SourceType.RESSO, SourceType.SPOTIFY, SourceType.YOUTUBE, None]: # NONE BEACUSE IN THESE PLATFORMS THE streamtype and been provided by later
+                self.is_live = True #MAY BE I DON'T KNOW CORRECTLY
 
     async def is_exists(self):
         exists = False
@@ -48,7 +51,7 @@ class Track:
             if await is_on_off(YTDOWNLOADER):
                 exists = os.path.exists(self.file_path)
             else:
-                exists = len(self.file_path) > 30
+                exists = len(self.file_path) > 30 # FOR m3u8 URLS for m3u8 download mode
 
         return exists
 
@@ -59,12 +62,15 @@ class Track:
 
     @property
     def is_m3u8(self) -> bool:
-        return bool(self.is_live and self.title is None and self.duration is None)
+        return bool(self.is_live and not self.is_youtube)
+        #return bool(self.is_live and not self.title and not self.duration)
 
     async def download(self, options: dict | None = None):
         url = self.download_url if self.download_url else self.link
-
-        if await is_on_off(YTDOWNLOADER):
+        
+        if self.file_path is not None and await self.is_exists(): # THIS CONDITION FOR TELEGRAM FILES
+            return self.file_path
+        if await is_on_off(YTDOWNLOADER) and not self.is_live:
             ytdl_opts = {
                 "format": (
                     "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])"
@@ -124,7 +130,7 @@ class Track:
                 raise Exception(f"Failed to get file path: {stderr.decode().strip()}")
 
     async def __call__(self, audio: bool = True):
-        return self.file_path or await self.download(audio)
+        return self.file_path or await self.download()
 
 
 @alru_cache(maxsize=None)
@@ -137,7 +143,7 @@ async def search(query):
                 title=result["title"],
                 link=result["link"],
                 download_url=result["link"],
-                duration=(time_to_seconds(duration) if duration else 0),
+                duration=(time_to_seconds(duration) if str(duration) != "None" else 0), #TODO: CHECK THAT THE YOUTBE SEARCH PYTHON RETUNS DURATION IS None or "None"
                 thumb=result["thumbnails"][0]["url"].split("?")[0],
                 streamtype=None,
                 video=None,
@@ -158,7 +164,7 @@ def search_from_ytdlp(query):
     }
 
     with YoutubeDL(options) as ydl:
-        info_dict = ydl.extract_info(f"ytsearch: {query}", download=False)
+        info_dict = ydl.extract_info(f"ytsearch: {query}", download=False) #TODO: THIS CAN RETURN SEARCH RESULT OF A CHANNEL FIX IT
         details = info_dict.get("entries", [None])[0]
         if not details:
             raise ValueError("No results found.")
