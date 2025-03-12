@@ -12,7 +12,8 @@ import math
 from telethon import Button
 
 from YukkiMusic.utils.formatters import time_to_seconds
-
+from YukkiMusic.core.youtube import Track
+from YukkiMusic.core.enum import SourceType
 
 def get_progress_bar(percentage):
     umm = math.floor(percentage)
@@ -39,8 +40,7 @@ def get_progress_bar(percentage):
         return "▰▰▰▰▰▰▰▰▰▰"
     else:
         return "▱▱▱▱▱▱▱▱▱"
-
-
+        
 def stream_markup_timer(_, videoid, chat_id, played, dur):
     played_sec = time_to_seconds(played)
     duration_sec = time_to_seconds(dur)
@@ -147,6 +147,14 @@ def telegram_markup(_, chat_id):
     return buttons
 
 
+
+def play_markup(language: dict, chat_id: int, track :Track | None = None):
+    if track.vidid is not None and track.streamtype in [SourceType.APPLE, SourceType.RESSO, SourceType.SPOTIFY, SourceType.YOUTUBE]:
+        return "stream", stream_markup(language, videoid=vidid, chat_id=chat_id)
+    else:
+        return "tg", telegram_markup(language, chat_id)
+        
+        
 ## Search Query Inline
 
 
