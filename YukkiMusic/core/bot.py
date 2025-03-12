@@ -17,14 +17,7 @@ from functools import wraps
 
 import uvloop
 from pyrogram import Client, StopPropagation
-from pyrogram.errors import (
-    ChatSendMediaForbidden,
-    ChatSendPhotosForbidden,
-    ChatWriteForbidden,
-    FloodWait,
-    MessageIdInvalid,
-    MessageNotModified,
-)
+from pyrogram import errors
 from pyrogram.handlers import MessageHandler
 
 import config
@@ -38,14 +31,8 @@ uvloop.install()
 
 class YukkiBot(Client):
     def __init__(self, *args, **kwargs):
-        logger(__name__).info("Starting Bot...")
-
         super().__init__(*args, **kwargs)
         self.loaded_plug_counts: int = 0
-        self.name: str = None
-        self.username: str = None
-        self.mention: str = None
-        self.id: int = None
 
     def on_message(self, filters=None, group=0):
         def decorator(func):
@@ -59,11 +46,11 @@ class YukkiBot(Client):
                     )
                     await asyncio.sleep(e.value)
                 except (
-                    ChatWriteForbidden,
-                    ChatSendMediaForbidden,
-                    ChatSendPhotosForbidden,
-                    MessageNotModified,
-                    MessageIdInvalid,
+                    errors.ChatWriteForbidden,
+                    errors.ChatSendMediaForbidden,
+                    errors.ChatSendPhotosForbidden,
+                    errors.MessageNotModified,
+                    errors.MessageIdInvalid,
                 ):
                     pass
                 except StopPropagation:
@@ -143,31 +130,20 @@ class YukkiBot(Client):
                 logger(__name__).error(
                     "Failed to load 'utils' module: %s", e, exc_info=True
                 )
+                sys.exit()
 
         if utils:
             attrs["utils"] = utils
+        from YukkiMusic import HELPABLE
         for root, _, files in os.walk(base_dir):
             for file in files:
                 if (
                     file.endswith(".py")
                     and not file == "utils.py"
-                    or not file.startswith("__")
+                    and not file.startswith("__")
                 ):
                     file_path = os.path.join(root, file)
                     mod = await self.load_plugin(file_path, base_dir, attrs)
-                    yield mod
-
-    async def run_shell_command(self, command: list):
-        process = await asyncio.create_subprocess_exec(
-            *command,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-
-        stdout, stderr = await process.communicate()
-
-        return {
-            "returncode": process.returncode,
-            "stdout": stdout.decode().strip() if stdout else None,
-            "stderr": stderr.decode().strip() if stderr else None,
-        }
+                    if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
+                        if hasattr(mod, "__HELP__") and mod.__HELP__:
+                            HELPABLE[mod.__MODULE__.lower()] = mod
