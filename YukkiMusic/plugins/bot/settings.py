@@ -423,8 +423,8 @@ async def authusers_mar(event, _):
             except Exception:
                 pass
             j = 0
-            await event.edit(_["FETCHING_AUTHORIZED_USERS"])
-            msg = _["AUTHORIZED_USERS_LIST"]
+            await event.edit(_["auth_6"])
+            msg = _["auth_7"]
             for note in _authusers:
                 _note = await get_authuser(event.chat_id, note)
                 user_id = _note["auth_user_id"]
@@ -437,7 +437,7 @@ async def authusers_mar(event, _):
                 except Exception:
                     continue
                 msg += f"{j}➤ {user}[`{user_id}`]\n"
-                msg += f"   {_['AUTHORIZED_BY']} {admin_name}[`{admin_id}`]\n\n"
+                msg += f"   {_['auth_8']} {admin_name}[`{admin_id}`]\n\n"
             upl = [
                 [
                     Button.inline(text=_["BACK_BUTTON"], data=f"AU"),

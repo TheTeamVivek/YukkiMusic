@@ -32,7 +32,7 @@ from YukkiMusic.utils.decorators.language import language
 async def gbanuser(event, _):
     if not event.is_reply:
         if len(event.text.split()) != 2:
-            return await event.reply(_["USER_IDENTIFIER_REQUIRED"])
+            return await event.reply(_["general_1"])
         user = event.text.split(None, 1)[1]
         user = await tbot.get_entity(user)
         user_id = user.id
@@ -78,7 +78,7 @@ async def gbanuser(event, _):
 async def gungabn(event, _):
     if not event.is_reply:
         if len(event.text.split()) != 2:
-            return await event.reply(_["USER_IDENTIFIER_REQUIRED"])
+            return await event.reply(_["general_1"])
         user = event.text.split(None, 1)[1]
         user = await tbot.get_entity(user)
         user_id = user.id

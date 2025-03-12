@@ -22,7 +22,7 @@ from YukkiMusic.utils.decorators import admin_rights_check
 @admin_rights_check
 async def admins(event_, chat_id):
     if not len(event.text.split()) == 1:
-        return await event.reply(_["COMMAND_USAGE_ERROR"])
+        return await event.reply(_["general_2"])
     check = db.get(chat_id)
     if not check:
         return await event.reply(_["admin_21"])

@@ -107,7 +107,7 @@ async def play_commnd(
                 if ex_type == "AssistantErr":
                     err = e
                 else:
-                    err = _["ERROR_OCCURRED_MSG"].format(ex_type)
+                    err = _["general_3"].format(ex_type)
                     logger(__name__).error("An error occurred", exc_info=True)
                 return await mystic.edit(err)
             return await mystic.delete()
@@ -156,7 +156,7 @@ async def play_commnd(
                     err = e
                 else:
                     logger(__name__).error("An error occurred", exc_info=True)
-                    err = _["ERROR_OCCURRED_MSG"].format(ex_type)
+                    err = _["general_3"].format(ex_type)
                 return await mystic.edit(err)
             return await mystic.delete()
         return
@@ -325,7 +325,7 @@ async def play_commnd(
                 if ex_type == "AssistantErr":
                     err = e
                 else:
-                    err = _["ERROR_OCCURRED_MSG"].format(ex_type)
+                    err = _["general_3"].format(ex_type)
                     logger(__name__).error("An error occurred", exc_info=True)
                 return await mystic.edit(err)
             return await mystic.delete()
@@ -361,7 +361,7 @@ async def play_commnd(
                     err = e
                 else:
                     logger(__name__).error("An error occurred", exc_info=True)
-                    err = _["ERROR_OCCURRED_MSG"].format(ex_type)
+                    err = _["general_3"].format(ex_type)
                 return await mystic.edit(err)
             return await mystic.delete()
         else:
@@ -388,7 +388,7 @@ async def play_commnd(
                     err = e
                 else:
                     logger(__name__).error("An error occurred", exc_info=True)
-                    err = _["ERROR_OCCURRED_MSG"].format(ex_type)
+                    err = _["general_3"].format(ex_type)
                 return await mystic.edit(err)
             return await play_logs(message, streamtype="M3u8 or Index Link")
     else:
@@ -451,7 +451,7 @@ async def play_commnd(
             else:
                 logger(__name__).error("An error occurred", exc_info=True)
 
-                err = _["ERROR_OCCURRED_MSG"].format(ex_type)
+                err = _["general_3"].format(ex_type)
             return await mystic.edit(err)
         await mystic.delete()
         return await play_logs(message, streamtype=streamtype)

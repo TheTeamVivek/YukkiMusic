@@ -47,7 +47,7 @@ def play_wrapper(command):
                     ]
                 ]
             )
-            return await event.reply(_["ANONYMOUS_ADMIN"], buttons=upl)
+            return await event.reply(_["general_4"], buttons=upl)
 
         if await is_maintenance() is False:
             if event.sender_id not in SUDOERS:

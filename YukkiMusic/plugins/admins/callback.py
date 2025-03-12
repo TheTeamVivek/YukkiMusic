@@ -133,7 +133,7 @@ async def admin_callback(event, _):
     command, chat = callback_request.split("|")
     chat_id = int(chat)
     if not await is_active_chat(chat_id):
-        return await event.answer(_["NO_ACTIVE_VIDEO_STREAM"], alert=True)
+        return await event.answer(_["general_6"], alert=True)
     sender = await event.get_sender()
     mention = await tbot.create_mention(sender)
     is_non_admin = await is_nonadmin_chat(event.chat_id)
@@ -244,7 +244,7 @@ async def admin_callback(event, _):
             try:
                 await Yukki.skip_stream(chat_id, link, video=status)
             except Exception:
-                return await event.reply(_["STREAM_SWITCH_FAILED"])
+                return await event.reply(_["call_7"])
             button = telegram_markup(_, chat_id)
             img = await gen_thumb(videoid)
             run = await event.reply(
@@ -259,7 +259,7 @@ async def admin_callback(event, _):
             db[chat_id][0]["markup"] = "tg"
             await event.edit(txt)
         elif "vid_" in queued:
-            mystic = await event.reply(_["DOWNLOADING_NEXT_TRACK"], link_preview=False)
+            mystic = await event.reply(_["call_8"], link_preview=False)
             try:
                 file_path, direct = await Platform.youtube.download(
                     videoid,
@@ -268,11 +268,11 @@ async def admin_callback(event, _):
                     video=status,
                 )
             except Exception:
-                return await mystic.edit(_["STREAM_SWITCH_FAILED"])
+                return await mystic.edit(_["call_7"])
             try:
                 await Yukki.skip_stream(chat_id, file_path, video=status)
             except Exception:
-                return await mystic.edit(_["STREAM_SWITCH_FAILED"])
+                return await mystic.edit(_["call_7"])
             button = stream_markup(_, videoid, chat_id)
             img = await gen_thumb(videoid)
             run = await event.reply(
@@ -293,7 +293,7 @@ async def admin_callback(event, _):
             try:
                 await Yukki.skip_stream(chat_id, videoid, video=status)
             except Exception:
-                return await event.reply(_["STREAM_SWITCH_FAILED"])
+                return await event.reply(_["call_7"])
             button = telegram_markup(_, chat_id)
             run = await event.reply(
                 file=STREAM_IMG_URL,
@@ -307,7 +307,7 @@ async def admin_callback(event, _):
             try:
                 await Yukki.skip_stream(chat_id, queued, video=status)
             except Exception:
-                return await event.reply(_["STREAM_SWITCH_FAILED"])
+                return await event.reply(_["call_7"])
             if videoid == "telegram":
                 button = telegram_markup(_, chat_id)
                 run = await event.reply(
@@ -485,7 +485,7 @@ async def play_music(event, _):
     except Exception as e:
         ex_type = type(e).__name__
         err = (
-            e if ex_type == "AssistantErr" else _["ERROR_OCCURRED_MSG"].format(ex_type)
+            e if ex_type == "AssistantErr" else _["general_3"].format(ex_type)
         )
         return await mystic.edit(err)
     return await mystic.delete()
@@ -583,7 +583,7 @@ async def play_playlists_cb(event, _):
     except Exception as e:
         ex_type = type(e).__name__
         err = (
-            e if ex_type == "AssistantErr" else _["ERROR_OCCURRED_MSG"].format(ex_type)
+            e if ex_type == "AssistantErr" else _["general_3"].format(ex_type)
         )
         return await mystic.edit(err)
     return await mystic.delete()

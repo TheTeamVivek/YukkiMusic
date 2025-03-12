@@ -66,7 +66,7 @@ async def play_live_stream(client, CallbackQuery, _):
             err = (
                 e
                 if ex_type == "AssistantErr"
-                else _["ERROR_OCCURRED_MSG"].format(ex_type)
+                else _["general_3"].format(ex_type)
             )
             return await mystic.edit(err)
     else:

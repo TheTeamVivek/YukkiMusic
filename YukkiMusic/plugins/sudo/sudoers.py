@@ -23,7 +23,7 @@ async def useradd(event, _):
         )
     if not event.is_reply:
         if len(event.text.split()) != 2:
-            return await event.reply(_["USER_IDENTIFIER_REQUIRED"])
+            return await event.reply(_["general_1"])
         user = event.text.split(None, 1)[1]
         if "@" in user:
             user = user.replace("@", "")
@@ -61,7 +61,7 @@ async def userdel(event, _):
         )
     if not event.is_reply:
         if len(event.text.split()) != 2:
-            return await event.reply(_["USER_IDENTIFIER_REQUIRED"])
+            return await event.reply(_["general_1"])
         user = event.text.split(None, 1)[1]
         if "@" in user:
             user = user.replace("@", "")

@@ -65,7 +65,7 @@ async def stop_music(event):
                 ),
             ]
         ]
-        return await event.reply(_["ANONYMOUS_ADMIN"], buttons=upl)
+        return await event.reply(_["general_4"], buttons=upl)
 
     if comm[0][1] == "c":
         chat_id = await get_cmode(event.chat_id)
@@ -78,7 +78,7 @@ async def stop_music(event):
     else:
         chat_id = event.chat_id
     if not await is_active_chat(chat_id):
-        return await event.reply(_["NO_ACTIVE_VIDEO_STREAM"])
+        return await event.reply(_["general_6"])
     is_non_admin = await is_nonadmin_chat(event.chat_id)
     if not is_non_admin:
         if event.sender_id not in SUDOERS:

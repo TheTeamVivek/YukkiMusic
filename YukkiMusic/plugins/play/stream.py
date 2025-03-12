@@ -48,7 +48,7 @@ async def stream_command(
             text = "Please Turn on voice chat.. Bot is unable to stream urls.."
             return await app.send_message(config.LOG_GROUP_ID, text)
         except Exception as e:
-            return await mystic.edit(_["ERROR_OCCURRED_MSG"].format(type(e).__name__))
+            return await mystic.edit(_["general_3"].format(type(e).__name__))
         await mystic.edit(_["str_2"])
         try:
             await stream(
@@ -67,7 +67,7 @@ async def stream_command(
             err = (
                 e
                 if ex_type == "AssistantErr"
-                else _["ERROR_OCCURRED_MSG"].format(ex_type)
+                else _["general_3"].format(ex_type)
             )
             return await mystic.edit(err)
         return await play_logs(message, streamtype="M3u8 or Index Link")

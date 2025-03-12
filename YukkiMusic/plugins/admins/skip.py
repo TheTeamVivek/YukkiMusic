@@ -115,7 +115,7 @@ async def skip(event, _, chat_id):
         try:
             await Yukki.skip_stream(chat_id, link, video=status)
         except Exception:
-            return await event.reply(_["STREAM_SWITCH_FAILED"])
+            return await event.reply(_["call_7"])
         button = telegram_markup(_, chat_id)
         img = await gen_thumb(videoid)
         run = await event.reply(
@@ -129,7 +129,7 @@ async def skip(event, _, chat_id):
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "tg"
     elif "vid_" in queued:
-        mystic = await event.reply(_["DOWNLOADING_NEXT_TRACK"], link_preview=False)
+        mystic = await event.reply(_["call_8"], link_preview=False)
         try:
             file_path, direct = await Platform.youtube.download(
                 videoid,
@@ -138,11 +138,11 @@ async def skip(event, _, chat_id):
                 video=status,
             )
         except Exception:
-            return await mystic.edit(_["STREAM_SWITCH_FAILED"])
+            return await mystic.edit(_["call_7"])
         try:
             await Yukki.skip_stream(chat_id, file_path, video=status)
         except Exception:
-            return await mystic.edit(_["STREAM_SWITCH_FAILED"])
+            return await mystic.edit(_["call_7"])
         button = stream_markup(_, videoid, chat_id)
         img = await gen_thumb(videoid)
         run = await event.reply(
@@ -162,7 +162,7 @@ async def skip(event, _, chat_id):
         try:
             await Yukki.skip_stream(chat_id, videoid, video=status)
         except Exception:
-            return await event.reply(_["STREAM_SWITCH_FAILED"])
+            return await event.reply(_["call_7"])
         button = telegram_markup(_, chat_id)
         run = await event.reply(
             file=config.STREAM_IMG_URL,
@@ -175,7 +175,7 @@ async def skip(event, _, chat_id):
         try:
             await Yukki.skip_stream(chat_id, queued, video=status)
         except Exception:
-            return await event.reply(_["STREAM_SWITCH_FAILED"])
+            return await event.reply(_["call_7"])
         if videoid == "telegram":
             button = telegram_markup(_, chat_id)
             run = await event.reply(
