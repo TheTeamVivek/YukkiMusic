@@ -118,7 +118,7 @@ class TelethonClient(TelegramClient):
             "MEMBER": types.ChannelParticipant,
         }
 
-        if isinstance(chat, types.InputPeerChat):
+        if isinstance(chat, types.Chat):
             r = await self(functions.messages.GetFullChatRequest(chat_id=chat.chat_id))
 
             members = getattr(r.full_chat.participants, "participants", [])
@@ -128,9 +128,9 @@ class TelethonClient(TelegramClient):
                     for status, cls in status_map.items():
                         if isinstance(member, cls):
                             return member, status
-                    raise errors.UserNotParticipantError
+            raise errors.UserNotParticipantError
 
-        elif isinstance(chat, types.InputPeerChannel):
+        elif isinstance(chat, types.Channel):
             r = await self(
                 functions.channels.GetParticipantRequest(channel=chat, participant=user)
             )
@@ -175,10 +175,10 @@ class TelethonClient(TelegramClient):
                     errors.MessageNotModifiedError,
                     errors.MessageIdInvalidError,
                 ) as e:
-                    if isinstance(e, errors.ChatWriteForbiddenError):
-                        await self.run_coro(
-                            event.chat_id, func=self.leave_chat, err=False
-                        )  # using for disable errors
+                  #  if isinstance(e, errors.ChatWriteForbiddenError):
+                  #      await self.run_coro(
+                  #          event.chat_id, func=self.leave_chat, err=False
+                  #      )  # using for disable errors
 
                 except events.StopPropagation as e:
                     raise events.StopPropagation from e
@@ -194,7 +194,7 @@ class TelethonClient(TelegramClient):
 
         return decorator
 
-    async def run(self, command: list):
+    async def run_shell_command(self, command: list):
         process = await asyncio.create_subprocess_exec(
             *command,
             stdout=asyncio.subprocess.PIPE,
@@ -267,17 +267,17 @@ class TelethonClient(TelegramClient):
             else config.LOG_GROUP_ID
         )
 
-        for owner_id in config.OWNER_ID:
+        for id in config.OWNER_ID:
             try:
                 await self.set_bot_commands(
                     owner_commands,
                     scope=types.BotCommandScopePeerUser(
-                        peer=logger_id, user_id=owner_id
+                        peer=logger_id, user_id=id
                     ),
                 )
                 await self.set_bot_commands(
                     private_commands + owner_commands,
-                    scope=types.BotCommandScopePeer(peer=owner_id),
+                    scope=types.BotCommandScopePeer(peer=id),
                 )
             except Exception:
                 pass
