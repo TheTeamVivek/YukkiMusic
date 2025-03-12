@@ -8,10 +8,16 @@
 # All rights reserved.
 #
 
-from .channelplay import *
+from .channelplay import is_cplay, get_channeplay_cb
 from .database import *
 from .decorators import *
 from .formatters import *
+from .stream import *
 from .inline import *
 from .pastebin import *
 from .sys import *
+from .exceptions import AssistantErr
+from .logger import play_logs
+from .pastebin import paste
+from .sys import bot_sys_stats
+from .thumbnails import gen_thumb, gen_qthumb
