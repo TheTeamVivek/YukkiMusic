@@ -19,7 +19,7 @@ def is_cplay(text: str, command: list | str) -> bool:
         command = [command]
     text = text.lstrip("/").split() # remove prfix and split
     text = text[0].split("@")[0] # split and remove @username if in text
-    return any(text == cmd for cmd in command])
+    return any(text == cmd for cmd in command)
 
 async def get_channeplay_cb(_, cplay, event):
     if cplay == "c":
