@@ -16,8 +16,7 @@ from datetime import datetime
 from functools import wraps
 
 import uvloop
-from pyrogram import Client, StopPropagation
-from pyrogram import errors
+from pyrogram import Client, StopPropagation, errors
 from pyrogram.handlers import MessageHandler
 
 import config
@@ -135,6 +134,7 @@ class YukkiBot(Client):
         if utils:
             attrs["utils"] = utils
         from YukkiMusic import HELPABLE
+
         for root, _, files in os.walk(base_dir):
             for file in files:
                 if (

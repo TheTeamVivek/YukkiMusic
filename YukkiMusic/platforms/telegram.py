@@ -14,14 +14,8 @@ import time
 from datetime import datetime, timedelta
 
 import aiohttp
-from pyrogram.enums import MessageEntityType
 from pyrogram.file_id import FileId, FileType, FileUniqueId, FileUniqueType
-from pyrogram.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    Message,
-    Voice,
-)
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Voice
 from telethon.tl import types
 
 from config import lyrical
