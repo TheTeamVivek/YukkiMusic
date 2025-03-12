@@ -15,8 +15,36 @@ jobs:
         shell: bash
         run: |
           declare -A replacements=(
-            ["message.chat.id"]="event.chat_id"
-            ["message.from_user.id"]="event.sender_id"
+            ["USER_IDENTIFIER_REQUIRED"]="general_1"
+            ["COMMAND_USAGE_ERROR"]="general_2"
+            ["ERROR_OCCURRED_MSG"]="general_3"
+            ["ANONYMOUS_ADMIN"]="general_4"
+            ["PERMISSION_REQUIRED"]="general_5"
+            ["NO_ACTIVE_VIDEO_STREAM"]="general_6"
+
+            ["OVERLOAD_WAIT_MSG"]="tg_1"
+            ["DOWNLOAD_FAILED_MSG"]="tg_2"
+
+            ["BOT_ADMIN_REQUIRED"]="call_1"
+            ["ASSISTANT_BANNED"]="call_2"
+            ["ASSISTANT_INVITE_EXCEPTION"]="call_3"
+            ["INVITE_PERMISSION_REQUIRED"]="call_4"
+            ["ASSISTANT_JOINING_WAIT"]="call_5"
+            ["ASSISTANT_JOIN_SUCCESS"]="call_6"
+            ["STREAM_SWITCH_FAILED"]="call_7"
+            ["DOWNLOADING_NEXT_TRACK"]="call_8"
+            ["ASSISTANT_TOO_MANY_CHATS"]="call_9"
+            ["ASSISTANT_FLOOD_WAIT"]="call_10"
+
+            ["MAX_AUTHORIZED_USERS"]="auth_1"
+            ["AUTHORIZED_USER_ADDED"]="auth_2"
+            ["USER_ALREADY_AUTHORIZED"]="auth_3"
+            ["AUTHORIZED_USER_REMOVED"]="auth_4"
+            ["USER_NOT_AUTHORIZED"]="auth_5"
+            ["FETCHING_AUTHORIZED_USERS"]="auth_6"
+            ["AUTHORIZED_USERS_LIST"]="auth_7"
+            ["AUTHORIZED_BY"]="auth_8"
+          
           )
 
           for key in "${!replacements[@]}"; do
