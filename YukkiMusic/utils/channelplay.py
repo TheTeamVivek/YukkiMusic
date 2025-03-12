@@ -11,9 +11,18 @@
 
 from YukkiMusic.utils.database import get_cmode
 
+def is_cplay(text: str, command: list | str) -> bool:
+    text = str(text).strip()
+    if not text or not text.strip():
+        return False
+    if isistance(command, str):
+        command = [command]
+    text = text.lstrip("/").split() # remove prfix and split
+    text = text[0].split("@")[0] # split and remove @username if in text
+    return any(text == cmd for cmd in command])
 
-async def get_channeplay_cb(_, command, event):
-    if command == "c":
+async def get_channeplay_cb(_, cplay, event):
+    if cplay == "c":
         chat_id = await get_cmode(event.chat_id)
         if chat_id is None:
             try:
