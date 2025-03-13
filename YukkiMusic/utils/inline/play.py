@@ -38,7 +38,7 @@ def get_progress_bar(percentage):
     elif 80 < umm <= 90:
         return "▰▰▰▰▰▰▰▰▰"
     elif 90 < umm <= 100:
-        return "▰▰▰▰▰▰▰▰▰▰"
+        return "▰▰▰▰▰▰▰▰▰"
     else:
         return "▱▱▱▱▱▱▱▱▱"
 
@@ -155,8 +155,8 @@ def play_markup(language: dict, chat_id: int, track: Track | None = None):
         SourceType.RESSO,
         SourceType.SPOTIFY,
         SourceType.YOUTUBE,
-    ]:
-        return "stream", stream_markup(language, videoid=vidid, chat_id=chat_id)
+    ] and not (track.is_live or track.is_m3u8):
+        return "stream", stream_markup(language, videoid=track.vidid, chat_id=chat_id)
     else:
         return "tg", telegram_markup(language, chat_id)
 
