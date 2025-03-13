@@ -11,27 +11,22 @@
 import os
 from random import randint
 
-from strings import get_string
-
 import config
-from YukkiMusic import Platform, tbot
-from YukkiMusic.platforms import carbon
+from strings import get_string
+from YukkiMusic import tbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.core.youtube import Track
 from YukkiMusic.misc import db
-from YukkiMusic.utils.database import (
-    add_active_video_chat,
-    is_active_chat,
-    is_video_allowed,
-    get_lang,
-)
+from YukkiMusic.platforms import carbon
+from YukkiMusic.utils.database import get_lang, is_active_chat, is_video_allowed
 from YukkiMusic.utils.exceptions import AssistantErr
+from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline.play import play_markup
 from YukkiMusic.utils.inline.playlist import close_markup
 from YukkiMusic.utils.pastebin import paste
-from YukkiMusic.utils.stream.queue import put_queue, put_queue_index
+from YukkiMusic.utils.stream.queue import put_queue
 from YukkiMusic.utils.thumbnails import gen_qthumb, gen_thumb
-from YukkiMusic.utils.formatters import seconds_to_min
+
 
 async def stream(
     chat_id: int,
@@ -43,9 +38,8 @@ async def stream(
     language = await get_lang(original_chat_id)
     _ = get_string(language)
     user_mention = await tbot.create_mention(user_id)
-    track_ = None
     is_queue_ = False
-    
+
     if not result:
         return
     if video:
@@ -68,7 +62,7 @@ async def stream(
                     original_chat_id=original_chat_id,
                     user_id=user_id,
                     track=song,
-                    )
+                )
                 position = len(db.get(chat_id)) - 1
                 count += 1
                 msg += f"{count}- {title[:70]}\n"
@@ -76,13 +70,13 @@ async def stream(
             else:
                 if not forceplay:
                     db[chat_id] = []
-                
+
                 try:
                     file_path = await song.download()
                 except Exception as e:
                     await tbot.handle_error(e)
                     raise AssistantErr(_["play_16"])
-                await Yukki.join_call(  
+                await Yukki.join_call(
                     chat_id, file_path, video=song.video, image=song.thumb
                 )
                 await put_queue(
@@ -92,9 +86,7 @@ async def stream(
                     track=song,
                     forceplay=forceplay,
                 )
-                thumb = await gen_thumb(
-                    track.vidid, track.thumb
-                )  
+                thumb = await gen_thumb(track.vidid, track.thumb)
                 what, button = play_markup(_, chat_id, track)
                 run = await tbot.send_file(
                     original_chat_id,
@@ -118,9 +110,7 @@ async def stream(
                 car = os.linesep.join(msg.split(os.linesep)[:17])
             else:
                 car = msg
-            carbon = await carbon.generate(
-                car, randint(100, 10000000)
-            )
+            carbon = await carbon.generate(car, randint(100, 10000000))
             upl = close_markup(_)
             return await tbot.send_file(
                 original_chat_id,
@@ -134,10 +124,11 @@ async def stream(
             return
         if await is_active_chat(chat_id):
             await put_queue(
-                    chat_id=chat_id,
-                    original_chat_id=original_chat_id,
-                    user_id=user_id,
-                    track=track)
+                chat_id=chat_id,
+                original_chat_id=original_chat_id,
+                user_id=user_id,
+                track=track,
+            )
             is_queue_ = True
         else:
             if not forceplay:
@@ -146,30 +137,28 @@ async def stream(
                 file_path = await track.download()
             except Exception as e:
                 await tbot.handle_error(e)
-                raise AssistantErr(_["play_16"])    
-            await Yukki.join_call(
-                chat_id, file_path, video=video, image=track.thumb
-            )
+                raise AssistantErr(_["play_16"])
+            await Yukki.join_call(chat_id, file_path, video=video, image=track.thumb)
             await put_queue(
-                    chat_id=chat_id,
-                    original_chat_id=original_chat_id,
-                    user_id=user_id,
-                    track=track,
-                    forceplay=forceplay,
+                chat_id=chat_id,
+                original_chat_id=original_chat_id,
+                user_id=user_id,
+                track=track,
+                forceplay=forceplay,
             )
     elif track.is_live or track.is_m3u8:
         if await is_active_chat(chat_id):
             await put_queue(
-                    chat_id=chat_id,
-                    original_chat_id=original_chat_id,
-                    user_id=user_id,
-                    track=track,
+                chat_id=chat_id,
+                original_chat_id=original_chat_id,
+                user_id=user_id,
+                track=track,
             )
             is_queue_ = True
         else:
             if not forceplay:
                 db[chat_id] = []
-            try:    
+            try:
                 file_path = await track.download()
             except Exception as e:
                 await tbot.handle_error(e)
@@ -181,32 +170,38 @@ async def stream(
                 image=track.thumb,
             )
             await put_queue(
-                    chat_id=chat_id,
-                    original_chat_id=original_chat_id,
-                    user_id=user_id,
-                    track=track,
-                    forceplay=forceplay,
+                chat_id=chat_id,
+                original_chat_id=original_chat_id,
+                user_id=user_id,
+                track=track,
+                forceplay=forceplay,
             )
     if is_queue_:
         photo = await gen_qthumb(track.vidid, track.thumb)
         caption = _["queue_4"].format(
-            len(db.get(chat_id)) - 1, 
+            len(db.get(chat_id)) - 1,
             track.title[:30],
-            seconds_to_min(track.duration), 
-            user_mention
+            seconds_to_min(track.duration),
+            user_mention,
         )
         button = close_markup(_)
     else:
         title = track.title or "Index or M3u8 Link"
-        link = f"https://t.me/{tbot.username}?start=info_{track.vidid}" if track.vidid else track.link
+        link = (
+            f"https://t.me/{tbot.username}?start=info_{track.vidid}"
+            if track.vidid
+            else track.link
+        )
         duration = seconds_to_min(track.duration) if track.duration else "00:00"
         photo = await gen_thumb(track.vidid, track.thumb)
-        caption=_["stream_1"].format(
-                        title[:27],
-                        link,    
-                        duration,
-                        user_mention,
-                    ),
+        caption = (
+            _["stream_1"].format(
+                title[:27],
+                link,
+                duration,
+                user_mention,
+            ),
+        )
         what, button = play_markup(_, chat_id, track)
     run = await tbot.send_message(
         original_chat_id,
