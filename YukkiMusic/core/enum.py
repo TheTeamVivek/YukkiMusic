@@ -15,3 +15,4 @@ class SourceType(Enum):
     SPOTIFY = "Spotify"
     TELEGRAM = "Telegram"
     YOUTUBE = "YouTube"
+    M3U8 = "M3U8 Urls"
