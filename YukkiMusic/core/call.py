@@ -214,9 +214,7 @@ class Call:
         except ChatAdminRequiredError as e:
             raise AssistantErr(_["call_1"]) from e
         except Exception as e:
-            raise AssistantErr(
-                _["call_3"].format(app.mention, type(e).__name__)
-            ) from e
+            raise AssistantErr(_["call_3"].format(app.mention, type(e).__name__)) from e
         if chat_id in links:
             invitelink = links[chat_id]
         else:
@@ -236,9 +234,7 @@ class Call:
                     raise AssistantErr(_["call_1"]) from e
                 except Exception as e:
                     raise AssistantErr(
-                        _["call_3"].format(
-                            app.mention, type(e).__name__
-                        )
+                        _["call_3"].format(app.mention, type(e).__name__)
                     ) from e
 
             if invitelink.startswith("https://t.me/+"):
@@ -254,9 +250,7 @@ class Call:
             try:
                 await tbot(HideChatJoinRequestRequest(chat_id, userbot.id))
             except Exception as e:
-                raise AssistantErr(
-                    _["call_3"].format(type(e).__name__)
-                ) from e
+                raise AssistantErr(_["call_3"].format(type(e).__name__)) from e
             await asyncio.sleep(1)
             raise AssistantErr(_["call_6"].format(app.mention))
         except UserAlreadyParticipant:
@@ -266,9 +260,7 @@ class Call:
                 attempts += 1
                 await set_assistant(chat_id)
                 return await self.join_chat(chat_id, attempts)
-            raise AssistantErr(
-                _["call_9"].format(config.SUPPORT_GROUP)
-            ) from e
+            raise AssistantErr(_["call_9"].format(config.SUPPORT_GROUP)) from e
         except FloodWait as e:
             time = e.value
             if time < 20:
@@ -282,9 +274,7 @@ class Call:
 
             raise AssistantErr(_["call_10"].format(time)) from e
         except Exception as e:
-            raise AssistantErr(
-                _["call_3"].format(type(e).__name__)
-            ) from e
+            raise AssistantErr(_["call_3"].format(type(e).__name__)) from e
 
     async def play(self, chat_id, stream=None, config=None, group: bool = True):
         assistant = await group_assistant(self, chat_id)
@@ -451,9 +441,7 @@ class Call:
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
             elif "vid_" in queued:
-                mystic = await app.send_message(
-                    original_chat_id, _["call_8"]
-                )
+                mystic = await app.send_message(original_chat_id, _["call_8"])
                 try:
                     file_path, direct = await Platform.youtube.download(
                         videoid,
@@ -462,9 +450,7 @@ class Call:
                         video=True if str(streamtype) == "video" else False,
                     )
                 except Exception:
-                    return await mystic.edit(
-                        _["call_7"], link_preview=False
-                    )
+                    return await mystic.edit(_["call_7"], link_preview=False)
                 if video:
                     stream = MediaStream(
                         file_path,

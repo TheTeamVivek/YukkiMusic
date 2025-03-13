@@ -14,6 +14,7 @@ from YukkiMusic.utils.formatters import time_to_seconds
 
 from .enum import SourceType
 
+
 @dataclass
 class Track:
     title: str
@@ -22,7 +23,7 @@ class Track:
     duration: int  # duration in seconds
     streamtype: SourceType
     video: bool  # The song is audio or video
-        
+
     download_url: str | None = (
         None  # If provided directly used to download instead self.link
     )
@@ -38,7 +39,7 @@ class Track:
             self.vidid = p_match.group(1)
         else:
             self.vidid = ""
-            
+
         self.title = self.title.title() if self.title is not None else None
         if (
             not self.duration and self.is_live is None
@@ -71,14 +72,13 @@ class Track:
     @property
     def is_m3u8(self) -> bool:
         return self.streamtype == SourceType.M3U8
-        
-        
+
     async def download(self):
         if (
             self.file_path is not None and await self.is_exists()
         ):  # THIS CONDITION FOR TELEGRAM FILES BECAUSE THESE FILES ARE ALREADY DOWNLOADED
             return self.file_path
-            
+
         if await is_on_off(YTDOWNLOADER) and not (self.is_live or self.is_m3u8):
             ytdl_opts = {
                 "format": (
@@ -117,7 +117,7 @@ class Track:
         else:
             if self.is_m3u8:
                 return self.link or self.download_url
-                
+
             format_code = "b" if self.video else "bestaudio/best"  # Keep "b" not "best"
             command = f'yt-dlp -g -f "{format_code}" {"--cookies " + cookies() if self.is_youtube else ""} "{self.download_url}"'
             process = await asyncio.create_subprocess_shell(
@@ -128,10 +128,12 @@ class Track:
             stdout, stderr = await process.communicate()
 
             if stdout:
-                self.file_path = stdout.decode('utf-8').strip().split()[0]
+                self.file_path = stdout.decode("utf-8").strip().split()[0]
                 return self.file_path
             else:
-                raise Exception(f"Failed to get file path: {stderr.decode('utf-8').strip()}")
+                raise Exception(
+                    f"Failed to get file path: {stderr.decode('utf-8').strip()}"
+                )
 
     async def __call__(self):
         return self.file_path or await self.download()
@@ -187,6 +189,6 @@ def search_from_ytdlp(query: str, video: bool = False):
             download_url=details["webpage_url"],
             duration=details["duration"],
             thumb=details["thumbnails"][0]["url"],
-            streamtype=SourceType.YOUTUBE, # KEEP HERE YOUTUBE LATER WE CAN CHANGE IT TO CORRECT SourceType
+            streamtype=SourceType.YOUTUBE,  # KEEP HERE YOUTUBE LATER WE CAN CHANGE IT TO CORRECT SourceType
             video=video,
         )
