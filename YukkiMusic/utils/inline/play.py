@@ -150,12 +150,17 @@ def telegram_markup(_, chat_id):
 
 
 def play_markup(language: dict, chat_id: int, track: Track | None = None):
-    if track.vidid is not None and track.streamtype in [
-        SourceType.APPLE,
-        SourceType.RESSO,
-        SourceType.SPOTIFY,
-        SourceType.YOUTUBE,
-    ] and not (track.is_live or track.is_m3u8):
+    if (
+        track.vidid is not None
+        and track.streamtype
+        in [
+            SourceType.APPLE,
+            SourceType.RESSO,
+            SourceType.SPOTIFY,
+            SourceType.YOUTUBE,
+        ]
+        and not (track.is_live or track.is_m3u8)
+    ):
         return "stream", stream_markup(language, videoid=track.vidid, chat_id=chat_id)
     else:
         return "tg", telegram_markup(language, chat_id)
