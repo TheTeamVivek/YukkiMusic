@@ -176,23 +176,23 @@ async def stream(
                 track=track,
                 forceplay=forceplay,
             )
-    if is_queue_:
-        photo = await gen_qthumb(track.vidid, track.thumb)
-        caption = _["queue_4"].format(
-            len(db.get(chat_id)) - 1,
-            track.title[:30],
-            seconds_to_min(track.duration),
-            user_mention,
-        )
-        button = close_markup(_)
-    else:
-        title = track.title or "Index or M3u8 Link"
-        link = (
+    title = track.title or "Index or M3u8 Link"
+    link = (
             f"https://t.me/{tbot.username}?start=info_{track.vidid}"
             if track.vidid
             else track.link
         )
-        duration = seconds_to_min(track.duration) if track.duration else "00:00"
+    duration = seconds_to_min(track.duration) if track.duration else "00:00"        
+    if is_queue_:
+        photo = await gen_qthumb(track.vidid, track.thumb)
+        caption = _["queue_4"].format(
+            len(db.get(chat_id)) - 1,
+            title[:30],
+            duration,
+            user_mention,
+        )
+        button = close_markup(_)
+    else:
         photo = await gen_thumb(track.vidid, track.thumb)
         caption = (
             _["stream_1"].format(
