@@ -10,8 +10,8 @@
 
 import asyncio
 import inspect
-import traceback
 import logging
+import traceback
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -30,17 +30,17 @@ class ShellRunResult:
     returncode: int
     stdout: str
     stderr: str
-        
+
+
 commands = {
     "en": {
-        private : [
+        private: [
             types.BotCommand("start", "Start the bot"),
             types.BotCommand("help", "Get the help menu"),
             types.BotCommand("ping", "Check if the bot is alive or dead"),
         ],
-        group : [types.BotCommand("play", "Start playing requested song")],
-
-        admin : [
+        group: [types.BotCommand("play", "Start playing requested song")],
+        admin: [
             types.BotCommand("play", "Start playing requested song"),
             types.BotCommand("skip", "Move to next track in queue"),
             types.BotCommand("pause", "Pause the current playing song"),
@@ -50,7 +50,6 @@ commands = {
             types.BotCommand("playmode", "Change the default playmode for your chat"),
             types.BotCommand("settings", "Open bot settings for your chat"),
             types.BotCommand("reboot", "Reboot  the bot for your chat"),
-            
         ],
         owner: [
             types.BotCommand("autoend", "Enable or disable auto end for streams"),
@@ -66,7 +65,7 @@ commands = {
             types.BotCommand("getvar", "Get a specific environment variable"),
             types.BotCommand("delvar", "Delete a specific environment variable"),
             types.BotCommand("setvar", "Set a specific environment variable"),
-            #types.BotCommand("usage", "Get dyno usage information"),
+            # types.BotCommand("usage", "Get dyno usage information"),
             types.BotCommand("maintenance", "Enable or disable maintenance mode"),
             types.BotCommand("logger", "Enable or disable logging"),
             types.BotCommand("block", "Block a user"),
@@ -75,8 +74,8 @@ commands = {
             types.BotCommand("whitelist", "Whitelist a chat"),
             types.BotCommand("blacklisted", "List all blacklisted chats"),
         ],
-    }            
-}                    
+    }
+}
 
 
 class TelethonClient(TelegramClient):
@@ -183,7 +182,7 @@ class TelethonClient(TelegramClient):
         else:
             raise ValueError(f'The chat_id "{chat_id}" belongs to a user')
 
-    async def handle_error(self, exc: Exception, e = None):  # TODO Make it more brief
+    async def handle_error(self, exc: Exception, e=None):  # TODO Make it more brief
         date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         error_trace = traceback.format_exc()
 
@@ -256,21 +255,21 @@ class TelethonClient(TelegramClient):
         for lang_code, command in commands.items():
             try:
                 await self.set_bot_commands(
-                    commands=command["private"], 
-                    lang_code=lang_code, 
-                    scope=types.BotCommandScopeUsers()
-                )
-                await self.set_bot_commands(
-                    commands=command["group"], 
+                    commands=command["private"],
                     lang_code=lang_code,
-                    scope=types.BotCommandScopeChats()
+                    scope=types.BotCommandScopeUsers(),
                 )
                 await self.set_bot_commands(
-                   commands=command["admin"], 
-                   lang_code=lang_code, 
-                   scope=types.BotCommandScopeChatAdmins()
+                    commands=command["group"],
+                    lang_code=lang_code,
+                    scope=types.BotCommandScopeChats(),
                 )
-                
+                await self.set_bot_commands(
+                    commands=command["admin"],
+                    lang_code=lang_code,
+                    scope=types.BotCommandScopeChatAdmins(),
+                )
+
                 logger_id = config.LOG_GROUP_ID
                 for id in config.OWNER_ID:
                     await self.set_bot_commands(
@@ -286,7 +285,9 @@ class TelethonClient(TelegramClient):
             except Exception:
                 pass
 
-    async def set_bot_commands(self, scope, commands: list[types.BotCommand], lang_code: str = "en"):
+    async def set_bot_commands(
+        self, scope, commands: list[types.BotCommand], lang_code: str = "en"
+    ):
         return await self(
             functions.bots.SetBotCommandsRequest(
                 scope=scope,
