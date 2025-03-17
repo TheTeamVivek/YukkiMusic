@@ -9,7 +9,7 @@
 #
 
 from config import BANNED_USERS
-from YukkiMusic import app, tbot
+from YukkiMusic import tbot
 from YukkiMusic.utils.database import (
     get_playmode,
     get_playtype,
