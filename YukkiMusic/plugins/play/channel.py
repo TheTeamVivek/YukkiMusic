@@ -13,7 +13,7 @@ from telethon.tl.functions.channels import GetFullChannelRequest
 from telethon.tl.types import Channel
 
 from config import BANNED_USERS
-from YukkiMusic import tbot
+from YukkiMusic import tbot, utils
 from YukkiMusic.utils.database import set_cmode
 from YukkiMusic.utils.decorators.admins import admin_actual
 
@@ -24,16 +24,17 @@ from YukkiMusic.utils.decorators.admins import admin_actual
 @admin_actual
 async def playmode_(language, _):
     chat = await event.get_chat()
-    if len(event.message.text.split()) < 2:
+    if len(event.text.split()) < 2:
+        comm = _["CHANNELPLAY_COMMAND"][0]
         return await event.reply(
-            _["cplay_1"].format(chat.title, _["CHANNELPLAY_COMMAND"])
+            _["cplay_1"].format(chat.title, comm)
         )
-    query = event.message.text.split(None, 2)[1].lower().strip()
-    if (str(query)).lower() == "disable":
+    query = event.text.split(None, 2)[1].lower().strip()
+    if query == "disable":
         await set_cmode(event.chat_id, None)
         return await event.reply("Channel Play Disabled")
 
-    elif str(query) == "linked":
+    elif query == "linked":
         chat = (await tbot(GetFullChannelRequest(channel=chat.id))).full_chat
         if chat.linked_chat_id:
             chat_id = chat.linked_chat_id
@@ -50,10 +51,7 @@ async def playmode_(language, _):
             chat = await tbot.get_entity(query)
         except Exception:
             return await event.reply(_["cplay_4"])
-        if isinstance(chat, Channel):
-            if chat.megagroup:
-                return await event.reply(_["cplay_5"])
-        else:
+        if not isinstance(chat, Channel) or getattr(chat, "megagroup", False):
             return await event.reply(_["cplay_5"])
         try:
             creator, status = await tbot.get_chat_member(chat.id, event.sender_id)
