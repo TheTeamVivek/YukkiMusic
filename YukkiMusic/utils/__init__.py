@@ -36,3 +36,21 @@ def get_chat_id(entity: types.User | types.Chat | types.Channel) -> int:
     elif isinstance(entity, types.Channel):
         chat_id = int(f"-100{entity.id}")
     return chat_id
+
+def parse_flags(text: str):
+    is_vplay = is_forceplay = is_cplay = False
+    args = text.lstrip("/").split()
+
+    for arg in args:
+        if arg in ["-v", "vplay"]:
+            is_vplay = True
+        elif arg in ["-f", "fplay", "forceplay"]:
+            is_forceplay = True
+        elif arg in ["-c", "cplay"]:
+            is_cplay = True
+        elif arg == "cvplay":
+            is_vplay, is_cplay = True, True
+        elif arg == "cvplayforce":
+            is_vplay, is_cplay, is_forceplay = True, True, True
+
+    return is_vplay, is_forceplay, is_cplay
