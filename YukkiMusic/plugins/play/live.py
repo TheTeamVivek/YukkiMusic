@@ -33,15 +33,13 @@ async def play_live_stream(event, _):
         chat_id, channel = await get_channeplay_cb(_, cplay, event)
     except Exception:
         return
-        
+
     await event.delete()
     try:
         await event.answer()
     except Exception:
         pass
-    mystic = await event.reply(
-        _["play_2"].format(channel) if channel else _["play_1"]
-    )
+    mystic = await event.reply(_["play_2"].format(channel) if channel else _["play_1"])
     try:
         url = youtube.base + vidid
         track = await youtube.track(url, mode == "v")
