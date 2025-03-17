@@ -32,7 +32,7 @@ class Filter:
                 return False
             return x and y
 
-        return Filter(and_filter)
+        return self.__class__(and_filter)
 
     def __or__(self, other):
         "Or Filter"
@@ -44,7 +44,7 @@ class Filter:
                 return True
             return x or y
 
-        return Filter(or_filter)
+        return self.__class__(or_filter)
 
     def __invert__(self):
         "Invert Filter"
@@ -52,7 +52,7 @@ class Filter:
         async def invert_filter(event):
             return not (await self(event))
 
-        return Filter(invert_filter)
+        return self.__class__(invert_filter)
 
 
 def wrap(func):
