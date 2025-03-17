@@ -8,12 +8,8 @@
 # All rights reserved.
 #
 
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardMarkup, Message
-
 from config import BANNED_USERS
-from strings import command
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.utils.database import (
     get_playmode,
     get_playtype,
@@ -23,26 +19,28 @@ from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.inline.settings import playmode_users_markup
 
 
-@app.on_message(command("PLAYMODE_COMMAND") & filters.group & ~BANNED_USERS)
+@tbot.on_message(flt.command("PLAYMODE_COMMAND", True) & flt.group & ~BANNED_USERS)
 @language
-async def playmode_(client, message: Message, _):
-    playmode = await get_playmode(event.chat_id)
+async def playmode_(event, _):
+    chat_id = event.chat_id
+    chat_title = (await event.get_chat()).title
+    playmode = await get_playmode(chat_id)
     if playmode == "Direct":
-        Direct = True
+        direct = True
     else:
-        Direct = None
-    is_non_admin = await is_nonadmin_chat(event.chat_id)
+        direct = None
+    is_non_admin = await is_nonadmin_chat(chat_id)
     if not is_non_admin:
-        Group = True
+        group = True
     else:
-        Group = None
-    playty = await get_playtype(event.chat_id)
+        group = None
+    playty = await get_playtype(chat_id)
     if playty == "Everyone":
-        Playtype = None
+        playtype = None
     else:
-        Playtype = True
-    buttons = playmode_users_markup(_, Direct, Group, Playtype)
-    response = await event.reply(
-        _["playmode_1"].format(message.chat.title),
-        buttons=InlineKeyboardMarkup(buttons),
+        playtype = True
+    buttons = playmode_users_markup(_, direct, group, playtype)
+    await event.reply(
+        _["playmode_1"].format(chat_title),
+        buttons=buttons,
     )
