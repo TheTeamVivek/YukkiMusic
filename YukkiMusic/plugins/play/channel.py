@@ -13,7 +13,7 @@ from telethon.tl.functions.channels import GetFullChannelRequest
 from telethon.tl.types import Channel
 
 from config import BANNED_USERS
-from YukkiMusic import tbot, utils
+from YukkiMusic import tbot
 from YukkiMusic.utils.database import set_cmode
 from YukkiMusic.utils.decorators.admins import admin_actual
 
@@ -26,9 +26,7 @@ async def playmode_(language, _):
     chat = await event.get_chat()
     if len(event.text.split()) < 2:
         comm = _["CHANNELPLAY_COMMAND"][0]
-        return await event.reply(
-            _["cplay_1"].format(chat.title, comm)
-        )
+        return await event.reply(_["cplay_1"].format(chat.title, comm))
     query = event.text.split(None, 2)[1].lower().strip()
     if query == "disable":
         await set_cmode(event.chat_id, None)
