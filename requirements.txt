@@ -13,7 +13,7 @@ motor
 pykeyboard2
 psutil
 pytube
-py-tgcalls==2.1.0
+py-tgcalls==2.0.6
 python-dotenv
 pyyaml
 requests
