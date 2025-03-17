@@ -14,6 +14,7 @@
 import os
 import sys
 import traceback
+import contextlib
 from io import StringIO
 from time import time
 
@@ -42,25 +43,25 @@ async def aexec(code, event):
 @tbot.on_message(flt.command(["ev", "eval"]) & flt.user(SUDOERS) & ~flt.forwarded)
 async def executor(event):
     if len(event.text.split()) < 2:
-        return await event.reply("**Give me something to exceute**")
+        return await event.reply("**Give me something to execute**")
     try:
         cmd = event.text.split(" ", maxsplit=1)[1]
     except IndexError:
         return await event.delete()
     t1 = time()
-    old_stderr = sys.stderr
-    old_stdout = sys.stdout
-    redirected_output = sys.stdout = StringIO()
-    redirected_error = sys.stderr = StringIO()
+
+    redirected_output = StringIO()
+    redirected_error = StringIO()
     stdout, stderr, exc = None, None, None
-    try:
-        await aexec(cmd, event)
-    except Exception:
-        exc = traceback.format_exc()
+
+    with contextlib.redirect_stdout(redirected_output), contextlib.redirect_stderr(redirected_error):
+        try:
+            await aexec(cmd, event)
+        except Exception:
+            exc = traceback.format_exc()
+
     stdout = redirected_output.getvalue()
     stderr = redirected_error.getvalue()
-    sys.stdout = old_stdout
-    sys.stderr = old_stderr
     evaluation = "\n"
     if exc:
         evaluation += exc
@@ -70,21 +71,14 @@ async def executor(event):
         evaluation += stdout
     else:
         evaluation += "Success"
+    
     final_output = f"<b>RESULTS:</b>\n<pre language='python'>{evaluation}</pre>"
     if len(final_output) > 4096:
         filename = "output.txt"
         with open(filename, "w+", encoding="utf8") as out_file:
             out_file.write(str(evaluation))
         t2 = time()
-        keyboard = [
-            [
-                Button.inline(
-                    text="⏳",
-                    data=f"runtime {t2-t1} Seconds",
-                )
-            ]
-        ]
-
+        keyboard = [[Button.inline(text="⏳", data=f"runtime {t2-t1} Seconds")]]
         await event.reply(
             file=filename,
             message=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
@@ -96,14 +90,8 @@ async def executor(event):
         t2 = time()
         keyboard = [
             [
-                Button.inline(
-                    text="⏳",
-                    data=f"runtime {round(t2-t1, 3)} Seconds",
-                ),
-                Button.inline(
-                    text="🗑",
-                    data=f"forceclose abc|{event.sender_id}",
-                ),
+                Button.inline(text="⏳", data=f"runtime {round(t2-t1, 3)} Seconds"),
+                Button.inline(text="🗑", data=f"forceclose abc|{event.sender_id}"),
             ]
         ]
         await event.reply(message=final_output, buttons=keyboard, parse_mode="HTML")
