@@ -8,13 +8,13 @@
 # All rights reserved.
 #
 
+import contextlib
+
 # This aeval and sh module is taken from < https://github.com/TheHamkerCat/WilliamButcherBot >
 # Credit goes to TheHamkerCat.
 #
 import os
-import sys
 import traceback
-import contextlib
 from io import StringIO
 from time import time
 
@@ -54,7 +54,9 @@ async def executor(event):
     redirected_error = StringIO()
     stdout, stderr, exc = None, None, None
 
-    with contextlib.redirect_stdout(redirected_output), contextlib.redirect_stderr(redirected_error):
+    with contextlib.redirect_stdout(redirected_output), contextlib.redirect_stderr(
+        redirected_error
+    ):
         try:
             await aexec(cmd, event)
         except Exception:
@@ -71,7 +73,7 @@ async def executor(event):
         evaluation += stdout
     else:
         evaluation += "Success"
-    
+
     final_output = f"<b>RESULTS:</b>\n<pre language='python'>{evaluation}</pre>"
     if len(final_output) > 4096:
         filename = "output.txt"
