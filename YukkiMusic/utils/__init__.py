@@ -8,6 +8,10 @@
 # All rights reserved.
 #
 
+from typing import Union
+
+from telethon.tl import types
+
 from .channelplay import get_channeplay_cb, is_cplay
 from .database import *
 from .decorators import *
@@ -23,16 +27,12 @@ from .sys import bot_sys_stats
 from .thumbnails import gen_qthumb, gen_thumb
 
 
-
-from typing import Union
-from telethon.tl import types
-
-def get_chat_id(entity : Union[types.User, types.Chat, types.Channel]) -> int:
+def get_chat_id(entity: types.User | types.Chat | types.Channel) -> int:
     chat_id = None
     if isinstance(entity, types.User):
-    	    chat_id = entity.id
+        chat_id = entity.id
     elif isinstance(entity, types.Chat):
-    	    chat_id = int(f"-{entity.id}")
+        chat_id = int(f"-{entity.id}")
     elif isinstance(entity, types.Channel):
-    	    chat_id = int(f"-100{entity.id}")
-    return chat_id	
+        chat_id = int(f"-100{entity.id}")
+    return chat_id
