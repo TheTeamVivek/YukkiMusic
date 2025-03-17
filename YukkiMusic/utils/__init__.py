@@ -37,6 +37,7 @@ def get_chat_id(entity: types.User | types.Chat | types.Channel) -> int:
         chat_id = int(f"-100{entity.id}")
     return chat_id
 
+
 def parse_flags(text: str):
     is_vplay = is_forceplay = is_cplay = False
     args = text.lstrip("/").split()
