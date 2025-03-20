@@ -14,23 +14,16 @@
 
 import asyncio
 import os
-import re
-import sys
 import traceback
-from inspect import getfullargspec
+import contextlib
 from io import StringIO
 from time import time
 
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from YukkiMusic import app, userbot
-from YukkiMusic.core.call import Yukki
+from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-
-
-## end
-
 
 async def aexec(code, client, message):
     local_vars = {
@@ -60,19 +53,15 @@ async def executor(client: app, message: Message):
     except IndexError:
         return await message.delete()
     t1 = time()
-    old_stderr = sys.stderr
-    old_stdout = sys.stdout
-    redirected_output = sys.stdout = StringIO()
-    redirected_error = sys.stderr = StringIO()
+    redirected_output = redirected_error = StringIO()
     stdout, stderr, exc = None, None, None
-    try:
-        await aexec(cmd, client, message)
-    except Exception:
-        exc = traceback.format_exc()
+    with contextlib.redirect_stdout(redirected_output), contextlib.redirect_stderr(redirected_error):
+        try:
+            await aexec(cmd, client, message)
+        except Exception:
+            exc = traceback.format_exc()
     stdout = redirected_output.getvalue()
     stderr = redirected_error.getvalue()
-    sys.stdout = old_stdout
-    sys.stderr = old_stderr
     evaluation = "\n"
     if exc:
         evaluation += exc
@@ -171,13 +160,7 @@ async def shellrunner(_, message: Message):
             stdout, stderr = await process.communicate()
             return stdout.decode().strip(), stderr.decode().strip()
         except Exception as err:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            errors = traceback.format_exception(
-                etype=exc_type,
-                value=exc_obj,
-                tb=exc_tb,
-            )
-            return None, "".join(errors)
+            return None, traceback.format_exc()
 
     if "\n" in text:
         commands = text.split("\n")
