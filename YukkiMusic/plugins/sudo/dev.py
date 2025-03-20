@@ -22,28 +22,24 @@ from io import StringIO
 from time import time
 
 from pyrogram import filters
-from pyrogram.raw.functions import *
-from pyrogram.raw.types import *
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from YukkiMusic import app, userbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS
 
-## -------- end of required imports to run this script
-
-## ------ Below are some optional Imports you can remove it if is imported  you don't need to import it when using eval command
-
 
 ## end
 
 
 async def aexec(code, client, message):
-    local_vars = {}
+    local_vars = {
+        "__builtins__": __builtins__, # DON'T REMOVE THIS
+        "app": app,
+    }
     exec(
         "async def __aexec(client, message): "
         + "".join(f"\n {a}" for a in code.split("\n")),
-        globals(),
         local_vars,
     )
     __aexec_func = local_vars["__aexec"]
