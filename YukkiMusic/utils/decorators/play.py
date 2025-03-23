@@ -111,7 +111,7 @@ def play_wrapper(command):
 
         playmode = await get_playmode(event.chat_id)
         playty = await get_playtype(event.chat_id)
-        if playty != "Everyone":
+        if playty != "EVERYONE":
             if event.sender_id not in SUDOERS:
                 admins = adminlist.get(event.chat_id)
                 if not admins:

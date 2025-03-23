@@ -94,7 +94,7 @@ async def set_cmode(chat_id: int, mode: int):
 async def get_playtype(chat_id: int) -> str:
     if chat_id not in playtype:
         playtype[chat_id] = (
-            await playtypedb.find_one({"chat_id": chat_id}) or {"mode": "Everyone"}
+            await playtypedb.find_one({"chat_id": chat_id}) or {"mode": "EVERYONE"}
         )["mode"]
     return playtype[chat_id]
 
@@ -110,7 +110,7 @@ async def set_playtype(chat_id: int, mode: str):
 async def get_playmode(chat_id: int) -> str:
     if chat_id not in playmode:
         playmode[chat_id] = (
-            await playmodedb.find_one({"chat_id": chat_id}) or {"mode": "Direct"}
+            await playmodedb.find_one({"chat_id": chat_id}) or {"mode": "DIRECT"}
         )["mode"]
     return playmode[chat_id]
 

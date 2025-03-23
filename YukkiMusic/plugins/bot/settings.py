@@ -210,21 +210,21 @@ async def without_Admin_rights(event, _):
         except Exception:
             pass
         playmode = await get_playmode(event.chat_id)
-        if playmode == "Direct":
-            Direct = True
+        if playmode == "DIRECT":
+            DIRECT = True
         else:
-            Direct = None
+            DIRECT = None
         is_non_admin = await is_nonadmin_chat(event.chat_id)
         if not is_non_admin:
             Group = True
         else:
             Group = None
         playty = await get_playtype(event.chat_id)
-        if playty == "Everyone":
+        if playty == "EVERYONE":
             Playtype = None
         else:
             Playtype = True
-        buttons = playmode_users_markup(_, Direct, Group, Playtype)
+        buttons = playmode_users_markup(_, DIRECT, Group, Playtype)
     if command == "AU":
         try:
             await event.answer(_["set_cb_3"], alert=True)
@@ -344,62 +344,62 @@ async def playmode_ans(event, _):
             await remove_nonadmin_chat(event.chat_id)
             Group = True
         playmode = await get_playmode(event.chat_id)
-        if playmode == "Direct":
-            Direct = True
+        if playmode == "DIRECT":
+            DIRECT = True
         else:
-            Direct = None
+            DIRECT = None
         playty = await get_playtype(event.chat_id)
-        if playty == "Everyone":
+        if playty == "EVERYONE":
             Playtype = None
         else:
             Playtype = True
-        buttons = playmode_users_markup(_, Direct, Group, Playtype)
+        buttons = playmode_users_markup(_, DIRECT, Group, Playtype)
     if command == "MODECHANGE":
         try:
             await event.answer(_["set_cb_6"], alert=True)
         except Exception:
             pass
         playmode = await get_playmode(event.chat_id)
-        if playmode == "Direct":
+        if playmode == "DIRECT":
             await set_playmode(event.chat_id, "Inline")
-            Direct = None
+            DIRECT = None
         else:
-            await set_playmode(event.chat_id, "Direct")
-            Direct = True
+            await set_playmode(event.chat_id, "DIRECT")
+            DIRECT = True
         is_non_admin = await is_nonadmin_chat(event.chat_id)
         if not is_non_admin:
             Group = True
         else:
             Group = None
         playty = await get_playtype(event.chat_id)
-        if playty == "Everyone":
+        if playty == "EVERYONE":
             Playtype = False
         else:
             Playtype = True
-        buttons = playmode_users_markup(_, Direct, Group, Playtype)
+        buttons = playmode_users_markup(_, DIRECT, Group, Playtype)
     if command == "PLAYTYPECHANGE":
         try:
             await event.answer(_["set_cb_6"], alert=True)
         except Exception:
             pass
         playty = await get_playtype(event.chat_id)
-        if playty == "Everyone":
+        if playty == "EVERYONE":
             await set_playtype(event.chat_id, "Admin")
             Playtype = False
         else:
-            await set_playtype(event.chat_id, "Everyone")
+            await set_playtype(event.chat_id, "EVERYONE")
             Playtype = True
         playmode = await get_playmode(event.chat_id)
-        if playmode == "Direct":
-            Direct = True
+        if playmode == "DIRECT":
+            DIRECT = True
         else:
-            Direct = None
+            DIRECT = None
         is_non_admin = await is_nonadmin_chat(event.chat_id)
         if not is_non_admin:
             Group = True
         else:
             Group = None
-        buttons = playmode_users_markup(_, Direct, Group, Playtype)
+        buttons = playmode_users_markup(_, DIRECT, Group, Playtype)
     return await event.edit(buttons=buttons)
 
 

@@ -25,7 +25,7 @@ async def playmode_(event, _):
     chat_id = event.chat_id
     chat_title = (await event.get_chat()).title
     playmode = await get_playmode(chat_id)
-    if playmode == "Direct":
+    if playmode == "DIRECT":
         direct = True
     else:
         direct = None
@@ -35,7 +35,7 @@ async def playmode_(event, _):
     else:
         group = None
     playty = await get_playtype(chat_id)
-    if playty == "Everyone":
+    if playty == "EVERYONE":
         playtype = None
     else:
         playtype = True
