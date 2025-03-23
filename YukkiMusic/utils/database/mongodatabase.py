@@ -111,7 +111,7 @@ async def is_served_chat(chat_id: int) -> bool:
 
 
 async def add_served_chat(chat_id: int):
-    if not await is_served_chat(chat_id)
+    if not await is_served_chat(chat_id):
         return await chatsdb.insert_one({"chat_id": chat_id})
 
 
