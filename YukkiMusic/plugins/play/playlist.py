@@ -120,7 +120,7 @@ async def add_playlist(event, _):
         adding = await event.reply(_["playlist_21"])
         try:
             results = await youtube.playlist(query, config.SERVER_PLAYLIST_LIMIT)
-            count = len(await get_playlist_names(user_id)
+            count = len(await get_playlist_names(user_id))
             for x in results:
                 if count == SERVER_PLAYLIST_LIMIT:
                     break
