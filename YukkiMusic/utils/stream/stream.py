@@ -56,7 +56,7 @@ async def stream(
         track = track[: config.PLAYLIST_FETCH_LIMIT]
 
         for song in track:
-            if not isinstance(song Track):
+            if not isinstance(song, Track):
                 q = youtube.base + song if track[0].streamtype == SourceType.YOUTUBE else song
                 song = await youtube.track(q,track[0].video)
                 song.streamtype = track[0].streamtype
