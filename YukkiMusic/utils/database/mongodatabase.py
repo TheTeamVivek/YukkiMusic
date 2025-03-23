@@ -26,6 +26,11 @@ privatedb = mongodb.privatechats
 
 playlist = []
 
+
+
+async def _agen_to_list(f):
+    result = [ element async for element in f]
+    return result
 # Playlist
 
 
@@ -37,25 +42,18 @@ async def _get_playlists(chat_id: int) -> dict[str, int]:
 
 
 async def get_playlist_names(chat_id: int) -> list[str]:
-    _notes = []
-    for note in await _get_playlists(chat_id):
-        _notes.append(note)
-    return _notes
+    note = await _get_playlists(chat_id)
+    return await _agen_to_list(note)
 
 
-async def get_playlist(chat_id: int, name: str) -> bool | dict:
-    name = name
+async def get_playlist(chat_id: int, vidid: str) -> bool | dict:
     _notes = await _get_playlists(chat_id)
-    if name in _notes:
-        return _notes[name]
-    else:
-        return False
+    return _notes.get(vidid, False)
 
 
-async def save_playlist(chat_id: int, name: str, note: dict):
-    name = name
+async def save_playlist(chat_id: int, vidid: str, info: dict): #FIXME: MAYBE IF I GUESS RIGHT SO WE DONT NEED TO PROVIDE THE INFO BEACAUSE THIS IS NOT IN USED
     _notes = await _get_playlists(chat_id)
-    _notes[name] = note
+    _notes[vidid] = info
     await playlistdb.update_one(
         {"chat_id": chat_id}, {"$set": {"notes": _notes}}, upsert=True
     )
@@ -63,7 +61,6 @@ async def save_playlist(chat_id: int, name: str, note: dict):
 
 async def delete_playlist(chat_id: int, name: str) -> bool:
     notesd = await _get_playlists(chat_id)
-    name = name
     if name in notesd:
         del notesd[name]
         await playlistdb.update_one(
@@ -77,24 +74,18 @@ async def delete_playlist(chat_id: int, name: str) -> bool:
 
 # Users
 
-
 async def is_served_user(user_id: int) -> bool:
-    user = await usersdb.find_one({"user_id": user_id})
-    if not user:
-        return False
-    return True
+    if user := await usersdb.find_one({"user_id": user_id}):
+        return True
+    return False
 
 
 async def get_served_users() -> list:
-    users_list = []
-    async for user in usersdb.find({"user_id": {"$gt": 0}}):
-        users_list.append(user)
-    return users_list
+    return await _agen_to_list(usersdb.find({"user_id": {"$gt": 0}}))
 
 
 async def add_served_user(user_id: int):
-    is_served = await is_served_user(user_id)
-    if is_served:
+    if is_served := await is_served_user(user_id):
         return
     return await usersdb.insert_one({"user_id": user_id})
 
@@ -108,22 +99,18 @@ async def delete_served_user(user_id: int):
 
 
 async def get_served_chats() -> list:
-    chats_list = []
-    async for chat in chatsdb.find({"chat_id": {"$lt": 0}}):
-        chats_list.append(chat)
-    return chats_list
+    chat = chatsdb.find({"chat_id": {"$lt": 0}})
+    return await _agen_to_list(chat)
 
 
 async def is_served_chat(chat_id: int) -> bool:
-    chat = await chatsdb.find_one({"chat_id": chat_id})
-    if not chat:
-        return False
-    return True
+    if chat := await chatsdb.find_one({"chat_id": chat_id}):
+        return True
+    return False
 
 
 async def add_served_chat(chat_id: int):
-    is_served = await is_served_chat(chat_id)
-    if is_served:
+    if is_served := await is_served_chat(chat_id)
         return
     return await chatsdb.insert_one({"chat_id": chat_id})
 
@@ -160,17 +147,14 @@ async def whitelist_chat(chat_id: int) -> bool:
 
 
 async def get_private_served_chats() -> list:
-    chats_list = []
-    async for chat in privatedb.find({"chat_id": {"$lt": 0}}):
-        chats_list.append(chat)
-    return chats_list
+    chat =   privatedb.find({"chat_id": {"$lt": 0}})
+    return await _agen_to_list(chat)
 
 
 async def is_served_private_chat(chat_id: int) -> bool:
-    chat = await privatedb.find_one({"chat_id": chat_id})
-    if not chat:
-        return False
-    return True
+    if chat := await privatedb.find_one({"chat_id": chat_id}):
+        return True
+    return False
 
 
 async def add_private_chat(chat_id: int):
@@ -191,30 +175,23 @@ async def remove_private_chat(chat_id: int):
 
 
 async def _get_authusers(chat_id: int) -> dict[str, int]:
-    _notes = await authuserdb.find_one({"chat_id": chat_id})
-    if not _notes:
-        return {}
-    return _notes["notes"]
+    if _notes := await authuserdb.find_one({"chat_id": chat_id}):
+        return _notes["notes"]
+    return {}    
 
 
-async def get_authuser_names(chat_id: int) -> list[str]:
+async def get_authuser_names(chat_id: int) -> List[str]:
     _notes = []
     for note in await _get_authusers(chat_id):
         _notes.append(note)
     return _notes
 
-
 async def get_authuser(chat_id: int, name: str) -> bool | dict:
-    name = name
     _notes = await _get_authusers(chat_id)
-    if name in _notes:
-        return _notes[name]
-    else:
-        return False
+    return _notes.get(name, False)
 
 
 async def save_authuser(chat_id: int, name: str, note: dict):
-    name = name
     _notes = await _get_authusers(chat_id)
     _notes[name] = note
 
@@ -225,7 +202,6 @@ async def save_authuser(chat_id: int, name: str, note: dict):
 
 async def delete_authuser(chat_id: int, name: str) -> bool:
     notesd = await _get_authusers(chat_id)
-    name = name
     if name in notesd:
         del notesd[name]
         await authuserdb.update_one(
@@ -250,23 +226,21 @@ async def get_gbanned() -> list:
 
 async def is_gbanned_user(user_id: int) -> bool:
     user = await gbansdb.find_one({"user_id": user_id})
-    if not user:
-        return False
-    return True
+    if user:
+        return True
+    return False
 
 
 async def add_gban_user(user_id: int):
     is_gbanned = await is_gbanned_user(user_id)
-    if is_gbanned:
-        return
-    return await gbansdb.insert_one({"user_id": user_id})
+    if not is_gbanned:
+        return await gbansdb.insert_one({"user_id": user_id})
 
 
 async def remove_gban_user(user_id: int):
     is_gbanned = await is_gbanned_user(user_id)
-    if not is_gbanned:
-        return
-    return await gbansdb.delete_one({"user_id": user_id})
+    if is_gbanned:
+        return await gbansdb.delete_one({"user_id": user_id})
 
 
 # Sudoers
@@ -432,20 +406,18 @@ async def get_banned_count() -> int:
 
 async def is_banned_user(user_id: int) -> bool:
     user = await blockeddb.find_one({"user_id": user_id})
-    if not user:
-        return False
-    return True
+    if user:
+        return True
+    return False
 
 
 async def add_banned_user(user_id: int):
     is_gbanned = await is_banned_user(user_id)
-    if is_gbanned:
-        return
-    return await blockeddb.insert_one({"user_id": user_id})
+    if not is_gbanned:
+        return await blockeddb.insert_one({"user_id": user_id})
 
 
 async def remove_banned_user(user_id: int):
     is_gbanned = await is_banned_user(user_id)
-    if not is_gbanned:
-        return
-    return await blockeddb.delete_one({"user_id": user_id})
+    if is_gbanned:
+        return await blockeddb.delete_one({"user_id": user_id})
