@@ -29,7 +29,7 @@ async def put_queue(
         "chat_id": original_chat_id,
         "track": track,
         "played": 0,
-        "by": by,    
+        "by": by,
     }
     if forceplay:
         if check := db.get(chat_id):
