@@ -24,7 +24,7 @@ async def _mongo():
         logger(__name__).warning(
             "No MONGO DB URL found.. Your Bot will work on Yukki's Database"
         )
-        from YukkiMusic import tbkt
+        from YukkiMusic import tbot
         await tbot.start()
         _mongo_async_ = AsyncIOMotorClient(TEMP_MONGODB)
         mongodb = _mongo_async_[tbot.username]
