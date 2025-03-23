@@ -71,8 +71,8 @@ def time_to_seconds(time):
 
 
 def seconds_to_min(seconds):
-    if seconds is None:
-        return "-"
+    if not seconds:
+        return "00:00"
     seconds = int(seconds)
     d, h, m, s = (
         seconds // (3600 * 24),
