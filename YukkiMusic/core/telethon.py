@@ -11,8 +11,8 @@
 import asyncio
 import inspect
 import logging
-import traceback
 import sys
+import traceback
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -21,8 +21,8 @@ from functools import wraps
 from telethon import TelegramClient, errors, events
 from telethon.tl import functions, types
 
-from YukkiMusic.utils import pastebin
 import config
+from YukkiMusic.utils import pastebin
 
 log = logging.getLogger(__name__)
 
@@ -193,30 +193,30 @@ class TelethonClient(TelegramClient):
             args = type(exc), exc, exc.__traceback__
         else:
             args = sys.exc_info()
-            
+
         error_trace = "".join(traceback.format_exception(*args))
         error_message = f"**Date:** {date_time}\n"
         if event:
             chat = await event.get_chat()
             if event.is_private:
-                msg_link =  f"tg://openmessage?user_id={chat.id}&message_id={event.id}"
+                msg_link = f"tg://openmessage?user_id={chat.id}&message_id={event.id}"
             else:
-                msg_link =  f"https://t.me/c/{chat.id}/{event.id}"
-                
-            error_message+= (
+                msg_link = f"https://t.me/c/{chat.id}/{event.id}"
+
+            error_message += (
                 f"**ChatId:** {event.chat_id}\n"
                 f"**SenderId:** {event.sender_id}\n"
                 f"**Text:** ```python\n{event.text}```\n"
                 f"**MessageLink:** {msg_link}\n\n"
-            )    
-            
+            )
+
         error_message += f"**Error:** {type(exc).__name__}\n"
         if len(error_trace) > 900:
             pastebin_link = await pastebin.paste(error_trace)
-            error_message+= f"**Traceback:** [BatBin Link]({pastebin_link})\n"
+            error_message += f"**Traceback:** [BatBin Link]({pastebin_link})\n"
         else:
-            error_message+= f"**Traceback:**\n```python\n{error_trace}```\n"
-            
+            error_message += f"**Traceback:**\n```python\n{error_trace}```\n"
+
         await self.send_message(config.LOG_GROUP_ID, error_message)
 
         try:
