@@ -22,7 +22,7 @@ loop = asyncio.get_event_loop_policy().get_event_loop()
 
 async def _mongo():
     if config.MONGO_DB_URI is None:
-        logger(__name__).warning(
+        logger.warning(
             "No MONGO DB URL found.. Your Bot will work on Yukki's Database"
         )
         from YukkiMusic import tbot
