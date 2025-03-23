@@ -6,14 +6,14 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-
+import asyncio
 import socket
 import time
 
 import heroku3
 
 import config
-from YukkiMusic.core.mongo import pymongodb
+from YukkiMusic.core.mongo import mongodb
 
 from .logging import logger
 
@@ -21,34 +21,35 @@ db = {}
 HAPP = None
 _boot_ = time.time()
 
+loop = asyncio.get_event_loop_policy().get_event_loop()
 
 def is_heroku():
     return "heroku" in socket.getfqdn()
 
+async def _sudo():
+    if config.MONGO_DB_URI is None:
+        for user_id in config.OWNER_ID:
+            config.SUDOERS.add(user_id)
+    else:
+        sudoersdb = mongodb.sudoers
+        db_sudoers = await sudoersdb.find_one({"sudo": "sudo"})
+        db_sudoers = [] if not db_sudoers else db_sudoers["sudoers"]
+        for user_id in config.OWNER_ID:
+            config.SUDOERS.add(user_id)
+            if user_id not in db_sudoers:
+                db_sudoers.append(user_id)
+                await sudoersdb.update_one(
+                    {"sudo": "sudo"},
+                    {"$set": {"sudoers": db_sudoers}},
+                    upsert=True,
+                )
+        if db_sudoers:
+            for x in db_sudoers:
+                config.SUDOERS.add(x)
+                
+    logger(__name__).info("Sudoers Loaded.")
 
-SUDOERS = set()
-
-if config.MONGO_DB_URI is None:
-    for user_id in config.OWNER_ID:
-        SUDOERS.add(user_id)
-else:
-    sudoersdb = pymongodb.sudoers
-    db_sudoers = sudoersdb.find_one({"sudo": "sudo"})
-    db_sudoers = [] if not db_sudoers else db_sudoers["sudoers"]
-    for user_id in config.OWNER_ID:
-        SUDOERS.add(user_id)
-        if user_id not in db_sudoers:
-            db_sudoers.append(user_id)
-            sudoersdb.update_one(
-                {"sudo": "sudo"},
-                {"$set": {"sudoers": db_sudoers}},
-                upsert=True,
-            )
-    if db_sudoers:
-        for x in db_sudoers:
-            SUDOERS.add(x)
-logger(__name__).info("Sudoers Loaded.")
-
+loop.run_until_complete(_sudo())
 
 if is_heroku():
     if config.HEROKU_API_KEY and config.HEROKU_APP_NAME:
