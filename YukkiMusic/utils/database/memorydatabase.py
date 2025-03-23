@@ -46,25 +46,30 @@ autoend = {}
 
 # Auto End Stream
 
+
 async def is_autoend() -> bool:
     chat_id = 123
     if chat_id not in autoend:
         autoend[chat_id] = bool(await autoenddb.find_one({"chat_id": chat_id}))
     return autoend[chat_id]
 
+
 async def autoend_on():
     autoend[123] = True
     if not await autoenddb.find_one({"chat_id": 123}):
         return await autoenddb.insert_one({"chat_id": 123})
+
 
 async def autoend_off():
     autoend[123] = False
     if await autoenddb.find_one({"chat_id": 123}):
         return await autoenddb.delete_one({"chat_id": 123})
 
+
 # LOOP PLAY
 async def get_loop(chat_id: int) -> int:
     return loop.get(chat_id, 0)
+
 
 async def set_loop(chat_id: int, mode: int):
     loop[chat_id] = mode
@@ -88,7 +93,9 @@ async def set_cmode(chat_id: int, mode: int):
 # PLAY TYPE WHETHER ADMINS ONLY OR EVERYONE
 async def get_playtype(chat_id: int) -> str:
     if chat_id not in playtype:
-        playtype[chat_id] = (await playtypedb.find_one({"chat_id": chat_id}) or {"mode": "Everyone"})["mode"]
+        playtype[chat_id] = (
+            await playtypedb.find_one({"chat_id": chat_id}) or {"mode": "Everyone"}
+        )["mode"]
     return playtype[chat_id]
 
 
@@ -102,7 +109,9 @@ async def set_playtype(chat_id: int, mode: str):
 # play mode whether inline or direct query
 async def get_playmode(chat_id: int) -> str:
     if chat_id not in playmode:
-        playmode[chat_id] = (await playmodedb.find_one({"chat_id": chat_id}) or {"mode": "Direct"})["mode"]
+        playmode[chat_id] = (
+            await playmodedb.find_one({"chat_id": chat_id}) or {"mode": "Direct"}
+        )["mode"]
     return playmode[chat_id]
 
 
@@ -116,7 +125,9 @@ async def set_playmode(chat_id: int, mode: str):
 # language
 async def get_lang(chat_id: int) -> str:
     if chat_id not in langm:
-        langm[chat_id] = (await langdb.find_one({"chat_id": chat_id}) or {"lang": "en"})["lang"]
+        langm[chat_id] = (
+            await langdb.find_one({"chat_id": chat_id}) or {"lang": "en"}
+        )["lang"]
     return langm[chat_id]
 
 
@@ -177,7 +188,7 @@ async def get_active_video_chats() -> list:
 
 async def is_active_video_chat(chat_id: int) -> bool:
     return chat_id in activevideo
-    
+
 
 async def add_active_video_chat(chat_id: int):
     if chat_id not in activevideo:
@@ -258,8 +269,12 @@ async def is_video_allowed(chat_id: int) -> bool:
     else:
         limit = vlimit[0]
 
-    return limit != 0 and (await is_active_video_chat(chat_id) or len(await get_active_video_chats()) < limit)
-    
+    return limit != 0 and (
+        await is_active_video_chat(chat_id)
+        or len(await get_active_video_chats()) < limit
+    )
+
+
 async def get_video_limit() -> str:
     if not vlimit:
         dblimit = await videodb.find_one({"chat_id": 123456})
@@ -277,7 +292,7 @@ async def set_video_limit(limit: int):
 # On Off
 async def is_on_off(on_off: int) -> bool:
     return bool(await onoffdb.find_one({"on_off": on_off}))
-    
+
 
 async def add_on(on_off: int):
     is_on = await is_on_off(on_off)
@@ -299,6 +314,7 @@ async def is_maintenance() -> bool:
         maintenance[:] = [1 if await onoffdb.find_one({"on_off": 1}) else 2]
     return 1 not in maintenance
 
+
 async def maintenance_off():
     maintenance[:] = [2]
     if await is_on_off(1):
@@ -309,6 +325,7 @@ async def maintenance_on():
     maintenance[:] = [1]
     if not await is_on_off(1):
         return await onoffdb.insert_one({"on_off": 1})
+
 
 async def save_audio_bitrate(chat_id: int, bitrate: str):
     audio[chat_id] = bitrate
