@@ -54,8 +54,8 @@ async def is_autoend() -> bool:
 
 async def autoend_on():
     autoend[123] = True
-    if not await autoenddb.find_one({"chat_id": 123):
-        return await autoenddb.insert_one({"chat_id": 123)
+    if not await autoenddb.find_one({"chat_id": 123}):
+        return await autoenddb.insert_one({"chat_id": 123})
 
 async def autoend_off():
     autoend[123] = False
