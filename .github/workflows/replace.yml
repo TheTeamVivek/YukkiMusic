@@ -66,8 +66,3 @@ jobs:
 
       - name: Delete old workflow run
         uses: Viyomx/delete-workflow-runs@dev
-
-      - name: Delete old workflow run
-        uses: Viyomx/delete-workflow-runs@dev
-        with:
-          workflow_name: 'pages-build-deployment'
