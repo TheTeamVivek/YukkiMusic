@@ -276,7 +276,7 @@ async def playlist_multi_func(event, _):
         await event.answer()
     except Exception:
         pass
-    elif name.startswith("get_playlist_playmode"):
+    if name.startswith("get_playlist_playmode"):
         buttons = get_playlist_markup(_)
         
     elif name.startswith("home_play"):
