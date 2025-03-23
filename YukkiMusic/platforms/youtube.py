@@ -12,8 +12,8 @@ import logging
 import re
 
 from async_lru import alru_cache
-from yt_dlp import YoutubeDL
 from youtubesearchpython.__future__ import VideosSearch
+from yt_dlp import YoutubeDL
 
 from config import cookies
 from YukkiMusic.utils.decorators import asyncify
@@ -23,6 +23,8 @@ from ..core.youtube import SourceType
 from .base import PlatformBase
 
 logger = logging.getLogger(__name__)
+
+
 async def shell_cmd(cmd):
     proc = await asyncio.create_subprocess_shell(
         cmd,
@@ -122,8 +124,7 @@ class YouTube(PlatformBase):
         return formats_available, link
 
     @alru_cache(maxsize=None)
-    async def playlist(
-        self, link, limit) -> list[Track]:
+    async def playlist(self, link, limit) -> list[Track]:
         if "&" in link:
             link = link.split("&")[0]
 
@@ -146,7 +147,7 @@ class YouTube(PlatformBase):
             item = result.pop(0)
             result.insert(0, await search(self.base + item))
         return result
-        
+
     @alru_cache(maxsize=None)
     @staticmethod
     async def track(url: str, video: bool = False):
@@ -159,7 +160,7 @@ class YouTube(PlatformBase):
                     link=result["link"],
                     duration=(
                         time_to_seconds(duration) if str(duration) != "None" else 0
-                     ),  # TODO: CHECK THAT THE YOUTBE SEARCH PYTHON RETUNS DURATION IS None or "None"
+                    ),  # TODO: CHECK THAT THE YOUTBE SEARCH PYTHON RETUNS DURATION IS None or "None"
                     thumb=result["thumbnails"][0]["url"].split("?")[0],
                     streamtype=SourceType.YOUTUBE,
                     video=video,
@@ -167,7 +168,7 @@ class YouTube(PlatformBase):
         except Exception:
             logger.info("", exc_info=True)
             return await YouTube._track_from_ytdlp(url, video=video)
-            
+
     @alru_cache(maxsize=None)
     @staticmethod
     @asyncify

@@ -7,36 +7,34 @@
 #
 # All rights reserved.
 #
+import logging
 import os
 from random import randint
-import logging
-from pykeyboard import InlineKeyboard
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from telethon import events, Button
+from pykeyboard import InlineKeyboard
+from pyrogram.types import InlineKeyboardButton
+from telethon import Button, events
 
 import config
 from config import BANNED_USERS, SERVER_PLAYLIST_LIMIT
-from strings import command
-from YukkiMusic import Platform, tbot
+from YukkiMusic import tbot
+from YukkiMusic.core.youtube import Track
 from YukkiMusic.platforms import carbon, youtube
+from YukkiMusic.utils import parse_flags
 from YukkiMusic.utils.database import (
     delete_playlist,
     get_playlist,
     get_playlist_names,
     save_playlist,
 )
-from YukkiMusic.core.youtube import Track
-from YukkiMusic.utils import parse_flags
 from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.decorators.play import botplaylist_markup
 from YukkiMusic.utils.inline.playlist import get_playlist_markup, warning_markup
 from YukkiMusic.utils.pastebin import paste
 from YukkiMusic.utils.stream.stream import stream
 
-
 logger = logging.getLogger(__name__)
+
 
 async def get_keyboard(_, user_id):
     keyboard = InlineKeyboard(row_width=5)
@@ -60,8 +58,8 @@ async def get_keyboard(_, user_id):
         InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data=f"close"),
     )
     return keyboard, count
-    
-    
+
+
 @tbot.on_message(flt.command("PLAYLIST_COMMAND", True) & flt.group & ~BANNED_USERS)
 @language
 async def check_playlist(event, _):
@@ -90,14 +88,17 @@ async def check_playlist(event, _):
     await get.delete()
     await event.reply(file=carbon, message=_["playlist_15"].format(link))
 
+
 @tbot.on_message(flt.command("DELETE_PLAYLIST_COMMAND", True) & ~BANNED_USERS)
 @language
 async def del_group_message(event, _):
     if event.is_group:
-        
-        upl = Button.inline(_["PL_B_6"], f"https://t.me/{tbot.username}?start=delplaylists")
+
+        upl = Button.inline(
+            _["PL_B_6"], f"https://t.me/{tbot.username}?start=delplaylists"
+        )
         await event.reply(_["playlist_6"], buttons=upl)
-        
+
     elif event.is_private:
         _playlist = await get_playlist_names(event.sender_id)
         if _playlist:
@@ -107,14 +108,17 @@ async def del_group_message(event, _):
         keyboard, count = await get_keyboard(_, event.sender_id)
         await get.edit(_["playlist_7"].format(count), buttons=keyboard)
 
-@tbot.on_message(flt.command("ADD_PLAYLIST_COMMAND", True) & ~BANNED_USERS) # TODO: ADD SUPPORT FOR SPOTIFY, RESSO, APPLE
+
+@tbot.on_message(
+    flt.command("ADD_PLAYLIST_COMMAND", True) & ~BANNED_USERS
+)  # TODO: ADD SUPPORT FOR SPOTIFY, RESSO, APPLE
 @language
 async def add_playlist(event, _):
     user_id = event.sender_id
     command = event.text.split()
     if len(command) < 2:
         return await event.reply(_["playlist_22"])
-    query = event.text.replace(command[0], "") 
+    query = event.text.replace(command[0], "")
 
     if "youtube.com/playlist" in query:
         adding = await event.reply(_["playlist_21"])
@@ -124,7 +128,7 @@ async def add_playlist(event, _):
             for x in results:
                 if count == SERVER_PLAYLIST_LIMIT:
                     break
-             
+
                 if isinstance(x, Track):
                     _check = await get_playlist(user_id, x.vidid)
                     if _check:
@@ -135,20 +139,20 @@ async def add_playlist(event, _):
                     if _check:
                         continue
                     t = await youtube.track(youtube.base + x)
-                    
+
                 video_info = {
                     "videoid": t.vidid,
                     "title": t.title,
                     "duration": t.duration,
                 }
                 await save_playlist(user_id, t.vidid, video_info)
-                count+=1
-                
-        except Exception as e:
+                count += 1
+
+        except Exception:
             return await event.reply(
                 f"Looking like not a valid youtube playlist url or\nPlaylist created by YouTube Not Supported"
             )
-            
+
         await adding.delete()
         return await event.reply(_["playlist_20"])
     else:
@@ -161,11 +165,11 @@ async def add_playlist(event, _):
             count = len(await get_playlist_names(user_id))
             if count == SERVER_PLAYLIST_LIMIT:
                 return await event.reply(
-                        _["playlist_9"].format(config.SERVER_PLAYLIST_LIMIT)
-                    )
+                    _["playlist_9"].format(config.SERVER_PLAYLIST_LIMIT)
+                )
 
             m = await event.reply(_["playlist_21"])
-            
+
             plist = {
                 "videoid": track.vidid,
                 "title": track.title[:30],
@@ -212,11 +216,10 @@ async def add_playlist(event, _):
     await save_playlist(user_id, videoid, plist)
     try:
         title = (title[:30]).title()
-        return await event.answer(
-            _["playlist_10"].format(title), alert=True
-        )
+        return await event.answer(_["playlist_10"].format(title), alert=True)
     except Exception:
         return
+
 
 @tbot.on(events.CallbackQuery("del_playlist", func=~BANNED_USERS))
 @language
@@ -237,7 +240,7 @@ async def del_plist(event, _):
             return
     keyboard, count = await get_keyboard(_, user_id)
     return await event.edit(buttons=keyboard)
-    
+
 
 @tbot.on(events.CallbackQuery("delete_whole_playlist", func=~BANNED_USERS))
 @languageCB
@@ -247,6 +250,7 @@ async def del_whole_playlist(event, _):
     for x in _playlist:
         await delete_playlist(event.sender_id, x)
     return await event.edit(_["playlist_13"])
+
 
 @tbot.on(events.CallbackQuery("del_back_playlist", func=~BANNED_USERS))
 @language
@@ -265,7 +269,8 @@ async def del_back_playlist(event, _):
             return
     keyboard, count = await get_keyboard(_, user_id)
     return await event.edit(_["playlist_7"].format(count), buttons=keyboard)
-    
+
+
 @tbot.on(events.CallbackQuery("get_playlist_playmode", func=~BANNED_USERS))
 @tbot.on(events.CallbackQuery("home_play", func=~BANNED_USERS))
 @tbot.on(events.CallbackQuery("delete_warning", func=~BANNED_USERS))
@@ -278,16 +283,17 @@ async def playlist_multi_func(event, _):
         pass
     if name.startswith("get_playlist_playmode"):
         buttons = get_playlist_markup(_)
-        
+
     elif name.startswith("home_play"):
         buttons = botplaylist_markup(_)
-        
+
     elif name.startswith("delete_warning"):
         upl = warning_markup(_)
         return await event.edit(_["playlist_14"], buttons=upl)
-        
+
     return await event.edit(buttons=buttons)
-            
+
+
 @tbot.on(events.CallbackQuery("play_playlist", func=~BANNED_USERS))
 @language
 async def play_playlist(event, _):
@@ -313,7 +319,7 @@ async def play_playlist(event, _):
     mystic = await event.reply(_["play_1"])
     for vidids in _playlist:
         result.append(vidids)
-    result.insert(0, await youtube.track(youtube.base + result.pop(0), mode == "v"))    
+    result.insert(0, await youtube.track(youtube.base + result.pop(0), mode == "v"))
     try:
         await stream(
             chat_id=chat_id,
@@ -324,7 +330,7 @@ async def play_playlist(event, _):
     except Exception as e:
         ex_type = type(e).__name__
         if ex_type == "AssistantErr":
-            err = e  
+            err = e
         else:
             err = _["general_3"].format(ex_type)
             logger.error("", exc_info=True)
@@ -332,7 +338,7 @@ async def play_playlist(event, _):
     return await mystic.delete()
 
 
-@tbot.on_message(flt.command("PLAY_PLAYLIST_COMMAND", True) & ~BANNED_USERS & flt.group) 
+@tbot.on_message(flt.command("PLAY_PLAYLIST_COMMAND", True) & ~BANNED_USERS & flt.group)
 @language
 async def play_playlist_command(event, _):
     video, fplay, cplay = parse_flags(event.text, "playplaylist")
@@ -341,12 +347,12 @@ async def play_playlist_command(event, _):
         if chat_id is None:
             return await event.reply(_["setting_12"])
         try:
-            chat = await tbot.get_entity(chat_id)
+            await tbot.get_entity(chat_id)
         except Exception:
             return await event.reply(_["cplay_4"])
     else:
         chat_id = event.chat_id
-        
+
     user_id = event.sender_id
     _playlist = await get_playlist_names(user_id)
     if not _playlist:
@@ -357,7 +363,7 @@ async def play_playlist_command(event, _):
             )
         except Exception:
             return
-            
+
     try:
         await event.delete()
     except Exception:
@@ -368,7 +374,7 @@ async def play_playlist_command(event, _):
 
     for vidids in _playlist:
         result.append(vidids)
-    result.insert(0, await youtube.track(youtube.base + result.pop(0), video))     
+    result.insert(0, await youtube.track(youtube.base + result.pop(0), video))
 
     try:
         await stream(
@@ -381,12 +387,13 @@ async def play_playlist_command(event, _):
     except Exception as e:
         ex_type = type(e).__name__
         if ex_type == "AssistantErr":
-            err = e  
+            err = e
         else:
             err = _["general_3"].format(ex_type)
             logger.error("", exc_info=True)
         return await mystic.edit(err)
     return await mystic.delete()
+
 
 @tbot.on(events.CallbackQuery("remove_playlist", func=~BANNED_USERS))
 @language

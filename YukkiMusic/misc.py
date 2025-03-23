@@ -23,8 +23,10 @@ _boot_ = time.time()
 
 loop = asyncio.get_event_loop_policy().get_event_loop()
 
+
 def is_heroku():
     return "heroku" in socket.getfqdn()
+
 
 async def _sudo():
     if config.MONGO_DB_URI is None:
@@ -46,8 +48,9 @@ async def _sudo():
         if db_sudoers:
             for x in db_sudoers:
                 config.SUDOERS.add(x)
-                
+
     logger(__name__).info("Sudoers Loaded.")
+
 
 loop.run_until_complete(_sudo())
 

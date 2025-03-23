@@ -10,28 +10,24 @@
 
 import logging
 
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardMarkup
-
 from telethon import events
 
 from config import BANNED_USERS
-from YukkiMusic import app
 from YukkiMusic.utils.database import (
     get_global_tops,
     get_particulars,
     get_userss,
 )
-from YukkiMusic.utils.decorators import language
+from YukkiMusic.utils.decorators import asyncify, language
 from YukkiMusic.utils.inline.playlist import (
     botplaylist_markup,
     failed_top_markup,
     top_play_markup,
 )
 from YukkiMusic.utils.stream.stream import stream
-from YukkiMusic.utils.decorators import asyncify
 
 logger = logging.getLogger(__name__)
+
 
 @tbot.on(events.CallbackQuery("get_playmarkup", func=~BANNED_USERS))
 @tbot.on(events.CallbackQuery("get_top_playlists", func=~BANNED_USERS))
@@ -42,15 +38,14 @@ async def get_play_markup(event, _):
     except Exception:
         pass
     data = event.data.decode("utf-8")
-    
+
     if data.startswith("get_playmarkup"):
         buttons = botplaylist_markup(_)
     elif data.startswith("get_top_playlists"):
         buttons = top_play_markup(_)
-        
-    return await event.edit(
-        buttons=buttons
-    )
+
+    return await event.edit(buttons=buttons)
+
 
 @tbot.on(events.CallbackQuery("SERVERTOP", func=~BANNED_USERS))
 @language
@@ -79,8 +74,8 @@ async def server_to_play(event, _):
         stats = await get_userss(user_id)
     if not stats:
         return await mystic.edit(_["tracks_2"].format(what), buttons=upl)
-        
-    @asyncify    
+
+    @asyncify
     def get_stats():
         results = {}
         for i in stats:
@@ -110,14 +105,14 @@ async def server_to_play(event, _):
 
     try:
         details = await get_stats()
-    except Exception as e:
+    except Exception:
         logger.error("", exc_info=True)
         return
     try:
         await stream(
             chat_id=chat_id,
             original_chat_id=chat_id,
-            track=details, #TODO: fix it
+            track=details,  # TODO: fix it
             user_id=user_id,
         )
     except Exception as e:
@@ -127,6 +122,6 @@ async def server_to_play(event, _):
         else:
             err = _["general_3"].format(ex_type)
         logger.error("\n", exc_info=True)
-                
+
         return await mystic.edit(err)
     return await mystic.delete()

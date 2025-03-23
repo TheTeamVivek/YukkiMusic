@@ -38,31 +38,33 @@ def get_chat_id(entity: types.User | types.Chat | types.Channel) -> int:
     return chat_id
 
 
-def parse_flags(text: str, comm = None): #NOTE: HERE WE ARE USING THE OLD STYLE COMMAND PARSING ALSO LIKE VPLAY, CPLAY, PLAYFORCE BECUAUSE USER'S DIRECTLY CAN'T FORGOT THESE COMMANDS AND UNDERSTAND THE FLAGS 
+def parse_flags(
+    text: str, comm=None
+):  # NOTE: HERE WE ARE USING THE OLD STYLE COMMAND PARSING ALSO LIKE VPLAY, CPLAY, PLAYFORCE BECUAUSE USER'S DIRECTLY CAN'T FORGOT THESE COMMANDS AND UNDERSTAND THE FLAGS
     is_vplay = is_forceplay = is_cplay = False
     args = text.lstrip("/").split()
     if comm is None:
         comm = "play"
-        
+
     for arg in args:
         if arg in ["-v", f"v{comm}"]:
             is_vplay = True
-            
+
         elif arg in ["-f", f"f{comm}", f"{comm}force"]:
             is_forceplay = True
-            
+
         elif arg == f"v{comm}force":
-            is_forceplay, is_vplay = True, True   
-            
+            is_forceplay, is_vplay = True, True
+
         elif arg in ["-c", f"c{comm}"]:
             is_cplay = True
-            
+
         elif arg == f"cv{comm}":
             is_vplay, is_cplay = True, True
-            
+
         elif arg == f"cv{comm}force":
             is_vplay, is_cplay, is_forceplay = True, True, True
-        
+
         elif arg == f"c{comm}force":
             is_cplay, is_forceplay = True, True
 

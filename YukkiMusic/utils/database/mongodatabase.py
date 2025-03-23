@@ -27,10 +27,11 @@ privatedb = mongodb.privatechats
 playlist = []
 
 
-
 async def _agen_to_list(f):
-    result = [ element async for element in f]
+    result = [element async for element in f]
     return result
+
+
 # Playlist
 
 
@@ -47,12 +48,15 @@ async def get_playlist_names(chat_id: int) -> List[str]:
         _notes.append(note)
     return _notes
 
+
 async def get_playlist(chat_id: int, vidid: str) -> bool | dict:
     _notes = await _get_playlists(chat_id)
     return _notes.get(vidid, False)
 
 
-async def save_playlist(chat_id: int, vidid: str, info: dict): #FIXME: MAYBE IF I GUESS RIGHT SO WE DONT NEED TO PROVIDE THE INFO BEACAUSE THIS IS NOT IN USED
+async def save_playlist(
+    chat_id: int, vidid: str, info: dict
+):  # FIXME: MAYBE IF I GUESS RIGHT SO WE DONT NEED TO PROVIDE THE INFO BEACAUSE THIS IS NOT IN USED
     _notes = await _get_playlists(chat_id)
     _notes[vidid] = info
     await playlistdb.update_one(
@@ -74,6 +78,7 @@ async def delete_playlist(chat_id: int, name: str) -> bool:
 
 
 # Users
+
 
 async def is_served_user(user_id: int) -> bool:
     if await usersdb.find_one({"user_id": user_id}):
@@ -147,7 +152,7 @@ async def whitelist_chat(chat_id: int) -> bool:
 
 
 async def get_private_served_chats() -> list:
-    chat =   privatedb.find({"chat_id": {"$lt": 0}})
+    chat = privatedb.find({"chat_id": {"$lt": 0}})
     return await _agen_to_list(chat)
 
 
@@ -177,7 +182,7 @@ async def remove_private_chat(chat_id: int):
 async def _get_authusers(chat_id: int) -> dict[str, int]:
     if _notes := await authuserdb.find_one({"chat_id": chat_id}):
         return _notes["notes"]
-    return {}    
+    return {}
 
 
 async def get_authuser_names(chat_id: int) -> List[str]:
@@ -185,6 +190,7 @@ async def get_authuser_names(chat_id: int) -> List[str]:
     for note in await _get_authusers(chat_id):
         _notes.append(note)
     return _notes
+
 
 async def get_authuser(chat_id: int, name: str) -> bool | dict:
     _notes = await _get_authusers(chat_id)

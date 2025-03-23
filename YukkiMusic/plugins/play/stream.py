@@ -8,27 +8,20 @@
 # All rights reserved.
 #
 import logging
-from pyrogram import filters
-from pyrogram.types import Message
-from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
 from config import BANNED_USERS
-from strings import command
-from YukkiMusic import app, tbot
-from YukkiMusic.core.call import Yukki
+from YukkiMusic import tbot
+from YukkiMusic.core.enum import SourceType
+from YukkiMusic.core.youtube import Track
 from YukkiMusic.utils.decorators.play import play_wrapper
 from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
 
-from YukkiMusic.core.youtube import Track
-from YukkiMusic.core.enum import SourceType
-
 logger = logging.getLogger(__name__)
 
-@tbot.on_message(
-    flt.command("STREAM_COMMAND", True) & flt.group & ~BANNED_USERS
-)
+
+@tbot.on_message(flt.command("STREAM_COMMAND", True) & flt.group & ~BANNED_USERS)
 @play_wrapper
 async def stream_command(
     event,
