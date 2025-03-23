@@ -8,18 +8,21 @@
 # All rights reserved.
 #
 import asyncio
+import logging
 import re
 
 from async_lru import alru_cache
 from yt_dlp import YoutubeDL
+from youtubesearchpython.__future__ import VideosSearch
 
 from config import cookies
 from YukkiMusic.utils.decorators import asyncify
+from YukkiMusic.utils.formatters import time_to_seconds
 
 from ..core.youtube import SourceType
-from ..core.youtube import YouTube as YouTubeBase
+from .base import PlatformBase
 
-
+logger = logging.getLogger(__name__)
 async def shell_cmd(cmd):
     proc = await asyncio.create_subprocess_shell(
         cmd,
@@ -35,9 +38,8 @@ async def shell_cmd(cmd):
     return out.decode("utf-8")
 
 
-class YouTube(YouTubeBase):
+class YouTube(PlatformBase):
     def __init__(self):
-        super.__init__()
         self.base = "https://www.youtube.com/watch?v="
         self.regex = r"(?:youtube\.com|youtu\.be)"
         self.status = "https://www.youtube.com/oembed?url="
@@ -121,10 +123,7 @@ class YouTube(YouTubeBase):
 
     @alru_cache(maxsize=None)
     async def playlist(
-        self, link, limit, videoid: bool | str = None
-    ) -> None | list[Track]:
-        if videoid:
-            link = self.listbase + link
+        self, link, limit) -> list[Track]:
         if "&" in link:
             link = link.split("&")[0]
 
@@ -140,14 +139,64 @@ class YouTube(YouTubeBase):
         try:
             for key in playlist.split("\n"):
                 if key:
-                    t = await search(self.base + key)
-                    t.streamtype = SourceType.YOUTUBE
-                    result.append(t)
+                    result.append(key)
         except Exception:
             pass
+        if result:
+            item = result.pop(0)
+            result.insert(0, await search(self.base + item))
         return result
+        
+    @alru_cache(maxsize=None)
+    @staticmethod
+    async def track(url: str, video: bool = False):
+        try:
+            results = VideosSearch(url, limit=1)
+            for result in (await results.next())["result"]:
+                duration = result.get("duration")
+                return Track(
+                    title=result["title"],
+                    link=result["link"],
+                    duration=(
+                        time_to_seconds(duration) if str(duration) != "None" else 0
+                     ),  # TODO: CHECK THAT THE YOUTBE SEARCH PYTHON RETUNS DURATION IS None or "None"
+                    thumb=result["thumbnails"][0]["url"].split("?")[0],
+                    streamtype=SourceType.YOUTUBE,
+                    video=video,
+                )
+        except Exception:
+            logger.info("", exc_info=True)
+            return await YouTube._track_from_ytdlp(url, video=video)
+            
+    @alru_cache(maxsize=None)
+    @staticmethod
+    @asyncify
+    def _track_from_ytdlp(query: str, video: bool = False):
+        options = {
+            "format": "best",
+            "noplaylist": True,
+            "quiet": True,
+            "extract_flat": "in_playlist",
+            "cookiefile": cookies(),
+        }
+        logger.info(f"Searching Song from yt-dlp for {query}")
+        with YoutubeDL(options) as ydl:
+            info_dict = ydl.extract_info(
+                f"ytsearch: {query}", download=False
+            )  # TODO: THIS CAN RETURN SEARCH RESULT OF A CHANNEL FIX IT
+            details = info_dict.get("entries", [None])[0]
+            if not details:
+                raise ValueError("No results found.")
 
-    async def track(self, url: str):
-        t = await search(url)
-        t.streamtype = SourceType.YOUTUBE
-        return t
+            return Track(
+                title=details["title"],
+                link=(
+                    details["webpage_url"].split("&")[0]
+                    if "&" in details["webpage_url"]
+                    else details["webpage_url"]
+                ),
+                duration=details["duration"],
+                thumb=details["thumbnails"][0]["url"],
+                streamtype=SourceType.YOUTUBE,  # KEEP HERE YOUTUBE LATER WE CAN CHANGE IT TO CORRECT SourceType
+                video=video,
+            )
