@@ -1,7 +1,17 @@
+#
+# Copyright (C) 2024-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+#
+# This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
+# and is released under the MIT License.
+# Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
+#
+# All rights reserved.
+#
+
 import asyncio
 import os
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from async_lru import alru_cache
 from youtubesearchpython.__future__ import VideosSearch
@@ -51,7 +61,16 @@ class Track:
                 SourceType.YOUTUBE,
             ]:
                 self.is_live = True
-
+                
+    async def __call__(self):
+        return self.file_path or await self.download()
+        
+    def __getitem__(self, name):
+        return getattr(self, name)
+        
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+            
     async def is_exists(self):
         exists = False
 
@@ -72,8 +91,24 @@ class Track:
     @property
     def is_m3u8(self) -> bool:
         return self.streamtype == SourceType.M3U8
-
-    async def download(self):
+        
+    def delete(self):
+        from YukkiMusic.misc import db
+        
+        if self.is_youtube and not self.is_live:
+            t = []
+            for _, y in db.items():
+                for element in y:
+                    if track := element.get("track"):
+                        t.append((track.vidid, self.video))
+            if not any(a == self.vidid and b == self.video for a, b in t):
+                try:
+                    os.remove(self.file_path)
+                except Exception:
+                    pass
+                    # TODO: ADD CHECK FOR TELEGRAM FILES AND SAAVN, SOUNDCLOUD, ETC.
+                    
+    async def download(self): # TODO: if Download mode is M3U8 so Return tuple of video and audio url
         if (
             self.file_path is not None and await self.is_exists()
         ):  # THIS CONDITION FOR TELEGRAM FILES BECAUSE THESE FILES ARE ALREADY DOWNLOADED
@@ -133,62 +168,4 @@ class Track:
             else:
                 raise Exception(
                     f"Failed to get file path: {stderr.decode('utf-8').strip()}"
-                )
-
-    async def __call__(self):
-        return self.file_path or await self.download()
-
-
-@alru_cache(maxsize=None)
-async def search(query: str, video: bool = False):
-    try:
-        results = VideosSearch(query, limit=1)
-        for result in (await results.next())["result"]:
-            duration = result.get("duration")
-            return Track(
-                title=result["title"],
-                link=result["link"],
-                download_url=result["link"],
-                duration=(
-                    time_to_seconds(duration) if str(duration) != "None" else 0
-                ),  # TODO: CHECK THAT THE YOUTBE SEARCH PYTHON RETUNS DURATION IS None or "None"
-                thumb=result["thumbnails"][0]["url"].split("?")[0],
-                streamtype=SourceType.YOUTUBE,
-                video=video,
-            )
-    except Exception:
-        return await search_from_ytdlp(query)
-
-
-@alru_cache(maxsize=None)
-@asyncify
-def search_from_ytdlp(query: str, video: bool = False):
-    options = {
-        "format": "best",
-        "noplaylist": True,
-        "quiet": True,
-        "extract_flat": "in_playlist",
-        "cookiefile": cookies(),
-    }
-
-    with YoutubeDL(options) as ydl:
-        info_dict = ydl.extract_info(
-            f"ytsearch: {query}", download=False
-        )  # TODO: THIS CAN RETURN SEARCH RESULT OF A CHANNEL FIX IT
-        details = info_dict.get("entries", [None])[0]
-        if not details:
-            raise ValueError("No results found.")
-
-        return Track(
-            title=details["title"],
-            link=(
-                details["webpage_url"].split("&")[0]
-                if "&" in details["webpage_url"]
-                else details["webpage_url"]
-            ),
-            download_url=details["webpage_url"],
-            duration=details["duration"],
-            thumb=details["thumbnails"][0]["url"],
-            streamtype=SourceType.YOUTUBE,  # KEEP HERE YOUTUBE LATER WE CAN CHANGE IT TO CORRECT SourceType
-            video=video,
-        )
+    )
