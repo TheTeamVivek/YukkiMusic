@@ -17,7 +17,7 @@ from YukkiMusic import tbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.core.youtube import Track
 from YukkiMusic.misc import db
-from YukkiMusic.platforms import carbon
+from YukkiMusic.platforms import carbon, youtube
 from YukkiMusic.utils.database import get_lang, is_active_chat, is_video_allowed
 from YukkiMusic.utils.exceptions import AssistantErr
 from YukkiMusic.utils.formatters import seconds_to_min
@@ -29,9 +29,10 @@ from YukkiMusic.utils.thumbnails import gen_qthumb, gen_thumb
 
 
 async def stream(
+    *,
     chat_id: int,
     original_chat_id,
-    track: Track | list[Track],
+    track: Track | list[Track] | list[str], # NOTE: If THE TRACK IS PLAYLIST SO FIRST ELEMENT MUST BE instance OF TRACK OTHER CAN REMAIN ALSO TRACK OR VIDID IF Source IS YOUTUBE ELSE SONG NAME
     user_id: int,
     forceplay: bool | None = None,
 ):
@@ -47,6 +48,7 @@ async def stream(
             raise AssistantErr(_["play_7"])
     if forceplay:
         await Yukki.force_stop_stream(chat_id)
+        
     if isinstance(track, list):
 
         msg = f"{_['playlist_16']}\n\n"
@@ -54,6 +56,10 @@ async def stream(
         track = track[: config.PLAYLIST_FETCH_LIMIT]
 
         for song in track:
+            if not isinstance(song Track):
+                q = youtube.base + song if track[0].streamtype == SourceType.YOUTUBE else song
+                song = await youtube.track(q,track[0].video)
+                song.streamtype = track[0].streamtype
             if not song.duration or song.duration > config.DURATION_LIMIT:
                 continue
             if await is_active_chat(chat_id):
