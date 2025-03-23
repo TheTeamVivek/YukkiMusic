@@ -7,7 +7,7 @@
 #
 # All rights reserved.
 #
-
+import logging
 from pyrogram import filters
 from pyrogram.types import Message
 from pytgcalls.exceptions import NoActiveGroupCall
@@ -15,18 +15,23 @@ from pytgcalls.exceptions import NoActiveGroupCall
 import config
 from config import BANNED_USERS
 from strings import command
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.decorators.play import play_wrapper
 from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
 
+from YukkiMusic.core.youtube import Track
+from YukkiMusic.core.enum import SourceType
 
-@app.on_message(command("STREAM_COMMAND") & filters.group & ~BANNED_USERS)
+logger = logging.getLogger(__name__)
+
+@tbot.on_message(
+    flt.command("STREAM_COMMAND", True) & flt.group & ~BANNED_USERS)
+)
 @play_wrapper
 async def stream_command(
-    client,
-    message: Message,
+    event,
     _,
     chat_id,
     video,
@@ -39,33 +44,30 @@ async def stream_command(
         mystic = await event.reply(
             _["play_2"].format(channel) if channel else _["play_1"]
         )
-        try:
-            await Yukki.stream_call(url)
-        except NoActiveGroupCall:
-            await mystic.edit(
-                "There's an issue with the bot. please report it to my Owner and ask them to check logger group"
-            )
-            text = "Please Turn on voice chat.. Bot is unable to stream urls.."
-            return await app.send_message(config.LOG_GROUP_ID, text)
-        except Exception as e:
-            return await mystic.edit(_["general_3"].format(type(e).__name__))
-        await mystic.edit(_["str_2"])
+        track = Track(
+            title="M3U8 or index Urls",
+            link=url,
+            thumb=config.STREAM_IMG_URL,
+            duration=0,
+            streamtype=SourceType.M3U8,
+            video=video,
+        )
         try:
             await stream(
-                _,
-                mystic,
-                event.sender_id,
-                url,
-                chat_id,
-                message.from_user.first_name,
-                event.chat_id,
-                video=True,
-                streamtype="index",
+                chat_id=chat_id,
+                original_chat_id=event.chat_id,
+                track=track,
+                user_id=event.sender_id,
+                forceplay=fplay,
             )
         except Exception as e:
             ex_type = type(e).__name__
-            err = e if ex_type == "AssistantErr" else _["general_3"].format(ex_type)
+            if ex_type == "AssistantErr":
+                err = e
+            else:
+                err = _["general_3"].format(ex_type)
+                logger.error("\n", exc_info=True)
             return await mystic.edit(err)
-        return await play_logs(message, streamtype="M3u8 or Index Link")
+        return await play_logs(event, streamtype=SourceType.M3U8)
     else:
         await event.reply(_["str_1"])
