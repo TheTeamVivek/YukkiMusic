@@ -99,7 +99,6 @@ async def del_group_message(event, _):
         await event.reply(_["playlist_6"], buttons=upl)
         
     elif event.is_private:
-        
         _playlist = await get_playlist_names(event.sender_id)
         if _playlist:
             get = await event.reply(_["playlist_2"])
@@ -121,9 +120,9 @@ async def add_playlist(event, _):
         adding = await event.reply(_["playlist_21"])
         try:
             results = await youtube.playlist(query, config.SERVER_PLAYLIST_LIMIT)
-            _count = len(await get_playlist_names(user_id)
+            count = len(await get_playlist_names(user_id)
             for x in results:
-                if _count == SERVER_PLAYLIST_LIMIT:
+                if count == SERVER_PLAYLIST_LIMIT:
                     break
              
                 if isinstance(x, Track):
@@ -143,7 +142,7 @@ async def add_playlist(event, _):
                     "duration": t.duration,
                 }
                 await save_playlist(user_id, t.vidid, video_info)
-                _count+=1
+                count+=1
                 
         except Exception as e:
             return await event.reply(
