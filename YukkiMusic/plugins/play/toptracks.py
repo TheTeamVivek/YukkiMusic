@@ -7,10 +7,13 @@
 #
 # All rights reserved.
 #
-import asyncio
+
+import logging
 
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup
+
+from telethon import events
 
 from config import BANNED_USERS
 from YukkiMusic import app
@@ -26,51 +29,45 @@ from YukkiMusic.utils.inline.playlist import (
     top_play_markup,
 )
 from YukkiMusic.utils.stream.stream import stream
+from YukkiMusic.utils.decorators import asyncify
 
-loop = asyncio.get_running_loop()
+logger = logging.getLogger(__name__)
 
-
-@app.on_callback_query(filters.regex("get_playmarkup") & ~BANNED_USERS)
+@tbot.on(events.CallbackQuery("get_playmarkup", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery("get_top_playlists", func=~BANNED_USERS))
 @language
-async def get_play_markup(client, CallbackQuery, _):
+async def get_play_markup(event, _):
     try:
-        await CallbackQuery.answer()
+        await event.answer()
     except Exception:
         pass
-    buttons = botplaylist_markup(_)
-    return await CallbackQuery.edit_message_reply_markup(
-        buttons=InlineKeyboardMarkup(buttons)
+    data = event.data.decode("utf-8")
+    
+    if data.startswith("get_playmarkup"):
+        buttons = botplaylist_markup(_)
+    elif data.startswith("get_top_playlists"):
+        buttons = top_play_markup(_)
+        
+    return await event.edit(
+        buttons=buttons
     )
 
-
-@app.on_callback_query(filters.regex("get_top_playlists") & ~BANNED_USERS)
+@tbot.on(events.CallbackQuery("SERVERTOP", func=~BANNED_USERS))
 @language
-async def get_topz_playlists(client, CallbackQuery, _):
+async def server_to_play(event, _):
+    chat_id = event.chat_id
+    user_id = event.sender_id
+    user_name = (await event.get_sender).first_name
     try:
-        await CallbackQuery.answer()
+        await event.answer()
     except Exception:
         pass
-    buttons = top_play_markup(_)
-    return await CallbackQuery.edit_message_reply_markup(
-        buttons=InlineKeyboardMarkup(buttons)
-    )
-
-
-@app.on_callback_query(filters.regex("SERVERTOP") & ~BANNED_USERS)
-@language
-async def server_to_play(client, CallbackQuery, _):
-    chat_id = CallbackQuery.event.chat_id
-    user_name = CallbackQuery.from_user.first_name
-    try:
-        await CallbackQuery.answer()
-    except Exception:
-        pass
-    callback_data = CallbackQuery.data.strip()
+    callback_data = event.data.decode("utf-8").strip()
     what = callback_data.split(None, 1)[1]
-    mystic = await CallbackQuery.edit(
+    mystic = await event.edit(
         _["tracks_1"].format(
             what,
-            CallbackQuery.from_user.first_name,
+            user_name,
         )
     )
     upl = failed_top_markup(_)
@@ -79,10 +76,11 @@ async def server_to_play(client, CallbackQuery, _):
     elif what == "Group":
         stats = await get_particulars(chat_id)
     elif what == "Personal":
-        stats = await get_userss(CallbackQuery.from_user.id)
+        stats = await get_userss(user_id)
     if not stats:
         return await mystic.edit(_["tracks_2"].format(what), buttons=upl)
-
+        
+    @asyncify    
     def get_stats():
         results = {}
         for i in stats:
@@ -111,24 +109,24 @@ async def server_to_play(client, CallbackQuery, _):
         return details
 
     try:
-        details = await loop.run_in_executor(None, get_stats)
+        details = await get_stats()
     except Exception as e:
-        print(e)
+        logger.error("", exc_info=True)
         return
     try:
         await stream(
-            _,
-            mystic,
-            CallbackQuery.from_user.id,
-            details,
-            chat_id,
-            user_name,
-            CallbackQuery.event.chat_id,
-            video=False,
-            streamtype="playlist",
+            chat_id=chat_id,
+            original_chat_id=chat_id,
+            track=details, #TODO: fix it
+            user_id=user_id,
         )
     except Exception as e:
         ex_type = type(e).__name__
-        err = e if ex_type == "AssistantErr" else _["general_3"].format(ex_type)
+        if ex_type == "AssistantErr":
+            err = e
+        else:
+            err = _["general_3"].format(ex_type)
+        logger.error("\n", exc_info=True)
+                
         return await mystic.edit(err)
     return await mystic.delete()
