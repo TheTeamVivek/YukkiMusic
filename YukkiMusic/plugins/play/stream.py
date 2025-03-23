@@ -27,7 +27,7 @@ from YukkiMusic.core.enum import SourceType
 logger = logging.getLogger(__name__)
 
 @tbot.on_message(
-    flt.command("STREAM_COMMAND", True) & flt.group & ~BANNED_USERS)
+    flt.command("STREAM_COMMAND", True) & flt.group & ~BANNED_USERS
 )
 @play_wrapper
 async def stream_command(
