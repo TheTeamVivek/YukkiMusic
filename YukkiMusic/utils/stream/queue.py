@@ -21,12 +21,15 @@ async def put_queue(
     track: Track,
     forceplay: bool = False,
 ):
+    from YukkiMusic import tbot
 
     track.title = track.title.title()
+    by = await tbot.create_mention(user_id)
     put = {
         "chat_id": original_chat_id,
         "track": track,
         "played": 0,
+        "by": by,    
     }
     if forceplay:
         if check := db.get(chat_id):
