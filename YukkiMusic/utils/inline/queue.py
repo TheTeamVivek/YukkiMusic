@@ -49,7 +49,7 @@ def queue_markup(
             ),
         ],
     ]
-    upl = InlineKeyboardMarkup(not_dur if duration == "UNKNOWN" else dur)
+    upl = not_dur if duration == "UNKNOWN" else dur
     return upl
 
 
