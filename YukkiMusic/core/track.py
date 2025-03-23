@@ -11,16 +11,13 @@
 import asyncio
 import os
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
-from async_lru import alru_cache
-from youtubesearchpython.__future__ import VideosSearch
 from yt_dlp import YoutubeDL
 
 from config import YTDOWNLOADER, cookies
 from YukkiMusic.decorators.asyncify import asyncify
 from YukkiMusic.utils.database import is_on_off
-from YukkiMusic.utils.formatters import time_to_seconds
 
 from .enum import SourceType
 
@@ -61,16 +58,16 @@ class Track:
                 SourceType.YOUTUBE,
             ]:
                 self.is_live = True
-                
+
     async def __call__(self):
         return self.file_path or await self.download()
-        
+
     def __getitem__(self, name):
         return getattr(self, name)
-        
+
     def __setitem__(self, key, value):
         setattr(self, key, value)
-            
+
     async def is_exists(self):
         exists = False
 
@@ -91,10 +88,10 @@ class Track:
     @property
     def is_m3u8(self) -> bool:
         return self.streamtype == SourceType.M3U8
-        
+
     def delete(self):
         from YukkiMusic.misc import db
-        
+
         if self.is_youtube and not self.is_live:
             t = []
             for _, y in db.items():
@@ -107,8 +104,10 @@ class Track:
                 except Exception:
                     pass
                     # TODO: ADD CHECK FOR TELEGRAM FILES AND SAAVN, SOUNDCLOUD, ETC.
-                    
-    async def download(self): # TODO: if Download mode is M3U8 so Return tuple of video and audio url
+
+    async def download(
+        self,
+    ):  # TODO: if Download mode is M3U8 so Return tuple of video and audio url
         if (
             self.file_path is not None and await self.is_exists()
         ):  # THIS CONDITION FOR TELEGRAM FILES BECAUSE THESE FILES ARE ALREADY DOWNLOADED
@@ -168,4 +167,4 @@ class Track:
             else:
                 raise Exception(
                     f"Failed to get file path: {stderr.decode('utf-8').strip()}"
-    )
+                )
