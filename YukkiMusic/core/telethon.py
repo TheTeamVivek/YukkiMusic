@@ -12,6 +12,7 @@ import asyncio
 import inspect
 import logging
 import traceback
+import sys
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -20,6 +21,7 @@ from functools import wraps
 from telethon import TelegramClient, errors, events
 from telethon.tl import functions, types
 
+from YukkiMusic.utils import pastebin
 import config
 
 log = logging.getLogger(__name__)
@@ -82,8 +84,10 @@ class TelethonClient(TelegramClient):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    async def start(self, *args, **kwargs):
-        await super().start(*args, **kwargs)
+    async def start(self):
+        if super().is_connected():
+            return
+        await super().start(bot_token=config.BOT_TOKEN)
         me = await self.get_me()
         # pylint: disable=attribute-defined-outside-init
         self.me = me
@@ -182,23 +186,43 @@ class TelethonClient(TelegramClient):
         else:
             raise ValueError(f'The chat_id "{chat_id}" belongs to a user')
 
-    async def handle_error(self, exc: Exception, e=None):  # TODO Make it more brief
-        date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        error_trace = traceback.format_exc()
-
-        error_message = (
-            f"**Error:** {type(exc).__name__}\n"
-            f"**Date:** {date_time}\n"
-            f"**Traceback:**\n```python\n{error_trace}```\n"
-        )
-
+    async def handle_error(self, exc: Exception | None = None, event=None):
+        date_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+        traceback.print_exc()
+        if exc:
+            args = type(exc), exc, exc.__traceback__
+        else:
+            args = sys.exc_info()
+            
+        error_trace = "".join(traceback.format_exception(*args))
+        error_message = f"**Date:** {date_time}\n"
+        if event:
+            chat = await event.get_chat()
+            if event.is_private:
+                msg_link =  f"tg://openmessage?user_id={chat.id}&message_id={event.id}"
+            else:
+                msg_link =  f"https://t.me/c/{chat.id}/{event.id}"
+                
+            error_message+= (
+                f"**ChatId:** {event.chat_id}\n"
+                f"**SenderId:** {event.sender_id}\n"
+                f"**Text:** ```python\n{event.text}```\n"
+                f"**MessageLink:** {msg_link}\n\n"
+            )    
+            
+        error_message += f"**Error:** {type(exc).__name__}\n"
+        if len(error_trace) > 900:
+            pastebin_link = await pastebin.paste(error_trace)
+            error_message+= f"**Traceback:** [BatBin Link]({pastebin_link})\n"
+        else:
+            error_message+= f"**Traceback:**\n```python\n{error_trace}```\n"
+            
         await self.send_message(config.LOG_GROUP_ID, error_message)
 
         try:
             await self.send_message(config.OWNER_ID[0], error_message)
         except Exception:
             pass
-        log.error(error_trace)
 
     def on_message(self, func=None, *args, **kwargs):
         def decorator(function):
@@ -207,7 +231,7 @@ class TelethonClient(TelegramClient):
                 try:
                     return await function(event)
                 except errors.FloodWaitError as e:
-                    log.warning("FloodWait: Sleeping for %d seconds.", e.value)
+                    log.warning("FloodWait: Sleeping for %d seconds.", e.seconds)
                     await asyncio.sleep(e.value)
                 except (
                     errors.ChatWriteForbiddenError,
