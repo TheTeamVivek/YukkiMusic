@@ -8,13 +8,13 @@
 # All rights reserved.
 #
 
-import contextlib
-
 # This aeval and sh module is taken from < https://github.com/TheHamkerCat/WilliamButcherBot >
 # Credit goes to TheHamkerCat.
 #
 import os
+import sys
 import traceback
+import contextlib
 from io import StringIO
 from time import time
 
@@ -25,10 +25,13 @@ from YukkiMusic.misc import SUDOERS
 
 
 async def aexec(code, event):
-    local_vars = {}
+    local_vars = {
+        "__builtins__": __builtins__, # DON'T REMOVE THIS
+        "app": tbot,
+        "tbot": tbot,    
+    }
     exec(
         "async def __aexec(event): " + "".join(f"\n {a}" for a in code.split("\n")),
-        globals(),
         local_vars,
     )
     __aexec_func = local_vars["__aexec"]
@@ -43,25 +46,19 @@ async def aexec(code, event):
 @tbot.on_message(flt.command(["ev", "eval"]) & flt.user(SUDOERS) & ~flt.forwarded)
 async def executor(event):
     if len(event.text.split()) < 2:
-        return await event.reply("**Give me something to execute**")
+        return await event.reply("**Give me something to exceute**")
     try:
         cmd = event.text.split(" ", maxsplit=1)[1]
     except IndexError:
         return await event.delete()
     t1 = time()
-
-    redirected_output = StringIO()
-    redirected_error = StringIO()
+    redirected_output = redirected_error = StringIO()
     stdout, stderr, exc = None, None, None
-
-    with contextlib.redirect_stdout(redirected_output), contextlib.redirect_stderr(
-        redirected_error
-    ):
+    with contextlib.redirect_stdout(redirected_output), contextlib.redirect_stderr(redirected_error):
         try:
             await aexec(cmd, event)
         except Exception:
             exc = traceback.format_exc()
-
     stdout = redirected_output.getvalue()
     stderr = redirected_error.getvalue()
     evaluation = "\n"
@@ -73,14 +70,21 @@ async def executor(event):
         evaluation += stdout
     else:
         evaluation += "Success"
-
     final_output = f"<b>RESULTS:</b>\n<pre language='python'>{evaluation}</pre>"
     if len(final_output) > 4096:
         filename = "output.txt"
         with open(filename, "w+", encoding="utf8") as out_file:
             out_file.write(str(evaluation))
         t2 = time()
-        keyboard = [[Button.inline(text="⏳", data=f"runtime {t2-t1} Seconds")]]
+        keyboard = [
+            [
+                Button.inline(
+                    text="⏳",
+                    data=f"runtime {t2-t1} Seconds",
+                )
+            ]
+        ]
+
         await event.reply(
             file=filename,
             message=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
@@ -92,8 +96,14 @@ async def executor(event):
         t2 = time()
         keyboard = [
             [
-                Button.inline(text="⏳", data=f"runtime {round(t2-t1, 3)} Seconds"),
-                Button.inline(text="🗑", data=f"forceclose abc|{event.sender_id}"),
+                Button.inline(
+                    text="⏳",
+                    data=f"runtime {round(t2-t1, 3)} Seconds",
+                ),
+                Button.inline(
+                    text="🗑",
+                    data=f"forceclose abc|{event.sender_id}",
+                ),
             ]
         ]
         await event.reply(message=final_output, buttons=keyboard, parse_mode="HTML")
