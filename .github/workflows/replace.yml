@@ -16,8 +16,6 @@ jobs:
         shell: bash
         run: |
           declare -A replacements=(
-            ["Direct"]="DIRECT"
-            ["Everyone"]="EVERYONE"
             ["USER_IDENTIFIER_REQUIRED"]="general_1"
             ["COMMAND_USAGE_ERROR"]="general_2"
             ["ERROR_OCCURRED_MSG"]="general_3"
