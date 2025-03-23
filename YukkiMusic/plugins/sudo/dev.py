@@ -8,13 +8,13 @@
 # All rights reserved.
 #
 
+import contextlib
+
 # This aeval and sh module is taken from < https://github.com/TheHamkerCat/WilliamButcherBot >
 # Credit goes to TheHamkerCat.
 #
 import os
-import sys
 import traceback
-import contextlib
 from io import StringIO
 from time import time
 
@@ -26,9 +26,9 @@ from YukkiMusic.misc import SUDOERS
 
 async def aexec(code, event):
     local_vars = {
-        "__builtins__": __builtins__, # DON'T REMOVE THIS
+        "__builtins__": __builtins__,  # DON'T REMOVE THIS
         "app": tbot,
-        "tbot": tbot,    
+        "tbot": tbot,
     }
     exec(
         "async def __aexec(event): " + "".join(f"\n {a}" for a in code.split("\n")),
@@ -54,7 +54,9 @@ async def executor(event):
     t1 = time()
     redirected_output = redirected_error = StringIO()
     stdout, stderr, exc = None, None, None
-    with contextlib.redirect_stdout(redirected_output), contextlib.redirect_stderr(redirected_error):
+    with contextlib.redirect_stdout(redirected_output), contextlib.redirect_stderr(
+        redirected_error
+    ):
         try:
             await aexec(cmd, event)
         except Exception:
