@@ -38,7 +38,7 @@ async def init():
     except Exception:
         pass
     await app.start()
-    await tbot.start(bot_token=config.BOT_TOKEN)
+    await tbot.start()
 
     attrs = {"userbot": userbot, "tbot": tbot}
     await app.load_plugins_from("YukkiMusic/plugins")
