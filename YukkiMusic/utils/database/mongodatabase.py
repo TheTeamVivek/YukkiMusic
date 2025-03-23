@@ -41,10 +41,11 @@ async def _get_playlists(chat_id: int) -> dict[str, int]:
     return _notes["notes"]
 
 
-async def get_playlist_names(chat_id: int) -> list[str]:
-    note = await _get_playlists(chat_id)
-    return await _agen_to_list(note)
-
+async def get_playlist_names(chat_id: int) -> List[str]:
+    _notes = []
+    for note in await _get_playlists(chat_id):
+        _notes.append(note)
+    return _notes
 
 async def get_playlist(chat_id: int, vidid: str) -> bool | dict:
     _notes = await _get_playlists(chat_id)
@@ -75,7 +76,7 @@ async def delete_playlist(chat_id: int, name: str) -> bool:
 # Users
 
 async def is_served_user(user_id: int) -> bool:
-    if user := await usersdb.find_one({"user_id": user_id}):
+    if await usersdb.find_one({"user_id": user_id}):
         return True
     return False
 
@@ -85,7 +86,7 @@ async def get_served_users() -> list:
 
 
 async def add_served_user(user_id: int):
-    if is_served := await is_served_user(user_id):
+    if await is_served_user(user_id):
         return
     return await usersdb.insert_one({"user_id": user_id})
 
@@ -104,15 +105,14 @@ async def get_served_chats() -> list:
 
 
 async def is_served_chat(chat_id: int) -> bool:
-    if chat := await chatsdb.find_one({"chat_id": chat_id}):
+    if await chatsdb.find_one({"chat_id": chat_id}):
         return True
     return False
 
 
 async def add_served_chat(chat_id: int):
-    if is_served := await is_served_chat(chat_id)
-        return
-    return await chatsdb.insert_one({"chat_id": chat_id})
+    if not await is_served_chat(chat_id)
+        return await chatsdb.insert_one({"chat_id": chat_id})
 
 
 async def delete_served_chat(chat_id: int):
@@ -152,7 +152,7 @@ async def get_private_served_chats() -> list:
 
 
 async def is_served_private_chat(chat_id: int) -> bool:
-    if chat := await privatedb.find_one({"chat_id": chat_id}):
+    if await privatedb.find_one({"chat_id": chat_id}):
         return True
     return False
 
