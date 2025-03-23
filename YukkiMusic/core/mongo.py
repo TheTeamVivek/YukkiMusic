@@ -7,39 +7,30 @@
 #
 # All rights reserved.
 #
-
-from motor.motor_asyncio import AsyncIOMotorClient as _mongo_client_
-from pymongo import MongoClient
-from pyrogram import Client
+import asyncio
+import logging
+from motor.motor_asyncio import AsyncIOMotorClient
 
 import config
 
-from ..logging import logger
 
+logger = logging.getLogger(__name__)
 TEMP_MONGODB = "mongodb+srv://TeamVivek:teambackup@teamvivekbackup.7acwn.mongodb.net/?retryWrites=true&w=majority&appName=TeamVivekBackup"  # pylint: disable=line-too-long
-
 DB_NAME = "Yukki"
+loop = asyncio.get_event_loop_policy().get_event_loop()
 
-if config.MONGO_DB_URI is None:
-    logger(__name__).warning(
-        "No MONGO DB URL found.. Your Bot will work on Yukki's Database"
-    )
-    temp_client = Client(
-        "Yukki",
-        bot_token=config.BOT_TOKEN,
-        api_id=config.API_ID,
-        api_hash=config.API_HASH,
-    )
-    temp_client.start()
-    info = temp_client.get_me()
-    username = info.username
-    temp_client.stop()
-    _mongo_async_ = _mongo_client_(TEMP_MONGODB)
-    _mongo_sync_ = MongoClient(TEMP_MONGODB)
-    mongodb = _mongo_async_[username]
-    pymongodb = _mongo_sync_[username]
-else:
-    _mongo_async_ = _mongo_client_(config.MONGO_DB_URI)
-    _mongo_sync_ = MongoClient(config.MONGO_DB_URI)
-    mongodb = _mongo_async_[DB_NAME]
-    pymongodb = _mongo_sync_[DB_NAME]
+async def _mongo():
+    if config.MONGO_DB_URI is None:
+        logger(__name__).warning(
+            "No MONGO DB URL found.. Your Bot will work on Yukki's Database"
+        )
+        from YukkiMusic import tbkt
+        await tbot.start()
+        _mongo_async_ = AsyncIOMotorClient(TEMP_MONGODB)
+        mongodb = _mongo_async_[tbot.username]
+    else:
+       _mongo_async_ = AsyncIOMotorClient(config.MONGO_DB_URI)
+        mongodb = _mongo_async_[DB_NAME]
+    return  mongodb
+    
+mongodb = loop.run_until_complete(_mongo())    
