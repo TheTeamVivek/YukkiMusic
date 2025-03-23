@@ -255,6 +255,7 @@ def _user():
 
 
 BANNED_USERS = _user()
+SUDOERS = _user()
 YTDOWNLOADER = 1
 LOG = 2
 LOG_FILE_NAME = "logs.txt"
