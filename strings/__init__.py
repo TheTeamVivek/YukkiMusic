@@ -50,7 +50,7 @@ def update_helpers(data: dict):
     for dict_key, value in data.items():
         if isinstance(value, dict):
             data[dict_key] = update_helpers(value)
-        #elif isinstance(value, str) and dict_key.endswith("_HELPER"):
+        # elif isinstance(value, str) and dict_key.endswith("_HELPER"):
         elif isinstance(value, str):
             data[dict_key] = replace_placeholders(value, data)
 
