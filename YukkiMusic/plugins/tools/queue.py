@@ -11,15 +11,15 @@
 import asyncio
 
 from pyrogram import filters
-from pyrogram.errors import FloodWait
+from telethon.errors import FloodWaitError
 from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
 
 import config
 from config import BANNED_USERS
 from strings import command
-from YukkiMusic import Platform, app
+from YukkiMusic import Platform, tbot
 from YukkiMusic.misc import db
-from YukkiMusic.utils import get_channeplay_cb, paste, seconds_to_min
+from YukkiMusic.utils import parse_flags, get_channeplay_cb, paste, seconds_to_min
 from YukkiMusic.utils.database import (
     get_cmode,
     is_active_chat,
@@ -30,35 +30,24 @@ from YukkiMusic.utils.inline.queue import queue_back_markup, queue_markup
 
 basic = {}
 
-
-def get_image(videoid):
-    try:
-        url = f"https://img.youtube.com/vi/{videoid}/hqdefault.jpg"
-        return url
-    except Exception:
-        return config.YOUTUBE_IMG_URL
-
-
 def get_duration(playing):
-    file_path = playing[0]["file"]
-    if "index_" in file_path or "live_" in file_path:
-        return "Unknown"
-    duration_seconds = int(playing[0]["seconds"])
-    if duration_seconds == 0:
-        return "Unknown"
-    else:
-        return "Inline"
+    track = playing[0]["track"]
+    if track.is_live or track.is_m3u8 or not track.duration:
+        return "UNKNOWM"
+    return "INLINE"
 
-
-@app.on_message(command("QUEUE_COMMAND") & filters.group & ~BANNED_USERS)
+@tbot.on_message(
+    flt.command("QUEUE_COMMAND", True) & flt.group & ~BANNED_USERS
+)
 @language
-async def ping_com(client, message: Message, _):
-    if message.command[0][0] == "c":
+async def ping_com(event, _):
+    _, _, is_cplay = parse_flags(event.text, "queue")
+    if is_cplay:
         chat_id = await get_cmode(event.chat_id)
         if chat_id is None:
             return await event.reply(_["setting_12"])
         try:
-            await app.get_chat(chat_id)
+            await tbot.get_entity(chat_id)
         except Exception:
             return await event.reply(_["cplay_4"])
         cplay = True
@@ -66,248 +55,178 @@ async def ping_com(client, message: Message, _):
         chat_id = event.chat_id
         cplay = False
     if not await is_active_chat(chat_id):
-        return await event.reply(_["general_6"])
+        return await event.reply(_["NO_ACTIVE_VIDEO_STREAM"])
     got = db.get(chat_id)
     if not got:
         return await event.reply(_["queue_2"])
-    file = got[0]["file"]
-    videoid = got[0]["vidid"]
+    track = got[0]["track"]
+    videoid = track["vidid"]
     user = got[0]["by"]
-    title = (got[0]["title"]).title()
-    type = (got[0]["streamtype"]).title()
+    title = track["title"]
+    streamtype = track.streamtype.value
     DUR = get_duration(got)
-    if "live_" in file:
-        image = get_image(videoid)
-    elif "vid_" in file:
-        image = get_image(videoid)
-    elif "index_" in file:
-        image = config.STREAM_IMG_URL
-    else:
-        if videoid == "telegram":
-            image = (
-                config.TELEGRAM_AUDIO_URL
-                if type == "Audio"
-                else config.TELEGRAM_VIDEO_URL
-            )
-        elif videoid == "soundcloud":
-            image = config.SOUNCLOUD_IMG_URL
-        elif "saavn" in videoid:
-            details = await Platform.saavn.info(got[0]["url"])
-            image = details["thumb"]
-        else:
-            image = get_image(videoid)
+    image = track.thumb or None # TODO: REPLACE NONE WITH A IMAGE URL OR PATH
+    
     send = (
         "**⌛️ Duration:** Unknown duration limit\n\nClick on below button to get whole queued list"
-        if DUR == "Unknown"
+        if DUR == "UNKNOWN"
         else "\nClick on below button to get whole queued list."
     )
-    cap = f"""**{app.mention} Player**
+    cap = f"""**{tbot.mention} Player**
 
 🎥**Playing:** {title}
 
-🔗**Stream Type:** {type}
+🔗**Stream Type:** {streamtype}
 🙍‍♂️**Played By:** {user}
 {send}"""
     upl = (
         queue_markup(_, DUR, "c" if cplay else "g", videoid)
-        if DUR == "Unknown"
+        if DUR == "UNKNOWN"
         else queue_markup(
             _,
             DUR,
             "c" if cplay else "g",
             videoid,
             seconds_to_min(got[0]["played"]),
-            got[0]["dur"],
+            seconds_to_min(track["duration"]),
         )
     )
     basic[videoid] = True
-    mystic = await message.reply_photo(image, caption=cap, buttons=upl)
-    if DUR != "Unknown":
+    mystic = await event.reply(file=image, message=cap, buttons=upl)
+    if DUR != "UNKNOWN":
         try:
-            while db[chat_id][0]["vidid"] == videoid:
+            while db[chat_id][0]["track"]["vidid"] == videoid and basic[videoid] and await is_active_chat(chat_id):
                 await asyncio.sleep(5)
-                if await is_active_chat(chat_id):
-                    if basic[videoid]:
-                        if await is_music_playing(chat_id):
-                            try:
-                                buttons = queue_markup(
+                if await is_music_playing(chat_id):
+                    try:
+                        buttons = queue_markup(
                                     _,
                                     DUR,
                                     "c" if cplay else "g",
                                     videoid,
                                     seconds_to_min(db[chat_id][0]["played"]),
-                                    db[chat_id][0]["dur"],
+                                    seconds_to_min(db[chat_id][0]["track"]["duration"]),
                                 )
-                                await mystic.edit_reply_markup(buttons=buttons)
-                            except FloodWait:
-                                pass
-                        else:
-                            pass
-                    else:
-                        break
+                        await mystic.edit(buttons=buttons)
+                    except FloodWaitError:
+                        pass
                 else:
-                    break
+                    pass
         except Exception:
             return
 
-
-@app.on_callback_query(filters.regex("GetTimer") & ~BANNED_USERS)
-async def quite_timer(client, CallbackQuery: CallbackQuery):
+@tbot.on(events.CallbackQuery("GetTimer", func=~BANNED_USERS))
+async def quite_timer(event):
     try:
-        await CallbackQuery.answer()
+        await event.answer()
     except Exception:
         pass
 
-
-@app.on_callback_query(filters.regex("GetQueued") & ~BANNED_USERS)
+@tbot.on(events.CallbackQuery("GetQueued", func=~BANNED_USERS))
 @language
-async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
-    callback_data = CallbackQuery.data.strip()
+async def queued_tracks(event, _):
+    callback_data = event.data.decode("utf-8").strip()
     callback_request = callback_data.split(None, 1)[1]
     what, videoid = callback_request.split("|")
     try:
-        chat_id, channel = await get_channeplay_cb(_, what, CallbackQuery)
+        chat_id, channel = await get_channeplay_cb(_, what, event)
     except Exception:
         return
     if not await is_active_chat(chat_id):
-        return await CallbackQuery.answer(_["general_6"], show_alert=True)
+        return await event.answer(_["NO_ACTIVE_VIDEO_STREAM"], alert=True)
     got = db.get(chat_id)
     if not got:
-        return await CallbackQuery.answer(_["queue_2"], show_alert=True)
+        return await event.answer(_["queue_2"], alert=True)
     if len(got) == 1:
-        return await CallbackQuery.answer(_["queue_5"], show_alert=True)
-    await CallbackQuery.answer()
+        return await event.answer(_["queue_5"], alert=True)
+    await event.answer()
     basic[videoid] = False
     buttons = queue_back_markup(_, what)
-    med = InputMediaPhoto(
-        media="https://telegra.ph//file/6f7d35131f69951c74ee5.jpg",
-        caption=_["queue_1"],
-    )
-    await CallbackQuery.edit_message_media(media=med)
-    j = 0
+    await event.edit(file="https://telegra.ph//file/6f7d35131f69951c74ee5.jpg", text=_["queue_1"])
     msg = ""
-    for x in got:
-        j += 1
-        if j == 1:
+    for j, x in enumerate(got):
+        if j == 0:
             msg += f'Current playing:\n\n🏷Title: {x["title"]}\nDuration: {x["dur"]}\nBy: {x["by"]}\n\n'
-        elif j == 2:
+        elif j == 1:
             msg += f'Queued:\n\n🏷Title: {x["title"]}\nDuratiom: {x["dur"]}\nby: {x["by"]}\n\n'
         else:
             msg += f'🏷Title: {x["title"]}\nDuration: {x["dur"]}\nBy: {x["by"]}\n\n'
-    if "Queued" in msg:
-        if len(msg) < 700:
-            await asyncio.sleep(1)
-            return await CallbackQuery.edit(msg, buttons=buttons)
-
-        if "🏷" in msg:
-            msg = msg.replace("🏷", "")
+                
+    await asyncio.sleep(1)
+    if len(msg) > 700:
+        #msg = msg.replace("🏷", "")
         link = await paste(msg)
-        await CallbackQuery.edit(_["queue_3"].format(link), buttons=buttons)
-    else:
-        if len(msg) > 700:
-            if "🏷" in msg:
-                msg = msg.replace("🏷", "")
-            link = await paste(msg)
-            await asyncio.sleep(1)
-            return await CallbackQuery.edit(_["queue_3"].format(link), buttons=buttons)
+        return await event.edit(_["queue_3"].format(link), buttons=buttons)
+        
+    return await event.edit(msg, buttons=buttons)
 
-        await asyncio.sleep(1)
-        return await CallbackQuery.edit(msg, buttons=buttons)
-
-
-@app.on_callback_query(filters.regex("queue_back_timer") & ~BANNED_USERS)
+@tbot.on(events.CallbackQuery("queue_back_timer", func=~BANNED_USERS))
 @language
-async def queue_back(client, CallbackQuery: CallbackQuery, _):
-    callback_data = CallbackQuery.data.strip()
+async def queue_back(event, _):
+    callback_data = event.data.decode("utf-8").strip()
     cplay = callback_data.split(None, 1)[1]
     try:
-        chat_id, channel = await get_channeplay_cb(_, cplay, CallbackQuery)
+        chat_id, channel = await get_channeplay_cb(_, cplay, event)
     except Exception:
         return
     if not await is_active_chat(chat_id):
-        return await CallbackQuery.answer(_["general_6"], show_alert=True)
+        return await event.answer(_["NO_ACTIVE_VIDEO_STREAM"], alert=True)
     got = db.get(chat_id)
     if not got:
-        return await CallbackQuery.answer(_["queue_2"], show_alert=True)
-    await CallbackQuery.answer(_["set_cb_8"], show_alert=True)
-    file = got[0]["file"]
-    videoid = got[0]["vidid"]
-    user = got[0]["by"]
-    title = (got[0]["title"]).title()
-    type = (got[0]["streamtype"]).title()
+        return await event.answer(_["queue_2"], alert=True)
+    await event.answer(_["set_cb_8"], alert=True)
+    file = got[0]["track"]
+    videoid = file.vidid
+    user = await tbot.create_mention(got[0]["by"])
+    title = file.title
+    streamtype = file.streamtype.value
     DUR = get_duration(got)
-    if "live_" in file:
-        image = get_image(videoid)
-    elif "vid_" in file:
-        image = get_image(videoid)
-    elif "index_" in file:
-        image = config.STREAM_IMG_URL
-    else:
-        if videoid == "telegram":
-            image = (
-                config.TELEGRAM_AUDIO_URL
-                if type == "Audio"
-                else config.TELEGRAM_VIDEO_URL
-            )
-        elif videoid == "soundcloud":
-            image = config.SOUNCLOUD_IMG_URL
-        elif "saavn" in videoid:
-            details = await Platform.saavn.info(got[0]["url"])
-            image = details["thumb"]
-        else:
-            image = get_image(videoid)
+    image = file.thumb
     send = (
         "**⌛️ Duration:** Unknown duration limit\n\nClick on below button to get whole queued list"
-        if DUR == "Unknown"
+        if DUR == "UNKNOWN"
         else "\nClick on below button to get whole queued list."
     )
-    cap = f"""**{app.mention} Player**
+    cap = f"""**{tbot.mention} Player**
 
 🎥**Playing:** {title}
 
-🔗**Stream Type:** {type}
+🔗**Stream Type:** {streamtype}
 🙍‍♂️**Played By:** {user}
 {send}"""
     upl = (
         queue_markup(_, DUR, cplay, videoid)
-        if DUR == "Unknown"
+        if DUR == "UNKNOWN"
         else queue_markup(
             _,
             DUR,
             cplay,
             videoid,
             seconds_to_min(got[0]["played"]),
-            got[0]["dur"],
+            seconds_to_min(got[0]["track"]["duration"]),
         )
     )
     basic[videoid] = True
 
-    med = InputMediaPhoto(media=image, caption=cap)
-    mystic = await CallbackQuery.edit_message_media(media=med, buttons=upl)
-    if DUR != "Unknown":
+    mystic = await event.edit(file=image, text=cap, buttons=upl)
+    if DUR != "UNKNOWN":
         try:
-            while db[chat_id][0]["vidid"] == videoid:
+            while db[chat_id][0]["track"]["vidid"] == videoid and basic[videoid] and await is_active_chat(chat_id):
                 await asyncio.sleep(5)
-                if await is_active_chat(chat_id):
-                    if basic[videoid]:
-                        if await is_music_playing(chat_id):
-                            try:
-                                buttons = queue_markup(
+                if await is_music_playing(chat_id):
+                    try:
+                        buttons = queue_markup(
                                     _,
                                     DUR,
                                     cplay,
                                     videoid,
                                     seconds_to_min(db[chat_id][0]["played"]),
-                                    db[chat_id][0]["dur"],
+                                    seconds_to_min(db[chat_id][0]["track"]["duration"]),
                                 )
-                                await mystic.edit_reply_markup(buttons=buttons)
-                            except FloodWait:
-                                pass
-                        else:
-                            pass
-                    else:
-                        break
+                        await mystic.edit(buttons=buttons)
+                    except FloodWaitError:
+                        pass
                 else:
-                    break
+                    pass
         except Exception:
             return
