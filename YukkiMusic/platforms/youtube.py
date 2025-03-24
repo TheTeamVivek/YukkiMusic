@@ -16,10 +16,11 @@ from youtubesearchpython.__future__ import VideosSearch
 from yt_dlp import YoutubeDL
 
 from config import cookies
+import config
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import time_to_seconds
 
-from ..core.youtube import SourceType
+from ..core.enum import SourceType
 from .base import PlatformBase
 
 logger = logging.getLogger(__name__)
@@ -124,7 +125,7 @@ class YouTube(PlatformBase):
         return formats_available, link
 
     @alru_cache(maxsize=None)
-    async def playlist(self, link, limit) -> list[Track]:
+    async def playlist(self, link, limit: int = config.PLAYLIST_FETCH_LIMIT) -> list[Track]:
         if "&" in link:
             link = link.split("&")[0]
 
@@ -150,7 +151,7 @@ class YouTube(PlatformBase):
 
     @alru_cache(maxsize=None)
     @staticmethod
-    async def track(url: str, video: bool = False):
+    async def track(url: str):
         try:
             results = VideosSearch(url, limit=1)
             for result in (await results.next())["result"]:
@@ -163,16 +164,16 @@ class YouTube(PlatformBase):
                     ),  # TODO: CHECK THAT THE YOUTBE SEARCH PYTHON RETUNS DURATION IS None or "None"
                     thumb=result["thumbnails"][0]["url"].split("?")[0],
                     streamtype=SourceType.YOUTUBE,
-                    video=video,
+                    video=None,
                 )
         except Exception:
             logger.info("", exc_info=True)
-            return await YouTube._track_from_ytdlp(url, video=video)
+            return await YouTube._track_from_ytdlp(url)
 
     @alru_cache(maxsize=None)
     @staticmethod
     @asyncify
-    def _track_from_ytdlp(query: str, video: bool = False):
+    def _track_from_ytdlp(query: str):
         options = {
             "format": "best",
             "noplaylist": True,
@@ -199,5 +200,5 @@ class YouTube(PlatformBase):
                 duration=details["duration"],
                 thumb=details["thumbnails"][0]["url"],
                 streamtype=SourceType.YOUTUBE,  # KEEP HERE YOUTUBE LATER WE CAN CHANGE IT TO CORRECT SourceType
-                video=video,
+                video=None,
             )
