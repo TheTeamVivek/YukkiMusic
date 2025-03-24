@@ -59,7 +59,7 @@ class Saavn:
                         "duration_sec": duration_sec,
                         "duration_min": seconds_to_time(duration_sec),
                         "thumb": entry.get("thumbnail", ""),
-                        "url": self.clean_url(entry["url"]),
+                        "url": self.clean_url(entry["webpage_url"]),
                     }
                     song_info.append(info)
                     count += 1
@@ -85,7 +85,7 @@ class Saavn:
                 "duration_sec": info.get("duration", 0),
                 "duration_min": seconds_to_time(info.get("duration", 0)),
                 "thumb": info.get("thumbnail", None),
-                "url": self.clean_url(info["url"]),
+                "url": self.clean_url(info["webpage_url"]),
             }
 
     @asyncify
@@ -113,7 +113,7 @@ class Saavn:
                     "duration_sec": info.get("duration", 0),
                     "duration_min": seconds_to_time(info.get("duration", 0)),
                     "thumb": info.get("thumbnail", None),
-                    "url": self.clean_url(info["url"]),
+                    "url": self.clean_url(info["webpage_url"]),
                     "filepath": file_path,
                 }
 
@@ -123,6 +123,6 @@ class Saavn:
                 "duration_sec": info.get("duration", 0),
                 "duration_min": seconds_to_time(info.get("duration", 0)),
                 "thumb": info.get("thumbnail", None),
-                "url": self.clean_url(info["url"]),
+                "url": self.clean_url(info["webpage_url"]),
                 "filepath": file_path,
             }
