@@ -17,8 +17,6 @@ from YukkiMusic.utils.decorators import asyncify
 
 
 class Saavn:
-    def __init__(self):
-        pass
 
     @staticmethod
     async def valid(url: str) -> bool:
@@ -73,7 +71,7 @@ class Saavn:
         if not url.startswith("https://www.jiosaavn.com"):
             
             async with aiohttp.ClientSession() as session:
-                async with session.get("https://saavn.dev/api/search/songs", params=params = {"query": url, "limit": 1}) as response:
+                async with session.get("https://saavn.dev/api/search/songs", params= {"query": url, "limit": 1}) as response:
                     data = await response.json()
                     url = data["data"]["results"][0]["url"]
 
@@ -85,7 +83,6 @@ class Saavn:
             "quiet": True,
             "no_warnings": True,
         }
-        if 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             return {
