@@ -9,7 +9,7 @@
 #
 
 import os
-
+import aiohttp
 import yt_dlp
 
 from config import seconds_to_time
@@ -69,7 +69,15 @@ class Saavn:
 
     @asyncify
     def info(self, url):
-        clean_url = self.clean_url(url)
+        url = self.clean_url(url)
+        if not url.startswith("https://www.jiosaavn.com"):
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.get("https://saavn.dev/api/search/songs", params=params = {"query": url, "limit": 1}) as response:
+                    data = await response.json()
+                    url = data["data"]["results"][0]["url"]
+
+
         ydl_opts = {
             "format": "bestaudio/best",
             "geo_bypass": True,
@@ -77,9 +85,9 @@ class Saavn:
             "quiet": True,
             "no_warnings": True,
         }
-
+        if 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(clean_url, download=False)
+            info = ydl.extract_info(url, download=False)
             return {
                 "title": info["title"],
                 "duration_sec": info.get("duration", 0),
