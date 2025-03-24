@@ -68,30 +68,17 @@ class Saavn:
     @asyncify
     def info(self, url):
         url = self.clean_url(url)
-        if not url.startswith("https://www.jiosaavn.com"):
-            
-            async with aiohttp.ClientSession() as session:
-                async with session.get("https://saavn.dev/api/search/songs", params= {"query": url, "limit": 1}) as response:
-                    data = await response.json()
-                    url = data["data"]["results"][0]["url"]
-
-
-        ydl_opts = {
-            "format": "bestaudio/best",
-            "geo_bypass": True,
-            "nocheckcertificate": True,
-            "quiet": True,
-            "no_warnings": True,
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-            return {
-                "title": info["title"],
-                "duration_sec": info.get("duration", 0),
-                "duration_min": seconds_to_time(info.get("duration", 0)),
-                "thumb": info.get("thumbnail", None),
-                "url": self.clean_url(info["webpage_url"]),
-            }
+          
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://saavn.dev/api/search/songs", params= {"query": url, "limit": 1}) as response:
+                info = await response.json()["data"]["results"][0]
+                return {
+                    "title": info["name"],
+                    "duration_sec": info.get("duration", 0),
+                    "duration_min": seconds_to_time(info.get("duration", 0)),
+                    "thumb": info["image"][-1]["url"]),
+                    "url": self.clean_url(info["url"]),
+               }
 
     @asyncify
     def download(self, url):
