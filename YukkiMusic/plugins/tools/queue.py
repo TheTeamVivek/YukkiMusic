@@ -10,16 +10,17 @@
 
 import asyncio
 
-from pyrogram import filters
 from telethon.errors import FloodWaitError
-from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
 
-import config
 from config import BANNED_USERS
-from strings import command
-from YukkiMusic import Platform, tbot
+from YukkiMusic import tbot
 from YukkiMusic.misc import db
-from YukkiMusic.utils import parse_flags, get_channeplay_cb, paste, seconds_to_min
+from YukkiMusic.utils import (
+    get_channeplay_cb,
+    parse_flags,
+    paste,
+    seconds_to_min,
+)
 from YukkiMusic.utils.database import (
     get_cmode,
     is_active_chat,
@@ -30,15 +31,15 @@ from YukkiMusic.utils.inline.queue import queue_back_markup, queue_markup
 
 basic = {}
 
+
 def get_duration(playing):
     track = playing[0]["track"]
     if track.is_live or track.is_m3u8 or not track.duration:
         return "UNKNOWM"
     return "INLINE"
 
-@tbot.on_message(
-    flt.command("QUEUE_COMMAND", True) & flt.group & ~BANNED_USERS
-)
+
+@tbot.on_message(flt.command("QUEUE_COMMAND", True) & flt.group & ~BANNED_USERS)
 @language
 async def ping_com(event, _):
     _, _, is_cplay = parse_flags(event.text, "queue")
@@ -65,8 +66,8 @@ async def ping_com(event, _):
     title = track["title"]
     streamtype = track.streamtype.value
     DUR = get_duration(got)
-    image = track.thumb or None # TODO: REPLACE NONE WITH A IMAGE URL OR PATH
-    
+    image = track.thumb or None  # TODO: REPLACE NONE WITH A IMAGE URL OR PATH
+
     send = (
         "**⌛️ Duration:** Unknown duration limit\n\nClick on below button to get whole queued list"
         if DUR == "UNKNOWN"
@@ -95,18 +96,22 @@ async def ping_com(event, _):
     mystic = await event.reply(file=image, message=cap, buttons=upl)
     if DUR != "UNKNOWN":
         try:
-            while db[chat_id][0]["track"]["vidid"] == videoid and basic[videoid] and await is_active_chat(chat_id):
+            while (
+                db[chat_id][0]["track"]["vidid"] == videoid
+                and basic[videoid]
+                and await is_active_chat(chat_id)
+            ):
                 await asyncio.sleep(5)
                 if await is_music_playing(chat_id):
                     try:
                         buttons = queue_markup(
-                                    _,
-                                    DUR,
-                                    "c" if cplay else "g",
-                                    videoid,
-                                    seconds_to_min(db[chat_id][0]["played"]),
-                                    seconds_to_min(db[chat_id][0]["track"]["duration"]),
-                                )
+                            _,
+                            DUR,
+                            "c" if cplay else "g",
+                            videoid,
+                            seconds_to_min(db[chat_id][0]["played"]),
+                            seconds_to_min(db[chat_id][0]["track"]["duration"]),
+                        )
                         await mystic.edit(buttons=buttons)
                     except FloodWaitError:
                         pass
@@ -115,12 +120,14 @@ async def ping_com(event, _):
         except Exception:
             return
 
+
 @tbot.on(events.CallbackQuery("GetTimer", func=~BANNED_USERS))
 async def quite_timer(event):
     try:
         await event.answer()
     except Exception:
         pass
+
 
 @tbot.on(events.CallbackQuery("GetQueued", func=~BANNED_USERS))
 @language
@@ -142,7 +149,9 @@ async def queued_tracks(event, _):
     await event.answer()
     basic[videoid] = False
     buttons = queue_back_markup(_, what)
-    await event.edit(file="https://telegra.ph//file/6f7d35131f69951c74ee5.jpg", text=_["queue_1"])
+    await event.edit(
+        file="https://telegra.ph//file/6f7d35131f69951c74ee5.jpg", text=_["queue_1"]
+    )
     msg = ""
     for j, x in enumerate(got):
         if j == 0:
@@ -151,14 +160,15 @@ async def queued_tracks(event, _):
             msg += f'Queued:\n\n🏷Title: {x["title"]}\nDuratiom: {x["dur"]}\nby: {x["by"]}\n\n'
         else:
             msg += f'🏷Title: {x["title"]}\nDuration: {x["dur"]}\nBy: {x["by"]}\n\n'
-                
+
     await asyncio.sleep(1)
     if len(msg) > 700:
-        #msg = msg.replace("🏷", "")
+        # msg = msg.replace("🏷", "")
         link = await paste(msg)
         return await event.edit(_["queue_3"].format(link), buttons=buttons)
-        
+
     return await event.edit(msg, buttons=buttons)
+
 
 @tbot.on(events.CallbackQuery("queue_back_timer", func=~BANNED_USERS))
 @language
@@ -211,18 +221,22 @@ async def queue_back(event, _):
     mystic = await event.edit(file=image, text=cap, buttons=upl)
     if DUR != "UNKNOWN":
         try:
-            while db[chat_id][0]["track"]["vidid"] == videoid and basic[videoid] and await is_active_chat(chat_id):
+            while (
+                db[chat_id][0]["track"]["vidid"] == videoid
+                and basic[videoid]
+                and await is_active_chat(chat_id)
+            ):
                 await asyncio.sleep(5)
                 if await is_music_playing(chat_id):
                     try:
                         buttons = queue_markup(
-                                    _,
-                                    DUR,
-                                    cplay,
-                                    videoid,
-                                    seconds_to_min(db[chat_id][0]["played"]),
-                                    seconds_to_min(db[chat_id][0]["track"]["duration"]),
-                                )
+                            _,
+                            DUR,
+                            cplay,
+                            videoid,
+                            seconds_to_min(db[chat_id][0]["played"]),
+                            seconds_to_min(db[chat_id][0]["track"]["duration"]),
+                        )
                         await mystic.edit(buttons=buttons)
                     except FloodWaitError:
                         pass
