@@ -7,7 +7,7 @@ from .decorators.asyncify import asyncify
 @asyncify
 def download(title, video):
     video = None
-    path = await Saavn().download(title)
+    path, _ = await Saavn().download(title)
     return path, video
 
 
