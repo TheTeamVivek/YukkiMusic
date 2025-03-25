@@ -154,24 +154,20 @@ async def stream(
         status = True if video else None
         try:
             if Platform.youtube.use_fallback:
-                file_path, status = await fallback.download(
-                   title, video=status
-             )
+                file_path, status = await fallback.download(title, video=status)
                 direct = None
             else:
                 try:
                     file_path, direct = await Platform.youtube.download(
-                    vidid, mystic, videoid=True, video=status
-                )
+                        vidid, mystic, videoid=True, video=status
+                    )
                 except Exception:
                     Platform.youtube.use_fallback = True
-                    file_path, status = await fallback.download(
-                   title, video=status
-             )
+                    file_path, status = await fallback.download(title, video=status)
                     direct = None
         except Exception:
             raise AssistantErr(_["play_16"])
-            
+
         if await is_active_chat(chat_id):
             await put_queue(
                 chat_id,
