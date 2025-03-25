@@ -24,6 +24,7 @@ from YukkiMusic.utils.database import is_on_off
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
+NOTHINGS = {"cookies_dead": None}
 
 def cookies():
     folder_path = f"{os.getcwd()}/cookies"
@@ -68,6 +69,10 @@ class YouTube:
             return True
         else:
             return False
+
+    @property
+    def use_fallback(self):
+        return NOTHING["cookies_dead"] is True
 
     @asyncify
     def url(self, message_1: Message) -> str | None:
