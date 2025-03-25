@@ -96,3 +96,5 @@ class Saavn:
                         print(f"Downloaded: {filename}")
                     else:
                         raise ValueError(f"Failed to download {details["_download_url"]}. HTTP Status: {resp.status}")
+
+        return file_path, details
