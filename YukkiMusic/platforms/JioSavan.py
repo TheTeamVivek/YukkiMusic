@@ -9,6 +9,7 @@
 #
 
 import os
+
 import aiohttp
 import yt_dlp
 
@@ -70,7 +71,9 @@ class Saavn:
         url = self.clean_url(url)
 
         async with aiohttp.ClientSession() as session:
-            async with session.get("https://saavn.dev/api/search/songs", params={"query": url, "limit": 1}) as response:
+            async with session.get(
+                "https://saavn.dev/api/search/songs", params={"query": url, "limit": 1}
+            ) as response:
                 info = (await response.json())["data"]["results"][0]
                 return {
                     "title": info["name"],
@@ -96,6 +99,8 @@ class Saavn:
                                 f.write(chunk)
                         print(f"Downloaded: {file_path}")
                     else:
-                        raise ValueError(f"Failed to download {details['_download_url']}. HTTP Status: {resp.status}")
+                        raise ValueError(
+                            f"Failed to download {details['_download_url']}. HTTP Status: {resp.status}"
+                        )
 
         return file_path, details

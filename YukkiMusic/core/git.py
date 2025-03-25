@@ -22,7 +22,7 @@ from ..logging import LOGGER
 loop = asyncio.get_event_loop_policy().get_event_loop()
 
 
-def install_req(cmd: str) -> Tuple[str, str, int, int]:
+def install_req(cmd: str) -> tuple[str, str, int, int]:
     async def install_requirements():
         args = shlex.split(cmd)
         process = await asyncio.create_subprocess_exec(

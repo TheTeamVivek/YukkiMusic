@@ -309,7 +309,6 @@ class Call:
         except NoActiveGroupCall:
             raise AssistantErr(
                 "**No Active Voice Chat Found**\n\nPlease make sure group's voice chat is enabled. If already enabled, please end it and start fresh voice chat again and if the problem continues, try /restart"
-            
             )
         except TelegramServerError:
             raise AssistantErr(

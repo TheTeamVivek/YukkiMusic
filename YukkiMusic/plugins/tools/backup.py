@@ -146,9 +146,9 @@ async def import_database(client, message):
     file_path = await message.reply_to_message.download(progress=progress)
 
     try:
-        with open(file_path, "r") as backup_file:
+        with open(file_path) as backup_file:
             data = json.load(backup_file)
-    except (json.JSONDecodeError, IOError):
+    except (json.JSONDecodeError, OSError):
         return await edit_or_reply(
             mystic, "Invalid Data Format Please Provide A Valid Exported File"
         )

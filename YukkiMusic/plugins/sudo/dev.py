@@ -13,9 +13,9 @@
 #
 
 import asyncio
+import contextlib
 import os
 import traceback
-import contextlib
 from io import StringIO
 from time import time
 
@@ -25,9 +25,10 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 
+
 async def aexec(code, client, message):
     local_vars = {
-        "__builtins__": __builtins__, # DON'T REMOVE THIS
+        "__builtins__": __builtins__,  # DON'T REMOVE THIS
         "app": app,
     }
     exec(
@@ -55,7 +56,9 @@ async def executor(client: app, message: Message):
     t1 = time()
     redirected_output = redirected_error = StringIO()
     stdout, stderr, exc = None, None, None
-    with contextlib.redirect_stdout(redirected_output), contextlib.redirect_stderr(redirected_error):
+    with contextlib.redirect_stdout(redirected_output), contextlib.redirect_stderr(
+        redirected_error
+    ):
         try:
             await aexec(cmd, client, message)
         except Exception:

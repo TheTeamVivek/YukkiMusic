@@ -175,7 +175,7 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
         ),
         EqInlineKeyboardButton(
             "❯",
-            callback_data="help_next({},{})".format(modulo_page + 1, int(close)),
+            callback_data=f"help_next({modulo_page + 1},{int(close)})",
         ),
     ]
 

@@ -58,14 +58,14 @@ async def get_filters_count() -> dict:
     }
 
 
-async def _get_filters(chat_id: int) -> Dict[str, int]:
+async def _get_filters(chat_id: int) -> dict[str, int]:
     _filters = await filtersdb.find_one({"chat_id": chat_id})
     if not _filters:
         return {}
     return _filters["filters"]
 
 
-async def get_filters_names(chat_id: int) -> List[str]:
+async def get_filters_names(chat_id: int) -> list[str]:
     _filters = []
     for _filter in await _get_filters(chat_id):
         _filters.append(_filter)
@@ -119,14 +119,14 @@ async def get_notes_count() -> dict:
     return {"chats_count": chats_count, "notes_count": notes_count}
 
 
-async def _get_notes(chat_id: int) -> Dict[str, int]:
+async def _get_notes(chat_id: int) -> dict[str, int]:
     _notes = await notesdb.find_one({"chat_id": chat_id})
     if not _notes:
         return {}
     return _notes["notes"]
 
 
-async def get_note_names(chat_id: int) -> List[str]:
+async def get_note_names(chat_id: int) -> list[str]:
     _notes = []
     for note in await _get_notes(chat_id):
         _notes.append(note)
@@ -393,14 +393,14 @@ COMMAND_DB = os.path.join(config.TEMP_DB_FOLDER, "command.json")
 
 def load_cleanmode():
     if os.path.exists(CLEANMODE_DB):
-        with open(CLEANMODE_DB, "r") as file:
+        with open(CLEANMODE_DB) as file:
             return json.load(file)
     return []
 
 
 def load_command():
     if os.path.exists(COMMAND_DB):
-        with open(COMMAND_DB, "r") as file:
+        with open(COMMAND_DB) as file:
             return json.load(file)
     return []
 
@@ -603,7 +603,7 @@ VIDEO_FILE = os.path.join(config.TEMP_DB_FOLDER, "video.json")
 
 def load_data(file_path):
     if os.path.exists(file_path):
-        with open(file_path, "r") as file:
+        with open(file_path) as file:
             return json.load(file)
     return {}
 

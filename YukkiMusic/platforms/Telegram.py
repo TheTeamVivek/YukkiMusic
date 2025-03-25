@@ -45,7 +45,7 @@ class Telegram:
         if message.chat.username:
             link = f"https://t.me/{message.chat.username}/{message.reply_to_message.id}"
         else:
-            xf = str((message.chat.id))[4:]
+            xf = str(message.chat.id)[4:]
             link = f"https://t.me/c/{xf}/{message.reply_to_message.id}"
         return link
 

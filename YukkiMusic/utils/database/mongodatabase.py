@@ -30,14 +30,14 @@ playlist = []
 # Playlist
 
 
-async def _get_playlists(chat_id: int) -> Dict[str, int]:
+async def _get_playlists(chat_id: int) -> dict[str, int]:
     _notes = await playlistdb.find_one({"chat_id": chat_id})
     if not _notes:
         return {}
     return _notes["notes"]
 
 
-async def get_playlist_names(chat_id: int) -> List[str]:
+async def get_playlist_names(chat_id: int) -> list[str]:
     _notes = []
     for note in await _get_playlists(chat_id):
         _notes.append(note)
@@ -191,14 +191,14 @@ async def remove_private_chat(chat_id: int):
 # Auth Users DB
 
 
-async def _get_authusers(chat_id: int) -> Dict[str, int]:
+async def _get_authusers(chat_id: int) -> dict[str, int]:
     _notes = await authuserdb.find_one({"chat_id": chat_id})
     if not _notes:
         return {}
     return _notes["notes"]
 
 
-async def get_authuser_names(chat_id: int) -> List[str]:
+async def get_authuser_names(chat_id: int) -> list[str]:
     _notes = []
     for note in await _get_authusers(chat_id):
         _notes.append(note)
@@ -353,7 +353,7 @@ async def get_global_tops() -> dict:
     return results
 
 
-async def get_particulars(chat_id: int) -> Dict[str, int]:
+async def get_particulars(chat_id: int) -> dict[str, int]:
     ids = await chattopdb.find_one({"chat_id": chat_id})
     if not ids:
         return {}
@@ -377,7 +377,7 @@ async def update_particular_top(chat_id: int, name: str, vidid: dict):
 # Top User DB
 
 
-async def get_userss(chat_id: int) -> Dict[str, int]:
+async def get_userss(chat_id: int) -> dict[str, int]:
     ids = await userdb.find_one({"chat_id": chat_id})
     if not ids:
         return {}
