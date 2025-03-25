@@ -31,7 +31,7 @@ def load_yaml_file(file_path: str) -> dict:
         return yaml.safe_load(file)
 
 
-def get_command(lang: str = "en") -> Union[str, list[str]]:
+def get_command(lang: str = "en") -> str | list[str]:
     if lang not in commands:
         lang = "en"
     return commands[lang]
@@ -101,8 +101,8 @@ if not commands:
 
 
 def command(
-    commands: Union[str, list[str]],
-    prefixes: Union[str, list[str], None] = "/",
+    commands: str | list[str],
+    prefixes: str | list[str] | None = "/",
     case_sensitive: bool = False,
 ):
     async def func(flt, client: Client, message: Message):

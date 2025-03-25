@@ -72,7 +72,7 @@ async def get_filters_names(chat_id: int) -> list[str]:
     return _filters
 
 
-async def get_filter(chat_id: int, name: str) -> Union[bool, dict]:
+async def get_filter(chat_id: int, name: str) -> bool | dict:
     name = name.lower().strip()
     _filters = await _get_filters(chat_id)
     if name in _filters:
@@ -133,7 +133,7 @@ async def get_note_names(chat_id: int) -> list[str]:
     return _notes
 
 
-async def get_note(chat_id: int, name: str) -> Union[bool, dict]:
+async def get_note(chat_id: int, name: str) -> bool | dict:
     name = name.lower().strip()
     _notes = await _get_notes(chat_id)
     if name in _notes:

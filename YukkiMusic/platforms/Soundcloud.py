@@ -31,7 +31,7 @@ class SoundCloud:
         return "soundcloud" in link
 
     @asyncify
-    def download(self, url: str) -> Union[dict, bool]:
+    def download(self, url: str) -> dict | bool:
         with YoutubeDL(self.opts):
             try:
                 info = d.extract_info(url)

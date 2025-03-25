@@ -44,7 +44,7 @@ async def get_playlist_names(chat_id: int) -> list[str]:
     return _notes
 
 
-async def get_playlist(chat_id: int, name: str) -> Union[bool, dict]:
+async def get_playlist(chat_id: int, name: str) -> bool | dict:
     name = name
     _notes = await _get_playlists(chat_id)
     if name in _notes:
@@ -205,7 +205,7 @@ async def get_authuser_names(chat_id: int) -> list[str]:
     return _notes
 
 
-async def get_authuser(chat_id: int, name: str) -> Union[bool, dict]:
+async def get_authuser(chat_id: int, name: str) -> bool | dict:
     name = name
     _notes = await _get_authusers(chat_id)
     if name in _notes:
@@ -360,7 +360,7 @@ async def get_particulars(chat_id: int) -> dict[str, int]:
     return ids["vidid"]
 
 
-async def get_particular_top(chat_id: int, name: str) -> Union[bool, dict]:
+async def get_particular_top(chat_id: int, name: str) -> bool | dict:
     ids = await get_particulars(chat_id)
     if name in ids:
         return ids[name]
@@ -389,7 +389,7 @@ async def delete_userss(chat_id: int) -> bool:
     return result.deleted_count > 0
 
 
-async def get_user_top(chat_id: int, name: str) -> Union[bool, dict]:
+async def get_user_top(chat_id: int, name: str) -> bool | dict:
     ids = await get_userss(chat_id)
     if name in ids:
         return ids[name]

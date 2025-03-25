@@ -49,7 +49,7 @@ class Telegram:
             link = f"https://t.me/c/{xf}/{message.reply_to_message.id}"
         return link
 
-    async def get_filename(self, file, audio: Union[bool, str] = None):
+    async def get_filename(self, file, audio: bool | str = None):
         try:
             file_name = file.file_name
             if file_name is None:
@@ -67,8 +67,8 @@ class Telegram:
 
     async def get_filepath(
         self,
-        audio: Union[bool, str] = None,
-        video: Union[bool, str] = None,
+        audio: bool | str = None,
+        video: bool | str = None,
     ):
         if audio:
             try:
