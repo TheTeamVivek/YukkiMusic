@@ -242,7 +242,7 @@ class YouTube:
             details = info_dict.get("entries")[0]
             info = {
                 "title": details["title"],
-                "link": details["webpage_url"],
+                "link": details["url"],
                 "vidid": details["id"],
                 "duration_min": (
                     seconds_to_min(details["duration"])
