@@ -71,50 +71,28 @@ class Saavn:
           
         async with aiohttp.ClientSession() as session:
             async with session.get("https://saavn.dev/api/search/songs", params= {"query": url, "limit": 1}) as response:
-                info = await response.json()["data"]["results"][0]
+                info = (await response.json())["data"]["results"][0]
                 return {
                     "title": info["name"],
                     "duration_sec": info.get("duration", 0),
                     "duration_min": seconds_to_time(info.get("duration", 0)),
                     "thumb": info["image"][-1]["url"]),
                     "url": self.clean_url(info["url"]),
+                    "_download_url": info["downloadUrl"][-1]["url"]
+                    "_id": info["id"]
                }
 
     @asyncify
     def download(self, url):
-        clean_url = self.clean_url(url)
-        ydl_opts = {
-            "format": "bestaudio/best",
-            "outtmpl": "downloads/%(id)s.%(ext)s",
-            "geo_bypass": True,
-            "nocheckcertificate": True,
-            "quiet": True,
-            "no_warnings": True,
-            "retries": 3,
-            "nooverwrites": False,
-            "continuedl": True,
-        }
-
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(clean_url, download=False)
-            file_path = os.path.join("downloads", f"{info['id']}.{info['ext']}")
-
-            if os.path.exists(file_path):
-                return file_path, {
-                    "title": info["title"],
-                    "duration_sec": info.get("duration", 0),
-                    "duration_min": seconds_to_time(info.get("duration", 0)),
-                    "thumb": info.get("thumbnail", None),
-                    "url": self.clean_url(info["webpage_url"]),
-                    "filepath": file_path,
-                }
-
-            ydl.download([clean_url])
-            return file_path, {
-                "title": info["title"],
-                "duration_sec": info.get("duration", 0),
-                "duration_min": seconds_to_time(info.get("duration", 0)),
-                "thumb": info.get("thumbnail", None),
-                "url": self.clean_url(info["webpage_url"]),
-                "filepath": file_path,
-            }
+        details = await self.info(url)
+        file_path = os.path.join("downloads", f"Saavn_{details["_id"]}.mp3")
+        if not os.path.exists(file_path):
+            async with aiohttp.ClientSession() as session:
+                async with session.get(details["_download_url"]) as resp:
+                    if resp.status == 200:
+                        with open(file_path, "wb") as f:
+                            while chunk := await resp.content.read(1024):
+                                f.write(chunk)
+                        print(f"Downloaded: {filename}")
+                    else:
+                        raise ValueError(f"Failed to download {details["_download_url"]}. HTTP Status: {resp.status}")
