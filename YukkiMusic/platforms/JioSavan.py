@@ -101,4 +101,5 @@ class Saavn:
                             f"Failed to download {details['_download_url']}. HTTP Status: {resp.status}"
                         )
 
+        details["filepath"] = file_path
         return file_path, details
