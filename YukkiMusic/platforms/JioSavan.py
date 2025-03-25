@@ -77,7 +77,7 @@ class Saavn:
                     "duration_sec": info.get("duration", 0),
                     "duration_min": seconds_to_time(info.get("duration", 0)),
                     "thumb": info["image"][-1]["url"],
-                    "url": self.clean_url(info["url"],
+                    "url": self.clean_url(info["url"]),
                     "_download_url": info["downloadUrl"][-1]["url"],
                     "_id": info["id"],
                }
