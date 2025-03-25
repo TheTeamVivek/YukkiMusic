@@ -146,7 +146,9 @@ async def skip(cli, message: Message, _, chat_id):
                     )
                 except Exception:
                     Platform.youtube.use_fallback = True
-                    file_path, status = await fallback.download(title[:20], video=status)
+                    file_path, status = await fallback.download(
+                        title[:20], video=status
+                    )
                     direct = None
         except Exception:
             return await mystic.edit_text(_["call_7"])
