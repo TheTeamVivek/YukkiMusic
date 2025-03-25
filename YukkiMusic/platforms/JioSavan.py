@@ -66,8 +66,7 @@ class Saavn:
                 pass
         return song_info
 
-    @asyncify
-    def info(self, url):
+    async def info(self, url):
         url = self.clean_url(url)
 
         async with aiohttp.ClientSession() as session:
@@ -85,8 +84,8 @@ class Saavn:
                     "_id": info["id"],
                 }
 
-    @asyncify
-    def download(self, url):
+
+    async def download(self, url):
         details = await self.info(url)
         file_path = os.path.join("downloads", f"Saavn_{details['_id']}.mp3")
 
