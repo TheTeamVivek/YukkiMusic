@@ -70,10 +70,21 @@ class Saavn:
         url = self.clean_url(url)
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(
-                "https://saavn.dev/api/search/songs", params={"query": url, "limit": 1}
-            ) as response:
-                info = (await response.json())["data"]["results"][0]
+            if "jiosaavn.com" in url:
+                api_url = "https://saavn.dev/api/songs"
+                params = {"link": url, "limit": 1}
+            else:
+                api_url = "https://saavn.dev/api/search/songs"
+                params = {"query": url, "limit": 1}
+
+            async with session.get(api_url, params=params) as response:
+                data = await response.json()
+
+                if "jiosaavn.com" in url:
+                    info = data["data"][0]  # For Saavn URLs
+                else:
+                    info = data["data"]["results"][0]  # For search queries
+
                 return {
                     "title": info["name"],
                     "duration_sec": info.get("duration", 0),
