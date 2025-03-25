@@ -17,6 +17,7 @@ import config
 from YukkiMusic import Platform, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
+from YukkiMusic.utils import fallback
 from YukkiMusic.utils.database import (
     add_active_video_chat,
     is_active_chat,
@@ -152,11 +153,23 @@ async def stream(
         thumbnail = result["thumb"]
         status = True if video else None
         try:
-            file_path, direct = await Platform.youtube.download(
-                vidid, mystic, videoid=True, video=status
-            )
+            if Platform.youtube.use_fallback:
+                file_path, status = await fallback.download(
+                   title, video=status
+             )
+                direct = None
+            else:
+                file_path, direct = await Platform.youtube.download(
+                    vidid, mystic, videoid=True, video=status
+                )
         except Exception:
-            raise AssistantErr(_["play_16"])
+            Platform.youtube.use_fallback = True
+            file_path, status = await fallback.download(
+                   title, video=status
+             )
+            direct = None
+except Exception:
+    raise AssistantErr(_["play_16"])
         if await is_active_chat(chat_id):
             await put_queue(
                 chat_id,
