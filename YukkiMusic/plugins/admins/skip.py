@@ -18,6 +18,7 @@ from strings import command
 from YukkiMusic import Platform, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
+from YukkiMusic.utils import fallback
 from YukkiMusic.utils.database import get_loop
 from YukkiMusic.utils.decorators import AdminRightsCheck
 from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
@@ -135,12 +136,18 @@ async def skip(cli, message: Message, _, chat_id):
     elif "vid_" in queued:
         mystic = await message.reply_text(_["call_8"], disable_web_page_preview=True)
         try:
-            file_path, direct = await Platform.youtube.download(
-                videoid,
-                mystic,
-                videoid=True,
-                video=status,
-            )
+            if Platform.youtube.use_fallback:
+                file_path, status = await fallback.download(title, video=status)
+                direct = None
+            else:
+                try:
+                    file_path, direct = await Platform.youtube.download(
+                        vidid, mystic, videoid=True, video=status
+                    )
+                except Exception:
+                    Platform.youtube.use_fallback = True
+                    file_path, status = await fallback.download(title, video=status)
+                    direct = None
         except Exception:
             return await mystic.edit_text(_["call_7"])
         try:
