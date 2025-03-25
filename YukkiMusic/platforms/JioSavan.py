@@ -68,9 +68,9 @@ class Saavn:
     @asyncify
     def info(self, url):
         url = self.clean_url(url)
-          
+
         async with aiohttp.ClientSession() as session:
-            async with session.get("https://saavn.dev/api/search/songs", params= {"query": url, "limit": 1}) as response:
+            async with session.get("https://saavn.dev/api/search/songs", params={"query": url, "limit": 1}) as response:
                 info = (await response.json())["data"]["results"][0]
                 return {
                     "title": info["name"],
@@ -80,12 +80,13 @@ class Saavn:
                     "url": self.clean_url(info["url"]),
                     "_download_url": info["downloadUrl"][-1]["url"],
                     "_id": info["id"],
-               }
+                }
 
     @asyncify
     def download(self, url):
         details = await self.info(url)
-        file_path = os.path.join("downloads", f"Saavn_{details["_id"]}.mp3")
+        file_path = os.path.join("downloads", f"Saavn_{details['_id']}.mp3")
+
         if not os.path.exists(file_path):
             async with aiohttp.ClientSession() as session:
                 async with session.get(details["_download_url"]) as resp:
@@ -93,8 +94,8 @@ class Saavn:
                         with open(file_path, "wb") as f:
                             while chunk := await resp.content.read(1024):
                                 f.write(chunk)
-                        print(f"Downloaded: {filename}")
+                        print(f"Downloaded: {file_path}")
                     else:
-                        raise ValueError(f"Failed to download {details["_download_url"]}. HTTP Status: {resp.status}")
+                        raise ValueError(f"Failed to download {details['_download_url']}. HTTP Status: {resp.status}")
 
         return file_path, details
