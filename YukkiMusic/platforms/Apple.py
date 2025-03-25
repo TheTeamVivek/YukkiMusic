@@ -9,7 +9,6 @@
 #
 
 import re
-from typing import Union
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -27,7 +26,7 @@ class Apple:
         else:
             return False
 
-    async def track(self, url, playid: Union[bool, str] = None):
+    async def track(self, url, playid: bool | str = None):
         if playid:
             url = self.base + url
         async with aiohttp.ClientSession() as session:
@@ -58,7 +57,7 @@ class Apple:
         }
         return track_details, vidid
 
-    async def playlist(self, url, playid: Union[bool, str] = None):
+    async def playlist(self, url, playid: bool | str = None):
         if playid:
             url = self.base + url
         playlist_id = url.split("playlist/")[1]

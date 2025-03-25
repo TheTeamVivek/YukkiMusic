@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 import asyncio
-from typing import Union
 
 from ntgcalls import TelegramServerError
 from pyrogram.errors import (
@@ -33,6 +32,7 @@ from strings import get_string
 from YukkiMusic import LOGGER, Platform, app, userbot
 from YukkiMusic.core.userbot import assistants
 from YukkiMusic.misc import db
+from YukkiMusic.utils import fallback
 from YukkiMusic.utils.database import (
     add_active_chat,
     add_active_video_chat,
@@ -119,8 +119,8 @@ class Call:
         self,
         chat_id: int,
         link: str,
-        video: Union[bool, str] = None,
-        image: Union[bool, str] = None,
+        video: bool | str = None,
+        image: bool | str = None,
     ):
         assistant = await group_assistant(self, chat_id)
         audio_stream_quality = await get_audio_bitrate(chat_id)
@@ -260,8 +260,8 @@ class Call:
         chat_id: int,
         original_chat_id: int,
         link,
-        video: Union[bool, str] = None,
-        image: Union[bool, str] = None,
+        video: bool | str = None,
+        image: bool | str = None,
     ):
         assistant = await group_assistant(self, chat_id)
         audio_stream_quality = await get_audio_bitrate(chat_id)
@@ -309,7 +309,6 @@ class Call:
         except NoActiveGroupCall:
             raise AssistantErr(
                 "**No Active Voice Chat Found**\n\nPlease make sure group's voice chat is enabled. If already enabled, please end it and start fresh voice chat again and if the problem continues, try /restart"
-            
             )
         except TelegramServerError:
             raise AssistantErr(
@@ -417,16 +416,32 @@ class Call:
             elif "vid_" in queued:
                 mystic = await app.send_message(original_chat_id, _["call_8"])
                 try:
-                    file_path, direct = await Platform.youtube.download(
-                        videoid,
-                        mystic,
-                        videoid=True,
-                        video=True if str(streamtype) == "video" else False,
-                    )
+                    if Platform.youtube.use_fallback:
+                        file_path, status = await fallback.download(
+                            title[:20],
+                            video=(True if str(streamtype) == "video" else False),
+                        )
+                        direct = None
+                    else:
+                        try:
+                            file_path, direct = await Platform.youtube.download(
+                                videoid,
+                                mystic,
+                                videoid=True,
+                                video=(True if str(streamtype) == "video" else False),
+                            )
+                        except Exception:
+                            Platform.youtube.use_fallback = True
+                            file_path, status = await fallback.download(
+                                title[:20],
+                                video=(True if str(streamtype) == "video" else False),
+                            )
+                            direct = None
                 except Exception:
                     return await mystic.edit_text(
                         _["call_7"], disable_web_page_preview=True
                     )
+
                 if video:
                     stream = MediaStream(
                         file_path,

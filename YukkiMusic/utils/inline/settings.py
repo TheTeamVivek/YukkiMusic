@@ -7,7 +7,6 @@
 #
 # All rights reserved.
 #
-from typing import Union
 
 from pyrogram.types import InlineKeyboardButton
 
@@ -35,10 +34,10 @@ def setting_markup(_):
 
 def audio_quality_markup(
     _,
-    LOW: Union[bool, str] = None,
-    MEDIUM: Union[bool, str] = None,
-    HIGH: Union[bool, str] = None,
-    STUDIO: Union[bool, str] = None,
+    LOW: bool | str = None,
+    MEDIUM: bool | str = None,
+    HIGH: bool | str = None,
+    STUDIO: bool | str = None,
 ):
     buttons = [
         [
@@ -88,12 +87,12 @@ def audio_quality_markup(
 
 def video_quality_markup(
     _,
-    SD_360p: Union[bool, str] = None,
-    SD_480p: Union[bool, str] = None,
-    HD_720p: Union[bool, str] = None,
-    FHD_1080p: Union[bool, str] = None,
-    QHD_2K: Union[bool, str] = None,
-    UHD_4K: Union[bool, str] = None,
+    SD_360p: bool | str = None,
+    SD_480p: bool | str = None,
+    HD_720p: bool | str = None,
+    FHD_1080p: bool | str = None,
+    QHD_2K: bool | str = None,
+    UHD_4K: bool | str = None,
 ):
     buttons = [
         [
@@ -163,8 +162,8 @@ def video_quality_markup(
 
 def cleanmode_settings_markup(
     _,
-    status: Union[bool, str] = None,
-    dels: Union[bool, str] = None,
+    status: bool | str = None,
+    dels: bool | str = None,
 ):
     buttons = [
         [
@@ -192,7 +191,7 @@ def cleanmode_settings_markup(
     return buttons
 
 
-def auth_users_markup(_, status: Union[bool, str] = None):
+def auth_users_markup(_, status: bool | str = None):
     buttons = [
         [
             InlineKeyboardButton(text=_["ST_B_3"], callback_data="AUTHANSWER"),
@@ -217,9 +216,9 @@ def auth_users_markup(_, status: Union[bool, str] = None):
 
 def playmode_users_markup(
     _,
-    Direct: Union[bool, str] = None,
-    Group: Union[bool, str] = None,
-    Playtype: Union[bool, str] = None,
+    Direct: bool | str = None,
+    Group: bool | str = None,
+    Playtype: bool | str = None,
 ):
     buttons = [
         [

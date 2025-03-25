@@ -11,7 +11,6 @@ import asyncio
 import os
 import random
 import re
-from typing import Union
 
 from async_lru import alru_cache
 from py_yt import VideosSearch
@@ -23,6 +22,8 @@ import config
 from YukkiMusic.utils.database import is_on_off
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
+
+NOTHING = {"cookies_dead": None}
 
 
 def cookies():
@@ -61,7 +62,7 @@ class YouTube:
         self.listbase = "https://youtube.com/playlist?list="
         self.reg = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
-    async def exists(self, link: str, videoid: Union[bool, str] = None):
+    async def exists(self, link: str, videoid: bool | str = None):
         if videoid:
             link = self.base + link
         if re.search(self.regex, link):
@@ -69,8 +70,17 @@ class YouTube:
         else:
             return False
 
+    @property
+    def use_fallback(self):
+        return NOTHING["cookies_dead"] is True
+
+    @use_fallback.setter
+    def use_fallback(self, value):
+        if NOTHING["cookies_dead"] is None:
+            NOTHING["cookies_dead"] = value
+
     @asyncify
-    def url(self, message_1: Message) -> Union[str, None]:
+    def url(self, message_1: Message) -> str | None:
         messages = [message_1]
         if message_1.reply_to_message:
             messages.append(message_1.reply_to_message)
@@ -95,7 +105,7 @@ class YouTube:
         return text[offset : offset + length]
 
     @alru_cache(maxsize=None)
-    async def details(self, link: str, videoid: Union[bool, str] = None):
+    async def details(self, link: str, videoid: bool | str = None):
         if videoid:
             link = self.base + link
         if "&" in link:
@@ -113,7 +123,7 @@ class YouTube:
         return title, duration_min, duration_sec, thumbnail, vidid
 
     @alru_cache(maxsize=None)
-    async def title(self, link: str, videoid: Union[bool, str] = None):
+    async def title(self, link: str, videoid: bool | str = None):
         if videoid:
             link = self.base + link
         if "&" in link:
@@ -124,7 +134,7 @@ class YouTube:
         return title
 
     @alru_cache(maxsize=None)
-    async def duration(self, link: str, videoid: Union[bool, str] = None):
+    async def duration(self, link: str, videoid: bool | str = None):
         if videoid:
             link = self.base + link
         if "&" in link:
@@ -135,7 +145,7 @@ class YouTube:
         return duration
 
     @alru_cache(maxsize=None)
-    async def thumbnail(self, link: str, videoid: Union[bool, str] = None):
+    async def thumbnail(self, link: str, videoid: bool | str = None):
         if videoid:
             link = self.base + link
         if "&" in link:
@@ -145,7 +155,7 @@ class YouTube:
             thumbnail = result["thumbnails"][0]["url"].split("?")[0]
         return thumbnail
 
-    async def video(self, link: str, videoid: Union[bool, str] = None):
+    async def video(self, link: str, videoid: bool | str = None):
         if videoid:
             link = self.base + link
         if "&" in link:
@@ -171,7 +181,7 @@ class YouTube:
             return 0, stderr.decode()
 
     @alru_cache(maxsize=None)
-    async def playlist(self, link, limit, videoid: Union[bool, str] = None):
+    async def playlist(self, link, limit, videoid: bool | str = None):
         if videoid:
             link = self.listbase + link
         if "&" in link:
@@ -192,7 +202,7 @@ class YouTube:
         return result
 
     @alru_cache(maxsize=None)
-    async def track(self, link: str, videoid: Union[bool, str] = None):
+    async def track(self, link: str, videoid: bool | str = None):
         if videoid:
             link = self.base + link
         if "&" in link:
@@ -232,7 +242,7 @@ class YouTube:
             details = info_dict.get("entries")[0]
             info = {
                 "title": details["title"],
-                "link": details["url"],
+                "link": details["webpage_url"],
                 "vidid": details["id"],
                 "duration_min": (
                     seconds_to_min(details["duration"])
@@ -245,7 +255,7 @@ class YouTube:
 
     @alru_cache(maxsize=None)
     @asyncify
-    def formats(self, link: str, videoid: Union[bool, str] = None):
+    def formats(self, link: str, videoid: bool | str = None):
         if videoid:
             link = self.base + link
         if "&" in link:
@@ -291,7 +301,7 @@ class YouTube:
         self,
         link: str,
         query_type: int,
-        videoid: Union[bool, str] = None,
+        videoid: bool | str = None,
     ):
         if videoid:
             link = self.base + link
@@ -309,12 +319,12 @@ class YouTube:
         self,
         link: str,
         mystic,
-        video: Union[bool, str] = None,
-        videoid: Union[bool, str] = None,
-        songaudio: Union[bool, str] = None,
-        songvideo: Union[bool, str] = None,
-        format_id: Union[bool, str] = None,
-        title: Union[bool, str] = None,
+        video: bool | str = None,
+        videoid: bool | str = None,
+        songaudio: bool | str = None,
+        songvideo: bool | str = None,
+        format_id: bool | str = None,
+        title: bool | str = None,
     ) -> str:
         if videoid:
             link = self.base + link

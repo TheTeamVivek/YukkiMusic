@@ -10,7 +10,6 @@
 
 import os
 from random import randint
-from typing import Union
 
 from pyrogram.types import InlineKeyboardMarkup
 
@@ -18,6 +17,7 @@ import config
 from YukkiMusic import Platform, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
+from YukkiMusic.utils import fallback
 from YukkiMusic.utils.database import (
     add_active_video_chat,
     is_active_chat,
@@ -39,10 +39,10 @@ async def stream(
     chat_id,
     user_name,
     original_chat_id,
-    video: Union[bool, str] = None,
-    streamtype: Union[bool, str] = None,
-    spotify: Union[bool, str] = None,
-    forceplay: Union[bool, str] = None,
+    video: bool | str = None,
+    streamtype: bool | str = None,
+    spotify: bool | str = None,
+    forceplay: bool | str = None,
 ):
     if not result:
         return
@@ -153,11 +153,21 @@ async def stream(
         thumbnail = result["thumb"]
         status = True if video else None
         try:
-            file_path, direct = await Platform.youtube.download(
-                vidid, mystic, videoid=True, video=status
-            )
+            if Platform.youtube.use_fallback:
+                file_path, status = await fallback.download(title, video=status)
+                direct = None
+            else:
+                try:
+                    file_path, direct = await Platform.youtube.download(
+                        vidid, mystic, videoid=True, video=status
+                    )
+                except Exception:
+                    Platform.youtube.use_fallback = True
+                    file_path, status = await fallback.download(title, video=status)
+                    direct = None
         except Exception:
             raise AssistantErr(_["play_16"])
+
         if await is_active_chat(chat_id):
             await put_queue(
                 chat_id,

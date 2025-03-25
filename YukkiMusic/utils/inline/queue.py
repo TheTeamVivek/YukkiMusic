@@ -7,7 +7,6 @@
 #
 # All rights reserved.
 #
-from typing import Union
 
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -17,8 +16,8 @@ def queue_markup(
     DURATION,
     CPLAY,
     videoid,
-    played: Union[bool, int] = None,
-    dur: Union[bool, int] = None,
+    played: bool | int = None,
+    dur: bool | int = None,
 ):
     not_dur = [
         [

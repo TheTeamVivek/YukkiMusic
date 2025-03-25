@@ -7,7 +7,6 @@
 #
 # All rights reserved.
 #
-from typing import Union
 
 from pyrogram.types import InlineKeyboardButton
 
@@ -44,7 +43,7 @@ def start_pannel(_):
     return buttons
 
 
-def private_panel(_, BOT_USERNAME, OWNER: Union[bool, int] = None):
+def private_panel(_, BOT_USERNAME, OWNER: bool | int = None):
     buttons = [
         [InlineKeyboardButton(text=_["S_B_8"], callback_data="settings_back_helper")]
     ]

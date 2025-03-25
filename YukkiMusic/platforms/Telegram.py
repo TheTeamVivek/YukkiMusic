@@ -12,7 +12,6 @@ import asyncio
 import os
 import time
 from datetime import datetime, timedelta
-from typing import Union
 
 import aiohttp
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Voice
@@ -45,11 +44,11 @@ class Telegram:
         if message.chat.username:
             link = f"https://t.me/{message.chat.username}/{message.reply_to_message.id}"
         else:
-            xf = str((message.chat.id))[4:]
+            xf = str(message.chat.id)[4:]
             link = f"https://t.me/c/{xf}/{message.reply_to_message.id}"
         return link
 
-    async def get_filename(self, file, audio: Union[bool, str] = None):
+    async def get_filename(self, file, audio: bool | str = None):
         try:
             file_name = file.file_name
             if file_name is None:
@@ -67,8 +66,8 @@ class Telegram:
 
     async def get_filepath(
         self,
-        audio: Union[bool, str] = None,
-        video: Union[bool, str] = None,
+        audio: bool | str = None,
+        video: bool | str = None,
     ):
         if audio:
             try:
