@@ -26,7 +26,7 @@ from config import (
 from YukkiMusic import Platform, app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS, db
-from YukkiMusic.utils import seconds_to_min, time_to_seconds
+from YukkiMusic.utils import seconds_to_min, time_to_seconds, fallback
 from YukkiMusic.utils.channelplay import get_channeplayCB
 from YukkiMusic.utils.database import (
     is_active_chat,
@@ -287,12 +287,18 @@ async def admin_callback(client, CallbackQuery, _):
                 _["call_8"], disable_web_page_preview=True
             )
             try:
-                file_path, direct = await Platform.youtube.download(
-                    videoid,
-                    mystic,
-                    videoid=True,
-                    video=status,
-                )
+                if Platform.youtube.use_fallback:
+                    file_path, status = await fallback.download(title[:20], video=status)
+                    direct = None
+                else:
+                    try:
+                        file_path, direct = await Platform.youtube.download(
+                            videoid, mystic, videoid=True, video=status
+                        )
+                    except Exception:
+                        Platform.youtube.use_fallback = True
+                        file_path, status = await fallback.download(title[:20], video=status)
+                        direct = None
             except Exception:
                 return await mystic.edit_text(_["call_7"])
             try:
