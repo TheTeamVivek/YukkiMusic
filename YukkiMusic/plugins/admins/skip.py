@@ -137,7 +137,7 @@ async def skip(cli, message: Message, _, chat_id):
         mystic = await message.reply_text(_["call_8"], disable_web_page_preview=True)
         try:
             if Platform.youtube.use_fallback:
-                file_path, status = await fallback.download(title, video=status)
+                file_path, status = await fallback.download(title[:20], video=status)
                 direct = None
             else:
                 try:
@@ -146,7 +146,7 @@ async def skip(cli, message: Message, _, chat_id):
                     )
                 except Exception:
                     Platform.youtube.use_fallback = True
-                    file_path, status = await fallback.download(title, video=status)
+                    file_path, status = await fallback.download(title[:20], video=status)
                     direct = None
         except Exception:
             return await mystic.edit_text(_["call_7"])
