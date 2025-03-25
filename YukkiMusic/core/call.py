@@ -47,6 +47,7 @@ from YukkiMusic.utils.database import (
     set_assistant,
     set_loop,
 )
+from YukkiMusic.utils import fallback
 from YukkiMusic.utils.exceptions import AssistantErr
 from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
 from YukkiMusic.utils.stream.autoclear import auto_clean
@@ -415,16 +416,25 @@ class Call:
             elif "vid_" in queued:
                 mystic = await app.send_message(original_chat_id, _["call_8"])
                 try:
-                    file_path, direct = await Platform.youtube.download(
-                        videoid,
-                        mystic,
-                        videoid=True,
-                        video=True if str(streamtype) == "video" else False,
-                    )
+                    if Platform.youtube.use_fallback:
+                        file_path, status = await fallback.download(
+                            title[:20], video=(True if str(streamtype) == "video" else False)
+        )
+                        direct = None
+                    else:
+                        try:
+                            file_path, direct = await Platform.youtube.download(
+                videoid, mystic, videoid=True, video=(True if str(streamtype) == "video" else False)
+            )
+                        except Exception:
+                            Platform.youtube.use_fallback = True
+                            file_path, status = await fallback.download(
+                title[:20], video=(True if str(streamtype) == "video" else False)
+            )
+                            direct = None
                 except Exception:
-                    return await mystic.edit_text(
-                        _["call_7"], disable_web_page_preview=True
-                    )
+                    return await mystic.edit_text(_["call_7"], disable_web_page_preview=True)
+
                 if video:
                     stream = MediaStream(
                         file_path,
