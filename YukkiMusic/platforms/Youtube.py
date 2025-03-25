@@ -76,7 +76,7 @@ class YouTube:
 
     @use_fallback.setattr
     def use_fallback(self):
-        NOTHING["cookies_dead"] = value 
+        NOTHING["cookies_dead"] = value
 
     @asyncify
     def url(self, message_1: Message) -> str | None:
