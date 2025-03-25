@@ -23,7 +23,7 @@ from YukkiMusic.utils.database import is_on_off
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
-NOTHINGS = {"cookies_dead": None}
+NOTHING = {"cookies_dead": None}
 
 
 def cookies():
@@ -73,6 +73,10 @@ class YouTube:
     @property
     def use_fallback(self):
         return NOTHING["cookies_dead"] is True
+
+    @use_fallback.setattr
+    def use_fallback(self):
+        NOTHING["cookies_dead"] = value 
 
     @asyncify
     def url(self, message_1: Message) -> str | None:
