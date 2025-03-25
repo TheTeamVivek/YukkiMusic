@@ -16,8 +16,6 @@ import yt_dlp
 from config import seconds_to_time
 from YukkiMusic.utils.decorators import asyncify
 
-# TODO: Fix dowbload function of Saavn where where it used
-
 
 class Saavn:
 
@@ -88,12 +86,13 @@ class Saavn:
                 }
 
     @asyncify
-    def download(self, dowbload_url):
+    def download(self, url):
+        details = await self.info(url)
         file_path = os.path.join("downloads", f"Saavn_{details['_id']}.mp3")
 
         if not os.path.exists(file_path):
             async with aiohttp.ClientSession() as session:
-                async with session.get(dowbload_url) as resp:
+                async with session.get(details["_download_url"]) as resp:
                     if resp.status == 200:
                         with open(file_path, "wb") as f:
                             while chunk := await resp.content.read(1024):
@@ -101,7 +100,7 @@ class Saavn:
                         print(f"Downloaded: {file_path}")
                     else:
                         raise ValueError(
-                            f"Failed to download {dowbload_url}. HTTP Status: {resp.status}"
+                            f"Failed to download {details['_download_url']}. HTTP Status: {resp.status}"
                         )
 
-        return file_path
+        return file_path, details
