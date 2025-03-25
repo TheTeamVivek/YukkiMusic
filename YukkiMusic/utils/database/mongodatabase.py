@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 
-from typing import Union
 
 from YukkiMusic.core.mongo import mongodb
 

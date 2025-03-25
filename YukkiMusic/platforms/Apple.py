@@ -9,7 +9,6 @@
 #
 
 import re
-from typing import Union
 
 import aiohttp
 from bs4 import BeautifulSoup

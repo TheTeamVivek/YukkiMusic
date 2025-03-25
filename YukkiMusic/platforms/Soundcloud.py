@@ -9,7 +9,6 @@
 #
 
 from os import path
-from typing import Union
 
 from yt_dlp import YoutubeDL
 

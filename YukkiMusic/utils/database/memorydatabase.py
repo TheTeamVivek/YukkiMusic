@@ -10,7 +10,6 @@
 
 import json
 import os
-from typing import Union
 
 import config
 from YukkiMusic.core.mongo import mongodb

@@ -12,7 +12,6 @@ import asyncio
 import os
 import time
 from datetime import datetime, timedelta
-from typing import Union
 
 import aiohttp
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Voice

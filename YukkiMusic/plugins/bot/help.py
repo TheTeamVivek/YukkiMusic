@@ -11,7 +11,6 @@
 import logging
 import re
 from math import ceil
-from typing import Union
 
 from pyrogram import filters, types
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
@@ -198,9 +197,7 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
 
 @app.on_message(command("HELP_COMMAND") & filters.private & ~BANNED_USERS)
 @app.on_callback_query(filters.regex("settings_back_helper") & ~BANNED_USERS)
-async def helper_private(
-    client: app, update: types.Message | types.CallbackQuery
-):
+async def helper_private(client: app, update: types.Message | types.CallbackQuery):
     is_callback = isinstance(update, types.CallbackQuery)
     if is_callback:
         try:

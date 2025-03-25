@@ -11,7 +11,6 @@ import asyncio
 import os
 import random
 import re
-from typing import Union
 
 from async_lru import alru_cache
 from py_yt import VideosSearch
@@ -25,6 +24,7 @@ from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
 NOTHINGS = {"cookies_dead": None}
+
 
 def cookies():
     folder_path = f"{os.getcwd()}/cookies"
