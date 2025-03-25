@@ -5,9 +5,11 @@ from .decorators.asyncify import asyncify
 
 
 @asyncify
-def fallback_download():
-    pass
+def download(title, video):
+    video = None
+    path = await Saavn().download(title)
+    return path, video
 
 
-async def fallback_track(name):
+async def track(name):
     pass
