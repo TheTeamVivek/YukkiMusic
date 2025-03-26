@@ -45,7 +45,7 @@ async def init():
             if hasattr(mod, "__HELP__") and mod.__HELP__:
                 HELPABLE[mod.__MODULE__.lower()] = mod
 
-    if config.EXTRA_PLUGINS:
+    if config.EXTRA_PLUGINS.lower() == "true":
         if os.path.exists("xtraplugins"):
             result = await app.run_shell_command(["git", "-C", "xtraplugins", "pull"])
             if result["returncode"] != 0:
