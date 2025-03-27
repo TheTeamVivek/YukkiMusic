@@ -10,11 +10,11 @@
 from async_lru import alru_cache
 from yt_dlp import YoutubeDL
 
+import config
 from YukkiMusic.utils.decorators import asyncify
 
-import config
-from ..core.request import Request
 from ..core.enum import SourceType
+from ..core.request import Request
 from ..core.track import Track
 from .base import PlatformBase
 
