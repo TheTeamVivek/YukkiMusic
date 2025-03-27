@@ -89,7 +89,7 @@ class Saavn:
                     info = data["data"]["results"][0]  # For search queries
 
                 thumb_url = info["image"][-1]["url"]
-                thumb_path = await self._resize_thumb(thumb_url, info["_id"])
+                thumb_path = await self._resize_thumb(thumb_url, info["id"])
 
                 return {
                     "title": info["name"],
