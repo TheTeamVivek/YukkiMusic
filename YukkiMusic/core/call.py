@@ -415,28 +415,36 @@ class Call:
                 db[chat_id][0]["markup"] = "tg"
             elif "vid_" in queued:
                 mystic = await app.send_message(original_chat_id, _["call_8"])
+                flink = f"https://t.me/{app.username}?start=info_{videoid}"
+                thumbnail = None
                 try:
                     if Platform.youtube.use_fallback:
-                        file_path, status = await fallback.download(
-                            title[:20],
-                            video=(True if str(streamtype) == "video" else False),
+                        file_path, _data, video = await fallback.download(
+                            title[:12],
+                            video=video,
                         )
                         direct = None
+                        title = _data.get("title", title)
+                        thumbnail = _data.get("thumb")
+                        flink = _data.get("url", flink)
                     else:
                         try:
                             file_path, direct = await Platform.youtube.download(
                                 videoid,
                                 mystic,
                                 videoid=True,
-                                video=(True if str(streamtype) == "video" else False),
+                                video=video,
                             )
                         except Exception:
                             Platform.youtube.use_fallback = True
-                            file_path, status = await fallback.download(
-                                title[:20],
+                            file_path, video = await fallback.download(
+                                title[:12],
                                 video=(True if str(streamtype) == "video" else False),
                             )
                             direct = None
+                            title = _data.get("title", title)
+                            thumbnail = _data.get("thumb")
+                            flink = _data.get("url", flink)
                 except Exception:
                     return await mystic.edit_text(
                         _["call_7"], disable_web_page_preview=True
@@ -473,7 +481,7 @@ class Call:
                         original_chat_id,
                         text=_["call_7"],
                     )
-                img = await gen_thumb(videoid)
+                img = await gen_thumb(videoid, thumbnail)
                 button = stream_markup(_, videoid, chat_id)
                 await mystic.delete()
                 run = await app.send_photo(
@@ -481,7 +489,7 @@ class Call:
                     photo=img,
                     caption=_["stream_1"].format(
                         title[:27],
-                        f"https://t.me/{app.username}?start=info_{videoid}",
+                        flink,
                         check[0]["dur"],
                         user,
                     ),
