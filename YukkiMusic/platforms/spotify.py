@@ -14,6 +14,7 @@ import spotipy
 from async_lru import alru_cache
 
 import config
+
 from ..core.enum import SourceType
 from ..core.track import Track
 from .base import PlatformBase
@@ -45,7 +46,8 @@ class Spotify(PlatformBase):
             fetched = f' {artist["name"]}'
             if "Various Artists" not in fetched:
                 info += fetched
-        from .youtube import YouTube        
+        from .youtube import YouTube
+
         t = await YouTube.track(info)
         t.link = link
         t.streamtype = SourceType.SPOTIFY
@@ -64,9 +66,10 @@ class Spotify(PlatformBase):
                 if "Various Artists" not in fetched:
                     info += fetched
             results.append(info)
-            
+
         if len(results) > 0:
             from .youtube import YouTube
+
             t = await YouTube.track(results.pop(0))
             t.link = url
             t.streamtype = SourceType.SPOTIFY
@@ -85,13 +88,14 @@ class Spotify(PlatformBase):
                 if "Various Artists" not in fetched:
                     info += fetched
             results.append(info)
-            
+
         if len(results) > 0:
             from .youtube import YouTube
+
             t = await YouTube.track(results.pop(0))
             t.link = url
             t.streamtype = SourceType.SPOTIFY
-            results.insert(0, t)    
+            results.insert(0, t)
         return results, album_id
 
     @alru_cache(maxsize=None)
@@ -110,9 +114,10 @@ class Spotify(PlatformBase):
             info.link = url
             info.streamtype = SourceType.SPOTIFY
             results.append(info)
-            
+
         if len(results) > 0:
             from .youtube import YouTube
+
             t = await YouTube.track(results.pop(0))
             t.link = url
             t.streamtype = SourceType.SPOTIFY
