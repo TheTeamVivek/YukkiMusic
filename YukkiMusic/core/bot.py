@@ -127,7 +127,7 @@ class YukkiBot(Client):
             )
             LOGGER(__name__).error("Error details:", exc_info=True)
             exit()
-        if config.SET_CMDS == str(True):
+        if config.SET_CMDS:
             try:
                 await self._set_default_commands()
             except Exception as e:
