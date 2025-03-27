@@ -53,7 +53,7 @@ def PlayWrapper(command):
             if message.from_user.id not in SUDOERS:
                 return
 
-        if PRIVATE_BOT_MODE == str(True):
+        if PRIVATE_BOT_MODE:
             if not await is_served_private_chat(message.chat.id):
                 await message.reply_text(
                     "**PRIVATE MUSIC BOT**\n\nOnly For Authorized chats from the owner ask my owner to allow your chat first."
