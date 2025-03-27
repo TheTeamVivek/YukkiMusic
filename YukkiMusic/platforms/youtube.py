@@ -15,8 +15,8 @@ from async_lru import alru_cache
 from youtubesearchpython.__future__ import VideosSearch
 from yt_dlp import YoutubeDL
 
-import config
 from config import cookies
+import config
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import time_to_seconds
 
@@ -125,9 +125,7 @@ class YouTube(PlatformBase):
         return formats_available, link
 
     @alru_cache(maxsize=None)
-    async def playlist(
-        self, link, limit: int = config.PLAYLIST_FETCH_LIMIT
-    ) -> list[Track]:
+    async def playlist(self, link, limit: int = config.PLAYLIST_FETCH_LIMIT) -> list[Track]:
         if "&" in link:
             link = link.split("&")[0]
 
