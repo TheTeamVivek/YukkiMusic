@@ -15,8 +15,8 @@ from bs4 import BeautifulSoup
 
 import config
 
-from ..core.request import Request
 from ..core.enum import SourceType
+from ..core.request import Request
 from ..core.track import Track
 from .base import PlatformBase
 
@@ -40,14 +40,17 @@ class Apple(PlatformBase):
         if song_name is None:
             return False
         from .youtube import YouTube
+
         t = await YouTube.track(song_name)
         t.streamtype = SourceType.APPLE
         t.link = url
         return t
 
     @alru_cache(maxsize=None)
-    async def playlist(self, url: str, limit: int = config.PLAYLIST_FETCH_LIMIT) -> list[Track]:
-        
+    async def playlist(
+        self, url: str, limit: int = config.PLAYLIST_FETCH_LIMIT
+    ) -> list[Track]:
+
         playlist_id = url.split("playlist/")[1]
 
         html = await Request.get_text(url)
@@ -55,7 +58,7 @@ class Apple(PlatformBase):
         applelinks = soup.find_all("meta", attrs={"property": "music:song"})
         results = []
         from .youtube import YouTube
-        
+
         for item in applelinks:
             if len(results) == limit:
                 break
@@ -64,9 +67,9 @@ class Apple(PlatformBase):
                     "-", " "
                 )
             except Exception:
-                xx = ((item["content"]).split("album/")[1]).split("/")[0]
+                ((item["content"]).split("album/")[1]).split("/")[0]
             results.append(t)
-            
+
         if len(results) > 0:
             t = await YouTube.track(results.pop(0))
             t.streamtype = SourceType.APPLE
