@@ -427,6 +427,7 @@ class Call:
                         title = _data.get("title", title)
                         thumbnail = _data.get("thumb")
                         flink = _data.get("url", flink)
+                        check[0]["dur"] = _data.get("duration_min", check[0]["dur"])
                     else:
                         try:
                             file_path, direct = await Platform.youtube.download(
@@ -445,6 +446,7 @@ class Call:
                             title = _data.get("title", title)
                             thumbnail = _data.get("thumb")
                             flink = _data.get("url", flink)
+                            check[0]["dur"] = _data.get("duration_min", check[0]["dur"])
                 except Exception:
                     return await mystic.edit_text(
                         _["call_7"], disable_web_page_preview=True
