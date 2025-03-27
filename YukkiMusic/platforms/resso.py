@@ -13,8 +13,8 @@ import re
 from async_lru import alru_cache
 from bs4 import BeautifulSoup
 
-from ..core.request import Request
 from ..core.enum import SourceType
+from ..core.request import Request
 from ..core.track import Track
 from .base import PlatformBase
 
@@ -43,6 +43,7 @@ class Resso(PlatformBase):
         if des == "":
             raise ValueError(f"Failed to download Song: {url}")
         from .youtube import YouTube
+
         track = await YouTube.track(title)
         track.link = url
         track.streamtype = SourceType.RESSO
