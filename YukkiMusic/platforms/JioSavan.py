@@ -13,6 +13,9 @@ import os
 import aiohttp
 import yt_dlp
 
+from io import BytesIO
+from PIL import Image
+
 from config import seconds_to_time
 from YukkiMusic.utils.decorators import asyncify
 
@@ -85,11 +88,14 @@ class Saavn:
                 else:
                     info = data["data"]["results"][0]  # For search queries
 
+                thumb_url = info["image"][-1]["url"]
+                thumb_path = await self._resize_thumb(thumb_url, info["_id"])
+
                 return {
                     "title": info["name"],
                     "duration_sec": info.get("duration", 0),
                     "duration_min": seconds_to_time(info.get("duration", 0)),
-                    "thumb": info["image"][-1]["url"],
+                    "thumb": thumb_path,
                     "url": self.clean_url(info["url"]),
                     "_download_url": info["downloadUrl"][-1]["url"],
                     "_id": info["id"],
@@ -114,3 +120,26 @@ class Saavn:
 
         details["filepath"] = file_path
         return file_path, details
+
+    async def _resize_thumb(self, thumb_url, _id, size=(1280, 720)):
+        thumb_path = os.path.join("cache", f"Thumb_{_id}.jpg")
+
+        if os.path.exists(thumb_path):
+            return thumb_path
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(thumb_url) as response:
+                img_data = await response.read()
+
+        img = Image.open(BytesIO(img_data))
+        scale_factor = size[1] / img.height
+        new_width = int(img.width * scale_factor)
+        new_height = size[1]
+
+        resized_img = img.resize((new_width, new_height), Image.LANCZOS)
+        new_img = Image.new("RGB", size, (0, 0, 0))
+        new_img.paste(resized_img, ((size[0] - new_width) // 2, 0))
+
+        new_img.save(thumb_path, format="JPEG")
+        return thumb_path
+        
