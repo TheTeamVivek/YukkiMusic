@@ -126,7 +126,6 @@ def command(
         else:
             commands_list = commands
 
-        # Get localized and English commands
         localized_commands = []
         en_commands = []
         for cmd in commands_list:
@@ -153,7 +152,7 @@ def command(
             if with_prefix and flt.prefixes:
                 for prefix in flt.prefixes:
                     if text.startswith(prefix):
-                        without_prefix = text[len(prefix) :]
+                        without_prefix = text[len(prefix):]
                         if re.match(
                             rf"^(?:{cmd}(?:@?{username})?)(?:\s|$)",
                             without_prefix,
@@ -161,7 +160,6 @@ def command(
                         ):
                             return prefix + cmd
             else:
-                # Match without prefix
                 if re.match(
                     rf"^(?:{cmd}(?:@?{username})?)(?:\s|$)",
                     text,
@@ -171,25 +169,18 @@ def command(
             return None
 
         all_commands = []
-
-        # Add English commands with prefix only
         if lang_code == "en":
-            all_commands.extend((cmd, True) for cmd in en_commands)  # Only with prefix
+            all_commands.extend((cmd, True) for cmd in en_commands)
         else:
-            # For non-English languages, add commands both with and without prefix
-            all_commands.extend(
-                (cmd, True) for cmd in en_commands
-            )  # English commands with prefix
-            all_commands.extend(
-                (cmd, True) for cmd in localized_commands
-            )  # Non-English commands with prefix
-            all_commands.extend(
-                (cmd, False) for cmd in localized_commands
-            )  # Non-English commands without prefix
+            all_commands.extend((cmd, True) for cmd in en_commands)
+            all_commands.extend((cmd, True) for cmd in localized_commands)
+            all_commands.extend((cmd, False) for cmd in localized_commands)
 
         for cmd, with_prefix in all_commands:
             matched_cmd = match_command(cmd, text, with_prefix)
             if matched_cmd:
+                prefix_length = len(next(iter(flt.prefixes), "")) if with_prefix else 0
+                command_name = matched_cmd[prefix_length:]
                 without_command = re.sub(
                     rf"{matched_cmd}(?:@?{username})?\s?",
                     "",
@@ -197,7 +188,7 @@ def command(
                     count=1,
                     flags=re.IGNORECASE if not flt.case_sensitive else 0,
                 )
-                message.command = [matched_cmd] + [
+                message.command = [command_name] + [
                     re.sub(r"\\([\"'])", r"\1", m.group(2) or m.group(3) or "")
                     for m in re.finditer(
                         r'([^\s"\']+)|"([^"]*)"|\'([^\']*)\'', without_command
