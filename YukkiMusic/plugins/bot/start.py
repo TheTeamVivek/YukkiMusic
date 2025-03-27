@@ -250,7 +250,7 @@ async def testbot(client, message: Message, _):
 @app.on_message(filters.new_chat_members, group=-1)
 async def welcome(client, message: Message):
     chat_id = message.chat.id
-    if config.PRIVATE_BOT_MODE == str(True):
+    if config.PRIVATE_BOT_MODE:
         if not await is_served_private_chat(message.chat.id):
             await message.reply_text(
                 "This Bot's private mode has been enabled only my owner can use this if want to use in your chat so say my Owner to authorize your chat."
