@@ -11,7 +11,7 @@
 import json
 import random
 import string
-from os.path import realpath
+import os
 
 from YukkiMusic.core.request import Request
 
@@ -74,21 +74,25 @@ colour = [
 
 
 async def generate(text: str):
+    background = random.choice(colour)
+    theme = random.choice(themes)
     params = {
         "code": text,
-        "backgroundColor": random.choice(colour),
-        "theme": random.choice(themes),
+        "backgroundColor": background,
+        "theme": theme,
         "fontFamily": "JetBrains Mono",
     }
-
+    file_path = os.path.join("cache", f"Carbon_{background}{theme}.jpg")
+    if os.path.exists(file_path):
+        return file_path
     resp = await Request.post_raw(
         "https://carbonara.solopov.dev/api/cook",
         data=json.dumps(params),
         headers={"Content-Type": "application/json"},
     )
     with open(
-        f"cache/carbon{''.join(random.choices(string.ascii_letters + string.digits, k=length))}.jpg",
+        file_path,
         "wb",
     ) as f:
         f.write(resp)
-    return realpath(f.name)
+    return (f.name)
