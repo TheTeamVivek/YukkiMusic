@@ -13,8 +13,11 @@ import re
 from async_lru import alru_cache
 from bs4 import BeautifulSoup
 
+import config
+
 from ..core.request import Request
-from ..core.youtube import SourceType, Track, search
+from ..core.enum import SourceType
+from ..core.track import Track
 from .base import PlatformBase
 
 
@@ -36,28 +39,37 @@ class Apple(PlatformBase):
                 song_name = tag.get("content", None)
         if song_name is None:
             return False
-        t = await search(song_name)
+        from .youtube import YouTube
+        t = await YouTube.track(song_name)
         t.streamtype = SourceType.APPLE
+        t.link = url
         return t
 
     @alru_cache(maxsize=None)
-    async def playlist(self, url, playid: bool | str = None) -> list[Track]:
-        if playid:
-            url = self.base + url
+    async def playlist(self, url: str, limit: int = config.PLAYLIST_FETCH_LIMIT) -> list[Track]:
+        
         playlist_id = url.split("playlist/")[1]
 
         html = await Request.get_text(url)
         soup = BeautifulSoup(html, "html.parser")
         applelinks = soup.find_all("meta", attrs={"property": "music:song"})
         results = []
+        from .youtube import YouTube
+        
         for item in applelinks:
+            if len(results) == limit:
+                break
             try:
                 xx = (((item["content"]).split("album/")[1]).split("/")[0]).replace(
                     "-", " "
                 )
             except Exception:
                 xx = ((item["content"]).split("album/")[1]).split("/")[0]
-            t = await search(xx)
-            t.streamtype = SourceType.APPLE
             results.append(t)
+            
+        if len(results) > 0:
+            t = await YouTube.track(results.pop(0))
+            t.streamtype = SourceType.APPLE
+            t.link = url
+            results.insert(0, t)
         return results, playlist_id
