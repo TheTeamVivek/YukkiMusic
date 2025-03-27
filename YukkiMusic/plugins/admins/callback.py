@@ -284,7 +284,7 @@ async def admin_callback(client, CallbackQuery, _):
             await CallbackQuery.edit_message_text(txt)
         elif "vid_" in queued:
             flink = f"https://t.me/{app.username}?start=info_{videoid}"
-            thumbnail = 
+            thumbnail = None
             mystic = await CallbackQuery.message.reply_text(
                 _["call_8"], disable_web_page_preview=True
             )
