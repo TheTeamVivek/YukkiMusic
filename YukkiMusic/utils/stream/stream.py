@@ -152,19 +152,27 @@ async def stream(
         duration_min = result["duration_min"]
         thumbnail = result["thumb"]
         status = True if video else None
+        flink = None
         try:
             if Platform.youtube.use_fallback:
-                file_path, status = await fallback.download(title, video=status)
+                file_path, _data, status = await fallback.download(title, video=status)
                 direct = None
+                title = _data.get("title", title)
+                thumbnail = _data.get("thumb", thumbnail)
+                flink = _data.get("url", link)
             else:
                 try:
                     file_path, direct = await Platform.youtube.download(
                         vidid, mystic, videoid=True, video=status
                     )
+                    flink = f"https://t.me/{app.username}?start=info_{vidid}"
                 except Exception:
                     Platform.youtube.use_fallback = True
-                    file_path, status = await fallback.download(title, video=status)
+                    file_path, , _data, status = await fallback.download(title, video=status)
                     direct = None
+                    title = _data.get("title", title)
+                    thumbnail = _data.get("thumb", thumbnail)
+                    flink = _data.get("url", link)
         except Exception:
             raise AssistantErr(_["play_16"])
 
@@ -181,7 +189,7 @@ async def stream(
                 "video" if video else "audio",
             )
             position = len(db.get(chat_id)) - 1
-            qimg = await gen_qthumb(vidid)
+            qimg = await gen_qthumb(vidid, thumbnail)
             run = await app.send_photo(
                 original_chat_id,
                 photo=qimg,
@@ -208,14 +216,14 @@ async def stream(
                 "video" if video else "audio",
                 forceplay=forceplay,
             )
-            img = await gen_thumb(vidid)
+            img = await gen_thumb(vidid, thumbnail)
             button = stream_markup(_, vidid, chat_id)
             run = await app.send_photo(
                 original_chat_id,
                 photo=img,
                 caption=_["stream_1"].format(
                     title[:27],
-                    f"https://t.me/{app.username}?start=info_{vidid}",
+                    flink,
                     duration_min,
                     user_name,
                 ),
