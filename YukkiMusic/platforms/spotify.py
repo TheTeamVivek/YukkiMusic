@@ -14,8 +14,8 @@ import spotipy
 from async_lru import alru_cache
 
 import config
-
-from ..core.youtube import SourceType, Track
+from ..core.enum import SourceType
+from ..core.track import Track
 from .base import PlatformBase
 
 
@@ -45,7 +45,8 @@ class Spotify(PlatformBase):
             fetched = f' {artist["name"]}'
             if "Various Artists" not in fetched:
                 info += fetched
-        t = await search(info)
+        from .youtube import YouTube        
+        t = await YouTube.track(info)
         t.link = link
         t.streamtype = SourceType.SPOTIFY
         return t
@@ -62,10 +63,14 @@ class Spotify(PlatformBase):
                 fetched = f' {artist["name"]}'
                 if "Various Artists" not in fetched:
                     info += fetched
-            info = await search(info)
-            info.link = url
-            info.streamtype = SourceType.SPOTIFY
             results.append(info)
+            
+        if len(results) > 0:
+            from .youtube import YouTube
+            t = await YouTube.track(results.pop(0))
+            t.link = url
+            t.streamtype = SourceType.SPOTIFY
+            results.insert(0, t)
         return results, playlist_id
 
     @alru_cache(maxsize=None)
@@ -79,10 +84,14 @@ class Spotify(PlatformBase):
                 fetched = f' {artist["name"]}'
                 if "Various Artists" not in fetched:
                     info += fetched
-            info = await search(info)
-            info.link = url
-            info.streamtype = SourceType.SPOTIFY
             results.append(info)
+            
+        if len(results) > 0:
+            from .youtube import YouTube
+            t = await YouTube.track(results.pop(0))
+            t.link = url
+            t.streamtype = SourceType.SPOTIFY
+            results.insert(0, t)    
         return results, album_id
 
     @alru_cache(maxsize=None)
@@ -101,4 +110,11 @@ class Spotify(PlatformBase):
             info.link = url
             info.streamtype = SourceType.SPOTIFY
             results.append(info)
+            
+        if len(results) > 0:
+            from .youtube import YouTube
+            t = await YouTube.track(results.pop(0))
+            t.link = url
+            t.streamtype = SourceType.SPOTIFY
+            results.insert(0, t)
         return results, artist_id
