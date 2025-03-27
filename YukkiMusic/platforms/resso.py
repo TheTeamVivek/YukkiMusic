@@ -14,7 +14,8 @@ from async_lru import alru_cache
 from bs4 import BeautifulSoup
 
 from ..core.request import Request
-from ..core.youtube import SourceType, Track, search
+from ..core.enum import SourceType
+from ..core.track import Track
 from .base import PlatformBase
 
 
@@ -27,9 +28,7 @@ class Resso(PlatformBase):
         return bool(re.search(self.regex, link))
 
     @alru_cache(maxsize=None)
-    async def track(self, url, playid: bool | str | None = None) -> Track:
-        if playid:
-            url = self.base + url
+    async def track(self, url: str) -> Track:
         html = await Request.get_text(url)
         soup = BeautifulSoup(html, "html.parser")
         for tag in soup.find_all("meta"):
@@ -42,8 +41,9 @@ class Resso(PlatformBase):
                 except Exception:
                     pass
         if des == "":
-            return
-        track = await search(title)
+            raise ValueError(f"Failed to download Song: {url}")
+        from .youtube import YouTube
+        track = await YouTube.track(title)
         track.link = url
         track.streamtype = SourceType.RESSO
         return track
