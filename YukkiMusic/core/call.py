@@ -437,7 +437,7 @@ class Call:
                             )
                         except Exception:
                             Platform.youtube.use_fallback = True
-                            file_path, video = await fallback.download(
+                            file_path, _data, video = await fallback.download(
                                 title[:12],
                                 video=(True if str(streamtype) == "video" else False),
                             )
