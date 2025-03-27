@@ -283,15 +283,20 @@ async def admin_callback(client, CallbackQuery, _):
             db[chat_id][0]["markup"] = "tg"
             await CallbackQuery.edit_message_text(txt)
         elif "vid_" in queued:
+            flink = f"https://t.me/{app.username}?start=info_{videoid}"
+            thumbnail = 
             mystic = await CallbackQuery.message.reply_text(
                 _["call_8"], disable_web_page_preview=True
             )
             try:
                 if Platform.youtube.use_fallback:
-                    file_path, status = await fallback.download(
-                        title[:20], video=status
+                    file_path, _data, status = await fallback.download(
+                        title[:12], video=status
                     )
                     direct = None
+                    title = _data.get("title", title)
+                    thumbnail = _data.get("thumb")
+                    flink = _data.get("url", flink)
                 else:
                     try:
                         file_path, direct = await Platform.youtube.download(
@@ -299,10 +304,13 @@ async def admin_callback(client, CallbackQuery, _):
                         )
                     except Exception:
                         Platform.youtube.use_fallback = True
-                        file_path, status = await fallback.download(
-                            title[:20], video=status
+                        file_path, _data, status = await fallback.download(
+                            title[:12], video=status
                         )
                         direct = None
+                        title = _data.get("title", title)
+                        thumbnail = _data.get("thumb")
+                        flink = _data.get("url", flink)
             except Exception:
                 return await mystic.edit_text(_["call_7"])
             try:
@@ -310,12 +318,12 @@ async def admin_callback(client, CallbackQuery, _):
             except Exception:
                 return await mystic.edit_text(_["call_7"])
             button = stream_markup(_, videoid, chat_id)
-            img = await gen_thumb(videoid)
+            img = await gen_thumb(videoid, thumbnail)
             run = await CallbackQuery.message.reply_photo(
                 photo=img,
                 caption=_["stream_1"].format(
                     title[:27],
-                    f"https://t.me/{app.username}?start=info_{videoid}",
+                    flink,
                     duration_min,
                     user,
                 ),
