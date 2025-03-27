@@ -64,7 +64,8 @@ async def stream(
                     if track[0].streamtype == SourceType.YOUTUBE
                     else song
                 )
-                song = await youtube.track(q, track[0].video)
+                song = await youtube.track(q)
+                song.video = track[0].video
                 song.streamtype = track[0].streamtype
             if not song.duration or song.duration > config.DURATION_LIMIT:
                 continue
