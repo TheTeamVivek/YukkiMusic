@@ -89,9 +89,6 @@ async def generate(text: str):
         data=json.dumps(params),
         headers={"Content-Type": "application/json"},
     )
-    with open(
-        file_path,
-        "wb",
-    ) as f:
+    with open(file_path, "wb") as f:
         f.write(resp)
-    return f.name
+    return file_path
