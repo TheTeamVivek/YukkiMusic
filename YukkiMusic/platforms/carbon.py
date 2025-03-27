@@ -9,9 +9,8 @@
 #
 
 import json
-import random
-import string
 import os
+import random
 
 from YukkiMusic.core.request import Request
 
@@ -95,4 +94,4 @@ async def generate(text: str):
         "wb",
     ) as f:
         f.write(resp)
-    return (f.name)
+    return f.name
