@@ -16,6 +16,9 @@ from pyrogram import filters
 load_dotenv()
 
 
+def is_true(value: str) -> bool:
+    return value.lower() in ["true", "yes"]
+
 # Get it from my.telegram.org
 
 API_ID = int(getenv("API_ID", ""))
@@ -155,7 +158,7 @@ TG_VIDEO_FILESIZE_LIMIT = int(
 
 # If you want your bot to setup the commands automatically in the bot's menu set it to true.
 # Refer to https://i.postimg.cc/Bbg3LQTG/image.png
-SET_CMDS = getenv("SET_CMDS", "False")
+SET_CMDS = is_true(getenv("SET_CMDS", "False"))
 
 
 # You'll need a Pyrogram String Session for these vars. Generate String from our session generator bot @YukkiStringBot
