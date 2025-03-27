@@ -297,6 +297,8 @@ async def admin_callback(client, CallbackQuery, _):
                     title = _data.get("title", title)
                     thumbnail = _data.get("thumb")
                     flink = _data.get("url", flink)
+
+                    duration_min = _data.get("duration_min", duration_min)
                 else:
                     try:
                         file_path, direct = await Platform.youtube.download(
@@ -311,12 +313,15 @@ async def admin_callback(client, CallbackQuery, _):
                         title = _data.get("title", title)
                         thumbnail = _data.get("thumb")
                         flink = _data.get("url", flink)
+
+                        duration_min = _data.get("duration_min", duration_min)
             except Exception:
                 return await mystic.edit_text(_["call_7"])
             try:
                 await Yukki.skip_stream(chat_id, file_path, video=status)
             except Exception:
                 return await mystic.edit_text(_["call_7"])
+            check[0]["dur"] = duration_min
             button = stream_markup(_, videoid, chat_id)
             img = await gen_thumb(videoid, thumbnail)
             run = await CallbackQuery.message.reply_photo(

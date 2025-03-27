@@ -158,6 +158,7 @@ async def stream(
                 file_path, _data, status = await fallback.download(title[:12], video=status)
                 direct = None
                 title = _data.get("title", title)
+                duration_min = _data.get("duration_min", duration_min)
                 thumbnail = _data.get("thumb", thumbnail)
                 flink = _data.get("url", link)
             else:
@@ -171,6 +172,7 @@ async def stream(
                     file_path, _data, status = await fallback.download(title[:12], video=status)
                     direct = None
                     title = _data.get("title", title)
+                    duration_min = _data.get("duration_min", duration_min)
                     thumbnail = _data.get("thumb", thumbnail)
                     flink = _data.get("url", link)
         except Exception:
