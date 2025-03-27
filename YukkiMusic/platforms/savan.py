@@ -12,8 +12,10 @@ from yt_dlp import YoutubeDL
 
 from YukkiMusic.utils.decorators import asyncify
 
+import config
 from ..core.request import Request
-from ..core.youtube import SourceType, Track
+from ..core.enum import SourceType
+from ..core.track import Track
 from .base import PlatformBase
 
 
@@ -34,7 +36,7 @@ class Saavn(PlatformBase):
 
     @alru_cache(maxsize=None)
     @asyncify
-    def playlist(self, url, limit) -> list[Track]:
+    def playlist(self, url, limit: int = config.PLAYLIST_FETCH_LIMIT) -> list[Track]:
         url = self.clean_url(url)
         ydl_opts = {
             "extract_flat": True,
@@ -42,12 +44,11 @@ class Saavn(PlatformBase):
             "quiet": True,
         }
         tracks = []
-        count = 0
         with YoutubeDL(ydl_opts) as ydl:
             try:
                 playlist_info = ydl.extract_info(url, download=False)
                 for entry in playlist_info["entries"]:
-                    if count == limit:
+                    if len(tracks) == limit:
                         break
                     duration_sec = entry.get("duration", 0)
                     track = Track(
@@ -57,9 +58,9 @@ class Saavn(PlatformBase):
                         link=entry["webpage_url"],
                         video=False,
                         streamtype=SourceType.SAAVN,
+                        is_live=False,
                     )
                     tracks.append(track)
-                    count += 1
             except Exception:
                 pass
         return tracks
@@ -85,6 +86,7 @@ class Saavn(PlatformBase):
                 thumb=info.get("thumbnail", None),
                 video=False,
                 streamtype=SourceType.SAAVN,
+                is_live=False,
             )
 
 
