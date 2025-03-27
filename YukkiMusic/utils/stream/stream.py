@@ -155,7 +155,7 @@ async def stream(
         flink = None
         try:
             if Platform.youtube.use_fallback:
-                file_path, _data, status = await fallback.download(title, video=status)
+                file_path, _data, status = await fallback.download(title[:12], video=status)
                 direct = None
                 title = _data.get("title", title)
                 thumbnail = _data.get("thumb", thumbnail)
@@ -168,7 +168,7 @@ async def stream(
                     flink = f"https://t.me/{app.username}?start=info_{vidid}"
                 except Exception:
                     Platform.youtube.use_fallback = True
-                    file_path, , _data, status = await fallback.download(title, video=status)
+                    file_path, , _data, status = await fallback.download(title[:12], video=status)
                     direct = None
                     title = _data.get("title", title)
                     thumbnail = _data.get("thumb", thumbnail)
