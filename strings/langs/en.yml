@@ -265,11 +265,11 @@ L_B_1: "🎶 Check out lyrics now"
 # Start
 S_B_1 : "🗒 Command"
 S_B_2 : "🔧 Setting"
-S_B_3 : "📨 Support"
-S_B_4 : "📨 Channel"
-S_B_5 : "✚ Add me to your Group ✚"
-S_B_6 : "💡 Git Repo"
-S_B_7 : "👤 Owner"
+S_B_3 : "💬 Get Help!"
+S_B_4 : "🔔 Updates"
+S_B_5 : "✚ Add Me, Let’s Play! ✚"
+S_B_6 : "🚀 GitHub Repo"
+S_B_7 : "👑 The Creator"
 S_B_8 : "🔎 How to use? Command Menu"
 
 #PlayMode
