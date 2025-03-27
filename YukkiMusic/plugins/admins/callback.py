@@ -290,7 +290,7 @@ async def admin_callback(client, CallbackQuery, _):
             )
             try:
                 if Platform.youtube.use_fallback:
-                    file_path, status = await fallback.download(
+                    file_path, _data, status = await fallback.download(
                         title[:12], video=status
                     )
                     direct = None
@@ -304,7 +304,7 @@ async def admin_callback(client, CallbackQuery, _):
                         )
                     except Exception:
                         Platform.youtube.use_fallback = True
-                        file_path, status = await fallback.download(
+                        file_path, _data, status = await fallback.download(
                             title[:12], video=status
                         )
                         direct = None
