@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from ..core.youtube import Track
-
+import config
 
 class PlatformBase(ABC):
     @abstractmethod
@@ -28,12 +28,13 @@ class PlatformBase(ABC):
             Track: An instance of the Track class representing the track.
         """
 
-    async def playlist(self, url: str) -> list[Track, str]:
+    async def playlist(self, url: str, limit:int = config.PLAYLIST_FETCH_LIMIT) -> list[Track, str]:
         """
         Retrieves a playlist from the given URL.
 
         Args:
             url (str): The URL of the playlist.
+            limit (int): The limit of the elements that should be return
 
         Returns:
             list[Track, str]: A list where:
