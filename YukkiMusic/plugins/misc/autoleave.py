@@ -29,7 +29,7 @@ autoend = {}
 
 
 async def auto_leave():
-    if config.AUTO_LEAVING_ASSISTANT == str(True):
+    if config.AUTO_LEAVING_ASSISTANT:
         from YukkiMusic.core.userbot import assistants
 
         async def leave_inactive_chats(client):
@@ -59,7 +59,7 @@ async def auto_leave():
             except Exception:
                 pass
 
-        if config.AUTO_LEAVING_ASSISTANT == str(True):
+        if config.AUTO_LEAVING_ASSISTANT:
             await asyncio.sleep(config.AUTO_LEAVE_ASSISTANT_TIME)
             tasks = []
             for num in assistants:
