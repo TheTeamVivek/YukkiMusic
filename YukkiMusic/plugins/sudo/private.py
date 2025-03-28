@@ -44,7 +44,7 @@ async def authorize(client, message: Message, _):
 @app.on_message(command("UNAUTHORIZE_COMMAND") & SUDOERS)
 @language
 async def unauthorize(client, message: Message, _):
-    if config.PRIVATE_BOT_MODE != str(True):
+    if not config.PRIVATE_BOT_MODE:
         return await message.reply_text(_["pbot_12"])
     if len(message.command) != 2:
         return await message.reply_text(_["pbot_2"])
