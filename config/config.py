@@ -16,7 +16,7 @@ from pyrogram import filters
 load_dotenv()
 
 def is_true(value: str) -> bool:
-    return value.lower() in ["true", "yes"]
+    return str(value).lower() in ["true", "yes"]
 
 # Get it from my.telegram.org
 
