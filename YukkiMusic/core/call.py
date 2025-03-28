@@ -132,7 +132,7 @@ class Call:
                 audio_parameters=audio_stream_quality,
                 video_parameters=video_stream_quality,
             )
-        elif image and config.PRIVATE_BOT_MODE == str(True):
+        elif image and config.PRIVATE_BOT_MODE:
             stream = MediaStream(
                 image,
                 audio_path=link,
@@ -273,7 +273,7 @@ class Call:
                 audio_parameters=audio_stream_quality,
                 video_parameters=video_stream_quality,
             )
-        elif image and config.PRIVATE_BOT_MODE == str(True):
+        elif image and config.PRIVATE_BOT_MODE:
             stream = MediaStream(
                 image,
                 audio_path=link,
@@ -378,7 +378,7 @@ class Call:
                         image = await Platform.youtube.thumbnail(videoid, True)
                     except Exception:
                         image = None
-                    if image and config.PRIVATE_BOT_MODE == str(True):
+                    if image and config.PRIVATE_BOT_MODE:
                         stream = MediaStream(
                             image,
                             audio_path=link,
@@ -463,7 +463,7 @@ class Call:
                         image = await Platform.youtube.thumbnail(videoid, True)
                     except Exception:
                         image = None
-                    if image and config.PRIVATE_BOT_MODE == str(True):
+                    if image and config.PRIVATE_BOT_MODE:
                         stream = MediaStream(
                             image,
                             audio_path=file_path,
@@ -552,7 +552,7 @@ class Call:
                         video_parameters=video_stream_quality,
                     )
                 else:
-                    if image and config.PRIVATE_BOT_MODE == str(True):
+                    if image and config.PRIVATE_BOT_MODE:
                         stream = MediaStream(
                             image,
                             audio_path=queued,

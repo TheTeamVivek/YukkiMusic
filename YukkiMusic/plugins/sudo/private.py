@@ -26,7 +26,7 @@ from YukkiMusic.utils.decorators.language import language
 @app.on_message(command("AUTHORIZE_COMMAND") & SUDOERS)
 @language
 async def authorize(client, message: Message, _):
-    if config.PRIVATE_BOT_MODE != str(True):
+    if not config.PRIVATE_BOT_MODE:
         return await message.reply_text(_["pbot_12"])
     if len(message.command) != 2:
         return await message.reply_text(_["pbot_1"])
@@ -62,7 +62,7 @@ async def unauthorize(client, message: Message, _):
 @app.on_message(command("AUTHORIZED_COMMAND") & SUDOERS)
 @language
 async def authorized(client, message: Message, _):
-    if config.PRIVATE_BOT_MODE != str(True):
+    if not config.PRIVATE_BOT_MODE:
         return await message.reply_text(_["pbot_12"])
     m = await message.reply_text(_["pbot_8"])
     served_chats = []

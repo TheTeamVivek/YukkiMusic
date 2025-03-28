@@ -15,6 +15,8 @@ from pyrogram import filters
 
 load_dotenv()
 
+def is_true(value: str) -> bool:
+    return str(value).lower() in ["true", "yes"]
 
 # Get it from my.telegram.org
 
@@ -42,7 +44,7 @@ DURATION_LIMIT_MIN = int(
 )  # Remember to give value in Minutes
 
 
-EXTRA_PLUGINS = getenv("EXTRA_PLUGINS", "False")
+EXTRA_PLUGINS = is_true(getenv("EXTRA_PLUGINS", "False"))
 
 # Fill False if you Don't want to load extra plugins
 
@@ -99,7 +101,7 @@ SUPPORT_GROUP = getenv(
 
 
 # Set it in True if you want to leave your assistant after a certain amount of time. [Set time via AUTO_LEAVE_ASSISTANT_TIME]
-AUTO_LEAVING_ASSISTANT = getenv("AUTO_LEAVING_ASSISTANT", False)
+AUTO_LEAVING_ASSISTANT = is_true(getenv("AUTO_LEAVING_ASSISTANT", "False"))
 
 # Time after which you're assistant account will leave chats automatically.
 AUTO_LEAVE_ASSISTANT_TIME = int(
@@ -108,7 +110,7 @@ AUTO_LEAVE_ASSISTANT_TIME = int(
 
 
 # Set it true if you want your bot to be private only [You'll need to allow CHAT_ID via /authorize command then only your bot will play music in that chat.]
-PRIVATE_BOT_MODE = getenv("PRIVATE_BOT_MODE", "False")
+PRIVATE_BOT_MODE = is_true(getenv("PRIVATE_BOT_MODE", "False"))
 
 
 # Time sleep duration For Youtube Downloader
@@ -155,7 +157,7 @@ TG_VIDEO_FILESIZE_LIMIT = int(
 
 # If you want your bot to setup the commands automatically in the bot's menu set it to true.
 # Refer to https://i.postimg.cc/Bbg3LQTG/image.png
-SET_CMDS = getenv("SET_CMDS", "False")
+SET_CMDS = is_true(getenv("SET_CMDS", "False"))
 
 
 # You'll need a Pyrogram String Session for these vars. Generate String from our session generator bot @YukkiStringBot
