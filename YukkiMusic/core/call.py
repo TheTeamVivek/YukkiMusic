@@ -16,7 +16,9 @@ from pyrogram.errors import (
     FloodWait,
     InviteRequestSent,
     UserAlreadyParticipant,
+    UserNotParticipant,
 )
+from pyrogram.enums import ChatMemberStatus
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls, filters
 from pytgcalls.exceptions import NoActiveGroupCall
@@ -189,6 +191,20 @@ class Call:
             _ = get_string(language)
         except Exception:
             _ = get_string("en")
+        try:
+            try:
+                get = await app.get_chat_member(chat_id, userbot.id)
+            except ChatAdminRequired:
+                raise AssistantErr(_["call_1"])
+            if get.status in [ChatMemberStatus.BANNED , ChatMemberStatus.RESTRICTED]:
+                try:
+                    await app.unban_chat_member(chat_id, userbot.id)
+                except Exception:  
+                    raise AssistantErr(
+                        _["call_2"].format(userbot.username, userbot.id)
+                    )
+        except UserNotParticipant:
+            pass
         try:
             chat = await app.get_chat(chat_id)
         except ChatAdminRequired:
