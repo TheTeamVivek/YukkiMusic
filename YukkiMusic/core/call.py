@@ -668,10 +668,7 @@ class Call:
 
             @call.on_update(filters.stream_end())
             async def stream_end_handler(client, update: StreamEnded):
-                if update.stream_type not in [
-                    StreamEnded.Type.AUDIO,
-                    StreamEnded.Type.VIDEO,
-                ]:
+                if not update.stream_type == StreamEnded.Type.AUDIO:
                     return
                 await self.change_stream(client, update.chat_id)
 
