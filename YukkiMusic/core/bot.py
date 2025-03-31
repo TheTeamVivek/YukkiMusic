@@ -18,6 +18,7 @@ import traceback
 from datetime import datetime
 from functools import wraps
 
+import pyromod.listen #noqa
 from pyrogram import Client, StopPropagation, errors
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import (
