@@ -245,7 +245,7 @@ class Call:
             except Exception as e:
                 raise AssistantErr(_["call_3"].format(type(e).__name__))
             await asyncio.sleep(1)
-            raise AssistantErr(_["call_6"].format(app.mention))
+            #raise AssistantErr(_["call_6"].format(app.mention))
         except UserAlreadyParticipant:
             pass
         except ChannelsTooMuch:
