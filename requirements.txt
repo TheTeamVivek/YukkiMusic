@@ -12,6 +12,7 @@ lyricsgenius
 motor
 pillow
 pykeyboard2
+pyromod
 psutil
 pytube
 py-tgcalls~=2.1.0
