@@ -32,7 +32,7 @@ assistants = []
 assistantids = []
 
 
-class Userbot(Client):
+class Userbot:
     def __init__(self):
         self.clients = [
             Client(
