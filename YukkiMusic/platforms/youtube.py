@@ -161,9 +161,7 @@ class YouTube(PlatformBase):
                 return Track(
                     title=result["title"],
                     link=result["link"],
-                    duration=(
-                        time_to_seconds(duration) if duration is not None else 0
-                    ),
+                    duration=(time_to_seconds(duration) if duration is not None else 0),
                     thumb=result["thumbnails"][0]["url"].split("?")[0],
                     streamtype=SourceType.YOUTUBE,
                     video=None,
