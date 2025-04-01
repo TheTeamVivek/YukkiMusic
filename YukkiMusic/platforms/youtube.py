@@ -162,8 +162,8 @@ class YouTube(PlatformBase):
                     title=result["title"],
                     link=result["link"],
                     duration=(
-                        time_to_seconds(duration) if str(duration) != "None" else 0
-                    ),  # TODO: CHECK THAT THE YOUTBE SEARCH PYTHON RETUNS DURATION IS None or "None"
+                        time_to_seconds(duration) if duration is not None else 0
+                    ),
                     thumb=result["thumbnails"][0]["url"].split("?")[0],
                     streamtype=SourceType.YOUTUBE,
                     video=None,
