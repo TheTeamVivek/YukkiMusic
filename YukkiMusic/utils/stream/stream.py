@@ -15,6 +15,7 @@ import config
 from strings import get_string
 from YukkiMusic import tbot
 from YukkiMusic.core.call import Yukki
+from YukkiMusic.core.enum import SourceType
 from YukkiMusic.core.youtube import Track
 from YukkiMusic.misc import db
 from YukkiMusic.platforms import carbon, youtube
@@ -42,8 +43,8 @@ async def stream(
     _ = get_string(language)
     user_mention = await tbot.create_mention(user_id)
     is_queue_ = False
-
-    if not result:
+    video = track.video if not isinstance(track, list) else track[0].video
+    if not track:
         return
     if video:
         if not await is_video_allowed(chat_id):
@@ -78,7 +79,7 @@ async def stream(
                 )
                 position = len(db.get(chat_id)) - 1
                 count += 1
-                msg += f"{count}- {title[:70]}\n"
+                msg += f"{count}- {track.title[:70]}\n"
                 msg += f"{_['playlist_17']} {position}\n\n"
             else:
                 if not forceplay:
@@ -99,7 +100,7 @@ async def stream(
                     track=song,
                     forceplay=forceplay,
                 )
-                await gen_thumb(track.vidid, track.thumb)
+                img = await gen_thumb(track.vidid, track.thumb)
                 what, button = play_markup(_, chat_id, track)
                 run = await tbot.send_file(
                     original_chat_id,
