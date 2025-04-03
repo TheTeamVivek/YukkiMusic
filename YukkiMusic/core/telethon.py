@@ -36,13 +36,13 @@ class ShellRunResult:
 
 commands = {
     "en": {
-        private: [
+        "private": [
             types.BotCommand("start", "Start the bot"),
             types.BotCommand("help", "Get the help menu"),
             types.BotCommand("ping", "Check if the bot is alive or dead"),
         ],
-        group: [types.BotCommand("play", "Start playing requested song")],
-        admin: [
+        "group": [types.BotCommand("play", "Start playing requested song")],
+        "admin": [
             types.BotCommand("play", "Start playing requested song"),
             types.BotCommand("skip", "Move to next track in queue"),
             types.BotCommand("pause", "Pause the current playing song"),
@@ -53,7 +53,7 @@ commands = {
             types.BotCommand("settings", "Open bot settings for your chat"),
             types.BotCommand("reboot", "Reboot  the bot for your chat"),
         ],
-        owner: [
+        "owner": [
             types.BotCommand("autoend", "Enable or disable auto end for streams"),
             types.BotCommand("restart", "Restart the bot"),
             types.BotCommand("update", "Update the bot"),
@@ -239,7 +239,7 @@ class TelethonClient(TelegramClient):
                     errors.ChatSendPhotosForbiddenError,
                     errors.MessageNotModifiedError,
                     errors.MessageIdInvalidError,
-                ) as e:
+                ):
                     pass
                 #  if isinstance(e, errors.ChatWriteForbiddenError):
                 #      await self.run_coro(
