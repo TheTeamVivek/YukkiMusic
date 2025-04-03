@@ -66,9 +66,10 @@ class Apple(PlatformBase):
                 xx = (((item["content"]).split("album/")[1]).split("/")[0]).replace(
                     "-", " "
                 )
+                results.append(xx)
             except Exception:
-                ((item["content"]).split("album/")[1]).split("/")[0]
-            results.append(t)
+                results.append(((item["content"]).split("album/")[1]).split("/")[0])
+            
 
         if len(results) > 0:
             t = await YouTube.track(results.pop(0))
