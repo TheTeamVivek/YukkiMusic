@@ -9,7 +9,7 @@
 #
 
 import random
-
+from YukkiMusic.core import filters as flt
 from config import BANNED_USERS
 from YukkiMusic import tbot
 from YukkiMusic.misc import db
@@ -20,7 +20,7 @@ from YukkiMusic.utils.decorators import admin_rights_check
     flt.command("SHUFFLE_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
 )
 @admin_rights_check
-async def admins(event_, chat_id):
+async def admins(event, _, chat_id):
     if not len(event.text.split()) == 1:
         return await event.reply(_["general_2"])
     check = db.get(chat_id)
