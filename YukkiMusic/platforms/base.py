@@ -46,5 +46,5 @@ class PlatformBase(ABC):
                 - The other element depends on the platform:
                     - If the platform is YouTube, it will be the video ID (`vidid`).
                     - For other streaming services, it will be the song name.
-                    
+
         """
