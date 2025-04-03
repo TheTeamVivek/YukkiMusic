@@ -13,7 +13,7 @@ import random
 import string
 
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardMarkup, Message
+from pyrogram.types import Message
 
 import config
 from config import BANNED_USERS, lyrical
@@ -407,7 +407,7 @@ async def play_commnd(
             buttons = botplaylist_markup(_)
             return await mystic.edit(
                 _["playlist_1"],
-                buttons=InlineKeyboardMarkup(buttons),
+                buttons=buttons,
             )
         slider = True
         query = message.text.split(None, 1)[1]
@@ -439,7 +439,7 @@ async def play_commnd(
             )
             return await mystic.edit(
                 _["play_15"],
-                buttons=InlineKeyboardMarkup(buttons),
+                buttons=buttons,
             )
         try:
             await stream(
@@ -484,7 +484,7 @@ async def play_commnd(
             await message.reply_photo(
                 photo=img,
                 caption=cap,
-                buttons=InlineKeyboardMarkup(buttons),
+                buttons=buttons,
             )
             return await play_logs(message, streamtype=f"Playlist : {plist_type}")
         else:
@@ -505,7 +505,7 @@ async def play_commnd(
                         details["title"].title(),
                         details["duration_min"],
                     ),
-                    buttons=InlineKeyboardMarkup(buttons),
+                    buttons=buttons,
                 )
                 return await play_logs(message, streamtype=f"Searched on Youtube")
             else:
@@ -520,6 +520,6 @@ async def play_commnd(
                 await message.reply_photo(
                     photo=img,
                     caption=cap,
-                    buttons=InlineKeyboardMarkup(buttons),
+                    buttons=buttons,
                 )
                 return await play_logs(message, streamtype=f"URL Searched Inline")
