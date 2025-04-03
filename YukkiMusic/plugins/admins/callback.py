@@ -23,6 +23,7 @@ from config import (
     lyrical,
 )
 from YukkiMusic import Platform, tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils import time_to_seconds
