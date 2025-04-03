@@ -35,7 +35,6 @@ from YukkiMusic.utils.stream.stream import stream
 
 logger = logging.getlogger
 
-
 @app.on_message(
     command(
         "PLAY_COMMAND",
