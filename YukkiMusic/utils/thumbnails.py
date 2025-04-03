@@ -8,8 +8,10 @@
 # All rights reserved.
 #
 
+
 async def gen_thumb(thumb_url=None):
     return thumb_url
-    
+
+
 async def gen_qthumb(thumb_url):
     return await gen_thumb(thumb_url)
