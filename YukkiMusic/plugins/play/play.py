@@ -8,6 +8,7 @@
 # All rights reserved.
 #
 
+import logging
 import random
 import string
 
@@ -32,6 +33,7 @@ from YukkiMusic.utils.inline.playlist import botplaylist_markup
 from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
 
+logger = logging.getlogger
 
 @app.on_message(
     command(
@@ -108,7 +110,7 @@ async def play_commnd(
                     err = e
                 else:
                     err = _["general_3"].format(ex_type)
-                    logger(__name__).error("An error occurred", exc_info=True)
+                    logger.error("An error occurred", exc_info=True)
                 return await mystic.edit(err)
             return await mystic.delete()
         return
@@ -155,7 +157,7 @@ async def play_commnd(
                 if ex_type == "AssistantErr":
                     err = e
                 else:
-                    logger(__name__).error("An error occurred", exc_info=True)
+                    logger.error("An error occurred", exc_info=True)
                     err = _["general_3"].format(ex_type)
                 return await mystic.edit(err)
             return await mystic.delete()
@@ -283,7 +285,7 @@ async def play_commnd(
                     file_path, details = await Platform.saavn.download(url)
                 except Exception as e:
                     ex_type = type(e).__name__
-                    logger(__name__).error("An error occurred", exc_info=True)
+                    logger.error("An error occurred", exc_info=True)
                     return await mystic.edit(_["play_3"])
                 duration_sec = details["duration_sec"]
                 streamtype = "saavn_track"
@@ -303,7 +305,7 @@ async def play_commnd(
                     streamtype = "saavn_playlist"
                 except Exception as e:
                     ex_type = type(e).__name__
-                    logger(__name__).error("An error occurred", exc_info=True)
+                    logger.error("An error occurred", exc_info=True)
                     return await mystic.edit(_["play_3"])
 
                 if len(details) == 0:
@@ -326,7 +328,7 @@ async def play_commnd(
                     err = e
                 else:
                     err = _["general_3"].format(ex_type)
-                    logger(__name__).error("An error occurred", exc_info=True)
+                    logger.error("An error occurred", exc_info=True)
                 return await mystic.edit(err)
             return await mystic.delete()
 
@@ -360,7 +362,7 @@ async def play_commnd(
                 if ex_type == "AssistantErr":
                     err = e
                 else:
-                    logger(__name__).error("An error occurred", exc_info=True)
+                    logger.error("An error occurred", exc_info=True)
                     err = _["general_3"].format(ex_type)
                 return await mystic.edit(err)
             return await mystic.delete()
@@ -387,7 +389,7 @@ async def play_commnd(
                 if ex_type == "AssistantErr":
                     err = e
                 else:
-                    logger(__name__).error("An error occurred", exc_info=True)
+                    logger.error("An error occurred", exc_info=True)
                     err = _["general_3"].format(ex_type)
                 return await mystic.edit(err)
             return await play_logs(message, streamtype="M3u8 or Index Link")
@@ -449,7 +451,7 @@ async def play_commnd(
             if ex_type == "AssistantErr":
                 err = e
             else:
-                logger(__name__).error("An error occurred", exc_info=True)
+                logger.error("An error occurred", exc_info=True)
 
                 err = _["general_3"].format(ex_type)
             return await mystic.edit(err)
