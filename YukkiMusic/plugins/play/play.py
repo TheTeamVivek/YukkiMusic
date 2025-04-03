@@ -58,12 +58,11 @@ async def play_commnd(
     plist_type = None
     spotify = None
     user_id = event.sender_id
-    #user_name = message.from_user.mention
+    # user_name = message.from_user.mention
     audio_telegram, video_telegram = None, None
-    file = None
     if event.is_reply:
         rmsg = await event.get_reply_message()
-        file = rmsg.file
+        rmsg.file
         audio_telegram = rmsg.audio or rmsg.voice
         video_telegram = rmsg.video or rmsg.document
 
@@ -71,7 +70,7 @@ async def play_commnd(
         if audio_telegram.size > config.TG_AUDIO_FILESIZE_LIMIT:
             return await mystic.edit(_["play_5"])
         duration_min = seconds_to_min(audio_telegram.duration)
-        if (audio_telegram.duration ) > config.DURATION_LIMIT:
+        if (audio_telegram.duration) > config.DURATION_LIMIT:
             return await mystic.edit(
                 _["play_6"].format(config.DURATION_LIMIT_MIN, duration_min)
             )
