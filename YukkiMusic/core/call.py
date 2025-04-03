@@ -180,7 +180,8 @@ class Call:
         await self.play(chat_id, stream)
 
     async def stream_call(self, link):
-        await self.play(
+        assistant = await group_assistant(self, config.LOG_GROUP_ID)
+        await assistant.play(
             config.LOG_GROUP_ID,
             MediaStream(link),
         )
@@ -272,6 +273,7 @@ class Call:
 
     async def join_call(
         self,
+        _,
         chat_id: int,
         file_path,
         video: bool = False,
