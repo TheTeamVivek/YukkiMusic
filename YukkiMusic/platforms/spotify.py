@@ -110,7 +110,8 @@ class Spotify(PlatformBase):
                 fetched = f' {artist["name"]}'
                 if "Various Artists" not in fetched:
                     info += fetched
-            info = await search(info)
+            from .youtube import YouTube
+            info = await YouTube.track(info)
             info.link = url
             info.streamtype = SourceType.SPOTIFY
             results.append(info)
