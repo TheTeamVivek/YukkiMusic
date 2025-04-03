@@ -11,6 +11,7 @@
 
 from config import BANNED_USERS, adminlist
 from YukkiMusic import app, tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.utils.database import (
     delete_authuser,
     get_authuser,
