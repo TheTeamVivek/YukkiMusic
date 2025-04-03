@@ -18,7 +18,7 @@ from pyrogram.types import Message
 import config
 from config import BANNED_USERS, lyrical
 from strings import command
-from YukkiMusic import app
+from YukkiMusic import app, tbot
 from YukkiMusic.platforms import (
     apple,
     resso,
@@ -43,13 +43,9 @@ from YukkiMusic.utils.stream.stream import stream
 
 logger = logging.getLogger(__name__)
 
-
-@app.on_message(
-    command(
-        "PLAY_COMMAND",
-        prefixes=["/", "!", "%", ",", "@", "#"],
-    )
-    & filters.group
+@tbot.on_message(
+    flt.command("PLAY_COMMAND", True) 
+    & flt.group 
     & ~BANNED_USERS
 )
 @play_wrapper
