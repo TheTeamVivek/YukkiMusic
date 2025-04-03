@@ -3,7 +3,7 @@ import inspect
 import re
 from collections.abc import Callable
 
-from telethon.tl.types import PeerChannel, User
+from telethon.tl import types
 
 from strings import get_string
 from YukkiMusic.utils.database import get_lang
@@ -90,7 +90,7 @@ async def channel(event):
     msg = getattr(event, "message", None)
     peer = getattr(msg, "peer_id", None) if msg else None
 
-    if isinstance(peer, PeerChannel):
+    if isinstance(peer, types.PeerChannel):
         entity = await event.client.get_entity(peer)
         return not getattr(entity, "megagroup", False)
 
@@ -114,7 +114,7 @@ class User(set, Filter):
 
     async def func(self, event):
         sender = await event.get_sender()
-        return isinstance(sender, User) and (
+        return isinstance(sender, types.User) and (
             sender.id in self
             or (sender.username and sender.username.lower() in self)
             or ("me" in self and sender.is_self)
