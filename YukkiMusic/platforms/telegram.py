@@ -45,22 +45,23 @@ class Telegram:
                 break
             if message.entities:
                 for entity in message.entities:
-                    if isistance(entity, types.MessageEntityUrl):
+                    if isinstance(entity, types.MessageEntityUrl):
                         text = message.text
                         offset, length = entity.offset, entity.length
                         break
-                    elif isistance(entity, types.MessageEntityTextUrl):
+                    elif isinstance(entity, types.MessageEntityTextUrl):
                         return entity.url
         if offset is None:
             return None
         return text[offset : offset + length]
 
-    async def get_link(self, message):
-        if message.chat.username:
-            link = f"https://t.me/{message.chat.username}/{message.reply_to_message.id}"
+    async def get_link(self, event):
+        rmsg = await event.get_reply_message()
+        chat = await event.get_chat()
+        if username:= chat.username:
+            link = f"https://t.me/{username}/{rmsg.id}"
         else:
-            xf = str(event.chat_id)[4:]
-            link = f"https://t.me/c/{xf}/{message.reply_to_message.id}"
+            link = f"https://t.me/c/{chat.id}/{rmsg.id}"
         return link
 
     async def get_filename(self, file, audio: bool | str = None):
@@ -107,42 +108,6 @@ class Telegram:
                 file_name = video.file_unique_id + "." + "mp4"
             file_name = os.path.join(os.path.realpath("downloads"), file_name)
         return file_name
-
-    def get_pyro_fileid(
-        self, document: types.Document
-    ):  # using Pyrogram for getting file_id with Telethon raw upadte
-        attributes = {type(attr): attr for attr in document.attributes}
-
-        if not any(
-            attr in attributes
-            for attr in (types.DocumentAttributeAudio, types.DocumentAttributeVideo)
-        ):
-            return None
-
-        file_name = (
-            getattr(attributes.get(types.DocumentAttributeFilename), "file_name", None)
-            or f"audio_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.mp3"
-        )
-
-        file_type = (
-            FileType.AUDIO
-            if types.DocumentAttributeAudio in attributes
-            else FileType.VIDEO
-        )
-
-        file_id = FileId(
-            file_type=file_type,
-            dc_id=document.dc_id,
-            media_id=document.id,
-            access_hash=document.access_hash,
-            file_reference=document.file_reference,
-        ).encode()
-
-        file_unique_id = FileUniqueId(
-            file_unique_type=FileUniqueType.DOCUMENT, media_id=document.id
-        ).encode()
-
-        return file_id, file_unique_id
 
     async def is_streamable_url(self, url: str) -> bool:
         try:
