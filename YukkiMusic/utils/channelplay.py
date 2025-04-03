@@ -16,7 +16,7 @@ def is_cplay(text: str, command: list | str) -> bool:
     text = str(text).strip()
     if not text or not text.strip():
         return False
-    if isistance(command, str):
+    if isinstance(command, str):
         command = [command]
     text = text.lstrip("/").split()  # remove prfix and split
     text = text[0].split("@")[0]  # split and remove @username if in text
