@@ -12,8 +12,6 @@ import logging
 import random
 import string
 
-from pyrogram.types import Message
-
 import config
 from config import BANNED_USERS, lyrical
 from YukkiMusic import tbot
@@ -63,10 +61,10 @@ async def play_commnd(
     user_name = message.from_user.mention
     audio_telegram, video_telegram = None, None
     if event.is_reply:
-      rmsg = await event.get_reply_message()
-      audio_telegram = rmsg.audio or rmsg.voice
-      video_telegram = rmsg.video or rmsg.document
-        
+        rmsg = await event.get_reply_message()
+        audio_telegram = rmsg.audio or rmsg.voice
+        video_telegram = rmsg.video or rmsg.document
+
     if audio_telegram:
         if audio_telegram.size > config.TG_AUDIO_FILESIZE_LIMIT:
             return await mystic.edit(_["play_5"])
