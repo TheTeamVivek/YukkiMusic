@@ -13,8 +13,9 @@ from telethon.tl.types import PeerUser
 from config import BANNED_USERS, EXTRA_PLUGINS, adminlist
 from strings import get_string
 from YukkiMusic import tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.misc import SUDOERS
+from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils.database import (
     delete_filter,
     get_cmode,
