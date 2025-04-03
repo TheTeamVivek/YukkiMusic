@@ -121,8 +121,8 @@ class Userbot(Client):
                 except Exception as e:
                     # Detailed error logging
                     date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    user_id = event.sender_id if message.from_user else "Unknown"
-                    chat_id = event.chat_id if message.chat else "Unknown"
+                    user_id = message.from_user.id if message.from_user else "Unknown"
+                    chat_id = message.chat.id if message.chat else "Unknown"
                     chat_username = (
                         f"@{message.chat.username}"
                         if message.chat.username
