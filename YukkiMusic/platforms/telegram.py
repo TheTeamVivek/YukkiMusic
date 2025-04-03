@@ -14,7 +14,6 @@ import time
 from datetime import datetime, timedelta
 
 import aiohttp
-from pyrogram.file_id import FileId, FileType, FileUniqueId, FileUniqueType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Voice
 from telethon.tl import types
 
@@ -58,7 +57,7 @@ class Telegram:
     async def get_link(self, event):
         rmsg = await event.get_reply_message()
         chat = await event.get_chat()
-        if username:= chat.username:
+        if username := chat.username:
             link = f"https://t.me/{username}/{rmsg.id}"
         else:
             link = f"https://t.me/c/{chat.id}/{rmsg.id}"
