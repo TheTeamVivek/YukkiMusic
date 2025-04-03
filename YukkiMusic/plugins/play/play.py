@@ -18,7 +18,7 @@ from pyrogram.types import Message
 import config
 from config import BANNED_USERS, lyrical
 from strings import command
-from YukkiMusic import app, tbot
+from YukkiMusic import app
 from YukkiMusic.platforms import (
     apple,
     resso,
