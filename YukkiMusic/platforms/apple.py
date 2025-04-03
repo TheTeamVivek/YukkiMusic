@@ -69,7 +69,6 @@ class Apple(PlatformBase):
                 results.append(xx)
             except Exception:
                 results.append(((item["content"]).split("album/")[1]).split("/")[0])
-            
 
         if len(results) > 0:
             t = await YouTube.track(results.pop(0))
