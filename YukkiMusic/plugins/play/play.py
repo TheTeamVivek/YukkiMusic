@@ -45,8 +45,7 @@ logger = logging.getLogger(__name__)
 @tbot.on_message(flt.command("PLAY_COMMAND", True) & flt.group & ~BANNED_USERS)
 @play_wrapper
 async def play_commnd(
-    client,
-    message: Message,
+    event,
     _,
     chat_id,
     video,
@@ -62,18 +61,14 @@ async def play_commnd(
     spotify = None
     user_id = event.sender_id
     user_name = message.from_user.mention
-    audio_telegram = (
-        (message.reply_to_message.audio or message.reply_to_message.voice)
-        if message.reply_to_message
-        else None
-    )
-    video_telegram = (
-        (message.reply_to_message.video or message.reply_to_message.document)
-        if message.reply_to_message
-        else None
-    )
+    audio_telegram, video_telegram = None, None
+    if event.is_reply:
+      rmsg = await event.get_reply_message()
+      audio_telegram = rmsg.audio or rmsg.voice
+      video_telegram = rmsg.video or rmsg.document
+        
     if audio_telegram:
-        if audio_telegram.file_size > config.TG_AUDIO_FILESIZE_LIMIT:
+        if audio_telegram.size > config.TG_AUDIO_FILESIZE_LIMIT:
             return await mystic.edit(_["play_5"])
         duration_min = seconds_to_min(audio_telegram.duration)
         if (audio_telegram.duration) > config.DURATION_LIMIT:
