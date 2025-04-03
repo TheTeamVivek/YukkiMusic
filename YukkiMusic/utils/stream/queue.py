@@ -45,7 +45,7 @@ async def put_queue(
         )  # Since in queue the track is not downloaded so what to do
         vidid = track.vidid if track.is_youtube else track.vidid.value
 
-        to_append = {"vidid": vidid, "title": title}
+        to_append = {"vidid": vidid, "title": track.title}
         if chat_id not in chatstats:
             chatstats[chat_id] = []
         chatstats[chat_id].append(to_append)
