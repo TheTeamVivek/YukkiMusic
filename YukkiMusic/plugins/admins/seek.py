@@ -7,7 +7,7 @@
 #
 # All rights reserved.
 #
-
+from YukkiMusic.core import filters as flt
 from config import BANNED_USERS
 from YukkiMusic import tbot
 from YukkiMusic.core.call import Yukki
@@ -68,7 +68,7 @@ async def seek_comm(event, _, chat_id):
         )
     except Exception:
         return await mystic.edit(_["admin_34"])
-    if message.command[0][-2] == "c":
+    if message.command[0][-2] == "c": #TODO: replace with patse_flags
         db[chat_id][0]["played"] -= duration_to_skip
     else:
         db[chat_id][0]["played"] += duration_to_skip
