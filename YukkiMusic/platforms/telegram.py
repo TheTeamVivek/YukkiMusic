@@ -14,9 +14,10 @@ import time
 from datetime import datetime, timedelta
 
 import aiohttp
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Voice
-from pyrogram.file_id import FileId, FileType, FileUniqueId, FileUniqueType
+from pyrogram.file_id import FileUniqueId, FileUniqueType
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from telethon.tl import types
+
 from config import lyrical
 from YukkiMusic import app
 from YukkiMusic.utils.decorators import asyncify
@@ -85,32 +86,28 @@ class Telegram:
         video: types.Document | None = None,
     ):
         if video:
-            file_unique_id=FileUniqueId(
-                     file_unique_type=FileUniqueType.DOCUMENT,
-                      media_id=video.id
-                ).encode()
+            file_unique_id = FileUniqueId(
+                file_unique_type=FileUniqueType.DOCUMENT, media_id=video.id
+            ).encode()
             file_name = (
-                    file_unique_id + "." + (file.name.split(".")[-1]) if file.name else "mp4"
-                )
-           
+                file_unique_id + "." + (file.name.split(".")[-1])
+                if file.name
+                else "mp4"
+            )
+
             file_name = os.path.join(os.path.realpath("downloads"), file_name)
-            
+
         elif audio:
-            file_unique_id=FileUniqueId(
-                     file_unique_type=FileUniqueType.DOCUMENT,
-                      media_id=audio.id
-                ).encode()
+            file_unique_id = FileUniqueId(
+                file_unique_type=FileUniqueType.DOCUMENT, media_id=audio.id
+            ).encode()
             file_name = (
-                    file_unique_id
-                    + "."
-                    + (
-                        (file.name.split(".")[-1])
-                        if file.name
-                        else "ogg"
-                    )
-                )
+                file_unique_id
+                + "."
+                + ((file.name.split(".")[-1]) if file.name else "ogg")
+            )
             file_name = os.path.join(os.path.realpath("downloads"), file_name)
-       
+
         return file_name
 
     async def is_streamable_url(self, url: str) -> bool:
