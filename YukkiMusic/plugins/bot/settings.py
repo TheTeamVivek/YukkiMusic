@@ -12,6 +12,7 @@ from telethon.errors import MessageNotModifiedError
 
 from config import BANNED_USERS, CLEANMODE_DELETE_TIME, OWNER_ID
 from YukkiMusic import tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.utils.database import (
     add_nonadmin_chat,
     cleanmode_off,
@@ -440,10 +441,10 @@ async def authusers_mar(event, _):
                 msg += f"   {_['auth_8']} {admin_name}[`{admin_id}`]\n\n"
             upl = [
                 [
-                    Button.inline(text=_["BACK_BUTTON"], data=f"AU"),
+                    Button.inline(text=_["BACK_BUTTON"], data="AU"),
                     Button.inline(
                         text=_["CLOSE_BUTTON"],
-                        data=f"close",
+                        data="close",
                     ),
                 ]
             ]
