@@ -20,7 +20,7 @@ from YukkiMusic.utils.decorators import admin_rights_check
 @tbot.on_message(flt.command("MUTE_COMMAND") & flt.group & ~flt.user(BANNED_USERS))
 @admin_rights_check
 async def mute_admin(event, _, chat_id):
-    if not len(event.text.split()) == 1 or event.reply_to:
+    if not len(event.text.split()) == 1 or event.is_reply:
         return
     if await is_muted(chat_id):
         return await event.reply(_["admin_5"], link_preview=False)
@@ -33,7 +33,7 @@ async def mute_admin(event, _, chat_id):
 @tbot.on_message(flt.command("UNMUTE_COMMAND") & flt.group & ~flt.user(BANNED_USERS))
 @admin_rights_check
 async def unmute_admin(event, _, chat_id):
-    if not len(event.text.split()) == 1 or event.reply_to:
+    if not len(event.text.split()) == 1 or event.is_reply:
         return
     if not await is_muted(chat_id):
         return await event.reply(_["admin_7"], link_preview=False)
