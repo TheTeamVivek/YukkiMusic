@@ -15,8 +15,8 @@ from datetime import datetime, timedelta
 
 import aiohttp
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Voice
+from pyrogram.file_id import FileId, FileType, FileUniqueId, FileUniqueType
 from telethon.tl import types
-
 from config import lyrical
 from YukkiMusic import app
 from YukkiMusic.utils.decorators import asyncify
@@ -28,8 +28,7 @@ downloader = {}
 
 class Telegram:
     def __init__(self):
-        self.chars_limit = 4094
-        self.sleep = 3
+        self.sleep = 5
 
     @asyncify
     def get_url_from_message(self, event) -> str | None:
@@ -81,31 +80,38 @@ class Telegram:
 
     async def get_filepath(
         self,
-        audio: bool | str = None,
-        video: bool | str = None,
+        file,
+        audio: types.Document | None = None,
+        video: types.Document | None = None,
     ):
-        if audio:
+        if video:
+            file_unique_id=FileUniqueId(
+                     file_unique_type=FileUniqueType.DOCUMENT,
+                      media_id=video.id
+                ).encode()
+            file_name = (
+                    file_unique_id + "." + (file.name.split(".")[-1]) if file.name else "mp4"
+                )
+           
+            file_name = os.path.join(os.path.realpath("downloads"), file_name)
+            
+        elif audio:
+            file_unique_id=FileUniqueId(
+                     file_unique_type=FileUniqueType.DOCUMENT,
+                      media_id=audio.id
+                ).encode()
             try:
                 file_name = (
-                    audio.file_unique_id
+                    file_unique_id
                     + "."
                     + (
-                        (audio.file_name.split(".")[-1])
-                        if (not isinstance(audio, Voice))
+                        (file.name.split(".")[-1])
+                        if file.name
                         else "ogg"
                     )
                 )
-            except Exception:
-                file_name = audio.file_unique_id + "." + ".ogg"
             file_name = os.path.join(os.path.realpath("downloads"), file_name)
-        if video:
-            try:
-                file_name = (
-                    video.file_unique_id + "." + (video.file_name.split(".")[-1])
-                )
-            except Exception:
-                file_name = video.file_unique_id + "." + "mp4"
-            file_name = os.path.join(os.path.realpath("downloads"), file_name)
+       
         return file_name
 
     async def is_streamable_url(self, url: str) -> bool:
