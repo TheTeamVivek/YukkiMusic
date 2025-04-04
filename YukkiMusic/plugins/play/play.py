@@ -59,22 +59,23 @@ async def play_commnd(
     spotify = None
     user_id = event.sender_id
     # user_name = message.from_user.mention
+    file = None
     audio_telegram, video_telegram = None, None
     if event.is_reply:
         rmsg = await event.get_reply_message()
-        rmsg.file
-        audio_telegram = rmsg.audio or rmsg.voice
-        video_telegram = rmsg.video or rmsg.document
+        file = rmsg.file
+        audio_telegram = True if rmsg.audio or rmsg.voice else False
+        video_telegram = True if rmsg.video or rmsg.document else False
 
     if audio_telegram:
-        if audio_telegram.size > config.TG_AUDIO_FILESIZE_LIMIT:
+        if file.size > config.TG_AUDIO_FILESIZE_LIMIT:
             return await mystic.edit(_["play_5"])
-        duration_min = seconds_to_min(audio_telegram.duration)
-        if (audio_telegram.duration) > config.DURATION_LIMIT:
+        duration_min = seconds_to_min(file.duration)
+        if (file.duration) > config.DURATION_LIMIT:
             return await mystic.edit(
                 _["play_6"].format(config.DURATION_LIMIT_MIN, duration_min)
             )
-        file_path = await telegram.get_filepath(audio=audio_telegram)
+        file_path = await telegram.get_filepath(file, video_telegram)
         if await telegram.download(_, event, mystic, file_path):
             message_link = await telegram.get_link(event)
             file_name = await telegram.get_filename(audio_telegram, audio=True)
