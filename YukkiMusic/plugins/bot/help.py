@@ -15,7 +15,8 @@ from telethon import Button, events
 
 from config import BANNED_USERS, START_IMG_URL
 from strings import get_string
-from YukkiMusic import HELPABLE
+from YukkiMusic import HELPABLE, tbot
+from YukkiMusic.core import filtera as flt
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline.help import private_help_panel
