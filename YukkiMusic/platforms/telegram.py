@@ -100,8 +100,7 @@ class Telegram:
                      file_unique_type=FileUniqueType.DOCUMENT,
                       media_id=audio.id
                 ).encode()
-            try:
-                file_name = (
+            file_name = (
                     file_unique_id
                     + "."
                     + (
