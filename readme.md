@@ -1,4 +1,4 @@
-# 🎵 **YukkiMusic** 🎶
+# 🎵 **YukkiMusicFlex** 🎶
 
 [**YukkiMusic**](https://github.com/TheTeamVivek/YukkiMusic) is an enhanced version of the original [**YukkiMusicBot**](https://github.com/TeamYukki/YukkiMusicBot), optimized for high-quality music streaming in Telegram voice chats. Built with Python and Pyrogram. 🚀
 
@@ -17,12 +17,18 @@ Get started quickly by deploying to Heroku with just one click:
 </a>
 
 ### 🖥️ VPS Deployment Guide
-
   - Update and Install Dependencies: `sudo apt update && sudo apt upgrade -y && sudo apt install -y ffmpeg git python3-pip python3-venv tmux nano`
+  - wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+  - sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
+  - sudo apt update
+  - sudo apt install -y google-chrome-stable
+  - sudo apt-get install xvfb -y
+  - Xvfb :1 -screen 0 1024x768x24 &
+  - google-chrome-stable --version # too see if google chrome installed
 
-  - Create the Virtual Environment: `python3 -m venv .venv`
+  - Create the Virtual Environment: `python3 -m venv /root/myenv`
 
-  - Activate Virtual Env: `source .venv/bin/activate`
+  - Activate Virtual Env: `source /root/myenv/bin/activate`
 
   - Clone the Repository: `git clone https://github.com/ahmed-ghost/YukkiMusicFlex && cd YukkiMusicFlex`
 
@@ -36,12 +42,14 @@ Get started quickly by deploying to Heroku with just one click:
 
   After editing, press `Ctrl+X`, then `Y`, and press **Enter** to save the changes.
 
+  - to run boot and Never Stop create screen with ( screen -S FlexMusic ) And when you wanna back to the screen ( screen -R FlexMusic )  ( source /root/myenv/bin/activate )  ( Run the Bot: `bash start` )
+  - and to run ( cookies_manger ) create screen for it with ( screen -S cookies ) And when you wanna back to the screen ( screen -R cookies ) run it ( source /root/myenv/bin/activate ) ( python3 cookie_manager.py ) 
 
   -  Run the Bot: `bash start`
 
   - Keep the Bot Running with tmux: `tmux`
 
-To exit the **tmux session** without stopping the bot, press `Ctrl+b`, then `d`.
+To exit the **tmux session** without stopping the bot, press `Ctrl+a`, then `d`.
 
 
 
