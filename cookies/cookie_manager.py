@@ -16,7 +16,7 @@ import traceback
 GMAIL_EMAIL = "you gmail" # use your gmail 
 GMAIL_PASSWORD = "password gmail" #Gmail Password
 
-BASE_DIR = "/root/YukkiMusic" #don't change it!
+BASE_DIR = "/root/YukkiMusicFlex" #don't change it!
 COOKIES_DIR = os.path.join(BASE_DIR, "cookies")
 COOKIES_FILENAME = "cookies.txt"
 COOKIES_PATH = os.path.join(COOKIES_DIR, COOKIES_FILENAME)
