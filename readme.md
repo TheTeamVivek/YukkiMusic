@@ -24,7 +24,7 @@ Get started quickly by deploying to Heroku with just one click:
 
   - Activate Virtual Env: `source .venv/bin/activate`
 
-  - Clone the Repository: `git clone https://github.com/ahmed-ghost/YukkiMusicFlex && cd YukkiMusic`
+  - Clone the Repository: `git clone https://github.com/ahmed-ghost/YukkiMusicFlex && cd YukkiMusicFlex`
 
   - Install Python Requirements: `pip install -r requirements.txt`
 
