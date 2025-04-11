@@ -36,7 +36,6 @@ def cookies():
     cookie_txt_file = random.choice(txt_files)
     cookie_txt_file = os.path.join(folder_path, cookie_txt_file)
     return cookie_txt_file
-    # return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
 
 
 async def shell_cmd(cmd):
@@ -333,7 +332,7 @@ class YouTube:
         def audio_dl():
             ydl_optssx = {
                 "format": "bestaudio/best",
-                "outtmpl": "downloads/%(id)s.%(ext)s",
+                "outtmpl": "downloads/%(id)s.%(ext)s", 
                 "geo_bypass": True,
                 "noplaylist": True,
                 "nocheckcertificate": True,
@@ -355,7 +354,7 @@ class YouTube:
         def video_dl():
             ydl_optssx = {
                 "format": "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])",
-                "outtmpl": "downloads/%(id)s.%(ext)s",
+                "outtmpl": "downloads/%(id)s.%(ext)s", 
                 "geo_bypass": True,
                 "noplaylist": True,
                 "nocheckcertificate": True,
@@ -376,10 +375,11 @@ class YouTube:
         @asyncify
         def song_video_dl():
             formats = f"{format_id}+140"
-            fpath = f"downloads/{title}"
+
             ydl_optssx = {
                 "format": formats,
-                "outtmpl": fpath,
+
+                'outtmpl': 'downloads/%(id)s.%(ext)s', 
                 "geo_bypass": True,
                 "noplaylist": True,
                 "nocheckcertificate": True,
@@ -391,16 +391,21 @@ class YouTube:
             }
 
             with YoutubeDL(ydl_optssx) as x:
-                info = x.extract_info(link)
-                file_path = x.prepare_filename(info)
+                info = x.extract_info(link, download=False) 
+
+                file_path = os.path.join("downloads", f"{info['id']}.mp4") 
+                if not os.path.exists(file_path): 
+                     info = x.extract_info(link) 
+                     file_path = os.path.join("downloads", f"{info['id']}.mp4") 
                 return file_path
 
         @asyncify
         def song_audio_dl():
-            fpath = f"downloads/{title}.%(ext)s"
+            
             ydl_optssx = {
                 "format": format_id,
-                "outtmpl": fpath,
+                
+                'outtmpl': 'downloads/%(id)s.%(ext)s', 
                 "geo_bypass": True,
                 "noplaylist": True,
                 "nocheckcertificate": True,
@@ -418,8 +423,12 @@ class YouTube:
             }
 
             with YoutubeDL(ydl_optssx) as x:
-                info = x.extract_info(link)
-                file_path = x.prepare_filename(info)
+                info = x.extract_info(link, download=False) 
+
+                file_path = os.path.join("downloads", f"{info['id']}.mp3") 
+                if not os.path.exists(file_path): 
+                    info = x.extract_info(link) 
+                    file_path = os.path.join("downloads", f"{info['id']}.mp3") 
                 return file_path
 
         if songvideo:
