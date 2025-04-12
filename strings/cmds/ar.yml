@@ -15,7 +15,7 @@
 PING_COMMAND : ["بينج", "بنج"]
 PRIVACY_COMMAND: ["الخصوصية"]
 START_COMMAND : ["تفعيل", "ميوزك"]
-HELP_COMMAND : ["مساعده"]
+HELP_COMMAND : ["مساعده", "الاوامر"]
 SETTINGS_COMMAND : ["اعدادات", "الاعدادت", "اعدادات", "الاعدادات"]
 RELOAD_COMMAND : ["ريلود"]
 GSTATS_COMMAND : ["الاحصائيات", "احصائيات"]
