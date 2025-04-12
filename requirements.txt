@@ -10,14 +10,14 @@ httpx[http2]
 kurigram==2.1.38
 lyricsgenius
 motor
+ntgcalls~=1.3.3
 pillow
 pykeyboard2
 pyromod
 psutil
 pytube
-py-tgcalls==2.1.0
+py-tgcalls
 python-dotenv
-pyyaml
 requests
 speedtest-cli
 spotipy
@@ -26,8 +26,9 @@ urllib3
 uvloop
 flask
 gunicorn
-yt-dlp==2025.3.27
+yt-dlp
 py-yt-search
+pyyaml
 selenium
 webdriver-manager
 xvfbwrapper
