@@ -305,19 +305,21 @@ class Call:
 
         try:
             await assistant.play(
-                chat_id=chat_id,
+                chat_id,
                 stream=stream,
                 config=call_config,
             )
         except Exception:
+            LOGGER(__name__).error("\n", exc_info=True)
             await self.join_chat(chat_id)
             try:
                 await assistant.play(
-                    chat_id=chat_id,
+                    chat_id,
                     stream=stream,
                     config=call_config,
                 )
             except Exception as e:
+                LOGGER(__name__).error("\n", exc_info=True)
                 raise AssistantErr(
                     "**No Active Voice Chat Found**\n\nPlease make sure group's voice chat is enabled. If already enabled, please end it and start fresh voice chat again and if the problem continues, try /restart"
                 )
