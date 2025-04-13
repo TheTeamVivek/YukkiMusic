@@ -80,7 +80,6 @@ async def play_commnd(
         if file_path := await telegram.download(_, rmsg, mystic):
             message_link = await telegram.get_link(rmsg)
             file_name = await telegram.get_filename(file)
-            await telegram.get_duration(file)
             details = Track(
                 title=file_name,
                 link=message_link,
@@ -122,9 +121,9 @@ async def play_commnd(
                         config.PLAYLIST_FETCH_LIMIT,
                     )
                 except Exception as e:
-                    print(e)
+                    logger.error("", exc_info=True)
                     return await mystic.edit(_["play_3"])
-                streamtype = "playlist"
+                
                 plist_type = "yt"
                 if "&" in url:
                     plist_id = (url.split("=")[1]).split("&")[0]
