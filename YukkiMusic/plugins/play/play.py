@@ -80,24 +80,22 @@ async def play_commnd(
         if file_path := await telegram.download(_, rmsg, mystic):
             message_link = await telegram.get_link(rmsg)
             file_name = await telegram.get_filename(file)
-            dur = await telegram.get_duration(file)
+            await telegram.get_duration(file)
             details = Track(
-                title =file_name,
-                link= message_link,
+                title=file_name,
+                link=message_link,
                 thumb=config.TELEGRAM_AUDIO_URL,
                 duration=file.duration,
                 streamtype=SourceType.TELEGRAM,
                 video=False,
-                file_path= file_path,
+                file_path=file_path,
             )
     elif video_telegram:
         if not await is_video_allowed(event.chat_id):
             return await mystic.edit(_["play_3"])
         try:
             if file.ext.lower() not in formats:
-                    return await mystic.edit(
-                        _["play_8"].format(f"{' | '.join(formats)}")
-                    )
+                return await mystic.edit(_["play_8"].format(f"{' | '.join(formats)}"))
         except Exception:
             return await mystic.edit(_["play_8"].format(f"{' | '.join(formats)}"))
         if file.size > config.TG_VIDEO_FILESIZE_LIMIT:
@@ -106,15 +104,15 @@ async def play_commnd(
             message_link = await telegram.get_link(rmsg)
             file_name = await telegram.get_filename(file)
             details = Track(
-                title =file_name,
-                link= message_link,
+                title=file_name,
+                link=message_link,
                 thumb=config.TELEGRAM_VIDEO_URL,
                 duration=file.duration,
                 streamtype=SourceType.TELEGRAM,
                 video=True,
-                file_path= file_path,
+                file_path=file_path,
             )
-           
+
     elif url:
         if await youtube.valid(url):
             if "playlist" in url:
