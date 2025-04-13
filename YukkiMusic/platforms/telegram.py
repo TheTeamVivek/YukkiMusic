@@ -55,22 +55,18 @@ class Telegram:
             return None
         return text[offset : offset + length]
 
-    async def get_link(self, event):
-        rmsg = await event.get_reply_message()
+    async def get_link(self, msg):
         chat = await event.get_chat()
         if username := chat.username:
-            link = f"https://t.me/{username}/{rmsg.id}"
+            link = f"https://t.me/{username}/{msg.id}"
         else:
-            link = f"https://t.me/c/{chat.id}/{rmsg.id}"
+            link = f"https://t.me/c/{chat.id}/{msg.id}"
         return link
 
-    async def get_filename(self, file, audio: bool | str = None):
-        try:
-            file_name = file.file_name
-            if file_name is None:
-                file_name = "Telagram audio file" if audio else "Telagram video file"
-        except Exception:
-            file_name = "Telagram audio file" if audio else "Telagram video file"
+    async def get_filename(self, file, video: bool = None):
+        file_name = file.name
+        if file_name is None:
+            file_name = "Telagram video file" if audio else "Telagram audio file"
         return file_name
 
     async def get_duration(self, file):
