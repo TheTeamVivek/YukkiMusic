@@ -14,16 +14,18 @@ import time
 from datetime import datetime, timedelta
 
 import aiohttp
+from pyrogram.file_id import FileUniqueId, FileUniqueType
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from telethon.tl import types
 
 from config import lyrical
+from YukkiMusic import app
+from YukkiMusic.core.track import Track
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.inline import downlod_markup
-
 from ..utils.formatters import convert_bytes, get_readable_time, seconds_to_min
 
 downloader = {}
-
 
 # tg_3: "**{0} Telagram Media Downloader**\n\n**Total file size:** {1}\n**Completed:** {2} \n**Percentage:** {3}%\n\n**Speed:** {4}/s\n**Elapsed Time:** {5}"
 # tg_4: "Sucessfully Downloaded\n Processing File Now..."
@@ -79,14 +81,22 @@ class Telegram:
             dur = "Unknown"
         return dur
 
-    async def __get_filepath(self, file, video: bool = False):
+    async def __get_filepath(
+        self,
+        file,
+        video: bool = False
+    ):
         if video:
             file_name = (
-                file.id + "." + (file.name.split(".")[-1]) if file.name else "mp4"
+                file.id + "." + (file.name.split(".")[-1])
+                if file.name
+                else "mp4"
             )
         else:
             file_name = (
-                file.id + "." + ((file.name.split(".")[-1]) if file.name else "ogg")
+                file.id
+                + "."
+                + ((file.name.split(".")[-1]) if file.name else "ogg")
             )
 
             file_name = os.path.join(os.path.realpath("downloads"), file_name)
@@ -127,6 +137,9 @@ class Telegram:
         speed_counter = {}
         if os.path.exists(fname):
             return True
+        track = Track(
+            
+            )
 
         async def down_load():
             async def progress(current, total):
@@ -148,14 +161,7 @@ class Telegram:
                     total_size = convert_bytes(total)
                     completed_size = convert_bytes(current)
                     speed = convert_bytes(speed)
-                    text = _["tg_3"].format(
-                        tbot.mention,
-                        total_size,
-                        completed_size,
-                        percentage[:5],
-                        speed,
-                        eta,
-                    )
+                    text = _["tg_3"].format(tbot.mention, total_size, completed_size, percentage[:5], speed, eta)
                     try:
                         await mystic.edit(text, buttons=upl)
                     except Exception:
