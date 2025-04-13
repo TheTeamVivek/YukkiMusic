@@ -129,7 +129,7 @@ async def play_commnd(
                     plist_id = (url.split("=")[1]).split("&")[0]
                 else:
                     plist_id = url.split("=")[1]
-                img = config.PLAYLIST_IMG_URL
+                img = details[0].thumb
                 cap = _["play_10"]
             elif "https://youtu.be" in url:
                 videoid = url.split("/")[-1].split("?")[0]
@@ -257,31 +257,6 @@ async def play_commnd(
                     ex_type = type(e).__name__
                     logger.error("An error occurred", exc_info=True)
                     return await mystic.edit(_["play_3"])
-
-                if len(details) == 0:
-                    return await mystic.edit(_["play_3"])
-            try:
-                await stream(
-                    _,
-                    mystic,
-                    user_id,
-                    details,
-                    chat_id,
-                    user_name,
-                    event.chat_id,
-                    streamtype=streamtype,
-                    forceplay=fplay,
-                )
-            except Exception as e:
-                ex_type = type(e).__name__
-                if ex_type == "AssistantErr":
-                    err = e
-                else:
-                    err = _["general_3"].format(ex_type)
-                    logger.error("An error occurred", exc_info=True)
-                return await mystic.edit(err)
-            return await mystic.delete()
-
         elif await soundcloud.valid(url):
             try:
                 details, track_path = await soundcloud.download(url)
