@@ -270,27 +270,8 @@ async def play_commnd(
                         details["duration_min"],
                     )
                 )
-            try:
-                await stream(
-                    _,
-                    mystic,
-                    user_id,
-                    details,
-                    chat_id,
-                    user_name,
-                    event.chat_id,
-                    streamtype="soundcloud",
-                    forceplay=fplay,
-                )
-            except Exception as e:
-                ex_type = type(e).__name__
-                if ex_type == "AssistantErr":
-                    err = e
-                else:
-                    logger.error("An error occurred", exc_info=True)
-                    err = _["general_3"].format(ex_type)
-                return await mystic.edit(err)
-            return await mystic.delete()
+                
+           
         else:
             if not await telegram.is_streamable_url(url):
                 return await mystic.edit(_["play_19"])
