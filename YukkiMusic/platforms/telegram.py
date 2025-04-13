@@ -21,12 +21,13 @@ from telethon.tl import types
 from config import lyrical
 from YukkiMusic import app
 from YukkiMusic.utils.decorators import asyncify
-
+from YukkiMusic.utils.inline import downlod_markup
 from ..utils.formatters import convert_bytes, get_readable_time, seconds_to_min
 
 downloader = {}
 
-
+# tg_3: "**{0} Telagram Media Downloader**\n\n**Total file size:** {1}\n**Completed:** {2} \n**Percentage:** {3}%\n\n**Speed:** {4}/s\n**Elapsed Time:** {5}"
+# tg_4: "Sucessfully Downloaded\n Processing File Now..."
 class Telegram:
     def __init__(self):
         self.sleep = 5
@@ -82,32 +83,22 @@ class Telegram:
     async def __get_filepath(
         self,
         file,
-        audio: types.Document | None = None,
-        video: types.Document | None = None,
+        video: bool = False
     ):
         if video:
-            file_unique_id = FileUniqueId(
-                file_unique_type=FileUniqueType.DOCUMENT, media_id=video.id
-            ).encode()
             file_name = (
-                file_unique_id + "." + (file.name.split(".")[-1])
+                file.id + "." + (file.name.split(".")[-1])
                 if file.name
                 else "mp4"
             )
-
-            file_name = os.path.join(os.path.realpath("downloads"), file_name)
-
-        elif audio:
-            file_unique_id = FileUniqueId(
-                file_unique_type=FileUniqueType.DOCUMENT, media_id=audio.id
-            ).encode()
+        else:
             file_name = (
-                file_unique_id
+                file.id
                 + "."
                 + ((file.name.split(".")[-1]) if file.name else "ogg")
             )
-            file_name = os.path.join(os.path.realpath("downloads"), file_name)
 
+            file_name = os.path.join(os.path.realpath("downloads"), file_name)
         return file_name
 
     async def is_streamable_url(self, url: str) -> bool:
@@ -139,7 +130,8 @@ class Telegram:
             pass
         return False
 
-    async def download(self, _, message, mystic, fname):
+    async def download(self, _, message, mystic, video=False):
+        fname = await self.__get_filepath(file, video=video)
         left_time = {}
         speed_counter = {}
         if os.path.exists(fname):
@@ -152,16 +144,7 @@ class Telegram:
                 current_time = time.time()
                 start_time = speed_counter.get(message.id)
                 check_time = current_time - start_time
-                upl = InlineKeyboardMarkup(
-                    [
-                        [
-                            InlineKeyboardButton(
-                                text="🚦 Cancel downloading",
-                                callback_data="stop_downloading",
-                            ),
-                        ]
-                    ]
-                )
+                upl = downlod_markup(_)
                 if datetime.now() > left_time.get(message.id):
                     percentage = current * 100 / total
                     percentage = str(round(percentage, 2))
@@ -174,15 +157,7 @@ class Telegram:
                     total_size = convert_bytes(total)
                     completed_size = convert_bytes(current)
                     speed = convert_bytes(speed)
-                    text = f"""
-**{app.mention} Telagram Media Downloader**
-
-**Total file size:** {total_size}
-**Completed:** {completed_size} 
-**Percentage:** {percentage[:5]}%
-
-**Speed:** {speed}/s
-**Elapsed Time:** {eta}"""
+                    text = _["tg_3"].format(tbot.mention, total_size, completed_size, percentage[:5], speed, eta)
                     try:
                         await mystic.edit(text, buttons=upl)
                     except Exception:
@@ -195,12 +170,12 @@ class Telegram:
             left_time[message.id] = datetime.now()
 
             try:
-                await app.download_media(
-                    message.reply_to_message,
-                    file_name=fname,
-                    progress=progress,
+                await tbot.download_media(
+                    message,
+                    file=fname,
+                    progress_callback=progress,
                 )
-                await mystic.edit("Sucessfully Downloaded\n Processing File Now...")
+                await mystic.edit(_["tg_4"])
                 downloader.pop(message.id, None)
             except Exception:
                 await mystic.edit(_["tg_2"])
