@@ -87,58 +87,34 @@ async def play_commnd(
                 thumb=config.TELEGRAM_AUDIO_URL,
                 duration=file.duration,
                 streamtype=SourceType.TELEGRAM,
-                video=False
-                is_live=False,
+                video=False,
                 file_path= file_path,
             )
     elif video_telegram:
         if not await is_video_allowed(event.chat_id):
             return await mystic.edit(_["play_3"])
-        if message.reply_to_message.document:
-            try:
-                ext = video_telegram.file_name.split(".")[-1]
-                if ext.lower() not in formats:
+        try:
+            if file.ext.lower() not in formats:
                     return await mystic.edit(
                         _["play_8"].format(f"{' | '.join(formats)}")
                     )
-            except Exception:
-                return await mystic.edit(_["play_8"].format(f"{' | '.join(formats)}"))
-        if video_telegram.file_size > config.TG_VIDEO_FILESIZE_LIMIT:
+        except Exception:
+            return await mystic.edit(_["play_8"].format(f"{' | '.join(formats)}"))
+        if file.size > config.TG_VIDEO_FILESIZE_LIMIT:
             return await mystic.edit(_["play_9"])
-        file_path = await telegram.get_filepath(video=video_telegram)
-        if await telegram.download(_, message, mystic, file_path):
-            message_link = await telegram.get_link(message)
-            file_name = await telegram.get_filename(video_telegram)
-            dur = await telegram.get_duration(video_telegram)
-            details = {
-                "title": file_name,
-                "link": message_link,
-                "path": file_path,
-                "dur": dur,
-            }
-            try:
-                await stream(
-                    _,
-                    mystic,
-                    user_id,
-                    details,
-                    chat_id,
-                    user_name,
-                    event.chat_id,
-                    video=True,
-                    streamtype="telegram",
-                    forceplay=fplay,
-                )
-            except Exception as e:
-                ex_type = type(e).__name__
-                if ex_type == "AssistantErr":
-                    err = e
-                else:
-                    logger.error("An error occurred", exc_info=True)
-                    err = _["general_3"].format(ex_type)
-                return await mystic.edit(err)
-            return await mystic.delete()
-        return
+        if await telegram.download(_, rmsg, mystic, True):
+            message_link = await telegram.get_link(rmsg)
+            file_name = await telegram.get_filename(file)
+            details = Track(
+                title =file_name,
+                link= message_link,
+                thumb=config.TELEGRAM_VIDEO_URL,
+                duration=file.duration,
+                streamtype=SourceType.TELEGRAM,
+                video=True,
+                file_path= file_path,
+            )
+           
     elif url:
         if await youtube.valid(url):
             if "playlist" in url:
