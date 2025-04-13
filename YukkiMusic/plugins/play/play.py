@@ -120,10 +120,10 @@ async def play_commnd(
                         url,
                         config.PLAYLIST_FETCH_LIMIT,
                     )
-                except Exception as e:
+                except Exception:
                     logger.error("", exc_info=True)
                     return await mystic.edit(_["play_3"])
-                
+
                 plist_type = "yt"
                 if "&" in url:
                     plist_id = (url.split("=")[1]).split("&")[0]
