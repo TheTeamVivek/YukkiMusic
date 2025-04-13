@@ -148,7 +148,7 @@ class YouTube(PlatformBase):
             pass
         if result:
             item = result.pop(0)
-            result.insert(0, await search(self.base + item))
+            result.insert(0, await self.track(self.base + item))
         return result
 
     @alru_cache(maxsize=None)
