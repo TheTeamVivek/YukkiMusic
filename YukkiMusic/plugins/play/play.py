@@ -15,6 +15,8 @@ import string
 import config
 from config import BANNED_USERS, lyrical
 from YukkiMusic import tbot
+from YukkiMusic.core.enum import SourceType
+from YukkiMusic.core.track import Track
 from YukkiMusic.platforms import (
     apple,
     resso,
@@ -76,15 +78,19 @@ async def play_commnd(
                 _["play_6"].format(config.DURATION_LIMIT_MIN, duration_min)
             )
         if file_path := await telegram.download(_, rmsg, mystic):
-            message_link = await telegram.get_link(event)
-            file_name = await telegram.get_filename(audio_telegram, audio=True)
-            dur = await telegram.get_duration(audio_telegram)
-            details = {
-                "title": file_name,
-                "link": message_link,
-                "path": file_path,
-                "dur": dur,
-            }
+            message_link = await telegram.get_link(rmsg)
+            file_name = await telegram.get_filename(file)
+            dur = await telegram.get_duration(file)
+            details = Track(
+                title =file_name,
+                link= message_link,
+                thumb=config.TELEGRAM_AUDIO_URL,
+                duration=file.duration,
+                streamtype=SourceType.TELEGRAM,
+                video=False
+                is_live=False,
+                file_path= file_path,
+            })
 
             try:
                 await stream(
