@@ -6,11 +6,13 @@ class PlayType(Enum):
     PAUSED = auto()  # Paused
     MUTED = auto()  # Muted
 
+
 class SpotifyType(Enum):
     TRACK = auto()
     PLAYLIST = auto()
     ALBUM = auto()
     ARTIST = auto()
+
 
 class SourceType(Enum):
     APPLE = "Apple"
