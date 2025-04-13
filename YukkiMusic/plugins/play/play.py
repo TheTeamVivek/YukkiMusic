@@ -90,30 +90,7 @@ async def play_commnd(
                 video=False
                 is_live=False,
                 file_path= file_path,
-            })
-
-            try:
-                await stream(
-                    _,
-                    mystic,
-                    user_id,
-                    details,
-                    chat_id,
-                    user_name,
-                    event.chat_id,
-                    streamtype="telegram",
-                    forceplay=fplay,
-                )
-            except Exception as e:
-                ex_type = type(e).__name__
-                if ex_type == "AssistantErr":
-                    err = e
-                else:
-                    err = _["general_3"].format(ex_type)
-                    logger.error("An error occurred", exc_info=True)
-                return await mystic.edit(err)
-            return await mystic.delete()
-        return
+            )
     elif video_telegram:
         if not await is_video_allowed(event.chat_id):
             return await mystic.edit(_["play_3"])
