@@ -79,7 +79,7 @@ class Telegram:
             dur = "Unknown"
         return dur
 
-    async def get_filepath(
+    async def __get_filepath(
         self,
         file,
         audio: types.Document | None = None,
