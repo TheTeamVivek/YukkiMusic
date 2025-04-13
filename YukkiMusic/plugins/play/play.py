@@ -60,7 +60,6 @@ async def play_commnd(
     user_id = event.sender_id
     # user_name = message.from_user.mention
     file = None
-    rsmg = None
     audio_telegram, video_telegram = None, None
     if event.is_reply:
         rmsg = await event.get_reply_message()
