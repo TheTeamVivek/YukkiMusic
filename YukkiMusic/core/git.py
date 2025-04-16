@@ -8,7 +8,6 @@
 # All rights reserved.
 
 import asyncio
-import shlex
 
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
