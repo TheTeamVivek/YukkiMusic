@@ -49,7 +49,6 @@ async def play_commnd(
     fplay,
 ):
     mystic = await event.reply(_["play_2"].format(channel) if channel else _["play_1"])
-    plist_id = None
     plist_type = None
     spotify = None
     user_id = event.sender_id
@@ -140,7 +139,7 @@ async def play_commnd(
 
             if details is None:
                 return await mystic.edit(_["play_17"])
-                
+
         elif await apple.valid(url):
             try:
                 details = await apple.track(url)
@@ -148,7 +147,7 @@ async def play_commnd(
                 return await mystic.edit(_["play_3"])
             if details is None:
                 return await mystic.edit(_["play_16"])
-                
+
         elif await resso.valid(url):
             try:
                 details, track_id = await resso.track(url)
