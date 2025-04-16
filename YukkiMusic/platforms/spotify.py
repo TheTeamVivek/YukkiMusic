@@ -37,9 +37,25 @@ class Spotify(PlatformBase):
 
     async def valid(self, link: str):
         return bool(re.search(self.regex, link))
-
+        
+    async def track(self, url):
+        
+        if "track" in url:
+            t = await self.__track(url)
+        elif "album" in url:
+            t = await self.__album(url)
+        elif "artist" in url:
+            t = await spotify.__artist(url)
+        elif "playlist" in url:
+            t = await self.playlist(url)
+        else:
+            return None
+        return t
+                
+                
+              
     @alru_cache(maxsize=None)
-    async def track(self, link: str) -> Track:
+    async def __track(self, link: str) -> Track:
         track = self.spotify.track(link)
         info = track["name"]
         for artist in track["artists"]:
@@ -77,7 +93,7 @@ class Spotify(PlatformBase):
         return results, playlist_id
 
     @alru_cache(maxsize=None)
-    async def album(self, url: str) -> tuple:
+    async def __album(self, url: str) -> tuple:
         album = self.spotify.album(url)
         album_id = album["id"]
         results = []
@@ -99,7 +115,7 @@ class Spotify(PlatformBase):
         return results, album_id
 
     @alru_cache(maxsize=None)
-    async def artist(self, url: str) -> tuple:
+    async def __artist(self, url: str) -> tuple:
         artist_info = self.spotify.artist(url)
         artist_id = artist_info["id"]
         results = []
