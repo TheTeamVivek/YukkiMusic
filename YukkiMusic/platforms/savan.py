@@ -23,17 +23,18 @@ class Saavn(PlatformBase):
     async def valid(self, link: str) -> bool:
         return "jiosaavn.com" in link
 
-    async def is_song(self, url: str) -> bool:  # TODO remove this function
-        return "song" in url and "/featured/" not in url and "/album/" not in url
-
-    async def is_playlist(self, url: str) -> bool:
-        return "/featured/" in url or "/album" in url  # TODO Remove this function
-
-    def clean_url(self, url: str) -> str:
-        if "#" in url:
-            url = url.split("#")[0]
-        return url
-
+    async def track(self, url):
+        is_song = lambda url: "song" in url and not any(x in url for x in ["/featured/", "/album/"])
+        is_playlist = lambda url: "/featured/" in url or "/album" in url
+        handlers = {
+            is_song: self.__track,
+            is_playlist: self.playlist,
+        }
+        for condition, func in handlers.items():
+            if condition(url):
+                return await func(url)
+        return None
+        
     @alru_cache(maxsize=None)
     @asyncify
     def playlist(self, url, limit: int = config.PLAYLIST_FETCH_LIMIT) -> list[Track]:
@@ -67,7 +68,7 @@ class Saavn(PlatformBase):
 
     @alru_cache(maxsize=None)
     @asyncify
-    def track(self, url):
+    def __track(self, url):
         url = self.clean_url(url)
         ydl_opts = {
             "format": "bestaudio/best",
