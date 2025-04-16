@@ -27,6 +27,15 @@ from .sys import bot_sys_stats
 from .thumbnails import gen_qthumb, gen_thumb
 
 
+async def get_message_link(msg):
+    chat = await msg.get_chat()
+    if username := chat.username:
+        link = f"https://t.me/{username}/{msg.id}"
+    else:
+        link = f"https://t.me/c/{chat.id}/{msg.id}"
+    return link
+
+    
 def get_chat_id(entity: types.User | types.Chat | types.Channel) -> int:
     chat_id = None
     if isinstance(entity, types.User):
