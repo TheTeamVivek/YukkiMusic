@@ -28,9 +28,19 @@ class Apple(PlatformBase):
 
     async def valid(self, link: str):
         return bool(re.search(self.regex, link))
-
+        
+    async def track(self, url):
+        handlers = {
+            "album": self.__track,
+            "playlist": self.playlist,
+        }
+        for key, handler in handlers.items():
+            if key in url:
+                return await handler(url)
+        return None
+     
     @alru_cache(maxsize=None)
-    async def track(self, url: str) -> Track | bool:
+    async def __track(self, url: str) -> Track | bool:
         html = await Request.get_text(url)
         soup = BeautifulSoup(html, "html.parser")
         song_name = None
