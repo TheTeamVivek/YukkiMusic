@@ -160,15 +160,15 @@ async def play_commnd(
 
             try:
                 details = await saavn.track(url)
-            except Exception as e:
+            except Exception:
                 return await mystic.edit(_["play_3"])
-                      
+
         elif await soundcloud.valid(url):
             try:
                 details = await soundcloud.details(url)
             except Exception:
                 return await mystic.edit(_["play_3"])
-            
+
         else:
             if not await telegram.is_streamable_url(url):
                 return await mystic.edit(_["play_19"])
