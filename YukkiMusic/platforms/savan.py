@@ -24,7 +24,9 @@ class Saavn(PlatformBase):
         return "jiosaavn.com" in link
 
     async def track(self, url):
-        is_song = lambda url: "song" in url and not any(x in url for x in ["/featured/", "/album/"])
+        is_song = lambda url: "song" in url and not any(
+            x in url for x in ["/featured/", "/album/"]
+        )
         is_playlist = lambda url: "/featured/" in url or "/album" in url
         handlers = {
             is_song: self.__track,
@@ -34,7 +36,7 @@ class Saavn(PlatformBase):
             if condition(url):
                 return await func(url)
         return None
-        
+
     @alru_cache(maxsize=None)
     @asyncify
     def playlist(self, url, limit: int = config.PLAYLIST_FETCH_LIMIT) -> list[Track]:
