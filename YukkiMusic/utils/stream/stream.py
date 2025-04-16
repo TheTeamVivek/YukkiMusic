@@ -35,7 +35,7 @@ async def stream(
     *,
     track: (
         Track | list[Track] | list[str]
-    ),  # NOTE: If THE TRACK IS PLAYLIST SO FIRST ELEMENT MUST BE instance OF TRACK OTHER CAN REMAIN ALSO TRACK OR VIDID IF Source IS YOUTUBE ELSE SONG NAME
+    ),  # NOTE: If THE TRACK IS PLAYLIST SO FIRST ELEMENT MUST BE instance OF Track OTHER CAN REMAIN ALSO Track OR vidid IF Internal Source IS YOUTUBE ELSE SONG NAME
     user_id: int,
     forceplay: bool | None = None,
 ):
