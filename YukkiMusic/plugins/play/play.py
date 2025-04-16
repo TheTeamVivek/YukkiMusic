@@ -101,7 +101,7 @@ async def play_commnd(
             return await mystic.edit(_["play_9"])
         if await telegram.download(_, rmsg, mystic, True):
             message_link = await telegram.get_link(rmsg)
-            file_name = await telegram.get_filename(file)
+            file_name = await telegram.get_filename(file, True)
             details = Track(
                 title=file_name,
                 link=message_link,
@@ -363,7 +363,7 @@ async def play_commnd(
             return await mystic.edit(err)
         await mystic.delete()
         return await play_logs(message, streamtype=streamtype)
-    else:
+    '''else:
         if plist_type:
             ran_hash = "".join(
                 random.choices(string.ascii_uppercase + string.digits, k=10)
@@ -419,4 +419,4 @@ async def play_commnd(
                     caption=cap,
                     buttons=buttons,
                 )
-                return await play_logs(message, streamtype=f"URL Searched Inline")
+                return await play_logs(message, streamtype=f"URL Searched Inline")'''
