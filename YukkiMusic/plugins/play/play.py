@@ -49,7 +49,6 @@ async def play_commnd(
     fplay,
 ):
     mystic = await event.reply(_["play_2"].format(channel) if channel else _["play_1"])
-    plist_type = None
     spotify = None
     user_id = event.sender_id
     # user_name = message.from_user.mention
@@ -195,7 +194,7 @@ async def play_commnd(
         except Exception:
             return await mystic.edit(_["play_3"])
 
-    #if str(playmode) == "DIRECT" and not plist_type:
+    # if str(playmode) == "DIRECT" and not plist_type:
     if True:
         if details["duration_min"]:
             duration_sec = time_to_seconds(details["duration_min"])
@@ -226,9 +225,8 @@ async def play_commnd(
                 track=details,
                 user_id=user_id,
                 forceplay=fplay,
-                
-                )
-           
+            )
+
         except Exception as e:
             ex_type = type(e).__name__
             if ex_type == "AssistantErr":
