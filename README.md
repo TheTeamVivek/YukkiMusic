@@ -33,15 +33,13 @@ Get started quickly by deploying to Heroku with just one click:
     Copy the sample environment file: `cp sample.env .env`
 
     Edit the variables in the .env file: `nano .env`
-
   After editing, press `Ctrl+X`, then `Y`, and press **Enter** to save the changes.
 
+- Start a tmux Session to Keep the Bot Running: `tmux`
 
-  -  Run the Bot: `bash start`
+- Run the Bot: `bash start`
 
-  - Keep the Bot Running with tmux: `tmux`
-
-To exit the **tmux session** without stopping the bot, press `Ctrl+b`, then `d`.
+Detach from the **tmux Session** (Bot keeps running) Press `Ctrl+b`, then `d`
 
 
 
