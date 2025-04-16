@@ -134,7 +134,7 @@ async def play_commnd(
             if not config.SPOTIFY_CLIENT_ID and not config.SPOTIFY_CLIENT_SECRET:
                 return await mystic.edit(_["spotify_1"])
             try:
-                (details) = await spotify.artist(url)
+                details = await spotify.artist(url)
             except Exception:
                 return await mystic.edit(_["play_3"])
 
