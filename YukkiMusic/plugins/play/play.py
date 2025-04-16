@@ -49,7 +49,6 @@ async def play_commnd(
     fplay,
 ):
     mystic = await event.reply(_["play_2"].format(channel) if channel else _["play_1"])
-    spotify = None
     user_id = event.sender_id
     # user_name = message.from_user.mention
     file = None
