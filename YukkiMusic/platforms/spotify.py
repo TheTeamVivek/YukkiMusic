@@ -39,18 +39,16 @@ class Spotify(PlatformBase):
         return bool(re.search(self.regex, link))
 
     async def track(self, url):
-
-        if "track" in url:
-            t = await self.__track(url)
-        elif "album" in url:
-            t = await self.__album(url)
-        elif "artist" in url:
-            t = await spotify.__artist(url)
-        elif "playlist" in url:
-            t = await self.playlist(url)
-        else:
-            return None
-        return t
+        handlers = {
+            "track": self.__track,
+            "album": self.__album,
+            "artist": spotify.__artist,
+            "playlist": self.playlist,
+       }
+        for key, handler in handlers.items():
+            if key in url:
+                return await handler(url)
+        return None
 
     @alru_cache(maxsize=None)
     async def __track(self, link: str) -> Track:
