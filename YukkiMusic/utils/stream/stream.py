@@ -30,9 +30,9 @@ from YukkiMusic.utils.thumbnails import gen_qthumb, gen_thumb
 
 
 async def stream(
-    *,
     chat_id: int,
     original_chat_id,
+    *,
     track: (
         Track | list[Track] | list[str]
     ),  # NOTE: If THE TRACK IS PLAYLIST SO FIRST ELEMENT MUST BE instance OF TRACK OTHER CAN REMAIN ALSO TRACK OR VIDID IF Source IS YOUTUBE ELSE SONG NAME
