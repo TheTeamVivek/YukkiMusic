@@ -195,7 +195,8 @@ async def play_commnd(
         except Exception:
             return await mystic.edit(_["play_3"])
 
-    if str(playmode) == "DIRECT" and not plist_type:
+    #if str(playmode) == "DIRECT" and not plist_type:
+    if True:
         if details["duration_min"]:
             duration_sec = time_to_seconds(details["duration_min"])
             if duration_sec > config.DURATION_LIMIT:
@@ -220,18 +221,14 @@ async def play_commnd(
             )
         try:
             await stream(
-                _,
-                mystic,
-                user_id,
-                details,
                 chat_id,
-                user_name,
                 event.chat_id,
-                video=video,
-                streamtype=streamtype,
-                spotify=spotify,
+                track=details,
+                user_id=user_id,
                 forceplay=fplay,
-            )
+                
+                )
+           
         except Exception as e:
             ex_type = type(e).__name__
             if ex_type == "AssistantErr":
