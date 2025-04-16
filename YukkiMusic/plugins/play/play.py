@@ -140,34 +140,21 @@ async def play_commnd(
 
             if details is None:
                 return await mystic.edit(_["play_17"])
+                
         elif await apple.valid(url):
-            if "album" in url:
-                try:
-                    details, track_id = await apple.track(url)
-                except Exception:
-                    return await mystic.edit(_["play_3"])
-                streamtype = "youtube"
-                details["thumb"]
-                _["play_11"].format(details["title"], details["duration_min"])
-            elif "playlist" in url:
-                spotify = True
-                try:
-                    details, plist_id = await apple.playlist(url)
-                except Exception:
-                    return await mystic.edit(_["play_3"])
-                streamtype = "playlist"
-                plist_type = "apple"
-                _["play_13"].format(message.from_user.first_name)
-            else:
+            try:
+                details = await apple.track(url)
+            except Exception:
+                return await mystic.edit(_["play_3"])
+            if details is None:
                 return await mystic.edit(_["play_16"])
+                
         elif await resso.valid(url):
             try:
                 details, track_id = await resso.track(url)
             except Exception:
                 return await mystic.edit(_["play_3"])
-            streamtype = "youtube"
-            details["thumb"]
-            _["play_11"].format(details["title"], details["duration_min"])
+
         elif await saavn.valid(url):
             if "shows" in url:
                 return await mystic.edit(_["saavn_1"])
