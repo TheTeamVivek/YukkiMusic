@@ -28,7 +28,7 @@ class Apple(PlatformBase):
 
     async def valid(self, link: str):
         return bool(re.search(self.regex, link))
-        
+
     async def track(self, url):
         handlers = {
             "album": self.__track,
@@ -38,7 +38,7 @@ class Apple(PlatformBase):
             if key in url:
                 return await handler(url)
         return None
-     
+
     @alru_cache(maxsize=None)
     async def __track(self, url: str) -> Track | bool:
         html = await Request.get_text(url)
