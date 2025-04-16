@@ -33,7 +33,7 @@ from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
 
 logger = logging.getLogger(__name__)
-
+# spotify_1: "This Bot can't play spotify tracks and playlist, please contact my owner and ask him to add Spotify player."
 
 @tbot.on_message(flt.command("PLAY_COMMAND", True) & flt.group & ~BANNED_USERS)
 @play_wrapper
@@ -116,78 +116,30 @@ async def play_commnd(
                     logger.error("", exc_info=True)
                     return await mystic.edit(_["play_3"])
 
-                plist_type = "yt"
-                if "&" in url:
-                    plist_id = (url.split("=")[1]).split("&")[0]
-                else:
-                    plist_id = url.split("=")[1]
-                details[0].thumb
-                cap = _["play_10"]
             elif "https://youtu.be" in url:
                 videoid = url.split("/")[-1].split("?")[0]
-                details, track_id = await youtube.track(
+                details = await youtube.track(
                     f"https://www.youtube.com/watch?v={videoid}"
                 )
-                streamtype = "youtube"
-                details["thumb"]
-                cap = _["play_11"].format(
-                    details["title"],
-                    details["duration_min"],
-                )
+       
             else:
                 try:
-                    details, track_id = await youtube.track(url)
+                    details = await youtube.track(url)
                 except Exception as e:
-                    print(e)
+                    logger.info("", exc_info=True)
                     return await mystic.edit(_["play_3"])
-                streamtype = "youtube"
-                details["thumb"]
-                cap = _["play_11"].format(
-                    details["title"],
-                    details["duration_min"],
-                )
+               
         elif await spotify.valid(url):
-            spotify = True
             if not config.SPOTIFY_CLIENT_ID and not config.SPOTIFY_CLIENT_SECRET:
                 return await mystic.edit(
-                    "This Bot can't play spotify tracks and playlist, please contact my owner and ask him to add Spotify player."
+                    _["spotify_1"]
                 )
-            if "track" in url:
-                try:
-                    details, track_id = await spotify.track(url)
-                except Exception:
-                    return await mystic.edit(_["play_3"])
-                streamtype = "youtube"
-                details["thumb"]
-                _["play_11"].format(details["title"], details["duration_min"])
-            elif "playlist" in url:
-                try:
-                    details, plist_id = await spotify.playlist(url)
-                except Exception:
-                    return await mystic.edit(_["play_3"])
-                streamtype = "playlist"
-                plist_type = "spplay"
-                config.SPOTIFY_PLAYLIST_IMG_URL
-                _["play_12"].format(message.from_user.first_name)
-            elif "album" in url:
-                try:
-                    details, plist_id = await spotify.album(url)
-                except Exception:
-                    return await mystic.edit(_["play_3"])
-                streamtype = "playlist"
-                plist_type = "spalbum"
-                config.SPOTIFY_ALBUM_IMG_URL
-                _["play_12"].format(message.from_user.first_name)
-            elif "artist" in url:
-                try:
-                    details, plist_id = await spotify.artist(url)
-                except Exception:
-                    return await mystic.edit(_["play_3"])
-                streamtype = "playlist"
-                plist_type = "spartist"
-                config.SPOTIFY_ARTIST_IMG_URL
-                _["play_12"].format(message.from_user.first_name)
-            else:
+            try:
+                details,= await spotify.artist(url)
+            except Exception:
+                return await mystic.edit(_["play_3"])
+        
+            if details is None:
                 return await mystic.edit(_["play_17"])
         elif await apple.valid(url):
             if "album" in url:
