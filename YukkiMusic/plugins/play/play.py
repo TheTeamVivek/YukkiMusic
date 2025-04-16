@@ -158,47 +158,17 @@ async def play_commnd(
             if "shows" in url:
                 return await mystic.edit(_["saavn_1"])
 
-            elif await saavn.is_song(url):
-                try:
-                    file_path, details = await saavn.download(url)
-                except Exception as e:
-                    ex_type = type(e).__name__
-                    logger.error("An error occurred", exc_info=True)
-                    return await mystic.edit(_["play_3"])
-                duration_sec = details["duration_sec"]
-                streamtype = "saavn_track"
-
-                if duration_sec > config.DURATION_LIMIT:
-                    return await mystic.edit(
-                        _["play_6"].format(
-                            config.DURATION_LIMIT_MIN,
-                            details["duration_min"],
-                        )
-                    )
-            elif await saavn.is_playlist(url):
-                try:
-                    details = await saavn.playlist(
-                        url, limit=config.PLAYLIST_FETCH_LIMIT
-                    )
-                    streamtype = "saavn_playlist"
-                except Exception as e:
-                    ex_type = type(e).__name__
-                    logger.error("An error occurred", exc_info=True)
-                    return await mystic.edit(_["play_3"])
+            try:
+                details = await saavn.track(url)
+            except Exception as e:
+                return await mystic.edit(_["play_3"])
+                      
         elif await soundcloud.valid(url):
             try:
-                details, track_path = await soundcloud.download(url)
+                details = await soundcloud.details(url)
             except Exception:
                 return await mystic.edit(_["play_3"])
-            duration_sec = details["duration_sec"]
-            if duration_sec > config.DURATION_LIMIT:
-                return await mystic.edit(
-                    _["play_6"].format(
-                        config.DURATION_LIMIT_MIN,
-                        details["duration_min"],
-                    )
-                )
-
+            
         else:
             if not await telegram.is_streamable_url(url):
                 return await mystic.edit(_["play_19"])
