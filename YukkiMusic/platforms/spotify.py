@@ -44,7 +44,7 @@ class Spotify(PlatformBase):
             "album": self.__album,
             "artist": spotify.__artist,
             "playlist": self.playlist,
-        }
+       }
         for key, handler in handlers.items():
             if key in url:
                 return await handler(url)
