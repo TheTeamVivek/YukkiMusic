@@ -23,7 +23,7 @@ from YukkiMusic.platforms import (
     telegram,
     youtube,
 )
-from YukkiMusic.utils import seconds_to_min, time_to_seconds
+from YukkiMusic.utils import seconds_to_min, time_to_seconds, get_message_link
 from YukkiMusic.utils.database import is_video_allowed
 from YukkiMusic.utils.decorators.play import play_wrapper
 from YukkiMusic.utils.formatters import formats
@@ -68,8 +68,8 @@ async def play_commnd(
                 _["play_6"].format(config.DURATION_LIMIT_MIN, duration_min)
             )
         if file_path := await telegram.download(_, rmsg, mystic):
-            message_link = await telegram.get_link(rmsg)
-            file_name = await telegram.get_filename(file)
+            message_link = await get_message_link(rmsg)
+            file_name = await file.name or  "Telagram audio file"
             details = Track(
                 title=file_name,
                 link=message_link,
@@ -90,8 +90,8 @@ async def play_commnd(
         if file.size > config.TG_VIDEO_FILESIZE_LIMIT:
             return await mystic.edit(_["play_9"])
         if await telegram.download(_, rmsg, mystic, True):
-            message_link = await telegram.get_link(rmsg)
-            file_name = await telegram.get_filename(file, True)
+            message_link = await get_message_link(rmsg)
+            file_name = file.name or "Telagram video file"
             details = Track(
                 title=file_name,
                 link=message_link,
