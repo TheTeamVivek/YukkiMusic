@@ -191,10 +191,10 @@ async def play_commnd(
         if "-v" in query:
             query = query.replace("-v", "")
         try:
-            details, track_id = await youtube.track(query)
+            details = await youtube.track(query)
         except Exception:
             return await mystic.edit(_["play_3"])
-        streamtype = "youtube"
+        
     if str(playmode) == "DIRECT" and not plist_type:
         if details["duration_min"]:
             duration_sec = time_to_seconds(details["duration_min"])
