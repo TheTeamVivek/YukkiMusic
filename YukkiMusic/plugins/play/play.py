@@ -35,6 +35,7 @@ from YukkiMusic.utils.stream.stream import stream
 logger = logging.getLogger(__name__)
 # spotify_1: "This Bot can't play spotify tracks and playlist, please contact my owner and ask him to add Spotify player."
 
+
 @tbot.on_message(flt.command("PLAY_COMMAND", True) & flt.group & ~BANNED_USERS)
 @play_wrapper
 async def play_commnd(
@@ -121,24 +122,22 @@ async def play_commnd(
                 details = await youtube.track(
                     f"https://www.youtube.com/watch?v={videoid}"
                 )
-       
+
             else:
                 try:
                     details = await youtube.track(url)
-                except Exception as e:
+                except Exception:
                     logger.info("", exc_info=True)
                     return await mystic.edit(_["play_3"])
-               
+
         elif await spotify.valid(url):
             if not config.SPOTIFY_CLIENT_ID and not config.SPOTIFY_CLIENT_SECRET:
-                return await mystic.edit(
-                    _["spotify_1"]
-                )
+                return await mystic.edit(_["spotify_1"])
             try:
-                details,= await spotify.artist(url)
+                (details,) = await spotify.artist(url)
             except Exception:
                 return await mystic.edit(_["play_3"])
-        
+
             if details is None:
                 return await mystic.edit(_["play_17"])
         elif await apple.valid(url):

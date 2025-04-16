@@ -37,9 +37,9 @@ class Spotify(PlatformBase):
 
     async def valid(self, link: str):
         return bool(re.search(self.regex, link))
-        
+
     async def track(self, url):
-        
+
         if "track" in url:
             t = await self.__track(url)
         elif "album" in url:
@@ -51,9 +51,7 @@ class Spotify(PlatformBase):
         else:
             return None
         return t
-                
-                
-              
+
     @alru_cache(maxsize=None)
     async def __track(self, link: str) -> Track:
         track = self.spotify.track(link)
