@@ -8,7 +8,7 @@
 # All rights reserved.
 #
 
-import asyncio, requests
+import asyncio
 import os
 import time
 from datetime import datetime, timedelta
