@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-import config
-
 from ..core.youtube import Track
 
 
