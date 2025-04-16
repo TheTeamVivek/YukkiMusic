@@ -17,7 +17,6 @@ import aiohttp
 from telethon.tl import types
 
 from config import lyrical
-from YukkiMusic.core.track import Track
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.inline import downlod_markup
 
