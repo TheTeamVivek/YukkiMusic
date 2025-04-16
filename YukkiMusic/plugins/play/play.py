@@ -173,13 +173,13 @@ async def play_commnd(
             if not await telegram.is_streamable_url(url):
                 return await mystic.edit(_["play_19"])
             details = track = Track(
-            title="M3U8 or index Urls",
-            link=url,
-            thumb=config.STREAM_IMG_URL,
-            duration=0,
-            streamtype=SourceType.M3U8,
-            video=video,
-        )
+                title="M3U8 or index Urls",
+                link=url,
+                thumb=config.STREAM_IMG_URL,
+                duration=0,
+                streamtype=SourceType.M3U8,
+                video=video,
+            )
     else:
         if len(message.command) < 2:
             buttons = botplaylist_markup(_)
@@ -194,7 +194,7 @@ async def play_commnd(
             details = await youtube.track(query)
         except Exception:
             return await mystic.edit(_["play_3"])
-        
+
     if str(playmode) == "DIRECT" and not plist_type:
         if details["duration_min"]:
             duration_sec = time_to_seconds(details["duration_min"])
