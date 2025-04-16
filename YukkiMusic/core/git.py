@@ -20,11 +20,10 @@ from ..logging import logger
 loop = asyncio.get_event_loop_policy().get_event_loop()
 
 
-def install_req(cmd: str) -> tuple[str, str, int, int]:
+def install_req() -> tuple[str, str, int, int]:
     async def install_requirements():
-        args = shlex.split(cmd)
         process = await asyncio.create_subprocess_exec(
-            *args,
+            "pip3 install --no-cache-dir -r requirements.txt",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
@@ -40,10 +39,9 @@ def install_req(cmd: str) -> tuple[str, str, int, int]:
 
 
 def git():
-    repo_link = config.UPSTREAM_REPO
     if config.GIT_TOKEN:
-        git_username = repo_link.split("com/")[1].split("/")[0]
-        temp_repo = repo_link.split("https://")[1]
+        git_username = config.UPSTREAM_REPO.split("com/")[1].split("/")[0]
+        temp_repo = config.UPSTREAM_REPO.split("https://")[1]
         upstream_repo = f"https://{git_username}:{config.GIT_TOKEN}@{temp_repo}"
     else:
         upstream_repo = config.UPSTREAM_REPO
@@ -77,19 +75,8 @@ def git():
     nrs = repo.remote("origin")
     nrs.fetch(config.UPSTREAM_BRANCH)
 
-    requirements_file = "requirements.txt"
-    diff_index = repo.head.commit.diff("FETCH_HEAD")
-
-    requirements_updated = any(
-        requirements_file in (diff.a_path, diff.b_path) for diff in diff_index
-    )
-
     try:
         nrs.pull(config.UPSTREAM_BRANCH)
     except GitCommandError:
         repo.git.reset("--hard", "FETCH_HEAD")
-
-    if requirements_updated:
-        install_req("pip3 install --no-cache-dir -r requirements.txt")
-
-    logger(__name__).info("Fetched Updates from: %s", repo_link)
+    install_req()
