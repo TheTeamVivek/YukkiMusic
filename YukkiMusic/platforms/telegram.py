@@ -53,40 +53,11 @@ class Telegram:
         if offset is None:
             return None
         return text[offset : offset + length]
-
-    async def get_link(self, msg):
-        chat = await event.get_chat()
-        if username := chat.username:
-            link = f"https://t.me/{username}/{msg.id}"
-        else:
-            link = f"https://t.me/c/{chat.id}/{msg.id}"
-        return link
-
-    async def get_filename(self, file, video: bool = None):
-        file_name = file.name
-        if file_name is None:
-            file_name = "Telagram video file" if audio else "Telagram audio file"
-        return file_name
-
-    async def get_duration(self, file):
-        try:
-            dur = seconds_to_min(file.duration)
-        except Exception:
-            dur = "Unknown"
-        return dur
-
+        
     async def __get_filepath(self, file, video: bool = False):
-        if video:
-            file_name = (
-                file.id + "." + (file.name.split(".")[-1]) if file.name else "mp4"
-            )
-        else:
-            file_name = (
-                file.id + "." + ((file.name.split(".")[-1]) if file.name else "ogg")
-            )
-
-            file_name = os.path.join(os.path.realpath("downloads"), file_name)
-        return file_name
+        ext = (file.name.split(".")[-1] if file.name else ("mp4" if video else "ogg"))
+        file_name = f"{file.id}.{ext}"
+        return os.path.join(os.path.realpath("downloads"), file_name)
 
     async def is_streamable_url(self, url: str) -> bool:
         try:
