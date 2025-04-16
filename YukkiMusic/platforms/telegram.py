@@ -20,7 +20,7 @@ from config import lyrical
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.inline import downlod_markup
 
-from ..utils.formatters import convert_bytes, get_readable_time, seconds_to_min
+from ..utils.formatters import convert_bytes, get_readable_time
 
 downloader = {}
 
@@ -53,9 +53,9 @@ class Telegram:
         if offset is None:
             return None
         return text[offset : offset + length]
-        
+
     async def __get_filepath(self, file, video: bool = False):
-        ext = (file.name.split(".")[-1] if file.name else ("mp4" if video else "ogg"))
+        ext = file.name.split(".")[-1] if file.name else ("mp4" if video else "ogg")
         file_name = f"{file.id}.{ext}"
         return os.path.join(os.path.realpath("downloads"), file_name)
 

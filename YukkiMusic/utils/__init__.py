@@ -35,7 +35,7 @@ async def get_message_link(msg):
         link = f"https://t.me/c/{chat.id}/{msg.id}"
     return link
 
-    
+
 def get_chat_id(entity: types.User | types.Chat | types.Channel) -> int:
     chat_id = None
     if isinstance(entity, types.User):
