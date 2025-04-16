@@ -172,30 +172,14 @@ async def play_commnd(
         else:
             if not await telegram.is_streamable_url(url):
                 return await mystic.edit(_["play_19"])
-
-            await mystic.edit(_["str_2"])
-            try:
-                await stream(
-                    _,
-                    mystic,
-                    event.sender_id,
-                    url,
-                    chat_id,
-                    message.from_user.first_name,
-                    event.chat_id,
-                    video=video,
-                    streamtype="index",
-                    forceplay=fplay,
-                )
-            except Exception as e:
-                ex_type = type(e).__name__
-                if ex_type == "AssistantErr":
-                    err = e
-                else:
-                    logger.error("An error occurred", exc_info=True)
-                    err = _["general_3"].format(ex_type)
-                return await mystic.edit(err)
-            return await play_logs(message, streamtype="M3u8 or Index Link")
+            details = track = Track(
+            title="M3U8 or index Urls",
+            link=url,
+            thumb=config.STREAM_IMG_URL,
+            duration=0,
+            streamtype=SourceType.M3U8,
+            video=video,
+        )
     else:
         if len(message.command) < 2:
             buttons = botplaylist_markup(_)
