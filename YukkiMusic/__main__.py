@@ -41,7 +41,7 @@ async def init():
     await tbot.start()
 
     attrs = {"userbot": userbot, "tbot": tbot}
-    await app.load_plugins_from("YukkiMusic/plugins")
+    await app.load_plugins_from("YukkiMusic/plugins", attrs)
 
     if config.EXTRA_PLUGINS:
         if os.path.exists("xtraplugins"):
