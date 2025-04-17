@@ -130,7 +130,7 @@ HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
 PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", "25"))
 
 # Set it true if you want your bot to be private only
-# [You'll need to allow CHAT_ID via /authorize command 
+# [You'll need to allow CHAT_ID via /authorize command
 # then only your bot will play music in that chat.]
 PRIVATE_BOT_MODE = is_true(getenv("PRIVATE_BOT_MODE", "False"))
 
@@ -250,7 +250,8 @@ SPOTIFY_PLAYLIST_IMG_URL = getenv(
 
 
 def _user():
-    from YukkiMusic.core.filters import User # pylint: disable=import-outside-toplevel
+    from YukkiMusic.core.filters import \
+        User  # pylint: disable=import-outside-toplevel
 
     return User()
 
