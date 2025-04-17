@@ -32,8 +32,6 @@ async def auth(event, _):
         if len(event.text.split()) != 2:
             return await event.reply(_["general_1"])
         user = event.text.split(None, 1)[1]
-        if "@" in user:
-            user = user.replace("@", "")
         user = await app.get_entity(user)
         token = await int_to_alpha(user.id)
         from_user_name = event.sender.first_name
@@ -97,8 +95,6 @@ async def unauthusers(event, _):
         if len(event.text.split()) != 2:
             return await event.reply(_["general_1"])
         user = event.text.split(None, 1)[1]
-        if "@" in user:
-            user = user.replace("@", "")
         user = await app.get_entity(user)
         token = await int_to_alpha(user.id)
         deleted = await delete_authuser(event.chat_id, token)
