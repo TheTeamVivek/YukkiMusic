@@ -7,7 +7,7 @@
 #
 # All rights reserved.
 
- # pylint: disable=C0103
+# pylint: disable=C0103
 from telethon import TelegramClient
 
 import config
