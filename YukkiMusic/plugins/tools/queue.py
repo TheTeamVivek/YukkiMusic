@@ -56,7 +56,7 @@ async def ping_com(event, _):
         chat_id = event.chat_id
         cplay = False
     if not await is_active_chat(chat_id):
-        return await event.reply(_["NO_ACTIVE_VIDEO_STREAM"])
+        return await event.reply(_["general_6"])
     got = db.get(chat_id)
     if not got:
         return await event.reply(_["queue_2"])
@@ -140,7 +140,7 @@ async def queued_tracks(event, _):
     except Exception:
         return
     if not await is_active_chat(chat_id):
-        return await event.answer(_["NO_ACTIVE_VIDEO_STREAM"], alert=True)
+        return await event.answer(_["general_6"], alert=True)
     got = db.get(chat_id)
     if not got:
         return await event.answer(_["queue_2"], alert=True)
@@ -180,7 +180,7 @@ async def queue_back(event, _):
     except Exception:
         return
     if not await is_active_chat(chat_id):
-        return await event.answer(_["NO_ACTIVE_VIDEO_STREAM"], alert=True)
+        return await event.answer(_["general_6"], alert=True)
     got = db.get(chat_id)
     if not got:
         return await event.answer(_["queue_2"], alert=True)
