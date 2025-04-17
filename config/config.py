@@ -37,7 +37,7 @@ API_HASH = getenv("API_HASH")
 BOT_TOKEN = getenv("BOT_TOKEN")
 
 # You'll need a Private Group ID for this.
-LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", 0))
+LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", "0"))
 
 # Your User ID.
 OWNER_ID = list(
@@ -130,7 +130,8 @@ HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
 PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", "25"))
 
 # Set it true if you want your bot to be private only
-# [You'll need to allow CHAT_ID via /authorize command then only your bot will play music in that chat.]
+# [You'll need to allow CHAT_ID via /authorize command 
+# then only your bot will play music in that chat.]
 PRIVATE_BOT_MODE = is_true(getenv("PRIVATE_BOT_MODE", "False"))
 
 # If you want your bot to setup the commands automatically in the bot's menu set it to true.
@@ -226,8 +227,7 @@ SOUNCLOUD_IMG_URL = getenv(
 
 YOUTUBE_IMG_URL = getenv(
     "YOUTUBE_IMG_URL",
-    "assets/Youtube.jpeg",
-)
+    "assets/Youtube.jpeg"
 
 SPOTIFY_ARTIST_IMG_URL = getenv(
     "SPOTIFY_ARTIST_IMG_URL",
@@ -249,7 +249,7 @@ SPOTIFY_PLAYLIST_IMG_URL = getenv(
 
 
 def _user():
-    from YukkiMusic.core.filters import User
+    from YukkiMusic.core.filters import User # pylint: disable=import-outside-toplevel
 
     return User()
 
@@ -322,6 +322,6 @@ for name, default in _DEFAULTS.items():
         var = globals().get(name)
         if var and not re.match(r"^https?://", var):
             print(
-                f"[ERROR] - Your {var_name} URL is incorrect. Please ensure it starts with https://"
+                f"[ERROR] - Your {name} URL is incorrect. Please ensure it starts with https://"
             )
             sys.exit()
