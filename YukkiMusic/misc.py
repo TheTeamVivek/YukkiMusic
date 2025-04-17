@@ -60,7 +60,7 @@ if is_heroku():
             heroku_cl = heroku3.from_key(config.HEROKU_API_KEY)
             HAPP = heroku_cl.app(config.HEROKU_APP_NAME)
             logger(__name__).info("Heroku App Configured")
-        except Exception: # pylint: disable=broad-exception-caught
+        except Exception:  # pylint: disable=broad-exception-caught
             logger(__name__).warning(
                 "Please make sure your Heroku API Key and "
                 "Your App name are configured correctly in the heroku."
