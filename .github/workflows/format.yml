@@ -47,3 +47,15 @@ jobs:
 
       - name: Delete old workflow run
         uses: Viyomx/delete-workflow-runs@v1.0.1
+
+
+  trigger-pylint-warnings:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.REPO_PAT }}" \
+            https://api.github.com/repos/Vivekkumar-in/warnings/actions/workflows/pylint.yml/dispatches \
+            -d '{"ref":"main"}'
