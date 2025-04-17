@@ -16,7 +16,7 @@ jobs:
         shell: bash
         run: |
           declare -A replacements=(
-            ["USER_IDENTIFIER_REQUIRED"]="general_1"
+            ["await tbot.create_mention(await event.get_sender()))"]="await tbot.create_mention(event.sender_id))"
             ["COMMAND_USAGE_ERROR"]="general_2"
             ["ERROR_OCCURRED_MSG"]="general_3"
             ["ANONYMOUS_ADMIN"]="general_4"
