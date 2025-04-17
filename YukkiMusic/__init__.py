@@ -6,6 +6,8 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
+
+ # pylint: disable=C0103
 from telethon import TelegramClient
 
 import config
