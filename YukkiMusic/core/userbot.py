@@ -154,3 +154,5 @@ class Userbot(Client):
             return func
 
         return decorator
+userbot = Userbot()
+
