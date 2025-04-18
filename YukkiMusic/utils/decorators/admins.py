@@ -120,7 +120,6 @@ def admin_actual(mystic):
                 ] or (
                     member.admin_rights is None or not member.admin_rights.manage_call
                 ):
-
                     return await event.reply(_["general_5"])
 
             except Exception as e:

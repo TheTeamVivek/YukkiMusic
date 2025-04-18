@@ -155,11 +155,11 @@ async def queued_tracks(event, _):
     msg = ""
     for j, x in enumerate(got):
         if j == 0:
-            msg += f'Current playing:\n\n🏷Title: {x["title"]}\nDuration: {x["dur"]}\nBy: {x["by"]}\n\n'
+            msg += f"Current playing:\n\n🏷Title: {x['title']}\nDuration: {x['dur']}\nBy: {x['by']}\n\n"
         elif j == 1:
-            msg += f'Queued:\n\n🏷Title: {x["title"]}\nDuratiom: {x["dur"]}\nby: {x["by"]}\n\n'
+            msg += f"Queued:\n\n🏷Title: {x['title']}\nDuratiom: {x['dur']}\nby: {x['by']}\n\n"
         else:
-            msg += f'🏷Title: {x["title"]}\nDuration: {x["dur"]}\nBy: {x["by"]}\n\n'
+            msg += f"🏷Title: {x['title']}\nDuration: {x['dur']}\nBy: {x['by']}\n\n"
 
     await asyncio.sleep(1)
     if len(msg) > 700:

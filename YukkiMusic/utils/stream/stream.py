@@ -53,7 +53,6 @@ async def stream(
         await Yukki.force_stop_stream(chat_id)
 
     if isinstance(track, list):
-
         msg = f"{_['playlist_16']}\n\n"
         count = 0
         track = track[: config.PLAYLIST_FETCH_LIMIT]

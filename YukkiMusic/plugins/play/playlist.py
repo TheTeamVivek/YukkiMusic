@@ -93,7 +93,6 @@ async def check_playlist(event, _):
 @language
 async def del_group_message(event, _):
     if event.is_group:
-
         upl = Button.inline(
             _["PL_B_6"], f"https://t.me/{tbot.username}?start=delplaylists"
         )

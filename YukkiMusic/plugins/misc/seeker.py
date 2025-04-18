@@ -131,7 +131,6 @@ async def markup_timer():
 
                 is_muted = bool(m.is_muted and not m.can_self_unmute)
                 if is_muted:
-
                     if chat_id not in muted:
                         muted[chat_id] = {
                             "timestamp": time.time(),

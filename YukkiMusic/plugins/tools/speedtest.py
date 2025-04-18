@@ -42,14 +42,14 @@ async def speedtest_function(event):
         output = f"""**Speedtest Results**
     
 <u>**Client:**</u>
-**ISP :** {result['client']['isp']}
-**Country :** {result['client']['country']}
+**ISP :** {result["client"]["isp"]}
+**Country :** {result["client"]["country"]}
   
 <u>**Server:**</u>
-**Name :** {result['server']['name']}
-**Country:** {result['server']['country']}, {result['server']['cc']}
-**Sponsor:** {result['server']['sponsor']}
-**Latency:** {result['server']['latency']}  
-**Ping :** {result['ping']}"""
+**Name :** {result["server"]["name"]}
+**Country:** {result["server"]["country"]}, {result["server"]["cc"]}
+**Sponsor:** {result["server"]["sponsor"]}
+**Latency:** {result["server"]["latency"]}  
+**Ping :** {result["ping"]}"""
         await event.respond(file=result["share"], message=output)
         await m.delete()

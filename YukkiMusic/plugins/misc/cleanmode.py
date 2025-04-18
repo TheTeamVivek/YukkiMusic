@@ -142,7 +142,6 @@ async def braodcast_message(event, _):
         served_users = [int(user["user_id"]) for user in susers]
 
         for user_id in served_users:
-
             try:
                 m = (
                     await r_msg.forward_to(user_id)

@@ -55,7 +55,7 @@ class Spotify(PlatformBase):
         track = self.spotify.track(link)
         info = track["name"]
         for artist in track["artists"]:
-            fetched = f' {artist["name"]}'
+            fetched = f" {artist['name']}"
             if "Various Artists" not in fetched:
                 info += fetched
         from .youtube import YouTube
@@ -74,7 +74,7 @@ class Spotify(PlatformBase):
             music_track = item["track"]
             info = music_track["name"]
             for artist in music_track["artists"]:
-                fetched = f' {artist["name"]}'
+                fetched = f" {artist['name']}"
                 if "Various Artists" not in fetched:
                     info += fetched
             results.append(info)
@@ -96,7 +96,7 @@ class Spotify(PlatformBase):
         for item in album["tracks"]["items"]:
             info = item["name"]
             for artist in item["artists"]:
-                fetched = f' {artist["name"]}'
+                fetched = f" {artist['name']}"
                 if "Various Artists" not in fetched:
                     info += fetched
             results.append(info)
@@ -119,7 +119,7 @@ class Spotify(PlatformBase):
         for item in artist_top_tracks["tracks"]:
             info = item["name"]
             for artist in item["artists"]:
-                fetched = f' {artist["name"]}'
+                fetched = f" {artist['name']}"
                 if "Various Artists" not in fetched:
                     info += fetched
             from .youtube import YouTube

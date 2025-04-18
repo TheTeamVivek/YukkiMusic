@@ -60,7 +60,6 @@ class Apple(PlatformBase):
     async def playlist(
         self, url: str, limit: int = config.PLAYLIST_FETCH_LIMIT
     ) -> list[Track]:
-
         playlist_id = url.split("playlist/")[1]
 
         html = await Request.get_text(url)

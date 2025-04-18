@@ -40,7 +40,6 @@ async def save_assistant(chat_id, number):
 
 
 async def set_assistant(chat_id):
-
     dbassistant = await db.find_one({"chat_id": chat_id})
     current_assistant = dbassistant["assistant"] if dbassistant else None
 
@@ -63,7 +62,6 @@ async def set_assistant(chat_id):
 
 
 async def get_assistant(chat_id: int) -> str:
-
     assistant = assistantdict.get(chat_id)
     if not assistant:
         dbassistant = await db.find_one({"chat_id": chat_id})
@@ -89,7 +87,6 @@ async def get_assistant(chat_id: int) -> str:
 
 
 async def set_calls_assistant(chat_id):
-
     ran_assistant = random.choice(assistants)
     assistantdict[chat_id] = ran_assistant
     await db.update_one(

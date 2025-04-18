@@ -54,8 +54,9 @@ async def executor(event):
     t1 = time()
     redirected_output = redirected_error = StringIO()
     stdout, stderr, exc = None, None, None
-    with contextlib.redirect_stdout(redirected_output), contextlib.redirect_stderr(
-        redirected_error
+    with (
+        contextlib.redirect_stdout(redirected_output),
+        contextlib.redirect_stderr(redirected_error),
     ):
         try:
             await aexec(cmd, event)
@@ -82,7 +83,7 @@ async def executor(event):
             [
                 Button.inline(
                     text="⏳",
-                    data=f"runtime {t2-t1} Seconds",
+                    data=f"runtime {t2 - t1} Seconds",
                 )
             ]
         ]
@@ -100,7 +101,7 @@ async def executor(event):
             [
                 Button.inline(
                     text="⏳",
-                    data=f"runtime {round(t2-t1, 3)} Seconds",
+                    data=f"runtime {round(t2 - t1, 3)} Seconds",
                 ),
                 Button.inline(
                     text="🗑",

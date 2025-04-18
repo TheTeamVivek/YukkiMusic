@@ -12,7 +12,7 @@ def asyncify(
     executor: Executor | None = None,
     max_workers: int | None = None,
     *args: Any,
-    **kwargs: Any
+    **kwargs: Any,
 ):
     async def run():
         pfunc = partial(func, *args, **kwargs)
