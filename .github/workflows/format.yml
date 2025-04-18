@@ -37,8 +37,7 @@ jobs:
       - name: Ruff
         uses: astral-sh/ruff-action@v3
         with:
-          args: "check --fix"
-      #- run: ruff format
+          args: "format"
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
