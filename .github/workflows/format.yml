@@ -34,6 +34,8 @@ jobs:
       - name: Update Syntax to python3.10+
         run: |
           find . -name "*.py" -exec pyupgrade --py310-plus {} \;
+      - name: Ruff
+        uses: astral-sh/ruff-action@v3
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
