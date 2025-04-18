@@ -36,8 +36,9 @@ jobs:
           find . -name "*.py" -exec pyupgrade --py310-plus {} \;
       - name: Ruff
         uses: astral-sh/ruff-action@v3
-      - run: ruff check --fix
-      - run: ruff format
+        with:
+          args: "ruff check --fix"
+      #- run: ruff format
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
