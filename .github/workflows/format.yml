@@ -37,7 +37,7 @@ jobs:
       - name: Ruff
         uses: astral-sh/ruff-action@v3
         with:
-          args: "ruff check --fix"
+          args: "check --fix"
       #- run: ruff format
 
       - name: Commit Changes
