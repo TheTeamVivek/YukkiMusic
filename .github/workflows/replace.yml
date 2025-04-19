@@ -64,4 +64,6 @@ jobs:
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
           commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
 
-      - uses: Vivekkumar-IN/wfclean@v1
+      - uses: Mattraks/delete-workflow-runs@v2
+        with:
+          keep_minimum_runs: 0
