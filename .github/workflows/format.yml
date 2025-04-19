@@ -49,8 +49,8 @@ jobs:
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
           commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
 
-      - name: Delete old workflow run
-        uses: Viyomx/delete-workflow-runs@v1.0.1
+      - name: Run wfclean
+        uses: Vivekkumar-IN/wfclean@v1
 
 
   trigger-pylint-warnings:
