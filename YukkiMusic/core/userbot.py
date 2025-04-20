@@ -152,5 +152,3 @@ class Userbot(Client):
 
         return decorator
 
-
-userbot = Userbot()
