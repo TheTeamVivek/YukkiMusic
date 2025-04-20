@@ -6,10 +6,8 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-#
 
 import asyncio
-import shlex
 
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
@@ -21,11 +19,10 @@ from ..logging import LOGGER
 loop = asyncio.get_event_loop_policy().get_event_loop()
 
 
-def install_req(cmd: str) -> tuple[str, str, int, int]:
+def install_req() -> tuple[str, str, int, int]:
     async def install_requirements():
-        args = shlex.split(cmd)
-        process = await asyncio.create_subprocess_exec(
-            *args,
+        process = await asyncio.create_subprocess_shell(
+            "uv pip install --no-cache-dir -r requirements.txt",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
@@ -41,25 +38,24 @@ def install_req(cmd: str) -> tuple[str, str, int, int]:
 
 
 def git():
-    REPO_LINK = config.UPSTREAM_REPO
     if config.GIT_TOKEN:
-        GIT_USERNAME = REPO_LINK.split("com/")[1].split("/")[0]
-        TEMP_REPO = REPO_LINK.split("https://")[1]
-        UPSTREAM_REPO = f"https://{GIT_USERNAME}:{config.GIT_TOKEN}@{TEMP_REPO}"
+        git_username = config.UPSTREAM_REPO.split("com/")[1].split("/")[0]
+        temp_repo = config.UPSTREAM_REPO.split("https://")[1]
+        upstream_repo = f"https://{git_username}:{config.GIT_TOKEN}@{temp_repo}"
     else:
-        UPSTREAM_REPO = config.UPSTREAM_REPO
+        upstream_repo = config.UPSTREAM_REPO
 
     try:
         repo = Repo()
-        LOGGER(__name__).info(f"Git Client Found [VPS DEPLOYER]")
+        LOGGER(__name__).info("Git Client Found [VPS DEPLOYER]")
     except GitCommandError:
-        LOGGER(__name__).info(f"Invalid Git Command")
+        LOGGER(__name__).info("Invalid Git Command")
     except InvalidGitRepositoryError:
         repo = Repo.init()
         if "origin" in repo.remotes:
             origin = repo.remote("origin")
         else:
-            origin = repo.create_remote("origin", UPSTREAM_REPO)
+            origin = repo.create_remote("origin", upstream_repo)
         origin.fetch()
         repo.create_head(
             config.UPSTREAM_BRANCH,
@@ -78,20 +74,9 @@ def git():
     nrs = repo.remote("origin")
     nrs.fetch(config.UPSTREAM_BRANCH)
 
-    requirements_file = "requirements.txt"
-    diff_index = repo.head.commit.diff("FETCH_HEAD")
-
-    requirements_updated = any(
-        diff.a_path == requirements_file or diff.b_path == requirements_file
-        for diff in diff_index
-    )
-
     try:
         nrs.pull(config.UPSTREAM_BRANCH)
     except GitCommandError:
         repo.git.reset("--hard", "FETCH_HEAD")
-
-    if requirements_updated:
-        install_req("pip3 install --no-cache-dir -r requirements.txt")
-
+    install_req()
     LOGGER(__name__).info(f"Fetched Updates from: {REPO_LINK}")
