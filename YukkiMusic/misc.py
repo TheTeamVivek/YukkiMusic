@@ -6,7 +6,6 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-import asyncio
 import socket
 import time
 
@@ -21,14 +20,12 @@ db = {}
 HAPP = None
 _boot_ = time.time()
 
-loop = asyncio.get_event_loop()
-
 
 def is_heroku():
     return "heroku" in socket.getfqdn()
 
 
-async def _sudo():
+async def sudo():
     if config.MONGO_DB_URI is None:
         for user_id in config.OWNER_ID:
             config.SUDOERS.add(user_id)
@@ -50,9 +47,6 @@ async def _sudo():
                 config.SUDOERS.add(x)
 
     logger(__name__).info("Sudoers Loaded.")
-
-
-loop.run_until_complete(_sudo())
 
 if is_heroku():
     if config.HEROKU_API_KEY and config.HEROKU_APP_NAME:
