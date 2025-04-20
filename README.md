@@ -26,7 +26,12 @@ Get started quickly by deploying to Heroku with just one click:
 
   - Clone the Repository: `git clone https://github.com/TheTeamVivek/YukkiMusic && cd YukkiMusic`
 
-  - Install Python Requirements: `pip install -r requirements.txt`
+  - Install Python Requirements:
+  ```bash
+  pip install uv
+  uv self update
+  uv pip install --upgrade setuptools wheel
+  uv pip install -r requirements.txt```
 
   - Copy and Edit Environment Variables:
 
