@@ -15,7 +15,7 @@ from YukkiMusic.core.bot import YukkiBot
 from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
 from YukkiMusic.core.telethon import TelethonClient
-from YukkiMusic.core.userbot import userbot
+from YukkiMusic.core.userbot import Userbot
 
 from .logging import logger
 
@@ -37,6 +37,8 @@ tbot = TelethonClient(
     api_hash=config.API_HASH,
     flood_sleep_threshold=240,
 )
+
+userbot = Userbot()
 
 # Directories
 dirr()
