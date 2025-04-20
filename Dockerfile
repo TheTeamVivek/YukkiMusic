@@ -8,7 +8,8 @@ WORKDIR /app
 
 COPY requirements.txt ./
 
-RUN pip install --no-cache-dir --upgrade pip uv && \
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    uv self update && \
     uv pip install --upgrade --system setuptools wheel && \
     uv pip install --system -r requirements.txt
 
