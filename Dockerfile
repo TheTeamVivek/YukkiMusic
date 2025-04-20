@@ -1,4 +1,3 @@
-# Use the official lightweight Python image
 FROM python:3.13-bookworm
 
 RUN apt-get update && \
@@ -8,9 +7,11 @@ RUN apt-get update && \
 WORKDIR /app
 
 COPY requirements.txt ./
-RUN python3 -m pip install --upgrade pip setuptools wheel && \
-    pip3 install --no-cache-dir -r requirements.txt && \
-    rm -rf ~/.cache/pip
+
+RUN pip install --no-cache-dir uv && \
+    uv self update && \
+    uv pip install --upgrade setuptools wheel && \
+    uv pip install -r requirements.txt
 
 COPY . .
 
