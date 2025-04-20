@@ -8,6 +8,7 @@
 # All rights reserved.
 #
 import asyncio
+import logging
 import sys
 import traceback
 from datetime import datetime
@@ -26,12 +27,11 @@ from pyrogram.handlers import MessageHandler
 
 import config
 
-import logging
-
 assistants = []
 assistantids = []
 
 logger = logging.getlogger
+
 
 class Userbot(Client):
     def __init__(self):
@@ -77,9 +77,7 @@ class Userbot(Client):
                 client.add_handler(handler, group)
 
         except Exception as e:
-            logger.error(
-                "Assistant Account {index} failed with error: %s xiting...", e
-            )
+            logger.error("Assistant Account {index} failed with error: %s xiting...", e)
             sys.exit(1)
 
     async def start(self):
@@ -105,9 +103,7 @@ class Userbot(Client):
                 try:
                     await func(client, message)
                 except FloodWait as e:
-                    logger.warning(
-                        "FloodWait: Sleeping for %d seconds.", e.value
-                    )
+                    logger.warning("FloodWait: Sleeping for %d seconds.", e.value)
                     await asyncio.sleep(e.value)
                 except (
                     ChatWriteForbidden,
