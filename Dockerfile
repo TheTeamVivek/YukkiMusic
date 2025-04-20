@@ -8,8 +8,7 @@ WORKDIR /app
 
 COPY requirements.txt ./
 
-RUN pip install --no-cache-dir uv && \
-    uv self update && \
+RUN pip install --no-cache-dir --upgrade pip uv && \
     uv pip install --upgrade setuptools wheel && \
     uv pip install -r requirements.txt
 
