@@ -79,4 +79,4 @@ def git():
     except GitCommandError:
         repo.git.reset("--hard", "FETCH_HEAD")
     install_req()
-    LOGGER(__name__).info(f"Fetched Updates from: {REPO_LINK}")
+    LOGGER(__name__).info(f"Fetched Updates from: {config.UPSTREAM_REPO}")
