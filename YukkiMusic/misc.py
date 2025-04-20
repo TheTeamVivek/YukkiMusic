@@ -48,6 +48,7 @@ async def sudo():
 
     logger(__name__).info("Sudoers Loaded.")
 
+
 if is_heroku():
     if config.HEROKU_API_KEY and config.HEROKU_APP_NAME:
         try:
