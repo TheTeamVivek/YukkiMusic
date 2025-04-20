@@ -28,10 +28,12 @@ Get started quickly by deploying to Heroku with just one click:
 
   - Install Python Requirements:
   ```bash
+
   pip install uv
   uv self update
   uv pip install --upgrade setuptools wheel
-  uv pip install -r requirements.txt```
+  uv pip install -r requirements.txt
+```
 
   - Copy and Edit Environment Variables:
 
