@@ -13,7 +13,7 @@ from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
 from config import BANNED_USERS, fetch_cookies
-from YukkiMusic import app, logger, tbot
+from YukkiMusic import app, logger, tbot, userbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
@@ -28,7 +28,6 @@ async def init():
         logger.warning(
             "No Spotify Vars defined. Your bot won't be able to play spotify queries."
         )
-    from YukkiMusic import userbot
 
     try:
         users = await get_gbanned()
