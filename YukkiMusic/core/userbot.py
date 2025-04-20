@@ -26,11 +26,12 @@ from pyrogram.handlers import MessageHandler
 
 import config
 
-from ..logging import logger
+import logging
 
 assistants = []
 assistantids = []
 
+logger = logging.getlogger
 
 class Userbot(Client):
     def __init__(self):
@@ -46,7 +47,7 @@ class Userbot(Client):
         self.handlers = []
 
     async def _start(self, client, index):
-        logger(__name__).info("Starting Assistant Client %d", index)
+        logger.info("Starting Assistant Client %d", index)
         try:
             await client.start()
             assistants.append(index)
@@ -57,7 +58,7 @@ class Userbot(Client):
                     await client.join_chat(config.LOG_GROUP_ID)
                     await client.send_message(config.LOG_GROUP_ID, "Assistant Started")
                 except Exception:
-                    logger(__name__).error(
+                    logger.error(
                         "Assistant Account %d failed to send message in log group. "
                         "Ensure the assistant is added to the log group.",
                         index,
@@ -76,7 +77,7 @@ class Userbot(Client):
                 client.add_handler(handler, group)
 
         except Exception as e:
-            logger(__name__).error(
+            logger.error(
                 "Assistant Account {index} failed with error: %s xiting...", e
             )
             sys.exit(1)
@@ -104,7 +105,7 @@ class Userbot(Client):
                 try:
                     await func(client, message)
                 except FloodWait as e:
-                    logger(__name__).warning(
+                    logger.warning(
                         "FloodWait: Sleeping for %d seconds.", e.value
                     )
                     await asyncio.sleep(e.value)
