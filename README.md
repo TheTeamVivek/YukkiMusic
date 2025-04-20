@@ -29,6 +29,13 @@ Get started quickly by deploying to Heroku with just one click:
   uv self update
   ```
 
+
+- Clone the Repository:  
+  ```bash
+  git clone https://github.com/TheTeamVivek/YukkiMusic && cd YukkiMusic
+  ```
+  
+
 - Create the Virtual Environment:  
   ```bash
   uv venv
@@ -39,11 +46,6 @@ Get started quickly by deploying to Heroku with just one click:
   source .venv/bin/activate
   ```
 
-- Clone the Repository:  
-  ```bash
-  git clone https://github.com/TheTeamVivek/YukkiMusic && cd YukkiMusic
-  ```
-  
 - Install Python Requirements:  
   ```bash
   uv pip install --upgrade setuptools wheel
