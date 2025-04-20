@@ -1,8 +1,10 @@
 FROM python:3.13-bookworm
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg git && \
+    apt-get install -y --no-install-recommends ffmpeg git curl && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/root/.local/bin:${PATH}"
 
 WORKDIR /app
 
