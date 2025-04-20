@@ -21,7 +21,7 @@ db = {}
 HAPP = None
 _boot_ = time.time()
 
-loop = asyncio.get_event_loop_policy().get_event_loop()
+loop = asyncio.get_event_loop()
 
 
 def is_heroku():
