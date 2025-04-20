@@ -21,8 +21,8 @@ loop = asyncio.get_event_loop_policy().get_event_loop()
 
 def install_req() -> tuple[str, str, int, int]:
     async def install_requirements():
-        process = await asyncio.create_subprocess_exec(
-            "pip3 install --no-cache-dir -r requirements.txt",
+        process = await asyncio.create_subprocess_shell(
+            "uv pip install --no-cache-dir -r requirements.txt",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
