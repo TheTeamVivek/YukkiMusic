@@ -1,6 +1,6 @@
 
 async-lru==2.0.5
-aiohttp==3.11.16
+aiohttp==3.11.18
 beautifulsoup4==4.13.4
 dnspython==2.7.0
 ffmpeg-python==0.2.0
