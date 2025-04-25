@@ -284,11 +284,13 @@ def add_to_clean(chat_id, msg_id):
 
 
 def time_to_seconds(time):
-    stringt = str(time)
-    return sum(
-        int(x) * 60**i for i, x in enumerate(reversed(stringt.split(":")))
-    )  # TODO: Make it multiline
-
+    parts = str(time).split(":")
+    reversed_parts = reversed(parts)
+    total_seconds = sum(
+        int(x) * 60**i
+        for i, x in enumerate(reversed_parts)
+    )
+    return total_seconds
 
 def seconds_to_time(seconds):
     minutes = seconds // 60
