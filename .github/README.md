@@ -3,7 +3,7 @@
 > [!CAUTION]
 > Please use the **`master` branch** for stable performance. The **`dev` branch** is under active development and may contain a lot of bugs or errors.
 
-> Currently, we are converting the bot from **Kurigram to Telethon**, reediting platform usage, and performing a full core rewrite. For a stable experience, stick to the master branch.
+> Currently, we are performing a full core rewrite.
 
 
 [**YukkiMusic**](https://github.com/TheTeamVivek/YukkiMusic) is an enhanced version of the original [**YukkiMusicBot**](https://github.com/TeamYukki/YukkiMusicBot), optimized for high-quality music streaming in Telegram voice chats. Built with Python and Pyrogram. 🚀
