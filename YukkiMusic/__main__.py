@@ -29,7 +29,7 @@ async def init():
         return
     if not config.SPOTIFY_CLIENcT_ID and not config.SPOTIFY_CLIENT_SECRET:
         logger.warning(
-            "No Spotify Vars defined." "Your bot won't be able to play spotify queries."
+            "No Spotify Vars defined.Your bot won't be able to play spotify queries."
         )
 
     try:
@@ -56,9 +56,7 @@ async def init():
             "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
         )
     except NoActiveGroupCall:
-        logger.error(
-            "Please ensure there are a voice call," "In your log group active."
-        )
+        logger.error("Please ensure there are a voice call,In your log group active.")
         sys.exit()
     logger.info("YukkiMusic Started Successfully")
     tbot.run_until_disconnected()

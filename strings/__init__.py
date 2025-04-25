@@ -73,7 +73,7 @@ for filename in os.listdir(r"./strings/langs/"):
         try:
             languages_present[lang_name] = languages[lang_name]["name"]
         except KeyError:
-            print("There is an issue with the language file." "Please report it.")
+            print("There is an issue with the language file.Please report it.")
             sys.exit()
 
         languages[lang_name] = update_helpers(languages[lang_name])

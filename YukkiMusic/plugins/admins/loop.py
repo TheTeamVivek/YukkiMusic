@@ -21,7 +21,6 @@ from YukkiMusic.utils.decorators import admin_rights_check
 )
 @admin_rights_check
 async def admins(event, _, chat_id):
-
     if len(event.text.split()) != 2:
         return await event.reply(_["admin_25"])
     state = event.text.split(None, 1)[1].strip()

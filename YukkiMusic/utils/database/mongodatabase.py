@@ -243,7 +243,6 @@ async def delete_authuser(chat_id: int, name: str) -> bool:
 async def get_gbanned() -> list:
     if not _cache["gbanned"]:
         async for user in gbansdb.find({"user_id": {"$gt": 0}}):
-
             _cache["gbanned"].append(user["user_id"])
     return _cache["gbanned"].copy()
 
@@ -256,13 +255,11 @@ async def is_gbanned_user(user_id: int) -> bool:
 
 async def add_gban_user(user_id: int):
     if not await is_gbanned_user(user_id):
-
         await gbansdb.insert_one({"user_id": user_id})
         _cache["gbanned"].append(user_id)
 
 
 async def remove_gban_user(user_id: int):
-
     if await is_gbanned_user(user_id):
         await gbansdb.delete_one({"user_id": user_id})
         _cache["gbanned"].remove(user_id)
@@ -274,7 +271,6 @@ async def remove_gban_user(user_id: int):
 async def get_banned_users() -> list:
     if not _cache["banned"]:
         async for user in blockeddb.find({"user_id": {"$gt": 0}}):
-
             _cache["banned"].append(user["user_id"])
     return _cache["banned"].copy()
 
@@ -291,13 +287,11 @@ async def is_banned_user(user_id: int) -> bool:
 
 async def add_banned_user(user_id: int):
     if not await is_banned_user(user_id):
-
         await blockeddb.insert_one({"user_id": user_id})
         _cache["banned"].append(user_id)
 
 
 async def remove_banned_user(user_id: int):
-
     if await is_banned_user(user_id):
         await blockeddb.delete_one({"user_id": user_id})
         _cache["banned"].remove(user_id)
