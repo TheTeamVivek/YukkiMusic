@@ -44,5 +44,7 @@ async def valid(url: str) -> SourceType:
 
 async def info(
     type: SourceType, **kwargs
-) -> dict:  # todo implement all classes and there info function in this function using SourceType and **kwargs
+) -> (
+    dict
+):  # todo implement all classes and there info function in this function using SourceType and **kwargs
     pass

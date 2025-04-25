@@ -64,8 +64,8 @@ if "en" not in languages:
 for filename in os.listdir(r"./strings/langs/"):
     if filename.endswith(".yml") and filename != "en.yml":
         lang_name = filename[:-4]
-        languages[lang_name] = load_yaml(os.path.join(r"./strings/langs/", filename))
-
+        lang_path = os.path.join(r"./strings/langs/", filename)
+        languages[lang_name] = load_yaml(lang_path)
         for key in languages["en"]:
             if key not in languages[lang_name]:
                 languages[lang_name][key] = languages["en"][key]
@@ -73,7 +73,7 @@ for filename in os.listdir(r"./strings/langs/"):
         try:
             languages_present[lang_name] = languages[lang_name]["name"]
         except KeyError:
-            print("There is an issue with the language file. Please report it.")
+            print("There is an issue with the language file." "Please report it.")
             sys.exit()
 
         languages[lang_name] = update_helpers(languages[lang_name])

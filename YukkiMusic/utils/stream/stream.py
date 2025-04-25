@@ -9,7 +9,6 @@
 #
 
 import os
-from random import randint
 
 import config
 from strings import get_string
@@ -19,7 +18,11 @@ from YukkiMusic.core.enum import SourceType
 from YukkiMusic.core.youtube import Track
 from YukkiMusic.misc import db
 from YukkiMusic.platforms import carbon, youtube
-from YukkiMusic.utils.database import get_lang, is_active_chat, is_video_allowed
+from YukkiMusic.utils.database import (
+    get_lang,
+    is_active_chat,
+    is_video_allowed,
+)
 from YukkiMusic.utils.exceptions import AssistantErr
 from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline.play import play_markup
@@ -33,11 +36,9 @@ async def stream(
     chat_id: int,
     original_chat_id,
     *,
-    track: (
-        Track | list[Track] | list[str]
-    ),  # NOTE: If THE TRACK IS PLAYLIST SO FIRST ELEMENT MUST BE instance OF Track OTHER CAN REMAIN ALSO Track OR vidid IF Internal Source IS YOUTUBE ELSE SONG NAME
+    track: Track | list[Track] | list[str],
     user_id: int,
-    forceplay: bool | None = None,
+    forceplay: bool = False,
 ):
     language = await get_lang(original_chat_id)
     _ = get_string(language)
@@ -52,13 +53,15 @@ async def stream(
     if forceplay:
         await Yukki.force_stop_stream(chat_id)
 
-    if isinstance(track, list):
+    if isinstance(track, list):  # PLAYLIST
         msg = f"{_['playlist_16']}\n\n"
         count = 0
         track = track[: config.PLAYLIST_FETCH_LIMIT]
 
         for song in track:
-            if not isinstance(song, Track):
+            if not isinstance(song, Track):  # FOR YOUTUBE FIRST ELEMET IS TRACK
+                # AND OTHER IS VIDID AND FOR OTHER
+                # FIRST ELEMENT IS TRACK AND OTHER IS SONG NAME
                 q = (
                     youtube.base + song
                     if track[0].streamtype == SourceType.YOUTUBE
@@ -101,12 +104,14 @@ async def stream(
                 )
                 img = await gen_thumb(track.vidid, track.thumb)
                 what, button = play_markup(_, chat_id, track)
+                li = (f"https://t.me/{tbot.username}?start=info_{song.vidid}",)
+
                 run = await tbot.send_file(
                     original_chat_id,
                     file=img,
                     caption=_["stream_1"].format(
                         song.title[:27],
-                        f"https://t.me/{tbot.username}?start=info_{song.vidid}",
+                        li,
                         seconds_to_min(song.duration),
                         user_mention,
                     ),
@@ -123,7 +128,7 @@ async def stream(
                 car = os.linesep.join(msg.split(os.linesep)[:17])
             else:
                 car = msg
-            carbon = await carbon.generate(car, randint(100, 10000000))
+            carbon = await carbon.generate(car)
             upl = close_markup(_)
             return await tbot.send_file(
                 original_chat_id,

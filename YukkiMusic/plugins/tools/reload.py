@@ -10,7 +10,6 @@
 
 
 from pyrogram.enums import ChatMembersFilter
-from pyrogram.types import Message
 
 from config import BANNED_USERS, adminlist
 from YukkiMusic import tbot
@@ -20,12 +19,10 @@ from YukkiMusic.utils.formatters import alpha_to_int
 
 
 @tbot.on_message(
-    flt.command("RELOAD_COMMAND", use_strings=True)
-    & flt.group
-    & ~flt.user(BANNED_USERS)
+    flt.command("RELOAD_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
 )
 @language
-async def reload_admin_cache(client, message: Message, _):
+async def reload_admin_cache(event, _):
     try:
         chat_id = event.chat_id
         admins = app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS)
@@ -39,6 +36,4 @@ async def reload_admin_cache(client, message: Message, _):
             adminlist[chat_id].append(user_id)
         await event.reply(_["admin_20"])
     except Exception:
-        await event.reply(
-            "Failed to reload admincache make sure bot is an admin in your chat"
-        )
+        await event.reply(_["admin_21"])

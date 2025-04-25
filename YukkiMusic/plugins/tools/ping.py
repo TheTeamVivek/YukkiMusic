@@ -17,9 +17,7 @@ from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline import support_group_markup
 
 
-@tbot.on_message(
-    flt.command("PING_COMMAND", use_strings=True) & ~flt.user(list(BANNED_USERS))
-)
+@tbot.on_message(flt.command("PING_COMMAND", True) & ~BANNED_USERS)
 @language
 async def ping_com(event, _):
     response = await event.reply(

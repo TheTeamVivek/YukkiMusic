@@ -21,8 +21,8 @@ from YukkiMusic.utils.decorators import admin_rights_check
 )
 @admin_rights_check
 async def resume_com(event, _, chat_id):
-    if not len(event.text.split()) == 1:
-        return await event.reply(_["general_2"])
+    # if not len(event.text.split()) == 1:
+    #    return await event.reply(_["general_2"])
     if await is_music_playing(chat_id):
         return await event.reply(_["admin_3"])
     await music_on(chat_id)

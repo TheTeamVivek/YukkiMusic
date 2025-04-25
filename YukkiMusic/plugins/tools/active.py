@@ -7,28 +7,20 @@
 #
 # All rights reserved.
 #
+
+import config
 from YukkiMusic import tbot
-from YukkiMusic.misc import db
+from YukkiMusic.core.decorators.language import language
 from YukkiMusic.utils.database.memorydatabase import (
     get_active_chats,
     get_active_video_chats,
-    remove_active_chat,
-    remove_active_video_chat,
 )
 
 
-# Function for removing the Active voice and video chat also clear the db dictionary for the chat
-async def _clear_(chat_id):
-    db[chat_id] = []
-    await remove_active_video_chat(chat_id)
-    await remove_active_chat(chat_id)
-
-
-@tbot.on_message(
-    flt.command("ACTIVEVC_COMMAND", use_strings=True) & flt.user(list(BANNED_USERS))
-)
-async def active_audio(event):
-    mystic = await event.reply("Getting Active Voicechats....\nPlease hold on")
+@tbot.on_message(flt.command("ACTIVEVC_COMMAND", True) & config.SUDOERS)
+@language(no_check=True)
+async def active_audio(event, _):
+    mystic = await event.reply(_["ac_1"])
     served_chats = await get_active_chats()
     text = ""
     j = 0
@@ -45,22 +37,21 @@ async def active_audio(event):
             j += 1
         except ValueError as e:
             await tbot.handle_error(e)  # Just for verifying the error
-            # await _clear_(x)
+            # await clear(x)
             continue
     if not text:
-        await mystic.edit("No active Chats Found")
+        await mystic.edit(_["ac_2"])
     else:
         await mystic.edit(
-            f"**Active Voice Chat's:-**\n\n{text}",
+            _["ac_3"] + text,
             link_preview=False,
         )
 
 
-@tbot.on_message(
-    flt.command("ACTIVEVIDEO_COMMAND", use_strings=True) & flt.user(list(BANNED_USERS))
-)
-async def active_video(event):
-    mystic = await event.reply("Getting Active Voicechats....\nPlease hold on")
+@tbot.on_message(flt.command("ACTIVEVIDEO_COMMAND", True) & config.SUDOERS)
+@language(no_check=True)
+async def active_video(event, _):
+    mystic = await event.reply(_["ac_1"])
     served_chats = await get_active_video_chats()
     text = ""
     j = 0
@@ -74,22 +65,21 @@ async def active_video(event):
                 text += f"**{j + 1}. {title}** [`{x}`]\n"
             j += 1
         except ValueError:
-            #  await _clear_(x)
+            #  await clear(x)
             continue
     if not text:
-        await mystic.edit("No active Chats Found")
+        await mystic.edit(_["ac_2"])
     else:
         await mystic.edit(
-            f"**Active Video Chat's:-**\n\n{text}",
+            _["ac_3"] + text,
             link_preview=False,
         )
 
 
-@tbot.on_message(
-    flt.command("AC_COMMAND", use_strings=True) & flt.user(list(BANNED_USERS))
-)
-async def ac_counts(event):
+@tbot.on_message(flt.command("AC_COMMAND", True) & config.SUDOERS)
+@language(no_check=True)
+async def ac_counts(event, _):
     ac_audio = len(await get_active_chats())
     ac_video = len(await get_active_video_chats())
-    total_audio = int(ac_audio - ac_video)
-    await event.reply(f"Active Chats info:\nAudio: {total_audio}\nVideo: {ac_video}")
+    total_audio = ac_audio - ac_video
+    await event.reply(_["ac_4"].format(total_audio, ac_video))

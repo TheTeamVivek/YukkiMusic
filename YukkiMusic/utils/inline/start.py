@@ -10,8 +10,8 @@
 
 from telethon import Button
 
-from config import GITHUB_REPO, SUPPORT_CHANNEL, SUPPORT_GROUP
-from YukkiMusic import app
+import config
+from YukkiMusic import tbot
 
 
 def start_pannel(_):
@@ -19,40 +19,40 @@ def start_pannel(_):
         [
             Button.url(
                 text=_["S_B_1"],
-                url=f"https://t.me/{app.username}?start=help",
+                url=f"https://t.me/{tbot.username}?start=help",
             ),
             Button.inline(text=_["S_B_2"], data="settings_helper"),
         ],
     ]
-    if SUPPORT_CHANNEL and SUPPORT_GROUP:
+    if config.SUPPORT_CHANNEL and config.SUPPORT_GROUP:
         buttons.append(
             [
-                Button.url(text=_["S_B_4"], url=f"{SUPPORT_CHANNEL}"),
-                Button.url(text=_["S_B_3"], url=f"{SUPPORT_GROUP}"),
+                Button.url(text=_["S_B_4"], url=config.SUPPORT_CHANNEL),
+                Button.url(text=_["S_B_3"], url=config.SUPPORT_GROUP),
             ]
         )
     else:
-        if SUPPORT_CHANNEL:
-            buttons.append([Button.url(text=_["S_B_4"], url=f"{SUPPORT_CHANNEL}")])
-        if SUPPORT_GROUP:
-            buttons.append([Button.url(text=_["S_B_3"], url=f"{SUPPORT_GROUP}")])
+        if config.SUPPORT_CHANNEL:
+            buttons.append([Button.url(text=_["S_B_4"], url=config.SUPPORT_CHANNEL)])
+        if config.SUPPORT_GROUP:
+            buttons.append([Button.url(text=_["S_B_3"], url=config.SUPPORT_GROUP)])
     return buttons
 
 
 def private_panel(_, owner: bool | int = None):
     buttons = [[Button.inline(text=_["S_B_8"], data="settings_back_helper")]]
-    if SUPPORT_CHANNEL and SUPPORT_GROUP:
+    if config.SUPPORT_CHANNEL and config.SUPPORT_GROUP:
         buttons.append(
             [
-                Button.url(text=_["S_B_4"], url=f"{SUPPORT_CHANNEL}"),
-                Button.url(text=_["S_B_3"], url=f"{SUPPORT_GROUP}"),
+                Button.url(text=_["S_B_4"], url=config.SUPPORT_CHANNEL),
+                Button.url(text=_["S_B_3"], url=config.SUPPORT_GROUP),
             ]
         )
     else:
-        if SUPPORT_CHANNEL:
-            buttons.append([Button.url(text=_["S_B_4"], url=f"{SUPPORT_CHANNEL}")])
-        if SUPPORT_GROUP:
-            buttons.append([Button.url(text=_["S_B_3"], url=f"{SUPPORT_GROUP}")])
+        if config.SUPPORT_CHANNEL:
+            buttons.append([Button.url(text=_["S_B_4"], url=config.SUPPORT_CHANNEL)])
+        if config.SUPPORT_GROUP:
+            buttons.append([Button.url(text=_["S_B_3"], url=config.SUPPORT_GROUP)])
     buttons.append(
         [
             Button.url(
@@ -61,18 +61,18 @@ def private_panel(_, owner: bool | int = None):
             )
         ]
     )
-    if GITHUB_REPO and owner:
+    if config.GITHUB_REPO and owner:
         buttons.append(
             [
                 Button.url(text=_["S_B_7"], url=f"tg://user?id={owner}"),
-                Button.url(text=_["S_B_6"], url=f"{GITHUB_REPO}"),
+                Button.url(text=_["S_B_6"], url=config.GITHUB_REPO),
             ]
         )
     else:
-        if GITHUB_REPO:
+        if config.GITHUB_REPO:
             buttons.append(
                 [
-                    Button.url(text=_["S_B_6"], url=f"{GITHUB_REPO}"),
+                    Button.url(text=_["S_B_6"], url=config.GITHUB_REPO),
                 ]
             )
 

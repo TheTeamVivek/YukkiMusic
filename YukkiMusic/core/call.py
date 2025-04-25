@@ -7,6 +7,7 @@
 #
 # All rights reserved.
 #
+
 import asyncio
 import logging
 
@@ -60,14 +61,8 @@ from YukkiMusic.utils.thumbnails import gen_thumb
 links = {}
 logger = logging.getLogger(__name__)
 
-"""
-call_11: "**No Active Voice Chat Found**\n\nPlease make sure group's voice chat is enabled. If already enabled, please end it and start fresh voice chat again and if the problem continues, try /reboot"
-call_12: "**ASSISTANT IS ALREADY IN VOICECHAT** \n\nMusic bot system detected that assistant is already in the voicechat, if the problem continues restart the videochat and try again."
-call_13: "**TELEGRAM SERVER ERROR**\n\nPlease restart Your voicechat."
-"""
 
-
-async def _clear_(chat_id):
+async def clear(chat_id):
     try:
         popped = db.pop(chat_id, None)
         if popped:
@@ -109,7 +104,7 @@ class Call:
     async def stop_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         try:
-            await _clear_(chat_id)
+            await clear(chat_id)
             await assistant.leave_call(chat_id)
         except Exception:
             pass
@@ -358,9 +353,7 @@ class Call:
             user = check[0]["by"]
             original_chat_id = check[0]["chat_id"]
             videoid = track.vidid
-
-            thumb = track.thumb  # MAKE SURE THT THUMB IS PROVIDED FOR M3U8 URLS
-
+            thumb = track.thumb
             check[0]["played"] = 0
             url = (
                 f"https://t.me/{tbot.username}?start=info_{videoid}"

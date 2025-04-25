@@ -21,11 +21,11 @@ from YukkiMusic.utils.decorators import admin_rights_check
 )
 @admin_rights_check
 async def admins(event, _, chat_id):
-    usage = _["admin_24"]
+
     if len(event.text.split()) != 2:
-        return await event.reply(usage)
+        return await event.reply(_["admin_25"])
     state = event.text.split(None, 1)[1].strip()
-    await event.get_sender()
+    sender = await event.get_sender()
     if state.isnumeric():
         state = int(state)
         if 1 <= state <= 10:
@@ -35,16 +35,17 @@ async def admins(event, _, chat_id):
             if int(state) > 10:
                 state = 10
             await set_loop(chat_id, state)
-            return await event.reply(
-                _["admin_25"].format(event.sender.first_name, state)
-            )
+            return await event.reply(_["admin_26"].format(sender.first_name, state))
         else:
-            return await event.reply(_["admin_26"])
-    elif state.lower() == "enable":
+            return await event.reply(_["admin_27"])
+
+    elif any(state.lower() == key for key in await get_value(chat_id, "enable")):
         await set_loop(chat_id, 10)
-        return await event.reply(_["admin_25"].format(event.sender.first_name, 10))
-    elif state.lower() == "disable":
+        return await event.reply(_["admin_26"].format(sender.first_name, 10))
+
+    elif any(state.lower() == key for key in await get_value(chat_id, "disable")):
         await set_loop(chat_id, 0)
-        return await event.reply(_["admin_27"])
+        return await event.reply(_["admin_29"])
+
     else:
-        return await event.reply(usage)
+        return await event.reply(_["admin_25"])

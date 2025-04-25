@@ -42,7 +42,7 @@ def get_duration(playing):
 @tbot.on_message(flt.command("QUEUE_COMMAND", True) & flt.group & ~BANNED_USERS)
 @language
 async def ping_com(event, _):
-    _, _, is_cplay = parse_flags(event.text, "queue")
+    _, _, is_cplay = await parse_flags(chat_id, event.text)
     if is_cplay:
         chat_id = await get_cmode(event.chat_id)
         if chat_id is None:

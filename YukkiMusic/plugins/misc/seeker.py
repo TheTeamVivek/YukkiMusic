@@ -82,8 +82,7 @@ async def leave_if_muted():
 
 
 async def markup_timer():
-    while True:
-        await asyncio.sleep(2)
+    while not await asyncio.sleep(2):
         active_chats = await get_active_chats()
         for chat_id in active_chats:
             if not await is_music_playing(chat_id):
@@ -111,10 +110,8 @@ async def markup_timer():
                             continue
                         members.append(member)
                 except ValueError:
-                    try:
-                        await Yukki.stop_stream(chat_id)
-                    except Exception:
-                        pass
+                    await Yukki.stop_stream(chat_id)
+
                     continue
 
                 if not members:

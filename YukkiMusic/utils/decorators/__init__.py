@@ -8,6 +8,7 @@
 # All rights reserved.
 #
 
-from .admins import *
+from .admins import actual_admin_cb, admin_actual, admin_rights_check
 from .asyncify import asyncify
-from .language import *
+from .language import language
+from .play import play_wrapper

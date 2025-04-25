@@ -21,7 +21,7 @@ def asyncify(
             return await asyncio.to_thread(pfunc)
         else:
             loop = asyncio.get_running_loop()
-            with executor(max_workers=max_workers) as exec:
-                return await loop.run_in_executor(exec, pfunc)
+            with executor(max_workers=max_workers) as exe:
+                return await loop.run_in_executor(exe, pfunc)
 
     return run

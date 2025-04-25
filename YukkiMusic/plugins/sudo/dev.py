@@ -29,13 +29,13 @@ async def aexec(code, event):
         "__builtins__": __builtins__,  # DON'T REMOVE THIS
         "app": tbot,
         "tbot": tbot,
+        "rmsg": await event.get_reply_message(),
     }
     exec(
         "async def __aexec(event): " + "".join(f"\n {a}" for a in code.split("\n")),
         local_vars,
     )
-    __aexec_func = local_vars["__aexec"]
-    return await __aexec_func(event)
+    return await local_vars["__aexec"](event)
 
 
 @tbot.on(
@@ -64,20 +64,27 @@ async def executor(event):
             exc = traceback.format_exc()
     stdout = redirected_output.getvalue()
     stderr = redirected_error.getvalue()
-    evaluation = "\n"
+    template = "<b>{0}:</b>\n<pre language='python'>{1}</pre>"
+    final_output = "\n"
+    if stdout:
+        final_output += template.format("STDOUTPUT", stdout)
+    if stderr:
+        final_output += template.format("STDERR", stderr)
     if exc:
-        evaluation += exc
-    elif stderr:
-        evaluation += stderr
-    elif stdout:
-        evaluation += stdout
-    else:
-        evaluation += "Success"
-    final_output = f"<b>RESULTS:</b>\n<pre language='python'>{evaluation}</pre>"
+        final_output += template.format("EXCEPTION", exc)
+    final_output = final_output or "Success"
     if len(final_output) > 4096:
         filename = "output.txt"
+        text = ""
+        if stdout:
+            text += "STDOUTPUT\n" + stdout
+        if stderr:
+            text += "STDERR\n" + stderr
+        if exc:
+            text += "EXCEPTION\n" + exc
+
         with open(filename, "w+", encoding="utf8") as out_file:
-            out_file.write(str(evaluation))
+            out_file.write(text)
         t2 = time()
         keyboard = [
             [
@@ -153,14 +160,14 @@ async def shellrunner(event):
     if "\n" in text:
         commands = text.split("\n")
         for cmd in commands:
-            r = await tbot.run(cmd)
+            r = await tbot.run_shell_command(cmd)
             output += f"<b>Command:</b> {cmd}\n"
             if r.stdout:
                 output += f"<b>Output:</b>\n<pre>{r.stdout}</pre>\n"
             if r.stderr:
                 output += f"<b>Error:</b>\n<pre>{r.stderr}</pre>\n"
     else:
-        r = await tbot.run(text)
+        r = await tbot.run_shell_command(text)
         if r.stdout:
             output += f"<b>Output:</b>\n<pre>{r.stdout}</pre>\n"
         if r.stderr:

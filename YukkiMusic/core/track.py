@@ -29,7 +29,7 @@ class Track:
     thumb: str
     duration: int  # duration in seconds
     streamtype: SourceType
-    video: bool  # The song is audio or video
+    video: bool
 
     download_url: str | None = (
         None  # If provided directly used to download instead self.link
@@ -91,25 +91,9 @@ class Track:
     def is_m3u8(self) -> bool:
         return self.streamtype == SourceType.M3U8
 
-    def delete(self):
-        from YukkiMusic.misc import db
-
-        if self.is_youtube and not self.is_live:
-            t = []
-            for _, y in db.items():
-                for element in y:
-                    if track := element.get("track"):
-                        t.append((track.vidid, self.video))
-            if not any(a == self.vidid and b == self.video for a, b in t):
-                try:
-                    os.remove(self.file_path)
-                except Exception:
-                    pass
-                    # TODO: ADD CHECK FOR TELEGRAM FILES AND SAAVN, SOUNDCLOUD, ETC.
-
     async def download(
         self,
-    ):  # TODO: if Download mode is M3U8 so Return tuple of video and audio url
+    ):
         if (
             self.file_path is not None and await self.is_exists()
         ):  # THIS CONDITION FOR TELEGRAM FILES BECAUSE THESE FILES ARE ALREADY DOWNLOADED
@@ -154,7 +138,7 @@ class Track:
             if self.is_m3u8:
                 return self.link or self.download_url
 
-            format_code = "b" if self.video else "bestaudio/best"  # Keep "b" not "best"
+            format_code = "b" if self.video else "bestaudio/best"  #
             command = f'yt-dlp -g -f "{format_code}" {"--cookies " + cookies() if self.is_youtube else ""} "{self.download_url}"'
             process = await asyncio.create_subprocess_shell(
                 command,

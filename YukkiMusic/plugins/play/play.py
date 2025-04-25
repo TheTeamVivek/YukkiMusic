@@ -33,7 +33,6 @@ from YukkiMusic.utils.logger import play_logs
 from YukkiMusic.utils.stream.stream import stream
 
 logger = logging.getLogger(__name__)
-# spotify_1: "This Bot can't play spotify tracks and playlist, please contact my owner and ask him to add Spotify player."
 
 
 @tbot.on_message(flt.command("PLAY_COMMAND", True) & flt.group & ~BANNED_USERS)

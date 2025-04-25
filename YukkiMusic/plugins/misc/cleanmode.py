@@ -9,11 +9,14 @@
 #
 
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from pyrogram.errors import FloodWait
 from telethon import events
-from telethon.tl.types import ChannelParticipantsAdmins, UpdateReadChannelOutbox
+from telethon.tl.types import (
+    ChannelParticipantsAdmins,
+    UpdateReadChannelOutbox,
+)
 
 import config
 from config import adminlist, chatstats, clean, userstats
@@ -45,7 +48,7 @@ async def clean_mode(event):
     global IS_BROADCASTING
     if IS_BROADCASTING:
         return
-    logger.info(update.stringify())
+    logger.info(event.stringify())
     update = event
     if hasattr(event, "users") and event.users:
         return
@@ -57,16 +60,7 @@ async def clean_mode(event):
 
     if not await is_cleanmode_on(chat_id):
         return
-
-    if chat_id not in clean:
-        clean[chat_id] = []
-
-    time_now = datetime.now()
-    put = {
-        "msg_id": message_id,
-        "timer_after": time_now + timedelta(minutes=AUTO_DELETE),
-    }
-    clean[chat_id].append(put)
+    config.add_to_clean(chat_id, message_id)
     await set_queries(1)
 
 

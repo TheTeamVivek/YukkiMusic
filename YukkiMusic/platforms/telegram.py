@@ -25,8 +25,6 @@ from ..utils.formatters import convert_bytes, get_readable_time
 downloader = {}
 
 
-# tg_3: "**{0} Telagram Media Downloader**\n\n**Total file size:** {1}\n**Completed:** {2} \n**Percentage:** {3}%\n\n**Speed:** {4}/s\n**Elapsed Time:** {5}"
-# tg_4: "Sucessfully Downloaded\n Processing File Now..."
 class Telegram:
     def __init__(self):
         self.sleep = 5

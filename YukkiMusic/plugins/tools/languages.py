@@ -3,18 +3,17 @@
 #
 # This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
 # and is released under the MIT License.
-# Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
+# Please see < https://github.com/The TeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
 #
 
-from pykeyboard import InlineKeyboard
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, Message
+from pykeyboard.telethon import InlineKeyboard
+from telethon import Button, events
 
 from config import BANNED_USERS
-from strings import command, get_string, languages_present
-from YukkiMusic import app
+from strings import get_string, languages_present
+from YukkiMusic import tbot
 from YukkiMusic.utils.database import get_lang, set_lang
 from YukkiMusic.utils.decorators import actual_admin_cb, language
 
@@ -26,64 +25,61 @@ def lanuages_keyboard(_):
     keyboard.add(
         *[
             (
-                InlineKeyboardButton(
+                Button.inline(
                     text=value,
-                    callback_data=f"languages:{key}",
+                    data=f"languages:{key}",
                 )
             )
             for key, value in languages_present.items()
         ]
     )
     keyboard.row(
-        InlineKeyboardButton(
+        Button.inline(
             text=_["BACK_BUTTON"],
-            callback_data=f"settingsback_helper",
+            data=f"settingsback_helper",
         ),
-        InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data=f"close"),
+        Button.inline(text=_["CLOSE_BUTTON"], callback_data=f"close"),
     )
     return keyboard
 
 
-@app.on_message(command("LANGUAGE_COMMAND") & filters.group & ~BANNED_USERS)
+@tbot.on_message(flt.command("LANGUAGE_COMMAND", True) & flt.group & ~BANNED_USERS)
 @language
-async def langs_command(client, message: Message, _):
+async def langs_command(event, _):
     keyboard = lanuages_keyboard(_)
+    chat = await event.get_chat()
     await event.reply(
-        _["setting_1"].format(message.chat.title, event.chat_id),
+        _["setting_1"].format(chat.title, event.chat_id),
         buttons=keyboard,
     )
 
 
-@app.on_callback_query(filters.regex("LG") & ~BANNED_USERS)
+@tbot.on(events.CallbackQuery("LG", func=~BANNED_USERS))
 @language
-async def lanuagecb(client, CallbackQuery, _):
+async def lanuagecb(event, _):
     try:
-        await CallbackQuery.answer()
+        await event.answer()
     except Exception:
         pass
     keyboard = lanuages_keyboard(_)
-    return await CallbackQuery.edit_message_reply_markup(buttons=keyboard)
+    return await event.edit(buttons=keyboard)
 
 
-@app.on_callback_query(filters.regex(r"languages:(.*?)") & ~BANNED_USERS)
+@tbot.on(events.CallbackQuery(r"languages:(.*?)", func=~BANNED_USERS))
 @actual_admin_cb
-async def language_markup(client, CallbackQuery, _):
-    langauge = (CallbackQuery.data).split(":")[1]
-    old = await get_lang(CallbackQuery.event.chat_id)
+async def language_markup(event, _):
+    langauge = event.data.decode("utf-8").split(":")[1]
+    old = await get_lang(event.chat_id)
     if str(old) == str(langauge):
-        return await CallbackQuery.answer(
-            "You are already using same language", show_alert=True
-        )
+        return await event.answer(_["lang_1"], alert=True)
     try:
         _ = get_string(langauge)
-        await CallbackQuery.answer(
-            "Your language changed successfully..", show_alert=True
-        )
+        await event.answer(_["lang_2"], alert=True)
     except Exception:
-        return await CallbackQuery.answer(
-            "Failed to change language or language in under Upadte",
-            show_alert=True,
+        return await event.answer(
+            _["lang_3"],
+            alert=True,
         )
-    await set_lang(CallbackQuery.event.chat_id, langauge)
+    await set_lang(event.chat_id, langauge)
     keyboard = lanuages_keyboard(_)
-    return await CallbackQuery.edit_message_reply_markup(buttons=keyboard)
+    return await event.edit(buttons=keyboard)

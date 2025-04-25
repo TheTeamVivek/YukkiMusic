@@ -9,22 +9,30 @@
 #
 
 
-from YukkiMusic.core.mongo import mongodb
+from YukkiMusic.core.mongo import mongodb as _mongodb
 
-queriesdb = mongodb.queries
-userdb = mongodb.userstats
-chattopdb = mongodb.chatstats
-authuserdb = mongodb.authuser
-gbansdb = mongodb.gban
-sudoersdb = mongodb.sudoers
-chatsdb = mongodb.chats
-blacklist_chatdb = mongodb.blacklistChat
-usersdb = mongodb.tgusersdb
-playlistdb = mongodb.playlist
-blockeddb = mongodb.blockedusers
+queriesdb = _mongodb.queries
+userdb = _mongodb.userstats
+chattopdb = _mongodb.chatstats
+authuserdb = _mongodb.authuser
+gbansdb = _mongodb.gban
+sudoersdb = _mongodb.sudoers
+chatsdb = _mongodb.chats
+blacklist_chatdb = _mongodb.blacklistChat
+usersdb = _mongodb.tgusersdb
+playlistdb = _mongodb.playlist
+blockeddb = _mongodb.blockedusers
 privatedb = mongodb.privatechats
 
-playlist = []
+_cache = {
+    "users": [],  # SERVED USERS
+    "chats": [],  # SERVED CHATS
+    "blacklisted_chats": [],  # BLACKLISTED CHATS
+    "gbanned": [],  # GBANNED USERS
+    "banned": [],  # BANNED USERS
+    "private_sc": [],  # PRIVATE SERVED CHATS
+    "sudoers": [],  # SUDOERS
+}
 
 
 async def _agen_to_list(f):
@@ -56,7 +64,7 @@ async def get_playlist(chat_id: int, vidid: str) -> bool | dict:
 
 async def save_playlist(
     chat_id: int, vidid: str, info: dict
-):  # FIXME: MAYBE IF I GUESS RIGHT SO WE DONT NEED TO PROVIDE THE INFO BEACAUSE THIS IS NOT IN USED
+):  # TODO: MAYBE IF I GUESS RIGHT SO WE DONT NEED TO PROVIDE THE INFO BEACAUSE THIS IS NOT IN USED
     _notes = await _get_playlists(chat_id)
     _notes[vidid] = info
     await playlistdb.update_one(
@@ -81,99 +89,112 @@ async def delete_playlist(chat_id: int, name: str) -> bool:
 
 
 async def is_served_user(user_id: int) -> bool:
-    if await usersdb.find_one({"user_id": user_id}):
-        return True
-    return False
+    if not _cache["users"]:
+        _cache["users"] = await get_served_users()
+    return user_id in _cache["users"]
 
 
 async def get_served_users() -> list:
-    return await _agen_to_list(usersdb.find({"user_id": {"$gt": 0}}))
+    if not _cache["users"]:
+        user = usersdb.find({"user_id": {"$gt": 0}})
+        _cache["users"] = await _agen_to_list(user)
+    return _cache["users"].copy()
 
 
 async def add_served_user(user_id: int):
-    if await is_served_user(user_id):
-        return
-    return await usersdb.insert_one({"user_id": user_id})
+    if not await is_served_user(user_id):
+        await usersdb.insert_one({"user_id": user_id})
+        _cache["users"].append(user_id)
 
 
 async def delete_served_user(user_id: int):
-    if not await is_served_user(user_id):
+    if await is_served_user(user_id):
         await usersdb.delete_one({"user_id": user_id})
+        _cache["users"].remove(user_id)
 
 
 # Served Chats
 
 
 async def get_served_chats() -> list:
-    chat = chatsdb.find({"chat_id": {"$lt": 0}})
-    return await _agen_to_list(chat)
+    if not _cache["chats"]:
+        chat = chatsdb.find({"chat_id": {"$lt": 0}})
+        _cache["chats"] = await _agen_to_list(chat)
+    return _cache["chats"].copy()
 
 
 async def is_served_chat(chat_id: int) -> bool:
-    if await chatsdb.find_one({"chat_id": chat_id}):
-        return True
-    return False
+    if not _cache["chats"]:
+        _cache["chats"] = await get_served_chats()
+    return chat_id in _cache["chats"]
 
 
 async def add_served_chat(chat_id: int):
     if not await is_served_chat(chat_id):
-        return await chatsdb.insert_one({"chat_id": chat_id})
+        await chatsdb.insert_one({"chat_id": chat_id})
+        _cache["chats"].append(chat_id)
 
 
 async def delete_served_chat(chat_id: int):
-    await chatsdb.delete_one({"chat_id": chat_id})
+    if await is_served_chat(chat_id):
+        await chatsdb.delete_one({"chat_id": chat_id})
+        _cache["chats"].remove(chat_id)
 
 
 # Blacklisted Chats
 
 
 async def blacklisted_chats() -> list:
-    chats_list = []
-    async for chat in blacklist_chatdb.find({"chat_id": {"$lt": 0}}):
-        chats_list.append(chat["chat_id"])
-    return chats_list
+    if not _cache["blacklisted_chats"]:
+        async for chat in blacklist_chatdb.find({"chat_id": {"$lt": 0}}):
+            _cache["blacklisted_chats"].append(chat["chat_id"])
+    return _cache["blacklisted_chats"].copy()
 
 
-async def blacklist_chat(chat_id: int) -> bool:
-    if not await blacklist_chatdb.find_one({"chat_id": chat_id}):
+async def is_blacklist_chat(chat_id: int) -> bool:
+    if not _cache["blacklisted_chats"]:
+        _cache["blacklisted_chats"] = await blacklisted_chats()
+    return chat_id in _cache["blacklisted_chats"]
+
+
+async def blacklist_chat(chat_id: int):
+    if not await is_blacklist_chat(chat_id):
         await blacklist_chatdb.insert_one({"chat_id": chat_id})
-        return True
-    return False
+        _cache["blacklisted_chats"].append(chat_id)
 
 
-async def whitelist_chat(chat_id: int) -> bool:
-    if await blacklist_chatdb.find_one({"chat_id": chat_id}):
+async def whitelist_chat(chat_id: int):
+    if await is_blacklist_chat(chat_id):
         await blacklist_chatdb.delete_one({"chat_id": chat_id})
-        return True
-    return False
+        _cache["blacklisted_chats"].remove(chat_id)
 
 
 # Private Served Chats
 
 
 async def get_private_served_chats() -> list:
-    chat = privatedb.find({"chat_id": {"$lt": 0}})
-    return await _agen_to_list(chat)
+    if not _cache["private_sc"]:
+        chat = privatedb.find({"chat_id": {"$lt": 0}})
+        _cache["private_sc"] = await _agen_to_list(chat)
+    return _cache["private_sc"].copy()
 
 
 async def is_served_private_chat(chat_id: int) -> bool:
-    if await privatedb.find_one({"chat_id": chat_id}):
-        return True
-    return False
+    if not _cache["private_sc"]:
+        _cache["private_sc"] = await get_private_served_chats()
+    return chat_id in _cache["private_sc"]
 
 
 async def add_private_chat(chat_id: int):
-    is_served = await is_served_private_chat(chat_id)
-    if is_served:
-        return
-    return await privatedb.insert_one({"chat_id": chat_id})
+    if not await is_served_private_chat(chat_id):
+        await privatedb.insert_one({"chat_id": chat_id})
+        _cache["private_sc"].append(chat_id)
 
 
 async def remove_private_chat(chat_id: int):
-    is_served = await is_served_private_chat(chat_id)
-    if not is_served:
-        return
-    return await privatedb.delete_one({"chat_id": chat_id})
+    if await is_served_private_chat(chat_id):
+        await privatedb.delete_one({"chat_id": chat_id})
+        _cache["private_sc"].remove(chat_id)
 
 
 # Auth Users DB
@@ -219,62 +240,94 @@ async def delete_authuser(chat_id: int, name: str) -> bool:
     return False
 
 
-# Blocked Users
-
-
 async def get_gbanned() -> list:
-    results = []
-    async for user in gbansdb.find({"user_id": {"$gt": 0}}):
-        user_id = user["user_id"]
-        results.append(user_id)
-    return results
+    if not _cache["gbanned"]:
+        async for user in gbansdb.find({"user_id": {"$gt": 0}}):
+
+            _cache["gbanned"].append(user["user_id"])
+    return _cache["gbanned"].copy()
 
 
 async def is_gbanned_user(user_id: int) -> bool:
-    user = await gbansdb.find_one({"user_id": user_id})
-    if user:
-        return True
-    return False
+    if not _cache["gbanned"]:
+        _cache["gbanned"] = await get_gbanned()
+    return user_id in _cache["gbanned"]
 
 
 async def add_gban_user(user_id: int):
-    is_gbanned = await is_gbanned_user(user_id)
-    if not is_gbanned:
-        return await gbansdb.insert_one({"user_id": user_id})
+    if not await is_gbanned_user(user_id):
+
+        await gbansdb.insert_one({"user_id": user_id})
+        _cache["gbanned"].append(user_id)
 
 
 async def remove_gban_user(user_id: int):
-    is_gbanned = await is_gbanned_user(user_id)
-    if is_gbanned:
-        return await gbansdb.delete_one({"user_id": user_id})
+
+    if await is_gbanned_user(user_id):
+        await gbansdb.delete_one({"user_id": user_id})
+        _cache["gbanned"].remove(user_id)
+
+
+# banned
+
+
+async def get_banned_users() -> list:
+    if not _cache["banned"]:
+        async for user in blockeddb.find({"user_id": {"$gt": 0}}):
+
+            _cache["banned"].append(user["user_id"])
+    return _cache["banned"].copy()
+
+
+async def get_banned_count() -> int:
+    return len(await get_banned_users())
+
+
+async def is_banned_user(user_id: int) -> bool:
+    if not _cache["banned"]:
+        _cache["banned"] = await get_banned_users()
+    return user_id in _cache["banned"]
+
+
+async def add_banned_user(user_id: int):
+    if not await is_banned_user(user_id):
+
+        await blockeddb.insert_one({"user_id": user_id})
+        _cache["banned"].append(user_id)
+
+
+async def remove_banned_user(user_id: int):
+
+    if await is_banned_user(user_id):
+        await blockeddb.delete_one({"user_id": user_id})
+        _cache["banned"].remove(user_id)
 
 
 # Sudoers
 
 
 async def get_sudoers() -> list:
-    sudoers = await sudoersdb.find_one({"sudo": "sudo"})
-    if not sudoers:
-        return []
-    return sudoers["sudoers"]
+    if not _cache["sudoers"]:
+        sudoers = await sudoersdb.find_one({"sudo": "sudo"})
+        if sudoers:
+            _cache["sudoers"] = sudoers["sudoers"]
+    return _cache["sudoers"].copy()
 
 
 async def add_sudo(user_id: int) -> bool:
-    sudoers = await get_sudoers()
-    sudoers.append(user_id)
-    await sudoersdb.update_one(
-        {"sudo": "sudo"}, {"$set": {"sudoers": sudoers}}, upsert=True
-    )
-    return True
+    if user_id not in await get_sudoers():
+        _cache["sudoers"].append(user_id)
+        await sudoersdb.update_one(
+            {"sudo": "sudo"}, {"$set": {"sudoers": _cache["sudoers"]}}, upsert=True
+        )
 
 
 async def remove_sudo(user_id: int) -> bool:
-    sudoers = await get_sudoers()
-    sudoers.remove(user_id)
-    await sudoersdb.update_one(
-        {"sudo": "sudo"}, {"$set": {"sudoers": sudoers}}, upsert=True
-    )
-    return True
+    if user_id in await get_sudoers():
+        _cache["sudoers"].remove(user_id)
+        await sudoersdb.update_one(
+            {"sudo": "sudo"}, {"$set": {"sudoers": sudoers}}, upsert=True
+        )
 
 
 # Total Queries on bot
@@ -391,39 +444,3 @@ async def get_topp_users() -> dict:
                 total += counts_
         results[user_id] = total
     return results
-
-
-# Gban Users
-
-
-async def get_banned_users() -> list:
-    results = []
-    async for user in blockeddb.find({"user_id": {"$gt": 0}}):
-        user_id = user["user_id"]
-        results.append(user_id)
-    return results
-
-
-async def get_banned_count() -> int:
-    users = blockeddb.find({"user_id": {"$gt": 0}})
-    users = await users.to_list(length=100000)
-    return len(users)
-
-
-async def is_banned_user(user_id: int) -> bool:
-    user = await blockeddb.find_one({"user_id": user_id})
-    if user:
-        return True
-    return False
-
-
-async def add_banned_user(user_id: int):
-    is_gbanned = await is_banned_user(user_id)
-    if not is_gbanned:
-        return await blockeddb.insert_one({"user_id": user_id})
-
-
-async def remove_banned_user(user_id: int):
-    is_gbanned = await is_banned_user(user_id)
-    if is_gbanned:
-        return await blockeddb.delete_one({"user_id": user_id})

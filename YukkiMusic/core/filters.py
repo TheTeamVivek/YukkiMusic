@@ -1,3 +1,13 @@
+#
+# Copyright (C) 2024-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+#
+# This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
+# and is released under the MIT License.
+# Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
+#
+# All rights reserved.
+#
+
 import asyncio
 import inspect
 import re
@@ -67,7 +77,7 @@ def forwarded(e):
 
 
 @wrap
-def new_chat_members(event):  # May be only useable in events.ChatAction
+def new_chat_members(event):  # May be only usable in events.ChatAction
     "Member is joined or added in chat"
     return getattr(event, "user_added", False) or getattr(event, "user_joined", False)
 
@@ -107,9 +117,7 @@ class User(set, Filter):
             (
                 "me"
                 if u in ["me", "self"]
-                else u.lower().strip("@")
-                if isinstance(u, str)
-                else u
+                else u.lower().strip("@") if isinstance(u, str) else u
             )
             for u in users
         )
@@ -134,9 +142,7 @@ def command(commands, use_strings=False):
         if not text:
             return False
 
-        username = (
-            event.client.username.lower()
-        )  # Because this event.client is Bot client so username can't be None
+        u = re.escape(event.client.username.lower())
 
         if use_strings:
             lang = await get_lang(event.chat_id)
@@ -144,10 +150,10 @@ def command(commands, use_strings=False):
 
             commands = {
                 lang.get(cmd, cmd) for cmd in commands
-            }  # Get the command from string if use_strings is True if the command is not found on string so use the command
+            }  # Try to get command from lang if not found so use as it.
         commands = {cmd.lower() for cmd in commands}
-        command_pattern = "|".join(map(re.escape, commands))
-        pattern = rf"^(?:/)?({command_pattern})(?:@{re.escape(username)})?(?:\s|$)"
+        cp = "|".join(map(re.escape, commands))
+        pattern = rf"^(?:/)?({cp})(?:@{u})?(?:\s|$)"
 
         return bool(re.match(pattern, text, flags=re.IGNORECASE))
 

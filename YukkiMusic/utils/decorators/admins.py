@@ -15,7 +15,7 @@ from config import adminlist
 from strings import get_string
 from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import (
+from YukkiMusic.utils import (
     get_authuser_names,
     get_cmode,
     get_lang,
@@ -23,6 +23,7 @@ from YukkiMusic.utils.database import (
     is_commanddelete_on,
     is_maintenance,
     is_nonadmin_chat,
+    parse_flags,
 )
 
 from ..formatters import int_to_alpha
@@ -47,13 +48,15 @@ def admin_rights_check(mystic):
             upl = [
                 [
                     Button.inline(
-                        text="How to Fix this? ",
+                        text=_["anon_admin"],
                         data="AnonymousAdmin",
                     ),
                 ]
             ]
             return await event.reply(_["general_4"], buttons=upl)
-        if event.text.split()[0][0] == "c":
+        _, _, cplay = await parse_flags(event.chat_id, event.text)
+
+        if cplay:
             chat_id = await get_cmode(event.chat_id)
             if chat_id is None:
                 return await event.reply(_["setting_12"])
@@ -101,7 +104,7 @@ def admin_actual(mystic):
             upl = [
                 [
                     Button.inline(
-                        text="How to Fix this?",
+                        text=_["anon_admin"],
                         data="AnonymousAdmin",
                     ),
                 ]

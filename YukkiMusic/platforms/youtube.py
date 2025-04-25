@@ -52,15 +52,6 @@ class YouTube(PlatformBase):
     async def valid(self, link: str) -> bool:
         return bool(re.search(self.regex, link))
 
-    @alru_cache(maxsize=None)
-    async def thumbnail(self, link: str, videoid: bool | str = None):
-        if videoid:
-            link = self.base + link
-        if "&" in link:
-            link = link.split("&")[0]
-        results = await self.search(link)
-        return results.thumb
-
     async def video(self, link: str, videoid: bool | str = None):
         if videoid:
             link = self.base + link
@@ -132,7 +123,7 @@ class YouTube(PlatformBase):
             link = link.split("&")[0]
 
         cmd = (
-            f"yt-dlp -i --compat-options no-youtube-unavailable-videos "
+            f"yt-dlp -i --compat-options --no-youtube-unavailable-videos "
             f'--get-id --flat-playlist --playlist-end {limit} --skip-download "{link}" '
             f"2>/dev/null"
         )
@@ -168,7 +159,14 @@ class YouTube(PlatformBase):
                 )
         except Exception:
             logger.info("", exc_info=True)
-            return await YouTube._track_from_ytdlp(url)
+            return await YouTube._track(url)
+
+    @alru_cache(maxsize=None)
+    @staticmethod
+    async def _track(
+        url,
+    ):  # implement getting track with help of oembed url use ytdlp for fallback
+        return YouTube._track_from_ytdlp(url)
 
     @alru_cache(maxsize=None)
     @staticmethod
@@ -199,6 +197,6 @@ class YouTube(PlatformBase):
                 ),
                 duration=details["duration"],
                 thumb=details["thumbnails"][0]["url"],
-                streamtype=SourceType.YOUTUBE,  # KEEP HERE YOUTUBE LATER WE CAN CHANGE IT TO CORRECT SourceType
+                streamtype=SourceType.YOUTUBE,
                 video=None,
             )

@@ -7,6 +7,7 @@
 #
 # All rights reserved.
 #
+
 import asyncio
 import logging
 
@@ -17,7 +18,7 @@ import config
 logger = logging.getLogger(__name__)
 TEMP_MONGODB = "mongodb+srv://TeamVivek:teambackup@teamvivekbackup.7acwn.mongodb.net/?retryWrites=true&w=majority&appName=TeamVivekBackup"  # pylint: disable=line-too-long
 DB_NAME = "Yukki"
-loop = asyncio.get_event_loop_policy().get_event_loop()
+loop = asyncio.get_event_loop()
 
 
 async def _mongo():

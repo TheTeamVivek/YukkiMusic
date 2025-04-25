@@ -104,12 +104,13 @@ def warning_markup(_):
 
 
 def close_markup(_):
-    upl = [
+    """upl = [
         [
             Button.inline(
                 text=_["CLOSE_BUTTON"],
                 data="close",
             ),
         ]
-    ]
+    ]"""
+    upl = Button.inline(text=_["CLOSE_BUTTON"], data="close")
     return upl

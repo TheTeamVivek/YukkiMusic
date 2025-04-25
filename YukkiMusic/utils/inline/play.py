@@ -48,7 +48,7 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
     duration_sec = time_to_seconds(dur)
     percentage = (played_sec / duration_sec) * 100
 
-    status_bar = get_progress_bar(percentage)  # using for getting the bar
+    status_bar = get_progress_bar(percentage)
 
     buttons = [
         [

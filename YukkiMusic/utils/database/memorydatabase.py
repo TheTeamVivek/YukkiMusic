@@ -208,7 +208,7 @@ async def is_cleanmode_on(chat_id: int) -> bool:
 
 
 async def cleanmode_off(chat_id: int):
-    if chat_id in cleanmode:
+    if chat_id not in cleanmode:
         cleanmode.append(chat_id)
 
 
@@ -336,25 +336,25 @@ async def save_video_bitrate(chat_id: int, bitrate: str):
 
 
 async def get_aud_bit_name(chat_id: int) -> str:
-    return audio.get(chat_id, "HIGH")
+    return audio.get(chat_id, "STUDIO")
 
 
 async def get_vid_bit_name(chat_id: int) -> str:
-    return video.get(chat_id, "HD_720p")
+    return video.get(chat_id, "UHD_4K")
 
 
 async def get_audio_bitrate(chat_id: int) -> str:
-    mode = audio.get(chat_id, "MEDIUM")
+    mode = audio.get(chat_id, "STUDIO")
     return {
         "STUDIO": AudioQuality.STUDIO,
         "HIGH": AudioQuality.HIGH,
         "MEDIUM": AudioQuality.MEDIUM,
         "LOW": AudioQuality.LOW,
-    }.get(mode, AudioQuality.MEDIUM)
+    }.get(mode, AudioQuality.STUDIO)
 
 
 async def get_video_bitrate(chat_id: int) -> str:
-    mode = video.get(chat_id, "SD_480p")
+    mode = video.get(chat_id, "UHD_4K")
     return {
         "UHD_4K": VideoQuality.UHD_4K,
         "QHD_2K": VideoQuality.QHD_2K,
@@ -362,4 +362,4 @@ async def get_video_bitrate(chat_id: int) -> str:
         "HD_720p": VideoQuality.HD_720p,
         "SD_480p": VideoQuality.SD_480p,
         "SD_360p": VideoQuality.SD_360p,
-    }.get(mode, VideoQuality.SD_480p)
+    }.get(mode, VideoQuality.UHD_4K)

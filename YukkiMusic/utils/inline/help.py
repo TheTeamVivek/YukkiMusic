@@ -9,19 +9,20 @@
 #
 from telethon import Button
 
-from config import SUPPORT_GROUP
+import config
 from YukkiMusic import tbot
 
 
 def support_group_markup(_):
-    upl = [
+    """upl = [
         [
             Button.url(
                 text=_["S_B_3"],
-                url=SUPPORT_GROUP,
+                url=config.SUPPORT_GROUP,
             ),
         ]
-    ]
+    ]"""
+    upl = Button.url(text=_["S_B_3"], url=config.SUPPORT_GROUP)
     return upl
 
 
@@ -36,7 +37,10 @@ def help_back_markup(_):
 
 
 def private_help_panel(_):
-    buttons = [
+    """buttons = [
         [Button.url(text=_["S_B_1"], url=f"https://t.me/{tbot.username}?start=help")],
-    ]
+    ]"""
+    buttons = Button.url(
+        text=_["S_B_1"], url=f"https://t.me/{tbot.username}?start=help"
+    )
     return buttons

@@ -8,32 +8,18 @@
 # All rights reserved.
 
 # pylint: disable=C0103
-from telethon import TelegramClient
 
-import config
-from YukkiMusic.core.bot import YukkiBot
+import config as _config
 from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
 from YukkiMusic.core.telethon import TelethonClient
 
-from .logging import logger
-
-# Pyrogram Client
-
-app = YukkiBot(
-    "YukkiMusic",
-    api_id=config.API_ID,
-    api_hash=config.API_HASH,
-    bot_token=config.BOT_TOKEN,
-    sleep_threshold=240,
-    max_concurrent_transmissions=5,
-    workers=50,
-)
+# from .logging import logger
 
 tbot = TelethonClient(
     "YukkiMusic",
-    api_id=config.API_ID,
-    api_hash=config.API_HASH,
+    api_id=_config.API_ID,
+    api_hash=_config.API_HASH,
     flood_sleep_threshold=240,
 )
 

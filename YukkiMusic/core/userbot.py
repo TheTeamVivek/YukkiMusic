@@ -7,6 +7,7 @@
 #
 # All rights reserved.
 #
+
 import asyncio
 import logging
 import sys
@@ -40,7 +41,7 @@ class Userbot(Client):
                 f"YukkiString_{i}",
                 api_id=config.API_ID,
                 api_hash=config.API_HASH,
-                session_string=session.strip(),
+                session_string=session,
             )
             for i, session in enumerate(config.STRING_SESSIONS, start=1)
         ]

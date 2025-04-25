@@ -102,8 +102,8 @@ async def skip(event, _, chat_id):
                 return await Yukki.stop_stream(chat_id)
             except Exception:
                 return
-    queued = check[0]["file"]
-    title = (check[0]["title"]).title()
+    track = check[0]["track"]
+    title = track.title
     user = check[0]["by"]
     streamtype = check[0]["streamtype"]
     videoid = check[0]["vidid"]

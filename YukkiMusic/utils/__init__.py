@@ -27,6 +27,20 @@ from .sys import bot_sys_stats
 from .thumbnails import gen_qthumb, gen_thumb
 
 
+async def get_value(chat_id, key) -> list[str]:
+    from strings import get_string
+
+    value = []
+
+    language = await get_lang(chat_id)  # get_lang from .database
+    if language != "en":
+        value.append(get_string(language)[key])
+        value.append(get_string("en")[key])
+    else:
+        value.append(get_string(language)[key])
+    return value
+
+
 async def get_message_link(msg):
     chat = await msg.get_chat()
     if username := chat.username:
@@ -47,34 +61,39 @@ def get_chat_id(entity: types.User | types.Chat | types.Channel) -> int:
     return chat_id
 
 
-def parse_flags(
-    text: str, comm=None
-):  # NOTE: HERE WE ARE USING THE OLD STYLE COMMAND PARSING ALSO LIKE VPLAY, CPLAY, PLAYFORCE BECUAUSE USER'S DIRECTLY CAN'T FORGOT THESE COMMANDS AND UNDERSTAND THE FLAGS
+async def parse_flags(chat_id, text: str):
+    vplay_flag = await get_value(chat_id, "VPLAY_FLAGS")
+    cplay_flag = await get_value(chat_id, "CPLAY_FLAGS")
+    playforce_flag = await get_value(chat_id, "FPLAY_FLAGS")
+
     is_vplay = is_forceplay = is_cplay = False
-    args = text.lstrip("/").split()
-    if comm is None:
-        comm = "play"
+    args = text.lstrip("/").lower().split()
+    comm = args[0]
 
     for arg in args:
-        if arg in ["-v", f"v{comm}"]:
+        if arg in [f"v{comm}", *vplay_flag]:  # /play -v or /vplay
             is_vplay = True
 
-        elif arg in ["-f", f"f{comm}", f"{comm}force"]:
+        elif arg in [
+            f"{comm}",
+            f"{comm}force",
+            *playforce_flag,
+        ]:  # /fplay or /playforce or /play -f
             is_forceplay = True
 
-        elif arg == f"v{comm}force":
+        elif arg == f"v{comm}force":  # /vplayforce the oldstyle
             is_forceplay, is_vplay = True, True
 
-        elif arg in ["-c", f"c{comm}"]:
+        elif arg in [f"c{comm}", *cplay_flag]:  # /cplay
             is_cplay = True
 
-        elif arg == f"cv{comm}":
+        elif arg == f"cv{comm}":  # /cvplay
             is_vplay, is_cplay = True, True
 
-        elif arg == f"cv{comm}force":
+        elif arg == f"cv{comm}force":  # /cvplayforce
             is_vplay, is_cplay, is_forceplay = True, True, True
 
-        elif arg == f"c{comm}force":
+        elif arg == f"c{comm}force":  # /cplayforce
             is_cplay, is_forceplay = True, True
 
     return is_vplay, is_forceplay, is_cplay

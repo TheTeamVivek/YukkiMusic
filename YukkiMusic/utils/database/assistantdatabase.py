@@ -8,32 +8,32 @@
 # All rights reserved.
 #
 
-import random
+import random as _random
 
-from pytgcalls import PyTgCalls
+from pytgcalls import PyTgCalls as _PyTgCalls
 
-from YukkiMusic import userbot
-from YukkiMusic.core.mongo import mongodb
+from YukkiMusic import userbot as _userbot
+from YukkiMusic.core.mongo import mongodb as _mongodb
 from YukkiMusic.core.userbot import assistants
 
-db = mongodb.assistants
+db = _mongodb.assistants
 
 assistantdict = {}
 
 
-async def get_client(assistant: int):
-    clients = userbot.clients
-    if 1 <= assistant <= len(userbot.clients):
-        return clients[assistant - 1]
+async def get_client(index: int):
+    clients = _userbot.clients
+    if 1 <= index <= len(clients):
+        return clients[index - 1]  # -1 Because the index start from 1 not from 0
     return None
 
 
-async def save_assistant(chat_id, number):
-    number = int(number)
-    assistantdict[chat_id] = number
+async def save_assistant(chat_id, index):
+    index = int(index)
+    assistantdict[chat_id] = index
     await db.update_one(
         {"chat_id": chat_id},
-        {"$set": {"assistant": number}},
+        {"$set": {"assistant": index}},
         upsert=True,
     )
     return await get_assistant(chat_id)
@@ -43,12 +43,12 @@ async def set_assistant(chat_id):
     dbassistant = await db.find_one({"chat_id": chat_id})
     current_assistant = dbassistant["assistant"] if dbassistant else None
 
-    available_assistants = [assi for assi in assistants if assi != current_assistant]
+    available_assistants = [ass for ass in assistants if ass != current_assistant]
 
     if len(available_assistants) <= 1:
-        ran_assistant = random.choice(assistants)
+        ran_assistant = _random.choice(assistants)
     else:
-        ran_assistant = random.choice(available_assistants)
+        ran_assistant = _random.choice(available_assistants)
 
     assistantdict[chat_id] = ran_assistant
     await db.update_one(
@@ -87,7 +87,7 @@ async def get_assistant(chat_id: int) -> str:
 
 
 async def set_calls_assistant(chat_id):
-    ran_assistant = random.choice(assistants)
+    ran_assistant = _random.choice(assistants)
     assistantdict[chat_id] = ran_assistant
     await db.update_one(
         {"chat_id": chat_id},
@@ -97,7 +97,7 @@ async def set_calls_assistant(chat_id):
     return ran_assistant
 
 
-async def group_assistant(self, chat_id: int) -> PyTgCalls:
+async def group_assistant(self, chat_id: int) -> _PyTgCalls:
     assistant = assistantdict.get(chat_id)
     if not assistant:
         dbassistant = await db.find_one({"chat_id": chat_id})
@@ -115,9 +115,9 @@ async def group_assistant(self, chat_id: int) -> PyTgCalls:
         else:
             assis = await set_calls_assistant(chat_id)
 
-    assistant_index = int(assis) - 1
+    assistant = await get_client(assis)
 
-    if 0 <= assistant_index < len(self.calls):
-        return self.clients[assistant_index]
+    if assistant:
+        return assistant
     else:
         raise ValueError(f"Assistant index {assistant_index + 1} is out of range.")

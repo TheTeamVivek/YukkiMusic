@@ -15,16 +15,17 @@ from .config import *
 
 
 async def fetch_cookies():
-    if not COOKIE_LINK:
+    if not COOKIE_LINK:  # noqa
         return None
-    paste_id = COOKIE_LINK.split("/")[-1]
+    paste_id = COOKIE_LINK.split("/")[-1]  # noqa
     raw_url = f"https://batbin.me/raw/{paste_id}"
     async with aiohttp.ClientSession() as session:
         async with session.get(raw_url) as response:
             if response.status == 200:
-                raw_content = await response.text()
-                with open("config/cookies/cookies.txt", "w", encoding="utf-8") as file:
-                    file.write(raw_content)
+                rc = await response.text()
+                path = "config/cookies/cookies.txt"
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(rc)
 
                 print("Cookies successfully written")
             else:
@@ -35,7 +36,8 @@ def cookies():
     folder_path = os.path.join(os.getcwd(), "config", "cookies")
     if not os.path.exists(folder_path):
         raise FileNotFoundError(
-            f"The folder '{folder_path}' does not exist. Make sure your cookies folder in config/ "
+            f"The folder '{folder_path}' does not exist."
+            "Make sure your cookies folder in config/ "
         )
 
     txt_files = [file for file in os.listdir(folder_path) if file.endswith(".txt")]

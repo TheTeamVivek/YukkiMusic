@@ -1,0 +1,1 @@
+autoflake -i -r --ignore-init-module-imports --remove-unused-variables --remove-duplicate-keys --remove-all-unused-imports . && black -t py310 . && isort -n --py 310 -m 3 --trailing-comma . 

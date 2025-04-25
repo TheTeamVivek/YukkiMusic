@@ -9,6 +9,7 @@
 
 import re
 import sys
+from datetime import datetime, timedelta
 from os import getenv
 
 from dotenv import load_dotenv
@@ -20,11 +21,11 @@ def is_true(value: str) -> bool:
     return value.lower() in ["true", "yes"]
 
 
-##########################################################################
-#                   #                                 #                  #
-#####################     [ NECESSARY VARIABLES ]     ####################
-#                   #                                 #                  #
-##########################################################################
+#####################################################################
+#                #                                #                 #
+################     [ NECESSARY VARIABLES ]     ####################
+#                #                                #                 #
+#####################################################################
 
 
 # Get it from my.telegram.org
@@ -41,10 +42,12 @@ LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", "0"))
 
 # Your User ID.
 OWNER_ID = list(
-    map(int, getenv("OWNER_ID", "6815918609").split())
-)  # Input type must be interger, Replace 6815918609 it to your own id
+    map(int, getenv("OWNER_ID", "").split())
+)  # Input type must be interger,
+# You can add multiple id seperated by a space
 
-# You'll need a Pyrogram String Session for these vars. Generate String from telegram.tools
+# You'll need a Pyrogram String Session for these vars.
+# Generate String from telegram.tools
 
 raw_sessions = getenv("STRING_SESSIONS")
 
@@ -52,11 +55,11 @@ raw_sessions = getenv("STRING_SESSIONS")
 STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions else []
 
 
-############################################################################
-#                   #                                   #               #
-#####################     OPTIONAL [ BUT REQUIRED ]     ####################
-#                   #                                   #               #
-############################################################################
+#######################################################################
+#                  #                                  #               #
+################     OPTIONAL [ BUT REQUIRED ]     ####################
+#                  #                                  #               #
+#######################################################################
 
 
 # Your cookies pasted link on batbin.me
@@ -69,11 +72,11 @@ COOKIE_LINK = getenv("COOKIE_LINK", None)
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
 
-#################################################################
-#                   #                        #                  #
-#####################     FULLY OPTIONAL     ####################
-#                   #                        #                  #
-#################################################################
+############################################################
+#                 #                      #                 #
+################     FULLY OPTIONAL     ####################
+#                 #                      #                 #
+############################################################
 
 
 # Set it in True if you want to leave your assistant after
@@ -126,7 +129,8 @@ HEROKU_API_KEY = getenv("HEROKU_API_KEY")
 # which you gave to identify your  Music Bot in Heroku.
 HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
 
-# MaximuM limit for fetching playlist's track from youtube, spotify, apple and other valids links.
+# MaximuM limit for fetching playlist's track
+# from youtube, spotify, apple and other valids links.
 PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", "25"))
 
 # Set it true if you want your bot to be private only
@@ -134,7 +138,6 @@ PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", "25"))
 # then only your bot will play music in that chat.]
 PRIVATE_BOT_MODE = is_true(getenv("PRIVATE_BOT_MODE", "False"))
 
-# If you want your bot to setup the commands automatically in the bot's menu set it to true.
 # Refer to https://i.postimg.cc/Bbg3LQTG/image.png
 SET_CMDS = is_true(getenv("SET_CMDS", "False"))
 
@@ -147,15 +150,16 @@ SONG_DOWNLOAD_DURATION = int(
 )  # Remember to give value in Minutes
 
 # Spotify Client.. Get it from https://developer.spotify.com/dashboard
-SPOTIFY_CLIENT_ID = getenv("SPOTIFY_CLIENT_ID", "19609edb1b9f4ed7be0c8c1342039362")
-SPOTIFY_CLIENT_SECRET = getenv(
-    "SPOTIFY_CLIENT_SECRET", "409e31d3ddd64af08cfcc3b0f064fcbe"
-)
+SPOTIFY_CLIENT_ID = getenv("SPOTIFY_CLIENT_ID", "")
+SPOTIFY_CLIENT_SECRET = getenv("SPOTIFY_CLIENT_SECRET", "")
 
 # Only  Links formats are  accepted for this Var value.
-SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", None)  # Example:- https://t.me/TheYukki
-SUPPORT_GROUP = getenv("SUPPORT_GROUP", None)  # Example:- https://t.me/YukkiSupport
 
+# Example:- https://t.me/TheYukki
+SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", None)
+
+# Example:- https://t.me/YukkiSupport
+SUPPORT_GROUP = getenv("SUPPORT_GROUP", None)
 
 # Telegram audio  and video file size limit
 
@@ -246,11 +250,12 @@ SPOTIFY_PLAYLIST_IMG_URL = getenv(
 )
 
 
-### DONT TOUCH or EDIT codes after this line
+# DONT TOUCH OR EDIT CODES AFTER THIS LINE
 
 
 def _user():
-    from YukkiMusic.core.filters import User  # pylint: disable=import-outside-toplevel
+    from YukkiMusic.core.filters import \
+        User  # pylint: disable=import-outside-toplevel
 
     return User()
 
@@ -268,9 +273,22 @@ clean = {}
 autoclean = []
 
 
+def add_to_clean(chat_id, msg_id):
+    if chat_id not in clean:
+        clean[chat_id] = []
+    time_now = datetime.now()
+    put = {
+        "msg_id": msg_id,
+        "timer_after": time_now + timedelta(minutes=CLEANMODE_DELETE_TIME),
+    }
+    clean[chat_id].append(put)
+
+
 def time_to_seconds(time):
     stringt = str(time)
-    return sum(int(x) * 60**i for i, x in enumerate(reversed(stringt.split(":"))))
+    return sum(
+        int(x) * 60**i for i, x in enumerate(reversed(stringt.split(":")))
+    )  # TODO: Make it multiline
 
 
 def seconds_to_time(seconds):
@@ -280,11 +298,13 @@ def seconds_to_time(seconds):
 
 
 DURATION_LIMIT = int(time_to_seconds(f"{DURATION_LIMIT_MIN}:00"))
-SONG_DOWNLOAD_DURATION_LIMIT = int(time_to_seconds(f"{SONG_DOWNLOAD_DURATION}:00"))
+_SDD = time_to_seconds(f"{SONG_DOWNLOAD_DURATION}:00")
+SONG_DOWNLOAD_DURATION_LIMIT = int(_SDD)
 
 if not STRING_SESSIONS:
     print(
-        "Oops! You need to fill at least one Pyrogram session to run this bot, Exiting..."
+        "Oops! You need to fill at least one Pyrogram session,"
+        "To run this bot, Exiting..."
     )
     sys.exit()
 
@@ -316,13 +336,15 @@ for name, default in _DEFAULTS.items():
         and not re.match(r"^https?://", var)
     ):
         print(
-            f"[ERROR] - Your {name} URL is incorrect. Please ensure it starts with https://"
+            f"[ERROR] - Your {name} URL is incorrect."
+            "Please ensure it starts with https://"
         )
         sys.exit()
     elif default is None:
         var = globals().get(name)
         if var and not re.match(r"^https?://", var):
             print(
-                f"[ERROR] - Your {name} URL is incorrect. Please ensure it starts with https://"
+                f"[ERROR] - Your {name} URL is incorrect."
+                "Please ensure it starts with https://"
             )
             sys.exit()

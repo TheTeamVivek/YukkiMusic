@@ -25,11 +25,11 @@ flask
 gunicorn
 youtube-search-python
 yt-dlp
-git+https://github.com/Vivekkumar-IN/pykeyboard@dev
+pykeyboard2
+
 
 # Telethon Req
-
-cryptg # For faster Telethon like 
+cryptg
 Telethon
-pillow # Not used just for telethon image compression to dimensions errors 
-hachoir # for Telethon image processing
+pillow 
+hachoir

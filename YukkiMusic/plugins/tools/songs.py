@@ -8,6 +8,7 @@
 # All rights reserved.
 #
 
+"""
 import os
 import re
 
@@ -22,11 +23,7 @@ from pyrogram.types import (
     Message,
 )
 
-from config import (
-    BANNED_USERS,
-    SONG_DOWNLOAD_DURATION,
-    SONG_DOWNLOAD_DURATION_LIMIT,
-)
+from config import BANNED_USERS, SONG_DOWNLOAD_DURATION, SONG_DOWNLOAD_DURATION_LIMIT
 from strings import command
 from YukkiMusic import Platform, app
 from YukkiMusic.platforms.Youtube import cookies
@@ -375,3 +372,4 @@ async def song_download_cb(client, CallbackQuery, _):
             return await mystic.edit(_["song_10"])
 
         os.remove(filename)
+"""

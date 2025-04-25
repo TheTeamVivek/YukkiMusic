@@ -11,26 +11,29 @@ from YukkiMusic import tbot
 from YukkiMusic.utils.database import is_on_off
 
 
-async def play_logs(message, streamtype):
+async def play_logs(_, event, streamtype):
     if await is_on_off(LOG):
-        if message.chat.username:
-            chatusername = f"@{message.chat.username}"
+        chat = await event.get_chat()
+        if chat.username:
+            chatusername = f"@{chat.username}"
         else:
             chatusername = "Private Group"
-
-        logger_text = f"""
-**{tbot.mention} Play Log**
-
-**Chat ID:** `{event.chat_id}`
-**Chat Name:** {message.chat.title}
-**Chat Username:** {chatusername}
-
-**User ID:** `{event.sender_id}`
-**Name:** {message.from_user.mention}
-**Username:** @{message.from_user.username}
-
-**Query:** {message.text.split(None, 1)[1]}
-**Stream Type:** {streamtype}"""
+        sender = await event.get_sender()
+        if event.is_reply:
+            query = "Replied Message"
+        else:
+            query = event.text.split(None, 1)[1]
+        logger_text = _["logger_text"].format(
+            bot_mention=tbot.mention,
+            chat_id=event.chat_id,
+            title=chat.title,
+            chatusername=chatusername,
+            sender_id=event.sender_id,
+            user_mention=await tbot.create_mention(sender),
+            username=f"@{sender.username}" if sender.username else "No Username",
+            query=query,
+            streamtype=streamtype,
+        )
         if event.chat_id != LOG_GROUP_ID:
             try:
                 await tbot.send_message(

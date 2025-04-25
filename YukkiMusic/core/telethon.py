@@ -9,8 +9,10 @@
 #
 
 import asyncio
+import importlib.util
 import inspect
 import logging
+import os
 import sys
 import traceback
 from collections.abc import Callable
@@ -18,11 +20,17 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import wraps
 
+import uvloop
 from telethon import TelegramClient, errors, events
 from telethon.tl import functions, types
 
 import config
 from YukkiMusic.utils import pastebin
+from YukkiMusic.utils.decorators.asyncify import asyncify
+
+from . import filters as telethon_filters
+
+uvloop.install()
 
 log = logging.getLogger(__name__)
 
@@ -35,57 +43,56 @@ class ShellRunResult:
 
 
 commands = {
-    "en": {
-        "private": [
-            types.BotCommand("start", "Start the bot"),
-            types.BotCommand("help", "Get the help menu"),
-            types.BotCommand("ping", "Check if the bot is alive or dead"),
-        ],
-        "group": [types.BotCommand("play", "Start playing requested song")],
-        "admin": [
-            types.BotCommand("play", "Start playing requested song"),
-            types.BotCommand("skip", "Move to next track in queue"),
-            types.BotCommand("pause", "Pause the current playing song"),
-            types.BotCommand("resume", "Resume the paused song"),
-            types.BotCommand("end", "Clear the queue and leave voice chat"),
-            types.BotCommand("shuffle", "Randomly shuffle the queued playlist"),
-            types.BotCommand("playmode", "Change the default playmode for your chat"),
-            types.BotCommand("settings", "Open bot settings for your chat"),
-            types.BotCommand("reboot", "Reboot  the bot for your chat"),
-        ],
-        "owner": [
-            types.BotCommand("autoend", "Enable or disable auto end for streams"),
-            types.BotCommand("restart", "Restart the bot"),
-            types.BotCommand("update", "Update the bot"),
-            types.BotCommand("logs", "Get logs"),
-            types.BotCommand("export", "Export all data of mongodb"),
-            types.BotCommand("import", "Import all data in mongodb"),
-            types.BotCommand("addsudo", "Add a user as a sudoer"),
-            types.BotCommand("delsudo", "Remove a user from sudoers"),
-            types.BotCommand("sudolist", "List all sudo users"),
-            types.BotCommand("log", "Get the bot logs"),
-            types.BotCommand("getvar", "Get a specific environment variable"),
-            types.BotCommand("delvar", "Delete a specific environment variable"),
-            types.BotCommand("setvar", "Set a specific environment variable"),
-            # types.BotCommand("usage", "Get dyno usage information"),
-            types.BotCommand("maintenance", "Enable or disable maintenance mode"),
-            types.BotCommand("logger", "Enable or disable logging"),
-            types.BotCommand("block", "Block a user"),
-            types.BotCommand("unblock", "Unblock a user"),
-            types.BotCommand("blacklist", "Blacklist a chat"),
-            types.BotCommand("whitelist", "Whitelist a chat"),
-            types.BotCommand("blacklisted", "List all blacklisted chats"),
-        ],
-    }
+    "private": [
+        types.BotCommand("start", "Start the bot"),
+        types.BotCommand("help", "Get the help menu"),
+        types.BotCommand("ping", "Check if the bot is alive or dead"),
+    ],
+    "group": [types.BotCommand("play", "Start playing requested song")],
+    "admin": [
+        types.BotCommand("play", "Start playing requested song"),
+        types.BotCommand("skip", "Move to next track in queue"),
+        types.BotCommand("pause", "Pause the current playing song"),
+        types.BotCommand("resume", "Resume the paused song"),
+        types.BotCommand("end", "Clear the queue and leave voice chat"),
+        types.BotCommand("shuffle", "Randomly shuffle the queued playlist"),
+        types.BotCommand("playmode", "Change the default playmode for your chat"),
+        types.BotCommand("settings", "Open bot settings for your chat"),
+        types.BotCommand("reboot", "Reboot  the bot for your chat"),
+    ],
+    "owner": [
+        types.BotCommand("autoend", "Enable or disable auto end for streams"),
+        types.BotCommand("restart", "Restart the bot"),
+        types.BotCommand("update", "Update the bot"),
+        types.BotCommand("logs", "Get logs"),
+        types.BotCommand("export", "Export all data of mongodb"),
+        types.BotCommand("import", "Import all data in mongodb"),
+        types.BotCommand("addsudo", "Add a user as a sudoer"),
+        types.BotCommand("delsudo", "Remove a user from sudoers"),
+        types.BotCommand("sudolist", "List all sudo users"),
+        types.BotCommand("log", "Get the bot logs"),
+        types.BotCommand("getvar", "Get a specific environment variable"),
+        types.BotCommand("delvar", "Delete a specific environment variable"),
+        types.BotCommand("setvar", "Set a specific environment variable"),
+        # types.BotCommand("usage", "Get dyno usage information"),
+        types.BotCommand("maintenance", "Enable or disable maintenance mode"),
+        types.BotCommand("logger", "Enable or disable logging"),
+        types.BotCommand("block", "Block a user"),
+        types.BotCommand("unblock", "Unblock a user"),
+        types.BotCommand("blacklist", "Blacklist a chat"),
+        types.BotCommand("whitelist", "Whitelist a chat"),
+        types.BotCommand("blacklisted", "List all blacklisted chats"),
+    ],
 }
 
 
 class TelethonClient(TelegramClient):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.loaded_plug_counts: int = 0
 
     async def start(self):
-        if super().is_connected():
+        if self.is_connected():
             return
         await super().start(bot_token=config.BOT_TOKEN)
         me = await self.get_me()
@@ -250,7 +257,7 @@ class TelethonClient(TelegramClient):
                     raise events.StopPropagation from e
 
                 except Exception as e:
-                    await self.handle_error(e)
+                    await self.handle_error(e, event)
 
             if func is not None:
                 kwargs["func"] = func
@@ -260,9 +267,9 @@ class TelethonClient(TelegramClient):
 
         return decorator
 
-    async def run_shell_command(self, command: list):
-        process = await asyncio.create_subprocess_exec(
-            *command,
+    async def run_shell_command(self, command: str):
+        process = await asyncio.create_subprocess_shell(
+            command,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
@@ -276,46 +283,90 @@ class TelethonClient(TelegramClient):
         )
 
     async def _set_default_commands(self):
-        for lang_code, command in commands.items():
-            try:
-                await self.set_bot_commands(
-                    commands=command["private"],
-                    lang_code=lang_code,
-                    scope=types.BotCommandScopeUsers(),
-                )
-                await self.set_bot_commands(
-                    commands=command["group"],
-                    lang_code=lang_code,
-                    scope=types.BotCommandScopeChats(),
-                )
-                await self.set_bot_commands(
-                    commands=command["admin"],
-                    lang_code=lang_code,
-                    scope=types.BotCommandScopeChatAdmins(),
-                )
+        try:
+            await self.set_bot_commands(
+                commands=command["private"],
+                scope=types.BotCommandScopeUsers(),
+            )
+            await self.set_bot_commands(
+                commands=command["group"],
+                scope=types.BotCommandScopeChats(),
+            )
+            await self.set_bot_commands(
+                commands=command["admin"],
+                scope=types.BotCommandScopeChatAdmins(),
+            )
 
-                logger_id = config.LOG_GROUP_ID
-                for id in config.OWNER_ID:
-                    await self.set_bot_commands(
-                        commands=command["owner"],
-                        lang_code=lang_code,
-                        scope=types.BotCommandScopePeerUser(peer=logger_id, user_id=id),
-                    )
-                    await self.set_bot_commands(
-                        commands=command["private"] + command["owner"],
-                        lang_code=lang_code,
-                        scope=types.BotCommandScopePeer(peer=id),
-                    )
-            except Exception:
-                pass
+            logger_id = config.LOG_GROUP_ID
+            for id in config.OWNER_ID:
+                await self.set_bot_commands(
+                    commands=command["owner"],
+                    scope=types.BotCommandScopePeerUser(peer=logger_id, user_id=id),
+                )
+                await self.set_bot_commands(
+                    commands=command["private"] + command["owner"],
+                    scope=types.BotCommandScopePeer(peer=id),
+                )
+        except Exception:
+            pass
 
-    async def set_bot_commands(
-        self, scope, commands: list[types.BotCommand], lang_code: str = "en"
-    ):
+    async def set_bot_commands(self, scope, commands: list[types.BotCommand]):
         return await self(
             functions.bots.SetBotCommandsRequest(
                 scope=scope,
-                lang_code=lang_code,
+                lang_code="",
                 commands=commands,
             )
         )
+
+    @asyncify
+    def load_plugin(self, file_path: str, base_dir: str, attrs: dict):
+        relative_path = os.path.relpath(file_path, base_dir).replace(os.sep, ".")
+        module_path = f"{os.path.basename(base_dir)}.{relative_path[:-3]}"
+
+        spec = importlib.util.spec_from_file_location(module_path, file_path)
+        module = importlib.util.module_from_spec(spec)
+
+        attrs = {app: self, Config: config, flt: telethon_filters, **attrs}
+        for name, attr in attrs.items():
+            setattr(module, name, attr)
+
+        try:
+            spec.loader.exec_module(module)
+            self.loaded_plug_counts += 1
+        except Exception as e:
+            logger.error("Failed to load %s: %s\n\n", module_path, e, exc_info=True)
+            sys.exit()
+
+        return module
+
+    async def load_plugins_from(self, base_folder: str, attrs: dict):
+        base_dir = os.path.abspath(base_folder)
+        utils_path = os.path.join(base_dir, "utils.py")
+        utils = None
+
+        if os.path.exists(utils_path) and os.path.isfile(utils_path):
+            try:
+                spec = importlib.util.spec_from_file_location("utils", utils_path)
+                utils = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(utils)
+            except Exception as e:
+                logger.error("Failed to load 'utils' module: %s", e, exc_info=True)
+                sys.exit()
+
+        if utils:
+            attrs["utils"] = utils
+        from YukkiMusic import HELPABLE
+
+        for root, _, files in os.walk(base_dir):
+            for file in files:
+                if (
+                    file.endswith(".py")
+                    and not file == "utils.py"
+                    and not file.startswith("__")
+                ):
+                    file_path = os.path.join(root, file)
+                    mod = await self.load_plugin(file_path, base_dir, attrs)
+                    if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
+                        if hasattr(mod, "__HELP__") and mod.__HELP__:
+                            HELPABLE[mod.__MODULE__.lower()] = mod
