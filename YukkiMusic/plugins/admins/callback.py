@@ -194,7 +194,7 @@ async def admin_callback(event, _):
         await event.answer()
         random.shuffle(check)
         check.insert(0, popped)
-        await event.reply(_["admin_25"].format(mention), link_preview=False)
+        await event.reply(_["admin_24"].format(mention), link_preview=False)
     elif command in ["Skip", "Replay"]:
         check = db.get(chat_id)
         txt = f"» Track {command.lower()}ed by {mention} !"
@@ -361,10 +361,10 @@ async def admin_callback(event, _):
             return await event.answer(_["queue_2"], alert=True)
         duration_seconds = int(playing[0]["seconds"])
         if duration_seconds == 0:
-            return await event.answer(_["admin_35"], alert=True)
+            return await event.answer(_["admin_31"], alert=True)
         file_path = playing[0]["file"]
         if "index_" in file_path or "live_" in file_path:
-            return await event.answer(_["admin_35"], alert=True)
+            return await event.answer(_["admin_31"], alert=True)
         duration_played = int(playing[0]["played"])
         if int(command) in [1, 2]:
             duration_to_skip = 10
@@ -388,11 +388,11 @@ async def admin_callback(event, _):
                 )
             to_seek = duration_played + duration_to_skip + 1
         await event.answer()
-        mystic = await event.reply(_["admin_35"])
+        mystic = await event.reply(_["admin_33"])
         if "vid_" in file_path:
             n, file_path = await Platform.youtube.video(playing[0]["vidid"], True)
             if n == 0:
-                return await mystic.edit(_["admin_35"])
+                return await mystic.edit(_["admin_31"])
         try:
             await Yukki.seek_stream(
                 chat_id,
@@ -407,7 +407,7 @@ async def admin_callback(event, _):
             db[chat_id][0]["played"] -= duration_to_skip
         else:
             db[chat_id][0]["played"] += duration_to_skip
-        string = _["admin_35"].format(seconds_to_min(to_seek))
+        string = _["admin_34"].format(seconds_to_min(to_seek))
         await mystic.edit(f"{string}\n\nChanges Done by: {mention} !")
 
 

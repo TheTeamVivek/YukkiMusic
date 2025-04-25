@@ -44,4 +44,4 @@ async def admins(event, _, chat_id):
     random.shuffle(check)
     check.insert(0, popped)
     mention = await tbot.create_mention(await event.get_sender())
-    await event.reply(_["admin_25"].format(mention))
+    await event.reply(_["admin_24"].format(mention))
