@@ -64,12 +64,8 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
     return pairs
 
 
-@tbot.on_message(
-    flt.command("HELP_COMMAND", True) & flt.private & ~BANNED_USERS
-)
-@tbot.on(
-    events.CallbackQuery(pattern="settings_back_helper", func=~BANNED_USERS)
-)
+@tbot.on_message(flt.command("HELP_COMMAND", True) & flt.private & ~BANNED_USERS)
+@tbot.on(events.CallbackQuery(pattern="settings_back_helper", func=~BANNED_USERS))
 async def helper_private(event):
     is_callback = hasattr(event, "data")
     chat_id = event.chat_id
@@ -102,9 +98,7 @@ async def helper_private(event):
             )
 
 
-@tbot.on_message(
-    flt.command("HELP_COMMAND", True) & flt.group & ~BANNED_USERS
-)
+@tbot.on_message(flt.command("HELP_COMMAND", True) & flt.group & ~BANNED_USERS)
 @language(no_check=True)
 async def help_com_group(event, _):
     keyboard = private_help_panel(_)

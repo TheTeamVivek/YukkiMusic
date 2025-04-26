@@ -30,7 +30,7 @@ html_favicon = "_static/logo.png"
 pygments_style = "friendly"
 
 html_theme_options = {
-#   "home_page_in_toc": True,
+    #   "home_page_in_toc": True,
     "repository_url": "https://github.com/TheTeamVivek/YukkiMusic",
     "repository_branch": "dev",
     "path_to_docs": "docs",
