@@ -11,6 +11,7 @@
 
 import config
 from YukkiMusic import app, tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
     add_private_chat,

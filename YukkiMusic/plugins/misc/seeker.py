@@ -39,8 +39,8 @@ async def timer():
             playing = db.get(chat_id)
             if not playing:
                 continue
-            file_path = playing[0]["file"]
-            if "index_" in file_path or "live_" in file_path:
+            playing[0]["track"]
+            if track.is_live or track.is_m3u8:
                 continue
             duration = int(playing[0]["seconds"])
             if duration == 0:
@@ -157,17 +157,17 @@ async def markup_timer():
                 buttons = (
                     stream_markup_timer(
                         _,
-                        playing[0]["vidid"],
+                        playing[0]["track"]["vidid"],
                         chat_id,
                         seconds_to_min(playing[0]["played"]),
-                        playing[0]["dur"],
+                        seconds_to_min(playing[0]["track"]["duration"]),
                     )
                     if markup == "stream"
                     else telegram_markup_timer(
                         _,
                         chat_id,
                         seconds_to_min(playing[0]["played"]),
-                        playing[0]["dur"],
+                        seconds_to_min(playing[0]["track"]["duration"]),
                     )
                 )
 

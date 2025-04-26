@@ -21,6 +21,7 @@ from time import time
 from telethon import Button, events
 
 from YukkiMusic import tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.misc import SUDOERS
 
 

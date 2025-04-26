@@ -12,6 +12,8 @@ from typing import Union
 
 from telethon.tl import types
 
+from YukkiMusic.core import filters as flt
+
 from .channelplay import get_channeplay_cb, is_cplay
 from .database import *
 from .decorators import *

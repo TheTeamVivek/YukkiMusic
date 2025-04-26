@@ -42,7 +42,7 @@ class Spotify(PlatformBase):
         handlers = {
             "track": self.__track,
             "album": self.__album,
-            "artist": spotify.__artist,
+            "artist": self.__artist,
             "playlist": self.playlist,
         }
         for key, handler in handlers.items():

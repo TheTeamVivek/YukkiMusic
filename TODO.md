@@ -1,4 +1,4 @@
-# TODO
+# TODO NECESSARY
 
 ## 1.
 
@@ -77,7 +77,22 @@ lang_2: "Your language changed successfully.."
 lang_3: "Failed to change language or language in under Upadte"
 
 admin_21 : "❌ Failed to reload admincache make sure bot is an admin in your chat"
+admin_36: "⏭️ Music is skipped by {}!"
+admin_37: "🔁 Music replayed by {0} !"
+admin_38: f"Bot is unable to seek because duration exceeds.\n\nCurrently played:** {0}** minutes out of **{1}** minutes."
+        
 ```
 
 ## 6.
   If Possible so remove the /gstats,  it uses userdb and chattopdb that consumes too Database and still useless
+
+
+## 7.
+
+  Now we can say that YukkiMusic fully support multiples langauge with command, enable, disable so we need to refactor all languages
+   
+
+
+# FEAT CAN BE ADDED [ OPTIONAL ]
+
+### Use **defaultdict** as a replacement of pythons dict

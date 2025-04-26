@@ -9,10 +9,12 @@
 #
 
 import logging
+import traceback
 
 import config
 from config import BANNED_USERS
 from YukkiMusic import tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.core.enum import SourceType
 from YukkiMusic.core.track import Track
 from YukkiMusic.platforms import (
@@ -103,35 +105,26 @@ async def play_commnd(
 
     elif url:
         if await youtube.valid(url):
-            if "playlist" in url:
-                try:
-                    details = await youtube.playlist(
-                        url,
-                        config.PLAYLIST_FETCH_LIMIT,
-                    )
-                except Exception:
-                    logger.error("", exc_info=True)
-                    return await mystic.edit(_["play_3"])
 
-            elif "https://youtu.be" in url:
+            if "https://youtu.be" in url:
                 videoid = url.split("/")[-1].split("?")[0]
                 details = await youtube.track(
                     f"https://www.youtube.com/watch?v={videoid}"
                 )
-
             else:
                 try:
                     details = await youtube.track(url)
                 except Exception:
-                    logger.info("", exc_info=True)
+                    traceback.print_exc()
                     return await mystic.edit(_["play_3"])
 
         elif await spotify.valid(url):
             if not config.SPOTIFY_CLIENT_ID and not config.SPOTIFY_CLIENT_SECRET:
                 return await mystic.edit(_["spotify_1"])
             try:
-                details = await spotify.artist(url)
+                details = await spotify.track(url)
             except Exception:
+                traceback.print_exc()
                 return await mystic.edit(_["play_3"])
 
             if details is None:
@@ -141,6 +134,7 @@ async def play_commnd(
             try:
                 details = await apple.track(url)
             except Exception:
+                traceback.print_exc()
                 return await mystic.edit(_["play_3"])
             if details is None:
                 return await mystic.edit(_["play_16"])
@@ -149,6 +143,7 @@ async def play_commnd(
             try:
                 details, track_id = await resso.track(url)
             except Exception:
+                traceback.print_exc()
                 return await mystic.edit(_["play_3"])
 
         elif await saavn.valid(url):
@@ -158,12 +153,14 @@ async def play_commnd(
             try:
                 details = await saavn.track(url)
             except Exception:
+                traceback.print_exc()
                 return await mystic.edit(_["play_3"])
 
         elif await soundcloud.valid(url):
             try:
                 details = await soundcloud.details(url)
             except Exception:
+                traceback.print_exc()
                 return await mystic.edit(_["play_3"])
 
         else:
@@ -190,6 +187,7 @@ async def play_commnd(
         try:
             details = await youtube.track(query)
         except Exception:
+            traceback.print_exc()
             return await mystic.edit(_["play_3"])
 
     # if str(playmode) == "DIRECT" and not plist_type:
@@ -230,8 +228,7 @@ async def play_commnd(
             if ex_type == "AssistantErr":
                 err = e
             else:
-                logger.error("An error occurred", exc_info=True)
-
+                traceback.print_exc()
                 err = _["general_3"].format(ex_type)
             return await mystic.edit(err)
         await mystic.delete()

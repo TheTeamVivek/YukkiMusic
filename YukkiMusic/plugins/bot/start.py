@@ -244,7 +244,7 @@ async def start_comm(event, _):
     flt.command("START_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
 )
 @language(no_check=True)
-async def testbot(event, _):
+async def start_group(event, _):
     uptime = int(time.time() - _boot_)
     await event.reply(_["start_7"].format(get_readable_time(uptime)))
     return await add_served_chat(event.chat_id)

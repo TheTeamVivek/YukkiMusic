@@ -14,6 +14,7 @@ from telethon.tl.types import Channel
 
 from config import BANNED_USERS
 from YukkiMusic import tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.utils.database import set_cmode
 from YukkiMusic.utils.decorators.admins import admin_actual
 

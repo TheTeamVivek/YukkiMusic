@@ -67,7 +67,7 @@ class Filter:
 
 def wrap(func):
     "wrap the function by Filter"
-    return Filter(func=func)
+    return Filter(func)
 
 
 @wrap
@@ -117,9 +117,7 @@ class User(set, Filter):
             (
                 "me"
                 if u in ["me", "self"]
-                else u.lower().strip("@")
-                if isinstance(u, str)
-                else u
+                else u.lower().strip("@") if isinstance(u, str) else u
             )
             for u in users
         )
@@ -150,10 +148,12 @@ def command(commands, use_strings=False):
             lang = await get_lang(event.chat_id)
             lang = get_string(lang)
 
-            commands = {
-                lang.get(cmd, cmd) for cmd in commands
-            }  # Try to get command from lang if not found so use as it.
-        commands = {cmd.lower() for cmd in commands}
+            _commands = set()
+            for cmd in commands:
+                _commands.add(lang["cmd"].lower())
+                if lang != "en":
+                    _commands.add(get_string("en")[key].lower())
+            commands = list(_commands)
         cp = "|".join(map(re.escape, commands))
         pattern = rf"^(?:/)?({cp})(?:@{u})?(?:\s|$)"
 

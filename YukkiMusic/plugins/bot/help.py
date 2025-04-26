@@ -8,14 +8,14 @@
 # All rights reserved.
 #
 
-import logging
+import traceback
 from math import ceil
 
 from telethon import Button, events
 
 from config import BANNED_USERS, START_IMG_URL
 from strings import get_string
-from YukkiMusic import HELPABLE, tbot
+from YukkiMusic import tbot
 from YukkiMusic.core import filtera as flt
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
 from YukkiMusic.utils.decorators.language import language
@@ -29,28 +29,16 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
     lang = await get_lang(chat_id)
     string = get_string(lang)
 
-    helper_buttons = [
+    buttons = [
         Button.inline(
-            helper_key.replace("_HELPER", "").lower(),
+            helper_key.replace("_HELPER", "").title(),
             data=f"help_helper:{helper_key}:{page_n}:{int(close)}",
         )
         for helper_key in string.keys()
         if helper_key.endswith("_HELPER")
     ]
 
-    module_buttons = [
-        Button.inline(
-            x.__MODULE__,
-            data=f"help_module:{x.__MODULE__.lower()}:{page_n}:{int(close)}",
-        )
-        for x in HELPABLE.values()
-    ]
-
-    all_buttons = helper_buttons + module_buttons
-    pairs = [
-        all_buttons[i : i + NUM_COLUMNS]
-        for i in range(0, len(all_buttons), NUM_COLUMNS)
-    ]
+    pairs = [buttons[i : i + NUM_COLUMNS] for i in range(0, len(buttons), NUM_COLUMNS)]
     max_num_pages = ceil(len(pairs) / COLUMN_SIZE) if len(pairs) > 0 else 1
     modulo_page = page_n % max_num_pages
 
@@ -77,10 +65,10 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
 
 
 @tbot.on_message(
-    flt.command("HELP_COMMAND", True) & flt.private & ~flt.user(BANNED_USERS)
+    flt.command("HELP_COMMAND", True) & flt.private & ~BANNED_USERS
 )
 @tbot.on(
-    events.CallbackQuery(pattern="settings_back_helper", func=~flt.user(BANNED_USERS))
+    events.CallbackQuery(pattern="settings_back_helper", func=~BANNED_USERS)
 )
 async def helper_private(event):
     is_callback = hasattr(event, "data")
@@ -115,7 +103,7 @@ async def helper_private(event):
 
 
 @tbot.on_message(
-    flt.command("HELP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+    flt.command("HELP_COMMAND", True) & flt.group & ~BANNED_USERS
 )
 @language(no_check=True)
 async def help_com_group(event, _):
@@ -129,27 +117,7 @@ async def help_button(event):
     lang = await get_lang(event.chat_id)
     string = get_string(lang)
 
-    if pattern_match.startswith("module"):
-        _, module, prev_page_num, close = pattern_match.split(":")
-        close = bool(int(close))
-        text = (
-            f"<b><u>Here is the help for {HELPABLE[module].__MODULE__}:</u></b>\n"
-            + HELPABLE[module].__HELP__
-        )
-
-        buttons = [
-            [
-                Button.inline(
-                    string["BACK_BUTTON"],
-                    data=f"help_prev:{prev_page_num}:{int(close)}",
-                ),
-                Button.inline(string["CLOSE_BUTTON"], data="close"),
-            ]
-        ]
-
-        await event.edit(text, buttons=buttons, link_preview=False)
-
-    elif pattern_match.startswith("prev"):
+    if pattern_match.startswith("prev"):
         _, curr_page, close = pattern_match.split(":")
         close = bool(int(close))
         chat_id = event.chat_id
@@ -188,9 +156,9 @@ async def help_button(event):
 
         try:
             await event.edit(
-                f"<b>{helper_key}:</b>\n{text}", buttons=buttons, link_preview=False
+                f"**{helper_key}:**\n{text}", buttons=buttons, link_preview=False
             )
-        except Exception as e:
-            logging.exception(e)
+        except Exception:
+            traceback.print_exc()
 
     await event.answer()

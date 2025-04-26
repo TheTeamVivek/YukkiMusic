@@ -26,21 +26,6 @@ from .base import PlatformBase
 logger = logging.getLogger(__name__)
 
 
-async def shell_cmd(cmd):
-    proc = await asyncio.create_subprocess_shell(
-        cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    out, errorz = await proc.communicate()
-    if errorz:
-        if "unavailable videos are hidden" in (errorz.decode("utf-8")).lower():
-            return out.decode("utf-8")
-        else:
-            return errorz.decode("utf-8")
-    return out.decode("utf-8")
-
-
 class YouTube(PlatformBase):
     def __init__(self):
         self.base = "https://www.youtube.com/watch?v="
@@ -51,31 +36,6 @@ class YouTube(PlatformBase):
 
     async def valid(self, link: str) -> bool:
         return bool(re.search(self.regex, link))
-
-    async def video(self, link: str, videoid: bool | str = None):
-        if videoid:
-            link = self.base + link
-        if "&" in link:
-            link = link.split("&")[0]
-        cmd = [
-            "yt-dlp",
-            f"--cookies",
-            cookies(),
-            "-g",
-            "-f",
-            "best[height<=?720][width<=?1280]",
-            f"{link}",
-        ]
-        proc = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, stderr = await proc.communicate()
-        if stdout:
-            return 1, stdout.decode().split("\n")[0]
-        else:
-            return 0, stderr.decode()
 
     @alru_cache(maxsize=None)
     @asyncify
@@ -127,8 +87,19 @@ class YouTube(PlatformBase):
             f'--get-id --flat-playlist --playlist-end {limit} --skip-download "{link}" '
             f"2>/dev/null"
         )
+        proc = await asyncio.create_subprocess_shell(
+            cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        out, errorz = await proc.communicate()
+        if errorz:
+            if "unavailable videos are hidden" in (errorz.decode("utf-8")).lower():
+                playlist = out.decode("utf-8")
+            else:
+                raise Exception(errorz.decode("utf-8"))
 
-        playlist = await shell_cmd(cmd)
+        playlist = out.decode("utf-8")
 
         result = []
         try:
@@ -140,11 +111,14 @@ class YouTube(PlatformBase):
         if result:
             item = result.pop(0)
             result.insert(0, await self.track(self.base + item))
-        return result
+        return result  # FIRST ELEMET IS Track AND OTHER(S) VIDEOID
 
     @alru_cache(maxsize=None)
     @staticmethod
     async def track(url: str):
+        if "playlist" in url:
+            return await self.playlist(url)
+
         try:
             results = VideosSearch(url, limit=1)
             for result in (await results.next())["result"]:
@@ -166,7 +140,7 @@ class YouTube(PlatformBase):
     async def _track(
         url,
     ):  # implement getting track with help of oembed url use ytdlp for fallback
-        return YouTube._track_from_ytdlp(url)
+        return await YouTube._track_from_ytdlp(url)
 
     @alru_cache(maxsize=None)
     @staticmethod

@@ -12,6 +12,7 @@ import logging
 import config
 from config import BANNED_USERS
 from YukkiMusic import tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.core.enum import SourceType
 from YukkiMusic.core.youtube import Track
 from YukkiMusic.utils.decorators.play import play_wrapper

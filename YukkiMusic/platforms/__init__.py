@@ -7,6 +7,8 @@
 #
 # All rights reserved.
 #
+from YukkiMusic.core import filters as flt
+
 from ..core.enum import SongType, SourceType
 from . import carbon
 from .apple import Apple
@@ -44,5 +46,7 @@ async def valid(url: str) -> SourceType:
 
 async def info(
     type: SourceType, **kwargs
-) -> dict:  # todo implement all classes and there info function in this function using SourceType and **kwargs
+) -> (
+    dict
+):  # todo implement all classes and there info function in this function using SourceType and **kwargs
     pass

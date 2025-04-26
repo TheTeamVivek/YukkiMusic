@@ -10,6 +10,7 @@
 
 import config
 from YukkiMusic import tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.core.decorators.language import language
 from YukkiMusic.utils.database.memorydatabase import (
     get_active_chats,

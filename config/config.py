@@ -254,7 +254,8 @@ SPOTIFY_PLAYLIST_IMG_URL = getenv(
 
 
 def _user():
-    from YukkiMusic.core.filters import User  # pylint: disable=import-outside-toplevel
+    from YukkiMusic.core.filters import \
+        User  # pylint: disable=import-outside-toplevel
 
     return User()
 

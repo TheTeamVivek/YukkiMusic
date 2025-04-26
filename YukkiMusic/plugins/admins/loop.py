@@ -44,7 +44,7 @@ async def admins(event, _, chat_id):
 
     elif any(state.lower() == key for key in await get_value(chat_id, "disable")):
         await set_loop(chat_id, 0)
-        return await event.reply(_["admin_29"])
+        return await event.reply(_["admin_28"])
 
     else:
         return await event.reply(_["admin_25"])

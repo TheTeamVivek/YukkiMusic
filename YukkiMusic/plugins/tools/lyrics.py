@@ -16,6 +16,7 @@ from telethon import Button
 
 from config import BANNED_USERS, lyrical
 from YukkiMusic import tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.utils.decorators.language import language
 
 api_key = "Vd9FvPMOKWfsKJNG9RbZnItaTNIRFzVyyXFdrGHONVsGqHcHBoj3AI3sIlNuqzuf0ZNG8uLcF9wAd5DXBBnUzA"

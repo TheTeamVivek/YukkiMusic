@@ -21,6 +21,7 @@ from telethon.tl.types import (
 import config
 from config import adminlist, chatstats, clean, userstats
 from YukkiMusic import tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.utils.database import (
     get_active_chats,
     get_authuser_names,

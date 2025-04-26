@@ -10,21 +10,18 @@
 
 
 import config
-from config import BANNED_USERS
-from YukkiMusic import Platform, tbot
+from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
+from YukkiMusic.utils import seconds_to_min
 from YukkiMusic.utils.database import get_loop
 from YukkiMusic.utils.decorators import admin_rights_check
-from YukkiMusic.utils.inline.play import stream_markup, telegram_markup
+from YukkiMusic.utils.inline.play import play_markup
 from YukkiMusic.utils.stream.autoclear import auto_clean
-from YukkiMusic.utils.thumbnails import gen_thumb
 
 
-@tbot.on_message(
-    flt.command("SKIP_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
-)
+@tbot.on_message(flt.command("SKIP_COMMAND", True) & flt.group & ~config.BANNED_USERS)
 @admin_rights_check
 async def skip(event, _, chat_id):
     mention = await tbot.create_mention(await event.get_sender())
@@ -103,133 +100,35 @@ async def skip(event, _, chat_id):
             except Exception:
                 return
     track = check[0]["track"]
-    title = track.title
     user = check[0]["by"]
-    streamtype = check[0]["streamtype"]
-    videoid = check[0]["vidid"]
-    duration_min = check[0]["dur"]
-    status = True if str(streamtype) == "video" else None
-    if "live_" in queued:
-        n, link = await Platform.youtube.video(videoid, True)
-        if n == 0:
-            return await event.reply(_["admin_11"].format(title))
-        try:
-            await Yukki.skip_stream(chat_id, link, video=status)
-        except Exception:
-            return await event.reply(_["call_7"])
-        button = telegram_markup(_, chat_id)
-        img = await gen_thumb(videoid)
-        run = await event.reply(
-            file=img,
-            text=_["stream_1"].format(
-                user,
-                f"https://t.me/{tbot.username}?start=info_{videoid}",
-            ),
-            buttons=button,
-        )
-        db[chat_id][0]["mystic"] = run
-        db[chat_id][0]["markup"] = "tg"
-    elif "vid_" in queued:
-        mystic = await event.reply(_["call_8"], link_preview=False)
-        try:
-            file_path, direct = await Platform.youtube.download(
-                videoid,
-                mystic,
-                videoid=True,
-                video=status,
-            )
-        except Exception:
-            return await mystic.edit(_["call_7"])
-        try:
-            await Yukki.skip_stream(chat_id, file_path, video=status)
-        except Exception:
-            return await mystic.edit(_["call_7"])
-        button = stream_markup(_, videoid, chat_id)
-        img = await gen_thumb(videoid)
-        run = await event.reply(
-            file=img,
-            text=_["stream_1"].format(
-                title[:27],
-                f"https://t.me/{tbot.username}?start=info_{videoid}",
-                duration_min,
-                user,
-            ),
-            buttons=button,
-        )
-        db[chat_id][0]["mystic"] = run
-        db[chat_id][0]["markup"] = "stream"
-        await mystic.delete()
-    elif "index_" in queued:
-        try:
-            await Yukki.skip_stream(chat_id, videoid, video=status)
-        except Exception:
-            return await event.reply(_["call_7"])
-        button = telegram_markup(_, chat_id)
-        run = await event.reply(
-            file=config.STREAM_IMG_URL,
-            text=_["stream_2"].format(user),
-            buttons=button,
-        )
-        db[chat_id][0]["mystic"] = run
-        db[chat_id][0]["markup"] = "tg"
-    else:
-        try:
-            await Yukki.skip_stream(chat_id, queued, video=status)
-        except Exception:
-            return await event.reply(_["call_7"])
-        if videoid == "telegram":
-            button = telegram_markup(_, chat_id)
-            run = await event.reply(
-                file=(
-                    config.TELEGRAM_AUDIO_URL
-                    if str(streamtype) == "audio"
-                    else config.TELEGRAM_VIDEO_URL
-                ),
-                text=_["stream_1"].format(
-                    title, config.SUPPORT_GROUP, check[0]["dur"], user
-                ),
-                buttons=button,
-            )
-            db[chat_id][0]["mystic"] = run
-            db[chat_id][0]["markup"] = "tg"
-        elif videoid == "soundcloud":
-            button = telegram_markup(_, chat_id)
-            run = await event.reply(
-                file=(
-                    config.SOUNCLOUD_IMG_URL
-                    if str(streamtype) == "audio"
-                    else config.TELEGRAM_VIDEO_URL
-                ),
-                text=_["stream_1"].format(
-                    title, config.SUPPORT_GROUP, check[0]["dur"], user
-                ),
-                buttons=button,
-            )
-            db[chat_id][0]["mystic"] = run
-            db[chat_id][0]["markup"] = "tg"
-        elif "saavn" in videoid:
-            button = telegram_markup(_, chat_id)
-            url = check[0]["url"]
-            details = await Platform.saavn.info(url)
-            run = await event.reply(
-                file=details["thumb"] or config.TELEGRAM_AUDIO_URL,
-                text=_["stream_1"].format(title, url, check[0]["dur"], user),
-                buttons=button,
-            )
-            db[chat_id][0]["mystic"] = run
-            db[chat_id][0]["markup"] = "tg"
-        else:
-            button = stream_markup(_, videoid, chat_id)
-            img = await gen_thumb(videoid)
-            run = await event.reply(
-                file=img,
-                text=_["stream_1"].format(
-                    title[:27],
-                    f"https://t.me/{tbot.username}?start=info_{videoid}",
-                    duration_min,
-                    user,
-                ),
-                buttons=button,
-            )
-            db[chat_id][0]["mystic"] = run
-            db[chat_id][0]["markup"] = "stream"
+    url = (
+        f"https://t.me/{tbot.username}?start=info_{track.vidid}"
+        if track.is_youtube
+        else track.link
+    )
+    db[chat_id][0]["played"] = 0
+    mystic = await event.reply(_["call_8"], link_preview=False)
+
+    try:
+        file_path = await track.download()
+        await Yukki.skip_stream(chat_id, file_path, video=track.video)
+
+    except Exception as e:
+        await tbot.handle_error(e, event)
+        return await mystic.edit(_["call_7"])
+
+    what, button = play_markup(_, chat_id, track)
+
+    run = await event.respond(
+        file=track.thumb,
+        message=_["stream_1"].format(
+            track.title[:27],
+            url,
+            seconds_to_min(track.duration),
+            user,
+        ),
+        buttons=button,
+    )
+    db[chat_id][0]["mystic"] = run
+    db[chat_id][0]["markup"] = what
+    await mystic.delete()

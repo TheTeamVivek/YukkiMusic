@@ -11,6 +11,7 @@ from datetime import datetime
 
 from config import BANNED_USERS, PING_IMG_URL
 from YukkiMusic import tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils import bot_sys_stats
 from YukkiMusic.utils.decorators.language import language

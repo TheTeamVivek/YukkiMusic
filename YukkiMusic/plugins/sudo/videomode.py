@@ -11,6 +11,7 @@
 
 import config
 from YukkiMusic import tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import add_off, add_on
 from YukkiMusic.utils.decorators.language import language

@@ -26,11 +26,11 @@ from .enum import SourceType
 class Track:
     title: str
     link: str
-    thumb: str
     duration: int  # duration in seconds
     streamtype: SourceType
     video: bool
 
+    thumb: str | None = None
     download_url: str | None = (
         None  # If provided directly used to download instead self.link
     )

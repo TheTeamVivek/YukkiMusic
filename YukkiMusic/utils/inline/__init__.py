@@ -7,6 +7,8 @@
 #
 # All rights reserved.
 #
+from YukkiMusic.core import filters as flt
+
 from .help import *
 from .play import *
 from .playlist import *

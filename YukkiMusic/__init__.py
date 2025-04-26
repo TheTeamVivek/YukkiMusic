@@ -8,8 +8,8 @@
 # All rights reserved.
 
 # pylint: disable=C0103
-
 import config as _config
+from YukkiMusic.core import filters as flt
 from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
 from YukkiMusic.core.telethon import TelethonClient
@@ -32,5 +32,3 @@ dirr()
 
 # Check Git Updates
 git()
-
-HELPABLE = {}

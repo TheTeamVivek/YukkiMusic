@@ -16,6 +16,7 @@ import os
 import sys
 import traceback
 from collections.abc import Callable
+from contextlib import suppress
 from dataclasses import dataclass
 from datetime import datetime
 from functools import wraps
@@ -27,8 +28,6 @@ from telethon.tl import functions, types
 import config
 from YukkiMusic.utils import pastebin
 from YukkiMusic.utils.decorators.asyncify import asyncify
-
-from . import filters as telethon_filters
 
 uvloop.install()
 
@@ -128,7 +127,7 @@ class TelethonClient(TelegramClient):
             pass
         log.info("MusicBot started as %s", self.name)
         if config.SET_CMDS:
-            await self._set_default_commands()
+            await self.__set_default_commands()
 
     async def run_coro(self, func: Callable, err: bool = True, *args, **kwargs):
         try:
@@ -246,12 +245,17 @@ class TelethonClient(TelegramClient):
                     errors.ChatSendPhotosForbiddenError,
                     errors.MessageNotModifiedError,
                     errors.MessageIdInvalidError,
-                ):
-                    pass
-                #  if isinstance(e, errors.ChatWriteForbiddenError):
-                #      await self.run_coro(
-                #          event.chat_id, func=self.leave_chat, err=False
-                #      )  # using for disable errors
+                ) as e:
+                    if type(e) in [
+                        errors.MessageNotModifiedError,
+                        errors.MessageIdInvalidError,
+                    ]:
+                        pass
+                    with suppress(Exception):
+                        await event.reply(
+                            "I dont have rights to send message or medias, So Leaving..."
+                        )
+                        await self.leave_chat(event.chat_id)
 
                 except events.StopPropagation as e:
                     raise events.StopPropagation from e
@@ -282,7 +286,7 @@ class TelethonClient(TelegramClient):
             stderr=stderr.decode().strip() if stderr else None,
         )
 
-    async def _set_default_commands(self):
+    async def __set_default_commands(self):
         try:
             await self.set_bot_commands(
                 commands=command["private"],
@@ -320,16 +324,12 @@ class TelethonClient(TelegramClient):
         )
 
     @asyncify
-    def load_plugin(self, file_path: str, base_dir: str, attrs: dict):
+    def __load_plugin(self, file_path: str, base_dir: str):
         relative_path = os.path.relpath(file_path, base_dir).replace(os.sep, ".")
         module_path = f"{os.path.basename(base_dir)}.{relative_path[:-3]}"
 
         spec = importlib.util.spec_from_file_location(module_path, file_path)
         module = importlib.util.module_from_spec(spec)
-
-        attrs = {app: self, Config: config, flt: telethon_filters, **attrs}
-        for name, attr in attrs.items():
-            setattr(module, name, attr)
 
         try:
             spec.loader.exec_module(module)
@@ -340,33 +340,11 @@ class TelethonClient(TelegramClient):
 
         return module
 
-    async def load_plugins_from(self, base_folder: str, attrs: dict):
+    async def load_plugins_from(self, base_folder: str):
         base_dir = os.path.abspath(base_folder)
-        utils_path = os.path.join(base_dir, "utils.py")
-        utils = None
-
-        if os.path.exists(utils_path) and os.path.isfile(utils_path):
-            try:
-                spec = importlib.util.spec_from_file_location("utils", utils_path)
-                utils = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(utils)
-            except Exception as e:
-                logger.error("Failed to load 'utils' module: %s", e, exc_info=True)
-                sys.exit()
-
-        if utils:
-            attrs["utils"] = utils
-        from YukkiMusic import HELPABLE
 
         for root, _, files in os.walk(base_dir):
             for file in files:
-                if (
-                    file.endswith(".py")
-                    and not file == "utils.py"
-                    and not file.startswith("__")
-                ):
+                if file.endswith(".py") and not file.startswith("_"):
                     file_path = os.path.join(root, file)
-                    mod = await self.load_plugin(file_path, base_dir, attrs)
-                    if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
-                        if hasattr(mod, "__HELP__") and mod.__HELP__:
-                            HELPABLE[mod.__MODULE__.lower()] = mod
+                    await self.__load_plugin(file_path, base_dir)

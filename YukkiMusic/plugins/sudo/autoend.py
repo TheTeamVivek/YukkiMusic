@@ -9,6 +9,7 @@
 #
 
 from YukkiMusic import tbot
+from YukkiMusic.core import filters as flt
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import autoend_off, autoend_on
 
