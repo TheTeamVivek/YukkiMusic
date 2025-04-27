@@ -12,8 +12,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -21,8 +19,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-           pip install --upgrade pip
-           pip install Sphinx==8.2.3
+           #pip install --upgrade pip
+           pip install -r docs/requirements.txt
 
       - name: Build documentation
         run: |
