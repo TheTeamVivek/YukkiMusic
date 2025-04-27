@@ -77,6 +77,9 @@ admin_32 : "🚫 Bot is not able to seek due to high duration given. You need to
 admin_33 : "⏳➻ Please Wait... Seeking ongoing stream."
 admin_34 : "✅➻ Successfully Seeked Stream to {0} Mins"
 admin_35 : "❌➻ Failed to seek the current stream."
+admin_36: "⏭️ Music is skipped by {}!"
+admin_37: "🔁 Music replayed by {0} !"
+admin_38: "Bot is unable to seek because duration exceeds.\n\nCurrently played:** {0}** minutes out of **{1}** minutes."
 
 # Anonymous Admin
 anon_admin: "How to Fix this?"
@@ -150,6 +153,7 @@ cplay_3: "✅ Channel defined to {0}\n\nChannel ID: {1}"
 cplay_4: "❌ Failed to get channel.\n\nMake sure you have added the bot in your channel and promoted it as admin.\nChange channel via /channelplay or disable channel play mode via /playmode."
 cplay_5: "🚫 Only channels are supported."
 cplay_6: "🔑 You need to be the **owner** of the channel [{0}] to connect it with this group.\n**Channel's owner:** @{1}\n\nAlternatively, you can link your group to that channel and then try connecting with `/channelplay linked`."
+cplay_7: "Channel Play Disabled"
 
 # Play Messages
 play_1: "🔄 **Processing...**"
@@ -171,6 +175,7 @@ play_16: "❌ Failed to fetch track details; maybe that track is age restricted 
 play_17: "🚫 Unable to play this type of Spotify query!\n\nI can only play Spotify tracks, albums, artists, and playlists."
 play_18: "🔊 **No active voice chat**\n\nTo use force play, there must be an active voice chat."
 play_19: "I don't think that it is a streamable URL. If you believe that it is a streamable URL, please use /stream <url>."
+play_20: "Not a live stream"
 
 # Play Flags
 VPLAY_FLAGS: ["-v"]
