@@ -3,24 +3,19 @@ name: name: "Sphinx: Render docs"
 on:
   push:
 
-permissions:
-  contents: write
-  actions: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
@@ -30,15 +25,15 @@ jobs:
           pip install Sphinx==8.2.3
           make html
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: html-docs
-        path: docs/build/html/
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-docs
+          path: docs/build/html/
 
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/dev'
-      with:
-        #github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: docs/build/html
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/dev'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build/html
