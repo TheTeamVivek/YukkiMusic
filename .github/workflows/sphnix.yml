@@ -21,7 +21,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install Sphinx==8.2.3
+          python -m pip install --upgrade pip Sphinx==8.2.3
 
       - name: Build documentation
         run: |
