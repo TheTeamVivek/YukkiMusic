@@ -39,14 +39,4 @@ async def info(url: str) -> "Track":
 
     for service, source_type in services:
         if await service.valid(url):
-<<<<<<< HEAD
             return service.track(url)
-=======
-            return source_type
-
-
-async def info(
-    type: SourceType, **kwargs
-) -> dict:  # todo implement all classes and there info function in this function using SourceType and **kwargs
-    pass
->>>>>>> ff3266fbaa535f0c42807caa4dc214770ec9d4cb
