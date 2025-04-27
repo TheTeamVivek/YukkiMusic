@@ -35,6 +35,6 @@ jobs:
           commit_message: ${{ github.event.head_commit.message }}
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
-          publish_dir: docs/build/html
+          publish_dir: docs/_build/html
           external_repository: TheTeamVivek/TheTeamVivek.github.io
           publish_branch: gh-pages
