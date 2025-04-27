@@ -1,6 +1,11 @@
-name: "Sphinx: Render docs"
-on: 
+name: name: "Sphinx: Render docs"
+
+on:
   push:
+
+permissions:
+  contents: write
+  actions: write
 
 jobs:
   build:
@@ -9,12 +14,21 @@ jobs:
       contents: write
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        persist-credentials: false
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Build HTML
-      uses: ammaraskar/sphinx-action@master
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Build documentation
+        run: |
+          cd docs
+          pip install Sphinx==8.2.3
+          make html
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
@@ -24,7 +38,7 @@ jobs:
 
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/dev'
       with:
         #github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: docs/build/html
