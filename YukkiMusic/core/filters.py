@@ -20,7 +20,7 @@ from YukkiMusic.utils.database import get_lang as _get_lang
 
 __all__ = [
     "Filter",
-    "wrap" "forwarded",
+    "wrapforwarded",
     "new_chat_members",
     "private",
     "group",

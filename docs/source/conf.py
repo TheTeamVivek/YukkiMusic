@@ -1,4 +1,4 @@
-	# Configuration file for the Sphinx documentation builder.
+# Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
@@ -42,6 +42,4 @@ html_theme_options = {
     "footer_content_items": "copyright.html, last-updated.html, extra-footer.html",
     "search_bar_text": "Search the docs",
     "back_to_top_button": False,
-
 }
-

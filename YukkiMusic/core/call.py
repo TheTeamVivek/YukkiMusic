@@ -61,6 +61,7 @@ from YukkiMusic.utils.thumbnails import gen_thumb
 links = {}
 logger = logging.getLogger(__name__)
 
+
 def _clean(data: list | dict):
     if isinstance(data, list):
         for element in data:
@@ -69,9 +70,8 @@ def _clean(data: list | dict):
     else:
         if msg := data.get("mystic"):
             config.add_to_clean(msg.chat_id, msg.id)
-    
-                
-                
+
+
 async def clear(chat_id):
     try:
         popped = db.pop(chat_id, None)
@@ -341,7 +341,7 @@ class Call:
                 if popped:
                     await auto_clean(popped)
                     _clean(popped)
-                    
+
             else:
                 loop = loop - 1
                 await set_loop(chat_id, loop)

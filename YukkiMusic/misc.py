@@ -11,8 +11,7 @@ import socket
 import time
 
 import heroku3
-from collections import defaultdict
- 
+
 import config
 from YukkiMusic.core.mongo import mongodb
 
