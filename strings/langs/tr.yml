@@ -76,7 +76,10 @@ admin_31 : "Şu anda oynatılan akışı arayamazsınız. Sadece atlanabilir vey
 admin_32 : "Verilen yüksek süre nedeniyle bot arama yapamıyor. Daha düşük bir süreye arama yapmanız gerekir ve arama sonrasında 10 saniye kaldığını hatırlayın.\n\nŞu anda oynatılan **{0}** dakika **{1}** dakikadan"
 admin_33 : "➻ Lütfen bekleyin... Akış aranıyor."
 admin_34 : "➻ Akış başarıyla {0} dakikaya arandı."
-admin_35 : "➻ Mevcut akışı arama başarısız oldu.
+admin_35 : "➻ Mevcut akışı arama başarısız oldu."
+admin_36: "⏭️ Müzik {} tarafından atlandı!"
+admin_37: "🔁 Müzik {0} tarafından yeniden oynatıldı!"
+admin_38: "Bot süre aşımı nedeniyle arama yapamıyor.\n\nŞu anda çalınan: **{0}** dakika (Toplam: **{1}** dakika)"
 
 # Anonymous
 anon_admin: "Bunu Nasıl Düzeltebilirim?"
@@ -143,6 +146,7 @@ cplay_3: "Kanal {0} olarak belirlendi\n\nKanal ID'si: {1}"
 cplay_4: "Kanal alınamadı.\n\nBot'unuzu kanalınıza eklediğinizden ve yönetici olarak tanıttığınızdan emin olun.\nKanalı değiştirmek için /channelplay komutunu kullanın veya kanal oynatma modunu devre dışı bırakın /playmode ile."
 cplay_5: "Yalnızca kanallar desteklenir."
 cplay_6: "{0} kanalının **SAHİBİ** olmanız gerekiyor, bu gruba bağlanmak için.\n**Kanalın Sahibi:** @{1}\n\nAlternatif olarak, grubunuzu bu kanala bağlayabilir ve ardından `/channelplay linked` komutuyla bağlanmayı deneyebilirsiniz."
+cplay_7: "Kanal Oynatma Devre Dışı"
 
 play_1: "**🥀 İşleniyor...**"
 play_2: "🏷**Kanal Oynatma Modu**\n🔄 Sorgu işleniyor... Lütfen bekleyin!\n\n**Bağlantılı Kanal:** {0}"
@@ -163,7 +167,7 @@ play_16: "Parça detaylarını almak başarısız oldu, belki bu parça YouTube'
 play_17: "Bu tür Spotify sorgularını çalamıyorum!\n\nYalnızca Spotify parçalarını, albümleri, sanatçıları ve çalma listelerini çalabilirim."
 play_18: "**Aktif Sesli Sohbet Yok**\n\nZorunlu oynatma için, aktif bir sesli sohbet bulunmalıdır."
 play_19: "Bu akış yapılabilir bir URL olduğunu düşünmüyorum. Eğer bunun akış yapılabilir bir URL olduğunu düşünüyorsanız, lütfen /stream <url> kullanın."
-
+play_20: "Canlı yayın değil"
 
 #playlist
 playlist_1: "**Kullanım:** /play [Müzik Adı veya YouTube Linki veya Sesinize Yanıt Verin]\n\nBot'un sunucusundaki çalma listesini çalmak istiyorsanız! Aşağıdaki düğmeye basın."
