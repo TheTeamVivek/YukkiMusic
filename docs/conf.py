@@ -7,7 +7,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 project = "YukkiMusic"
-project_copyright = "2024-2025, TheTeamVivek"
+project_copyright = "2025, TheTeamVivek"
 author = "TheTeamVivek"
 release = "2.0"
 
