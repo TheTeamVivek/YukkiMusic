@@ -66,5 +66,6 @@ jobs:
 
       - uses: Mattraks/delete-workflow-runs@v2
         with:
+          delete_workflow_pattern: "Replace"
           keep_minimum_runs: 0
           retain_days: 0
