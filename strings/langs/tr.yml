@@ -11,6 +11,10 @@ general_6 : "Bot şu anda video sohbetinde yayın yapmıyor."
 # Classes - Telegram.py
 tg_1 : "Bot şu anda **indirmelerle aşırı yüklü**.\n\n**Tekrar deneyin:** {0} (__beklenen zaman__)"
 tg_2 : "Telegram'dan medyayı indirme başarısız oldu."
+tg_3: "**{0} Telegram Medya İndirici**\n\n**Toplam dosya boyutu:** {1}\n**Tamamlanan:** {2} \n**Yüzde:** {3}%\n\n**Hız:** {4}/s\n**Geçen Süre:** {5}"
+tg_4: "Başarıyla İndirildi\nDosya İşleniyor..."
+tg_5: "İndirme Zaten Tamamlandı"
+tg_6: "İndirme Zaten İptal Edildi"
 
 # Core - Call.py
 call_1 : "Bot, asistan hesabını kanalınıza davet etmek için **yönetici** iznine ihtiyaç duyar."
@@ -23,6 +27,9 @@ call_7 : "**Akış değiştirme başarısız oldu**\nLütfen parçayı değişti
 call_8 : "Çalma listesinden sonraki parçayı indiriyor...."
 call_9 : "Asistan çok fazla sohbete katıldı, bu yüzden buraya katılamıyor.\nBu sorunu çözmek ve bildirmek için [Destek Grubu]({0}) ile iletişime geçin."
 call_10: "Asistan, katılma/ayrılma nedeniyle FloodWait'te, lütfen {0} saniye bekleyin"
+call_11: "**Aktif Sesli Sohbet Bulunamadı**\n\nLütfen grubun sesli sohbetinin etkinleştirilmiş olduğundan emin olun. Zaten etkinse, lütfen sonlandırıp yeni bir sesli sohbet başlatın. Sorun devam ederse /reboot komutunu deneyin"
+call_12: "**ASİSTAN ZATEN SESLİ SOHBETTE** \n\nMüzik bot sistemi asistanın zaten sesli sohbette olduğunu tespit etti. Sorun devam ederse video sohbeti yeniden başlatıp tekrar deneyin"
+call_13: "**TELEGRAM SUNUCU HATASI**\n\nLütfen sesli sohbetinizi yeniden başlatın"
 
 # PLUGINS - Auth.py
 auth_1 : "Grubunuzun yetkili kullanıcılar listesinde (aul) sadece 20 kullanıcı olabilir."
@@ -55,6 +62,7 @@ admin_17 :  "{0}.. Lütfen bekleyin"
 admin_18 : "Yönetici Listesi Bulunamadı\n\nLütfen /admincache veya /reload ile yönetici listesini yeniden yükleyin"
 admin_19 : "Bu işlemi gerçekleştirmek için **sesli sohbeti yönet** haklarına sahip yönetici olmanız gerekir.\nZaten yöneticiyseniz, /admincache komutuyla yönetici önbelleğini yeniden yükleyin."
 admin_20 : "Yönetici önbelleği başarıyla yeniden yüklendi."
+admin_21 : "❌ Yönetici önbelleği yenilenemedi, botun sohbetinizde yönetici olduğundan emin olun"
 admin_22 : "Karıştırılacak sırada hiçbir şey yok"
 admin_23 : "Karıştırma başarısız oldu.\n\nSırayı kontrol edin: /queue"
 admin_24 : "**Sıra {0} tarafından karıştırıldı**\n\nKarıştırılmış sırayı kontrol edin: /queue"
@@ -68,7 +76,11 @@ admin_31 : "Şu anda oynatılan akışı arayamazsınız. Sadece atlanabilir vey
 admin_32 : "Verilen yüksek süre nedeniyle bot arama yapamıyor. Daha düşük bir süreye arama yapmanız gerekir ve arama sonrasında 10 saniye kaldığını hatırlayın.\n\nŞu anda oynatılan **{0}** dakika **{1}** dakikadan"
 admin_33 : "➻ Lütfen bekleyin... Akış aranıyor."
 admin_34 : "➻ Akış başarıyla {0} dakikaya arandı."
-admin_35 : "➻ Mevcut akışı arama başarısız oldu."
+admin_35 : "➻ Mevcut akışı arama başarısız oldu.
+
+# Anonymous
+anon_admin: "Bunu Nasıl Düzeltebilirim?"
+anon_admin2: "Anonim yöneticisiniz\nBeni kullanmak için kullanıcı hesabınıza dönün"
 
 # bot
 start_1 : "нєу, ɪ ᴀᴍ {0} 🥀.\n\n➻ Ben bazı yararlı özelliklere sahip bir Telegram akış botuyum.\n\nDesteklenen platformlar: YouTube, Spotify, SoundCloud vb.\n\n๏ Beni gruplarınıza eklemekten çekinmeyin."
@@ -183,6 +195,7 @@ playlist_25: "⏱️ Lütfen bekleyin\n🗑️ Çalma listeniz siliniyor...."
 
 saavn_1: "😞 Üzgünüm! Şu anda bot Saavn Podcast URL'sini oynatamıyor."
 
+spotify_1: "Bu bot Spotify parçaları ve çalma listelerini çalamaz, lütfen sahibimle iletişime geçin ve Spotify oynatıcısı eklemesini isteyin"
 
 #misc
 
@@ -210,7 +223,25 @@ lyrics_2: "Şarkı sözleri aranıyor..."
 lyrics_3: "Şarkı sözlerini getirme başarısız oldu 🥲.\n\n**Aranan:** {0}"
 lyrics_4: "Aşağıdaki düğmeye tıklayın ve şarkı sözlerini almak için arama yapın, uzun spam türlerinden kaçının."
 
+# Lang
+lang_1: "Zaten aynı dili kullanıyorsunuz"
+lang_2: "Diliniz başarıyla değiştirildi.."
+lang_3: "Dil değiştirilemedi veya dil güncellemesi devam ediyor"
 
+# Logger
+logger_text: |
+**{bot_mention} Oynatma Kaydı**
+
+**Sohbet ID:** `{chat_id}`
+**Sohbet Adı:** {title}
+**Sohbet Kullanıcı Adı:** {chatusername}
+
+**Kullanıcı ID:** `{sender_id}`
+**Ad:** {user_mention}
+**Kullanıcı Adı:** {username}
+
+**Sorgu:** {query}
+**Yayın Türü:** {streamtype}
 
 #Ping
 ping_1 : "»{0} ᴘɪɴɢ ɪɴɢ..."
@@ -245,6 +276,16 @@ V_C_2 : "**İsim: {0}**\n   ID: {1}\n    **Kullanıcı Adı:** {2}\n    **Video 
 V_C_3 : "Sesli sohbette katılımcı yok"
 V_C_4 : "[Sesli sohbet katılımcılarının tüm ayrıntılarını buradan kontrol edebilirsiniz]({0})"
 V_C_5 : "Bu sohbette aktif bir çağrı yok."
+
+# Active Vc
+ac_1: "Aktif Sesli Sohbetler Alınıyor...\nLütfen bekleyin"
+ac_2: "Aktif Sohbet Bulunamadı"
+ac_3: "**Aktif Sesli Sohbetler:-**\n\n"
+ac_4: "Aktif Sohbet Bilgileri:\nSes: {0}\nVideo: {1}"
+
+#Enable-Disable
+enable: "Etkinleştir"
+disable: "Devre Dışı Bırak"
 
 # Inline Buttons
 
@@ -334,6 +375,9 @@ ST_B_31 : "🧑‍🚀 Öneri Modu"
 SG_B_1 : "↗️ ÖZELDE AÇ"
 SG_B_2 : "🔊 Ses"
 SG_B_3 : "🎥 Video"
+
+# TG-Download
+TG_B_1: "🚦 İndirmeyi İptal Et"
 
 # Stats
 SA_B_1 : "📢 İlk 10 Sohbet"

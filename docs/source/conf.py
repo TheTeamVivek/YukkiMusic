@@ -1,4 +1,4 @@
-# Configuration file for the Sphinx documentation builder.
+	# Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
@@ -44,3 +44,4 @@ html_theme_options = {
     "back_to_top_button": False,
 
 }
+

@@ -11,6 +11,10 @@ general_6 : "📺 Bot isn't streaming on video chat."
 # Classes - Telegram.py
 tg_1 : "⚠️ Bot is **overloaded** with downloads right now.\n\n**Try after:** {0} (__expected time__)"
 tg_2 : "❌ Failed to download the media from Telegram."
+tg_3: "**{0} Telagram Media Downloader**\n\n**Total file size:** {1}\n**Completed:** {2} \n**Percentage:** {3}%\n\n**Speed:** {4}/s\n**Elapsed Time:** {5}"
+tg_4: "Sucessfully Downloaded\n Processing File Now..."
+tg_5: "Download Already Completed."
+tg_6: "Downloading already Cancelled."
 
 # Core - Call.py
 call_1 : "🤖 Bot requires **admin** permission to invite assistant account to your channel."
@@ -23,6 +27,9 @@ call_7 : "❌ **Failed to switch stream**\nPlease use /skip to change track agai
 call_8 : "📥 Downloading next track from playlist...."
 call_9 : "📉 Assistant is joined too many chats, therefore assistant can't join here\nContact [Support Group]({0}) to fix and inform this problem."
 call_10: "⏳ Assistant is on FloodWait due to join/leave please wait {0} seconds."
+call_11: "**No Active Voice Chat Found**\n\nPlease make sure group's voice chat is enabled. If already enabled, please end it and start fresh voice chat again and if the problem continues, try /reboot"
+call_12: "**ASSISTANT IS ALREADY IN VOICECHAT** \n\nMusic bot system detected that assistant is already in the voicechat, if the problem continues restart the videochat and try again."
+call_13: "**TELEGRAM SERVER ERROR**\n\nPlease restart Your voicechat."
 
 # PLUGINS - Auth.py
 auth_1 : "🔒 You can only have 20 users in your group's authorized users list (aul)."
@@ -70,6 +77,10 @@ admin_32 : "🚫 Bot is not able to seek due to high duration given. You need to
 admin_33 : "⏳➻ Please Wait... Seeking ongoing stream."
 admin_34 : "✅➻ Successfully Seeked Stream to {0} Mins"
 admin_35 : "❌➻ Failed to seek the current stream."
+
+# Anonymous Admin
+anon_admin: "How to Fix this?"
+anon_admin2: "You are an anonymous admin\nRevert back to user to use me"
 
 # Bot 
 
@@ -161,6 +172,10 @@ play_17: "🚫 Unable to play this type of Spotify query!\n\nI can only play Spo
 play_18: "🔊 **No active voice chat**\n\nTo use force play, there must be an active voice chat."
 play_19: "I don't think that it is a streamable URL. If you believe that it is a streamable URL, please use /stream <url>."
 
+# Play Flags
+VPLAY_FLAGS: ["-v"]
+CPLAY_FLAGS: ["-c"]
+FPLAY_FLAGS: ["-f", "-force"]
 
 # Playlist
 playlist_1: "📋 **Usage:** /play [music name or YouTube link or reply to audio]\n\nIf you want to play the bot's server playlist! Press the button below."
@@ -192,6 +207,10 @@ playlist_25: "⏱️ Please wait\n🗑️ Deleting your playlist...."
 
 saavn_1: "😞 Sorry! Currently, the bot is unable to play the Saavn Podcast URL."
 
+spotify_1: "This Bot can't play spotify tracks and playlist, please contact my owner and ask him to add Spotify player."
+
+# misc
+misc_1: "🤖 Bot automatically cleared the queue and left the voice chat because no one was listening to songs in the voice chat."
 
 # Playmode
 playmode_1: "🎮 Select the mode in which you want to play the queries inside your group [{0}]."
@@ -213,6 +232,26 @@ lyrics_1: "**USAGE:**\n\n/lyrics [music name]"
 lyrics_2: "🔍 searching lyrics..."
 lyrics_3: "❌ Failed to fetch lyrics 🥲.\n\n**Tried searching for:** {0}"
 lyrics_4: "Click on the button below and get searched lyrics to avoid long spam types lyrics search."
+
+# Lang
+lang_1: "You are already using same language"
+lang_2: "Your language changed successfully.."
+lang_3: "Failed to change language or language in under Upadte"
+
+# Logger
+logger_text: |
+**{bot_mention} Play Log**
+
+**Chat ID:** `{chat_id}`
+**Chat Name:** {title}
+**Chat Username:** {chatusername}
+
+**User ID:** `{sender_id}`
+**Name:** {user_mention}
+**Username:** {username}
+
+**Query:** {query}
+**Stream Type:** {streamtype}
 
 # Ping
 ping_1: "» {0} is pinging..."
@@ -248,10 +287,15 @@ V_C_3: "🚫 No participants in voice chat."
 V_C_4: "[🔗 You can check all details of voice chat participants from here]({0})"
 V_C_5: "❌ There is no active call in this chat."
 
-# misc
-misc_1: "🤖 Bot automatically cleared the queue and left the voice chat because no one was listening to songs in the voice chat."
+# Active Vc
+ac_1: "Getting Active Voicechats....\nPlease hold on"
+ac_2: "No active Chats Found"
+ac_3: "**Active Voice Chat's:-**\n\n"
+ac_4: "Active Chats info:\nAudio: {0}\nVideo: {1}"
 
-# Inline Buttons
+# Enable-Disable
+enable: "enable"
+disable: "disable"
 
 # General Buttons
 CLOSE_BUTTON: "Close"
@@ -340,6 +384,9 @@ ST_B_31 : "🧑‍🚀 Suggestion Mode"
 SG_B_1 : "↗️ Open In Private"
 SG_B_2 : "🔊 Audio"
 SG_B_3 : "🎥 Video"
+
+# TG-Download
+TG_B_1: "🚦 Cancel downloading"
 
 # Stats
 SA_B_1 : "📢 Top 10 Chat"

@@ -128,7 +128,9 @@ class User(set, Filter):
             (
                 "me"
                 if u in ["me", "self"]
-                else u.lower().strip("@") if isinstance(u, str) else u
+                else u.lower().strip("@")
+                if isinstance(u, str)
+                else u
             )
             for u in users
         )

@@ -108,7 +108,6 @@ async def play_commnd(
 
     elif url:
         if await youtube.valid(url):
-
             if "https://youtu.be" in url:
                 videoid = url.split("/")[-1].split("?")[0]
                 details = await youtube.track(
