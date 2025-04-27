@@ -3,7 +3,6 @@ name: "Sphinx: Render docs"
 on:
   push:
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
