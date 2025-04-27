@@ -1,5 +1,13 @@
-from YukkiMusic.core import filters as flt
+#
+# Copyright (C) 2024-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+#
+# This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
+# and is released under the MIT License.
+# Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
+#
+# All rights reserved.
+#
 
-from .autoclear import auto_clean
-from .queue import put_queue
-from .stream import stream
+from .autoclear import *
+from .queue import *
+from .stream import *

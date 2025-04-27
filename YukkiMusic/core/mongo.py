@@ -15,6 +15,8 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 import config
 
+__all__ = ["DB_NAME", "mongodb"]
+
 logger = logging.getLogger(__name__)
 TEMP_MONGODB = "mongodb+srv://TeamVivek:teambackup@teamvivekbackup.7acwn.mongodb.net/?retryWrites=true&w=majority&appName=TeamVivekBackup"  # pylint: disable=line-too-long
 DB_NAME = "Yukki"

@@ -11,13 +11,14 @@ import socket
 import time
 
 import heroku3
-
+from collections import defaultdict
+ 
 import config
 from YukkiMusic.core.mongo import mongodb
 
 from .logging import logger
 
-db = {}
+db = dict()
 HAPP = None
 _boot_ = time.time()
 loop = asyncio.get_event_loop()

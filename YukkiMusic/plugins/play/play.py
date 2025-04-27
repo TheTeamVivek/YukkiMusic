@@ -14,7 +14,7 @@ import traceback
 import config
 from config import BANNED_USERS
 from YukkiMusic import tbot
-from YukkiMusic.core import filters as flt
+from YukkiMusic.core import filters
 from YukkiMusic.core.enum import SourceType
 from YukkiMusic.core.track import Track
 from YukkiMusic.platforms import (
@@ -25,19 +25,22 @@ from YukkiMusic.platforms import (
     telegram,
     youtube,
 )
-from YukkiMusic.utils import get_message_link, seconds_to_min, time_to_seconds
-from YukkiMusic.utils.database import is_video_allowed
-from YukkiMusic.utils.decorators.play import play_wrapper
-from YukkiMusic.utils.formatters import formats
-from YukkiMusic.utils.inline.play import livestream_markup
-from YukkiMusic.utils.inline.playlist import botplaylist_markup
-from YukkiMusic.utils.logger import play_logs
-from YukkiMusic.utils.stream.stream import stream
+from YukkiMusic.utils import (
+    botplaylist_markup,
+    formats,
+    get_message_link,
+    is_video_allowed,
+    livestream_markup,
+    play_logs,
+    play_wrapper,
+    seconds_to_min,
+    stream,
+)
 
 logger = logging.getLogger(__name__)
 
 
-@tbot.on_message(flt.command("PLAY_COMMAND", True) & flt.group & ~BANNED_USERS)
+@tbot.on_message(filters.command("PLAY_COMMAND", True) & filters.group & ~BANNED_USERS)
 @play_wrapper
 async def play_commnd(
     event,
@@ -57,8 +60,8 @@ async def play_commnd(
     if event.is_reply:
         rmsg = await event.get_reply_message()
         file = rmsg.file
-        audio_telegram = rmsg.audio or rmsg.voice
-        video_telegram = rmsg.video
+        audio_telegram = True if (rmsg.audio or rmsg.voice) else False
+        video_telegram = True if rmsg.video else False
 
     if audio_telegram:
         if file.size > config.TG_AUDIO_FILESIZE_LIMIT:
@@ -181,7 +184,7 @@ async def play_commnd(
                 _["playlist_1"],
                 buttons=buttons,
             )
-        query = message.text.split(None, 1)[1]
+        query = event.text.split(None, 1)[1]
         if "-v" in query:
             query = query.replace("-v", "")
         try:
@@ -192,15 +195,15 @@ async def play_commnd(
 
     # if str(playmode) == "DIRECT" and not plist_type:
     if True:
-        if details["duration_min"]:
-            duration_sec = time_to_seconds(details["duration_min"])
-            if duration_sec > config.DURATION_LIMIT:
-                return await mystic.edit(
-                    _["play_6"].format(
-                        config.DURATION_LIMIT_MIN,
-                        details["duration_min"],
+        if isinstance(details, (list, Track)):
+            if isinstance(details, Track):
+                if details.duration > config.DURATION_LIMIT:
+                    return await mystic.edit(
+                        _["play_6"].format(
+                            config.DURATION_LIMIT_MIN,
+                            details["duration_min"],
+                        )
                     )
-                )
         else:
             buttons = livestream_markup(
                 _,

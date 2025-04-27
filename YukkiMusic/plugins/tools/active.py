@@ -10,15 +10,11 @@
 
 import config
 from YukkiMusic import tbot
-from YukkiMusic.core import filters as flt
-from YukkiMusic.core.decorators.language import language
-from YukkiMusic.utils.database.memorydatabase import (
-    get_active_chats,
-    get_active_video_chats,
-)
+from YukkiMusic.core import filters, language
+from YukkiMusic.utils import get_active_chats, get_active_video_chats
 
 
-@tbot.on_message(flt.command("ACTIVEVC_COMMAND", True) & config.SUDOERS)
+@tbot.on_message(filters.command("ACTIVEVC_COMMAND", True) & config.SUDOERS)
 @language(no_check=True)
 async def active_audio(event, _):
     mystic = await event.reply(_["ac_1"])
@@ -49,7 +45,7 @@ async def active_audio(event, _):
         )
 
 
-@tbot.on_message(flt.command("ACTIVEVIDEO_COMMAND", True) & config.SUDOERS)
+@tbot.on_message(filters.command("ACTIVEVIDEO_COMMAND", True) & config.SUDOERS)
 @language(no_check=True)
 async def active_video(event, _):
     mystic = await event.reply(_["ac_1"])
@@ -77,7 +73,7 @@ async def active_video(event, _):
         )
 
 
-@tbot.on_message(flt.command("AC_COMMAND", True) & config.SUDOERS)
+@tbot.on_message(filters.command("AC_COMMAND", True) & config.SUDOERS)
 @language(no_check=True)
 async def ac_counts(event, _):
     ac_audio = len(await get_active_chats())

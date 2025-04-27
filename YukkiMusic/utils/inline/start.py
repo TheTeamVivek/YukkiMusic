@@ -8,79 +8,79 @@
 # All rights reserved.
 #
 
-from telethon import Button
+from telethon import Button as _Button
 
-import config
-from YukkiMusic import tbot
+import config as _config
+from YukkiMusic import tbot as _tbot
 
 
 def start_pannel(_):
     buttons = [
         [
-            Button.url(
+            _Button.url(
                 text=_["S_B_1"],
-                url=f"https://t.me/{tbot.username}?start=help",
+                url=f"https://t.me/{_tbot.username}?start=help",
             ),
-            Button.inline(text=_["S_B_2"], data="settings_helper"),
+            _Button.inline(text=_["S_B_2"], data="settings_helper"),
         ],
     ]
-    if config.SUPPORT_CHANNEL and config.SUPPORT_GROUP:
+    if _config.SUPPORT_CHANNEL and _config.SUPPORT_GROUP:
         buttons.append(
             [
-                Button.url(text=_["S_B_4"], url=config.SUPPORT_CHANNEL),
-                Button.url(text=_["S_B_3"], url=config.SUPPORT_GROUP),
+                _Button.url(text=_["S_B_4"], url=_config.SUPPORT_CHANNEL),
+                _Button.url(text=_["S_B_3"], url=_config.SUPPORT_GROUP),
             ]
         )
     else:
-        if config.SUPPORT_CHANNEL:
-            buttons.append([Button.url(text=_["S_B_4"], url=config.SUPPORT_CHANNEL)])
-        if config.SUPPORT_GROUP:
-            buttons.append([Button.url(text=_["S_B_3"], url=config.SUPPORT_GROUP)])
+        if _config.SUPPORT_CHANNEL:
+            buttons.append([_Button.url(text=_["S_B_4"], url=_config.SUPPORT_CHANNEL)])
+        if _config.SUPPORT_GROUP:
+            buttons.append([_Button.url(text=_["S_B_3"], url=_config.SUPPORT_GROUP)])
     return buttons
 
 
 def private_panel(_, owner: bool | int = None):
-    buttons = [[Button.inline(text=_["S_B_8"], data="settings_back_helper")]]
-    if config.SUPPORT_CHANNEL and config.SUPPORT_GROUP:
+    buttons = [[_Button.inline(text=_["S_B_8"], data="settings_back_helper")]]
+    if _config.SUPPORT_CHANNEL and _config.SUPPORT_GROUP:
         buttons.append(
             [
-                Button.url(text=_["S_B_4"], url=config.SUPPORT_CHANNEL),
-                Button.url(text=_["S_B_3"], url=config.SUPPORT_GROUP),
+                _Button.url(text=_["S_B_4"], url=_config.SUPPORT_CHANNEL),
+                _Button.url(text=_["S_B_3"], url=_config.SUPPORT_GROUP),
             ]
         )
     else:
-        if config.SUPPORT_CHANNEL:
-            buttons.append([Button.url(text=_["S_B_4"], url=config.SUPPORT_CHANNEL)])
-        if config.SUPPORT_GROUP:
-            buttons.append([Button.url(text=_["S_B_3"], url=config.SUPPORT_GROUP)])
+        if _config.SUPPORT_CHANNEL:
+            buttons.append([_Button.url(text=_["S_B_4"], url=_config.SUPPORT_CHANNEL)])
+        if _config.SUPPORT_GROUP:
+            buttons.append([_Button.url(text=_["S_B_3"], url=_config.SUPPORT_GROUP)])
     buttons.append(
         [
-            Button.url(
+            _Button.url(
                 text=_["S_B_5"],
-                url=f"https://t.me/{tbot.username}?startgroup=true",
+                url=f"https://t.me/{_tbot.username}?startgroup=true",
             )
         ]
     )
-    if config.GITHUB_REPO and owner:
+    if _config.GITHUB_REPO and owner:
         buttons.append(
             [
-                Button.url(text=_["S_B_7"], url=f"tg://user?id={owner}"),
-                Button.url(text=_["S_B_6"], url=config.GITHUB_REPO),
+                _Button.url(text=_["S_B_7"], url=f"tg://user?id={owner}"),
+                _Button.url(text=_["S_B_6"], url=_config.GITHUB_REPO),
             ]
         )
     else:
-        if config.GITHUB_REPO:
+        if _config.GITHUB_REPO:
             buttons.append(
                 [
-                    Button.url(text=_["S_B_6"], url=config.GITHUB_REPO),
+                    _Button.url(text=_["S_B_6"], url=_config.GITHUB_REPO),
                 ]
             )
 
         if owner:
             buttons.append(
                 [
-                    Button.url(text=_["S_B_7"], url=f"tg://user?id={owner}"),
+                    _Button.url(text=_["S_B_7"], url=f"tg://user?id={owner}"),
                 ]
             )
-    buttons.append([Button.inline(text=_["ST_B_6"], data="LG")])
+    buttons.append([_Button.inline(text=_["ST_B_6"], data="LG")])
     return buttons

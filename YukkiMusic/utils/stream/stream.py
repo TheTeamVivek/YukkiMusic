@@ -31,6 +31,8 @@ from YukkiMusic.utils.pastebin import paste
 from YukkiMusic.utils.stream.queue import put_queue
 from YukkiMusic.utils.thumbnails import gen_qthumb, gen_thumb
 
+__all__ = ["stream"]
+
 
 async def stream(
     chat_id: int,

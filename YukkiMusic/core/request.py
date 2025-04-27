@@ -12,6 +12,8 @@ from typing import Any
 
 import aiohttp
 
+__all__["Request"]
+
 
 class Request:
     @staticmethod

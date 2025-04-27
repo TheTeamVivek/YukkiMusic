@@ -10,6 +10,8 @@ import aiohttp
 
 BASE = "https://batbin.me/"
 
+__all__ = ["paste "]
+
 
 async def post(url: str, *args, **kwargs):
     async with aiohttp.ClientSession() as session:

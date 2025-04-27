@@ -8,6 +8,8 @@
 # All rights reserved.
 #
 
+__all__ = ["gen_thumb", "gen_qthumb"]
+
 
 async def gen_thumb(thumb_url=None):
     return thumb_url

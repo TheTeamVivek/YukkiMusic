@@ -9,26 +9,26 @@
 #
 
 import asyncio
+import os
 
 from telethon.errors import FloodWaitError
 
 from config import BANNED_USERS
 from YukkiMusic import tbot
-from YukkiMusic.core import filters as flt
+from YukkiMusic.core import filters
 from YukkiMusic.misc import db
 from YukkiMusic.utils import (
     get_channeplay_cb,
-    parse_flags,
-    paste,
-    seconds_to_min,
-)
-from YukkiMusic.utils.database import (
     get_cmode,
     is_active_chat,
     is_music_playing,
+    language,
+    parse_flags,
+    paste,
+    queue_back_markup,
+    queue_markup,
+    seconds_to_min,
 )
-from YukkiMusic.utils.decorators.language import language
-from YukkiMusic.utils.inline.queue import queue_back_markup, queue_markup
 
 basic = {}
 
@@ -40,7 +40,7 @@ def get_duration(playing):
     return "INLINE"
 
 
-@tbot.on_message(flt.command("QUEUE_COMMAND", True) & flt.group & ~BANNED_USERS)
+@tbot.on_message(filters.command("QUEUE_COMMAND", True) & filters.group & ~BANNED_USERS)
 @language
 async def ping_com(event, _):
     _, _, is_cplay = await parse_flags(chat_id, event.text)
@@ -67,7 +67,7 @@ async def ping_com(event, _):
     title = track["title"]
     streamtype = track.streamtype.value
     DUR = get_duration(got)
-    image = track.thumb or None  # TODO: REPLACE NONE WITH A IMAGE URL OR PATH
+    image = track.thumb or os.path.join("assets", "Stream.jpeg")
 
     send = (
         "**⌛️ Duration:** Unknown duration limit\n\nClick on below button to get whole queued list"

@@ -9,6 +9,7 @@
 
 import re
 import sys
+from collections import defaultdict
 from datetime import datetime, timedelta
 from os import getenv
 
@@ -269,13 +270,11 @@ adminlist = {}
 lyrical = {}
 chatstats = {}
 userstats = {}
-clean = {}
+clean = defaultdict(list)
 autoclean = []
 
 
 def add_to_clean(chat_id, msg_id):
-    if chat_id not in clean:
-        clean[chat_id] = []
     time_now = datetime.now()
     put = {
         "msg_id": msg_id,
@@ -298,7 +297,7 @@ def seconds_to_time(seconds):
 
 
 DURATION_LIMIT = int(time_to_seconds(f"{DURATION_LIMIT_MIN}:00"))
-_SDD = time_to_seconds(f"{SONG_DOWNLOAD_DURATION}:00")
+_SDDL = time_to_seconds(f"{SONG_DOWNLOAD_DURATION}:00")
 SONG_DOWNLOAD_DURATION_LIMIT = int(_SDD)
 
 if not STRING_SESSIONS:

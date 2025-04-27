@@ -8,9 +8,7 @@
 # All rights reserved.
 #
 
-from YukkiMusic.core import filters as flt
-
-from .admins import actual_admin_cb, admin_actual, admin_rights_check
-from .asyncify import asyncify
-from .language import language
-from .play import play_wrapper
+from .admins import *
+from .asyncify import *
+from .language import *
+from .play import *

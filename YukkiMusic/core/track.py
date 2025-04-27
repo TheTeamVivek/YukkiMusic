@@ -21,6 +21,8 @@ from YukkiMusic.utils.database import is_on_off
 
 from .enum import SourceType
 
+__all__ = ["Track"]
+
 
 @dataclass
 class Track:

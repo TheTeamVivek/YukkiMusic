@@ -8,6 +8,8 @@
 # All rights reserved.
 #
 
+__all__ = ["AssistantErr"]
+
 
 class AssistantErr(Exception):
     def __init__(self, errr: str):

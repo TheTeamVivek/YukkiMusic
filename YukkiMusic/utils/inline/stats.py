@@ -7,19 +7,19 @@
 #
 # All rights reserved.
 #
-from telethon import Button
+from telethon import Button as _btn
 
-from YukkiMusic import tbot
+from YukkiMusic import tbot as _tbot
 
 
 def back_stats_markup(_):
     upl = [
         [
-            Button.inline(
+            _btn.inline(
                 text=_["BACK_BUTTON"],
                 data="TOPMARKUPGET",
             ),
-            Button.inline(
+            _btn.inline(
                 text=_["CLOSE_BUTTON"],
                 data="close",
             ),
@@ -31,11 +31,11 @@ def back_stats_markup(_):
 def overallback_stats_markup(_):
     upl = [
         [
-            Button.inline(
+            _btn.inline(
                 text=_["BACK_BUTTON"],
                 data="GlobalStats",
             ),
-            Button.inline(
+            _btn.inline(
                 text=_["CLOSE_BUTTON"],
                 data="close",
             ),
@@ -46,34 +46,34 @@ def overallback_stats_markup(_):
 
 def get_stats_markup(_, status):
     not_sudo = [
-        Button.inline(
+        _btn.inline(
             text=_["CLOSEMENU_BUTTON"],
             data="close",
         )
     ]
     sudo = [
-        Button.inline(
+        _btn.inline(
             text=_["SA_B_8"],
             data="bot_stats_sudo g",
         ),
-        Button.inline(
+        _btn.inline(
             text=_["CLOSEMENU_BUTTON"],
             data="close",
         ),
     ]
     upl = [
         [
-            Button.inline(
+            _btn.inline(
                 text=_["SA_B_7"],
                 data="TOPMARKUPGET",
             )
         ],
         [
-            Button.inline(
+            _btn.inline(
                 text=_["SA_B_6"],
-                url=f"https://t.me/{tbot.username}?start=stats",
+                url=f"https://t.me/{_tbot.username}?start=stats",
             ),
-            Button.inline(
+            _btn.inline(
                 text=_["SA_B_5"],
                 data="TopOverall g",
             ),
@@ -85,17 +85,17 @@ def get_stats_markup(_, status):
 
 def stats_buttons(_, status):
     not_sudo = [
-        Button.inline(
+        _btn.inline(
             text=_["SA_B_5"],
             data="TopOverall s",
         )
     ]
     sudo = [
-        Button.inline(
+        _btn.inline(
             text=_["SA_B_8"],
             data="bot_stats_sudo s",
         ),
-        Button.inline(
+        _btn.inline(
             text=_["SA_B_5"],
             data="TopOverall s",
         ),
@@ -103,7 +103,7 @@ def stats_buttons(_, status):
     upl = [
         sudo if status else not_sudo,
         [
-            Button.inline(
+            _btn.inline(
                 text=_["CLOSE_BUTTON"],
                 data="close",
             ),
@@ -115,11 +115,11 @@ def stats_buttons(_, status):
 def back_stats_buttons(_):
     upl = [
         [
-            Button.inline(
+            _btn.inline(
                 text=_["BACK_BUTTON"],
                 data="GETSTATS",
             ),
-            Button.inline(
+            _btn.inline(
                 text=_["CLOSE_BUTTON"],
                 data="close",
             ),
@@ -131,31 +131,31 @@ def back_stats_buttons(_):
 def top_ten_stats_markup(_):
     upl = [
         [
-            Button.inline(
+            _btn.inline(
                 text=_["SA_B_2"],
                 data="GetStatsNow Tracks",
             ),
-            Button.inline(
+            _btn.inline(
                 text=_["SA_B_1"],
                 data="GetStatsNow Chats",
             ),
         ],
         [
-            Button.inline(
+            _btn.inline(
                 text=_["SA_B_3"],
                 data="GetStatsNow Users",
             ),
-            Button.inline(
+            _btn.inline(
                 text=_["SA_B_4"],
                 data="GetStatsNow Here",
             ),
         ],
         [
-            Button.inline(
+            _btn.inline(
                 text=_["BACK_BUTTON"],
                 data="GlobalStats",
             ),
-            Button.inline(
+            _btn.inline(
                 text=_["CLOSE_BUTTON"],
                 data="close",
             ),

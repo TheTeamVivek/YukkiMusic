@@ -13,9 +13,7 @@ from telethon import events
 from config import BANNED_USERS
 from YukkiMusic import tbot
 from YukkiMusic.platforms import youtube
-from YukkiMusic.utils.channelplay import get_channeplay_cb
-from YukkiMusic.utils.decorators.language import language
-from YukkiMusic.utils.stream.stream import stream
+from YukkiMusic.utils import get_channeplay_cb, language, stream
 
 
 @tbot.on(events.CallbackQuery("LiveStream", func=~BANNED_USERS))
@@ -42,7 +40,8 @@ async def play_live_stream(event, _):
     mystic = await event.reply(_["play_2"].format(channel) if channel else _["play_1"])
     try:
         url = youtube.base + vidid
-        track = await youtube.track(url, mode == "v")
+        track = await youtube.track(url)
+        track.video = mode == "v"
     except Exception:
         return await mystic.edit(_["play_3"])
     if track.is_live:
@@ -60,5 +59,5 @@ async def play_live_stream(event, _):
             await tbot.handle_error(e)
             return await mystic.edit(err)
     else:
-        return await mystic.edit("Not a live stream")
+        return await mystic.edit(_["play_20"])
     await mystic.delete()

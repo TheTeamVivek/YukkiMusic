@@ -13,6 +13,8 @@ import os
 from config import autoclean
 from YukkiMusic.utils.decorators import asyncify
 
+__all__ = ["auto_clean"]
+
 
 @asyncify
 def auto_clean(popped):

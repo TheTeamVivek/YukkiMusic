@@ -7,26 +7,20 @@
 #
 # All rights reserved.
 #
+from telethon.tl import types as _types
 
-from typing import Union
-
-from telethon.tl import types
-
-from YukkiMusic.core import filters as flt
-
-from .channelplay import get_channeplay_cb, is_cplay
+from .channelplay import *
 from .database import *
 from .decorators import *
-from .exceptions import AssistantErr
+from .exceptions import *
 from .formatters import *
 from .inline import *
-from .logger import play_logs
+from .inlinequery import *
+from .logger import *
 from .pastebin import *
-from .pastebin import paste
 from .stream import *
 from .sys import *
-from .sys import bot_sys_stats
-from .thumbnails import gen_qthumb, gen_thumb
+from .thumbnails import *
 
 
 async def get_value(chat_id, key) -> list[str]:
@@ -52,13 +46,13 @@ async def get_message_link(msg):
     return link
 
 
-def get_chat_id(entity: types.User | types.Chat | types.Channel) -> int:
+def get_chat_id(entity: _types.User | _types.Chat | _types.Channel) -> int:
     chat_id = None
-    if isinstance(entity, types.User):
+    if isinstance(entity, _types.User):
         chat_id = entity.id
-    elif isinstance(entity, types.Chat):
+    elif isinstance(entity, _types.Chat):
         chat_id = int(f"-{entity.id}")
-    elif isinstance(entity, types.Channel):
+    elif isinstance(entity, _types.Channel):
         chat_id = int(f"-100{entity.id}")
     return chat_id
 

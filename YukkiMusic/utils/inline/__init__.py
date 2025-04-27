@@ -7,7 +7,7 @@
 #
 # All rights reserved.
 #
-from YukkiMusic.core import filters as flt
+
 
 from .help import *
 from .play import *
@@ -16,3 +16,5 @@ from .queue import *
 from .settings import *
 from .song import *
 from .start import *
+from .stats import *
+from .telegram import *

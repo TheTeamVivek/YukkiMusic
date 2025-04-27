@@ -7,25 +7,25 @@
 #
 # All rights reserved.
 #
-from telethon import Button
+from telethon import Button as _Button
 
 
 def setting_markup(_):
     buttons = [
         [
-            Button.inline(text=_["ST_B_1"], data="AQ"),
-            Button.inline(text=_["ST_B_2"], data="VQ"),
+            _Button.inline(text=_["ST_B_1"], data="AQ"),
+            _Button.inline(text=_["ST_B_2"], data="VQ"),
         ],
         [
-            Button.inline(text=_["ST_B_3"], data="AU"),
-            Button.inline(text=_["ST_B_6"], data="LG"),
+            _Button.inline(text=_["ST_B_3"], data="AU"),
+            _Button.inline(text=_["ST_B_6"], data="LG"),
         ],
         [
-            Button.inline(text=_["ST_B_5"], data="PM"),
-            Button.inline(text=_["ST_B_7"], data="CM"),
+            _Button.inline(text=_["ST_B_5"], data="PM"),
+            _Button.inline(text=_["ST_B_7"], data="CM"),
         ],
         [
-            Button.inline(text=_["CLOSE_BUTTON"], data="close"),
+            _Button.inline(text=_["CLOSE_BUTTON"], data="close"),
         ],
     ]
     return buttons
@@ -40,13 +40,13 @@ def audio_quality_markup(
 ):
     buttons = [
         [
-            Button.inline(
+            _Button.inline(
                 text=(
                     _["ST_B_8"].format("✅") if low is True else _["ST_B_8"].format("")
                 ),
                 data="LOW",
             ),
-            Button.inline(
+            _Button.inline(
                 text=(
                     _["ST_B_9"].format("✅")
                     if medium is True
@@ -56,7 +56,7 @@ def audio_quality_markup(
             ),
         ],
         [
-            Button.inline(
+            _Button.inline(
                 text=(
                     _["ST_B_10"].format("✅")
                     if high is True
@@ -64,7 +64,7 @@ def audio_quality_markup(
                 ),
                 data="HIGH",
             ),
-            Button.inline(
+            _Button.inline(
                 text=(
                     _["ST_B_11"].format("✅")
                     if studio is True
@@ -74,11 +74,11 @@ def audio_quality_markup(
             ),
         ],
         [
-            Button.inline(
+            _Button.inline(
                 text=_["BACK_BUTTON"],
                 data="settingsback_helper",
             ),
-            Button.inline(text=_["CLOSE_BUTTON"], data="close"),
+            _Button.inline(text=_["CLOSE_BUTTON"], data="close"),
         ],
     ]
     return buttons
@@ -95,7 +95,7 @@ def video_quality_markup(
 ):
     buttons = [
         [
-            Button.inline(
+            _Button.inline(
                 text=(
                     _["ST_B_12"].format("✅")
                     if sd_360p is True
@@ -103,7 +103,7 @@ def video_quality_markup(
                 ),
                 data="SD_360p",
             ),
-            Button.inline(
+            _Button.inline(
                 text=(
                     _["ST_B_13"].format("✅")
                     if sd_480p is True
@@ -113,7 +113,7 @@ def video_quality_markup(
             ),
         ],
         [
-            Button.inline(
+            _Button.inline(
                 text=(
                     _["ST_B_14"].format("✅")
                     if hd_720p is True
@@ -121,7 +121,7 @@ def video_quality_markup(
                 ),
                 data="HD_720p",
             ),
-            Button.inline(
+            _Button.inline(
                 text=(
                     _["ST_B_15"].format("✅")
                     if fhd_1080p is True
@@ -131,7 +131,7 @@ def video_quality_markup(
             ),
         ],
         [
-            Button.inline(
+            _Button.inline(
                 text=(
                     _["ST_B_16"].format("✅")
                     if qhd_2k is True
@@ -139,7 +139,7 @@ def video_quality_markup(
                 ),
                 data="QHD_2K",
             ),
-            Button.inline(
+            _Button.inline(
                 text=(
                     _["ST_B_17"].format("✅")
                     if uhd_4k is True
@@ -149,11 +149,11 @@ def video_quality_markup(
             ),
         ],
         [
-            Button.inline(
+            _Button.inline(
                 text=_["BACK_BUTTON"],
                 data="settingsback_helper",
             ),
-            Button.inline(text=_["CLOSE_BUTTON"], data="close"),
+            _Button.inline(text=_["CLOSE_BUTTON"], data="close"),
         ],
     ]
     return buttons
@@ -166,25 +166,25 @@ def cleanmode_settings_markup(
 ):
     buttons = [
         [
-            Button.inline(text=_["ST_B_7"], data="CMANSWER"),
-            Button.inline(
+            _Button.inline(text=_["ST_B_7"], data="CMANSWER"),
+            _Button.inline(
                 text=_["ST_B_18"] if status is True else _["ST_B_19"],
                 data="CLEANMODE",
             ),
         ],
         [
-            Button.inline(text=_["ST_B_30"], data="COMMANDANSWER"),
-            Button.inline(
+            _Button.inline(text=_["ST_B_30"], data="COMMANDANSWER"),
+            _Button.inline(
                 text=_["ST_B_18"] if dels is True else _["ST_B_19"],
                 data="COMMANDELMODE",
             ),
         ],
         [
-            Button.inline(
+            _Button.inline(
                 text=_["BACK_BUTTON"],
                 data="settingsback_helper",
             ),
-            Button.inline(text=_["CLOSE_BUTTON"], data="close"),
+            _Button.inline(text=_["CLOSE_BUTTON"], data="close"),
         ],
     ]
     return buttons
@@ -193,21 +193,21 @@ def cleanmode_settings_markup(
 def auth_users_markup(_, status: bool | str = None):
     buttons = [
         [
-            Button.inline(text=_["ST_B_3"], data="AUTHANSWER"),
-            Button.inline(
+            _Button.inline(text=_["ST_B_3"], data="AUTHANSWER"),
+            _Button.inline(
                 text=_["ST_B_20"] if status is True else _["ST_B_21"],
                 data="AUTH",
             ),
         ],
         [
-            Button.inline(text=_["ST_B_22"], data="AUTHLIST"),
+            _Button.inline(text=_["ST_B_22"], data="AUTHLIST"),
         ],
         [
-            Button.inline(
+            _Button.inline(
                 text=_["BACK_BUTTON"],
                 data="settingsback_helper",
             ),
-            Button.inline(text=_["CLOSE_BUTTON"], data="close"),
+            _Button.inline(text=_["CLOSE_BUTTON"], data="close"),
         ],
     ]
     return buttons
@@ -221,32 +221,32 @@ def playmode_users_markup(
 ):
     buttons = [
         [
-            Button.inline(text=_["ST_B_23"], data="SEARCHANSWER"),
-            Button.inline(
+            _Button.inline(text=_["ST_B_23"], data="SEARCHANSWER"),
+            _Button.inline(
                 text=_["ST_B_24"] if direct is True else _["ST_B_25"],
                 data="MODECHANGE",
             ),
         ],
         [
-            Button.inline(text=_["ST_B_26"], data="AUTHANSWER"),
-            Button.inline(
+            _Button.inline(text=_["ST_B_26"], data="AUTHANSWER"),
+            _Button.inline(
                 text=_["ST_B_20"] if group is True else _["ST_B_21"],
                 data="CHANNELMODECHANGE",
             ),
         ],
         [
-            Button.inline(text=_["ST_B_29"], data="PLAYTYPEANSWER"),
-            Button.inline(
+            _Button.inline(text=_["ST_B_29"], data="PLAYTYPEANSWER"),
+            _Button.inline(
                 text=_["ST_B_20"] if playtype is True else _["ST_B_21"],
                 data="PLAYTYPECHANGE",
             ),
         ],
         [
-            Button.inline(
+            _Button.inline(
                 text=_["BACK_BUTTON"],
                 data="settingsback_helper",
             ),
-            Button.inline(text=_["CLOSE_BUTTON"], data="close"),
+            _Button.inline(text=_["CLOSE_BUTTON"], data="close"),
         ],
     ]
     return buttons

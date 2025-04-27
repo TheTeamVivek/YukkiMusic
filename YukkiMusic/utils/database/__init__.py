@@ -8,9 +8,6 @@
 # All rights reserved.
 #
 
-
-from YukkiMusic.core import filters as flt
-
 from .assistantdatabase import *
 from .memorydatabase import *
 from .mongodatabase import *

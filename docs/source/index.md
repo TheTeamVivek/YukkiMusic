@@ -78,6 +78,5 @@ This repository aims to continue the legacy of [`YukkiMusicBot`](https://github.
 :hidden:
 
 overview
-setup
 deployment
 ```

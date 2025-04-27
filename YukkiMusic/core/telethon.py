@@ -33,6 +33,8 @@ uvloop.install()
 
 log = logging.getLogger(__name__)
 
+__all__ = ["ShellRunResult", "TelethonClient"]
+
 
 @dataclass
 class ShellRunResult:

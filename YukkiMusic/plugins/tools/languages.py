@@ -14,9 +14,8 @@ from telethon import Button, events
 from config import BANNED_USERS
 from strings import get_string, languages_present
 from YukkiMusic import tbot
-from YukkiMusic.core import filters as flt
-from YukkiMusic.utils.database import get_lang, set_lang
-from YukkiMusic.utils.decorators import actual_admin_cb, language
+from YukkiMusic.core import filters
+from YukkiMusic.utils import actual_admin_cb, get_lang, language, set_lang
 
 # Languages Available
 
@@ -44,7 +43,9 @@ def lanuages_keyboard(_):
     return keyboard
 
 
-@tbot.on_message(flt.command("LANGUAGE_COMMAND", True) & flt.group & ~BANNED_USERS)
+@tbot.on_message(
+    filters.command("LANGUAGE_COMMAND", True) & filters.group & ~BANNED_USERS
+)
 @language
 async def langs_command(event, _):
     keyboard = lanuages_keyboard(_)

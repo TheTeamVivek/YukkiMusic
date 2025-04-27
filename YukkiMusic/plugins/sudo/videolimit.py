@@ -9,13 +9,12 @@
 #
 
 
-from YukkiMusic.core import filters as flt
+from YukkiMusic.core import filters
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import set_video_limit
-from YukkiMusic.utils.decorators.language import language
+from YukkiMusic.utils import language, set_video_limit
 
 
-@tbot.on_message(flt.command("VIDEOLIMIT_COMMAND", True) & flt.user(SUDOERS))
+@tbot.on_message(filters.command("VIDEOLIMIT_COMMAND", True) & SUDOERS)
 @language
 async def set_video_limit_kid(event, _):
     if len(event.text.split()) != 2:

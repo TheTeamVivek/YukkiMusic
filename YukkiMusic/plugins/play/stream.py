@@ -12,17 +12,15 @@ import logging
 import config
 from config import BANNED_USERS
 from YukkiMusic import tbot
-from YukkiMusic.core import filters as flt
-from YukkiMusic.core.enum import SourceType
-from YukkiMusic.core.youtube import Track
-from YukkiMusic.utils.decorators.play import play_wrapper
-from YukkiMusic.utils.logger import play_logs
-from YukkiMusic.utils.stream.stream import stream
+from YukkiMusic.core import SourceType, Track, filters
+from YukkiMusic.utils import play_logs, play_wrapper, stream
 
 logger = logging.getLogger(__name__)
 
 
-@tbot.on_message(flt.command("STREAM_COMMAND", True) & flt.group & ~BANNED_USERS)
+@tbot.on_message(
+    filters.command("STREAM_COMMAND", True) & filters.group & ~BANNED_USERS
+)
 @play_wrapper
 async def stream_command(
     event,

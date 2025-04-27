@@ -12,7 +12,7 @@
 from speedtest import Speedtest
 
 from YukkiMusic import tbot
-from YukkiMusic.core import filters as flt
+from YukkiMusic.core import filters
 from YukkiMusic.misc import SUDOERS
 
 
@@ -34,7 +34,7 @@ async def run_speedtest(m):
 
 
 @tbot.on_message(
-    flt.command("SPEEDTEST_COMMAND", use_strings=True) & flt.user(list(SUDOERS))
+    filters.command("SPEEDTEST_COMMAND", use_strings=True) & filters.user(list(SUDOERS))
 )
 async def speedtest_function(event):
     m = await event.reply("Running Speedtest...")

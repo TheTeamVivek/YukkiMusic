@@ -28,6 +28,8 @@ from YukkiMusic.utils import (
 
 from ..formatters import int_to_alpha
 
+__all__ = ["admin_rights_check", "admin_actual", "actual_admin_cb"]
+
 
 def admin_rights_check(mystic):
     async def wrapper(event):

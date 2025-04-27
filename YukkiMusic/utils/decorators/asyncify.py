@@ -5,6 +5,8 @@ from typing import Any
 
 from decorator import decorator
 
+__all__ = ["asyncify"]
+
 
 @decorator
 def asyncify(

@@ -7,7 +7,7 @@
 #
 # All rights reserved.
 #
-import asyncio
+'''import asyncio
 import platform
 from sys import version as pyver
 
@@ -259,12 +259,12 @@ async def overall_stats(client, CallbackQuery, _):
     text = f"""**Bot's Stats and information:**
 
 **Imported Modules:** {mod}
-**Served chats:** {served_chats} 
-**Served Users:** {served_users} 
-**Blocked Users:** {blocked} 
-**Sudo Users:** {sudoers} 
-    
-**Total Queries:** {total_queries} 
+**Served chats:** {served_chats}
+**Served Users:** {served_users}
+**Blocked Users:** {blocked}
+**Sudo Users:** {sudoers}
+
+**Total Queries:** {total_queries}
 **Total Assistant:** {assistant}
 **Auto Leaving Assistsant:** {ass}
 
@@ -346,10 +346,10 @@ async def overall_stats(client, CallbackQuery, _):
 **Storage Used:** {used[:4]} ɢiʙ
 **Storage Left:** {free[:4]} ɢiʙ
 
-**Served chats:** {served_chats} 
-**Served users:** {served_users} 
-**Blocked users:** {blocked} 
-**Sudo users:** {sudoers} 
+**Served chats:** {served_chats}
+**Served users:** {served_users}
+**Blocked users:** {blocked}
+**Sudo users:** {sudoers}
 
 **Total DB Storage:** {storage} ᴍʙ
 **Total DB Collection:** {collections}
@@ -423,3 +423,4 @@ async def back_buttons(client, CallbackQuery, _):
                 caption=_["gstats_11"].format(app.mention),
                 buttons=upl,
             )
+'''

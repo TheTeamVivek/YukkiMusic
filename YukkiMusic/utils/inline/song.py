@@ -7,23 +7,23 @@
 #
 # All rights reserved.
 #
-from telethon import Button
+from telethon import Button as _Button
 
 
 def song_markup(_, vidid):
     buttons = [
         [
-            Button.inline(
+            _Button.inline(
                 text=_["SG_B_2"],
                 data=f"song_helper audio|{vidid}",
             ),
-            Button.inline(
+            _Button.inline(
                 text=_["SG_B_3"],
                 data=f"song_helper video|{vidid}",
             ),
         ],
         [
-            Button.inline(text=_["CLOSE_BUTTON"], data="close"),
+            _Button.inline(text=_["CLOSE_BUTTON"], data="close"),
         ],
     ]
     return buttons

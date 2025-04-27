@@ -12,6 +12,8 @@ from telethon import Button
 import config
 from YukkiMusic import tbot
 
+__all__ = ["support_group_markup", "help_back_markup", "private_help_panel"]
+
 
 def support_group_markup(_):
     """upl = [

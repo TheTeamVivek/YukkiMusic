@@ -61,12 +61,23 @@ from YukkiMusic.utils.thumbnails import gen_thumb
 links = {}
 logger = logging.getLogger(__name__)
 
-
+def _clean(data: list | dict):
+    if isinstance(data, list):
+        for element in data:
+            if msg := element.get("mystic"):
+                config.add_to_clean(msg.chat_id, msg.id)
+    else:
+        if msg := data.get("mystic"):
+            config.add_to_clean(msg.chat_id, msg.id)
+    
+                
+                
 async def clear(chat_id):
     try:
         popped = db.pop(chat_id, None)
         if popped:
             await auto_clean(popped)
+        _clean(popped)
         db[chat_id] = []
         await remove_active_video_chat(chat_id)
         await remove_active_chat(chat_id)
@@ -329,11 +340,8 @@ class Call:
                 popped = check.pop(0)
                 if popped:
                     await auto_clean(popped)
-                    if popped.get("mystic"):
-                        try:
-                            await popped.get("mystic").delete()
-                        except Exception:
-                            pass
+                    _clean(popped)
+                    
             else:
                 loop = loop - 1
                 await set_loop(chat_id, loop)

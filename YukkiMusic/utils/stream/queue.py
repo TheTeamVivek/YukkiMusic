@@ -13,6 +13,8 @@ from config import autoclean, chatstats, userstats
 from YukkiMusic.core.youtube import Track
 from YukkiMusic.misc import db
 
+__all__ = ["put_queue"]
+
 
 async def put_queue(
     chat_id,

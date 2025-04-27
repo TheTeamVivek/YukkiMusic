@@ -11,8 +11,7 @@ import logging
 import os
 from random import randint
 
-from pykeyboard import InlineKeyboard
-from pyrogram.types import InlineKeyboardButton
+from pykeyboard.telethon import InlineKeyboard
 from telethon import Button, events
 
 import config
@@ -21,21 +20,19 @@ from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.core.youtube import Track
 from YukkiMusic.platforms import carbon, youtube
-from YukkiMusic.utils import parse_flags
-from YukkiMusic.utils.database import (
+from YukkiMusic.utils import (
+    botplaylist_markup,
     delete_playlist,
     get_playlist,
-    get_playlist_names,
-    save_playlist,
-)
-from YukkiMusic.utils.decorators import language
-from YukkiMusic.utils.decorators.play import botplaylist_markup
-from YukkiMusic.utils.inline.playlist import (
     get_playlist_markup,
+    get_playlist_names,
+    language,
+    parse_flags,
+    paste,
+    save_playlist,
+    stream,
     warning_markup,
 )
-from YukkiMusic.utils.pastebin import paste
-from YukkiMusic.utils.stream.stream import stream
 
 logger = logging.getLogger(__name__)
 
@@ -49,17 +46,17 @@ async def get_keyboard(_, user_id):
         title = _note["title"]
         title = title.title()
         keyboard.row(
-            InlineKeyboardButton(
+            Button.inline(
                 text=title,
-                callback_data=f"del_playlist {x}",
+                data=f"del_playlist {x}",
             )
         )
     keyboard.row(
-        InlineKeyboardButton(
+        Buton.inline(
             text=_["PL_B_5"],
-            callback_data=f"delete_warning",
+            data=f"delete_warning",
         ),
-        InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data=f"close"),
+        Button.inline(text=_["CLOSE_BUTTON"], data=f"close"),
     )
     return keyboard, count
 

@@ -9,9 +9,8 @@
 
 # pylint: disable=C0103
 import config as _config
-from YukkiMusic.core import filters as flt
-from YukkiMusic.core.dir import dirr
-from YukkiMusic.core.git import git
+from YukkiMusic.core.dir import dirr as _dirr
+from YukkiMusic.core.git import git as _git
 from YukkiMusic.core.telethon import TelethonClient
 
 # from .logging import logger
@@ -28,7 +27,7 @@ from YukkiMusic.core.userbot import Userbot
 userbot = Userbot()
 
 # Directories
-dirr()
+_dirr()
 
 # Check Git Updates
-git()
+_git()

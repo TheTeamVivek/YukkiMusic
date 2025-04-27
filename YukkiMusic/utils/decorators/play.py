@@ -31,6 +31,8 @@ from YukkiMusic.utils.inline import botplaylist_markup
 
 links = {}
 
+__all__ = ["play_wrapper"]
+
 
 def play_wrapper(command):
     async def wrapper(client, message):

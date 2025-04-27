@@ -11,8 +11,6 @@ import random
 
 import aiohttp
 
-from YukkiMusic.core import filters as flt
-
 from .config import *
 
 

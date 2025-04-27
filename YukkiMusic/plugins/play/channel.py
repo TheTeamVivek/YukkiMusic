@@ -14,13 +14,12 @@ from telethon.tl.types import Channel
 
 from config import BANNED_USERS
 from YukkiMusic import tbot
-from YukkiMusic.core import filters as flt
-from YukkiMusic.utils.database import set_cmode
-from YukkiMusic.utils.decorators.admins import admin_actual
+from YukkiMusic.core import filters
+from YukkiMusic.utils import admin_actual, get_value, set_cmode
 
 
 @tbot.on_message(
-    flt.command("CHANNELPLAY_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+    filters.command("CHANNELPLAY_COMMAND", True) & filters.group & ~BANNED_USERS
 )
 @admin_actual
 async def playmode_(language, _):
@@ -29,9 +28,9 @@ async def playmode_(language, _):
         comm = _["CHANNELPLAY_COMMAND"][0]
         return await event.reply(_["cplay_1"].format(chat.title, comm))
     query = event.text.split(None, 2)[1].lower().strip()
-    if query == "disable":
+    if any(query == value for value in await get_value(chat.id, "disable")):
         await set_cmode(event.chat_id, None)
-        return await event.reply("Channel Play Disabled")
+        return await event.reply(_["cplay_7"])
 
     elif query == "linked":
         chat = (await tbot(GetFullChannelRequest(channel=chat.id))).full_chat
@@ -61,3 +60,6 @@ async def playmode_(language, _):
             return await event.reply(_["cplay_6"].format(chat.title, creator.username))
         await set_cmode(event.chat_id, chat.id)
         return await event.reply(_["cplay_3"].format(chat.title, chat.id))
+
+
+# TODO: REMOVE THE DISABLE AND LINKED MODE AND KEEP LINKED DEFAULT

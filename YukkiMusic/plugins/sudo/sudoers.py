@@ -7,15 +7,13 @@
 #
 # All rights reserved.
 #
-from config import BANNED_USERS, MONGO_DB_URI, OWNER_ID
+from config import BANNED_USERS, MONGO_DB_URI, OWNER_ID, SUDOERS
 from YukkiMusic import tbot
-from YukkiMusic.core import filters as flt
-from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import add_sudo, remove_sudo
-from YukkiMusic.utils.decorators.language import language
+from YukkiMusic.core import filters
+from YukkiMusic.utils import add_sudo, language, remove_sudo
 
 
-@tbot.on_message(flt.command("ADDSUDO_COMMAND", True) & flt.user(OWNER_ID))
+@tbot.on_message(filters.command("ADDSUDO_COMMAND", True) & filters.user(OWNER_ID))
 @language
 async def useradd(event, _):
     if MONGO_DB_URI is None:
@@ -53,7 +51,7 @@ async def useradd(event, _):
     return
 
 
-@tbot.on_message(flt.command("DELSUDO_COMMAND", True) & flt.user(OWNER_ID))
+@tbot.on_message(filters.command("DELSUDO_COMMAND", True) & filters.user(OWNER_ID))
 @language
 async def userdel(event, _):
     if MONGO_DB_URI is None:
@@ -88,7 +86,9 @@ async def userdel(event, _):
     await event.reply(f"Something wrong happened")
 
 
-@tbot.on_message(flt.command("SUDOUSERS_COMMAND", True) & ~flt.user(BANNED_USERS))
+@tbot.on_message(
+    filters.command("SUDOUSERS_COMMAND", True) & ~filters.user(BANNED_USERS)
+)
 @language
 async def sudoers_list(event, _):
     text = _["sudo_5"]

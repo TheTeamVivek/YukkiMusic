@@ -7,9 +7,7 @@
 #
 # All rights reserved.
 #
-from YukkiMusic.core import filters as flt
-
-from ..core.enum import SongType, SourceType
+from ..core.enum import SourceType
 from . import carbon
 from .apple import Apple
 from .resso import Resso
@@ -29,7 +27,7 @@ telegram = Telegram()
 youtube = YouTube()
 
 
-async def valid(url: str) -> SourceType:
+async def info(url: str) -> "Track":
     services = [
         (apple, SourceType.APPLE),
         (saavn, SourceType.SAAVN),
@@ -41,12 +39,4 @@ async def valid(url: str) -> SourceType:
 
     for service, source_type in services:
         if await service.valid(url):
-            return source_type
-
-
-async def info(
-    type: SourceType, **kwargs
-) -> (
-    dict
-):  # todo implement all classes and there info function in this function using SourceType and **kwargs
-    pass
+            return service.track(url)

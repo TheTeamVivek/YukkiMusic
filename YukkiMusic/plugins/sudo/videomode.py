@@ -11,13 +11,12 @@
 
 import config
 from YukkiMusic import tbot
-from YukkiMusic.core import filters as flt
+from YukkiMusic.core import filters
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import add_off, add_on
-from YukkiMusic.utils.decorators.language import language
+from YukkiMusic.utils import add_off, add_on, language
 
 
-@tbot.on_message(flt.command("VIDEOMODE_COMMAND", True) & flt.user(SUDOERS))
+@tbot.on_message(filters.command("VIDEOMODE_COMMAND", True) & SUDOERS)
 @language
 async def videoloaymode(event, _):
     usage = _["vidmode_1"]

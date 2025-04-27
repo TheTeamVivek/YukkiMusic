@@ -10,6 +10,12 @@
 
 from enum import Enum, auto
 
+__all__ = [
+    "PlayType",
+    "SpotifyType",
+    "SourceType",
+]
+
 
 class PlayType(Enum):
     PLAYING = auto()  # playing

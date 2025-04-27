@@ -33,6 +33,8 @@ assistantids = []
 
 logger = logging.getlogger
 
+__all__ = ["Userbot"]
+
 
 class Userbot(Client):
     def __init__(self):

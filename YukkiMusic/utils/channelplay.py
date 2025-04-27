@@ -11,8 +11,12 @@
 
 from YukkiMusic.utils.database import get_cmode
 
+__all__ = ["is_cplay", "get_channeplay_cb"]
 
-def is_cplay(text: str, command: list | str) -> bool:
+
+def is_cplay(
+    text: str, command: list | str
+) -> bool:  # TODO: REMOVE IT AND USE PARSE FLAGS
     text = str(text).strip()
     if not text or not text.strip():
         return False

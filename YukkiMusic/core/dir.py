@@ -12,6 +12,7 @@ import logging
 import os
 from os import listdir, mkdir
 
+__all__ = ["dirr"]
 # remove all files on startup  that contains these extentions
 files = [
     ".jpg",

@@ -9,11 +9,11 @@
 #
 
 
+from config import SUDOERS
 from strings import get_string
 from YukkiMusic import tbot
-from YukkiMusic.core import filters as flt
-from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import (
+from YukkiMusic.core import filters
+from YukkiMusic.utils import (
     get_lang,
     is_maintenance,
     maintenance_off,
@@ -21,7 +21,7 @@ from YukkiMusic.utils.database import (
 )
 
 
-@tbot.on_message(flt.command("MAINTENANCE_COMMAND", True) & flt.user(SUDOERS))
+@tbot.on_message(filters.command("MAINTENANCE_COMMAND", True) & filters.user(SUDOERS))
 async def maintenance(event):
     try:
         language = await get_lang(event.chat_id)

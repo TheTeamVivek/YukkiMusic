@@ -18,6 +18,8 @@ from ..logging import logger
 
 loop = asyncio.get_event_loop_policy().get_event_loop()
 
+__all__ = ["git"]
+
 
 def install_req() -> tuple[str, str, int, int]:
     async def install_requirements():

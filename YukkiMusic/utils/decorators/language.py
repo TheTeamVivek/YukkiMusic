@@ -18,6 +18,8 @@ from YukkiMusic.utils.database import (
     is_maintenance,
 )
 
+__all__ = ["language"]
+
 
 @decorator
 async def language(func, event, no_check=False):

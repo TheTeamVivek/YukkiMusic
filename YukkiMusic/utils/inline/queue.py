@@ -8,7 +8,7 @@
 # All rights reserved.
 #
 
-from telethon import Button
+from telethon import Button as _Button
 
 
 def queue_markup(
@@ -21,11 +21,11 @@ def queue_markup(
 ):
     not_dur = [
         [
-            Button.inline(
+            _Button.inline(
                 text=_["QU_B_1"],
                 data=f"GetQueued {cplay}|{videoid}",
             ),
-            Button.inline(
+            _Button.inline(
                 text=_["CLOSEMENU_BUTTON"],
                 data="close",
             ),
@@ -33,17 +33,17 @@ def queue_markup(
     ]
     dur = [
         [
-            Button.inline(
+            _Button.inline(
                 text=_["QU_B_2"].format(played, dur),
                 data="GetTimer",
             )
         ],
         [
-            Button.inline(
+            _Button.inline(
                 text=_["QU_B_1"],
                 data=f"GetQueued {cplay}|{videoid}",
             ),
-            Button.inline(
+            _Button.inline(
                 text=_["CLOSEMENU_BUTTON"],
                 data="close",
             ),
@@ -56,11 +56,11 @@ def queue_markup(
 def queue_back_markup(_, cplay):
     upl = [
         [
-            Button.inline(
+            _Button.inline(
                 text=_["BACK_BUTTON"],
                 data=f"queue_back_timer {cplay}",
             ),
-            Button.inline(
+            _Button.inline(
                 text=_["CLOSE_BUTTON"],
                 data="close",
             ),

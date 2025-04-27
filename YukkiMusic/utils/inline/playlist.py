@@ -9,6 +9,15 @@
 #
 from telethon import Button
 
+__all__ = [
+    "botplaylist_markup",
+    "top_play_markup",
+    "get_playlist_markup",
+    "failed_top_markup",
+    "close_markup",
+    "warning_markup",
+]
+
 
 def botplaylist_markup(_):
     buttons = [
@@ -48,19 +57,6 @@ def get_playlist_markup(_):
         ],
         [
             Button.inline(text=_["BACK_BUTTON"], data="home_play"),
-            Button.inline(text=_["CLOSE_BUTTON"], data="close"),
-        ],
-    ]
-    return buttons
-
-
-def top_play_markup(_):
-    buttons = [
-        [Button.inline(text=_["PL_B_9"], data="SERVERTOP Global")],
-        [Button.inline(text=_["PL_B_10"], data="SERVERTOP Group")],
-        [Button.inline(text=_["PL_B_11"], data="SERVERTOP Personal")],
-        [
-            Button.inline(text=_["BACK_BUTTON"], data="get_playmarkup"),
             Button.inline(text=_["CLOSE_BUTTON"], data="close"),
         ],
     ]

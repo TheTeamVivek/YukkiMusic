@@ -8,13 +8,12 @@
 # All rights reserved.
 #
 import config
-from YukkiMusic.core import filters as flt
+from YukkiMusic.core import filters
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import add_off, add_on
-from YukkiMusic.utils.decorators.language import language
+from YukkiMusic.utils import add_off, add_on, language
 
 
-@tbot.on_message(flt.command("LOGGER_COMMAND", True) & flt.user(SUDOERS))
+@tbot.on_message(filters.command("LOGGER_COMMAND", True) & filters.user(SUDOERS))
 @language
 async def logger(event, _):
     usage = _["log_1"]
