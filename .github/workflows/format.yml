@@ -50,6 +50,7 @@ jobs:
 
       - uses: Mattraks/delete-workflow-runs@v2
         with:
+          delete_workflow_pattern: "Format Codes"
           keep_minimum_runs: 0
           retain_days: 0
 
