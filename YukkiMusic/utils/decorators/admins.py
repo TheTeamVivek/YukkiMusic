@@ -15,7 +15,7 @@ from config import adminlist
 from strings import get_string
 from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils import (
+from . import (
     get_authuser_names,
     get_cmode,
     get_lang,
