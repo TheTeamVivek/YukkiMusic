@@ -12,8 +12,9 @@ import random
 from telethon import events
 
 import config
-from YukkiMusic import Platform, tbot
+from YukkiMusic import tbot
 from YukkiMusic.core.call import Yukki
+from YukkiMusic.platforms import youtube, spotify, apple
 from YukkiMusic.misc import BANNED_USERS, SUDOERS, db
 from YukkiMusic.utils import time_to_seconds
 from YukkiMusic.utils.channelplay import get_channeplay_cb
@@ -335,7 +336,7 @@ async def play_music(event, _):
         pass
     mystic = await event.reply(_["play_2"].format(channel) if channel else _["play_1"])
     try:
-        details, track_id = await Platform.youtube.track(vidid, True)
+        details, track_id = await youtube.track(vidid, True)
     except Exception:
         return await mystic.edit(_["play_3"])
     if details["duration_min"]:
@@ -428,7 +429,7 @@ async def play_playlists_cb(event, _):
     if ptype == "yt":
         spotify = False
         try:
-            result = await Platform.youtube.playlist(
+            result = await youtube.playlist(
                 videoid,
                 config.PLAYLIST_FETCH_LIMIT,
                 True,
@@ -437,22 +438,22 @@ async def play_playlists_cb(event, _):
             return await mystic.edit(_["play_3"])
     if ptype == "spplay":
         try:
-            result, spotify_id = await Platform.spotify.playlist(videoid)
+            result, spotify_id = await spotify.playlist(videoid)
         except Exception:
             return await mystic.edit(_["play_3"])
     if ptype == "spalbum":
         try:
-            result, spotify_id = await Platform.spotify.album(videoid)
+            result, spotify_id = await spotify.album(videoid)
         except Exception:
             return await mystic.edit(_["play_3"])
     if ptype == "spartist":
         try:
-            result, spotify_id = await Platform.spotify.artist(videoid)
+            result, spotify_id = await spotify.artist(videoid)
         except Exception:
             return await mystic.edit(_["play_3"])
     if ptype == "apple":
         try:
-            result, apple_id = await Platform.apple.playlist(videoid, True)
+            result, apple_id = await apple.playlist(videoid, True)
         except Exception:
             return await mystic.edit(_["play_3"])
     try:
@@ -506,7 +507,7 @@ async def slider_queries(event, _):
             await event.answer(_["playcb_2"])
         except Exception:
             pass
-        title, duration_min, thumbnail, vidid = await Platform.youtube.slider(
+        title, duration_min, thumbnail, vidid = await youtube.slider(
             query, query_type
         )  # todo use youtube.track
         buttons = slider_markup(_, vidid, user_id, query, query_type, cplay, fplay)
@@ -527,7 +528,7 @@ async def slider_queries(event, _):
             await event.answer(_["playcb_2"])
         except Exception:
             pass
-        title, duration_min, thumbnail, vidid = await Platform.youtube.slider(
+        title, duration_min, thumbnail, vidid = await youtube.slider(
             query, query_type
         )
         buttons = slider_markup(_, vidid, user_id, query, query_type, cplay, fplay)
