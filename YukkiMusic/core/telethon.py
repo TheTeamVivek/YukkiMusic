@@ -26,7 +26,7 @@ from telethon import TelegramClient, errors, events
 from telethon.tl import functions, types
 
 import config
-from YukkiMusic.utils import pastebin
+from YukkiMusic.utils.pastebin import paste
 from YukkiMusic.utils.decorators.asyncify import asyncify
 
 uvloop.install()
@@ -225,7 +225,7 @@ class TelethonClient(TelegramClient):
 
         error_message += f"**Error:** {type(exc).__name__}\n"
         if len(error_trace) > 900:
-            pastebin_link = await pastebin.paste(error_trace)
+            pastebin_link = await paste(error_trace)
             error_message += f"**Traceback:** [BatBin Link]({pastebin_link})\n"
         else:
             error_message += f"**Traceback:**\n```python\n{error_trace}```\n"
