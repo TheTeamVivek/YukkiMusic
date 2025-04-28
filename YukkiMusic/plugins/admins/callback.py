@@ -14,8 +14,8 @@ from telethon import events
 import config
 from YukkiMusic import tbot
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.platforms import youtube, spotify, apple
 from YukkiMusic.misc import BANNED_USERS, SUDOERS, db
+from YukkiMusic.platforms import apple, youtube
 from YukkiMusic.utils import time_to_seconds
 from YukkiMusic.utils.channelplay import get_channeplay_cb
 from YukkiMusic.utils.database import (
@@ -528,9 +528,7 @@ async def slider_queries(event, _):
             await event.answer(_["playcb_2"])
         except Exception:
             pass
-        title, duration_min, thumbnail, vidid = await youtube.slider(
-            query, query_type
-        )
+        title, duration_min, thumbnail, vidid = await youtube.slider(query, query_type)
         buttons = slider_markup(_, vidid, user_id, query, query_type, cplay, fplay)
         return await event.edit(
             text=_["play_11"].format(
