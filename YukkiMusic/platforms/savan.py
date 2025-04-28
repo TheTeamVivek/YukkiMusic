@@ -74,8 +74,8 @@ class Saavn(PlatformBase):
         return tracks
 
     @alru_cache(maxsize=None)
-    @asyncify
-    def __track(self, url):
+    #@asyncify
+    async def __track(self, url):
         url = self.clean_url(url)
         ydl_opts = {
             "format": "bestaudio/best",
