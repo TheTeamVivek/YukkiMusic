@@ -297,7 +297,7 @@ def seconds_to_time(seconds):
 
 DURATION_LIMIT = int(time_to_seconds(f"{DURATION_LIMIT_MIN}:00"))
 _SDDL = time_to_seconds(f"{SONG_DOWNLOAD_DURATION}:00")
-SONG_DOWNLOAD_DURATION_LIMIT = int(_SDD)
+SONG_DOWNLOAD_DURATION_LIMIT = int(_SDDL)
 
 if not STRING_SESSIONS:
     print(
