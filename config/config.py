@@ -254,14 +254,6 @@ SPOTIFY_PLAYLIST_IMG_URL = getenv(
 # DONT TOUCH OR EDIT CODES AFTER THIS LINE
 
 
-def _user():
-    from YukkiMusic.core.filters import User  # pylint: disable=import-outside-toplevel
-
-    return User()
-
-
-BANNED_USERS = _user()
-SUDOERS = _user()
 YTDOWNLOADER = 1
 LOG = 2
 LOG_FILE_NAME = "logs.txt"
