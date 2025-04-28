@@ -31,7 +31,7 @@ async def inline_query_handler(event):
     answers = []
     if text.strip() == "":
         try:
-            await event.answer(results=answer, cache_time=10)
+            await event.answer(results=answer(), cache_time=10)
         except Exception:
             return
     else:
