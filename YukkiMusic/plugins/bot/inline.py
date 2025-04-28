@@ -20,7 +20,7 @@ from telethon.tl.types import (
 )
 from youtubesearchpython.__future__ import VideosSearch
 
-from config import BANNED_USERS
+from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic import app, tbot
 from YukkiMusic.utils.inlinequery import answer
 
