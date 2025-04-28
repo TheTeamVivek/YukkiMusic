@@ -244,19 +244,7 @@ lang_2: "Your language changed successfully.."
 lang_3: "Failed to change language or language in under Upadte"
 
 # Logger
-logger_text: |
-**{bot_mention} Play Log**
-
-**Chat ID:** `{chat_id}`
-**Chat Name:** {title}
-**Chat Username:** {chatusername}
-
-**User ID:** `{sender_id}`
-**Name:** {user_mention}
-**Username:** {username}
-
-**Query:** {query}
-**Stream Type:** {streamtype}
+logger_text: "**{bot_mention} Play Log**\n\n**Chat ID:** `{chat_id}`\n**Chat Name:** {title}\n**Chat Username:** {chatusername}\n\n**User ID:** `{sender_id}`\n**Name:** {user_mention}\n**Username:** {username}\n\n**Query:** {query}\n**Stream Type:** {streamtype}"
 
 # Ping
 ping_1: "» {0} is pinging..."
