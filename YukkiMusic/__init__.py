@@ -12,16 +12,11 @@
 import config as _config
 from YukkiMusic.core.dir import dirr as _dirr
 from YukkiMusic.core.git import git as _git
-from YukkiMusic.core.telethon import TelethonClient as _tc
+from YukkiMusic.core.telethon import TelethonClient as _TelethonClient
 
 # from .logging import logger
 
-tbot = _tc(
-    "YukkiMusic",
-    api_id=_config.API_ID,
-    api_hash=_config.API_HASH,
-    flood_sleep_threshold=240,
-)
+tbot = _TelethonClient()
 
 from YukkiMusic.core.userbot import Userbot
 
