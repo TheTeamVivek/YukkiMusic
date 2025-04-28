@@ -1,29 +1,15 @@
 import asyncio
-from concurrent.futures import Executor
-from functools import partial
-from typing import Any
-
-from decorator import decorator
+from functools import wraps, partial
+from typing import Any, Callable
 
 __all__ = ["asyncify"]
 
 
-@decorator
-def asyncify(
-    func,
-    executor: Executor | None = None,
-    max_workers: int | None = None,
-    *args: Any,
-    **kwargs: Any,
-):
-    async def run():
-        pfunc = partial(func, *args, **kwargs)
-
-        if executor is None:
+def asyncify(func: Callable) -> Callable[..., Any]:
+    @wraps(func)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        async def run():
+            pfunc = partial(func, *args, **kwargs)
             return await asyncio.to_thread(pfunc)
-        else:
-            loop = asyncio.get_running_loop()
-            with executor(max_workers=max_workers) as exe:
-                return await loop.run_in_executor(exe, pfunc)
-
-    return run
+        return run()
+    return wrapper
