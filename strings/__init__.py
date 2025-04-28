@@ -13,8 +13,6 @@ import sys
 
 import yaml
 
-from YukkiMusic.core import filters as flt
-
 languages = {}
 languages_present = {}
 
