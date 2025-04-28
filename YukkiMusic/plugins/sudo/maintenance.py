@@ -9,10 +9,10 @@
 #
 
 
-from YukkiMusic.misc import SUDOERS
 from strings import get_string
 from YukkiMusic import tbot
 from YukkiMusic.core import filters
+from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils import (
     get_lang,
     is_maintenance,

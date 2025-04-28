@@ -26,7 +26,7 @@ import config
 from YukkiMusic import tbot
 from YukkiMusic.core import filters
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.misc import HAPP, db, is_heroku, SUDOERS, BANNED_USERS
+from YukkiMusic.misc import BANNED_USERS, HAPP, SUDOERS, db, is_heroku
 from YukkiMusic.utils import (
     admin_actual,
     get_active_chats,
@@ -339,9 +339,7 @@ async def reboot(event, _):
     return await mystic.edit("Sucessfully Restarted \nTry playing Now..")
 
 
-@tbot.on_message(
-    filters.command("RESTART_COMMAND", True) & ~filters.user(BANNED_USERS)
-)
+@tbot.on_message(filters.command("RESTART_COMMAND", True) & ~filters.user(BANNED_USERS))
 async def restart_(event):
     if event.sender_id not in SUDOERS:
         if event.is_private:
