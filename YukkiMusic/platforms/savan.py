@@ -38,8 +38,8 @@ class Saavn(PlatformBase):
                 return await func(url)
         return None
 
-    @alru_cache(maxsize=None)
     @asyncify
+    @alru_cache(maxsize=None)
     def playlist(self, url, limit: int = PLAYLIST_FETCH_LIMIT):
         url = self.clean_url(url)
         ydl_opts = {
