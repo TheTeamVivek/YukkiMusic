@@ -11,11 +11,11 @@
 import config as _config
 from YukkiMusic.core.dir import dirr as _dirr
 from YukkiMusic.core.git import git as _git
-from YukkiMusic.core.telethon import TelethonClient
+from YukkiMusic.core.telethon import TelethonClient as _tc
 
 # from .logging import logger
 
-tbot = TelethonClient(
+tbot = _tc(
     "YukkiMusic",
     api_id=_config.API_ID,
     api_hash=_config.API_HASH,
