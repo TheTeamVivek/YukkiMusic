@@ -158,7 +158,7 @@ def command(commands, use_strings=False):
         u = re.escape(event.client.username.lower())
 
         if use_strings:
-            from YukkiMusic.utils.database import get_lang
+            from YukkiMusic.utils.database.memorydatabase import get_lang
 
             lang = await get_lang(event.chat_id)
             lang = _get_string(lang)
