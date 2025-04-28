@@ -8,21 +8,20 @@
 # All rights reserved.
 import socket
 import time
-
+import logging
 import heroku3
 
 import config
 from YukkiMusic.core.filters import User
 from YukkiMusic.core.mongo import mongodb
 
-from .logging import logger
 
 BANNED_USERS = User()
 SUDOERS = User()
 db = {}
 HAPP = None
 _boot_ = time.time()
-
+logger = logging.getLogger(__name__)
 
 def is_heroku():
     return "heroku" in socket.getfqdn()
@@ -49,7 +48,7 @@ async def sudo():
             for x in db_sudoers:
                 SUDOERS.add(x)
 
-    logger(__name__).info("Sudoers Loaded.")
+    logger.info("Sudoers Loaded.")
 
 
 if is_heroku():
@@ -57,9 +56,9 @@ if is_heroku():
         try:
             heroku_cl = heroku3.from_key(config.HEROKU_API_KEY)
             HAPP = heroku_cl.app(config.HEROKU_APP_NAME)
-            logger(__name__).info("Heroku App Configured")
+            logger.info("Heroku App Configured")
         except Exception:  # pylint: disable=broad-exception-caught
-            logger(__name__).warning(
+            logger.warning(
                 "Please make sure your Heroku API Key and "
                 "Your App name are configured correctly in the heroku."
             )
