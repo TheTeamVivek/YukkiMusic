@@ -16,11 +16,10 @@ from collections.abc import Callable as _Callable
 from telethon.tl import types as _types
 
 from strings import get_string as _get_string
-from YukkiMusic.utils.database import get_lang as _get_lang
-
 __all__ = [
     "Filter",
-    "wrapforwarded",
+    "wrap",
+    "forwarded",
     "new_chat_members",
     "private",
     "group",
@@ -158,7 +157,8 @@ def command(commands, use_strings=False):
         u = re.escape(event.client.username.lower())
 
         if use_strings:
-            lang = await _get_lang(event.chat_id)
+            from YukkiMusic.utils.database import get_lang
+            lang = await get_lang(event.chat_id)
             lang = _get_string(lang)
 
             _commands = set()
