@@ -15,6 +15,7 @@ __all__ = ["play_logs"]
 async def play_logs(_, event, streamtype):
     if await is_on_off(LOG):
         from YukkiMusic import tbot
+
         chat = await event.get_chat()
         if chat.username:
             chatusername = f"@{chat.username}"
