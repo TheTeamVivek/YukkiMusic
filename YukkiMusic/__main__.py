@@ -16,7 +16,7 @@ import config
 from config import fetch_cookies
 from YukkiMusic import tbot, userbot
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.misc import sudo, BANNED_USERS
+from YukkiMusic.misc import BANNED_USERS, sudo
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
 logger = logging.getLogger("YukkiMusic")
