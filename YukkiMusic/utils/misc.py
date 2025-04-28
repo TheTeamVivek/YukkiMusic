@@ -1,9 +1,14 @@
+from telethon.tl import types as _types
+from YukkiMusic.database import get_lang as _get_lang
+
+
 async def get_value(chat_id, key) -> list[str]:
     from strings import get_string
 
     value = []
 
-    language = await get_lang(chat_id)  # get_lang from .database
+    language = await _get_lang(chat_id)
+
     if language != "en":
         value.append(get_string(language)[key])
         value.append(get_string("en")[key])
