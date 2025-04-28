@@ -40,7 +40,7 @@ class Saavn(PlatformBase):
 
     @alru_cache(maxsize=None)
     @asyncify
-    def playlist(self, url, limit: int = config.PLAYLIST_FETCH_LIMIT) -> list["Track"]:
+    def playlist(self, url, limit: int = config.PLAYLIST_FETCH_LIMIT):
         url = self.clean_url(url)
         ydl_opts = {
             "extract_flat": True,
