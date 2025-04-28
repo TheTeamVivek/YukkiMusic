@@ -6,15 +6,15 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
+import logging
 import socket
 import time
-import logging
+
 import heroku3
 
 import config
 from YukkiMusic.core.filters import User
 from YukkiMusic.core.mongo import mongodb
-
 
 BANNED_USERS = User()
 SUDOERS = User()
@@ -22,6 +22,7 @@ db = {}
 HAPP = None
 _boot_ = time.time()
 logger = logging.getLogger(__name__)
+
 
 def is_heroku():
     return "heroku" in socket.getfqdn()
