@@ -12,7 +12,7 @@ import asyncio
 
 from telethon.errors import FloodWaitError
 
-from config import BANNED_USERS
+from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.misc import SUDOERS
