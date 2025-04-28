@@ -12,7 +12,7 @@ lyricsgenius
 motor
 psutil
 pytube
-py-tgcalls
+py-tgcalls==2.0.1
 python-dotenv
 pyyaml
 requests
