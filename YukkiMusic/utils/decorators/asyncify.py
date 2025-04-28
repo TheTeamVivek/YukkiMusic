@@ -8,8 +8,9 @@ __all__ = ["asyncify"]
 
 def asyncify(func: Callable) -> Callable[..., Any]:
     @wraps(func)
-    async def wrapper(*args: Any, **kwargs: Any) -> Any:
+    """async def wrapper(*args: Any, **kwargs: Any) -> Any:
         pfunc = partial(func, *args, **kwargs)
         return await asyncio.to_thread(pfunc)
 
-    return wrapper
+    return wrapper"""
+    return func
