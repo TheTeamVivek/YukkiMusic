@@ -239,19 +239,8 @@ lang_2: "تم تغيير اللغة بنجاح.."
 lang_3: "فشل تغيير اللغة أو اللغة قيد التحديث"
 
 # Logger
-logger_text: |
-**سجل تشغيل {bot_mention}**
+logger_text: "**سجل تشغيل {bot_mention}**\n\n**معرف المحادثة:** `{chat_id}`\n**اسم المحادثة:** {title}\n**اسم مستخدم المحادثة:** {chatusername}\n\n**معرف المستخدم:** `{sender_id}`\n**الاسم:** {user_mention}\n**اسم المستخدم:** {username}\n\n**الطلب:** {query}\n**نوع البث:** {streamtype}"
 
-**معرف المحادثة:** `{chat_id}`
-**اسم المحادثة:** {title}
-**اسم مستخدم المحادثة:** {chatusername}
-
-**معرف المستخدم:** `{sender_id}`
-**الاسم:** {user_mention}
-**اسم المستخدم:** {username}
-
-**الطلب:** {query}
-**نوع البث:** {streamtype}
 
 #Ping
 ping_1: "» {0} جاري الاتصال..."
