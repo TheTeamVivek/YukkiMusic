@@ -16,6 +16,7 @@ from collections.abc import Callable as _Callable
 from telethon.tl import types as _types
 
 from strings import get_string as _get_string
+
 __all__ = [
     "Filter",
     "wrap",
@@ -158,6 +159,7 @@ def command(commands, use_strings=False):
 
         if use_strings:
             from YukkiMusic.utils.database import get_lang
+
             lang = await get_lang(event.chat_id)
             lang = _get_string(lang)
 
