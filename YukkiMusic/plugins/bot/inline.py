@@ -21,7 +21,7 @@ from telethon.tl.types import (
 from youtubesearchpython.__future__ import VideosSearch
 
 from YukkiMusic.misc import BANNED_USERS
-from YukkiMusic import app, tbot
+from YukkiMusic import tbot
 from YukkiMusic.utils.inlinequery import answer
 
 
@@ -68,7 +68,7 @@ async def inline_query_handler(event):
 
 __ʀᴇᴘʟʏ ᴡɪᴛʜ /play ᴏɴ ᴛʜɪs sᴇᴀʀᴄʜᴇᴅ ᴍᴇssᴀɢᴇ ᴛᴏ sᴛʀᴇᴀᴍ ɪᴛ ᴏɴ ᴠᴏɪᴄᴇᴄʜᴀᴛ.__
 
-⚡️ ** ɪɴʟɪɴᴇ sᴇᴀʀᴄʜ ʙʏ {app.mention} **"""
+⚡️ ** ɪɴʟɪɴᴇ sᴇᴀʀᴄʜ ʙʏ {tbot.mention} **"""
             photo = InputWebDocument(
                 url=thumbnail,
                 size=0,
