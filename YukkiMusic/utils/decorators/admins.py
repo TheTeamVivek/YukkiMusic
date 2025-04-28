@@ -176,7 +176,7 @@ def actual_admin_cb(mystic):
                             )
 
             except Exception as e:
-                await tbot.handle_error(e)
+                await event.client.handle_error(e)
                 return await query.answer(f"Error: {str(e)}")
 
         return await mystic(event, _)
