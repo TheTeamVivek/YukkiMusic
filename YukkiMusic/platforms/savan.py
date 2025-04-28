@@ -7,7 +7,6 @@
 #
 # All rights reserved.
 #
-from typing import List
 
 from async_lru import alru_cache
 from yt_dlp import YoutubeDL
