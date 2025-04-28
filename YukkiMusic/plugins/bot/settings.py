@@ -10,7 +10,8 @@
 from telethon import Button, events
 from telethon.errors import MessageNotModifiedError
 
-from config import BANNED_USERS, CLEANMODE_DELETE_TIME, OWNER_ID
+from YukkiMusic.misc import BANNED_USERS
+from config import CLEANMODE_DELETE_TIME, OWNER_ID
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.utils.database import (
