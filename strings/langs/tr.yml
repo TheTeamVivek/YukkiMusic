@@ -234,18 +234,18 @@ lang_3: "Dil değiştirilemedi veya dil güncellemesi devam ediyor"
 
 # Logger
 logger_text: |
-**{bot_mention} Oynatma Kaydı**
+    **{bot_mention} Oynatma Kaydı**
 
-**Sohbet ID:** `{chat_id}`
-**Sohbet Adı:** {title}
-**Sohbet Kullanıcı Adı:** {chatusername}
+    **Sohbet ID:** `{chat_id}`
+    **Sohbet Adı:** {title}
+    **Sohbet Kullanıcı Adı:** {chatusername}
 
-**Kullanıcı ID:** `{sender_id}`
-**Ad:** {user_mention}
-**Kullanıcı Adı:** {username}
+    **Kullanıcı ID:** `{sender_id}`
+    **Ad:** {user_mention}
+    **Kullanıcı Adı:** {username}
 
-**Sorgu:** {query}
-**Yayın Türü:** {streamtype}
+    **Sorgu:** {query}
+    **Yayın Türü:** {streamtype}
 
 #Ping
 ping_1 : "»{0} ᴘɪɴɢ ɪɴɢ..."
