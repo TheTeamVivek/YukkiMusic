@@ -31,13 +31,13 @@ def is_heroku():
 async def sudo():
     if config.MONGO_DB_URI is None:
         for user_id in config.OWNER_ID:
-            config.SUDOERS.add(user_id)
+            SUDOERS.add(user_id)
     else:
         sudoersdb = mongodb.sudoers
         db_sudoers = await sudoersdb.find_one({"sudo": "sudo"})
         db_sudoers = [] if not db_sudoers else db_sudoers["sudoers"]
         for user_id in config.OWNER_ID:
-            config.SUDOERS.add(user_id)
+            SUDOERS.add(user_id)
             if user_id not in db_sudoers:
                 db_sudoers.append(user_id)
                 await sudoersdb.update_one(
@@ -47,7 +47,7 @@ async def sudo():
                 )
         if db_sudoers:
             for x in db_sudoers:
-                config.SUDOERS.add(x)
+                SUDOERS.add(x)
 
     logger(__name__).info("Sudoers Loaded.")
 
