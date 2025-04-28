@@ -9,6 +9,7 @@
 
 # pylint: disable=C0103, C0413
 import uvloop
+
 uvloop.install()
 from YukkiMusic.core.dir import dirr as _dirr
 from YukkiMusic.core.git import git as _git
