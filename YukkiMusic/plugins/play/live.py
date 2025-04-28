@@ -10,7 +10,7 @@
 
 from telethon import events
 
-from config import BANNED_USERS
+from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic import tbot
 from YukkiMusic.platforms import youtube
 from YukkiMusic.utils import get_channeplay_cb, language, stream
