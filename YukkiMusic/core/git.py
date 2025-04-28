@@ -23,7 +23,12 @@ __all__ = ["git"]
 def install_req() -> tuple[str, str, int, int]:
     async def install_requirements():
         process = await asyncio.create_subprocess_exec(
-            "uv", "pip", "install", "--no-cache-dir", "-r", "requirements.txt",
+            "uv",
+            "pip",
+            "install",
+            "--no-cache-dir",
+            "-r",
+            "requirements.txt",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
@@ -36,6 +41,7 @@ def install_req() -> tuple[str, str, int, int]:
         )
 
     return loop.run_until_complete(install_requirements())
+
 
 def git():
     if config.GIT_TOKEN:
