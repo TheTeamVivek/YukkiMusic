@@ -50,7 +50,7 @@ async def _get_playlists(chat_id: int) -> dict[str, int]:
     return _notes["notes"]
 
 
-async def get_playlist_names(chat_id: int) -> List[str]:
+async def get_playlist_names(chat_id: int) -> list[str]:
     _notes = []
     for note in await _get_playlists(chat_id):
         _notes.append(note)
