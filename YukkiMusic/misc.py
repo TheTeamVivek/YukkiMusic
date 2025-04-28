@@ -19,7 +19,8 @@ from .logging import logger
 
 BANNED_USERS = User()
 SUDOERS = User()
-db = dict()
+db = {}}
+
 HAPP = None
 _boot_ = time.time()
 
