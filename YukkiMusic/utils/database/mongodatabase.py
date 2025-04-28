@@ -22,7 +22,7 @@ _blistchatdb = _mongodb.blacklistChat
 _usersdb = _mongodb.tgusersdb
 _playlistdb = _mongodb.playlist
 _blockeddb = _mongodb.blockedusers
-_privatedb = mongodb.privatechats
+_privatedb = _mongodb.privatechats
 
 _cache = {
     "users": [],  # SERVED USERS
