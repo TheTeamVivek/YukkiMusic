@@ -12,7 +12,7 @@
 from telethon.tl.functions.channels import GetFullChannelRequest
 from telethon.tl.types import Channel
 
-from config import BANNED_USERS
+from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic import tbot
 from YukkiMusic.core import filters
 from YukkiMusic.utils import admin_actual, get_value, set_cmode
