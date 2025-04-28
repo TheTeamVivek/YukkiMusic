@@ -13,7 +13,7 @@ import logging
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
-import config
+
 
 __all__ = ["DB_NAME", "mongodb"]
 
@@ -24,6 +24,7 @@ loop = asyncio.get_event_loop()
 
 
 async def _mongo():
+    import config
     if config.MONGO_DB_URI is None:
         logger.warning("No MONGO DB URL found.. Your Bot will work on Yukki's Database")
         from YukkiMusic import tbot
