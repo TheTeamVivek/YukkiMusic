@@ -17,7 +17,7 @@ from config import BANNED_USERS, fetch_cookies
 from YukkiMusic import tbot, userbot
 from YukkiMusic.core.call import Yukki
 
-# from YukkiMusic.misc import sudo
+from YukkiMusic.misc import sudo
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
 logger = logging.getLogger("YukkiMusic")
@@ -42,6 +42,7 @@ async def init():
             BANNED_USERS.add(user_id)
     except Exception:
         pass
+    await sudo()
     await tbot.start()
 
     await tbot.load_plugins_from("YukkiMusic/plugins")
