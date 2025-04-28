@@ -16,9 +16,7 @@ from telethon.tl.types import Channel, Chat
 from youtubesearchpython.__future__ import VideosSearch
 
 import config
-from config import START_IMG_URL
-from config import BANNED_USERS
-from config import OWNER_ID
+from config import BANNED_USERS, OWNER_ID, START_IMG_URL
 from strings import get_string
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt

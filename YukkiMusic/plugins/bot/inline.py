@@ -20,8 +20,8 @@ from telethon.tl.types import (
 )
 from youtubesearchpython.__future__ import VideosSearch
 
-from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic import tbot
+from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic.utils.inlinequery import answer
 
 
