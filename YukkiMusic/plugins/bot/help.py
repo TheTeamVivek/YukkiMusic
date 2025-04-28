@@ -13,7 +13,8 @@ from math import ceil
 
 from telethon import Button, events
 
-from config import BANNED_USERS, START_IMG_URL
+from config import START_IMG_URL
+from YukkiMusic.misc import BANNED_USERS
 from strings import get_string
 from YukkiMusic import tbot
 from YukkiMusic.core import filtera as flt
