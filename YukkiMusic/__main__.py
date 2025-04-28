@@ -27,7 +27,7 @@ async def init():
     if not config.STRING_SESSIONS:
         logger.error("No Assistant Clients Vars Defined!.. Exiting Process.")
         return
-    if not config.SPOTIFY_CLIENcT_ID and not config.SPOTIFY_CLIENT_SECRET:
+    if not config.SPOTIFY_CLIENT_ID and not config.SPOTIFY_CLIENT_SECRET:
         logger.warning(
             "No Spotify Vars defined.Your bot won't be able to play spotify queries."
         )
@@ -59,7 +59,6 @@ async def init():
         sys.exit()
     logger.info("YukkiMusic Started Successfully")
     tbot.run_until_disconnected()
-    await app.stop()
     await userbot.stop()
     await Yukki.stop()
 
