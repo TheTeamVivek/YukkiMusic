@@ -26,7 +26,6 @@ from telethon import TelegramClient, errors, events
 from telethon.tl import functions, types
 
 import config
-from YukkiMusic.utils.decorators.asyncify import asyncify
 from YukkiMusic.utils.pastebin import paste
 
 uvloop.install()
@@ -337,15 +336,21 @@ class TelethonClient(TelegramClient):
             for file in files:
                 if file.endswith(".py") and not file.startswith("_"):
                     file_path = os.path.join(root, file)
-                    relative_path = os.path.relpath(file_path, base_dir).replace(os.sep, ".")
+                    relative_path = os.path.relpath(file_path, base_dir).replace(
+                        os.sep, "."
+                    )
                     module_path = f"{os.path.basename(base_dir)}.{relative_path[:-3]}"
 
-                    spec = importlib.util.spec_from_file_location(module_path, file_path)
+                    spec = importlib.util.spec_from_file_location(
+                        module_path, file_path
+                    )
                     module = importlib.util.module_from_spec(spec)
 
                     try:
                         spec.loader.exec_module(module)
                         self.loaded_plug_counts += 1
                     except Exception as e:
-                        logger.error("Failed to load %s: %s\n\n", module_path, e, exc_info=True)
+                        logger.error(
+                            "Failed to load %s: %s\n\n", module_path, e, exc_info=True
+                        )
                         sys.exit()
