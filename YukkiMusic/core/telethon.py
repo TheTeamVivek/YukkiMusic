@@ -350,7 +350,7 @@ class TelethonClient(TelegramClient):
                         spec.loader.exec_module(module)
                         self.loaded_plug_counts += 1
                     except Exception as e:
-                        logger.error(
+                        log.error(
                             "Failed to load %s: %s\n\n", module_path, e, exc_info=True
                         )
                         sys.exit()
