@@ -42,11 +42,9 @@ async def init():
             BANNED_USERS.add(user_id)
     except Exception:
         pass
-    await app.start()
     await tbot.start()
 
-    attrs = {"userbot": userbot, "tbot": tbot}
-    await app.load_plugins_from("YukkiMusic/plugins", attrs)
+    await tbot.load_plugins_from("YukkiMusic/plugins")
     logger.info("Successfully Imported All Modules ")
     await fetch_cookies()
     await userbot.start()
