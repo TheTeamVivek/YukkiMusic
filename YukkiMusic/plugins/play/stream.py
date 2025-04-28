@@ -10,7 +10,7 @@
 import logging
 
 import config
-from config import BANNED_USERS
+from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic import tbot
 from YukkiMusic.core import SourceType, Track, filters
 from YukkiMusic.utils import play_logs, play_wrapper, stream
