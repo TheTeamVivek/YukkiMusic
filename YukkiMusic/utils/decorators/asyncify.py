@@ -1,7 +1,7 @@
 import asyncio
+from collections.abc import Callable
 from functools import partial, wraps
 from typing import Any
-from collections.abc import Callable
 
 __all__ = ["asyncify"]
 
