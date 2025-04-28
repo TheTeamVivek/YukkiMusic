@@ -91,8 +91,8 @@ class TelethonClient(TelegramClient):
     def __init__(self):
         super().__init__(
             "YukkiMusic",
-            api_id=_config.API_ID,
-            api_hash=_config.API_HASH,
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
             flood_sleep_threshold=240,
         )
         self.loaded_plug_counts: int = 0
