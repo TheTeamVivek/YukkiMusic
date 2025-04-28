@@ -31,7 +31,7 @@ __all__ = [
 
 
 class Filter:
-    def __init__(self, func: _Callable = None):
+    def __init__(self, func):
         self.func = func
 
     async def __call__(self, event):
@@ -45,35 +45,33 @@ class Filter:
 
     def __and__(self, other):
         "And Filter"
-
         async def and_filter(event):
             x = await self(event)
             y = await other(event)
             if not x:
                 return False
             return x and y
-
         return self.__class__(and_filter)
 
     def __or__(self, other):
         "Or Filter"
-
         async def or_filter(event):
             x = await self(event)
             y = await other(event)
             if x:
                 return True
             return x or y
-
         return self.__class__(or_filter)
 
     def __invert__(self):
         "Invert Filter"
-
         async def invert_filter(event):
             return not (await self(event))
-
         return self.__class__(invert_filter)
+
+def wrap(func):
+    "wrap the function by Filter"
+    return Filter(func)
 
 
 def wrap(func):
