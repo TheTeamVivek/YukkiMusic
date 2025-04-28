@@ -21,14 +21,14 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import wraps
 
-import uvloop
+#import uvloop
 from telethon import TelegramClient, errors, events
 from telethon.tl import functions, types
 
 import config
 from YukkiMusic.utils.pastebin import paste
 
-uvloop.install()
+#uvloop.install()
 
 log = logging.getLogger(__name__)
 
