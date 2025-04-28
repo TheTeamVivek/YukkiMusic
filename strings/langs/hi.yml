@@ -244,18 +244,18 @@ lang_3: "भाषा बदलने में विफल या भाषा
 
 # Logger
 logger_text: |
-**{bot_mention} प्ले लॉग**
+    **{bot_mention} प्ले लॉग**
 
-**चैट आईडी:** `{chat_id}`
-**चैट नाम:** {title}
-**चैट यूज़रनेम:** {chatusername}
+    **चैट आईडी:** `{chat_id}`
+    **चैट नाम:** {title}
+    **चैट यूज़रनेम:** {chatusername}
 
-**यूज़र आईडी:** `{sender_id}`
-**नाम:** {user_mention}
-**यूज़रनेम:** {username}
+    **यूज़र आईडी:** `{sender_id}`
+    **नाम:** {user_mention}
+    **यूज़रनेम:** {username}
 
-**क्वेरी:** {query}
-**स्ट्रीम प्रकार:** {streamtype}
+    **क्वेरी:** {query}
+    **स्ट्रीम प्रकार:** {streamtype}
 
 #Ping
 ping_1 : "» {0} पिंग हो रहा है..."
