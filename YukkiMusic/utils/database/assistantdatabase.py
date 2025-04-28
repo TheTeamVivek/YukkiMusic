@@ -19,6 +19,7 @@ assistantdict = {}
 
 async def get_client(index: int):
     from YukkiMusic import userbot
+
     clients = userbot.clients
     if 1 <= index <= len(clients):
         return clients[index - 1]  # -1 Because the index start from 1 not from 0
@@ -38,6 +39,7 @@ async def save_assistant(chat_id, index):
 
 async def set_assistant(chat_id):
     from YukkiMusic.core.userbot import assistants
+
     dbassistant = await _db.find_one({"chat_id": chat_id})
     current_assistant = dbassistant["assistant"] if dbassistant else None
 
@@ -61,6 +63,7 @@ async def set_assistant(chat_id):
 
 async def get_assistant(chat_id: int) -> str:
     from YukkiMusic.core.userbot import assistants
+
     assistant = assistantdict.get(chat_id)
     if not assistant:
         dbassistant = await _db.find_one({"chat_id": chat_id})
@@ -87,6 +90,7 @@ async def get_assistant(chat_id: int) -> str:
 
 async def set_calls_assistant(chat_id):
     from YukkiMusic.core.userbot import assistants
+
     ran_assistant = _random.choice(assistants)
     assistantdict[chat_id] = ran_assistant
     await _db.update_one(
@@ -99,6 +103,7 @@ async def set_calls_assistant(chat_id):
 
 async def group_assistant(self, chat_id: int):
     from YukkiMusic.core.userbot import assistants
+
     assistant = assistantdict.get(chat_id)
     if not assistant:
         dbassistant = await _db.find_one({"chat_id": chat_id})
