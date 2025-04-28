@@ -147,6 +147,7 @@ class User(set, Filter):
             or ("me" in self and sender.is_self)
         )
 
+
 user = User
 
 
