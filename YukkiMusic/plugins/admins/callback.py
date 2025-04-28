@@ -14,7 +14,7 @@ from telethon import events
 import config
 from YukkiMusic import Platform, tbot
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.misc import SUDOERS, db
+from YukkiMusic.misc import SUDOERS, db, BANNED_USERS
 from YukkiMusic.utils import time_to_seconds
 from YukkiMusic.utils.channelplay import get_channeplay_cb
 from YukkiMusic.utils.database import (
@@ -47,7 +47,7 @@ from YukkiMusic.utils.stream.stream import stream
 wrong = {}
 
 
-@tbot.on(events.CallbackQuery("PanelMarkup", func=~config.BANNED_USERS))
+@tbot.on(events.CallbackQuery("PanelMarkup", func=~BANNED_USERS))
 @language
 async def markup_panel(event, _):
     await event.answer()
@@ -65,7 +65,7 @@ async def markup_panel(event, _):
     wrong[chat_id][event.message_id] = False
 
 
-@tbot.on(events.CallbackQuery("MainMarkup", func=~config.BANNED_USERS))
+@tbot.on(events.CallbackQuery("MainMarkup", func=~BANNED_USERS))
 @language
 async def main_markup_(event, _):
     await event.answer()
@@ -86,7 +86,7 @@ async def main_markup_(event, _):
     wrong[chat_id][event.message_id] = True
 
 
-@tbot.on(events.CallbackQuery("Pages", func=~config.BANNED_USERS))
+@tbot.on(events.CallbackQuery("Pages", func=~BANNED_USERS))
 @language
 async def pages_markup(event, _):
     await event.answer()
@@ -115,7 +115,7 @@ async def pages_markup(event, _):
         return
 
 
-@tbot.on(events.CallbackQuery("ADMIN", func=~config.BANNED_USERS))
+@tbot.on(events.CallbackQuery("ADMIN", func=~BANNED_USERS))
 @language
 async def admin_callback(event, _):
     callback_data = event.data.decode("utf-8").strip()
@@ -311,7 +311,7 @@ async def admin_callback(event, _):
         await mystic.edit(string)  # f"{string}\n\nChanges Done by: {mention} !")
 
 
-@tbot.on(events.CallbackQuery("MusicStream", func=~config.BANNED_USERS))
+@tbot.on(events.CallbackQuery("MusicStream", func=~BANNED_USERS))
 @language
 async def play_music(event, _):
     callback_data = event.data.decode("utf-8").strip()
@@ -379,7 +379,7 @@ async def play_music(event, _):
     return await mystic.delete()
 
 
-@tbot.on(events.CallbackQuery("AnonymousAdmin", func=~config.BANNED_USERS))
+@tbot.on(events.CallbackQuery("AnonymousAdmin", func=~BANNED_USERS))
 @language
 async def anonymous_check(event, _):
     try:
@@ -391,7 +391,7 @@ async def anonymous_check(event, _):
         return
 
 
-@tbot.on(events.CallbackQuery("YukkiPlaylists", func=~config.BANNED_USERS))
+@tbot.on(events.CallbackQuery("YukkiPlaylists", func=~BANNED_USERS))
 @language
 async def play_playlists_cb(event, _):
     callback_data = event.data.decode("utf-8").strip()
@@ -476,7 +476,7 @@ async def play_playlists_cb(event, _):
     return await mystic.delete()
 
 
-@tbot.on(events.CallbackQuery("slider", func=~config.BANNED_USERS))
+@tbot.on(events.CallbackQuery("slider", func=~BANNED_USERS))
 @language
 async def slider_queries(event, _):
     callback_data = event.data.decode("utf-8").strip()
@@ -541,13 +541,13 @@ async def slider_queries(event, _):
         )
 
 
-@tbot.on(events.CallbackQuery("close", func=~config.BANNED_USERS))
+@tbot.on(events.CallbackQuery("close", func=~BANNED_USERS))
 async def close_menu(event):
     await event.delete()
     await event.answer()
 
 
-@tbot.on(events.CallbackQuery("stop_downloading", func=~config.BANNED_USERS))
+@tbot.on(events.CallbackQuery("stop_downloading", func=~BANNED_USERS))
 @actual_admin_cb
 async def stop_download(event, _):
     message_id = event.message_id
