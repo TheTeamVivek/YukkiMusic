@@ -16,8 +16,8 @@ from dataclasses import dataclass
 from yt_dlp import YoutubeDL
 
 from config import YTDOWNLOADER, cookies
-from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.database import is_on_off
+from YukkiMusic.utils.decorators import asyncify
 
 from .enum import SourceType
 
