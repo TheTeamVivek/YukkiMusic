@@ -15,7 +15,7 @@ from strings import get_string
 from YukkiMusic import tbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.core.enum import SourceType
-from YukkiMusic.core.youtube import Track
+from YukkiMusic.core.track import Track
 from YukkiMusic.misc import db
 from YukkiMusic.platforms import carbon, youtube
 from YukkiMusic.utils.database import (
