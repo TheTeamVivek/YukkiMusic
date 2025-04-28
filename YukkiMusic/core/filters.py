@@ -147,6 +147,8 @@ class User(set, Filter):
             or ("me" in self and sender.is_self)
         )
 
+user = User
+
 
 def command(commands, use_strings=False):
     "Check if the message startswith the provided command"
