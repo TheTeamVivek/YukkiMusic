@@ -9,6 +9,7 @@
 
 import asyncio
 import logging
+
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
 
