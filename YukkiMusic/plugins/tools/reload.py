@@ -11,7 +11,8 @@
 
 from pyrogram.enums import ChatMembersFilter
 
-from config import BANNED_USERS, adminlist
+from config import adminlist
+from YukkiMusic import BANNED_USERS, SUDOERS
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.utils.database import get_authuser_names
