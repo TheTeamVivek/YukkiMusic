@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from ..core.youtube import Track
+from ..core.track import Track
 
 
 class PlatformBase(ABC):
@@ -20,6 +20,7 @@ class PlatformBase(ABC):
     async def track(self, url: str) -> Track:
         """
         Retrieves a track instance from the given URL.
+        if the url of the playform but of playlist other kind of track, album etc, so must return a list of elements where first element must be a `Track` instance
 
         Args:
             url (str): The URL of the track.
