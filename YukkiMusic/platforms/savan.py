@@ -40,7 +40,8 @@ class Saavn(PlatformBase):
 
     @alru_cache(maxsize=None)
     async def playlist(self, url, limit: int = PLAYLIST_FETCH_LIMIT):
-        return await self._playlist(url, limit)
+        x = await self._playlist(url, limit)
+        return x
 
     @asyncify
     def _playlist(self, url, limit: int = PLAYLIST_FETCH_LIMIT):
