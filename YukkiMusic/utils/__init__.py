@@ -7,12 +7,10 @@
 #
 # All rights reserved.
 #
-from telethon.tl import types as _types
 
 from .channelplay import *
 from .database import *
-
-# from .decorators import *
+from .decorators import *
 from .exceptions import *
 from .formatters import *
 from .inline import *
