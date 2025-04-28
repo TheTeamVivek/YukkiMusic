@@ -8,16 +8,14 @@
 # All rights reserved.
 
 import asyncio
-
+import logging
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
 
 import config
 
-from ..logging import logger
-
 loop = asyncio.get_event_loop_policy().get_event_loop()
-
+logger = logging.getlogger(__name__)
 __all__ = ["git"]
 
 
@@ -49,9 +47,9 @@ def git():
 
     try:
         repo = Repo()
-        logger(__name__).info("Git Client Found [VPS DEPLOYER]")
+        logger.info("Git Client Found [VPS DEPLOYER]")
     except GitCommandError:
-        logger(__name__).info("Invalid Git Command")
+        logger.info("Invalid Git Command")
     except InvalidGitRepositoryError:
         repo = Repo.init()
         if "origin" in repo.remotes:
