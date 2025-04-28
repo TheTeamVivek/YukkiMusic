@@ -10,7 +10,7 @@
 
 
 from config import adminlist
-from YukkiMusic import app, tbot
+from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic.utils.database import (
@@ -31,7 +31,7 @@ async def auth(event, _):
         if len(event.text.split()) != 2:
             return await event.reply(_["general_1"])
         user = event.text.split(None, 1)[1]
-        user = await app.get_entity(user)
+        user = await tbot.get_entity(user)
         token = await int_to_alpha(user.id)
         from_user_name = event.sender.first_name
         from_user_id = event.sender.id
@@ -92,7 +92,7 @@ async def unauthusers(event, _):
         if len(event.text.split()) != 2:
             return await event.reply(_["general_1"])
         user = event.text.split(None, 1)[1]
-        user = await app.get_entity(user)
+        user = await tbot.get_entity(user)
         token = await int_to_alpha(user.id)
         deleted = await delete_authuser(event.chat_id, token)
         get = adminlist.get(event.chat_id)
@@ -134,7 +134,7 @@ async def authusers(event, _):
             admin_id = _note["admin_id"]
             admin_name = _note["admin_name"]
             try:
-                user = await app.get_entity(user_id)
+                user = await tbot.get_entity(user_id)
                 user = user.first_name
                 j += 1
             except Exception:
