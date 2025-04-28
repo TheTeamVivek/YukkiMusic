@@ -43,8 +43,8 @@ class Saavn(PlatformBase):
         x = await self._playlist(url, limit)
         return x
 
-    @asyncify
-    def _playlist(self, url, limit: int = PLAYLIST_FETCH_LIMIT):
+    #@asyncify
+    async def _playlist(self, url, limit: int = PLAYLIST_FETCH_LIMIT):
         url = self.clean_url(url)
         ydl_opts = {
             "extract_flat": True,
