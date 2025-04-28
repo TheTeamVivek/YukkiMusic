@@ -330,23 +330,6 @@ class TelethonClient(TelegramClient):
             )
         )
 
-    @asyncify
-    def __load_plugin(self, file_path: str, base_dir: str):
-        relative_path = os.path.relpath(file_path, base_dir).replace(os.sep, ".")
-        module_path = f"{os.path.basename(base_dir)}.{relative_path[:-3]}"
-
-        spec = importlib.util.spec_from_file_location(module_path, file_path)
-        module = importlib.util.module_from_spec(spec)
-
-        try:
-            spec.loader.exec_module(module)
-            self.loaded_plug_counts += 1
-        except Exception as e:
-            logger.error("Failed to load %s: %s\n\n", module_path, e, exc_info=True)
-            sys.exit()
-
-        return module
-
     async def load_plugins_from(self, base_folder: str):
         base_dir = os.path.abspath(base_folder)
 
@@ -354,4 +337,15 @@ class TelethonClient(TelegramClient):
             for file in files:
                 if file.endswith(".py") and not file.startswith("_"):
                     file_path = os.path.join(root, file)
-                    await self.__load_plugin(file_path, base_dir)
+                    relative_path = os.path.relpath(file_path, base_dir).replace(os.sep, ".")
+                    module_path = f"{os.path.basename(base_dir)}.{relative_path[:-3]}"
+
+                    spec = importlib.util.spec_from_file_location(module_path, file_path)
+                    module = importlib.util.module_from_spec(spec)
+
+                    try:
+                        spec.loader.exec_module(module)
+                        self.loaded_plug_counts += 1
+                    except Exception as e:
+                        logger.error("Failed to load %s: %s\n\n", module_path, e, exc_info=True)
+                        sys.exit()
