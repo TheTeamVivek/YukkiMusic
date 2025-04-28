@@ -88,7 +88,7 @@ commands = {
 
 
 class TelethonClient(TelegramClient):
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         super().__init__(
             "YukkiMusic",
             api_id=_config.API_ID,
