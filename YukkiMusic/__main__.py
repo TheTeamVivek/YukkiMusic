@@ -8,18 +8,18 @@
 # All rights reserved.
 import asyncio
 import sys
-
+import logging
 from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
 from config import BANNED_USERS, fetch_cookies
-from YukkiMusic import app, logger, tbot, userbot
+from YukkiMusic import tbot, userbot
 from YukkiMusic.core.call import Yukki
 
 # from YukkiMusic.misc import sudo
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
-logger = logger("YukkiMusic")
+logger = logging.getLogger("YukkiMusic")
 loop = asyncio.get_event_loop()
 
 
