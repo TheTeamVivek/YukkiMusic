@@ -10,11 +10,7 @@
 
 import random as _random
 
-from pytgcalls import PyTgCalls as _PyTgCalls
-
-from YukkiMusic import userbot as _userbot
 from YukkiMusic.core.mongo import mongodb as _mongodb
-from YukkiMusic.core.userbot import assistants as _assistants
 
 _db = _mongodb.assistants
 
@@ -22,7 +18,8 @@ assistantdict = {}
 
 
 async def get_client(index: int):
-    clients = _userbot.clients
+    from YukkiMusic import userbot
+    clients = userbot.clients
     if 1 <= index <= len(clients):
         return clients[index - 1]  # -1 Because the index start from 1 not from 0
     return None
@@ -40,13 +37,14 @@ async def save_assistant(chat_id, index):
 
 
 async def set_assistant(chat_id):
+    from YukkiMusic.core.userbot import assistants
     dbassistant = await _db.find_one({"chat_id": chat_id})
     current_assistant = dbassistant["assistant"] if dbassistant else None
 
-    available_assistants = [ass for ass in _assistants if ass != current_assistant]
+    available_assistants = [ass for ass in assistants if ass != current_assistant]
 
     if len(available_assistants) <= 1:
-        ran_assistant = _random.choice(_assistants)
+        ran_assistant = _random.choice(assistants)
     else:
         ran_assistant = _random.choice(available_assistants)
 
@@ -62,6 +60,7 @@ async def set_assistant(chat_id):
 
 
 async def get_assistant(chat_id: int) -> str:
+    from YukkiMusic.core.userbot import assistants
     assistant = assistantdict.get(chat_id)
     if not assistant:
         dbassistant = await _db.find_one({"chat_id": chat_id})
@@ -70,7 +69,7 @@ async def get_assistant(chat_id: int) -> str:
             return userbot
         else:
             got_assis = dbassistant["assistant"]
-            if got_assis in _assistants:
+            if got_assis in assistants:
                 assistantdict[chat_id] = got_assis
                 userbot = await get_client(got_assis)
                 return userbot
@@ -78,7 +77,7 @@ async def get_assistant(chat_id: int) -> str:
                 userbot = await set_assistant(chat_id)
                 return userbot
     else:
-        if assistant in _assistants:
+        if assistant in assistants:
             userbot = await get_client(assistant)
             return userbot
         else:
@@ -87,7 +86,8 @@ async def get_assistant(chat_id: int) -> str:
 
 
 async def set_calls_assistant(chat_id):
-    ran_assistant = _random.choice(_assistants)
+    from YukkiMusic.core.userbot import assistants
+    ran_assistant = _random.choice(assistants)
     assistantdict[chat_id] = ran_assistant
     await _db.update_one(
         {"chat_id": chat_id},
@@ -97,7 +97,8 @@ async def set_calls_assistant(chat_id):
     return ran_assistant
 
 
-async def group_assistant(self, chat_id: int) -> _PyTgCalls:
+async def group_assistant(self, chat_id: int):
+    from YukkiMusic.core.userbot import assistants
     assistant = assistantdict.get(chat_id)
     if not assistant:
         dbassistant = await _db.find_one({"chat_id": chat_id})
@@ -105,12 +106,12 @@ async def group_assistant(self, chat_id: int) -> _PyTgCalls:
             assis = await set_calls_assistant(chat_id)
         else:
             assis = dbassistant["assistant"]
-            if assis in _assistants:
+            if assis in assistants:
                 assistantdict[chat_id] = assis
             else:
                 assis = await set_calls_assistant(chat_id)
     else:
-        if assistant in _assistants:
+        if assistant in assistants:
             assis = assistant
         else:
             assis = await set_calls_assistant(chat_id)
