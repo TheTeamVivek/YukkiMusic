@@ -10,7 +10,7 @@ import aiohttp
 
 BASE = "https://batbin.me/"
 
-__all__ = ["paste "]
+__all__ = ["paste"]
 
 
 async def post(url: str, *args, **kwargs):
