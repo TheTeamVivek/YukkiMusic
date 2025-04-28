@@ -9,7 +9,8 @@
 #
 from datetime import datetime
 
-from config import BANNED_USERS, PING_IMG_URL
+from config import PING_IMG_URL
+from YukkiMusic import BANNED_USERS, SUDOERS
 from YukkiMusic import tbot
 from YukkiMusic.core import filters
 from YukkiMusic.core.call import Yukki
