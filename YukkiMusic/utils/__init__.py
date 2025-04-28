@@ -18,8 +18,8 @@ from .formatters import *
 from .inline import *
 from .inlinequery import *
 from .logger import *
+from .misc import *
 from .pastebin import *
 from .stream import *
 from .sys import *
 from .thumbnails import *
-from .misc import *

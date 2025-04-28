@@ -1,5 +1,3 @@
-
-
 async def get_value(chat_id, key) -> list[str]:
     from strings import get_string
 
