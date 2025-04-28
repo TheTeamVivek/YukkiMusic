@@ -12,11 +12,10 @@ import time
 import heroku3
 
 import config
+from YukkiMusic.core.filters import User
 from YukkiMusic.core.mongo import mongodb
 
 from .logging import logger
-from YukkiMusic.core.filters import User
-
 
 BANNED_USERS = User()
 SUDOERS = User()
