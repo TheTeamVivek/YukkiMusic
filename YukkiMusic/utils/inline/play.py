@@ -12,7 +12,7 @@ import math
 from telethon import Button
 
 from YukkiMusic.core.enum import SourceType
-from YukkiMusic.core.youtube import Track
+from YukkiMusic.core.track import Track
 from YukkiMusic.utils.formatters import time_to_seconds
 
 __all__ = [
