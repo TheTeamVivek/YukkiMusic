@@ -7,8 +7,9 @@
 #
 # All rights reserved.
 import asyncio
-import sys
 import logging
+import sys
+
 from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
