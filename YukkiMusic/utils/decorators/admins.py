@@ -17,7 +17,7 @@ from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS
 
 from ..formatters import int_to_alpha
-from . import (
+from .database import (
     get_authuser_names,
     get_cmode,
     get_lang,
@@ -25,7 +25,6 @@ from . import (
     is_commanddelete_on,
     is_maintenance,
     is_nonadmin_chat,
-    parse_flags,
 )
 
 __all__ = ["admin_rights_check", "admin_actual", "actual_admin_cb"]
