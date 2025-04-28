@@ -8,9 +8,7 @@
 # All rights reserved.
 #
 
-import config
-from YukkiMusic import tbot
-from YukkiMusic import BANNED_USERS, SUDOERS
+from YukkiMusic import SUDOERS, tbot
 from YukkiMusic.core import filters, language
 from YukkiMusic.utils import get_active_chats, get_active_video_chats
 

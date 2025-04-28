@@ -13,8 +13,7 @@ import os
 
 from telethon.errors import FloodWaitError
 
-from YukkiMusic import BANNED_USERS, SUDOERS
-from YukkiMusic import tbot
+from YukkiMusic import BANNED_USERS, tbot
 from YukkiMusic.core import filters
 from YukkiMusic.misc import db
 from YukkiMusic.utils import (

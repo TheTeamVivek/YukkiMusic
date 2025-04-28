@@ -10,9 +10,9 @@
 
 from pykeyboard.telethon import InlineKeyboard
 from telethon import Button, events
-from YukkiMusic import BANNED_USERS, SUDOERS
+
 from strings import get_string, languages_present
-from YukkiMusic import tbot
+from YukkiMusic import BANNED_USERS, tbot
 from YukkiMusic.core import filters
 from YukkiMusic.utils import actual_admin_cb, get_lang, language, set_lang
 
