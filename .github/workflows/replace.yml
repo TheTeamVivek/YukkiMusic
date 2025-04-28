@@ -16,8 +16,8 @@ jobs:
         shell: bash
         run: |
           declare -A replacements=(
-            ["USER_IDENTIFIER_REQUIRED"]="general_1"
-            ["COMMAND_USAGE_ERROR"]="general_2"
+            ["flt.user(BANNED_USERS)"]="BANNED_USERS"
+            ["flt.user(SUDOERS)"]="SUDOERS"
             ["ERROR_OCCURRED_MSG"]="general_3"
             ["ANONYMOUS_ADMIN"]="general_4"
             ["PERMISSION_REQUIRED"]="general_5"
