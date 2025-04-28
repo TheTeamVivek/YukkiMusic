@@ -12,10 +12,9 @@ import asyncio
 
 from telethon.errors import FloodWaitError
 
-from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
-from YukkiMusic.misc import SUDOERS
+from YukkiMusic.misc import BANNED_USERS, SUDOERS
 from YukkiMusic.utils import get_readable_time
 from YukkiMusic.utils.database import (
     add_banned_user,

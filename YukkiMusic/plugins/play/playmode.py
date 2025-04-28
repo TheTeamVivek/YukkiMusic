@@ -8,9 +8,9 @@
 # All rights reserved.
 #
 
-from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic import tbot
 from YukkiMusic.core import filters
+from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic.utils import (
     get_playmode,
     get_playtype,
