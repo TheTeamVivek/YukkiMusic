@@ -25,6 +25,7 @@ def thumb(url):
 
 def answer():
     from YukkiMusic import tbot
+
     builder = InlineBuilder(tbot)
 
     answer = [
