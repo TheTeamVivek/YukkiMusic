@@ -10,6 +10,7 @@
 from async_lru import alru_cache
 from yt_dlp import YoutubeDL
 
+from typing import List
 import config
 from YukkiMusic.utils.decorators import asyncify
 
@@ -39,7 +40,7 @@ class Saavn(PlatformBase):
 
     @alru_cache(maxsize=None)
     @asyncify
-    def playlist(self, url, limit: int = config.PLAYLIST_FETCH_LIMIT) -> list[Track]:
+    def playlist(self, url, limit: int = config.PLAYLIST_FETCH_LIMIT) -> List[Track]:
         url = self.clean_url(url)
         ydl_opts = {
             "extract_flat": True,
