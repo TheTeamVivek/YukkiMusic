@@ -31,7 +31,7 @@ import config
 assistants = []
 assistantids = []
 
-logger = logging.getlogger
+logger = logging.getLogger(__name__)
 
 __all__ = ["Userbot"]
 
