@@ -6,7 +6,6 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-import asyncio
 import socket
 import time
 
