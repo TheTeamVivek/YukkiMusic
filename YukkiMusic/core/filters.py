@@ -148,12 +148,12 @@ class User(set, Filter):
         )
 
 
-@wrap
 def command(commands, use_strings=False):
     "Check if the message startswith the provided command"
     if isinstance(commands, str):
         commands = [commands]
 
+    @wrap
     async def func(event):
         text = event.text
         if not text:
