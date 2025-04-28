@@ -14,7 +14,8 @@ import string
 import lyricsgenius as lg
 from telethon import Button
 
-from config import BANNED_USERS, lyrical
+from config import lyrical
+from YukkiMusic import BANNED_USERS, SUDOERS
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.utils import language
