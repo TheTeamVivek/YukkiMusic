@@ -15,9 +15,9 @@ import lyricsgenius as lg
 from telethon import Button
 
 from config import lyrical
-from YukkiMusic.misc import BANNED_USERS, SUDOERS
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
+from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic.utils import language
 
 api_key = "Vd9FvPMOKWfsKJNG9RbZnItaTNIRFzVyyXFdrGHONVsGqHcHBoj3AI3sIlNuqzuf0ZNG8uLcF9wAd5DXBBnUzA"

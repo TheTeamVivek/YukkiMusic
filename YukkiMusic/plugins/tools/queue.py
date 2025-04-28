@@ -13,10 +13,9 @@ import os
 
 from telethon.errors import FloodWaitError
 
-from YukkiMusic import  tbot
-from YukkiMusic.misc import BANNED_USERS, SUDOERS
+from YukkiMusic import tbot
 from YukkiMusic.core import filters
-from YukkiMusic.misc import db
+from YukkiMusic.misc import BANNED_USERS, db
 from YukkiMusic.utils import (
     get_channeplay_cb,
     get_cmode,

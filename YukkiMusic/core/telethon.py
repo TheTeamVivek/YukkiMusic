@@ -26,8 +26,8 @@ from telethon import TelegramClient, errors, events
 from telethon.tl import functions, types
 
 import config
-from YukkiMusic.utils.pastebin import paste
 from YukkiMusic.utils.decorators.asyncify import asyncify
+from YukkiMusic.utils.pastebin import paste
 
 uvloop.install()
 

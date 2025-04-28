@@ -9,8 +9,8 @@
 #
 
 from YukkiMusic import tbot
-from YukkiMusic.misc import BANNED_USERS, SUDOERS
 from YukkiMusic.core import filters, language
+from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils import get_active_chats, get_active_video_chats
 
 
