@@ -11,8 +11,6 @@
 from telethon.tl.custom.inlinebuilder import InlineBuilder
 from telethon.tl.types import DocumentAttributeImageSize, InputWebDocument
 
-from YukkiMusic import tbot
-
 __all__ = ["answer"]
 
 
@@ -25,7 +23,8 @@ def thumb(url):
     )
 
 
-def _answer():
+def answer():
+    from YukkiMusic import tbot
     builder = InlineBuilder(tbot)
 
     answer = [
@@ -92,6 +91,3 @@ def _answer():
         ]
     ]
     return answer
-
-
-answer = _answer()
