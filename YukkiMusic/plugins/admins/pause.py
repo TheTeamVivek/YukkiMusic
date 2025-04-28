@@ -7,7 +7,7 @@
 #
 # All rights reserved.
 #
-from config import BANNED_USERS
+from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.core.call import Yukki
@@ -16,7 +16,7 @@ from YukkiMusic.utils.decorators import admin_rights_check
 
 
 @tbot.on_message(
-    flt.command("PAUSE_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+    flt.command("PAUSE_COMMAND", True) & flt.group & ~BANNED_USERS
 )
 @admin_rights_check
 async def pause_admin(event, _, chat_id):
