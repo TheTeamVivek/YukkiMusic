@@ -12,7 +12,7 @@ import logging
 
 from telethon import events
 
-from config import BANNED_USERS
+from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic.utils import (
     asyncify,
     botplaylist_markup,
