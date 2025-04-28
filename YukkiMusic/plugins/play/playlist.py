@@ -15,8 +15,9 @@ from pykeyboard.telethon import InlineKeyboard
 from telethon import Button, events
 
 import config
-from config import BANNED_USERS, SERVER_PLAYLIST_LIMIT
+from config import SERVER_PLAYLIST_LIMIT
 from YukkiMusic import tbot
+from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic.core import filters as flt
 from YukkiMusic.core.youtube import Track
 from YukkiMusic.platforms import carbon, youtube
