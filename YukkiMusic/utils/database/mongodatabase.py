@@ -206,7 +206,7 @@ async def _get_authusers(chat_id: int) -> dict[str, int]:
     return {}
 
 
-async def get_authuser_names(chat_id: int) -> List[str]:
+async def get_authuser_names(chat_id: int) -> list[str]:
     _notes = []
     for note in await _get_authusers(chat_id):
         _notes.append(note)
