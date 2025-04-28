@@ -16,7 +16,7 @@ from git.exc import GitCommandError, InvalidGitRepositoryError
 import config
 
 loop = asyncio.get_event_loop_policy().get_event_loop()
-logger = logging.getlogger(__name__)
+logger = logging.getLogger(__name__)
 __all__ = ["git"]
 
 
