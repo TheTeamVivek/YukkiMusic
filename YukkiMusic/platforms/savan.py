@@ -12,7 +12,6 @@ from async_lru import alru_cache
 from yt_dlp import YoutubeDL
 
 from config import PLAYLIST_FETCH_LIMIT
-from YukkiMusic.utils.decorators import asyncify
 
 from ..core.enum import SourceType
 from ..core.request import Request
@@ -74,7 +73,7 @@ class Saavn(PlatformBase):
         return tracks
 
     @alru_cache(maxsize=None)
-    #@asyncify
+    # @asyncify
     async def __track(self, url):
         url = self.clean_url(url)
         ydl_opts = {
