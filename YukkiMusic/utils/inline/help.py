@@ -25,7 +25,7 @@ def support_group_markup(_):
         ]
     ]"""
     upl = Button.url(text=_["S_B_3"], url=config.SUPPORT_GROUP)
-    return upl
+    return upl if config.SUPPORT_GROUP else None
 
 
 def help_back_markup(_):
