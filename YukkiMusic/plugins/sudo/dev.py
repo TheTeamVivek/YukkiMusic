@@ -51,7 +51,8 @@ async def executor(event):
     except IndexError:
         return await event.delete()
     t1 = time()
-    redirected_output = redirected_error = StringIO()
+    redirected_output = StringIO()
+    redirected_error = StringIO()
     stdout, stderr, exc = None, None, None
     with (
         contextlib.redirect_stdout(redirected_output),
