@@ -151,34 +151,36 @@ class User(set, Filter):
 user = User
 
 
-def command(commands, use_strings=False):
-    "Check if the message startswith the provided command"
-    if isinstance(commands, str):
-        commands = [commands]
+def command(command_list, use_strings=False):
+    "Check if the message starts with the provided command(s)"
+    if isinstance(command_list, str):
+        command_list = [command_list]
 
     @wrap
-    async def func(event):
-        text = event.text
-        if not text:
+    async def filter_func(event):
+        message_text = event.text
+        if not message_text:
             return False
 
-        u = _re.escape(event.client.username.lower())
+        username = _re.escape(event.client.username.lower())
+        resolved_commands = command_list
 
         if use_strings:
             from YukkiMusic.utils.database.memorydatabase import get_lang
+            lang_code = await get_lang(event.chat_id)
+            lang_strings = _get_string(lang_code)
 
-            lang = await get_lang(event.chat_id)
-            lang = _get_string(lang)
+            command_set = set()
+            for command in command_list:
+                command_set.add(lang_strings[command].lower())
+                if lang_code != "en":
+                    command_set.add(_get_string("en")[command].lower())
 
-            _commands = set()
-            for cmd in commands:
-                _commands.add(lang["cmd"].lower())
-                if lang != "en":
-                    _commands.add(_get_string("en")[key].lower())
-            commands = list(_commands)
-        cp = "|".join(map(_re.escape, commands))
-        pattern = rf"^(?:/)?({cp})(?:@{u})?(?:\s|$)"
+            resolved_commands = list(command_set)
 
-        return bool(_re.match(pattern, text, flags=re.IGNORECASE))
+        escaped_commands = map(_re.escape, resolved_commands)
+        pattern = rf"^(?:/)?({'|'.join(escaped_commands)})(?:@{username})?(?:\s|$)"
 
-    return func
+        return bool(_re.match(pattern, message_text, flags=re.IGNORECASE))
+
+    return filter_func
