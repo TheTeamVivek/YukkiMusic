@@ -7,10 +7,10 @@
 #
 # All rights reserved.
 #
-import sys
 import asyncio as _asyncio
 import inspect as _inspect
 import re as _re
+import sys
 
 from telethon.tl import types as _types
 
