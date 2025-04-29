@@ -13,7 +13,7 @@ import config
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.misc import db
+from YukkiMusic.misc import db, BANNED_USERS
 from YukkiMusic.utils import seconds_to_min
 from YukkiMusic.utils.database import get_loop
 from YukkiMusic.utils.decorators import admin_rights_check
@@ -21,7 +21,7 @@ from YukkiMusic.utils.inline.play import play_markup
 from YukkiMusic.utils.stream.autoclear import auto_clean
 
 
-@tbot.on_message(flt.command("SKIP_COMMAND", True) & flt.group & ~config.BANNED_USERS)
+@tbot.on_message(flt.command("SKIP_COMMAND", True) & flt.group & ~BANNED_USERS)
 @admin_rights_check
 async def skip(event, _, chat_id):
     mention = await tbot.create_mention(await event.get_sender())
