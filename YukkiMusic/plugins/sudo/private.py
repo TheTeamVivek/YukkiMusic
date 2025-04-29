@@ -10,7 +10,7 @@
 
 
 import config
-from YukkiMusic import app, tbot
+from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
@@ -74,7 +74,7 @@ async def authorized(event, _):
     msg = _["pbot_13"]
     for served_chat in served_chats:
         try:
-            title = (await app.get_entity(served_chat)).title
+            title = (await tbot.get_entity(served_chat)).title
             count += 1
             text += f"{count}:- {title[:15]} [{served_chat}]\n"
         except Exception:
