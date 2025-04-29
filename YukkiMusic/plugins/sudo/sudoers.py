@@ -88,7 +88,7 @@ async def userdel(event, _):
 
 
 @tbot.on_message(
-    filters.command("SUDOUSERS_COMMAND", True) & ~filters.user(BANNED_USERS)
+    filters.command("SUDOUSERS_COMMAND", True) & ~BANNED_USERS
 )
 @language
 async def sudoers_list(event, _):

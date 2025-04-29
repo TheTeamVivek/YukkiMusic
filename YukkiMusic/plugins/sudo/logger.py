@@ -13,7 +13,7 @@ from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils import add_off, add_on, language
 
 
-@tbot.on_message(filters.command("LOGGER_COMMAND", True) & filters.user(SUDOERS))
+@tbot.on_message(filters.command("LOGGER_COMMAND", True) & SUDOERS)
 @language
 async def logger(event, _):
     usage = _["log_1"]

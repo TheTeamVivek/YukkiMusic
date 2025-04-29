@@ -21,7 +21,7 @@ from YukkiMusic.utils import (
 )
 
 
-@tbot.on_message(filters.command("MAINTENANCE_COMMAND", True) & filters.user(SUDOERS))
+@tbot.on_message(filters.command("MAINTENANCE_COMMAND", True) & SUDOERS)
 async def maintenance(event):
     try:
         language = await get_lang(event.chat_id)

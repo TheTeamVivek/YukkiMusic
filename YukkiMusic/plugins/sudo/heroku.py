@@ -40,7 +40,7 @@ from YukkiMusic.utils import (
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-@tbot.on_message(filters.command("GETLOG_COMMAND", True) & filters.user(SUDOERS))
+@tbot.on_message(filters.command("GETLOG_COMMAND", True) & SUDOERS)
 @language
 async def log_(event, _):
     async def _get_log():
@@ -74,7 +74,7 @@ async def log_(event, _):
         await event.reply(_["heroku_2"])
 
 
-@tbot.on_message(filters.command("GETVAR_COMMAND", True) & filters.user(SUDOERS))
+@tbot.on_message(filters.command("GETVAR_COMMAND", True) & SUDOERS)
 @language
 async def varget_(event, _):
     usage = _["heroku_3"]
@@ -100,7 +100,7 @@ async def varget_(event, _):
             return await event.reply(f"**{check_var}:** `{str(output)}`")
 
 
-@tbot.on_message(filters.command("DELVAR_COMMAND", True) & filters.user(SUDOERS))
+@tbot.on_message(filters.command("DELVAR_COMMAND", True) & SUDOERS)
 @language
 async def vardel_(event, _):
     usage = _["heroku_6"]
@@ -128,7 +128,7 @@ async def vardel_(event, _):
             os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
 
 
-@tbot.on_message(filters.command("SETVAR_COMMAND", True) & filters.user(SUDOERS))
+@tbot.on_message(filters.command("SETVAR_COMMAND", True) & SUDOERS)
 @language
 async def set_var(event, _):
     usage = _["heroku_8"]
@@ -157,7 +157,7 @@ async def set_var(event, _):
         os.system(f"kill -9 {os.getpid()} && python3 -m YukkiMusic")
 
 
-@tbot.on_message(filters.command("USAGE_COMMAND", True) & filters.user(SUDOERS))
+@tbot.on_message(filters.command("USAGE_COMMAND", True) & SUDOERS)
 @language
 async def usage_dynos(event, _):
     ### Credits CatUserbot
@@ -216,7 +216,7 @@ Total Left: <code>{hours}</code><b>h</b> <code>{minutes}</code><b>m</b>
     return await dyno.edit(text, parse_mode="HTML")
 
 
-@tbot.on_message(filters.command("UPDATE_COMMAND", True) & filters.user(SUDOERS))
+@tbot.on_message(filters.command("UPDATE_COMMAND", True) & SUDOERS)
 @language
 async def update_(event, _):
     if await is_heroku():
@@ -316,7 +316,7 @@ async def update_(event, _):
 @tbot.on_message(
     filters.command("REBOOT_COMMAND", True)
     & filters.group
-    & ~filters.user(BANNED_USERS)
+    & ~BANNED_USERS
 )
 @admin_actual
 async def reboot(event, _):
@@ -339,7 +339,7 @@ async def reboot(event, _):
     return await mystic.edit("Sucessfully Restarted \nTry playing Now..")
 
 
-@tbot.on_message(filters.command("RESTART_COMMAND", True) & ~filters.user(BANNED_USERS))
+@tbot.on_message(filters.command("RESTART_COMMAND", True) & ~BANNED_USERS)
 async def restart_(event):
     if event.sender_id not in SUDOERS:
         if event.is_private:
