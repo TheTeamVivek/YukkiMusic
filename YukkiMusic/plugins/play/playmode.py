@@ -17,9 +17,7 @@ from YukkiMusic.utils import (
     is_nonadmin_chat,
     language,
 )
-from YukkiMusic.utils.inline import (
-    playmode_users_markup,
-)
+from YukkiMusic.utils.inline import playmode_users_markup
 
 
 @tbot.on_message(
