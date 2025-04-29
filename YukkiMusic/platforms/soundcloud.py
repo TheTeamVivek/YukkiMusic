@@ -21,8 +21,8 @@ class SoundCloud(PlatformBase):
     async def valid(self, link: str) -> bool:
         return "soundcloud" in link.lower()
 
-    @asyncify
-    def track(self, url: str) -> Track | bool:
+    #@asyncify
+    async def track(self, url: str) -> Track | bool:
         options = {
             "format": "bestaudio/best",
             "retries": 3,
