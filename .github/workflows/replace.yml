@@ -22,10 +22,11 @@ jobs:
           )
 
           for key in "${!replacements[@]}"; do
-            git ls-files "*.py" "*.yml" | while read -r file; do
+            git ls-files "*.py" | grep -v "^.github/workflows/" | while read -r file; do
               sed -i "s|$key|${replacements[$key]}|g" "$file"
             done
           done
+
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
