@@ -7,7 +7,7 @@
 #
 # All rights reserved.
 #
-
+import sys
 import asyncio as _asyncio
 import inspect as _inspect
 import re as _re
@@ -191,6 +191,8 @@ def command(commands, use_strings=False):
         escaped = map(_re.escape, final_commands)
         pattern = rf"^(?:/)?({'|'.join(escaped)})(?:@{username})?(?:\s|$)"
 
-        return bool(_re.match(pattern, message_text, flags=_re.IGNORECASE))
+        x = bool(_re.match(pattern, message_text, flags=_re.IGNORECASE))
+        print(f"Pattern: {pattern}\ntext: {message_text}\nResult: {x)", file=sys.stdout)
+        return x
 
     return filter_func
