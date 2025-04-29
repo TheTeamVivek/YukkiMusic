@@ -115,7 +115,6 @@ class YouTube(PlatformBase):
 
     @staticmethod
     @alru_cache(maxsize=None)
-
     async def track(url: str):
         if "playlist" in url:
             return await self.playlist(url)
