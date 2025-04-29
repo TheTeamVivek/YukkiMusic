@@ -10,10 +10,9 @@
 
 import random
 
-from config import BANNED_USERS
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
-from YukkiMusic.misc import db
+from YukkiMusic.misc import db, BANNED_USERS
 from YukkiMusic.utils.decorators import admin_rights_check
 
 
