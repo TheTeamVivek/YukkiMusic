@@ -15,13 +15,15 @@ from telethon import events
 from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic.utils import (
     asyncify,
-    botplaylist_markup,
-    failed_top_markup,
     get_global_tops,
     get_particulars,
     get_userss,
     language,
     stream,
+)
+from YukkiMusic.utils.inline import (
+    botplaylist_markup,
+    failed_top_markup,
     top_play_markup,
 )
 
