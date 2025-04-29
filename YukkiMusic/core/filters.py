@@ -150,6 +150,7 @@ class User(set, Filter):
 
 user = User
 
+
 def command(commands, use_strings=False):
     "Check if the message starts with the provided command(s)"
     if isinstance(commands, str):
@@ -166,6 +167,7 @@ def command(commands, use_strings=False):
 
         if use_strings:
             from YukkiMusic.utils.database.memorydatabase import get_lang
+
             lang_code = await get_lang(event.chat_id)
             lang_strings = _get_string(lang_code)
 
