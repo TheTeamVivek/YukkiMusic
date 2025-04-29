@@ -8,17 +8,15 @@
 # All rights reserved.
 #
 
-from telethon.tl import types
-from telethon import Button
 from pyrogram.errors import ChannelPrivate
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from telethon import Button
+from telethon.tl import types
 
 from config import PLAYLIST_IMG_URL, PRIVATE_BOT_MODE, adminlist
 from strings import get_string
-from YukkiMusic import Platform, app
-from YukkiMusic.platforms import telegram
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS
+from YukkiMusic.platforms import telegram
 from YukkiMusic.utils.database import (
     get_assistant,
     get_cmode,
@@ -43,15 +41,15 @@ def play_wrapper(func):
         _ = get_string(language)
         sender = await event.get_sender()
         if not isinstance(sender, types.User):
-            upl =  [
-                    [
-                        Button.inline(
-                            text=_["anon_admin"],
-                            callback_data="AnonymousAdmin",
-                        ),
-                    ]
+            upl = [
+                [
+                    Button.inline(
+                        text=_["anon_admin"],
+                        callback_data="AnonymousAdmin",
+                    ),
                 ]
-            
+            ]
+
             return await event.reply(_["general_4"], buttons=upl)
 
         if await is_maintenance() is False:
