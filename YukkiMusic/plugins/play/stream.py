@@ -15,7 +15,9 @@ from YukkiMusic.core import filters
 from YukkiMusic.core.enum import SourceType
 from YukkiMusic.core.track import Track
 from YukkiMusic.misc import BANNED_USERS
-from YukkiMusic.utils import play_logs, play_wrapper, stream
+from YukkiMusic.utils import play_logs
+from YukkiMusic.utils.decorators import play_wrapper
+from YukkiMusic.utils.stream import  stream
 
 logger = logging.getLogger(__name__)
 
