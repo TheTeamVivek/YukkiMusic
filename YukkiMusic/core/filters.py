@@ -150,13 +150,11 @@ user = User
 
 
 def _normalize_command(value):
-    """Normalize string or list into a set of lowercase command strings."""
     if isinstance(value, list):
         return {v.lower() for v in value if isinstance(v, str)}
     elif isinstance(value, str):
         return {value.lower()}
     return set()
-
 
 def command(commands, use_strings=False):
     "Check if the message starts with the provided command(s)"
