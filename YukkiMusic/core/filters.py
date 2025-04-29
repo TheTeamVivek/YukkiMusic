@@ -191,8 +191,6 @@ def command(commands, use_strings=False):
         escaped = map(_re.escape, final_commands)
         pattern = rf"^(?:/)?({'|'.join(escaped)})(?:@{username})?(?:\s|$)"
 
-        x = bool(_re.match(pattern, message_text, flags=_re.IGNORECASE))
-        print(f"Pattern: {pattern}\nText: {message_text}\nResult: {x}", file=sys.stdout)
-        return x
+        return bool(_re.match(pattern, message_text, flags=_re.IGNORECASE))
 
     return filter_func
