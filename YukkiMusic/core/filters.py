@@ -35,11 +35,10 @@ class Filter:
 
     async def __call__(self, event):
         if self.func is not None:
-            return (
-                await self.func(event)
-                if _inspect.iscoroutinefunction(self.func)
-                else await _asyncio.to_thread(self.func(event))
-            )
+            if _inspect.iscoroutinefunction(self.func):
+                return await self.func(event)
+            else:
+                return await _asyncio.to_thread(self.func, event)
         return False
 
     def __and__(self, other):
