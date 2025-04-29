@@ -25,17 +25,20 @@ from YukkiMusic.platforms import (
     telegram,
     youtube,
 )
-from YukkiMusic.utils import (
+from YukkiMusic.utils.inline import (
     botplaylist_markup,
+    livestream_markup,
+
+)
     formats,
     get_message_link,
     is_video_allowed,
-    livestream_markup,
     play_logs,
-    play_wrapper,
     seconds_to_min,
-    stream,
 )
+from YukkiMusic.utils.decorators.play import play_wrapper
+from YukkiMusic.utils.stream.stream import stream
+
 
 logger = logging.getLogger(__name__)
 
