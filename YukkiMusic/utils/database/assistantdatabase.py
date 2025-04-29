@@ -121,6 +121,6 @@ async def group_assistant(self, chat_id: int):
         else:
             assis = await set_calls_assistant(chat_id)
 
-    if 1 <= assistant <= len(self.clients):
-        return self.clients[assistant - 1]
-    raise ValueError(f"Assistant index {assistant_index + 1} is out of range.")
+    if 1 <= assis <= len(self.clients):
+        return self.clients[assis - 1]
+    raise ValueError(f"Assistant index {assis + 1} is out of range.")
