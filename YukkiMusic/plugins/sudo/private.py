@@ -22,7 +22,7 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.decorators.language import language
 
 
-@tbot.on_message(flt.command("AUTHORIZE_COMMAND", True) & flt.user(SUDOERS))
+@tbot.on_message(flt.command("AUTHORIZE_COMMAND", True) & SUDOERS)
 @language
 async def authorize(event, _):
     if not config.PRIVATE_BOT_MODE:
@@ -40,7 +40,7 @@ async def authorize(event, _):
         await event.reply(_["pbot_5"])
 
 
-@tbot.on_message(flt.command("UNAUTHORIZE_COMMAND", True) & flt.user(SUDOERS))
+@tbot.on_message(flt.command("UNAUTHORIZE_COMMAND", True) & SUDOERS)
 @language
 async def unauthorize(event, _):
     if not config.PRIVATE_BOT_MODE:
@@ -58,7 +58,7 @@ async def unauthorize(event, _):
         return await event.reply(_["pbot_4"])
 
 
-@tbot.on_message(flt.command("AUTHORIZED_COMMAND", True) & flt.user(SUDOERS))
+@tbot.on_message(flt.command("AUTHORIZED_COMMAND", True) & SUDOERS)
 @language
 async def authorized(event, _):
     if not config.PRIVATE_BOT_MODE:

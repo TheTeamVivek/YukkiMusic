@@ -49,7 +49,7 @@ from YukkiMusic.utils.inline.start import private_panel
 
 
 @tbot.on_message(
-    flt.command("SETTINGS_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+    flt.command("SETTINGS_COMMAND", True) & flt.group & ~BANNED_USERS
 )
 @language
 async def settings_mar(event, _):
@@ -61,7 +61,7 @@ async def settings_mar(event, _):
     )
 
 
-@tbot.on(events.CallbackQuery(pattern="settings_helper", func=~flt.user(BANNED_USERS)))
+@tbot.on(events.CallbackQuery(pattern="settings_helper", func=~BANNED_USERS))
 @language
 async def settings_cb(event, _):
     try:
@@ -80,7 +80,7 @@ async def settings_cb(event, _):
 
 
 @tbot.on(
-    events.CallbackQuery(pattern="settingsback_helper", func=~flt.user(BANNED_USERS))
+    events.CallbackQuery(pattern="settingsback_helper", func=~BANNED_USERS)
 )
 @language
 async def settings_back_markup(event, _):
@@ -140,7 +140,7 @@ async def gen_buttons_vid(_, aud):
 @tbot.on(
     events.CallbackQuery(
         pattern=r"^(SEARCHANSWER|PLAYMODEANSWER|PLAYTYPEANSWER|AUTHANSWER|CMANSWER|COMMANDANSWER|CM|AQ|VQ|PM|AU)$",
-        func=~flt.user(BANNED_USERS),
+        func=~BANNED_USERS,
     )
 )
 @language
@@ -246,7 +246,7 @@ async def without_Admin_rights(event, _):
 @tbot.on(
     events.CallbackQuery(
         pattern=r"^(LOW|MEDIUM|HIGH|STUDIO|SD_360p|SD_480p|HD_720p|FHD_1080p|QHD_2K|UHD_4K)$",
-        func=~flt.user(BANNED_USERS),
+        func=~BANNED_USERS,
     )
 )
 @actual_admin_cb
@@ -291,7 +291,7 @@ async def aud_vid_cb(event, _):
 
 @tbot.on(
     events.CallbackQuery(
-        pattern=r"^(CLEANMODE|COMMANDELMODE)$", func=~flt.user(BANNED_USERS)
+        pattern=r"^(CLEANMODE|COMMANDELMODE)$", func=~BANNED_USERS
     )
 )
 @actual_admin_cb
@@ -331,7 +331,7 @@ async def cleanmode_mark(event, _):
 @tbot.on(
     events.CallbackQuery(
         pattern=r"^(|MODECHANGE|CHANNELMODECHANGE|PLAYTYPECHANGE)$",
-        func=~flt.user(BANNED_USERS),
+        func=~BANNED_USERS,
     )
 )
 @actual_admin_cb
@@ -407,7 +407,7 @@ async def playmode_ans(event, _):
 
 # Auth Users Settings
 @tbot.on(
-    events.CallbackQuery(pattern=r"^(AUTH|AUTHLIST)$", func=~flt.user(BANNED_USERS))
+    events.CallbackQuery(pattern=r"^(AUTH|AUTHLIST)$", func=~BANNED_USERS)
 )
 @actual_admin_cb
 async def authusers_mar(event, _):

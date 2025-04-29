@@ -27,7 +27,7 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.decorators.language import language
 
 
-@tbot.on_message(flt.command("GBAN_COMMAND", True) & flt.user(SUDOERS))
+@tbot.on_message(flt.command("GBAN_COMMAND", True) & SUDOERS)
 @language
 async def gbanuser(event, _):
     if not event.is_reply:
@@ -73,7 +73,7 @@ async def gbanuser(event, _):
     await mystic.delete()
 
 
-@tbot.on_message(flt.command("UNGBAN_COMMAND", True) & flt.user(SUDOERS))
+@tbot.on_message(flt.command("UNGBAN_COMMAND", True) & SUDOERS)
 @language
 async def gungabn(event, _):
     if not event.is_reply:
@@ -113,7 +113,7 @@ async def gungabn(event, _):
     await mystic.delete()
 
 
-@tbot.on_message(flt.command("GBANNED_COMMAND", True) & flt.user(SUDOERS))
+@tbot.on_message(flt.command("GBANNED_COMMAND", True) & SUDOERS)
 @language
 async def gbanned_list(event, _):
     counts = await get_banned_count()

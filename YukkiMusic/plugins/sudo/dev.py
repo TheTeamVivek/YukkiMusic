@@ -41,10 +41,10 @@ async def aexec(code, event):
 
 @tbot.on(
     events.MessageEdited(
-        func=flt.command(["ev", "eval"]) & flt.user(SUDOERS) & ~flt.forwarded
+        func=flt.command(["ev", "eval"]) & SUDOERS & ~flt.forwarded
     )
 )
-@tbot.on_message(flt.command(["ev", "eval"]) & flt.user(SUDOERS) & ~flt.forwarded)
+@tbot.on_message(flt.command(["ev", "eval"]) & SUDOERS & ~flt.forwarded)
 async def executor(event):
     if len(event.text.split()) < 2:
         return await event.reply("**Give me something to exceute**")
@@ -148,9 +148,9 @@ async def forceclose_command(event):
 
 
 @tbot.on(
-    events.MessageEdited(func=flt.command("sh") & flt.user(SUDOERS) & ~flt.forwarded)
+    events.MessageEdited(func=flt.command("sh") & SUDOERS & ~flt.forwarded)
 )
-@tbot.on_message(flt.command("sh") & flt.user(SUDOERS) & ~flt.forwarded)
+@tbot.on_message(flt.command("sh") & SUDOERS & ~flt.forwarded)
 async def shellrunner(event):
     if len(event.text.split()) < 2:
         return await event.reply("**Give some commands like:**\n/sh git pull")

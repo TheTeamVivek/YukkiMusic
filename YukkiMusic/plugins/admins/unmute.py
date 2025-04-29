@@ -17,7 +17,7 @@ from YukkiMusic.utils.database import is_muted, mute_off
 from YukkiMusic.utils.decorators import admin_rights_check
 
 
-@tbot.on_message(flt.command("UNMUTE_COMMAND") & flt.group & ~flt.user(BANNED_USERS))
+@tbot.on_message(flt.command("UNMUTE_COMMAND") & flt.group & ~BANNED_USERS)
 @admin_rights_check
 async def unmute_admin(event, _, chat_id):
     if not len(event.text.split()) == 1 or event.is_reply:

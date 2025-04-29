@@ -21,7 +21,7 @@ from YukkiMusic.utils.formatters import alpha_to_int
 
 
 @tbot.on_message(
-    flt.command("RELOAD_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+    flt.command("RELOAD_COMMAND", True) & flt.group & ~BANNED_USERS
 )
 @language
 async def reload_admin_cache(event, _):

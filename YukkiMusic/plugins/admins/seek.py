@@ -17,7 +17,7 @@ from YukkiMusic.utils import admin_rights_check, seconds_to_min
 @tbot.on_message(
     flt.command(["SEEK_COMMAND", "SEEK_BACK_COMMAND"], True)
     & flt.group
-    & ~flt.user(BANNED_USERS)
+    & ~BANNED_USERS
 )
 @admin_rights_check
 async def seek_comm(event, _, chat_id):

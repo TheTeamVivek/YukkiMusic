@@ -15,7 +15,7 @@ from YukkiMusic.utils.database import add_gban_user, remove_gban_user
 from YukkiMusic.utils.decorators.language import language
 
 
-@tbot.on_message(flt.command("BLOCK_COMMAND", True) & flt.user(SUDOERS))
+@tbot.on_message(flt.command("BLOCK_COMMAND", True) & SUDOERS)
 @language
 async def useradd(event, _):
     if not event.is_reply:
@@ -41,7 +41,7 @@ async def useradd(event, _):
     await event.reply(_["block_2"].format(mention))
 
 
-@tbot.on_message(flt.command("UNBLOCK_COMMAND", True) & flt.user(SUDOERS))
+@tbot.on_message(flt.command("UNBLOCK_COMMAND", True) & SUDOERS)
 @language
 async def userdel(event, _):
     if not event.is_reply:
@@ -66,7 +66,7 @@ async def userdel(event, _):
     await event.reply(_["block_4"])
 
 
-@tbot.on_message(flt.command("BLOCKED_COMMAND", True) & ~flt.user(BANNED_USERS))
+@tbot.on_message(flt.command("BLOCKED_COMMAND", True) & ~BANNED_USERS)
 @language
 async def sudoers_list(event, _):
     if not BANNED_USERS:

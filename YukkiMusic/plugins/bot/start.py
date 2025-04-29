@@ -44,7 +44,7 @@ loop = asyncio.get_running_loop()
 
 
 @tbot.on_message(
-    flt.command("START_COMMAND", True) & flt.private & ~flt.user(BANNED_USERS)
+    flt.command("START_COMMAND", True) & flt.private & ~BANNED_USERS
 )
 @language(no_check=True)
 async def start_comm(event, _):
@@ -240,7 +240,7 @@ async def start_comm(event, _):
 
 
 @tbot.on_message(
-    flt.command("START_COMMAND", True) & flt.group & ~flt.user(BANNED_USERS)
+    flt.command("START_COMMAND", True) & flt.group & ~BANNED_USERS
 )
 @language(no_check=True)
 async def start_group(event, _):

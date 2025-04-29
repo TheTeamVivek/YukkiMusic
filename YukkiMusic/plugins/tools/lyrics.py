@@ -30,7 +30,7 @@ y = lg.Genius(
 y.verbose = False
 
 
-@tbot.on_message(flt.command("LYRICS_COMMAND", True) & ~flt.user(BANNED_USERS))
+@tbot.on_message(flt.command("LYRICS_COMMAND", True) & ~BANNED_USERS)
 @language
 async def lrsearch(event, _):
     if len(event.text.split()) < 2:
