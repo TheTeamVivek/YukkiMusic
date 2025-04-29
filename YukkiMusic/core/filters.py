@@ -150,11 +150,10 @@ class User(set, Filter):
 
 user = User
 
-
-def command(command_list, use_strings=False):
+def command(commands, use_strings=False):
     "Check if the message starts with the provided command(s)"
-    if isinstance(command_list, str):
-        command_list = [command_list]
+    if isinstance(commands, str):
+        commands = [commands]
 
     @wrap
     async def filter_func(event):
@@ -163,24 +162,23 @@ def command(command_list, use_strings=False):
             return False
 
         username = _re.escape(event.client.username.lower())
-        resolved_commands = command_list
+        final_commands = commands
 
         if use_strings:
             from YukkiMusic.utils.database.memorydatabase import get_lang
-
             lang_code = await get_lang(event.chat_id)
             lang_strings = _get_string(lang_code)
 
-            command_set = set()
-            for command in command_list:
-                command_set.add(lang_strings[command].lower())
+            command_variants = set()
+            for cmd in commands:
+                command_variants.add(lang_strings[cmd].lower())
                 if lang_code != "en":
-                    command_set.add(_get_string("en")[command].lower())
+                    command_variants.add(_get_string("en")[cmd].lower())
 
-            resolved_commands = list(command_set)
+            final_commands = list(command_variants)
 
-        escaped_commands = map(_re.escape, resolved_commands)
-        pattern = rf"^(?:/)?({'|'.join(escaped_commands)})(?:@{username})?(?:\s|$)"
+        escaped = map(_re.escape, final_commands)
+        pattern = rf"^(?:/)?({'|'.join(escaped)})(?:@{username})?(?:\s|$)"
 
         return bool(_re.match(pattern, message_text, flags=re.IGNORECASE))
 
