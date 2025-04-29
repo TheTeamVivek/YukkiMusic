@@ -23,7 +23,7 @@ from YukkiMusic.utils.inline import support_group_markup
 async def ping_com(event, _):
     response = await event.reply(
         file=PING_IMG_URL,
-        message=_["ping_1"].format(app.mention),
+        message=_["ping_1"].format(tbot.mention),
     )
     start = datetime.now()
     pytgping = await Yukki.ping()
