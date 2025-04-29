@@ -20,7 +20,7 @@ from config import cookies
 from YukkiMusic.utils.formatters import time_to_seconds
 
 from ..core.enum import SourceType
-from ..core track import Track 
+from ..core.track import Track 
 from .base import PlatformBase
 
 logger = logging.getLogger(__name__)
