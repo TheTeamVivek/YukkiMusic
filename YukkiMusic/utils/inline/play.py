@@ -12,7 +12,6 @@ import math
 from telethon import Button
 
 from YukkiMusic.core.enum import SourceType
-from YukkiMusic.core.track import Track
 from YukkiMusic.utils.formatters import time_to_seconds
 
 __all__ = [
@@ -164,7 +163,7 @@ def telegram_markup(_, chat_id):
     return buttons
 
 
-def play_markup(language: dict, chat_id: int, track: Track | None = None):
+def play_markup(language: dict, chat_id: int, track: "Track" = None):
     if (
         track.vidid is not None
         and track.streamtype
