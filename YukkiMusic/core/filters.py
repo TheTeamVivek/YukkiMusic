@@ -151,6 +151,15 @@ class User(set, Filter):
 user = User
 
 
+
+def _normalize_command(value):
+    """Normalize string or list into a set of lowercase command strings."""
+    if isinstance(value, list):
+        return {v.lower() for v in value if isinstance(v, str)}
+    elif isinstance(value, str):
+        return {value.lower()}
+    return set()
+
 def command(commands, use_strings=False):
     "Check if the message starts with the provided command(s)"
     if isinstance(commands, str):
@@ -167,17 +176,17 @@ def command(commands, use_strings=False):
 
         if use_strings:
             from YukkiMusic.utils.database.memorydatabase import get_lang
-
             lang_code = await get_lang(event.chat_id)
             lang_strings = _get_string(lang_code)
+            fallback_strings = _get_string("en") if lang_code != "en" else {}
 
-            command_variants = set()
+            command_set = set()
             for cmd in commands:
-                command_variants.add(lang_strings[cmd].lower())
-                if lang_code != "en":
-                    command_variants.add(_get_string("en")[cmd].lower())
+                command_set.update(_normalize_command(lang_strings.get(cmd)))
+                if fallback_strings:
+                    command_set.update(_normalize_command(fallback_strings.get(cmd)))
 
-            final_commands = list(command_variants)
+            final_commands = list(command_set)
 
         escaped = map(_re.escape, final_commands)
         pattern = rf"^(?:/)?({'|'.join(escaped)})(?:@{username})?(?:\s|$)"
