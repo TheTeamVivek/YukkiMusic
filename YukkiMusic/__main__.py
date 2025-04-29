@@ -8,7 +8,6 @@
 # All rights reserved.
 import asyncio
 import logging
-import sys
 
 from pytgcalls.exceptions import NoActiveGroupCall
 
@@ -57,7 +56,7 @@ async def init():
         )
     except NoActiveGroupCall:
         logger.error("Please ensure there are a voice call,In your log group active.")
-        #sys.exit()
+        # sys.exit()
     logger.info("YukkiMusic Started Successfully")
     tbot.run_until_disconnected()
     await userbot.stop()
