@@ -122,30 +122,24 @@ async def channel(event):
 
 
 class User(set, Filter):
-    """Check if the sender is a specific user."""
-
-    def __init__(self, users: int | str | list[int, str] | None = None):
+    def __init__(self, users=None):
         users = [] if users is None else users if isinstance(users, list) else [users]
 
-        super().__init__(
-            (
-                "me"
-                if u in ["me", "self"]
-                else u.lower().strip("@")
-                if isinstance(u, str)
-                else u
-            )
+        cleaned = set(
+            "me" if u in ("me", "self") else u.lower().strip("@") if isinstance(u, str) else u
             for u in users
         )
 
-    async def func(self, event):
+        set.__init__(self, cleaned)
+        Filter.__init__(self, self.check_user)
+
+    async def check_user(self, event):
         sender = await event.get_sender()
-        return isinstance(sender, _types.User) and (
+        return (
             sender.id in self
             or (sender.username and sender.username.lower() in self)
             or ("me" in self and sender.is_self)
         )
-
 
 user = User
 
