@@ -8,6 +8,7 @@
 # All rights reserved.
 #
 import config
+from YukkiMusic import tbot
 from YukkiMusic.core import filters
 from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils import add_off, add_on, language
