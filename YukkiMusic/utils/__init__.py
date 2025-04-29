@@ -13,8 +13,8 @@ from .database import *
 from .decorators import *
 from .formatters import *
 from .logger import *
+from .misc import *
 
 # from .inline import *
 from .pastebin import *
 from .sys import *
-from .misc import *
