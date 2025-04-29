@@ -246,7 +246,7 @@ async def del_plist(event, _):
 
 
 @tbot.on(events.CallbackQuery("delete_whole_playlist", func=~BANNED_USERS))
-@languageCB
+@language
 async def del_whole_playlist(event, _):
     _playlist = await get_playlist_names(event.sender_id)
     await event.answer(_["playlist_25"], alert=True)
