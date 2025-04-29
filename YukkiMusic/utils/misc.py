@@ -10,7 +10,7 @@
 
 from telethon.tl import types as _types
 
-from YukkiMusic.database import get_lang as _get_lang
+from YukkiMusic.utils.database import get_lang as _get_lang
 
 
 async def get_value(chat_id, key) -> list[str]:
