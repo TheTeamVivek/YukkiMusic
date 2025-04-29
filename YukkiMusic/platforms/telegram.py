@@ -29,8 +29,7 @@ class Telegram:
     def __init__(self):
         self.sleep = 5
 
-    @asyncify
-    def get_url_from_message(self, event) -> str | None:
+    async def get_url_from_message(self, event) -> str | None:
         messages = [event.message]
         if event.is_reply:
             messages.append(await event.get_reply_message())
