@@ -16,11 +16,11 @@ from telethon.tl.types import Channel, Chat
 from youtubesearchpython.__future__ import VideosSearch
 
 import config
-from config import BANNED_USERS, OWNER_ID, START_IMG_URL
+from config import OWNER_ID, START_IMG_URL
 from strings import get_string
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
-from YukkiMusic.misc import SUDOERS, _boot_
+from YukkiMusic.misc import SUDOERS,BANNED_USERS, _boot_
 from YukkiMusic.platforms import youtube
 from YukkiMusic.plugins.bot.help import paginate_modules
 from YukkiMusic.plugins.play.playlist import del_plist_msg
@@ -43,7 +43,9 @@ from YukkiMusic.utils.inline import private_panel, start_pannel
 loop = asyncio.get_running_loop()
 
 
-@tbot.on_message(flt.command("START_COMMAND", True) & flt.private & ~BANNED_USERS)
+@tbot.on_message(
+    flt.command("START_COMMAND", True) & flt.private & ~BANNED_USERS
+)
 @language(no_check=True)
 async def start_comm(event, _):
     chat_id = event.chat_id
@@ -237,7 +239,9 @@ async def start_comm(event, _):
             )
 
 
-@tbot.on_message(flt.command("START_COMMAND", True) & flt.group & ~BANNED_USERS)
+@tbot.on_message(
+    flt.command("START_COMMAND", True) & flt.group & ~BANNED_USERS
+)
 @language(no_check=True)
 async def start_group(event, _):
     uptime = int(time.time() - _boot_)
