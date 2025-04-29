@@ -13,6 +13,7 @@ motor
 psutil
 pytube
 py-tgcalls==2.0.1
+Ntgcalls==1.2.0
 python-dotenv
 pyyaml
 requests
