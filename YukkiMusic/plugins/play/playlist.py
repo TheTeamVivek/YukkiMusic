@@ -22,18 +22,20 @@ from YukkiMusic.core.track import Track
 from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic.platforms import carbon, youtube
 from YukkiMusic.utils import (
-    botplaylist_markup,
     delete_playlist,
     get_playlist,
-    get_playlist_markup,
     get_playlist_names,
     language,
     parse_flags,
     paste,
     save_playlist,
     stream,
-    warning_markup,
 )
+from YukkiMusic.utils.inline import (
+    botplaylist_markup,
+    get_playlist_markup, warning_markup,
+)
+
 
 logger = logging.getLogger(__name__)
 
