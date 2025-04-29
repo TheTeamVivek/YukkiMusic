@@ -26,11 +26,7 @@ from YukkiMusic.utils import (
     paste,
     seconds_to_min,
 )
-
-from YukkiMusic.utils.inline import (
-    queue_back_markup,
-    queue_markup,
-)
+from YukkiMusic.utils.inline import queue_back_markup, queue_markup
 
 basic = {}
 
