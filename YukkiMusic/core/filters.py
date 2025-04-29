@@ -167,6 +167,7 @@ def command(command_list, use_strings=False):
 
         if use_strings:
             from YukkiMusic.utils.database.memorydatabase import get_lang
+
             lang_code = await get_lang(event.chat_id)
             lang_strings = _get_string(lang_code)
 
