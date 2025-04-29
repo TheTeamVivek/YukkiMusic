@@ -25,7 +25,7 @@ flask
 gunicorn
 youtube-search-python
 yt-dlp
-pykeyboard2
+pykeyboard2==0.2.0a1
 
 
 # Telethon Req
