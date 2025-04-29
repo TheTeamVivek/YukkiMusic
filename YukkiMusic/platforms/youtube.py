@@ -38,8 +38,8 @@ class YouTube(PlatformBase):
         return bool(re.search(self.regex, link))
 
     @alru_cache(maxsize=None)
-    @asyncify
-    def formats(self, link: str, videoid: bool | str = None):
+    #@asyncify
+    async def formats(self, link: str, videoid: bool | str = None):
         if videoid:
             link = self.base + link
         if "&" in link:
@@ -144,8 +144,8 @@ class YouTube(PlatformBase):
 
     @alru_cache(maxsize=None)
     @staticmethod
-    @asyncify
-    def _track_from_ytdlp(query: str):
+    #@asyncify
+    async def _track_from_ytdlp(query: str):
         options = {
             "format": "best",
             "noplaylist": True,
