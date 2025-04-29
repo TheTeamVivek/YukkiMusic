@@ -16,7 +16,7 @@ from strings import get_string
 from YukkiMusic.misc import SUDOERS
 
 from ..formatters import int_to_alpha
-from .database import (
+from ..database import (
     get_authuser_names,
     get_cmode,
     get_lang,
