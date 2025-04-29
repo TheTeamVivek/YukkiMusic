@@ -125,10 +125,16 @@ class User(set, Filter):
     def __init__(self, users=None):
         users = [] if users is None else users if isinstance(users, list) else [users]
 
-        cleaned = set(
-            "me" if u in ("me", "self") else u.lower().strip("@") if isinstance(u, str) else u
+        cleaned = {
+            (
+                "me"
+                if u in ("me", "self")
+                else u.lower().strip("@")
+                if isinstance(u, str)
+                else u
+            )
             for u in users
-        )
+        }
 
         set.__init__(self, cleaned)
         Filter.__init__(self, self.check_user)
@@ -140,6 +146,7 @@ class User(set, Filter):
             or (sender.username and sender.username.lower() in self)
             or ("me" in self and sender.is_self)
         )
+
 
 user = User
 
