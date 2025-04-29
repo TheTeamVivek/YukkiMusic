@@ -41,10 +41,9 @@ async def init():
     except Exception:
         pass
     await sudo()
-    await tbot.load_plugins_from("YukkiMusic/plugins")
     await tbot.start()
 
-    # await tbot.load_plugins_from("YukkiMusic/plugins")
+    await tbot.load_plugins_from("YukkiMusic/plugins")
     logger.info("Successfully Imported All Modules ")
     await fetch_cookies()
     await userbot.start()
