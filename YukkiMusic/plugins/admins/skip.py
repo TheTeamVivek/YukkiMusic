@@ -9,11 +9,10 @@
 #
 
 
-import config
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.misc import db, BANNED_USERS
+from YukkiMusic.misc import BANNED_USERS, db
 from YukkiMusic.utils import seconds_to_min
 from YukkiMusic.utils.database import get_loop
 from YukkiMusic.utils.decorators import admin_rights_check
