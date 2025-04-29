@@ -9,9 +9,9 @@
 #
 
 from YukkiMusic import tbot
-from YukkiMusic.core import filters, language
+from YukkiMusic.core import filters
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils import get_active_chats, get_active_video_chats
+from YukkiMusic.utils import get_active_chats, get_active_video_chats,  language
 
 
 @tbot.on_message(filters.command("ACTIVEVC_COMMAND", True) & SUDOERS)
