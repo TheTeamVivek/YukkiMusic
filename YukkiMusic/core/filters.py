@@ -7,10 +7,10 @@
 #
 # All rights reserved.
 #
-import sys
 import asyncio as _asyncio
 import inspect as _inspect
 import re as _re
+import sys
 
 from telethon.tl import types as _types
 
@@ -192,8 +192,9 @@ def command(commands, use_strings=False):
 
         x = bool(_re.match(pattern, message_text, flags=_re.IGNORECASE))
         if x:
-            print(f"Text: {event.text}\nPattern: {pattern}\nResult: {x}", file=sys.stderr)
+            print(
+                f"Text: {event.text}\nPattern: {pattern}\nResult: {x}", file=sys.stderr
+            )
         return x
-        
 
     return filter_func
