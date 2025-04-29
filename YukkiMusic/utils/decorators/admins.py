@@ -62,7 +62,7 @@ def admin_rights_check(mystic):
             if chat_id is None:
                 return await event.reply(_["setting_12"])
             try:
-                await tbot.get_entity(chat_id)
+                await event.client.get_entity(chat_id)
             except Exception:
                 return await event.reply(_["cplay_4"])
         else:
@@ -114,7 +114,7 @@ def admin_actual(mystic):
 
         if event.sender_id not in SUDOERS:
             try:
-                member, status = await tbot.get_chat_member(
+                member, status = await event.client.get_chat_member(
                     event.chat_id, event.sender_id
                 )
 
@@ -155,7 +155,7 @@ def actual_admin_cb(mystic):
         is_non_admin = await is_nonadmin_chat(event.chat_id)
         if not is_non_admin:
             try:
-                member, status = await tbot.get_chat_member(
+                member, status = await event.client.get_chat_member(
                     event.chat_id,
                     event.sender_id,
                 )
