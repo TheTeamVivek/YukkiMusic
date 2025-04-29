@@ -17,7 +17,7 @@ from YukkiMusic.core.track import Track
 from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic.utils import play_logs
 from YukkiMusic.utils.decorators import play_wrapper
-from YukkiMusic.utils.stream import  stream
+from YukkiMusic.utils.stream import stream
 
 logger = logging.getLogger(__name__)
 
