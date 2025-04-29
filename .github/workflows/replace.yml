@@ -1,8 +1,10 @@
 name: Replace
+
 on:
   push:
     paths:
       - ".github/workflows/replace.yml"
+
 jobs:
   replace-text:
     runs-on: ubuntu-latest
@@ -10,7 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
 
       - name: Replace text
         shell: bash
@@ -22,7 +23,7 @@ jobs:
 
           for key in "${!replacements[@]}"; do
             find . -type d -name ".git" -o -path "./.github/*" -prune -o \
-      -type f -name "*.py" -o -name "*.yml" \
+            -type f -name "*.py" -o -name "*.yml" \
             -exec sed -i "s|$key|${replacements[$key]}|g" {} +
           done
 
@@ -36,7 +37,8 @@ jobs:
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
           commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
 
-      - uses: Mattraks/delete-workflow-runs@v2
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
         with:
           delete_workflow_pattern: "Replace"
           keep_minimum_runs: 0
