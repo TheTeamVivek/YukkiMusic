@@ -9,6 +9,7 @@
 #
 
 import asyncio
+import logging
 from datetime import datetime
 
 from pyrogram.errors import FloodWait
@@ -42,7 +43,7 @@ AUTO_DELETE = config.CLEANMODE_DELETE_TIME
 AUTO_SLEEP = 5
 IS_BROADCASTING = False
 cleanmode_group = 15
-
+logger = logging.getLogger(__name__)
 
 @tbot.on(events.Raw(types=UpdateReadChannelOutbox))
 async def clean_mode(event):
