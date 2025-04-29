@@ -24,9 +24,12 @@ from YukkiMusic.utils import (
     language,
     parse_flags,
     paste,
+    seconds_to_min,
+)
+
+from YukkiMusic.utils.inline import (
     queue_back_markup,
     queue_markup,
-    seconds_to_min,
 )
 
 basic = {}
