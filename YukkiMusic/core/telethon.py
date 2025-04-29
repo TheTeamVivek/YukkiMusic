@@ -248,7 +248,7 @@ class TelethonClient(TelegramClient):
                 except (
                     errors.ChatWriteForbiddenError,
                     errors.ChatSendMediaForbiddenError,
-                    errors.ChatSendPhotosForbiddenError,
+                    #errors.ChatSendPhotosForbiddenError,
                     errors.MessageNotModifiedError,
                     errors.MessageIdInvalidError,
                 ) as e:
