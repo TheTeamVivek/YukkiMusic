@@ -57,7 +57,7 @@ async def init():
         )
     except NoActiveGroupCall:
         logger.error("Please ensure there are a voice call,In your log group active.")
-        sys.exit()
+        #sys.exit()
     logger.info("YukkiMusic Started Successfully")
     tbot.run_until_disconnected()
     await userbot.stop()
