@@ -162,7 +162,7 @@ def command(commands, use_strings=False):
         if not text:
             return False
 
-        u = re.escape(event.client.username.lower())
+        u = _re.escape(event.client.username.lower())
 
         if use_strings:
             from YukkiMusic.utils.database.memorydatabase import get_lang
