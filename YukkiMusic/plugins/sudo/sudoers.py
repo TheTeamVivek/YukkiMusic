@@ -87,9 +87,7 @@ async def userdel(event, _):
     await event.reply(f"Something wrong happened")
 
 
-@tbot.on_message(
-    filters.command("SUDOUSERS_COMMAND", True) & ~BANNED_USERS
-)
+@tbot.on_message(filters.command("SUDOUSERS_COMMAND", True) & ~BANNED_USERS)
 @language
 async def sudoers_list(event, _):
     text = _["sudo_5"]

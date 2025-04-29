@@ -314,9 +314,7 @@ async def update_(event, _):
 
 
 @tbot.on_message(
-    filters.command("REBOOT_COMMAND", True)
-    & filters.group
-    & ~BANNED_USERS
+    filters.command("REBOOT_COMMAND", True) & filters.group & ~BANNED_USERS
 )
 @admin_actual
 async def reboot(event, _):
