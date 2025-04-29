@@ -17,7 +17,6 @@ from yt_dlp import YoutubeDL
 
 import config
 from config import cookies
-from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import time_to_seconds
 
 from ..core.enum import SourceType
@@ -38,7 +37,7 @@ class YouTube(PlatformBase):
         return bool(re.search(self.regex, link))
 
     @alru_cache(maxsize=None)
-    #@asyncify
+    # @asyncify
     async def formats(self, link: str, videoid: bool | str = None):
         if videoid:
             link = self.base + link
@@ -144,7 +143,7 @@ class YouTube(PlatformBase):
 
     @alru_cache(maxsize=None)
     @staticmethod
-    #@asyncify
+    # @asyncify
     async def _track_from_ytdlp(query: str):
         options = {
             "format": "best",
