@@ -37,7 +37,6 @@ from YukkiMusic.utils.database import (
 )
 from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.formatters import get_readable_time
-from YukkiMusic.utils.functions import MARKDOWN, WELCOMEHELP
 from YukkiMusic.utils.inline import private_panel, start_pannel
 
 loop = asyncio.get_running_loop()
@@ -67,18 +66,6 @@ async def start_comm(event, _):
         if name[0:4] == "song":
             await event.reply(_["song_2"])
             return
-        if name == "mkdwn_help":
-            await event.reply(
-                MARKDOWN,
-                parse_mode="HTML",
-                link_preview=False,
-            )
-        if name == "greetings":
-            await event.reply(
-                WELCOMEHELP,
-                parse_mode="HTML",
-                link_preview=False,
-            )
         if name[0:3] == "sta":
             m = await event.reply("🔎 Fetching Your personal stats.!")
             stats = await get_userss(event.sender_id)
