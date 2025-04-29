@@ -11,7 +11,7 @@
 from .channelplay import *
 from .database import *
 
-# from .decorators import *
+from .decorators import *
 from .formatters import *
 from .logger import *
 
