@@ -113,8 +113,9 @@ class YouTube(PlatformBase):
             result.insert(0, await self.track(self.base + item))
         return result  # FIRST ELEMET IS Track AND OTHER(S) VIDEOID
 
-    @alru_cache(maxsize=None)
     @staticmethod
+    @alru_cache(maxsize=None)
+
     async def track(url: str):
         if "playlist" in url:
             return await self.playlist(url)
@@ -135,15 +136,16 @@ class YouTube(PlatformBase):
             logger.info("", exc_info=True)
             return await YouTube._track(url)
 
-    @alru_cache(maxsize=None)
     @staticmethod
+    @alru_cache(maxsize=None)
     async def _track(
         url,
     ):  # implement getting track with help of oembed url use ytdlp for fallback
         return await YouTube._track_from_ytdlp(url)
 
-    @alru_cache(maxsize=None)
     @staticmethod
+    @alru_cache(maxsize=None)
+
     # @asyncify
     async def _track_from_ytdlp(query: str):
         options = {
