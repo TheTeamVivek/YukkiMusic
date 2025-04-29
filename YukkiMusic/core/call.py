@@ -189,8 +189,8 @@ class Call:
         assistant = await group_assistant(self, config.LOG_GROUP_ID)
         await assistant.play(
             config.LOG_GROUP_ID,
-            MediaStream(link), 
-            config = GroupCallConfig(auto_start=False)
+            MediaStream(link),
+            config=GroupCallConfig(auto_start=False),
         )
         await asyncio.sleep(0.5)
         await assistant.leave_call(config.LOG_GROUP_ID)
