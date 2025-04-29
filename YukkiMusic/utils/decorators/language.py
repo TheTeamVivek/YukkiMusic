@@ -8,6 +8,7 @@
 # All rights reserved.
 #
 import functools
+
 from telethon.tl.types import User
 
 from strings import get_string
@@ -50,6 +51,7 @@ def language(func=None, *, no_check=False):
                     pass
 
             return await f(event, language)
+
         return wrapper
 
     if func is None:
