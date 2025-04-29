@@ -218,7 +218,7 @@ class TelethonClient(TelegramClient):
             error_message += (
                 f"**ChatId:** {event.chat_id}\n"
                 f"**SenderId:** {event.sender_id}\n"
-                f"**Text:** ```python\n{event.text}```\n"
+                f"**Text:**\n```python\n{event.text}```\n"
                 f"**MessageLink:** {msg_link}\n\n"
             )
 
