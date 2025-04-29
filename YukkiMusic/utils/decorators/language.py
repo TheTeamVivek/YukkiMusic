@@ -26,6 +26,7 @@ def language(func=None, *, no_check=False):
     def decorator(f):
         @functools.wraps(f)
         async def wrapper(event):
+            await event.reply("language decorator working")
             chat = await event.get_chat()
             try:
                 lang_code = await get_lang(chat.id)
