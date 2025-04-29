@@ -14,7 +14,10 @@ from YukkiMusic import tbot
 from YukkiMusic.core import filters
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import BANNED_USERS
-from YukkiMusic.utils import bot_sys_stats, language, support_group_markup
+from YukkiMusic.utils import bot_sys_stats, language
+from YukkiMusic.utils.inline import (
+    support_group_markup
+)
 
 
 @tbot.on_message(filters.command("PING_COMMAND", True) & ~BANNED_USERS)
