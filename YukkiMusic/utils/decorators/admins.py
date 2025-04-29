@@ -13,7 +13,6 @@ from telethon.tl.types import PeerUser
 
 from config import adminlist
 from strings import get_string
-from YukkiMusic import tbot
 from YukkiMusic.misc import SUDOERS
 
 from ..formatters import int_to_alpha
