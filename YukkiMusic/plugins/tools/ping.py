@@ -32,7 +32,7 @@ async def ping_com(event, _):
     await response.edit(
         _["ping_2"].format(
             resp,
-            app.mention,
+            tbot.mention,
             UP,
             RAM,
             CPU,
