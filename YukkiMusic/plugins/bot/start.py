@@ -23,7 +23,7 @@ from YukkiMusic.core import filters as flt
 from YukkiMusic.misc import BANNED_USERS, SUDOERS, _boot_
 from YukkiMusic.platforms import youtube
 from YukkiMusic.plugins.bot.help import paginate_modules
-from YukkiMusic.plugins.play.playlist import del_plist_msg
+from YukkiMusic.plugins.play.playlist import del_group_message as del_plist_msg
 from YukkiMusic.plugins.sudo.sudoers import sudoers_list
 from YukkiMusic.utils.database import (
     add_served_chat,
