@@ -156,6 +156,7 @@ def _normalize_command(value):
         return {value.lower()}
     return set()
 
+
 def command(commands, use_strings=False):
     "Check if the message starts with the provided command(s)"
     if isinstance(commands, str):
