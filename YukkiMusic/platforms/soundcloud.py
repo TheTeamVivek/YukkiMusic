@@ -10,8 +10,6 @@
 
 from yt_dlp import YoutubeDL
 
-from YukkiMusic.utils.decorators import asyncify
-
 from ..core.enum import SourceType
 from ..core.track import Track
 from .base import PlatformBase
@@ -21,7 +19,7 @@ class SoundCloud(PlatformBase):
     async def valid(self, link: str) -> bool:
         return "soundcloud" in link.lower()
 
-    #@asyncify
+    # @asyncify
     async def track(self, url: str) -> Track | bool:
         options = {
             "format": "bestaudio/best",
