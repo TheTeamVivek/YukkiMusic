@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 from ..core.enum import SourceType
-from . import carbon
 from .apple import Apple
 from .resso import Resso
 from .savan import Saavn
@@ -18,7 +17,6 @@ from .telegram import Telegram
 from .youtube import YouTube
 
 apple = Apple()
-carbon = Carbon()
 saavn = Saavn()
 resso = Resso()
 soundcloud = SoundCloud()
