@@ -429,7 +429,7 @@ class Call:
         await self._decorators()
 
     async def stop(self):
-        await asyncio.gather(*[self.stop_stream(chat_id) for chat_id in self.calls])
+        "await asyncio.gather(*[self.stop_stream(chat_id) for chat_id in self.calls])"
 
     async def _decorators(self):
         for client in self.clients:
