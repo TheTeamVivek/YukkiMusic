@@ -111,7 +111,7 @@ class TelethonClient(TelegramClient):
             await self.send_message(
                 entity=config.LOG_GROUP_ID,
                 message=(
-                    f"<u><b>{self.mention} Bot Started :</b></u>\n\n"
+                    f"<u><b><a href='tg://user?id={self.id}'>{self.name}</a> Bot Started :</b></u>\n\n"
                     f"Id : <code>{self.id}</code>\n"
                     f"Name : {self.name}\n"
                     f"Username : @{self.username}"
