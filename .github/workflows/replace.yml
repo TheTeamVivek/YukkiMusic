@@ -17,8 +17,8 @@ jobs:
         shell: bash
         run: |
           declare -A replacements=(
-            ["flt.user(BANNED_USERS)"]="BANNED_USERS"
-            ["flt.user(SUDOERS)"]="SUDOERS"
+            ["filters.user(BANNED_USERS)"]="BANNED_USERS"
+            ["filters.user(SUDOERS)"]="SUDOERS"
           )
 
           for key in "${!replacements[@]}"; do
