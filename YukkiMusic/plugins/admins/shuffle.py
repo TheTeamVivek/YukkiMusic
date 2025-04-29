@@ -12,7 +12,7 @@ import random
 
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
-from YukkiMusic.misc import db, BANNED_USERS
+from YukkiMusic.misc import BANNED_USERS, db
 from YukkiMusic.utils.decorators import admin_rights_check
 
 
