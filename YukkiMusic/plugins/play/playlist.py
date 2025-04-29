@@ -33,9 +33,9 @@ from YukkiMusic.utils import (
 )
 from YukkiMusic.utils.inline import (
     botplaylist_markup,
-    get_playlist_markup, warning_markup,
+    get_playlist_markup,
+    warning_markup,
 )
-
 
 logger = logging.getLogger(__name__)
 
