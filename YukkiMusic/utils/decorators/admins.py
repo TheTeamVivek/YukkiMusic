@@ -15,7 +15,6 @@ from config import adminlist
 from strings import get_string
 from YukkiMusic.misc import SUDOERS
 
-from ..formatters import int_to_alpha
 from ..database import (
     get_authuser_names,
     get_cmode,
@@ -25,6 +24,7 @@ from ..database import (
     is_maintenance,
     is_nonadmin_chat,
 )
+from ..formatters import int_to_alpha
 
 __all__ = ["admin_rights_check", "admin_actual", "actual_admin_cb"]
 
