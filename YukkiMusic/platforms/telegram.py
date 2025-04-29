@@ -17,7 +17,6 @@ import aiohttp
 from telethon.tl import types
 
 from config import lyrical
-from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.inline import downlod_markup
 
 from ..utils.formatters import convert_bytes, get_readable_time
