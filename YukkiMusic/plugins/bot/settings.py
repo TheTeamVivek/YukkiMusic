@@ -48,9 +48,7 @@ from YukkiMusic.utils.inline.settings import (
 from YukkiMusic.utils.inline.start import private_panel
 
 
-@tbot.on_message(
-    flt.command("SETTINGS_COMMAND", True) & flt.group & ~BANNED_USERS
-)
+@tbot.on_message(flt.command("SETTINGS_COMMAND", True) & flt.group & ~BANNED_USERS)
 @language
 async def settings_mar(event, _):
     buttons = setting_markup(_)
@@ -79,9 +77,7 @@ async def settings_cb(event, _):
     )
 
 
-@tbot.on(
-    events.CallbackQuery(pattern="settingsback_helper", func=~BANNED_USERS)
-)
+@tbot.on(events.CallbackQuery(pattern="settingsback_helper", func=~BANNED_USERS))
 @language
 async def settings_back_markup(event, _):
     try:
@@ -290,9 +286,7 @@ async def aud_vid_cb(event, _):
 
 
 @tbot.on(
-    events.CallbackQuery(
-        pattern=r"^(CLEANMODE|COMMANDELMODE)$", func=~BANNED_USERS
-    )
+    events.CallbackQuery(pattern=r"^(CLEANMODE|COMMANDELMODE)$", func=~BANNED_USERS)
 )
 @actual_admin_cb
 async def cleanmode_mark(event, _):
@@ -406,9 +400,7 @@ async def playmode_ans(event, _):
 
 
 # Auth Users Settings
-@tbot.on(
-    events.CallbackQuery(pattern=r"^(AUTH|AUTHLIST)$", func=~BANNED_USERS)
-)
+@tbot.on(events.CallbackQuery(pattern=r"^(AUTH|AUTHLIST)$", func=~BANNED_USERS))
 @actual_admin_cb
 async def authusers_mar(event, _):
     command = event.pattern_match.group(0)

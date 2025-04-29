@@ -20,9 +20,7 @@ from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.formatters import alpha_to_int
 
 
-@tbot.on_message(
-    flt.command("RELOAD_COMMAND", True) & flt.group & ~BANNED_USERS
-)
+@tbot.on_message(flt.command("RELOAD_COMMAND", True) & flt.group & ~BANNED_USERS)
 @language
 async def reload_admin_cache(event, _):
     try:
