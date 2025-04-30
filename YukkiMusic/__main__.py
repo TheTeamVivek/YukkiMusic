@@ -51,6 +51,7 @@ async def init():
         if "database is locked" in str(e).lower():
             logger.info("Database is locked. Cleaning session files...")
             clean_session()
+            logger.info("Restarting...")
             os.execv(sys.executable, [sys.executable] + sys.argv)
 
     await tbot.load_plugins_from("YukkiMusic/plugins")
