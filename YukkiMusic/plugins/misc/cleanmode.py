@@ -51,15 +51,9 @@ async def clean_mode(event):
     global IS_BROADCASTING
     if IS_BROADCASTING:
         return
-    logger.info(event.stringify())
-    update = event
-    if hasattr(event, "users") and event.users:
-        return
-    if hasattr(event, "chats") and event.chats:
-        return
-
-    message_id = update.max_id
-    chat_id = int(f"-100{update.channel_id}")
+    
+    message_id = event.max_id
+    chat_id = int(f"-100{event.channel_id}")
 
     if not await is_cleanmode_on(chat_id):
         return
