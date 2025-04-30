@@ -44,14 +44,3 @@ play_20: "Not a live stream"
 ## 7.
 
   Now we can say that YukkiMusic fully support multiples langauge with command, enable, disable so we need to refactor all languages
-   
-
-
-# FEAT CAN BE ADDED [ OPTIONAL ]
-
-### Use **defaultdict** as a replacement of pythons dict
-
-# Dev [contextlib]
-Note
-
-Both redirect_stdout() and redirect_stderr() modify global state by replacing objects in the sys module, and should be used with care. The functions are not thread-safe, and may interfere with other operations that expect the standard output streams to be attached to terminal devices
