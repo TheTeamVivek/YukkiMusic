@@ -47,7 +47,7 @@ async def executor(event):
     if len(event.text.split()) < 2:
         return await event.reply("**Give me something to execute**")
     try:
-        cmd = event.text.split(" ", maxsplit=1)[1]
+        cmd = event.text.split(" ", maxsplit=1)[1].strip()
     except IndexError:
         return await event.delete()
 
