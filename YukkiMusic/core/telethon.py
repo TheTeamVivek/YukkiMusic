@@ -226,9 +226,13 @@ class TelethonClient(TelegramClient):
         error_message += f"<b>Error:</b> {type(exc).__name__}\n"
         if len(error_trace) > 900:
             pastebin_link = await paste(error_trace)
-            error_message += f"<b>Traceback:<b> <a href='{pastebin_link}'>BatBin Link</a>\n"
+            error_message += (
+                f"<b>Traceback:<b> <a href='{pastebin_link}'>BatBin Link</a>\n"
+            )
         else:
-            error_message += f"<b>Traceback:</b>\n<pre class='python' > {error_trace}</pre>"
+            error_message += (
+                f"<b>Traceback:</b>\n<pre class='python' > {error_trace}</pre>"
+            )
 
         await self.send_message(config.LOG_GROUP_ID, error_message)
 
