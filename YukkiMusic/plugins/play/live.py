@@ -16,7 +16,7 @@ from YukkiMusic.platforms import youtube
 from YukkiMusic.utils import get_channeplay_cb, language, stream
 
 
-@tbot.on(events.CallbackQuery("LiveStream", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="LiveStream", func=~BANNED_USERS))
 @language
 async def play_live_stream(event, _):
     callback_data = event.data.decode("utf-8").strip()
