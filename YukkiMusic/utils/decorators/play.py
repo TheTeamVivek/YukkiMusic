@@ -73,7 +73,7 @@ def play_wrapper(func):
         command = event.text.split()
         url = await telegram.get_url_from_message(event)
         rmsg = await event.get_reply_message()
-        if rmsg.document is None and url is None:
+        if rmsg and rmsg.document is None and url is None:
             if len(command) < 2:
                 if "/stream" in command:
                     return await event.reply(_["str_1"])
