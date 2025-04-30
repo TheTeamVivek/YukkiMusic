@@ -44,7 +44,7 @@ def language(func=None, *, no_check=False):
                         return await event.answer(language["maint_4"], alert=True)
                     return
 
-            if event.message and await is_commanddelete_on(chat.id):
+            if getattr(event, "message", False) and await is_commanddelete_on(chat.id):
                 try:
                     await event.delete()
                 except Exception:
