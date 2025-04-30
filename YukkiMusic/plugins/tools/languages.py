@@ -67,7 +67,7 @@ async def lanuagecb(event, _):
     return await event.edit(buttons=keyboard)
 
 
-@tbot.on(events.CallbackQuery(r"languages:(.*?)", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern=r"languages:(.*?)", func=~BANNED_USERS))
 @actual_admin_cb
 async def language_markup(event, _):
     langauge = event.data.decode("utf-8").split(":")[1]
