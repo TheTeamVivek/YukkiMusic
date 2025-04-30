@@ -8,7 +8,6 @@
 # All rights reserved.
 import asyncio
 import logging
-import sqlite3
 
 from pytgcalls.exceptions import NoActiveGroupCall
 
