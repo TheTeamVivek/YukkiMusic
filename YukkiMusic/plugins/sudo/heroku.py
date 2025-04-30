@@ -267,7 +267,9 @@ async def update_(event, _):
             parse_mode="HTML",
         )
     else:
-        nrs = await response.edit(_final_updates_, link_preview=False, parse_mode="HTML")
+        nrs = await response.edit(
+            _final_updates_, link_preview=False, parse_mode="HTML"
+        )
     os.system("git stash &> /dev/null && git pull")
 
     try:
