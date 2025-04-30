@@ -13,10 +13,9 @@ import uvloop
 uvloop.install()
 from YukkiMusic.core.dir import dirr as _dirr
 from YukkiMusic.core.git import git as _git
+from YukkiMusic.core.logger import setup_logger as _setup_logger
 from YukkiMusic.core.telethon import TelethonClient as _TelethonClient
 from YukkiMusic.core.userbot import Userbot as _Userbot
-
-from YukkiMusic.core.logger import setup_logger as _setup_logger
 
 _setup_logger()
 
