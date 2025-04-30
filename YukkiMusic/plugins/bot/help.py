@@ -108,7 +108,7 @@ async def help_com_group(event, _):
 
 @tbot.on(events.CallbackQuery(pattern=r"^help_(.+)"))
 async def help_button(event):
-    pattern_match = event.pattern_match.group(1)
+    pattern_match = event.pattern_match.group(1).decode("utf-8")
     lang = await get_lang(event.chat_id)
     string = get_string(lang)
 
