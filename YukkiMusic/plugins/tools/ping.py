@@ -24,6 +24,7 @@ async def ping_com(event, _):
     response = await event.reply(
         file=PING_IMG_URL,
         message=_["ping_1"].format(tbot.mention),
+        parse_mode="html",
     )
     start = datetime.now()
     pytgping = await Yukki.ping()
