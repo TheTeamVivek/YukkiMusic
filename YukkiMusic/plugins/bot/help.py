@@ -149,9 +149,7 @@ async def help_button(event):
         ]
 
         try:
-            await event.edit(
-                text, buttons=buttons, link_preview=False
-            )
+            await event.edit(text, buttons=buttons, link_preview=False)
         except Exception:
             traceback.print_exc()
 
