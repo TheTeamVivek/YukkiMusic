@@ -72,7 +72,8 @@ async def executor(event):
         final_output += template.format("STDERR", stderr)
     if exc:
         final_output += template.format("EXCEPTION", exc)
-    final_output = final_output or "Success"
+    if not final_output:
+        final_output = "Success"
     if len(final_output) > 4096:
         filename = "output.txt"
         text = ""
