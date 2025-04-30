@@ -187,7 +187,7 @@ async def add_playlist(event, _):
             return await event.reply("**Something wrong happens **\nSee Logs")
 
 
-@tbot.on(events.CallbackQuery("add_playlist", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="add_playlist", func=~BANNED_USERS))
 @language
 async def add_playlist(event, _):
     callback_data = event.data.decode("utf-8").strip()
@@ -224,7 +224,7 @@ async def add_playlist(event, _):
         return
 
 
-@tbot.on(events.CallbackQuery("del_playlist", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="del_playlist", func=~BANNED_USERS))
 @language
 async def del_plist(event, _):
     callback_data = event.data.decode("utf-8").strip()
@@ -245,7 +245,7 @@ async def del_plist(event, _):
     return await event.edit(buttons=keyboard)
 
 
-@tbot.on(events.CallbackQuery("delete_whole_playlist", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="delete_whole_playlist", func=~BANNED_USERS))
 @language
 async def del_whole_playlist(event, _):
     _playlist = await get_playlist_names(event.sender_id)
@@ -255,7 +255,7 @@ async def del_whole_playlist(event, _):
     return await event.edit(_["playlist_13"])
 
 
-@tbot.on(events.CallbackQuery("del_back_playlist", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="del_back_playlist", func=~BANNED_USERS))
 @language
 async def del_back_playlist(event, _):
     user_id = event.sender_id
@@ -274,9 +274,9 @@ async def del_back_playlist(event, _):
     return await event.edit(_["playlist_7"].format(count), buttons=keyboard)
 
 
-@tbot.on(events.CallbackQuery("get_playlist_playmode", func=~BANNED_USERS))
-@tbot.on(events.CallbackQuery("home_play", func=~BANNED_USERS))
-@tbot.on(events.CallbackQuery("delete_warning", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="get_playlist_playmode", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="home_play", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="delete_warning", func=~BANNED_USERS))
 @language
 async def playlist_multi_func(event, _):
     name = event.data.decode("utf-8").strip()
@@ -297,7 +297,7 @@ async def playlist_multi_func(event, _):
     return await event.edit(buttons=buttons)
 
 
-@tbot.on(events.CallbackQuery("play_playlist", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="play_playlist", func=~BANNED_USERS))
 @language
 async def play_playlist(event, _):
     callback_data = event.data.decode("utf-8").strip()
@@ -398,7 +398,7 @@ async def play_playlist_command(event, _):
     return await mystic.delete()
 
 
-@tbot.on(events.CallbackQuery("remove_playlist", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="remove_playlist", func=~BANNED_USERS))
 @language
 async def del_plist(event, _):
     callback_data = event.data.decode("utf-8").strip()

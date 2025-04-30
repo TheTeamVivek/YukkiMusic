@@ -121,7 +121,7 @@ async def ping_com(event, _):
             return
 
 
-@tbot.on(events.CallbackQuery("GetTimer", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="GetTimer", func=~BANNED_USERS))
 async def quite_timer(event):
     try:
         await event.answer()
@@ -129,7 +129,7 @@ async def quite_timer(event):
         pass
 
 
-@tbot.on(events.CallbackQuery("GetQueued", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="GetQueued", func=~BANNED_USERS))
 @language
 async def queued_tracks(event, _):
     callback_data = event.data.decode("utf-8").strip()
@@ -170,7 +170,7 @@ async def queued_tracks(event, _):
     return await event.edit(msg, buttons=buttons)
 
 
-@tbot.on(events.CallbackQuery("queue_back_timer", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="queue_back_timer", func=~BANNED_USERS))
 @language
 async def queue_back(event, _):
     callback_data = event.data.decode("utf-8").strip()

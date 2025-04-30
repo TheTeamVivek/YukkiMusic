@@ -56,7 +56,7 @@ async def langs_command(event, _):
     )
 
 
-@tbot.on(events.CallbackQuery("LG", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="LG", func=~BANNED_USERS))
 @language
 async def lanuagecb(event, _):
     try:

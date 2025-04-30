@@ -31,8 +31,8 @@ from YukkiMusic.utils.inline import (
 logger = logging.getLogger(__name__)
 
 
-@tbot.on(events.CallbackQuery("get_playmarkup", func=~BANNED_USERS))
-@tbot.on(events.CallbackQuery("get_top_playlists", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="get_playmarkup", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="get_top_playlists", func=~BANNED_USERS))
 @language
 async def get_play_markup(event, _):
     try:
@@ -49,7 +49,7 @@ async def get_play_markup(event, _):
     return await event.edit(buttons=buttons)
 
 
-@tbot.on(events.CallbackQuery("SERVERTOP", func=~BANNED_USERS))
+@tbot.on(events.CallbackQuery(pattern="SERVERTOP", func=~BANNED_USERS))
 @language
 async def server_to_play(event, _):
     chat_id = event.chat_id
