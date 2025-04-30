@@ -21,14 +21,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import wraps
 
-# import uvloop
 from telethon import TelegramClient, errors, events
+from telethon.sessions.memory import MemorySession
 from telethon.tl import functions, types
 
 import config
 from YukkiMusic.utils.pastebin import paste
-
-# uvloop.install()
 
 log = logging.getLogger(__name__)
 
@@ -89,9 +87,10 @@ commands = {
 class TelethonClient(TelegramClient):
     def __init__(self):
         super().__init__(
-            "YukkiMusic",
+            MemorySession(),
             api_id=config.API_ID,
             api_hash=config.API_HASH,
+            
             flood_sleep_threshold=240,
         )
         self.loaded_plug_counts: int = 0
