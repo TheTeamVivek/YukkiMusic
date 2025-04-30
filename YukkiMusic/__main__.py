@@ -6,9 +6,12 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-import asyncio, os, sys
+import asyncio
 import logging
+import os
 import sqlite3
+import sys
+
 from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
