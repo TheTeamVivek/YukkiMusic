@@ -49,7 +49,7 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
             data=f"help_prev:{modulo_page - 1 if modulo_page > 0 else max_num_pages - 1}:{int(close)}",
         ),
         Button.inline(
-            string["CLOSE_BUTTON"] if close else string["CLOSE_BUTTON"],
+            string["CLOSE_BUTTON"] if close else string["BACK_BUTTON"],
             data="close" if close else "settings_back_helper",
         ),
         Button.inline("❯", data=f"help_next:{modulo_page + 1}:{int(close)}"),
