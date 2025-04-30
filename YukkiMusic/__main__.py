@@ -52,7 +52,7 @@ async def init():
             logger.info("Database is locked. Cleaning session files...")
             clean_session()
             logger.info("Restarting...")
-            os.execv(sys.executable, [sys.executable] + sys.argv)
+            await tbot.start()
 
     await tbot.load_plugins_from("YukkiMusic/plugins")
     logger.info("Successfully Imported All Modules ")
