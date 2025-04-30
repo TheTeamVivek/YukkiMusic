@@ -9,7 +9,7 @@
 #
 
 from telethon import Button
-from telethon.tl.types import PeerUser, User
+from telethon.tl.types import User
 
 from config import adminlist
 from strings import get_string
