@@ -214,7 +214,7 @@ class TelethonClient(TelegramClient):
                 msg_link = f"https://t.me/c/{chat.id}/{event.id}"
 
             text = None
-            if getattr(event, text, None):
+            if getattr(event, "text", None):
                 text = f"**Text:**\n```python\n{event.text}```\n"
             error_message += (
                 f"**ChatId:** {event.chat_id}\n"
