@@ -237,7 +237,9 @@ class TelethonClient(TelegramClient):
         await self.send_message(config.LOG_GROUP_ID, error_message, parse_mode="HTML")
 
         try:
-            await self.send_message(config.OWNER_ID[0], error_message, parse_mode="HTML")
+            await self.send_message(
+                config.OWNER_ID[0], error_message, parse_mode="HTML"
+            )
         except Exception:
             pass
 
