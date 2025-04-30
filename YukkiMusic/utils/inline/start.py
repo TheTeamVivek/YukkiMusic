@@ -42,6 +42,7 @@ def start_pannel(_):
 
 
 def private_panel(_, owner: bool | int = None):
+    # owner must be an input entity
     keyboard = InlineKeyboard(
         row_width=2
     )  # Using PyKeyboard because [ may be not sure] Telethon didn't think that _types.InputKeyboardButtonUserProfile is an inline button
@@ -68,7 +69,7 @@ def private_panel(_, owner: bool | int = None):
     if _config.GITHUB_REPO and owner:
         keyboard.add(
             _types.InputKeyboardButtonUserProfile(
-                text=_["S_B_7"], user_id=await tbot.get_input_entity(owner)
+                text=_["S_B_7"], user_id=owner
             ),
             _Button.url(text=_["S_B_6"], url=_config.GITHUB_REPO),
         )
@@ -78,7 +79,7 @@ def private_panel(_, owner: bool | int = None):
         if owner:
             keyboard.row(
                 _types.InputKeyboardButtonUserProfile(
-                    text=_["S_B_7"], user_id=await tbot.get_input_entity(owner)
+                    text=_["S_B_7"], user_id=owner
                 )
             )
 
