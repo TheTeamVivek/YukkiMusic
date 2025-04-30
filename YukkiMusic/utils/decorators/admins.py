@@ -101,8 +101,8 @@ def admin_actual(mystic):
             _ = get_string(language)
         except Exception:
             _ = get_string("en")
-
-        if isinstance(event.message.from_id, PeerUser):
+        sender = await event.get_sender()
+        if not isinstance(sender, User):
             upl = [
                 [
                     Button.inline(
