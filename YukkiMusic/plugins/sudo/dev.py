@@ -67,7 +67,7 @@ async def executor(event):
 
     stdout = redirected_output.getvalue()
     stderr = redirected_error.getvalue()
-    template = "<b>{0}:</b>\n<pre language='python'>{1}</pre>"
+    template = "<b>{0}:</b>\n<pre class='python'>{1}</pre>"
 
     if stdout or stderr or exc:
         final_output = ""
@@ -107,6 +107,7 @@ async def executor(event):
         await event.reply(
             file=filename,
             message=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
+            parse_mode="HTML",
             buttons=keyboard,
         )
         await event.delete()
@@ -188,6 +189,7 @@ async def shellrunner(event):
         await event.reply(
             file="output.txt",
             message="<code>Output</code>",
+            parse_mode="HTML",
         )
         os.remove("output.txt")
     else:
