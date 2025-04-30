@@ -176,7 +176,7 @@ async def play_commnd(
                 video=video,
             )
     else:
-        if len(message.command) < 2:
+        if len(event.text.split()) < 2:
             buttons = botplaylist_markup(_)
             return await mystic.edit(
                 _["playlist_1"],
