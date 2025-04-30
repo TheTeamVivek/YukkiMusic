@@ -6,15 +6,16 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-import asyncio
+import asyncio, os, sys
 import logging
-
+import sqlite3
 from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
 from config import fetch_cookies
 from YukkiMusic import tbot, userbot
 from YukkiMusic.core.call import Yukki
+from YukkiMusic.core.dir import clean_session
 from YukkiMusic.misc import BANNED_USERS, sudo
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
@@ -41,7 +42,13 @@ async def init():
     except Exception:
         pass
     await sudo()
-    await tbot.start()
+    try:
+        await tbot.start()
+    except sqlite3.OperationalError as e:
+        if "database is locked" in str(e).lower():
+            logger.info("Database is locked. Cleaning session files...")
+            clean_session()
+            os.execv(sys.executable, [sys.executable] + sys.argv)
 
     await tbot.load_plugins_from("YukkiMusic/plugins")
     logger.info("Successfully Imported All Modules ")
