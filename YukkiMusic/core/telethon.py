@@ -205,7 +205,7 @@ class TelethonClient(TelegramClient):
             args = sys.exc_info()
 
         error_trace = "".join(traceback.format_exception(*args))
-        error_message = f"**Date:** {date_time}\n"
+        error_message = f"<b>Date:</b> {date_time}\n"
         if event:
             chat = await event.get_chat()
             if event.is_private:
@@ -215,20 +215,20 @@ class TelethonClient(TelegramClient):
 
             text = None
             if getattr(event, "text", None):
-                text = f"**Text:**\n```python\n{event.text}```\n"
+                text = f"<b>Text:</b>\n<pre class='python'>{event.text}</pre>\n"
             error_message += (
-                f"**ChatId:** {event.chat_id}\n"
-                f"**SenderId:** {event.sender_id}\n"
+                f"<b>ChatId:</b> {event.chat_id}\n"
+                f"<b>SenderId:</b> {event.sender_id}\n"
                 f"{text if text else ''}"
-                f"**MessageLink:** {msg_link}\n\n"
+                f"<b>MessageLink:</b> {msg_link}\n\n"
             )
 
-        error_message += f"**Error:** {type(exc).__name__}\n"
+        error_message += f"<b>Error:</b> {type(exc).__name__}\n"
         if len(error_trace) > 900:
             pastebin_link = await paste(error_trace)
-            error_message += f"**Traceback:** [BatBin Link]({pastebin_link})\n"
+            error_message += f"<b>Traceback:<b> <a href='{pastebin_link}'>BatBin Link</a>\n"
         else:
-            error_message += f"**Traceback:**\n```python\n{error_trace}```\n"
+            error_message += f"<b>Traceback:</b>\n<pre class='python' > {error_trace}</pre>"
 
         await self.send_message(config.LOG_GROUP_ID, error_message)
 
