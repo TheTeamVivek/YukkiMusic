@@ -10,12 +10,11 @@
 
 import os
 import re
-from telethon import Button, events
-from telethon.tl.types import InputMediaDocument, InputMediaPhoto
 
 import yt_dlp
+from telethon import Button, events
+
 from config import SONG_DOWNLOAD_DURATION, SONG_DOWNLOAD_DURATION_LIMIT
-from strings import command
 from YukkiMusic import Platform, tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.misc import BANNED_USERS
@@ -24,13 +23,13 @@ from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.formatters import convert_bytes
 from YukkiMusic.utils.inline.song import song_markup
 
+
 @tbot.on_message(flt.command("SONG_COMMAND", True) & flt.group & ~BANNED_USERS)
 @language
 async def song_command_group(event, _):
-    buttons = [
-        [Button.url(_["SG_B_1"], f"https://t.me/{tbot.me.username}?start=song")]
-    ]
+    buttons = [[Button.url(_["SG_B_1"], f"https://t.me/{tbot.me.username}?start=song")]]
     await event.reply(_["song_1"], buttons=buttons)
+
 
 @tbot.on_message(flt.command("SONG_COMMAND", True) & flt.private & ~BANNED_USERS)
 @language
@@ -72,7 +71,7 @@ async def song_command_private(event, _):
                 event.chat_id,
                 thumbnail,
                 caption=_["song_4"].format(title),
-                buttons=buttons
+                buttons=buttons,
             )
         else:
             return await event.reply(_["song_4"].format(title), buttons=buttons)
@@ -107,13 +106,11 @@ async def song_command_private(event, _):
 
     if thumbnail:
         return await event.client.send_file(
-            event.chat_id,
-            thumbnail,
-            caption=_["song_4"].format(title),
-            buttons=buttons
+            event.chat_id, thumbnail, caption=_["song_4"].format(title), buttons=buttons
         )
     else:
         return await event.reply(_["song_4"].format(title), buttons=buttons)
+
 
 @tbot.on(events.CallbackQuery(pattern="song_back", func=~BANNED_USERS))
 @language
@@ -123,6 +120,7 @@ async def songs_back_helper(event, _):
     stype, vidid = callback_request.split("|")
     buttons = song_markup(_, vidid)
     await event.edit(buttons=buttons)
+
 
 @tbot.on(events.CallbackQuery(pattern="song_helper", func=~BANNED_USERS))
 @language
@@ -156,16 +154,20 @@ async def song_helper_cb(event, _):
                 fom = x["format_id"]
 
                 buttons.append(
-                    [Button.inline(
-                        f"{form} Quality Audio = {sz}",
-                        data=f"song_download {stype}|{fom}|{vidid}"
-                    )]
+                    [
+                        Button.inline(
+                            f"{form} Quality Audio = {sz}",
+                            data=f"song_download {stype}|{fom}|{vidid}",
+                        )
+                    ]
                 )
 
-        buttons.append([
-            Button.inline(_["BACK_BUTTON"], data=f"song_back {stype}|{vidid}"),
-            Button.inline(_["CLOSE_BUTTON"], data="close")
-        ])
+        buttons.append(
+            [
+                Button.inline(_["BACK_BUTTON"], data=f"song_back {stype}|{vidid}"),
+                Button.inline(_["CLOSE_BUTTON"], data="close"),
+            ]
+        )
 
         await event.edit(buttons=buttons)
     else:
@@ -190,18 +192,22 @@ async def song_helper_cb(event, _):
             to = f"{ap} = {sz}"
 
             buttons.append(
-                [Button.inline(
-                    to,
-                    data=f"song_download {stype}|{x['format_id']}|{vidid}"
-                )]
+                [
+                    Button.inline(
+                        to, data=f"song_download {stype}|{x['format_id']}|{vidid}"
+                    )
+                ]
             )
 
-        buttons.append([
-            Button.inline(_["BACK_BUTTON"], data=f"song_back {stype}|{vidid}"),
-            Button.inline(_["CLOSE_BUTTON"], data="close")
-        ])
+        buttons.append(
+            [
+                Button.inline(_["BACK_BUTTON"], data=f"song_back {stype}|{vidid}"),
+                Button.inline(_["CLOSE_BUTTON"], data="close"),
+            ]
+        )
 
         await event.edit(buttons=buttons)
+
 
 @tbot.on(events.CallbackQuery(pattern="song_download", func=~BANNED_USERS))
 @language
@@ -249,9 +255,9 @@ async def song_download_cb(event, _):
                     types.DocumentAttributeVideo(
                         duration=duration,
                         w=event.message.media.width,
-                        h=event.message.media.height
+                        h=event.message.media.height,
                     )
-                ]
+                ],
             )
             await mystic.delete()
         except Exception as e:
@@ -283,11 +289,9 @@ async def song_download_cb(event, _):
                 thumb=thumb_image_path,
                 attributes=[
                     types.DocumentAttributeAudio(
-                        duration=duration,
-                        title=title,
-                        performer=x["uploader"]
+                        duration=duration, title=title, performer=x["uploader"]
                     )
-                ]
+                ],
             )
             await mystic.delete()
         except Exception as e:
