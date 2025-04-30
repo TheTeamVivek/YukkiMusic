@@ -14,6 +14,8 @@ from telethon.tl import types as _types
 import config as _config
 from YukkiMusic import tbot as _tbot
 
+from pykeyboard.telethon import InlineKeyboard
+
 
 def start_pannel(_):
     buttons = [
@@ -40,7 +42,7 @@ def start_pannel(_):
     return buttons
 
 
-def private_panel(_, owner: bool | int = None):
+'''def private_panel(_, owner: bool | int = None):
     buttons = [[_Button.inline(text=_["S_B_8"], data="settings_back_helper")]]
     if _config.SUPPORT_CHANNEL and _config.SUPPORT_GROUP:
         buttons.append(
@@ -86,4 +88,52 @@ def private_panel(_, owner: bool | int = None):
                 ]
             )
     buttons.append([_Button.inline(text=_["ST_B_6"], data="LG")])
-    return buttons
+    return buttons'''
+
+
+def private_panel(_, owner: bool | int = None):
+    keyboard = InlineKeyboard(row_width=2)
+
+    keyboard.row(_Button.inline(text=_["S_B_8"], data="settings_back_helper"))
+
+    if _config.SUPPORT_CHANNEL and _config.SUPPORT_GROUP:
+        keyboard.add(
+            _Button.url(text=_["S_B_4"], url=_config.SUPPORT_CHANNEL),
+            _Button.url(text=_["S_B_3"], url=_config.SUPPORT_GROUP),
+        )
+    else:
+        if _config.SUPPORT_CHANNEL:
+            keyboard.row(
+                _Button.url(text=_["S_B_4"], url=_config.SUPPORT_CHANNEL)
+            )
+        if _config.SUPPORT_GROUP:
+            keyboard.row(
+                _Button.url(text=_["S_B_3"], url=_config.SUPPORT_GROUP)
+            )
+
+    keyboard.row(
+        _Button.url(
+            text=_["S_B_5"], url=f"https://t.me/{_tbot.username}?startgroup=true"
+        )
+    )
+
+    if _config.GITHUB_REPO and owner:
+        keyboard.add(
+            _types.InputKeyboardButtonUserProfile(text=_["S_B_7"], user_id=owner),
+            _Button.url(text=_["S_B_6"], url=_config.GITHUB_REPO),
+        )
+    else:
+        if _config.GITHUB_REPO:
+            keyboard.row(
+                _Button.url(text=_["S_B_6"], url=_config.GITHUB_REPO)
+            )
+        if owner:
+            keyboard.row(
+                _types.InputKeyboardButtonUserProfile(
+                    text=_["S_B_7"], user_id=owner
+                )
+            )
+
+    keyboard.row(_Button.inline(text=_["ST_B_6"], data="LG"))
+
+    return keyboard.rows
