@@ -40,3 +40,12 @@ def dirr():
         mkdir(cache_folder)
 
     logging.info("Directories Updated.")
+
+def clean_session():
+    targets = [".session", ".session-journal"]
+    for f in os.listdir():
+        if any(f.endswith(x) for x in targets):
+            try:
+                os.remove(f)
+            except Exception:
+                pass
