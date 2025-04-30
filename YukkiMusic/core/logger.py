@@ -15,7 +15,7 @@ def setup_logger():
         ],
     )
 
-    logging.getLogger("telethon").setLevel(logging.INFO)
+    logging.getLogger("telethon").setLevel(logging.DEBUG)
 
     logging.getLogger("pyrogram").setLevel(logging.ERROR)
     logging.getLogger("pytgcalls").setLevel(logging.ERROR)
