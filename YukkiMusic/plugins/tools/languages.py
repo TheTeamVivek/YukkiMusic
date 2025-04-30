@@ -38,7 +38,7 @@ def lanuages_keyboard(_):
             text=_["BACK_BUTTON"],
             data=f"settingsback_helper",
         ),
-        Button.inline(text=_["CLOSE_BUTTON"], callback_data=f"close"),
+        Button.inline(text=_["CLOSE_BUTTON"], data=f"close"),
     )
     return keyboard
 
