@@ -10,6 +10,7 @@
 
 from telethon import Button as _Button
 from telethon.tl import types as _types
+
 import config as _config
 from YukkiMusic import tbot as _tbot
 
@@ -64,7 +65,9 @@ def private_panel(_, owner: bool | int = None):
     if _config.GITHUB_REPO and owner:
         buttons.append(
             [
-                _types.KeyboardButtonUserProfile(text=_["S_B_7"], user_id=f"tg://user?id={owner}"),
+                _types.KeyboardButtonUserProfile(
+                    text=_["S_B_7"], user_id=f"tg://user?id={owner}"
+                ),
                 _Button.url(text=_["S_B_6"], url=_config.GITHUB_REPO),
             ]
         )
@@ -79,7 +82,9 @@ def private_panel(_, owner: bool | int = None):
         if owner:
             buttons.append(
                 [
-                    _types.KeyboardButtonUserProfile(text=_["S_B_7"], user_id=f"tg://user?id={owner}"),
+                    _types.KeyboardButtonUserProfile(
+                        text=_["S_B_7"], user_id=f"tg://user?id={owner}"
+                    ),
                 ]
             )
     buttons.append([_Button.inline(text=_["ST_B_6"], data="LG")])
