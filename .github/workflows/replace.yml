@@ -17,7 +17,7 @@ jobs:
         shell: bash
         run: |
           declare -A replacements=(
-            ["filters.user(BANNED_USERS)"]="BANNED_USERS"
+            ["events.CallbackQuery(\""]="events.CallbackQuery(pattern=\""
             ["filters.user(SUDOERS)"]="SUDOERS"
           )
 
