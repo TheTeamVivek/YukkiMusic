@@ -236,6 +236,37 @@ class TelethonClient(TelegramClient):
         except Exception:
             pass
 
+    def on(self, event: events.common.EventBuilder):
+        def decorator(function):
+            @wraps(function)
+            async def wrapper(event):
+                try:
+                    return await function(event)
+                except errors.FloodWaitError as e:
+                    await asyncio.sleep(e.seconds)
+                except (
+                    errors.ChatWriteForbiddenError,
+                    errors.ChatSendMediaForbiddenError,
+                    errors.MessageNotModifiedError,
+                    errors.MessageIdInvalidError,
+                ) as e:
+                    if type(e) not in (
+                        errors.MessageNotModifiedError,
+                        errors.MessageIdInvalidError,
+                    ):
+                        with suppress(Exception):
+                            await event.reply("I don't have rights to send message or media, so leaving...")
+                            await self.leave_chat(event.chat_id)
+                except events.StopPropagation:
+                    raise
+                except Exception as e:
+                    await self.handle_error(e, event)
+
+            self.add_event_handler(wrapper, event)
+            return wrapper
+
+        return decorator
+
     def on_message(self, func=None, *args, **kwargs):
         def decorator(function):
             @wraps(function)
