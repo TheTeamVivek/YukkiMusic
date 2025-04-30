@@ -8,9 +8,9 @@
 # All rights reserved.
 
 # pylint: disable=C0103, C0413
-import uvloop
+"""import uvloop
 
-uvloop.install()
+uvloop.install()"""
 from YukkiMusic.core.dir import dirr as _dirr
 from YukkiMusic.core.git import git as _git
 from YukkiMusic.core.logger import setup_logger as _setup_logger
