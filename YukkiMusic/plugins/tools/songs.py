@@ -8,56 +8,39 @@
 # All rights reserved.
 #
 
-r"""
 import os
 import re
+from telethon import Button, events
+from telethon.tl.types import InputMediaDocument, InputMediaPhoto
 
 import yt_dlp
-from pykeyboard import InlineKeyboard
-from pyrogram import enums, filters
-from pyrogram.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    InputMediaAudio,
-    InputMediaVideo,
-    Message,
-)
-
-from config import BANNED_USERS, SONG_DOWNLOAD_DURATION, SONG_DOWNLOAD_DURATION_LIMIT
+from config import SONG_DOWNLOAD_DURATION, SONG_DOWNLOAD_DURATION_LIMIT
 from strings import command
-from YukkiMusic import Platform, app
+from YukkiMusic import Platform, tbot
+from YukkiMusic.core import filters as flt
+from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic.platforms.Youtube import cookies
-from YukkiMusic.utils.decorators.language import language
+from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.formatters import convert_bytes
 from YukkiMusic.utils.inline.song import song_markup
 
-
-@app.on_message(command("SONG_COMMAND") & filters.group & ~BANNED_USERS)
+@tbot.on(flt.command("SONG_COMMAND"), True) & flt.group & ~BANNED_USERS)
 @language
-async def song_commad_group(client, message: Message, _):
-    upl = InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(
-                    text=_["SG_B_1"],
-                    url=f"https://t.me/{app.username}?start=song",
-                ),
-            ]
-        ]
-    )
+async def song_command_group(event, _):
+    buttons = [
+        [Button.url(_["SG_B_1"], f"https://t.me/{tbot.me.username}?start=song")]
+    ]
+    await event.reply(_["song_1"], buttons=buttons)
 
-    await event.reply(_["song_1"], buttons=upl)
-
-
-# Song Module
-
-
-@app.on_message(command("SONG_COMMAND") & filters.private & ~BANNED_USERS)
+@tbot.on(flt.command("SONG_COMMAND"), True) & flt.private & ~BANNED_USERS)
 @language
-async def song_commad_private(client, message: Message, _):
-    await message.delete()
+async def song_command_private(event, _):
+    try:
+        await event.delete()
+    except:
+        pass
 
-    url = await Platform.telegram.get_url_from_message(message)
+    url = await Platform.telegram.get_url_from_message(event)
 
     if url:
         if not await Platform.youtube.valid(url):
@@ -82,22 +65,23 @@ async def song_commad_private(client, message: Message, _):
             )
 
         buttons = song_markup(_, vidid)
-
         await mystic.delete()
 
-        return await message.reply_photo(
-            thumbnail,
-            caption=_["song_4"].format(title),
-            buttons=InlineKeyboardMarkup(buttons),
-        )
-
+        if thumbnail:
+            return await event.client.send_file(
+                event.chat_id,
+                thumbnail,
+                caption=_["song_4"].format(title),
+                buttons=buttons
+            )
+        else:
+            return await event.reply(_["song_4"].format(title), buttons=buttons)
     else:
-        if len(message.command) < 2:
+        if len(event.text.split()) < 2:
             return await event.reply(_["song_2"])
 
     mystic = await event.reply(_["play_1"])
-
-    query = message.text.split(None, 1)[1]
+    query = event.text.split(None, 1)[1]
 
     try:
         (
@@ -107,7 +91,6 @@ async def song_commad_private(client, message: Message, _):
             thumbnail,
             vidid,
         ) = await Platform.youtube.track(query)
-
     except Exception:
         return await mystic.edit(_["play_3"])
 
@@ -120,182 +103,130 @@ async def song_commad_private(client, message: Message, _):
         )
 
     buttons = song_markup(_, vidid)
-
     await mystic.delete()
 
-    return await message.reply_photo(
-        thumbnail,
-        caption=_["song_4"].format(title),
-        buttons=InlineKeyboardMarkup(buttons),
-    )
+    if thumbnail:
+        return await event.client.send_file(
+            event.chat_id,
+            thumbnail,
+            caption=_["song_4"].format(title),
+            buttons=buttons
+        )
+    else:
+        return await event.reply(_["song_4"].format(title), buttons=buttons)
 
-
-@app.on_callback_query(filters.regex(pattern=r"song_back") & ~BANNED_USERS)
+@tbot.on(events.CallbackQuery(pattern="song_back", func=~BANNED_USERS))
 @language
-async def songs_back_helper(client, CallbackQuery, _):
-    callback_data = CallbackQuery.data.strip()
-
+async def songs_back_helper(event, _):
+    callback_data = event.data.decode().strip()
     callback_request = callback_data.split(None, 1)[1]
-
     stype, vidid = callback_request.split("|")
-
     buttons = song_markup(_, vidid)
+    await event.edit(buttons=buttons)
 
-    return await CallbackQuery.edit_message_reply_markup(
-        buttons=InlineKeyboardMarkup(buttons)
-    )
-
-
-@app.on_callback_query(filters.regex(pattern=r"song_helper") & ~BANNED_USERS)
+@tbot.on(events.CallbackQuery(pattern="song_helper", func=~BANNED_USERS))
 @language
-async def song_helper_cb(client, CallbackQuery, _):
-    callback_data = CallbackQuery.data.strip()
-
+async def song_helper_cb(event, _):
+    callback_data = event.data.decode().strip()
     callback_request = callback_data.split(None, 1)[1]
-
     stype, vidid = callback_request.split("|")
-
-    try:
-        await CallbackQuery.answer(_["song_6"], show_alert=True)
-
-    except Exception:
-        pass
 
     if stype == "audio":
         try:
             formats_available, link = await Platform.youtube.formats(vidid, True)
-
         except Exception:
-            return await CallbackQuery.edit(_["song_7"])
+            return await event.edit(_["song_7"])
 
-        keyboard = InlineKeyboard()
-
+        buttons = []
         done = []
 
         for x in formats_available:
             check = x["format"]
-
             if "audio" in check:
                 if x["filesize"] is None:
                     continue
 
                 form = x["format_note"].title()
-
                 if form not in done:
                     done.append(form)
-
                 else:
                     continue
 
                 sz = convert_bytes(x["filesize"])
-
                 fom = x["format_id"]
 
-                keyboard.row(
-                    InlineKeyboardButton(
-                        text=f"{form} Quality Audio = {sz}",
-                        callback_data=f"song_download {stype}|{fom}|{vidid}",
-                    ),
+                buttons.append(
+                    [Button.inline(
+                        f"{form} Quality Audio = {sz}",
+                        data=f"song_download {stype}|{fom}|{vidid}"
+                    )]
                 )
 
-        keyboard.row(
-            InlineKeyboardButton(
-                text=_["BACK_BUTTON"],
-                callback_data=f"song_back {stype}|{vidid}",
-            ),
-            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data=f"close"),
-        )
+        buttons.append([
+            Button.inline(_["BACK_BUTTON"], data=f"song_back {stype}|{vidid}"),
+            Button.inline(_["CLOSE_BUTTON"], data="close")
+        ])
 
-        return await CallbackQuery.edit_message_reply_markup(buttons=keyboard)
-
+        await event.edit(buttons=buttons)
     else:
         try:
             formats_available, link = await Platform.youtube.formats(vidid, True)
-
         except Exception as e:
             print(e)
+            return await event.edit(_["song_7"])
 
-            return await CallbackQuery.edit(_["song_7"])
-
-        keyboard = InlineKeyboard()
-
-        # AVC Formats Only
-
+        buttons = []
         done = [160, 133, 134, 135, 136, 137, 298, 299, 264, 304, 266]
 
         for x in formats_available:
             check = x["format"]
-
             if x["filesize"] is None:
                 continue
-
             if int(x["format_id"]) not in done:
                 continue
 
             sz = convert_bytes(x["filesize"])
-
             ap = check.split("-")[1]
-
             to = f"{ap} = {sz}"
 
-            keyboard.row(
-                InlineKeyboardButton(
-                    text=to,
-                    callback_data=f"song_download {stype}|{x['format_id']}|{vidid}",
-                )
+            buttons.append(
+                [Button.inline(
+                    to,
+                    data=f"song_download {stype}|{x['format_id']}|{vidid}"
+                )]
             )
 
-        keyboard.row(
-            InlineKeyboardButton(
-                text=_["BACK_BUTTON"],
-                callback_data=f"song_back {stype}|{vidid}",
-            ),
-            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data=f"close"),
-        )
+        buttons.append([
+            Button.inline(_["BACK_BUTTON"], data=f"song_back {stype}|{vidid}"),
+            Button.inline(_["CLOSE_BUTTON"], data="close")
+        ])
 
-        return await CallbackQuery.edit_message_reply_markup(buttons=keyboard)
+        await event.edit(buttons=buttons)
 
-
-# Downloading Songs Here
-
-
-@app.on_callback_query(filters.regex(pattern=r"song_download") & ~BANNED_USERS)
+@tbot.on(events.CallbackQuery(pattern="song_download", func=~BANNED_USERS))
 @language
-async def song_download_cb(client, CallbackQuery, _):
-    try:
-        await CallbackQuery.answer("ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...")
-
-    except Exception:
-        pass
-
-    callback_data = CallbackQuery.data.strip()
-
+async def song_download_cb(event, _):
+    callback_data = event.data.decode().strip()
     callback_request = callback_data.split(None, 1)[1]
-
     stype, format_id, vidid = callback_request.split("|")
 
-    mystic = await CallbackQuery.edit(_["song_8"])
-
+    mystic = await event.edit(_["song_8"])
     yturl = f"https://www.youtube.com/watch?v={vidid}"
 
     with yt_dlp.YoutubeDL({"quiet": True, "cookiefile": f"{cookies()}"}) as ytdl:
         x = ytdl.extract_info(yturl, download=False)
 
     title = (x["title"]).title()
-
     title = re.sub(r"\W+", " ", title)
 
-    thumb_image_path = await CallbackQuery.message.download()
+    try:
+        thumb_image_path = await event.client.download_media(event.message.media)
+    except:
+        thumb_image_path = None
 
     duration = x["duration"]
 
     if stype == "video":
-        thumb_image_path = await CallbackQuery.message.download()
-
-        width = CallbackQuery.message.photo.width
-
-        height = CallbackQuery.message.photo.height
-
         try:
             file_path = await Platform.youtube.download(
                 yturl,
@@ -304,36 +235,33 @@ async def song_download_cb(client, CallbackQuery, _):
                 format_id=format_id,
                 title=title,
             )
-
         except Exception as e:
             return await mystic.edit(_["song_9"].format(e))
 
-        med = InputMediaVideo(
-            media=file_path,
-            duration=duration,
-            width=width,
-            height=height,
-            thumb=thumb_image_path,
-            caption=title,
-            supports_streaming=True,
-        )
-
-        await mystic.edit(_["song_11"])
-
-        await app.send_chat_action(
-            chat_id=CallbackQuery.event.chat_id,
-            action=enums.ChatAction.UPLOAD_VIDEO,
-        )
-
         try:
-            await CallbackQuery.edit_message_media(media=med)
-
+            await event.client.send_file(
+                event.chat_id,
+                file_path,
+                supports_streaming=True,
+                caption=title,
+                thumb=thumb_image_path,
+                attributes=[
+                    types.DocumentAttributeVideo(
+                        duration=duration,
+                        w=event.message.media.width,
+                        h=event.message.media.height
+                    )
+                ]
+            )
+            await mystic.delete()
         except Exception as e:
             print(e)
-
             return await mystic.edit(_["song_10"])
-
-        os.remove(file_path)
+        finally:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            if thumb_image_path and os.path.exists(thumb_image_path):
+                os.remove(thumb_image_path)
 
     elif stype == "audio":
         try:
@@ -344,32 +272,29 @@ async def song_download_cb(client, CallbackQuery, _):
                 format_id=format_id,
                 title=title,
             )
-
         except Exception as e:
             return await mystic.edit(_["song_9"].format(e))
 
-        med = InputMediaAudio(
-            media=filename,
-            caption=title,
-            thumb=thumb_image_path,
-            title=title,
-            performer=x["uploader"],
-        )
-
-        await mystic.edit(_["song_11"])
-
-        await app.send_chat_action(
-            chat_id=CallbackQuery.event.chat_id,
-            action=enums.ChatAction.UPLOAD_AUDIO,
-        )
-
         try:
-            await CallbackQuery.edit_message_media(media=med)
-
+            await event.client.send_file(
+                event.chat_id,
+                filename,
+                caption=title,
+                thumb=thumb_image_path,
+                attributes=[
+                    types.DocumentAttributeAudio(
+                        duration=duration,
+                        title=title,
+                        performer=x["uploader"]
+                    )
+                ]
+            )
+            await mystic.delete()
         except Exception as e:
             print(e)
-
             return await mystic.edit(_["song_10"])
-
-        os.remove(filename)
-"""
+        finally:
+            if os.path.exists(filename):
+                os.remove(filename)
+            if thumb_image_path and os.path.exists(thumb_image_path):
+                os.remove(thumb_image_path)
