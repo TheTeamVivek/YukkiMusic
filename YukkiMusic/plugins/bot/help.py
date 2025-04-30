@@ -137,7 +137,6 @@ async def help_button(event):
     elif pattern_match.startswith("helper"):
         _, helper_key, page_n, close = pattern_match.split(":")
         close = bool(int(close))
-        helper_key = helper_key.upper() + "_HELPER"
         text = string.get(helper_key, f"No help available for {helper_key}.")
 
         buttons = [
@@ -151,7 +150,7 @@ async def help_button(event):
 
         try:
             await event.edit(
-                f"**{helper_key}:**\n{text}", buttons=buttons, link_preview=False
+                text, buttons=buttons, link_preview=False
             )
         except Exception:
             traceback.print_exc()
