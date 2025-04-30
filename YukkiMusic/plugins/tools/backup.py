@@ -16,7 +16,6 @@ from datetime import datetime
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import OperationFailure
-from telethon import events
 from telethon.errors import FloodWaitError
 from telethon.tl.types import DocumentAttributeFilename
 
@@ -25,6 +24,7 @@ from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.core.mongo import DB_NAME
 from YukkiMusic.misc import BANNED_USERS
+
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -74,7 +74,7 @@ async def export_database(event):
         return await event.reply(
             "**Due to privacy issues, you can't Import/Export when using Yukki Database\n\nPlease set MONGO_DB_URI in config to use this feature**"
         )
-    
+
     mystic = await event.reply("Exporting your MongoDB database...")
     _mongo_async_ = AsyncIOMotorClient(MONGO_DB_URI)
     databases = await _mongo_async_.list_database_names()
@@ -86,7 +86,7 @@ async def export_database(event):
         db = _mongo_async_[db_name]
         mystic = await edit_or_reply(
             mystic,
-            f"Found data in {db_name} database. **Uploading** and **Deleting**..."
+            f"Found data in {db_name} database. **Uploading** and **Deleting**...",
         )
 
         file_path = await ex_port(db, db_name)
@@ -95,7 +95,7 @@ async def export_database(event):
                 event.chat_id,
                 file_path,
                 caption=f"MongoDB backup data for {db_name}",
-                attributes=[DocumentAttributeFilename(file_path)]
+                attributes=[DocumentAttributeFilename(file_path)],
             )
         except FloodWaitError as e:
             await asyncio.sleep(e.seconds)
@@ -104,7 +104,7 @@ async def export_database(event):
         except OperationFailure:
             mystic = await edit_or_reply(
                 mystic,
-                f"Database deletion not allowed. Couldn't delete {db_name} database"
+                f"Database deletion not allowed. Couldn't delete {db_name} database",
             )
         try:
             os.remove(file_path)
@@ -127,12 +127,13 @@ async def export_database(event):
             file_path,
             caption=f"Mongo Backup of {tbot.me.username}. Reply with /import to restore",
             progress_callback=progress,
-            attributes=[DocumentAttributeFilename(file_path)]
+            attributes=[DocumentAttributeFilename(file_path)],
         )
     except FloodWaitError as e:
         await asyncio.sleep(e.seconds)
 
     await mystic.delete()
+
 
 @tbot.on_message(flt.command("import", True) & ~BANNED_USERS)
 async def import_database(event):
@@ -164,14 +165,10 @@ async def import_database(event):
         with open(file_path) as backup_file:
             data = json.load(backup_file)
     except (json.JSONDecodeError, OSError):
-        return await edit_or_reply(
-            mystic, "Invalid backup file format"
-        )
+        return await edit_or_reply(mystic, "Invalid backup file format")
 
     if not isinstance(data, dict):
-        return await edit_or_reply(
-            mystic, "Invalid backup file structure"
-        )
+        return await edit_or_reply(mystic, "Invalid backup file structure")
 
     _mongo_async_ = AsyncIOMotorClient(MONGO_DB_URI)
     db = _mongo_async_[DB_NAME]
