@@ -25,17 +25,8 @@ Implement a env var or using db that help we can disable the Cleanmode and enabl
  
   On livestream every time returns audio url thats cause video playback not work add support for videp by returing or processing the audio and video url
   
-## 5. Add this yml files and amd thier translations
+## 5. To Work better with multiple lanaguge as command we can Merge all command lanaguge command in files
 
-```yml
-admin_21 : "❌ Failed to reload admincache make sure bot is an admin in your chat"
-admin_36: "⏭️ Music is skipped by {}!"
-admin_37: "🔁 Music replayed by {0} !"
-admin_38: "Bot is unable to seek because duration exceeds.\n\nCurrently played:** {0}** minutes out of **{1}** minutes."
-
-cplay_7: "Channel Play Disabled"
-play_20: "Not a live stream"
-```
 
 ## 6.
   If Possible so remove the /gstats,  it uses userdb and chattopdb that consumes too Database and still useless
