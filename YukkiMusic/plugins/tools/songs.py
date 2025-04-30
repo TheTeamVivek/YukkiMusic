@@ -24,7 +24,7 @@ from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.formatters import convert_bytes
 from YukkiMusic.utils.inline.song import song_markup
 
-@tbot.on(flt.command("SONG_COMMAND"), True) & flt.group & ~BANNED_USERS)
+@tbot.on_message(flt.command("SONG_COMMAND", True) & flt.group & ~BANNED_USERS)
 @language
 async def song_command_group(event, _):
     buttons = [
@@ -32,7 +32,7 @@ async def song_command_group(event, _):
     ]
     await event.reply(_["song_1"], buttons=buttons)
 
-@tbot.on(flt.command("SONG_COMMAND"), True) & flt.private & ~BANNED_USERS)
+@tbot.on_message(flt.command("SONG_COMMAND", True) & flt.private & ~BANNED_USERS)
 @language
 async def song_command_private(event, _):
     try:
