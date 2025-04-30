@@ -61,9 +61,6 @@ async def edit_or_reply(event, text):
 
 @tbot.on_message(flt.command("export", True) & ~BANNED_USERS)
 async def export_database(event):
-    if event.sender_id not in OWNER_ID:
-        return await event.reply("**You're not authorized to use this command.**")
-
     if not MONGO_DB_URI:
         return await event.reply(
             "**Due to privacy concerns, you can't import/export when using the default database.\n\nPlease configure your own MONGO_DB_URI.**"
@@ -130,9 +127,6 @@ async def export_database(event):
 
 @tbot.on_message(flt.command("import", True) & ~BANNED_USERS)
 async def import_database(event):
-    if event.sender_id not in OWNER_ID:
-        return await event.reply("**You're not authorized to use this command.**")
-
     if not MONGO_DB_URI:
         return await event.reply(
             "**Due to privacy concerns, you can't import/export when using the default database.\n\nPlease configure your own MONGO_DB_URI.**"
