@@ -57,6 +57,7 @@ async def init():
         # sys.exit()
     logger.info("YukkiMusic Started Successfully")
     await tbot.run_until_disconnected()
+    await tbot.disconnect()
     await userbot.stop()
     await Yukki.stop()
 
