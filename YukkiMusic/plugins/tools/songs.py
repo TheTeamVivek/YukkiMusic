@@ -14,11 +14,11 @@ import re
 import yt_dlp
 from telethon import Button, events
 
-from config import SONG_DOWNLOAD_DURATION, SONG_DOWNLOAD_DURATION_LIMIT
-from YukkiMusic import Platform, tbot
+from config import SONG_DOWNLOAD_DURATION, SONG_DOWNLOAD_DURATION_LIMIT, cookies
+from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.misc import BANNED_USERS
-from YukkiMusic.platforms.Youtube import cookies
+from YukkiMusic.platforms import youtube, telegram
 from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.formatters import convert_bytes
 from YukkiMusic.utils.inline.song import song_markup
@@ -39,10 +39,10 @@ async def song_command_private(event, _):
     except:
         pass
 
-    url = await Platform.telegram.get_url_from_message(event)
+    url = await telegram.get_url_from_message(event)
 
     if url:
-        if not await Platform.youtube.valid(url):
+        if not await youtube.valid(url):
             return await event.reply(_["song_5"])
 
         mystic = await event.reply(_["play_1"])
@@ -53,7 +53,7 @@ async def song_command_private(event, _):
             duration_sec,
             thumbnail,
             vidid,
-        ) = await Platform.youtube.track(url)
+        ) = await youtube.track(url)
 
         if str(duration_min) == "None":
             return await mystic.edit(_["song_3"])
@@ -89,7 +89,7 @@ async def song_command_private(event, _):
             duration_sec,
             thumbnail,
             vidid,
-        ) = await Platform.youtube.track(query)
+        ) = await youtube.track(query)
     except Exception:
         return await mystic.edit(_["play_3"])
 
@@ -131,7 +131,7 @@ async def song_helper_cb(event, _):
 
     if stype == "audio":
         try:
-            formats_available, link = await Platform.youtube.formats(vidid, True)
+            formats_available, link = await youtube.formats(vidid, True)
         except Exception:
             return await event.edit(_["song_7"])
 
@@ -172,7 +172,7 @@ async def song_helper_cb(event, _):
         await event.edit(buttons=buttons)
     else:
         try:
-            formats_available, link = await Platform.youtube.formats(vidid, True)
+            formats_available, link = await youtube.formats(vidid, True)
         except Exception as e:
             print(e)
             return await event.edit(_["song_7"])
@@ -234,7 +234,7 @@ async def song_download_cb(event, _):
 
     if stype == "video":
         try:
-            file_path = await Platform.youtube.download(
+            file_path = await youtube.download(
                 yturl,
                 mystic,
                 songvideo=True,
@@ -271,7 +271,7 @@ async def song_download_cb(event, _):
 
     elif stype == "audio":
         try:
-            filename = await Platform.youtube.download(
+            filename = await youtube.download(
                 yturl,
                 mystic,
                 songaudio=True,
