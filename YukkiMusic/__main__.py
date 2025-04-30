@@ -8,9 +8,7 @@
 # All rights reserved.
 import asyncio
 import logging
-import os
 import sqlite3
-import sys
 
 from pytgcalls.exceptions import NoActiveGroupCall
 
