@@ -87,11 +87,10 @@ async def settings_back_markup(event, _):
 
     if event.is_private:
         try:
-            await tbot.get_entity(OWNER_ID[0])
-            OWNER = OWNER_ID[0]
+            owner = await tbot.get_input_entity(OWNER_ID[0])
         except Exception:
-            OWNER = None
-        buttons = private_panel(_, OWNER)
+            owner = None
+        buttons = private_panel(_, owner)
         await event.edit(
             _["start_1"].format(tbot.mention),
             buttons=buttons,
