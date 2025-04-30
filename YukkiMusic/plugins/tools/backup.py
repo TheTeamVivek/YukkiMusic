@@ -16,7 +16,7 @@ from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import OperationFailure
 
-from config import MONGO_DB_URI, OWNER_ID
+from config import MONGO_DB_URI
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.core.mongo import DB_NAME
