@@ -8,20 +8,20 @@
 # All rights reserved.
 #
 
-import asyncio
 import json
 import os
 from datetime import datetime
-from telethon import events
 
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import OperationFailure
+
 from config import MONGO_DB_URI, OWNER_ID
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
-from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic.core.mongo import DB_NAME
+from YukkiMusic.misc import BANNED_USERS
+
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -30,6 +30,7 @@ class CustomJSONEncoder(json.JSONEncoder):
         if isinstance(o, datetime):
             return o.isoformat()
         return super().default(o)
+
 
 async def ex_port(db, db_name):
     data = {}
@@ -46,8 +47,10 @@ async def ex_port(db, db_name):
 
     return file_path
 
+
 async def drop_db(client, db_name):
     await client.drop_database(db_name)
+
 
 async def edit_or_reply(event, text):
     try:
@@ -55,11 +58,12 @@ async def edit_or_reply(event, text):
     except Exception:
         return await event.respond(text, link_preview=False)
 
+
 @tbot.on_message(flt.command("export", True) & ~BANNED_USERS)
 async def export_database(event):
     if event.sender_id not in OWNER_ID:
         return await event.reply("**You're not authorized to use this command.**")
-    
+
     if not MONGO_DB_URI:
         return await event.reply(
             "**Due to privacy concerns, you can't import/export when using the default database.\n\nPlease configure your own MONGO_DB_URI.**"
@@ -76,27 +80,24 @@ async def export_database(event):
         db = _mongo_async_[db_name]
         mystic = await edit_or_reply(
             mystic,
-            f"Found data in {db_name} database. **Uploading** and **deleting**..."
+            f"Found data in {db_name} database. **Uploading** and **deleting**...",
         )
 
         file_path = await ex_port(db, db_name)
         try:
             await tbot.send_file(
-                event.chat_id,
-                file_path,
-                caption=f"MongoDB backup for {db_name}"
+                event.chat_id, file_path, caption=f"MongoDB backup for {db_name}"
             )
         except Exception as e:
             await mystic.edit(f"Error sending file: {str(e)}")
-        
+
         try:
             await drop_db(_mongo_async_, db_name)
         except OperationFailure:
             mystic = await edit_or_reply(
-                mystic,
-                f"Database deletion not allowed for {db_name}"
+                mystic, f"Database deletion not allowed for {db_name}"
             )
-        
+
         try:
             os.remove(file_path)
         except Exception:
@@ -117,20 +118,21 @@ async def export_database(event):
             event.chat_id,
             file_path,
             caption=f"Mongo backup of {DB_NAME}. Reply with /import to restore",
-            progress_callback=progress
+            progress_callback=progress,
         )
     except Exception as e:
         await mystic.edit(f"Upload error: {str(e)}")
-    
+
     await mystic.delete()
     if os.path.exists(file_path):
         os.remove(file_path)
+
 
 @tbot.on_message(flt.command("import", True) & ~BANNED_USERS)
 async def import_database(event):
     if event.sender_id not in OWNER_ID:
         return await event.reply("**You're not authorized to use this command.**")
-    
+
     if not MONGO_DB_URI:
         return await event.reply(
             "**Due to privacy concerns, you can't import/export when using the default database.\n\nPlease configure your own MONGO_DB_URI.**"
@@ -154,9 +156,7 @@ async def import_database(event):
         with open(file_path) as backup_file:
             data = json.load(backup_file)
     except (json.JSONDecodeError, OSError):
-        return await edit_or_reply(
-            mystic, "**Invalid backup file format.**"
-        )
+        return await edit_or_reply(mystic, "**Invalid backup file format.**")
 
     if not isinstance(data, dict):
         return await edit_or_reply(mystic, "**Invalid data structure in backup file.**")
@@ -172,7 +172,7 @@ async def import_database(event):
             collection = db[collection_name]
 
             for document in documents:
-                if '_id' in document:
+                if "_id" in document:
                     await collection.replace_one(
                         {"_id": document["_id"]}, document, upsert=True
                     )
