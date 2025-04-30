@@ -41,6 +41,7 @@ def dirr():
 
     logging.info("Directories Updated.")
 
+
 def clean_session():
     targets = [".session", ".session-journal"]
     for f in os.listdir():
