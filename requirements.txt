@@ -6,7 +6,7 @@ dnspython
 ffmpeg-python
 gitpython
 heroku3
-httpx[http2]==0.27.2
+httpx[http2]==0.28.1
 kurigram==2.1.36
 lyricsgenius
 motor
