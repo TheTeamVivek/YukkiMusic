@@ -65,8 +65,8 @@ def private_panel(_, owner: bool | int = None):
     if _config.GITHUB_REPO and owner:
         buttons.append(
             [
-                _types.KeyboardButtonUserProfile(
-                    text=_["S_B_7"], user_id=f"tg://user?id={owner}"
+                _types.InputKeyboardButtonUserProfile(
+                    text=_["S_B_7"], user_id=owner
                 ),
                 _Button.url(text=_["S_B_6"], url=_config.GITHUB_REPO),
             ]
@@ -82,8 +82,8 @@ def private_panel(_, owner: bool | int = None):
         if owner:
             buttons.append(
                 [
-                    _types.KeyboardButtonUserProfile(
-                        text=_["S_B_7"], user_id=f"tg://user?id={owner}"
+                    _types.InputKeyboardButtonUserProfile(
+                        text=_["S_B_7"], user_id=owner
                     ),
                 ]
             )
