@@ -255,7 +255,9 @@ class TelethonClient(TelegramClient):
                         errors.MessageIdInvalidError,
                     ):
                         with suppress(Exception):
-                            await event.reply("I don't have rights to send message or media, so leaving...")
+                            await event.reply(
+                                "I don't have rights to send message or media, so leaving..."
+                            )
                             await self.leave_chat(event.chat_id)
                 except events.StopPropagation:
                     raise
