@@ -14,11 +14,15 @@ import re
 import yt_dlp
 from telethon import Button, events
 
-from config import SONG_DOWNLOAD_DURATION, SONG_DOWNLOAD_DURATION_LIMIT, cookies
+from config import (
+    SONG_DOWNLOAD_DURATION,
+    SONG_DOWNLOAD_DURATION_LIMIT,
+    cookies,
+)
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.misc import BANNED_USERS
-from YukkiMusic.platforms import youtube, telegram
+from YukkiMusic.platforms import telegram, youtube
 from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.formatters import convert_bytes
 from YukkiMusic.utils.inline.song import song_markup
