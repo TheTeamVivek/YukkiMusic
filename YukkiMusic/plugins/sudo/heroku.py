@@ -57,7 +57,7 @@ async def log_(event, _):
             return None
 
     try:
-        if await is_heroku():
+        if is_heroku():
             if HAPP:
                 log_data = HAPP.get_log()
                 link = await pastebin.paste(log_data)
@@ -81,7 +81,7 @@ async def varget_(event, _):
     if len(event.text.split()) != 2:
         return await event.reply(usage)
     check_var = event.text.split(None, 2)[1]
-    if await is_heroku():
+    if is_heroku():
         if HAPP is None:
             return await event.reply(_["heroku_1"])
         heroku_config = HAPP.config()
@@ -107,7 +107,7 @@ async def vardel_(event, _):
     if len(event.text.split()) != 2:
         return await event.reply(usage)
     check_var = event.text.split(None, 2)[1]
-    if await is_heroku():
+    if is_heroku():
         if HAPP is None:
             return await event.reply(_["heroku_1"])
         heroku_config = HAPP.config()
@@ -136,7 +136,7 @@ async def set_var(event, _):
         return await event.reply(usage)
     to_set = event.text.split(None, 2)[1].strip()
     value = event.text.split(None, 2)[2].strip()
-    if await is_heroku():
+    if is_heroku():
         if HAPP is None:
             return await event.reply(_["heroku_1"])
         heroku_config = HAPP.config()
@@ -161,7 +161,7 @@ async def set_var(event, _):
 @language
 async def usage_dynos(event, _):
     ### Credits CatUserbot
-    if await is_heroku():
+    if is_heroku():
         if HAPP is None:
             return await event.reply(_["heroku_1"])
     else:
@@ -219,7 +219,7 @@ Total Left: <code>{hours}</code><b>h</b> <code>{minutes}</code><b>m</b>
 @tbot.on_message(filters.command("UPDATE_COMMAND", True) & SUDOERS)
 @language
 async def update_(event, _):
-    if await is_heroku():
+    if is_heroku():
         if HAPP is None:
             return await event.reply(_["heroku_1"])
     response = await event.reply(_["heroku_13"])
@@ -291,7 +291,7 @@ async def update_(event, _):
     except Exception:
         pass
 
-    if await is_heroku():
+    if is_heroku():
         try:
             os.system(
                 f"git push https://heroku:{config.HEROKU_API_KEY}@git.heroku.com/{config.HEROKU_APP_NAME}.git HEAD:main"
