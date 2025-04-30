@@ -16,9 +16,9 @@ from YukkiMusic.core.git import git as _git
 from YukkiMusic.core.telethon import TelethonClient as _TelethonClient
 from YukkiMusic.core.userbot import Userbot as _Userbot
 
-from .logging import setup_logger
+from YukkiMusic.core.logger import setup_logger as _setup_logger
 
-setup_logger()
+_setup_logger()
 
 tbot = _TelethonClient()
 userbot = _Userbot()
