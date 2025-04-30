@@ -24,8 +24,8 @@ from ..database import (
     is_maintenance,
     is_nonadmin_chat,
 )
-from ..misc import parse_flags
 from ..formatters import int_to_alpha
+from ..misc import parse_flags
 
 __all__ = ["admin_rights_check", "admin_actual", "actual_admin_cb"]
 
