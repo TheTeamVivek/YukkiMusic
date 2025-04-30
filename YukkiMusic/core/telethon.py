@@ -234,10 +234,10 @@ class TelethonClient(TelegramClient):
                 f"<b>Traceback:</b>\n<pre class='python' > {error_trace}</pre>"
             )
 
-        await self.send_message(config.LOG_GROUP_ID, error_message)
+        await self.send_message(config.LOG_GROUP_ID, error_message, parse_mode="HTML")
 
         try:
-            await self.send_message(config.OWNER_ID[0], error_message)
+            await self.send_message(config.OWNER_ID[0], error_message, parse_mode="HTML")
         except Exception:
             pass
 
