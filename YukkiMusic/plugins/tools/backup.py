@@ -22,6 +22,9 @@ from YukkiMusic.core import filters as flt
 from YukkiMusic.core.mongo import DB_NAME
 from YukkiMusic.misc import BANNED_USERS
 
+# Ensure cache directory exists
+os.makedirs("cache", exist_ok=True)
+
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -132,8 +135,12 @@ async def import_database(event):
             "**Due to privacy concerns, you can't import/export when using the default database.\n\nPlease configure your own MONGO_DB_URI.**"
         )
 
-    if not event.is_reply or not await event.get_reply_message().media:
+    if not event.is_reply:
         return await event.reply("**Reply to a backup file to import.**")
+
+    reply_msg = await event.get_reply_message()
+    if not reply_msg.media:
+        return await event.reply("**The replied message doesn't contain a file.**")
 
     mystic = await event.reply("Downloading backup file...")
 
@@ -143,7 +150,6 @@ async def import_database(event):
         except Exception:
             pass
 
-    reply_msg = await event.get_reply_message()
     file_path = await reply_msg.download_media(progress_callback=progress)
 
     try:
