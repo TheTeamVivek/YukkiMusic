@@ -51,7 +51,7 @@ async def clean_mode(event):
     global IS_BROADCASTING
     if IS_BROADCASTING:
         return
-    
+
     message_id = event.max_id
     chat_id = int(f"-100{event.channel_id}")
 
