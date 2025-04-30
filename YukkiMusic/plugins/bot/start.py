@@ -192,11 +192,10 @@ async def start_comm(event, _):
                 )
     else:
         try:
-            await tbot.get_entity(OWNER_ID[0])
-            OWNER = OWNER_ID[0]
+            owner = await tbot.get_input_entity(OWNER_ID[0])
         except Exception:
-            OWNER = None
-        out = private_panel(_, OWNER)
+            owner = None
+        out = private_panel(_, owner)
         if config.START_IMG_URL:
             try:
                 await event.reply(
