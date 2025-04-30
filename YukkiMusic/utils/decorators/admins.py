@@ -9,7 +9,7 @@
 #
 
 from telethon import Button
-from telethon.tl.types import PeerUser
+from telethon.tl.types import PeerUser, User
 
 from config import adminlist
 from strings import get_string
@@ -45,7 +45,8 @@ def admin_rights_check(mystic):
             _ = get_string(language)
         except Exception:
             _ = get_string("en")
-        if not isinstance(event.message.from_id, PeerUser):
+        sender = await event.get_sender()
+        if not isinstance(sender, User):
             upl = [
                 [
                     Button.inline(
