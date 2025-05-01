@@ -45,17 +45,15 @@ async def aexec(code, event):
 @tbot.on_message(flt.command(["ev", "eval"]) & SUDOERS & ~flt.forwarded)
 async def executor(event):
     if len(event.text.split()) < 2:
-        return await event.reply("**Give me something to execute**")
+        return await event.reply("**Give me something to exceute**")
     try:
         cmd = event.text.split(" ", maxsplit=1)[1]
     except IndexError:
         return await event.delete()
-
     t1 = time()
     redirected_output = StringIO()
     redirected_error = StringIO()
     stdout, stderr, exc = None, None, None
-
     with (
         contextlib.redirect_stdout(redirected_output),
         contextlib.redirect_stderr(redirected_error),
@@ -64,24 +62,17 @@ async def executor(event):
             await aexec(cmd, event)
         except Exception:
             exc = traceback.format_exc()
-
     stdout = redirected_output.getvalue()
     stderr = redirected_error.getvalue()
-    template = "<b>{0}:</b>\n<pre class='python'>{1}</pre>"
-
-    if stdout or stderr or exc:
-        final_output = ""
-        if stdout:
-            final_output += template.format("OUTPUT", stdout)
-        if stderr:
-            final_output += template.format("ERROR", stderr)
-        if exc:
-            final_output += template.format("EXCEPTION", exc)
-    else:
-        final_output = "Success"
-
-    t2 = time()
-
+    template = "<b>{0}:</b>\n<pre language='python'>{1}</pre>"
+    final_output = "\n"
+    if stdout:
+        final_output += template.format("STDOUTPUT", stdout)
+    if stderr:
+        final_output += template.format("STDERR", stderr)
+    if exc:
+        final_output += template.format("EXCEPTION", exc)
+    final_output = final_output or "Success"
     if len(final_output) > 4096:
         filename = "output.txt"
         text = ""
@@ -94,7 +85,7 @@ async def executor(event):
 
         with open(filename, "w+", encoding="utf8") as out_file:
             out_file.write(text)
-
+        t2 = time()
         keyboard = [
             [
                 Button.inline(
@@ -112,6 +103,7 @@ async def executor(event):
         await event.delete()
         os.remove(filename)
     else:
+        t2 = time()
         keyboard = [
             [
                 Button.inline(
