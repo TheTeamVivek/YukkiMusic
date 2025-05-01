@@ -18,6 +18,7 @@ from YukkiMusic.utils.decorators import admin_rights_check
 
 MUTE_COMMAND = get_command("MUTE_COMMAND")
 
+
 @tbot.on_message(flt.command(MUTE_COMMAND) & flt.group & ~BANNED_USERS)
 @admin_rights_check
 async def mute_admin(event, _, chat_id):
