@@ -85,7 +85,7 @@ class Telegram:
         return False
 
     async def download(self, _, message, mystic, video=False):
-        fname = await self.__get_filepath(file, video=video)
+        fname = await self.__get_filepath(message.file, video=video)
         left_time = {}
         speed_counter = {}
         if os.path.exists(fname):
