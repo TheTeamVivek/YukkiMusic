@@ -33,14 +33,11 @@ async def aexec(code, event):
         "rmsg": await event.get_reply_message(),
     }
 
-    code = f"async def __aexec(event):\n"
+    func_code = "async def __aexec(event):\n"
     for line in code.splitlines():
-        code += f"    {line}\n"
+        func_code += f"    {line}\n"
 
-    exec(
-        code,
-        local_vars,
-    )
+    exec(func_code, local_vars)
     return await local_vars["__aexec"](event)
 
 
