@@ -70,27 +70,25 @@ def update_helpers(data: dict, lang_code: str = "en"):
             data[dict_key] = replace_placeholders(value, data, dict_key, lang_code)
     return data
 
+commands.update(load_yaml(os.path.join("strings", "commands.yaml")))
 
 if "en" not in languages:
-    languages["en"] = load_yaml(os.path.join("strings", "langs", "en.yml"))
-    languages_present["en"] = languages["en"]["name"]
-
-for filename in os.listdir(os.path.join("strings", "langs")):
-    if filename.endswith(".yml") and filename != "en.yml":
-        lang_name = filename[:-4]
-        lang_path = os.path.join("strings", "langs", filename)
-        languages[lang_name] = load_yaml(lang_path)
-        for key in languages["en"]:
-            if key not in languages[lang_name]:
-                languages[lang_name][key] = languages["en"][key]
-        try:
-            languages_present[lang_name] = languages[lang_name]["name"]
-        except KeyError:
-            print("There is an issue with the language file. Please report it.")
-            sys.exit()
-        languages[lang_name] = update_helpers(languages[lang_name], lang_name)
-
+    languages["en"] = load_yaml(os.path.join("strings", "langs", "en.yml"))
+    languages_present["en"] = languages["en"]["name"]
 
 languages["en"] = update_helpers(languages["en"], "en")
 
-commands.update(load_yaml(os.path.join("strings", "commands.yaml")))
+for filename in os.listdir(os.path.join("strings", "langs")):
+    if filename.endswith(".yml") and filename != "en.yml":
+        lang_name = filename[:-4]
+        lang_path = os.path.join("strings", "langs", filename)
+        languages[lang_name] = load_yaml(lang_path)
+        for key in languages["en"]:
+            if key not in languages[lang_name]:
+                languages[lang_name][key] = languages["en"][key]
+        try:
+            languages_present[lang_name] = languages[lang_name]["name"]
+        except KeyError:
+            print("There is an issue with the language file. Please report it.")
+            sys.exit()
+        languages[lang_name] = update_helpers(languages[lang_name], lang_name)
