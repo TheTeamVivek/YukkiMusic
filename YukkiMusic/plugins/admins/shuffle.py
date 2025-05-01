@@ -9,14 +9,15 @@
 #
 
 import random
-from strings import get_command
 
+from strings import get_command
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.misc import BANNED_USERS, db
 from YukkiMusic.utils.decorators import admin_rights_check
 
 SHUFFLE_COMMAND = get_command("SHUFFLE_COMMAND")
+
 
 @tbot.on_message(flt.command(SHUFFLE_COMMAND) & flt.group & ~BANNED_USERS)
 @admin_rights_check
