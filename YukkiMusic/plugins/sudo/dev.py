@@ -28,17 +28,17 @@ from YukkiMusic.misc import SUDOERS
 async def aexec(code, event):
     local_vars = {
         "__builtins__": __builtins__,  # DON'T REMOVE THIS
-        "app": tbot,
         "tbot": tbot,
-        # "rmsg": await event.get_reply_message(),
+        "client": tbot,
     }
-
-    func_code = "async def __aexec(event):\n"
-    for line in code.splitlines():
-        func_code += f"    {line}\n"
-
-    exec(func_code, local_vars)
+    exec(
+        "async def __aexec(event): "
+        + "".join(f"\n {a}" for a in code.split("\n")),
+        local_vars,
+    )
     return await local_vars["__aexec"](event)
+
+
 
 
 @tbot.on(
