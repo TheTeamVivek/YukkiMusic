@@ -8,7 +8,7 @@
 # All rights reserved.
 #
 
-
+from strings import get_command
 from config import adminlist
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
@@ -22,8 +22,11 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.decorators import admin_actual, language
 from YukkiMusic.utils.formatters import int_to_alpha
 
+AUTH_COMMAND = get_command("AUTH_COMMAND")
+UNAUTH_COMMAND = get_command("UNAUTH_COMMAND")
+AUTHUSERS_COMMAND = get_command("AUTHUSERS_COMMAND")
 
-@tbot.on_message(flt.command("AUTH_COMMAND", True) & flt.group & ~BANNED_USERS)
+@tbot.on_message(flt.command(AUTH_COMMAND) & flt.group & ~BANNED_USERS)
 @admin_actual
 async def auth(event, _):
     await event.get_sender()
@@ -85,7 +88,7 @@ async def auth(event, _):
         await event.reply(_["auth_3"])
 
 
-@tbot.on_message(flt.command("UNAUTH_COMMAND", True) & flt.group & ~BANNED_USERS)
+@tbot.on_message(flt.command(UNAUTH_COMMAND) & flt.group & ~BANNED_USERS)
 @admin_actual
 async def unauthusers(event, _):
     if not event.reply_to:
@@ -118,7 +121,7 @@ async def unauthusers(event, _):
         return await event.reply(_["auth_5"])
 
 
-@tbot.on_message(flt.command("AUTHUSERS_COMMAND", True) & flt.group & ~BANNED_USERS)
+@tbot.on_message(flt.command(AUTHUSERS_COMMAND) & flt.group & ~BANNED_USERS)
 @language
 async def authusers(event, _):
     _playlist = await get_authuser_names(event.chat_id)
