@@ -22,7 +22,7 @@ def get_command(command, lang=None):
     if not data:
         return []
     if lang:
-        return list(set(cmd.lower() for cmd in data.get(lang, [])))
+        return list({cmd.lower() for cmd in data.get(lang, [])})
     all_commands = set()
     for lang_commands in data.values():
         all_commands.update(cmd.lower() for cmd in lang_commands)
