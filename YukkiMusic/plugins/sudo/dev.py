@@ -8,11 +8,12 @@
 # All rights reserved.
 #
 
-import contextlib
-
 # This aeval and sh module is taken from < https://github.com/TheHamkerCat/WilliamButcherBot >
 # Credit goes to TheHamkerCat.
 #
+
+import contextlib
+
 import os
 import traceback
 from io import StringIO
