@@ -33,7 +33,7 @@ async def aexec(code, event):
         "rmsg": await event.get_reply_message(),
     }
 
-    code = f'async def __aexec(event):\n'
+    code = f"async def __aexec(event):\n"
     for line in code.splitlines():
         code += f"    {line}\n"
 
