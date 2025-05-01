@@ -21,6 +21,7 @@ from YukkiMusic.utils.stream.autoclear import auto_clean
 
 SKIP_COMMAND = get_command("SKIP_COMMAND")
 
+
 @tbot.on_message(flt.command(SKIP_COMMAND) & flt.group & ~BANNED_USERS)
 @admin_rights_check
 async def skip(event, _, chat_id):
