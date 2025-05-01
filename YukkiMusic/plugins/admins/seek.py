@@ -27,7 +27,7 @@ async def seek_comm(event, _, chat_id):
     text = event.text
     comm = text.lstrip("/").lower.split()
     is_seekback = any(
-        comm[0] == key for key in await get_value(chat_id, "SEEK_BACK_COMMAND")
+        comm[0] == key for key in SEEK_BACK_COMMAND
     )
     if len(comm) == 1:
         return await event.reply(_["admin_29"])
