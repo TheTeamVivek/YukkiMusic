@@ -20,7 +20,7 @@ SEEK_BACK_COMMAND = get_command("SEEK_BACK_COMMAND")
 
 
 @tbot.on_message(
-    flt.command([SEEK_COMMAND, SEEK_BACK_COMMAND]) & flt.group & ~BANNED_USERS
+    flt.command(SEEK_COMMAND + SEEK_BACK_COMMAND) & flt.group & ~BANNED_USERS
 )
 @admin_rights_check
 async def seek_comm(event, _, chat_id):
