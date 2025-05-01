@@ -13,7 +13,7 @@ import re as _re
 
 from telethon.tl import types as _types
 
-from strings import get_string as _get_string, get_command as _get_command
+from strings import get_command as _get_command
 
 __all__ = [
     "Filter",
