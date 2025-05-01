@@ -151,7 +151,7 @@ class Telegram:
             await mystic.edit(_["tg_1"].format(eta))
             return False
 
-        task = asyncio.create_task(down_load(), name=f"download_{event.chat_id}")
+        task = asyncio.create_task(down_load(), name=f"download_{message.chat_id}")
         lyrical[mystic.id] = task
         await task
         downloaded = downloader.get(message.id)
