@@ -22,6 +22,7 @@ from YukkiMusic.platforms import (
     resso,
     saavn,
     soundcloud,
+    spotify,
     telegram,
     youtube,
 )
