@@ -105,7 +105,7 @@ class TelethonClient(TelegramClient):
         self.id = me.id
         self.name = f"{me.first_name} {me.last_name or ''}".strip()
         self.username = me.username
-        self.mention = f"[{self.name}](tg://user?id={self.id})"
+        self.mention = await self.create_mention(me)
         try:
             await self.send_message(
                 entity=config.LOG_GROUP_ID,
@@ -150,9 +150,9 @@ class TelethonClient(TelegramClient):
             user = await self.get_entity(user)
         user_name = f"{user.first_name} {user.last_name or ''}".strip()
         user_id = user.id
-        if html:
-            return f'<a href="tg://user?id={user_id}">{user_name}</a>'
-        return f"[{user_name}](tg://user?id={user_id})"
+        #if html:
+        return f'<a href="tg://user?id={user_id}">{user_name}</a>'
+        #return f"[{user_name}](tg://user?id={user_id})"
 
     async def leave_chat(self, chat):
         await self.kick_participant(chat, "me")
