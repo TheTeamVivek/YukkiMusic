@@ -13,7 +13,7 @@ import re as _re
 
 from telethon.tl import types as _types
 
-from strings import get_string as _get_string
+from strings import get_string as _get_string, get_command as _get_command
 
 __all__ = [
     "Filter",
@@ -169,28 +169,17 @@ def command(commands, use_strings=False):
         if not message_text:
             return False
 
-        username = _re.escape(event.client.username.lower())
-        final_commands = commands
+        username = event.client.username.lower()
+        final_commands = []
 
         if use_strings:
-            from YukkiMusic.utils.database.memorydatabase import get_lang
-
-            lang_code = await get_lang(event.chat_id)
-            lang_strings = _get_string(lang_code)
-            fallback_strings = _get_string("en") if lang_code != "en" else {}
-
-            command_set = set()
             for cmd in commands:
-                command_set.update(_normalize_command(lang_strings.get(cmd)))
-                if fallback_strings:
-                    command_set.update(_normalize_command(fallback_strings.get(cmd)))
-
-            final_commands = list(command_set)
+                final_commands.extend(_get_command(cmd))
+        else:
+            final_commands = commands
 
         escaped = map(_re.escape, final_commands)
         pattern = rf"^(?:/)?({'|'.join(escaped)})(?:@{username})?(?:\s|$)"
-
-        x = bool(_re.match(pattern, message_text, flags=_re.IGNORECASE))
-        return x
+        return bool(_re.match(pattern, message_text, flags=_re.IGNORECASE))
 
     return filter_func
