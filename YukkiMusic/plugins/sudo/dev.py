@@ -32,8 +32,13 @@ async def aexec(code, event):
         "tbot": tbot,
         "rmsg": await event.get_reply_message(),
     }
+
+    code = f'async def __aexec(event):\n'
+    for line in code.splitlines():
+        code += f"    {line}\n"
+
     exec(
-        "async def __aexec(event): " + "".join(f"\n {a}" for a in code.split("\n")),
+        code,
         local_vars,
     )
     return await local_vars["__aexec"](event)
