@@ -13,6 +13,7 @@
 #
 
 import contextlib
+import builtins
 import os
 import traceback
 from io import StringIO
@@ -27,7 +28,7 @@ from YukkiMusic.misc import SUDOERS
 
 async def aexec(code, event):
     local_vars = {
-        "__builtins__": __builtins__,  # DON'T REMOVE THIS
+        "__builtins__": builtins,  # DON'T REMOVE THIS
         "tbot": tbot,
         "client": tbot,
     }
