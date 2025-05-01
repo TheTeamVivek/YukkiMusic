@@ -45,24 +45,30 @@ def format_value(value):
     return value
 
 
-def replace_placeholders(text: str, lang_data: dict) -> str:
-    if not isinstance(text, str):
-        return text
-    pattern = re.compile(r"\{(\w+)\}")
-    return pattern.sub(
-        lambda m: format_value(lang_data.get(m.group(1), m.group(0))), text
-    )
+def replace_placeholders(text: str, lang_data: dict, outer_key: str = "", lang_code: str = "en") -> str:
+    if not isinstance(text, str):
+        return text
+
+    pattern = re.compile(r"\{(\w+)\}")
+
+    def replacer(match):
+        key = match.group(1)
+        if key.endswith("_COMMAND"):
+            return format_value(get_command(key, lang_code))
+        return format_value(lang_data.get(key, match.group(0)))
+
+    return pattern.sub(replacer, text)
 
 
-def update_helpers(data: dict):
-    if not isinstance(data, dict):
-        return data
-    for dict_key, value in data.items():
-        if isinstance(value, dict):
-            data[dict_key] = update_helpers(value)
-        elif isinstance(value, str):
-            data[dict_key] = replace_placeholders(value, data)
-    return data
+def update_helpers(data: dict, lang_code: str = "en"):
+    if not isinstance(data, dict):
+        return data
+    for dict_key, value in data.items():
+        if isinstance(value, dict):
+            data[dict_key] = update_helpers(value, lang_code)
+        elif isinstance(value, str):
+            data[dict_key] = replace_placeholders(value, data, dict_key, lang_code)
+    return data
 
 
 if "en" not in languages:
@@ -82,7 +88,9 @@ for filename in os.listdir(os.path.join("strings", "langs")):
         except KeyError:
             print("There is an issue with the language file. Please report it.")
             sys.exit()
-        languages[lang_name] = update_helpers(languages[lang_name])
+        languages[lang_name] = update_helpers(languages[lang_name], lang_name)
 
-languages["en"] = update_helpers(languages["en"])
-commands = load_yaml(os.path.join("strings", "commands.yaml"))
+
+languages["en"] = update_helpers(languages["en"], "en")
+
+commands.update(load_yaml(os.path.join("strings", "commands.yaml")))
