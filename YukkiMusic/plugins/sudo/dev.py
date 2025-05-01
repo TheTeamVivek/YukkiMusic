@@ -32,13 +32,10 @@ async def aexec(code, event):
         "client": tbot,
     }
     exec(
-        "async def __aexec(event): "
-        + "".join(f"\n {a}" for a in code.split("\n")),
+        "async def __aexec(event): " + "".join(f"\n {a}" for a in code.split("\n")),
         local_vars,
     )
     return await local_vars["__aexec"](event)
-
-
 
 
 @tbot.on(
