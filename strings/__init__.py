@@ -18,7 +18,6 @@ languages_present = {}
 commands = {}
 
 
-
 def get_command(command, lang=None):
     data = commands.get(command)
     if not data:
@@ -28,8 +27,8 @@ def get_command(command, lang=None):
     all_commands = set()
     for lang_commands in data.values():
         all_commands.update(lang_commands)
-    return list(all_commands)    
-    
+    return list(all_commands)
+
 
 def load_yaml(file_path: str) -> dict:
     with open(file_path, encoding="utf8") as file:
