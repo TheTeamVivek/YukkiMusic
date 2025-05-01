@@ -11,12 +11,10 @@
 # This aeval and sh module is taken from < https://github.com/TheHamkerCat/WilliamButcherBot >
 # Credit goes to TheHamkerCat.
 #
-
-import builtins
 import contextlib
-import os
+import io
+import textwrap
 import traceback
-from io import StringIO
 from time import time
 
 from telethon import Button, events
@@ -26,17 +24,28 @@ from YukkiMusic.core import filters as flt
 from YukkiMusic.misc import SUDOERS
 
 
+def cleanup_code(code):
+    if code.startswith("```") and code.endswith("```"):
+        return "\n".join(code.strip("`").split("\n")[1:-1])
+    return code.strip("` \n")
+
+
 async def aexec(code, event):
     local_vars = {
-        "__builtins__": builtins,  # DON'T REMOVE THIS
+        "__builtins__": globals()["__builtins__"],
         "tbot": tbot,
         "client": tbot,
+        "app": tbot,
+        "event": event,
+        "rmsg": await event.get_reply_message(),
     }
+    to_compile = f"async def __aexec_func():\n{textwrap.indent(code, '  ')}"
     exec(
-        "async def __aexec(event): " + "".join(f"\n {a}" for a in code.split("\n")),
+        to_compile,
         local_vars,
     )
-    return await local_vars["__aexec"](event)
+    func = local_vars["__aexec_func"]
+    return await func()
 
 
 @tbot.on(
@@ -47,21 +56,32 @@ async def executor(event):
     if len(event.text.split()) < 2:
         return await event.reply("**Give me something to execute**")
     try:
-        cmd = event.text.split(None, 1)[1]
+        cmd = event.raw_text.split(None, 1)[1]
+        cmd = cleanup_code(cmd)
     except IndexError:
         return await event.delete()
 
     t1 = time()
-    redirected_output = StringIO()
-    redirected_error = StringIO()
-    stdout, stderr, exc = None, None, None
+    redirected_output = io.StringIO()
+    redirected_error = io.StringIO()
+    (
+        stdout,
+        stderr,
+        exc,
+        result,
+    ) = (
+        None,
+        None,
+        None,
+        None,
+    )
 
     with (
         contextlib.redirect_stdout(redirected_output),
         contextlib.redirect_stderr(redirected_error),
     ):
         try:
-            await aexec(cmd, event)
+            result = await aexec(cmd, event)
         except Exception:
             exc = traceback.format_exc()
 
@@ -69,49 +89,49 @@ async def executor(event):
     stderr = redirected_error.getvalue()
     template = "<b>{0}:</b>\n<pre class='python'>{1}</pre>"
 
-    if stdout or stderr or exc:
-        final_output = ""
-        if stdout:
-            final_output += template.format("STDOUTPUT", stdout)
-        if stderr:
-            final_output += template.format("STDERR", stderr)
-        if exc:
-            final_output += template.format("EXCEPTION", exc)
-    else:
-        final_output = "Success"
+    final_output = ""
+    if stdout:
+        final_output += template.format("Output", stdout)
+    if stderr:
+        final_output += template.format("Error", stderr)
+    if exc:
+        final_output += template.format("Exception", exc)
+    if result is not None:
+        final_output += template.format("Returns", str(result))
+
+    if not final_output:
+        final_output = template.format("Result", "Success")
 
     t2 = time()
 
-    if len(final_output) > 4096:
-        filename = "output.txt"
+    if len(final_output) > 3000:
         text = ""
         if stdout:
-            text += "STDOUTPUT\n" + stdout
+            text += "OUTPUT\n" + stdout
         if stderr:
-            text += "STDERR\n" + stderr
+            text += "ERROR\n" + stderr
         if exc:
             text += "EXCEPTION\n" + exc
-
-        with open(filename, "w+", encoding="utf8") as out_file:
-            out_file.write(text)
-
-        keyboard = [
-            [
-                Button.inline(
-                    text="⏳",
-                    data=f"runtime {t2 - t1} Seconds",
-                )
+        if result is not None:
+            text += "RETURNS\n" + result
+        with io.BytesIO(str(text).encode()) as f:
+            f.name = "output.txt"
+            keyboard = [
+                [
+                    Button.inline(
+                        text="⏳",
+                        data=f"runtime {t2 - t1} Seconds",
+                    )
+                ]
             ]
-        ]
 
-        await event.reply(
-            file=filename,
-            message=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
-            parse_mode="HTML",
-            buttons=keyboard,
-        )
+            await event.reply(
+                file=f,
+                message=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
+                parse_mode="HTML",
+                buttons=keyboard,
+            )
         await event.delete()
-        os.remove(filename)
     else:
         keyboard = [
             [
@@ -161,7 +181,7 @@ async def shellrunner(event):
     if len(event.text.split()) < 2:
         return await event.reply("**Give some commands like:**\n/sh git pull")
 
-    text = event.text.split(None, 1)[1]
+    text = event.raw_text.split(None, 1)[1]
     output = ""
 
     if "\n" in text:
@@ -183,15 +203,16 @@ async def shellrunner(event):
     if not output.strip():
         output = "<b>OUTPUT :</b>\n<code>None</code>"
 
-    if len(output) > 4096:
-        with open("output.txt", "w") as file:
-            file.write(output)
-        await event.reply(
-            file="output.txt",
-            message="<code>Output</code>",
-            parse_mode="HTML",
-        )
-        os.remove("output.txt")
+    if len(output) > 3000:
+        with io.BytesIO(str(output).encode()) as f:
+            f.name = "output.txt"
+
+            await event.reply(
+                file=f,
+                message="<code>Output</code>",
+                parse_mode="HTML",
+            )
+
     else:
         await event.reply(output, parse_mode="HTML")
 

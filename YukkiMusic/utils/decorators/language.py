@@ -36,15 +36,17 @@ def language(func=None, *, no_check=False):
             if no_check:
                 return await f(event, language)
 
+            is_message = getattr(event, "message", False)
+
             if not await is_maintenance():
                 if event.sender_id not in SUDOERS:
                     if isinstance(chat, User):
-                        if event.message:
+                        if is_message:
                             return await event.reply(language["maint_4"])
                         return await event.answer(language["maint_4"], alert=True)
                     return
 
-            if getattr(event, "message", False) and await is_commanddelete_on(chat.id):
+            if is_message and await is_commanddelete_on(chat.id):
                 try:
                     await event.delete()
                 except Exception:

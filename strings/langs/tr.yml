@@ -566,7 +566,7 @@ PLIST_HELPER: |
     <b>{PLAY_PLAYLIST_COMMAND}</b> - Kaydedilmiş oynatma listenizi **ses** olarak çalmaya başlayın
     <b>{PLAY_PLAYLIST_COMMAND}</b> - Oynatma listenizi **video** olarak çalmaya başlayın
 
-BList: |
+BLIST_HELPER: |
     <b>✧ {BLACKLISTCHAT_COMMAND}</b> [chat ID] - Herhangi bir sohbeti Müzik Botunu kullanmaktan engelleyin.
     <b>✧ {WHITELISTCHAT_COMMAND}</b> [chat ID] - Kara listeye alınan herhangi bir sohbetin Müzik Botunu kullanmasına izin verin.
     <b>✧ {BLACKLISTEDCHAT_COMMAND}</b> - Engellenen tüm sohbetleri kontrol edin.

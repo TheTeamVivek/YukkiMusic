@@ -580,7 +580,7 @@ PLIST_HELPER: |
     <b>{PLAY_PLAYLIST_COMMAND}</b> - अपनी सहेजी गई प्लेलिस्ट को **ऑडियो** में चलाना शुरू करें
     <b>{PLAY_PLAYLIST_COMMAND}</b> - अपनी प्लेलिस्ट को **वीडियो** में चलाना शुरू करें
 
-BList: |
+BLIST_HELPER: |
     <b>✧ {BLACKLISTCHAT_COMMAND}</b> [चैट ID] - किसी भी चैट को म्यूजिक बॉट का उपयोग करने से ब्लैकलिस्ट करें।
     <b>✧ {WHITELISTCHAT_COMMAND}</b> [चैट ID] - किसी भी ब्लैकलिस्टेड चैट को म्यूजिक बॉट का उपयोग करने की अनुमति दें।
     <b>✧ {BLACKLISTEDCHAT_COMMAND}</b> - सभी ब्लॉक किए गए चैट्स की जांच करें।

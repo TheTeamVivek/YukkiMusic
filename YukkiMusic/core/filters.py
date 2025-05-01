@@ -158,10 +158,16 @@ def _normalize_command(value):
     return set()
 
 
-def command(commands, use_strings=False):
-    "Check if the message starts with the provided command(s)"
+def command(commands, use_strings=False, prefixes=None):
+    "Check if the message starts with the provided command(s), supporting a list of prefixes"
+
     if isinstance(commands, str):
         commands = [commands]
+
+    if prefixes is None:
+        prefixes = ["/"]
+    elif isinstance(prefixes, str):
+        prefixes = [prefixes]
 
     @wrap
     async def filter_func(event):
@@ -179,7 +185,8 @@ def command(commands, use_strings=False):
             final_commands = commands
 
         escaped = map(_re.escape, final_commands)
-        pattern = rf"^(?:/)?({'|'.join(escaped)})(?:@{username})?(?:\s|$)"
+        prefix_pattern = f"[{''.join(map(_re.escape, prefixes))}]"
+        pattern = rf"^{prefix_pattern}({'|'.join(escaped)})(?:@{username})?(?:\s|$)"
         return bool(_re.match(pattern, message_text, flags=_re.IGNORECASE))
 
     return filter_func

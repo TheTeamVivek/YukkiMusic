@@ -30,7 +30,6 @@ from YukkiMusic.utils import (
     formats,
     get_message_link,
     is_video_allowed,
-    play_logs,
     seconds_to_min,
 )
 from YukkiMusic.utils.decorators.play import play_wrapper
@@ -62,6 +61,9 @@ async def play_commnd(
         file = rmsg.file
         audio_telegram = True if (rmsg.audio or rmsg.voice) else False
         video_telegram = True if rmsg.video else False
+        if not audio_telegram and not video_telegram and rmsg.document:
+            if rmsg.document.mime_type.startswith("video"):
+                video_telegram = True
 
     if audio_telegram:
         if file.size > config.TG_AUDIO_FILESIZE_LIMIT:
@@ -71,7 +73,11 @@ async def play_commnd(
             return await mystic.edit(
                 _["play_6"].format(config.DURATION_LIMIT_MIN, duration_min)
             )
-        if file_path := await telegram.download(_, rmsg, mystic):
+        file_path = await telegram.download(_, rmsg, mystic)
+        if not file_path:
+            return
+
+        if file_path:
             message_link = await get_message_link(rmsg)
             file_name = file.name or "Telagram audio file"
             details = Track(
@@ -83,6 +89,7 @@ async def play_commnd(
                 video=False,
                 file_path=file_path,
             )
+
     elif video_telegram:
         if not await is_video_allowed(event.chat_id):
             return await mystic.edit(_["play_3"])
@@ -93,7 +100,10 @@ async def play_commnd(
             return await mystic.edit(_["play_8"].format(f"{' | '.join(formats)}"))
         if file.size > config.TG_VIDEO_FILESIZE_LIMIT:
             return await mystic.edit(_["play_9"])
-        if await telegram.download(_, rmsg, mystic, True):
+        file_path = await telegram.download(_, rmsg, mystic, True)
+        if not file_path:
+            return
+        if file_path:
             message_link = await get_message_link(rmsg)
             file_name = file.name or "Telagram video file"
             details = Track(
@@ -160,7 +170,7 @@ async def play_commnd(
 
         elif await soundcloud.valid(url):
             try:
-                details = await soundcloud.details(url)
+                details = await soundcloud.track(url)
             except Exception:
                 traceback.print_exc()
                 return await mystic.edit(_["play_3"])
@@ -168,7 +178,7 @@ async def play_commnd(
         else:
             if not await telegram.is_streamable_url(url):
                 return await mystic.edit(_["play_19"])
-            details = track = Track(
+            details = Track(
                 title="M3U8 or index Urls",
                 link=url,
                 thumb=config.STREAM_IMG_URL,
@@ -206,7 +216,8 @@ async def play_commnd(
         else:
             buttons = livestream_markup(
                 _,
-                track_id,
+                details.vidid,
+                # track_id,
                 user_id,
                 "v" if video else "a",
                 "c" if channel else "g",
@@ -232,9 +243,9 @@ async def play_commnd(
             else:
                 traceback.print_exc()
                 err = _["general_3"].format(ex_type)
-            return await mystic.edit(err)
+            return await mystic.edit(str(err))
         await mystic.delete()
-        return await play_logs(message, streamtype=streamtype)
+        return  # await play_logs(message, streamtype=)
     """else:
         if plist_type:
             ran_hash = "".join(

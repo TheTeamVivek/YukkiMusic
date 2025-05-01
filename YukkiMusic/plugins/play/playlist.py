@@ -210,10 +210,10 @@ async def add_playlist(event, _):
         except Exception:
             return
     track = await youtube.track(videoid)
-    title = (title[:50]).title()
+    title = (track.title[:25]).title()
     plist = {
         "videoid": track.vidid,
-        "title": track.title[:30],
+        "title": title,
         "duration": track.duration,
     }
     await save_playlist(user_id, videoid, plist)

@@ -2,6 +2,10 @@ name: "Sphinx: Render docs"
 
 on:
   push:
+    paths:
+      - "**.yml"
+      - "docs/**"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -9,6 +13,7 @@ jobs:
     permissions:
       contents: write
       actions: write
+
 
     steps:
       - uses: actions/checkout@v4

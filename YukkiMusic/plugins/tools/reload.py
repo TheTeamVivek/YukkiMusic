@@ -9,7 +9,7 @@
 #
 
 
-from pyrogram.enums import ChatMembersFilter
+from telethon.tl.types import ChannelParticipantsAdmins
 
 from config import adminlist
 from YukkiMusic import tbot
@@ -25,12 +25,13 @@ from YukkiMusic.utils.formatters import alpha_to_int
 async def reload_admin_cache(event, _):
     try:
         chat_id = event.chat_id
-        admins = app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS)
         authusers = await get_authuser_names(chat_id)
         adminlist[chat_id] = []
-        async for user in admins:
-            if user.privileges.can_manage_video_chats:
-                adminlist[chat_id].append(user.user.id)
+        async for user in tbot.iter_participants(
+            chat_id, filter=ChannelParticipantsAdmins
+        ):
+            if user.participant.admin_rights.manage_call:
+                adminlist[chat_id].append(user.id)
         for user in authusers:
             user_id = await alpha_to_int(user)
             adminlist[chat_id].append(user_id)

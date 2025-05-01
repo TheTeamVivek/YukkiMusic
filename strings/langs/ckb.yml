@@ -611,7 +611,7 @@ PLIST_HELPER: |
     
     <b>{PLAY_PLAYLIST_COMMAND}</b> - پەخشکردنی لیستی گۆرانییەکانت **ڤیدیۆ**.
 
-BList: |
+BLIST_HELPER: |
     <b>✧ {BLACKLISTCHAT_COMMAND}</b> [ناسنامەی گرووپ] - بلۆککردنی گرووپ لە بەکارهێنانی بۆتی گۆرانی.
     <b>✧ {WHITELISTCHAT_COMMAND}</b> [ناسنامەی گرووپ] - لادانی بلۆکی گرووپ بۆ بەکارهێنانی بۆتی گۆرانی.
     <b>✧ {BLACKLISTEDCHAT_COMMAND}</b> - پشکنینی هەموو گرووپە بلۆککراوەکان.

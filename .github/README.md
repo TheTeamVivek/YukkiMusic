@@ -2,7 +2,7 @@
 
 > [!CAUTION]
 > Please use the **`master` branch** for stable performance. The **`dev` branch** is under active development and may contain a lot of bugs or errors.
-
+>
 > Currently, we are performing a full core rewrite.
 
 
@@ -24,30 +24,58 @@ Get started quickly by deploying to Heroku with just one click:
 
 ### 🖥️ VPS Deployment Guide
 
-  - Update and Install Dependencies: `sudo apt update && sudo apt upgrade -y && sudo apt install -y ffmpeg git python3-pip python3-venv tmux nano`
+- Update and Install Dependencies:  
+  ```bash
+  sudo apt update && sudo apt upgrade -y && sudo apt install -y ffmpeg git python3-pip tmux nano
+  ```
 
-  - Create the Virtual Environment: `python3 -m venv .venv`
+- Install uv:  
+  ```bash
+  pip install --upgrade uv
+  ```
 
-  - Activate Virtual Env: `source .venv/bin/activate`
 
-  - Clone the Repository: `git clone https://github.com/TheTeamVivek/YukkiMusic && cd YukkiMusic`
+- Clone the Repository:  
+  ```bash
+  git clone https://github.com/TheTeamVivek/YukkiMusic && cd YukkiMusic
+  ```
+  
 
-  - Install Python Requirements: `pip install -r requirements.txt`
+- Create the Virtual Environment:  
+  ```bash
+  uv venv
+  ```
 
-  - Copy and Edit Environment Variables:
+- Activate the Virtual Environment:  
+  ```bash
+  source .venv/bin/activate
+  ```
 
-    Copy the sample environment file: `cp sample.env .env`
+- Install Python Requirements:  
+  ```bash
+  uv pip install --upgrade setuptools wheel
+  uv pip install -r requirements.txt
+  ```
 
-    Edit the variables in the .env file: `nano .env`
-
+- Copy and Edit Environment Variables:  
+  ```bash
+  cp sample.env .env
+  nano .env
+  ```
   After editing, press `Ctrl+X`, then `Y`, and press **Enter** to save the changes.
 
+- Start a tmux Session to Keep the Bot Running:  
+  ```bash
+  tmux
+  ```
 
-  -  Run the Bot: `bash start`
+- Run the Bot:  
+  ```bash
+  bash start
+  ```
 
-  - Keep the Bot Running with tmux: `tmux`
-
-To exit the **tmux session** without stopping the bot, press `Ctrl+b`, then `d`.
+- Detach from the **tmux** Session (Bot keeps running):  
+  Press `Ctrl+b`, then `d`
 
 
 

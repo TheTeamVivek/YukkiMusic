@@ -7,7 +7,7 @@
 #
 # All rights reserved.
 #
-from ..core.enum import SourceType
+
 from .apple import Apple
 from .resso import Resso
 from .savan import Saavn
@@ -25,16 +25,9 @@ telegram = Telegram()
 youtube = YouTube()
 
 
-async def info(url: str) -> "Track":
-    services = [
-        (apple, SourceType.APPLE),
-        (saavn, SourceType.SAAVN),
-        (resso, SourceType.RESSO),
-        (soundcloud, SourceType.SOUNDCLOUD),
-        (spotify, SourceType.SPOTIFY),
-        (youtube, SourceType.YOUTUBE),
-    ]
+async def track(url: str) -> "Track":
+    services = [apple, saavn, resso, soundcloud, spotify, telegram, youtube]
 
-    for service, source_type in services:
-        if await service.valid(url):
-            return service.track(url)
+    for x in services:
+        if await x.valid(url):
+            return await x.track(url)

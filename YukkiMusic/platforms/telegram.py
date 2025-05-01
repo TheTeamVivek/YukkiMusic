@@ -17,6 +17,7 @@ import aiohttp
 from telethon.tl import types
 
 from config import lyrical
+from YukkiMusic.core.FastTelethon import download_file
 from YukkiMusic.utils.inline import downlod_markup
 
 from ..utils.formatters import convert_bytes, get_readable_time
@@ -26,7 +27,7 @@ downloader = {}
 
 class Telegram:
     def __init__(self):
-        self.sleep = 5
+        self.sleep = 2
 
     async def get_url_from_message(self, event) -> str | None:
         messages = [event.message]
@@ -89,7 +90,7 @@ class Telegram:
         left_time = {}
         speed_counter = {}
         if os.path.exists(fname):
-            return True
+            return fname
 
         async def down_load():
             async def progress(current, total):
@@ -112,7 +113,7 @@ class Telegram:
                     completed_size = convert_bytes(current)
                     speed = convert_bytes(speed)
                     text = _["tg_3"].format(
-                        tbot.mention,
+                        message.client.mention,
                         total_size,
                         completed_size,
                         percentage[:5],
@@ -131,15 +132,24 @@ class Telegram:
             left_time[message.id] = datetime.now()
 
             try:
-                await tbot.download_media(
+                with open(fname, "wb") as out:
+                    await download_file(
+                        message.client,
+                        message.document,
+                        out,
+                        progress_callback=progress,
+                    )
+
+                """await message.client.download_media(
                     message,
                     file=fname,
                     progress_callback=progress,
-                )
+                )"""
                 await mystic.edit(_["tg_4"])
                 downloader.pop(message.id, None)
-            except Exception:
+            except Exception as e:
                 await mystic.edit(_["tg_2"])
+                await message.client.handle_error(e)
 
         if len(downloader) > 10:
             timers = list(downloader.values())
@@ -162,4 +172,4 @@ class Telegram:
         if not verify:
             return False
         lyrical.pop(mystic.id)
-        return True
+        return fname

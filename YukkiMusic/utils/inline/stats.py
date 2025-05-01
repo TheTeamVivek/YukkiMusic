@@ -69,7 +69,7 @@ def get_stats_markup(_, status):
             )
         ],
         [
-            _btn.inline(
+            _btn.url(
                 text=_["SA_B_6"],
                 url=f"https://t.me/{_tbot.username}?start=stats",
             ),

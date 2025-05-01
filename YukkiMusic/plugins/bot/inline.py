@@ -9,14 +9,13 @@
 #
 from uuid import uuid4
 
-from telethon import events
+from telethon import Button, events
+from telethon.extensions import markdown
 from telethon.tl.types import (
     DocumentAttributeImageSize,
     InputBotInlineMessageMediaAuto,
     InputBotInlineResult,
     InputWebDocument,
-    KeyboardButtonUrl,
-    ReplyInlineMarkup,
 )
 from youtubesearchpython.__future__ import VideosSearch
 
@@ -32,7 +31,8 @@ async def inline_query_handler(event):
     if text.strip() == "":
         try:
             await event.answer(results=answer(), cache_time=10)
-        except Exception:
+        except Exception as e:
+            await tbot.handle_error(e)
             return
     else:
         a = VideosSearch(text, limit=20)
@@ -47,16 +47,6 @@ async def inline_query_handler(event):
             link = result[x]["link"]
             published = result[x]["publishedTime"]
             description = f"{views} | {duration} Mins | {channel}  | {published}"
-            buttons = ReplyInlineMarkup(
-                [
-                    [
-                        KeyboardButtonUrl(
-                            text="🎥 ᴡᴀᴛᴄʜ ᴏɴ ʏᴏᴜᴛᴜʙᴇ",
-                            url=link,
-                        )
-                    ],
-                ]
-            )
             searched_text = f"""
 ❇️**ᴛɪᴛʟᴇ:** [{title}]({link})
 
@@ -68,14 +58,15 @@ async def inline_query_handler(event):
 
 __ʀᴇᴘʟʏ ᴡɪᴛʜ /play ᴏɴ ᴛʜɪs sᴇᴀʀᴄʜᴇᴅ ᴍᴇssᴀɢᴇ ᴛᴏ sᴛʀᴇᴀᴍ ɪᴛ ᴏɴ ᴠᴏɪᴄᴇᴄʜᴀᴛ.__
 
-⚡️ ** ɪɴʟɪɴᴇ sᴇᴀʀᴄʜ ʙʏ {tbot.mention} **"""
+⚡️ ** ɪɴʟɪɴᴇ sᴇᴀʀᴄʜ ʙʏ [{tbot.name}](tg://user?id={tbot.id}) **"""
             photo = InputWebDocument(
                 url=thumbnail,
                 size=0,
                 mime_type="image/jpeg",
                 attributes=[DocumentAttributeImageSize(w=0, h=0)],
             )
-            msg, entities = tbot._parse_message_text(searched_text, ())
+            msg, entities = markdown.parse(searched_text)
+
             answers.append(
                 InputBotInlineResult(
                     id=str(uuid4()),
@@ -85,7 +76,14 @@ __ʀᴇᴘʟʏ ᴡɪᴛʜ /play ᴏɴ ᴛʜɪs sᴇᴀʀᴄʜᴇᴅ ᴍᴇssᴀ�
                     thumb=photo,
                     description=description,
                     send_message=InputBotInlineMessageMediaAuto(
-                        message=msg, entities=entities, buttons=buttons
+                        message=msg,
+                        entities=entities,
+                        reply_markup=tbot.build_reply_markup(
+                            Button.url(
+                                text="🎥 ᴡᴀᴛᴄʜ ᴏɴ ʏᴏᴜᴛᴜʙᴇ",
+                                url=link,
+                            )
+                        ),
                     ),
                 )
             )

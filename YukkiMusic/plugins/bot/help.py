@@ -35,7 +35,7 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
             helper_key.replace("_HELPER", "").title(),
             data=f"help_helper:{helper_key}:{page_n}:{int(close)}",
         )
-        for helper_key in string.keys()
+        for helper_key in sorted(string.keys())
         if helper_key.endswith("_HELPER")
     ]
 

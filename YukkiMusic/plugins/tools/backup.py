@@ -8,7 +8,6 @@
 # All rights reserved.
 #
 
-import asyncio
 import json
 import os
 from datetime import datetime
@@ -16,12 +15,12 @@ from datetime import datetime
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import OperationFailure
-from telethon.errors import FloodWaitError
-from telethon.tl.types import DocumentAttributeFilename
+from telethon import types, utils
 
 from config import MONGO_DB_URI, OWNER_ID
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
+from YukkiMusic.core.FastTelethon import download_file, upload_file
 from YukkiMusic.core.mongo import DB_NAME
 from YukkiMusic.misc import BANNED_USERS
 
@@ -44,7 +43,7 @@ async def ex_port(db, db_name):
         documents = await collection.find().to_list(length=None)
         data[collection_name] = documents
 
-    file_path = os.path.join("cache", f"{db_name}_backup.txt")
+    file_path = os.path.join("cache", f"{db_name}_backup.json")
     with open(file_path, "w") as backup_file:
         json.dump(data, backup_file, indent=4, cls=CustomJSONEncoder)
 
@@ -52,18 +51,18 @@ async def ex_port(db, db_name):
 
 
 async def drop_db(client, db_name):
-    await client.drop_database(db_name)
+    db = client[db_name]
+    collections = await db.list_collection_names()
+    for name in collections:
+        await db[name].drop()
 
 
 async def edit_or_reply(event, text):
     try:
         return await event.edit(text, link_preview=False)
-    except FloodWaitError as e:
-        await asyncio.sleep(e.seconds)
-        return await event.edit(text, link_preview=False)
     except Exception:
-        pass
-    return await event.reply(text, link_preview=False)
+        await event.delete()
+        return await event.reply(text, link_preview=False)
 
 
 @tbot.on_message(flt.command("export") & ~BANNED_USERS)
@@ -90,15 +89,19 @@ async def export_database(event):
         )
 
         file_path = await ex_port(db, db_name)
-        try:
-            await tbot.send_file(
-                event.chat_id,
+        with open(file_path, "rb") as out:
+            res = await upload_file(tbot, out)
+            attributes, mime_type = utils.get_attributes(
                 file_path,
-                caption=f"MongoDB backup data for {db_name}",
-                attributes=[DocumentAttributeFilename(file_path)],
             )
-        except FloodWaitError as e:
-            await asyncio.sleep(e.seconds)
+            media = types.InputMediaUploadedDocument(
+                file=res, mime_type=mime_type, attributes=attributes, force_file=False
+            )
+            await event.reply(
+                file=media,
+                message=f"MongoDB backup data for {db_name}",
+            )
+
         try:
             await drop_db(_mongo_async_, db_name)
         except OperationFailure:
@@ -117,20 +120,22 @@ async def export_database(event):
     async def progress(current, total):
         try:
             await mystic.edit(f"Uploading... {current * 100 / total:.1f}%")
-        except FloodWaitError as e:
-            await asyncio.sleep(e.seconds)
+        except Exception:
+            pass
 
     file_path = await ex_port(db, DB_NAME)
-    try:
-        await tbot.send_file(
-            event.chat_id,
+    with open(file_path, "rb") as out:
+        res = await upload_file(tbot, out, progress_callback=progress)
+        attributes, mime_type = utils.get_attributes(
             file_path,
-            caption=f"Mongo Backup of {tbot.me.username}. Reply with /import to restore",
-            progress_callback=progress,
-            attributes=[DocumentAttributeFilename(file_path)],
         )
-    except FloodWaitError as e:
-        await asyncio.sleep(e.seconds)
+        media = types.InputMediaUploadedDocument(
+            file=res, mime_type=mime_type, attributes=attributes, force_file=False
+        )
+        await event.reply(
+            file=media,
+            message=f"Mongo Backup of {tbot.me.username}. Reply with /import to restore",
+        )
 
     await mystic.delete()
 
@@ -156,10 +161,17 @@ async def import_database(event):
     async def progress(current, total):
         try:
             await mystic.edit(f"Downloading... {current * 100 / total:.1f}%")
-        except FloodWaitError as e:
-            await asyncio.sleep(e.seconds)
+        except Exception:
+            pass
 
-    file_path = await reply.download_media(progress_callback=progress)
+    file_path = os.path.join("cache", reply.file.name + ".tmp")
+    with open(file_path, "wb") as out:
+        await download_file(
+            tbot,
+            reply.document,
+            out,
+            progress_callback=progress,
+        )
 
     try:
         with open(file_path) as backup_file:

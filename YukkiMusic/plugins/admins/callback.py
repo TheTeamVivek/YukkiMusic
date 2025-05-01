@@ -73,7 +73,7 @@ async def main_markup_(event, _):
     callback_data = event.data.decode("utf-8").strip()
     callback_request = callback_data.split(None, 1)[1]
     videoid, chat_id = callback_request.split("|")
-    if videoid == str(None):
+    if videoid == "None":
         buttons = telegram_markup(_, chat_id)
     else:
         buttons = stream_markup(_, videoid, chat_id)
@@ -137,20 +137,23 @@ async def admin_callback(event, _):
             else:
                 if sender.id not in admins:
                     return await event.answer(_["admin_19"], alert=True)
-    if command == "pause":
-        if not await is_music_playing(chat_id):
-            return await event.answer(_["admin_1"], alert=True)
+    if command in ["resume", "pause"]:
         await event.answer()
+        videoid = db[chat_id][0]["track"].vidid
+        button = panel_markup_1(_, videoid, chat_id)
+
+        if not await is_music_playing(chat_id):
+            await music_on(chat_id)
+            await Yukki.resume_stream(chat_id)
+            await event.reply(_["admin_4"].format(mention), link_preview=False)
+            await event.edit(buttons=button)
+            return
+
         await music_off(chat_id)
         await Yukki.pause_stream(chat_id)
         await event.reply(_["admin_2"].format(mention), link_preview=False)
-    elif command == "resume":
-        if await is_music_playing(chat_id):
-            return await event.answer(_["admin_3"], alert=True)
-        await event.answer()
-        await music_on(chat_id)
-        await Yukki.resume_stream(chat_id)
-        await event.reply(_["admin_4"].format(mention), link_preview=False)
+        await event.edit(buttons=button)
+
     elif command == "stop" or command == "end":
         try:
             check = db.get(chat_id)

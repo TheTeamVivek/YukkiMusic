@@ -593,7 +593,7 @@ PLIST_HELPER: |
     
     <b>{PLAY_PLAYLIST_COMMAND}</b> - Start playing your playlist in **video**
 
-BList: |
+BLIST_HELPER: |
     <b>✧ {BLACKLISTCHAT_COMMAND}</b> [chat ID] - Blacklist any chat from using the Music Bot.
     <b>✧ {WHITELISTCHAT_COMMAND}</b> [chat ID] - Whitelist any blacklisted chat from using the Music Bot.
     <b>✧ {BLACKLISTEDCHAT_COMMAND}</b> - Check all blocked chats.

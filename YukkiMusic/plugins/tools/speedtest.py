@@ -52,5 +52,5 @@ async def speedtest_function(event):
 **Sponsor:** {result["server"]["sponsor"]}
 **Latency:** {result["server"]["latency"]}  
 **Ping :** {result["ping"]}"""
-        await event.respond(file=result["share"], message=output)
+        await event.respond(file=result["share"], message=output, parse_mode="md")
         await m.delete()

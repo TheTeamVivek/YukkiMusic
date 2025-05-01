@@ -506,7 +506,7 @@ PLIST_HELPER: |
     <b>{PLAY_PLAYLIST_COMMAND}</b> - আপোনাৰ সংৰক্ষিত প্লেলিষ্ট অডিঅ’ ৰূপে বজাব আৰম্ভ কৰক
     <b>{PLAY_PLAYLIST_COMMAND}</b> - আপোনাৰ প্লেলিষ্ট ভিডিঅ’ ৰূপে বজাব আৰম্ভ কৰক
 
-BList: |
+BLIST_HELPER: |
     <b>✧ {BLACKLISTCHAT_COMMAND}</b> [চেট ID] - সংগীত বট ব্যৱহাৰৰ পৰা কোনো চেটক ক’লা তালিকাভুক্ত কৰক।
     <b>✧ {WHITELISTCHAT_COMMAND}</b> [চেট ID] - ক’লা তালিকাভুক্ত চেটক সংগীত বট ব্যৱহাৰৰ অনুমতি কৰক।
     <b>✧ {BLACKLISTEDCHAT_COMMAND}</b> - আটাইতকৈ বাধা প্ৰাপ্ত চেটসমূহ পৰীক্ষা কৰক।

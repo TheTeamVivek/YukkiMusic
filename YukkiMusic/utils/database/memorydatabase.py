@@ -156,6 +156,10 @@ async def is_music_playing(chat_id: int) -> bool:
     return _pause.get(chat_id, False)
 
 
+def is_music_playing_sync(chat_id: int) -> bool:
+    return _pause.get(chat_id, False)
+
+
 async def music_on(chat_id: int):
     _pause[chat_id] = True
 

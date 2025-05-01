@@ -565,7 +565,7 @@ PLIST_HELPER: |
     <b>{PLAY_PLAYLIST_COMMAND}</b> - بدء تشغيل قائمة التشغيل المحفوظة الخاصة بك بالصوت
     <b>{PLAY_PLAYLIST_COMMAND}</b> - بدء تشغيل قائمة التشغيل الخاصة بك بالفيديو
 
-BList: |
+BLIST_HELPER: |
     <b>✧ {BLACKLISTCHAT_COMMAND}</b> [chat ID] - منع أي دردشة من استخدام بوت الموسيقى.
     <b>✧ {WHITELISTCHAT_COMMAND}</b> [chat ID] - السماح لأي دردشة محظورة باستخدام بوت الموسيقى.
     <b>✧ {BLACKLISTEDCHAT_COMMAND}</b> - التحقق من جميع الدردشات المحظورة.
