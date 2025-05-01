@@ -66,7 +66,7 @@ async def edit_or_reply(event, text):
     return await event.reply(text, link_preview=False)
 
 
-@tbot.on_message(flt.command("export", True) & ~BANNED_USERS)
+@tbot.on_message(flt.command("export") & ~BANNED_USERS)
 async def export_database(event):
     if event.sender_id not in OWNER_ID:
         return
@@ -135,7 +135,7 @@ async def export_database(event):
     await mystic.delete()
 
 
-@tbot.on_message(flt.command("import", True) & ~BANNED_USERS)
+@tbot.on_message(flt.command("import") & ~BANNED_USERS)
 async def import_database(event):
     if event.sender_id not in OWNER_ID:
         return
