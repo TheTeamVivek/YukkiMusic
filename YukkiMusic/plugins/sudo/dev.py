@@ -30,7 +30,7 @@ async def aexec(code, event):
         "__builtins__": __builtins__,  # DON'T REMOVE THIS
         "app": tbot,
         "tbot": tbot,
-        "rmsg": await event.get_reply_message(),
+        #"rmsg": await event.get_reply_message(),
     }
 
     func_code = "async def __aexec(event):\n"
