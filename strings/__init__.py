@@ -6,11 +6,9 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved
-
 import os
 import re
 import sys
-
 import yaml
 
 languages = {}
@@ -46,49 +44,50 @@ def format_value(value):
 
 
 def replace_placeholders(text: str, lang_data: dict, outer_key: str = "", lang_code: str = "en") -> str:
-    if not isinstance(text, str):
-        return text
+    if not isinstance(text, str):
+        return text
 
-    pattern = re.compile(r"\{(\w+)\}")
+    pattern = re.compile(r"\{(\w+)\}")
 
-    def replacer(match):
-        key = match.group(1)
-        if key.endswith("_COMMAND"):
-            return format_value(get_command(key, lang_code))
-        return format_value(lang_data.get(key, match.group(0)))
+    def replacer(match):
+        key = match.group(1)
+        if key.endswith("_COMMAND"):
+            return format_value(get_command(key, lang_code))
+        return format_value(lang_data.get(key, match.group(0)))
 
-    return pattern.sub(replacer, text)
+    return pattern.sub(replacer, text)
 
 
 def update_helpers(data: dict, lang_code: str = "en"):
-    if not isinstance(data, dict):
-        return data
-    for dict_key, value in data.items():
-        if isinstance(value, dict):
-            data[dict_key] = update_helpers(value, lang_code)
-        elif isinstance(value, str):
-            data[dict_key] = replace_placeholders(value, data, dict_key, lang_code)
-    return data
+    if not isinstance(data, dict):
+        return data
+    for dict_key, value in data.items():
+        if isinstance(value, dict):
+            data[dict_key] = update_helpers(value, lang_code)
+        elif isinstance(value, str):
+            data[dict_key] = replace_placeholders(value, data, dict_key, lang_code)
+    return data
+
 
 commands.update(load_yaml(os.path.join("strings", "commands.yaml")))
 
 if "en" not in languages:
-    languages["en"] = load_yaml(os.path.join("strings", "langs", "en.yml"))
-    languages_present["en"] = languages["en"]["name"]
+    languages["en"] = load_yaml(os.path.join("strings", "langs", "en.yml"))
+    languages_present["en"] = languages["en"]["name"]
 
 languages["en"] = update_helpers(languages["en"], "en")
 
 for filename in os.listdir(os.path.join("strings", "langs")):
-    if filename.endswith(".yml") and filename != "en.yml":
-        lang_name = filename[:-4]
-        lang_path = os.path.join("strings", "langs", filename)
-        languages[lang_name] = load_yaml(lang_path)
-        for key in languages["en"]:
-            if key not in languages[lang_name]:
-                languages[lang_name][key] = languages["en"][key]
-        try:
-            languages_present[lang_name] = languages[lang_name]["name"]
-        except KeyError:
-            print("There is an issue with the language file. Please report it.")
-            sys.exit()
-        languages[lang_name] = update_helpers(languages[lang_name], lang_name)
+    if filename.endswith(".yml") and filename != "en.yml":
+        lang_name = filename[:-4]
+        lang_path = os.path.join("strings", "langs", filename)
+        languages[lang_name] = load_yaml(lang_path)
+        for key in languages["en"]:
+            if key not in languages[lang_name]:
+                languages[lang_name][key] = languages["en"][key]
+        try:
+            languages_present[lang_name] = languages[lang_name]["name"]
+        except KeyError:
+            print("There is an issue with the language file. Please report it.")
+            sys.exit()
+        languages[lang_name] = update_helpers(languages[lang_name], lang_name)
