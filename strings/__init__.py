@@ -9,6 +9,7 @@
 import os
 import re
 import sys
+
 import yaml
 
 languages = {}
@@ -43,7 +44,9 @@ def format_value(value):
     return value
 
 
-def replace_placeholders(text: str, lang_data: dict, outer_key: str = "", lang_code: str = "en") -> str:
+def replace_placeholders(
+    text: str, lang_data: dict, outer_key: str = "", lang_code: str = "en"
+) -> str:
     if not isinstance(text, str):
         return text
 

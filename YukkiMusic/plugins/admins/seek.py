@@ -18,6 +18,7 @@ from YukkiMusic.utils import admin_rights_check, seconds_to_min
 SEEK_COMMAND = get_command("SEEK_COMMAND")
 SEEK_BACK_COMMAND = get_command("SEEK_BACK_COMMAND")
 
+
 @tbot.on_message(
     flt.command([SEEK_COMMAND, SEEK_BACK_COMMAND]) & flt.group & ~BANNED_USERS
 )
