@@ -7,15 +7,19 @@
 #
 # All rights reserved.
 #
+
+from strings import get_command
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import BANNED_USERS, db
 from YukkiMusic.utils import admin_rights_check, seconds_to_min
 
+SEEK_COMMAND = get_command("SEEK_COMMAND")
+SEEK_BACK_COMMAND = get_command("SEEK_BACK_COMMAND")
 
 @tbot.on_message(
-    flt.command(["SEEK_COMMAND", "SEEK_BACK_COMMAND"], True) & flt.group & ~BANNED_USERS
+    flt.command(SEEK_COMMAND + SEEK_BACK_COMMAND) & flt.group & ~BANNED_USERS
 )
 @admin_rights_check
 async def seek_comm(event, _, chat_id):
