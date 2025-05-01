@@ -8,11 +8,11 @@
 # All rights reserved.
 #
 
-import contextlib
-
 # This aeval and sh module is taken from < https://github.com/TheHamkerCat/WilliamButcherBot >
 # Credit goes to TheHamkerCat.
 #
+
+import contextlib
 import os
 import traceback
 from io import StringIO
@@ -28,9 +28,8 @@ from YukkiMusic.misc import SUDOERS
 async def aexec(code, event):
     local_vars = {
         "__builtins__": __builtins__,  # DON'T REMOVE THIS
-        "app": tbot,
         "tbot": tbot,
-        "rmsg": await event.get_reply_message(),
+        "client": tbot,
     }
     exec(
         "async def __aexec(event): " + "".join(f"\n {a}" for a in code.split("\n")),
@@ -38,22 +37,23 @@ async def aexec(code, event):
     )
     return await local_vars["__aexec"](event)
 
-
 @tbot.on(
     events.MessageEdited(func=flt.command(["ev", "eval"]) & SUDOERS & ~flt.forwarded)
 )
 @tbot.on_message(flt.command(["ev", "eval"]) & SUDOERS & ~flt.forwarded)
 async def executor(event):
     if len(event.text.split()) < 2:
-        return await event.reply("**Give me something to exceute**")
+        return await event.reply("**Give me something to execute**")
     try:
-        cmd = event.text.split(" ", maxsplit=1)[1]
+        cmd = event.text.split(None, 1)[1]
     except IndexError:
         return await event.delete()
+
     t1 = time()
     redirected_output = StringIO()
     redirected_error = StringIO()
     stdout, stderr, exc = None, None, None
+
     with (
         contextlib.redirect_stdout(redirected_output),
         contextlib.redirect_stderr(redirected_error),
@@ -62,17 +62,24 @@ async def executor(event):
             await aexec(cmd, event)
         except Exception:
             exc = traceback.format_exc()
+
     stdout = redirected_output.getvalue()
     stderr = redirected_error.getvalue()
-    template = "<b>{0}:</b>\n<pre language='python'>{1}</pre>"
-    final_output = "\n"
-    if stdout:
-        final_output += template.format("STDOUTPUT", stdout)
-    if stderr:
-        final_output += template.format("STDERR", stderr)
-    if exc:
-        final_output += template.format("EXCEPTION", exc)
-    final_output = final_output or "Success"
+    template = "<b>{0}:</b>\n<pre class='python'>{1}</pre>"
+
+    if stdout or stderr or exc:
+        final_output = ""
+        if stdout:
+            final_output += template.format("STDOUTPUT", stdout)
+        if stderr:
+            final_output += template.format("STDERR", stderr)
+        if exc:
+            final_output += template.format("EXCEPTION", exc)
+    else:
+        final_output = "Success"
+
+    t2 = time()
+
     if len(final_output) > 4096:
         filename = "output.txt"
         text = ""
@@ -85,7 +92,7 @@ async def executor(event):
 
         with open(filename, "w+", encoding="utf8") as out_file:
             out_file.write(text)
-        t2 = time()
+
         keyboard = [
             [
                 Button.inline(
@@ -98,12 +105,12 @@ async def executor(event):
         await event.reply(
             file=filename,
             message=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
+            parse_mode="HTML",
             buttons=keyboard,
         )
         await event.delete()
         os.remove(filename)
     else:
-        t2 = time()
         keyboard = [
             [
                 Button.inline(
@@ -180,6 +187,7 @@ async def shellrunner(event):
         await event.reply(
             file="output.txt",
             message="<code>Output</code>",
+            parse_mode="HTML",
         )
         os.remove("output.txt")
     else:
