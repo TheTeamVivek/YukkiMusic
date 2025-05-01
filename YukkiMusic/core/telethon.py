@@ -98,6 +98,7 @@ class TelethonClient(TelegramClient):
         if self.is_connected():
             return
         await super().start(bot_token=config.BOT_TOKEN)
+        self.parse_mode = "HTML"
         me = await self.get_me()
         # pylint: disable=attribute-defined-outside-init
         self.me = me
