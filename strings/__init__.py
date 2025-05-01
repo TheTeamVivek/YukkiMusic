@@ -18,6 +18,19 @@ languages_present = {}
 commands = {}
 
 
+
+def get_command(command, lang=None):
+    data = commands.get(command)
+    if not data:
+        return []
+    if lang:
+        return list(set(data.get(lang, [])))
+    all_commands = set()
+    for lang_commands in data.values():
+        all_commands.update(lang_commands)
+    return list(all_commands)    
+    
+
 def load_yaml(file_path: str) -> dict:
     with open(file_path, encoding="utf8") as file:
         return yaml.safe_load(file)
@@ -74,15 +87,3 @@ for filename in os.listdir(os.path.join("strings", "langs")):
 
 languages["en"] = update_helpers(languages["en"])
 commands = load_yaml(os.path.join("strings", "commands.yaml"))
-
-
-def get_command(command, lang=None):
-    data = commands.get(command)
-    if not data:
-        return []
-    if lang:
-        return data.get(lang, [])
-    all_commands = []
-    for lang_commands in data.values():
-        all_commands.extend(lang_commands)
-    return all_commands
