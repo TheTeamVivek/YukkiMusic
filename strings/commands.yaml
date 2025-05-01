@@ -50,6 +50,7 @@ SETTINGS_COMMAND:
   tr:
     - ayarlar
     - ayar
+    
 RELOAD_COMMAND:
   ar:
     - ريلود
@@ -62,6 +63,7 @@ RELOAD_COMMAND:
   tr:
     - admincache
     - reload
+    
 GSTATS_COMMAND:
   ar:
     - الاحصائيات
@@ -73,6 +75,7 @@ GSTATS_COMMAND:
     - gstats
   tr:
     - gstats
+    
 STATS_COMMAND:
   ar:
     - إحصائيات
@@ -82,6 +85,7 @@ STATS_COMMAND:
     - stats
   tr:
     - stats
+    
 LANGUAGE_COMMAND:
   ar:
     - لغه
@@ -96,6 +100,7 @@ LANGUAGE_COMMAND:
   tr:
     - dil
     - diller
+    
 PLAY_COMMAND:
   ar:
     - تشغيل
@@ -119,6 +124,7 @@ PLAY_COMMAND:
     - oynat
     - voynat
     - coynat
+    
 PLAYMODE_COMMAND:
   ar:
     - وضع تشغيل
@@ -131,6 +137,7 @@ PLAYMODE_COMMAND:
     - playmode
   tr:
     - oynatmamodu
+    
 CHANNELPLAY_COMMAND:
   ar:
     - ربط قناة
@@ -140,6 +147,7 @@ CHANNELPLAY_COMMAND:
     - channelplay
   tr:
     - kanaloynat
+    
 STREAM_COMMAND:
   ar:
     - لايف
@@ -154,6 +162,7 @@ STREAM_COMMAND:
   tr:
     - stream
     - cstream
+    
 PLAYLIST_COMMAND:
   ar:
     - قائمة التشغيل
@@ -164,6 +173,7 @@ PLAYLIST_COMMAND:
     - playlist
   tr:
     - oynatmalistesi
+    
 PLAY_PLAYLIST_COMMAND:
   ar:
     - شغل قائمتي
@@ -182,6 +192,7 @@ PLAY_PLAYLIST_COMMAND:
   tr:
     - oynatmalistesinioynat
     - voynatmalistesinioynat
+    
 DELETE_PLAYLIST_COMMAND:
   ar:
     - حذف قائمة التشغيل
@@ -193,6 +204,7 @@ DELETE_PLAYLIST_COMMAND:
     - delplaylist
   tr:
     - oynatmalistesinisil
+    
 ADD_PLAYLIST_COMMAND:
   ar:
     - اضافة لقائمة التشغيل
@@ -203,6 +215,7 @@ ADD_PLAYLIST_COMMAND:
     - addplaylist
   tr:
     - pekle
+    
 QUEUE_COMMAND:
   ar:
     - قائمة الانتظار
@@ -227,6 +240,7 @@ QUEUE_COMMAND:
   tr:
     - csira
     - sira
+    
 SONG_COMMAND:
   ar:
     - تنزيل
@@ -243,6 +257,7 @@ SONG_COMMAND:
     - sarki
     - muzik
     - indir
+    
 LYRICS_COMMAND:
   ar:
     - كلمات
@@ -252,6 +267,7 @@ LYRICS_COMMAND:
     - lyrics
   tr:
     - sarkisozu
+    
 AUTH_COMMAND:
   ar:
     - رفع ادمن
@@ -262,6 +278,7 @@ AUTH_COMMAND:
   tr:
     - yetki
     - yetkiver
+    
 UNAUTH_COMMAND:
   ar:
     - تنزيل ادمن
@@ -271,6 +288,7 @@ UNAUTH_COMMAND:
     - unauth
   tr:
     - yetkial
+    
 AUTHUSERS_COMMAND:
   ar:
     - الادمنيه
@@ -280,6 +298,7 @@ AUTHUSERS_COMMAND:
     - authusers
   tr:
     - yetkililer
+    
 PAUSE_COMMAND:
   ar:
     - وقف
@@ -293,6 +312,7 @@ PAUSE_COMMAND:
     - duraklat
     - cduraklat
     - kduraklat
+    
 RESUME_COMMAND:
   ar:
     - كمل
@@ -306,6 +326,7 @@ RESUME_COMMAND:
     - devam
     - cdevam
     - kdevam
+    
 MUTE_COMMAND:
   ar:
     - اسكت
@@ -318,6 +339,7 @@ MUTE_COMMAND:
     - sustur
     - csustur
     - ksustur
+    
 UNMUTE_COMMAND:
   ar:
     - اتكلم
@@ -329,6 +351,7 @@ UNMUTE_COMMAND:
   tr:
     - unmute
     - cunmute
+    
 STOP_COMMAND:
   ar:
     - ايقاف
@@ -345,6 +368,7 @@ STOP_COMMAND:
     - durdur
     - cdurdur
     - kdurdur
+    
 SKIP_COMMAND:
   ar:
     - تخطي
@@ -359,6 +383,7 @@ SKIP_COMMAND:
     - atla
     - catla
     - katla
+    
 SHUFFLE_COMMAND:
   ar:
     - خلط
@@ -371,6 +396,7 @@ SHUFFLE_COMMAND:
     - ckaristir
     - ckaristir
     - karistir
+    
 LOOP_COMMAND:
   ar:
     - تكرار
@@ -382,6 +408,7 @@ LOOP_COMMAND:
   tr:
     - cdongu
     - dongu
+    
 SEEK_COMMAND:
   ar:
     - تقديم
@@ -393,6 +420,7 @@ SEEK_COMMAND:
   tr:
     - sar
     - csar
+    
 SEEK_BACK_COMMAND:
   ar:
     - ارجع_الى_الخلف
@@ -407,6 +435,7 @@ SEEK_BACK_COMMAND:
     - gerisar
     - cilerisar
     - cgerisar
+    
 REBOOT_COMMAND:
   ar:
     - اعاده تشغيل
@@ -416,6 +445,7 @@ REBOOT_COMMAND:
     - reboot
   tr:
     - yenidenbaslat
+    
 ADDSUDO_COMMAND:
   ar:
     - رفع مطور
@@ -425,6 +455,7 @@ ADDSUDO_COMMAND:
     - addsudo
   tr:
     - sudoekle
+    
 DELSUDO_COMMAND:
   ar:
     - تنزيل مطور
@@ -434,6 +465,7 @@ DELSUDO_COMMAND:
     - delsudo
   tr:
     - sudosil
+    
 SUDOUSERS_COMMAND:
   ar:
     - المطورين
@@ -443,6 +475,7 @@ SUDOUSERS_COMMAND:
     - sudolist
   tr:
     - sudolistesi
+    
 BROADCAST_COMMAND:
   ar:
     - اذاعة
@@ -457,6 +490,7 @@ BROADCAST_COMMAND:
   tr:
     - reklam
     - duyuru
+    
 BLACKLISTCHAT_COMMAND:
   ar:
     - المجموعات المحظورة
@@ -466,6 +500,7 @@ BLACKLISTCHAT_COMMAND:
     - blacklistchat
   tr:
     - grupyasakla
+    
 WHITELISTCHAT_COMMAND:
   ar:
     - المجموعات المسموحة
@@ -475,6 +510,7 @@ WHITELISTCHAT_COMMAND:
     - whitelistchat
   tr:
     - grupyasakkaldir
+    
 BLACKLISTEDCHAT_COMMAND:
   ar:
     - المجموعات المحظورة حاليا
@@ -484,6 +520,7 @@ BLACKLISTEDCHAT_COMMAND:
     - blacklistedchat
   tr:
     - yasakligruplar
+    
 VIDEOLIMIT_COMMAND:
   ar:
     - تحديد حد الفيديو
@@ -493,6 +530,7 @@ VIDEOLIMIT_COMMAND:
     - set_video_limit
   tr:
     - set_video_limit
+    
 VIDEOMODE_COMMAND:
   ar:
     - وضع الفيديو
@@ -502,6 +540,7 @@ VIDEOMODE_COMMAND:
     - videomode
   tr:
     - videomode
+    
 MAINTENANCE_COMMAND:
   ar:
     - الصيانة
@@ -512,6 +551,7 @@ MAINTENANCE_COMMAND:
   tr:
     - bakimmodu
     - bakim
+    
 LOGGER_COMMAND:
   ar:
     - السجل
@@ -521,6 +561,7 @@ LOGGER_COMMAND:
     - logger
   tr:
     - logger
+    
 GETLOG_COMMAND:
   ar:
     - سجل
@@ -537,6 +578,7 @@ GETLOG_COMMAND:
     - getlogs
   tr:
     - log
+    
 GETVAR_COMMAND:
   ar:
     - جلب فار
@@ -549,6 +591,7 @@ GETVAR_COMMAND:
   tr:
     - get_var
     - getvar
+    
 DELVAR_COMMAND:
   ar:
     - حذف فار
@@ -561,6 +604,7 @@ DELVAR_COMMAND:
   tr:
     - del_var
     - delvar
+    
 SETVAR_COMMAND:
   ar:
     - تعيين فار
@@ -572,6 +616,7 @@ SETVAR_COMMAND:
     - setvar
   tr:
     - setvar
+    
 USAGE_COMMAND:
   ar:
     - الاستخدام
@@ -581,6 +626,7 @@ USAGE_COMMAND:
     - usage
   tr:
     - kullanim
+    
 UPDATE_COMMAND:
   ar:
     - تحديث
@@ -593,6 +639,7 @@ UPDATE_COMMAND:
     - up
   tr:
     - guncelle
+    
 RESTART_COMMAND:
   ar:
     - اعاده تشغيل
@@ -602,6 +649,7 @@ RESTART_COMMAND:
     - restart
   tr:
     - restart
+    
 AUTOEND_COMMAND:
   ar:
     - الإيقاف التلقائي
@@ -611,6 +659,7 @@ AUTOEND_COMMAND:
     - autoend
   tr:
     - autoend
+    
 AUTHORIZE_COMMAND:
   ar:
     - سماح
@@ -620,6 +669,7 @@ AUTHORIZE_COMMAND:
     - authorize
   tr:
     - authorize
+    
 UNAUTHORIZE_COMMAND:
   ar:
     - رفض
@@ -629,6 +679,7 @@ UNAUTHORIZE_COMMAND:
     - unauthorize
   tr:
     - unauthorize
+    
 AUTHORIZED_COMMAND:
   ar:
     - المسوحين
@@ -638,6 +689,7 @@ AUTHORIZED_COMMAND:
     - authorized
   tr:
     - authorized
+    
 BLOCK_COMMAND:
   ar:
     - حظر
@@ -648,6 +700,7 @@ BLOCK_COMMAND:
     - block
   tr:
     - yasakla
+    
 UNBLOCK_COMMAND:
   ar:
     - الغاء حظر
@@ -657,6 +710,7 @@ UNBLOCK_COMMAND:
     - unblock
   tr:
     - yasakkaldir
+    
 BLOCKED_COMMAND:
   ar:
     - المحظورين
@@ -666,6 +720,7 @@ BLOCKED_COMMAND:
     - blockedusers
   tr:
     - yasaklilar
+    
 SPEEDTEST_COMMAND:
   ar:
     - السرعة
@@ -676,6 +731,7 @@ SPEEDTEST_COMMAND:
     - speedtest
   tr:
     - hiztesti
+    
 ACTIVEVC_COMMAND:
   ar:
     - المكالمات النشطة
@@ -687,6 +743,7 @@ ACTIVEVC_COMMAND:
     - activevc
   tr:
     - aktifses
+    
 ACTIVEVIDEO_COMMAND:
   ar:
     - مكالمات الفديو النشطة
@@ -698,6 +755,7 @@ ACTIVEVIDEO_COMMAND:
     - activevd
   tr:
     - aktifvideo
+    
 AC_COMMAND:
   ar:
     - تبريد
@@ -707,6 +765,7 @@ AC_COMMAND:
     - ac
   tr:
     - ac
+    
 GBAN_COMMAND:
   ar:
     - حظر عام
@@ -716,6 +775,7 @@ GBAN_COMMAND:
     - gban
   tr:
     - gban
+    
 UNGBAN_COMMAND:
   ar:
     - الغاء حظر عام
@@ -725,6 +785,7 @@ UNGBAN_COMMAND:
     - ungban
   tr:
     - ungban
+    
 GBANNED_COMMAND:
   ar:
     - المحظورين عام
@@ -735,12 +796,3 @@ GBANNED_COMMAND:
   tr:
     - gbannedusers
     - gbanlist
-PRIVACY_COMMAND:
-  ar:
-    - الخصوصية
-  ckb:
-    - تایبەتمەندییەتی
-  en:
-    - privacy
-  tr:
-    - privacy
