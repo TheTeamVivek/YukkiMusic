@@ -16,6 +16,8 @@ from YukkiMusic.utils.database.memorydatabase import get_loop, set_loop
 from YukkiMusic.utils.decorators import admin_rights_check
 
 LOOP_COMMAND = get_command("LOOP_COMMAND")
+
+
 @tbot.on_message(flt.command(LOOP_COMMAND) & flt.group & ~BANNED_USERS)
 @admin_rights_check
 async def admins(event, _, chat_id):
