@@ -18,6 +18,7 @@ from YukkiMusic.utils.decorators import admin_rights_check
 
 STOP_COMMAND = get_command("STOP_COMMAND")
 
+
 @tbot.on_message(flt.command(STOP_COMMAND) & flt.group & ~BANNED_USERS)
 @admin_rights_check
 async def stop_music(event, _, chat_id):
