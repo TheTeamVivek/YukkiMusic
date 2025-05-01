@@ -13,7 +13,6 @@
 #
 
 import contextlib
-
 import os
 import traceback
 from io import StringIO
