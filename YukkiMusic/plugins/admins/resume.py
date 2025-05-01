@@ -18,6 +18,7 @@ from YukkiMusic.utils.decorators import admin_rights_check
 
 RESUME_COMMAND = get_command("RESUME_COMMAND")
 
+
 @tbot.on_message(flt.command(RESUME_COMMAND) & flt.group & ~BANNED_USERS)
 @admin_rights_check
 async def resume_com(event, _, chat_id):
