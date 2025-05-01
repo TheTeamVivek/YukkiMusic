@@ -37,6 +37,7 @@ async def aexec(code, event):
     )
     return await local_vars["__aexec"](event)
 
+
 @tbot.on(
     events.MessageEdited(func=flt.command(["ev", "eval"]) & SUDOERS & ~flt.forwarded)
 )
