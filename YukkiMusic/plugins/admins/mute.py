@@ -8,7 +8,7 @@
 # All rights reserved.
 #
 
-
+from strings import get_command
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.core.call import Yukki
@@ -16,8 +16,9 @@ from YukkiMusic.misc import BANNED_USERS
 from YukkiMusic.utils.database import is_muted, mute_on
 from YukkiMusic.utils.decorators import admin_rights_check
 
+MUTE_COMMAND = get_command("MUTE_COMMAND")
 
-@tbot.on_message(flt.command("MUTE_COMMAND") & flt.group & ~BANNED_USERS)
+@tbot.on_message(flt.command(MUTE_COMMAND) & flt.group & ~BANNED_USERS)
 @admin_rights_check
 async def mute_admin(event, _, chat_id):
     if not len(event.text.split()) == 1 or event.is_reply:
