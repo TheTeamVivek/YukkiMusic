@@ -12,8 +12,8 @@
 # Credit goes to TheHamkerCat.
 #
 
-import contextlib
 import builtins
+import contextlib
 import os
 import traceback
 from io import StringIO
