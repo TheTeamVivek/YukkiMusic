@@ -8,7 +8,7 @@
 # All rights reserved.
 #
 
-
+from strings import get_command
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.core.call import Yukki
@@ -19,8 +19,9 @@ from YukkiMusic.utils.decorators import admin_rights_check
 from YukkiMusic.utils.inline.play import play_markup
 from YukkiMusic.utils.stream.autoclear import auto_clean
 
+SKIP_COMMAND = get_command("SKIP_COMMAND")
 
-@tbot.on_message(flt.command("SKIP_COMMAND", True) & flt.group & ~BANNED_USERS)
+@tbot.on_message(flt.command(SKIP_COMMAND) & flt.group & ~BANNED_USERS)
 @admin_rights_check
 async def skip(event, _, chat_id):
     mention = await tbot.create_mention(await event.get_sender())
