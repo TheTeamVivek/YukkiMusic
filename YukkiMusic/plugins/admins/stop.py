@@ -8,6 +8,7 @@
 # All rights reserved.
 #
 
+from strings import get_command
 from YukkiMusic import tbot
 from YukkiMusic.core import filters as flt
 from YukkiMusic.core.call import Yukki
@@ -15,8 +16,9 @@ from YukkiMusic.misc import BANNED_USERS, db
 from YukkiMusic.utils.database import set_loop
 from YukkiMusic.utils.decorators import admin_rights_check
 
+STOP_COMMAND = get_command("STOP_COMMAND")
 
-@tbot.on_message(flt.command("STOP_COMMAND", True) & flt.group & ~BANNED_USERS)
+@tbot.on_message(flt.command(STOP_COMMAND) & flt.group & ~BANNED_USERS)
 @admin_rights_check
 async def stop_music(event, _, chat_id):
     try:
