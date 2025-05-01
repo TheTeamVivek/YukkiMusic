@@ -8,11 +8,11 @@
 # All rights reserved.
 #
 
+import contextlib
+
 # This aeval and sh module is taken from < https://github.com/TheHamkerCat/WilliamButcherBot >
 # Credit goes to TheHamkerCat.
 #
-
-import contextlib
 import os
 import traceback
 from io import StringIO
@@ -28,8 +28,9 @@ from YukkiMusic.misc import SUDOERS
 async def aexec(code, event):
     local_vars = {
         "__builtins__": __builtins__,  # DON'T REMOVE THIS
+        "app": tbot,
         "tbot": tbot,
-        "client": tbot,
+        "rmsg": await event.get_reply_message(),
     }
     exec(
         "async def __aexec(event): " + "".join(f"\n {a}" for a in code.split("\n")),
@@ -71,9 +72,9 @@ async def executor(event):
     if stdout or stderr or exc:
         final_output = ""
         if stdout:
-            final_output += template.format("STDOUTPUT", stdout)
+            final_output += template.format("OUTPUT", stdout)
         if stderr:
-            final_output += template.format("STDERR", stderr)
+            final_output += template.format("ERROR", stderr)
         if exc:
             final_output += template.format("EXCEPTION", exc)
     else:
@@ -106,7 +107,6 @@ async def executor(event):
         await event.reply(
             file=filename,
             message=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
-            parse_mode="HTML",
             buttons=keyboard,
         )
         await event.delete()
@@ -188,7 +188,6 @@ async def shellrunner(event):
         await event.reply(
             file="output.txt",
             message="<code>Output</code>",
-            parse_mode="HTML",
         )
         os.remove("output.txt")
     else:
