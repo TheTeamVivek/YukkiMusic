@@ -25,8 +25,7 @@ Get started quickly by deploying to Heroku with just one click:
 
 - Install uv:  
   ```bash
-  pip install uv
-  uv self update
+  pip install --upgrade uv
   ```
 
 
