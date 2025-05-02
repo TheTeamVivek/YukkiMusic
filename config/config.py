@@ -167,6 +167,10 @@ raw_sessions = getenv("STRING_SESSIONS")
 # Split the sessions only if raw_sessions is not empty
 STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions else []
 
+# Your cookies pasted link on batbin.me
+# you can skip if you are adding cookies
+# manually in config/cookies dir
+COOKIE_LINK = getenv("COOKIE_LINK", None)
 
 #  __     ___    _ _  ___  _______   __  __ _    _  _____ _____ _____
 #  \ \   / / |  | | |/ / |/ /_   _| |  \/  | |  | |/ ____|_   _/ ____|

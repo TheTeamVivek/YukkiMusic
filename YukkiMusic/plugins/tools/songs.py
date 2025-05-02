@@ -26,10 +26,10 @@ from config import (
     BANNED_USERS,
     SONG_DOWNLOAD_DURATION,
     SONG_DOWNLOAD_DURATION_LIMIT,
+    cookies,
 )
 from strings import command
 from YukkiMusic import Platform, app
-from YukkiMusic.platforms.Youtube import cookies
 from YukkiMusic.utils.decorators.language import language, languageCB
 from YukkiMusic.utils.formatters import convert_bytes
 from YukkiMusic.utils.inline.song import song_markup
