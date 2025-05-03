@@ -125,9 +125,11 @@ Use a browser extension to export cookies in the **Netscape HTTP Cookie File** f
 
 #### **2. Upload Cookies to BatBin Service**  
 1. Go to **[BatBin](https://batbin.me)**.  
-2. Upload your `cookies.txt` file.  
-3. Copy the generated URL.  
+2. Paste your `cookies`.  
+3. Then tap to Save and Copy the URL.  
 
 #### **3. Configure the Environment Variable**  
-Paste the BatBin URL into your **`COOKIE_LINK`** environment variable. 
-> **Example:** `COOKIE_LINK=https://batbin.me/1234567890/cookies.txt, https://batbin.me/9876543210/cookies.txt` ...
+Paste the BatBin URL(s) into your **`COOKIE_LINK`** environment variable. 
+
+- You can add **multiple cookie links**, separated by **commas**.
+> **Example:** `COOKIE_LINK=cookielink1 , cookielink2, cookielink3, cookielink4, cookielink5 ...`
