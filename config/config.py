@@ -32,6 +32,14 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
+# Your cookies pasted link on batbin.me
+# you can skip if you are adding cookies
+# manually in config/cookies dir
+
+_cookies = getenv("COOKIE_LINK", "")
+
+COOKIE_LINK = list(map(str.strip, _cookies.split(","))) if _cookies else []
+
 CLEANMODE_DELETE_MINS = int(
     getenv("CLEANMODE_MINS", "5")
 )  # Remember to give value in Minute
@@ -166,11 +174,6 @@ raw_sessions = getenv("STRING_SESSIONS")
 
 # Split the sessions only if raw_sessions is not empty
 STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions else []
-
-# Your cookies pasted link on batbin.me
-# you can skip if you are adding cookies
-# manually in config/cookies dir
-COOKIE_LINK = getenv("COOKIE_LINK", None)
 
 #  __     ___    _ _  ___  _______   __  __ _    _  _____ _____ _____
 #  \ \   / / |  | | |/ / |/ /_   _| |  \/  | |  | |/ ____|_   _/ ____|
