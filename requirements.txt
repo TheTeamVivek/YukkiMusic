@@ -1,8 +1,6 @@
 async-lru==2.0.5
 aiohttp==3.11.18
 beautifulsoup4==4.13.4
-dnspython==2.7.0
-ffmpeg-python==0.2.0
 gitpython==3.1.44
 heroku3==5.2.1
 httpx[http2]==0.28.1
@@ -13,7 +11,6 @@ ntgcalls~=1.4.0b3
 pillow==11.2.1
 pykeyboard2==0.1.6
 psutil==7.0.0
-pytube==15.0.0
 py-tgcalls==2.2.0b1
 python-dotenv==1.1.0
 requests==2.32.3
