@@ -44,7 +44,6 @@ class Saavn(PlatformBase):
 
     # @asyncify
     async def _playlist(self, url, limit: int = PLAYLIST_FETCH_LIMIT):
-        url = self.clean_url(url)
         ydl_opts = {
             "extract_flat": True,
             "force_generic_extractor": True,
@@ -75,7 +74,6 @@ class Saavn(PlatformBase):
     @alru_cache(maxsize=None)
     # @asyncify
     async def __track(self, url):
-        url = self.clean_url(url)
         ydl_opts = {
             "format": "bestaudio/best",
             "geo_bypass": True,
