@@ -9,6 +9,7 @@
 #
 
 import os
+import traceback
 from random import randint
 
 from pyrogram.types import InlineKeyboardMarkup
@@ -176,6 +177,7 @@ async def stream(
                     thumbnail = _data.get("thumb", thumbnail)
                     flink = _data.get("url", link)
         except Exception:
+            traceback.print_exc()
             raise AssistantErr(_["play_16"])
 
         if await is_active_chat(chat_id):
