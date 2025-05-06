@@ -195,8 +195,8 @@ class YouTube:
             link = self.base + link
         if "&" in link:
             link = link.split("&")[0]
-        if link.startswith("http://") or link.startswith("https://"):
-            return await self._track(link)
+        # if link.startswith("http://") or link.startswith("https://"):
+        #     return await self._track(link)
         try:
             results = VideosSearch(link, limit=1)
             for result in (await results.next())["result"]:
