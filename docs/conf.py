@@ -63,13 +63,13 @@ html_theme_options = {
 
 html_theme_options["announcement"] = """
 <div style="
-    background-color: #f3e5f5; /* Very light purple */
-    color: #4a148c; /* Dark purple for good contrast */
+    background-color: var(--md-sys-color-warning-container, #fff9c4); /* Light warning yellow */
+    color: var(--md-sys-color-on-warning-container, #424242); /* Text on warning */
     text-align: center;
     padding: 12px 20px;
     font-weight: 600;
     font-size: 1rem;
-    border-bottom: 1px solid #ce93d8; /* Medium purple border */
+    border-bottom: 1px solid var(--md-sys-color-warning, #ffb300); /* Optional: warning color border */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 ">
     ⚠️ <strong>Notice:</strong> This documentation is currently <em>under development</em>. Stay tuned for updates!
