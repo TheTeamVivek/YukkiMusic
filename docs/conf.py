@@ -30,12 +30,6 @@ templates_path = ["_templates"]
 html_favicon = "_static/html_favicon.svg"
 pygments_style = "friendly"
 
-html_context = {
-    "copyright_links": [
-        {"text": "TheTeamVivek", "url": "https://github.com/TheTeamVivek"},
-    ],
-}
-
 html_theme_options = {
     "use_repository_button": True,
     "use_edit_page_button": True,
