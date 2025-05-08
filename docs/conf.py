@@ -11,7 +11,7 @@ project_copyright = (
 )
 author = "TheTeamVivek"
 release = "2.0"
-
+language = 'en'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
