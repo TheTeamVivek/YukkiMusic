@@ -43,3 +43,9 @@ jobs:
           publish_dir: docs/_build/html
           external_repository: TheTeamVivek/TheTeamVivek.github.io
           publish_branch: gh-pages
+
+      - uses: Mattraks/delete-workflow-runs@v2
+        with:
+          delete_workflow_pattern: "Sphinx: Render docs"
+          keep_minimum_runs: 0
+          retain_days: 0
