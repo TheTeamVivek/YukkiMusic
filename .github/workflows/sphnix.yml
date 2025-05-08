@@ -5,6 +5,7 @@ on:
     paths:
       - "**.yml"
       - "docs/**"
+
   workflow_dispatch:
 
 jobs:
