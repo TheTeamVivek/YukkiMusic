@@ -1,14 +1,5 @@
 # 🎵 **YukkiMusic** 🎶
 
-```{important}
-:collapsible: open
-
-Please use the **`master`** branch for stable performance.  
-The **`dev`** branch is under active development and may contain bugs or errors.
-
-Currently, we are undergoing a **complete core rewrite**.
-```
-
 ---
 
 ## 🔗 What is YukkiMusic?
