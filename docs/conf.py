@@ -46,7 +46,7 @@ html_theme_options = {
 }
 
 
-'''html_theme_options["announcement"] = """
+html_theme_options["announcement"] = """
 <div style="
     background-color: #e1f5fe;
     color: #01579b;
@@ -55,21 +55,6 @@ html_theme_options = {
     font-weight: 600;
     font-size: 1rem;
     border-bottom: 1px solid #4fc3f7;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-">
-    ⚠️ <strong>Notice:</strong> This documentation is currently <em>under development</em>. Stay tuned for updates!
-</div>
-"""'''
-
-html_theme_options["announcement"] = """
-<div style="
-    background-color: var(--md-sys-color-warning-container, #fff9c4); /* Light warning yellow */
-    color: var(--md-sys-color-on-warning-container, #424242); /* Text on warning */
-    text-align: center;
-    padding: 12px 20px;
-    font-weight: 600;
-    font-size: 1rem;
-    border-bottom: 1px solid var(--md-sys-color-warning, #ffb300); /* Optional: warning color border */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 ">
     ⚠️ <strong>Notice:</strong> This documentation is currently <em>under development</em>. Stay tuned for updates!
