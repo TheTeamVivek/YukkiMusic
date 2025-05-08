@@ -27,7 +27,7 @@ html_baseurl = "https://TheTeamVivek.github.io"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 templates_path = ["_templates"]
-# html_favicon = "_static/html_favicon.svg"
+html_favicon = "_static/html_favicon.svg"
 pygments_style = "friendly"
 
 html_theme_options = {
