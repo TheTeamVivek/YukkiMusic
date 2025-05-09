@@ -15,9 +15,9 @@ language = "en"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx_copybutton", "myst_parser", "notfound.extension"]
+extensions = ["sphinx_copybutton", "myst_parser"]
 
-# -- Options for HTML output -------------------------------------------------
+# -- Options for HTML output  -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_title = "YukkiMusic 2.0"
