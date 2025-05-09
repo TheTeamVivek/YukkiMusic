@@ -5,54 +5,113 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Page Not Found</title>
   <style>
+    :root {
+      --background-light: #f9fafb;
+      --container-light: #ffffff;
+      --text-primary-light: #1f2937;
+      --text-secondary-light: #4b5563;
+      --text-muted-light: #6b7280;
+      --accent-light: #3b82f6;
+      --accent-hover-light: #2563eb;
+      --border-light: #e5e7eb;
+      
+      --background-dark: #1A1F2C;
+      --container-dark: #222222;
+      --text-primary-dark: #f9fafb;
+      --text-secondary-dark: #e5e7eb;
+      --text-muted-dark: #9ca3af;
+      --accent-dark: #60a5fa;
+      --accent-hover-dark: #93c5fd;
+      --border-dark: #374151;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --background: var(--background-dark);
+        --container: var(--container-dark);
+        --text-primary: var(--text-primary-dark);
+        --text-secondary: var(--text-secondary-dark);
+        --text-muted: var(--text-muted-dark);
+        --accent: var(--accent-dark);
+        --accent-hover: var(--accent-hover-dark);
+        --border: var(--border-dark);
+      }
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --background: var(--background-light);
+        --container: var(--container-light);
+        --text-primary: var(--text-primary-light);
+        --text-secondary: var(--text-secondary-light);
+        --text-muted: var(--text-muted-light);
+        --accent: var(--accent-light);
+        --accent-hover: var(--accent-hover-light);
+        --border: var(--border-light);
+      }
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       line-height: 1.6;
-      color: #333;
+      color: var(--text-primary);
       margin: 0;
       padding: 0;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #f9fafb;
+      background-color: var(--background);
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
+    
     .container {
       text-align: center;
       max-width: 28rem;
       padding: 2rem;
-      background-color: white;
+      background-color: var(--container);
       border-radius: 0.5rem;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
     }
+    
     h1 {
       font-size: 4rem;
       font-weight: 800;
-      color: #1f2937;
+      color: var(--text-primary);
       margin-bottom: 0.5rem;
       line-height: 1.2;
+      transition: color 0.3s ease;
     }
+    
     .divider {
       width: 4rem;
       height: 0.25rem;
-      background-color: #3b82f6;
+      background-color: var(--accent);
       margin: 1rem auto 1.5rem auto;
+      transition: background-color 0.3s ease;
     }
+    
     h2 {
       font-size: 1.5rem;
       font-weight: 600;
-      color: #4b5563;
+      color: var(--text-secondary);
       margin-bottom: 1rem;
+      transition: color 0.3s ease;
     }
+    
     p {
-      color: #6b7280;
+      color: var(--text-muted);
       margin-bottom: 2rem;
+      transition: color 0.3s ease;
     }
+    
     .button-container {
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
     }
+    
     .button {
       display: inline-flex;
       align-items: center;
@@ -63,26 +122,33 @@
       text-decoration: none;
       transition: all 0.2s ease;
     }
+    
     .button-primary {
-      background-color: #3b82f6;
+      background-color: var(--accent);
       color: white;
     }
+    
     .button-primary:hover {
-      background-color: #2563eb;
+      background-color: var(--accent-hover);
     }
+    
     .button-outline {
-      background-color: white;
-      color: #4b5563;
-      border: 1px solid #e5e7eb;
+      background-color: var(--container);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
+    
     .button-outline:hover {
-      background-color: #f9fafb;
+      background-color: var(--background);
     }
+    
     .icon {
       margin-right: 0.5rem;
       width: 1rem;
       height: 1rem;
     }
+    
     @media (max-width: 640px) {
       .container {
         margin: 0 1rem;
@@ -114,13 +180,6 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
         Search Documentation
-      </a>
-      
-      <a href="/contents.html" class="button button-outline">
-        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-        </svg>
-        Table of Contents
       </a>
     </div>
   </div>
