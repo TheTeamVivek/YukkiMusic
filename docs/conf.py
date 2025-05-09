@@ -26,6 +26,7 @@ html_theme = "sphinx_book_theme"
 html_baseurl = "https://TheTeamVivek.github.io"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
+html_extra_path = ["html_extra"]
 templates_path = ["_templates"]
 html_favicon = "_static/html_favicon.svg"
 pygments_style = "friendly"
