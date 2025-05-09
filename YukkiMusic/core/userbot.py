@@ -8,6 +8,7 @@
 # All rights reserved.
 #
 import asyncio
+import logging
 import sys
 import traceback
 from datetime import datetime
@@ -30,7 +31,7 @@ from ..logging import LOGGER
 
 assistants = []
 assistantids = []
-
+logger = logging.getLogger(__name__)
 
 class Userbot:
     def __init__(self):
@@ -46,7 +47,7 @@ class Userbot:
         self.handlers = []
 
     async def _start(self, client, index):
-        LOGGER(__name__).info(f"Starting Assistant Client {index}")
+        logger.info(f"Starting Assistant Client {index}")
         try:
             await client.start()
             assistants.append(index)
@@ -57,7 +58,7 @@ class Userbot:
                     await client.join_chat(config.LOG_GROUP_ID)
                     await client.send_message(config.LOG_GROUP_ID, "Assistant Started")
                 except Exception:
-                    LOGGER(__name__).error(
+                    logger.error(
                         f"Assistant Account {index} failed to send message in log group. "
                         f"Ensure the assistant is added to the log group."
                     )
@@ -75,7 +76,7 @@ class Userbot:
                 client.add_handler(handler, group)
 
         except Exception as e:
-            LOGGER(__name__).error(
+            logger.error(
                 f"Assistant Account {index} failed with error: {str(e)}. Exiting..."
             )
             sys.exit(1)
@@ -101,7 +102,7 @@ class Userbot:
                 try:
                     await func(client, message)
                 except FloodWait as e:
-                    LOGGER(__name__).warning(
+                    logger.warning(
                         f"FloodWait: Sleeping for {e.value} seconds."
                     )
                     await asyncio.sleep(e.value)
