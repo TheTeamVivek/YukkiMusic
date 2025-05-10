@@ -5,12 +5,8 @@
       <stop offset="100%" style="stop-color:#4a00e0; stop-opacity:1" />
     </linearGradient>
   </defs>
-
   <rect width="64" height="64" rx="14" ry="14" fill="url(#grad)" />
-
-  <path d="M22 18 L32 32 L42 18" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
-  <path d="M32 32 L32 44" stroke="white" stroke-width="4" stroke-linecap="round"/>
-
+  <path d="M22 18 L32 32 L42 18" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" />
+  <path d="M32 32 L32 44" stroke="white" stroke-width="4" stroke-linecap="round" />
   <circle cx="32" cy="48" r="4" fill="white" />
-
 </svg>
