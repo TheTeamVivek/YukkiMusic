@@ -7,6 +7,8 @@
 #
 # All rights reserved.
 import asyncio
+
+import logging
 import os
 
 from pyrogram import idle
@@ -18,7 +20,7 @@ from YukkiMusic import HELPABLE, LOGGER, app, userbot
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
-logger = LOGGER("YukkiMusic")
+logger = logging.getLogger(__name__)
 loop = asyncio.get_event_loop()
 
 
