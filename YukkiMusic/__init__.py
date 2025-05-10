@@ -14,8 +14,8 @@ from YukkiMusic.core.git import git
 from YukkiMusic.core.userbot import Userbot
 from YukkiMusic.misc import dbb, heroku, sudo
 
-from ..core.logger import setup_logger as _setup_logger
-from .logging import LOGGER
+from YukkiMusic.core.logger import setup_logger as _setup_logger
+from YukkiMusic.logging import LOGGER
 
 # Pyrogram Client
 
