@@ -53,8 +53,7 @@ dependencies = [
   "PyYAML==6.0.2"
 ]
 
-[tool.setuptools.packages]
-find = {}
+[tool.setuptools.packages.find]
 include = ["YukkiMusic", "config", "strings"]
 
 [project.urls]
