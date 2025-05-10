@@ -94,7 +94,9 @@ async def init():
     await app.stop()
     await userbot.stop()
 
-
-if __name__ == "__main__":
+def main():
     loop.run_until_complete(init())
     LOGGER("YukkiMusic").info("Stopping YukkiMusic! GoodBye")
+
+if __name__ == "__main__":
+    main()
