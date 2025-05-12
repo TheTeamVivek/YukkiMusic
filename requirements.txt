@@ -7,7 +7,7 @@ httpx[http2]==0.28.1
 Kurigram==2.2.3
 lyricsgenius==3.6.0
 motor==3.7.0
-ntgcalls~=1.4.0b3
+ntgcalls~=2.0.0rc1
 pillow==11.2.1
 pykeyboard2==0.1.6
 psutil==7.0.0
