@@ -4,7 +4,7 @@ beautifulsoup4==4.13.4
 gitpython==3.1.44
 heroku3==5.2.1
 httpx[http2]==0.28.1
-Kurigram==2.2.2
+Kurigram==2.2.3
 lyricsgenius==3.6.0
 motor==3.7.0
 ntgcalls~=1.4.0b3
