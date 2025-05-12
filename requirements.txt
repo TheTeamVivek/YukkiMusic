@@ -11,7 +11,7 @@ ntgcalls~=2.0.0rc1
 pillow==11.2.1
 pykeyboard2==0.1.6
 psutil==7.0.0
-py-tgcalls==2.2.0b1
+py-tgcalls==2.2.0rc1
 python-dotenv==1.1.0
 requests==2.32.3
 speedtest-cli==2.1.3
