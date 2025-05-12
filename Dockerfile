@@ -4,14 +4,11 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends ffmpeg git curl && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENV PATH="/root/.local/bin:${PATH}"
-
 WORKDIR /app
 
 COPY requirements.txt ./
 
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    uv self update && \
+RUN pip install -U uv && \
     uv pip install --upgrade --system setuptools wheel && \
     uv pip install --system -r requirements.txt
 
