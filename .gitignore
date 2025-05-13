@@ -3,6 +3,8 @@
 logs.txt
 .DS_Store
 *.session
+.venv/
+venv/
 raw_files/
 cache/
 downloads/
