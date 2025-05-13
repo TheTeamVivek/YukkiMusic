@@ -108,7 +108,7 @@ async def skip(cli, message: Message, _, chat_id):
     queued = check[0]["file"]
     title = (check[0]["title"]).title()
     user = check[0]["by"]
-    user_id = message.from_user.id
+    message.from_user.id
     streamtype = check[0]["streamtype"]
     videoid = check[0]["vidid"]
     duration_min = check[0]["dur"]
@@ -134,12 +134,14 @@ async def skip(cli, message: Message, _, chat_id):
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "tg"
     elif "vid_" in queued:
-        flink = f"https://t.me/{app.username}?start=info_{videoid}",   
+        flink = (f"https://t.me/{app.username}?start=info_{videoid}",)
         thumbnail = None
         mystic = await message.reply_text(_["call_8"], disable_web_page_preview=True)
         try:
             if Platform.youtube.use_fallback:
-                file_path, _data, status = await fallback.download(title[:12], video=status)
+                file_path, _data, status = await fallback.download(
+                    title[:12], video=status
+                )
                 direct = None
                 title = _data.get("title", title)
                 thumbnail = _data.get("thumb")
@@ -155,7 +157,6 @@ async def skip(cli, message: Message, _, chat_id):
                     file_path, _data, status = await fallback.download(
                         title[:12], video=status
                     )
-                    direct = None
                     title = _data.get("title", title)
                     thumbnail = _data.get("thumb")
                     flink = _data.get("url", flink)

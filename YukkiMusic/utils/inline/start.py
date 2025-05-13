@@ -79,7 +79,6 @@ def private_panel(_, BOT_USERNAME, OWNER: bool | int = None):
             ]
         )
     else:
-
         if GITHUB_REPO:
             buttons.append(
                 [

@@ -83,7 +83,6 @@ async def unauthorised(
 
 
 async def bot_permissions(chat_id: int):
-    perms = []
     bot_id = (await app.get_me()).id
     return await member_permissions(chat_id, bot_id)
 

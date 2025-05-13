@@ -1,6 +1,6 @@
 .env
 .cache
-Yukkilogs.txt
+logs.txt
 .DS_Store
 *.session
 raw_files/
@@ -9,3 +9,4 @@ downloads/
 __pycache__/
 *.session-journal
 tempdb/
+*.egg-info/

@@ -102,5 +102,5 @@ async def on_bot_kicked(_, message: Message):
             )
             await delete_served_chat(chat_id)
             await userbot.leave_chat(chat_id)
-    except Exception as e:
+    except Exception:
         pass

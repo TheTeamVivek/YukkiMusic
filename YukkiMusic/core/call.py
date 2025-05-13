@@ -10,6 +10,7 @@
 import asyncio
 
 from ntgcalls import TelegramServerError
+from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import (
     ChannelsTooMuch,
     ChatAdminRequired,
@@ -18,7 +19,6 @@ from pyrogram.errors import (
     UserAlreadyParticipant,
     UserNotParticipant,
 )
-from pyrogram.enums import ChatMemberStatus
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls, filters
 from pytgcalls.exceptions import NoActiveGroupCall
@@ -196,13 +196,11 @@ class Call:
                 get = await app.get_chat_member(chat_id, userbot.id)
             except ChatAdminRequired:
                 raise AssistantErr(_["call_1"])
-            if get.status in [ChatMemberStatus.BANNED , ChatMemberStatus.RESTRICTED]:
+            if get.status in [ChatMemberStatus.BANNED, ChatMemberStatus.RESTRICTED]:
                 try:
                     await app.unban_chat_member(chat_id, userbot.id)
-                except Exception:  
-                    raise AssistantErr(
-                        _["call_2"].format(userbot.username, userbot.id)
-                    )
+                except Exception:
+                    raise AssistantErr(_["call_2"].format(userbot.username, userbot.id))
         except UserNotParticipant:
             pass
         try:
@@ -245,7 +243,7 @@ class Call:
             except Exception as e:
                 raise AssistantErr(_["call_3"].format(type(e).__name__))
             await asyncio.sleep(1)
-            #raise AssistantErr(_["call_6"].format(app.mention))
+            # raise AssistantErr(_["call_6"].format(app.mention))
         except UserAlreadyParticipant:
             pass
         except ChannelsTooMuch:
@@ -318,7 +316,7 @@ class Call:
                     stream=stream,
                     config=call_config,
                 )
-            except Exception as e:
+            except Exception:
                 LOGGER(__name__).error("\n", exc_info=True)
                 raise AssistantErr(
                     "**No Active Voice Chat Found**\n\nPlease make sure group's voice chat is enabled. If already enabled, please end it and start fresh voice chat again and if the problem continues, try /restart"
@@ -374,7 +372,7 @@ class Call:
             audio_stream_quality = await get_audio_bitrate(chat_id)
             video_stream_quality = await get_video_bitrate(chat_id)
             videoid = check[0]["vidid"]
-            userid = check[0].get("user_id")
+            check[0].get("user_id")
             check[0]["played"] = 0
             video = True if str(streamtype) == "video" else False
             call_config = GroupCallConfig(auto_start=False)
@@ -460,7 +458,6 @@ class Call:
                                 title[:12],
                                 video=(True if str(streamtype) == "video" else False),
                             )
-                            direct = None
                             title = _data.get("title", title)
                             thumbnail = _data.get("thumb")
                             flink = _data.get("url", flink)

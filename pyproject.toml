@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "YukkiMusic"
+version = "1.3.0"
+description = "This is YukkiMusic an updated version of YukkiMusicBot for streaming in Telegram voice chats."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+  { name = "TheTeamVivek" }
+]
+keywords = ["telegram", "music", "bot", "pyrogram", "pytgcalls"]
+classifiers = [
+  "Environment :: Console",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Utilities",
+]
+
+dependencies = [
+    "async-lru==2.0.5",
+    "aiohttp==3.11.18",
+    "beautifulsoup4==4.13.4",
+    "gitpython==3.1.44",
+    "heroku3==5.2.1",
+    "httpx[http2]==0.28.1",
+    "Kurigram==2.2.3",
+    "lyricsgenius==3.6.0",
+    "motor==3.7.0",
+    "ntgcalls~=2.0.0rc1",
+    "pillow==11.2.1",
+    "pykeyboard2==0.1.6",
+    "psutil==7.0.0",
+    "py-tgcalls==2.2.0rc2",
+    "python-dotenv==1.1.0",
+    "requests==2.32.3",
+    "speedtest-cli==2.1.3",
+    "spotipy==2.25.1",
+    "TgCrypto==1.2.5",
+    "urllib3==2.4.0",
+    "uvloop==0.21.0",
+    "Flask==3.1.0",
+    "gunicorn==23.0.0",
+    "yt-dlp==2025.4.30",
+    "py-yt-search==0.3",
+    "PyYAML==6.0.2"
+]
+
+[tool.setuptools.packages.find]
+include = ["YukkiMusic", "config", "strings"]
+
+[project.urls]
+Repository = "https://github.com/TheTeamVivek/YukkiMusic"
+Issues = "https://github.com/TheTeamVivek/YukkiMusic/issues"
+Changelog = "https://github.com/TheTeamVivek/YukkiMusic/blob/master/CHANGELOG.md"
+
+[project.scripts]
+yukkimusic = "YukkiMusic.__main__:main"

@@ -9,11 +9,10 @@
 #
 
 import os
+from io import BytesIO
 
 import aiohttp
 import yt_dlp
-
-from io import BytesIO
 from PIL import Image
 
 from config import seconds_to_time
@@ -21,7 +20,6 @@ from YukkiMusic.utils.decorators import asyncify
 
 
 class Saavn:
-
     @staticmethod
     async def valid(url: str) -> bool:
         return "jiosaavn.com" in url
@@ -142,4 +140,3 @@ class Saavn:
 
         new_img.save(thumb_path, format="JPEG")
         return thumb_path
-        

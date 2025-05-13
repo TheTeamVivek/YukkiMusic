@@ -103,11 +103,23 @@ Config vars are basically the variables which configure or modify bot to functio
 12. `SPOTIFY_ALBUM_IMG_URL` : This image comes when someone plays Spotify album via link in inline mode. 
 13. `SPOTIFY_PLAYLIST_IMG_URL` : This image comes when someone plays Spotify album via link in inline mode. 
 
-## Multi Assistant Mode
+## 🌐 Multi Assistant Mode
 
-- Supports unlimited assistant clients.
+- Supports **unlimited assistant clients** using **Pyrogram v2**.
 
-`STRING_SESSIONS`: Add multiple Pyrogram v2 string sessions, separated by commas.
+### 🔐 `STRING_SESSIONS`  
+Add **multiple Pyrogram v2 string sessions**, separated by commas.
+
+#### ✅ Example:
+```env
+STRING_SESSIONS=ABC1234xyz... , DEF5678uvw... , GHI9012rst...
+```
+
+Each session corresponds to a separate assistant client. You can add as many as needed, separated by commas.
+
+### 🛠 How to generate string sessions:
+You can easily generate Pyrogram v2 string sessions from:  
+👉 [**telegram.tools**](https://telegram.tools/session-string-generator#pyrogram,user)
 
 ## **Using Cookies for Authentication**  
 

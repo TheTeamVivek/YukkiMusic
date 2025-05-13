@@ -18,7 +18,7 @@ import traceback
 from datetime import datetime
 from functools import wraps
 
-#import pyromod.listen #noqa
+# import pyromod.listen #noqa
 from pyrogram import Client, StopPropagation, errors
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import (
@@ -131,7 +131,7 @@ class YukkiBot(Client):
         if config.SET_CMDS:
             try:
                 await self._set_default_commands()
-            except Exception as e:
+            except Exception:
                 LOGGER(__name__).warning("Failed to set commands:", exc_info=True)
 
         try:

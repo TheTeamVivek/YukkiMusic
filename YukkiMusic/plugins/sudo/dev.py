@@ -56,8 +56,9 @@ async def executor(client: app, message: Message):
     t1 = time()
     redirected_output = redirected_error = StringIO()
     stdout, stderr, exc = None, None, None
-    with contextlib.redirect_stdout(redirected_output), contextlib.redirect_stderr(
-        redirected_error
+    with (
+        contextlib.redirect_stdout(redirected_output),
+        contextlib.redirect_stderr(redirected_error),
     ):
         try:
             await aexec(cmd, client, message)
@@ -85,7 +86,7 @@ async def executor(client: app, message: Message):
                 [
                     InlineKeyboardButton(
                         text="⏳",
-                        callback_data=f"runtime {t2-t1} Seconds",
+                        callback_data=f"runtime {t2 - t1} Seconds",
                     )
                 ]
             ]
@@ -105,7 +106,7 @@ async def executor(client: app, message: Message):
                 [
                     InlineKeyboardButton(
                         text="⏳",
-                        callback_data=f"runtime {round(t2-t1, 3)} Seconds",
+                        callback_data=f"runtime {round(t2 - t1, 3)} Seconds",
                     ),
                     InlineKeyboardButton(
                         text="🗑",
@@ -162,7 +163,7 @@ async def shellrunner(_, message: Message):
             )
             stdout, stderr = await process.communicate()
             return stdout.decode().strip(), stderr.decode().strip()
-        except Exception as err:
+        except Exception:
             return None, traceback.format_exc()
 
     if "\n" in text:

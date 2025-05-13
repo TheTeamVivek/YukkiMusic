@@ -156,7 +156,9 @@ async def stream(
         flink = None
         try:
             if Platform.youtube.use_fallback:
-                file_path, _data, status = await fallback.download(title[:12], video=status)
+                file_path, _data, status = await fallback.download(
+                    title[:12], video=status
+                )
                 direct = None
                 title = _data.get("title", title)
                 duration_min = _data.get("duration_min", duration_min)
@@ -170,7 +172,9 @@ async def stream(
                     flink = f"https://t.me/{app.username}?start=info_{vidid}"
                 except Exception:
                     Platform.youtube.use_fallback = True
-                    file_path, _data, status = await fallback.download(title[:12], video=status)
+                    file_path, _data, status = await fallback.download(
+                        title[:12], video=status
+                    )
                     direct = None
                     title = _data.get("title", title)
                     duration_min = _data.get("duration_min", duration_min)
@@ -327,7 +331,6 @@ async def stream(
                     msg += f"{_['playlist_17']} {position}\n\n"
 
                 else:
-
                     if not forceplay:
                         db[chat_id] = []
                     await Yukki.join_call(

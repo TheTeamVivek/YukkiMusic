@@ -15,6 +15,7 @@ import aiohttp
 
 from .config import *
 
+
 async def fetch_cookies():
     if not COOKIE_LINK or not isinstance(COOKIE_LINK, list):  # noqa
         return None
@@ -27,14 +28,17 @@ async def fetch_cookies():
             raw_url = f"https://batbin.me/raw/{paste_id}"
 
             async with session.get(raw_url) as response:
-                if response.status == 200: 
+                if response.status == 200:
                     rc = await response.text()
                     path = f"config/cookies/cookies_{i}.txt"
                     with open(path, "w", encoding="utf-8") as f:
                         f.write(rc)
                     print(f"Cookies {i} successfully written to {path}")
                 else:
-                    print(f"Failed to get the URL {link}. Status code: {response.status}")
+                    print(
+                        f"Failed to get the URL {link}. Status code: {response.status}"
+                    )
+
 
 def cookies():
     folder_path = os.path.join(os.getcwd(), "config", "cookies")

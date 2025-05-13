@@ -15,8 +15,16 @@ from pyrogram import filters
 
 load_dotenv()
 
+
 def is_true(value: str) -> bool:
     return str(value).lower() in ["true", "yes"]
+
+
+def parse_list(text: str, sep: str = ",") -> list[str]:
+    if not text:
+        text = ""
+    return [v.strip() for v in text.strip("'\"").split(sep) if v.strip()]
+
 
 # Get it from my.telegram.org
 
@@ -36,9 +44,7 @@ MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 # you can skip if you are adding cookies
 # manually in config/cookies dir
 
-_cookies = getenv("COOKIE_LINK", "")
-
-COOKIE_LINK = list(map(str.strip, _cookies.split(","))) if _cookies else []
+COOKIE_LINK = parse_list(getenv("COOKIE_LINK", ""))
 
 CLEANMODE_DELETE_MINS = int(
     getenv("CLEANMODE_MINS", "5")
@@ -168,12 +174,9 @@ TG_VIDEO_FILESIZE_LIMIT = int(
 SET_CMDS = is_true(getenv("SET_CMDS", "False"))
 
 
-# You'll need a Pyrogram String Session for these vars. Generate String from our session generator bot @YukkiStringBot
-# Get the environment variable with a default value of an empty string
-raw_sessions = getenv("STRING_SESSIONS")
-
-# Split the sessions only if raw_sessions is not empty
-STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions else []
+# You'll need a Pyrogram String Session for these vars. See config/README.md for more information.
+# Get the environment variable with a default value of an empty
+STRING_SESSIONS = parse_list(getenv("STRING_SESSIONS", ""))
 
 #  __     ___    _ _  ___  _______   __  __ _    _  _____ _____ _____
 #  \ \   / / |  | | |/ / |/ /_   _| |  \/  | |  | |/ ____|_   _/ ____|
@@ -187,7 +190,7 @@ STRING_SESSIONS = list(map(str.strip, raw_sessions.split(","))) if raw_sessions 
 BANNED_USERS = filters.user()
 YTDOWNLOADER = 1
 LOG = 2
-LOG_FILE_NAME = "Yukkilogs.txt"
+LOG_FILE_NAME = "logs.txt"
 TEMP_DB_FOLDER = "tempdb"
 adminlist = {}
 lyrical = {}
