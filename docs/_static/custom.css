@@ -1,9 +1,0 @@
-/*
-.prev-next-area a p.prev-next-title {
-    text-decoration: none;
-}
-*/
-
-a[href], a[href] *, a[href] * * {
-  text-decoration: none !important;
-}
