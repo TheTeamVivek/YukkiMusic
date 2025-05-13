@@ -36,6 +36,7 @@ Get started quickly by deploying to Heroku with just one click:
   
 
 - Create the Virtual Environment:  
+  - You can activate the virtual Environment before cloning the repo.
   ```bash
   uv venv
   ```
@@ -47,8 +48,7 @@ Get started quickly by deploying to Heroku with just one click:
 
 - Install Python Requirements:  
   ```bash
-  uv pip install --upgrade setuptools wheel
-  uv pip install -r requirements.txt
+  uv pip install -e .
   ```
 
 - Copy and Edit Environment Variables:  
@@ -65,7 +65,7 @@ Get started quickly by deploying to Heroku with just one click:
 
 - Run the Bot:  
   ```bash
-  bash start
+  yukkimusic
   ```
 
 - Detach from the **tmux** Session (Bot keeps running):  

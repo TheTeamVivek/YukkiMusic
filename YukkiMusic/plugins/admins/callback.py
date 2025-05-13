@@ -309,7 +309,6 @@ async def admin_callback(client, CallbackQuery, _):
                         file_path, _data, status = await fallback.download(
                             title[:12], video=status
                         )
-                        direct = None
                         title = _data.get("title", title)
                         thumbnail = _data.get("thumb")
                         flink = _data.get("url", flink)

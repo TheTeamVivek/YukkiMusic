@@ -1,0 +1,62 @@
+name: Format Codes
+
+on:
+  push:
+    paths:
+      - "**.py"
+      - "**.yml"
+      - "**.toml"
+  workflow_dispatch:
+
+jobs:
+  Format_Code:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10.x"
+
+      - name: Install Formatting Tools
+        run: |
+             pip install --upgrade uv
+             uv pip install --system autoflake isort black pyupgrade pylint
+
+      - name: format codes
+        run: |
+          autoflake -i -r --ignore-init-module-imports --remove-unused-variables --remove-duplicate-keys --remove-all-unused-imports .
+          black -t py310 .
+          isort -n --py 310 -m 3 --trailing-comma .
+
+
+      - name: Update Syntax to python3.10+
+        run: |
+          find . -name "*.py" -exec pyupgrade --py310-plus {} \;
+
+      - name: Ruff
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: "format"
+
+      - name: Uv
+        run: |
+          uv lock
+          uv sync
+
+      - name: Commit Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Format Codes"
+          commit_options: "--no-verify"
+          repository: .
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+
+      - uses: Mattraks/delete-workflow-runs@v2
+        with:
+          delete_workflow_pattern: "Format Codes"
+          keep_minimum_runs: 0
+          retain_days: 0

@@ -152,7 +152,7 @@ def command(
             if with_prefix and flt.prefixes:
                 for prefix in flt.prefixes:
                     if text.startswith(prefix):
-                        without_prefix = text[len(prefix):]
+                        without_prefix = text[len(prefix) :]
                         if re.match(
                             rf"^(?:{cmd}(?:@?{username})?)(?:\s|$)",
                             without_prefix,
