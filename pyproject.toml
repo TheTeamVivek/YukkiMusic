@@ -46,7 +46,7 @@ dependencies = [
     "TgCrypto==1.2.5",
     "urllib3==2.4.0",
     "uvloop==0.21.0",
-    "Flask==3.1.0",
+    "Flask==3.1.1",
     "gunicorn==23.0.0",
     "yt-dlp==2025.4.30",
     "py-yt-search==0.3",
