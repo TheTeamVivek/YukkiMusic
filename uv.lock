@@ -298,18 +298,19 @@ wheels = [
 
 [[package]]
 name = "flask"
-version = "3.1.0"
+version = "3.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "blinker" },
     { name = "click" },
     { name = "itsdangerous" },
     { name = "jinja2" },
+    { name = "markupsafe" },
     { name = "werkzeug" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/89/50/dff6380f1c7f84135484e176e0cac8690af72fa90e932ad2a0a60e28c69b/flask-3.1.0.tar.gz", hash = "sha256:5f873c5184c897c8d9d1b05df1e3d01b14910ce69607a117bd3277098a5836ac", size = 680824, upload-time = "2024-11-13T18:24:38.127Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c0/de/e47735752347f4128bcf354e0da07ef311a78244eba9e3dc1d4a5ab21a98/flask-3.1.1.tar.gz", hash = "sha256:284c7b8f2f58cb737f0cf1c30fd7eaf0ccfcde196099d24ecede3fc2005aa59e", size = 753440, upload-time = "2025-05-13T15:01:17.447Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/af/47/93213ee66ef8fae3b93b3e29206f6b251e65c97bd91d8e1c5596ef15af0a/flask-3.1.0-py3-none-any.whl", hash = "sha256:d667207822eb83f1c4b50949b1623c8fc8d51f2341d65f72e1a1815397551136", size = 102979, upload-time = "2024-11-13T18:24:36.135Z" },
+    { url = "https://files.pythonhosted.org/packages/3d/68/9d4508e893976286d2ead7f8f571314af6c2037af34853a30fd769c02e9d/flask-3.1.1-py3-none-any.whl", hash = "sha256:07aae2bb5eaf77993ef57e357491839f5fd9f4dc281593a81a9e4d79a24f295c", size = 103305, upload-time = "2025-05-13T15:01:15.591Z" },
 ]
 
 [[package]]
@@ -573,15 +574,15 @@ wheels = [
 
 [[package]]
 name = "lyricsgenius"
-version = "3.6.0"
+version = "3.6.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e8/02/67c8058a7b65ad941f5ca5fdb5827c47417f71443dd828014bff969d4a0e/lyricsgenius-3.6.0.tar.gz", hash = "sha256:91b25d78ed7c718ed3a0fb4de964a7a33ae45d7d3743a90a3c620e6dac6c9a7c", size = 506483, upload-time = "2025-04-12T05:44:13.06Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/64/47/ec4a105ce84659291216753e3bf80175d51870efd2308ef2ae603416c901/lyricsgenius-3.6.2.tar.gz", hash = "sha256:e23491940d26af7ec7b718f7d13eaf86e4e0085006b3e071e35bc2f248cab148", size = 506867, upload-time = "2025-04-19T13:47:12.558Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/33/ae/a402b3daee4403f656c3e1cd66d2a50d06bae75305a1890cf9f6ecdfb5b4/lyricsgenius-3.6.0-py3-none-any.whl", hash = "sha256:93df8dd6234669aecb3d52ff9d64054672fb862f9dc9e33bc6db74d82ce05718", size = 44910, upload-time = "2025-04-12T05:44:11.036Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/e5/84b9de1d76a32b48b56bdf493d3442686d2cfd37284e326be411d86cbd30/lyricsgenius-3.6.2-py3-none-any.whl", hash = "sha256:7990fe4c6fffbe570bbd84deaf7987de6921dd9937813ddf79fc3e8b13a39165", size = 44820, upload-time = "2025-04-19T13:47:11.106Z" },
 ]
 
 [[package]]
@@ -1453,13 +1454,13 @@ requires-dist = [
     { name = "aiohttp", specifier = "==3.11.18" },
     { name = "async-lru", specifier = "==2.0.5" },
     { name = "beautifulsoup4", specifier = "==4.13.4" },
-    { name = "flask", specifier = "==3.1.0" },
+    { name = "flask", specifier = "==3.1.1" },
     { name = "gitpython", specifier = "==3.1.44" },
     { name = "gunicorn", specifier = "==23.0.0" },
     { name = "heroku3", specifier = "==5.2.1" },
     { name = "httpx", extras = ["http2"], specifier = "==0.28.1" },
     { name = "kurigram", specifier = "==2.2.3" },
-    { name = "lyricsgenius", specifier = "==3.6.0" },
+    { name = "lyricsgenius", specifier = "==3.6.2" },
     { name = "motor", specifier = "==3.7.0" },
     { name = "ntgcalls", specifier = ">=2.0.0rc5,<3.0.0" },
     { name = "pillow", specifier = "==11.2.1" },
