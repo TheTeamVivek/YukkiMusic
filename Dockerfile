@@ -6,12 +6,8 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-COPY requirements.txt ./
-
-RUN pip install --no-cache-dir --upgrade uv && \
-    uv pip install --upgrade setuptools wheel && \
-    uv pip install -r requirements.txt
-
 COPY . .
 
-CMD ["python3", "-m", "YukkiMusic"]
+RUN pip install -U uv && uv pip install --system -e .
+
+CMD ["yukkimusic"]
