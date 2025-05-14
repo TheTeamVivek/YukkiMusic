@@ -37,3 +37,7 @@ Implement a env var or using db that help we can disable the Cleanmode and enabl
 ## 7.
 
   Now we can say that YukkiMusic fully support multiples langauge with command, enable, disable so we need to refactor all languages
+
+## 8.
+
+  Add External plugin support by sys.argv + externalplugin.setup(...)
