@@ -11,6 +11,8 @@
 import json
 import os
 
+from pytgcalls import types as _types
+
 import config
 from YukkiMusic.core.mongo import mongodb
 
@@ -26,8 +28,10 @@ onoffdb = mongodb.onoffper
 autoenddb = mongodb.autoend
 notesdb = mongodb.notes
 filtersdb = mongodb.filters
-
+ 
 # Shifting to memory [ mongo sucks often]
+audio = {}
+video = {}
 loop = {}
 playtype = {}
 playmode = {}
@@ -37,6 +41,8 @@ pause = {}
 mute = {}
 active = []
 activevideo = []
+command = []
+cleanmode = []
 nonadmin = {}
 vlimit = []
 maintenance = []
@@ -385,39 +391,6 @@ async def remove_active_video_chat(chat_id: int):
 
 # Delete command mode
 
-# Define file paths
-CLEANMODE_DB = os.path.join(config.TEMP_DB_FOLDER, "cleanmode.json")
-COMMAND_DB = os.path.join(config.TEMP_DB_FOLDER, "command.json")
-
-
-def load_cleanmode():
-    if os.path.exists(CLEANMODE_DB):
-        with open(CLEANMODE_DB) as file:
-            return json.load(file)
-    return []
-
-
-def load_command():
-    if os.path.exists(COMMAND_DB):
-        with open(COMMAND_DB) as file:
-            return json.load(file)
-    return []
-
-
-def save_cleanmode():
-    with open(CLEANMODE_DB, "w") as file:
-        json.dump(cleanmode, file)
-
-
-def save_command():
-    with open(COMMAND_DB, "w") as file:
-        json.dump(command, file)
-
-
-cleanmode = load_cleanmode()
-command = load_command()
-
-
 async def is_cleanmode_on(chat_id: int) -> bool:
     return chat_id not in cleanmode
 
@@ -425,13 +398,11 @@ async def is_cleanmode_on(chat_id: int) -> bool:
 async def cleanmode_off(chat_id: int):
     if chat_id not in cleanmode:
         cleanmode.append(chat_id)
-        save_cleanmode()
 
 
 async def cleanmode_on(chat_id: int):
     if chat_id in cleanmode:
         cleanmode.remove(chat_id)
-        save_cleanmode()
 
 
 async def is_commanddelete_on(chat_id: int) -> bool:
@@ -441,13 +412,11 @@ async def is_commanddelete_on(chat_id: int) -> bool:
 async def commanddelete_off(chat_id: int):
     if chat_id not in command:
         command.append(chat_id)
-        save_command()
 
 
 async def commanddelete_on(chat_id: int):
     if chat_id in command:
         command.remove(chat_id)
-        save_command()
 
 
 # Non Admin Chat
@@ -593,66 +562,39 @@ async def maintenance_on():
     return await onoffdb.insert_one({"on_off": 1})
 
 
-# Audio Video Limit
-from pytgcalls.types import AudioQuality, VideoQuality
-
-AUDIO_FILE = os.path.join(config.TEMP_DB_FOLDER, "audio.json")
-VIDEO_FILE = os.path.join(config.TEMP_DB_FOLDER, "video.json")
-
-
-def load_data(file_path):
-    if os.path.exists(file_path):
-        with open(file_path) as file:
-            return json.load(file)
-    return {}
-
-
-def save_data(file_path, data):
-    with open(file_path, "w") as file:
-        json.dump(data, file, indent=4)
-
-
-audio = load_data(AUDIO_FILE)
-video = load_data(VIDEO_FILE)
-
-
 async def save_audio_bitrate(chat_id: int, bitrate: str):
-    audio[str(chat_id)] = bitrate
-    save_data(AUDIO_FILE, audio)
+    audio[chat_id] = bitrate
 
 
 async def save_video_bitrate(chat_id: int, bitrate: str):
-    video[str(chat_id)] = bitrate
-    save_data(VIDEO_FILE, video)
+    video[chat_id] = bitrate
 
 
 async def get_aud_bit_name(chat_id: int) -> str:
-    return audio.get(str(chat_id), "HIGH")
+    return audio.get(chat_id, "STUDIO")
 
 
 async def get_vid_bit_name(chat_id: int) -> str:
-    return video.get(str(chat_id), "HD_720p")
+    return video.get(chat_id, "UHD_4K")
 
 
 async def get_audio_bitrate(chat_id: int) -> str:
-    mode = audio.get(str(chat_id), "MEDIUM")
+    mode = audio.get(chat_id, "STUDIO")
     return {
-        "STUDIO": AudioQuality.STUDIO,
-        "HIGH": AudioQuality.HIGH,
-        "MEDIUM": AudioQuality.MEDIUM,
-        "LOW": AudioQuality.LOW,
-    }.get(mode, AudioQuality.MEDIUM)
+        "STUDIO": _types.AudioQuality.STUDIO,
+        "HIGH": _types.AudioQuality.HIGH,
+        "MEDIUM": _types.AudioQuality.MEDIUM,
+        "LOW": _types.AudioQuality.LOW,
+    }.get(mode, _types.AudioQuality.STUDIO)
 
 
 async def get_video_bitrate(chat_id: int) -> str:
-    mode = video.get(
-        str(chat_id), "SD_480p"
-    )  # Ensure chat_id is a string for JSON compatibility
+    mode = video.get(chat_id, "UHD_4K")
     return {
-        "UHD_4K": VideoQuality.UHD_4K,
-        "QHD_2K": VideoQuality.QHD_2K,
-        "FHD_1080p": VideoQuality.FHD_1080p,
-        "HD_720p": VideoQuality.HD_720p,
-        "SD_480p": VideoQuality.SD_480p,
-        "SD_360p": VideoQuality.SD_360p,
-    }.get(mode, VideoQuality.SD_480p)
+        "UHD_4K": _types.VideoQuality.UHD_4K,
+        "QHD_2K": _types.VideoQuality.QHD_2K,
+        "FHD_1080p": _types.VideoQuality.FHD_1080p,
+        "HD_720p": _types.VideoQuality.HD_720p,
+        "SD_480p": _types.VideoQuality.SD_480p,
+        "SD_360p": _types.VideoQuality.SD_360p,
+    }.get(mode, _types.VideoQuality.UHD_4K)

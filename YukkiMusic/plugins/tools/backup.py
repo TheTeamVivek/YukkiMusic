@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 
 from bson import ObjectId
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import AsyncMongoClient as AsyncIOMotorClient
 from pymongo.errors import OperationFailure
 from pyrogram import filters
 from pyrogram.errors import FloodWait
