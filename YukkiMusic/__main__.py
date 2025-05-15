@@ -15,6 +15,7 @@ from pytgcalls.exceptions import NoActiveGroupCall
 import config
 from config import BANNED_USERS
 from YukkiMusic import HELPABLE, LOGGER, app, userbot
+from YukkiMusic.misc import sudo
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
@@ -39,6 +40,7 @@ async def init():
             BANNED_USERS.add(user_id)
     except Exception:
         pass
+    await sudo()
     await app.start()
     for mod in app.load_plugins_from("YukkiMusic/plugins"):
         if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
