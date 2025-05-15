@@ -10,6 +10,7 @@
 
 import socket
 import time
+import logging
 
 import heroku3
 from pyrogram import filters
@@ -17,14 +18,12 @@ from pyrogram import filters
 import config
 from YukkiMusic.core.mongo import mongodb
 
-from .logging import LOGGER
-
 SUDOERS = filters.user()
 
 
 HAPP = None
 _boot_ = time.time()
-
+logger = logging.getLogger(__name__)
 
 def is_heroku():
     return "heroku" in socket.getfqdn()
@@ -50,7 +49,7 @@ XCB = [
 def dbb():
     global db
     db = {}
-    LOGGER(__name__).info(f"Database Initialized.")
+    logger.info(f"Database Initialized.")
 
 
 async def sudo():
@@ -84,8 +83,8 @@ def heroku():
             try:
                 Heroku = heroku3.from_key(config.HEROKU_API_KEY)
                 HAPP = Heroku.app(config.HEROKU_APP_NAME)
-                LOGGER(__name__).info(f"Heroku App Configured")
+                logger.info(f"Heroku App Configured")
             except Exception:
-                LOGGER(__name__).warning(
+                logger.warning(
                     f"Please make sure your Heroku API Key and Your App name are configured correctly in the heroku."
                 )
