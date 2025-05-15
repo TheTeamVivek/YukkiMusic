@@ -22,8 +22,9 @@ import config
 from config import BANNED_USERS
 from strings import command
 from YukkiMusic import Platform, app
+from YukkiMusic.core.mongo import mongodb
 from YukkiMusic.core.userbot import assistants
-from YukkiMusic.misc import SUDOERS, pymongodb
+from YukkiMusic.misc import SUDOERS
 from YukkiMusic.utils.database import (
     get_global_tops,
     get_particulars,
@@ -317,8 +318,7 @@ async def overall_stats(client, CallbackQuery, _):
     free = hdd.free / (1024.0**3)
     free = str(free)
     mod = int(app.loaded_plug_counts)
-    db = pymongodb
-    call = db.command("dbstats")
+    call = await mongodb.command("dbstats")
     datasize = call["dataSize"] / 1024
     datasize = str(datasize)
     storage = call["storageSize"] / 1024
