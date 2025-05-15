@@ -63,7 +63,7 @@ async def init():
 
         req = os.path.join("xtraplugins", "requirements.txt")
         if os.path.exists(req):
-            result = await app.run_shell_command(["pip", "install", "-r", req])
+            result = await app.run_shell_command(["uv", "pip", "install", "--system", "-r", req])
             if result["returncode"] != 0:
                 logger.error(f"Error installing requirements: {result['stderr']}")
 
