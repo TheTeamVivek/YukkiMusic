@@ -33,7 +33,7 @@ dependencies = [
     "httpx[http2]==0.28.1",
     "Kurigram==2.2.3",
     "lyricsgenius==3.6.2",
-    "motor==3.7.0",
+    "motor==3.7.1",
     "ntgcalls>=2.0.0rc5,<3.0.0",
     "pillow==11.2.1",
     "pykeyboard2==0.1.6",
