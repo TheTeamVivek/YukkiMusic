@@ -214,6 +214,9 @@ lyrics_2: "🔍 searching lyrics..."
 lyrics_3: "❌ Failed to fetch lyrics 🥲.\n\n**Tried searching for:** {0}"
 lyrics_4: "Click on the button below and get searched lyrics to avoid long spam types lyrics search."
 
+# Logger
+logger_text: "**{bot_mention} Play Log**\n\n**Chat ID:** `{chat_id}`\n**Chat Name:** {title}\n**Chat Username:** {chatusername}\n\n**User ID:** `{sender_id}`\n**Name:** {user_mention}\n**Username:** {username}\n\n**Query:** {query}\n**Stream Type:** {streamtype}"
+
 # Ping
 ping_1: "» {0} is pinging..."
 ping_2: "**» PONG**: `{0}`ms \n\n<b><u>{1} system stat's :</u></b>\n\n🌋 Uptime : {2}\n🌋 RAM : {3} \n🌋 CPU : {4} \n🌋 Disk : {5} \n🌋 Py-tgcalls : `{6} ms`"

@@ -210,7 +210,8 @@ lyrics_2: "Şarkı sözleri aranıyor..."
 lyrics_3: "Şarkı sözlerini getirme başarısız oldu 🥲.\n\n**Aranan:** {0}"
 lyrics_4: "Aşağıdaki düğmeye tıklayın ve şarkı sözlerini almak için arama yapın, uzun spam türlerinden kaçının."
 
-
+# Logger
+logger_text: "**{bot_mention} Oynatma Kaydı**\n\n**Sohbet ID:** `{chat_id}`\n**Sohbet Adı:** {title}\n**Sohbet Kullanıcı Adı:** {chatusername}\n\n**Kullanıcı ID:** `{sender_id}`\n**Ad:** {user_mention}\n**Kullanıcı Adı:** {username}\n\n**Sorgu:** {query}\n**Yayın Türü:** {streamtype}"
 
 #Ping
 ping_1 : "»{0} ᴘɪɴɢ ɪɴɢ..."
