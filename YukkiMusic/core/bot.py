@@ -7,17 +7,13 @@
 #
 # All rights reserved.
 #
-import uvloop
 import asyncio
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-
 import importlib.util
 import os
 import traceback
 from datetime import datetime
 from functools import wraps
 
-# import pyromod.listen #noqa
 from pyrogram import Client, StopPropagation, errors
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import (
