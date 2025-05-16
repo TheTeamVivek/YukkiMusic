@@ -8,10 +8,9 @@
 # All rights reserved.
 #
 import uvloop
-
-uvloop.install()
-
 import asyncio
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
 import importlib.util
 import os
 import traceback
