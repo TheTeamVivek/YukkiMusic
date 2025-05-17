@@ -10,7 +10,6 @@
 import os
 import re
 import sys
-from typing import Dict, List, Union
 
 import yaml
 from pyrogram import Client, filters
@@ -18,7 +17,6 @@ from pyrogram.enums import ChatType
 from pyrogram.types import Message
 
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import get_lang, is_maintenance
 
 languages = {}
 commands = {}
@@ -106,6 +104,8 @@ def command(
     case_sensitive: bool = False,
 ):
     async def func(flt, client: Client, message: Message):
+        from YukkiMusic.utils.database import get_lang, is_maintenance
+  
         lang_code = await get_lang(message.chat.id)
         try:
             _ = get_string(lang_code)

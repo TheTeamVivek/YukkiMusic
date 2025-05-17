@@ -12,9 +12,10 @@ from pyrogram.types import Message
 
 from config import BANNED_USERS
 from strings import command
-from YukkiMusic import Platform, app
+from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
+from YukkiMusic.platforms import youtube
 from YukkiMusic.utils import AdminRightsCheck, seconds_to_min
 
 
@@ -54,7 +55,7 @@ async def seek_comm(cli, message: Message, _, chat_id):
         to_seek = duration_played + duration_to_skip + 1
     mystic = await message.reply_text(_["admin_32"])
     if "vid_" in file_path:
-        n, file_path = await Platform.youtube.video(playing[0]["vidid"], True)
+        n, file_path = await youtube.video(playing[0]["vidid"], True)
         if n == 0:
             return await message.reply_text(_["admin_30"])
     try:

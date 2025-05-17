@@ -17,8 +17,9 @@ from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
 import config
 from config import BANNED_USERS
 from strings import command
-from YukkiMusic import Platform, app
+from YukkiMusic import app
 from YukkiMusic.misc import db
+from YukkiMusic.platforms import saavn
 from YukkiMusic.utils import Yukkibin, get_channeplayCB, seconds_to_min
 from YukkiMusic.utils.database import (
     get_cmode,
@@ -92,7 +93,7 @@ async def ping_com(client, message: Message, _):
         elif videoid == "soundcloud":
             IMAGE = config.SOUNCLOUD_IMG_URL
         elif "saavn" in videoid:
-            details = await Platform.saavn.info(got[0]["url"])
+            details = await saavn.info(got[0]["url"])
             IMAGE = details["thumb"]
         else:
             IMAGE = get_image(videoid)
@@ -256,7 +257,7 @@ async def queue_back(client, CallbackQuery: CallbackQuery, _):
         elif videoid == "soundcloud":
             IMAGE = config.SOUNCLOUD_IMG_URL
         elif "saavn" in videoid:
-            details = await Platform.saavn.info(got[0]["url"])
+            details = await saavn.info(got[0]["url"])
             IMAGE = details["thumb"]
         else:
             IMAGE = get_image(videoid)

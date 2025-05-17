@@ -26,7 +26,7 @@ class Saavn:
 
     @staticmethod
     async def is_song(url: str) -> bool:
-        return "song" in url and not "/featured/" in url and "/album/" not in url
+        return "song" in url and "/featured/" not in url and "/album/" not in url
 
     @staticmethod
     async def is_playlist(url: str) -> bool:

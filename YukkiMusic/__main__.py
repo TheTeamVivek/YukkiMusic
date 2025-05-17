@@ -15,8 +15,8 @@ from pytgcalls.exceptions import NoActiveGroupCall
 import config
 from config import BANNED_USERS
 from YukkiMusic import HELPABLE, LOGGER, app, userbot
-from YukkiMusic.misc import sudo
 from YukkiMusic.core.call import Yukki
+from YukkiMusic.misc import sudo
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
 logger = LOGGER("YukkiMusic")

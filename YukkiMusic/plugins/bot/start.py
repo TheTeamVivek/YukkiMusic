@@ -19,8 +19,9 @@ import config
 from config import BANNED_USERS, START_IMG_URL
 from config.config import OWNER_ID
 from strings import command, get_string
-from YukkiMusic import Platform, app
+from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS, _boot_
+from YukkiMusic.platforms import telegram, youtube
 from YukkiMusic.plugins.bot.help import paginate_modules
 from YukkiMusic.plugins.play.playlist import del_plist_msg
 from YukkiMusic.plugins.sudo.sudoers import sudoers_list
@@ -125,7 +126,7 @@ async def start_comm(client, message: Message, _):
             except Exception as e:
                 print(e)
                 return
-            thumbnail = await Platform.youtube.thumbnail(videoid, True)
+            thumbnail = await youtube.thumbnail(videoid, True)
             await m.delete()
             await message.reply_photo(photo=thumbnail, caption=msg)
             return
@@ -146,7 +147,7 @@ async def start_comm(client, message: Message, _):
             lyrical = config.lyrical
             lyrics = lyrical.get(query)
             if lyrics:
-                await Platform.telegram.send_split_text(message, lyrics)
+                await telegram.send_split_text(message, lyrics)
                 return
             else:
                 await message.reply_text("Failed to get lyrics ")

@@ -17,7 +17,10 @@ from pyrogram.types import InlineKeyboardMarkup, Message
 import config
 from config import BANNED_USERS, lyrical
 from strings import command
-from YukkiMusic import LOGGER, Platform, app
+from YukkiMusic import LOGGER, app
+from YukkiMusic.platforms import apple, resso, saavn, soundcloud
+from YukkiMusic.platforms import spotify as spotifyapi
+from YukkiMusic.platforms import telegram, youtube
 from YukkiMusic.utils import seconds_to_min, time_to_seconds
 from YukkiMusic.utils.database import is_video_allowed
 from YukkiMusic.utils.decorators.play import PlayWrapper
@@ -80,11 +83,11 @@ async def play_commnd(
             return await mystic.edit_text(
                 _["play_6"].format(config.DURATION_LIMIT_MIN, duration_min)
             )
-        file_path = await Platform.telegram.get_filepath(audio=audio_telegram)
-        if await Platform.telegram.download(_, message, mystic, file_path):
-            message_link = await Platform.telegram.get_link(message)
-            file_name = await Platform.telegram.get_filename(audio_telegram, audio=True)
-            dur = await Platform.telegram.get_duration(audio_telegram)
+        file_path = await telegram.get_filepath(audio=audio_telegram)
+        if await telegram.download(_, message, mystic, file_path):
+            message_link = await telegram.get_link(message)
+            file_name = await telegram.get_filename(audio_telegram, audio=True)
+            dur = await telegram.get_duration(audio_telegram)
             details = {
                 "title": file_name,
                 "link": message_link,
@@ -130,11 +133,11 @@ async def play_commnd(
                 )
         if video_telegram.file_size > config.TG_VIDEO_FILESIZE_LIMIT:
             return await mystic.edit_text(_["play_9"])
-        file_path = await Platform.telegram.get_filepath(video=video_telegram)
-        if await Platform.telegram.download(_, message, mystic, file_path):
-            message_link = await Platform.telegram.get_link(message)
-            file_name = await Platform.telegram.get_filename(video_telegram)
-            dur = await Platform.telegram.get_duration(video_telegram)
+        file_path = await telegram.get_filepath(video=video_telegram)
+        if await telegram.download(_, message, mystic, file_path):
+            message_link = await telegram.get_link(message)
+            file_name = await telegram.get_filename(video_telegram)
+            dur = await telegram.get_duration(video_telegram)
             details = {
                 "title": file_name,
                 "link": message_link,
@@ -165,10 +168,10 @@ async def play_commnd(
             return await mystic.delete()
         return
     elif url:
-        if await Platform.youtube.exists(url):
+        if await youtube.exists(url):
             if "playlist" in url:
                 try:
-                    details = await Platform.youtube.playlist(
+                    details = await youtube.playlist(
                         url,
                         config.PLAYLIST_FETCH_LIMIT,
                     )
@@ -185,7 +188,7 @@ async def play_commnd(
                 cap = _["play_10"]
             elif "https://youtu.be" in url:
                 videoid = url.split("/")[-1].split("?")[0]
-                details, track_id = await Platform.youtube.track(
+                details, track_id = await youtube.track(
                     f"https://www.youtube.com/watch?v={videoid}"
                 )
                 streamtype = "youtube"
@@ -196,7 +199,7 @@ async def play_commnd(
                 )
             else:
                 try:
-                    details, track_id = await Platform.youtube.track(url)
+                    details, track_id = await youtube.track(url)
                 except Exception as e:
                     print(e)
                     return await mystic.edit_text(_["play_3"])
@@ -206,7 +209,7 @@ async def play_commnd(
                     details["title"],
                     details["duration_min"],
                 )
-        elif await Platform.spotify.valid(url):
+        elif await spotifyapi.valid(url):
             spotify = True
             if not config.SPOTIFY_CLIENT_ID and not config.SPOTIFY_CLIENT_SECRET:
                 return await mystic.edit_text(
@@ -214,7 +217,7 @@ async def play_commnd(
                 )
             if "track" in url:
                 try:
-                    details, track_id = await Platform.spotify.track(url)
+                    details, track_id = await spotifyapi.track(url)
                 except Exception:
                     return await mystic.edit_text(_["play_3"])
                 streamtype = "youtube"
@@ -222,7 +225,7 @@ async def play_commnd(
                 cap = _["play_11"].format(details["title"], details["duration_min"])
             elif "playlist" in url:
                 try:
-                    details, plist_id = await Platform.spotify.playlist(url)
+                    details, plist_id = await spotifyapi.playlist(url)
                 except Exception:
                     return await mystic.edit_text(_["play_3"])
                 streamtype = "playlist"
@@ -231,7 +234,7 @@ async def play_commnd(
                 cap = _["play_12"].format(message.from_user.first_name)
             elif "album" in url:
                 try:
-                    details, plist_id = await Platform.spotify.album(url)
+                    details, plist_id = await spotifyapi.album(url)
                 except Exception:
                     return await mystic.edit_text(_["play_3"])
                 streamtype = "playlist"
@@ -240,7 +243,7 @@ async def play_commnd(
                 cap = _["play_12"].format(message.from_user.first_name)
             elif "artist" in url:
                 try:
-                    details, plist_id = await Platform.spotify.artist(url)
+                    details, plist_id = await spotifyapi.artist(url)
                 except Exception:
                     return await mystic.edit_text(_["play_3"])
                 streamtype = "playlist"
@@ -249,10 +252,10 @@ async def play_commnd(
                 cap = _["play_12"].format(message.from_user.first_name)
             else:
                 return await mystic.edit_text(_["play_17"])
-        elif await Platform.apple.valid(url):
+        elif await apple.valid(url):
             if "album" in url:
                 try:
-                    details, track_id = await Platform.apple.track(url)
+                    details, track_id = await apple.track(url)
                 except Exception:
                     return await mystic.edit_text(_["play_3"])
                 streamtype = "youtube"
@@ -261,7 +264,7 @@ async def play_commnd(
             elif "playlist" in url:
                 spotify = True
                 try:
-                    details, plist_id = await Platform.apple.playlist(url)
+                    details, plist_id = await apple.playlist(url)
                 except Exception:
                     return await mystic.edit_text(_["play_3"])
                 streamtype = "playlist"
@@ -270,21 +273,21 @@ async def play_commnd(
                 img = url
             else:
                 return await mystic.edit_text(_["play_16"])
-        elif await Platform.resso.valid(url):
+        elif await resso.valid(url):
             try:
-                details, track_id = await Platform.resso.track(url)
+                details, track_id = await resso.track(url)
             except Exception:
                 return await mystic.edit_text(_["play_3"])
             streamtype = "youtube"
             img = details["thumb"]
             cap = _["play_11"].format(details["title"], details["duration_min"])
-        elif await Platform.saavn.valid(url):
+        elif await saavn.valid(url):
             if "shows" in url:
                 return await mystic.edit_text(_["saavn_1"])
 
-            elif await Platform.saavn.is_song(url):
+            elif await saavn.is_song(url):
                 try:
-                    file_path, details = await Platform.saavn.download(url)
+                    file_path, details = await saavn.download(url)
                 except Exception as e:
                     ex_type = type(e).__name__
                     LOGGER(__name__).error("An error occurred", exc_info=True)
@@ -299,9 +302,9 @@ async def play_commnd(
                             details["duration_min"],
                         )
                     )
-            elif await Platform.saavn.is_playlist(url):
+            elif await saavn.is_playlist(url):
                 try:
-                    details = await Platform.saavn.playlist(
+                    details = await saavn.playlist(
                         url, limit=config.PLAYLIST_FETCH_LIMIT
                     )
                     streamtype = "saavn_playlist"
@@ -334,9 +337,9 @@ async def play_commnd(
                 return await mystic.edit_text(err)
             return await mystic.delete()
 
-        elif await Platform.soundcloud.valid(url):
+        elif await soundcloud.valid(url):
             try:
-                details, track_path = await Platform.soundcloud.download(url)
+                details, track_path = await soundcloud.download(url)
             except Exception:
                 return await mystic.edit_text(_["play_3"])
             duration_sec = details["duration_sec"]
@@ -369,7 +372,7 @@ async def play_commnd(
                 return await mystic.edit_text(err)
             return await mystic.delete()
         else:
-            if not await Platform.telegram.is_streamable_url(url):
+            if not await telegram.is_streamable_url(url):
                 return await mystic.edit_text(_["play_19"])
 
             await mystic.edit_text(_["str_2"])
@@ -407,7 +410,7 @@ async def play_commnd(
         if "-v" in query:
             query = query.replace("-v", "")
         try:
-            details, track_id = await Platform.youtube.track(query)
+            details, track_id = await youtube.track(query)
         except Exception:
             return await mystic.edit_text(_["play_3"])
         streamtype = "youtube"
@@ -500,7 +503,7 @@ async def play_commnd(
                     ),
                     reply_markup=InlineKeyboardMarkup(buttons),
                 )
-                return await play_logs(message, streamtype=f"Searched on Youtube")
+                return await play_logs(message, streamtype="Searched on Youtube")
             else:
                 buttons = track_markup(
                     _,
@@ -515,4 +518,4 @@ async def play_commnd(
                     caption=cap,
                     reply_markup=InlineKeyboardMarkup(buttons),
                 )
-                return await play_logs(message, streamtype=f"URL Searched Inline")
+                return await play_logs(message, streamtype="URL Searched Inline")

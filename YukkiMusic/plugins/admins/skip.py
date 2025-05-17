@@ -15,9 +15,10 @@ from pyrogram.types import InlineKeyboardMarkup, Message
 import config
 from config import BANNED_USERS
 from strings import command
-from YukkiMusic import Platform, app
+from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
+from YukkiMusic.platforms import saavn, youtube
 from YukkiMusic.utils import fallback
 from YukkiMusic.utils.database import get_loop
 from YukkiMusic.utils.decorators import AdminRightsCheck
@@ -114,7 +115,7 @@ async def skip(cli, message: Message, _, chat_id):
     duration_min = check[0]["dur"]
     status = True if str(streamtype) == "video" else None
     if "live_" in queued:
-        n, link = await Platform.youtube.video(videoid, True)
+        n, link = await youtube.video(videoid, True)
         if n == 0:
             return await message.reply_text(_["admin_11"].format(title))
         try:
@@ -138,7 +139,7 @@ async def skip(cli, message: Message, _, chat_id):
         thumbnail = None
         mystic = await message.reply_text(_["call_8"], disable_web_page_preview=True)
         try:
-            if Platform.youtube.use_fallback:
+            if youtube.use_fallback:
                 file_path, _data, status = await fallback.download(
                     title[:12], video=status
                 )
@@ -149,11 +150,11 @@ async def skip(cli, message: Message, _, chat_id):
                 duration_min = _data.get("duration_min", duration_min)
             else:
                 try:
-                    file_path, direct = await Platform.youtube.download(
-                        vidid, mystic, videoid=True, video=status
+                    file_path, direct = await youtube.download(
+                        videoid, mystic, videoid=True, video=status
                     )
                 except Exception:
-                    Platform.youtube.use_fallback = True
+                    youtube.use_fallback = True
                     file_path, _data, status = await fallback.download(
                         title[:12], video=status
                     )
@@ -234,7 +235,7 @@ async def skip(cli, message: Message, _, chat_id):
         elif "saavn" in videoid:
             button = telegram_markup(_, chat_id)
             url = check[0]["url"]
-            details = await Platform.saavn.info(url)
+            details = await saavn.info(url)
             run = await message.reply_photo(
                 photo=details["thumb"] or config.TELEGRAM_AUDIO_URL,
                 caption=_["stream_1"].format(title, url, check[0]["dur"], user),

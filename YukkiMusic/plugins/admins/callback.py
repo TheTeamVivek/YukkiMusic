@@ -23,9 +23,12 @@ from config import (
     adminlist,
     lyrical,
 )
-from YukkiMusic import Platform, app
+from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS, db
+from YukkiMusic.platforms import apple, saavn
+from YukkiMusic.platforms import spotify as spotifyapi
+from YukkiMusic.platforms import youtube
 from YukkiMusic.utils import fallback, seconds_to_min, time_to_seconds
 from YukkiMusic.utils.channelplay import get_channeplayCB
 from YukkiMusic.utils.database import (
@@ -41,7 +44,6 @@ from YukkiMusic.utils.database import (
 )
 from YukkiMusic.utils.decorators import ActualAdminCB
 from YukkiMusic.utils.decorators.language import languageCB
-from YukkiMusic.utils.formatters import seconds_to_min
 from YukkiMusic.utils.inline.play import (
     livestream_markup,
     panel_markup_1,
@@ -260,7 +262,7 @@ async def admin_callback(client, CallbackQuery, _):
         status = True if str(streamtype) == "video" else None
         db[chat_id][0]["played"] = 0
         if "live_" in queued:
-            n, link = await Platform.youtube.video(videoid, True)
+            n, link = await youtube.video(videoid, True)
             if n == 0:
                 return await CallbackQuery.message.reply_text(
                     _["admin_11"].format(title)
@@ -289,7 +291,7 @@ async def admin_callback(client, CallbackQuery, _):
                 _["call_8"], disable_web_page_preview=True
             )
             try:
-                if Platform.youtube.use_fallback:
+                if youtube.use_fallback:
                     file_path, _data, status = await fallback.download(
                         title[:12], video=status
                     )
@@ -301,11 +303,11 @@ async def admin_callback(client, CallbackQuery, _):
                     duration_min = _data.get("duration_min", duration_min)
                 else:
                     try:
-                        file_path, direct = await Platform.youtube.download(
+                        file_path, direct = await youtube.download(
                             videoid, mystic, videoid=True, video=status
                         )
                     except Exception:
-                        Platform.youtube.use_fallback = True
+                        youtube.use_fallback = True
                         file_path, _data, status = await fallback.download(
                             title[:12], video=status
                         )
@@ -388,7 +390,7 @@ async def admin_callback(client, CallbackQuery, _):
                 db[chat_id][0]["markup"] = "tg"
             elif "saavn" in videoid:
                 url = check[0]["url"]
-                details = await Platform.saavn.info(url)
+                details = await saavn.info(url)
                 button = telegram_markup(_, chat_id)
                 run = await CallbackQuery.message.reply_photo(
                     photo=details["thumb"],
@@ -448,7 +450,7 @@ async def admin_callback(client, CallbackQuery, _):
         await CallbackQuery.answer()
         mystic = await CallbackQuery.message.reply_text(_["admin_32"])
         if "vid_" in file_path:
-            n, file_path = await Platform.youtube.video(playing[0]["vidid"], True)
+            n, file_path = await youtube.video(playing[0]["vidid"], True)
             if n == 0:
                 return await mystic.edit_text(_["admin_30"])
         try:
@@ -494,7 +496,7 @@ async def play_music(client, CallbackQuery, _):
         _["play_2"].format(channel) if channel else _["play_1"]
     )
     try:
-        details, track_id = await Platform.youtube.track(vidid, True)
+        details, track_id = await youtube.track(vidid, True)
     except Exception:
         return await mystic.edit_text(_["play_3"])
     if details["duration_min"]:
@@ -587,7 +589,7 @@ async def play_playlists_cb(client, CallbackQuery, _):
     if ptype == "yt":
         spotify = False
         try:
-            result = await Platform.youtube.playlist(
+            result = await youtube.playlist(
                 videoid,
                 config.PLAYLIST_FETCH_LIMIT,
                 True,
@@ -596,22 +598,22 @@ async def play_playlists_cb(client, CallbackQuery, _):
             return await mystic.edit_text(_["play_3"])
     if ptype == "spplay":
         try:
-            result, spotify_id = await Platform.spotify.playlist(videoid)
+            result, spotify_id = await spotifyapi.playlist(videoid)
         except Exception:
             return await mystic.edit_text(_["play_3"])
     if ptype == "spalbum":
         try:
-            result, spotify_id = await Platform.spotify.album(videoid)
+            result, spotify_id = await spotifyapi.album(videoid)
         except Exception:
             return await mystic.edit_text(_["play_3"])
     if ptype == "spartist":
         try:
-            result, spotify_id = await Platform.spotify.artist(videoid)
+            result, spotify_id = await spotifyapi.artist(videoid)
         except Exception:
             return await mystic.edit_text(_["play_3"])
     if ptype == "apple":
         try:
-            result, apple_id = await Platform.apple.playlist(videoid, True)
+            result, apple_id = await apple.playlist(videoid, True)
         except Exception:
             return await mystic.edit_text(_["play_3"])
     try:
@@ -664,9 +666,7 @@ async def slider_queries(client, CallbackQuery, _):
             await CallbackQuery.answer(_["playcb_2"])
         except Exception:
             pass
-        title, duration_min, thumbnail, vidid = await Platform.youtube.slider(
-            query, query_type
-        )
+        title, duration_min, thumbnail, vidid = await youtube.slider(query, query_type)
         buttons = slider_markup(_, vidid, user_id, query, query_type, cplay, fplay)
         med = InputMediaPhoto(
             media=thumbnail,
@@ -687,9 +687,7 @@ async def slider_queries(client, CallbackQuery, _):
             await CallbackQuery.answer(_["playcb_2"])
         except Exception:
             pass
-        title, duration_min, thumbnail, vidid = await Platform.youtube.slider(
-            query, query_type
-        )
+        title, duration_min, thumbnail, vidid = await youtube.slider(query, query_type)
         buttons = slider_markup(_, vidid, user_id, query, query_type, cplay, fplay)
         med = InputMediaPhoto(
             media=thumbnail,

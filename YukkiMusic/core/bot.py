@@ -43,7 +43,15 @@ class YukkiBot(Client):
     def __init__(self, *args, **kwargs):
         LOGGER(__name__).info("Starting Bot...")
 
-        super().__init__(*args, **kwargs)
+        super().__init__(
+            "YukkiMusic",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            bot_token=config.BOT_TOKEN,
+            sleep_threshold=240,
+            max_concurrent_transmissions=5,
+            workers=50,
+        )
         self.loaded_plug_counts = 0
 
     def on_message(self, filters=None, group=0):

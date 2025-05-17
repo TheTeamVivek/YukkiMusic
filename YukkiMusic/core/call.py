@@ -31,9 +31,10 @@ from pytgcalls.types import (
 
 import config
 from strings import get_string
-from YukkiMusic import LOGGER, Platform, app, userbot
+from YukkiMusic import LOGGER, app, userbot
 from YukkiMusic.core.userbot import assistants
 from YukkiMusic.misc import db
+from YukkiMusic.platforms import saavn, youtube
 from YukkiMusic.utils import fallback
 from YukkiMusic.utils.database import (
     add_active_chat,
@@ -377,7 +378,7 @@ class Call:
             video = True if str(streamtype) == "video" else False
             call_config = GroupCallConfig(auto_start=False)
             if "live_" in queued:
-                n, link = await Platform.youtube.video(videoid, True)
+                n, link = await youtube.video(videoid, True)
                 if n == 0:
                     return await app.send_message(
                         original_chat_id,
@@ -391,7 +392,7 @@ class Call:
                     )
                 else:
                     try:
-                        image = await Platform.youtube.thumbnail(videoid, True)
+                        image = await youtube.thumbnail(videoid, True)
                     except Exception:
                         image = None
                     if image and config.PRIVATE_BOT_MODE:
@@ -434,7 +435,7 @@ class Call:
                 flink = f"https://t.me/{app.username}?start=info_{videoid}"
                 thumbnail = None
                 try:
-                    if Platform.youtube.use_fallback:
+                    if youtube.use_fallback:
                         file_path, _data, video = await fallback.download(
                             title[:12],
                             video=video,
@@ -446,14 +447,14 @@ class Call:
                         check[0]["dur"] = _data.get("duration_min", check[0]["dur"])
                     else:
                         try:
-                            file_path, direct = await Platform.youtube.download(
+                            file_path, direct = await youtube.download(
                                 videoid,
                                 mystic,
                                 videoid=True,
                                 video=video,
                             )
                         except Exception:
-                            Platform.youtube.use_fallback = True
+                            youtube.use_fallback = True
                             file_path, _data, video = await fallback.download(
                                 title[:12],
                                 video=(True if str(streamtype) == "video" else False),
@@ -475,7 +476,7 @@ class Call:
                     )
                 else:
                     try:
-                        image = await Platform.youtube.thumbnail(videoid, True)
+                        image = await youtube.thumbnail(videoid, True)
                     except Exception:
                         image = None
                     if image and config.PRIVATE_BOT_MODE:
@@ -553,11 +554,11 @@ class Call:
 
                 elif "saavn" in videoid:
                     url = check[0].get("url")
-                    details = await Platform.saavn.info(url)
+                    details = await saavn.info(url)
                     image = details["thumb"]
                 else:
                     try:
-                        image = await Platform.youtube.thumbnail(videoid, True)
+                        image = await youtube.thumbnail(videoid, True)
                     except Exception:
                         image = None
                 if video:
@@ -655,7 +656,7 @@ class Call:
 
     async def start(self):
         """Starts all PyTgCalls instances for the existing userbot clients."""
-        LOGGER(__name__).info(f"Starting PyTgCall Clients")
+        LOGGER(__name__).info("Starting PyTgCall Clients")
         await asyncio.gather(*[c.start() for c in self.calls])
 
     async def decorators(self):

@@ -16,7 +16,8 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from config import BANNED_USERS, SERVER_PLAYLIST_LIMIT
 from strings import command
-from YukkiMusic import Platform, app
+from YukkiMusic import app
+from YukkiMusic.platforms import carbon, youtube
 from YukkiMusic.utils.database import (
     delete_playlist,
     get_playlist,
@@ -57,9 +58,9 @@ async def check_playlist(client, message: Message, _):
         car = os.linesep.join(msg.split(os.linesep)[:17])
     else:
         car = msg
-    carbon = await Platform.carbon.generate(car, randint(100, 10000000000))
+    img = await carbon.generate(car, randint(100, 10000000000))
     await get.delete()
-    await message.reply_photo(carbon, caption=_["playlist_15"].format(link))
+    await message.reply_photo(img, caption=_["playlist_15"].format(link))
 
 
 async def get_keyboard(_, user_id):
@@ -79,9 +80,9 @@ async def get_keyboard(_, user_id):
     keyboard.row(
         InlineKeyboardButton(
             text=_["PL_B_5"],
-            callback_data=f"delete_warning",
+            callback_data="delete_warning",
         ),
-        InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data=f"close"),
+        InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
     )
     return keyboard, count
 
@@ -100,30 +101,6 @@ async def del_group_message(client, message: Message, _):
         ]
     )
     await message.reply_text(_["playlist_6"], reply_markup=upl)
-
-
-async def get_keyboard(_, user_id):
-    keyboard = InlineKeyboard(row_width=5)
-    _playlist = await get_playlist_names(user_id)
-    count = len(_playlist)
-    for x in _playlist:
-        _note = await get_playlist(user_id, x)
-        title = _note["title"]
-        title = title.title()
-        keyboard.row(
-            InlineKeyboardButton(
-                text=title,
-                callback_data=f"del_playlist {x}",
-            )
-        )
-    keyboard.row(
-        InlineKeyboardButton(
-            text=_["PL_B_5"],
-            callback_data=f"delete_warning",
-        ),
-        InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data=f"close"),
-    )
-    return keyboard, count
 
 
 @app.on_message(command("DELETE_PLAYLIST_COMMAND") & filters.private & ~BANNED_USERS)
@@ -286,7 +263,7 @@ async def add_playlist(client, message: Message, _):
 
             m = await message.reply(_["playlist_21"])
             title, duration_min, duration_sec, thumbnail, videoid = (
-                await Platform.youtube.details(videoid, True)
+                await youtube.details(videoid, True)
             )
             title = (title[:50]).title()
             plist = {
@@ -354,7 +331,7 @@ async def add_playlist(client, CallbackQuery, _):
         duration_sec,
         thumbnail,
         vidid,
-    ) = await Platform.youtube.details(videoid, True)
+    ) = await youtube.details(videoid, True)
     title = (title[:50]).title()
     plist = {
         "videoid": vidid,
@@ -373,7 +350,7 @@ async def add_playlist(client, CallbackQuery, _):
 
 @app.on_callback_query(filters.regex("del_playlist") & ~BANNED_USERS)
 @languageCB
-async def del_plist(client, CallbackQuery, _):
+async def del_plistcb(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     videoid = callback_data.split(None, 1)[1]
     user_id = CallbackQuery.from_user.id

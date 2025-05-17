@@ -29,7 +29,8 @@ from config import (
     cookies,
 )
 from strings import command
-from YukkiMusic import Platform, app
+from YukkiMusic import app
+from YukkiMusic.platforms import youtube
 from YukkiMusic.utils.decorators.language import language, languageCB
 from YukkiMusic.utils.formatters import convert_bytes
 from YukkiMusic.utils.inline.song import song_markup
@@ -60,10 +61,10 @@ async def song_commad_group(client, message: Message, _):
 async def song_commad_private(client, message: Message, _):
     await message.delete()
 
-    url = await Platform.youtube.url(message)
+    url = await youtube.url(message)
 
     if url:
-        if not await Platform.youtube.exists(url):
+        if not await youtube.exists(url):
             return await message.reply_text(_["song_5"])
 
         mystic = await message.reply_text(_["play_1"])
@@ -74,7 +75,7 @@ async def song_commad_private(client, message: Message, _):
             duration_sec,
             thumbnail,
             vidid,
-        ) = await Platform.youtube.details(url)
+        ) = await youtube.details(url)
 
         if str(duration_min) == "None":
             return await mystic.edit_text(_["song_3"])
@@ -109,7 +110,7 @@ async def song_commad_private(client, message: Message, _):
             duration_sec,
             thumbnail,
             vidid,
-        ) = await Platform.youtube.details(query)
+        ) = await youtube.details(query)
 
     except Exception:
         return await mystic.edit_text(_["play_3"])
@@ -166,7 +167,7 @@ async def song_helper_cb(client, CallbackQuery, _):
 
     if stype == "audio":
         try:
-            formats_available, link = await Platform.youtube.formats(vidid, True)
+            formats_available, link = await youtube.formats(vidid, True)
 
         except Exception:
             return await CallbackQuery.edit_message_text(_["song_7"])
@@ -206,14 +207,14 @@ async def song_helper_cb(client, CallbackQuery, _):
                 text=_["BACK_BUTTON"],
                 callback_data=f"song_back {stype}|{vidid}",
             ),
-            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data=f"close"),
+            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
         )
 
         return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
 
     else:
         try:
-            formats_available, link = await Platform.youtube.formats(vidid, True)
+            formats_available, link = await youtube.formats(vidid, True)
 
         except Exception as e:
             print(e)
@@ -253,7 +254,7 @@ async def song_helper_cb(client, CallbackQuery, _):
                 text=_["BACK_BUTTON"],
                 callback_data=f"song_back {stype}|{vidid}",
             ),
-            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data=f"close"),
+            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
         )
 
         return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
@@ -300,7 +301,7 @@ async def song_download_cb(client, CallbackQuery, _):
         height = CallbackQuery.message.photo.height
 
         try:
-            file_path = await Platform.youtube.download(
+            file_path = await youtube.download(
                 yturl,
                 mystic,
                 songvideo=True,
@@ -340,7 +341,7 @@ async def song_download_cb(client, CallbackQuery, _):
 
     elif stype == "audio":
         try:
-            filename = await Platform.youtube.download(
+            filename = await youtube.download(
                 yturl,
                 mystic,
                 songaudio=True,

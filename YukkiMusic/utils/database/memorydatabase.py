@@ -8,8 +8,6 @@
 # All rights reserved.
 #
 
-import json
-import os
 
 from pytgcalls import types as _types
 
@@ -28,7 +26,7 @@ onoffdb = mongodb.onoffper
 autoenddb = mongodb.autoend
 notesdb = mongodb.notes
 filtersdb = mongodb.filters
- 
+
 # Shifting to memory [ mongo sucks often]
 audio = {}
 video = {}
@@ -390,6 +388,7 @@ async def remove_active_video_chat(chat_id: int):
 
 
 # Delete command mode
+
 
 async def is_cleanmode_on(chat_id: int) -> bool:
     return chat_id not in cleanmode

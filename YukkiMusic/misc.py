@@ -8,9 +8,9 @@
 # All rights reserved.
 
 
+import logging
 import socket
 import time
-import logging
 
 import heroku3
 from pyrogram import filters
@@ -24,6 +24,7 @@ SUDOERS = filters.user()
 HAPP = None
 _boot_ = time.time()
 logger = logging.getLogger(__name__)
+
 
 def is_heroku():
     return "heroku" in socket.getfqdn()

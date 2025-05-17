@@ -21,10 +21,11 @@ from pytgcalls.__version__ import __version__ as pytgver
 import config
 from config import BANNED_USERS
 from strings import command
-from YukkiMusic import Platform, app
+from YukkiMusic import app
 from YukkiMusic.core.mongo import mongodb
 from YukkiMusic.core.userbot import assistants
 from YukkiMusic.misc import SUDOERS
+from YukkiMusic.platforms import youtube
 from YukkiMusic.utils.database import (
     get_global_tops,
     get_particulars,
@@ -104,7 +105,7 @@ async def gstats_global(client, message: Message, _):
         duration_sec,
         thumbnail,
         vidid,
-    ) = await Platform.youtube.details(videoid, True)
+    ) = await youtube.details(videoid, True)
     title = title.title()
     final = f"Top played Tracks on  {app.mention}\n\n**Title:** {title}\n\nPlayed** {co} **times"
     upl = get_stats_markup(_, True if message.from_user.id in SUDOERS else False)
@@ -230,7 +231,7 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
 
 @app.on_callback_query(filters.regex("TopOverall") & ~BANNED_USERS)
 @languageCB
-async def overall_stats(client, CallbackQuery, _):
+async def top_overall_stats(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     what = callback_data.split(None, 1)[1]
     if what != "s":
@@ -284,7 +285,7 @@ async def overall_stats(client, CallbackQuery, _):
 
 @app.on_callback_query(filters.regex("bot_stats_sudo"))
 @languageCB
-async def overall_stats(client, CallbackQuery, _):
+async def bot_stats(client, CallbackQuery, _):
     if CallbackQuery.from_user.id not in SUDOERS:
         return await CallbackQuery.answer("ᴏɴʟʏ ғᴏʀ sᴜᴅᴏ ᴜsᴇʀ's", show_alert=True)
     callback_data = CallbackQuery.data.strip()

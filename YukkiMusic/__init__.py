@@ -6,11 +6,12 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-import uvloop as _uvloop
 import asyncio as _asyncio
+
+import uvloop as _uvloop
+
 _asyncio.set_event_loop_policy(_uvloop.EventLoopPolicy())
 
-import config
 from YukkiMusic.core.bot import YukkiBot
 from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
@@ -18,20 +19,6 @@ from YukkiMusic.core.userbot import Userbot
 from YukkiMusic.misc import dbb, heroku
 
 from .logging import LOGGER
-
-# Pyrogram Client
-
-app = YukkiBot(
-    "YukkiMusic",
-    api_id=config.API_ID,
-    api_hash=config.API_HASH,
-    bot_token=config.BOT_TOKEN,
-    sleep_threshold=240,
-    max_concurrent_transmissions=5,
-    workers=50,
-)
-
-userbot = Userbot()
 
 # Directories
 dirr()
@@ -45,7 +32,7 @@ dbb()
 # Heroku APP
 heroku()
 
-from .platforms import PlaTForms
+app = YukkiBot()
+userbot = Userbot()
 
-Platform = PlaTForms()
 HELPABLE = {}

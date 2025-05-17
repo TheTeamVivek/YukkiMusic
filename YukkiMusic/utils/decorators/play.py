@@ -13,9 +13,10 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from config import PLAYLIST_IMG_URL, PRIVATE_BOT_MODE, adminlist
 from strings import get_string
-from YukkiMusic import Platform, app
+from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import SUDOERS
+from YukkiMusic.platforms import youtube
 from YukkiMusic.utils.database import (
     get_assistant,
     get_cmode,
@@ -75,7 +76,7 @@ def PlayWrapper(command):
             if message.reply_to_message
             else None
         )
-        url = await Platform.youtube.url(message)
+        url = await youtube.url(message)
         if audio_telegram is None and video_telegram is None and url is None:
             if len(message.command) < 2:
                 if "stream" in message.command:
