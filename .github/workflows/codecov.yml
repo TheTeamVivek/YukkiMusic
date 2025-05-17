@@ -19,8 +19,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade uv
-          uv pip install pytest pytest-cov
-          uv pip install -e .
+          uv pip install --system pytest pytest-cov
+          uv pip install --system -e .
 
       - name: Run tests
         run: pytest --cov --cov-branch --cov-report=xml
