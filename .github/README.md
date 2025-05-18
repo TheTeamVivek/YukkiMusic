@@ -36,7 +36,7 @@ Get started quickly by deploying to Heroku with just one click:
   
 
 - Create the Virtual Environment:  
-  - You can activate the virtual Environment before cloning the repo.
+  - You can create and activate the virtual Environment before cloning the repo.
   ```bash
   uv venv
   ```
