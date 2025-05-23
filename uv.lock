@@ -1397,11 +1397,11 @@ wheels = [
 
 [[package]]
 name = "yt-dlp"
-version = "2025.4.30"
+version = "2025.5.22"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/75/ca/1d1a33dec2107463f59bc4b448fcf43718d86a36b6150e8a0cfd1a96a893/yt_dlp-2025.4.30.tar.gz", hash = "sha256:d01367d0c3ae94e35cb1e2eccb7a7c70e181c4ca448f4ee2374f26489d263603", size = 2981094, upload-time = "2025-04-30T23:31:17.679Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/09/93/695cef32796dc7e76597e68a267a34a1b4e29bef8e12da445fa7c0ad1e55/yt_dlp-2025.5.22.tar.gz", hash = "sha256:ea73854c5dabc124f29a35a8fae9bc5d422ef3231bebeea2bdfa82ac191a9c29", size = 3017654, upload-time = "2025-05-22T09:58:35.694Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ea/18/bbccb18661a853c3db947152439229b9bf686fe0ab2cc7848ab3a24f2ad2/yt_dlp-2025.4.30-py3-none-any.whl", hash = "sha256:53cd82bf13f12a1fe9c564b0004e001156b153c9247fa3cef14d1400ab359150", size = 3239476, upload-time = "2025-04-30T23:31:14.997Z" },
+    { url = "https://files.pythonhosted.org/packages/25/68/4f108193ebce3ee7beb5f9a21daa6bc875e261150b510be468626f151959/yt_dlp-2025.5.22-py3-none-any.whl", hash = "sha256:a49c4b76afeaded6254c3e2b759d8d5a13271aa963d5fccb51fe059d1c313151", size = 3264137, upload-time = "2025-05-22T09:58:32.613Z" },
 ]
 
 [[package]]
@@ -1464,5 +1464,5 @@ requires-dist = [
     { name = "tgcrypto", specifier = "==1.2.5" },
     { name = "urllib3", specifier = "==2.4.0" },
     { name = "uvloop", specifier = "==0.21.0" },
-    { name = "yt-dlp", specifier = "==2025.4.30" },
+    { name = "yt-dlp", specifier = "==2025.5.22" },
 ]
