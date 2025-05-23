@@ -2,13 +2,15 @@ name: Update uv Cache
 
 on:
   push:
+    branches:
+      - master
     paths:
       - "**.toml"
   workflow_dispatch:
 
 jobs:
   update:
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +29,7 @@ jobs:
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "ci(deps): update uv.lock file"
+          commit_message: "ci(deps): update uv.lock"
           commit_options: "--no-verify"
           repository: .
           commit_user_name: "github-actions[bot]"
