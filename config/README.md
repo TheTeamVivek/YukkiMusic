@@ -13,8 +13,8 @@ Config vars are basically the variables which configure or modify bot to functio
 3. `BOT_TOKEN` : Get it from [@Botfather](http://t.me/BotFather) in Telegram
 4. `MONGO_DB_URI` : Get mongo db [from here.](https://notreallyshikhar.gitbook.io/yukkimusicbot/deployment/mongodb)
 5. `LOG_GROUP_ID` : You'll need a Private Group ID for this. Supergroup Needed with id starting from -100 
-6. `OWNER_ID` : Your Owner ID for managing your bot., muktiple ids can be seperated by commas.
-7. `STRING_SESSIONS`: Pyrogram v2 session strings for multiple assistants, separated by commas.
+6. `OWNER_ID` : Your Owner ID for managing your bot., multiple ids can be seperated by a space.
+7. `STRING_SESSIONS`: Pyrogram v2 session string. If you want to use multiple assistants, separate them with commas.
 
 
 ## Non-Mandatory Vars
