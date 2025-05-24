@@ -179,7 +179,7 @@ async def start_comm(client, message: Message, _):
 ⏰**Published times:** {published}
 🎥**Channel Name:** {channel}
 📎**Channel Link:** [Visit from here]({channellink})
-🔗**Videp linl:** [Link]({link})
+🔗**Video Link:** [Link]({link})
 """
             key = InlineKeyboardMarkup(
                 [
