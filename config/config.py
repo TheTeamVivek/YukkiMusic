@@ -6,15 +6,15 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
+import os as _os
 import re as _re
 import sys as _sys
-import os as _os
 
-import  dotenv as _dotenv
+import dotenv as _dotenv
 from pyrogram import filters as _flt
 
 _dotenv.load_dotenv()
- 
+
 
 def is_bool(value: str) -> bool:
     return str(value).lower() in ["true", "yes"]
@@ -25,11 +25,13 @@ def parse_list(text: str, sep: str = ",") -> list[str]:
         text = ""
     return [v.strip() for v in str(text).strip("'\"").split(sep) if v.strip()]
 
+
 def getenv(key, default=None):
     value = default
     if v := _os.getenv(key):
         value = v
     return value
+
 
 # Get it from my.telegram.org
 

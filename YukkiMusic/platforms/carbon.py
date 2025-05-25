@@ -7,10 +7,10 @@
 #
 # All rights reserved.
 #
-import aiofiles
-import random
 import os
+import random
 
+import aiofiles
 import aiohttp
 from aiohttp import client_exceptions
 
@@ -109,7 +109,7 @@ class Carbon:
                 raise UnableToFetchCarbon("Can not reach the Host!")
             resp = await request.read()
             os.makedirs("cache", exist_ok=True)
-        
+
             async with aiofiles.open(f"cache/carbon{user_id}.jpg", "wb") as f:
                 await f.write(resp)
             return os.path.realpath(f.name)

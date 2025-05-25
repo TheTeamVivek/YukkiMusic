@@ -9,9 +9,9 @@
 #
 
 import os as _os
-import aiofiles as _aiofiles
 import random as _random
 
+import aiofiles as _aiofiles
 import aiohttp as _aiohttp
 
 from .config import *

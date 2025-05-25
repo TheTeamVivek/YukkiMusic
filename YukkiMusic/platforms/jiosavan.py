@@ -9,9 +9,9 @@
 #
 
 import os
-import aiofiles
 from io import BytesIO
 
+import aiofiles
 import aiohttp
 import yt_dlp
 from PIL import Image

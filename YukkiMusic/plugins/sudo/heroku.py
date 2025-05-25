@@ -18,7 +18,6 @@ import aiofiles
 import aiohttp
 import dotenv
 import heroku3
-import urllib3
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
 from pyrogram import filters
@@ -31,6 +30,7 @@ from strings import command
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import HAPP, SUDOERS, XCB, db
+from YukkiMusic.utils import pastebin
 from YukkiMusic.utils.database import (
     get_active_chats,
     get_cmode,
@@ -39,19 +39,20 @@ from YukkiMusic.utils.database import (
 )
 from YukkiMusic.utils.decorators import AdminActual, language
 from YukkiMusic.utils.decorators.language import language
-from YukkiMusic.utils import pastebin
+
 
 async def is_heroku():
     loop = asyncio.get_running_loop()
     return "heroku" in await loop.run_in_executor(None, socket.getfqdn)
-    
+
+
 @app.on_message(command("GETLOG_COMMAND") & SUDOERS)
 @language
 async def log_(client, message, _):
     async def _get_log():
         async with aiofiles.open(config.LOG_FILE_NAME) as f:
             lines = await f.readlines()
-        
+
         data = ""
         try:
             NUMB = int(message.text.split(None, 1)[1])
