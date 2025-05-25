@@ -9,6 +9,7 @@
 #
 
 import os
+import aiofiles
 from io import BytesIO
 
 import aiohttp
@@ -107,9 +108,9 @@ class Saavn:
             async with aiohttp.ClientSession() as session:
                 async with session.get(details["_download_url"]) as resp:
                     if resp.status == 200:
-                        with open(file_path, "wb") as f:
+                        async with aiofiles.open(file_path, "wb") as f:
                             while chunk := await resp.content.read(1024):
-                                f.write(chunk)
+                                await f.write(chunk)
                         print(f"Downloaded: {file_path}")
                     else:
                         raise ValueError(

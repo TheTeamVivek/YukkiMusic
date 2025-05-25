@@ -13,6 +13,7 @@
 #
 
 import asyncio
+import aiofiles
 import contextlib
 import os
 import traceback
@@ -78,8 +79,8 @@ async def executor(client: app, message: Message):
     final_output = f"<b>RESULTS:</b>\n<pre language='python'>{evaluation}</pre>"
     if len(final_output) > 4096:
         filename = "output.txt"
-        with open(filename, "w+", encoding="utf8") as out_file:
-            out_file.write(str(evaluation))
+        async with aiofiles.open(filename, "w+", encoding="utf8") as out_file:
+            await out_file.write(str(evaluation))
         t2 = time()
         keyboard = InlineKeyboardMarkup(
             [
@@ -186,8 +187,8 @@ async def shellrunner(_, message: Message):
         output = "<b>OUTPUT :</b>\n<code>None</code>"
 
     if len(output) > 4096:
-        with open("output.txt", "w+") as file:
-            file.write(output)
+        async with aiofiles.open("output.txt", "w+") as file:
+            await file.write(output)
         await app.send_document(
             message.chat.id,
             "output.txt",

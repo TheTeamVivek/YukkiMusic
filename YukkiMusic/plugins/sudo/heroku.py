@@ -14,9 +14,10 @@ import shutil
 import socket
 from datetime import datetime
 
+import aiofiles
+import aiohttp
 import dotenv
 import heroku3
-import requests
 import urllib3
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
@@ -38,26 +39,19 @@ from YukkiMusic.utils.database import (
 )
 from YukkiMusic.utils.decorators import AdminActual, language
 from YukkiMusic.utils.decorators.language import language
-from YukkiMusic.utils.pastebin import Yukkibin
-
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
+from YukkiMusic.utils import pastebin
 
 async def is_heroku():
-    return "heroku" in socket.getfqdn()
-
-
-async def paste_neko(code: str):
-    return await Yukkibin(code)
-
-
+    loop = asyncio.get_running_loop()
+    return "heroku" in await loop.run_in_executor(None, socket.getfqdn)
+    
 @app.on_message(command("GETLOG_COMMAND") & SUDOERS)
 @language
 async def log_(client, message, _):
     async def _get_log():
-        log = open(config.LOG_FILE_NAME)
-        lines = log.readlines()
-        log.close()
+        async with aiofiles.open(config.LOG_FILE_NAME) as f:
+            lines = await f.readlines()
+        
         data = ""
         try:
             NUMB = int(message.text.split(None, 1)[1])
@@ -65,7 +59,7 @@ async def log_(client, message, _):
             NUMB = 100
         for x in lines[-NUMB:]:
             data += x
-        link = await Yukkibin(data)
+        link = await pastebin.paste(data)
         return link
 
     try:
@@ -75,7 +69,7 @@ async def log_(client, message, _):
                     return await message.reply_text(await _get_log())
                 return await message.reply_text(_["heroku_1"])
             data = HAPP.get_log()
-            link = await Yukkibin(data)
+            link = await pastebin.paste(data)
             return await message.reply_text(link)
         else:
             if os.path.exists(config.LOG_FILE_NAME):
@@ -195,10 +189,12 @@ async def usage_dynos(client, message, _):
         "Accept": "application/vnd.heroku+json; version=3.account-quotas",
     }
     path = "/accounts/" + account_id + "/actions/get-quota"
-    r = requests.get("https://api.heroku.com" + path, headers=headers)
-    if r.status_code != 200:
-        return await dyno.edit("Unable to fetch.")
-    result = r.json()
+    url = "https://api.heroku.com" + path
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as r:
+            if r.status != 200:
+                return await dyno.edit("Unable to fetch.")
+            result = await r.json()
     quota = result["account_quota"]
     quota_used = result["quota_used"]
     remaining_quota = quota - quota_used
@@ -263,7 +259,7 @@ async def update_(client, message, _):
     _final_updates_ = f"{_update_response_} {updates}"
 
     if len(_final_updates_) > 4096:
-        url = await Yukkibin(updates)
+        url = await pastebin.paste(updates)
         nrs = await response.edit(
             f"**A new upadte is available for the Bot!**\n\n➣ Pushing upadtes Now\n\n__**Updates:**__\n\n[Check Upadtes]({url})",
             disable_web_page_preview=True,
