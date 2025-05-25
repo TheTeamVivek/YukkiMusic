@@ -105,7 +105,7 @@ def command(
 ):
     async def func(flt, client: Client, message: Message):
         from YukkiMusic.utils.database import get_lang, is_maintenance
-  
+
         lang_code = await get_lang(message.chat.id)
         try:
             _ = get_string(lang_code)

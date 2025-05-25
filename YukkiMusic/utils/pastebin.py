@@ -27,3 +27,6 @@ async def Yukkibin(text):
         return
     link = BASE + resp["message"]
     return link
+
+
+paste = Yukkibin

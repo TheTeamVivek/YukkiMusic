@@ -9,7 +9,7 @@
 #
 from pyrogram import filters
 from pyrogram.enums import ChatType
-from pyrogram.errors import MessageNotModified, QueryIdInvalid, PeerIdInvalid
+from pyrogram.errors import MessageNotModified, PeerIdInvalid, QueryIdInvalid
 from pyrogram.types import (
     CallbackQuery,
     InlineKeyboardButton,
@@ -86,7 +86,7 @@ async def settings_cb(client, CallbackQuery, _):
 async def settings_back_markup(client, CallbackQuery: CallbackQuery, _):
     try:
         await CallbackQuery.answer()
-    except QueryIdInvalid as e:
+    except QueryIdInvalid:
         return
 
     if CallbackQuery.message.chat.type == ChatType.PRIVATE:

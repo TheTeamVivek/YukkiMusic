@@ -8,10 +8,11 @@
 # All rights reserved.
 #
 
-import os
-import random
+import os as _os
+import random as _random
 
-import aiohttp
+import aiofiles as _aiofiles
+import aiohttp as _aiohttp
 
 from .config import *
 
@@ -20,9 +21,9 @@ async def fetch_cookies():
     if not COOKIE_LINK or not isinstance(COOKIE_LINK, list):  # noqa
         return None
 
-    os.makedirs("config/cookies", exist_ok=True)
+    _os.makedirs("config/cookies", exist_ok=True)
 
-    async with aiohttp.ClientSession() as session:
+    async with _aiohttp.ClientSession() as session:
         for i, link in enumerate(COOKIE_LINK, start=1):
             paste_id = link.split("/")[-1]
             raw_url = f"https://batbin.me/raw/{paste_id}"
@@ -31,8 +32,8 @@ async def fetch_cookies():
                 if response.status == 200:
                     rc = await response.text()
                     path = f"config/cookies/cookies_{i}.txt"
-                    with open(path, "w", encoding="utf-8") as f:
-                        f.write(rc)
+                    async with _aiofiles.open(path, "w", encoding="utf-8") as f:
+                        await f.write(rc)
                     print(f"Cookies {i} successfully written to {path}")
                 else:
                     print(
@@ -41,20 +42,20 @@ async def fetch_cookies():
 
 
 def cookies():
-    folder_path = os.path.join(os.getcwd(), "config", "cookies")
-    if not os.path.exists(folder_path):
+    folder_path = _os.path.join(_os.getcwd(), "config", "cookies")
+    if not _os.path.exists(folder_path):
         raise FileNotFoundError(
             f"The folder '{folder_path}' does not exist."
             "Make sure your cookies folder in config/ "
         )
 
-    txt_files = [file for file in os.listdir(folder_path) if file.endswith(".txt")]
+    txt_files = [file for file in _os.listdir(folder_path) if file.endswith(".txt")]
     if not txt_files:
         raise FileNotFoundError(
             "No cookies found in the 'cookies' directory."
             "Make sure your cookies are saved as .txt files."
         )
 
-    random_cookie = random.choice(txt_files)
-    cookie_path = os.path.join(folder_path, random_cookie)
+    random_cookie = _random.choice(txt_files)
+    cookie_path = _os.path.join(folder_path, random_cookie)
     return cookie_path
