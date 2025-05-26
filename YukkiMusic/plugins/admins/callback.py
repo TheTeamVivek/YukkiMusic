@@ -710,7 +710,7 @@ async def close_menu(_, query):
 
 @app.on_callback_query(filters.regex("stop_downloading") & ~BANNED_USERS)
 @ActualAdminCB
-async def stop_download(client, query: query, _):
+async def stop_download(client, query, _):
     message_id = query.message.id
     task = lyrical.get(message_id)
     if not task:
