@@ -362,11 +362,9 @@ class YouTube:
 
         @asyncify
         def song_video_dl():
-            formats = f"{format_id}+140"
-            fpath = f"downloads/{title}"
             ydl_optssx = {
-                "format": formats,
-                "outtmpl": fpath,
+                "format": f"{format_id}+140",
+                "outtmpl": os.path.join("downloads", f"%(id)s_{format_id}.%(ext)s"),
                 "geo_bypass": True,
                 "noplaylist": True,
                 "nocheckcertificate": True,
@@ -379,15 +377,15 @@ class YouTube:
 
             with YoutubeDL(ydl_optssx) as x:
                 info = x.extract_info(link)
-                file_path = x.prepare_filename(info)
+                filename = f"{info['id']}_{format_id}.mp4"
+                file_path = os.path.join("downloads", filename)
                 return file_path
 
         @asyncify
         def song_audio_dl():
-            fpath = f"downloads/{title}.%(ext)s"
             ydl_optssx = {
                 "format": format_id,
-                "outtmpl": fpath,
+                "outtmpl": os.path.join("downloads", f"%(id)s_{format_id}.%(ext)s"),
                 "geo_bypass": True,
                 "noplaylist": True,
                 "nocheckcertificate": True,
@@ -406,7 +404,8 @@ class YouTube:
 
             with YoutubeDL(ydl_optssx) as x:
                 info = x.extract_info(link)
-                file_path = x.prepare_filename(info)
+                filename = f"{info['id']}_{format_id}.mp3"
+                file_path = os.path.join("downloads", filename)
                 return file_path
 
         if songvideo:
