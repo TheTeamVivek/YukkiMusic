@@ -59,8 +59,7 @@ class YouTube:
 
     @property
     def use_fallback(self):
-        return False
-        #return NOTHING["cookies_dead"] is True
+        return NOTHING["cookies_dead"] is True
 
     @use_fallback.setter
     def use_fallback(self, value):
