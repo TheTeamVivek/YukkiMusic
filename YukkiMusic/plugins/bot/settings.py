@@ -78,7 +78,7 @@ async def settings_cb(client, query, _):
 
 @app.on_callback_query(filters.regex("settingsback_helper") & ~BANNED_USERS)
 @languageCB
-async def settings_back_markup(client, _):
+async def settings_back_markup(client, query, _):
     try:
         await query.answer()
     except QueryIdInvalid:

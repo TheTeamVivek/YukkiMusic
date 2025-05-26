@@ -9,136 +9,46 @@
 #
 
 import logging
-import re
+import traceback
 from math import ceil
 
 from pyrogram import filters, types
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from config import BANNED_USERS, START_IMG_URL
-from strings import command, get_command, get_string, helpers
+from strings import command, get_string
 from YukkiMusic import HELPABLE, app
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
 from YukkiMusic.utils.decorators.language import LanguageStart
 from YukkiMusic.utils.inline.help import private_help_panel
 
-COLUMN_SIZE = 4  # Number of button height
+COLUMN_SIZE = 3  # Number of button height
 NUM_COLUMNS = 3  # Number of button width
 
-
-async def format_helper_text(lng, helper_key: str, text: str) -> str:
-    if not text:
-        return ""
-    _ = get_command(lng)
-
-    def _cmd(key):
-        return " ".join(f"/{cmd}" for cmd in _[key])
-
-    if helper_key == "Auth":
-        return text.format(
-            _cmd("AUTH_COMMAND"), _cmd("UNAUTH_COMMAND"), _cmd("AUTHUSERS_COMMAND")
-        )
-    elif helper_key == "Admin":
-        return text.format(
-            _cmd("PAUSE_COMMAND"),
-            _cmd("RESUME_COMMAND"),
-            _cmd("MUTE_COMMAND"),
-            _cmd("UNMUTE_COMMAND"),
-            _cmd("SKIP_COMMAND"),
-            _cmd("STOP_COMMAND"),
-            _cmd("SHUFFLE_COMMAND"),
-            _cmd("SEEK_COMMAND"),
-            _cmd("SEEK_BACK_COMMAND"),
-            _cmd("REBOOT_COMMAND"),
-            _cmd("LOOP_COMMAND"),
-        )
-    elif helper_key == "Active":
-        return text.format(
-            _cmd("ACTIVEVC_COMMAND"),
-            _cmd("ACTIVEVIDEO_COMMAND"),
-            _cmd("AC_COMMAND"),
-            _cmd("STATS_COMMAND"),
-        )
-    elif helper_key == "Play":
-        return text.format(
-            _cmd("PLAY_COMMAND"),
-            _cmd("PLAYMODE_COMMAND"),
-            _cmd("CHANNELPLAY_COMMAND"),
-            _cmd("STREAM_COMMAND"),
-        )
-    elif helper_key == "G-cast":
-        return text.format(_cmd("BROADCAST_COMMAND"))
-    elif helper_key == "Bot":
-        return text.format(
-            _cmd("GSTATS_COMMAND"),
-            _cmd("SUDOUSERS_COMMAND"),
-            _cmd("LYRICS_COMMAND"),
-            _cmd("SONG_COMMAND"),
-            _cmd("QUEUE_COMMAND"),
-            _cmd("AUTHORIZE_COMMAND"),
-            _cmd("UNAUTHORIZE_COMMAND"),
-            _cmd("AUTHORIZED_COMMAND"),
-        )
-    elif helper_key == "P-List":
-        return text.format(
-            _cmd("PLAYLIST_COMMAND"),
-            _cmd("DELETE_PLAYLIST_COMMAND"),
-            _cmd("PLAY_PLAYLIST_COMMAND"),
-            _cmd("PLAY_PLAYLIST_COMMAND"),
-        )
-    elif helper_key == "B-list":
-        return text.format(
-            _cmd("BLACKLISTCHAT_COMMAND"),
-            _cmd("WHITELISTCHAT_COMMAND"),
-            _cmd("BLACKLISTEDCHAT_COMMAND"),
-            _cmd("BLOCK_COMMAND"),
-            _cmd("UNBLOCK_COMMAND"),
-            _cmd("BLOCKED_COMMAND"),
-            _cmd("GBAN_COMMAND"),
-            _cmd("UNGBAN_COMMAND"),
-            _cmd("GBANNED_COMMAND"),
-        )
-    elif helper_key == "Dev":
-        return text.format(
-            _cmd("ADDSUDO_COMMAND"),
-            _cmd("DELSUDO_COMMAND"),
-            _cmd("SUDOUSERS_COMMAND"),
-            _cmd("USAGE_COMMAND"),
-            _cmd("GETVAR_COMMAND"),
-            _cmd("DELVAR_COMMAND"),
-            _cmd("SETVAR_COMMAND"),
-            _cmd("RESTART_COMMAND"),
-            _cmd("UPDATE_COMMAND"),
-            _cmd("SPEEDTEST_COMMAND"),
-            _cmd("MAINTENANCE_COMMAND"),
-            _cmd("LOGGER_COMMAND"),
-            _cmd("GETLOG_COMMAND"),
-            _cmd("AUTOEND_COMMAND"),
-        )
-    else:
-        return text
+logger = logging.getLogger(__name__)
 
 
 async def paginate_modules(page_n, chat_id: int, close: bool = False):
-    language = await get_lang(chat_id)
-    helpers_dict = helpers.get(language, helpers.get("en", {}))
+    lang = await get_lang(chat_id)
+    string = get_string(lang)
 
     helper_buttons = [
-        EqInlineKeyboardButton(
-            text=helper_key,
-            callback_data=f"help_helper({helper_key},{page_n},{int(close)})",
+        InlineKeyboardButton(
+            text=helper_key.replace("_HELPER", "").title(),
+            callback_data=f"help_helper({helper_key}:{page_n}:{int(close)})",
         )
-        for helper_key in helpers_dict
+        for helper_key in sorted(string.keys())
+        if helper_key.endswith("_HELPER")
     ]
 
     module_buttons = [
-        EqInlineKeyboardButton(
+        InlineKeyboardButton(
             x.__MODULE__,
-            callback_data="help_module({},{},{})".format(
+            callback_data="help_module({}:{}:{})".format(
                 x.__MODULE__.lower(), page_n, int(close)
             ),
         )
-        for x in HELPABLE.values()
+        for x in sorted(HELPABLE.values(), key=lambda m: m.__MODULE__.lower())
     ]
 
     all_buttons = helper_buttons + module_buttons
@@ -150,20 +60,20 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
     modulo_page = page_n % max_num_pages
 
     navigation_buttons = [
-        EqInlineKeyboardButton(
+        InlineKeyboardButton(
             "❮",
-            callback_data="help_prev({},{})".format(
+            callback_data="help_prev({}:{})".format(
                 modulo_page - 1 if modulo_page > 0 else max_num_pages - 1,
                 int(close),
             ),
         ),
-        EqInlineKeyboardButton(
+        InlineKeyboardButton(
             "close" if close else "Back",
             callback_data="close" if close else "settingsback_helper",
         ),
-        EqInlineKeyboardButton(
+        InlineKeyboardButton(
             "❯",
-            callback_data=f"help_next({modulo_page + 1},{int(close)})",
+            callback_data=f"help_next({modulo_page + 1}:{int(close)})",
         ),
     ]
 
@@ -174,7 +84,7 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
     else:
         pairs.append(
             [
-                EqInlineKeyboardButton(
+                InlineKeyboardButton(
                     "close" if close else "Back",
                     callback_data="close" if close else "settingsback_helper",
                 )
@@ -228,38 +138,26 @@ async def help_com_group(client, message: Message, _):
     await message.reply_text(_["help_2"], reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-@app.on_callback_query(filters.regex(r"help_(.*?)"))
+@app.on_callback_query(filters.regex(r"help_(\w+)\(([\w:]+)\)"))
 async def help_button(client, query):
-    mod_match = re.match(r"help_module\((.+?),(.+?),(\d+)\)", query.data)
-    prev_match = re.match(r"help_prev\((.+?),(\d+)\)", query.data)
-    next_match = re.match(r"help_next\((.+?),(\d+)\)", query.data)
-    helper_match = re.match(r"help_helper\((.+?),(.+?),(\d+)\)", query.data)
-
-    try:
-        language = await get_lang(query.message.chat.id)
-        _ = get_string(language)
-        helpers_dict = helpers.get(language, helpers.get("en"))
-
-    except Exception:
-        _ = get_string("en")
-        helpers_dict = helpers.get("en", {})
-
+    pattern_match = query.matches[0]
+    key = pattern_match.group(1).lower()
+    language = await get_lang(query.message.chat.id)
+    _ = get_string(language)
     top_text = _["help_1"]
 
-    if mod_match:
-        module = mod_match.group(1)
-        prev_page_num = int(mod_match.group(2))
-        close = bool(int(mod_match.group(3)))
-        text = (
-            f"<b><u>Here is the help for {HELPABLE[module].__MODULE__}:</u></b>\n"
-            + HELPABLE[module].__HELP__
-        )
+    if key == "module":
+
+        module, prev_page_num, close = pattern_match.group(2).split(":")
+        prev_page_num = int(prev_page_num)
+        close = bool(int(close))
+        text = HELPABLE[module].__HELP__
         key = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
                         text="↪️ Back",
-                        callback_data=f"help_prev({prev_page_num},{int(close)})",
+                        callback_data=f"help_prev({prev_page_num}:{int(close)})",
                     ),
                     InlineKeyboardButton(text="🔄 Close", callback_data="close"),
                 ],
@@ -270,9 +168,10 @@ async def help_button(client, query):
             reply_markup=key,
             disable_web_page_preview=True,
         )
-    elif prev_match:
-        curr_page = int(prev_match.group(1))
-        close = bool(int(prev_match.group(2)))
+    elif key == "prev":
+        curr_page, close = pattern_match.group(2).split(":")
+        curr_page = int(curr_page)
+        close = bool(int(close))
         await query.message.edit(
             text=top_text,
             reply_markup=await paginate_modules(
@@ -280,9 +179,10 @@ async def help_button(client, query):
             ),
             disable_web_page_preview=True,
         )
-    elif next_match:
-        next_page = int(next_match.group(1))
-        close = bool(int(next_match.group(2)))
+    elif key == "next":
+        next_page, close = pattern_match.group(2).split(":")
+        next_page = int(next_page)
+        close = bool(int(close))
         await query.message.edit(
             text=top_text,
             reply_markup=await paginate_modules(
@@ -290,17 +190,16 @@ async def help_button(client, query):
             ),
             disable_web_page_preview=True,
         )
-    elif helper_match:
-        helper_key = helper_match.group(1)
-        page_n = int(helper_match.group(2))
-        close = bool(int(helper_match.group(3)))
-        raw_text = helpers_dict.get(helper_key, None)
-        formatted_text = await format_helper_text(language, helper_key, raw_text)
+    elif key == "helper":
+        helper_key, page_n, close = pattern_match.group(2).split(":")
+        page_n = int(page_n)
+        close = bool(int(close))
+
         key = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
-                        text="↪️ Back", callback_data=f"help_prev({page_n},{int(close)})"
+                        text="↪️ Back", callback_data=f"help_prev({page_n}:{int(close)})"
                     ),
                     InlineKeyboardButton(text="🔄 Close", callback_data="close"),
                 ]
@@ -308,11 +207,11 @@ async def help_button(client, query):
         )
         try:
             await query.message.edit(
-                text=f"<b>{helper_key}:</b>\n{formatted_text}",
+                text=_[helper_key],
                 reply_markup=key,
                 disable_web_page_preview=True,
             )
-        except Exception as e:
-            logging.exception(e)
+        except Exception:
+            traceback.print_exc()
 
     await client.answer_callback_query(query.id)

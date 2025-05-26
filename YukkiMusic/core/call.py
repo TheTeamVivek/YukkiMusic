@@ -8,6 +8,8 @@
 # All rights reserved.
 #
 import asyncio
+import logging
+import traceback
 
 from ntgcalls import TelegramServerError
 from pyrogram.enums import ChatMemberStatus
@@ -31,7 +33,7 @@ from pytgcalls.types import (
 
 import config
 from strings import get_string
-from YukkiMusic import LOGGER, app, userbot
+from YukkiMusic import app, userbot
 from YukkiMusic.core.userbot import assistants
 from YukkiMusic.misc import db
 from YukkiMusic.platforms import saavn, youtube
@@ -58,6 +60,7 @@ from YukkiMusic.utils.stream.autoclear import auto_clean
 from YukkiMusic.utils.thumbnails import gen_thumb
 
 links = {}
+logger = logging.getLogger(__name__)
 
 
 async def _clear_(chat_id):
@@ -313,7 +316,7 @@ class Call:
                 config=call_config,
             )
         except Exception:
-            LOGGER(__name__).error("\n", exc_info=True)
+            traceback.print_exc()
             await self.join_chat(chat_id)
             try:
                 await assistant.play(
@@ -322,7 +325,7 @@ class Call:
                     config=call_config,
                 )
             except Exception:
-                LOGGER(__name__).error("\n", exc_info=True)
+                traceback.print_exc()
                 raise AssistantErr(
                     "**No Active Voice Chat Found**\n\nPlease make sure group's voice chat is enabled. If already enabled, please end it and start fresh voice chat again and if the problem continues, try /restart"
                 )
@@ -655,12 +658,12 @@ class Call:
         if pings:
             return str(round(sum(pings) / len(pings), 3))
         else:
-            LOGGER(__name__).error("No active clients for ping calculation.")
+            logger.error("No active clients for ping calculation.")
             return "No active clients"
 
     async def start(self):
         """Starts all PyTgCalls instances for the existing userbot clients."""
-        LOGGER(__name__).info("Starting PyTgCall Clients")
+        logger.info("Starting PyTgCall Clients")
         await asyncio.gather(*[c.start() for c in self.calls])
 
     async def stop(self):

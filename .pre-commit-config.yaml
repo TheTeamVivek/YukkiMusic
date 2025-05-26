@@ -7,7 +7,6 @@ repos:
           [
             --in-place,
             --ignore-init-module-imports,
-            --remove-unused-variables,
             --remove-duplicate-keys,
             --remove-all-unused-imports,
           ]
