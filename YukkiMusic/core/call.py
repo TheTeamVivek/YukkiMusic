@@ -39,6 +39,7 @@ from YukkiMusic.utils import fallback
 from YukkiMusic.utils.database import (
     add_active_chat,
     add_active_video_chat,
+    get_active_chats,
     get_assistant,
     get_audio_bitrate,
     get_lang,
@@ -96,11 +97,14 @@ class Call:
         assistant = await group_assistant(self, chat_id)
         await assistant.unmute(chat_id)
 
-    async def stop_stream(self, chat_id: int):
+    async def leave_call(self, chat_id):
         assistant = await group_assistant(self, chat_id)
+        await assistant.leave_call(chat_id)
+
+    async def stop_stream(self, chat_id: int):
         try:
             await _clear_(chat_id)
-            await assistant.leave_call(chat_id)
+            await self.leave_call(chat_id)
         except Exception:
             pass
 
@@ -658,6 +662,12 @@ class Call:
         """Starts all PyTgCalls instances for the existing userbot clients."""
         LOGGER(__name__).info("Starting PyTgCall Clients")
         await asyncio.gather(*[c.start() for c in self.calls])
+
+    async def stop(self):
+        t = []
+        for x in await get_active_chats():
+            t.append(self.leave_call(x))
+        await asyncio.gather(*t, return_exceptions=True)
 
     async def decorators(self):
         for call in self.calls:

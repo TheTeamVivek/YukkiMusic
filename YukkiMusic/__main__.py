@@ -95,6 +95,7 @@ async def init():
     await idle()
     await app.stop()
     await userbot.stop()
+    await Yukki.stop()
 
 
 def main():
