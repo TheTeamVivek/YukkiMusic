@@ -124,7 +124,7 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
     helpers_dict = helpers.get(language, helpers.get("en", {}))
 
     helper_buttons = [
-        EqInlineKeyboardButton(
+        InlineKeyboardButton(
             text=helper_key,
             callback_data=f"help_helper({helper_key},{page_n},{int(close)})",
         )
@@ -132,7 +132,7 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
     ]
 
     module_buttons = [
-        EqInlineKeyboardButton(
+        InlineKeyboardButton(
             x.__MODULE__,
             callback_data="help_module({},{},{})".format(
                 x.__MODULE__.lower(), page_n, int(close)
@@ -150,18 +150,18 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
     modulo_page = page_n % max_num_pages
 
     navigation_buttons = [
-        EqInlineKeyboardButton(
+        InlineKeyboardButton(
             "❮",
             callback_data="help_prev({},{})".format(
                 modulo_page - 1 if modulo_page > 0 else max_num_pages - 1,
                 int(close),
             ),
         ),
-        EqInlineKeyboardButton(
+        InlineKeyboardButton(
             "close" if close else "Back",
             callback_data="close" if close else "settingsback_helper",
         ),
-        EqInlineKeyboardButton(
+        InlineKeyboardButton(
             "❯",
             callback_data=f"help_next({modulo_page + 1},{int(close)})",
         ),
@@ -174,7 +174,7 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
     else:
         pairs.append(
             [
-                EqInlineKeyboardButton(
+                InlineKeyboardButton(
                     "close" if close else "Back",
                     callback_data="close" if close else "settingsback_helper",
                 )
