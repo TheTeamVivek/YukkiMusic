@@ -37,13 +37,13 @@ from YukkiMusic.utils.database import (
     remove_active_chat,
     remove_active_video_chat,
 )
-from YukkiMusic.utils.decorators import AdminActual, language
+from YukkiMusic.utils.decorators import AdminActual, asyncify, language
 from YukkiMusic.utils.decorators.language import language
 
 
-async def is_heroku():
-    loop = asyncio.get_running_loop()
-    return "heroku" in await loop.run_in_executor(None, socket.getfqdn)
+@asyncify
+def is_heroku():
+    return "heroku" in socket.getfqdn()
 
 
 @app.on_message(command("GETLOG_COMMAND") & SUDOERS)

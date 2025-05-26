@@ -7,6 +7,8 @@
 #
 # All rights reserved.
 #
+import asyncio
+
 import speedtest
 
 from strings import command
@@ -16,17 +18,22 @@ from YukkiMusic.misc import SUDOERS
 
 async def testspeed(m):
     try:
-        test = speedtest.Speedtest()
-        test.get_best_server()
+        test = await asyncio.to_thread(speedtest.Speedtest)
+        await asyncio.to_thread(test.get_best_server)
+
         m = await m.edit("⇆ Running Download Speedtest ...")
-        test.download()
+        await asyncio.to_thread(test.download)
+
         m = await m.edit("⇆ Running Upload SpeedTest...")
-        test.upload()
-        test.results.share()
-        result = test.results.dict()
+        await asyncio.to_thread(test.upload)
+
+        await asyncio.to_thread(test.results.share)
+        result = await asyncio.to_thread(test.results.dict)
+
         m = await m.edit("↻ Sharing SpeedTest results")
     except Exception as e:
-        return await m.edit(e)
+        return await m.edit(str(e))
+
     return result
 
 
