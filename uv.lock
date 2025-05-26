@@ -1423,7 +1423,7 @@ requires-dist = [
     { name = "ntgcalls", specifier = ">=2.0.0rc5,<3.0.0" },
     { name = "pillow", specifier = "==11.2.1" },
     { name = "psutil", specifier = "==7.0.0" },
-    { name = "py-tgcalls", specifier = "==2.2.0rc3" },
+    { name = "py-tgcalls", specifier = "~=2.2.0rc3" },
     { name = "py-yt-search", specifier = "==0.3" },
     { name = "pykeyboard2", specifier = "==0.1.6" },
     { name = "pymongo", specifier = "==4.13.0" },
