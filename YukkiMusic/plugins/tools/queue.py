@@ -12,7 +12,7 @@ import asyncio
 
 from pyrogram import filters
 from pyrogram.errors import FloodWait
-from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
+from pyrogram.types import InputMediaPhoto, Message
 
 import config
 from config import BANNED_USERS
@@ -153,38 +153,38 @@ async def ping_com(client, message: Message, _):
 
 
 @app.on_callback_query(filters.regex("GetTimer") & ~BANNED_USERS)
-async def quite_timer(client, CallbackQuery: CallbackQuery):
+async def quite_timer(client, query):
     try:
-        await CallbackQuery.answer()
+        await query.answer()
     except Exception:
         pass
 
 
 @app.on_callback_query(filters.regex("GetQueued") & ~BANNED_USERS)
 @languageCB
-async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
-    callback_data = CallbackQuery.data.strip()
+async def queued_tracks(client, query, _):
+    callback_data = query.data.strip()
     callback_request = callback_data.split(None, 1)[1]
     what, videoid = callback_request.split("|")
     try:
-        chat_id, channel = await get_channeplayCB(_, what, CallbackQuery)
+        chat_id, channel = await get_channeplayCB(_, what, query)
     except Exception:
         return
     if not await is_active_chat(chat_id):
-        return await CallbackQuery.answer(_["general_6"], show_alert=True)
+        return await query.answer(_["general_6"], show_alert=True)
     got = db.get(chat_id)
     if not got:
-        return await CallbackQuery.answer(_["queue_2"], show_alert=True)
+        return await query.answer(_["queue_2"], show_alert=True)
     if len(got) == 1:
-        return await CallbackQuery.answer(_["queue_5"], show_alert=True)
-    await CallbackQuery.answer()
+        return await query.answer(_["queue_5"], show_alert=True)
+    await query.answer()
     basic[videoid] = False
     buttons = queue_back_markup(_, what)
     med = InputMediaPhoto(
         media="https://telegra.ph//file/6f7d35131f69951c74ee5.jpg",
         caption=_["queue_1"],
     )
-    await CallbackQuery.edit_message_media(media=med)
+    await query.edit_message_media(media=med)
     j = 0
     msg = ""
     for x in got:
@@ -198,43 +198,41 @@ async def queued_tracks(client, CallbackQuery: CallbackQuery, _):
     if "Queued" in msg:
         if len(msg) < 700:
             await asyncio.sleep(1)
-            return await CallbackQuery.edit_message_text(msg, reply_markup=buttons)
+            return await query.edit_message_text(msg, reply_markup=buttons)
 
         if "🏷" in msg:
             msg = msg.replace("🏷", "")
         link = await Yukkibin(msg)
-        await CallbackQuery.edit_message_text(
-            _["queue_3"].format(link), reply_markup=buttons
-        )
+        await query.edit_message_text(_["queue_3"].format(link), reply_markup=buttons)
     else:
         if len(msg) > 700:
             if "🏷" in msg:
                 msg = msg.replace("🏷", "")
             link = await Yukkibin(msg)
             await asyncio.sleep(1)
-            return await CallbackQuery.edit_message_text(
+            return await query.edit_message_text(
                 _["queue_3"].format(link), reply_markup=buttons
             )
 
         await asyncio.sleep(1)
-        return await CallbackQuery.edit_message_text(msg, reply_markup=buttons)
+        return await query.edit_message_text(msg, reply_markup=buttons)
 
 
 @app.on_callback_query(filters.regex("queue_back_timer") & ~BANNED_USERS)
 @languageCB
-async def queue_back(client, CallbackQuery: CallbackQuery, _):
-    callback_data = CallbackQuery.data.strip()
+async def queue_back(client, query, _):
+    callback_data = query.data.strip()
     cplay = callback_data.split(None, 1)[1]
     try:
-        chat_id, channel = await get_channeplayCB(_, cplay, CallbackQuery)
+        chat_id, channel = await get_channeplayCB(_, cplay, query)
     except Exception:
         return
     if not await is_active_chat(chat_id):
-        return await CallbackQuery.answer(_["general_6"], show_alert=True)
+        return await query.answer(_["general_6"], show_alert=True)
     got = db.get(chat_id)
     if not got:
-        return await CallbackQuery.answer(_["queue_2"], show_alert=True)
-    await CallbackQuery.answer(_["set_cb_8"], show_alert=True)
+        return await query.answer(_["queue_2"], show_alert=True)
+    await query.answer(_["set_cb_8"], show_alert=True)
     file = got[0]["file"]
     videoid = got[0]["vidid"]
     user = got[0]["by"]
@@ -288,7 +286,7 @@ async def queue_back(client, CallbackQuery: CallbackQuery, _):
     basic[videoid] = True
 
     med = InputMediaPhoto(media=IMAGE, caption=cap)
-    mystic = await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+    mystic = await query.edit_message_media(media=med, reply_markup=upl)
     if DUR != "Unknown":
         try:
             while db[chat_id][0]["vidid"] == videoid:

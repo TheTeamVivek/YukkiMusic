@@ -10,8 +10,7 @@
 
 import os
 import re
-
-import traceback 
+import traceback
 
 import yt_dlp
 from pykeyboard import InlineKeyboard
@@ -138,8 +137,8 @@ async def song_commad_private(client, message: Message, _):
 
 @app.on_callback_query(filters.regex(pattern=r"song_back") & ~BANNED_USERS)
 @languageCB
-async def songs_back_helper(client, CallbackQuery, _):
-    callback_data = CallbackQuery.data.strip()
+async def songs_back_helper(client, query, _):
+    callback_data = query.data.strip()
 
     callback_request = callback_data.split(None, 1)[1]
 
@@ -147,22 +146,22 @@ async def songs_back_helper(client, CallbackQuery, _):
 
     buttons = song_markup(_, vidid)
 
-    return await CallbackQuery.edit_message_reply_markup(
+    return await query.edit_message_reply_markup(
         reply_markup=InlineKeyboardMarkup(buttons)
     )
 
 
 @app.on_callback_query(filters.regex(pattern=r"song_helper") & ~BANNED_USERS)
 @languageCB
-async def song_helper_cb(client, CallbackQuery, _):
-    callback_data = CallbackQuery.data.strip()
+async def song_helper_cb(client, query, _):
+    callback_data = query.data.strip()
 
     callback_request = callback_data.split(None, 1)[1]
 
     stype, vidid = callback_request.split("|")
 
     try:
-        await CallbackQuery.answer(_["song_6"], show_alert=True)
+        await query.answer(_["song_6"], show_alert=True)
 
     except Exception:
         pass
@@ -172,7 +171,7 @@ async def song_helper_cb(client, CallbackQuery, _):
             formats_available, link = await youtube.formats(vidid, True)
 
         except Exception:
-            return await CallbackQuery.edit_message_text(_["song_7"])
+            return await query.edit_message_text(_["song_7"])
 
         keyboard = InlineKeyboard()
 
@@ -212,7 +211,7 @@ async def song_helper_cb(client, CallbackQuery, _):
             InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
         )
 
-        return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
+        return await query.edit_message_reply_markup(reply_markup=keyboard)
 
     else:
         try:
@@ -221,7 +220,7 @@ async def song_helper_cb(client, CallbackQuery, _):
         except Exception as e:
             print(e)
 
-            return await CallbackQuery.edit_message_text(_["song_7"])
+            return await query.edit_message_text(_["song_7"])
 
         keyboard = InlineKeyboard()
 
@@ -259,7 +258,7 @@ async def song_helper_cb(client, CallbackQuery, _):
             InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
         )
 
-        return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
+        return await query.edit_message_reply_markup(reply_markup=keyboard)
 
 
 # Downloading Songs Here
@@ -267,20 +266,20 @@ async def song_helper_cb(client, CallbackQuery, _):
 
 @app.on_callback_query(filters.regex(pattern=r"song_download") & ~BANNED_USERS)
 @languageCB
-async def song_download_cb(client, CallbackQuery, _):
+async def song_download_cb(client, query, _):
     try:
-        await CallbackQuery.answer("ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...")
+        await query.answer("ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...")
 
     except Exception:
         pass
 
-    callback_data = CallbackQuery.data.strip()
+    callback_data = query.data.strip()
 
     callback_request = callback_data.split(None, 1)[1]
 
     stype, format_id, vidid = callback_request.split("|")
 
-    mystic = await CallbackQuery.edit_message_text(_["song_8"])
+    mystic = await query.edit_message_text(_["song_8"])
 
     yturl = f"https://www.youtube.com/watch?v={vidid}"
 
@@ -291,16 +290,16 @@ async def song_download_cb(client, CallbackQuery, _):
 
     title = re.sub(r"\W+", " ", title)
 
-    thumb_image_path = await CallbackQuery.message.download()
+    thumb_image_path = await query.message.download()
 
     duration = x["duration"]
 
     if stype == "video":
-        thumb_image_path = await CallbackQuery.message.download()
+        thumb_image_path = await query.message.download()
 
-        width = CallbackQuery.message.photo.width
+        width = query.message.photo.width
 
-        height = CallbackQuery.message.photo.height
+        height = query.message.photo.height
 
         try:
             file_path = await youtube.download(
@@ -327,12 +326,12 @@ async def song_download_cb(client, CallbackQuery, _):
         await mystic.edit_text(_["song_11"])
 
         await app.send_chat_action(
-            chat_id=CallbackQuery.message.chat.id,
+            chat_id=query.message.chat.id,
             action=enums.ChatAction.UPLOAD_VIDEO,
         )
 
         try:
-            await CallbackQuery.edit_message_media(media=med)
+            await query.edit_message_media(media=med)
 
         except Exception:
             traceback.print_exc()
@@ -365,12 +364,12 @@ async def song_download_cb(client, CallbackQuery, _):
         await mystic.edit_text(_["song_11"])
 
         await app.send_chat_action(
-            chat_id=CallbackQuery.message.chat.id,
+            chat_id=query.message.chat.id,
             action=enums.ChatAction.UPLOAD_AUDIO,
         )
 
         try:
-            await CallbackQuery.edit_message_media(media=med)
+            await query.edit_message_media(media=med)
 
         except Exception:
             traceback.print_exc()

@@ -15,7 +15,7 @@ import psutil
 from pyrogram import __version__ as pyrover
 from pyrogram import filters
 from pyrogram.errors import MessageIdInvalid
-from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
+from pyrogram.types import InputMediaPhoto, Message
 from pytgcalls.__version__ import __version__ as pytgver
 
 import config
@@ -119,18 +119,18 @@ async def gstats_global(client, message: Message, _):
 
 @app.on_callback_query(filters.regex("GetStatsNow") & ~BANNED_USERS)
 @languageCB
-async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
-    chat_id = CallbackQuery.message.chat.id
-    callback_data = CallbackQuery.data.strip()
+async def top_users_ten(client, query, _):
+    chat_id = query.message.chat.id
+    callback_data = query.data.strip()
     what = callback_data.split(None, 1)[1]
     upl = back_stats_markup(_)
     try:
-        await CallbackQuery.answer()
+        await query.answer()
     except Exception:
         pass
-    mystic = await CallbackQuery.edit_message_text(
+    mystic = await query.edit_message_text(
         _["gstats_3"].format(
-            f"ᴏғ {CallbackQuery.message.chat.title}" if what == "Here" else what
+            f"ᴏғ {query.message.chat.title}" if what == "Here" else what
         )
     )
     if what == "Tracks":
@@ -222,27 +222,27 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
         msg = temp + msg
     med = InputMediaPhoto(media=config.GLOBAL_IMG_URL, caption=msg)
     try:
-        await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+        await query.edit_message_media(media=med, reply_markup=upl)
     except MessageIdInvalid:
-        await CallbackQuery.message.reply_photo(
+        await query.message.reply_photo(
             photo=config.GLOBAL_IMG_URL, caption=msg, reply_markup=upl
         )
 
 
 @app.on_callback_query(filters.regex("TopOverall") & ~BANNED_USERS)
 @languageCB
-async def top_overall_stats(client, CallbackQuery, _):
-    callback_data = CallbackQuery.data.strip()
+async def top_overall_stats(client, query, _):
+    callback_data = query.data.strip()
     what = callback_data.split(None, 1)[1]
     if what != "s":
         upl = overallback_stats_markup(_)
     else:
         upl = back_stats_buttons(_)
     try:
-        await CallbackQuery.answer()
+        await query.answer()
     except Exception:
         pass
-    await CallbackQuery.edit_message_text(_["gstats_8"])
+    await query.edit_message_text(_["gstats_8"])
     served_chats = len(await get_served_chats())
     served_users = len(await get_served_users())
     total_queries = await get_queries()
@@ -276,29 +276,29 @@ async def top_overall_stats(client, CallbackQuery, _):
 **Playlist Play Limit:** {fetch_playlist}"""
     med = InputMediaPhoto(media=config.STATS_IMG_URL, caption=text)
     try:
-        await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+        await query.edit_message_media(media=med, reply_markup=upl)
     except MessageIdInvalid:
-        await CallbackQuery.message.reply_photo(
+        await query.message.reply_photo(
             photo=config.STATS_IMG_URL, caption=text, reply_markup=upl
         )
 
 
 @app.on_callback_query(filters.regex("bot_stats_sudo"))
 @languageCB
-async def bot_stats(client, CallbackQuery, _):
-    if CallbackQuery.from_user.id not in SUDOERS:
-        return await CallbackQuery.answer("ᴏɴʟʏ ғᴏʀ sᴜᴅᴏ ᴜsᴇʀ's", show_alert=True)
-    callback_data = CallbackQuery.data.strip()
+async def bot_stats(client, query, _):
+    if query.from_user.id not in SUDOERS:
+        return await query.answer("ᴏɴʟʏ ғᴏʀ sᴜᴅᴏ ᴜsᴇʀ's", show_alert=True)
+    callback_data = query.data.strip()
     what = callback_data.split(None, 1)[1]
     if what != "s":
         upl = overallback_stats_markup(_)
     else:
         upl = back_stats_buttons(_)
     try:
-        await CallbackQuery.answer()
+        await query.answer()
     except Exception:
         pass
-    await CallbackQuery.edit_message_text(_["gstats_8"])
+    await query.edit_message_text(_["gstats_8"])
     sc = platform.system()
     p_core = psutil.cpu_count(logical=False)
     t_core = psutil.cpu_count(logical=True)
@@ -359,9 +359,9 @@ async def bot_stats(client, CallbackQuery, _):
     """
     med = InputMediaPhoto(media=config.STATS_IMG_URL, caption=text)
     try:
-        await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+        await query.edit_message_media(media=med, reply_markup=upl)
     except MessageIdInvalid:
-        await CallbackQuery.message.reply_photo(
+        await query.message.reply_photo(
             photo=config.STATS_IMG_URL, caption=text, reply_markup=upl
         )
 
@@ -370,12 +370,12 @@ async def bot_stats(client, CallbackQuery, _):
     filters.regex(pattern=r"^(TOPMARKUPGET|GETSTATS|GlobalStats)$") & ~BANNED_USERS
 )
 @languageCB
-async def back_buttons(client, CallbackQuery, _):
+async def back_buttons(client, query, _):
     try:
-        await CallbackQuery.answer()
+        await query.answer()
     except Exception:
         pass
-    command = CallbackQuery.matches[0].group(1)
+    command = query.matches[0].group(1)
     if command == "TOPMARKUPGET":
         upl = top_ten_stats_markup(_)
         med = InputMediaPhoto(
@@ -383,9 +383,9 @@ async def back_buttons(client, CallbackQuery, _):
             caption=_["gstats_9"],
         )
         try:
-            await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+            await query.edit_message_media(media=med, reply_markup=upl)
         except MessageIdInvalid:
-            await CallbackQuery.message.reply_photo(
+            await query.message.reply_photo(
                 photo=config.GLOBAL_IMG_URL,
                 caption=_["gstats_9"],
                 reply_markup=upl,
@@ -393,16 +393,16 @@ async def back_buttons(client, CallbackQuery, _):
     if command == "GlobalStats":
         upl = get_stats_markup(
             _,
-            True if CallbackQuery.from_user.id in SUDOERS else False,
+            True if query.from_user.id in SUDOERS else False,
         )
         med = InputMediaPhoto(
             media=config.GLOBAL_IMG_URL,
             caption=_["gstats_10"].format(app.mention),
         )
         try:
-            await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+            await query.edit_message_media(media=med, reply_markup=upl)
         except MessageIdInvalid:
-            await CallbackQuery.message.reply_photo(
+            await query.message.reply_photo(
                 photo=config.GLOBAL_IMG_URL,
                 caption=_["gstats_10"].format(app.mention),
                 reply_markup=upl,
@@ -410,16 +410,16 @@ async def back_buttons(client, CallbackQuery, _):
     if command == "GETSTATS":
         upl = stats_buttons(
             _,
-            True if CallbackQuery.from_user.id in SUDOERS else False,
+            True if query.from_user.id in SUDOERS else False,
         )
         med = InputMediaPhoto(
             media=config.STATS_IMG_URL,
             caption=_["gstats_11"].format(app.mention),
         )
         try:
-            await CallbackQuery.edit_message_media(media=med, reply_markup=upl)
+            await query.edit_message_media(media=med, reply_markup=upl)
         except MessageIdInvalid:
-            await CallbackQuery.message.reply_photo(
+            await query.message.reply_photo(
                 photo=config.STATS_IMG_URL,
                 caption=_["gstats_11"].format(app.mention),
                 reply_markup=upl,
