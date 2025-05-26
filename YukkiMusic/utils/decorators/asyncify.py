@@ -1,12 +1,10 @@
 import asyncio
-from functools import partial, wraps
+from functools import wraps
 
 
-def asyncify(func):
-    @wraps(func)
-    async def run(*args, **kwargs):
-        loop = asyncio.get_running_loop()
-        pfunc = partial(func, *args, **kwargs)
-        return await loop.run_in_executor(None, pfunc)
+def asyncify(sync_function):
+    @wraps(sync_function)
+    async def async_wrapper(*args, **kwargs):
+        return await asyncio.to_thread(sync_function, *args, **kwargs)
 
-    return run
+    return async_wrapper

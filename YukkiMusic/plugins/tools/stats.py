@@ -36,7 +36,7 @@ from YukkiMusic.utils.database import (
     get_top_chats,
     get_topp_users,
 )
-from YukkiMusic.utils.decorators.language import language, languageCB
+from YukkiMusic.utils.decorators import asyncify, language, languageCB
 from YukkiMusic.utils.inline.stats import (
     back_stats_buttons,
     back_stats_markup,
@@ -45,8 +45,6 @@ from YukkiMusic.utils.inline.stats import (
     stats_buttons,
     top_ten_stats_markup,
 )
-
-loop = asyncio.get_running_loop()
 
 
 @app.on_message(command("STATS_COMMAND") & ~BANNED_USERS)
@@ -69,6 +67,7 @@ async def gstats_global(client, message: Message, _):
         await asyncio.sleep(1)
         return await mystic.edit(_["gstats_2"])
 
+    @asyncify
     def get_stats():
         results = {}
         for i in stats:
@@ -95,7 +94,7 @@ async def gstats_global(client, message: Message, _):
         return videoid, co
 
     try:
-        videoid, co = await loop.run_in_executor(None, get_stats)
+        videoid, co = await get_stats()
     except Exception as e:
         print(e)
         return
@@ -147,6 +146,7 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
         return await mystic.edit(_["gstats_2"], reply_markup=upl)
     queries = await get_queries()
 
+    @asyncify
     def get_stats():
         results = {}
         for i in stats:
@@ -192,7 +192,7 @@ async def top_users_ten(client, CallbackQuery: CallbackQuery, _):
         return msg, list_arranged
 
     try:
-        msg, list_arranged = await loop.run_in_executor(None, get_stats)
+        msg, list_arranged = await get_stats()
     except Exception as e:
         print(e)
         return

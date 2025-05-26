@@ -35,12 +35,10 @@ from YukkiMusic.utils.database import (
     is_on_off,
     is_served_private_chat,
 )
-from YukkiMusic.utils.decorators.language import LanguageStart
+from YukkiMusic.utils.decorators import LanguageStart, asyncify
 from YukkiMusic.utils.formatters import get_readable_time
 from YukkiMusic.utils.functions import MARKDOWN, WELCOMEHELP
 from YukkiMusic.utils.inline import private_panel, start_pannel
-
-loop = asyncio.get_running_loop()
 
 
 @app.on_message(command("START_COMMAND") & filters.private & ~BANNED_USERS)
@@ -84,9 +82,9 @@ async def start_comm(client, message: Message, _):
             stats = await get_userss(message.from_user.id)
             tot = len(stats)
             if not stats:
-                await asyncio.sleep(1)
                 return await m.edit(_["ustats_1"])
 
+            @asyncify
             def get_stats():
                 msg = ""
                 limit = 0
@@ -122,7 +120,7 @@ async def start_comm(client, message: Message, _):
                 return videoid, msg
 
             try:
-                videoid, msg = await loop.run_in_executor(None, get_stats)
+                videoid, msg = await get_stats()
             except Exception as e:
                 print(e)
                 return

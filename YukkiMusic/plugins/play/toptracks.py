@@ -19,7 +19,7 @@ from YukkiMusic.utils.database import (
     get_particulars,
     get_userss,
 )
-from YukkiMusic.utils.decorators import languageCB
+from YukkiMusic.utils.decorators import asyncify, languageCB
 from YukkiMusic.utils.inline.playlist import (
     botplaylist_markup,
     failed_top_markup,
@@ -83,6 +83,7 @@ async def server_to_play(client, CallbackQuery, _):
     if not stats:
         return await mystic.edit(_["tracks_2"].format(what), reply_markup=upl)
 
+    @asyncify
     def get_stats():
         results = {}
         for i in stats:
@@ -111,7 +112,7 @@ async def server_to_play(client, CallbackQuery, _):
         return details
 
     try:
-        details = await loop.run_in_executor(None, get_stats)
+        details = await get_stats()
     except Exception as e:
         print(e)
         return
