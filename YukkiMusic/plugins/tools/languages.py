@@ -56,34 +56,32 @@ async def langs_command(client, message: Message, _):
 
 @app.on_callback_query(filters.regex("LG") & ~BANNED_USERS)
 @languageCB
-async def lanuagecb(client, CallbackQuery, _):
+async def lanuagecb(client, query, _):
     try:
-        await CallbackQuery.answer()
+        await query.answer()
     except Exception:
         pass
     keyboard = lanuages_keyboard(_)
-    return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
+    return await query.edit_message_reply_markup(reply_markup=keyboard)
 
 
 @app.on_callback_query(filters.regex(r"languages:(.*?)") & ~BANNED_USERS)
 @ActualAdminCB
-async def language_markup(client, CallbackQuery, _):
-    langauge = (CallbackQuery.data).split(":")[1]
-    old = await get_lang(CallbackQuery.message.chat.id)
+async def language_markup(client, query, _):
+    langauge = (query.data).split(":")[1]
+    old = await get_lang(query.message.chat.id)
     if str(old) == str(langauge):
-        return await CallbackQuery.answer(
+        return await query.answer(
             "You are already using same language", show_alert=True
         )
     try:
         _ = get_string(langauge)
-        await CallbackQuery.answer(
-            "Your language changed successfully..", show_alert=True
-        )
+        await query.answer("Your language changed successfully..", show_alert=True)
     except Exception:
-        return await CallbackQuery.answer(
+        return await query.answer(
             "Failed to change language or language in under Upadte",
             show_alert=True,
         )
-    await set_lang(CallbackQuery.message.chat.id, langauge)
+    await set_lang(query.message.chat.id, langauge)
     keyboard = lanuages_keyboard(_)
-    return await CallbackQuery.edit_message_reply_markup(reply_markup=keyboard)
+    return await query.edit_message_reply_markup(reply_markup=keyboard)

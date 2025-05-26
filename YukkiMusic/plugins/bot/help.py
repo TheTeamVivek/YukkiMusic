@@ -26,17 +26,6 @@ COLUMN_SIZE = 4  # Number of button height
 NUM_COLUMNS = 3  # Number of button width
 
 
-class EqInlineKeyboardButton(InlineKeyboardButton):
-    def __eq__(self, other):
-        return self.text == other.text
-
-    def __lt__(self, other):
-        return self.text < other.text
-
-    def __gt__(self, other):
-        return self.text > other.text
-
-
 async def format_helper_text(lng, helper_key: str, text: str) -> str:
     if not text:
         return ""

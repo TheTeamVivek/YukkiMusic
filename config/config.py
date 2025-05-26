@@ -40,7 +40,7 @@ API_ID = int(getenv("API_ID", ""))
 API_HASH = getenv("API_HASH")
 
 
-## Get it from @Botfather in Telegram.
+# Get it from @Botfather in Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
 
 
@@ -193,7 +193,7 @@ STRING_SESSIONS = parse_list(getenv("STRING_SESSIONS", ""))
 #     |_|   \____/|_|\_\_|\_\_____| |_|  |_|\____/|_____/|_____\_____|
 
 
-### DONT TOUCH or EDIT codes after this line
+# DONT TOUCH or EDIT codes after this line
 BANNED_USERS = _flt.user()
 YTDOWNLOADER = 1
 LOG = 2
@@ -211,7 +211,7 @@ autoclean = []
 
 START_IMG_URL = getenv(
     "START_IMG_URL",
-    "https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg",  # This is the file id of the photo you can also put the url of photo
+    "https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg",
 )
 
 PING_IMG_URL = getenv(

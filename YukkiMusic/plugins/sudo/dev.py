@@ -126,20 +126,20 @@ async def runtime_func_cq(_, cq):
 
 
 @app.on_callback_query(filters.regex("forceclose"))
-async def forceclose_command(_, CallbackQuery):
-    callback_data = CallbackQuery.data.strip()
+async def forceclose_command(_, query):
+    callback_data = query.data.strip()
     callback_request = callback_data.split(None, 1)[1]
     query, user_id = callback_request.split("|")
-    if CallbackQuery.from_user.id != int(user_id):
+    if query.from_user.id != int(user_id):
         try:
-            return await CallbackQuery.answer(
+            return await query.answer(
                 "This is not for you stay away from here", show_alert=True
             )
         except Exception:
             return
-    await CallbackQuery.message.delete()
+    await query.message.delete()
     try:
-        await CallbackQuery.answer()
+        await query.answer()
     except Exception:
         return
 

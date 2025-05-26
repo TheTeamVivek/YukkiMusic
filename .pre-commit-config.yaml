@@ -1,6 +1,31 @@
 repos:
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1
+    hooks:
+      - id: autoflake
+        args:
+          [
+            --in-place,
+            --ignore-init-module-imports,
+            --remove-unused-variables,
+            --remove-duplicate-keys,
+            --remove-all-unused-imports,
+          ]
+
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 25.1.0
     hooks:
       - id: black
-        #language_version: python
+        args: [-t, py310]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 6.0.1
+    hooks:
+      - id: isort
+        args: ["--py", "310", "-m", "3", "--trailing-comma"]
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.20.0
+    hooks:
+      - id: pyupgrade
+        args: [--py310-plus]
