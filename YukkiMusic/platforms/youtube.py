@@ -23,11 +23,7 @@ from YukkiMusic.utils.database import is_on_off
 from YukkiMusic.utils.decorators import asyncify
 from YukkiMusic.utils.formatters import seconds_to_min, time_to_seconds
 
-NOTHING = {"cookies_dead": False}
-
-# Keep True to use always download song from fallback
-# None for autocheck ( download from youtube on error turn Fallback mode)
-# False to disable
+NOTHING = {"cookies_dead": None}
 
 
 async def shell_cmd(cmd):
@@ -63,7 +59,8 @@ class YouTube:
 
     @property
     def use_fallback(self):
-        return NOTHING["cookies_dead"] is True
+        return False
+        #return NOTHING["cookies_dead"] is True
 
     @use_fallback.setter
     def use_fallback(self, value):
