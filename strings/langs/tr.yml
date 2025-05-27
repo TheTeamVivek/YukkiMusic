@@ -459,3 +459,97 @@ gban_9 : " **GBANINDAN BAŞARILI BİR ŞEKİLDE ÇIKARILDI BOT VERİTABANINA\n\n
 gban_10 : "Kimse gbanlanmamış."
 gban_11 : "GBANLANMIŞ KULLANICILAR LİSTESİ ALINIYOR..."
 
+
+
+# Helpers
+
+AUTH_HELPER: |
+  <b>Yetkili kullanıcılar, sohbetinizde yönetici hakları olmadan yönetici komutlarını kullanabilir.</b>
+  <b>✧ {AUTH_COMMAND}</b> [Kullanıcı adı] - Kullanıcıyı grubun YETKİLİ listesine ekleyin.
+  <b>✧ {UNAUTH_COMMAND}</b> [Kullanıcı adı] - Kullanıcıyı grubun YETKİLİ listesinden çıkarın.
+  <b>✧ {AUTHUSERS_COMMAND}</b> - Grubun YETKİLİ listesini kontrol edin.
+
+ADMIN_HELPER: |
+  <b>c, kanal oynatmayı ifade eder</b>
+  <b>✧ {PAUSE_COMMAND}</b> - Çalan müziği duraklatın.
+  <b>✧ {RESUME_COMMAND}</b> - Duraklatılmış müziği devam ettirin.
+  <b>✧ {MUTE_COMMAND}</b> - Çalan müziğin sesini kapatın.
+  <b>✧ {UNMUTE_COMMAND}</b> - Sessiz müziği tekrar açın.
+  <b>✧ {SKIP_COMMAND}</b> - Şu anda çalan müziği atlayın.
+  <b>✧ {STOP_COMMAND}</b> - Çalan müziği durdurun.
+  <b>✧ {SHUFFLE_COMMAND}</b> - Kuyruktaki çalma listesini/şarkıları rastgele karıştırın.
+  <b>✧ {SEEK_COMMAND}</b> - Müziği ileri sarın.
+  <b>✧ {SEEK_BACK_COMMAND}</b> - Müziği geriye sararak belirtilen süreye dönün.
+  <b>✧ {REBOOT_COMMAND}</b> - Botu sohbetiniz için yeniden başlatın.
+  <b>✧ {SKIP_COMMAND}</b> [Sayı (Örnek: 3)] - Müziği belirli bir sıraya atlayın. Örnek: <b>/skip 3</b>, üçüncü sıradaki müziğe atlayacak ve 1 ile 2'yi geçecektir.
+  <b>✧ {LOOP_COMMAND}</b> [enable/disable] veya [1-10 arasında bir sayı] - Etkinleştirildiğinde, bot mevcut müziği sesli sohbette 1-10 kez tekrar eder. Varsayılan döngü değeri 10'dur.
+
+ACTIVE_HELPER: |
+  <b>✧ {ACTIVEVC_COMMAND}</b> - Botta aktif sesli sohbetleri kontrol edin.
+  <b>✧ {ACTIVEVIDEO_COMMAND}</b> - Botta aktif sesli ve görüntülü aramaları kontrol edin.
+  <b>✧ {AC_COMMAND}</b> - Botta aktif görüntülü aramaları kontrol edin.
+  <b>✧ {STATS_COMMAND}</b> - Bot istatistiklerini kontrol edin.
+
+PLAY_HELPER: |
+  <b>✧ {PLAY_COMMAND}</b> - Bot, verilen sorguyu sesli sohbette çalmaya veya canlı bağlantıları yayınlamaya başlar.
+  <b>✧ {PLAYMODE_COMMAND}</b> - Zorla Çalma, mevcut çalan parçayı durdurur ve aranan parçayı hemen çalmaya başlar, kuyruğu rahatsız etmeden/silmeden.
+  <b>✧ {CHANNELPLAY_COMMAND}</b> - Bir kanalı bir gruba bağlayın ve grubunuzdan kanalın sesli sohbetinde müzik yayınlayın.
+  <b>✧ {STREAM_COMMAND}</b> - Doğrudan veya m3u8 olduğunu düşündüğünüz ve /play ile çalınamayan bir URL yayınlayın.
+
+GCAST_HELPER: |
+  <b>{BROADCAST_COMMAND} [Mesaj veya herhangi bir mesaja yanıt]</b> » Botun hizmet verdiği sohbetlere bir mesaj yayınlayın
+  <u>Yayın Modları:</u>
+  <b><code>-pin</code></b> » Yayınlanan mesajı hizmet verilen sohbetlerde sabitleyin
+  <b><code>-pinloud</code></b> » Yayınlanan mesajı sabitleyin ve üyelere bildirim gönderin
+  <b><code>-user</code></b> » Mesajı botu başlatan kullanıcılara yayınlayın [Mesajı sabitlemek için `-pin` veya `-pinloud` ekleyebilirsiniz]
+  <b><code>-assistant</code></b> » Mesajınızı botun tüm asistanları aracılığıyla yayınlayın
+  <b><code>-nobot</code></b> » **Bot**'un mesajı yayınlamamasını sağlar [Mesajı gruplara yayınlamak istemediğinizde kullanışlıdır]
+  > <b>Örnek:</b> <code>/{BROADCAST_COMMAND} -user -assistant -pin Test yayını</code>
+
+BOT_HELPER: |
+  <b>★ {GSTATS_COMMAND}</b> - En İyi 10 Parça Küresel İstatistikleri, Botun En İyi 10 Kullanıcısı, Botun En İyi 10 Sohbeti, Bir Sohbette En Çok Oynatılan 10 Parça vb.
+  <b>★ {SUDOUSERS_COMMAND}</b> - Botun Sudo kullanıcılarını kontrol edin.
+  <b>★ {LYRICS_COMMAND} [Şarkı Adı]</b> - Belirli bir müzik için web'de söz arayın.
+  <b>★ {SONG_COMMAND} [Parça Adı] veya [YouTube Bağlantısı]</b> - YouTube'dan herhangi bir parçayı MP3 veya MP4 formatında indirin.
+  <b>★ {QUEUE_COMMAND}</b> - Müzik kuyruğunu kontrol edin.
+  <u><b>⚡️Özel Bot:</b></u>
+  <b>✧ {AUTHORIZE_COMMAND} [CHAT_ID]</b> - Bir sohbetin botunuzu kullanmasına izin verin.
+  <b>✧ {UNAUTHORIZE_COMMAND} [CHAT_ID]</b> - Bir sohbetin botunuzu kullanmasını engelleyin.
+  <b>✧ {AUTHORIZED_COMMAND}</b> - Botunuzu kullanmasına izin verilen tüm sohbetleri kontrol edin.
+
+PLIST_HELPER: |
+  <b>{PLAYLIST_COMMAND}</b> - Bot sunucusunda tüm oynatma listenizi kontrol edin
+  <b>{DELETE_PLAYLIST_COMMAND}</b> - Kaydedilmiş oynatma listenizden herhangi bir şarkıyı silin
+  <b>{PLAY_PLAYLIST_COMMAND}</b> - Kaydedilmiş oynatma listenizi **ses** olarak çalmaya başlayın
+  <b>{PLAY_PLAYLIST_COMMAND}</b> - Oynatma listenizi **video** olarak çalmaya başlayın
+
+BLIST_HELPER: |
+  <b>✧ {BLACKLISTCHAT_COMMAND}</b> [chat ID] - Herhangi bir sohbeti Müzik Botunu kullanmaktan engelleyin.
+  <b>✧ {WHITELISTCHAT_COMMAND}</b> [chat ID] - Kara listeye alınan herhangi bir sohbetin Müzik Botunu kullanmasına izin verin.
+  <b>✧ {BLACKLISTEDCHAT_COMMAND}</b> - Engellenen tüm sohbetleri kontrol edin.
+  <b>✧ {BLOCK_COMMAND}</b> [Kullanıcı adı veya bir kullanıcıya yanıt] - Kullanıcının bot komutlarını kullanmasını engelleyin.
+  <b>✧ {UNBLOCK_COMMAND}</b> [Kullanıcı adı veya bir kullanıcıya yanıt] - Kullanıcıyı botun engellenen listesinden çıkarın.
+  <b>✧ {BLOCKED_COMMAND}</b> - Engellenen kullanıcıların listesini kontrol edin.
+  <b>✧ {GBAN_COMMAND}</b> [Kullanıcı adı veya bir kullanıcıya yanıt] - Kullanıcıyı tüm hizmet verilen sohbetlerden yasaklayın ve botunuzu kullanmasını engelleyin.
+  <b>✧ {UNGBAN_COMMAND}</b> [Kullanıcı adı veya bir kullanıcıya yanıt] - Kullanıcıyı küresel yasak listesinden çıkarın ve botunuzu kullanmasına izin verin.
+  <b>✧ {GBANNED_COMMAND}</b> - Küresel yasaklı kullanıcıların listesini kontrol edin.
+
+DEV_HELPER: |
+  <b><u>Sudoers ekleme ve kaldırma:</u></b>
+  <b>{ADDSUDO_COMMAND} [Kullanıcı adı veya bir kullanıcıya yanıt] - Botunuza Sudo ekleyin</b>
+  <b>{DELSUDO_COMMAND} [Kullanıcı adı veya kullanıcı kimliği veya bir kullanıcıya yanıt] - Kullanıcıyı bot sudoers'larından çıkarın</b>
+  <b>{SUDOUSERS_COMMAND} - Tüm sudoers listesini alın</b>
+  <b><u>Heroku:</u></b>
+  <b>{USAGE_COMMAND}</b> - Dyno kullanımı
+  <b>{GETVAR_COMMAND} [Değişken Adı]</b> - Bir yapılandırma değişkenini alın
+  <b>{DELVAR_COMMAND} [Değişken Adı]</b> - Bir yapılandırma değişkenini silin
+  <b>{SETVAR_COMMAND} [Değişken Adı] [Değer]</b> - Bir değişken ekleyin veya güncelleyin. Değişken ve değeri bir boşlukla ayırın
+  <b><u>Bot komutu:</u></b>
+  <b>{RESTART_COMMAND}</b> - Botu yeniden başlatın (yalnızca SUDOERS)
+  <b>{UPDATE_COMMAND}</b> - Botu güncelleyin
+  <b>{SPEEDTEST_COMMAND}</b> - Sunucu hızlarını kontrol edin
+  <b>{MAINTENANCE_COMMAND} [enable/disable]</b> - Bot bakım modunu geçiş yapın
+  <b>{LOGGER_COMMAND} [enable/disable]</b> - Aranan sorguların log grubuna kaydedilmesini geçiş yapın
+  <b>{GETLOG_COMMAND} [Satır sayısı]</b> - Sunucudan günlükleri alın
+  <b>{AUTOEND_COMMAND} [enable/disable]</b> - Eğer kimse şarkıyı dinlemiyorsa yayını 30 saniye sonra otomatik olarak bitirin
+

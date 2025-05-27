@@ -18,7 +18,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 import config
 from config import BANNED_USERS, START_IMG_URL
 from config.config import OWNER_ID
-from strings import command, get_string
+from strings import command, get_command, get_string
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS, _boot_
 from YukkiMusic.platforms import telegram, youtube
@@ -41,7 +41,9 @@ from YukkiMusic.utils.functions import MARKDOWN, WELCOMEHELP
 from YukkiMusic.utils.inline import private_panel, start_pannel
 
 
-@app.on_message(command("START_COMMAND") & filters.private & ~BANNED_USERS)
+@app.on_message(
+    filters.command(get_command("START_COMMAND")) & filters.private & ~BANNED_USERS
+)
 @LanguageStart
 async def start_comm(client, message: Message, _):
     chat_id = message.chat.id
