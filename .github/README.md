@@ -3,8 +3,13 @@
 [**YukkiMusic**](https://github.com/TheTeamVivek/YukkiMusic) is a powerful, enhanced version of the original [**YukkiMusicBot**](https://github.com/TeamYukki/YukkiMusicBot), designed for seamless, high-quality music streaming in Telegram voice chats. Built with **Python** and **Pyrogram**, it offers a robust and user-friendly experience for music lovers and bot developers alike. 🚀
 
 
-## ⭐ Support the Original
-Show your love for the project that started it all! If you're using or forking **YukkiMusic**, please **star** the original repository: [**⭐ YukkiMusicBot**](https://github.com/TeamYukki/YukkiMusicBot)
+## ⚙️ Configuration
+
+Need help setting up? Check out our detailed configuration guide: [**Configuration Instructions**](https://github.com/TheTeamVivek/YukkiMusic/blob/master/config/README.md).
+
+> [!TIP]
+> **Looking to use cookies for authentication?**  
+> See: [**Using Cookies for Authentication**](https://github.com/TheTeamVivek/YukkiMusic/blob/master/config/README.md#using-cookies-for-authentication)
 
 ## Quick Deployment Options
 
@@ -64,12 +69,6 @@ Get started quickly by deploying to Heroku with just one click:
 - Detach from the **tmux** Session (Bot keeps running):  
   Press `Ctrl+b`, then `d`
 
-
-## ⚙️ Configuration
-
-Need help setting up? Check out our detailed configuration guide: [**Configuration Instructions**](https://github.com/TheTeamVivek/YukkiMusic/blob/master/config/README.md).
-
-
 ## 🤝 Get Support
 
 We're here to help you every step of the way! Reach out through:
@@ -80,6 +79,10 @@ We're here to help you every step of the way! Reach out through:
 
 - **👥 Support Channel**: Join our community at
  [**TheTeamVivek**](https://t.me/TheTeamVivek).
+
+
+## ⭐ Support the Original
+Show your love for the project that started it all! If you're using or forking **YukkiMusic**, please **star** the original repository: [**⭐ YukkiMusicBot**](https://github.com/TeamYukki/YukkiMusicBot)
 
 
 ## ❣️ Show Your Support
