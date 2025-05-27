@@ -42,7 +42,7 @@ from YukkiMusic.utils.inline import private_panel, start_pannel
 
 
 @app.on_message(
-    filters.command(get_command("START_COMMAND")) & filters.private & ~BANNED_USERS
+    command("START_COMMAND") & filters.private & ~BANNED_USERS
 )
 @LanguageStart
 async def start_comm(client, message: Message, _):
