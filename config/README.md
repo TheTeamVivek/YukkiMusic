@@ -146,3 +146,9 @@ Paste the BatBin URL(s) into your **`COOKIE_LINK`** environment variable.
 
 - You can add **multiple cookie links**, separated by **commas**.
 > **Example:** `COOKIE_LINK=cookielink1 , cookielink2, cookielink3, cookielink4, cookielink5 ...`
+
+**Or**
+
+#### **4. Upload & Paste Cookies From File**  
+
+Paste the Netscape HTTP cookies into config/cookies dir.
