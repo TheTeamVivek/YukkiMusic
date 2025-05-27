@@ -59,7 +59,10 @@ class YukkiBot(Client):
             @wraps(func)
             async def wrapper(client, message):
                 try:
-                    await func(client, message)
+                    if asyncio.iscoroutinefunction(func):
+                        await func(client, message)
+                    else:
+                        func(client, message)
                 except FloodWait as e:
                     LOGGER(__name__).warning(
                         f"FloodWait: Sleeping for {e.value} seconds."
