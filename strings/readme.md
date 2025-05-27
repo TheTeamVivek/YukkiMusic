@@ -5,6 +5,7 @@
 | Code | Language | Contributor |
 |------|----------|-------------|
 | en   | English  | Thanks to [TeamYukki](https://t.me/TeamYukki) |
+| ckb   | Kurdish   | Thanks to [Mohammed](https://t.me/IQ7amo) |
 | hi   | Hindi    | Thanks to [TeamYukki](https://t.me/TeamYukki) |
 | ar   | Arabic   | Thanks to [Mustafa](https://t.me/tr_4z) |
 | tr   | Turkish  | Thanks to [TeamYukki](https://t.me/TeamYukki) |
