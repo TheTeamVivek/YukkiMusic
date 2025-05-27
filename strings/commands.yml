@@ -8,9 +8,6 @@
 # All rights reserved.
 #
 
-# add you lang key and commands
-# Note Some commands didn't work for now in another like for like "play a song in force" or "playing in video mode"
-# Soon it will be fixed
 
 START_COMMAND:
   ar: ["تفعيل", "ميوزك"]
