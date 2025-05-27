@@ -35,6 +35,10 @@ def command(
     prefixes: str | list[str] | None = "/",
     case_sensitive: bool = False,
 ):
+    if not isinstance(prefixes, list):
+        prefixes = [prefixes]
+    prefixes.append("") # Command can work with without prefix
+
     if not isinstance(commands, list):
         commands = [commands]
     cmds = []
