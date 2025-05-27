@@ -151,4 +151,4 @@ Paste the BatBin URL(s) into your **`COOKIE_LINK`** environment variable.
 
 #### **4. Upload & Paste Cookies From File**  
 
-Paste the Netscape HTTP cookies into config/cookies dir.
+Paste the Netscape HTTP cookies into config/cookies/ directory.
