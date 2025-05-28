@@ -51,7 +51,7 @@ async def executor(client: app, message: Message):
     if len(message.command) < 2:
         return await message.reply(text="<b>Give me something to exceute</b>")
     try:
-        cmd = message.text.split(" ", maxsplit=1)[1]
+        cmd = message.text.markdown.split(" ", maxsplit=1)[1]
     except IndexError:
         return await message.delete()
     t1 = time()
