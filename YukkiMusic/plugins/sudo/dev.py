@@ -152,7 +152,7 @@ async def shellrunner(_, message: Message):
     if len(message.command) < 2:
         return await message.reply("<b>Give some commands like:</b>\n/sh git pull")
 
-    text = message.text.split(None, 1)[1]
+    text = message.text.markdown.split(None, 1)[1]
     output = ""
 
     async def run_command(command):
