@@ -263,11 +263,11 @@ def panel_markup_1(_, videoid, chat_id):
             InlineKeyboardButton(text="⏯ Skip", callback_data=f"ADMIN Skip|{chat_id}"),
             InlineKeyboardButton(text="⏹ Stop", callback_data=f"ADMIN Stop|{chat_id}"),
         ],
-        [
-            InlineKeyboardButton(
-                text="🔁 Replay ", callback_data=f"ADMIN Replay|{chat_id}"
-            ),
-        ],
+        # [
+        #    InlineKeyboardButton(
+        #        text="🔁 Replay ", callback_data=f"ADMIN Replay|{chat_id}"
+        #    ),
+        # ],
         [
             InlineKeyboardButton(
                 text="◀️",
