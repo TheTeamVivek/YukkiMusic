@@ -259,13 +259,13 @@ async def update_(client, message, _):
         f"<b>➣ #{info.count()}: <a href={REPO_}/commit/{info}>{info.summary}</a> By -> {info.author}</b>\n\t\t\t\t<b>➥ Commited On:</b> {ordinal(int(datetime.fromtimestamp(info.committed_date).strftime('%d')))} {datetime.fromtimestamp(info.committed_date).strftime('%b')}, {datetime.fromtimestamp(info.committed_date).strftime('%Y')}\n\n"
         for info in repo.iter_commits(f"HEAD..origin/{config.UPSTREAM_BRANCH}")
     )
-    _update_response_ = "**A new upadte is available for the Bot! **\n\n➣ Pushing upadtes Now\n\n__**Updates:**__\n"
+    _update_response_ = "**A new update is available for the Bot! **\n\n➣ Pushing updates Now\n\n__**Updates:**__\n"
     _final_updates_ = f"{_update_response_} {updates}"
 
     if len(_final_updates_) > 4096:
         url = await pastebin.paste(updates)
         nrs = await response.edit(
-            f"**A new upadte is available for the Bot!**\n\n➣ Pushing upadtes Now\n\n__**Updates:**__\n\n[Check Upadtes]({url})",
+            f"**A new update is available for the Bot!**\n\n➣ Pushing updates Now\n\n__**Updates:**__\n\n[Check Updates]({url})",
             disable_web_page_preview=True,
         )
     else:
