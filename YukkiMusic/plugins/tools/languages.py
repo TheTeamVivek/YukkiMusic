@@ -72,14 +72,14 @@ async def language_markup(client, query, _):
     old = await get_lang(query.message.chat.id)
     if str(old) == str(langauge):
         return await query.answer(
-            "You are already using same language", show_alert=True
+            "You are already using the same language", show_alert=True
         )
     try:
         _ = get_string(langauge)
         await query.answer("Your language changed successfully..", show_alert=True)
     except Exception:
         return await query.answer(
-            "Failed to change language or language in under Upadte",
+            "Failed to change language or language is under maintenance",
             show_alert=True,
         )
     await set_lang(query.message.chat.id, langauge)
