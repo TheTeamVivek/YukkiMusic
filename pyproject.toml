@@ -27,7 +27,7 @@ classifiers = [
 dependencies = [
     "async-lru==2.0.5",
     "aiofiles==24.1.0",
-    "aiohttp==3.12.4",
+    "aiohttp==3.12.6",
     "beautifulsoup4==4.13.4",
     "gitpython==3.1.44",
     "heroku3==5.2.1",
