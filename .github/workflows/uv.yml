@@ -2,8 +2,8 @@ name: Update uv Cache
 
 on:
   push:
-    branches:
-      - master
+   # branches:
+   #   - master
     paths:
       - "**.toml"
   workflow_dispatch:
