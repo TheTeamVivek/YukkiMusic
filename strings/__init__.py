@@ -75,8 +75,20 @@ def replace_placeholders(
 
     def replacer(match):
         key = match.group(1)
+        index = match.group(2)
+
         if key.endswith("_COMMAND"):
-            return format_value(get_command(key, lang_code))
+            cmds = get_command(key, lang_code)
+            if not cmds:
+                return match.group(0)
+
+            if index is not None:
+                i = int(index)
+                if 0 <= i < len(cmds):
+                    return f"/{cmds[i]}"
+                else:
+                    return f"/{random.choice(cmds)}"
+            return format_value(cmds)
         return format_value(lang_data.get(key, match.group(0)))
 
     return pattern.sub(replacer, text)
