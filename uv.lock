@@ -1415,7 +1415,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "aiofiles", specifier = "==24.1.0" },
-    { name = "aiohttp", specifier = "==3.12.9" },
+    { name = "aiohttp", specifier = "~=3.12.9" },
     { name = "async-lru", specifier = "==2.0.5" },
     { name = "beautifulsoup4", specifier = "==4.13.4" },
     { name = "flask", specifier = "==3.1.1" },
