@@ -36,7 +36,7 @@ dependencies = [
     "ntgcalls>=2.0.0rc5,<3.0.0",
     "pillow==11.2.1",
     "pykeyboard2==0.1.6",
-    "pymongo==4.13.0",
+    "pymongo==4.13.1",
     "psutil==7.0.0",
     "py-tgcalls~=2.2.0",
     "python-dotenv==1.1.0",
