@@ -31,7 +31,7 @@ dependencies = [
     "beautifulsoup4==4.13.4",
     "gitpython==3.1.44",
     "heroku3==5.2.1",
-    "Kurigram==2.2.4",
+    "Kurigram==2.2.5",
     "lyricsgenius==3.6.4",
     "ntgcalls>=2.0.0rc5,<3.0.0",
     "pillow==11.2.1",
