@@ -85,7 +85,7 @@ def replace_placeholders(
     if not isinstance(text, str):
         return text
 
-    pattern = re.compile(r"\{(\w+)(?:(\d+))?\}")
+    pattern = re.compile(r"\{(\w+)(?:\[(\d+)\])?\}")
 
     def replacer(match):
         key = match.group(1)

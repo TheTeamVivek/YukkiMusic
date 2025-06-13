@@ -154,7 +154,6 @@ class YukkiBot(Client):
         ]
         owner_commands = [
             types.BotCommand("update", "Update the bot"),
-            types.BotCommand("restart", "Restart the bot"),
             types.BotCommand("logs", "Get logs"),
             types.BotCommand("export", "Export all data of mongodb"),
             types.BotCommand("import", "Import all data in mongodb"),
@@ -174,7 +173,7 @@ class YukkiBot(Client):
             types.BotCommand("whitelist", "Whitelist a chat"),
             types.BotCommand("blacklisted", "List all blacklisted chats"),
             types.BotCommand("autoend", "Enable or disable auto end for streams"),
-            types.BotCommand("reboot", "Reboot the bot"),
+            types.BotCommand("reboot", "Reboot the bot for your chat"),
             types.BotCommand("restart", "Restart the bot"),
         ]
 
