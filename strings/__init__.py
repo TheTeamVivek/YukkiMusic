@@ -10,12 +10,25 @@
 import os
 import re
 import sys
+import random
 
 import yaml
 
 languages = {}
 languages_present = {}
 commands = {}
+
+"""
+In the YAML translation files, you can use placeholders like:
+
+  {SOME_KEY}                 - Replaced with the value of that key from the same language file.
+  {PING_COMMAND}             - Replaced with all localized commands for that key (e.g., "/ping /alive /aalive").
+  {PING_COMMAND[0]}          - Replaced with the first command (e.g., "/ping").
+  {PING_COMMAND[5]}          - If the index is out of range, a random command will be chosen (e.g., "/alive").
+
+These placeholders can be used in any string value, not just helper keys.
+"""
+
 
 
 def get_command(command, lang=None):
