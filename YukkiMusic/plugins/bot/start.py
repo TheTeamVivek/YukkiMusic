@@ -71,13 +71,14 @@ async def start_comm(client, message: Message, _):
             await message.reply(
                 MARKDOWN,
                 parse_mode=ParseMode.HTML,
-                disable_web_page_preview=True,
+                
             )
         if name == "greetings":
             await message.reply(
                 WELCOMEHELP,
                 parse_mode=ParseMode.HTML,
-                disable_web_page_preview=True,
+                
+                
             )
         if name[0:3] == "sta":
             m = await message.reply_text("🔎 Fetching Your personal stats.!")

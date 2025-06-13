@@ -14,25 +14,9 @@ import traceback
 from datetime import datetime
 from functools import wraps
 
-from pyrogram import Client, StopPropagation, errors
+from pyrogram import Client, StopPropagation, errors, types
 from pyrogram.enums import ChatMemberStatus
-from pyrogram.errors import (
-    ChatSendMediaForbidden,
-    ChatSendPhotosForbidden,
-    ChatWriteForbidden,
-    FloodWait,
-    MessageIdInvalid,
-    MessageNotModified,
-)
 from pyrogram.handlers import MessageHandler
-from pyrogram.types import (
-    BotCommand,
-    BotCommandScopeAllChatAdministrators,
-    BotCommandScopeAllGroupChats,
-    BotCommandScopeAllPrivateChats,
-    BotCommandScopeChat,
-    BotCommandScopeChatMember,
-)
 
 import config
 
@@ -48,9 +32,11 @@ class YukkiBot(Client):
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             bot_token=config.BOT_TOKEN,
+            
+            workers=50,
             sleep_threshold=240,
             max_concurrent_transmissions=5,
-            workers=50,
+            link_preview_options=types.LinkPreviewOptions(is_disabled=True)
         )
         self.loaded_plug_counts = 0
 
@@ -63,17 +49,17 @@ class YukkiBot(Client):
                         await func(client, message)
                     else:
                         func(client, message)
-                except FloodWait as e:
+                except errors.FloodWait as e:
                     LOGGER(__name__).warning(
                         f"FloodWait: Sleeping for {e.value} seconds."
                     )
                     await asyncio.sleep(e.value)
                 except (
-                    ChatWriteForbidden,
-                    ChatSendMediaForbidden,
-                    ChatSendPhotosForbidden,
-                    MessageNotModified,
-                    MessageIdInvalid,
+                    errors.ChatWriteForbidden,
+                    errors.ChatSendMediaForbidden,
+                    errors.ChatSendPhotosForbidden,
+                    errors.MessageNotModified,
+                    errors.MessageIdInvalid,
                 ):
                     pass
                 except StopPropagation:
@@ -151,55 +137,55 @@ class YukkiBot(Client):
 
     async def _set_default_commands(self):
         private_commands = [
-            BotCommand("start", "Start the bot"),
-            BotCommand("help", "Get the help menu"),
-            BotCommand("ping", "Check if the bot is alive or dead"),
+            types.BotCommand("start", "Start the bot"),
+            types.BotCommand("help", "Get the help menu"),
+            types.BotCommand("ping", "Check if the bot is alive or dead"),
         ]
-        group_commands = [BotCommand("play", "Start playing requested song")]
+        group_commands = [types.BotCommand("play", "Start playing requested song")]
         admin_commands = [
-            BotCommand("play", "Start playing requested song"),
-            BotCommand("skip", "Move to next track in queue"),
-            BotCommand("pause", "Pause the current playing song"),
-            BotCommand("resume", "Resume the paused song"),
-            BotCommand("end", "Clear the queue and leave voice chat"),
-            BotCommand("shuffle", "Randomly shuffle the queued playlist"),
-            BotCommand("playmode", "Change the default playmode for your chat"),
-            BotCommand("settings", "Open bot settings for your chat"),
+            types.BotCommand("play", "Start playing requested song"),
+            types.BotCommand("skip", "Move to next track in queue"),
+            types.BotCommand("pause", "Pause the current playing song"),
+            types.BotCommand("resume", "Resume the paused song"),
+            types.BotCommand("end", "Clear the queue and leave voice chat"),
+            types.BotCommand("shuffle", "Randomly shuffle the queued playlist"),
+            types.BotCommand("playmode", "Change the default playmode for your chat"),
+            types.BotCommand("settings", "Open bot settings for your chat"),
         ]
         owner_commands = [
-            BotCommand("update", "Update the bot"),
-            BotCommand("restart", "Restart the bot"),
-            BotCommand("logs", "Get logs"),
-            BotCommand("export", "Export all data of mongodb"),
-            BotCommand("import", "Import all data in mongodb"),
-            BotCommand("addsudo", "Add a user as a sudoer"),
-            BotCommand("delsudo", "Remove a user from sudoers"),
-            BotCommand("sudolist", "List all sudo users"),
-            BotCommand("log", "Get the bot logs"),
-            BotCommand("getvar", "Get a specific environment variable"),
-            BotCommand("delvar", "Delete a specific environment variable"),
-            BotCommand("setvar", "Set a specific environment variable"),
-            BotCommand("usage", "Get dyno usage information"),
-            BotCommand("maintenance", "Enable or disable maintenance mode"),
-            BotCommand("logger", "Enable or disable logging"),
-            BotCommand("block", "Block a user"),
-            BotCommand("unblock", "Unblock a user"),
-            BotCommand("blacklist", "Blacklist a chat"),
-            BotCommand("whitelist", "Whitelist a chat"),
-            BotCommand("blacklisted", "List all blacklisted chats"),
-            BotCommand("autoend", "Enable or disable auto end for streams"),
-            BotCommand("reboot", "Reboot the bot"),
-            BotCommand("restart", "Restart the bot"),
+            types.BotCommand("update", "Update the bot"),
+            types.BotCommand("restart", "Restart the bot"),
+            types.BotCommand("logs", "Get logs"),
+            types.BotCommand("export", "Export all data of mongodb"),
+            types.BotCommand("import", "Import all data in mongodb"),
+            types.BotCommand("addsudo", "Add a user as a sudoer"),
+            types.BotCommand("delsudo", "Remove a user from sudoers"),
+            types.BotCommand("sudolist", "List all sudo users"),
+            types.BotCommand("log", "Get the bot logs"),
+            types.BotCommand("getvar", "Get a specific environment variable"),
+            types.BotCommand("delvar", "Delete a specific environment variable"),
+            types.BotCommand("setvar", "Set a specific environment variable"),
+            types.BotCommand("usage", "Get dyno usage information"),
+            types.BotCommand("maintenance", "Enable or disable maintenance mode"),
+            types.BotCommand("logger", "Enable or disable logging"),
+            types.BotCommand("block", "Block a user"),
+            types.BotCommand("unblock", "Unblock a user"),
+            types.BotCommand("blacklist", "Blacklist a chat"),
+            types.BotCommand("whitelist", "Whitelist a chat"),
+            types.BotCommand("blacklisted", "List all blacklisted chats"),
+            types.BotCommand("autoend", "Enable or disable auto end for streams"),
+            types.BotCommand("reboot", "Reboot the bot"),
+            types.BotCommand("restart", "Restart the bot"),
         ]
 
         await self.set_bot_commands(
-            private_commands, scope=BotCommandScopeAllPrivateChats()
+            private_commands, scope=types.BotCommandScopeAllPrivateChats()
         )
         await self.set_bot_commands(
-            group_commands, scope=BotCommandScopeAllGroupChats()
+            group_commands, scope=types.BotCommandScopeAllGroupChats()
         )
         await self.set_bot_commands(
-            admin_commands, scope=BotCommandScopeAllChatAdministrators()
+            admin_commands, scope=types.BotCommandScopeAllChatAdministrators()
         )
 
         LOG_GROUP_ID = (
@@ -213,13 +199,13 @@ class YukkiBot(Client):
             try:
                 await self.set_bot_commands(
                     owner_commands,
-                    scope=BotCommandScopeChatMember(
+                    scope=types.BotCommandScopeChatMember(
                         chat_id=LOG_GROUP_ID, user_id=owner_id
                     ),
                 )
                 await self.set_bot_commands(
                     private_commands + owner_commands,
-                    scope=BotCommandScopeChat(chat_id=owner_id),
+                    scope=types.BotCommandScopeChat(chat_id=owner_id),
                 )
             except Exception:
                 pass

@@ -52,7 +52,7 @@ async def play_logs(message, streamtype):
                 await app.send_message(
                     chat_id=LOG_GROUP_ID,
                     text=logger_text,
-                    disable_web_page_preview=True,
+                    
                 )
             except Exception as e:
                 print(e)

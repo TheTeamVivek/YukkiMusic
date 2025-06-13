@@ -166,7 +166,7 @@ async def help_button(client, query):
         await query.message.edit(
             text=text,
             reply_markup=key,
-            disable_web_page_preview=True,
+            
         )
     elif key == "prev":
         curr_page, close = pattern_match.group(2).split(":")
@@ -177,7 +177,7 @@ async def help_button(client, query):
             reply_markup=await paginate_modules(
                 curr_page, query.message.chat.id, close=close
             ),
-            disable_web_page_preview=True,
+            
         )
     elif key == "next":
         next_page, close = pattern_match.group(2).split(":")
@@ -188,7 +188,7 @@ async def help_button(client, query):
             reply_markup=await paginate_modules(
                 next_page, query.message.chat.id, close=close
             ),
-            disable_web_page_preview=True,
+            
         )
     elif key == "helper":
         helper_key, page_n, close = pattern_match.group(2).split(":")
@@ -209,7 +209,7 @@ async def help_button(client, query):
             await query.message.edit(
                 text=_[helper_key],
                 reply_markup=key,
-                disable_web_page_preview=True,
+                
             )
         except Exception:
             traceback.print_exc()

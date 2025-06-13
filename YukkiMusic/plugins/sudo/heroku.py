@@ -38,7 +38,6 @@ from YukkiMusic.utils.database import (
     remove_active_video_chat,
 )
 from YukkiMusic.utils.decorators import AdminActual, asyncify, language
-from YukkiMusic.utils.decorators.language import language
 
 
 @asyncify
@@ -266,10 +265,10 @@ async def update_(client, message, _):
         url = await pastebin.paste(updates)
         nrs = await response.edit(
             f"**A new update is available for the Bot!**\n\n➣ Pushing updates Now\n\n__**Updates:**__\n\n[Check Updates]({url})",
-            disable_web_page_preview=True,
+            
         )
     else:
-        nrs = await response.edit(_final_updates_, disable_web_page_preview=True)
+        nrs = await response.edit(_final_updates_)
     os.system("git stash &> /dev/null && git pull")
 
     try:
@@ -288,8 +287,8 @@ async def update_(client, message, _):
                 pass
         await response.edit(
             _final_updates_
-            + f"» Bot Upadted Sucessfully Now wait until the bot starts",
-            disable_web_page_preview=True,
+            + "» Bot Upadted Sucessfully Now wait until the bot starts",
+            
         )
     except Exception:
         pass
@@ -344,7 +343,7 @@ async def reboot(client, message: Message, _):
 
 @app.on_message(command("RESTART_COMMAND") & ~BANNED_USERS)
 async def restart_(client, message):
-    if message.from_user and not message.from_user.id in SUDOERS:
+    if message.from_user and  message.from_user.id not in SUDOERS:
         if message.chat.type not in [ChatType.GROUP, ChatType.SUPERGROUP]:
             return
         return await reboot(client, message)
