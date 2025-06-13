@@ -504,7 +504,7 @@ GCAST_HELPER: |
   <b><code>-user</code></b> » Mesajı botu başlatan kullanıcılara yayınlayın [Mesajı sabitlemek için `-pin` veya `-pinloud` ekleyebilirsiniz]
   <b><code>-assistant</code></b> » Mesajınızı botun tüm asistanları aracılığıyla yayınlayın
   <b><code>-nobot</code></b> » **Bot**'un mesajı yayınlamamasını sağlar [Mesajı gruplara yayınlamak istemediğinizde kullanışlıdır]
-  > <b>Örnek:</b> <code>/{BROADCAST_COMMAND} -user -assistant -pin Test yayını</code>
+  > <b>Örnek:</b> <code>{BROADCAST_COMMAND[999]} -user -assistant -pin Test yayını</code>
 
 BOT_HELPER: |
   <b>★ {GSTATS_COMMAND}</b> - En İyi 10 Parça Küresel İstatistikleri, Botun En İyi 10 Kullanıcısı, Botun En İyi 10 Sohbeti, Bir Sohbette En Çok Oynatılan 10 Parça vb.
