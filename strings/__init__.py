@@ -100,10 +100,7 @@ def replace_placeholders(
 
             if index is not None:
                 i = int(index)
-                if 0 <= i < len(cmds):
-                    return f"/{cmds[i]}"
-                else:
-                    return f"/{random.choice(cmds)}"
+                return f"/{cmds[i]}" if 0 <= i < len(cmds) else f"/{random.choice(cmds)}"
             return format_value(cmds, is_command=True)
 
         return format_value(lang_data.get(key, match.group(0)), is_command=False)
