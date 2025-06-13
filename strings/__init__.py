@@ -30,7 +30,6 @@ These placeholders can be used in any string value, not just helper keys.
 """
 
 
-
 def get_command(command, lang=None):
     data = commands.get(command)
     if not data:
@@ -50,7 +49,7 @@ def command(
 ):
     if not isinstance(prefixes, list):
         prefixes = [prefixes]
-    prefixes.append("") # Command can work with without prefix
+    prefixes.append("")  # Command can work with and without prefix
 
     if not isinstance(commands, list):
         commands = [commands]
@@ -72,10 +71,12 @@ def get_string(lang: str):
     return languages.get(lang, "en")
 
 
-def format_value(value):
+def format_value(value, is_command=False):
     if isinstance(value, list):
-        return " ".join(f"/{cmd}" for cmd in value)
-    return value
+        if is_command:
+            return " ".join(f"/{cmd}" for cmd in value)
+        return " ".join(str(v) for v in value)
+    return f"/{value}" if is_command else value
 
 
 def replace_placeholders(
@@ -84,13 +85,15 @@ def replace_placeholders(
     if not isinstance(text, str):
         return text
 
-    pattern = re.compile(r"\{(\w+)(?:\[(\d+)\])?\}")
+    pattern = re.compile(r"\{(\w+)(?:(\d+))?\}")
 
     def replacer(match):
         key = match.group(1)
         index = match.group(2)
 
-        if key.endswith("_COMMAND"):
+        is_command = key.endswith("_COMMAND")
+
+        if is_command:
             cmds = get_command(key, lang_code)
             if not cmds:
                 return match.group(0)
@@ -101,8 +104,9 @@ def replace_placeholders(
                     return f"/{cmds[i]}"
                 else:
                     return f"/{random.choice(cmds)}"
-            return format_value(cmds)
-        return format_value(lang_data.get(key, match.group(0)))
+            return format_value(cmds, is_command=True)
+
+        return format_value(lang_data.get(key, match.group(0)), is_command=False)
 
     return pattern.sub(replacer, text)
 
@@ -131,12 +135,15 @@ for filename in os.listdir(os.path.join("strings", "langs")):
         lang_name = filename[:-4]
         lang_path = os.path.join("strings", "langs", filename)
         languages[lang_name] = load_yaml(lang_path)
+
         for key in languages["en"]:
             if key not in languages[lang_name]:
                 languages[lang_name][key] = languages["en"][key]
+
         try:
             languages_present[lang_name] = languages[lang_name]["name"]
         except KeyError:
             print("There is an issue with the language file. Please report it.")
             sys.exit()
+
         languages[lang_name] = update_helpers(languages[lang_name], lang_name)
