@@ -19,6 +19,7 @@ import traceback
 from time import time
 
 from pyrogram import filters
+from pyrogram.enums import ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from YukkiMusic import app
@@ -116,9 +117,9 @@ async def executor(client: app, message: Message):
             await message.reply_document(
                 document=f,
                 caption=(
-                    f"<b>EVAL :</b>\n<code>{cmd[:980]}</code>"
-                    "\n\n<b>Results:</b>\nAttached Document",
+                    f"**EVAL :**\n`{cmd[:980]}`" "\n\n**Results:**\nAttached Document"
                 ),
+                parse_mode=ParseMode.MARKDOWN,  # disable html formatting result can include some tags that can break formatting
                 reply_markup=keyboard,
             )
             await message.delete()
@@ -137,7 +138,9 @@ async def executor(client: app, message: Message):
                 ]
             ]
         )
-        await message.reply(text=final_output, reply_markup=keyboard)
+        await message.reply(
+            text=final_output, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard
+        )
         await message.stop_propagation()
 
 
@@ -200,20 +203,20 @@ async def shellrunner(_, message: Message):
         commands = text.split("\n")
         for cmd in commands:
             stdout, stderr = await run_command(cmd)
-            output += f"<b>Command:</b> {cmd}\n"
+            output += f"**Command:** {cmd}\n"
             if stdout:
-                output += f"<b>Output:</b>\n<pre>{stdout}</pre>\n"
+                output += f"**Output:**\n```\n{stdout}```\n"
             if stderr:
-                output += f"<b>Error:</b>\n<pre>{stderr}</pre>\n"
+                output += f"**Error:**\n```\n{stderr}```\n"
     else:
         stdout, stderr = await run_command(text)
         if stdout:
-            output += f"<b>Output:</b>\n<pre>{stdout}</pre>\n"
+            output += f"**Output:**\n```\n{stdout}\n```\n"
         if stderr:
-            output += f"<b>Error:</b>\n<pre>{stderr}</pre>\n"
+            output += f"**Error:**\n```\n{stderr}\n```\n"
 
     if not output.strip():
-        output = "<b>OUTPUT :</b>\n<code>None</code>"
+        output = "**OUTPUT :**\n`None`"
 
     if len(output) > 4000:
         with io.BytesIO(str(output).encode()) as f:
@@ -222,9 +225,10 @@ async def shellrunner(_, message: Message):
                 message.chat.id,
                 f,
                 reply_to_message_id=message.id,
-                caption="<code>Output</code>",
+                caption="**Output**",
+                parse_mode=ParseMode.MARKDOWN,
             )
     else:
-        await message.reply(text=output)
+        await message.reply(text=output, parse_mode=ParseMode.MARKDOWN)
 
     await message.stop_propagation()
