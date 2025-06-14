@@ -52,7 +52,6 @@ async def play_logs(message, streamtype):
                 await app.send_message(
                     chat_id=LOG_GROUP_ID,
                     text=logger_text,
-                    
                 )
             except Exception as e:
                 print(e)

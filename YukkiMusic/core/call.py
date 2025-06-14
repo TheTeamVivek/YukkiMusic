@@ -471,9 +471,7 @@ class Call:
                             flink = _data.get("url", flink)
                             check[0]["dur"] = _data.get("duration_min", check[0]["dur"])
                 except Exception:
-                    return await mystic.edit_text(
-                        _["call_7"]
-                    )
+                    return await mystic.edit_text(_["call_7"])
 
                 if video:
                     stream = MediaStream(

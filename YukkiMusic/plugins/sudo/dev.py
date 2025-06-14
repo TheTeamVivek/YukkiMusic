@@ -14,22 +14,22 @@
 
 import asyncio
 import contextlib
-import os
-import traceback
 import io
+import traceback
 from time import time
 
-import aiofiles
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 
+
 def cleanup_code(code):
     if code.startswith("```") and code.endswith("```"):
         return "\n".join(code.strip("`").split("\n")[1:-1])
     return code.strip("` \n")
+
 
 async def aexec(code, client, message):
     local_vars = {
@@ -40,11 +40,9 @@ async def aexec(code, client, message):
         "m": message,
         "c": client,
         "rmsg": message.reply_to_message,
-        
     }
     exec(
-        "async def __aexec(): "
-        + "".join(f"\n {a}" for a in code.split("\n")),
+        "async def __aexec(): " + "".join(f"\n {a}" for a in code.split("\n")),
         local_vars,
     )
     return await local_vars["__aexec"]()
@@ -58,7 +56,7 @@ async def aexec(code, client, message):
 )
 async def executor(client: app, message: Message):
     if message.edit_hide:
-        return 
+        return
     if len(message.command) < 2:
         return await message.reply(text="<b>Give me something to exceute</b>")
     try:
@@ -92,7 +90,7 @@ async def executor(client: app, message: Message):
     stderr = redirected_error.getvalue()
     template = "**{0}:**\n```python\n{1}\n```"
     t2 = time()
-    
+
     final_output = ""
     if stdout:
         final_output += template.format("StdOut", stdout)
@@ -105,7 +103,7 @@ async def executor(client: app, message: Message):
 
     if not final_output:
         final_output = template.format("Result", "Success")
-        
+
     if len(final_output) > 3000:
         text = ""
         if stdout:
@@ -118,21 +116,20 @@ async def executor(client: app, message: Message):
             text += "Result\n" + result
         with io.BytesIO(str(text).encode()) as f:
             f.name = "output.txt"
-        
+
             keyboard = InlineKeyboardMarkup(
-                 [
-                     [
-                         InlineKeyboardButton(
-                             text="⏳",
-                             callback_data=f"runtime {t2 - t1} Seconds",
-                         )
-                     ]               
-                 ]     
-             )
+                [
+                    [
+                        InlineKeyboardButton(
+                            text="⏳",
+                            callback_data=f"runtime {t2 - t1} Seconds",
+                        )
+                    ]
+                ]
+            )
             await message.reply_document(
                 document=f,
                 caption=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
-        
                 reply_markup=keyboard,
             )
             await message.delete()
@@ -186,13 +183,13 @@ async def forceclose_command(_, query):
 @app.on_message(filters.command("sh") & SUDOERS & ~filters.forwarded & ~filters.via_bot)
 async def shellrunner(_, message: Message):
     if message.edit_hide:
-        return 
+        return
     if len(message.command) < 2:
         return await message.reply("<b>Give some commands like:</b>\n/sh git pull")
 
     text = message.text.markdown.split(None, 1)[1]
     output = ""
-    
+
     async def run_command(command: str, timeout: int = 30):
         try:
             process = await asyncio.create_subprocess_shell(
@@ -201,9 +198,11 @@ async def shellrunner(_, message: Message):
                 stderr=asyncio.subprocess.PIPE,
             )
 
-            stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=timeout)
+            stdout, stderr = await asyncio.wait_for(
+                process.communicate(), timeout=timeout
+            )
             return stdout.decode().strip(), stderr.decode().strip()
-    
+
         except asyncio.TimeoutError:
             process.kill()
             await process.wait()
@@ -211,6 +210,7 @@ async def shellrunner(_, message: Message):
 
         except Exception:
             return None, traceback.format_exc()
+
     if "\n" in text:
         commands = text.split("\n")
         for cmd in commands:

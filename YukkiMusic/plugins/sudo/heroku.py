@@ -265,7 +265,6 @@ async def update_(client, message, _):
         url = await pastebin.paste(updates)
         nrs = await response.edit(
             f"**A new update is available for the Bot!**\n\n➣ Pushing updates Now\n\n__**Updates:**__\n\n[Check Updates]({url})",
-            
         )
     else:
         nrs = await response.edit(_final_updates_)
@@ -286,9 +285,7 @@ async def update_(client, message, _):
             except Exception:
                 pass
         await response.edit(
-            _final_updates_
-            + "» Bot Upadted Sucessfully Now wait until the bot starts",
-            
+            _final_updates_ + "» Bot Upadted Sucessfully Now wait until the bot starts",
         )
     except Exception:
         pass
@@ -343,7 +340,7 @@ async def reboot(client, message: Message, _):
 
 @app.on_message(command("RESTART_COMMAND") & ~BANNED_USERS)
 async def restart_(client, message):
-    if message.from_user and  message.from_user.id not in SUDOERS:
+    if message.from_user and message.from_user.id not in SUDOERS:
         if message.chat.type not in [ChatType.GROUP, ChatType.SUPERGROUP]:
             return
         return await reboot(client, message)

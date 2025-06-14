@@ -16,6 +16,7 @@ from YukkiMusic.misc import _boot_
 from .decorators.asyncify import asyncify
 from .formatters import get_readable_time
 
+
 @asyncify
 def bot_sys_stats():
     bot_uptime = int(time.time() - _boot_)

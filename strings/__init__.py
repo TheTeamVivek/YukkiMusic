@@ -8,9 +8,9 @@
 # All rights reserved
 
 import os
+import random
 import re
 import sys
-import random
 
 import yaml
 
@@ -100,7 +100,9 @@ def replace_placeholders(
 
             if index is not None:
                 i = int(index)
-                return f"/{cmds[i]}" if 0 <= i < len(cmds) else f"/{random.choice(cmds)}"
+                return (
+                    f"/{cmds[i]}" if 0 <= i < len(cmds) else f"/{random.choice(cmds)}"
+                )
             return format_value(cmds, is_command=True)
 
         return format_value(lang_data.get(key, match.group(0)), is_command=False)

@@ -51,7 +51,6 @@ async def activevc(_, message: Message):
     else:
         await mystic.edit_text(
             f"**Active Voice Chat's:-**\n\n{text}",
-            
         )
 
 
@@ -78,7 +77,6 @@ async def activevi_(_, message: Message):
     else:
         await mystic.edit_text(
             f"**Active Video Chat's:-**\n\n{text}",
-            
         )
 
 
