@@ -8,6 +8,7 @@
 # All rights reserved
 
 import os
+import random
 import re
 import sys
 
@@ -16,6 +17,17 @@ import yaml
 languages = {}
 languages_present = {}
 commands = {}
+
+"""
+In the YAML translation files, you can use placeholders like:
+
+  {SOME_KEY}                 - Replaced with the value of that key from the same language file.
+  {PING_COMMAND}             - Replaced with all localized commands for that key (e.g., "/ping /alive /aalive").
+  {PING_COMMAND[0]}          - Replaced with the first command (e.g., "/ping").
+  {PING_COMMAND[5]}          - If the index is out of range, a random command will be chosen (e.g., "/alive").
+
+These placeholders can be used in any string value, not just helper keys.
+"""
 
 
 def get_command(command, lang=None):
@@ -37,7 +49,7 @@ def command(
 ):
     if not isinstance(prefixes, list):
         prefixes = [prefixes]
-    prefixes.append("") # Command can work with without prefix
+    prefixes.append("")  # Command can work with and without prefix
 
     if not isinstance(commands, list):
         commands = [commands]
@@ -59,10 +71,12 @@ def get_string(lang: str):
     return languages.get(lang, "en")
 
 
-def format_value(value):
+def format_value(value, is_command=False):
     if isinstance(value, list):
-        return " ".join(f"/{cmd}" for cmd in value)
-    return value
+        if is_command:
+            return " ".join(f"/{cmd}" for cmd in value)
+        return " ".join(str(v) for v in value)
+    return f"/{value}" if is_command else value
 
 
 def replace_placeholders(
@@ -71,13 +85,27 @@ def replace_placeholders(
     if not isinstance(text, str):
         return text
 
-    pattern = re.compile(r"\{(\w+)\}")
+    pattern = re.compile(r"\{(\w+)(?:\[(\d+)\])?\}")
 
     def replacer(match):
         key = match.group(1)
-        if key.endswith("_COMMAND"):
-            return format_value(get_command(key, lang_code))
-        return format_value(lang_data.get(key, match.group(0)))
+        index = match.group(2)
+
+        is_command = key.endswith("_COMMAND")
+
+        if is_command:
+            cmds = get_command(key, lang_code)
+            if not cmds:
+                return match.group(0)
+
+            if index is not None:
+                i = int(index)
+                return (
+                    f"/{cmds[i]}" if 0 <= i < len(cmds) else f"/{random.choice(cmds)}"
+                )
+            return format_value(cmds, is_command=True)
+
+        return format_value(lang_data.get(key, match.group(0)), is_command=False)
 
     return pattern.sub(replacer, text)
 
@@ -106,12 +134,15 @@ for filename in os.listdir(os.path.join("strings", "langs")):
         lang_name = filename[:-4]
         lang_path = os.path.join("strings", "langs", filename)
         languages[lang_name] = load_yaml(lang_path)
+
         for key in languages["en"]:
             if key not in languages[lang_name]:
                 languages[lang_name][key] = languages["en"][key]
+
         try:
             languages_present[lang_name] = languages[lang_name]["name"]
         except KeyError:
             print("There is an issue with the language file. Please report it.")
             sys.exit()
+
         languages[lang_name] = update_helpers(languages[lang_name], lang_name)

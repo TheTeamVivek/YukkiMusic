@@ -86,6 +86,11 @@ start_7 : "Heya :) I am alive since **{0}**"
 help_1 : "Click on the buttons below for more information. If you're facing any problem you can ask in support chat.\n\nAll commands can be used with: /"
 help_2 : "Contact me in PM for help."
 
+lang_1: "🌐 Please choose the language you want to set as this group's default language:"
+lang_2: "⚠️ You are already using the same language."
+lang_3: "✅ Your language has been changed successfully."
+lang_4: "❌ Failed to change the language or the selected language is under maintenance."
+
 # Settings Messages
 setting_1 : "⚙️ **Music Bot Settings**\n\n🖇**Group:** {0}\n🔖**Group ID:** `{1}`\n\n💡**Choose the function buttons from below which you want to edit or change.**"
 setting_3 : "⁉️ What is This?\n\n1) Direct: Plays search queries directly. Use -v to play videos in direct mode.\n\n2) Inline: Returns Inline Markup Buttons for choosing between video & audio."
@@ -528,7 +533,7 @@ GCAST_HELPER: |
   
   <b><code>-nobot</code></b> » Ensures that the **bot** doesn't broadcast the message [Useful when you don't want to broadcast the message to groups]
   
-  > <b>Example:</b> <code>/{BROADCAST_COMMAND} -user -assistant -pin Testing broadcast</code>
+  > <b>Example:</b> <code>{BROADCAST_COMMAND[999]} -user -assistant -pin Testing broadcast</code>
 
 BOT_HELPER: |
   <b>★ {GSTATS_COMMAND}</b> - Get Top 10 Tracks Global Stats, Top 10 Users of Bot, Top 10 Chats on Bot, Top 10 Played in a chat, etc.

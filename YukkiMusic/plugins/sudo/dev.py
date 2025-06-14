@@ -14,31 +14,57 @@
 
 import asyncio
 import contextlib
-import os
+import io
 import traceback
-from io import StringIO
 from time import time
 
-import aiofiles
 from pyrogram import filters
+from pyrogram.enums import ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 
 
+def cleanup_code(code):
+    if code.startswith("```") and code.endswith("```"):
+        return "\n".join(code.strip("`").split("\n")[1:-1])
+    return code.strip("` \n")
+
+
+def get_output(stdout, stderr, exc, result, fmt=False):
+    data = {
+        "StdOut": stdout,
+        "StdError": stderr,
+        "Exception": exc,
+        "Result": result,
+    }
+
+    if fmt:
+        template = "**{0}:**\n```python\n{1}\n```"
+        output = [template.format(k, v) for k, v in data.items() if v]
+        if not output:
+            output.append(template.format("Result", "Success"))
+        return "".join(output)
+    return "".join(f"{k}\n{v}" for k, v in data.items() if v)
+
+
 async def aexec(code, client, message):
     local_vars = {
         "__builtins__": __builtins__,  # DON'T REMOVE THIS
-        "app": app,
+        "client": client,
+        "app": client,
+        "message": message,
+        "m": message,
+        "c": client,
+        "rmsg": message.reply_to_message,
     }
+    # pylint: disable-next=exec-used
     exec(
-        "async def __aexec(client, message): "
-        + "".join(f"\n {a}" for a in code.split("\n")),
+        "async def __aexec(): " + "".join(f"\n {a}" for a in code.split("\n")),
         local_vars,
     )
-    __aexec_func = local_vars["__aexec"]
-    return await __aexec_func(client, message)
+    return await local_vars["__aexec"]()
 
 
 @app.on_edited_message(
@@ -48,60 +74,56 @@ async def aexec(code, client, message):
     filters.command(["ev", "eval"]) & SUDOERS & ~filters.forwarded & ~filters.via_bot
 )
 async def executor(client: app, message: Message):
+    if message.edit_hide:
+        return
     if len(message.command) < 2:
         return await message.reply(text="<b>Give me something to exceute</b>")
     try:
         cmd = message.text.markdown.split(" ", maxsplit=1)[1]
+        cmd = cleanup_code(cmd)
     except IndexError:
         return await message.delete()
     t1 = time()
-    redirected_output = redirected_error = StringIO()
-    stdout, stderr, exc = None, None, None
+    (exc,) = (None,)
     with (
-        contextlib.redirect_stdout(redirected_output),
-        contextlib.redirect_stderr(redirected_error),
+        contextlib.redirect_stdout(io.StringIO()) as stdout,
+        contextlib.redirect_stderr(io.StringIO()) as stderr,
     ):
         try:
-            await aexec(cmd, client, message)
+            result = await aexec(
+                cmd, client, message
+            )  # pylint: disable-next=broad-exception-caught
         except Exception:
             exc = traceback.format_exc()
-    stdout = redirected_output.getvalue()
-    stderr = redirected_error.getvalue()
-    evaluation = "\n"
-    if exc:
-        evaluation += exc
-    elif stderr:
-        evaluation += stderr
-    elif stdout:
-        evaluation += stdout
-    else:
-        evaluation += "Success"
-    final_output = f"<b>RESULTS:</b>\n<pre language='python'>{evaluation}</pre>"
-    if len(final_output) > 4096:
-        filename = "output.txt"
-        async with aiofiles.open(filename, "w+", encoding="utf8") as out_file:
-            await out_file.write(str(evaluation))
-        t2 = time()
-        keyboard = InlineKeyboardMarkup(
-            [
+    t2 = time()
+    final_output = get_output(stdout.getvalue(), stderr.getvalue(), exc, result, True)
+
+    if len(final_output) > 3000:
+        text = get_output(stdout.getvalue(), stderr.getvalue(), exc, result)
+
+        with io.BytesIO(text.encode()) as f:
+            f.name = "output.txt"
+
+            keyboard = InlineKeyboardMarkup(
                 [
-                    InlineKeyboardButton(
-                        text="⏳",
-                        callback_data=f"runtime {t2 - t1} Seconds",
-                    )
+                    [
+                        InlineKeyboardButton(
+                            text="⏳",
+                            callback_data=f"runtime {t2 - t1} Seconds",
+                        )
+                    ]
                 ]
-            ]
-        )
-        await message.reply_document(
-            document=filename,
-            caption=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
-            quote=False,
-            reply_markup=keyboard,
-        )
-        await message.delete()
-        os.remove(filename)
+            )
+            await message.reply_document(
+                document=f,
+                caption=(
+                    f"**EVAL :**\n`{cmd[:980]}`" "\n\n**Results:**\nAttached Document"
+                ),
+                parse_mode=ParseMode.MARKDOWN,  # disable html formatting result can include some tags that can break formatting
+                reply_markup=keyboard,
+            )
+            await message.delete()
     else:
-        t2 = time()
         keyboard = InlineKeyboardMarkup(
             [
                 [
@@ -116,7 +138,10 @@ async def executor(client: app, message: Message):
                 ]
             ]
         )
-        await message.reply(text=final_output, reply_markup=keyboard)
+        await message.reply(
+            text=final_output, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard
+        )
+        await message.stop_propagation()
 
 
 @app.on_callback_query(filters.regex(r"runtime"))
@@ -131,17 +156,11 @@ async def forceclose_command(_, query):
     callback_request = callback_data.split(None, 1)[1]
     query, user_id = callback_request.split("|")
     if query.from_user.id != int(user_id):
-        try:
-            return await query.answer(
-                "This is not for you stay away from here", show_alert=True
-            )
-        except Exception:
-            return
+        return await query.answer(
+            "This is not for you stay away from here", show_alert=True
+        )
     await query.message.delete()
-    try:
-        await query.answer()
-    except Exception:
-        return
+    await query.answer()
 
 
 @app.on_edited_message(
@@ -149,21 +168,34 @@ async def forceclose_command(_, query):
 )
 @app.on_message(filters.command("sh") & SUDOERS & ~filters.forwarded & ~filters.via_bot)
 async def shellrunner(_, message: Message):
+    if message.edit_hide:
+        return
     if len(message.command) < 2:
         return await message.reply("<b>Give some commands like:</b>\n/sh git pull")
 
     text = message.text.markdown.split(None, 1)[1]
     output = ""
 
-    async def run_command(command):
+    async def run_command(command: str, timeout: int = 30):
         try:
             process = await asyncio.create_subprocess_shell(
                 command,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
-            stdout, stderr = await process.communicate()
+
+            stdout, stderr = await asyncio.wait_for(
+                process.communicate(), timeout=timeout
+            )
             return stdout.decode().strip(), stderr.decode().strip()
+
+        except asyncio.TimeoutError:
+            process.kill()
+            await process.wait()
+            return (
+                None,
+                "Command timed out after 30 seconds.",
+            )  # pylint: disable-next=broad-exception-caught
         except Exception:
             return None, traceback.format_exc()
 
@@ -171,32 +203,32 @@ async def shellrunner(_, message: Message):
         commands = text.split("\n")
         for cmd in commands:
             stdout, stderr = await run_command(cmd)
-            output += f"<b>Command:</b> {cmd}\n"
+            output += f"**Command:** {cmd}\n"
             if stdout:
-                output += f"<b>Output:</b>\n<pre>{stdout}</pre>\n"
+                output += f"**Output:**\n```\n{stdout}```\n"
             if stderr:
-                output += f"<b>Error:</b>\n<pre>{stderr}</pre>\n"
+                output += f"**Error:**\n```\n{stderr}```\n"
     else:
         stdout, stderr = await run_command(text)
         if stdout:
-            output += f"<b>Output:</b>\n<pre>{stdout}</pre>\n"
+            output += f"**Output:**\n```\n{stdout}\n```\n"
         if stderr:
-            output += f"<b>Error:</b>\n<pre>{stderr}</pre>\n"
+            output += f"**Error:**\n```\n{stderr}\n```\n"
 
     if not output.strip():
-        output = "<b>OUTPUT :</b>\n<code>None</code>"
+        output = "**OUTPUT :**\n`None`"
 
-    if len(output) > 4096:
-        async with aiofiles.open("output.txt", "w+") as file:
-            await file.write(output)
-        await app.send_document(
-            message.chat.id,
-            "output.txt",
-            reply_to_message_id=message.id,
-            caption="<code>Output</code>",
-        )
-        os.remove("output.txt")
+    if len(output) > 4000:
+        with io.BytesIO(str(output).encode()) as f:
+            f.name = "output.txt"
+            await app.send_document(
+                message.chat.id,
+                f,
+                reply_to_message_id=message.id,
+                caption="**Output**",
+                parse_mode=ParseMode.MARKDOWN,
+            )
     else:
-        await message.reply(text=output)
+        await message.reply(text=output, parse_mode=ParseMode.MARKDOWN)
 
     await message.stop_propagation()

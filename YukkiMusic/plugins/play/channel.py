@@ -18,6 +18,7 @@ from YukkiMusic import app
 from YukkiMusic.utils.database import get_lang, set_cmode
 from YukkiMusic.utils.decorators.admins import AdminActual
 
+
 @app.on_message(command("CHANNELPLAY_COMMAND") & filters.group & ~BANNED_USERS)
 @AdminActual
 async def playmode_(client, message: Message, _):

@@ -83,6 +83,11 @@ start_7: "Heya :) **{0}**'den beri hayattayım"
 help_1 : "Daha fazla bilgi için aşağıdaki düğmelere tıklayın. Herhangi bir sorunla karşılaşıyorsanız, destek sohbetinde sorabilirsiniz.\n\nTüm komutlar şu şekilde kullanılabilir: /"
 help_2 : "Yardım için PM'den bana ulaşın."
 
+lang_1: "🌐 Lütfen bu grubun varsayılan dili olarak ayarlamak istediğiniz dili seçin:"
+lang_2: "⚠️ Zaten bu dili kullanıyorsunuz."
+lang_3: "✅ Diliniz başarıyla değiştirildi."
+lang_4: "❌ Dil değiştirilemedi veya seçilen dil bakımda."
+
 # Ayarlar
 setting_1 : "⚙️ **Müzik Botu Ayarları**\n\n🖇**Grup:** {0}\n🔖**Grup ID:** `{1}`\n\n💡**Düzenlemek veya değiştirmek istediğiniz işlev düğmelerini aşağıdan seçin.**"
 setting_3 : "⁉️ Bu nedir?\n\n1) Doğrudan: Arama sorgularını doğrudan oynatır. Doğrudan modda video oynatmak için -v kullanın.\n\n2) İçerik: Video ve ses arasında seçim yapmak için İçerik İşaretleme Düğmeleri döndürür."
@@ -504,7 +509,7 @@ GCAST_HELPER: |
   <b><code>-user</code></b> » Mesajı botu başlatan kullanıcılara yayınlayın [Mesajı sabitlemek için `-pin` veya `-pinloud` ekleyebilirsiniz]
   <b><code>-assistant</code></b> » Mesajınızı botun tüm asistanları aracılığıyla yayınlayın
   <b><code>-nobot</code></b> » **Bot**'un mesajı yayınlamamasını sağlar [Mesajı gruplara yayınlamak istemediğinizde kullanışlıdır]
-  > <b>Örnek:</b> <code>/{BROADCAST_COMMAND} -user -assistant -pin Test yayını</code>
+  > <b>Örnek:</b> <code>{BROADCAST_COMMAND[999]} -user -assistant -pin Test yayını</code>
 
 BOT_HELPER: |
   <b>★ {GSTATS_COMMAND}</b> - En İyi 10 Parça Küresel İstatistikleri, Botun En İyi 10 Kullanıcısı, Botun En İyi 10 Sohbeti, Bir Sohbette En Çok Oynatılan 10 Parça vb.

@@ -62,7 +62,6 @@ async def skip(cli, message: Message, _, chat_id):
                                         _["admin_10"].format(
                                             message.from_user.first_name
                                         ),
-                                        disable_web_page_preview=True,
                                     )
                                     await Yukki.stop_stream(chat_id)
                                 except Exception:
@@ -91,7 +90,6 @@ async def skip(cli, message: Message, _, chat_id):
             if not check:
                 await message.reply_text(
                     _["admin_10"].format(message.from_user.first_name),
-                    disable_web_page_preview=True,
                 )
                 try:
                     return await Yukki.stop_stream(chat_id)
@@ -101,7 +99,6 @@ async def skip(cli, message: Message, _, chat_id):
             try:
                 await message.reply_text(
                     _["admin_10"].format(message.from_user.first_name),
-                    disable_web_page_preview=True,
                 )
                 return await Yukki.stop_stream(chat_id)
             except Exception:
@@ -137,7 +134,7 @@ async def skip(cli, message: Message, _, chat_id):
     elif "vid_" in queued:
         flink = (f"https://t.me/{app.username}?start=info_{videoid}",)
         thumbnail = None
-        mystic = await message.reply_text(_["call_8"], disable_web_page_preview=True)
+        mystic = await message.reply_text(_["call_8"])
         try:
             if youtube.use_fallback:
                 file_path, _data, status = await fallback.download(
