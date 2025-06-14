@@ -148,18 +148,18 @@ class YukkiBot(Client):
             types.BotCommand("resume", "Resume the paused song"),
             types.BotCommand("end", "Clear the queue and leave voice chat"),
             types.BotCommand("shuffle", "Randomly shuffle the queued playlist"),
+            types.BotCommand("reboot", "Reboot the bot for your chat"),
             types.BotCommand("playmode", "Change the default playmode for your chat"),
             types.BotCommand("settings", "Open bot settings for your chat"),
         ]
         owner_commands = [
             types.BotCommand("update", "Update the bot"),
             types.BotCommand("logs", "Get logs"),
-            types.BotCommand("export", "Export all data of mongodb"),
-            types.BotCommand("import", "Import all data in mongodb"),
+            # types.BotCommand("export", "Export all data of mongodb"),
+            # types.BotCommand("import", "Import all data in mongodb"),
             types.BotCommand("addsudo", "Add a user as a sudoer"),
             types.BotCommand("delsudo", "Remove a user from sudoers"),
             types.BotCommand("sudolist", "List all sudo users"),
-            types.BotCommand("log", "Get the bot logs"),
             types.BotCommand("getvar", "Get a specific environment variable"),
             types.BotCommand("delvar", "Delete a specific environment variable"),
             types.BotCommand("setvar", "Set a specific environment variable"),
@@ -172,7 +172,6 @@ class YukkiBot(Client):
             types.BotCommand("whitelist", "Whitelist a chat"),
             types.BotCommand("blacklisted", "List all blacklisted chats"),
             types.BotCommand("autoend", "Enable or disable auto end for streams"),
-            types.BotCommand("reboot", "Reboot the bot for your chat"),
             types.BotCommand("restart", "Restart the bot"),
         ]
 

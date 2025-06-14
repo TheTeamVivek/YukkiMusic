@@ -31,6 +31,23 @@ def cleanup_code(code):
     return code.strip("` \n")
 
 
+def get_output(stdout, stderr, exc, result, fmt=False):
+    data = {
+        "StdOut": stdout,
+        "StdError": stderr,
+        "Exception": exc,
+        "Result": result,
+    }
+
+    if fmt:
+        template = "**{0}:**\n```python\n{1}\n```"
+        output = [template.format(k, v) for k, v in data.items() if v]
+        if not output:
+            output.append(template.format("Result", "Success"))
+        return "".join(output)
+    return "".join(f"{k}\n{v}" for k, v in data.items() if v)
+
+
 async def aexec(code, client, message):
     local_vars = {
         "__builtins__": __builtins__,  # DON'T REMOVE THIS
@@ -41,6 +58,7 @@ async def aexec(code, client, message):
         "c": client,
         "rmsg": message.reply_to_message,
     }
+    # pylint: disable-next=exec-used
     exec(
         "async def __aexec(): " + "".join(f"\n {a}" for a in code.split("\n")),
         local_vars,
@@ -65,56 +83,24 @@ async def executor(client: app, message: Message):
     except IndexError:
         return await message.delete()
     t1 = time()
-    redirected_output = io.StringIO()
-    redirected_error = io.StringIO()
-    (
-        stdout,
-        stderr,
-        exc,
-        result,
-    ) = (
-        None,
-        None,
-        None,
-        None,
-    )
+    (exc,) = (None,)
     with (
-        contextlib.redirect_stdout(redirected_output),
-        contextlib.redirect_stderr(redirected_error),
+        contextlib.redirect_stdout(io.StringIO()) as stdout,
+        contextlib.redirect_stderr(io.StringIO()) as stderr,
     ):
         try:
-            result = await aexec(cmd, client, message)
+            result = await aexec(
+                cmd, client, message
+            )  # pylint: disable-next=broad-exception-caught
         except Exception:
             exc = traceback.format_exc()
-    stdout = redirected_output.getvalue()
-    stderr = redirected_error.getvalue()
-    template = "**{0}:**\n```python\n{1}\n```"
     t2 = time()
-
-    final_output = ""
-    if stdout:
-        final_output += template.format("StdOut", stdout)
-    if stderr:
-        final_output += template.format("StdError", stderr)
-    if exc:
-        final_output += template.format("Exception", exc)
-    if result is not None:
-        final_output += template.format("Result", str(result))
-
-    if not final_output:
-        final_output = template.format("Result", "Success")
+    final_output = get_output(stdout.getvalue(), stderr.getvalue(), exc, result, True)
 
     if len(final_output) > 3000:
-        text = ""
-        if stdout:
-            text += "StdOut\n" + stdout
-        if stderr:
-            text += "StdError\n" + stderr
-        if exc:
-            text += "Exception\n" + exc
-        if result is not None:
-            text += "Result\n" + result
-        with io.BytesIO(str(text).encode()) as f:
+        text = get_output(stdout.getvalue(), stderr.getvalue(), exc, result)
+
+        with io.BytesIO(text.encode()) as f:
             f.name = "output.txt"
 
             keyboard = InlineKeyboardMarkup(
@@ -129,7 +115,10 @@ async def executor(client: app, message: Message):
             )
             await message.reply_document(
                 document=f,
-                caption=f"<b>EVAL :</b>\n<code>{cmd[0:980]}</code>\n\n<b>Results:</b>\nAttached Document",
+                caption=(
+                    f"<b>EVAL :</b>\n<code>{cmd[:980]}</code>"
+                    "\n\n<b>Results:</b>\nAttached Document",
+                ),
                 reply_markup=keyboard,
             )
             await message.delete()
@@ -164,17 +153,11 @@ async def forceclose_command(_, query):
     callback_request = callback_data.split(None, 1)[1]
     query, user_id = callback_request.split("|")
     if query.from_user.id != int(user_id):
-        try:
-            return await query.answer(
-                "This is not for you stay away from here", show_alert=True
-            )
-        except Exception:
-            return
+        return await query.answer(
+            "This is not for you stay away from here", show_alert=True
+        )
     await query.message.delete()
-    try:
-        await query.answer()
-    except Exception:
-        return
+    await query.answer()
 
 
 @app.on_edited_message(
@@ -206,8 +189,10 @@ async def shellrunner(_, message: Message):
         except asyncio.TimeoutError:
             process.kill()
             await process.wait()
-            return None, "Command timed out after 30 seconds."
-
+            return (
+                None,
+                "Command timed out after 30 seconds.",
+            )  # pylint: disable-next=broad-exception-caught
         except Exception:
             return None, traceback.format_exc()
 
