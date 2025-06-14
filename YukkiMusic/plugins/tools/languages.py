@@ -37,51 +37,46 @@ def lanuages_keyboard(_):
     keyboard.row(
         InlineKeyboardButton(
             text=_["BACK_BUTTON"],
-            callback_data=f"settingsback_helper",
+            callback_data="settingsback_helper",
         ),
-        InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data=f"close"),
+        InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
     )
     return keyboard
 
 
 @app.on_message(command("LANGUAGE_COMMAND") & filters.group & ~BANNED_USERS)
 @language
-async def langs_command(client, message: Message, _):
-    keyboard = lanuages_keyboard(_)
+async def langs_command(_, message: Message, lng):
+    keyboard = lanuages_keyboard(lng)
     await message.reply_text(
-        _["setting_1"].format(message.chat.title, message.chat.id),
+        lng["lang_1"],
         reply_markup=keyboard,
     )
 
 
 @app.on_callback_query(filters.regex("LG") & ~BANNED_USERS)
 @languageCB
-async def lanuagecb(client, query, _):
-    try:
-        await query.answer()
-    except Exception:
-        pass
-    keyboard = lanuages_keyboard(_)
+async def lanuagecb(_, query, lang):
+    await query.answer()
+    keyboard = lanuages_keyboard(lang)
     return await query.edit_message_reply_markup(reply_markup=keyboard)
 
 
 @app.on_callback_query(filters.regex(r"languages:(.*?)") & ~BANNED_USERS)
 @ActualAdminCB
-async def language_markup(client, query, _):
+async def language_markup(_, query, lang):
     langauge = (query.data).split(":")[1]
     old = await get_lang(query.message.chat.id)
     if str(old) == str(langauge):
-        return await query.answer(
-            "You are already using the same language", show_alert=True
-        )
+        return await query.answer(lang["lang_2"], show_alert=True)
     try:
-        _ = get_string(langauge)
-        await query.answer("Your language changed successfully..", show_alert=True)
-    except Exception:
+        lang = get_string(langauge)
+        await query.answer(lang["lang_3"], show_alert=True)
+    except KeyError:
         return await query.answer(
-            "Failed to change language or language is under maintenance",
+            lang["lang_4"],
             show_alert=True,
         )
     await set_lang(query.message.chat.id, langauge)
-    keyboard = lanuages_keyboard(_)
+    keyboard = lanuages_keyboard(lang)
     return await query.edit_message_reply_markup(reply_markup=keyboard)
