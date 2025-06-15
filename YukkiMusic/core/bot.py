@@ -9,6 +9,7 @@
 #
 import asyncio
 import importlib.util
+import logging
 import os
 import traceback
 from datetime import datetime
@@ -20,12 +21,12 @@ from pyrogram.handlers import MessageHandler
 
 import config
 
-from ..logging import LOGGER
+logger = logging.getLogger(__name__)
 
 
 class YukkiBot(Client):
     def __init__(self, *args, **kwargs):
-        LOGGER(__name__).info("Starting Bot...")
+        logger.info("Starting Bot...")
 
         super().__init__(
             "YukkiMusic",
@@ -49,9 +50,7 @@ class YukkiBot(Client):
                     else:
                         func(client, message)
                 except errors.FloodWait as e:
-                    LOGGER(__name__).warning(
-                        f"FloodWait: Sleeping for {e.value} seconds."
-                    )
+                    logger.warning(f"FloodWait: Sleeping for {e.value} seconds.")
                     await asyncio.sleep(e.value)
                 except (
                     errors.ChatWriteForbidden,
@@ -114,25 +113,25 @@ class YukkiBot(Client):
                 ),
             )
         except (errors.ChannelInvalid, errors.PeerIdInvalid):
-            LOGGER(__name__).error(
+            logger.error(
                 "Bot failed to access the log group. Ensure the bot is added and promoted as admin."
             )
-            LOGGER(__name__).error("Error details:", exc_info=True)
+            logger.error("Error details:", exc_info=True)
             exit()
         if config.SET_CMDS:
             try:
                 await self._set_default_commands()
             except Exception:
-                LOGGER(__name__).warning("Failed to set commands:", exc_info=True)
+                logger.warning("Failed to set commands:", exc_info=True)
 
         try:
             a = await self.get_chat_member(config.LOG_GROUP_ID, "me")
             if a.status != ChatMemberStatus.ADMINISTRATOR:
-                LOGGER(__name__).error("Please promote bot as admin in logger group")
+                logger.error("Please promote bot as admin in logger group")
                 exit()
         except Exception:
             pass
-        LOGGER(__name__).info(f"MusicBot started as {self.name}")
+        logger.info(f"MusicBot started as {self.name}")
 
     async def _set_default_commands(self):
         private_commands = [
@@ -218,7 +217,7 @@ class YukkiBot(Client):
 
         spec = importlib.util.spec_from_file_location(module_path, file_path)
         module = importlib.util.module_from_spec(spec)
-        module.logger = LOGGER(module_path)
+        module.logger = logging.getLogger(module_path)
         module.app = self
         module.Config = config
 
@@ -229,9 +228,7 @@ class YukkiBot(Client):
             spec.loader.exec_module(module)
             self.loaded_plug_counts += 1
         except Exception as e:
-            LOGGER(__name__).error(
-                f"Failed to load {module_path}: {e}\n\n", exc_info=True
-            )
+            logger.error(f"Failed to load {module_path}: {e}\n\n", exc_info=True)
             exit()
 
         return module
@@ -247,9 +244,7 @@ class YukkiBot(Client):
                 utils = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(utils)
             except Exception as e:
-                LOGGER(__name__).error(
-                    f"Failed to load 'utils' module: {e}", exc_info=True
-                )
+                logger.error(f"Failed to load 'utils' module: {e}", exc_info=True)
 
         for root, _, files in os.walk(base_dir):
             for file in files:

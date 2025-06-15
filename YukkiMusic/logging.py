@@ -25,8 +25,4 @@ logging.basicConfig(
 )
 
 for noisy in ["httpx", "ntgcalls", "pyrogram", "pytgcalls", "pymongo"]:
-    logging.getLogger(noisy).setLevel(logging.ERROR)
-
-
-def LOGGER(name: str) -> logging.Logger:
-    return logging.getLogger(name)
+    logging.getLogger(noisy).setLevel(logging.INFO)

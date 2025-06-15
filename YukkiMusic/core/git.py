@@ -8,15 +8,15 @@
 # All rights reserved.
 
 import asyncio
+import logging
 
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
 
 import config
 
-from ..logging import LOGGER
-
 loop = asyncio.get_event_loop_policy().get_event_loop()
+logger = logging.getLogger(__name__)
 
 
 def install_req() -> tuple[str, str, int, int]:
@@ -47,9 +47,9 @@ def git():
 
     try:
         repo = Repo()
-        LOGGER(__name__).info("Git Client Found [VPS DEPLOYER]")
+        logger.info("Git Client Found [VPS DEPLOYER]")
     except GitCommandError:
-        LOGGER(__name__).info("Invalid Git Command")
+        logger.info("Invalid Git Command")
     except InvalidGitRepositoryError:
         repo = Repo.init()
         if "origin" in repo.remotes:
@@ -79,4 +79,4 @@ def git():
     except GitCommandError:
         repo.git.reset("--hard", "FETCH_HEAD")
     install_req()
-    LOGGER(__name__).info(f"Fetched Updates from: {config.UPSTREAM_REPO}")
+    logger.info(f"Fetched Updates from: {config.UPSTREAM_REPO}")

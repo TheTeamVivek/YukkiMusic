@@ -12,13 +12,12 @@ import uvloop as _uvloop
 
 _asyncio.set_event_loop_policy(_uvloop.EventLoopPolicy())  # noqa
 
+import YukkiMusic.logging  # noqa
 from YukkiMusic.core.bot import YukkiBot
 from YukkiMusic.core.dir import dirr
 from YukkiMusic.core.git import git
 from YukkiMusic.core.userbot import Userbot
 from YukkiMusic.misc import dbb, heroku
-
-from .logging import LOGGER
 
 # Directories
 dirr()
