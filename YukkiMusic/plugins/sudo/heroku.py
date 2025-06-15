@@ -285,7 +285,7 @@ async def update_(client, message, _):
             except Exception:
                 pass
         await response.edit(
-            _final_updates_ + "» Bot Upadted Sucessfully Now wait until the bot starts",
+            f"{_final_updates_}» Bot Upadted Sucessfully Now wait until the bot starts"
         )
     except Exception:
         pass
