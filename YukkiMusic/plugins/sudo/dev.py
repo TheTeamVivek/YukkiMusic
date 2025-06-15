@@ -84,7 +84,7 @@ async def executor(client: app, message: Message):
     except IndexError:
         return await message.delete()
     t1 = time()
-    (exc,) = (None,)
+    exc = None
     with (
         contextlib.redirect_stdout(io.StringIO()) as stdout,
         contextlib.redirect_stderr(io.StringIO()) as stderr,
