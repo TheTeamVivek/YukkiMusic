@@ -16,6 +16,5 @@ for root, dirs, files in os.walk(base_dir):
                 f"{__package__}.{mod_name}" if __package__ else mod_name
             )
 
-            if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
-                if hasattr(mod, "__HELP__") and mod.__HELP__:
-                    HELPABLE[mod.__MODULE__.lower()] = mod
+            if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__ and (hasattr(mod, "__HELP__") and mod.__HELP__):
+                HELPABLE[mod.__MODULE__.lower()] = mod
