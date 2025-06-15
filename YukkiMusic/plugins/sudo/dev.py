@@ -45,7 +45,7 @@ def get_output(stdout, stderr, exc, result, fmt=False):
         output = [template.format(k, v) for k, v in data.items() if v]
         if not output:
             output.append(template.format("Result", "Success"))
-        return "".join(output)
+        return "\n\n".join(output)
     return "".join(f"{k}\n{v}" for k, v in data.items() if v)
 
 
