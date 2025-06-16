@@ -1,0 +1,31 @@
+name: 💡 Feature Request
+description: Suggest a new feature or improvement
+title: "[Feature Request]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: feature
+    attributes:
+      label: What feature do you want?
+      description: Clearly describe the feature or improvement you are requesting.
+      placeholder: Describe the new feature or enhancement...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Why is this feature useful?
+      description: Explain how it would improve the bot or help users.
+      placeholder: It would improve the experience by...
+    validations:
+      required: true
+
+  - type: textarea
+    id: extras
+    attributes:
+      label: Anything else?
+      description: (Optional) Add any other context or related ideas.
+      placeholder: Optional context or suggestions...
+    validations:
+      required: false
