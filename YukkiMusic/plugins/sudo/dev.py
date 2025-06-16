@@ -28,7 +28,12 @@ from YukkiMusic.misc import SUDOERS
 
 def cleanup_code(code):
     if code.startswith("```") and code.endswith("```"):
-        return "\n".join(code.strip("`").split("\n")[1:-1])
+        lines = code.strip("`").split("\n")
+        # If the first line after the opening ``` contains a language tag, skip it
+        if lines[0].strip() == "" or lines[0].isalpha():
+            return "\n".join(lines[1:-1])
+        else:
+            return "\n".join(lines[:-1])
     return code.strip("` \n")
 
 
