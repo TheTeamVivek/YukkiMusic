@@ -415,7 +415,8 @@ async def admin_callback(client, query, _):
             if (duration_played - duration_to_skip) <= 10:
                 bet = seconds_to_min(duration_played)
                 return await query.answer(
-                    f"Bot is unable to seek because duration exceeds.\n\nCurrently played:** {bet}** minutes out of **{duration}** minutes.",
+                    f"Bot is unable to seek because duration exceeds.\n\n"
+                    "Currently played:** {bet}** minutes out of **{duration}** minutes.",
                     show_alert=True,
                 )
             to_seek = duration_played - duration_to_skip + 1

@@ -47,6 +47,20 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 # Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
+
+# You'll need a Group ID or USERNAME for this.
+LOG_GROUP_ID = getenv("LOG_GROUP_ID", "").strip()
+
+# Your User ID.
+OWNER_ID = list(
+    map(int, getenv("OWNER_ID", "6815918609").split())
+)  # Input type must be interger
+
+
+# You'll need a Pyrogram String Session for these vars. See config/README.md for more information.
+# Get the environment variable with a default value of an empty
+STRING_SESSIONS = parse_list(getenv("STRING_SESSIONS", ""))
+
 # Your cookies pasted link on batbin.me
 # you can skip if you are adding cookies
 # manually in config/cookies dir
@@ -64,32 +78,11 @@ DURATION_LIMIT_MIN = int(
     getenv("DURATION_LIMIT", "300")
 )  # Remember to give value in Minutes
 
-
-EXTRA_PLUGINS = is_bool(getenv("EXTRA_PLUGINS", "False"))
-
-# Fill False if you Don't want to load extra plugins
-
-
-EXTRA_PLUGINS_REPO = getenv(
-    "EXTRA_PLUGINS_REPO",
-    "https://github.com/TheTeamVivek/Extra-Plugin",
-)
-# Fill here the external plugins repo where plugins that you want to load
-
-
 # Duration Limit for downloading Songs in MP3 or MP4 format from bot
 SONG_DOWNLOAD_DURATION = int(
     getenv("SONG_DOWNLOAD_DURATION_LIMIT", "90")
 )  # Remember to give value in Minutes
 
-
-# You'll need a Group ID or USERNAME for this.
-LOG_GROUP_ID = getenv("LOG_GROUP_ID", "").strip()
-
-# Your User ID.
-OWNER_ID = list(
-    map(int, getenv("OWNER_ID", "6815918609").split())
-)  # Input type must be interger
 
 # Get it from http://dashboard.heroku.com/account
 HEROKU_API_KEY = getenv("HEROKU_API_KEY")
@@ -180,24 +173,11 @@ TG_VIDEO_FILESIZE_LIMIT = int(
 # Refer to https://i.postimg.cc/Bbg3LQTG/image.png
 SET_CMDS = is_bool(getenv("SET_CMDS", "False"))
 
-
-# You'll need a Pyrogram String Session for these vars. See config/README.md for more information.
-# Get the environment variable with a default value of an empty
-STRING_SESSIONS = parse_list(getenv("STRING_SESSIONS", ""))
-
-#  __     ___    _ _  ___  _______   __  __ _    _  _____ _____ _____
-#  \ \   / / |  | | |/ / |/ /_   _| |  \/  | |  | |/ ____|_   _/ ____|
-#   \ \_/ /| |  | | ' /| ' /  | |   | \  / | |  | | (___   | || |
-#    \   / | |  | |  < |  <   | |   | |\/| | |  | |\___ \  | || |
-#     | |  | |__| | . \| . \ _| |_  | |  | | |__| |____) |_| || |____
-#     |_|   \____/|_|\_\_|\_\_____| |_|  |_|\____/|_____/|_____\_____|
-
-
 # DONT TOUCH or EDIT codes after this line
 BANNED_USERS = _flt.user()
 YTDOWNLOADER = 1
 LOG = 2
-LOG_FILE_NAME = "logs.txt"
+CLEANMODE = 3
 adminlist = {}
 lyrical = {}
 chatstats = {}

@@ -6,25 +6,22 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
+
 import asyncio
 import logging
-import os
 
 from pyrogram import idle
 from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
-import YukkiMusic.plugins
 from config import BANNED_USERS
-from YukkiMusic import HELPABLE, app, userbot
+from YukkiMusic import app, userbot
 from YukkiMusic.core.call import Yukki
+from YukkiMusic.core.modules import LoaderContext, load_mod
 from YukkiMusic.misc import sudo
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
 logger = logging.getLogger("YukkiMusic")
-loop = asyncio.get_event_loop()
-
-_ = YukkiMusic.plugins
 
 
 async def init():
@@ -49,34 +46,8 @@ async def init():
     await sudo()
     await app.start()
     if config.EXTRA_PLUGINS:
-        if os.path.exists("xtraplugins"):
-            result = await app.run_shell_command(["git", "-C", "xtraplugins", "pull"])
-            if result["returncode"] != 0:
-                logger.error(
-                    f"Error pulling updates for extra plugins: {result['stderr']}"
-                )
-                exit()
-        else:
-            result = await app.run_shell_command(
-                ["git", "clone", config.EXTRA_PLUGINS_REPO, "xtraplugins"]
-            )
-            if result["returncode"] != 0:
-                logger.error(f"Error cloning extra plugins: {result['stderr']}")
-                exit()
-
-        req = os.path.join("xtraplugins", "requirements.txt")
-        if os.path.exists(req):
-            result = await app.run_shell_command(
-                ["uv", "pip", "install", "--system", "-r", req]
-            )
-            if result["returncode"] != 0:
-                logger.error(f"Error installing requirements: {result['stderr']}")
-
-        for mod in app.load_plugins_from("xtraplugins"):
-            if mod and hasattr(mod, "__MODULE__") and mod.__MODULE__:
-                if hasattr(mod, "__HELP__") and mod.__HELP__:
-                    HELPABLE[mod.__MODULE__.lower()] = mod
-
+        ctx = LoaderContext()
+        load_mod(config.EXTRA_PLUGINS, ctx)
     logger.info("Successfully Imported All Modules ")
     await userbot.start()
     await Yukki.start()
@@ -98,7 +69,7 @@ async def init():
 
 
 def main():
-    loop.run_until_complete(init())
+    asyncio.get_event_loop().run_until_complete(init())
     logger.info("Stopping YukkiMusic! GoodBye")
 
 

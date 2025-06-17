@@ -11,18 +11,30 @@
 import logging
 from logging.handlers import RotatingFileHandler
 
-from config import LOG_FILE_NAME
+formatter = logging.Formatter(
+    "{asctime} - {levelname} - {message}", style="{", datefmt="%d-%b-%y %H:%M:%S"
+)
+
+file_handler = RotatingFileHandler("logs.txt", maxBytes=5_000_000, backupCount=10)
+file_handler.setFormatter(formatter)
+
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
 
 logging.basicConfig(
     level=logging.INFO,
     format="{asctime} - {levelname} - {message}",
     style="{",
     datefmt="%d-%b-%y %H:%M:%S",
-    handlers=[
-        RotatingFileHandler(LOG_FILE_NAME, maxBytes=5000000, backupCount=10),
-        logging.StreamHandler(),
-    ],
+    handlers=[file_handler, stream_handler],
 )
 
-for noisy in ["httpx", "ntgcalls", "pyrogram", "pytgcalls", "pymongo"]:
-    logging.getLogger(noisy).setLevel(logging.INFO)
+noisy_modules = ["httpx", "ntgcalls", "pyrogram", "pytgcalls", "pymongo"]
+
+for name in noisy_modules:
+    noisy_logger = logging.getLogger(name)
+    noisy_logger.setLevel(logging.INFO)
+    noisy_logger.handlers.clear()
+    noisy_logger.addHandler(file_handler)
+    noisy_logger.addHandler(stream_handler)
+    noisy_logger.propagate = False

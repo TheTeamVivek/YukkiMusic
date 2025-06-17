@@ -49,7 +49,7 @@ def is_heroku():
 @language
 async def log_(client, message, _):
     async def _get_log():
-        async with aiofiles.open(config.LOG_FILE_NAME) as f:
+        async with aiofiles.open("logs.txt") as f:
             lines = await f.readlines()
 
         data = ""
@@ -65,14 +65,14 @@ async def log_(client, message, _):
     try:
         if await is_heroku():
             if HAPP is None:
-                if os.path.exists(config.LOG_FILE_NAME):
+                if os.path.exists("logs.txt"):
                     return await message.reply_text(await _get_log())
                 return await message.reply_text(_["heroku_1"])
             data = HAPP.get_log()
             link = await pastebin.paste(data)
             return await message.reply_text(link)
         else:
-            if os.path.exists(config.LOG_FILE_NAME):
+            if os.path.exists("logs.txt"):
                 link = await _get_log()
                 return await message.reply_text(link)
             else:

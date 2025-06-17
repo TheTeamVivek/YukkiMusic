@@ -8,6 +8,10 @@
 # All rights reserved.
 #
 
+  
+CLEANMODE_COMMAND: # Need to add translations
+  en: ["cleanmode"]
+  
 
 START_COMMAND:
   ar: ["تفعيل", "ميوزك"]

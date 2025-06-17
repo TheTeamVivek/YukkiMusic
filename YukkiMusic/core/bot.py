@@ -8,9 +8,8 @@
 # All rights reserved.
 #
 import asyncio
-import importlib.util
 import logging
-import os
+import sys
 import traceback
 from datetime import datetime
 from functools import wraps
@@ -117,7 +116,7 @@ class YukkiBot(Client):
                 "Bot failed to access the log group. Ensure the bot is added and promoted as admin."
             )
             logger.error("Error details:", exc_info=True)
-            exit()
+            sys.exit()
         if config.SET_CMDS:
             try:
                 await self._set_default_commands()
@@ -128,7 +127,7 @@ class YukkiBot(Client):
             a = await self.get_chat_member(config.LOG_GROUP_ID, "me")
             if a.status != ChatMemberStatus.ADMINISTRATOR:
                 logger.error("Please promote bot as admin in logger group")
-                exit()
+                sys.exit()
         except Exception:
             pass
         logger.info(f"MusicBot started as {self.name}")
@@ -205,65 +204,3 @@ class YukkiBot(Client):
                 )
             except Exception:
                 pass
-
-    def load_plugin(self, file_path: str, base_dir: str, utils=None):
-        file_name = os.path.basename(file_path)
-        module_name, ext = os.path.splitext(file_name)
-        if module_name.startswith("__") or ext != ".py":
-            return None
-
-        relative_path = os.path.relpath(file_path, base_dir).replace(os.sep, ".")
-        module_path = f"{os.path.basename(base_dir)}.{relative_path[:-3]}"
-
-        spec = importlib.util.spec_from_file_location(module_path, file_path)
-        module = importlib.util.module_from_spec(spec)
-        module.logger = logging.getLogger(module_path)
-        module.app = self
-        module.Config = config
-
-        if utils:
-            module.utils = utils
-
-        try:
-            spec.loader.exec_module(module)
-            self.loaded_plug_counts += 1
-        except Exception as e:
-            logger.error(f"Failed to load {module_path}: {e}\n\n", exc_info=True)
-            exit()
-
-        return module
-
-    def load_plugins_from(self, base_folder: str):
-        base_dir = os.path.abspath(base_folder)
-        utils_path = os.path.join(base_dir, "utils.py")
-        utils = None
-
-        if os.path.exists(utils_path) and os.path.isfile(utils_path):
-            try:
-                spec = importlib.util.spec_from_file_location("utils", utils_path)
-                utils = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(utils)
-            except Exception as e:
-                logger.error(f"Failed to load 'utils' module: {e}", exc_info=True)
-
-        for root, _, files in os.walk(base_dir):
-            for file in files:
-                if file.endswith(".py") and not file == "utils.py":
-                    file_path = os.path.join(root, file)
-                    mod = self.load_plugin(file_path, base_dir, utils)
-                    yield mod
-
-    async def run_shell_command(self, command: list):
-        process = await asyncio.create_subprocess_exec(
-            *command,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-
-        stdout, stderr = await process.communicate()
-
-        return {
-            "returncode": process.returncode,
-            "stdout": stdout.decode().strip() if stdout else None,
-            "stderr": stderr.decode().strip() if stderr else None,
-        }
