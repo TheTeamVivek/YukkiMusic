@@ -18,10 +18,7 @@ def parse_list(sep=","):
     def _parse(text):
         if not text:
             return False, None
-        if not sep or not sep.strip():
-            h = "space-separated"
-        else:
-            h = "comma-separated"
+        h = "space-separated" if not sep or not sep.strip() else "comma-separated"
         values = [v.strip() for v in text.strip("'\"").split(sep) if v.strip()]
         if not values:
             print_hint(f"Provide {h} values")
