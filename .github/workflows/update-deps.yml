@@ -25,7 +25,6 @@ jobs:
       - name: update
         run: |
           uv sync --refresh --locked
-          touch changed.txt
           uv pip list --outdated --format json | jq -c '.[]' | while read -r p; do
             n=$(echo "$p" | jq -r '.name')
             v=$(echo "$p" | jq -r '.latest_version')
@@ -33,15 +32,11 @@ jobs:
             if grep -qE "\"$e[ \t]*[~=><!]=?[^\"\[]*\"" pyproject.toml; then
               echo "$n → $v"
               sed -i -E "s/\"$e[ \t]*[~=><!]=?[^\"\[]*\"/\"$n==$v\"/" pyproject.toml
-              touch changed.txt
             fi
           done
-          if [ -s changed.txt ]; then
-            uv lock
-          fi
+          uv lock
 
       - name: pull request
-        if: success()
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
