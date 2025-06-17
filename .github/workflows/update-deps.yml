@@ -43,6 +43,7 @@ jobs:
           commit-message: "⬆️ Update dependencies"
           title: "⬆️ Dependency updates"
           body: "This PR updates outdated dependencies to their latest versions."
-          branch: dep-update
+          branch: deps/update-pip-deps
           delete-branch: true
           assignees: Vivekkumar-IN
+          reviewers: Vivekkumar-IN
