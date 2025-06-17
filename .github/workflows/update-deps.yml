@@ -14,17 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: i
+      - name: install
         run: pip install uv jq
 
-      - name: u
+      - name: update
         run: |
           uv sync --refresh --locked
-          changed=false
+          touch changed.txt
           uv pip list --outdated --format json | jq -c '.[]' | while read -r p; do
             n=$(echo "$p" | jq -r '.name')
             v=$(echo "$p" | jq -r '.latest_version')
@@ -32,30 +33,21 @@ jobs:
             if grep -qE "\"$e[ \t]*[~=><!]=?[^\"\[]*\"" pyproject.toml; then
               echo "$n → $v"
               sed -i -E "s/\"$e[ \t]*[~=><!]=?[^\"\[]*\"/\"$n==$v\"/" pyproject.toml
-              changed=true
+              touch changed.txt
             fi
           done
-          $changed && uv lock
-
-      - name: c
-        run: |
-          git config user.name bot
-          git config user.email bot@users.noreply.github.com
-          if ! git diff --quiet; then
-            b=up-$(date +%s)
-            git checkout -b $b
-            git add pyproject.toml uv.lock
-            git commit -m "⬆️"
-            git push origin $b
-            echo "b=$b" >> $GITHUB_ENV
+          if [ -s changed.txt ]; then
+            uv lock
           fi
 
-      - name: pr
-        if: env.b
+      - name: pull request
+        if: success()
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: "⬆️"
-          body: update deps
-          branch: ${{ env.b }}
+          commit-message: "⬆️ Update dependencies"
+          title: "⬆️ Dependency updates"
+          body: "This PR updates outdated dependencies to their latest versions."
+          branch: dep-update
+          delete-branch: true
           assignees: Vivekkumar-IN
