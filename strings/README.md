@@ -46,6 +46,8 @@ If you want to localize the bot commands in your language, you can do so by edit
 
 Unlike `en.yml`, this file maps each command to language codes directly. Here’s how it looks:
 
+#### Before:
+
 ```yaml
 START_COMMAND:
   ar: ["تفعيل", "ميوزك"]
@@ -61,14 +63,28 @@ COMMAND_NAME:
   isolangkey: ["translated_command_1", "translated_command_2"]
 ```
 
-For example, to add Hindi commands for `START_COMMAND`:
+For example, to add **Hindi** translations to `START_COMMAND`:
 
 ```yaml
 START_COMMAND:
+  ar: ["تفعيل", "ميوزك"]
+  ku: ["دەستپێکردن", "چالاککردن"]
+  en: ["start"]
+  tr: ["baslat"]
   hi: ["शुरू", "चालू"]
 ```
 
-Save your changes in the same `commands.yml` file and include it when you submit your translation.
+Or to add French translations to a STOP command:
+
+```yaml
+STOP_COMMAND:
+  fr: ["arrêter", "stop"]
+```
+
+> [!NOTE]
+> Make sure you **append** new language keys to existing command blocks instead of creating duplicate `COMMAND_NAME` entries.
+
+Save your changes in the same `commands.yml` file and include it when you submit your translation PR.
 
 ---
 

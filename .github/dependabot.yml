@@ -1,15 +1,5 @@
 version: 2
 updates:
-  - package-ecosystem: pip
-    directory: "/"
-    schedule:
-      interval: daily
-    open-pull-requests-limit: 50
-    groups:
-      all-pip-deps:
-        patterns:
-          - "*"
-
   - package-ecosystem: docker
     directory: "/"
     schedule:
