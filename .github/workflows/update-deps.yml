@@ -1,0 +1,48 @@
+name: Update deps
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # Runs every day at 00:00 UTC
+  push:
+    paths:
+      - "pyproject.toml"
+      - "**.yml"
+jobs:
+  deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: install
+        run: pip install uv jq
+
+      - name: update
+        run: |
+          uv sync --refresh --locked
+          uv pip list --outdated --format json | jq -c '.[]' | while read -r p; do
+            n=$(echo "$p" | jq -r '.name')
+            v=$(echo "$p" | jq -r '.latest_version')
+            e=$(printf '%s' "$n" | sed 's/[][\.*^$(){}?+|/]/\\&/g')
+            if grep -qE "\"$e[ \t]*[~=><!]=?[^\"\[]*\"" pyproject.toml; then
+              echo "$n → $v"
+              sed -i -E "s/\"$e[ \t]*[~=><!]=?[^\"\[]*\"/\"$n==$v\"/" pyproject.toml
+            fi
+          done
+          uv lock
+
+      - name: pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "⬆️ Update dependencies"
+          title: "⬆️ Dependency updates"
+          body: "This PR updates outdated dependencies to their latest versions."
+          branch: deps/update-pip-deps
+          delete-branch: true
+          assignees: Vivekkumar-IN
+          reviewers: Vivekkumar-IN
