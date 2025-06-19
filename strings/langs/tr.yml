@@ -246,12 +246,6 @@ queue_5 : "Sıralamada yalnızca bir parça var, sıralamayı kontrol etmek içi
 stream_1 : "**✮ Akış Başladı**\n\n**✯ Başlık :** [{0}]({1})\n**✬ Süre :** {2} dakika\n✭ Boyut :** {3}"
 stream_2 : "➲ **Akış Başladı |**\n\n**‣ Akış Türü :** Canlı akış [URL]\n**‣ Ekleyen :** {0}"
 
-V_C_1 : "Katılımcı listesi getiriliyor...."
-V_C_2 : "**İsim: {0}**\n   ID: {1}\n    **Kullanıcı Adı:** {2}\n    **Video Paylaşımı:** {3}\n    **Ekran Paylaşımı:** {4}\n    **El Kaldırdı:** {5}\n    **Sessize Alındı:** {6}\n     **Konuşuyor:** {7}\n    **Grupta Değil:** {8}"
-V_C_3 : "Sesli sohbette katılımcı yok"
-V_C_4 : "[Sesli sohbet katılımcılarının tüm ayrıntılarını buradan kontrol edebilirsiniz]({0})"
-V_C_5 : "Bu sohbette aktif bir çağrı yok."
-
 # Inline Buttons
 
 #General Buttons

@@ -250,12 +250,6 @@ queue_5: "🚫 Only one track is in queue; add some more tracks in the queue to 
 stream_1: "**✮ Started Streaming**\n\n**✯ Title:** [{0}]({1})\n**✬ Duration:** {2} minutes\n**✭ By:** {3}"
 stream_2: "➲ **Started Streaming |**\n\n**‣ Stream type:** live stream [url]\n**‣ By:** {0}"
 
-V_C_1: "🔄 Fetching participants list...."
-V_C_2: "**Name:** {0}\n    **ID:** {1}\n    **Username:** {2}\n    **Video sharing:** {3}\n    **Screen sharing:** {4}\n    **Is hand raised:** {5}\n    **Muted:** {6}\n    **Speaking:** {7}\n    **Left from group:** {8}"
-V_C_3: "🚫 No participants in voice chat."
-V_C_4: "[🔗 You can check all details of voice chat participants from here]({0})"
-V_C_5: "❌ There is no active call in this chat."
-
 # misc
 misc_1: "🤖 Bot automatically cleared the queue and left the voice chat because no one was listening to songs in the voice chat."
 

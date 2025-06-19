@@ -9,6 +9,7 @@
 
 from __future__ import annotations  # noqa
 
+import asyncio
 import importlib
 import logging
 from dataclasses import dataclass
@@ -54,7 +55,7 @@ def _setup_logger(name: str):
     plugin_logger.propagate = False
 
 
-def load_mod(modules: list[str], ctx: LoaderContext):
+async def load_mod(modules: list[str], ctx: LoaderContext):
     for mod_name in modules:
         try:
             mod = importlib.import_module(mod_name)
@@ -66,7 +67,10 @@ def load_mod(modules: list[str], ctx: LoaderContext):
 
         if hasattr(mod, "setup"):
             try:
-                mod.setup(ctx)
+                if asyncio.iscoroutinefunction(mod.setup):
+                    await mod.setup(ctx)
+                else:
+                    mod.setup(ctx)
                 logger.info(f"[MOD] Loaded and setup: {mod_name}")
             except Exception as e:
                 logger.warning(f"[MOD] Setup failed for '{mod_name}': {e}")
