@@ -6,41 +6,6 @@ ac_3: "🔊 <b>Active Voice Chats:</b>\n\n{0}"
 ac_4: "📹 <b>Active Video Chats:</b>\n\n{0}"
 ac_5: "📊 <b>Active Chats Info:</b>\n🎧 Total Active Audio Chats: <b>{0}</b>\n🎥 Total Active Video Chats: <b>{1}</b>"
 
-# General Strings
-general_1 : "🔄 Reply to a user's message or give username/user_id."
-general_2 : "❌ Error! Wrong usage of command."
-general_3 : "⚠️ Some **exception occurred** while processing your query.\n\nException type: {0}"
-general_4 : "👤 You're an anonymous admin in this chat group!\nRevert back to user account for admin rights."
-general_5 : "🔑 You need to be an admin with **manage video chat** rights to perform this action."
-general_6 : "📺 Bot isn't streaming on video chat."
-
-# Classes - Telegram.py
-tg_1 : "⚠️ Bot is **overloaded** with downloads right now.\n\n**Try after:** {0} (__expected time__)"
-tg_2 : "❌ Failed to download the media from Telegram."
-
-# Core - Call.py
-call_1 : "🤖 Bot requires **admin** permission to invite assistant account to your channel."
-call_2 : "🚫 Assistant is banned in your group or channel.\nPlease unban and play song again\n\n**Assistant username:** @{0}\n**Assistant ID:** {1}"
-call_3 : "❗ Exception occurred while inviting assistant account to your.\n\n**Reason**: {0}"
-call_4 : "🔗 Bot requires **invite users via link** permission to invite assistant account to your chat group."
-call_5 : "⏳ Assistant account will be joining in 5 seconds, please wait..."
-call_6 : "✅ Assistant account of {0} joined successfully.\n\nStarting music now."
-call_7 : "❌ **Failed to switch stream**\nPlease use /skip to change track again."
-call_8 : "📥 Downloading next track from playlist...."
-call_9 : "📉 Assistant is joined too many chats, therefore assistant can't join here\nContact [Support Group]({0}) to fix and inform this problem."
-call_10: "⏳ Assistant is on FloodWait due to join/leave please wait {0} seconds."
-
-# PLUGINS - Auth.py
-auth_1 : "🔒 You can only have 20 users in your group's authorized users list (aul)."
-auth_2 : "✅ Added to authorized users list of your group."
-auth_3 : "⚠️ Already in the authorized users list."
-auth_4 : "❌ Removed from authorized users list of this group."
-auth_5 : "🚫 Targeted user is not an authorized user."
-auth_6 : "🔄 Fetching authorized users...please wait!"
-auth_7 : "**Authorized users list[aul]:**\n\n"
-auth_8 : "┗ Added by:-"
-
-# PLUGINS - Admins
 admin_1 : "🎶➻ Music is already paused!"
 admin_2 : "🎶➻ Music is paused by {}!"
 admin_3 : "🎶➻ Music is already resumed."
@@ -76,56 +41,77 @@ admin_32 : "⏳➻ Please Wait... Seeking ongoing stream."
 admin_33 : "✅➻ Successfully Seeked Stream to {0} Mins"
 admin_34 : "❌➻ Failed to seek the current stream."
 
+auth_1 : "🔒 You can only have 20 users in your group's authorized users list (aul)."
+auth_2 : "✅ Added to authorized users list of your group."
+auth_3 : "⚠️ Already in the authorized users list."
+auth_4 : "❌ Removed from authorized users list of this group."
+auth_5 : "🚫 Targeted user is not an authorized user."
+auth_6 : "🔄 Fetching authorized users...please wait!"
+auth_7 : "**Authorized users list[aul]:**\n\n"
+auth_8 : "┗ Added by:-"
 
-# Bot 
+black_1: "**Usage:**\n/blacklistchat [CHAT_ID]"
+black_2: "🚫 Chat is already blacklisted."
+black_3: "✅ Chat has been successfully blacklisted."
+black_4: "**Usage:**\n/whitelistchat [CHAT_ID]"
+black_5: "✅ Chat is already whitelisted."
+black_6: "✅ Chat has been successfully whitelisted."
+black_7: "**Blacklisted chats:**\n\n"
+black_8: "🔍 No blacklisted chats."
 
-# Start
-start_1 : "Hey, I am {0} 🥀.\n\n➻ I'm a Telegram streaming bot with some useful features.\n\nSupporting platforms: YouTube, Spotify, SoundCloud etc.\n\nFeel free to add me to your groups."
-start_2 : "Hey,\n this is {0}\n\nA fast and powerful music player bot with some awesome features.\n\nAssistant username: @{1}\nAssistant ID: {2}"
-start_3 : "The owner of {0}, {1} just joined your chat."
-start_4 : "The sudo user of {0}, {1} just joined your chat."
-start_5 : "🦸 **Supergroup needed** 🦸\n\nPlease convert your **group** to **supergroup** and then add me back.\n\n**How to make supergroup?**\n🥱 Make your group's chat history **visible** once."
-start_6 : "**Blacklisted chat**\n\nThis chat is blacklisted for using the bot. Request a sudo user to whitelist your chat, sudo users [list]({0})."
-start_7 : "Heya :) I am alive since **{0}**"
+block_1: "{0} is already blocked from the bot."
+block_2: "🚫 Added **{0}** to block list of bot. User won't be able to use bot now under any condition.\n\nCheck blocked users: /blockedusers"
+block_3: "🆓 User is already free."
+block_4: "✅ Removed user from the block list. User will be able to use bot now."
+block_5: "🔍 No blocked users found."
+block_6: "⏳ Getting blocked users list...please wait!"
+block_7: "**Blocked users:**\n\n"
 
-# Help Messages
-help_1 : "Click on the buttons below for more information. If you're facing any problem you can ask in support chat.\n\nAll commands can be used with: /"
-help_2 : "Contact me in PM for help."
+broad_1: "**📢 Broadcasted message in {0} chats with {1} pins from bot.**"
+broad_2: "🔊 Started assistant broadcast..."
+broad_3: "**Assistant broadcast:\n\n"
+broad_4: "🗣️ Assistant {0} broadcasted in {1} chats\n"
+broad_5: "**Usage**:\n/broadcast [MESSAGE] or [Reply to a Message]"
+broad_6: "❗ Please provide some text to broadcast."
+broad_7: "**📬 Broadcasted message to {0} users with {1} pins from bot.**"
 
-lang_1: "🌐 Please choose the language you want to set as this group's default language:"
-lang_2: "⚠️ You are already using the same language."
-lang_3: "✅ Your language has been changed successfully."
-lang_4: "❌ Failed to change the language or the selected language is under maintenance."
+call_1 : "🤖 Bot requires **admin** permission to invite assistant account to your channel."
+call_2 : "🚫 Assistant is banned in your group or channel.\nPlease unban and play song again\n\n**Assistant username:** @{0}\n**Assistant ID:** {1}"
+call_3 : "❗ Exception occurred while inviting assistant account to your.\n\n**Reason**: {0}"
+call_4 : "🔗 Bot requires **invite users via link** permission to invite assistant account to your chat group."
+call_5 : "⏳ Assistant account will be joining in 5 seconds, please wait..."
+call_6 : "✅ Assistant account of {0} joined successfully.\n\nStarting music now."
+call_7 : "❌ **Failed to switch stream**\nPlease use /skip to change track again."
+call_8 : "📥 Downloading next track from playlist...."
+call_9 : "📉 Assistant is joined too many chats, therefore assistant can't join here\nContact [Support Group]({0}) to fix and inform this problem."
+call_10: "⏳ Assistant is on FloodWait due to join/leave please wait {0} seconds."
 
-# Settings Messages
-setting_1 : "⚙️ **Music Bot Settings**\n\n🖇**Group:** {0}\n🔖**Group ID:** `{1}`\n\n💡**Choose the function buttons from below which you want to edit or change.**"
-setting_3 : "⁉️ What is This?\n\n1) Direct: Plays search queries directly. Use -v to play videos in direct mode.\n\n2) Inline: Returns Inline Markup Buttons for choosing between video & audio."
-setting_4 : "⁉️ What is This?\n\n👥 Everyone: Anyone can use admin commands(skip, pause, resume etc) present in this group.\n\n🙍 Admin Only: Only admins and authorized users can use admin commands."
-setting_5 : "No Authorized Users Found\n\nYou can allow any non-admin to use my admin commands by /auth and delete by using /unauth."
-setting_9 : "⁉️ What is This?\n\nWhen activated, Bot will delete its message after {0} to make your chat clean and clear."
-setting_10 : "⁉️ What is This?\n\n1) Group: Plays music in the group where the command is given.\n\n2) Channel: Plays music in the channel you want. Set channel id via /channelplay."
-setting_11 : "⁉️ What is This?\n\n1) Everyone: Anyone present in this group can play music here.\n\n2) Admin Only: Only admins can play the music in this group."
-setting_12 : "❌ You've no channel id defined for channel mode. Please define with /channelplay."
-setting_13 : "Can't change play mode in active group call. Please stop the voice chat first with /stop."
-setting_14 : "⁉️ What is This?\n\nWhen activated, Bot will delete its executed commands (/play, /pause, /shuffle, /stop etc) immediately.\n\nBot will be requiring delete messages admin right for this to work properly."
-setting_15 : "Failed to resolve peer, Make sure you have added bot in your channel and promoted it as admin.\n\nTry setting /channelplay again.."
-setting_16 : "⁉️ What is This?\n\nWhen activated, Bot will suggest you..."
+cplay_1: "🎶 You can play music in channels from this chat [{0}] to any channel or your chat's linked channel.\n\n**For linked channel:**\n/{1} linked\n\n**For any other channel:**\n/{1} [channel ID]"
+cplay_2: "🚫 This chat has no linked channel."
+cplay_3: "✅ Channel defined to {0}\n\nChannel ID: {1}"
+cplay_4: "❌ Failed to get channel.\n\nMake sure you have added the bot in your channel and promoted it as admin.\nChange channel via /channelplay or disable channel play mode via /playmode."
+cplay_5: "🚫 Only channels are supported."
+cplay_6: "🔑 You need to be the **owner** of the channel [{0}] to connect it with this group.\n**Channel's owner:** @{1}\n\nAlternatively, you can link your group to that channel and then try connecting with `/channelplay linked`."
 
-# Setting Callbacks
-set_cb_1 : "🎵 Getting audio quality panel..."
-set_cb_2 : "📺 Getting video quality panel..."
-set_cb_3 : "🔒 Getting auth users panel..."
-set_cb_4 : "🎮 Getting play mode panel..."
-set_cb_5 : "🧹 Getting clean mode panel..."
-set_cb_6 : "⚙️ Setting up changes."
-set_cb_7 : "🔄 Getting auth users list.. please wait."
-set_cb_8 : "🔙 Getting back.."
+gban_1: "🚫 You can't gban yourself? Bloody noob!"
+gban_2: "🙄 You want me to gban myself?"
+gban_3: "🤨 You want to gban my ex?"
+gban_4: "{0} is already **gbanned** from the bot."
+gban_5: "**🌍 Global ban running on BOT database by Team Yukki**\n\n**Gbanning on {0}**\n\n**Expected time**: {1}."
+gban_6: "**✅ Gbanned successfully on BOT database\n\nBanned **{0}** from **{1}** chats\n**Gbanned by Team Yukki**"
+gban_7: "{0} is not **gbanned**, how can I unban him?"
+gban_8: "**🔓 Unbanning {0}**\n\nExpected time: {1}."
+gban_9: "**✅ Unbanned successfully on BOT database\n\nUnbanned **{0}** in **{1}** chats\n**Unbanned by TheTeamVivek**"
+gban_10: "🚫 No one is gbanned."
+gban_11: "⏳ Getting gbanned users list..."
 
+general_1 : "🔄 Reply to a user's message or give username/user_id."
+general_2 : "❌ Error! Wrong usage of command."
+general_3 : "⚠️ Some **exception occurred** while processing your query.\n\nException type: {0}"
+general_4 : "👤 You're an anonymous admin in this chat group!\nRevert back to user account for admin rights."
+general_5 : "🔑 You need to be an admin with **manage video chat** rights to perform this action."
+general_6 : "📺 Bot isn't streaming on video chat."
 
-ustats_1 : "🚫 No user stats found."
-ustats_2 : "🎶 You have played **{0}** tracks till now with a whopping count of **{1}** times.\n\nTop **{2}** played by you:\n\n"
-
-# Global Stats
 gstats_1 : "📊 Getting global stats, this could take some time..."
 gstats_2 : "🚫 No global stats found."
 gstats_3 : "📊 Getting global top 10 {0} of the bot, this could take some time..."
@@ -138,20 +124,67 @@ gstats_9 : "**Global top 10 stats of the bot**\n\nSelect the buttons from below 
 gstats_10 : "**Global stats of {0}**\n\nSelect the buttons from below for which you want to check global stats from bot's servers."
 gstats_11 : "**General stats of {0}**\nSelect the buttons from below for which you want to check global stats from bot's servers.\n\nUse /gstats to check top tracks, chats, users, and many other stuffs."
 
-# Play 
-# Play Callback Messages
-playcb_1: "🚫 This is not for you! Search your own."
-playcb_2: "🔄 Getting next result..."
+help_1 : "Click on the buttons below for more information. If you're facing any problem you can ask in support chat.\n\nAll commands can be used with: /"
+help_2 : "Contact me in PM for help."
 
-# Channel Play Messages
-cplay_1: "🎶 You can play music in channels from this chat [{0}] to any channel or your chat's linked channel.\n\n**For linked channel:**\n/{1} linked\n\n**For any other channel:**\n/{1} [channel ID]"
-cplay_2: "🚫 This chat has no linked channel."
-cplay_3: "✅ Channel defined to {0}\n\nChannel ID: {1}"
-cplay_4: "❌ Failed to get channel.\n\nMake sure you have added the bot in your channel and promoted it as admin.\nChange channel via /channelplay or disable channel play mode via /playmode."
-cplay_5: "🚫 Only channels are supported."
-cplay_6: "🔑 You need to be the **owner** of the channel [{0}] to connect it with this group.\n**Channel's owner:** @{1}\n\nAlternatively, you can link your group to that channel and then try connecting with `/channelplay linked`."
+heroku_1: "🔑 Please make sure your **Heroku API Key**, your **App Name** are configured correctly in Heroku."
+heroku_2: "📜 You can only get logs of Heroku apps."
+heroku_3: "**Usage:**\n/get_var [Var Name]"
+heroku_4: "🚫 Unable to find any such var."
+heroku_5: "❌ .env file not found."
+heroku_6: "**Usage:**\n/del_var [Var Name]"
+heroku_7: "✅ {0} deleted."
+heroku_8: "**Usage:**\n/set_var [Var Name] [Var Value]"
+heroku_9: "✅ {0} has been updated successfully."
+heroku_10: "✅ {0} has been added successfully."
+heroku_11: "🛠️ Only for Heroku apps."
+heroku_12: "🔍 Checking Heroku usage...please wait!"
+heroku_13: "🔄 Checking for available updates..."
+heroku_14: "⚠️ Git command error."
+heroku_15: "❌ Invalid git repository."
 
-# Play Messages
+lang_1: "🌐 Please choose the language you want to set as this group's default language:"
+lang_2: "⚠️ You are already using the same language."
+lang_3: "✅ Your language has been changed successfully."
+lang_4: "❌ Failed to change the language or the selected language is under maintenance."
+
+log_1: "**Usage:**\n/logger [enable|disable]"
+log_2: "✅ Enabled logging."
+log_3: "❌ Disabled logging."
+
+logger_text: "**{bot_mention} Play Log**\n\n**Chat ID:** `{chat_id}`\n**Chat Name:** {title}\n**Chat Username:** {chatusername}\n\n**User ID:** `{sender_id}`\n**Name:** {user_mention}\n**Username:** {username}\n\n**Query:** {query}\n**Stream Type:** {streamtype}"
+
+lyrics_1: "**USAGE:**\n\n/lyrics [music name]"
+lyrics_2: "🔍 searching lyrics..."
+lyrics_3: "❌ Failed to fetch lyrics 🥲.\n\n**Tried searching for:** {0}"
+lyrics_4: "Click on the button below and get searched lyrics to avoid long spam types lyrics search."
+
+maint_1: "**Usage:**\n/maintenance [enable|disable]"
+maint_2: "🔧 Enabled for maintenance."
+maint_3: "🔧 Maintenance mode disabled."
+maint_4: "🛠️ The bot is under maintenance. Visit support to know the reason."
+maint_5: "Maintenance Mode is already Disabled."
+maint_6: "Maintenance Mode is already enabled."
+
+misc_1: "🤖 Bot automatically cleared the queue and left the voice chat because no one was listening to songs in the voice chat."
+
+pbot_1: "**Usage:**\n/authorize [CHAT_ID]"
+pbot_2: "**Usage:**\n/unauthorize [CHAT_ID]"
+pbot_3: "✅ Added given chat to authorized list."
+pbot_4: "✅ Removed given chat from authorized list."
+pbot_5: "🔒 Chat is already in the authorized list."
+pbot_6: "🚫 No such chat exists in the authorized list."
+pbot_7: "❌ Failed to verify chat_id.\n\nMake sure it's numeric and in correct format. Don't use chat usernames or links."
+pbot_8: "⏳ Please wait... Fetching authorized chats..."
+pbot_9: "**<b>Fetched Chats:</b>**\n\n"
+pbot_10: "🤖 Private chat"
+pbot_11: "🔍 No authorized chats found."
+pbot_12: "🚫 Private bot mode is disabled.\n\nTo use your bot as a private bot make sure to set **PRIVATE_BOT_MODE** = **TRUE**"
+pbot_13: "\n**<b>Unfetched Chats:</b>**\n\n"
+
+ping_1: "» {0} is pinging..."
+ping_2: "**» PONG**: `{0}`ms \n\n<b><u>{1} system stat's :</u></b>\n\n🌋 Uptime : {2}\n🌋 RAM : {3} \n🌋 CPU : {4} \n🌋 Disk : {5} \n🌋 Py-tgcalls : `{6} ms`"
+
 play_1: "🔄 **Processing...**"
 play_2: "📺 **Channel play mode**\nProcessing query... please wait!\n\n**Linked channel:** {0}"
 play_3: "❌ Failed to process query!"
@@ -172,8 +205,9 @@ play_17: "🚫 Unable to play this type of Spotify query!\n\nI can only play Spo
 play_18: "🔊 **No active voice chat**\n\nTo use force play, there must be an active voice chat."
 play_19: "I don't think that it is a streamable URL. If you believe that it is a streamable URL, please use /stream <url>."
 
+playcb_1: "🚫 This is not for you! Search your own."
+playcb_2: "🔄 Getting next result..."
 
-# Playlist
 playlist_1: "📋 **Usage:** /play [music name or YouTube link or reply to audio]\n\nIf you want to play the bot's server playlist! Press the button below."
 playlist_2: "🔄 Getting your playlist... please wait!"
 playlist_3: "🚫 You have no playlist on the bot's server."
@@ -200,39 +234,39 @@ playlist_23: "🗑️ All songs have been deleted from your playlist."
 playlist_24: "🪄 The song has been deleted from your playlist."
 playlist_25: "⏱️ Please wait\n🗑️ Deleting your playlist...."
 
-
-saavn_1: "😞 Sorry! Currently, the bot is unable to play the Saavn Podcast URL."
-
-
-# Playmode
 playmode_1: "🎮 Select the mode in which you want to play the queries inside your group [{0}]."
 playmode_2: "✅ Settings changed and saved successfully by {0}."
 
-# Stream 
-str_1: "🔗 Please provide m3u8 links or index links."
-str_2: "✅ Valid stream verified\n\nPlease wait processing link..."
-str_3: "❌ Unable to stream YouTube live streams. No live format found."
+queue_1: "⏳ » Please wait..."
+queue_2: "🚫 Queued List is empty. No tracks found."
+queue_3: "<u>**Queued Tracks:</u>**  [Checkout More Queued Tracks From Here]({0})"
+queue_4: "**💫 Added to queue at #{0}**\n\n**🥀Title:** {1}\n**⏱ Duration:** {2}\n**🥀Added by:** {3} ❄️"
+queue_5: "🚫 Only one track is in queue; add some more tracks in the queue to check the whole queue."
 
-# TopPlay
-tracks_1: "**🔄 Processing {0} top 10 playlist**\n\n**Requested by:** {1}\n\nCheck top 10 tracks by /gstats."
-tracks_2: "❌ **Error**\n\nThere's no **{0} top 10 playlist** on bot's servers. Please try any other playlist."
+saavn_1: "😞 Sorry! Currently, the bot is unable to play the Saavn Podcast URL."
 
-# TOOLS
+set_cb_1 : "🎵 Getting audio quality panel..."
+set_cb_2 : "📺 Getting video quality panel..."
+set_cb_3 : "🔒 Getting auth users panel..."
+set_cb_4 : "🎮 Getting play mode panel..."
+set_cb_5 : "🧹 Getting clean mode panel..."
+set_cb_6 : "⚙️ Setting up changes."
+set_cb_7 : "🔄 Getting auth users list.. please wait."
+set_cb_8 : "🔙 Getting back.."
 
-# Lyrics
-lyrics_1: "**USAGE:**\n\n/lyrics [music name]"
-lyrics_2: "🔍 searching lyrics..."
-lyrics_3: "❌ Failed to fetch lyrics 🥲.\n\n**Tried searching for:** {0}"
-lyrics_4: "Click on the button below and get searched lyrics to avoid long spam types lyrics search."
+setting_1 : "⚙️ **Music Bot Settings**\n\n🖇**Group:** {0}\n🔖**Group ID:** `{1}`\n\n💡**Choose the function buttons from below which you want to edit or change.**"
+setting_3 : "⁉️ What is This?\n\n1) Direct: Plays search queries directly. Use -v to play videos in direct mode.\n\n2) Inline: Returns Inline Markup Buttons for choosing between video & audio."
+setting_4 : "⁉️ What is This?\n\n👥 Everyone: Anyone can use admin commands(skip, pause, resume etc) present in this group.\n\n🙍 Admin Only: Only admins and authorized users can use admin commands."
+setting_5 : "No Authorized Users Found\n\nYou can allow any non-admin to use my admin commands by /auth and delete by using /unauth."
+setting_9 : "⁉️ What is This?\n\nWhen activated, Bot will delete its message after {0} to make your chat clean and clear."
+setting_10 : "⁉️ What is This?\n\n1) Group: Plays music in the group where the command is given.\n\n2) Channel: Plays music in the channel you want. Set channel id via /channelplay."
+setting_11 : "⁉️ What is This?\n\n1) Everyone: Anyone present in this group can play music here.\n\n2) Admin Only: Only admins can play the music in this group."
+setting_12 : "❌ You've no channel id defined for channel mode. Please define with /channelplay."
+setting_13 : "Can't change play mode in active group call. Please stop the voice chat first with /stop."
+setting_14 : "⁉️ What is This?\n\nWhen activated, Bot will delete its executed commands (/play, /pause, /shuffle, /stop etc) immediately.\n\nBot will be requiring delete messages admin right for this to work properly."
+setting_15 : "Failed to resolve peer, Make sure you have added bot in your channel and promoted it as admin.\n\nTry setting /channelplay again.."
+setting_16 : "⁉️ What is This?\n\nWhen activated, Bot will suggest you..."
 
-# Logger
-logger_text: "**{bot_mention} Play Log**\n\n**Chat ID:** `{chat_id}`\n**Chat Name:** {title}\n**Chat Username:** {chatusername}\n\n**User ID:** `{sender_id}`\n**Name:** {user_mention}\n**Username:** {username}\n\n**Query:** {query}\n**Stream Type:** {streamtype}"
-
-# Ping
-ping_1: "» {0} is pinging..."
-ping_2: "**» PONG**: `{0}`ms \n\n<b><u>{1} system stat's :</u></b>\n\n🌋 Uptime : {2}\n🌋 RAM : {3} \n🌋 CPU : {4} \n🌋 Disk : {5} \n🌋 Py-tgcalls : `{6} ms`"
-
-# Song
 song_1: "🚫 You can download music or video from YouTube only in private chat. Please start me in private chat."
 song_2: "**USAGE:**\n\n/song [music name] or [YouTube link]"
 song_3: "❌ Live link detected. I am not able to download live YouTube videos."
@@ -245,23 +279,48 @@ song_9: "❌ Failed to download song from yt-dl\n\n**Reason:** {0}"
 song_10: "❌ Failed to upload on Telegram servers."
 song_11: "📤 Uploading started\nPlease hold on..."
 
-# Tools - Queue
-queue_1: "⏳ » Please wait..."
-queue_2: "🚫 Queued List is empty. No tracks found."
-queue_3: "<u>**Queued Tracks:</u>**  [Checkout More Queued Tracks From Here]({0})"
-queue_4: "**💫 Added to queue at #{0}**\n\n**🥀Title:** {1}\n**⏱ Duration:** {2}\n**🥀Added by:** {3} ❄️"
-queue_5: "🚫 Only one track is in queue; add some more tracks in the queue to check the whole queue."
+start_1 : "Hey, I am {0} 🥀.\n\n➻ I'm a Telegram streaming bot with some useful features.\n\nSupporting platforms: YouTube, Spotify, SoundCloud etc.\n\nFeel free to add me to your groups."
+start_2 : "Hey,\n this is {0}\n\nA fast and powerful music player bot with some awesome features.\n\nAssistant username: @{1}\nAssistant ID: {2}"
+start_3 : "The owner of {0}, {1} just joined your chat."
+start_4 : "The sudo user of {0}, {1} just joined your chat."
+start_5 : "🦸 **Supergroup needed** 🦸\n\nPlease convert your **group** to **supergroup** and then add me back.\n\n**How to make supergroup?**\n🥱 Make your group's chat history **visible** once."
+start_6 : "**Blacklisted chat**\n\nThis chat is blacklisted for using the bot. Request a sudo user to whitelist your chat, sudo users [list]({0})."
+start_7 : "Heya :) I am alive since **{0}**"
 
-# All Streaming Lines
+str_1: "🔗 Please provide m3u8 links or index links."
+str_2: "✅ Valid stream verified\n\nPlease wait processing link..."
+str_3: "❌ Unable to stream YouTube live streams. No live format found."
+
 stream_1: "**✮ Started Streaming**\n\n**✯ Title:** [{0}]({1})\n**✬ Duration:** {2} minutes\n**✭ By:** {3}"
 stream_2: "➲ **Started Streaming |**\n\n**‣ Stream type:** live stream [url]\n**‣ By:** {0}"
 
-# misc
-misc_1: "🤖 Bot automatically cleared the queue and left the voice chat because no one was listening to songs in the voice chat."
+sudo_1: "{0} is already a sudo user."
+sudo_2: "✅ Added **{0}** to sudo users."
+sudo_3: "❌ Not a part of bot's sudo."
+sudo_4: "🚫 Removed from bot's sudo user."
+sudo_5: "🔥 <u>**owners:**</u>\n"
+sudo_6: "\n🔥 <u>**sudoers:**</u>\n"
+sudo_7: "🔍 No sudo users found."
 
-# Inline Buttons
+tg_1 : "⚠️ Bot is **overloaded** with downloads right now.\n\n**Try after:** {0} (__expected time__)"
+tg_2 : "❌ Failed to download the media from Telegram."
 
-# General Buttons
+tracks_1: "**🔄 Processing {0} top 10 playlist**\n\n**Requested by:** {1}\n\nCheck top 10 tracks by /gstats."
+tracks_2: "❌ **Error**\n\nThere's no **{0} top 10 playlist** on bot's servers. Please try any other playlist."
+
+ustats_1 : "🚫 No user stats found."
+ustats_2 : "🎶 You have played **{0}** tracks till now with a whopping count of **{1}** times.\n\nTop **{2}** played by you:\n\n"
+
+vid_1: "**Usage:**\n/set_video_limit [number of chats] or [disable]"
+vid_2: "🔢 Please use numeric numbers for setting limit."
+vid_3: "📊 Video calls maximum limit defined to {0} chats."
+vid_4: "🚫 Video calls disabled."
+
+vidmode_1: "**Usage:**\n/videomode [download|m3u8]"
+vidmode_2: "📥 Video play mode set as downloader. Bot will be downloading tracks now."
+vidmode_3: "🔗 Video play mode set as m3u8. Bot will be able to play tracks live now."
+
+
 CLOSE_BUTTON: "Close"
 CLOSEMENU_BUTTON: "Close"
 BACK_BUTTON: "🔙 Back"
@@ -363,116 +422,6 @@ SA_B_8 : "🤖 Bot Stats"
 # Queue
 QU_B_1: "📋 Queued list"
 QU_B_2: "▶️ Played {0} out of {1} mins"
-
-# Sudo Users [ If you are translating this to some other language .. you can leave all these strings in English language]
-
-# Sudo
-sudo_1: "{0} is already a sudo user."
-sudo_2: "✅ Added **{0}** to sudo users."
-sudo_3: "❌ Not a part of bot's sudo."
-sudo_4: "🚫 Removed from bot's sudo user."
-sudo_5: "🔥 <u>**owners:**</u>\n"
-sudo_6: "\n🔥 <u>**sudoers:**</u>\n"
-sudo_7: "🔍 No sudo users found."
-
-# Block
-block_1: "{0} is already blocked from the bot."
-block_2: "🚫 Added **{0}** to block list of bot. User won't be able to use bot now under any condition.\n\nCheck blocked users: /blockedusers"
-block_3: "🆓 User is already free."
-block_4: "✅ Removed user from the block list. User will be able to use bot now."
-block_5: "🔍 No blocked users found."
-block_6: "⏳ Getting blocked users list...please wait!"
-block_7: "**Blocked users:**\n\n"
-
-# Blacklist Chats
-black_1: "**Usage:**\n/blacklistchat [CHAT_ID]"
-black_2: "🚫 Chat is already blacklisted."
-black_3: "✅ Chat has been successfully blacklisted."
-black_4: "**Usage:**\n/whitelistchat [CHAT_ID]"
-black_5: "✅ Chat is already whitelisted."
-black_6: "✅ Chat has been successfully whitelisted."
-black_7: "**Blacklisted chats:**\n\n"
-black_8: "🔍 No blacklisted chats."
-
-# Video Limit
-vid_1: "**Usage:**\n/set_video_limit [number of chats] or [disable]"
-vid_2: "🔢 Please use numeric numbers for setting limit."
-vid_3: "📊 Video calls maximum limit defined to {0} chats."
-vid_4: "🚫 Video calls disabled."
-
-# Maintenance
-maint_1: "**Usage:**\n/maintenance [enable|disable]"
-maint_2: "🔧 Enabled for maintenance."
-maint_3: "🔧 Maintenance mode disabled."
-maint_4: "🛠️ The bot is under maintenance. Visit support to know the reason."
-maint_5: "Maintenance Mode is already Disabled."
-maint_6: "Maintenance Mode is already enabled."
-
-# Log
-log_1: "**Usage:**\n/logger [enable|disable]"
-log_2: "✅ Enabled logging."
-log_3: "❌ Disabled logging."
-
-# Video Mode
-vidmode_1: "**Usage:**\n/videomode [download|m3u8]"
-vidmode_2: "📥 Video play mode set as downloader. Bot will be downloading tracks now."
-vidmode_3: "🔗 Video play mode set as m3u8. Bot will be able to play tracks live now."
-
-# Broadcast
-broad_1: "**📢 Broadcasted message in {0} chats with {1} pins from bot.**"
-broad_2: "🔊 Started assistant broadcast..."
-broad_3: "**Assistant broadcast:\n\n"
-broad_4: "🗣️ Assistant {0} broadcasted in {1} chats\n"
-broad_5: "**Usage**:\n/broadcast [MESSAGE] or [Reply to a Message]"
-broad_6: "❗ Please provide some text to broadcast."
-broad_7: "**📬 Broadcasted message to {0} users with {1} pins from bot.**"
-
-# Heroku
-heroku_1: "🔑 Please make sure your **Heroku API Key**, your **App Name** are configured correctly in Heroku."
-heroku_2: "📜 You can only get logs of Heroku apps."
-heroku_3: "**Usage:**\n/get_var [Var Name]"
-heroku_4: "🚫 Unable to find any such var."
-heroku_5: "❌ .env file not found."
-heroku_6: "**Usage:**\n/del_var [Var Name]"
-heroku_7: "✅ {0} deleted."
-heroku_8: "**Usage:**\n/set_var [Var Name] [Var Value]"
-heroku_9: "✅ {0} has been updated successfully."
-heroku_10: "✅ {0} has been added successfully."
-heroku_11: "🛠️ Only for Heroku apps."
-heroku_12: "🔍 Checking Heroku usage...please wait!"
-heroku_13: "🔄 Checking for available updates..."
-heroku_14: "⚠️ Git command error."
-heroku_15: "❌ Invalid git repository."
-
-# Private Bot Mode
-pbot_1: "**Usage:**\n/authorize [CHAT_ID]"
-pbot_2: "**Usage:**\n/unauthorize [CHAT_ID]"
-pbot_3: "✅ Added given chat to authorized list."
-pbot_4: "✅ Removed given chat from authorized list."
-pbot_5: "🔒 Chat is already in the authorized list."
-pbot_6: "🚫 No such chat exists in the authorized list."
-pbot_7: "❌ Failed to verify chat_id.\n\nMake sure it's numeric and in correct format. Don't use chat usernames or links."
-pbot_8: "⏳ Please wait... Fetching authorized chats..."
-pbot_9: "**<b>Fetched Chats:</b>**\n\n"
-pbot_10: "🤖 Private chat"
-pbot_11: "🔍 No authorized chats found."
-pbot_12: "🚫 Private bot mode is disabled.\n\nTo use your bot as a private bot make sure to set **PRIVATE_BOT_MODE** = **TRUE**"
-pbot_13: "\n**<b>Unfetched Chats:</b>**\n\n"
-
-# Global Ban Messages
-gban_1: "🚫 You can't gban yourself? Bloody noob!"
-gban_2: "🙄 You want me to gban myself?"
-gban_3: "🤨 You want to gban my ex?"
-gban_4: "{0} is already **gbanned** from the bot."
-gban_5: "**🌍 Global ban running on BOT database by Team Yukki**\n\n**Gbanning on {0}**\n\n**Expected time**: {1}."
-gban_6: "**✅ Gbanned successfully on BOT database\n\nBanned **{0}** from **{1}** chats\n**Gbanned by Team Yukki**"
-gban_7: "{0} is not **gbanned**, how can I unban him?"
-gban_8: "**🔓 Unbanning {0}**\n\nExpected time: {1}."
-gban_9: "**✅ Unbanned successfully on BOT database\n\nUnbanned **{0}** in **{1}** chats\n**Unbanned by TheTeamVivek**"
-gban_10: "🚫 No one is gbanned."
-gban_11: "⏳ Getting gbanned users list..."
-
-# Helpers
 
 AUTH_HELPER: |
   <b>Auth Users can use Admin commands without admin rights in your chat.</b>

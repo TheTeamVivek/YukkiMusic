@@ -14,9 +14,11 @@ import sys
 
 import yaml
 
-languages = {}
-languages_present = {}
-commands = {}
+from .attrdict import AttrDict
+
+languages = AttrDict()
+languages_present = AttrDict()
+commands: AttrDict
 print("yep print working")
 
 
@@ -116,7 +118,7 @@ def update_helpers(data: dict, lang_code: str = "en"):
     return data
 
 
-commands.update(load_yaml(os.path.join("strings", "commands.yml")))
+commands = AttrDict(load_yaml(os.path.join("strings", "commands.yml")))
 
 if "en" not in languages:
     languages["en"] = load_yaml(os.path.join("strings", "langs", "en.yml"))
