@@ -19,7 +19,7 @@ from YukkiMusic.utils.decorators.language import language
 @app.on_message(command("CLEANMODE_COMMAND") & SUDOERS)
 @language
 async def setcleanmode(client, message, _):
-    if len(message.command) != 2:
+    if len(message.command) < 2 or message.command[1].lower() not in ["on", "off"]:
         return await message.reply_text(
             "Usage:\n"
             "`/cleanmode on` - Enable cleanmode\n"
