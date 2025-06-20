@@ -10,8 +10,9 @@
 from pyrogram.errors import ChannelInvalid
 from pyrogram.types import Message
 
-from strings import command
+from strings import command, pick_commands
 from YukkiMusic import app
+from YukkiMusic.core.help import ModuleHelp
 from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils.database.memorydatabase import (
     get_active_chats,
@@ -19,6 +20,12 @@ from YukkiMusic.utils.database.memorydatabase import (
     remove_active_chat,
     remove_active_video_chat,
 )
+from YukkiMusic.utils.decorators.language import LanguageStart
+
+ac_1 = "Getting Active Voicechats....\nPlease hold on"
+ac_2 = "No active Chats Found"
+ac_3 = "**Active Voice Chat's:-**\n\n{0}"
+ac_4 = "**Active Video Chat's:-**\n\n{0}"
 
 
 # Function for removing the Active voice and video chat also clear the db dictionary for the chat
@@ -29,8 +36,9 @@ async def _clear_(chat_id):
 
 
 @app.on_message(command("ACTIVEVC_COMMAND") & SUDOERS)
-async def activevc(_, message: Message):
-    mystic = await message.reply_text("Getting Active Voicechats....\nPlease hold on")
+@LanguageStart
+async def activevc(_, message: Message, lang):
+    mystic = await message.reply_text(lang["ac_1"])
     served_chats = await get_active_chats()
     text = ""
     j = 0
@@ -47,16 +55,15 @@ async def activevc(_, message: Message):
             await _clear_(x)
             continue
     if not text:
-        await mystic.edit_text("No active Chats Found")
+        await mystic.edit_text(lang["ac_2"])
     else:
-        await mystic.edit_text(
-            f"**Active Voice Chat's:-**\n\n{text}",
-        )
+        await mystic.edit_text(lang["ac_3"].format(text))
 
 
 @app.on_message(command("ACTIVEVIDEO_COMMAND") & SUDOERS)
-async def activevi_(_, message: Message):
-    mystic = await message.reply_text("Getting Active Voicechats....\nPlease hold on")
+@LanguageStart
+async def activevi_(_, message: Message, lang):
+    mystic = await message.reply_text(lang["ac_1"])
     served_chats = await get_active_video_chats()
     text = ""
     j = 0
@@ -73,14 +80,83 @@ async def activevi_(_, message: Message):
             await _clear_(x)
             continue
     if not text:
-        await mystic.edit_text("No active Chats Found")
+        await mystic.edit_text(lang["ac_2"])
     else:
         await mystic.edit_text(
-            f"**Active Video Chat's:-**\n\n{text}",
+            lang["ac_4"].format(text),
         )
 
 
 @app.on_message(command("AC_COMMAND") & SUDOERS)
-async def vc(client, message: Message):
-    ac_audio = str(len(await get_active_chats()))
-    await message.reply_text(f"Active Chats info: {ac_audio}")
+@LanguageStart
+async def vc(_, message: Message, lang):
+    ac_audio = len(await get_active_chats())
+    ac_video = len(await get_active_video_chats())
+    if ac_audio != 0:
+        ac_audio = ac_audio - ac_video
+    await message.reply_text(lang["ac_5"].format(ac_audio, ac_video))
+
+
+(
+    ModuleHelp("Active")
+    .add(
+        "en",
+        f"""<b>Commands to view currently active calls.</b>
+
+<b>✧ {pick_commands("ACTIVEVC_COMMAND", "en")}</b> - Check active voice chats on the bot.
+
+<b>✧ {pick_commands("ACTIVEVIDEO_COMMAND", "en")}</b> - Check active video calls on the bot.
+
+<b>✧ {pick_commands("AC_COMMAND", "en")}</b> - Check all active calls (voice & video) on the bot.""",
+    )
+    .add(
+        "ar",
+        f"""<b>أوامر لعرض المكالمات النشطة.</b>
+
+<b>✧ {pick_commands("ACTIVEVC_COMMAND", "ar")}</b> - التحقق من الدردشات الصوتية النشطة على البوت.
+
+<b>✧ {pick_commands("ACTIVEVIDEO_COMMAND", "ar")}</b> - التحقق من المكالمات المرئية النشطة على البوت.
+
+<b>✧ {pick_commands("AC_COMMAND", "ar")}</b> - التحقق من المكالمات الصوتية والمرئية النشطة على البوت.""",
+    )
+    .add(
+        "as",
+        f"""<b>বৰ্তমান সক্ৰিয় কলবোৰ চাবলৈ কমান্ডসমূহ।</b>
+
+<b>✧ {pick_commands("ACTIVEVC_COMMAND", "as")}</b> - বটৰ ওপৰত সক্ৰিয় ভইচ চেটবোৰ পৰীক্ষা কৰক।
+
+<b>✧ {pick_commands("ACTIVEVIDEO_COMMAND", "as")}</b> - বটৰ ওপৰত সক্ৰিয় ভিডিঅ’ কলবোৰ পৰীক্ষা কৰক।
+
+<b>✧ {pick_commands("AC_COMMAND", "as")}</b> - বটৰ ওপৰত সক্ৰিয় ভইচ আৰু ভিডিঅ’ কলবোৰ পৰীক্ষা কৰক।""",
+    )
+    .add(
+        "hi",
+        f"""<b>बॉट पर सक्रिय कॉल्स देखने के लिए कमांड्स।</b>
+
+<b>✧ {pick_commands("ACTIVEVC_COMMAND", "hi")}</b> - बॉट पर सक्रिय वॉइस चैट्स की जांच करें।
+
+<b>✧ {pick_commands("ACTIVEVIDEO_COMMAND", "hi")}</b> - बॉट पर सक्रिय वीडियो कॉल्स की जांच करें।
+
+<b>✧ {pick_commands("AC_COMMAND", "hi")}</b> - बॉट पर सक्रिय वॉइस और वीडियो कॉल्स की जांच करें।""",
+    )
+    .add(
+        "ku",
+        f"""<b>فەرمانەکان بۆ بینینی پەیوەندییە چالاکەکان.</b>
+
+<b>✧ {pick_commands("ACTIVEVC_COMMAND", "ku")}</b> - پشکنینی پەیوەندییە دەنگییە چالاکەکان لە بۆتەکە.
+
+<b>✧ {pick_commands("ACTIVEVIDEO_COMMAND", "ku")}</b> - پشکنینی پەیوەندییە ڤیدیۆییە چالاکەکان لە بۆتەکە.
+
+<b>✧ {pick_commands("AC_COMMAND", "ku")}</b> - پشکنینی پەیوەندییە دەنگی و ڤیدیۆیی چالاکەکان لەسەر بۆتەکە.""",
+    )
+    .add(
+        "tr",
+        f"""<b>Şu anda botta aktif olan aramaları görüntüleme komutları.</b>
+
+<b>✧ {pick_commands("ACTIVEVC_COMMAND", "tr")}</b> - Botta aktif sesli sohbetleri kontrol edin.
+
+<b>✧ {pick_commands("ACTIVEVIDEO_COMMAND", "tr")}</b> - Botta aktif görüntülü aramaları kontrol edin.
+
+<b>✧ {pick_commands("AC_COMMAND", "tr")}</b> - Botta aktif sesli ve görüntülü aramaları kontrol edin.""",
+    )
+)

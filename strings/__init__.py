@@ -42,6 +42,13 @@ def get_command(command, lang=None):
     return list(all_commands)
 
 
+def pick_command(command, lang=None):
+    commands_list = get_command(command, lang)
+    if commands_list:
+        return "/" + random.choice(commands_list)
+    return None
+
+
 def command(
     commands: str | list[str],
     prefixes: str | list[str] | None = "/",

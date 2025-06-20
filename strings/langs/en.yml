@@ -1,5 +1,11 @@
 name : "🏴󠁧󠁢󠁥󠁮󠁧󠁿 English"
 
+ac_1: "🎙️ <i>Getting Active Voice Chats...</i>\n⏳ Please hold on"
+ac_2: "❌ <b>No active chats found!</b>"
+ac_3: "🔊 <b>Active Voice Chats:</b>\n\n{0}"
+ac_4: "📹 <b>Active Video Chats:</b>\n\n{0}"
+ac_5: "📊 <b>Active Chats Info:</b>\n🎧 Total Active Audio Chats: <b>{0}</b>\n🎥 Total Active Video Chats: <b>{1}</b>"
+
 # General Strings
 general_1 : "🔄 Reply to a user's message or give username/user_id."
 general_2 : "❌ Error! Wrong usage of command."
@@ -494,15 +500,6 @@ ADMIN_HELPER: |
   <b>✧ {SKIP_COMMAND}</b> [Number (Example: 3)] - Skip music to a specific number. Example: <b>/skip 3</b> will skip to the third queued music and will ignore 1 and 2 in the queue.
   
   <b>✧ {LOOP_COMMAND}</b> [Enable/Disable] or [Number between 1-10] - When activated, the bot will loop the current music 1-10 times in voice chat. Default loop value is 10 times.
-
-ACTIVE_HELPER: |
-  <b>✧ {ACTIVEVC_COMMAND}</b> - Check active voice chats on the bot.
-  
-  <b>✧ {ACTIVEVIDEO_COMMAND}</b> - Check active voice and video calls on the bot.
-  
-  <b>✧ {AC_COMMAND}</b> - Check active video calls on the bot.
-  
-  <b>✧ {STATS_COMMAND}</b> - Check bot stats.
 
 PLAY_HELPER: |
   <b>✧ {PLAY_COMMAND}</b> - Bot will start playing your given query on voice chat or stream live links on voice chats.

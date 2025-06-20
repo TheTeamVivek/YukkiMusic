@@ -1,5 +1,11 @@
 name: "🇹🇷 Turkish"
 
+ac_1: "🎙️ <i>Aktif sesli sohbetler alınıyor...</i>\n⏳ Lütfen bekleyin"
+ac_2: "❌ <b>Aktif sohbet bulunamadı!</b>"
+ac_3: "🔊 <b>Aktif Sesli Sohbetler:</b>\n\n{0}"
+ac_4: "📹 <b>Aktif Görüntülü Sohbetler:</b>\n\n{0}"
+ac_5: "📊 <b>Aktif Sohbet Bilgisi:</b>\n🎧 Toplam Aktif Sesli Sohbet: <b>{0}</b>\n🎥 Toplam Aktif Görüntülü Sohbet: <b>{1}</b>"
+
 # General Strings
 general_1 : "Bir kullanıcının mesajına yanıt verin veya kullanıcı adı/kullanıcı kimliği girin."
 general_2 : "Hata! Komut yanlış kullanıldı."
@@ -482,12 +488,6 @@ ADMIN_HELPER: |
   <b>✧ {REBOOT_COMMAND}</b> - Botu sohbetiniz için yeniden başlatın.
   <b>✧ {SKIP_COMMAND}</b> [Sayı (Örnek: 3)] - Müziği belirli bir sıraya atlayın. Örnek: <b>/skip 3</b>, üçüncü sıradaki müziğe atlayacak ve 1 ile 2'yi geçecektir.
   <b>✧ {LOOP_COMMAND}</b> [enable/disable] veya [1-10 arasında bir sayı] - Etkinleştirildiğinde, bot mevcut müziği sesli sohbette 1-10 kez tekrar eder. Varsayılan döngü değeri 10'dur.
-
-ACTIVE_HELPER: |
-  <b>✧ {ACTIVEVC_COMMAND}</b> - Botta aktif sesli sohbetleri kontrol edin.
-  <b>✧ {ACTIVEVIDEO_COMMAND}</b> - Botta aktif sesli ve görüntülü aramaları kontrol edin.
-  <b>✧ {AC_COMMAND}</b> - Botta aktif görüntülü aramaları kontrol edin.
-  <b>✧ {STATS_COMMAND}</b> - Bot istatistiklerini kontrol edin.
 
 PLAY_HELPER: |
   <b>✧ {PLAY_COMMAND}</b> - Bot, verilen sorguyu sesli sohbette çalmaya veya canlı bağlantıları yayınlamaya başlar.
