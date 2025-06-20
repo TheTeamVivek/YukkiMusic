@@ -24,7 +24,7 @@ from YukkiMusic.utils.database import (
     get_playlist_names,
     save_playlist,
 )
-from YukkiMusic.utils.decorators import language, languageCB
+from YukkiMusic.utils.decorators import language
 from YukkiMusic.utils.decorators.play import botplaylist_markup
 from YukkiMusic.utils.inline.playlist import (
     get_playlist_markup,
@@ -116,7 +116,7 @@ async def del_plist_msg(client, message: Message, _):
 
 
 @app.on_callback_query(filters.regex("play_playlist") & ~BANNED_USERS)
-@languageCB
+@language
 async def play_playlist(client, query, _):
     callback_data = query.data.strip()
     mode = callback_data.split(None, 1)[1]
@@ -162,7 +162,7 @@ async def play_playlist(client, query, _):
 
 
 @app.on_message(command("PLAY_PLAYLIST_COMMAND") & ~BANNED_USERS & filters.group)
-@languageCB
+@language
 async def play_playlist_command(client, message, _):
     mode = message.command[0][0]
     user_id = message.from_user.id
@@ -284,7 +284,7 @@ async def add_playlist(client, message: Message, _):
 
 
 @app.on_callback_query(filters.regex("remove_playlist") & ~BANNED_USERS)
-@languageCB
+@language
 async def del_plist(client, query, _):
     callback_data = query.data.strip()
     videoid = callback_data.split(None, 1)[1]
@@ -304,7 +304,7 @@ async def del_plist(client, query, _):
 
 
 @app.on_callback_query(filters.regex("add_playlist") & ~BANNED_USERS)
-@languageCB
+@language
 async def add_playlist(client, query, _):
     callback_data = query.data.strip()
     videoid = callback_data.split(None, 1)[1]
@@ -347,7 +347,7 @@ async def add_playlist(client, query, _):
 
 
 @app.on_callback_query(filters.regex("del_playlist") & ~BANNED_USERS)
-@languageCB
+@language
 async def del_plistcb(client, query, _):
     callback_data = query.data.strip()
     videoid = callback_data.split(None, 1)[1]
@@ -368,7 +368,7 @@ async def del_plistcb(client, query, _):
 
 
 @app.on_callback_query(filters.regex("delete_whole_playlist") & ~BANNED_USERS)
-@languageCB
+@language
 async def del_whole_playlist(client, query, _):
     _playlist = await get_playlist_names(query.from_user.id)
     for x in _playlist:
@@ -378,7 +378,7 @@ async def del_whole_playlist(client, query, _):
 
 
 @app.on_callback_query(filters.regex("get_playlist_playmode") & ~BANNED_USERS)
-@languageCB
+@language
 async def get_playlist_playmode_(client, query, _):
     try:
         await query.answer()
@@ -389,7 +389,7 @@ async def get_playlist_playmode_(client, query, _):
 
 
 @app.on_callback_query(filters.regex("home_play") & ~BANNED_USERS)
-@languageCB
+@language
 async def home_play_(client, query, _):
     pass
 
@@ -404,7 +404,7 @@ async def home_play_(client, query, _):
 
 
 @app.on_callback_query(filters.regex("delete_warning") & ~BANNED_USERS)
-@languageCB
+@language
 async def delete_warning_message(client, query, _):
     try:
         await query.answer()
@@ -415,7 +415,7 @@ async def delete_warning_message(client, query, _):
 
 
 @app.on_callback_query(filters.regex("del_back_playlist") & ~BANNED_USERS)
-@languageCB
+@language
 async def del_back_playlist(client, query, _):
     user_id = query.from_user.id
     _playlist = await get_playlist_names(user_id)

@@ -32,7 +32,7 @@ from config import (
 from strings import command
 from YukkiMusic import app
 from YukkiMusic.platforms import youtube
-from YukkiMusic.utils.decorators.language import language, languageCB
+from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.formatters import convert_bytes
 from YukkiMusic.utils.inline.song import song_markup
 
@@ -136,7 +136,7 @@ async def song_commad_private(client, message: Message, _):
 
 
 @app.on_callback_query(filters.regex(pattern=r"song_back") & ~BANNED_USERS)
-@languageCB
+@language
 async def songs_back_helper(client, query, _):
     callback_data = query.data.strip()
 
@@ -152,7 +152,7 @@ async def songs_back_helper(client, query, _):
 
 
 @app.on_callback_query(filters.regex(pattern=r"song_helper") & ~BANNED_USERS)
-@languageCB
+@language
 async def song_helper_cb(client, query, _):
     callback_data = query.data.strip()
 
@@ -265,7 +265,7 @@ async def song_helper_cb(client, query, _):
 
 
 @app.on_callback_query(filters.regex(pattern=r"song_download") & ~BANNED_USERS)
-@languageCB
+@language
 async def song_download_cb(client, query, _):
     try:
         await query.answer("ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...")

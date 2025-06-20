@@ -43,7 +43,7 @@ from YukkiMusic.utils.database import (
     set_loop,
 )
 from YukkiMusic.utils.decorators import ActualAdminCB
-from YukkiMusic.utils.decorators.language import languageCB
+from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline.play import (
     livestream_markup,
     panel_markup_1,
@@ -61,7 +61,7 @@ wrong = {}
 
 
 @app.on_callback_query(filters.regex("PanelMarkup") & ~BANNED_USERS)
-@languageCB
+@language
 async def markup_panel(client, query, _):
     await query.answer()
     callback_data = query.data.strip()
@@ -81,7 +81,7 @@ async def markup_panel(client, query, _):
 
 
 @app.on_callback_query(filters.regex("MainMarkup") & ~BANNED_USERS)
-@languageCB
+@language
 async def main_markup_(client, query, _):
     await query.answer()
     callback_data = query.data.strip()
@@ -104,7 +104,7 @@ async def main_markup_(client, query, _):
 
 
 @app.on_callback_query(filters.regex("Pages") & ~BANNED_USERS)
-@languageCB
+@language
 async def pages_markup(client, query, _):
     await query.answer()
     callback_data = query.data.strip()
@@ -135,7 +135,7 @@ async def pages_markup(client, query, _):
 
 
 @app.on_callback_query(filters.regex("ADMIN") & ~BANNED_USERS)
-@languageCB
+@language
 async def admin_callback(client, query, _):
     callback_data = query.data.strip()
     callback_request = callback_data.split(None, 1)[1]
@@ -453,7 +453,7 @@ async def admin_callback(client, query, _):
 
 
 @app.on_callback_query(filters.regex("MusicStream") & ~BANNED_USERS)
-@languageCB
+@language
 async def play_music(client, query, _):
     callback_data = query.data.strip()
     callback_request = callback_data.split(None, 1)[1]
@@ -533,7 +533,7 @@ async def anonymous_check(client, query):
 
 
 @app.on_callback_query(filters.regex("YukkiPlaylists") & ~BANNED_USERS)
-@languageCB
+@language
 async def play_playlists_cb(client, query, _):
     callback_data = query.data.strip()
     callback_request = callback_data.split(None, 1)[1]
@@ -619,7 +619,7 @@ async def play_playlists_cb(client, query, _):
 
 
 @app.on_callback_query(filters.regex("slider") & ~BANNED_USERS)
-@languageCB
+@language
 async def slider_queries(client, query, _):
     callback_data = query.data.strip()
     callback_request = callback_data.split(None, 1)[1]

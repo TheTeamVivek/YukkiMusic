@@ -178,6 +178,7 @@ BANNED_USERS = _flt.user()
 YTDOWNLOADER = 1
 LOG = 2
 CLEANMODE = 3
+MAINTENANCE = 4
 adminlist = {}
 lyrical = {}
 chatstats = {}

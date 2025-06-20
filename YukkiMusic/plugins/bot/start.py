@@ -35,14 +35,14 @@ from YukkiMusic.utils.database import (
     is_on_off,
     is_served_private_chat,
 )
-from YukkiMusic.utils.decorators import LanguageStart, asyncify
+from YukkiMusic.utils.decorators import asyncify, language
 from YukkiMusic.utils.formatters import get_readable_time
 from YukkiMusic.utils.functions import MARKDOWN, WELCOMEHELP
 from YukkiMusic.utils.inline import private_panel, start_pannel
 
 
 @app.on_message(command("START_COMMAND") & filters.private & ~BANNED_USERS)
-@LanguageStart
+@language(no_check=True)
 async def start_comm(client, message: Message, _):
     chat_id = message.chat.id
     await add_served_user(message.from_user.id)
@@ -235,7 +235,7 @@ async def start_comm(client, message: Message, _):
 
 
 @app.on_message(command("START_COMMAND") & filters.group & ~BANNED_USERS)
-@LanguageStart
+@language(no_check=True)
 async def testbot(client, message: Message, _):
     uptime = int(time.time() - _boot_)
     message.chat.id

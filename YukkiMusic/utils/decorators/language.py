@@ -7,6 +7,9 @@
 #
 # All rights reserved.
 #
+from functools import wraps
+
+from pyrogram import types
 from pyrogram.enums import ChatType
 
 from strings import get_string
@@ -18,56 +21,37 @@ from YukkiMusic.utils.database import (
 )
 
 
-def language(mystic):
-    async def wrapper(_, message, **kwargs):
-        try:
-            language = await get_lang(message.chat.id)
+def language(_func=None, *, no_check=False):
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(client, update: types.Message | types.CallbackQuery):
+            is_callback = isinstance(update, types.CallbackQuery)
+            chat = update.message.chat if is_callback else update.chat
+            chat_id = chat.id
+            language = await get_lang(chat_id)
             language = get_string(language)
-        except Exception:
-            language = get_string("en")
-        if not await is_maintenance():
-            if message.from_user.id not in SUDOERS:
-                if message.chat.type == ChatType.PRIVATE:
-                    return await message.reply_text(language["maint_4"])
+            if no_check:
+                return await func(client, update)
+            if await is_maintenance():
+                if update.from_user.id not in SUDOERS:
+                    if chat.type == ChatType.PRIVATE:
+                        if is_callback:
+                            return await update.answer(
+                                language["maint_4"],
+                                show_alert=True,
+                            )
+                        return await update.reply_text(language["maint_4"])
                 return
-        if await is_commanddelete_on(message.chat.id):
-            try:
-                await message.delete()
-            except Exception:
-                pass
-        return await mystic(_, message, language)
+            if await is_commanddelete_on(chat_id) and not is_callback:
+                try:
+                    await update.delete()
+                except Exception:
+                    pass
+            return await func(client, update, language)
 
-    return wrapper
+        return wrapper
 
-
-def languageCB(mystic):
-    async def wrapper(_, query, **kwargs):
-        try:
-            language = await get_lang(query.message.chat.id)
-            language = get_string(language)
-        except Exception:
-            language = get_string("en")
-        if not await is_maintenance():
-            if query.from_user.id not in SUDOERS:
-                if query.message.chat.type == ChatType.PRIVATE:
-                    return await query.answer(
-                        language["maint_4"],
-                        show_alert=True,
-                    )
-                return
-
-        return await mystic(_, query, language)
-
-    return wrapper
-
-
-def LanguageStart(mystic):
-    async def wrapper(_, message, **kwargs):
-        try:
-            language = await get_lang(message.chat.id)
-            language = get_string(language)
-        except Exception:
-            language = get_string("en")
-        return await mystic(_, message, language)
-
-    return wrapper
+    if _func is None:
+        return decorator
+    elif callable(_func):
+        return decorator(_func)

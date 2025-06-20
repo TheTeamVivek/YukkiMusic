@@ -36,7 +36,7 @@ from YukkiMusic.utils.database import (
     get_top_chats,
     get_topp_users,
 )
-from YukkiMusic.utils.decorators import asyncify, language, languageCB
+from YukkiMusic.utils.decorators import asyncify, language
 from YukkiMusic.utils.inline.stats import (
     back_stats_buttons,
     back_stats_markup,
@@ -118,7 +118,7 @@ async def gstats_global(client, message: Message, _):
 
 
 @app.on_callback_query(filters.regex("GetStatsNow") & ~BANNED_USERS)
-@languageCB
+@language
 async def top_users_ten(client, query, _):
     chat_id = query.message.chat.id
     callback_data = query.data.strip()
@@ -230,7 +230,7 @@ async def top_users_ten(client, query, _):
 
 
 @app.on_callback_query(filters.regex("TopOverall") & ~BANNED_USERS)
-@languageCB
+@language
 async def top_overall_stats(client, query, _):
     callback_data = query.data.strip()
     what = callback_data.split(None, 1)[1]
@@ -284,7 +284,7 @@ async def top_overall_stats(client, query, _):
 
 
 @app.on_callback_query(filters.regex("bot_stats_sudo"))
-@languageCB
+@language
 async def bot_stats(client, query, _):
     if query.from_user.id not in SUDOERS:
         return await query.answer("ᴏɴʟʏ ғᴏʀ sᴜᴅᴏ ᴜsᴇʀ's", show_alert=True)
@@ -369,7 +369,7 @@ async def bot_stats(client, query, _):
 @app.on_callback_query(
     filters.regex(pattern=r"^(TOPMARKUPGET|GETSTATS|GlobalStats)$") & ~BANNED_USERS
 )
-@languageCB
+@language
 async def back_buttons(client, query, _):
     try:
         await query.answer()

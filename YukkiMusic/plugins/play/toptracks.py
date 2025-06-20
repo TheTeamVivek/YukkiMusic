@@ -19,7 +19,7 @@ from YukkiMusic.utils.database import (
     get_particulars,
     get_userss,
 )
-from YukkiMusic.utils.decorators import asyncify, languageCB
+from YukkiMusic.utils.decorators import asyncify, language
 from YukkiMusic.utils.inline.playlist import (
     botplaylist_markup,
     failed_top_markup,
@@ -31,7 +31,7 @@ loop = asyncio.get_running_loop()
 
 
 @app.on_callback_query(filters.regex("get_playmarkup") & ~BANNED_USERS)
-@languageCB
+@language
 async def get_play_markup(client, query, _):
     try:
         await query.answer()
@@ -44,7 +44,7 @@ async def get_play_markup(client, query, _):
 
 
 @app.on_callback_query(filters.regex("get_top_playlists") & ~BANNED_USERS)
-@languageCB
+@language
 async def get_topz_playlists(client, query, _):
     try:
         await query.answer()
@@ -57,7 +57,7 @@ async def get_topz_playlists(client, query, _):
 
 
 @app.on_callback_query(filters.regex("SERVERTOP") & ~BANNED_USERS)
-@languageCB
+@language
 async def server_to_play(client, query, _):
     chat_id = query.message.chat.id
     user_name = query.from_user.first_name

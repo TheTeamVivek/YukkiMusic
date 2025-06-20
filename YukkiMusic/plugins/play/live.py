@@ -14,12 +14,12 @@ from config import BANNED_USERS
 from YukkiMusic import app
 from YukkiMusic.platforms import youtube
 from YukkiMusic.utils.channelplay import get_channeplayCB
-from YukkiMusic.utils.decorators.language import languageCB
+from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.stream.stream import stream
 
 
 @app.on_callback_query(filters.regex("LiveStream") & ~BANNED_USERS)
-@languageCB
+@language
 async def play_live_stream(client, query, _):
     callback_data = query.data.strip()
     callback_request = callback_data.split(None, 1)[1]

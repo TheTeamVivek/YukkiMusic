@@ -19,7 +19,7 @@ from config import BANNED_USERS, START_IMG_URL
 from strings import command, get_string
 from YukkiMusic import HELPABLE, app
 from YukkiMusic.utils.database import get_lang, is_commanddelete_on
-from YukkiMusic.utils.decorators.language import LanguageStart
+from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline.help import private_help_panel
 
 COLUMN_SIZE = 3  # Number of button height
@@ -132,7 +132,7 @@ async def helper_private(client: app, update: types.Message | types.CallbackQuer
 
 
 @app.on_message(command("HELP_COMMAND") & filters.group & ~BANNED_USERS)
-@LanguageStart
+@language(no_check=True)
 async def help_com_group(client, message: Message, _):
     keyboard = private_help_panel(_)
     await message.reply_text(_["help_2"], reply_markup=InlineKeyboardMarkup(keyboard))

@@ -30,7 +30,7 @@ from ..formatters import int_to_alpha
 
 def AdminRightsCheck(mystic):
     async def wrapper(client, message):
-        if not await is_maintenance():
+        if await is_maintenance():
             if message.from_user.id not in SUDOERS:
                 return
         if await is_commanddelete_on(message.chat.id):
@@ -83,7 +83,7 @@ def AdminRightsCheck(mystic):
 
 def AdminActual(mystic):
     async def wrapper(client, message):
-        if not await is_maintenance():
+        if await is_maintenance():
             if message.from_user.id not in SUDOERS:
                 return
 
@@ -143,7 +143,7 @@ def ActualAdminCB(mystic):
         except Exception:
             _ = get_string("en")
 
-        if not await is_maintenance():
+        if await is_maintenance():
             if query.from_user.id not in SUDOERS:
                 return await query.answer(
                     _["maint_4"],

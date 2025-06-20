@@ -16,7 +16,7 @@ from config import BANNED_USERS
 from strings import command, get_string, languages_present
 from YukkiMusic import app
 from YukkiMusic.utils.database import get_lang, set_lang
-from YukkiMusic.utils.decorators import ActualAdminCB, language, languageCB
+from YukkiMusic.utils.decorators import ActualAdminCB, language
 
 # Languages Available
 
@@ -55,7 +55,7 @@ async def langs_command(_, message: Message, lng):
 
 
 @app.on_callback_query(filters.regex("LG") & ~BANNED_USERS)
-@languageCB
+@language
 async def lanuagecb(_, query, lang):
     await query.answer()
     keyboard = lanuages_keyboard(lang)

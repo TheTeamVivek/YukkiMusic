@@ -37,7 +37,7 @@ from YukkiMusic.utils.database import (
     set_playtype,
 )
 from YukkiMusic.utils.decorators.admins import ActualAdminCB
-from YukkiMusic.utils.decorators.language import language, languageCB
+from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline.settings import (
     audio_quality_markup,
     auth_users_markup,
@@ -60,7 +60,7 @@ async def settings_mar(client, message: Message, _):
 
 
 @app.on_callback_query(filters.regex("settings_helper") & ~BANNED_USERS)
-@languageCB
+@language
 async def settings_cb(client, query, _):
     try:
         await query.answer(_["set_cb_8"])
@@ -77,7 +77,7 @@ async def settings_cb(client, query, _):
 
 
 @app.on_callback_query(filters.regex("settingsback_helper") & ~BANNED_USERS)
-@languageCB
+@language
 async def settings_back_markup(client, query, _):
     try:
         await query.answer()
@@ -146,7 +146,7 @@ async def gen_buttons_vid(_, aud):
     )
     & ~BANNED_USERS
 )
-@languageCB
+@language
 async def without_Admin_rights(client, query, _):
     command = query.matches[0].group(1)
     chat_id = query.message.chat.id
@@ -468,12 +468,10 @@ async def authusers_mar(client, query, _):
             upl = InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton(
-                            text=_["BACK_BUTTON"], callback_data=f"AU"
-                        ),
+                        InlineKeyboardButton(text=_["BACK_BUTTON"], callback_data="AU"),
                         InlineKeyboardButton(
                             text=_["CLOSE_BUTTON"],
-                            callback_data=f"close",
+                            callback_data="close",
                         ),
                     ]
                 ]

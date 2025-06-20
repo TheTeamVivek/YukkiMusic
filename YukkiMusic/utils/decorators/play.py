@@ -50,7 +50,7 @@ def PlayWrapper(command):
             )
             return await message.reply_text(_["general_4"], reply_markup=upl)
 
-        if await is_maintenance() is False:
+        if await is_maintenance():
             if message.from_user.id not in SUDOERS:
                 return
 

@@ -35,13 +35,13 @@ async def maintenance(client, message: Message):
     state = message.text.split(None, 1)[1].strip()
     state = state.lower()
     if state == "enable":
-        if await is_maintenance() is False:
+        if await is_maintenance():
             await message.reply_text(_["maint_6"])
         else:
             await maintenance_on()
             await message.reply_text(_["maint_2"])
     elif state == "disable":
-        if await is_maintenance() is False:
+        if await is_maintenance():
             await maintenance_off()
             await message.reply_text(_["maint_3"])
         else:

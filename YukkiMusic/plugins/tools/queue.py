@@ -26,7 +26,7 @@ from YukkiMusic.utils.database import (
     is_active_chat,
     is_music_playing,
 )
-from YukkiMusic.utils.decorators.language import language, languageCB
+from YukkiMusic.utils.decorators.language import language
 from YukkiMusic.utils.inline.queue import queue_back_markup, queue_markup
 
 basic = {}
@@ -161,7 +161,7 @@ async def quite_timer(client, query):
 
 
 @app.on_callback_query(filters.regex("GetQueued") & ~BANNED_USERS)
-@languageCB
+@language
 async def queued_tracks(client, query, _):
     callback_data = query.data.strip()
     callback_request = callback_data.split(None, 1)[1]
@@ -219,7 +219,7 @@ async def queued_tracks(client, query, _):
 
 
 @app.on_callback_query(filters.regex("queue_back_timer") & ~BANNED_USERS)
-@languageCB
+@language
 async def queue_back(client, query, _):
     callback_data = query.data.strip()
     cplay = callback_data.split(None, 1)[1]

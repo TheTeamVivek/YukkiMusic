@@ -43,7 +43,6 @@ command = []
 cleanmode = []
 nonadmin = {}
 vlimit = []
-maintenance = []
 autoend = {}
 greeting_message = {"welcome": {}, "goodbye": {}}
 
@@ -180,7 +179,7 @@ async def set_private_note(chat_id, private_note):
 
 async def is_pnote_on(chat_id) -> bool:
     GetNoteData = await notesdb.find_one({"chat_id": chat_id})
-    if not GetNoteData == None:
+    if GetNoteData is not None:
         if "private_note" in GetNoteData:
             private_note = GetNoteData["private_note"]
             return private_note
@@ -503,62 +502,36 @@ async def set_video_limit(limt: int):
 # On Off
 async def is_on_off(on_off: int) -> bool:
     onoff = await onoffdb.find_one({"on_off": on_off})
-    if not onoff:
-        return False
-    return True
+    return bool(onoff)
 
 
 async def add_on(on_off: int):
     is_on = await is_on_off(on_off)
     if is_on:
         return
-    return await onoffdb.insert_one({"on_off": on_off})
+    await onoffdb.insert_one({"on_off": on_off})
+    return
 
 
 async def add_off(on_off: int):
     is_off = await is_on_off(on_off)
     if not is_off:
         return
-    return await onoffdb.delete_one({"on_off": on_off})
+    await onoffdb.delete_one({"on_off": on_off})
+    return
 
 
 # Maintenance
-
-
 async def is_maintenance():
-    if not maintenance:
-        get = await onoffdb.find_one({"on_off": 1})
-        if not get:
-            maintenance.clear()
-            maintenance.append(2)
-            return True
-        else:
-            maintenance.clear()
-            maintenance.append(1)
-            return False
-    else:
-        if 1 in maintenance:
-            return False
-        else:
-            return True
-
-
-async def maintenance_off():
-    maintenance.clear()
-    maintenance.append(2)
-    is_off = await is_on_off(1)
-    if not is_off:
-        return
-    return await onoffdb.delete_one({"on_off": 1})
+    return await is_on_off(config.MAINTENANCE)
 
 
 async def maintenance_on():
-    maintenance.clear()
-    maintenance.append(1)
-    is_on = await is_on_off(1)
-    if is_on:
-        return
-    return await onoffdb.insert_one({"on_off": 1})
+    return await add_on(config.MAINTENANCE)
+
+
+async def maintenance_off():
+    return await add_off(config.MAINTENANCE)
 
 
 async def save_audio_bitrate(chat_id: int, bitrate: str):
