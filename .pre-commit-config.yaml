@@ -28,3 +28,9 @@ repos:
     hooks:
       - id: pyupgrade
         args: [--py310-plus]
+
+  - repo: https://github.com/pycqa/pylint
+    rev: v3.3.7
+    hooks:
+      - id: pylint
+        args: [--exit-zero, --disable=import-error, --py-version=3.10, --output=pylint.json, --output-format=json2]

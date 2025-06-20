@@ -6,6 +6,7 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
+# pylint: disable=missing-module-docstring, missing-function-docstring
 import os as _os
 import re as _re
 import sys as _sys
@@ -14,6 +15,8 @@ import dotenv as _dotenv
 from pyrogram import filters as _flt
 
 _dotenv.load_dotenv()
+
+print("yep print working")
 
 
 def is_bool(value: str) -> bool:
@@ -44,7 +47,7 @@ API_HASH = getenv("API_HASH")
 BOT_TOKEN = getenv("BOT_TOKEN")
 
 
-# Database to save your chats and stats... Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
+# Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
 
@@ -67,12 +70,16 @@ STRING_SESSIONS = parse_list(getenv("STRING_SESSIONS", ""))
 
 COOKIE_LINK = parse_list(getenv("COOKIE_LINK", ""))
 
+EXTRA_PLUGINS = parse_list(getenv("EXTRA_PLUGINS", "yukkmusic_plugin_addon"), "")
+
 CLEANMODE_DELETE_MINS = int(
     getenv("CLEANMODE_MINS", "5")
 )  # Remember to give value in Minute
 
 
-# Custom max audio(music) duration for voice chat. set DURATION_LIMIT in variables with your own time(mins), Default to 60 mins.
+# Custom max audio(music) duration for voice chat.
+# set DURATION_LIMIT in variables with your own time(mins),
+# Default to 60 mins.
 
 DURATION_LIMIT_MIN = int(
     getenv("DURATION_LIMIT", "300")
@@ -114,7 +121,9 @@ SUPPORT_GROUP = getenv(
 )  # Example:- https://t.me/TheTeamVk
 
 
-# Set it in True if you want to leave your assistant after a certain amount of time. [Set time via AUTO_LEAVE_ASSISTANT_TIME]
+# Set it in True if you want to leave your assistant
+# after a certain amount of time.
+# [Set time via AUTO_LEAVE_ASSISTANT_TIME]
 AUTO_LEAVING_ASSISTANT = is_bool(getenv("AUTO_LEAVING_ASSISTANT", "False"))
 
 # Time after which you're assistant account will leave chats automatically.
@@ -123,7 +132,9 @@ AUTO_LEAVE_ASSISTANT_TIME = int(
 )  # Remember to give value in Seconds
 
 
-# Set it true if you want your bot to be private only [You'll need to allow CHAT_ID via /authorize command then only your bot will play music in that chat.]
+# Set it true if you want your bot to be private only
+# You'll need to allow CHAT_ID via /authorize command
+# then only your bot will play music in that chat.
 PRIVATE_BOT_MODE = is_bool(getenv("PRIVATE_BOT_MODE", "False"))
 
 
@@ -145,7 +156,8 @@ SPOTIFY_CLIENT_SECRET = getenv(
 )
 
 
-# Maximum number of video calls allowed on bot. You can later set it via /set_video_limit on telegram
+# Maximum number of video calls allowed on bot.
+# You can later set it via /set_video_limit on telegram
 VIDEO_STREAM_LIMIT = int(getenv("VIDEO_STREAM_LIMIT", "999"))
 
 
@@ -274,108 +286,24 @@ SONG_DOWNLOAD_DURATION_LIMIT = int(time_to_seconds(f"{SONG_DOWNLOAD_DURATION}:00
 if LOG_GROUP_ID.lstrip("-").isdigit():
     LOG_GROUP_ID = int(LOG_GROUP_ID)
 
-if SUPPORT_CHANNEL:
-    if not _re.match("(?:http|https)://", SUPPORT_CHANNEL):
+for x in (
+    SUPPORT_CHANNEL,
+    SUPPORT_GROUP,
+    UPSTREAM_REPO,
+    GITHUB_REPO,
+    PING_IMG_URL,
+    PLAYLIST_IMG_URL,
+    GLOBAL_IMG_URL,
+    STATS_IMG_URL,
+    TELEGRAM_AUDIO_URL,
+    TELEGRAM_VIDEO_URL,
+    STREAM_IMG_URL,
+    SOUNCLOUD_IMG_URL,
+    YOUTUBE_IMG_URL,
+):
+    if x and not _re.match("(?:http|https)://", x):
         print(
-            "[ERROR] - Your SUPPORT_CHANNEL url is wrong. Please ensure that it starts with https://"
+            f"[ERROR] - Your {x} url is wrong."
+            "Please ensure that it starts with https://"
         )
         _sys.exit()
-
-if SUPPORT_GROUP:
-    if not _re.match("(?:http|https)://", SUPPORT_GROUP):
-        print(
-            "[ERROR] - Your SUPPORT_GROUP url is wrong. Please ensure that it starts with https://"
-        )
-        _sys.exit()
-
-if UPSTREAM_REPO:
-    if not _re.match("(?:http|https)://", UPSTREAM_REPO):
-        print(
-            "[ERROR] - Your UPSTREAM_REPO url is wrong. Please ensure that it starts with https://"
-        )
-        _sys.exit()
-
-if GITHUB_REPO:
-    if not _re.match("(?:http|https)://", GITHUB_REPO):
-        print(
-            "[ERROR] - Your GITHUB_REPO url is wrong. Please ensure that it starts with https://"
-        )
-        _sys.exit()
-
-
-if PING_IMG_URL:
-    if PING_IMG_URL != "https://telegra.ph/file/91533956c91d0fd7c9f20.jpg":
-        if not _re.match("(?:http|https)://", PING_IMG_URL):
-            print(
-                "[ERROR] - Your PING_IMG_URL url is wrong. Please ensure that it starts with https://"
-            )
-            _sys.exit()
-
-if PLAYLIST_IMG_URL:
-    if PLAYLIST_IMG_URL != "https://telegra.ph/file/f4edfbd83ec3150284aae.jpg":
-        if not _re.match("(?:http|https)://", PLAYLIST_IMG_URL):
-            print(
-                "[ERROR] - Your PLAYLIST_IMG_URL url is wrong. Please ensure that it starts with https://"
-            )
-            _sys.exit()
-
-if GLOBAL_IMG_URL:
-    if GLOBAL_IMG_URL != "https://telegra.ph/file/de1db74efac1770b1e8e9.jpg":
-        if not _re.match("(?:http|https)://", GLOBAL_IMG_URL):
-            print(
-                "[ERROR] - Your GLOBAL_IMG_URL url is wrong. Please ensure that it starts with https://"
-            )
-            _sys.exit()
-
-
-if STATS_IMG_URL:
-    if STATS_IMG_URL != "https://telegra.ph/file/4dd9e2c231eaf7c290404.jpg":
-        if not _re.match("(?:http|https)://", STATS_IMG_URL):
-            print(
-                "[ERROR] - Your STATS_IMG_URL url is wrong. Please ensure that it starts with https://"
-            )
-            _sys.exit()
-
-
-if TELEGRAM_AUDIO_URL:
-    if TELEGRAM_AUDIO_URL != "https://telegra.ph/file/8234d704952738ebcda7f.jpg":
-        if not _re.match("(?:http|https)://", TELEGRAM_AUDIO_URL):
-            print(
-                "[ERROR] - Your TELEGRAM_AUDIO_URL url is wrong. Please ensure that it starts with https://"
-            )
-            _sys.exit()
-
-
-if STREAM_IMG_URL:
-    if STREAM_IMG_URL != "https://telegra.ph/file/e24f4a5f695ec5576a8f3.jpg":
-        if not _re.match("(?:http|https)://", STREAM_IMG_URL):
-            print(
-                "[ERROR] - Your STREAM_IMG_URL url is wrong. Please ensure that it starts with https://"
-            )
-            _sys.exit()
-
-
-if SOUNCLOUD_IMG_URL:
-    if SOUNCLOUD_IMG_URL != "https://telegra.ph/file/7645d1e04021323c21db9.jpg":
-        if not _re.match("(?:http|https)://", SOUNCLOUD_IMG_URL):
-            print(
-                "[ERROR] - Your SOUNCLOUD_IMG_URL url is wrong. Please ensure that it starts with https://"
-            )
-            _sys.exit()
-
-if YOUTUBE_IMG_URL:
-    if YOUTUBE_IMG_URL != "https://telegra.ph/file/76d29aa31c40a7f026d7e.jpg":
-        if not _re.match("(?:http|https)://", YOUTUBE_IMG_URL):
-            print(
-                "[ERROR] - Your YOUTUBE_IMG_URL url is wrong. Please ensure that it starts with https://"
-            )
-            _sys.exit()
-
-
-if TELEGRAM_VIDEO_URL:
-    if TELEGRAM_VIDEO_URL != "https://telegra.ph/file/8d02ff3bde400e465219a.jpg":
-        if not _re.match("(?:http|https)://", TELEGRAM_VIDEO_URL):
-            print(
-                "[ERROR] - Your TELEGRAM_VIDEO_URL url is wrong. Please ensure that it starts with https://"
-            )
-            _sys.exit()

@@ -1,15 +1,34 @@
+#
+# Copyright (C) 2024-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+#
+# This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
+# and is released under the MIT License.
+# Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
+#
+# All rights reserved.
+# pylint: disable=missing-module-docstring, missing-function-docstring, missing-class-docstring
+
 import os
 import sys
 import termios
 import tty
+from dataclasses import dataclass
 
 
 def is_bool(value):
     v = str(value).lower()
-    if v in ["true", "yes", "y"]:
-        return True, True
-    elif v in ["false", "no", "n"]:
-        return True, False
+    truth_map = {
+        "true": True,
+        "yes": True,
+        "y": True,
+        "false": False,
+        "no": False,
+        "n": False,
+    }
+
+    if v in truth_map:
+        return True, truth_map[v]
+
     print_hint('Accepted values: "yes", "no"')
     return False, None
 
@@ -39,7 +58,9 @@ def isint(text):
     return True, v
 
 
-_str = lambda t: (True, str(t))
+def _str(t):
+    return True, str(t)
+
 
 required_vars = {
     "API_ID": ("Enter your API_ID from my.telegram.org", True, isint),
@@ -106,6 +127,7 @@ optional_vars = {
 }
 
 
+@dataclass
 class Colors:
     HEADER = "\033[95m"
     OKBLUE = "\033[94m"
@@ -209,8 +231,8 @@ def get_input(var_name, prompt_text, required=True, validator=None, default=None
 def load_config(path="config/config.py"):
     loc = {}
     if os.path.exists(path):
-        with open(path) as f:
-            exec(f.read(), loc)
+        with open(path, encoding="utf-8") as f:  # noqa
+            exec(f.read(), loc)  # pylint: disable=W0122
         print_success(f"Loaded default values from {path}")
     else:
         print_warning(f"No config file found at {path}. Continuing without defaults.")
@@ -241,7 +263,7 @@ def main():
                     value = ",".join(map(str, value))
                 env_lines.append(f"{key}={value}")
 
-    with open(".env", "w") as f:
+    with open(".env", "w", encoding="utf-8") as f:
         f.write("\n".join(env_lines) + "\n")
 
     print_section("Configuration Complete")

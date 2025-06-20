@@ -6,7 +6,7 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-
+# pylint: disable=missing-module-docstring, missing-class-docstring, missing-function-docstring
 from __future__ import annotations  # noqa
 
 import asyncio
@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from pymongo.asynchronous.database import AsyncDatabase
 
     from .bot import YukkiBot
+    from .help import ModuleHelp
     from .userbot import Userbot
 
 logger = logging.getLogger(__name__)
@@ -30,7 +31,7 @@ class LoaderContext:
     app: YukkiBot
     userbot: Userbot
     mongodb: AsyncDatabase
-    help: dict
+    help: ModuleHelp
 
 
 def _setup_logger(name: str):
@@ -60,7 +61,7 @@ async def load_mod(modules: list[str], ctx: LoaderContext):
         try:
             mod = importlib.import_module(mod_name)
         except ImportError as e:
-            logger.warning(f"[MOD] Failed to import '{mod_name}': {e}")
+            logger.warning("[MOD] Failed to import '%s': %s", mod_name, e)
             continue
 
         _setup_logger(mod_name)
@@ -71,8 +72,8 @@ async def load_mod(modules: list[str], ctx: LoaderContext):
                     await mod.setup(ctx)
                 else:
                     mod.setup(ctx)
-                logger.info(f"[MOD] Loaded and setup: {mod_name}")
-            except Exception as e:
-                logger.warning(f"[MOD] Setup failed for '{mod_name}': {e}")
+                logger.info("[MOD] Sucessfully Loaded: %s", mod_name)
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                logger.warning("[MOD] Setup failed for '%s': %s", mod_name, e)
         else:
-            logger.warning(f"[MOD] '{mod_name}' has no 'setup' method.")
+            logger.warning("[MOD] '%s' has no 'setup' method, Skipping...", mod_name)

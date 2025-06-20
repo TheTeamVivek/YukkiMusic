@@ -12,3 +12,4 @@ __pycache__/
 *.session-journal
 tempdb/
 *.egg-info/
+pylint.json

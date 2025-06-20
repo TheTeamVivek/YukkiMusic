@@ -24,7 +24,6 @@ PING_COMMAND:
   ku: ["پینگ"]
   en: ["ping", "alive", "aalive"]
   tr: ["ping"]
-  tr: ["ping"]
 
 HELP_COMMAND:
   ar: ["مساعده"]

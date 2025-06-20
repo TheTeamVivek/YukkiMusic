@@ -6,9 +6,10 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved.
-
+# pylint: disable=missing-module-docstring, missing-function-docstring
 import asyncio
 import logging
+import sys
 
 from pyrogram import idle
 from pytgcalls.exceptions import NoActiveGroupCall
@@ -17,7 +18,9 @@ import config
 from config import BANNED_USERS
 from YukkiMusic import app, userbot
 from YukkiMusic.core.call import Yukki
+from YukkiMusic.core.help import ModuleHelp
 from YukkiMusic.core.modules import LoaderContext, load_mod
+from YukkiMusic.core.mongo import mongodb
 from YukkiMusic.misc import sudo
 from YukkiMusic.utils.database import get_banned_users, get_gbanned
 
@@ -41,13 +44,20 @@ async def init():
         for user_id in users:
             BANNED_USERS.add(user_id)
         logger.debug("Sucessfully loaded banned users")
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         logger.debug("Failed loaded banned users %s", e)
     await sudo()
     await app.start()
     if config.EXTRA_PLUGINS:
-        ctx = LoaderContext()
-        load_mod(config.EXTRA_PLUGINS, ctx)
+        await load_mod(
+            config.EXTRA_PLUGINS,
+            LoaderContext(
+                app=app,
+                userbot=userbot,
+                mongodb=mongodb,
+                help=ModuleHelp,
+            ),
+        )
     logger.info("Successfully Imported All Modules ")
     await userbot.start()
     await Yukki.start()
@@ -58,7 +68,7 @@ async def init():
         )
     except NoActiveGroupCall:
         logger.error("Please ensure the voice call in your log group is active.")
-        exit()
+        sys.exit()
 
     await Yukki.decorators()
     logger.info("YukkiMusic Started Successfully")

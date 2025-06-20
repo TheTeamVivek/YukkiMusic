@@ -6,7 +6,7 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved
-
+# pylint: disable=missing-module-docstring, missing-function-docstring
 import os
 import random
 import re
@@ -17,21 +17,11 @@ import yaml
 languages = {}
 languages_present = {}
 commands = {}
-
-"""
-In the YAML translation files, you can use placeholders like:
-
-  {SOME_KEY}                 - Replaced with the value of that key from the same language file.
-  {PING_COMMAND}             - Replaced with all localized commands for that key (e.g., "/ping /alive /aalive").
-  {PING_COMMAND[0]}          - Replaced with the first command (e.g., "/ping").
-  {PING_COMMAND[5]}          - If the index is out of range, a random command will be chosen (e.g., "/alive").
-
-These placeholders can be used in any string value, not just helper keys.
-"""
+print("yep print working")
 
 
-def get_command(command, lang=None):
-    data = commands.get(command)
+def get_command(key, lang=None):
+    data = commands.get(key)
     if not data:
         return []
     if lang:
@@ -42,15 +32,15 @@ def get_command(command, lang=None):
     return list(all_commands)
 
 
-def pick_command(command, lang=None):
-    commands_list = get_command(command, lang)
+def pick_command(key, lang=None):
+    commands_list = get_command(key, lang)
     if commands_list:
         return "/" + random.choice(commands_list)
     return None
 
 
 def command(
-    commands: str | list[str],
+    commands: str | list[str],  # pylint: disable=W0621
     prefixes: str | list[str] | None = "/",
     case_sensitive: bool = False,
 ):
@@ -64,7 +54,7 @@ def command(
     for key in commands:
         cmds.extend(get_command(key))
 
-    from pyrogram import filters
+    from pyrogram import filters  # pylint: disable=import-outside-toplevel
 
     return filters.command(cmds, prefixes=prefixes, case_sensitive=case_sensitive)
 
@@ -86,9 +76,7 @@ def format_value(value, is_command=False):
     return f"/{value}" if is_command else value
 
 
-def replace_placeholders(
-    text: str, lang_data: dict, outer_key: str = "", lang_code: str = "en"
-) -> str:
+def replace_placeholders(text: str, lang_data: dict, lang_code: str = "en") -> str:
     if not isinstance(text, str):
         return text
 
@@ -124,7 +112,7 @@ def update_helpers(data: dict, lang_code: str = "en"):
         if isinstance(value, dict):
             data[dict_key] = update_helpers(value, lang_code)
         elif isinstance(value, str):
-            data[dict_key] = replace_placeholders(value, data, dict_key, lang_code)
+            data[dict_key] = replace_placeholders(value, data, lang_code)
     return data
 
 
@@ -142,9 +130,9 @@ for filename in os.listdir(os.path.join("strings", "langs")):
         lang_path = os.path.join("strings", "langs", filename)
         languages[lang_name] = load_yaml(lang_path)
 
-        for key in languages["en"]:
-            if key not in languages[lang_name]:
-                languages[lang_name][key] = languages["en"][key]
+        for key_holder in languages["en"]:
+            if key_holder not in languages[lang_name]:
+                languages[lang_name][key_holder] = languages["en"][key_holder]
 
         try:
             languages_present[lang_name] = languages[lang_name]["name"]
