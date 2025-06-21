@@ -51,7 +51,7 @@ def overallback_stats_markup(_):
 def get_stats_markup(_, status):
     not_sudo = [
         InlineKeyboardButton(
-            text=_["CLOSEMENU_BUTTON"],
+            text=_["CLOSE_BUTTON"],
             callback_data="close",
         )
     ]
@@ -61,7 +61,7 @@ def get_stats_markup(_, status):
             callback_data="bot_stats_sudo g",
         ),
         InlineKeyboardButton(
-            text=_["CLOSEMENU_BUTTON"],
+            text=_["CLOSE_BUTTON"],
             callback_data="close",
         ),
     ]

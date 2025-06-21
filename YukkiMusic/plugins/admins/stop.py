@@ -83,10 +83,10 @@ async def stop_music(cli, message: Message):
         if message.from_user.id not in SUDOERS:
             admins = adminlist.get(message.chat.id)
             if not admins:
-                return await message.reply_text(_["admin_18"])
+                return await message.reply_text(_["admin_1"])
             else:
                 if message.from_user.id not in admins:
-                    return await message.reply_text(_["admin_19"])
+                    return await message.reply_text(_["admin_2"])
     try:
         check = db.get(chat_id)
         if check[0].get("mystic"):
@@ -95,4 +95,4 @@ async def stop_music(cli, message: Message):
         pass
     await Yukki.stop_stream(chat_id)
     await set_loop(chat_id, 0)
-    await message.reply_text(_["admin_9"].format(message.from_user.mention))
+    await message.reply_text(_["stop_1"].format(message.from_user.mention))

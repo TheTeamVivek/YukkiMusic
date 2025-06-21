@@ -1,45 +1,14 @@
 name : "🏴󠁧󠁢󠁥󠁮󠁧󠁿 English"
 
-ac_1: "🎙️ <i>Getting Active Voice Chats...</i>\n⏳ Please hold on"
-ac_2: "❌ <b>No active chats found!</b>"
-ac_3: "🔊 <b>Active Voice Chats:</b>\n\n{0}"
-ac_4: "📹 <b>Active Video Chats:</b>\n\n{0}"
-ac_5: "📊 <b>Active Chats Info:</b>\n🎧 Total Active Audio Chats: <b>{0}</b>\n🎥 Total Active Video Chats: <b>{1}</b>"
+active_1: "🎙️ <i>Getting Active Voice Chats...</i>\n⏳ Please hold on"
+active_2: "❌ <b>No active chats found!</b>"
+active_3: "🔊 <b>Active Voice Chats:</b>\n\n{0}"
+active_4: "📹 <b>Active Video Chats:</b>\n\n{0}"
+active_5: "📊 <b>Active Chats Info:</b>\n🎧 Total Active Audio Chats: <b>{0}</b>\n🎥 Total Active Video Chats: <b>{1}</b>"
 
-admin_1 : "🎶➻ Music is already paused!"
-admin_2 : "🎶➻ Music is paused by {}!"
-admin_3 : "🎶➻ Music is already resumed."
-admin_4 : "🎶➻ Music is resumed by {}"
-admin_5 : "🔇➻ Music is already muted"
-admin_6 : "🔇➻ Music is muted by {}!"
-admin_7 : "🔊➻ Music is already unmuted"
-admin_8 : "🔊➻ Music is unmuted by {}!"
-admin_9 : "⏹️➻ Music is ended/stopped by {}!"
-admin_10: "⏭️➻ Music is skipped by {}! No more music in queue"
-admin_11 : "❌ Error while changing stream to **{0}**\n\nPlease use /skip again."
-admin_12 : "🚫 Unable to skip to a specific track because of enabled loop play. Please disable loop play via `/loop disable` to use this feature."
-admin_13 : "🔢 Please use numeric numbers for specific tracks, like 1, 2 or 4 etc."
-admin_14 : "⚠️ At least 2 tracks needed in queue to skip to a specific number. Check queue by /queue"
-admin_15 : "❗ Not enough tracks in queue for the value given by you. Please choose numbers between 1 and {0}"
-admin_16 : "🚫 Failed to skip to specific track.\n\nCheck left queue by /queue"
-admin_17 : "{0}.. ⏳ Please Wait"
-admin_18 : "❌ Admin List Not Found\n\nPlease reload adminlist via /admincache or /reload"
-admin_19 : "🔑 You need to be an admin with manage voice chat rights to perform this.\nIf you're already an admin, reload admincache via /admincache"
-admin_20 : "✅ Admin cache reloaded successfully."
-admin_21 : "❌ Nothing inside queue to shuffle"
-admin_22 : "🚫 Failed to shuffle.\n\nCheck queue: /queue"
-admin_23 : "**Queue Shuffled by {0}**\n\nCheck shuffled queue: /queue"
-admin_24 : "**Usage:**\n/loop [enable/disable] or [Number between 1-10]\n\nExample: `/loop 5`"
-admin_25 : "🔁 Loop enabled by **{0}** for **{1}** times. Bot will now repeat the current playing music on voice chat for **{1}** times"
-admin_26 : "⚠️ Please use numbers between 1-10 for loop play"
-admin_27 : "🔁 Loop Play has been disabled"
-admin_28 : "📏 Usage:\n/seek or /seekback [Duration in seconds]"
-admin_29 : "🔢 Please use numeric duration seconds like 10-20-30 seconds for seeking"
-admin_30 : "❌ Sorry but you can't seek the currently playing stream. It can only be skipped or stopped."
-admin_31 : "🚫 Bot is not able to seek due to high duration given. You need to seek to a lower duration and remember that a time of 10 seconds is left after seeking.\n\nCurrently played **{0}** mins..."
-admin_32 : "⏳➻ Please Wait... Seeking ongoing stream."
-admin_33 : "✅➻ Successfully Seeked Stream to {0} Mins"
-admin_34 : "❌➻ Failed to seek the current stream."
+admin_1 : "❌ Admin List Not Found\n\nPlease reload adminlist via /admincache or /reload"
+admin_2 : "🔑 You need to be an admin with manage voice chat rights to perform this.\nIf you're already an admin, reload admincache via /admincache"
+admin_3 : "✅ Admin cache reloaded successfully."
 
 auth_1 : "🔒 You can only have 20 users in your group's authorized users list (aul)."
 auth_2 : "✅ Added to authorized users list of your group."
@@ -154,6 +123,11 @@ log_3: "❌ Disabled logging."
 
 logger_text: "**{bot_mention} Play Log**\n\n**Chat ID:** `{chat_id}`\n**Chat Name:** {title}\n**Chat Username:** {chatusername}\n\n**User ID:** `{sender_id}`\n**Name:** {user_mention}\n**Username:** {username}\n\n**Query:** {query}\n**Stream Type:** {streamtype}"
 
+loop_1 : "**Usage:**\n/loop [enable/disable] or [Number between 1-10]\n\nExample: `/loop 5`"
+loop_2 : "🔁 Loop enabled by **{0}** for **{1}** times. Bot will now repeat the current playing music on voice chat for **{1}** times"
+loop_3 : "⚠️ Please use numbers between 1-10 for loop play"
+loop_4 : "🔁 Loop Play has been disabled"
+
 lyrics_1: "**USAGE:**\n\n/lyrics [music name]"
 lyrics_2: "🔍 searching lyrics..."
 lyrics_3: "❌ Failed to fetch lyrics 🥲.\n\n**Tried searching for:** {0}"
@@ -167,6 +141,12 @@ maint_5: "Maintenance Mode is already Disabled."
 maint_6: "Maintenance Mode is already enabled."
 
 misc_1: "🤖 Bot automatically cleared the queue and left the voice chat because no one was listening to songs in the voice chat."
+
+mute_1 : "🔇➻ Music is already muted"
+mute_2 : "🔇➻ Music is muted by {}!"
+
+pause_1 : "🎶➻ Music is already paused!"
+pause_2 : "🎶➻ Music is paused by {}!"
 
 pbot_1: "**Usage:**\n/authorize [CHAT_ID]"
 pbot_2: "**Usage:**\n/unauthorize [CHAT_ID]"
@@ -243,7 +223,18 @@ queue_3: "<u>**Queued Tracks:</u>**  [Checkout More Queued Tracks From Here]({0}
 queue_4: "**💫 Added to queue at #{0}**\n\n**🥀Title:** {1}\n**⏱ Duration:** {2}\n**🥀Added by:** {3} ❄️"
 queue_5: "🚫 Only one track is in queue; add some more tracks in the queue to check the whole queue."
 
+resume_1 : "🎶➻ Music is already resumed."
+resume_2 : "🎶➻ Music is resumed by {}"
+
 saavn_1: "😞 Sorry! Currently, the bot is unable to play the Saavn Podcast URL."
+
+seek_1 : "📏 Usage:\n/seek or /seekback [Duration in seconds]"
+seek_2 : "🔢 Please use numeric duration seconds like 10-20-30 seconds for seeking"
+seek_3 : "❌ Sorry but you can't seek the currently playing stream. It can only be skipped or stopped."
+seek_4 : "🚫 Bot is not able to seek due to high duration given. You need to seek to a lower duration and remember that a time of 10 seconds is left after seeking.\n\nCurrently played **{0}** mins..."
+seek_5 : "⏳➻ Please Wait... Seeking ongoing stream."
+seek_6 : "✅➻ Successfully Seeked Stream to {0} Mins"
+seek_7 : "❌➻ Failed to seek the current stream."
 
 set_cb_1 : "🎵 Getting audio quality panel..."
 set_cb_2 : "📺 Getting video quality panel..."
@@ -267,6 +258,18 @@ setting_14 : "⁉️ What is This?\n\nWhen activated, Bot will delete its execut
 setting_15 : "Failed to resolve peer, Make sure you have added bot in your channel and promoted it as admin.\n\nTry setting /channelplay again.."
 setting_16 : "⁉️ What is This?\n\nWhen activated, Bot will suggest you..."
 
+shuffle_1 : "❌ Nothing inside queue to shuffle"
+shuffle_2 : "🚫 Failed to shuffle.\n\nCheck queue: /queue"
+shuffle_3 : "**Queue Shuffled by {0}**\n\nCheck shuffled queue: /queue"
+
+skip_1: "⏭️➻ Music is skipped by {}! No more music in queue"
+skip_2 : "❌ Error while changing stream to **{0}**\n\nPlease use /skip again."
+skip_3 : "🚫 Unable to skip to a specific track because of enabled loop play. Please disable loop play via `/loop disable` to use this feature."
+skip_4 : "🔢 Please use numeric numbers for specific tracks, like 1, 2 or 4 etc."
+skip_5 : "⚠️ At least 2 tracks needed in queue to skip to a specific number. Check queue by /queue"
+skip_6 : "❗ Not enough tracks in queue for the value given by you. Please choose numbers between 1 and {0}"
+skip_7 : "🚫 Failed to skip to specific track.\n\nCheck left queue by /queue"
+
 song_1: "🚫 You can download music or video from YouTube only in private chat. Please start me in private chat."
 song_2: "**USAGE:**\n\n/song [music name] or [YouTube link]"
 song_3: "❌ Live link detected. I am not able to download live YouTube videos."
@@ -286,6 +289,8 @@ start_4 : "The sudo user of {0}, {1} just joined your chat."
 start_5 : "🦸 **Supergroup needed** 🦸\n\nPlease convert your **group** to **supergroup** and then add me back.\n\n**How to make supergroup?**\n🥱 Make your group's chat history **visible** once."
 start_6 : "**Blacklisted chat**\n\nThis chat is blacklisted for using the bot. Request a sudo user to whitelist your chat, sudo users [list]({0})."
 start_7 : "Heya :) I am alive since **{0}**"
+
+stop_1 : "⏹️➻ Music is ended/stopped by {}!"
 
 str_1: "🔗 Please provide m3u8 links or index links."
 str_2: "✅ Valid stream verified\n\nPlease wait processing link..."
@@ -308,6 +313,9 @@ tg_2 : "❌ Failed to download the media from Telegram."
 tracks_1: "**🔄 Processing {0} top 10 playlist**\n\n**Requested by:** {1}\n\nCheck top 10 tracks by /gstats."
 tracks_2: "❌ **Error**\n\nThere's no **{0} top 10 playlist** on bot's servers. Please try any other playlist."
 
+unmute_1 : "🔊➻ Music is already unmuted"
+unmute_2 : "🔊➻ Music is unmuted by {}!"
+
 ustats_1 : "🚫 No user stats found."
 ustats_2 : "🎶 You have played **{0}** tracks till now with a whopping count of **{1}** times.\n\nTop **{2}** played by you:\n\n"
 
@@ -322,9 +330,7 @@ vidmode_3: "🔗 Video play mode set as m3u8. Bot will be able to play tracks li
 
 
 CLOSE_BUTTON: "Close"
-CLOSEMENU_BUTTON: "Close"
 BACK_BUTTON: "🔙 Back"
-UNBAN_BUTTON: "🆓 Unban assistant"
 
 # Lyrics
 L_B_1: "🎶 Check out lyrics now"

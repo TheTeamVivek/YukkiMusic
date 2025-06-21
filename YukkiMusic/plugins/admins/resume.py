@@ -25,7 +25,7 @@ async def resume_com(cli, message: Message, _, chat_id):
     if not len(message.command) == 1:
         return await message.reply_text(_["general_2"])
     if await is_music_playing(chat_id):
-        return await message.reply_text(_["admin_3"])
+        return await message.reply_text(_["resume_1"])
     await music_on(chat_id)
     await Yukki.resume_stream(chat_id)
-    await message.reply_text(_["admin_4"].format(message.from_user.mention))
+    await message.reply_text(_["resume_2"].format(message.from_user.mention))

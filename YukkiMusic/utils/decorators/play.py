@@ -114,7 +114,7 @@ def PlayWrapper(command):
             if message.from_user.id not in SUDOERS:
                 admins = adminlist.get(message.chat.id)
                 if not admins:
-                    return await message.reply_text(_["admin_18"])
+                    return await message.reply_text(_["admin_1"])
                 else:
                     if message.from_user.id not in admins:
                         return await message.reply_text(_["play_4"])

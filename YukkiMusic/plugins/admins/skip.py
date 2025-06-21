@@ -33,7 +33,7 @@ async def skip(cli, message: Message, _, chat_id):
     if not len(message.command) < 2:
         loop = await get_loop(chat_id)
         if loop != 0:
-            return await message.reply_text(_["admin_12"])
+            return await message.reply_text(_["skip_3"])
         state = message.text.split(None, 1)[1].strip()
         if state.isnumeric():
             state = int(state)
@@ -53,13 +53,13 @@ async def skip(cli, message: Message, _, chat_id):
                                     except Exception:
                                         pass
                             except Exception:
-                                return await message.reply_text(_["admin_16"])
+                                return await message.reply_text(_["skip_7"])
                             if popped:
                                 await auto_clean(popped)
                             if not check:
                                 try:
                                     await message.reply_text(
-                                        _["admin_10"].format(
+                                        _["skip_1"].format(
                                             message.from_user.first_name
                                         ),
                                     )
@@ -68,13 +68,13 @@ async def skip(cli, message: Message, _, chat_id):
                                     return
                                 break
                     else:
-                        return await message.reply_text(_["admin_15"].format(count))
+                        return await message.reply_text(_["skip_6"].format(count))
                 else:
-                    return await message.reply_text(_["admin_14"])
+                    return await message.reply_text(_["skip_5"])
             else:
                 return await message.reply_text(_["queue_2"])
         else:
-            return await message.reply_text(_["admin_13"])
+            return await message.reply_text(_["skip_4"])
     else:
         check = db.get(chat_id)
         popped = None
@@ -89,7 +89,7 @@ async def skip(cli, message: Message, _, chat_id):
                         pass
             if not check:
                 await message.reply_text(
-                    _["admin_10"].format(message.from_user.first_name),
+                    _["skip_1"].format(message.from_user.first_name),
                 )
                 try:
                     return await Yukki.stop_stream(chat_id)
@@ -98,7 +98,7 @@ async def skip(cli, message: Message, _, chat_id):
         except Exception:
             try:
                 await message.reply_text(
-                    _["admin_10"].format(message.from_user.first_name),
+                    _["skip_1"].format(message.from_user.first_name),
                 )
                 return await Yukki.stop_stream(chat_id)
             except Exception:
@@ -114,7 +114,7 @@ async def skip(cli, message: Message, _, chat_id):
     if "live_" in queued:
         n, link = await youtube.video(videoid, True)
         if n == 0:
-            return await message.reply_text(_["admin_11"].format(title))
+            return await message.reply_text(_["skip_2"].format(title))
         try:
             await Yukki.skip_stream(chat_id, link, video=status)
         except Exception:

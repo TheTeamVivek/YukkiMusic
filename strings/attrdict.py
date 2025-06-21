@@ -1,3 +1,15 @@
+#
+# Copyright (C) 2024-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+#
+# This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
+# and is released under the MIT License.
+# Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
+#
+# All rights reserved
+
+# pylint: disable=missing-module-docstring
+
+
 class AttrDict(dict):
     """Dict with attribute-style access and recursive wrapping."""
 
@@ -10,8 +22,8 @@ class AttrDict(dict):
     def __getattr__(self, item):
         try:
             return self[item]
-        except KeyError:
-            raise AttributeError(f"'AttrDict' has no attribute '{item}'")
+        except KeyError as e:
+            raise AttributeError(f"'AttrDict' has no attribute '{item}'") from e
 
     def __setattr__(self, key, value):
         self[key] = value

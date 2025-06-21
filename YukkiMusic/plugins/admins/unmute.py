@@ -26,10 +26,10 @@ async def unmute_admin(Client, message: Message, _, chat_id):
         return
     if not await is_muted(chat_id):
         return await message.reply_text(
-            _["admin_7"],
+            _["unmute_1"],
         )
     await mute_off(chat_id)
     await Yukki.unmute_stream(chat_id)
     await message.reply_text(
-        _["admin_8"].format(message.from_user.mention),
+        _["unmute_2"].format(message.from_user.mention),
     )

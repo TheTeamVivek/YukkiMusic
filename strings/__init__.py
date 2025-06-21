@@ -6,6 +6,7 @@
 # Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
 #
 # All rights reserved
+
 # pylint: disable=missing-module-docstring, missing-function-docstring
 import os
 import random

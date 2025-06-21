@@ -7,6 +7,8 @@
 #
 # All rights reserved.
 #
+
+# pylint: disable=missing-module-docstring, missing-function-docstring
 import random
 
 from pyrogram import filters
@@ -149,24 +151,24 @@ async def admin_callback(client, query, _):
         if query.from_user.id not in SUDOERS:
             admins = adminlist.get(query.message.chat.id)
             if not admins:
-                return await query.answer(_["admin_18"], show_alert=True)
+                return await query.answer(_["admin_1"], show_alert=True)
             else:
                 if query.from_user.id not in admins:
-                    return await query.answer(_["admin_19"], show_alert=True)
+                    return await query.answer(_["admin_2"], show_alert=True)
     if command == "Pause":
         if not await is_music_playing(chat_id):
-            return await query.answer(_["admin_1"], show_alert=True)
+            return await query.answer(_["pause_1"], show_alert=True)
         await query.answer()
         await music_off(chat_id)
         await Yukki.pause_stream(chat_id)
-        await query.message.reply_text(_["admin_2"].format(mention))
+        await query.message.reply_text(_["pause_2"].format(mention))
     elif command == "Resume":
         if await is_music_playing(chat_id):
-            return await query.answer(_["admin_3"], show_alert=True)
+            return await query.answer(_["resume_1"], show_alert=True)
         await query.answer()
         await music_on(chat_id)
         await Yukki.resume_stream(chat_id)
-        await query.message.reply_text(_["admin_4"].format(mention))
+        await query.message.reply_text(_["resume_2"].format(mention))
     elif command == "Stop" or command == "End":
         try:
             check = db.get(chat_id)
@@ -177,42 +179,42 @@ async def admin_callback(client, query, _):
         await query.answer()
         await Yukki.stop_stream(chat_id)
         await set_loop(chat_id, 0)
-        await query.message.reply_text(_["admin_9"].format(mention))
+        await query.message.reply_text(_["stop_1"].format(mention))
     elif command == "Mute":
         if await is_muted(chat_id):
-            return await query.answer(_["admin_5"], show_alert=True)
+            return await query.answer(_["mute_1"], show_alert=True)
         await query.answer()
         await mute_on(chat_id)
         await Yukki.mute_stream(chat_id)
-        await query.message.reply_text(_["admin_6"].format(mention))
+        await query.message.reply_text(_["mute_2"].format(mention))
     elif command == "Unmute":
         if not await is_muted(chat_id):
-            return await query.answer(_["admin_7"], show_alert=True)
+            return await query.answer(_["unmute_1"], show_alert=True)
         await query.answer()
         await mute_off(chat_id)
         await Yukki.unmute_stream(chat_id)
-        await query.message.reply_text(_["admin_8"].format(mention))
+        await query.message.reply_text(_["unmute_2"].format(mention))
     elif command == "Loop":
         await query.answer()
         await set_loop(chat_id, 3)
-        await query.message.reply_text(_["admin_25"].format(mention, 3))
+        await query.message.reply_text(_["loop_2"].format(mention, 3))
 
     elif command == "Shuffle":
         check = db.get(chat_id)
         if not check:
-            return await query.answer(_["admin_21"], show_alert=True)
+            return await query.answer(_["shuffle_1"], show_alert=True)
         try:
             popped = check.pop(0)
         except Exception:
-            return await query.answer(_["admin_22"], show_alert=True)
+            return await query.answer(_["shuffle_2"], show_alert=True)
         check = db.get(chat_id)
         if not check:
             check.insert(0, popped)
-            return await query.answer(_["admin_22"], show_alert=True)
+            return await query.answer(_["shuffle_2"], show_alert=True)
         await query.answer()
         random.shuffle(check)
         check.insert(0, popped)
-        await query.message.reply_text(_["admin_23"].format(mention))
+        await query.message.reply_text(_["shuffle_3"].format(mention))
     elif command in ["Skip", "Replay"]:
         check = db.get(chat_id)
         txt = f"» Track {command.lower()}ed by {mention} !"
@@ -224,14 +226,14 @@ async def admin_callback(client, query, _):
                     await auto_clean(popped)
                 if not check:
                     await query.edit_message_text(txt)
-                    await query.message.reply_text(_["admin_10"].format(mention))
+                    await query.message.reply_text(_["skip_1"].format(mention))
                     try:
                         return await Yukki.stop_stream(chat_id)
                     except Exception:
                         return
             except Exception:
                 await query.edit_message_text(txt)
-                await query.message.reply_text(_["admin_10"].format(mention))
+                await query.message.reply_text(_["skip_1"].format(mention))
                 return await Yukki.stop_stream(chat_id)
         elif command == "Replay":
             db[chat_id][0]["played"] = 0
@@ -248,7 +250,7 @@ async def admin_callback(client, query, _):
         if "live_" in queued:
             n, link = await youtube.video(videoid, True)
             if n == 0:
-                return await query.message.reply_text(_["admin_11"].format(title))
+                return await query.message.reply_text(_["skip_2"].format(title))
             try:
                 await Yukki.skip_stream(chat_id, link, video=status)
             except Exception:
@@ -401,10 +403,10 @@ async def admin_callback(client, query, _):
             return await query.answer(_["queue_2"], show_alert=True)
         duration_seconds = int(playing[0]["seconds"])
         if duration_seconds == 0:
-            return await query.answer(_["admin_30"], show_alert=True)
+            return await query.answer(_["seek_3"], show_alert=True)
         file_path = playing[0]["file"]
         if "index_" in file_path or "live_" in file_path:
-            return await query.answer(_["admin_30"], show_alert=True)
+            return await query.answer(_["seek_3"], show_alert=True)
         duration_played = int(playing[0]["played"])
         if int(command) in [1, 2]:
             duration_to_skip = 10
@@ -415,8 +417,8 @@ async def admin_callback(client, query, _):
             if (duration_played - duration_to_skip) <= 10:
                 bet = seconds_to_min(duration_played)
                 return await query.answer(
-                    f"Bot is unable to seek because duration exceeds.\n\n"
-                    "Currently played:** {bet}** minutes out of **{duration}** minutes.",
+                    "Bot is unable to seek because duration exceeds.\n\n"
+                    f"Currently played:** {bet}** minutes out of **{duration}** minutes.",
                     show_alert=True,
                 )
             to_seek = duration_played - duration_to_skip + 1
@@ -424,16 +426,17 @@ async def admin_callback(client, query, _):
             if (duration_seconds - (duration_played + duration_to_skip)) <= 10:
                 bet = seconds_to_min(duration_played)
                 return await query.answer(
-                    f"Bot is unable to seek because duration exceeds.\n\nCurrently played:** {bet}** minutes out of **{duration}** minutes.",
+                    "Bot is unable to seek because duration exceeds.\n\n"
+                    f"Currently played:** {bet}** minutes out of **{duration}** minutes.",
                     show_alert=True,
                 )
             to_seek = duration_played + duration_to_skip + 1
         await query.answer()
-        mystic = await query.message.reply_text(_["admin_32"])
+        mystic = await query.message.reply_text(_["seek_5"])
         if "vid_" in file_path:
             n, file_path = await youtube.video(playing[0]["vidid"], True)
             if n == 0:
-                return await mystic.edit_text(_["admin_30"])
+                return await mystic.edit_text(_["seek_3"])
         try:
             await Yukki.seek_stream(
                 chat_id,
@@ -443,12 +446,12 @@ async def admin_callback(client, query, _):
                 playing[0]["streamtype"],
             )
         except Exception:
-            return await mystic.edit_text(_["admin_34"])
+            return await mystic.edit_text(_["seek_7"])
         if int(command) in [1, 3]:
             db[chat_id][0]["played"] -= duration_to_skip
         else:
             db[chat_id][0]["played"] += duration_to_skip
-        string = _["admin_33"].format(seconds_to_min(to_seek))
+        string = _["seek_6"].format(seconds_to_min(to_seek))
         await mystic.edit_text(f"{string}\n\nChanges Done by: {mention} !")
 
 
