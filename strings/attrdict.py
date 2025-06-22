@@ -11,7 +11,7 @@
 
 
 class AttrDict(dict):
-    """Dict with attribute-style access and recursive wrapping."""
+    """Dict with attribute-style access."""
 
     def __init__(self, *args, **kwargs):
         super().__init__()

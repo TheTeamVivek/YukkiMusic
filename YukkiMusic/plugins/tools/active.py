@@ -7,6 +7,8 @@
 #
 # All rights reserved.
 #
+# pylint: disable=missing-module-docstring, missing-function-docstring
+
 from pyrogram.errors import ChannelInvalid
 from pyrogram.types import Message
 
@@ -21,11 +23,6 @@ from YukkiMusic.utils.database.memorydatabase import (
     remove_active_video_chat,
 )
 from YukkiMusic.utils.decorators.language import LanguageStart
-
-active_1 = "Getting Active Voicechats....\nPlease hold on"
-active_2 = "No active Chats Found"
-active_3 = "**Active Voice Chat's:-**\n\n{0}"
-active_4 = "**Active Video Chat's:-**\n\n{0}"
 
 
 # Function for removing the Active voice and video chat also clear the db dictionary for the chat
@@ -97,66 +94,55 @@ async def vc(_, message: Message, lang):
     await message.reply_text(lang["active_5"].format(ac_audio, ac_video))
 
 
+# pylint: disable=C0301
 (
     ModuleHelp("Active")
+    .name("en", "ActiveVc")
     .add(
         "en",
-        f"""<b>Commands to view currently active calls.</b>
-
-<b>✧ {pick_commands("ACTIVEVC_COMMAND", "en")}</b> - Check active voice chats on the bot.
-
-<b>✧ {pick_commands("ACTIVEVIDEO_COMMAND", "en")}</b> - Check active video calls on the bot.
-
-<b>✧ {pick_commands("AC_COMMAND", "en")}</b> - Check all active calls (voice & video) on the bot.""",
+        "<b>Commands to view currently active calls.</b>\n"
+        f"<b>✧ {pick_commands('ACTIVEVC_COMMAND', 'en')}</b> - Check active voice chats on the bot.\n"
+        f"<b>✧ {pick_commands('ACTIVEVIDEO_COMMAND', 'en')}</b> - Check active video calls on the bot.\n"
+        f"<b>✧ {pick_commands('AC_COMMAND', 'en')}</b> - Check all active calls (voice & video) on the bot.",
     )
+    .name("ar", "الدردشات النشطة")
     .add(
         "ar",
-        f"""<b>أوامر لعرض المكالمات النشطة.</b>
-
-<b>✧ {pick_commands("ACTIVEVC_COMMAND", "ar")}</b> - التحقق من الدردشات الصوتية النشطة على البوت.
-
-<b>✧ {pick_commands("ACTIVEVIDEO_COMMAND", "ar")}</b> - التحقق من المكالمات المرئية النشطة على البوت.
-
-<b>✧ {pick_commands("AC_COMMAND", "ar")}</b> - التحقق من المكالمات الصوتية والمرئية النشطة على البوت.""",
+        "<b>أوامر لعرض المكالمات النشطة.</b>\n\n"
+        f"<b>✧ {pick_commands('ACTIVEVC_COMMAND', 'ar')}</b> - التحقق من الدردشات الصوتية النشطة على البوت.\n\n"
+        f"<b>✧ {pick_commands('ACTIVEVIDEO_COMMAND', 'ar')}</b> - التحقق من المكالمات المرئية النشطة على البوت.\n\n"
+        f"<b>✧ {pick_commands('AC_COMMAND', 'ar')}</b> - التحقق من المكالمات الصوتية والمرئية النشطة على البوت.",
     )
+    .name("as", "সক্ৰিয় চেট")
     .add(
         "as",
-        f"""<b>বৰ্তমান সক্ৰিয় কলবোৰ চাবলৈ কমান্ডসমূহ।</b>
-
-<b>✧ {pick_commands("ACTIVEVC_COMMAND", "as")}</b> - বটৰ ওপৰত সক্ৰিয় ভইচ চেটবোৰ পৰীক্ষা কৰক।
-
-<b>✧ {pick_commands("ACTIVEVIDEO_COMMAND", "as")}</b> - বটৰ ওপৰত সক্ৰিয় ভিডিঅ’ কলবোৰ পৰীক্ষা কৰক।
-
-<b>✧ {pick_commands("AC_COMMAND", "as")}</b> - বটৰ ওপৰত সক্ৰিয় ভইচ আৰু ভিডিঅ’ কলবোৰ পৰীক্ষা কৰক।""",
+        "<b>বৰ্তমান সক্ৰিয় কলবোৰ চাবলৈ কমান্ডসমূহ।</b>\n\n"
+        f"<b>✧ {pick_commands('ACTIVEVC_COMMAND', 'as')}</b> - বটৰ ওপৰত সক্ৰিয় ভইচ চেটবোৰ পৰীক্ষা কৰক।\n\n"
+        f"<b>✧ {pick_commands('ACTIVEVIDEO_COMMAND', 'as')}</b> - বটৰ ওপৰত সক্ৰিয় ভিডিঅ’ কলবোৰ পৰীক্ষা কৰক।\n\n"
+        f"<b>✧ {pick_commands('AC_COMMAND', 'as')}</b> - বটৰ ওপৰত সক্ৰিয় ভইচ আৰু ভিডিঅ’ কলবোৰ পৰীক্ষা কৰক।",
     )
+    .name("hi", "सक्रिय कॉल")
     .add(
         "hi",
-        f"""<b>बॉट पर सक्रिय कॉल्स देखने के लिए कमांड्स।</b>
-
-<b>✧ {pick_commands("ACTIVEVC_COMMAND", "hi")}</b> - बॉट पर सक्रिय वॉइस चैट्स की जांच करें।
-
-<b>✧ {pick_commands("ACTIVEVIDEO_COMMAND", "hi")}</b> - बॉट पर सक्रिय वीडियो कॉल्स की जांच करें।
-
-<b>✧ {pick_commands("AC_COMMAND", "hi")}</b> - बॉट पर सक्रिय वॉइस और वीडियो कॉल्स की जांच करें।""",
+        "<b>बॉट पर सक्रिय कॉल्स देखने के लिए कमांड्स।</b>\n\n"
+        f"<b>✧ {pick_commands('ACTIVEVC_COMMAND', 'hi')}</b> - बॉट पर सक्रिय वॉइस चैट्स की जांच करें।\n\n"
+        f"<b>✧ {pick_commands('ACTIVEVIDEO_COMMAND', 'hi')}</b> - बॉट पर सक्रिय वीडियो कॉल्स की जांच करें।\n\n"
+        f"<b>✧ {pick_commands('AC_COMMAND', 'hi')}</b> - बॉट पर सक्रिय वॉइस और वीडियो कॉल्स की जांच करें।",
     )
+    .name("ku", "پەیوەندە چالاکەکان")
     .add(
         "ku",
-        f"""<b>فەرمانەکان بۆ بینینی پەیوەندییە چالاکەکان.</b>
-
-<b>✧ {pick_commands("ACTIVEVC_COMMAND", "ku")}</b> - پشکنینی پەیوەندییە دەنگییە چالاکەکان لە بۆتەکە.
-
-<b>✧ {pick_commands("ACTIVEVIDEO_COMMAND", "ku")}</b> - پشکنینی پەیوەندییە ڤیدیۆییە چالاکەکان لە بۆتەکە.
-
-<b>✧ {pick_commands("AC_COMMAND", "ku")}</b> - پشکنینی پەیوەندییە دەنگی و ڤیدیۆیی چالاکەکان لەسەر بۆتەکە.""",
+        "<b>فەرمانەکان بۆ بینینی پەیوەندییە چالاکەکان.</b>\n\n"
+        f"<b>✧ {pick_commands('ACTIVEVC_COMMAND', 'ku')}</b> - پشکنینی چاتی دەنگییە چالاکەکان لە بۆتەکە.\n\n"
+        f"<b>✧ {pick_commands('ACTIVEVIDEO_COMMAND', 'ku')}</b> - پشکنینی چاتی ڤیدیۆییە چالاکەکان لە بۆتەکە.\n\n"
+        f"<b>✧ {pick_commands('AC_COMMAND', 'ku')}</b> - پشکنینی هەموو پەیوەندە چالاکەکان (دەنگ و ڤیدیۆ) لە بۆتەکە.",
     )
+    .name("tr", "Aktif Çağrılar")
     .add(
         "tr",
-        f"""<b>Şu anda botta aktif olan aramaları görüntüleme komutları.</b>
-
-<b>✧ {pick_commands("ACTIVEVC_COMMAND", "tr")}</b> - Botta aktif sesli sohbetleri kontrol edin.
-
-<b>✧ {pick_commands("ACTIVEVIDEO_COMMAND", "tr")}</b> - Botta aktif görüntülü aramaları kontrol edin.
-
-<b>✧ {pick_commands("AC_COMMAND", "tr")}</b> - Botta aktif sesli ve görüntülü aramaları kontrol edin.""",
+        "<b>Şu anda botta aktif olan aramaları görüntüleme komutları.</b>\n\n"
+        f"<b>✧ {pick_commands('ACTIVEVC_COMMAND', 'tr')}</b> - Botta aktif sesli sohbetleri kontrol edin.\n\n"
+        f"<b>✧ {pick_commands('ACTIVEVIDEO_COMMAND', 'tr')}</b> - Botta aktif görüntülü aramaları kontrol edin.\n\n"
+        f"<b>✧ {pick_commands('AC_COMMAND', 'tr')}</b> - Botta aktif sesli ve görüntülü aramaları kontrol edin.",
     )
 )

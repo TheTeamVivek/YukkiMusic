@@ -493,16 +493,6 @@ PLAY_HELPER: |
   <b>✧ {CHANNELPLAY_COMMAND}</b> - Bir kanalı bir gruba bağlayın ve grubunuzdan kanalın sesli sohbetinde müzik yayınlayın.
   <b>✧ {STREAM_COMMAND}</b> - Doğrudan veya m3u8 olduğunu düşündüğünüz ve /play ile çalınamayan bir URL yayınlayın.
 
-GCAST_HELPER: |
-  <b>{BROADCAST_COMMAND} [Mesaj veya herhangi bir mesaja yanıt]</b> » Botun hizmet verdiği sohbetlere bir mesaj yayınlayın
-  <u>Yayın Modları:</u>
-  <b><code>-pin</code></b> » Yayınlanan mesajı hizmet verilen sohbetlerde sabitleyin
-  <b><code>-pinloud</code></b> » Yayınlanan mesajı sabitleyin ve üyelere bildirim gönderin
-  <b><code>-user</code></b> » Mesajı botu başlatan kullanıcılara yayınlayın [Mesajı sabitlemek için `-pin` veya `-pinloud` ekleyebilirsiniz]
-  <b><code>-assistant</code></b> » Mesajınızı botun tüm asistanları aracılığıyla yayınlayın
-  <b><code>-nobot</code></b> » **Bot**'un mesajı yayınlamamasını sağlar [Mesajı gruplara yayınlamak istemediğinizde kullanışlıdır]
-  > <b>Örnek:</b> <code>{BROADCAST_COMMAND[999]} -user -assistant -pin Test yayını</code>
-
 BOT_HELPER: |
   <b>★ {GSTATS_COMMAND}</b> - En İyi 10 Parça Küresel İstatistikleri, Botun En İyi 10 Kullanıcısı, Botun En İyi 10 Sohbeti, Bir Sohbette En Çok Oynatılan 10 Parça vb.
   <b>★ {SUDOUSERS_COMMAND}</b> - Botun Sudo kullanıcılarını kontrol edin.

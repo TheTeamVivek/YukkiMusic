@@ -9,6 +9,7 @@
 #
 
 import asyncio
+import random
 from datetime import datetime, timedelta
 
 from pyrogram import filters
@@ -18,8 +19,9 @@ from pyrogram.raw import types
 
 import config
 from config import adminlist, chatstats, clean, userstats
-from strings import command
+from strings import command, get_command, pick_command
 from YukkiMusic import app
+from YukkiMusic.core.help import ModuleHelp
 from YukkiMusic.utils.database import (
     get_active_chats,
     get_authuser_names,
@@ -289,3 +291,80 @@ async def auto_clean():
 
 
 asyncio.create_task(auto_clean())
+
+# pylint: disable=C0301
+(
+    ModuleHelp("GCast")
+    .name("en", "Broadcast")
+    .add(
+        "en",
+        f"<b>{pick_command('BROADCAST_COMMAND', 'en')} [Message or Reply to any message]</b> » Broadcast a message to served chats of bot\n"
+        "<u>Broadcasting Modes:</u>\n\n"
+        "<b><code>-pin</code></b> » Pins your broadcasted message in served chats\n\n"
+        "<b><code>-pinloud</code></b> » Pins your broadcasted message in served chats and sends notification to the members\n\n"
+        "<b><code>-user</code></b> » Broadcast the message to users who have started your bot [You can also pin the message by adding `-pin` or `-pinloud`]\n\n"
+        "<b><code>-assistant</code></b> » Broadcast your message through all assistants of the bot\n\n"
+        "<b><code>-nobot</code></b> » Ensures that the <b>bot</b> doesn't broadcast the message [Useful when you don't want to broadcast the message to groups]\n\n"
+        f"> <b>Example:</b> <code>/{random.choice(get_command('BROADCAST_COMMAND', 'en'))} -user -assistant -pin Testing broadcast</code>",
+    )
+    .name("ar", "البث")
+    .add(
+        "ar",
+        f"<b>{pick_command('BROADCAST_COMMAND', 'ar')} [رسالة أو الرد على أي رسالة]</b> » بث رسالة إلى الدردشات المقدمة من البوت\n"
+        "<u>أوضاع البث:</u>\n\n"
+        "<b><code>-pin</code></b> » تثبيت الرسالة المذاعة في الدردشات المقدمة\n\n"
+        "<b><code>-pinloud</code></b> » تثبيت الرسالة المذاعة وإرسال إشعار للأعضاء\n\n"
+        "<b><code>-user</code></b> » بث الرسالة للمستخدمين الذين بدأوا البوت [يمكنك أيضًا تثبيت الرسالة بإضافة `-pin` أو `-pinloud`]\n\n"
+        "<b><code>-assistant</code></b> » بث رسالتك من خلال جميع مساعدي البوت\n\n"
+        "<b><code>-nobot</code></b> » التأكد من أن <b>البوت</b> لا يبث الرسالة [مفيد عندما لا ترغب في بث الرسالة إلى المجموعات]\n\n"
+        f"> <b>مثال:</b> <code>/{random.choice(get_command('BROADCAST_COMMAND', 'ar'))} -user -assistant -pin اختبار البث</code>",
+    )
+    .name("hi", "प्रसारण")
+    .add(
+        "hi",
+        f"<b>{pick_command('BROADCAST_COMMAND', 'hi')} [संदेश या किसी भी संदेश का उत्तर]</b> » बॉट द्वारा सेवा किए गए चैट्स में एक संदेश प्रसारित करें\n"
+        "<u>प्रसारण मोड:</u>\n\n"
+        "<b><code>-pin</code></b> » प्रसारित किए गए संदेश को सेवा किए गए चैट्स में पिन करें\n\n"
+        "<b><code>-pinloud</code></b> » प्रसारित किए गए संदेश को पिन करें और सदस्यों को अधिसूचना भेजें\n\n"
+        "<b><code>-user</code></b> » संदेश को उन उपयोगकर्ताओं तक प्रसारित करें जिन्होंने आपके बॉट को शुरू किया है [आप संदेश को पिन करने के लिए `-pin` या `-pinloud` भी जोड़ सकते हैं]\n\n"
+        "<b><code>-assistant</code></b> » अपने संदेश को बॉट के सभी सहायकों के माध्यम से प्रसारित करें\n\n"
+        "<b><code>-nobot</code></b> » सुनिश्चित करता है कि <b>बॉट</b> संदेश को प्रसारित नहीं करता [उपयोगी जब आप संदेश को समूहों में प्रसारित नहीं करना चाहते हैं]\n\n"
+        f"> <b>उदाहरण:</b> <code>/{random.choice(get_command('BROADCAST_COMMAND', 'hi'))} -user -assistant -pin परीक्षण प्रसारण</code>",
+    )
+    .name("as", "প্ৰচাৰ")
+    .add(
+        "as",
+        f"<b>{pick_command('BROADCAST_COMMAND', 'as')} [মেছেজ বা কোনো মেছেজত প্ৰতিক্ৰিয়া]</b> » বটৰ দ্বাৰা পূৰ্বতে সেৱা কৰা চেটসমূহত মেছেজ প্ৰচাৰ কৰক\n"
+        "<u>প্ৰচাৰ মড:</u>\n\n"
+        "<b><code>-pin</code></b> » প্ৰচাৰ কৰা মেছেজ সেৱা কৰা চেটসমূহত পিন কৰক\n\n"
+        "<b><code>-pinloud</code></b> » প্ৰচাৰ কৰা মেছেজ সেৱা কৰা চেটসমূহত পিন কৰক আৰু সদস্যসকলক নিৰ্দেশনা প্ৰেৰণ কৰক\n\n"
+        "<b><code>-user</code></b> » বটে আৰম্ভ কৰা ব্যৱহাৰকাৰীসকললৈ মেছেজ প্ৰচাৰ কৰক [আপুনি `-pin` বা `-pinloud` যোগ কৰি মেছেজ পিন কৰিব পাৰে]\n\n"
+        "<b><code>-assistant</code></b> » আপোনাৰ মেছেজ বটৰ সকলো সহায়কৰ দ্বাৰা প্ৰচাৰ কৰক\n\n"
+        "<b><code>-nobot</code></b> » নিশ্চিত কৰে যে <b>বট</b> মেছেজটো প্ৰচাৰ নকৰে [আপুনি মেছেজটো গোটসমূহলৈ প্ৰচাৰ কৰিবলৈ নাছাহিলে সুবিধাজনক]\n\n"
+        f"> <b>উদাহৰণ:</b> <code>/{random.choice(get_command('BROADCAST_COMMAND', 'as'))} -user -assistant -pin পৰীক্ষা প্ৰচাৰ</code>",
+    )
+    .name("ckb", "بڵاوکردنەوە")
+    .add(
+        "ckb",
+        f"<b>{pick_command('BROADCAST_COMMAND', 'ckb')} [نامە یان وەڵامدانەوەی نامە]</b> » نامەیە بڵاوبکەوە بۆ هەموو گرووپی بۆتەکە\n"
+        "<u>جۆرەکانی ناردن:</u>\n\n"
+        "<b><code>-pin</code></b> » نامەکەت لە گرووپەکان پین بکە\n\n"
+        "<b><code>-pinloud</code></b> » نامەکەت لە گرووپەکان پین بکە و ئاگاداری بنێرە بۆ ئەندامەکان\n\n"
+        "<b><code>-user</code></b> » نامە بڵاوبکەوە بۆ ئەوانەی کە بۆتەکەیان لەلایە [دەتوانیت پەیامەکە پین بکەی، تەنها `pin` یان `-pinloud` بەکارببە]\n\n"
+        "<b><code>-assistant</code></b> » نامەکەت بڵاوبکەوە لە ڕێگەی یاریدەدەری بۆتەکەوە\n\n"
+        "<b><code>-nobot</code></b> » بۆتەکەت وادەکات کە نامەکە بڵاونەکاتەوە [بە سوودە بۆ کاتێک ناتەوێت نامەکە بڵاوبکرێتەوە لە گرووپەکان]\n\n"
+        f"> <b>نموونە:</b> <code>/{random.choice(get_command('BROADCAST_COMMAND', 'ckb'))} -user -assistant -pin تاقیکردنەوەی بڵاوکردنەوە</code>",
+    )
+    .name("tr", "Yayınla")
+    .add(
+        "tr",
+        f"<b>{pick_command('BROADCAST_COMMAND', 'tr')} [Mesaj veya herhangi bir mesaja yanıt]</b> » Botun hizmet verdiği sohbetlere bir mesaj yayınlayın\n"
+        "<u>Yayın Modları:</u>\n\n"
+        "<b><code>-pin</code></b> » Yayınlanan mesajı hizmet verilen sohbetlerde sabitleyin\n\n"
+        "<b><code>-pinloud</code></b> » Yayınlanan mesajı sabitleyin ve üyelere bildirim gönderin\n\n"
+        "<b><code>-user</code></b> » Mesajı botu başlatan kullanıcılara yayınlayın [Mesajı sabitlemek için `-pin` veya `-pinloud` ekleyebilirsiniz]\n\n"
+        "<b><code>-assistant</code></b> » Mesajınızı botun tüm asistanları aracılığıyla yayınlayın\n\n"
+        "<b><code>-nobot</code></b> » <b>Bot</b>'un mesajı yayınlamamasını sağlar [Mesajı gruplara yayınlamak istemediğinizde kullanışlıdır]\n\n"
+        f"> <b>Örnek:</b> <code>/{random.choice(get_command('BROADCAST_COMMAND', 'tr'))} -user -assistant -pin Test yayını</code>",
+    )
+)

@@ -465,21 +465,6 @@ PLAY_HELPER: |
   
   <b>✧ {STREAM_COMMAND}</b> - Stream a URL that you believe is direct or m3u8 that can't be played by /play.
 
-GCAST_HELPER: |
-  <b>{BROADCAST_COMMAND} [Message or Reply to any message]</b> » Broadcast a message to served chats of bot
-  <u>Broadcasting Modes:</u>
-  
-  <b><code>-pin</code></b> » Pins your broadcasted message in served chats
-  
-  <b><code>-pinloud</code></b> » Pins your broadcasted message in served chats and sends notification to the members
-  
-  <b><code>-user</code></b> » Broadcast the message to users who have started your bot [You can also pin the message by adding `-pin` or `-pinloud`]
-  
-  <b><code>-assistant</code></b> » Broadcast your message through all assistants of the bot
-  
-  <b><code>-nobot</code></b> » Ensures that the **bot** doesn't broadcast the message [Useful when you don't want to broadcast the message to groups]
-  
-  > <b>Example:</b> <code>{BROADCAST_COMMAND[999]} -user -assistant -pin Testing broadcast</code>
 
 BOT_HELPER: |
   <b>★ {GSTATS_COMMAND}</b> - Get Top 10 Tracks Global Stats, Top 10 Users of Bot, Top 10 Chats on Bot, Top 10 Played in a chat, etc.

@@ -8,6 +8,8 @@
 # All rights reserved.
 #
 
+# pylint: disable=missing-module-docstring, missing-function-docstring
+
 from pykeyboard import InlineKeyboard
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, Message
@@ -46,10 +48,10 @@ def lanuages_keyboard(_):
 
 @app.on_message(command("LANGUAGE_COMMAND") & filters.group & ~BANNED_USERS)
 @language
-async def langs_command(_, message: Message, lng):
-    keyboard = lanuages_keyboard(lng)
+async def langs_command(_, message: Message, lang):
+    keyboard = lanuages_keyboard(lang)
     await message.reply_text(
-        lng["lang_1"],
+        lang["lang_1"],
         reply_markup=keyboard,
     )
 
