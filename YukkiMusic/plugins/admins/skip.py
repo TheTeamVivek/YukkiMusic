@@ -14,9 +14,10 @@ from pyrogram.types import InlineKeyboardMarkup, Message
 
 import config
 from config import BANNED_USERS
-from strings import command
+from strings import command, pick_commands
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
+from YukkiMusic.core.help import ModuleHelp
 from YukkiMusic.misc import db
 from YukkiMusic.platforms import saavn, youtube
 from YukkiMusic.utils import fallback
@@ -255,3 +256,50 @@ async def skip(cli, message: Message, _, chat_id):
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "stream"
+
+
+(
+    ModuleHelp("Admins")
+    .name("en", "Admins")
+    .add(
+        "en",
+        f"<b>✧ {pick_commands('SKIP_COMMAND', 'en')}</b> - Skip the current playing music.\n"
+        f"<b>✧ {pick_commands('SKIP_COMMAND', 'en')} [Number]</b> - Skip to a specific track in queue. Example: <code>/skip 3</code> will skip first 2 tracks.",
+        priority=17,
+    )
+    .name("ar", "المسؤولين")
+    .add(
+        "ar",
+        f"<b>✧ {pick_commands('SKIP_COMMAND', 'ar')}</b> - تخطي الموسيقى التي يتم تشغيلها حاليًا.\n"
+        f"<b>✧ {pick_commands('SKIP_COMMAND', 'ar')} [رقم]</b> - تخطي إلى رقم معين في قائمة الانتظار. مثال: <code>/skip 3</code> سيتخطى أول مقطعين.",
+        priority=17,
+    )
+    .name("as", "প্ৰশাসক")
+    .add(
+        "as",
+        f"<b>✧ {pick_commands('SKIP_COMMAND', 'as')}</b> - বৰ্তমান বজাই থকা সংগীতটো এৰক।\n"
+        f"<b>✧ {pick_commands('SKIP_COMMAND', 'as')} [সংখ্যা]</b> - কিউৰ নিৰ্দিষ্ট স্থানলৈ এৰক। উদাহৰণ: <code>/skip 3</code> এ প্ৰথম 2 টা সংগীত এৰি দিব।",
+        priority=17,
+    )
+    .name("hi", "प्रशासक")
+    .add(
+        "hi",
+        f"<b>✧ {pick_commands('SKIP_COMMAND', 'hi')}</b> - वर्तमान में चल रहे संगीत को छोड़ें।\n"
+        f"<b>✧ {pick_commands('SKIP_COMMAND', 'hi')} [संख्या]</b> - कतार में किसी विशेष गाने तक छोड़ें। उदाहरण: <code>/skip 3</code> पहले दो गानों को छोड़ देगा।",
+        priority=17,
+    )
+    .name("ku", "بەڕێوەبەرەکان")
+    .add(
+        "ku",
+        f"<b>✧ {pick_commands('SKIP_COMMAND', 'ku')}</b> - گۆرانییە ناوەڕاستەکە بپارێزە.\n"
+        f"<b>✧ {pick_commands('SKIP_COMMAND', 'ku')} [ژمارە]</b> - بپارێزە بۆ گۆرانییە دیاری کراوەکە. نموونە: <code>/skip 3</code> دوایین دوو گۆرانی دەجێتەوە.",
+        priority=17,
+    )
+    .name("tr", "Yöneticiler")
+    .add(
+        "tr",
+        f"<b>✧ {pick_commands('SKIP_COMMAND', 'tr')}</b> - Çalan müziği atla.\n"
+        f"<b>✧ {pick_commands('SKIP_COMMAND', 'tr')} [Sayı]</b> - Sıradaki belirli şarkıya atla. Örnek: <code>/skip 3</code> ilk iki şarkıyı atlar.",
+        priority=17,
+    )
+)

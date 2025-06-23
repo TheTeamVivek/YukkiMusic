@@ -16,6 +16,18 @@ class ModuleHelp:
         self.module = module
         HELP_DATA.setdefault(module, {"names": {}, "entries": {}})
 
+    def __call__(self, module: str):
+        """
+        Allows calling the instance to create a new ModuleHelp for another module.
+
+        Args:
+            module (str): New module name to register
+
+        Returns:
+            ModuleHelp: New instance for the new module
+        """
+        return ModuleHelp(module)
+
     def name(self, lang: str, text: str):
         """
         Set the localized display name for this module.

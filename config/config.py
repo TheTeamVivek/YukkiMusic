@@ -52,7 +52,7 @@ MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
 
 # You'll need a Group ID or USERNAME for this.
-LOG_GROUP_ID = getenv("LOG_GROUP_ID", "").strip()
+LOG_GROUP_ID = getenv("LOG_GROUP_ID", "").strip()  # pylint: disable=invalid-name
 
 # Your User ID.
 OWNER_ID = list(

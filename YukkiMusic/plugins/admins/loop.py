@@ -12,10 +12,12 @@ from pyrogram import filters
 from pyrogram.types import Message
 
 from config import BANNED_USERS
-from strings import command
+from strings import command, pick_commands
 from YukkiMusic import app
 from YukkiMusic.utils.database.memorydatabase import get_loop, set_loop
 from YukkiMusic.utils.decorators import AdminRightsCheck
+
+from . import mhelp
 
 
 @app.on_message(command("LOOP_COMMAND") & filters.group & ~BANNED_USERS)
@@ -49,3 +51,37 @@ async def admins(cli, message: Message, _, chat_id):
         return await message.reply_text(_["loop_4"])
     else:
         return await message.reply_text(usage)
+
+
+(
+    mhelp.add(
+        "en",
+        f"<b>✧ {pick_commands('LOOP_COMMAND', 'en')}</b> [Enable/Disable or 1–10] - Loop the current track either continuously or a specific number of times (1–10).",
+        priority=12,
+    )
+    .add(
+        "ar",
+        f"<b>✧ {pick_commands('LOOP_COMMAND', 'ar')}</b> [Enable/Disable أو 1–10] - تكرار المسار الحالي إما بشكل مستمر أو عدد محدد من المرات (1–10).",
+        priority=12,
+    )
+    .add(
+        "as",
+        f"<b>✧ {pick_commands('LOOP_COMMAND', 'as')}</b> [Enable/Disable বা 1–10] - বৰ্তমান সংগীতটো অনবরত বা 1-10 বাৰ লুপ কৰক।",
+        priority=12,
+    )
+    .add(
+        "hi",
+        f"<b>✧ {pick_commands('LOOP_COMMAND', 'hi')}</b> [Enable/Disable या 1–10] - वर्तमान ट्रैक को निरंतर या 1-10 बार दोहराएं।",
+        priority=12,
+    )
+    .add(
+        "ku",
+        f"<b>✧ {pick_commands('LOOP_COMMAND', 'ku')}</b> [Enable/Disable یان ١–١٠] - گۆرانییەکە بەردەوام یان ١–١٠ جار دووبارە بکەوە.",
+        priority=12,
+    )
+    .add(
+        "tr",
+        f"<b>✧ {pick_commands('LOOP_COMMAND', 'tr')}</b> [Enable/Disable veya 1–10] - Geçerli parçayı sürekli veya 1–10 kez döngüye al.",
+        priority=12,
+    )
+)

@@ -466,27 +466,6 @@ gban_11 : "GBANLANMIŞ KULLANICILAR LİSTESİ ALINIYOR..."
 
 # Helpers
 
-AUTH_HELPER: |
-  <b>Yetkili kullanıcılar, sohbetinizde yönetici hakları olmadan yönetici komutlarını kullanabilir.</b>
-  <b>✧ {AUTH_COMMAND}</b> [Kullanıcı adı] - Kullanıcıyı grubun YETKİLİ listesine ekleyin.
-  <b>✧ {UNAUTH_COMMAND}</b> [Kullanıcı adı] - Kullanıcıyı grubun YETKİLİ listesinden çıkarın.
-  <b>✧ {AUTHUSERS_COMMAND}</b> - Grubun YETKİLİ listesini kontrol edin.
-
-ADMIN_HELPER: |
-  <b>c, kanal oynatmayı ifade eder</b>
-  <b>✧ {PAUSE_COMMAND}</b> - Çalan müziği duraklatın.
-  <b>✧ {RESUME_COMMAND}</b> - Duraklatılmış müziği devam ettirin.
-  <b>✧ {MUTE_COMMAND}</b> - Çalan müziğin sesini kapatın.
-  <b>✧ {UNMUTE_COMMAND}</b> - Sessiz müziği tekrar açın.
-  <b>✧ {SKIP_COMMAND}</b> - Şu anda çalan müziği atlayın.
-  <b>✧ {STOP_COMMAND}</b> - Çalan müziği durdurun.
-  <b>✧ {SHUFFLE_COMMAND}</b> - Kuyruktaki çalma listesini/şarkıları rastgele karıştırın.
-  <b>✧ {SEEK_COMMAND}</b> - Müziği ileri sarın.
-  <b>✧ {SEEK_BACK_COMMAND}</b> - Müziği geriye sararak belirtilen süreye dönün.
-  <b>✧ {REBOOT_COMMAND}</b> - Botu sohbetiniz için yeniden başlatın.
-  <b>✧ {SKIP_COMMAND}</b> [Sayı (Örnek: 3)] - Müziği belirli bir sıraya atlayın. Örnek: <b>/skip 3</b>, üçüncü sıradaki müziğe atlayacak ve 1 ile 2'yi geçecektir.
-  <b>✧ {LOOP_COMMAND}</b> [enable/disable] veya [1-10 arasında bir sayı] - Etkinleştirildiğinde, bot mevcut müziği sesli sohbette 1-10 kez tekrar eder. Varsayılan döngü değeri 10'dur.
-
 PLAY_HELPER: |
   <b>✧ {PLAY_COMMAND}</b> - Bot, verilen sorguyu sesli sohbette çalmaya veya canlı bağlantıları yayınlamaya başlar.
   <b>✧ {PLAYMODE_COMMAND}</b> - Zorla Çalma, mevcut çalan parçayı durdurur ve aranan parçayı hemen çalmaya başlar, kuyruğu rahatsız etmeden/silmeden.

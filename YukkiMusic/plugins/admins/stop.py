@@ -11,10 +11,11 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from config import BANNED_USERS, EXTRA_PLUGINS, adminlist
-from strings import command, get_string
+from strings import command, get_string, pick_commands
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
-from YukkiMusic.misc import SUDOERS
+from YukkiMusic.core.help import ModuleHelp
+from YukkiMusic.misc import SUDOERS, db
 from YukkiMusic.utils.database import (
     delete_filter,
     get_cmode,
@@ -96,3 +97,44 @@ async def stop_music(cli, message: Message):
     await Yukki.stop_stream(chat_id)
     await set_loop(chat_id, 0)
     await message.reply_text(_["stop_1"].format(message.from_user.mention))
+
+
+(
+    ModuleHelp("Admins")
+    .name("en", "Admins")
+    .add(
+        "en",
+        f"<b>✧ {pick_commands('STOP_COMMAND', 'en')}</b> - Stop the currently playing music and clear the queue.",
+        priority=16,
+    )
+    .name("ar", "المسؤولين")
+    .add(
+        "ar",
+        f"<b>✧ {pick_commands('STOP_COMMAND', 'ar')}</b> - إيقاف تشغيل الموسيقى الحالية ومسح قائمة الانتظار.",
+        priority=16,
+    )
+    .name("as", "প্ৰশাসক")
+    .add(
+        "as",
+        f"<b>✧ {pick_commands('STOP_COMMAND', 'as')}</b> - বৰ্তমান সংগীত ৰখাওক আৰু কিউ পৰিষ্কাৰ কৰক।",
+        priority=16,
+    )
+    .name("hi", "प्रशासक")
+    .add(
+        "hi",
+        f"<b>✧ {pick_commands('STOP_COMMAND', 'hi')}</b> - वर्तमान में चल रहे संगीत को बंद करें और कतार को साफ़ करें।",
+        priority=16,
+    )
+    .name("ku", "بەڕێوەبەرەکان")
+    .add(
+        "ku",
+        f"<b>✧ {pick_commands('STOP_COMMAND', 'ku')}</b> - گۆرانییە چالاکەکە وەستا و ڕیزبەندییەکە پاک بکەوە.",
+        priority=16,
+    )
+    .name("tr", "Yöneticiler")
+    .add(
+        "tr",
+        f"<b>✧ {pick_commands('STOP_COMMAND', 'tr')}</b> - Çalan müziği durdur ve sırayı temizle.",
+        priority=16,
+    )
+)

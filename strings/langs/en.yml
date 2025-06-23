@@ -429,32 +429,6 @@ SA_B_8 : "🤖 Bot Stats"
 QU_B_1: "📋 Queued list"
 QU_B_2: "▶️ Played {0} out of {1} mins"
 
-AUTH_HELPER: |
-  <b>Auth Users can use Admin commands without admin rights in your chat.</b>
-  
-  <b>✧ {AUTH_COMMAND}</b> [Username] - Add a user to AUTH LIST of the Group.
-  
-  <b>✧ {UNAUTH_COMMAND}</b> [Username] - Remove a user from AUTH LIST of the group.
-  
-  <b>✧ {AUTHUSERS_COMMAND}</b> - Check AUTH LIST of the Group.
-
-ADMIN_HELPER: |
-  <b>c stands for channel play</b>
-  
-  <b>✧ {PAUSE_COMMAND}</b> - Pause the playing music.
-  <b>✧ {RESUME_COMMAND}</b> - Resume the paused music.
-  <b>✧ {MUTE_COMMAND}</b> - Mute the playing music.
-  <b>✧ {UNMUTE_COMMAND}</b> - Unmute the muted music.
-  <b>✧ {SKIP_COMMAND}</b> - Skip the current playing music.
-  <b>✧ {STOP_COMMAND}</b> - Stop the playing music.
-  <b>✧ {SHUFFLE_COMMAND}</b> - Randomly shuffle the queued playlist/songs.
-  <b>✧ {SEEK_COMMAND}</b> - Forward seek the music.
-  <b>✧ {SEEK_BACK_COMMAND}</b> - Backward seek the music to your duration.
-  <b>✧ {REBOOT_COMMAND}</b> - Reboot bot for your chat.
-  
-  <b>✧ {SKIP_COMMAND}</b> [Number (Example: 3)] - Skip music to a specific number. Example: <b>/skip 3</b> will skip to the third queued music and will ignore 1 and 2 in the queue.
-  
-  <b>✧ {LOOP_COMMAND}</b> [Enable/Disable] or [Number between 1-10] - When activated, the bot will loop the current music 1-10 times in voice chat. Default loop value is 10 times.
 
 PLAY_HELPER: |
   <b>✧ {PLAY_COMMAND}</b> - Bot will start playing your given query on voice chat or stream live links on voice chats.

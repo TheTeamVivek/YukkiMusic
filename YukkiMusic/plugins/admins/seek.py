@@ -11,12 +11,14 @@ from pyrogram import filters
 from pyrogram.types import Message
 
 from config import BANNED_USERS
-from strings import command
+from strings import command, pick_commands
 from YukkiMusic import app
 from YukkiMusic.core.call import Yukki
 from YukkiMusic.misc import db
 from YukkiMusic.platforms import youtube
 from YukkiMusic.utils import AdminRightsCheck, seconds_to_min
+
+from . import mhelp
 
 
 @app.on_message(
@@ -73,3 +75,43 @@ async def seek_comm(cli, message: Message, _, chat_id):
     else:
         db[chat_id][0]["played"] += duration_to_skip
     await mystic.edit_text(_["seek_6"].format(seconds_to_min(to_seek)))
+
+
+(
+    mhelp.add(
+        "en",
+        f"<b>✧ {pick_commands('SEEK_COMMAND', 'en')}</b> - Forward seek the current track.\n"
+        f"<b>✧ {pick_commands('SEEK_BACK_COMMAND', 'en')}</b> - Rewind the current track to a previous point.",
+        priority=14,
+    )
+    .add(
+        "ar",
+        f"<b>✧ {pick_commands('SEEK_COMMAND', 'ar')}</b> - تقديم المسار الحالي.\n"
+        f"<b>✧ {pick_commands('SEEK_BACK_COMMAND', 'ar')}</b> - إرجاع المسار الحالي إلى نقطة سابقة.",
+        priority=14,
+    )
+    .add(
+        "as",
+        f"<b>✧ {pick_commands('SEEK_COMMAND', 'as')}</b> - বৰ্তমান সংগীত আগবঢ়াওক।\n"
+        f"<b>✧ {pick_commands('SEEK_BACK_COMMAND', 'as')}</b> - সংগীতক পুৰণি সময়লৈ পিচলৈ আনক।",
+        priority=14,
+    )
+    .add(
+        "hi",
+        f"<b>✧ {pick_commands('SEEK_COMMAND', 'hi')}</b> - वर्तमान ट्रैक को आगे बढ़ाएं।\n"
+        f"<b>✧ {pick_commands('SEEK_BACK_COMMAND', 'hi')}</b> - ट्रैक को पहले की स्थिति पर पीछे करें।",
+        priority=14,
+    )
+    .add(
+        "ku",
+        f"<b>✧ {pick_commands('SEEK_COMMAND', 'ku')}</b> - گۆرانییەکە بەرامبەر بگەڕێنەوە.\n"
+        f"<b>✧ {pick_commands('SEEK_BACK_COMMAND', 'ku')}</b> - گۆرانییەکە بگەڕێنەوە بۆ خاڵێکی پێشوو.",
+        priority=14,
+    )
+    .add(
+        "tr",
+        f"<b>✧ {pick_commands('SEEK_COMMAND', 'tr')}</b> - Çalan şarkıyı ileri sar.\n"
+        f"<b>✧ {pick_commands('SEEK_BACK_COMMAND', 'tr')}</b> - Şarkıyı geri sar.",
+        priority=14,
+    )
+)
