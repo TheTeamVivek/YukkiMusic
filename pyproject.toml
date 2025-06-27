@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "YukkiMusic"
+name = "yukkimusic"
 version = "1.5.0"
-description = "This is YukkiMusic an updated version of YukkiMusicBot for streaming in Telegram voice chats."
+description = "This is yukkimusic an updated version of yukkimusicBot for streaming in Telegram voice chats."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
@@ -52,12 +52,12 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["YukkiMusic", "config", "strings"]
+include = ["yukkimusic", "config", "strings"]
 
 [project.urls]
-Repository = "https://github.com/TheTeamVivek/YukkiMusic"
-Issues = "https://github.com/TheTeamVivek/YukkiMusic/issues"
-Changelog = "https://github.com/TheTeamVivek/YukkiMusic/blob/master/CHANGELOG.md"
+Repository = "https://github.com/TheTeamVivek/yukkimusic"
+Issues = "https://github.com/TheTeamVivek/yukkimusic/issues"
+Changelog = "https://github.com/TheTeamVivek/yukkimusic/blob/master/CHANGELOG.md"
 
 [project.scripts]
-yukkimusic = "YukkiMusic.__main__:main"
+yukkimusic = "yukkimusic.__main__:main"

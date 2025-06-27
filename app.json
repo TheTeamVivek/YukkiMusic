@@ -1,13 +1,13 @@
 {
-    "name": "YukkiMusic",
+    "name": "yukkimusic",
     "description": "Telegram Group Calls streaming bot with some useful features, written in Python with Pyrogram and Py-Tgcalls. Supporting platforms like Youtube, Spotify, Resso, AppleMusic, Soundcloud and M3u8 Links.",
     "logo": "https://graph.org/file/c0e014ff34f34d1056627.png",
     "keywords": [
     "python3",
     "telegram",
     "bot",
-    "Yukki",
-    "YukkiMusicBot",
+    "yukki",
+    "yukkimusicBot",
     "telegram-bot",
     "pyrogram"
     ],
@@ -35,7 +35,7 @@
         "required": false
       },
       "MONGO_DB_URI": {
-        "description": "Get a mongodb url from https://cloud.mongodb.com . You can leave it blank if you want , bot will use Yukki's database for you.",
+        "description": "Get a mongodb url from https://cloud.mongodb.com . You can leave it blank if you want , bot will use yukki's database for you.",
         "value": "",
         "required": false
       },
@@ -66,7 +66,7 @@
       },
       "UPSTREAM_REPO": {
         "description": "If you dont know this, Leave as it is",
-        "value": "https://github.com/TheTeamVivek/YukkiMusic",
+        "value": "https://github.com/TheTeamVivek/yukkimusic",
         "required": true
       },
       "UPSTREAM_BRANCH": {

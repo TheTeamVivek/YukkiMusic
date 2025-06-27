@@ -1,22 +1,22 @@
-# 🎵 **YukkiMusic** 🎶
+# 🎵 **yukkimusic** 🎶
 
-[**YukkiMusic**](https://github.com/TheTeamVivek/YukkiMusic) is a powerful, enhanced version of the original [**YukkiMusicBot**](https://github.com/TeamYukki/YukkiMusicBot), designed for seamless, high-quality music streaming in Telegram voice chats. Built with **Python** and **Pyrogram**, it offers a robust and user-friendly experience for music lovers and bot developers alike. 🚀
+[**yukkimusic**](https://github.com/TheTeamVivek/yukkimusic) is a powerful, enhanced version of the original [**yukkimusicBot**](https://github.com/Teamyukki/yukkimusicBot), designed for seamless, high-quality music streaming in Telegram voice chats. Built with **Python** and **Pyrogram**, it offers a robust and user-friendly experience for music lovers and bot developers alike. 🚀
 
 
 ## ⚙️ Configuration
 
-Need help setting up? Check out our detailed configuration guide: [**Configuration Instructions**](https://github.com/TheTeamVivek/YukkiMusic/blob/master/config/README.md).
+Need help setting up? Check out our detailed configuration guide: [**Configuration Instructions**](https://github.com/TheTeamVivek/yukkimusic/blob/master/config/README.md).
 
 > [!TIP]
 > **Looking to use cookies for authentication?**  
-> See: [**Using Cookies for Authentication**](https://github.com/TheTeamVivek/YukkiMusic/blob/master/config/README.md#using-cookies-for-authentication)
+> See: [**Using Cookies for Authentication**](https://github.com/TheTeamVivek/yukkimusic/blob/master/config/README.md#using-cookies-for-authentication)
 
 ## Quick Deployment Options
 
 ## Deploy on Heroku
 Get started quickly by deploying to Heroku with just one click:
 
-<a href="https://dashboard.heroku.com/new?template=https://github.com/TheTeamVivek/YukkiMusic">
+<a href="https://dashboard.heroku.com/new?template=https://github.com/TheTeamVivek/yukkimusic">
   <img src="https://img.shields.io/badge/Deploy%20To%20Heroku-red?style=for-the-badge&logo=heroku" width="200"/>
 </a>
 
@@ -35,7 +35,7 @@ Get started quickly by deploying to Heroku with just one click:
 
 - **Clone the Repository:**  
   ```bash
-  git clone https://github.com/TheTeamVivek/YukkiMusic && cd YukkiMusic
+  git clone https://github.com/TheTeamVivek/yukkimusic && cd yukkimusic
   ```
   
 
@@ -73,7 +73,7 @@ Get started quickly by deploying to Heroku with just one click:
 
 We're here to help you every step of the way! Reach out through:
 
-- **📝 GitHub Issues**: Report bugs or ask questions by [**opening an issue**](https://github.com/TheTeamVivek/YukkiMusic/issues/new?assignees=&labels=question&title=support).
+- **📝 GitHub Issues**: Report bugs or ask questions by [**opening an issue**](https://github.com/TheTeamVivek/yukkimusic/issues/new?assignees=&labels=question&title=support).
 
 - **💬 Telegram Support**: Connect with us on [**Telegram**](https://t.me/TheTeamVk).
 
@@ -82,25 +82,25 @@ We're here to help you every step of the way! Reach out through:
 
 
 ## ⭐ Support the Original
-Show your love for the project that started it all! If you're using or forking **YukkiMusic**, please **star** the original repository: [**⭐ YukkiMusicBot**](https://github.com/TeamYukki/YukkiMusicBot)
+Show your love for the project that started it all! If you're using or forking **yukkimusic**, please **star** the original repository: [**⭐ yukkimusicBot**](https://github.com/Teamyukki/yukkimusicBot)
 
 
 ## ❣️ Show Your Support
 
-Love YukkiMusic? Help us grow the project with these simple actions:
+Love yukkimusic? Help us grow the project with these simple actions:
 
-- **⭐ Star the Original:** Give a star to [**YukkiMusicBot**](https://github.com/TeamYukki/YukkiMusicBot).
+- **⭐ Star the Original:** Give a star to [**yukkimusicBot**](https://github.com/Teamyukki/yukkimusicBot).
   
-- **🍴 Fork & Contribute**: Dive into the code and contribute to [**YukkiMusic**](https://github.com/TheTeamVivek/YukkiMusic).
+- **🍴 Fork & Contribute**: Dive into the code and contribute to [**yukkimusic**](https://github.com/TheTeamVivek/yukkimusic).
 
 - **📢 Spread the Word**: Share your experience on [**Dev.to**](https://dev.to/), [**Medium**](https://medium.com/), or your personal blog.
 
-Together, we can make **YukkiMusic** and **YukkiMusicBot** even better!
+Together, we can make **yukkimusic** and **yukkimusicBot** even better!
 
 ## 🙏 Acknowledgments 
 
-A huge thank you to [**Team Yukki**](https://github.com/TeamYukki) for creating the original [**YukkiMusicBot**](https://github.com/TeamYukki/YukkiMusicBot), the foundation of this project. Though the original is now inactive, its legacy lives on.
+A huge thank you to [**Team yukki**](https://github.com/Teamyukki) for creating the original [**yukkimusicBot**](https://github.com/Teamyukki/yukkimusicBot), the foundation of this project. Though the original is now inactive, its legacy lives on.
 
-Special gratitude to [**Pranav-Saraswat**](https://github.com/Pranav-Saraswat) for reviving the project with [**YukkiMusicFork**](https://github.com/Pranav-Saraswat/YukkiMusicFork) (now deleted), which inspired YukkiMusic.
+Special gratitude to [**Pranav-Saraswat**](https://github.com/Pranav-Saraswat) for reviving the project with [**yukkimusicFork**](https://github.com/Pranav-Saraswat/yukkimusicFork) (now deleted), which inspired yukkimusic.
 
-**YukkiMusic** is an imported and enhanced version of the now-deleted **YukkiMusicFork**, with ongoing improvements to deliver the best music streaming experience.
+**yukkimusic** is an imported and enhanced version of the now-deleted **yukkimusicFork**, with ongoing improvements to deliver the best music streaming experience.

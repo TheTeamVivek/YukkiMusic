@@ -1,11 +1,11 @@
 #!/bin/bash
 
 RED='\033[1;31m'; GREEN='\033[1;32m'; CYAN='\033[1;36m'; RESET='\033[0m'
-REPO="https://github.com/TheTeamVivek/YukkiMusic"
+REPO="https://github.com/TheTeamVivek/yukkimusic"
 FOLDER="yukki"
 
 if ! command -v sudo &> /dev/null || ! sudo -n true 2>/dev/null; then
-  echo -e "${RED}[✖] YukkiMusic requires sudo privileges.${RESET}"
+  echo -e "${RED}[✖] yukkimusic requires sudo privileges.${RESET}"
   exit 1
 fi
 
@@ -72,7 +72,7 @@ if [ ! -d .git ]; then
     rm -rf "$FOLDER"
   fi
   if [ ! -d "$FOLDER/.git" ]; then
-    echo -e "${CYAN}[~] Cloning YukkiMusic...${RESET}"
+    echo -e "${CYAN}[~] Cloning yukkimusic...${RESET}"
     git clone "$REPO" "$FOLDER" >/dev/null 2>&1 || {
       echo -e "${RED}[✖] Failed to clone repo.${RESET}"
       exit 1

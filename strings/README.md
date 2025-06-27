@@ -1,29 +1,29 @@
-# Yukki Multi-Language Support
+# yukki Multi-Language Support
 
-- The following languages are currently supported in YukkiMusic. You can edit or change all strings available.
+- The following languages are currently supported in yukkimusic. You can edit or change all strings available.
 
 | Code | Language | Contributor |
 |------|----------|-------------|
-| en   | English  | Thanks to [TeamYukki](https://t.me/TeamYukki) |
+| en   | English  | Thanks to [Teamyukki](https://t.me/Teamyukki) |
 | ku   | Kurdish  | Thanks to [Mohammed](https://t.me/IQ7amo) |
-| hi   | Hindi    | Thanks to [TeamYukki](https://t.me/TeamYukki) |
+| hi   | Hindi    | Thanks to [Teamyukki](https://t.me/Teamyukki) |
 | ar   | Arabic   | Thanks to [Mustafa](https://t.me/tr_4z) |
-| tr   | Turkish  | Thanks to [TeamYukki](https://t.me/TeamYukki) |
+| tr   | Turkish  | Thanks to [Teamyukki](https://t.me/Teamyukki) |
 | as   | Assamese | Thanks to [Mungnem Chiranji](https://t.me/ChiranjibKoch) |
 
 ---
 
-### Help Us Add More Languages to YukkiMusic! How to Contribute?
+### Help Us Add More Languages to yukkimusic! How to Contribute?
 
 1. Translate using the enhanced web-based translator  
-   Use [**TranslateIt**](https://vivekkumar-in.github.io/translateit), an enhanced web-based translator created with the help of [**lovable AI ❤️**](https://loveable.dev) — to easily and quickly translate YukkiMusic without editing files manually.
+   Use [**TranslateIt**](https://vivekkumar-in.github.io/translateit), an enhanced web-based translator created with the help of [**lovable AI ❤️**](https://loveable.dev) — to easily and quickly translate yukkimusic without editing files manually.
 
 ---
 
 If you prefer manual translation, follow the steps below:
 
 1. **Edit the language file manually**  
-   Start by editing the [`en.yml`](https://github.com/TheTeamVivek/YukkiMusic/blob/master/strings%2Flangs%2Fen.yml) file, which contains the English language strings. Translate it into your language.
+   Start by editing the [`en.yml`](https://github.com/TheTeamVivek/yukkimusic/blob/master/strings%2Flangs%2Fen.yml) file, which contains the English language strings. Translate it into your language.
 
 2. **Submit your translation**  
    Once you've completed your translation, send the edited file to us at [@TheTeamVk](https://t.me/TheTeamVk) or open a pull request in our GitHub repository.
@@ -88,5 +88,5 @@ Save your changes in the same `commands.yml` file and include it when you submit
 
 ---
 
-By contributing to YukkiMusic translations, you help make it accessible to more users around the world.  
+By contributing to yukkimusic translations, you help make it accessible to more users around the world.  
 **Thank you for your support! ❤️**
