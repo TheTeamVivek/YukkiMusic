@@ -23,7 +23,7 @@ jobs:
 
       - name: update
         run: |
-          uv sync --refresh --locked
+          uv sync --refresh # --locked
           uv pip list --outdated --format json | jq -c '.[]' | while read -r p; do
             n=$(echo "$p" | jq -r '.name')
             v=$(echo "$p" | jq -r '.latest_version')
