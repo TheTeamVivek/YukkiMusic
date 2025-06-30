@@ -47,7 +47,7 @@ class Userbot:
         self.handlers = []
 
     async def _start(self, client, index):
-        logger.info(f"Starting Assistant Client {index}")
+        logger.info("Starting Assistant Client: %d", index)
         try:
             await client.start()
             assistants.append(index)
@@ -59,8 +59,9 @@ class Userbot:
                     await client.send_message(config.LOG_GROUP_ID, "Assistant Started")
                 except Exception:
                     logger.error(
-                        f"Assistant Account {index} failed to send message in log group. "
-                        f"Ensure the assistant is added to the log group."
+                        "Assistant Account %d failed to send message in log group. "
+                        "Ensure the assistant is added to the log group.",
+                        index,
                     )
                     sys.exit(1)
 
@@ -77,7 +78,9 @@ class Userbot:
 
         except Exception as e:
             logger.error(
-                f"Assistant Account {index} failed with error: {str(e)}. Exiting..."
+                "Assistant Account %d failed with error: %s\n. Exiting...",
+                index,
+                str(e),
             )
             sys.exit(1)
 
@@ -102,7 +105,8 @@ class Userbot:
                 try:
                     await func(client, message)
                 except FloodWait as e:
-                    logger.warning(f"FloodWait: Sleeping for {e.value} seconds.")
+
+                    logger.warning("FloodWait: Sleeping for %d seconds.", e.value)
                     await asyncio.sleep(e.value)
                 except (
                     ChatWriteForbidden,

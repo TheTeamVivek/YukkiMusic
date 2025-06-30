@@ -26,9 +26,10 @@ logger = logging.getLogger(__name__)
 class YukkiBot(Client):
     def __init__(self, *args, **kwargs):
         logger.info("Starting Bot...")
-
         super().__init__(
             "yukkimusic",
+            *args,
+            **kwargs,
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             bot_token=config.BOT_TOKEN,
@@ -39,7 +40,7 @@ class YukkiBot(Client):
         )
         self.loaded_plug_counts = 0
 
-    def on_message(self, filters=None, group=0):
+    def on_message(self, filters=None, group=0):  # pylint: disable=signature-differs
         def decorator(func):
             @wraps(func)
             async def wrapper(client, message):
@@ -49,7 +50,7 @@ class YukkiBot(Client):
                     else:
                         func(client, message)
                 except errors.FloodWait as e:
-                    logger.warning(f"FloodWait: Sleeping for {e.value} seconds.")
+                    logger.warning("FloodWait: Sleeping for %d seconds.", e.value)
                     await asyncio.sleep(e.value)
                 except (
                     errors.ChatWriteForbidden,
@@ -72,14 +73,15 @@ class YukkiBot(Client):
                     )
                     command = message.text
                     error_trace = traceback.format_exc()
+                    p_fmt = "<b>{0}:</b>\n<pre language='python'><code>{1}</code></pre>"
                     error_message = (
                         f"<b>Error:</b> {type(e).__name__}\n"
                         f"<b>Date:</b> {date_time}\n"
                         f"<b>Chat ID:</b> {chat_id}\n"
                         f"<b>Chat Username:</b> {chat_username}\n"
                         f"<b>User ID:</b> {user_id}\n"
-                        f"<b>Command/Text:</b>\n<pre language='python'><code>{command}</code></pre>\n\n"
-                        f"<b>Traceback:</b>\n<pre language='python'><code>{error_trace}</code></pre>"
+                        f"{p_fmt.format('Message', command)}\n\n"
+                        f"{p_fmt.format('Traceback', error_trace)}\n\n"
                     )
                     await self.send_message(config.LOG_GROUP_ID, error_message)
                     try:
@@ -93,9 +95,11 @@ class YukkiBot(Client):
 
         return decorator
 
-    async def start(self):
-        await super().start()
+    async def start(self, *args, **kwargs):
+        await super().start(*args, **kwargs)
         get_me = await self.get_me()
+        # pylint: disable=attribute-defined-outside-init
+        self.me = get_me
         self.username = get_me.username
         self.id = get_me.id
         self.name = get_me.full_name
