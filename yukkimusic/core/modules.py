@@ -32,6 +32,7 @@ class LoaderContext:
     userbot: Userbot
     mongodb: AsyncDatabase
     help: ModuleHelp
+    config: config
 
 
 def _setup_logger(name: str):

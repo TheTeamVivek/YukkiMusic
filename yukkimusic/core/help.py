@@ -67,22 +67,6 @@ class ModuleHelp:
         return self
 
 
-def get_module_name(module: str, lang: str = "en") -> str | None:
-    """
-    Get the localized module name.
-
-    Args:
-        module (str): Module key
-        lang (str): Preferred language
-
-    Returns:
-        str | None: Localized name or fallback
-    """
-    return HELP_DATA.get(module, {}).get("names", {}).get(lang) or HELP_DATA.get(
-        module, {}
-    ).get("names", {}).get("en")
-
-
 def get_help(module: str, lang: str = "en", sort: bool = True) -> list[dict] | None:
     """
     Get help entries for a module.
@@ -118,21 +102,3 @@ def render_help(module: str, lang: str = "en") -> str | None:
     if not entries:
         return None
     return "\n".join(entry["text"] for entry in entries)
-
-
-def get_all_modules(lang: str = "en") -> list[tuple[str, str]]:
-    """
-    Get all modules with their localized names.
-
-    Args:
-        lang (str): Language code
-
-    Returns:
-        list[tuple[str, str]]: List of (module_key, display_name)
-    """
-    result = []
-    for module, data in HELP_DATA.items():
-        name = data.get("names", {}).get(lang) or data.get("names", {}).get("en")
-        if name:
-            result.append((module, name))
-    return result

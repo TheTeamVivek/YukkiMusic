@@ -56,6 +56,7 @@ async def init():
                 userbot=userbot,
                 mongodb=mongodb,
                 help=ModuleHelp,
+                config=config,
             ),
         )
     logger.info("Successfully Imported All Modules ")

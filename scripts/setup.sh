@@ -5,7 +5,7 @@ REPO="https://github.com/TheTeamVivek/YukkiMusic"
 FOLDER="yukki"
 
 if ! command -v sudo &> /dev/null || ! sudo -n true 2>/dev/null; then
-  echo -e "${RED}[✖] YukkiMusic requires sudo privileges.${RESET}"
+  echo -e "${RED}[✖] script requires sudo privileges.${RESET}"
   exit 1
 fi
 
@@ -102,7 +102,7 @@ source .venv/bin/activate
 
 echo -e "${CYAN}[~] Installing dependencies...${RESET}"
 uv pip install -e . >/dev/null 2>&1 || {
-  echo -e "${RED}[✖] pip install -e . failed.${RESET}"
+  echo -e "${RED}[✖] uv pip install -e . failed.${RESET}"
   exit 1
 }
 
