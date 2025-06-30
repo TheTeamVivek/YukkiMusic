@@ -35,7 +35,7 @@ def get_command(key, lang=None):
     return list(all_commands)
 
 
-def pick_command(key, lang=None):
+def pick_commands(key, lang=None):
     commands_list = get_command(key, lang)
     if commands_list:
         return "/" + random.choice(commands_list)
