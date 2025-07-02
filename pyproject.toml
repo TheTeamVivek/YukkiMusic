@@ -34,7 +34,7 @@ dependencies = [
     "Kurigram==2.2.6",
     "lyricsgenius==3.6.4",
     "ntgcalls==2.0.5",
-    "pillow==11.2.1",
+    "pillow==11.3.0",
     "pykeyboard2==0.1.6",
     "pymongo==4.13.2",
     "psutil==7.0.0",
