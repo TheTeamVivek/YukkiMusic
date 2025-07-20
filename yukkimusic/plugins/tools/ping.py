@@ -7,9 +7,9 @@
 #
 # All rights reserved.
 #
-from datetime import datetime
+import time
 
-from pyrogram.types import Message
+from pyrogram import types
 
 from config import BANNED_USERS, PING_IMG_URL
 from strings import command
@@ -22,24 +22,28 @@ from yukkimusic.utils.inline import support_group_markup
 
 @app.on_message(command("PING_COMMAND") & ~BANNED_USERS)
 @language
-async def ping_com(client, message: Message, _):
-    response = await message.reply_photo(
-        photo=PING_IMG_URL,
-        caption=_["ping_1"].format(app.mention),
+async def ping_com(_, message: types.Message, lang):
+    start = time.time()
+    m = await message.reply_text(
+        lang["ping_1"].format(app.mention),
     )
-    start = datetime.now()
+    end = time.time()
     pytgping = await yukki.ping()
-    UP, CPU, RAM, DISK = await bot_sys_stats()
-    resp = (datetime.now() - start).microseconds / 1000
-    await response.edit_text(
-        _["ping_2"].format(
-            resp,
-            app.mention,
-            UP,
-            RAM,
-            CPU,
-            DISK,
-            pytgping,
+    up, cpu, ram, disk = await bot_sys_stats()
+    resp = round((end - start) * 1000, 3)
+    await m.edit_media(
+        media=types.InputMediaPhoto(
+            media=PING_IMG_URL,
+            caption=lang["ping_2"].format(
+                resp,
+                app.mention,
+                up,
+                ram,
+                cpu,
+                disk,
+                pytgping,
+            ),
         ),
-        reply_markup=support_group_markup(_),
+        reply_markup=support_group_markup(lang),
     )
+    await message.stop_propagation()

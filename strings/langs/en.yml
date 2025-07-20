@@ -9,6 +9,7 @@ active_5: "📊 <b>Active Chats Info:</b>\n🎧 Total Active Audio Chats: <b>{0}
 admin_1 : "❌ Admin List Not Found\n\nPlease reload adminlist via /admincache or /reload"
 admin_2 : "🔑 You need to be an admin with manage voice chat rights to perform this.\nIf you're already an admin, reload admincache via /admincache"
 admin_3 : "✅ Admin cache reloaded successfully."
+admin_4 : "Failed to reload admincache make sure bot is an admin in your chat"
 
 auth_1 : "🔒 You can only have 20 users in your group's authorized users list (aul)."
 auth_2 : "✅ Added to authorized users list of your group."
