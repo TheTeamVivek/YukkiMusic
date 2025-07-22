@@ -23,7 +23,7 @@ jobs:
 
       - name: update
         run: |
-          uv sync --refresh --locked
+          uv sync --refresh
           uv pip list --outdated --format json | jq -c '.[]' | while read -r p; do
             n=$(echo "$p" | jq -r '.name')
             v=$(echo "$p" | jq -r '.latest_version')
@@ -39,8 +39,8 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "⬆️ Update dependencies"
-          title: "⬆️ Dependency updates"
+          commit-message: "chore: update deps"
+          title: "Update deps"
           body: "This PR updates outdated dependencies to their latest versions."
           branch: deps/update-pip-deps
           delete-branch: true
