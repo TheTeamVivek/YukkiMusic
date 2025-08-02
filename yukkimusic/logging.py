@@ -33,7 +33,7 @@ noisy_modules = ["httpx", "ntgcalls", "pyrogram", "pytgcalls", "pymongo"]
 
 for name in noisy_modules:
     noisy_logger = logging.getLogger(name)
-    noisy_logger.setLevel(logging.INFO)
+    noisy_logger.setLevel(logging.WARNING)
     noisy_logger.handlers.clear()
     noisy_logger.addHandler(file_handler)
     noisy_logger.addHandler(stream_handler)

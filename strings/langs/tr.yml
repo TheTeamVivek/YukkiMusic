@@ -96,7 +96,7 @@ lang_3: "✅ Diliniz başarıyla değiştirildi."
 lang_4: "❌ Dil değiştirilemedi veya seçilen dil bakımda."
 
 # Ayarlar
-setting_1 : "⚙️ **Müzik Botu Ayarları**\n\n🖇**Grup:** {0}\n🔖**Group ID:** `{1}`\n\n💡**Düzenlemek veya değiştirmek istediğiniz işlev düğmelerini aşağıdan seçin.**"
+setting_1 : "⚙️ **Müzik Botu Ayarları**\n\n🖇**Grup:** {0}\n🔖**Grup ID:** `{1}`\n\n💡**Düzenlemek veya değiştirmek istediğiniz işlev düğmelerini aşağıdan seçin.**"
 setting_3 : "⁉️ Bu nedir?\n\n1) Doğrudan: Arama sorgularını doğrudan oynatır. Doğrudan modda video oynatmak için -v kullanın.\n\n2) İçerik: Video ve ses arasında seçim yapmak için İçerik İşaretleme Düğmeleri döndürür."
 setting_4 : "⁉️ Bu nedir?\n\n👥 Herkes: Bu grupta bulunan herkes yönetici komutlarını (atla, duraklat, devam et vb.) kullanabilir.\n\n🙍 Sadece Yönetici: Sadece yöneticiler ve yetkili kullanıcılar yönetici komutlarını kullanabilir."
 setting_5 : "Yetkili Kullanıcı Bulunamadı\n\nYetkili olmayan herhangi bir kullanıcıyı yönetici komutlarımı kullanmaya yetkilendirebilirsiniz /auth ve /unauth kullanarak silebilirsiniz."
@@ -104,7 +104,7 @@ setting_9 : "⁉️ Bu nedir?\n\nEtkinleştirildiğinde, Bot {0} sonra mesajın�
 setting_10 : "⁉️ Bu nedir?\n\n1) Grup: Komutun verildiği grupta müzik oynatır.\n\n2) Kanal: İstediğiniz kanalda müzik oynatır. Kanal kimliğini /channelplay ile ayarlayın."
 setting_11 : "⁉️ Bu nedir?\n\n1) Herkes: Bu grupta bulunan herkes müzik oynatabilir.\n\n2) Sadece Yönetici: Sadece yöneticiler bu grupta müzik oynatabilir."
 setting_12 : "Kanal modu için tanımlanmış kanal kimliğiniz yok. Lütfen /channelplay ile tanımlayın."
-setting_13 : "Aktif group çağrısında oynatma modunu değiştiremiyorum. Lütfen önce /stop ile sesli sohbeti durdurun."
+setting_13 : "Aktif grup çağrısında oynatma modunu değiştiremiyorum. Lütfen önce /stop ile sesli sohbeti durdurun."
 setting_14 : "⁉️ Bu nedir?\n\nEtkinleştirildiğinde, Bot yürütülen komutlarını (/play, /pause, /shuffle, /stop vb.) hemen siler.\n\nBot, doğru çalışması için mesajları silme yönetici hakkına ihtiyaç duyacaktır."
 setting_15 : "Eş çözümleme başarısız oldu, botu kanalınıza eklediğinizden ve yönetici olarak terfi ettirdiğinizden emin olun.\n\nTekrar /channelplay ayarını deneyin.."
 setting_16 : "⁉️ Bu nedir?\n\nEtkinleştirildiğinde, Bot sohbetinize her 1-2 saatte bir bot komutları hakkında (nasıl kullanılır, hangi komutlar var ve daha birçok şey) rastgele önerilerde bulunacaktır."
