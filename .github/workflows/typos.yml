@@ -1,38 +1,18 @@
-name: Typo Fix
+name: CI
+
 on:
-  pull_request:
   push:
-    branches:
-      - unstable
+  pull_request:
 
 jobs:
-  run:
+  spell-check:
+    timeout-minutes: 5
+    name: Check spelling
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Actions Repository
+        uses: actions/checkout@v4
 
-      - name: Run typos
-        id: typos
-        uses: crate-ci/typos@v1.34.0
-        with:
-          write_changes: true
-
-      - name: Check changes
-        id: changes
-        run: |
-          if git diff --quiet; then
-            echo "no_changes=true" >> $GITHUB_OUTPUT
-          else
-            echo "no_changes=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create PR
-        if: steps.changes.outputs.no_changes == 'false'
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: fix typos"
-          title: "Fix typo fixes"
-          body: "This PR was created automatically by the typo-fix GitHub Action. It contains typo corrections detected by [crate-ci/typos](https://github.com/crate-ci/typos)."
-          branch: typos
-          delete-branch: true
+      - name: Check spelling
+        uses: crate-ci/typos@master
