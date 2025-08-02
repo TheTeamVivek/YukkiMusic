@@ -42,7 +42,7 @@ async def blacklist_chat_func(client, message: Message, _):
 
 @app.on_message(command("WHITELISTCHAT_COMMAND") & SUDOERS)
 @language
-async def white_funciton(client, message: Message, _):
+async def white_function(client, message: Message, _):
     if len(message.command) != 2:
         return await message.reply_text(_["black_4"])
     chat_id = int(message.text.strip().split()[1])
