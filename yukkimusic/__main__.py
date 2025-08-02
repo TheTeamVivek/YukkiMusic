@@ -43,7 +43,7 @@ async def init():
         users = await get_banned_users()
         for user_id in users:
             BANNED_USERS.add(user_id)
-        logger.debug("Sucessfully loaded banned users")
+        logger.debug("Successfully loaded banned users")
     except Exception as e:  # pylint: disable=broad-exception-caught
         logger.debug("Failed loaded banned users %s", e)
     await sudo()
@@ -62,7 +62,7 @@ async def init():
     logger.info("Successfully Imported All Modules ")
     await userbot.start()
     await yukki.start()
-    logger.info("Assistant Started Sucessfully")
+    logger.info("Assistant Started Successfully")
     try:
         await yukki.stream_call(
             "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"

@@ -11,7 +11,7 @@ import logging
 import os
 from os import listdir, mkdir
 
-# remove all files on startup  that contains these extentions
+# remove all files on startup  that contains these extensions
 files = [
     ".jpg",
     ".jpeg",

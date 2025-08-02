@@ -39,7 +39,7 @@ from yukkimusic.utils.inline.song import song_markup
 
 @app.on_message(command("SONG_COMMAND") & filters.group & ~BANNED_USERS)
 @language
-async def song_commad_group(client, message: Message, _):
+async def song_command_group(client, message: Message, _):
     upl = InlineKeyboardMarkup(
         [
             [
@@ -194,12 +194,12 @@ async def song_helper_cb(client, query, _):
 
                 sz = convert_bytes(x["filesize"])
 
-                fom = x["format_id"]
+                fmt = x["format_id"]
 
                 keyboard.row(
                     InlineKeyboardButton(
                         text=f"{form} Quality Audio = {sz}",
-                        callback_data=f"song_download {stype}|{fom}|{vidid}",
+                        callback_data=f"song_download {stype}|{fmt}|{vidid}",
                     ),
                 )
 

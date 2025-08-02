@@ -40,7 +40,7 @@ async def reboot(client, message, _):
     chat_id = await get_cmode(message.chat.id)
     if chat_id:
         await yukki.stop_stream(chat_id)
-    return await mystic.edit_text("Sucessfully Restarted \nTry playing Now..")
+    return await mystic.edit_text("Successfully Restarted \nTry playing Now..")
 
 
 @app.on_message(command("RESTART_COMMAND") & ~BANNED_USERS)

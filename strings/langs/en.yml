@@ -234,7 +234,7 @@ seek_2 : "🔢 Please use numeric duration seconds like 10-20-30 seconds for see
 seek_3 : "❌ Sorry but you can't seek the currently playing stream. It can only be skipped or stopped."
 seek_4 : "🚫 Bot is not able to seek due to high duration given. You need to seek to a lower duration and remember that a time of 10 seconds is left after seeking.\n\nCurrently played **{0}** mins..."
 seek_5 : "⏳➻ Please Wait... Seeking ongoing stream."
-seek_6 : "✅➻ Successfully Seeked Stream to {0} Mins"
+seek_6: "✅➻ Successfully Sought Stream to {0} Mins"
 seek_7 : "❌➻ Failed to seek the current stream."
 
 set_cb_1 : "🎵 Getting audio quality panel..."

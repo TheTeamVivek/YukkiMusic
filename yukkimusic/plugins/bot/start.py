@@ -38,7 +38,7 @@ from yukkimusic.utils.database import (
 from yukkimusic.utils.decorators import asyncify, language
 from yukkimusic.utils.formatters import get_readable_time
 from yukkimusic.utils.functions import MARKDOWN, WELCOMEHELP
-from yukkimusic.utils.inline import private_panel, start_pannel
+from yukkimusic.utils.inline import private_panel, start_panel
 
 
 @app.on_message(command("START_COMMAND") & filters.private & ~BANNED_USERS)
@@ -199,7 +199,7 @@ async def start_comm(client, message: Message, _):
                 sender_name = message.from_user.first_name
                 return await app.send_message(
                     config.LOG_GROUP_ID,
-                    f"{message.from_user.mention} Has just started bot ot check <code> Video information  </code>\n\n**User Id:** {sender_id}\n**User Name** {sender_name}",
+                    f"{message.from_user.mention} Has just started bot to check <code> Video information  </code>\n\n**User Id:** {sender_id}\n**User Name** {sender_name}",
                 )
     else:
         try:
@@ -272,7 +272,7 @@ async def welcome(client, message: Message):
                     )
                     return await app.leave_chat(chat_id)
                 userbot = await get_assistant(message.chat.id)
-                out = start_pannel(_)
+                out = start_panel(_)
                 await message.reply_text(
                     _["start_2"].format(
                         app.mention,

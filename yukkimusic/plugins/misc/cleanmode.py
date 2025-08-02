@@ -41,10 +41,9 @@ from yukkimusic.utils.formatters import alpha_to_int
 AUTO_DELETE = config.CLEANMODE_DELETE_MINS
 AUTO_SLEEP = 5
 IS_BROADCASTING = False
-cleanmode_group = 15
 
 
-@app.on_raw_update(group=cleanmode_group)
+@app.on_raw_update(group=15)
 async def clean_mode(client, update, users, chats):
     global IS_BROADCASTING
     if IS_BROADCASTING:
@@ -75,7 +74,7 @@ async def clean_mode(client, update, users, chats):
 
 @app.on_message(command("BROADCAST_COMMAND") & filters.user(config.OWNER_ID))
 @language
-async def braodcast_message(client, message, _):
+async def broadcast_message(client, message, _):
     global IS_BROADCASTING
     if message.reply_to_message:
         x = message.reply_to_message.id

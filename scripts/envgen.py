@@ -78,7 +78,7 @@ required_vars = {
 
 recommended_vars = {
     "COOKIE_LINK": (
-        "List of batbin.me cookie links must be seperated by a space",
+        "List of batbin.me cookie links must be separated by a space",
         False,
         parse_list(None),
     ),

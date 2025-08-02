@@ -57,7 +57,7 @@ LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", 0))
 # Your User ID.
 OWNER_ID = list(
     map(int, getenv("OWNER_ID", "6815918609").split())
-)  # Input type must be interger
+)  # Input type must be integer
 
 
 # You'll need a Pyrogram String Session for these vars. See config/README.md for more information.
@@ -164,7 +164,7 @@ VIDEO_STREAM_LIMIT = int(getenv("VIDEO_STREAM_LIMIT", "999"))
 # Maximum Limit Allowed for users to save playlists on bot's server
 SERVER_PLAYLIST_LIMIT = int(getenv("SERVER_PLAYLIST_LIMIT", "25"))
 
-# MaximuM limit for fetching playlist's track from youtube, spotify, apple links.
+# Maximum limit for fetching playlist's track from youtube, spotify, apple links.
 PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", "25"))
 
 

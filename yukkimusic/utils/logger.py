@@ -29,7 +29,7 @@ async def play_logs(message, streamtype):
         if message.from_user.username:
             username = f"@{message.from_user.username}"
         else:
-            username = "Unknow"
+            username = "Unknown"
 
         if message.reply_to_message:
             query = "Replied Message"

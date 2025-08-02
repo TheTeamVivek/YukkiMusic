@@ -73,7 +73,7 @@ async def load_mod(modules: list[str], ctx: LoaderContext):
                     await mod.setup(ctx)
                 else:
                     mod.setup(ctx)
-                logger.info("[MOD] Sucessfully Loaded: %s", mod_name)
+                logger.info("[MOD] Successfully Loaded: %s", mod_name)
             except Exception as e:  # pylint: disable=broad-exception-caught
                 logger.warning("[MOD] Setup failed for '%s': %s", mod_name, e)
         else:

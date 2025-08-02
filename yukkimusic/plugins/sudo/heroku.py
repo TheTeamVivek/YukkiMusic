@@ -8,15 +8,12 @@
 # All rights reserved.
 #
 import asyncio
-import math
 import os
 import socket
 from datetime import datetime
 
 import aiofiles
-import aiohttp
 import dotenv
-import heroku3
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
 
@@ -153,65 +150,6 @@ async def set_var(client, message, _):
         os.system(f"kill -9 {os.getpid()} && python3 -m yukkimusic")
 
 
-@app.on_message(command("USAGE_COMMAND") & SUDOERS)
-@language
-async def usage_dynos(client, message, _):
-    # Credits CatUserbot
-    if await is_heroku():
-        if HAPP is None:
-            return await message.reply_text(_["heroku_1"])
-    else:
-        return await message.reply_text(_["heroku_11"])
-    dyno = await message.reply_text(_["heroku_12"])
-    Heroku = heroku3.from_key(config.HEROKU_API_KEY)
-    account_id = Heroku.account().id
-    useragent = (
-        "Mozilla/5.0 (Linux; Android 10; SM-G975F) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/80.0.3987.149 Mobile Safari/537.36"
-    )
-    headers = {
-        "User-Agent": useragent,
-        "Authorization": f"Bearer {config.HEROKU_API_KEY}",
-        "Accept": "application/vnd.heroku+json; version=3.account-quotas",
-    }
-    path = "/accounts/" + account_id + "/actions/get-quota"
-    url = "https://api.heroku.com" + path
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=headers) as r:
-            if r.status != 200:
-                return await dyno.edit("Unable to fetch.")
-            result = await r.json()
-    quota = result["account_quota"]
-    quota_used = result["quota_used"]
-    remaining_quota = quota - quota_used
-    percentage = math.floor(remaining_quota / quota * 100)
-    minutes_remaining = remaining_quota / 60
-    hours = math.floor(minutes_remaining / 60)
-    minutes = math.floor(minutes_remaining % 60)
-    App = result["apps"]
-    try:
-        App[0]["quota_used"]
-    except IndexError:
-        AppQuotaUsed = 0
-        AppPercentage = 0
-    else:
-        AppQuotaUsed = App[0]["quota_used"] / 60
-        AppPercentage = math.floor(App[0]["quota_used"] * 100 / quota)
-    AppHours = math.floor(AppQuotaUsed / 60)
-    AppMinutes = math.floor(AppQuotaUsed % 60)
-    await asyncio.sleep(1.5)
-    text = f"""
-**Dyno usage**
-
-<u>Usage:</u>
-Total used: `{AppHours}`**h**  `{AppMinutes}`**m**  [`{AppPercentage}`**%**]
-
-<u>Remaining Quota</u>
-Total Left: `{hours}`**h**  `{minutes}`**m**  [`{percentage}`**%**]"""
-    return await dyno.edit(text)
-
-
 @app.on_message(command("UPDATE_COMMAND") & SUDOERS)
 @language
 async def update_(client, message, _):
@@ -242,7 +180,7 @@ async def update_(client, message, _):
         )
 
     updates = "".join(
-        f"<b>➣ #{info.count()}: <a href={REPO_}/commit/{info}>{info.summary}</a> By -> {info.author}</b>\n\t\t\t\t<b>➥ Commited On:</b> {ordinal(int(datetime.fromtimestamp(info.committed_date).strftime('%d')))} {datetime.fromtimestamp(info.committed_date).strftime('%b')}, {datetime.fromtimestamp(info.committed_date).strftime('%Y')}\n\n"
+        f"<b>➣ #{info.count()}: <a href={REPO_}/commit/{info}>{info.summary}</a> By -> {info.author}</b>\n\t\t\t\t<b>➥ Committed On:</b> {ordinal(int(datetime.fromtimestamp(info.committed_date).strftime('%d')))} {datetime.fromtimestamp(info.committed_date).strftime('%b')}, {datetime.fromtimestamp(info.committed_date).strftime('%Y')}\n\n"
         for info in repo.iter_commits(f"HEAD..origin/{config.UPSTREAM_BRANCH}")
     )
     _update_response_ = "**A new update is available for the Bot! **\n\n➣ Pushing updates Now\n\n__**Updates:**__\n"
@@ -263,7 +201,7 @@ async def update_(client, message, _):
             try:
                 await app.send_message(
                     chat_id=int(x),
-                    text="{} Is upadted herself\n\nYou can start playing after 15-20 Seconds".format(
+                    text="{} Is updated herself\n\nYou can start playing after 15-20 Seconds".format(
                         app.mention
                     ),
                 )
@@ -272,7 +210,7 @@ async def update_(client, message, _):
             except Exception:
                 pass
         await response.edit(
-            f"{_final_updates_}» Bot Upadted Sucessfully Now wait until the bot starts"
+            f"{_final_updates_}» Bot updated Successfully Now wait until the bot starts"
         )
     except Exception:
         pass
