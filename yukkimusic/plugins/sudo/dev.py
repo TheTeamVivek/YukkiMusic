@@ -82,7 +82,7 @@ async def executor(client: app, message: Message):
     if message.edit_hide:
         return
     if len(message.command) < 2:
-        return await message.reply(text="<b>Give me something to exceute</b>")
+        return await message.reply("Give me something to execute")
     try:
         cmd = message.text.markdown.split(" ", maxsplit=1)[1]
         cmd = cleanup_code(cmd)
