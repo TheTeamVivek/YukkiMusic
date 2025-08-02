@@ -8,15 +8,18 @@
 # All rights reserved.
 #
 
+
 from pyrogram import filters
 from pyrogram.types import Message
 
 from config import BANNED_USERS, MONGO_DB_URI, OWNER_ID
-from strings import command
+from strings import command, pick_commands
 from yukkimusic import app
 from yukkimusic.misc import SUDOERS
 from yukkimusic.utils.database import add_sudo, remove_sudo
 from yukkimusic.utils.decorators.language import language
+
+from . import ohelp
 
 
 @app.on_message(command("ADDSUDO_COMMAND") & filters.user(OWNER_ID))
@@ -78,7 +81,7 @@ async def userdel(client, message: Message, _):
             SUDOERS.remove(user.id)
             await message.reply_text(_["sudo_4"])
             return
-        await message.reply_text(f"Something wrong happened")
+        await message.reply_text("Something wrong happened")
         return
     user_id = message.reply_to_message.from_user.id
     if user_id not in SUDOERS:
@@ -88,7 +91,7 @@ async def userdel(client, message: Message, _):
         SUDOERS.remove(user_id)
         await message.reply_text(_["sudo_4"])
         return
-    await message.reply_text(f"Something wrong happened")
+    await message.reply_text("Something wrong happened")
 
 
 @app.on_message(command("SUDOUSERS_COMMAND") & ~BANNED_USERS)
@@ -121,3 +124,67 @@ async def sudoers_list(client, message: Message, _):
         await message.reply_text(_["sudo_7"])
     else:
         await message.reply_text(text)
+
+
+(
+    ohelp.add(
+        "en",
+        (
+            "<b><u>Add and remove sudoers:</u></b>\n\n"
+            f"<b>{pick_commands('ADDSUDO_COMMAND')} [Username or reply to a user]</b> - Add sudo in your bot\n"
+            f"<b>{pick_commands('DELSUDO_COMMAND')} [Username or user ID or reply to a user]</b> - Remove from bot sudoers\n"
+            f"<b>{pick_commands('SUDOUSERS_COMMAND')}</b> - Get a list of all sudoers"
+        ),
+        priority=100,
+    )
+    .add(
+        "ar",
+        (
+            "<b><u>إضافة وإزالة المدراء:</u></b>\n\n"
+            f"<b>{pick_commands('ADDSUDO_COMMAND')} [اسم المستخدم أو الرد على مستخدم]</b> - أضف مديرًا إلى البوت\n"
+            f"<b>{pick_commands('DELSUDO_COMMAND')} [اسم المستخدم أو معرف المستخدم أو الرد على مستخدم]</b> - إزالة من مدراء البوت\n"
+            f"<b>{pick_commands('SUDOUSERS_COMMAND')}</b> - احصل على قائمة بجميع المدراء"
+        ),
+        priority=100,
+    )
+    .add(
+        "as",
+        (
+            "<b><u>সুডোৰ্ছ যোগ আৰু আঁতৰাওক:</u></b>\n\n"
+            f"<b>{pick_commands('ADDSUDO_COMMAND')} [ব্যৱহাৰকাৰী নাম বা এজন ব্যৱহাৰকাৰীক উত্তৰ দিয়ক]</b> - আপোনাৰ বটত সুডো যোগ কৰক\n"
+            f"<b>{pick_commands('DELSUDO_COMMAND')} [ব্যৱহাৰকাৰী নাম বা ব্যৱহাৰকাৰী আইডি বা এজন ব্যৱহাৰকাৰীক উত্তৰ দিয়ক]</b> - বটৰ সুডোৰ্ছৰ পৰা আঁতৰাওক\n"
+            f"<b>{pick_commands('SUDOUSERS_COMMAND')}</b> - সকলো সুডোৰ্ছৰ তালিকা লাভ কৰক"
+        ),
+        priority=100,
+    )
+    .add(
+        "hi",
+        (
+            "<b><u>सूडोअर्स जोड़ें और हटाएँ:</u></b>\n\n"
+            f"<b>{pick_commands('ADDSUDO_COMMAND')} [उपयोगकर्ता नाम या किसी उपयोगकर्ता को उत्तर दें]</b> - अपने बॉट में सूडो जोड़ें\n"
+            f"<b>{pick_commands('DELSUDO_COMMAND')} [उपयोगकर्ता नाम या उपयोगकर्ता आईडी या किसी उपयोगकर्ता को उत्तर दें]</b> - बॉट के सूडोअर्स से हटाएँ\n"
+            f"<b>{pick_commands('SUDOUSERS_COMMAND')}</b> - सभी सूडोअर्स की सूची प्राप्त करें"
+        ),
+        priority=100,
+    )
+    .add(
+        "ku",
+        (
+            "<b><u>زیادکردن و سڕینەوەی سودوەکان:</u></b>\n\n"
+            f"<b>{pick_commands('ADDSUDO_COMMAND')} [ناوی بەکارهێنەر یان وەڵامدانەوە بە بەکارهێنەرێک]</b> - سودو زیاد بکە بۆ بۆت\n"
+            f"<b>{pick_commands('DELSUDO_COMMAND')} [ناوی بەکارهێنەر یان ناسنامەی بەکارهێنەر یان وەڵامدانەوە]</b> - سڕینەوە لە سودوەکانی بۆت\n"
+            f"<b>{pick_commands('SUDOUSERS_COMMAND')}</b> - وەشانێکی لیستی هەموو سودوەکان بگرە"
+        ),
+        priority=100,
+    )
+    .add(
+        "tr",
+        (
+            "<b><u>Sudo kullanıcılarını ekle ve kaldır:</u></b>\n\n"
+            f"<b>{pick_commands('ADDSUDO_COMMAND')} [Kullanıcı adı veya bir kullanıcıya yanıt ver]</b> - Bota sudo ekle\n"
+            f"<b>{pick_commands('DELSUDO_COMMAND')} [Kullanıcı adı veya kullanıcı ID’si veya bir kullanıcıya yanıt ver]</b> - Bot sudo kullanıcılarından kaldır\n"
+            f"<b>{pick_commands('SUDOUSERS_COMMAND')}</b> - Tüm sudo kullanıcılarının listesini al"
+        ),
+        priority=100,
+    )
+)

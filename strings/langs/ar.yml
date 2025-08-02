@@ -500,21 +500,9 @@ BLIST_HELPER: |
   <b>✧ {GBANNED_COMMAND}</b> - التحقق من قائمة المستخدمين المحظورين عالميًا.
 
 DEV_HELPER: |
-  <b><u>إضافة وإزالة المستخدمين المميزين:</u></b>
-  <b>{ADDSUDO_COMMAND} [اسم المستخدم أو الرد على مستخدم] - إضافة Sudo للبوت</b>
-  <b>{DELSUDO_COMMAND} [اسم المستخدم أو رقم المستخدم أو الرد على مستخدم] - إزالة من مستخدمي Sudo للبوت</b>
-  <b>{SUDOUSERS_COMMAND} - الحصول على قائمة بجميع المستخدمين المميزين Sudoers</b>
-  <b><u>Heroku:</u></b>
-  <b>{USAGE_COMMAND}</b> - استخدام Dyno
-  <b>{GETVAR_COMMAND} [اسم المتغير]</b> - الحصول على متغير من التكوين
-  <b>{DELVAR_COMMAND} [اسم المتغير]</b> - حذف متغير من التكوين
-  <b>{SETVAR_COMMAND} [اسم المتغير] [القيمة]</b> - إضافة أو تحديث متغير. يفصل بين المتغير وقيمته بمسافة
-  <b><u>أمر البوت:</u></b>
   <b>{RESTART_COMMAND}</b> - إعادة تشغيل البوت (للمستخدمين المميزين فقط)
   <b>{UPDATE_COMMAND}</b> - تحديث البوت
   <b>{SPEEDTEST_COMMAND}</b> - التحقق من سرعة الخادم
   <b>{MAINTENANCE_COMMAND} [enable/disable]</b> - تبديل وضع الصيانة للبوت
   <b>{LOGGER_COMMAND} [enable/disable]</b> - تبديل تسجيل البوت لعمليات البحث في مجموعة السجل
   <b>{GETLOG_COMMAND} [عدد الأسطر]</b> - الحصول على السجلات من الخادم
-  <b>{AUTOEND_COMMAND} [enable/disable]</b> - إنهاء البث تلقائيًا بعد 30 ثانية إذا لم يكن هناك أحد يستمع للأغنية
-

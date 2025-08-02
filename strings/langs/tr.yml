@@ -502,21 +502,9 @@ BLIST_HELPER: |
   <b>✧ {GBANNED_COMMAND}</b> - Küresel yasaklı kullanıcıların listesini kontrol edin.
 
 DEV_HELPER: |
-  <b><u>Sudoers ekleme ve kaldırma:</u></b>
-  <b>{ADDSUDO_COMMAND} [Kullanıcı adı veya bir kullanıcıya yanıt] - Botunuza Sudo ekleyin</b>
-  <b>{DELSUDO_COMMAND} [Kullanıcı adı veya kullanıcı kimliği veya bir kullanıcıya yanıt] - Kullanıcıyı bot sudoers'larından çıkarın</b>
-  <b>{SUDOUSERS_COMMAND} - Tüm sudoers listesini alın</b>
-  <b><u>Heroku:</u></b>
-  <b>{USAGE_COMMAND}</b> - Dyno kullanımı
-  <b>{GETVAR_COMMAND} [Değişken Adı]</b> - Bir yapılandırma değişkenini alın
-  <b>{DELVAR_COMMAND} [Değişken Adı]</b> - Bir yapılandırma değişkenini silin
-  <b>{SETVAR_COMMAND} [Değişken Adı] [Değer]</b> - Bir değişken ekleyin veya güncelleyin. Değişken ve değeri bir boşlukla ayırın
-  <b><u>Bot komutu:</u></b>
   <b>{RESTART_COMMAND}</b> - Botu yeniden başlatın (yalnızca SUDOERS)
   <b>{UPDATE_COMMAND}</b> - Botu güncelleyin
   <b>{SPEEDTEST_COMMAND}</b> - Sunucu hızlarını kontrol edin
   <b>{MAINTENANCE_COMMAND} [enable/disable]</b> - Bot bakım modunu geçiş yapın
   <b>{LOGGER_COMMAND} [enable/disable]</b> - Aranan sorguların log grubuna kaydedilmesini geçiş yapın
   <b>{GETLOG_COMMAND} [Satır sayısı]</b> - Sunucudan günlükleri alın
-  <b>{AUTOEND_COMMAND} [enable/disable]</b> - Eğer kimse şarkıyı dinlemiyorsa yayını 30 saniye sonra otomatik olarak bitirin
-

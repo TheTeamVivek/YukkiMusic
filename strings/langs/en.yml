@@ -481,26 +481,9 @@ BLIST_HELPER: |
   <b>✧ {GBANNED_COMMAND}</b> - Check the list of gban users.
 
 DEV_HELPER: |
-  <b><u>Add and remove sudoers:</u></b>
-  
-  <b>{ADDSUDO_COMMAND} [Username or reply to a user] - Add sudo in your bot</b>
-  <b>{DELSUDO_COMMAND} [Username or userid or reply to a user] - Remove from bot sudoers</b>
-  <b>{SUDOUSERS_COMMAND} - Get a list of all sudoers</b>
-  
-  <b><u>Heroku:</u></b>
-  
-  <b>{USAGE_COMMAND}</b> - Dyno usage
-  <b>{GETVAR_COMMAND} [Var Name]</b> - Get a config var from vars
-  <b>{DELVAR_COMMAND} [Var Name]</b> - Delete a var from vars
-  <b>{SETVAR_COMMAND} [Var Name] [Value]</b> - Add or update a var. Separate var and its value with a space
-  
-  <b><u>Bot command:</u></b>
-  
   <b>{RESTART_COMMAND}</b> - Restart the bot (SUDOERS only)
   <b>{UPDATE_COMMAND}</b> - Update the bot
   <b>{SPEEDTEST_COMMAND}</b> - Check server speeds
   <b>{MAINTENANCE_COMMAND} [enable / disable]</b> - Toggle bot maintenance mode
   <b>{LOGGER_COMMAND} [enable / disable]</b> - Toggle bot logging of searched queries to log group
   <b>{GETLOG_COMMAND} [Number of lines]</b> - Get logs from server
-  <b>{AUTOEND_COMMAND} [enable / disable]</b> - Automatically end the stream after 30s if no one is listening to songs
-

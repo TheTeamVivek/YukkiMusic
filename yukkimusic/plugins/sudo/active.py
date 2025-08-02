@@ -14,7 +14,6 @@ from pyrogram.types import Message
 
 from strings import command, pick_commands
 from yukkimusic import app
-from yukkimusic.core.help import ModuleHelp
 from yukkimusic.misc import SUDOERS, db
 from yukkimusic.utils.database.memorydatabase import (
     get_active_chats,
@@ -23,6 +22,8 @@ from yukkimusic.utils.database.memorydatabase import (
     remove_active_video_chat,
 )
 from yukkimusic.utils.decorators.language import LanguageStart
+
+from . import mhelp
 
 
 # Function for removing the Active voice and video chat also clear the db dictionary for the chat
@@ -95,17 +96,15 @@ async def vc(_, message: Message, lang):
 
 
 # pylint: disable=C0301
+
 (
-    ModuleHelp("Active")
-    .name("en", "ActiveVc")
-    .add(
+    mhelp.add(
         "en",
         "<b>Commands to view currently active calls.</b>\n"
         f"<b>✧ {pick_commands('ACTIVEVC_COMMAND', 'en')}</b> - Check active voice chats on the bot.\n"
         f"<b>✧ {pick_commands('ACTIVEVIDEO_COMMAND', 'en')}</b> - Check active video calls on the bot.\n"
         f"<b>✧ {pick_commands('AC_COMMAND', 'en')}</b> - Check all active calls (voice & video) on the bot.",
     )
-    .name("ar", "الدردشات النشطة")
     .add(
         "ar",
         "<b>أوامر لعرض المكالمات النشطة.</b>\n\n"
@@ -113,7 +112,6 @@ async def vc(_, message: Message, lang):
         f"<b>✧ {pick_commands('ACTIVEVIDEO_COMMAND', 'ar')}</b> - التحقق من المكالمات المرئية النشطة على البوت.\n\n"
         f"<b>✧ {pick_commands('AC_COMMAND', 'ar')}</b> - التحقق من المكالمات الصوتية والمرئية النشطة على البوت.",
     )
-    .name("as", "সক্ৰিয় চেট")
     .add(
         "as",
         "<b>বৰ্তমান সক্ৰিয় কলবোৰ চাবলৈ কমান্ডসমূহ।</b>\n\n"
@@ -121,7 +119,6 @@ async def vc(_, message: Message, lang):
         f"<b>✧ {pick_commands('ACTIVEVIDEO_COMMAND', 'as')}</b> - বটৰ ওপৰত সক্ৰিয় ভিডিঅ’ কলবোৰ পৰীক্ষা কৰক।\n\n"
         f"<b>✧ {pick_commands('AC_COMMAND', 'as')}</b> - বটৰ ওপৰত সক্ৰিয় ভইচ আৰু ভিডিঅ’ কলবোৰ পৰীক্ষা কৰক।",
     )
-    .name("hi", "सक्रिय कॉल")
     .add(
         "hi",
         "<b>बॉट पर सक्रिय कॉल्स देखने के लिए कमांड्स।</b>\n\n"
@@ -129,7 +126,6 @@ async def vc(_, message: Message, lang):
         f"<b>✧ {pick_commands('ACTIVEVIDEO_COMMAND', 'hi')}</b> - बॉट पर सक्रिय वीडियो कॉल्स की जांच करें।\n\n"
         f"<b>✧ {pick_commands('AC_COMMAND', 'hi')}</b> - बॉट पर सक्रिय वॉइस और वीडियो कॉल्स की जांच करें।",
     )
-    .name("ku", "پەیوەندە چالاکەکان")
     .add(
         "ku",
         "<b>فەرمانەکان بۆ بینینی پەیوەندییە چالاکەکان.</b>\n\n"
@@ -137,7 +133,6 @@ async def vc(_, message: Message, lang):
         f"<b>✧ {pick_commands('ACTIVEVIDEO_COMMAND', 'ku')}</b> - پشکنینی چاتی ڤیدیۆییە چالاکەکان لە بۆتەکە.\n\n"
         f"<b>✧ {pick_commands('AC_COMMAND', 'ku')}</b> - پشکنینی هەموو پەیوەندە چالاکەکان (دەنگ و ڤیدیۆ) لە بۆتەکە.",
     )
-    .name("tr", "Aktif Çağrılar")
     .add(
         "tr",
         "<b>Şu anda botta aktif olan aramaları görüntüleme komutları.</b>\n\n"

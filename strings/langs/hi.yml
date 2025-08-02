@@ -498,21 +498,10 @@ BLIST_HELPER: |
   <b>✧ {GBANNED_COMMAND}</b> - gban उपयोगकर्ताओं की सूची की जांच करें।
 
 DEV_HELPER: |
-  <b><u>sudoers जोड़ें और हटाएं:</u></b>
-  <b>{ADDSUDO_COMMAND} [यूजरनेम या उपयोगकर्ता को उत्तर दें] - बॉट में Sudo जोड़ें</b>
-  <b>{DELSUDO_COMMAND} [यूजरनेम या उपयोगकर्ता का आईडी या उपयोगकर्ता को उत्तर दें] - बॉट के Sudoers से हटाएं</b>
-  <b>{SUDOUSERS_COMMAND} - सभी Sudoers की सूची प्राप्त करें</b>
-  <b><u>Heroku:</u></b>
-  <b>{USAGE_COMMAND}</b> - Dyno उपयोग
-  <b>{GETVAR_COMMAND} [Var Name]</b> - एक config var प्राप्त करें
-  <b>{DELVAR_COMMAND} [Var Name]</b> - var को हटाएं
-  <b>{SETVAR_COMMAND} [Var Name] [Value]</b> - var को जोड़ें या अपडेट करें। var और उसके मान को एक स्पेस से अलग करें
-  <b><u>बॉट कमांड:</u></b>
   <b>{RESTART_COMMAND}</b> - बॉट को पुनः शुरू करें (केवल SUDOERS)
   <b>{UPDATE_COMMAND}</b> - बॉट अपडेट करें
   <b>{SPEEDTEST_COMMAND}</b> - सर्वर की गति की जांच करें
   <b>{MAINTENANCE_COMMAND} [enable / disable]</b> - बॉट मेंटेनेंस मोड को टॉगल करें
   <b>{LOGGER_COMMAND} [enable / disable]</b> - बॉट के खोजे गए क्वेरी को लॉग ग्रुप में लॉग करने को टॉगल करें
   <b>{GETLOG_COMMAND} [पंक्तियों की संख्या]</b> - सर्वर से लॉग प्राप्त करें
-  <b>{AUTOEND_COMMAND} [enable / disable]</b> - अगर कोई गाना नहीं सुन रहा है तो 30 सेकंड के बाद स्ट्रीम को अपने आप बंद करें
 
