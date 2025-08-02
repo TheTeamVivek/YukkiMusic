@@ -27,12 +27,12 @@ classifiers = [
 dependencies = [
     "async-lru==2.0.5",
     "aiofiles==24.1.0",
-    "aiohttp==3.12.14",
+    "aiohttp==3.12.15",
     "beautifulsoup4==4.13.4",
-    "gitpython==3.1.44",
+    "gitpython==3.1.45",
     "heroku3==5.2.1",
     "Kurigram==2.2.5",
-    "lyricsgenius==3.6.4",
+    "lyricsgenius==3.6.5",
     "ntgcalls==2.0.5",
     "pillow==11.3.0",
     "pykeyboard2==0.1.6",
@@ -46,7 +46,7 @@ dependencies = [
     "uvloop==0.21.0",
     "Flask==3.1.1",
     "gunicorn==23.0.0",
-    "yt-dlp==2025.6.30",
+    "yt-dlp==2025.7.21",
     "py-yt-search==0.3",
     "PyYAML==6.0.2"
 ]
