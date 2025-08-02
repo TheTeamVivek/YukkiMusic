@@ -44,150 +44,8 @@ cleanmode = []
 nonadmin = {}
 vlimit = []
 autoend = {}
-greeting_message = {"welcome": {}, "goodbye": {}}
 
-
-async def get_filters_count() -> dict:
-    chats_count = 0
-    filters_count = 0
-    async for chat in filtersdb.find({"chat_id": {"$lt": 0}}):
-        filters_name = await get_filters_names(chat["chat_id"])
-        filters_count += len(filters_name)
-        chats_count += 1
-    return {
-        "chats_count": chats_count,
-        "filters_count": filters_count,
-    }
-
-
-async def _get_filters(chat_id: int) -> dict[str, int]:
-    _filters = await filtersdb.find_one({"chat_id": chat_id})
-    if not _filters:
-        return {}
-    return _filters["filters"]
-
-
-async def get_filters_names(chat_id: int) -> list[str]:
-    _filters = []
-    for _filter in await _get_filters(chat_id):
-        _filters.append(_filter)
-    return _filters
-
-
-async def get_filter(chat_id: int, name: str) -> bool | dict:
-    name = name.lower().strip()
-    _filters = await _get_filters(chat_id)
-    if name in _filters:
-        return _filters[name]
-    return False
-
-
-async def save_filter(chat_id: int, name: str, _filter: dict):
-    name = name.lower().strip()
-    _filters = await _get_filters(chat_id)
-    _filters[name] = _filter
-    await filtersdb.update_one(
-        {"chat_id": chat_id},
-        {"$set": {"filters": _filters}},
-        upsert=True,
-    )
-
-
-async def delete_filter(chat_id: int, name: str) -> bool:
-    filtersd = await _get_filters(chat_id)
-    name = name.lower().strip()
-    if name in filtersd:
-        del filtersd[name]
-        await filtersdb.update_one(
-            {"chat_id": chat_id},
-            {"$set": {"filters": filtersd}},
-            upsert=True,
-        )
-        return True
-    return False
-
-
-async def deleteall_filters(chat_id: int):
-    return await filtersdb.delete_one({"chat_id": chat_id})
-
-
-async def get_notes_count() -> dict:
-    chats_count = 0
-    notes_count = 0
-    async for chat in notesdb.find({"chat_id": {"$exists": 1}}):
-        notes_name = await get_note_names(chat["chat_id"])
-        notes_count += len(notes_name)
-        chats_count += 1
-    return {"chats_count": chats_count, "notes_count": notes_count}
-
-
-async def _get_notes(chat_id: int) -> dict[str, int]:
-    _notes = await notesdb.find_one({"chat_id": chat_id})
-    if not _notes:
-        return {}
-    return _notes["notes"]
-
-
-async def get_note_names(chat_id: int) -> list[str]:
-    _notes = []
-    for note in await _get_notes(chat_id):
-        _notes.append(note)
-    return _notes
-
-
-async def get_note(chat_id: int, name: str) -> bool | dict:
-    name = name.lower().strip()
-    _notes = await _get_notes(chat_id)
-    if name in _notes:
-        return _notes[name]
-    return False
-
-
-async def save_note(chat_id: int, name: str, note: dict):
-    name = name.lower().strip()
-    _notes = await _get_notes(chat_id)
-    _notes[name] = note
-
-    await notesdb.update_one(
-        {"chat_id": chat_id}, {"$set": {"notes": _notes}}, upsert=True
-    )
-
-
-async def delete_note(chat_id: int, name: str) -> bool:
-    notesd = await _get_notes(chat_id)
-    name = name.lower().strip()
-    if name in notesd:
-        del notesd[name]
-        await notesdb.update_one(
-            {"chat_id": chat_id},
-            {"$set": {"notes": notesd}},
-            upsert=True,
-        )
-        return True
-    return False
-
-
-async def deleteall_notes(chat_id: int):
-    return await notesdb.delete_one({"chat_id": chat_id})
-
-
-async def set_private_note(chat_id, private_note):
-    await notesdb.update_one(
-        {"chat_id": chat_id}, {"$set": {"private_note": private_note}}, upsert=True
-    )
-
-
-async def is_pnote_on(chat_id) -> bool:
-    GetNoteData = await notesdb.find_one({"chat_id": chat_id})
-    if GetNoteData is not None:
-        if "private_note" in GetNoteData:
-            private_note = GetNoteData["private_note"]
-            return private_note
-        else:
-            return False
-    else:
-        return False
-
+cache = {"on_off": set()}
 
 # Auto End Stream
 
@@ -500,25 +358,29 @@ async def set_video_limit(limt: int):
 
 
 # On Off
-async def is_on_off(on_off: int) -> bool:
-    onoff = await onoffdb.find_one({"on_off": on_off})
-    return bool(onoff)
 
 
-async def add_on(on_off: int):
-    is_on = await is_on_off(on_off)
-    if is_on:
-        return
-    await onoffdb.insert_one({"on_off": on_off})
-    return
+async def preload_onoff_cache():
+    cursor = onoffdb.find({})
+    cache["on_off"] = {str(doc["on_off"]).lower() async for doc in cursor}
 
 
-async def add_off(on_off: int):
-    is_off = await is_on_off(on_off)
-    if not is_off:
-        return
-    await onoffdb.delete_one({"on_off": on_off})
-    return
+async def is_on_off(on_off: int | str) -> bool:
+    return str(on_off).lower() in cache["on_off"]
+
+
+async def add_on(on_off: int | str):
+    value = str(on_off).lower()
+    if value not in cache["on_off"]:
+        await onoffdb.insert_one({"on_off": value})
+        cache["on_off"].add(value)
+
+
+async def add_off(on_off: int | str):
+    value = str(on_off).lower()
+    if value in cache["on_off"]:
+        await onoffdb.delete_one({"on_off": value})
+        cache["on_off"].remove(value)
 
 
 # Maintenance

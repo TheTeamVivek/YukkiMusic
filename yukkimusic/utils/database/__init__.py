@@ -11,4 +11,9 @@
 
 from .assistantdatabase import *
 from .memorydatabase import *
+from .memorydatabase import preload_onoff_cache
 from .mongodatabase import *
+
+
+async def init():
+    await preload_onoff_cache()
