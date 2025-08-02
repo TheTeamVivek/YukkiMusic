@@ -46,7 +46,7 @@ from yukkimusic.utils.stream.stream import stream
     & ~BANNED_USERS
 )
 @PlayWrapper
-async def play_commnd(
+async def play_command(
     client,
     message: Message,
     _,
