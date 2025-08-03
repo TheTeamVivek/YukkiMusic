@@ -11,8 +11,6 @@
 import importlib
 import os
 
-from yukkimusic import HELPABLE
-
 base_dir = os.path.dirname(__file__)
 
 for root, dirs, files in os.walk(base_dir):
@@ -25,11 +23,3 @@ for root, dirs, files in os.walk(base_dir):
             mod = importlib.import_module(
                 f"{__package__}.{mod_name}" if __package__ else mod_name
             )
-
-            if (
-                mod
-                and hasattr(mod, "__MODULE__")
-                and mod.__MODULE__
-                and (hasattr(mod, "__HELP__") and mod.__HELP__)
-            ):
-                HELPABLE[mod.__MODULE__.lower()] = mod
