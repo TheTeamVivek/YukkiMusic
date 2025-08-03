@@ -16,7 +16,7 @@ from pyrogram.types import InputMediaPhoto, Message
 
 import config
 from config import BANNED_USERS
-from strings import command
+from strings import command, pick_commands
 from yukkimusic import app
 from yukkimusic.misc import db
 from yukkimusic.platforms import saavn
@@ -28,6 +28,8 @@ from yukkimusic.utils.database import (
 )
 from yukkimusic.utils.decorators.language import language
 from yukkimusic.utils.inline.queue import queue_back_markup, queue_markup
+
+from . import mhelp
 
 basic = {}
 
@@ -314,3 +316,25 @@ async def queue_back(client, query, _):
                     break
         except Exception:
             return
+
+
+(
+    mhelp.add(
+        "en",
+        f"<b>★ {pick_commands('QUEUE_COMMAND')}</b> - Check the queue list of music.",
+    )
+    .add(
+        "ar",
+        f"<b>★ {pick_commands('QUEUE_COMMAND')}</b> - تحقق من قائمة الانتظار للموسيقى.",
+    )
+    .add("as", f"<b>★ {pick_commands('QUEUE_COMMAND')}</b> - সংগীতৰ কিউ তালিকা চাওক।")
+    .add("hi", f"<b>★ {pick_commands('QUEUE_COMMAND')}</b> - संगीत की कतार सूची देखें।")
+    .add(
+        "ku",
+        f"<b>★ {pick_commands('QUEUE_COMMAND')}</b> - لیستی چاوەڕوانی میوزیک بپشکنە.",
+    )
+    .add(
+        "tr",
+        f"<b>★ {pick_commands('QUEUE_COMMAND')}</b> - Müzik kuyruğu listesini kontrol edin.",
+    )
+)

@@ -13,10 +13,12 @@ from pyrogram.errors import ChatAdminRequired
 from pyrogram.types import Message
 
 from config import BANNED_USERS
-from strings import command, get_command
+from strings import command, get_command, pick_commands
 from yukkimusic import app
 from yukkimusic.utils.database import get_lang, set_cmode
 from yukkimusic.utils.decorators.admins import AdminActual
+
+from . import mhelp
 
 
 @app.on_message(command("CHANNELPLAY_COMMAND") & filters.group & ~BANNED_USERS)
@@ -69,3 +71,31 @@ async def playmode_(client, message: Message, _):
             )
         await set_cmode(message.chat.id, chat.id)
         return await message.reply_text(_["cplay_3"].format(chat.title, chat.id))
+
+
+(
+    mhelp.add(
+        "en",
+        f"<b>✧ {pick_commands('CHANNELPLAY_COMMAND')}</b> - Connect channel to a group and stream music on channel's voice chat from your group.",
+    )
+    .add(
+        "ar",
+        f"<b>✧ {pick_commands('CHANNELPLAY_COMMAND')}</b> - اربط القناة بالمجموعة وشغّل الموسيقى في الدردشة الصوتية للقناة من مجموعتك.",
+    )
+    .add(
+        "as",
+        f"<b>✧ {pick_commands('CHANNELPLAY_COMMAND')}</b> - চেনেলক এটা গ্ৰুপৰ সৈতে সংযোগ কৰক আৰু আপোনাৰ গ্ৰুপৰ পৰা চেনেলৰ ভইচ চেটত সংগীত স্ট্ৰিম কৰক।",
+    )
+    .add(
+        "hi",
+        f"<b>✧ {pick_commands('CHANNELPLAY_COMMAND')}</b> - चैनल को ग्रुप से जोड़ें और अपने ग्रुप से चैनल की वॉयस चैट पर म्यूजिक स्ट्रीम करें।",
+    )
+    .add(
+        "ku",
+        f"<b>✧ {pick_commands('CHANNELPLAY_COMMAND')}</b> - کەناڵەکە بە گرووپێک ببەستێت و میوزیک لە ڕووبارەوەی دەنگی کەناڵەکەی خۆت بڵاو بکەرەوە.",
+    )
+    .add(
+        "tr",
+        f"<b>✧ {pick_commands('CHANNELPLAY_COMMAND')}</b> - Kanalı bir gruba bağlayın ve grubunuzdan kanalın sesli sohbetinde müzik yayınlayın.",
+    )
+)

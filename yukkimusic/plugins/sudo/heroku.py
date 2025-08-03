@@ -18,7 +18,7 @@ from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
 
 import config
-from strings import command
+from strings import command, pick_commands
 from yukkimusic import app
 from yukkimusic.misc import HAPP, SUDOERS
 from yukkimusic.utils import pastebin
@@ -28,6 +28,8 @@ from yukkimusic.utils.database import (
     remove_active_video_chat,
 )
 from yukkimusic.utils.decorators import asyncify, language
+
+from . import mhelp
 
 
 @asyncify
@@ -234,3 +236,61 @@ async def update_(client, message, _):
     else:
         os.system(f"kill -9 {os.getpid()} && python3 -m yukkimusic")
         exit()
+
+
+(
+    mhelp.add(
+        "en",
+        (
+            f"<b>{pick_commands('RESTART_COMMAND')}</b> - Restart the bot (SUDOERS only)\n"
+            f"<b>{pick_commands('UPDATE_COMMAND')}</b> - Update the bot\n"
+            f"<b>{pick_commands('LOGGER_COMMAND')}</b> [enable / disable] - Toggle bot logging of searched queries to log group\n"
+            f"<b>{pick_commands('GETLOG_COMMAND')}</b> [Number of lines] - Get logs from server"
+        ),
+    )
+    .add(
+        "ar",
+        (
+            f"<b>{pick_commands('RESTART_COMMAND')}</b> - إعادة تشغيل البوت (للمدراء فقط)\n"
+            f"<b>{pick_commands('UPDATE_COMMAND')}</b> - تحديث البوت\n"
+            f"<b>{pick_commands('LOGGER_COMMAND')}</b> [تفعيل / تعطيل] - تبديل تسجيل عمليات البحث إلى مجموعة السجلات\n"
+            f"<b>{pick_commands('GETLOG_COMMAND')}</b> [عدد الأسطر] - جلب السجلات من الخادم"
+        ),
+    )
+    .add(
+        "as",
+        (
+            f"<b>{pick_commands('RESTART_COMMAND')}</b> - বট পুনৰাৰম্ভ কৰক (শুধুমাত্ৰ সুডোৰ্ছ)\n"
+            f"<b>{pick_commands('UPDATE_COMMAND')}</b> - বট আপডেট কৰক\n"
+            f"<b>{pick_commands('LOGGER_COMMAND')}</b> [সক্ৰিয় কৰক / নিষ্ক্ৰিয় কৰক] - অনুসন্ধান লগ বট লগ গ্ৰুপত টগল কৰক\n"
+            f"<b>{pick_commands('GETLOG_COMMAND')}</b> [শাৰীৰ সংখ্যা] - চাৰ্ভাৰৰ পৰা লগস প্ৰাপ্ত কৰক"
+        ),
+    )
+    .add(
+        "hi",
+        (
+            f"<b>{pick_commands('RESTART_COMMAND')}</b> - बॉट को रीस्टार्ट करें (केवल SUDOERS)\n"
+            f"<b>{pick_commands('UPDATE_COMMAND')}</b> - बॉट अपडेट करें\n"
+            f"<b>{pick_commands('LOGGER_COMMAND')}</b> [सक्रिय / निष्क्रिय] - खोज लॉगिंग को लॉग ग्रुप में टॉगल करें\n"
+            f"<b>{pick_commands('GETLOG_COMMAND')}</b> [पंक्तियों की संख्या] - सर्वर से लॉग प्राप्त करें"
+        ),
+    )
+    .add(
+        "ku",
+        (
+            f"<b>{pick_commands('RESTART_COMMAND')}</b> - بۆت دووبارە دەستپێبکە (تەنها بۆ سودوەکان)\n"
+            f"<b>{pick_commands('UPDATE_COMMAND')}</b> - بۆت نوێ بکەوە\n"
+            f"<b>{pick_commands('LOGGER_COMMAND')}</b> [چالاک / ناچالاک] - تۆگڵکردنی تۆمارکردنی گەڕانەکان بۆ گروپی لاگ\n"
+            f"<b>{pick_commands('GETLOG_COMMAND')}</b> [ژمارەی دێڕەکان] - وەرگرتنی لاگەکان لە ڕاژەکار"
+        ),
+    )
+    .add(
+        "tr",
+        (
+            f"<b>{pick_commands('RESTART_COMMAND')}</b> - Botu yeniden başlat (yalnızca SUDOERS)\n"
+            f"<b>{pick_commands('UPDATE_COMMAND')}</b> - Botu güncelle\n"
+            f"<b>{pick_commands('LOGGER_COMMAND')}</b> [etkinleştir / devre dışı bırak] - Arama kayıtlarını log grubuna kaydetmeyi değiştir\n"
+            f"<b>{pick_commands('GETLOG_COMMAND')}</b> [Satır sayısı] - Sunucudan logları al"
+        ),
+    )
+)

@@ -12,12 +12,13 @@ import random
 import re
 import string
 
+from . import mhelp
 import lyricsgenius as lg
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from config import BANNED_USERS, lyrical
-from strings import get_command
+from strings import get_command, pick_commands
 from yukkimusic import app
 from yukkimusic.utils.decorators.language import language
 
@@ -60,4 +61,32 @@ async def lrsearch(client, message: Message, _):
         ]
     )
     await m.edit(_["lyrics_4"], reply_markup=upl)
+
+(
+    mhelp
+    .add(
+        "en",
+        f"<b>★ {pick_commands('LYRICS_COMMAND')}</b> [Music Name] - Search lyrics for the particular music on the web."
+    )
+    .add(
+        "ar",
+        f"<b>★ {pick_commands('LYRICS_COMMAND')}</b> [اسم الموسيقى] - ابحث عن كلمات الأغنية المحددة على الويب."
+    )
+    .add(
+        "as",
+        f"<b>★ {pick_commands('LYRICS_COMMAND')}</b> [গীতৰ নাম] - ৱেবত বিশেষ গীতৰ লিৰিকচ সন্ধান কৰক।"
+    )
+    .add(
+        "hi",
+        f"<b>★ {pick_commands('LYRICS_COMMAND')}</b> [संगीत का नाम] - वेब पर विशेष गीत के बोल खोजें।"
+    )
+    .add(
+        "ku",
+        f"<b>★ {pick_commands('LYRICS_COMMAND')}</b> [ناوی میوزیک] - لەسەر وێب بگەڕێ بۆ هۆنراوی گۆرانییە دیاریکراوەکان."
+    )
+    .add(
+        "tr",
+        f"<b>★ {pick_commands('LYRICS_COMMAND')}</b> [Müzik Adı] - Web'de belirli bir müziğin sözlerini arayın."
+    )
+)
 """

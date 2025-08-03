@@ -11,11 +11,13 @@
 from pyrogram.types import Message
 
 from config import BANNED_USERS
-from strings import command
+from strings import command, pick_commands
 from yukkimusic import app
 from yukkimusic.misc import SUDOERS
 from yukkimusic.utils.database import add_gban_user, remove_gban_user
 from yukkimusic.utils.decorators.language import language
+
+from . import mhelp
 
 
 @app.on_message(command("BLOCK_COMMAND") & SUDOERS)
@@ -89,3 +91,55 @@ async def sudoers_list(client, message: Message, _):
         return await mystic.edit_text(_["block_5"])
     else:
         return await mystic.edit_text(msg)
+
+
+(
+    mhelp.add(
+        "en",
+        (
+            f"<b>✧ {pick_commands('BLOCK_COMMAND')}</b> [Username or reply to a user] - Prevents a user from using bot commands.\n"
+            f"<b>✧ {pick_commands('UNBLOCK_COMMAND')}</b> [Username or reply to a user] - Remove a user from the bot's blocked list.\n"
+            f"<b>✧ {pick_commands('BLOCKED_COMMAND')}</b> - Check the list of blocked users."
+        ),
+    )
+    .add(
+        "ar",
+        (
+            f"<b>✧ {pick_commands('BLOCK_COMMAND')}</b> [اسم المستخدم أو الرد على المستخدم] - يمنع المستخدم من استخدام أوامر البوت.\n"
+            f"<b>✧ {pick_commands('UNBLOCK_COMMAND')}</b> [اسم المستخدم أو الرد على المستخدم] - إزالة المستخدم من قائمة الحظر.\n"
+            f"<b>✧ {pick_commands('BLOCKED_COMMAND')}</b> - عرض قائمة المستخدمين المحظورين."
+        ),
+    )
+    .add(
+        "as",
+        (
+            f"<b>✧ {pick_commands('BLOCK_COMMAND')}</b> [ব্যৱহাৰকাৰী নাম বা ব্যৱহাৰকাৰীক প্ৰত্যুত্তৰ কৰক] - এজন ব্যৱহাৰকাৰীক বটৰ কমান্ড ব্যৱহাৰ কৰা পৰা ৰোধ কৰে।\n"
+            f"<b>✧ {pick_commands('UNBLOCK_COMMAND')}</b> [ব্যৱহাৰকাৰী নাম বা ব্যৱহাৰকাৰীক প্ৰত্যুত্তৰ কৰক] - এজন ব্যৱহাৰকাৰীক ব্লক তালিকাৰ পৰা আতৰাওক।\n"
+            f"<b>✧ {pick_commands('BLOCKED_COMMAND')}</b> - ব্লক কৰা ব্যৱহাৰকাৰীৰ তালিকা চাওক।"
+        ),
+    )
+    .add(
+        "hi",
+        (
+            f"<b>✧ {pick_commands('BLOCK_COMMAND')}</b> [यूज़रनेम या यूज़र को रिप्लाई करें] - किसी यूज़र को बॉट कमांड्स इस्तेमाल करने से रोकें।\n"
+            f"<b>✧ {pick_commands('UNBLOCK_COMMAND')}</b> [यूज़रनेम या यूज़र को रिप्लाई करें] - किसी यूज़र को ब्लॉक सूची से हटाएँ।\n"
+            f"<b>✧ {pick_commands('BLOCKED_COMMAND')}</b> - ब्लॉक किए गए यूज़र्स की सूची देखें।"
+        ),
+    )
+    .add(
+        "ku",
+        (
+            f"<b>✧ {pick_commands('BLOCK_COMMAND')}</b> [ناوی بەکارهێنەر یان وەڵامدانەوە بە بەکارهێنەر] - بەکارهێنەرێک لە بەکارهێنانی فەرمانەکانی بۆت بەرز دەگرێت.\n"
+            f"<b>✧ {pick_commands('UNBLOCK_COMMAND')}</b> [ناوی بەکارهێنەر یان وەڵامدانەوە بە بەکارهێنەر] - بەکارهێنەرێک لە لیستی بلۆک دەربهێنە.\n"
+            f"<b>✧ {pick_commands('BLOCKED_COMMAND')}</b> - لیستی بەکارهێنەرانی بلۆک کراو بپشکنە."
+        ),
+    )
+    .add(
+        "tr",
+        (
+            f"<b>✧ {pick_commands('BLOCK_COMMAND')}</b> [Kullanıcı adı veya kullanıcıya yanıt ver] - Bir kullanıcının bot komutlarını kullanmasını engeller.\n"
+            f"<b>✧ {pick_commands('UNBLOCK_COMMAND')}</b> [Kullanıcı adı veya kullanıcıya yanıt ver] - Bir kullanıcıyı botun engelli listesinden kaldır.\n"
+            f"<b>✧ {pick_commands('BLOCKED_COMMAND')}</b> - Engellenmiş kullanıcıların listesini kontrol et."
+        ),
+    )
+)

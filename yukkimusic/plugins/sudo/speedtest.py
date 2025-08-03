@@ -11,9 +11,11 @@ import asyncio
 
 import speedtest
 
-from strings import command
+from strings import command, pick_commands
 from yukkimusic import app
 from yukkimusic.misc import SUDOERS
+
+from . import mhelp
 
 
 async def testspeed(m):
@@ -53,7 +55,19 @@ async def speedtest_function(client, message):
 **Sponsor:** {result["server"]["sponsor"]}
 **Latency:** {result["server"]["latency"]}  
 **Ping :** {result["ping"]}"""
-    msg = await app.send_photo(
-        chat_id=message.chat.id, photo=result["share"], caption=output
-    )
+    await app.send_photo(chat_id=message.chat.id, photo=result["share"], caption=output)
     await m.delete()
+
+
+(
+    mhelp.add(
+        "en", f"<b>{pick_commands('SPEEDTEST_COMMAND')}</b> - Check server speeds"
+    )
+    .add("ar", f"<b>{pick_commands('SPEEDTEST_COMMAND')}</b> - فحص سرعة الخادم")
+    .add("as", f"<b>{pick_commands('SPEEDTEST_COMMAND')}</b> - ছাৰ্ভাৰৰ গতি পৰীক্ষা কৰক")
+    .add("hi", f"<b>{pick_commands('SPEEDTEST_COMMAND')}</b> - सर्वर की गति जांचें")
+    .add("ku", f"<b>{pick_commands('SPEEDTEST_COMMAND')}</b> - خێرایی ڕاژەکار بپشکنە")
+    .add(
+        "tr", f"<b>{pick_commands('SPEEDTEST_COMMAND')}</b> - Sunucu hızını kontrol et"
+    )
+)

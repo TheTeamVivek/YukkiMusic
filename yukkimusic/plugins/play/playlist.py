@@ -15,7 +15,7 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from config import BANNED_USERS, SERVER_PLAYLIST_LIMIT
-from strings import command
+from strings import command, pick_commands
 from yukkimusic import app
 from yukkimusic.platforms import carbon, youtube
 from yukkimusic.utils.database import (
@@ -32,6 +32,8 @@ from yukkimusic.utils.inline.playlist import (
 )
 from yukkimusic.utils.pastebin import Yukkibin
 from yukkimusic.utils.stream.stream import stream
+
+from . import mhelp
 
 
 @app.on_message(command("PLAYLIST_COMMAND") & ~BANNED_USERS)
@@ -433,3 +435,55 @@ async def del_back_playlist(client, query, _):
     return await query.edit_message_text(
         _["playlist_7"].format(count), reply_markup=keyboard
     )
+
+
+(
+    mhelp.add(
+        "en",
+        (
+            f"<b>{pick_commands('PLAYLIST_COMMAND')}</b> - Check your whole playlist on the bot server\n"
+            f"<b>{pick_commands('DELETE_PLAYLIST_COMMAND')}</b> - Delete any song from your saved playlist\n"
+            f"<b>{pick_commands('PLAY_PLAYLIST_COMMAND')}</b> - Start playing your saved playlist in voice chat."
+        ),
+    )
+    .add(
+        "ar",
+        (
+            f"<b>{pick_commands('PLAYLIST_COMMAND')}</b> - تحقق من قائمة التشغيل الكاملة الخاصة بك على خادم البوت\n"
+            f"<b>{pick_commands('DELETE_PLAYLIST_COMMAND')}</b> - احذف أي أغنية من قائمة التشغيل المحفوظة الخاصة بك\n"
+            f"<b>{pick_commands('PLAY_PLAYLIST_COMMAND')}</b> - ابدأ تشغيل قائمة التشغيل المحفوظة الخاصة بك في الدردشة الصوتية."
+        ),
+    )
+    .add(
+        "as",
+        (
+            f"<b>{pick_commands('PLAYLIST_COMMAND')}</b> - বট ছাৰ্ভাৰত আপোনাৰ সম্পূৰ্ণ প্লেলিষ্ট চাওক\n"
+            f"<b>{pick_commands('DELETE_PLAYLIST_COMMAND')}</b> - আপোনাৰ ছেভ কৰা প্লেলিষ্টৰ পৰা যিকোনো গান মচক\n"
+            f"<b>{pick_commands('PLAY_PLAYLIST_COMMAND')}</b> - ভইচ চেটত আপোনাৰ ছেভ কৰা প্লেলিষ্ট প্লে আৰম্ভ কৰক।"
+        ),
+    )
+    .add(
+        "hi",
+        (
+            f"<b>{pick_commands('PLAYLIST_COMMAND')}</b> - बॉट सर्वर पर अपनी पूरी प्लेलिस्ट देखें\n"
+            f"<b>{pick_commands('DELETE_PLAYLIST_COMMAND')}</b> - अपनी सेव की गई प्लेलिस्ट से कोई भी गाना हटाएँ\n"
+            f"<b>{pick_commands('PLAY_PLAYLIST_COMMAND')}</b> - अपनी सेव की गई प्लेलिस्ट को वॉयस चैट में प्ले करना शुरू करें।"
+        ),
+    )
+    .add(
+        "ku",
+        (
+            f"<b>{pick_commands('PLAYLIST_COMMAND')}</b> - لیستی گۆرانییەکانت لەسەر ڕاژەی بۆت بپشکنە\n"
+            f"<b>{pick_commands('DELETE_PLAYLIST_COMMAND')}</b> - هەر گۆرانییەک لە لیستی پاشەکەوتکراوەکەت بسڕەوە\n"
+            f"<b>{pick_commands('PLAY_PLAYLIST_COMMAND')}</b> - دەست بکە بە پەخشکردنی لیستی پاشەکەوتکراوەکەت لە قسەکردنی دەنگ."
+        ),
+    )
+    .add(
+        "tr",
+        (
+            f"<b>{pick_commands('PLAYLIST_COMMAND')}</b> - Bot sunucusundaki tüm çalma listenizi kontrol edin\n"
+            f"<b>{pick_commands('DELETE_PLAYLIST_COMMAND')}</b> - Kaydedilmiş çalma listenizden herhangi bir şarkıyı silin\n"
+            f"<b>{pick_commands('PLAY_PLAYLIST_COMMAND')}</b> - Kaydedilmiş çalma listenizi sesli sohbette çalmaya başlayın."
+        ),
+    )
+)

@@ -10,11 +10,12 @@
 
 import asyncio
 
+from pyrogram import filters
 from pyrogram.errors import FloodWait
 from pyrogram.types import Message
 
-from config import BANNED_USERS
-from strings import command
+from config import BANNED_USERS, OWNER_ID
+from strings import command, pick_commands
 from yukkimusic import app
 from yukkimusic.misc import SUDOERS
 from yukkimusic.utils import get_readable_time
@@ -28,8 +29,10 @@ from yukkimusic.utils.database import (
 )
 from yukkimusic.utils.decorators.language import language
 
+from . import ohelp
 
-@app.on_message(command("GBAN_COMMAND") & SUDOERS)
+
+@app.on_message(command("GBAN_COMMAND") & filters.user(OWNER_ID))
 @language
 async def gbanuser(client, message: Message, _):
     if not message.reply_to_message:
@@ -74,7 +77,7 @@ async def gbanuser(client, message: Message, _):
     await mystic.delete()
 
 
-@app.on_message(command("UNGBAN_COMMAND") & SUDOERS)
+@app.on_message(command("UNGBAN_COMMAND") & filters.user(OWNER_ID))
 @language
 async def gungabn(client, message: Message, _):
     if not message.reply_to_message:
@@ -113,7 +116,7 @@ async def gungabn(client, message: Message, _):
     await mystic.delete()
 
 
-@app.on_message(command("GBANNED_COMMAND") & SUDOERS)
+@app.on_message(command("GBANNED_COMMAND") & filters.user(OWNER_ID))
 @language
 async def gbanned_list(client, message: Message, _):
     counts = await get_banned_count()
@@ -136,3 +139,55 @@ async def gbanned_list(client, message: Message, _):
         return await mystic.edit_text(_["gban_10"])
     else:
         return await mystic.edit_text(msg)
+
+
+(
+    ohelp.add(
+        "en",
+        (
+            f"<b>✧ {pick_commands('GBAN_COMMAND')}</b> [Username or reply to a user] - Gban a user from all served chats and stop them from using your bot.\n"
+            f"<b>✧ {pick_commands('UNGBAN_COMMAND')}</b> [Username or reply to a user] - Remove a user from the bot's gban list and allow them to use your bot.\n"
+            f"<b>✧ {pick_commands('GBANNED_COMMAND')}</b> - Check the list of gban users."
+        ),
+    )
+    .add(
+        "ar",
+        (
+            f"<b>✧ {pick_commands('GBAN_COMMAND')}</b> [اسم المستخدم أو الرد على المستخدم] - حظر مستخدم من جميع الدردشات ومنعه من استخدام البوت.\n"
+            f"<b>✧ {pick_commands('UNGBAN_COMMAND')}</b> [اسم المستخدم أو الرد على المستخدم] - إزالة مستخدم من قائمة الحظر العام والسماح له باستخدام البوت.\n"
+            f"<b>✧ {pick_commands('GBANNED_COMMAND')}</b> - عرض قائمة المستخدمين المحظورين."
+        ),
+    )
+    .add(
+        "as",
+        (
+            f"<b>✧ {pick_commands('GBAN_COMMAND')}</b> [ব্যৱহাৰকাৰী নাম বা ব্যৱহাৰকাৰীক প্ৰত্যুত্তৰ কৰক] - সকলো চেটৰ পৰা এজন ব্যৱহাৰকাৰীক গ্লোবেলি ব্যান কৰক আৰু তেওঁক বট ব্যৱহাৰ কৰাৰ পৰা আটকাওক।\n"
+            f"<b>✧ {pick_commands('UNGBAN_COMMAND')}</b> [ব্যৱহাৰকাৰী নাম বা ব্যৱহাৰকাৰীক প্ৰত্যুত্তৰ কৰক] - এজন ব্যৱহাৰকাৰীক গ্লোবেলি ব্যান তালিকাৰ পৰা আতৰাওক আৰু তেওঁক বট ব্যৱহাৰ কৰিবলৈ দিয়ক।\n"
+            f"<b>✧ {pick_commands('GBANNED_COMMAND')}</b> - গ্লোবেলি ব্যান কৰা ব্যৱহাৰকাৰীৰ তালিকা চাওক।"
+        ),
+    )
+    .add(
+        "hi",
+        (
+            f"<b>✧ {pick_commands('GBAN_COMMAND')}</b> [यूज़रनेम या यूज़र को रिप्लाई करें] - किसी यूज़र को सभी चैट से ग्लोबल बैन करें और उसे बॉट इस्तेमाल करने से रोकें।\n"
+            f"<b>✧ {pick_commands('UNGBAN_COMMAND')}</b> [यूज़रनेम या यूज़र को रिप्लाई करें] - किसी यूज़र को ग्लोबल बैन सूची से हटाएँ और उसे बॉट इस्तेमाल करने दें।\n"
+            f"<b>✧ {pick_commands('GBANNED_COMMAND')}</b> - ग्लोबल बैन किए गए यूज़र्स की सूची देखें।"
+        ),
+    )
+    .add(
+        "ku",
+        (
+            f"<b>✧ {pick_commands('GBAN_COMMAND')}</b> [ناوی بەکارهێنەر یان وەڵامدانەوە بە بەکارهێنەر] - بەکارهێنەرێک لە هەموو چاتەکان بەنێ و مانهێڵە لە بەکارهێنانی بۆت.\n"
+            f"<b>✧ {pick_commands('UNGBAN_COMMAND')}</b> [ناوی بەکارهێنەر یان وەڵامدانەوە بە بەکارهێنەر] - بەکارهێنەرێک لە لیستی بەنە گشتی دەربهێنە و ڕێگە بدە لە بەکارهێنانی بۆت.\n"
+            f"<b>✧ {pick_commands('GBANNED_COMMAND')}</b> - لیستی بەکارهێنەرانی بەنە گشتی بپشکنە."
+        ),
+    )
+    .add(
+        "tr",
+        (
+            f"<b>✧ {pick_commands('GBAN_COMMAND')}</b> [Kullanıcı adı veya kullanıcıya yanıt ver] - Bir kullanıcıyı tüm sohbetlerden global olarak yasakla ve botu kullanmasını engelle.\n"
+            f"<b>✧ {pick_commands('UNGBAN_COMMAND')}</b> [Kullanıcı adı veya kullanıcıya yanıt ver] - Bir kullanıcıyı global yasak listesinden kaldır ve botu kullanmasına izin ver.\n"
+            f"<b>✧ {pick_commands('GBANNED_COMMAND')}</b> - Global olarak yasaklanan kullanıcıların listesini kontrol et."
+        ),
+    )
+)

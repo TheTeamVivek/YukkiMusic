@@ -17,7 +17,7 @@ from pyrogram.types import InlineKeyboardMarkup, Message
 
 import config
 from config import BANNED_USERS, lyrical
-from strings import command
+from strings import command, pick_commands
 from yukkimusic import app
 from yukkimusic.platforms import apple, resso, saavn, soundcloud
 from yukkimusic.platforms import spotify as spotifyapi
@@ -35,6 +35,8 @@ from yukkimusic.utils.inline.play import (
 from yukkimusic.utils.inline.playlist import botplaylist_markup
 from yukkimusic.utils.logger import play_logs
 from yukkimusic.utils.stream.stream import stream
+
+from . import mhelp
 
 
 @app.on_message(
@@ -520,3 +522,37 @@ async def play_command(
                     reply_markup=InlineKeyboardMarkup(buttons),
                 )
                 return await play_logs(message, streamtype="URL Searched Inline")
+
+
+(
+    mhelp.add(
+        "en",
+        f"<b>✧ {pick_commands('PLAY_COMMAND')}</b> - Bot will start playing your given query on voice chat or stream live links on voice chats.",
+        priority=10,
+    )
+    .add(
+        "ar",
+        f"<b>✧ {pick_commands('PLAY_COMMAND')}</b> - سيبدأ البوت في تشغيل طلبك على الدردشة الصوتية أو بث الروابط المباشرة على الدردشات الصوتية.",
+        priority=10,
+    )
+    .add(
+        "as",
+        f"<b>✧ {pick_commands('PLAY_COMMAND')}</b> - বট আপোনাৰ অনুৰোধক ভইচ চেটত প্লে কৰিব বা লাইভ লিংকসমূহ স্ট্ৰিম কৰিব।",
+        priority=10,
+    )
+    .add(
+        "hi",
+        f"<b>✧ {pick_commands('PLAY_COMMAND')}</b> - बॉट आपके दिए गए क्वेरी को वॉयस चैट पर प्ले करेगा या लाइव लिंक को स्ट्रीम करेगा।",
+        priority=10,
+    )
+    .add(
+        "ku",
+        f"<b>✧ {pick_commands('PLAY_COMMAND')}</b> - بۆت دەستپێدەکات بە پەخشکردنی داوای تۆ لە قسەکردنی دەنگ یان بڵاوکردنەوەی بەستەرە زیندووەکان.",
+        priority=10,
+    )
+    .add(
+        "tr",
+        f"<b>✧ {pick_commands('PLAY_COMMAND')}</b> - Bot, verdiğiniz sorguyu sesli sohbette çalmaya veya canlı bağlantıları sesli sohbetlerde yayınlamaya başlayacaktır.",
+        priority=10,
+    )
+)

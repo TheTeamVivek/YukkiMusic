@@ -20,7 +20,7 @@ from pytgcalls.__version__ import __version__ as pytgver
 
 import config
 from config import BANNED_USERS
-from strings import command
+from strings import command, pick_commands
 from yukkimusic import app
 from yukkimusic.core.mongo import mongodb
 from yukkimusic.core.userbot import assistants
@@ -45,6 +45,8 @@ from yukkimusic.utils.inline.stats import (
     stats_buttons,
     top_ten_stats_markup,
 )
+
+from . import mhelp
 
 
 @app.on_message(command("STATS_COMMAND") & ~BANNED_USERS)
@@ -424,3 +426,31 @@ async def back_buttons(client, query, _):
                 caption=_["gstats_11"].format(app.mention),
                 reply_markup=upl,
             )
+
+
+(
+    mhelp.add(
+        "en",
+        f"<b>★ {pick_commands('GSTATS_COMMAND')}</b> - Get Top 10 Tracks Global Stats, Top 10 Users of Bot, Top 10 Chats on Bot, Top 10 Played in a chat, etc.",
+    )
+    .add(
+        "ar",
+        f"<b>★ {pick_commands('GSTATS_COMMAND')}</b> - احصل على أفضل 10 إحصائيات للأغاني عالميًا، أفضل 10 مستخدمين للبوت، أفضل 10 محادثات في البوت، أفضل 10 تشغيلات في محادثة، إلخ.",
+    )
+    .add(
+        "as",
+        f"<b>★ {pick_commands('GSTATS_COMMAND')}</b> - শীৰ্ষ 10 ট্ৰেক গ্ল'বেল ষ্টেটচ, বটৰ শীৰ্ষ 10 ব্যৱহাৰকাৰী, বটৰ শীৰ্ষ 10 চেট, চেটত শীৰ্ষ 10 প্লে আদি পাব।",
+    )
+    .add(
+        "hi",
+        f"<b>★ {pick_commands('GSTATS_COMMAND')}</b> - टॉप 10 ट्रैक्स ग्लोबल स्टैट्स, बॉट के टॉप 10 यूज़र्स, बॉट के टॉप 10 चैट्स, चैट में टॉप 10 प्ले आदि प्राप्त करें।",
+    )
+    .add(
+        "ku",
+        f"<b>★ {pick_commands('GSTATS_COMMAND')}</b> - 10 گۆرانییە باشترینەکان لە جیھاندا، 10 بەکارهێنەرە سەرەکییەکانی بۆت، 10 چاتی سەرەکیی بۆت، 10 یاری زۆرترین لە چات، هتد بگرە.",
+    )
+    .add(
+        "tr",
+        f"<b>★ {pick_commands('GSTATS_COMMAND')}</b> - En iyi 10 Parça Global İstatistikleri, Botun En İyi 10 Kullanıcısı, Botun En İyi 10 Sohbeti, Sohbette En Çok Çalınan 10 Parça vb. alın.",
+    )
+)

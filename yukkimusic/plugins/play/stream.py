@@ -14,12 +14,14 @@ from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
 from config import BANNED_USERS
-from strings import command
+from strings import command, pick_commands
 from yukkimusic import app
 from yukkimusic.core.call import yukki
 from yukkimusic.utils.decorators.play import PlayWrapper
 from yukkimusic.utils.logger import play_logs
 from yukkimusic.utils.stream.stream import stream
+
+from . import mhelp
 
 
 @app.on_message(command("STREAM_COMMAND") & filters.group & ~BANNED_USERS)
@@ -69,3 +71,31 @@ async def stream_command(
         return await play_logs(message, streamtype="M3u8 or Index Link")
     else:
         await message.reply_text(_["str_1"])
+
+
+(
+    mhelp.add(
+        "en",
+        f"<b>✧ {pick_commands('STREAM_COMMAND')}</b> - Stream a URL that you believe is direct or m3u8 that can't be played by play.",
+    )
+    .add(
+        "ar",
+        f"<b>✧ {pick_commands('STREAM_COMMAND')}</b> - قم ببث رابط تعتقد أنه مباشر أو m3u8 ولا يمكن تشغيله باستخدام تشغيل.",
+    )
+    .add(
+        "as",
+        f"<b>✧ {pick_commands('STREAM_COMMAND')}</b> - এটা URL স্ট্ৰিম কৰক যাক আপুনি প্ৰত্যক্ষ বা m3u8 বুলি বিশ্বাস কৰে আৰু যাক প্লে ৰ দ্বাৰা প্লে কৰা নাযায়।",
+    )
+    .add(
+        "hi",
+        f"<b>✧ {pick_commands('STREAM_COMMAND')}</b> - ऐसा URL स्ट्रीम करें जो सीधा हो या m3u8 हो जिसे प्ले से प्ले नहीं किया जा सकता।",
+    )
+    .add(
+        "ku",
+        f"<b>✧ {pick_commands('STREAM_COMMAND')}</b> - بەستەرێک بڵاو بکەرەوە کە باوەڕت پێیە سەردەشتە یان m3u8 ـە کە ناتوانرێت بە پەخشکردن بلیژرێت.",
+    )
+    .add(
+        "tr",
+        f"<b>✧ {pick_commands('STREAM_COMMAND')}</b> - play ile çalınamayan doğrudan veya m3u8 olduğunu düşündüğünüz bir URL'yi yayınlayın.",
+    )
+)

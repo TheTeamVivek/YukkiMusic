@@ -29,12 +29,14 @@ from config import (
     SONG_DOWNLOAD_DURATION_LIMIT,
     cookies,
 )
-from strings import command
+from strings import command, pick_commands
 from yukkimusic import app
 from yukkimusic.platforms import youtube
 from yukkimusic.utils.decorators.language import language
 from yukkimusic.utils.formatters import convert_bytes
 from yukkimusic.utils.inline.song import song_markup
+
+from . import mhelp
 
 
 @app.on_message(command("SONG_COMMAND") & filters.group & ~BANNED_USERS)
@@ -377,3 +379,31 @@ async def song_download_cb(client, query, _):
             return await mystic.edit_text(_["song_10"])
 
         os.remove(filename)
+
+
+(
+    mhelp.add(
+        "en",
+        f"<b>★ {pick_commands('SONG_COMMAND')}</b> [Track Name] or [YT Link] - Download any track from YouTube in MP3 or MP4 formats.",
+    )
+    .add(
+        "ar",
+        f"<b>★ {pick_commands('SONG_COMMAND')}</b> [اسم المقطع] أو [رابط يوتيوب] - قم بتنزيل أي مقطع من يوتيوب بصيغة MP3 أو MP4.",
+    )
+    .add(
+        "as",
+        f"<b>★ {pick_commands('SONG_COMMAND')}</b> [গীতৰ নাম] বা [YT লিংক] - যিকোনো গান YouTube ৰ পৰা MP3 বা MP4 ফৰ্মেটত ডাউনল'ড কৰক।",
+    )
+    .add(
+        "hi",
+        f"<b>★ {pick_commands('SONG_COMMAND')}</b> [गाने का नाम] या [YT लिंक] - YouTube से कोई भी गाना MP3 या MP4 फ़ॉर्मेट में डाउनलोड करें।",
+    )
+    .add(
+        "ku",
+        f"<b>★ {pick_commands('SONG_COMMAND')}</b> [ناوی گۆرانی] یان [لینکی YT] - هەر گۆرانییەک لە YouTube دا بە فۆرماتی MP3 یان MP4 داگرتن بکە.",
+    )
+    .add(
+        "tr",
+        f"<b>★ {pick_commands('SONG_COMMAND')}</b> [Şarkı Adı] veya [YT Link] - YouTube'dan herhangi bir şarkıyı MP3 veya MP4 formatında indirin.",
+    )
+)
