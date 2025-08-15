@@ -23,7 +23,6 @@ langdb = mongodb.language
 authdb = mongodb.adminauth
 videodb = mongodb.yukkivideocalls
 onoffdb = mongodb.onoffper
-autoenddb = mongodb.autoend
 notesdb = mongodb.notes
 filtersdb = mongodb.filters
 
@@ -43,42 +42,31 @@ command = []
 cleanmode = []
 nonadmin = {}
 vlimit = []
-autoend = {}
 
-cache = {"on_off": set()}
+cache = {"on_off": set(), "mute": set()}
 
 # Auto End Stream
 
-
-async def is_autoend() -> bool:
-    chat_id = 123
-    mode = autoend.get(chat_id)
-    if not mode:
-        user = await autoenddb.find_one({"chat_id": chat_id})
-        if not user:
-            autoend[chat_id] = False
-            return False
-        autoend[chat_id] = True
-        return True
-    return mode
-
+async def is_autoend():
+    return await is_on_off(config.AUTOEND)
 
 async def autoend_on():
-    chat_id = 123
-    autoend[chat_id] = True
-    user = await autoenddb.find_one({"chat_id": chat_id})
-    if not user:
-        return await autoenddb.insert_one({"chat_id": chat_id})
-
+    return await add_on(config.AUTOEND)
 
 async def autoend_off():
-    chat_id = 123
-    autoend[chat_id] = False
-    user = await autoenddb.find_one({"chat_id": chat_id})
-    if user:
-        return await autoenddb.delete_one({"chat_id": chat_id})
+    return await add_off(config.AUTOEND)
+    
+# Auto leave assistant 
 
+async def is_autoleave():
+    return await is_on_off(config.AUTOLEAVE)
 
+async def autoleave_on():
+    return await add_on(config.AUTOLEAVE)
+
+async def autoleave_off():
+    return await add_off(config.AUTOLEAVE)
+    
 # LOOP PLAY
 async def get_loop(chat_id: int) -> int:
     lop = loop.get(chat_id)
@@ -170,18 +158,13 @@ async def set_lang(chat_id: int, lang: str):
 
 # Muted
 async def is_muted(chat_id: int) -> bool:
-    mode = mute.get(chat_id)
-    if not mode:
-        return False
-    return mode
-
-
+    return int(chat_id) in cache["mute"]
+    
 async def mute_on(chat_id: int):
-    mute[chat_id] = True
-
+    cache["mute"].add(int(chat_id))
 
 async def mute_off(chat_id: int):
-    mute[chat_id] = False
+    cache["mute"].discard(int(chat_id))
 
 
 # Pause-Skip

@@ -17,3 +17,4 @@ from .mongodatabase import *
 
 async def init():
     await preload_onoff_cache()
+    await mongodb.autoend.drop()

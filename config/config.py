@@ -8,6 +8,7 @@
 # All rights reserved.
 # pylint: disable=missing-module-docstring, missing-function-docstring
 import os as _os
+from os import dotenv
 import re as _re
 import sys as _sys
 
@@ -27,14 +28,6 @@ def parse_list(text: str, sep: str = ",") -> list[str]:
     if not text:
         text = ""
     return [v.strip() for v in str(text).strip("'\"").split(sep) if v.strip()]
-
-
-def getenv(key, default=None):
-    value = default
-    if v := _os.getenv(key):
-        value = v
-    return value
-
 
 # Get it from my.telegram.org
 
@@ -191,6 +184,8 @@ YTDOWNLOADER = 1
 LOG = 2
 CLEANMODE = 3
 MAINTENANCE = 4
+AUTOLEAVE = 5
+AUTOEND = 6
 adminlist = {}
 lyrical = {}
 chatstats = {}
