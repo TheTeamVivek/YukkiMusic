@@ -26,9 +26,6 @@ dirr()
 # Check Git Updates
 git()
 
-# Initialize Memory DB
-dbb()
-
 # Heroku APP
 heroku()
 
