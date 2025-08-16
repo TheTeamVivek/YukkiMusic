@@ -29,8 +29,6 @@ onoffdb = mongodb.onoffper
 playtype = {}
 playmode = {}
 langm = {}
-command = []
-cleanmode = []
 
 cache = {
     "on_off": set(),
