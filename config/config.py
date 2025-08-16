@@ -7,8 +7,8 @@
 #
 # All rights reserved.
 # pylint: disable=missing-module-docstring, missing-function-docstring
-import os as _os
-from os import dotenv
+
+from os import getenv
 import re as _re
 import sys as _sys
 
@@ -63,7 +63,7 @@ STRING_SESSIONS = parse_list(getenv("STRING_SESSIONS", ""))
 
 COOKIE_LINK = parse_list(getenv("COOKIE_LINK", ""))
 
-EXTRA_PLUGINS = parse_list(getenv("EXTRA_PLUGINS", "yukkmusic_plugin_addon"), "")
+EXTRA_PLUGINS = parse_list(getenv("EXTRA_PLUGINS", "yukkmusic_plugin_addon"))
 
 CLEANMODE_DELETE_MINS = int(
     getenv("CLEANMODE_MINS", "5")
