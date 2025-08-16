@@ -35,11 +35,11 @@ from yukkimusic.utils import fallback, seconds_to_min, time_to_seconds
 from yukkimusic.utils.channelplay import get_channeplayCB
 from yukkimusic.utils.database import (
     is_active_chat,
-    is_music_playing,
+    is_music_paused,
     is_muted,
     is_nonadmin_chat,
-    music_off,
-    music_on,
+    set_music_paused,
+    set_music_playing,
     mute_off,
     mute_on,
     set_loop,
@@ -156,17 +156,17 @@ async def admin_callback(client, query, _):
                 if query.from_user.id not in admins:
                     return await query.answer(_["admin_2"], show_alert=True)
     if command == "Pause":
-        if not await is_music_playing(chat_id):
+        if await is_music_paused(chat_id):
             return await query.answer(_["pause_1"], show_alert=True)
         await query.answer()
-        await music_off(chat_id)
+        await set_music_paused(chat_id)
         await yukki.pause_stream(chat_id)
         await query.message.reply_text(_["pause_2"].format(mention))
     elif command == "Resume":
-        if await is_music_playing(chat_id):
+        if not await is_music_paused(chat_id):
             return await query.answer(_["resume_1"], show_alert=True)
         await query.answer()
-        await music_on(chat_id)
+        await set_music_playing(chat_id)
         await yukki.resume_stream(chat_id)
         await query.message.reply_text(_["resume_2"].format(mention))
     elif command == "Stop" or command == "End":

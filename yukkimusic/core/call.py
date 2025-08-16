@@ -48,7 +48,7 @@ from yukkimusic.utils.database import (
     get_loop,
     get_video_bitrate,
     group_assistant,
-    music_on,
+    set_music_playing,
     remove_active_chat,
     remove_active_video_chat,
     set_assistant,
@@ -339,7 +339,7 @@ class Call:
                 "**TELEGRAM SERVER ERROR**\n\nPlease restart Your voicechat."
             )
         await add_active_chat(chat_id)
-        await music_on(chat_id)
+        await set_music_playing(chat_id)
         if video:
             await add_active_video_chat(chat_id)
 

@@ -101,7 +101,6 @@ recommended_vars = {
 optional_vars = {
     "DURATION_LIMIT": ("Maximum playback duration in minutes", False, isint),
     "SONG_DOWNLOAD_DURATION_LIMIT": ("Max download duration in minutes", False, isint),
-    "VIDEO_STREAM_LIMIT": ("Max number of video streams", False, isint),
     "PRIVATE_BOT_MODE": ("Enable private bot mode?", False, is_bool),
     "CLEANMODE_MINS": ("Interval for clean mode (in mins)", False, isint),
     "YOUTUBE_EDIT_SLEEP": ("Sleep between yt-dl edit messages", False, isint),

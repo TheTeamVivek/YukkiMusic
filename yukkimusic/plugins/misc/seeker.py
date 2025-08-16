@@ -22,7 +22,7 @@ from yukkimusic.utils.database import (
     get_active_chats,
     get_assistant,
     get_lang,
-    is_music_playing,
+    is_music_paused,
     set_loop,
 )
 from yukkimusic.utils.formatters import seconds_to_min
@@ -36,7 +36,7 @@ async def timer():
     while not await asyncio.sleep(1):
         active_chats = await get_active_chats()
         for chat_id in active_chats:
-            if not await is_music_playing(chat_id):
+            if await is_music_paused(chat_id):
                 continue
             playing = db.get(chat_id)
             if not playing:
@@ -90,7 +90,7 @@ async def markup_timer():
         await asyncio.sleep(2)
         active_chats = await get_active_chats()
         for chat_id in active_chats:
-            if not await is_music_playing(chat_id):
+            if await is_music_paused(chat_id):
                 continue
 
             playing = db.get(chat_id)

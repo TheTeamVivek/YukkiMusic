@@ -24,7 +24,7 @@ from yukkimusic.utils import Yukkibin, get_channeplayCB, seconds_to_min
 from yukkimusic.utils.database import (
     get_cmode,
     is_active_chat,
-    is_music_playing,
+    is_music_paused,
 )
 from yukkimusic.utils.decorators.language import language
 from yukkimusic.utils.inline.queue import queue_back_markup, queue_markup
@@ -131,7 +131,7 @@ async def ping_com(client, message: Message, _):
                 await asyncio.sleep(5)
                 if await is_active_chat(chat_id):
                     if basic[videoid]:
-                        if await is_music_playing(chat_id):
+                        if not await is_music_paused(chat_id):
                             try:
                                 buttons = queue_markup(
                                     _,
@@ -295,7 +295,7 @@ async def queue_back(client, query, _):
                 await asyncio.sleep(5)
                 if await is_active_chat(chat_id):
                     if basic[videoid]:
-                        if await is_music_playing(chat_id):
+                        if not await is_music_paused(chat_id):
                             try:
                                 buttons = queue_markup(
                                     _,

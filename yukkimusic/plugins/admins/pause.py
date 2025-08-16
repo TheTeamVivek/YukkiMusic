@@ -16,18 +16,16 @@ from strings import command, pick_commands
 from yukkimusic import app
 from yukkimusic.core.call import yukki
 from yukkimusic.core.help import ModuleHelp
-from yukkimusic.utils.database import is_music_playing, music_off, music_on
+from yukkimusic.utils.database import is_music_paused, set_music_paused, set_music_playing
 from yukkimusic.utils.decorators import AdminRightsCheck
 
 
 @app.on_message(command("PAUSE_COMMAND") & filters.group & ~BANNED_USERS)
 @AdminRightsCheck
 async def pause_admin(cli, message: Message, _, chat_id):
-    if not len(message.command) == 1:
-        return await message.reply_text(_["general_2"])
-    if not await is_music_playing(chat_id):
+    if await is_music_paused(chat_id):
         return await message.reply_text(_["pause_1"])
-    await music_off(chat_id)
+    await set_music_paused(chat_id)
     await yukki.pause_stream(chat_id)
     await message.reply_text(_["pause_2"].format(message.from_user.mention))
 
@@ -37,9 +35,9 @@ async def pause_admin(cli, message: Message, _, chat_id):
 async def resume_com(cli, message: Message, _, chat_id):
     if not len(message.command) == 1:
         return await message.reply_text(_["general_2"])
-    if await is_music_playing(chat_id):
+    if not await is_music_paused(chat_id):
         return await message.reply_text(_["resume_1"])
-    await music_on(chat_id)
+    await set_music_playing(chat_id)
     await yukki.resume_stream(chat_id)
     await message.reply_text(_["resume_2"].format(message.from_user.mention))
 

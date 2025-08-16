@@ -16,6 +16,7 @@ from yukkimusic.core.mongo import mongodb
 
 channeldb = mongodb.cplaymode
 commanddb = mongodb.commands
+cleanmodedb = mongodb.cleanmode
 cleandb = mongodb.cleanmode
 playmodedb = mongodb.playmode
 playtypedb = mongodb.playtypedb
@@ -23,80 +24,147 @@ langdb = mongodb.language
 authdb = mongodb.adminauth
 videodb = mongodb.yukkivideocalls
 onoffdb = mongodb.onoffper
-notesdb = mongodb.notes
-filtersdb = mongodb.filters
 
 # Shifting to memory [ mongo sucks often]
-audio = {}
-video = {}
-loop = {}
 playtype = {}
 playmode = {}
-channelconnect = {}
 langm = {}
-pause = {}
-mute = {}
-active = []
-activevideo = []
 command = []
 cleanmode = []
-nonadmin = {}
-vlimit = []
 
-cache = {"on_off": set(), "mute": set()}
+cache = {
+    "on_off": set(),
+    "mute": set(),
+    "cmode": {},
+    "pause": set(),
+    "active_audio": set(),
+    "active_video": set()
+    "cleanmode": set(),
+    "commanddelete": set(),
+    "audio_bitrate": {},
+    "video_bitrate": {},
+    "loop": {},
+    "videolimit": None,
+    "nonadmin": {},
+    
+}
 
 # Auto End Stream
+
 
 async def is_autoend():
     return await is_on_off(config.AUTOEND)
 
+
 async def autoend_on():
     return await add_on(config.AUTOEND)
 
+
 async def autoend_off():
     return await add_off(config.AUTOEND)
-    
-# Auto leave assistant 
+
+
+# Auto leave assistant
+
 
 async def is_autoleave():
     return await is_on_off(config.AUTOLEAVE)
 
+
 async def autoleave_on():
     return await add_on(config.AUTOLEAVE)
 
+
 async def autoleave_off():
     return await add_off(config.AUTOLEAVE)
-    
+
+
 # LOOP PLAY
 async def get_loop(chat_id: int) -> int:
-    lop = loop.get(chat_id)
-    if not lop:
-        return 0
-    return lop
+    return cache["loop"].get(chat_id, 0)
 
 
 async def set_loop(chat_id: int, mode: int):
-    loop[chat_id] = mode
+    cache["loop"][chat_id] = mode
 
 
 # Channel Play IDS
-async def get_cmode(chat_id: int) -> int:
-    mode = channelconnect.get(chat_id)
-    if not mode:
-        mode = await channeldb.find_one({"chat_id": chat_id})
-        if not mode:
+async def get_cmode(chat_id: int) -> int | None:
+    mode = cache["cmode"].get(chat_id)
+    if mode is None:
+        doc = await channeldb.find_one({"_id": chat_id})
+        if not doc:
             return None
-        channelconnect[chat_id] = mode["mode"]
-        return mode["mode"]
+        mode = int(doc["mode"])
+        cache["cmode"][chat_id] = mode
     return mode
 
 
 async def set_cmode(chat_id: int, mode: int):
-    channelconnect[chat_id] = mode
-    await channeldb.update_one(
-        {"chat_id": chat_id}, {"$set": {"mode": mode}}, upsert=True
-    )
+    mode = int(mode)
+    if cache["cmode"].get(chat_id, 0) != mode:
+        await channeldb.update_one(
+            {"_id": chat_id}, {"$set": {"mode": mode}}, upsert=True
+        )
+        cache["cmode"][chat_id] = mode
 
+
+# Muted
+async def is_muted(chat_id: int) -> bool:
+    return int(chat_id) in cache["mute"]
+
+
+async def mute_on(chat_id: int):
+    cache["mute"].add(int(chat_id))
+
+
+async def mute_off(chat_id: int):
+    cache["mute"].discard(int(chat_id))
+
+
+# Pause-Skip
+async def is_music_paused(chat_id: int) -> bool:
+    return chat_id in cache["pause"]
+
+
+async def set_music_paused(chat_id: int):
+    cache["pause"].add(chat_id)
+
+
+async def set_music_playing(chat_id: int):
+    cache["pause"].discard(chat_id)
+
+# Active Voice Chats
+async def get_active_chats() -> list:
+    return list(cache["active_audio"])
+
+
+async def is_active_chat(chat_id: int) -> bool:
+    return chat_id in cache["active_audio"]
+
+
+async def add_active_chat(chat_id: int):
+    cache["active_audio"].add(chat_id)
+
+
+async def remove_active_chat(chat_id: int):
+    cache["active_audio"].discard(chat_id)
+    
+# Active Video Chats
+async def get_active_video_chats() -> list:
+    return list(cache["active_video"])
+
+
+async def is_active_video_chat(chat_id: int) -> bool:
+    return chat_id in cache["active_video"]
+
+
+async def add_active_video_chat(chat_id: int):
+    cache["active_video"].add(chat_id)
+
+
+async def remove_active_video_chat(chat_id: int):
+    cache["active_video"].discard(chat_id)
 
 # PLAY TYPE WHETHER ADMINS ONLY OR EVERYONE
 async def get_playtype(chat_id: int) -> str:
@@ -155,188 +223,113 @@ async def set_lang(chat_id: int, lang: str):
     langm[chat_id] = lang
     await langdb.update_one({"chat_id": chat_id}, {"$set": {"lang": lang}}, upsert=True)
 
-
-# Muted
-async def is_muted(chat_id: int) -> bool:
-    return int(chat_id) in cache["mute"]
-    
-async def mute_on(chat_id: int):
-    cache["mute"].add(int(chat_id))
-
-async def mute_off(chat_id: int):
-    cache["mute"].discard(int(chat_id))
-
-
-# Pause-Skip
-async def is_music_playing(chat_id: int) -> bool:
-    mode = pause.get(chat_id)
-    if not mode:
-        return False
-    return mode
-
-
-async def music_on(chat_id: int):
-    pause[chat_id] = True
-
-
-async def music_off(chat_id: int):
-    pause[chat_id] = False
-
-
-# Active Voice Chats
-async def get_active_chats() -> list:
-    return active
-
-
-async def is_active_chat(chat_id: int) -> bool:
-    if chat_id not in active:
-        return False
-    else:
-        return True
-
-
-async def add_active_chat(chat_id: int):
-    if chat_id not in active:
-        active.append(chat_id)
-
-
-async def remove_active_chat(chat_id: int):
-    if chat_id in active:
-        active.remove(chat_id)
-
-
-# Active Video Chats
-async def get_active_video_chats() -> list:
-    return activevideo
-
-
-async def is_active_video_chat(chat_id: int) -> bool:
-    if chat_id not in activevideo:
-        return False
-    else:
-        return True
-
-
-async def add_active_video_chat(chat_id: int):
-    if chat_id not in activevideo:
-        activevideo.append(chat_id)
-
-
-async def remove_active_video_chat(chat_id: int):
-    if chat_id in activevideo:
-        activevideo.remove(chat_id)
-
-
-# Delete command mode
-
+# ---------- CLEANMODE ----------
 
 async def is_cleanmode_on(chat_id: int) -> bool:
-    return chat_id not in cleanmode
+    if not cache["cleanmode"]:
+        doc = await cleanmodedb.find_one({"_id": "cleanmode"}) or {}
+        cache["cleanmode"] = set(doc.get("cleanmode", []))
+    return chat_id in cache["cleanmode"]
 
 
-async def cleanmode_off(chat_id: int):
-    if chat_id not in cleanmode:
-        cleanmode.append(chat_id)
+async def cleanmode_on(chat_id: int):  # ENABLE
+    if not await is_cleanmode_on(chat_id):
+        cache["cleanmode"].add(chat_id)
+        await cleanmodedb.update_one(
+            {"_id": "cleanmode"},
+            {"$addToSet": {"cleanmode": chat_id}},
+            upsert=True
+        )
 
 
-async def cleanmode_on(chat_id: int):
-    if chat_id in cleanmode:
-        cleanmode.remove(chat_id)
+async def cleanmode_off(chat_id: int):  # DISABLE
+    if await is_cleanmode_on(chat_id):
+        cache["cleanmode"].remove(chat_id)
+        await cleanmodedb.update_one(
+            {"_id": "cleanmode"},
+            {"$pull": {"cleanmode": chat_id}},
+            upsert=True
+        )
 
+
+# ---------- COMMAND DELETE ----------
 
 async def is_commanddelete_on(chat_id: int) -> bool:
-    return chat_id not in command
+    if not cache["commanddelete"]:
+        doc = await cleanmodedb.find_one({"_id": "cleanmode"}) or {}
+        cache["commanddelete"] = set(doc.get("commanddelete", []))
+    return chat_id in cache["commanddelete"]
 
 
-async def commanddelete_off(chat_id: int):
-    if chat_id not in command:
-        command.append(chat_id)
+async def commanddelete_on(chat_id: int):  # ENABLE
+    if not await is_commanddelete_on(chat_id):
+        cache["commanddelete"].add(chat_id)
+        await cleanmodedb.update_one(
+            {"_id": "cleanmode"},
+            {"$addToSet": {"commanddelete": chat_id}},
+            upsert=True
+        )
 
 
-async def commanddelete_on(chat_id: int):
-    if chat_id in command:
-        command.remove(chat_id)
-
+async def commanddelete_off(chat_id: int):  # DISABLE
+    if await is_commanddelete_on(chat_id):
+        cache["commanddelete"].remove(chat_id)
+        await cleanmodedb.update_one(
+            {"_id": "cleanmode"},
+            {"$pull": {"commanddelete": chat_id}},
+            upsert=True
+        )
 
 # Non Admin Chat
-async def check_nonadmin_chat(chat_id: int) -> bool:
-    user = await authdb.find_one({"chat_id": chat_id})
-    if not user:
-        return False
-    return True
-
 
 async def is_nonadmin_chat(chat_id: int) -> bool:
-    mode = nonadmin.get(chat_id)
-    if not mode:
-        user = await authdb.find_one({"chat_id": chat_id})
-        if not user:
-            nonadmin[chat_id] = False
-            return False
-        nonadmin[chat_id] = True
-        return True
-    return mode
+  if chat_id in cache["nonadmin"]:
+        return cache["nonadmin"][chat_id]
 
+    user = await authdb.find_one({"_id": chat_id})
+    exists = bool(user)
+    cache["nonadmin"][chat_id] = exists
+    return exists
 
 async def add_nonadmin_chat(chat_id: int):
-    nonadmin[chat_id] = True
-    is_admin = await check_nonadmin_chat(chat_id)
-    if is_admin:
+    cache["nonadmin"][chat_id] = True
+    if await is_nonadmin_chat(chat_id):
         return
-    return await authdb.insert_one({"chat_id": chat_id})
+    return await authdb.insert_one({"_id": chat_id})
 
 
 async def remove_nonadmin_chat(chat_id: int):
-    nonadmin[chat_id] = False
-    is_admin = await check_nonadmin_chat(chat_id)
-    if not is_admin:
+    cache["nonadmin"].pop(chat_id, None)
+    if not await is_nonadmin_chat(chat_id):
         return
-    return await authdb.delete_one({"chat_id": chat_id})
-
+    return await authdb.delete_one({"_id": chat_id})
 
 # Video Limit
-async def is_video_allowed(chat_idd) -> str:
-    chat_id = 123456
-    if not vlimit:
-        dblimit = await videodb.find_one({"chat_id": chat_id})
-        if not dblimit:
-            vlimit.clear()
-            vlimit.append(config.VIDEO_STREAM_LIMIT)
-            limit = config.VIDEO_STREAM_LIMIT
-        else:
-            limit = dblimit["limit"]
-            vlimit.clear()
-            vlimit.append(limit)
-    else:
-        limit = vlimit[0]
-    if limit == 0:
+
+async def is_video_allowed(chat_id: int) -> bool:
+    limit = await get_video_limit()
+    if not limit or limit == 0:
         return False
+
     count = len(await get_active_video_chats())
-    if int(count) == int(limit):
-        if not await is_active_video_chat(chat_idd):
-            return False
+    if count >= limit and not await is_active_video_chat(chat_id):
+        return False
     return True
 
 
-async def get_video_limit() -> str:
-    chat_id = 123456
-    if not vlimit:
-        dblimit = await videodb.find_one({"chat_id": chat_id})
-        if not dblimit:
-            limit = config.VIDEO_STREAM_LIMIT
-        else:
-            limit = dblimit["limit"]
-    else:
-        limit = vlimit[0]
+async def get_video_limit() -> int | None:
+    limit = cache.get("videolimit")
+    if limit is None:
+        dblimit = await videodb.find_one({"_id": "videolimit"})
+        limit = int(dblimit["limit"]) if dblimit else None
+        cache["videolimit"] = limit
     return limit
 
 
 async def set_video_limit(limt: int):
-    chat_id = 123456
-    vlimit.clear()
-    vlimit.append(limt)
+    cache["videolimit"] = limt
     return await videodb.update_one(
-        {"chat_id": chat_id}, {"$set": {"limit": limt}}, upsert=True
+        {"_id": "videolimit"}, {"$set": {"limit": limt}}, upsert=True
     )
 
 
@@ -378,25 +371,24 @@ async def maintenance_on():
 async def maintenance_off():
     return await add_off(config.MAINTENANCE)
 
-
+# --- Save Bitrate ---
 async def save_audio_bitrate(chat_id: int, bitrate: str):
-    audio[chat_id] = bitrate
+    cache["audio_bitrate"][chat_id] = bitrate
 
 
 async def save_video_bitrate(chat_id: int, bitrate: str):
-    video[chat_id] = bitrate
+    cache["video_bitrate"][chat_id] = bitrate
 
-
+# --- Get Bitrate Names (raw strings) ---
 async def get_aud_bit_name(chat_id: int) -> str:
-    return audio.get(chat_id, "STUDIO")
-
+    return cache["audio_bitrate"].get(chat_id, "STUDIO")
 
 async def get_vid_bit_name(chat_id: int) -> str:
-    return video.get(chat_id, "UHD_4K")
+    return cache["video_bitrate"].get(chat_id, "UHD_4K")
 
-
-async def get_audio_bitrate(chat_id: int) -> str:
-    mode = audio.get(chat_id, "STUDIO")
+# --- Get Bitrate Enum Values ---
+async def get_audio_bitrate(chat_id: int):
+    mode = cache["audio_bitrate"].get(chat_id, "STUDIO")
     return {
         "STUDIO": _types.AudioQuality.STUDIO,
         "HIGH": _types.AudioQuality.HIGH,
@@ -405,8 +397,8 @@ async def get_audio_bitrate(chat_id: int) -> str:
     }.get(mode, _types.AudioQuality.STUDIO)
 
 
-async def get_video_bitrate(chat_id: int) -> str:
-    mode = video.get(chat_id, "UHD_4K")
+async def get_video_bitrate(chat_id: int):
+    mode = cache["video_bitrate"].get(chat_id, "UHD_4K")
     return {
         "UHD_4K": _types.VideoQuality.UHD_4K,
         "QHD_2K": _types.VideoQuality.QHD_2K,
