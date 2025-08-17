@@ -15,16 +15,331 @@ queriesdb = mongodb.queries
 userdb = mongodb.userstats
 chattopdb = mongodb.chatstats
 authuserdb = mongodb.authuser
-gbansdb = mongodb.gban
 sudoersdb = mongodb.sudoers
 chatsdb = mongodb.chats
-blacklist_chatdb = mongodb.blacklistChat
 usersdb = mongodb.tgusersdb
 playlistdb = mongodb.playlist
-blockeddb = mongodb.blockedusers
 privatedb = mongodb.privatechats
-
+serveddb = mongodb.servedstats
+blocklistdb = mongodb.blocklist
 playlist = []
+__cache = {
+    "users": set(),
+    "chats": set(),
+    "gban": set(),
+    "sudoers": set(),
+    "blacklist_chats": set(),
+    "blocklist_users": set(),
+    "private_chats": set(),
+    "authusers": {},
+}
+
+
+async def migrate_served_stats():
+    users = [doc["user_id"] async for doc in usersdb.find({}, {"_id": 0, "user_id": 1})]
+    chats = [doc["chat_id"] async for doc in chatsdb.find({}, {"_id": 0, "chat_id": 1})]
+
+    await serveddb.update_one(
+        {"_id": "served"},
+        {"$set": {"users": users, "chats": chats}},
+        upsert=True,
+    )
+
+    await usersdb.drop()
+    await chatsdb.drop()
+
+    await get_served_users()
+    await get_served_chats()
+
+
+async def migrate_blocklist():
+    old_chats = []
+    async for chat in mongodb.blacklistChat.find({"chat_id": {"$lt": 0}}):
+        old_chats.append(chat["chat_id"])
+
+    old_gbans = []
+    async for user in mongodb.gban.find({"user_id": {"$gt": 0}}):
+        old_gbans.append(user["user_id"])
+
+    old_blocklist_users = []
+    async for user in mongodb.blockedusers.find({"user_id": {"$gt": 0}}):
+        old_blocklist_users.append(user["user_id"])
+
+    await blocklistdb.update_one(
+        {"_id": "blocklist"},
+        {"$addToSet": {"blacklisted_chats": {"$each": old_chats}}},
+        upsert=True,
+    )
+    await blocklistdb.update_one(
+        {"_id": "blocklist"},
+        {"$addToSet": {"gbans": {"$each": old_gbans}}},
+        upsert=True,
+    )
+    await blocklistdb.update_one(
+        {"_id": "blocklist"},
+        {"$addToSet": {"blocklist_users": {"$each": old_blocklist_users}}},
+        upsert=True,
+    )
+
+    doc = await blocklistdb.find_one({"_id": "blocklist"})
+    __cache["blacklist_chats"] = set(doc.get("blacklisted_chats", []))
+    __cache["gban"] = set(doc.get("gbans", []))
+    __cache["blocklist_users"] = set(doc.get("blocklist_users", []))
+
+    await mongodb.blacklistChat.drop()
+    await mongodb.gban.drop()
+    await mongodb.blockedusers.drop()
+
+
+async def migrate_private_chats():
+    old_chats = []
+    async for chat in privatedb.find({"chat_id": {"$lt": 0}}):
+        old_chats.append(chat["chat_id"])
+
+    await privatedb.update_one(
+        {"_id": "private_chats"},
+        {"$addToSet": {"chats": {"$each": old_chats}}},
+        upsert=True,
+    )
+
+    doc = await privatedb.find_one({"_id": "private_chats"})
+    __cache["private_chats"] = set(doc.get("chats", []))
+
+    await privatedb.delete_many({"chat_id": {"$lt": 0}})
+
+
+# Served chats/usersdb
+async def is_served_user(user_id: int) -> bool:
+    if not __cache["users"]:
+        await get_served_users()
+    return user_id in __cache["users"]
+
+
+async def add_served_user(user_id: int):
+    if await is_served_user(user_id):
+        return
+    __cache["users"].add(user_id)
+    await serveddb.update_one(
+        {"_id": "served"},
+        {"$addToSet": {"users": user_id}},
+        upsert=True,
+    )
+
+
+async def delete_served_user(user_id: int):
+    if not await is_served_user(user_id):
+        return
+    __cache["users"].discard(user_id)
+    await serveddb.update_one(
+        {"_id": "served"},
+        {"$pull": {"users": user_id}},
+    )
+
+
+async def get_served_users() -> list[int]:
+    if not __cache["users"]:
+        doc = await serveddb.find_one({"_id": "served"})
+        if doc:
+            __cache["users"] = set(doc.get("users", []))
+    return list(__cache["users"])
+
+
+async def is_served_chat(chat_id: int) -> bool:
+    if not __cache["chats"]:
+        await get_served_chats()
+    return chat_id in __cache["chats"]
+
+
+async def add_served_chat(chat_id: int):
+    if await is_served_chat(chat_id):
+        return
+    __cache["chats"].add(chat_id)
+    await serveddb.update_one(
+        {"_id": "served"},
+        {"$addToSet": {"chats": chat_id}},
+        upsert=True,
+    )
+
+
+async def delete_served_chat(chat_id: int):
+    if not await is_served_chat(chat_id):
+        return
+    __cache["chats"].discard(chat_id)
+    await serveddb.update_one(
+        {"_id": "served"},
+        {"$pull": {"chats": chat_id}},
+    )
+
+
+async def get_served_chats() -> list[int]:
+    if not __cache["chats"]:
+        doc = await serveddb.find_one({"_id": "served"})
+        if doc:
+            __cache["chats"] = set(doc.get("chats", []))
+
+    return list(__cache["chats"])
+
+
+# ---- Chat Blacklist ----
+
+
+async def get_blacklisted_chats() -> list[int]:
+    if not __cache["blacklist_chats"]:
+        doc = await blocklistdb.find_one({"_id": "blocklist"}, {"blacklisted_chats": 1})
+        if doc:
+            __cache["blacklist_chats"] = set(doc.get("blacklisted_chats", []))
+    return list(__cache["blacklist_chats"])
+
+
+async def is_blacklisted_chat(chat_id: int) -> bool:
+    if not __cache["blacklist_chats"]:
+        await get_blacklisted_chats()
+    return chat_id in __cache["blacklist_chats"]
+
+
+async def blacklist_chat(chat_id: int) -> bool:
+    if await is_blacklisted_chat(chat_id):
+        return False
+    await blocklistdb.update_one(
+        {"_id": "blocklist"}, {"$addToSet": {"blacklisted_chats": chat_id}}, upsert=True
+    )
+    __cache["blacklist_chats"].add(chat_id)
+    return True
+
+
+async def whitelist_chat(chat_id: int) -> bool:
+    if not await is_blacklisted_chat(chat_id):
+        return False
+    result = await blocklistdb.update_one(
+        {"_id": "blocklist"}, {"$pull": {"blacklisted_chats": chat_id}}
+    )
+    if result.modified_count > 0:
+        __cache["blacklist_chats"].discard(chat_id)
+        return True
+    return False
+
+
+async def get_banned_users() -> list[int]:
+    if not __cache["blocklist_users"]:
+        doc = await blocklistdb.find_one({"_id": "blocklist"}, {"blocklist_users": 1})
+        if doc:
+            __cache["blocklist_users"] = set(doc.get("blocklist_users", []))
+    return list(__cache["blocklist_users"])
+
+
+async def get_banned_count() -> int:
+    users = await get_banned_users()
+    return len(users)
+
+
+async def is_banned_user(user_id: int) -> bool:
+    if not __cache["blocklist_users"]:
+        await get_banned_users()
+    return user_id in __cache["blocklist_users"]
+
+
+async def add_banned_user(user_id: int) -> bool:
+    if await is_banned_user(user_id):
+        return False
+    await blocklistdb.update_one(
+        {"_id": "blocklist"}, {"$addToSet": {"blocklist_users": user_id}}, upsert=True
+    )
+    __cache["blocklist_users"].add(user_id)
+    return True
+
+
+async def remove_banned_user(user_id: int) -> bool:
+    if not await is_banned_user(user_id):
+        return False
+    result = await blocklistdb.update_one(
+        {"_id": "blocklist"}, {"$pull": {"blocklist_users": user_id}}
+    )
+    if result.modified_count > 0:
+        __cache["blocklist_users"].discard(user_id)
+        return True
+    return False
+
+
+# ---- GBan ----
+
+
+async def get_gbanned() -> list[int]:
+    if not __cache["gban"]:
+        doc = await blocklistdb.find_one({"_id": "blocklist"}, {"gbans": 1})
+        if doc:
+            __cache["gban"] = set(doc.get("gbans", []))
+    return list(__cache["gban"])
+
+
+async def is_gbanned_user(user_id: int) -> bool:
+    if not __cache["gban"]:
+        await get_gbanned()
+    return user_id in __cache["gban"]
+
+
+async def add_gban_user(user_id: int) -> bool:
+    if await is_gbanned_user(user_id):
+        return False
+    await blocklistdb.update_one(
+        {"_id": "blocklist"}, {"$addToSet": {"gbans": user_id}}, upsert=True
+    )
+    __cache["gban"].add(user_id)
+    return True
+
+
+async def remove_gban_user(user_id: int) -> bool:
+    if not await is_gbanned_user(user_id):
+        return False
+    result = await blocklistdb.update_one(
+        {"_id": "blocklist"}, {"$pull": {"gbans": user_id}}
+    )
+    if result.modified_count > 0:
+        __cache["gban"].discard(user_id)
+        return True
+    return False
+
+
+# Private Served Chats
+
+
+async def get_private_served_chats() -> list[int]:
+    if not __cache["private_chats"]:
+        doc = await privatedb.find_one({"_id": "private_chats"}, {"chats": 1})
+        if doc:
+            __cache["private_chats"] = set(doc.get("chats", []))
+    return list(__cache["private_chats"])
+
+
+async def is_served_private_chat(chat_id: int) -> bool:
+    if not __cache["private_chats"]:
+        await get_private_served_chats()
+    return chat_id in __cache["private_chats"]
+
+
+async def add_private_chat(chat_id: int) -> bool:
+    if await is_served_private_chat(chat_id):
+        return False
+    await privatedb.update_one(
+        {"_id": "private_chats"},
+        {"$addToSet": {"chats": chat_id}},
+        upsert=True,
+    )
+    __cache["private_chats"].add(chat_id)
+    return True
+
+
+async def remove_private_chat(chat_id: int) -> bool:
+    if not await is_served_private_chat(chat_id):
+        return False
+    result = await privatedb.update_one(
+        {"_id": "private_chats"},
+        {"$pull": {"chats": chat_id}},
+    )
+    if result.modified_count > 0:
+        __cache["private_chats"].discard(chat_id)
+        return True
+    return False
+
 
 # Playlist
 
@@ -75,225 +390,92 @@ async def delete_playlist(chat_id: int, name: str) -> bool:
     return False
 
 
-# Users
-
-
-async def is_served_user(user_id: int) -> bool:
-    user = await usersdb.find_one({"user_id": user_id})
-    if not user:
-        return False
-    return True
-
-
-async def get_served_users() -> list:
-    users_list = []
-    async for user in usersdb.find({"user_id": {"$gt": 0}}):
-        users_list.append(user)
-    return users_list
-
-
-async def add_served_user(user_id: int):
-    is_served = await is_served_user(user_id)
-    if is_served:
-        return
-    return await usersdb.insert_one({"user_id": user_id})
-
-
-async def delete_served_user(user_id: int):
-    if not await is_served_user(user_id):
-        await usersdb.delete_one({"user_id": user_id})
-
-
-# Served Chats
-
-
-async def get_served_chats() -> list:
-    chats_list = []
-    async for chat in chatsdb.find({"chat_id": {"$lt": 0}}):
-        chats_list.append(chat)
-    return chats_list
-
-
-async def is_served_chat(chat_id: int) -> bool:
-    chat = await chatsdb.find_one({"chat_id": chat_id})
-    if not chat:
-        return False
-    return True
-
-
-async def add_served_chat(chat_id: int):
-    is_served = await is_served_chat(chat_id)
-    if is_served:
-        return
-    return await chatsdb.insert_one({"chat_id": chat_id})
-
-
-async def delete_served_chat(chat_id: int):
-    await chatsdb.delete_one({"chat_id": chat_id})
-
-
-# Blacklisted Chats
-
-
-async def blacklisted_chats() -> list:
-    chats_list = []
-    async for chat in blacklist_chatdb.find({"chat_id": {"$lt": 0}}):
-        chats_list.append(chat["chat_id"])
-    return chats_list
-
-
-async def blacklist_chat(chat_id: int) -> bool:
-    if not await blacklist_chatdb.find_one({"chat_id": chat_id}):
-        await blacklist_chatdb.insert_one({"chat_id": chat_id})
-        return True
-    return False
-
-
-async def whitelist_chat(chat_id: int) -> bool:
-    if await blacklist_chatdb.find_one({"chat_id": chat_id}):
-        await blacklist_chatdb.delete_one({"chat_id": chat_id})
-        return True
-    return False
-
-
-# Private Served Chats
-
-
-async def get_private_served_chats() -> list:
-    chats_list = []
-    async for chat in privatedb.find({"chat_id": {"$lt": 0}}):
-        chats_list.append(chat)
-    return chats_list
-
-
-async def is_served_private_chat(chat_id: int) -> bool:
-    chat = await privatedb.find_one({"chat_id": chat_id})
-    if not chat:
-        return False
-    return True
-
-
-async def add_private_chat(chat_id: int):
-    is_served = await is_served_private_chat(chat_id)
-    if is_served:
-        return
-    return await privatedb.insert_one({"chat_id": chat_id})
-
-
-async def remove_private_chat(chat_id: int):
-    is_served = await is_served_private_chat(chat_id)
-    if not is_served:
-        return
-    return await privatedb.delete_one({"chat_id": chat_id})
-
-
 # Auth Users DB
 
 
-async def _get_authusers(chat_id: int) -> dict[str, int]:
-    _notes = await authuserdb.find_one({"chat_id": chat_id})
-    if not _notes:
-        return {}
-    return _notes["notes"]
+async def _get_authusers(chat_id: int) -> dict[str, dict]:
+    if chat_id not in __cache["authusers"]:
+        doc = await authuserdb.find_one({"chat_id": chat_id})
+        if not doc:
+            __cache["authusers"][chat_id] = {}
+        else:
+            __cache["authusers"][chat_id] = doc.get("notes", {})
+    return __cache["authusers"][chat_id]
 
 
 async def get_authuser_names(chat_id: int) -> list[str]:
-    _notes = []
-    for note in await _get_authusers(chat_id):
-        _notes.append(note)
-    return _notes
+    notes = await _get_authusers(chat_id)
+    return list(notes.keys())
 
 
 async def get_authuser(chat_id: int, name: str) -> bool | dict:
-    name = name
-    _notes = await _get_authusers(chat_id)
-    if name in _notes:
-        return _notes[name]
-    else:
-        return False
+    notes = await _get_authusers(chat_id)
+    return notes.get(name, False)
 
 
 async def save_authuser(chat_id: int, name: str, note: dict):
-    name = name
-    _notes = await _get_authusers(chat_id)
-    _notes[name] = note
+    notes = await _get_authusers(chat_id)
+    notes[name] = note
+    __cache["authusers"][chat_id] = notes
 
     await authuserdb.update_one(
-        {"chat_id": chat_id}, {"$set": {"notes": _notes}}, upsert=True
+        {"chat_id": chat_id}, {"$set": {"notes": notes}}, upsert=True
     )
 
 
 async def delete_authuser(chat_id: int, name: str) -> bool:
-    notesd = await _get_authusers(chat_id)
-    name = name
-    if name in notesd:
-        del notesd[name]
-        await authuserdb.update_one(
-            {"chat_id": chat_id},
-            {"$set": {"notes": notesd}},
-            upsert=True,
-        )
-        return True
-    return False
-
-
-# Blocked Users
-
-
-async def get_gbanned() -> list:
-    results = []
-    async for user in gbansdb.find({"user_id": {"$gt": 0}}):
-        user_id = user["user_id"]
-        results.append(user_id)
-    return results
-
-
-async def is_gbanned_user(user_id: int) -> bool:
-    user = await gbansdb.find_one({"user_id": user_id})
-    if not user:
+    notes = await _get_authusers(chat_id)
+    if name not in notes:
         return False
+
+    del notes[name]
+    __cache["authusers"][chat_id] = notes
+
+    await authuserdb.update_one(
+        {"chat_id": chat_id}, {"$set": {"notes": notes}}, upsert=True
+    )
     return True
-
-
-async def add_gban_user(user_id: int):
-    is_gbanned = await is_gbanned_user(user_id)
-    if is_gbanned:
-        return
-    return await gbansdb.insert_one({"user_id": user_id})
-
-
-async def remove_gban_user(user_id: int):
-    is_gbanned = await is_gbanned_user(user_id)
-    if not is_gbanned:
-        return
-    return await gbansdb.delete_one({"user_id": user_id})
 
 
 # Sudoers
 
 
-async def get_sudoers() -> list:
+async def get_sudoers() -> list[int]:
+    if __cache["sudoers"]:
+        return list(__cache["sudoers"])
+
     sudoers = await sudoersdb.find_one({"sudo": "sudo"})
     if not sudoers:
+        __cache["sudoers"] = set()
         return []
-    return sudoers["sudoers"]
+
+    __cache["sudoers"] = set(sudoers.get("sudoers", []))
+    return list(__cache["sudoers"])
 
 
 async def add_sudo(user_id: int) -> bool:
-    sudoers = await get_sudoers()
-    sudoers.append(user_id)
+    if user_id in __cache["sudoers"]:
+        return False
+
     await sudoersdb.update_one(
-        {"sudo": "sudo"}, {"$set": {"sudoers": sudoers}}, upsert=True
+        {"sudo": "sudo"}, {"$addToSet": {"sudoers": user_id}}, upsert=True
     )
+
+    doc = await sudoersdb.find_one({"sudo": "sudo"})
+    __cache["sudoers"] = set(doc.get("sudoers", []))
     return True
 
 
 async def remove_sudo(user_id: int) -> bool:
-    sudoers = await get_sudoers()
-    sudoers.remove(user_id)
+    if user_id not in __cache["sudoers"]:
+        return False
+
     await sudoersdb.update_one(
-        {"sudo": "sudo"}, {"$set": {"sudoers": sudoers}}, upsert=True
+        {"sudo": "sudo"}, {"$pull": {"sudoers": user_id}}, upsert=True
     )
+
+    doc = await sudoersdb.find_one({"sudo": "sudo"})
+    __cache["sudoers"] = set(doc.get("sudoers", []))
     return True
 
 
@@ -411,41 +593,3 @@ async def get_topp_users() -> dict:
                 total += counts_
         results[user_id] = total
     return results
-
-
-# Gban Users
-
-
-async def get_banned_users() -> list:
-    results = []
-    async for user in blockeddb.find({"user_id": {"$gt": 0}}):
-        user_id = user["user_id"]
-        results.append(user_id)
-    return results
-
-
-async def get_banned_count() -> int:
-    users = blockeddb.find({"user_id": {"$gt": 0}})
-    users = await users.to_list(length=100000)
-    return len(users)
-
-
-async def is_banned_user(user_id: int) -> bool:
-    user = await blockeddb.find_one({"user_id": user_id})
-    if not user:
-        return False
-    return True
-
-
-async def add_banned_user(user_id: int):
-    is_gbanned = await is_banned_user(user_id)
-    if is_gbanned:
-        return
-    return await blockeddb.insert_one({"user_id": user_id})
-
-
-async def remove_banned_user(user_id: int):
-    is_gbanned = await is_banned_user(user_id)
-    if not is_gbanned:
-        return
-    return await blockeddb.delete_one({"user_id": user_id})
