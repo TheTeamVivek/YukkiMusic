@@ -552,15 +552,15 @@ wheels = [
 
 [[package]]
 name = "lyricsgenius"
-version = "3.7.0"
+version = "3.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e5/7e/45dddd5814123daf1f4a243b3a972bb0967ca083f2f9124942ca0efbaa6c/lyricsgenius-3.7.0.tar.gz", hash = "sha256:caf644a225fa1f9cda2043e581ab86cbe8b9d74c70b4ee2daceb55ef23eb4cfd", size = 512427, upload-time = "2025-08-07T04:49:28.942Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/94/f6/32e4b3767a3d1c9a95bd8d77b3309dab6293cf18260b96612e0ae3a25686/lyricsgenius-3.7.1.tar.gz", hash = "sha256:a9fcb7c8deaf888febf42f6645fb3f2afc6c0790156338692640647ce620ac37", size = 518903, upload-time = "2025-08-18T03:07:11.785Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d9/27/20ea59659d33cf8369d64b5a108bd8854bd2f9695d79b23686ca2a8a1a46/lyricsgenius-3.7.0-py3-none-any.whl", hash = "sha256:2c552fc19fc72f91acfb849b89b48b251ef3b7e8ccdc322cd6b9496629979f10", size = 48293, upload-time = "2025-08-07T04:49:26.901Z" },
+    { url = "https://files.pythonhosted.org/packages/c2/e9/455fd3e054767387601c85c8d0dcc77058f8a71a6c576696785d671a1aee/lyricsgenius-3.7.1-py3-none-any.whl", hash = "sha256:9604aed6151bf0ce8d62a9f87e1d31be28533ad24dd9a864867ee0feb97d7f81", size = 48292, upload-time = "2025-08-18T03:07:10.066Z" },
 ]
 
 [[package]]
@@ -720,26 +720,30 @@ wheels = [
 
 [[package]]
 name = "ntgcalls"
-version = "2.0.5"
+version = "2.0.6"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/58/99/6c6781f4e58237cf6159d0b0755bda7cf95233d7771b908703439356039f/ntgcalls-2.0.5.tar.gz", hash = "sha256:82b5b270c7e9fcbb139f709e1125d487e54ccd2f337f50f56f38fdc964ed8dec", size = 9045640, upload-time = "2025-06-27T09:23:19.111Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/de/9b/bf3f1b0936bc81566aa8df9f857ec2d1235ce654e68664e89c838586b3df/ntgcalls-2.0.6.tar.gz", hash = "sha256:64628c827be5bb5932d9d4d2b4f1c826f6d9316608a474b51678c19b1fbae777", size = 9045681, upload-time = "2025-08-18T09:22:13.775Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4e/6a/de3d80748bf853d748dfb2813a7e4cdeb097ac7bf0082e445af54a716bbf/ntgcalls-2.0.5-cp310-cp310-macosx_12_0_arm64.whl", hash = "sha256:63bc5abb18cbdad22fa7c9807a494c73d128a3d65b9f6d94895ad0a402138cc9", size = 8818409, upload-time = "2025-06-27T09:22:18.802Z" },
-    { url = "https://files.pythonhosted.org/packages/7e/62/a484fca5d4fe7efe08bb3996b24ec7d3eabd9eb28c7aba76ba8e728fa9d4/ntgcalls-2.0.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d37e6385fa61953adef924dace3a74cfad31eedf264aac7e0486805ace0a251e", size = 37484421, upload-time = "2025-06-27T09:22:22.183Z" },
-    { url = "https://files.pythonhosted.org/packages/d6/f2/30080c96654b23da48642370f4b7e1f542dd1d9d16e77063df5b8593c747/ntgcalls-2.0.5-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:9466a30a96892c7c1aba2aa935da582c31c46f8cffbde4c49343bc5cbe57b9da", size = 34156458, upload-time = "2025-06-27T09:22:25.433Z" },
-    { url = "https://files.pythonhosted.org/packages/a1/3a/6c01572f5b626288ffc9c6d4b6c0a942d55efb7914b3c7feb7da9239a9ec/ntgcalls-2.0.5-cp310-cp310-win_amd64.whl", hash = "sha256:b6e13407c3d340fe67d176b01d546a2ae1e6d418d33fe5625b995f110ab9de21", size = 10381827, upload-time = "2025-06-27T09:22:28.237Z" },
-    { url = "https://files.pythonhosted.org/packages/31/dc/833e8232ec81a44d06a140dee749f1034b14e3f3441ff4ab1cbb35c7ebc9/ntgcalls-2.0.5-cp311-cp311-macosx_12_0_arm64.whl", hash = "sha256:bc08eb031ffd024149b456cb6bfd4dac3702b353f8ad7e08422acc1245aeb845", size = 8819380, upload-time = "2025-06-27T09:22:30.832Z" },
-    { url = "https://files.pythonhosted.org/packages/5e/5a/bea4f0dddf3d3ed4190d3c8bd9b1af9b14365d3eb42c3e0c12d8b86dd1ef/ntgcalls-2.0.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3538bd6f7520357ff347ae17fd09afb7981fd1c49fe8ed22e6e21c17de8e36c6", size = 37511679, upload-time = "2025-06-27T09:22:33.53Z" },
-    { url = "https://files.pythonhosted.org/packages/d1/9a/982cf3f1b02aa23b2c3c664bd3b9d62e46299bc55841a23cafa831106d87/ntgcalls-2.0.5-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:e21301db3646b11fbee2794c598b4e7a37adf9f3c1b01a5568667fa5b9b983f1", size = 34184173, upload-time = "2025-06-27T09:22:36.82Z" },
-    { url = "https://files.pythonhosted.org/packages/d0/c7/5a114517186f353b43c53fca6b6c1e92e1cea1fdced4424b98336c042712/ntgcalls-2.0.5-cp311-cp311-win_amd64.whl", hash = "sha256:44eca92dd79dc1558f069994370a121813da5a8c77d8aac682f64d2ac53d3840", size = 10382626, upload-time = "2025-06-27T09:22:40.226Z" },
-    { url = "https://files.pythonhosted.org/packages/15/b5/6231651e8a8fbb34562c76b534fd3dfa238ca9ca9734f182f450c34be8e3/ntgcalls-2.0.5-cp312-cp312-macosx_12_0_arm64.whl", hash = "sha256:bcb65f141244c571f453e1344ce474e96879c255153e9bac2a3e9b061e40313b", size = 8819418, upload-time = "2025-06-27T09:22:42.331Z" },
-    { url = "https://files.pythonhosted.org/packages/91/42/b40d814c6cf7732b78c734fbdb4d93a98c410ded4be9c762e69a474a2946/ntgcalls-2.0.5-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e9f3f4544070394043e1ff25f92ca74b449b4401b3b1310fa7357b39c5488700", size = 37535997, upload-time = "2025-06-27T09:22:45.094Z" },
-    { url = "https://files.pythonhosted.org/packages/22/95/6bcfd5c01ff125ed9319ba1e951eae491169c61e979ae430fc0ede18f30a/ntgcalls-2.0.5-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:a879581b779653145aab4ce70c604b2f1a88def59b869c7fc20e22636aafe0ed", size = 34203834, upload-time = "2025-06-27T09:22:48.798Z" },
-    { url = "https://files.pythonhosted.org/packages/7f/e5/a539fbaaf8cf6686491454f80a7387242249a2f46ab97dff0c98c1ca61e1/ntgcalls-2.0.5-cp312-cp312-win_amd64.whl", hash = "sha256:ae2c082a92753897b307b8a82f2b9c9d1c9f448bc8008c3f8fab00f7d0221cdf", size = 10385205, upload-time = "2025-06-27T09:22:52.003Z" },
-    { url = "https://files.pythonhosted.org/packages/ba/c7/529de46854fa06ca6bf9d64f5e4431fff48b33e39a190e4da03e6e4c82d4/ntgcalls-2.0.5-cp313-cp313-macosx_12_0_arm64.whl", hash = "sha256:e41f16f587d5bccf5d30eee8b259445b82a44f2d2a26a18f6399188e9431670c", size = 8819466, upload-time = "2025-06-27T09:22:54.297Z" },
-    { url = "https://files.pythonhosted.org/packages/75/5d/92d0540d23b72ba451cfc9059705ffdbc2cb035fba69bc2b9cff10bc3824/ntgcalls-2.0.5-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0182fbc4b55d0f9f4c7f7ae66e3b6d26a639bb02d69fa54d236838e293242adb", size = 37534906, upload-time = "2025-06-27T09:22:57.444Z" },
-    { url = "https://files.pythonhosted.org/packages/d0/39/ba72bb58d522ee43474dbec81c0b43c2997f4b90333d26c3bdae64427662/ntgcalls-2.0.5-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:065318c81d42d92d22fd63ec3003a0dc66eca1b348a3362887bb9295e4f4662d", size = 34202150, upload-time = "2025-06-27T09:23:01.047Z" },
-    { url = "https://files.pythonhosted.org/packages/6f/37/3f4fb1e879656b7dccf25c13245e30cec71dde6ff965088f7b7519900b71/ntgcalls-2.0.5-cp313-cp313-win_amd64.whl", hash = "sha256:5e18259a7de64496a8aaea99da9b0e1630b313660f14cdf402b2da347481705b", size = 10384883, upload-time = "2025-06-27T09:23:04.389Z" },
+    { url = "https://files.pythonhosted.org/packages/b7/8e/fa5cc8964d58d4f4a6576a1929f700fa37c19435697ba91c4600fa40a5db/ntgcalls-2.0.6-cp310-cp310-macosx_12_0_arm64.whl", hash = "sha256:ce18c7de2a4461943db4abc071c51e8170fbe70b2788ee3b050714d9ccd06263", size = 8831144, upload-time = "2025-08-18T09:21:04.436Z" },
+    { url = "https://files.pythonhosted.org/packages/21/92/2a63739926f3fd347a34451385113f70a98da3950157fe3a2725f08a907e/ntgcalls-2.0.6-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:79f71d31c67ba414d5468069a3747c00ba0b3fc7c19adaba36450f5323bc3015", size = 37519695, upload-time = "2025-08-18T09:21:08.191Z" },
+    { url = "https://files.pythonhosted.org/packages/85/c5/baa8eefebd4d07e77e42b3a659c4ca26307d567798bcdeac228ae97e9477/ntgcalls-2.0.6-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:d61802e7695012916c5cb7ee6e624a74395536dfb165e1ac93a24c2d51635361", size = 33795349, upload-time = "2025-08-18T09:21:11.685Z" },
+    { url = "https://files.pythonhosted.org/packages/dd/19/2640d3cb5eee043f3465ddd50b06318548abe14708476ab13997fd47e23d/ntgcalls-2.0.6-cp310-cp310-win_amd64.whl", hash = "sha256:04eea836475a3b414fd9236b34930b1e2fe2e83be550b88b647151dfeb5069bc", size = 10381158, upload-time = "2025-08-18T09:21:14.546Z" },
+    { url = "https://files.pythonhosted.org/packages/47/40/eb202fb44c6e5b1a9489ef7d01d67637f6b0b868fce1e9eb065e396f5e9f/ntgcalls-2.0.6-cp311-cp311-macosx_12_0_arm64.whl", hash = "sha256:80749776a52f74a77e92f2e06dd8da1773be8f08d9ccb5911cf0b1522e3bf7b0", size = 8831928, upload-time = "2025-08-18T09:21:16.701Z" },
+    { url = "https://files.pythonhosted.org/packages/21/64/25c461b11fc2f8ff272820449059292ec41552b9270fd2fddbafe1be5160/ntgcalls-2.0.6-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:d80b791170ea334bef94350a30385aa0029aa6d982bbe8aabefa49b2e1c2e871", size = 37548848, upload-time = "2025-08-18T09:21:19.263Z" },
+    { url = "https://files.pythonhosted.org/packages/05/5f/f843de3dcc7df438d3978336c87765d66f31f77ee77c8ae7d256c36d3063/ntgcalls-2.0.6-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:eda9447ab744d6b1c8f501fad918ef741d266616318e61295c80355d6264b78c", size = 33824788, upload-time = "2025-08-18T09:21:22.533Z" },
+    { url = "https://files.pythonhosted.org/packages/2b/f2/5d9a193d824790fc2d6a0bbfa0eda9f0b9dbd0949accd01cd4132630cf67/ntgcalls-2.0.6-cp311-cp311-win_amd64.whl", hash = "sha256:9c26a84b9114ff5d9cfcf6596a03482239aca176a4117640ae5fccbe3ba75ceb", size = 10381882, upload-time = "2025-08-18T09:21:25.481Z" },
+    { url = "https://files.pythonhosted.org/packages/76/f5/1c778df10d24596932b41b9e9e853ff21b62a6be60b8a95116b7914e21c8/ntgcalls-2.0.6-cp312-cp312-macosx_12_0_arm64.whl", hash = "sha256:6eddc663d8dcced4ecabc40b9575968ea3ffb2537ac23bb1d70af7281493f7b9", size = 8832921, upload-time = "2025-08-18T09:21:27.823Z" },
+    { url = "https://files.pythonhosted.org/packages/9b/a0/fa55ebd8fd2190592a393ce077239a1e73fad3428bc3d049c9a18fa7fc20/ntgcalls-2.0.6-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:686fcb81b469b646124351942187cdfb7bb899de5e4f7499ee36245854a3358c", size = 37570830, upload-time = "2025-08-18T09:21:30.34Z" },
+    { url = "https://files.pythonhosted.org/packages/0b/d4/bd3a32655a02763beff92258c23697125c8479cd4178b0441de11fb007aa/ntgcalls-2.0.6-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:f3ede350d0043504fb535ca578d3e7fae2ab72f53b13b7e6a38406ccdb054d4a", size = 33844943, upload-time = "2025-08-18T09:21:33.585Z" },
+    { url = "https://files.pythonhosted.org/packages/02/b9/077671f75a0442d0248f637b4ac57fb1c8e8627d16d6b3dea84a3946334f/ntgcalls-2.0.6-cp312-cp312-win_amd64.whl", hash = "sha256:5f5d22a7ec01dcb9868d92ca9f3b2171807c07869148d025a6c6de936f10f47e", size = 10382586, upload-time = "2025-08-18T09:21:36.526Z" },
+    { url = "https://files.pythonhosted.org/packages/d8/0b/daf77f767e4767622594602eb0c4301f0b60ddc42f40c292b3c8efe48e73/ntgcalls-2.0.6-cp313-cp313-macosx_12_0_arm64.whl", hash = "sha256:208a2722642eee3db8564040f5201a60643b7abd59c345d1b3fce6ea25089f1d", size = 8833091, upload-time = "2025-08-18T09:21:38.623Z" },
+    { url = "https://files.pythonhosted.org/packages/24/be/6d3e75e4aa5c562cbbd1bbecc0c9663416c2d95cd4e99285020b5483b6db/ntgcalls-2.0.6-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:fbacac3564789e16b0e1e03e65595214e3273de29c65cb12288ce72a23d28dd0", size = 37568563, upload-time = "2025-08-18T09:21:41.834Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/b8/bfd23f51166319f0ec84fd23c5c2c422879654f39bcfeb1cda78886b9628/ntgcalls-2.0.6-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:e18e7e0065aa8f27c8a3ef300004320b546b17f74be5bffe194ae12091b46d9e", size = 33844616, upload-time = "2025-08-18T09:21:45.344Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/33/2893e6a7b097c56685d2d0717a744f0e62368fbdd8d832c25c200e24cd2f/ntgcalls-2.0.6-cp313-cp313-win_amd64.whl", hash = "sha256:51d2246e5bda2b2ad5fcdca32b4740f0c54197a2d68e004d61d232dcf55b220e", size = 10382398, upload-time = "2025-08-18T09:21:48.375Z" },
+    { url = "https://files.pythonhosted.org/packages/51/5d/8231e3c90a3a2d57af8b3575bfdc148555e1b81903d0ed5cae1d1d8e36fe/ntgcalls-2.0.6-cp314-cp314-macosx_12_0_arm64.whl", hash = "sha256:4080a5353769c46f55bb7ae44c27ba5e742bbb7a68141e276ea712dd13c67277", size = 8834376, upload-time = "2025-08-18T09:21:50.836Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/8e/f0ab7d69a5a0954b11fab3858f88e3939c78e1a99a49269937f1c3460831/ntgcalls-2.0.6-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:045d227d94fdbc176cc98652a50055e0a6fe741b7652fcffacc1d94786b05268", size = 37564404, upload-time = "2025-08-18T09:21:53.39Z" },
+    { url = "https://files.pythonhosted.org/packages/9e/61/b4cd305933798312c792b402d3e13b17088dfb31acebbdd9c8418620c053/ntgcalls-2.0.6-cp314-cp314-manylinux_2_28_aarch64.whl", hash = "sha256:3e31c2fff36dab060290448fe8e3a76f9eba9121b47c6b8ff80e11e0c4ad03d3", size = 33843061, upload-time = "2025-08-18T09:21:56.775Z" },
+    { url = "https://files.pythonhosted.org/packages/fe/52/e1c659e86b5e1f9e6a8b10ced570dedcb83162bcbf35727d96a7e78335f2/ntgcalls-2.0.6-cp314-cp314-win_amd64.whl", hash = "sha256:df5a6ce325b530352919ca37f0556f4239a7b7d6bbfd516e1857e269906a7c84", size = 10676833, upload-time = "2025-08-18T09:21:59.952Z" },
 ]
 
 [[package]]
@@ -959,7 +963,7 @@ wheels = [
 
 [[package]]
 name = "py-tgcalls"
-version = "2.2.5"
+version = "2.2.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -967,7 +971,7 @@ dependencies = [
     { name = "ntgcalls" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f8/6e/cae33d03a6a91546accc2b64e870ae079d915c7a87989e1db33534ff4539/py_tgcalls-2.2.5-py3-none-any.whl", hash = "sha256:6bd1328f13a9609f29984c6524bf7327c23fe33ce540da0384b5f0f0433845aa", size = 84035, upload-time = "2025-06-29T09:21:00.94Z" },
+    { url = "https://files.pythonhosted.org/packages/17/1b/1e7e76486eb25b1d0ec3bafb870ab67151966b5b1ed953a52cb0eac54865/py_tgcalls-2.2.6-py3-none-any.whl", hash = "sha256:b36fee13dc2227d1c61eab2382f1fb58de7f882bea6e79709dc258a652ce05f2", size = 84246, upload-time = "2025-08-17T21:03:10.702Z" },
 ]
 
 [[package]]
@@ -1449,11 +1453,11 @@ requires-dist = [
     { name = "gunicorn", specifier = "==23.0.0" },
     { name = "heroku3", specifier = "==5.2.1" },
     { name = "kurigram", specifier = "==2.2.6" },
-    { name = "lyricsgenius", specifier = "==3.7.0" },
-    { name = "ntgcalls", specifier = "==2.0.5" },
+    { name = "lyricsgenius", specifier = "==3.7.1" },
+    { name = "ntgcalls", specifier = "==2.0.6" },
     { name = "pillow", specifier = "==11.3.0" },
     { name = "psutil", specifier = "==7.0.0" },
-    { name = "py-tgcalls", specifier = "==2.2.5" },
+    { name = "py-tgcalls", specifier = "==2.2.6" },
     { name = "py-yt-search", specifier = "==0.3" },
     { name = "pykeyboard2", specifier = "==0.1.6" },
     { name = "pymongo", specifier = "==4.14.0" },
