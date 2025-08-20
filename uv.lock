@@ -312,7 +312,7 @@ wheels = [
 
 [[package]]
 name = "flask"
-version = "3.1.1"
+version = "3.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "blinker" },
@@ -322,9 +322,9 @@ dependencies = [
     { name = "markupsafe" },
     { name = "werkzeug" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c0/de/e47735752347f4128bcf354e0da07ef311a78244eba9e3dc1d4a5ab21a98/flask-3.1.1.tar.gz", hash = "sha256:284c7b8f2f58cb737f0cf1c30fd7eaf0ccfcde196099d24ecede3fc2005aa59e", size = 753440, upload-time = "2025-05-13T15:01:17.447Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/dc/6d/cfe3c0fcc5e477df242b98bfe186a4c34357b4847e87ecaef04507332dab/flask-3.1.2.tar.gz", hash = "sha256:bf656c15c80190ed628ad08cdfd3aaa35beb087855e2f494910aa3774cc4fd87", size = 720160, upload-time = "2025-08-19T21:03:21.205Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3d/68/9d4508e893976286d2ead7f8f571314af6c2037af34853a30fd769c02e9d/flask-3.1.1-py3-none-any.whl", hash = "sha256:07aae2bb5eaf77993ef57e357491839f5fd9f4dc281593a81a9e4d79a24f295c", size = 103305, upload-time = "2025-05-13T15:01:15.591Z" },
+    { url = "https://files.pythonhosted.org/packages/ec/f9/7f9263c5695f4bd0023734af91bedb2ff8209e8de6ead162f35d8dc762fd/flask-3.1.2-py3-none-any.whl", hash = "sha256:ca1d8112ec8a6158cc29ea4858963350011b5c846a414cdb7a954aa9e967d03c", size = 103308, upload-time = "2025-08-19T21:03:19.499Z" },
 ]
 
 [[package]]
@@ -539,15 +539,15 @@ wheels = [
 
 [[package]]
 name = "kurigram"
-version = "2.2.6"
+version = "2.2.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyaes" },
     { name = "pysocks" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7e/b6/f6bacbdf59181901ef4056506e93363a32b60ccc8b1d637f9be69cfd041f/kurigram-2.2.6.tar.gz", hash = "sha256:15b64199a076c12b2c73915f66fb580294ea4ca6c1cba05f33e19a364a569d3d", size = 484918, upload-time = "2025-06-12T21:26:48.422Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/23/8a/0bf73959dffc64c47c64cf5e89120ddc52a28f30879888b47194b603a746/kurigram-2.2.7.tar.gz", hash = "sha256:61f3529a0cdc0a0f10f8b98103c6509317d90ebc0ae69959f38a4b684ad244f8", size = 496972, upload-time = "2025-07-13T14:29:22.254Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/15/88/d7cf7236d222ff92faabe6d581d0e069765cae7bfc7be004c4c6ff3a79ae/kurigram-2.2.6-py3-none-any.whl", hash = "sha256:0fd245a7117e2b6479149995857c81b93cb19979ddadcf3fc8063dca05465847", size = 4885322, upload-time = "2025-06-12T21:26:46.649Z" },
+    { url = "https://files.pythonhosted.org/packages/e0/60/e04aa30e8137a7b2fc007f24552412fe22933eeac160dcff20cdcf6e7e79/kurigram-2.2.7-py3-none-any.whl", hash = "sha256:3ebcfd4f4e7e6e9a2547997b8915ed323f679d9e99fde70a1f30f4c72aee0a97", size = 4933992, upload-time = "2025-07-13T14:29:20.469Z" },
 ]
 
 [[package]]
@@ -1448,11 +1448,11 @@ requires-dist = [
     { name = "aiohttp", specifier = "==3.12.15" },
     { name = "async-lru", specifier = "==2.0.5" },
     { name = "beautifulsoup4", specifier = "==4.13.4" },
-    { name = "flask", specifier = "==3.1.1" },
+    { name = "flask", specifier = "==3.1.2" },
     { name = "gitpython", specifier = "==3.1.45" },
     { name = "gunicorn", specifier = "==23.0.0" },
     { name = "heroku3", specifier = "==5.2.1" },
-    { name = "kurigram", specifier = "==2.2.6" },
+    { name = "kurigram", specifier = "==2.2.7" },
     { name = "lyricsgenius", specifier = "==3.7.1" },
     { name = "ntgcalls", specifier = "==2.0.6" },
     { name = "pillow", specifier = "==11.3.0" },
