@@ -44,5 +44,6 @@ jobs:
           body: "This PR updates outdated dependencies to their latest versions."
           branch: deps/update-pip-deps
           delete-branch: true
-          assignees: Vivekkumar-IN
-          reviewers: Vivekkumar-IN
+          # assignees: Vivekkumar-IN
+          # reviewers: Vivekkumar-IN
+          author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
