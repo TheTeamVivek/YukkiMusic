@@ -28,7 +28,7 @@ dependencies = [
     "async-lru==2.0.5",
     "aiofiles==24.1.0",
     "aiohttp==3.12.15",
-    "beautifulsoup4==4.13.4",
+    "beautifulsoup4==4.13.5",
     "gitpython==3.1.45",
     "heroku3==5.2.1",
     "kurigram==2.2.7",
@@ -46,7 +46,7 @@ dependencies = [
     "uvloop==0.21.0",
     "flask==3.1.2",
     "gunicorn==23.0.0",
-    "yt-dlp==2025.8.20",
+    "yt-dlp==2025.8.22",
     "py-yt-search==0.3",
     "PyYAML==6.0.2"
 ]
