@@ -552,15 +552,15 @@ wheels = [
 
 [[package]]
 name = "lyricsgenius"
-version = "3.7.1"
+version = "3.7.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/94/f6/32e4b3767a3d1c9a95bd8d77b3309dab6293cf18260b96612e0ae3a25686/lyricsgenius-3.7.1.tar.gz", hash = "sha256:a9fcb7c8deaf888febf42f6645fb3f2afc6c0790156338692640647ce620ac37", size = 518903, upload-time = "2025-08-18T03:07:11.785Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/03/fa/c0fc14d8449bdf82d987e1e481174584bf445bf8c11ca2571d4229dca6e8/lyricsgenius-3.7.2.tar.gz", hash = "sha256:01ad51fdca6f7f5a7bc1e24d2a1dc513e664ceaa9abb59f7da9362b16a0a173a", size = 519033, upload-time = "2025-08-25T13:20:44.378Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c2/e9/455fd3e054767387601c85c8d0dcc77058f8a71a6c576696785d671a1aee/lyricsgenius-3.7.1-py3-none-any.whl", hash = "sha256:9604aed6151bf0ce8d62a9f87e1d31be28533ad24dd9a864867ee0feb97d7f81", size = 48292, upload-time = "2025-08-18T03:07:10.066Z" },
+    { url = "https://files.pythonhosted.org/packages/d8/2d/67de320f52c3a7710cd5d4e4db8741e4af2e560dda0bd3d321842923ee66/lyricsgenius-3.7.2-py3-none-any.whl", hash = "sha256:edd0769ac64e7276695d7d7e2018a51fa1c23598a0f38fcb15a0c659fdb6bc33", size = 48428, upload-time = "2025-08-25T13:20:42.809Z" },
 ]
 
 [[package]]
@@ -1404,11 +1404,11 @@ wheels = [
 
 [[package]]
 name = "yt-dlp"
-version = "2025.8.22"
+version = "2025.8.27"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/40/98/b077bebdc5c759a3f7af3ed3a2a5345ad1145c61963b476469b840ac84ce/yt_dlp-2025.8.22.tar.gz", hash = "sha256:d1846bbb7edbcd2a0d4a2d76c7a2124868de9ea3b3959a8cb8219e3f7cb5c335", size = 3037631, upload-time = "2025-08-23T00:07:02.939Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f4/d4/d9dd231b03f09fdfb5f0fe70f30de0b5f59454aa54fa6b2b2aea49404988/yt_dlp-2025.8.27.tar.gz", hash = "sha256:ed74768d2a93b29933ab14099da19497ef571637f7aa375140dd3d882b9c1854", size = 3038374, upload-time = "2025-08-28T00:03:41.418Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f4/06/e9e5e85969bd85142b004577915f33356ee0d5e20b79af8dd40b8bbfc96f/yt_dlp-2025.8.22-py3-none-any.whl", hash = "sha256:b8c71fe4516170dea60c6e5c54e2d45654693b8dc273cad060f22199476ec979", size = 3266783, upload-time = "2025-08-23T00:07:00.176Z" },
+    { url = "https://files.pythonhosted.org/packages/cb/9c/b69fc0c800f80b94ea2f8eff1d1f473fecee6aa337681d297ba7c7c5d3fd/yt_dlp-2025.8.27-py3-none-any.whl", hash = "sha256:0b8fd3bb7c54bc2e7ecb5cdac7d64c30e2503ea4d3dd9ae24d4f09e22aaa95f4", size = 3267059, upload-time = "2025-08-28T00:03:38.793Z" },
 ]
 
 [[package]]
@@ -1453,7 +1453,7 @@ requires-dist = [
     { name = "gunicorn", specifier = "==23.0.0" },
     { name = "heroku3", specifier = "==5.2.1" },
     { name = "kurigram", specifier = "==2.2.9" },
-    { name = "lyricsgenius", specifier = "==3.7.1" },
+    { name = "lyricsgenius", specifier = "==3.7.2" },
     { name = "ntgcalls", specifier = "==2.0.6" },
     { name = "pillow", specifier = "==11.3.0" },
     { name = "psutil", specifier = "==7.0.0" },
@@ -1467,5 +1467,5 @@ requires-dist = [
     { name = "spotipy", specifier = "==2.25.1" },
     { name = "tgcrypto", specifier = "==1.2.5" },
     { name = "uvloop", specifier = "==0.21.0" },
-    { name = "yt-dlp", specifier = "==2025.8.22" },
+    { name = "yt-dlp", specifier = "==2025.8.27" },
 ]
