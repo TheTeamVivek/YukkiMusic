@@ -9,6 +9,7 @@
 # pylint: disable=missing-module-docstring, missing-function-docstring, missing-class-docstring
 
 import os
+import re
 import sys
 import termios
 import tty
@@ -62,10 +63,21 @@ def _str(t):
     return True, str(t)
 
 
+def is_token(text: str):
+    """Validate Telegram Bot Token format."""
+    if not text:
+        return False, None
+    pattern = re.compile(r"^\d{5,15}:[a-zA-Z0-9_-]{20,100}$")
+    if pattern.match(text):
+        return True, text
+    print_hint("Bot token should look like: 123456789:ABCDefGhIjKlMnOpQrStUvWxYz")
+    return False, None
+
+
 required_vars = {
     "API_ID": ("Enter your API_ID from my.telegram.org", True, isint),
     "API_HASH": ("Enter your API_HASH from my.telegram.org", True, _str),
-    "BOT_TOKEN": ("Enter your bot token from @BotFather", True, _str),
+    "BOT_TOKEN": ("Enter your bot token from @BotFather", True, is_token),
     "MONGO_DB_URI": ("MongoDB URI for database connection", True, _str),
     "LOG_GROUP_ID": ("Group ID for logging bot errors and events", True, isint),
     "OWNER_ID": ("Owner Telegram user ID(s), space-separated", True, parse_list(None)),

@@ -9,6 +9,7 @@
 
 # pylint: disable=missing-module-docstring
 
+
 class AttrDict(dict):
     """Dict with attribute-style access."""
 
@@ -21,7 +22,9 @@ class AttrDict(dict):
         try:
             return self[item]
         except KeyError:
-            raise AttributeError(f"{self.__class__.__name__!r} object has no attribute {item!r}")
+            raise AttributeError(
+                f"{self.__class__.__name__!r} object has no attribute {item!r}"
+            )
 
     def __setattr__(self, key, value):
         self[key] = self._wrap(value)

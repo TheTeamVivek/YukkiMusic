@@ -15,8 +15,7 @@ from .mongodatabase import *
 
 
 async def init():
-    await preload_onoff_cache() # from memorydatabase
-    await migrate_served_stats() # from mongodatabase
-    await migrate_blocklist() # from mongodatabase
-    await migrate_private_chats() # from mongodatabase
+    await migrate_served_stats()  # from mongodatabase
+    await migrate_blocklist()  # from mongodatabase
+    await migrate_private_chats()  # from mongodatabase
     await mongodb.autoend.drop()

@@ -8,9 +8,9 @@
 # All rights reserved.
 # pylint: disable=missing-module-docstring, missing-function-docstring
 
-from os import getenv
 import re as _re
 import sys as _sys
+from os import getenv
 
 import dotenv as _dotenv
 from pyrogram import filters as _flt
@@ -28,6 +28,7 @@ def parse_list(text: str, sep: str = ",") -> list[str]:
     if not text:
         text = ""
     return [v.strip() for v in str(text).strip("'\"").split(sep) if v.strip()]
+
 
 # Get it from my.telegram.org
 

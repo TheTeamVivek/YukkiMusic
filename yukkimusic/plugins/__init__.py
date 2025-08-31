@@ -20,6 +20,6 @@ for root, dirs, files in os.walk(base_dir):
             rel_path = os.path.relpath(full_path, base_dir)
             mod_name = rel_path.replace(os.sep, ".")[:-3]
 
-            mod = importlib.import_module(
+            importlib.import_module(
                 f"{__package__}.{mod_name}" if __package__ else mod_name
             )

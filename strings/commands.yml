@@ -124,7 +124,7 @@ SONG_COMMAND:
 LYRICS_COMMAND:
   ar: ["كلمات"]
   ku: ["ژێرنووس"]
-  en: ["lyrics"]
+  en: ["lyrics", "lyric"]
   tr: ["sarkisozu"]
 
 AUTH_COMMAND:

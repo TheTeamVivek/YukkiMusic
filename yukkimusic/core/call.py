@@ -48,11 +48,11 @@ from yukkimusic.utils.database import (
     get_loop,
     get_video_bitrate,
     group_assistant,
-    set_music_playing,
     remove_active_chat,
     remove_active_video_chat,
     set_assistant,
     set_loop,
+    set_music_playing,
 )
 from yukkimusic.utils.exceptions import AssistantErr
 from yukkimusic.utils.inline.play import stream_markup, telegram_markup
@@ -663,6 +663,7 @@ class Call:
         """Starts all PyTgCalls instances for the existing userbot clients."""
         logger.info("Starting PyTgCall Clients")
         await asyncio.gather(*[c.start() for c in self.calls])
+        await self.decorators()
 
     async def stop(self):
         t = []

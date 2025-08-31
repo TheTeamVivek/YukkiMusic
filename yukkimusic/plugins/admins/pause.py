@@ -16,7 +16,11 @@ from strings import command, pick_commands
 from yukkimusic import app
 from yukkimusic.core.call import yukki
 from yukkimusic.core.help import ModuleHelp
-from yukkimusic.utils.database import is_music_paused, set_music_paused, set_music_playing
+from yukkimusic.utils.database import (
+    is_music_paused,
+    set_music_paused,
+    set_music_playing,
+)
 from yukkimusic.utils.decorators import AdminRightsCheck
 
 

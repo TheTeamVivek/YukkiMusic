@@ -7,16 +7,19 @@
 #
 # All rights reserved.
 #
+import asyncio
 import time
 
+import psutil
 from pyrogram import types
 
 from config import BANNED_USERS, PING_IMG_URL
 from strings import command
 from yukkimusic import app
 from yukkimusic.core.call import yukki
-from yukkimusic.utils import bot_sys_stats
+from yukkimusic.misc import _boot_
 from yukkimusic.utils.decorators.language import language
+from yukkimusic.utils.formatters import get_readable_time
 from yukkimusic.utils.inline import support_group_markup
 
 
@@ -28,19 +31,24 @@ async def ping_com(_, message: types.Message, lang):
         lang["ping_1"].format(app.mention),
     )
     end = time.time()
+
     pytgping = await yukki.ping()
-    up, cpu, ram, disk = await bot_sys_stats()
+    uptime = get_readable_time(int(time.time() - _boot_))
     resp = round((end - start) * 1000, 3)
+    cpu_usage = f"{await asyncio.to_thread(psutil.cpu_percent, interval=0.5)}%"
+    ram_usage = f"{psutil.virtual_memory().percent}%"
+    disk_usage = f"{psutil.disk_usage('/').percent}%"
+
     await m.edit_media(
         media=types.InputMediaPhoto(
             media=PING_IMG_URL,
             caption=lang["ping_2"].format(
                 resp,
                 app.mention,
-                up,
-                ram,
-                cpu,
-                disk,
+                uptime,
+                ram_usage,
+                cpu_usage,
+                disk_usage,
                 pytgping,
             ),
         ),
