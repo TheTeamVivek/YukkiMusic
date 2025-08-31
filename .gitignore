@@ -13,3 +13,4 @@ __pycache__/
 tempdb/
 *.egg-info/
 pylint.json
+.pre-commit-config.yaml
