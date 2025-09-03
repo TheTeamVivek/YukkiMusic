@@ -963,7 +963,7 @@ wheels = [
 
 [[package]]
 name = "py-tgcalls"
-version = "2.2.7"
+version = "2.2.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -971,7 +971,7 @@ dependencies = [
     { name = "ntgcalls" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/80/fa/a4238f5696a126431cce7d5cea11b65fa7e80bc467927eb3b786d295cb1e/py_tgcalls-2.2.7-py3-none-any.whl", hash = "sha256:239b7c475a4ac630ddde7ac4693763486c8a48281782e4fe11df069a94f56749", size = 84293, upload-time = "2025-08-30T13:22:38.55Z" },
+    { url = "https://files.pythonhosted.org/packages/4c/fb/7155eb67faab7f6e7b99f6a50faaa2a19a8ca5d1de2d60353a41c1357af5/py_tgcalls-2.2.8-py3-none-any.whl", hash = "sha256:9aef2987c059276a34c1af628192af362d4980627d0206d7500a3799a18aaf89", size = 84448, upload-time = "2025-09-02T09:48:18.826Z" },
 ]
 
 [[package]]
@@ -1457,7 +1457,7 @@ requires-dist = [
     { name = "ntgcalls", specifier = "==2.0.6" },
     { name = "pillow", specifier = "==11.3.0" },
     { name = "psutil", specifier = "==7.0.0" },
-    { name = "py-tgcalls", specifier = "==2.2.7" },
+    { name = "py-tgcalls", specifier = "==2.2.8" },
     { name = "py-yt-search", specifier = "==0.3" },
     { name = "pykeyboard2", specifier = "==0.1.6" },
     { name = "pymongo", specifier = "==4.14.1" },
