@@ -539,15 +539,15 @@ wheels = [
 
 [[package]]
 name = "kurigram"
-version = "2.2.10"
+version = "2.2.12"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyaes" },
     { name = "pysocks" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1a/6c/c51dcf3c48e3a149fdbafa61a9b1306c3ec4806bbecd6c6ee93e8ce8f29f/kurigram-2.2.10.tar.gz", hash = "sha256:5fe912c7b972859902475391bd503e77fbf02e81eb4d4ff50ec9313f8c0d07fd", size = 515841, upload-time = "2025-09-05T09:05:08.036Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/21/dc/da266f27a96d67725861dbf6d44c856adbd07f7cacb95a36e85df2e9cd22/kurigram-2.2.12.tar.gz", hash = "sha256:0c40b8881bda9f4a5ceed5d8fdf97811eecf0e76ea34e529d8181925450a4335", size = 523275, upload-time = "2025-09-19T20:00:16.921Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/44/83/4e9da7c4b11e6f5062c98b7514839bae81efed3492ef734a6e6311570fef/kurigram-2.2.10-py3-none-any.whl", hash = "sha256:346b2c205c041a7d3e0297268c11d22094b18e8761ee9dc4850927af9a27a54e", size = 5065712, upload-time = "2025-09-05T09:05:06.291Z" },
+    { url = "https://files.pythonhosted.org/packages/f2/9c/e325ab31c48f463b55d683a73e0345fa30dbc3a8dfc58130395655e07225/kurigram-2.2.12-py3-none-any.whl", hash = "sha256:f9dcedff87160cf48a911ee9b92b2e956b700c306e2bc10f008684962aed5eac", size = 5091137, upload-time = "2025-09-19T20:00:15.506Z" },
 ]
 
 [[package]]
@@ -1458,7 +1458,7 @@ requires-dist = [
     { name = "gitpython", specifier = "==3.1.45" },
     { name = "gunicorn", specifier = "==23.0.0" },
     { name = "heroku3", specifier = "==5.2.1" },
-    { name = "kurigram", specifier = "==2.2.10" },
+    { name = "kurigram", specifier = "==2.2.12" },
     { name = "lyricsgenius", specifier = "==3.7.2" },
     { name = "ntgcalls", specifier = "==2.0.6" },
     { name = "pillow", specifier = "==11.3.0" },
