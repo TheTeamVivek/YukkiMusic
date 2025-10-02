@@ -109,5 +109,5 @@ uv pip install -e . >/dev/null 2>&1 || {
 echo -en "${CYAN}[*] Run config setup (scripts/envgen.py)? (y/n): ${RESET}"
 read -r yn
 if [[ $yn =~ ^[Yy]$ ]]; then
-  python3 scripts/envgen.py
+  python3 scripts/startup/envgen.py
 fi
