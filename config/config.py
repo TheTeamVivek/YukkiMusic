@@ -44,8 +44,7 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 # Get MongoDB:-  https://telegra.ph/How-To-get-Mongodb-URI-04-06
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
-
-# You'll need a Group ID or USERNAME for this.
+# Set the Log Group ID to a Telegram group where the bot should send logs and server messages. Add the bot to the group and promote it as admin. To turn off this feature, set the Log Group ID to 0.
 LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", 0))
 
 # Your User ID.

@@ -43,11 +43,7 @@ async def auto_leave():
                         ChatType.CHANNEL,
                     ]:
                         chat_id = i.chat.id
-                        if chat_id not in [
-                            config.LOG_GROUP_ID,
-                            -1002159045835,
-                            -1002146211959,
-                        ]:
+                        if chat_id != config.LOG_GROUP_ID:
                             if left == 20:
                                 break
                             if not await is_active_chat(chat_id):

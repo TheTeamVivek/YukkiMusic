@@ -11,7 +11,7 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from config import LOG, LOG_GROUP_ID
+import config
 from yukkimusic import app
 from yukkimusic.utils.database import (
     delete_served_chat,
@@ -23,7 +23,7 @@ from yukkimusic.utils.database import (
 @app.on_message(filters.new_chat_members)
 async def on_bot_added(_, message):
     try:
-        if not await is_on_off(LOG):
+        if not (await is_on_off(config.LOG) or config.LOG_GROUP_ID):
             return
         userbot = await get_assistant(message.chat.id)
         chat = message.chat
@@ -42,7 +42,7 @@ async def on_bot_added(_, message):
                     f"**Added By:** {message.from_user.mention}"
                 )
                 await app.send_message(
-                    LOG_GROUP_ID,
+                    config.LOG_GROUP_ID,
                     text=msg,
                     reply_markup=InlineKeyboardMarkup(
                         [
@@ -64,7 +64,7 @@ async def on_bot_added(_, message):
 @app.on_message(filters.left_chat_member)
 async def on_bot_kicked(_, message: Message):
     try:
-        if not await is_on_off(LOG):
+        if not (await is_on_off(config.LOG) or config.LOG_GROUP_ID):
             return
         userbot = await get_assistant(message.chat.id)
 
@@ -87,7 +87,7 @@ async def on_bot_kicked(_, message: Message):
             )
 
             await app.send_message(
-                LOG_GROUP_ID,
+                config.LOG_GROUP_ID,
                 text=left,
                 reply_markup=InlineKeyboardMarkup(
                     [

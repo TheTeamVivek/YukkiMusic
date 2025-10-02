@@ -51,19 +51,22 @@ class Userbot:
         try:
             await client.start()
             assistants.append(index)
-            try:
-                await client.send_message(config.LOG_GROUP_ID, "Assistant Started")
-            except ChatWriteForbidden:
+            if config.LOG_GROUP_ID:
                 try:
-                    await client.join_chat(config.LOG_GROUP_ID)
                     await client.send_message(config.LOG_GROUP_ID, "Assistant Started")
-                except Exception:
-                    logger.error(
-                        "Assistant Account %d failed to send message in log group. "
-                        "Ensure the assistant is added to the log group.",
-                        index,
-                    )
-                    sys.exit(1)
+                except ChatWriteForbidden:
+                    try:
+                        await client.join_chat(config.LOG_GROUP_ID)
+                        await client.send_message(
+                            config.LOG_GROUP_ID, "Assistant Started"
+                        )
+                    except Exception:
+                        logger.error(
+                            "Assistant Account %d failed to send message in log group. "
+                            "Ensure the assistant is added to the log group.",
+                            index,
+                        )
+                        sys.exit(1)
 
             get_me = await client.get_me()
             client.username = get_me.username
@@ -119,7 +122,7 @@ class Userbot:
                 except StopPropagation:
                     raise
                 except Exception as e:
-                    # Detailed error logging
+                    traceback.print_exc()
                     date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     user_id = message.from_user.id if message.from_user else "Unknown"
                     chat_id = message.chat.id if message.chat else "Unknown"
@@ -143,11 +146,12 @@ class Userbot:
                         f"**Command/Text:** {command}\n"
                         f"**Traceback:**\n{error_trace}"
                     )
-                    await client.send_message(config.LOG_GROUP_ID, error_message)
-                    try:
-                        await client.send_message(config.OWNER_ID[0], error_message)
-                    except Exception:
-                        pass
+                    if config.LOG_GROUP_ID:
+                        await client.send_message(config.LOG_GROUP_ID, error_message)
+                        try:
+                            await client.send_message(config.OWNER_ID[0], error_message)
+                        except Exception:
+                            pass
 
             handler = MessageHandler(wrapper, filters)
             self.handlers.append((handler, group))

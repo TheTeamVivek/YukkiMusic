@@ -129,7 +129,7 @@ async def start_comm(client, message: Message, _):
         if name[0:3] == "sud":
             await sudoers_list(client=client, message=message, _=_)
             await asyncio.sleep(1)
-            if await is_on_off(config.LOG):
+            if await is_on_off(config.LOG) and config.LOG_GROUP_ID:
                 sender_id = message.from_user.id
                 message.from_user.mention
                 sender_name = message.from_user.first_name
@@ -194,7 +194,7 @@ async def start_comm(client, message: Message, _):
                 reply_markup=key,
             )
             await asyncio.sleep(1)
-            if await is_on_off(config.LOG):
+            if await is_on_off(config.LOG) and config.LOG_GROUP_ID:
                 sender_id = message.from_user.id
                 sender_name = message.from_user.first_name
                 return await app.send_message(
@@ -225,7 +225,7 @@ async def start_comm(client, message: Message, _):
                 text=_["start_1"].format(app.mention),
                 reply_markup=InlineKeyboardMarkup(out),
             )
-        if await is_on_off(config.LOG):
+        if await is_on_off(config.LOG) and config.LOG_GROUP_ID:
             sender_id = message.from_user.id
             sender_name = message.from_user.first_name
             return await app.send_message(

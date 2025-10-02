@@ -61,6 +61,7 @@ class YukkiBot(Client):
                 except StopPropagation:
                     raise
                 except Exception as e:
+                    traceback.print_exc()
                     date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     user_id = message.from_user.id if message.from_user else "Unknown"
                     chat_id = message.chat.id if message.chat else "Unknown"
@@ -81,11 +82,12 @@ class YukkiBot(Client):
                         f"{p_fmt.format('Message', command)}\n\n"
                         f"{p_fmt.format('Traceback', error_trace)}\n\n"
                     )
-                    await self.send_message(config.LOG_GROUP_ID, error_message)
-                    try:
-                        await self.send_message(config.OWNER_ID[0], error_message)
-                    except Exception:
-                        pass
+                    if config.LOG_GROUP_ID:
+                        await self.send_message(config.LOG_GROUP_ID, error_message)
+                        try:
+                            await self.send_message(config.OWNER_ID[0], error_message)
+                        except Exception:
+                            pass
 
             handler = MessageHandler(wrapper, filters)
             self.add_handler(handler, group)
@@ -104,15 +106,16 @@ class YukkiBot(Client):
         self.mention = get_me.mention
 
         try:
-            await self.send_message(
-                config.LOG_GROUP_ID,
-                text=(
-                    f"<u><b>{self.mention} Bot Started :</b></u>\n\n"
-                    f"Id : <code>{self.id}</code>\n"
-                    f"Name : {self.name}\n"
-                    f"Username : @{self.username}"
-                ),
-            )
+            if config.LOG_GROUP_ID:
+                await self.send_message(
+                    config.LOG_GROUP_ID,
+                    text=(
+                        f"<u><b>{self.mention} Bot Started :</b></u>\n\n"
+                        f"Id : <code>{self.id}</code>\n"
+                        f"Name : {self.name}\n"
+                        f"Username : @{self.username}"
+                    ),
+                )
         except (errors.ChannelInvalid, errors.PeerIdInvalid):
             logger.error(
                 "Bot failed to access the log group. Ensure the bot is added and promoted as admin."
@@ -125,13 +128,14 @@ class YukkiBot(Client):
             except Exception:
                 logger.warning("Failed to set commands:", exc_info=True)
 
-        try:
-            a = await self.get_chat_member(config.LOG_GROUP_ID, "me")
-            if a.status != ChatMemberStatus.ADMINISTRATOR:
-                logger.error("Please promote bot as admin in logger group")
-                sys.exit()
-        except Exception:
-            pass
+        if config.LOG_GROUP_ID:
+            try:
+                a = await self.get_chat_member(config.LOG_GROUP_ID, "me")
+                if a.status != ChatMemberStatus.ADMINISTRATOR:
+                    logger.error("Please promote bot as admin in logger group")
+                    sys.exit()
+            except Exception:
+                pass
         logger.info(f"MusicBot started as {self.name}")
 
     async def _set_default_commands(self):
@@ -185,21 +189,15 @@ class YukkiBot(Client):
             admin_commands, scope=types.BotCommandScopeAllChatAdministrators()
         )
 
-        LOG_GROUP_ID = (
-            f"@{config.LOG_GROUP_ID}"
-            if isinstance(config.LOG_GROUP_ID, str)
-            and not config.LOG_GROUP_ID.startswith("@")
-            else config.LOG_GROUP_ID
-        )
-
         for owner_id in config.OWNER_ID:
             try:
-                await self.set_bot_commands(
-                    owner_commands,
-                    scope=types.BotCommandScopeChatMember(
-                        chat_id=LOG_GROUP_ID, user_id=owner_id
-                    ),
-                )
+                if config.LOG_GROUP_ID:
+                    await self.set_bot_commands(
+                        owner_commands,
+                        scope=types.BotCommandScopeChatMember(
+                            chat_id=config.LOG_GROUP_ID, user_id=owner_id
+                        ),
+                    )
                 await self.set_bot_commands(
                     private_commands + owner_commands,
                     scope=types.BotCommandScopeChat(chat_id=owner_id),

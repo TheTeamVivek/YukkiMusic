@@ -59,9 +59,9 @@
       "required": false
     },
     "LOG_GROUP_ID": {
-      "description": "Your Log Group ID, add your bot and promote as an admin with full rights!. Use only Group. Please don't use Channel ID.",
-      "value": "",
-      "required": true
+      "description": "Set the LOG_GROUP_ID to a Telegram group where the bot should send logs and server messages. Add the bot to the group and promote it as admin. To turn off this feature, set the LOG_GROUP_ID to 0.",
+      "value": "0",
+      "required": false
     },
     "UPSTREAM_REPO": {
       "description": "If you dont know this, Leave as it is",

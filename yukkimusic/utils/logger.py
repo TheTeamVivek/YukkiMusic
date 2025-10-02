@@ -7,14 +7,14 @@
 #
 # All rights reserved.
 
-from config import LOG, LOG_GROUP_ID
+import config
 from strings import get_string
 from yukkimusic import app
 from yukkimusic.utils.database import get_lang, is_on_off
 
 
 async def play_logs(message, streamtype):
-    if await is_on_off(LOG):
+    if await is_on_off(config.LOG) and config.LOG_GROUP_ID:
         try:
             language = await get_lang(message.chat.id)
             _ = get_string(language)
@@ -47,10 +47,10 @@ async def play_logs(message, streamtype):
             query=query,
             streamtype=streamtype,
         )
-        if message.chat.id != LOG_GROUP_ID:
+        if message.chat.id != config.LOG_GROUP_ID:
             try:
                 await app.send_message(
-                    chat_id=LOG_GROUP_ID,
+                    chat_id=config.LOG_GROUP_ID,
                     text=logger_text,
                 )
             except Exception as e:
