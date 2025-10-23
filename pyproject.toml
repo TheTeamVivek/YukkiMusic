@@ -46,7 +46,7 @@ dependencies = [
     "uvloop==0.22.1",
     "flask==3.1.2",
     "gunicorn==23.0.0",
-    "yt-dlp==2025.10.14",
+    "yt-dlp==2025.10.22",
     "py-yt-search==0.3",
     "pyyaml==6.0.3"
 ]
