@@ -1,0 +1,63 @@
+name: format codes
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - "**.go"
+      - ".github/workflows/format.yml"
+  workflow_dispatch:
+
+jobs:
+  format_and_lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.24"
+          cache: true
+          cache-dependency-path: '**/go.sum'
+
+      - name: Cache Go tools
+        id: cache-tools
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/bin
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-tools-
+
+      - name: Install Tools
+        if: steps.cache-tools.outputs.cache-hit != 'true'
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+          go install mvdan.cc/gofumpt@latest
+          go install github.com/segmentio/golines@latest
+          go install github.com/daixiang0/gci@latest
+          go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Format Code
+        run: |
+          go mod tidy
+          gofmt -w .
+          goimports -w .
+          gci write . -s standard -s default -s "prefix(github.com/TheTeamVivek/YukkiMusic)"
+          gofumpt -w -extra .
+          golines --max-len=80 .
+          go mod tidy
+
+      - name: Commit changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add $(find . -name '*.go' -not -path './ntgcalls/*') go.mod go.sum
+          git diff --cached --quiet || git commit -m "style: format codes"
+          git fetch origin master
+          git rebase --autostash origin/master || (echo "Rebase conflict, aborting" && git rebase --abort && exit 1)
+          git push origin HEAD:master

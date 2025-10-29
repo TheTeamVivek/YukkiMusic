@@ -1,1 +1,1 @@
-worker: yukkimusic
+worker: /app/myapp
