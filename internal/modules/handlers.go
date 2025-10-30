@@ -155,7 +155,7 @@ func Init(c, u *telegram.Client, n *ubot.Context) {
 	if is, _ := database.GetAutoLeave(); is {
 		go startAutoLeave()
 	}
-	if config.SetCmds {
+	if config.SetCmds && config.OwnerID != 0{
 		go setBotCommands(c)
 	}
 }
