@@ -25,9 +25,9 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/ubot"
+	"main/config"
+	"main/internal/database"
+	"main/ubot"
 )
 
 type MsgHandlerDef struct {

@@ -28,10 +28,10 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/config"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/utils"
 )
 
 func handleAddSudo(m *telegram.NewMessage) error {

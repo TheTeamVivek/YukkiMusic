@@ -29,9 +29,9 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/config"
+	"main/internal/state"
+	"main/internal/utils"
 )
 
 var registry []state.Platform

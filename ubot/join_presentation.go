@@ -5,7 +5,7 @@ import (
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/ntgcalls"
+	"main/ntgcalls"
 )
 
 func (ctx *Context) joinPresentation(chatId int64, join bool) error {

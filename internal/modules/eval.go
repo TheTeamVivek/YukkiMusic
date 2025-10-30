@@ -34,8 +34,8 @@ import (
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
+	"main/config"
+	"main/internal/core"
 )
 
 var evalLogger = gologging.GetLogger("Eval")

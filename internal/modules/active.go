@@ -24,7 +24,7 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
+	"main/internal/core"
 )
 
 func activeHandler(m *telegram.NewMessage) error {

@@ -3,7 +3,7 @@ package ubot
 import (
 	"slices"
 
-	"github.com/TheTeamVivek/YukkiMusic/ubot/types"
+	"main/ubot/types"
 )
 
 func (ctx *Context) updateSources(chatId int64) error {

@@ -33,17 +33,14 @@ package main
 import "C"
 
 import (
-	"log"
-	"net/http"
-	_ "net/http/pprof"
 
 	"github.com/Laky-64/gologging"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/cookies"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/modules"
+	"main/config"
+	"main/internal/cookies"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/modules"
 )
 
 func main() {
@@ -57,6 +54,8 @@ func main() {
 	defer dbCleanup()
 	l.Info("✅ Database connected successfully")
 
+	go database.MigrateData(config.MongoURI)
+
 	l.Debug("🔹 Initializing cookies...")
 	cookies.Init()
 
@@ -65,9 +64,5 @@ func main() {
 	defer cleanup()
 	modules.Init(core.Bot, core.UBot, core.Ntg)
 	l.Info("🚀 Bot is started")
-	go func() {
-		log.Println("pprof running on :6060")
-		http.ListenAndServe("localhost:6060", nil)
-	}()
 	core.Bot.Idle()
 }

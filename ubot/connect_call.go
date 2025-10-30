@@ -6,8 +6,8 @@ import (
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/ntgcalls"
-	"github.com/TheTeamVivek/YukkiMusic/ubot/types"
+	"main/ntgcalls"
+	"main/ubot/types"
 )
 
 func (ctx *Context) connectCall(chatId int64, mediaDescription ntgcalls.MediaDescription, jsonParams string) error {

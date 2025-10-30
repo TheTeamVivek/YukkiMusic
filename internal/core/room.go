@@ -31,8 +31,8 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
-	"github.com/TheTeamVivek/YukkiMusic/ntgcalls"
+	"main/internal/state"
+	"main/ntgcalls"
 )
 
 var (

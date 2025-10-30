@@ -29,7 +29,7 @@ import (
 
 	"github.com/Laky-64/gologging"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
+	"main/config"
 )
 
 var logger = gologging.GetLogger("cookies")

@@ -25,8 +25,8 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
+	"main/config"
+	"main/internal/database"
 )
 
 func formatUptime(d time.Duration) string {

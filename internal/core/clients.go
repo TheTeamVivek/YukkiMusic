@@ -27,7 +27,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/ubot"
+	"main/ubot"
 )
 
 var (

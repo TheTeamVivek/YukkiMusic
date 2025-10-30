@@ -25,8 +25,8 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/database"
+	"main/internal/utils"
 )
 
 func handleLogger(m *telegram.NewMessage) error {

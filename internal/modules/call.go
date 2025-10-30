@@ -27,11 +27,11 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/platforms"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
-	"github.com/TheTeamVivek/YukkiMusic/ntgcalls"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/platforms"
+	"main/internal/utils"
+	"main/ntgcalls"
 )
 
 func onStreamEndHandler(chatID int64, streamType ntgcalls.StreamType, streamDevice ntgcalls.StreamDevice) {

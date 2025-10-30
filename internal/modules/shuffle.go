@@ -25,7 +25,7 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/utils"
 )
 
 func shuffleHandler(m *telegram.NewMessage) error {

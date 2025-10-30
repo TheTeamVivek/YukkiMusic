@@ -24,7 +24,7 @@ import (
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
+	"main/internal/core"
 )
 
 const helpMessage = "📚 <b>Help Menu</b>\n\nSelect a category below to explore detailed commands and their usage for managing, controlling, and customizing the bot."

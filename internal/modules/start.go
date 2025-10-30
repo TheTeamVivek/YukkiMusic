@@ -25,10 +25,10 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/config"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/utils"
 )
 
 var startMSG = "⚡️Pika Pika, %s!\n⚡️  Welcome to <b>%s</b> \n🎶  I’m here to help you play, stream, and manage music right here on Telegram. 🎵"

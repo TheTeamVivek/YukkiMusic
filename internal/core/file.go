@@ -23,7 +23,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
+	"main/internal/state"
 )
 
 func (r *RoomState) releaseFile() {

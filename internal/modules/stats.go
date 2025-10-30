@@ -30,9 +30,9 @@ import (
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/mem"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/config"
+	"main/internal/database"
+	"main/internal/utils"
 )
 
 func statsHandler(m *telegram.NewMessage) error {

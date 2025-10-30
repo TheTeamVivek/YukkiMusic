@@ -45,7 +45,7 @@ jobs:
           go mod tidy
           gofmt -w .
           goimports -w .
-          gci write . -s standard -s default -s "prefix(github.com/TheTeamVivek/YukkiMusic)"
+          gci write . -s standard -s default -s "prefix(main)"
           gofumpt -w -extra .
           golines --max-len=80 .
           go mod tidy

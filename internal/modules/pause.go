@@ -28,7 +28,7 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/utils"
 )
 
 func pauseHandler(m *telegram.NewMessage) error {

@@ -31,8 +31,8 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/cookies"
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
+	"main/internal/cookies"
+	"main/internal/state"
 )
 
 type YtDlpPlatform struct{}

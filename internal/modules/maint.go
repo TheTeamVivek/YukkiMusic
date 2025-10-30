@@ -27,9 +27,9 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/utils"
 )
 
 var maintenanceCancel = struct {

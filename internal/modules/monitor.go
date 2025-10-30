@@ -25,7 +25,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
+	"main/internal/core"
 )
 
 var logger = gologging.GetLogger("monitor")

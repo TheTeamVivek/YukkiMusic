@@ -30,11 +30,11 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/platforms"
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/platforms"
+	"main/internal/state"
+	"main/internal/utils"
 )
 
 func cancelHandler(cb *telegram.CallbackQuery) error {

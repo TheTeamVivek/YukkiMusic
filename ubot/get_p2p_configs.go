@@ -3,7 +3,7 @@ package ubot
 import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/ubot/types"
+	"main/ubot/types"
 )
 
 func (ctx *Context) getP2PConfigs(GAorB []byte) (*types.P2PConfig, error) {

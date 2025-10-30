@@ -25,8 +25,8 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/core"
+	"main/internal/utils"
 )
 
 func reloadHandler(m *telegram.NewMessage) error {
