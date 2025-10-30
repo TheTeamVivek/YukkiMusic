@@ -10,6 +10,7 @@
   ],
   "repository": "https://github.com/TheTeamVivek/YukkiMusic",
   "website": "https://github.com/TheTeamVivek/YukkiMusic",
+  "stack": "container",
   "env": {
     "API_ID": {
       "description": "Your Telegram API ID from my.telegram.org.",
