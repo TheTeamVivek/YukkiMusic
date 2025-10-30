@@ -27,6 +27,9 @@
 > 🔸 **Video playback is not supported.**  
 > 🔸 Only **YouTube** and **Telegram audio files** are supported.
 
+> [!NOTE]  
+> 💡 To set up **music downloading** from YouTube, see the [Configuration](#setting-up-youtube-downloads) section below — it explains how to use the **Fallen API** or **cookies** for downloads.
+
 ---
 
 ## 🚀 Getting Started
@@ -103,21 +106,96 @@ All settings are managed using a `.env` file or environment variables.
 
 | Variable | Description | Default |
 |:----------|:-------------|:----------|
-| `FALLEN_API_KEY` | API key for the [Fallen API](https://tgmusic.fallenapi.fun/) (YouTube downloader). |  |
-| `FALLEN_API_URL` | API URL for the [Fallen API](https://tgmusic.fallenapi.fun/). |  |
+| `FALLEN_API_KEY` | API key for the [Fallen API](https://tgmusic.fallenapi.fun/) (YouTube downloader). You can get one from [@FallenApiBot](https://t.me/FallenApiBot). If you are using cookies, you can leave this empty. | *(empty)* |
+| `FALLEN_API_URL` | Base URL for the [Fallen API](https://tgmusic.fallenapi.fun/). For most users, the default should work fine. | `https://tgmusic.fallenapi.fun` |
 | `OWNER_ID` | User ID of the bot owner. |  |
-| `LOGGER_ID` | Chat ID for logging errors and events. |  |
+| `LOGGER_ID` | Chat ID for logging errors and events. | *(empty)* |
 | `DURATION_LIMIT` | Maximum track duration in seconds. | `4200` (70 minutes) |
 | `QUEUE_LIMIT` | Maximum queue size per chat. | `7` |
 | `START_IMG_URL` | Start image URL for `/start` message. | [Default Image](https://raw.githubusercontent.com/Vivekkumar-IN/assets/master/images.png) |
 | `SUPPORT_CHAT` | Support group link. | [@TheTeamVk](https://t.me/TheTeamVk) |
 | `SUPPORT_CHANNEL` | Update channel link. | [@TheTeamVivek](https://t.me/TheTeamVivek) |
-| `COOKIES_LINK` | `batbin.me` link to `yt-dlp` cookies file. |  |
-| `SET_CMDS` | Set bot commands automatically on startup. | `false` |
+| `COOKIES_LINK` | The [batbin.me](https://batbin.me) link where you pasted your `yt-dlp` cookies file. If you are using the Fallen API, you can leave this empty. You can also skip this if you manually place your cookies `.txt` file in `internal/cookies/`. | *(empty)* |
+| `SET_CMDS` | Set [bot commands](https://raw.githubusercontent.com/Vivekkumar-IN/assets/refs/heads/master/bot_commands.png) automatically on startup. | `false` |
 | `MAX_AUTH_USERS` | Max number of authorized users per chat. | `25` |
 
 ---
 
+---
+
+<h2 id="setting-up-youtube-downloads">🎧 Setting Up YouTube Downloads</h2>
+
+YukkiMusic supports multiple methods to handle **YouTube downloads**.  
+You can use any **one** of the following approaches depending on your setup.
+
+---
+
+### 🍪 1. Using Local Cookies Files
+
+If you have your own YouTube cookies files:
+
+- Place one or more `.txt` files inside:  
+```
+internal/cookies/
+```
+
+- Each file should follow the format:  
+```
+internal/cookies/<filename>.txt
+```
+
+- The bot will automatically detect and randomly use a cookie file from this directory at runtime.
+
+> 💡 You can store multiple cookie files to reduce rate-limiting.
+
+---
+
+### 🌐 2. Using a Batbin Link (`COOKIES_LINK`)
+
+If you prefer to host your cookies online:
+
+1. Go to [batbin.me](https://batbin.me).  
+2. Paste your full cookies content there and save.  
+3. Copy the resulting link (for example, `https://batbin.me/abcd1234`).  
+4. Add it in your varibles or in `.env` file like this:  
+```
+COOKIES_LINK=https://batbin.me/abcd1234
+```
+
+> ⚙️ The bot will automatically fetch and save the cookies from your Batbin link into the `internal/cookies/` folder during startup.
+
+---
+
+### ⚡ 3. Using [Fallen API](https://tgmusic.fallenapi.fun/)
+
+The simplest and most reliable method for most users.  
+The **Fallen API** handles YouTube extraction and downloading on the server side — no cookies required.
+
+- Get your API key from [@FallenApiBot](https://t.me/FallenApiBot).  
+- In your `.env` file:  
+```
+FALLEN_API_KEY=your_api_key_here  
+FALLEN_API_URL=https://tgmusic.fallenapi.fun
+```
+
+- If you don’t have a key, you can leave it empty.
+
+> 💡 Recommended for users who don’t want to manage cookies manually.
+
+---
+
+### 🧩 4. Custom API or Advanced Integration
+
+If you have your own API endpoint or downloader implementation,  
+contact us at [@TheTeamVk](https://t.me/TheTeamVk) —  
+we’ll provide ready-to-use **code templates** that you can integrate directly for your setup.
+
+---
+> ✅ **Summary:**  
+> - Use **Fallen API** for the easiest setup (**paid**).  
+> - Use **cookies** if you don’t want to pay for an API.  
+> - Or contact us for a **custom solution** if you want to use your own API.
+---
 ## 💬 Commands
 
 Type `/help` in your bot’s chat to view the complete list of available commands.
