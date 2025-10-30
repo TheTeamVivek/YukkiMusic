@@ -52,9 +52,9 @@ func main() {
 	dbCleanup := database.Init(config.MongoURI)
 	defer dbCleanup()
 	l.Info("✅ Database connected successfully")
-	
-        go database.MigrateData(config.MongoURI)
-        
+
+	go database.MigrateData(config.MongoURI)
+
 	l.Debug("🔹 Initializing cookies...")
 	cookies.Init()
 
