@@ -81,7 +81,7 @@ func GetTracks(m *telegram.NewMessage) ([]*state.Track, error) {
 		yt := &YouTubePlatform{}
 		ytTracks, err := yt.VideoSearch(query, true)
 		if err != nil {
-			return nil, fmt.Errorf("<b>⚠️ YouTube search error</b>\n\nError: <a>%s</a>", html.EscapeString(err.Error()))
+			return nil, fmt.Errorf("<b>⚠️ YouTube search error</b>\n\n<i>%s</i>", html.EscapeString(err.Error()))
 		}
 
 		if len(ytTracks) > 0 {
