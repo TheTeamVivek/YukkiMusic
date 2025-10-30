@@ -33,10 +33,6 @@ package main
 import "C"
 
 import (
-	"log"
-	"net/http"
-	_ "net/http/pprof"
-
 	"github.com/Laky-64/gologging"
 
 	"github.com/TheTeamVivek/YukkiMusic/config"
@@ -56,7 +52,9 @@ func main() {
 	dbCleanup := database.Init(config.MongoURI)
 	defer dbCleanup()
 	l.Info("✅ Database connected successfully")
-
+	
+        go database.MigrateData(config.MongoURI)
+        
 	l.Debug("🔹 Initializing cookies...")
 	cookies.Init()
 
@@ -65,9 +63,5 @@ func main() {
 	defer cleanup()
 	modules.Init(core.Bot, core.UBot, core.Ntg)
 	l.Info("🚀 Bot is started")
-	go func() {
-		log.Println("pprof running on :6060")
-		http.ListenAndServe("localhost:6060", nil)
-	}()
 	core.Bot.Idle()
 }
