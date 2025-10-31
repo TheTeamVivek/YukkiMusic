@@ -165,7 +165,7 @@ If you prefer to host your cookies online:
 1. Go to [batbin.me](https://batbin.me).  
 2. Paste your full cookies content there and save.  
 3. Copy the resulting link (for example, `https://batbin.me/abcd1234`).  
-4. Add it in your varibles or in `.env` file like this:  
+4. Add it in your variables or in `.env` file like this:  
 ```
 COOKIES_LINK=https://batbin.me/abcd1234
 ```
