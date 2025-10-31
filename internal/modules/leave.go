@@ -150,8 +150,7 @@ func startAutoLeave() {
 					if !ok {
 						return
 					}
-					chatID, err := utils.GetPeerID(core.UBot, di.Peer)
-					//	chatID, err := utils.GetPeerID(core.UBot, d.Peer)
+					chatID, err := utils.GetPeerID(core.UBot, d.Peer)
 					if err != nil {
 						gologging.Error("[Autoleave] Failed to get peer, Error: " + err.Error())
 						continue
