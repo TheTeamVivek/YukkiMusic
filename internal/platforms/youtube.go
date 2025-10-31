@@ -51,7 +51,7 @@ var (
 )
 
 func init() {
-	Register(&YouTubePlatform{})
+	addPlatform(90, state.PlatformYouTube, &YouTubePlatform{})
 }
 
 func (*YouTubePlatform) Name() state.PlatformName { return state.PlatformYouTube }
@@ -107,7 +107,7 @@ func (yp *YouTubePlatform) GetTracks(query string) ([]*state.Track, error) {
 		return nil, err
 	}
 	if len(trackList) == 0 {
-		return nil, errors.New("track not found for the given video ID")
+		return nil, errors.New("track not found for the given url")
 	}
 
 	return trackList, nil
@@ -187,7 +187,7 @@ func (yp *YouTubePlatform) VideoSearch(query string, singleOpt ...bool) ([]*stat
 			}
 		}()
 		if err != nil {
-			return nil, fmt.Errorf("both scraping and ytsearch failed: %w", err)
+			return nil, fmt.Errorf("ytsearch failed: %w", err)
 		}
 	}
 

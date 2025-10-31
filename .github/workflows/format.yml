@@ -1,12 +1,6 @@
 name: format codes
 
 on:
-  push:
-    branches:
-      - dev
-    paths:
-      - "**.go"
-      - ".github/workflows/format.yml"
   workflow_dispatch:
 
 jobs:

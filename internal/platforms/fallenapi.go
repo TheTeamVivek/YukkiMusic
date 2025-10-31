@@ -42,7 +42,7 @@ import (
 type FallenApiPlatform struct{}
 
 func init() {
-	Register(&FallenApiPlatform{})
+	addPlatform(80, state.PlatformFallenApi, &FallenApiPlatform{})
 }
 
 func (*FallenApiPlatform) Name() state.PlatformName {
