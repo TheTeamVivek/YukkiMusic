@@ -28,7 +28,7 @@
 > 🔸 Only **YouTube** and **Telegram audio files** are supported.
 
 > [!NOTE]  
-> 💡 To set up **music downloading** from YouTube, see the [Configuration](#setting-up-youtube-downloads) section below — it explains how to use the **Fallen API** or **cookies** for downloads.
+> 💡 To set up **music downloading** from YouTube, see the [Configuration](#-setting-up-youtube-downloads) section below — it explains how to use the **Fallen API** or **cookies** for downloads.
 
 ---
 
@@ -120,10 +120,13 @@ All settings are managed using a `.env` file or environment variables.
 | `MAX_AUTH_USERS` | Max number of authorized users per chat. | `25` |
 
 ---
+## 💬 Commands
+
+Type `/help` in your bot’s chat to view the complete list of available commands.
 
 ---
 
-<h2 id="setting-up-youtube-downloads">🎧 Setting Up YouTube Downloads</h2>
+## 🎧 Setting Up YouTube Downloads
 
 YukkiMusic supports multiple methods to handle **YouTube downloads**.  
 You can use any **one** of the following approaches depending on your setup.
@@ -196,10 +199,17 @@ we’ll provide ready-to-use **code templates** that you can integrate directly 
 > - Use **cookies** if you don’t want to pay for an API.  
 > - Or contact us for a **custom solution** if you want to use your own API.
 ---
-## 💬 Commands
 
-Type `/help` in your bot’s chat to view the complete list of available commands.
+## 🧱 Platform System
 
+YukkiMusic is powered by a **modular Platform System** — a flexible framework that allows it to fetch and download music from multiple sources like **YouTube**, **Telegram**, and more.  
+
+Each platform works independently but connects seamlessly through a **priority-based registry**, ensuring the bot always picks the most efficient source for every query. ⚙️  
+
+📖 **Learn More:**  
+➡️ [📘 YukkiMusic Platform System](../internal/platforms/README.md)
+
+> 💡 The Platform System is perfect for developers who want to add **custom APIs, new music sources, or modify fetching logic** without touching the bot’s core.
 ---
 
 ## 🤝 Contributing
@@ -222,4 +232,4 @@ You can also open an [issue](https://github.com/TheTeamVivek/YukkiMusic/issues/n
 
 ## 📜 License
 
-🧾 This project is licensed under the **GNU GPLv3 License** — see the [LICENSE](LICENSE) file for details.
+🧾 This project is licensed under the **GNU GPLv3 License** — see the [LICENSE](../LICENSE) file for details.

@@ -33,7 +33,7 @@ import (
 
 var (
 	logger = gologging.GetLogger("config")
-	 
+
 	// To learn more about what each variable does, see README.md
 	// Required Vars
 	ApiID         = int32(getInt64("API_ID"))

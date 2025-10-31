@@ -38,7 +38,7 @@ import (
 type YtDlpPlatform struct{}
 
 func init() {
-	Register(&YtDlpPlatform{})
+	addPlatform(70, state.PlatformYtDlp, &YtDlpPlatform{})
 }
 
 func (*YtDlpPlatform) Name() state.PlatformName {

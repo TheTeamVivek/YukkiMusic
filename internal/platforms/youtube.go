@@ -51,7 +51,7 @@ var (
 )
 
 func init() {
-	Register(&YouTubePlatform{})
+	addPlatform(90, state.PlatformYouTube, &YouTubePlatform{})
 }
 
 func (*YouTubePlatform) Name() state.PlatformName { return state.PlatformYouTube }

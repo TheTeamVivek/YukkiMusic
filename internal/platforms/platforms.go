@@ -34,12 +34,6 @@ import (
 	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
 )
 
-var registry []state.Platform
-
-func Register(p state.Platform) {
-	registry = append(registry, p)
-}
-
 func GetTracks(m *telegram.NewMessage) ([]*state.Track, error) {
 	var tracks []*state.Track
 	query := m.Args()
@@ -49,7 +43,7 @@ func GetTracks(m *telegram.NewMessage) ([]*state.Track, error) {
 	urls, _ := utils.ExtractURLs(m)
 	for _, url := range urls {
 		found := false
-		for _, p := range registry {
+		for _, p := range getOrderedPlatforms() {
 			if p.IsValid(url) {
 				t, err := p.GetTracks(url)
 				if err != nil {
@@ -136,7 +130,7 @@ func GetTracks(m *telegram.NewMessage) ([]*state.Track, error) {
 }
 
 func Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
-	for _, p := range registry {
+	for _, p := range getOrderedPlatforms() {
 		if p.IsDownloadSupported(track.Source) {
 			return p.Download(ctx, track, mystic)
 		}

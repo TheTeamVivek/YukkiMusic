@@ -46,7 +46,7 @@ var (
 )
 
 func init() {
-	Register(&TelegramPlatform{})
+	addPlatform(100, state.PlatformTelegram, &TelegramPlatform{})
 }
 
 func (t *TelegramPlatform) Name() state.PlatformName {
