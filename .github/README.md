@@ -5,10 +5,15 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Go-1.24-blue?style=for-the-badge&logo=go" alt="Go Version">
-  <img src="https://img.shields.io/badge/License-GNU%20GPLv3-blue.svg?style=for-the-badge" alt="License: GPLv3">
-  <a href="https://goreportcard.com/report/github.com/TheTeamVivek/YukkiMusic">
-    <img src="https://goreportcard.com/badge/github.com/TheTeamVivek/YukkiMusic?style=for-the-badge" alt="Go Report Card">
+  <img src="https://img.shields.io/badge/Go-1.24-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go Version">
+  <img src="https://img.shields.io/badge/Version-v2.0-9C27B0?style=for-the-badge&logo=semver&logoColor=white" alt="Version">
+  
+  <img src="https://img.shields.io/badge/License-GPLv3-FF3860?style=for-the-badge&logo=gnu&logoColor=white" alt="License: GPLv3">
+  <a href="https://github.com/TheTeamVivek/YukkiMusic/stargazers">
+    <img src="https://img.shields.io/github/stars/TheTeamVivek/YukkiMusic?color=FFD700&style=for-the-badge&logo=github&logoColor=black" alt="GitHub Stars">
+  </a>
+  <a href="https://github.com/TheTeamVivek/YukkiMusic/fork">
+    <img src="https://img.shields.io/github/forks/TheTeamVivek/YukkiMusic?color=00C853&style=for-the-badge&logo=github&logoColor=black" alt="GitHub Forks">
   </a>
 </p>
 
