@@ -145,11 +145,6 @@ func startAutoLeave() {
 					default:
 					}
 
-					di, ok := d.(*telegram.DialogObj)
-
-					if !ok {
-						return
-					}
 					chatID, err := utils.GetPeerID(core.UBot, d.Peer)
 					if err != nil {
 						gologging.Error("[Autoleave] Failed to get peer, Error: " + err.Error())
