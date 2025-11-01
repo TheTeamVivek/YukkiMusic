@@ -87,6 +87,9 @@ func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, my
 
 	var downloadErr error
 	if telegramDLRegex.MatchString(dlURL) {
+		if mystic == nil {
+			return "", errors.New("cannot download from telegram without a message context")
+		}
 		filePath, downloadErr = f.downloadFromTelegram(ctx, mystic.Client, dlURL, track.ID, pm)
 	} else {
 		downloadErr = f.downloadFromURL(ctx, dlURL, filePath)
