@@ -71,8 +71,11 @@ type APIResponse struct {
 }
 
 func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
-	pm := utils.GetProgress(mystic)
-
+  var pm *telegram.ProgressManager
+  if mystic != nil {
+   	pm = utils.GetProgress(mystic)
+  }
+  
 	if path, err := f.checkDownloadedFile(track.ID); err == nil {
 		return path, nil
 	}
@@ -87,10 +90,7 @@ func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, my
 
 	var downloadErr error
 	if telegramDLRegex.MatchString(dlURL) {
-		if mystic == nil {
-			return "", errors.New("cannot download from telegram without a message context")
-		}
-		filePath, downloadErr = f.downloadFromTelegram(ctx, mystic.Client, dlURL, track.ID, pm)
+		filePath, downloadErr = f.downloadFromTelegram(ctx, dlURL, track.ID, pm)
 	} else {
 		downloadErr = f.downloadFromURL(ctx, dlURL, filePath)
 	}
@@ -158,7 +158,7 @@ func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, filePath
 	return err
 }
 
-func (f *FallenApiPlatform) downloadFromTelegram(ctx context.Context, client *telegram.Client, dlURL, videoId string, pm *telegram.ProgressManager) (string, error) {
+func (f *FallenApiPlatform) downloadFromTelegram(ctx context.Context, dlURL, videoId string, pm *telegram.ProgressManager) (string, error) {
 	matches := telegramDLRegex.FindStringSubmatch(dlURL)
 	if len(matches) < 3 {
 		return "", fmt.Errorf("invalid telegram download url: %s", dlURL)
@@ -170,7 +170,7 @@ func (f *FallenApiPlatform) downloadFromTelegram(ctx context.Context, client *te
 		return "", fmt.Errorf("invalid message ID: %v", err)
 	}
 
-	msg, err := client.GetMessageByID(username, int32(messageID))
+	msg, err := core.Bot.GetMessageByID(username, int32(messageID))
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch Telegram message: %w", err)
 	}
