@@ -57,7 +57,7 @@ func (*YtDlpPlatform) IsDownloadSupported(source state.PlatformName) bool {
 	return source == state.PlatformYouTube
 }
 
-func (p *YtDlpPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
+func (p *YtDlpPlatform) Download(ctx context.Context, track *state.Track, _ *telegram.NewMessage) (string, error) {
 	if path, err := p.checkDownloadedFile(track.ID); err == nil {
 		return path, nil
 	}

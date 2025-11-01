@@ -109,8 +109,6 @@ func (t *TelegramPlatform) GetTracksByMessage(rmsg *telegram.NewMessage) ([]*sta
 }
 
 func (t *TelegramPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
-	pm := utils.GetProgress(mystic)
-
 	downloadsDir := "downloads"
 	if err := os.MkdirAll(downloadsDir, os.ModePerm); err != nil {
 		return "", fmt.Errorf("⚠️ TelegramPlatform error: can't create Downloads folder: %v", err)
@@ -134,9 +132,9 @@ func (t *TelegramPlatform) Download(ctx context.Context, track *state.Track, mys
 		return path, nil
 	}
 
-	dOpts := &telegram.DownloadOptions{
-		FileName:        rawFile,
-		ProgressManager: pm,
+	dOpts := &telegram.DownloadOptions{FileName: rawFile}
+	if mystic != nil {
+		dOpts.ProgressManager = utils.GetProgress(mystic)
 	}
 
 	downloadFn := func() (string, error) {

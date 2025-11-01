@@ -2,14 +2,12 @@ package ntgcalls
 
 import (
 	"sync"
+	"unsafe"
 )
 
 // #include "ntgcalls.h"
 // extern void unlockMutex(void*);
 import "C"
-import (
-	"unsafe"
-)
 
 type Future struct {
 	mutex      *sync.Mutex
