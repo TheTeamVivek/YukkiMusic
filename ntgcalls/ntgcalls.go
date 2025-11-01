@@ -12,6 +12,7 @@ package ntgcalls
 //extern void handleRequestBroadcastPart(uintptr_t ptr, int64_t chatID, ntg_segment_part_request_struct segmentPartRequest, void*);
 //extern void handleLogs(ntg_log_message_struct logMessage);
 import "C"
+
 import (
 	"fmt"
 	"unsafe"
@@ -404,14 +405,14 @@ func (ctx *Client) SendExternalFrame(chatId int64, streamDevice StreamDevice, da
 	return parseErrorCode(f)
 }
 
-func (ctx *Client) SendBroadcastTimestamp(chatId int64, timestamp int64) error {
+func (ctx *Client) SendBroadcastTimestamp(chatId, timestamp int64) error {
 	f := CreateFuture()
 	C.ntg_send_broadcast_timestamp(C.uintptr_t(ctx.ptr), C.int64_t(chatId), C.int64_t(timestamp), f.ParseToC())
 	f.wait()
 	return parseErrorCode(f)
 }
 
-func (ctx *Client) SendBroadcastPart(chatId int64, segmentID int64, partID int32, status MediaSegmentStatus, qualityUpdate bool, data []byte) error {
+func (ctx *Client) SendBroadcastPart(chatId, segmentID int64, partID int32, status MediaSegmentStatus, qualityUpdate bool, data []byte) error {
 	f := CreateFuture()
 	dataC, dataSize := parseBytes(data)
 	C.ntg_send_broadcast_part(C.uintptr_t(ctx.ptr), C.int64_t(chatId), C.int64_t(segmentID), C.int32_t(partID), status.ParseToC(), C.bool(qualityUpdate), dataC, dataSize, f.ParseToC())

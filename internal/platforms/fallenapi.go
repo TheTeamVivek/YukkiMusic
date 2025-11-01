@@ -35,7 +35,7 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"github.com/TheTeamVivek/YukkiMusic/config"
-        "github.com/TheTeamVivek/YukkiMusic/internal/core"
+	"github.com/TheTeamVivek/YukkiMusic/internal/core"
 	"github.com/TheTeamVivek/YukkiMusic/internal/state"
 	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
 )
@@ -72,11 +72,11 @@ type APIResponse struct {
 }
 
 func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
-  var pm *telegram.ProgressManager
-  if mystic != nil {
-   	pm = utils.GetProgress(mystic)
-  }
-  
+	var pm *telegram.ProgressManager
+	if mystic != nil {
+		pm = utils.GetProgress(mystic)
+	}
+
 	if path, err := f.checkDownloadedFile(track.ID); err == nil {
 		return path, nil
 	}

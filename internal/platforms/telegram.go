@@ -132,9 +132,9 @@ func (t *TelegramPlatform) Download(ctx context.Context, track *state.Track, mys
 		return path, nil
 	}
 
-	dOpts := &telegram.DownloadOptions{FileName:        rawFile}
+	dOpts := &telegram.DownloadOptions{FileName: rawFile}
 	if mystic != nil {
-	  dOpts.ProgressManager = utils.GetProgress(mystic)
+		dOpts.ProgressManager = utils.GetProgress(mystic)
 	}
 
 	downloadFn := func() (string, error) {
