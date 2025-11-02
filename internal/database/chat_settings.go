@@ -21,7 +21,9 @@ package database
 
 import (
 	"context"
+	"reflect"
 	"fmt"
+	"strconv"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -43,7 +45,7 @@ func defaultChatSettings(chatID int64) *ChatSettings {
 }
 
 func getChatSettings(ctx context.Context, chatID int64) (*ChatSettings, error) {
-	cacheKey := fmt.Sprintf("chat_settings_%d", chatID)
+	cacheKey := "chat_settings_" + strconv.FormatInt(chatID, 10)
 	if cached, found := dbCache.Get(cacheKey); found {
 		if settings, ok := cached.(*ChatSettings); ok {
 			return settings, nil
@@ -57,7 +59,7 @@ func getChatSettings(ctx context.Context, chatID int64) (*ChatSettings, error) {
 		dbCache.Set(cacheKey, def)
 		return def, nil
 	} else if err != nil {
-		logger.ErrorF("Failed to get chat settings for chat %d: %v", chatID, err)
+		logger.Error("Failed to get chat settings for chat "+ strconv.FormatInt(chatID, 10)+ " :" + err.Error())
 		return nil, err
 	}
 
@@ -65,7 +67,7 @@ func getChatSettings(ctx context.Context, chatID int64) (*ChatSettings, error) {
 
 	// Proactively cache the cplayID -> chatID mapping
 	if settings.CPlayID != 0 {
-		cplayCacheKey := fmt.Sprintf("cplayid_%d", settings.CPlayID)
+		cplayCacheKey := "cplayid_" + strconv.FormatInt(settings.CPlayID, 10)
 		dbCache.Set(cplayCacheKey, settings.ChatID)
 	}
 
@@ -73,15 +75,30 @@ func getChatSettings(ctx context.Context, chatID int64) (*ChatSettings, error) {
 }
 
 func updateChatSettings(ctx context.Context, newSettings *ChatSettings) error {
-	cacheKey := fmt.Sprintf("chat_settings_%d", newSettings.ChatID)
-	opts := options.UpdateOne().SetUpsert(true)
+	cacheKey := "chat_settings_" + strconv.FormatInt(newSettings.ChatID, 10)
 
-	_, err := chatSettingsColl.UpdateOne(ctx, bson.M{"_id": newSettings.ChatID}, bson.M{"$set": newSettings}, opts)
+	currentSettings, err := getChatSettings(ctx, newSettings.ChatID)
 	if err != nil {
-		logger.ErrorF("Failed to update chat settings for chat %d: %v", newSettings.ChatID, err)
+		return err
+	}
+
+	if reflect.DeepEqual(currentSettings, newSettings) {
+		// No changes, skip DB update
+		return nil
+	}
+
+	opts := options.UpdateOne().SetUpsert(true)
+	_, err = chatSettingsColl.UpdateOne(ctx, bson.M{"_id": newSettings.ChatID}, bson.M{"$set": newSettings}, opts)
+	if err != nil {
+		logger.Error("Failed to update chat settings for chat "+ strconv.FormatInt(newSettings.ChatID, 10)+ " :" + err.Error())
 		return err
 	}
 
 	dbCache.Set(cacheKey, newSettings)
+	if newSettings.CPlayID != 0 {
+		cplayCacheKey := "cplayid_" + strconv.FormatInt(newSettings.CPlayID, 10)
+		dbCache.Set(cplayCacheKey, newSettings.ChatID)
+	}
+
 	return nil
 }
