@@ -86,7 +86,7 @@ func updateBotState(ctx context.Context, newState *BotState) error {
 		// States are identical, skip update
 		return nil
 	}
-	
+
 	opts := options.UpdateOne().SetUpsert(true)
 	_, err = settingsColl.UpdateOne(ctx, bson.M{"_id": "global"}, bson.M{"$set": newState}, opts)
 	if err != nil {

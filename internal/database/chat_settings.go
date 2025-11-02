@@ -22,7 +22,6 @@ package database
 import (
 	"context"
 	"reflect"
-	"fmt"
 	"strconv"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -59,7 +58,7 @@ func getChatSettings(ctx context.Context, chatID int64) (*ChatSettings, error) {
 		dbCache.Set(cacheKey, def)
 		return def, nil
 	} else if err != nil {
-		logger.Error("Failed to get chat settings for chat "+ strconv.FormatInt(chatID, 10)+ " :" + err.Error())
+		logger.Error("Failed to get chat settings for chat " + strconv.FormatInt(chatID, 10) + " :" + err.Error())
 		return nil, err
 	}
 
@@ -90,7 +89,7 @@ func updateChatSettings(ctx context.Context, newSettings *ChatSettings) error {
 	opts := options.UpdateOne().SetUpsert(true)
 	_, err = chatSettingsColl.UpdateOne(ctx, bson.M{"_id": newSettings.ChatID}, bson.M{"$set": newSettings}, opts)
 	if err != nil {
-		logger.Error("Failed to update chat settings for chat "+ strconv.FormatInt(newSettings.ChatID, 10)+ " :" + err.Error())
+		logger.Error("Failed to update chat settings for chat " + strconv.FormatInt(newSettings.ChatID, 10) + " :" + err.Error())
 		return err
 	}
 
