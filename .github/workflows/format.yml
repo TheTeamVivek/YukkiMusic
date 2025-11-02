@@ -50,8 +50,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          BRANCH_NAME="${GITHUB_REF##*/}"
+
           git add $(find . -name '*.go' -not -path './ntgcalls/*') go.mod go.sum
           git diff --cached --quiet || git commit -m "style: format codes"
-          git fetch origin master
-          git rebase --autostash origin/master || (echo "Rebase conflict, aborting" && git rebase --abort && exit 1)
-          git push origin HEAD:master
+
+          git fetch origin "$BRANCH_NAME"
+          git rebase --autostash "origin/$BRANCH_NAME" || (echo "Rebase conflict, aborting" && git rebase --abort && exit 1)
+          git push origin "HEAD:$BRANCH_NAME"
