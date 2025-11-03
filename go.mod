@@ -1,6 +1,6 @@
 module github.com/TheTeamVivek/YukkiMusic
 
-go 1.24.7
+go 1.24.9
 
 require (
 	github.com/Laky-64/gologging v1.1.0
