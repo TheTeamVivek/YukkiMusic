@@ -3,7 +3,7 @@ package ubot
 import (
 	"slices"
 
-	"github.com/TheTeamVivek/YukkiMusic/ubot/types"
+	"main/ubot/types"
 )
 
 func (ctx *Context) updateSources(chatId int64) error {
@@ -11,12 +11,9 @@ func (ctx *Context) updateSources(chatId int64) error {
 	if err != nil {
 		return err
 	}
-	if ctx.callSources[chatId] == nil {
-		ctx.callSources[chatId] = &types.CallSources{
-			CameraSources: make(map[int64]string),
-			ScreenSources: make(map[int64]string),
-		}
-	}
+
+	ctx.ensureCallSources(chatId)
+
 	for _, participant := range participants {
 		participantId := getParticipantId(participant.Peer)
 		if participant.Video != nil && ctx.callSources[chatId].CameraSources[participantId] == "" {
@@ -38,4 +35,13 @@ func (ctx *Context) updateSources(chatId int64) error {
 		}
 	}
 	return nil
+}
+
+func (ctx *Context) ensureCallSources(chatId int64) {
+	if ctx.callSources[chatId] == nil {
+		ctx.callSources[chatId] = &types.CallSources{
+			CameraSources: make(map[int64]string),
+			ScreenSources: make(map[int64]string),
+		}
+	}
 }

@@ -24,6 +24,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"go/build"
 	"io"
 	"os"
 	"reflect"
@@ -34,8 +35,8 @@ import (
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
+	"main/config"
+	"main/internal/core"
 )
 
 var evalLogger = gologging.GetLogger("Eval")
@@ -73,12 +74,15 @@ Examples:
 		return nil
 	}
 
+	goPath := os.Getenv("GOPATH")
+	if goPath == "" {
+		goPath = build.Default.GOPATH
+	}
 	var stdout, stderr bytes.Buffer
 	i := interp.New(interp.Options{
 		Stdout: &stdout,
 		Stderr: &stderr,
-		GoPath: os.Getenv("GOPATH"),
-		//	GoPath: build.Default.GOPATH,
+		GoPath: goPath,
 	})
 	i.Use(stdlib.Symbols)
 
@@ -100,7 +104,6 @@ Examples:
 	if err := i.Use(symbols); err != nil {
 		evalLogger.ErrorF("failed to use custom symbols: %v", err)
 	}
-
 	ctx := context.Background()
 
 	// Wrap snippet mode

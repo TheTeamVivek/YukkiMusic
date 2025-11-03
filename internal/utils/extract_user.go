@@ -33,50 +33,68 @@ func ExtractUser(m *telegram.NewMessage) (int64, error) {
 	}
 
 	if m.IsReply() {
-		r, err := m.GetReplyMessage()
-		if err != nil {
-			return 0, fmt.Errorf("failed to fetch reply message: %w", err)
-		}
-
-		if r.Message.FromID == nil {
-			return 0, fmt.Errorf("replied message's sender is not a user (may be anon admin)")
-		}
-		if _, ok := r.Message.FromID.(*telegram.PeerUser); !ok {
-			return 0, fmt.Errorf("replied message's sender is not a user (maybe channel/group)")
-		}
-		return r.SenderID(), nil
+		return extractFromReply(m)
 	}
+
 	text := m.Text()
 	if text == "" {
 		return 0, fmt.Errorf("empty message text")
 	}
 
+	if id, ok, err := extractFromEntities(m, text); ok || err != nil {
+		return id, err
+	}
+
+	return extractFromPlainText(m, text)
+}
+
+// --- Sub Functions ---
+
+func extractFromReply(m *telegram.NewMessage) (int64, error) {
+	r, err := m.GetReplyMessage()
+	if err != nil {
+		return 0, fmt.Errorf("failed to fetch reply message: %w", err)
+	}
+
+	if r.Message.FromID == nil {
+		return 0, fmt.Errorf("replied message's sender is not a user (may be anon admin)")
+	}
+
+	if _, ok := r.Message.FromID.(*telegram.PeerUser); !ok {
+		return 0, fmt.Errorf("replied message's sender is not a user (maybe channel/group)")
+	}
+
+	return r.SenderID(), nil
+}
+
+func extractFromEntities(m *telegram.NewMessage, text string) (int64, bool, error) {
 	for _, ent := range m.Message.Entities {
 		switch e := ent.(type) {
 
+		// Inline mention (tg://user?id=xxxx)
 		case *telegram.MessageEntityMentionName:
-			// Inline mention (tg://user?id=xxxx)
-			return e.UserID, nil
+			return e.UserID, true, nil
 
+		// @username mention → resolve peer
 		case *telegram.MessageEntityMention:
-			// @username mention → resolve peer
 			username := strings.TrimPrefix(text[e.Offset:e.Offset+e.Length], "@")
-
 			peer, err := m.Client.ResolvePeer(username)
 			if err != nil {
-				return 0, fmt.Errorf("failed to resolve peer for @%s: %w", username, err)
+				return 0, false, fmt.Errorf("failed to resolve peer for @%s: %w", username, err)
 			}
 
 			userPeer, ok := peer.(*telegram.InputPeerUser)
 			if !ok {
-				return 0, fmt.Errorf("resolved peer is not a user (maybe channel/group)")
+				return 0, false, fmt.Errorf("resolved peer is not a user (maybe channel/group)")
 			}
 
-			return userPeer.UserID, nil
+			return userPeer.UserID, true, nil
 		}
 	}
+	return 0, false, nil
+}
 
-	// Maybe plain /id <id>
+func extractFromPlainText(m *telegram.NewMessage, text string) (int64, error) {
 	parts := strings.Fields(text)
 	if len(parts) < 2 {
 		return 0, fmt.Errorf("no user identifier found")
@@ -88,7 +106,6 @@ func ExtractUser(m *telegram.NewMessage) (int64, error) {
 		return id, nil
 	}
 
-	// Try resolving as peer string (like username without @)
 	peer, err := m.Client.ResolvePeer(idStr)
 	if err != nil {
 		return 0, fmt.Errorf("failed to resolve peer: %w", err)

@@ -34,11 +34,17 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/config"
+	"main/internal/core"
+	"main/internal/state"
+	"main/internal/utils"
 )
+
+var telegramDLRegex = regexp.MustCompile(`https:\/\/t\.me\/([a-zA-Z0-9_]{5,})\/(\d+)`)
+
+type APIResponse struct {
+	CdnUrl string `json:"cdnurl"`
+}
 
 type FallenApiPlatform struct{}
 
@@ -63,12 +69,6 @@ func (*FallenApiPlatform) IsDownloadSupported(source state.PlatformName) bool {
 		return false
 	}
 	return source == state.PlatformYouTube
-}
-
-var telegramDLRegex = regexp.MustCompile(`https:\/\/t\.me\/([a-zA-Z0-9_]{5,})\/(\d+)`)
-
-type APIResponse struct {
-	CdnUrl string `json:"cdnurl"`
 }
 
 func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {

@@ -24,8 +24,8 @@ import (
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/config"
+	"main/internal/utils"
 )
 
 func AddMeMarkup(username string) tg.ReplyMarkup {

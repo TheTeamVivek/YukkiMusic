@@ -1,6 +1,6 @@
 package types
 
-import "github.com/TheTeamVivek/YukkiMusic/ntgcalls"
+import "main/ntgcalls"
 
 type PendingConnection struct {
 	MediaDescription ntgcalls.MediaDescription

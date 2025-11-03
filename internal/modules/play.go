@@ -31,12 +31,12 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/platforms"
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/config"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/platforms"
+	"main/internal/state"
+	"main/internal/utils"
 )
 
 func channelPlayHandler(m *telegram.NewMessage) error {
@@ -267,55 +267,55 @@ func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 type msgFn func(error) string
 
 var errMessageMap = map[error]msgFn{
-		core.ErrAssistantBanned: func(_ error) string {
-			return "<b>🚫 Assistant Restricted</b>\n\nI can't play music because " +
-				utils.MentionHTML(core.UbUser) +
-				"(UserID: <code>" + utils.IntToStr(core.UbUser.ID) +
-				"</code>) is banned or removed from this chat.\n\n" +
-				"<i><b>✅ Unbanned already?</b> Use /reload to refresh and sync.</i>"
-		},
+	core.ErrAssistantBanned: func(_ error) string {
+		return "<b>🚫 Assistant Restricted</b>\n\nI can't play music because " +
+			utils.MentionHTML(core.UbUser) +
+			"(UserID: <code>" + utils.IntToStr(core.UbUser.ID) +
+			"</code>) is banned or removed from this chat.\n\n" +
+			"<i><b>✅ Unbanned already?</b> Use /reload to refresh and sync.</i>"
+	},
 
-		core.ErrAdminPermissionRequired: func(_ error) string {
-			return "⚠️ <b>Admin Permission Required</b>\n\n" +
-				"I need <i>admin access</i> to manage and check members in this chat.\n\n" +
-				"➤ <b>Promote me with</b> <code>Manage Chat / Invite Users</code> permission."
-		},
+	core.ErrAdminPermissionRequired: func(_ error) string {
+		return "⚠️ <b>Admin Permission Required</b>\n\n" +
+			"I need <i>admin access</i> to manage and check members in this chat.\n\n" +
+			"➤ <b>Promote me with</b> <code>Manage Chat / Invite Users</code> permission."
+	},
 
-		core.ErrAssistantJoinRateLimited: func(_ error) string {
-			return "⚠️ Assistant cannot join because it has reached the maximum number of allowed groups."
-		},
+	core.ErrAssistantJoinRateLimited: func(_ error) string {
+		return "⚠️ Assistant cannot join because it has reached the maximum number of allowed groups."
+	},
 
-		core.ErrAssistantJoinRequestSent: func(_ error) string {
-			return "⚠️ Assistant sent a join request, but I couldn't auto-approve it.\n\n" +
-				"<i>✅ Please manually approve the request, then try again.</i>"
-		},
+	core.ErrAssistantJoinRequestSent: func(_ error) string {
+		return "⚠️ Assistant sent a join request, but I couldn't auto-approve it.\n\n" +
+			"<i>✅ Please manually approve the request, then try again.</i>"
+	},
 
-		core.ErrAssistantInviteLinkFetch: func(e error) string {
-			return "⚠️ Failed to fetch invite link:\n\n<i>" + e.Error() + "</i>"
-		},
+	core.ErrAssistantInviteLinkFetch: func(e error) string {
+		return "⚠️ Failed to fetch invite link:\n\n<i>" + e.Error() + "</i>"
+	},
 
-		core.ErrAssistantInviteFailed: func(e error) string {
-			return "⚠️ Assistant failed to join this chat:\n\n<i>" + e.Error() + "</i>"
-		},
+	core.ErrAssistantInviteFailed: func(e error) string {
+		return "⚠️ Assistant failed to join this chat:\n\n<i>" + e.Error() + "</i>"
+	},
 
-		core.ErrAssistantJoinRejected: func(_ error) string {
-			return "⚠️ Invite link is invalid or expired. Please regenerate a fresh invite link."
-		},
+	core.ErrAssistantJoinRejected: func(_ error) string {
+		return "⚠️ Invite link is invalid or expired. Please regenerate a fresh invite link."
+	},
 
-		core.ErrNoActiveVoiceChat: func(_ error) string {
-			return "<b>🎙️ No Active Voice Chat</b>\n\n" +
-				"I can't join yet — please start a voice chat to begin playing music.\n\n" +
-				"<i><b>✅ Already started one?</b> Use /reload to refresh and sync this chat.</i>"
-		},
+	core.ErrNoActiveVoiceChat: func(_ error) string {
+		return "<b>🎙️ No Active Voice Chat</b>\n\n" +
+			"I can't join yet — please start a voice chat to begin playing music.\n\n" +
+			"<i><b>✅ Already started one?</b> Use /reload to refresh and sync this chat.</i>"
+	},
 
-		core.ErrFetchFailed: func(e error) string {
-			return "⚠️ Failed to fetch chat info:\n\n<i>" + e.Error() + "</i>"
-		},
+	core.ErrFetchFailed: func(e error) string {
+		return "⚠️ Failed to fetch chat info:\n\n<i>" + e.Error() + "</i>"
+	},
 
-		core.ErrPeerResolveFailed: func(_ error) string {
-			return "⚠️ Failed to resolve peer information. Try again later or re-add the assistant."
-		},
-	}
+	core.ErrPeerResolveFailed: func(_ error) string {
+		return "⚠️ Failed to resolve peer information. Try again later or re-add the assistant."
+	},
+}
 
 func getAssistantErrorMessage(err error) string {
 	if err == nil {

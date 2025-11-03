@@ -27,7 +27,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/ubot"
+	"main/ubot"
 )
 
 var (
@@ -39,8 +39,26 @@ var (
 )
 
 func Init(apiID int32, apiHash, token, session string, loggerID int64) func() {
-	l := gologging.GetLogger("Clients")
+	Bot = initBotClient(apiID, apiHash, token)
+	BUser = getSelfOrFatal(Bot, "bot")
 
+	UBot = initAssistantClient(apiID, apiHash, session)
+	UbUser = getSelfOrFatal(UBot, "assistant")
+
+	if loggerID != 0 {
+		notifyStartup(Bot, UBot, loggerID)
+	}
+
+	Ntg = ubot.NewContext(UBot, UbUser)
+
+	return func() {
+		Ntg.Close()
+		Bot.Stop()
+		UBot.Stop()
+	}
+}
+
+func initBotClient(apiID int32, apiHash, token string) *telegram.Client {
 	client, err := telegram.NewClient(telegram.ClientConfig{
 		AppID:     apiID,
 		AppHash:   apiHash,
@@ -49,76 +67,57 @@ func Init(apiID int32, apiHash, token, session string, loggerID int64) func() {
 		Session:   "bot.session",
 	})
 	if err != nil {
-		l.FatalF("❌ Failed to create bot: %s", err)
-		return nil
+		gologging.Fatal("❌ Failed to create bot: " + err.Error())
 	}
 
 	if err := client.LoginBot(token); err != nil {
 		if strings.Contains(err.Error(), "ACCESS_TOKEN_EXPIRED") {
-			l.FatalF("❌ Bot token has been revoked or expired.")
+			gologging.Fatal("❌ Bot token has been revoked or expired.")
 		} else {
-			l.FatalF("❌ Failed to start the bot: %s", err)
+			gologging.Fatal("❌ Failed to start the bot: " + err.Error())
 		}
-		return nil
+	}
+	return client
+}
+
+func initAssistantClient(apiID int32, apiHash, session string) *telegram.Client {
+	sess, err := decodePyrogramSessionString(session)
+	if err != nil {
+		gologging.Fatal("❌ Failed to decode Pyrogram session: " + err.Error())
 	}
 
-	if me, err := client.GetMe(); err != nil {
-		l.FatalF("❌ Failed to GetMe: %s", err)
-		return nil
-	} else {
-		BUser = me
-	}
-
-	sess, serr := decodePyrogramSessionString(session)
-	if serr != nil {
-		l.FatalF("❌ Failed to decode Pyrogram session: %s", serr)
-		return nil
-	}
-
-	ub, err2 := telegram.NewClient(telegram.ClientConfig{
+	client, err := telegram.NewClient(telegram.ClientConfig{
 		AppID:         apiID,
 		AppHash:       apiHash,
 		LogLevel:      telegram.LogError,
 		ParseMode:     "HTML",
 		StringSession: sess.Encode(),
-
-		Session: "ass.session",
+		Session:       "ass.session",
 	})
-	if err2 != nil {
-		l.FatalF("❌ Failed to create ubot: %s", err2)
-		return nil
+	if err != nil {
+		gologging.Fatal("❌ Failed to create assistant: " + err.Error())
+	}
+	return client
+}
+
+func getSelfOrFatal(c *telegram.Client, label string) *telegram.UserObj {
+	me, err := c.GetMe()
+	if err != nil {
+		gologging.Fatal("❌ Failed to GetMe for " + label + ": " + err.Error())
+	}
+	gologging.Info("Logged in as " + label + ": " + me.FirstName)
+	return me
+}
+
+func notifyStartup(bot, ub *telegram.Client, loggerID int64) {
+	_, err := bot.SendMessage(loggerID, "🚀 Bot Started...")
+	if err != nil {
+		gologging.Warn("Failed to send bot startup message: " + err.Error())
 	}
 
-	if me, err := ub.GetMe(); err != nil {
-		l.FatalF("❌ Failed to GetMe: %s", err)
-		return nil
-	} else {
-		UbUser = me
-		l.InfoF("Logged in as: %s", me.FirstName)
-	}
-	if peer, err := client.ResolvePeer(loggerID); err != nil {
-		l.WarnF("Failed to get peer ID of logger: %s", err)
-	} else if _, err := client.SendMessage(peer, "🚀 Bot Started..."); err != nil {
-		l.WarnF("Failed to send startup message: %s", err)
-	}
-
-	if peer, err := ub.ResolvePeer(loggerID); err != nil {
-		l.WarnF("Failed to get peer ID of logger (assistant): %s", err)
-	} else if _, err := ub.SendMessage(peer, "🚀 Assistant Started..."); err != nil {
-		l.WarnF("Failed to send assistant startup message: %s", err)
-	}
-
-	ub.SendMessage(BUser.Username, "/start")
-	Bot = client
-	UBot = ub
-	Ntg = ubot.NewContext(ub, UbUser)
-
-	return func() {
-		if Ntg != nil {
-			Ntg.Close()
-			Bot.Stop()
-			UBot.Stop()
-		}
+	_, err = ub.SendMessage(loggerID, "🚀 Assistant Started...")
+	if err != nil {
+		gologging.Warn("Failed to send assistant startup message: " + err.Error())
 	}
 }
 

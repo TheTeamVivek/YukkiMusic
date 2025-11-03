@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -36,9 +37,9 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 	"github.com/raitonoberu/ytsearch"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/config"
+	"main/internal/state"
+	"main/internal/utils"
 )
 
 type YouTubePlatform struct{}
@@ -230,13 +231,17 @@ func getPlaylist(pUrl string) ([]string, error) {
 //
 // searchYouTube scrapes YouTube results page
 func searchYouTube(query string) ([]*state.Track, error) {
-	query = strings.ReplaceAll(query, " ", "+")
-	url := "https://www.youtube.com/results?search_query=" + query
+	encodedQuery := url.QueryEscape(query)
+	url := "https://www.youtube.com/results?search_query=" + encodedQuery
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64)")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36")
+	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
+	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)

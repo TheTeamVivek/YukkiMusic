@@ -21,18 +21,17 @@ package modules
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/Laky-64/gologging"
-	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/config"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/utils"
 )
 
 var (
@@ -42,52 +41,48 @@ var (
 	limit           = 30
 )
 
-func autoLeaveHandler(m *telegram.NewMessage) error {
+func autoLeaveHandler(m *tg.NewMessage) error {
 	args := strings.Fields(m.Text())
+	chatID := m.ChatID()
 
 	currentState, err := database.GetAutoLeave()
 	if err != nil {
-		m.Reply("⚠️ <b>Failed to fetch AutoLeave state.</b>")
-		return telegram.EndGroup
+		m.Reply(F(chatID, "autoleave_fetch_fail"))
+		return tg.EndGroup
 	}
 
-	status := "❌ Disabled"
-	if currentState {
-		status = "✅ Enabled"
-	}
+	status := F(chatID, utils.IfElse(currentState, "enabled", "disabled"))
 
 	if len(args) < 2 {
-		m.Reply(fmt.Sprintf("🏃‍♂️ <b>AutoLeave Control</b>\n\nUsage: %s [enable|disable]\nCurrent state: "+status, getCommand(m)))
-		return telegram.EndGroup
-	}
-
-	mystic, err := m.Reply("⚙️ <b>Updating AutoLeave...</b>")
-	if err != nil {
-		return err
+		m.Reply(F(chatID, "autoleave_status", arg{
+			"cmd":    getCommand(m),
+			"action": status,
+		}))
+		return tg.EndGroup
 	}
 
 	newState, err := utils.ParseBool(args[1])
 	if err != nil {
-		utils.EOR(mystic, "⚠️ <b>Invalid value.</b>\nUse 'enable' or 'disable'.")
-		return telegram.EndGroup
+		m.Reply(F(chatID, "invalid_bool"))
+		return tg.EndGroup
 	}
 
 	if newState == currentState {
-		utils.EOR(mystic, "⚠️ AutoLeave is already "+status)
-		return telegram.EndGroup
+		m.Reply(F(chatID, "autoleave_already", arg{
+			"action": status,
+		}))
+		return tg.EndGroup
 	}
 
 	if err := database.SetAutoLeave(newState); err != nil {
-		utils.EOR(mystic, "⚠️ <b>Failed to update AutoLeave state.</b>")
-		return telegram.EndGroup
+		m.Reply(F(chatID, "autoleave_update_fail"))
+		return tg.EndGroup
 	}
 
-	newStatus := "❌ Disabled"
-	if newState {
-		newStatus = "✅ Enabled"
-	}
-
-	utils.EOR(mystic, "🏃‍♂️ AutoLeave has been "+newStatus)
+	newStatus := F(chatID, utils.IfElse(newState, "autoleave_enabled", "autoleave_disabled").(string))
+	m.Reply(F(chatID, "autoleave_updated", arg{
+		"action": newStatus,
+	}))
 
 	autoLeaveMu.Lock()
 	defer autoLeaveMu.Unlock()
@@ -99,8 +94,7 @@ func autoLeaveHandler(m *telegram.NewMessage) error {
 		autoLeaveCtx = nil
 		autoLeaveCancel = nil
 	}
-
-	return telegram.EndGroup
+	return tg.EndGroup
 }
 
 func startAutoLeave() {
@@ -128,7 +122,7 @@ func startAutoLeave() {
 				exists[chatID] = struct{}{}
 			}
 
-			dialogCh, errCh := core.UBot.IterDialogs(&telegram.DialogOptions{Limit: int32(limit * 2)})
+			dialogCh, errCh := core.UBot.IterDialogs(&tg.DialogOptions{Limit: int32(limit * 2)})
 			leaveCount := 0
 
 		loop:

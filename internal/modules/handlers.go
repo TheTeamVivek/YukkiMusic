@@ -25,9 +25,9 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/ubot"
+	"main/config"
+	"main/internal/database"
+	"main/ubot"
 )
 
 type MsgHandlerDef struct {
@@ -61,6 +61,7 @@ var handlers = []MsgHandlerDef{
 	{Pattern: "start", Handler: startHandler, Filters: []telegram.Filter{ignoreChannelFilter}},
 	{Pattern: "stats", Handler: statsHandler, Filters: []telegram.Filter{ignoreChannelFilter, sudoOnlyFilter}},
 	{Pattern: "bug", Handler: bugHandler, Filters: []telegram.Filter{ignoreChannelFilter}},
+	{Pattern: "(lang|language)", Handler: langHandler, Filters: []telegram.Filter{superGroupFilter, authFilter}},
 
 	// SuperGroup & Admin Filters
 	{Pattern: "(play|vplay)", Handler: playHandler, Filters: []telegram.Filter{superGroupFilter}},
@@ -116,6 +117,7 @@ var handlers = []MsgHandlerDef{
 var cbHandlers = []CbHandlerDef{
 	{Pattern: "start", Handler: startCB},
 	{Pattern: "help_cb", Handler: helpCB},
+	{Pattern: "^lang:[a-z]", Handler: langCallbackHandler},
 	{Pattern: `^help:(.+)`, Handler: helpCallbackHandler},
 	{Pattern: "close", Handler: closeHandler},
 	{Pattern: "cancel", Handler: cancelHandler},
@@ -137,17 +139,17 @@ func Init(c, u *telegram.Client, n *ubot.Context) {
 
 	for _, h := range cbHandlers {
 		if len(h.Filters) > 0 {
-			c.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler), h.Filters...).SetGroup("callback")
+			c.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler), h.Filters...) //.SetGroup("callback")
 		} else {
-			c.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler)).SetGroup("callback")
+			c.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler)) //.SetGroup("callback")
 		}
 	}
 
-	c.On("edit:/eval", evalHandle).SetGroup("edit")
+	c.On("edit:/eval", evalHandle) //.SetGroup("edit")
 
-	c.On("participant", handleParticipantUpdate).SetGroup("pu")
+	c.On("participant", handleParticipantUpdate) //.SetGroup("pu")
 
-	c.AddActionHandler(handleActions).SetGroup("service_msg")
+	c.AddActionHandler(handleActions) //.SetGroup("service_msg")
 
 	n.OnStreamEnd(onStreamEndHandler)
 

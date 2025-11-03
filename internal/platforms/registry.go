@@ -23,7 +23,7 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
+	"main/internal/state"
 )
 
 type regEntry struct {

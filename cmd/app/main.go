@@ -35,11 +35,12 @@ import "C"
 import (
 	"github.com/Laky-64/gologging"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/cookies"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/modules"
+	"main/config"
+	"main/internal/cookies"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/locales"
+	"main/internal/modules"
 )
 
 func main() {
@@ -57,7 +58,7 @@ func main() {
 
 	l.Debug("🔹 Initializing cookies...")
 	cookies.Init()
-
+	locales.Init()
 	l.Debug("🔹 Initializing clients...")
 	cleanup := core.Init(config.ApiID, config.ApiHash, config.Token, config.StringSession, config.LoggerID)
 	defer cleanup()

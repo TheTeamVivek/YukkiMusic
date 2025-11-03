@@ -17,25 +17,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package cookies
 
 import (
+	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/Laky-64/gologging"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
+	"main/config"
 )
 
-var logger = gologging.GetLogger("cookies")
+var (
+	cachedFiles []string
+	cacheOnce   sync.Once
+	logger      = gologging.GetLogger("cookies")
+)
 
 func Init() {
-	if err := os.MkdirAll("internal/cookies", 0o755); err != nil {
+	if err := os.MkdirAll("internal/cookies", 0o700); err != nil {
 		logger.Fatal("Failed to create cookies directory:", err)
 	}
 
@@ -56,7 +63,9 @@ func downloadCookieFile(url string) error {
 		return err
 	}
 	defer resp.Body.Close()
-
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code %d from %s", resp.StatusCode, rawURL)
+	}
 	filePath := filepath.Join("internal/cookies", id+".txt")
 	file, err := os.Create(filePath)
 	if err != nil {
@@ -69,12 +78,31 @@ func downloadCookieFile(url string) error {
 }
 
 func GetRandomCookieFile() (string, error) {
-	files, err := filepath.Glob("internal/cookies/*.txt")
+	var err error
+
+	cacheOnce.Do(func() {
+		err = loadCookieCache()
+	})
+
 	if err != nil {
+		logger.WarnF("Failed to load cookie cache: %v — retrying next call", err)
+		cacheOnce = sync.Once{} // allow retry next time
 		return "", err
 	}
-	if len(files) == 0 {
-		return "", nil // No cookie files found
+
+	if len(cachedFiles) == 0 {
+		logger.Warn("No cookie files found in cache")
+		return "", nil
 	}
-	return files[rand.Intn(len(files))], nil
+
+	return cachedFiles[rand.Intn(len(cachedFiles))], nil
+}
+
+func loadCookieCache() error {
+	files, err := filepath.Glob("internal/cookies/*.txt")
+	if err != nil {
+		return err
+	}
+	cachedFiles = files
+	return nil
 }

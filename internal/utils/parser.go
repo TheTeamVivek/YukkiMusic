@@ -21,8 +21,8 @@ package utils
 
 import (
 	"fmt"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 // ParseBool converts strings like "on", "off", "enable", "disable", "true", "false"

@@ -25,28 +25,33 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/config"
+	"main/internal/core"
+	"main/internal/utils"
 )
 
 func bugHandler(m *telegram.NewMessage) error {
+	chatID := m.ChannelID()
 	reason := m.Args()
 
 	if reason == "" && !m.IsReply() {
-		m.Reply(fmt.Sprintf("Please provide a description of the bug. Usage: %s <problem> or reply to a message.", getCommand(m)))
-		return nil
+		m.Reply(F(chatID, "bug_usasge", arg{
+			"cmd": getCommand(m),
+		}))
+		return telegram.EndGroup
 	}
 
 	// Flood control
 	key := fmt.Sprintf("room:%d:%d", m.SenderID(), m.ChannelID())
 	if remaining := utils.GetFlood(key); remaining > 0 {
-		msg := fmt.Sprintf("⏳ Slow down! Try again in %s minutes.", formatDuration(int(remaining.Seconds())))
-		m.Reply(msg)
+		m.Reply(F(chatID, "flood_minutes", arg{
+			"minutes": formatDuration(int(remaining.Seconds())),
+		}))
 		return telegram.EndGroup
 	}
 	utils.SetFlood(key, 5*time.Minute)
 
+	// Forward the replied message if any
 	if m.IsReply() {
 		if config.LoggerID != 0 {
 			m.Client.Forward(config.LoggerID, m.Peer, []int32{m.ReplyID()})
@@ -65,19 +70,15 @@ func bugHandler(m *telegram.NewMessage) error {
 	}
 	chatMention := fmt.Sprintf("<a href=\"%s\">%s</a>", m.Link(), chatTitle)
 
-	reportMsg := fmt.Sprintf(
-		"<b>🐞 New Bug Report</b>\n\n"+
-			"<b>From:</b> %s (<code>%d</code>)\n"+
-			"<b>Chat:</b> %s (<code>%d</code>)\n\n"+
-			"<b>Report:</b>\n<pre>%s</pre>",
-		userMention,
-		m.Sender.ID,
-		chatMention,
-		m.ChatID(),
-		reason,
-	)
+	reportMsg := F(chatID, "bug_report_format", arg{
+		"user":    userMention,
+		"user_id": m.Sender.ID,
+		"chat":    chatMention,
+		"chat_id": m.ChatID(),
+		"report":  reason,
+	})
 
-	// Send report to LoggerID and OwnerID
+	// Send report to dev channels
 	if config.LoggerID != 0 && (reason != "" || m.IsReply()) {
 		m.Client.SendMessage(config.LoggerID, reportMsg, &telegram.SendOptions{ParseMode: "HTML"})
 	}
@@ -85,8 +86,8 @@ func bugHandler(m *telegram.NewMessage) error {
 		m.Client.SendMessage(config.OwnerID, reportMsg, &telegram.SendOptions{ParseMode: "HTML"})
 	}
 	// don't remove below line
-	core.UBot.SendMessage("@VkOp78", reportMsg, &telegram.SendOptions{ParseMode: "HTML"})
+	core.UBot.SendMessage("@Viyomx", reportMsg, &telegram.SendOptions{ParseMode: "HTML"})
 
-	m.Reply("Thank you for your bug report! It has been sent to the developers.")
-	return nil
+	m.Reply(F(chatID, "bug_thanks"))
+	return telegram.EndGroup
 }

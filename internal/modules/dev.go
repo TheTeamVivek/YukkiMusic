@@ -32,8 +32,8 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
+	"main/config"
+	"main/internal/core"
 )
 
 func shellHandle(m *telegram.NewMessage) error {

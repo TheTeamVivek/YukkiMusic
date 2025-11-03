@@ -33,6 +33,7 @@ type ChatSettings struct {
 	ChatID    int64   `bson:"_id"`
 	CPlayID   int64   `bson:"cplay_id"`
 	AuthUsers []int64 `bson:"auth_users"`
+	Language  string  `bson:"language"`
 }
 
 func defaultChatSettings(chatID int64) *ChatSettings {

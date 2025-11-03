@@ -3,18 +3,24 @@
 <p align="center">
   <i>⚡ A blazing-fast, reliable, and feature-packed Telegram bot for streaming music in group voice chats — built with Go.</i>
 </p>
-
 <p align="center">
-  <img src="https://img.shields.io/badge/Go-1.24-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go Version">
-  <img src="https://img.shields.io/badge/Version-v2.0-9C27B0?style=for-the-badge&logo=semver&logoColor=white" alt="Version">
-  
-  <img src="https://img.shields.io/badge/License-GPLv3-FF3860?style=for-the-badge&logo=gnu&logoColor=white" alt="License: GPLv3">
+
+  <a href="https://go.dev/">
+    <img src="https://img.shields.io/badge/Go-1.24-00ADD8?style=for-the-badge&logo=go&labelColor=000000&logoColor=white" alt="Go Version">
+  </a>
+  <a href="https://github.com/TheTeamVivek/YukkiMusic/releases/tag/v2.0">
+    <img src="https://img.shields.io/badge/Version-v2.0-FF9800?style=for-the-badge&logo=semver&labelColor=000000&logoColor=white" alt="Version">
+  </a>
+  <a href="../LICENSE">
+    <img src="https://img.shields.io/badge/License-GPLv3-FF3860?style=for-the-badge&logo=gnu&labelColor=000000&logoColor=white" alt="License: GPLv3">
+  </a>
   <a href="https://github.com/TheTeamVivek/YukkiMusic/stargazers">
-    <img src="https://img.shields.io/github/stars/TheTeamVivek/YukkiMusic?color=FFD700&style=for-the-badge&logo=github&logoColor=black" alt="GitHub Stars">
+    <img src="https://img.shields.io/github/stars/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Stars&labelColor=000000&color=FFD700&logo=github&logoColor=white" alt="GitHub Stars">
   </a>
   <a href="https://github.com/TheTeamVivek/YukkiMusic/fork">
-    <img src="https://img.shields.io/github/forks/TheTeamVivek/YukkiMusic?color=00C853&style=for-the-badge&logo=github&logoColor=black" alt="GitHub Forks">
+    <img src="https://img.shields.io/github/forks/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Forks&labelColor=000000&color=00C853&logo=github&logoColor=white" alt="GitHub Forks">
   </a>
+
 </p>
 
 ---
@@ -200,7 +206,6 @@ we’ll provide ready-to-use **code templates** that you can integrate directly 
 
 ---
 > ✅ **Summary:**  
-> - Use **Fallen API** for the easiest setup (**paid**).  
 > - Use **cookies** if you don’t want to pay for an API.  
 > - Or contact us for a **custom solution** if you want to use your own API.
 ---

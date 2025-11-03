@@ -1,0 +1,180 @@
+name: "English"
+
+invalid_bool: "⚠️ <b>Invalid value.</b>\nUse 'enable' or 'disable'."
+
+active_chats_info: "📊 Active Chats Info: {count}"
+
+# 🧩 Common auth messages
+auth_no_user: "⚠️ Please provide a user — use:\n{cmd} [user_id] or reply to a user's message."
+user_extract_fail: "⚠️ Unable to get that user: <i>{error}</i>"
+auth_limit_reached: "⚠️ This chat has reached the maximum authorized users limit ({limit}). Please remove someone before adding a new one."
+already_authed: "⚠️ That user is already authorized — no need to add them again."
+
+# 🤖 Add auth
+addauth_bot_user: "🤖 You can’t add a bot to the auth list — sudoers must be human!"
+addauth_add_fail: "❌ Failed to add authorized user: {error}"
+addauth_success_with_count: "✅ Added {user}.\nNow {count}/{limit} authorized users."
+addauth_success: "✅ Successfully added {user} to the authorized users list."
+
+# 🗑️ Delete auth
+del_auth_not_authorized: "⚠️ That user isn’t authorized — nothing to remove."
+del_auth_remove_fail: "❌ Failed to remove authorized user: <code>{error}</code>"
+del_auth_success: "✅ Successfully removed {user} from the authorized users list."
+
+# 📜 Auth list
+authlist_fetch_fail: "❌ Failed to get authorized users list: <code>{error}</code>"
+authlist_empty: "ℹ️ There are no authorized users in this chat."
+authlist_fetching: "⏳ Fetching authorized users list..."
+authlist_header: "<b>Authorized Users:</b>"
+authlist_user_fail: "{index}. <code>{user_id}</code> (Could not fetch user info)"
+authlist_user_entry: "{index}. {user} (<code>{user_id}</code>)"
+authlist_total: "<b>Total:</b> {count} users"
+
+autoleave_fetch_fail: "⚠️ <b>Failed to fetch AutoLeave state.</b>"
+autoleave_status: "🏃‍♂️ <b>AutoLeave Control</b>\n\nUsage: {cmd} [enable|disable]\nCurrent state: {action}"
+autoleave_already: "⚠️ AutoLeave is already {action}"
+autoleave_update_fail: "⚠️ <b>Failed to update AutoLeave state.</b>"
+autoleave_updated: "🏃‍♂️ AutoLeave has been {action}"
+
+enabled: "✅ Enabled"
+disabled: "❌ Disabled"
+
+bug_usasge: "⚠️ Please describe the bug. Usage: {cmd} <problem> or reply to a message."
+bug_thanks: "✅ Thank you for your bug report! It has been sent to the developers."
+
+bug_report_format: |
+  <b>🐞 New Bug Report</b>
+
+  <b>From:</b> {user} (<code>{user_id}</code>)
+  <b>Chat:</b> {chat} (<code>{chat_id}</code>)
+
+  <b>Report:</b>
+  <pre>{report}</pre>
+  
+
+chat_not_recognized: "⚠️ Chat not recognized."
+
+flood_seconds: "⏳ Slow down! Try again in {duration} seconds."
+flood_minutes: "⏳ Please wait {duration} minutes before using this command again."
+
+help_private_only: "🤖 Hi! For bot help and commands, please DM me directly — I'm more responsive in private chats!"
+help_main: "📚 <b>Help Menu</b>\n\nSelect a category below to explore detailed commands and their usage for managing, controlling, and customizing the bot."
+
+help_owner: |
+  👑 <b>Owner Commands</b>
+  <i>Exclusive tools for managing sudoers, executing system code, and performing bot administration securely.</i>
+
+  <b>Commands:</b>
+  <b>/addsudo</b> - Add a new user to bot's sudolist
+  <b>/delsudo</b> - Remove a user from bot's sudolist
+  <b>/eval</b> - Execute Go code snippets
+  <b>/maintenance</b> — Manage the bot’s maintenance mode
+  <b>/sh</b> - Run shell commands
+
+help_sudo: |
+  ⚡ <b>Sudoer Commands</b>
+  <i>Advanced tools for managing bot behavior, monitoring performance, and controlling logging and automation.</i>
+
+  <b>Commands:</b>
+  <b>/active</b> - Shows total active chats
+  <b>/autoleave</b> - Toggle automatic chat leaving
+  <b>/logger</b> - Enable or disable logger
+  <b>/stats</b> - Display the bot & system stats
+
+help_admin: |
+  🛠 <b>Admin Commands</b>
+  <i>Music and playback control tools for admins to handle playback easily.</i>
+
+  <b>Commands:</b>
+  <b>/speed</b> - Change playback speed
+  <b>/skip</b> - Skip the current song
+  <b>/pause</b> - Pause the current playback
+  <b>/resume</b> - Resume paused playback
+  <b>/replay</b> - Replay the current song
+  <b>/mute</b> - Mute playback
+  <b>/unmute</b> - Unmute playback
+  <b>/seek</b> - Seek forward by a few seconds
+  <b>/seekback</b> - Seek backward by a few seconds
+  <b>/jump</b> - Jump to a given time in track
+  <b>/move</b> - Move a queued track to another position
+  <b>/clear</b> - Clear all songs from queue
+  <b>/remove</b> - Remove a specific track from queue
+  <b>/shuffle</b> - Shuffle all queued tracks
+  <b>/loop</b> - Enable or disable looping
+  <b>/stop</b> - Stop playback and leave VC
+
+help_public: |
+  🌍 <b>Public Commands</b>
+  <i>Features for playing songs, viewing queues, checking latency, and reporting bugs.</i>
+
+  <b>Commands:</b>
+  <b>/play</b> - Play a song
+  <b>/queue</b> - View all tracks currently queued
+  <b>/ping</b> - Check bot’s network latency
+  <b>/start</b> - Start the bot
+  <b>/help</b> - Show help menu
+  <b>/bug</b> - Report an issue or problem
+  <b>/position</b> - Show current track’s timestamp
+  <b>/reload</b> - Reload admin or cache data
+  <b>/json</b> - Show message JSON structure
+  <b>/sudolist</b> - View sudo user list
+
+lang_same: "ℹ️ You’re already using this language."
+lang_select: "🌐 Select your preferred language:"
+lang_fail: "❌ Failed to update language. Please try again later."
+lang_success: "✅ Language successfully updated to {lang_name}."
+
+loop_usage: "🔁 <b>Loop Control</b>\n\nUsage: {cmd} [count]\n• 0 - Disable loop\n• 1-10 - Loop count\n\n<i>{count_line}</i>"
+loop_invalid: "⚠️ <b>Invalid loop count.</b>\nUse 0 to disable or 1-10 to set loop count."
+loop_already_set: "⚠️ Loop count is already set to <b>{count}</b> time(s)."
+loop_disabled: "🔁 Loop has been <b>disabled</b> by {user}"
+loop_set: "🔁 Set to loop <b>{count}</b> time(s)\n└ Changed by: {user}"
+loop_current: "• Current loop: <b>{count}</b> time(s)"
+
+logger_usage: "⚙️ Usage: <code>{cmd} [enable|disable]</code> - To enable or disable the logger\n\n{status}"
+logger_status: "📜 Current status: {action}"
+logger_check_fail: "❌ Failed to check logger status: {error}"
+logger_already: "ℹ️ Logger is already {action}."
+logger_update_fail: "❌ Failed to update logger setting: {error}"
+logger_updated: "✅ Logger has been {action} successfully."
+
+# reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
+maint: "⚠️ I'm under maintenance at the moment and temporarily unavailable. Please check back later.\n\n{reason}"
+maint_reason: "<i>📝 Reason: {reason}</i>"
+
+only_admin: "⚠️ <b>Permission Denied!</b>\nOnly <b>admins</b> can control this actions. You can still play songs 🎵.\n\nIf you believe you are an admin, please use /reload to refresh your admin status."
+only_admin_or_auth: "⚠️ <b>Access Denied</b>\nOnly <b>admins</b> or <b>authorized users</b> can control this actions.\n\nIf you recently became an admin, use /reload to refresh your permissions."
+only_admin_or_auth_cb: "⚠️ Only admins can do this actions."
+only_supergroup: "⚠️ This command can only be used in groups."
+only_owner: "⚠️ Only the bot owner can use this command."
+only_sudo: "⚠️ Only sudo users or the bot owner can use this command."
+
+room_not_active_cb: "⚠️ Nothing playing right now."
+room_no_active: "⚠️ <b>No active playback.</b>\nThere's nothing playing right now."
+room_not_linked: "⚠️ This channel isn't linked to any group."
+
+room_already_paused: "⏸️ Track is already paused. Tap ▶️ Resume to continue."
+room_already_paused_auto: "⏸️ Track is already paused — auto-resuming in {duration}."
+room_pause_failed: "❌ Failed to pause playback.\n\n<i>{error}</i>"
+
+stream_channelid_fail: "⚠️ Failed to get your connected channel’s ID."
+stream_queue_finished: "🎵 <b>Queue Finished!</b>\n\nNo more songs to play. Use /play to add more tracks! 🎶"
+stream_downloading_next: "📥 Downloading your next track..."
+stream_download_fail: "❌ Failed to download.\nError: <code>{error}</code>\nUse /skip to skip playback."
+stream_play_fail: "❌ Failed to play the song."
+stream_now_playing: |
+  <b>🎵 Now Playing:</b>
+
+  <b>▫ Track:</b> <a href="{url}">{title}</a>
+  <b>▫ Duration:</b> {duration}
+  <b>▫ Requested by:</b> {by}
+
+supergroup_needed: |
+  This chat (ID: <code>{chat_id}</code>) is not a supergroup yet.
+  <b>⚠️ Please convert this chat to a supergroup then add me as admin.</b>
+  
+  If you don't know how to convert, use this guide:
+  🔗 <a href=\"https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02\">How to convert to a SuperGroup</a>
+  
+  If you have any questions, join our support group:
+  

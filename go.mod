@@ -1,4 +1,4 @@
-module github.com/TheTeamVivek/YukkiMusic
+module main
 
 go 1.24.9
 
@@ -11,6 +11,8 @@ require (
 	github.com/traefik/yaegi v0.16.1
 	go.mongodb.org/mongo-driver/v2 v2.4.0
 	golang.org/x/text v0.30.0
+	gopkg.in/yaml.v3 v3.0.1
+
 )
 
 require (

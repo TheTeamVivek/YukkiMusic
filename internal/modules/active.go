@@ -20,15 +20,19 @@
 package modules
 
 import (
-	"strconv"
-
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
+	"main/internal/core"
 )
 
 func activeHandler(m *telegram.NewMessage) error {
+	chatID := m.ChannelID()
 	chats := len(core.GetAllRoomIDs())
-	m.Reply("Active Chats info: " + strconv.Itoa(chats))
+
+	msg := F(chatID, "active_chats_info", arg{
+		"count": chats,
+	})
+
+	m.Reply(msg)
 	return telegram.EndGroup
 }

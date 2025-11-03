@@ -1,6 +1,6 @@
 package ubot
 
-import "github.com/TheTeamVivek/YukkiMusic/ntgcalls"
+import "main/ntgcalls"
 
 func (ctx *Context) Record(chatId any, mediaDescription ntgcalls.MediaDescription) error {
 	parsedChatId, err := ctx.parseChatId(chatId)

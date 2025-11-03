@@ -6,8 +6,8 @@ import (
 	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/ntgcalls"
-	"github.com/TheTeamVivek/YukkiMusic/ubot/types"
+	"main/ntgcalls"
+	"main/ubot/types"
 )
 
 type Context struct {

@@ -3,7 +3,7 @@ package ubot
 import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/ntgcalls"
+	"main/ntgcalls"
 )
 
 func parseVideoSources(sources []*tg.GroupCallParticipantVideoSourceGroup) []ntgcalls.SsrcGroup {

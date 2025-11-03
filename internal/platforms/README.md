@@ -33,14 +33,13 @@ When `getOrderedPlatforms()` is called:
 |-----------|-----------|--------------|
 | 100 | Telegram | Handles direct Telegram audio/video links |
 | 90 | YouTube | Extracts track metadata only (no downloading) |
-| 80 | FallenAPI | Downloads songs using a paid external API |
 | 70 | YtDlp | Downloads songs using cookies |
 
 > [!NOTE]
 > YukkiMusic always picks the **highest priority** platform that can handle the query.  
 > For example:  
 > - YouTube → used first for track info 🎵  
-> - FallenAPI or YtDlp → used for downloading the track ⬇️  
+> - API or YtDlp → used for downloading the track ⬇️  
 > - Telegram → handles direct Telegram media 💬  
 
 > [!NOTE]
@@ -62,7 +61,7 @@ type Platform interface {
     // A unique name for the platform.
     Name() PlatformName
 
-    // Checks if this platform can handle a given query.
+    // Checks if this platform can return a track for given query.
     IsValid(query string) bool
 
     // Fetches track metadata.
@@ -152,15 +151,14 @@ func (p *MyPlatform) GetTracks(query string) ([]*state.Track, error) {
 }
 
 func (p *MyPlatform) IsDownloadSupported(source state.PlatformName) bool {
-    // 💾 Can this platform download from another?
-    // Example:
-    // return source == state.PlatformYouTube
-    return false
+    // 💾 Can this platform download the song for source
+    return source == state.PlatformMyPlatform // yep this can Download song of its
 }
 
 func (p *MyPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
     // ⬇️ Actual download logic here
     // ...
+    // you can use mystic for displaying progress of download, make sure just progress if you encountered any error so just return it bot will handle it
 }
 ```
 

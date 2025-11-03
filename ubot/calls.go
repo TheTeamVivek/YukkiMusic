@@ -1,6 +1,6 @@
 package ubot
 
-import "github.com/TheTeamVivek/YukkiMusic/ntgcalls"
+import "main/ntgcalls"
 
 func (ctx *Context) Calls() map[int64]*ntgcalls.CallInfo {
 	return ctx.binding.Calls()
