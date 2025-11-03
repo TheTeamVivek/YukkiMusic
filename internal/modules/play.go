@@ -264,35 +264,71 @@ func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 	return telegram.EndGroup
 }
 
+type msgFn func(error) string
+
+var errMessageMap = map[error]msgFn{
+		core.ErrAssistantBanned: func(_ error) string {
+			return "<b>🚫 Assistant Restricted</b>\n\nI can't play music because " +
+				utils.MentionHTML(core.UbUser) +
+				"(UserID: <code>" + utils.IntToStr(core.UbUser.ID) +
+				"</code>) is banned or removed from this chat.\n\n" +
+				"<i><b>✅ Unbanned already?</b> Use /reload to refresh and sync.</i>"
+		},
+
+		core.ErrAdminPermissionRequired: func(_ error) string {
+			return "⚠️ <b>Admin Permission Required</b>\n\n" +
+				"I need <i>admin access</i> to manage and check members in this chat.\n\n" +
+				"➤ <b>Promote me with</b> <code>Manage Chat / Invite Users</code> permission."
+		},
+
+		core.ErrAssistantJoinRateLimited: func(_ error) string {
+			return "⚠️ Assistant cannot join because it has reached the maximum number of allowed groups."
+		},
+
+		core.ErrAssistantJoinRequestSent: func(_ error) string {
+			return "⚠️ Assistant sent a join request, but I couldn't auto-approve it.\n\n" +
+				"<i>✅ Please manually approve the request, then try again.</i>"
+		},
+
+		core.ErrAssistantInviteLinkFetch: func(e error) string {
+			return "⚠️ Failed to fetch invite link:\n\n<i>" + e.Error() + "</i>"
+		},
+
+		core.ErrAssistantInviteFailed: func(e error) string {
+			return "⚠️ Assistant failed to join this chat:\n\n<i>" + e.Error() + "</i>"
+		},
+
+		core.ErrAssistantJoinRejected: func(_ error) string {
+			return "⚠️ Invite link is invalid or expired. Please regenerate a fresh invite link."
+		},
+
+		core.ErrNoActiveVoiceChat: func(_ error) string {
+			return "<b>🎙️ No Active Voice Chat</b>\n\n" +
+				"I can't join yet — please start a voice chat to begin playing music.\n\n" +
+				"<i><b>✅ Already started one?</b> Use /reload to refresh and sync this chat.</i>"
+		},
+
+		core.ErrFetchFailed: func(e error) string {
+			return "⚠️ Failed to fetch chat info:\n\n<i>" + e.Error() + "</i>"
+		},
+
+		core.ErrPeerResolveFailed: func(_ error) string {
+			return "⚠️ Failed to resolve peer information. Try again later or re-add the assistant."
+		},
+	}
+
 func getAssistantErrorMessage(err error) string {
 	if err == nil {
 		return ""
 	}
 
-	switch {
-	case errors.Is(err, core.ErrAssistantBanned):
-		return fmt.Sprintf("<b>🚫 Assistant Restricted</b>\n\nI can't play music because %s(UserID: <code>%d</code>) is banned or removed from this chat.\n\n<i><b>✅ Unbanned already?</b> Use /reload to refresh and sync.</i>", utils.MentionHTML(core.UbUser), core.UbUser.ID)
-	case errors.Is(err, core.ErrAdminPermissionRequired):
-		return "⚠️ <b>Admin Permission Required</b>\n\nI need <i>admin access</i> to manage and check members in this chat.\n\n➤ <b>Promote me with</b> <code>Manage Chat / Invite Users</code> permission."
-	case errors.Is(err, core.ErrAssistantJoinRateLimited):
-		return "⚠️ Assistant cannot join because it has reached the maximum number of allowed groups."
-	case errors.Is(err, core.ErrAssistantJoinRequestSent):
-		return "⚠️ Assistant sent a join request, but I couldn't auto-approve it.\n\n<i>✅ Please manually approve the request, then try again.</i>"
-	case errors.Is(err, core.ErrAssistantInviteLinkFetch):
-		return fmt.Sprintf("⚠️ Failed to fetch invite link:\n\n<i>%v</i>", err)
-	case errors.Is(err, core.ErrAssistantInviteFailed):
-		return fmt.Sprintf("⚠️ Assistant failed to join this chat:\n\n<i>%v</i>", err)
-	case errors.Is(err, core.ErrAssistantJoinRejected):
-		return "⚠️ Invite link is invalid or expired. Please regenerate a fresh invite link."
-	case errors.Is(err, core.ErrNoActiveVoiceChat):
-		return "<b>🎙️ No Active Voice Chat</b>\n\nI can't join yet — please start a voice chat to begin playing music.\n\n<i><b>✅ Already started one?</b> Use /reload to refresh and sync this chat.</i>"
-	case errors.Is(err, core.ErrFetchFailed):
-		return fmt.Sprintf("⚠️ Failed to fetch chat info:\n\n<i>%v</i>", err)
-	case errors.Is(err, core.ErrPeerResolveFailed):
-		return "⚠️ Failed to resolve peer information. Try again later or re-add the assistant."
-	default:
-		return fmt.Sprintf("⚠️ Unknown Error Occurred:\n\n<i>%v</i>", err)
+	for key, fn := range errMessageMap {
+		if errors.Is(err, key) {
+			return fn(err)
+		}
 	}
+
+	return "⚠️ Unknown Error Occurred:\n\n<i>" + err.Error() + "</i>"
 }
 
 func safeGetTracks(m, replyMsg *telegram.NewMessage) (tracks []*state.Track, err error) {
