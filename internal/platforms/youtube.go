@@ -230,8 +230,8 @@ func getPlaylist(pUrl string) ([]string, error) {
 //
 // searchYouTube scrapes YouTube results page
 func searchYouTube(query string) ([]*state.Track, error) {
-	query = strings.ReplaceAll(query, " ", "+")
-	url := "https://www.youtube.com/results?search_query=" + query
+        encodedQuery := url.QueryEscape(query)
+        url := "https://www.youtube.com/results?search_query=" + encodedQuery
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
