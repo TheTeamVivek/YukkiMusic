@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -230,8 +231,8 @@ func getPlaylist(pUrl string) ([]string, error) {
 //
 // searchYouTube scrapes YouTube results page
 func searchYouTube(query string) ([]*state.Track, error) {
-        encodedQuery := url.QueryEscape(query)
-        url := "https://www.youtube.com/results?search_query=" + encodedQuery
+	encodedQuery := url.QueryEscape(query)
+	url := "https://www.youtube.com/results?search_query=" + encodedQuery
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)

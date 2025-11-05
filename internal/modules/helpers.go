@@ -152,7 +152,7 @@ func sendPlayLogs(m *telegram.NewMessage, track *state.Track, queued bool) {
 
 func FilterOwner(m *telegram.NewMessage) bool {
 	if config.OwnerID == 0 || m.SenderID() != config.OwnerID {
-		if m.IsPrivate()|| strings.HasSuffix(m.GetCommand(), core.BUser.Username){
+		if m.IsPrivate() || strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
 			m.Reply("⚠️ Only the bot owner can use this command.")
 		}
 		return false
@@ -164,7 +164,7 @@ func FilterSudo(m *telegram.NewMessage) bool {
 	is, _ := database.IsSudo(m.SenderID())
 
 	if config.OwnerID == 0 || (m.SenderID() != config.OwnerID && !is) {
-		if m.IsPrivate() || strings.HasSuffix(m.GetCommand(), core.BUser.Username){
+		if m.IsPrivate() || strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
 			m.Reply("⚠️ Only sudo users or the bot owner can use this command.")
 		}
 		return false
