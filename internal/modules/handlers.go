@@ -45,12 +45,16 @@ type CbHandlerDef struct {
 var handlers = []MsgHandlerDef{
 	{Pattern: "json", Handler: jsonHandle},
 	{Pattern: "eval", Handler: evalHandle, Filters: []telegram.Filter{ownerFilter}},
-	// {Pattern: "(eval|ev)", Handler: evalCommandHandler, Filters: []telegram.Filter{ownerFilter}},
+	{Pattern: "ev", Handler: evalCommandHandler, Filters: []telegram.Filter{ownerFilter}},
 	{Pattern: "(bash|sh)", Handler: shellHandle, Filters: []telegram.Filter{ownerFilter}},
+	{Pattern: "restart", Handler: handleRestart, Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter}},
 
 	{Pattern: "(addsudo|addsudoer|sudoadd)", Handler: handleAddSudo, Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter}},
 	{Pattern: "(delsudo|delsudoer|sudodel|remsudo|rmsudo|sudorem|dropsudo|unsudo)", Handler: handleDelSudo, Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter}},
 	{Pattern: "(sudoers|listsudo|sudolist)", Handler: handleGetSudoers, Filters: []telegram.Filter{ignoreChannelFilter}},
+
+	{Pattern: "(speedtest|spt)", Handler: sptHandle, Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter}},
+
 	{Pattern: "(ac|active|activevc|activevoice)", Handler: activeHandler, Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter}},
 	{Pattern: "(maintenance|maint)", Handler: handleMaintenance, Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter}},
 	{Pattern: "logger", Handler: handleLogger, Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter}},
@@ -145,7 +149,8 @@ func Init(c, u *telegram.Client, n *ubot.Context) {
 		}
 	}
 
-	c.On("edit:/eval", evalHandle) //.SetGroup("edit")
+	c.On("edit:/eval", evalHandle)       //.SetGroup("edit")
+	c.On("edit:/ev", evalCommandHandler) //.SetGroup("edit")
 
 	c.On("participant", handleParticipantUpdate) //.SetGroup("pu")
 

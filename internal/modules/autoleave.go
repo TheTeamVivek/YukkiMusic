@@ -106,7 +106,7 @@ func startAutoLeave() {
 	autoLeaveCtx, autoLeaveCancel = context.WithCancel(context.Background())
 	autoLeaveMu.Unlock()
 
-	ticker := time.NewTicker(120 * time.Second)
+	ticker := time.NewTicker(15 * time.Minute)
 	defer ticker.Stop()
 
 	exists := make(map[int64]struct{})
@@ -165,7 +165,7 @@ func startAutoLeave() {
 					logger.InfoF("AutoLeave: left chat %d (%d/%d)", chatID, leaveCount, limit)
 
 					select {
-					case <-time.After(1 * time.Second):
+					case <-time.After(2500 * time.Millisecond):
 					case <-autoLeaveCtx.Done():
 						return
 					}

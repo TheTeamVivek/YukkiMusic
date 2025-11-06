@@ -126,7 +126,6 @@ func handleAssistantRestriction(p *telegram.ParticipantUpdate, chatID int64, s *
 
 	s.SetAssistantPresence(bool_(false))
 	core.DeleteRoom(chatID)
-
 	ok, err := p.Unban()
 	if err != nil || !ok {
 		s.SetAssistantBanned(bool_(true))

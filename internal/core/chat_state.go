@@ -25,6 +25,8 @@ import (
 	"sync"
 
 	"github.com/amarnathcjd/gogram/telegram"
+
+	"main/internal/utils"
 )
 
 type ChatState struct {
@@ -179,48 +181,31 @@ func GetAssistantStatus(chatID int64, force ...bool) (bool, error) {
 }
 
 func updateVoiceChatStatus(s *ChatState, chatID int64) error {
-	chPeer, err := resolveChannelPeer(chatID)
-	if err != nil {
-		return fmt.Errorf("%w: %v", ErrFetchFailed, err)
-	}
-
-	fullChat, err := fetchFullChannel(chPeer)
+	fullChat, err := fetchFullChat(chatID)
 	if err != nil {
 		return err
 	}
 
 	s.SetVoiceChatStatus(boolToPtr(fullChat.Call != nil))
-
 	setInviteLinkIfNeeded(s, fullChat)
+
 	return nil
 }
 
-func resolveChannelPeer(chatID int64) (*telegram.InputPeerChannel, error) {
-	peer, err := Bot.ResolvePeer(chatID)
-	if err != nil {
-		return nil, err
-	}
+// --- helpers ---
 
-	chPeer, ok := peer.(*telegram.InputPeerChannel)
-	if !ok {
-		return nil, fmt.Errorf("chatID %d is not an InputPeerChannel, got %T", chatID, peer)
-	}
-	return chPeer, nil
-}
-
-func fetchFullChannel(chPeer *telegram.InputPeerChannel) (*telegram.ChannelFull, error) {
-	fullChat, err := Bot.ChannelsGetFullChannel(&telegram.InputChannelObj{
-		ChannelID:  chPeer.ChannelID,
-		AccessHash: chPeer.AccessHash,
-	})
+func fetchFullChat(chatID int64) (*telegram.ChannelFull, error) {
+	fullChat, err := utils.GetFullChannel(Bot, chatID)
 	if err != nil {
-		if telegram.MatchError(err, "CHANNEL_INVALID") || telegram.MatchError(err, "CHANNEL_PRIVATE") {
+		switch {
+		case telegram.MatchError(err, "CHANNEL_INVALID"),
+			telegram.MatchError(err, "CHANNEL_PRIVATE"):
 			return nil, ErrAdminPermissionRequired
+		default:
+			return nil, fmt.Errorf("%w: %v", ErrFetchFailed, err)
 		}
-		return nil, fmt.Errorf("%w: %v", ErrFetchFailed, err)
 	}
-
-	return fullChat.FullChat.(*telegram.ChannelFull), nil
+	return fullChat, nil
 }
 
 func setInviteLinkIfNeeded(s *ChatState, chat *telegram.ChannelFull) {

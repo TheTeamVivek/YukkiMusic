@@ -39,7 +39,7 @@
 > 🔸 Only **YouTube** and **Telegram audio files** are supported.
 
 > [!NOTE]  
-> 💡 To set up **music downloading** from YouTube, see the [Configuration](#-setting-up-youtube-downloads) section below — it explains how to use the **Fallen API** or **cookies** for downloads.
+> 💡 To set up **music downloading** from YouTube, see the [Configuration](#-setting-up-youtube-downloads) section below — it explains how to use the **cookies** or **API** for downloads.
 
 ---
 

@@ -21,7 +21,7 @@ package modules
 
 import (
 	"fmt"
-"html"
+	"html"
 	"strings"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
@@ -56,7 +56,7 @@ func showHelpFor(m *tg.NewMessage, cmd string) error {
 		}
 	}
 	if help == "" {
-_, err := m.Reply("⚠️ <i>No help found for command <code>" + html.EscapeString(cmd) + "</code></i>")
+		_, err := m.Reply("⚠️ <i>No help found for command <code>" + html.EscapeString(cmd) + "</code></i>")
 		return eoe(err)
 	}
 	_, err := m.Reply("📘 <b>Help for</b> <code>" + cmd + "</code>:\n\n" + help)

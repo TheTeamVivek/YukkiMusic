@@ -69,6 +69,7 @@ help_owner: |
   <b>/delsudo</b> - Remove a user from bot's sudolist
   <b>/eval</b> - Execute Go code snippets
   <b>/maintenance</b> — Manage the bot’s maintenance mode
+  <b>/restart</b> — Restart the bot
   <b>/sh</b> - Run shell commands
 
 help_sudo: |

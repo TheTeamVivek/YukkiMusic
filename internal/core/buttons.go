@@ -32,7 +32,7 @@ func AddMeMarkup(username string) tg.ReplyMarkup {
 	return tg.NewKeyboard().
 		AddRow(
 			tg.Button.URL("⚡ Add Me to Your startgroup",
-				"https://t.me/"+username+"?startgroup=true",
+				"https://t.me/"+username+"?startgroup&admin=invite_users",
 			),
 		).
 		Build()
@@ -92,7 +92,7 @@ func GetStartMarkup() tg.ReplyMarkup {
 	return tg.NewKeyboard().
 		AddRow(
 			tg.Button.URL("⚡ Add Me to Your startgroup",
-				"https://t.me/"+BUser.Username+"?startgroup=true",
+				"https://t.me/"+BUser.Username+"?startgroup&admin=invite_users",
 			),
 		).
 		AddRow(

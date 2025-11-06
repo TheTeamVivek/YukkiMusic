@@ -30,6 +30,7 @@ import (
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/config"
 	"main/internal/core"
@@ -213,10 +214,43 @@ func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 			filePath = path
 			logger.InfoF("Downloaded track to %s", filePath)
 		}
-		if err := r.Play(track, filePath, force && i == 0); err != nil {
-			utils.EOR(replyMsg, "❌ Failed to play\nError: "+err.Error())
-			return err
+		maxRetries := 3
+		for attempt := 1; attempt <= maxRetries; attempt++ {
+			err := r.Play(track, filePath, force && i == 0)
+			if err == nil {
+				if attempt > 1 {
+					logger.Info("Successfully played after retry attempt " + utils.IntToStr(attempt))
+				}
+				break
+			}
+
+			if wait := telegram.GetFloodWait(err); wait > 0 {
+				logger.Error("FloodWait detected (" + strconv.Itoa(wait) + "s). Retrying... (attempt " + utils.IntToStr(attempt) + ")")
+				time.Sleep(time.Duration(wait) * time.Second)
+				continue
+			}
+
+			if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
+				utils.EOR(replyMsg, "⚠️ RTMP stream not supported right now.")
+				r.Destroy() // may be useless
+				return telegram.EndGroup
+
+			}
+			if tg.MatchError(err, "INTERDC_X_CALL_ERROR") {
+				logger.Error("INTERDC_X_CALL_ERROR occurred. Retrying... (attempt " + utils.IntToStr(attempt) + ")")
+				time.Sleep(2 * time.Second)
+				continue
+			}
+
+			if attempt == maxRetries {
+				logger.Error("❌ Failed to play after " + utils.IntToStr(maxRetries) + " attempts. Error: " + err.Error())
+				utils.EOR(replyMsg, "❌ Failed to play\nError: "+err.Error())
+				return err
+			}
+
+			logger.Error("Unexpected error occurred. Retrying... (attempt " + utils.IntToStr(attempt) + "): " + err.Error())
 		}
+
 		sendPlayLogs(m, track, (isActive && !force) || i > 0)
 	}
 	mainTrack := tracks[0]

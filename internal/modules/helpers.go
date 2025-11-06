@@ -54,12 +54,12 @@ func bool_(b bool) *bool {
 }
 
 func eoe(e error) error {
+	if e != nil {
+		return e
+	}
+	return tg.EndGroup
+}
 
-if e != nil {
-return e
-}
-return tg.EndGroup
-}
 func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	chatID := m.ChannelID()
 	if !cplay {

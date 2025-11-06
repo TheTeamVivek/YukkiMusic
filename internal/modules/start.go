@@ -21,8 +21,8 @@ package modules
 
 import (
 	"fmt"
-	"log"
 
+	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/config"
@@ -43,21 +43,23 @@ func startHandler(m *telegram.NewMessage) error {
 	arg := m.Args()
 	database.AddServed(m.ChannelID(), true)
 
-	switch arg {
+	if arg != "" {
+		gologging.Info("Got Start parameter: " + arg + "in ChatID: " + utils.IntToStr(m.ChannelID()))
+	}
 
+	switch arg {
 	case "help":
+		gologging.Info("User requested help via start param")
 		helpHandler(m)
 
 	default:
-
 		caption := fmt.Sprintf(startMSG, utils.MentionHTML(m.Sender), utils.MentionHTML(core.BUser))
-
 		if _, err := m.RespondMedia(config.StartImage, telegram.MediaOptions{
 			Caption:     caption,
 			NoForwards:  true,
 			ReplyMarkup: core.GetStartMarkup(),
 		}); err != nil {
-			log.Printf("Error responding start in chat: %v", err)
+			gologging.Error("Error sending start media: " + err.Error())
 			return err
 		}
 	}

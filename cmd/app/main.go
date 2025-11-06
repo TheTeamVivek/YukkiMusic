@@ -45,7 +45,8 @@ import (
 
 func main() {
 	gologging.SetLevel(gologging.DebugLevel)
-	gologging.GetLogger("webrtc").SetLevel(gologging.WarnLevel)
+	gologging.GetLogger("ntgcalls").SetLevel(gologging.InfoLevel)
+	gologging.GetLogger("webrtc").SetLevel(gologging.FatalLevel)
 
 	l := gologging.GetLogger("Main")
 
