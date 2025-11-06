@@ -189,11 +189,10 @@ ping_result: |
   
   <b><u>🤖 {bot} system stat's :</u></b>
   
-  🌋 Uptime : {uptime}
-  💾 RAM Usage: {ram_info}
-  ⚙️ CPU Usage: {cpu_usage}
-  💽 Disk Usage: {disk_usage}
-  🌋 Py-tgcalls : `{6} ms`"
+  <b>Uptime:</b> {uptime}
+  <b>RAM Usage:</b> {ram_info}
+  <b>CPU Usage:</b> {cpu_usage}
+  <b>Disk Usage:</b> {disk_usage}
 
 room_not_active_cb: "⚠️ Nothing playing right now."
 room_no_active: "⚠️ <b>No active playback.</b>\nThere's nothing playing right now."

@@ -23,12 +23,15 @@ import (
 	"fmt"
 	"time"
 
-tg	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v3/mem"
 
-"github.com/shirou/gopsutil/v3/mem"
-"github.com/shirou/gopsutil/v3/cpu"
 	"main/config"
+	"main/internal/core"
 	"main/internal/database"
+	"main/internal/utils"
 )
 
 func formatUptime(d time.Duration) string {
@@ -54,7 +57,6 @@ func formatUptime(d time.Duration) string {
 	return result
 }
 
-
 func pingHandler(m *tg.NewMessage) error {
 	if m.IsPrivate() {
 		m.Delete()
@@ -75,23 +77,21 @@ func pingHandler(m *tg.NewMessage) error {
 	ramInfo := "N/A"
 	cpuUsage := "N/A"
 	diskUsage := "N/A"
-	
-	
-	opt := telegram.SendOptions{
-	ReplyMarkup: core.SuppMarkup()
+
+	opt := tg.SendOptions{
+		ReplyMarkup: core.SuppMarkup(),
 	}
-		if config.PingImage != "" {
-			opt.Media = config.PingImage
-		}
-		
-	
+	if config.PingImage != "" {
+		opt.Media = config.PingImage
+	}
+
 	v, err := mem.VirtualMemory()
 	if err == nil {
-	usedGB := float64(v.Used) / 1024 / 1024 / 1024
-	totalGB := float64(v.Total) / 1024 / 1024 / 1024
-	
-	ramInfo = fmt.Sprintf("%.2f / %.2f GB", usedGB, totalGB)
-	}"
+		usedGB := float64(v.Used) / 1024 / 1024 / 1024
+		totalGB := float64(v.Total) / 1024 / 1024 / 1024
+
+		ramInfo = fmt.Sprintf("%.2f / %.2f GB", usedGB, totalGB)
+	}
 
 	if percentages, err := cpu.Percent(time.Second, false); err == nil && len(percentages) > 0 {
 		cpuUsage = fmt.Sprintf("%.2f%%", percentages[0])
@@ -104,11 +104,11 @@ func pingHandler(m *tg.NewMessage) error {
 	}
 
 	msg := F(m.ChatID(), "ping_result", arg{
-		"latency": latency,
-		"bot": utils.MentionHTML(core.Buser),
-		"uptime":  uptimeStr,
-		"ram_info": ramInfo,
-		"cpu_usage": cpuUsage,
+		"latency":    latency,
+		"bot":        utils.MentionHTML(core.BUser),
+		"uptime":     uptimeStr,
+		"ram_info":   ramInfo,
+		"cpu_usage":  cpuUsage,
 		"disk_usage": diskUsage,
 	})
 

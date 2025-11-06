@@ -57,8 +57,8 @@ var (
 	SetCmds        = getBool("SET_CMDS", false)
 	MaxAuthUsers   = int(getInt64("MAX_AUTH_USERS", 25))
 
-	StartImage     = getString("START_IMG_URL", "https://raw.githubusercontent.com/Vivekkumar-IN/assets/master/images.png")
-	PingImage     = getString("PING_IMG_URL", "https://telegra.ph/file/91533956c91d0fd7c9f20.jpg")
+	StartImage = getString("START_IMG_URL", "https://raw.githubusercontent.com/Vivekkumar-IN/assets/master/images.png")
+	PingImage  = getString("PING_IMG_URL", "https://telegra.ph/file/91533956c91d0fd7c9f20.jpg")
 )
 
 func init() {

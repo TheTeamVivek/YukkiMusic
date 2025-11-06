@@ -79,7 +79,7 @@ func autoLeaveHandler(m *tg.NewMessage) error {
 		return tg.EndGroup
 	}
 
-	newStatus := F(chatID, utils.IfElse(newState, "autoleave_enabled", "autoleave_disabled").(string))
+	newStatus := F(chatID, utils.IfElse(newState, "enabled", "disabled"))
 	m.Reply(F(chatID, "autoleave_updated", arg{
 		"action": newStatus,
 	}))

@@ -235,7 +235,6 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 }
 
 func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
-
 	if r.IsPaused() {
 		return true, nil
 	}
@@ -244,11 +243,11 @@ func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	
+
 	if r.IsMuted() {
 		r.Unmute()
 	}
-	
+
 	r.Lock()
 	defer r.Unlock()
 

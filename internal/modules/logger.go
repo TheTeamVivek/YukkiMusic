@@ -34,7 +34,7 @@ func handleLogger(m *telegram.NewMessage) error {
 
 	current, dbErr := database.IsLoggerEnabled()
 
-	action := F(chatID, utils.IfElse(enable, "enabled", "disabled"))
+	action := F(chatID, utils.IfElse(current, "enabled", "disabled"))
 
 	if len(args) < 2 {
 		if dbErr == nil {

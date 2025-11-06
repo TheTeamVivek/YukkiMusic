@@ -20,13 +20,12 @@
 package modules
 
 import (
-	"fmt"
 	"html"
 	"strconv"
 	"strings"
 	"time"
 
-tg	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/utils"
 )

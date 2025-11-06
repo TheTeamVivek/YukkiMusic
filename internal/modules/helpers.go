@@ -53,6 +53,13 @@ func bool_(b bool) *bool {
 	return &b
 }
 
+func eoe(e error) error {
+
+if e != nil {
+return e
+}
+return tg.EndGroup
+}
 func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	chatID := m.ChannelID()
 	if !cplay {
@@ -303,7 +310,6 @@ func SafeCallbackHandler(handler func(*tg.CallbackQuery) error) func(*tg.Callbac
 				return err
 			}
 			handlePanic(err, cb, false)
-			err = fmt.Errorf("internal error occurred")
 		}
 		return err
 	}
@@ -311,7 +317,10 @@ func SafeCallbackHandler(handler func(*tg.CallbackQuery) error) func(*tg.Callbac
 
 func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage) error {
 	return func(m *tg.NewMessage) (err error) {
+		gologging.Info("Handling message from " + fmt.Sprint(m.SenderID()) + " in chat " + fmt.Sprint(m.ChannelID()))
+
 		if is, _ := database.IsMaintenance(); is {
+			gologging.Debug("Maintenance mode active")
 			if m.SenderID() != config.OwnerID {
 				if ok, _ := database.IsSudo(m.SenderID()); !ok {
 					if m.ChatType() == tg.EntityUser || strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
@@ -319,7 +328,7 @@ func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage)
 						reason = F(m.ChannelID(), "maint_reason", arg{"reason": reason})
 						msg := F(m.ChannelID(), "maint", arg{"reason": reason})
 						m.Reply(msg)
-
+						gologging.Info("Sent maintenance notice to " + fmt.Sprint(m.SenderID()))
 					}
 					return tg.EndGroup
 				}
@@ -328,18 +337,33 @@ func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage)
 
 		defer func() {
 			if r := recover(); r != nil {
+				gologging.Error("Recovered from panic: " + fmt.Sprint(r))
 				handlePanic(r, m, true)
-				err = fmt.Errorf("internal error occurred")
+				err = fmt.Errorf("internal panic occurred")
 			}
 		}()
-		err = handler(m)
+
+		if checkForHelpFlag(m) {
+			cmd := getCommand(m)
+			gologging.Debug("Help flag detected for command " + cmd)
+			err = showHelpFor(m, cmd)
+		} else {
+			cmd := getCommand(m)
+			gologging.Debug("Executing handler for command " + cmd)
+			err = handler(m)
+		}
+
 		if err != nil {
 			if errors.Is(err, tg.EndGroup) {
+				gologging.Debug("Handler exited early (EndGroup)")
 				return err
 			}
+			gologging.Error("Handler error: " + err.Error())
 			handlePanic(err, m, false)
-			err = fmt.Errorf("internal error occurred")
+		} else {
+			gologging.Info("Handler completed successfully for command " + getCommand(m))
 		}
+
 		return err
 	}
 }

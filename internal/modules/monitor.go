@@ -43,22 +43,20 @@ func MonitorRooms() {
 				defer func() { <-sem }()
 				r, ok := core.GetRoom(id)
 				if !ok {
-				  return
-				  
+					return
 				}
 				if !r.IsActiveChat() {
-	// recheck after delay before deleting
-	time.Sleep(7 * time.Second)
-	if r2, ok2 := core.GetRoom(id); ok2 && !r2.IsActiveChat() {
-		core.DeleteRoom(id)
-	}
-	return
-}
+					// recheck after delay before deleting
+					time.Sleep(7 * time.Second)
+					if r2, ok2 := core.GetRoom(id); ok2 && !r2.IsActiveChat() {
+						core.DeleteRoom(id)
+					}
+					return
+				}
 
-if r.IsPaused() {
-	return
-}
-
+				if r.IsPaused() {
+					return
+				}
 
 				r.Parse()
 				mystic := r.GetMystic()

@@ -30,10 +30,20 @@ import (
 )
 
 func helpHandler(m *tg.NewMessage) error {
+	args := strings.Fields(m.Text())
+	if len(args) > 1 {
+		cmd := args[1]
+		if !strings.HasPrefix(cmd, "/") {
+			cmd = "/" + cmd
+		}
+		return showHelpFor(m, cmd)
+	}
+
 	if m.ChatType() != tg.EntityUser {
 		m.Reply(F(m.ChannelID(), "help_private_only"))
 		return tg.EndGroup
 	}
+
 	m.Reply(F(m.ChannelID(), "help_main"), tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard()})
 	return tg.EndGroup
 }
