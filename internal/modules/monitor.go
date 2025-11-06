@@ -41,11 +41,24 @@ func MonitorRooms() {
 			sem <- struct{}{}
 			go func(id int64) {
 				defer func() { <-sem }()
-
 				r, ok := core.GetRoom(id)
-				if !ok || !r.IsActiveChat() || r.IsPaused() {
-					return
+				if !ok {
+				  return
+				  
 				}
+				if !r.IsActiveChat() {
+	// recheck after delay before deleting
+	time.Sleep(7 * time.Second)
+	if r2, ok2 := core.GetRoom(id); ok2 && !r2.IsActiveChat() {
+		core.DeleteRoom(id)
+	}
+	return
+}
+
+if r.IsPaused() {
+	return
+}
+
 
 				r.Parse()
 				mystic := r.GetMystic()

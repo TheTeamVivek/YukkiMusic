@@ -38,6 +38,13 @@ func AddMeMarkup(username string) tg.ReplyMarkup {
 		Build()
 }
 
+func SuppMarkup() tg.ReplyMarkup {
+	return tg.NewKeyboard().
+		AddRow(
+		  		tg.Button.URL("💬 Support", config.SupportChat),
+		).
+		Build()
+}
 func GetPlayMarkup(r *RoomState, queued bool) tg.ReplyMarkup {
 	btn := tg.NewKeyboard()
 	prefix := "room:"

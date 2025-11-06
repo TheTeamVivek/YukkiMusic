@@ -423,6 +423,5 @@ func rp(c *tg.CallbackQuery, t string) {
 	if err != nil {
 		return
 	}
-
 	msg.Reply(t)
 }

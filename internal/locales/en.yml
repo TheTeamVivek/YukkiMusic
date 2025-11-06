@@ -142,12 +142,58 @@ logger_updated: "✅ Logger has been {action} successfully."
 maint: "⚠️ I'm under maintenance at the moment and temporarily unavailable. Please check back later.\n\n{reason}"
 maint_reason: "<i>📝 Reason: {reason}</i>"
 
+# ⚙️ Maintenance control
+maint_usage: "⚙️ <b>Maintenance Control</b>\n\nUsage: {cmd} [enable|disable] [reason]\n📜 Current status: {status}"
+maint_check_fail: "❌ Failed to check maintenance status: <code>{error}</code>"
+maint_already_enabled: "ℹ️ Maintenance mode is already enabled 🟢."
+maint_already_disabled: "ℹ️ Maintenance mode is already disabled 🔴."
+maint_already_reason_same: "ℹ️ Maintenance is already enabled with the same reason."
+maint_reason_removed: "✅ Maintenance reason removed successfully."
+maint_reason_updated: "✅ Maintenance reason updated.\n📝 Reason: {reason}"
+maint_enabled: "✅ Maintenance mode has been <b>enabled</b> successfully."
+maint_enabled_reason: "✅ Maintenance mode enabled.\n📝 Reason: {reason}"
+maint_disabled: "✅ Maintenance mode has been <b>disabled</b> successfully."
+maint_entering: "⚠️ Bot is entering maintenance mode..."
+enabled_with_reason: "🟢 Enabled\n📝 Reason: {reason}"
+
+# 🔇 Mute messages
+mute_already_muted: "🔇 <b>Already Muted</b>\nThe music is already muted in this chat.\nWould you like to unmute it?"
+mute_already_muted_with_time: "🔇 <b>Already Muted</b>\nThe music is muted.\nAuto-unmute in <b>{duration}</b>."
+mute_invalid_duration: "⚠️ Invalid duration for auto-unmute.\nIt must be between <b>5</b> and <b>3600</b> seconds."
+mute_invalid_format: "⚠️ Invalid format.\nUse: <code>/{cmd} 30</code> or <code>/{cmd} 30s</code>"
+mute_failed: "❌ <b>Playback Mute Failed</b>\nError: <code>{error}</code>"
+mute_success: |
+  🔇 <b>Muted playback</b>
+
+  🎵 Track: {title}
+  👤 Muted by: {user}
+
+mute_success_with_time: |
+  🔇 <b>Muted playback</b>
+
+  🎵 Track: {title}
+  👤 Muted by: {user}
+  <i>⏳ Auto-unmute in <b>{duration}</b> seconds</i>
+
 only_admin: "⚠️ <b>Permission Denied!</b>\nOnly <b>admins</b> can control this actions. You can still play songs 🎵.\n\nIf you believe you are an admin, please use /reload to refresh your admin status."
 only_admin_or_auth: "⚠️ <b>Access Denied</b>\nOnly <b>admins</b> or <b>authorized users</b> can control this actions.\n\nIf you recently became an admin, use /reload to refresh your permissions."
 only_admin_or_auth_cb: "⚠️ Only admins can do this actions."
 only_supergroup: "⚠️ This command can only be used in groups."
 only_owner: "⚠️ Only the bot owner can use this command."
 only_sudo: "⚠️ Only sudo users or the bot owner can use this command."
+
+# 🏓 Ping messages
+ping_start: "🏓 Pinging..."
+ping_result: |
+  <b>🏓 PONG</b>: <code>{latency}ms</code>
+  
+  <b><u>🤖 {bot} system stat's :</u></b>
+  
+  🌋 Uptime : {uptime}
+  💾 RAM Usage: {ram_info}
+  ⚙️ CPU Usage: {cpu_usage}
+  💽 Disk Usage: {disk_usage}
+  🌋 Py-tgcalls : `{6} ms`"
 
 room_not_active_cb: "⚠️ Nothing playing right now."
 room_no_active: "⚠️ <b>No active playback.</b>\nThere's nothing playing right now."

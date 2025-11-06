@@ -23,8 +23,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+tg	"github.com/amarnathcjd/gogram/telegram"
 
+"github.com/shirou/gopsutil/v3/mem"
+"github.com/shirou/gopsutil/v3/cpu"
 	"main/config"
 	"main/internal/database"
 )
@@ -52,15 +54,17 @@ func formatUptime(d time.Duration) string {
 	return result
 }
 
-func pingHandler(m *telegram.NewMessage) error {
+
+func pingHandler(m *tg.NewMessage) error {
 	if m.IsPrivate() {
 		m.Delete()
 		database.AddServed(m.ChannelID(), true)
 	} else {
 		database.AddServed(m.ChannelID())
 	}
+
 	start := time.Now()
-	reply, err := m.Respond("🏓 Pinging...")
+	reply, err := m.Respond(F(m.ChatID(), "ping_start"))
 	if err != nil {
 		return err
 	}
@@ -68,12 +72,46 @@ func pingHandler(m *telegram.NewMessage) error {
 	latency := time.Since(start).Milliseconds()
 	uptime := time.Since(config.StartTime)
 	uptimeStr := formatUptime(uptime)
+	ramInfo := "N/A"
+	cpuUsage := "N/A"
+	diskUsage := "N/A"
+	
+	
+	opt := telegram.SendOptions{
+	ReplyMarkup: core.SuppMarkup()
+	}
+		if config.PingImage != "" {
+			opt.Media = config.PingImage
+		}
+		
+	
+	v, err := mem.VirtualMemory()
+	if err == nil {
+	usedGB := float64(v.Used) / 1024 / 1024 / 1024
+	totalGB := float64(v.Total) / 1024 / 1024 / 1024
+	
+	ramInfo = fmt.Sprintf("%.2f / %.2f GB", usedGB, totalGB)
+	}"
 
-	text := fmt.Sprintf(
-		"🏓 Pong!\nLatency: %dms\n🤖 I've been running for %s without rest!",
-		latency, uptimeStr,
-	)
+	if percentages, err := cpu.Percent(time.Second, false); err == nil && len(percentages) > 0 {
+		cpuUsage = fmt.Sprintf("%.2f%%", percentages[0])
+	}
 
-	reply.Edit(text)
-	return telegram.EndGroup
+	if d, err := disk.Usage("/"); err == nil {
+		usedGB := float64(d.Used) / 1024 / 1024 / 1024
+		totalGB := float64(d.Total) / 1024 / 1024 / 1024
+		diskUsage = fmt.Sprintf("%.2f / %.2f GB", usedGB, totalGB)
+	}
+
+	msg := F(m.ChatID(), "ping_result", arg{
+		"latency": latency,
+		"bot": utils.MentionHTML(core.Buser),
+		"uptime":  uptimeStr,
+		"ram_info": ramInfo,
+		"cpu_usage": cpuUsage,
+		"disk_usage": diskUsage,
+	})
+
+	reply.Edit(msg, opt)
+	return tg.EndGroup
 }
