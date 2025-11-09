@@ -26,6 +26,7 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 	"github.com/showwin/speedtest-go/speedtest"
 
+	"main/internal/locales"
 	"main/internal/utils"
 )
 

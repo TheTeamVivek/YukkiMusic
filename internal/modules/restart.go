@@ -28,6 +28,7 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
