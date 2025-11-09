@@ -30,70 +30,56 @@ import (
 )
 
 func sptHandle(m *telegram.NewMessage) error {
+	chatID := m.ChannelID()
+
 	user, err := speedtest.FetchUserInfo()
 	if err != nil {
-		m.Reply(fmt.Sprintf("⚠️ Failed to fetch network info: %v", err))
+		m.Reply(F(chatID, "spt_fetch_fail", locales.Arg{
+			"error": err,
+		}))
 		return nil
 	}
 
 	servers, err := speedtest.FetchServers()
 	if err != nil {
-		m.Reply(fmt.Sprintf("⚠️ Failed to fetch servers: %v", err))
+		m.Reply(F(chatID, "spt_servers_fetch_fail", locales.Arg{
+			"error": err,
+		}))
 		return nil
 	}
 
 	best, err := servers.FindServer([]int{})
 	if err != nil || len(best) == 0 {
-		m.Reply(fmt.Sprintf("⚠️ Failed to find best server: %v", err))
+		m.Reply(F(chatID, "spt_best_server_fail", locales.Arg{
+			"error": err,
+		}))
 		return nil
 	}
-
 	server := best[0]
 
-	statusMsg, err := m.Reply("🚀 Running download test...")
+	statusMsg, err := m.Reply(F(chatID, "spt_running_download"))
 	if err != nil {
 		return err
 	}
 
 	server.DownloadTest()
 
-	utils.EOR(statusMsg, "📤 Running upload test...")
+	utils.EOR(statusMsg, F(chatID, "spt_running_upload"))
 	server.UploadTest()
 
-	res := `<b>📡 SpeedTest Result</b>
-
-<b><u>👤 Client</u></b>
-IP: <code>%s</code>
-ISP: %s
-Lat: <code>%s</code>
-Lon: <code>%s</code>
-
-<b><u>🛰️ Server</u></b>
-Name: %s
-Country: %s
-Sponsor: %s
-Distance: %.2f km
-Latency: %.2f ms
-
-<b><u>⚡ Speed</u></b>
-Download: <code>%.2f Mbps</code>
-Upload: <code>%.2f Mbps</code>
-`
-
-	output := fmt.Sprintf(
-		res,
-		user.IP,
-		user.Isp,
-		user.Lat,
-		user.Lon,
-		server.Name,
-		server.Country,
-		server.Sponsor,
-		server.Distance,
-		float64(server.Latency.Microseconds())/1000,
-		server.DLSpeed/1024/1024,
-		server.ULSpeed/1024/1024,
-	)
+	output := F(chatID, "spt_result", locales.Arg{
+		"ip":          user.IP,
+		"isp":         user.Isp,
+		"lat":         user.Lat,
+		"lon":         user.Lon,
+		"server_name": server.Name,
+		"country":     server.Country,
+		"sponsor":     server.Sponsor,
+		"distance_km": fmt.Sprintf("%.2f", server.Distance),
+		"latency_ms":  fmt.Sprintf("%.2f", float64(server.Latency.Microseconds())/1000),
+		"dl_mbps":     fmt.Sprintf("%.2f", server.DLSpeed/1024/1024),
+		"ul_mbps":     fmt.Sprintf("%.2f", server.ULSpeed/1024/1024),
+	})
 
 	utils.EOR(statusMsg, output)
 	return nil

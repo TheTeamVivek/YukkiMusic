@@ -32,36 +32,46 @@ import (
 )
 
 func handleRestart(m *tg.NewMessage) error {
-	mystic, err := m.Reply("♻️ Restarting...")
+	chatID := m.ChannelID()
+
+	mystic, err := m.Reply(F(chatID, "restart"))
 	if err != nil {
 		gologging.Error("Failed to send restart message: " + err.Error())
 	}
 
 	exePath, err := os.Executable()
 	if err != nil {
-		utils.EOR(mystic, "❌ Failed to get executable path: "+err.Error())
+		utils.EOR(mystic, F(chatID, "restart_exepath_fail", locales.Arg{
+			"error": err.Error(),
+		}))
 		return tg.EndGroup
 	}
 
 	exePath, err = filepath.EvalSymlinks(exePath)
 	if err != nil {
-		utils.EOR(mystic, "❌ Failed to resolve executable path: "+err.Error())
+		utils.EOR(mystic, F(chatID, "restart_symlink_fail", locales.Arg{
+			"error": err.Error(),
+		}))
 		return tg.EndGroup
 	}
 
-	for _, chatID := range core.GetAllRoomIDs() {
-		if r, _ := core.GetRoom(chatID); r != nil {
+	for _, id := range core.GetAllRoomIDs() {
+		if r, _ := core.GetRoom(id); r != nil {
 			r.Stop()
-			m.Client.SendMessage(chatID, utils.MentionHTML(core.BUser)+" has just restarted herself. Sorry for the issues.\n\nStart playing again after 10–15 seconds.")
+			m.Client.SendMessage(id, F(id, "restart_service", locales.Arg{
+				"bot": utils.MentionHTML(core.BUser),
+			}))
 		}
 	}
 
-	utils.EOR(mystic, "✅ Restart initiated successfully!")
+	utils.EOR(mystic, F(chatID, "restart_initiated"))
 
-	os.RemoveAll("downloads")
+	_ = os.RemoveAll("downloads")
 
 	if err := syscall.Exec(exePath, os.Args, os.Environ()); err != nil {
-		utils.EOR(mystic, "❌ Failed to restart: "+err.Error())
+		utils.EOR(mystic, F(chatID, "restart_fail", locales.Arg{
+			"error": err.Error(),
+		}))
 	}
 
 	return tg.EndGroup

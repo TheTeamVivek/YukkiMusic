@@ -54,11 +54,201 @@ bug_report_format: |
 
 chat_not_recognized: "⚠️ Chat not recognized."
 
+clear_no_active: "⚠️ <b>No active playback or queue to clear.</b>"
+clear_success: "✅ The queue has been cleared by {user}."
+
 flood_seconds: "⏳ Slow down! Try again in {duration} seconds."
 flood_minutes: "⏳ Please wait {duration} minutes before using this command again."
 
 help_private_only: "🤖 Hi! For bot help and commands, please DM me directly — I'm more responsive in private chats!"
 help_main: "📚 <b>Help Menu</b>\n\nSelect a category below to explore detailed commands and their usage for managing, controlling, and customizing the bot."
+
+lang_same: "ℹ️ You’re already using this language."
+lang_select: "🌐 Select your preferred language:"
+lang_fail: "❌ Failed to update language. Please try again later."
+lang_success: "✅ Language successfully updated to {lang_name}."
+
+loop_usage: "🔁 <b>Loop Control</b>\n\nUsage: {cmd} [count]\n• 0 - Disable loop\n• 1-10 - Loop count\n\n<i>{count_line}</i>"
+loop_invalid: "⚠️ <b>Invalid loop count.</b>\nUse 0 to disable or 1-10 to set loop count."
+loop_already_set: "⚠️ Loop count is already set to <b>{count}</b> time(s)."
+loop_disabled: "🔁 Loop has been <b>disabled</b> by {user}"
+loop_set: "🔁 Set to loop <b>{count}</b> time(s)\n└ Changed by: {user}"
+loop_current: "• Current loop: <b>{count}</b> time(s)"
+
+logger_usage: "⚙️ Usage: <code>{cmd} [enable|disable]</code> - To enable or disable the logger\n\n{status}"
+logger_status: "📜 Current status: {action}"
+logger_check_fail: "❌ Failed to check logger status: {error}"
+logger_already: "ℹ️ Logger is already {action}."
+logger_update_fail: "❌ Failed to update logger setting: {error}"
+logger_updated: "✅ Logger has been {action} successfully."
+
+# reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
+maint: "⚠️ I'm under maintenance at the moment and temporarily unavailable. Please check back later.\n\n{reason}"
+maint_reason: "<i>📝 Reason: {reason}</i>"
+
+# ⚙️ Maintenance control
+maint_usage: "⚙️ <b>Maintenance Control</b>\n\nUsage: {cmd} [enable|disable] [reason]\n📜 Current status: {status}"
+maint_check_fail: "❌ Failed to check maintenance status: <code>{error}</code>"
+maint_already_enabled: "ℹ️ Maintenance mode is already enabled 🟢."
+maint_already_disabled: "ℹ️ Maintenance mode is already disabled 🔴."
+maint_already_reason_same: "ℹ️ Maintenance is already enabled with the same reason."
+maint_reason_removed: "✅ Maintenance reason removed successfully."
+maint_reason_updated: "✅ Maintenance reason updated.\n📝 Reason: {reason}"
+maint_enabled: "✅ Maintenance mode has been <b>enabled</b> successfully."
+maint_enabled_reason: "✅ Maintenance mode enabled.\n📝 Reason: {reason}"
+maint_disabled: "✅ Maintenance mode has been <b>disabled</b> successfully."
+maint_entering: "⚠️ Bot is entering maintenance mode..."
+enabled_with_reason: "🟢 Enabled\n📝 Reason: {reason}"
+
+move_usage: "⚠️ Usage: <code>{cmd} [from] [to]</code>"
+move_invalid_numbers: "⚠️ Invalid numbers. Example: <code>/{cmd} 2 1</code>"
+move_invalid_indexes_min: "⚠️ Indexes must be greater than 0."
+move_invalid_indexes_max: "⚠️ Queue has only {queue_len} tracks."
+move_success: "✅ Moved track from position {from} to {to} by {user}."
+
+# 🔇 Mute messages
+mute_already_muted: "🔇 <b>Already Muted</b>\nThe music is already muted in this chat.\nWould you like to unmute it?"
+mute_already_muted_with_time: "🔇 <b>Already Muted</b>\nThe music is muted.\nAuto-unmute in <b>{duration}</b>."
+mute_invalid_duration: "⚠️ Invalid duration for auto-unmute.\nIt must be between <b>5</b> and <b>3600</b> seconds."
+mute_invalid_format: "⚠️ Invalid format.\nUse: <code>/{cmd} 30</code> or <code>/{cmd} 30s</code>"
+mute_failed: "❌ <b>Playback Mute Failed</b>\nError: <code>{error}</code>"
+mute_success: |
+  🔇 <b>Muted playback</b>
+
+  🎵 Track: {title}
+  👤 Muted by: {user}
+
+mute_success_with_time: |
+  🔇 <b>Muted playback</b>
+
+  🎵 Track: {title}
+  👤 Muted by: {user}
+  <i>⏳ Auto-unmute in <b>{duration}</b> seconds</i>
+
+only_admin: "⚠️ <b>Permission Denied!</b>\nOnly <b>admins</b> can control this actions. You can still play songs 🎵.\n\nIf you believe you are an admin, please use /reload to refresh your admin status."
+only_admin_or_auth: "⚠️ <b>Access Denied</b>\nOnly <b>admins</b> or <b>authorized users</b> can control this actions.\n\nIf you recently became an admin, use /reload to refresh your permissions."
+only_admin_or_auth_cb: "⚠️ Only admins can do this actions."
+only_supergroup: "⚠️ This command can only be used in groups."
+only_owner: "⚠️ Only the bot owner can use this command."
+only_sudo: "⚠️ Only sudo users or the bot owner can use this command."
+
+pause_invalid_duration: "⚠️ Invalid duration for auto-resume.\nIt must be between <b>5</b> and <b>3600</b> seconds."
+pause_invalid_format: "⚠️ Invalid format.\nUse: <code>/{cmd} 30</code> or <code>/{cmd} 30s</code>"
+auto_resume_line: "\n<i>⏳ Auto-resume in <b>{seconds}</b> seconds</i>"
+
+pause_already: |
+  ⏸️ <b>Already Paused</b>
+  The music is already paused.{auto_resume_line}
+
+pause_success: |
+  ⏸️ <b>Paused playback</b>
+
+  🎵 Track: {title}
+  ⏱️ Position: {position} / {duration}
+  👤 Paused by: {user}
+  {auto_resume_line}
+
+speed_line: "⚙️ Speed: <b>{speed}x</b>"
+
+# 🏓 Ping messages
+ping_start: "🏓 Pinging..."
+ping_result: |
+  <b>🏓 PONG</b>: <code>{latency}ms</code>
+  
+  <b><u>🤖 {bot} system stat's :</u></b>
+  
+  <b>Uptime:</b> {uptime}
+  <b>RAM Usage:</b> {ram_info}
+  <b>CPU Usage:</b> {cpu_usage}
+  <b>Disk Usage:</b> {disk_usage}
+
+position_now: |
+  🎵 <b>{title}</b>
+  📍 <code>{position} / {duration}</code>
+  ⚙️ Speed: <b>{speed}x</b>
+
+queue_no_active: "⚠️ <b>No active playback.</b>\nNothing is queued right now."
+queue_header: "🎶 <b>Current Queue</b>"
+queue_now_playing: "▶️ <b>Now Playing:</b>"
+queue_up_next: "⏭️ <b>Up Next:</b>"
+queue_more_line: "\n… and {remaining} more"
+queue_empty_tail: "📭 <i>No more songs in queue.</i>"
+queue_empty: "⚠️ <b>The queue is already empty.</b>"
+
+remove_usage: "⚠️ <b>Invalid usage.</b>\nUsage: <code>{cmd} [index]</code>"
+remove_invalid_index: "⚠️ <b>Invalid index.</b> It must be a <b>number</b>."
+remove_index_too_small: "⚠️ <b>Index must be greater than 0.</b>"
+remove_index_too_big: "⚠️ Invalid index. Queue only has <b>{total}</b> tracks."
+remove_success: "✅ Removed track at position <b>{index}</b> from the queue.\n👤 By: {user}"
+
+restart: "♻️ Restarting..."
+restart_exepath_fail: "❌ Failed to get executable path: {error}"
+restart_symlink_fail: "❌ Failed to resolve executable path: {error}"
+restart_service: "{bot} has just restarted. Sorry for the issues.\n\nStart playing again after 10–15 seconds."
+restart_initiated: "✅ Restart initiated successfully!"
+restart_fail: "❌ Failed to restart: {error}"
+
+
+room_not_active_cb: "⚠️ Nothing playing right now."
+room_no_active: "⚠️ <b>No active playback.</b>\nThere's nothing playing right now."
+room_not_linked: "⚠️ This channel isn't linked to any group."
+
+room_already_paused: "⏸️ Track is already paused. Tap ▶️ Resume to continue."
+room_already_paused_auto: "⏸️ Track is already paused — auto-resuming in {duration}."
+room_pause_failed: "❌ Failed to pause playback.\n\n<i>{error}</i>"
+
+spt_fetch_fail: "⚠️ Failed to fetch network info: <code>{error}</code>"
+spt_servers_fetch_fail: "⚠️ Failed to fetch servers: <code>{error}</code>"
+spt_best_server_fail: "⚠️ Failed to find best server: <code>{error}</code>"
+
+spt_running_download: "🚀 Running download test..."
+spt_running_upload: "📤 Running upload test..."
+
+spt_result: |
+  <b>📡 SpeedTest Result</b>
+
+  <b><u>👤 Client</u></b>
+  IP: <code>{ip}</code>
+  ISP: {isp}
+  Lat: <code>{lat}</code>
+  Lon: <code>{lon}</code>
+
+  <b><u>🛰️ Server</u></b>
+  Name: {server_name}
+  Country: {country}
+  Sponsor: {sponsor}
+  Distance: {distance_km} km
+  Latency: {latency_ms} ms
+
+  <b><u>⚡ Speed</u></b>
+  Download: <code>{dl_mbps} Mbps</code>
+  Upload: <code>{ul_mbps} Mbps</code>
+
+
+stream_channelid_fail: "⚠️ Failed to get your connected channel’s ID."
+stream_queue_finished: "🎵 <b>Queue Finished!</b>\n\nNo more songs to play. Use /play to add more tracks! 🎶"
+stream_downloading_next: "📥 Downloading your next track..."
+stream_download_fail: "❌ Failed to download.\nError: <code>{error}</code>\nUse /skip to skip playback."
+stream_play_fail: "❌ Failed to play the song."
+stream_now_playing: |
+  <b>🎵 Now Playing:</b>
+
+  <b>▫ Track:</b> <a href="{url}">{title}</a>
+  <b>▫ Duration:</b> {duration}
+  <b>▫ Requested by:</b> {by}
+
+supergroup_needed: |
+  This chat (ID: <code>{chat_id}</code>) is not a supergroup yet.
+  <b>⚠️ Please convert this chat to a supergroup then add me as admin.</b>
+  
+  If you don't know how to convert, use this guide:
+  🔗 <a href=\"https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02\">How to convert to a SuperGroup</a>
+  
+  If you have any questions, join our support group:
+  
+
+
+# Commands help
 
 help_owner: |
   👑 <b>Owner Commands</b>
@@ -119,108 +309,3 @@ help_public: |
   <b>/reload</b> - Reload admin or cache data
   <b>/json</b> - Show message JSON structure
   <b>/sudolist</b> - View sudo user list
-
-lang_same: "ℹ️ You’re already using this language."
-lang_select: "🌐 Select your preferred language:"
-lang_fail: "❌ Failed to update language. Please try again later."
-lang_success: "✅ Language successfully updated to {lang_name}."
-
-loop_usage: "🔁 <b>Loop Control</b>\n\nUsage: {cmd} [count]\n• 0 - Disable loop\n• 1-10 - Loop count\n\n<i>{count_line}</i>"
-loop_invalid: "⚠️ <b>Invalid loop count.</b>\nUse 0 to disable or 1-10 to set loop count."
-loop_already_set: "⚠️ Loop count is already set to <b>{count}</b> time(s)."
-loop_disabled: "🔁 Loop has been <b>disabled</b> by {user}"
-loop_set: "🔁 Set to loop <b>{count}</b> time(s)\n└ Changed by: {user}"
-loop_current: "• Current loop: <b>{count}</b> time(s)"
-
-logger_usage: "⚙️ Usage: <code>{cmd} [enable|disable]</code> - To enable or disable the logger\n\n{status}"
-logger_status: "📜 Current status: {action}"
-logger_check_fail: "❌ Failed to check logger status: {error}"
-logger_already: "ℹ️ Logger is already {action}."
-logger_update_fail: "❌ Failed to update logger setting: {error}"
-logger_updated: "✅ Logger has been {action} successfully."
-
-# reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
-maint: "⚠️ I'm under maintenance at the moment and temporarily unavailable. Please check back later.\n\n{reason}"
-maint_reason: "<i>📝 Reason: {reason}</i>"
-
-# ⚙️ Maintenance control
-maint_usage: "⚙️ <b>Maintenance Control</b>\n\nUsage: {cmd} [enable|disable] [reason]\n📜 Current status: {status}"
-maint_check_fail: "❌ Failed to check maintenance status: <code>{error}</code>"
-maint_already_enabled: "ℹ️ Maintenance mode is already enabled 🟢."
-maint_already_disabled: "ℹ️ Maintenance mode is already disabled 🔴."
-maint_already_reason_same: "ℹ️ Maintenance is already enabled with the same reason."
-maint_reason_removed: "✅ Maintenance reason removed successfully."
-maint_reason_updated: "✅ Maintenance reason updated.\n📝 Reason: {reason}"
-maint_enabled: "✅ Maintenance mode has been <b>enabled</b> successfully."
-maint_enabled_reason: "✅ Maintenance mode enabled.\n📝 Reason: {reason}"
-maint_disabled: "✅ Maintenance mode has been <b>disabled</b> successfully."
-maint_entering: "⚠️ Bot is entering maintenance mode..."
-enabled_with_reason: "🟢 Enabled\n📝 Reason: {reason}"
-
-# 🔇 Mute messages
-mute_already_muted: "🔇 <b>Already Muted</b>\nThe music is already muted in this chat.\nWould you like to unmute it?"
-mute_already_muted_with_time: "🔇 <b>Already Muted</b>\nThe music is muted.\nAuto-unmute in <b>{duration}</b>."
-mute_invalid_duration: "⚠️ Invalid duration for auto-unmute.\nIt must be between <b>5</b> and <b>3600</b> seconds."
-mute_invalid_format: "⚠️ Invalid format.\nUse: <code>/{cmd} 30</code> or <code>/{cmd} 30s</code>"
-mute_failed: "❌ <b>Playback Mute Failed</b>\nError: <code>{error}</code>"
-mute_success: |
-  🔇 <b>Muted playback</b>
-
-  🎵 Track: {title}
-  👤 Muted by: {user}
-
-mute_success_with_time: |
-  🔇 <b>Muted playback</b>
-
-  🎵 Track: {title}
-  👤 Muted by: {user}
-  <i>⏳ Auto-unmute in <b>{duration}</b> seconds</i>
-
-only_admin: "⚠️ <b>Permission Denied!</b>\nOnly <b>admins</b> can control this actions. You can still play songs 🎵.\n\nIf you believe you are an admin, please use /reload to refresh your admin status."
-only_admin_or_auth: "⚠️ <b>Access Denied</b>\nOnly <b>admins</b> or <b>authorized users</b> can control this actions.\n\nIf you recently became an admin, use /reload to refresh your permissions."
-only_admin_or_auth_cb: "⚠️ Only admins can do this actions."
-only_supergroup: "⚠️ This command can only be used in groups."
-only_owner: "⚠️ Only the bot owner can use this command."
-only_sudo: "⚠️ Only sudo users or the bot owner can use this command."
-
-# 🏓 Ping messages
-ping_start: "🏓 Pinging..."
-ping_result: |
-  <b>🏓 PONG</b>: <code>{latency}ms</code>
-  
-  <b><u>🤖 {bot} system stat's :</u></b>
-  
-  <b>Uptime:</b> {uptime}
-  <b>RAM Usage:</b> {ram_info}
-  <b>CPU Usage:</b> {cpu_usage}
-  <b>Disk Usage:</b> {disk_usage}
-
-room_not_active_cb: "⚠️ Nothing playing right now."
-room_no_active: "⚠️ <b>No active playback.</b>\nThere's nothing playing right now."
-room_not_linked: "⚠️ This channel isn't linked to any group."
-
-room_already_paused: "⏸️ Track is already paused. Tap ▶️ Resume to continue."
-room_already_paused_auto: "⏸️ Track is already paused — auto-resuming in {duration}."
-room_pause_failed: "❌ Failed to pause playback.\n\n<i>{error}</i>"
-
-stream_channelid_fail: "⚠️ Failed to get your connected channel’s ID."
-stream_queue_finished: "🎵 <b>Queue Finished!</b>\n\nNo more songs to play. Use /play to add more tracks! 🎶"
-stream_downloading_next: "📥 Downloading your next track..."
-stream_download_fail: "❌ Failed to download.\nError: <code>{error}</code>\nUse /skip to skip playback."
-stream_play_fail: "❌ Failed to play the song."
-stream_now_playing: |
-  <b>🎵 Now Playing:</b>
-
-  <b>▫ Track:</b> <a href="{url}">{title}</a>
-  <b>▫ Duration:</b> {duration}
-  <b>▫ Requested by:</b> {by}
-
-supergroup_needed: |
-  This chat (ID: <code>{chat_id}</code>) is not a supergroup yet.
-  <b>⚠️ Please convert this chat to a supergroup then add me as admin.</b>
-  
-  If you don't know how to convert, use this guide:
-  🔗 <a href=\"https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02\">How to convert to a SuperGroup</a>
-  
-  If you have any questions, join our support group:
-  

@@ -39,61 +39,89 @@ func cpauseHandler(m *telegram.NewMessage) error {
 	return handlePause(m, true)
 }
 
-func handlePause(m *telegram.NewMessage, cplay bool) error {
-	r, err := getEffectiveRoom(m, cplay)
-	if err != nil {
-		m.Reply(err.Error())
-		return telegram.EndGroup
-	}
-	if !r.IsActiveChat() {
-		m.Reply("⚠️ <b>No active playback.</b>\nThere’s nothing playing right now.")
-		return telegram.EndGroup
-	}
-	if r.IsMuted() {
-		m.Reply("⚠️ <b>Oops!</b>\nThe room is muted. Please unmute it first to pause playback.")
-		return telegram.EndGroup
-	}
-	if r.IsPaused() {
-		remaining := r.RemainingResumeDuration()
-		if remaining > 0 {
-			m.Reply(fmt.Sprintf("⏸️ <b>Already Paused</b>\nThe music is already paused.\nAuto-resume in <b>%s</b>", formatDuration(int(remaining.Seconds()))))
-		} else {
-			m.Reply("⏸️ <b>Already Paused</b>\nThe music is already paused. Would you like to resume it?")
-		}
-		return telegram.EndGroup
-	}
-	args := strings.Fields(m.Text())
-	var autoResumeDuration time.Duration
-	if len(args) >= 2 {
-		rawDuration := strings.ToLower(strings.TrimSpace(args[1]))
-		rawDuration = strings.TrimSuffix(rawDuration, "s")
-		seconds, err := strconv.Atoi(rawDuration)
-		if err != nil || seconds < 5 || seconds > 3600 {
-			m.Reply("⚠️ Invalid duration for auto-resume. It must be between <b>5</b> and <b>3600</b> seconds.")
-			return telegram.EndGroup
-		}
-		autoResumeDuration = time.Duration(seconds) * time.Second
-	}
-	var pauseErr error
-	if autoResumeDuration > 0 {
-		_, pauseErr = r.Pause(autoResumeDuration)
-	} else {
-		_, pauseErr = r.Pause()
-	}
-	if pauseErr != nil {
-		m.Reply(fmt.Sprintf("❌ <b>Playback Pause Failed</b>\nError: <code>%v</code>", pauseErr))
-		return telegram.EndGroup
-	}
-	mention := utils.MentionHTML(m.Sender)
-	trackTitle := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
-	msg := fmt.Sprintf("⏸️ <b>Paused playback</b>\n\nTrack: \"%s\"\nPosition: %s / %s\nPaused by: %s\n",
-		trackTitle, formatDuration(r.Position), formatDuration(r.Track.Duration), mention)
-	if sp := r.GetSpeed(); sp != 1.0 {
-		msg += fmt.Sprintf("⚙️ Speed: <b>%.2fx</b>\n", sp)
-	}
-	if autoResumeDuration > 0 {
-		msg += fmt.Sprintf("\n<i>⏳ Will auto-resume playback after %d seconds</i>", int(autoResumeDuration.Seconds()))
-	}
-	m.Reply(msg)
-	return telegram.EndGroup
+func handlePause(m *tg.NewMessage, cplay bool) error {
+    chatID := m.ChannelID()
+    r, err := getEffectiveRoom(m, cplay)
+    if err != nil {
+        m.Reply(err.Error())
+        return tg.EndGroup
+    }
+
+    if !r.IsActiveChat() {
+        m.Reply(F(chatID, "room_no_active"))
+        return tg.EndGroup
+    }
+
+    if r.IsPaused() {
+        remaining := r.RemainingResumeDuration()
+        autoResumeLine := ""
+        if remaining > 0 {
+            autoResumeLine = F(chatID, "auto_resume_line", locales.Arg{
+                "seconds": formatDuration(int(remaining.Seconds())),
+            })
+        }
+        m.Reply(F(chatID, "pause_already", locales.Arg{
+            "auto_resume_line": autoResumeLine,
+        }))
+        return tg.EndGroup
+    }
+
+    args := strings.Fields(m.Text())
+    var autoResumeDuration time.Duration
+    if len(args) >= 2 {
+        raw := strings.ToLower(strings.TrimSpace(args[1]))
+        raw = strings.TrimSuffix(raw, "s")
+        if sec, convErr := strconv.Atoi(raw); convErr == nil {
+            if sec < 5 || sec > 3600 {
+                m.Reply(F(chatID, "pause_invalid_duration"))
+                return tg.EndGroup
+            }
+            autoResumeDuration = time.Duration(sec) * time.Second
+        } else {
+            m.Reply(F(chatID, "pause_invalid_format", locales.Arg{
+                "cmd": getCommand(m),
+            }))
+            return tg.EndGroup
+        }
+    }
+
+    var pauseErr error
+    if autoResumeDuration > 0 {
+        _, pauseErr = r.Pause(autoResumeDuration)
+    } else {
+        _, pauseErr = r.Pause()
+    }
+    if pauseErr != nil {
+        m.Reply(F(chatID, "room_pause_failed", locales.Arg{
+            "error": pauseErr.Error(),
+        }))
+        return tg.EndGroup
+    }
+
+    mention := utils.MentionHTML(m.Sender)
+    title := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
+
+    autoResumeLine := ""
+    if autoResumeDuration > 0 {
+        autoResumeLine = F(chatID, "auto_resume_line", locales.Arg{
+            "seconds": int(autoResumeDuration.Seconds()),
+        })
+    }
+
+    msg := F(chatID, "pause_success", locales.Arg{
+        "title":           title,
+        "position":        formatDuration(r.Position),
+        "duration":        formatDuration(r.Track.Duration),
+        "user":            mention,
+        "auto_resume_line": autoResumeLine,
+    })
+
+    if sp := r.GetSpeed(); sp != 1.0 {
+        msg += "\n" + F(chatID, "speed_line", locales.Arg{
+            "speed": fmt.Sprintf("%.2f", sp),
+        })
+    }
+
+    m.Reply(msg)
+    return tg.EndGroup
 }

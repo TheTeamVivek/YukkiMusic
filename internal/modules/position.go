@@ -36,28 +36,30 @@ func cpositionHandler(m *telegram.NewMessage) error {
 	return handlePosition(m, true)
 }
 
-func handlePosition(m *telegram.NewMessage, cplay bool) error {
-	r, err := getEffectiveRoom(m, cplay)
-	if err != nil {
-		m.Reply(err.Error())
-		return telegram.EndGroup
-	}
+func handlePosition(m *tg.NewMessage, cplay bool) error {
+    chatID := m.ChannelID()
 
-	if !r.IsActiveChat() || r.Track == nil {
-		m.Reply("⚠️ <b>No active playback.</b>\nNothing is playing right now.")
-		return telegram.EndGroup
-	}
+    r, err := getEffectiveRoom(m, cplay)
+    if err != nil {
+        m.Reply(err.Error())
+        return tg.EndGroup
+    }
 
-	r.Parse()
+    if !r.IsActiveChat() || r.Track == nil {
+        m.Reply(F(chatID, "room_no_active"))
+        return tg.EndGroup
+    }
 
-	progress := fmt.Sprintf(
-		"🎵 <b>%s</b>\n📍 <code>%s / %s</code>\n⚙️ Speed: <b>%.2fx</b>",
-		html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
-		formatDuration(r.Position),
-		formatDuration(r.Track.Duration),
-		r.Speed,
-	)
+    r.Parse()
 
-	m.Reply(progress)
-	return telegram.EndGroup
+    title := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
+
+    m.Reply(F(chatID, "position_now", locales.Arg{
+        "title":    title,
+        "position": formatDuration(r.Position),
+        "duration": formatDuration(r.Track.Duration),
+        "speed":    fmt.Sprintf("%.2f", r.Speed),
+    }))
+
+    return tg.EndGroup
 }
