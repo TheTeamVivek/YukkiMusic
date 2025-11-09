@@ -75,16 +75,24 @@ func Get(lang, key string, values Arg) string {
 	if _, ok := loadedLocales[lang]; !ok {
 		lang = config.DefaultLang
 	}
+
 	val, ok := loadedLocales[lang][key]
 	if !ok {
 		val = loadedLocales[config.DefaultLang][key]
 	}
+
 	if values == nil {
 		return val
 	}
+
+	var buf strings.Builder
+
 	for k, v := range values {
-		val = strings.ReplaceAll(val, fmt.Sprintf("{%s}", k), fmt.Sprintf("%v", v))
+		buf.Reset()
+		fmt.Fprintf(&buf, "%v", v)
+		val = strings.ReplaceAll(val, "{"+k+"}", buf.String())
 	}
+
 	return val
 }
 
