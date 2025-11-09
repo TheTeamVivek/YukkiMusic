@@ -21,6 +21,7 @@ package modules
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -41,6 +42,21 @@ var (
 	autoLeaveMu     sync.Mutex
 	limit           = 30
 )
+
+func init() {
+	helpTexts["autoleave"] = fmt.Sprintf(`<i>Automatically makes the bot leave inactive or unnecessary chats every 15 minutes.</i>
+
+<u>Usage:</u>
+<b>/autoleave </b>— Shows current auto-leave status (enabled/disabled).  
+<b>/autoleave enable</b> — Enable auto-leave mode.  
+<b>/autoleave disable</b> — Disable auto-leave mode.
+
+<b>🧠 Details:</b>
+Once enabled, the bot checks all joined groups/channels every <b>15 minutes</b> and leaves up to <b>%d chats per cycle</b> that are not in the active room list.
+
+<b>⚠️ Restrictions:</b>
+This command can only be used by <b>owners</b> or <b>sudo users</b>.`, limit)
+}
 
 func autoLeaveHandler(m *tg.NewMessage) error {
 	args := strings.Fields(m.Text())

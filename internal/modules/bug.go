@@ -31,6 +31,22 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["bug"] = fmt.Sprintf(`<i>Report a bug, issue, or unexpected behavior directly to the bot developers.</i>
+
+<u>Usage:</u>
+<b>/bug &lt;description&gt;</b> — Send a bug report with a short explanation.  
+<b>Reply + /bug</b> — Report a specific message or media as a bug.
+
+<b>🧠 Details:</b>
+When used, the bot automatically forwards your report (and the replied message if any) to the <b>owner</b> and <b>logger channels</b>.  
+Flood protection is applied — you can only send one report every <b>5 minutes</b> per chat.
+
+<b>⚠️ Note:</b>  
+Reports are logged for debugging purposes only. Misuse (like spam) may restrict your access to this command.`)
+}
+
+// TODO: Add support for bug answers, misuse bans
 func bugHandler(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()
 	reason := m.Args()

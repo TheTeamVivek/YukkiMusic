@@ -28,11 +28,28 @@ import (
 
 func activeHandler(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()
-	chats := len(core.GetAllRoomIDs())
+
+	allChats := core.GetAllRoomIDs()
+	activeCount := len(allChats)
+	ntgChats := core.Ntg.Calls()
+
+	brokenCount := 0
+	for _, id := range allChats {
+		if _, ok := ntgChats[id]; !ok {
+			brokenCount++
+		}
+	}
 
 	msg := F(chatID, "active_chats_info", locales.Arg{
-		"count": chats,
+		"count": activeCount,
 	})
+
+	if brokenCount > 0 {
+		msg = F(chatID, "active_chats_info_with_issue", locales.Arg{
+			"count":  activeCount,
+			"broken": brokenCount,
+		})
+	}
 
 	m.Reply(msg)
 	return telegram.EndGroup

@@ -20,6 +20,7 @@
 package modules
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/amarnathcjd/gogram/telegram"
@@ -30,6 +31,41 @@ import (
 	"main/internal/locales"
 	"main/internal/utils"
 )
+
+func init() {
+	helpTexts["/addauth"] = fmt.Sprintf(`<i>Grant permission to a regular user to control playback and other admin-level features without making them a Telegram admin.</i>
+
+<u>Usage:</u>
+<b>/addauth [reply to user]</b> — Add a user by replying to their message.  
+<b>/addauth &lt;user_id / username&gt;</b> — Add a user directly by ID or @username.
+
+<b>⚙️ Notes:</b>
+• Only <b>chat admins</b> can use this command.  
+• Auth users can control playback with commands like <code>/pause</code>, <code>/resume</code>, <code>/skip</code>, <code>/seek</code>, <code>/mute</code>, etc.  
+• 🤖 Bots cannot be added as auth users.  
+• 🔢 You can have up to <b>%d</b> auth users per chat.  
+• 👑 The <b>Bot Owner</b>, <b>Assistant</b>, and all <b>Sudoers</b> are <b>already authorized by default</b> — they do not appear in the list and cannot be removed.
+
+For related commands, see <code>/delauth</code> and <code>/authlist</code>.`, config.MaxAuthUsers)
+
+	helpTexts["/delauth"] = `<i>Revoke permission from a user who was previously authorized to control playback.</i>
+
+<u>Usage:</u>
+<b>/delauth [reply to user]</b> — Remove by replying to their message.  
+<b>/delauth &lt;user_id / username&gt; </b>— Remove by ID or @username.
+
+<b>⚙️ Notes:</b>
+• Only <b>chat admins</b> can use this command.  
+• Use this to revoke access from misbehaving users.  
+• To check who’s currently authorized, use <code>/authlist</code>.`
+
+	helpTexts["/authlist"] = `<u>Usage:</u>
+<b>/authlist</b> - <i>Displays all users currently authorized to control playback in this chat.</i>
+
+<b>⚙️ Notes:</b>
+• Anyone in the chat can use this command.  
+• Shows only manually added auth users — the Owner, Assistant, and Sudoers are not listed but are always authorized.`
+}
 
 func addAuthHandler(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()

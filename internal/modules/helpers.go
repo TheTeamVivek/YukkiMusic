@@ -178,7 +178,7 @@ func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 	}
 }
 
-func F(chatID int64, key string, values ...arg) string {
+func F(chatID int64, key string, values ...locales.Arg) string {
 	lang, err := database.GetChatLanguage(chatID)
 	if err != nil {
 		gologging.Error("Failed to get language for " + utils.IntToStr(chatID) + " Got error " + err.Error())
@@ -187,8 +187,8 @@ func F(chatID int64, key string, values ...arg) string {
 	return FWithLang(lang, key, values...)
 }
 
-func FWithLang(lang, key string, values ...arg) string {
-	var val arg
+func FWithLang(lang, key string, values ...locales.Arg) string {
+	var val locales.Arg
 	if len(values) > 0 {
 		val = values[0]
 	}

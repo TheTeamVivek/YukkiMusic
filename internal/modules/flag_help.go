@@ -20,27 +20,13 @@
 package modules
 
 import (
-	"fmt"
 	"html"
 	"strings"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
-
-	"main/config"
 )
 
-var helpTexts = map[string]string{
-	"/help": fmt.Sprintf(`ℹ️ <b>Help Command</b>
-<i>Displays general bot help or detailed information about a specific command.</i>
-
-<u>Usage:</u>
-<code>/help</code> — Show the main help menu.
-<code>/help &lt;command&gt;</code> — Show help for a specific command.
-
-<b>💡 Tip:</b> You can view help for any command directly by adding a <code>-h</code> or <code>--help</code> flag, e.g. <code>/play -h</code>
-
-For more info, visit our <a href="%s">Support Chat</a>.`, config.SupportChat),
-}
+var helpTexts = map[string]string{}
 
 func checkForHelpFlag(m *tg.NewMessage) bool {
 	text := strings.ToLower(strings.TrimSpace(m.Text()))

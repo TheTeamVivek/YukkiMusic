@@ -25,8 +25,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 	"net/url"
 	"os/exec"
 	"regexp"
@@ -36,6 +34,7 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 	"github.com/raitonoberu/ytsearch"
+	"resty.dev/v3"
 
 	"main/config"
 	"main/internal/state"
@@ -230,59 +229,50 @@ func getPlaylist(pUrl string) ([]string, error) {
 // See https://github.com/AshokShau/TgMusicBot
 //
 // searchYouTube scrapes YouTube results page
-func searchYouTube(query string) ([]*state.Track, error) {
-	encodedQuery := url.QueryEscape(query)
-	url := "https://www.youtube.com/results?search_query=" + encodedQuery
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64)")
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36")
-	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
-	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 
-	resp, err := http.DefaultClient.Do(req)
+func searchYouTube(query string) ([]*state.Track, error) {
+	client := resty.New().
+		SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36").
+		SetHeader("Accept-Language", "en-US,en;q=0.9").
+		SetHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+
+	defer client.Close()
+
+	encodedQuery := url.QueryEscape(query)
+	searchURL := "https://www.youtube.com/results?search_query=" + encodedQuery
+
+	resp, err := client.R().Get(searchURL)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode())
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
-	}
-
+	body := resp.String()
 	re := regexp.MustCompile(`var ytInitialData = (.*?);\s*</script>`)
-	match := re.FindSubmatch(body)
+	match := re.FindStringSubmatch(body)
 	if len(match) < 2 {
 		return nil, fmt.Errorf("ytInitialData not found")
 	}
 
 	var data map[string]interface{}
-	if err := json.Unmarshal(match[1], &data); err != nil {
+	if err := json.Unmarshal([]byte(match[1]), &data); err != nil {
 		return nil, err
 	}
 
-	// Navigate nested fields
 	contents := dig(data, "contents", "twoColumnSearchResultsRenderer",
 		"primaryContents", "sectionListRenderer", "contents")
-
 	if contents == nil {
-		return nil, fmt.Errorf("no contents")
+		return nil, fmt.Errorf("no contents found")
 	}
 
 	var tracks []*state.Track
 	parseSearchResults(contents, &tracks)
-
 	return tracks, nil
 }
 
-// Recursively find items
 func parseSearchResults(node interface{}, tracks *[]*state.Track) {
 	switch v := node.(type) {
 	case []interface{}:
@@ -312,7 +302,6 @@ func parseSearchResults(node interface{}, tracks *[]*state.Track) {
 	}
 }
 
-// safely dig into nested JSON
 func dig(m interface{}, path ...interface{}) interface{} {
 	curr := m
 	for _, p := range path {
@@ -334,7 +323,6 @@ func dig(m interface{}, path ...interface{}) interface{} {
 	return curr
 }
 
-// safely cast to string
 func safeString(v interface{}) string {
 	if s, ok := v.(string); ok {
 		return s
@@ -342,7 +330,6 @@ func safeString(v interface{}) string {
 	return ""
 }
 
-// parse duration like "3:45" -> 225 seconds
 func parseDuration(s string) int {
 	if s == "" {
 		return 0
@@ -350,8 +337,6 @@ func parseDuration(s string) int {
 	parts := strings.Split(s, ":")
 	total := 0
 	multiplier := 1
-
-	// Process from right to left (seconds → minutes → hours)
 	for i := len(parts) - 1; i >= 0; i-- {
 		total += atoi(parts[i]) * multiplier
 		multiplier *= 60
@@ -359,7 +344,6 @@ func parseDuration(s string) int {
 	return total
 }
 
-// atoi converts a string to an integer
 func atoi(s string) int {
 	var n int
 	for _, r := range s {
