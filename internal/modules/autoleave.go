@@ -31,6 +31,7 @@ import (
 	"main/config"
 	"main/internal/core"
 	"main/internal/database"
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -54,7 +55,7 @@ func autoLeaveHandler(m *tg.NewMessage) error {
 	status := F(chatID, utils.IfElse(currentState, "enabled", "disabled"))
 
 	if len(args) < 2 {
-		m.Reply(F(chatID, "autoleave_status", arg{
+		m.Reply(F(chatID, "autoleave_status", locales.Arg{
 			"cmd":    getCommand(m),
 			"action": status,
 		}))
@@ -68,7 +69,7 @@ func autoLeaveHandler(m *tg.NewMessage) error {
 	}
 
 	if newState == currentState {
-		m.Reply(F(chatID, "autoleave_already", arg{
+		m.Reply(F(chatID, "autoleave_already", locales.Arg{
 			"action": status,
 		}))
 		return tg.EndGroup
@@ -80,7 +81,7 @@ func autoLeaveHandler(m *tg.NewMessage) error {
 	}
 
 	newStatus := F(chatID, utils.IfElse(newState, "enabled", "disabled"))
-	m.Reply(F(chatID, "autoleave_updated", arg{
+	m.Reply(F(chatID, "autoleave_updated", locales.Arg{
 		"action": newStatus,
 	}))
 

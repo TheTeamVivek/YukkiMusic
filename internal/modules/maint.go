@@ -21,6 +21,7 @@ import (
 
 	"main/internal/core"
 	"main/internal/database"
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -33,7 +34,7 @@ func handleMaintenance(m *tg.NewMessage) error {
 	args := strings.Fields(m.Text())
 	current, err := database.IsMaintenance()
 	if err != nil {
-		m.Reply(F(m.ChatID(), "maint_check_fail", arg{"error": err.Error()}))
+		m.Reply(F(m.ChatID(), "maint_check_fail", locales.Arg{"error": err.Error()}))
 		return tg.EndGroup
 	}
 
@@ -43,12 +44,12 @@ func handleMaintenance(m *tg.NewMessage) error {
 		status := F(m.ChatID(), "disabled")
 		if current {
 			if reason != "" {
-				status = F(m.ChatID(), "enabled_with_reason", arg{"reason": reason})
+				status = F(m.ChatID(), "enabled_with_reason", locales.Arg{"reason": reason})
 			} else {
 				status = F(m.ChatID(), "enabled")
 			}
 		}
-		m.Reply(F(m.ChatID(), "maint_usage", arg{
+		m.Reply(F(m.ChatID(), "maint_usage", locales.Arg{
 			"cmd":    getCommand(m),
 			"status": status,
 		}))
@@ -74,7 +75,7 @@ func handleMaintenance(m *tg.NewMessage) error {
 				m.Reply(F(m.ChatID(), "maint_reason_removed"))
 			case reason != "" && reason != oldReason:
 				_ = database.SetMaintenance(true, reason)
-				m.Reply(F(m.ChatID(), "maint_reason_updated", arg{"reason": reason}))
+				m.Reply(F(m.ChatID(), "maint_reason_updated", locales.Arg{"reason": reason}))
 			default:
 				m.Reply(F(m.ChatID(), "maint_already_enabled"))
 			}
@@ -106,7 +107,7 @@ func handleMaintenance(m *tg.NewMessage) error {
 					r.Destroy()
 					msg := F(id, "maint_entering")
 					if reason != "" {
-						msg += "\n" + F(id, "maint_reason", arg{"reason": reason})
+						msg += "\n" + F(id, "maint_reason", locales.Arg{"reason": reason})
 					}
 					c.SendMessage(id, msg)
 					time.Sleep(time.Second)
@@ -114,7 +115,7 @@ func handleMaintenance(m *tg.NewMessage) error {
 			}
 		}(m.Client, reason)
 
-		args := arg{}
+		args := locales.Arg{}
 		if reason != "" {
 			args["reason"] = reason
 			m.Reply(F(m.ChatID(), "maint_enabled_reason", args))

@@ -31,6 +31,7 @@ import (
 	"main/config"
 	"main/internal/core"
 	"main/internal/database"
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -103,7 +104,7 @@ func pingHandler(m *tg.NewMessage) error {
 		diskUsage = fmt.Sprintf("%.2f / %.2f GB", usedGB, totalGB)
 	}
 
-	msg := F(m.ChatID(), "ping_result", arg{
+	msg := F(m.ChatID(), "ping_result", locales.Arg{
 		"latency":    latency,
 		"bot":        utils.MentionHTML(core.BUser),
 		"uptime":     uptimeStr,

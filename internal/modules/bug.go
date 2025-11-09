@@ -27,6 +27,7 @@ import (
 
 	"main/config"
 	"main/internal/core"
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -35,7 +36,7 @@ func bugHandler(m *telegram.NewMessage) error {
 	reason := m.Args()
 
 	if reason == "" && !m.IsReply() {
-		m.Reply(F(chatID, "bug_usasge", arg{
+		m.Reply(F(chatID, "bug_usasge", locales.Arg{
 			"cmd": getCommand(m),
 		}))
 		return telegram.EndGroup
@@ -44,7 +45,7 @@ func bugHandler(m *telegram.NewMessage) error {
 	// Flood control
 	key := fmt.Sprintf("room:%d:%d", m.SenderID(), m.ChannelID())
 	if remaining := utils.GetFlood(key); remaining > 0 {
-		m.Reply(F(chatID, "flood_minutes", arg{
+		m.Reply(F(chatID, "flood_minutes", locales.Arg{
 			"minutes": formatDuration(int(remaining.Seconds())),
 		}))
 		return telegram.EndGroup
@@ -70,7 +71,7 @@ func bugHandler(m *telegram.NewMessage) error {
 	}
 	chatMention := fmt.Sprintf("<a href=\"%s\">%s</a>", m.Link(), chatTitle)
 
-	reportMsg := F(chatID, "bug_report_format", arg{
+	reportMsg := F(chatID, "bug_report_format", locales.Arg{
 		"user":    userMention,
 		"user_id": m.Sender.ID,
 		"chat":    chatMention,

@@ -25,6 +25,7 @@ import (
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -54,12 +55,12 @@ func handleLoop(m *tg.NewMessage, cplay bool) error {
 	if len(args) < 2 {
 		countLine := ""
 		if currentLoop > 0 {
-			countLine = "\n" + F(m.ChatID(), "loop_current", arg{
+			countLine = "\n" + F(m.ChatID(), "loop_current", locales.Arg{
 				"count": currentLoop,
 			})
 		}
 
-		msg := F(m.ChatID(), "loop_usage", arg{
+		msg := F(m.ChatID(), "loop_usage", locales.Arg{
 			"cmd":        getCommand(m),
 			"count_line": countLine,
 		})
@@ -75,7 +76,7 @@ func handleLoop(m *tg.NewMessage, cplay bool) error {
 	}
 
 	if newLoop == currentLoop {
-		m.Reply(F(m.ChatID(), "loop_already_set", arg{
+		m.Reply(F(m.ChatID(), "loop_already_set", locales.Arg{
 			"count": currentLoop,
 		}))
 		return tg.EndGroup
@@ -88,11 +89,11 @@ func handleLoop(m *tg.NewMessage, cplay bool) error {
 	mention := utils.MentionHTML(m.Sender)
 	var msg string
 	if newLoop == 0 {
-		msg = F(m.ChatID(), "loop_disabled", arg{
+		msg = F(m.ChatID(), "loop_disabled", locales.Arg{
 			"user": mention,
 		})
 	} else {
-		msg = F(m.ChatID(), "loop_set", arg{
+		msg = F(m.ChatID(), "loop_set", locales.Arg{
 			"count": newLoop,
 			"user":  mention,
 		})

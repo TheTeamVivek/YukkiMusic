@@ -48,7 +48,6 @@ var (
 	ownerFilter         = tg.FilterFunc(FilterOwner)
 )
 
-type arg = locales.Arg // just local aliase of locales.Arg
 func bool_(b bool) *bool {
 	return &b
 }
@@ -293,7 +292,7 @@ func SafeCallbackHandler(handler func(*tg.CallbackQuery) error) func(*tg.Callbac
 						cb.Answer(FWithLang(config.DefaultLang, "chat_not_recognized"), &tg.CallbackOptions{Alert: true})
 						return tg.EndGroup
 					}
-					cb.Answer(F(chatID, "maint", arg{"reason": ""}), &tg.CallbackOptions{Alert: true})
+					cb.Answer(F(chatID, "maint", locales.Arg{"reason": ""}), &tg.CallbackOptions{Alert: true})
 					return tg.EndGroup
 				}
 			}
@@ -325,8 +324,8 @@ func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage)
 				if ok, _ := database.IsSudo(m.SenderID()); !ok {
 					if m.ChatType() == tg.EntityUser || strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
 						reason, _ := database.GetMaintReason()
-						reason = F(m.ChannelID(), "maint_reason", arg{"reason": reason})
-						msg := F(m.ChannelID(), "maint", arg{"reason": reason})
+						reason = F(m.ChannelID(), "maint_reason", locales.Arg{"reason": reason})
+						msg := F(m.ChannelID(), "maint", locales.Arg{"reason": reason})
 						m.Reply(msg)
 						gologging.Info("Sent maintenance notice to " + fmt.Sprint(m.SenderID()))
 					}
@@ -422,7 +421,7 @@ func handlePanic(r, ctx interface{}, isPanic bool) {
 }
 
 func warnAndLeave(client *tg.Client, chatID int64) {
-	text := F(chatID, "supergroup_needed", arg{"chat_id": chatID})
+	text := F(chatID, "supergroup_needed", locales.Arg{"chat_id": chatID})
 	_, err := client.SendMessage(
 		chatID,
 		text,

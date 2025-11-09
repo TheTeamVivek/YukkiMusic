@@ -27,6 +27,7 @@ import (
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -53,7 +54,7 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 	if r.IsMuted() {
 		remaining := r.RemainingUnmuteDuration()
 		if remaining > 0 {
-			m.Reply(F(m.ChatID(), "mute_already_muted_with_time", arg{
+			m.Reply(F(m.ChatID(), "mute_already_muted_with_time", locales.Arg{
 				"duration": formatDuration(int(remaining.Seconds())),
 			}))
 		} else {
@@ -77,7 +78,7 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 			}
 			autoUnmuteDuration = time.Duration(seconds) * time.Second
 		} else {
-			m.Reply(F(m.ChatID(), "mute_invalid_format", arg{
+			m.Reply(F(m.ChatID(), "mute_invalid_format", locales.Arg{
 				"cmd": getCommand(m),
 			}))
 			return tg.EndGroup
@@ -92,13 +93,13 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 	}
 
 	if muteErr != nil {
-		m.Reply(F(m.ChatID(), "mute_failed", arg{
+		m.Reply(F(m.ChatID(), "mute_failed", locales.Arg{
 			"error": muteErr.Error(),
 		}))
 		return tg.EndGroup
 	}
 
-	msgArgs := arg{
+	msgArgs := locales.Arg{
 		"title": html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
 		"user":  mention,
 	}

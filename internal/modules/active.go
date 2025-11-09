@@ -23,13 +23,14 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"
+	"main/internal/locales"
 )
 
 func activeHandler(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()
 	chats := len(core.GetAllRoomIDs())
 
-	msg := F(chatID, "active_chats_info", arg{
+	msg := F(chatID, "active_chats_info", locales.Arg{
 		"count": chats,
 	})
 

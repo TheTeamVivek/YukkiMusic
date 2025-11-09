@@ -94,7 +94,7 @@ func langCallbackHandler(cb *telegram.CallbackQuery) error {
 		return telegram.EndGroup
 	}
 
-	msg := F(chatID, "lang_success", arg{"lang_name": langName})
+	msg := F(chatID, "lang_success", locales.Arg{"lang_name": langName})
 	cb.Answer(msg, opt)
 	cb.Edit(msg)
 	return telegram.EndGroup

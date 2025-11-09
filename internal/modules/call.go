@@ -28,6 +28,7 @@ import (
 
 	"main/internal/core"
 	"main/internal/database"
+	"main/internal/locales"
 	"main/internal/platforms"
 	"main/internal/utils"
 	"main/ntgcalls"
@@ -65,7 +66,7 @@ func onStreamEndHandler(chatID int64, streamType ntgcalls.StreamType, streamDevi
 	filePath, err := platforms.Download(context.Background(), t, mystic)
 	if err != nil {
 		gologging.ErrorF("Download failed for %s: %v", t.URL, err)
-		utils.EOR(mystic, F(chatID, "stream_download_fail", arg{
+		utils.EOR(mystic, F(chatID, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
 		}))
 		return
@@ -79,7 +80,7 @@ func onStreamEndHandler(chatID int64, streamType ntgcalls.StreamType, streamDevi
 	title := utils.ShortTitle(t.Title, 25)
 	safeTitle := html.EscapeString(title)
 
-	msgText := F(chatID, "stream_now_playing", arg{
+	msgText := F(chatID, "stream_now_playing", locales.Arg{
 		"url":      t.URL,
 		"title":    safeTitle,
 		"duration": formatDuration(t.Duration),

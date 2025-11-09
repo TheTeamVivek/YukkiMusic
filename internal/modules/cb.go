@@ -33,6 +33,7 @@ import (
 	"main/config"
 	"main/internal/core"
 	"main/internal/database"
+	"main/internal/locales"
 	"main/internal/platforms"
 	"main/internal/state"
 	"main/internal/utils"
@@ -119,7 +120,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 
 	key := fmt.Sprintf("room:%d:%d", cb.Sender.ID, chatID)
 	if remaining := utils.GetFlood(key); remaining > 0 {
-		cb.Answer(F(chatID, "flood_seconds", arg{"duration": remaining.Seconds()}), opt)
+		cb.Answer(F(chatID, "flood_seconds", locales.Arg{"duration": remaining.Seconds()}), opt)
 		return tg.EndGroup
 	}
 	utils.SetFlood(key, 5*time.Second)
@@ -137,7 +138,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 			remaining := r.RemainingResumeDuration()
 			msg := utils.IfElse(
 				remaining > 0,
-				F(chatID, "room_already_paused_auto", arg{
+				F(chatID, "room_already_paused_auto", locales.Arg{
 					"duration": formatDuration(int(remaining.Seconds())),
 				}),
 				F(chatID, "room_already_paused"),
@@ -148,7 +149,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 
 		if _, pauseErr := r.Pause(); pauseErr != nil {
 			gologging.ErrorF("Pause failed: %v", pauseErr)
-			cb.Answer(F(chatID, "room_pause_failed", arg{"error": pauseErr.Error()}), opt)
+			cb.Answer(F(chatID, "room_pause_failed", locales.Arg{"error": pauseErr.Error()}), opt)
 			return tg.EndGroup
 		}
 		if r.IsMuted() {
