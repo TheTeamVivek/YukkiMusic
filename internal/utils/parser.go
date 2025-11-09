@@ -21,7 +21,7 @@ package utils
 
 import (
 	"fmt"
-        "strconv"
+	"strconv"
 	"strings"
 )
 
@@ -41,27 +41,27 @@ func ParseBool(s string) (bool, error) {
 // IntToStr converts any signed integer type to string.
 // Returns empty string if type is unsupported.
 func IntToStr(v any) string {
-        switch n := v.(type) {
-        case int:
-                return strconv.Itoa(n)
-        case int8, int16, int32, int64:
-                return strconv.FormatInt(toInt64(n), 10)
-        default:
-                return ""
-        }
+	switch n := v.(type) {
+	case int:
+		return strconv.Itoa(n)
+	case int8, int16, int32, int64:
+		return strconv.FormatInt(toInt64(n), 10)
+	default:
+		return ""
+	}
 }
 
 func toInt64(v any) int64 {
-        switch n := v.(type) {
-        case int8:
-                return int64(n)
-        case int16:
-                return int64(n)
-        case int32:
-                return int64(n)
-        case int64:
-                return n
-        default:
-                return 0
-        }
+	switch n := v.(type) {
+	case int8:
+		return int64(n)
+	case int16:
+		return int64(n)
+	case int32:
+		return int64(n)
+	case int64:
+		return n
+	default:
+		return 0
+	}
 }
