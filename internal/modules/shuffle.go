@@ -20,11 +20,11 @@
 package modules
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -37,6 +37,7 @@ func cshuffleHandler(m *telegram.NewMessage) error {
 }
 
 func handleShuffle(m *telegram.NewMessage, cplay bool) error {
+	chatID := m.ChannelID()
 	arg := strings.ToLower(m.Args())
 
 	r, err := getEffectiveRoom(m, cplay)
@@ -46,24 +47,24 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	if r.Track == nil {
-		m.Reply("⚠️ No active playback found.")
+		m.Reply(F(chatID, "room_no_active"))
 		return telegram.EndGroup
 	}
 
 	r.Parse()
 
 	if arg == "" {
-		state := "disabled ❌"
+		state := F(chatID, "disabled")
 		cmd := getCommand(m) + " on"
 		if r.Shuffle {
-			state = "enabled ✅"
+			state = F(chatID, "enabled")
 			cmd = getCommand(m) + " off"
 		}
 
-		m.Reply(fmt.Sprintf(
-			"🔀 Currently shuffle is <b>%s</b> for this chat.\n\nUse <code>%s</code> to toggle it.",
-			state, cmd,
-		))
+		m.Reply(F(chatID, "shuffle_current_state", locales.Arg{
+			"state": state,
+			"cmd":   cmd,
+		}))
 		return telegram.EndGroup
 	}
 
@@ -76,11 +77,15 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 
 	r.SetShuffle(newState)
 
-	state := "disabled ❌"
+	state := F(chatID, "disabled")
 	if newState {
-		state = "enabled ✅"
+		state = F(chatID, "enabled")
 	}
 
-	m.Reply(fmt.Sprintf("🔀 Shuffle <b>%s</b> by %s.", state, utils.MentionHTML(m.Sender)))
+	m.Reply(F(chatID, "shuffle_updated", locales.Arg{
+		"state": state,
+		"user":  utils.MentionHTML(m.Sender),
+	}))
+
 	return telegram.EndGroup
 }

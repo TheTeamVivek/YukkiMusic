@@ -25,6 +25,7 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -37,6 +38,8 @@ func creplayHandler(m *telegram.NewMessage) error {
 }
 
 func handleReplay(m *telegram.NewMessage, cplay bool) error {
+	chatID := m.ChannelID()
+
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
@@ -44,16 +47,22 @@ func handleReplay(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	if !r.IsActiveChat() {
-		m.Reply("⚠️ <b>No active playback.</b>\nNothing is playing right now.")
+		m.Reply(F(chatID, "room_no_active"))
 		return telegram.EndGroup
 	}
 
 	if err := r.Replay(); err != nil {
-		m.Reply(fmt.Sprintf("❌ <b>Replay Failed</b>\nError: <code>%v</code>", err))
+		m.Reply(F(chatID, "replay_failed", locales.Arg{
+			"error": err,
+		}))
 	} else {
 		trackTitle := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
 		totalDuration := formatDuration(r.Track.Duration)
-		m.Reply(fmt.Sprintf("🔁 Now replaying:\n\n<b>Title: </b>%s\n🎵 Duration: <code>%s</code>\n⏱️ Speed: %.2fx", trackTitle, totalDuration, r.Speed))
+		m.Reply(F(chatID, "replay_success", locales.Arg{
+			"title":    trackTitle,
+			"duration": totalDuration,
+			"speed":    fmt.Sprintf("%.2f", r.Speed),
+		}))
 	}
 
 	return telegram.EndGroup

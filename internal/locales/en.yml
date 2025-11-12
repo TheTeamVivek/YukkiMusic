@@ -64,6 +64,13 @@ flood_minutes: "⏳ Please wait {duration} minutes before using this command aga
 help_private_only: "🤖 Hi! For bot help and commands, please DM me directly — I'm more responsive in private chats!"
 help_main: "📚 <b>Help Menu</b>\n\nSelect a category below to explore detailed commands and their usage for managing, controlling, and customizing the bot."
 
+jump_no_active: "⚠️ <b>No active track to jump within.</b>"
+jump_usage: "⚠️ Please provide seconds.\nExample: <code>{cmd} 120</code>"
+jump_invalid_position: "⚠️ Invalid position.\nExample: <code>{cmd} 120</code>"
+jump_too_close_end: "⚠️ Cannot jump to <b>{position}</b> — that’s too close to the end of the track."
+jump_failed: "❌ Failed to jump to <b>{position}</b>.\nError: <code>{error}</code>"
+jump_success: "⏩ Jumped to <u>{position}</u> of <u>{duration}</u>."
+
 lang_same: "ℹ️ You’re already using this language."
 lang_select: "🌐 Select your preferred language:"
 lang_fail: "❌ Failed to update language. Please try again later."
@@ -182,6 +189,26 @@ remove_index_too_small: "⚠️ <b>Index must be greater than 0.</b>"
 remove_index_too_big: "⚠️ Invalid index. Queue only has <b>{total}</b> tracks."
 remove_success: "✅ Removed track at position <b>{index}</b> from the queue.\n👤 By: {user}"
 
+# 🔁 Replay
+replay_failed: "❌ <b>Replay Failed</b>\nError: <code>{error}</code>"
+replay_success: |
+  🔁 <b>Now replaying</b>
+
+  🎵 Title: {title}
+  ⏱️ Duration: <code>{duration}</code>
+  ⚙️ Speed: <b>{speed}x</b>
+
+# ▶️ Resume
+resume_already_playing: "ℹ️ <b>Already Playing</b>\nThe music is already playing in this chat.\nWould you like to pause it?"
+resume_failed: "❌ <b>Playback Resume Failed</b>\nError: <code>{error}</code>"
+resume_success: |
+  ▶️ <b>Resuming playback</b>
+
+  🎵 Title: {title}
+  📍 Position: {position} / {duration}
+  👤 Resumed by: {user}
+  {speed_line}
+
 restart: "♻️ Restarting..."
 restart_exepath_fail: "❌ Failed to get executable path: {error}"
 restart_symlink_fail: "❌ Failed to resolve executable path: {error}"
@@ -197,6 +224,17 @@ room_not_linked: "⚠️ This channel isn't linked to any group."
 room_already_paused: "⏸️ Track is already paused. Tap ▶️ Resume to continue."
 room_already_paused_auto: "⏸️ Track is already paused — auto-resuming in {duration}."
 room_pause_failed: "❌ Failed to pause playback.\n\n<i>{error}</i>"
+
+seek_no_active: "⚠️ <b>No track is currently playing.</b>"
+seek_usage: "⚠️ Please provide seconds.\nExample: <code>{cmd} 40</code>"
+seek_invalid_seconds: "⚠️ Invalid seconds value.\nExample: <code>{cmd} 40</code>"
+seek_too_close_start: "⚠️ Cannot seek backward <b>{seconds}</b> seconds — that would be too close to the beginning of the track."
+seek_too_close_end: "⚠️ Cannot seek forward <b>{seconds}</b> seconds — that would be too close to the end of the track."
+seek_failed: "❌ Failed to seek {direction} <b>{seconds}</b> seconds.\nError: <code>{error}</code>"
+seek_success: "{emoji} Jumped {direction} to <u>{position}</u> of <u>{duration}</u>."
+
+shuffle_current_state: "🔀 Currently shuffle is <b>{state}</b> for this chat.\n\nUse <code>{cmd}</code> to toggle it."
+shuffle_updated: "🔀 Shuffle <b>{state}</b> by {user}."
 
 spt_fetch_fail: "⚠️ Failed to fetch network info: <code>{error}</code>"
 spt_servers_fetch_fail: "⚠️ Failed to fetch servers: <code>{error}</code>"

@@ -111,7 +111,6 @@ Examples:
 		code = fmt.Sprintf(`package main
 import (
 	e "eval/eval"
-        "github.com/amarnathcjd/gogram/telegram"
 	"fmt"
 )
 
@@ -122,13 +121,11 @@ func runSnippet() (res any) {
 	call, ntg, Ntg := e.Ntg, e.Ntg, e.Ntg
 	ub, UBot := e.UBot, e.UBot
 	j := e.Client.JSON
-sOpts := &telegram.SendOptions{}
 
 	_ = m; _ = msg; _ = message; _ = M
 	_ = r; _ = client; _ = c; _ = app; _ = bot; _ = Client
 	_ = call; _ = ntg; _ = Ntg; _ = ub; _ = UBot
 	_ = j; _ = fmt.Println
-_ = sOpts
 
 	%s
 

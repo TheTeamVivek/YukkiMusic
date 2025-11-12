@@ -25,6 +25,7 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -37,32 +38,49 @@ func cresumeHandler(m *telegram.NewMessage) error {
 }
 
 func handleResume(m *telegram.NewMessage, cplay bool) error {
+	chatID := m.ChannelID()
+
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
 		return telegram.EndGroup
 	}
+
 	if !r.IsActiveChat() {
-		m.Reply("⚠️ <b>No active playback.</b>\nNothing is playing right now.")
+		m.Reply(F(chatID, "room_no_active"))
 		return telegram.EndGroup
 	}
+
 	if !r.IsPaused() {
-		m.Reply("ℹ️ <b>Already Playing</b>\nThe music is already playing in this chat.\nWould you like to pause it?")
+		m.Reply(F(chatID, "resume_already_playing"))
 		return telegram.EndGroup
 	}
+
 	if _, err := r.Resume(); err != nil {
-		m.Reply(fmt.Sprintf("❌ <b>Playback Resume Failed</b>\nError: <code>%v</code>", err))
+		m.Reply(F(chatID, "resume_failed", locales.Arg{
+			"error": err,
+		}))
 	} else {
 		title := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
 		pos := formatDuration(r.Position)
 		total := formatDuration(r.Track.Duration)
 		mention := utils.MentionHTML(m.Sender)
-		msg := fmt.Sprintf("▶️ Resuming playback:\n\n <b>Title: </b>\"%s\"\n📍 Position: %s / %s\nResumed by: %s", title, pos, total, mention)
 
+		speedLine := ""
 		if sp := r.GetSpeed(); sp != 1.0 {
-			msg += fmt.Sprintf("\n⚙️ Speed: <b>%.2fx</b>", sp)
+			speedLine = F(chatID, "speed_line", locales.Arg{
+				"speed": fmt.Sprintf("%.2f", r.GetSpeed()),
+			})
 		}
-		m.Reply(msg)
+
+		m.Reply(F(chatID, "resume_success", locales.Arg{
+			"title":      title,
+			"position":   pos,
+			"duration":   total,
+			"user":       mention,
+			"speed_line": speedLine,
+		}))
 	}
+
 	return telegram.EndGroup
 }

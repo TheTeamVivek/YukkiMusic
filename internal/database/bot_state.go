@@ -32,26 +32,27 @@ type UsersChats struct {
 	Users []int64 `bson:"users"`
 	Chats []int64 `bson:"chats"`
 }
+type Maintenance struct {
+	Enabled bool   `bson:"enabled,omitempty"`
+	Reason  string `bson:"reason,omitempty"`
+}
 
 type BotState struct {
-	ID            string     `bson:"_id"`
-	Served        UsersChats `bson:"served"`
-	Sudoers       []int64    `bson:"sudoers"`
-	AutoLeave     bool       `bson:"autoleave"`
-	LoggerEnabled bool       `bson:"logger"`
-	Maintenance   bool       `bson:"maintenance"`
-	MaintReason   string     `bson:"maint_reason"`
+	ID            string      `bson:"_id"`
+	Served        UsersChats  `bson:"served"`
+	Sudoers       []int64     `bson:"sudoers"`
+	AutoLeave     bool        `bson:"autoleave"`
+	LoggerEnabled bool        `bson:"logger"`
+	Maintenance   Maintenance `bson:"maint,omitempty"`
 }
 
 const cacheKey = "bot_state"
 
-func defaultState() *BotState {
-	return &BotState{
-		ID:            "global",
-		Served:        UsersChats{Users: []int64{}, Chats: []int64{}},
-		Sudoers:       []int64{},
-		LoggerEnabled: true,
-	}
+var defaultBotState = &BotState{
+	ID:            "global",
+	Served:        UsersChats{Users: []int64{}, Chats: []int64{}},
+	Sudoers:       []int64{},
+	LoggerEnabled: true,
 }
 
 func getBotState(ctx context.Context) (*BotState, error) {
@@ -64,9 +65,8 @@ func getBotState(ctx context.Context) (*BotState, error) {
 	var state BotState
 	err := settingsColl.FindOne(ctx, bson.M{"_id": "global"}).Decode(&state)
 	if err == mongo.ErrNoDocuments {
-		def := defaultState()
-		dbCache.Set(cacheKey, def)
-		return def, nil
+		dbCache.Set(cacheKey, defaultBotState)
+		return defaultBotState, nil
 	} else if err != nil {
 		logger.ErrorF("Failed to get bot state: %v", err)
 		return nil, err
