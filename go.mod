@@ -10,7 +10,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/traefik/yaegi v0.16.1
 	go.mongodb.org/mongo-driver/v2 v2.4.0
-	golang.org/x/text v0.30.0
+	golang.org/x/text v0.31.0
 )
 
 require (
@@ -42,7 +42,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	golang.org/x/crypto v0.43.0 // indirect
 	golang.org/x/net v0.46.0 // indirect
-	golang.org/x/sync v0.17.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/term v0.36.0 // indirect
 )
