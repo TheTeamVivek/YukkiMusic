@@ -51,7 +51,7 @@ func Init(apiID int32, apiHash, token, session string, loggerID int64) func() {
 		notifyStartup(Bot, UBot, loggerID)
 	}
 
-	Ntg = ubot.NewContext(UBot, UbUser)
+	Ntg = ubot.NewContext(UBot)
 
 	return func() {
 		Ntg.Close()
