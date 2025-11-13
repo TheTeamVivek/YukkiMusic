@@ -30,12 +30,8 @@ type Context struct {
 	frameCallbacks        []ntgcalls.FrameCallback
 }
 
-func NewContext(app *tg.Client, u ...*tg.UserObj) *Context {
-	var self *tg.UserObj
+func NewContext(app *tg.Client) *Context {
 
-	if len(u) > 0 && u[0] != nil {
-		self = u[0]
-	}
 	client := &Context{
 		binding:             ntgcalls.NTgCalls(),
 		app:                 app,
@@ -47,17 +43,23 @@ func NewContext(app *tg.Client, u ...*tg.UserObj) *Context {
 		callParticipants:    make(map[int64]*types.CallParticipantsCache),
 		callSources:         make(map[int64]*types.CallSources),
 		waitConnect:         make(map[int64]chan error),
-		self:                self,
 	}
-	if app.IsConnected() && client.self == nil {
-		self, err := app.GetMe()
-		if err != nil {
-			gologging.Fatal(err)
-		}
-		client.self = self
-	}
-	client.handleUpdates()
-	return client
+if app.IsConnected() {
+    me := app.Me()
+
+    if me.ID == 0 {
+        var err error
+        me, err = app.GetMe()
+        if err != nil {
+            gologging.Fatal(err)
+        }
+    }
+
+    client.self = me
+}
+
+client.handleUpdates()
+return client
 }
 
 func (ctx *Context) OnIncomingCall(callback func(client *Context, chatId int64)) {
