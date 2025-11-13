@@ -134,20 +134,20 @@ func Init(c, u *telegram.Client, n *ubot.Context) {
 	u.UpdatesGetState()
 
 	for _, h := range handlers {
-	 c.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...)//.SetGroup("commands")
+	 c.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...).SetGroup(100)
 		
 	}
 
 	for _, h := range cbHandlers {
-		c.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler), h.Filters...).SetGroup("callback")
+		c.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler), h.Filters...).SetGroup(90)
 	}
 
-	c.On("edit:/eval", evalHandle).SetGroup("edit")
-	c.On("edit:/ev", evalCommandHandler).SetGroup("edit")
+	c.On("edit:/eval", evalHandle).SetGroup(80)
+	c.On("edit:/ev", evalCommandHandler).SetGroup(80)
 
-	c.On("participant", handleParticipantUpdate).SetGroup("pu")
+	c.On("participant", handleParticipantUpdate).SetGroup(70)
 
-	c.AddActionHandler(handleActions).SetGroup("service_msg")
+	c.AddActionHandler(handleActions).SetGroup(60)
 
 	n.OnStreamEnd(onStreamEndHandler)
 
