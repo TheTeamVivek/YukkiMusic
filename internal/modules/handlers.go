@@ -135,18 +135,13 @@ func Init(c, u *telegram.Client, n *ubot.Context) {
 
 	for _, h := range handlers {
 		if len(h.Filters) > 0 {
-			c.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...) //.SetGroup("commands")
-		} else {
-			c.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler)) //.SetGroup("commands")
+			c.On("command:"+h.Pattern, SafeMessageHandler(h.Handler), h.Filters...)
+			// c.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...) //.SetGroup("commands")
 		}
 	}
 
 	for _, h := range cbHandlers {
-		if len(h.Filters) > 0 {
-			c.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler), h.Filters...) //.SetGroup("callback")
-		} else {
-			c.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler)) //.SetGroup("callback")
-		}
+		c.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler), h.Filters...) //.SetGroup("callback")
 	}
 
 	c.On("edit:/eval", evalHandle)       //.SetGroup("edit")

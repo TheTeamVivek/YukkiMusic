@@ -45,6 +45,8 @@ func Init(apiID int32, apiHash, token, session string, loggerID int64) func() {
 	UBot = initAssistantClient(apiID, apiHash, session)
 	UbUser = getSelfOrFatal(UBot, "assistant")
 
+	Bot.SetCommandPrefixes("/")
+	UBot.SetCommandPrefixes(".")
 	if loggerID != 0 {
 		notifyStartup(Bot, UBot, loggerID)
 	}
