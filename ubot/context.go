@@ -31,7 +31,6 @@ type Context struct {
 }
 
 func NewContext(app *tg.Client) *Context {
-
 	client := &Context{
 		binding:             ntgcalls.NTgCalls(),
 		app:                 app,
@@ -44,22 +43,22 @@ func NewContext(app *tg.Client) *Context {
 		callSources:         make(map[int64]*types.CallSources),
 		waitConnect:         make(map[int64]chan error),
 	}
-if app.IsConnected() {
-    me := app.Me()
+	if app.IsConnected() {
+		me := app.Me()
 
-    if me.ID == 0 {
-        var err error
-        me, err = app.GetMe()
-        if err != nil {
-            gologging.Fatal(err)
-        }
-    }
+		if me.ID == 0 {
+			var err error
+			me, err = app.GetMe()
+			if err != nil {
+				gologging.Fatal(err)
+			}
+		}
 
-    client.self = me
-}
+		client.self = me
+	}
 
-client.handleUpdates()
-return client
+	client.handleUpdates()
+	return client
 }
 
 func (ctx *Context) OnIncomingCall(callback func(client *Context, chatId int64)) {

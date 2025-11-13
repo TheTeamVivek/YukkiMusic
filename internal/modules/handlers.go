@@ -134,8 +134,7 @@ func Init(c, u *telegram.Client, n *ubot.Context) {
 	u.UpdatesGetState()
 
 	for _, h := range handlers {
-	 c.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...).SetGroup(100)
-		
+		c.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...).SetGroup(100)
 	}
 
 	for _, h := range cbHandlers {
