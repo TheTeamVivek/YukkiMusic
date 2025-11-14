@@ -285,6 +285,14 @@ supergroup_needed: |
   
   If you have any questions, join our support group:
   
+unmute_already: "ℹ️ <b>Already Unmuted</b>\nThe music is not muted in this chat."
+unmute_failed: "❌ <b>Playback Unmute Failed</b>\nError: <code>{error}</code>"
+unmute_success: |
+  🔊 <b>Unmuted playback</b>
+
+  🎵 Track: {title}
+  👤 Unmuted by: {user}
+  {speed_line}
 
 
 # Commands help
