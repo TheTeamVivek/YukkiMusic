@@ -305,10 +305,7 @@ spt_result: |
   Download: <code>{dl_mbps} Mbps</code>
   Upload: <code>{ul_mbps} Mbps</code>
 
-start_private: |
-  ⚡️Pika Pika, {user}!
-  ⚡️ Welcome to <b>{bot}</b>
-  🎶 I’m here to help you play, stream, and manage music right here on Telegram. 🎵
+start_private: "⚡️Pika Pika, {user}!\n\n⚡️ Welcome to <b>{bot}</b>\n🎶 I’m here to help you play, stream, and manage music right here on Telegram. 🎵"
 
 start_group: "<b>💫 I’m here!</b> Try a command… if you think you can handle me 😉"
 
