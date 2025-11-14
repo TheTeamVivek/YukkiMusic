@@ -29,7 +29,7 @@ import (
 var helpTexts = map[string]string{}
 
 func checkForHelpFlag(m *tg.NewMessage) bool {
-    text := strings.Fields(strings.ToLower(strings.TrimSpace(m.Text)))
+    text := strings.Fields(strings.ToLower(strings.TrimSpace(m.Text())))
     for _, t := range text {
         switch t {
         case "-h", "--h", "-help", "--help", "help":
