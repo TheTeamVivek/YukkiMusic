@@ -20,6 +20,7 @@
 package modules
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"html"
@@ -34,8 +35,8 @@ import (
 	"main/config"
 	"main/internal/core"
 	"main/internal/database"
-	"main/internal/locales"
 	"main/internal/state"
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -51,6 +52,8 @@ var (
 func bool_(b bool) *bool {
 	return &b
 }
+
+var downloadCancels = make(map[int64]context.CancelFunc)
 
 func eoe(e error) error {
 	if e != nil {
@@ -71,26 +74,6 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	}
 	r, _ := core.GetRoom(cplayID, true)
 	return r, nil
-}
-
-func getCbChatID(cb *tg.CallbackQuery) (int64, error) {
-	// If private chat, just return sender ID directly
-	if cb.IsPrivate() {
-		return cb.SenderID, nil
-	}
-
-	// Otherwise, fetch the chat/channel info
-	chat, err := cb.GetChannel()
-	if err != nil {
-		return 0, fmt.Errorf("get channel: %w", err)
-	}
-
-	chatID, err := utils.GetPeerID(cb.Client, chat.ID)
-	if err != nil {
-		return 0, fmt.Errorf("get peer ID: %w", err)
-	}
-
-	return chatID, nil
 }
 
 func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
@@ -287,12 +270,7 @@ func SafeCallbackHandler(handler func(*tg.CallbackQuery) error) func(*tg.Callbac
 		if is, _ := database.IsMaintenance(); is {
 			if cb.Sender.ID != config.OwnerID {
 				if ok, _ := database.IsSudo(cb.Sender.ID); !ok {
-					chatID, err := getCbChatID(cb)
-					if err != nil {
-						cb.Answer(FWithLang(config.DefaultLang, "chat_not_recognized"), &tg.CallbackOptions{Alert: true})
-						return tg.EndGroup
-					}
-					cb.Answer(F(chatID, "maint", locales.Arg{"reason": ""}), &tg.CallbackOptions{Alert: true})
+					cb.Answer(F(cb.ChannelID(), "maint", locales.Arg{"reason": ""}), &tg.CallbackOptions{Alert: true})
 					return tg.EndGroup
 				}
 			}

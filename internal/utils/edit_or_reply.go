@@ -24,7 +24,7 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 )
 
-func EOR(msg *telegram.NewMessage, text string, opts ...telegram.SendOptions) (m *telegram.NewMessage, err error) {
+func EOR(msg *telegram.NewMessage, text string, opts ...*telegram.SendOptions) (m *telegram.NewMessage, err error) {
 	m, err = msg.Edit(text, opts...)
 	if err != nil {
 		msg.Delete()

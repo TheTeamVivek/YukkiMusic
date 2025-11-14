@@ -42,6 +42,8 @@ import (
 
 var telegramDLRegex = regexp.MustCompile(`https:\/\/t\.me\/([a-zA-Z0-9_]{5,})\/(\d+)`)
 
+const PlatformFallenApi state.PlatformName = "FallenApi"
+
 type APIResponse struct {
 	CdnUrl string `json:"cdnurl"`
 }
@@ -49,11 +51,11 @@ type APIResponse struct {
 type FallenApiPlatform struct{}
 
 func init() {
-	addPlatform(80, state.PlatformFallenApi, &FallenApiPlatform{})
+	addPlatform(80, PlatformFallenApi, &FallenApiPlatform{})
 }
 
 func (*FallenApiPlatform) Name() state.PlatformName {
-	return state.PlatformFallenApi
+	return PlatformFallenApi
 }
 
 func (*FallenApiPlatform) IsValid(query string) bool {
@@ -68,7 +70,7 @@ func (*FallenApiPlatform) IsDownloadSupported(source state.PlatformName) bool {
 	if config.ApiURL == "" || config.ApiKEY == "" {
 		return false
 	}
-	return source == state.PlatformYouTube
+	return source == PlatformYouTube
 }
 
 func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {

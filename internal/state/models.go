@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package state
 
 import (
@@ -24,6 +25,16 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 )
+
+type Track struct {
+	ID       string
+	Title    string
+	Duration int
+	Artwork  string
+	URL      string
+	BY       string
+	Source   PlatformName
+}
 
 type (
 	PlatformName string
@@ -35,23 +46,4 @@ type (
 		Download(ctx context.Context, track *Track, mystic *telegram.NewMessage) (string, error)
 		IsDownloadSupported(source PlatformName) bool
 	}
-
-	Track struct {
-		ID       string
-		Title    string
-		Duration int
-		Artwork  string
-		URL      string
-		BY       string
-		Source   PlatformName
-	}
 )
-
-const (
-	PlatformYouTube   PlatformName = "YouTube"
-	PlatformTelegram  PlatformName = "Telegram"
-	PlatformFallenApi PlatformName = "FallenApi"
-	PlatformYtDlp     PlatformName = "YtDlp"
-)
-
-var DownloadCancels = make(map[int64]context.CancelFunc)

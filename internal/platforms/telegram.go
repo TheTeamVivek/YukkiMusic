@@ -33,8 +33,8 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"
-	"main/internal/state"
 	"main/internal/utils"
+        "main/internal/state"
 )
 
 type TelegramPlatform struct{}
@@ -45,12 +45,14 @@ var (
 	telegramMsgCache     = make(map[string]*telegram.NewMessage)
 )
 
+const PlatformTelegram state.PlatformName = "Telegram"
+
 func init() {
-	addPlatform(100, state.PlatformTelegram, &TelegramPlatform{})
+	addPlatform(100, PlatformTelegram, &TelegramPlatform{})
 }
 
 func (t *TelegramPlatform) Name() state.PlatformName {
-	return state.PlatformTelegram
+	return PlatformTelegram
 }
 
 func (t *TelegramPlatform) IsValid(query string) bool {
@@ -102,7 +104,7 @@ func (t *TelegramPlatform) GetTracksByMessage(rmsg *telegram.NewMessage) ([]*sta
 		Title:    file.Name,
 		Duration: duration,
 		URL:      rmsg.Link(),
-		Source:   state.PlatformTelegram,
+		Source:   PlatformTelegram,
 	}
 
 	return []*state.Track{track}, nil
@@ -205,5 +207,5 @@ func findDownloadedFile(id string) (string, error) {
 }
 
 func (t *TelegramPlatform) IsDownloadSupported(source state.PlatformName) bool {
-	return source == state.PlatformTelegram
+	return source == PlatformTelegram
 }

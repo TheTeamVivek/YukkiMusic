@@ -35,14 +35,16 @@ import (
 	"main/internal/state"
 )
 
+const PlatformYtDlp state.PlatformName = "YtDlp"
+
 type YtDlpPlatform struct{}
 
 func init() {
-	addPlatform(70, state.PlatformYtDlp, &YtDlpPlatform{})
+	addPlatform(70, PlatformYtDlp, &YtDlpPlatform{})
 }
 
 func (*YtDlpPlatform) Name() state.PlatformName {
-	return state.PlatformYtDlp
+	return PlatformYtDlp
 }
 
 func (*YtDlpPlatform) IsValid(query string) bool {
@@ -54,7 +56,7 @@ func (*YtDlpPlatform) GetTracks(query string) ([]*state.Track, error) {
 }
 
 func (*YtDlpPlatform) IsDownloadSupported(source state.PlatformName) bool {
-	return source == state.PlatformYouTube
+	return source == PlatformYouTube
 }
 
 func (p *YtDlpPlatform) Download(ctx context.Context, track *state.Track, _ *telegram.NewMessage) (string, error) {

@@ -21,7 +21,7 @@ package modules
 
 import (
 	"github.com/Laky-64/gologging"
-	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/config"
 	"main/internal/core"
@@ -30,13 +30,13 @@ import (
 	"main/internal/utils"
 )
 
-func startHandler(m *telegram.NewMessage) error {
-	if m.ChatType() != telegram.EntityUser {
+func startHandler(m *tg.NewMessage) error {
+	if m.ChatType() != tg.EntityUser {
 		database.AddServed(m.ChannelID())
 		m.Reply(
 			F(m.ChannelID(), "start_group"),
 		)
-		return telegram.EndGroup
+		return tg.EndGroup
 	}
 
 	arg := m.Args()
@@ -57,7 +57,7 @@ func startHandler(m *telegram.NewMessage) error {
 			"bot":  utils.MentionHTML(core.BUser),
 		})
 
-		if _, err := m.RespondMedia(config.StartImage, telegram.MediaOptions{
+		if _, err := m.RespondMedia(config.StartImage, &tg.MediaOptions{
 			Caption:     caption,
 			NoForwards:  true,
 			ReplyMarkup: core.GetStartMarkup(),
@@ -67,25 +67,18 @@ func startHandler(m *telegram.NewMessage) error {
 		}
 	}
 
-	return telegram.EndGroup
+	return tg.EndGroup
 }
 
-func startCB(cb *telegram.CallbackQuery) error {
-	opt := &telegram.CallbackOptions{Alert: true}
-
-	chatID, err := getCbChatID(cb)
-	if err != nil {
-		gologging.ErrorF("PeerID error for %v", err)
-		cb.Answer(FWithLang(config.DefaultLang, "chat_not_recognized"), opt)
-		return telegram.EndGroup
-	}
+func startCB(cb *tg.CallbackQuery) error {
 	cb.Answer("")
-	caption := F(chatID, "start_private", locales.Arg{
+
+	caption := F(cb.ChannelID(), "start_private", locales.Arg{
 		"user": utils.MentionHTML(cb.Sender),
 		"bot":  utils.MentionHTML(core.BUser),
 	})
 
-	sendOpt := &telegram.SendOptions{
+	sendOpt := &tg.SendOptions{
 		ReplyMarkup: core.GetStartMarkup(),
 		NoForwards:  true,
 	}
@@ -95,5 +88,5 @@ func startCB(cb *telegram.CallbackQuery) error {
 	}
 
 	cb.Edit(caption, sendOpt)
-	return telegram.EndGroup
+	return tg.EndGroup
 }

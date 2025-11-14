@@ -79,7 +79,7 @@ func pingHandler(m *tg.NewMessage) error {
 	cpuUsage := "N/A"
 	diskUsage := "N/A"
 
-	opt := tg.SendOptions{
+	opt := &tg.SendOptions{
 		ReplyMarkup: core.SuppMarkup(),
 	}
 	if config.PingImage != "" {

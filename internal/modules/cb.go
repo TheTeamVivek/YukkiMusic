@@ -30,12 +30,10 @@ import (
 	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
 	"main/internal/core"
 	"main/internal/database"
 	"main/internal/locales"
 	"main/internal/platforms"
-	"main/internal/state"
 	"main/internal/utils"
 )
 
@@ -43,15 +41,12 @@ import (
 // flood_seconds -> fix float
 
 func cancelHandler(cb *tg.CallbackQuery) error {
-	chatID, err := getCbChatID(cb)
+	chatID := cb.ChannelID()
 	opt := &tg.CallbackOptions{Alert: true}
-	if err != nil {
-		cb.Answer(FWithLang(config.DefaultLang, "chat_not_recognized"), opt)
-		return tg.EndGroup
-	}
-	if cancel, ok := state.DownloadCancels[chatID]; ok {
+
+	if cancel, ok := downloadCancels[chatID]; ok {
 		cancel()
-		delete(state.DownloadCancels, chatID)
+		delete(downloadCancels, chatID)
 		cb.Answer("Download canceled.", opt)
 	} else {
 		cb.Answer("No download to cancel.", opt)
@@ -82,12 +77,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 		return tg.EndGroup
 	}
 
-	chatID, err := getCbChatID(cb)
-	if err != nil {
-		gologging.ErrorF("PeerID error for %v", err)
-		cb.Answer(FWithLang(config.DefaultLang, "chat_not_recognized"), opt)
-		return tg.EndGroup
-	}
+	chatID := cb.ChannelID()
 
 	var r *core.RoomState
 	var ok bool
@@ -266,7 +256,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 			optSend.Media = utils.CleanURL(track.Artwork)
 		}
 
-		mystic, _ = utils.EOR(mystic, msgText, *optSend)
+		mystic, _ = utils.EOR(mystic, msgText, optSend)
 		r.SetMystic(mystic)
 
 		if _, err := cb.Edit(fmt.Sprintf("🔁 Track replayed by %s.", utils.MentionHTML(cb.Sender))); err != nil {
@@ -387,7 +377,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 			opt.Media = utils.CleanURL(t.Artwork)
 		}
 
-		mystic, _ = utils.EOR(mystic, msgText, *opt)
+		mystic, _ = utils.EOR(mystic, msgText, opt)
 
 		if _, err := mystic.Reply(fmt.Sprintf("⏭️ Skipped by %s", mention)); err != nil {
 			gologging.ErrorF("Reply error: %v", err)

@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/config"
@@ -59,22 +58,16 @@ func helpHandler(m *tg.NewMessage) error {
 	}
 
 	if m.ChatType() != tg.EntityUser {
-		m.Reply(F(m.ChannelID(), "help_private_only"), tg.SendOptions{ReplyMarkup: core.GetGroupHelpKeyboard()})
+		m.Reply(F(m.ChannelID(), "help_private_only"), &tg.SendOptions{ReplyMarkup: core.GetGroupHelpKeyboard()})
 		return tg.EndGroup
 	}
 
-	m.Reply(F(m.ChannelID(), "help_main"), tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard()})
+	m.Reply(F(m.ChannelID(), "help_main"), &tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard()})
 	return tg.EndGroup
 }
 
 func helpCB(c *tg.CallbackQuery) error {
-	chatID, err := getCbChatID(c)
-	if err != nil {
-		gologging.ErrorF("getCbChatID error %v", err)
-		c.Answer("⚠️ Chat not recognized.", &tg.CallbackOptions{Alert: true})
-		return tg.EndGroup
-	}
-	c.Edit(F(chatID, "help_main"), &tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard()})
+	c.Edit(F(c.ChannelID(), "help_main"), &tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard()})
 	c.Answer("")
 	return tg.EndGroup
 }
@@ -85,12 +78,7 @@ func helpCallbackHandler(c *tg.CallbackQuery) error {
 	if data == "" {
 		return tg.EndGroup
 	}
-	chatID, err := getCbChatID(c)
-	if err != nil {
-		gologging.ErrorF("getCbChatID error %v", err)
-		c.Answer(FWithLang(config.DefaultLang, "chat_not_recognized"), &tg.CallbackOptions{Alert: true})
-		return tg.EndGroup
-	}
+	chatID := c.ChannelID()
 	parts := strings.SplitN(data, ":", 2)
 	if len(parts) < 2 {
 		return tg.EndGroup

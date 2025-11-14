@@ -36,7 +36,8 @@ import (
 	"main/internal/core"
 	"main/internal/database"
 	"main/internal/platforms"
-	"main/internal/state"
+		"main/internal/state"
+
 	"main/internal/utils"
 )
 
@@ -58,26 +59,26 @@ func cplayHandler(m *telegram.NewMessage) error {
 
 	if len(args) > 1 && args[1] == "--set" {
 		if len(args) < 3 {
-			m.Reply("<b>Usage:</b> <code>/cplay --set &lt;channel_id&gt;</code>", telegram.SendOptions{ParseMode: "HTML"})
+			m.Reply("<b>Usage:</b> <code>/cplay --set &lt;channel_id&gt;</code>", &telegram.SendOptions{ParseMode: "HTML"})
 			return telegram.EndGroup
 		}
 
 		cplayIDStr := args[2]
 		cplayID, err := strconv.ParseInt(cplayIDStr, 10, 64)
 		if err != nil {
-			m.Reply("<b>Invalid Chat ID:</b> Please provide a valid integer ID for the channel.", telegram.SendOptions{ParseMode: "HTML"})
+			m.Reply("<b>Invalid Chat ID:</b> Please provide a valid integer ID for the channel.", &telegram.SendOptions{ParseMode: "HTML"})
 			return telegram.EndGroup
 		}
 
 		peer, err := m.Client.ResolvePeer(cplayID)
 		if err != nil {
-			m.Reply("<b>Failed to resolve peer:</b> Could not fetch channel details. Ensure I can access this channel.", telegram.SendOptions{ParseMode: "HTML"})
+			m.Reply("<b>Failed to resolve peer:</b> Could not fetch channel details. Ensure I can access this channel.", &telegram.SendOptions{ParseMode: "HTML"})
 			return telegram.EndGroup
 		}
 
 		chPeer, ok := peer.(*telegram.InputPeerChannel)
 		if !ok {
-			m.Reply("<b>Invalid Target:</b> The provided ID is not a valid channel.", telegram.SendOptions{ParseMode: "HTML"})
+			m.Reply("<b>Invalid Target:</b> The provided ID is not a valid channel.", &telegram.SendOptions{ParseMode: "HTML"})
 			return telegram.EndGroup
 		}
 
@@ -87,17 +88,17 @@ func cplayHandler(m *telegram.NewMessage) error {
 		})
 		if err != nil || fullChat == nil {
 			gologging.GetLogger("CPlay").ErrorF("Failed to get full channel for cplay ID %d: %v", cplayID, err)
-			m.Reply("<b>Channel Not Accessible:</b> Could not retrieve channel information. Please ensure I am an administrator in the target channel.", telegram.SendOptions{ParseMode: "HTML"})
+			m.Reply("<b>Channel Not Accessible:</b> Could not retrieve channel information. Please ensure I am an administrator in the target channel.", &telegram.SendOptions{ParseMode: "HTML"})
 			return telegram.EndGroup
 		}
 
 		if err := database.SetCPlayID(m.ChannelID(), cplayID); err != nil {
 			gologging.GetLogger("CPlay").ErrorF("Failed to set cplay ID for chat %d: %v", m.ChannelID(), err)
-			m.Reply("<b>Error:</b> Failed to save CPlay settings.", telegram.SendOptions{ParseMode: "HTML"})
+			m.Reply("<b>Error:</b> Failed to save CPlay settings.", &telegram.SendOptions{ParseMode: "HTML"})
 			return err
 		}
 
-		m.Reply(fmt.Sprintf("✅ <b>Channel Play enabled.</b> All <code>/c</code> commands will now work in channel <code>%d</code>.", cplayID), telegram.SendOptions{ParseMode: "HTML"})
+		m.Reply(fmt.Sprintf("✅ <b>Channel Play enabled.</b> All <code>/c</code> commands will now work in channel <code>%d</code>.", cplayID), &telegram.SendOptions{ParseMode: "HTML"})
 		return telegram.EndGroup
 	}
 
@@ -184,7 +185,7 @@ func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 		if len(tracks) == 1 && len(filteredTracks) == 0 {
 			return telegram.EndGroup
 		}
-		<-time.After(1 * time.Second)
+		time.Sleep(1 * time.Second)
 	}
 	tracks = filteredTracks
 	if len(tracks) == 0 {
@@ -202,7 +203,16 @@ func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 		var filePath string
 		if i == 0 && (!isActive || force) {
 			replyMsg, _ = utils.EOR(replyMsg, fmt.Sprintf("📥 Downloading song \"%s\"", title))
-			path, err := platforms.Download(context.Background(), track, replyMsg)
+			ctx, cancel := context.WithCancel(context.Background())
+			downloadCancels[r.ChatID] = cancel
+			defer func() {
+				if _, ok := downloadCancels[r.ChatID]; ok {
+
+					delete(downloadCancels, r.ChatID)
+					cancel()
+				}
+			}()
+			path, err := platforms.Download(ctx, track, replyMsg)
 			if err != nil {
 				if errors.Is(err, context.Canceled) {
 					utils.EOR(replyMsg, fmt.Sprintf("⚠️ Download canceled by %s.", mention))
@@ -263,7 +273,7 @@ func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 		if mainTrack.Artwork != "" {
 			opt.Media = utils.CleanURL(mainTrack.Artwork)
 		}
-		replyMsg, _ = utils.EOR(replyMsg, fmt.Sprintf("<b>🎵 Now Playing:</b>\n\n<b>▫ Track:</b> <a href=\"%s\">%s</a>\n<b>▫ Duration:</b> %s\n<b>▫ Requested by:</b> %s", mainTrack.URL, title, formatDuration(mainTrack.Duration), mention), opt)
+		replyMsg, _ = utils.EOR(replyMsg, fmt.Sprintf("<b>🎵 Now Playing:</b>\n\n<b>▫ Track:</b> <a href=\"%s\">%s</a>\n<b>▫ Duration:</b> %s\n<b>▫ Requested by:</b> %s", mainTrack.URL, title, formatDuration(mainTrack.Duration), mention), &opt)
 		r.SetMystic(replyMsg)
 		if len(tracks) > 1 {
 			var b strings.Builder
@@ -278,9 +288,10 @@ func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 		if len(tracks) == 1 {
 			title := html.EscapeString(utils.ShortTitle(mainTrack.Title, 25))
 			btn := core.GetPlayMarkup(r, true)
-			var opt telegram.SendOptions
-			opt.ParseMode = "HTML"
-			opt.ReplyMarkup = btn
+			opt :=  &telegram.SendOptions{
+			ParseMode: "HTML",
+			ReplyMarkup: btn,
+			}
 			if mainTrack.Artwork != "" {
 				opt.Media = utils.CleanURL(mainTrack.Artwork)
 			}

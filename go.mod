@@ -4,7 +4,7 @@ go 1.24.9
 
 require (
 	github.com/Laky-64/gologging v1.1.0
-	github.com/amarnathcjd/gogram v1.6.5-0.20251113114248-f5e5fdbb3e75
+	github.com/amarnathcjd/gogram v1.6.5-0.20251114185648-ae2b931ff4fa
 	github.com/joho/godotenv v1.5.1
 	github.com/raitonoberu/ytsearch v0.2.0
 	github.com/shirou/gopsutil/v3 v3.24.5

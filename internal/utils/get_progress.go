@@ -50,11 +50,7 @@ func GetProgress(mystic *telegram.NewMessage) *telegram.ProgressManager {
 			pm.GetSpeed(current),
 		)
 
-		if opts != nil {
-			mystic.Edit(text, *opts)
-		} else {
-			mystic.Edit(text)
-		}
+		mystic.Edit(text, opts)
 	})
 
 	return pm

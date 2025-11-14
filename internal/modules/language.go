@@ -49,7 +49,7 @@ func langHandler(m *telegram.NewMessage) error {
 	}
 	kb.NewColumn(2, btns...)
 
-	_, err = m.Reply(F(chatID, "lang_select"), telegram.SendOptions{ReplyMarkup: kb.Build()})
+	_, err = m.Reply(F(chatID, "lang_select"), &telegram.SendOptions{ReplyMarkup: kb.Build()})
 	if err != nil {
 		return err
 	}
@@ -66,11 +66,7 @@ func langCallbackHandler(cb *telegram.CallbackQuery) error {
 	}
 	lang := parts[1]
 
-	chatID, err := getCbChatID(cb)
-	if err != nil {
-		cb.Answer(F(chatID, "chat_not_recognized"), opt)
-		return telegram.EndGroup
-	}
+	chatID := cb.ChannelID()
 	if isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); err != nil || !isAdmin {
 		cb.Answer(
 			"⚠️Only admins can do this actions.",

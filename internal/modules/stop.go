@@ -21,6 +21,9 @@ package modules
 
 import (
 	"github.com/amarnathcjd/gogram/telegram"
+
+	"main/internal/locales"
+	"main/internal/utils"
 )
 
 func stopHandler(m *telegram.NewMessage) error {

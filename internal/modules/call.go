@@ -87,7 +87,7 @@ func onStreamEndHandler(chatID int64, streamType ntgcalls.StreamType, streamDevi
 		"by":       t.BY,
 	})
 
-	opt := telegram.SendOptions{
+	opt := &telegram.SendOptions{
 		ParseMode:   "HTML",
 		ReplyMarkup: core.GetPlayMarkup(r, false),
 	}

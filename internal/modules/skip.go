@@ -107,7 +107,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		"by":       t.BY,
 	})
 
-	opt := telegram.SendOptions{
+	opt := &telegram.SendOptions{
 		ParseMode:   "HTML",
 		ReplyMarkup: core.GetPlayMarkup(r, false),
 	}

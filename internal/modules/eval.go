@@ -179,7 +179,7 @@ func main() {
 		file, _ := os.Create("output.txt")
 		defer file.Close()
 		io.WriteString(file, output)
-		m.ReplyMedia(file.Name(), telegram.MediaOptions{Caption: "Output"})
+		m.ReplyMedia(file.Name(), &telegram.MediaOptions{Caption: "Output"})
 		os.Remove(file.Name())
 		return nil
 	}

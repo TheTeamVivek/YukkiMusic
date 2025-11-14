@@ -65,7 +65,7 @@ func MonitorRooms() {
 				}
 
 				markup := core.GetPlayMarkup(r, false)
-				opts := telegram.SendOptions{
+				opts := &telegram.SendOptions{
 					ReplyMarkup: markup,
 					Entities:    mystic.Message.Entities,
 				}

@@ -26,10 +26,12 @@ import (
 	"main/internal/state"
 )
 
-type regEntry struct {
-	platform state.Platform
-	priority int
-}
+type (
+	regEntry struct {
+		platform state.Platform
+		priority int
+	}
+)
 
 var (
 	registry = make(map[state.PlatformName]regEntry)

@@ -68,6 +68,7 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 		utils.AddChatAdmin(p.Client, chatID, p.UserID())
 	}
 
+	handleSudoJoin(p)
 	return nil
 }
 
@@ -187,6 +188,20 @@ func handleDemotion(p *telegram.ParticipantUpdate, chatID int64) {
 		return
 	}
 	utils.RemoveChatAdmin(p.Client, chatID, p.UserID())
+}
+
+func handleSudoJoin(p *telegram.ParticipantUpdate) {
+	var text string
+
+	if p.UserID() == config.OwnerID {
+		text = "👑 " + utils.MentionHTML(p.User) + " — owner of " + utils.MentionHTML(core.BUser) + " — just entered the chat."
+	} else if database.IsSudoWithoutError(p.UserID()) {
+		text = "🛡️ " + utils.MentionHTML(p.User) + ", a sudo user of " + utils.MentionHTML(core.BUser) + ", just joined the chat."
+	}
+
+	if text != "" {
+		p.Client.SendMessage(p.ChannelID(), text)
+	}
 }
 
 func handleGroupCallAction(m *telegram.NewMessage, chatID int64, action *telegram.MessageActionGroupCall, isMaintenance bool) error {

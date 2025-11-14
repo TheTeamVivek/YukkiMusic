@@ -239,7 +239,7 @@ func evalHandle(m *telegram.NewMessage) error {
 
 	resp, isfile := performEval(code, m, imports)
 	if isfile {
-		if _, err := m.ReplyMedia(resp, telegram.MediaOptions{Caption: "Output"}); err != nil {
+		if _, err := m.ReplyMedia(resp, &telegram.MediaOptions{Caption: "Output"}); err != nil {
 			m.Reply("Error: " + err.Error())
 		}
 		return nil
@@ -380,7 +380,7 @@ func jsonHandle(m *telegram.NewMessage) error {
 			return nil
 		}
 
-		_, err = m.ReplyMedia(tmpFile.Name(), telegram.MediaOptions{Caption: "Message JSON"})
+		_, err = m.ReplyMedia(tmpFile.Name(), &telegram.MediaOptions{Caption: "Message JSON"})
 		if err != nil {
 			m.Reply("Error: " + err.Error())
 		}

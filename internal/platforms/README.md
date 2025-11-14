@@ -54,12 +54,12 @@ For example:
 
 ## 🧩 **The Platform Interface**
 
-To create a new platform, implement the `state.Platform` interface (found in `internal/state/models.go`):
+To create a new platform, implement the `Platform` interface (found in `platforms/registry.go`):
 
 ```go
 type Platform interface {
     // A unique name for the platform.
-    Name() PlatformName
+    Name() state.PlatformName
 
     // Checks if this platform can return a track for given query.
     IsValid(query string) bool
@@ -68,12 +68,13 @@ type Platform interface {
     GetTracks(query string) ([]*Track, error)
 
     // Checks if downloading is supported from a given source.
-    IsDownloadSupported(source PlatformName) bool
+    IsDownloadSupported(source state.PlatformName) bool
 
     // Downloads a track and returns the local file path.
     Download(ctx context.Context, track *Track, mystic *telegram.NewMessage) (string, error)
 }
 ```
+Everything (type, constants, logic) stays inside the `platforms` package.
 
 ---
 
@@ -83,31 +84,14 @@ Adding a new platform is easy! Just follow these simple steps. 🌱
 
 ---
 
-### 🪪 **1. Define a Platform Constant**
-
-Add your new platform constant inside `internal/state/models.go`:
-
-```go
-// internal/state/models.go
-
-const (
-    PlatformYouTube     PlatformName = "YouTube"
-    PlatformTelegram    PlatformName = "Telegram"
-    // ... other platforms
-    PlatformMyPlatform  PlatformName = "MyPlatform" // 🆕 Add yours here!
-)
-```
-
----
-
-### 📁 **2. Create a New File**
+### 📁 **1. Create a New File**
 
 Create a new Go file for your platform:  
 `internal/platforms/my_platform.go`
 
 ---
 
-### 🧱 **3. Define Your Platform Struct**
+### 🧱 **2. Define Your Platform Struct**
 
 Define the structure for your platform — include API keys or clients if needed.
 
@@ -120,8 +104,10 @@ import (
     "context"
     
     "github.com/amarnathcjd/gogram/telegram"
-    
-    "github.com/TheTeamVivek/YukkiMusic/internal/state"
+)
+
+const (
+    PlatformMyPlatform state.PlatformName = "MyPlatform"
 )
 
 type MyPlatform struct {
@@ -131,13 +117,14 @@ type MyPlatform struct {
 
 ---
 
-### 🧩 **4. Implement the Platform Interface**
+### 🧩 **3. Implement the Platform Interface**
 
 Implement all interface methods step by step:
 
 ```go
+
 func (p *MyPlatform) Name() state.PlatformName {
-    return state.PlatformMyPlatform
+    return PlatformMyPlatform
 }
 
 func (p *MyPlatform) IsValid(query string) bool {
@@ -152,7 +139,7 @@ func (p *MyPlatform) GetTracks(query string) ([]*state.Track, error) {
 
 func (p *MyPlatform) IsDownloadSupported(source state.PlatformName) bool {
     // 💾 Can this platform download the song for source
-    return source == state.PlatformMyPlatform // yep this can Download song of its
+    return source == PlatformMyPlatform // yep, this can Download song of PlatformMyPlatform
 }
 
 func (p *MyPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
@@ -164,7 +151,7 @@ func (p *MyPlatform) Download(ctx context.Context, track *state.Track, mystic *t
 
 ---
 
-### 🧩 **5. Register Your Platform**
+### 🧩 **4. Register Your Platform**
 
 Finally, register your platform so the bot recognizes it!  
 Pick a **priority value** wisely.  
@@ -173,7 +160,7 @@ Pick a **priority value** wisely.
 ```go
 func init() {
     priority := 85 // ⚡ Example: between YouTube (90) and Telegram (100)
-    AddPlatform(priority, state.PlatformMyPlatform, &MyPlatform{})
+    AddPlatform(priority, PlatformMyPlatform, &MyPlatform{})
 }
 ```
 

@@ -50,11 +50,13 @@ var (
 	youtubeCache     = utils.NewCache[string, []*state.Track](1 * time.Hour)
 )
 
+const PlatformYouTube state.PlatformName = "YouTube"
+
 func init() {
-	addPlatform(90, state.PlatformYouTube, &YouTubePlatform{})
+	addPlatform(90, PlatformYouTube, &YouTubePlatform{})
 }
 
-func (*YouTubePlatform) Name() state.PlatformName { return state.PlatformYouTube }
+func (*YouTubePlatform) Name() state.PlatformName { return PlatformYouTube }
 func (*YouTubePlatform) IsValid(link string) bool { return youtubeLinkRegex.MatchString(link) }
 
 func (yp *YouTubePlatform) GetTracks(query string) ([]*state.Track, error) {
@@ -174,7 +176,7 @@ func (yp *YouTubePlatform) VideoSearch(query string, singleOpt ...bool) ([]*stat
 						Duration: v.Duration,
 						Artwork:  thumb,
 						URL:      v.URL,
-						Source:   state.PlatformYouTube,
+						Source:   PlatformYouTube,
 					}
 					tracks = append(tracks, t)
 					if single {
@@ -292,7 +294,7 @@ func parseSearchResults(node interface{}, tracks *[]*state.Track) {
 				ID:       id,
 				Artwork:  thumb,
 				Duration: duration,
-				Source:   state.PlatformYouTube,
+				Source:   PlatformYouTube,
 			})
 		} else {
 			for _, child := range v {

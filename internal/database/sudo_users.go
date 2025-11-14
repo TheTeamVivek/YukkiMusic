@@ -32,6 +32,11 @@ func GetSudoers() ([]int64, error) {
 	return state.Sudoers, nil
 }
 
+func IsSudoWithoutError(id int64) ( bool) {
+	is, _ := IsSudo(id)
+	return is
+}
+
 // IsSudo checks if the given ID is a sudoer.
 func IsSudo(id int64) (bool, error) {
 	ctx, cancel := mongoCtx()
