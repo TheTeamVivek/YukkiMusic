@@ -38,10 +38,10 @@ func handleStop(m *telegram.NewMessage, cplay bool) error {
 		return telegram.EndGroup
 	}
 	if !r.IsActiveChat() {
-		m.Reply("⚠️ <b>No active playback.</b>\nNothing is playing right now.")
+		m.Reply(F(m.ChannelID(), "room_no_active"))
 		return telegram.EndGroup
 	}
 	r.Destroy()
-	m.Reply("⏹️ <b>Playback stopped and cleared.</b>")
+	m.Reply(F(m.ChannelID(), "stopped", locales.Arg{"user": utils.MentionHTML(m.Sender)}))
 	return telegram.EndGroup
 }
