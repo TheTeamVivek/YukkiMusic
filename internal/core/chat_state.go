@@ -218,30 +218,79 @@ func setInviteLinkIfNeeded(s *ChatState, chat *telegram.ChannelFull) {
 }
 
 func updateAssistantStatus(s *ChatState, chatID int64) error {
-	member, err := Bot.GetChatMember(chatID, UbUser.ID)
-	if err != nil {
-		return handleMemberFetchError(s, err)
-	}
+        member, err := Bot.GetChatMember(chatID, UbUser.ID)
+        if err != nil {
+                if errors.Is(err, ErrFetchFailed) {
+                        if triggerAssistantStartIfNeeded(err) {
+                                member, err = Bot.GetChatMember(chatID, UbUser.ID)
+                                if err != nil {
+                                        return handleMemberFetchError(s, err)
+                                }
+                                return applyMemberStatus(s, member)
+                        }
+                }
+                return handleMemberFetchError(s, err)
+        }
 
-	if member == nil {
-		s.SetAssistantPresence(boolToPtr(false))
-		s.SetAssistantBanned(boolToPtr(false))
-		return nil
-	}
-
-	switch member.Status {
-	case telegram.Kicked, telegram.Restricted:
-		s.SetAssistantPresence(boolToPtr(false))
-		s.SetAssistantBanned(boolToPtr(true))
-	case telegram.Left:
-		s.SetAssistantPresence(boolToPtr(false))
-		s.SetAssistantBanned(boolToPtr(false))
-	case telegram.Admin, telegram.Member:
-		s.SetAssistantPresence(boolToPtr(true))
-		s.SetAssistantBanned(boolToPtr(false))
-	}
-	return nil
+        return applyMemberStatus(s, member)
 }
+
+func applyMemberStatus(s *ChatState, member *telegram.ChatMember) error {
+        if member == nil {
+                s.SetAssistantPresence(boolToPtr(false))
+                s.SetAssistantBanned(boolToPtr(false))
+                return nil
+        }
+
+        switch member.Status {
+        case telegram.Kicked, telegram.Restricted:
+                s.SetAssistantPresence(boolToPtr(false))
+                s.SetAssistantBanned(boolToPtr(true))
+        case telegram.Left:
+                s.SetAssistantPresence(boolToPtr(false))
+                s.SetAssistantBanned(boolToPtr(false))
+        case telegram.Admin, telegram.Member:
+                s.SetAssistantPresence(boolToPtr(true))
+                s.SetAssistantBanned(boolToPtr(false))
+        }
+
+        return nil
+}
+
+func triggerAssistantStartIfNeeded(err error) bool {
+        if !idMatchesAssistant(err, UbUser.ID) {
+                return false
+        }
+
+        _, sendErr := UBot.SendMessage(BUser.ID, "/start")
+        if sendErr == nil {
+                return true
+        }
+
+        _, sendErr = UBot.SendMessage(BUser.Username, "/start")
+        if sendErr == nil {
+                return true
+        }
+
+        if config.LoggerID != 0 {
+                UBot.SendMessage(config.LoggerID,
+                        "⚠️ Unable to get assistant state. Please start the bot with assistant id")
+        }
+
+        if config.OwnerID != 0 {
+                UBot.SendMessage(config.OwnerID,
+                        "⚠️ Unable to get assistant state. Please start the bot with assistant id")
+        }
+
+        return false
+}
+
+func idMatchesAssistant(err error, assistantID int64) bool {
+        raw := err.Error()
+        idStr := strconv.FormatInt(assistantID, 10)
+        return strings.Contains(raw, idStr)
+}
+
 
 func handleMemberFetchError(s *ChatState, err error) error {
 	switch {
