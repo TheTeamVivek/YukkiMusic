@@ -236,6 +236,8 @@ seek_success: "{emoji} Jumped {direction} to <u>{position}</u> of <u>{duration}<
 shuffle_current_state: "🔀 Currently shuffle is <b>{state}</b> for this chat.\n\nUse <code>{cmd}</code> to toggle it."
 shuffle_updated: "🔀 Shuffle <b>{state}</b> by {user}."
 
+skip_stopped: "⏹️ Playback stopped. Queue is empty.\nSkipped by: {user}"
+
 spt_fetch_fail: "⚠️ Failed to fetch network info: <code>{error}</code>"
 spt_servers_fetch_fail: "⚠️ Failed to fetch servers: <code>{error}</code>"
 spt_best_server_fail: "⚠️ Failed to find best server: <code>{error}</code>"
