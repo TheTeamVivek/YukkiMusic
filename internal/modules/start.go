@@ -31,55 +31,70 @@ import (
 	"main/internal/utils"
 )
 
-var startMSG = "⚡️Pika Pika, %s!\n⚡️  Welcome to <b>%s</b> \n🎶  I’m here to help you play, stream, and manage music right here on Telegram. 🎵"
-
 func startHandler(m *telegram.NewMessage) error {
-	if m.ChatType() != telegram.EntityUser {
-		database.AddServed(m.ChannelID())
-		m.Reply("🎶 I'm all set!\n▶️ Drop a command to light up the chat with music.")
-		return telegram.EndGroup
-	}
+        if m.ChatType() != telegram.EntityUser {
+                database.AddServed(m.ChannelID())
+                m.Reply(
+                        F(m.ChannelID(), "start_group"),
+                )
+                return telegram.EndGroup
+        }
 
-	arg := m.Args()
-	database.AddServed(m.ChannelID(), true)
+        arg := m.Args()
+        database.AddServed(m.ChannelID(), true)
 
-	if arg != "" {
-		gologging.Info("Got Start parameter: " + arg + "in ChatID: " + utils.IntToStr(m.ChannelID()))
-	}
+        if arg != "" {
+                gologging.Info("Got Start parameter: " + arg + " in ChatID: " + utils.IntToStr(m.ChannelID()))
+        }
 
-	switch arg {
-	case "help":
-		gologging.Info("User requested help via start param")
-		helpHandler(m)
+        switch arg {
+        case "help":
+                gologging.Info("User requested help via start param")
+                helpHandler(m)
 
-	default:
-		caption := fmt.Sprintf(startMSG, utils.MentionHTML(m.Sender), utils.MentionHTML(core.BUser))
-		if _, err := m.RespondMedia(config.StartImage, telegram.MediaOptions{
-			Caption:     caption,
-			NoForwards:  true,
-			ReplyMarkup: core.GetStartMarkup(),
-		}); err != nil {
-			gologging.Error("Error sending start media: " + err.Error())
-			return err
-		}
-	}
+        default:
+                caption := F(m.ChannelID(), "start_private", locales.Arg{
+                        "user": utils.MentionHTML(m.Sender),
+                        "bot":  utils.MentionHTML(core.BUser),
+                })
 
-	return telegram.EndGroup
+                if _, err := m.RespondMedia(config.StartImage, telegram.MediaOptions{
+                        Caption:     caption,
+                        NoForwards:  true,
+                        ReplyMarkup: core.GetStartMarkup(),
+                }); err != nil {
+                        gologging.Error("Error sending start media: " + err.Error())
+                        return err
+                }
+        }
+
+        return telegram.EndGroup
 }
 
-func startCB(c *telegram.CallbackQuery) error {
-	c.Answer("")
+func startCB(cb *telegram.CallbackQuery) error {
+        opt := &telegram.CallbackOptions{Alert: true}
 
-	caption := fmt.Sprintf(startMSG, utils.MentionHTML(c.Sender), utils.MentionHTML(core.BUser))
+        chatID, err := getCbChatID(cb)
+        if err != nil {
+                gologging.ErrorF("PeerID error for %v", err)
+                cb.Answer(FWithLang(config.DefaultLang, "chat_not_recognized"), opt)
+                return telegram.EndGroup
+        }
+        cb.Answer("")
+        caption := F(chatID, "start_private", locales.Arg{
+                "user": utils.MentionHTML(cb.Sender),
+                "bot":  utils.MentionHTML(core.BUser),
+        })
 
-	opt := &telegram.SendOptions{
-		ReplyMarkup: core.GetStartMarkup(),
-		NoForwards:  true,
-	}
+        sendOpt := &telegram.SendOptions{
+                ReplyMarkup: core.GetStartMarkup(),
+                NoForwards:  true,
+        }
 
-	if config.StartImage != "" {
-		opt.Media = config.StartImage
-	}
-	c.Edit(caption, opt)
-	return telegram.EndGroup
+        if config.StartImage != "" {
+                sendOpt.Media = config.StartImage
+        }
+
+        cb.Edit(caption, sendOpt)
+        return telegram.EndGroup
 }
