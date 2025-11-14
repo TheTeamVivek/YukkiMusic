@@ -83,7 +83,7 @@ func GetPlayMarkup(r *RoomState, queued bool) tg.ReplyMarkup {
 func GetGroupHelpKeyboard() *tg.ReplyInlineMarkup {
 	return tg.NewKeyboard().
 		AddRow(
-			tg.Button.URL("📒 Commands", "https://t.me/"+BUser.Username+"?start=help"),
+			tg.Button.URL("📒 Commands", "https://t.me/"+BUser.Username+"?start=pm_help"),
 		).
 		Build()
 }
