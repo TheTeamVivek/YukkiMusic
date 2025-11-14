@@ -31,7 +31,7 @@ import (
 
 func handleLogger(m *telegram.NewMessage) error {
 	args := strings.Fields(m.Text())
-	chatID := m.ChatID()
+	chatID := m.ChannelID()
 
 	current, dbErr := database.IsLoggerEnabled()
 
