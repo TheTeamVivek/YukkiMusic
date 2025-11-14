@@ -28,6 +28,7 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -40,137 +41,137 @@ func cspeedHandler(m *telegram.NewMessage) error {
 }
 
 func handleSpeed(m *telegram.NewMessage, cplay bool) error {
-        r, err := getEffectiveRoom(m, cplay)
-        if err != nil {
-                m.Reply(err.Error())
-                return telegram.EndGroup
-        }
+	r, err := getEffectiveRoom(m, cplay)
+	if err != nil {
+		m.Reply(err.Error())
+		return telegram.EndGroup
+	}
 
-        chatID := m.ChannelID()
+	chatID := m.ChannelID()
 
-        if !r.IsActiveChat() {
-                m.Reply(F(chatID, "room_no_active"))
-                return telegram.EndGroup
-        }
+	if !r.IsActiveChat() {
+		m.Reply(F(chatID, "room_no_active"))
+		return telegram.EndGroup
+	}
 
-        args := strings.Fields(m.Text())
+	args := strings.Fields(m.Text())
 
-        // No args -> show current speed or usage hint
-        if len(args) < 2 {
-                if r.Speed != 1.0 {
-                        remaining := r.RemainingSpeedDuration()
-                        if remaining > 0 {
-                                m.Reply(F(chatID, "speed_current_with_reset", locales.Arg{
-                                        "speed":    fmt.Sprintf("%.2f", r.Speed),
-                                        "title":    html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
-                                        "duration": formatDuration(int(remaining.Seconds())),
-                                        "cmd":      getCommand(m),
-                                }))
-                        } else {
-                                m.Reply(F(chatID, "speed_current", locales.Arg{
-                                        "speed": fmt.Sprintf("%.2f", r.Speed),
-                                        "title": html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
-                                        "cmd":   getCommand(m),
-                                }))
-                        }
-                } else {
-                        m.Reply(F(chatID, "speed_usage", locales.Arg{
-                                "cmd": getCommand(m),
-                        }))
-                }
-                return telegram.EndGroup
-        }
+	// No args -> show current speed or usage hint
+	if len(args) < 2 {
+		if r.Speed != 1.0 {
+			remaining := r.RemainingSpeedDuration()
+			if remaining > 0 {
+				m.Reply(F(chatID, "speed_current_with_reset", locales.Arg{
+					"speed":    fmt.Sprintf("%.2f", r.Speed),
+					"title":    html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
+					"duration": formatDuration(int(remaining.Seconds())),
+					"cmd":      getCommand(m),
+				}))
+			} else {
+				m.Reply(F(chatID, "speed_current", locales.Arg{
+					"speed": fmt.Sprintf("%.2f", r.Speed),
+					"title": html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
+					"cmd":   getCommand(m),
+				}))
+			}
+		} else {
+			m.Reply(F(chatID, "speed_usage", locales.Arg{
+				"cmd": getCommand(m),
+			}))
+		}
+		return telegram.EndGroup
+	}
 
-        // Parse speed
-        raw := strings.ToLower(strings.TrimSpace(args[1]))
-        raw = strings.TrimSuffix(raw, "x")
-        raw = strings.TrimSuffix(raw, "×")
+	// Parse speed
+	raw := strings.ToLower(strings.TrimSpace(args[1]))
+	raw = strings.TrimSuffix(raw, "x")
+	raw = strings.TrimSuffix(raw, "×")
 
-        var newSpeed float64
-        if raw == "normal" || raw == "reset" || raw == "default" {
-                newSpeed = 1.0
-        } else {
-                s, err := strconv.ParseFloat(raw, 64)
-                if err != nil {
-                        m.Reply(F(chatID, "speed_invalid_value", locales.Arg{
-                                "cmd": getCommand(m),
-                        }))
-                        return telegram.EndGroup
-                }
-                if s < 0.50 || s > 4.0 {
-                        m.Reply(F(chatID, "speed_invalid_range"))
-                        return telegram.EndGroup
-                }
-                newSpeed = s
-        }
+	var newSpeed float64
+	if raw == "normal" || raw == "reset" || raw == "default" {
+		newSpeed = 1.0
+	} else {
+		s, err := strconv.ParseFloat(raw, 64)
+		if err != nil {
+			m.Reply(F(chatID, "speed_invalid_value", locales.Arg{
+				"cmd": getCommand(m),
+			}))
+			return telegram.EndGroup
+		}
+		if s < 0.50 || s > 4.0 {
+			m.Reply(F(chatID, "speed_invalid_range"))
+			return telegram.EndGroup
+		}
+		newSpeed = s
+	}
 
-        // Parse auto-reset duration
-        var resetDuration time.Duration
-        if len(args) >= 3 {
-                d := strings.ToLower(strings.TrimSpace(args[2]))
-                d = strings.TrimSuffix(d, "s")
+	// Parse auto-reset duration
+	var resetDuration time.Duration
+	if len(args) >= 3 {
+		d := strings.ToLower(strings.TrimSpace(args[2]))
+		d = strings.TrimSuffix(d, "s")
 
-                seconds, err := strconv.Atoi(d)
-                if err != nil || seconds < 5 || seconds > 3600 {
-                        m.Reply(F(chatID, "speed_invalid_duration"))
-                        return telegram.EndGroup
-                }
-                resetDuration = time.Duration(seconds) * time.Second
-        }
+		seconds, err := strconv.Atoi(d)
+		if err != nil || seconds < 5 || seconds > 3600 {
+			m.Reply(F(chatID, "speed_invalid_duration"))
+			return telegram.EndGroup
+		}
+		resetDuration = time.Duration(seconds) * time.Second
+	}
 
-        // Same speed → give info
-        if newSpeed == r.Speed {
-                if resetDuration == 0 {
-                        m.Reply(F(chatID, "speed_already_set", locales.Arg{
-                                "speed": fmt.Sprintf("%.2f", newSpeed),
-                                "title": html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
-                        }))
-                } else if newSpeed != 1.0 {
-                        m.Reply(F(chatID, "speed_already_set_reset_hint", locales.Arg{
-                                "speed": fmt.Sprintf("%.2f", newSpeed),
-                                "title": html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
-                                "cmd":   getCommand(m),
-                        }))
-                }
-                return telegram.EndGroup
-        }
+	// Same speed → give info
+	if newSpeed == r.Speed {
+		if resetDuration == 0 {
+			m.Reply(F(chatID, "speed_already_set", locales.Arg{
+				"speed": fmt.Sprintf("%.2f", newSpeed),
+				"title": html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
+			}))
+		} else if newSpeed != 1.0 {
+			m.Reply(F(chatID, "speed_already_set_reset_hint", locales.Arg{
+				"speed": fmt.Sprintf("%.2f", newSpeed),
+				"title": html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
+				"cmd":   getCommand(m),
+			}))
+		}
+		return telegram.EndGroup
+	}
 
-        // Apply speed
-        var setErr error
-        if resetDuration > 0 && newSpeed != 1.0 {
-                setErr = r.SetSpeed(newSpeed, resetDuration)
-        } else {
-                setErr = r.SetSpeed(newSpeed)
-        }
+	// Apply speed
+	var setErr error
+	if resetDuration > 0 && newSpeed != 1.0 {
+		setErr = r.SetSpeed(newSpeed, resetDuration)
+	} else {
+		setErr = r.SetSpeed(newSpeed)
+	}
 
-        if setErr != nil {
-                m.Reply(F(chatID, "speed_failed", locales.Arg{
-                        "speed": fmt.Sprintf("%.2f", newSpeed),
-                        "error": setErr.Error(),
-                }))
-                return telegram.EndGroup
-        }
+	if setErr != nil {
+		m.Reply(F(chatID, "speed_failed", locales.Arg{
+			"speed": fmt.Sprintf("%.2f", newSpeed),
+			"error": setErr.Error(),
+		}))
+		return telegram.EndGroup
+	}
 
-        mention := utils.MentionHTML(m.Sender)
+	mention := utils.MentionHTML(m.Sender)
 
-        if newSpeed == 1.0 {
-                m.Reply(F(chatID, "speed_reset_success", locales.Arg{
-                        "user": mention,
-                }))
-        } else {
-                if resetDuration > 0 {
-                        m.Reply(F(chatID, "speed_set_with_reset", locales.Arg{
-                                "speed":    fmt.Sprintf("%.2f", newSpeed),
-                                "user":     mention,
-                                "duration": int(resetDuration.Seconds()),
-                        }))
-                } else {
-                        m.Reply(F(chatID, "speed_set", locales.Arg{
-                                "speed": fmt.Sprintf("%.2f", newSpeed),
-                                "user":  mention,
-                        }))
-                }
-        }
+	if newSpeed == 1.0 {
+		m.Reply(F(chatID, "speed_reset_success", locales.Arg{
+			"user": mention,
+		}))
+	} else {
+		if resetDuration > 0 {
+			m.Reply(F(chatID, "speed_set_with_reset", locales.Arg{
+				"speed":    fmt.Sprintf("%.2f", newSpeed),
+				"user":     mention,
+				"duration": int(resetDuration.Seconds()),
+			}))
+		} else {
+			m.Reply(F(chatID, "speed_set", locales.Arg{
+				"speed": fmt.Sprintf("%.2f", newSpeed),
+				"user":  mention,
+			}))
+		}
+	}
 
-        return telegram.EndGroup
+	return telegram.EndGroup
 }

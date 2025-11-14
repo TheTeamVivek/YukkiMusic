@@ -20,81 +20,80 @@
 package modules
 
 import (
-	"fmt"
-
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/config"
 	"main/internal/core"
 	"main/internal/database"
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
 func startHandler(m *telegram.NewMessage) error {
-        if m.ChatType() != telegram.EntityUser {
-                database.AddServed(m.ChannelID())
-                m.Reply(
-                        F(m.ChannelID(), "start_group"),
-                )
-                return telegram.EndGroup
-        }
+	if m.ChatType() != telegram.EntityUser {
+		database.AddServed(m.ChannelID())
+		m.Reply(
+			F(m.ChannelID(), "start_group"),
+		)
+		return telegram.EndGroup
+	}
 
-        arg := m.Args()
-        database.AddServed(m.ChannelID(), true)
+	arg := m.Args()
+	database.AddServed(m.ChannelID(), true)
 
-        if arg != "" {
-                gologging.Info("Got Start parameter: " + arg + " in ChatID: " + utils.IntToStr(m.ChannelID()))
-        }
+	if arg != "" {
+		gologging.Info("Got Start parameter: " + arg + " in ChatID: " + utils.IntToStr(m.ChannelID()))
+	}
 
-        switch arg {
-        case "help":
-                gologging.Info("User requested help via start param")
-                helpHandler(m)
+	switch arg {
+	case "help":
+		gologging.Info("User requested help via start param")
+		helpHandler(m)
 
-        default:
-                caption := F(m.ChannelID(), "start_private", locales.Arg{
-                        "user": utils.MentionHTML(m.Sender),
-                        "bot":  utils.MentionHTML(core.BUser),
-                })
+	default:
+		caption := F(m.ChannelID(), "start_private", locales.Arg{
+			"user": utils.MentionHTML(m.Sender),
+			"bot":  utils.MentionHTML(core.BUser),
+		})
 
-                if _, err := m.RespondMedia(config.StartImage, telegram.MediaOptions{
-                        Caption:     caption,
-                        NoForwards:  true,
-                        ReplyMarkup: core.GetStartMarkup(),
-                }); err != nil {
-                        gologging.Error("Error sending start media: " + err.Error())
-                        return err
-                }
-        }
+		if _, err := m.RespondMedia(config.StartImage, telegram.MediaOptions{
+			Caption:     caption,
+			NoForwards:  true,
+			ReplyMarkup: core.GetStartMarkup(),
+		}); err != nil {
+			gologging.Error("Error sending start media: " + err.Error())
+			return err
+		}
+	}
 
-        return telegram.EndGroup
+	return telegram.EndGroup
 }
 
 func startCB(cb *telegram.CallbackQuery) error {
-        opt := &telegram.CallbackOptions{Alert: true}
+	opt := &telegram.CallbackOptions{Alert: true}
 
-        chatID, err := getCbChatID(cb)
-        if err != nil {
-                gologging.ErrorF("PeerID error for %v", err)
-                cb.Answer(FWithLang(config.DefaultLang, "chat_not_recognized"), opt)
-                return telegram.EndGroup
-        }
-        cb.Answer("")
-        caption := F(chatID, "start_private", locales.Arg{
-                "user": utils.MentionHTML(cb.Sender),
-                "bot":  utils.MentionHTML(core.BUser),
-        })
+	chatID, err := getCbChatID(cb)
+	if err != nil {
+		gologging.ErrorF("PeerID error for %v", err)
+		cb.Answer(FWithLang(config.DefaultLang, "chat_not_recognized"), opt)
+		return telegram.EndGroup
+	}
+	cb.Answer("")
+	caption := F(chatID, "start_private", locales.Arg{
+		"user": utils.MentionHTML(cb.Sender),
+		"bot":  utils.MentionHTML(core.BUser),
+	})
 
-        sendOpt := &telegram.SendOptions{
-                ReplyMarkup: core.GetStartMarkup(),
-                NoForwards:  true,
-        }
+	sendOpt := &telegram.SendOptions{
+		ReplyMarkup: core.GetStartMarkup(),
+		NoForwards:  true,
+	}
 
-        if config.StartImage != "" {
-                sendOpt.Media = config.StartImage
-        }
+	if config.StartImage != "" {
+		sendOpt.Media = config.StartImage
+	}
 
-        cb.Edit(caption, sendOpt)
-        return telegram.EndGroup
+	cb.Edit(caption, sendOpt)
+	return telegram.EndGroup
 }

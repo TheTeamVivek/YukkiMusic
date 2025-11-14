@@ -25,6 +25,7 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -37,48 +38,48 @@ func cunmuteHandler(m *telegram.NewMessage) error {
 }
 
 func handleUnmute(m *telegram.NewMessage, cplay bool) error {
-        r, err := getEffectiveRoom(m, cplay)
-        if err != nil {
-                m.Reply(err.Error())
-                return telegram.EndGroup
-        }
+	r, err := getEffectiveRoom(m, cplay)
+	if err != nil {
+		m.Reply(err.Error())
+		return telegram.EndGroup
+	}
 
-        chatID := m.ChannelID()
+	chatID := m.ChannelID()
 
-        if !r.IsActiveChat() {
-                m.Reply(F(chatID, "room_no_active"))
-                return telegram.EndGroup
-        }
+	if !r.IsActiveChat() {
+		m.Reply(F(chatID, "room_no_active"))
+		return telegram.EndGroup
+	}
 
-        if !r.IsMuted() {
-                m.Reply(F(chatID, "unmute_already"))
-                return telegram.EndGroup
-        }
+	if !r.IsMuted() {
+		m.Reply(F(chatID, "unmute_already"))
+		return telegram.EndGroup
+	}
 
-        title := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
-        mention := utils.MentionHTML(m.Sender)
+	title := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
+	mention := utils.MentionHTML(m.Sender)
 
-        if _, err := r.Unmute(); err != nil {
-                m.Reply(F(chatID, "unmute_failed", locales.Arg{
-                        "error": err.Error(),
-                }))
-                return telegram.EndGroup
-        }
+	if _, err := r.Unmute(); err != nil {
+		m.Reply(F(chatID, "unmute_failed", locales.Arg{
+			"error": err.Error(),
+		}))
+		return telegram.EndGroup
+	}
 
-        // optional speed line
-        var speedOpt string
-        if sp := r.GetSpeed(); sp != 1.0 {
-                speedOpt = F(chatID, "speed_line", locales.Arg{
-                        "speed": fmt.Sprintf("%.2f", sp),
-                })
-        }
+	// optional speed line
+	var speedOpt string
+	if sp := r.GetSpeed(); sp != 1.0 {
+		speedOpt = F(chatID, "speed_line", locales.Arg{
+			"speed": fmt.Sprintf("%.2f", sp),
+		})
+	}
 
-        msg := F(chatID, "unmute_success", locales.Arg{
-                "title":               title,
-                "user":                mention,
-                "speed_line": speedOpt,
-        })
+	msg := F(chatID, "unmute_success", locales.Arg{
+		"title":      title,
+		"user":       mention,
+		"speed_line": speedOpt,
+	})
 
-        m.Reply(msg)
-        return telegram.EndGroup
+	m.Reply(msg)
+	return telegram.EndGroup
 }
