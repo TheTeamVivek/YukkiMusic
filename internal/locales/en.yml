@@ -238,6 +238,46 @@ shuffle_updated: "🔀 Shuffle <b>{state}</b> by {user}."
 
 skip_stopped: "⏹️ Playback stopped. Queue is empty.\nSkipped by: {user}"
 
+speed_usage: |
+  💡 <b>Usage:</b>
+  <code>{cmd} [speed] [duration]</code> — change playback speed
+  
+  Allowed speed range: <b>0.50x → 4.00x</b>
+  Duration (optional) resets the speed after given seconds.
+  
+  Example:
+  <code>{cmd} 1.25 45</code> — play at 1.25x for 45 seconds.
+
+speed_current: "🎧 <b>Current Speed:</b> <code>{speed}x</code> for 🎵 <u>{title}</u>\n\n💡 Use <code>{cmd} reset</code> to restore normal playback."
+
+speed_current_with_reset: |
+  🎧 <b>Current Speed:</b> <code>{speed}x</code>
+
+  🎵 <b>Track:</b> <i>{title}</i>
+  ⏳ <b>Auto-reset in:</b> {duration}
+  
+  💡 Use <code>{cmd} reset</code> to restore normal playback instantly.
+
+speed_invalid_value: "❌ Invalid speed value.\nExample: <code>{cmd} 1.5</code> or <code>{cmd} 2x</code>"
+speed_invalid_range: "⚠️ Speed must be between <b>0.50x</b> and <b>4.00x</b>."
+speed_invalid_duration: "⚠️ Invalid duration. It must be between <b>5</b> and <b>3600</b> seconds."
+
+speed_already_set: "ℹ️ Playback speed is already <b>{speed}x</b> for 🎵 <b>{title}</b>"
+
+speed_already_set_reset_hint: "ℹ️ Playback speed is already <b>{speed}x</b> for 🎵 <b>{title}</b>\n\n💡 Use <code>{cmd} reset</code> to return to normal speed."
+
+speed_failed: |
+  ❌ Failed to change speed to <b>{speed}x</b>.
+  Error: <code>{error}</code>
+
+speed_reset_success: "✅ Playback speed reset to <b>1.0x</b> by {user}"
+
+speed_set: "🚀 Playback speed set to <b>{speed}x</b> by {user}."
+speed_set_with_reset: |
+  🚀 Playback speed set to <b>{speed}x</b> by {user}.
+  ⏳ Will reset to normal after <b>{duration}</b> seconds.
+
+
 spt_fetch_fail: "⚠️ Failed to fetch network info: <code>{error}</code>"
 spt_servers_fetch_fail: "⚠️ Failed to fetch servers: <code>{error}</code>"
 spt_best_server_fail: "⚠️ Failed to find best server: <code>{error}</code>"
