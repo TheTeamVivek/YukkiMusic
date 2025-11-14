@@ -3,7 +3,7 @@ FROM golang:1.25.3-bookworm AS builder
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+    apt-get install -y \
         git \
         gcc \
         unzip \
@@ -25,7 +25,7 @@ RUN chmod +x setup_ntgcalls.sh && \
 FROM debian:bookworm-slim
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+    apt-get install -y \
         ffmpeg \
         wget \
         zlib1g && \
