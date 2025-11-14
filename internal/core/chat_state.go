@@ -235,7 +235,7 @@ func updateAssistantStatus(s *ChatState, chatID int64) error {
         return applyMemberStatus(s, member)
 }
 
-func applyMemberStatus(s *ChatState, member *telegram.ChatMember) error {
+func applyMemberStatus(s *ChatState, member *telegram.Participant) error {
         if member == nil {
                 s.SetAssistantPresence(boolToPtr(false))
                 s.SetAssistantBanned(boolToPtr(false))
