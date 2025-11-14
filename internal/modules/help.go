@@ -59,7 +59,7 @@ func helpHandler(m *tg.NewMessage) error {
 	}
 
 	if m.ChatType() != tg.EntityUser {
-		m.Reply(F(m.ChannelID(), "help_private_only"))
+		m.Reply(F(m.ChannelID(), "help_private_only"), &tg.SendOptions{ReplyMarkup: core.GetGroupHelpKeyboard()})
 		return tg.EndGroup
 	}
 
