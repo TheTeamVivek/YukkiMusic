@@ -233,6 +233,8 @@ seek_too_close_end: "⚠️ Cannot seek forward <b>{seconds}</b> seconds — tha
 seek_failed: "❌ Failed to seek {direction} <b>{seconds}</b> seconds.\nError: <code>{error}</code>"
 seek_success: "{emoji} Jumped {direction} to <u>{position}</u> of <u>{duration}</u>."
 
+stopped: "⏹️ <b>Playback stopped and cleared by {user}.</b>"
+
 shuffle_current_state: "🔀 Currently shuffle is <b>{state}</b> for this chat.\n\nUse <code>{cmd}</code> to toggle it."
 shuffle_updated: "🔀 Shuffle <b>{state}</b> by {user}."
 
