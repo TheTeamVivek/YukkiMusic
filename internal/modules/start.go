@@ -47,7 +47,7 @@ func startHandler(m *telegram.NewMessage) error {
 	}
 
 	switch arg {
-	case "help":
+	case "pm_help":
 		gologging.Info("User requested help via start param")
 		helpHandler(m)
 
