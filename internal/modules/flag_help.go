@@ -29,10 +29,15 @@ import (
 var helpTexts = map[string]string{}
 
 func checkForHelpFlag(m *tg.NewMessage) bool {
-	text := strings.ToLower(strings.TrimSpace(m.Text()))
-	return strings.Contains(text, " --help") || strings.Contains(text, " -h") || strings.Contains(text, " help")
+    text := strings.Fields(strings.ToLower(strings.TrimSpace(m.Text)))
+    for _, t := range text {
+        switch t {
+        case "-h", "--h", "-help", "--help", "help":
+            return true
+        }
+    }
+    return false
 }
-
 func showHelpFor(m *tg.NewMessage, cmd string) error {
 	help, ok := helpTexts[cmd]
 	if !ok {
