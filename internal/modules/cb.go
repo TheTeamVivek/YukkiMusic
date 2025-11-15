@@ -44,6 +44,14 @@ func cancelHandler(cb *tg.CallbackQuery) error {
 	chatID := cb.ChannelID()
 	opt := &tg.CallbackOptions{Alert: true}
 
+        if isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); err != nil || !isAdmin {
+                cb.Answer(
+                        F(chatID, "only_admin_or_auth_cb"),
+                        opt,
+                )
+                return tg.EndGroup
+        }
+
 	if cancel, ok := downloadCancels[chatID]; ok {
 		cancel()
 		delete(downloadCancels, chatID)
