@@ -4,7 +4,7 @@ go 1.24.9
 
 require (
 	github.com/Laky-64/gologging v1.1.0
-	github.com/amarnathcjd/gogram v1.6.5-0.20251114185648-ae2b931ff4fa
+	github.com/amarnathcjd/gogram v1.6.5-0.20251115134840-f3bd87a026c5
 	github.com/joho/godotenv v1.5.1
 	github.com/raitonoberu/ytsearch v0.2.0
 	github.com/shirou/gopsutil/v3 v3.24.5
@@ -14,7 +14,6 @@ require (
 	golang.org/x/text v0.31.0
 	gopkg.in/yaml.v3 v3.0.1
 	resty.dev/v3 v3.0.0-beta.3
-
 )
 
 require (
