@@ -119,7 +119,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 	if mystic != nil {
 		newMystic, _ = utils.EOR(mystic, msg, opt)
 	} else {
-		newMystic, _ = core.Bot.SendMessage(chatID, msg, &opt)
+		newMystic, _ = core.Bot.SendMessage(chatID, msg, opt)
 	}
 
 	if newMystic != nil {
