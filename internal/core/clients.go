@@ -64,6 +64,7 @@ func initBotClient(apiID int32, apiHash, token string) *telegram.Client {
 	client, err := telegram.NewClient(telegram.ClientConfig{
 		AppID:     apiID,
 		AppHash:   apiHash,
+  Logger: telegram.WrapSimpleLogger(GetTgLogger("gogram", telegram.LogError)),
 		LogLevel:  telegram.LogError,
 		ParseMode: "HTML",
 		Session:   "bot.session",
