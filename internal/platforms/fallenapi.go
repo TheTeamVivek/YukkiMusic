@@ -158,7 +158,11 @@ func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, filePath
 	defer out.Close()
 
 	_, err = io.Copy(out, resp.Body)
-	return err
+	if err != nil {
+        os.Remove(filePath)
+        return err
+  }
+	return nil
 }
 
 func (f *FallenApiPlatform) downloadFromTelegram(ctx context.Context, dlURL, videoId string, pm *telegram.ProgressManager) (string, error) {
@@ -180,26 +184,19 @@ func (f *FallenApiPlatform) downloadFromTelegram(ctx context.Context, dlURL, vid
 
 	rawFile := filepath.Join("downloads", videoId+msg.File.Ext)
 
-	dOpts := &telegram.DownloadOptions{FileName: rawFile, Threads: 3}
+	dOpts := &telegram.DownloadOptions{
+	  FileName: rawFile, 
+	  Threads: 3,
+	  Ctx: ctx,
+	}
 	if pm != nil {
 		dOpts.ProgressManager = pm
 	}
-
-	done := make(chan error)
-	go func() {
-		_, err := msg.Download(dOpts)
-		done <- err
-	}()
-
-	select {
-	case <-ctx.Done():
-		return "", ctx.Err()
-	case err := <-done:
-		if err != nil {
-			return "", fmt.Errorf("telegram download failed: %w", err)
-		}
+	_, err := msg.Download(dOpts)
+	if err != nil {
+	  os.Remove(rawFile)
+		return "", err
 	}
-
 	return rawFile, nil
 }
 

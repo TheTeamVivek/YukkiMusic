@@ -111,88 +111,67 @@ func (t *TelegramPlatform) GetTracksByMessage(rmsg *telegram.NewMessage) ([]*sta
 }
 
 func (t *TelegramPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
-	downloadsDir := "downloads"
-	if err := os.MkdirAll(downloadsDir, os.ModePerm); err != nil {
-		return "", fmt.Errorf("⚠️ TelegramPlatform error: can't create Downloads folder: %v", err)
-	}
+    downloadsDir := "downloads"
+    if err := os.MkdirAll(downloadsDir, os.ModePerm); err != nil {
+        return "", fmt.Errorf("⚠️ TelegramPlatform error: can't create Downloads folder: %v", err)
+    }
 
-	ext := ".webm"
-	if ext2 := filepath.Ext(track.Title); ext2 != "" {
-		ext = ext2
-	}
-	rawFile := filepath.Join(downloadsDir, fmt.Sprintf("%s%s", track.ID, ext))
+    ext := ".webm"
+    if ext2 := filepath.Ext(track.Title); ext2 != "" {
+        ext = ext2
+    }
+    rawFile := filepath.Join(downloadsDir, fmt.Sprintf("%s%s", track.ID, ext))
 
-	// check if file already exists
-	if path, err := findDownloadedFile(track.ID); err == nil && path != "" {
-		if track.Duration == 0 {
-			if dur, err := utils.GetDurationByFFProbe(path); err == nil {
-				track.Duration = dur
-			} else {
-				log.Printf("Failed to get duration using ffprobe: %v", err)
-			}
-		}
-		return path, nil
-	}
+    if path, err := findDownloadedFile(track.ID); err == nil && path != "" {
+        if track.Duration == 0 {
+            if dur, err := utils.GetDurationByFFProbe(path); err == nil {
+                track.Duration = dur
+            }
+        }
+        return path, nil
+    }
 
-	dOpts := &telegram.DownloadOptions{FileName: rawFile}
-	if mystic != nil {
-		dOpts.ProgressManager = utils.GetProgress(mystic)
-	}
+    dOpts := &telegram.DownloadOptions{
+        FileName: rawFile,
+        Ctx:      ctx,
+    }
+    if mystic != nil {
+        dOpts.ProgressManager = utils.GetProgress(mystic)
+    }
 
-	downloadFn := func() (string, error) {
-		if msg, ok := telegramMsgCache[track.ID]; ok {
-			return msg.Download(dOpts)
-		}
+    var path string
+    var err error
 
-		file, err := telegram.ResolveBotFileID(track.ID)
-		if err != nil {
-			return "", fmt.Errorf("⚠️ TelegramPlatform error: failed to locate file: %v", err)
-		}
-		return core.Bot.DownloadMedia(file, dOpts)
-	}
+    if msg, ok := telegramMsgCache[track.ID]; ok {
+        path, err = msg.Download(dOpts)
+    } else {
+        file, ferr := telegram.ResolveBotFileID(track.ID)
+        if ferr != nil {
+            return "", fmt.Errorf("⚠️ TelegramPlatform error: failed to locate file: %v", ferr)
+        }
+        path, err = core.Bot.DownloadMedia(file, dOpts)
+    }
 
-	resultCh := make(chan struct {
-		path string
-		err  error
-	}, 1)
+    if err != nil {
+        if errors.Is(err, context.Canceled) {
+            os.Remove(rawFile)
+            return "", err
+        }
+        os.Remove(rawFile)
+        return "", fmt.Errorf("⚠️ TelegramPlatform error: download failed: %v", err)
+    }
 
-	go func() {
-		path, err := downloadFn()
-		resultCh <- struct {
-			path string
-			err  error
-		}{path, err}
-	}()
+    if _, statErr := os.Stat(rawFile); statErr != nil {
+        return "", fmt.Errorf("unable to get downloaded file: %v", statErr)
+    }
 
-	select {
-	case <-ctx.Done():
-		if _, statErr := os.Stat(rawFile); statErr == nil {
-			_ = os.Remove(rawFile)
-		}
-		return "", fmt.Errorf("⚠️ TelegramPlatform error: download cancelled: %v", ctx.Err())
+    if track.Duration == 0 {
+        if dur, err := utils.GetDurationByFFProbe(path); err == nil {
+            track.Duration = dur
+        }
+    }
 
-	case res := <-resultCh:
-		if res.err != nil {
-			if _, statErr := os.Stat(rawFile); statErr == nil {
-				_ = os.Remove(rawFile)
-			}
-			return "", fmt.Errorf("⚠️ TelegramPlatform error: download failed: %v", res.err)
-		}
-
-		if _, statErr := os.Stat(rawFile); statErr != nil {
-			return "", fmt.Errorf("unable to get downloaded file: %v", statErr)
-		}
-
-		if track.Duration == 0 {
-			if dur, err := utils.GetDurationByFFProbe(res.path); err == nil {
-				track.Duration = dur
-			} else {
-				log.Printf("Failed to get duration using ffprobe: %v", err)
-			}
-		}
-
-		return res.path, nil
-	}
+    return path, nil
 }
 
 func findDownloadedFile(id string) (string, error) {
