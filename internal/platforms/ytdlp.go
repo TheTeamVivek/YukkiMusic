@@ -104,7 +104,7 @@ func (p *YtDlpPlatform) Download(ctx context.Context, track *state.Track, _ *tel
 			track.URL, err, outStr, errStr,
 		)
 		return "", fmt.Errorf("yt-dlp error: %w\nstdout: %s\nstderr: %s", err, outStr, errStr)
-}
+	}
 
 	return filePath, nil
 }

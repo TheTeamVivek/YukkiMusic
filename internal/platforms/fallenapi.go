@@ -159,9 +159,9 @@ func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, filePath
 
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
-        os.Remove(filePath)
-        return err
-  }
+		os.Remove(filePath)
+		return err
+	}
 	return nil
 }
 
@@ -185,16 +185,16 @@ func (f *FallenApiPlatform) downloadFromTelegram(ctx context.Context, dlURL, vid
 	rawFile := filepath.Join("downloads", videoId+msg.File.Ext)
 
 	dOpts := &telegram.DownloadOptions{
-	  FileName: rawFile, 
-	  Threads: 3,
-	  Ctx: ctx,
+		FileName: rawFile,
+		Threads:  3,
+		Ctx:      ctx,
 	}
 	if pm != nil {
 		dOpts.ProgressManager = pm
 	}
 	_, err := msg.Download(dOpts)
 	if err != nil {
-	  os.Remove(rawFile)
+		os.Remove(rawFile)
 		return "", err
 	}
 	return rawFile, nil
