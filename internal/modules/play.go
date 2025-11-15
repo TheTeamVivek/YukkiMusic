@@ -36,8 +36,7 @@ import (
 	"main/internal/core"
 	"main/internal/database"
 	"main/internal/platforms"
-		"main/internal/state"
-
+	"main/internal/state"
 	"main/internal/utils"
 )
 
@@ -288,9 +287,9 @@ func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 		if len(tracks) == 1 {
 			title := html.EscapeString(utils.ShortTitle(mainTrack.Title, 25))
 			btn := core.GetPlayMarkup(r, true)
-			opt :=  &telegram.SendOptions{
-			ParseMode: "HTML",
-			ReplyMarkup: btn,
+			opt := &telegram.SendOptions{
+				ParseMode:   "HTML",
+				ReplyMarkup: btn,
 			}
 			if mainTrack.Artwork != "" {
 				opt.Media = utils.CleanURL(mainTrack.Artwork)

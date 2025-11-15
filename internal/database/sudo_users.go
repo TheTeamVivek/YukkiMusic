@@ -32,7 +32,7 @@ func GetSudoers() ([]int64, error) {
 	return state.Sudoers, nil
 }
 
-func IsSudoWithoutError(id int64) ( bool) {
+func IsSudoWithoutError(id int64) bool {
 	is, _ := IsSudo(id)
 	return is
 }

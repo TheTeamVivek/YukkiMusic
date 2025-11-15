@@ -33,8 +33,8 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"
+	"main/internal/state"
 	"main/internal/utils"
-        "main/internal/state"
 )
 
 type TelegramPlatform struct{}

@@ -35,8 +35,8 @@ import (
 	"main/config"
 	"main/internal/core"
 	"main/internal/database"
-	"main/internal/state"
 	"main/internal/locales"
+	"main/internal/state"
 	"main/internal/utils"
 )
 
