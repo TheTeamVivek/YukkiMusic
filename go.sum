@@ -2,6 +2,8 @@ github.com/Laky-64/gologging v1.1.0 h1:iV/VgoIbImLrI3EPssOzzoyv1OQrp6t5RtDQTKzUe
 github.com/Laky-64/gologging v1.1.0/go.mod h1:Ody93tsM0OZUAsWApkfb3rg35fAvyZDAx07kNH13DhI=
 github.com/amarnathcjd/gogram v1.6.5-0.20251115134840-f3bd87a026c5 h1:kQh3dmkzUC2yuw4J3SavQjyiKfdGisQppfCKA7zYNFg=
 github.com/amarnathcjd/gogram v1.6.5-0.20251115134840-f3bd87a026c5/go.mod h1:R6oIfyidP7PqzskDl13P+pFY0ObPXTBzQyQfWo+GCjU=
+github.com/amarnathcjd/gogram v1.6.5-0.20251115145605-88f35a548e71 h1:agCk3ta3UuKtj8T55RcSIBcvVSlqbd6pUPAkMi1ed9E=
+github.com/amarnathcjd/gogram v1.6.5-0.20251115145605-88f35a548e71/go.mod h1:R6oIfyidP7PqzskDl13P+pFY0ObPXTBzQyQfWo+GCjU=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1 h1:HwpRHbFMcZLEVr42D4p7XBqjyuxQH5SMiErDT4WkJ2k=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1/go.mod h1:uYgXzlJ7ZpABp8OJ+exZzJJhRNQ2ASbcXHWsFqH8hp8=
 github.com/charmbracelet/colorprofile v0.3.3 h1:DjJzJtLP6/NZ8p7Cgjno0CKGr7wwRJGxWUwh2IyhfAI=
