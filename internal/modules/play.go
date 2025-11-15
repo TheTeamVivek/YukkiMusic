@@ -206,7 +206,7 @@ var opt *telegram.SendOption
 
 if track.Duration > 420 {
 
-opt = &telegram.SendOption{ReplyMarkup: core.GetCancekKeyboard())}
+opt = &telegram.SendOption{ReplyMarkup: core.GetCancekKeyboard()}
 
 }
 			replyMsg, _ = utils.EOR(replyMsg, fmt.Sprintf("📥 Downloading song \"%s\"", title), opt)
