@@ -192,7 +192,7 @@ func (f *FallenApiPlatform) downloadFromTelegram(ctx context.Context, dlURL, vid
 	if pm != nil {
 		dOpts.ProgressManager = pm
 	}
-	_, err := msg.Download(dOpts)
+	_, err = msg.Download(dOpts)
 	if err != nil {
 		os.Remove(rawFile)
 		return "", err
