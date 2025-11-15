@@ -202,11 +202,11 @@ func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 		var filePath string
 		if i == 0 && (!isActive || force) {
 
-var opt *telegram.SendOption
+var opt *telegram.SendOptions
 
 if track.Duration > 420 {
 
-opt = &telegram.SendOption{ReplyMarkup: core.GetCancekKeyboard()}
+opt = &telegram.SendOptions{ReplyMarkup: core.GetCancekKeyboard()}
 
 }
 			replyMsg, _ = utils.EOR(replyMsg, fmt.Sprintf("📥 Downloading song \"%s\"", title), opt)
