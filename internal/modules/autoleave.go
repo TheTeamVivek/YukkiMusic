@@ -138,8 +138,8 @@ func startAutoLeave() {
 			for _, chatID := range core.GetAllRoomIDs() {
 				exists[chatID] = struct{}{}
 			}
-
-			dialogCh, errCh := core.UBot.IterDialogs(&tg.DialogOptions{Limit: int32(limit * 2)})
+			iterCtx, iterCancel := context.WithCancel(context.Background())
+			dialogCh, errCh := core.UBot.IterDialogs(&tg.DialogOptions{Limit: int32(limit * 3), Context: iterCtx})
 			leaveCount := 0
 
 		loop:
@@ -202,6 +202,7 @@ func startAutoLeave() {
 					return
 				}
 			}
+			iterCancel()
 
 		case <-autoLeaveCtx.Done():
 			return
