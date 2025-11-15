@@ -23,6 +23,7 @@ import (
 	"io"
 
 	"github.com/Laky-64/gologging"
+	"github.com/amarnathcjd/gogram/telegram"
 )
 
 type TgLogger struct {
