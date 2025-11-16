@@ -197,7 +197,7 @@ func (ctx *Context) handleUpdates() {
 	ctx.app.AddRawHandler(&tg.UpdateGroupCall{}, func(m tg.Update, c *tg.Client) error {
 		updateGroupCall := m.(*tg.UpdateGroupCall)
 		if groupCallRaw := updateGroupCall.Call; groupCallRaw != nil {
-			chatID, err := ctx.parseChatId(updateGroupCall.ChatID)
+			chatID, err := ctx.parseChatId(updateGroupCall.Peer)
 			if err != nil {
 				return err
 			}
