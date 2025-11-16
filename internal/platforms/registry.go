@@ -47,14 +47,6 @@ func addPlatform(priority int, name state.PlatformName, p state.Platform) {
 	}
 }
 
-func getPlatform(name state.PlatformName) (state.Platform, bool) {
-	entry, ok := registry[name]
-	if !ok {
-		return nil, false
-	}
-	return entry.platform, true
-}
-
 func getOrderedPlatforms() []state.Platform {
 	platforms := make([]regEntry, 0, len(registry))
 	for _, entry := range registry {
