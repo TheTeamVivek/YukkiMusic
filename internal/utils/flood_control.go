@@ -30,8 +30,3 @@ func SetFlood(key string, duration time.Duration) {
 
 	floodMap[key] = time.Now().Add(duration)
 }
-
-// CanAct returns true if the key is allowed to act (cooldown expired).
-func CanAct(key string) bool {
-	return GetFlood(key) <= 0
-}
