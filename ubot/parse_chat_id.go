@@ -32,6 +32,15 @@ func (ctx *Context) parseChatId(chatId any) (int64, error) {
 		case *tg.Channel:
 			parsedChatId = -1000000000000 - chat.ID
 		}
+        case tg.Peer:
+                switch v.(type) {
+                case *tg.PeerUser:
+                        parsedChatId = v.(*tg.PeerUser).UserID
+                case *tg.PeerChat:
+                        parsedChatId = -v.(*tg.PeerChat).ChatID
+                case *tg.PeerChannel:
+                        parsedChatId = -1000000000000 - v.(*tg.PeerChannel).ChannelID
+                }
 	default:
 		return 0, fmt.Errorf("unsupported chatId type: %T", chatId)
 	}
