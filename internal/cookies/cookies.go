@@ -22,15 +22,14 @@ package cookies
 
 import (
 	"fmt"
-	"io"
 	"math/rand"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 
 	"github.com/Laky-64/gologging"
+	"resty.dev/v3"
 
 	"main/config"
 )
@@ -57,24 +56,22 @@ func Init() {
 func downloadCookieFile(url string) error {
 	id := filepath.Base(url)
 	rawURL := "https://batbin.me/raw/" + id
-
-	resp, err := http.Get(rawURL)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected status code %d from %s", resp.StatusCode, rawURL)
-	}
 	filePath := filepath.Join("internal/cookies", id+".txt")
-	file, err := os.Create(filePath)
+
+	client := resty.New()
+	resp, err := client.R().
+		SetOutputFileName(filePath).
+		Get(rawURL)
+
 	if err != nil {
 		return err
 	}
-	defer file.Close()
 
-	_, err = io.Copy(file, resp.Body)
-	return err
+	if resp.IsError() {
+		return fmt.Errorf("unexpected status code %d from %s", resp.StatusCode(), rawURL)
+	}
+
+	return nil
 }
 
 func GetRandomCookieFile() (string, error) {
