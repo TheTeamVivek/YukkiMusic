@@ -21,11 +21,8 @@ package platforms
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -33,6 +30,7 @@ import (
 	"strconv"
 
 	"github.com/amarnathcjd/gogram/telegram"
+	"resty.dev/v3"
 
 	"main/config"
 	"main/internal/core"
@@ -110,23 +108,21 @@ func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, my
 
 func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string) (string, error) {
 	apiReqURL := fmt.Sprintf("%s/track?api_key=%s&url=%s", config.ApiURL, config.ApiKEY, url.QueryEscape(mediaURL))
-	req, err := http.NewRequestWithContext(ctx, "GET", apiReqURL, nil)
-	if err != nil {
-		return "", fmt.Errorf("failed to create request: %w", err)
-	}
-	resp, err := http.DefaultClient.Do(req)
+
+	client := resty.New()
+	var apiResp APIResponse
+
+	resp, err := client.R().
+		SetContext(ctx).
+		SetResult(&apiResp).
+		Get(apiReqURL)
+
 	if err != nil {
 		return "", fmt.Errorf("API request failed: %w", err)
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("API request failed with status: %d", resp.StatusCode)
-	}
-
-	var apiResp APIResponse
-	if err := json.NewDecoder(resp.Body).Decode(&apiResp); err != nil {
-		return "", fmt.Errorf("invalid API response: %w", err)
+	if resp.IsError() {
+		return "", fmt.Errorf("API request failed with status: %d", resp.StatusCode())
 	}
 
 	if apiResp.CdnUrl == "" {
@@ -137,31 +133,20 @@ func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string)
 }
 
 func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, filePath string) error {
-	req, err := http.NewRequestWithContext(ctx, "GET", dlURL, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
-	}
-	resp, err := http.DefaultClient.Do(req)
+	client := resty.New()
+	resp, err := client.R().
+		SetContext(ctx).
+		SetOutputFileName(filePath).
+		Get(dlURL)
+
 	if err != nil {
 		return fmt.Errorf("HTTP download failed: %w", err)
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("download failed with status: %d", resp.StatusCode)
+	if resp.IsError() {
+		return fmt.Errorf("download failed with status: %d", resp.StatusCode())
 	}
 
-	out, err := os.Create(filePath)
-	if err != nil {
-		return fmt.Errorf("failed to create file: %w", err)
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		os.Remove(filePath)
-		return err
-	}
 	return nil
 }
 
