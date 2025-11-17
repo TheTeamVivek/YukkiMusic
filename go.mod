@@ -4,7 +4,7 @@ go 1.24.7
 
 require (
 	github.com/Laky-64/gologging v1.1.0
-	github.com/amarnathcjd/gogram v1.6.5-0.20251106000256-22e8b5a2d446
+	github.com/amarnathcjd/gogram v1.6.8
 	github.com/joho/godotenv v1.5.1
 	github.com/raitonoberu/ytsearch v0.2.0
 	github.com/shirou/gopsutil/v3 v3.24.5
@@ -28,7 +28,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
@@ -41,7 +40,6 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	golang.org/x/crypto v0.43.0 // indirect
-	golang.org/x/net v0.46.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/term v0.36.0 // indirect
