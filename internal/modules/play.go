@@ -199,22 +199,38 @@ func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 		filteredTracks = append(filteredTracks, track)
 	}
 	if len(skippedTracks) > 0 {
-		var b strings.Builder
-		b.WriteString(fmt.Sprintf("<b>⚠️ %d tracks were skipped (max duration %d mins):</b>\n", len(skippedTracks), config.DurationLimit/60))
-		for i, title := range skippedTracks {
-			if i < 5 { // Limit to showing 5 tracks to avoid flood
-				b.WriteString(fmt.Sprintf("— <i>%s</i>\n", title))
-			} else {
-				b.WriteString(fmt.Sprintf("... and %d more.\n", len(skippedTracks)-i))
-				break
-			}
-		}
-		utils.EOR(replyMsg, b.String())
-		if len(tracks) == 1 && len(filteredTracks) == 0 {
-			return telegram.EndGroup
-		}
-		time.Sleep(1 * time.Second)
-	}
+
+    // CASE 1: Only one track was given AND it was skipped
+    if len(tracks) == 1 && len(filteredTracks) == 0 {
+        msg := fmt.Sprintf(
+            "⚠️ You can't play songs longer than %d minutes.\n<i>%s</i> was skipped.",
+            config.DurationLimit/60,
+            skippedTracks[0],
+        )
+        utils.EOR(replyMsg, msg)
+        return telegram.EndGroup
+    }
+
+    // CASE 2: Multiple skipped tracks → show normal skipped list
+    var b strings.Builder
+    fmt.Fprintf(&b,
+        "<b>⚠️ %d tracks were skipped (max duration %d mins):</b>\n",
+        len(skippedTracks),
+        config.DurationLimit/60,
+    )
+
+    for i, title := range skippedTracks {
+        if i < 5 { // avoid spam
+            fmt.Fprintf(&b, "— <i>%s</i>\n", title)
+        } else {
+            fmt.Fprintf(&b, "... and %d more.\n", len(skippedTracks)-i)
+            break
+        }
+    }
+
+    utils.EOR(replyMsg, b.String())
+    time.Sleep(1 * time.Second)
+}
 	tracks = filteredTracks
 	if len(tracks) == 0 {
 		utils.EOR(replyMsg, "❌ All found tracks were skipped due to duration limits.")
