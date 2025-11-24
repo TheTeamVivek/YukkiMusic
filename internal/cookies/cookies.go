@@ -62,7 +62,6 @@ func downloadCookieFile(url string) error {
 	resp, err := client.R().
 		SetOutputFileName(filePath).
 		Get(rawURL)
-
 	if err != nil {
 		return err
 	}

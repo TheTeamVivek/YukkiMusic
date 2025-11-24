@@ -26,6 +26,7 @@ import (
 	"main/config"
 	"main/internal/core"
 	"main/internal/database"
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -123,30 +124,30 @@ func handleAssistantState(p *telegram.ParticipantUpdate, chatID int64) {
 }
 
 func handleAssistantRestriction(p *telegram.ParticipantUpdate, chatID int64, s *core.ChatState) {
-    gologging.Debug("Assistant restricted in chatID " + utils.IntToStr(chatID))
+	gologging.Debug("Assistant restricted in chatID " + utils.IntToStr(chatID))
 
-    s.SetAssistantPresence(bool_(false))
-    core.DeleteRoom(chatID)
+	s.SetAssistantPresence(bool_(false))
+	core.DeleteRoom(chatID)
 
-    ok, err := p.Unban()
-    if err != nil || !ok {
-        s.SetAssistantBanned(bool_(true))
+	ok, err := p.Unban()
+	if err != nil || !ok {
+		s.SetAssistantBanned(bool_(true))
 
-        if !shouldIgnoreParticipant(p) {
-            _, sendErr := p.Client.SendMessage(
-                chatID,
-                F(chatID, "assistant_restricted_warning", locales.Arg{
-                    "assistant": utils.MentionHTML(core.UbUser),
-                    "id":        core.UbUser.ID,
-                }),
-            )
+		if !shouldIgnoreParticipant(p) {
+			_, sendErr := p.Client.SendMessage(
+				chatID,
+				F(chatID, "assistant_restricted_warning", locales.Arg{
+					"assistant": utils.MentionHTML(core.UbUser),
+					"id":        core.UbUser.ID,
+				}),
+			)
 
-            if sendErr != nil {
-                gologging.Error("Failed to send assistant restricted warning in ChatID: " +
-                    utils.IntToStr(chatID) + " Error: " + sendErr.Error())
-            }
-        }
-    }
+			if sendErr != nil {
+				gologging.Error("Failed to send assistant restricted warning in ChatID: " +
+					utils.IntToStr(chatID) + " Error: " + sendErr.Error())
+			}
+		}
+	}
 }
 
 func handleAssistantFallback(p *telegram.ParticipantUpdate, chatID int64, s *core.ChatState) {
@@ -211,7 +212,6 @@ func handleSudoJoin(p *telegram.ParticipantUpdate, charID int64) {
 	}
 }
 
-
 func handleGroupCallAction(m *telegram.NewMessage, chatID int64, action *telegram.MessageActionGroupCall, isMaintenance bool) error {
 	if isMaintenance {
 		return telegram.EndGroup
@@ -227,7 +227,7 @@ func handleGroupCallAction(m *telegram.NewMessage, chatID int64, action *telegra
 		gologging.Debug("Voice chat started in " + utils.IntToStr(chatID))
 	} else {
 		s.SetVoiceChatStatus(bool_(false))
-m.Respond(F(chatID, "voicechat_started"))
+		m.Respond(F(chatID, "voicechat_started"))
 		gologging.Debug("Voice chat ended in " + utils.IntToStr(chatID))
 	}
 
@@ -251,7 +251,6 @@ func handleDeleteUserAction(m *telegram.NewMessage, chatID int64, action *telegr
 	return telegram.EndGroup
 }
 
-
 func handleAddUserAction(m *telegram.NewMessage, chatID int64, action *telegram.MessageActionChatAddUser, isMaintenance bool) error {
 	for _, uid := range action.Users {
 		gologging.Debug("User added to chatID " + utils.IntToStr(chatID) + ": " + utils.IntToStr(uid))
@@ -262,7 +261,7 @@ func handleAddUserAction(m *telegram.NewMessage, chatID int64, action *telegram.
 		}
 
 		// Bot added during maintenance
-        // Only owner + sudo can add the bot during maintenance
+		// Only owner + sudo can add the bot during maintenance
 		if isMaintenance && m.SenderID() != config.OwnerID {
 			if ok, _ := database.IsSudo(m.SenderID()); !ok {
 

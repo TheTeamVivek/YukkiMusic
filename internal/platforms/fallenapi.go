@@ -116,7 +116,6 @@ func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string)
 		SetContext(ctx).
 		SetResult(&apiResp).
 		Get(apiReqURL)
-
 	if err != nil {
 		return "", fmt.Errorf("API request failed: %w", err)
 	}
@@ -138,7 +137,6 @@ func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, filePath
 		SetContext(ctx).
 		SetOutputFileName(filePath).
 		Get(dlURL)
-
 	if err != nil {
 		return fmt.Errorf("HTTP download failed: %w", err)
 	}

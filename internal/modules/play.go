@@ -35,6 +35,7 @@ import (
 	"main/config"
 	"main/internal/core"
 	"main/internal/database"
+	"main/internal/locales"
 	"main/internal/platforms"
 	"main/internal/state"
 	"main/internal/utils"
@@ -54,85 +55,86 @@ func fplayHandler(m *telegram.NewMessage) error {
 }
 
 func cplayHandler(m *telegram.NewMessage) error {
-        args := strings.Fields(m.Text())
-        chatID := m.ChannelID()
+	args := strings.Fields(m.Text())
+	chatID := m.ChannelID()
 
-        if len(args) > 1 && args[1] == "--set" {
-                if len(args) < 3 {
-                        m.Reply(
-                                F(chatID, "cplay_usage"),
-                                &telegram.SendOptions{ParseMode: "HTML"},
-                        )
-                        return telegram.EndGroup
-                }
+	if len(args) > 1 && args[1] == "--set" {
+		if len(args) < 3 {
+			m.Reply(
+				F(chatID, "cplay_usage"),
+				&telegram.SendOptions{ParseMode: "HTML"},
+			)
+			return telegram.EndGroup
+		}
 
-                cplayIDStr := args[2]
-                cplayID, err := strconv.ParseInt(cplayIDStr, 10, 64)
-                if err != nil {
-                        m.Reply(
-                                F(chatID, "cplay_invalid_chat_id"),
-                                &telegram.SendOptions{ParseMode: "HTML"},
-                        )
-                        return telegram.EndGroup
-                }
+		cplayIDStr := args[2]
+		cplayID, err := strconv.ParseInt(cplayIDStr, 10, 64)
+		if err != nil {
+			m.Reply(
+				F(chatID, "cplay_invalid_chat_id"),
+				&telegram.SendOptions{ParseMode: "HTML"},
+			)
+			return telegram.EndGroup
+		}
 
-                peer, err := m.Client.ResolvePeer(cplayID)
-                if err != nil {
-                        m.Reply(
-                                F(chatID, "cplay_resolve_peer_fail"),
-                                &telegram.SendOptions{ParseMode: "HTML"},
-                        )
-                        return telegram.EndGroup
-                }
+		peer, err := m.Client.ResolvePeer(cplayID)
+		if err != nil {
+			m.Reply(
+				F(chatID, "cplay_resolve_peer_fail"),
+				&telegram.SendOptions{ParseMode: "HTML"},
+			)
+			return telegram.EndGroup
+		}
 
-                chPeer, ok := peer.(*telegram.InputPeerChannel)
-                if !ok {
-                        m.Reply(
-                                F(chatID, "cplay_invalid_target"),
-                                &telegram.SendOptions{ParseMode: "HTML"},
-                        )
-                        return telegram.EndGroup
-                }
+		chPeer, ok := peer.(*telegram.InputPeerChannel)
+		if !ok {
+			m.Reply(
+				F(chatID, "cplay_invalid_target"),
+				&telegram.SendOptions{ParseMode: "HTML"},
+			)
+			return telegram.EndGroup
+		}
 
-                fullChat, err := m.Client.ChannelsGetFullChannel(&telegram.InputChannelObj{
-                        ChannelID:  chPeer.ChannelID,
-                        AccessHash: chPeer.AccessHash,
-                })
-                if err != nil || fullChat == nil {
-                        gologging.ErrorF(
-                                "Failed to get full channel for cplay ID %d: %v",
-                                cplayID, err,
-                        )
-                        m.Reply(
-                                F(chatID, "cplay_channel_not_accessible"),
-                                &telegram.SendOptions{ParseMode: "HTML"},
-                        )
-                        return telegram.EndGroup
-                }
+		fullChat, err := m.Client.ChannelsGetFullChannel(&telegram.InputChannelObj{
+			ChannelID:  chPeer.ChannelID,
+			AccessHash: chPeer.AccessHash,
+		})
+		if err != nil || fullChat == nil {
+			gologging.ErrorF(
+				"Failed to get full channel for cplay ID %d: %v",
+				cplayID, err,
+			)
+			m.Reply(
+				F(chatID, "cplay_channel_not_accessible"),
+				&telegram.SendOptions{ParseMode: "HTML"},
+			)
+			return telegram.EndGroup
+		}
 
-                if err := database.SetCPlayID(m.ChannelID(), cplayID); err != nil {
-                        gologging.ErrorF(
-                                "Failed to set cplay ID for chat %d: %v",
-                                m.ChannelID(), err,
-                        )
-                        m.Reply(
-                                F(chatID, "cplay_save_error"),
-                                &telegram.SendOptions{ParseMode: "HTML"},
-                        )
-                        return err
-                }
+		if err := database.SetCPlayID(m.ChannelID(), cplayID); err != nil {
+			gologging.ErrorF(
+				"Failed to set cplay ID for chat %d: %v",
+				m.ChannelID(), err,
+			)
+			m.Reply(
+				F(chatID, "cplay_save_error"),
+				&telegram.SendOptions{ParseMode: "HTML"},
+			)
+			return err
+		}
 
-                m.Reply(
-                        F(chatID, "cplay_enabled", locales.Arg{
-                                "channel_id": cplayID,
-                        }),
-                        &telegram.SendOptions{ParseMode: "HTML"},
-                )
-                return telegram.EndGroup
-        }
+		m.Reply(
+			F(chatID, "cplay_enabled", locales.Arg{
+				"channel_id": cplayID,
+			}),
+			&telegram.SendOptions{ParseMode: "HTML"},
+		)
+		return telegram.EndGroup
+	}
 
-        return handlePlay(m, false, true)
+	return handlePlay(m, false, true)
 }
+
 func cfplayHandler(m *telegram.NewMessage) error {
 	return handlePlay(m, true, true)
 }
@@ -200,37 +202,37 @@ func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 	}
 	if len(skippedTracks) > 0 {
 
-    // CASE 1: Only one track was given AND it was skipped
-    if len(tracks) == 1 && len(filteredTracks) == 0 {
-        msg := fmt.Sprintf(
-            "⚠️ You can't play songs longer than %d minutes.\n<i>%s</i> was skipped.",
-            config.DurationLimit/60,
-            skippedTracks[0],
-        )
-        utils.EOR(replyMsg, msg)
-        return telegram.EndGroup
-    }
+		// CASE 1: Only one track was given AND it was skipped
+		if len(tracks) == 1 && len(filteredTracks) == 0 {
+			msg := fmt.Sprintf(
+				"⚠️ You can't play songs longer than %d minutes.\n<i>%s</i> was skipped.",
+				config.DurationLimit/60,
+				skippedTracks[0],
+			)
+			utils.EOR(replyMsg, msg)
+			return telegram.EndGroup
+		}
 
-    // CASE 2: Multiple skipped tracks → show normal skipped list
-    var b strings.Builder
-    fmt.Fprintf(&b,
-        "<b>⚠️ %d tracks were skipped (max duration %d mins):</b>\n",
-        len(skippedTracks),
-        config.DurationLimit/60,
-    )
+		// CASE 2: Multiple skipped tracks → show normal skipped list
+		var b strings.Builder
+		fmt.Fprintf(&b,
+			"<b>⚠️ %d tracks were skipped (max duration %d mins):</b>\n",
+			len(skippedTracks),
+			config.DurationLimit/60,
+		)
 
-    for i, title := range skippedTracks {
-        if i < 5 { // avoid spam
-            fmt.Fprintf(&b, "— <i>%s</i>\n", title)
-        } else {
-            fmt.Fprintf(&b, "... and %d more.\n", len(skippedTracks)-i)
-            break
-        }
-    }
+		for i, title := range skippedTracks {
+			if i < 5 { // avoid spam
+				fmt.Fprintf(&b, "— <i>%s</i>\n", title)
+			} else {
+				fmt.Fprintf(&b, "... and %d more.\n", len(skippedTracks)-i)
+				break
+			}
+		}
 
-    utils.EOR(replyMsg, b.String())
-    time.Sleep(1 * time.Second)
-}
+		utils.EOR(replyMsg, b.String())
+		time.Sleep(1 * time.Second)
+	}
 	tracks = filteredTracks
 	if len(tracks) == 0 {
 		utils.EOR(replyMsg, "❌ All found tracks were skipped due to duration limits.")
