@@ -5,6 +5,16 @@ invalid_bool: "⚠️ <b>Invalid value.</b>\nUse 'enable' or 'disable'."
 active_chats_info: "📊 <b>Active Chats:</b>\n\nThere are <i>{count}</i> active chats across the bot system."
 active_chats_info_with_issue: "📊 <b>Active Chats:</b>\n\nThere are <i>{count}</i> active chats across the bot system, but <i>{broken}</i> of them may have issues displaying correctly."
 
+# 🚫 Assistant Restricted / Banned
+assistant_restricted_warning: |
+  ⚠️ <b>Assistant Restricted</b>
+
+  The assistant {assistant} (ID: <code>{id}</code>) has been <b>banned</b> or restricted in this chat.
+  I cannot play music, manage the queue, or clean up tracks while this continues.
+
+  <i>Unban the assistant to restore all music features 🎵</i>
+
+
 # 🧩 Common auth messages
 auth_no_user: "⚠️ Please provide a user — use:\n{cmd} [user_id] or reply to a user's message."
 user_extract_fail: "⚠️ Unable to get that user: <i>{error}</i>"
@@ -16,6 +26,23 @@ addauth_bot_user: "🤖 You can’t add a bot to the auth list — sudoers must 
 addauth_add_fail: "❌ Failed to add authorized user: {error}"
 addauth_success_with_count: "✅ Added {user}.\nNow {count}/{limit} authorized users."
 addauth_success: "✅ Successfully added {user} to the authorized users list."
+
+# 🤖 Bot Added to Chat
+bot_added_normal: "🎵 Thanks for adding me! Use /play <song> to start playing music."
+
+# 🛠️ Bot Added During Maintenance
+bot_added_maintenance: "⚠️ I'm currently under maintenance and will be back soon. Thanks for your patience! ⏰"
+maint_reason_generic: "<i>📝 Reason: {reason}</i>"
+
+# ⚠️ Bot Demotion
+bot_demotion_goodbye: |
+  <b>⚠️ Permission Lost</b>
+
+  I’ve been <b>demoted from admin</b> and can’t perform my tasks anymore.
+  Without proper rights, I’m unable to function here, so I’ll be <i>leaving the chat now</i>.
+
+  <b>Goodbye 👋</b>
+
 
 # 🗑️ Delete auth
 del_auth_not_authorized: "⚠️ That user isn’t authorized — nothing to remove."
@@ -371,6 +398,10 @@ stream_now_playing: |
   <b>▫ Duration:</b> {duration}
   <b>▫ Requested by:</b> {by}
 
+# 👑 Sudo / Owner Join Messages
+sudo_join_owner: "👑 {user} — owner of {bot} — just entered the chat."
+sudo_join_sudo: "🛡️ {user}, a sudo user of {bot}, just joined the chat."
+
 supergroup_needed: |
   This chat (ID: <code>{chat_id}</code>) is not a supergroup yet.
   <b>⚠️ Please convert this chat to a supergroup then add me as admin.</b>
@@ -390,6 +421,9 @@ unmute_success: |
   {speed_line}
 
 
+# 🔊 Voice Chat Events
+voicechat_ended: "📴 Voice chat ended!\nAll queues cleared."
+voicechat_started: "📢 Voice chat started!\nUse /play <song> to play music."
 # Commands help
 
 help_owner: |
