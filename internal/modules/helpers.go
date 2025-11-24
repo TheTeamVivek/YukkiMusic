@@ -70,7 +70,7 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	}
 	cplayID, err := database.GetCPlayID(chatID)
 	if err != nil || cplayID == 0 {
-		return nil, errors.New("cplay ID not set. Use /cplay --set <chat_id> to set it")
+		return nil, errors.New(F(chatID, "cplay_id_not_set"))
 	}
 	r, _ := core.GetRoom(cplayID, true)
 	return r, nil
@@ -83,6 +83,7 @@ func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 
 	if is, err := database.IsLoggerEnabled(); err != nil {
 		gologging.Error("Failed to get IsLoggerEnabled: " + err.Error())
+		return
 	} else if !is {
 		return
 	}
@@ -92,70 +93,77 @@ func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 		err error
 	)
 
-	header := "Playback Started"
+	chatID := m.ChatID()
+
+	header := F(chatID, "logger_playback_started")
 	if queued {
-		header = "Playback Queued"
+		header = F(chatID, "logger_playback_queued")
 	}
 
+	// Header
 	sb.WriteString("🎵 ")
 	if m.Channel.Username != "" {
-		sb.WriteString("<b><a href=\"")
-		sb.WriteString(m.Link())
-		sb.WriteString("\">")
-		sb.WriteString(header)
-		sb.WriteString("</a></b>\n\n")
+		fmt.Fprintf(&sb, "<b><a href=\"%s\">%s</a></b>\n\n", m.Link(), header)
 	} else {
-		sb.WriteString("<b><u>")
-		sb.WriteString(header)
-		sb.WriteString("</u></b>\n\n")
+		fmt.Fprintf(&sb, "<b><u>%s</u></b>\n\n", header)
 	}
 
+	// artwork block
 	if track.Artwork != "" {
 		sb.WriteString("<blockquote>")
 	}
 
-	sb.WriteString("<b>🎧 Track:</b> <a href=\"")
-	sb.WriteString(track.URL)
-	sb.WriteString("\">")
-	sb.WriteString(utils.ShortTitle(track.Title))
-	sb.WriteString("</a>\n")
+	// Track
+	fmt.Fprintf(&sb,
+		"<b>%s</b> <a href=\"%s\">%s</a>\n",
+		F(chatID, "logger_track"),
+		track.URL,
+		utils.ShortTitle(track.Title),
+	)
 
-	sb.WriteString("<b>🔗 Source:</b> ")
-	sb.WriteString(string(track.Source))
-	sb.WriteByte('\n')
+	// Source
+	fmt.Fprintf(&sb,
+		"<b>%s</b> %s\n",
+		F(chatID, "logger_source"),
+		string(track.Source),
+	)
 
-	sb.WriteString("<b>📌 Group:</b> ")
+	// Group
+	fmt.Fprintf(&sb, "<b>%s</b> ", F(chatID, "logger_group"))
 	if m.Channel.Username != "" {
-		sb.WriteByte('@')
-		sb.WriteString(m.Channel.Username)
+		fmt.Fprintf(&sb, "@%s", m.Channel.Username)
 	} else {
 		sb.WriteString(m.Channel.Title)
 	}
-	sb.WriteString(" (")
-	sb.WriteString(strconv.FormatInt(m.ChannelID(), 10))
-	sb.WriteString(")\n")
+	fmt.Fprintf(&sb, " (%d)\n", m.ChannelID())
 
-	sb.WriteString("<b>👤 Requested by:</b> ")
+	// Requested by
+	fmt.Fprintf(&sb, "<b>%s</b> ", F(chatID, "logger_requested_by"))
 	if m.Sender.Username != "" {
-		sb.WriteByte('@')
-		sb.WriteString(m.Sender.Username)
+		fmt.Fprintf(&sb, "@%s", m.Sender.Username)
 	} else {
 		sb.WriteString(utils.MentionHTML(m.Sender))
 	}
-	sb.WriteString(" (<code>")
-	sb.WriteString(strconv.FormatInt(m.Sender.ID, 10))
-	sb.WriteString("</code>)\n")
+	fmt.Fprintf(&sb, " (<code>%d</code>)\n", m.Sender.ID)
 
-	sb.WriteString("<b>⏳ Timestamp:</b> ")
-	sb.WriteString(time.Now().Format("2006-01-02 15:04:05"))
+	// Timestamp
+	fmt.Fprintf(&sb, "<b>%s</b> %s",
+		F(chatID, "logger_timestamp"),
+		time.Now().Format("2006-01-02 15:04:05"),
+	)
 
+	// Sending
 	if track.Artwork != "" {
-
 		sb.WriteString("\n</blockquote>")
-		_, err = core.Bot.SendMedia(config.LoggerID, utils.CleanURL(track.Artwork), &tg.MediaOptions{Caption: sb.String()})
+		_, err = core.Bot.SendMedia(
+			config.LoggerID,
+			utils.CleanURL(track.Artwork),
+			&tg.MediaOptions{Caption: sb.String()},
+		)
 	} else {
 		_, err = core.Bot.SendMessage(config.LoggerID, sb.String())
 	}
+
 	if err != nil {
 		gologging.Error("Failed to send logger msg: " + err.Error())
 	}
