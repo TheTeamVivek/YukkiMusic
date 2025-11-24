@@ -57,41 +57,38 @@ func langHandler(m *telegram.NewMessage) error {
 }
 
 func langCallbackHandler(cb *telegram.CallbackQuery) error {
-	data := cb.DataString()
-	opt := &telegram.CallbackOptions{Alert: true}
-	parts := strings.SplitN(data, ":", 2)
-	if len(parts) != 2 {
-		cb.Answer("⚠️ Invalid data.", opt)
-		return telegram.EndGroup
-	}
-	lang := parts[1]
+    data := cb.DataString()
+    opt := &telegram.CallbackOptions{Alert: true}
+    parts := strings.SplitN(data, ":", 2)
+    if len(parts) != 2 {
+        cb.Answer("⚠️ Invalid data.", opt)
+        return telegram.EndGroup
+    }
+    lang := parts[1]
 
-	chatID := cb.ChannelID()
-	if isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); err != nil || !isAdmin {
-		cb.Answer(
-			"⚠️Only admins can do this actions.",
-			opt,
-		)
-		return telegram.EndGroup
-	}
+    chatID := cb.ChannelID()
+    if isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); err != nil || !isAdmin {
+        cb.Answer(F(chatID, "only_admin_or_auth_cb"), opt)
+        return telegram.EndGroup
+    }
 
-	currentLang, _ := database.GetChatLanguage(chatID)
+    currentLang, _ := database.GetChatLanguage(chatID)
 
-	if lang == currentLang {
-		cb.Answer(F(chatID, "lang_same"), opt)
-		return telegram.EndGroup
-	}
+    if lang == currentLang {
+        cb.Answer(F(chatID, "lang_same"), opt)
+        return telegram.EndGroup
+    }
 
-	langName := locales.Get(lang, "name", nil)
+    langName := locales.Get(lang, "name", nil)
 
-	if err := database.SetChatLanguage(chatID, lang); err != nil {
-		logger.ErrorF("SetChatLanguage error: %v", err)
-		cb.Answer(F(chatID, "lang_fail"), opt)
-		return telegram.EndGroup
-	}
+    if err := database.SetChatLanguage(chatID, lang); err != nil {
+        logger.ErrorF("SetChatLanguage error: %v", err)
+        cb.Answer(F(chatID, "lang_fail"), opt)
+        return telegram.EndGroup
+    }
 
-	msg := F(chatID, "lang_success", locales.Arg{"lang_name": langName})
-	cb.Answer(msg, opt)
-	cb.Edit(msg)
-	return telegram.EndGroup
+    msg := F(chatID, "lang_success", locales.Arg{"lang_name": langName})
+    cb.Answer(msg, opt)
+    cb.Edit(msg)
+    return telegram.EndGroup
 }
