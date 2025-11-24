@@ -43,6 +43,8 @@ bot_demotion_goodbye: |
 
   <b>Goodbye 👋</b>
 
+cplay_id_not_set: "⚠️ cplay ID not set.\nUse <code>/cplay --set &lt;chat_id&gt;</code> to set it."
+
 
 # 🗑️ Delete auth
 del_auth_not_authorized: "⚠️ That user isn’t authorized — nothing to remove."
@@ -102,6 +104,15 @@ lang_same: "ℹ️ You’re already using this language."
 lang_select: "🌐 Select your preferred language:"
 lang_fail: "❌ Failed to update language. Please try again later."
 lang_success: "✅ Language successfully updated to {lang_name}."
+
+logger_playback_started: "Playback Started"
+logger_playback_queued: "Playback Queued"
+
+logger_track: "🎧 Track:"
+logger_source: "🔗 Source:"
+logger_group: "📌 Group:"
+logger_requested_by: "👤 Requested by:"
+logger_timestamp: "⏳ Timestamp:"
 
 loop_usage: "🔁 <b>Loop Control</b>\n\nUsage: {cmd} [count]\n• 0 - Disable loop\n• 1-10 - Loop count\n\n<i>{count_line}</i>"
 loop_invalid: "⚠️ <b>Invalid loop count.</b>\nUse 0 to disable or 1-10 to set loop count."
