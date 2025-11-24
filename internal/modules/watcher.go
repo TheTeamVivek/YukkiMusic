@@ -68,7 +68,7 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 		utils.AddChatAdmin(p.Client, chatID, p.UserID())
 	}
 
-	handleSudoJoin(p)
+	handleSudoJoin(p, chatID)
 	return nil
 }
 
@@ -123,28 +123,30 @@ func handleAssistantState(p *telegram.ParticipantUpdate, chatID int64) {
 }
 
 func handleAssistantRestriction(p *telegram.ParticipantUpdate, chatID int64, s *core.ChatState) {
-	gologging.Debug("Assistant restricted in chatID " + utils.IntToStr(chatID))
+    gologging.Debug("Assistant restricted in chatID " + utils.IntToStr(chatID))
 
-	s.SetAssistantPresence(bool_(false))
-	core.DeleteRoom(chatID)
-	ok, err := p.Unban()
-	if err != nil || !ok {
-		s.SetAssistantBanned(bool_(true))
+    s.SetAssistantPresence(bool_(false))
+    core.DeleteRoom(chatID)
 
-		if !shouldIgnoreParticipant(p) {
-			_, sendErr := p.Client.SendMessage(chatID,
-				"⚠️ <b>Assistant Restricted</b>\n\n"+
-					"The assistant "+utils.MentionHTML(core.UbUser)+
-					" (ID: <code>"+utils.IntToStr(core.UbUser.ID)+"</code>) has been <b>banned</b> or restricted in this chat.\n"+
-					"I cannot play music, manage the queue, or clean up tracks while this lasts.\n\n"+
-					"<i>Unban the assistant to restore all music features 🎵</i>",
-			)
-			if sendErr != nil {
-				gologging.Error("Failed to send assistant restricted warning in ChatID: " +
-					utils.IntToStr(chatID) + " Error: " + sendErr.Error())
-			}
-		}
-	}
+    ok, err := p.Unban()
+    if err != nil || !ok {
+        s.SetAssistantBanned(bool_(true))
+
+        if !shouldIgnoreParticipant(p) {
+            _, sendErr := p.Client.SendMessage(
+                chatID,
+                F(chatID, "assistant_restricted_warning", locales.Arg{
+                    "assistant": utils.MentionHTML(core.UbUser),
+                    "id":        core.UbUser.ID,
+                }),
+            )
+
+            if sendErr != nil {
+                gologging.Error("Failed to send assistant restricted warning in ChatID: " +
+                    utils.IntToStr(chatID) + " Error: " + sendErr.Error())
+            }
+        }
+    }
 }
 
 func handleAssistantFallback(p *telegram.ParticipantUpdate, chatID int64, s *core.ChatState) {
@@ -175,34 +177,40 @@ func handleAssistantFallback(p *telegram.ParticipantUpdate, chatID int64, s *cor
 
 func handleDemotion(p *telegram.ParticipantUpdate, chatID int64) {
 	if p.UserID() == core.BUser.ID {
+
 		core.DeleteRoom(chatID)
 		core.DeleteChatState(chatID)
-		p.Client.SendMessage(chatID,
-			"<b>⚠️ Permission Lost</b>\n\n"+
-				"I’ve been <b>demoted from admin</b> and can’t perform my tasks anymore.\n"+
-				"Without proper rights, I’m unable to function here, so I’ll be <i>leaving the chat now</i>.\n\n"+
-				"<b>Goodbye 👋</b>",
-		)
+
+		p.Client.SendMessage(chatID, F(chatID, "bot_demotion_goodbye"))
+
 		p.Client.LeaveChannel(chatID)
 		core.UBot.LeaveChannel(chatID)
 		return
 	}
+
 	utils.RemoveChatAdmin(p.Client, chatID, p.UserID())
 }
 
-func handleSudoJoin(p *telegram.ParticipantUpdate) {
+func handleSudoJoin(p *telegram.ParticipantUpdate, charID int64) {
 	var text string
 
 	if p.UserID() == config.OwnerID {
-		text = "👑 " + utils.MentionHTML(p.User) + " — owner of " + utils.MentionHTML(core.BUser) + " — just entered the chat."
+		text = F(chatID, "sudo_join_owner", locales.Arg{
+			"user": utils.MentionHTML(p.User),
+			"bot":  utils.MentionHTML(core.BUser),
+		})
 	} else if database.IsSudoWithoutError(p.UserID()) {
-		text = "🛡️ " + utils.MentionHTML(p.User) + ", a sudo user of " + utils.MentionHTML(core.BUser) + ", just joined the chat."
+		text = F(chatID, "sudo_join_sudo", locales.Arg{
+			"user": utils.MentionHTML(p.User),
+			"bot":  utils.MentionHTML(core.BUser),
+		})
 	}
 
 	if text != "" {
-		p.Client.SendMessage(p.ChannelID(), text)
+		p.Client.SendMessage(chatID, text)
 	}
 }
+
 
 func handleGroupCallAction(m *telegram.NewMessage, chatID int64, action *telegram.MessageActionGroupCall, isMaintenance bool) error {
 	if isMaintenance {
@@ -214,11 +222,12 @@ func handleGroupCallAction(m *telegram.NewMessage, chatID int64, action *telegra
 
 	if action.Duration == 0 {
 		s.SetVoiceChatStatus(bool_(true))
-		m.Respond("📢 Voice chat started!\nUse /play <song> to play music")
+		m.Respond(F(chatID, "voicechat_ended"))
+
 		gologging.Debug("Voice chat started in " + utils.IntToStr(chatID))
 	} else {
 		s.SetVoiceChatStatus(bool_(false))
-		m.Respond("📴 Voice chat ended!\nAll queues cleared")
+m.Respond(F(chatID, "voicechat_started"))
 		gologging.Debug("Voice chat ended in " + utils.IntToStr(chatID))
 	}
 
@@ -242,28 +251,38 @@ func handleDeleteUserAction(m *telegram.NewMessage, chatID int64, action *telegr
 	return telegram.EndGroup
 }
 
+
 func handleAddUserAction(m *telegram.NewMessage, chatID int64, action *telegram.MessageActionChatAddUser, isMaintenance bool) error {
 	for _, uid := range action.Users {
 		gologging.Debug("User added to chatID " + utils.IntToStr(chatID) + ": " + utils.IntToStr(uid))
 
+		// Not the bot, skip
 		if uid != core.BUser.ID {
 			continue
 		}
 
+		// Bot added during maintenance
+        // Only owner + sudo can add the bot during maintenance
 		if isMaintenance && m.SenderID() != config.OwnerID {
 			if ok, _ := database.IsSudo(m.SenderID()); !ok {
-				msg := "⚠️ I'm currently under maintenance and will be back soon. Thanks for your patience! ⏰"
+
+				msg := F(chatID, "bot_added_maintenance")
 				if reason, err := database.GetMaintReason(); err == nil && reason != "" {
-					msg += "\n\n<i>📝 Reason: " + reason + "</i>"
+					msg += "\n\n" + F(chatID, "maint_reason_generic", locales.Arg{
+						"reason": reason,
+					})
 				}
+
 				m.Reply(msg)
 				m.Client.LeaveChannel(chatID)
+
 				gologging.Debug("Bot left chatID " + utils.IntToStr(chatID) + " due to maintenance")
 				return telegram.EndGroup
 			}
 		}
 
-		m.Respond("🎵 Thanks for adding me! Use /play <song> to start playing music.")
+		m.Respond(F(chatID, "bot_added_normal"))
+
 		gologging.Debug("Bot added to chat: " + utils.IntToStr(chatID))
 		database.AddServed(chatID)
 		return telegram.EndGroup
