@@ -158,6 +158,29 @@ pause_success: |
 
 speed_line: "⚙️ Speed: <b>{speed}x</b>"
 
+stats_system_header: "🔧 <b>System:</b>"
+stats_go_mem_header: "📦 <b>Internal Memory (Go):</b>"
+stats_server_header: "💻 <b>Server Stats:</b>"
+stats_served_header: "📊 <b>Served:</b>"
+
+stats_system_os_arch: "• OS: <code>{os}</code>, Arch: <code>{arch}</code>"
+stats_system_cpu_goroutines: "• CPUs: <code>{cpus}</code>, Goroutines: <code>{goroutines}</code>"
+
+stats_go_alloc: "• Alloc: <code>{alloc} MB</code>"
+stats_go_sys: "• Sys: <code>{sys} MB</code>"
+stats_go_gc: "• NumGC: <code>{gc_count}</code> ({emoji} {gc_rate}/min)"
+
+stats_server_cpu: "• CPU Usage: {emoji} <code>{cpu}%</code>"
+stats_server_ram: "• RAM Usage: {emoji} <code>{used_gib} GiB</code> | <code>{total_gib} GiB</code>"
+stats_server_storage: "• Storage: <code>{used_gib} GiB</code> | <code>{total_gib} GiB</code>"
+
+stats_served_chats: "• Chats: <code>{count}</code>"
+stats_served_chats_err: "• Chats: <code>Error: {error}</code>"
+
+stats_served_users: "• Users: <code>{count}</code>"
+stats_served_users_err: "• Users: <code>Error: {error}</code>"
+
+
 # 🏓 Ping messages
 ping_start: "🏓 Pinging..."
 ping_result: |
