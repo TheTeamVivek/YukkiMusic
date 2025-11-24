@@ -183,6 +183,31 @@ queue_more_line: "\n… and {remaining} more"
 queue_empty_tail: "📭 <i>No more songs in queue.</i>"
 queue_empty: "⚠️ <b>The queue is already empty.</b>"
 
+# 🔄 Reload
+reload_start: "⚙️ Reloading admin cache, voice chat status, and assistant status..."
+
+reload_done: "<b>⚙️ Reload complete:</b>\n\n{summary}"
+
+reload_admin_cache_ok: "<b>• Admin cache:</b> <i>✅ Done</i>"
+reload_admin_cache_fail: "<b>• Admin cache:</b> <i>❌ ({error})</i>"
+
+reload_voice_inactive: "<b>• Voice chat:</b> <i>⚪ Inactive</i>"
+reload_voice_admin_required: "<b>• Voice chat:</b> <i>❌ Admin permission required</i>"
+reload_voice_fail: "<b>• Voice chat:</b> <i>❌ ({error})</i>"
+reload_voice_active: "<b>• Voice chat:</b> <i>✅ Active</i>"
+
+reload_assistant_banned: "<b>• Assistant:</b> <i>❌ Banned</i>"
+reload_assistant_admin_required: "<b>• Assistant:</b> <i>❌ Admin permission required</i>"
+reload_assistant_join_rejected: "<b>• Assistant:</b> <i>❌ Invite rejected or invalid</i>"
+reload_assistant_rate_limited: "<b>• Assistant:</b> <i>❌ Rate limited</i>"
+reload_assistant_join_request_sent: "<b>• Assistant:</b> <i>⚪ Join request sent</i>"
+reload_assistant_fail: "<b>• Assistant:</b> <i>❌ ({error})</i>"
+reload_assistant_present: "<b>• Assistant:</b> <i>✅ Present</i>"
+reload_assistant_not_present: "<b>• Assistant:</b> <i>⚪ Not present</i>"
+
+reload_room_reset: "<b>• Room:</b> <i>Reset ✅</i>"
+
+
 remove_usage: "⚠️ <b>Invalid usage.</b>\nUsage: <code>{cmd} [index]</code>"
 remove_invalid_index: "⚠️ <b>Invalid index.</b> It must be a <b>number</b>."
 remove_index_too_small: "⚠️ <b>Index must be greater than 0.</b>"
