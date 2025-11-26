@@ -171,64 +171,69 @@ func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 }
 
 func prepareRoomAndSearchMessage(m *telegram.NewMessage, cplay bool) (*core.RoomState, *telegram.NewMessage, error) {
-	r, err := getEffectiveRoom(m, cplay)
-	if err != nil {
-		m.Reply(err.Error())
-		return nil, nil, err
-	}
+        r, err := getEffectiveRoom(m, cplay)
+        if err != nil {
+                m.Reply(err.Error())
+                return nil, nil, err
+        }
 
-	r.SetCPlay(cplay)
-	r.Parse()
+        chatID := r.ChatID
+        r.SetCPlay(cplay)
+        r.Parse()
 
-	if len(r.Queue) >= config.QueueLimit {
-		m.Reply(fmt.Sprintf(
-			"⚠️ Queue limit reached (%d tracks max). Use /clear to clear queue.",
-			config.QueueLimit,
-		))
-		return nil, nil, fmt.Errorf("queue limit reached")
-	}
+        if len(r.Queue) >= config.QueueLimit {
+                m.Reply(F(chatID, "queue_limit_reached", locales.Arg{
+                        "limit": config.QueueLimit,
+                }))
+                return nil, nil, fmt.Errorf("queue limit reached")
+        }
 
-	parts := strings.SplitN(m.Text(), " ", 2)
-	query := ""
-	if len(parts) > 1 {
-		query = strings.TrimSpace(parts[1])
-	}
+        parts := strings.SplitN(m.Text(), " ", 2)
+        query := ""
+        if len(parts) > 1 {
+                query = strings.TrimSpace(parts[1])
+        }
 
-	if query == "" && !m.IsReply() {
-		m.Reply(fmt.Sprintf(
-			"🎵 <b>Whoops! No song detected.</b> Type <b>%s</b> <i>song name</i> or reply to a <i>media</i> to get the music going!",
-			getCommand(m),
-		))
-		return nil, nil, fmt.Errorf("no song query")
-	}
+        if query == "" && !m.IsReply() {
+                m.Reply(F(chatID, "no_song_query", locales.Arg{
+                        "cmd": getCommand(m),
+                }))
+                return nil, nil, fmt.Errorf("no song query")
+        }
 
-	searchStr := "🔍🎶 Searching... ⚡✨"
-	if query != "" {
-		searchStr = "🔍🎶 Searching for: " + html.EscapeString(query) + "... ⚡✨"
-	}
+        // Searching messages
+        searchStr := ""
+        if query != "" {
+                searchStr = F(chatID, "searching_query", locales.Arg{
+                        "query": html.EscapeString(query),
+                })
+        } else {
+                searchStr = F(chatID, "searching")
+        }
 
-	replyMsg, err := m.Reply(searchStr)
-	if err != nil {
-		gologging.ErrorF("Failed to send searching message: %v", err)
-		return nil, nil, err
-	}
+        replyMsg, err := m.Reply(searchStr)
+        if err != nil {
+                gologging.ErrorF("Failed to send searching message: %v", err)
+                return nil, nil, err
+        }
 
-	return r, replyMsg, nil
+        return r, replyMsg, nil
 }
+
 
 func fetchTracksAndCheckStatus(
 	m *telegram.NewMessage,
 	replyMsg *telegram.NewMessage,
 	r *core.RoomState,
 ) ([]*state.Track, bool, error) {
-	tracks, err := safeGetTracks(m, replyMsg)
+	tracks, err := safeGetTracks(m, replyMsg, r.ChatID)
 	if err != nil {
 		utils.EOR(replyMsg, err.Error())
 		return nil, false, err
 	}
 
 	if len(tracks) == 0 {
-		utils.EOR(replyMsg, "❌ No tracks found.")
+		utils.EOR(replyMsg, F(r.ChatID, "no_song_found"))
 		return nil, false, fmt.Errorf("no tracks found")
 	}
 
@@ -236,13 +241,13 @@ func fetchTracksAndCheckStatus(
 
 	if _, err := core.GetVoiceChatStatus(r.ChatID); err != nil {
 		gologging.ErrorF("Error getting voice chat status: %v", err)
-		utils.EOR(replyMsg, getAssistantErrorMessage(err))
+		utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
 		return nil, false, err
 	}
 
 	if _, err := core.GetAssistantStatus(r.ChatID); err != nil {
 		gologging.ErrorF("Error getting assistant status: %v", err)
-		utils.EOR(replyMsg, getAssistantErrorMessage(err))
+		utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
 		return nil, false, err
 	}
 
@@ -349,7 +354,7 @@ func playTracksAndRespond(
 				}
 			}()
 
-			path, err := safeDownload(ctx, track, replyMsg)
+			path, err := safeDownload(ctx, track, replyMsg, r.ChatID)
 			if err != nil {
 				if errors.Is(err, context.Canceled) {
 					utils.EOR(replyMsg, fmt.Sprintf("⚠️ Download canceled by %s.", mention))
@@ -494,81 +499,82 @@ func playTrackWithRetry(
 	return nil
 }
 
-type msgFn func(error) string
+type msgFn func(chatID int64, err error) string
 
 var errMessageMap = map[error]msgFn{
-	core.ErrAssistantBanned: func(_ error) string {
-		return "<b>🚫 Assistant Restricted</b>\n\nI can't play music because " +
-			utils.MentionHTML(core.UbUser) +
-			"(UserID: <code>" + utils.IntToStr(core.UbUser.ID) +
-			"</code>) is banned or removed from this chat.\n\n" +
-			"<i><b>✅ Unbanned already?</b> Use /reload to refresh and sync.</i>"
+	core.ErrAssistantBanned: func(chatID int64, _ error) string {
+		return F(chatID, "err_assistant_banned", locales.Arg{
+			"user": utils.MentionHTML(core.UbUser),
+			"id":   utils.IntToStr(core.UbUser.ID),
+		})
 	},
 
-	core.ErrAdminPermissionRequired: func(_ error) string {
-		return "⚠️ <b>Admin Permission Required</b>\n\n" +
-			"I need <i>admin access</i> to manage and check members in this chat.\n\n" +
-			"➤ <b>Promote me with</b> <code>Manage Chat / Invite Users</code> permission."
+	core.ErrAdminPermissionRequired: func(chatID int64, _ error) string {
+		return F(chatID, "err_admin_permission_required")
 	},
 
-	core.ErrAssistantJoinRateLimited: func(_ error) string {
-		return "⚠️ Assistant cannot join because it has reached the maximum number of allowed groups."
+	core.ErrAssistantJoinRateLimited: func(chatID int64, _ error) string {
+		return F(chatID, "err_assistant_join_rate_limited")
 	},
 
-	core.ErrAssistantJoinRequestSent: func(_ error) string {
-		return "⚠️ Assistant sent a join request, but I couldn't auto-approve it.\n\n" +
-			"<i>✅ Please manually approve the request, then try again.</i>"
+	core.ErrAssistantJoinRequestSent: func(chatID int64, _ error) string {
+		return F(chatID, "err_assistant_join_request_sent")
 	},
 
-	core.ErrAssistantInviteLinkFetch: func(e error) string {
-		return "⚠️ Failed to fetch invite link:\n\n<i>" + e.Error() + "</i>"
+	core.ErrAssistantInviteLinkFetch: func(chatID int64, e error) string {
+		return F(chatID, "err_assistant_invite_link_fetch", locales.Arg{
+			"error": e.Error(),
+		})
 	},
 
-	core.ErrAssistantInviteFailed: func(e error) string {
-		return "⚠️ Assistant failed to join this chat:\n\n<i>" + e.Error() + "</i>"
+	core.ErrAssistantInviteFailed: func(chatID int64, e error) string {
+		return F(chatID, "err_assistant_invite_failed", locales.Arg{
+			"error": e.Error(),
+		})
 	},
 
-	core.ErrAssistantJoinRejected: func(_ error) string {
-		return "⚠️ Invite link is invalid or expired. Please regenerate a fresh invite link."
+	core.ErrNoActiveVoiceChat: func(chatID int64, _ error) string {
+		return F(chatID, "err_no_active_voicechat")
 	},
 
-	core.ErrNoActiveVoiceChat: func(_ error) string {
-		return "<b>🎙️ No Active Voice Chat</b>\n\n" +
-			"I can't join yet — please start a voice chat to begin playing music.\n\n" +
-			"<i><b>✅ Already started one?</b> Use /reload to refresh and sync this chat.</i>"
+	core.ErrFetchFailed: func(chatID int64, e error) string {
+		return F(chatID, "err_fetch_failed", locales.Arg{
+			"error": e.Error(),
+		})
 	},
 
-	core.ErrFetchFailed: func(e error) string {
-		return "⚠️ Failed to fetch chat info:\n\n<i>" + e.Error() + "</i>"
-	},
-
-	core.ErrPeerResolveFailed: func(_ error) string {
-		return "⚠️ Failed to resolve peer information. Try again later or re-add the assistant."
+	core.ErrPeerResolveFailed: func(chatID int64, _ error) string {
+		return F(chatID, "err_peer_resolve_failed")
 	},
 }
 
-func getAssistantErrorMessage(err error) string {
+func getErrorMessage(chatID int64, err error) string {
 	if err == nil {
 		return ""
 	}
 
 	for key, fn := range errMessageMap {
 		if errors.Is(err, key) {
-			return fn(err)
+			return fn(chatID, err)
 		}
 	}
 
-	return "⚠️ Unknown Error Occurred:\n\n<i>" + err.Error() + "</i>"
+	return F(chatID, "err_unknown", locales.Arg{
+		"error": err.Error(),
+	})
 }
 
 // Both safeDownload and safeGetTracks re-raise panic because all command
 // handlers are wrapped by SafeMessageHandler, which catches panics and sends
 // the debug trace to the logger and the owner.
 
-func safeGetTracks(m, replyMsg *telegram.NewMessage) (tracks []*state.Track, err error) {
+func safeGetTracks(
+	m, replyMsg *telegram.NewMessage,
+	chatID int64,
+) (tracks []*state.Track, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			utils.EOR(replyMsg, "⚠️ Failed to fetch track details.\nPlease try again later.")
+			utils.EOR(replyMsg, F(chatID, "err_fetch_tracks"))
 			panic(r)
 		}
 	}()
@@ -581,10 +587,11 @@ func safeDownload(
 	ctx context.Context,
 	track *state.Track,
 	replyMsg *telegram.NewMessage,
+	chatID int64,
 ) (path string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			utils.EOR(replyMsg, "⚠️ Download failed due to an unexpected internal error.")
+			utils.EOR(replyMsg, F(chatID, "err_download_internal"))
 			panic(r)
 		}
 	}()
