@@ -82,9 +82,7 @@ func handleLoop(m *tg.NewMessage, cplay bool) error {
 		return tg.EndGroup
 	}
 
-	r.Lock()
-	r.Loop = newLoop
-	r.Unlock()
+	r.SetLoop( newLoop)
 
 	mention := utils.MentionHTML(m.Sender)
 	var msg string
