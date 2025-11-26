@@ -41,9 +41,7 @@ import (
 	"main/internal/utils"
 )
 
-	const playMaxRetries = 3
-
-
+const playMaxRetries = 3
 
 func channelPlayHandler(m *telegram.NewMessage) error {
 	m.Reply("⚠️ This handler is deprecated. Use <code><a>/cplay --set channel_id </code></a> to set your channel for playback.")
@@ -142,6 +140,7 @@ func cplayHandler(m *telegram.NewMessage) error {
 func cfplayHandler(m *telegram.NewMessage) error {
 	return handlePlay(m, true, true)
 }
+
 func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 	mention := utils.MentionHTML(m.Sender)
 
@@ -222,7 +221,6 @@ func fetchTracksAndCheckStatus(
 	replyMsg *telegram.NewMessage,
 	r *core.RoomState,
 ) ([]*state.Track, bool, error) {
-
 	tracks, err := safeGetTracks(m, replyMsg)
 	if err != nil {
 		utils.EOR(replyMsg, err.Error())
@@ -256,7 +254,6 @@ func filterAndTrimTracks(
 	r *core.RoomState,
 	tracks []*state.Track,
 ) ([]*state.Track, int, error) {
-
 	var filteredTracks []*state.Track
 	var skippedTracks []string
 
@@ -329,7 +326,6 @@ func playTracksAndRespond(
 	isActive, force bool,
 	availableSlots int,
 ) error {
-
 	for i, track := range tracks {
 		track.BY = mention
 		title := html.EscapeString(utils.ShortTitle(track.Title, 25))
@@ -455,7 +451,6 @@ func playTrackWithRetry(
 	force bool,
 	replyMsg *telegram.NewMessage,
 ) error {
-
 	for attempt := 1; attempt <= playMaxRetries; attempt++ {
 		err := r.Play(track, filePath, force)
 		if err == nil {
@@ -583,18 +578,17 @@ func safeGetTracks(m, replyMsg *telegram.NewMessage) (tracks []*state.Track, err
 }
 
 func safeDownload(
-    ctx context.Context,
-    track *state.Track,
-    replyMsg *telegram.NewMessage,
+	ctx context.Context,
+	track *state.Track,
+	replyMsg *telegram.NewMessage,
 ) (path string, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			utils.EOR(replyMsg, "⚠️ Download failed due to an unexpected internal error.")
+			panic(r)
+		}
+	}()
 
-    defer func() {
-        if r := recover(); r != nil {
-            utils.EOR(replyMsg, "⚠️ Download failed due to an unexpected internal error.")
-            panic(r)
-        }
-    }()
-
-    path, err = platforms.Download(ctx, track, replyMsg)
-    return path, err
+	path, err = platforms.Download(ctx, track, replyMsg)
+	return path, err
 }
