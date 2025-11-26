@@ -44,7 +44,7 @@ import (
 const playMaxRetries = 3
 
 func channelPlayHandler(m *telegram.NewMessage) error {
-	m.Reply("⚠️ This handler is deprecated. Use <code><a>/cplay --set channel_id </code></a> to set your channel for playback.")
+	m.Reply(F(m.ChannelID(), "channel_play_depreceated"))
 	return telegram.EndGroup
 }
 
@@ -253,12 +253,14 @@ func fetchTracksAndCheckStatus(
 
 	return tracks, isActive, nil
 }
-
 func filterAndTrimTracks(
 	replyMsg *telegram.NewMessage,
 	r *core.RoomState,
 	tracks []*state.Track,
 ) ([]*state.Track, int, error) {
+
+	chatID := r.ChatID
+
 	var filteredTracks []*state.Track
 	var skippedTracks []string
 
@@ -273,31 +275,36 @@ func filterAndTrimTracks(
 		filteredTracks = append(filteredTracks, track)
 	}
 
+	// Some tracks were skipped due to duration limit
 	if len(skippedTracks) > 0 {
+
 		// CASE 1: Only one track and it was skipped
 		if len(tracks) == 1 && len(filteredTracks) == 0 {
-			msg := fmt.Sprintf(
-				"⚠️ You can't play songs longer than %d minutes.\n<i>%s</i> was skipped.",
-				config.DurationLimit/60,
-				skippedTracks[0],
-			)
-			utils.EOR(replyMsg, msg)
+			utils.EOR(replyMsg, F(chatID, "play_single_track_too_long", locales.Arg{
+				"limit_mins": formatDuration(config.DurationLimit),
+				"title":      skippedTracks[0],
+			}))
 			return nil, 0, fmt.Errorf("single long track skipped")
 		}
 
-		// CASE 2: multiple skipped tracks
+		// CASE 2: Multiple tracks skipped
 		var b strings.Builder
-		fmt.Fprintf(&b,
-			"<b>⚠️ %d tracks were skipped (max duration %d mins):</b>\n",
-			len(skippedTracks),
-			config.DurationLimit/60,
-		)
+
+		b.WriteString(F(chatID, "play_multiple_tracks_too_long_header", locales.Arg{
+			"count":      len(skippedTracks),
+			"limit_mins": config.DurationLimit / 60,
+		}))
+		b.WriteString("\n")
 
 		for i, title := range skippedTracks {
 			if i < 5 {
-				fmt.Fprintf(&b, "— <i>%s</i>\n", title)
+				b.WriteString(F(chatID, "play_multiple_tracks_too_long_item", locales.Arg{
+					"title": title,
+				}) + "\n")
 			} else {
-				fmt.Fprintf(&b, "... and %d more.\n", len(skippedTracks)-i)
+				b.WriteString(F(chatID, "play_multiple_tracks_too_long_more", locales.Arg{
+					"remaining": len(skippedTracks) - i,
+				}) + "\n")
 				break
 			}
 		}
@@ -306,17 +313,20 @@ func filterAndTrimTracks(
 		time.Sleep(1 * time.Second)
 	}
 
+	// Keep only accepted tracks
 	tracks = filteredTracks
 
+	// CASE: everything was skipped
 	if len(tracks) == 0 {
-		utils.EOR(replyMsg, "❌ All found tracks were skipped due to duration limits.")
+		utils.EOR(replyMsg, F(chatID, "play_all_tracks_skipped"))
 		return nil, 0, fmt.Errorf("all tracks skipped")
 	}
 
+	// Respect queue limit
 	availableSlots := config.QueueLimit - len(r.Queue)
 	if availableSlots < len(tracks) {
 		tracks = tracks[:availableSlots]
-		gologging.WarnF("Queue full — adding only %d tracks out of request.", availableSlots)
+		gologging.WarnF("Queue full — adding only %d tracks out of requested.", availableSlots)
 	}
 
 	return tracks, availableSlots, nil
@@ -331,6 +341,8 @@ func playTracksAndRespond(
 	isActive, force bool,
 	availableSlots int,
 ) error {
+	chatID := r.ChatID
+
 	for i, track := range tracks {
 		track.BY = mention
 		title := html.EscapeString(utils.ShortTitle(track.Title, 25))
@@ -343,7 +355,10 @@ func playTracksAndRespond(
 				opt = &telegram.SendOptions{ReplyMarkup: core.GetCancekKeyboard()}
 			}
 
-			replyMsg, _ = utils.EOR(replyMsg, fmt.Sprintf("📥 Downloading song \"%s\"", title), opt)
+			downloadingText := F(chatID, "play_downloading_song", locales.Arg{
+				"title": title,
+			})
+			replyMsg, _ = utils.EOR(replyMsg, downloadingText, opt)
 
 			ctx, cancel := context.WithCancel(context.Background())
 			downloadCancels[r.ChatID] = cancel
@@ -354,12 +369,17 @@ func playTracksAndRespond(
 				}
 			}()
 
-			path, err := safeDownload(ctx, track, replyMsg, r.ChatID)
+			path, err := safeDownload(ctx, track, replyMsg, chatID)
 			if err != nil {
 				if errors.Is(err, context.Canceled) {
-					utils.EOR(replyMsg, fmt.Sprintf("⚠️ Download canceled by %s.", mention))
+					utils.EOR(replyMsg, F(chatID, "play_download_canceled", locales.Arg{
+						"user": mention,
+					}))
 				} else {
-					utils.EOR(replyMsg, fmt.Sprintf("❌ Failed to download \"%s\". Error: %v", title, err))
+					utils.EOR(replyMsg, F(chatID, "play_download_failed", locales.Arg{
+						"title": title,
+						"error": html.EscapeString(err.Error()),
+					}))
 				}
 				return telegram.EndGroup
 			}
@@ -368,7 +388,7 @@ func playTracksAndRespond(
 			gologging.InfoF("Downloaded track to %s", filePath)
 		}
 
-		// 🔁 play with retry handled by helper
+		// 🔁 play with retry
 		if err := playTrackWithRetry(r, track, filePath, force && i == 0, replyMsg); err != nil {
 			return err
 		}
@@ -390,27 +410,32 @@ func playTracksAndRespond(
 			opt.Media = utils.CleanURL(mainTrack.Artwork)
 		}
 
-		replyMsg, _ = utils.EOR(
-			replyMsg,
-			fmt.Sprintf(
-				"<b>🎵 Now Playing:</b>\n\n<b>▫ Track:</b> <a href=\"%s\">%s</a>\n<b>▫ Duration:</b> %s\n<b>▫ Requested by:</b> %s",
-				mainTrack.URL,
-				title,
-				formatDuration(mainTrack.Duration),
-				mention,
-			),
-			&opt,
-		)
+		nowPlayingText := F(chatID, "stream_now_playing", locales.Arg{
+			"url":      mainTrack.URL,
+			"title":    title,
+			"duration": formatDuration(mainTrack.Duration),
+			"by":       mention,
+		})
 
+		replyMsg, _ = utils.EOR(replyMsg, nowPlayingText, &opt)
 		r.SetMystic(replyMsg)
 
 		if len(tracks) > 1 {
+			addedCount := len(tracks) - 1
+
 			var b strings.Builder
-			b.WriteString(fmt.Sprintf("➕ <b>Added %d tracks</b> by %s\n\n", len(tracks)-1, mention))
+			b.WriteString(F(chatID, "play_added_multiple_header", locales.Arg{
+				"count": addedCount,
+				"user":  mention,
+			}))
+			b.WriteString("\n\n")
+
 			if availableSlots <= len(tracks) {
-				b.WriteString("⚠️ <i>Queue limit reached — some tracks were skipped.</i>\n")
+				b.WriteString(F(chatID, "play_queue_limit_hint"))
+				b.WriteString("\n")
 			}
-			b.WriteString("<i>Use /queue to view full list.</i>")
+
+			b.WriteString(F(chatID, "play_queue_view_hint"))
 			replyMsg.Respond(b.String())
 		}
 	} else {
@@ -424,24 +449,29 @@ func playTracksAndRespond(
 			if mainTrack.Artwork != "" {
 				opt.Media = utils.CleanURL(mainTrack.Artwork)
 			}
-			replyMsg, _ = utils.EOR(
-				replyMsg,
-				fmt.Sprintf(
-					"<b>🎵 Added to Queue:</b>\n\n<b>▫ Track:</b> <a href=\"%s\">%s</a>\n<b>▫ Duration:</b> %s\n<b>▫ Requested by:</b> %s",
-					mainTrack.URL,
-					title,
-					formatDuration(mainTrack.Duration),
-					mention,
-				),
-				opt,
-			)
+
+			addedText := F(chatID, "play_added_to_queue_single", locales.Arg{
+				"url":      mainTrack.URL,
+				"title":    title,
+				"duration": formatDuration(mainTrack.Duration),
+				"by":       mention,
+			})
+
+			replyMsg, _ = utils.EOR(replyMsg, addedText, opt)
 		} else {
 			var b strings.Builder
-			b.WriteString(fmt.Sprintf("➕ <b>Added %d tracks</b> by %s\n\n", len(tracks), mention))
+			b.WriteString(F(chatID, "play_added_multiple_header", locales.Arg{
+				"count": len(tracks),
+				"user":  mention,
+			}))
+			b.WriteString("\n\n")
+
 			if availableSlots <= len(tracks) {
-				b.WriteString("⚠️ <i>Queue limit reached — some tracks were skipped.</i>\n")
+				b.WriteString(F(chatID, "play_queue_limit_hint"))
+				b.WriteString("\n")
 			}
-			b.WriteString("<i>Use /queue to view full list.</i>")
+
+			b.WriteString(F(chatID, "play_queue_view_hint"))
 			utils.EOR(replyMsg, b.String())
 		}
 	}
@@ -474,7 +504,7 @@ func playTrackWithRetry(
 
 		// RTMP unsupported
 		if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
-			utils.EOR(replyMsg, "⚠️ RTMP stream not supported right now.")
+			utils.EOR(replyMsg, F(r.ChatID, "play_rtmp_not_supported"))
 			r.Destroy()
 			return telegram.EndGroup
 		}
@@ -489,7 +519,7 @@ func playTrackWithRetry(
 		// Last attempt failed
 		if attempt == playMaxRetries {
 			gologging.Error("❌ Failed to play after " + utils.IntToStr(maxRetries) + " attempts. Error: " + err.Error())
-			utils.EOR(replyMsg, "❌ Failed to play\nError: "+err.Error())
+			utils.EOR(replyMsg, F(r.ChatID, "play_failed", locales.Arg{"error": err.Error()}))
 			return err
 		}
 
