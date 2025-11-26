@@ -266,6 +266,34 @@ pause_success: |
   👤 Paused by: {user}
   {auto_resume_line}
 
+play_single_track_too_long: |
+  ⚠️ You can't play songs longer than {limit_mins} minutes.
+  <i>{title}</i> was skipped.
+
+play_download_failed: |
+  ❌ Failed to download "<i>{title}</i>".
+  Error: <code>{error}</code>
+
+play_added_to_queue_single: |
+  <b>🎵 Added to Queue:</b>
+
+  <b>▫ Track:</b> <a href="{url}">{title}</a>
+  <b>▫ Duration:</b> {duration}
+  <b>▫ Requested by:</b> {by}
+
+channel_play_depreceated: "⚠️ This handler is deprecated. Use <code><a>/cplay --set channel_id </code></a> to set your channel for playback."
+play_multiple_tracks_too_long_header: "<b>⚠️ {count} tracks were skipped (max duration {limit_mins} mins):</b>"
+play_multiple_tracks_too_long_item: "— <i>{title}</i>"
+play_multiple_tracks_too_long_more: "... and {remaining} more."
+play_all_tracks_skipped: "❌ All found tracks were skipped due to duration limits."
+play_rtmp_not_supported: "⚠️ RTMP stream not supported right now."
+play_failed: "❌ Failed to play\nError: {error}"
+play_downloading_song: "📥 Downloading song \"{title}\""
+play_download_canceled: "⚠️ Download canceled by {user}."
+play_added_multiple_header: "➕ <b>Added {count} tracks</b> by {user}"
+play_queue_limit_hint: "⚠️ <i>Queue limit reached — some tracks were skipped.</i>"
+play_queue_view_hint: "<i>Use /queue to view full list.</i>"
+
 queue_limit_reached: "⚠️ Queue limit reached ({limit} tracks max). Use /clear to clear queue."
 
 searching: "🔍🎶 Searching... ⚡✨"
