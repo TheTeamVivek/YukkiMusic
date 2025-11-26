@@ -5,6 +5,7 @@ invalid_bool: "⚠️ <b>Invalid value.</b>\nUse 'enable' or 'disable'."
 active_chats_info: "📊 <b>Active Chats:</b>\n\nThere are <i>{count}</i> active chats across the bot system."
 active_chats_info_with_issue: "📊 <b>Active Chats:</b>\n\nThere are <i>{count}</i> active chats across the bot system, but <i>{broken}</i> of them may have issues displaying correctly."
 
+
 # 🚫 Assistant Restricted / Banned
 assistant_restricted_warning: |
   ⚠️ <b>Assistant Restricted</b>
@@ -97,6 +98,62 @@ chat_not_recognized: "⚠️ Chat not recognized."
 clear_no_active: "⚠️ <b>No active playback or queue to clear.</b>"
 clear_success: "✅ The queue has been cleared by {user}."
 
+err_assistant_banned: |
+  <b>🚫 Assistant Restricted</b>
+
+  I can't play music because {user} (UserID: <code>{id}</code>) is <b>banned</b> or <b>removed</b> from this chat.
+
+  <i>✅ Unbanned them already? Use /reload to refresh.</i>
+
+err_admin_permission_required: |
+  ⚠️ <b>Admin Permission Required</b>
+
+  I need <i>admin access</i> to manage and check members in this chat.
+  
+  ➤ <b>Promote me with</b> <code>Manage Chat / Invite Users</code> permission.
+
+err_assistant_join_rate_limited: |
+  ⚠️ Assistant cannot join this chat because it has reached the maximum number of allowed groups.
+
+err_assistant_join_request_sent: |
+  ⚠️ Assistant sent a join request, but I could not auto-approve it.
+
+  <i>✅ Please approve the request manually, then try again.</i>
+
+err_assistant_invite_link_fetch: |
+  ⚠️ Failed to fetch invite link:
+  <i>{error}</i>
+
+err_assistant_invite_failed: |
+  ⚠️ Assistant failed to join this chat:
+  <i>{error}</i>
+
+err_no_active_voicechat: |
+  🎙️ <b>No Active Voice Chat</b>
+
+  I can't join — please start a voice chat first.
+
+  <i>Already started one? Use /reload to refresh.</i>
+
+err_fetch_failed: |
+  ⚠️ Failed to fetch chat info:
+  <i>{error}</i>
+
+err_peer_resolve_failed: |
+  ⚠️ Failed to resolve peer information. Try again later or re-add the assistant.
+
+err_unknown: |
+  ⚠️ Unknown Error Occurred:
+  <i>{error}</i>
+
+err_fetch_tracks: |
+  ⚠️ <b>Failed to fetch track details.</b>
+  Please try again later.
+
+err_download_internal: |
+  ⚠️ <b>Download failed</b> due to an unexpected internal error.
+  Please try again later.
+  
 flood_seconds: "⏳ Slow down! Try again in {duration} seconds."
 flood_minutes: "⏳ Please wait {duration} minutes before using this command again."
 
@@ -181,6 +238,11 @@ mute_success_with_time: |
   👤 Muted by: {user}
   <i>⏳ Auto-unmute in <b>{duration}</b> seconds</i>
 
+no_song_query: |
+  🎵 <b>Whoops! No song detected.</b>
+  Type <b>{cmd}</b> <i>song name</i> or reply to a <i>media</i> to start playing!
+
+no_song_found: "❌ No tracks found."
 only_admin: "⚠️ <b>Permission Denied!</b>\nOnly <b>admins</b> can control this actions. You can still play songs 🎵.\n\nIf you believe you are an admin, please use /reload to refresh your admin status."
 only_admin_or_auth: "⚠️ <b>Access Denied</b>\nOnly <b>admins</b> or <b>authorized users</b> can control this actions.\n\nIf you recently became an admin, use /reload to refresh your permissions."
 only_admin_or_auth_cb: "⚠️ Only admins can do this actions."
@@ -203,6 +265,11 @@ pause_success: |
   ⏱️ Position: {position} / {duration}
   👤 Paused by: {user}
   {auto_resume_line}
+
+queue_limit_reached: "⚠️ Queue limit reached ({limit} tracks max). Use /clear to clear queue."
+
+searching: "🔍🎶 Searching... ⚡✨"
+searching_query: "🔍🎶 Searching for: <b>{query}</b>... ⚡✨"
 
 speed_line: "⚙️ Speed: <b>{speed}x</b>"
 
