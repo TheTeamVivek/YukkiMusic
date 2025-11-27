@@ -43,6 +43,7 @@ const (
 	font2Path = "internal/utils/_font2.ttf"
 )
 
+// FormatDuration formats a duration given in milliseconds as MM:SS.
 func FormatDuration(d int) string {
 	d /= 1000
 	m := d / 60
@@ -55,12 +56,15 @@ func trimToWidth(dc *gg.Context, text string, maxWidth float64) string {
 	if width, _ := dc.MeasureString(text); width <= maxWidth {
 		return text
 	}
-	for i := len(text); i > 0; i-- {
-		newText := text[:i] + ellipsis
-		if width, _ := dc.MeasureString(newText); width <= maxWidth {
-			return newText
+
+	runes := []rune(text)
+	for i := len(runes); i > 0; i-- {
+		candidate := string(runes[:i]) + ellipsis
+		if width, _ := dc.MeasureString(candidate); width <= maxWidth {
+			return candidate
 		}
 	}
+
 	return ellipsis
 }
 
@@ -73,15 +77,22 @@ func GenerateThumbnail(ctx context.Context, track *state.Track, artist string) (
 	if err := os.MkdirAll(CACHE_DIR, 0o755); err != nil {
 		return "", err
 	}
+
 	// Download thumbnail
 	thumbPath := filepath.Join(CACHE_DIR, fmt.Sprintf("thumb_%s.jpg", track.ID))
 	defer os.Remove(thumbPath)
 
-	resp, err := http.Get(track.Artwork)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, track.Artwork, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to create thumbnail request: %w", err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("failed to download thumbnail: %w", err)
 	}
 	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("failed to download thumbnail: status %s", resp.Status)
 	}
@@ -90,9 +101,9 @@ func GenerateThumbnail(ctx context.Context, track *state.Track, artist string) (
 	if err != nil {
 		return "", err
 	}
-	_, err = io.Copy(outFile, resp.Body)
-	outFile.Close()
-	if err != nil {
+	defer outFile.Close()
+
+	if _, err := io.Copy(outFile, resp.Body); err != nil {
 		return "", err
 	}
 
@@ -130,14 +141,16 @@ func GenerateThumbnail(ctx context.Context, track *state.Track, artist string) (
 
 	// Playing text
 	if err := dc.LoadFontFace(fontPath, 55); err != nil {
-		log.Printf("Failed to load font, using default: %v", err)
+		log.Printf("Failed to load font: %v", err)
+		return "", fmt.Errorf("load font %s: %w", fontPath, err)
 	}
 	dc.SetHexColor("#b9c0c7")
 	dc.DrawStringAnchored("Playing", textX, y1, 0, 0.2)
 
 	// Title text
 	if err := dc.LoadFontFace(font2Path, 100); err != nil {
-		log.Printf("Failed to load font2, using default: %v", err)
+		log.Printf("Failed to load font2: %v", err)
+		return "", fmt.Errorf("load font %s: %w", font2Path, err)
 	}
 	titleTrimmed := trimToWidth(dc, track.Title, 950)
 	dc.SetHexColor("#ffffff")
@@ -145,14 +158,16 @@ func GenerateThumbnail(ctx context.Context, track *state.Track, artist string) (
 
 	// Artist text
 	if err := dc.LoadFontFace(font2Path, 65); err != nil {
-		log.Printf("Failed to load font2, using default: %v", err)
+		log.Printf("Failed to load font2 for artist text: %v", err)
+		return "", fmt.Errorf("load font %s: %w", font2Path, err)
 	}
 	dc.SetHexColor("#cdcdcd")
 	dc.DrawStringAnchored(artist, textX, y1+220, 0, 0.2)
 
 	// Duration text
 	if err := dc.LoadFontFace(fontPath, 50); err != nil {
-		log.Printf("Failed to load font, using default: %v", err)
+		log.Printf("Failed to load font for duration: %v", err)
+		return "", fmt.Errorf("load font %s: %w", fontPath, err)
 	}
 	dc.SetHexColor("#b4b4b4")
 	durationStr := fmt.Sprintf("Duration: %s", FormatDuration(track.Duration))
