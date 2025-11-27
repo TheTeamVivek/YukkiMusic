@@ -222,6 +222,14 @@ Each platform works independently but connects seamlessly through a **priority-b
 > 💡 The Platform System is perfect for developers who want to add **custom APIs, new music sources, or modify fetching logic** without touching the bot’s core.
 ---
 
+## 📌 To-Do
+
+- [ ] Add multi-platform download fallback  
+      (if one platform fails, automatically try the next)
+
+- [ ] Improve auth command checks  
+      (simplify user extraction, bot checks, and errors)
+
 ## 🤝 Contributing
 
 Contributions are **welcome and appreciated**!  
