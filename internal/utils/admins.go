@@ -33,6 +33,10 @@ var adminCache = NewCache[string, []int64](30 * time.Minute)
 func IsChatAdmin(c *telegram.Client, chatID, userID int64) (bool, error) {
 	cacheKey := fmt.Sprintf("admins:%d", chatID)
 
+if chatID == userID { // chat anon admin 
+
+return true, nil
+}
 	ids, ok := adminCache.Get(cacheKey)
 	if ok {
 		return slices.Contains(ids, userID), nil
