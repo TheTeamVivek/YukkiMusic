@@ -38,8 +38,8 @@ const (
 	CACHE_DIR = "cache"
 	W         = 1920
 	H         = 1080
-	fontPath = "assets/font.ttf"
-	font2Path = "assets/font2.ttf"
+	fontPath = "internal/utils/_font.ttf"
+	font2Path = "internal/utils/_font2.ttf"
 
 )
 
