@@ -406,6 +406,14 @@ func playTracksAndRespond(
 		var opt telegram.SendOptions
 		opt.ParseMode = "HTML"
 		opt.ReplyMarkup = btn
+
+                thumb, tErr := utils.GenerateThumbnail(context.Background(), mainTrack, core.BUser.Username)
+                if tErr != nil {
+                        fmt.Println("Thumb err", err)
+                } else {
+                        mainTrack.Artwork = thumb
+                }
+
 		if mainTrack.Artwork != "" {
 			opt.Media = utils.CleanURL(mainTrack.Artwork)
 		}
