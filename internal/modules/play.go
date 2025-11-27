@@ -171,55 +171,54 @@ func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
 }
 
 func prepareRoomAndSearchMessage(m *telegram.NewMessage, cplay bool) (*core.RoomState, *telegram.NewMessage, error) {
-        r, err := getEffectiveRoom(m, cplay)
-        if err != nil {
-                m.Reply(err.Error())
-                return nil, nil, err
-        }
+	r, err := getEffectiveRoom(m, cplay)
+	if err != nil {
+		m.Reply(err.Error())
+		return nil, nil, err
+	}
 
-        chatID := r.ChatID
-        r.SetCPlay(cplay)
-        r.Parse()
+	chatID := r.ChatID
+	r.SetCPlay(cplay)
+	r.Parse()
 
-        if len(r.Queue) >= config.QueueLimit {
-                m.Reply(F(chatID, "queue_limit_reached", locales.Arg{
-                        "limit": config.QueueLimit,
-                }))
-                return nil, nil, fmt.Errorf("queue limit reached")
-        }
+	if len(r.Queue) >= config.QueueLimit {
+		m.Reply(F(chatID, "queue_limit_reached", locales.Arg{
+			"limit": config.QueueLimit,
+		}))
+		return nil, nil, fmt.Errorf("queue limit reached")
+	}
 
-        parts := strings.SplitN(m.Text(), " ", 2)
-        query := ""
-        if len(parts) > 1 {
-                query = strings.TrimSpace(parts[1])
-        }
+	parts := strings.SplitN(m.Text(), " ", 2)
+	query := ""
+	if len(parts) > 1 {
+		query = strings.TrimSpace(parts[1])
+	}
 
-        if query == "" && !m.IsReply() {
-                m.Reply(F(chatID, "no_song_query", locales.Arg{
-                        "cmd": getCommand(m),
-                }))
-                return nil, nil, fmt.Errorf("no song query")
-        }
+	if query == "" && !m.IsReply() {
+		m.Reply(F(chatID, "no_song_query", locales.Arg{
+			"cmd": getCommand(m),
+		}))
+		return nil, nil, fmt.Errorf("no song query")
+	}
 
-        // Searching messages
-        searchStr := ""
-        if query != "" {
-                searchStr = F(chatID, "searching_query", locales.Arg{
-                        "query": html.EscapeString(query),
-                })
-        } else {
-                searchStr = F(chatID, "searching")
-        }
+	// Searching messages
+	searchStr := ""
+	if query != "" {
+		searchStr = F(chatID, "searching_query", locales.Arg{
+			"query": html.EscapeString(query),
+		})
+	} else {
+		searchStr = F(chatID, "searching")
+	}
 
-        replyMsg, err := m.Reply(searchStr)
-        if err != nil {
-                gologging.ErrorF("Failed to send searching message: %v", err)
-                return nil, nil, err
-        }
+	replyMsg, err := m.Reply(searchStr)
+	if err != nil {
+		gologging.ErrorF("Failed to send searching message: %v", err)
+		return nil, nil, err
+	}
 
-        return r, replyMsg, nil
+	return r, replyMsg, nil
 }
-
 
 func fetchTracksAndCheckStatus(
 	m *telegram.NewMessage,
@@ -253,12 +252,12 @@ func fetchTracksAndCheckStatus(
 
 	return tracks, isActive, nil
 }
+
 func filterAndTrimTracks(
 	replyMsg *telegram.NewMessage,
 	r *core.RoomState,
 	tracks []*state.Track,
 ) ([]*state.Track, int, error) {
-
 	chatID := r.ChatID
 
 	var filteredTracks []*state.Track
@@ -407,12 +406,12 @@ func playTracksAndRespond(
 		opt.ParseMode = "HTML"
 		opt.ReplyMarkup = btn
 
-                thumb, tErr := utils.GenerateThumbnail(context.Background(), mainTrack, core.BUser.Username)
-                if tErr != nil {
-                        fmt.Println("Thumb err", err)
-                } else {
-                        mainTrack.Artwork = thumb
-                }
+		thumb, tErr := utils.GenerateThumbnail(context.Background(), mainTrack, core.BUser.Username)
+		if tErr != nil {
+			fmt.Println("Thumb err", err)
+		} else {
+			mainTrack.Artwork = thumb
+		}
 
 		if mainTrack.Artwork != "" {
 			opt.Media = utils.CleanURL(mainTrack.Artwork)

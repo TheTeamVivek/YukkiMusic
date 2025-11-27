@@ -29,18 +29,18 @@ import (
 	"os"
 	"path/filepath"
 
-	"main/internal/state"
 	"github.com/disintegration/imaging"
 	"github.com/fogleman/gg"
+
+	"main/internal/state"
 )
 
 const (
 	CACHE_DIR = "cache"
 	W         = 1920
 	H         = 1080
-	fontPath = "internal/utils/_font.ttf"
+	fontPath  = "internal/utils/_font.ttf"
 	font2Path = "internal/utils/_font2.ttf"
-
 )
 
 func FormatDuration(d int) string {
@@ -70,7 +70,7 @@ func GenerateThumbnail(ctx context.Context, track *state.Track, artist string) (
 		return cachePath, nil
 	}
 
-	if err := os.MkdirAll(CACHE_DIR, 0755); err != nil {
+	if err := os.MkdirAll(CACHE_DIR, 0o755); err != nil {
 		return "", err
 	}
 	// Download thumbnail
