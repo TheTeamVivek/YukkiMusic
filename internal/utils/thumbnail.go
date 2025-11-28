@@ -29,21 +29,20 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/TheTeamVivek/YukkiMusic/internal/state"
 	"github.com/disintegration/imaging"
 	"github.com/fogleman/gg"
-
-	"main/internal/state"
 )
 
 const (
 	CACHE_DIR = "cache"
-	W         = 1920
-	H         = 1080
 	fontPath  = "internal/utils/_font.ttf"
 	font2Path = "internal/utils/_font2.ttf"
+
+	W         = 1920
+	H         = 1080
 )
 
-// FormatDuration formats a duration given in milliseconds as MM:SS.
 func FormatDuration(d int) string {
 	d /= 1000
 	m := d / 60
@@ -56,43 +55,37 @@ func trimToWidth(dc *gg.Context, text string, maxWidth float64) string {
 	if width, _ := dc.MeasureString(text); width <= maxWidth {
 		return text
 	}
-
-	runes := []rune(text)
-	for i := len(runes); i > 0; i-- {
-		candidate := string(runes[:i]) + ellipsis
-		if width, _ := dc.MeasureString(candidate); width <= maxWidth {
-			return candidate
+	for i := len(text); i > 0; i-- {
+		newText := text[:i] + ellipsis
+		if width, _ := dc.MeasureString(newText); width <= maxWidth {
+			return newText
 		}
 	}
-
 	return ellipsis
+}
+
+func rndCur(d int) int {
+	return int(float64(d) * (0.10 + rand.Float64()*0.60))
 }
 
 func GenerateThumbnail(ctx context.Context, track *state.Track, artist string) (string, error) {
 	cachePath := filepath.Join(CACHE_DIR, fmt.Sprintf("%s_spotify_style.png", track.ID))
-	if _, err := os.Stat(cachePath); err == nil {
-		return cachePath, nil
-	}
 
-	if err := os.MkdirAll(CACHE_DIR, 0o755); err != nil {
+duration := track.Duration
+current := rndCur(duration)
+
+	if err := os.MkdirAll(CACHE_DIR, 0755); err != nil {
 		return "", err
 	}
-
 	// Download thumbnail
 	thumbPath := filepath.Join(CACHE_DIR, fmt.Sprintf("thumb_%s.jpg", track.ID))
 	defer os.Remove(thumbPath)
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, track.Artwork, nil)
-	if err != nil {
-		return "", fmt.Errorf("failed to create thumbnail request: %w", err)
-	}
-
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := http.Get(track.Artwork)
 	if err != nil {
 		return "", fmt.Errorf("failed to download thumbnail: %w", err)
 	}
 	defer resp.Body.Close()
-
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("failed to download thumbnail: status %s", resp.Status)
 	}
@@ -101,9 +94,9 @@ func GenerateThumbnail(ctx context.Context, track *state.Track, artist string) (
 	if err != nil {
 		return "", err
 	}
-	defer outFile.Close()
-
-	if _, err := io.Copy(outFile, resp.Body); err != nil {
+	_, err = io.Copy(outFile, resp.Body)
+	outFile.Close()
+	if err != nil {
 		return "", err
 	}
 
@@ -141,16 +134,14 @@ func GenerateThumbnail(ctx context.Context, track *state.Track, artist string) (
 
 	// Playing text
 	if err := dc.LoadFontFace(fontPath, 55); err != nil {
-		log.Printf("Failed to load font: %v", err)
-		return "", fmt.Errorf("load font %s: %w", fontPath, err)
+		log.Printf("Failed to load font, using default: %v", err)
 	}
 	dc.SetHexColor("#b9c0c7")
 	dc.DrawStringAnchored("Playing", textX, y1, 0, 0.2)
 
 	// Title text
 	if err := dc.LoadFontFace(font2Path, 100); err != nil {
-		log.Printf("Failed to load font2: %v", err)
-		return "", fmt.Errorf("load font %s: %w", font2Path, err)
+		log.Printf("Failed to load font2, using default: %v", err)
 	}
 	titleTrimmed := trimToWidth(dc, track.Title, 950)
 	dc.SetHexColor("#ffffff")
@@ -158,20 +149,35 @@ func GenerateThumbnail(ctx context.Context, track *state.Track, artist string) (
 
 	// Artist text
 	if err := dc.LoadFontFace(font2Path, 65); err != nil {
-		log.Printf("Failed to load font2 for artist text: %v", err)
-		return "", fmt.Errorf("load font %s: %w", font2Path, err)
+		log.Printf("Failed to load font2, using default: %v", err)
 	}
 	dc.SetHexColor("#cdcdcd")
 	dc.DrawStringAnchored(artist, textX, y1+220, 0, 0.2)
 
-	// Duration text
-	if err := dc.LoadFontFace(fontPath, 50); err != nil {
-		log.Printf("Failed to load font for duration: %v", err)
-		return "", fmt.Errorf("load font %s: %w", fontPath, err)
+	// Progress bar
+	y2 := float64(800)
+	progress := float64(current) / float64(duration)
+	barWidth := float64(1000)
+	barHeight := float64(20)
+	startX := (W - barWidth) / 2
+
+	// Draw background bar
+	dc.SetHexColor("#404040")
+	dc.DrawRectangle(startX, y2, barWidth, barHeight)
+	dc.Fill()
+
+	// Draw progress bar
+	dc.SetHexColor("#ffffff")
+	dc.DrawRectangle(startX, y2, barWidth*progress, barHeight)
+	dc.Fill()
+
+	// Time labels
+	if err := dc.LoadFontFace(fontPath, 40); err != nil {
+		log.Printf("Failed to load font, using default: %v", err)
 	}
-	dc.SetHexColor("#b4b4b4")
-	durationStr := fmt.Sprintf("Duration: %s", FormatDuration(track.Duration))
-	dc.DrawStringAnchored(durationStr, textX, y1+320, 0, 0.2)
+	dc.SetHexColor("#ffffff")
+	dc.DrawString(FormatDuration(current), startX, y2+barHeight+40)
+	dc.DrawStringAnchored(FormatDuration(duration), startX+barWidth, y2+barHeight+40, 1, 0)
 
 	// Save
 	if err := dc.SavePNG(cachePath); err != nil {
