@@ -29,7 +29,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
+	"main/internal/state"
 	"github.com/disintegration/imaging"
 	"github.com/fogleman/gg"
 )
@@ -51,18 +51,19 @@ func FormatDuration(d int) string {
 }
 
 func trimToWidth(dc *gg.Context, text string, maxWidth float64) string {
-	ellipsis := "…"
-	if width, _ := dc.MeasureString(text); width <= maxWidth {
-		return text
-	}
-	for i := len(text); i > 0; i-- {
-		newText := text[:i] + ellipsis
-		if width, _ := dc.MeasureString(newText); width <= maxWidth {
-			return newText
-		}
-	}
-	return ellipsis
+        ellipsis := "…"
+        if width, _ := dc.MeasureString(text); width <= maxWidth {
+                return text
+        }
+        for i := len(text); i > 0; i-- {
+                newText := text[:i] + ellipsis
+                if width, _ := dc.MeasureString(newText); width <= maxWidth {
+                        return newText
+                }
+        }
+        return ellipsis
 }
+
 
 func rndCur(d int) int {
 	return int(float64(d) * (0.10 + rand.Float64()*0.60))
