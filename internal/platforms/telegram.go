@@ -112,7 +112,7 @@ func (t *TelegramPlatform) GetTracksByMessage(rmsg *telegram.NewMessage) ([]*sta
 func (t *TelegramPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
 	downloadsDir := "downloads"
 	if err := os.MkdirAll(downloadsDir, os.ModePerm); err != nil {
-		return "", fmt.Errorf("⚠️ TelegramPlatform error: can't create Downloads folder: %v", err)
+		return "", fmt.Errorf("can't create downloads folder: %v", err)
 	}
 
 	ext := ".webm"
@@ -146,18 +146,18 @@ func (t *TelegramPlatform) Download(ctx context.Context, track *state.Track, mys
 	} else {
 		file, ferr := telegram.ResolveBotFileID(track.ID)
 		if ferr != nil {
-			return "", fmt.Errorf("⚠️ TelegramPlatform error: failed to locate file: %v", ferr)
+			return "", fmt.Errorf("failed to locate file: %v", ferr)
 		}
 		path, err = core.Bot.DownloadMedia(file, dOpts)
 	}
 
 	if err != nil {
+os.Remove(rawFile)
+		
 		if errors.Is(err, context.Canceled) {
-			os.Remove(rawFile)
 			return "", err
 		}
-		os.Remove(rawFile)
-		return "", fmt.Errorf("⚠️ TelegramPlatform error: download failed: %v", err)
+		return "", fmt.Errorf("download failed: %v", err)
 	}
 
 	if _, statErr := os.Stat(rawFile); statErr != nil {
