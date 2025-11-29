@@ -61,7 +61,7 @@ func (*FallenApiPlatform) IsValid(query string) bool {
 }
 
 func (*FallenApiPlatform) GetTracks(query string) ([]*state.Track, error) {
-	return nil, errors.New("FallenApi is a download-only platform")
+	return nil, errors.New("fallenapi is a download-only platform")
 }
 
 func (*FallenApiPlatform) IsDownloadSupported(source state.PlatformName) bool {
@@ -117,11 +117,11 @@ func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string)
 		SetResult(&apiResp).
 		Get(apiReqURL)
 	if err != nil {
-		return "", fmt.Errorf("API request failed: %w", err)
+		return "", fmt.Errorf("api request failed: %w", err)
 	}
 
 	if resp.IsError() {
-		return "", fmt.Errorf("API request failed with status: %d", resp.StatusCode())
+		return "", fmt.Errorf("api request failed with status: %d", resp.StatusCode())
 	}
 
 	if apiResp.CdnUrl == "" {
@@ -138,7 +138,7 @@ func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, filePath
 		SetOutputFileName(filePath).
 		Get(dlURL)
 	if err != nil {
-		return fmt.Errorf("HTTP download failed: %w", err)
+		return fmt.Errorf("http download failed: %w", err)
 	}
 
 	if resp.IsError() {
@@ -193,7 +193,7 @@ func (f *FallenApiPlatform) checkDownloadedFile(videoId string) (string, error) 
 	}
 
 	if len(matches) == 0 {
-		return "", errors.New("❌ file not found")
+		return "", errors.New("file not found")
 	}
 
 	// If multiple matches, pick the first one
