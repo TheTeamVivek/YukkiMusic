@@ -21,8 +21,6 @@ package platforms
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"html"
 	"mime"
 	"strings"
@@ -34,106 +32,153 @@ import (
 	"main/internal/utils"
 )
 
-func GetTracks(m *telegram.NewMessage) ([]*state.Track, error) {
+func clampTracks(tracks []*state.Track) []*state.Track {
+	if config.QueueLimit > 0 && len(tracks) > config.QueueLimit {
+		return tracks[:config.QueueLimit]
+	}
+	return tracks
+}
+
+func GetTracks(m *telegram.NewMessage) ([]*state.Track, string) {
 	var tracks []*state.Track
 	query := m.Args()
-	errorsCollected := []string{}
+	var errorsCollected []string
 
-	// --- 1. Extract URLs from message and reply ---
 	urls, _ := utils.ExtractURLs(m)
-	for _, url := range urls {
-		found := false
-		for _, p := range getOrderedPlatforms() {
-			if p.IsValid(url) {
-				t, err := p.GetTracks(url)
-				if err != nil {
-					errorsCollected = append(errorsCollected, fmt.Sprintf("<b>%s error:</b> %v", p.Name(), err))
-				} else {
-					tracks = append(tracks, t...)
-					found = true
 
-					// Check queue limit
-					if config.QueueLimit > 0 && len(tracks) >= config.QueueLimit {
-						return tracks[:config.QueueLimit], nil
-					}
-				}
-				break
+	for _, url := range urls {
+		supported := false
+
+		for _, p := range getOrderedPlatforms() {
+			if !p.IsValid(url) {
+				continue
 			}
+
+			supported = true
+			t, err := p.GetTracks(url)
+			if err != nil {
+				errorsCollected = append(errorsCollected,
+					"<b>"+html.EscapeString(p.Name())+" error:</b> "+html.EscapeString(err.Error()))
+			} else {
+				tracks = clampTracks(append(tracks, t...))
+				if len(tracks) > 0 && (config.QueueLimit == 0 || len(tracks) >= config.QueueLimit) {
+					return tracks, ""
+				}
+			}
+			break
 		}
 
-		if !found {
-			errorsCollected = append(errorsCollected, fmt.Sprintf("Unsupported or invalid URL: %s", html.EscapeString(url)))
+		if !supported {
+			errorsCollected = append(errorsCollected,
+				"Unsupported or invalid URL: "+html.EscapeString(url))
 		}
 	}
 
 	if len(tracks) > 0 {
-		return tracks, nil
+		return tracks, ""
 	}
 
-	// --- 2. If no URL tracks, try query as normal search ---
 	if query != "" {
 		yt := &YouTubePlatform{}
 		ytTracks, err := yt.VideoSearch(query, true)
 		if err != nil {
-			return nil, fmt.Errorf("<b>⚠️ YouTube search error</b>\n\n<i>%s</i>", html.EscapeString(err.Error()))
+			return nil, "<b>⚠️ YouTube search error</b>\n\n<i>" +
+				html.EscapeString(err.Error()) + "</i>"
 		}
 
 		if len(ytTracks) > 0 {
-			if config.QueueLimit > 0 && len(ytTracks) > config.QueueLimit {
-				ytTracks = ytTracks[:config.QueueLimit]
-			}
-			return []*state.Track{ytTracks[0]}, nil
+			ytTracks = clampTracks(ytTracks)
+			return []*state.Track{ytTracks[0]}, ""
 		}
-		errorsCollected = append(errorsCollected, fmt.Sprintf("No results found for: %s", html.EscapeString(query)))
+
+		errorsCollected = append(errorsCollected,
+			"No results found for: "+html.EscapeString(query))
 	}
 
-	// --- 3. If no URLs or query, check replied media ---
 	if m.IsReply() {
 		rmsg, err := m.GetReplyMessage()
 		if err != nil {
-			return nil, fmt.Errorf("failed to get replied message: %v", err)
+			return nil, "failed to get replied message: " + err.Error()
 		}
 
-		if rmsg.IsMedia() && (rmsg.Audio() != nil || rmsg.Video() != nil || rmsg.Voice() != nil || rmsg.Document() != nil) {
-			tg := &TelegramPlatform{}
+		if !(rmsg.IsMedia() &&
+			(rmsg.Audio() != nil || rmsg.Video() != nil || rmsg.Voice() != nil || rmsg.Document() != nil)) {
+			return nil, "⚠️ Reply with a valid media (audio/video)"
+		}
+
+		tg := &TelegramPlatform{}
+		isAudio := false
+		isVideo := false
+
+		if rmsg.Audio() != nil || rmsg.Voice() != nil {
+			isAudio = true
+		} else if rmsg.Video() != nil {
+			isVideo = true
+		} else if rmsg.Document() != nil {
 			ext := strings.ToLower(rmsg.File.Ext)
 			if !strings.HasPrefix(ext, ".") {
 				ext = "." + ext
 			}
-
 			mimeType := mime.TypeByExtension(ext)
-			audio := strings.HasPrefix(mimeType, "audio/")
-			video := strings.HasPrefix(mimeType, "video/")
+			isAudio = strings.HasPrefix(mimeType, "audio/")
+			isVideo = strings.HasPrefix(mimeType, "video/")
+		}
 
-			if audio || video {
-				t, err := tg.GetTracksByMessage(rmsg)
-				if err != nil {
-					errorsCollected = append(errorsCollected, fmt.Sprintf("Failed to get track from reply: %v", err))
-				} else {
-					if config.QueueLimit > 0 && len(t) > config.QueueLimit {
-						t = t[:config.QueueLimit]
-					}
-					return t, nil
-				}
-			} else {
-				return nil, fmt.Errorf("⚠️ Reply with a valid media (audio/video)")
-			}
+		if !isAudio && !isVideo {
+			return nil, "⚠️ Reply with a valid media (audio/video)"
+		}
+
+		t, err := tg.GetTracksByMessage(rmsg)
+		if err != nil {
+			errorsCollected = append(errorsCollected,
+				"Failed to get track from reply: "+html.EscapeString(err.Error()))
 		} else {
-			return nil, fmt.Errorf("⚠️ Reply with a valid media (audio/video)")
+			return clampTracks(t), ""
 		}
 	}
 
 	if len(errorsCollected) > 0 {
-		return nil, errors.New(strings.Join(errorsCollected, "\n"))
+		return nil, formatErrorsHTML(errorsCollected)
 	}
-	return nil, errors.New("⚠️ Provide a song to play")
+
+	return nil, "⚠️ Provide a song to play"
 }
 
-func Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
+func Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, string) {
+	var errs []string
+
 	for _, p := range getOrderedPlatforms() {
 		if p.IsDownloadSupported(track.Source) {
-			return p.Download(ctx, track, mystic)
+			path, err := p.Download(ctx, track, mystic)
+			if err == nil {
+				return path, ""
+			}
+			errs = append(errs,
+				html.EscapeString(p.Name())+": "+html.EscapeString(err.Error()))
 		}
 	}
-	return "", fmt.Errorf("no downloader available for source %q", track.Source)
+
+	if len(errs) > 0 {
+		return "", formatErrorsHTML(errs)
+	}
+
+	return "", "⚠️ No downloader available for source \"" + html.EscapeString(track.Source) + "\""
+}
+
+func formatErrorsHTML(errs []string) string {
+	if len(errs) == 0 {
+		return ""
+	}
+
+	var b strings.Builder
+	b.WriteString("<blockquote><b>⚠️ Multiple errors occurred:</b>\n\n")
+
+	for _, e := range errs {
+		b.WriteString("• ")
+		b.WriteString(e)
+		b.WriteString("\n")
+	}
+
+	b.WriteString("</blockquote>")
+	return b.String()
 }
