@@ -32,13 +32,16 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 	"resty.dev/v3"
 
-	"main/config"
 	"main/internal/core"
 	"main/internal/state"
 	"main/internal/utils"
 )
 
-var telegramDLRegex = regexp.MustCompile(`https:\/\/t\.me\/([a-zA-Z0-9_]{5,})\/(\d+)`)
+var (
+	telegramDLRegex = regexp.MustCompile(`https:\/\/t\.me\/([a-zA-Z0-9_]{5,})\/(\d+)`)
+	fallenAPIURL    = os.Getenv("FALLEN_API_URL")
+	fallenAPIKey    = os.Getenv("FALLEN_API_KEY")
+)
 
 const PlatformFallenApi state.PlatformName = "FallenApi"
 
@@ -50,6 +53,9 @@ type FallenApiPlatform struct{}
 
 func init() {
 	addPlatform(80, PlatformFallenApi, &FallenApiPlatform{})
+	if fallenAPIURL == "" {
+		fallenAPIURL = "https://tgmusic.fallenapi.fun"
+	}
 }
 
 func (*FallenApiPlatform) Name() state.PlatformName {
@@ -65,7 +71,7 @@ func (*FallenApiPlatform) GetTracks(query string) ([]*state.Track, error) {
 }
 
 func (*FallenApiPlatform) IsDownloadSupported(source state.PlatformName) bool {
-	if config.ApiURL == "" || config.ApiKEY == "" {
+	if fallenAPIURL == "" || fallenAPIKey == "" {
 		return false
 	}
 	return source == PlatformYouTube
@@ -107,7 +113,7 @@ func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, my
 }
 
 func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string) (string, error) {
-	apiReqURL := fmt.Sprintf("%s/track?api_key=%s&url=%s", config.ApiURL, config.ApiKEY, url.QueryEscape(mediaURL))
+	apiReqURL := fmt.Sprintf("%s/track?api_key=%s&url=%s", fallenAPIURL, fallenAPIKey, url.QueryEscape(mediaURL))
 
 	client := resty.New()
 	var apiResp APIResponse
