@@ -15,7 +15,6 @@
  * GNU General Public License for a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
 package modules
 
 import (
@@ -94,44 +93,45 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 	}
 	utils.SetFlood(floodKey, floodDuration)
 
-	// --- Voice chat status ---
-	voiceActive, voiceErr := core.GetVoiceChatStatus(chatID, true)
-	if voiceErr != nil {
+	cs := core.GetChatState(chatID)
+	defer cs.CleanIfNeeded()
+	err = cs.Refresh(true)
+	if err != nil {
 		switch {
-		case errors.Is(voiceErr, core.ErrNoActiveVoiceChat):
-			summary += F(chatID, "reload_voice_inactive") + "\n"
-		case errors.Is(voiceErr, core.ErrAdminPermissionRequired):
+		case errors.Is(err, core.ErrAdminPermissionRequired):
 			summary += F(chatID, "reload_voice_admin_required") + "\n"
 		default:
 			summary += F(chatID, "reload_voice_fail", locales.Arg{
-				"error": voiceErr.Error(),
+				"error": err.Error(),
 			}) + "\n"
 		}
-	} else if voiceActive {
+	} else if cs.IsActiveVC() {
 		summary += F(chatID, "reload_voice_active") + "\n"
+	} else {
+		summary += F(chatID, "reload_voice_inactive") + "\n"
 	}
 
-	// --- Assistant status ---
-	assistantActive, assistantErr := core.GetAssistantStatus(chatID, true)
-	if assistantErr != nil {
+	if err != nil {
 		switch {
-		case errors.Is(assistantErr, core.ErrAssistantBanned):
+		case errors.Is(err, core.ErrAssistantBanned):
 			summary += F(chatID, "reload_assistant_banned") + "\n"
-		case errors.Is(assistantErr, core.ErrAdminPermissionRequired):
+		case errors.Is(err, core.ErrAdminPermissionRequired):
 			summary += F(chatID, "reload_assistant_admin_required") + "\n"
-		case errors.Is(assistantErr, core.ErrAssistantJoinRejected):
+		case errors.Is(err, core.ErrAssistantJoinRejected):
 			summary += F(chatID, "reload_assistant_join_rejected") + "\n"
-		case errors.Is(assistantErr, core.ErrAssistantJoinRateLimited):
+		case errors.Is(err, core.ErrAssistantJoinRateLimited):
 			summary += F(chatID, "reload_assistant_rate_limited") + "\n"
-		case errors.Is(assistantErr, core.ErrAssistantJoinRequestSent):
+		case errors.Is(err, core.ErrAssistantJoinRequestSent):
 			summary += F(chatID, "reload_assistant_join_request_sent") + "\n"
 		default:
 			summary += F(chatID, "reload_assistant_fail", locales.Arg{
-				"error": assistantErr.Error(),
+				"error": err.Error(),
 			}) + "\n"
 		}
-	} else if assistantActive {
+	} else if cs.IsAssistantPresent() {
 		summary += F(chatID, "reload_assistant_present") + "\n"
+	} else if cs.IsAssistantBanned() {
+		summary += F(chatID, "reload_assistant_banned") + "\n"
 	} else {
 		summary += F(chatID, "reload_assistant_not_present") + "\n"
 	}
