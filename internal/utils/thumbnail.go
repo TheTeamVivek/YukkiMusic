@@ -23,15 +23,14 @@ package utils
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"math/rand/v2"
-	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/disintegration/imaging"
 	"github.com/fogleman/gg"
+	"resty.dev/v3"
 
 	"main/internal/state"
 )
@@ -83,23 +82,13 @@ func GenerateThumbnail(ctx context.Context, track *state.Track, artist string) (
 	thumbPath := filepath.Join(CACHE_DIR, fmt.Sprintf("thumb_%s.jpg", track.ID))
 	defer os.Remove(thumbPath)
 
-	resp, err := http.Get(track.Artwork)
+	client := resty.New()
+	resp, err := client.R().SetOutputFileName(thumbPath).Get(track.Artwork)
 	if err != nil {
 		return "", fmt.Errorf("failed to download thumbnail: %w", err)
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("failed to download thumbnail: status %s", resp.Status)
-	}
-
-	outFile, err := os.Create(thumbPath)
-	if err != nil {
-		return "", err
-	}
-	_, err = io.Copy(outFile, resp.Body)
-	outFile.Close()
-	if err != nil {
-		return "", err
+	if resp.IsError() {
+		return "", fmt.Errorf("failed to download thumbnail: status %s", resp.Status())
 	}
 
 	// Start drawing
