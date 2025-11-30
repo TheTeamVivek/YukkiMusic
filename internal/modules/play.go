@@ -237,17 +237,30 @@ func fetchTracksAndCheckStatus(
 	}
 
 	isActive := r.IsActiveChat()
-
-	if _, err := core.GetVoiceChatStatus(r.ChatID); err != nil {
-		gologging.ErrorF("Error getting voice chat status: %v", err)
+	cs := core.GetChatState(r.ChatID)
+	defer cs.CleanIfNeeded()
+	if err := cs.Refresh(); err != nil {
+		gologging.ErrorF("Error refreshing state: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
 		return nil, false, err
 	}
 
-	if _, err := core.GetAssistantStatus(r.ChatID); err != nil {
-		gologging.ErrorF("Error getting assistant status: %v", err)
-		utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
-		return nil, false, err
+	if !cs.IsActiveVC() {
+		utils.EOR(replyMsg, F(r.ChatID, "err_no_active_voicechat"))
+		return nil, false, core.ErrNoActiveVoiceChat
+	}
+
+	if cs.IsAssistantBanned() {
+		utils.EOR(replyMsg, getErrorMessage(r.ChatID, core.ErrAssistantBanned))
+		return nil, false, core.ErrAssistantBanned
+	}
+
+	if !cs.IsAssistantPresent() {
+		if err := cs.TryJoin(); err != nil {
+			gologging.ErrorF("Error joining assistant: %v", err)
+			utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
+			return nil, false, err
+		}
 	}
 
 	return tracks, isActive, nil
