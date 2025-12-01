@@ -24,13 +24,13 @@ auth_limit_reached: "⚠️ This chat has reached the maximum authorized users l
 already_authed: "⚠️ That user is already authorized — no need to add them again."
 
 # 🤖 Add auth
-addauth_bot_user: "🤖 You can’t add a bot to the auth list — sudoers must be human!"
+addauth_bot_user: "🤖 You can’t add a bot to the auth list — authusers must be human!"
 addauth_add_fail: "❌ Failed to add authorized user: {error}"
 addauth_success_with_count: "✅ Added {user}.\nNow {count}/{limit} authorized users."
 addauth_success: "✅ Successfully added {user} to the authorized users list."
 
 # 🤖 Bot Added to Chat
-bot_added_normal: "🎵 Thanks for adding me! Use /play <song> to start playing music."
+bot_added_normal: "🎵 Thanks for adding me! Use /play [song] to start playing music."
 
 # 🛠️ Bot Added During Maintenance
 bot_added_maintenance: "⚠️ I'm currently under maintenance and will be back soon. Thanks for your patience! ⏰"
@@ -73,7 +73,7 @@ authlist_user_entry: "{index}. {user} (<code>{user_id}</code>)"
 authlist_total: "<b>Total:</b> {count} users"
 
 autoleave_fetch_fail: "⚠️ <b>Failed to fetch AutoLeave state.</b>"
-autoleave_status: "🏃‍♂️ <b>AutoLeave Control</b>\n\nUsage: {cmd} [enable|disable]\nCurrent state: {action}"
+autoleave_status: "🏃‍♂️ <b>AutoLeave Control</b>\n\nWhen enabled, the assistant will automatically leave the chat.\nUsage: {cmd} [enable|disable]\nCurrent state: {action}"
 autoleave_already: "⚠️ AutoLeave is already {action}"
 autoleave_update_fail: "⚠️ <b>Failed to update AutoLeave state.</b>"
 autoleave_updated: "🏃‍♂️ AutoLeave has been {action}"
