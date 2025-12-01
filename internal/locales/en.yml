@@ -1,5 +1,6 @@
-name: "English"
+name: "🇺🇸 English"
 
+# basically this string used in /command [bool]
 invalid_bool: "⚠️ <b>Invalid value.</b>\nUse 'enable' or 'disable'."
 
 active_chats_info: "📊 <b>Active Chats:</b>\n\nThere are <i>{count}</i> active chats across the bot system."
