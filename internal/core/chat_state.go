@@ -42,10 +42,8 @@ type ChatState struct {
 }
 
 var (
-	ErrNoActiveVoiceChat        = errors.New("no active voice chat")
 	ErrAdminPermissionRequired  = errors.New("admin permission required")
 	ErrFetchFailed              = errors.New("failed to fetch chat info")
-	ErrAssistantBanned          = errors.New("assistant banned in chat")
 	ErrAssistantInviteLinkFetch = errors.New("failed to fetch invite link")
 	ErrAssistantJoinRejected    = errors.New("invite link is invalid or expired")
 	ErrAssistantJoinRateLimited = errors.New("assistant cannot join, rate limited")
@@ -85,75 +83,40 @@ func (cs *ChatState) Clean() {
 	delete(ChatStates, cs.ChatID)
 }
 
-func (cs *ChatState) CleanIfNeeded() {
-	cs.mu.RLock()
-	defer cs.mu.RUnlock()
-	if cs.VoiceChatActive == nil && cs.AssistantPresent == nil && cs.AssistantBanned == nil && cs.InviteLink == "" {
-		cs.Clean()
-	}
-}
-
-func (cs *ChatState) IsActiveVC() bool {
-	cs.mu.RLock()
-	defer cs.mu.RUnlock()
-	return cs.VoiceChatActive != nil && *cs.VoiceChatActive
-}
-
-func (cs *ChatState) IsAssistantBanned() bool {
-	cs.mu.RLock()
-	defer cs.mu.RUnlock()
-	return cs.AssistantBanned != nil && *cs.AssistantBanned
-}
-
-func (cs *ChatState) IsAssistantPresent() bool {
-	cs.mu.RLock()
-	defer cs.mu.RUnlock()
-	return cs.AssistantPresent != nil && *cs.AssistantPresent
-}
-
-func (cs *ChatState) Refresh(force ...bool) error {
+func (cs *ChatState) IsActiveVC(force ...bool) (bool, error) {
 	isForce := len(force) > 0 && force[0]
-	var voiceErr, assistantErr error
-	if cs.VoiceChatActive == nil || isForce {
-		fullChat, err := fetchFullChat(cs.ChatID)
-		if err != nil {
-			voiceErr = err
-		} else {
-			cs.mu.Lock()
-			isVCActive := fullChat.Call != nil
-			cs.VoiceChatActive = boolToPtr(isVCActive)
-			if isVCActive && fullChat.ExportedInvite != nil {
-				if l, ok := fullChat.ExportedInvite.(*telegram.ChatInviteExported); ok && l.Link != "" {
-					cs.InviteLink = l.Link
-				}
-			}
-			cs.mu.Unlock()
-		}
+
+	if err := cs.ensureVoiceState(isForce); err != nil {
+		return false, err
 	}
 
-	if cs.AssistantPresent == nil || cs.AssistantBanned == nil || isForce {
-		member, err := Bot.GetChatMember(cs.ChatID, UbUser.ID)
-		if err != nil {
-			if errors.Is(err, ErrFetchFailed) {
-				if triggerAssistantStartIfNeeded(err) {
-					member, err = Bot.GetChatMember(cs.ChatID, UbUser.ID)
-					if err != nil {
-						assistantErr = handleMemberFetchError(cs, err)
-					} else {
-						assistantErr = applyMemberStatus(cs, member)
-					}
-				}
-			} else {
-				assistantErr = handleMemberFetchError(cs, err)
-			}
-		} else {
-			assistantErr = applyMemberStatus(cs, member)
-		}
+	cs.mu.RLock()
+	defer cs.mu.RUnlock()
+	return cs.VoiceChatActive != nil && *cs.VoiceChatActive, nil
+}
+
+func (cs *ChatState) IsAssistantBanned(force ...bool) (bool, error) {
+	isForce := len(force) > 0 && force[0]
+
+	if err := cs.ensureAssistantState(isForce); err != nil {
+		return false, err
 	}
-	if voiceErr != nil {
-		return voiceErr
+
+	cs.mu.RLock()
+	defer cs.mu.RUnlock()
+	return cs.AssistantBanned != nil && *cs.AssistantBanned, nil
+}
+
+func (cs *ChatState) IsAssistantPresent(force ...bool) (bool, error) {
+	isForce := len(force) > 0 && force[0]
+
+	if err := cs.ensureAssistantState(isForce); err != nil {
+		return false, err
 	}
-	return assistantErr
+
+	cs.mu.RLock()
+	defer cs.mu.RUnlock()
+	return cs.AssistantPresent != nil && *cs.AssistantPresent, nil
 }
 
 func (cs *ChatState) TryJoin() error {
@@ -198,6 +161,61 @@ func (cs *ChatState) TryJoin() error {
 }
 
 // --- helpers ---
+
+func (cs *ChatState) ensureVoiceState(force bool) error {
+	cs.mu.RLock()
+	need := cs.VoiceChatActive == nil || force
+	cs.mu.RUnlock()
+
+	if !need {
+		return nil
+	}
+
+	fullChat, err := fetchFullChat(cs.ChatID)
+	if err != nil {
+		return err
+	}
+
+	cs.mu.Lock()
+	defer cs.mu.Unlock()
+
+	isVCActive := fullChat.Call != nil
+	cs.VoiceChatActive = boolToPtr(isVCActive)
+
+	if isVCActive && fullChat.ExportedInvite != nil {
+		if l, ok := fullChat.ExportedInvite.(*telegram.ChatInviteExported); ok && l.Link != "" {
+			cs.InviteLink = l.Link
+		}
+	}
+
+	return nil
+}
+
+func (cs *ChatState) ensureAssistantState(force bool) error {
+	cs.mu.RLock()
+	need := cs.AssistantPresent == nil || cs.AssistantBanned == nil || force
+	cs.mu.RUnlock()
+
+	if !need {
+		return nil
+	}
+
+	member, err := Bot.GetChatMember(cs.ChatID, UbUser.ID)
+	if err != nil {
+		if errors.Is(err, ErrFetchFailed) {
+			if triggerAssistantStartIfNeeded(err) {
+				member, err = Bot.GetChatMember(cs.ChatID, UbUser.ID)
+				if err != nil {
+					return handleMemberFetchError(cs, err)
+				}
+				return applyMemberStatus(cs, member)
+			}
+		}
+		return handleMemberFetchError(cs, err)
+	}
+
+	return applyMemberStatus(cs, member)
+}
 
 func fetchFullChat(chatID int64) (*telegram.ChannelFull, error) {
 	fullChat, err := utils.GetFullChannel(Bot, chatID)
