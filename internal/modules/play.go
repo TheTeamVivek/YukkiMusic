@@ -238,24 +238,44 @@ func fetchTracksAndCheckStatus(
 
 	isActive := r.IsActiveChat()
 	cs := core.GetChatState(r.ChatID)
-	defer cs.CleanIfNeeded()
-	if err := cs.Refresh(); err != nil {
-		gologging.ErrorF("Error refreshing state: %v", err)
+
+	activeVC, err := cs.IsActiveVC()
+	if err != nil {
+		gologging.ErrorF("Error checking voicechat state: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
 		return nil, false, err
 	}
 
-	if !cs.IsActiveVC() {
+	if !activeVC {
 		utils.EOR(replyMsg, F(r.ChatID, "err_no_active_voicechat"))
-		return nil, false, core.ErrNoActiveVoiceChat
+		return nil, false, fmt.Errorf("no active voice chat")
 	}
 
-	if cs.IsAssistantBanned() {
-		utils.EOR(replyMsg, getErrorMessage(r.ChatID, core.ErrAssistantBanned))
-		return nil, false, core.ErrAssistantBanned
+	banned, err := cs.IsAssistantBanned()
+	if err != nil {
+		gologging.ErrorF("Error checking assistant banned state: %v", err)
+		utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
+		return nil, false, err
 	}
 
-	if !cs.IsAssistantPresent() {
+	if banned {
+		utils.EOR(replyMsg,
+			F(r.ChatID, "err_assistant_banned", locales.Arg{
+				"user": utils.MentionHTML(core.UbUser),
+				"id":   utils.IntToStr(core.UbUser.ID),
+			}),
+		)
+		return nil, false, fmt.Errorf("assistant banned")
+	}
+
+	present, err := cs.IsAssistantPresent()
+	if err != nil {
+		gologging.ErrorF("Error checking assistant presence: %v", err)
+		utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
+		return nil, false, err
+	}
+
+	if !present {
 		if err := cs.TryJoin(); err != nil {
 			gologging.ErrorF("Error joining assistant: %v", err)
 			utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
@@ -552,13 +572,6 @@ func playTrackWithRetry(
 type msgFn func(chatID int64, err error) string
 
 var errMessageMap = map[error]msgFn{
-	core.ErrAssistantBanned: func(chatID int64, _ error) string {
-		return F(chatID, "err_assistant_banned", locales.Arg{
-			"user": utils.MentionHTML(core.UbUser),
-			"id":   utils.IntToStr(core.UbUser.ID),
-		})
-	},
-
 	core.ErrAdminPermissionRequired: func(chatID int64, _ error) string {
 		return F(chatID, "err_admin_permission_required")
 	},
@@ -581,10 +594,6 @@ var errMessageMap = map[error]msgFn{
 		return F(chatID, "err_assistant_invite_failed", locales.Arg{
 			"error": e.Error(),
 		})
-	},
-
-	core.ErrNoActiveVoiceChat: func(chatID int64, _ error) string {
-		return F(chatID, "err_no_active_voicechat")
 	},
 
 	core.ErrFetchFailed: func(chatID int64, e error) string {
