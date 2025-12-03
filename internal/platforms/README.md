@@ -65,7 +65,7 @@ type Platform interface {
     IsValid(query string) bool
 
     // Fetches track metadata.
-    GetTracks(query string) ([]*Track, error)
+    GetTracks(query string, video bool) ([]*Track, error)
 
     // Checks if downloading is supported from a given source.
     IsDownloadSupported(source state.PlatformName) bool
@@ -132,9 +132,10 @@ func (p *MyPlatform) IsValid(query string) bool {
     return strings.HasPrefix(query, "https://my-service.com/")
 }
 
-func (p *MyPlatform) GetTracks(query string) ([]*state.Track, error) {
+func (p *MyPlatform) GetTracks(query string, video bool) ([]*state.Track, error) {
     // 🎵 Fetch and return track metadata
     // ...
+    // if your platform didn't support video so ignore video flags else overwrite the tracks.Video to video
 }
 
 func (p *MyPlatform) IsDownloadSupported(source state.PlatformName) bool {
@@ -142,9 +143,14 @@ func (p *MyPlatform) IsDownloadSupported(source state.PlatformName) bool {
     return source == PlatformMyPlatform // yep, this can Download song of PlatformMyPlatform
 }
 
-func (p *MyPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
+func (p *MyPlatform) Download(
+  ctx context.Context, 
+  track *state.Track, 
+  mystic *telegram.NewMessage,
+) (string, error) {
     // ⬇️ Actual download logic here
     // ...
+    // if your platform supports video playback so download video and return the fpath when track.Video is true else process as audio and track.Video must be false for audio playbacks
     // you can use mystic for displaying progress of download, make sure just progress if you encountered any error so just return it bot will handle it
 }
 ```

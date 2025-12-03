@@ -95,8 +95,6 @@ bug_report_format: |
   <b>प्रतिवेदन:</b>
   <pre>{report}</pre>  
 
-chat_not_recognized: "⚠️ संवाद की पहचान नहीं हो सकी।"
-
 clear_success: "✅ क्रम-सूची {user} द्वारा शुद्ध कर दी गई है।"
 clear_no_active: "⚠️ <b>कोई सक्रिय प्रचलन (playback) अथवा क्रम-सूची उपलब्ध नहीं है जिसे हटाया जा सके।</b>"
 

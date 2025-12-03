@@ -49,11 +49,31 @@ func channelPlayHandler(m *telegram.NewMessage) error {
 }
 
 func playHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, false, false)
+	return handlePlay(m, &state.PlayOpts{})
 }
 
 func fplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, true, false)
+	return handlePlay(m, &state.PlayOpts{Force: true})
+}
+
+func cfplayHandler(m *telegram.NewMessage) error {
+	return handlePlay(m, &state.PlayOpts{Force: true, CPlay: true})
+}
+
+func vplayHandler(m *telegram.NewMessage) error {
+	return handlePlay(m, &state.PlayOpts{Video: true})
+}
+
+func fvplayHandler(m *telegram.NewMessage) error {
+	return handlePlay(m, &state.PlayOpts{Force: true, Video: true})
+}
+
+func vcplayHandler(m *telegram.NewMessage) error {
+	return handlePlay(m, &state.PlayOpts{CPlay: true, Video: true})
+}
+
+func fvcplayHandler(m *telegram.NewMessage) error {
+	return handlePlay(m, &state.PlayOpts{Force: true, CPlay: true, Video: true})
 }
 
 func cplayHandler(m *telegram.NewMessage) error {
@@ -133,43 +153,36 @@ func cplayHandler(m *telegram.NewMessage) error {
 		)
 		return telegram.EndGroup
 	}
-
-	return handlePlay(m, false, true)
+	return handlePlay(m, &state.PlayOpts{CPlay: true})
 }
 
-func cfplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, true, true)
-}
-
-func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
+func handlePlay(m *telegram.NewMessage, opts *state.PlayOpts) error {
 	mention := utils.MentionHTML(m.Sender)
 
-	// 1️⃣ Prepare room + search message
-	r, replyMsg, err := prepareRoomAndSearchMessage(m, cplay)
+	r, replyMsg, err := prepareRoomAndSearchMessage(m, opts.CPlay)
 	if err != nil {
 		return telegram.EndGroup
 	}
 
-	// 2️⃣ Tracks and assistant status
-	tracks, isActive, err := fetchTracksAndCheckStatus(m, replyMsg, r)
+	tracks, isActive, err := fetchTracksAndCheckStatus(m, replyMsg, r, opts.Video)
 	if err != nil {
 		return telegram.EndGroup
 	}
 
-	// 3️⃣ Filter & trim
 	tracks, availableSlots, err := filterAndTrimTracks(replyMsg, r, tracks)
 	if err != nil {
 		return telegram.EndGroup
 	}
 
-	// 4️⃣ Download, play, respond
-	if err := playTracksAndRespond(m, replyMsg, r, tracks, mention, isActive, force, availableSlots); err != nil {
+	if err := playTracksAndRespond(
+		m, replyMsg, r, tracks, mention,
+		isActive, opts.Force, availableSlots,
+	); err != nil {
 		return err
 	}
 
 	return telegram.EndGroup
 }
-
 func prepareRoomAndSearchMessage(m *telegram.NewMessage, cplay bool) (*core.RoomState, *telegram.NewMessage, error) {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
@@ -224,8 +237,9 @@ func fetchTracksAndCheckStatus(
 	m *telegram.NewMessage,
 	replyMsg *telegram.NewMessage,
 	r *core.RoomState,
+	video bool,
 ) ([]*state.Track, bool, error) {
-	tracks, err := safeGetTracks(m, replyMsg, r.ChatID)
+	tracks, err := safeGetTracks(m, replyMsg, r.ChatID, video)
 	if err != nil {
 		utils.EOR(replyMsg, err.Error())
 		return nil, false, err
@@ -630,6 +644,7 @@ func getErrorMessage(chatID int64, err error) string {
 func safeGetTracks(
 	m, replyMsg *telegram.NewMessage,
 	chatID int64,
+	video bool,
 ) (tracks []*state.Track, err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -638,7 +653,7 @@ func safeGetTracks(
 		}
 	}()
 
-	tracks, err = platforms.GetTracks(m)
+	tracks, err = platforms.GetTracks(m, video)
 	return tracks, err
 }
 

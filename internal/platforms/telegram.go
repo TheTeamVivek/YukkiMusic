@@ -62,7 +62,7 @@ func (t *TelegramPlatform) IsValid(query string) bool {
 	return telegramLinkRegex.MatchString(query)
 }
 
-func (t *TelegramPlatform) GetTracks(query string) ([]*state.Track, error) {
+func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, error) {
 	if !telegramLinkRegex.MatchString(query) {
 		return nil, fmt.Errorf("Provide a valid Telegram link (e.g., https://t.me/channel/12345).")
 	}
@@ -85,7 +85,11 @@ func (t *TelegramPlatform) GetTracks(query string) ([]*state.Track, error) {
 	}
 
 	// process fetched message with GetTrackByMessage
-	return t.GetTracksByMessage(msg)
+	track, tErr := t.GetTracksByMessage(msg)
+	if tErr != nil {
+	  return nil, tErr
+	}
+	return []*state.Track{track}, nil
 }
 
 func (t *TelegramPlatform) GetTracksByMessage(rmsg *telegram.NewMessage) ([]*state.Track, error) {
@@ -106,7 +110,7 @@ func (t *TelegramPlatform) GetTracksByMessage(rmsg *telegram.NewMessage) ([]*sta
 		Source:   PlatformTelegram,
 	}
 
-	return []*state.Track{track}, nil
+	return track, nil
 }
 
 func (t *TelegramPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {

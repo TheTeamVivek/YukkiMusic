@@ -72,12 +72,16 @@ func (f *YoutubifyPlatform) Download(
 	track *state.Track,
 	_ *telegram.NewMessage,
 ) (string, error) {
-	return downloadAudio(track.ID)
+	return downloadAudio(track.ID, track.Video)
 }
 
-func downloadAudio(videoID string) (string, error) {
+func downloadAudio(videoID string, video bool) (string, error) {
+  
 	filepath := fmt.Sprintf("downloads/%s.mp3", videoID)
+if video {
+  filepath = fmt.Sprintf("downloads/%s.mp4", videoID)
 
+}
 	if _, err := os.Stat(filepath); err == nil {
 		return filepath, nil
 	}

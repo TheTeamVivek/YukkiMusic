@@ -39,7 +39,7 @@ func clampTracks(tracks []*state.Track) []*state.Track {
 	return tracks
 }
 
-func GetTracks(m *telegram.NewMessage) ([]*state.Track, string) {
+func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, string) {
 	var tracks []*state.Track
 	query := m.Args()
 	var errorsCollected []string
@@ -55,7 +55,7 @@ func GetTracks(m *telegram.NewMessage) ([]*state.Track, string) {
 			}
 
 			supported = true
-			t, err := p.GetTracks(url)
+			t, err := p.GetTracks(url, video)
 			if err != nil {
 				errorsCollected = append(errorsCollected,
 					"<b>"+html.EscapeString(p.Name())+" error:</b> "+html.EscapeString(err.Error()))
@@ -80,14 +80,13 @@ func GetTracks(m *telegram.NewMessage) ([]*state.Track, string) {
 
 	if query != "" {
 		yt := &YouTubePlatform{}
-		ytTracks, err := yt.VideoSearch(query, true)
+		ytTracks, err := yt.GetTracks(query, video)
 		if err != nil {
 			return nil, "<b>⚠️ YouTube search error</b>\n\n<i>" +
 				html.EscapeString(err.Error()) + "</i>"
 		}
 
 		if len(ytTracks) > 0 {
-			ytTracks = clampTracks(ytTracks)
 			return []*state.Track{ytTracks[0]}, ""
 		}
 
@@ -133,7 +132,9 @@ func GetTracks(m *telegram.NewMessage) ([]*state.Track, string) {
 			errorsCollected = append(errorsCollected,
 				"Failed to get track from reply: "+html.EscapeString(err.Error()))
 		} else {
-			return clampTracks(t), ""
+		  // for tg medias we allow only Video when replied media is a video
+		  t.Video = isVideo
+			return []*state.Track{t}, ""
 		}
 	}
 
@@ -170,7 +171,13 @@ func formatErrorsHTML(errs []string) string {
 		return ""
 	}
 
+	if len(errs) == 1 {
+		return "<blockquote><b>⚠️ Error:</b>\n" + errs[0] + "\n</blockquote>"
+	}
+
 	var b strings.Builder
+	b.Grow(64 + len(errs)*32)
+
 	b.WriteString("<blockquote><b>⚠️ Multiple errors occurred:</b>\n\n")
 
 	for _, e := range errs {

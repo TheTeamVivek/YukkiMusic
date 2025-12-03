@@ -36,7 +36,6 @@ func reloadHandler(m *telegram.NewMessage) error {
 func creloadHandler(m *telegram.NewMessage) error {
 	return handleReload(m, true)
 }
-
 func handleReload(m *telegram.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
@@ -66,7 +65,6 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 
 	summary := ""
 
-	// --- Admin cache ---
 	admins, adminErr := utils.ReloadChatAdmin(m.Client, chatID)
 	if adminErr != nil {
 		summary += F(chatID, "reload_admin_cache_fail", locales.Arg{
@@ -76,7 +74,6 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		summary += F(chatID, "reload_admin_cache_ok") + "\n"
 	}
 
-	// Check if current user is admin
 	isAdmin := false
 	if adminErr == nil {
 		for _, id := range admins {
@@ -88,55 +85,58 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	if isAdmin {
-		// shorter flood for admins
 		floodDuration = 2 * time.Minute
 	}
 	utils.SetFlood(floodKey, floodDuration)
 
 	cs := core.GetChatState(chatID)
-	defer cs.CleanIfNeeded()
-	err = cs.Refresh(true)
-	if err != nil {
+
+	activeVC, vcErr := cs.IsActiveVC(true)
+	if vcErr != nil {
 		switch {
-		case errors.Is(err, core.ErrAdminPermissionRequired):
+		case errors.Is(vcErr, core.ErrAdminPermissionRequired):
 			summary += F(chatID, "reload_voice_admin_required") + "\n"
 		default:
 			summary += F(chatID, "reload_voice_fail", locales.Arg{
-				"error": err.Error(),
+				"error": vcErr.Error(),
 			}) + "\n"
 		}
-	} else if cs.IsActiveVC() {
+	} else if activeVC {
 		summary += F(chatID, "reload_voice_active") + "\n"
 	} else {
 		summary += F(chatID, "reload_voice_inactive") + "\n"
 	}
 
-	if err != nil {
+	banned, assErr := cs.IsAssistantBanned(true)
+	if assErr != nil {
 		switch {
-		case errors.Is(err, core.ErrAssistantBanned):
-			summary += F(chatID, "reload_assistant_banned") + "\n"
-		case errors.Is(err, core.ErrAdminPermissionRequired):
+		case errors.Is(assErr, core.ErrAdminPermissionRequired):
 			summary += F(chatID, "reload_assistant_admin_required") + "\n"
-		case errors.Is(err, core.ErrAssistantJoinRejected):
-			summary += F(chatID, "reload_assistant_join_rejected") + "\n"
-		case errors.Is(err, core.ErrAssistantJoinRateLimited):
-			summary += F(chatID, "reload_assistant_rate_limited") + "\n"
-		case errors.Is(err, core.ErrAssistantJoinRequestSent):
-			summary += F(chatID, "reload_assistant_join_request_sent") + "\n"
 		default:
 			summary += F(chatID, "reload_assistant_fail", locales.Arg{
-				"error": err.Error(),
+				"error": assErr.Error(),
 			}) + "\n"
 		}
-	} else if cs.IsAssistantPresent() {
-		summary += F(chatID, "reload_assistant_present") + "\n"
-	} else if cs.IsAssistantBanned() {
+	} else if banned {
 		summary += F(chatID, "reload_assistant_banned") + "\n"
 	} else {
-		summary += F(chatID, "reload_assistant_not_present") + "\n"
+		present, assErr2 := cs.IsAssistantPresent()
+		if assErr2 != nil {
+			switch {
+			case errors.Is(assErr2, core.ErrAdminPermissionRequired):
+				summary += F(chatID, "reload_assistant_admin_required") + "\n"
+			default:
+				summary += F(chatID, "reload_assistant_fail", locales.Arg{
+					"error": assErr2.Error(),
+				}) + "\n"
+			}
+		} else if present {
+			summary += F(chatID, "reload_assistant_present") + "\n"
+		} else {
+			summary += F(chatID, "reload_assistant_not_present") + "\n"
+		}
 	}
 
-	// --- Destroy room if user is admin ---
 	if isAdmin {
 		if room, ok := core.GetRoom(chatID); ok {
 			room.Destroy()
@@ -144,7 +144,6 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		}
 	}
 
-	// Header + summary
 	utils.EOR(mystic, F(chatID, "reload_done", locales.Arg{
 		"summary": summary,
 	}))

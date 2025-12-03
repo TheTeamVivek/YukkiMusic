@@ -68,8 +68,17 @@ var handlers = []MsgHandlerDef{
 	{Pattern: "(lang|language)", Handler: langHandler, Filters: []telegram.Filter{superGroupFilter, authFilter}},
 
 	// SuperGroup & Admin Filters
-	{Pattern: "(play|vplay)", Handler: playHandler, Filters: []telegram.Filter{superGroupFilter}},
-	{Pattern: "(fplay|forceplay)", Handler: fplayHandler, Filters: []telegram.Filter{superGroupFilter, authFilter}},
+	
+	// play/cplay/vplay/fplay commands
+	{Pattern: "play", Handler: playHandler, Filters: []telegram.Filter{superGroupFilter}},
+	{Pattern: "(fplay|playforce)", Handler: fplayHandler, Filters: []telegram.Filter{superGroupFilter, authFilter}},
+	{Pattern: "cplay", Handler: cplayHandler, Filters: []telegram.Filter{superGroupFilter}},
+	{Pattern: "(cfplay|fcplay|cplayforce)", Handler: cfplayHandler, Filters: []telegram.Filter{superGroupFilter, authFilter}},
+	{Pattern: "vplay", Handler: vplayHandler, Filters: []telegram.Filter{superGroupFilter}},
+	{Pattern: "(fvplay|vfplay|vplayforce)", Handler: fvplayHandler, Filters: []telegram.Filter{superGroupFilter, authFilter}},
+	{Pattern: "(vcplay|cvplay)", Handler: vcplayHandler, Filters: []telegram.Filter{superGroupFilter}},
+	{Pattern: "(fvcplay|fvcpay|vcplayforce)", Handler: fvcplayHandler, Filters: []telegram.Filter{superGroupFilter, authFilter}},
+	
 	{Pattern: "(speed|setspeed|speedup)", Handler: speedHandler, Filters: []telegram.Filter{superGroupFilter, authFilter}},
 	{Pattern: "skip", Handler: skipHandler, Filters: []telegram.Filter{superGroupFilter, authFilter}},
 	{Pattern: "pause", Handler: pauseHandler, Filters: []telegram.Filter{superGroupFilter, authFilter}},

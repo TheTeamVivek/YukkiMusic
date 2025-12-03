@@ -208,13 +208,15 @@ func (cs *ChatState) ensureAssistantState(force bool) error {
 				if err != nil {
 					return handleMemberFetchError(cs, err)
 				}
-				return applyMemberStatus(cs, member)
+				 applyMemberStatus(cs, member)
+				 return nil
 			}
 		}
 		return handleMemberFetchError(cs, err)
 	}
 
-	return applyMemberStatus(cs, member)
+	 applyMemberStatus(cs, member)
+	 return nil
 }
 
 func fetchFullChat(chatID int64) (*telegram.ChannelFull, error) {
@@ -231,13 +233,13 @@ func fetchFullChat(chatID int64) (*telegram.ChannelFull, error) {
 	return fullChat, nil
 }
 
-func applyMemberStatus(s *ChatState, member *telegram.Participant) error {
+func applyMemberStatus(s *ChatState, member *telegram.Participant) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if member == nil {
 		s.AssistantPresent = boolToPtr(false)
 		s.AssistantBanned = boolToPtr(false)
-		return nil
+		return
 	}
 
 	switch member.Status {
@@ -252,7 +254,7 @@ func applyMemberStatus(s *ChatState, member *telegram.Participant) error {
 		s.AssistantBanned = boolToPtr(false)
 	}
 
-	return nil
+	return
 }
 
 func triggerAssistantStartIfNeeded(err error) bool {

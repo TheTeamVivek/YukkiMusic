@@ -93,9 +93,6 @@ bug_report_format: |
   <b>Report:</b>
   <pre>{report}</pre>
   
-
-chat_not_recognized: "⚠️ Chat not recognized."
-
 clear_no_active: "⚠️ <b>No active playback or queue to clear.</b>"
 clear_success: "✅ The queue has been cleared by {user}."
 
@@ -336,13 +333,9 @@ reload_voice_active: "<b>• Voice chat:</b> <i>✅ Active</i>"
 
 reload_assistant_banned: "<b>• Assistant:</b> <i>❌ Banned</i>"
 reload_assistant_admin_required: "<b>• Assistant:</b> <i>❌ Admin permission required</i>"
-reload_assistant_join_rejected: "<b>• Assistant:</b> <i>❌ Invite rejected or invalid</i>"
-reload_assistant_rate_limited: "<b>• Assistant:</b> <i>❌ Rate limited</i>"
-reload_assistant_join_request_sent: "<b>• Assistant:</b> <i>⚪ Join request sent</i>"
 reload_assistant_fail: "<b>• Assistant:</b> <i>❌ ({error})</i>"
 reload_assistant_present: "<b>• Assistant:</b> <i>✅ Present</i>"
 reload_assistant_not_present: "<b>• Assistant:</b> <i>⚪ Not present</i>"
-
 reload_room_reset: "<b>• Room:</b> <i>Reset ✅</i>"
 
 

@@ -26,17 +26,17 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 )
 
-type Track struct {
-	ID       string
-	Title    string
-	Duration int
-	Artwork  string
-	URL      string
-	BY       string
-	Source   PlatformName
-}
-
 type (
+  Track struct {
+	  ID         string        // track unique id
+	  Title      string        // title
+	  Duration   int           // track duration in seconds
+  	Artwork    string        // thumbnail url of the track
+  	URL        string        // track url
+	  Requester  string        // html mention or @username who requested this track
+  	Video      bool          // whether this track will be played as video
+  	Source     PlatformName  // unique PlatformName
+  }
 	PlatformName string
 
 	Platform interface {
@@ -46,4 +46,10 @@ type (
 		Download(ctx context.Context, track *Track, mystic *telegram.NewMessage) (string, error)
 		IsDownloadSupported(source PlatformName) bool
 	}
+	
+ PlayOpts struct {
+	Force bool
+	CPlay bool
+	Video bool
+}
 )

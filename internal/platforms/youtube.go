@@ -59,60 +59,80 @@ func init() {
 func (*YouTubePlatform) Name() state.PlatformName { return PlatformYouTube }
 func (*YouTubePlatform) IsValid(link string) bool { return youtubeLinkRegex.MatchString(link) }
 
-func (yp *YouTubePlatform) GetTracks(query string) ([]*state.Track, error) {
-	trimmed := strings.TrimSpace(query)
-
-	if !youtubeLinkRegex.MatchString(trimmed) {
-		return nil, errors.New("input is not a supported YouTube URL")
+func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, error) {
+	trimmed := strings.TrimSpace(input)
+	if trimmed == "" {
+		return nil, errors.New("empty query")
 	}
 
-	if playlistRegex.MatchString(trimmed) {
+	if youtubeLinkRegex.MatchString(trimmed) {
+		// playlist URL
+		if playlistRegex.MatchString(trimmed) {
+			cacheKey := "playlist:" + strings.ToLower(trimmed)
+			if cached, ok := youtubeCache.Get(cacheKey); ok {
+				return updateCached(cached, video), nil
+			}
 
-		cacheKey := "playlist:" + strings.ToLower(trimmed)
-		if cached, ok := youtubeCache.Get(cacheKey); ok {
-			return cached, nil
+			videoIDs, err := getPlaylist(trimmed)
+			if err != nil {
+				return nil, err
+			}
+
+var tracks []*state.Track
+for _, videoID := range videoIDs {
+	if cached, ok := youtubeCache.Get("track:" + videoID); ok && len(cached) > 0 {
+		tracks = append(tracks, cached[0])
+		continue
+	}
+
+	trackList, err := yp.VideoSearch("https://youtube.com/watch?v="+videoID, true)
+	if err != nil || len(trackList) == 0 {
+		continue
+	}
+
+	t := trackList[0]
+	youtubeCache.Set("track:"+videoID, []*state.Track{t})
+	tracks = append(tracks, t)
+}
+
+			if len(tracks) > 0 {
+				youtubeCache.Set(cacheKey, tracks)
+			}
+
+			return updateCached(tracks, video), nil
 		}
 
-		videoIDs, err := getPlaylist(trimmed)
+		// single video URL
+		matches := videoIDRegex.FindStringSubmatch(trimmed)
+		if len(matches) < 2 {
+			return nil, errors.New("unsupported YouTube URL or missing video ID")
+		}
+
+		videoID := matches[1]
+if cached, ok := youtubeCache.Get("track:" + videoID); ok && len(cached) > 0 {
+	return updateCached(cached, video), nil
+}
+
+		trackList, err := yp.VideoSearch("https://youtube.com/watch?v="+videoID, true)
 		if err != nil {
 			return nil, err
 		}
-
-		var tracks []*state.Track
-		for _, videoID := range videoIDs {
-			trackList, err := yp.VideoSearch("https://youtube.com/watch?v="+videoID, true)
-			if err != nil {
-				// decide whether to continue or return error
-				continue // simple approach: skip failed lookups
-			}
-			if len(trackList) > 0 {
-				tracks = append(tracks, trackList[0])
-			}
+		if len(trackList) == 0 {
+			return nil, errors.New("track not found for the given url")
 		}
 
-		if len(tracks) > 0 {
-			youtubeCache.Set(cacheKey, tracks)
-		}
-
-		return tracks, nil
+		return updateCached(trackList, video), nil
 	}
 
-	matches := videoIDRegex.FindStringSubmatch(trimmed)
-	if len(matches) < 2 {
-		return nil, errors.New("unsupported YouTube URL or missing video ID")
-	}
-
-	videoID := matches[1]
-
-	trackList, err := yp.VideoSearch("https://youtube.com/watch?v="+videoID, true)
+	tracks, err := yp.VideoSearch(trimmed, true)
 	if err != nil {
 		return nil, err
 	}
-	if len(trackList) == 0 {
-		return nil, errors.New("track not found for the given url")
+	if len(tracks) == 0 {
+		return nil, errors.New("no tracks found for the given query")
 	}
 
-	return trackList, nil
+	return updateCached(tracks, video), nil
 }
 
 func (*YouTubePlatform) IsDownloadSupported(source state.PlatformName) bool {
@@ -179,6 +199,7 @@ func (yp *YouTubePlatform) VideoSearch(query string, singleOpt ...bool) ([]*stat
 						Source:   PlatformYouTube,
 					}
 					tracks = append(tracks, t)
+					youtubeCache.Set("track:"+t.ID, []*state.Track{t})
 					if single {
 						break
 					}
@@ -224,6 +245,23 @@ func getPlaylist(pUrl string) ([]string, error) {
 
 	return strings.Split(strings.TrimSpace(out.String()), "\n"), nil
 }
+
+func updateCached(arr []*state.Track, video bool) []*state.Track {
+	if len(arr) == 0 {
+		return nil
+	}
+	out := make([]*state.Track, len(arr))
+	for i, t := range arr {
+		if t == nil {
+			continue
+		}
+		clone := *t
+		clone.Video = video
+		out[i] = &clone
+	}
+	return out
+}
+
 
 // The following search functions are adapted from TgMusicBot.
 // Copyright (c) 2025 Ashok Shau
@@ -288,14 +326,16 @@ func parseSearchResults(node interface{}, tracks *[]*state.Track) {
 			thumb := safeString(dig(vid, "thumbnail", "thumbnails", 0, "url"))
 			durationText := safeString(dig(vid, "lengthText", "simpleText"))
 			duration := parseDuration(durationText)
-			*tracks = append(*tracks, &state.Track{
+			t := &state.Track{
 				URL:      "https://www.youtube.com/watch?v=" + id,
 				Title:    title,
 				ID:       id,
 				Artwork:  thumb,
 				Duration: duration,
 				Source:   PlatformYouTube,
-			})
+			}
+			*tracks = append(*tracks, t)
+			youtubeCache.Set("track:"+t.ID, []*state.Track{t})
 		} else {
 			for _, child := range v {
 				parseSearchResults(child, tracks)
