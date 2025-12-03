@@ -71,37 +71,56 @@ func (*YoutubifyPlatform) IsDownloadSupported(source PlatformName) bool {
 }
 
 func (f *YoutubifyPlatform) Download(
-	_ context.Context,
-	track *state.Track,
-	_ *telegram.NewMessage,
+    ctx context.Context,
+    track *state.Track,
+    _ *telegram.NewMessage,
 ) (string, error) {
-	return downloadAudio(track.ID, track.Video)
-}
+    ext := "mp3"
+    endpoint := "audio"
+    if track.Video {
+        ext = "mp4"
+        endpoint = "video"
+    }
 
-func downloadAudio(videoID string, video bool) (string, error) {
-	filepath := fmt.Sprintf("downloads/%s.mp3", videoID)
-	if video {
-		filepath = fmt.Sprintf("downloads/%s.mp4", videoID)
-	}
-	if _, err := os.Stat(filepath); err == nil {
-		return filepath, nil
-	}
+    filepath := "downloads/" + track.ID + "." + ext
 
-	if err := os.MkdirAll("downloads", 0o755); err != nil {
-		return "", err
-	}
+    if _, err := os.Stat(filepath); err == nil {
+        return filepath, nil
+    }
 
-	client := resty.New()
-	url := fmt.Sprintf("%s/download/audio?video_id=%s&mode=download&no_redirect=1&api_key=%s", apiBase, videoID, apiKey)
+    if err := os.MkdirAll("downloads", 0o755); err != nil {
+        return "", err
+    }
 
-	resp, err := client.R().SetOutputFileName(filepath).Get(url)
-	if err != nil {
-		return "", err
-	}
+    client := resty.New()
 
-	if resp.IsError() {
-		return "", fmt.Errorf("API returned %s", resp.Status())
-	}
+    url := apiBase +
+        "/download/" + endpoint +
+        "?video_id=" + track.ID +
+        "&mode=download&no_redirect=1&api_key=" + apiKey
 
-	return filepath, nil
+    resp, err := client.R().
+        SetContext(ctx).
+        SetOutputFileName(filepath).
+        Get(url)
+
+    if err != nil {
+        _ = os.Remove(filepath)
+        if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+            return "", err
+        }
+        return "", err
+    }
+
+    if resp.IsError() {
+        _ = os.Remove(filepath)
+        return "", fmt.Errorf("API returned %s", resp.Status())
+    }
+
+    if ctx.Err() != nil {
+        _ = os.Remove(filepath)
+        return "", ctx.Err()
+    }
+
+    return filepath, nil
 }
