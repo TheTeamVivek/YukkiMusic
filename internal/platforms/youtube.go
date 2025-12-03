@@ -78,22 +78,22 @@ func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, 
 				return nil, err
 			}
 
-var tracks []*state.Track
-for _, videoID := range videoIDs {
-	if cached, ok := youtubeCache.Get("track:" + videoID); ok && len(cached) > 0 {
-		tracks = append(tracks, cached[0])
-		continue
-	}
+			var tracks []*state.Track
+			for _, videoID := range videoIDs {
+				if cached, ok := youtubeCache.Get("track:" + videoID); ok && len(cached) > 0 {
+					tracks = append(tracks, cached[0])
+					continue
+				}
 
-	trackList, err := yp.VideoSearch("https://youtube.com/watch?v="+videoID, true)
-	if err != nil || len(trackList) == 0 {
-		continue
-	}
+				trackList, err := yp.VideoSearch("https://youtube.com/watch?v="+videoID, true)
+				if err != nil || len(trackList) == 0 {
+					continue
+				}
 
-	t := trackList[0]
-	youtubeCache.Set("track:"+videoID, []*state.Track{t})
-	tracks = append(tracks, t)
-}
+				t := trackList[0]
+				youtubeCache.Set("track:"+videoID, []*state.Track{t})
+				tracks = append(tracks, t)
+			}
 
 			if len(tracks) > 0 {
 				youtubeCache.Set(cacheKey, tracks)
@@ -109,9 +109,9 @@ for _, videoID := range videoIDs {
 		}
 
 		videoID := matches[1]
-if cached, ok := youtubeCache.Get("track:" + videoID); ok && len(cached) > 0 {
-	return updateCached(cached, video), nil
-}
+		if cached, ok := youtubeCache.Get("track:" + videoID); ok && len(cached) > 0 {
+			return updateCached(cached, video), nil
+		}
 
 		trackList, err := yp.VideoSearch("https://youtube.com/watch?v="+videoID, true)
 		if err != nil {
@@ -261,7 +261,6 @@ func updateCached(arr []*state.Track, video bool) []*state.Track {
 	}
 	return out
 }
-
 
 // The following search functions are adapted from TgMusicBot.
 // Copyright (c) 2025 Ashok Shau

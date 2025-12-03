@@ -27,12 +27,15 @@ import (
 	"os"
 
 	"github.com/amarnathcjd/gogram/telegram"
-	"main/internal/state"
 	"resty.dev/v3"
+
+	"main/internal/state"
 )
 
-type PlatformName = state.PlatformName
-type YoutubifyPlatform struct{}
+type (
+	PlatformName      = state.PlatformName
+	YoutubifyPlatform struct{}
+)
 
 var (
 	apiBase = os.Getenv("YOUTUBIFY_API_URL")
@@ -76,17 +79,15 @@ func (f *YoutubifyPlatform) Download(
 }
 
 func downloadAudio(videoID string, video bool) (string, error) {
-  
 	filepath := fmt.Sprintf("downloads/%s.mp3", videoID)
-if video {
-  filepath = fmt.Sprintf("downloads/%s.mp4", videoID)
-
-}
+	if video {
+		filepath = fmt.Sprintf("downloads/%s.mp4", videoID)
+	}
 	if _, err := os.Stat(filepath); err == nil {
 		return filepath, nil
 	}
 
-	if err := os.MkdirAll("downloads", 0755); err != nil {
+	if err := os.MkdirAll("downloads", 0o755); err != nil {
 		return "", err
 	}
 

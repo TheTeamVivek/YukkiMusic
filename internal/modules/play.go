@@ -183,6 +183,7 @@ func handlePlay(m *telegram.NewMessage, opts *state.PlayOpts) error {
 
 	return telegram.EndGroup
 }
+
 func prepareRoomAndSearchMessage(m *telegram.NewMessage, cplay bool) (*core.RoomState, *telegram.NewMessage, error) {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {

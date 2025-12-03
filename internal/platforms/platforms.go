@@ -132,8 +132,8 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, string) {
 			errorsCollected = append(errorsCollected,
 				"Failed to get track from reply: "+html.EscapeString(err.Error()))
 		} else {
-		  // for tg medias we allow only Video when replied media is a video
-		  t.Video = isVideo
+			// for tg medias we allow only Video when replied media is a video
+			t.Video = isVideo
 			return []*state.Track{t}, ""
 		}
 	}

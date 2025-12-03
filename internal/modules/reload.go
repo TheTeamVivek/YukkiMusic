@@ -36,6 +36,7 @@ func reloadHandler(m *telegram.NewMessage) error {
 func creloadHandler(m *telegram.NewMessage) error {
 	return handleReload(m, true)
 }
+
 func handleReload(m *telegram.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {

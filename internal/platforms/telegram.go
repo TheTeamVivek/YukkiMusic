@@ -87,7 +87,7 @@ func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, erro
 	// process fetched message with GetTrackByMessage
 	track, tErr := t.GetTracksByMessage(msg)
 	if tErr != nil {
-	  return nil, tErr
+		return nil, tErr
 	}
 	return []*state.Track{track}, nil
 }
@@ -156,8 +156,8 @@ func (t *TelegramPlatform) Download(ctx context.Context, track *state.Track, mys
 	}
 
 	if err != nil {
-os.Remove(rawFile)
-		
+		os.Remove(rawFile)
+
 		if errors.Is(err, context.Canceled) {
 			return "", err
 		}

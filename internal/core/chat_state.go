@@ -208,15 +208,15 @@ func (cs *ChatState) ensureAssistantState(force bool) error {
 				if err != nil {
 					return handleMemberFetchError(cs, err)
 				}
-				 applyMemberStatus(cs, member)
-				 return nil
+				applyMemberStatus(cs, member)
+				return nil
 			}
 		}
 		return handleMemberFetchError(cs, err)
 	}
 
-	 applyMemberStatus(cs, member)
-	 return nil
+	applyMemberStatus(cs, member)
+	return nil
 }
 
 func fetchFullChat(chatID int64) (*telegram.ChannelFull, error) {
