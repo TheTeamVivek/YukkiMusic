@@ -551,40 +551,34 @@ func (r *RoomState) MoveInQueue(from, to int) {
 }
 
 func getMediaDescription(url string, seek int, speed float64) ntgcalls.MediaDescription {
-	// Clamp speed
-	if speed < 0.5 {
-		speed = 0.5
-	} else if speed > 4.0 {
-		speed = 4.0
-	}
+    // Clamp speed
+    if speed < 0.5 {
+        speed = 0.5
+    } else if speed > 4.0 {
+        speed = 4.0
+    }
 
-	audio := &ntgcalls.AudioDescription{
-		MediaSource:  ntgcalls.MediaSourceShell,
-		SampleRate:   96000,
-		ChannelCount: 2,
-	}
+    audio := &ntgcalls.AudioDescription{
+        MediaSource:  ntgcalls.MediaSourceShell,
+        SampleRate:   96000,
+        ChannelCount: 2,
+    }
 
-	var b strings.Builder
+    cmd := "ffmpeg "
 
-	b.WriteString("ffmpeg ")
-	if seek > 0 {
-		b.WriteString("-ss ")
-		b.WriteString(strconv.Itoa(seek))
-		b.WriteByte(' ')
-	}
-	b.WriteString("-v warning -i \"")
-	b.WriteString(url)
-	b.WriteString("\" -filter:a \"atempo=")
-	b.WriteString(strconv.FormatFloat(speed, 'f', 2, 64))
-	b.WriteString("\" -f s16le -ac ")
-	b.WriteString(strconv.Itoa(int(audio.ChannelCount)))
-	b.WriteString(" -ar ")
-	b.WriteString(strconv.Itoa(int(audio.SampleRate)))
-	b.WriteString(" pipe:1")
+    if seek > 0 {
+        cmd += "-ss " + strconv.Itoa(seek) + " "
+    }
 
-	audio.Input = b.String()
+    cmd += "-v warning -i \"" + url + "\""
+    cmd += " -filter:a \"atempo=" + strconv.FormatFloat(speed, 'f', 2, 64) + "\""
+    cmd += " -f s16le -ac " + strconv.Itoa(int(audio.ChannelCount))
+    cmd += " -ar " + strconv.Itoa(int(audio.SampleRate))
+    cmd += " pipe:1"
 
-	return ntgcalls.MediaDescription{
-		Microphone: audio,
-	}
+    audio.Input = cmd
+
+    return ntgcalls.MediaDescription{
+        Microphone: audio,
+    }
 }
