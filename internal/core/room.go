@@ -219,7 +219,7 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 		return nil
 	}
 
-	err := Ntg.Play(r.ChatID, getMediaDescription(path, 0, r.Speed))
+	err := Ntg.Play(r.ChatID, getMediaDescription(path, 0, r.Speed, t.Video))
 	if err != nil {
 		return err
 	}
@@ -303,7 +303,7 @@ func (r *RoomState) Replay() error {
 		return fmt.Errorf("no track to replay")
 	}
 
-	err := Ntg.Play(r.ChatID, getMediaDescription(r.FilePath, 0, r.Speed))
+	err := Ntg.Play(r.ChatID, getMediaDescription(r.FilePath, 0, r.Speed, r.Track.Video))
 	if err != nil {
 		return err
 	}
@@ -380,7 +380,7 @@ func (r *RoomState) SetSpeed(speed float64, timeAfterNormal ...time.Duration) er
 	r.Muted = false
 	r.UpdatedAt = time.Now().Unix()
 
-	err := Ntg.Play(r.ChatID, getMediaDescription(file, pos, speed))
+	err := Ntg.Play(r.ChatID, getMediaDescription(file, pos, speed, r.Track.Video))
 	if err != nil {
 		return err
 	}
@@ -400,7 +400,7 @@ func (r *RoomState) SetSpeed(speed float64, timeAfterNormal ...time.Duration) er
 			if r.Track != nil && r.Playing && r.Speed != 1.0 {
 				r.parse()
 				r.Speed = 1.0
-				Ntg.Play(r.ChatID, getMediaDescription(r.FilePath, r.Position, 1.0))
+				Ntg.Play(r.ChatID, getMediaDescription(r.FilePath, r.Position, 1.0, r.Track.Video))
 				r.UpdatedAt = time.Now().Unix()
 			}
 		})
@@ -550,35 +550,81 @@ func (r *RoomState) MoveInQueue(from, to int) {
 	}
 }
 
-func getMediaDescription(url string, seek int, speed float64) ntgcalls.MediaDescription {
-    // Clamp speed
-    if speed < 0.5 {
-        speed = 0.5
-    } else if speed > 4.0 {
-        speed = 4.0
-    }
+func getMediaDescription(url string, seek int, speed float64, isVideo bool) ntgcalls.MediaDescription {
+	if speed < 0.5 {
+		speed = 0.5
+	} else if speed > 4.0 {
+		speed = 4.0
+	}
 
-    audio := &ntgcalls.AudioDescription{
-        MediaSource:  ntgcalls.MediaSourceShell,
-        SampleRate:   96000,
-        ChannelCount: 2,
-    }
+	audio := &ntgcalls.AudioDescription{
+		MediaSource:  ntgcalls.MediaSourceShell,
+		SampleRate:   96000,
+		ChannelCount: 2,
+	}
 
-    cmd := "ffmpeg "
+	baseCmd := "ffmpeg "
+	if seek > 0 {
+		baseCmd += "-ss " + strconv.Itoa(seek) + " "
+	}
+	baseCmd += "-v warning -i \"" + url + "\" "
 
-    if seek > 0 {
-        cmd += "-ss " + strconv.Itoa(seek) + " "
-    }
+	audioCmd := baseCmd
+	audioCmd += "-filter:a \"atempo=" + strconv.FormatFloat(speed, 'f', 2, 64) + "\" "
+	audioCmd += "-f s16le -ac " + strconv.Itoa(int(audio.ChannelCount)) + " "
+	audioCmd += "-ar " + strconv.Itoa(int(audio.SampleRate)) + " "
+	audioCmd += "pipe:1"
+	audio.Input = audioCmd
 
-    cmd += "-v warning -i \"" + url + "\""
-    cmd += " -filter:a \"atempo=" + strconv.FormatFloat(speed, 'f', 2, 64) + "\""
-    cmd += " -f s16le -ac " + strconv.Itoa(int(audio.ChannelCount))
-    cmd += " -ar " + strconv.Itoa(int(audio.SampleRate))
-    cmd += " pipe:1"
+	if !isVideo {
+		return ntgcalls.MediaDescription{
+			Microphone: audio,
+		}
+	}
 
-    audio.Input = cmd
+	w, h := getVideoDimensions(url)
+	if w <= 0 || h <= 0 {
+		w = 1280
+		h = 720
+	}
 
-    return ntgcalls.MediaDescription{
-        Microphone: audio,
-    }
+	maxW := 1280
+	maxH := 720
+
+	if w > maxW {
+		h = h * maxW / w
+		w = maxW
+	}
+	if h > maxH {
+		w = w * maxH / h
+		h = maxH
+	}
+
+	if w%2 != 0 {
+		w--
+	}
+	if h%2 != 0 {
+		h--
+	}
+
+	video := &ntgcalls.VideoDescription{
+		MediaSource: ntgcalls.MediaSourceShell,
+		Width:       int16(w),
+		Height:      int16(h),
+		Fps:         30,
+	}
+
+	videoSpeed := 1.0 / speed
+	videoFilter := "setpts=" + strconv.FormatFloat(videoSpeed, 'f', 4, 64) + "*PTS,scale=" + strconv.Itoa(w) + ":" + strconv.Itoa(h)
+
+	videoCmd := baseCmd
+	videoCmd += "-filter:v \"" + videoFilter + "\" "
+	videoCmd += "-f rawvideo -r " + strconv.Itoa(int(video.Fps)) + " -pix_fmt yuv420p "
+	videoCmd += "pipe:1"
+	video.Input = videoCmd
+
+	return ntgcalls.MediaDescription{
+		Microphone: audio,
+		Camera:     video,
+	}
 }
