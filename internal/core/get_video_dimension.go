@@ -19,6 +19,14 @@
  */
 package core
 
+import (
+	"os/exec"
+	"strconv"
+	"strings"
+
+	"github.com/Laky-64/gologging"
+)
+
 func getVideoDimensions(filePath string) (int, int) {
 	cmd := exec.Command("ffprobe",
 		"-v", "error",

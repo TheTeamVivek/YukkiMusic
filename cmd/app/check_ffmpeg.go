@@ -22,6 +22,8 @@ package main
 
 import (
 	"os/exec"
+
+	"github.com/Laky-64/gologging"
 )
 
 func checkFFmpegAndFFprobe() {
