@@ -50,6 +50,8 @@ func main() {
 
 	l := gologging.GetLogger("Main")
 
+checkFFmpegAndFFprobe()
+
 	l.Debug("🔹 Initializing MongoDB...")
 	dbCleanup := database.Init(config.MongoURI)
 	defer dbCleanup()
