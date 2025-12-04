@@ -100,16 +100,16 @@ func handleActions(m *telegram.NewMessage) error {
 }
 
 func handleAssistantState(p *telegram.ParticipantUpdate, chatID int64) {
-	s, _ := core.GetChatState(chatID, true)
+	s := core.GetChatState(chatID)
 
 	// Joined / Left
 	if p.IsLeft() {
-		s.SetAssistantPresence(bool_(false))
-		s.SetAssistantBanned(bool_(false))
+		s.SetAssistantPresent(false)
+		s.SetAssistantBanned(false)
 	}
 	if p.IsJoined() {
-		s.SetAssistantPresence(bool_(true))
-		s.SetAssistantBanned(bool_(false))
+		s.SetAssistantPresent(true)
+		s.SetAssistantBanned(false)
 	}
 
 	// Restricted / Banned / Kicked
@@ -126,12 +126,12 @@ func handleAssistantState(p *telegram.ParticipantUpdate, chatID int64) {
 func handleAssistantRestriction(p *telegram.ParticipantUpdate, chatID int64, s *core.ChatState) {
 	gologging.Debug("Assistant restricted in chatID " + utils.IntToStr(chatID))
 
-	s.SetAssistantPresence(bool_(false))
+	s.SetAssistantPresent(false)
 	core.DeleteRoom(chatID)
 
 	ok, err := p.Unban()
 	if err != nil || !ok {
-		s.SetAssistantBanned(bool_(true))
+		s.SetAssistantBanned(true)
 
 		if !shouldIgnoreParticipant(p) {
 			_, sendErr := p.Client.SendMessage(
@@ -154,8 +154,8 @@ func handleAssistantFallback(p *telegram.ParticipantUpdate, chatID int64, s *cor
 	member, err := p.Client.GetChatMember(chatID, core.UbUser.ID)
 	if err != nil {
 		if telegram.MatchError(err, "USER_NOT_PARTICIPANT") {
-			s.SetAssistantPresence(bool_(false))
-			s.SetAssistantBanned(bool_(false))
+			s.SetAssistantPresent(false)
+			s.SetAssistantBanned(false)
 		} else {
 			gologging.Error("Error getting assistant membership; ChatId: " +
 				utils.IntToStr(chatID) + ", Error: " + err.Error())
@@ -165,14 +165,14 @@ func handleAssistantFallback(p *telegram.ParticipantUpdate, chatID int64, s *cor
 
 	switch member.Status {
 	case telegram.Kicked, telegram.Restricted:
-		s.SetAssistantPresence(bool_(false))
-		s.SetAssistantBanned(bool_(true))
+		s.SetAssistantPresent(false)
+		s.SetAssistantBanned(true)
 	case telegram.Left:
-		s.SetAssistantPresence(bool_(false))
-		s.SetAssistantBanned(bool_(false))
+		s.SetAssistantPresent(false)
+		s.SetAssistantBanned(false)
 	case telegram.Admin, telegram.Member:
-		s.SetAssistantPresence(bool_(true))
-		s.SetAssistantBanned(bool_(false))
+		s.SetAssistantPresent(true)
+		s.SetAssistantBanned(false)
 	}
 }
 
@@ -192,7 +192,7 @@ func handleDemotion(p *telegram.ParticipantUpdate, chatID int64) {
 	utils.RemoveChatAdmin(p.Client, chatID, p.UserID())
 }
 
-func handleSudoJoin(p *telegram.ParticipantUpdate, charID int64) {
+func handleSudoJoin(p *telegram.ParticipantUpdate, chatID int64) {
 	var text string
 
 	if p.UserID() == config.OwnerID {
@@ -218,16 +218,17 @@ func handleGroupCallAction(m *telegram.NewMessage, chatID int64, action *telegra
 	}
 
 	core.DeleteRoom(chatID)
-	s, _ := core.GetChatState(chatID, true)
+	s := core.GetChatState(chatID)
 
 	if action.Duration == 0 {
-		s.SetVoiceChatStatus(bool_(true))
-		m.Respond(F(chatID, "voicechat_ended"))
-
+		// Voice chat started
+		s.SetVoiceChatActive(true)
+		m.Respond(F(chatID, "voicechat_started"))
 		gologging.Debug("Voice chat started in " + utils.IntToStr(chatID))
 	} else {
-		s.SetVoiceChatStatus(bool_(false))
-		m.Respond(F(chatID, "voicechat_started"))
+		// Voice chat ended
+		s.SetVoiceChatActive(false)
+		m.Respond(F(chatID, "voicechat_ended"))
 		gologging.Debug("Voice chat ended in " + utils.IntToStr(chatID))
 	}
 

@@ -78,9 +78,8 @@ func (*FallenApiPlatform) IsDownloadSupported(source state.PlatformName) bool {
 }
 
 func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
-
-// fallen api didn't support video downloads so disable it
-track.Video = false
+	// fallen api didn't support video downloads so disable it
+	track.Video = false
 	var pm *telegram.ProgressManager
 	if mystic != nil {
 		pm = utils.GetProgress(mystic)

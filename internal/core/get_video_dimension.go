@@ -20,35 +20,65 @@
 package core
 
 import (
+	"context"
+	"encoding/json"
 	"os/exec"
-	"strconv"
-	"strings"
+	"time"
 
 	"github.com/Laky-64/gologging"
 )
 
+const ffprobeTimeout = 7 * time.Second
+
+type ffprobeOutput struct {
+	Streams []struct {
+		CodecType string `json:"codec_type"`
+		Width     int    `json:"width"`
+		Height    int    `json:"height"`
+	} `json:"streams"`
+}
+
 func getVideoDimensions(filePath string) (int, int) {
-	cmd := exec.Command("ffprobe",
-		"-v", "error",
-		"-select_streams", "v:0",
-		"-show_entries", "stream=width,height",
-		"-of", "csv=s=x:p=0",
+	ctx, cancel := context.WithTimeout(context.Background(), ffprobeTimeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(
+		ctx,
+		"ffprobe",
+		"-v", "quiet",
+		"-print_format", "json",
+		"-show_streams",
 		filePath,
 	)
 
 	out, err := cmd.Output()
+	if ctx.Err() == context.DeadlineExceeded {
+		gologging.Error("[getVideoDimensions] ffprobe timed out for " + filePath)
+		return 0, 0
+	}
 	if err != nil {
-		gologging.Error("[getVideoDimensions] Failed to get video dimensions for " + filePath + " : " + err.Error())
+		gologging.Error("[getVideoDimensions] ffprobe failed for " + filePath + " : " + err.Error())
 		return 0, 0
 	}
 
-	dim := strings.Split(strings.TrimSpace(string(out)), "x")
-	if len(dim) != 2 {
-		gologging.Error("[getVideoDimensions] Invalid video dimensions for " + filePath + " : " + string(out))
+	var probe ffprobeOutput
+	if err := json.Unmarshal(out, &probe); err != nil {
+		gologging.Error("[getVideoDimensions] failed to parse ffprobe JSON for " + filePath + " : " + err.Error())
 		return 0, 0
 	}
 
-	width, _ := strconv.Atoi(dim[0])
-	height, _ := strconv.Atoi(dim[1])
-	return width, height
+	for _, s := range probe.Streams {
+		if s.CodecType == "video" && s.Width > 0 && s.Height > 0 {
+			return s.Width, s.Height
+		}
+	}
+
+	for _, s := range probe.Streams {
+		if s.Width > 0 && s.Height > 0 {
+			return s.Width, s.Height
+		}
+	}
+
+	gologging.Error("[getVideoDimensions] no valid video stream found for " + filePath)
+	return 0, 0
 }

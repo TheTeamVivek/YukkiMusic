@@ -1,0 +1,133 @@
+/*
+ * This file is part of YukkiMusic.
+ *
+ * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+ * Copyright (C) 2025 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package core
+
+import (
+	"strconv"
+
+	"main/ntgcalls"
+)
+
+type NtgPlayer struct{}
+
+func (p *NtgPlayer) Play(r *RoomState) error {
+	desc := getMediaDescription(r.FilePath, 0, r.Speed, r.Track.Video)
+	return Ntg.Play(r.ChatID, desc)
+}
+
+func (p *NtgPlayer) Pause(r *RoomState) (bool, error) {
+	return Ntg.Pause(r.ChatID)
+}
+
+func (p *NtgPlayer) Resume(r *RoomState) (bool, error) {
+	return Ntg.Resume(r.ChatID)
+}
+
+func (p *NtgPlayer) Stop(r *RoomState) error {
+	return Ntg.Stop(r.ChatID)
+}
+
+func (p *NtgPlayer) Mute(r *RoomState) (bool, error) {
+	return Ntg.Mute(r.ChatID)
+}
+
+func (p *NtgPlayer) Unmute(r *RoomState) (bool, error) {
+	return Ntg.UnMute(r.ChatID)
+}
+
+func getMediaDescription(url string, seek int, speed float64, isVideo bool) ntgcalls.MediaDescription {
+	if speed < 0.5 {
+		speed = 0.5
+	} else if speed > 4.0 {
+		speed = 4.0
+	}
+
+	audio := &ntgcalls.AudioDescription{
+		MediaSource:  ntgcalls.MediaSourceShell,
+		SampleRate:   96000,
+		ChannelCount: 2,
+	}
+
+	baseCmd := "ffmpeg "
+	if seek > 0 {
+		baseCmd += "-ss " + strconv.Itoa(seek) + " "
+	}
+	baseCmd += "-v warning -i \"" + url + "\" "
+
+	audioCmd := baseCmd
+	audioCmd += "-filter:a \"atempo=" + strconv.FormatFloat(speed, 'f', 2, 64) + "\" "
+	audioCmd += "-f s16le -ac " + strconv.Itoa(int(audio.ChannelCount)) + " "
+	audioCmd += "-ar " + strconv.Itoa(int(audio.SampleRate)) + " "
+	audioCmd += "pipe:1"
+	audio.Input = audioCmd
+
+	if !isVideo {
+		return ntgcalls.MediaDescription{
+			Microphone: audio,
+		}
+	}
+
+	w, h := getVideoDimensions(url)
+	if w <= 0 || h <= 0 {
+		w = 1280
+		h = 720
+	}
+
+	maxW := 1280
+	maxH := 720
+
+	if w > maxW {
+		h = h * maxW / w
+		w = maxW
+	}
+	if h > maxH {
+		w = w * maxH / h
+		h = maxH
+	}
+
+	if w%2 != 0 {
+		w--
+	}
+	if h%2 != 0 {
+		h--
+	}
+
+	video := &ntgcalls.VideoDescription{
+		MediaSource: ntgcalls.MediaSourceShell,
+		Width:       int16(w),
+		Height:      int16(h),
+		Fps:         30,
+	}
+
+	videoSpeed := 1.0 / speed
+	videoFilter := "setpts=" + strconv.FormatFloat(videoSpeed, 'f', 4, 64) + "*PTS,scale=" + strconv.Itoa(w) + ":" + strconv.Itoa(h)
+
+	videoCmd := baseCmd
+	videoCmd += "-filter:v \"" + videoFilter + "\" "
+	videoCmd += "-f rawvideo -r " + strconv.Itoa(int(video.Fps)) + " -pix_fmt yuv420p "
+	videoCmd += "pipe:1"
+	video.Input = videoCmd
+
+	return ntgcalls.MediaDescription{
+		Microphone: audio,
+		Camera:     video,
+	}
+}

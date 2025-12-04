@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"math/rand"
 	"runtime"
-	"strconv"
 	"sync"
 	"time"
 
@@ -31,17 +30,25 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/state"
-	"main/ntgcalls"
 )
 
 var (
 	rooms   = make(map[int64]*RoomState)
 	roomsMu sync.RWMutex
-	logger  = gologging.GetLogger("roomstate")
 )
+
+type Player interface {
+	Play(r *RoomState) error
+	Pause(r *RoomState) (bool, error)
+	Resume(r *RoomState) (bool, error)
+	Stop(r *RoomState) error
+	Mute(r *RoomState) (bool, error)
+	Unmute(r *RoomState) (bool, error)
+}
 
 type RoomState struct {
 	sync.RWMutex
+
 	ChatID    int64
 	Track     *state.Track
 	Position  int
@@ -54,11 +61,65 @@ type RoomState struct {
 	Speed     float64
 	Shuffle   bool
 
-	Loop  int
-	cplay bool
-
+	Loop   int
+	cplay  bool
 	mystic *telegram.NewMessage
+
+	p Player
 	*ScheduledTimers
+}
+
+func DeleteRoom(chatID int64) {
+	_, file, line, _ := runtime.Caller(1)
+
+	gologging.DebugF("DeleteRoom Called from %s:%d", file, line)
+
+	roomsMu.RLock()
+	room, exists := rooms[chatID]
+	roomsMu.RUnlock()
+
+	if exists {
+		room.Destroy()
+	}
+}
+
+func GetRoom(chatID int64, create ...bool) (*RoomState, bool) {
+	roomsMu.RLock()
+	room, exists := rooms[chatID]
+	roomsMu.RUnlock()
+
+	if exists {
+		return room, true
+	}
+
+	if len(create) > 0 && create[0] {
+		roomsMu.Lock()
+		defer roomsMu.Unlock()
+
+		room, exists = rooms[chatID]
+		if !exists {
+			room = &RoomState{
+				ChatID: chatID,
+				Queue:  []*state.Track{},
+				Speed:  1.0,
+				p:      &NtgPlayer{},
+			}
+			rooms[chatID] = room
+		}
+		return room, true
+	}
+	return nil, false
+}
+
+func GetAllRoomIDs() []int64 {
+	roomsMu.RLock()
+	defer roomsMu.RUnlock()
+
+	ids := make([]int64, 0, len(rooms))
+	for chatID := range rooms {
+		ids = append(ids, chatID)
+	}
+	return ids
 }
 
 func (r *RoomState) SetCPlay(isCPlay bool) {
@@ -119,62 +180,10 @@ func (r *RoomState) GetMystic() *telegram.NewMessage {
 	return r.mystic
 }
 
-func DeleteRoom(chatID int64) {
-	_, file, line, _ := runtime.Caller(1)
-
-	logger.DebugF("DeleteRoom Called from %s:%d", file, line)
-
-	roomsMu.RLock()
-	room, exists := rooms[chatID]
-	roomsMu.RUnlock()
-
-	if exists {
-		room.Destroy()
-	}
-}
-
-func GetRoom(chatID int64, create ...bool) (*RoomState, bool) {
-	roomsMu.RLock()
-	room, exists := rooms[chatID]
-	roomsMu.RUnlock()
-
-	if exists {
-		return room, true
-	}
-
-	if len(create) > 0 && create[0] {
-		roomsMu.Lock()
-		defer roomsMu.Unlock()
-
-		room, exists = rooms[chatID]
-		if !exists {
-			room = &RoomState{
-				ChatID: chatID,
-				Queue:  []*state.Track{},
-				Speed:  1.0,
-			}
-			rooms[chatID] = room
-		}
-		return room, true
-	}
-	return nil, false
-}
-
-func GetAllRoomIDs() []int64 {
-	roomsMu.RLock()
-	defer roomsMu.RUnlock()
-
-	ids := make([]int64, 0, len(rooms))
-	for chatID := range rooms {
-		ids = append(ids, chatID)
-	}
-	return ids
-}
-
 func (r *RoomState) Destroy() {
 	_, file, line, _ := runtime.Caller(1)
 
-	logger.DebugF("Destroy Called from %s:%d", file, line)
+	gologging.DebugF("Destroy Called from %s:%d", file, line)
 
 	r.Stop()
 	r.cleanupFile()
@@ -218,11 +227,6 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 		return nil
 	}
 
-	err := Ntg.Play(r.ChatID, getMediaDescription(path, 0, r.Speed, t.Video))
-	if err != nil {
-		return err
-	}
-
 	r.Track = t
 	r.Position = 0
 	r.Playing = true
@@ -230,7 +234,8 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 	r.Muted = false
 	r.FilePath = path
 	r.UpdatedAt = time.Now().Unix()
-	return nil
+
+	return r.p.Play(r) // note: when err so must handle and cleanup room
 }
 
 func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
@@ -238,7 +243,7 @@ func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
 		return true, nil
 	}
 
-	paused, err := Ntg.Pause(r.ChatID)
+	paused, err := r.p.Pause(r)
 	if err != nil {
 		return false, err
 	}
@@ -280,7 +285,7 @@ func (r *RoomState) Resume() (bool, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	resumed, err := Ntg.Resume(r.ChatID)
+	resumed, err := r.p.Resume(r)
 	if err != nil {
 		return false, err
 	}
@@ -302,12 +307,15 @@ func (r *RoomState) Replay() error {
 		return fmt.Errorf("no track to replay")
 	}
 
-	err := Ntg.Play(r.ChatID, getMediaDescription(r.FilePath, 0, r.Speed, r.Track.Video))
+	old := r.Position
+	r.Position = 0
+
+	err := r.p.Play(r)
 	if err != nil {
+		r.Position = old
 		return err
 	}
 
-	r.Position = 0
 	r.Playing = true
 	r.Paused = false
 	r.Muted = false
@@ -332,6 +340,12 @@ func (r *RoomState) Seek(seconds int) error {
 		return fmt.Errorf("cannot seek, track is about to end")
 	}
 
+	oldPos := r.Position
+	oldPlaying := r.Playing
+	oldPaused := r.Paused
+	oldMuted := r.Muted
+	oldUpdated := r.UpdatedAt
+
 	newPos := r.Position + seconds
 	if newPos >= r.Track.Duration {
 		newPos = r.Track.Duration - 5
@@ -340,19 +354,24 @@ func (r *RoomState) Seek(seconds int) error {
 		newPos = 0
 	}
 
-	err := Ntg.Play(r.ChatID, getMediaDescription(r.FilePath, newPos, r.Speed))
-	if err != nil {
-		return err
-	}
-
-	if r.Muted {
-		Ntg.UnMute(r.ChatID)
-	}
 	r.Position = newPos
 	r.Playing = true
 	r.Paused = false
 	r.Muted = false
 	r.UpdatedAt = time.Now().Unix()
+
+	err := r.p.Play(r)
+	if err != nil {
+		r.Position = oldPos
+		r.Playing = oldPlaying
+		r.Paused = oldPaused
+		r.Muted = oldMuted
+		r.UpdatedAt = oldUpdated
+		return err
+	}
+	if oldMuted {
+		r.p.Unmute(r)
+	}
 	return nil
 }
 
@@ -379,7 +398,7 @@ func (r *RoomState) SetSpeed(speed float64, timeAfterNormal ...time.Duration) er
 	r.Muted = false
 	r.UpdatedAt = time.Now().Unix()
 
-	err := Ntg.Play(r.ChatID, getMediaDescription(file, pos, speed, r.Track.Video))
+	err := r.p.Play(r)
 	if err != nil {
 		return err
 	}
@@ -399,7 +418,7 @@ func (r *RoomState) SetSpeed(speed float64, timeAfterNormal ...time.Duration) er
 			if r.Track != nil && r.Playing && r.Speed != 1.0 {
 				r.parse()
 				r.Speed = 1.0
-				Ntg.Play(r.ChatID, getMediaDescription(r.FilePath, r.Position, 1.0, r.Track.Video))
+				r.p.Play(r)
 				r.UpdatedAt = time.Now().Unix()
 			}
 		})
@@ -412,7 +431,7 @@ func (r *RoomState) Mute(unmuteAfter ...time.Duration) (bool, error) {
 		return true, nil
 	}
 
-	muted, err := Ntg.Mute(r.ChatID)
+	muted, err := r.p.Mute(r)
 	if err != nil {
 		return false, err
 	}
@@ -447,7 +466,7 @@ func (r *RoomState) Unmute() (bool, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	unmuted, err := Ntg.UnMute(r.ChatID)
+	unmuted, err := r.p.Unmute(r)
 	if err != nil {
 		return false, err
 	}
@@ -464,9 +483,9 @@ func (r *RoomState) Stop() error {
 
 	_, file, line, _ := runtime.Caller(1)
 
-	logger.DebugF("Stop Called from %s:%d", file, line)
+	gologging.DebugF("Stop Called from %s:%d", file, line)
 
-	err := Ntg.Stop(r.ChatID)
+	err := r.p.Stop(r)
 
 	r.Track = nil
 	r.Position = 0
@@ -546,84 +565,5 @@ func (r *RoomState) MoveInQueue(from, to int) {
 		r.Queue = append(r.Queue, item)
 	} else {
 		r.Queue = append(r.Queue[:to], append([]*state.Track{item}, r.Queue[to:]...)...)
-	}
-}
-
-func getMediaDescription(url string, seek int, speed float64, isVideo bool) ntgcalls.MediaDescription {
-	if speed < 0.5 {
-		speed = 0.5
-	} else if speed > 4.0 {
-		speed = 4.0
-	}
-
-	audio := &ntgcalls.AudioDescription{
-		MediaSource:  ntgcalls.MediaSourceShell,
-		SampleRate:   96000,
-		ChannelCount: 2,
-	}
-
-	baseCmd := "ffmpeg "
-	if seek > 0 {
-		baseCmd += "-ss " + strconv.Itoa(seek) + " "
-	}
-	baseCmd += "-v warning -i \"" + url + "\" "
-
-	audioCmd := baseCmd
-	audioCmd += "-filter:a \"atempo=" + strconv.FormatFloat(speed, 'f', 2, 64) + "\" "
-	audioCmd += "-f s16le -ac " + strconv.Itoa(int(audio.ChannelCount)) + " "
-	audioCmd += "-ar " + strconv.Itoa(int(audio.SampleRate)) + " "
-	audioCmd += "pipe:1"
-	audio.Input = audioCmd
-
-	if !isVideo {
-		return ntgcalls.MediaDescription{
-			Microphone: audio,
-		}
-	}
-
-	w, h := getVideoDimensions(url)
-	if w <= 0 || h <= 0 {
-		w = 1280
-		h = 720
-	}
-
-	maxW := 1280
-	maxH := 720
-
-	if w > maxW {
-		h = h * maxW / w
-		w = maxW
-	}
-	if h > maxH {
-		w = w * maxH / h
-		h = maxH
-	}
-
-	if w%2 != 0 {
-		w--
-	}
-	if h%2 != 0 {
-		h--
-	}
-
-	video := &ntgcalls.VideoDescription{
-		MediaSource: ntgcalls.MediaSourceShell,
-		Width:       int16(w),
-		Height:      int16(h),
-		Fps:         30,
-	}
-
-	videoSpeed := 1.0 / speed
-	videoFilter := "setpts=" + strconv.FormatFloat(videoSpeed, 'f', 4, 64) + "*PTS,scale=" + strconv.Itoa(w) + ":" + strconv.Itoa(h)
-
-	videoCmd := baseCmd
-	videoCmd += "-filter:v \"" + videoFilter + "\" "
-	videoCmd += "-f rawvideo -r " + strconv.Itoa(int(video.Fps)) + " -pix_fmt yuv420p "
-	videoCmd += "pipe:1"
-	video.Input = videoCmd
-
-	return ntgcalls.MediaDescription{
-		Microphone: audio,
-		Camera:     video,
 	}
 }

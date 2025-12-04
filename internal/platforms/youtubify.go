@@ -71,56 +71,55 @@ func (*YoutubifyPlatform) IsDownloadSupported(source PlatformName) bool {
 }
 
 func (f *YoutubifyPlatform) Download(
-    ctx context.Context,
-    track *state.Track,
-    _ *telegram.NewMessage,
+	ctx context.Context,
+	track *state.Track,
+	_ *telegram.NewMessage,
 ) (string, error) {
-    ext := "mp3"
-    endpoint := "audio"
-    if track.Video {
-        ext = "mp4"
-        endpoint = "video"
-    }
+	ext := "mp3"
+	endpoint := "audio"
+	if track.Video {
+		ext = "mp4"
+		endpoint = "video"
+	}
 
-    filepath := "downloads/" + track.ID + "." + ext
+	filepath := "downloads/" + track.ID + "." + ext
 
-    if _, err := os.Stat(filepath); err == nil {
-        return filepath, nil
-    }
+	if _, err := os.Stat(filepath); err == nil {
+		return filepath, nil
+	}
 
-    if err := os.MkdirAll("downloads", 0o755); err != nil {
-        return "", err
-    }
+	if err := os.MkdirAll("downloads", 0o755); err != nil {
+		return "", err
+	}
 
-    client := resty.New()
+	client := resty.New()
 
-    url := apiBase +
-        "/download/" + endpoint +
-        "?video_id=" + track.ID +
-        "&mode=download&no_redirect=1&api_key=" + apiKey
+	url := apiBase +
+		"/download/" + endpoint +
+		"?video_id=" + track.ID +
+		"&mode=download&no_redirect=1&api_key=" + apiKey
 
-    resp, err := client.R().
-        SetContext(ctx).
-        SetOutputFileName(filepath).
-        Get(url)
+	resp, err := client.R().
+		SetContext(ctx).
+		SetOutputFileName(filepath).
+		Get(url)
+	if err != nil {
+		_ = os.Remove(filepath)
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+			return "", err
+		}
+		return "", err
+	}
 
-    if err != nil {
-        _ = os.Remove(filepath)
-        if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
-            return "", err
-        }
-        return "", err
-    }
+	if resp.IsError() {
+		_ = os.Remove(filepath)
+		return "", fmt.Errorf("API returned %s", resp.Status())
+	}
 
-    if resp.IsError() {
-        _ = os.Remove(filepath)
-        return "", fmt.Errorf("API returned %s", resp.Status())
-    }
+	if ctx.Err() != nil {
+		_ = os.Remove(filepath)
+		return "", ctx.Err()
+	}
 
-    if ctx.Err() != nil {
-        _ = os.Remove(filepath)
-        return "", ctx.Err()
-    }
-
-    return filepath, nil
+	return filepath, nil
 }
