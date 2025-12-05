@@ -60,6 +60,7 @@ func handleLogger(m *telegram.NewMessage) error {
 		return telegram.EndGroup
 	}
 
+        action = F(chatID, utils.IfElse(enable, "enabled", "disabled"))
 	if dbErr != nil {
 		m.Reply(F(chatID, "logger_check_fail", locales.Arg{"error": dbErr.Error()}))
 		return telegram.EndGroup
