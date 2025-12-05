@@ -575,8 +575,10 @@ func playTrackWithRetry(
 			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_rtmp_missing_params"))
 			r.Destroy()
 			return telegram.EndGroup
-			}
+			} else {
 			r.SetRTMPPlayer(url, key)
+			
+			}
 			continue
 		}
 
