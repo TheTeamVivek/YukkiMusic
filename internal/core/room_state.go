@@ -411,7 +411,6 @@ func (r *RoomState) Seek(seconds int) error {
 	}
 
 	oldPos := r.position
-	oldPlaying := r.playing
 	oldPaused := r.paused
 	oldMuted := r.muted
 	oldUpdated := r.updatedAt
@@ -425,7 +424,6 @@ func (r *RoomState) Seek(seconds int) error {
 	}
 
 	r.position = newPos
-	r.playing = true
 	r.paused = false
 	r.muted = false
 	r.updatedAt = time.Now().Unix()
@@ -433,7 +431,6 @@ func (r *RoomState) Seek(seconds int) error {
 	err := r.p.Play(r)
 	if err != nil {
 		r.position = oldPos
-		r.playing = oldPlaying
 		r.paused = oldPaused
 		r.muted = oldMuted
 		r.updatedAt = oldUpdated
@@ -597,7 +594,7 @@ func (r *RoomState) NextTrack() *state.Track {
 
 	r.track = next
 	r.position = 0
-	r.playing = false
+	r.playing = true
 	r.paused = false
 	r.muted = false
 	r.updatedAt = time.Now().Unix()

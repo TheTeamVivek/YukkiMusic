@@ -29,7 +29,7 @@ import (
 type NtgPlayer struct{}
 
 func (p *NtgPlayer) Play(r *RoomState) error {
-	desc := getMediaDescription(r.fpath, 0, r.speed, r.track.Video)
+	desc := getMediaDescription(r.fpath, r.position, r.speed, r.track.Video)
 	return Ntg.Play(r.chatID, desc)
 }
 
@@ -53,7 +53,7 @@ func (p *NtgPlayer) Unmute(r *RoomState) (bool, error) {
 	return Ntg.Unmute(r.chatID)
 }
 
-func getMediaDescription(url string, seek int, speed float64, isVideo bool) ntgcalls.MediaDescription {
+func getMediaDescription(url string, pos int, speed float64, isVideo bool) ntgcalls.MediaDescription {
 	if speed < 0.5 {
 		speed = 0.5
 	} else if speed > 4.0 {
@@ -67,8 +67,8 @@ func getMediaDescription(url string, seek int, speed float64, isVideo bool) ntgc
 	}
 
 	baseCmd := "ffmpeg "
-	if seek > 0 {
-		baseCmd += "-ss " + strconv.Itoa(seek) + " "
+	if pos > 0 {
+		baseCmd += "-ss " + strconv.Itoa(pos) + " "
 	}
 	baseCmd += "-v warning -i \"" + url + "\" "
 
