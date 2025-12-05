@@ -239,10 +239,10 @@ gologging.Error("raw error of GetChatMember in core.ChatState"+err.Error())
 				member, err = Bot.GetChatMember(cs.ChatID, UbUser.ID)
 				if err != nil {
 					return handleMemberFetchError(cs, err)
-				
+				}
 				applyMemberStatus(cs, member)
 				return nil
-			}
+			
 		}
 		return handleMemberFetchError(cs, err)
 	}
