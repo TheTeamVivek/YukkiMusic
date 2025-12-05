@@ -320,7 +320,7 @@ func triggerAssistantStartIfNeeded(err error) bool {
 func idMatchesAssistant(err error, assistantID int64) bool {
 	raw := err.Error()
 	idStr := strconv.FormatInt(assistantID, 10)
-	return strings.Contains(raw, "'" + idStr "'")
+	return strings.Contains(raw, "'" + idStr + "'")
 }
 
 func handleMemberFetchError(s *ChatState, err error) error {
