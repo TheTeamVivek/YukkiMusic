@@ -93,7 +93,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 		args = append(args, "-filter:a", audioFilter)
 	}
 
-	if r.track !=  nil && r.track.Video {
+	if r.track != nil && r.track.Video {
 		_, _, fps, filter := normalizeVideo(r.fpath, speed)
 
 		args = append(args,

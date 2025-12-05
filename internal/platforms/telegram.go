@@ -23,6 +23,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"mime"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -84,47 +85,47 @@ func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, erro
 		return nil, fmt.Errorf("failed to fetch Telegram message: %w", err)
 	}
 
-	                isAudio := false
-                isVideo := false
+	isAudio := false
+	isVideo := false
 
-                if msg.Audio() != nil || rmsg.Voice() != nil {
-                        isAudio = true
-                } else if msg.Video() != nil {
-                        isVideo = true
-                } else if msg.Document() != nil {
-                        ext := strings.ToLower(msg.File.Ext)
-                        if !strings.HasPrefix(ext, ".") {
-                                ext = "." + ext
-                        }
-                        mimeType := mime.TypeByExtension(ext)
-                        isAudio = strings.HasPrefix(mimeType, "audio/")
-                        isVideo = strings.HasPrefix(mimeType, "video/")
-                }
+	if msg.Audio() != nil || rmsg.Voice() != nil {
+		isAudio = true
+	} else if msg.Video() != nil {
+		isVideo = true
+	} else if msg.Document() != nil {
+		ext := strings.ToLower(msg.File.Ext)
+		if !strings.HasPrefix(ext, ".") {
+			ext = "." + ext
+		}
+		mimeType := mime.TypeByExtension(ext)
+		isAudio = strings.HasPrefix(mimeType, "audio/")
+		isVideo = strings.HasPrefix(mimeType, "video/")
+	}
 
-                if !isAudio && !isVideo {
-                        return nil, errors.New("⚠️ Provide a valid tg media (audio/video) url")
-                }
+	if !isAudio && !isVideo {
+		return nil, errors.New("⚠️ Provide a valid tg media (audio/video) url")
+	}
 
 	track, tErr := t.GetTracksByMessage(msg)
 	if tErr != nil {
 		return nil, tErr
 	}
-track.Video = isVideo
-if isVideo {
-    thumbPath := filepath.Join("downloads", track.ID+".jpg")
+	track.Video = isVideo
+	if isVideo {
+		thumbPath := filepath.Join("downloads", track.ID+".jpg")
 
-    if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-        path, err := rmsg.Download(&telegram.DownloadOptions{
-            ThumbOnly: true,
-            FileName:  thumbPath,
-        })
-        if err == nil {
-            if _, err := os.Stat(path); err == nil {
-                track.Artwork = path
-            }
-        }
-    }
-}
+		if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
+			path, err := rmsg.Download(&telegram.DownloadOptions{
+				ThumbOnly: true,
+				FileName:  thumbPath,
+			})
+			if err == nil {
+				if _, err := os.Stat(path); err == nil {
+					track.Artwork = path
+				}
+			}
+		}
+	}
 
 	return []*state.Track{track}, nil
 }

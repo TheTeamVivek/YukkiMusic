@@ -569,15 +569,15 @@ func playTrackWithRetry(
 		// RTMP unsupported
 		if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
 			if url, key, err := database.GetRTMP(r.ChatID()); err != nil || url == "" || key == "" {
-			  if err != nil {
-			    replyMsg.Reply("Failed to get rtmp cfg: "+ err.Error())
-			  }
-			  replyMsg.Reply(url+ key)
-			  utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_rtmp_missing_params"))
-			  r.Destroy()
-			  return telegram.EndGroup
+				if err != nil {
+					replyMsg.Reply("Failed to get rtmp cfg: " + err.Error())
+				}
+				replyMsg.Reply(url + key)
+				utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_rtmp_missing_params"))
+				r.Destroy()
+				return telegram.EndGroup
 			} else {
-			  r.SetRTMPPlayer(url, key)
+				r.SetRTMPPlayer(url, key)
 			}
 			continue
 		}

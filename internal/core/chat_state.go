@@ -25,8 +25,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
-        "github.com/Laky-64/gologging"
 
 	"main/config"
 	"main/internal/utils"
@@ -230,19 +230,18 @@ func (cs *ChatState) ensureAssistantState(force bool) error {
 	}
 
 	member, err := Bot.GetChatMember(cs.ChatID, UbUser.ID)
-
 	if err != nil {
-gologging.Error("raw error of GetChatMember in core.ChatState"+err.Error())
+		gologging.Error("raw error of GetChatMember in core.ChatState" + err.Error())
 		if strings.Contains(err.Error(), "there is no peer with id") {
 
 			triggerAssistantStart()
-				member, err = Bot.GetChatMember(cs.ChatID, UbUser.ID)
-				if err != nil {
-					return handleMemberFetchError(cs, err)
-				}
-				applyMemberStatus(cs, member)
-				return nil
-			
+			member, err = Bot.GetChatMember(cs.ChatID, UbUser.ID)
+			if err != nil {
+				return handleMemberFetchError(cs, err)
+			}
+			applyMemberStatus(cs, member)
+			return nil
+
 		}
 		return handleMemberFetchError(cs, err)
 	}
@@ -251,8 +250,7 @@ gologging.Error("raw error of GetChatMember in core.ChatState"+err.Error())
 	return nil
 }
 
-func triggerAssistantStart(){
-
+func triggerAssistantStart() {
 	_, sendErr := UBot.SendMessage(BUser.Username, "/start")
 	if sendErr == nil {
 		return

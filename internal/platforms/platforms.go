@@ -24,6 +24,8 @@ import (
 	"errors"
 	"html"
 	"mime"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/amarnathcjd/gogram/telegram"
@@ -137,21 +139,21 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 		} else {
 			// for tg medias we allow only Video when replied media is a video
 			t.Video = isVideo
-if isVideo {
-    thumbPath := filepath.Join("downloads", t.ID+".jpg")
+			if isVideo {
+				thumbPath := filepath.Join("downloads", t.ID+".jpg")
 
-    if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-        path, err := rmsg.Download(&telegram.DownloadOptions{
-            ThumbOnly: true,
-            FileName:  thumbPath,
-        })
-        if err == nil {
-            if _, err := os.Stat(path); err == nil {
-                t.Artwork = path
-            }
-        }
-    }
-}
+				if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
+					path, err := rmsg.Download(&telegram.DownloadOptions{
+						ThumbOnly: true,
+						FileName:  thumbPath,
+					})
+					if err == nil {
+						if _, err := os.Stat(path); err == nil {
+							t.Artwork = path
+						}
+					}
+				}
+			}
 			return []*state.Track{t}, nil
 		}
 	}
@@ -172,8 +174,8 @@ func Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessa
 			if err == nil {
 				return path, nil
 			}
-			if errors.Is(err, context.Canceled){
-			  return "", err
+			if errors.Is(err, context.Canceled) {
+				return "", err
 			}
 			errs = append(errs,
 				html.EscapeString(string(p.Name()))+": "+html.EscapeString(err.Error()))

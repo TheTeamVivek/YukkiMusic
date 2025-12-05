@@ -33,6 +33,9 @@ package main
 import "C"
 
 import (
+	"net/http"
+	_ "net/http/pprof"
+
 	"github.com/Laky-64/gologging"
 
 	"main/config"
@@ -41,8 +44,6 @@ import (
 	"main/internal/database"
 	"main/internal/locales"
 	"main/internal/modules"
-_ "net/http/pprof"
-"net/http"
 )
 
 func main() {
