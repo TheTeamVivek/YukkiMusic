@@ -140,6 +140,17 @@ err_fetch_failed: |
 err_peer_resolve_failed: |
   ⚠️ Failed to resolve peer information. Try again later or re-add the assistant.
 
+err_rtmp_missing_params: |
+  <b>⚠️ RTMP Details Missing</b>
+
+  It looks like an <b>RTMP stream</b> is active in this chat, but you have not provided the required
+  <b>RTMP URL</b> or <b>Stream Key</b>. Without these, I cannot start streaming music to RTMP.
+
+  <b>Use:</b> <code>/setrtmp [chat_id] [url+key]</code>
+
+  <i>📌 Once the RTMP details are set, you may start streaming.</i>  
+  <i>➡️ If you do not wish to use RTMP, switch to regular voice chat instead.</i>
+  
 err_unknown: |
   ⚠️ Unknown Error Occurred:
   <i>{error}</i>
@@ -284,7 +295,6 @@ play_multiple_tracks_too_long_header: "<b>⚠️ {count} tracks were skipped (ma
 play_multiple_tracks_too_long_item: "— <i>{title}</i>"
 play_multiple_tracks_too_long_more: "... and {remaining} more."
 play_all_tracks_skipped: "❌ All found tracks were skipped due to duration limits."
-play_rtmp_not_supported: "⚠️ RTMP stream not supported right now."
 play_failed: "❌ Failed to play\nError: {error}"
 play_downloading_song: "📥 Downloading song \"{title}\""
 play_download_canceled: "⚠️ Download canceled by {user}."
