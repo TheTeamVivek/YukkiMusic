@@ -143,8 +143,8 @@ err_peer_resolve_failed: |
 err_rtmp_missing_params: |
   <b>⚠️ RTMP Details Missing</b>
 
-  It looks like an <b>RTMP stream</b> is active in this chat, but you have not provided the required
-  <b>RTMP URL</b> or <b>Stream Key</b>. Without these, I cannot start streaming music to RTMP.
+  <i>It looks like an <b>RTMP stream</b> is active in this chat, but you have not provided the required
+  <b>RTMP URL</b> or <b>Stream Key</b>. Without these, I cannot start streaming music to RTMP.</i>
 
   <b>Use:</b> <code>/setrtmp [chat_id] [url+key]</code>
 

@@ -573,12 +573,11 @@ func playTrackWithRetry(
 			    gologging.Error("Failed to get rtmp cfg: "+ err.Error())
 			  }
 			  gologging.Info(url+ key)
-			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_rtmp_missing_params"))
-			r.Destroy()
-			return telegram.EndGroup
+			  utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_rtmp_missing_params"))
+			  r.Destroy()
+			  return telegram.EndGroup
 			} else {
-			r.SetRTMPPlayer(url, key)
-			
+			  r.SetRTMPPlayer(url, key)
 			}
 			continue
 		}
