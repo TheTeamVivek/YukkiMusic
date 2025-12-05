@@ -52,7 +52,7 @@ func (p *RTMPPlayer) kill() {
 }
 
 func (p *RTMPPlayer) Play(r *RoomState) error {
-	if r.FilePath() == "" {
+	if r.fpath == "" {
 		return errors.New("no file")
 	}
 	if r.rtmpURL == "" || r.rtmpKey == "" {
@@ -64,7 +64,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 
 	p.killLocked()
 
-	speed := r.Speed()
+	speed := r.speed
 	if speed < 0.5 {
 		speed = 0.5
 	} else if speed > 4.0 {
@@ -80,7 +80,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 
 	args = append(args,
 		"-v", "warning",
-		"-i", r.FilePath(),
+		"-i", r.fpath,
 	)
 
 	audioFilter := "atempo=" + strconv.FormatFloat(speed, 'f', 2, 64)
@@ -93,8 +93,8 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 		args = append(args, "-filter:a", audioFilter)
 	}
 
-	if r.Track().ID != "" && r.Track().Video {
-		_, _, fps, filter := normalizeVideo(r.FilePath(), speed)
+	if r.track.ID !=  nil && r.track.Video {
+		_, _, fps, filter := normalizeVideo(r.fpath, speed)
 
 		args = append(args,
 			"-c:v", "libx264",
@@ -134,7 +134,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 				onStreamEnd(chatID)
 			}
 		}
-	}(r.ChatID(), cmd)
+	}(r.chatID, cmd)
 
 	return nil
 }

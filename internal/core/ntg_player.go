@@ -29,28 +29,28 @@ import (
 type NtgPlayer struct{}
 
 func (p *NtgPlayer) Play(r *RoomState) error {
-	desc := getMediaDescription(r.FilePath(), 0, r.Speed(), r.Track().Video)
-	return Ntg.Play(r.ChatID(), desc)
+	desc := getMediaDescription(r.fpath, 0, r.speed, r.track.Video)
+	return Ntg.Play(r.chatID, desc)
 }
 
 func (p *NtgPlayer) Pause(r *RoomState) (bool, error) {
-	return Ntg.Pause(r.ChatID())
+	return Ntg.Pause(r.chatID)
 }
 
 func (p *NtgPlayer) Resume(r *RoomState) (bool, error) {
-	return Ntg.Resume(r.ChatID())
+	return Ntg.Resume(r.chatID)
 }
 
 func (p *NtgPlayer) Stop(r *RoomState) error {
-	return Ntg.Stop(r.ChatID())
+	return Ntg.Stop(r.chatID)
 }
 
 func (p *NtgPlayer) Mute(r *RoomState) (bool, error) {
-	return Ntg.Mute(r.ChatID())
+	return Ntg.Mute(r.chatID)
 }
 
 func (p *NtgPlayer) Unmute(r *RoomState) (bool, error) {
-	return Ntg.Unmute(r.ChatID())
+	return Ntg.Unmute(r.chatID)
 }
 
 func getMediaDescription(url string, seek int, speed float64, isVideo bool) ntgcalls.MediaDescription {
