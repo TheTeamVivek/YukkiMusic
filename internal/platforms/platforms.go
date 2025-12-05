@@ -199,7 +199,7 @@ func formatErrorsHTML(errs []string) error {
 	}
 
 	if len(errs) == 1 {
-		return errors.New("<blockquote><b>⚠️ Error:</b>\n" + errs[0] + "\n</blockquote>")
+		return errors.New(errs[0])
 	}
 
 	var b strings.Builder
