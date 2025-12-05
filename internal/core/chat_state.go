@@ -296,10 +296,6 @@ func applyMemberStatus(s *ChatState, member *telegram.Participant) {
 
 func triggerAssistantStartIfNeeded(err error) bool {
 
-	if !idMatchesAssistant(err, UbUser.ID) {
-		return false
-	}
-
 	_, sendErr := UBot.SendMessage(BUser.ID, "/start")
 	if sendErr == nil {
 		return true
@@ -321,12 +317,6 @@ func triggerAssistantStartIfNeeded(err error) bool {
 	}
 
 	return false
-}
-
-func idMatchesAssistant(err error, assistantID int64) bool {
-	raw := err.Error()
-	idStr := strconv.FormatInt(assistantID, 10)
-	return strings.Contains(raw, "'" + idStr + "'")
 }
 
 func handleMemberFetchError(s *ChatState, err error) error {
