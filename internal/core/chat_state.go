@@ -27,6 +27,7 @@ import (
 	"sync"
 
 	"github.com/amarnathcjd/gogram/telegram"
+        "github.com/Laky-64/gologging"
 
 	"main/config"
 	"main/internal/utils"
@@ -230,8 +231,12 @@ func (cs *ChatState) ensureAssistantState(force bool) error {
 	}
 
 	member, err := Bot.GetChatMember(cs.ChatID, UbUser.ID)
+gologging.Error("raw error"+err.Error())
+
 	if err != nil {
 		if strings.Contains(err.Error(), "there is no peer with id") {
+gologging.Info("may be newd to start bot by ub")
+
 			if triggerAssistantStartIfNeeded(err) {
 				member, err = Bot.GetChatMember(cs.ChatID, UbUser.ID)
 				if err != nil {
@@ -290,6 +295,7 @@ func applyMemberStatus(s *ChatState, member *telegram.Participant) {
 }
 
 func triggerAssistantStartIfNeeded(err error) bool {
+
 	if !idMatchesAssistant(err, UbUser.ID) {
 		return false
 	}
