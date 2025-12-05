@@ -110,7 +110,21 @@ func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, erro
 		return nil, tErr
 	}
 track.Video = isVideo
+if isVideo {
+    thumbPath := filepath.Join("downloads", track.ID+".jpg")
 
+    if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
+        path, err := rmsg.Download(&telegram.DownloadOptions{
+            ThumbOnly: true,
+            FileName:  thumbPath,
+        })
+        if err == nil {
+            if _, err := os.Stat(path); err == nil {
+                track.Artwork = path
+            }
+        }
+    }
+}
 
 	return []*state.Track{track}, nil
 }
