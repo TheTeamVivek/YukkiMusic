@@ -85,12 +85,9 @@ func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, erro
 		return nil, fmt.Errorf("failed to fetch Telegram message: %w", err)
 	}
 
-	isAudio := false
 	isVideo := false
 
-	if msg.Audio() != nil || msg.Voice() != nil {
-		isAudio = true
-	} else if msg.Video() != nil {
+	 if msg.Video() != nil {
 		isVideo = true
 	} else if msg.Document() != nil {
 		ext := strings.ToLower(msg.File.Ext)
@@ -98,12 +95,7 @@ func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, erro
 			ext = "." + ext
 		}
 		mimeType := mime.TypeByExtension(ext)
-		isAudio = strings.HasPrefix(mimeType, "audio/")
 		isVideo = strings.HasPrefix(mimeType, "video/")
-	}
-
-	if !isAudio && !isVideo {
-		return nil, errors.New("⚠️ Provide a valid tg media (audio/video) url")
 	}
 
 	track, tErr := t.GetTracksByMessage(msg)
