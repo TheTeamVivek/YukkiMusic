@@ -69,5 +69,6 @@ func main() {
 	defer cleanup()
 	modules.Init(core.Bot, core.UBot, core.Ntg)
 	l.Info("🚀 Bot is started")
-	http.ListenAndServe("localhost:6060", nil)
+	go http.ListenAndServe("localhost:6060", nil)
+	core.Bot.Idle()
 }
