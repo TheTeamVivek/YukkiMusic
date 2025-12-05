@@ -231,7 +231,7 @@ func (cs *ChatState) ensureAssistantState(force bool) error {
 
 	member, err := Bot.GetChatMember(cs.ChatID, UbUser.ID)
 	if err != nil {
-		if errors.Is(err, ErrFetchFailed) {
+		if errors.Is(err, "there is no peer with id") {
 			if triggerAssistantStartIfNeeded(err) {
 				member, err = Bot.GetChatMember(cs.ChatID, UbUser.ID)
 				if err != nil {
