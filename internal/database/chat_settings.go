@@ -29,11 +29,16 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
+type RTMPConfig struct {
+	RtmpURL string `bson:"rtmp_url"`
+	RtmpKey string `bson:"rtmp_key"`
+}
 type ChatSettings struct {
-	ChatID    int64   `bson:"_id"`
-	CPlayID   int64   `bson:"cplay_id"`
-	AuthUsers []int64 `bson:"auth_users"`
-	Language  string  `bson:"language"`
+	ChatID     int64      `bson:"_id"`
+	CPlayID    int64      `bson:"cplay_id"`
+	AuthUsers  []int64    `bson:"auth_users"`
+	Language   string     `bson:"language"`
+	RTMPConfig RTMPConfig `bson:"rtmp_config"`
 }
 
 func defaultChatSettings(chatID int64) *ChatSettings {

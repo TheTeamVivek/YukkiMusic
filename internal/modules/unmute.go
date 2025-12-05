@@ -23,37 +23,40 @@ import (
 	"fmt"
 	"html"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/locales"
 	"main/internal/utils"
 )
 
-func unmuteHandler(m *telegram.NewMessage) error {
+func unmuteHandler(m *tg.NewMessage) error {
 	return handleUnmute(m, false)
 }
 
-func cunmuteHandler(m *telegram.NewMessage) error {
+func cunmuteHandler(m *tg.NewMessage) error {
 	return handleUnmute(m, true)
 }
 
-func handleUnmute(m *telegram.NewMessage, cplay bool) error {
+func handleUnmute(m *tg.NewMessage, cplay bool) error {
+	if m.Args() != "" {
+		return tg.EndGroup
+	}
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return tg.EndGroup
 	}
 
 	chatID := m.ChannelID()
 
 	if !r.IsActiveChat() {
 		m.Reply(F(chatID, "room_no_active"))
-		return telegram.EndGroup
+		return tg.EndGroup
 	}
 
 	if !r.IsMuted() {
 		m.Reply(F(chatID, "unmute_already"))
-		return telegram.EndGroup
+		return tg.EndGroup
 	}
 
 	title := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
@@ -63,7 +66,7 @@ func handleUnmute(m *telegram.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "unmute_failed", locales.Arg{
 			"error": err.Error(),
 		}))
-		return telegram.EndGroup
+		return tg.EndGroup
 	}
 
 	// optional speed line
@@ -81,5 +84,5 @@ func handleUnmute(m *telegram.NewMessage, cplay bool) error {
 	})
 
 	m.Reply(msg)
-	return telegram.EndGroup
+	return tg.EndGroup
 }

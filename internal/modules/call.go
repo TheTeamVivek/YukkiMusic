@@ -31,10 +31,9 @@ import (
 	"main/internal/locales"
 	"main/internal/platforms"
 	"main/internal/utils"
-	"main/ntgcalls"
 )
 
-func onStreamEndHandler(chatID int64, streamType ntgcalls.StreamType, streamDevice ntgcalls.StreamDevice) {
+func onStreamEndHandler(chatID int64) {
 	r, ok := core.GetRoom(chatID)
 	if !ok {
 		return

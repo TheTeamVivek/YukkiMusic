@@ -26,18 +26,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/locales"
 	"main/internal/utils"
 )
 
-func pauseHandler(m *telegram.NewMessage) error {
+func pauseHandler(m *tg.NewMessage) error {
 	return handlePause(m, false)
 }
 
-func cpauseHandler(m *telegram.NewMessage) error {
+func cpauseHandler(m *tg.NewMessage) error {
 	return handlePause(m, true)
 }
 

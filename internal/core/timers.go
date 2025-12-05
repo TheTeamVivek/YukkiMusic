@@ -21,7 +21,7 @@ package core
 
 import "time"
 
-type ScheduledTimers struct {
+type scheduledTimers struct {
 	scheduledUnmuteTimer *time.Timer
 	scheduledResumeTimer *time.Timer
 	scheduledSpeedTimer  *time.Timer
@@ -30,28 +30,28 @@ type ScheduledTimers struct {
 	scheduledSpeedUntil  time.Time
 }
 
-func (st *ScheduledTimers) RemainingUnmuteDuration() time.Duration {
+func (st *scheduledTimers) RemainingUnmuteDuration() time.Duration {
 	if st == nil || st.scheduledUnmuteUntil.IsZero() {
 		return 0
 	}
 	return time.Until(st.scheduledUnmuteUntil)
 }
 
-func (st *ScheduledTimers) RemainingResumeDuration() time.Duration {
+func (st *scheduledTimers) RemainingResumeDuration() time.Duration {
 	if st == nil || st.scheduledResumeUntil.IsZero() {
 		return 0
 	}
 	return time.Until(st.scheduledResumeUntil)
 }
 
-func (st *ScheduledTimers) RemainingSpeedDuration() time.Duration {
+func (st *scheduledTimers) RemainingSpeedDuration() time.Duration {
 	if st == nil || st.scheduledSpeedUntil.IsZero() {
 		return 0
 	}
 	return time.Until(st.scheduledSpeedUntil)
 }
 
-func (st *ScheduledTimers) cancelScheduledUnmute() {
+func (st *scheduledTimers) cancelScheduledUnmute() {
 	if st != nil && st.scheduledUnmuteTimer != nil {
 		st.scheduledUnmuteTimer.Stop()
 		st.scheduledUnmuteTimer = nil
@@ -59,7 +59,7 @@ func (st *ScheduledTimers) cancelScheduledUnmute() {
 	}
 }
 
-func (st *ScheduledTimers) cancelScheduledResume() {
+func (st *scheduledTimers) cancelScheduledResume() {
 	if st != nil && st.scheduledResumeTimer != nil {
 		st.scheduledResumeTimer.Stop()
 		st.scheduledResumeTimer = nil
@@ -67,7 +67,7 @@ func (st *ScheduledTimers) cancelScheduledResume() {
 	}
 }
 
-func (st *ScheduledTimers) cancelScheduledSpeed() {
+func (st *scheduledTimers) cancelScheduledSpeed() {
 	if st != nil && st.scheduledSpeedTimer != nil {
 		st.scheduledSpeedTimer.Stop()
 		st.scheduledSpeedTimer = nil

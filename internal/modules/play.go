@@ -298,6 +298,15 @@ func fetchTracksAndCheckStatus(
 		}
 	}
 
+	/* TODO
+	if err, isRtmp := cs.IsRTMPStream(); err != nil {
+	  	gologging.ErrorF("Error joining assistant: %v", err)
+			utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
+			return nil, false, err
+	} else if isRtmp {
+	  // rtmp key, url check and warn
+	}*/
+
 	return tracks, isActive, nil
 }
 

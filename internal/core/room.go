@@ -65,8 +65,11 @@ type RoomState struct {
 	cplay  bool
 	mystic *telegram.NewMessage
 
+	rtmpURL string
+	rtmpKey string
+
 	p Player
-	*ScheduledTimers
+	*scheduledTimers
 }
 
 func DeleteRoom(chatID int64) {
@@ -126,6 +129,15 @@ func (r *RoomState) SetCPlay(isCPlay bool) {
 	r.Lock()
 	defer r.Unlock()
 	r.cplay = isCPlay
+}
+
+func (r *RoomState) SetRTMPPlayer(url, key string) {
+	r.Lock()
+	defer r.Unlock()
+
+	r.rtmpURL = url
+	r.rtmpKey = key
+	r.p = &RTMPPlayer{}
 }
 
 func (r *RoomState) IsCPlay() bool {
@@ -259,10 +271,10 @@ func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
 	r.Paused = true
 	r.Muted = false
 
-	if r.ScheduledTimers == nil {
-		r.ScheduledTimers = &ScheduledTimers{}
+	if r.scheduledTimers == nil {
+		r.scheduledTimers = &scheduledTimers{}
 	}
-	r.ScheduledTimers.cancelScheduledResume()
+	r.scheduledTimers.cancelScheduledResume()
 
 	if len(autoResumeAfter) > 0 && autoResumeAfter[0] > 0 {
 		d := autoResumeAfter[0]
@@ -295,7 +307,7 @@ func (r *RoomState) Resume() (bool, error) {
 	r.Playing = true
 	r.UpdatedAt = time.Now().Unix()
 
-	r.ScheduledTimers.cancelScheduledResume()
+	r.scheduledTimers.cancelScheduledResume()
 	return resumed, nil
 }
 
@@ -321,8 +333,8 @@ func (r *RoomState) Replay() error {
 	r.Muted = false
 	r.UpdatedAt = time.Now().Unix()
 
-	r.ScheduledTimers.cancelScheduledResume()
-	r.ScheduledTimers.cancelScheduledUnmute()
+	r.scheduledTimers.cancelScheduledResume()
+	r.scheduledTimers.cancelScheduledUnmute()
 	return nil
 }
 
@@ -403,10 +415,10 @@ func (r *RoomState) SetSpeed(speed float64, timeAfterNormal ...time.Duration) er
 		return err
 	}
 
-	if r.ScheduledTimers == nil {
-		r.ScheduledTimers = &ScheduledTimers{}
+	if r.scheduledTimers == nil {
+		r.scheduledTimers = &scheduledTimers{}
 	}
-	r.ScheduledTimers.cancelScheduledSpeed()
+	r.scheduledTimers.cancelScheduledSpeed()
 
 	if len(timeAfterNormal) > 0 && timeAfterNormal[0] > 0 && speed != 1.0 {
 		d := timeAfterNormal[0]
@@ -445,10 +457,10 @@ func (r *RoomState) Mute(unmuteAfter ...time.Duration) (bool, error) {
 	r.Lock()
 	defer r.Unlock()
 	r.Muted = true
-	if r.ScheduledTimers == nil {
-		r.ScheduledTimers = &ScheduledTimers{}
+	if r.scheduledTimers == nil {
+		r.scheduledTimers = &scheduledTimers{}
 	}
-	r.ScheduledTimers.cancelScheduledUnmute()
+	r.scheduledTimers.cancelScheduledUnmute()
 
 	if len(unmuteAfter) > 0 && unmuteAfter[0] > 0 {
 		duration := unmuteAfter[0]
@@ -473,7 +485,7 @@ func (r *RoomState) Unmute() (bool, error) {
 	r.parse()
 	r.Muted = false
 	r.Paused = false
-	r.ScheduledTimers.cancelScheduledUnmute()
+	r.scheduledTimers.cancelScheduledUnmute()
 	return unmuted, nil
 }
 
@@ -493,9 +505,9 @@ func (r *RoomState) Stop() error {
 	r.Paused = false
 	r.Muted = false
 	r.UpdatedAt = 0
-	r.ScheduledTimers.cancelScheduledUnmute()
-	r.ScheduledTimers.cancelScheduledResume()
-	r.ScheduledTimers.cancelScheduledSpeed()
+	r.scheduledTimers.cancelScheduledUnmute()
+	r.scheduledTimers.cancelScheduledResume()
+	r.scheduledTimers.cancelScheduledSpeed()
 	return err
 }
 

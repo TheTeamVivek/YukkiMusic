@@ -39,27 +39,7 @@ import (
 	"main/internal/utils"
 )
 
-var (
-	superGroupFilter    = tg.FilterFunc(FilterSuperGroup)
-	adminFilter         = tg.FilterFunc(FilterChatAdmins)
-	authFilter          = tg.FilterFunc(FilterAuthUsers)
-	ignoreChannelFilter = tg.FilterFunc(FilterChannel)
-	sudoOnlyFilter      = tg.FilterFunc(FilterSudo)
-	ownerFilter         = tg.FilterFunc(FilterOwner)
-)
-
-func bool_(b bool) *bool {
-	return &b
-}
-
 var downloadCancels = make(map[int64]context.CancelFunc)
-
-func eoe(e error) error {
-	if e != nil {
-		return e
-	}
-	return tg.EndGroup
-}
 
 func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	chatID := m.ChannelID()
@@ -183,93 +163,6 @@ func FWithLang(lang, key string, values ...locales.Arg) string {
 		val = values[0]
 	}
 	return locales.Get(lang, key, val)
-}
-
-func FilterOwner(m *tg.NewMessage) bool {
-	if config.OwnerID == 0 || m.SenderID() != config.OwnerID {
-		if m.IsPrivate() || strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
-			m.Reply(F(m.ChannelID(), "only_owner"))
-		}
-		return false
-	}
-	return true
-}
-
-func FilterSudo(m *tg.NewMessage) bool {
-	is, _ := database.IsSudo(m.SenderID())
-
-	if config.OwnerID == 0 || (m.SenderID() != config.OwnerID && !is) {
-		if m.IsPrivate() || strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
-			m.Reply(F(m.ChannelID(), "only_sudo"))
-		}
-		return false
-	}
-
-	return true
-}
-
-func FilterChannel(m *tg.NewMessage) bool {
-	if _, ok := m.Message.FromID.(*tg.PeerChannel); ok {
-		return false
-	}
-	return true
-}
-
-func FilterAuthUsers(m *tg.NewMessage) bool {
-	isAdmin, err := utils.IsChatAdmin(m.Client, m.ChannelID(), m.SenderID())
-	if err == nil && isAdmin {
-		return true
-	}
-
-	isAuth, err := database.IsAuthUser(m.ChannelID(), m.SenderID())
-	if err == nil && isAuth {
-		return true
-	}
-
-	m.Reply(F(m.ChannelID(), "only_admin_or_auth"))
-	return false
-}
-
-func FilterSuperGroup(m *tg.NewMessage) bool {
-	/*if m.Message.FromID == nil || (m.SenderChat != nil && m.SenderChat.ID != 0) {
-		m.Reply("⚠️ You are using Anonymous Admin Mode.\n\n👉 Switch back to your user account to use commands.")
-		return false
-	}*/
-
-	if !FilterChannel(m) {
-		return false
-	}
-	// Validate chat type
-	switch m.ChatType() {
-	case tg.EntityChat:
-		// EntityChat can be basic group or supergroup — allow only supergroup
-		if m.Channel != nil && !m.Channel.Broadcast {
-			database.AddServed(m.ChannelID())
-			return true // Supergroup
-		}
-		warnAndLeave(m.Client, m.ChatID()) // Basic group → leave
-		database.DeleteServed(m.ChannelID())
-		return false
-
-	case tg.EntityChannel:
-		return false // Pure channel chat → ignore
-
-	case tg.EntityUser:
-		m.Reply(F(m.ChannelID(), "only_supergroup"))
-		database.AddServed(m.ChannelID(), true)
-		return false // Private chat → warn
-	}
-
-	return false
-}
-
-func FilterChatAdmins(m *tg.NewMessage) bool {
-	isAdmin, err := utils.IsChatAdmin(m.Client, m.ChannelID(), m.SenderID())
-	if err != nil || !isAdmin {
-		m.Reply(F(m.ChannelID(), "only_admin"))
-		return false
-	}
-	return true
 }
 
 func SafeCallbackHandler(handler func(*tg.CallbackQuery) error) func(*tg.CallbackQuery) error {

@@ -72,6 +72,7 @@ func getMediaDescription(url string, seek int, speed float64, isVideo bool) ntgc
 	}
 	baseCmd += "-v warning -i \"" + url + "\" "
 
+	// Audio pipeline
 	audioCmd := baseCmd
 	audioCmd += "-filter:a \"atempo=" + strconv.FormatFloat(speed, 'f', 2, 64) + "\" "
 	audioCmd += "-f s16le -ac " + strconv.Itoa(int(audio.ChannelCount)) + " "
@@ -85,44 +86,19 @@ func getMediaDescription(url string, seek int, speed float64, isVideo bool) ntgc
 		}
 	}
 
-	w, h := getVideoDimensions(url)
-	if w <= 0 || h <= 0 {
-		w = 1280
-		h = 720
-	}
-
-	maxW := 1280
-	maxH := 720
-
-	if w > maxW {
-		h = h * maxW / w
-		w = maxW
-	}
-	if h > maxH {
-		w = w * maxH / h
-		h = maxH
-	}
-
-	if w%2 != 0 {
-		w--
-	}
-	if h%2 != 0 {
-		h--
-	}
+	w, h, fps, filter := normalizeVideo(url, speed)
 
 	video := &ntgcalls.VideoDescription{
 		MediaSource: ntgcalls.MediaSourceShell,
 		Width:       int16(w),
 		Height:      int16(h),
-		Fps:         30,
+		Fps:         int16(fps),
 	}
 
-	videoSpeed := 1.0 / speed
-	videoFilter := "setpts=" + strconv.FormatFloat(videoSpeed, 'f', 4, 64) + "*PTS,scale=" + strconv.Itoa(w) + ":" + strconv.Itoa(h)
-
+	// Video ffmpeg command
 	videoCmd := baseCmd
-	videoCmd += "-filter:v \"" + videoFilter + "\" "
-	videoCmd += "-f rawvideo -r " + strconv.Itoa(int(video.Fps)) + " -pix_fmt yuv420p "
+	videoCmd += "-filter:v \"" + filter + "\" "
+	videoCmd += "-f rawvideo -r " + strconv.Itoa(fps) + " -pix_fmt yuv420p "
 	videoCmd += "pipe:1"
 	video.Input = videoCmd
 

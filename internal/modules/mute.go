@@ -40,6 +40,10 @@ func cmuteHandler(m *tg.NewMessage) error {
 }
 
 func handleMute(m *tg.NewMessage, cplay bool) error {
+	if m.Args() != "" {
+		return tg.EndGroup
+	}
+
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())

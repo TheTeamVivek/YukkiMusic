@@ -38,7 +38,7 @@ type ffprobeOutput struct {
 	} `json:"streams"`
 }
 
-func getVideoDimensions(filePath string) (int, int) {
+func GetVideoDimensions(filePath string) (int, int) {
 	ctx, cancel := context.WithTimeout(context.Background(), ffprobeTimeout)
 	defer cancel()
 

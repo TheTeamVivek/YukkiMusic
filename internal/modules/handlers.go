@@ -26,7 +26,9 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/config"
+	"main/internal/core"
 	"main/internal/database"
+	"main/ntgcalls"
 	"main/ubot"
 )
 
@@ -70,6 +72,7 @@ var handlers = []MsgHandlerDef{
 	// SuperGroup & Admin Filters
 
 	// play/cplay/vplay/fplay commands
+	{Pattern: "(rtmp|setrtmp|rtmpset)", Handler: setRTMPHandler},
 	{Pattern: "play", Handler: playHandler, Filters: []telegram.Filter{superGroupFilter}},
 	{Pattern: "(fplay|playforce)", Handler: fplayHandler, Filters: []telegram.Filter{superGroupFilter, authFilter}},
 	{Pattern: "cplay", Handler: cplayHandler, Filters: []telegram.Filter{superGroupFilter}},
@@ -157,15 +160,22 @@ func Init(c, u *telegram.Client, n *ubot.Context) {
 
 	c.AddActionHandler(handleActions).SetGroup(60)
 
-	n.OnStreamEnd(onStreamEndHandler)
+	n.OnStreamEnd(ntgOnStreamEnd)
+	core.SetOnStreamEnd(onStreamEndHandler)
 
 	go MonitorRooms()
+
 	if is, _ := database.GetAutoLeave(); is {
 		go startAutoLeave()
 	}
+
 	if config.SetCmds && config.OwnerID != 0 {
 		go setBotCommands(c)
 	}
+}
+
+func ntgOnStreamEnd(chatID int64, _ ntgcalls.StreamType, _ ntgcalls.StreamDevice) {
+	onStreamEndHandler(chatID)
 }
 
 func setBotCommands(c *telegram.Client) {
