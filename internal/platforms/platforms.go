@@ -157,6 +157,9 @@ func Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessa
 			if err == nil {
 				return path, nil
 			}
+			if errors.Is(err, context.Canceled){
+			  return "", err
+			}
 			errs = append(errs,
 				html.EscapeString(string(p.Name()))+": "+html.EscapeString(err.Error()))
 		}
