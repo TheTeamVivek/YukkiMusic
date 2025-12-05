@@ -18,7 +18,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 package modules
-import 	tg "github.com/amarnathcjd/gogram/telegram"
+
+import (
+	"strings"
+
+	tg "github.com/amarnathcjd/gogram/telegram"
+
+	"main/config"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/utils"
+)
 
 var (
 	superGroupFilter    = tg.FilterFunc(filterSuperGroup)

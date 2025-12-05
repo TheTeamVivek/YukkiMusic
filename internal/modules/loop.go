@@ -45,7 +45,7 @@ func handleLoop(m *tg.NewMessage, cplay bool) error {
 	}
 	chatID := m.ChannelID()
 	args := strings.Fields(m.Text())
-	currentLoop := r.Loop
+	currentLoop := r.Loop()
 
 	if !r.IsActiveChat() {
 		m.Reply(F(chatID, "room_no_active"))

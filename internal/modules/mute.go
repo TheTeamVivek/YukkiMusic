@@ -104,7 +104,7 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 	}
 
 	msgArgs := locales.Arg{
-		"title": html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
+		"title": html.EscapeString(utils.ShortTitle(r.Track().Title, 25)),
 		"user":  mention,
 	}
 

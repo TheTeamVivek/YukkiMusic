@@ -47,20 +47,20 @@ func handlePosition(m *tg.NewMessage, cplay bool) error {
 		return tg.EndGroup
 	}
 
-	if !r.IsActiveChat() || r.Track == nil {
+	if !r.IsActiveChat() || r.Track().ID == "" {
 		m.Reply(F(chatID, "room_no_active"))
 		return tg.EndGroup
 	}
 
 	r.Parse()
 
-	title := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
+	title := html.EscapeString(utils.ShortTitle(r.Track().Title, 25))
 
 	m.Reply(F(chatID, "position_now", locales.Arg{
 		"title":    title,
-		"position": formatDuration(r.Position),
-		"duration": formatDuration(r.Track.Duration),
-		"speed":    fmt.Sprintf("%.2f", r.Speed),
+		"position": formatDuration(r.Position()),
+		"duration": formatDuration(r.Track().Duration),
+		"speed":    fmt.Sprintf("%.2f", r.Speed()),
 	}))
 
 	return tg.EndGroup

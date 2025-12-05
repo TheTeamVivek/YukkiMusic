@@ -55,7 +55,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 
 	mention := utils.MentionHTML(m.Sender)
 
-	if len(r.Queue) == 0 && r.Loop == 0 {
+	if len(r.Queue()) == 0 && r.Loop() == 0 {
 		r.Destroy()
 		m.Reply(F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
@@ -104,7 +104,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		"url":      t.URL,
 		"title":    safeTitle,
 		"duration": formatDuration(t.Duration),
-		"by":       t.BY,
+		"by":       t.Requester,
 	})
 
 	opt := &telegram.SendOptions{

@@ -22,6 +22,7 @@ package modules
 import (
 	"html"
 	"strings"
+	"strconv"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
@@ -70,7 +71,7 @@ func setRTMPHandler(m *tg.NewMessage) error {
 		return tg.EndGroup
 	}
 
-	chatID := args[1]
+	cid := args[1]
 	raw := args[2]
 
 	idx := strings.LastIndex(raw, "/")
@@ -86,6 +87,11 @@ func setRTMPHandler(m *tg.NewMessage) error {
 		m.Reply("⚠️ RTMP URL or key is empty.")
 		return tg.EndGroup
 	}
+	chatID, err := strconv.ParseInt(cid, 10, 64)
+if err != nil {
+	m.Reply("⚠️ Invalid chat ID.\nPlease provide a valid numeric chat ID.\n\nExample:\n/setrtmp -1001234567890 url+key")
+	return tg.EndGroup
+}
 	if ok, err := utils.IsChatAdmin(m.Client, chatID, m.SenderID()); err != nil {
 		m.Reply("⚠️ Unable to check chat details.\nMake sure:\n• I am an admin in that chat\n• The provided chat ID is valid")
 		return tg.EndGroup
@@ -100,7 +106,7 @@ func setRTMPHandler(m *tg.NewMessage) error {
 
 	m.Reply(
 		"✅ RTMP settings saved!\n\n" +
-			"🆔 Chat: " + chatID + "\n" +
+			"🆔 Chat: " + utils.IntToStr(chatID)+ "\n" +
 			"🔗 URL: " + htmlEscape(url) + "\n" +
 			"🔑 Key: " + htmlEscape(maskKey(key)),
 	)

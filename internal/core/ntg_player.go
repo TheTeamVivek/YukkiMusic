@@ -29,28 +29,28 @@ import (
 type NtgPlayer struct{}
 
 func (p *NtgPlayer) Play(r *RoomState) error {
-	desc := getMediaDescription(r.FilePath, 0, r.Speed, r.Track.Video)
-	return Ntg.Play(r.ChatID, desc)
+	desc := getMediaDescription(r.FilePath(), 0, r.Speed(), r.Track().Video)
+	return Ntg.Play(r.ChatID(), desc)
 }
 
 func (p *NtgPlayer) Pause(r *RoomState) (bool, error) {
-	return Ntg.Pause(r.ChatID)
+	return Ntg.Pause(r.ChatID())
 }
 
 func (p *NtgPlayer) Resume(r *RoomState) (bool, error) {
-	return Ntg.Resume(r.ChatID)
+	return Ntg.Resume(r.ChatID())
 }
 
 func (p *NtgPlayer) Stop(r *RoomState) error {
-	return Ntg.Stop(r.ChatID)
+	return Ntg.Stop(r.ChatID())
 }
 
 func (p *NtgPlayer) Mute(r *RoomState) (bool, error) {
-	return Ntg.Mute(r.ChatID)
+	return Ntg.Mute(r.ChatID())
 }
 
 func (p *NtgPlayer) Unmute(r *RoomState) (bool, error) {
-	return Ntg.UnMute(r.ChatID)
+	return Ntg.Unmute(r.ChatID())
 }
 
 func getMediaDescription(url string, seek int, speed float64, isVideo bool) ntgcalls.MediaDescription {
@@ -92,7 +92,7 @@ func getMediaDescription(url string, seek int, speed float64, isVideo bool) ntgc
 		MediaSource: ntgcalls.MediaSourceShell,
 		Width:       int16(w),
 		Height:      int16(h),
-		Fps:         int16(fps),
+		Fps:         uint8(fps),
 	}
 
 	// Video ffmpeg command

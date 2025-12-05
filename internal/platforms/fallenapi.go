@@ -66,7 +66,7 @@ func (*FallenApiPlatform) IsValid(query string) bool {
 	return false
 }
 
-func (*FallenApiPlatform) GetTracks(query string) ([]*state.Track, error) {
+func (*FallenApiPlatform) GetTracks(_ string, _ bool) ([]*state.Track, error) {
 	return nil, errors.New("fallenapi is a download-only platform")
 }
 

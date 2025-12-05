@@ -62,7 +62,7 @@ func (*YoutubifyPlatform) IsValid(query string) bool {
 	return false
 }
 
-func (*YoutubifyPlatform) GetTracks(query string) ([]*state.Track, error) {
+func (*YoutubifyPlatform) GetTracks(_ string, _ bool) ([]*state.Track, error) {
 	return nil, errors.New("youtubify is a direct download platform")
 }
 
@@ -104,7 +104,7 @@ func (f *YoutubifyPlatform) Download(
 		SetOutputFileName(filepath).
 		Get(url)
 	if err != nil {
-		_ = os.Remove(filepath)
+		os.Remove(filepath)
 		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 			return "", err
 		}

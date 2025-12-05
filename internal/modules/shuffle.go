@@ -37,7 +37,6 @@ func cshuffleHandler(m *telegram.NewMessage) error {
 }
 
 func handleShuffle(m *telegram.NewMessage, cplay bool) error {
-	chatID := m.ChannelID()
 	arg := strings.ToLower(m.Args())
 
 	r, err := getEffectiveRoom(m, cplay)
@@ -45,7 +44,8 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 		m.Reply(err.Error())
 		return telegram.EndGroup
 	}
-
+	chatID := m.ChannelID()
+	
 	if r.Track == nil {
 		m.Reply(F(chatID, "room_no_active"))
 		return telegram.EndGroup
@@ -56,7 +56,7 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 	if arg == "" {
 		state := F(chatID, "disabled")
 		cmd := getCommand(m) + " on"
-		if r.Shuffle {
+		if r.Shuffle() {
 			state = F(chatID, "enabled")
 			cmd = getCommand(m) + " off"
 		}

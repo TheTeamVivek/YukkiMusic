@@ -56,14 +56,15 @@ func handleResume(m *telegram.NewMessage, cplay bool) error {
 		return telegram.EndGroup
 	}
 
+t := r.Track()
 	if _, err := r.Resume(); err != nil {
 		m.Reply(F(chatID, "resume_failed", locales.Arg{
 			"error": err,
 		}))
 	} else {
-		title := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
-		pos := formatDuration(r.Position)
-		total := formatDuration(r.Track.Duration)
+		title := html.EscapeString(utils.ShortTitle(t.Title, 25))
+		pos := formatDuration(r.Position())
+		total := formatDuration(t.Duration)
 		mention := utils.MentionHTML(m.Sender)
 
 		speedLine := ""

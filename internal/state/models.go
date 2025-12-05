@@ -42,7 +42,7 @@ type (
 	Platform interface {
 		Name() PlatformName
 		IsValid(query string) bool
-		GetTracks(query string) ([]*Track, error)
+		GetTracks(query string, video bool) ([]*Track, error)
 		Download(ctx context.Context, track *Track, mystic *telegram.NewMessage) (string, error)
 		IsDownloadSupported(source PlatformName) bool
 	}

@@ -21,6 +21,7 @@ package platforms
 
 import (
 	"context"
+	"errors"
 	"html"
 	"mime"
 	"strings"
@@ -39,7 +40,7 @@ func clampTracks(tracks []*state.Track) []*state.Track {
 	return tracks
 }
 
-func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, string) {
+func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 	var tracks []*state.Track
 	query := m.Args()
 	var errorsCollected []string
@@ -58,11 +59,11 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, string) {
 			t, err := p.GetTracks(url, video)
 			if err != nil {
 				errorsCollected = append(errorsCollected,
-					"<b>"+html.EscapeString(p.Name())+" error:</b> "+html.EscapeString(err.Error()))
+					"<b>"+html.EscapeString(string(p.Name()))+" error:</b> "+html.EscapeString(err.Error()))
 			} else {
 				tracks = clampTracks(append(tracks, t...))
 				if len(tracks) > 0 && (config.QueueLimit == 0 || len(tracks) >= config.QueueLimit) {
-					return tracks, ""
+					return tracks, nil
 				}
 			}
 			break
@@ -75,19 +76,21 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, string) {
 	}
 
 	if len(tracks) > 0 {
-		return tracks, ""
+		return tracks, nil
 	}
 
 	if query != "" {
 		yt := &YouTubePlatform{}
 		ytTracks, err := yt.GetTracks(query, video)
 		if err != nil {
-			return nil, "<b>⚠️ YouTube search error</b>\n\n<i>" +
-				html.EscapeString(err.Error()) + "</i>"
+			return nil, errors.New(
+				"<b>⚠️ YouTube search error</b>\n\n<i>" +
+					html.EscapeString(err.Error()) + "</i>",
+			)
 		}
 
 		if len(ytTracks) > 0 {
-			return []*state.Track{ytTracks[0]}, ""
+			return []*state.Track{ytTracks[0]}, nil
 		}
 
 		errorsCollected = append(errorsCollected,
@@ -97,12 +100,12 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, string) {
 	if m.IsReply() {
 		rmsg, err := m.GetReplyMessage()
 		if err != nil {
-			return nil, "failed to get replied message: " + err.Error()
+			return nil, errors.New("failed to get replied message: " + err.Error())
 		}
 
 		if !(rmsg.IsMedia() &&
 			(rmsg.Audio() != nil || rmsg.Video() != nil || rmsg.Voice() != nil || rmsg.Document() != nil)) {
-			return nil, "⚠️ Reply with a valid media (audio/video)"
+			return nil, errors.New("⚠️ Reply with a valid media (audio/video)")
 		}
 
 		tg := &TelegramPlatform{}
@@ -124,7 +127,7 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, string) {
 		}
 
 		if !isAudio && !isVideo {
-			return nil, "⚠️ Reply with a valid media (audio/video)"
+			return nil, errors.New("⚠️ Reply with a valid media (audio/video)")
 		}
 
 		t, err := tg.GetTracksByMessage(rmsg)
@@ -134,7 +137,7 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, string) {
 		} else {
 			// for tg medias we allow only Video when replied media is a video
 			t.Video = isVideo
-			return []*state.Track{t}, ""
+			return []*state.Track{t}, nil
 		}
 	}
 
@@ -142,20 +145,20 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, string) {
 		return nil, formatErrorsHTML(errorsCollected)
 	}
 
-	return nil, "⚠️ Provide a song to play"
+	return nil, errors.New("⚠️ Provide a song to play")
 }
 
-func Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, string) {
+func Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
 	var errs []string
 
 	for _, p := range getOrderedPlatforms() {
 		if p.IsDownloadSupported(track.Source) {
 			path, err := p.Download(ctx, track, mystic)
 			if err == nil {
-				return path, ""
+				return path, nil
 			}
 			errs = append(errs,
-				html.EscapeString(p.Name())+": "+html.EscapeString(err.Error()))
+				html.EscapeString(string(p.Name()))+": "+html.EscapeString(err.Error()))
 		}
 	}
 
@@ -163,16 +166,16 @@ func Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessa
 		return "", formatErrorsHTML(errs)
 	}
 
-	return "", "⚠️ No downloader available for source \"" + html.EscapeString(track.Source) + "\""
+	return "", errors.New("⚠️ No downloader available for source \"" + html.EscapeString(string(track.Source)) + "\"")
 }
 
-func formatErrorsHTML(errs []string) string {
+func formatErrorsHTML(errs []string) error {
 	if len(errs) == 0 {
-		return ""
+		return nil
 	}
 
 	if len(errs) == 1 {
-		return "<blockquote><b>⚠️ Error:</b>\n" + errs[0] + "\n</blockquote>"
+		return errors.New("<blockquote><b>⚠️ Error:</b>\n" + errs[0] + "\n</blockquote>")
 	}
 
 	var b strings.Builder
@@ -183,9 +186,8 @@ func formatErrorsHTML(errs []string) string {
 	for _, e := range errs {
 		b.WriteString("• ")
 		b.WriteString(e)
-		b.WriteString("\n")
 	}
 
 	b.WriteString("</blockquote>")
-	return b.String()
+	return errors.New(b.String())
 }

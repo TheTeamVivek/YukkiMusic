@@ -50,14 +50,15 @@ func handleReplay(m *telegram.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "room_no_active"))
 		return telegram.EndGroup
 	}
-
+	t := r.Track()
+	
 	if err := r.Replay(); err != nil {
 		m.Reply(F(chatID, "replay_failed", locales.Arg{
 			"error": err,
 		}))
 	} else {
-		trackTitle := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
-		totalDuration := formatDuration(r.Track.Duration)
+		trackTitle := html.EscapeString(utils.ShortTitle(t.Title, 25))
+		totalDuration := formatDuration(t.Duration)
 		m.Reply(F(chatID, "replay_success", locales.Arg{
 			"title":    trackTitle,
 			"duration": totalDuration,

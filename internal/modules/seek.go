@@ -53,14 +53,13 @@ func cjumpHandler(m *telegram.NewMessage) error {
 }
 
 func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
-	chatID := m.ChannelID()
-
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
 		return telegram.EndGroup
 	}
-
+	chatID := m.ChannelID()
+	t := r.Track()
 	if !r.IsActiveChat() {
 		m.Reply(F(chatID, "seek_no_active"))
 		return telegram.EndGroup
@@ -86,7 +85,7 @@ func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
 	var seekErr error
 
 	if isBack {
-		if (r.Position - seconds) <= 10 {
+		if (r.Position() - seconds) <= 10 {
 			m.Reply(F(chatID, "seek_too_close_start", locales.Arg{
 				"seconds": seconds,
 			}))
@@ -96,7 +95,7 @@ func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
 		direction = "backward"
 		emoji = "⏪"
 	} else {
-		if (r.Track.Duration - (r.Position + seconds)) <= 10 {
+		if (t.Duration - (r.Position() + seconds)) <= 10 {
 			m.Reply(F(chatID, "seek_too_close_end", locales.Arg{
 				"seconds": seconds,
 			}))
@@ -117,8 +116,8 @@ func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
 		m.Reply(F(chatID, "seek_success", locales.Arg{
 			"emoji":     emoji,
 			"direction": direction,
-			"position":  formatDuration(r.Position),
-			"duration":  formatDuration(r.Track.Duration),
+			"position":  formatDuration(r.Position()),
+			"duration":  formatDuration(t.Duration),
 		}))
 	}
 
@@ -133,8 +132,10 @@ func handleJump(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	chatID := m.ChannelID()
+	t := r.Track()
+	
 
-	if !r.IsActiveChat() || r.Track == nil {
+	if !r.IsActiveChat() || t.ID == "" {
 		m.Reply(F(chatID, "jump_no_active"))
 		return telegram.EndGroup
 	}
@@ -155,14 +156,14 @@ func handleJump(m *telegram.NewMessage, cplay bool) error {
 		return telegram.EndGroup
 	}
 
-	if r.Track.Duration-seconds <= 10 {
+	if t.Duration-seconds <= 10 {
 		m.Reply(F(chatID, "jump_too_close_end", locales.Arg{
 			"position": formatDuration(seconds),
 		}))
 		return telegram.EndGroup
 	}
 
-	if err := r.Seek(seconds - r.Position); err != nil {
+	if err := r.Seek(seconds - r.Position()); err != nil {
 		m.Reply(F(chatID, "jump_failed", locales.Arg{
 			"position": formatDuration(seconds),
 			"error":    err,
@@ -170,7 +171,7 @@ func handleJump(m *telegram.NewMessage, cplay bool) error {
 	} else {
 		m.Reply(F(chatID, "jump_success", locales.Arg{
 			"position": formatDuration(seconds),
-			"duration": formatDuration(r.Track.Duration),
+			"duration": formatDuration(t.Duration),
 		}))
 	}
 

@@ -59,7 +59,7 @@ func handleUnmute(m *tg.NewMessage, cplay bool) error {
 		return tg.EndGroup
 	}
 
-	title := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
+	title := html.EscapeString(utils.ShortTitle(r.Track().Title, 25))
 	mention := utils.MentionHTML(m.Sender)
 
 	if _, err := r.Unmute(); err != nil {

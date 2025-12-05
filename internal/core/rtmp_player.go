@@ -21,6 +21,7 @@
 package core
 
 import (
+	"errors"
 	"os/exec"
 	"strconv"
 	"sync"
@@ -51,11 +52,11 @@ func (p *RTMPPlayer) kill() {
 }
 
 func (p *RTMPPlayer) Play(r *RoomState) error {
-	if r.FilePath == "" {
-		return Err("no file")
+	if r.FilePath() == "" {
+		return errors.New("no file")
 	}
 	if r.rtmpURL == "" || r.rtmpKey == "" {
-		return Err("missing rtmp config")
+		return errors.New("missing rtmp config")
 	}
 
 	p.mu.Lock()
@@ -63,14 +64,14 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 
 	p.killLocked()
 
-	speed := r.Speed
+	speed := r.Speed()
 	if speed < 0.5 {
 		speed = 0.5
 	} else if speed > 4.0 {
 		speed = 4.0
 	}
 
-	seek := r.Position
+	seek := r.Position()
 	args := []string{"-re"}
 
 	if seek > 0 {
@@ -79,7 +80,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 
 	args = append(args,
 		"-v", "warning",
-		"-i", r.FilePath,
+		"-i", r.FilePath(),
 	)
 
 	audioFilter := "atempo=" + strconv.FormatFloat(speed, 'f', 2, 64)
@@ -92,8 +93,8 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 		args = append(args, "-filter:a", audioFilter)
 	}
 
-	if r.Track != nil && r.Track.Video {
-		w, h, fps, filter := normalizeVideo(r.FilePath, speed)
+	if r.Track().ID != ""  && r.Track().Video {
+		_, _, fps, filter := normalizeVideo(r.FilePath(), speed)
 
 		args = append(args,
 			"-c:v", "libx264",
@@ -133,7 +134,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 				onStreamEnd(chatID)
 			}
 		}
-	}(r.ChatID, cmd)
+	}(r.ChatID(), cmd)
 
 	return nil
 }

@@ -51,7 +51,7 @@ func (*YtDlpPlatform) IsValid(query string) bool {
 	return false
 }
 
-func (*YtDlpPlatform) GetTracks(query string) ([]*state.Track, error) {
+func (*YtDlpPlatform) GetTracks(_ string, _ bool) ([]*state.Track, error) {
 	return nil, errors.New("YtDlp is a download-only platform")
 }
 

@@ -48,7 +48,8 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	chatID := m.ChannelID()
-
+	t := r.Track()
+	
 	if !r.IsActiveChat() {
 		m.Reply(F(chatID, "room_no_active"))
 		return telegram.EndGroup
@@ -58,19 +59,19 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 
 	// No args -> show current speed or usage hint
 	if len(args) < 2 {
-		if r.Speed != 1.0 {
+		if r.Speed() != 1.0 {
 			remaining := r.RemainingSpeedDuration()
 			if remaining > 0 {
 				m.Reply(F(chatID, "speed_current_with_reset", locales.Arg{
-					"speed":    fmt.Sprintf("%.2f", r.Speed),
-					"title":    html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
+					"speed":    fmt.Sprintf("%.2f", r.Speed()),
+					"title":    html.EscapeString(utils.ShortTitle(t.Title, 25)),
 					"duration": formatDuration(int(remaining.Seconds())),
 					"cmd":      getCommand(m),
 				}))
 			} else {
 				m.Reply(F(chatID, "speed_current", locales.Arg{
-					"speed": fmt.Sprintf("%.2f", r.Speed),
-					"title": html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
+					"speed": fmt.Sprintf("%.2f", r.Speed()),
+					"title": html.EscapeString(utils.ShortTitle(t.Title, 25)),
 					"cmd":   getCommand(m),
 				}))
 			}
@@ -120,16 +121,16 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	// Same speed → give info
-	if newSpeed == r.Speed {
+	if newSpeed == r.Speed() {
 		if resetDuration == 0 {
 			m.Reply(F(chatID, "speed_already_set", locales.Arg{
 				"speed": fmt.Sprintf("%.2f", newSpeed),
-				"title": html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
+				"title": html.EscapeString(utils.ShortTitle(t.Title, 25)),
 			}))
 		} else if newSpeed != 1.0 {
 			m.Reply(F(chatID, "speed_already_set_reset_hint", locales.Arg{
 				"speed": fmt.Sprintf("%.2f", newSpeed),
-				"title": html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
+				"title": html.EscapeString(utils.ShortTitle(t.Title, 25)),
 				"cmd":   getCommand(m),
 			}))
 		}

@@ -50,7 +50,7 @@ func onStreamEndHandler(chatID int64) {
 		chatID = cid
 	}
 
-	if len(r.Queue) == 0 && r.Loop == 0 {
+	if len(r.Queue()) == 0 && r.Loop() == 0 {
 		r.Destroy()
 		core.Bot.SendMessage(chatID, F(chatID, "stream_queue_finished"))
 		return
@@ -83,7 +83,7 @@ func onStreamEndHandler(chatID int64) {
 		"url":      t.URL,
 		"title":    safeTitle,
 		"duration": formatDuration(t.Duration),
-		"by":       t.BY,
+		"by":       t.Requester,
 	})
 
 	opt := &telegram.SendOptions{

@@ -44,7 +44,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		return telegram.EndGroup
 	}
 
-	chatID := r.ChatID
+	chatID := r.ChatID()
 	userID := m.SenderID()
 	floodKey := fmt.Sprintf("reload:%d%d", chatID, userID)
 	floodDuration := 5 * time.Minute

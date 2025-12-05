@@ -48,14 +48,15 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 		m.Reply(err.Error())
 		return tg.EndGroup
 	}
+	t := r.Track()
 
-	if !r.IsActiveChat() || r.Track == nil {
+	if !r.IsActiveChat() || t.ID == "" {
 		m.Reply(F(chatID, "queue_no_active"))
 		return tg.EndGroup
 	}
 
 	var b strings.Builder
-
+	
 	b.WriteString(F(chatID, "queue_header"))
 	b.WriteString("\n\n")
 
@@ -64,21 +65,21 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 	b.WriteString("\n")
 	b.WriteString(fmt.Sprintf(
 		"🎧 <a href=\"%s\">%s</a> — %s [%s]\n\n",
-		r.Track.URL,
-		html.EscapeString(utils.ShortTitle(r.Track.Title, 35)),
-		r.Track.BY,
-		formatDuration(r.Track.Duration),
+		t.URL,
+		html.EscapeString(utils.ShortTitle(t.Title, 35)),
+		t.Requester,
+		formatDuration(t.Duration),
 	))
 
 	// Up Next
-	if len(r.Queue) > 0 {
+	if len(r.Queue()) > 0 {
 		b.WriteString(F(chatID, "queue_up_next"))
 		b.WriteString("\n\n")
 
-		for i, track := range r.Queue {
+		for i, track := range r.Queue() {
 			if i >= 10 {
 				b.WriteString(F(chatID, "queue_more_line", locales.Arg{
-					"remaining": len(r.Queue) - 10,
+					"remaining": len(r.Queue()) - 10,
 				}))
 				break
 			}
@@ -88,7 +89,7 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 				i+1,
 				track.URL,
 				html.EscapeString(utils.ShortTitle(track.Title, 35)),
-				track.BY,
+				track.Requester,
 				formatDuration(track.Duration),
 			))
 		}
@@ -116,13 +117,13 @@ func handleRemove(m *tg.NewMessage, cplay bool) error {
 		m.Reply(err.Error())
 		return tg.EndGroup
 	}
-
-	if r.Track == nil {
+	t := r.Track()
+	if !r.IsActiveChat() || t.ID == "" {
 		m.Reply(F(chatID, "queue_no_active"))
 		return tg.EndGroup
 	}
 
-	if len(r.Queue) == 0 {
+	if len(r.Queue()) == 0 {
 		m.Reply(F(chatID, "queue_empty"))
 		return tg.EndGroup
 	}
@@ -146,7 +147,7 @@ func handleRemove(m *tg.NewMessage, cplay bool) error {
 		return tg.EndGroup
 	}
 
-	total := len(r.Queue)
+	total := len(r.Queue())
 	if index > total {
 		m.Reply(F(chatID, "remove_index_too_big", locales.Arg{
 			"total": total,
@@ -180,13 +181,13 @@ func handleClear(m *tg.NewMessage, cplay bool) error {
 		m.Reply(err.Error())
 		return tg.EndGroup
 	}
-
-	if r.Track == nil {
+t := r.Track()
+	if !r.IsActiveChat() || t.ID == "" {
 		m.Reply(F(chatID, "clear_no_active"))
 		return tg.EndGroup
 	}
 
-	if len(r.Queue) == 0 {
+	if len(r.Queue()) == 0 {
 		m.Reply(F(chatID, "queue_empty"))
 		return tg.EndGroup
 	}
@@ -217,12 +218,12 @@ func handleMove(m *tg.NewMessage, cplay bool) error {
 		return tg.EndGroup
 	}
 
-	if r.Track == nil {
+	if !r.IsActiveChat() || r.Track().ID == "" {
 		m.Reply(F(chatID, "queue_no_active"))
 		return tg.EndGroup
 	}
 
-	if len(r.Queue) == 0 {
+	if len(r.Queue()) == 0 {
 		m.Reply(F(chatID, "queue_empty"))
 		return tg.EndGroup
 	}
@@ -249,7 +250,7 @@ func handleMove(m *tg.NewMessage, cplay bool) error {
 		return tg.EndGroup
 	}
 
-	queueLen := len(r.Queue)
+	queueLen := len(r.Queue())
 	if from > queueLen || to > queueLen {
 		m.Reply(F(chatID, "move_invalid_indexes_max", locales.Arg{
 			"queue_len": queueLen,

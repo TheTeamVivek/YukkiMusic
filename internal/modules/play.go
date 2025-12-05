@@ -191,11 +191,11 @@ func prepareRoomAndSearchMessage(m *telegram.NewMessage, cplay bool) (*core.Room
 		return nil, nil, err
 	}
 
-	chatID := r.ChatID
+	chatID := m.ChannelID()
 	r.SetCPlay(cplay)
 	r.Parse()
 
-	if len(r.Queue) >= config.QueueLimit {
+	if len(r.Queue()) >= config.QueueLimit {
 		m.Reply(F(chatID, "queue_limit_reached", locales.Arg{
 			"limit": config.QueueLimit,
 		}))
@@ -240,42 +240,42 @@ func fetchTracksAndCheckStatus(
 	r *core.RoomState,
 	video bool,
 ) ([]*state.Track, bool, error) {
-	tracks, err := safeGetTracks(m, replyMsg, r.ChatID, video)
+	tracks, err := safeGetTracks(m, replyMsg, m.ChannelID(), video)
 	if err != nil {
 		utils.EOR(replyMsg, err.Error())
 		return nil, false, err
 	}
 
 	if len(tracks) == 0 {
-		utils.EOR(replyMsg, F(r.ChatID, "no_song_found"))
+		utils.EOR(replyMsg, F(m.ChannelID(), "no_song_found"))
 		return nil, false, fmt.Errorf("no tracks found")
 	}
 
 	isActive := r.IsActiveChat()
-	cs := core.GetChatState(r.ChatID)
+	cs := core.GetChatState(r.ChatID())
 
 	activeVC, err := cs.IsActiveVC()
 	if err != nil {
 		gologging.ErrorF("Error checking voicechat state: %v", err)
-		utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
+		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
 		return nil, false, err
 	}
 
 	if !activeVC {
-		utils.EOR(replyMsg, F(r.ChatID, "err_no_active_voicechat"))
+		utils.EOR(replyMsg, F(m.ChannelID(), "err_no_active_voicechat"))
 		return nil, false, fmt.Errorf("no active voice chat")
 	}
 
 	banned, err := cs.IsAssistantBanned()
 	if err != nil {
 		gologging.ErrorF("Error checking assistant banned state: %v", err)
-		utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
+		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
 		return nil, false, err
 	}
 
 	if banned {
 		utils.EOR(replyMsg,
-			F(r.ChatID, "err_assistant_banned", locales.Arg{
+			F(m.ChannelID(), "err_assistant_banned", locales.Arg{
 				"user": utils.MentionHTML(core.UbUser),
 				"id":   utils.IntToStr(core.UbUser.ID),
 			}),
@@ -286,14 +286,14 @@ func fetchTracksAndCheckStatus(
 	present, err := cs.IsAssistantPresent()
 	if err != nil {
 		gologging.ErrorF("Error checking assistant presence: %v", err)
-		utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
+		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
 		return nil, false, err
 	}
 
 	if !present {
 		if err := cs.TryJoin(); err != nil {
 			gologging.ErrorF("Error joining assistant: %v", err)
-			utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
+			utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
 			return nil, false, err
 		}
 	}
@@ -301,7 +301,7 @@ func fetchTracksAndCheckStatus(
 	/* TODO
 	if err, isRtmp := cs.IsRTMPStream(); err != nil {
 	  	gologging.ErrorF("Error joining assistant: %v", err)
-			utils.EOR(replyMsg, getErrorMessage(r.ChatID, err))
+			utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
 			return nil, false, err
 	} else if isRtmp {
 	  // rtmp key, url check and warn
@@ -315,7 +315,7 @@ func filterAndTrimTracks(
 	r *core.RoomState,
 	tracks []*state.Track,
 ) ([]*state.Track, int, error) {
-	chatID := r.ChatID
+	chatID := replyMsg.ChannelID()
 
 	var filteredTracks []*state.Track
 	var skippedTracks []string
@@ -379,7 +379,7 @@ func filterAndTrimTracks(
 	}
 
 	// Respect queue limit
-	availableSlots := config.QueueLimit - len(r.Queue)
+	availableSlots := config.QueueLimit - len(r.Queue())
 	if availableSlots < len(tracks) {
 		tracks = tracks[:availableSlots]
 		gologging.WarnF("Queue full — adding only %d tracks out of requested.", availableSlots)
@@ -397,10 +397,10 @@ func playTracksAndRespond(
 	isActive, force bool,
 	availableSlots int,
 ) error {
-	chatID := r.ChatID
+	chatID := m.ChannelID()
 
 	for i, track := range tracks {
-		track.BY = mention
+		track.Requester = mention
 		title := html.EscapeString(utils.ShortTitle(track.Title, 25))
 		var filePath string
 
@@ -417,10 +417,10 @@ func playTracksAndRespond(
 			replyMsg, _ = utils.EOR(replyMsg, downloadingText, opt)
 
 			ctx, cancel := context.WithCancel(context.Background())
-			downloadCancels[r.ChatID] = cancel
+			downloadCancels[m.ChannelID()] = cancel
 			defer func() {
-				if _, ok := downloadCancels[r.ChatID]; ok {
-					delete(downloadCancels, r.ChatID)
+				if _, ok := downloadCancels[m.ChannelID()]; ok {
+					delete(downloadCancels, m.ChannelID())
 					cancel()
 				}
 			}()
@@ -463,9 +463,9 @@ func playTracksAndRespond(
 		opt.ParseMode = "HTML"
 		opt.ReplyMarkup = btn
 
-		thumb, tErr := utils.GenerateThumbnail(context.Background(), mainTrack, core.BUser.Username)
-		if tErr != nil {
-			fmt.Println("Thumb err", err)
+		thumb, err := utils.GenerateThumbnail(context.Background(), mainTrack, core.BUser.Username)
+		if err != nil {
+			fmt.Println("Thumb err", err )
 		} else {
 			mainTrack.Artwork = thumb
 		}
@@ -568,7 +568,7 @@ func playTrackWithRetry(
 
 		// RTMP unsupported
 		if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
-			utils.EOR(replyMsg, F(r.ChatID, "play_rtmp_not_supported"))
+			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_rtmp_not_supported"))
 			r.Destroy()
 			return telegram.EndGroup
 		}
@@ -582,8 +582,8 @@ func playTrackWithRetry(
 
 		// Last attempt failed
 		if attempt == playMaxRetries {
-			gologging.Error("❌ Failed to play after " + utils.IntToStr(maxRetries) + " attempts. Error: " + err.Error())
-			utils.EOR(replyMsg, F(r.ChatID, "play_failed", locales.Arg{"error": err.Error()}))
+			gologging.Error("❌ Failed to play after " + utils.IntToStr(playMaxRetries) + " attempts. Error: " + err.Error())
+			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_failed", locales.Arg{"error": err.Error()}))
 			return err
 		}
 

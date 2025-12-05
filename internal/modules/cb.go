@@ -154,10 +154,10 @@ func roomHandle(cb *tg.CallbackQuery) error {
 			r.Unmute() // unmute playback
 		}
 
-		cb.Answer("⏸️ Track paused at "+formatDuration(r.Position), opt)
+		cb.Answer("⏸️ Track paused at "+formatDuration(r.Position()), opt)
 
 		mention := utils.MentionHTML(cb.Sender)
-		track := r.Track
+		track := r.Track()
 		safeTitle := html.EscapeString(track.Title)
 
 		msgText := fmt.Sprintf(
@@ -167,7 +167,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 				"<b>▫ Paused by:</b> %s",
 			track.URL,
 			utils.ShortTitle(safeTitle, 25),
-			formatDuration(r.Position),
+			formatDuration(r.Position()),
 			formatDuration(track.Duration),
 			mention,
 		)
@@ -195,12 +195,12 @@ func roomHandle(cb *tg.CallbackQuery) error {
 			return tg.EndGroup
 		}
 
-		if _, err := cb.Answer(fmt.Sprintf("▶️ Resumed at %s.", formatDuration(r.Position)), opt); err != nil {
+		if _, err := cb.Answer(fmt.Sprintf("▶️ Resumed at %s.", formatDuration(r.Position())), opt); err != nil {
 			gologging.ErrorF("Answer error: %v", err)
 		}
 
 		mention := utils.MentionHTML(cb.Sender)
-		track := r.Track
+		track := r.Track()
 
 		msgText := fmt.Sprintf(
 			"<b>🎵 Now Playing:</b>\n\n"+
@@ -235,7 +235,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 			cb.Answer("❌ Failed to replay track.", opt)
 			return tg.EndGroup
 		}
-		track := r.Track
+		track := r.Track()
 
 		trackTitle := html.EscapeString(utils.ShortTitle(track.Title, 25))
 		totalDuration := formatDuration(track.Duration)
@@ -249,7 +249,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 			track.URL,
 			trackTitle,
 			totalDuration,
-			track.BY,
+			track.Requester,
 			utils.MentionHTML(cb.Sender),
 		)
 
@@ -280,8 +280,8 @@ func roomHandle(cb *tg.CallbackQuery) error {
 		}
 
 		// Clamp to start
-		if r.Position <= seconds {
-			r.Seek(-int(r.Position))
+		if r.Position() <= seconds {
+			r.Seek(-int(r.Position()))
 		} else {
 			r.Seek(-seconds)
 		}
@@ -298,7 +298,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 		}
 
 		// Warn if near end
-		if (r.Track.Duration - r.Position) <= seconds {
+		if (r.Track().Duration - r.Position()) <= seconds {
 			cb.Answer(fmt.Sprintf("⚠️ Cannot seek forward %d seconds — about to reach end.", seconds), opt)
 
 			return tg.EndGroup
@@ -313,7 +313,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 
 		mention := utils.MentionHTML(cb.Sender)
 
-		if len(r.Queue) == 0 && r.Loop == 0 {
+		if len(r.Queue()) == 0 && r.Loop() == 0 {
 			r.Destroy()
 			msgText := fmt.Sprintf(
 				"⏹️ <b>Playback stopped.</b>\nQueue is empty.\n\n▫ Skipped by: %s",
@@ -373,7 +373,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 			t.URL,
 			safeTitle,
 			formatDuration(t.Duration),
-			t.BY,
+			t.Requester,
 		)
 
 		opt := &tg.SendOptions{

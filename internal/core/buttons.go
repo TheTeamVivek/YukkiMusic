@@ -60,8 +60,8 @@ func GetPlayMarkup(r *RoomState, queued bool) tg.ReplyMarkup {
 	if r.IsCPlay() {
 		prefix = "croom:"
 	}
-	progress := utils.GetProgressBar(r.Position, r.Track.Duration)
-	progress = formatDuration(r.Position) + " " + progress + " " + formatDuration(r.Track.Duration)
+	progress := utils.GetProgressBar(r.Position(), r.Track().Duration)
+	progress = formatDuration(r.Position()) + " " + progress + " " + formatDuration(r.Track().Duration)
 
 	if !queued {
 		btn.AddRow(

@@ -92,7 +92,7 @@ func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, erro
 	return []*state.Track{track}, nil
 }
 
-func (t *TelegramPlatform) GetTracksByMessage(rmsg *telegram.NewMessage) ([]*state.Track, error) {
+func (t *TelegramPlatform) GetTracksByMessage(rmsg *telegram.NewMessage) (*state.Track, error) {
 	file := rmsg.File
 	if file == nil || file.FileID == "" {
 		return nil, fmt.Errorf("⚠️ Oops! This <a href=\"%s\">message</> doesn't contain any media.", rmsg.Link())
