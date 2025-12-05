@@ -230,17 +230,16 @@ func (cs *ChatState) ensureAssistantState(force bool) error {
 	}
 
 	member, err := Bot.GetChatMember(cs.ChatID, UbUser.ID)
-gologging.Error("raw error"+err.Error())
 
 	if err != nil {
+gologging.Error("raw error of GetChatMember in core.ChatState"+err.Error())
 		if strings.Contains(err.Error(), "there is no peer with id") {
-gologging.Info("may be newd to start bot by ub")
 
-			if triggerAssistantStartIfNeeded(err) {
+			triggerAssistantStart()
 				member, err = Bot.GetChatMember(cs.ChatID, UbUser.ID)
 				if err != nil {
 					return handleMemberFetchError(cs, err)
-				}
+				
 				applyMemberStatus(cs, member)
 				return nil
 			}
@@ -250,6 +249,26 @@ gologging.Info("may be newd to start bot by ub")
 
 	applyMemberStatus(cs, member)
 	return nil
+}
+
+func triggerAssistantStart(){
+
+	_, sendErr = UBot.SendMessage(BUser.Username, "/start")
+	if sendErr == nil {
+		return
+	}
+
+	if config.LoggerID != 0 {
+		UBot.SendMessage(config.LoggerID,
+			"⚠️ Unable to get assistant state. Please start the bot with assistant id")
+	}
+
+	if config.OwnerID != 0 {
+		UBot.SendMessage(config.OwnerID,
+			"⚠️ Unable to get assistant state. Please start the bot with assistant id")
+	}
+
+	return
 }
 
 func fetchFullChat(chatID int64) (*telegram.ChannelFull, error) {
@@ -291,31 +310,6 @@ func applyMemberStatus(s *ChatState, member *telegram.Participant) {
 	s.SetAssistantPresent(p)
 	s.SetAssistantBanned(b)
 	return
-}
-
-func triggerAssistantStartIfNeeded(err error) bool {
-
-	_, sendErr := UBot.SendMessage(BUser.ID, "/start")
-	if sendErr == nil {
-		return true
-	}
-
-	_, sendErr = UBot.SendMessage(BUser.Username, "/start")
-	if sendErr == nil {
-		return true
-	}
-
-	if config.LoggerID != 0 {
-		UBot.SendMessage(config.LoggerID,
-			"⚠️ Unable to get assistant state. Please start the bot with assistant id")
-	}
-
-	if config.OwnerID != 0 {
-		UBot.SendMessage(config.OwnerID,
-			"⚠️ Unable to get assistant state. Please start the bot with assistant id")
-	}
-
-	return false
 }
 
 func handleMemberFetchError(s *ChatState, err error) error {
