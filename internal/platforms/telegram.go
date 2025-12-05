@@ -88,7 +88,7 @@ func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, erro
 	isAudio := false
 	isVideo := false
 
-	if msg.Audio() != nil || rmsg.Voice() != nil {
+	if msg.Audio() != nil || msg.Voice() != nil {
 		isAudio = true
 	} else if msg.Video() != nil {
 		isVideo = true
@@ -115,7 +115,7 @@ func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, erro
 		thumbPath := filepath.Join("downloads", track.ID+".jpg")
 
 		if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-			path, err := rmsg.Download(&telegram.DownloadOptions{
+			path, err := msg.Download(&telegram.DownloadOptions{
 				ThumbOnly: true,
 				FileName:  thumbPath,
 			})
