@@ -253,7 +253,7 @@ gologging.Error("raw error of GetChatMember in core.ChatState"+err.Error())
 
 func triggerAssistantStart(){
 
-	_, sendErr = UBot.SendMessage(BUser.Username, "/start")
+	_, sendErr := UBot.SendMessage(BUser.Username, "/start")
 	if sendErr == nil {
 		return
 	}
