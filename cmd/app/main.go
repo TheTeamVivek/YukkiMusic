@@ -47,7 +47,7 @@ _ "net/http/pprof"
 
 func main() {
 	gologging.SetLevel(gologging.DebugLevel)
-	gologging.GetLogger("ntgcalls").SetLevel(gologging.InfoLevel)
+	gologging.GetLogger("ntgcalls").SetLevel(gologging.ErrorLevel)
 	gologging.GetLogger("webrtc").SetLevel(gologging.FatalLevel)
 
 	l := gologging.GetLogger("Main")
