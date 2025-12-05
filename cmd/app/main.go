@@ -41,6 +41,8 @@ import (
 	"main/internal/database"
 	"main/internal/locales"
 	"main/internal/modules"
+_ "net/http/pprof"
+"net/http"
 )
 
 func main() {
@@ -67,5 +69,5 @@ func main() {
 	defer cleanup()
 	modules.Init(core.Bot, core.UBot, core.Ntg)
 	l.Info("🚀 Bot is started")
-	core.Bot.Idle()
+	http.ListenAndServe("localhost:6060", nil)
 }
