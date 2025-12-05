@@ -56,7 +56,7 @@ type RoomState struct {
 	muted     bool
 	paused    bool
 	updatedAt int64
-	fpath  string
+	fpath     string
 	queue     []*state.Track
 	speed     float64
 	shuffle   bool
@@ -125,7 +125,6 @@ func GetAllRoomIDs() []int64 {
 	return ids
 }
 
-
 func (r *RoomState) ChatID() int64 {
 	r.RLock()
 	defer r.RUnlock()
@@ -137,7 +136,6 @@ func (r *RoomState) FilePath() string {
 	defer r.RUnlock()
 	return r.fpath
 }
-
 
 func (r *RoomState) Loop() int {
 	r.RLock()
@@ -159,6 +157,7 @@ func (r *RoomState) Queue() []*state.Track {
 	copy(q, r.queue)
 	return q
 }
+
 func (r *RoomState) Shuffle() bool {
 	r.RLock()
 	defer r.RUnlock()
@@ -171,11 +170,11 @@ func (r *RoomState) Speed() float64 {
 	return r.speed
 }
 
-func (r  *RoomState) Track() state.Track {
-    r.RLock()
+func (r *RoomState) Track() state.Track {
+	r.RLock()
 	defer r.RUnlock()
-	
-    return *r.track
+
+	return *r.track
 }
 
 func (r *RoomState) SetCPlay(isCPlay bool) {
@@ -189,6 +188,7 @@ func (r *RoomState) SetLoop(loop int) {
 	defer r.Unlock()
 	r.loop = loop
 }
+
 func (r *RoomState) SetRTMPPlayer(url, key string) {
 	r.Lock()
 	defer r.Unlock()

@@ -56,7 +56,7 @@ func handleResume(m *telegram.NewMessage, cplay bool) error {
 		return telegram.EndGroup
 	}
 
-t := r.Track()
+	t := r.Track()
 	if _, err := r.Resume(); err != nil {
 		m.Reply(F(chatID, "resume_failed", locales.Arg{
 			"error": err,

@@ -51,7 +51,7 @@ func handleReplay(m *telegram.NewMessage, cplay bool) error {
 		return telegram.EndGroup
 	}
 	t := r.Track()
-	
+
 	if err := r.Replay(); err != nil {
 		m.Reply(F(chatID, "replay_failed", locales.Arg{
 			"error": err,

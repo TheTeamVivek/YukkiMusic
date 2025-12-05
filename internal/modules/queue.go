@@ -56,7 +56,7 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 	}
 
 	var b strings.Builder
-	
+
 	b.WriteString(F(chatID, "queue_header"))
 	b.WriteString("\n\n")
 
@@ -181,7 +181,7 @@ func handleClear(m *tg.NewMessage, cplay bool) error {
 		m.Reply(err.Error())
 		return tg.EndGroup
 	}
-t := r.Track()
+	t := r.Track()
 	if !r.IsActiveChat() || t.ID == "" {
 		m.Reply(F(chatID, "clear_no_active"))
 		return tg.EndGroup

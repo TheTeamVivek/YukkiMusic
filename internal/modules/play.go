@@ -465,7 +465,7 @@ func playTracksAndRespond(
 
 		thumb, err := utils.GenerateThumbnail(context.Background(), mainTrack, core.BUser.Username)
 		if err != nil {
-			fmt.Println("Thumb err", err )
+			fmt.Println("Thumb err", err)
 		} else {
 			mainTrack.Artwork = thumb
 		}

@@ -50,13 +50,13 @@ func showHelpFor(m *tg.NewMessage, cmd string) error {
 	if help == "" {
 		_, err := m.Reply("⚠️ <i>No help found for command <code>" + html.EscapeString(cmd) + "</code></i>")
 		if err != nil {
-		  return err
+			return err
 		}
 		return tg.EndGroup
 	}
 	_, err := m.Reply("📘 <b>Help for</b> <code>" + cmd + "</code>:\n\n" + help)
 	if err != nil {
-		  return err
-		}
-		return tg.EndGroup
+		return err
 	}
+	return tg.EndGroup
+}

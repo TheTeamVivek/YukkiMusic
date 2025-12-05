@@ -93,7 +93,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 		args = append(args, "-filter:a", audioFilter)
 	}
 
-	if r.Track().ID != ""  && r.Track().Video {
+	if r.Track().ID != "" && r.Track().Video {
 		_, _, fps, filter := normalizeVideo(r.FilePath(), speed)
 
 		args = append(args,

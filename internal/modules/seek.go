@@ -133,7 +133,6 @@ func handleJump(m *telegram.NewMessage, cplay bool) error {
 
 	chatID := m.ChannelID()
 	t := r.Track()
-	
 
 	if !r.IsActiveChat() || t.ID == "" {
 		m.Reply(F(chatID, "jump_no_active"))

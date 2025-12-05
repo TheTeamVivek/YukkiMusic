@@ -45,7 +45,7 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 		return telegram.EndGroup
 	}
 	chatID := m.ChannelID()
-	
+
 	if r.Track == nil {
 		m.Reply(F(chatID, "room_no_active"))
 		return telegram.EndGroup
