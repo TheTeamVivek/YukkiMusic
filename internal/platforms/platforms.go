@@ -144,7 +144,8 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 			// for tg medias we allow only Video when replied media is a video
 			t.Video = isVideo
 			if isVideo {
-				thumbPath := filepath.Join("downloads", "thumb_"+t.ID+".jpg")
+os.MkdirAll("cache", os.ModePerm)
+				thumbPath := filepath.Join("cache", "thumb_"+t.ID+".jpg")
 
 				if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
 					path, err := rmsg.Download(&telegram.DownloadOptions{
