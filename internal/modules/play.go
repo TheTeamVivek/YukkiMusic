@@ -27,6 +27,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+"log"
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
@@ -570,9 +571,9 @@ func playTrackWithRetry(
 		if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
 			if url, key, err := database.GetRTMP(r.ChatID()); err != nil || url == "" || key == "" {
 				if err != nil {
-					replyMsg.Reply("Failed to get rtmp cfg: " + err.Error())
+					log.Print("Failed to get rtmp cfg: " + err.Error())
 				}
-				replyMsg.Reply(url + key)
+				log.Print(url + key)
 				utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_rtmp_missing_params"))
 				r.Destroy()
 				return telegram.EndGroup
