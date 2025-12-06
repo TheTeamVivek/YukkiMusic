@@ -93,36 +93,29 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 		args = append(args, "-ss", strconv.Itoa(seek))
 	}
 
-	args = append(args,
-		"-v", "warning",
-		"-i", r.fpath,
-	)
+	args = append(args, "-v", "warning", "-i", r.fpath)
 
-	audioFilter := "atempo=" + strconv.FormatFloat(speed, 'f', 2, 64)
+	audioFilter := buildAudioFilter(speed)
 
 	if r.track != nil && r.track.Video {
-		_, _, fps, filter := normalizeVideo(r.fpath, speed)
-
+		_, _, fps, vfilter := normalizeVideo(r.fpath, speed)
 		gologging.Info("stream with video, fps=" + strconv.Itoa(fps) +
-			" filter=" + filter +
+			" filter=" + vfilter +
 			" chatID=" + strconv.FormatInt(r.chatID, 10))
-
 		args = append(args,
 			"-c:v", "libx264",
 			"-preset", "veryfast",
 			"-pix_fmt", "yuv420p",
 			"-r", strconv.Itoa(fps),
-			"-filter:v", filter,
+			"-filter:v", vfilter,
 		)
 	} else if r.track != nil && r.track.Artwork != "" {
 		gologging.Info("audio with artwork, chatID=" + strconv.FormatInt(r.chatID, 10) +
 			" artwork=" + r.track.Artwork)
-
 		args = append(args,
 			"-loop", "1",
 			"-i", downloadThumb(r.track.ID, r.track.Artwork),
 		)
-
 		args = append(args,
 			"-c:v", "libx264",
 			"-preset", "veryfast",
@@ -136,20 +129,14 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 		args = append(args, "-vn")
 	}
 
-	args = append(args,
-		"-c:a", "aac",
-		"-b:a", "128k",
-	)
-	if speed != 1.0 {
+	args = append(args, "-c:a", "aac", "-b:a", "128k")
+
+	if audioFilter != "" {
 		args = append(args, "-filter:a", audioFilter)
 	}
 
 	outputURL := r.rtmpURL + "/" + r.rtmpKey
-
-	args = append(args,
-		"-f", "flv",
-		outputURL,
-	)
+	args = append(args, "-f", "flv", outputURL)
 
 	gologging.Debug("ffmpeg args: " + strings.Join(args, " ") +
 		" chatID=" + strconv.FormatInt(r.chatID, 10))
@@ -187,7 +174,6 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 			p.cmd = nil
 			gologging.Debug("onStreamEnd callback, chatID=" +
 				strconv.FormatInt(chatID, 10))
-
 			if onStreamEnd != nil {
 				onStreamEnd(chatID)
 			}

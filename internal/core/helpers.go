@@ -23,6 +23,7 @@ package core
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/Laky-64/gologging"
 	"resty.dev/v3"
@@ -30,20 +31,35 @@ import (
 	"main/internal/utils"
 )
 
+func buildAudioFilter(speed float64) string {
+	if speed == 1.0 {
+		return ""
+	}
+	filters := []string{}
+	if speed > 1.0 {
+		remaining := speed
+		for remaining > 2.0+1e-6 {
+			filters = append(filters, "atempo=2.0")
+			remaining /= 2.0
+		}
+		filters = append(filters, fmt.Sprintf("atempo=%.2f", remaining))
+	} else {
+		filters = append(filters, fmt.Sprintf("atempo=%.2f", speed))
+	}
+	return strings.Join(filters, ",")
+}
+
 func normalizeVideo(path string, speed float64) (int, int, int, string) {
 	if speed <= 0 {
 		speed = 1.0
 	}
-
 	w, h := utils.GetVideoDimensions(path)
 	if w <= 0 || h <= 0 {
 		w = 1280
 		h = 720
 	}
-
 	maxW := 1280
 	maxH := 720
-
 	if w > maxW {
 		h = h * maxW / w
 		w = maxW
@@ -52,19 +68,15 @@ func normalizeVideo(path string, speed float64) (int, int, int, string) {
 		w = w * maxH / h
 		h = maxH
 	}
-
-	// Ensure even values (required by x264/yuv420p)
 	if w%2 != 0 {
 		w--
 	}
 	if h%2 != 0 {
 		h--
 	}
-
 	fps := 30
 	videoSpeed := 1.0 / speed
 	filter := fmt.Sprintf("setpts=%.4f*PTS,scale=%d:%d", videoSpeed, w, h)
-
 	return w, h, fps, filter
 }
 
