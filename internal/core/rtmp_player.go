@@ -100,14 +100,6 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 
 	audioFilter := "atempo=" + strconv.FormatFloat(speed, 'f', 2, 64)
 
-	args = append(args,
-		"-c:a", "aac",
-		"-b:a", "128k",
-	)
-	if speed != 1.0 {
-		args = append(args, "-filter:a", audioFilter)
-	}
-
 	if r.track != nil && r.track.Video {
 		_, _, fps, filter := normalizeVideo(r.fpath, speed)
 
@@ -144,6 +136,14 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 		args = append(args, "-vn")
 	}
 
+	args = append(args,
+		"-c:a", "aac",
+		"-b:a", "128k",
+	)
+	if speed != 1.0 {
+		args = append(args, "-filter:a", audioFilter)
+	}
+
 	outputURL := r.rtmpURL + "/" + r.rtmpKey
 
 	args = append(args,
@@ -155,8 +155,6 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 		" chatID=" + strconv.FormatInt(r.chatID, 10))
 
 	cmd := exec.Command("ffmpeg", args...)
-cmd.Stdout = os.Stdout
-cmd.Stderr = os.Stderr
 	p.cmd = cmd
 
 	gologging.Info("starting ffmpeg, outputURL=" + outputURL +
@@ -196,6 +194,7 @@ cmd.Stderr = os.Stderr
 
 	return nil
 }
+
 
 func (p *RTMPPlayer) Pause(r *RoomState) (bool, error) {
 	gologging.Info("pause requested, chatID=" + strconv.FormatInt(r.chatID, 10))
