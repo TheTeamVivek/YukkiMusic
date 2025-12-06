@@ -43,7 +43,10 @@ type RTMPPlayer struct {
 
 func (p *RTMPPlayer) killLocked() {
 	if p.cmd != nil && p.cmd.Process != nil {
+		gologging.Debug("killLocked: killing process pid=" + strconv.Itoa(p.cmd.Process.Pid))
 		_ = p.cmd.Process.Kill()
+	} else {
+		gologging.Debug("killLocked: no running process")
 	}
 	p.cmd = nil
 }
@@ -51,6 +54,7 @@ func (p *RTMPPlayer) killLocked() {
 func (p *RTMPPlayer) kill() {
 	p.mu.Lock()
 	defer p.mu.Unlock()
+	gologging.Debug("kill called")
 	p.killLocked()
 }
 
@@ -191,30 +195,41 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 }
 
 func (p *RTMPPlayer) Pause(r *RoomState) (bool, error) {
+	gologging.Info("pause requested, chatID=" + strconv.FormatInt(r.chatID, 10))
 	p.kill()
 	return true, nil
 }
 
 func (p *RTMPPlayer) Resume(r *RoomState) (bool, error) {
+	gologging.Info("resume requested, chatID=" + strconv.FormatInt(r.chatID, 10))
 	if err := p.Play(r); err != nil {
+		gologging.Error("resume failed, chatID=" + strconv.FormatInt(r.chatID, 10) +
+			" error=" + err.Error())
 		return false, err
 	}
+	gologging.Info("resume started, chatID=" + strconv.FormatInt(r.chatID, 10))
 	return true, nil
 }
 
 func (p *RTMPPlayer) Stop(r *RoomState) error {
+	gologging.Info("stop requested, chatID=" + strconv.FormatInt(r.chatID, 10))
 	p.kill()
 	return nil
 }
 
 func (p *RTMPPlayer) Mute(r *RoomState) (bool, error) {
+	gologging.Info("mute requested, chatID=" + strconv.FormatInt(r.chatID, 10))
 	p.kill()
 	return true, nil
 }
 
 func (p *RTMPPlayer) Unmute(r *RoomState) (bool, error) {
+	gologging.Info("unmute requested, chatID=" + strconv.FormatInt(r.chatID, 10))
 	if err := p.Play(r); err != nil {
+		gologging.Error("unmute failed, chatID=" + strconv.FormatInt(r.chatID, 10) +
+			" error=" + err.Error())
 		return false, err
 	}
+	gologging.Info("unmute started, chatID=" + strconv.FormatInt(r.chatID, 10))
 	return true, nil
 }
