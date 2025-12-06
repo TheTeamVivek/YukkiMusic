@@ -195,7 +195,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 			strconv.FormatInt(r.chatID, 10) +
 			" err=" + err.Error())
 		return err
-	case <-time.After(5 * time.Second):
+	case <-time.After(3500 * time.Millisecond):
 		gologging.Debug("ffmpeg running fine after 5s, chatID=" +
 			strconv.FormatInt(r.chatID, 10))
 		return nil
