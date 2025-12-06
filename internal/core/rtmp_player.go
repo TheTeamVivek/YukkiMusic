@@ -114,7 +114,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 			"-r", strconv.Itoa(fps),
 			"-filter:v", filter,
 		)
-	} else if r.track != nil && r.track.Artwork != "" {
+	} else { /*if r.track != nil && r.track.Artwork != "" {
 		gologging.Info("audio with artwork, chatID=" + strconv.FormatInt(r.chatID, 10) +
 			" artwork=" + r.track.Artwork)
 
@@ -131,7 +131,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 			"-map", "0:a",
 			"-map", "1:v",
 		)
-	} else {
+	} else {*/
 		gologging.Info("audio only (no artwork), chatID=" + strconv.FormatInt(r.chatID, 10))
 		args = append(args, "-vn")
 	}
