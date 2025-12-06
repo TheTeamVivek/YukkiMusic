@@ -53,25 +53,32 @@ func (p *RTMPPlayer) kill() {
 
 func (p *RTMPPlayer) Play(r *RoomState) error {
 	if r.fpath == "" {
+		gologging.Error("no file, chatID=" + strconv.FormatInt(r.chatID, 10))
 		return errors.New("no file")
 	}
 	if r.rtmpURL == "" || r.rtmpKey == "" {
+		gologging.Error("missing rtmp config, chatID=" + strconv.FormatInt(r.chatID, 10))
 		return errors.New("missing rtmp config")
 	}
 
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
+	gologging.Debug("killing existing ffmpeg, chatID=" + strconv.FormatInt(r.chatID, 10))
 	p.killLocked()
 
 	speed := r.speed
 	if speed < 0.5 {
+		gologging.Warn("speed below min, requested=" + strconv.FormatFloat(r.speed, 'f', 2, 64) +
+			" using=0.50 chatID=" + strconv.FormatInt(r.chatID, 10))
 		speed = 0.5
 	} else if speed > 4.0 {
+		gologging.Warn("speed above max, requested=" + strconv.FormatFloat(r.speed, 'f', 2, 64) +
+			" using=4.00 chatID=" + strconv.FormatInt(r.chatID, 10))
 		speed = 4.0
 	}
 
-	seek := r.Position()
+	seek := r.position
 	args := []string{"-re"}
 
 	if seek > 0 {
@@ -96,6 +103,10 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 	if r.track != nil && r.track.Video {
 		_, _, fps, filter := normalizeVideo(r.fpath, speed)
 
+		gologging.Info("stream with video, fps=" + strconv.Itoa(fps) +
+			" filter=" + filter +
+			" chatID=" + strconv.FormatInt(r.chatID, 10))
+
 		args = append(args,
 			"-c:v", "libx264",
 			"-preset", "veryfast",
@@ -103,7 +114,25 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 			"-r", strconv.Itoa(fps),
 			"-filter:v", filter,
 		)
+	} else if r.track != nil && r.track.Artwork != "" {
+		gologging.Info("audio with artwork, chatID=" + strconv.FormatInt(r.chatID, 10) +
+			" artwork=" + r.track.Artwork)
+
+		args = append(args,
+			"-loop", "1",
+			"-i", r.track.Artwork,
+		)
+
+		args = append(args,
+			"-c:v", "libx264",
+			"-preset", "veryfast",
+			"-pix_fmt", "yuv420p",
+			"-shortest",
+			"-map", "0:a",
+			"-map", "1:v",
+		)
 	} else {
+		gologging.Info("audio only (no artwork), chatID=" + strconv.FormatInt(r.chatID, 10))
 		args = append(args, "-vn")
 	}
 
@@ -114,22 +143,41 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 		outputURL,
 	)
 
+	gologging.Debug("ffmpeg args: " + strings.Join(args, " ") +
+		" chatID=" + strconv.FormatInt(r.chatID, 10))
+
 	cmd := exec.Command("ffmpeg", args...)
 	p.cmd = cmd
 
+	gologging.Info("starting ffmpeg, outputURL=" + outputURL +
+		" chatID=" + strconv.FormatInt(r.chatID, 10))
+
 	if err := cmd.Start(); err != nil {
+		gologging.Error("ffmpeg start error: " + err.Error() +
+			" chatID=" + strconv.FormatInt(r.chatID, 10))
 		p.cmd = nil
 		return err
 	}
 
 	go func(chatID int64, c *exec.Cmd) {
-		_ = c.Wait()
+		err := c.Wait()
 
 		p.mu.Lock()
 		defer p.mu.Unlock()
 
+		if err != nil {
+			gologging.Error("ffmpeg exited with error: " + err.Error() +
+				" chatID=" + strconv.FormatInt(chatID, 10))
+		} else {
+			gologging.Info("ffmpeg exited normally, chatID=" +
+				strconv.FormatInt(chatID, 10))
+		}
+
 		if p.cmd == c {
 			p.cmd = nil
+			gologging.Debug("onStreamEnd callback, chatID=" +
+				strconv.FormatInt(chatID, 10))
+
 			if onStreamEnd != nil {
 				onStreamEnd(chatID)
 			}
@@ -138,6 +186,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 
 	return nil
 }
+
 
 func (p *RTMPPlayer) Pause(r *RoomState) (bool, error) {
 	p.kill()
