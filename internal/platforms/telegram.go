@@ -104,7 +104,8 @@ func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, erro
 	}
 	track.Video = isVideo
 	if isVideo {
-		thumbPath := filepath.Join("downloads", "thumb_"+track.ID+".jpg")
+os.MkdirAll("cache", os.ModePerm)
+		thumbPath := filepath.Join("cache", "thumb_"+track.ID+".jpg")
 
 		if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
 			path, err := msg.Download(&telegram.DownloadOptions{
