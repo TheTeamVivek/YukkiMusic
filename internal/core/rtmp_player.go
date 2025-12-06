@@ -21,8 +21,8 @@
 package core
 
 import (
-"os"
 	"errors"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -155,8 +155,8 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 		" chatID=" + strconv.FormatInt(r.chatID, 10))
 
 	cmd := exec.Command("ffmpeg", args...)
-cmd.Stdout = os.Stdout
-cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	p.cmd = cmd
 
 	gologging.Info("starting ffmpeg, outputURL=" + outputURL +
@@ -196,7 +196,6 @@ cmd.Stderr = os.Stderr
 
 	return nil
 }
-
 
 func (p *RTMPPlayer) Pause(r *RoomState) (bool, error) {
 	gologging.Info("pause requested, chatID=" + strconv.FormatInt(r.chatID, 10))

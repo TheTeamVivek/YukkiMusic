@@ -22,6 +22,10 @@ package core
 
 import (
 	"fmt"
+	"os"
+
+	"github.com/Laky-64/gologging"
+	"resty.dev/v3"
 
 	"main/internal/utils"
 )
@@ -64,7 +68,6 @@ func normalizeVideo(path string, speed float64) (int, int, int, string) {
 	return w, h, fps, filter
 }
 
-
 func downloadThumb(id, url string) string {
 	thumbPath := "cache/thumb_" + id + ".jpg"
 
@@ -73,17 +76,17 @@ func downloadThumb(id, url string) string {
 	}
 
 	if err := os.MkdirAll("cache", 0o755); err != nil {
-		gologging.Error("mkdir error:"+ err.Error())
+		gologging.Error("mkdir error:" + err.Error())
 		return url
 	}
-client := resty.New()
+	client := resty.New()
 
-defer client.Close()
+	defer client.Close()
 	resp, err := client.R().
 		SetOutputFileName(thumbPath).
 		Get(url)
 	if err != nil {
-		gologging.Error("thumb download failed:"+err.Error())
+		gologging.Error("thumb download failed:" + err.Error())
 		return url
 	}
 
