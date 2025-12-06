@@ -130,6 +130,9 @@ func buildFFmpegArgs(r *RoomState, speed float64, seek int) ([]string, string) {
 
     if r.track != nil && r.track.Video {
         _, _, fps, vfilter := normalizeVideo(r.fpath, speed)
+        gologging.Info("stream with video, fps=" + strconv.Itoa(fps) +
+            " filter=" + vfilter +
+            " chatID=" + strconv.FormatInt(r.chatID, 10))
 
         args = append(args,
             "-c:v", "libx264",
@@ -145,6 +148,10 @@ func buildFFmpegArgs(r *RoomState, speed float64, seek int) ([]string, string) {
         )
 
     } else if r.track != nil && r.track.Artwork != "" {
+        gologging.Info("audio with artwork, chatID=" +
+            strconv.FormatInt(r.chatID, 10) +
+            " artwork=" + r.track.Artwork)
+
         args = append(args,
             "-loop", "1",
             "-i", downloadThumb(r.track.ID, r.track.Artwork),
@@ -168,6 +175,8 @@ func buildFFmpegArgs(r *RoomState, speed float64, seek int) ([]string, string) {
         )
 
     } else {
+        gologging.Info("audio only (no artwork), chatID=" +
+            strconv.FormatInt(r.chatID, 10))
         args = append(args, "-vn")
     }
 
@@ -181,7 +190,6 @@ func buildFFmpegArgs(r *RoomState, speed float64, seek int) ([]string, string) {
 
     return args, outputURL
 }
-
 
 func (p *RTMPPlayer) setCmd(cmd *exec.Cmd) {
     p.mu.Lock()
