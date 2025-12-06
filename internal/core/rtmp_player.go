@@ -120,7 +120,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 
 		args = append(args,
 			"-loop", "1",
-			"-i", r.track.Artwork,
+			"-i", downloadThumb(r.track.ID, r.track.Artwork),
 		)
 
 		args = append(args,
