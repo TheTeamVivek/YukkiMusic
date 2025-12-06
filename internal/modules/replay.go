@@ -62,7 +62,7 @@ func handleReplay(m *telegram.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "replay_success", locales.Arg{
 			"title":    trackTitle,
 			"duration": totalDuration,
-			"speed":    fmt.Sprintf("%.2f", r.Speed),
+			"speed":    fmt.Sprintf("%.2f", r.Speed()),
 		}))
 	}
 
