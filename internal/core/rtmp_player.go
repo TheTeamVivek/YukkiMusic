@@ -195,7 +195,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 			strconv.FormatInt(r.chatID, 10) +
 			" err=" + err.Error())
 		return err
-	case <-time.After(3500 * time.Millisecond):
+	case <-time.After(5* time.Second):
 		gologging.Debug("ffmpeg running fine after 5s, chatID=" +
 			strconv.FormatInt(r.chatID, 10))
 		return nil
@@ -205,6 +205,7 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 func (p *RTMPPlayer) Pause(r *RoomState) (bool, error) {
 	gologging.Info("pause requested, chatID=" + strconv.FormatInt(r.chatID, 10))
 	p.kill()
+time.Sleep(3* time.Second)
 	return true, nil
 }
 
@@ -222,12 +223,16 @@ func (p *RTMPPlayer) Resume(r *RoomState) (bool, error) {
 func (p *RTMPPlayer) Stop(r *RoomState) error {
 	gologging.Info("stop requested, chatID=" + strconv.FormatInt(r.chatID, 10))
 	p.kill()
+time.Sleep(3* time.Second)
+	
 	return nil
 }
 
 func (p *RTMPPlayer) Mute(r *RoomState) (bool, error) {
 	gologging.Info("mute requested, chatID=" + strconv.FormatInt(r.chatID, 10))
 	p.kill()
+time.Sleep(3* time.Second)
+	
 	return true, nil
 }
 
