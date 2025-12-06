@@ -106,8 +106,8 @@ func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, erro
 	if isVideo {
 		err := os.MkdirAll("cache", os.ModePerm)
 		if err != nil {
-			gologiing.Error("Failed to create cache folder: " + err.Error())
-			return []*state.Track{t}, nil
+			gologging.Error("Failed to create cache folder: " + err.Error())
+			return []*state.Track{track}, nil
 		}
 
 		thumbPath := filepath.Join("cache", "thumb_"+track.ID+".jpg")
