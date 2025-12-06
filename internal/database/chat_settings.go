@@ -29,6 +29,8 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
+
+// TODO: reflect deepequal checked removed so handle caching of same opt in high-level 
 type RTMPConfig struct {
 	RtmpURL string `bson:"rtmp_url"`
 	RtmpKey string `bson:"rtmp_key"`
@@ -81,16 +83,6 @@ func getChatSettings(ctx context.Context, chatID int64) (*ChatSettings, error) {
 
 func updateChatSettings(ctx context.Context, newSettings *ChatSettings) error {
 	cacheKey := "chat_settings_" + strconv.FormatInt(newSettings.ChatID, 10)
-
-	currentSettings, err := getChatSettings(ctx, newSettings.ChatID)
-	if err != nil {
-		return err
-	}
-
-	if reflect.DeepEqual(currentSettings, newSettings) {
-		// No changes, skip DB update
-		return nil
-	}
 
 	opts := options.UpdateOne().SetUpsert(true)
 	_, err = chatSettingsColl.UpdateOne(ctx, bson.M{"_id": newSettings.ChatID}, bson.M{"$set": newSettings}, opts)
