@@ -130,37 +130,44 @@ func buildFFmpegArgs(r *RoomState, speed float64, seek int) ([]string, string) {
 
     if r.track != nil && r.track.Video {
         _, _, fps, vfilter := normalizeVideo(r.fpath, speed)
-        gologging.Info("stream with video, fps=" + strconv.Itoa(fps) +
-            " filter=" + vfilter +
-            " chatID=" + strconv.FormatInt(r.chatID, 10))
 
         args = append(args,
             "-c:v", "libx264",
             "-preset", "veryfast",
+            "-tune", "zerolatency",
             "-pix_fmt", "yuv420p",
             "-r", strconv.Itoa(fps),
+            "-g", strconv.Itoa(fps),
+            "-keyint_min", strconv.Itoa(fps),
+            "-sc_threshold", "0",
+            "-b:v", "2000k",
             "-filter:v", vfilter,
         )
-    } else if r.track != nil && r.track.Artwork != "" {
-        gologging.Info("audio with artwork, chatID=" +
-            strconv.FormatInt(r.chatID, 10) +
-            " artwork=" + r.track.Artwork)
 
+    } else if r.track != nil && r.track.Artwork != "" {
         args = append(args,
             "-loop", "1",
             "-i", downloadThumb(r.track.ID, r.track.Artwork),
         )
+
+        fps := 30
+
         args = append(args,
             "-c:v", "libx264",
             "-preset", "veryfast",
+            "-tune", "zerolatency",
             "-pix_fmt", "yuv420p",
+            "-r", strconv.Itoa(fps),
+            "-g", strconv.Itoa(fps),
+            "-keyint_min", strconv.Itoa(fps),
+            "-sc_threshold", "0",
+            "-b:v", "2000k",
             "-shortest",
             "-map", "0:a",
             "-map", "1:v",
         )
+
     } else {
-        gologging.Info("audio only (no artwork), chatID=" +
-            strconv.FormatInt(r.chatID, 10))
         args = append(args, "-vn")
     }
 
@@ -174,6 +181,7 @@ func buildFFmpegArgs(r *RoomState, speed float64, seek int) ([]string, string) {
 
     return args, outputURL
 }
+
 
 func (p *RTMPPlayer) setCmd(cmd *exec.Cmd) {
     p.mu.Lock()
