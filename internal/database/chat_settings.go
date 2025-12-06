@@ -85,7 +85,7 @@ func updateChatSettings(ctx context.Context, newSettings *ChatSettings) error {
 	cacheKey := "chat_settings_" + strconv.FormatInt(newSettings.ChatID, 10)
 
 	opts := options.UpdateOne().SetUpsert(true)
-	_, err = chatSettingsColl.UpdateOne(ctx, bson.M{"_id": newSettings.ChatID}, bson.M{"$set": newSettings}, opts)
+	_, err := chatSettingsColl.UpdateOne(ctx, bson.M{"_id": newSettings.ChatID}, bson.M{"$set": newSettings}, opts)
 	if err != nil {
 		logger.Error("Failed to update chat settings for chat " + strconv.FormatInt(newSettings.ChatID, 10) + " :" + err.Error())
 		return err
