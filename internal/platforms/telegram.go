@@ -87,7 +87,7 @@ func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, erro
 
 	isVideo := false
 
-	 if msg.Video() != nil {
+	if msg.Video() != nil {
 		isVideo = true
 	} else if msg.Document() != nil {
 		ext := strings.ToLower(msg.File.Ext)

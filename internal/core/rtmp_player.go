@@ -24,7 +24,10 @@ import (
 	"errors"
 	"os/exec"
 	"strconv"
+	"strings"
 	"sync"
+
+	"github.com/Laky-64/gologging"
 )
 
 var onStreamEnd func(chatID int64)
@@ -186,7 +189,6 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 
 	return nil
 }
-
 
 func (p *RTMPPlayer) Pause(r *RoomState) (bool, error) {
 	p.kill()
