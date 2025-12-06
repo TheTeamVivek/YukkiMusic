@@ -91,7 +91,7 @@ func downloadThumb(id, url string) string {
 	}
 
 	if resp.IsError() {
-		gologiing.Error("thumb HTTP error:" + resp.Status())
+		gologging.Error("thumb HTTP error:" + resp.Status())
 		return url
 	}
 
