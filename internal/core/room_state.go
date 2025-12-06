@@ -298,17 +298,19 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 	}
 
 r.track = t
+	r.playing = true
+	r.fpath = path
 	
 
 	if err := r.p.Play(r); err != nil { // note: when err so must handle and cleanup room
 r.track = nil
+r.playing = false
+r.fpath = ""
 		return err
 	}
 	r.position = 0
-	r.playing = true
 	r.paused = false
 	r.muted = false
-	r.fpath = path
 	r.updatedAt = time.Now().Unix()
 
 	return nil
