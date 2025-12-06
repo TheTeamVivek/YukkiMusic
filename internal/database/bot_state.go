@@ -21,7 +21,6 @@ package database
 
 import (
 	"context"
-	"reflect"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -81,7 +80,7 @@ func getBotState(ctx context.Context) (*BotState, error) {
 
 func updateBotState(ctx context.Context, newState *BotState) error {
 	opts := options.UpdateOne().SetUpsert(true)
-	_, err = settingsColl.UpdateOne(ctx, bson.M{"_id": "global"}, bson.M{"$set": newState}, opts)
+	_, err := settingsColl.UpdateOne(ctx, bson.M{"_id": "global"}, bson.M{"$set": newState}, opts)
 	if err != nil {
 		logger.ErrorF("Failed to update bot state: %v", err)
 		return err
