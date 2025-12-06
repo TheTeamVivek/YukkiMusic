@@ -21,6 +21,7 @@
 package core
 
 import (
+"os"
 	"errors"
 	"os/exec"
 	"strconv"
@@ -154,6 +155,8 @@ func (p *RTMPPlayer) Play(r *RoomState) error {
 		" chatID=" + strconv.FormatInt(r.chatID, 10))
 
 	cmd := exec.Command("ffmpeg", args...)
+cmd.Stdout = os.Stdout
+cmd.Stderr = os.Stderr
 	p.cmd = cmd
 
 	gologging.Info("starting ffmpeg, outputURL=" + outputURL +
