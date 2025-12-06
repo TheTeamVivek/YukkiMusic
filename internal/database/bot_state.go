@@ -28,6 +28,9 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
+// TODO: reflect deepequal checked removed so handle caching of same opt in high-level 
+
+
 type UsersChats struct {
 	Users []int64 `bson:"users"`
 	Chats []int64 `bson:"chats"`
@@ -77,16 +80,6 @@ func getBotState(ctx context.Context) (*BotState, error) {
 }
 
 func updateBotState(ctx context.Context, newState *BotState) error {
-	currentState, err := getBotState(ctx)
-	if err != nil {
-		return err
-	}
-
-	if reflect.DeepEqual(currentState, newState) {
-		// States are identical, skip update
-		return nil
-	}
-
 	opts := options.UpdateOne().SetUpsert(true)
 	_, err = settingsColl.UpdateOne(ctx, bson.M{"_id": "global"}, bson.M{"$set": newState}, opts)
 	if err != nil {
