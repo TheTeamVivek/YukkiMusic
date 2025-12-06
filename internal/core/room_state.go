@@ -297,6 +297,9 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 		return nil
 	}
 
+	if err := r.p.Play(r); err != nil { // note: when err so must handle and cleanup room
+		return err
+	}
 	r.track = t
 	r.position = 0
 	r.playing = true
@@ -305,7 +308,7 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 	r.fpath = path
 	r.updatedAt = time.Now().Unix()
 
-	return r.p.Play(r) // note: when err so must handle and cleanup room
+	return nil
 }
 
 func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
