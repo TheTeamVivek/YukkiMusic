@@ -145,10 +145,10 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 			t.Video = isVideo
 			if isVideo {
 				err := os.MkdirAll("cache", os.ModePerm)
-if err != nil {
-gologiing.Error("Failed to create cache folder: "+err.Error())
-                        return []*state.Track{t}, nil
-}
+				if err != nil {
+					gologiing.Error("Failed to create cache folder: " + err.Error())
+					return []*state.Track{t}, nil
+				}
 				thumbPath := filepath.Join("cache", "thumb_"+t.ID+".jpg")
 
 				if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
