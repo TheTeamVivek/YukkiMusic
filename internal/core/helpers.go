@@ -73,7 +73,7 @@ func downloadThumb(id, url string) string {
 	}
 
 	if err := os.MkdirAll("cache", 0o755); err != nil {
-		log.Error("mkdir error:", err)
+		gologging.Error("mkdir error:"+ err.Error())
 		return url
 	}
 client := resty.New()
@@ -83,12 +83,12 @@ defer client.Close()
 		SetOutputFileName(thumbPath).
 		Get(url)
 	if err != nil {
-		log.Error("thumb download failed:", err)
+		gologging.Error("thumb download failed:"+err.Error())
 		return url
 	}
 
 	if resp.IsError() {
-		log.Error("thumb HTTP error:", resp.Status())
+		gologiing.Error("thumb HTTP error:" + resp.Status())
 		return url
 	}
 
