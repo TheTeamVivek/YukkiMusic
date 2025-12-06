@@ -76,8 +76,10 @@ func downloadThumb(id, url string) string {
 		log.Error("mkdir error:", err)
 		return url
 	}
+client := resty.New()
 
-	resp, err := resty.New().R().
+defer client.Close()
+	resp, err := client.R().
 		SetOutputFileName(thumbPath).
 		Get(url)
 	if err != nil {
