@@ -93,12 +93,12 @@ Examples:
 
 	symbols := map[string]map[string]reflect.Value{
 		"eval/eval": {
-			"M":       reflect.ValueOf(m),
-			"Client":  reflect.ValueOf(core.Bot),
-			"UBot":    reflect.ValueOf(core.UBot),
-			"R":       reflect.ValueOf(reply),
-			"Message": reflect.ValueOf(m),
-			"Ntg":     reflect.ValueOf(core.Ntg),
+			"M":          reflect.ValueOf(m),
+			"Client":     reflect.ValueOf(core.Bot),
+			"Assistants": reflect.ValueOf(core.Assistants),
+			"A":          reflect.ValueOf(core.Assistants),
+			"R":          reflect.ValueOf(reply),
+			"Message":    reflect.ValueOf(m),
 		},
 	}
 	if err := i.Use(symbols); err != nil {
@@ -118,8 +118,7 @@ func runSnippet() (res any) {
 	m, msg, message, M := e.M, e.M, e.M, e.M
 	r := e.R
 	client, c, app, bot, Client := e.Client, e.Client, e.Client, e.Client, e.Client
-	call, ntg, Ntg := e.Ntg, e.Ntg, e.Ntg
-	ub, UBot := e.UBot, e.UBot
+	a, ass, Assistants, A := e.A, e.A, e.A, e.A
 	j := e.Client.JSON
 
 	_ = m; _ = msg; _ = message; _ = M

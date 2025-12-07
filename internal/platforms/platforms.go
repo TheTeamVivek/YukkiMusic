@@ -62,7 +62,7 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 			t, err := p.GetTracks(url, video)
 			if err != nil {
 				errorsCollected = append(errorsCollected,
-					"<b>"+html.EscapeString(string(p.Name()))+" error:</b> "+html.EscapeString(err.Error()))
+					"<b>"+string(p.Name())+" error:</b> "+err.Error())
 			} else {
 				tracks = clampTracks(append(tracks, t...))
 				if len(tracks) > 0 && (config.QueueLimit == 0 || len(tracks) >= config.QueueLimit) {
@@ -92,7 +92,7 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 		if err != nil {
 			return nil, errors.New(
 				"<b>⚠️ YouTube search error</b>\n\n<i>" +
-					html.EscapeString(err.Error()) + "</i>",
+					err.Error() + "</i>",
 			)
 		}
 
@@ -101,7 +101,7 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 		}
 
 		errorsCollected = append(errorsCollected,
-			"No results found for: "+html.EscapeString(query))
+			"No results found for: "+query)
 	}
 
 	if m.IsReply() {
@@ -140,7 +140,7 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 		t, err := tg.GetTracksByMessage(rmsg)
 		if err != nil {
 			errorsCollected = append(errorsCollected,
-				"Failed to get track from reply: "+html.EscapeString(err.Error()))
+				"Failed to get track from reply: "+err.Error())
 		} else {
 			// for tg medias we allow only Video when replied media is a video
 			t.Video = isVideo
@@ -188,7 +188,7 @@ func Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessa
 				return "", err
 			}
 			errs = append(errs,
-				html.EscapeString(string(p.Name()))+": "+html.EscapeString(err.Error()))
+				string(p.Name())+": "+err.Error())
 		}
 	}
 
@@ -196,7 +196,7 @@ func Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessa
 		return "", formatErrorsHTML(errs)
 	}
 
-	return "", errors.New("⚠️ No downloader available for source \"" + html.EscapeString(string(track.Source)) + "\"")
+	return "", errors.New("⚠️ No downloader available for source \"" + string(track.Source) + "\"")
 }
 
 func formatErrorsHTML(errs []string) error {

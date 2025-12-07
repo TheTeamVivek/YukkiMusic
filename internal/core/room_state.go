@@ -101,16 +101,27 @@ func GetRoom(chatID int64, create ...bool) (*RoomState, bool) {
 
 		room, exists = rooms[chatID]
 		if !exists {
+
+			ass, err := Assistants.ForChat(chatID)
+			if err != nil {
+				gologging.Error("Failed to select assistant for room: ", err)
+				return nil, false
+			}
+
 			room = &RoomState{
 				chatID: chatID,
 				queue:  []*state.Track{},
 				speed:  1.0,
-				p:      &NtgPlayer{},
+				p: &NtgPlayer{
+					Ntg: ass.Ntg,
+				},
 			}
 			rooms[chatID] = room
 		}
+
 		return room, true
 	}
+
 	return nil, false
 }
 
@@ -297,15 +308,14 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 		return nil
 	}
 
-r.track = t
+	r.track = t
 	r.playing = true
 	r.fpath = path
-	
 
 	if err := r.p.Play(r); err != nil { // note: when err so must handle and cleanup room
-r.track = nil
-r.playing = false
-r.fpath = ""
+		r.track = nil
+		r.playing = false
+		r.fpath = ""
 		return err
 	}
 	r.position = 0

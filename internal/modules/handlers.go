@@ -29,7 +29,6 @@ import (
 	"main/internal/core"
 	"main/internal/database"
 	"main/ntgcalls"
-	"main/ubot"
 )
 
 type MsgHandlerDef struct {
@@ -141,26 +140,30 @@ var cbHandlers = []CbHandlerDef{
 	{Pattern: "progress", Handler: emptyCBHandler},
 }
 
-func Init(c, u *telegram.Client, n *ubot.Context) {
-	c.UpdatesGetState()
-	u.UpdatesGetState()
+func Init(bot *telegram.Client, assistants *core.AssistantManager) {
+	bot.UpdatesGetState()
+	assistants.ForEach(func(a *core.Assistant) {
+		a.Client.UpdatesGetState()
+	})
 
 	for _, h := range handlers {
-		c.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...).SetGroup(100)
+		bot.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...).SetGroup(100)
 	}
 
 	for _, h := range cbHandlers {
-		c.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler), h.Filters...).SetGroup(90)
+		bot.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler), h.Filters...).SetGroup(90)
 	}
 
-	c.On("edit:/eval", evalHandle).SetGroup(80)
-	c.On("edit:/ev", evalCommandHandler).SetGroup(80)
+	bot.On("edit:/eval", evalHandle).SetGroup(80)
+	bot.On("edit:/ev", evalCommandHandler).SetGroup(80)
 
-	c.On("participant", handleParticipantUpdate).SetGroup(70)
+	bot.On("participant", handleParticipantUpdate).SetGroup(70)
 
-	c.AddActionHandler(handleActions).SetGroup(60)
+	bot.AddActionHandler(handleActions).SetGroup(60)
 
-	n.OnStreamEnd(ntgOnStreamEnd)
+	assistants.ForEach(func(a *core.Assistant) {
+		a.Ntg.OnStreamEnd(ntgOnStreamEnd)
+	})
 	core.SetOnStreamEnd(onStreamEndHandler)
 
 	go MonitorRooms()
@@ -170,7 +173,7 @@ func Init(c, u *telegram.Client, n *ubot.Context) {
 	}
 
 	if config.SetCmds && config.OwnerID != 0 {
-		go setBotCommands(c)
+		go setBotCommands(bot)
 	}
 }
 
@@ -178,19 +181,19 @@ func ntgOnStreamEnd(chatID int64, _ ntgcalls.StreamType, _ ntgcalls.StreamDevice
 	onStreamEndHandler(chatID)
 }
 
-func setBotCommands(c *telegram.Client) {
+func setBotCommands(bot *telegram.Client) {
 	// Set commands for normal users in private chats
-	if _, err := c.BotsSetBotCommands(&telegram.BotCommandScopeUsers{}, "", AllCommands.PrivateUserCommands); err != nil {
+	if _, err := bot.BotsSetBotCommands(&telegram.BotCommandScopeUsers{}, "", AllCommands.PrivateUserCommands); err != nil {
 		gologging.Error("Failed to set PrivateUserCommands " + err.Error())
 	}
 
 	// Set commands for normal users in group chats
-	if _, err := c.BotsSetBotCommands(&telegram.BotCommandScopeChats{}, "", AllCommands.GroupUserCommands); err != nil {
+	if _, err := bot.BotsSetBotCommands(&telegram.BotCommandScopeChats{}, "", AllCommands.GroupUserCommands); err != nil {
 		gologging.Error("Failed to set GroupUserCommands " + err.Error())
 	}
 
 	// Set commands for chat admins
-	if _, err := c.BotsSetBotCommands(
+	if _, err := bot.BotsSetBotCommands(
 		&telegram.BotCommandScopeChatAdmins{},
 		"",
 		append(AllCommands.GroupUserCommands, AllCommands.GroupAdminCommands...),
@@ -205,7 +208,7 @@ func setBotCommands(c *telegram.Client) {
 	} else {
 		sudoCommands := append(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands...)
 		for _, sudoer := range sudoers {
-			if _, err := c.BotsSetBotCommands(&telegram.BotCommandScopePeer{
+			if _, err := bot.BotsSetBotCommands(&telegram.BotCommandScopePeer{
 				Peer: &telegram.InputPeerUser{UserID: sudoer, AccessHash: 0},
 			},
 				"",
@@ -218,7 +221,7 @@ func setBotCommands(c *telegram.Client) {
 
 	ownerCommands := append(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands...)
 	ownerCommands = append(ownerCommands, AllCommands.PrivateOwnerCommands...)
-	if _, err := c.BotsSetBotCommands(&telegram.BotCommandScopePeer{
+	if _, err := bot.BotsSetBotCommands(&telegram.BotCommandScopePeer{
 		Peer: &telegram.InputPeerUser{UserID: config.OwnerID, AccessHash: 0},
 	}, "", ownerCommands); err != nil {
 		gologging.Error("Failed to set PrivateOwnerCommands " + err.Error())

@@ -21,13 +21,8 @@ package modules
 
 import (
 	"html"
-	"strconv"
-	"strings"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
-
-	"main/internal/database"
-	"main/internal/utils"
 )
 
 func htmlEscape(s string) string { return html.EscapeString(s) }
@@ -44,7 +39,7 @@ func maskKey(k string) string {
 }
 
 func setRTMPHandler(m *tg.NewMessage) error {
-	if !filterChannel(m) {
+	/*if !filterChannel(m) {
 		return tg.EndGroup
 	}
 
@@ -110,6 +105,6 @@ func setRTMPHandler(m *tg.NewMessage) error {
 			"🔗 URL: " + htmlEscape(url) + "\n" +
 			"🔑 Key: " + htmlEscape(maskKey(key)),
 	)
-
+	*/
 	return tg.EndGroup
 }

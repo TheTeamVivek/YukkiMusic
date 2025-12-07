@@ -276,8 +276,8 @@ func fetchTracksAndCheckStatus(
 	if banned {
 		utils.EOR(replyMsg,
 			F(m.ChannelID(), "err_assistant_banned", locales.Arg{
-				"user": utils.MentionHTML(core.UbUser),
-				"id":   utils.IntToStr(core.UbUser.ID),
+				"user": utils.MentionHTML(cs.Assistant.User),
+				"id":   utils.IntToStr(cs.Assistant.User.ID),
 			}),
 		)
 		return nil, false, fmt.Errorf("assistant banned")
@@ -297,16 +297,6 @@ func fetchTracksAndCheckStatus(
 			return nil, false, err
 		}
 	}
-
-	/* TODO
-	if err, isRtmp := cs.IsRTMPStream(); err != nil {
-	  	gologging.ErrorF("Error joining assistant: %v", err)
-			utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
-			return nil, false, err
-	} else if isRtmp {
-	  // rtmp key, url check and warn
-	}*/
-
 	return tracks, isActive, nil
 }
 
@@ -568,7 +558,9 @@ func playTrackWithRetry(
 
 		// RTMP unsupported
 		if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
-			if url, key, err := database.GetRTMP(r.ChatID()); err != nil || url == "" || key == "" {
+			utils.EOR(replyMsg, "Streaming is not supported when using RTMP")
+
+			/*if url, key, err := database.GetRTMP(r.ChatID()); err != nil || url == "" || key == "" {
 				if err != nil {
 					gologging.ErrorF("Failed to get RTMP config for chat %d: %v", r.ChatID(), err)
 				} else {
@@ -579,8 +571,8 @@ func playTrackWithRetry(
 				return telegram.EndGroup
 			} else {
 				r.SetRTMPPlayer(url, key)
-			}
-			continue
+			}*/
+			return telegram.EndGroup
 		}
 
 		// INTERDC_X_CALL_ERROR → retry
@@ -609,7 +601,12 @@ var errMessageMap = map[error]msgFn{
 	core.ErrAdminPermissionRequired: func(chatID int64, _ error) string {
 		return F(chatID, "err_admin_permission_required")
 	},
-
+	core.ErrAssistantGetFailed: func(chatID int64, e error) string {
+		gologging.Error(e)
+		return F(chatID, "err_assistant_get_failed", locales.Arg{
+			"error": e.Error(),
+		})
+	},
 	core.ErrAssistantJoinRateLimited: func(chatID int64, _ error) string {
 		return F(chatID, "err_assistant_join_rate_limited")
 	},

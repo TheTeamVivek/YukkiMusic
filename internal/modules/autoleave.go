@@ -126,83 +126,96 @@ func startAutoLeave() {
 	ticker := time.NewTicker(15 * time.Minute)
 	defer ticker.Stop()
 
-	exists := make(map[int64]struct{})
-
 	for {
 		select {
 		case <-ticker.C:
-			// Refresh set of valid room IDs
-			for k := range exists {
-				delete(exists, k)
+			activeRooms := map[int64]struct{}{}
+			for _, id := range core.GetAllRoomIDs() {
+				activeRooms[id] = struct{}{}
 			}
-			for _, chatID := range core.GetAllRoomIDs() {
-				exists[chatID] = struct{}{}
-			}
-			iterCtx, iterCancel := context.WithCancel(context.Background())
-			dialogCh, errCh := core.UBot.IterDialogs(&tg.DialogOptions{Limit: int32(limit * 3), Context: iterCtx})
-			leaveCount := 0
 
-		loop:
-			for {
-				select {
-				case d, ok := <-dialogCh:
-					if !ok {
-						break loop // No more dialogs, break inner loop
-					}
-
-					select {
-					case <-autoLeaveCtx.Done():
-						return // Exit if context was cancelled
-					default:
-					}
-
-					chatID, err := utils.GetPeerID(core.UBot, d.Peer)
-					if err != nil {
-						gologging.Error("[Autoleave] Failed to get peer, Error: " + err.Error())
-						continue
-
-					}
-
-					if chatID == 0 || chatID == config.LoggerID || chatID > 0 {
-						continue
-					}
-					if _, ok := exists[chatID]; ok {
-						continue
-					}
-
-					if err := core.UBot.LeaveChannel(chatID); err != nil {
-						if strings.Contains(err.Error(), "USER_NOT_PARTICIPANT") || strings.Contains(err.Error(), "CHANNEL_PRIVATE") {
-							continue
-						}
-						logger.WarnF("AutoLeave: failed to leave chat %d: %v", chatID, err)
-						continue
-					}
-
-					leaveCount++
-					logger.InfoF("AutoLeave: left chat %d (%d/%d)", chatID, leaveCount, limit)
-
-					select {
-					case <-time.After(2500 * time.Millisecond):
-					case <-autoLeaveCtx.Done():
-						return
-					}
-
-					if leaveCount >= limit {
-						break loop
-					}
-
-				case err, ok := <-errCh:
-					if !ok {
-						break loop
-					}
-					logger.WarnF("AutoLeave: IterDialogs error: %v", err)
-					break loop
-
-				case <-autoLeaveCtx.Done():
+			core.Assistants.ForEach(func(a *core.Assistant) {
+				if a == nil || a.Client == nil {
 					return
 				}
-			}
-			iterCancel()
+
+				// each assistant runs in parallel
+				go func(ass *core.Assistant) {
+					leaveCount := 0
+
+					iterCtx, iterCancel := context.WithCancel(context.Background())
+					dialogCh, errCh := ass.Client.IterDialogs(&tg.DialogOptions{
+						Limit:   int32(limit * 3),
+						Context: iterCtx,
+					})
+
+				loop:
+					for {
+						select {
+						case d, ok := <-dialogCh:
+							if !ok {
+								break loop
+							}
+
+							select {
+							case <-autoLeaveCtx.Done():
+								iterCancel()
+								return
+							default:
+							}
+
+							chatID, err := utils.GetPeerID(ass.Client, d.Peer)
+							if err != nil {
+								gologging.Error("[Autoleave] Peer error: " + err.Error())
+								continue
+							}
+
+							if chatID == 0 ||
+								chatID == config.LoggerID ||
+								chatID > 0 {
+								continue
+							}
+
+							if _, exists := activeRooms[chatID]; exists {
+								continue
+							}
+
+							if err := ass.Client.LeaveChannel(chatID); err != nil {
+								if strings.Contains(err.Error(), "USER_NOT_PARTICIPANT") ||
+									strings.Contains(err.Error(), "CHANNEL_PRIVATE") {
+									continue
+								}
+								logger.WarnF("AutoLeave (Assistant %d) failed to leave chat %d: %v",
+									ass.Index, chatID, err)
+								continue
+							}
+
+							leaveCount++
+							logger.InfoF("AutoLeave: Assistant %d left %d (%d/%d)",
+								ass.Index, chatID, leaveCount, limit)
+
+							time.Sleep(2500 * time.Millisecond)
+
+							if leaveCount >= limit {
+								break loop
+							}
+
+						case err, ok := <-errCh:
+							if ok {
+								logger.WarnF("AutoLeave: IterDialogs error (assistant %d): %v",
+									ass.Index, err)
+							}
+							break loop
+
+						case <-autoLeaveCtx.Done():
+							iterCancel()
+							return
+						}
+					}
+
+					iterCancel()
+				}(a)
+			})
 
 		case <-autoLeaveCtx.Done():
 			return

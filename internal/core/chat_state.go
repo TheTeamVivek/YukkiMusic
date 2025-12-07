@@ -22,6 +22,7 @@ package core
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -35,6 +36,7 @@ import (
 type ChatState struct {
 	mu               *sync.RWMutex
 	ChatID           int64
+	Assistant        *Assistant
 	AssistantPresent *bool
 	AssistantBanned  *bool
 	VoiceChatActive  *bool
@@ -44,6 +46,7 @@ type ChatState struct {
 var (
 	ErrAdminPermissionRequired  = errors.New("admin permission required")
 	ErrFetchFailed              = errors.New("failed to fetch chat info")
+	ErrAssistantGetFailed       = errors.New("failed to assistant for your chat")
 	ErrAssistantInviteLinkFetch = errors.New("failed to fetch invite link")
 	ErrAssistantJoinRejected    = errors.New("invite link is invalid or expired")
 	ErrAssistantJoinRateLimited = errors.New("assistant cannot join, rate limited")
@@ -56,10 +59,6 @@ var (
 	chMutex    = &sync.Mutex{}
 	ChatStates = make(map[int64]*ChatState)
 )
-
-func boolToPtr(b bool) *bool {
-	return &b
-}
 
 func GetChatState(chatID int64) *ChatState {
 	chMutex.Lock()
@@ -168,7 +167,13 @@ func (cs *ChatState) TryJoin() error {
 		cs.mu.RLock()
 		link = cs.InviteLink
 		cs.mu.RUnlock()
-		_, err := UBot.JoinChannel(link)
+
+		ass, err := cs.GetAssistant()
+		if err != nil {
+			return fmt.Errorf("%w: %w", ErrAssistantGetFailed, err)
+		}
+		_, err = ass.Client.JoinChannel(link)
+
 		if err == nil || telegram.MatchError(err, "USER_ALREADY_PARTICIPANT") {
 			cs.SetAssistantPresent(true)
 			cs.SetAssistantBanned(false)
@@ -190,6 +195,31 @@ func (cs *ChatState) TryJoin() error {
 		return handleJoinError(err, cs.ChatID, cs)
 	}
 	return nil
+}
+
+func (cs *ChatState) GetAssistant() (*Assistant, error) {
+	cs.mu.RLock()
+	ass := cs.Assistant
+	cs.mu.RUnlock()
+
+	if ass != nil {
+		return ass, nil
+	}
+
+	if Assistants == nil || Assistants.Count() == 0 {
+		return nil, fmt.Errorf("no assistants available")
+	}
+
+	ass, err := Assistants.ForChat(cs.ChatID)
+	if err != nil {
+		return nil, err
+	}
+
+	cs.mu.Lock()
+	cs.Assistant = ass
+	cs.mu.Unlock()
+
+	return ass, nil
 }
 
 // --- helpers ---
@@ -228,14 +258,18 @@ func (cs *ChatState) ensureAssistantState(force bool) error {
 	if !need {
 		return nil
 	}
+	ass, Aerr := cs.GetAssistant()
+	if Aerr != nil {
+		return fmt.Errorf("%w: %w", ErrAssistantGetFailed, Aerr)
+	}
 
-	member, err := Bot.GetChatMember(cs.ChatID, UbUser.ID)
+	member, err := Bot.GetChatMember(cs.ChatID, ass.User.ID)
 	if err != nil {
 		gologging.Error("raw error of GetChatMember in core.ChatState" + err.Error())
 		if strings.Contains(err.Error(), "there is no peer with id") {
 
-			triggerAssistantStart()
-			member, err = Bot.GetChatMember(cs.ChatID, UbUser.ID)
+			cs.triggerAssistantStart(ass)
+			member, err = Bot.GetChatMember(cs.ChatID, ass.User.ID)
 			if err != nil {
 				return handleMemberFetchError(cs, err)
 			}
@@ -250,23 +284,23 @@ func (cs *ChatState) ensureAssistantState(force bool) error {
 	return nil
 }
 
-func triggerAssistantStart() {
-	_, sendErr := UBot.SendMessage(BUser.Username, "/start")
+func (cs *ChatState) triggerAssistantStart(ass *Assistant) {
+	_, sendErr := ass.Client.SendMessage(ass.User.Username, "/start")
 	if sendErr == nil {
 		return
 	}
 
+	msg := "⚠️ Unable to get assistant state for chat " +
+		strconv.FormatInt(cs.ChatID, 10) +
+		". Please start the assistant manually."
+
 	if config.LoggerID != 0 {
-		UBot.SendMessage(config.LoggerID,
-			"⚠️ Unable to get assistant state. Please start the bot with assistant id")
+		ass.Client.SendMessage(config.LoggerID, msg)
 	}
 
 	if config.OwnerID != 0 {
-		UBot.SendMessage(config.OwnerID,
-			"⚠️ Unable to get assistant state. Please start the bot with assistant id")
+		ass.Client.SendMessage(config.OwnerID, msg)
 	}
-
-	return
 }
 
 func fetchFullChat(chatID int64) (*telegram.ChannelFull, error) {
@@ -372,7 +406,12 @@ func handleJoinRequestPending(chatID int64, s *ChatState) error {
 		return fmt.Errorf("%w: %v", ErrPeerResolveFailed, errChat)
 	}
 
-	iUser, errUser := Bot.ResolvePeer(UbUser.ID)
+	ass, err := s.GetAssistant()
+	if err != nil {
+		return fmt.Errorf("%w: %w", ErrAssistantGetFailed, err)
+	}
+
+	iUser, errUser := Bot.ResolvePeer(ass.User.ID)
 	if errUser != nil {
 		return fmt.Errorf("%w: %v", ErrPeerResolveFailed, errUser)
 	}

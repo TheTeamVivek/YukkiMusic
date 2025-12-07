@@ -24,33 +24,36 @@ import (
 	"strconv"
 
 	"main/ntgcalls"
+	"main/ubot"
 )
 
-type NtgPlayer struct{}
+type NtgPlayer struct {
+	Ntg *ubot.Context
+}
 
 func (p *NtgPlayer) Play(r *RoomState) error {
 	desc := getMediaDescription(r.fpath, r.position, r.speed, r.track.Video)
-	return Ntg.Play(r.chatID, desc)
+	return p.Ntg.Play(r.chatID, desc)
 }
 
 func (p *NtgPlayer) Pause(r *RoomState) (bool, error) {
-	return Ntg.Pause(r.chatID)
+	return p.Ntg.Pause(r.chatID)
 }
 
 func (p *NtgPlayer) Resume(r *RoomState) (bool, error) {
-	return Ntg.Resume(r.chatID)
+	return p.Ntg.Resume(r.chatID)
 }
 
 func (p *NtgPlayer) Stop(r *RoomState) error {
-	return Ntg.Stop(r.chatID)
+	return p.Ntg.Stop(r.chatID)
 }
 
 func (p *NtgPlayer) Mute(r *RoomState) (bool, error) {
-	return Ntg.Mute(r.chatID)
+	return p.Ntg.Mute(r.chatID)
 }
 
 func (p *NtgPlayer) Unmute(r *RoomState) (bool, error) {
-	return Ntg.Unmute(r.chatID)
+	return p.Ntg.Unmute(r.chatID)
 }
 
 func getMediaDescription(url string, pos int, speed float64, isVideo bool) ntgcalls.MediaDescription {

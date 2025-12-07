@@ -34,17 +34,17 @@ type RTMPConfig struct {
 	RtmpKey string `bson:"rtmp_key"`
 }
 type ChatSettings struct {
-	ChatID     int64      `bson:"_id"`
-	CPlayID    int64      `bson:"cplay_id"`
-	AuthUsers  []int64    `bson:"auth_users"`
-	Language   string     `bson:"language"`
-	RTMPConfig RTMPConfig `bson:"rtmp_config"`
+	ChatID         int64      `bson:"_id"`
+	CPlayID        int64      `bson:"cplay_id"`
+	AuthUsers      []int64    `bson:"auth_users"`
+	Language       string     `bson:"language"`
+	RTMPConfig     RTMPConfig `bson:"rtmp_config"`
+	AssistantIndex int        `bson:"ass_index,omitempty"`
 }
 
 func defaultChatSettings(chatID int64) *ChatSettings {
 	return &ChatSettings{
 		ChatID:    chatID,
-		CPlayID:   0,
 		AuthUsers: []int64{},
 	}
 }

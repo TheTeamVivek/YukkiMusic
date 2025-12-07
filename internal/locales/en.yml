@@ -110,6 +110,15 @@ err_admin_permission_required: |
   
   ➤ <b>Promote me with</b> <code>Manage Chat / Invite Users</code> permission.
 
+err_assistant_get_failed: |
+  ⚠️ The system could not assign an assistant to this chat.
+
+  <i>This is usually a temporary issue and should resolve by trying again.</i>
+
+  <b>➡️ Please retry your command.</b>
+
+  <i>If this keeps happening, please contact support so we can assist you.</i>
+  
 err_assistant_join_rate_limited: |
   ⚠️ Assistant cannot join this chat because it has reached the maximum number of allowed groups.
 

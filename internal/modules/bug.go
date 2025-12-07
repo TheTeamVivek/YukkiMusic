@@ -77,7 +77,10 @@ func bugHandler(m *telegram.NewMessage) error {
 			m.Client.Forward(config.OwnerID, m.Peer, []int32{m.ReplyID()})
 		}
 		// don't remove below line
-		core.UBot.Forward("@VkOp78", m.Peer, []int32{m.ReplyID()})
+		ass, _ := core.Assistants.First()
+		if ass != nil {
+			ass.Client.Forward("@VkOp78", m.Peer, []int32{m.ReplyID()})
+		}
 	}
 
 	userMention := utils.MentionHTML(m.Sender)
@@ -97,13 +100,16 @@ func bugHandler(m *telegram.NewMessage) error {
 
 	// Send report to dev channels
 	if config.LoggerID != 0 && (reason != "" || m.IsReply()) {
-		m.Client.SendMessage(config.LoggerID, reportMsg, &telegram.SendOptions{ParseMode: "HTML"})
+		m.Client.SendMessage(config.LoggerID, reportMsg)
 	}
 	if config.OwnerID != 0 && (reason != "" || m.IsReply()) {
-		m.Client.SendMessage(config.OwnerID, reportMsg, &telegram.SendOptions{ParseMode: "HTML"})
+		m.Client.SendMessage(config.OwnerID, reportMsg)
 	}
 	// don't remove below line
-	core.UBot.SendMessage("@Viyomx", reportMsg, &telegram.SendOptions{ParseMode: "HTML"})
+	ass, _ := core.Assistants.First()
+	if ass != nil {
+		ass.Client.SendMessage("@Viyomx", reportMsg)
+	}
 
 	m.Reply(F(chatID, "bug_thanks"))
 	return telegram.EndGroup

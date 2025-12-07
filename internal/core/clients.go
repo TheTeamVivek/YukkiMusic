@@ -21,7 +21,9 @@ package core
 
 import (
 	"encoding/base64"
+	"encoding/binary"
 	"fmt"
+	"net"
 	"strings"
 
 	"github.com/Laky-64/gologging"
@@ -31,32 +33,72 @@ import (
 )
 
 var (
-	Bot  *telegram.Client // bot client
-	UBot *telegram.Client // user client
-	Ntg  *ubot.Context    // wrapper client of ntgcalls
+	Bot   *telegram.Client
+	BUser *telegram.UserObj
 
-	BUser, UbUser *telegram.UserObj
+	Assistants         *AssistantManager
+	AssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // AssistantIndexFunc = database.GetAssistantIndex
 )
 
-func Init(apiID int32, apiHash, token, session string, loggerID int64) func() {
+func Init(apiID int32, apiHash, token string, sessions []string, sessionType string, loggerID int64) func() {
+	if len(sessions) == 0 {
+		gologging.Fatal("No STRING_SESSIONS provided for assistant client.")
+	}
+
+	gologging.Info("Starting bot client...")
 	Bot = initBotClient(apiID, apiHash, token)
 	BUser = getSelfOrFatal(Bot, "bot")
 
-	UBot = initAssistantClient(apiID, apiHash, session)
-	UbUser = getSelfOrFatal(UBot, "assistant")
+	gologging.Info("Starting assistant clients...")
 
-	Bot.SetCommandPrefixes("/")
-	UBot.SetCommandPrefixes(".")
-	if loggerID != 0 {
-		notifyStartup(Bot, UBot, loggerID)
+	assistants := make([]*Assistant, 0, len(sessions))
+
+	for i, sess := range sessions {
+		gologging.InfoF("Initializing assistant[%d]...", i)
+
+		client := initAssistantClient(apiID, apiHash, sess, sessionType, i)
+		user := getSelfOrFatal(client, fmt.Sprintf("assistant[%d]", i))
+		ctx := ubot.NewContext(client)
+
+		client.SetCommandPrefixes(".")
+
+		assistants = append(assistants, &Assistant{
+			Index:  i,
+			Client: client,
+			User:   user,
+			Ntg:    ctx,
+		})
+
+		if loggerID != 0 {
+			_, _ = client.SendMessage(loggerID, fmt.Sprintf("Assistant %d Started", i))
+		}
+
+		gologging.InfoF("assistant[%d] ready: %s", i, user.FirstName)
 	}
 
-	Ntg = ubot.NewContext(UBot)
+	Bot.SetCommandPrefixes("/")
+
+	Assistants = &AssistantManager{
+		list:       assistants,
+		indexCache: make(map[int64]int),
+	}
+	gologging.Info("All assistants initialized successfully.")
 
 	return func() {
-		Ntg.Close()
+		gologging.Info("Shutting down assistant contexts...")
+		for _, a := range Assistants.list {
+			a.Ntg.Close()
+		}
+
+		gologging.Info("Stopping bot...")
 		Bot.Stop()
-		UBot.Stop()
+
+		gologging.Info("Stopping assistants...")
+		for _, a := range Assistants.list {
+			a.Client.Stop()
+		}
+
+		gologging.Info("Shutdown complete.")
 	}
 }
 
@@ -83,10 +125,29 @@ func initBotClient(apiID int32, apiHash, token string) *telegram.Client {
 	return client
 }
 
-func initAssistantClient(apiID int32, apiHash, session string) *telegram.Client {
-	sess, err := decodePyrogramSessionString(session)
-	if err != nil {
-		gologging.Fatal("❌ Failed to decode Pyrogram session: " + err.Error())
+func initAssistantClient(apiID int32, apiHash, session, sessionType string, idx int) *telegram.Client {
+	var stringSession string
+
+	switch strings.ToLower(sessionType) {
+	case "pyrogram", "pyro":
+		sess, err := decodePyrogramSessionString(session)
+		if err != nil {
+			gologging.Fatal("Failed to decode Pyrogram session: " + err.Error())
+		}
+		stringSession = sess.Encode()
+
+	case "telethon":
+		sess, err := decodeTelethonSessionString(session)
+		if err != nil {
+			gologging.Fatal("Failed to decode Telethon session: " + err.Error())
+		}
+		stringSession = sess.Encode()
+
+	case "gogram":
+		stringSession = session
+
+	default:
+		gologging.Fatal("Invalid SESSION_TYPE: " + sessionType)
 	}
 
 	client, err := telegram.NewClient(telegram.ClientConfig{
@@ -94,12 +155,13 @@ func initAssistantClient(apiID int32, apiHash, session string) *telegram.Client 
 		AppHash:       apiHash,
 		LogLevel:      telegram.LogError,
 		ParseMode:     "HTML",
-		StringSession: sess.Encode(),
-		Session:       "ass.session",
+		StringSession: stringSession,
+		Session:       fmt.Sprintf("ass%d.session", idx),
 	})
 	if err != nil {
-		gologging.Fatal("❌ Failed to create assistant: " + err.Error())
+		gologging.Fatal("Failed to create assistant: " + err.Error())
 	}
+
 	return client
 }
 
@@ -110,18 +172,6 @@ func getSelfOrFatal(c *telegram.Client, label string) *telegram.UserObj {
 	}
 	gologging.Info("Logged in as " + label + ": " + me.FirstName)
 	return me
-}
-
-func notifyStartup(bot, ub *telegram.Client, loggerID int64) {
-	_, err := bot.SendMessage(loggerID, "🚀 Bot Started...")
-	if err != nil {
-		gologging.Warn("Failed to send bot startup message: " + err.Error())
-	}
-
-	_, err = ub.SendMessage(loggerID, "🚀 Assistant Started...")
-	if err != nil {
-		gologging.Warn("Failed to send assistant startup message: " + err.Error())
-	}
 }
 
 func decodePyrogramSessionString(encodedString string) (*telegram.Session, error) {
@@ -154,5 +204,44 @@ func decodePyrogramSessionString(encodedString string) (*telegram.Session, error
 		Hostname: telegram.ResolveDataCenterIP(int(uint8(packedData[0])), packedData[5] != 0, false),
 		AppID:    int32(uint32(packedData[1])<<24 | uint32(packedData[2])<<16 | uint32(packedData[3])<<8 | uint32(packedData[4])),
 		Key:      packedData[6 : 6+authKeySize],
+	}, nil
+}
+
+func decodeTelethonSessionString(sessionString string) (*telegram.Session, error) {
+	data, err := base64.URLEncoding.DecodeString(sessionString[1:])
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode base64: %v", err)
+	}
+
+	ipLen := 4
+	if len(data) == 352 {
+		ipLen = 16
+	}
+
+	expectedLen := 1 + ipLen + 2 + 256
+	if len(data) != expectedLen {
+		return nil, fmt.Errorf("invalid session string length")
+	}
+
+	// ">B{}sH256s"
+	offset := 1
+
+	// IP Address (4 or 16 bytes based on IPv4 or IPv6)
+	ipData := data[offset : offset+ipLen]
+	ip := net.IP(ipData)
+	ipAddress := ip.String()
+	offset += ipLen
+
+	// Port (2 bytes, Big Endian)
+	port := binary.BigEndian.Uint16(data[offset : offset+2])
+	offset += 2
+
+	// Auth Key (256 bytes)
+	var authKey [256]byte
+	copy(authKey[:], data[offset:offset+256])
+
+	return &telegram.Session{
+		Hostname: ipAddress + ":" + fmt.Sprint(port),
+		Key:      authKey[:],
 	}, nil
 }

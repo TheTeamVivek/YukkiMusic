@@ -55,7 +55,8 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 		return err
 	}
 
-	if p.UserID() == core.UbUser.ID {
+	assistant, err := core.Assistants.ForChat(chatID)
+	if err == nil && p.UserID() == assistant.User.ID {
 		handleAssistantState(p, chatID)
 	}
 
@@ -132,13 +133,18 @@ func handleAssistantRestriction(p *telegram.ParticipantUpdate, chatID int64, s *
 	ok, err := p.Unban()
 	if err != nil || !ok {
 		s.SetAssistantBanned(true)
+		assistant, aErr := core.Assistants.ForChat(chatID)
+		if aErr != nil {
+			gologging.Error("Failed to get assitand: " + aErr.Error())
+			return
+		}
 
 		if !shouldIgnoreParticipant(p) {
-			_, sendErr := p.Client.SendMessage(
+			_, sendErr := assistant.Client.SendMessage(
 				chatID,
 				F(chatID, "assistant_restricted_warning", locales.Arg{
-					"assistant": utils.MentionHTML(core.UbUser),
-					"id":        core.UbUser.ID,
+					"assistant": utils.MentionHTML(assistant.User),
+					"id":        assistant.User.ID,
 				}),
 			)
 
@@ -151,7 +157,12 @@ func handleAssistantRestriction(p *telegram.ParticipantUpdate, chatID int64, s *
 }
 
 func handleAssistantFallback(p *telegram.ParticipantUpdate, chatID int64, s *core.ChatState) {
-	member, err := p.Client.GetChatMember(chatID, core.UbUser.ID)
+	assistant, aErr := core.Assistants.ForChat(chatID)
+	if aErr != nil {
+		gologging.Error("Failed to get assitand: " + aErr.Error())
+		return
+	}
+	member, err := p.Client.GetChatMember(chatID, assistant.User.ID)
 	if err != nil {
 		if telegram.MatchError(err, "USER_NOT_PARTICIPANT") {
 			s.SetAssistantPresent(false)
@@ -185,7 +196,13 @@ func handleDemotion(p *telegram.ParticipantUpdate, chatID int64) {
 		p.Client.SendMessage(chatID, F(chatID, "bot_demotion_goodbye"))
 
 		p.Client.LeaveChannel(chatID)
-		core.UBot.LeaveChannel(chatID)
+		assistant, aErr := core.Assistants.ForChat(chatID)
+		if aErr != nil {
+			gologging.Error("Failed to get assitand: " + aErr.Error())
+			return
+		}
+
+		assistant.Client.LeaveChannel(chatID)
 		return
 	}
 
@@ -240,9 +257,12 @@ func handleDeleteUserAction(m *telegram.NewMessage, chatID int64, action *telegr
 		"User removed from chatID " + utils.IntToStr(chatID) +
 			": " + utils.IntToStr(action.UserID),
 	)
-
-	if action.UserID == core.BUser.ID {
-		core.UBot.LeaveChannel(chatID)
+	assistant, aErr := core.Assistants.ForChat(chatID)
+	if aErr != nil {
+		gologging.Error("Failed to get assitand: " + aErr.Error())
+	}
+	if aErr == nil && action.UserID == assistant.User.ID {
+		assistant.Client.LeaveChannel(chatID)
 		core.DeleteRoom(chatID)
 		core.DeleteChatState(chatID)
 		database.DeleteServed(chatID)

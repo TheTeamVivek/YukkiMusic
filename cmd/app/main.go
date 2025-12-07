@@ -35,6 +35,7 @@ import "C"
 import (
 	"net/http"
 	_ "net/http/pprof"
+	"os"
 
 	"github.com/Laky-64/gologging"
 
@@ -46,12 +47,12 @@ import (
 	"main/internal/modules"
 )
 
+var l = gologging.GetLogger("Main")
+
 func main() {
 	gologging.SetLevel(gologging.DebugLevel)
 	gologging.GetLogger("ntgcalls").SetLevel(gologging.ErrorLevel)
 	gologging.GetLogger("webrtc").SetLevel(gologging.FatalLevel)
-
-	l := gologging.GetLogger("Main")
 
 	checkFFmpegAndFFprobe()
 
@@ -64,12 +65,34 @@ func main() {
 
 	l.Debug("🔹 Initializing cookies...")
 	cookies.Init()
+
 	locales.Init()
+
 	l.Debug("🔹 Initializing clients...")
-	cleanup := core.Init(config.ApiID, config.ApiHash, config.Token, config.StringSession, config.LoggerID)
+	cleanup := core.Init(
+		config.ApiID,
+		config.ApiHash,
+		config.Token,
+		config.StringSessions, // list of sessions
+		config.SessionType,    // pyrogram / telethon / gogram
+		config.LoggerID,
+	)
 	defer cleanup()
-	modules.Init(core.Bot, core.UBot, core.Ntg)
+
+	core.AssistantIndexFunc = database.GetAssistantIndex
+
+	if err := database.RebalanceAssistantIndexes(core.Assistants.Count()); err != nil {
+		l.Error("Failed to rebalance Assistants: " + err.Error())
+	}
+
+	modules.Init(core.Bot, core.Assistants)
+
 	l.Info("🚀 Bot is started")
-	go http.ListenAndServe("localhost:6060", nil)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+	go http.ListenAndServe(":"+port, nil)
+
 	core.Bot.Idle()
 }

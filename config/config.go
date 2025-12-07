@@ -36,11 +36,12 @@ var (
 
 	// To learn more about what each variable does, see README.md
 	// Required Vars
-	ApiID         = int32(getInt64("API_ID"))
-	ApiHash       = getString("API_HASH")
-	Token         = getString("TOKEN")
-	MongoURI      = getString("MONGO_DB_URI")
-	StringSession = getString("STRING_SESSION") // pyro session
+	ApiID          = int32(getInt64("API_ID"))
+	ApiHash        = getString("API_HASH")
+	Token          = getString("TOKEN")
+	MongoURI       = getString("MONGO_DB_URI")
+	StringSessions = getStringSlice("STRING_SESSIONS")
+	SessionType    = getString("SESSION_TYPE", "pyrogram") // pyrogram, telethon, gogram
 
 	// Optional Vars
 	ApiKEY         = getString("FALLEN_API_KEY")
@@ -73,10 +74,15 @@ func init() {
 		logger.Fatal("MONGO_DB_URI is required but missing!")
 		return
 	}
-	if StringSession == "" {
-		logger.Fatal("STRING_SESSION is empty — continuing without it.")
-		return
+	if len(StringSessions) == 0 {
+		StringSessions = getStringSlice("STRING_SESSION")
+
+		if len(StringSessions) == 0 {
+			logger.Fatal("STRING_SESSIONS is empty — at least one Pyro v2 session string is required.")
+			return
+		}
 	}
+
 	if ApiID == 0 {
 		logger.Fatal("API_ID is required but missing!")
 		return
@@ -127,6 +133,25 @@ func getInt64(key string, def ...int64) int64 {
 		return num
 	}
 	return defaultValue
+}
+
+func getStringSlice(key string, def ...[]string) []string {
+	if val, ok := getEnvAny(variants(key)...); ok {
+		normalized := strings.NewReplacer(
+			",", " ",
+			";", " ",
+		).Replace(val)
+
+		parts := strings.Fields(normalized)
+		if len(parts) > 0 {
+			return parts
+		}
+	}
+
+	if len(def) > 0 {
+		return def[0]
+	}
+	return nil
 }
 
 func getEnvAny(keys ...string) (string, bool) {
