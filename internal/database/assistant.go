@@ -20,12 +20,16 @@
 package database
 
 import (
-	"context"
 	"fmt"
 	"strconv"
+	"sync"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
-	"go.mongodb.org/mongo-driver/v2/mongo"
+)
+
+var (
+	assistantUsage []int64 // index 1..assistantCount used
+	usageMu        sync.RWMutex
 )
 
 func GetAssistantIndex(chatID int64, assistantCount int) (int, error) {
@@ -47,12 +51,12 @@ func GetAssistantIndex(chatID int64, assistantCount int) (int, error) {
 		return settings.AssistantIndex, nil
 	}
 
-	counts, err := aggregateAssistantUsage(ctx, assistantCount)
-	if err != nil {
-		return 0, err
-	}
+	usageMu.RLock()
+	countsCopy := make([]int64, len(assistantUsage))
+	copy(countsCopy, assistantUsage)
+	usageMu.RUnlock()
 
-	newIndex := pickLeastUsedAssistant(counts)
+	newIndex := pickLeastUsedAssistant(countsCopy)
 
 	logger.Debug(
 		"Assigning assistant index " + strconv.Itoa(newIndex) +
@@ -67,6 +71,12 @@ func GetAssistantIndex(chatID int64, assistantCount int) (int, error) {
 		)
 		return 0, err
 	}
+
+	usageMu.Lock()
+	if len(assistantUsage) > newIndex {
+		assistantUsage[newIndex]++
+	}
+	usageMu.Unlock()
 
 	return newIndex, nil
 }
@@ -108,6 +118,11 @@ func RebalanceAssistantIndexes(assistantCount int) error {
 	total := len(all)
 	if total == 0 {
 		logger.Debug("Rebalance: no chats found")
+
+		usageMu.Lock()
+		assistantUsage = make([]int64, assistantCount+1)
+		usageMu.Unlock()
+
 		return nil
 	}
 
@@ -191,60 +206,24 @@ func RebalanceAssistantIndexes(assistantCount int) error {
 		updated++
 	}
 
+	counts := make([]int64, assistantCount+1)
+	for _, s := range all {
+		idx := s.AssistantIndex
+		if idx >= 1 && idx <= assistantCount {
+			counts[idx]++
+		}
+	}
+
+	usageMu.Lock()
+	assistantUsage = counts
+	usageMu.Unlock()
+
 	logger.Debug(
 		"Rebalance complete. total_chats=" + strconv.Itoa(total) +
 			", updated_chats=" + strconv.Itoa(updated),
 	)
 
 	return nil
-}
-
-func aggregateAssistantUsage(ctx context.Context, assistantCount int) ([]int64, error) {
-	pipeline := mongo.Pipeline{
-		bson.D{{
-			"$group", bson.D{
-				{"_id", "$ass_index"},
-				{"count", bson.D{{"$sum", 1}}},
-			},
-		}},
-	}
-
-	cursor, err := chatSettingsColl.Aggregate(ctx, pipeline)
-	if err != nil {
-		logger.Error("Failed to aggregate assistant usage: " + err.Error())
-		return nil, err
-	}
-	defer cursor.Close(ctx)
-
-	counts := make([]int64, assistantCount+1)
-
-	for cursor.Next(ctx) {
-		var doc struct {
-			ID    *int  `bson:"_id"`
-			Count int64 `bson:"count"`
-		}
-
-		if err := cursor.Decode(&doc); err != nil {
-			logger.Error("Failed to decode aggregation result: " + err.Error())
-			return nil, err
-		}
-
-		if doc.ID == nil {
-			continue
-		}
-
-		idx := *doc.ID
-		if idx >= 1 && idx <= assistantCount {
-			counts[idx] = doc.Count
-		}
-	}
-
-	if err := cursor.Err(); err != nil {
-		logger.Error("Cursor error during assistant usage aggregation: " + err.Error())
-		return nil, err
-	}
-
-	return counts, nil
 }
 
 func pickLeastUsedAssistant(counts []int64) int {

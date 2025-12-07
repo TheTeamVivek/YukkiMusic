@@ -82,7 +82,7 @@ func main() {
 	core.AssistantIndexFunc = database.GetAssistantIndex
 
 	if err := database.RebalanceAssistantIndexes(core.Assistants.Count()); err != nil {
-		l.Error("Failed to rebalance Assistants: " + err.Error())
+		l.Fatal("Failed to rebalance Assistants: " + err.Error())
 	}
 
 	modules.Init(core.Bot, core.Assistants)
