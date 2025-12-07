@@ -203,7 +203,7 @@ func aggregateAssistantUsage(ctx context.Context, assistantCount int) ([]int64, 
 	pipeline := mongo.Pipeline{
 		bson.D{{
 			"$group", bson.D{
-				{"_id", "$assistant_index"},
+				{"_id", "$ass_index"},
 				{"count", bson.D{{"$sum", 1}}},
 			},
 		}},
