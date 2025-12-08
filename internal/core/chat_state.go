@@ -60,7 +60,7 @@ var (
 	ChatStates = make(map[int64]*ChatState)
 )
 
-func GetChatState(chatID int64) (*ChatState, error){
+func GetChatState(chatID int64) (*ChatState, error) {
 	chMutex.Lock()
 	defer chMutex.Unlock()
 
@@ -73,9 +73,9 @@ func GetChatState(chatID int64) (*ChatState, error){
 		}
 		ChatStates[chatID] = state
 	}
-		if _, err := state.getAssistant(); err != nil {
-			return nil, fmt.Errorf("%w: %w", ErrAssistantGetFailed, err)
-		}
+	if _, err := state.getAssistant(); err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrAssistantGetFailed, err)
+	}
 	return state
 }
 
@@ -170,7 +170,7 @@ func (cs *ChatState) TryJoin() error {
 		cs.mu.RLock()
 		link = cs.InviteLink
 		cs.mu.RUnlock()
-		
+
 		_, err = cs.Assistant.Client.JoinChannel(link)
 
 		if err == nil || telegram.MatchError(err, "USER_ALREADY_PARTICIPANT") {
@@ -400,7 +400,7 @@ func handleJoinRequestPending(chatID int64, s *ChatState) error {
 	if errChat != nil {
 		return fmt.Errorf("%w: %v", ErrPeerResolveFailed, errChat)
 	}
-	
+
 	iUser, errUser := Bot.ResolvePeer(cs.Assistant.User.ID)
 	if errUser != nil {
 		return fmt.Errorf("%w: %v", ErrPeerResolveFailed, errUser)

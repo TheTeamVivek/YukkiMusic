@@ -187,8 +187,8 @@ func handleDemotion(p *telegram.ParticipantUpdate, s *core.ChatState, chatID int
 
 		p.Client.LeaveChannel(chatID)
 		if s != nil && s.Assistant != nil {
-		s.Assistant.Client.LeaveChannel(chatID)
-			}
+			s.Assistant.Client.LeaveChannel(chatID)
+		}
 		return
 	}
 
@@ -247,9 +247,9 @@ func handleDeleteUserAction(m *telegram.NewMessage, chatID int64, action *telegr
 		"User removed from chatID " + utils.IntToStr(chatID) +
 			": " + utils.IntToStr(action.UserID),
 	)
-	
+
 	if aErr == nil && action.UserID == assistant.User.ID {
-		core.Assistans.WithAssistant(chatID, func(ass *core.Assistant){ass.Client.LeaveChannel(chatID)})
+		core.Assistans.WithAssistant(chatID, func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) })
 		core.DeleteRoom(chatID)
 		core.DeleteChatState(chatID)
 		database.DeleteServed(chatID)

@@ -73,19 +73,18 @@ func (m *AssistantManager) ForEach(fn func(*Assistant)) {
 }
 
 func (m *AssistantManager) WithAssistant(chatID int64, fn func(*Assistant)) {
-    if m == nil {
-        return
-    }
+	if m == nil {
+		return
+	}
 
-    ass, err := m.ForChat(chatID)
-    if err != nil {
-        gologging.Errorf("Failed to get assistant for chat %d, Error: %v", chatID, err)
-        return
-    }
+	ass, err := m.ForChat(chatID)
+	if err != nil {
+		gologging.Errorf("Failed to get assistant for chat %d, Error: %v", chatID, err)
+		return
+	}
 
-    fn(ass)
+	fn(ass)
 }
-
 
 func (m *AssistantManager) ForChat(chatID int64) (*Assistant, error) {
 	if m == nil || len(m.list) == 0 {
