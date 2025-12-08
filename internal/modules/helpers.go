@@ -318,7 +318,7 @@ func warnAndLeave(client *tg.Client, chatID int64) {
 		if err := client.LeaveChannel(chatID); err != nil {
 			gologging.ErrorF("Failed to leave non-supergroup chatID=%d: %v", chatID, err)
 		}
-core.Assistans.WithAssistant(chatID, func(ass *core.Assistant){ass.Client.LeaveChannel(chatID)}
+core.Assistans.WithAssistant(chatID, func(ass *core.Assistant){ass.Client.LeaveChannel(chatID)})
 		
 	}()
 }
