@@ -249,7 +249,7 @@ func handleDeleteUserAction(m *telegram.NewMessage, chatID int64, action *telegr
 	)
 	
 	if aErr == nil && action.UserID == assistant.User.ID {
-		core.Assistans.WithAssistant(chatID, func(ass *core.Assistant){ass.Client.LeaveChannel(chatID)}
+		core.Assistans.WithAssistant(chatID, func(ass *core.Assistant){ass.Client.LeaveChannel(chatID)})
 		core.DeleteRoom(chatID)
 		core.DeleteChatState(chatID)
 		database.DeleteServed(chatID)
