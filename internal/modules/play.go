@@ -252,7 +252,12 @@ func fetchTracksAndCheckStatus(
 	}
 
 	isActive := r.IsActiveChat()
-	cs := core.GetChatState(r.ChatID())
+	cs, err := core.GetChatState(r.ChatID())
+	if err != nil {
+		gologging.ErrorF("Error getting chat state: %v", err)
+		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
+		return nil, false, err
+	}
 
 	activeVC, err := cs.IsActiveVC()
 	if err != nil {
