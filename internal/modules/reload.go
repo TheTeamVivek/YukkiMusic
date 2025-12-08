@@ -90,7 +90,16 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 	}
 	utils.SetFlood(floodKey, floodDuration)
 
-	cs := core.GetChatState(chatID)
+	cs, err := core.GetChatState(chatID)
+	if err != nil {
+		summary += F(chatID, "reload_assistant_fail", locales.Arg{
+			"error": err.Error(),
+		}) + "\n"
+		utils.EOR(mystic, F(chatID, "reload_done", locales.Arg{
+			"summary": summary,
+		}))
+		return nil
+	}
 
 	activeVC, vcErr := cs.IsActiveVC(true)
 	if vcErr != nil {
