@@ -60,7 +60,7 @@ var (
 	ChatStates = make(map[int64]*ChatState)
 )
 
-func GetChatState(chatID int64) *ChatState {
+func GetChatState(chatID int64) (*ChatState, error){
 	chMutex.Lock()
 	defer chMutex.Unlock()
 
@@ -73,6 +73,9 @@ func GetChatState(chatID int64) *ChatState {
 		}
 		ChatStates[chatID] = state
 	}
+		if _, err := state.getAssistant(); err != nil {
+			return nil, fmt.Errorf("%w: %w", ErrAssistantGetFailed, err)
+		}
 	return state
 }
 
@@ -167,12 +170,8 @@ func (cs *ChatState) TryJoin() error {
 		cs.mu.RLock()
 		link = cs.InviteLink
 		cs.mu.RUnlock()
-
-		ass, err := cs.GetAssistant()
-		if err != nil {
-			return fmt.Errorf("%w: %w", ErrAssistantGetFailed, err)
-		}
-		_, err = ass.Client.JoinChannel(link)
+		
+		_, err = cs.Assistant.Client.JoinChannel(link)
 
 		if err == nil || telegram.MatchError(err, "USER_ALREADY_PARTICIPANT") {
 			cs.SetAssistantPresent(true)
@@ -197,7 +196,7 @@ func (cs *ChatState) TryJoin() error {
 	return nil
 }
 
-func (cs *ChatState) GetAssistant() (*Assistant, error) {
+func (cs *ChatState) getAssistant() (*Assistant, error) {
 	cs.mu.RLock()
 	ass := cs.Assistant
 	cs.mu.RUnlock()
@@ -258,17 +257,13 @@ func (cs *ChatState) ensureAssistantState(force bool) error {
 	if !need {
 		return nil
 	}
-	ass, Aerr := cs.GetAssistant()
-	if Aerr != nil {
-		return fmt.Errorf("%w: %w", ErrAssistantGetFailed, Aerr)
-	}
 
-	member, err := Bot.GetChatMember(cs.ChatID, ass.User.ID)
+	member, err := Bot.GetChatMember(cs.ChatID, cs.Assistant.User.ID)
 	if err != nil {
 		gologging.Error("raw error of GetChatMember in core.ChatState" + err.Error())
 		if strings.Contains(err.Error(), "there is no peer with id") {
 
-			cs.triggerAssistantStart(ass)
+			cs.triggerAssistantStart()
 			member, err = Bot.GetChatMember(cs.ChatID, ass.User.ID)
 			if err != nil {
 				return handleMemberFetchError(cs, err)
@@ -284,8 +279,8 @@ func (cs *ChatState) ensureAssistantState(force bool) error {
 	return nil
 }
 
-func (cs *ChatState) triggerAssistantStart(ass *Assistant) {
-	_, sendErr := ass.Client.SendMessage(ass.User.Username, "/start")
+func (cs *ChatState) triggerAssistantStart() {
+	_, sendErr := ass.Client.SendMessage(cs.Assistant.User.Username, "/start")
 	if sendErr == nil {
 		return
 	}
@@ -295,11 +290,11 @@ func (cs *ChatState) triggerAssistantStart(ass *Assistant) {
 		". Please start the assistant manually."
 
 	if config.LoggerID != 0 {
-		ass.Client.SendMessage(config.LoggerID, msg)
+		cs.Assistant.Client.SendMessage(config.LoggerID, msg)
 	}
 
 	if config.OwnerID != 0 {
-		ass.Client.SendMessage(config.OwnerID, msg)
+		cs.Assistant.Client.SendMessage(config.OwnerID, msg)
 	}
 }
 
@@ -405,13 +400,8 @@ func handleJoinRequestPending(chatID int64, s *ChatState) error {
 	if errChat != nil {
 		return fmt.Errorf("%w: %v", ErrPeerResolveFailed, errChat)
 	}
-
-	ass, err := s.GetAssistant()
-	if err != nil {
-		return fmt.Errorf("%w: %w", ErrAssistantGetFailed, err)
-	}
-
-	iUser, errUser := Bot.ResolvePeer(ass.User.ID)
+	
+	iUser, errUser := Bot.ResolvePeer(cs.Assistant.User.ID)
 	if errUser != nil {
 		return fmt.Errorf("%w: %v", ErrPeerResolveFailed, errUser)
 	}
