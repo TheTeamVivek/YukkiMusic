@@ -86,7 +86,7 @@ func DeleteRoom(chatID int64) {
 	}
 }
 
-func GetRoom(chatID int64, create ...bool) (*RoomState, bool) {
+func GetRoom(chatID int64, ass *Assistant, create ...bool) (*RoomState, bool) {
 	roomsMu.RLock()
 	room, exists := rooms[chatID]
 	roomsMu.RUnlock()
@@ -101,12 +101,6 @@ func GetRoom(chatID int64, create ...bool) (*RoomState, bool) {
 
 		room, exists = rooms[chatID]
 		if !exists {
-
-			ass, err := Assistants.ForChat(chatID)
-			if err != nil {
-				gologging.Error("Failed to select assistant for room: ", err)
-				return nil, false
-			}
 
 			room = &RoomState{
 				chatID: chatID,
