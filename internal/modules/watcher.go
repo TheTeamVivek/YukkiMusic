@@ -54,15 +54,17 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 		gologging.Error("Failed to resolve peer for chatID=" + utils.IntToStr(p.ChannelID()) + ", Error=" + err.Error())
 		return err
 	}
-
-	assistant, err := core.Assistants.ForChat(chatID)
-	if err == nil && p.UserID() == assistant.User.ID {
-		handleAssistantState(p, chatID)
+	s, err := core.GetChatState(chatID)
+	if err != nil {
+		gologging.Error("Failed to get chat state: " + err.Error())
+	}
+	if err == nil && p.UserID() == s.Assistant.User.ID {
+		handleAssistantState(p, s, chatID)
 	}
 
 	// Handle demotion
 	if p.IsDemoted() {
-		handleDemotion(p, chatID)
+		handleDemotion(p, s, chatID)
 	}
 
 	// Handle promotion
@@ -100,9 +102,7 @@ func handleActions(m *telegram.NewMessage) error {
 	}
 }
 
-func handleAssistantState(p *telegram.ParticipantUpdate, chatID int64) {
-	s := core.GetChatState(chatID)
-
+func handleAssistantState(p *telegram.ParticipantUpdate, s *core.ChatState, chatID int64) {
 	// Joined / Left
 	if p.IsLeft() {
 		s.SetAssistantPresent(false)
@@ -133,18 +133,13 @@ func handleAssistantRestriction(p *telegram.ParticipantUpdate, chatID int64, s *
 	ok, err := p.Unban()
 	if err != nil || !ok {
 		s.SetAssistantBanned(true)
-		assistant, aErr := core.Assistants.ForChat(chatID)
-		if aErr != nil {
-			gologging.Error("Failed to get assitand: " + aErr.Error())
-			return
-		}
 
 		if !shouldIgnoreParticipant(p) {
-			_, sendErr := assistant.Client.SendMessage(
+			_, sendErr := s.Assistant.Client.SendMessage(
 				chatID,
 				F(chatID, "assistant_restricted_warning", locales.Arg{
-					"assistant": utils.MentionHTML(assistant.User),
-					"id":        assistant.User.ID,
+					"assistant": utils.MentionHTML(s.Assistant.User),
+					"id":        s.Assistant.User.ID,
 				}),
 			)
 
@@ -157,12 +152,7 @@ func handleAssistantRestriction(p *telegram.ParticipantUpdate, chatID int64, s *
 }
 
 func handleAssistantFallback(p *telegram.ParticipantUpdate, chatID int64, s *core.ChatState) {
-	assistant, aErr := core.Assistants.ForChat(chatID)
-	if aErr != nil {
-		gologging.Error("Failed to get assitand: " + aErr.Error())
-		return
-	}
-	member, err := p.Client.GetChatMember(chatID, assistant.User.ID)
+	member, err := p.Client.GetChatMember(chatID, s.Assistant.User.ID)
 	if err != nil {
 		if telegram.MatchError(err, "USER_NOT_PARTICIPANT") {
 			s.SetAssistantPresent(false)
@@ -187,7 +177,7 @@ func handleAssistantFallback(p *telegram.ParticipantUpdate, chatID int64, s *cor
 	}
 }
 
-func handleDemotion(p *telegram.ParticipantUpdate, chatID int64) {
+func handleDemotion(p *telegram.ParticipantUpdate, s *core.ChatState chatID int64) {
 	if p.UserID() == core.BUser.ID {
 
 		core.DeleteRoom(chatID)
@@ -196,13 +186,9 @@ func handleDemotion(p *telegram.ParticipantUpdate, chatID int64) {
 		p.Client.SendMessage(chatID, F(chatID, "bot_demotion_goodbye"))
 
 		p.Client.LeaveChannel(chatID)
-		assistant, aErr := core.Assistants.ForChat(chatID)
-		if aErr != nil {
-			gologging.Error("Failed to get assitand: " + aErr.Error())
-			return
-		}
-
-		assistant.Client.LeaveChannel(chatID)
+		if s != nil && s.Assistant != nil {
+		s.Assistant.Client.LeaveChannel(chatID)
+			}
 		return
 	}
 
@@ -235,7 +221,11 @@ func handleGroupCallAction(m *telegram.NewMessage, chatID int64, action *telegra
 	}
 
 	core.DeleteRoom(chatID)
-	s := core.GetChatState(chatID)
+	s, err := core.GetChatState(chatID)
+	if err != nil {
+		gologging.Error("Failed to get chat state: " + err.Error())
+		return telegram.EndGroup
+	}
 
 	if action.Duration == 0 {
 		// Voice chat started
@@ -257,12 +247,9 @@ func handleDeleteUserAction(m *telegram.NewMessage, chatID int64, action *telegr
 		"User removed from chatID " + utils.IntToStr(chatID) +
 			": " + utils.IntToStr(action.UserID),
 	)
-	assistant, aErr := core.Assistants.ForChat(chatID)
-	if aErr != nil {
-		gologging.Error("Failed to get assitand: " + aErr.Error())
-	}
+	
 	if aErr == nil && action.UserID == assistant.User.ID {
-		assistant.Client.LeaveChannel(chatID)
+		core.Assistans.WithAssistant(chatID, func(ass *core.Assistant){ass.Client.LeaveChannel(chatID)}
 		core.DeleteRoom(chatID)
 		core.DeleteChatState(chatID)
 		database.DeleteServed(chatID)
