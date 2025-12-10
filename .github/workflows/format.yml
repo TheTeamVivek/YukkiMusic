@@ -53,7 +53,9 @@ jobs:
           
           BRANCH_NAME="${GITHUB_REF##*/}"
 
-          git add $(find . -name '*.go' -not -path './ntgcalls/*') go.mod go.sum
+          # git add $(find . -name '*.go' -not -path './ntgcalls/*') go.mod go.sum
+
+          git add $(find . -name '*.go') go.mod go.sum
           git diff --cached --quiet || git commit -m "style: format codes"
 
           git fetch origin "$BRANCH_NAME"
