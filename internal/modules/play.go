@@ -44,7 +44,7 @@ import (
 const playMaxRetries = 3
 
 func channelPlayHandler(m *telegram.NewMessage) error {
-	m.Reply(F(m.ChannelID(), "channel_play_depreceated"))
+	m.Reply(F(m.ChannelID(), "channel_play_depreciated"))
 	return telegram.EndGroup
 }
 

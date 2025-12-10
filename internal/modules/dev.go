@@ -270,7 +270,7 @@ func performEval(code string, m *telegram.NewMessage, imports []string) (string,
 	}
 	ass, aErr := core.Assistants.First()
 	if aErr != nil {
-		return fmt.Sprintf("Failed to get assitant: %v", aErr), false
+		return fmt.Sprintf("Failed to get assistant: %v", aErr), false
 	}
 	code_file := fmt.Sprintf(boiler_code_for_eval, importStatement, m.ID, msg_b, snd_b, cnt_b, chn_b, cache_b, code, m.Client.ExportSession(), ass.Client.ExportSession())
 	tmp_dir := "tmp"

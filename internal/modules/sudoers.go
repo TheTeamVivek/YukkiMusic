@@ -67,7 +67,7 @@ func handleAddSudo(m *telegram.NewMessage) error {
 		return telegram.EndGroup
 	}
 
-	// Trying to add the assitant
+	// Trying to add the assistant
 	if ass, err := core.Assistants.ForChat(chatID); err == nil {
 		if targetID == ass.User.ID {
 			m.Reply(F(chatID, "sudo_assistant_self"))
