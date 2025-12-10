@@ -231,7 +231,7 @@ Each platform works independently but connects seamlessly through a **priority-b
       (simplify user extraction, bot checks, and errors)
 
 - [ ] Add automatic rtmp check in CharState && iml multi lang
-- [ ] Assitant restricted to send message but still able to join vc
+- [ ] Assistant restricted to send message but still able to join vc
 - [ ] Broadcast command
 - [ ] Refactor connect call
 ## 🤝 Contributing
