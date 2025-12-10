@@ -9,7 +9,7 @@ require (
 	github.com/raitonoberu/ytsearch v0.2.0
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/traefik/yaegi v0.16.1
-	go.mongodb.org/mongo-driver/v2 v2.4.0
+	go.mongodb.org/mongo-driver/v2 v2.4.1
 	golang.org/x/text v0.30.0
 )
 
