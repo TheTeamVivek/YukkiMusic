@@ -138,7 +138,6 @@ func (ctx *Context) handleUpdates() {
 
 	ctx.app.AddRawHandler(&tg.UpdateGroupCallParticipants{}, func(m tg.Update, c *tg.Client) error {
 		participantsUpdate := m.(*tg.UpdateGroupCallParticipants)
-
 		chatId, err := ctx.convertGroupCallId(
 			participantsUpdate.Call.(*tg.InputGroupCallObj).ID,
 		)
@@ -156,21 +155,28 @@ func (ctx *Context) handleUpdates() {
 			}
 		}
 
+		ctx.callSourcesMutex.Lock()
+		if ctx.callSources == nil {
+			ctx.callSources = make(map[int64]*types.CallSources)
+		}
+		if ctx.callSources[chatId] == nil {
+			ctx.callSources[chatId] = &types.CallSources{
+				CameraSources: make(map[int64]string),
+				ScreenSources: make(map[int64]string),
+			}
+		}
+
 		for _, participant := range participantsUpdate.Participants {
 			participantId := getParticipantId(participant.Peer)
 
 			if participant.Left {
 				delete(ctx.callParticipants[chatId].CallParticipants, participantId)
 
-				ctx.callSourcesMutex.Lock()
 				var oldCamera, oldScreen string
-				if ctx.callSources != nil && ctx.callSources[chatId] != nil {
-					oldCamera = ctx.callSources[chatId].CameraSources[participantId]
-					oldScreen = ctx.callSources[chatId].ScreenSources[participantId]
-					delete(ctx.callSources[chatId].CameraSources, participantId)
-					delete(ctx.callSources[chatId].ScreenSources, participantId)
-				}
-				ctx.callSourcesMutex.Unlock()
+				oldCamera = ctx.callSources[chatId].CameraSources[participantId]
+				oldScreen = ctx.callSources[chatId].ScreenSources[participantId]
+				delete(ctx.callSources[chatId].CameraSources, participantId)
+				delete(ctx.callSources[chatId].ScreenSources, participantId)
 
 				if oldCamera != "" || oldScreen != "" {
 					updates = append(updates, participantUpdate{
@@ -185,46 +191,42 @@ func (ctx *Context) handleUpdates() {
 
 			ctx.callParticipants[chatId].CallParticipants[participantId] = participant
 
-			ctx.callSourcesMutex.Lock()
-			if ctx.callSources != nil && ctx.callSources[chatId] != nil {
-				wasCamera := ctx.callSources[chatId].CameraSources[participantId] != ""
-				wasScreen := ctx.callSources[chatId].ScreenSources[participantId] != ""
-				hasCamera := participant.Video != nil
-				hasScreen := participant.Presentation != nil
+			wasCamera := ctx.callSources[chatId].CameraSources[participantId] != ""
+			wasScreen := ctx.callSources[chatId].ScreenSources[participantId] != ""
+			hasCamera := participant.Video != nil
+			hasScreen := participant.Presentation != nil
 
-				update := participantUpdate{
-					participantId: participantId,
-					participant:   participant,
-					wasCamera:     wasCamera,
-					wasScreen:     wasScreen,
-					hasCamera:     hasCamera,
-					hasScreen:     hasScreen,
-				}
-
-				if hasCamera && !wasCamera {
-					update.cameraEndpoint = participant.Video.Endpoint
-					update.cameraSourceGroups = participant.Video.SourceGroups
-					ctx.callSources[chatId].CameraSources[participantId] = participant.Video.Endpoint
-				} else if !hasCamera && wasCamera {
-					update.oldCameraEndpoint = ctx.callSources[chatId].CameraSources[participantId]
-					delete(ctx.callSources[chatId].CameraSources, participantId)
-				}
-
-				if hasScreen && !wasScreen {
-					update.screenEndpoint = participant.Presentation.Endpoint
-					update.screenSourceGroups = participant.Presentation.SourceGroups
-					ctx.callSources[chatId].ScreenSources[participantId] = participant.Presentation.Endpoint
-				} else if !hasScreen && wasScreen {
-					update.oldScreenEndpoint = ctx.callSources[chatId].ScreenSources[participantId]
-					delete(ctx.callSources[chatId].ScreenSources, participantId)
-				}
-
-				if update.cameraEndpoint != "" || update.screenEndpoint != "" ||
-					update.oldCameraEndpoint != "" || update.oldScreenEndpoint != "" {
-					updates = append(updates, update)
-				}
+			update := participantUpdate{
+				participantId: participantId,
+				participant:   participant,
+				wasCamera:     wasCamera,
+				wasScreen:     wasScreen,
+				hasCamera:     hasCamera,
+				hasScreen:     hasScreen,
 			}
-			ctx.callSourcesMutex.Unlock()
+
+			if hasCamera && !wasCamera {
+				update.cameraEndpoint = participant.Video.Endpoint
+				update.cameraSourceGroups = participant.Video.SourceGroups
+				ctx.callSources[chatId].CameraSources[participantId] = participant.Video.Endpoint
+			} else if !hasCamera && wasCamera {
+				update.oldCameraEndpoint = ctx.callSources[chatId].CameraSources[participantId]
+				delete(ctx.callSources[chatId].CameraSources, participantId)
+			}
+
+			if hasScreen && !wasScreen {
+				update.screenEndpoint = participant.Presentation.Endpoint
+				update.screenSourceGroups = participant.Presentation.SourceGroups
+				ctx.callSources[chatId].ScreenSources[participantId] = participant.Presentation.Endpoint
+			} else if !hasScreen && wasScreen {
+				update.oldScreenEndpoint = ctx.callSources[chatId].ScreenSources[participantId]
+				delete(ctx.callSources[chatId].ScreenSources, participantId)
+			}
+
+			if update.cameraEndpoint != "" || update.screenEndpoint != "" ||
+				update.oldCameraEndpoint != "" || update.oldScreenEndpoint != "" {
+				updates = append(updates, update)
+			}
 
 			if participantId == ctx.self.ID {
 				selfUpdate = participant
@@ -232,6 +234,7 @@ func (ctx *Context) handleUpdates() {
 		}
 
 		ctx.callParticipants[chatId].LastMtprotoUpdate = time.Now()
+		ctx.callSourcesMutex.Unlock()
 		ctx.participantsMutex.Unlock()
 
 		for _, update := range updates {
@@ -270,7 +273,7 @@ func (ctx *Context) handleUpdates() {
 				ctx.pendingConnectionsMutex.RUnlock()
 
 				if pending != nil {
-					go ctx.connectCall(chatId, pending.MediaDescription, pending.Payload)
+					ctx.connectCall(chatId, pending.MediaDescription, pending.Payload)
 				}
 
 			} else if !selfUpdate.CanSelfUnmute {

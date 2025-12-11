@@ -11,9 +11,7 @@ import (
 func (ctx *Context) joinPresentation(chatId int64, join bool) error {
 	defer func() {
 		ctx.waitConnectMutex.Lock()
-		if ctx.waitConnect[chatId] != nil {
-			delete(ctx.waitConnect, chatId)
-		}
+		delete(ctx.waitConnect, chatId)
 		ctx.waitConnectMutex.Unlock()
 	}()
 
@@ -28,82 +26,98 @@ func (ctx *Context) joinPresentation(chatId int64, join bool) error {
 			ctx.pendingConnections[chatId].Presentation = join
 		}
 		ctx.pendingConnectionsMutex.Unlock()
-	} else if connectionMode == ntgcalls.RtcConnection {
-		if join {
-			ctx.presentationsMutex.Lock()
-			alreadyPresenting := slices.Contains(ctx.presentations, chatId)
-			ctx.presentationsMutex.Unlock()
+		return nil
+	}
 
-			if !alreadyPresenting {
-				ctx.waitConnectMutex.Lock()
-				ctx.waitConnect[chatId] = make(chan error)
-				waitChan := ctx.waitConnect[chatId]
-				ctx.waitConnectMutex.Unlock()
+	if connectionMode != ntgcalls.RtcConnection {
+		return nil
+	}
 
-				jsonParams, err := ctx.binding.InitPresentation(chatId)
-				if err != nil {
-					return err
-				}
+	if join {
+		ctx.presentationsMutex.Lock()
+		alreadyPresenting := slices.Contains(ctx.presentations, chatId)
+		ctx.presentationsMutex.Unlock()
 
-				ctx.inputGroupCallsMutex.RLock()
-				inputGroupCall := ctx.inputGroupCalls[chatId]
-				ctx.inputGroupCallsMutex.RUnlock()
+		if alreadyPresenting {
+			return nil
+		}
 
-				resultParams := "{\"transport\": null}"
-				callResRaw, err := ctx.app.PhoneJoinGroupCallPresentation(
-					inputGroupCall,
-					&tg.DataJson{
-						Data: jsonParams,
-					},
-				)
-				if err != nil {
-					return err
-				}
-				callRes := callResRaw.(*tg.UpdatesObj)
-				for _, u := range callRes.Updates {
-					switch update := u.(type) {
-					case *tg.UpdateGroupCallConnection:
-						resultParams = update.Params.Data
-					}
-				}
-				err = ctx.binding.Connect(
-					chatId,
-					resultParams,
-					true,
-				)
-				if err != nil {
-					return err
-				}
-				<-waitChan
+		ctx.waitConnectMutex.Lock()
+		waitChan := make(chan error, 1)
+		ctx.waitConnect[chatId] = waitChan
+		ctx.waitConnectMutex.Unlock()
 
-				ctx.presentationsMutex.Lock()
-				ctx.presentations = append(ctx.presentations, chatId)
-				ctx.presentationsMutex.Unlock()
-			}
-		} else {
-			ctx.presentationsMutex.Lock()
-			isPresenting := slices.Contains(ctx.presentations, chatId)
-			if isPresenting {
-				ctx.presentations = stdRemove(ctx.presentations, chatId)
-			}
-			ctx.presentationsMutex.Unlock()
+		jsonParams, err := ctx.binding.InitPresentation(chatId)
+		if err != nil {
+			return err
+		}
 
-			if isPresenting {
-				err = ctx.binding.StopPresentation(chatId)
-				if err != nil {
-					return err
-				}
+		ctx.inputGroupCallsMutex.RLock()
+		inputGroupCall := ctx.inputGroupCalls[chatId]
+		ctx.inputGroupCallsMutex.RUnlock()
 
-				ctx.inputGroupCallsMutex.RLock()
-				inputGroupCall := ctx.inputGroupCalls[chatId]
-				ctx.inputGroupCallsMutex.RUnlock()
+		resultParams := "{\"transport\": null}"
+		callResRaw, err := ctx.app.PhoneJoinGroupCallPresentation(
+			inputGroupCall,
+			&tg.DataJson{
+				Data: jsonParams,
+			},
+		)
+		if err != nil {
+			return err
+		}
 
-				_, err = ctx.app.PhoneLeaveGroupCallPresentation(inputGroupCall)
-				if err != nil {
-					return err
-				}
+		callRes := callResRaw.(*tg.UpdatesObj)
+		for _, u := range callRes.Updates {
+			switch update := u.(type) {
+			case *tg.UpdateGroupCallConnection:
+				resultParams = update.Params.Data
 			}
 		}
+
+		err = ctx.binding.Connect(chatId, resultParams, true)
+		if err != nil {
+			return err
+		}
+
+		select {
+		case err = <-waitChan:
+			if err != nil {
+				return err
+			}
+		}
+
+		ctx.presentationsMutex.Lock()
+		ctx.presentations = append(ctx.presentations, chatId)
+		ctx.presentationsMutex.Unlock()
+
+	} else {
+		// Leave presentation
+		ctx.presentationsMutex.Lock()
+		isPresenting := slices.Contains(ctx.presentations, chatId)
+		if isPresenting {
+			ctx.presentations = stdRemove(ctx.presentations, chatId)
+		}
+		ctx.presentationsMutex.Unlock()
+
+		if !isPresenting {
+			return nil
+		}
+
+		err = ctx.binding.StopPresentation(chatId)
+		if err != nil {
+			return err
+		}
+
+		ctx.inputGroupCallsMutex.RLock()
+		inputGroupCall := ctx.inputGroupCalls[chatId]
+		ctx.inputGroupCallsMutex.RUnlock()
+
+		_, err = ctx.app.PhoneLeaveGroupCallPresentation(inputGroupCall)
+		if err != nil {
+			return err
+		}
 	}
+
 	return nil
 }

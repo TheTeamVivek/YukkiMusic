@@ -132,9 +132,11 @@ func handleStreamEnd(_ C.uintptr_t, chatID C.int64_t, streamType C.ntg_stream_ty
 	} else {
 		goStreamType = VideoStream
 	}
+	goStreamDevice := parseStreamDevice(streamDevice)
 
-	for _, callback := range self.streamEndCallbacks {
-		go callback(goChatID, goStreamType, parseStreamDevice(streamDevice))
+	callbacks := self.getStreamEndCallbacks()
+	for _, callback := range callbacks {
+		go callback(goChatID, goStreamType, goStreamDevice)
 	}
 }
 
@@ -153,7 +155,8 @@ func handleUpgrade(_ C.uintptr_t, chatID C.int64_t, state C.ntg_media_state_stru
 		PresentationPaused: bool(state.presentationPaused),
 	}
 
-	for _, callback := range self.upgradeCallbacks {
+	callbacks := self.getUpgradeCallbacks()
+	for _, callback := range callbacks {
 		go callback(goChatID, goState)
 	}
 }
@@ -166,9 +169,13 @@ func handleSignal(_ C.uintptr_t, chatID C.int64_t, data *C.uint8_t, size C.int, 
 	}
 
 	goChatID := int64(chatID)
+	goData := C.GoBytes(unsafe.Pointer(data), size)
 
-	for _, callback := range self.signalCallbacks {
-		go callback(goChatID, C.GoBytes(unsafe.Pointer(data), size))
+	callbacks := self.getSignalCallbacks()
+	for _, callback := range callbacks {
+		dataCopy := make([]byte, len(goData))
+		copy(dataCopy, goData)
+		go callback(goChatID, dataCopy)
 	}
 }
 
@@ -189,7 +196,8 @@ func handleConnectionChange(_ C.uintptr_t, chatID C.int64_t, networkInfo C.ntg_n
 	}
 	goCallState.State = parseConnectionState(networkInfo.state)
 
-	for _, callback := range self.connectionChangeCallbacks {
+	callbacks := self.getConnectionChangeCallbacks()
+	for _, callback := range callbacks {
 		go callback(goChatID, goCallState)
 	}
 }
@@ -209,13 +217,17 @@ func handleFrames(_ C.uintptr_t, chatID C.int64_t, streamMode C.ntg_stream_mode_
 	case C.NTG_STREAM_PLAYBACK:
 		goStreamMode = PlaybackStream
 	}
+	goStreamDevice := parseStreamDevice(streamDevice)
 
 	rawFrames := make([]Frame, size)
 	for i := 0; i < int(size); i++ {
 		rawFrame := *(*C.ntg_frame_struct)(unsafe.Pointer(uintptr(unsafe.Pointer(frames)) + uintptr(i)*unsafe.Sizeof(C.ntg_frame_struct{})))
+
+		frameData := C.GoBytes(unsafe.Pointer(rawFrame.data), rawFrame.sizeData)
+
 		rawFrames[i] = Frame{
 			Ssrc: uint32(rawFrame.ssrc),
-			Data: C.GoBytes(unsafe.Pointer(rawFrame.data), rawFrame.sizeData),
+			Data: frameData,
 			FrameData: FrameData{
 				AbsoluteCaptureTimestampMs: int64(rawFrame.frameData.absoluteCaptureTimestampMs),
 				Width:                      uint16(rawFrame.frameData.width),
@@ -225,8 +237,11 @@ func handleFrames(_ C.uintptr_t, chatID C.int64_t, streamMode C.ntg_stream_mode_
 		}
 	}
 
-	for _, callback := range self.frameCallbacks {
-		go callback(goChatID, goStreamMode, parseStreamDevice(streamDevice), rawFrames)
+	callbacks := self.getFrameCallbacks()
+	for _, callback := range callbacks {
+		framesCopy := make([]Frame, len(rawFrames))
+		copy(framesCopy, rawFrames)
+		go callback(goChatID, goStreamMode, goStreamDevice, framesCopy)
 	}
 }
 
@@ -244,7 +259,8 @@ func handleRemoteSourceChange(_ C.uintptr_t, chatID C.int64_t, remoteSource C.nt
 		Device: parseStreamDevice(remoteSource.device),
 	}
 
-	for _, callback := range self.remoteSourceCallbacks {
+	callbacks := self.getRemoteSourceCallbacks()
+	for _, callback := range callbacks {
 		go callback(goChatID, goRemoteSource)
 	}
 }
@@ -257,7 +273,8 @@ func handleRequestBroadcastTimestamp(_ C.uintptr_t, chatID C.int64_t, userData u
 	}
 
 	goChatID := int64(chatID)
-	for _, callback := range self.broadcastTimestampCallbacks {
+	callbacks := self.getBroadcastTimestampCallbacks()
+	for _, callback := range callbacks {
 		go callback(goChatID)
 	}
 }
@@ -292,41 +309,10 @@ func handleRequestBroadcastPart(_ C.uintptr_t, chatID C.int64_t, segmentPartRequ
 		Quality:       goSegmentQuality,
 	}
 
-	for _, callback := range self.broadcastPartCallbacks {
+	callbacks := self.getBroadcastPartCallbacks()
+	for _, callback := range callbacks {
 		go callback(goChatID, goSegmentPartRequest)
 	}
-}
-
-func (ctx *Client) OnStreamEnd(callback StreamEndCallback) {
-	ctx.streamEndCallbacks = append(ctx.streamEndCallbacks, callback)
-}
-
-func (ctx *Client) OnUpgrade(callback UpgradeCallback) {
-	ctx.upgradeCallbacks = append(ctx.upgradeCallbacks, callback)
-}
-
-func (ctx *Client) OnConnectionChange(callback ConnectionChangeCallback) {
-	ctx.connectionChangeCallbacks = append(ctx.connectionChangeCallbacks, callback)
-}
-
-func (ctx *Client) OnSignal(callback SignalCallback) {
-	ctx.signalCallbacks = append(ctx.signalCallbacks, callback)
-}
-
-func (ctx *Client) OnFrame(callback FrameCallback) {
-	ctx.frameCallbacks = append(ctx.frameCallbacks, callback)
-}
-
-func (ctx *Client) OnRemoteSourceChange(callback RemoteSourceCallback) {
-	ctx.remoteSourceCallbacks = append(ctx.remoteSourceCallbacks, callback)
-}
-
-func (ctx *Client) OnRequestBroadcastTimestamp(callback BroadcastTimestampCallback) {
-	ctx.broadcastTimestampCallbacks = append(ctx.broadcastTimestampCallbacks, callback)
-}
-
-func (ctx *Client) OnRequestBroadcastPart(callback BroadcastPartCallback) {
-	ctx.broadcastPartCallbacks = append(ctx.broadcastPartCallbacks, callback)
 }
 
 func (ctx *Client) GetState(chatId int64) (MediaState, error) {
@@ -649,6 +635,8 @@ func getClientFromUserData(userData unsafe.Pointer) *Client {
 	ptr := uintptr(userData)
 
 	clientRegistry.RLock()
-	defer clientRegistry.RUnlock()
-	return clientRegistry.clients[ptr]
+	client := clientRegistry.clients[ptr]
+	clientRegistry.RUnlock()
+
+	return client
 }

@@ -11,63 +11,78 @@ import (
 )
 
 func (ctx *Context) connectCall(chatId int64, mediaDescription ntgcalls.MediaDescription, jsonParams string) error {
+	// Create wait channel and ensure cleanup
+	ctx.waitConnectMutex.Lock()
+	waitChan := make(chan error, 1) // Buffered to prevent goroutine leak
+	ctx.waitConnect[chatId] = waitChan
+	ctx.waitConnectMutex.Unlock()
+
 	defer func() {
 		ctx.waitConnectMutex.Lock()
-		if ctx.waitConnect[chatId] != nil {
-			delete(ctx.waitConnect, chatId)
-		}
+		delete(ctx.waitConnect, chatId)
 		ctx.waitConnectMutex.Unlock()
 	}()
 
-	ctx.waitConnectMutex.Lock()
-	ctx.waitConnect[chatId] = make(chan error)
-	waitChan := ctx.waitConnect[chatId]
-	ctx.waitConnectMutex.Unlock()
+	// Helper to signal error and return
+	signalError := func(err error) error {
+		select {
+		case waitChan <- err:
+		default:
+		}
+		return err
+	}
 
 	if chatId >= 0 {
+		// P2P call handling
 		defer func() {
 			ctx.p2pConfigsMutex.Lock()
-			if ctx.p2pConfigs[chatId] != nil {
-				delete(ctx.p2pConfigs, chatId)
-			}
+			delete(ctx.p2pConfigs, chatId)
 			ctx.p2pConfigsMutex.Unlock()
 		}()
 
+		// Get or create P2P config
 		ctx.p2pConfigsMutex.Lock()
-		if ctx.p2pConfigs[chatId] == nil {
-			ctx.p2pConfigsMutex.Unlock()
-			p2pConfigs, err := ctx.getP2PConfigs(nil)
-			if err != nil {
-				return err
-			}
-			ctx.p2pConfigsMutex.Lock()
-			ctx.p2pConfigs[chatId] = p2pConfigs
-		}
 		p2pConfig := ctx.p2pConfigs[chatId]
 		ctx.p2pConfigsMutex.Unlock()
 
+		if p2pConfig == nil {
+			var err error
+			p2pConfig, err = ctx.getP2PConfigs(nil)
+			if err != nil {
+				return signalError(err)
+			}
+			ctx.p2pConfigsMutex.Lock()
+			ctx.p2pConfigs[chatId] = p2pConfig
+			ctx.p2pConfigsMutex.Unlock()
+		}
+
 		err := ctx.binding.CreateP2PCall(chatId)
 		if err != nil {
-			return err
+			return signalError(err)
 		}
 
 		err = ctx.binding.SetStreamSources(chatId, ntgcalls.CaptureStream, mediaDescription)
 		if err != nil {
-			return err
+			return signalError(err)
 		}
 
 		ctx.p2pConfigsMutex.Lock()
-
-		p2pConfig.GAorB, err = ctx.binding.InitExchange(chatId, ntgcalls.DhConfig{
+		dhConfig := ntgcalls.DhConfig{
 			G:      p2pConfig.DhConfig.G,
 			P:      p2pConfig.DhConfig.P,
 			Random: p2pConfig.DhConfig.Random,
-		}, p2pConfig.GAorB)
+		}
+		gaOrB := p2pConfig.GAorB
 		ctx.p2pConfigsMutex.Unlock()
 
+		newGAorB, err := ctx.binding.InitExchange(chatId, dhConfig, gaOrB)
 		if err != nil {
-			return err
+			return signalError(err)
 		}
+
+		ctx.p2pConfigsMutex.Lock()
+		p2pConfig.GAorB = newGAorB
+		ctx.p2pConfigsMutex.Unlock()
 
 		protocolRaw := ntgcalls.GetProtocol()
 		protocol := &tg.PhoneCallProtocol{
@@ -80,58 +95,66 @@ func (ctx *Context) connectCall(chatId int64, mediaDescription ntgcalls.MediaDes
 
 		userId, err := ctx.app.GetSendableUser(chatId)
 		if err != nil {
-			return err
+			return signalError(err)
 		}
+
 		ctx.inputCallsMutex.RLock()
 		inputCall := ctx.inputCalls[chatId]
 		ctx.inputCallsMutex.RUnlock()
 
-		if p2pConfig.IsOutgoing {
+		ctx.p2pConfigsMutex.RLock()
+		isOutgoing := p2pConfig.IsOutgoing
+		gaOrBHash := p2pConfig.GAorB
+		ctx.p2pConfigsMutex.RUnlock()
+
+		if isOutgoing {
 			_, err = ctx.app.PhoneRequestCall(
 				&tg.PhoneRequestCallParams{
 					Protocol: protocol,
 					UserID:   userId,
-					GAHash:   p2pConfig.GAorB,
+					GAHash:   gaOrBHash,
 					RandomID: int32(tg.GenRandInt()),
 					Video:    mediaDescription.Camera != nil || mediaDescription.Screen != nil,
 				},
 			)
 			if err != nil {
-				return err
+				return signalError(err)
 			}
 		} else {
 			_, err = ctx.app.PhoneAcceptCall(
 				inputCall,
-				p2pConfig.GAorB,
+				gaOrBHash,
 				protocol,
 			)
 			if err != nil {
-				return err
+				return signalError(err)
 			}
 		}
+
 		select {
 		case err = <-p2pConfig.WaitData:
 			if err != nil {
-				return err
+				return signalError(err)
 			}
 		case <-time.After(10 * time.Second):
-			return fmt.Errorf("timed out waiting for an answer")
+			return signalError(fmt.Errorf("timed out waiting for an answer"))
 		}
+
 		ctx.p2pConfigsMutex.RLock()
-		gaOrB := p2pConfig.GAorB
+		gaOrB = p2pConfig.GAorB
 		fingerprint := p2pConfig.KeyFingerprint
 		ctx.p2pConfigsMutex.RUnlock()
 
-		res, err := ctx.binding.ExchangeKeys(
-			chatId,
-			gaOrB,
-			fingerprint,
-		)
+		res, err := ctx.binding.ExchangeKeys(chatId, gaOrB, fingerprint)
 		if err != nil {
-			return err
+			return signalError(err)
 		}
 
-		if p2pConfig.IsOutgoing {
+		ctx.p2pConfigsMutex.RLock()
+		isOutgoing = p2pConfig.IsOutgoing
+		ctx.p2pConfigsMutex.RUnlock()
+
+		if isOutgoing {
 			confirmRes, err := ctx.app.PhoneConfirmCall(
 				inputCall,
 				res.GAOrB,
@@ -139,7 +162,7 @@ func (ctx *Context) connectCall(chatId int64, mediaDescription ntgcalls.MediaDes
 				protocol,
 			)
 			if err != nil {
-				return err
+				return signalError(err)
 			}
 			ctx.p2pConfigsMutex.Lock()
 			p2pConfig.PhoneCall = confirmRes.PhoneCall.(*tg.PhoneCallObj)
@@ -157,27 +180,28 @@ func (ctx *Context) connectCall(chatId int64, mediaDescription ntgcalls.MediaDes
 			phoneCall.P2PAllowed,
 		)
 		if err != nil {
-			return err
+			return signalError(err)
 		}
 
 	} else {
+		// Group call handling
 		var err error
 		jsonParams, err = ctx.binding.CreateCall(chatId)
 		if err != nil {
 			ctx.binding.Stop(chatId)
-			return err
+			return signalError(err)
 		}
 
 		err = ctx.binding.SetStreamSources(chatId, ntgcalls.CaptureStream, mediaDescription)
 		if err != nil {
 			ctx.binding.Stop(chatId)
-			return err
+			return signalError(err)
 		}
 
 		inputGroupCall, err := ctx.GetInputGroupCall(chatId)
 		if err != nil {
 			ctx.binding.Stop(chatId)
-			return err
+			return signalError(err)
 		}
 
 		resultParams := "{\"transport\": null}"
@@ -196,8 +220,10 @@ func (ctx *Context) connectCall(chatId int64, mediaDescription ntgcalls.MediaDes
 			},
 		)
 		if err != nil {
-			return err
+			ctx.binding.Stop(chatId)
+			return signalError(err)
 		}
+
 		callRes := callResRaw.(*tg.UpdatesObj)
 		for _, u := range callRes.Updates {
 			switch update := u.(type) {
@@ -206,18 +232,14 @@ func (ctx *Context) connectCall(chatId int64, mediaDescription ntgcalls.MediaDes
 			}
 		}
 
-		err = ctx.binding.Connect(
-			chatId,
-			resultParams,
-			false,
-		)
+		err = ctx.binding.Connect(chatId, resultParams, false)
 		if err != nil {
-			return err
+			return signalError(err)
 		}
 
 		connectionMode, err := ctx.binding.GetConnectionMode(chatId)
 		if err != nil {
-			return err
+			return signalError(err)
 		}
 
 		if connectionMode == ntgcalls.StreamConnection && len(jsonParams) > 0 {
@@ -229,5 +251,6 @@ func (ctx *Context) connectCall(chatId int64, mediaDescription ntgcalls.MediaDes
 			ctx.pendingConnectionsMutex.Unlock()
 		}
 	}
+
 	return <-waitChan
 }

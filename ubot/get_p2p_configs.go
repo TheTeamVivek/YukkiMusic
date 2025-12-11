@@ -16,6 +16,6 @@ func (ctx *Context) getP2PConfigs(GAorB []byte) (*types.P2PConfig, error) {
 		DhConfig:   dhConfig,
 		IsOutgoing: GAorB == nil,
 		GAorB:      GAorB,
-		WaitData:   make(chan error),
+		WaitData:   make(chan error, 1),
 	}, nil
 }
