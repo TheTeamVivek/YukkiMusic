@@ -9,7 +9,6 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/ntgcalls"
-	"main/ubot/types"
 )
 
 type participantUpdate struct {
@@ -150,17 +149,17 @@ func (ctx *Context) handleUpdates() {
 
 		ctx.participantsMutex.Lock()
 		if ctx.callParticipants[chatId] == nil {
-			ctx.callParticipants[chatId] = &types.CallParticipantsCache{
+			ctx.callParticipants[chatId] = &CallParticipantsCache{
 				CallParticipants: make(map[int64]*tg.GroupCallParticipant),
 			}
 		}
 
 		ctx.callSourcesMutex.Lock()
 		if ctx.callSources == nil {
-			ctx.callSources = make(map[int64]*types.CallSources)
+			ctx.callSources = make(map[int64]*CallSources)
 		}
 		if ctx.callSources[chatId] == nil {
-			ctx.callSources[chatId] = &types.CallSources{
+			ctx.callSources[chatId] = &CallSources{
 				CameraSources: make(map[int64]string),
 				ScreenSources: make(map[int64]string),
 			}

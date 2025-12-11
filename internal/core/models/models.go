@@ -46,10 +46,4 @@ type (
 		Download(ctx context.Context, track *Track, mystic *telegram.NewMessage) (string, error)
 		IsDownloadSupported(source PlatformName) bool
 	}
-
-	PlayOpts struct {
-		Force bool
-		CPlay bool
-		Video bool
-	}
 )

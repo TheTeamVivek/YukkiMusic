@@ -34,7 +34,7 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"
-	"main/internal/state"
+	"main/internal/core/models"
 	"main/internal/utils"
 )
 

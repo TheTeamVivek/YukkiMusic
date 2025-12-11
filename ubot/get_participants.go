@@ -6,15 +6,13 @@ import (
 	"time"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
-
-	"main/ubot/types"
 )
 
 func (ctx *Context) GetParticipants(chatId int64) ([]*tg.GroupCallParticipant, error) {
 	ctx.participantsMutex.Lock()
 	defer ctx.participantsMutex.Unlock()
 	if ctx.callParticipants[chatId] == nil {
-		ctx.callParticipants[chatId] = &types.CallParticipantsCache{
+		ctx.callParticipants[chatId] = &CallParticipantsCache{
 			CallParticipants: make(map[int64]*tg.GroupCallParticipant),
 		}
 	}

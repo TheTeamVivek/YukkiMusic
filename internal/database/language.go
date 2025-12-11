@@ -19,7 +19,7 @@
  */
 package database
 
-import "main/config"
+import "main/internal/config"
 
 func GetChatLanguage(chatID int64) (string, error) {
 	ctx, cancel := mongoCtx()

@@ -7,7 +7,6 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/ntgcalls"
-	"main/ubot/types"
 )
 
 type Context struct {
@@ -25,7 +24,7 @@ type Context struct {
 	pendingPresentation      map[int64]bool
 
 	p2pConfigsMutex sync.RWMutex
-	p2pConfigs      map[int64]*types.P2PConfig
+	p2pConfigs      map[int64]*P2PConfig
 
 	inputCallsMutex sync.RWMutex
 	inputCalls      map[int64]*tg.InputPhoneCall
@@ -34,13 +33,13 @@ type Context struct {
 	inputGroupCalls      map[int64]tg.InputGroupCall
 
 	participantsMutex sync.Mutex
-	callParticipants  map[int64]*types.CallParticipantsCache
+	callParticipants  map[int64]*CallParticipantsCache
 
 	pendingConnectionsMutex sync.RWMutex
-	pendingConnections      map[int64]*types.PendingConnection
+	pendingConnections      map[int64]*PendingConnection
 
 	callSourcesMutex sync.RWMutex
-	callSources      map[int64]*types.CallSources
+	callSources      map[int64]*CallSources
 
 	waitConnectMutex sync.RWMutex
 	waitConnect      map[int64]chan error
@@ -57,12 +56,12 @@ func NewContext(app *tg.Client) *Context {
 		app:     app,
 
 		pendingPresentation: make(map[int64]bool),
-		p2pConfigs:          make(map[int64]*types.P2PConfig),
+		p2pConfigs:          make(map[int64]*P2PConfig),
 		inputCalls:          make(map[int64]*tg.InputPhoneCall),
 		inputGroupCalls:     make(map[int64]tg.InputGroupCall),
-		pendingConnections:  make(map[int64]*types.PendingConnection),
-		callParticipants:    make(map[int64]*types.CallParticipantsCache),
-		callSources:         make(map[int64]*types.CallSources),
+		pendingConnections:  make(map[int64]*PendingConnection),
+		callParticipants:    make(map[int64]*CallParticipantsCache),
+		callSources:         make(map[int64]*CallSources),
 		waitConnect:         make(map[int64]chan error),
 	}
 	if app.IsConnected() {

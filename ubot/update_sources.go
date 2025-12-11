@@ -4,8 +4,6 @@ import (
 	"slices"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
-
-	"main/ubot/types"
 )
 
 type videoToAdd struct {
@@ -26,7 +24,7 @@ func (ctx *Context) updateSources(chatId int64) error {
 
 	ctx.callSourcesMutex.Lock()
 	if ctx.callSources[chatId] == nil {
-		ctx.callSources[chatId] = &types.CallSources{
+		ctx.callSources[chatId] = &CallSources{
 			CameraSources: make(map[int64]string),
 			ScreenSources: make(map[int64]string),
 		}

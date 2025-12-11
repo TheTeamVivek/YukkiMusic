@@ -31,8 +31,8 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
-	"main/internal/state"
+	"main/internal/config"
+	"main/internal/core/models"
 	"main/internal/utils"
 )
 

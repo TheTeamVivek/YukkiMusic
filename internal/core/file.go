@@ -25,7 +25,7 @@ import (
 
 	"github.com/Laky-64/gologging"
 
-	"main/internal/state"
+	"main/internal/core/models"
 )
 
 // check if a track is used in any room (other than the given room)

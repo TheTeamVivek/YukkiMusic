@@ -32,15 +32,20 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
+	"main/internal/config"
 	"main/internal/core"
 	"main/internal/database"
 	"main/internal/locales"
 	"main/internal/platforms"
-	"main/internal/state"
+	"main/internal/core/models"
 	"main/internal/utils"
 )
-
+type playOpts struct {
+		Force bool
+		CPlay bool
+		Video bool
+	}
+	
 const playMaxRetries = 3
 
 func channelPlayHandler(m *telegram.NewMessage) error {
@@ -49,31 +54,31 @@ func channelPlayHandler(m *telegram.NewMessage) error {
 }
 
 func playHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.PlayOpts{})
+	return handlePlay(m, &state.playOpts{})
 }
 
 func fplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.PlayOpts{Force: true})
+	return handlePlay(m, &state.playOpts{Force: true})
 }
 
 func cfplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.PlayOpts{Force: true, CPlay: true})
+	return handlePlay(m, &state.playOpts{Force: true, CPlay: true})
 }
 
 func vplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.PlayOpts{Video: true})
+	return handlePlay(m, &state.playOpts{Video: true})
 }
 
 func fvplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.PlayOpts{Force: true, Video: true})
+	return handlePlay(m, &state.playOpts{Force: true, Video: true})
 }
 
 func vcplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.PlayOpts{CPlay: true, Video: true})
+	return handlePlay(m, &state.playOpts{CPlay: true, Video: true})
 }
 
 func fvcplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.PlayOpts{Force: true, CPlay: true, Video: true})
+	return handlePlay(m, &state.playOpts{Force: true, CPlay: true, Video: true})
 }
 
 func cplayHandler(m *telegram.NewMessage) error {
@@ -153,10 +158,10 @@ func cplayHandler(m *telegram.NewMessage) error {
 		)
 		return telegram.EndGroup
 	}
-	return handlePlay(m, &state.PlayOpts{CPlay: true})
+	return handlePlay(m, &state.playOpts{CPlay: true})
 }
 
-func handlePlay(m *telegram.NewMessage, opts *state.PlayOpts) error {
+func handlePlay(m *telegram.NewMessage, opts *state.playOpts) error {
 	mention := utils.MentionHTML(m.Sender)
 
 	r, replyMsg, err := prepareRoomAndSearchMessage(m, opts.CPlay)

@@ -25,7 +25,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
+	"main/internal/config"
 	"main/internal/core"
 	"main/internal/database"
 	"main/ntgcalls"

@@ -24,7 +24,7 @@ import (
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
+	"main/internal/config"
 	"main/internal/utils"
 )
 

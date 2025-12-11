@@ -578,8 +578,8 @@ unmute_success: |
 # 🔊 Voice Chat Events
 voicechat_ended: "📴 Voice chat ended!\nAll queues cleared."
 voicechat_started: "📢 Voice chat started!\nUse /play <song> to play music."
-# Commands help
 
+# Commands help
 help_owner: |
   👑 <b>Owner Commands</b>
   <i>Exclusive tools for managing sudoers, executing system code, and performing bot administration securely.</i>

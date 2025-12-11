@@ -7,7 +7,6 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/ntgcalls"
-	"main/ubot/types"
 )
 
 func (ctx *Context) connectCall(chatId int64, mediaDescription ntgcalls.MediaDescription, jsonParams string) error {
@@ -244,7 +243,7 @@ func (ctx *Context) connectCall(chatId int64, mediaDescription ntgcalls.MediaDes
 
 		if connectionMode == ntgcalls.StreamConnection && len(jsonParams) > 0 {
 			ctx.pendingConnectionsMutex.Lock()
-			ctx.pendingConnections[chatId] = &types.PendingConnection{
+			ctx.pendingConnections[chatId] = &PendingConnection{
 				MediaDescription: mediaDescription,
 				Payload:          jsonParams,
 			}
