@@ -25,8 +25,6 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 )
 
-func htmlEscape(s string) string { return html.EscapeString(s) }
-
 func maskKey(k string) string {
 	l := len(k)
 	if l <= 4 {
@@ -39,10 +37,11 @@ func maskKey(k string) string {
 }
 
 func setRTMPHandler(m *tg.NewMessage) error {
-	/*if !filterChannel(m) {
+	if !filterChannel(m) {
 		return tg.EndGroup
 	}
-
+	m.Reply("⚠️ This feature will be implemented soon as possible.")
+	/*
 	switch m.ChatType() {
 	case tg.EntityChat:
 		m.Reply("⚙️ This command works only in my DM.\n\n📩 Open private chat and send:\n/setrtmp [chat_id] [rtmp_url/rtmp_key]")
@@ -95,15 +94,15 @@ func setRTMPHandler(m *tg.NewMessage) error {
 		return tg.EndGroup
 	}
 	if err := database.SetRTMP(chatID, url, key); err != nil {
-		m.Reply("❌ Failed to save RTMP settings:\n" + htmlEscape(err.Error()))
+		m.Reply("❌ Failed to save RTMP settings:\n" + html.EscapeString(err.Error()))
 		return tg.EndGroup
 	}
 
 	m.Reply(
 		"✅ RTMP settings saved!\n\n" +
 			"🆔 Chat: " + utils.IntToStr(chatID) + "\n" +
-			"🔗 URL: " + htmlEscape(url) + "\n" +
-			"🔑 Key: " + htmlEscape(maskKey(key)),
+			"🔗 URL: " + html.EscapeString(url) + "\n" +
+			"🔑 Key: " + html.EscapeString(maskKey(key)),
 	)
 	*/
 	return tg.EndGroup
