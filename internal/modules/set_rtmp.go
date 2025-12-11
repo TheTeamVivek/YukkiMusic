@@ -20,8 +20,6 @@
 package modules
 
 import (
-	"html"
-
 	tg "github.com/amarnathcjd/gogram/telegram"
 )
 
@@ -42,68 +40,68 @@ func setRTMPHandler(m *tg.NewMessage) error {
 	}
 	m.Reply("⚠️ This feature will be implemented soon as possible.")
 	/*
-	switch m.ChatType() {
-	case tg.EntityChat:
-		m.Reply("⚙️ This command works only in my DM.\n\n📩 Open private chat and send:\n/setrtmp [chat_id] [rtmp_url/rtmp_key]")
-		return tg.EndGroup
+		switch m.ChatType() {
+		case tg.EntityChat:
+			m.Reply("⚙️ This command works only in my DM.\n\n📩 Open private chat and send:\n/setrtmp [chat_id] [rtmp_url/rtmp_key]")
+			return tg.EndGroup
 
-	case tg.EntityUser:
-	default:
-		return tg.EndGroup
-	}
+		case tg.EntityUser:
+		default:
+			return tg.EndGroup
+		}
 
-	args := strings.Fields(m.Text())
-	if len(args) < 3 {
-		m.Reply("<b>❗ Missing parameters.</b>\n\n" +
-			"<b>Use:</b> <i>/setrtmp [chat_id] [url+key]</i>\n\n" +
-			"<blockquote><b>📌 Example:</b>\n\n" +
-			"<b>URL:</b> <i>rtmps://dc5-1.rtmp.t.me/s/</i>\n" +
-			"<b>Key:</b> <i>2146211959:yJaXZGb7KXpRk9Nv2reFOA</i>\n\n" +
-			"<b>Format:</b> url + key.\n\n" +
-			"<i>/setrtmp -1001234567890 rtmps://dc5-1.rtmp.t.me/s/1234567890:abcdefghijkll</i></blockquote>",
+		args := strings.Fields(m.Text())
+		if len(args) < 3 {
+			m.Reply("<b>❗ Missing parameters.</b>\n\n" +
+				"<b>Use:</b> <i>/setrtmp [chat_id] [url+key]</i>\n\n" +
+				"<blockquote><b>📌 Example:</b>\n\n" +
+				"<b>URL:</b> <i>rtmps://dc5-1.rtmp.t.me/s/</i>\n" +
+				"<b>Key:</b> <i>2146211959:yJaXZGb7KXpRk9Nv2reFOA</i>\n\n" +
+				"<b>Format:</b> url + key.\n\n" +
+				"<i>/setrtmp -1001234567890 rtmps://dc5-1.rtmp.t.me/s/1234567890:abcdefghijkll</i></blockquote>",
+			)
+			return tg.EndGroup
+		}
+
+		cid := args[1]
+		raw := args[2]
+
+		idx := strings.LastIndex(raw, "/")
+		if idx <= 0 || idx == len(raw)-1 {
+			m.Reply("⚠️ Invalid RTMP format.")
+			return tg.EndGroup
+		}
+
+		url := raw[:idx]
+		key := raw[idx+1:]
+
+		if url == "" || key == "" {
+			m.Reply("⚠️ RTMP URL or key is empty.")
+			return tg.EndGroup
+		}
+		chatID, err := strconv.ParseInt(cid, 10, 64)
+		if err != nil {
+			m.Reply("⚠️ Invalid chat ID.\nPlease provide a valid numeric chat ID.\n\nExample:\n/setrtmp -1001234567890 url+key")
+			return tg.EndGroup
+		}
+		if ok, err := utils.IsChatAdmin(m.Client, chatID, m.SenderID()); err != nil {
+			m.Reply("⚠️ Unable to check chat details.\nMake sure:\n• I am an admin in that chat\n• The provided chat ID is valid")
+			return tg.EndGroup
+		} else if !ok {
+			m.Reply("⚠️ Only chat administrators can set the RTMP stream.")
+			return tg.EndGroup
+		}
+		if err := database.SetRTMP(chatID, url, key); err != nil {
+			m.Reply("❌ Failed to save RTMP settings:\n" + html.EscapeString(err.Error()))
+			return tg.EndGroup
+		}
+
+		m.Reply(
+			"✅ RTMP settings saved!\n\n" +
+				"🆔 Chat: " + utils.IntToStr(chatID) + "\n" +
+				"🔗 URL: " + html.EscapeString(url) + "\n" +
+				"🔑 Key: " + html.EscapeString(maskKey(key)),
 		)
-		return tg.EndGroup
-	}
-
-	cid := args[1]
-	raw := args[2]
-
-	idx := strings.LastIndex(raw, "/")
-	if idx <= 0 || idx == len(raw)-1 {
-		m.Reply("⚠️ Invalid RTMP format.")
-		return tg.EndGroup
-	}
-
-	url := raw[:idx]
-	key := raw[idx+1:]
-
-	if url == "" || key == "" {
-		m.Reply("⚠️ RTMP URL or key is empty.")
-		return tg.EndGroup
-	}
-	chatID, err := strconv.ParseInt(cid, 10, 64)
-	if err != nil {
-		m.Reply("⚠️ Invalid chat ID.\nPlease provide a valid numeric chat ID.\n\nExample:\n/setrtmp -1001234567890 url+key")
-		return tg.EndGroup
-	}
-	if ok, err := utils.IsChatAdmin(m.Client, chatID, m.SenderID()); err != nil {
-		m.Reply("⚠️ Unable to check chat details.\nMake sure:\n• I am an admin in that chat\n• The provided chat ID is valid")
-		return tg.EndGroup
-	} else if !ok {
-		m.Reply("⚠️ Only chat administrators can set the RTMP stream.")
-		return tg.EndGroup
-	}
-	if err := database.SetRTMP(chatID, url, key); err != nil {
-		m.Reply("❌ Failed to save RTMP settings:\n" + html.EscapeString(err.Error()))
-		return tg.EndGroup
-	}
-
-	m.Reply(
-		"✅ RTMP settings saved!\n\n" +
-			"🆔 Chat: " + utils.IntToStr(chatID) + "\n" +
-			"🔗 URL: " + html.EscapeString(url) + "\n" +
-			"🔑 Key: " + html.EscapeString(maskKey(key)),
-	)
 	*/
 	return tg.EndGroup
 }

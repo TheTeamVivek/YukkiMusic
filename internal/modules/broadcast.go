@@ -33,7 +33,6 @@ import (
 
 	"main/config"
 	"main/internal/database"
-	"main/internal/utils"
 )
 
 var (
@@ -41,31 +40,31 @@ var (
 	broadcastActive bool
 	broadcastCancel context.CancelFunc
 	broadcastCtx    context.Context
-	
+
 	defaultDelay = 1.5
 )
 
 type BroadcastStats struct {
-	TotalChats   int
-	TotalUsers   int
-	DoneChats    int
-	DoneUsers    int
-	FailedChats  []int64
-	FailedUsers  []int64
-	Delay        float64
-	StartTime    time.Time
-	LastUpdate   time.Time
-	mu           sync.Mutex
+	TotalChats  int
+	TotalUsers  int
+	DoneChats   int
+	DoneUsers   int
+	FailedChats []int64
+	FailedUsers []int64
+	Delay       float64
+	StartTime   time.Time
+	LastUpdate  time.Time
+	mu          sync.Mutex
 }
 
 type BroadcastFlags struct {
-	NoChat   bool
-	NoUser   bool
-	Copy     bool
-	Limit    int
-	Delay    float64
-	Pin      bool
-	PinLoud  bool
+	NoChat  bool
+	NoUser  bool
+	Copy    bool
+	Limit   int
+	Delay   float64
+	Pin     bool
+	PinLoud bool
 }
 
 func init() {
@@ -229,7 +228,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 
 	// Start progress updater in goroutine
 	go updateBroadcastProgress(broadcastCtx, progressMsg, stats)
-	
+
 	// Start broadcast in goroutine
 	go func() {
 		defer func() {
@@ -239,7 +238,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 			broadcastCancel = nil
 			broadcastMu.Unlock()
 		}()
-		
+
 		startBroadcast(broadcastCtx, m, progressMsg, flags, content, servedChats, servedUsers, stats)
 	}()
 
@@ -254,23 +253,23 @@ func parseBroadcastCommand(m *tg.NewMessage) (*BroadcastFlags, string, error) {
 	text := strings.TrimSpace(m.Text())
 	text = strings.TrimPrefix(text, m.GetCommand())
 	text = strings.TrimSpace(text)
-	
+
 	lines := strings.Split(text, "\n")
-	
+
 	firstLine := lines[0]
 	words := strings.Fields(firstLine)
-	
+
 	var contentWords []string
 	skipNext := false
-	
+
 	for i := 0; i < len(words); i++ {
 		if skipNext {
 			skipNext = false
 			continue
 		}
-		
+
 		word := strings.ToLower(words[i])
-		
+
 		switch word {
 		case "-nochat", "--nochat":
 			flags.NoChat = true
@@ -318,9 +317,9 @@ func parseBroadcastCommand(m *tg.NewMessage) (*BroadcastFlags, string, error) {
 			contentWords = append(contentWords, words[i])
 		}
 	}
-	
+
 	firstLineContent := strings.Join(contentWords, " ")
-	
+
 	var content string
 	if firstLineContent != "" {
 		content = firstLineContent
@@ -330,7 +329,7 @@ func parseBroadcastCommand(m *tg.NewMessage) (*BroadcastFlags, string, error) {
 	} else if len(lines) > 1 {
 		content = strings.Join(lines[1:], "\n")
 	}
-	
+
 	content = strings.TrimSpace(content)
 
 	return flags, content, nil
@@ -338,10 +337,10 @@ func parseBroadcastCommand(m *tg.NewMessage) (*BroadcastFlags, string, error) {
 
 func startBroadcast(
 	ctx context.Context,
-	m, progressMsg *tg.NewMessage, 
+	m, progressMsg *tg.NewMessage,
 	flags *BroadcastFlags,
-	content string, 
-	chats, users []int64, 
+	content string,
+	chats, users []int64,
 	stats *BroadcastStats,
 ) {
 	defer func() {
@@ -363,7 +362,7 @@ func startBroadcast(
 		}
 
 		success := sendBroadcastMessage(ctx, m, chatID, content, flags)
-		
+
 		stats.mu.Lock()
 		stats.DoneChats++
 		stats.LastUpdate = time.Now()
@@ -389,7 +388,7 @@ func startBroadcast(
 		}
 
 		success := sendBroadcastMessage(ctx, m, userID, content, flags)
-		
+
 		stats.mu.Lock()
 		stats.DoneUsers++
 		stats.LastUpdate = time.Now()
@@ -413,7 +412,7 @@ func sendBroadcastMessage(ctx context.Context, m *tg.NewMessage, targetID int64,
 		sentMsg *tg.NewMessage
 		err     error
 	)
-	
+
 	try := func() error {
 		if m.IsReply() {
 			fOpts := tg.ForwardOptions{}
@@ -437,14 +436,14 @@ func sendBroadcastMessage(ctx context.Context, m *tg.NewMessage, targetID int64,
 		sentMsg = sent
 		return nil
 	}
-	
+
 	maxAttempts := 3
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
 		err = try()
 		if err == nil {
 			break
 		}
-		
+
 		if wait := tg.GetFloodWait(err); wait > 0 {
 			gologging.ErrorF("FloodWait detected (%ds). Retrying (attempt %d).", wait, attempt)
 			if !sleepCtx(ctx, time.Duration(wait)*time.Second) {
@@ -455,7 +454,7 @@ func sendBroadcastMessage(ctx context.Context, m *tg.NewMessage, targetID int64,
 			break
 		}
 	}
-	
+
 	if err != nil {
 		if !tg.MatchError(err, "USER_IS_BLOCKED") &&
 			!tg.MatchError(err, "CHAT_WRITE_FORBIDDEN") &&
@@ -516,9 +515,9 @@ func finalizeBroadcast(progressMsg *tg.NewMessage, stats *BroadcastStats, cancel
 
 func formatBroadcastProgress(stats *BroadcastStats, final bool) string {
 	elapsed := time.Since(stats.StartTime)
-	
+
 	var sb strings.Builder
-	
+
 	if !final {
 		sb.WriteString("📡 <b>Broadcasting...</b>\n\n")
 	}
@@ -527,15 +526,15 @@ func formatBroadcastProgress(stats *BroadcastStats, final bool) string {
 	if stats.TotalChats > 0 {
 		chatProgress = float64(stats.DoneChats) / float64(stats.TotalChats) * 100
 	}
-	
+
 	userProgress := 0.0
 	if stats.TotalUsers > 0 {
 		userProgress = float64(stats.DoneUsers) / float64(stats.TotalUsers) * 100
 	}
 
-	sb.WriteString(fmt.Sprintf("📊 <b>Total Chats:</b> %d/%d (%.1f%%)\n", 
+	sb.WriteString(fmt.Sprintf("📊 <b>Total Chats:</b> %d/%d (%.1f%%)\n",
 		stats.DoneChats, stats.TotalChats, chatProgress))
-	sb.WriteString(fmt.Sprintf("👥 <b>Total Users:</b> %d/%d (%.1f%%)\n\n", 
+	sb.WriteString(fmt.Sprintf("👥 <b>Total Users:</b> %d/%d (%.1f%%)\n\n",
 		stats.DoneUsers, stats.TotalUsers, userProgress))
 
 	if len(stats.FailedChats) > 0 {
@@ -552,7 +551,7 @@ func formatBroadcastProgress(stats *BroadcastStats, final bool) string {
 	// Calculate speed and metrics
 	totalDone := stats.DoneChats + stats.DoneUsers
 	totalTargets := stats.TotalChats + stats.TotalUsers
-	
+
 	avgSpeed := 0.0
 	if elapsed.Seconds() > 0 && totalDone > 0 {
 		avgSpeed = float64(totalDone) / elapsed.Seconds()
@@ -572,13 +571,13 @@ func formatBroadcastProgress(stats *BroadcastStats, final bool) string {
 	if final {
 		totalSent := stats.DoneChats + stats.DoneUsers
 		totalFailed := len(stats.FailedChats) + len(stats.FailedUsers)
-		
+
 		successRate := 0.0
 		if totalTargets > 0 {
 			successRate = float64(totalSent-totalFailed) / float64(totalTargets) * 100
 		}
-		
-		sb.WriteString(fmt.Sprintf("\n\n✨ <b>Success Rate:</b> %.1f%% (%d/%d)", 
+
+		sb.WriteString(fmt.Sprintf("\n\n✨ <b>Success Rate:</b> %.1f%% (%d/%d)",
 			successRate, totalSent-totalFailed, totalTargets))
 	}
 
@@ -606,7 +605,7 @@ func handleBroadcastCancel(m *tg.NewMessage) error {
 	broadcastActive = false
 	broadcastCtx = nil
 	broadcastCancel = nil
-	
+
 	m.Reply("🚫 <b>Broadcast cancelled successfully.</b>")
 	return tg.EndGroup
 }
@@ -628,11 +627,11 @@ func broadcastCancelCB(cb *tg.CallbackQuery) error {
 	if broadcastCancel != nil {
 		broadcastCancel()
 	}
-	
+
 	broadcastActive = false
 	broadcastCtx = nil
 	broadcastCancel = nil
-	
+
 	cb.Answer("🚫 Broadcast cancelled.", &tg.CallbackOptions{Alert: true})
 	return tg.EndGroup
 }

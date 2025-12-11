@@ -55,7 +55,7 @@ var handlers = []MsgHandlerDef{
 	{Pattern: "(sudoers|listsudo|sudolist)", Handler: handleGetSudoers, Filters: []telegram.Filter{ignoreChannelFilter}},
 
 	{Pattern: "(speedtest|spt)", Handler: sptHandle, Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter}},
-	
+
 	{Pattern: "(broadcast|gcast|bcast)", Handler: broadcastHandler, Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter}},
 
 	{Pattern: "(ac|active|activevc|activevoice)", Handler: activeHandler, Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter}},
@@ -140,7 +140,7 @@ var cbHandlers = []CbHandlerDef{
 	{Pattern: "close", Handler: closeHandler},
 	{Pattern: "cancel", Handler: cancelHandler},
 	{Pattern: "broadcast:cancel", Handler: broadcastCancelCB},
-	
+
 	{Pattern: `^room:(\w+)$`, Handler: roomHandle},
 	{Pattern: "progress", Handler: emptyCBHandler},
 }
