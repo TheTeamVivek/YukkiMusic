@@ -54,6 +54,7 @@ type BroadcastStats struct {
 	Delay       float64
 	StartTime   time.Time
 	LastUpdate  time.Time
+	Finished    bool
 	mu          sync.Mutex
 }
 
@@ -231,6 +232,9 @@ func broadcastHandler(m *tg.NewMessage) error {
 	go func() {
 		defer func() {
 			broadcastMu.Lock()
+			if broadcastCancel != nil {
+				broadcastCancel()
+			}
 			broadcastActive = false
 			broadcastCtx = nil
 			broadcastCancel = nil
@@ -487,6 +491,10 @@ func updateBroadcastProgress(ctx context.Context, progressMsg *tg.NewMessage, st
 			return
 		case <-ticker.C:
 			stats.mu.Lock()
+			if stats.Finished {
+				stats.mu.Unlock()
+				return
+			}
 			text := formatBroadcastProgress(stats, false)
 			stats.mu.Unlock()
 
@@ -499,6 +507,7 @@ func updateBroadcastProgress(ctx context.Context, progressMsg *tg.NewMessage, st
 
 func finalizeBroadcast(progressMsg *tg.NewMessage, stats *BroadcastStats, cancelled bool) {
 	stats.mu.Lock()
+	stats.Finished = true
 	text := formatBroadcastProgress(stats, true)
 	stats.mu.Unlock()
 
