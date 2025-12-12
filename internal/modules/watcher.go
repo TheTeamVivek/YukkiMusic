@@ -247,9 +247,14 @@ func handleDeleteUserAction(m *telegram.NewMessage, chatID int64, action *telegr
 		"User removed from chatID " + utils.IntToStr(chatID) +
 			": " + utils.IntToStr(action.UserID),
 	)
-
-	if aErr == nil && action.UserID == assistant.User.ID {
-		core.Assistants.WithAssistant(chatID, func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) })
+				ass, aErr := core.Assistants.ForChat(id)
+  if err != nil {
+    gologging.ErrorF("Failed to get Assistant for %d: %v", id, err)
+    return telegram.EndGroup
+  }
+  
+	if aErr == nil && action.UserID == ass.User.ID {
+	  ass.Client.LeaveChannel(chatID)
 		core.DeleteRoom(chatID)
 		core.DeleteChatState(chatID)
 		database.DeleteServed(chatID)

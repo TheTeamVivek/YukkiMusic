@@ -102,7 +102,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 	if ass, err := core.Assistants.ForChat(chatID); err != nil {
     gologging.ErrorF("Failed to get Assistant for %d: %v", chatID, err)
     cb.Answer(fmt.Sprintf("Failed to get Assistant for %d: %v", chatID, err), opt)
-			return
+			return err
   } else {
 	r, ok = core.GetRoom(chatID, ass)
     

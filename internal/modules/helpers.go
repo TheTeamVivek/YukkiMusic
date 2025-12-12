@@ -54,6 +54,24 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	r, _ := core.GetRoom(cplayID, true)
 	return r, nil
 }
+func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
+	chatID := m.ChannelID()
+
+	if cplay {
+		cplayID, err := database.GetCPlayID(chatID)
+		if err != nil || cplayID == 0 {
+			return nil, errors.New(F(chatID, "cplay_id_not_set"))
+		}
+		chatID = cplayID
+	}
+				ass, err := core.Assistants.ForChat(id)
+  if err != nil {
+   return nil,  fmt.Errorf("Failed to get assistant for you chat: %w", err)
+  }
+	r, _ := core.GetRoom(chatID, ass, true)
+	return r, nil
+}
+
 
 func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 	if config.LoggerID == 0 || config.LoggerID == m.ChatID() || config.LoggerID == m.ChannelID() {
