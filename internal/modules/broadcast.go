@@ -87,14 +87,12 @@ func init() {
 
 • <code>-cancel</code> - Cancel a ongoing broadcast.
 </blockquote>
-
 <blockquote>
 <b>📌 Examples:</b>
 /broadcast -nochat -delay 2 Important announcement
 /broadcast -copy -nochat -pin [reply to message]
 /broadcast -limit 10 -delay 3 Limited broadcast
 </blockquote>
-
 <b>⚠️ Notes:</b>
 • Only the <b>owner</b> can use this command
 • After every 30 messages, there's an automatic 7.5s pause
