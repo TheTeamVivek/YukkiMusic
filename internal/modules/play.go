@@ -34,18 +34,19 @@ import (
 
 	"main/internal/config"
 	"main/internal/core"
+	state "main/internal/core/models"
 	"main/internal/database"
 	"main/internal/locales"
 	"main/internal/platforms"
-	"main/internal/core/models"
 	"main/internal/utils"
 )
+
 type playOpts struct {
-		Force bool
-		CPlay bool
-		Video bool
-	}
-	
+	Force bool
+	CPlay bool
+	Video bool
+}
+
 const playMaxRetries = 3
 
 func channelPlayHandler(m *telegram.NewMessage) error {

@@ -29,7 +29,7 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 	"resty.dev/v3"
 
-	"main/internal/core/models"
+	state "main/internal/core/models"
 )
 
 type (

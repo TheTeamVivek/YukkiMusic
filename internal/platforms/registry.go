@@ -23,7 +23,7 @@ import (
 	"sort"
 	"sync"
 
-	"main/internal/core/models"
+	state "main/internal/core/models"
 )
 
 type (

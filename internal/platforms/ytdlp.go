@@ -32,7 +32,7 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/cookies"
-	"main/internal/core/models"
+	state "main/internal/core/models"
 )
 
 const PlatformYtDlp state.PlatformName = "YtDlp"
