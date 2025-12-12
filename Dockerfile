@@ -12,7 +12,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY go.mod go.sum ./
-RUN go mod download
+RUN go mod tidy
 
 
 COPY setup_ntgcalls.sh ./
@@ -20,7 +20,7 @@ COPY . .
 
 RUN chmod +x setup_ntgcalls.sh && \
     ./setup_ntgcalls.sh && \
-    CGO_ENABLED=1 go build -trimpath -ldflags="-w -s" -o myapp ./cmd/app/
+    CGO_ENABLED=1 go build -v -trimpath -ldflags="-w -s" -o myapp ./cmd/app/
 
 FROM debian:bookworm-slim
 
