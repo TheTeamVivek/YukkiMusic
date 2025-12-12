@@ -296,6 +296,7 @@ func handlePanic(r, ctx interface{}, isPanic bool) {
 			short = fmt.Sprintf(shortMsg, handlerType, userMention, chatInfo, messageInfo, errorMessage)
 		}
 
+gologging.Error(short)
 		if _, sendErr := client.SendMessage(config.LoggerID, short, &tg.SendOptions{ParseMode: "HTML"}); sendErr != nil {
 			logger.ErrorF("Failed to send panic message to log chat: %v", sendErr)
 		}
