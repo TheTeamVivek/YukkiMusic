@@ -36,7 +36,7 @@ import (
 func onStreamEndHandler(chatID int64) {
   ass, err := core.Assistants.ForChat(chatID)
   if err != nil {
-    gologging.ErrorF("Failed to get Assistant for %d: %v" chatID, err)
+    gologging.ErrorF("Failed to get Assistant for %d: %v",chatID, err)
     return
   }
 	r, ok := core.GetRoom(chatID, ass)

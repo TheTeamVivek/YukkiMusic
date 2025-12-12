@@ -59,7 +59,7 @@ func handleRestart(m *tg.NewMessage) error {
 	for _, id := range core.GetAllRoomIDs() {
 	  ass, err := core.Assistants.ForChat(id)
   if err != nil {
-    gologging.ErrorF("Failed to get Assistant for %d: %v" id, err)
+    gologging.ErrorF("Failed to get Assistant for %d: %v", id, err)
     continue
   }
 	
