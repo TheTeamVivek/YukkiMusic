@@ -20,10 +20,8 @@
 package database
 
 func IsLoggerEnabled() (bool, error) {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	
+	state, err := getBotState()
 	if err != nil {
 		return false, err
 	}
@@ -31,14 +29,12 @@ func IsLoggerEnabled() (bool, error) {
 }
 
 func SetLoggerEnabled(enabled bool) error {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	
+	state, err := getBotState()
 	if err != nil || state.LoggerEnabled == enabled {
 		return err
 	}
 
 	state.LoggerEnabled = enabled
-	return updateBotState(ctx, state)
+	return updateBotState( state)
 }

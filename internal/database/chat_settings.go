@@ -49,7 +49,10 @@ func defaultChatSettings(chatID int64) *ChatSettings {
 	}
 }
 
-func getChatSettings(ctx context.Context, chatID int64) (*ChatSettings, error) {
+func getChatSettings(chatID int64) (*ChatSettings, error) {
+		ctx, cancel := mongoCtx()
+	defer cancel()
+	
 	cacheKey := "chat_settings_" + strconv.FormatInt(chatID, 10)
 	if cached, found := dbCache.Get(cacheKey); found {
 		if settings, ok := cached.(*ChatSettings); ok {
@@ -79,8 +82,10 @@ func getChatSettings(ctx context.Context, chatID int64) (*ChatSettings, error) {
 	return &settings, nil
 }
 
-func updateChatSettings(ctx context.Context, newSettings *ChatSettings) error {
+func updateChatSettings(newSettings *ChatSettings) error {
 	cacheKey := "chat_settings_" + strconv.FormatInt(newSettings.ChatID, 10)
+		ctx, cancel := mongoCtx()
+	defer cancel()
 
 	opts := options.UpdateOne().SetUpsert(true)
 	_, err := chatSettingsColl.UpdateOne(ctx, bson.M{"_id": newSettings.ChatID}, bson.M{"$set": newSettings}, opts)

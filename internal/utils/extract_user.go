@@ -41,8 +41,10 @@ func ExtractUser(m *telegram.NewMessage) (int64, error) {
 		return 0, fmt.Errorf("empty message text")
 	}
 
-	if id, ok, err := extractFromEntities(m, text); ok || err != nil {
-		return id, err
+	if id, err := extractFromEntities(m, text); err != nil {
+		return 0, err
+	} else if id != 0 {
+	  return id, nil
 	}
 
 	return extractFromPlainText(m, text)
@@ -67,31 +69,31 @@ func extractFromReply(m *telegram.NewMessage) (int64, error) {
 	return r.SenderID(), nil
 }
 
-func extractFromEntities(m *telegram.NewMessage, text string) (int64, bool, error) {
+func extractFromEntities(m *telegram.NewMessage, text string) (int64, error) {
 	for _, ent := range m.Message.Entities {
 		switch e := ent.(type) {
 
 		// Inline mention (tg://user?id=xxxx)
 		case *telegram.MessageEntityMentionName:
-			return e.UserID, true, nil
+			return e.UserID, nil
 
 		// @username mention → resolve peer
 		case *telegram.MessageEntityMention:
 			username := strings.TrimPrefix(text[e.Offset:e.Offset+e.Length], "@")
 			peer, err := m.Client.ResolvePeer(username)
 			if err != nil {
-				return 0, false, fmt.Errorf("failed to resolve peer for @%s: %w", username, err)
+				return 0, fmt.Errorf("failed to resolve peer for @%s: %w", username, err)
 			}
 
 			userPeer, ok := peer.(*telegram.InputPeerUser)
 			if !ok {
-				return 0, false, fmt.Errorf("resolved peer is not a user (maybe channel/group)")
+				return 0, fmt.Errorf("resolved peer is not a user (maybe channel/group)")
 			}
 
-			return userPeer.UserID, true, nil
+			return userPeer.UserID, nil
 		}
 	}
-	return 0, false, nil
+	return 0,  nil
 }
 
 func extractFromPlainText(m *telegram.NewMessage, text string) (int64, error) {
@@ -113,7 +115,7 @@ func extractFromPlainText(m *telegram.NewMessage, text string) (int64, error) {
 
 	userPeer, ok := peer.(*telegram.InputPeerUser)
 	if !ok {
-		return 0, fmt.Errorf("resolved peer is not a user")
+		return 0, fmt.Errorf("resolved peer is not a user (maybe channel/group)")
 	}
 
 	return userPeer.UserID, nil

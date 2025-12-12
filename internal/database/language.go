@@ -22,9 +22,7 @@ package database
 import "main/internal/config"
 
 func GetChatLanguage(chatID int64) (string, error) {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-	settings, err := getChatSettings(ctx, chatID)
+	settings, err := getChatSettings( chatID)
 	if err != nil || settings.Language == "" {
 		return config.DefaultLang, err
 	}
@@ -32,12 +30,10 @@ func GetChatLanguage(chatID int64) (string, error) {
 }
 
 func SetChatLanguage(chatID int64, lang string) error {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-	settings, err := getChatSettings(ctx, chatID)
+	settings, err := getChatSettings( chatID)
 	if err != nil || settings.Language == lang {
 		return err
 	}
 	settings.Language = lang
-	return updateChatSettings(ctx, settings)
+	return updateChatSettings( settings)
 }

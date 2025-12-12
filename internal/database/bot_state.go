@@ -56,12 +56,14 @@ var defaultBotState = &BotState{
 	LoggerEnabled: true,
 }
 
-func getBotState(ctx context.Context) (*BotState, error) {
+func getBotState() (*BotState, error) {
 	if cached, found := dbCache.Get(cacheKey); found {
 		if state, ok := cached.(*BotState); ok {
 			return state, nil
 		}
 	}
+		ctx, cancel := mongoCtx()
+	defer cancel()
 
 	var state BotState
 	err := settingsColl.FindOne(ctx, bson.M{"_id": "global"}).Decode(&state)
@@ -77,8 +79,11 @@ func getBotState(ctx context.Context) (*BotState, error) {
 	return &state, nil
 }
 
-func updateBotState(ctx context.Context, newState *BotState) error {
-	opts := options.UpdateOne().SetUpsert(true)
+func updateBotState( newState *BotState) error {
+		ctx, cancel := mongoCtx()
+	defer cancel()
+
+opts := options.UpdateOne().SetUpsert(true)
 	_, err := settingsColl.UpdateOne(ctx, bson.M{"_id": "global"}, bson.M{"$set": newState}, opts)
 	if err != nil {
 		logger.ErrorF("Failed to update bot state: %v", err)

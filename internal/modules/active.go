@@ -55,7 +55,7 @@ func activeHandler(m *telegram.NewMessage) error {
 	})
 
 	if brokenCount > 0 {
-		msg = F(chatID, "active_chats_info_with_issue", locales.Arg{
+		msg = F(chatID, "active_chats_info_with_broken", locales.Arg{
 			"count":  activeCount,
 			"broken": brokenCount,
 		})

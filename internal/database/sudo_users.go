@@ -21,10 +21,7 @@ package database
 
 // GetSudoers returns all sudoers.
 func GetSudoers() ([]int64, error) {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	state, err := getBotState()
 	if err != nil {
 		logger.ErrorF("Failed to get current sudoers: %v", err)
 		return nil, err
@@ -39,10 +36,7 @@ func IsSudoWithoutError(id int64) bool {
 
 // IsSudo checks if the given ID is a sudoer.
 func IsSudo(id int64) (bool, error) {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	state, err := getBotState()
 	if err != nil {
 		logger.ErrorF("Failed to get current sudoers: %v", err)
 		return false, err
@@ -67,17 +61,14 @@ func AddSudo(id int64) error {
 		return nil
 	}
 
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	state, err := getBotState()
 	if err != nil {
 		logger.ErrorF("Failed to get current sudoers: %v", err)
 		return err
 	}
 
 	state.Sudoers = append(state.Sudoers, id)
-	if err := updateBotState(ctx, state); err != nil {
+	if err := updateBotState( state); err != nil {
 		logger.ErrorF("Failed to update sudoers: %v", err)
 		return err
 	}
@@ -96,10 +87,7 @@ func DeleteSudo(id int64) error {
 		return nil
 	}
 
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	state, err := getBotState()
 	if err != nil {
 		logger.ErrorF("Failed to get current sudoers: %v", err)
 		return err
@@ -113,7 +101,7 @@ func DeleteSudo(id int64) error {
 	}
 	state.Sudoers = newSudoers
 
-	if err := updateBotState(ctx, state); err != nil {
+	if err := updateBotState( state); err != nil {
 		logger.ErrorF("Failed to update sudoers: %v", err)
 		return err
 	}

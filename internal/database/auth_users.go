@@ -37,29 +37,21 @@ func IsAuthUser(chatID, userID int64) (bool, error) {
 }
 
 func AddAuthUser(chatID, userID int64) error {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	settings, err := getChatSettings(ctx, chatID)
+  if is, err := IsAuthUser(chatID, userID); is || err != nil {
+    return err
+  }
+  
+	settings, err := getChatSettings(chatID)
 	if err != nil {
 		return err
 	}
 
-	for _, user := range settings.AuthUsers {
-		if user == userID {
-			return nil // User already authorized
-		}
-	}
-
 	settings.AuthUsers = append(settings.AuthUsers, userID)
-	return updateChatSettings(ctx, settings)
+	return updateChatSettings( settings)
 }
 
 func RemoveAuthUser(chatID, userID int64) error {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	settings, err := getChatSettings(ctx, chatID)
+	settings, err := getChatSettings(chatID)
 	if err != nil {
 		return err
 	}
@@ -79,14 +71,11 @@ func RemoveAuthUser(chatID, userID int64) error {
 	}
 
 	settings.AuthUsers = newAuthUsers
-	return updateChatSettings(ctx, settings)
+	return updateChatSettings(settings)
 }
 
 func GetAuthUsers(chatID int64) ([]int64, error) {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	settings, err := getChatSettings(ctx, chatID)
+	settings, err := getChatSettings(chatID)
 	if err != nil {
 		return nil, err
 	}

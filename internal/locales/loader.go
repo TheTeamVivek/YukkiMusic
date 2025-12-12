@@ -42,7 +42,7 @@ var (
 
 type Arg map[string]any
 
-func Init() {
+func init() {
 	files, err := locales.ReadDir(".")
 	if err != nil {
 		logger.Fatal("Failed to read embedded locales:", err)

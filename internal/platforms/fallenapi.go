@@ -118,6 +118,7 @@ func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string)
 	apiReqURL := fmt.Sprintf("%s/track?api_key=%s&url=%s", fallenAPIURL, fallenAPIKey, url.QueryEscape(mediaURL))
 
 	client := resty.New()
+		defer client.Close()
 	var apiResp APIResponse
 
 	resp, err := client.R().

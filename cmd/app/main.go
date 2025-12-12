@@ -40,10 +40,8 @@ import (
 	"github.com/Laky-64/gologging"
 
 	"main/internal/config"
-	"main/internal/cookies"
 	"main/internal/core"
 	"main/internal/database"
-	"main/internal/locales"
 	"main/internal/modules"
 )
 
@@ -60,14 +58,6 @@ func main() {
 	dbCleanup := database.Init(config.MongoURI)
 	defer dbCleanup()
 	l.Info("✅ Database connected successfully")
-
-	go database.MigrateData(config.MongoURI)
-
-	l.Debug("🔹 Initializing cookies...")
-	cookies.Init()
-
-	locales.Init()
-
 	l.Debug("🔹 Initializing clients...")
 	cleanup := core.Init(
 		config.ApiID,

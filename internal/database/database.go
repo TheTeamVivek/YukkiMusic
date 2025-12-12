@@ -52,6 +52,8 @@ func Init(mongoURL string) func() {
 	database = client.Database("YukkiMusic")
 	settingsColl = database.Collection("bot_settings")
 	chatSettingsColl = database.Collection("chat_settings")
+	
+	go database.MigrateData(mongoURL)
 
 	return func() {
 		ctx, cancel := mongoCtx()

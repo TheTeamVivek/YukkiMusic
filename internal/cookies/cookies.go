@@ -40,7 +40,8 @@ var (
 	logger      = gologging.GetLogger("cookies")
 )
 
-func Init() {
+func init() {
+  gologging.Debug("🔹 Initializing cookies...")
 	if err := os.MkdirAll("internal/cookies", 0o700); err != nil {
 		logger.Fatal("Failed to create cookies directory:", err)
 	}
@@ -59,6 +60,8 @@ func downloadCookieFile(url string) error {
 	filePath := filepath.Join("internal/cookies", id+".txt")
 
 	client := resty.New()
+	defer client.Close()
+	
 	resp, err := client.R().
 		SetOutputFileName(filePath).
 		Get(rawURL)

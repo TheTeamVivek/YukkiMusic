@@ -32,16 +32,15 @@ var (
 	usageMu        sync.RWMutex
 )
 
+// IMPORTANT: RebalanceAssistantIndexes must be called first before calling GetAssistantIndex
+
 func GetAssistantIndex(chatID int64, assistantCount int) (int, error) {
 	if assistantCount <= 0 {
 		logger.Error("assistantCount must be positive")
 		return 0, fmt.Errorf("assistantCount must be positive")
 	}
-
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	settings, err := getChatSettings(ctx, chatID)
+	
+	settings, err := getChatSettings(chatID)
 	if err != nil {
 		logger.Error("Failed to get chat settings for chat " + strconv.FormatInt(chatID, 10) + ": " + err.Error())
 		return 0, err
@@ -64,7 +63,7 @@ func GetAssistantIndex(chatID int64, assistantCount int) (int, error) {
 	)
 
 	settings.AssistantIndex = newIndex
-	if err := updateChatSettings(ctx, settings); err != nil {
+	if err := updateChatSettings( settings); err != nil {
 		logger.Error(
 			"Failed to update assistant index for chat " +
 				strconv.FormatInt(chatID, 10) + ": " + err.Error(),
@@ -87,7 +86,7 @@ func RebalanceAssistantIndexes(assistantCount int) error {
 		return fmt.Errorf("assistantCount must be positive")
 	}
 
-	ctx, cancel := mongoCtx()
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	cursor, err := chatSettingsColl.Find(ctx, bson.M{})
@@ -196,7 +195,7 @@ func RebalanceAssistantIndexes(assistantCount int) error {
 				" to " + strconv.Itoa(s.AssistantIndex),
 		)
 
-		if err := updateChatSettings(ctx, s); err != nil {
+		if err := updateChatSettings(s); err != nil {
 			logger.Error(
 				"Rebalance: failed updating chat " +
 					strconv.FormatInt(s.ChatID, 10) + ": " + err.Error(),

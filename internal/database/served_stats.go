@@ -20,10 +20,7 @@
 package database
 
 func GetServed(user ...bool) ([]int64, error) {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	state, err := getBotState()
 	if err != nil {
 		return nil, err
 	}
@@ -35,10 +32,7 @@ func GetServed(user ...bool) ([]int64, error) {
 }
 
 func IsServed(id int64, user ...bool) (bool, error) {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	state, err := getBotState()
 	if err != nil {
 		return false, err
 	}
@@ -65,10 +59,7 @@ func AddServed(id int64, user ...bool) error {
 		return nil
 	}
 
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	state, err := getBotState()
 	if err != nil {
 		return err
 	}
@@ -79,7 +70,7 @@ func AddServed(id int64, user ...bool) error {
 	}
 
 	*target = append(*target, id)
-	return updateBotState(ctx, state)
+	return updateBotState( state)
 }
 
 func DeleteServed(id int64, user ...bool) error {
@@ -91,10 +82,7 @@ func DeleteServed(id int64, user ...bool) error {
 		return nil
 	}
 
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	state, err := getBotState()
 	if err != nil {
 		return err
 	}
@@ -111,5 +99,5 @@ func DeleteServed(id int64, user ...bool) error {
 		}
 	}
 	*target = newSlice
-	return updateBotState(ctx, state)
+	return updateBotState( state)
 }

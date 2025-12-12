@@ -23,10 +23,7 @@ package database
 // If enabling, you can provide an optional reason.
 // If disabling, it clears any existing reason.
 func SetMaintenance(enabled bool, reason ...string) error {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	state, err := getBotState()
 	if err != nil {
 		return err
 	}
@@ -35,10 +32,10 @@ func SetMaintenance(enabled bool, reason ...string) error {
 	if state.Maintenance.Enabled == enabled {
 		if enabled && len(reason) > 0 && state.Maintenance.Reason != reason[0] {
 			state.Maintenance.Reason = reason[0]
-			return updateBotState(ctx, state)
+			return updateBotState( state)
 		} else if !enabled && state.Maintenance.Reason != "" {
 			state.Maintenance.Reason = ""
-			return updateBotState(ctx, state)
+			return updateBotState( state)
 		}
 		return nil
 	}
@@ -50,14 +47,11 @@ func SetMaintenance(enabled bool, reason ...string) error {
 		state.Maintenance.Reason = ""
 	}
 
-	return updateBotState(ctx, state)
+	return updateBotState( state)
 }
 
 func GetMaintReason() (string, error) {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	state, err := getBotState()
 	if err != nil {
 		return "", err
 	}
@@ -65,10 +59,7 @@ func GetMaintReason() (string, error) {
 }
 
 func IsMaintenance() (bool, error) {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	state, err := getBotState()
 	if err != nil {
 		return false, err
 	}

@@ -77,6 +77,7 @@ func (f *YoutubifyPlatform) Download(
 ) (string, error) {
 	ext := "mp3"
 	endpoint := "audio"
+	
 	if track.Video {
 		ext = "mp4"
 		endpoint = "video"
@@ -93,7 +94,8 @@ func (f *YoutubifyPlatform) Download(
 	}
 
 	client := resty.New()
-
+	defer client.Close()
+	
 	url := apiBase +
 		"/download/" + endpoint +
 		"?video_id=" + track.ID +
