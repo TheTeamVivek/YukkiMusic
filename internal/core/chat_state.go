@@ -76,7 +76,7 @@ func GetChatState(chatID int64) (*ChatState, error) {
 	if _, err := state.getAssistant(); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrAssistantGetFailed, err)
 	}
-	return state
+	return state, nil
 }
 
 func DeleteChatState(chatID int64) {
@@ -171,8 +171,7 @@ func (cs *ChatState) TryJoin() error {
 		link = cs.InviteLink
 		cs.mu.RUnlock()
 
-		_, err = cs.Assistant.Client.JoinChannel(link)
-
+		_, err := cs.Assistant.Client.JoinChannel(link)
 		if err == nil || telegram.MatchError(err, "USER_ALREADY_PARTICIPANT") {
 			cs.SetAssistantPresent(true)
 			cs.SetAssistantBanned(false)
@@ -264,7 +263,7 @@ func (cs *ChatState) ensureAssistantState(force bool) error {
 		if strings.Contains(err.Error(), "there is no peer with id") {
 
 			cs.triggerAssistantStart()
-			member, err = Bot.GetChatMember(cs.ChatID, ass.User.ID)
+			member, err = Bot.GetChatMember(cs.ChatID, cs.Assistant.User.ID)
 			if err != nil {
 				return handleMemberFetchError(cs, err)
 			}
@@ -280,7 +279,7 @@ func (cs *ChatState) ensureAssistantState(force bool) error {
 }
 
 func (cs *ChatState) triggerAssistantStart() {
-	_, sendErr := ass.Client.SendMessage(cs.Assistant.User.Username, "/start")
+	_, sendErr := cs.Assistant.Client.SendMessage(BUser.Username, "/start")
 	if sendErr == nil {
 		return
 	}
@@ -401,7 +400,7 @@ func handleJoinRequestPending(chatID int64, s *ChatState) error {
 		return fmt.Errorf("%w: %v", ErrPeerResolveFailed, errChat)
 	}
 
-	iUser, errUser := Bot.ResolvePeer(cs.Assistant.User.ID)
+	iUser, errUser := Bot.ResolvePeer(s.Assistant.User.ID)
 	if errUser != nil {
 		return fmt.Errorf("%w: %v", ErrPeerResolveFailed, errUser)
 	}
