@@ -29,7 +29,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/state"
+	state "main/internal/core/models"
 )
 
 var (

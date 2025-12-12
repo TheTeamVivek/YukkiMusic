@@ -31,7 +31,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"resty.dev/v3"
 
-	"main/config"
+	"main/internal/config"
 )
 
 var (

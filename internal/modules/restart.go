@@ -57,7 +57,13 @@ func handleRestart(m *tg.NewMessage) error {
 	}
 
 	for _, id := range core.GetAllRoomIDs() {
-		if r, _ := core.GetRoom(id); r != nil {
+		ass, err := core.Assistants.ForChat(id)
+		if err != nil {
+			gologging.ErrorF("Failed to get Assistant for %d: %v", id, err)
+			continue
+		}
+
+		if r, _ := core.GetRoom(id, ass); r != nil {
 			r.Stop()
 			m.Client.SendMessage(id, F(id, "restart_service", locales.Arg{
 				"bot": utils.MentionHTML(core.BUser),

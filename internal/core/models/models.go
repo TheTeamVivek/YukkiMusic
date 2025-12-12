@@ -18,34 +18,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package utils
+package state
 
 import (
-	"fmt"
+	"context"
 
 	"github.com/amarnathcjd/gogram/telegram"
 )
 
-func GetGroupCall(c *telegram.Client, chatID int64) (*telegram.PhoneGroupCall, error) {
-	fullChat, err := GetFullChannel(c, chatID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get full channel for chatID %d: %w", chatID, err)
+type (
+	Track struct {
+		ID        string       // track unique id
+		Title     string       // title
+		Duration  int          // track duration in seconds
+		Artwork   string       // thumbnail url of the track
+		URL       string       // track url
+		Requester string       // html mention or @username who requested this track
+		Video     bool         // whether this track will be played as video
+		Source    PlatformName // unique PlatformName
 	}
+	PlatformName string
 
-	if fullChat.Call == nil {
-		return nil, fmt.Errorf("no active group call found in chatID %d", chatID)
+	Platform interface {
+		Name() PlatformName
+		IsValid(query string) bool
+		GetTracks(query string, video bool) ([]*Track, error)
+		Download(ctx context.Context, track *Track, mystic *telegram.NewMessage) (string, error)
+		IsDownloadSupported(source PlatformName) bool
 	}
-
-	var call interface{}
-	call, err = c.PhoneGetGroupCall(fullChat.Call, 0) // reuse 'err' here
-	if err != nil {
-		return nil, fmt.Errorf("failed to get group call details for chatID %d: %w", chatID, err)
-	}
-
-	gc, ok := call.(*telegram.PhoneGroupCall)
-	if !ok {
-		return nil, fmt.Errorf("unexpected type returned for group call in chatID %d: got %T", chatID, call)
-	}
-
-	return gc, nil
-}
+)

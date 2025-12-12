@@ -41,14 +41,20 @@ func MonitorRooms() {
 			sem <- struct{}{}
 			go func(id int64) {
 				defer func() { <-sem }()
-				r, ok := core.GetRoom(id)
+				ass, err := core.Assistants.ForChat(id)
+				if err != nil {
+					gologging.ErrorF("Failed to get Assistant for %d: %v", id, err)
+					return
+				}
+
+				r, ok := core.GetRoom(id, ass)
 				if !ok {
 					return
 				}
 				if !r.IsActiveChat() {
 					// recheck after delay before deleting
 					time.Sleep(7 * time.Second)
-					if r2, ok2 := core.GetRoom(id); ok2 && !r2.IsActiveChat() {
+					if r2, ok2 := core.GetRoom(id, ass); ok2 && !r2.IsActiveChat() {
 						core.DeleteRoom(id)
 					}
 					return

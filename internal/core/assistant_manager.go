@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/ubot"
@@ -79,7 +80,7 @@ func (m *AssistantManager) WithAssistant(chatID int64, fn func(*Assistant)) {
 
 	ass, err := m.ForChat(chatID)
 	if err != nil {
-		gologging.Errorf("Failed to get assistant for chat %d, Error: %v", chatID, err)
+		gologging.ErrorF("Failed to get assistant for chat %d, Error: %v", chatID, err)
 		return
 	}
 

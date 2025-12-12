@@ -36,8 +36,8 @@ import (
 	"github.com/raitonoberu/ytsearch"
 	"resty.dev/v3"
 
-	"main/config"
-	"main/internal/state"
+	"main/internal/config"
+	state "main/internal/core/models"
 	"main/internal/utils"
 )
 

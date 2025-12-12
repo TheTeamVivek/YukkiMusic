@@ -31,11 +31,11 @@ import (
 	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
+	"main/internal/config"
 	"main/internal/core"
+	state "main/internal/core/models"
 	"main/internal/database"
 	"main/internal/locales"
-	"main/internal/state"
 	"main/internal/utils"
 )
 
@@ -43,15 +43,19 @@ var downloadCancels = make(map[int64]context.CancelFunc)
 
 func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	chatID := m.ChannelID()
-	if !cplay {
-		r, _ := core.GetRoom(chatID, true)
-		return r, nil
+
+	if cplay {
+		cplayID, err := database.GetCPlayID(chatID)
+		if err != nil || cplayID == 0 {
+			return nil, errors.New(F(chatID, "cplay_id_not_set"))
+		}
+		chatID = cplayID
 	}
-	cplayID, err := database.GetCPlayID(chatID)
-	if err != nil || cplayID == 0 {
-		return nil, errors.New(F(chatID, "cplay_id_not_set"))
+	ass, err := core.Assistants.ForChat(chatID)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get assistant for you chat: %w", err)
 	}
-	r, _ := core.GetRoom(cplayID, true)
+	r, _ := core.GetRoom(chatID, ass, true)
 	return r, nil
 }
 
@@ -318,7 +322,7 @@ func warnAndLeave(client *tg.Client, chatID int64) {
 		if err := client.LeaveChannel(chatID); err != nil {
 			gologging.ErrorF("Failed to leave non-supergroup chatID=%d: %v", chatID, err)
 		}
-		core.Assistans.WithAssistant(chatID, func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) })
+		core.Assistants.WithAssistant(chatID, func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) })
 	}()
 }
 

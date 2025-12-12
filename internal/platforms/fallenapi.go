@@ -33,7 +33,7 @@ import (
 	"resty.dev/v3"
 
 	"main/internal/core"
-	"main/internal/state"
+	state "main/internal/core/models"
 	"main/internal/utils"
 )
 

@@ -17,6 +17,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"
@@ -102,8 +103,13 @@ func handleMaintenance(m *tg.NewMessage) error {
 					break
 				}
 				maintCancel.Unlock()
+				ass, err := core.Assistants.ForChat(id)
+				if err != nil {
+					gologging.ErrorF("Failed to get Assistant for %d: %v", id, err)
+					continue
+				}
 
-				if r, ok := core.GetRoom(id); ok {
+				if r, ok := core.GetRoom(id, ass); ok {
 					r.Destroy()
 					msg := F(id, "maint_entering")
 					if reason != "" {

@@ -25,7 +25,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
+	"main/internal/config"
 	"main/internal/core"
 	"main/internal/database"
 	"main/ntgcalls"
@@ -55,6 +55,8 @@ var handlers = []MsgHandlerDef{
 	{Pattern: "(sudoers|listsudo|sudolist)", Handler: handleGetSudoers, Filters: []telegram.Filter{ignoreChannelFilter}},
 
 	{Pattern: "(speedtest|spt)", Handler: sptHandle, Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter}},
+
+	{Pattern: "(broadcast|gcast|bcast)", Handler: broadcastHandler, Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter}},
 
 	{Pattern: "(ac|active|activevc|activevoice)", Handler: activeHandler, Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter}},
 	{Pattern: "(maintenance|maint)", Handler: handleMaintenance, Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter}},
@@ -134,8 +136,11 @@ var cbHandlers = []CbHandlerDef{
 	{Pattern: "help_cb", Handler: helpCB},
 	{Pattern: "^lang:[a-z]", Handler: langCallbackHandler},
 	{Pattern: `^help:(.+)`, Handler: helpCallbackHandler},
+
 	{Pattern: "close", Handler: closeHandler},
 	{Pattern: "cancel", Handler: cancelHandler},
+	{Pattern: "broadcast:cancel", Handler: broadcastCancelCB},
+
 	{Pattern: `^room:(\w+)$`, Handler: roomHandle},
 	{Pattern: "progress", Handler: emptyCBHandler},
 }

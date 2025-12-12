@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"
@@ -148,9 +149,14 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	if isAdmin {
-		if room, ok := core.GetRoom(chatID); ok {
-			room.Destroy()
-			summary += F(chatID, "reload_room_reset") + "\n"
+		ass, err := core.Assistants.ForChat(chatID)
+		if err != nil {
+			gologging.ErrorF("Failed to get Assistant for %d: %v", chatID, err)
+		} else {
+			if room, ok := core.GetRoom(chatID, ass); ok {
+				room.Destroy()
+				summary += F(chatID, "reload_room_reset") + "\n"
+			}
 		}
 	}
 

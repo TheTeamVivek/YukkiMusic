@@ -31,7 +31,7 @@ import (
 	"github.com/fogleman/gg"
 	"resty.dev/v3"
 
-	"main/internal/state"
+	state "main/internal/core/models"
 )
 
 const (

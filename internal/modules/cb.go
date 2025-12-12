@@ -99,8 +99,14 @@ func roomHandle(cb *tg.CallbackQuery) error {
 		}
 		chatID = realChatID
 	}
+	if ass, err := core.Assistants.ForChat(chatID); err != nil {
+		gologging.ErrorF("Failed to get Assistant for %d: %v", chatID, err)
+		cb.Answer(fmt.Sprintf("Failed to get Assistant for %d: %v", chatID, err), opt)
+		return err
+	} else {
+		r, ok = core.GetRoom(chatID, ass)
+	}
 
-	r, ok = core.GetRoom(chatID)
 	if !ok || !r.IsActiveChat() {
 		cb.Answer(F(chatID, "room_not_active_cb"), opt)
 		if _, err := cb.Edit(F(chatID, "room_not_active")); err != nil {

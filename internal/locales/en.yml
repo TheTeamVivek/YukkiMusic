@@ -299,7 +299,7 @@ play_added_to_queue_single: |
   <b>▫ Duration:</b> {duration}
   <b>▫ Requested by:</b> {by}
 
-channel_play_depreceated: "⚠️ This handler is deprecated. Use <code><a>/cplay --set channel_id </code></a> to set your channel for playback."
+channel_play_depreciated: "⚠️ This handler is deprecated. Use <code><a>/cplay --set channel_id </code></a> to set your channel for playback."
 play_multiple_tracks_too_long_header: "<b>⚠️ {count} tracks were skipped (max duration {limit_mins} mins):</b>"
 play_multiple_tracks_too_long_item: "— <i>{title}</i>"
 play_multiple_tracks_too_long_more: "... and {remaining} more."
@@ -578,8 +578,8 @@ unmute_success: |
 # 🔊 Voice Chat Events
 voicechat_ended: "📴 Voice chat ended!\nAll queues cleared."
 voicechat_started: "📢 Voice chat started!\nUse /play <song> to play music."
-# Commands help
 
+# Commands help
 help_owner: |
   👑 <b>Owner Commands</b>
   <i>Exclusive tools for managing sudoers, executing system code, and performing bot administration securely.</i>

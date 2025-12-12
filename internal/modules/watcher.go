@@ -23,7 +23,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
+	"main/internal/config"
 	"main/internal/core"
 	"main/internal/database"
 	"main/internal/locales"
@@ -247,9 +247,14 @@ func handleDeleteUserAction(m *telegram.NewMessage, chatID int64, action *telegr
 		"User removed from chatID " + utils.IntToStr(chatID) +
 			": " + utils.IntToStr(action.UserID),
 	)
+	ass, aErr := core.Assistants.ForChat(chatID)
+	if aErr != nil {
+		gologging.ErrorF("Failed to get Assistant for %d: %v", chatID, aErr)
+		return telegram.EndGroup
+	}
 
-	if aErr == nil && action.UserID == assistant.User.ID {
-		core.Assistans.WithAssistant(chatID, func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) })
+	if aErr == nil && action.UserID == ass.User.ID {
+		ass.Client.LeaveChannel(chatID)
 		core.DeleteRoom(chatID)
 		core.DeleteChatState(chatID)
 		database.DeleteServed(chatID)

@@ -35,7 +35,7 @@ import (
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 
-	"main/config"
+	"main/internal/config"
 	"main/internal/core"
 )
 
