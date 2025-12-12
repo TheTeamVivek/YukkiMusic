@@ -41,12 +41,12 @@ func MonitorRooms() {
 			sem <- struct{}{}
 			go func(id int64) {
 				defer func() { <-sem }()
-							ass, err := core.Assistants.ForChat(id)
-  if err != nil {
-    gologging.ErrorF("Failed to get Assistant for %d: %v", id, err)
-    return
-  }
-  
+				ass, err := core.Assistants.ForChat(id)
+				if err != nil {
+					gologging.ErrorF("Failed to get Assistant for %d: %v", id, err)
+					return
+				}
+
 				r, ok := core.GetRoom(id, ass)
 				if !ok {
 					return
