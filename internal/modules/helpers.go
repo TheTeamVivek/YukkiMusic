@@ -43,20 +43,6 @@ var downloadCancels = make(map[int64]context.CancelFunc)
 
 func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	chatID := m.ChannelID()
-	if !cplay {
-		r, _ := core.GetRoom(chatID, true)
-		return r, nil
-	}
-	cplayID, err := database.GetCPlayID(chatID)
-	if err != nil || cplayID == 0 {
-		return nil, errors.New(F(chatID, "cplay_id_not_set"))
-	}
-	r, _ := core.GetRoom(cplayID, true)
-	return r, nil
-}
-
-func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
-	chatID := m.ChannelID()
 
 	if cplay {
 		cplayID, err := database.GetCPlayID(chatID)
@@ -65,7 +51,7 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 		}
 		chatID = cplayID
 	}
-	ass, err := core.Assistants.ForChat(id)
+	ass, err := core.Assistants.ForChat(chatID)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get assistant for you chat: %w", err)
 	}

@@ -149,9 +149,9 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	if isAdmin {
-		ass, err := core.Assistants.ForChat(id)
+		ass, err := core.Assistants.ForChat(chatID)
 		if err != nil {
-			gologging.ErrorF("Failed to get Assistant for %d: %v", id, err)
+			gologging.ErrorF("Failed to get Assistant for %d: %v", chatID, err)
 		} else {
 			if room, ok := core.GetRoom(chatID, ass); ok {
 				room.Destroy()
