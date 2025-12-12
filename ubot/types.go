@@ -1,3 +1,5 @@
+package ubot
+
 import (
 	"time"
 
