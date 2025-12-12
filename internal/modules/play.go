@@ -55,31 +55,31 @@ func channelPlayHandler(m *telegram.NewMessage) error {
 }
 
 func playHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.playOpts{})
+	return handlePlay(m, &playOpts{})
 }
 
 func fplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.playOpts{Force: true})
+	return handlePlay(m, &playOpts{Force: true})
 }
 
 func cfplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.playOpts{Force: true, CPlay: true})
+	return handlePlay(m, &playOpts{Force: true, CPlay: true})
 }
 
 func vplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.playOpts{Video: true})
+	return handlePlay(m, &playOpts{Video: true})
 }
 
 func fvplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.playOpts{Force: true, Video: true})
+	return handlePlay(m, &playOpts{Force: true, Video: true})
 }
 
 func vcplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.playOpts{CPlay: true, Video: true})
+	return handlePlay(m, &playOpts{CPlay: true, Video: true})
 }
 
 func fvcplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, &state.playOpts{Force: true, CPlay: true, Video: true})
+	return handlePlay(m, &playOpts{Force: true, CPlay: true, Video: true})
 }
 
 func cplayHandler(m *telegram.NewMessage) error {
@@ -159,10 +159,10 @@ func cplayHandler(m *telegram.NewMessage) error {
 		)
 		return telegram.EndGroup
 	}
-	return handlePlay(m, &state.playOpts{CPlay: true})
+	return handlePlay(m, &playOpts{CPlay: true})
 }
 
-func handlePlay(m *telegram.NewMessage, opts *state.playOpts) error {
+func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
 	mention := utils.MentionHTML(m.Sender)
 
 	r, replyMsg, err := prepareRoomAndSearchMessage(m, opts.CPlay)

@@ -415,7 +415,7 @@ func sendBroadcastMessage(ctx context.Context, m *tg.NewMessage, targetID int64,
 
 	try := func() error {
 		if m.IsReply() {
-			fOpts := tg.ForwardOptions{}
+			fOpts := &tg.ForwardOptions{}
 			if flags.Copy {
 				fOpts.HideAuthor = true
 			}
@@ -465,7 +465,7 @@ func sendBroadcastMessage(ctx context.Context, m *tg.NewMessage, targetID int64,
 	}
 
 	if sentMsg != nil && (flags.Pin || flags.PinLoud) {
-		if perr := m.Client.PinMessage(targetID, sentMsg.ID, &tg.PinOptions{Silent: !flags.PinLoud}); perr != nil {
+		if _, perr := m.Client.PinMessage(targetID, sentMsg.ID, &tg.PinOptions{Silent: !flags.PinLoud}); perr != nil {
 			gologging.ErrorF("Pin failed for %d: %v", targetID, perr)
 		}
 	}
