@@ -20,7 +20,7 @@
 package database
 
 func GetRTMP(chatID int64) (string, string, error) {
-	s, err := getChatSettings( chatID)
+	s, err := getChatSettings(chatID)
 	if err != nil {
 		return "", "", err
 	}
@@ -28,7 +28,7 @@ func GetRTMP(chatID int64) (string, string, error) {
 }
 
 func SetRTMP(chatID int64, url, key string) error {
-	s, err := getChatSettings( chatID)
+	s, err := getChatSettings(chatID)
 	if err != nil {
 		return err
 	}
@@ -36,5 +36,5 @@ func SetRTMP(chatID int64, url, key string) error {
 	s.RTMPConfig.RtmpURL = url
 	s.RTMPConfig.RtmpKey = key
 
-	return updateChatSettings( s)
+	return updateChatSettings(s)
 }

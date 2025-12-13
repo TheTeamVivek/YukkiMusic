@@ -25,7 +25,7 @@ type scheduledTimers struct {
 	scheduledUnmuteTimer *time.Timer
 	scheduledResumeTimer *time.Timer
 	scheduledSpeedTimer  *time.Timer
-	
+
 	scheduledUnmuteUntil time.Time
 	scheduledResumeUntil time.Time
 	scheduledSpeedUntil  time.Time

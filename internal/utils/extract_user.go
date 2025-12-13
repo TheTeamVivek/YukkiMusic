@@ -44,7 +44,7 @@ func ExtractUser(m *telegram.NewMessage) (int64, error) {
 	if id, err := extractFromEntities(m, text); err != nil {
 		return 0, err
 	} else if id != 0 {
-	  return id, nil
+		return id, nil
 	}
 
 	return extractFromPlainText(m, text)
@@ -93,7 +93,7 @@ func extractFromEntities(m *telegram.NewMessage, text string) (int64, error) {
 			return userPeer.UserID, nil
 		}
 	}
-	return 0,  nil
+	return 0, nil
 }
 
 func extractFromPlainText(m *telegram.NewMessage, text string) (int64, error) {

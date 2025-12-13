@@ -27,7 +27,7 @@ import (
 )
 
 func GetCPlayID(chatID int64) (int64, error) {
-	settings, err := getChatSettings( chatID)
+	settings, err := getChatSettings(chatID)
 	if err != nil {
 		return 0, err
 	}
@@ -35,7 +35,7 @@ func GetCPlayID(chatID int64) (int64, error) {
 }
 
 func SetCPlayID(chatID, cplayID int64) error {
-	settings, err := getChatSettings( chatID)
+	settings, err := getChatSettings(chatID)
 	if err != nil {
 		return err
 	}
@@ -51,7 +51,7 @@ func SetCPlayID(chatID, cplayID int64) error {
 	}
 
 	settings.CPlayID = cplayID
-	err = updateChatSettings( settings)
+	err = updateChatSettings(settings)
 	if err == nil {
 		newCacheKey := fmt.Sprintf("cplayid_%d", cplayID)
 		dbCache.Set(newCacheKey, chatID)

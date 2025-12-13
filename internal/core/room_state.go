@@ -606,7 +606,7 @@ func (r *RoomState) NextTrack() *state.Track {
 
 	r.track = next
 	r.position = 0
-	r.playing = false 
+	r.playing = false
 	r.paused = false
 	r.muted = false
 	r.updatedAt = time.Now().Unix()

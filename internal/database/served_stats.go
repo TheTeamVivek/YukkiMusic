@@ -70,7 +70,7 @@ func AddServed(id int64, user ...bool) error {
 	}
 
 	*target = append(*target, id)
-	return updateBotState( state)
+	return updateBotState(state)
 }
 
 func DeleteServed(id int64, user ...bool) error {
@@ -99,5 +99,5 @@ func DeleteServed(id int64, user ...bool) error {
 		}
 	}
 	*target = newSlice
-	return updateBotState( state)
+	return updateBotState(state)
 }

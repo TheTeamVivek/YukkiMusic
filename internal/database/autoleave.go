@@ -28,7 +28,6 @@ func GetAutoLeave() (bool, error) {
 }
 
 func SetAutoLeave(value bool) error {
-  
 	state, err := getBotState()
 	if err != nil {
 		logger.ErrorF("Failed to get bot state for setting AutoEnd: %v", err)

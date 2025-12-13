@@ -37,17 +37,17 @@ func IsAuthUser(chatID, userID int64) (bool, error) {
 }
 
 func AddAuthUser(chatID, userID int64) error {
-  if is, err := IsAuthUser(chatID, userID); is || err != nil {
-    return err
-  }
-  
+	if is, err := IsAuthUser(chatID, userID); is || err != nil {
+		return err
+	}
+
 	settings, err := getChatSettings(chatID)
 	if err != nil {
 		return err
 	}
 
 	settings.AuthUsers = append(settings.AuthUsers, userID)
-	return updateChatSettings( settings)
+	return updateChatSettings(settings)
 }
 
 func RemoveAuthUser(chatID, userID int64) error {

@@ -20,7 +20,6 @@
 package database
 
 func IsLoggerEnabled() (bool, error) {
-	
 	state, err := getBotState()
 	if err != nil {
 		return false, err
@@ -29,12 +28,11 @@ func IsLoggerEnabled() (bool, error) {
 }
 
 func SetLoggerEnabled(enabled bool) error {
-	
 	state, err := getBotState()
 	if err != nil || state.LoggerEnabled == enabled {
 		return err
 	}
 
 	state.LoggerEnabled = enabled
-	return updateBotState( state)
+	return updateBotState(state)
 }

@@ -20,7 +20,6 @@
 package utils
 
 import (
-	"fmt"
 	"slices"
 	"time"
 
@@ -34,7 +33,7 @@ func IsChatAdmin(c *telegram.Client, chatID, userID int64) (bool, error) {
 	if chatID == userID { // chat anon admin
 		return true, nil
 	}
-	
+
 	ids, ok := adminCache.Get(chatID)
 	if ok {
 		return slices.Contains(ids, userID), nil

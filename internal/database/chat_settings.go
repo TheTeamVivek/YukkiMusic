@@ -20,7 +20,6 @@
 package database
 
 import (
-	"context"
 	"strconv"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -50,9 +49,9 @@ func defaultChatSettings(chatID int64) *ChatSettings {
 }
 
 func getChatSettings(chatID int64) (*ChatSettings, error) {
-		ctx, cancel := mongoCtx()
+	ctx, cancel := mongoCtx()
 	defer cancel()
-	
+
 	cacheKey := "chat_settings_" + strconv.FormatInt(chatID, 10)
 	if cached, found := dbCache.Get(cacheKey); found {
 		if settings, ok := cached.(*ChatSettings); ok {
@@ -84,7 +83,7 @@ func getChatSettings(chatID int64) (*ChatSettings, error) {
 
 func updateChatSettings(newSettings *ChatSettings) error {
 	cacheKey := "chat_settings_" + strconv.FormatInt(newSettings.ChatID, 10)
-		ctx, cancel := mongoCtx()
+	ctx, cancel := mongoCtx()
 	defer cancel()
 
 	opts := options.UpdateOne().SetUpsert(true)

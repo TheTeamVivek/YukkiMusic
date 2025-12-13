@@ -32,10 +32,10 @@ func SetMaintenance(enabled bool, reason ...string) error {
 	if state.Maintenance.Enabled == enabled {
 		if enabled && len(reason) > 0 && state.Maintenance.Reason != reason[0] {
 			state.Maintenance.Reason = reason[0]
-			return updateBotState( state)
+			return updateBotState(state)
 		} else if !enabled && state.Maintenance.Reason != "" {
 			state.Maintenance.Reason = ""
-			return updateBotState( state)
+			return updateBotState(state)
 		}
 		return nil
 	}
@@ -47,7 +47,7 @@ func SetMaintenance(enabled bool, reason ...string) error {
 		state.Maintenance.Reason = ""
 	}
 
-	return updateBotState( state)
+	return updateBotState(state)
 }
 
 func GetMaintReason() (string, error) {

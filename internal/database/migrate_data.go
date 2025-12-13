@@ -53,7 +53,7 @@ func MigrateData(mongoURI string) {
 	logger.Info("Checking for old database to migrate...")
 
 	oldDB := client.Database(oldDBName)
-	ctx, cancel := mongoCtx(15* time.Second)
+	ctx, cancel := mongoCtx(15 * time.Second)
 	defer cancel()
 
 	flagColl := oldDB.Collection("migration_status")

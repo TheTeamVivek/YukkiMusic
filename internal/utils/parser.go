@@ -24,9 +24,8 @@ import (
 	"html"
 	"strconv"
 	"strings"
-	
-	tg "github.com/amarnathcjd/gogram/telegram"
 
+	tg "github.com/amarnathcjd/gogram/telegram"
 )
 
 func ShortTitle(title string, max ...int) string {
@@ -61,7 +60,7 @@ func MentionHTML(u *tg.UserObj) string {
 	}
 	fullName = html.EscapeString(ShortTitle(fullName, 15))
 
-	return "<a href=\"tg://user?id=" +IntToStr(u.ID)+ "\">" + fullName + "</a>"
+	return "<a href=\"tg://user?id=" + IntToStr(u.ID) + "\">" + fullName + "</a>"
 }
 
 // IfElse returns `a` if condition is true, else returns `b`.

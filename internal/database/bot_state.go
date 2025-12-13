@@ -20,8 +20,6 @@
 package database
 
 import (
-	"context"
-
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -62,7 +60,7 @@ func getBotState() (*BotState, error) {
 			return state, nil
 		}
 	}
-		ctx, cancel := mongoCtx()
+	ctx, cancel := mongoCtx()
 	defer cancel()
 
 	var state BotState
@@ -79,11 +77,11 @@ func getBotState() (*BotState, error) {
 	return &state, nil
 }
 
-func updateBotState( newState *BotState) error {
-		ctx, cancel := mongoCtx()
+func updateBotState(newState *BotState) error {
+	ctx, cancel := mongoCtx()
 	defer cancel()
 
-opts := options.UpdateOne().SetUpsert(true)
+	opts := options.UpdateOne().SetUpsert(true)
 	_, err := settingsColl.UpdateOne(ctx, bson.M{"_id": "global"}, bson.M{"$set": newState}, opts)
 	if err != nil {
 		logger.ErrorF("Failed to update bot state: %v", err)

@@ -20,9 +20,11 @@
 package database
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"sync"
+	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
@@ -39,7 +41,7 @@ func GetAssistantIndex(chatID int64, assistantCount int) (int, error) {
 		logger.Error("assistantCount must be positive")
 		return 0, fmt.Errorf("assistantCount must be positive")
 	}
-	
+
 	settings, err := getChatSettings(chatID)
 	if err != nil {
 		logger.Error("Failed to get chat settings for chat " + strconv.FormatInt(chatID, 10) + ": " + err.Error())
@@ -63,7 +65,7 @@ func GetAssistantIndex(chatID int64, assistantCount int) (int, error) {
 	)
 
 	settings.AssistantIndex = newIndex
-	if err := updateChatSettings( settings); err != nil {
+	if err := updateChatSettings(settings); err != nil {
 		logger.Error(
 			"Failed to update assistant index for chat " +
 				strconv.FormatInt(chatID, 10) + ": " + err.Error(),

@@ -68,7 +68,7 @@ func AddSudo(id int64) error {
 	}
 
 	state.Sudoers = append(state.Sudoers, id)
-	if err := updateBotState( state); err != nil {
+	if err := updateBotState(state); err != nil {
 		logger.ErrorF("Failed to update sudoers: %v", err)
 		return err
 	}
@@ -101,7 +101,7 @@ func DeleteSudo(id int64) error {
 	}
 	state.Sudoers = newSudoers
 
-	if err := updateBotState( state); err != nil {
+	if err := updateBotState(state); err != nil {
 		logger.ErrorF("Failed to update sudoers: %v", err)
 		return err
 	}
