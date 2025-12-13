@@ -38,11 +38,11 @@ import (
 var (
 	autoLeaveMu      sync.Mutex
 	autoLeaveRunning bool
-	limit            = 30
+	limit            = 50
 )
 
 func init() {
-	helpTexts["autoleave"] = fmt.Sprintf(`<i>Automatically makes the bot leave inactive or unnecessary chats every 15 minutes.</i>
+	helpTexts["autoleave"] = fmt.Sprintf(`<i>Automatically makes the assistant leave inactive or unnecessary chats every 10 minutes.</i>
 
 <u>Usage:</u>
 <b>/autoleave </b>— Shows current auto-leave status (enabled/disabled).  
@@ -50,7 +50,7 @@ func init() {
 <b>/autoleave disable</b> — Disable auto-leave mode.
 
 <b>🧠 Details:</b>
-Once enabled, the bot checks all joined groups/channels every <b>15 minutes</b> and leaves up to <b>%d chats per cycle</b> that are not in the active room list.
+Once enabled, the bot checks all joined groups/channels every <b>10 minutes</b> and leaves up to <b>%d chats per cycle</b> that are not in the active room  list.
 
 <b>⚠️ Restrictions:</b>
 This command can only be used by <b>owners</b> or <b>sudo users</b>.`, limit)
@@ -121,7 +121,7 @@ func startAutoLeave() {
 	autoLeaveRunning = true
 	autoLeaveMu.Unlock()
 
-	ticker := time.NewTicker(15 * time.Minute)
+	ticker := time.NewTicker(10 * time.Minute)
 	defer ticker.Stop()
 
 	for {
