@@ -51,13 +51,14 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 	floodDuration := 5 * time.Minute
 
 	if remaining := utils.GetFlood(floodKey); remaining > 0 {
-		return m.E(m.Reply(F(
+		 _, err := m.Reply(F(
 			chatID,
 			"flood_minutes",
 			locales.Arg{
 				"duration": formatDuration(int(remaining.Seconds())),
 			},
 		)))
+return err
 	}
 
 	mystic, err := m.Reply(F(chatID, "reload_start"))
