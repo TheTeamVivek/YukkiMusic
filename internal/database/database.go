@@ -53,7 +53,7 @@ func Init(mongoURL string) func() {
 	settingsColl = database.Collection("bot_settings")
 	chatSettingsColl = database.Collection("chat_settings")
 
-	go database.MigrateData(mongoURL)
+	go migrateData(mongoURL)
 
 	return func() {
 		ctx, cancel := mongoCtx()
