@@ -20,7 +20,6 @@
 package modules
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"sync"
@@ -148,6 +147,7 @@ func startAutoLeave() {
 		<-ticker.C
 	}
 }
+
 func autoLeaveAssistant(
 	ass *core.Assistant,
 	activeRooms map[int64]struct{},

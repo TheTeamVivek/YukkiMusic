@@ -43,7 +43,7 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 	if m.Args() != "" {
 		return tg.ErrEndGroup
 	}
-	
+
 	chatID := m.ChannelID()
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
