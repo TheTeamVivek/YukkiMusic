@@ -45,12 +45,12 @@ func handlePause(m *tg.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if !r.IsActiveChat() {
 		m.Reply(F(chatID, "room_no_active"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if r.IsPaused() {
@@ -64,7 +64,7 @@ func handlePause(m *tg.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "pause_already", locales.Arg{
 			"auto_resume_line": autoResumeLine,
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	args := strings.Fields(m.Text())
@@ -75,14 +75,14 @@ func handlePause(m *tg.NewMessage, cplay bool) error {
 		if sec, convErr := strconv.Atoi(raw); convErr == nil {
 			if sec < 5 || sec > 3600 {
 				m.Reply(F(chatID, "pause_invalid_duration"))
-				return tg.EndGroup
+				return tg.ErrEndGroup
 			}
 			autoResumeDuration = time.Duration(sec) * time.Second
 		} else {
 			m.Reply(F(chatID, "pause_invalid_format", locales.Arg{
 				"cmd": getCommand(m),
 			}))
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 	}
 
@@ -96,7 +96,7 @@ func handlePause(m *tg.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "room_pause_failed", locales.Arg{
 			"error": pauseErr.Error(),
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	mention := utils.MentionHTML(m.Sender)
@@ -124,5 +124,5 @@ func handlePause(m *tg.NewMessage, cplay bool) error {
 	}
 
 	m.Reply(msg)
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }

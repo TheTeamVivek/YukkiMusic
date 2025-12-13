@@ -41,18 +41,18 @@ func cmuteHandler(m *tg.NewMessage) error {
 
 func handleMute(m *tg.NewMessage, cplay bool) error {
 	if m.Args() != "" {
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if !r.IsActiveChat() {
 		m.Reply(F(m.ChatID(), "room_no_active"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if r.IsMuted() {
@@ -64,7 +64,7 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 		} else {
 			m.Reply(F(m.ChatID(), "mute_already_muted"))
 		}
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	mention := utils.MentionHTML(m.Sender)
@@ -78,14 +78,14 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 		if seconds, err := strconv.Atoi(rawDuration); err == nil {
 			if seconds < 5 || seconds > 3600 {
 				m.Reply(F(m.ChatID(), "mute_invalid_duration"))
-				return tg.EndGroup
+				return tg.ErrEndGroup
 			}
 			autoUnmuteDuration = time.Duration(seconds) * time.Second
 		} else {
 			m.Reply(F(m.ChatID(), "mute_invalid_format", locales.Arg{
 				"cmd": getCommand(m),
 			}))
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 	}
 
@@ -100,7 +100,7 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 		m.Reply(F(m.ChatID(), "mute_failed", locales.Arg{
 			"error": muteErr.Error(),
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	msgArgs := locales.Arg{
@@ -115,5 +115,5 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 		m.Reply(F(m.ChatID(), "mute_success", msgArgs))
 	}
 
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }

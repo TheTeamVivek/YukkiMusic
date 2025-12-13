@@ -51,32 +51,32 @@ func handleLogger(m *telegram.NewMessage) error {
 				"status": "",
 			}))
 		}
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	enable, err := utils.ParseBool(args[1])
 	if err != nil {
 		m.Reply(F(chatID, "invalid_bool"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	action = F(chatID, utils.IfElse(enable, "enabled", "disabled"))
 	if dbErr != nil {
 		m.Reply(F(chatID, "logger_check_fail", locales.Arg{"error": dbErr.Error()}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if current == enable {
 		m.Reply(F(chatID, "logger_already", locales.Arg{"action": action}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if err := database.SetLoggerEnabled(enable); err != nil {
 		m.Reply(F(chatID, "logger_update_fail", locales.Arg{"error": err.Error()}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	m.Reply(F(chatID, "logger_updated", locales.Arg{"action": action}))
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

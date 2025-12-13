@@ -44,13 +44,13 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	chatID := m.ChannelID()
 	if !r.IsActiveChat() {
 		m.Reply(F(chatID, "room_no_active"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	mention := utils.MentionHTML(m.Sender)
@@ -60,7 +60,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	t := r.NextTrack()
@@ -83,7 +83,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		}
 
 		r.Destroy()
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if err := r.Play(t, path); err != nil {
@@ -94,7 +94,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 			core.Bot.SendMessage(chatID, txt)
 		}
 		r.Destroy()
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	title := utils.ShortTitle(t.Title, 25)
@@ -126,5 +126,5 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		r.SetMystic(newMystic)
 	}
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

@@ -175,7 +175,7 @@ func SafeCallbackHandler(handler func(*tg.CallbackQuery) error) func(*tg.Callbac
 			if cb.Sender.ID != config.OwnerID {
 				if ok, _ := database.IsSudo(cb.Sender.ID); !ok {
 					cb.Answer(F(cb.ChannelID(), "maint", locales.Arg{"reason": ""}), &tg.CallbackOptions{Alert: true})
-					return tg.EndGroup
+					return tg.ErrEndGroup
 				}
 			}
 		}
@@ -187,7 +187,7 @@ func SafeCallbackHandler(handler func(*tg.CallbackQuery) error) func(*tg.Callbac
 		}()
 		err = handler(cb)
 		if err != nil {
-			if errors.Is(err, tg.EndGroup) {
+			if errors.Is(err, tg.ErrEndGroup) {
 				return err
 			}
 			handlePanic(err, cb, false)
@@ -211,7 +211,7 @@ func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage)
 						m.Reply(msg)
 						gologging.Info("Sent maintenance notice to " + fmt.Sprint(m.SenderID()))
 					}
-					return tg.EndGroup
+					return tg.ErrEndGroup
 				}
 			}
 		}
@@ -235,8 +235,8 @@ func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage)
 		}
 
 		if err != nil {
-			if errors.Is(err, tg.EndGroup) {
-				gologging.Debug("Handler exited early (EndGroup)")
+			if errors.Is(err, tg.ErrEndGroup) {
+				gologging.Debug("Handler exited early (ErrEndGroup)")
 				return err
 			}
 			gologging.Error("Handler error: " + err.Error())

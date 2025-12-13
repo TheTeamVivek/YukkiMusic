@@ -51,7 +51,7 @@ const playMaxRetries = 3
 
 func channelPlayHandler(m *telegram.NewMessage) error {
 	m.Reply(F(m.ChannelID(), "channel_play_depreciated"))
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }
 
 func playHandler(m *telegram.NewMessage) error {
@@ -92,7 +92,7 @@ func cplayHandler(m *telegram.NewMessage) error {
 				F(chatID, "cplay_usage"),
 				&telegram.SendOptions{ParseMode: "HTML"},
 			)
-			return telegram.EndGroup
+			return telegram.ErrEndGroup
 		}
 
 		cplayIDStr := args[2]
@@ -102,7 +102,7 @@ func cplayHandler(m *telegram.NewMessage) error {
 				F(chatID, "cplay_invalid_chat_id"),
 				&telegram.SendOptions{ParseMode: "HTML"},
 			)
-			return telegram.EndGroup
+			return telegram.ErrEndGroup
 		}
 
 		peer, err := m.Client.ResolvePeer(cplayID)
@@ -111,7 +111,7 @@ func cplayHandler(m *telegram.NewMessage) error {
 				F(chatID, "cplay_resolve_peer_fail"),
 				&telegram.SendOptions{ParseMode: "HTML"},
 			)
-			return telegram.EndGroup
+			return telegram.ErrEndGroup
 		}
 
 		chPeer, ok := peer.(*telegram.InputPeerChannel)
@@ -120,7 +120,7 @@ func cplayHandler(m *telegram.NewMessage) error {
 				F(chatID, "cplay_invalid_target"),
 				&telegram.SendOptions{ParseMode: "HTML"},
 			)
-			return telegram.EndGroup
+			return telegram.ErrEndGroup
 		}
 
 		fullChat, err := m.Client.ChannelsGetFullChannel(&telegram.InputChannelObj{
@@ -136,7 +136,7 @@ func cplayHandler(m *telegram.NewMessage) error {
 				F(chatID, "cplay_channel_not_accessible"),
 				&telegram.SendOptions{ParseMode: "HTML"},
 			)
-			return telegram.EndGroup
+			return telegram.ErrEndGroup
 		}
 
 		if err := database.SetCPlayID(m.ChannelID(), cplayID); err != nil {
@@ -157,7 +157,7 @@ func cplayHandler(m *telegram.NewMessage) error {
 			}),
 			&telegram.SendOptions{ParseMode: "HTML"},
 		)
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 	return handlePlay(m, &playOpts{CPlay: true})
 }
@@ -167,17 +167,17 @@ func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
 
 	r, replyMsg, err := prepareRoomAndSearchMessage(m, opts.CPlay)
 	if err != nil {
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	tracks, isActive, err := fetchTracksAndCheckStatus(m, replyMsg, r, opts.Video)
 	if err != nil {
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	tracks, availableSlots, err := filterAndTrimTracks(replyMsg, r, tracks)
 	if err != nil {
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if err := playTracksAndRespond(
@@ -187,7 +187,7 @@ func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
 		return err
 	}
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }
 
 func prepareRoomAndSearchMessage(m *telegram.NewMessage, cplay bool) (*core.RoomState, *telegram.NewMessage, error) {
@@ -438,7 +438,7 @@ func playTracksAndRespond(
 						"error": html.EscapeString(err.Error()),
 					}))
 				}
-				return telegram.EndGroup
+				return telegram.ErrEndGroup
 			}
 
 			filePath = path
@@ -579,11 +579,11 @@ func playTrackWithRetry(
 				}
 				utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_rtmp_missing_params"))
 				r.Destroy()
-				return telegram.EndGroup
+				return telegram.ErrEndGroup
 			} else {
 				r.SetRTMPPlayer(url, key)
 			}*/
-			return telegram.EndGroup
+			return telegram.ErrEndGroup
 		}
 
 		// INTERDC_X_CALL_ERROR → retry

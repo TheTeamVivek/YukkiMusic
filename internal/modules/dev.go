@@ -38,7 +38,7 @@ import (
 
 func shellHandle(m *telegram.NewMessage) error {
 	if m.SenderID() != config.OwnerID {
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 	cmd := m.Args()
 	var cmd_args []string
@@ -218,11 +218,11 @@ func resolveImports(code string) (string, []string) {
 
 func evalHandle(m *telegram.NewMessage) error {
 	if m.SenderID() != config.OwnerID {
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 	code := ""
 	if x := strings.Split(m.RawText(true), " "); len(x) < 2 {
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	} else {
 		code = strings.TrimSpace(strings.Join(x[1:], " "))
 	}

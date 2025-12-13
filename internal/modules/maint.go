@@ -36,7 +36,7 @@ func handleMaintenance(m *tg.NewMessage) error {
 	current, err := database.IsMaintenance()
 	if err != nil {
 		m.Reply(F(m.ChatID(), "maint_check_fail", locales.Arg{"error": err.Error()}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	// show current status if no args
@@ -54,13 +54,13 @@ func handleMaintenance(m *tg.NewMessage) error {
 			"cmd":    getCommand(m),
 			"status": status,
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	enable, err := utils.ParseBool(args[1])
 	if err != nil {
 		m.Reply(F(m.ChatID(), "invalid_bool"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 	reason := strings.Join(args[2:], " ")
 	oldReason, _ := database.GetMaintReason()
@@ -83,7 +83,7 @@ func handleMaintenance(m *tg.NewMessage) error {
 		} else {
 			m.Reply(F(m.ChatID(), "maint_already_disabled"))
 		}
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	// apply new state
@@ -128,7 +128,7 @@ func handleMaintenance(m *tg.NewMessage) error {
 		} else {
 			m.Reply(F(m.ChatID(), "maint_enabled"))
 		}
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	// disable maintenance
@@ -137,5 +137,5 @@ func handleMaintenance(m *tg.NewMessage) error {
 	maintCancel.Unlock()
 
 	m.Reply(F(m.ChatID(), "maint_disabled"))
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }

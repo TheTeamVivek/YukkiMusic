@@ -39,24 +39,24 @@ func cunmuteHandler(m *tg.NewMessage) error {
 
 func handleUnmute(m *tg.NewMessage, cplay bool) error {
 	if m.Args() != "" {
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	chatID := m.ChannelID()
 
 	if !r.IsActiveChat() {
 		m.Reply(F(chatID, "room_no_active"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if !r.IsMuted() {
 		m.Reply(F(chatID, "unmute_already"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	title := html.EscapeString(utils.ShortTitle(r.Track().Title, 25))
@@ -66,7 +66,7 @@ func handleUnmute(m *tg.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "unmute_failed", locales.Arg{
 			"error": err.Error(),
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	// optional speed line
@@ -84,5 +84,5 @@ func handleUnmute(m *tg.NewMessage, cplay bool) error {
 	})
 
 	m.Reply(msg)
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }

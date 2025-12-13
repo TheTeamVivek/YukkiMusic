@@ -36,7 +36,7 @@ func startHandler(m *tg.NewMessage) error {
 		m.Reply(
 			F(m.ChannelID(), "start_group"),
 		)
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	arg := m.Args()
@@ -67,7 +67,7 @@ func startHandler(m *tg.NewMessage) error {
 		}
 	}
 
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func startCB(cb *tg.CallbackQuery) error {
@@ -88,5 +88,5 @@ func startCB(cb *tg.CallbackQuery) error {
 	}
 
 	cb.Edit(caption, sendOpt)
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }

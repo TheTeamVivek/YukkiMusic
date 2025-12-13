@@ -42,13 +42,13 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 	chatID := m.ChannelID()
 
 	if !r.IsActiveChat() {
 		m.Reply(F(chatID, "room_no_active"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	r.Parse()
@@ -65,7 +65,7 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 			"state": state,
 			"cmd":   cmd,
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	var newState bool
@@ -87,5 +87,5 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 		"user":  utils.MentionHTML(m.Sender),
 	}))
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

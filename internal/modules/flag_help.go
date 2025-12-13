@@ -52,11 +52,11 @@ func showHelpFor(m *tg.NewMessage, cmd string) error {
 		if err != nil {
 			return err
 		}
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 	_, err := m.Reply("📘 <b>Help for</b> <code>" + cmd + "</code>:\n\n" + help)
 	if err != nil {
 		return err
 	}
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }

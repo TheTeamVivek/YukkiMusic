@@ -46,7 +46,7 @@ func statsHandler(m *telegram.NewMessage) error {
 	sb.WriteString(getServedStats(chatID))
 
 	m.Reply(sb.String())
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }
 
 // ---- Sub Functions ----

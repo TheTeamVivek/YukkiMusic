@@ -119,7 +119,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 			"Please wait for it to complete or cancel it first using:\n" +
 			"• <code>/broadcast -cancel</code>\n" +
 			"• Or click the Cancel button on the progress message")
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 	broadcastActive = true
 	broadcastMu.Unlock()
@@ -132,7 +132,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 		broadcastMu.Unlock()
 		m.Reply(fmt.Sprintf("❌ <b>Failed to parse broadcast command:</b>\n<code>%s</code>",
 			html.EscapeString(err.Error())))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if content == "" && !m.IsReply() {
@@ -143,7 +143,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 			"<b>Usage:</b> <code>%s [text or reply to message]</code>\n\n"+
 			"<b>Example:</b>\n<code>%s Hello everyone!</code>",
 			getCommand(m), getCommand(m)))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	// Get served chats and users
@@ -158,7 +158,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 			broadcastMu.Unlock()
 			m.Reply(fmt.Sprintf("❌ <b>Failed to fetch served chats:</b>\n<code>%s</code>",
 				html.EscapeString(servedChatErr.Error())))
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 	}
 
@@ -170,7 +170,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 			broadcastMu.Unlock()
 			m.Reply(fmt.Sprintf("❌ <b>Failed to fetch served users:</b>\n<code>%s</code>",
 				html.EscapeString(servedUserErr.Error())))
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 	}
 
@@ -181,7 +181,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 		broadcastMu.Unlock()
 		m.Reply("⚠️ <b>No targets found for broadcast.</b>\n\n" +
 			"Make sure you haven't excluded all targets with flags.")
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	// Apply limit if specified
@@ -222,7 +222,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 		broadcastCancel = nil
 		broadcastMu.Unlock()
 		gologging.ErrorF("Failed to send broadcast progress message: %v", err)
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	// Start progress updater in goroutine
@@ -244,7 +244,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 		startBroadcast(broadcastCtx, m, progressMsg, flags, content, servedChats, servedUsers, stats)
 	}()
 
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func parseBroadcastCommand(m *tg.NewMessage) (*BroadcastFlags, string, error) {
@@ -603,7 +603,7 @@ func handleBroadcastCancel(m *tg.NewMessage) error {
 
 	if !broadcastActive {
 		m.Reply("ℹ️ <b>No broadcast is currently running.</b>")
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if broadcastCancel != nil {
@@ -614,13 +614,13 @@ func handleBroadcastCancel(m *tg.NewMessage) error {
 	broadcastCancel = nil
 
 	m.Reply("🚫 <b>Broadcast cancelled successfully.</b>")
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func broadcastCancelCB(cb *tg.CallbackQuery) error {
 	if cb.SenderID != config.OwnerID {
 		cb.Answer("⚠️ Only the owner can cancel broadcasts.", &tg.CallbackOptions{Alert: true})
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	broadcastMu.Lock()
@@ -628,7 +628,7 @@ func broadcastCancelCB(cb *tg.CallbackQuery) error {
 
 	if !broadcastActive {
 		cb.Answer("ℹ️ No broadcast is currently running.", &tg.CallbackOptions{Alert: true})
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if broadcastCancel != nil {
@@ -640,7 +640,7 @@ func broadcastCancelCB(cb *tg.CallbackQuery) error {
 	broadcastCancel = nil
 
 	cb.Answer("🚫 Broadcast cancelled.", &tg.CallbackOptions{Alert: true})
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func sleepCtx(ctx context.Context, d time.Duration) bool {

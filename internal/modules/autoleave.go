@@ -65,7 +65,7 @@ func autoLeaveHandler(m *tg.NewMessage) error {
 	currentState, err := database.GetAutoLeave()
 	if err != nil {
 		m.Reply(F(chatID, "autoleave_fetch_fail"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	status := F(chatID, utils.IfElse(currentState, "enabled", "disabled"))
@@ -75,25 +75,25 @@ func autoLeaveHandler(m *tg.NewMessage) error {
 			"cmd":    getCommand(m),
 			"action": status,
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	newState, err := utils.ParseBool(args[1])
 	if err != nil {
 		m.Reply(F(chatID, "invalid_bool"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if newState == currentState {
 		m.Reply(F(chatID, "autoleave_already", locales.Arg{
 			"action": status,
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if err := database.SetAutoLeave(newState); err != nil {
 		m.Reply(F(chatID, "autoleave_update_fail"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	newStatus := F(chatID, utils.IfElse(newState, "enabled", "disabled"))
@@ -111,7 +111,7 @@ func autoLeaveHandler(m *tg.NewMessage) error {
 		autoLeaveCtx = nil
 		autoLeaveCancel = nil
 	}
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func startAutoLeave() {

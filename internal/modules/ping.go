@@ -114,5 +114,5 @@ func pingHandler(m *tg.NewMessage) error {
 	})
 
 	reply.Edit(msg, opt)
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }

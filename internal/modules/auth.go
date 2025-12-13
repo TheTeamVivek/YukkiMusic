@@ -74,14 +74,14 @@ func addAuthHandler(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "auth_no_user", locales.Arg{
 			"cmd": getCommand(m),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if au, _ := database.GetAuthUsers(chatID); len(au) >= config.MaxAuthUsers {
 		m.Reply(F(chatID, "auth_limit_reached", locales.Arg{
 			"limit": config.MaxAuthUsers,
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	userID, err := utils.ExtractUser(m)
@@ -89,23 +89,23 @@ func addAuthHandler(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "user_extract_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// owner, bot, self, already auth, or admin — all treated the same
 	if userID == config.OwnerID || userID == core.BUser.ID || userID == m.SenderID() {
 		m.Reply(F(chatID, "already_authed"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if ok, _ := database.IsAuthUser(chatID, userID); ok {
 		m.Reply(F(chatID, "already_authed"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if ok, _ := utils.IsChatAdmin(m.Client, chatID, userID); ok {
 		m.Reply(F(chatID, "already_authed"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	user, err := m.Client.GetUser(userID)
@@ -113,19 +113,19 @@ func addAuthHandler(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "user_extract_fail", locales.Arg{
 			"error": utils.IfElse(err != nil, err.Error(), ""),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if user.Bot {
 		m.Reply(F(chatID, "addauth_bot_user"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if err := database.AddAuthUser(chatID, userID); err != nil {
 		m.Reply(F(chatID, "addauth_add_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	uname := utils.MentionHTML(user)
@@ -145,7 +145,7 @@ func addAuthHandler(m *telegram.NewMessage) error {
 		}))
 	}
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }
 
 func delAuthHandler(m *telegram.NewMessage) error {
@@ -155,7 +155,7 @@ func delAuthHandler(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "auth_no_user", locales.Arg{
 			"cmd": getCommand(m),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	userID, err := utils.ExtractUser(m)
@@ -163,12 +163,12 @@ func delAuthHandler(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "user_extract_fail", locales.Arg{
 			"error": utils.IfElse(err != nil, err.Error(), "unknown error"),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if ok, err := database.IsAuthUser(chatID, userID); !ok && err == nil {
 		m.Reply(F(chatID, "del_auth_not_authorized", nil))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	user, err := m.Client.GetUser(userID)
@@ -176,14 +176,14 @@ func delAuthHandler(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "user_extract_fail", locales.Arg{
 			"error": utils.IfElse(err != nil, err.Error(), "unknown error"),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if err := database.RemoveAuthUser(chatID, userID); err != nil {
 		m.Reply(F(chatID, "del_auth_remove_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	uname := utils.MentionHTML(user)
@@ -194,7 +194,7 @@ func delAuthHandler(m *telegram.NewMessage) error {
 	m.Reply(F(chatID, "del_auth_success", locales.Arg{
 		"user": uname,
 	}))
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }
 
 func authListHandler(m *telegram.NewMessage) error {
@@ -248,5 +248,5 @@ func authListHandler(m *telegram.NewMessage) error {
 	}))
 
 	utils.EOR(mystic, sb.String())
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

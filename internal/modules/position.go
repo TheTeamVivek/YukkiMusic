@@ -44,12 +44,12 @@ func handlePosition(m *tg.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if !r.IsActiveChat() || r.Track().ID == "" {
 		m.Reply(F(chatID, "room_no_active"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	r.Parse()
@@ -63,5 +63,5 @@ func handlePosition(m *tg.NewMessage, cplay bool) error {
 		"speed":    fmt.Sprintf("%.2f", r.Speed()),
 	}))
 
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }

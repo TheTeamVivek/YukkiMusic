@@ -46,13 +46,13 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 	t := r.Track()
 
 	if !r.IsActiveChat() || t.ID == "" {
 		m.Reply(F(chatID, "queue_no_active"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	var b strings.Builder
@@ -98,7 +98,7 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 	}
 
 	m.Reply(b.String())
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func removeHandler(m *telegram.NewMessage) error {
@@ -115,17 +115,17 @@ func handleRemove(m *tg.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 	t := r.Track()
 	if !r.IsActiveChat() || t.ID == "" {
 		m.Reply(F(chatID, "queue_no_active"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if len(r.Queue()) == 0 {
 		m.Reply(F(chatID, "queue_empty"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	args := strings.Fields(m.Text())
@@ -133,18 +133,18 @@ func handleRemove(m *tg.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "remove_usage", locales.Arg{
 			"cmd": getCommand(m),
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	index, err := strconv.Atoi(args[1])
 	if err != nil {
 		m.Reply(F(chatID, "remove_invalid_index"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if index <= 0 {
 		m.Reply(F(chatID, "remove_index_too_small"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	total := len(r.Queue())
@@ -152,7 +152,7 @@ func handleRemove(m *tg.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "remove_index_too_big", locales.Arg{
 			"total": total,
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	r.RemoveFromQueue(index - 1)
@@ -162,7 +162,7 @@ func handleRemove(m *tg.NewMessage, cplay bool) error {
 		"user":  utils.MentionHTML(m.Sender),
 	}))
 
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func clearHandler(m *telegram.NewMessage) error {
@@ -179,17 +179,17 @@ func handleClear(m *tg.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 	t := r.Track()
 	if !r.IsActiveChat() || t.ID == "" {
 		m.Reply(F(chatID, "clear_no_active"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if len(r.Queue()) == 0 {
 		m.Reply(F(chatID, "queue_empty"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	r.RemoveFromQueue(-1)
@@ -198,7 +198,7 @@ func handleClear(m *tg.NewMessage, cplay bool) error {
 		"user": utils.MentionHTML(m.Sender),
 	}))
 
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func moveHandler(m *telegram.NewMessage) error {
@@ -215,17 +215,17 @@ func handleMove(m *tg.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if !r.IsActiveChat() || r.Track().ID == "" {
 		m.Reply(F(chatID, "queue_no_active"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if len(r.Queue()) == 0 {
 		m.Reply(F(chatID, "queue_empty"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	args := strings.Fields(m.Text())
@@ -233,7 +233,7 @@ func handleMove(m *tg.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "move_usage", locales.Arg{
 			"cmd": getCommand(m),
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	from, err1 := strconv.Atoi(args[1])
@@ -242,12 +242,12 @@ func handleMove(m *tg.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "move_invalid_numbers", locales.Arg{
 			"cmd": getCommand(m),
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if from <= 0 || to <= 0 {
 		m.Reply(F(chatID, "move_invalid_indexes_min"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	queueLen := len(r.Queue())
@@ -255,7 +255,7 @@ func handleMove(m *tg.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "move_invalid_indexes_max", locales.Arg{
 			"queue_len": queueLen,
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	r.MoveInQueue(from-1, to-1)
@@ -266,5 +266,5 @@ func handleMove(m *tg.NewMessage, cplay bool) error {
 		"user": utils.MentionHTML(m.Sender),
 	}))
 
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }

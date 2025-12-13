@@ -43,7 +43,7 @@ var evalLogger = gologging.GetLogger("Eval")
 
 func evalCommandHandler(m *telegram.NewMessage) error {
 	if m.SenderID() != config.OwnerID {
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	parts := strings.SplitN(m.RawText(true), " ", 2)

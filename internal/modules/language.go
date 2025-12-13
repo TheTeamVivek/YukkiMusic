@@ -53,7 +53,7 @@ func langHandler(m *telegram.NewMessage) error {
 	if err != nil {
 		return err
 	}
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }
 
 func langCallbackHandler(cb *telegram.CallbackQuery) error {
@@ -62,21 +62,21 @@ func langCallbackHandler(cb *telegram.CallbackQuery) error {
 	parts := strings.SplitN(data, ":", 2)
 	if len(parts) != 2 {
 		cb.Answer("⚠️ Invalid data.", opt)
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 	lang := parts[1]
 
 	chatID := cb.ChannelID()
 	if isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); err != nil || !isAdmin {
 		cb.Answer(F(chatID, "only_admin_or_auth_cb"), opt)
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	currentLang, _ := database.GetChatLanguage(chatID)
 
 	if lang == currentLang {
 		cb.Answer(F(chatID, "lang_same"), opt)
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	langName := locales.Get(lang, "name", nil)
@@ -84,11 +84,11 @@ func langCallbackHandler(cb *telegram.CallbackQuery) error {
 	if err := database.SetChatLanguage(chatID, lang); err != nil {
 		logger.ErrorF("SetChatLanguage error: %v", err)
 		cb.Answer(F(chatID, "lang_fail"), opt)
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	msg := F(chatID, "lang_success", locales.Arg{"lang_name": langName})
 	cb.Answer(msg, opt)
 	cb.Edit(msg)
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

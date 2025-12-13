@@ -36,18 +36,18 @@ func maskKey(k string) string {
 
 func setRTMPHandler(m *tg.NewMessage) error {
 	if !filterChannel(m) {
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 	m.Reply("⚠️ This feature will be implemented soon as possible.")
 	/*
 		switch m.ChatType() {
 		case tg.EntityChat:
 			m.Reply("⚙️ This command works only in my DM.\n\n📩 Open private chat and send:\n/setrtmp [chat_id] [rtmp_url/rtmp_key]")
-			return tg.EndGroup
+			return tg.ErrEndGroup
 
 		case tg.EntityUser:
 		default:
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		args := strings.Fields(m.Text())
@@ -60,7 +60,7 @@ func setRTMPHandler(m *tg.NewMessage) error {
 				"<b>Format:</b> url + key.\n\n" +
 				"<i>/setrtmp -1001234567890 rtmps://dc5-1.rtmp.t.me/s/1234567890:abcdefghijkll</i></blockquote>",
 			)
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		cid := args[1]
@@ -69,7 +69,7 @@ func setRTMPHandler(m *tg.NewMessage) error {
 		idx := strings.LastIndex(raw, "/")
 		if idx <= 0 || idx == len(raw)-1 {
 			m.Reply("⚠️ Invalid RTMP format.")
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		url := raw[:idx]
@@ -77,23 +77,23 @@ func setRTMPHandler(m *tg.NewMessage) error {
 
 		if url == "" || key == "" {
 			m.Reply("⚠️ RTMP URL or key is empty.")
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 		chatID, err := strconv.ParseInt(cid, 10, 64)
 		if err != nil {
 			m.Reply("⚠️ Invalid chat ID.\nPlease provide a valid numeric chat ID.\n\nExample:\n/setrtmp -1001234567890 url+key")
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 		if ok, err := utils.IsChatAdmin(m.Client, chatID, m.SenderID()); err != nil {
 			m.Reply("⚠️ Unable to check chat details.\nMake sure:\n• I am an admin in that chat\n• The provided chat ID is valid")
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		} else if !ok {
 			m.Reply("⚠️ Only chat administrators can set the RTMP stream.")
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 		if err := database.SetRTMP(chatID, url, key); err != nil {
 			m.Reply("❌ Failed to save RTMP settings:\n" + html.EscapeString(err.Error()))
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		m.Reply(
@@ -103,5 +103,5 @@ func setRTMPHandler(m *tg.NewMessage) error {
 				"🔑 Key: " + html.EscapeString(maskKey(key)),
 		)
 	*/
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }

@@ -49,7 +49,7 @@ func cancelHandler(cb *tg.CallbackQuery) error {
 			F(chatID, "only_admin_or_auth_cb"),
 			opt,
 		)
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if cancel, ok := downloadCancels[chatID]; ok {
@@ -59,18 +59,18 @@ func cancelHandler(cb *tg.CallbackQuery) error {
 	} else {
 		cb.Answer("No download to cancel.", opt)
 	}
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func closeHandler(cb *tg.CallbackQuery) error {
 	cb.Answer("")
 	cb.Delete()
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func emptyCBHandler(cb *tg.CallbackQuery) error {
 	cb.Answer("")
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func roomHandle(cb *tg.CallbackQuery) error {
@@ -82,7 +82,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 	if updateType == "" {
 		gologging.WarnF("Missing action in data: %s", data)
 		cb.Answer("⚠️ Invalid request.", opt)
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	chatID := cb.ChannelID()
@@ -95,7 +95,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 		if err != nil {
 			gologging.ErrorF("Failed to get chat ID for cplay ID %d: %v", chatID, err)
 			cb.Answer(F(chatID, "room_not_linked"), opt)
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 		chatID = realChatID
 	}
@@ -112,20 +112,20 @@ func roomHandle(cb *tg.CallbackQuery) error {
 		if _, err := cb.Edit(F(chatID, "room_not_active")); err != nil {
 			gologging.ErrorF("Edit error: %v", err)
 		}
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 	if isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); err != nil || !isAdmin {
 		cb.Answer(
 			F(chatID, "only_admin_or_auth_cb"),
 			opt,
 		)
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	key := fmt.Sprintf("room:%d:%d", cb.Sender.ID, chatID)
 	if remaining := utils.GetFlood(key); remaining > 0 {
 		cb.Answer(F(chatID, "flood_seconds", locales.Arg{"duration": remaining.Seconds()}), opt)
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 	utils.SetFlood(key, 5*time.Second)
 
@@ -135,7 +135,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 
 		/*if r.IsMuted() {
 			cb.Answer("🔇 The chat is muted. Please unmute first.", opt)
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}*/
 
 		if r.IsPaused() {
@@ -148,13 +148,13 @@ func roomHandle(cb *tg.CallbackQuery) error {
 				F(chatID, "room_already_paused"),
 			)
 			cb.Answer(msg, opt)
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		if _, pauseErr := r.Pause(); pauseErr != nil {
 			gologging.ErrorF("Pause failed: %v", pauseErr)
 			cb.Answer(F(chatID, "room_pause_failed", locales.Arg{"error": pauseErr.Error()}), opt)
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 		if r.IsMuted() {
 			r.Unmute() // unmute playback
@@ -190,7 +190,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 
 		if !r.IsPaused() {
 			cb.Answer("ℹ️ Track is already playing.", opt)
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		if _, err := r.Resume(); err != nil {
@@ -198,7 +198,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 			if _, e := cb.Answer("❌ Failed to resume playback.", opt); e != nil {
 				gologging.ErrorF("Answer error: %v", e)
 			}
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		if _, err := cb.Answer(fmt.Sprintf("▶️ Resumed at %s.", formatDuration(r.Position())), opt); err != nil {
@@ -232,14 +232,14 @@ func roomHandle(cb *tg.CallbackQuery) error {
 		mystic, err := cb.Respond("🔁 <b>Replaying current track...</b>")
 		if err != nil {
 			gologging.ErrorF("Failed to send replay message: %v", err)
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		if err := r.Replay(); err != nil {
 			gologging.ErrorF("Replay failed: %v", err)
 			utils.EOR(mystic, fmt.Sprintf("❌ <b>Replay Failed</b>\nError: <code>%v</code>", err))
 			cb.Answer("❌ Failed to replay track.", opt)
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 		track := r.Track()
 
@@ -282,7 +282,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 		seconds, err := strconv.Atoi(parts[1])
 		if err != nil {
 			cb.Answer("⚠️ Invalid seek value.", opt)
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		// Clamp to start
@@ -300,14 +300,14 @@ func roomHandle(cb *tg.CallbackQuery) error {
 		seconds, err := strconv.Atoi(parts[1])
 		if err != nil {
 			cb.Answer("⚠️ Invalid seek value.", opt)
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		// Warn if near end
 		if (r.Track().Duration - r.Position()) <= seconds {
 			cb.Answer(fmt.Sprintf("⚠️ Cannot seek forward %d seconds — about to reach end.", seconds), opt)
 
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		r.Seek(seconds)
@@ -331,7 +331,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 			if _, err := cb.Answer("⏹️ Playback stopped — queue empty.", opt); err != nil {
 				gologging.ErrorF("Answer error: %v", err)
 			}
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		t := r.NextTrack()
@@ -348,7 +348,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 			if _, err := cb.Answer("❌ Failed to download next track.", opt); err != nil {
 				gologging.ErrorF("Answer error: %v", err)
 			}
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		if err := r.Play(t, path); err != nil {
@@ -357,7 +357,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 			if _, err := cb.Answer("❌ Failed to play next track.", opt); err != nil {
 				gologging.ErrorF("Answer error: %v", err)
 			}
-			return tg.EndGroup
+			return tg.ErrEndGroup
 		}
 
 		if _, err := cb.Answer("⏭️ Track skipped.", opt); err != nil {
@@ -397,7 +397,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 			gologging.ErrorF("Reply error: %v", err)
 		}
 		r.SetMystic(mystic)
-		return tg.EndGroup
+		return tg.ErrEndGroup
 
 	case updateType == "stop":
 
@@ -420,7 +420,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 		}
 	}
 
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func rp(c *tg.CallbackQuery, t string) {

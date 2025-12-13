@@ -59,29 +59,29 @@ func helpHandler(m *tg.NewMessage) error {
 
 	if m.ChatType() != tg.EntityUser {
 		m.Reply(F(m.ChannelID(), "help_private_only"), &tg.SendOptions{ReplyMarkup: core.GetGroupHelpKeyboard()})
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	m.Reply(F(m.ChannelID(), "help_main"), &tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard()})
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func helpCB(c *tg.CallbackQuery) error {
 	c.Edit(F(c.ChannelID(), "help_main"), &tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard()})
 	c.Answer("")
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
 
 func helpCallbackHandler(c *tg.CallbackQuery) error {
 	data := c.DataString()
 	c.Answer("")
 	if data == "" {
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 	chatID := c.ChannelID()
 	parts := strings.SplitN(data, ":", 2)
 	if len(parts) < 2 {
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	var text string
@@ -102,5 +102,5 @@ func helpCallbackHandler(c *tg.CallbackQuery) error {
 	}
 
 	c.Edit(text, &tg.SendOptions{ReplyMarkup: btn})
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }

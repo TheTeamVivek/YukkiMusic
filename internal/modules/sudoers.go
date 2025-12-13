@@ -43,7 +43,7 @@ func handleAddSudo(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "auth_no_user", locales.Arg{
 			"cmd": getCommand(m),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Extract target user
@@ -52,26 +52,26 @@ func handleAddSudo(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "user_extract_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Owner trying to self
 	if targetID == config.OwnerID {
 		m.Reply(F(chatID, "sudo_owner_self"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Trying to add the bot itself
 	if targetID == core.BUser.ID {
 		m.Reply(F(chatID, "sudo_bot_self"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Trying to add the assistant
 	if ass, err := core.Assistants.ForChat(chatID); err == nil {
 		if targetID == ass.User.ID {
 			m.Reply(F(chatID, "sudo_assistant_self"))
-			return telegram.EndGroup
+			return telegram.ErrEndGroup
 		}
 	}
 
@@ -82,13 +82,13 @@ func handleAddSudo(m *telegram.NewMessage) error {
 			"error": err.Error(),
 		}))
 		gologging.Error("Failed to get user: " + err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Bots cannot be sudoers
 	if user.Bot {
 		m.Reply(F(chatID, "sudo_bot_user"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Username / mention
@@ -104,7 +104,7 @@ func handleAddSudo(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "sudo_check_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if exists {
@@ -112,7 +112,7 @@ func handleAddSudo(m *telegram.NewMessage) error {
 			"user": uname,
 			"id":   idStr,
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Add to sudo
@@ -120,7 +120,7 @@ func handleAddSudo(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "sudo_add_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	m.Reply(F(chatID, "sudo_add_success", locales.Arg{
@@ -143,7 +143,7 @@ func handleAddSudo(m *telegram.NewMessage) error {
 		}
 	}
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }
 
 func handleDelSudo(m *telegram.NewMessage) error {
@@ -154,7 +154,7 @@ func handleDelSudo(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "auth_no_user", locales.Arg{
 			"cmd": getCommand(m),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Extract target user
@@ -163,20 +163,20 @@ func handleDelSudo(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "user_extract_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Cannot remove owner
 	if targetID == config.OwnerID {
 		m.Reply(F(chatID, "sudo_owner_remove_block"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Cannot remove assistant (UbUser)
 	if ass, err := core.Assistants.ForChat(chatID); err == nil {
 		if targetID == ass.User.ID {
 			m.Reply(F(chatID, "sudo_assistant_cannot_remove"))
-			return telegram.EndGroup
+			return telegram.ErrEndGroup
 		}
 	}
 	// Fetch user info
@@ -185,7 +185,7 @@ func handleDelSudo(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "sudo_fetch_user_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	uname := utils.MentionHTML(user)
@@ -200,7 +200,7 @@ func handleDelSudo(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "sudo_check_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if !exists {
@@ -208,7 +208,7 @@ func handleDelSudo(m *telegram.NewMessage) error {
 			"user": uname,
 			"id":   idStr,
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Reset that user's bot commands
@@ -226,7 +226,7 @@ func handleDelSudo(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "sudo_remove_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Success
@@ -235,7 +235,7 @@ func handleDelSudo(m *telegram.NewMessage) error {
 		"id":   idStr,
 	}))
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }
 
 func handleGetSudoers(m *telegram.NewMessage) error {
@@ -246,7 +246,7 @@ func handleGetSudoers(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "flood_seconds", locales.Arg{
 			"duration": int(remaining.Seconds()),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 	utils.SetFlood(floodKey, 30*time.Second)
 
@@ -258,7 +258,7 @@ func handleGetSudoers(m *telegram.NewMessage) error {
 		utils.EOR(mystic, F(chatID, "sudo_list_fetch_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	var sb strings.Builder
@@ -320,5 +320,5 @@ func handleGetSudoers(m *telegram.NewMessage) error {
 	}
 
 	utils.EOR(mystic, sb.String())
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

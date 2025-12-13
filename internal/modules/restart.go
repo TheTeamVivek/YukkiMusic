@@ -45,7 +45,7 @@ func handleRestart(m *tg.NewMessage) error {
 		utils.EOR(mystic, F(chatID, "restart_exepath_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	exePath, err = filepath.EvalSymlinks(exePath)
@@ -53,7 +53,7 @@ func handleRestart(m *tg.NewMessage) error {
 		utils.EOR(mystic, F(chatID, "restart_symlink_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	for _, id := range core.GetAllRoomIDs() {
@@ -81,5 +81,5 @@ func handleRestart(m *tg.NewMessage) error {
 		}))
 	}
 
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }

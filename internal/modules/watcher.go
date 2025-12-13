@@ -82,7 +82,7 @@ func handleActions(m *telegram.NewMessage) error {
 	// Only allow in super groups
 	if m.ChatType() == telegram.EntityChat && (m.Channel == nil || !m.Channel.Megagroup) {
 		warnAndLeave(m.Client, chatID)
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	isMaintenance, _ := database.IsMaintenance()
@@ -98,7 +98,7 @@ func handleActions(m *telegram.NewMessage) error {
 		return handleDeleteUserAction(m, chatID, action)
 
 	default:
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 }
 
@@ -217,14 +217,14 @@ func handleSudoJoin(p *telegram.ParticipantUpdate, chatID int64) {
 
 func handleGroupCallAction(m *telegram.NewMessage, chatID int64, action *telegram.MessageActionGroupCall, isMaintenance bool) error {
 	if isMaintenance {
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	core.DeleteRoom(chatID)
 	s, err := core.GetChatState(chatID)
 	if err != nil {
 		gologging.Error("Failed to get chat state: " + err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if action.Duration == 0 {
@@ -239,7 +239,7 @@ func handleGroupCallAction(m *telegram.NewMessage, chatID int64, action *telegra
 		gologging.Debug("Voice chat ended in " + utils.IntToStr(chatID))
 	}
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }
 
 func handleDeleteUserAction(m *telegram.NewMessage, chatID int64, action *telegram.MessageActionChatDeleteUser) error {
@@ -250,7 +250,7 @@ func handleDeleteUserAction(m *telegram.NewMessage, chatID int64, action *telegr
 	ass, aErr := core.Assistants.ForChat(chatID)
 	if aErr != nil {
 		gologging.ErrorF("Failed to get Assistant for %d: %v", chatID, aErr)
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if aErr == nil && action.UserID == ass.User.ID {
@@ -259,9 +259,9 @@ func handleDeleteUserAction(m *telegram.NewMessage, chatID int64, action *telegr
 		core.DeleteChatState(chatID)
 		database.DeleteServed(chatID)
 		gologging.Debug("Bot left chat " + utils.IntToStr(chatID))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }
 
 func handleAddUserAction(m *telegram.NewMessage, chatID int64, action *telegram.MessageActionChatAddUser, isMaintenance bool) error {
@@ -289,7 +289,7 @@ func handleAddUserAction(m *telegram.NewMessage, chatID int64, action *telegram.
 				m.Client.LeaveChannel(chatID)
 
 				gologging.Debug("Bot left chatID " + utils.IntToStr(chatID) + " due to maintenance")
-				return telegram.EndGroup
+				return telegram.ErrEndGroup
 			}
 		}
 
@@ -297,9 +297,9 @@ func handleAddUserAction(m *telegram.NewMessage, chatID int64, action *telegram.
 
 		gologging.Debug("Bot added to chat: " + utils.IntToStr(chatID))
 		database.AddServed(chatID)
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }
 
 func isAssistantRestricted(newParticipant telegram.ChannelParticipant) bool {

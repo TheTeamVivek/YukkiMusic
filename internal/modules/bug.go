@@ -55,7 +55,7 @@ func bugHandler(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "bug_usasge", locales.Arg{
 			"cmd": getCommand(m),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Flood control
@@ -64,7 +64,7 @@ func bugHandler(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "flood_minutes", locales.Arg{
 			"minutes": formatDuration(int(remaining.Seconds())),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 	utils.SetFlood(key, 5*time.Minute)
 
@@ -112,5 +112,5 @@ func bugHandler(m *telegram.NewMessage) error {
 	}
 
 	m.Reply(F(chatID, "bug_thanks"))
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

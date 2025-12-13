@@ -62,5 +62,5 @@ func activeHandler(m *telegram.NewMessage) error {
 	}
 
 	m.Reply(msg)
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

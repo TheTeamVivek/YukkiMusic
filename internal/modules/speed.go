@@ -44,7 +44,7 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	chatID := m.ChannelID()
@@ -52,7 +52,7 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 
 	if !r.IsActiveChat() {
 		m.Reply(F(chatID, "room_no_active"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	args := strings.Fields(m.Text())
@@ -80,7 +80,7 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 				"cmd": getCommand(m),
 			}))
 		}
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Parse speed
@@ -97,11 +97,11 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 			m.Reply(F(chatID, "speed_invalid_value", locales.Arg{
 				"cmd": getCommand(m),
 			}))
-			return telegram.EndGroup
+			return telegram.ErrEndGroup
 		}
 		if s < 0.50 || s > 4.0 {
 			m.Reply(F(chatID, "speed_invalid_range"))
-			return telegram.EndGroup
+			return telegram.ErrEndGroup
 		}
 		newSpeed = s
 	}
@@ -115,7 +115,7 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 		seconds, err := strconv.Atoi(d)
 		if err != nil || seconds < 5 || seconds > 3600 {
 			m.Reply(F(chatID, "speed_invalid_duration"))
-			return telegram.EndGroup
+			return telegram.ErrEndGroup
 		}
 		resetDuration = time.Duration(seconds) * time.Second
 	}
@@ -134,7 +134,7 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 				"cmd":   getCommand(m),
 			}))
 		}
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	// Apply speed
@@ -150,7 +150,7 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 			"speed": fmt.Sprintf("%.2f", newSpeed),
 			"error": setErr.Error(),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	mention := utils.MentionHTML(m.Sender)
@@ -174,5 +174,5 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 		}
 	}
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

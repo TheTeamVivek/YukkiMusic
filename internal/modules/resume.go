@@ -43,17 +43,17 @@ func handleResume(m *telegram.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if !r.IsActiveChat() {
 		m.Reply(F(chatID, "room_no_active"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if !r.IsPaused() {
 		m.Reply(F(chatID, "resume_already_playing"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	t := r.Track()
@@ -83,5 +83,5 @@ func handleResume(m *telegram.NewMessage, cplay bool) error {
 		}))
 	}
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

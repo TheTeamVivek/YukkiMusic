@@ -56,13 +56,13 @@ func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 	chatID := m.ChannelID()
 	t := r.Track()
 	if !r.IsActiveChat() {
 		m.Reply(F(chatID, "seek_no_active"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	args := strings.Fields(m.Text())
@@ -70,7 +70,7 @@ func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
 		m.Reply(F(chatID, "seek_usage", locales.Arg{
 			"cmd": getCommand(m),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	seconds, err := strconv.Atoi(args[1])
@@ -78,7 +78,7 @@ func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
 		m.Reply(F(chatID, "seek_invalid_seconds", locales.Arg{
 			"cmd": getCommand(m),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	var direction, emoji string
@@ -89,7 +89,7 @@ func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
 			m.Reply(F(chatID, "seek_too_close_start", locales.Arg{
 				"seconds": seconds,
 			}))
-			return telegram.EndGroup
+			return telegram.ErrEndGroup
 		}
 		seekErr = r.Seek(-seconds)
 		direction = "backward"
@@ -99,7 +99,7 @@ func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
 			m.Reply(F(chatID, "seek_too_close_end", locales.Arg{
 				"seconds": seconds,
 			}))
-			return telegram.EndGroup
+			return telegram.ErrEndGroup
 		}
 		seekErr = r.Seek(seconds)
 		direction = "forward"
@@ -121,14 +121,14 @@ func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
 		}))
 	}
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }
 
 func handleJump(m *telegram.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	chatID := m.ChannelID()
@@ -136,7 +136,7 @@ func handleJump(m *telegram.NewMessage, cplay bool) error {
 
 	if !r.IsActiveChat() || t.ID == "" {
 		m.Reply(F(chatID, "jump_no_active"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	args := strings.Fields(m.Text())
@@ -144,7 +144,7 @@ func handleJump(m *telegram.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "jump_usage", locales.Arg{
 			"cmd": getCommand(m),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	seconds, err := strconv.Atoi(args[1])
@@ -152,14 +152,14 @@ func handleJump(m *telegram.NewMessage, cplay bool) error {
 		m.Reply(F(chatID, "jump_invalid_position", locales.Arg{
 			"cmd": getCommand(m),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if t.Duration-seconds <= 10 {
 		m.Reply(F(chatID, "jump_too_close_end", locales.Arg{
 			"position": formatDuration(seconds),
 		}))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if err := r.Seek(seconds - r.Position()); err != nil {
@@ -174,5 +174,5 @@ func handleJump(m *telegram.NewMessage, cplay bool) error {
 		}))
 	}
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

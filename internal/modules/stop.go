@@ -38,13 +38,13 @@ func handleStop(m *telegram.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 	if !r.IsActiveChat() {
 		m.Reply(F(m.ChannelID(), "room_no_active"))
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 	r.Destroy()
 	m.Reply(F(m.ChannelID(), "stopped", locales.Arg{"user": utils.MentionHTML(m.Sender)}))
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

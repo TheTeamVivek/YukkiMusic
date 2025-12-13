@@ -41,7 +41,7 @@ func handleLoop(m *tg.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 	chatID := m.ChannelID()
 	args := strings.Fields(m.Text())
@@ -49,7 +49,7 @@ func handleLoop(m *tg.NewMessage, cplay bool) error {
 
 	if !r.IsActiveChat() {
 		m.Reply(F(chatID, "room_no_active"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if len(args) < 2 {
@@ -66,20 +66,20 @@ func handleLoop(m *tg.NewMessage, cplay bool) error {
 		})
 
 		m.Reply(msg)
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	newLoop, err := strconv.Atoi(args[1])
 	if err != nil || newLoop < 0 || newLoop > 10 {
 		m.Reply(F(chatID, "loop_invalid"))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	if newLoop == currentLoop {
 		m.Reply(F(chatID, "loop_already_set", locales.Arg{
 			"count": currentLoop,
 		}))
-		return tg.EndGroup
+		return tg.ErrEndGroup
 	}
 
 	r.SetLoop(newLoop)
@@ -98,5 +98,5 @@ func handleLoop(m *tg.NewMessage, cplay bool) error {
 	}
 
 	m.Reply(msg)
-	return tg.EndGroup
+	return tg.ErrEndGroup
 }
