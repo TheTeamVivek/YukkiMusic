@@ -58,7 +58,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 			locales.Arg{
 				"duration": formatDuration(int(remaining.Seconds())),
 			},
-		)))
+		))
 return err
 	}
 
