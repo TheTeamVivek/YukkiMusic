@@ -20,46 +20,25 @@
 package platforms
 
 import (
-	"sort"
-	"sync"
-
-	state "main/internal/core/models"
+	"errors"
+	"os"
+	"path/filepath"
 )
 
-type (
-	regEntry struct {
-		platform state.Platform
-		priority int
+// checkDownloadedFile checks if a file already exists in downloads folder
+func checkDownloadedFile(trackID string) (string, error) {
+	pattern := filepath.Join("./downloads", trackID+".*")
+	matches, err := filepath.Glob(pattern)
+	if err != nil {
+		return "", err
 	}
-)
-
-var (
-	registry = make(map[state.PlatformName]regEntry)
-	regLock  sync.RWMutex
-)
-
-func addPlatform(priority int, name state.PlatformName, p state.Platform) {
-	regLock.Lock()
-	defer regLock.Unlock()
-	registry[name] = regEntry{
-		platform: p,
-		priority: priority,
+	if len(matches) == 0 {
+		return "", errors.New("file not found")
 	}
+	return matches[0], nil
 }
 
-func getOrderedPlatforms() []state.Platform {
-	platforms := make([]regEntry, 0, len(registry))
-	for _, entry := range registry {
-		platforms = append(platforms, entry)
-	}
-
-	sort.Slice(platforms, func(i, j int) bool {
-		return platforms[i].priority > platforms[j].priority
-	})
-
-	result := make([]state.Platform, len(platforms))
-	for i, entry := range platforms {
-		result[i] = entry.platform
-	}
-	return result
+// EnsureDownloadsDir creates the downloads directory if it doesn't exist
+func ensureDownloadsDir() error {
+	return os.MkdirAll("downloads", os.ModePerm)
 }

@@ -32,6 +32,26 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/skip"] = `<i>Skip the currently playing track and play the next in queue.</i>
+
+<u>Usage:</u>
+<b>/skip</b> — Skip current track
+
+<b>⚙️ Behavior:</b>
+• Downloads next track in queue
+• Starts playback automatically
+• If queue is empty and loop is 0, stops playback
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>⚠️ Notes:</b>
+• Cannot be undone
+• If no tracks in queue, playback stops
+• Loop count affects skip behavior`
+}
+
 func skipHandler(m *telegram.NewMessage) error {
 	return handleSkip(m, false)
 }
@@ -109,7 +129,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 
 	opt := &telegram.SendOptions{
 		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(r, false),
+		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
 	}
 	if t.Artwork != "" {
 		opt.Media = utils.CleanURL(t.Artwork)

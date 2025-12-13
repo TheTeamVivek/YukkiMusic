@@ -37,27 +37,33 @@ import (
 	"main/internal/utils"
 )
 
-// TODO: Impment Cancel correctly
-// flood_seconds -> fix float
+// Action handlers map for cleaner dispatch
+type actionHandler func(*tg.CallbackQuery, *core.RoomState, int64) error
+
+var actionHandlers = map[string]actionHandler{
+	"pause":  handlePauseAction,
+	"resume": handleResumeAction,
+	"replay": handleReplayAction,
+	"skip":   handleSkipAction,
+	"stop":   handleStopAction,
+	"mute":   handleMuteAction,
+	"unmute": handleUnmuteAction,
+}
 
 func cancelHandler(cb *tg.CallbackQuery) error {
 	chatID := cb.ChannelID()
 	opt := &tg.CallbackOptions{Alert: true}
 
-	if isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); err != nil || !isAdmin {
-		cb.Answer(
-			F(chatID, "only_admin_or_auth_cb"),
-			opt,
-		)
+	if !checkAdminOrAuth(cb, chatID, opt) {
 		return tg.ErrEndGroup
 	}
 
 	if cancel, ok := downloadCancels[chatID]; ok {
 		cancel()
 		delete(downloadCancels, chatID)
-		cb.Answer("Download canceled.", opt)
+		cb.Answer(F(chatID, "download_cancelled"), opt)
 	} else {
-		cb.Answer("No download to cancel.", opt)
+		cb.Answer(F(chatID, "no_download_to_cancel"), opt)
 	}
 	return tg.ErrEndGroup
 }
@@ -75,21 +81,21 @@ func emptyCBHandler(cb *tg.CallbackQuery) error {
 
 func roomHandle(cb *tg.CallbackQuery) error {
 	opt := &tg.CallbackOptions{Alert: true}
-	data := string(cb.Data)
-	updateType := strings.TrimPrefix(data, "croom:")
-	updateType = strings.TrimPrefix(data, "room:")
+	data := cb.DataString()
 
-	if updateType == "" {
+	// Parse action type
+	action := strings.TrimPrefix(data, "croom:")
+	action = strings.TrimPrefix(action, "room:")
+
+	if action == "" {
 		gologging.WarnF("Missing action in data: %s", data)
-		cb.Answer("⚠️ Invalid request.", opt)
+		cb.Answer(F(cb.ChannelID(), "invalid_request"), opt)
 		return tg.ErrEndGroup
 	}
 
 	chatID := cb.ChannelID()
 
-	var r *core.RoomState
-	var ok bool
-
+	// Handle cplay mode
 	if strings.HasPrefix(cb.DataString(), "croom:") {
 		realChatID, err := database.GetCPlayID(chatID)
 		if err != nil {
@@ -99,334 +105,423 @@ func roomHandle(cb *tg.CallbackQuery) error {
 		}
 		chatID = realChatID
 	}
-	if ass, err := core.Assistants.ForChat(chatID); err != nil {
-		gologging.ErrorF("Failed to get Assistant for %d: %v", chatID, err)
-		cb.Answer(fmt.Sprintf("Failed to get Assistant for %d: %v", chatID, err), opt)
-		return err
-	} else {
-		r, ok = core.GetRoom(chatID, ass)
-	}
 
-	if !ok || !r.IsActiveChat() {
-		cb.Answer(F(chatID, "room_not_active_cb"), opt)
-		if _, err := cb.Edit(F(chatID, "room_not_active")); err != nil {
-			gologging.ErrorF("Edit error: %v", err)
+	// Get room
+	r, err := getRoomForCallback(chatID)
+	if err != nil {
+		if strings.Contains(err.Error(), "no active room") {
+			cb.Answer(F(cb.ChannelID(), "room_not_active_cb"), opt)
+			editMessage(cb, F(cb.ChannelID(), "room_no_active"))
+		} else {
+			cb.Answer(err.Error(), opt)
 		}
 		return tg.ErrEndGroup
 	}
-	if isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); err != nil || !isAdmin {
-		cb.Answer(
-			F(chatID, "only_admin_or_auth_cb"),
-			opt,
-		)
+
+	// Check permissions
+	if !checkAdminOrAuth(cb, chatID, opt) {
 		return tg.ErrEndGroup
 	}
 
+	// Flood control
+	if !checkFloodControl(cb, chatID, opt) {
+		return tg.ErrEndGroup
+	}
+
+	// Handle seek actions
+	if strings.HasPrefix(action, "seek") {
+		return handleSeekAction(cb, r, action, opt)
+	}
+
+	// Dispatch to handler
+	if handler, ok := actionHandlers[action]; ok {
+		return handler(cb, r, chatID)
+	}
+
+	gologging.WarnF("Unknown callback type: %s", action)
+	cb.Answer(F(cb.ChannelID(), "unknown_action"), opt)
+	return tg.ErrEndGroup
+}
+
+// Helper functions
+
+func getRoomForCallback(chatID int64) (*core.RoomState, error) {
+	ass, err := core.Assistants.ForChat(chatID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get assistant: %w", err)
+	}
+
+	r, ok := core.GetRoom(chatID, ass)
+	if !ok || !r.IsActiveChat() {
+		return nil, fmt.Errorf("no active room")
+	}
+
+	return r, nil
+}
+
+func checkAdminOrAuth(cb *tg.CallbackQuery, chatID int64, opt *tg.CallbackOptions) bool {
+	isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID)
+	if err != nil || !isAdmin {
+		cb.Answer(F(cb.ChannelID(), "only_admin_or_auth_cb"), opt)
+		return false
+	}
+	return true
+}
+
+func checkFloodControl(cb *tg.CallbackQuery, chatID int64, opt *tg.CallbackOptions) bool {
 	key := fmt.Sprintf("room:%d:%d", cb.Sender.ID, chatID)
 	if remaining := utils.GetFlood(key); remaining > 0 {
-		cb.Answer(F(chatID, "flood_seconds", locales.Arg{"duration": remaining.Seconds()}), opt)
-		return tg.ErrEndGroup
+		cb.Answer(F(cb.ChannelID(), "flood_seconds", locales.Arg{
+			"duration": int(remaining.Seconds()),
+		}), opt)
+		return false
 	}
 	utils.SetFlood(key, 5*time.Second)
+	return true
+}
 
-	switch {
-	case updateType == "pause":
-		gologging.InfoF("Callback → pause, chatID=%d", chatID)
+func editMessage(cb *tg.CallbackQuery, text string) {
+	if _, err := cb.Edit(text); err != nil {
+		gologging.ErrorF("Edit error: %v", err)
+	}
+}
 
-		/*if r.IsMuted() {
-			cb.Answer("🔇 The chat is muted. Please unmute first.", opt)
-			return tg.ErrEndGroup
-		}*/
+func replyToCallback(cb *tg.CallbackQuery, text string) {
+	msg, err := cb.GetMessage()
+	if err != nil {
+		return
+	}
+	msg.Reply(text)
+}
 
-		if r.IsPaused() {
-			remaining := r.RemainingResumeDuration()
-			msg := utils.IfElse(
-				remaining > 0,
-				F(chatID, "room_already_paused_auto", locales.Arg{
-					"duration": formatDuration(int(remaining.Seconds())),
-				}),
-				F(chatID, "room_already_paused"),
-			)
-			cb.Answer(msg, opt)
-			return tg.ErrEndGroup
-		}
+// Action handlers
 
-		if _, pauseErr := r.Pause(); pauseErr != nil {
-			gologging.ErrorF("Pause failed: %v", pauseErr)
-			cb.Answer(F(chatID, "room_pause_failed", locales.Arg{"error": pauseErr.Error()}), opt)
-			return tg.ErrEndGroup
-		}
-		if r.IsMuted() {
-			r.Unmute() // unmute playback
-		}
+func handlePauseAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
 
-		cb.Answer("⏸️ Track paused at "+formatDuration(r.Position()), opt)
+	gologging.InfoF("Callback → pause, chatID=%d", chatID)
 
-		mention := utils.MentionHTML(cb.Sender)
-		track := r.Track()
-		safeTitle := html.EscapeString(track.Title)
-
-		msgText := fmt.Sprintf(
-			"<b>⏸️ Track Paused</b>\n\n"+
-				"<b>▫ Track:</b> <a href=\"%s\">%s</a>\n"+
-				"<b>▫ Position:</b> %s / %s\n"+
-				"<b>▫ Paused by:</b> %s",
-			track.URL,
-			utils.ShortTitle(safeTitle, 25),
-			formatDuration(r.Position()),
-			formatDuration(track.Duration),
-			mention,
+	if r.IsPaused() {
+		remaining := r.RemainingResumeDuration()
+		msg := utils.IfElse(
+			remaining > 0,
+			F(cb.ChannelID(), "room_already_paused_auto", locales.Arg{
+				"duration": formatDuration(int(remaining.Seconds())),
+			}),
+			F(cb.ChannelID(), "room_already_paused"),
 		)
+		cb.Answer(msg, opt)
+		return tg.ErrEndGroup
+	}
 
-		if _, err := cb.Edit(msgText, &tg.SendOptions{
-			ParseMode:   "HTML",
-			ReplyMarkup: core.GetPlayMarkup(r, false),
-		}); err != nil {
-			gologging.ErrorF("Edit error: %v", err)
-		}
+	if _, err := r.Pause(); err != nil {
+		gologging.ErrorF("Pause failed: %v", err)
+		cb.Answer(F(cb.ChannelID(), "room_pause_failed", locales.Arg{
+			"error": err.Error(),
+		}), opt)
+		return tg.ErrEndGroup
+	}
 
-	case updateType == "resume":
-		gologging.InfoF("Callback → resume, chatID=%d", chatID)
+	if r.IsMuted() {
+		r.Unmute()
+	}
 
-		if !r.IsPaused() {
-			cb.Answer("ℹ️ Track is already playing.", opt)
-			return tg.ErrEndGroup
-		}
+	cb.Answer(F(cb.ChannelID(), "cb_pause_success", locales.Arg{
+		"position": formatDuration(r.Position()),
+	}), opt)
 
-		if _, err := r.Resume(); err != nil {
-			gologging.ErrorF("Resume failed: %v", err)
-			if _, e := cb.Answer("❌ Failed to resume playback.", opt); e != nil {
-				gologging.ErrorF("Answer error: %v", e)
-			}
-			return tg.ErrEndGroup
-		}
+	updatePlaybackMessage(cb, r, "paused")
+	return tg.ErrEndGroup
+}
 
-		if _, err := cb.Answer(fmt.Sprintf("▶️ Resumed at %s.", formatDuration(r.Position())), opt); err != nil {
-			gologging.ErrorF("Answer error: %v", err)
-		}
+func handleResumeAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
 
-		mention := utils.MentionHTML(cb.Sender)
-		track := r.Track()
+	gologging.InfoF("Callback → resume, chatID=%d", chatID)
 
-		msgText := fmt.Sprintf(
-			"<b>🎵 Now Playing:</b>\n\n"+
-				"<b>▫ Track:</b> <a href=\"%s\">%s</a>\n"+
-				"<b>▫ Duration:</b> %s\n"+
-				"<b>▫ Resumed by:</b> %s",
-			track.URL,
-			html.EscapeString(utils.ShortTitle(track.Title, 25)),
-			formatDuration(track.Duration),
-			mention,
+	if !r.IsPaused() {
+		cb.Answer(F(cb.ChannelID(), "cb_already_playing"), opt)
+		return tg.ErrEndGroup
+	}
+
+	if _, err := r.Resume(); err != nil {
+		gologging.ErrorF("Resume failed: %v", err)
+		cb.Answer(F(cb.ChannelID(), "cb_resume_failed"), opt)
+		return tg.ErrEndGroup
+	}
+
+	cb.Answer(F(cb.ChannelID(), "cb_resume_success", locales.Arg{
+		"position": formatDuration(r.Position()),
+	}), opt)
+
+	updatePlaybackMessage(cb, r, "playing")
+	return tg.ErrEndGroup
+}
+
+func handleReplayAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
+
+	gologging.InfoF("Callback → replay, chatID=%d", chatID)
+
+	mystic, err := cb.Respond(F(cb.ChannelID(), "cb_replaying"))
+	if err != nil {
+		gologging.ErrorF("Failed to send replay message: %v", err)
+		return tg.ErrEndGroup
+	}
+
+	if err := r.Replay(); err != nil {
+		gologging.ErrorF("Replay failed: %v", err)
+		utils.EOR(mystic, F(cb.ChannelID(), "replay_failed", locales.Arg{
+			"error": err.Error(),
+		}))
+		cb.Answer(F(cb.ChannelID(), "cb_replay_failed"), opt)
+		return tg.ErrEndGroup
+	}
+
+	track := r.Track()
+	trackTitle := html.EscapeString(utils.ShortTitle(track.Title, 25))
+
+	msgText := F(cb.ChannelID(), "stream_now_playing", locales.Arg{
+		"url":      track.URL,
+		"title":    trackTitle,
+		"duration": formatDuration(track.Duration),
+		"by":       track.Requester,
+	})
+
+	cb.Answer(F(cb.ChannelID(), "cb_replay_success"), opt)
+
+	optSend := &tg.SendOptions{
+		ParseMode:   "HTML",
+		ReplyMarkup: core.GetPlayMarkup(cb.ChannelID(), r, false),
+	}
+	if track.Artwork != "" {
+		optSend.Media = utils.CleanURL(track.Artwork)
+	}
+
+	mystic, _ = utils.EOR(mystic, msgText, optSend)
+	r.SetMystic(mystic)
+
+	editMessage(cb, F(cb.ChannelID(), "cb_replay_edited", locales.Arg{
+		"user": utils.MentionHTML(cb.Sender),
+	}))
+	return tg.ErrEndGroup
+}
+
+func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
+
+	gologging.InfoF("Callback → skip, chatID=%d", chatID)
+
+	if len(r.Queue()) == 0 && r.Loop() == 0 {
+		r.Destroy()
+		editMessage(cb, F(cb.ChannelID(), "skip_stopped", locales.Arg{
+			"user": utils.MentionHTML(cb.Sender),
+		}))
+		cb.Answer(F(cb.ChannelID(), "cb_skip_queue_empty"), opt)
+		return tg.ErrEndGroup
+	}
+
+	t := r.NextTrack()
+
+	mystic, err := cb.Respond(F(cb.ChannelID(), "stream_downloading_next"))
+	if err != nil {
+		gologging.ErrorF("Failed to send message: %v", err)
+	}
+
+	path, err := platforms.Download(context.Background(), t, mystic)
+	if err != nil {
+		gologging.ErrorF("Download failed for %s: %v", t.URL, err)
+		utils.EOR(mystic, F(cb.ChannelID(), "stream_download_fail", locales.Arg{
+			"error": err.Error(),
+		}))
+		cb.Answer(F(cb.ChannelID(), "cb_skip_download_failed"), opt)
+		return tg.ErrEndGroup
+	}
+
+	if err := r.Play(t, path); err != nil {
+		gologging.ErrorF("Play error: %v", err)
+		utils.EOR(mystic, F(cb.ChannelID(), "stream_play_fail"))
+		cb.Answer(F(cb.ChannelID(), "cb_skip_play_failed"), opt)
+		return tg.ErrEndGroup
+	}
+
+	cb.Answer(F(cb.ChannelID(), "cb_skip_success"), opt)
+	cb.Delete()
+
+	title := utils.ShortTitle(t.Title, 25)
+	safeTitle := html.EscapeString(title)
+
+	msgText := F(cb.ChannelID(), "stream_now_playing", locales.Arg{
+		"url":      t.URL,
+		"title":    safeTitle,
+		"duration": formatDuration(t.Duration),
+		"by":       t.Requester,
+	})
+
+	sendOpt := &tg.SendOptions{
+		ParseMode:   "HTML",
+		ReplyMarkup: core.GetPlayMarkup(cb.ChannelID(), r, false),
+	}
+	if t.Artwork != "" {
+		sendOpt.Media = utils.CleanURL(t.Artwork)
+	}
+
+	mystic, _ = utils.EOR(mystic, msgText, sendOpt)
+	replyToCallback(cb, F(cb.ChannelID(), "cb_skip_edited", locales.Arg{
+		"user": utils.MentionHTML(cb.Sender),
+	}))
+
+	r.SetMystic(mystic)
+	return tg.ErrEndGroup
+}
+
+func handleStopAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
+
+	gologging.InfoF("Callback → stop, chatID=%d", chatID)
+
+	r.Destroy()
+
+	cb.Answer(F(cb.ChannelID(), "cb_stop_success"), opt)
+	editMessage(cb, F(cb.ChannelID(), "stopped", locales.Arg{
+		"user": utils.MentionHTML(cb.Sender),
+	}))
+
+	return tg.ErrEndGroup
+}
+
+func handleMuteAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
+
+	if r.IsMuted() {
+		remaining := r.RemainingUnmuteDuration()
+		msg := utils.IfElse(
+			remaining > 0,
+			F(cb.ChannelID(), "mute_already_muted_with_time", locales.Arg{
+				"duration": formatDuration(int(remaining.Seconds())),
+			}),
+			F(cb.ChannelID(), "mute_already_muted"),
 		)
+		cb.Answer(msg, opt)
+		return tg.ErrEndGroup
+	}
 
-		if _, err := cb.Edit(msgText, &tg.SendOptions{
-			ParseMode:   "HTML",
-			ReplyMarkup: core.GetPlayMarkup(r, false),
-		}); err != nil {
-			gologging.ErrorF("Edit error: %v", err)
-		}
+	if _, err := r.Mute(); err != nil {
+		cb.Answer(F(cb.ChannelID(), "mute_failed", locales.Arg{
+			"error": err.Error(),
+		}), opt)
+		return tg.ErrEndGroup
+	}
 
-	case updateType == "replay":
-		gologging.InfoF("Callback → replay, chatID=%d", chatID)
+	cb.Answer(F(cb.ChannelID(), "cb_mute_success"), opt)
+	updatePlaybackMessage(cb, r, "muted")
+	return tg.ErrEndGroup
+}
 
-		mystic, err := cb.Respond("🔁 <b>Replaying current track...</b>")
-		if err != nil {
-			gologging.ErrorF("Failed to send replay message: %v", err)
-			return tg.ErrEndGroup
-		}
+func handleUnmuteAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
 
-		if err := r.Replay(); err != nil {
-			gologging.ErrorF("Replay failed: %v", err)
-			utils.EOR(mystic, fmt.Sprintf("❌ <b>Replay Failed</b>\nError: <code>%v</code>", err))
-			cb.Answer("❌ Failed to replay track.", opt)
-			return tg.ErrEndGroup
-		}
-		track := r.Track()
+	if !r.IsMuted() {
+		cb.Answer(F(cb.ChannelID(), "unmute_already"), opt)
+		return tg.ErrEndGroup
+	}
 
-		trackTitle := html.EscapeString(utils.ShortTitle(track.Title, 25))
-		totalDuration := formatDuration(track.Duration)
+	if _, err := r.Unmute(); err != nil {
+		cb.Answer(F(cb.ChannelID(), "unmute_failed", locales.Arg{
+			"error": err.Error(),
+		}), opt)
+		return tg.ErrEndGroup
+	}
 
-		msgText := fmt.Sprintf(
-			"<b>🎵 Now Playing:</b>\n\n"+
-				"<b>▫ Track:</b> <a href=\"%s\">%s</a>\n"+
-				"<b>▫ Duration:</b> %s\n"+
-				"<b>▫ Requested by:</b> %s\n"+
-				"<b>▫ Replayed by:</b> %s",
-			track.URL,
-			trackTitle,
-			totalDuration,
-			track.Requester,
-			utils.MentionHTML(cb.Sender),
-		)
+	cb.Answer(F(cb.ChannelID(), "cb_unmute_success"), opt)
+	updatePlaybackMessage(cb, r, "playing")
+	return tg.ErrEndGroup
+}
 
-		cb.Answer("🔁 Track replayed.", opt)
+func handleSeekAction(cb *tg.CallbackQuery, r *core.RoomState, action string, opt *tg.CallbackOptions) error {
+	parts := strings.Split(action, "_")
+	if len(parts) != 2 {
+		cb.Answer(F(cb.ChannelID(), "invalid_request"), opt)
+		return tg.ErrEndGroup
+	}
 
-		optSend := &tg.SendOptions{
-			ParseMode:   "HTML",
-			ReplyMarkup: core.GetPlayMarkup(r, false),
-		}
+	seconds, err := strconv.Atoi(parts[1])
+	if err != nil {
+		cb.Answer(F(cb.ChannelID(), "invalid_request"), opt)
+		return tg.ErrEndGroup
+	}
 
-		if track.Artwork != "" {
-			optSend.Media = utils.CleanURL(track.Artwork)
-		}
+	isBackward := strings.HasPrefix(action, "seekback_")
 
-		mystic, _ = utils.EOR(mystic, msgText, optSend)
-		r.SetMystic(mystic)
-
-		if _, err := cb.Edit(fmt.Sprintf("🔁 Track replayed by %s.", utils.MentionHTML(cb.Sender))); err != nil {
-			gologging.ErrorF("Edit error: %v", err)
-		}
-
-	case strings.HasPrefix(updateType, "seekback_"):
-		parts := strings.Split(updateType, "_")
-		seconds, err := strconv.Atoi(parts[1])
-		if err != nil {
-			cb.Answer("⚠️ Invalid seek value.", opt)
-			return tg.ErrEndGroup
-		}
-
-		// Clamp to start
+	if isBackward {
 		if r.Position() <= seconds {
 			r.Seek(-int(r.Position()))
 		} else {
 			r.Seek(-seconds)
 		}
-
-		cb.Answer(fmt.Sprintf("⏪ Sought back %d seconds", seconds), opt)
-		rp(cb, fmt.Sprintf("⏪ Sought back %d seconds — by %s", seconds, utils.MentionHTML(cb.Sender)))
-
-	case strings.HasPrefix(updateType, "seek_"):
-		parts := strings.Split(updateType, "_")
-		seconds, err := strconv.Atoi(parts[1])
-		if err != nil {
-			cb.Answer("⚠️ Invalid seek value.", opt)
-			return tg.ErrEndGroup
-		}
-
-		// Warn if near end
+		cb.Answer(F(cb.ChannelID(), "cb_seekback_success", locales.Arg{
+			"seconds": seconds,
+		}), opt)
+		replyToCallback(cb, F(cb.ChannelID(), "cb_seekback_edited", locales.Arg{
+			"seconds": seconds,
+			"user":    utils.MentionHTML(cb.Sender),
+		}))
+	} else {
 		if (r.Track().Duration - r.Position()) <= seconds {
-			cb.Answer(fmt.Sprintf("⚠️ Cannot seek forward %d seconds — about to reach end.", seconds), opt)
-
+			cb.Answer(F(cb.ChannelID(), "cb_seek_near_end", locales.Arg{
+				"seconds": seconds,
+			}), opt)
 			return tg.ErrEndGroup
 		}
-
 		r.Seek(seconds)
-		cb.Answer(fmt.Sprintf("⏩ Sought %d seconds", seconds), opt)
-		rp(cb, fmt.Sprintf("⏩ Sought %d seconds — by %s", seconds, utils.MentionHTML(cb.Sender)))
-
-	case updateType == "skip":
-		gologging.InfoF("Callback → skip, chatID=%d", chatID)
-
-		mention := utils.MentionHTML(cb.Sender)
-
-		if len(r.Queue()) == 0 && r.Loop() == 0 {
-			r.Destroy()
-			msgText := fmt.Sprintf(
-				"⏹️ <b>Playback stopped.</b>\nQueue is empty.\n\n▫ Skipped by: %s",
-				mention,
-			)
-			if _, err := cb.Edit(msgText, &tg.SendOptions{ParseMode: "HTML"}); err != nil {
-				gologging.ErrorF("Edit error: %v", err)
-			}
-			if _, err := cb.Answer("⏹️ Playback stopped — queue empty.", opt); err != nil {
-				gologging.ErrorF("Answer error: %v", err)
-			}
-			return tg.ErrEndGroup
-		}
-
-		t := r.NextTrack()
-
-		mystic, err := cb.Respond("📥 Downloading your next track...")
-		if err != nil {
-			gologging.ErrorF("Failed to send msg: %v", err)
-		}
-
-		path, err := platforms.Download(context.Background(), t, mystic)
-		if err != nil {
-			gologging.ErrorF("Download failed for %s: %v", t.URL, err)
-			utils.EOR(mystic, "❌ Failed to download next track.")
-			if _, err := cb.Answer("❌ Failed to download next track.", opt); err != nil {
-				gologging.ErrorF("Answer error: %v", err)
-			}
-			return tg.ErrEndGroup
-		}
-
-		if err := r.Play(t, path); err != nil {
-			gologging.ErrorF("Play error: %v", err)
-			utils.EOR(mystic, "❌ Failed to play next track.")
-			if _, err := cb.Answer("❌ Failed to play next track.", opt); err != nil {
-				gologging.ErrorF("Answer error: %v", err)
-			}
-			return tg.ErrEndGroup
-		}
-
-		if _, err := cb.Answer("⏭️ Track skipped.", opt); err != nil {
-			gologging.ErrorF("Answer error: %v", err)
-		}
-
-		_, err = cb.Delete()
-		if err != nil {
-			gologging.ErrorF("Delete error: %v", err)
-		}
-
-		title := utils.ShortTitle(t.Title, 25)
-		safeTitle := html.EscapeString(title)
-		msgText := fmt.Sprintf(
-			"<b>🎵 Now Playing:</b>\n\n"+
-				"<b>▫ Track:</b> <a href=\"%s\">%s</a>\n"+
-				"<b>▫ Duration:</b> %s\n"+
-				"<b>▫ Requested by:</b> %s",
-			t.URL,
-			safeTitle,
-			formatDuration(t.Duration),
-			t.Requester,
-		)
-
-		opt := &tg.SendOptions{
-			ParseMode:   "HTML",
-			ReplyMarkup: core.GetPlayMarkup(r, false),
-		}
-
-		if t.Artwork != "" {
-			opt.Media = utils.CleanURL(t.Artwork)
-		}
-
-		mystic, _ = utils.EOR(mystic, msgText, opt)
-
-		if _, err := mystic.Reply(fmt.Sprintf("⏭️ Skipped by %s", mention)); err != nil {
-			gologging.ErrorF("Reply error: %v", err)
-		}
-		r.SetMystic(mystic)
-		return tg.ErrEndGroup
-
-	case updateType == "stop":
-
-		gologging.InfoF("Callback → stop, chatID=%d", chatID)
-
-		r.Destroy()
-
-		if _, err := cb.Answer("⏹️ Playback stopped.", opt); err != nil {
-			gologging.ErrorF("Answer error: %v", err)
-		}
-
-		if _, err := cb.Edit(fmt.Sprintf("⏹️ Playback stopped and cleared by %s.", utils.MentionHTML(cb.Sender))); err != nil {
-			gologging.ErrorF("Edit error: %v", err)
-		}
-
-	default:
-		gologging.WarnF("Unknown callback type: %s", updateType)
-		if _, err := cb.Answer("⚠️ Unknown action.", opt); err != nil {
-			gologging.ErrorF("Answer error: %v", err)
-		}
+		cb.Answer(F(cb.ChannelID(), "cb_seek_success", locales.Arg{
+			"seconds": seconds,
+		}), opt)
+		replyToCallback(cb, F(cb.ChannelID(), "cb_seek_edited", locales.Arg{
+			"seconds": seconds,
+			"user":    utils.MentionHTML(cb.Sender),
+		}))
 	}
 
 	return tg.ErrEndGroup
 }
 
-func rp(c *tg.CallbackQuery, t string) {
-	msg, err := c.GetMessage()
-	if err != nil {
-		return
+func updatePlaybackMessage(cb *tg.CallbackQuery, r *core.RoomState, state string) {
+	track := r.Track()
+	safeTitle := html.EscapeString(utils.ShortTitle(track.Title, 25))
+	mention := utils.MentionHTML(cb.Sender)
+
+	var msgText string
+	switch state {
+	case "paused":
+		msgText = F(cb.ChannelID(), "cb_pause_message", locales.Arg{
+			"url":      track.URL,
+			"title":    safeTitle,
+			"position": formatDuration(r.Position()),
+			"duration": formatDuration(track.Duration),
+			"user":     mention,
+		})
+	case "playing":
+		msgText = F(cb.ChannelID(), "cb_resume_message", locales.Arg{
+			"url":      track.URL,
+			"title":    safeTitle,
+			"duration": formatDuration(track.Duration),
+			"user":     mention,
+		})
+	case "muted":
+		msgText = F(cb.ChannelID(), "cb_mute_message", locales.Arg{
+			"url":   track.URL,
+			"title": safeTitle,
+			"user":  mention,
+		})
 	}
-	msg.Reply(t)
+
+	editMessage(cb, msgText)
+
+	if _, err := cb.Edit(msgText, &tg.SendOptions{
+		ParseMode:   "HTML",
+		ReplyMarkup: core.GetPlayMarkup(cb.ChannelID(), r, false),
+	}); err != nil {
+		gologging.ErrorF("Edit error: %v", err)
+	}
 }

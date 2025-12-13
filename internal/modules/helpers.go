@@ -169,6 +169,15 @@ func FWithLang(lang, key string, values ...locales.Arg) string {
 	return locales.Get(lang, key, val)
 }
 
+func isLogger() (l bool) {
+	var err error
+	l, err = database.IsLoggerEnabled()
+	if err != nil {
+		gologging.Error("Failed to get IsLoggerEnabled, Err: " + err.Error())
+	}
+	return l
+}
+
 func SafeCallbackHandler(handler func(*tg.CallbackQuery) error) func(*tg.CallbackQuery) error {
 	return func(cb *tg.CallbackQuery) (err error) {
 		if is, _ := database.IsMaintenance(); is {
@@ -309,7 +318,7 @@ func warnAndLeave(client *tg.Client, chatID int64) {
 		chatID,
 		text,
 		&tg.SendOptions{
-			ReplyMarkup: core.AddMeMarkup(core.BUser.Username),
+			ReplyMarkup: core.AddMeMarkup(chatID),
 			LinkPreview: false,
 		},
 	)

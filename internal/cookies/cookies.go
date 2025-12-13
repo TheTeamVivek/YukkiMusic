@@ -21,6 +21,7 @@
 package cookies
 
 import (
+	"embed"
 	"fmt"
 	"math/rand"
 	"os"
@@ -35,15 +36,23 @@ import (
 )
 
 var (
+	logger      = gologging.GetLogger("cookies")
 	cachedFiles []string
 	cacheOnce   sync.Once
-	logger      = gologging.GetLogger("cookies")
 )
+
+//go:embed *.txt
+var embeddedCookies embed.FS
 
 func init() {
 	gologging.Debug("🔹 Initializing cookies...")
+
 	if err := os.MkdirAll("internal/cookies", 0o700); err != nil {
 		logger.Fatal("Failed to create cookies directory:", err)
+	}
+
+	if err := copyEmbeddedCookies(); err != nil {
+		logger.Fatal("Failed to copy embedded cookies:", err)
 	}
 
 	urls := strings.Fields(config.CookiesLink)
@@ -52,6 +61,38 @@ func init() {
 			logger.WarnF("Failed to download cookie file from %s: %v", url, err)
 		}
 	}
+}
+
+func copyEmbeddedCookies() error {
+	entries, err := embeddedCookies.ReadDir(".")
+	if err != nil {
+		return err
+	}
+
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		if e.Name() == "example.txt" {
+			continue
+		}
+
+		dst := filepath.Join("internal/cookies", e.Name())
+
+		if _, err := os.Stat(dst); err == nil {
+			continue
+		}
+
+		data, err := embeddedCookies.ReadFile(e.Name())
+		if err != nil {
+			return err
+		}
+
+		if err := os.WriteFile(dst, data, 0o600); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func downloadCookieFile(url string) error {
@@ -70,9 +111,18 @@ func downloadCookieFile(url string) error {
 	}
 
 	if resp.IsError() {
-		return fmt.Errorf("unexpected status code %d from %s", resp.StatusCode(), rawURL)
+		return fmt.Errorf("unexpected status %d from %s", resp.StatusCode(), rawURL)
 	}
 
+	return nil
+}
+
+func loadCookieCache() error {
+	files, err := filepath.Glob("internal/cookies/*.txt")
+	if err != nil {
+		return err
+	}
+	cachedFiles = files
 	return nil
 }
 
@@ -84,24 +134,15 @@ func GetRandomCookieFile() (string, error) {
 	})
 
 	if err != nil {
-		logger.WarnF("Failed to load cookie cache: %v — retrying next call", err)
-		cacheOnce = sync.Once{} // allow retry next time
+		logger.WarnF("Failed to load cookie cache: %v", err)
+		cacheOnce = sync.Once{}
 		return "", err
 	}
 
 	if len(cachedFiles) == 0 {
-		logger.Warn("No cookie files found in cache")
+		logger.Warn("No cookie files available")
 		return "", nil
 	}
 
 	return cachedFiles[rand.Intn(len(cachedFiles))], nil
-}
-
-func loadCookieCache() error {
-	files, err := filepath.Glob("internal/cookies/*.txt")
-	if err != nil {
-		return err
-	}
-	cachedFiles = files
-	return nil
 }

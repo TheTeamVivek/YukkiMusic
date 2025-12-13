@@ -32,6 +32,23 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/pause"] = `<i>Pause the current playback.</i>
+
+<u>Usage:</u>
+<b>/pause</b> — Pause playback
+<b>/pause [seconds]</b> — Pause with auto-resume after specified seconds
+
+<b>⚙️ Features:</b>
+• Manual pause/resume control
+• Auto-resume timer (5-3600 seconds)
+
+<b>💡 Examples:</b>
+<code>/pause</code> — Pause indefinitely
+<code>/pause 30</code> — Pause for 30 seconds then auto-resume
+`
+}
+
 func pauseHandler(m *tg.NewMessage) error {
 	return handlePause(m, false)
 }

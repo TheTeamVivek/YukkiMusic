@@ -94,7 +94,7 @@ func addAuthHandler(m *telegram.NewMessage) error {
 
 	// owner, bot, self, already auth, or admin — all treated the same
 	if userID == config.OwnerID || userID == core.BUser.ID || userID == m.SenderID() {
-		m.Reply(F(chatID, "already_authed"))
+		m.Reply(F(chatID, "cannot_authorize_user"))
 		return telegram.ErrEndGroup
 	}
 
@@ -104,7 +104,7 @@ func addAuthHandler(m *telegram.NewMessage) error {
 	}
 
 	if ok, _ := utils.IsChatAdmin(m.Client, chatID, userID); ok {
-		m.Reply(F(chatID, "already_authed"))
+		m.Reply(F(chatID, "addauth_user_is_admin"))
 		return telegram.ErrEndGroup
 	}
 

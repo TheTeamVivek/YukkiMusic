@@ -58,16 +58,16 @@ func helpHandler(m *tg.NewMessage) error {
 	}
 
 	if m.ChatType() != tg.EntityUser {
-		m.Reply(F(m.ChannelID(), "help_private_only"), &tg.SendOptions{ReplyMarkup: core.GetGroupHelpKeyboard()})
+		m.Reply(F(m.ChannelID(), "help_private_only"), &tg.SendOptions{ReplyMarkup: core.GetGroupHelpKeyboard(m.ChannelID())})
 		return tg.ErrEndGroup
 	}
 
-	m.Reply(F(m.ChannelID(), "help_main"), &tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard()})
+	m.Reply(F(m.ChannelID(), "help_main"), &tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard(m.ChannelID())})
 	return tg.ErrEndGroup
 }
 
 func helpCB(c *tg.CallbackQuery) error {
-	c.Edit(F(c.ChannelID(), "help_main"), &tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard()})
+	c.Edit(F(c.ChannelID(), "help_main"), &tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard(c.ChannelID())})
 	c.Answer("")
 	return tg.ErrEndGroup
 }
@@ -85,7 +85,7 @@ func helpCallbackHandler(c *tg.CallbackQuery) error {
 	}
 
 	var text string
-	btn := core.GetBackKeyboard()
+	btn := core.GetBackKeyboard(chatID)
 
 	switch parts[1] {
 	case "admins":
@@ -98,7 +98,7 @@ func helpCallbackHandler(c *tg.CallbackQuery) error {
 		text = F(chatID, "help_public")
 	case "main":
 		text = F(chatID, "help_main")
-		btn = core.GetHelpKeyboard()
+		btn = core.GetHelpKeyboard(chatID)
 	}
 
 	c.Edit(text, &tg.SendOptions{ReplyMarkup: btn})

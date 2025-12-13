@@ -30,6 +30,26 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/speedtest"] = `<i>Run server network speed test.</i>
+
+<u>Usage:</u>
+<b>/speedtest</b> or <b>/spt</b> — Test network speed
+
+<b>📊 Results Include:</b>
+• Download speed (Mbps)
+• Upload speed (Mbps)
+• Server location
+• Latency (ms)
+• ISP information
+
+<b>🔒 Restrictions:</b>
+• <b>Sudo users</b> only
+
+<b>⚠️ Note:</b>
+Test may take 30-60 seconds to complete.`
+}
+
 func sptHandle(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()
 

@@ -32,16 +32,13 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 	"resty.dev/v3"
 
+	"main/internal/config"
 	"main/internal/core"
 	state "main/internal/core/models"
 	"main/internal/utils"
 )
 
-var (
-	telegramDLRegex = regexp.MustCompile(`https:\/\/t\.me\/([a-zA-Z0-9_]{5,})\/(\d+)`)
-	fallenAPIURL    = os.Getenv("FALLEN_API_URL")
-	fallenAPIKey    = os.Getenv("FALLEN_API_KEY")
-)
+var telegramDLRegex = regexp.MustCompile(`https:\/\/t\.me\/([a-zA-Z0-9_]{5,})\/(\d+)`)
 
 const PlatformFallenApi state.PlatformName = "FallenApi"
 
@@ -49,29 +46,30 @@ type APIResponse struct {
 	CdnUrl string `json:"cdnurl"`
 }
 
-type FallenApiPlatform struct{}
+type FallenApiPlatform struct {
+	name state.PlatformName
+}
 
 func init() {
-	addPlatform(80, PlatformFallenApi, &FallenApiPlatform{})
-	if fallenAPIURL == "" {
-		fallenAPIURL = "https://tgmusic.fallenapi.fun"
-	}
+	Register(80, &FallenApiPlatform{
+		name: PlatformFallenApi,
+	})
 }
 
-func (*FallenApiPlatform) Name() state.PlatformName {
-	return PlatformFallenApi
+func (f *FallenApiPlatform) Name() state.PlatformName {
+	return f.name
 }
 
-func (*FallenApiPlatform) IsValid(query string) bool {
+func (f *FallenApiPlatform) IsValid(query string) bool {
 	return false
 }
 
-func (*FallenApiPlatform) GetTracks(_ string, _ bool) ([]*state.Track, error) {
+func (f *FallenApiPlatform) GetTracks(_ string, _ bool) ([]*state.Track, error) {
 	return nil, errors.New("fallenapi is a download-only platform")
 }
 
-func (*FallenApiPlatform) IsDownloadSupported(source state.PlatformName) bool {
-	if fallenAPIURL == "" || fallenAPIKey == "" {
+func (f *FallenApiPlatform) IsDownloadSupported(source state.PlatformName) bool {
+	if config.FallenAPIURL == "" || config.FallenAPIKey == "" {
 		return false
 	}
 	return source == PlatformYouTube
@@ -85,7 +83,7 @@ func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, my
 		pm = utils.GetProgress(mystic)
 	}
 
-	if path, err := f.checkDownloadedFile(track.ID); err == nil {
+	if path, err := checkDownloadedFile(track.ID); err == nil {
 		return path, nil
 	}
 
@@ -115,7 +113,7 @@ func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, my
 }
 
 func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string) (string, error) {
-	apiReqURL := fmt.Sprintf("%s/track?api_key=%s&url=%s", fallenAPIURL, fallenAPIKey, url.QueryEscape(mediaURL))
+	apiReqURL := fmt.Sprintf("%s/track?api_key=%s&url=%s", config.FallenAPIURL, config.FallenAPIKey, url.QueryEscape(mediaURL))
 
 	client := resty.New()
 	defer client.Close()
@@ -190,21 +188,4 @@ func (f *FallenApiPlatform) downloadFromTelegram(ctx context.Context, dlURL, vid
 		return "", err
 	}
 	return rawFile, nil
-}
-
-func (f *FallenApiPlatform) checkDownloadedFile(videoId string) (string, error) {
-	outputDir := "./downloads"
-	pattern := filepath.Join(outputDir, videoId+".*")
-
-	matches, err := filepath.Glob(pattern)
-	if err != nil {
-		return "", fmt.Errorf("failed to search files: %v", err)
-	}
-
-	if len(matches) == 0 {
-		return "", errors.New("file not found")
-	}
-
-	// If multiple matches, pick the first one
-	return matches[0], nil
 }

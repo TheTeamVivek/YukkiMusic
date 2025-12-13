@@ -29,48 +29,39 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 	"resty.dev/v3"
 
+	"main/internal/config"
 	state "main/internal/core/models"
 )
 
-type (
-	PlatformName      = state.PlatformName
-	YoutubifyPlatform struct{}
-)
+type YoutubifyPlatform struct {
+	name state.PlatformName
+}
 
-var (
-	apiBase = os.Getenv("YOUTUBIFY_API_URL")
-	apiKey  = os.Getenv("YOUTUBIFY_API_KEY")
-)
-
-const (
-	PlatformYoutubify state.PlatformName = "Youtubeify API"
-)
+const PlatformYoutubify state.PlatformName = "Youtubeify API"
 
 func init() {
-	addPlatform(100, PlatformYoutubify, &YoutubifyPlatform{})
-
-	if apiBase == "" {
-		apiBase = "https://youtubify.me"
-	}
+	Register(100, &YoutubifyPlatform{
+		name: PlatformYoutubify,
+	})
 }
 
-func (*YoutubifyPlatform) Name() state.PlatformName {
-	return PlatformYoutubify
+func (y *YoutubifyPlatform) Name() state.PlatformName {
+	return y.name
 }
 
-func (*YoutubifyPlatform) IsValid(query string) bool {
+func (y *YoutubifyPlatform) IsValid(query string) bool {
 	return false
 }
 
-func (*YoutubifyPlatform) GetTracks(_ string, _ bool) ([]*state.Track, error) {
+func (y *YoutubifyPlatform) GetTracks(_ string, _ bool) ([]*state.Track, error) {
 	return nil, errors.New("youtubify is a direct download platform")
 }
 
-func (*YoutubifyPlatform) IsDownloadSupported(source PlatformName) bool {
-	return source == PlatformYouTube && apiKey != ""
+func (y *YoutubifyPlatform) IsDownloadSupported(source state.PlatformName) bool {
+	return source == PlatformYouTube && config.YoutubifyApiKey != ""
 }
 
-func (f *YoutubifyPlatform) Download(
+func (y *YoutubifyPlatform) Download(
 	ctx context.Context,
 	track *state.Track,
 	_ *telegram.NewMessage,
@@ -96,10 +87,10 @@ func (f *YoutubifyPlatform) Download(
 	client := resty.New()
 	defer client.Close()
 
-	url := apiBase +
+	url := config.YoutubifyApiURL +
 		"/download/" + endpoint +
 		"?video_id=" + track.ID +
-		"&mode=download&no_redirect=1&api_key=" + apiKey
+		"&mode=download&no_redirect=1&api_key=" + config.YoutubifyApiKey
 
 	resp, err := client.R().
 		SetContext(ctx).

@@ -123,7 +123,6 @@ func runSnippet() (res any) {
 
 	_ = m; _ = msg; _ = message; _ = M
 	_ = r; _ = client; _ = c; _ = app; _ = bot; _ = Client
-	_ = call; _ = ntg; _ = Ntg; _ = ub; _ = UBot
 	_ = j; _ = fmt.Println
 
 	%s

@@ -32,6 +32,25 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/restart"] = `<i>Restart the bot process.</i>
+
+<u>Usage:</u>
+<b>/restart</b> — Restart bot
+
+<b>⚙️ Behavior:</b>
+• Stops all active rooms
+• Notifies all active chats
+• Restarts bot process
+• Clears download cache
+
+<b>🔒 Restrictions:</b>
+• <b>Owner only</b> command
+
+<b>⚠️ Warning:</b>
+All playback will be interrupted. Bot will be offline for a few seconds.`
+}
+
 func handleRestart(m *tg.NewMessage) error {
 	chatID := m.ChannelID()
 

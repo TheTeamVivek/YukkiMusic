@@ -28,6 +28,63 @@ import (
 	"main/internal/locales"
 )
 
+func init() {
+	helpTexts["/seek"] = `<i>Seek forward in the currently playing track.</i>
+
+<u>Usage:</u>
+<b>/seek [seconds]</b> — Skip forward by specified seconds
+
+<b>⚙️ Features:</b>
+• Jump ahead in current track
+• Position tracking updated
+• Cannot seek past track end (10s buffer)
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/seek 30</code> — Skip forward 30 seconds
+<code>/seek 120</code> — Skip forward 2 minutes
+
+<b>⚠️ Notes:</b>
+• Minimum: any positive value
+• Maximum: track_duration - current_position - 10 seconds`
+
+	helpTexts["/seekback"] = `<i>Seek backward in the currently playing track.</i>
+
+<u>Usage:</u>
+<b>/seekback [seconds]</b> — Go back by specified seconds
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/seekback 15</code> — Go back 15 seconds
+<code>/seekback 60</code> — Go back 1 minute
+`
+
+	helpTexts["/jump"] = `<i>Jump to a specific position in the track.</i>
+
+<u>Usage:</u>
+<b>/jump [seconds]</b> — Jump to exact position
+
+<b>⚙️ Features:</b>
+• Absolute position seeking
+• Precise time control
+• 10-second buffer from end
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/jump 90</code> — Jump to 1:30
+<code>/jump 0</code> — Jump to start (same as /replay)
+
+<b>⚠️ Notes:</b>
+• Position must be within track duration - 10 seconds
+• More precise than <code>/seek</code> and <code>/seekback</code>`
+}
+
 func seekHandler(m *telegram.NewMessage) error {
 	return handleSeek(m, false, false)
 }

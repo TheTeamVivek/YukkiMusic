@@ -93,7 +93,7 @@ func onStreamEndHandler(chatID int64) {
 
 	opt := &telegram.SendOptions{
 		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(r, false),
+		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
 	}
 
 	if t.Artwork != "" {

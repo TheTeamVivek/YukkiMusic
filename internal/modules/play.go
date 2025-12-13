@@ -49,6 +49,119 @@ type playOpts struct {
 
 const playMaxRetries = 3
 
+func init() {
+	helpTexts["/play"] = `<i>Play a song in the voice chat from YouTube, Spotify, or other sources.</i>
+
+<u>Usage:</u>
+<b>/play [query/URL]</b> — Search and play a song
+<b>/play [reply to audio/video]</b> — Play replied media
+
+<b>🎵 Supported Sources:</b>
+• YouTube (videos, playlists)
+• Spotify (tracks, albums, playlists)
+• SoundCloud
+• Direct audio/video links
+
+<b>⚙️ Features:</b>
+• Queue support - adds to end if already playing
+• Auto-join voice chat if not present
+• Duration limit check
+• Multiple track support (playlists)
+
+<b>💡 Examples:</b>
+<code>/play never gonna give you up</code>
+<code>/play https://youtu.be/dQw4w9WgXcQ</code>
+<code>/play https://open.spotify.com/track/...</code>
+
+<b>⚠️ Notes:</b>
+• Bot must have proper permissions in voice chat
+• Tracks exceeding duration limit will be skipped
+• Use <code>/queue</code> to view upcoming tracks
+• Use <code>/fplay</code> to force play (skip queue)`
+
+	helpTexts["/fplay"] = `<i>Force play a song, skipping the current queue.</i>
+
+<u>Usage:</u>
+<b>/fplay [query/URL]</b> — Force play immediately
+<b>/fplay [reply to audio/video]</b> — Force play replied media
+
+<b>🎵 Behavior:</b>
+• Stops current playback
+• Clears queue
+• Starts playing immediately
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Example:</b>
+<code>/fplay urgent announcement track</code>
+
+<b>⚠️ Note:</b>
+This command is useful for urgent playback needs but will disrupt the current queue.`
+
+	helpTexts["/vplay"] = `<i>Play video content in voice chat (video mode).</i>
+
+<u>Usage:</u>
+<b>/vplay [query/URL]</b> — Play video
+<b>/vplay [reply to video]</b> — Play replied video
+
+<b>📹 Features:</b>
+• Full video playback support
+• Audio + Video streaming
+• Same queue system as audio
+
+<b>⚠️ Notes:</b>
+• Requires video streaming permissions
+• Use <code>/fvplay</code> for force video play`
+
+	helpTexts["/fvplay"] = `<i>Force play video content, skipping queue.</i>
+
+<u>Usage:</u>
+<b>/fvplay [query/URL]</b> — Force play video immediately
+
+<b>🔒 Restrictions:</b>
+• Admin/auth only command
+
+<b>💡 Use Case:</b>
+Immediate video playback when something urgent needs to be shown.`
+
+	helpTexts["/cplay"] = `<i>Play in linked channel's voice chat.</i>
+
+<u>Usage:</u>
+<b>/cplay [query]</b> — Play in linked channel
+
+<b>⚙️ Setup Required:</b>
+First use <code>/channelplay --set [channel_id]</code>
+
+<b>⚠️ Note:</b>
+All c* commands work the same as regular commands but affect the linked channel.`
+
+	helpTexts["/channelplay"] = `<i>Configure linked channel for channel play mode.</i>
+
+<u>Usage:</u>
+<b>/channelplay --set [channel_id]</b> — Set linked channel
+
+<b>⚙️ Behavior:</b>
+• Links a channel to current group
+• All <code>c*</code> commands affect linked channel
+• Channel must be accessible by bot
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> can configure
+
+<b>💡 Examples:</b>
+<code>/channelplay --set -1001234567890</code>
+
+<b>⚠️ Notes:</b>
+• Get channel ID using forward + @userinfobot
+• Bot must be admin in linked channel
+• Use <code>/cplay</code> after setup`
+
+	helpTexts["/playforce"] = helpTexts["/fplay"]
+	helpTexts["/fcplay"] = helpTexts["/cfplay"]
+	helpTexts["/cvplay"] = helpTexts["/vcplay"]
+}
+
 func channelPlayHandler(m *telegram.NewMessage) error {
 	m.Reply(F(m.ChannelID(), "channel_play_depreciated"))
 	return telegram.ErrEndGroup
@@ -409,7 +522,7 @@ func playTracksAndRespond(
 		if i == 0 && (!isActive || force) {
 			var opt *telegram.SendOptions
 			if track.Duration > 420 {
-				opt = &telegram.SendOptions{ReplyMarkup: core.GetCancekKeyboard()}
+				opt = &telegram.SendOptions{ReplyMarkup: core.GetCancelKeyboard(chatID)}
 			}
 
 			downloadingText := F(chatID, "play_downloading_song", locales.Arg{
@@ -458,7 +571,7 @@ func playTracksAndRespond(
 	// ---------- Now Playing / Added to queue ----------
 	if !isActive || (force && len(tracks) > 0) {
 		title := html.EscapeString(utils.ShortTitle(mainTrack.Title, 25))
-		btn := core.GetPlayMarkup(r, false)
+		btn := core.GetPlayMarkup(chatID, r, false)
 
 		var opt telegram.SendOptions
 		opt.ParseMode = "HTML"
@@ -506,7 +619,7 @@ func playTracksAndRespond(
 	} else {
 		if len(tracks) == 1 {
 			title := html.EscapeString(utils.ShortTitle(mainTrack.Title, 25))
-			btn := core.GetPlayMarkup(r, true)
+			btn := core.GetPlayMarkup(chatID, r, true)
 			opt := &telegram.SendOptions{
 				ParseMode:   "HTML",
 				ReplyMarkup: btn,
@@ -567,22 +680,15 @@ func playTrackWithRetry(
 			continue
 		}
 
-		// RTMP unsupported
 		if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
-			utils.EOR(replyMsg, "Streaming is not supported when using RTMP")
+			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "rtmp_streaming_not_supported"))
+			r.Destroy()
+			return telegram.ErrEndGroup
+		}
 
-			/*if url, key, err := database.GetRTMP(r.ChatID()); err != nil || url == "" || key == "" {
-				if err != nil {
-					gologging.ErrorF("Failed to get RTMP config for chat %d: %v", r.ChatID(), err)
-				} else {
-					gologging.ErrorF("RTMP config is incomplete for chat %d. URL: '%s', Key: '%s'", r.ChatID(), url, key)
-				}
-				utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_rtmp_missing_params"))
-				r.Destroy()
-				return telegram.ErrEndGroup
-			} else {
-				r.SetRTMPPlayer(url, key)
-			}*/
+		if tg.MatchError(err, "GROUPCALL_INVALID") {
+			gologging.Error("GROUPCALL_INVALID err occurred. Returning...")
+			r.Destroy()
 			return telegram.ErrEndGroup
 		}
 

@@ -26,6 +26,29 @@ import (
 	"main/internal/locales"
 )
 
+func init() {
+	helpTexts["/active"] = `<i>Show all active voice chat sessions.</i>
+
+<u>Usage:</u>
+<b>/active</b> or <b>/ac</b> — List active chats
+
+<b>📊 Information Shown:</b>
+• Total active chats
+• Active NTGCalls connections
+• Broken/stale sessions
+
+<b>🔒 Restrictions:</b>
+• <b>Sudo users</b> only
+
+<b>💡 Use Case:</b>
+Monitor bot usage and identify issues.`
+
+	keys := []string{"/ac", "/activevc", "/activevoice"}
+	for _, k := range keys {
+		helpTexts[k] = helpTexts["/active"]
+	}
+}
+
 func activeHandler(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()
 

@@ -29,6 +29,18 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/unmute"] = `<i>Unmute the audio output in voice chat.</i>
+
+<u>Usage:</u>
+<b>/unmute</b> — Restore audio
+
+<b>⚙️ Behavior:</b>
+• Restores audio immediately
+• Cancels auto-unmute timer if active
+• Shows current playback info`
+}
+
 func unmuteHandler(m *tg.NewMessage) error {
 	return handleUnmute(m, false)
 }

@@ -35,6 +35,23 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/ping"] = `<i>Check bot responsiveness and system stats.</i>
+
+<u>Usage:</u>
+<b>/ping</b> — Get bot status
+
+<b>📊 Information Shown:</b>
+• Response latency (ms)
+• Uptime
+• RAM usage
+• CPU usage
+• Disk usage
+
+<b>💡 Use Case:</b>
+Check if bot is responsive and view system health.`
+}
+
 func formatUptime(d time.Duration) string {
 	days := d / (24 * time.Hour)
 	d -= days * 24 * time.Hour
@@ -80,7 +97,7 @@ func pingHandler(m *tg.NewMessage) error {
 	diskUsage := "N/A"
 
 	opt := &tg.SendOptions{
-		ReplyMarkup: core.SuppMarkup(),
+		ReplyMarkup: core.SuppMarkup(m.ChannelID()),
 	}
 	if config.PingImage != "" {
 		opt.Media = config.PingImage

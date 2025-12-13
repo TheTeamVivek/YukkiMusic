@@ -26,6 +26,25 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/end"] = `<i>Stop playback and leave the voice chat.</i>
+
+<u>Usage:</u>
+<b>/stop</b> or <b>/end</b> — Stop playback
+
+<b>⚙️ Behavior:</b>
+• Stops current track
+• Clears queue
+• Assistant leaves voice chat
+•
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>⚠️ Note:</b>
+This action cannot be undone. Use <code>/pause</code> for temporary stops.`
+	helpTexts["/stop"] = helpTexts["/end"]
+}
+
 func stopHandler(m *telegram.NewMessage) error {
 	return handleStop(m, false)
 }

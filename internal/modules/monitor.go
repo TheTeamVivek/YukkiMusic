@@ -26,6 +26,7 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"
+	"main/internal/database"
 )
 
 var logger = gologging.GetLogger("monitor")
@@ -69,8 +70,14 @@ func MonitorRooms() {
 				if mystic == nil {
 					return
 				}
-
-				markup := core.GetPlayMarkup(r, false)
+				chatID := id
+				if r.IsCPlay() {
+					cid, err := database.GetChatIDFromCPlayID(id)
+					if err == nil {
+						chatID = cid
+					}
+				}
+				markup := core.GetPlayMarkup(chatID, r, false)
 				opts := &telegram.SendOptions{
 					ReplyMarkup: markup,
 					Entities:    mystic.Message.Entities,

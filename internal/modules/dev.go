@@ -36,6 +36,45 @@ import (
 	"main/internal/core"
 )
 
+func init() {
+	helpTexts["/sh"] = `<i>Execute shell commands on server.</i>
+
+<u>Usage:</u>
+<b>/sh [command]</b> — Run shell command
+
+<b>🔒 Restrictions:</b>
+• <b>Owner only</b> command
+
+<b>⚠️ Warning:</b>
+Direct system access - extremely powerful.`
+	helpTexts["/bash"] = helpTexts["/sh"]
+	helpTexts["/shell"] = helpTexts["/sh"]
+
+	helpTexts["/eval"] = helpTexts["/ev"]
+	helpTexts["/ev"] = `<i>Execute Go code dynamically (eval mode).</i>
+
+<u>Usage:</u>
+<b>/eval [code]</b> — Run Go code
+
+<b>🔒 Restrictions:</b>
+• <b>Owner only</b> command
+
+<b>⚠️ Warning:</b>
+Powerful command - use with caution.`
+
+	helpTexts["/json"] = `<i>Get JSON representation of message/user/chat.</i>
+
+<u>Usage:</u>
+<b>/json</b> — Current message JSON
+<b>/json -s</b> — Sender JSON
+<b>/json -c</b> — Chat JSON
+<b>/json -m</b> — Media JSON
+<b>/json [reply] -f</b> — File JSON
+
+<b>💡 Use Case:</b>
+Debugging and development.`
+}
+
 func shellHandle(m *telegram.NewMessage) error {
 	if m.SenderID() != config.OwnerID {
 		return telegram.ErrEndGroup

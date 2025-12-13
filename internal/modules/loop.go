@@ -29,6 +29,32 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/loop"] = `<i>Set loop count for the current track.</i>
+
+<u>Usage:</u>
+<b>/loop</b> — Show current loop count
+<b>/loop [count]</b> — Set loop count (0-10)
+
+<b>⚙️ Behavior:</b>
+• 0 = No loop (play once)
+• 1-10 = Repeat track that many times
+• Loop counter decrements after each playback
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/loop 0</code> — Disable loop
+<code>/loop 3</code> — Loop current track 3 times
+<code>/loop 10</code> — Loop current track 10 times
+
+<b>⚠️ Notes:</b>
+• Maximum loop count: 10
+• Loop affects only current track
+• After loops complete, plays next in queue`
+}
+
 func loopHandler(m *tg.NewMessage) error {
 	return handleLoop(m, false)
 }

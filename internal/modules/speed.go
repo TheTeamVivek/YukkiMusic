@@ -32,6 +32,36 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/speed"] = `<i>Control playback speed (tempo).</i>
+
+<u>Usage:</u>
+<b>/speed</b> — Show current speed
+<b>/speed [multiplier]</b> — Set speed (0.5-4.0x)
+<b>/speed [multiplier] [seconds]</b> — Set with auto-reset timer
+<b>/speed normal</b> or <b>/speed reset</b> — Reset to 1.0x
+
+<b>⚙️ Features:</b>
+• Range: 0.50x to 4.00x
+• Auto-reset timer (5-3600 seconds)
+• Pitch preservation
+• Real-time adjustment
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/speed 1.5</code> — Play 1.5x faster
+<code>/speed 0.75</code> — Play slower (0.75x)
+<code>/speed 2.0 300</code> — 2x speed for 5 minutes, then reset
+<code>/speed normal</code> — Reset to normal speed
+
+<b>⚠️ Notes:</b>
+• Speed affects duration calculations
+• Auto-reset only works for non-1.0x speeds
+• Suffix 'x' is optional: <code>1.5</code> = <code>1.5x</code>`
+}
+
 func speedHandler(m *telegram.NewMessage) error {
 	return handleSpeed(m, false)
 }

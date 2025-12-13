@@ -35,6 +35,23 @@ import (
 	"main/internal/locales"
 )
 
+func init() {
+	helpTexts["/stats"] = `<i>View detailed bot statistics.</i>
+
+<u>Usage:</u>
+<b>/stats</b> — Show statistics
+
+<b>📊 Information Shown:</b>
+• System stats (OS, CPU, RAM, disk)
+• Go runtime stats (memory, GC)
+• Server resources
+• Served chats count
+• Served users count
+
+<b>🔒 Restrictions:</b>
+• <b>Sudo users</b> only`
+}
+
 func statsHandler(m *telegram.NewMessage) error {
 	var sb strings.Builder
 	sb.Grow(512)

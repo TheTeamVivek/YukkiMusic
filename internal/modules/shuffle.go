@@ -28,6 +28,30 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/shuffle"] = `<i>Toggle shuffle mode for the queue.</i>
+
+<u>Usage:</u>
+<b>/shuffle</b> — Show current shuffle state
+<b>/shuffle on</b> — Enable shuffle
+<b>/shuffle off</b> — Disable shuffle
+
+<b>⚙️ Behavior:</b>
+• Randomly reorders queue when enabled
+• Affects track selection order
+• Can be toggled at any time
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/shuffle on</code> — Enable shuffle mode
+<code>/shuffle off</code> — Disable shuffle mode
+
+<b>⚠️ Note:</b>
+Shuffle only affects queue order, not currently playing track.`
+}
+
 func shuffleHandler(m *telegram.NewMessage) error {
 	return handleShuffle(m, false)
 }

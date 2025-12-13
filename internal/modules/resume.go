@@ -29,6 +29,22 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/resume"] = `<i>Resume the paused playback.</i>
+
+<u>Usage:</u>
+<b>/resume</b> — Resume playback from pause
+
+<b>⚙️ Behavior:</b>
+• Continues from last paused position
+• Cancels auto-resume timer if active
+
+<b>⚠️ Notes:</b>
+• Can only resume if currently paused
+• Position is preserved during pause
+• Speed settings remain active after resume`
+}
+
 func resumeHandler(m *telegram.NewMessage) error {
 	return handleResume(m, false)
 }

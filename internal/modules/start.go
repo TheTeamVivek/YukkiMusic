@@ -30,6 +30,10 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/start"] = `<i>Start the bot and show main menu.</i>`
+}
+
 func startHandler(m *tg.NewMessage) error {
 	if m.ChatType() != tg.EntityUser {
 		database.AddServed(m.ChannelID())
@@ -57,16 +61,49 @@ func startHandler(m *tg.NewMessage) error {
 			"bot":  utils.MentionHTML(core.BUser),
 		})
 
-		if _, err := m.RespondMedia(config.StartImage, &tg.MediaOptions{
+		_, err := m.RespondMedia(&tg.InputMediaWebPage{
+			URL:             config.StartImage,
+			ForceLargeMedia: true,
+		}, &tg.MediaOptions{
 			Caption:     caption,
 			NoForwards:  true,
-			ReplyMarkup: core.GetStartMarkup(),
-		}); err != nil {
-			gologging.Error("Error sending start media: " + err.Error())
-			return err
+			ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
+		})
+		if err != nil {
+			gologging.Error("[start] InputMediaWebPage Reply failed: " + err.Error())
+
+			_, err = m.RespondMedia(config.StartImage, &tg.MediaOptions{
+				Caption:     caption,
+				NoForwards:  true,
+				ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
+			})
+			if err != nil {
+				gologging.Error("[start] URL media reply failed: " + err.Error())
+
+				_, err = m.RespondMedia(caption, &tg.MediaOptions{
+					NoForwards:  true,
+					ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
+				})
+				return err
+			}
 		}
 	}
 
+	if config.LoggerID != 0 && isLogger() {
+		uName := "N/A"
+		if m.Sender.Username != "" {
+			uName = "@" + m.Sender.Username
+		}
+		msg := F(m.ChannelID(), "logger_bot_started", locales.Arg{
+			"mention":       utils.MentionHTML(m.Sender),
+			"user_id":       m.SenderID(),
+			"user_username": uName,
+		})
+		_, err := m.Client.SendMessage(config.LoggerID, msg)
+		if err != nil {
+			gologging.Error("Failed to send logger_bot_started msg, Err: " + err.Error())
+		}
+	}
 	return tg.ErrEndGroup
 }
 
@@ -79,7 +116,7 @@ func startCB(cb *tg.CallbackQuery) error {
 	})
 
 	sendOpt := &tg.SendOptions{
-		ReplyMarkup: core.GetStartMarkup(),
+		ReplyMarkup: core.GetStartMarkup(cb.ChannelID()),
 		NoForwards:  true,
 	}
 

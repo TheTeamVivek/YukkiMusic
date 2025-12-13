@@ -70,9 +70,15 @@ func getMediaDescription(url string, pos int, speed float64, isVideo bool) ntgca
 	}
 
 	baseCmd := "ffmpeg "
+
+	if isStreamURL(url) {
+		baseCmd += "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 "
+	}
+
 	if pos > 0 {
 		baseCmd += "-ss " + strconv.Itoa(pos) + " "
 	}
+
 	baseCmd += "-v warning -i \"" + url + "\" "
 
 	// Audio pipeline
@@ -98,7 +104,7 @@ func getMediaDescription(url string, pos int, speed float64, isVideo bool) ntgca
 		Fps:         uint8(fps),
 	}
 
-	// Video ffmpeg command
+	// Video pipeline
 	videoCmd := baseCmd
 	videoCmd += "-filter:v \"" + filter + "\" "
 	videoCmd += "-f rawvideo -r " + strconv.Itoa(fps) + " -pix_fmt yuv420p "

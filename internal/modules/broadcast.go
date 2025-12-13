@@ -32,7 +32,9 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
+	"main/internal/core"
 	"main/internal/database"
+	"main/internal/locales"
 )
 
 var (
@@ -107,6 +109,7 @@ func init() {
 func broadcastHandler(m *tg.NewMessage) error {
 	// Check for cancel flag
 	text := strings.ToLower(m.Text())
+	chatID := m.ChannelID()
 	if strings.Contains(text, "-cancel") || strings.Contains(text, "--cancel") {
 		return handleBroadcastCancel(m)
 	}
@@ -115,10 +118,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 	broadcastMu.Lock()
 	if broadcastActive {
 		broadcastMu.Unlock()
-		m.Reply("⚠️ <b>A broadcast is already running.</b>\n\n" +
-			"Please wait for it to complete or cancel it first using:\n" +
-			"• <code>/broadcast -cancel</code>\n" +
-			"• Or click the Cancel button on the progress message")
+		m.Reply(F(chatID, "broadcast_already_running"))
 		return tg.ErrEndGroup
 	}
 	broadcastActive = true
@@ -130,8 +130,9 @@ func broadcastHandler(m *tg.NewMessage) error {
 		broadcastMu.Lock()
 		broadcastActive = false
 		broadcastMu.Unlock()
-		m.Reply(fmt.Sprintf("❌ <b>Failed to parse broadcast command:</b>\n<code>%s</code>",
-			html.EscapeString(err.Error())))
+		m.Reply(F(chatID, "broadcast_parse_failed", locales.Arg{
+			"error": html.EscapeString(err.Error()),
+		}))
 		return tg.ErrEndGroup
 	}
 
@@ -139,10 +140,9 @@ func broadcastHandler(m *tg.NewMessage) error {
 		broadcastMu.Lock()
 		broadcastActive = false
 		broadcastMu.Unlock()
-		m.Reply(fmt.Sprintf("⚠️ <b>No content provided for broadcast.</b>\n\n"+
-			"<b>Usage:</b> <code>%s [text or reply to message]</code>\n\n"+
-			"<b>Example:</b>\n<code>%s Hello everyone!</code>",
-			getCommand(m), getCommand(m)))
+		m.Reply(F(chatID, "broadcast_no_content", locales.Arg{
+			"cmd": getCommand(m),
+		}))
 		return tg.ErrEndGroup
 	}
 
@@ -156,8 +156,10 @@ func broadcastHandler(m *tg.NewMessage) error {
 			broadcastMu.Lock()
 			broadcastActive = false
 			broadcastMu.Unlock()
-			m.Reply(fmt.Sprintf("❌ <b>Failed to fetch served chats:</b>\n<code>%s</code>",
-				html.EscapeString(servedChatErr.Error())))
+			m.Reply(F(chatID, "broadcast_fetch_chats_failed", locales.Arg{
+				"error": html.EscapeString(servedChatErr.Error()),
+			}))
+
 			return tg.ErrEndGroup
 		}
 	}
@@ -168,8 +170,9 @@ func broadcastHandler(m *tg.NewMessage) error {
 			broadcastMu.Lock()
 			broadcastActive = false
 			broadcastMu.Unlock()
-			m.Reply(fmt.Sprintf("❌ <b>Failed to fetch served users:</b>\n<code>%s</code>",
-				html.EscapeString(servedUserErr.Error())))
+			m.Reply(F(chatID, "broadcast_fetch_users_failed", locales.Arg{
+				"error": html.EscapeString(servedUserErr.Error()),
+			}))
 			return tg.ErrEndGroup
 		}
 	}
@@ -179,8 +182,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 		broadcastMu.Lock()
 		broadcastActive = false
 		broadcastMu.Unlock()
-		m.Reply("⚠️ <b>No targets found for broadcast.</b>\n\n" +
-			"Make sure you haven't excluded all targets with flags.")
+		m.Reply(F(chatID, "broadcast_no_targets"))
 		return tg.ErrEndGroup
 	}
 
@@ -211,9 +213,9 @@ func broadcastHandler(m *tg.NewMessage) error {
 
 	broadcastCtx, broadcastCancel = context.WithCancel(context.Background())
 
-	progressMsg, err := m.Reply("📡 <b>Initializing broadcast...</b>\n\nPlease wait...",
+	progressMsg, err := m.Reply(F(chatID, "broadcast_initializing"),
 		&tg.SendOptions{
-			ReplyMarkup: getBroadcastCancelKeyboard(),
+			ReplyMarkup: core.GetBroadcastCancelKeyboard(chatID),
 		})
 	if err != nil {
 		broadcastMu.Lock()
@@ -495,11 +497,11 @@ func updateBroadcastProgress(ctx context.Context, progressMsg *tg.NewMessage, st
 				stats.mu.Unlock()
 				return
 			}
-			text := formatBroadcastProgress(stats, false)
+			text := formatBroadcastProgress(stats, false, progressMsg.ChannelID())
 			stats.mu.Unlock()
 
 			progressMsg.Edit(text, &tg.SendOptions{
-				ReplyMarkup: getBroadcastCancelKeyboard(),
+				ReplyMarkup: core.GetBroadcastCancelKeyboard(progressMsg.ChannelID()),
 			})
 		}
 	}
@@ -508,25 +510,25 @@ func updateBroadcastProgress(ctx context.Context, progressMsg *tg.NewMessage, st
 func finalizeBroadcast(progressMsg *tg.NewMessage, stats *BroadcastStats, cancelled bool) {
 	stats.mu.Lock()
 	stats.Finished = true
-	text := formatBroadcastProgress(stats, true)
+	text := formatBroadcastProgress(stats, true, progressMsg.ChannelID())
 	stats.mu.Unlock()
 
 	if cancelled {
-		text = "🚫 <b>Broadcast Cancelled</b>\n\n" + text
+		text = F(progressMsg.ChannelID(), "broadcast_cancelled_header")
 	} else {
-		text = "✅ <b>Broadcast Completed</b>\n\n" + text
+		text = F(progressMsg.ChannelID(), "broadcast_completed_header")
 	}
 
 	progressMsg.Edit(text)
 }
 
-func formatBroadcastProgress(stats *BroadcastStats, final bool) string {
+func formatBroadcastProgress(stats *BroadcastStats, final bool, chatID int64) string {
 	elapsed := time.Since(stats.StartTime)
 
 	var sb strings.Builder
 
 	if !final {
-		sb.WriteString("📡 <b>Broadcasting...</b>\n\n")
+		sb.WriteString(F(chatID, "broadcast_progress_header") + "\n\n")
 	}
 
 	chatProgress := 0.0
@@ -539,23 +541,33 @@ func formatBroadcastProgress(stats *BroadcastStats, final bool) string {
 		userProgress = float64(stats.DoneUsers) / float64(stats.TotalUsers) * 100
 	}
 
-	sb.WriteString(fmt.Sprintf("📊 <b>Total Chats:</b> %d/%d (%.1f%%)\n",
-		stats.DoneChats, stats.TotalChats, chatProgress))
-	sb.WriteString(fmt.Sprintf("👥 <b>Total Users:</b> %d/%d (%.1f%%)\n\n",
-		stats.DoneUsers, stats.TotalUsers, userProgress))
+	sb.WriteString(F(chatID, "broadcast_total_chats", locales.Arg{
+		"done":     stats.DoneChats,
+		"total":    stats.TotalChats,
+		"progress": fmt.Sprintf("%.1f", chatProgress),
+	}) + "\n")
+
+	sb.WriteString(F(chatID, "broadcast_total_users", locales.Arg{
+		"done":     stats.DoneUsers,
+		"total":    stats.TotalUsers,
+		"progress": fmt.Sprintf("%.1f", userProgress),
+	}) + "\n\n")
 
 	if len(stats.FailedChats) > 0 {
-		sb.WriteString(fmt.Sprintf("❌ <b>Failed Chats:</b> %d\n", len(stats.FailedChats)))
+		sb.WriteString(F(chatID, "broadcast_failed_chats", locales.Arg{
+			"count": len(stats.FailedChats),
+		}) + "\n")
 	}
 	if len(stats.FailedUsers) > 0 {
-		sb.WriteString(fmt.Sprintf("❌ <b>Failed Users:</b> %d\n", len(stats.FailedUsers)))
+		sb.WriteString(F(chatID, "broadcast_failed_users", locales.Arg{
+			"count": len(stats.FailedUsers),
+		}) + "\n")
 	}
 
 	if len(stats.FailedChats) > 0 || len(stats.FailedUsers) > 0 {
 		sb.WriteString("\n")
 	}
 
-	// Calculate speed and metrics
 	totalDone := stats.DoneChats + stats.DoneUsers
 	totalTargets := stats.TotalChats + stats.TotalUsers
 
@@ -564,15 +576,20 @@ func formatBroadcastProgress(stats *BroadcastStats, final bool) string {
 		avgSpeed = float64(totalDone) / elapsed.Seconds()
 	}
 
-	sb.WriteString(fmt.Sprintf("⏱ <b>Delay:</b> %.1fs\n", stats.Delay))
-	sb.WriteString(fmt.Sprintf("⏰ <b>Elapsed:</b> %s\n", formatDuration(int(elapsed.Seconds()))))
-	sb.WriteString(fmt.Sprintf("🚀 <b>Avg Speed:</b> %.2f msg/s", avgSpeed))
+	sb.WriteString(F(chatID, "broadcast_delay", locales.Arg{
+		"delay": fmt.Sprintf("%.1f", stats.Delay),
+	}) + "\n")
 
-	// Calculate ETA for non-final broadcasts
+	sb.WriteString(F(chatID, "broadcast_elapsed", locales.Arg{
+		"elapsed": formatDuration(int(elapsed.Seconds())),
+	}) + "\n")
+
 	if !final && avgSpeed > 0 && totalDone < totalTargets {
 		remaining := totalTargets - totalDone
 		etaSeconds := float64(remaining) / avgSpeed
-		sb.WriteString(fmt.Sprintf("\n⏳ <b>ETA:</b> %s", formatDuration(int(etaSeconds))))
+		sb.WriteString("\n" + F(chatID, "broadcast_eta", locales.Arg{
+			"eta": formatDuration(int(etaSeconds)),
+		}))
 	}
 
 	if final {
@@ -584,17 +601,14 @@ func formatBroadcastProgress(stats *BroadcastStats, final bool) string {
 			successRate = float64(totalSent-totalFailed) / float64(totalTargets) * 100
 		}
 
-		sb.WriteString(fmt.Sprintf("\n\n✨ <b>Success Rate:</b> %.1f%% (%d/%d)",
-			successRate, totalSent-totalFailed, totalTargets))
+		sb.WriteString("\n\n" + F(chatID, "broadcast_success_rate", locales.Arg{
+			"rate":  fmt.Sprintf("%.1f", successRate),
+			"sent":  totalSent - totalFailed,
+			"total": totalTargets,
+		}))
 	}
 
 	return sb.String()
-}
-
-func getBroadcastCancelKeyboard() tg.ReplyMarkup {
-	kb := tg.NewKeyboard()
-	kb.AddRow(tg.Button.Data("🚫 Cancel Broadcast", "broadcast:cancel"))
-	return kb.Build()
 }
 
 func handleBroadcastCancel(m *tg.NewMessage) error {
@@ -602,7 +616,7 @@ func handleBroadcastCancel(m *tg.NewMessage) error {
 	defer broadcastMu.Unlock()
 
 	if !broadcastActive {
-		m.Reply("ℹ️ <b>No broadcast is currently running.</b>")
+		m.Reply(F(m.ChannelID(), "broadcast_not_running"))
 		return tg.ErrEndGroup
 	}
 
@@ -613,13 +627,13 @@ func handleBroadcastCancel(m *tg.NewMessage) error {
 	broadcastCtx = nil
 	broadcastCancel = nil
 
-	m.Reply("🚫 <b>Broadcast cancelled successfully.</b>")
+	m.Reply(F(m.ChannelID(), "broadcast_cancel_success"))
 	return tg.ErrEndGroup
 }
 
 func broadcastCancelCB(cb *tg.CallbackQuery) error {
 	if cb.SenderID != config.OwnerID {
-		cb.Answer("⚠️ Only the owner can cancel broadcasts.", &tg.CallbackOptions{Alert: true})
+		cb.Answer(F(cb.ChannelID(), "broadcast_cancel_owner_only"), &tg.CallbackOptions{Alert: true})
 		return tg.ErrEndGroup
 	}
 
@@ -627,7 +641,7 @@ func broadcastCancelCB(cb *tg.CallbackQuery) error {
 	defer broadcastMu.Unlock()
 
 	if !broadcastActive {
-		cb.Answer("ℹ️ No broadcast is currently running.", &tg.CallbackOptions{Alert: true})
+		cb.Answer(F(cb.ChannelID(), "broadcast_cancel_none_running"), &tg.CallbackOptions{Alert: true})
 		return tg.ErrEndGroup
 	}
 
@@ -638,8 +652,8 @@ func broadcastCancelCB(cb *tg.CallbackQuery) error {
 	broadcastActive = false
 	broadcastCtx = nil
 	broadcastCancel = nil
-
-	cb.Answer("🚫 Broadcast cancelled.", &tg.CallbackOptions{Alert: true})
+	cb.Answer(F(cb.ChannelID(), "broadcast_cancel_done"), &tg.CallbackOptions{Alert: true})
+	cb.Edit(F(cb.ChannelID(), "broadcast_cancel_done"))
 	return tg.ErrEndGroup
 }
 

@@ -32,12 +32,120 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/queue"] = `<i>Display the current playback queue.</i>
+
+<u>Usage:</u>
+<b>/queue</b> — Show queue
+
+<b>📋 Display Format:</b>
+• Now Playing - Current track with position
+• Up Next - Next 10 tracks in queue
+• Track info: Title, requester, duration
+
+<b>⚙️ Features:</b>
+• Real-time queue status
+• Requester attribution
+• Duration display
+• Queue length indicator
+
+<b>💡 Related Commands:</b>
+• <code>/position</code> - Current track position only
+• <code>/remove</code> - Remove specific track
+• <code>/clear</code> - Clear all tracks
+• <code>/move</code> - Reorder tracks`
+
+	helpTexts["/remove"] = `<i>Remove a specific track from the queue.</i>
+
+<u>Usage:</u>
+<b>/remove [index]</b> — Remove track at position
+
+<b>⚙️ Behavior:</b>
+• Index starts from 1 (first track in queue)
+• Cannot remove currently playing track
+• Queue positions update automatically
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/remove 1</code> — Remove first track in queue
+<code>/remove 5</code> — Remove 5th track
+
+<b>⚠️ Notes:</b>
+• Use <code>/queue</code> to see track indices
+• Invalid index shows error with queue length
+• Use <code>/clear</code> to remove all tracks`
+
+	helpTexts["/clear"] = `<i>Clear all tracks from the queue.</i>
+
+<u>Usage:</u>
+<b>/clear</b> — Remove all queued tracks
+
+<b>⚙️ Behavior:</b>
+• Removes all tracks from queue
+• Current playing track continues
+• Queue becomes empty after current track ends
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>⚠️ Warning:</b>
+This action cannot be undone. Use <code>/remove</code> for selective removal.`
+
+	helpTexts["/move"] = `<i>Reorder tracks in the queue.</i>
+
+<u>Usage:</u>
+<b>/move [from] [to]</b> — Move track from position to position
+
+<b>⚙️ Behavior:</b>
+• Moves track at index 'from' to index 'to'
+• Other tracks shift positions accordingly
+• Indices start from 1
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/move 3 1</code> — Move 3rd track to 1st position
+<code>/move 1 5</code> — Move 1st track to 5th position
+
+<b>⚠️ Notes:</b>
+• Both positions must be valid queue indices
+• Use <code>/queue</code> to see current order
+• Cannot move currently playing track`
+}
+
 func queueHandler(m *telegram.NewMessage) error {
 	return handleQueue(m, false)
 }
 
 func cqueueHandler(m *telegram.NewMessage) error {
 	return handleQueue(m, true)
+}
+
+func removeHandler(m *telegram.NewMessage) error {
+	return handleRemove(m, false)
+}
+
+func cremoveHandler(m *telegram.NewMessage) error {
+	return handleRemove(m, true)
+}
+
+func moveHandler(m *telegram.NewMessage) error {
+	return handleMove(m, false)
+}
+
+func cmoveHandler(m *telegram.NewMessage) error {
+	return handleMove(m, true)
+}
+
+func clearHandler(m *telegram.NewMessage) error {
+	return handleClear(m, false)
+}
+
+func cclearHandler(m *telegram.NewMessage) error {
+	return handleClear(m, true)
 }
 
 func handleQueue(m *tg.NewMessage, cplay bool) error {
@@ -101,14 +209,6 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 	return tg.ErrEndGroup
 }
 
-func removeHandler(m *telegram.NewMessage) error {
-	return handleRemove(m, false)
-}
-
-func cremoveHandler(m *telegram.NewMessage) error {
-	return handleRemove(m, true)
-}
-
 func handleRemove(m *tg.NewMessage, cplay bool) error {
 	chatID := m.ChannelID()
 
@@ -165,14 +265,6 @@ func handleRemove(m *tg.NewMessage, cplay bool) error {
 	return tg.ErrEndGroup
 }
 
-func clearHandler(m *telegram.NewMessage) error {
-	return handleClear(m, false)
-}
-
-func cclearHandler(m *telegram.NewMessage) error {
-	return handleClear(m, true)
-}
-
 func handleClear(m *tg.NewMessage, cplay bool) error {
 	chatID := m.ChannelID()
 
@@ -199,14 +291,6 @@ func handleClear(m *tg.NewMessage, cplay bool) error {
 	}))
 
 	return tg.ErrEndGroup
-}
-
-func moveHandler(m *telegram.NewMessage) error {
-	return handleMove(m, false)
-}
-
-func cmoveHandler(m *telegram.NewMessage) error {
-	return handleMove(m, true)
 }
 
 func handleMove(m *tg.NewMessage, cplay bool) error {

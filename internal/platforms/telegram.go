@@ -38,7 +38,9 @@ import (
 	"main/internal/utils"
 )
 
-type TelegramPlatform struct{}
+type TelegramPlatform struct {
+	name state.PlatformName
+}
 
 var (
 	telegramLinkRegex    = regexp.MustCompile(`^(https?://)?t\.me/(c/)?[\w\d_-]+/\d+$`)
@@ -49,11 +51,13 @@ var (
 const PlatformTelegram state.PlatformName = "Telegram"
 
 func init() {
-	addPlatform(100, PlatformTelegram, &TelegramPlatform{})
+	Register(100, &TelegramPlatform{
+		name: PlatformTelegram,
+	})
 }
 
 func (t *TelegramPlatform) Name() state.PlatformName {
-	return PlatformTelegram
+	return t.name
 }
 
 func (t *TelegramPlatform) IsValid(query string) bool {
@@ -62,6 +66,10 @@ func (t *TelegramPlatform) IsValid(query string) bool {
 		return false
 	}
 	return telegramLinkRegex.MatchString(query)
+}
+
+func (t *TelegramPlatform) IsDownloadSupported(source state.PlatformName) bool {
+	return source == t.name
 }
 
 func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, error) {
@@ -162,7 +170,7 @@ func (t *TelegramPlatform) Download(ctx context.Context, track *state.Track, mys
 	}
 	rawFile := filepath.Join(downloadsDir, fmt.Sprintf("%s%s", track.ID, ext))
 
-	if path, err := findDownloadedFile(track.ID); err == nil && path != "" {
+	if path, err := checkDownloadedFile(track.ID); err == nil && path != "" {
 		if track.Duration == 0 {
 			if dur, err := utils.GetDurationByFFProbe(path); err == nil {
 				track.Duration = dur
@@ -212,19 +220,4 @@ func (t *TelegramPlatform) Download(ctx context.Context, track *state.Track, mys
 	}
 
 	return path, nil
-}
-
-func findDownloadedFile(id string) (string, error) {
-	matches, err := filepath.Glob(filepath.Join("./downloads", id+".*"))
-	if err != nil {
-		return "", err
-	}
-	if len(matches) > 0 {
-		return matches[0], nil
-	}
-	return "", errors.New("no file found")
-}
-
-func (t *TelegramPlatform) IsDownloadSupported(source state.PlatformName) bool {
-	return source == PlatformTelegram
 }

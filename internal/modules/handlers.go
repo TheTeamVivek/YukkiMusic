@@ -20,6 +20,7 @@
 package modules
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/Laky-64/gologging"
@@ -72,8 +73,12 @@ var handlers = []MsgHandlerDef{
 
 	// SuperGroup & Admin Filters
 
+	{Pattern: "stream", Handler: streamHandler, Filters: []telegram.Filter{superGroupFilter}},
+	{Pattern: "streamstop", Handler: streamStopHandler, Filters: []telegram.Filter{superGroupFilter, authFilter}},
+	{Pattern: "streamstatus", Handler: streamStatusHandler, Filters: []telegram.Filter{superGroupFilter}},
+	{Pattern: "(rtmp|setrtmp)", Handler: setRTMPHandler},
+
 	// play/cplay/vplay/fplay commands
-	{Pattern: "(rtmp|setrtmp|rtmpset)", Handler: setRTMPHandler},
 	{Pattern: "play", Handler: playHandler, Filters: []telegram.Filter{superGroupFilter}},
 	{Pattern: "(fplay|playforce)", Handler: fplayHandler, Filters: []telegram.Filter{superGroupFilter, authFilter}},
 	{Pattern: "cplay", Handler: cplayHandler, Filters: []telegram.Filter{superGroupFilter}},
@@ -137,9 +142,9 @@ var cbHandlers = []CbHandlerDef{
 	{Pattern: "^lang:[a-z]", Handler: langCallbackHandler},
 	{Pattern: `^help:(.+)`, Handler: helpCallbackHandler},
 
-	{Pattern: "close", Handler: closeHandler},
-	{Pattern: "cancel", Handler: cancelHandler},
-	{Pattern: "broadcast:cancel", Handler: broadcastCancelCB},
+	{Pattern: "^close$", Handler: closeHandler},
+	{Pattern: "^cancel$", Handler: cancelHandler},
+	{Pattern: "^bcast_cancel$", Handler: broadcastCancelCB},
 
 	{Pattern: `^room:(\w+)$`, Handler: roomHandle},
 	{Pattern: "progress", Handler: emptyCBHandler},
@@ -169,7 +174,6 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 	assistants.ForEach(func(a *core.Assistant) {
 		a.Ntg.OnStreamEnd(ntgOnStreamEnd)
 	})
-	core.SetOnStreamEnd(onStreamEndHandler)
 
 	go MonitorRooms()
 
@@ -179,6 +183,30 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 
 	if config.SetCmds && config.OwnerID != 0 {
 		go setBotCommands(bot)
+	}
+
+	cplayCommands := []string{
+		"/cfplay", "/vcplay", "/fvcplay",
+		"/cpause", "/cresume", "/cskip", "/cstop",
+		"/cmute", "/cunmute", "/cseek", "/cseekback",
+		"/cjump", "/cremove", "/cclear", "/cmove",
+		"/cspeed", "/creplay", "/cposition", "/cshuffle",
+		"/cloop", "/cqueue", "/creload",
+	}
+
+	for _, cmd := range cplayCommands {
+		baseCmd := "/" + cmd[2:] // Remove 'c' prefix
+		if baseHelp, exists := helpTexts[baseCmd]; exists {
+			helpTexts[cmd] = fmt.Sprintf(`<i>Channel play variant of %s</i>
+
+<b>⚙️ Requires:</b>
+First configure channel using: <code>/channelplay --set [channel_id]</code>
+
+%s
+
+<b>💡 Note:</b>
+This command affects the linked channel's voice chat, not the current group.`, baseCmd, baseHelp)
+		}
 	}
 }
 

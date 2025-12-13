@@ -1,6 +1,6 @@
 FROM golang:1.25.3-bookworm AS builder
 
-WORKDIR /app
+WORKDIR /build
 
 RUN apt-get update && \
     apt-get install -y \
@@ -14,26 +14,44 @@ RUN apt-get update && \
 COPY go.mod go.sum ./
 RUN go mod tidy
 
-
-COPY setup_ntgcalls.sh ./
+COPY install.sh ./
 COPY . .
 
-RUN chmod +x setup_ntgcalls.sh && \
-    ./setup_ntgcalls.sh && \
-    CGO_ENABLED=1 go build -v -trimpath -ldflags="-w -s" -o myapp ./cmd/app/
+RUN chmod +x install.sh && \
+    ./install.sh -n --quiet --skip-summary && \
+    CGO_ENABLED=1 go build -v -trimpath -ldflags="-w -s" -o app ./cmd/app/
+
 
 FROM debian:bookworm-slim
 
 RUN apt-get update && \
     apt-get install -y \
         ffmpeg \
-        wget \
+        curl \
+        unzip \
         zlib1g && \
-    wget -q -O /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux && \
-    chmod +x /usr/local/bin/yt-dlp && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
-COPY --from=builder /app/myapp /app/
+COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 
-ENTRYPOINT ["/app/myapp"]
+RUN curl -L \
+      https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux \
+      -o /usr/local/bin/yt-dlp && \
+    chmod +x /usr/local/bin/yt-dlp && \
+    curl -fsSL https://deno.land/install.sh | sh
+
+ENV DENO_INSTALL=/root/.deno
+ENV PATH=$DENO_INSTALL/bin:$PATH
+
+RUN useradd -r -u 10001 appuser && \
+    mkdir -p /app && \
+    chown -R appuser:appuser /app
+
+WORKDIR /app
+
+COPY --from=builder /build/app /app/app
+RUN chown appuser:appuser /app/app
+
+USER appuser
+
+ENTRYPOINT ["/app/app"]

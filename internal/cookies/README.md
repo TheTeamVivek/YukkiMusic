@@ -1,7 +1,456 @@
-# Cookies
+# 🍪 YukkiMusic Cookies System
 
-This directory is used to store cookie files for `yt-dlp`.
+> **Cookie Management for YouTube Downloads via yt-dlp**
 
-You can add your own cookie files to this directory. Any file with a `.txt` extension will be randomly selected and used for YouTube downloads.
+---
 
-Cookie files can also be automatically downloaded from Batbin URLs specified in the `COOKIES_LINK` environment variable.
+## 📋 Table of Contents
+
+1. [Overview](#-overview)
+2. [Why Cookies?](#-why-cookies)
+3. [How It Works](#-how-it-works)
+4. [Setup Methods](#-setup-methods)
+5. [Cookie Format](#-cookie-format)
+6. [Troubleshooting](#-troubleshooting)
+7. [Advanced Usage](#-advanced-usage)
+
+---
+
+## 🌟 Overview
+
+The **Cookies System** in YukkiMusic enables the `yt-dlp` downloader to authenticate with YouTube and bypass certain restrictions when downloading videos.
+
+**Location**: `internal/cookies/`
+
+### What This Directory Does
+
+```
+internal/cookies/
+├── README.md                 # This file
+├── cookies.go               # Cookie management logic
+├── cookies1.txt             # Cookie file #1
+├── cookies2.txt             # Cookie file #2
+└── cookies_N.txt            # Cookie file #N
+```
+
+Every `.txt` file in this directory is:
+- ✅ Loaded on startup
+- ✅ Randomly selected for each download
+- ✅ Used by yt-dlp for authentication
+- ✅ Automatically updated from remote sources
+
+---
+
+## 🤔 Why Cookies?
+
+### Problems They Solve
+
+| Problem | Solution |
+|---------|----------|
+| **Age-restricted videos** | Cookies prove account is old enough |
+| **Geographic restrictions** | Cookies help bypass region locks |
+| **Rate limiting** | Authenticated requests get higher limits |
+| **Expired access tokens** | Cookies maintain login state |
+| **Video unavailability** | More likely to access with auth |
+
+### When You Need Cookies
+
+```
+❌ WITHOUT COOKIES           ✅ WITH COOKIES
+├─ Can't download youtube audio/videos
+├─ Limited to public content         
+├─ Low rate limits                   
+└─ May block requests                
+
+✅ WITH COOKIES
+├─ Access all your account's videos
+├─ Higher rate limits
+├─ Less likely to be blocked
+└─ Better success rate
+```
+
+---
+
+## ⚙️ How It Works
+
+### Initialization Flow
+
+```
+Bot Starts
+    ↓
+cookies.go init() called
+    ↓
+Check COOKIES_LINK env variable
+    ↓
+For each URL in COOKIES_LINK:
+    Download from Batbin → Save as .txt
+    ↓
+Load all .txt files from directory
+    ↓
+Cache file paths in memory
+    ↓
+Ready for downloads
+```
+
+### Download Flow
+
+```
+User requests song
+    ↓
+yt-dlp downloader invoked
+    ↓
+GetRandomCookieFile() called
+    ↓
+Pick random .txt from cache
+    ↓
+Pass to yt-dlp: --cookies cookies.txt
+    ↓
+yt-dlp authenticates with YouTube
+    ↓
+Video downloaded successfully
+```
+
+### Code Flow
+
+```go
+// 1. On startup
+func init() {
+    urls := strings.Fields(config.CookiesLink)
+    for _, url := range urls {
+        downloadCookieFile(url)  // Download from Batbin
+    }
+}
+
+// 2. When downloading
+func (p *YtDlpPlatform) Download(...) (string, error) {
+    cookieFile, err := cookies.GetRandomCookieFile()
+    // Use in yt-dlp:
+    args = append(args, "--cookies", cookieFile)
+}
+
+// 3. Cache management
+var cachedFiles []string  // Cached on startup
+func GetRandomCookieFile() (string, error) {
+    return cachedFiles[rand.Intn(len(cachedFiles))]
+}
+```
+
+---
+
+## 📥 Setup Methods
+
+### Method 1: Batbin URLs (Recommended)
+
+**What is Batbin?**  
+Batbin is a temporary file hosting service perfect for storing cookies without exposing them in git.
+
+**Steps**:
+
+1. **Export Browser Cookies**
+   - Install extension: [Get cookies.txt](https://chrome.google.com/webstore/detail/get-cookiestxt/)
+   - Visit youtube.com
+   - Click extension → Export
+   - Copy cookie data
+
+2. **Upload to Batbin**
+   - Go to https://batbin.me/
+   - Paste cookies
+   - Click "Create Paste"
+   - Copy the paste ID from URL
+   - Example: `https://batbin.me/abc123def456`
+
+3. **Configure Bot**
+   ```bash
+   # Single cookie
+   COOKIES_LINK=https://batbin.me/paste_id1
+   
+   # Multiple cookies (for load balancing)
+   COOKIES_LINK=https://batbin.me/paste_id1 https://batbin.me/paste_id2 https://batbin.me/paste_id3
+   ```
+
+4. **Bot Auto-Downloads**
+   - On startup, bot fetches cookies from Batbin URLs
+   - Saves as `internal/cookies/paste_id.txt`
+   - Automatically used for downloads
+
+**Pros**:
+- ✅ No git commits needed
+- ✅ Easy to update
+- ✅ Secure (not in repo)
+- ✅ Multiple sources for redundancy
+
+**Cons**:
+- ⚠️ Cookies expire periodically
+
+---
+
+### Method 2: Manual Files (Fallback)
+
+**Direct File Placement**:
+
+1. Export cookies as described above
+2. Place in `internal/cookies/` directory
+
+```bash
+# Create cookie file manually
+cat > internal/cookies/my_cookies.txt << 'EOF'
+# Netscape HTTP Cookie File
+# This file is generated by Get cookies.txt! Extension
+# https://chrome.google.com/webstore/detail/get-cookiestxt/
+
+.youtube.com	TRUE	/	TRUE	0	__Secure-1PSID	value_here
+.youtube.com	TRUE	/	TRUE	0	__Secure-3PSID	value_here
+# ... more cookies
+EOF
+```
+
+3. Bot automatically discovers and loads `*.txt` files
+
+**Pros**:
+- ✅ No external dependencies
+- ✅ Always available
+- ✅ Works offline
+
+**Cons**:
+- ⚠️ Needs git commits (avoid!)
+- ⚠️ Manual updates required
+
+---
+
+## 🍪 Cookie Format
+
+### Standard Netscape Format
+
+```
+# Netscape HTTP Cookie File
+# This file is generated by Get cookies.txt! Extension
+
+# Each line represents one cookie:
+# domain    flag    path    secure    expiry    name    value
+
+.youtube.com	TRUE	/	TRUE	0	__Secure-1PSID	AabCDef1234...
+.youtube.com	TRUE	/	TRUE	0	__Secure-3PSID	GhiJKlm5678...
+.youtube.com	TRUE	/	TRUE	0	VISITOR_INFO1_LIVE	xyz123abc456...
+.youtube.com	TRUE	/	TRUE	0	YSC	_hWvMnOpQrSt
+youtube.com	FALSE	/	FALSE	0	PREF	yt=UwgA7hWvMn
+```
+## 🐛 Troubleshooting
+
+### Issue 1: "No cookie files found"
+
+**Error**:
+```
+WARN Failed to load cookie cache: no cookie files found
+```
+
+**Solution**:
+1. Check `internal/cookies/` directory exists
+2. Verify `.txt` files are present
+3. Check file permissions: `chmod 644 internal/cookies/*.txt`
+4. If using Batbin, verify `COOKIES_LINK` is set
+
+```bash
+# Check directory
+ls -la internal/cookies/
+
+# Should show files like:
+# -rw-r--r--  1 user  group  2048 Dec 17 10:30 abc123.txt
+# -rw-r--r--  1 user  group  2048 Dec 17 10:30 def456.txt
+```
+
+---
+
+### Issue 2: "Download failed - 403 Forbidden"
+
+**Error**:
+```
+ERROR yt-dlp Sign in to confirm you’re not a bot.
+```
+
+**Causes & Solutions**:
+
+```
+❌ Cookies expired
+   → Regenerate cookies from browser
+   → Upload new Batbin paste
+   → Update COOKIES_LINK
+
+❌ Wrong format
+   → Export again using Get cookies.txt extension
+   → Verify Netscape format headers
+
+❌ YouTube blocked IP
+   → Try different cookies from different accounts
+   → Use multiple cookies (load balanced)
+   → Wait a few hours before retry
+
+❌ Account suspended
+   → Use different YouTube account
+   → Export fresh cookies from that account
+```
+
+---
+
+### Issue 3: "GetRandomCookieFile called on empty cache"
+
+**Error**:
+```
+WARN No cookie files found in cache
+```
+
+**Solution**:
+1. Call `loadCookieCache()` first time
+2. If still empty, check directory:
+
+```bash
+# Verify files exist
+find internal/cookies -name "*.txt" -type f
+
+# If none found, create one:
+touch internal/cookies/cookies.txt
+# Then add content from browser export
+```
+
+---
+
+### Issue 4: Cookie download fails
+
+**Error**:
+```
+WARN Failed to download cookie file from https://batbin.me/...: connection refused
+```
+
+**Causes & Solutions**:
+```
+❌ Batbin URL invalid
+   → Copy URL from browser correctly
+   → Format: https://batbin.me/PASTE_ID
+
+❌ Batbin paste expired
+   → Pastes expire after ~30 days
+   → Create new paste on batbin.me
+   → Update COOKIES_LINK
+
+❌ Network unreachable
+   → Check internet connection
+   → Check firewall rules
+   → Try from different network
+```
+
+---
+
+## 🚀 Advanced Usage
+
+### Rotating Cookies for Load Balancing
+
+```bash
+# Use multiple cookies for different downloads
+COOKIES_LINK="https://batbin.me/cookies1 https://batbin.me/cookies2 https://batbin.me/cookies3"
+
+# Each download randomly picks one:
+# Download 1: cookies1.txt
+# Download 2: cookies3.txt
+# Download 3: cookies2.txt
+```
+
+**Benefits**:
+- ✅ Distribute load across accounts
+- ✅ Better rate limit handling
+- ✅ Redundancy if one fails
+- ✅ Automatic fallback
+
+---
+
+## ⏰ Maintenance Schedule
+
+### Daily
+- Bot uses cookies automatically
+- No manual action needed
+
+### Weekly
+- Monitor download success rates
+- If failures increase, cookies may be expiring
+
+### Weekly (or when failures occur)
+1. Export fresh cookies from browser
+2. Upload to Batbin
+3. Update `COOKIES_LINK` in `.env`
+4. Restart bot
+
+### Semi-Annually
+- Review if alternative downloaders needed
+- Check for new YouTube restrictions
+
+---
+
+## 📊 Best Practices
+
+### ✅ Do's
+
+```bash
+✅ Use Batbin for secure storage
+✅ Refresh cookies monthly
+✅ Use multiple cookies for load balancing
+✅ Monitor download success rates
+✅ Keep COOKIES_LINK up to date
+✅ Test cookies after export
+```
+
+### ❌ Don'ts
+
+```bash
+❌ Don't commit cookies to git
+❌ Don't share cookie files publicly
+❌ Don't use same account for multiple bots
+❌ Don't ignore download failures
+❌ Don't use extremely old cookies
+❌ Don't store plaintext passwords
+```
+
+---
+
+## 🔗 Resources
+
+- **[Batbin](https://batbin.me/)** - Temporary file hosting
+- **[Get cookies.txt Extension](https://chrome.google.com/webstore/detail/get-cookiestxt/)** - Chrome extension
+- **[yt-dlp Documentation](https://github.com/yt-dlp/yt-dlp)** - Download tool
+- **[YouTube Cookie Docs](https://support.google.com/accounts/answer/61416)** - Cookie info
+
+---
+
+## 🆘 Support
+
+- **Not working?** Use `/bug` command
+- **Need help?** Join [Support Chat](https://t.me/TheTeamVk)
+- **Found issue?** Report on [GitHub](https://github.com/TheTeamVivek/YukkiMusic/issues)
+
+---
+
+## 📝 Implementation Details
+
+### `cookies.go` Functions
+
+```go
+// Initialize and download cookies from Batbin URLs
+func init()
+
+// Download single cookie file from Batbin
+func downloadCookieFile(url string) error
+
+// Get random cookie file for load balancing
+func GetRandomCookieFile() (string, error)
+
+// Load all .txt files from directory into cache
+func loadCookieCache() error
+```
+
+### Configuration
+
+```go
+// In internal/config/config.go
+CookiesLink = getString("COOKIES_LINK")  // Space-separated Batbin URLs
+```
+
+---
+
+**Happy downloading! 🎵**

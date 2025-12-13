@@ -194,15 +194,6 @@ func (r *RoomState) SetLoop(loop int) {
 	r.loop = loop
 }
 
-func (r *RoomState) SetRTMPPlayer(url, key string) {
-	r.Lock()
-	defer r.Unlock()
-
-	r.rtmpURL = url
-	r.rtmpKey = key
-	r.p = &RTMPPlayer{}
-}
-
 func (r *RoomState) IsCPlay() bool {
 	r.RLock()
 	defer r.RUnlock()

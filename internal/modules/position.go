@@ -30,6 +30,22 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/position"] = `<i>Show current playback position and track info.</i>
+
+<u>Usage:</u>
+<b>/position</b> — Show position
+
+<b>📊 Information Displayed:</b>
+• Current track title
+• Current position (MM:SS)
+• Total duration (MM:SS)
+• Playback speed (if not 1.0x)
+
+<b>💡 Use Case:</b>
+Quick position check without full queue display.`
+}
+
 func positionHandler(m *telegram.NewMessage) error {
 	return handlePosition(m, false)
 }

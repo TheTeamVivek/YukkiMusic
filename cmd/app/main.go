@@ -53,6 +53,7 @@ func main() {
 	gologging.GetLogger("webrtc").SetLevel(gologging.FatalLevel)
 
 	checkFFmpegAndFFprobe()
+	refreshCacheAndDownloads()
 
 	l.Debug("🔹 Initializing MongoDB...")
 	dbCleanup := database.Init(config.MongoURI)
@@ -70,6 +71,7 @@ func main() {
 	defer cleanup()
 
 	core.AssistantIndexFunc = database.GetAssistantIndex
+	core.GetChatLanguage = database.GetChatLanguage
 
 	if err := database.RebalanceAssistantIndexes(core.Assistants.Count()); err != nil {
 		l.Fatal("Failed to rebalance Assistants: " + err.Error())
@@ -85,4 +87,21 @@ func main() {
 	go http.ListenAndServe(":"+port, nil)
 
 	core.Bot.Idle()
+}
+
+func refreshCacheAndDownloads() error {
+	dirs := []string{
+		"./cache",
+		"./downloads",
+	}
+
+	for _, dir := range dirs {
+		if err := os.RemoveAll(dir); err != nil {
+			return err
+		}
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return err
+		}
+	}
+	return nil
 }

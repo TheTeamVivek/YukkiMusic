@@ -1,5 +1,24 @@
 name: "🇺🇸 English"
 
+# buttons
+ADD_ME_BTN: "⚡ Add Me to Your group"
+BROADCAST_CANCEL_BTN: "🚫 Cancel Broadcast"
+CLOSE_BTN: "Close"
+DOWNLOAD_CANCEL_BTN: "🚦 Cancel Downloading"
+GC_HELP_BTN: "📒 Commands"
+
+START_HELP_BTN: "❓ Help & Commands"
+
+UPDATES_BTN: "📢 Updates"
+SUPPORT_BTN: "💬 Support"
+
+HELP_ADMINS_BTN: "🛠 Admins"
+HELP_PUBLIC_BTN: "🌍 Public"
+HELP_OWNER_BTN: "👑 Owner"
+HELP_SUDOERS_BTN: "⚡ Sudoers"
+
+BACK_BTN: "⬅️ Back"
+
 # basically this string used in /command [bool]
 invalid_bool: "⚠️ <b>Invalid value.</b>\nUse 'enable' or 'disable'."
 
@@ -24,6 +43,8 @@ auth_limit_reached: "⚠️ This chat has reached the maximum authorized users l
 already_authed: "⚠️ That user is already authorized — no need to add them again."
 
 # 🤖 Add auth
+cannot_authorize_user: "⚠️ This user cannot be authorized.\nThe bot owner, the bot itself, or yourself do not require authorization."
+addauth_user_is_admin: "⚠️ This user is already a chat administrator. No authorization is required."
 addauth_bot_user: "🤖 You can’t add a bot to the auth list — authusers must be human!"
 addauth_add_fail: "❌ Failed to add authorized user: {error}"
 addauth_success_with_count: "✅ Added {user}.\nNow {count}/{limit} authorized users."
@@ -45,6 +66,29 @@ bot_demotion_goodbye: |
 
   <b>Goodbye 👋</b>
 
+broadcast_already_running: "⚠️ A broadcast is already running.\n\nPlease wait for it to complete or cancel it first using:\n• <code>/broadcast -cancel</code>\n• Or click the Cancel button on the progress message"
+broadcast_parse_failed: "❌ Failed to parse broadcast command:\n<code>{error}</code>"
+broadcast_no_content: "⚠️ No content provided for broadcast.\n\n<b>Usage:</b> <code>{cmd} [text or reply to message]</code>\n\n<b>Example:</b>\n<code>{cmd} Hello everyone!</code>"
+broadcast_fetch_chats_failed: "❌ Failed to fetch served chats:\n<code>{error}</code>"
+broadcast_fetch_users_failed: "❌ Failed to fetch served users:\n<code>{error}</code>"
+broadcast_no_targets: "⚠️ No targets found for broadcast.\n\nMake sure you haven't excluded all targets with flags."
+broadcast_initializing: "📡 Initializing broadcast...\n\nPlease wait..."
+broadcast_cancelled_header: "🚫 Broadcast Cancelled"
+broadcast_completed_header: "✅ Broadcast Completed"
+broadcast_progress_header: "📡 Broadcasting..."
+broadcast_total_chats: "📊 Total Chats: {done}/{total} ({progress}%)"
+broadcast_total_users: "👥 Total Users: {done}/{total} ({progress}%)"
+broadcast_failed_chats: "❌ Failed Chats: {count}"
+broadcast_failed_users: "❌ Failed Users: {count}"
+broadcast_delay: "⏱ Delay: {delay}s"
+broadcast_elapsed: "⏰ Elapsed: {elapsed}"
+broadcast_eta: "⏳ ETA: {eta}"
+broadcast_success_rate: "✨ Success Rate: {rate}% ({sent}/{total})"
+broadcast_not_running: "ℹ️ No broadcast is currently running."
+broadcast_cancel_success: "🚫 Broadcast cancelled successfully."
+broadcast_cancel_owner_only: "⚠️ Only the owner can cancel broadcasts."
+broadcast_cancel_none_running: "ℹ️ No broadcast is currently running."
+broadcast_cancel_done: "🚫 Broadcast cancelled."
 
 # 🎧 CPlay (Channel Play)
 
@@ -57,6 +101,64 @@ cplay_channel_not_accessible: "<b>Channel Not Accessible:</b> Could not retrieve
 cplay_save_error: "<b>Error:</b> Failed to save CPlay settings."
 cplay_enabled: "✅ <b>Channel Play enabled.</b> All <code>/c</code> commands will now work in channel <code>{channel_id}</code>."
 
+# Callback handler messages
+invalid_request: "⚠️ Invalid request."
+unknown_action: "⚠️ Unknown action."
+download_cancelled: "✅ Download cancelled."
+no_download_to_cancel: "ℹ️ No download to cancel."
+
+# Pause callback
+cb_pause_success: "⏸️ Track paused at {position}"
+cb_pause_message: |
+  <b>⏸️ Track Paused</b>
+
+  <b>▫ Track:</b> <a href="{url}">{title}</a>
+  <b>▫ Position:</b> {position} / {duration}
+  <b>▫ Paused by:</b> {user}
+
+# Resume callback
+cb_already_playing: "ℹ️ Track is already playing."
+cb_resume_failed: "❌ Failed to resume playback."
+cb_resume_success: "▶️ Resumed at {position}."
+cb_resume_message: |
+  <b>🎵 Now Playing:</b>
+
+  <b>▫ Track:</b> <a href="{url}">{title}</a>
+  <b>▫ Duration:</b> {duration}
+  <b>▫ Resumed by:</b> {user}
+
+# Replay callback
+cb_replaying: "🔁 <b>Replaying current track...</b>"
+cb_replay_failed: "❌ Failed to replay track."
+cb_replay_success: "🔁 Track replayed."
+cb_replay_edited: "🔁 Track replayed by {user}."
+
+# Skip callback
+cb_skip_queue_empty: "⏹️ Playback stopped — queue empty."
+cb_skip_download_failed: "❌ Failed to download next track."
+cb_skip_play_failed: "❌ Failed to play next track."
+cb_skip_success: "⏭️ Track skipped."
+cb_skip_edited: "⏭️ Skipped by {user}"
+
+# Stop callback
+cb_stop_success: "⏹️ Playback stopped."
+
+# Mute/Unmute callback
+cb_mute_success: "🔇 Muted."
+cb_mute_message: |
+  <b>🔇 Playback Muted</b>
+
+  <b>▫ Track:</b> <a href="{url}">{title}</a>
+  <b>▫ Muted by:</b> {user}
+
+cb_unmute_success: "🔊 Unmuted."
+
+cb_seek_success: "⏩ Sought forward {seconds} seconds"
+cb_seek_near_end: "⚠️ Cannot seek forward {seconds} seconds — about to reach end."
+cb_seek_edited: "⏩ Sought {seconds} seconds — by {user}"
+
+cb_seekback_success: "⏪ Sought back {seconds} seconds"
+cb_seekback_edited: "⏪ Sought back {seconds} seconds — by {user}"
 
 # 🗑️ Delete auth
 del_auth_not_authorized: "⚠️ That user isn’t authorized — nothing to remove."
@@ -78,8 +180,8 @@ autoleave_already: "⚠️ AutoLeave is already {action}"
 autoleave_update_fail: "⚠️ <b>Failed to update AutoLeave state.</b>"
 autoleave_updated: "🏃‍♂️ AutoLeave has been {action}"
 
-enabled: "✅ Enabled"
-disabled: "❌ Disabled"
+enabled: "Enabled"
+disabled: "Disabled"
 
 bug_usasge: "⚠️ Please describe the bug. Usage: {cmd} <problem> or reply to a message."
 bug_thanks: "✅ Thank you for your bug report! It has been sent to the developers."
@@ -193,6 +295,43 @@ lang_success: "✅ Language successfully updated to {lang_name}."
 logger_playback_started: "Playback Started"
 logger_playback_queued: "Playback Queued"
 
+logger_bot_added: |
+  🤖 <b>Bot Added to New Group</b>
+  
+  <blockquote>
+  <b>Group Name:</b> {group_name}
+  <b>Group ID:</b> {group_id}
+  <b>Group Username:</b> {group_username}
+
+  <b>Added By:</b> {added_by_name}
+  <b>User ID:</b> {added_by_id}
+  <b>User Username:</b> {added_by_username}
+
+  <b>Time:</b> {date_time}
+  </blockquote>
+#  👥 <b>Members Count:</b> {members_count}
+
+logger_bot_removed: |
+
+  🤖 <b>Bot Removed from Group</b>
+  <blockquote>
+  <b>Group Name:</b> {group_name}
+  <b>Group ID:</b> {group_id}
+  <b>Group Username:</b> {group_username}
+
+  <b>Removed By:</b> {removed_by_name}
+  <b>User ID:</b> {removed_by_id}
+  <b>User Username:</b> {removed_by_username}
+
+  <b>Time:</b> {date_time}
+  </blockquote>
+  
+logger_bot_started: |
+  ▶️ <b>{mention} started the bot</b>
+
+  <b>Username:</b> {user_username}
+  <b>ID:</b> {user_id}
+  
 logger_track: "🎧 Track:"
 logger_source: "🔗 Source:"
 logger_group: "📌 Group:"
@@ -305,6 +444,7 @@ play_multiple_tracks_too_long_item: "— <i>{title}</i>"
 play_multiple_tracks_too_long_more: "... and {remaining} more."
 play_all_tracks_skipped: "❌ All found tracks were skipped due to duration limits."
 play_failed: "❌ Failed to play\nError: {error}"
+play_unable: "<b> ❌ Unable to Play </b>\n\n<i>Please <b>restart the voice</b> chat and make sure you are an <b>admin</b> of this group.</i>"
 play_downloading_song: "📥 Downloading song \"{title}\""
 play_download_canceled: "⚠️ Download canceled by {user}."
 play_added_multiple_header: "➕ <b>Added {count} tracks</b> by {user}"
@@ -399,6 +539,158 @@ room_not_linked: "⚠️ This channel isn't linked to any group."
 room_already_paused: "⏸️ Track is already paused. Tap ▶️ Resume to continue."
 room_already_paused_auto: "⏸️ Track is already paused — auto-resuming in {duration}."
 room_pause_failed: "❌ Failed to pause playback.\n\n<i>{error}</i>"
+
+rtmp_not_configured: |
+  ⚠️ <b>RTMP not configured!</b>
+  
+  Please set RTMP server first:
+  <code>{cmd} rtmps://server/s/streamkey</code>
+
+rtmp_already_streaming: |
+  📡 <b>Already streaming!</b>
+  
+  Use <code>/streamstop</code> to end current stream.
+
+rtmp_init_failed: |
+  ❌ <b>Failed to initialize RTMP stream:</b>
+  <code>{error}</code>
+
+rtmp_starting_stream: "📡 <b>Starting RTMP stream...</b>"
+
+rtmp_play_failed: |
+  ❌ <b>Failed to start stream:</b>
+  <code>{error}</code>
+
+rtmp_now_streaming: |
+  📡 <b>Now Streaming (RTMP):</b>
+  
+  <b>▫ Track:</b> <a href="{url}">{title}</a>
+  <b>▫ Duration:</b> {duration}
+  <b>▫ Started by:</b> {by}
+  
+  ⚠️ <i>Note: RTMP has ~15-30s buffering delay</i>
+
+rtmp_not_streaming: "ℹ️ No active RTMP stream."
+
+rtmp_stop_failed: |
+  ❌ <b>Failed to stop stream:</b>
+  <code>{error}</code>
+
+rtmp_stopped: |
+  ⏹️ <b>RTMP stream stopped</b> by {user}
+
+rtmp_configured_not_started: |
+  ℹ️ <b>RTMP Status:</b> Not started
+  
+  <b>▫ Server:</b> <code>{server}</code>
+  <b>▫ State:</b> Ready to stream
+  
+  Use <code>/stream &lt;query&gt;</code> to start streaming.
+
+rtmp_status_playing: |
+  📡 <b>RTMP Stream Status</b>
+  
+  <b>▫ State:</b> ▶️ Streaming
+  <b>▫ Position:</b> {position}
+  <b>▫ Server:</b> <code>{server}</code>
+
+rtmp_status_paused: |
+  📡 <b>RTMP Stream Status</b>
+  
+  <b>▫ State:</b> ⏸️ Paused
+  <b>▫ Server:</b> <code>{server}</code>
+
+rtmp_status_idle: |
+  📡 <b>RTMP Stream Status</b>
+  
+  <b>▫ State:</b> ⏹️ Idle
+  <b>▫ Server:</b> <code>{server}</code>
+
+rtmp_dm_only: |
+  🔒 <b>Security Notice</b>
+  
+  RTMP credentials should NEVER be shared in groups!
+  
+  <b>📩 To configure RTMP:</b>
+  1. Open my private chat: @{bot_username}
+  2. Send: <code>{cmd} &lt;chat_id&gt; &lt;rtmp_url&gt;</code>
+  
+  <b>💡 Example:</b>
+  <code>/setrtmp -1001234567890 rtmps://server/s/key</code>
+
+rtmp_setup_usage: |
+  ⚙️ <b>RTMP Configuration</b>
+  
+  <u>Usage:</u>
+  <code>/setrtmp &lt;chat_id&gt; &lt;full_rtmp_url&gt;</code>
+  
+  <b>📋 Parameters:</b>
+  • <code>chat_id</code> - Target chat/channel ID
+  • <code>full_rtmp_url</code> - Complete RTMP URL with stream key
+  
+  <b>📝 Example:</b>
+  <code>/setrtmp -1001234567890 rtmps://dc5-1.rtmp.t.me/s/123:key</code>
+  
+  <b>🔍 How to get chat ID:</b>
+  • Forward any message from chat to @userinfobot
+  • Or use <code>/id</code> command in the chat
+  
+  <b>🔐 Security:</b>
+  • Configuration only works in DM (private chat)
+  • You must be admin in target chat
+  • Credentials are stored securely
+
+rtmp_invalid_chat_id: |
+  ❌ <b>Invalid chat ID!</b>
+  
+  Please provide a valid numeric chat ID.
+  
+  <b>💡 Example:</b>
+  <code>/setrtmp -1001234567890 rtmps://...</code>
+
+rtmp_check_admin_failed: |
+  ❌ <b>Failed to verify admin status:</b>
+  <code>{error}</code>
+  
+  <b>⚠️ Make sure:</b>
+  • I am admin in the target chat
+  • Chat ID is correct
+  • You have admin permissions
+
+rtmp_not_admin: |
+  ⚠️ <b>Permission Denied</b>
+  
+  You must be an <b>administrator</b> in the target chat to configure RTMP.
+
+rtmp_parse_failed: |
+  ❌ <b>Failed to parse RTMP URL:</b>
+  <code>{error}</code>
+  
+  <b>📋 Correct format:</b>
+  <code>rtmp://server/app/streamkey</code>
+  or
+  <code>rtmps://server/s/streamkey</code>
+
+rtmp_streaming_not_supported: |
+  ⚠️ <b>Streaming not supported</b>
+  
+  This action is not available while using <b>RTMP mode</b>.
+  
+  Use <code>/stream</code> to play media via RTMP.
+  
+rtmp_configured_success: |
+  ✅ <b>RTMP Configured Successfully!</b>
+  
+  <b>🆔 Chat ID:</b> <code>{chat_id}</code>
+  <b>🔗 URL:</b> <code>{url}</code>
+  <b>🔑 Key:</b> <code>{key}</code>
+  
+  <b>✨ Next Steps:</b>
+  Go to your chat and use:
+  <code>/stream &lt;song name&gt;</code>
+  
+  <b>🔒 Security Note:</b>
+  Credentials are stored securely and never shown in the group.
 
 
 searching: "🔍🎶 Searching... ⚡✨"

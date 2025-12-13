@@ -42,14 +42,22 @@ var (
 	MongoURI       = getString("MONGO_DB_URI")
 	StringSessions = getStringSlice("STRING_SESSIONS")
 	SessionType    = getString("SESSION_TYPE", "pyrogram") // pyrogram, telethon, gogram
-
 	// Optional Vars
-	ApiKEY         = getString("FALLEN_API_KEY")
-	ApiURL         = getString("FALLEN_API_URL", "https://tgmusic.fallenapi.fun")
-	OwnerID        = getInt64("OWNER_ID")
-	LoggerID       = getInt64("LOGGER_ID")
+	OwnerID  = getInt64("OWNER_ID")
+	LoggerID = getInt64("LOGGER_ID")
+
+	SpotifyClientID     = getString("SPOTIFY_CLIENT_ID", "40b91facfdee4c6e9456906613e7ca6b")
+	SpotifyClientSecret = getString("SPOTIFY_CLIENT_SECRET", "e8d7847ccdf545b9ac5051d2c456c5d2")
+
+	FallenAPIURL = getString("FALLEN_API_URL", "https://tgmusic.fallenapi.fun")
+	FallenAPIKey = getString("FALLEN_API_KEY")
+
+	YoutubifyApiURL = getString("YOUTUBIFY_API_URL", "https://youtubify.me")
+	YoutubifyApiKey = getString("YOUTUBIFY_API_KEY")
+
 	DefaultLang    = getString("DEFAULT_LANG", "en")
 	DurationLimit  = int(getInt64("DURATION_LIMIT", 4200)) // in seconds
+	LeaveOnDemoted = getBool("LEAVE_ON_DEMOTED", false)
 	QueueLimit     = int(getInt64("QUEUE_LIMIT", 7))
 	SupportChat    = getString("SUPPORT_CHAT", "https://t.me/TheTeamVk")
 	SupportChannel = getString("SUPPORT_CHANNEL", "https://t.me/TheTeamVivek")
@@ -63,6 +71,14 @@ var (
 )
 
 func init() {
+	if ApiID == 0 {
+		logger.Fatal("API_ID is required but missing!")
+		return
+	}
+	if ApiHash == "" {
+		logger.Fatal("API_HASH is required but missing!")
+		return
+	}
 	if Token == "" {
 		Token = getString("BOT_TOKEN")
 		if Token == "" {
@@ -78,18 +94,13 @@ func init() {
 		StringSessions = getStringSlice("STRING_SESSION")
 
 		if len(StringSessions) == 0 {
-			logger.Fatal("STRING_SESSIONS is empty — at least one Pyro v2 session string is required.")
+			logger.FatalF("STRING_SESSIONS is empty — at least one %s session string is required.", SessionType)
 			return
 		}
 	}
 
-	if ApiID == 0 {
-		logger.Fatal("API_ID is required but missing!")
-		return
-	}
-	if ApiHash == "" {
-		logger.Fatal("API_HASH is required but missing!")
-		return
+	if SpotifyClientID == "" || SpotifyClientSecret == "" {
+		logger.Warn("Spotify credentials not configured - Spotify links won't work")
 	}
 }
 
@@ -110,8 +121,8 @@ func getBool(key string, def ...bool) bool {
 	if ok {
 		boolVal, err := strconv.ParseBool(val)
 		if err != nil {
-			logger.FatalF("Invalid boolean for %s: %v — using default %t", key, err, defaultValue)
-			return defaultValue
+			logger.FatalF("Invalid boolean for %s: %v", key, err)
+			return defaultValue // never runs
 		}
 		return boolVal
 	}
@@ -127,7 +138,7 @@ func getInt64(key string, def ...int64) int64 {
 	if val, ok := getEnvAny(variants(key)...); ok {
 		num, err := strconv.ParseInt(val, 10, 64)
 		if err != nil {
-			logger.FatalF("Invalid int64 for %s: %v — using default %d", key, err, defaultValue)
+			logger.FatalF("Invalid int64 for %s: %v", key, err)
 			return defaultValue
 		}
 		return num

@@ -41,10 +41,11 @@ import (
 	"main/internal/utils"
 )
 
-type YouTubePlatform struct{}
+type YouTubePlatform struct {
+	name state.PlatformName
+}
 
 var (
-	videoIDRegex     = regexp.MustCompile(`(?i)(?:v=|\/v\/|\/embed\/|youtu\.be\/)([A-Za-z0-9_-]{11})`)
 	playlistRegex    = regexp.MustCompile(`(?i)(?:list=)([A-Za-z0-9_-]+)`)
 	youtubeLinkRegex = regexp.MustCompile(`(?i)^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|music\.youtube\.com)\/`)
 	youtubeCache     = utils.NewCache[string, []*state.Track](1 * time.Hour)
@@ -53,11 +54,18 @@ var (
 const PlatformYouTube state.PlatformName = "YouTube"
 
 func init() {
-	addPlatform(90, PlatformYouTube, &YouTubePlatform{})
+	Register(90, &YouTubePlatform{
+		name: PlatformYouTube,
+	})
 }
 
-func (*YouTubePlatform) Name() state.PlatformName { return PlatformYouTube }
-func (*YouTubePlatform) IsValid(link string) bool { return youtubeLinkRegex.MatchString(link) }
+func (yp *YouTubePlatform) Name() state.PlatformName {
+	return yp.name
+}
+
+func (yp *YouTubePlatform) IsValid(link string) bool {
+	return youtubeLinkRegex.MatchString(link)
+}
 
 func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, error) {
 	trimmed := strings.TrimSpace(input)
@@ -66,7 +74,7 @@ func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, 
 	}
 
 	if youtubeLinkRegex.MatchString(trimmed) {
-		// playlist URL
+
 		if playlistRegex.MatchString(trimmed) {
 			cacheKey := "playlist:" + strings.ToLower(trimmed)
 			if cached, ok := youtubeCache.Get(cacheKey); ok {
@@ -102,18 +110,16 @@ func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, 
 			return updateCached(tracks, video), nil
 		}
 
-		// single video URL
-		matches := videoIDRegex.FindStringSubmatch(trimmed)
-		if len(matches) < 2 {
-			return nil, errors.New("unsupported YouTube URL or missing video ID")
+		normalizedURL, videoID, err := yp.normalizeYouTubeURL(trimmed)
+		if err != nil {
+			return nil, err
 		}
 
-		videoID := matches[1]
 		if cached, ok := youtubeCache.Get("track:" + videoID); ok && len(cached) > 0 {
 			return updateCached(cached, video), nil
 		}
 
-		trackList, err := yp.VideoSearch("https://youtube.com/watch?v="+videoID, true)
+		trackList, err := yp.VideoSearch(normalizedURL, true)
 		if err != nil {
 			return nil, err
 		}
@@ -121,6 +127,7 @@ func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, 
 			return nil, errors.New("track not found for the given url")
 		}
 
+		youtubeCache.Set("track:"+videoID, trackList)
 		return updateCached(trackList, video), nil
 	}
 
@@ -135,7 +142,7 @@ func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, 
 	return updateCached(tracks, video), nil
 }
 
-func (*YouTubePlatform) IsDownloadSupported(source state.PlatformName) bool {
+func (yp *YouTubePlatform) IsDownloadSupported(source state.PlatformName) bool {
 	return false
 }
 
@@ -225,6 +232,45 @@ func (yp *YouTubePlatform) VideoSearch(query string, singleOpt ...bool) ([]*stat
 	}
 
 	return tracks, nil
+}
+
+func (yt *YouTubePlatform) normalizeYouTubeURL(input string) (string, string, error) {
+	u, err := url.Parse(strings.TrimSpace(input))
+	if err != nil {
+		return "", "", err
+	}
+
+	host := strings.ToLower(u.Host)
+	path := strings.Trim(u.Path, "/")
+
+	if strings.Contains(host, "youtu.be") {
+		id := strings.Split(path, "/")[0]
+		if len(id) == 11 {
+			return "https://www.youtube.com/watch?v=" + id, id, nil
+		}
+	}
+
+	if strings.Contains(host, "youtube.com") {
+		if v := u.Query().Get("v"); len(v) == 11 {
+			return "https://www.youtube.com/watch?v=" + v, v, nil
+		}
+
+		parts := strings.Split(path, "/")
+
+		if len(parts) >= 2 && parts[0] == "shorts" && len(parts[1]) == 11 {
+			return "https://www.youtube.com/watch?v=" + parts[1], parts[1], nil
+		}
+
+		if len(parts) >= 3 && parts[0] == "source" && len(parts[1]) == 11 {
+			return "https://www.youtube.com/watch?v=" + parts[1], parts[1], nil
+		}
+
+		if len(parts) >= 2 && parts[0] == "embed" && len(parts[1]) == 11 {
+			return "https://www.youtube.com/watch?v=" + parts[1], parts[1], nil
+		}
+	}
+
+	return "", "", errors.New("unsupported YouTube URL or missing video ID")
 }
 
 func getPlaylist(pUrl string) ([]string, error) {
@@ -320,10 +366,20 @@ func parseSearchResults(node interface{}, tracks *[]*state.Track) {
 		}
 	case map[string]interface{}:
 		if vid, ok := dig(v, "videoRenderer").(map[string]interface{}); ok {
+
+			if isLiveVideo(vid) {
+				return
+			}
+
 			id := safeString(vid["videoId"])
 			title := safeString(dig(vid, "title", "runs", 0, "text"))
 			thumb := safeString(dig(vid, "thumbnail", "thumbnails", 0, "url"))
 			durationText := safeString(dig(vid, "lengthText", "simpleText"))
+
+			if durationText == "" {
+				return
+			}
+
 			duration := parseDuration(durationText)
 			t := &state.Track{
 				URL:      "https://www.youtube.com/watch?v=" + id,
@@ -341,6 +397,36 @@ func parseSearchResults(node interface{}, tracks *[]*state.Track) {
 			}
 		}
 	}
+}
+
+func isLiveVideo(videoRenderer map[string]interface{}) bool {
+	if badges, ok := dig(videoRenderer, "badges").([]interface{}); ok {
+		for _, badge := range badges {
+			if badgeMap, ok := badge.(map[string]interface{}); ok {
+				if metadataBadge, ok := dig(badgeMap, "metadataBadgeRenderer").(map[string]interface{}); ok {
+
+					style := safeString(metadataBadge["style"])
+					label := safeString(metadataBadge["label"])
+
+					if style == "BADGE_STYLE_TYPE_LIVE_NOW" || label == "LIVE" {
+						return true
+					}
+				}
+			}
+		}
+	}
+
+	if viewCountText, ok := dig(videoRenderer, "viewCountText", "runs").([]interface{}); ok {
+		for _, run := range viewCountText {
+			if runMap, ok := run.(map[string]interface{}); ok {
+				text := safeString(runMap["text"])
+				if strings.Contains(strings.ToLower(text), "watching") {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 func dig(m interface{}, path ...interface{}) interface{} {

@@ -26,6 +26,33 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/maintenance"] = `<i>Toggle maintenance mode.</i>
+
+<u>Usage:</u>
+<b>/maintenance</b> — Show current status
+<b>/maintenance on [reason]</b> — Enable maintenance
+<b>/maintenance off</b> — Disable maintenance
+
+<b>⚙️ Behavior When Active:</b>
+• Stops all active rooms
+• Blocks non-owner/sudo commands
+• Shows maintenance message to users
+
+<b>🔒 Restrictions:</b>
+• <b>Owner only</b> command
+
+<b>💡 Examples:</b>
+<code>/maintenance on Server upgrade</code>
+<code>/maintenance off</code>
+
+<b>⚠️ Notes:</b>
+• Owner and sudoers can still use bot
+• All rooms are destroyed when enabled
+• Users see maintenance message with reason`
+	helpTexts["/maint"] = helpTexts["/maintenance"]
+}
+
 var maintCancel = struct {
 	sync.Mutex
 	cancel bool

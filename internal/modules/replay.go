@@ -29,6 +29,22 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/replay"] = `<i>Restart the current track from the beginning.</i>
+
+<u>Usage:</u>
+<b>/replay</b> — Restart current track
+
+<b>⚙️ Behavior:</b>
+• Resets position to 0:00
+• Maintains speed setting
+• Continues playback immediately
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+`
+}
+
 func replayHandler(m *telegram.NewMessage) error {
 	return handleReplay(m, false)
 }

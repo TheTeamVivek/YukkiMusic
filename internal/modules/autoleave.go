@@ -21,8 +21,8 @@ package modules
 
 import (
 	"fmt"
-	"strings"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -176,12 +176,12 @@ func autoLeaveAssistant(
 		}
 
 		if err := ass.Client.LeaveChannel(chatID); err != nil {
-		  if wait := tg.GetFloodWait(err); wait > 0 {
-        gologging.Error("FloodWait detected (" + strconv.Itoa(wait) + "s). Sleeping...")
-        time.Sleep(time.Duration(wait) * time.Second)
-        return nil
-      }
-                
+			if wait := tg.GetFloodWait(err); wait > 0 {
+				gologging.Error("FloodWait detected (" + strconv.Itoa(wait) + "s). Sleeping...")
+				time.Sleep(time.Duration(wait) * time.Second)
+				return nil
+			}
+
 			if strings.Contains(err.Error(), "USER_NOT_PARTICIPANT") ||
 				strings.Contains(err.Error(), "CHANNEL_PRIVATE") {
 				return nil

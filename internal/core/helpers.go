@@ -109,3 +109,8 @@ func downloadThumb(id, url string) string {
 
 	return thumbPath
 }
+
+func isStreamURL(path string) bool {
+	return strings.HasPrefix(path, "http://") ||
+		strings.HasPrefix(path, "https://")
+}

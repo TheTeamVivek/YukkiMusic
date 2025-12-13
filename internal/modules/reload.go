@@ -30,6 +30,33 @@ import (
 	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["/reload"] = `<i>Reload admin cache and refresh voice chat state.</i>
+
+<u>Usage:</u>
+<b>/reload</b> — Refresh all cached data
+
+<b>🔄 What Gets Reloaded:</b>
+• Chat admin list
+• Voice chat status
+• Assistant presence status
+• Assistant ban status
+
+<b>🔒 Flood Protection:</b>
+• Regular users: 5 minute cooldown
+• Admins: 2 minute cooldown
+
+<b>💡 When to Use:</b>
+• After promoting/demoting admins
+• Voice chat issues
+• Permission problems
+• Bot behaving incorrectly
+
+<b>⚠️ Notes:</b>
+• May reset room state if admin permissions required
+`
+}
+
 func reloadHandler(m *telegram.NewMessage) error {
 	return handleReload(m, false)
 }
