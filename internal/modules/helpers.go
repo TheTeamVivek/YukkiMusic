@@ -76,7 +76,7 @@ func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 		err error
 	)
 
-	chatID := m.ChatID()
+	chatID := m.ChannelID()
 
 	header := F(chatID, "logger_playback_started")
 	if queued {

@@ -33,24 +33,25 @@ var maintCancel = struct {
 
 func handleMaintenance(m *tg.NewMessage) error {
 	args := strings.Fields(m.Text())
+	chatID := m.ChannelID()
 	current, err := database.IsMaintenance()
 	if err != nil {
-		m.Reply(F(m.ChatID(), "maint_check_fail", locales.Arg{"error": err.Error()}))
+		m.Reply(F(chatID, "maint_check_fail", locales.Arg{"error": err.Error()}))
 		return tg.ErrEndGroup
 	}
 
 	// show current status if no args
 	if len(args) < 2 {
 		reason, _ := database.GetMaintReason()
-		status := F(m.ChatID(), "disabled")
+		status := F(chatID, "disabled")
 		if current {
 			if reason != "" {
-				status = F(m.ChatID(), "enabled_with_reason", locales.Arg{"reason": reason})
+				status = F(chatID, "enabled_with_reason", locales.Arg{"reason": reason})
 			} else {
-				status = F(m.ChatID(), "enabled")
+				status = F(chatID, "enabled")
 			}
 		}
-		m.Reply(F(m.ChatID(), "maint_usage", locales.Arg{
+		m.Reply(F(chatID, "maint_usage", locales.Arg{
 			"cmd":    getCommand(m),
 			"status": status,
 		}))
@@ -59,7 +60,7 @@ func handleMaintenance(m *tg.NewMessage) error {
 
 	enable, err := utils.ParseBool(args[1])
 	if err != nil {
-		m.Reply(F(m.ChatID(), "invalid_bool"))
+		m.Reply(F(chatID, "invalid_bool"))
 		return tg.ErrEndGroup
 	}
 	reason := strings.Join(args[2:], " ")
@@ -70,18 +71,18 @@ func handleMaintenance(m *tg.NewMessage) error {
 		if enable {
 			switch {
 			case reason == oldReason:
-				m.Reply(F(m.ChatID(), "maint_already_reason_same"))
+				m.Reply(F(chatID, "maint_already_reason_same"))
 			case reason == "" && oldReason != "":
 				_ = database.SetMaintenance(true, "")
-				m.Reply(F(m.ChatID(), "maint_reason_removed"))
+				m.Reply(F(chatID, "maint_reason_removed"))
 			case reason != "" && reason != oldReason:
 				_ = database.SetMaintenance(true, reason)
-				m.Reply(F(m.ChatID(), "maint_reason_updated", locales.Arg{"reason": reason}))
+				m.Reply(F(chatID, "maint_reason_updated", locales.Arg{"reason": reason}))
 			default:
-				m.Reply(F(m.ChatID(), "maint_already_enabled"))
+				m.Reply(F(chatID, "maint_already_enabled"))
 			}
 		} else {
-			m.Reply(F(m.ChatID(), "maint_already_disabled"))
+			m.Reply(F(chatID, "maint_already_disabled"))
 		}
 		return tg.ErrEndGroup
 	}
@@ -124,9 +125,9 @@ func handleMaintenance(m *tg.NewMessage) error {
 		args := locales.Arg{}
 		if reason != "" {
 			args["reason"] = reason
-			m.Reply(F(m.ChatID(), "maint_enabled_reason", args))
+			m.Reply(F(chatID, "maint_enabled_reason", args))
 		} else {
-			m.Reply(F(m.ChatID(), "maint_enabled"))
+			m.Reply(F(chatID, "maint_enabled"))
 		}
 		return tg.ErrEndGroup
 	}
@@ -136,6 +137,6 @@ func handleMaintenance(m *tg.NewMessage) error {
 	maintCancel.cancel = true
 	maintCancel.Unlock()
 
-	m.Reply(F(m.ChatID(), "maint_disabled"))
+	m.Reply(F(chatID, "maint_disabled"))
 	return tg.ErrEndGroup
 }

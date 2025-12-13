@@ -51,7 +51,7 @@ func filterSuperGroup(m *tg.NewMessage) bool {
 			database.AddServed(m.ChannelID())
 			return true // Supergroup
 		}
-		warnAndLeave(m.Client, m.ChatID()) // Basic group → leave
+		warnAndLeave(m.Client, m.ChannelID()) // Basic group → leave
 		database.DeleteServed(m.ChannelID())
 		return false
 

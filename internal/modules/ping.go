@@ -67,7 +67,7 @@ func pingHandler(m *tg.NewMessage) error {
 	}
 
 	start := time.Now()
-	reply, err := m.Respond(F(m.ChatID(), "ping_start"))
+	reply, err := m.Respond(F(m.ChannelID(), "ping_start"))
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func pingHandler(m *tg.NewMessage) error {
 		diskUsage = fmt.Sprintf("%.2f / %.2f GB", usedGB, totalGB)
 	}
 
-	msg := F(m.ChatID(), "ping_result", locales.Arg{
+	msg := F(m.ChannelID(), "ping_result", locales.Arg{
 		"latency":    latency,
 		"bot":        utils.MentionHTML(core.BUser),
 		"uptime":     uptimeStr,

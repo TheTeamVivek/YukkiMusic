@@ -229,6 +229,8 @@ Each platform works independently but connects seamlessly through a **priority-b
 - [ ] verify that ExtractUser working fine in all cases
 - [ ] Assistant restricted to send message but still able to join vc
 - [ ] Convert all MTProto peer IDs into Bot API–style IDs (id, -id, -100id)
+_ [ ] verify the usasge if r.ChatID()
+
 - ## 🤝 Contributing
 
 Contributions are **welcome and appreciated**!  

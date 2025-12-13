@@ -94,7 +94,7 @@ func bugHandler(m *telegram.NewMessage) error {
 		"user":    userMention,
 		"user_id": m.Sender.ID,
 		"chat":    chatMention,
-		"chat_id": m.ChatID(),
+		"chat_id": m.ChannelID(),
 		"report":  reason,
 	})
 

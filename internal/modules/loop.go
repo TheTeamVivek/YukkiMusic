@@ -60,7 +60,7 @@ func handleLoop(m *tg.NewMessage, cplay bool) error {
 			})
 		}
 
-		msg := F(m.ChatID(), "loop_usage", locales.Arg{
+		msg := F(m.ChannelID(), "loop_usage", locales.Arg{
 			"cmd":        getCommand(m),
 			"count_line": countLine,
 		})

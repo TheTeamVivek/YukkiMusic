@@ -43,7 +43,8 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 	if m.Args() != "" {
 		return tg.ErrEndGroup
 	}
-
+	
+	chatID := m.ChannelID()
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
@@ -51,18 +52,18 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 	}
 
 	if !r.IsActiveChat() {
-		m.Reply(F(m.ChatID(), "room_no_active"))
+		m.Reply(F(chatID, "room_no_active"))
 		return tg.ErrEndGroup
 	}
 
 	if r.IsMuted() {
 		remaining := r.RemainingUnmuteDuration()
 		if remaining > 0 {
-			m.Reply(F(m.ChatID(), "mute_already_muted_with_time", locales.Arg{
+			m.Reply(F(chatID, "mute_already_muted_with_time", locales.Arg{
 				"duration": formatDuration(int(remaining.Seconds())),
 			}))
 		} else {
-			m.Reply(F(m.ChatID(), "mute_already_muted"))
+			m.Reply(F(chatID, "mute_already_muted"))
 		}
 		return tg.ErrEndGroup
 	}
@@ -77,12 +78,12 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 
 		if seconds, err := strconv.Atoi(rawDuration); err == nil {
 			if seconds < 5 || seconds > 3600 {
-				m.Reply(F(m.ChatID(), "mute_invalid_duration"))
+				m.Reply(F(chatID, "mute_invalid_duration"))
 				return tg.ErrEndGroup
 			}
 			autoUnmuteDuration = time.Duration(seconds) * time.Second
 		} else {
-			m.Reply(F(m.ChatID(), "mute_invalid_format", locales.Arg{
+			m.Reply(F(chatID, "mute_invalid_format", locales.Arg{
 				"cmd": getCommand(m),
 			}))
 			return tg.ErrEndGroup
@@ -97,7 +98,7 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 	}
 
 	if muteErr != nil {
-		m.Reply(F(m.ChatID(), "mute_failed", locales.Arg{
+		m.Reply(F(chatID, "mute_failed", locales.Arg{
 			"error": muteErr.Error(),
 		}))
 		return tg.ErrEndGroup
@@ -110,9 +111,9 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 
 	if autoUnmuteDuration > 0 {
 		msgArgs["duration"] = int(autoUnmuteDuration.Seconds())
-		m.Reply(F(m.ChatID(), "mute_success_with_time", msgArgs))
+		m.Reply(F(chatID, "mute_success_with_time", msgArgs))
 	} else {
-		m.Reply(F(m.ChatID(), "mute_success", msgArgs))
+		m.Reply(F(chatID, "mute_success", msgArgs))
 	}
 
 	return tg.ErrEndGroup
