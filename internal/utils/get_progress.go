@@ -27,34 +27,36 @@ import (
 )
 
 func GetProgress(mystic *telegram.NewMessage) *telegram.ProgressManager {
-	pm := telegram.NewProgressManager(2)
+        pm := telegram.NewProgressManager(2)
 
-	if mystic == nil {
-		return pm
-	}
+        if mystic == nil {
+                return pm
+        }
 
-	var opts *telegram.SendOptions
-	if replyMarkup := mystic.ReplyMarkup(); replyMarkup != nil {
-		opts = &telegram.SendOptions{ReplyMarkup: *replyMarkup}
-	}
+        var opts *telegram.SendOptions
+        if replyMarkup := mystic.ReplyMarkup(); replyMarkup != nil {
+                opts = &telegram.SendOptions{ReplyMarkup: *replyMarkup}
+        }
 
-	pm.WithEdit(func(total, current int64) {
-		if mystic == nil {
-			return
-		}
+        pm.WithCallback(func(pi *telegram.ProgressInfo) {
+                text := fmt.Sprintf(
+                        "📥 Downloading your track...\n\n"+
+                                "Progress: %.1f%%\n"+
+                                "Speed: %s\n"+
+                                "ETA: %s\n"+
+                                "Elapsed: %s",
+                        pi.Percentage,
+                        pi.SpeedString(),
+                        pi.ETAString(),
+                        pi.ElapsedString(),
+                )
 
-		text := fmt.Sprintf(
-			"📥 Downloading your track...\n\nProgress: %.1f%%\nETA: %s | Speed: %s",
-			pm.GetProgress(current),
-			pm.GetETA(current),
-			pm.GetSpeed(current),
-		)
+                mystic.Edit(text, opts)
+        })
 
-		mystic.Edit(text, opts)
-	})
-
-	return pm
+        return pm
 }
+
 
 func GetProgressBar(playedSec, durationSec int) string {
 	if durationSec == 0 || playedSec <= 0 {
