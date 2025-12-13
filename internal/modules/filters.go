@@ -31,12 +31,12 @@ import (
 )
 
 var (
-	superGroupFilter    = tg.FilterFunc(filterSuperGroup)
-	adminFilter         = tg.FilterFunc(filterChatAdmins)
-	authFilter          = tg.FilterFunc(filterAuthUsers)
-	ignoreChannelFilter = tg.FilterFunc(filterChannel)
-	sudoOnlyFilter      = tg.FilterFunc(filterSudo)
-	ownerFilter         = tg.FilterFunc(filterOwner)
+	superGroupFilter    = tg.Custom(filterSuperGroup)
+	adminFilter         = tg.Custom(filterChatAdmins)
+	authFilter          = tg.Custom(filterAuthUsers)
+	ignoreChannelFilter = tg.Custom(filterChannel)
+	sudoOnlyFilter      = tg.Custom(filterSudo)
+	ownerFilter         = tg.Custom(filterOwner)
 )
 
 func filterSuperGroup(m *tg.NewMessage) bool {
