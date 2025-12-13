@@ -20,10 +20,7 @@
 package database
 
 func IsAuthUser(chatID, userID int64) (bool, error) {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	settings, err := getChatSettings(ctx, chatID)
+	settings, err := getChatSettings(chatID)
 	if err != nil {
 		return false, err
 	}
