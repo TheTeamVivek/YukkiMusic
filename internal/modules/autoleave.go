@@ -37,10 +37,9 @@ import (
 )
 
 var (
-	autoLeaveCtx    context.Context
-	autoLeaveCancel context.CancelFunc
-	autoLeaveMu     sync.Mutex
-	limit           = 30
+	autoLeaveMu      sync.Mutex
+	autoLeaveRunning bool
+	limit            = 30
 )
 
 func init() {
@@ -60,7 +59,7 @@ This command can only be used by <b>owners</b> or <b>sudo users</b>.`, limit)
 
 func autoLeaveHandler(m *tg.NewMessage) error {
 	args := strings.Fields(m.Text())
-	chatID := m.ChatID()
+	chatID := m.ChannelID()
 
 	currentState, err := database.GetAutoLeave()
 	if err != nil {
@@ -102,123 +101,113 @@ func autoLeaveHandler(m *tg.NewMessage) error {
 	}))
 
 	autoLeaveMu.Lock()
-	defer autoLeaveMu.Unlock()
-
 	if newState {
-		go startAutoLeave()
-	} else if autoLeaveCancel != nil {
-		autoLeaveCancel()
-		autoLeaveCtx = nil
-		autoLeaveCancel = nil
+		if !autoLeaveRunning {
+			go startAutoLeave()
+		}
+	} else {
+		autoLeaveRunning = false
 	}
+	autoLeaveMu.Unlock()
+
 	return tg.ErrEndGroup
 }
 
 func startAutoLeave() {
 	autoLeaveMu.Lock()
-	if autoLeaveCtx != nil {
+	if autoLeaveRunning {
 		autoLeaveMu.Unlock()
 		return
 	}
-	autoLeaveCtx, autoLeaveCancel = context.WithCancel(context.Background())
+	autoLeaveRunning = true
 	autoLeaveMu.Unlock()
 
 	ticker := time.NewTicker(15 * time.Minute)
 	defer ticker.Stop()
 
 	for {
-		select {
-		case <-ticker.C:
-			activeRooms := map[int64]struct{}{}
-			for _, id := range core.GetAllRoomIDs() {
-				activeRooms[id] = struct{}{}
-			}
-
-			core.Assistants.ForEach(func(a *core.Assistant) {
-				if a == nil || a.Client == nil {
-					return
-				}
-
-				// each assistant runs in parallel
-				go func(ass *core.Assistant) {
-					leaveCount := 0
-
-					iterCtx, iterCancel := context.WithCancel(context.Background())
-					dialogCh, errCh := ass.Client.IterDialogs(&tg.DialogOptions{
-						Limit:   int32(limit * 3),
-						Context: iterCtx,
-					})
-
-				loop:
-					for {
-						select {
-						case d, ok := <-dialogCh:
-							if !ok {
-								break loop
-							}
-
-							select {
-							case <-autoLeaveCtx.Done():
-								iterCancel()
-								return
-							default:
-							}
-
-							chatID, err := utils.GetPeerID(ass.Client, d.Peer)
-							if err != nil {
-								gologging.Error("[Autoleave] Peer error: " + err.Error())
-								continue
-							}
-
-							if chatID == 0 ||
-								chatID == config.LoggerID ||
-								chatID > 0 {
-								continue
-							}
-
-							if _, exists := activeRooms[chatID]; exists {
-								continue
-							}
-
-							if err := ass.Client.LeaveChannel(chatID); err != nil {
-								if strings.Contains(err.Error(), "USER_NOT_PARTICIPANT") ||
-									strings.Contains(err.Error(), "CHANNEL_PRIVATE") {
-									continue
-								}
-								logger.WarnF("AutoLeave (Assistant %d) failed to leave chat %d: %v",
-									ass.Index, chatID, err)
-								continue
-							}
-
-							leaveCount++
-							logger.InfoF("AutoLeave: Assistant %d left %d (%d/%d)",
-								ass.Index, chatID, leaveCount, limit)
-
-							time.Sleep(2500 * time.Millisecond)
-
-							if leaveCount >= limit {
-								break loop
-							}
-
-						case err, ok := <-errCh:
-							if ok {
-								logger.WarnF("AutoLeave: IterDialogs error (assistant %d): %v",
-									ass.Index, err)
-							}
-							break loop
-
-						case <-autoLeaveCtx.Done():
-							iterCancel()
-							return
-						}
-					}
-
-					iterCancel()
-				}(a)
-			})
-
-		case <-autoLeaveCtx.Done():
+		autoLeaveMu.Lock()
+		if !autoLeaveRunning {
+			autoLeaveMu.Unlock()
 			return
 		}
+		autoLeaveMu.Unlock()
+
+		activeRooms := make(map[int64]struct{})
+		for _, id := range core.GetAllRoomIDs() {
+			activeRooms[id] = struct{}{}
+		}
+
+		core.Assistants.ForEach(func(a *core.Assistant) {
+			if a == nil || a.Client == nil {
+				return
+			}
+			go autoLeaveAssistant(a, activeRooms, limit)
+		})
+
+		<-ticker.C
+	}
+}
+func autoLeaveAssistant(
+	ass *core.Assistant,
+	activeRooms map[int64]struct{},
+	limit int,
+) {
+	leaveCount := 0
+
+	err := ass.Client.IterDialogs(func(d *tg.TLDialog) error {
+		if d.IsUser() {
+			return nil
+		}
+
+		chatID, err := utils.GetPeerID(ass.Client, d.Peer)
+		if err != nil {
+			gologging.Error("[Autoleave] Peer error: " + err.Error())
+			return nil
+		}
+
+		if chatID == 0 || chatID == config.LoggerID {
+			return nil
+		}
+
+		if _, ok := activeRooms[chatID]; ok {
+			return nil
+		}
+
+		if err := ass.Client.LeaveChannel(chatID); err != nil {
+			if strings.Contains(err.Error(), "USER_NOT_PARTICIPANT") ||
+				strings.Contains(err.Error(), "CHANNEL_PRIVATE") {
+				return nil
+			}
+
+			logger.WarnF(
+				"AutoLeave (Assistant %d) failed to leave %d: %v",
+				ass.Index, chatID, err,
+			)
+			return nil
+		}
+
+		leaveCount++
+		logger.InfoF(
+			"AutoLeave: Assistant %d left %d (%d/%d)",
+			ass.Index, chatID, leaveCount, limit,
+		)
+
+		time.Sleep(3 * time.Second)
+
+		if leaveCount >= limit {
+			return tg.ErrStopIteration
+		}
+
+		return nil
+	}, &tg.DialogOptions{
+		Limit: 0,
+	})
+
+	if err != nil && err != tg.ErrStopIteration {
+		logger.WarnF(
+			"AutoLeave: IterDialogs error (assistant %d): %v",
+			ass.Index, err,
+		)
 	}
 }

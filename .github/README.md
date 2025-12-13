@@ -228,7 +228,8 @@ Each platform works independently but connects seamlessly through a **priority-b
       (simplify user extraction, bot checks, and errors)
 - [ ] verify that ExtractUser working fine in all cases
 - [ ] Assistant restricted to send message but still able to join vc
-## 🤝 Contributing
+- [ ] Convert all MTProto peer IDs into Bot API–style IDs (id, -id, -100id)
+- ## 🤝 Contributing
 
 Contributions are **welcome and appreciated**!  
 - 🍴 Fork the repo  
