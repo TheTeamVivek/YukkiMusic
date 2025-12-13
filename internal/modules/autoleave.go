@@ -22,6 +22,7 @@ package modules
 import (
 	"fmt"
 	"strings"
+	"strconv"
 	"sync"
 	"time"
 
@@ -175,12 +176,18 @@ func autoLeaveAssistant(
 		}
 
 		if err := ass.Client.LeaveChannel(chatID); err != nil {
+		  if wait := tg.GetFloodWait(err); wait > 0 {
+        gologging.Error("FloodWait detected (" + strconv.Itoa(wait) + "s). Sleeping...")
+        time.Sleep(time.Duration(wait) * time.Second)
+        return nil
+      }
+                
 			if strings.Contains(err.Error(), "USER_NOT_PARTICIPANT") ||
 				strings.Contains(err.Error(), "CHANNEL_PRIVATE") {
 				return nil
 			}
 
-			logger.WarnF(
+			gologging.WarnF(
 				"AutoLeave (Assistant %d) failed to leave %d: %v",
 				ass.Index, chatID, err,
 			)
@@ -188,7 +195,7 @@ func autoLeaveAssistant(
 		}
 
 		leaveCount++
-		logger.InfoF(
+		gologging.InfoF(
 			"AutoLeave: Assistant %d left %d (%d/%d)",
 			ass.Index, chatID, leaveCount, limit,
 		)
@@ -205,7 +212,7 @@ func autoLeaveAssistant(
 	})
 
 	if err != nil && err != tg.ErrStopIteration {
-		logger.WarnF(
+		gologging.WarnF(
 			"AutoLeave: IterDialogs error (assistant %d): %v",
 			ass.Index, err,
 		)

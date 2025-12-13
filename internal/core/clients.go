@@ -70,7 +70,7 @@ func Init(apiID int32, apiHash, token string, sessions []string, sessionType str
 		})
 
 		if loggerID != 0 {
-			_, _ = client.SendMessage(loggerID, fmt.Sprintf("Assistant %d Started", i))
+			_, _ = client.SendMessage(loggerID, fmt.Sprintf("Assistant %d Started", i+1))
 		}
 
 		gologging.InfoF("assistant[%d] ready: %s", i, user.FirstName)
