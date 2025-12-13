@@ -260,7 +260,7 @@ func handlePanic(r, ctx interface{}, isPanic bool) {
 	case *tg.NewMessage:
 		userMention = utils.MentionHTML(c.Sender)
 		handlerType = "message"
-		chatInfo = "ChatID: " + utils.IntToStr(c.ChatID())
+		chatInfo = "ChatID: " + utils.IntToStr(c.ChannelID())
 		messageInfo = "Message: " + html.EscapeString(c.Text()) + "\nLink: " + c.Link()
 		errorMessage = html.EscapeString(fmt.Sprint(r))
 		client = c.Client

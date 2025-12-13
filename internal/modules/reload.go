@@ -45,9 +45,10 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		return telegram.ErrEndGroup
 	}
 
-	chatID := r.ChatID()
+	chatID := m.ChannelID()
+	actualChatID := r.ChatID()
 	userID := m.SenderID()
-	floodKey := fmt.Sprintf("reload:%d%d", chatID, userID)
+	floodKey := fmt.Sprintf("reload:%d%d", actualChatID, userID)
 	floodDuration := 5 * time.Minute
 
 	if remaining := utils.GetFlood(floodKey); remaining > 0 {
@@ -68,7 +69,7 @@ return err
 
 	summary := ""
 
-	admins, adminErr := utils.ReloadChatAdmin(m.Client, chatID)
+	admins, adminErr := utils.ReloadChatAdmin(m.Client, actualChatID)
 	if adminErr != nil {
 		summary += F(chatID, "reload_admin_cache_fail", locales.Arg{
 			"error": adminErr.Error(),
@@ -92,7 +93,7 @@ return err
 	}
 	utils.SetFlood(floodKey, floodDuration)
 
-	cs, err := core.GetChatState(chatID)
+	cs, err := core.GetChatState(actualChatID)
 	if err != nil {
 		summary += F(chatID, "reload_assistant_fail", locales.Arg{
 			"error": err.Error(),
@@ -150,11 +151,11 @@ return err
 	}
 
 	if isAdmin {
-		ass, err := core.Assistants.ForChat(chatID)
+		ass, err := core.Assistants.ForChat(actualChatID)
 		if err != nil {
-			gologging.ErrorF("Failed to get Assistant for %d: %v", chatID, err)
+			gologging.ErrorF("Failed to get Assistant for %d: %v", actualChatID, err)
 		} else {
-			if room, ok := core.GetRoom(chatID, ass); ok {
+			if room, ok := core.GetRoom(actualChatID, ass); ok {
 				room.Destroy()
 				summary += F(chatID, "reload_room_reset") + "\n"
 			}
