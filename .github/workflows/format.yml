@@ -23,7 +23,7 @@ jobs:
           path: |
             ~/go/bin
             ~/.cache/go-build
-          key: ${{ runner.os }}-go-tools-
+          key: ${{ runner.os }}-go-tools-1
 
       - name: Install Tools
         if: steps.cache-tools.outputs.cache-hit != 'true'
