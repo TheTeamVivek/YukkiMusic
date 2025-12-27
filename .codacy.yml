@@ -1,0 +1,5 @@
+engines:
+  gosec:
+    enabled: true
+    exclude_rules:
+      - G103
