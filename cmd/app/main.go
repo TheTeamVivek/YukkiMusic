@@ -33,8 +33,6 @@ package main
 import "C"
 
 import (
-	"net/http"
-	_ "net/http/pprof"
 	"os"
 
 	"github.com/Laky-64/gologging"
@@ -78,14 +76,6 @@ func main() {
 	}
 
 	modules.Init(core.Bot, core.Assistants)
-
-	l.Info("🚀 Bot is started")
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
-	}
-	go http.ListenAndServe(":"+port, nil)
-
 	core.Bot.Idle()
 }
 
