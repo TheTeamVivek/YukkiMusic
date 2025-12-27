@@ -71,34 +71,55 @@ var (
 )
 
 func init() {
+	validateRequired()
+	validateToken()
+	validateSessions()
+	validateSpotify()
+}
+
+func validateRequired() {
+
 	if ApiID == 0 {
 		logger.Fatal("API_ID is required but missing!")
-		return
 	}
+
 	if ApiHash == "" {
 		logger.Fatal("API_HASH is required but missing!")
-		return
 	}
-	if Token == "" {
-		Token = getString("BOT_TOKEN")
-		if Token == "" {
-			logger.Fatal("TOKEN is required but missing! Please set it in .env or environment.")
-			return
-		}
-	}
+
 	if MongoURI == "" {
 		logger.Fatal("MONGO_DB_URI is required but missing!")
+	}
+
+}
+
+func validateToken() {
+	if Token != "" {
 		return
 	}
-	if len(StringSessions) == 0 {
-		StringSessions = getStringSlice("STRING_SESSION")
 
-		if len(StringSessions) == 0 {
-			logger.FatalF("STRING_SESSIONS is empty — at least one %s session string is required.", SessionType)
-			return
-		}
+	Token = getString("BOT_TOKEN")
+	if Token == "" {
+		logger.Fatal("TOKEN is required but missing! Please set it in .env or environment.")
 	}
 
+}
+
+func validateSessions() {
+	if len(StringSessions) > 0 {
+		return
+	}
+
+	StringSessions = getStringSlice("STRING_SESSION")
+	if len(StringSessions) == 0 {
+		logger.FatalF(
+			"STRING_SESSIONS is empty — at least one %s session string is required.",
+			SessionType,
+		)
+	}
+}
+
+func validateSpotify() {
 	if SpotifyClientID == "" || SpotifyClientSecret == "" {
 		logger.Warn("Spotify credentials not configured - Spotify links won't work")
 	}
