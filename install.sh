@@ -475,7 +475,7 @@ check_install_go() {
     print_step "Checking Go..."
     
     # Single Go version - always 1.25
-    GO_VERSION="1.25.0"
+    GO_VERSION="1.25.5"
     
     if command -v go >/dev/null 2>&1; then
         CURRENT_GO=$(go version | awk '{print $3}' | sed 's/go//')
