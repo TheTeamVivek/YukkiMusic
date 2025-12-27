@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout Actions Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Check spelling
         uses: crate-ci/typos@eb913959b723a9fa82a9edb0b28321ee7a8ebc84
