@@ -2,6 +2,7 @@ FROM golang:1.25.5-bookworm AS builder
 
 WORKDIR /build
 
+# hadolint ignore=DL3015
 RUN apt-get update && \
     apt-get install -y \
         git \
