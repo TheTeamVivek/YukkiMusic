@@ -1,5 +1,5 @@
 engines:
   gosec:
     enabled: true
-    exclude_rules:
-      - G103
+    rules:
+      G103: false
