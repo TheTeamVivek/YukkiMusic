@@ -122,15 +122,15 @@ func (r *RoomState) MoveInQueue(from, to int) {
 }
 
 func (r *RoomState) isValidMove(from, to int) bool {
-	return r.isValidQueueIndex(from) && 
-	       r.isValidQueueIndex(to) && 
-	       from != to
+	return r.isValidQueueIndex(from) &&
+		r.isValidQueueIndex(to) &&
+		from != to
 }
 
 func (r *RoomState) executeMoveOperation(from, to int) {
 	item := r.queue[from]
 	r.queue = append(r.queue[:from], r.queue[from+1:]...)
-	
+
 	if to >= len(r.queue) {
 		r.queue = append(r.queue, item)
 	} else {

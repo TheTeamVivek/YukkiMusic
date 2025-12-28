@@ -25,10 +25,10 @@ import (
 )
 
 const (
-	minSpeed          = 0.50
-	maxSpeed          = 4.0
-	seekEndThreshold  = 10
-	seekSafetyMargin  = 5
+	minSpeed         = 0.50
+	maxSpeed         = 4.0
+	seekEndThreshold = 10
+	seekSafetyMargin = 5
 )
 
 type playbackSnapshot struct {
@@ -79,14 +79,14 @@ func (r *RoomState) executeSeek(seconds int) error {
 
 func (r *RoomState) calculateNewPosition(seconds int) int {
 	newPos := r.position + seconds
-	
+
 	if newPos >= r.track.Duration {
 		return r.track.Duration - seekSafetyMargin
 	}
 	if newPos < 0 {
 		return 0
 	}
-	
+
 	return newPos
 }
 
@@ -126,11 +126,11 @@ func (r *RoomState) validateSpeedChange(speed float64) error {
 	if r.track == nil || r.fpath == "" {
 		return fmt.Errorf("no track to adjust speed")
 	}
-	
+
 	if speed < minSpeed || speed > maxSpeed {
 		return fmt.Errorf("invalid speed: must be between %.2fx and %.1fx", minSpeed, maxSpeed)
 	}
-	
+
 	return nil
 }
 
@@ -172,7 +172,7 @@ func (r *RoomState) shouldScheduleSpeedReset(speed float64, timeAfterNormal []ti
 func (r *RoomState) resetSpeedToNormal() {
 	r.Lock()
 	defer r.Unlock()
-	
+
 	if r.track != nil && r.playing && r.speed != 1.0 {
 		r.parse()
 		r.speed = 1.0
@@ -194,7 +194,7 @@ func (r *RoomState) Mute(unmuteAfter ...time.Duration) (bool, error) {
 
 	r.handleMuteStateTransition()
 	r.scheduleAutoUnmute(unmuteAfter)
-	
+
 	return muted, nil
 }
 
@@ -213,7 +213,7 @@ func (r *RoomState) handleMuteStateTransition() {
 func (r *RoomState) scheduleAutoUnmute(unmuteAfter []time.Duration) {
 	r.Lock()
 	defer r.Unlock()
-	
+
 	if r.scheduledTimers == nil {
 		r.scheduledTimers = &scheduledTimers{}
 	}
@@ -238,11 +238,11 @@ func (r *RoomState) Unmute() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	
+
 	r.parse()
 	r.muted = false
 	r.paused = false
 	r.scheduledTimers.cancelScheduledUnmute()
-	
+
 	return unmuted, nil
 }

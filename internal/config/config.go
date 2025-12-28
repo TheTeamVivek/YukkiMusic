@@ -78,7 +78,6 @@ func init() {
 }
 
 func validateRequired() {
-
 	if ApiID == 0 {
 		logger.Fatal("API_ID is required but missing!")
 	}
@@ -90,7 +89,6 @@ func validateRequired() {
 	if MongoURI == "" {
 		logger.Fatal("MONGO_DB_URI is required but missing!")
 	}
-
 }
 
 func validateToken() {
@@ -102,7 +100,6 @@ func validateToken() {
 	if Token == "" {
 		logger.Fatal("TOKEN is required but missing! Please set it in .env or environment.")
 	}
-
 }
 
 func validateSessions() {

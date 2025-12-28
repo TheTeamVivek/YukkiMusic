@@ -22,11 +22,7 @@ package core
 
 import (
 	"fmt"
-	"os"
 	"strings"
-
-	"github.com/Laky-64/gologging"
-	"resty.dev/v3"
 
 	"main/internal/utils"
 )

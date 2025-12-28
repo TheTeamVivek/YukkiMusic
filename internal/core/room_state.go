@@ -20,8 +20,6 @@
 package core
 
 import (
-	"fmt"
-	"math/rand"
 	"runtime"
 	"sync"
 	"time"

@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/Laky-64/gologging"
+
 	state "main/internal/core/models"
 )
 
@@ -90,7 +91,7 @@ func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
 
 	r.updatePauseState()
 	r.scheduleAutoResume(autoResumeAfter)
-	
+
 	return paused, nil
 }
 
@@ -134,7 +135,7 @@ func (r *RoomState) Resume() (bool, error) {
 
 	r.updateResumeState()
 	r.scheduledTimers.cancelScheduledResume()
-	
+
 	return resumed, nil
 }
 
@@ -170,7 +171,7 @@ func (r *RoomState) executeReplay() error {
 	r.playing = true
 	r.scheduledTimers.cancelScheduledResume()
 	r.scheduledTimers.cancelScheduledUnmute()
-	
+
 	return nil
 }
 
@@ -184,7 +185,7 @@ func (r *RoomState) Stop() error {
 
 	err := r.p.Stop(r)
 	r.clearPlaybackState()
-	
+
 	return err
 }
 
