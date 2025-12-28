@@ -34,10 +34,10 @@ RUN apt-get update && \
 
 COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 
-RUN curl -L \
-      https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux \
+RUN set -o pipefail && \
+    curl -fL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux \
       -o /usr/local/bin/yt-dlp && \
-    chmod +x /usr/local/bin/yt-dlp && \
+    chmod 0755 /usr/local/bin/yt-dlp && \
     curl -fsSL https://deno.land/install.sh | sh
 
 ENV DENO_INSTALL=/root/.deno
