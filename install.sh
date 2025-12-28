@@ -68,9 +68,10 @@ EOF
 
 print_banner() {
     [[ "$QUIET_MODE" == true ]] && return
-    echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗"
-    echo "║           🚀 Application Setup & Installation 🚀           ║"
-    echo "╚════════════════════════════════════════════════════════════╝${RESET}\n"
+
+    printf "%s\n" "${CYAN}╔════════════════════════════════════════════════════════════╗"
+    printf "%s\n" "║           🚀 Application Setup & Installation 🚀           ║"
+    printf "%s\n\n" "╚════════════════════════════════════════════════════════════╝${RESET}"
 }
 
 print_step() { 
@@ -419,7 +420,7 @@ check_install_python() {
     esac
     
     export PYTHON_CMD
-    [[ -n "$PYTHON_CMD" ]] && command -v $PYTHON_CMD >/dev/null 2>&1 && return 0
+    [[ -n "$PYTHON_CMD" ]] && command -v "$PYTHON_CMD" >/dev/null 2>&1 && return 0
     return 1
 }
 
@@ -528,6 +529,7 @@ check_install_go() {
         
         for profile in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile"; do
             if [[ -f "$profile" ]] && ! grep -q "/usr/local/go/bin" "$profile" 2>/dev/null; then
+                # shellcheck disable=SC2016
                 echo 'export PATH=$PATH:/usr/local/go/bin' >> "$profile"
                 print_info "Added Go to PATH in $profile"
                 mark_shell_reload
@@ -758,6 +760,7 @@ check_install_ytdlp() {
             export PATH="$HOME/.local/bin:$PATH"
             for profile in "$HOME/.bashrc" "$HOME/.zshrc"; do
                 if [[ -f "$profile" ]] && ! grep -q ".local/bin" "$profile" 2>/dev/null; then
+                    # shellcheck disable=SC2016
                     echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$profile"
                     mark_shell_reload
                     break
@@ -871,7 +874,7 @@ install_additional_libs() {
     esac
     
     for lib in "${LIBS[@]}"; do
-        command -v ${lib%%-dev} >/dev/null 2>&1 && continue
+        command -v "${lib%%-dev}" >/dev/null 2>&1 && continue
         dpkg -l | grep -q "^ii  $lib" 2>/dev/null && continue
         rpm -qa | grep -q "$lib" 2>/dev/null && continue
         install_package "$lib" "$lib" || print_soft_error "Could not install $lib"
