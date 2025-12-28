@@ -107,7 +107,7 @@ func handleActions(m *telegram.NewMessage) error {
 func handleBotState(p *telegram.ParticipantUpdate, chatID int64) {
 	action := "removed"
 	if p.IsLeft() {
-		action = "lefted"
+		action = "left"
 	}
 	if !p.IsLeft() && !p.IsBanned() && !p.IsKicked() && !(p.New != nil && isRestricted(p.New)) {
 		return
