@@ -80,36 +80,6 @@ func normalizeVideo(path string, speed float64) (int, int, int, string) {
 	return w, h, fps, filter
 }
 
-func downloadThumb(id, url string) string {
-	thumbPath := "cache/thumb_" + id + ".jpg"
-
-	if _, err := os.Stat(thumbPath); err == nil {
-		return thumbPath
-	}
-
-	if err := os.MkdirAll("cache", 0o755); err != nil {
-		gologging.Error("mkdir error:" + err.Error())
-		return url
-	}
-	client := resty.New()
-
-	defer client.Close()
-	resp, err := client.R().
-		SetOutputFileName(thumbPath).
-		Get(url)
-	if err != nil {
-		gologging.Error("thumb download failed:" + err.Error())
-		return url
-	}
-
-	if resp.IsError() {
-		gologging.Error("thumb HTTP error:" + resp.Status())
-		return url
-	}
-
-	return thumbPath
-}
-
 func isStreamURL(path string) bool {
 	return strings.HasPrefix(path, "http://") ||
 		strings.HasPrefix(path, "https://")

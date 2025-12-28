@@ -31,24 +31,35 @@ import (
 // check if a track is used in any room (other than the given room)
 func isTrackUsed(trackID string, skipChatID int64) bool {
 	for _, room := range rooms {
-		if room == nil || room.track == nil || room.chatID == skipChatID {
+		if !isRoomEligible(room, skipChatID) {
 			continue
 		}
 
-		// check current track
 		if room.track.ID == trackID {
 			return true
 		}
 
-		// check first 2 queued tracks
-		n := len(room.queue)
-		if n > 2 {
-			n = 2
+		if isTrackInQueue(trackID, room.queue, 2) {
+			return true
 		}
-		for _, q := range room.queue[:n] {
-			if q.ID == trackID {
-				return true
-			}
+	}
+	return false
+}
+
+func isRoomEligible(room *Room, skipChatID int64) bool {
+	return room != nil &&
+		room.track != nil &&
+		room.chatID != skipChatID
+}
+
+func isTrackInQueue(trackID string, queue []*state.Track, limit int) bool {
+	if len(queue) < limit {
+		limit = len(queue)
+	}
+
+	for _, q := range queue[:limit] {
+		if q.ID == trackID {
+			return true
 		}
 	}
 	return false
