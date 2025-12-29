@@ -831,10 +831,10 @@ spt_result: |
 # start_private: "⚡️Pika Pika, {user}!\n\n⚡️ Welcome to <b>{bot}</b>\n🎶 I’m here to help you play, stream, and manage music right here on Telegram. 🎵"
 
 start_private: |
-  start_private: | Hey <b>{user}</b>! 👋 Stream unlimited music with <b>{bot}</b> from YouTube, Spotify, SoundCloud & more in your Telegram voice chats! 🎧✨
+  Hey <b>{user}</b>! 👋 Stream unlimited music with <b>{bot}</b> from YouTube, Spotify, SoundCloud & more in your Telegram voice chats! 🎧✨
 
+  <blockquote>
   <b>⚡️ Features:</b>
-  </blockquote>
   🎵 Multi-platform support (YouTube, Spotify, SoundCloud)
   📹 HD video playback
   🎛 Full playback controls (seek, speed, loop)
@@ -842,8 +842,9 @@ start_private: |
   ⚡️ RTMP live streaming
   🌐 Multi-language
   </blockquote>
+
   <i>💡 Use <code>/help</code> for all commands</i>
-  
+
   <b>🎵 Let's make some noise! 🔊</b>
 
 start_group: "<b>💫 I’m here!</b> Try a command… if you think you can handle me 😉"
