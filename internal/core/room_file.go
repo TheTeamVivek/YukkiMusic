@@ -46,7 +46,7 @@ func isTrackUsed(trackID string, skipChatID int64) bool {
 	return false
 }
 
-func isRoomEligible(room *Room, skipChatID int64) bool {
+func isRoomEligible(room *RoomState, skipChatID int64) bool {
 	return room != nil &&
 		room.track != nil &&
 		room.chatID != skipChatID
