@@ -51,10 +51,12 @@ func helpHandler(m *tg.NewMessage) error {
 	args := strings.Fields(m.Text())
 	if len(args) > 1 {
 		cmd := args[1]
-		if !strings.HasPrefix(cmd, "/") {
-			cmd = "/" + cmd
-		}
-		return showHelpFor(m, cmd)
+		if cmd != "pm_help" {
+		  if !strings.HasPrefix(cmd, "/") {
+			  cmd = "/" + cmd
+	  	}
+		  return showHelpFor(m, cmd)
+  	}
 	}
 
 	if m.ChatType() != tg.EntityUser {

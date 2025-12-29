@@ -50,6 +50,7 @@ func MonitorRooms() {
 
 				r, ok := core.GetRoom(id, ass)
 				if !ok {
+				  gologging.DebugF("Room not exists for %d returning..", chatID)
 					return
 				}
 				if !r.IsActiveChat() {
@@ -62,12 +63,16 @@ func MonitorRooms() {
 				}
 
 				if r.IsPaused() {
+				  gologging.DebugF("Room paused for %d returning..", chatID)
+					
 					return
 				}
 
 				r.Parse()
 				mystic := r.GetMystic()
 				if mystic == nil {
+				  gologging.DebugF("mystic is nil for %d returning..", chatID)
+					
 					return
 				}
 				chatID := id

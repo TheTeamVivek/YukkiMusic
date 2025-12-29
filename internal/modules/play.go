@@ -420,6 +420,7 @@ func fetchTracksAndCheckStatus(
 			utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
 			return nil, false, err
 		}
+		time.Sleep(1 * time.Second)
 	}
 	return tracks, isActive, nil
 }
@@ -689,6 +690,7 @@ func playTrackWithRetry(
 		if tg.MatchError(err, "GROUPCALL_INVALID") {
 			gologging.Error("GROUPCALL_INVALID err occurred. Returning...")
 			r.Destroy()
+			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_unable"))
 			return telegram.ErrEndGroup
 		}
 

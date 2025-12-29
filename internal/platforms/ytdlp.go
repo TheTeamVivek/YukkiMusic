@@ -146,8 +146,14 @@ func (y *YtDlpDownloader) Download(ctx context.Context, track *state.Track, _ *t
 	if err := ensureDownloadsDir(); err != nil {
 		return "", fmt.Errorf("failed to create downloads directory: %w", err)
 	}
-
-	filePath := filepath.Join("downloads", track.ID+".webm")
+	
+	ext := ".mp3"
+	
+  if track.Video {
+    ext = ".mp4"
+  }
+  
+	filePath := filepath.Join("downloads", track.ID+ext)
 
 	args := []string{
 		"--no-playlist",
