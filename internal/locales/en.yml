@@ -831,33 +831,17 @@ spt_result: |
 # start_private: "⚡️Pika Pika, {user}!\n\n⚡️ Welcome to <b>{bot}</b>\n🎶 I’m here to help you play, stream, and manage music right here on Telegram. 🎵"
 
 start_private: |
-  <b>🎵 {bot}</b>
-  <i>Your Music Streaming Companion</i>
-  
-  <blockquote>
-  Hey <b>{user}</b>! 👋
-  
-  Stream unlimited music from <b>YouTube, Spotify, SoundCloud</b> & more in your Telegram voice chats! 🎧✨
-  </blockquote>
-  
+  start_private: | Hey <b>{user}</b>! 👋 Stream unlimited music with <b>{bot}</b> from YouTube, Spotify, SoundCloud & more in your Telegram voice chats! 🎧✨
+
   <b>⚡️ Features:</b>
-  
+  </blockquote>
   🎵 Multi-platform support (YouTube, Spotify, SoundCloud)
   📹 HD video playback
   🎛 Full playback controls (seek, speed, loop)
   📝 Queue management
   ⚡️ RTMP live streaming
   🌐 Multi-language
-  
-  <blockquote expandable>
-  <b>🚀 Quick Start:</b>
-  
-  1. Add me to your group
-  2. Make me admin (invite user perms)
-  3. Start voice chat
-  4. Use <code>/play [song name]</code>
   </blockquote>
-  
   <i>💡 Use <code>/help</code> for all commands</i>
   
   <b>🎵 Let's make some noise! 🔊</b>
