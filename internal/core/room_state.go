@@ -176,10 +176,10 @@ func (r *RoomState) Speed() float64 {
 	return r.speed
 }
 
-func (r *RoomState) Track() state.Track {
+func (r *RoomState) Track() *state.Track {
 	r.RLock()
 	defer r.RUnlock()
-	return *r.track
+	return r.track
 }
 
 func (r *RoomState) GetSpeed() float64 {

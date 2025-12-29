@@ -80,7 +80,7 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 	chatID := m.ChannelID()
 	t := r.Track()
 
-	if !r.IsActiveChat() {
+	if !r.IsActiveChat() || t == nil {
 		m.Reply(F(chatID, "room_no_active"))
 		return telegram.ErrEndGroup
 	}

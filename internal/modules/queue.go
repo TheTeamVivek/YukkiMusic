@@ -158,7 +158,7 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 	}
 	t := r.Track()
 
-	if !r.IsActiveChat() || t.ID == "" {
+	if !r.IsActiveChat() || t == nil {
 		m.Reply(F(chatID, "queue_no_active"))
 		return tg.ErrEndGroup
 	}
@@ -218,7 +218,7 @@ func handleRemove(m *tg.NewMessage, cplay bool) error {
 		return tg.ErrEndGroup
 	}
 	t := r.Track()
-	if !r.IsActiveChat() || t.ID == "" {
+	if !r.IsActiveChat() || t == nil {
 		m.Reply(F(chatID, "queue_no_active"))
 		return tg.ErrEndGroup
 	}
@@ -274,7 +274,7 @@ func handleClear(m *tg.NewMessage, cplay bool) error {
 		return tg.ErrEndGroup
 	}
 	t := r.Track()
-	if !r.IsActiveChat() || t.ID == "" {
+	if !r.IsActiveChat() || t == nil {
 		m.Reply(F(chatID, "clear_no_active"))
 		return tg.ErrEndGroup
 	}
@@ -302,7 +302,7 @@ func handleMove(m *tg.NewMessage, cplay bool) error {
 		return tg.ErrEndGroup
 	}
 
-	if !r.IsActiveChat() || r.Track().ID == "" {
+	if !r.IsActiveChat() || r.Track() == nil {
 		m.Reply(F(chatID, "queue_no_active"))
 		return tg.ErrEndGroup
 	}

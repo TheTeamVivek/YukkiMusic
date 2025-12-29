@@ -117,7 +117,7 @@ func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
 	}
 	chatID := m.ChannelID()
 	t := r.Track()
-	if !r.IsActiveChat() {
+	if !r.IsActiveChat() || t == nil {
 		m.Reply(F(chatID, "seek_no_active"))
 		return telegram.ErrEndGroup
 	}
@@ -191,7 +191,7 @@ func handleJump(m *telegram.NewMessage, cplay bool) error {
 	chatID := m.ChannelID()
 	t := r.Track()
 
-	if !r.IsActiveChat() || t.ID == "" {
+	if !r.IsActiveChat() || t == nil {
 		m.Reply(F(chatID, "jump_no_active"))
 		return telegram.ErrEndGroup
 	}
