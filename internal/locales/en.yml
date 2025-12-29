@@ -906,6 +906,7 @@ voicechat_started: "📢 Voice chat started!\nUse /play <song> to play music."
 # Commands help
 help_owner: |
   👑 <b>Owner Commands</b>
+
   <i>Exclusive tools for managing sudoers, executing system code, and performing bot administration securely.</i>
 
   <b>Commands:</b>
@@ -918,6 +919,7 @@ help_owner: |
 
 help_sudo: |
   ⚡ <b>Sudoer Commands</b>
+
   <i>Advanced tools for managing bot behavior, monitoring performance, and controlling logging and automation.</i>
 
   <b>Commands:</b>
@@ -928,6 +930,7 @@ help_sudo: |
 
 help_admin: |
   🛠 <b>Admin Commands</b>
+
   <i>Music and playback control tools for admins to handle playback easily.</i>
 
   <b>Commands:</b>
@@ -950,6 +953,7 @@ help_admin: |
 
 help_public: |
   🌍 <b>Public Commands</b>
+
   <i>Features for playing songs, viewing queues, checking latency, and reporting bugs.</i>
 
   <b>Commands:</b>
