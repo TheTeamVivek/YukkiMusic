@@ -21,7 +21,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: 🧹 Clean & 🚀 Install & ✅ Verify
         run: |
@@ -74,7 +74,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: 🧹 Clean & 🚀 Install & ✅ Verify
         run: |
@@ -119,7 +119,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: 🚀 Install & ✅ Verify
         shell: bash
@@ -162,7 +162,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: 📦 Install Old Go & 🚀 Upgrade & ✅ Verify
         run: |
@@ -201,7 +201,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: 🧹 Remove Tools & 🚀 Install & ✅ Verify
         run: |
@@ -241,7 +241,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: 🧹 Remove yt-dlp & 🚀 Install & ✅ Verify
         run: |
@@ -269,7 +269,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: 🚀 Full Install & Build & Test
         run: |
@@ -303,7 +303,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: 🚀 Run Twice & Compare
         run: |
@@ -340,7 +340,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: 🚧 Break & Fix & Verify
         run: |
