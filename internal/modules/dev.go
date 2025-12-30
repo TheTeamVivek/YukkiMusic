@@ -32,13 +32,52 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
+	"main/internal/config"
+	"main/internal/core"
 )
+
+func init() {
+	helpTexts["/sh"] = `<i>Execute shell commands on server.</i>
+
+<u>Usage:</u>
+<b>/sh [command]</b> — Run shell command
+
+<b>🔒 Restrictions:</b>
+• <b>Owner only</b> command
+
+<b>⚠️ Warning:</b>
+Direct system access - extremely powerful.`
+	helpTexts["/bash"] = helpTexts["/sh"]
+	helpTexts["/shell"] = helpTexts["/sh"]
+
+	helpTexts["/eval"] = helpTexts["/ev"]
+	helpTexts["/ev"] = `<i>Execute Go code dynamically (eval mode).</i>
+
+<u>Usage:</u>
+<b>/eval [code]</b> — Run Go code
+
+<b>🔒 Restrictions:</b>
+• <b>Owner only</b> command
+
+<b>⚠️ Warning:</b>
+Powerful command - use with caution.`
+
+	helpTexts["/json"] = `<i>Get JSON representation of message/user/chat.</i>
+
+<u>Usage:</u>
+<b>/json</b> — Current message JSON
+<b>/json -s</b> — Sender JSON
+<b>/json -c</b> — Chat JSON
+<b>/json -m</b> — Media JSON
+<b>/json [reply] -f</b> — File JSON
+
+<b>💡 Use Case:</b>
+Debugging and development.`
+}
 
 func shellHandle(m *telegram.NewMessage) error {
 	if m.SenderID() != config.OwnerID {
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 	cmd := m.Args()
 	var cmd_args []string
@@ -218,11 +257,11 @@ func resolveImports(code string) (string, []string) {
 
 func evalHandle(m *telegram.NewMessage) error {
 	if m.SenderID() != config.OwnerID {
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 	code := ""
 	if x := strings.Split(m.RawText(true), " "); len(x) < 2 {
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	} else {
 		code = strings.TrimSpace(strings.Join(x[1:], " "))
 	}
@@ -239,7 +278,7 @@ func evalHandle(m *telegram.NewMessage) error {
 
 	resp, isfile := performEval(code, m, imports)
 	if isfile {
-		if _, err := m.ReplyMedia(resp, telegram.MediaOptions{Caption: "Output"}); err != nil {
+		if _, err := m.ReplyMedia(resp, &telegram.MediaOptions{Caption: "Output"}); err != nil {
 			m.Reply("Error: " + err.Error())
 		}
 		return nil
@@ -268,8 +307,11 @@ func performEval(code string, m *telegram.NewMessage, imports []string) (string,
 		}
 		importStatement += ")\n"
 	}
-
-	code_file := fmt.Sprintf(boiler_code_for_eval, importStatement, m.ID, msg_b, snd_b, cnt_b, chn_b, cache_b, code, m.Client.ExportSession(), core.UBot.ExportSession())
+	ass, aErr := core.Assistants.First()
+	if aErr != nil {
+		return fmt.Sprintf("Failed to get assistant: %v", aErr), false
+	}
+	code_file := fmt.Sprintf(boiler_code_for_eval, importStatement, m.ID, msg_b, snd_b, cnt_b, chn_b, cache_b, code, m.Client.ExportSession(), ass.Client.ExportSession())
 	tmp_dir := "tmp"
 	_, err := os.ReadDir(tmp_dir)
 	if err != nil {
@@ -380,7 +422,7 @@ func jsonHandle(m *telegram.NewMessage) error {
 			return nil
 		}
 
-		_, err = m.ReplyMedia(tmpFile.Name(), telegram.MediaOptions{Caption: "Message JSON"})
+		_, err = m.ReplyMedia(tmpFile.Name(), &telegram.MediaOptions{Caption: "Message JSON"})
 		if err != nil {
 			m.Reply("Error: " + err.Error())
 		}

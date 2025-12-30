@@ -20,12 +20,10 @@
 package database
 
 import (
-	"context"
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 const (
@@ -51,27 +49,35 @@ type (
 	}
 )
 
-func MigrateData(mongoURI string) {
+func migrateData(mongoURI string) {
 	logger.Info("Checking for old database to migrate...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	oldDB := client.Database(oldDBName)
+	ctx, cancel := mongoCtx()
 	defer cancel()
 
-	oldClient, err := mongo.Connect(options.Client().ApplyURI(mongoURI))
-	if err != nil {
-		logger.ErrorF("Failed to connect to old MongoDB: %v", err)
+	flagColl := oldDB.Collection("migration_status")
+	var result bson.M
+	err := flagColl.FindOne(ctx, bson.M{"migrated": true}).Decode(&result)
+	if err == nil {
+		logger.Info("Migration already completed previously. Skipping.")
 		return
 	}
-	defer oldClient.Disconnect(ctx)
 
-	oldDB := oldClient.Database(oldDBName)
-
+	// perform migration
 	migrateCPlay(oldDB)
 	migrateServedUsers(oldDB)
 	migrateServedChats(oldDB)
 	migrateSudoers(oldDB)
 
-	logger.Info("Data migration check complete.")
+	_, err = flagColl.InsertOne(ctx, bson.M{
+		"migrated":  true,
+		"timestamp": time.Now(),
+	})
+	if err != nil {
+		logger.ErrorF("Failed to write migration flag: %v", err)
+	}
+	logger.Info("Data migration complete.")
 }
 
 func migrateCPlay(db *mongo.Database) {

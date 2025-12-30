@@ -56,6 +56,11 @@
             "value": "4200",
             "required": false
         },
+        "LEAVE_ON_DEMOTED": {
+            "description": "Leave the group when the bot is demoted. Set to true to enable.",
+            "value": "false",
+            "required": false
+        },
         "QUEUE_LIMIT": {
             "description": "The maximum number of tracks allowed in the queue.",
             "value": "7",

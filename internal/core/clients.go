@@ -21,105 +21,157 @@ package core
 
 import (
 	"encoding/base64"
+	"encoding/binary"
 	"fmt"
+	"net"
 	"strings"
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/ubot"
+	"main/ubot"
 )
 
 var (
-	Bot  *telegram.Client // bot client
-	UBot *telegram.Client // user client
-	Ntg  *ubot.Context    // wrapper client of ntgcalls
+	Bot   *telegram.Client
+	BUser *telegram.UserObj
 
-	BUser, UbUser *telegram.UserObj
+	Assistants         *AssistantManager
+	AssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // AssistantIndexFunc = database.GetAssistantIndex
 )
 
-func Init(apiID int32, apiHash, token, session string, loggerID int64) func() {
-	l := gologging.GetLogger("Clients")
+func Init(apiID int32, apiHash, token string, sessions []string, sessionType string, loggerID int64) func() {
+	if len(sessions) == 0 {
+		gologging.Fatal("No STRING_SESSIONS provided for assistant client.")
+	}
 
+	gologging.Info("Starting bot client...")
+	Bot = initBotClient(apiID, apiHash, token)
+	BUser = getSelfOrFatal(Bot, "bot")
+
+	gologging.Info("Starting assistant clients...")
+
+	assistants := make([]*Assistant, 0, len(sessions))
+
+	for i, sess := range sessions {
+		gologging.InfoF("Initializing assistant[%d]...", i)
+
+		client := initAssistantClient(apiID, apiHash, sess, sessionType, i)
+		user := getSelfOrFatal(client, fmt.Sprintf("assistant[%d]", i))
+		ctx := ubot.NewContext(client)
+
+		client.SetCommandPrefixes(".")
+
+		assistants = append(assistants, &Assistant{
+			Index:  i,
+			Client: client,
+			User:   user,
+			Ntg:    ctx,
+		})
+
+		if loggerID != 0 {
+			_, _ = client.SendMessage(loggerID, fmt.Sprintf("Assistant %d Started", i+1))
+		}
+
+		gologging.InfoF("assistant[%d] ready: %s", i, user.FirstName)
+	}
+
+	Bot.SetCommandPrefixes("/")
+
+	Assistants = &AssistantManager{
+		list:       assistants,
+		indexCache: make(map[int64]int),
+	}
+	gologging.Info("All assistants initialized successfully.")
+
+	return func() {
+		gologging.Info("Shutting down assistant contexts...")
+		for _, a := range Assistants.list {
+			a.Ntg.Close()
+		}
+
+		gologging.Info("Stopping bot...")
+		Bot.Stop()
+
+		gologging.Info("Stopping assistants...")
+		for _, a := range Assistants.list {
+			a.Client.Stop()
+		}
+
+		gologging.Info("Shutdown complete.")
+	}
+}
+
+func initBotClient(apiID int32, apiHash, token string) *telegram.Client {
 	client, err := telegram.NewClient(telegram.ClientConfig{
 		AppID:     apiID,
 		AppHash:   apiHash,
+		Logger:    telegram.WrapSimpleLogger(GetTgLogger("gogram", telegram.LogError)),
 		LogLevel:  telegram.LogError,
 		ParseMode: "HTML",
 		Session:   "bot.session",
 	})
 	if err != nil {
-		l.FatalF("❌ Failed to create bot: %s", err)
-		return nil
+		gologging.Fatal("❌ Failed to create bot: " + err.Error())
 	}
 
 	if err := client.LoginBot(token); err != nil {
 		if strings.Contains(err.Error(), "ACCESS_TOKEN_EXPIRED") {
-			l.FatalF("❌ Bot token has been revoked or expired.")
+			gologging.Fatal("❌ Bot token has been revoked or expired.")
 		} else {
-			l.FatalF("❌ Failed to start the bot: %s", err)
+			gologging.Fatal("❌ Failed to start the bot: " + err.Error())
 		}
-		return nil
+	}
+	return client
+}
+
+func initAssistantClient(apiID int32, apiHash, session, sessionType string, idx int) *telegram.Client {
+	var stringSession string
+
+	switch strings.ToLower(sessionType) {
+	case "pyrogram", "pyro":
+		sess, err := decodePyrogramSessionString(session)
+		if err != nil {
+			gologging.Fatal("Failed to decode Pyrogram session: " + err.Error())
+		}
+		stringSession = sess.Encode()
+
+	case "telethon":
+		sess, err := decodeTelethonSessionString(session)
+		if err != nil {
+			gologging.Fatal("Failed to decode Telethon session: " + err.Error())
+		}
+		stringSession = sess.Encode()
+
+	case "gogram":
+		stringSession = session
+
+	default:
+		gologging.Fatal("Invalid SESSION_TYPE: " + sessionType)
 	}
 
-	if me, err := client.GetMe(); err != nil {
-		l.FatalF("❌ Failed to GetMe: %s", err)
-		return nil
-	} else {
-		BUser = me
-	}
-
-	sess, serr := decodePyrogramSessionString(session)
-	if serr != nil {
-		l.FatalF("❌ Failed to decode Pyrogram session: %s", serr)
-		return nil
-	}
-
-	ub, err2 := telegram.NewClient(telegram.ClientConfig{
+	client, err := telegram.NewClient(telegram.ClientConfig{
 		AppID:         apiID,
 		AppHash:       apiHash,
 		LogLevel:      telegram.LogError,
 		ParseMode:     "HTML",
-		StringSession: sess.Encode(),
-
-		Session: "ass.session",
+		StringSession: stringSession,
+		Session:       fmt.Sprintf("ass%d.session", idx),
 	})
-	if err2 != nil {
-		l.FatalF("❌ Failed to create ubot: %s", err2)
-		return nil
+	if err != nil {
+		gologging.Fatal("Failed to create assistant: " + err.Error())
 	}
 
-	if me, err := ub.GetMe(); err != nil {
-		l.FatalF("❌ Failed to GetMe: %s", err)
-		return nil
-	} else {
-		UbUser = me
-		l.InfoF("Logged in as: %s", me.FirstName)
-	}
-	if peer, err := client.ResolvePeer(loggerID); err != nil {
-		l.WarnF("Failed to get peer ID of logger: %s", err)
-	} else if _, err := client.SendMessage(peer, "🚀 Bot Started..."); err != nil {
-		l.WarnF("Failed to send startup message: %s", err)
-	}
+	return client
+}
 
-	if peer, err := ub.ResolvePeer(loggerID); err != nil {
-		l.WarnF("Failed to get peer ID of logger (assistant): %s", err)
-	} else if _, err := ub.SendMessage(peer, "🚀 Assistant Started..."); err != nil {
-		l.WarnF("Failed to send assistant startup message: %s", err)
+func getSelfOrFatal(c *telegram.Client, label string) *telegram.UserObj {
+	me, err := c.GetMe()
+	if err != nil {
+		gologging.Fatal("❌ Failed to GetMe for " + label + ": " + err.Error())
 	}
-
-	ub.SendMessage(BUser.Username, "/start")
-	Bot = client
-	UBot = ub
-	Ntg = ubot.NewContext(ub, UbUser)
-
-	return func() {
-		if Ntg != nil {
-			Ntg.Close()
-			Bot.Stop()
-			UBot.Stop()
-		}
-	}
+	gologging.Info("Logged in as " + label + ": " + me.FirstName)
+	return me
 }
 
 func decodePyrogramSessionString(encodedString string) (*telegram.Session, error) {
@@ -152,5 +204,44 @@ func decodePyrogramSessionString(encodedString string) (*telegram.Session, error
 		Hostname: telegram.ResolveDataCenterIP(int(uint8(packedData[0])), packedData[5] != 0, false),
 		AppID:    int32(uint32(packedData[1])<<24 | uint32(packedData[2])<<16 | uint32(packedData[3])<<8 | uint32(packedData[4])),
 		Key:      packedData[6 : 6+authKeySize],
+	}, nil
+}
+
+func decodeTelethonSessionString(sessionString string) (*telegram.Session, error) {
+	data, err := base64.URLEncoding.DecodeString(sessionString[1:])
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode base64: %v", err)
+	}
+
+	ipLen := 4
+	if len(data) == 352 {
+		ipLen = 16
+	}
+
+	expectedLen := 1 + ipLen + 2 + 256
+	if len(data) != expectedLen {
+		return nil, fmt.Errorf("invalid session string length")
+	}
+
+	// ">B{}sH256s"
+	offset := 1
+
+	// IP Address (4 or 16 bytes based on IPv4 or IPv6)
+	ipData := data[offset : offset+ipLen]
+	ip := net.IP(ipData)
+	ipAddress := ip.String()
+	offset += ipLen
+
+	// Port (2 bytes, Big Endian)
+	port := binary.BigEndian.Uint16(data[offset : offset+2])
+	offset += 2
+
+	// Auth Key (256 bytes)
+	var authKey [256]byte
+	copy(authKey[:], data[offset:offset+256])
+
+	return &telegram.Session{
+		Hostname: ipAddress + ":" + fmt.Sprint(port),
+		Key:      authKey[:],
 	}, nil
 }

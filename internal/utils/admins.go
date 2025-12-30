@@ -20,20 +20,21 @@
 package utils
 
 import (
-	"fmt"
 	"slices"
 	"time"
 
 	"github.com/amarnathcjd/gogram/telegram"
 )
 
-var adminCache = NewCache[string, []int64](30 * time.Minute)
+var adminCache = NewCache[int64, []int64](30 * time.Minute)
 
 // Checks if a user is an admin in a chat
 func IsChatAdmin(c *telegram.Client, chatID, userID int64) (bool, error) {
-	cacheKey := fmt.Sprintf("admins:%d", chatID)
+	if chatID == userID { // chat anon admin
+		return true, nil
+	}
 
-	ids, ok := adminCache.Get(cacheKey)
+	ids, ok := adminCache.Get(chatID)
 	if ok {
 		return slices.Contains(ids, userID), nil
 	}
@@ -53,11 +54,10 @@ func ReloadChatAdmin(c *telegram.Client, chatID int64) ([]int64, error) {
 		return nil, err
 	}
 
-	cacheKey := fmt.Sprintf("admins:%d", chatID)
 	if len(ids) == 0 {
-		adminCache.Delete(cacheKey)
+		adminCache.Delete(chatID)
 	} else {
-		adminCache.Set(cacheKey, ids)
+		adminCache.Set(chatID, ids)
 	}
 
 	return ids, nil
@@ -65,9 +65,7 @@ func ReloadChatAdmin(c *telegram.Client, chatID int64) ([]int64, error) {
 
 // Adds a user to the cached admin list, auto-reloading if cache is missing
 func AddChatAdmin(c *telegram.Client, chatID, userID int64) error {
-	cacheKey := fmt.Sprintf("admins:%d", chatID)
-
-	ids, ok := adminCache.Get(cacheKey)
+	ids, ok := adminCache.Get(chatID)
 	if !ok || len(ids) == 0 {
 		var err error
 		ids, err = ReloadChatAdmin(c, chatID)
@@ -78,7 +76,7 @@ func AddChatAdmin(c *telegram.Client, chatID, userID int64) error {
 
 	if !slices.Contains(ids, userID) {
 		ids = append(ids, userID)
-		adminCache.Set(cacheKey, ids)
+		adminCache.Set(chatID, ids)
 	}
 
 	return nil
@@ -86,9 +84,7 @@ func AddChatAdmin(c *telegram.Client, chatID, userID int64) error {
 
 // Removes a user from the cached admin list, auto-reloading if cache is missing
 func RemoveChatAdmin(c *telegram.Client, chatID, userID int64) error {
-	cacheKey := fmt.Sprintf("admins:%d", chatID)
-
-	ids, ok := adminCache.Get(cacheKey)
+	ids, ok := adminCache.Get(chatID)
 	if !ok || len(ids) == 0 {
 		var err error
 		ids, err = ReloadChatAdmin(c, chatID)
@@ -105,9 +101,9 @@ func RemoveChatAdmin(c *telegram.Client, chatID, userID int64) error {
 	}
 
 	if len(newIDs) == 0 {
-		adminCache.Delete(cacheKey)
+		adminCache.Delete(chatID)
 	} else {
-		adminCache.Set(cacheKey, newIDs)
+		adminCache.Set(chatID, newIDs)
 	}
 
 	return nil

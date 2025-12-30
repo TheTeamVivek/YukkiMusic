@@ -36,51 +36,89 @@ var (
 
 	// To learn more about what each variable does, see README.md
 	// Required Vars
-	ApiID         = int32(getInt64("API_ID"))
-	ApiHash       = getString("API_HASH")
-	Token         = getString("TOKEN")
-	MongoURI      = getString("MONGO_DB_URI")
-	StringSession = getString("STRING_SESSION") // pyro session
-
+	ApiID          = int32(getInt64("API_ID"))
+	ApiHash        = getString("API_HASH")
+	Token          = getString("TOKEN")
+	MongoURI       = getString("MONGO_DB_URI")
+	StringSessions = getStringSlice("STRING_SESSIONS")
+	SessionType    = getString("SESSION_TYPE", "pyrogram") // pyrogram, telethon, gogram
 	// Optional Vars
-	ApiKEY         = getString("FALLEN_API_KEY")
-	ApiURL         = getString("FALLEN_API_URL", "https://tgmusic.fallenapi.fun")
-	OwnerID        = getInt64("OWNER_ID")
-	LoggerID       = getInt64("LOGGER_ID")
+	OwnerID  = getInt64("OWNER_ID")
+	LoggerID = getInt64("LOGGER_ID")
+
+	SpotifyClientID     = getString("SPOTIFY_CLIENT_ID", "40b91facfdee4c6e9456906613e7ca6b")
+	SpotifyClientSecret = getString("SPOTIFY_CLIENT_SECRET", "e8d7847ccdf545b9ac5051d2c456c5d2")
+
+	FallenAPIURL = getString("FALLEN_API_URL", "https://tgmusic.fallenapi.fun")
+	FallenAPIKey = getString("FALLEN_API_KEY")
+
+	YoutubifyApiURL = getString("YOUTUBIFY_API_URL", "https://youtubify.me")
+	YoutubifyApiKey = getString("YOUTUBIFY_API_KEY")
+
+	DefaultLang    = getString("DEFAULT_LANG", "en")
 	DurationLimit  = int(getInt64("DURATION_LIMIT", 4200)) // in seconds
+	LeaveOnDemoted = getBool("LEAVE_ON_DEMOTED", false)
 	QueueLimit     = int(getInt64("QUEUE_LIMIT", 7))
-	StartImage     = getString("START_IMG_URL", "https://raw.githubusercontent.com/Vivekkumar-IN/assets/master/images.png")
 	SupportChat    = getString("SUPPORT_CHAT", "https://t.me/TheTeamVk")
 	SupportChannel = getString("SUPPORT_CHANNEL", "https://t.me/TheTeamVivek")
 	StartTime      = time.Now()
 	CookiesLink    = getString("COOKIES_LINK")
 	SetCmds        = getBool("SET_CMDS", false)
 	MaxAuthUsers   = int(getInt64("MAX_AUTH_USERS", 25))
+
+	StartImage = getString("START_IMG_URL", "https://raw.githubusercontent.com/Vivekkumar-IN/assets/master/images.png")
+	PingImage  = getString("PING_IMG_URL", "https://telegra.ph/file/91533956c91d0fd7c9f20.jpg")
 )
 
 func init() {
-	if Token == "" {
-		Token = getString("BOT_TOKEN")
-		if Token == "" {
-			logger.Fatal("TOKEN is required but missing! Please set it in .env or environment.")
-			return
-		}
-	}
-	if MongoURI == "" {
-		logger.Fatal("MONGO_DB_URI is required but missing!")
-		return
-	}
-	if StringSession == "" {
-		logger.Fatal("STRING_SESSION is empty — continuing without it.")
-		return
-	}
+	validateRequired()
+	validateToken()
+	validateSessions()
+	validateSpotify()
+}
+
+func validateRequired() {
 	if ApiID == 0 {
 		logger.Fatal("API_ID is required but missing!")
-		return
 	}
+
 	if ApiHash == "" {
 		logger.Fatal("API_HASH is required but missing!")
+	}
+
+	if MongoURI == "" {
+		logger.Fatal("MONGO_DB_URI is required but missing!")
+	}
+}
+
+func validateToken() {
+	if Token != "" {
 		return
+	}
+
+	Token = getString("BOT_TOKEN")
+	if Token == "" {
+		logger.Fatal("TOKEN is required but missing! Please set it in .env or environment.")
+	}
+}
+
+func validateSessions() {
+	if len(StringSessions) > 0 {
+		return
+	}
+
+	StringSessions = getStringSlice("STRING_SESSION")
+	if len(StringSessions) == 0 {
+		logger.FatalF(
+			"STRING_SESSIONS is empty — at least one %s session string is required.",
+			SessionType,
+		)
+	}
+}
+
+func validateSpotify() {
+	if SpotifyClientID == "" || SpotifyClientSecret == "" {
+		logger.Warn("Spotify credentials not configured - Spotify links won't work")
 	}
 }
 
@@ -101,8 +139,8 @@ func getBool(key string, def ...bool) bool {
 	if ok {
 		boolVal, err := strconv.ParseBool(val)
 		if err != nil {
-			logger.FatalF("Invalid boolean for %s: %v — using default %t", key, err, defaultValue)
-			return defaultValue
+			logger.FatalF("Invalid boolean for %s: %v", key, err)
+			return defaultValue // never runs
 		}
 		return boolVal
 	}
@@ -118,12 +156,31 @@ func getInt64(key string, def ...int64) int64 {
 	if val, ok := getEnvAny(variants(key)...); ok {
 		num, err := strconv.ParseInt(val, 10, 64)
 		if err != nil {
-			logger.FatalF("Invalid int64 for %s: %v — using default %d", key, err, defaultValue)
+			logger.FatalF("Invalid int64 for %s: %v", key, err)
 			return defaultValue
 		}
 		return num
 	}
 	return defaultValue
+}
+
+func getStringSlice(key string, def ...[]string) []string {
+	if val, ok := getEnvAny(variants(key)...); ok {
+		normalized := strings.NewReplacer(
+			",", " ",
+			";", " ",
+		).Replace(val)
+
+		parts := strings.Fields(normalized)
+		if len(parts) > 0 {
+			return parts
+		}
+	}
+
+	if len(def) > 0 {
+		return def[0]
+	}
+	return nil
 }
 
 func getEnvAny(keys ...string) (string, bool) {

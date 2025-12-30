@@ -20,64 +20,110 @@
 package modules
 
 import (
-	"fmt"
-	"log"
+	"github.com/Laky-64/gologging"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/amarnathcjd/gogram/telegram"
-
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/config"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/locales"
+	"main/internal/utils"
 )
 
-var startMSG = "⚡️Pika Pika, %s!\n⚡️  Welcome to <b>%s</b> \n🎶  I’m here to help you play, stream, and manage music right here on Telegram. 🎵"
+func init() {
+	helpTexts["/start"] = `<i>Start the bot and show main menu.</i>`
+}
 
-func startHandler(m *telegram.NewMessage) error {
-	if m.ChatType() != telegram.EntityUser {
+func startHandler(m *tg.NewMessage) error {
+	if m.ChatType() != tg.EntityUser {
 		database.AddServed(m.ChannelID())
-		m.Reply("🎶 I'm all set!\n▶️ Drop a command to light up the chat with music.")
-		return telegram.EndGroup
+		m.Reply(
+			F(m.ChannelID(), "start_group"),
+		)
+		return tg.ErrEndGroup
 	}
 
 	arg := m.Args()
 	database.AddServed(m.ChannelID(), true)
 
-	switch arg {
+	if arg != "" {
+		gologging.Info("Got Start parameter: " + arg + " in ChatID: " + utils.IntToStr(m.ChannelID()))
+	}
 
-	case "help":
+	switch arg {
+	case "pm_help":
+		gologging.Info("User requested help via start param")
 		helpHandler(m)
 
 	default:
+		caption := F(m.ChannelID(), "start_private", locales.Arg{
+			"user": utils.MentionHTML(m.Sender),
+			"bot":  utils.MentionHTML(core.BUser),
+		})
 
-		caption := fmt.Sprintf(startMSG, utils.MentionHTML(m.Sender), utils.MentionHTML(core.BUser))
-
-		if _, err := m.RespondMedia(config.StartImage, telegram.MediaOptions{
+		_, err := m.RespondMedia(&tg.InputMediaWebPage{
+			URL:             config.StartImage,
+			ForceLargeMedia: true,
+		}, &tg.MediaOptions{
 			Caption:     caption,
 			NoForwards:  true,
-			ReplyMarkup: core.GetStartMarkup(),
-		}); err != nil {
-			log.Printf("Error responding start in chat: %v", err)
-			return err
+			ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
+		})
+		if err != nil {
+			gologging.Error("[start] InputMediaWebPage Reply failed: " + err.Error())
+
+			_, err = m.RespondMedia(config.StartImage, &tg.MediaOptions{
+				Caption:     caption,
+				NoForwards:  true,
+				ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
+			})
+			if err != nil {
+				gologging.Error("[start] URL media reply failed: " + err.Error())
+
+				_, err = m.RespondMedia(caption, &tg.MediaOptions{
+					NoForwards:  true,
+					ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
+				})
+				return err
+			}
 		}
 	}
 
-	return telegram.EndGroup
+	if config.LoggerID != 0 && isLogger() {
+		uName := "N/A"
+		if m.Sender.Username != "" {
+			uName = "@" + m.Sender.Username
+		}
+		msg := F(m.ChannelID(), "logger_bot_started", locales.Arg{
+			"mention":       utils.MentionHTML(m.Sender),
+			"user_id":       m.SenderID(),
+			"user_username": uName,
+		})
+		_, err := m.Client.SendMessage(config.LoggerID, msg)
+		if err != nil {
+			gologging.Error("Failed to send logger_bot_started msg, Err: " + err.Error())
+		}
+	}
+	return tg.ErrEndGroup
 }
 
-func startCB(c *telegram.CallbackQuery) error {
-	c.Answer("")
+func startCB(cb *tg.CallbackQuery) error {
+	cb.Answer("")
 
-	caption := fmt.Sprintf(startMSG, utils.MentionHTML(c.Sender), utils.MentionHTML(core.BUser))
+	caption := F(cb.ChannelID(), "start_private", locales.Arg{
+		"user": utils.MentionHTML(cb.Sender),
+		"bot":  utils.MentionHTML(core.BUser),
+	})
 
-	opt := &telegram.SendOptions{
-		ReplyMarkup: core.GetStartMarkup(),
+	sendOpt := &tg.SendOptions{
+		ReplyMarkup: core.GetStartMarkup(cb.ChannelID()),
 		NoForwards:  true,
 	}
 
 	if config.StartImage != "" {
-		opt.Media = config.StartImage
+		sendOpt.Media = config.StartImage
 	}
-	c.Edit(caption, opt)
-	return telegram.EndGroup
+
+	cb.Edit(caption, sendOpt)
+	return tg.ErrEndGroup
 }

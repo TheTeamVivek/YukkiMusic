@@ -24,6 +24,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"go/build"
 	"io"
 	"os"
 	"reflect"
@@ -34,15 +35,15 @@ import (
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
+	"main/internal/config"
+	"main/internal/core"
 )
 
 var evalLogger = gologging.GetLogger("Eval")
 
 func evalCommandHandler(m *telegram.NewMessage) error {
 	if m.SenderID() != config.OwnerID {
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	parts := strings.SplitN(m.RawText(true), " ", 2)
@@ -73,12 +74,15 @@ Examples:
 		return nil
 	}
 
+	goPath := os.Getenv("GOPATH")
+	if goPath == "" {
+		goPath = build.Default.GOPATH
+	}
 	var stdout, stderr bytes.Buffer
 	i := interp.New(interp.Options{
 		Stdout: &stdout,
 		Stderr: &stderr,
-		GoPath: os.Getenv("GOPATH"),
-		//	GoPath: build.Default.GOPATH,
+		GoPath: goPath,
 	})
 	i.Use(stdlib.Symbols)
 
@@ -89,18 +93,17 @@ Examples:
 
 	symbols := map[string]map[string]reflect.Value{
 		"eval/eval": {
-			"M":       reflect.ValueOf(m),
-			"Client":  reflect.ValueOf(core.Bot),
-			"UBot":    reflect.ValueOf(core.UBot),
-			"R":       reflect.ValueOf(reply),
-			"Message": reflect.ValueOf(m),
-			"Ntg":     reflect.ValueOf(core.Ntg),
+			"M":          reflect.ValueOf(m),
+			"Client":     reflect.ValueOf(core.Bot),
+			"Assistants": reflect.ValueOf(core.Assistants),
+			"A":          reflect.ValueOf(core.Assistants),
+			"R":          reflect.ValueOf(reply),
+			"Message":    reflect.ValueOf(m),
 		},
 	}
 	if err := i.Use(symbols); err != nil {
 		evalLogger.ErrorF("failed to use custom symbols: %v", err)
 	}
-
 	ctx := context.Background()
 
 	// Wrap snippet mode
@@ -115,13 +118,11 @@ func runSnippet() (res any) {
 	m, msg, message, M := e.M, e.M, e.M, e.M
 	r := e.R
 	client, c, app, bot, Client := e.Client, e.Client, e.Client, e.Client, e.Client
-	call, ntg, Ntg := e.Ntg, e.Ntg, e.Ntg
-	ub, UBot := e.UBot, e.UBot
+	a, ass, Assistants, A := e.A, e.A, e.A, e.A
 	j := e.Client.JSON
 
 	_ = m; _ = msg; _ = message; _ = M
 	_ = r; _ = client; _ = c; _ = app; _ = bot; _ = Client
-	_ = call; _ = ntg; _ = Ntg; _ = ub; _ = UBot
 	_ = j; _ = fmt.Println
 
 	%s
@@ -176,7 +177,7 @@ func main() {
 		file, _ := os.Create("output.txt")
 		defer file.Close()
 		io.WriteString(file, output)
-		m.ReplyMedia(file.Name(), telegram.MediaOptions{Caption: "Output"})
+		m.ReplyMedia(file.Name(), &telegram.MediaOptions{Caption: "Output"})
 		os.Remove(file.Name())
 		return nil
 	}

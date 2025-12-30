@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package state
 
 import (
@@ -26,32 +27,23 @@ import (
 )
 
 type (
+	Track struct {
+		ID        string       // track unique id
+		Title     string       // title
+		Duration  int          // track duration in seconds
+		Artwork   string       // thumbnail url of the track
+		URL       string       // track url
+		Requester string       // html mention or @username who requested this track
+		Video     bool         // whether this track will be played as video
+		Source    PlatformName // unique PlatformName
+	}
 	PlatformName string
 
 	Platform interface {
 		Name() PlatformName
 		IsValid(query string) bool
-		GetTracks(query string) ([]*Track, error)
+		GetTracks(query string, video bool) ([]*Track, error)
 		Download(ctx context.Context, track *Track, mystic *telegram.NewMessage) (string, error)
 		IsDownloadSupported(source PlatformName) bool
 	}
-
-	Track struct {
-		ID       string
-		Title    string
-		Duration int
-		Artwork  string
-		URL      string
-		BY       string
-		Source   PlatformName
-	}
 )
-
-const (
-	PlatformYouTube   PlatformName = "YouTube"
-	PlatformTelegram  PlatformName = "Telegram"
-	PlatformFallenApi PlatformName = "FallenApi"
-	PlatformYtDlp     PlatformName = "YtDlp"
-)
-
-var DownloadCancels = make(map[int64]context.CancelFunc)

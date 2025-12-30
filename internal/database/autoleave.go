@@ -20,10 +20,7 @@
 package database
 
 func GetAutoLeave() (bool, error) {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
+	state, err := getBotState()
 	if err != nil {
 		return false, err
 	}
@@ -31,26 +28,17 @@ func GetAutoLeave() (bool, error) {
 }
 
 func SetAutoLeave(value bool) error {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-	current, err := GetAutoLeave()
-	if err != nil {
-		logger.ErrorF("Failed to get current AutoEnd: %v", err)
-		return err
-	}
-
-	if current == value {
-		return nil
-	}
-
-	state, err := getBotState(ctx)
+	state, err := getBotState()
 	if err != nil {
 		logger.ErrorF("Failed to get bot state for setting AutoEnd: %v", err)
 		return err
 	}
+	if state.AutoLeave == value {
+		return nil
+	}
 
 	state.AutoLeave = value
-	if err := updateBotState(ctx, state); err != nil {
+	if err := updateBotState(state); err != nil {
 		logger.ErrorF("Failed to update AutoEnd: %v", err)
 		return err
 	}

@@ -20,15 +20,70 @@
 package modules
 
 import (
-	"strconv"
-
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
+	"main/internal/core"
+	"main/internal/locales"
 )
 
+func init() {
+	helpTexts["/active"] = `<i>Show all active voice chat sessions.</i>
+
+<u>Usage:</u>
+<b>/active</b> or <b>/ac</b> — List active chats
+
+<b>📊 Information Shown:</b>
+• Total active chats
+• Active NTGCalls connections
+• Broken/stale sessions
+
+<b>🔒 Restrictions:</b>
+• <b>Sudo users</b> only
+
+<b>💡 Use Case:</b>
+Monitor bot usage and identify issues.`
+
+	keys := []string{"/ac", "/activevc", "/activevoice"}
+	for _, k := range keys {
+		helpTexts[k] = helpTexts["/active"]
+	}
+}
+
 func activeHandler(m *telegram.NewMessage) error {
-	chats := len(core.GetAllRoomIDs())
-	m.Reply("Active Chats info: " + strconv.Itoa(chats))
-	return telegram.EndGroup
+	chatID := m.ChannelID()
+
+	allChats := core.GetAllRoomIDs()
+	activeCount := len(allChats)
+
+	ntgChats := make(map[int64]struct{})
+
+	core.Assistants.ForEach(func(a *core.Assistant) {
+		if a == nil || a.Ntg == nil {
+			return
+		}
+		for id := range a.Ntg.Calls() {
+			ntgChats[id] = struct{}{}
+		}
+	})
+
+	brokenCount := 0
+	for _, id := range allChats {
+		if _, ok := ntgChats[id]; !ok {
+			brokenCount++
+		}
+	}
+
+	msg := F(chatID, "active_chats_info", locales.Arg{
+		"count": activeCount,
+	})
+
+	if brokenCount > 0 {
+		msg = F(chatID, "active_chats_info_with_broken", locales.Arg{
+			"count":  activeCount,
+			"broken": brokenCount,
+		})
+	}
+
+	m.Reply(msg)
+	return telegram.ErrEndGroup
 }

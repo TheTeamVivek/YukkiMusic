@@ -8,136 +8,162 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package modules
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	"github.com/Laky-64/gologging"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/locales"
+	"main/internal/utils"
 )
 
-var maintenanceCancel = struct {
+func init() {
+	helpTexts["/maintenance"] = `<i>Toggle maintenance mode.</i>
+
+<u>Usage:</u>
+<b>/maintenance</b> — Show current status
+<b>/maintenance on [reason]</b> — Enable maintenance
+<b>/maintenance off</b> — Disable maintenance
+
+<b>⚙️ Behavior When Active:</b>
+• Stops all active rooms
+• Blocks non-owner/sudo commands
+• Shows maintenance message to users
+
+<b>🔒 Restrictions:</b>
+• <b>Owner only</b> command
+
+<b>💡 Examples:</b>
+<code>/maintenance on Server upgrade</code>
+<code>/maintenance off</code>
+
+<b>⚠️ Notes:</b>
+• Owner and sudoers can still use bot
+• All rooms are destroyed when enabled
+• Users see maintenance message with reason`
+	helpTexts["/maint"] = helpTexts["/maintenance"]
+}
+
+var maintCancel = struct {
 	sync.Mutex
 	cancel bool
 }{}
 
-func handleMaintenance(m *telegram.NewMessage) error {
+func handleMaintenance(m *tg.NewMessage) error {
 	args := strings.Fields(m.Text())
+	chatID := m.ChannelID()
 	current, err := database.IsMaintenance()
 	if err != nil {
-		m.Reply("❌ Failed to check maintenance status: " + err.Error())
-		return telegram.EndGroup
+		m.Reply(F(chatID, "maint_check_fail", locales.Arg{"error": err.Error()}))
+		return tg.ErrEndGroup
 	}
 
+	// show current status if no args
 	if len(args) < 2 {
-
-		status := "🔴 Disabled"
+		reason, _ := database.GetMaintReason()
+		status := F(chatID, "disabled")
 		if current {
-			if reason, rerr := database.GetMaintReason(); rerr == nil && reason != "" {
-				status = fmt.Sprintf("🟢 Enabled\n📝 Reason: %s", reason)
+			if reason != "" {
+				status = F(chatID, "enabled_with_reason", locales.Arg{"reason": reason})
 			} else {
-				status = "🟢 Enabled"
+				status = F(chatID, "enabled")
 			}
 		}
-
-		m.Reply(fmt.Sprintf(
-			"⚙️ Usage: %s [<code>enable</code>|<code>disable</code>] [reason]\n\n📜 Current status: %s",
-			getCommand(m),
-			status,
-		))
-		return telegram.EndGroup
+		m.Reply(F(chatID, "maint_usage", locales.Arg{
+			"cmd":    getCommand(m),
+			"status": status,
+		}))
+		return tg.ErrEndGroup
 	}
 
 	enable, err := utils.ParseBool(args[1])
 	if err != nil {
-		m.Reply("⚠️ Invalid option. Use 'enable' or 'disable'.")
-		return telegram.EndGroup
+		m.Reply(F(chatID, "invalid_bool"))
+		return tg.ErrEndGroup
 	}
 	reason := strings.Join(args[2:], " ")
-
 	oldReason, _ := database.GetMaintReason()
 
+	// no change in state
 	if current == enable {
 		if enable {
 			switch {
 			case reason == oldReason:
-				m.Reply("ℹ️ Maintenance mode is already enabled with the same reason.")
-				return telegram.EndGroup
+				m.Reply(F(chatID, "maint_already_reason_same"))
 			case reason == "" && oldReason != "":
 				_ = database.SetMaintenance(true, "")
-				m.Reply("✅ Maintenance reason removed successfully.")
-				return telegram.EndGroup
+				m.Reply(F(chatID, "maint_reason_removed"))
 			case reason != "" && reason != oldReason:
 				_ = database.SetMaintenance(true, reason)
-				m.Reply(fmt.Sprintf("✅ Maintenance reason updated successfully.\n📝 Reason: %s", reason))
-				return telegram.EndGroup
+				m.Reply(F(chatID, "maint_reason_updated", locales.Arg{"reason": reason}))
 			default:
-				m.Reply("ℹ️ Maintenance mode is already enabled 🟢.")
-				return telegram.EndGroup
+				m.Reply(F(chatID, "maint_already_enabled"))
 			}
 		} else {
-			m.Reply("ℹ️ Maintenance mode is already disabled 🔴.")
-			return telegram.EndGroup
+			m.Reply(F(chatID, "maint_already_disabled"))
 		}
+		return tg.ErrEndGroup
 	}
 
-	_ = database.SetMaintenance(enable, reason)
-	logger.InfoF("User %d set maintenance mode to %v. Reason: %s", m.SenderID(), enable, reason)
+	// apply new state
+	database.SetMaintenance(enable, reason)
+	logger.InfoF("User %d set maintenance: %v (reason: %s)", m.SenderID(), enable, reason)
 
 	if enable {
-		maintenanceCancel.Lock()
-		maintenanceCancel.cancel = false
-		maintenanceCancel.Unlock()
+		maintCancel.Lock()
+		maintCancel.cancel = false
+		maintCancel.Unlock()
 
-		go func(c *telegram.Client, reason string) {
+		go func(c *tg.Client, reason string) {
 			for _, id := range core.GetAllRoomIDs() {
-				maintenanceCancel.Lock()
-				if maintenanceCancel.cancel {
-					maintenanceCancel.Unlock()
+				maintCancel.Lock()
+				if maintCancel.cancel {
+					maintCancel.Unlock()
 					break
 				}
-				maintenanceCancel.Unlock()
+				maintCancel.Unlock()
+				ass, err := core.Assistants.ForChat(id)
+				if err != nil {
+					gologging.ErrorF("Failed to get Assistant for %d: %v", id, err)
+					continue
+				}
 
-				if r, ok := core.GetRoom(id); ok {
-
+				if r, ok := core.GetRoom(id, ass); ok {
 					r.Destroy()
+					msg := F(id, "maint_entering")
 					if reason != "" {
-						c.SendMessage(id, "⚠️ Bot is entering maintenance mode.\n📝 Reason: "+reason)
-
-						time.Sleep(1 * time.Second)
+						msg += "\n" + F(id, "maint_reason", locales.Arg{"reason": reason})
 					}
+					c.SendMessage(id, msg)
+					time.Sleep(time.Second)
 				}
 			}
 		}(m.Client, reason)
 
-		msg := "✅ Maintenance mode enabled successfully."
+		args := locales.Arg{}
 		if reason != "" {
-			msg += fmt.Sprintf("\n📝 Reason: %s", reason)
+			args["reason"] = reason
+			m.Reply(F(chatID, "maint_enabled_reason", args))
+		} else {
+			m.Reply(F(chatID, "maint_enabled"))
 		}
-		m.Reply(msg)
-		return telegram.EndGroup
+		return tg.ErrEndGroup
 	}
 
-	maintenanceCancel.Lock()
-	maintenanceCancel.cancel = true
-	maintenanceCancel.Unlock()
+	// disable maintenance
+	maintCancel.Lock()
+	maintCancel.cancel = true
+	maintCancel.Unlock()
 
-	m.Reply("✅ Maintenance mode disabled successfully.")
-	return telegram.EndGroup
+	m.Reply(F(chatID, "maint_disabled"))
+	return tg.ErrEndGroup
 }

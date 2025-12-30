@@ -33,35 +33,65 @@ package main
 import "C"
 
 import (
+	"os"
+
 	"github.com/Laky-64/gologging"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/cookies"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/modules"
+	"main/internal/config"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/modules"
 )
+
+var l = gologging.GetLogger("Main")
 
 func main() {
 	gologging.SetLevel(gologging.DebugLevel)
-	gologging.GetLogger("webrtc").SetLevel(gologging.WarnLevel)
+	gologging.GetLogger("ntgcalls").SetLevel(gologging.ErrorLevel)
+	gologging.GetLogger("webrtc").SetLevel(gologging.FatalLevel)
 
-	l := gologging.GetLogger("Main")
+	checkFFmpegAndFFprobe()
+	refreshCacheAndDownloads()
 
 	l.Debug("🔹 Initializing MongoDB...")
 	dbCleanup := database.Init(config.MongoURI)
 	defer dbCleanup()
 	l.Info("✅ Database connected successfully")
-
-	go database.MigrateData(config.MongoURI)
-
-	l.Debug("🔹 Initializing cookies...")
-	cookies.Init()
-
 	l.Debug("🔹 Initializing clients...")
-	cleanup := core.Init(config.ApiID, config.ApiHash, config.Token, config.StringSession, config.LoggerID)
+	cleanup := core.Init(
+		config.ApiID,
+		config.ApiHash,
+		config.Token,
+		config.StringSessions, // list of sessions
+		config.SessionType,    // pyrogram / telethon / gogram
+		config.LoggerID,
+	)
 	defer cleanup()
-	modules.Init(core.Bot, core.UBot, core.Ntg)
-	l.Info("🚀 Bot is started")
+
+	core.AssistantIndexFunc = database.GetAssistantIndex
+	core.GetChatLanguage = database.GetChatLanguage
+
+	if err := database.RebalanceAssistantIndexes(core.Assistants.Count()); err != nil {
+		l.Fatal("Failed to rebalance Assistants: " + err.Error())
+	}
+
+	modules.Init(core.Bot, core.Assistants)
 	core.Bot.Idle()
+}
+
+func refreshCacheAndDownloads() error {
+	dirs := []string{
+		"./cache",
+		"./downloads",
+	}
+
+	for _, dir := range dirs {
+		if err := os.RemoveAll(dir); err != nil {
+			return err
+		}
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return err
+		}
+	}
+	return nil
 }

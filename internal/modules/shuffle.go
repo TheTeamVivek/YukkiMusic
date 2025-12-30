@@ -20,13 +20,37 @@
 package modules
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/locales"
+	"main/internal/utils"
 )
+
+func init() {
+	helpTexts["/shuffle"] = `<i>Toggle shuffle mode for the queue.</i>
+
+<u>Usage:</u>
+<b>/shuffle</b> — Show current shuffle state
+<b>/shuffle on</b> — Enable shuffle
+<b>/shuffle off</b> — Disable shuffle
+
+<b>⚙️ Behavior:</b>
+• Randomly reorders queue when enabled
+• Affects track selection order
+• Can be toggled at any time
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/shuffle on</code> — Enable shuffle mode
+<code>/shuffle off</code> — Disable shuffle mode
+
+<b>⚠️ Note:</b>
+Shuffle only affects queue order, not currently playing track.`
+}
 
 func shuffleHandler(m *telegram.NewMessage) error {
 	return handleShuffle(m, false)
@@ -42,29 +66,30 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
+	chatID := m.ChannelID()
 
-	if r.Track == nil {
-		m.Reply("⚠️ No active playback found.")
-		return telegram.EndGroup
+	if !r.IsActiveChat() {
+		m.Reply(F(chatID, "room_no_active"))
+		return telegram.ErrEndGroup
 	}
 
 	r.Parse()
 
 	if arg == "" {
-		state := "disabled ❌"
+		state := F(chatID, "disabled")
 		cmd := getCommand(m) + " on"
-		if r.Shuffle {
-			state = "enabled ✅"
+		if r.Shuffle() {
+			state = F(chatID, "enabled")
 			cmd = getCommand(m) + " off"
 		}
 
-		m.Reply(fmt.Sprintf(
-			"🔀 Currently shuffle is <b>%s</b> for this chat.\n\nUse <code>%s</code> to toggle it.",
-			state, cmd,
-		))
-		return telegram.EndGroup
+		m.Reply(F(chatID, "shuffle_current_state", locales.Arg{
+			"state": state,
+			"cmd":   cmd,
+		}))
+		return telegram.ErrEndGroup
 	}
 
 	var newState bool
@@ -76,11 +101,15 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 
 	r.SetShuffle(newState)
 
-	state := "disabled ❌"
+	state := F(chatID, "disabled")
 	if newState {
-		state = "enabled ✅"
+		state = F(chatID, "enabled")
 	}
 
-	m.Reply(fmt.Sprintf("🔀 Shuffle <b>%s</b> by %s.", state, utils.MentionHTML(m.Sender)))
-	return telegram.EndGroup
+	m.Reply(F(chatID, "shuffle_updated", locales.Arg{
+		"state": state,
+		"user":  utils.MentionHTML(m.Sender),
+	}))
+
+	return telegram.ErrEndGroup
 }

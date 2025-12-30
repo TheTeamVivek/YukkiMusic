@@ -20,12 +20,70 @@
 package modules
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/amarnathcjd/gogram/telegram"
+
+	"main/internal/locales"
 )
+
+func init() {
+	helpTexts["/seek"] = `<i>Seek forward in the currently playing track.</i>
+
+<u>Usage:</u>
+<b>/seek [seconds]</b> — Skip forward by specified seconds
+
+<b>⚙️ Features:</b>
+• Jump ahead in current track
+• Position tracking updated
+• Cannot seek past track end (10s buffer)
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/seek 30</code> — Skip forward 30 seconds
+<code>/seek 120</code> — Skip forward 2 minutes
+
+<b>⚠️ Notes:</b>
+• Minimum: any positive value
+• Maximum: track_duration - current_position - 10 seconds`
+
+	helpTexts["/seekback"] = `<i>Seek backward in the currently playing track.</i>
+
+<u>Usage:</u>
+<b>/seekback [seconds]</b> — Go back by specified seconds
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/seekback 15</code> — Go back 15 seconds
+<code>/seekback 60</code> — Go back 1 minute
+`
+
+	helpTexts["/jump"] = `<i>Jump to a specific position in the track.</i>
+
+<u>Usage:</u>
+<b>/jump [seconds]</b> — Jump to exact position
+
+<b>⚙️ Features:</b>
+• Absolute position seeking
+• Precise time control
+• 10-second buffer from end
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/jump 90</code> — Jump to 1:30
+<code>/jump 0</code> — Jump to start (same as /replay)
+
+<b>⚠️ Notes:</b>
+• Position must be within track duration - 10 seconds
+• More precise than <code>/seek</code> and <code>/seekback</code>`
+}
 
 func seekHandler(m *telegram.NewMessage) error {
 	return handleSeek(m, false, false)
@@ -43,68 +101,6 @@ func cseekbackHandler(m *telegram.NewMessage) error {
 	return handleSeek(m, true, true)
 }
 
-func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
-	r, err := getEffectiveRoom(m, cplay)
-	if err != nil {
-		m.Reply(err.Error())
-		return telegram.EndGroup
-	}
-	if !r.IsActiveChat() {
-		m.Reply("⚠️ <b>No track is currently playing.</b>")
-		return telegram.EndGroup
-	}
-	args := strings.Fields(m.Text())
-	if len(args) < 2 {
-		m.Reply(fmt.Sprintf("⚠️ Please provide seconds. Example: <code>%s 40</code>", getCommand(m)))
-		return telegram.EndGroup
-	}
-	seconds, err := strconv.Atoi(args[1])
-	if err != nil {
-		m.Reply(fmt.Sprintf("⚠️ Invalid seconds value. Example: <code>%s 40</code>", getCommand(m)))
-		return telegram.EndGroup
-	}
-
-	var direction, emoji string
-	var seekErr error
-
-	if isBack {
-		if (r.Position - seconds) <= 10 {
-			m.Reply(fmt.Sprintf(
-				"⚠️ Cannot seek backward %d seconds — that would be too close to the beginning of the track.",
-				seconds,
-			))
-			return telegram.EndGroup
-		}
-		seekErr = r.Seek(-seconds)
-		direction = "backward"
-		emoji = "⏪"
-	} else {
-		if (r.Track.Duration - (r.Position + seconds)) <= 10 {
-			m.Reply(fmt.Sprintf(
-				"⚠️ Cannot seek forward %d seconds — that would be too close to the end of the track.",
-				seconds,
-			))
-			return telegram.EndGroup
-		}
-		seekErr = r.Seek(seconds)
-		direction = "forward"
-		emoji = "⏩"
-	}
-
-	if seekErr != nil {
-		m.Reply(fmt.Sprintf("❌ Failed to seek %s %d seconds.\nError: %v", direction, seconds, seekErr))
-	} else {
-		m.Reply(fmt.Sprintf(
-			"%s Jumped %s to <u>%s</u> of <u>%s</u>.",
-			emoji,
-			direction,
-			formatDuration(r.Position),
-			formatDuration(r.Track.Duration),
-		))
-	}
-	return telegram.EndGroup
-}
-
 func jumpHandler(m *telegram.NewMessage) error {
 	return handleJump(m, false)
 }
@@ -113,41 +109,127 @@ func cjumpHandler(m *telegram.NewMessage) error {
 	return handleJump(m, true)
 }
 
+func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
+	r, err := getEffectiveRoom(m, cplay)
+	if err != nil {
+		m.Reply(err.Error())
+		return telegram.ErrEndGroup
+	}
+	chatID := m.ChannelID()
+	t := r.Track()
+	if !r.IsActiveChat() || t == nil {
+		m.Reply(F(chatID, "seek_no_active"))
+		return telegram.ErrEndGroup
+	}
+
+	args := strings.Fields(m.Text())
+	if len(args) < 2 {
+		m.Reply(F(chatID, "seek_usage", locales.Arg{
+			"cmd": getCommand(m),
+		}))
+		return telegram.ErrEndGroup
+	}
+
+	seconds, err := strconv.Atoi(args[1])
+	if err != nil {
+		m.Reply(F(chatID, "seek_invalid_seconds", locales.Arg{
+			"cmd": getCommand(m),
+		}))
+		return telegram.ErrEndGroup
+	}
+
+	var direction, emoji string
+	var seekErr error
+
+	if isBack {
+		if (r.Position() - seconds) <= 10 {
+			m.Reply(F(chatID, "seek_too_close_start", locales.Arg{
+				"seconds": seconds,
+			}))
+			return telegram.ErrEndGroup
+		}
+		seekErr = r.Seek(-seconds)
+		direction = "backward"
+		emoji = "⏪"
+	} else {
+		if (t.Duration - (r.Position() + seconds)) <= 10 {
+			m.Reply(F(chatID, "seek_too_close_end", locales.Arg{
+				"seconds": seconds,
+			}))
+			return telegram.ErrEndGroup
+		}
+		seekErr = r.Seek(seconds)
+		direction = "forward"
+		emoji = "⏩"
+	}
+
+	if seekErr != nil {
+		m.Reply(F(chatID, "seek_failed", locales.Arg{
+			"direction": direction,
+			"seconds":   seconds,
+			"error":     seekErr,
+		}))
+	} else {
+		m.Reply(F(chatID, "seek_success", locales.Arg{
+			"emoji":     emoji,
+			"direction": direction,
+			"position":  formatDuration(r.Position()),
+			"duration":  formatDuration(t.Duration),
+		}))
+	}
+
+	return telegram.ErrEndGroup
+}
+
 func handleJump(m *telegram.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
-	if !r.IsActiveChat() || r.Track == nil {
-		m.Reply("⚠️ <b>No active track to jump within.</b>")
-		return telegram.EndGroup
+
+	chatID := m.ChannelID()
+	t := r.Track()
+
+	if !r.IsActiveChat() || t == nil {
+		m.Reply(F(chatID, "jump_no_active"))
+		return telegram.ErrEndGroup
 	}
+
 	args := strings.Fields(m.Text())
 	if len(args) < 2 {
-		m.Reply(fmt.Sprintf("⚠️ Please provide seconds. Example: <code>%s 120</code>", getCommand(m)))
-		return telegram.EndGroup
+		m.Reply(F(chatID, "jump_usage", locales.Arg{
+			"cmd": getCommand(m),
+		}))
+		return telegram.ErrEndGroup
 	}
+
 	seconds, err := strconv.Atoi(args[1])
 	if err != nil || seconds < 0 {
-		m.Reply(fmt.Sprintf("⚠️ Invalid position. Example: <code>%s 120</code>", getCommand(m)))
-		return telegram.EndGroup
+		m.Reply(F(chatID, "jump_invalid_position", locales.Arg{
+			"cmd": getCommand(m),
+		}))
+		return telegram.ErrEndGroup
 	}
-	if r.Track.Duration-seconds <= 10 {
-		m.Reply(fmt.Sprintf(
-			"⚠️ Cannot jump to %s — that’s too close to the end of the track.",
-			formatDuration(seconds),
-		))
-		return telegram.EndGroup
+
+	if t.Duration-seconds <= 10 {
+		m.Reply(F(chatID, "jump_too_close_end", locales.Arg{
+			"position": formatDuration(seconds),
+		}))
+		return telegram.ErrEndGroup
 	}
-	if err := r.Seek(seconds - r.Position); err != nil {
-		m.Reply(fmt.Sprintf("❌ Failed to jump to %d sec.\nError: %v", seconds, err))
+
+	if err := r.Seek(seconds - r.Position()); err != nil {
+		m.Reply(F(chatID, "jump_failed", locales.Arg{
+			"position": formatDuration(seconds),
+			"error":    err,
+		}))
 	} else {
-		m.Reply(fmt.Sprintf(
-			"⏩ Jumped to <u>%s</u> of <u>%s</u>.",
-			formatDuration(seconds),
-			formatDuration(r.Track.Duration),
-		))
+		m.Reply(F(chatID, "jump_success", locales.Arg{
+			"position": formatDuration(seconds),
+			"duration": formatDuration(t.Duration),
+		}))
 	}
-	return telegram.EndGroup
+
+	return telegram.ErrEndGroup
 }

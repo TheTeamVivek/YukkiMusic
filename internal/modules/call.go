@@ -21,47 +21,48 @@ package modules
 
 import (
 	"context"
-	"fmt"
 	"html"
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/platforms"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
-	"github.com/TheTeamVivek/YukkiMusic/ntgcalls"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/locales"
+	"main/internal/platforms"
+	"main/internal/utils"
 )
 
-func onStreamEndHandler(chatID int64, streamType ntgcalls.StreamType, streamDevice ntgcalls.StreamDevice) {
-	r, ok := core.GetRoom(chatID)
+func onStreamEndHandler(chatID int64) {
+	ass, err := core.Assistants.ForChat(chatID)
+	if err != nil {
+		gologging.ErrorF("Failed to get Assistant for %d: %v", chatID, err)
+		return
+	}
+	r, ok := core.GetRoom(chatID, ass)
 	if !ok {
 		return
 	}
 	r.Parse()
-	if r.IsCPlay() {
 
+	if r.IsCPlay() {
 		cid, err := database.GetChatIDFromCPlayID(chatID)
 		if err != nil {
-
-			core.Bot.SendMessage(chatID, "⚠️ Failed to get your connected channel's ID")
+			core.Bot.SendMessage(chatID, F(chatID, "stream_channelid_fail"))
 			r.Destroy()
 			return
 		}
-
 		chatID = cid
-
 	}
-	if len(r.Queue) == 0 && r.Loop == 0 {
+
+	if len(r.Queue()) == 0 && r.Loop() == 0 {
 		r.Destroy()
-		core.Bot.SendMessage(chatID, "🎵 <b>Queue Finished!</b>\n\nNo more songs to play. Use /play to add more tracks! 🎶")
+		core.Bot.SendMessage(chatID, F(chatID, "stream_queue_finished"))
 		return
 	}
 
 	t := r.NextTrack()
-
-	mystic, err := core.Bot.SendMessage(chatID, "📥 Downloading your next track...")
+	mystic, err := core.Bot.SendMessage(chatID, F(chatID, "stream_downloading_next"))
 	if err != nil {
 		gologging.ErrorF("[call.go] Failed to send msg: %v", err)
 	}
@@ -69,27 +70,30 @@ func onStreamEndHandler(chatID int64, streamType ntgcalls.StreamType, streamDevi
 	filePath, err := platforms.Download(context.Background(), t, mystic)
 	if err != nil {
 		gologging.ErrorF("Download failed for %s: %v", t.URL, err)
-		utils.EOR(mystic, fmt.Sprintf("❌ Failed to download.\nError: %v\nUse /skip to skip playback", err))
+		utils.EOR(mystic, F(chatID, "stream_download_fail", locales.Arg{
+			"error": err.Error(),
+		}))
 		return
 	}
+
 	if err := r.Play(t, filePath); err != nil {
-		utils.EOR(mystic, "❌ Failed to play song.")
+		utils.EOR(mystic, F(chatID, "stream_play_fail"))
 		return
 	}
 
 	title := utils.ShortTitle(t.Title, 25)
 	safeTitle := html.EscapeString(title)
 
-	msgText := fmt.Sprintf(
-		"<b>🎵 Now Playing:</b>\n\n<b>▫ Track:</b> <a href=\"%s\">%s</a>\n<b>▫ Duration:</b> %s\n<b>▫ Requested by:</b> %s",
-		t.URL,
-		safeTitle,
-		formatDuration(t.Duration),
-		t.BY,
-	)
-	opt := telegram.SendOptions{
+	msgText := F(chatID, "stream_now_playing", locales.Arg{
+		"url":      t.URL,
+		"title":    safeTitle,
+		"duration": formatDuration(t.Duration),
+		"by":       t.Requester,
+	})
+
+	opt := &telegram.SendOptions{
 		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(r, false),
+		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
 	}
 
 	if t.Artwork != "" {

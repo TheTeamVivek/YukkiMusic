@@ -25,7 +25,8 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
+	"main/internal/core"
+	"main/internal/database"
 )
 
 var logger = gologging.GetLogger("monitor")
@@ -41,20 +42,48 @@ func MonitorRooms() {
 			sem <- struct{}{}
 			go func(id int64) {
 				defer func() { <-sem }()
+				ass, err := core.Assistants.ForChat(id)
+				if err != nil {
+					gologging.ErrorF("Failed to get Assistant for %d: %v", id, err)
+					return
+				}
 
-				r, ok := core.GetRoom(id)
-				if !ok || !r.IsActiveChat() || r.IsPaused() {
+				r, ok := core.GetRoom(id, ass)
+				if !ok {
+					gologging.DebugF("Room not exists for %d returning..", chatID)
+					return
+				}
+				if !r.IsActiveChat() {
+					// recheck after delay before deleting
+					time.Sleep(7 * time.Second)
+					if r2, ok2 := core.GetRoom(id, ass); ok2 && !r2.IsActiveChat() {
+						core.DeleteRoom(id)
+					}
+					return
+				}
+
+				if r.IsPaused() {
+					gologging.DebugF("Room paused for %d returning..", chatID)
+
 					return
 				}
 
 				r.Parse()
 				mystic := r.GetMystic()
 				if mystic == nil {
+					gologging.DebugF("mystic is nil for %d returning..", chatID)
+
 					return
 				}
-
-				markup := core.GetPlayMarkup(r, false)
-				opts := telegram.SendOptions{
+				chatID := id
+				if r.IsCPlay() {
+					cid, err := database.GetChatIDFromCPlayID(id)
+					if err == nil {
+						chatID = cid
+					}
+				}
+				markup := core.GetPlayMarkup(chatID, r, false)
+				opts := &telegram.SendOptions{
 					ReplyMarkup: markup,
 					Entities:    mystic.Message.Entities,
 				}

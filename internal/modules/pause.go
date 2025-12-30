@@ -26,54 +26,83 @@ import (
 	"strings"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/locales"
+	"main/internal/utils"
 )
 
-func pauseHandler(m *telegram.NewMessage) error {
+func init() {
+	helpTexts["/pause"] = `<i>Pause the current playback.</i>
+
+<u>Usage:</u>
+<b>/pause</b> — Pause playback
+<b>/pause [seconds]</b> — Pause with auto-resume after specified seconds
+
+<b>⚙️ Features:</b>
+• Manual pause/resume control
+• Auto-resume timer (5-3600 seconds)
+
+<b>💡 Examples:</b>
+<code>/pause</code> — Pause indefinitely
+<code>/pause 30</code> — Pause for 30 seconds then auto-resume
+`
+}
+
+func pauseHandler(m *tg.NewMessage) error {
 	return handlePause(m, false)
 }
 
-func cpauseHandler(m *telegram.NewMessage) error {
+func cpauseHandler(m *tg.NewMessage) error {
 	return handlePause(m, true)
 }
 
-func handlePause(m *telegram.NewMessage, cplay bool) error {
+func handlePause(m *tg.NewMessage, cplay bool) error {
+	chatID := m.ChannelID()
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return tg.ErrEndGroup
 	}
+
 	if !r.IsActiveChat() {
-		m.Reply("⚠️ <b>No active playback.</b>\nThere’s nothing playing right now.")
-		return telegram.EndGroup
+		m.Reply(F(chatID, "room_no_active"))
+		return tg.ErrEndGroup
 	}
-	if r.IsMuted() {
-		m.Reply("⚠️ <b>Oops!</b>\nThe room is muted. Please unmute it first to pause playback.")
-		return telegram.EndGroup
-	}
+
 	if r.IsPaused() {
 		remaining := r.RemainingResumeDuration()
+		autoResumeLine := ""
 		if remaining > 0 {
-			m.Reply(fmt.Sprintf("⏸️ <b>Already Paused</b>\nThe music is already paused.\nAuto-resume in <b>%s</b>", formatDuration(int(remaining.Seconds()))))
-		} else {
-			m.Reply("⏸️ <b>Already Paused</b>\nThe music is already paused. Would you like to resume it?")
+			autoResumeLine = F(chatID, "auto_resume_line", locales.Arg{
+				"seconds": formatDuration(int(remaining.Seconds())),
+			})
 		}
-		return telegram.EndGroup
+		m.Reply(F(chatID, "pause_already", locales.Arg{
+			"auto_resume_line": autoResumeLine,
+		}))
+		return tg.ErrEndGroup
 	}
+
 	args := strings.Fields(m.Text())
 	var autoResumeDuration time.Duration
 	if len(args) >= 2 {
-		rawDuration := strings.ToLower(strings.TrimSpace(args[1]))
-		rawDuration = strings.TrimSuffix(rawDuration, "s")
-		seconds, err := strconv.Atoi(rawDuration)
-		if err != nil || seconds < 5 || seconds > 3600 {
-			m.Reply("⚠️ Invalid duration for auto-resume. It must be between <b>5</b> and <b>3600</b> seconds.")
-			return telegram.EndGroup
+		raw := strings.ToLower(strings.TrimSpace(args[1]))
+		raw = strings.TrimSuffix(raw, "s")
+		if sec, convErr := strconv.Atoi(raw); convErr == nil {
+			if sec < 5 || sec > 3600 {
+				m.Reply(F(chatID, "pause_invalid_duration"))
+				return tg.ErrEndGroup
+			}
+			autoResumeDuration = time.Duration(sec) * time.Second
+		} else {
+			m.Reply(F(chatID, "pause_invalid_format", locales.Arg{
+				"cmd": getCommand(m),
+			}))
+			return tg.ErrEndGroup
 		}
-		autoResumeDuration = time.Duration(seconds) * time.Second
 	}
+
 	var pauseErr error
 	if autoResumeDuration > 0 {
 		_, pauseErr = r.Pause(autoResumeDuration)
@@ -81,19 +110,36 @@ func handlePause(m *telegram.NewMessage, cplay bool) error {
 		_, pauseErr = r.Pause()
 	}
 	if pauseErr != nil {
-		m.Reply(fmt.Sprintf("❌ <b>Playback Pause Failed</b>\nError: <code>%v</code>", pauseErr))
-		return telegram.EndGroup
+		m.Reply(F(chatID, "room_pause_failed", locales.Arg{
+			"error": pauseErr.Error(),
+		}))
+		return tg.ErrEndGroup
 	}
+
 	mention := utils.MentionHTML(m.Sender)
-	trackTitle := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
-	msg := fmt.Sprintf("⏸️ <b>Paused playback</b>\n\nTrack: \"%s\"\nPosition: %s / %s\nPaused by: %s\n",
-		trackTitle, formatDuration(r.Position), formatDuration(r.Track.Duration), mention)
-	if sp := r.GetSpeed(); sp != 1.0 {
-		msg += fmt.Sprintf("⚙️ Speed: <b>%.2fx</b>\n", sp)
-	}
+	title := html.EscapeString(utils.ShortTitle(r.Track().Title, 25))
+
+	autoResumeLine := ""
 	if autoResumeDuration > 0 {
-		msg += fmt.Sprintf("\n<i>⏳ Will auto-resume playback after %d seconds</i>", int(autoResumeDuration.Seconds()))
+		autoResumeLine = F(chatID, "auto_resume_line", locales.Arg{
+			"seconds": int(autoResumeDuration.Seconds()),
+		})
 	}
+
+	msg := F(chatID, "pause_success", locales.Arg{
+		"title":            title,
+		"position":         formatDuration(r.Position()),
+		"duration":         formatDuration(r.Track().Duration),
+		"user":             mention,
+		"auto_resume_line": autoResumeLine,
+	})
+
+	if sp := r.GetSpeed(); sp != 1.0 {
+		msg += "\n" + F(chatID, "speed_line", locales.Arg{
+			"speed": fmt.Sprintf("%.2f", sp),
+		})
+	}
+
 	m.Reply(msg)
-	return telegram.EndGroup
+	return tg.ErrEndGroup
 }

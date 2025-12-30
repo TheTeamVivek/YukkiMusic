@@ -38,23 +38,20 @@ func GetProgress(mystic *telegram.NewMessage) *telegram.ProgressManager {
 		opts = &telegram.SendOptions{ReplyMarkup: *replyMarkup}
 	}
 
-	pm.WithEdit(func(total, current int64) {
-		if mystic == nil {
-			return
-		}
-
+	pm.WithCallback(func(pi *telegram.ProgressInfo) {
 		text := fmt.Sprintf(
-			"📥 Downloading your track...\n\nProgress: %.1f%%\nETA: %s | Speed: %s",
-			pm.GetProgress(current),
-			pm.GetETA(current),
-			pm.GetSpeed(current),
+			"📥 Downloading your track...\n\n"+
+				"Progress: %.1f%%\n"+
+				"Speed: %s\n"+
+				"ETA: %s\n"+
+				"Elapsed: %s",
+			pi.Percentage,
+			pi.SpeedString(),
+			pi.ETAString(),
+			pi.ElapsedString(),
 		)
 
-		if opts != nil {
-			mystic.Edit(text, *opts)
-		} else {
-			mystic.Edit(text)
-		}
+		mystic.Edit(text, opts)
 	})
 
 	return pm

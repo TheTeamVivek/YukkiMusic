@@ -5,14 +5,29 @@ func (ctx *Context) Stop(chatId any) error {
 	if err != nil {
 		return err
 	}
+
+	ctx.presentationsMutex.Lock()
 	ctx.presentations = stdRemove(ctx.presentations, parsedChatId)
+	ctx.presentationsMutex.Unlock()
+
+	ctx.pendingPresentationMutex.Lock()
 	delete(ctx.pendingPresentation, parsedChatId)
+	ctx.pendingPresentationMutex.Unlock()
+
+	ctx.callSourcesMutex.Lock()
 	delete(ctx.callSources, parsedChatId)
+	ctx.callSourcesMutex.Unlock()
+
 	err = ctx.binding.Stop(parsedChatId)
 	if err != nil {
 		return err
 	}
-	_, err = ctx.app.PhoneLeaveGroupCall(ctx.inputGroupCalls[parsedChatId], 0)
+
+	ctx.inputGroupCallsMutex.RLock()
+	inputGroupCall := ctx.inputGroupCalls[parsedChatId]
+	ctx.inputGroupCallsMutex.RUnlock()
+
+	_, err = ctx.app.PhoneLeaveGroupCall(inputGroupCall, 0)
 	if err != nil {
 		return err
 	}

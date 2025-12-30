@@ -23,46 +23,78 @@ import (
 	"fmt"
 	"html"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/locales"
+	"main/internal/utils"
 )
 
-func unmuteHandler(m *telegram.NewMessage) error {
+func init() {
+	helpTexts["/unmute"] = `<i>Unmute the audio output in voice chat.</i>
+
+<u>Usage:</u>
+<b>/unmute</b> — Restore audio
+
+<b>⚙️ Behavior:</b>
+• Restores audio immediately
+• Cancels auto-unmute timer if active
+• Shows current playback info`
+}
+
+func unmuteHandler(m *tg.NewMessage) error {
 	return handleUnmute(m, false)
 }
 
-func cunmuteHandler(m *telegram.NewMessage) error {
+func cunmuteHandler(m *tg.NewMessage) error {
 	return handleUnmute(m, true)
 }
 
-func handleUnmute(m *telegram.NewMessage, cplay bool) error {
+func handleUnmute(m *tg.NewMessage, cplay bool) error {
+	if m.Args() != "" {
+		return tg.ErrEndGroup
+	}
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return tg.ErrEndGroup
 	}
+
+	chatID := m.ChannelID()
+
 	if !r.IsActiveChat() {
-		m.Reply("⚠️ <b>No active playback.</b>\nThere’s nothing playing right now.")
-		return telegram.EndGroup
+		m.Reply(F(chatID, "room_no_active"))
+		return tg.ErrEndGroup
 	}
+
 	if !r.IsMuted() {
-		m.Reply("ℹ️ <b>Already Unmuted</b>\nThe music is not muted in this chat.")
-		return telegram.EndGroup
+		m.Reply(F(chatID, "unmute_already"))
+		return tg.ErrEndGroup
 	}
+
+	title := html.EscapeString(utils.ShortTitle(r.Track().Title, 25))
 	mention := utils.MentionHTML(m.Sender)
-	trackTitle := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
+
 	if _, err := r.Unmute(); err != nil {
-		m.Reply(fmt.Sprintf("❌ <b>Playback Unmute Failed</b>\nError: <code>%v</code>", err))
-		return telegram.EndGroup
+		m.Reply(F(chatID, "unmute_failed", locales.Arg{
+			"error": err.Error(),
+		}))
+		return tg.ErrEndGroup
 	}
-	msg := fmt.Sprintf(
-		"🔊 <b>Unmuted playback</b>\n\n🎵 Track: %s\n👤 Unmuted by: %s",
-		trackTitle, mention,
-	)
+
+	// optional speed line
+	var speedOpt string
 	if sp := r.GetSpeed(); sp != 1.0 {
-		msg += fmt.Sprintf("\n⚙️ Speed: <b>%.2fx</b>", sp)
+		speedOpt = F(chatID, "speed_line", locales.Arg{
+			"speed": fmt.Sprintf("%.2f", sp),
+		})
 	}
+
+	msg := F(chatID, "unmute_success", locales.Arg{
+		"title":      title,
+		"user":       mention,
+		"speed_line": speedOpt,
+	})
+
 	m.Reply(msg)
-	return telegram.EndGroup
+	return tg.ErrEndGroup
 }

@@ -17,28 +17,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package database
 
-func IsLoggerEnabled() (bool, error) {
-	ctx, cancel := mongoCtx()
-	defer cancel()
+package main
 
-	state, err := getBotState(ctx)
-	if err != nil {
-		return false, err
-	}
-	return state.LoggerEnabled, nil
-}
+import (
+	"os/exec"
+)
 
-func SetLoggerEnabled(enabled bool) error {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
-	state, err := getBotState(ctx)
-	if err != nil || state.LoggerEnabled == enabled {
-		return err
+func checkFFmpegAndFFprobe() {
+	if _, err := exec.LookPath("ffmpeg"); err != nil {
+		l.Fatal("❌ ffmpeg not found in PATH. Please install ffmpeg.")
 	}
 
-	state.LoggerEnabled = enabled
-	return updateBotState(ctx, state)
+	if _, err := exec.LookPath("ffprobe"); err != nil {
+		l.Fatal("❌ ffprobe not found in PATH. Please install ffprobe.")
+	}
 }

@@ -20,60 +20,109 @@
 package modules
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/locales"
+	"main/internal/utils"
 )
 
-func loopHandler(m *telegram.NewMessage) error {
+func init() {
+	helpTexts["/loop"] = `<i>Set loop count for the current track.</i>
+
+<u>Usage:</u>
+<b>/loop</b> — Show current loop count
+<b>/loop [count]</b> — Set loop count (0-10)
+
+<b>⚙️ Behavior:</b>
+• 0 = No loop (play once)
+• 1-10 = Repeat track that many times
+• Loop counter decrements after each playback
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/loop 0</code> — Disable loop
+<code>/loop 3</code> — Loop current track 3 times
+<code>/loop 10</code> — Loop current track 10 times
+
+<b>⚠️ Notes:</b>
+• Maximum loop count: 10
+• Loop affects only current track
+• After loops complete, plays next in queue`
+}
+
+func loopHandler(m *tg.NewMessage) error {
 	return handleLoop(m, false)
 }
 
-func cloopHandler(m *telegram.NewMessage) error {
+func cloopHandler(m *tg.NewMessage) error {
 	return handleLoop(m, true)
 }
 
-func handleLoop(m *telegram.NewMessage, cplay bool) error {
+func handleLoop(m *tg.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return tg.ErrEndGroup
 	}
+	chatID := m.ChannelID()
 	args := strings.Fields(m.Text())
-	currentLoop := r.Loop
+	currentLoop := r.Loop()
+
 	if !r.IsActiveChat() {
-		m.Reply("⚠️ <b>No active playback.</b>\nThere's nothing playing right now.")
-		return telegram.EndGroup
+		m.Reply(F(chatID, "room_no_active"))
+		return tg.ErrEndGroup
 	}
+
 	if len(args) < 2 {
-		msg := fmt.Sprintf("🔁 <b>Loop Control</b>\n\nUsage: %s [count]\n• 0 - Disable loop\n• 1-10 - Loop count", getCommand(m))
+		countLine := ""
 		if currentLoop > 0 {
-			msg += fmt.Sprintf("\n• Current loop: <b>%d</b> time(s)", currentLoop)
+			countLine = "\n" + F(chatID, "loop_current", locales.Arg{
+				"count": currentLoop,
+			})
 		}
+
+		msg := F(m.ChannelID(), "loop_usage", locales.Arg{
+			"cmd":        getCommand(m),
+			"count_line": countLine,
+		})
+
 		m.Reply(msg)
-		return telegram.EndGroup
+		return tg.ErrEndGroup
 	}
+
 	newLoop, err := strconv.Atoi(args[1])
 	if err != nil || newLoop < 0 || newLoop > 10 {
-		m.Reply("⚠️ <b>Invalid loop count.</b>\nUse 0 to disable or 1-10 to set loop count.")
-		return telegram.EndGroup
+		m.Reply(F(chatID, "loop_invalid"))
+		return tg.ErrEndGroup
 	}
+
 	if newLoop == currentLoop {
-		m.Reply(fmt.Sprintf("⚠️ Loop count is already set to <b>%d</b> time(s).", currentLoop))
-		return telegram.EndGroup
+		m.Reply(F(chatID, "loop_already_set", locales.Arg{
+			"count": currentLoop,
+		}))
+		return tg.ErrEndGroup
 	}
-	r.Lock()
-	r.Loop = newLoop
-	r.Unlock()
+
+	r.SetLoop(newLoop)
+
 	mention := utils.MentionHTML(m.Sender)
-	msg := "🔁 Loop has been <b>disabled</b> by " + mention
-	if newLoop > 0 {
-		msg = fmt.Sprintf("🔁 Set to loop <b>%d</b> time(s)\n└ Changed by: %s", newLoop, mention)
+	var msg string
+	if newLoop == 0 {
+		msg = F(chatID, "loop_disabled", locales.Arg{
+			"user": mention,
+		})
+	} else {
+		msg = F(chatID, "loop_set", locales.Arg{
+			"count": newLoop,
+			"user":  mention,
+		})
 	}
+
 	m.Reply(msg)
-	return telegram.EndGroup
+	return tg.ErrEndGroup
 }

@@ -21,16 +21,36 @@ package modules
 
 import (
 	"context"
-	"fmt"
 	"html"
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/platforms"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/core"
+	"main/internal/locales"
+	"main/internal/platforms"
+	"main/internal/utils"
 )
+
+func init() {
+	helpTexts["/skip"] = `<i>Skip the currently playing track and play the next in queue.</i>
+
+<u>Usage:</u>
+<b>/skip</b> — Skip current track
+
+<b>⚙️ Behavior:</b>
+• Downloads next track in queue
+• Starts playback automatically
+• If queue is empty and loop is 0, stops playback
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>⚠️ Notes:</b>
+• Cannot be undone
+• If no tracks in queue, playback stops
+• Loop count affects skip behavior`
+}
 
 func skipHandler(m *telegram.NewMessage) error {
 	return handleSkip(m, false)
@@ -44,63 +64,72 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
+
 	chatID := m.ChannelID()
 	if !r.IsActiveChat() {
-		m.Reply("⚠️ <b>No active playback.</b>\nThere’s nothing playing right now.")
-		return telegram.EndGroup
+		m.Reply(F(chatID, "room_no_active"))
+		return telegram.ErrEndGroup
 	}
+
 	mention := utils.MentionHTML(m.Sender)
-	if len(r.Queue) == 0 && r.Loop == 0 {
+
+	if len(r.Queue()) == 0 && r.Loop() == 0 {
 		r.Destroy()
-		m.Reply(fmt.Sprintf("⏹️ Playback stopped. Queue is empty.\nSkipped by: %s", mention))
-		return telegram.EndGroup
+		m.Reply(F(chatID, "skip_stopped", locales.Arg{
+			"user": mention,
+		}))
+		return telegram.ErrEndGroup
 	}
 
 	t := r.NextTrack()
-	mystic, err := core.Bot.SendMessage(chatID, "📥 Downloading your next track...")
+
+	mystic, err := core.Bot.SendMessage(chatID, F(chatID, "stream_downloading_next"))
 	if err != nil {
-		gologging.ErrorF("[skip.go] Failed to send status message: %v", err)
+		gologging.ErrorF("[skip.go] err: %v", err)
 	}
 
 	path, err := platforms.Download(context.Background(), t, mystic)
 	if err != nil {
-		gologging.ErrorF("Download failed for %s: %v", t.URL, err)
-		errMsg := fmt.Sprintf("❌ Failed to download next track.\nError: %v", err)
+		txt := F(chatID, "stream_download_fail", locales.Arg{
+			"error": err.Error(),
+		})
+
 		if mystic != nil {
-			utils.EOR(mystic, errMsg)
+			utils.EOR(mystic, txt)
 		} else {
-			core.Bot.SendMessage(chatID, errMsg)
+			core.Bot.SendMessage(chatID, txt)
 		}
+
 		r.Destroy()
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
-	err = r.Play(t, path)
-	if err != nil {
-		errMsg := "❌ Failed to play song."
+	if err := r.Play(t, path); err != nil {
+		txt := F(chatID, "stream_play_fail")
 		if mystic != nil {
-			utils.EOR(mystic, errMsg)
+			utils.EOR(mystic, txt)
 		} else {
-			core.Bot.SendMessage(chatID, errMsg)
+			core.Bot.SendMessage(chatID, txt)
 		}
 		r.Destroy()
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	title := utils.ShortTitle(t.Title, 25)
 	safeTitle := html.EscapeString(title)
-	msgText := fmt.Sprintf(
-		"<b>🎵 Now Playing:</b>\n\n<b>▫ Track:</b> <a href=\"%s\">%s</a>\n<b>▫ Duration:</b> %s\n<b>▫ Requested by:</b> %s",
-		t.URL,
-		safeTitle,
-		formatDuration(t.Duration),
-		t.BY,
-	)
-	opt := telegram.SendOptions{
+
+	msg := F(chatID, "stream_now_playing", locales.Arg{
+		"url":      t.URL,
+		"title":    safeTitle,
+		"duration": formatDuration(t.Duration),
+		"by":       t.Requester,
+	})
+
+	opt := &telegram.SendOptions{
 		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(r, false),
+		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
 	}
 	if t.Artwork != "" {
 		opt.Media = utils.CleanURL(t.Artwork)
@@ -108,14 +137,14 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 
 	var newMystic *telegram.NewMessage
 	if mystic != nil {
-		newMystic, _ = utils.EOR(mystic, msgText, opt)
+		newMystic, _ = utils.EOR(mystic, msg, opt)
 	} else {
-		newMystic, _ = core.Bot.SendMessage(chatID, msgText, &opt)
+		newMystic, _ = core.Bot.SendMessage(chatID, msg, opt)
 	}
 
 	if newMystic != nil {
 		r.SetMystic(newMystic)
 	}
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

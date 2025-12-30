@@ -24,9 +24,27 @@ import (
 	"html"
 
 	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/locales"
+	"main/internal/utils"
 )
+
+func init() {
+	helpTexts["/position"] = `<i>Show current playback position and track info.</i>
+
+<u>Usage:</u>
+<b>/position</b> — Show position
+
+<b>📊 Information Displayed:</b>
+• Current track title
+• Current position (MM:SS)
+• Total duration (MM:SS)
+• Playback speed (if not 1.0x)
+
+<b>💡 Use Case:</b>
+Quick position check without full queue display.`
+}
 
 func positionHandler(m *telegram.NewMessage) error {
 	return handlePosition(m, false)
@@ -36,28 +54,30 @@ func cpositionHandler(m *telegram.NewMessage) error {
 	return handlePosition(m, true)
 }
 
-func handlePosition(m *telegram.NewMessage, cplay bool) error {
+func handlePosition(m *tg.NewMessage, cplay bool) error {
+	chatID := m.ChannelID()
+
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return tg.ErrEndGroup
 	}
 
-	if !r.IsActiveChat() || r.Track == nil {
-		m.Reply("⚠️ <b>No active playback.</b>\nNothing is playing right now.")
-		return telegram.EndGroup
+	if !r.IsActiveChat() || r.Track().ID == "" {
+		m.Reply(F(chatID, "room_no_active"))
+		return tg.ErrEndGroup
 	}
 
 	r.Parse()
 
-	progress := fmt.Sprintf(
-		"🎵 <b>%s</b>\n📍 <code>%s / %s</code>\n⚙️ Speed: <b>%.2fx</b>",
-		html.EscapeString(utils.ShortTitle(r.Track.Title, 25)),
-		formatDuration(r.Position),
-		formatDuration(r.Track.Duration),
-		r.Speed,
-	)
+	title := html.EscapeString(utils.ShortTitle(r.Track().Title, 25))
 
-	m.Reply(progress)
-	return telegram.EndGroup
+	m.Reply(F(chatID, "position_now", locales.Arg{
+		"title":    title,
+		"position": formatDuration(r.Position()),
+		"duration": formatDuration(r.Track().Duration),
+		"speed":    fmt.Sprintf("%.2f", r.Speed()),
+	}))
+
+	return tg.ErrEndGroup
 }

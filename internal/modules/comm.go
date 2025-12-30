@@ -37,8 +37,8 @@ type BotCommands struct {
 var AllCommands = BotCommands{
 	// Commands for private chats
 	PrivateUserCommands: []*telegram.BotCommand{
-		{"help", "Show help menu."},
 		{"start", "Start the bot."},
+		{"help", "Show help menu."},
 		{"ping", "Check if the bot is alive."},
 		{"sudolist", "List sudo users."},
 	},

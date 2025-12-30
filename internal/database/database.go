@@ -26,7 +26,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/utils"
 )
 
 var (
@@ -52,6 +52,8 @@ func Init(mongoURL string) func() {
 	database = client.Database("YukkiMusic")
 	settingsColl = database.Collection("bot_settings")
 	chatSettingsColl = database.Collection("chat_settings")
+
+	go migrateData(mongoURL)
 
 	return func() {
 		ctx, cancel := mongoCtx()

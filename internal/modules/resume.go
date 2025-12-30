@@ -25,8 +25,25 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/locales"
+	"main/internal/utils"
 )
+
+func init() {
+	helpTexts["/resume"] = `<i>Resume the paused playback.</i>
+
+<u>Usage:</u>
+<b>/resume</b> — Resume playback from pause
+
+<b>⚙️ Behavior:</b>
+• Continues from last paused position
+• Cancels auto-resume timer if active
+
+<b>⚠️ Notes:</b>
+• Can only resume if currently paused
+• Position is preserved during pause
+• Speed settings remain active after resume`
+}
 
 func resumeHandler(m *telegram.NewMessage) error {
 	return handleResume(m, false)
@@ -37,32 +54,50 @@ func cresumeHandler(m *telegram.NewMessage) error {
 }
 
 func handleResume(m *telegram.NewMessage, cplay bool) error {
+	chatID := m.ChannelID()
+
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
-	if !r.IsActiveChat() {
-		m.Reply("⚠️ <b>No active playback.</b>\nNothing is playing right now.")
-		return telegram.EndGroup
-	}
-	if !r.IsPaused() {
-		m.Reply("ℹ️ <b>Already Playing</b>\nThe music is already playing in this chat.\nWould you like to pause it?")
-		return telegram.EndGroup
-	}
-	if _, err := r.Resume(); err != nil {
-		m.Reply(fmt.Sprintf("❌ <b>Playback Resume Failed</b>\nError: <code>%v</code>", err))
-	} else {
-		title := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
-		pos := formatDuration(r.Position)
-		total := formatDuration(r.Track.Duration)
-		mention := utils.MentionHTML(m.Sender)
-		msg := fmt.Sprintf("▶️ Resuming playback:\n\n <b>Title: </b>\"%s\"\n📍 Position: %s / %s\nResumed by: %s", title, pos, total, mention)
 
-		if sp := r.GetSpeed(); sp != 1.0 {
-			msg += fmt.Sprintf("\n⚙️ Speed: <b>%.2fx</b>", sp)
-		}
-		m.Reply(msg)
+	if !r.IsActiveChat() {
+		m.Reply(F(chatID, "room_no_active"))
+		return telegram.ErrEndGroup
 	}
-	return telegram.EndGroup
+
+	if !r.IsPaused() {
+		m.Reply(F(chatID, "resume_already_playing"))
+		return telegram.ErrEndGroup
+	}
+
+	t := r.Track()
+	if _, err := r.Resume(); err != nil {
+		m.Reply(F(chatID, "resume_failed", locales.Arg{
+			"error": err,
+		}))
+	} else {
+		title := html.EscapeString(utils.ShortTitle(t.Title, 25))
+		pos := formatDuration(r.Position())
+		total := formatDuration(t.Duration)
+		mention := utils.MentionHTML(m.Sender)
+
+		speedLine := ""
+		if sp := r.GetSpeed(); sp != 1.0 {
+			speedLine = F(chatID, "speed_line", locales.Arg{
+				"speed": fmt.Sprintf("%.2f", r.GetSpeed()),
+			})
+		}
+
+		m.Reply(F(chatID, "resume_success", locales.Arg{
+			"title":      title,
+			"position":   pos,
+			"duration":   total,
+			"user":       mention,
+			"speed_line": speedLine,
+		}))
+	}
+
+	return telegram.ErrEndGroup
 }

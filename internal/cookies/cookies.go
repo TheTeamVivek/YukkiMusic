@@ -17,26 +17,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package cookies
 
 import (
-	"io"
+	"embed"
+	"fmt"
 	"math/rand"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/Laky-64/gologging"
+	"resty.dev/v3"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
+	"main/internal/config"
 )
 
-var logger = gologging.GetLogger("cookies")
+var (
+	logger      = gologging.GetLogger("cookies")
+	cachedFiles []string
+	cacheOnce   sync.Once
+)
 
-func Init() {
-	if err := os.MkdirAll("internal/cookies", 0o755); err != nil {
-		logger.Fatal("Failed to create cookies directory:", err)
+//go:embed *.txt
+var embeddedCookies embed.FS
+
+func init() {
+	gologging.Debug("🔹 Initializing cookies...")
+
+	if err := copyEmbeddedCookies(); err != nil {
+		logger.Fatal("Failed to copy embedded cookies:", err)
 	}
 
 	urls := strings.Fields(config.CookiesLink)
@@ -47,34 +59,86 @@ func Init() {
 	}
 }
 
+func copyEmbeddedCookies() error {
+	entries, err := embeddedCookies.ReadDir(".")
+	if err != nil {
+		return err
+	}
+
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		if e.Name() == "example.txt" {
+			continue
+		}
+
+		dst := filepath.Join("internal/cookies", e.Name())
+
+		if _, err := os.Stat(dst); err == nil {
+			continue
+		}
+
+		data, err := embeddedCookies.ReadFile(e.Name())
+		if err != nil {
+			return err
+		}
+
+		if err := os.WriteFile(dst, data, 0o600); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func downloadCookieFile(url string) error {
 	id := filepath.Base(url)
 	rawURL := "https://batbin.me/raw/" + id
-
-	resp, err := http.Get(rawURL)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
 	filePath := filepath.Join("internal/cookies", id+".txt")
-	file, err := os.Create(filePath)
+
+	client := resty.New()
+	defer client.Close()
+
+	resp, err := client.R().
+		SetOutputFileName(filePath).
+		Get(rawURL)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
 
-	_, err = io.Copy(file, resp.Body)
-	return err
+	if resp.IsError() {
+		return fmt.Errorf("unexpected status %d from %s", resp.StatusCode(), rawURL)
+	}
+
+	return nil
+}
+
+func loadCookieCache() error {
+	files, err := filepath.Glob("internal/cookies/*.txt")
+	if err != nil {
+		return err
+	}
+	cachedFiles = files
+	return nil
 }
 
 func GetRandomCookieFile() (string, error) {
-	files, err := filepath.Glob("internal/cookies/*.txt")
+	var err error
+
+	cacheOnce.Do(func() {
+		err = loadCookieCache()
+	})
+
 	if err != nil {
+		logger.WarnF("Failed to load cookie cache: %v", err)
+		cacheOnce = sync.Once{}
 		return "", err
 	}
-	if len(files) == 0 {
-		return "", nil // No cookie files found
+
+	if len(cachedFiles) == 0 {
+		logger.Warn("No cookie files available")
+		return "", nil
 	}
-	return files[rand.Intn(len(files))], nil
+
+	return cachedFiles[rand.Intn(len(cachedFiles))], nil
 }

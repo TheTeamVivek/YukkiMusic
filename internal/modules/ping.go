@@ -23,11 +23,34 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v3/mem"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
+	"main/internal/config"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/locales"
+	"main/internal/utils"
 )
+
+func init() {
+	helpTexts["/ping"] = `<i>Check bot responsiveness and system stats.</i>
+
+<u>Usage:</u>
+<b>/ping</b> — Get bot status
+
+<b>📊 Information Shown:</b>
+• Response latency (ms)
+• Uptime
+• RAM usage
+• CPU usage
+• Disk usage
+
+<b>💡 Use Case:</b>
+Check if bot is responsive and view system health.`
+}
 
 func formatUptime(d time.Duration) string {
 	days := d / (24 * time.Hour)
@@ -52,15 +75,16 @@ func formatUptime(d time.Duration) string {
 	return result
 }
 
-func pingHandler(m *telegram.NewMessage) error {
+func pingHandler(m *tg.NewMessage) error {
 	if m.IsPrivate() {
 		m.Delete()
 		database.AddServed(m.ChannelID(), true)
 	} else {
 		database.AddServed(m.ChannelID())
 	}
+
 	start := time.Now()
-	reply, err := m.Respond("🏓 Pinging...")
+	reply, err := m.Respond(F(m.ChannelID(), "ping_start"))
 	if err != nil {
 		return err
 	}
@@ -68,12 +92,44 @@ func pingHandler(m *telegram.NewMessage) error {
 	latency := time.Since(start).Milliseconds()
 	uptime := time.Since(config.StartTime)
 	uptimeStr := formatUptime(uptime)
+	ramInfo := "N/A"
+	cpuUsage := "N/A"
+	diskUsage := "N/A"
 
-	text := fmt.Sprintf(
-		"🏓 Pong!\nLatency: %dms\n🤖 I've been running for %s without rest!",
-		latency, uptimeStr,
-	)
+	opt := &tg.SendOptions{
+		ReplyMarkup: core.SuppMarkup(m.ChannelID()),
+	}
+	if config.PingImage != "" {
+		opt.Media = config.PingImage
+	}
 
-	reply.Edit(text)
-	return telegram.EndGroup
+	v, err := mem.VirtualMemory()
+	if err == nil {
+		usedGB := float64(v.Used) / 1024 / 1024 / 1024
+		totalGB := float64(v.Total) / 1024 / 1024 / 1024
+
+		ramInfo = fmt.Sprintf("%.2f / %.2f GB", usedGB, totalGB)
+	}
+
+	if percentages, err := cpu.Percent(time.Second, false); err == nil && len(percentages) > 0 {
+		cpuUsage = fmt.Sprintf("%.2f%%", percentages[0])
+	}
+
+	if d, err := disk.Usage("/"); err == nil {
+		usedGB := float64(d.Used) / 1024 / 1024 / 1024
+		totalGB := float64(d.Total) / 1024 / 1024 / 1024
+		diskUsage = fmt.Sprintf("%.2f / %.2f GB", usedGB, totalGB)
+	}
+
+	msg := F(m.ChannelID(), "ping_result", locales.Arg{
+		"latency":    latency,
+		"bot":        utils.MentionHTML(core.BUser),
+		"uptime":     uptimeStr,
+		"ram_info":   ramInfo,
+		"cpu_usage":  cpuUsage,
+		"disk_usage": diskUsage,
+	})
+
+	reply.Edit(msg, opt)
+	return tg.ErrEndGroup
 }

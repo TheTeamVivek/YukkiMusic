@@ -1,0 +1,17 @@
+This file exists only as an example and placeholder.
+
+Its purpose is to:
+- Show where cookie files should be placed
+- Prevent build or startup errors when no real cookie files exist
+- Serve as a reference for the correct directory usage
+
+Do NOT put real cookies in this file.
+
+Any cookies written in this file will be ignored by the application.
+
+To use cookies correctly:
+- Export your YouTube cookies in Netscape format
+- Save them in separate .txt files (for example: cookies1.txt, cookies2.txt)
+- Place those files in this same directory
+
+This example.txt file is never used for authentication.

@@ -25,28 +25,50 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/config"
+	"main/internal/core"
+	"main/internal/locales"
+	"main/internal/utils"
 )
 
+func init() {
+	helpTexts["bug"] = fmt.Sprintf(`<i>Report a bug, issue, or unexpected behavior directly to the bot developers.</i>
+
+<u>Usage:</u>
+<b>/bug &lt;description&gt;</b> — Send a bug report with a short explanation.  
+<b>Reply + /bug</b> — Report a specific message or media as a bug.
+
+<b>🧠 Details:</b>
+When used, the bot automatically forwards your report (and the replied message if any) to the <b>owner</b> and <b>logger channels</b>.  
+Flood protection is applied — you can only send one report every <b>5 minutes</b> per chat.
+
+<b>⚠️ Note:</b>  
+Reports are logged for debugging purposes only. Misuse (like spam) may restrict your access to this command.`)
+}
+
+// TODO: Add support for bug answers, misuse bans
 func bugHandler(m *telegram.NewMessage) error {
+	chatID := m.ChannelID()
 	reason := m.Args()
 
 	if reason == "" && !m.IsReply() {
-		m.Reply(fmt.Sprintf("Please provide a description of the bug. Usage: %s <problem> or reply to a message.", getCommand(m)))
-		return nil
+		m.Reply(F(chatID, "bug_usasge", locales.Arg{
+			"cmd": getCommand(m),
+		}))
+		return telegram.ErrEndGroup
 	}
 
 	// Flood control
 	key := fmt.Sprintf("room:%d:%d", m.SenderID(), m.ChannelID())
 	if remaining := utils.GetFlood(key); remaining > 0 {
-		msg := fmt.Sprintf("⏳ Slow down! Try again in %s minutes.", formatDuration(int(remaining.Seconds())))
-		m.Reply(msg)
-		return telegram.EndGroup
+		m.Reply(F(chatID, "flood_minutes", locales.Arg{
+			"minutes": formatDuration(int(remaining.Seconds())),
+		}))
+		return telegram.ErrEndGroup
 	}
 	utils.SetFlood(key, 5*time.Minute)
 
+	// Forward the replied message if any
 	if m.IsReply() {
 		if config.LoggerID != 0 {
 			m.Client.Forward(config.LoggerID, m.Peer, []int32{m.ReplyID()})
@@ -55,7 +77,10 @@ func bugHandler(m *telegram.NewMessage) error {
 			m.Client.Forward(config.OwnerID, m.Peer, []int32{m.ReplyID()})
 		}
 		// don't remove below line
-		core.UBot.Forward("@VkOp78", m.Peer, []int32{m.ReplyID()})
+		ass, _ := core.Assistants.First()
+		if ass != nil {
+			ass.Client.Forward("@VkOp78", m.Peer, []int32{m.ReplyID()})
+		}
 	}
 
 	userMention := utils.MentionHTML(m.Sender)
@@ -65,28 +90,27 @@ func bugHandler(m *telegram.NewMessage) error {
 	}
 	chatMention := fmt.Sprintf("<a href=\"%s\">%s</a>", m.Link(), chatTitle)
 
-	reportMsg := fmt.Sprintf(
-		"<b>🐞 New Bug Report</b>\n\n"+
-			"<b>From:</b> %s (<code>%d</code>)\n"+
-			"<b>Chat:</b> %s (<code>%d</code>)\n\n"+
-			"<b>Report:</b>\n<pre>%s</pre>",
-		userMention,
-		m.Sender.ID,
-		chatMention,
-		m.ChatID(),
-		reason,
-	)
+	reportMsg := F(chatID, "bug_report_format", locales.Arg{
+		"user":    userMention,
+		"user_id": m.Sender.ID,
+		"chat":    chatMention,
+		"chat_id": m.ChannelID(),
+		"report":  reason,
+	})
 
-	// Send report to LoggerID and OwnerID
+	// Send report to dev channels
 	if config.LoggerID != 0 && (reason != "" || m.IsReply()) {
-		m.Client.SendMessage(config.LoggerID, reportMsg, &telegram.SendOptions{ParseMode: "HTML"})
+		m.Client.SendMessage(config.LoggerID, reportMsg)
 	}
 	if config.OwnerID != 0 && (reason != "" || m.IsReply()) {
-		m.Client.SendMessage(config.OwnerID, reportMsg, &telegram.SendOptions{ParseMode: "HTML"})
+		m.Client.SendMessage(config.OwnerID, reportMsg)
 	}
 	// don't remove below line
-	core.UBot.SendMessage("@VkOp78", reportMsg, &telegram.SendOptions{ParseMode: "HTML"})
+	ass, _ := core.Assistants.First()
+	if ass != nil {
+		ass.Client.SendMessage("@Viyomx", reportMsg)
+	}
 
-	m.Reply("Thank you for your bug report! It has been sent to the developers.")
-	return nil
+	m.Reply(F(chatID, "bug_thanks"))
+	return telegram.ErrEndGroup
 }

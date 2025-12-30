@@ -26,9 +26,95 @@ import (
 	"strings"
 
 	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/locales"
+	"main/internal/utils"
 )
+
+func init() {
+	helpTexts["/queue"] = `<i>Display the current playback queue.</i>
+
+<u>Usage:</u>
+<b>/queue</b> — Show queue
+
+<b>📋 Display Format:</b>
+• Now Playing - Current track with position
+• Up Next - Next 10 tracks in queue
+• Track info: Title, requester, duration
+
+<b>⚙️ Features:</b>
+• Real-time queue status
+• Requester attribution
+• Duration display
+• Queue length indicator
+
+<b>💡 Related Commands:</b>
+• <code>/position</code> - Current track position only
+• <code>/remove</code> - Remove specific track
+• <code>/clear</code> - Clear all tracks
+• <code>/move</code> - Reorder tracks`
+
+	helpTexts["/remove"] = `<i>Remove a specific track from the queue.</i>
+
+<u>Usage:</u>
+<b>/remove [index]</b> — Remove track at position
+
+<b>⚙️ Behavior:</b>
+• Index starts from 1 (first track in queue)
+• Cannot remove currently playing track
+• Queue positions update automatically
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/remove 1</code> — Remove first track in queue
+<code>/remove 5</code> — Remove 5th track
+
+<b>⚠️ Notes:</b>
+• Use <code>/queue</code> to see track indices
+• Invalid index shows error with queue length
+• Use <code>/clear</code> to remove all tracks`
+
+	helpTexts["/clear"] = `<i>Clear all tracks from the queue.</i>
+
+<u>Usage:</u>
+<b>/clear</b> — Remove all queued tracks
+
+<b>⚙️ Behavior:</b>
+• Removes all tracks from queue
+• Current playing track continues
+• Queue becomes empty after current track ends
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>⚠️ Warning:</b>
+This action cannot be undone. Use <code>/remove</code> for selective removal.`
+
+	helpTexts["/move"] = `<i>Reorder tracks in the queue.</i>
+
+<u>Usage:</u>
+<b>/move [from] [to]</b> — Move track from position to position
+
+<b>⚙️ Behavior:</b>
+• Moves track at index 'from' to index 'to'
+• Other tracks shift positions accordingly
+• Indices start from 1
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Examples:</b>
+<code>/move 3 1</code> — Move 3rd track to 1st position
+<code>/move 1 5</code> — Move 1st track to 5th position
+
+<b>⚠️ Notes:</b>
+• Both positions must be valid queue indices
+• Use <code>/queue</code> to see current order
+• Cannot move currently playing track`
+}
 
 func queueHandler(m *telegram.NewMessage) error {
 	return handleQueue(m, false)
@@ -36,51 +122,6 @@ func queueHandler(m *telegram.NewMessage) error {
 
 func cqueueHandler(m *telegram.NewMessage) error {
 	return handleQueue(m, true)
-}
-
-func handleQueue(m *telegram.NewMessage, cplay bool) error {
-	r, err := getEffectiveRoom(m, cplay)
-	if err != nil {
-		m.Reply(err.Error())
-		return telegram.EndGroup
-	}
-	if !r.IsActiveChat() || r.Track == nil {
-		m.Reply("⚠️ <b>No active playback.</b>\nNothing is queued right now.")
-		return telegram.EndGroup
-	}
-	mystic, err := m.Reply("⏳ <b>Fetching queue...</b>")
-	if err != nil {
-		return err
-	}
-	var b strings.Builder
-	b.WriteString("🎶 <b>Current Queue</b>\n\n")
-	b.WriteString("▶️ <b>Now Playing:</b>\n")
-	b.WriteString(fmt.Sprintf("🎧 <a href=\"%s\">%s</a> – %s [%s]\n\n",
-		r.Track.URL, html.EscapeString(utils.ShortTitle(r.Track.Title, 35)),
-		r.Track.BY,
-		formatDuration(r.Track.Duration),
-	))
-	if len(r.Queue) > 0 {
-		b.WriteString("⏳ <b>Up Next:</b>\n\n")
-		for i, track := range r.Queue {
-			if i >= 10 {
-				remaining := len(r.Queue) - 10
-				b.WriteString(fmt.Sprintf("\n… and %d more", remaining))
-				break
-			}
-			b.WriteString(fmt.Sprintf("%d. 🎵 <a href=\"%s\">%s</a> – %s [%s]\n",
-				i+1,
-				track.URL,
-				html.EscapeString(utils.ShortTitle(track.Title, 35)),
-				track.BY,
-				formatDuration(track.Duration),
-			))
-		}
-	} else {
-		b.WriteString("📭 <i>No more songs in queue.</i>")
-	}
-	utils.EOR(mystic, b.String())
-	return telegram.EndGroup
 }
 
 func removeHandler(m *telegram.NewMessage) error {
@@ -91,42 +132,12 @@ func cremoveHandler(m *telegram.NewMessage) error {
 	return handleRemove(m, true)
 }
 
-func handleRemove(m *telegram.NewMessage, cplay bool) error {
-	r, err := getEffectiveRoom(m, cplay)
-	if err != nil {
-		m.Reply(err.Error())
-		return telegram.EndGroup
-	}
-	if r.Track == nil {
-		m.Reply("⚠️ No active playback or queue found.")
-		return telegram.EndGroup
-	}
-	if len(r.Queue) == 0 {
-		m.Reply("⚠️ The queue is already empty.")
-		return telegram.EndGroup
-	}
-	args := strings.Fields(m.Text())
-	if len(args) < 2 {
-		m.Reply(fmt.Sprintf("⚠️ Please provide the index of the track to remove.\nUsage: <code>%s [index]</code>", getCommand(m)))
-		return telegram.EndGroup
-	}
-	index, err := strconv.Atoi(args[1])
-	if err != nil {
-		m.Reply("⚠️ Invalid index: must be a number.")
-		return telegram.EndGroup
-	}
-	if index <= 0 {
-		m.Reply("⚠️ Index must be greater than 0.")
-		return telegram.EndGroup
-	}
-	queueLen := len(r.Queue)
-	if index > queueLen {
-		m.Reply(fmt.Sprintf("⚠️ Invalid index. Queue has only %d tracks.", queueLen))
-		return telegram.EndGroup
-	}
-	r.RemoveFromQueue(index - 1)
-	m.Reply(fmt.Sprintf("✅ Removed track at position %d from the queue by %s.", index, utils.MentionHTML(m.Sender)))
-	return telegram.EndGroup
+func moveHandler(m *telegram.NewMessage) error {
+	return handleMove(m, false)
+}
+
+func cmoveHandler(m *telegram.NewMessage) error {
+	return handleMove(m, true)
 }
 
 func clearHandler(m *telegram.NewMessage) error {
@@ -137,68 +148,207 @@ func cclearHandler(m *telegram.NewMessage) error {
 	return handleClear(m, true)
 }
 
-func handleClear(m *telegram.NewMessage, cplay bool) error {
+func handleQueue(m *tg.NewMessage, cplay bool) error {
+	chatID := m.ChannelID()
+
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return tg.ErrEndGroup
 	}
-	if r.Track == nil {
-		m.Reply("⚠️ There is no active playback or queue to clear.")
-		return telegram.EndGroup
+	t := r.Track()
+
+	if !r.IsActiveChat() || t == nil {
+		m.Reply(F(chatID, "queue_no_active"))
+		return tg.ErrEndGroup
 	}
-	if len(r.Queue) == 0 {
-		m.Reply("⚠️ The queue is already empty.")
-		return telegram.EndGroup
+
+	var b strings.Builder
+
+	b.WriteString(F(chatID, "queue_header"))
+	b.WriteString("\n\n")
+
+	// Now Playing
+	b.WriteString(F(chatID, "queue_now_playing"))
+	b.WriteString("\n")
+	b.WriteString(fmt.Sprintf(
+		"🎧 <a href=\"%s\">%s</a> — %s [%s]\n\n",
+		t.URL,
+		html.EscapeString(utils.ShortTitle(t.Title, 35)),
+		t.Requester,
+		formatDuration(t.Duration),
+	))
+
+	// Up Next
+	if len(r.Queue()) > 0 {
+		b.WriteString(F(chatID, "queue_up_next"))
+		b.WriteString("\n\n")
+
+		for i, track := range r.Queue() {
+			if i >= 10 {
+				b.WriteString(F(chatID, "queue_more_line", locales.Arg{
+					"remaining": len(r.Queue()) - 10,
+				}))
+				break
+			}
+
+			b.WriteString(fmt.Sprintf(
+				"%d. 🎵 <a href=\"%s\">%s</a> — %s [%s]\n",
+				i+1,
+				track.URL,
+				html.EscapeString(utils.ShortTitle(track.Title, 35)),
+				track.Requester,
+				formatDuration(track.Duration),
+			))
+		}
+	} else {
+		b.WriteString(F(chatID, "queue_empty_tail"))
 	}
+
+	m.Reply(b.String())
+	return tg.ErrEndGroup
+}
+
+func handleRemove(m *tg.NewMessage, cplay bool) error {
+	chatID := m.ChannelID()
+
+	r, err := getEffectiveRoom(m, cplay)
+	if err != nil {
+		m.Reply(err.Error())
+		return tg.ErrEndGroup
+	}
+	t := r.Track()
+	if !r.IsActiveChat() || t == nil {
+		m.Reply(F(chatID, "queue_no_active"))
+		return tg.ErrEndGroup
+	}
+
+	if len(r.Queue()) == 0 {
+		m.Reply(F(chatID, "queue_empty"))
+		return tg.ErrEndGroup
+	}
+
+	args := strings.Fields(m.Text())
+	if len(args) < 2 {
+		m.Reply(F(chatID, "remove_usage", locales.Arg{
+			"cmd": getCommand(m),
+		}))
+		return tg.ErrEndGroup
+	}
+
+	index, err := strconv.Atoi(args[1])
+	if err != nil {
+		m.Reply(F(chatID, "remove_invalid_index"))
+		return tg.ErrEndGroup
+	}
+
+	if index <= 0 {
+		m.Reply(F(chatID, "remove_index_too_small"))
+		return tg.ErrEndGroup
+	}
+
+	total := len(r.Queue())
+	if index > total {
+		m.Reply(F(chatID, "remove_index_too_big", locales.Arg{
+			"total": total,
+		}))
+		return tg.ErrEndGroup
+	}
+
+	r.RemoveFromQueue(index - 1)
+
+	m.Reply(F(chatID, "remove_success", locales.Arg{
+		"index": index,
+		"user":  utils.MentionHTML(m.Sender),
+	}))
+
+	return tg.ErrEndGroup
+}
+
+func handleClear(m *tg.NewMessage, cplay bool) error {
+	chatID := m.ChannelID()
+
+	r, err := getEffectiveRoom(m, cplay)
+	if err != nil {
+		m.Reply(err.Error())
+		return tg.ErrEndGroup
+	}
+	t := r.Track()
+	if !r.IsActiveChat() || t == nil {
+		m.Reply(F(chatID, "clear_no_active"))
+		return tg.ErrEndGroup
+	}
+
+	if len(r.Queue()) == 0 {
+		m.Reply(F(chatID, "queue_empty"))
+		return tg.ErrEndGroup
+	}
+
 	r.RemoveFromQueue(-1)
-	m.Reply(fmt.Sprintf("✅ The queue has been cleared by %s.", utils.MentionHTML(m.Sender)))
-	return telegram.EndGroup
+
+	m.Reply(F(chatID, "clear_success", locales.Arg{
+		"user": utils.MentionHTML(m.Sender),
+	}))
+
+	return tg.ErrEndGroup
 }
 
-func moveHandler(m *telegram.NewMessage) error {
-	return handleMove(m, false)
-}
+func handleMove(m *tg.NewMessage, cplay bool) error {
+	chatID := m.ChannelID()
 
-func cmoveHandler(m *telegram.NewMessage) error {
-	return handleMove(m, true)
-}
-
-func handleMove(m *telegram.NewMessage, cplay bool) error {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return tg.ErrEndGroup
 	}
-	if r.Track == nil {
-		m.Reply("⚠️ No active playback or queue found.")
-		return telegram.EndGroup
+
+	if !r.IsActiveChat() || r.Track() == nil {
+		m.Reply(F(chatID, "queue_no_active"))
+		return tg.ErrEndGroup
 	}
-	if len(r.Queue) == 0 {
-		m.Reply("⚠️ The queue is empty.")
-		return telegram.EndGroup
+
+	if len(r.Queue()) == 0 {
+		m.Reply(F(chatID, "queue_empty"))
+		return tg.ErrEndGroup
 	}
+
 	args := strings.Fields(m.Text())
 	if len(args) < 3 {
-		m.Reply(fmt.Sprintf("⚠️ Usage: <code>%s [from] [to]</code>", getCommand(m)))
-		return telegram.EndGroup
+		m.Reply(F(chatID, "move_usage", locales.Arg{
+			"cmd": getCommand(m),
+		}))
+		return tg.ErrEndGroup
 	}
+
 	from, err1 := strconv.Atoi(args[1])
 	to, err2 := strconv.Atoi(args[2])
 	if err1 != nil || err2 != nil {
-		m.Reply("⚠️ Invalid numbers. Example: <code>/move 2 1</code>")
-		return telegram.EndGroup
+		m.Reply(F(chatID, "move_invalid_numbers", locales.Arg{
+			"cmd": getCommand(m),
+		}))
+		return tg.ErrEndGroup
 	}
+
 	if from <= 0 || to <= 0 {
-		m.Reply("⚠️ Indexes must be greater than 0.")
-		return telegram.EndGroup
+		m.Reply(F(chatID, "move_invalid_indexes_min"))
+		return tg.ErrEndGroup
 	}
-	queueLen := len(r.Queue)
+
+	queueLen := len(r.Queue())
 	if from > queueLen || to > queueLen {
-		m.Reply(fmt.Sprintf("⚠️ Queue has only %d tracks.", queueLen))
-		return telegram.EndGroup
+		m.Reply(F(chatID, "move_invalid_indexes_max", locales.Arg{
+			"queue_len": queueLen,
+		}))
+		return tg.ErrEndGroup
 	}
+
 	r.MoveInQueue(from-1, to-1)
-	m.Reply(fmt.Sprintf("✅ Moved track from position %d to %d by %s.", from, to, utils.MentionHTML(m.Sender)))
-	return telegram.EndGroup
+
+	m.Reply(F(chatID, "move_success", locales.Arg{
+		"from": from,
+		"to":   to,
+		"user": utils.MentionHTML(m.Sender),
+	}))
+
+	return tg.ErrEndGroup
 }

@@ -25,8 +25,25 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/locales"
+	"main/internal/utils"
 )
+
+func init() {
+	helpTexts["/replay"] = `<i>Restart the current track from the beginning.</i>
+
+<u>Usage:</u>
+<b>/replay</b> — Restart current track
+
+<b>⚙️ Behavior:</b>
+• Resets position to 0:00
+• Maintains speed setting
+• Continues playback immediately
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+`
+}
 
 func replayHandler(m *telegram.NewMessage) error {
 	return handleReplay(m, false)
@@ -37,24 +54,33 @@ func creplayHandler(m *telegram.NewMessage) error {
 }
 
 func handleReplay(m *telegram.NewMessage, cplay bool) error {
+	chatID := m.ChannelID()
+
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return telegram.ErrEndGroup
 	}
 
 	if !r.IsActiveChat() {
-		m.Reply("⚠️ <b>No active playback.</b>\nNothing is playing right now.")
-		return telegram.EndGroup
+		m.Reply(F(chatID, "room_no_active"))
+		return telegram.ErrEndGroup
 	}
+	t := r.Track()
 
 	if err := r.Replay(); err != nil {
-		m.Reply(fmt.Sprintf("❌ <b>Replay Failed</b>\nError: <code>%v</code>", err))
+		m.Reply(F(chatID, "replay_failed", locales.Arg{
+			"error": err,
+		}))
 	} else {
-		trackTitle := html.EscapeString(utils.ShortTitle(r.Track.Title, 25))
-		totalDuration := formatDuration(r.Track.Duration)
-		m.Reply(fmt.Sprintf("🔁 Now replaying:\n\n<b>Title: </b>%s\n🎵 Duration: <code>%s</code>\n⏱️ Speed: %.2fx", trackTitle, totalDuration, r.Speed))
+		trackTitle := html.EscapeString(utils.ShortTitle(t.Title, 25))
+		totalDuration := formatDuration(t.Duration)
+		m.Reply(F(chatID, "replay_success", locales.Arg{
+			"title":    trackTitle,
+			"duration": totalDuration,
+			"speed":    fmt.Sprintf("%.2f", r.Speed()),
+		}))
 	}
 
-	return telegram.EndGroup
+	return telegram.ErrEndGroup
 }

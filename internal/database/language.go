@@ -17,47 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package utils
+package database
 
-import (
-	"fmt"
-	"html"
-	"strings"
+import "main/internal/config"
 
-	"github.com/amarnathcjd/gogram/telegram"
-)
-
-func ShortTitle(title string, max ...int) string {
-	limit := 25
-	if len(max) > 0 {
-		limit = max[0]
+func GetChatLanguage(chatID int64) (string, error) {
+	settings, err := getChatSettings(chatID)
+	if err != nil || settings.Language == "" {
+		return config.DefaultLang, err
 	}
-	runes := []rune(title)
-	if len(runes) <= limit {
-		return title
-	}
-	return string(runes[:limit]) + "..."
+	return settings.Language, nil
 }
 
-func CleanURL(raw string) string {
-	parts := strings.SplitN(raw, "?", 2)
-	return parts[0]
-}
-
-func MentionHTML(u *telegram.UserObj) string {
-	if u == nil {
-		return "Unknown"
+func SetChatLanguage(chatID int64, lang string) error {
+	settings, err := getChatSettings(chatID)
+	if err != nil || settings.Language == lang {
+		return err
 	}
-
-	fullName := u.FirstName
-	if u.LastName != "" {
-		fullName += " " + u.LastName
-	}
-
-	if fullName == "" {
-		fullName = "User"
-	}
-	fullName = html.EscapeString(ShortTitle(fullName, 15))
-
-	return fmt.Sprintf(`<a href="tg://user?id=%d">%s</a>`, u.ID, fullName)
+	settings.Language = lang
+	return updateChatSettings(settings)
 }

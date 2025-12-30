@@ -21,11 +21,8 @@ package platforms
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -33,51 +30,60 @@ import (
 	"strconv"
 
 	"github.com/amarnathcjd/gogram/telegram"
+	"resty.dev/v3"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/config"
+	"main/internal/core"
+	state "main/internal/core/models"
+	"main/internal/utils"
 )
 
-type FallenApiPlatform struct{}
-
-func init() {
-	addPlatform(80, state.PlatformFallenApi, &FallenApiPlatform{})
-}
-
-func (*FallenApiPlatform) Name() state.PlatformName {
-	return state.PlatformFallenApi
-}
-
-func (*FallenApiPlatform) IsValid(query string) bool {
-	return false
-}
-
-func (*FallenApiPlatform) GetTracks(query string) ([]*state.Track, error) {
-	return nil, errors.New("FallenApi is a download-only platform")
-}
-
-func (*FallenApiPlatform) IsDownloadSupported(source state.PlatformName) bool {
-	if config.ApiURL == "" || config.ApiKEY == "" {
-		return false
-	}
-	return source == state.PlatformYouTube
-}
-
 var telegramDLRegex = regexp.MustCompile(`https:\/\/t\.me\/([a-zA-Z0-9_]{5,})\/(\d+)`)
+
+const PlatformFallenApi state.PlatformName = "FallenApi"
 
 type APIResponse struct {
 	CdnUrl string `json:"cdnurl"`
 }
 
+type FallenApiPlatform struct {
+	name state.PlatformName
+}
+
+func init() {
+	Register(80, &FallenApiPlatform{
+		name: PlatformFallenApi,
+	})
+}
+
+func (f *FallenApiPlatform) Name() state.PlatformName {
+	return f.name
+}
+
+func (f *FallenApiPlatform) IsValid(query string) bool {
+	return false
+}
+
+func (f *FallenApiPlatform) GetTracks(_ string, _ bool) ([]*state.Track, error) {
+	return nil, errors.New("fallenapi is a download-only platform")
+}
+
+func (f *FallenApiPlatform) IsDownloadSupported(source state.PlatformName) bool {
+	if config.FallenAPIURL == "" || config.FallenAPIKey == "" {
+		return false
+	}
+	return source == PlatformYouTube
+}
+
 func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
+	// fallen api didn't support video downloads so disable it
+	track.Video = false
 	var pm *telegram.ProgressManager
 	if mystic != nil {
 		pm = utils.GetProgress(mystic)
 	}
 
-	if path, err := f.checkDownloadedFile(track.ID); err == nil {
+	if path, err := checkDownloadedFile(track.ID); err == nil {
 		return path, nil
 	}
 
@@ -107,24 +113,22 @@ func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, my
 }
 
 func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string) (string, error) {
-	apiReqURL := fmt.Sprintf("%s/track?api_key=%s&url=%s", config.ApiURL, config.ApiKEY, url.QueryEscape(mediaURL))
-	req, err := http.NewRequestWithContext(ctx, "GET", apiReqURL, nil)
-	if err != nil {
-		return "", fmt.Errorf("failed to create request: %w", err)
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("API request failed: %w", err)
-	}
-	defer resp.Body.Close()
+	apiReqURL := fmt.Sprintf("%s/track?api_key=%s&url=%s", config.FallenAPIURL, config.FallenAPIKey, url.QueryEscape(mediaURL))
 
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("API request failed with status: %d", resp.StatusCode)
-	}
-
+	client := resty.New()
+	defer client.Close()
 	var apiResp APIResponse
-	if err := json.NewDecoder(resp.Body).Decode(&apiResp); err != nil {
-		return "", fmt.Errorf("invalid API response: %w", err)
+
+	resp, err := client.R().
+		SetContext(ctx).
+		SetResult(&apiResp).
+		Get(apiReqURL)
+	if err != nil {
+		return "", fmt.Errorf("api request failed: %w", err)
+	}
+
+	if resp.IsError() {
+		return "", fmt.Errorf("api request failed with status: %d", resp.StatusCode())
 	}
 
 	if apiResp.CdnUrl == "" {
@@ -135,28 +139,20 @@ func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string)
 }
 
 func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, filePath string) error {
-	req, err := http.NewRequestWithContext(ctx, "GET", dlURL, nil)
+	client := resty.New()
+	resp, err := client.R().
+		SetContext(ctx).
+		SetOutputFileName(filePath).
+		Get(dlURL)
 	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("HTTP download failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("download failed with status: %d", resp.StatusCode)
+		return fmt.Errorf("http download failed: %w", err)
 	}
 
-	out, err := os.Create(filePath)
-	if err != nil {
-		return fmt.Errorf("failed to create file: %w", err)
+	if resp.IsError() {
+		return fmt.Errorf("download failed with status: %d", resp.StatusCode())
 	}
-	defer out.Close()
 
-	_, err = io.Copy(out, resp.Body)
-	return err
+	return nil
 }
 
 func (f *FallenApiPlatform) downloadFromTelegram(ctx context.Context, dlURL, videoId string, pm *telegram.ProgressManager) (string, error) {
@@ -178,42 +174,18 @@ func (f *FallenApiPlatform) downloadFromTelegram(ctx context.Context, dlURL, vid
 
 	rawFile := filepath.Join("downloads", videoId+msg.File.Ext)
 
-	dOpts := &telegram.DownloadOptions{FileName: rawFile, Threads: 3}
+	dOpts := &telegram.DownloadOptions{
+		FileName: rawFile,
+		Threads:  3,
+		Ctx:      ctx,
+	}
 	if pm != nil {
 		dOpts.ProgressManager = pm
 	}
-
-	done := make(chan error)
-	go func() {
-		_, err := msg.Download(dOpts)
-		done <- err
-	}()
-
-	select {
-	case <-ctx.Done():
-		return "", ctx.Err()
-	case err := <-done:
-		if err != nil {
-			return "", fmt.Errorf("telegram download failed: %w", err)
-		}
-	}
-
-	return rawFile, nil
-}
-
-func (f *FallenApiPlatform) checkDownloadedFile(videoId string) (string, error) {
-	outputDir := "./downloads"
-	pattern := filepath.Join(outputDir, videoId+".*")
-
-	matches, err := filepath.Glob(pattern)
+	_, err = msg.Download(dOpts)
 	if err != nil {
-		return "", fmt.Errorf("failed to search files: %v", err)
+		os.Remove(rawFile)
+		return "", err
 	}
-
-	if len(matches) == 0 {
-		return "", errors.New("❌ file not found")
-	}
-
-	// If multiple matches, pick the first one
-	return matches[0], nil
+	return rawFile, nil
 }

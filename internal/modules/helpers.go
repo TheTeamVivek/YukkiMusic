@@ -20,58 +20,53 @@
 package modules
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"html"
 	"runtime/debug"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Laky-64/gologging"
-	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/config"
+	"main/internal/core"
+	state "main/internal/core/models"
+	"main/internal/database"
+	"main/internal/locales"
+	"main/internal/utils"
 )
 
-var (
-	superGroupFilter    = telegram.FilterFunc(FilterSuperGroup)
-	adminFilter         = telegram.FilterFunc(FilterChatAdmins)
-	authFilter          = telegram.FilterFunc(FilterAuthUsers)
-	ignoreChannelFilter = telegram.FilterFunc(FilterChannel)
-	sudoOnlyFilter      = telegram.FilterFunc(FilterSudo)
-	ownerFilter         = telegram.FilterFunc(FilterOwner)
-)
+var downloadCancels = make(map[int64]context.CancelFunc)
 
-func bool_(b bool) *bool {
-	return &b
-}
-
-func getEffectiveRoom(m *telegram.NewMessage, cplay bool) (*core.RoomState, error) {
+func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	chatID := m.ChannelID()
-	if !cplay {
-		r, _ := core.GetRoom(chatID, true)
-		return r, nil
+
+	if cplay {
+		cplayID, err := database.GetCPlayID(chatID)
+		if err != nil || cplayID == 0 {
+			return nil, errors.New(F(chatID, "cplay_id_not_set"))
+		}
+		chatID = cplayID
 	}
-	cplayID, err := database.GetCPlayID(chatID)
-	if err != nil || cplayID == 0 {
-		return nil, errors.New("cplay ID not set. Use /cplay --set <chat_id> to set it")
+	ass, err := core.Assistants.ForChat(chatID)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get assistant for you chat: %w", err)
 	}
-	r, _ := core.GetRoom(cplayID, true)
+	r, _ := core.GetRoom(chatID, ass, true)
 	return r, nil
 }
 
-func sendPlayLogs(m *telegram.NewMessage, track *state.Track, queued bool) {
+func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 	if config.LoggerID == 0 || config.LoggerID == m.ChatID() || config.LoggerID == m.ChannelID() {
 		return
 	}
 
 	if is, err := database.IsLoggerEnabled(); err != nil {
 		gologging.Error("Failed to get IsLoggerEnabled: " + err.Error())
+		return
 	} else if !is {
 		return
 	}
@@ -81,231 +76,184 @@ func sendPlayLogs(m *telegram.NewMessage, track *state.Track, queued bool) {
 		err error
 	)
 
-	header := "Playback Started"
+	chatID := m.ChannelID()
+
+	header := F(chatID, "logger_playback_started")
 	if queued {
-		header = "Playback Queued"
+		header = F(chatID, "logger_playback_queued")
 	}
 
+	// Header
 	sb.WriteString("🎵 ")
 	if m.Channel.Username != "" {
-		sb.WriteString("<b><a href=\"")
-		sb.WriteString(m.Link())
-		sb.WriteString("\">")
-		sb.WriteString(header)
-		sb.WriteString("</a></b>\n\n")
+		fmt.Fprintf(&sb, "<b><a href=\"%s\">%s</a></b>\n\n", m.Link(), header)
 	} else {
-		sb.WriteString("<b><u>")
-		sb.WriteString(header)
-		sb.WriteString("</u></b>\n\n")
+		fmt.Fprintf(&sb, "<b><u>%s</u></b>\n\n", header)
 	}
 
+	// artwork block
 	if track.Artwork != "" {
 		sb.WriteString("<blockquote>")
 	}
 
-	sb.WriteString("<b>🎧 Track:</b> <a href=\"")
-	sb.WriteString(track.URL)
-	sb.WriteString("\">")
-	sb.WriteString(utils.ShortTitle(track.Title))
-	sb.WriteString("</a>\n")
+	// Track
+	fmt.Fprintf(&sb,
+		"<b>%s</b> <a href=\"%s\">%s</a>\n",
+		F(chatID, "logger_track"),
+		track.URL,
+		utils.ShortTitle(track.Title),
+	)
 
-	sb.WriteString("<b>🔗 Source:</b> ")
-	sb.WriteString(string(track.Source))
-	sb.WriteByte('\n')
+	// Source
+	fmt.Fprintf(&sb,
+		"<b>%s</b> %s\n",
+		F(chatID, "logger_source"),
+		string(track.Source),
+	)
 
-	sb.WriteString("<b>📌 Group:</b> ")
+	// Group
+	fmt.Fprintf(&sb, "<b>%s</b> ", F(chatID, "logger_group"))
 	if m.Channel.Username != "" {
-		sb.WriteByte('@')
-		sb.WriteString(m.Channel.Username)
+		fmt.Fprintf(&sb, "@%s", m.Channel.Username)
 	} else {
 		sb.WriteString(m.Channel.Title)
 	}
-	sb.WriteString(" (")
-	sb.WriteString(strconv.FormatInt(m.ChannelID(), 10))
-	sb.WriteString(")\n")
+	fmt.Fprintf(&sb, " (%d)\n", m.ChannelID())
 
-	sb.WriteString("<b>👤 Requested by:</b> ")
+	// Requested by
+	fmt.Fprintf(&sb, "<b>%s</b> ", F(chatID, "logger_requested_by"))
 	if m.Sender.Username != "" {
-		sb.WriteByte('@')
-		sb.WriteString(m.Sender.Username)
+		fmt.Fprintf(&sb, "@%s", m.Sender.Username)
 	} else {
 		sb.WriteString(utils.MentionHTML(m.Sender))
 	}
-	sb.WriteString(" (<code>")
-	sb.WriteString(strconv.FormatInt(m.Sender.ID, 10))
-	sb.WriteString("</code>)\n")
+	fmt.Fprintf(&sb, " (<code>%d</code>)\n", m.Sender.ID)
 
-	sb.WriteString("<b>⏳ Timestamp:</b> ")
-	sb.WriteString(time.Now().Format("2006-01-02 15:04:05"))
+	// Timestamp
+	fmt.Fprintf(&sb, "<b>%s</b> %s",
+		F(chatID, "logger_timestamp"),
+		time.Now().Format("2006-01-02 15:04:05"),
+	)
 
+	// Sending
 	if track.Artwork != "" {
-
 		sb.WriteString("\n</blockquote>")
-		_, err = core.Bot.SendMedia(config.LoggerID, utils.CleanURL(track.Artwork), &telegram.MediaOptions{Caption: sb.String()})
+		_, err = core.Bot.SendMedia(
+			config.LoggerID,
+			utils.CleanURL(track.Artwork),
+			&tg.MediaOptions{Caption: sb.String()},
+		)
 	} else {
 		_, err = core.Bot.SendMessage(config.LoggerID, sb.String())
 	}
+
 	if err != nil {
 		gologging.Error("Failed to send logger msg: " + err.Error())
 	}
 }
 
-func FilterOwner(m *telegram.NewMessage) bool {
-	if config.OwnerID == 0 || m.SenderID() != config.OwnerID {
-		if m.IsPrivate() || strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
-			m.Reply("⚠️ Only the bot owner can use this command.")
-		}
-		return false
+func F(chatID int64, key string, values ...locales.Arg) string {
+	lang, err := database.GetChatLanguage(chatID)
+	if err != nil {
+		gologging.Error("Failed to get language for " + utils.IntToStr(chatID) + " Got error " + err.Error())
+		lang = config.DefaultLang
 	}
-	return true
+	return FWithLang(lang, key, values...)
 }
 
-func FilterSudo(m *telegram.NewMessage) bool {
-	is, _ := database.IsSudo(m.SenderID())
-
-	if config.OwnerID == 0 || (m.SenderID() != config.OwnerID && !is) {
-		if m.IsPrivate() || strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
-			m.Reply("⚠️ Only sudo users or the bot owner can use this command.")
-		}
-		return false
+func FWithLang(lang, key string, values ...locales.Arg) string {
+	var val locales.Arg
+	if len(values) > 0 {
+		val = values[0]
 	}
-
-	return true
+	return locales.Get(lang, key, val)
 }
 
-func FilterChannel(m *telegram.NewMessage) bool {
-	if _, ok := m.Message.FromID.(*telegram.PeerChannel); ok {
-		return false
+func isLogger() (l bool) {
+	var err error
+	l, err = database.IsLoggerEnabled()
+	if err != nil {
+		gologging.Error("Failed to get IsLoggerEnabled, Err: " + err.Error())
 	}
-	return true
+	return l
 }
 
-func FilterAuthUsers(m *telegram.NewMessage) bool {
-	isAdmin, err := utils.IsChatAdmin(m.Client, m.ChannelID(), m.SenderID())
-	if err == nil && isAdmin {
-		return true
-	}
-
-	isAuth, err := database.IsAuthUser(m.ChannelID(), m.SenderID())
-	if err == nil && isAuth {
-		return true
-	}
-
-	m.Reply(
-		"⚠️ <b>Access Denied</b>\n" +
-			"Only <b>admins</b> or <b>authorized users</b> can control this actions.\n\n" +
-			"If you recently became an admin, use /reload to refresh your permissions.",
-	)
-	return false
-}
-
-func FilterSuperGroup(m *telegram.NewMessage) bool {
-	/*if m.Message.FromID == nil || (m.SenderChat != nil && m.SenderChat.ID != 0) {
-		m.Reply("⚠️ You are using Anonymous Admin Mode.\n\n👉 Switch back to your user account to use commands.")
-		return false
-	}*/
-
-	if !FilterChannel(m) {
-		return false
-	}
-	// Validate chat type
-	switch m.ChatType() {
-	case telegram.EntityChat:
-		// EntityChat can be basic group or supergroup — allow only supergroup
-		if m.Channel != nil && !m.Channel.Broadcast {
-			database.AddServed(m.ChannelID())
-			return true // Supergroup
-		}
-		warnAndLeave(m.Client, m.ChatID()) // Basic group → leave
-		database.DeleteServed(m.ChannelID())
-		return false
-
-	case telegram.EntityChannel:
-		return false // Pure channel chat → ignore
-
-	case telegram.EntityUser:
-		m.Reply("⚠️ This command can only be used in groups.")
-		database.AddServed(m.ChannelID(), true)
-		return false // Private chat → warn
-	}
-
-	return false
-}
-
-func FilterChatAdmins(m *telegram.NewMessage) bool {
-	isAdmin, err := utils.IsChatAdmin(m.Client, m.ChannelID(), m.SenderID())
-	if err != nil || !isAdmin {
-		m.Reply(
-			"⚠️ <b>Permission Denied!</b>\n" +
-				"Only <b>admins</b> can control this actions. You can still play songs 🎵.\n\n" +
-				"If you believe you are an admin, please use /reload to refresh your admin status.",
-		)
-		return false
-	}
-	return true
-}
-
-func SafeCallbackHandler(handler func(*telegram.CallbackQuery) error) func(*telegram.CallbackQuery) error {
-	return func(cb *telegram.CallbackQuery) (err error) {
+func SafeCallbackHandler(handler func(*tg.CallbackQuery) error) func(*tg.CallbackQuery) error {
+	return func(cb *tg.CallbackQuery) (err error) {
 		if is, _ := database.IsMaintenance(); is {
 			if cb.Sender.ID != config.OwnerID {
 				if ok, _ := database.IsSudo(cb.Sender.ID); !ok {
-					cb.Answer("⚠️ I'm under maintenance at the moment and temporarily unavailable. Please check back later.", &telegram.CallbackOptions{Alert: true})
-					return telegram.EndGroup
+					cb.Answer(F(cb.ChannelID(), "maint", locales.Arg{"reason": ""}), &tg.CallbackOptions{Alert: true})
+					return tg.ErrEndGroup
 				}
 			}
 		}
 		defer func() {
 			if r := recover(); r != nil {
 				handlePanic(r, cb, true)
-				err = fmt.Errorf("internal error occurred")
+				err = fmt.Errorf("Some panics handled")
 			}
 		}()
 		err = handler(cb)
 		if err != nil {
-			if errors.Is(err, telegram.EndGroup) {
+			if errors.Is(err, tg.ErrEndGroup) {
 				return err
 			}
 			handlePanic(err, cb, false)
-			err = fmt.Errorf("internal error occurred")
 		}
 		return err
 	}
 }
 
-func SafeMessageHandler(handler func(*telegram.NewMessage) error) func(*telegram.NewMessage) error {
-	return func(m *telegram.NewMessage) (err error) {
+func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage) error {
+	return func(m *tg.NewMessage) (err error) {
+		gologging.Info("Handling message from " + fmt.Sprint(m.SenderID()) + " in chat " + fmt.Sprint(m.ChannelID()))
+
 		if is, _ := database.IsMaintenance(); is {
+			gologging.Debug("Maintenance mode active")
 			if m.SenderID() != config.OwnerID {
 				if ok, _ := database.IsSudo(m.SenderID()); !ok {
-					if m.ChatType() == telegram.EntityUser || strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
-						msg := "⚠️ I'm under maintenance at the moment and temporarily unavailable. Please check back later."
-
-						if reason, err := database.GetMaintReason(); err == nil && reason != "" {
-							msg += "\n\n<i>📝 Reason: " + reason + "</i>"
-						}
+					if m.ChatType() == tg.EntityUser || strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
+						reason, _ := database.GetMaintReason()
+						reason = F(m.ChannelID(), "maint_reason", locales.Arg{"reason": reason})
+						msg := F(m.ChannelID(), "maint", locales.Arg{"reason": reason})
 						m.Reply(msg)
-
+						gologging.Info("Sent maintenance notice to " + fmt.Sprint(m.SenderID()))
 					}
-					return telegram.EndGroup
+					return tg.ErrEndGroup
 				}
 			}
 		}
 
 		defer func() {
 			if r := recover(); r != nil {
+				gologging.Error("Recovered from panic: " + fmt.Sprint(r))
 				handlePanic(r, m, true)
-				err = fmt.Errorf("internal error occurred")
+				err = fmt.Errorf("internal panic occurred")
 			}
 		}()
-		err = handler(m)
+
+		if checkForHelpFlag(m) {
+			cmd := getCommand(m)
+			gologging.Debug("Help flag detected for command " + cmd)
+			err = showHelpFor(m, cmd)
+		} else {
+			cmd := getCommand(m)
+			gologging.Debug("Executing handler for command " + cmd)
+			err = handler(m)
+		}
+
 		if err != nil {
-			if errors.Is(err, telegram.EndGroup) {
+			if errors.Is(err, tg.ErrEndGroup) {
+				gologging.Debug("Handler exited early (ErrEndGroup)")
 				return err
 			}
+			gologging.Error("Handler error: " + err.Error())
 			handlePanic(err, m, false)
-			err = fmt.Errorf("internal error occurred")
+		} else {
+			gologging.Info("Handler completed successfully for command " + getCommand(m))
 		}
+
 		return err
 	}
 }
@@ -315,23 +263,23 @@ func handlePanic(r, ctx interface{}, isPanic bool) {
 	stack := html.EscapeString(string(debug.Stack()))
 
 	var userMention, handlerType, chatInfo, messageInfo, errorMessage string
-	var client *telegram.Client
+	var client *tg.Client
 
 	switch c := ctx.(type) {
-	case *telegram.NewMessage:
+	case *tg.NewMessage:
 		userMention = utils.MentionHTML(c.Sender)
 		handlerType = "message"
-		chatInfo = fmt.Sprintf("ChatID: %d", c.ChatID())
-		messageInfo = fmt.Sprintf("Message: %s\nLink: %s", html.EscapeString(c.Text()), c.Link())
-		errorMessage = html.EscapeString(fmt.Sprintf("%v", r))
+		chatInfo = "ChatID: " + utils.IntToStr(c.ChannelID())
+		messageInfo = "Message: " + html.EscapeString(c.Text()) + "\nLink: " + c.Link()
+		errorMessage = html.EscapeString(fmt.Sprint(r))
 		client = c.Client
 
-	case *telegram.CallbackQuery:
+	case *tg.CallbackQuery:
 		userMention = utils.MentionHTML(c.Sender)
 		handlerType = "callback"
-		chatInfo = fmt.Sprintf("ChatID: %d", c.ChatID)
-		messageInfo = fmt.Sprintf("Data: %s", html.EscapeString(c.DataString()))
-		errorMessage = html.EscapeString(fmt.Sprintf("%v", r))
+		chatInfo = "ChatID: " + utils.IntToStr(c.ChatID)
+		messageInfo = "Data: " + html.EscapeString(c.DataString())
+		errorMessage = html.EscapeString(fmt.Sprint(r))
 		client = c.Client
 	}
 
@@ -357,27 +305,20 @@ func handlePanic(r, ctx interface{}, isPanic bool) {
 			short = fmt.Sprintf(shortMsg, handlerType, userMention, chatInfo, messageInfo, errorMessage)
 		}
 
-		if _, sendErr := client.SendMessage(config.LoggerID, short, &telegram.SendOptions{ParseMode: "HTML"}); sendErr != nil {
+		gologging.Error(short)
+		if _, sendErr := client.SendMessage(config.LoggerID, short, &tg.SendOptions{ParseMode: "HTML"}); sendErr != nil {
 			logger.ErrorF("Failed to send panic message to log chat: %v", sendErr)
 		}
 	}
 }
 
-func warnAndLeave(client *telegram.Client, chatID int64) {
-	text := fmt.Sprintf(
-		"This chat (ID: <code>%d</code>) is not a supergroup yet.\n"+
-			"<b>⚠️ Please convert this chat to a supergroup then add me as admin.</b>\n\n"+
-			"If you don't know how to convert, use this guide:\n"+
-			"🔗 <a href=\"https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02\">How to convert to a SuperGroup</a> \n\n"+
-			"If you have any questions, join our support group:",
-		chatID,
-	)
-
+func warnAndLeave(client *tg.Client, chatID int64) {
+	text := F(chatID, "supergroup_needed", locales.Arg{"chat_id": chatID})
 	_, err := client.SendMessage(
 		chatID,
 		text,
-		&telegram.SendOptions{
-			ReplyMarkup: core.AddMeMarkup(core.BUser.Username),
+		&tg.SendOptions{
+			ReplyMarkup: core.AddMeMarkup(chatID),
 			LinkPreview: false,
 		},
 	)
@@ -391,7 +332,7 @@ func warnAndLeave(client *telegram.Client, chatID int64) {
 		if err := client.LeaveChannel(chatID); err != nil {
 			gologging.ErrorF("Failed to leave non-supergroup chatID=%d: %v", chatID, err)
 		}
-		core.UBot.LeaveChannel(chatID)
+		core.Assistants.WithAssistant(chatID, func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) })
 	}()
 }
 
@@ -406,7 +347,7 @@ func formatDuration(sec int) string {
 	return fmt.Sprintf("%02d:%02d", m, s) // MM:SS
 }
 
-func getCommand(m *telegram.NewMessage) string {
+func getCommand(m *tg.NewMessage) string {
 	cmd := strings.SplitN(m.GetCommand(), "@", 2)[0]
 	return cmd
 }

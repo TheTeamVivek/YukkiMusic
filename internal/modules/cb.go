@@ -28,437 +28,500 @@ import (
 	"time"
 
 	"github.com/Laky-64/gologging"
-	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/platforms"
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/core"
+	"main/internal/database"
+	"main/internal/locales"
+	"main/internal/platforms"
+	"main/internal/utils"
 )
 
-func cancelHandler(cb *telegram.CallbackQuery) error {
-	var chatID int64
-	opt := &telegram.CallbackOptions{Alert: true}
+// Action handlers map for cleaner dispatch
+type actionHandler func(*tg.CallbackQuery, *core.RoomState, int64) error
 
-	chat, err := cb.GetChannel()
-	if err != nil {
-		cb.Answer("⚠️ Can’t access this chat.", opt)
-		return telegram.EndGroup
-	}
-
-	chatID, err = utils.GetPeerID(cb.Client, chat.ID)
-	if err != nil {
-		cb.Answer("⚠️ Chat not recognized.", opt)
-		return telegram.EndGroup
-	}
-	if cancel, ok := state.DownloadCancels[chatID]; ok {
-		cancel()
-		delete(state.DownloadCancels, chatID)
-		cb.Answer("Download canceled.", &telegram.CallbackOptions{Alert: true})
-	} else {
-		cb.Answer("No download to cancel.", &telegram.CallbackOptions{Alert: true})
-	}
-	return telegram.EndGroup
+var actionHandlers = map[string]actionHandler{
+	"pause":  handlePauseAction,
+	"resume": handleResumeAction,
+	"replay": handleReplayAction,
+	"skip":   handleSkipAction,
+	"stop":   handleStopAction,
+	"mute":   handleMuteAction,
+	"unmute": handleUnmuteAction,
 }
 
-func closeHandler(cb *telegram.CallbackQuery) error {
+func cancelHandler(cb *tg.CallbackQuery) error {
+	chatID := cb.ChannelID()
+	opt := &tg.CallbackOptions{Alert: true}
+
+	if !checkAdminOrAuth(cb, chatID, opt) {
+		return tg.ErrEndGroup
+	}
+
+	if cancel, ok := downloadCancels[chatID]; ok {
+		cancel()
+		delete(downloadCancels, chatID)
+		cb.Answer(F(chatID, "download_cancelled"), opt)
+	} else {
+		cb.Answer(F(chatID, "no_download_to_cancel"), opt)
+	}
+	return tg.ErrEndGroup
+}
+
+func closeHandler(cb *tg.CallbackQuery) error {
 	cb.Answer("")
 	cb.Delete()
-	return telegram.EndGroup
+	return tg.ErrEndGroup
 }
 
-func emptyCBHandler(cb *telegram.CallbackQuery) error {
+func emptyCBHandler(cb *tg.CallbackQuery) error {
 	cb.Answer("")
-	return telegram.EndGroup
+	return tg.ErrEndGroup
 }
 
-func roomHandle(cb *telegram.CallbackQuery) error {
-	logger := gologging.GetLogger("CALLBACK")
+func roomHandle(cb *tg.CallbackQuery) error {
+	opt := &tg.CallbackOptions{Alert: true}
+	data := cb.DataString()
 
-	var chatID int64
-	opt := &telegram.CallbackOptions{Alert: true}
-	data := string(cb.Data)
+	// Parse action type
+	action := strings.TrimPrefix(data, "croom:")
+	action = strings.TrimPrefix(action, "room:")
 
-	var updateType string
-	croom := false
-	if strings.HasPrefix(data, "croom:") {
-		updateType = strings.TrimPrefix(data, "croom:")
-		croom = true
-	} else if strings.HasPrefix(data, "room:") {
-		updateType = strings.TrimPrefix(data, "room:")
+	if action == "" {
+		gologging.WarnF("Missing action in data: %s", data)
+		cb.Answer(F(cb.ChannelID(), "invalid_request"), opt)
+		return tg.ErrEndGroup
 	}
 
-	if updateType == "" {
-		logger.WarnF("Missing action in data: %s", data)
-		if _, err := cb.Answer("⚠️ Invalid request.", opt); err != nil {
-			logger.ErrorF("Answer error: %v", err)
-		}
-		return telegram.EndGroup
-	}
+	chatID := cb.ChannelID()
 
-	chat, err := cb.GetChannel()
-	if err != nil {
-		logger.ErrorF("GetChannel error: %v", err)
-		if _, e := cb.Answer("⚠️ Can’t access this chat.", opt); e != nil {
-			logger.ErrorF("Answer error: %v", e)
-		}
-		return telegram.EndGroup
-	}
-
-	chatID, err = utils.GetPeerID(cb.Client, chat.ID)
-	if err != nil {
-		logger.ErrorF("PeerID error for %d: %v", chatID, err)
-		if _, e := cb.Answer("⚠️ Chat not recognized.", opt); e != nil {
-			logger.ErrorF("Answer error: %v", e)
-		}
-		return telegram.EndGroup
-	}
-
-	var r *core.RoomState
-	var ok bool
-	if croom {
+	// Handle cplay mode
+	if strings.HasPrefix(cb.DataString(), "croom:") {
 		realChatID, err := database.GetCPlayID(chatID)
 		if err != nil {
-			logger.ErrorF("Failed to get chat ID for cplay ID %d: %v", chatID, err)
-			cb.Answer("⚠️ This channel isn't linked to any group.", opt)
-			return telegram.EndGroup
+			gologging.ErrorF("Failed to get chat ID for cplay ID %d: %v", chatID, err)
+			cb.Answer(F(chatID, "room_not_linked"), opt)
+			return tg.ErrEndGroup
 		}
 		chatID = realChatID
 	}
-	r, ok = core.GetRoom(chatID)
-	if !ok || !r.IsActiveChat() {
-		if _, err := cb.Answer("⚠️ Nothing playing right now.", opt); err != nil {
-			logger.ErrorF("Answer error: %v", err)
-		}
-		if _, err := cb.Edit("🎵 Oops! The music is taking a break. Nothing’s playing at the moment."); err != nil {
-			logger.ErrorF("Edit error: %v", err)
-		}
-		return telegram.EndGroup
-	}
-	if isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); err != nil || !isAdmin {
-		cb.Answer(
-			"Only admins can do this actions.",
-			opt,
-		)
-		return telegram.EndGroup
-	}
 
-	key := fmt.Sprintf("room:%d:%d", cb.Sender.ID, chatID)
-	if remaining := utils.GetFlood(key); remaining > 0 {
-		msg := fmt.Sprintf("⏳ Slow down! Try again in %.2f seconds.", remaining.Seconds())
-		if _, err := cb.Answer(msg, opt); err != nil {
-			logger.ErrorF("Flood Answer error: %v", err)
-		}
-		return telegram.EndGroup
-	}
-	utils.SetFlood(key, 5*time.Second)
-
-	switch {
-	case updateType == "pause":
-		logger.InfoF("Callback → pause, chatID=%d", chatID)
-
-		if r.IsMuted() {
-			if _, err := cb.Answer("🔇 The chat is muted. Please unmute first.", opt); err != nil {
-				logger.ErrorF("Answer error: %v", err)
-			}
-			return telegram.EndGroup
-		}
-
-		if r.IsPaused() {
-			remaining := r.RemainingResumeDuration()
-			if remaining > 0 {
-				if _, err := cb.Answer(fmt.Sprintf("⏸️ Track is already paused — auto-resuming in %s.", formatDuration(int(remaining.Seconds()))), opt); err != nil {
-					logger.ErrorF("Answer error: %v", err)
-				}
-			} else {
-				if _, err := cb.Answer("⏸️ Track is already paused. Tap ▶️ Resume to continue.", opt); err != nil {
-					logger.ErrorF("Answer error: %v", err)
-				}
-			}
-			return telegram.EndGroup
-		}
-
-		if _, pauseErr := r.Pause(); pauseErr != nil {
-			logger.ErrorF("Pause failed: %v", pauseErr)
-			if _, err := cb.Answer("❌ Failed to pause playback.", opt); err != nil {
-				logger.ErrorF("Answer error: %v", err)
-			}
-			return telegram.EndGroup
-		}
-
-		if _, err := cb.Answer(fmt.Sprintf("⏸️ Track paused at %s.", formatDuration(r.Position)), opt); err != nil {
-			logger.ErrorF("Answer error: %v", err)
-		}
-
-		mention := utils.MentionHTML(cb.Sender)
-		track := r.Track
-		safeTitle := html.EscapeString(track.Title)
-
-		msgText := fmt.Sprintf(
-			"<b>⏸️ Track Paused</b>\n\n"+
-				"<b>▫ Track:</b> <a href=\"%s\">%s</a>\n"+
-				"<b>▫ Position:</b> %s / %s\n"+
-				"<b>▫ Paused by:</b> %s",
-			track.URL,
-			utils.ShortTitle(safeTitle, 25),
-			formatDuration(r.Position),
-			formatDuration(track.Duration),
-			mention,
-		)
-
-		if _, err := cb.Edit(msgText, &telegram.SendOptions{
-			ParseMode:   "HTML",
-			ReplyMarkup: core.GetPlayMarkup(r, false),
-		}); err != nil {
-			logger.ErrorF("Edit error: %v", err)
-		}
-
-	case updateType == "resume":
-		logger.InfoF("Callback → resume, chatID=%d", chatID)
-
-		if !r.IsPaused() {
-			if _, err := cb.Answer("ℹ️ Track is already playing.", opt); err != nil {
-				logger.ErrorF("Answer error: %v", err)
-			}
-			return telegram.EndGroup
-		}
-
-		if _, err := r.Resume(); err != nil {
-			logger.ErrorF("Resume failed: %v", err)
-			if _, e := cb.Answer("❌ Failed to resume playback.", opt); e != nil {
-				logger.ErrorF("Answer error: %v", e)
-			}
-			return telegram.EndGroup
-		}
-
-		if _, err := cb.Answer(fmt.Sprintf("▶️ Resumed at %s.", formatDuration(r.Position)), opt); err != nil {
-			logger.ErrorF("Answer error: %v", err)
-		}
-
-		mention := utils.MentionHTML(cb.Sender)
-		track := r.Track
-
-		msgText := fmt.Sprintf(
-			"<b>🎵 Now Playing:</b>\n\n"+
-				"<b>▫ Track:</b> <a href=\"%s\">%s</a>\n"+
-				"<b>▫ Duration:</b> %s\n"+
-				"<b>▫ Resumed by:</b> %s",
-			track.URL,
-			html.EscapeString(utils.ShortTitle(track.Title, 25)),
-			formatDuration(track.Duration),
-			mention,
-		)
-
-		if _, err := cb.Edit(msgText, &telegram.SendOptions{
-			ParseMode:   "HTML",
-			ReplyMarkup: core.GetPlayMarkup(r, false),
-		}); err != nil {
-			logger.ErrorF("Edit error: %v", err)
-		}
-
-	case updateType == "replay":
-		logger.InfoF("Callback → replay, chatID=%d", chatID)
-
-		mystic, err := cb.Respond("🔁 <b>Replaying current track...</b>")
-		if err != nil {
-			logger.ErrorF("Failed to send replay message: %v", err)
-			return telegram.EndGroup
-		}
-
-		if err := r.Replay(); err != nil {
-			logger.ErrorF("Replay failed: %v", err)
-			utils.EOR(mystic, fmt.Sprintf("❌ <b>Replay Failed</b>\nError: <code>%v</code>", err))
-			cb.Answer("❌ Failed to replay track.", opt)
-			return telegram.EndGroup
-		}
-		track := r.Track
-
-		trackTitle := html.EscapeString(utils.ShortTitle(track.Title, 25))
-		totalDuration := formatDuration(track.Duration)
-
-		msgText := fmt.Sprintf(
-			"<b>🎵 Now Playing:</b>\n\n"+
-				"<b>▫ Track:</b> <a href=\"%s\">%s</a>\n"+
-				"<b>▫ Duration:</b> %s\n"+
-				"<b>▫ Requested by:</b> %s\n"+
-				"<b>▫ Replayed by:</b> %s",
-			track.URL,
-			trackTitle,
-			totalDuration,
-			track.BY,
-			utils.MentionHTML(cb.Sender),
-		)
-
-		cb.Answer("🔁 Track replayed.", opt)
-
-		optSend := &telegram.SendOptions{
-			ParseMode:   "HTML",
-			ReplyMarkup: core.GetPlayMarkup(r, false),
-		}
-
-		if track.Artwork != "" {
-			optSend.Media = utils.CleanURL(track.Artwork)
-		}
-
-		mystic, _ = utils.EOR(mystic, msgText, *optSend)
-		r.SetMystic(mystic)
-
-		if _, err := cb.Edit(fmt.Sprintf("🔁 Track replayed by %s.", utils.MentionHTML(cb.Sender))); err != nil {
-			logger.ErrorF("Edit error: %v", err)
-		}
-
-	case strings.HasPrefix(updateType, "seekback_"):
-		parts := strings.Split(updateType, "_")
-		seconds, err := strconv.Atoi(parts[1])
-		if err != nil {
-			cb.Answer("⚠️ Invalid seek value.", opt)
-			return telegram.EndGroup
-		}
-
-		// Clamp to start
-		if r.Position <= seconds {
-			r.Seek(-int(r.Position))
+	// Get room
+	r, err := getRoomForCallback(chatID)
+	if err != nil {
+		if strings.Contains(err.Error(), "no active room") {
+			cb.Answer(F(cb.ChannelID(), "room_not_active_cb"), opt)
+			editMessage(cb, F(cb.ChannelID(), "room_no_active"))
 		} else {
-			r.Seek(-seconds)
+			cb.Answer(err.Error(), opt)
 		}
-
-		cb.Answer(fmt.Sprintf("⏪ Sought back %d seconds", seconds), opt)
-		rp(cb, fmt.Sprintf("⏪ Sought back %d seconds — by %s", seconds, utils.MentionHTML(cb.Sender)))
-
-	case strings.HasPrefix(updateType, "seek_"):
-		parts := strings.Split(updateType, "_")
-		seconds, err := strconv.Atoi(parts[1])
-		if err != nil {
-			cb.Answer("⚠️ Invalid seek value.", opt)
-			return telegram.EndGroup
-		}
-
-		// Warn if near end
-		if (r.Track.Duration - r.Position) <= seconds {
-			cb.Answer(fmt.Sprintf("⚠️ Cannot seek forward %d seconds — about to reach end.", seconds), opt)
-
-			return telegram.EndGroup
-		}
-
-		r.Seek(seconds)
-		cb.Answer(fmt.Sprintf("⏩ Sought %d seconds", seconds), opt)
-		rp(cb, fmt.Sprintf("⏩ Sought %d seconds — by %s", seconds, utils.MentionHTML(cb.Sender)))
-
-	case updateType == "skip":
-		logger.InfoF("Callback → skip, chatID=%d", chatID)
-
-		mention := utils.MentionHTML(cb.Sender)
-
-		if len(r.Queue) == 0 && r.Loop == 0 {
-			r.Destroy()
-			msgText := fmt.Sprintf(
-				"⏹️ <b>Playback stopped.</b>\nQueue is empty.\n\n▫ Skipped by: %s",
-				mention,
-			)
-			if _, err := cb.Edit(msgText, &telegram.SendOptions{ParseMode: "HTML"}); err != nil {
-				logger.ErrorF("Edit error: %v", err)
-			}
-			if _, err := cb.Answer("⏹️ Playback stopped — queue empty.", opt); err != nil {
-				logger.ErrorF("Answer error: %v", err)
-			}
-			return telegram.EndGroup
-		}
-
-		t := r.NextTrack()
-
-		mystic, err := cb.Respond("📥 Downloading your next track...")
-		if err != nil {
-			logger.ErrorF("Failed to send msg: %v", err)
-		}
-
-		path, err := platforms.Download(context.Background(), t, mystic)
-		if err != nil {
-			logger.ErrorF("Download failed for %s: %v", t.URL, err)
-			utils.EOR(mystic, "❌ Failed to download next track.")
-			if _, err := cb.Answer("❌ Failed to download next track.", opt); err != nil {
-				logger.ErrorF("Answer error: %v", err)
-			}
-			return telegram.EndGroup
-		}
-
-		if err := r.Play(t, path); err != nil {
-			logger.ErrorF("Play error: %v", err)
-			utils.EOR(mystic, "❌ Failed to play next track.")
-			if _, err := cb.Answer("❌ Failed to play next track.", opt); err != nil {
-				logger.ErrorF("Answer error: %v", err)
-			}
-			return telegram.EndGroup
-		}
-
-		if _, err := cb.Answer("⏭️ Track skipped.", opt); err != nil {
-			logger.ErrorF("Answer error: %v", err)
-		}
-
-		_, err = cb.Delete()
-		if err != nil {
-			logger.ErrorF("Delete error: %v", err)
-		}
-
-		title := utils.ShortTitle(t.Title, 25)
-		safeTitle := html.EscapeString(title)
-		msgText := fmt.Sprintf(
-			"<b>🎵 Now Playing:</b>\n\n"+
-				"<b>▫ Track:</b> <a href=\"%s\">%s</a>\n"+
-				"<b>▫ Duration:</b> %s\n"+
-				"<b>▫ Requested by:</b> %s",
-			t.URL,
-			safeTitle,
-			formatDuration(t.Duration),
-			t.BY,
-		)
-
-		opt := &telegram.SendOptions{
-			ParseMode:   "HTML",
-			ReplyMarkup: core.GetPlayMarkup(r, false),
-		}
-
-		if t.Artwork != "" {
-			opt.Media = utils.CleanURL(t.Artwork)
-		}
-
-		mystic, _ = utils.EOR(mystic, msgText, *opt)
-
-		if _, err := mystic.Reply(fmt.Sprintf("⏭️ Skipped by %s", mention)); err != nil {
-			logger.ErrorF("Reply error: %v", err)
-		}
-		r.SetMystic(mystic)
-		return telegram.EndGroup
-
-	case updateType == "stop":
-
-		logger.InfoF("Callback → stop, chatID=%d", chatID)
-
-		r.Destroy()
-
-		if _, err := cb.Answer("⏹️ Playback stopped.", opt); err != nil {
-			logger.ErrorF("Answer error: %v", err)
-		}
-
-		if _, err := cb.Edit(fmt.Sprintf("⏹️ Playback stopped and cleared by %s.", utils.MentionHTML(cb.Sender))); err != nil {
-			logger.ErrorF("Edit error: %v", err)
-		}
-
-	default:
-		logger.WarnF("Unknown callback type: %s", updateType)
-		if _, err := cb.Answer("⚠️ Unknown action.", opt); err != nil {
-			logger.ErrorF("Answer error: %v", err)
-		}
+		return tg.ErrEndGroup
 	}
 
-	return telegram.EndGroup
+	// Check permissions
+	if !checkAdminOrAuth(cb, chatID, opt) {
+		return tg.ErrEndGroup
+	}
+
+	// Flood control
+	if !checkFloodControl(cb, chatID, opt) {
+		return tg.ErrEndGroup
+	}
+
+	// Handle seek actions
+	if strings.HasPrefix(action, "seek") {
+		return handleSeekAction(cb, r, action, opt)
+	}
+
+	// Dispatch to handler
+	if handler, ok := actionHandlers[action]; ok {
+		return handler(cb, r, chatID)
+	}
+
+	gologging.WarnF("Unknown callback type: %s", action)
+	cb.Answer(F(cb.ChannelID(), "unknown_action"), opt)
+	return tg.ErrEndGroup
 }
 
-func rp(c *telegram.CallbackQuery, t string) {
-	msg, err := c.GetMessage()
+// Helper functions
+
+func getRoomForCallback(chatID int64) (*core.RoomState, error) {
+	ass, err := core.Assistants.ForChat(chatID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get assistant: %w", err)
+	}
+
+	r, ok := core.GetRoom(chatID, ass)
+	if !ok || !r.IsActiveChat() {
+		return nil, fmt.Errorf("no active room")
+	}
+
+	return r, nil
+}
+
+func checkAdminOrAuth(cb *tg.CallbackQuery, chatID int64, opt *tg.CallbackOptions) bool {
+	isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID)
+	if err != nil || !isAdmin {
+		cb.Answer(F(cb.ChannelID(), "only_admin_or_auth_cb"), opt)
+		return false
+	}
+	return true
+}
+
+func checkFloodControl(cb *tg.CallbackQuery, chatID int64, opt *tg.CallbackOptions) bool {
+	key := fmt.Sprintf("room:%d:%d", cb.Sender.ID, chatID)
+	if remaining := utils.GetFlood(key); remaining > 0 {
+		cb.Answer(F(cb.ChannelID(), "flood_seconds", locales.Arg{
+			"duration": int(remaining.Seconds()),
+		}), opt)
+		return false
+	}
+	utils.SetFlood(key, 5*time.Second)
+	return true
+}
+
+func editMessage(cb *tg.CallbackQuery, text string) {
+	if _, err := cb.Edit(text); err != nil {
+		gologging.ErrorF("Edit error: %v", err)
+	}
+}
+
+func replyToCallback(cb *tg.CallbackQuery, text string) {
+	msg, err := cb.GetMessage()
 	if err != nil {
 		return
 	}
+	msg.Reply(text)
+}
 
-	msg.Reply(t)
+// Action handlers
+
+func handlePauseAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
+
+	gologging.InfoF("Callback → pause, chatID=%d", chatID)
+
+	if r.IsPaused() {
+		remaining := r.RemainingResumeDuration()
+		msg := utils.IfElse(
+			remaining > 0,
+			F(cb.ChannelID(), "room_already_paused_auto", locales.Arg{
+				"duration": formatDuration(int(remaining.Seconds())),
+			}),
+			F(cb.ChannelID(), "room_already_paused"),
+		)
+		cb.Answer(msg, opt)
+		return tg.ErrEndGroup
+	}
+
+	if _, err := r.Pause(); err != nil {
+		gologging.ErrorF("Pause failed: %v", err)
+		cb.Answer(F(cb.ChannelID(), "room_pause_failed", locales.Arg{
+			"error": err.Error(),
+		}), opt)
+		return tg.ErrEndGroup
+	}
+
+	if r.IsMuted() {
+		r.Unmute()
+	}
+
+	cb.Answer(F(cb.ChannelID(), "cb_pause_success", locales.Arg{
+		"position": formatDuration(r.Position()),
+	}), opt)
+
+	updatePlaybackMessage(cb, r, "paused")
+	return tg.ErrEndGroup
+}
+
+func handleResumeAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
+
+	gologging.InfoF("Callback → resume, chatID=%d", chatID)
+
+	if !r.IsPaused() {
+		cb.Answer(F(cb.ChannelID(), "cb_already_playing"), opt)
+		return tg.ErrEndGroup
+	}
+
+	if _, err := r.Resume(); err != nil {
+		gologging.ErrorF("Resume failed: %v", err)
+		cb.Answer(F(cb.ChannelID(), "cb_resume_failed"), opt)
+		return tg.ErrEndGroup
+	}
+
+	cb.Answer(F(cb.ChannelID(), "cb_resume_success", locales.Arg{
+		"position": formatDuration(r.Position()),
+	}), opt)
+
+	updatePlaybackMessage(cb, r, "playing")
+	return tg.ErrEndGroup
+}
+
+func handleReplayAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
+
+	gologging.InfoF("Callback → replay, chatID=%d", chatID)
+
+	mystic, err := cb.Respond(F(cb.ChannelID(), "cb_replaying"))
+	if err != nil {
+		gologging.ErrorF("Failed to send replay message: %v", err)
+		return tg.ErrEndGroup
+	}
+
+	if err := r.Replay(); err != nil {
+		gologging.ErrorF("Replay failed: %v", err)
+		utils.EOR(mystic, F(cb.ChannelID(), "replay_failed", locales.Arg{
+			"error": err.Error(),
+		}))
+		cb.Answer(F(cb.ChannelID(), "cb_replay_failed"), opt)
+		return tg.ErrEndGroup
+	}
+
+	track := r.Track()
+	trackTitle := html.EscapeString(utils.ShortTitle(track.Title, 25))
+
+	msgText := F(cb.ChannelID(), "stream_now_playing", locales.Arg{
+		"url":      track.URL,
+		"title":    trackTitle,
+		"duration": formatDuration(track.Duration),
+		"by":       track.Requester,
+	})
+
+	cb.Answer(F(cb.ChannelID(), "cb_replay_success"), opt)
+
+	optSend := &tg.SendOptions{
+		ParseMode:   "HTML",
+		ReplyMarkup: core.GetPlayMarkup(cb.ChannelID(), r, false),
+	}
+	if track.Artwork != "" {
+		optSend.Media = utils.CleanURL(track.Artwork)
+	}
+
+	mystic, _ = utils.EOR(mystic, msgText, optSend)
+	r.SetMystic(mystic)
+
+	editMessage(cb, F(cb.ChannelID(), "cb_replay_edited", locales.Arg{
+		"user": utils.MentionHTML(cb.Sender),
+	}))
+	return tg.ErrEndGroup
+}
+
+func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
+
+	gologging.InfoF("Callback → skip, chatID=%d", chatID)
+
+	if len(r.Queue()) == 0 && r.Loop() == 0 {
+		r.Destroy()
+		editMessage(cb, F(cb.ChannelID(), "skip_stopped", locales.Arg{
+			"user": utils.MentionHTML(cb.Sender),
+		}))
+		cb.Answer(F(cb.ChannelID(), "cb_skip_queue_empty"), opt)
+		return tg.ErrEndGroup
+	}
+
+	t := r.NextTrack()
+
+	mystic, err := cb.Respond(F(cb.ChannelID(), "stream_downloading_next"))
+	if err != nil {
+		gologging.ErrorF("Failed to send message: %v", err)
+	}
+
+	path, err := platforms.Download(context.Background(), t, mystic)
+	if err != nil {
+		gologging.ErrorF("Download failed for %s: %v", t.URL, err)
+		utils.EOR(mystic, F(cb.ChannelID(), "stream_download_fail", locales.Arg{
+			"error": err.Error(),
+		}))
+		cb.Answer(F(cb.ChannelID(), "cb_skip_download_failed"), opt)
+		return tg.ErrEndGroup
+	}
+
+	if err := r.Play(t, path); err != nil {
+		gologging.ErrorF("Play error: %v", err)
+		utils.EOR(mystic, F(cb.ChannelID(), "stream_play_fail"))
+		cb.Answer(F(cb.ChannelID(), "cb_skip_play_failed"), opt)
+		return tg.ErrEndGroup
+	}
+
+	cb.Answer(F(cb.ChannelID(), "cb_skip_success"), opt)
+	cb.Delete()
+
+	title := utils.ShortTitle(t.Title, 25)
+	safeTitle := html.EscapeString(title)
+
+	msgText := F(cb.ChannelID(), "stream_now_playing", locales.Arg{
+		"url":      t.URL,
+		"title":    safeTitle,
+		"duration": formatDuration(t.Duration),
+		"by":       t.Requester,
+	})
+
+	sendOpt := &tg.SendOptions{
+		ParseMode:   "HTML",
+		ReplyMarkup: core.GetPlayMarkup(cb.ChannelID(), r, false),
+	}
+	if t.Artwork != "" {
+		sendOpt.Media = utils.CleanURL(t.Artwork)
+	}
+
+	mystic, _ = utils.EOR(mystic, msgText, sendOpt)
+	replyToCallback(cb, F(cb.ChannelID(), "cb_skip_edited", locales.Arg{
+		"user": utils.MentionHTML(cb.Sender),
+	}))
+
+	r.SetMystic(mystic)
+	return tg.ErrEndGroup
+}
+
+func handleStopAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
+
+	gologging.InfoF("Callback → stop, chatID=%d", chatID)
+
+	r.Destroy()
+
+	cb.Answer(F(cb.ChannelID(), "cb_stop_success"), opt)
+	editMessage(cb, F(cb.ChannelID(), "stopped", locales.Arg{
+		"user": utils.MentionHTML(cb.Sender),
+	}))
+
+	return tg.ErrEndGroup
+}
+
+func handleMuteAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
+
+	if r.IsMuted() {
+		remaining := r.RemainingUnmuteDuration()
+		msg := utils.IfElse(
+			remaining > 0,
+			F(cb.ChannelID(), "mute_already_muted_with_time", locales.Arg{
+				"duration": formatDuration(int(remaining.Seconds())),
+			}),
+			F(cb.ChannelID(), "mute_already_muted"),
+		)
+		cb.Answer(msg, opt)
+		return tg.ErrEndGroup
+	}
+
+	if _, err := r.Mute(); err != nil {
+		cb.Answer(F(cb.ChannelID(), "mute_failed", locales.Arg{
+			"error": err.Error(),
+		}), opt)
+		return tg.ErrEndGroup
+	}
+
+	cb.Answer(F(cb.ChannelID(), "cb_mute_success"), opt)
+	updatePlaybackMessage(cb, r, "muted")
+	return tg.ErrEndGroup
+}
+
+func handleUnmuteAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+	opt := &tg.CallbackOptions{Alert: true}
+
+	if !r.IsMuted() {
+		cb.Answer(F(cb.ChannelID(), "unmute_already"), opt)
+		return tg.ErrEndGroup
+	}
+
+	if _, err := r.Unmute(); err != nil {
+		cb.Answer(F(cb.ChannelID(), "unmute_failed", locales.Arg{
+			"error": err.Error(),
+		}), opt)
+		return tg.ErrEndGroup
+	}
+
+	cb.Answer(F(cb.ChannelID(), "cb_unmute_success"), opt)
+	updatePlaybackMessage(cb, r, "playing")
+	return tg.ErrEndGroup
+}
+
+func handleSeekAction(cb *tg.CallbackQuery, r *core.RoomState, action string, opt *tg.CallbackOptions) error {
+	parts := strings.Split(action, "_")
+	if len(parts) != 2 {
+		cb.Answer(F(cb.ChannelID(), "invalid_request"), opt)
+		return tg.ErrEndGroup
+	}
+
+	seconds, err := strconv.Atoi(parts[1])
+	if err != nil {
+		cb.Answer(F(cb.ChannelID(), "invalid_request"), opt)
+		return tg.ErrEndGroup
+	}
+
+	isBackward := strings.HasPrefix(action, "seekback_")
+
+	if isBackward {
+		if r.Position() <= seconds {
+			r.Seek(-int(r.Position()))
+		} else {
+			r.Seek(-seconds)
+		}
+		cb.Answer(F(cb.ChannelID(), "cb_seekback_success", locales.Arg{
+			"seconds": seconds,
+		}), opt)
+		replyToCallback(cb, F(cb.ChannelID(), "cb_seekback_edited", locales.Arg{
+			"seconds": seconds,
+			"user":    utils.MentionHTML(cb.Sender),
+		}))
+	} else {
+		if (r.Track().Duration - r.Position()) <= seconds {
+			cb.Answer(F(cb.ChannelID(), "cb_seek_near_end", locales.Arg{
+				"seconds": seconds,
+			}), opt)
+			return tg.ErrEndGroup
+		}
+		r.Seek(seconds)
+		cb.Answer(F(cb.ChannelID(), "cb_seek_success", locales.Arg{
+			"seconds": seconds,
+		}), opt)
+		replyToCallback(cb, F(cb.ChannelID(), "cb_seek_edited", locales.Arg{
+			"seconds": seconds,
+			"user":    utils.MentionHTML(cb.Sender),
+		}))
+	}
+
+	return tg.ErrEndGroup
+}
+
+func updatePlaybackMessage(cb *tg.CallbackQuery, r *core.RoomState, state string) {
+	track := r.Track()
+	safeTitle := html.EscapeString(utils.ShortTitle(track.Title, 25))
+	mention := utils.MentionHTML(cb.Sender)
+
+	var msgText string
+	switch state {
+	case "paused":
+		msgText = F(cb.ChannelID(), "cb_pause_message", locales.Arg{
+			"url":      track.URL,
+			"title":    safeTitle,
+			"position": formatDuration(r.Position()),
+			"duration": formatDuration(track.Duration),
+			"user":     mention,
+		})
+	case "playing":
+		msgText = F(cb.ChannelID(), "cb_resume_message", locales.Arg{
+			"url":      track.URL,
+			"title":    safeTitle,
+			"duration": formatDuration(track.Duration),
+			"user":     mention,
+		})
+	case "muted":
+		msgText = F(cb.ChannelID(), "cb_mute_message", locales.Arg{
+			"url":   track.URL,
+			"title": safeTitle,
+			"user":  mention,
+		})
+	}
+
+	editMessage(cb, msgText)
+
+	if _, err := cb.Edit(msgText, &tg.SendOptions{
+		ParseMode:   "HTML",
+		ReplyMarkup: core.GetPlayMarkup(cb.ChannelID(), r, false),
+	}); err != nil {
+		gologging.ErrorF("Edit error: %v", err)
+	}
 }

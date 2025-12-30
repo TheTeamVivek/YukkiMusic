@@ -1,0 +1,82 @@
+/*
+ * This file is part of YukkiMusic.
+ *
+ * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+ * Copyright (C) 2025 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package core
+
+import (
+	"fmt"
+	"strings"
+
+	"main/internal/utils"
+)
+
+func buildAudioFilter(speed float64) string {
+	if speed == 1.0 {
+		return ""
+	}
+	filters := []string{}
+	if speed > 1.0 {
+		remaining := speed
+		for remaining > 2.0+1e-6 {
+			filters = append(filters, "atempo=2.0")
+			remaining /= 2.0
+		}
+		filters = append(filters, fmt.Sprintf("atempo=%.2f", remaining))
+	} else {
+		filters = append(filters, fmt.Sprintf("atempo=%.2f", speed))
+	}
+	return strings.Join(filters, ",")
+}
+
+func normalizeVideo(path string, speed float64) (int, int, int, string) {
+	if speed <= 0 {
+		speed = 1.0
+	}
+	w, h := utils.GetVideoDimensions(path)
+	if w <= 0 || h <= 0 {
+		w = 1280
+		h = 720
+	}
+	maxW := 1280
+	maxH := 720
+	if w > maxW {
+		h = h * maxW / w
+		w = maxW
+	}
+	if h > maxH {
+		w = w * maxH / h
+		h = maxH
+	}
+	if w%2 != 0 {
+		w--
+	}
+	if h%2 != 0 {
+		h--
+	}
+	fps := 30
+	videoSpeed := 1.0 / speed
+	filter := fmt.Sprintf("setpts=%.4f*PTS,scale=%d:%d", videoSpeed, w, h)
+	return w, h, fps, filter
+}
+
+func isStreamURL(path string) bool {
+	return strings.HasPrefix(path, "http://") ||
+		strings.HasPrefix(path, "https://")
+}

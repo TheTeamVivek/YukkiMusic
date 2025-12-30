@@ -30,54 +30,210 @@ import (
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"github.com/TheTeamVivek/YukkiMusic/config"
-	"github.com/TheTeamVivek/YukkiMusic/internal/core"
-	"github.com/TheTeamVivek/YukkiMusic/internal/database"
-	"github.com/TheTeamVivek/YukkiMusic/internal/platforms"
-	"github.com/TheTeamVivek/YukkiMusic/internal/state"
-	"github.com/TheTeamVivek/YukkiMusic/internal/utils"
+	"main/internal/config"
+	"main/internal/core"
+	state "main/internal/core/models"
+	"main/internal/database"
+	"main/internal/locales"
+	"main/internal/platforms"
+	"main/internal/utils"
 )
 
+type playOpts struct {
+	Force bool
+	CPlay bool
+	Video bool
+}
+
+const playMaxRetries = 3
+
+func init() {
+	helpTexts["/play"] = `<i>Play a song in the voice chat from YouTube, Spotify, or other sources.</i>
+
+<u>Usage:</u>
+<b>/play [query/URL]</b> — Search and play a song
+<b>/play [reply to audio/video]</b> — Play replied media
+
+<b>🎵 Supported Sources:</b>
+• YouTube (videos, playlists)
+• Spotify (tracks, albums, playlists)
+• SoundCloud
+• Direct audio/video links
+
+<b>⚙️ Features:</b>
+• Queue support - adds to end if already playing
+• Auto-join voice chat if not present
+• Duration limit check
+• Multiple track support (playlists)
+
+<b>💡 Examples:</b>
+<code>/play never gonna give you up</code>
+<code>/play https://youtu.be/dQw4w9WgXcQ</code>
+<code>/play https://open.spotify.com/track/...</code>
+
+<b>⚠️ Notes:</b>
+• Bot must have proper permissions in voice chat
+• Tracks exceeding duration limit will be skipped
+• Use <code>/queue</code> to view upcoming tracks
+• Use <code>/fplay</code> to force play (skip queue)`
+
+	helpTexts["/fplay"] = `<i>Force play a song, skipping the current queue.</i>
+
+<u>Usage:</u>
+<b>/fplay [query/URL]</b> — Force play immediately
+<b>/fplay [reply to audio/video]</b> — Force play replied media
+
+<b>🎵 Behavior:</b>
+• Stops current playback
+• Clears queue
+• Starts playing immediately
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this
+
+<b>💡 Example:</b>
+<code>/fplay urgent announcement track</code>
+
+<b>⚠️ Note:</b>
+This command is useful for urgent playback needs but will disrupt the current queue.`
+
+	helpTexts["/vplay"] = `<i>Play video content in voice chat (video mode).</i>
+
+<u>Usage:</u>
+<b>/vplay [query/URL]</b> — Play video
+<b>/vplay [reply to video]</b> — Play replied video
+
+<b>📹 Features:</b>
+• Full video playback support
+• Audio + Video streaming
+• Same queue system as audio
+
+<b>⚠️ Notes:</b>
+• Requires video streaming permissions
+• Use <code>/fvplay</code> for force video play`
+
+	helpTexts["/fvplay"] = `<i>Force play video content, skipping queue.</i>
+
+<u>Usage:</u>
+<b>/fvplay [query/URL]</b> — Force play video immediately
+
+<b>🔒 Restrictions:</b>
+• Admin/auth only command
+
+<b>💡 Use Case:</b>
+Immediate video playback when something urgent needs to be shown.`
+
+	helpTexts["/cplay"] = `<i>Play in linked channel's voice chat.</i>
+
+<u>Usage:</u>
+<b>/cplay [query]</b> — Play in linked channel
+
+<b>⚙️ Setup Required:</b>
+First use <code>/channelplay --set [channel_id]</code>
+
+<b>⚠️ Note:</b>
+All c* commands work the same as regular commands but affect the linked channel.`
+
+	helpTexts["/channelplay"] = `<i>Configure linked channel for channel play mode.</i>
+
+<u>Usage:</u>
+<b>/channelplay --set [channel_id]</b> — Set linked channel
+
+<b>⚙️ Behavior:</b>
+• Links a channel to current group
+• All <code>c*</code> commands affect linked channel
+• Channel must be accessible by bot
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> can configure
+
+<b>💡 Examples:</b>
+<code>/channelplay --set -1001234567890</code>
+
+<b>⚠️ Notes:</b>
+• Get channel ID using forward + @userinfobot
+• Bot must be admin in linked channel
+• Use <code>/cplay</code> after setup`
+
+	helpTexts["/playforce"] = helpTexts["/fplay"]
+	helpTexts["/fcplay"] = helpTexts["/cfplay"]
+	helpTexts["/cvplay"] = helpTexts["/vcplay"]
+}
+
 func channelPlayHandler(m *telegram.NewMessage) error {
-	m.Reply("⚠️ This handler is deprecated. Use <code><a>/cplay --set channel_id </code></a> to set your channel for playback.")
-	return telegram.EndGroup
+	m.Reply(F(m.ChannelID(), "channel_play_depreciated"))
+	return telegram.ErrEndGroup
 }
 
 func playHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, false, false)
+	return handlePlay(m, &playOpts{})
 }
 
 func fplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, true, false)
+	return handlePlay(m, &playOpts{Force: true})
+}
+
+func cfplayHandler(m *telegram.NewMessage) error {
+	return handlePlay(m, &playOpts{Force: true, CPlay: true})
+}
+
+func vplayHandler(m *telegram.NewMessage) error {
+	return handlePlay(m, &playOpts{Video: true})
+}
+
+func fvplayHandler(m *telegram.NewMessage) error {
+	return handlePlay(m, &playOpts{Force: true, Video: true})
+}
+
+func vcplayHandler(m *telegram.NewMessage) error {
+	return handlePlay(m, &playOpts{CPlay: true, Video: true})
+}
+
+func fvcplayHandler(m *telegram.NewMessage) error {
+	return handlePlay(m, &playOpts{Force: true, CPlay: true, Video: true})
 }
 
 func cplayHandler(m *telegram.NewMessage) error {
 	args := strings.Fields(m.Text())
+	chatID := m.ChannelID()
 
 	if len(args) > 1 && args[1] == "--set" {
 		if len(args) < 3 {
-			m.Reply("<b>Usage:</b> <code>/cplay --set &lt;channel_id&gt;</code>", telegram.SendOptions{ParseMode: "HTML"})
-			return telegram.EndGroup
+			m.Reply(
+				F(chatID, "cplay_usage"),
+				&telegram.SendOptions{ParseMode: "HTML"},
+			)
+			return telegram.ErrEndGroup
 		}
 
 		cplayIDStr := args[2]
 		cplayID, err := strconv.ParseInt(cplayIDStr, 10, 64)
 		if err != nil {
-			m.Reply("<b>Invalid Chat ID:</b> Please provide a valid integer ID for the channel.", telegram.SendOptions{ParseMode: "HTML"})
-			return telegram.EndGroup
+			m.Reply(
+				F(chatID, "cplay_invalid_chat_id"),
+				&telegram.SendOptions{ParseMode: "HTML"},
+			)
+			return telegram.ErrEndGroup
 		}
 
 		peer, err := m.Client.ResolvePeer(cplayID)
 		if err != nil {
-			m.Reply("<b>Failed to resolve peer:</b> Could not fetch channel details. Ensure I can access this channel.", telegram.SendOptions{ParseMode: "HTML"})
-			return telegram.EndGroup
+			m.Reply(
+				F(chatID, "cplay_resolve_peer_fail"),
+				&telegram.SendOptions{ParseMode: "HTML"},
+			)
+			return telegram.ErrEndGroup
 		}
 
 		chPeer, ok := peer.(*telegram.InputPeerChannel)
 		if !ok {
-			m.Reply("<b>Invalid Target:</b> The provided ID is not a valid channel.", telegram.SendOptions{ParseMode: "HTML"})
-			return telegram.EndGroup
+			m.Reply(
+				F(chatID, "cplay_invalid_target"),
+				&telegram.SendOptions{ParseMode: "HTML"},
+			)
+			return telegram.ErrEndGroup
 		}
 
 		fullChat, err := m.Client.ChannelsGetFullChannel(&telegram.InputChannelObj{
@@ -85,249 +241,571 @@ func cplayHandler(m *telegram.NewMessage) error {
 			AccessHash: chPeer.AccessHash,
 		})
 		if err != nil || fullChat == nil {
-			gologging.GetLogger("CPlay").ErrorF("Failed to get full channel for cplay ID %d: %v", cplayID, err)
-			m.Reply("<b>Channel Not Accessible:</b> Could not retrieve channel information. Please ensure I am an administrator in the target channel.", telegram.SendOptions{ParseMode: "HTML"})
-			return telegram.EndGroup
+			gologging.ErrorF(
+				"Failed to get full channel for cplay ID %d: %v",
+				cplayID, err,
+			)
+			m.Reply(
+				F(chatID, "cplay_channel_not_accessible"),
+				&telegram.SendOptions{ParseMode: "HTML"},
+			)
+			return telegram.ErrEndGroup
 		}
 
 		if err := database.SetCPlayID(m.ChannelID(), cplayID); err != nil {
-			gologging.GetLogger("CPlay").ErrorF("Failed to set cplay ID for chat %d: %v", m.ChannelID(), err)
-			m.Reply("<b>Error:</b> Failed to save CPlay settings.", telegram.SendOptions{ParseMode: "HTML"})
+			gologging.ErrorF(
+				"Failed to set cplay ID for chat %d: %v",
+				m.ChannelID(), err,
+			)
+			m.Reply(
+				F(chatID, "cplay_save_error"),
+				&telegram.SendOptions{ParseMode: "HTML"},
+			)
 			return err
 		}
 
-		m.Reply(fmt.Sprintf("✅ <b>Channel Play enabled.</b> All <code>/c</code> commands will now work in channel <code>%d</code>.", cplayID), telegram.SendOptions{ParseMode: "HTML"})
-		return telegram.EndGroup
+		m.Reply(
+			F(chatID, "cplay_enabled", locales.Arg{
+				"channel_id": cplayID,
+			}),
+			&telegram.SendOptions{ParseMode: "HTML"},
+		)
+		return telegram.ErrEndGroup
+	}
+	return handlePlay(m, &playOpts{CPlay: true})
+}
+
+func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
+	mention := utils.MentionHTML(m.Sender)
+
+	r, replyMsg, err := prepareRoomAndSearchMessage(m, opts.CPlay)
+	if err != nil {
+		return telegram.ErrEndGroup
 	}
 
-	return handlePlay(m, false, true)
+	tracks, isActive, err := fetchTracksAndCheckStatus(m, replyMsg, r, opts.Video)
+	if err != nil {
+		return telegram.ErrEndGroup
+	}
+
+	tracks, availableSlots, err := filterAndTrimTracks(replyMsg, r, tracks)
+	if err != nil {
+		return telegram.ErrEndGroup
+	}
+
+	if err := playTracksAndRespond(
+		m, replyMsg, r, tracks, mention,
+		isActive, opts.Force, availableSlots,
+	); err != nil {
+		return err
+	}
+
+	return telegram.ErrEndGroup
 }
 
-func cfplayHandler(m *telegram.NewMessage) error {
-	return handlePlay(m, true, true)
-}
-
-func handlePlay(m *telegram.NewMessage, force, cplay bool) error {
-	logger := gologging.GetLogger("Play")
-	mention := utils.MentionHTML(m.Sender)
+func prepareRoomAndSearchMessage(m *telegram.NewMessage, cplay bool) (*core.RoomState, *telegram.NewMessage, error) {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
-		return telegram.EndGroup
+		return nil, nil, err
 	}
+
+	chatID := m.ChannelID()
 	r.SetCPlay(cplay)
 	r.Parse()
-	if len(r.Queue) >= config.QueueLimit {
-		m.Reply(fmt.Sprintf("⚠️ Queue limit reached (%d tracks max). Use /clear to clear queue.", config.QueueLimit))
-		return telegram.EndGroup
+
+	if len(r.Queue()) >= config.QueueLimit {
+		m.Reply(F(chatID, "queue_limit_reached", locales.Arg{
+			"limit": config.QueueLimit,
+		}))
+		return nil, nil, fmt.Errorf("queue limit reached")
 	}
+
 	parts := strings.SplitN(m.Text(), " ", 2)
 	query := ""
 	if len(parts) > 1 {
 		query = strings.TrimSpace(parts[1])
 	}
+
 	if query == "" && !m.IsReply() {
-		m.Reply(fmt.Sprintf("🎵 <b>Whoops! No song detected.</b> Type <b>%s</b> <i>song name</i> or reply to a <i>media</i> to get the music going!", getCommand(m)))
-		return telegram.EndGroup
+		m.Reply(F(chatID, "no_song_query", locales.Arg{
+			"cmd": getCommand(m),
+		}))
+		return nil, nil, fmt.Errorf("no song query")
 	}
-	searchStr := "🔍🎶 Searching... ⚡✨"
+
+	// Searching messages
+	searchStr := ""
 	if query != "" {
-		searchStr = "🔍🎶 Searching for: " + html.EscapeString(query) + "... ⚡✨"
+		searchStr = F(chatID, "searching_query", locales.Arg{
+			"query": html.EscapeString(query),
+		})
+	} else {
+		searchStr = F(chatID, "searching")
 	}
+
 	replyMsg, err := m.Reply(searchStr)
 	if err != nil {
-		logger.ErrorF("Failed to send searching message: %v", err)
-		return telegram.EndGroup
+		gologging.ErrorF("Failed to send searching message: %v", err)
+		return nil, nil, err
 	}
-	tracks, err := safeGetTracks(m, replyMsg)
+
+	return r, replyMsg, nil
+}
+
+func fetchTracksAndCheckStatus(
+	m *telegram.NewMessage,
+	replyMsg *telegram.NewMessage,
+	r *core.RoomState,
+	video bool,
+) ([]*state.Track, bool, error) {
+	tracks, err := safeGetTracks(m, replyMsg, m.ChannelID(), video)
 	if err != nil {
 		utils.EOR(replyMsg, err.Error())
-		return telegram.EndGroup
+		return nil, false, err
 	}
+
 	if len(tracks) == 0 {
-		utils.EOR(replyMsg, "❌ No tracks found.")
-		return telegram.EndGroup
+		utils.EOR(replyMsg, F(m.ChannelID(), "no_song_found"))
+		return nil, false, fmt.Errorf("no tracks found")
 	}
+
 	isActive := r.IsActiveChat()
-	if _, err := core.GetVoiceChatStatus(r.ChatID); err != nil {
-		logger.ErrorF("Error getting voice chat status: %v", err)
-		utils.EOR(replyMsg, getAssistantErrorMessage(err))
-		return telegram.EndGroup
+	cs, err := core.GetChatState(r.ChatID())
+	if err != nil {
+		gologging.ErrorF("Error getting chat state: %v", err)
+		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
+		return nil, false, err
 	}
-	if _, err := core.GetAssistantStatus(r.ChatID); err != nil {
-		logger.ErrorF("Error getting assistant status: %v", err)
-		utils.EOR(replyMsg, getAssistantErrorMessage(err))
-		return telegram.EndGroup
+
+	activeVC, err := cs.IsActiveVC()
+	if err != nil {
+		gologging.ErrorF("Error checking voicechat state: %v", err)
+		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
+		return nil, false, err
 	}
+
+	if !activeVC {
+		utils.EOR(replyMsg, F(m.ChannelID(), "err_no_active_voicechat"))
+		return nil, false, fmt.Errorf("no active voice chat")
+	}
+
+	banned, err := cs.IsAssistantBanned()
+	if err != nil {
+		gologging.ErrorF("Error checking assistant banned state: %v", err)
+		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
+		return nil, false, err
+	}
+
+	if banned {
+		utils.EOR(replyMsg,
+			F(m.ChannelID(), "err_assistant_banned", locales.Arg{
+				"user": utils.MentionHTML(cs.Assistant.User),
+				"id":   utils.IntToStr(cs.Assistant.User.ID),
+			}),
+		)
+		return nil, false, fmt.Errorf("assistant banned")
+	}
+
+	present, err := cs.IsAssistantPresent()
+	if err != nil {
+		gologging.ErrorF("Error checking assistant presence: %v", err)
+		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
+		return nil, false, err
+	}
+
+	if !present {
+		if err := cs.TryJoin(); err != nil {
+			gologging.ErrorF("Error joining assistant: %v", err)
+			utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
+			return nil, false, err
+		}
+		time.Sleep(1 * time.Second)
+	}
+	return tracks, isActive, nil
+}
+
+func filterAndTrimTracks(
+	replyMsg *telegram.NewMessage,
+	r *core.RoomState,
+	tracks []*state.Track,
+) ([]*state.Track, int, error) {
+	chatID := replyMsg.ChannelID()
+
 	var filteredTracks []*state.Track
 	var skippedTracks []string
+
 	for _, track := range tracks {
 		if track.Duration > config.DurationLimit {
-			skippedTracks = append(skippedTracks, html.EscapeString(utils.ShortTitle(track.Title, 35)))
+			skippedTracks = append(
+				skippedTracks,
+				html.EscapeString(utils.ShortTitle(track.Title, 35)),
+			)
 			continue
 		}
 		filteredTracks = append(filteredTracks, track)
 	}
+
+	// Some tracks were skipped due to duration limit
 	if len(skippedTracks) > 0 {
+
+		// CASE 1: Only one track and it was skipped
+		if len(tracks) == 1 && len(filteredTracks) == 0 {
+			utils.EOR(replyMsg, F(chatID, "play_single_track_too_long", locales.Arg{
+				"limit_mins": formatDuration(config.DurationLimit),
+				"title":      skippedTracks[0],
+			}))
+			return nil, 0, fmt.Errorf("single long track skipped")
+		}
+
+		// CASE 2: Multiple tracks skipped
 		var b strings.Builder
-		b.WriteString(fmt.Sprintf("<b>⚠️ %d tracks were skipped (max duration %d mins):</b>\n", len(skippedTracks), config.DurationLimit/60))
+
+		b.WriteString(F(chatID, "play_multiple_tracks_too_long_header", locales.Arg{
+			"count":      len(skippedTracks),
+			"limit_mins": config.DurationLimit / 60,
+		}))
+		b.WriteString("\n")
+
 		for i, title := range skippedTracks {
-			if i < 5 { // Limit to showing 5 tracks to avoid flood
-				b.WriteString(fmt.Sprintf("— <i>%s</i>\n", title))
+			if i < 5 {
+				b.WriteString(F(chatID, "play_multiple_tracks_too_long_item", locales.Arg{
+					"title": title,
+				}) + "\n")
 			} else {
-				b.WriteString(fmt.Sprintf("... and %d more.\n", len(skippedTracks)-i))
+				b.WriteString(F(chatID, "play_multiple_tracks_too_long_more", locales.Arg{
+					"remaining": len(skippedTracks) - i,
+				}) + "\n")
 				break
 			}
 		}
+
 		utils.EOR(replyMsg, b.String())
-		if len(tracks) == 1 && len(filteredTracks) == 0 {
-			return telegram.EndGroup
-		}
 		time.Sleep(1 * time.Second)
 	}
+
+	// Keep only accepted tracks
 	tracks = filteredTracks
+
+	// CASE: everything was skipped
 	if len(tracks) == 0 {
-		utils.EOR(replyMsg, "❌ All found tracks were skipped due to duration limits.")
-		return telegram.EndGroup
+		utils.EOR(replyMsg, F(chatID, "play_all_tracks_skipped"))
+		return nil, 0, fmt.Errorf("all tracks skipped")
 	}
-	availableSlots := config.QueueLimit - len(r.Queue)
+
+	// Respect queue limit
+	availableSlots := config.QueueLimit - len(r.Queue())
 	if availableSlots < len(tracks) {
 		tracks = tracks[:availableSlots]
-		logger.WarnF("Queue full — adding only %d tracks out of request.", availableSlots)
+		gologging.WarnF("Queue full — adding only %d tracks out of requested.", availableSlots)
 	}
+
+	return tracks, availableSlots, nil
+}
+
+func playTracksAndRespond(
+	m *telegram.NewMessage,
+	replyMsg *telegram.NewMessage,
+	r *core.RoomState,
+	tracks []*state.Track,
+	mention string,
+	isActive, force bool,
+	availableSlots int,
+) error {
+	chatID := m.ChannelID()
+
 	for i, track := range tracks {
-		track.BY = mention
+		track.Requester = mention
 		title := html.EscapeString(utils.ShortTitle(track.Title, 25))
 		var filePath string
+
+		// Download first track if needed
 		if i == 0 && (!isActive || force) {
-			replyMsg, _ = utils.EOR(replyMsg, fmt.Sprintf("📥 Downloading song \"%s\"", title))
-			path, err := platforms.Download(context.Background(), track, replyMsg)
+			var opt *telegram.SendOptions
+			if track.Duration > 420 {
+				opt = &telegram.SendOptions{ReplyMarkup: core.GetCancelKeyboard(chatID)}
+			}
+
+			downloadingText := F(chatID, "play_downloading_song", locales.Arg{
+				"title": title,
+			})
+			replyMsg, _ = utils.EOR(replyMsg, downloadingText, opt)
+
+			ctx, cancel := context.WithCancel(context.Background())
+			downloadCancels[m.ChannelID()] = cancel
+			defer func() {
+				if _, ok := downloadCancels[m.ChannelID()]; ok {
+					delete(downloadCancels, m.ChannelID())
+					cancel()
+				}
+			}()
+
+			path, err := safeDownload(ctx, track, replyMsg, chatID)
 			if err != nil {
 				if errors.Is(err, context.Canceled) {
-					utils.EOR(replyMsg, fmt.Sprintf("⚠️ Download canceled by %s.", mention))
+					utils.EOR(replyMsg, F(chatID, "play_download_canceled", locales.Arg{
+						"user": mention,
+					}))
 				} else {
-					utils.EOR(replyMsg, fmt.Sprintf("❌ Failed to download \"%s\". Error: %v", title, err))
+					utils.EOR(replyMsg, F(chatID, "play_download_failed", locales.Arg{
+						"title": title,
+						"error": html.EscapeString(err.Error()),
+					}))
 				}
-				return telegram.EndGroup
+				return telegram.ErrEndGroup
 			}
+
 			filePath = path
-			logger.InfoF("Downloaded track to %s", filePath)
+			gologging.InfoF("Downloaded track to %s", filePath)
 		}
-		maxRetries := 3
-		for attempt := 1; attempt <= maxRetries; attempt++ {
-			err := r.Play(track, filePath, force && i == 0)
-			if err == nil {
-				if attempt > 1 {
-					logger.Info("Successfully played after retry attempt " + utils.IntToStr(attempt))
-				}
-				break
-			}
 
-			if wait := telegram.GetFloodWait(err); wait > 0 {
-				logger.Error("FloodWait detected (" + strconv.Itoa(wait) + "s). Retrying... (attempt " + utils.IntToStr(attempt) + ")")
-				time.Sleep(time.Duration(wait) * time.Second)
-				continue
-			}
-			if telegram.MatchError(err, "INTERDC_X_CALL_ERROR") {
-				logger.Error("INTERDC_X_CALL_ERROR occurred. Retrying... (attempt " + utils.IntToStr(attempt) + ")")
-				time.Sleep(2 * time.Second)
-				continue
-			}
-
-			if attempt == maxRetries {
-				logger.Error("❌ Failed to play after " + utils.IntToStr(maxRetries) + " attempts. Error: " + err.Error())
-				utils.EOR(replyMsg, "❌ Failed to play\nError: "+err.Error())
-				return err
-			}
-
-			logger.Error("Unexpected error occurred. Retrying... (attempt " + utils.IntToStr(attempt) + "): " + err.Error())
+		// 🔁 play with retry
+		if err := playTrackWithRetry(r, track, filePath, force && i == 0, replyMsg); err != nil {
+			return err
 		}
+
 		sendPlayLogs(m, track, (isActive && !force) || i > 0)
 	}
+
 	mainTrack := tracks[0]
+
+	// ---------- Now Playing / Added to queue ----------
 	if !isActive || (force && len(tracks) > 0) {
 		title := html.EscapeString(utils.ShortTitle(mainTrack.Title, 25))
-		btn := core.GetPlayMarkup(r, false)
+		btn := core.GetPlayMarkup(chatID, r, false)
+
 		var opt telegram.SendOptions
 		opt.ParseMode = "HTML"
 		opt.ReplyMarkup = btn
+
+		/*thumb, err := utils.GenerateThumbnail(context.Background(), mainTrack, core.BUser.Username)
+		if err != nil {
+			fmt.Println("Thumb err", err)
+		} else {
+			mainTrack.Artwork = thumb
+		}*/
+
 		if mainTrack.Artwork != "" {
 			opt.Media = utils.CleanURL(mainTrack.Artwork)
 		}
-		replyMsg, _ = utils.EOR(replyMsg, fmt.Sprintf("<b>🎵 Now Playing:</b>\n\n<b>▫ Track:</b> <a href=\"%s\">%s</a>\n<b>▫ Duration:</b> %s\n<b>▫ Requested by:</b> %s", mainTrack.URL, title, formatDuration(mainTrack.Duration), mention), opt)
+
+		nowPlayingText := F(chatID, "stream_now_playing", locales.Arg{
+			"url":      mainTrack.URL,
+			"title":    title,
+			"duration": formatDuration(mainTrack.Duration),
+			"by":       mention,
+		})
+
+		replyMsg, _ = utils.EOR(replyMsg, nowPlayingText, &opt)
 		r.SetMystic(replyMsg)
+
 		if len(tracks) > 1 {
+			addedCount := len(tracks) - 1
+
 			var b strings.Builder
-			b.WriteString(fmt.Sprintf("➕ <b>Added %d tracks</b> by %s\n\n", len(tracks)-1, mention))
+			b.WriteString(F(chatID, "play_added_multiple_header", locales.Arg{
+				"count": addedCount,
+				"user":  mention,
+			}))
+			b.WriteString("\n\n")
+
 			if availableSlots <= len(tracks) {
-				b.WriteString("⚠️ <i>Queue limit reached — some tracks were skipped.</i>\n")
+				b.WriteString(F(chatID, "play_queue_limit_hint"))
+				b.WriteString("\n")
 			}
-			b.WriteString("<i>Use /queue to view full list.</i>")
+
+			b.WriteString(F(chatID, "play_queue_view_hint"))
 			replyMsg.Respond(b.String())
 		}
 	} else {
 		if len(tracks) == 1 {
 			title := html.EscapeString(utils.ShortTitle(mainTrack.Title, 25))
-			btn := core.GetPlayMarkup(r, true)
-			var opt telegram.SendOptions
-			opt.ParseMode = "HTML"
-			opt.ReplyMarkup = btn
+			btn := core.GetPlayMarkup(chatID, r, true)
+			opt := &telegram.SendOptions{
+				ParseMode:   "HTML",
+				ReplyMarkup: btn,
+			}
 			if mainTrack.Artwork != "" {
 				opt.Media = utils.CleanURL(mainTrack.Artwork)
 			}
-			replyMsg, _ = utils.EOR(replyMsg, fmt.Sprintf("<b>🎵 Added to Queue:</b>\n\n<b>▫ Track:</b> <a href=\"%s\">%s</a>\n<b>▫ Duration:</b> %s\n<b>▫ Requested by:</b> %s", mainTrack.URL, title, formatDuration(mainTrack.Duration), mention), opt)
+
+			addedText := F(chatID, "play_added_to_queue_single", locales.Arg{
+				"url":      mainTrack.URL,
+				"title":    title,
+				"duration": formatDuration(mainTrack.Duration),
+				"by":       mention,
+			})
+
+			replyMsg, _ = utils.EOR(replyMsg, addedText, opt)
 		} else {
 			var b strings.Builder
-			b.WriteString(fmt.Sprintf("➕ <b>Added %d tracks</b> by %s\n\n", len(tracks), mention))
+			b.WriteString(F(chatID, "play_added_multiple_header", locales.Arg{
+				"count": len(tracks),
+				"user":  mention,
+			}))
+			b.WriteString("\n\n")
+
 			if availableSlots <= len(tracks) {
-				b.WriteString("⚠️ <i>Queue limit reached — some tracks were skipped.</i>\n")
+				b.WriteString(F(chatID, "play_queue_limit_hint"))
+				b.WriteString("\n")
 			}
-			b.WriteString("<i>Use /queue to view full list.</i>")
+
+			b.WriteString(F(chatID, "play_queue_view_hint"))
 			utils.EOR(replyMsg, b.String())
 		}
 	}
-	return telegram.EndGroup
+
+	return nil
 }
 
-func getAssistantErrorMessage(err error) string {
+func playTrackWithRetry(
+	r *core.RoomState,
+	track *state.Track,
+	filePath string,
+	force bool,
+	replyMsg *telegram.NewMessage,
+) error {
+	for attempt := 1; attempt <= playMaxRetries; attempt++ {
+		err := r.Play(track, filePath, force)
+		if err == nil {
+			if attempt > 1 {
+				gologging.Info("Successfully played after retry attempt " + utils.IntToStr(attempt))
+			}
+			return nil
+		}
+
+		// FloodWait
+		if wait := telegram.GetFloodWait(err); wait > 0 {
+			gologging.Error("FloodWait detected (" + strconv.Itoa(wait) + "s). Retrying... (attempt " + utils.IntToStr(attempt) + ")")
+			time.Sleep(time.Duration(wait) * time.Second)
+			continue
+		}
+
+		if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
+			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "rtmp_streaming_not_supported"))
+			r.Destroy()
+			return telegram.ErrEndGroup
+		}
+
+		if tg.MatchError(err, "GROUPCALL_INVALID") {
+			gologging.Error("GROUPCALL_INVALID err occurred. Returning...")
+			r.Destroy()
+			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_unable"))
+			return telegram.ErrEndGroup
+		}
+
+		// INTERDC_X_CALL_ERROR → retry
+		if tg.MatchError(err, "INTERDC_X_CALL_ERROR") {
+			gologging.Error("INTERDC_X_CALL_ERROR occurred. Retrying... (attempt " + utils.IntToStr(attempt) + ")")
+			time.Sleep(2 * time.Second)
+			continue
+		}
+
+		// Last attempt failed
+		if attempt == playMaxRetries {
+			gologging.Error("❌ Failed to play after " + utils.IntToStr(playMaxRetries) + " attempts. Error: " + err.Error())
+			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_failed", locales.Arg{"error": err.Error()}))
+			return err
+		}
+
+		gologging.Error("Unexpected error occurred. Retrying... (attempt " + utils.IntToStr(attempt) + "): " + err.Error())
+	}
+
+	return nil
+}
+
+type msgFn func(chatID int64, err error) string
+
+var errMessageMap = map[error]msgFn{
+	core.ErrAdminPermissionRequired: func(chatID int64, _ error) string {
+		return F(chatID, "err_admin_permission_required")
+	},
+	core.ErrAssistantGetFailed: func(chatID int64, e error) string {
+		gologging.Error(e)
+		return F(chatID, "err_assistant_get_failed", locales.Arg{
+			"error": e.Error(),
+		})
+	},
+	core.ErrAssistantJoinRateLimited: func(chatID int64, _ error) string {
+		return F(chatID, "err_assistant_join_rate_limited")
+	},
+
+	core.ErrAssistantJoinRequestSent: func(chatID int64, _ error) string {
+		return F(chatID, "err_assistant_join_request_sent")
+	},
+
+	core.ErrAssistantInviteLinkFetch: func(chatID int64, e error) string {
+		return F(chatID, "err_assistant_invite_link_fetch", locales.Arg{
+			"error": e.Error(),
+		})
+	},
+
+	core.ErrAssistantInviteFailed: func(chatID int64, e error) string {
+		return F(chatID, "err_assistant_invite_failed", locales.Arg{
+			"error": e.Error(),
+		})
+	},
+
+	core.ErrFetchFailed: func(chatID int64, e error) string {
+		return F(chatID, "err_fetch_failed", locales.Arg{
+			"error": e.Error(),
+		})
+	},
+
+	core.ErrPeerResolveFailed: func(chatID int64, _ error) string {
+		return F(chatID, "err_peer_resolve_failed")
+	},
+}
+
+func getErrorMessage(chatID int64, err error) string {
 	if err == nil {
 		return ""
 	}
 
-	switch {
-	case errors.Is(err, core.ErrAssistantBanned):
-		return fmt.Sprintf("<b>🚫 Assistant Restricted</b>\n\nI can't play music because %s(UserID: <code>%d</code>) is banned or removed from this chat.\n\n<i><b>✅ Unbanned already?</b> Use /reload to refresh and sync.</i>", utils.MentionHTML(core.UbUser), core.UbUser.ID)
-	case errors.Is(err, core.ErrAdminPermissionRequired):
-		return "⚠️ <b>Admin Permission Required</b>\n\nI need <i>admin access</i> to manage and check members in this chat.\n\n➤ <b>Promote me with</b> <code>Manage Chat / Invite Users</code> permission."
-	case errors.Is(err, core.ErrAssistantJoinRateLimited):
-		return "⚠️ Assistant cannot join because it has reached the maximum number of allowed groups."
-	case errors.Is(err, core.ErrAssistantJoinRequestSent):
-		return "⚠️ Assistant sent a join request, but I couldn't auto-approve it.\n\n<i>✅ Please manually approve the request, then try again.</i>"
-	case errors.Is(err, core.ErrAssistantInviteLinkFetch):
-		return fmt.Sprintf("⚠️ Failed to fetch invite link:\n\n<i>%v</i>", err)
-	case errors.Is(err, core.ErrAssistantInviteFailed):
-		return fmt.Sprintf("⚠️ Assistant failed to join this chat:\n\n<i>%v</i>", err)
-	case errors.Is(err, core.ErrAssistantJoinRejected):
-		return "⚠️ Invite link is invalid or expired. Please regenerate a fresh invite link."
-	case errors.Is(err, core.ErrNoActiveVoiceChat):
-		return "<b>🎙️ No Active Voice Chat</b>\n\nI can't join yet — please start a voice chat to begin playing music.\n\n<i><b>✅ Already started one?</b> Use /reload to refresh and sync this chat.</i>"
-	case errors.Is(err, core.ErrFetchFailed):
-		return fmt.Sprintf("⚠️ Failed to fetch chat info:\n\n<i>%v</i>", err)
-	case errors.Is(err, core.ErrPeerResolveFailed):
-		return "⚠️ Failed to resolve peer information. Try again later or re-add the assistant."
-	default:
-		return fmt.Sprintf("⚠️ Unknown Error Occurred:\n\n<i>%v</i>", err)
+	for key, fn := range errMessageMap {
+		if errors.Is(err, key) {
+			return fn(chatID, err)
+		}
 	}
+
+	return F(chatID, "err_unknown", locales.Arg{
+		"error": err.Error(),
+	})
 }
 
-func safeGetTracks(m, replyMsg *telegram.NewMessage) (tracks []*state.Track, err error) {
+// Both safeDownload and safeGetTracks re-raise panic because all command
+// handlers are wrapped by SafeMessageHandler, which catches panics and sends
+// the debug trace to the logger and the owner.
+
+func safeGetTracks(
+	m, replyMsg *telegram.NewMessage,
+	chatID int64,
+	video bool,
+) (tracks []*state.Track, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			utils.EOR(replyMsg, "⚠️ Failed to fetch track details.\nPlease try again later.")
+			utils.EOR(replyMsg, F(chatID, "err_fetch_tracks"))
 			panic(r)
 		}
 	}()
 
-	tracks, err = platforms.GetTracks(m)
+	tracks, err = platforms.GetTracks(m, video)
 	return tracks, err
+}
+
+func safeDownload(
+	ctx context.Context,
+	track *state.Track,
+	replyMsg *telegram.NewMessage,
+	chatID int64,
+) (path string, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			utils.EOR(replyMsg, F(chatID, "err_download_internal"))
+			panic(r)
+		}
+	}()
+
+	path, err = platforms.Download(ctx, track, replyMsg)
+	return path, err
 }

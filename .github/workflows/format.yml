@@ -12,7 +12,7 @@ jobs:
 
       - uses: actions/setup-go@v6
         with:
-          go-version: "1.24"
+          go-version: "1.25"
           cache: true
           cache-dependency-path: '**/go.sum'
 
@@ -23,7 +23,7 @@ jobs:
           path: |
             ~/go/bin
             ~/.cache/go-build
-          key: ${{ runner.os }}-go-tools-
+          key: ${{ runner.os }}-go-tools-1
 
       - name: Install Tools
         if: steps.cache-tools.outputs.cache-hit != 'true'
@@ -39,7 +39,7 @@ jobs:
           go mod tidy
           gofmt -w .
           goimports -w .
-          gci write . -s standard -s default -s "prefix(github.com/TheTeamVivek/YukkiMusic)"
+          gci write . -s standard -s default -s "prefix(main)"
           gofumpt -w -extra .
           golines --max-len=80 .
           go mod tidy
@@ -50,8 +50,14 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add $(find . -name '*.go' -not -path './ntgcalls/*') go.mod go.sum
+          
+          BRANCH_NAME="${GITHUB_REF##*/}"
+
+          # git add $(find . -name '*.go' -not -path './ntgcalls/*') go.mod go.sum
+
+          git add $(find . -name '*.go') go.mod go.sum
           git diff --cached --quiet || git commit -m "style: format codes"
-          git fetch origin master
-          git rebase --autostash origin/master || (echo "Rebase conflict, aborting" && git rebase --abort && exit 1)
-          git push origin HEAD:master
+
+          git fetch origin "$BRANCH_NAME"
+          git rebase --autostash "origin/$BRANCH_NAME" || (echo "Rebase conflict, aborting" && git rebase --abort && exit 1)
+          git push origin "HEAD:$BRANCH_NAME"
