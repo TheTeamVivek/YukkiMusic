@@ -139,7 +139,6 @@ func (y *YtDlpDownloader) Download(
 	track *state.Track,
 	_ *telegram.NewMessage,
 ) (string, error) {
-
 	// Cache check
 	if path, err := checkDownloadedFile(track.ID); err == nil {
 		gologging.InfoF("YtDlp: Using cached file for %s", track.ID)
