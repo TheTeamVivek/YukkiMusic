@@ -15,4 +15,4 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Check spelling
-        uses: crate-ci/typos@345d4becf96f1a00e3dcd7fe1104a7169d8bdc22
+        uses: crate-ci/typos@1a319b54cc9e3b333fed6a5c88ba1a90324da514
