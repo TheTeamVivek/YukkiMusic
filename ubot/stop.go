@@ -21,9 +21,10 @@ func (ctx *Context) Stop(chatId any) error {
 	stopErr := ctx.binding.Stop(parsedChatId)
 
 	ctx.inputGroupCallsMutex.RLock()
-	inputGroupCall := ctx.inputGroupCalls[parsedChatId]
+	inputGroupCall, ok := ctx.inputGroupCalls[parsedChatId]
 	ctx.inputGroupCallsMutex.RUnlock()
 
+	if !ok { return stopErr }
 	_, leaveErr := ctx.app.PhoneLeaveGroupCall(inputGroupCall, 0)
 	if stopErr != nil {
 		return stopErr
