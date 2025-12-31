@@ -258,6 +258,8 @@ func handleDemotion(p *telegram.ParticipantUpdate, s *core.ChatState, chatID int
 func handleSudoJoin(p *telegram.ParticipantUpdate, chatID int64) {
 	var text string
 
+	if !p.IsJoined() { return }
+
 	if p.UserID() == config.OwnerID {
 		text = F(chatID, "sudo_join_owner", locales.Arg{
 			"user": utils.MentionHTML(p.User),
