@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package platforms
 
 import (
@@ -87,7 +88,10 @@ func (y *YtDlpDownloader) IsValid(query string) bool {
 }
 
 // GetTracks extracts metadata using yt-dlp
-func (y *YtDlpDownloader) GetTracks(query string, video bool) ([]*state.Track, error) {
+func (y *YtDlpDownloader) GetTracks(
+	query string,
+	video bool,
+) ([]*state.Track, error) {
 	query = strings.TrimSpace(query)
 
 	gologging.InfoF("YtDlp: Extracting metadata for %s", query)
@@ -101,14 +105,19 @@ func (y *YtDlpDownloader) GetTracks(query string, video bool) ([]*state.Track, e
 	// Check if it's a live stream
 	if info.IsLive {
 		gologging.Info("YtDlp: Detected live stream, returning error")
-		return nil, errors.New("live streams are not supported by yt-dlp downloader")
+		return nil, errors.New(
+			"live streams are not supported by yt-dlp downloader",
+		)
 	}
 
 	var tracks []*state.Track
 
 	// Handle playlists
 	if len(info.Entries) > 0 {
-		gologging.InfoF("YtDlp: Found playlist with %d entries", len(info.Entries))
+		gologging.InfoF(
+			"YtDlp: Found playlist with %d entries",
+			len(info.Entries),
+		)
 		for _, entry := range info.Entries {
 			if entry.IsLive {
 				continue // Skip live entries
@@ -122,7 +131,10 @@ func (y *YtDlpDownloader) GetTracks(query string, video bool) ([]*state.Track, e
 	}
 
 	if len(tracks) > 0 {
-		gologging.InfoF("YtDlp: Successfully extracted %d track(s)", len(tracks))
+		gologging.InfoF(
+			"YtDlp: Successfully extracted %d track(s)",
+			len(tracks),
+		)
 	}
 
 	return tracks, nil
@@ -186,7 +198,8 @@ func (y *YtDlpDownloader) Download(
 
 	// Cookies (YouTube only)
 	if y.isYouTubeURL(track.URL) {
-		if cookieFile, err := cookies.GetRandomCookieFile(); err == nil && cookieFile != "" {
+		if cookieFile, err := cookies.GetRandomCookieFile(); err == nil &&
+			cookieFile != "" {
 			args = append(args, "--cookies", cookieFile)
 		}
 	}
@@ -216,7 +229,8 @@ func (y *YtDlpDownloader) Download(
 			}
 		}
 
-		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		if errors.Is(err, context.Canceled) ||
+			errors.Is(err, context.DeadlineExceeded) {
 			return "", err
 		}
 
@@ -264,7 +278,11 @@ func (y *YtDlpDownloader) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 
 	if err := cmd.Run(); err != nil {
 		errStr := stderr.String()
-		gologging.ErrorF("YtDlp: Metadata extraction failed: %v\n%s", err, errStr)
+		gologging.ErrorF(
+			"YtDlp: Metadata extraction failed: %v\n%s",
+			err,
+			errStr,
+		)
 		return nil, fmt.Errorf("metadata extraction failed: %w", err)
 	}
 
@@ -303,7 +321,10 @@ func (y *YtDlpDownloader) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 }
 
 // infoToTrack converts yt-dlp info to Track
-func (y *YtDlpDownloader) infoToTrack(info *ytdlpInfo, video bool) *state.Track {
+func (y *YtDlpDownloader) infoToTrack(
+	info *ytdlpInfo,
+	video bool,
+) *state.Track {
 	duration := int(info.Duration)
 
 	// Use original_url if available, otherwise webpage_url

@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package platforms
 
 import (
@@ -43,9 +44,13 @@ type TelegramPlatform struct {
 }
 
 var (
-	telegramLinkRegex    = regexp.MustCompile(`^(https?://)?t\.me/(c/)?[\w\d_-]+/\d+$`)
-	telegramExtractRegex = regexp.MustCompile(`https?://t\.me/(c/)?([\w\d_-]+)/(\d+)`)
-	telegramMsgCache     = make(map[string]*telegram.NewMessage)
+	telegramLinkRegex = regexp.MustCompile(
+		`^(https?://)?t\.me/(c/)?[\w\d_-]+/\d+$`,
+	)
+	telegramExtractRegex = regexp.MustCompile(
+		`https?://t\.me/(c/)?([\w\d_-]+)/(\d+)`,
+	)
+	telegramMsgCache = make(map[string]*telegram.NewMessage)
 )
 
 const PlatformTelegram state.PlatformName = "Telegram"
@@ -72,15 +77,22 @@ func (t *TelegramPlatform) IsDownloadSupported(source state.PlatformName) bool {
 	return source == t.name
 }
 
-func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, error) {
+func (t *TelegramPlatform) GetTracks(
+	query string,
+	_ bool,
+) ([]*state.Track, error) {
 	if !telegramLinkRegex.MatchString(query) {
-		return nil, fmt.Errorf("Provide a valid Telegram link (e.g., https://t.me/channel/12345).")
+		return nil, fmt.Errorf(
+			"Provide a valid Telegram link (e.g., https://t.me/channel/12345).",
+		)
 	}
 
 	matches := telegramExtractRegex.FindStringSubmatch(query)
 
 	if len(matches) < 4 {
-		return nil, fmt.Errorf("provide a valid Telegram link (e.g., https://t.me/channel/12345)")
+		return nil, fmt.Errorf(
+			"provide a valid Telegram link (e.g., https://t.me/channel/12345)",
+		)
 	}
 
 	username := matches[2]
@@ -137,10 +149,15 @@ func (t *TelegramPlatform) GetTracks(query string, _ bool) ([]*state.Track, erro
 	return []*state.Track{track}, nil
 }
 
-func (t *TelegramPlatform) GetTracksByMessage(rmsg *telegram.NewMessage) (*state.Track, error) {
+func (t *TelegramPlatform) GetTracksByMessage(
+	rmsg *telegram.NewMessage,
+) (*state.Track, error) {
 	file := rmsg.File
 	if file == nil || file.FileID == "" {
-		return nil, fmt.Errorf("⚠️ Oops! This <a href=\"%s\">message</> doesn't contain any media.", rmsg.Link())
+		return nil, fmt.Errorf(
+			"⚠️ Oops! This <a href=\"%s\">message</> doesn't contain any media.",
+			rmsg.Link(),
+		)
 	}
 
 	duration := utils.GetDuration(rmsg.Media().(*telegram.MessageMediaDocument))
@@ -158,7 +175,11 @@ func (t *TelegramPlatform) GetTracksByMessage(rmsg *telegram.NewMessage) (*state
 	return track, nil
 }
 
-func (t *TelegramPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
+func (t *TelegramPlatform) Download(
+	ctx context.Context,
+	track *state.Track,
+	mystic *telegram.NewMessage,
+) (string, error) {
 	downloadsDir := "downloads"
 	if err := os.MkdirAll(downloadsDir, os.ModePerm); err != nil {
 		return "", fmt.Errorf("can't create downloads folder: %v", err)

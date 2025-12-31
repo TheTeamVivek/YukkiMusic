@@ -6,7 +6,9 @@ import (
 	"main/ntgcalls"
 )
 
-func parseVideoSources(sources []*tg.GroupCallParticipantVideoSourceGroup) []ntgcalls.SsrcGroup {
+func parseVideoSources(
+	sources []*tg.GroupCallParticipantVideoSourceGroup,
+) []ntgcalls.SsrcGroup {
 	var ssrcGroups []ntgcalls.SsrcGroup
 	for _, source := range sources {
 		var sourceIds []uint32

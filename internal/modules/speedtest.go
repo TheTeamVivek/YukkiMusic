@@ -97,9 +97,12 @@ func sptHandle(m *telegram.NewMessage) error {
 		"country":     server.Country,
 		"sponsor":     server.Sponsor,
 		"distance_km": fmt.Sprintf("%.2f", server.Distance),
-		"latency_ms":  fmt.Sprintf("%.2f", float64(server.Latency.Microseconds())/1000),
-		"dl_mbps":     fmt.Sprintf("%.2f", server.DLSpeed/1024/1024),
-		"ul_mbps":     fmt.Sprintf("%.2f", server.ULSpeed/1024/1024),
+		"latency_ms": fmt.Sprintf(
+			"%.2f",
+			float64(server.Latency.Microseconds())/1000,
+		),
+		"dl_mbps": fmt.Sprintf("%.2f", server.DLSpeed/1024/1024),
+		"ul_mbps": fmt.Sprintf("%.2f", server.ULSpeed/1024/1024),
 	})
 
 	utils.EOR(statusMsg, output)

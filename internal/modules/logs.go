@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package modules
 
 import (
@@ -145,7 +146,10 @@ func handleLogsDefault(m *tg.NewMessage, logFile string) error {
 
 	if len(contentStr) < maxMessageLength-100 {
 		escapedContent := html.EscapeString(contentStr)
-		msg := F(chatID, "logs_preview_header") + "\n\n<pre>" + escapedContent + "</pre>"
+		msg := F(
+			chatID,
+			"logs_preview_header",
+		) + "\n\n<pre>" + escapedContent + "</pre>"
 		m.Reply(msg)
 		return tg.ErrEndGroup
 	}
@@ -153,7 +157,12 @@ func handleLogsDefault(m *tg.NewMessage, logFile string) error {
 	return sendLogFile(m, logFile, info, chatID)
 }
 
-func sendLogFile(m *tg.NewMessage, logFile string, info os.FileInfo, chatID int64) error {
+func sendLogFile(
+	m *tg.NewMessage,
+	logFile string,
+	info os.FileInfo,
+	chatID int64,
+) error {
 	mystic, _ := m.Reply(F(chatID, "logs_uploading"))
 
 	fileSizeMB := float64(info.Size()) / 1024 / 1024
@@ -272,7 +281,10 @@ func handleLogsOld(m *tg.NewMessage, logFile string, lines int) error {
 		return tg.ErrEndGroup
 	}
 
-	tmpFile := filepath.Join(os.TempDir(), fmt.Sprintf("logs_old_%d.txt", time.Now().Unix()))
+	tmpFile := filepath.Join(
+		os.TempDir(),
+		fmt.Sprintf("logs_old_%d.txt", time.Now().Unix()),
+	)
 	if err := os.WriteFile(tmpFile, []byte(output), 0o644); err != nil {
 		m.Reply(F(chatID, "logs_send_error", locales.Arg{"error": err.Error()}))
 		return tg.ErrEndGroup
@@ -283,7 +295,7 @@ func handleLogsOld(m *tg.NewMessage, logFile string, lines int) error {
 		"count": len(selectedLines),
 	})
 
-	_, err = m.ReplyMedia( tmpFile, &tg.MediaOptions{
+	_, err = m.ReplyMedia(tmpFile, &tg.MediaOptions{
 		Caption: caption,
 	})
 	if err != nil {
@@ -323,7 +335,11 @@ func handleLogsClear(m *tg.NewMessage, logFile string) error {
 		return tg.ErrEndGroup
 	}
 
-	gologging.InfoF("Log file cleared by user %d (was %.2f MB)", m.SenderID(), fileSizeMB)
+	gologging.InfoF(
+		"Log file cleared by user %d (was %.2f MB)",
+		m.SenderID(),
+		fileSizeMB,
+	)
 
 	m.Reply(F(chatID, "logs_cleared", locales.Arg{
 		"size_mb": fmt.Sprintf("%.2f", fileSizeMB),
@@ -391,10 +407,18 @@ func readFirstLines(filePath string, n int) ([]string, error) {
 	return lines, nil
 }
 
-func sendLogLines(m *tg.NewMessage, lines []string, chatID int64, captionKey string) error {
+func sendLogLines(
+	m *tg.NewMessage,
+	lines []string,
+	chatID int64,
+	captionKey string,
+) error {
 	output := strings.Join(lines, "\n")
 
-	tmpFile := filepath.Join(os.TempDir(), fmt.Sprintf("logs_%d.txt", time.Now().Unix()))
+	tmpFile := filepath.Join(
+		os.TempDir(),
+		fmt.Sprintf("logs_%d.txt", time.Now().Unix()),
+	)
 	if err := os.WriteFile(tmpFile, []byte(output), 0o644); err != nil {
 		m.Reply(F(chatID, "logs_send_error", locales.Arg{"error": err.Error()}))
 		return tg.ErrEndGroup

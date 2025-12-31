@@ -82,7 +82,9 @@ func NewContext(app *tg.Client) *Context {
 	return client
 }
 
-func (ctx *Context) OnIncomingCall(callback func(client *Context, chatId int64)) {
+func (ctx *Context) OnIncomingCall(
+	callback func(client *Context, chatId int64),
+) {
 	ctx.callbacksMutex.Lock()
 	defer ctx.callbacksMutex.Unlock()
 	ctx.incomingCallCallbacks = append(ctx.incomingCallCallbacks, callback)

@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package database
 
 import (
@@ -44,11 +45,17 @@ func GetAssistantIndex(chatID int64, assistantCount int) (int, error) {
 
 	settings, err := getChatSettings(chatID)
 	if err != nil {
-		logger.Error("Failed to get chat settings for chat " + strconv.FormatInt(chatID, 10) + ": " + err.Error())
+		logger.Error(
+			"Failed to get chat settings for chat " + strconv.FormatInt(
+				chatID,
+				10,
+			) + ": " + err.Error(),
+		)
 		return 0, err
 	}
 
-	if settings.AssistantIndex >= 1 && settings.AssistantIndex <= assistantCount {
+	if settings.AssistantIndex >= 1 &&
+		settings.AssistantIndex <= assistantCount {
 		return settings.AssistantIndex, nil
 	}
 
@@ -93,7 +100,9 @@ func RebalanceAssistantIndexes(assistantCount int) error {
 
 	cursor, err := chatSettingsColl.Find(ctx, bson.M{})
 	if err != nil {
-		logger.Error("Failed to fetch chat settings for rebalance: " + err.Error())
+		logger.Error(
+			"Failed to fetch chat settings for rebalance: " + err.Error(),
+		)
 		return err
 	}
 	defer cursor.Close(ctx)
@@ -104,7 +113,9 @@ func RebalanceAssistantIndexes(assistantCount int) error {
 	for cursor.Next(ctx) {
 		var s ChatSettings
 		if err := cursor.Decode(&s); err != nil {
-			logger.Error("Failed to decode chat setting during rebalance: " + err.Error())
+			logger.Error(
+				"Failed to decode chat setting during rebalance: " + err.Error(),
+			)
 			return err
 		}
 		all = append(all, &s)

@@ -64,13 +64,17 @@ func parseStringVector(data unsafe.Pointer, size C.int) []string {
 
 func parseUint32VectorC(data []uint32) (*C.uint32_t, C.int) {
 	if len(data) > 0 {
-		cData := C.malloc(C.size_t(len(data)) * C.size_t(unsafe.Sizeof(C.uint32_t(0))))
+		cData := C.malloc(
+			C.size_t(len(data)) * C.size_t(unsafe.Sizeof(C.uint32_t(0))),
+		)
 		if cData == nil {
 			return nil, 0
 		}
 		ssrcs := (*C.uint32_t)(cData)
 		for i, v := range data {
-			*(*C.uint32_t)(unsafe.Pointer(uintptr(unsafe.Pointer(ssrcs)) + uintptr(i)*unsafe.Sizeof(C.uint32_t(0)))) = C.uint32_t(v)
+			*(*C.uint32_t)(unsafe.Pointer(uintptr(unsafe.Pointer(ssrcs)) + uintptr(i)*unsafe.Sizeof(C.uint32_t(0)))) = C.uint32_t(
+				v,
+			)
 		}
 		return ssrcs, C.int(len(data))
 	}
@@ -81,7 +85,9 @@ func parseStringVectorC(data []string) (**C.char, C.int) {
 	if len(data) == 0 {
 		return nil, 0
 	}
-	cArray := C.malloc(C.size_t(len(data)) * C.size_t(unsafe.Sizeof(uintptr(0))))
+	cArray := C.malloc(
+		C.size_t(len(data)) * C.size_t(unsafe.Sizeof(uintptr(0))),
+	)
 	goSlice := (*[1 << 30]*C.char)(cArray)[:len(data):len(data)]
 	for i, v := range data {
 		goSlice[i] = C.CString(v)
@@ -135,7 +141,13 @@ func parseRtcServers(rtcServers []RTCServer) *C.ntg_rtc_server_struct {
 	if len(rtcServers) == 0 {
 		return nil
 	}
-	cArray := C.malloc(C.size_t(len(rtcServers)) * C.size_t(unsafe.Sizeof(C.ntg_rtc_server_struct{})))
+	cArray := C.malloc(
+		C.size_t(
+			len(rtcServers),
+		) * C.size_t(
+			unsafe.Sizeof(C.ntg_rtc_server_struct{}),
+		),
+	)
 	goSlice := (*[1 << 30]C.ntg_rtc_server_struct)(cArray)[:len(rtcServers):len(rtcServers)]
 	for i, server := range rtcServers {
 		goSlice[i] = C.ntg_rtc_server_struct{
@@ -180,7 +192,13 @@ func parseSsrcGroups(ssrcGroups []SsrcGroup) *C.ntg_ssrc_group_struct {
 	if len(ssrcGroups) == 0 {
 		return nil
 	}
-	cArray := C.malloc(C.size_t(len(ssrcGroups)) * C.size_t(unsafe.Sizeof(C.ntg_ssrc_group_struct{})))
+	cArray := C.malloc(
+		C.size_t(
+			len(ssrcGroups),
+		) * C.size_t(
+			unsafe.Sizeof(C.ntg_ssrc_group_struct{}),
+		),
+	)
 	goSlice := (*[1 << 30]C.ntg_ssrc_group_struct)(cArray)[:len(ssrcGroups):len(ssrcGroups)]
 	for i, group := range ssrcGroups {
 		ssrcsC, sizeSsrcs := parseUint32VectorC(group.Ssrcs)

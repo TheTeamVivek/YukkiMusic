@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package platforms
 
 import (
@@ -38,7 +39,9 @@ import (
 	"main/internal/utils"
 )
 
-var telegramDLRegex = regexp.MustCompile(`https:\/\/t\.me\/([a-zA-Z0-9_]{5,})\/(\d+)`)
+var telegramDLRegex = regexp.MustCompile(
+	`https:\/\/t\.me\/([a-zA-Z0-9_]{5,})\/(\d+)`,
+)
 
 const PlatformFallenApi state.PlatformName = "FallenApi"
 
@@ -64,18 +67,27 @@ func (f *FallenApiPlatform) IsValid(query string) bool {
 	return false
 }
 
-func (f *FallenApiPlatform) GetTracks(_ string, _ bool) ([]*state.Track, error) {
+func (f *FallenApiPlatform) GetTracks(
+	_ string,
+	_ bool,
+) ([]*state.Track, error) {
 	return nil, errors.New("fallenapi is a download-only platform")
 }
 
-func (f *FallenApiPlatform) IsDownloadSupported(source state.PlatformName) bool {
+func (f *FallenApiPlatform) IsDownloadSupported(
+	source state.PlatformName,
+) bool {
 	if config.FallenAPIURL == "" || config.FallenAPIKey == "" {
 		return false
 	}
 	return source == PlatformYouTube
 }
 
-func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
+func (f *FallenApiPlatform) Download(
+	ctx context.Context,
+	track *state.Track,
+	mystic *telegram.NewMessage,
+) (string, error) {
 	// fallen api didn't support video downloads so disable it
 	track.Video = false
 	var pm *telegram.ProgressManager
@@ -112,8 +124,16 @@ func (f *FallenApiPlatform) Download(ctx context.Context, track *state.Track, my
 	return filePath, nil
 }
 
-func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string) (string, error) {
-	apiReqURL := fmt.Sprintf("%s/track?api_key=%s&url=%s", config.FallenAPIURL, config.FallenAPIKey, url.QueryEscape(mediaURL))
+func (f *FallenApiPlatform) getDownloadURL(
+	ctx context.Context,
+	mediaURL string,
+) (string, error) {
+	apiReqURL := fmt.Sprintf(
+		"%s/track?api_key=%s&url=%s",
+		config.FallenAPIURL,
+		config.FallenAPIKey,
+		url.QueryEscape(mediaURL),
+	)
 
 	client := resty.New()
 	defer client.Close()
@@ -124,15 +144,22 @@ func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string)
 		SetResult(&apiResp).
 		Get(apiReqURL)
 	if err != nil {
-	  if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		if errors.Is(err, context.Canceled) ||
+			errors.Is(err, context.DeadlineExceeded) {
 			return "", err
 		}
-		
-		return "", fmt.Errorf("api request failed: %w", sanitizeAPIError(err, config.FallenAPIKey))
+
+		return "", fmt.Errorf(
+			"api request failed: %w",
+			sanitizeAPIError(err, config.FallenAPIKey),
+		)
 	}
 
 	if resp.IsError() {
-		return "", fmt.Errorf("api request failed with status: %d", resp.StatusCode())
+		return "", fmt.Errorf(
+			"api request failed with status: %d",
+			resp.StatusCode(),
+		)
 	}
 
 	if apiResp.CdnUrl == "" {
@@ -142,16 +169,20 @@ func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string)
 	return apiResp.CdnUrl, nil
 }
 
-func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, filePath string) error {
+func (f *FallenApiPlatform) downloadFromURL(
+	ctx context.Context,
+	dlURL, filePath string,
+) error {
 	client := resty.New()
 	resp, err := client.R().
 		SetContext(ctx).
 		SetOutputFileName(filePath).
 		Get(dlURL)
 	if err != nil {
-	  os.Remove(filePath)
-	  if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
-			return  err
+		os.Remove(filePath)
+		if errors.Is(err, context.Canceled) ||
+			errors.Is(err, context.DeadlineExceeded) {
+			return err
 		}
 		return fmt.Errorf("http download failed: %w", err)
 	}
@@ -163,7 +194,11 @@ func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, filePath
 	return nil
 }
 
-func (f *FallenApiPlatform) downloadFromTelegram(ctx context.Context, dlURL, videoId string, pm *telegram.ProgressManager) (string, error) {
+func (f *FallenApiPlatform) downloadFromTelegram(
+	ctx context.Context,
+	dlURL, videoId string,
+	pm *telegram.ProgressManager,
+) (string, error) {
 	matches := telegramDLRegex.FindStringSubmatch(dlURL)
 	if len(matches) < 3 {
 		return "", fmt.Errorf("invalid telegram download url: %s", dlURL)

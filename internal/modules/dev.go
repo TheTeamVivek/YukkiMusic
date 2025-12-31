@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package modules
 
 import (
@@ -113,7 +114,9 @@ func shellHandle(m *telegram.NewMessage) error {
 	}
 
 	if out.String() != "" {
-		m.Reply(`<pre lang="bash">` + strings.TrimSpace(out.String()) + `</pre>`)
+		m.Reply(
+			`<pre lang="bash">` + strings.TrimSpace(out.String()) + `</pre>`,
+		)
 	} else {
 		m.Reply(`<pre lang="bash">` + strings.TrimSpace(errx.String()) + `</pre>`)
 	}
@@ -242,7 +245,9 @@ func packMessage(c *telegram.Client, message telegram.Message, sender *telegram.
 
 func resolveImports(code string) (string, []string) {
 	var imports []string
-	importsRegex := regexp.MustCompile(`import\s*\(([\s\S]*?)\)|import\s*\"([\s\S]*?)\"`)
+	importsRegex := regexp.MustCompile(
+		`import\s*\(([\s\S]*?)\)|import\s*\"([\s\S]*?)\"`,
+	)
 	importsMatches := importsRegex.FindAllStringSubmatch(code, -1)
 	for _, v := range importsMatches {
 		if v[1] != "" {
@@ -293,7 +298,11 @@ func evalHandle(m *telegram.NewMessage) error {
 	return nil
 }
 
-func performEval(code string, m *telegram.NewMessage, imports []string) (string, bool) {
+func performEval(
+	code string,
+	m *telegram.NewMessage,
+	imports []string,
+) (string, bool) {
 	msg_b, _ := json.Marshal(m.Message)
 	snd_b, _ := json.Marshal(m.Sender)
 	cnt_b, _ := json.Marshal(m.Chat)
@@ -311,7 +320,19 @@ func performEval(code string, m *telegram.NewMessage, imports []string) (string,
 	if aErr != nil {
 		return fmt.Sprintf("Failed to get assistant: %v", aErr), false
 	}
-	code_file := fmt.Sprintf(boiler_code_for_eval, importStatement, m.ID, msg_b, snd_b, cnt_b, chn_b, cache_b, code, m.Client.ExportSession(), ass.Client.ExportSession())
+	code_file := fmt.Sprintf(
+		boiler_code_for_eval,
+		importStatement,
+		m.ID,
+		msg_b,
+		snd_b,
+		cnt_b,
+		chn_b,
+		cache_b,
+		code,
+		m.Client.ExportSession(),
+		ass.Client.ExportSession(),
+	)
 	tmp_dir := "tmp"
 	_, err := os.ReadDir(tmp_dir)
 	if err != nil {
@@ -333,7 +354,10 @@ func performEval(code string, m *telegram.NewMessage, imports []string) (string,
 	err = cmd.Run()
 	if stdOut.String() == "" && stdErr.String() == "" {
 		if err != nil {
-			return fmt.Sprintf("<b>#EVALERR:</b> <code>%s</code>", err.Error()), false
+			return fmt.Sprintf(
+				"<b>#EVALERR:</b> <code>%s</code>",
+				err.Error(),
+			), false
 		}
 		return "<b>#EVALOut:</b> <code>No Output</code>", false
 	}
@@ -346,7 +370,10 @@ func performEval(code string, m *telegram.NewMessage, imports []string) (string,
 
 		strDou := strings.Split(stdOut.String(), "output-start")
 
-		return fmt.Sprintf("<b>#EVALOut:</b> <code>%s</code>", strings.TrimSpace(strDou[1])), false
+		return fmt.Sprintf(
+			"<b>#EVALOut:</b> <code>%s</code>",
+			strings.TrimSpace(strDou[1]),
+		), false
 	}
 
 	if stdErr.String() != "" {
@@ -357,9 +384,15 @@ func performEval(code string, m *telegram.NewMessage, imports []string) (string,
 				os.WriteFile("tmp/eval_out.txt", []byte(errMsg[1]), 0o644)
 				return "tmp/eval_out.txt", true
 			}
-			return fmt.Sprintf("<b>#EVALERR:</b> <code>%s</code>", strings.TrimSpace(errMsg[1])), false
+			return fmt.Sprintf(
+				"<b>#EVALERR:</b> <code>%s</code>",
+				strings.TrimSpace(errMsg[1]),
+			), false
 		}
-		return fmt.Sprintf("<b>#EVALERR:</b> <code>%s</code>", stdErr.String()), false
+		return fmt.Sprintf(
+			"<b>#EVALERR:</b> <code>%s</code>",
+			stdErr.String(),
+		), false
 	}
 
 	return "<b>#EVALOut:</b> <code>No Output</code>", false
@@ -405,7 +438,13 @@ func jsonHandle(m *telegram.NewMessage) error {
 			m.Reply("Error: " + err.Error())
 			return nil
 		}
-		jsonString = []byte(strings.ReplaceAll(string(jsonString), v[0], `"Data": "`+string(decoded)+`"`))
+		jsonString = []byte(
+			strings.ReplaceAll(
+				string(jsonString),
+				v[0],
+				`"Data": "`+string(decoded)+`"`,
+			),
+		)
 	}
 
 	if len(jsonString) > 4095 {
@@ -422,7 +461,10 @@ func jsonHandle(m *telegram.NewMessage) error {
 			return nil
 		}
 
-		_, err = m.ReplyMedia(tmpFile.Name(), &telegram.MediaOptions{Caption: "Message JSON"})
+		_, err = m.ReplyMedia(
+			tmpFile.Name(),
+			&telegram.MediaOptions{Caption: "Message JSON"},
+		)
 		if err != nil {
 			m.Reply("Error: " + err.Error())
 		}

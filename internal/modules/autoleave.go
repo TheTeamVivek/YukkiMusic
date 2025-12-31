@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package modules
 
 import (
@@ -43,7 +44,8 @@ var (
 )
 
 func init() {
-	helpTexts["autoleave"] = fmt.Sprintf(`<i>Automatically makes the assistant leave inactive or unnecessary chats every 10 minutes.</i>
+	helpTexts["autoleave"] = fmt.Sprintf(
+		`<i>Automatically makes the assistant leave inactive or unnecessary chats every 10 minutes.</i>
 
 <u>Usage:</u>
 <b>/autoleave </b>— Shows current auto-leave status (enabled/disabled).  
@@ -54,7 +56,9 @@ func init() {
 Once enabled, the bot checks all joined groups/channels every <b>10 minutes</b> and leaves up to <b>%d chats per cycle</b> that are not in the active room  list.
 
 <b>⚠️ Restrictions:</b>
-This command can only be used by <b>owners</b> or <b>sudo users</b>.`, limit)
+This command can only be used by <b>owners</b> or <b>sudo users</b>.`,
+		limit,
+	)
 }
 
 func autoLeaveHandler(m *tg.NewMessage) error {
@@ -177,7 +181,11 @@ func autoLeaveAssistant(
 
 		if err := ass.Client.LeaveChannel(chatID); err != nil {
 			if wait := tg.GetFloodWait(err); wait > 0 {
-				gologging.Error("FloodWait detected (" + strconv.Itoa(wait) + "s). Sleeping...")
+				gologging.Error(
+					"FloodWait detected (" + strconv.Itoa(
+						wait,
+					) + "s). Sleeping...",
+				)
 				time.Sleep(time.Duration(wait) * time.Second)
 				return nil
 			}

@@ -30,7 +30,10 @@ func (ctx *Client) OnUpgrade(callback UpgradeCallback) {
 func (ctx *Client) OnConnectionChange(callback ConnectionChangeCallback) {
 	ctx.mu.Lock()
 	defer ctx.mu.Unlock()
-	ctx.connectionChangeCallbacks = append(ctx.connectionChangeCallbacks, callback)
+	ctx.connectionChangeCallbacks = append(
+		ctx.connectionChangeCallbacks,
+		callback,
+	)
 }
 
 func (ctx *Client) OnSignal(callback SignalCallback) {
@@ -51,10 +54,15 @@ func (ctx *Client) OnRemoteSourceChange(callback RemoteSourceCallback) {
 	ctx.remoteSourceCallbacks = append(ctx.remoteSourceCallbacks, callback)
 }
 
-func (ctx *Client) OnRequestBroadcastTimestamp(callback BroadcastTimestampCallback) {
+func (ctx *Client) OnRequestBroadcastTimestamp(
+	callback BroadcastTimestampCallback,
+) {
 	ctx.mu.Lock()
 	defer ctx.mu.Unlock()
-	ctx.broadcastTimestampCallbacks = append(ctx.broadcastTimestampCallbacks, callback)
+	ctx.broadcastTimestampCallbacks = append(
+		ctx.broadcastTimestampCallbacks,
+		callback,
+	)
 }
 
 func (ctx *Client) OnRequestBroadcastPart(callback BroadcastPartCallback) {
@@ -135,7 +143,10 @@ func (ctx *Client) getBroadcastTimestampCallbacks() []BroadcastTimestampCallback
 	if len(ctx.broadcastTimestampCallbacks) == 0 {
 		return nil
 	}
-	cbs := make([]BroadcastTimestampCallback, len(ctx.broadcastTimestampCallbacks))
+	cbs := make(
+		[]BroadcastTimestampCallback,
+		len(ctx.broadcastTimestampCallbacks),
+	)
 	copy(cbs, ctx.broadcastTimestampCallbacks)
 	return cbs
 }

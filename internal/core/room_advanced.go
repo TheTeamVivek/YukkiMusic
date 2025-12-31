@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package core
 
 import (
@@ -107,7 +108,10 @@ func (r *RoomState) restorePlaybackSnapshot(snap playbackSnapshot) {
 }
 
 // SetSpeed adjusts playback speed with optional auto-reset
-func (r *RoomState) SetSpeed(speed float64, timeAfterNormal ...time.Duration) error {
+func (r *RoomState) SetSpeed(
+	speed float64,
+	timeAfterNormal ...time.Duration,
+) error {
 	r.Lock()
 	defer r.Unlock()
 
@@ -128,13 +132,20 @@ func (r *RoomState) validateSpeedChange(speed float64) error {
 	}
 
 	if speed < minSpeed || speed > maxSpeed {
-		return fmt.Errorf("invalid speed: must be between %.2fx and %.1fx", minSpeed, maxSpeed)
+		return fmt.Errorf(
+			"invalid speed: must be between %.2fx and %.1fx",
+			minSpeed,
+			maxSpeed,
+		)
 	}
 
 	return nil
 }
 
-func (r *RoomState) executeSpeedChange(speed float64, timeAfterNormal []time.Duration) error {
+func (r *RoomState) executeSpeedChange(
+	speed float64,
+	timeAfterNormal []time.Duration,
+) error {
 	r.parse()
 	r.speed = speed
 	r.playing = true
@@ -150,7 +161,10 @@ func (r *RoomState) executeSpeedChange(speed float64, timeAfterNormal []time.Dur
 	return nil
 }
 
-func (r *RoomState) scheduleSpeedReset(speed float64, timeAfterNormal []time.Duration) {
+func (r *RoomState) scheduleSpeedReset(
+	speed float64,
+	timeAfterNormal []time.Duration,
+) {
 	if r.scheduledTimers == nil {
 		r.scheduledTimers = &scheduledTimers{}
 	}
@@ -165,7 +179,10 @@ func (r *RoomState) scheduleSpeedReset(speed float64, timeAfterNormal []time.Dur
 	r.scheduledSpeedTimer = time.AfterFunc(d, r.resetSpeedToNormal)
 }
 
-func (r *RoomState) shouldScheduleSpeedReset(speed float64, timeAfterNormal []time.Duration) bool {
+func (r *RoomState) shouldScheduleSpeedReset(
+	speed float64,
+	timeAfterNormal []time.Duration,
+) bool {
 	return len(timeAfterNormal) > 0 && timeAfterNormal[0] > 0 && speed != 1.0
 }
 

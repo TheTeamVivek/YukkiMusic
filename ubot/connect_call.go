@@ -9,7 +9,11 @@ import (
 	"main/ntgcalls"
 )
 
-func (ctx *Context) connectCall(chatId int64, mediaDescription ntgcalls.MediaDescription, jsonParams string) error {
+func (ctx *Context) connectCall(
+	chatId int64,
+	mediaDescription ntgcalls.MediaDescription,
+	jsonParams string,
+) error {
 	// Create wait channel and ensure cleanup
 	ctx.waitConnectMutex.Lock()
 	waitChan := make(chan error, 1) // Buffered to prevent goroutine leak
@@ -60,7 +64,11 @@ func (ctx *Context) connectCall(chatId int64, mediaDescription ntgcalls.MediaDes
 			return signalError(err)
 		}
 
-		err = ctx.binding.SetStreamSources(chatId, ntgcalls.CaptureStream, mediaDescription)
+		err = ctx.binding.SetStreamSources(
+			chatId,
+			ntgcalls.CaptureStream,
+			mediaDescription,
+		)
 		if err != nil {
 			return signalError(err)
 		}
@@ -113,7 +121,8 @@ func (ctx *Context) connectCall(chatId int64, mediaDescription ntgcalls.MediaDes
 					UserID:   userId,
 					GAHash:   gaOrBHash,
 					RandomID: int32(tg.GenRandInt()),
-					Video:    mediaDescription.Camera != nil || mediaDescription.Screen != nil,
+					Video: mediaDescription.Camera != nil ||
+						mediaDescription.Screen != nil,
 				},
 			)
 			if err != nil {

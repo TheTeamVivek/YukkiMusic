@@ -32,7 +32,8 @@ func (ctx *Context) updateSources(chatId int64) error {
 	for _, participant := range participants {
 		participantId := getParticipantId(participant.Peer)
 
-		if participant.Video != nil && ctx.callSources[chatId].CameraSources[participantId] == "" {
+		if participant.Video != nil &&
+			ctx.callSources[chatId].CameraSources[participantId] == "" {
 			ctx.callSources[chatId].CameraSources[participantId] = participant.Video.Endpoint
 			videosToAdd = append(videosToAdd, videoToAdd{
 				participantId: participantId,
@@ -42,7 +43,8 @@ func (ctx *Context) updateSources(chatId int64) error {
 			})
 		}
 
-		if participant.Presentation != nil && ctx.callSources[chatId].ScreenSources[participantId] == "" {
+		if participant.Presentation != nil &&
+			ctx.callSources[chatId].ScreenSources[participantId] == "" {
 			ctx.callSources[chatId].ScreenSources[participantId] = participant.Presentation.Endpoint
 			videosToAdd = append(videosToAdd, videoToAdd{
 				participantId: participantId,

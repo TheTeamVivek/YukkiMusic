@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package core
 
 import (
@@ -40,7 +41,13 @@ var (
 	AssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // AssistantIndexFunc = database.GetAssistantIndex
 )
 
-func Init(apiID int32, apiHash, token string, sessions []string, sessionType string, loggerID int64) func() {
+func Init(
+	apiID int32,
+	apiHash, token string,
+	sessions []string,
+	sessionType string,
+	loggerID int64,
+) func() {
 	if len(sessions) == 0 {
 		gologging.Fatal("No STRING_SESSIONS provided for assistant client.")
 	}
@@ -70,7 +77,10 @@ func Init(apiID int32, apiHash, token string, sessions []string, sessionType str
 		})
 
 		if loggerID != 0 {
-			_, _ = client.SendMessage(loggerID, fmt.Sprintf("Assistant %d Started", i+1))
+			_, _ = client.SendMessage(
+				loggerID,
+				fmt.Sprintf("Assistant %d Started", i+1),
+			)
 		}
 
 		gologging.InfoF("assistant[%d] ready: %s", i, user.FirstName)
@@ -104,9 +114,11 @@ func Init(apiID int32, apiHash, token string, sessions []string, sessionType str
 
 func initBotClient(apiID int32, apiHash, token string) *telegram.Client {
 	client, err := telegram.NewClient(telegram.ClientConfig{
-		AppID:     apiID,
-		AppHash:   apiHash,
-		Logger:    telegram.WrapSimpleLogger(GetTgLogger("gogram", telegram.LogError)),
+		AppID:   apiID,
+		AppHash: apiHash,
+		Logger: telegram.WrapSimpleLogger(
+			GetTgLogger("gogram", telegram.LogError),
+		),
 		LogLevel:  telegram.LogError,
 		ParseMode: "HTML",
 		Session:   "bot.session",
@@ -125,7 +137,11 @@ func initBotClient(apiID int32, apiHash, token string) *telegram.Client {
 	return client
 }
 
-func initAssistantClient(apiID int32, apiHash, session, sessionType string, idx int) *telegram.Client {
+func initAssistantClient(
+	apiID int32,
+	apiHash, session, sessionType string,
+	idx int,
+) *telegram.Client {
 	var stringSession string
 
 	switch strings.ToLower(sessionType) {
@@ -174,7 +190,9 @@ func getSelfOrFatal(c *telegram.Client, label string) *telegram.UserObj {
 	return me
 }
 
-func decodePyrogramSessionString(encodedString string) (*telegram.Session, error) {
+func decodePyrogramSessionString(
+	encodedString string,
+) (*telegram.Session, error) {
 	// SESSION_STRING_FORMAT: Big-endian, uint8, uint32, bool, 256-byte array, uint64, bool
 	const (
 		dcIDSize     = 1 // uint8
@@ -197,17 +215,37 @@ func decodePyrogramSessionString(encodedString string) (*telegram.Session, error
 
 	expectedSize := dcIDSize + apiIDSize + testModeSize + authKeySize + userIDSize + isBotSize
 	if len(packedData) != expectedSize {
-		return nil, fmt.Errorf("unexpected data length: got %d, want %d", len(packedData), expectedSize)
+		return nil, fmt.Errorf(
+			"unexpected data length: got %d, want %d",
+			len(packedData),
+			expectedSize,
+		)
 	}
 
 	return &telegram.Session{
-		Hostname: telegram.ResolveDataCenterIP(int(uint8(packedData[0])), packedData[5] != 0, false),
-		AppID:    int32(uint32(packedData[1])<<24 | uint32(packedData[2])<<16 | uint32(packedData[3])<<8 | uint32(packedData[4])),
-		Key:      packedData[6 : 6+authKeySize],
+		Hostname: telegram.ResolveDataCenterIP(
+			int(uint8(packedData[0])),
+			packedData[5] != 0,
+			false,
+		),
+		AppID: int32(
+			uint32(
+				packedData[1],
+			)<<24 | uint32(
+				packedData[2],
+			)<<16 | uint32(
+				packedData[3],
+			)<<8 | uint32(
+				packedData[4],
+			),
+		),
+		Key: packedData[6 : 6+authKeySize],
 	}, nil
 }
 
-func decodeTelethonSessionString(sessionString string) (*telegram.Session, error) {
+func decodeTelethonSessionString(
+	sessionString string,
+) (*telegram.Session, error) {
 	data, err := base64.URLEncoding.DecodeString(sessionString[1:])
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode base64: %v", err)

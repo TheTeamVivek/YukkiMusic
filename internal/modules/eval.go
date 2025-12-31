@@ -68,7 +68,9 @@ Examples:
 	}
 
 	if code == "" {
-		m.Reply("No code provided.\nUse <code>/eval --help</code> for usage info.")
+		m.Reply(
+			"No code provided.\nUse <code>/eval --help</code> for usage info.",
+		)
 		return nil
 	}
 
@@ -180,6 +182,11 @@ func main() {
 		return nil
 	}
 
-	m.Reply(fmt.Sprintf("<b>#EVALOut:</b>\n<code>%s</code>", strings.TrimSpace(output)))
+	m.Reply(
+		fmt.Sprintf(
+			"<b>#EVALOut:</b>\n<code>%s</code>",
+			strings.TrimSpace(output),
+		),
+	)
 	return nil
 }

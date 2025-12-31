@@ -63,7 +63,9 @@ func handleMaintenance(m *tg.NewMessage) error {
 	chatID := m.ChannelID()
 	current, err := database.IsMaintenance()
 	if err != nil {
-		m.Reply(F(chatID, "maint_check_fail", locales.Arg{"error": err.Error()}))
+		m.Reply(
+			F(chatID, "maint_check_fail", locales.Arg{"error": err.Error()}),
+		)
 		return tg.ErrEndGroup
 	}
 
@@ -73,7 +75,11 @@ func handleMaintenance(m *tg.NewMessage) error {
 		status := F(chatID, "disabled")
 		if current {
 			if reason != "" {
-				status = F(chatID, "enabled_with_reason", locales.Arg{"reason": reason})
+				status = F(
+					chatID,
+					"enabled_with_reason",
+					locales.Arg{"reason": reason},
+				)
 			} else {
 				status = F(chatID, "enabled")
 			}
@@ -104,7 +110,13 @@ func handleMaintenance(m *tg.NewMessage) error {
 				m.Reply(F(chatID, "maint_reason_removed"))
 			case reason != "" && reason != oldReason:
 				_ = database.SetMaintenance(true, reason)
-				m.Reply(F(chatID, "maint_reason_updated", locales.Arg{"reason": reason}))
+				m.Reply(
+					F(
+						chatID,
+						"maint_reason_updated",
+						locales.Arg{"reason": reason},
+					),
+				)
 			default:
 				m.Reply(F(chatID, "maint_already_enabled"))
 			}
@@ -116,7 +128,12 @@ func handleMaintenance(m *tg.NewMessage) error {
 
 	// apply new state
 	database.SetMaintenance(enable, reason)
-	gologging.InfoF("User %d set maintenance: %v (reason: %s)", m.SenderID(), enable, reason)
+	gologging.InfoF(
+		"User %d set maintenance: %v (reason: %s)",
+		m.SenderID(),
+		enable,
+		reason,
+	)
 
 	if enable {
 		maintCancel.Lock()
@@ -133,7 +150,11 @@ func handleMaintenance(m *tg.NewMessage) error {
 				maintCancel.Unlock()
 				ass, err := core.Assistants.ForChat(id)
 				if err != nil {
-					gologging.ErrorF("Failed to get Assistant for %d: %v", id, err)
+					gologging.ErrorF(
+						"Failed to get Assistant for %d: %v",
+						id,
+						err,
+					)
 					continue
 				}
 
@@ -141,7 +162,11 @@ func handleMaintenance(m *tg.NewMessage) error {
 					r.Destroy()
 					msg := F(id, "maint_entering")
 					if reason != "" {
-						msg += "\n" + F(id, "maint_reason", locales.Arg{"reason": reason})
+						msg += "\n" + F(
+							id,
+							"maint_reason",
+							locales.Arg{"reason": reason},
+						)
 					}
 					c.SendMessage(id, msg)
 					time.Sleep(time.Second)

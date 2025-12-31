@@ -6,7 +6,10 @@ import (
 	"main/ntgcalls"
 )
 
-func (ctx *Context) setCallStatus(call tg.InputGroupCall, state ntgcalls.MediaState) error {
+func (ctx *Context) setCallStatus(
+	call tg.InputGroupCall,
+	state ntgcalls.MediaState,
+) error {
 	_, err := ctx.app.PhoneEditGroupCallParticipant(
 		&tg.PhoneEditGroupCallParticipantParams{
 			Call: call,

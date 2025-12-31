@@ -53,7 +53,11 @@ func init() {
 	urls := strings.Fields(config.CookiesLink)
 	for _, url := range urls {
 		if err := downloadCookieFile(url); err != nil {
-			gologging.WarnF("Failed to download cookie file from %s: %v", url, err)
+			gologging.WarnF(
+				"Failed to download cookie file from %s: %v",
+				url,
+				err,
+			)
 		}
 	}
 }
@@ -106,7 +110,11 @@ func downloadCookieFile(url string) error {
 	}
 
 	if resp.IsError() {
-		return fmt.Errorf("unexpected status %d from %s", resp.StatusCode(), rawURL)
+		return fmt.Errorf(
+			"unexpected status %d from %s",
+			resp.StatusCode(),
+			rawURL,
+		)
 	}
 
 	return nil

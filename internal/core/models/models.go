@@ -43,7 +43,11 @@ type (
 		Name() PlatformName
 		IsValid(query string) bool
 		GetTracks(query string, video bool) ([]*Track, error)
-		Download(ctx context.Context, track *Track, mystic *telegram.NewMessage) (string, error)
+		Download(
+			ctx context.Context,
+			track *Track,
+			mystic *telegram.NewMessage,
+		) (string, error)
 		IsDownloadSupported(source PlatformName) bool
 	}
 )

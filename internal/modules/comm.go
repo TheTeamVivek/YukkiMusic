@@ -68,7 +68,10 @@ var AllCommands = BotCommands{
 	GroupAdminCommands: []*telegram.BotCommand{
 		{"cplay", "Play a song in the linked channel."},
 		{"cqueue", "Show the queue in the linked channel."},
-		{"cposition", "Show the current position of the song in the linked channel."},
+		{
+			"cposition",
+			"Show the current position of the song in the linked channel.",
+		},
 		{"fplay", "Force play a song."},
 		{"speed", "Set the speed of the song."},
 		{"skip", "Skip the current song."},
@@ -94,11 +97,20 @@ var AllCommands = BotCommands{
 		{"cresume", "Resume the current song in the linked channel."},
 		{"cmute", "Mute the bot in the linked channel's voice chat."},
 		{"cunmute", "Unmute the bot in the linked channel's voice chat."},
-		{"cstop", "Stop the current song and leave the linked channel's voice chat."},
+		{
+			"cstop",
+			"Stop the current song and leave the linked channel's voice chat.",
+		},
 		{"cskip", "Skip the current song in the linked channel."},
 		{"cloop", "Loop the current song in the linked channel."},
-		{"cseek", "Seek to a specific position in the song in the linked channel."},
-		{"cseekback", "Seek back to a specific position in the song in the linked channel."},
+		{
+			"cseek",
+			"Seek to a specific position in the song in the linked channel.",
+		},
+		{
+			"cseekback",
+			"Seek back to a specific position in the song in the linked channel.",
+		},
 		{"cjump", "Jump to a specific song in the linked channel's queue."},
 		{"cremove", "Remove a song from the linked channel's queue."},
 		{"cclear", "Clear the linked channel's queue."},
