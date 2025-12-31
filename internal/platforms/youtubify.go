@@ -101,16 +101,17 @@ func (y *YoutubifyPlatform) Download(
 		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 			return "", err
 		}
-		return "", err
+		gologging.Error("Failed to download song using YoutubifyPlatform: " + sanitizeAPIError(err, config.YoutubifyApiKey).Error())
+		return "", sanitizeAPIError(err, config.YoutubifyApiKey)
 	}
 
 	if resp.IsError() {
-		_ = os.Remove(filepath)
+		os.Remove(filepath)
 		return "", fmt.Errorf("API returned %s", resp.Status())
 	}
 
 	if ctx.Err() != nil {
-		_ = os.Remove(filepath)
+	os.Remove(filepath)
 		return "", ctx.Err()
 	}
 

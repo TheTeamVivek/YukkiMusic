@@ -42,3 +42,11 @@ func checkDownloadedFile(trackID string) (string, error) {
 func ensureDownloadsDir() error {
 	return os.MkdirAll("downloads", os.ModePerm)
 }
+
+func sanitizeAPIError(err error, apiKey string) error {
+    if err == nil || apiKey == "" {
+        return err
+    }
+    masked := strings.ReplaceAll(err.Error(), apiKey, "***REDACTED***")
+    return errors.New(masked)
+}

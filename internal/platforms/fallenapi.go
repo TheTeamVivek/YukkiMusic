@@ -42,7 +42,7 @@ var telegramDLRegex = regexp.MustCompile(`https:\/\/t\.me\/([a-zA-Z0-9_]{5,})\/(
 
 const PlatformFallenApi state.PlatformName = "FallenApi"
 
-type APIResponse struct {
+type apiResponse struct {
 	CdnUrl string `json:"cdnurl"`
 }
 
@@ -117,14 +117,18 @@ func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string)
 
 	client := resty.New()
 	defer client.Close()
-	var apiResp APIResponse
+	var apiResp apiResponse
 
 	resp, err := client.R().
 		SetContext(ctx).
 		SetResult(&apiResp).
 		Get(apiReqURL)
 	if err != nil {
-		return "", fmt.Errorf("api request failed: %w", err)
+	  if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+			return "", err
+		}
+		
+		return "", fmt.Errorf("api request failed: %w", sanitizeAPIError(err, config.FallenAPIKey))
 	}
 
 	if resp.IsError() {
@@ -145,6 +149,10 @@ func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, filePath
 		SetOutputFileName(filePath).
 		Get(dlURL)
 	if err != nil {
+	  os.Remove(filePath)
+	  if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+			return  err
+		}
 		return fmt.Errorf("http download failed: %w", err)
 	}
 
