@@ -43,21 +43,18 @@ import (
 	"main/internal/modules"
 )
 
-var l = gologging.GetLogger("Main")
-
 func main() {
-	gologging.SetLevel(gologging.DebugLevel)
-	gologging.GetLogger("ntgcalls").SetLevel(gologging.ErrorLevel)
-	gologging.GetLogger("webrtc").SetLevel(gologging.FatalLevel)
-
+  initLogger()
+	defer config.CloseLogging()
+	
 	checkFFmpegAndFFprobe()
 	refreshCacheAndDownloads()
 
-	l.Debug("🔹 Initializing MongoDB...")
+	gologging.Debug("🔹 Initializing MongoDB...")
 	dbCleanup := database.Init(config.MongoURI)
 	defer dbCleanup()
-	l.Info("✅ Database connected successfully")
-	l.Debug("🔹 Initializing clients...")
+	gologging.Info("✅ Database connected successfully")
+	gologging.Debug("🔹 Initializing clients...")
 	cleanup := core.Init(
 		config.ApiID,
 		config.ApiHash,
@@ -72,13 +69,28 @@ func main() {
 	core.GetChatLanguage = database.GetChatLanguage
 
 	if err := database.RebalanceAssistantIndexes(core.Assistants.Count()); err != nil {
-		l.Fatal("Failed to rebalance Assistants: " + err.Error())
+		gologging.Fatal("Failed to rebalance Assistants: " + err.Error())
 	}
 
 	modules.Init(core.Bot, core.Assistants)
 	core.Bot.Idle()
 }
 
+func initLogger(){
+  gologging.SetLevel(gologging.DebugLevel)
+  gologging.SetOutput(config.LogWriter)
+	
+	l := gologging.GetLogger("ntgcalls")
+	l.SetLevel(gologging.ErrorLevel)
+	l.SetOutput(config.LogWriter)
+	
+	l = gologging.GetLogger("webrtc")
+	l.SetLevel(gologging.FatalLevel)
+	l.SetOutput(config.LogWriter)
+	
+	gologging.GetLogger("Database").SetOutput(config.LogWriter)
+	
+}
 func refreshCacheAndDownloads() error {
 	dirs := []string{
 		"./cache",

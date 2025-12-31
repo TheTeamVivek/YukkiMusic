@@ -29,8 +29,6 @@ import (
 	"main/internal/database"
 )
 
-var logger = gologging.GetLogger("monitor")
-
 func MonitorRooms() {
 	ticker := time.NewTicker(4 * time.Second)
 	defer ticker.Stop()

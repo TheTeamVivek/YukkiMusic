@@ -259,7 +259,6 @@ func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage)
 }
 
 func handlePanic(r, ctx interface{}, isPanic bool) {
-	logger := gologging.GetLogger("Handlers")
 	stack := html.EscapeString(string(debug.Stack()))
 
 	var userMention, handlerType, chatInfo, messageInfo, errorMessage string
@@ -292,9 +291,9 @@ func handlePanic(r, ctx interface{}, isPanic bool) {
 	}
 
 	if isPanic {
-		logger.ErrorF(logMsg, handlerType, userMention, chatInfo, messageInfo, r, stack)
+		gologging.ErrorF(logMsg, handlerType, userMention, chatInfo, messageInfo, r, stack)
 	} else {
-		logger.ErrorF(logMsg, handlerType, userMention, chatInfo, messageInfo, r)
+		gologging.ErrorF(logMsg, handlerType, userMention, chatInfo, messageInfo, r)
 	}
 
 	if config.LoggerID != 0 && client != nil {
@@ -307,7 +306,7 @@ func handlePanic(r, ctx interface{}, isPanic bool) {
 
 		gologging.Error(short)
 		if _, sendErr := client.SendMessage(config.LoggerID, short, &tg.SendOptions{ParseMode: "HTML"}); sendErr != nil {
-			logger.ErrorF("Failed to send panic message to log chat: %v", sendErr)
+			gologging.ErrorF("Failed to send panic message to log chat: %v", sendErr)
 		}
 	}
 }

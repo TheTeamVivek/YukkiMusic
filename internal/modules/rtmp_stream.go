@@ -21,7 +21,6 @@ import (
 var (
 	rtmpStreams   = make(map[int64]*tg.RTMPStream)
 	rtmpStreamsMu sync.RWMutex
-	rtmpLogger    = gologging.GetLogger("RTMP")
 )
 
 func init() {
@@ -138,7 +137,7 @@ func getOrCreateRTMPStream(chatID int64) (*tg.RTMPStream, error) {
 	stream.SetKey(key)
 
 	stream.OnError(func(err error) {
-		rtmpLogger.ErrorF("RTMP error in chat %d: %v", chatID, err)
+		gologging.ErrorF("RTMP error in chat %d: %v", chatID, err)
 		core.Bot.SendMessage(chatID, "⚠️ RTMP stream encountered an error. Check logs for details.")
 	})
 
@@ -198,7 +197,7 @@ func handleStream(m *tg.NewMessage, force bool) error {
 
 	replyMsg, err := m.Reply(searchStr)
 	if err != nil {
-		rtmpLogger.ErrorF("Failed to send searching message: %v", err)
+		gologging.ErrorF("Failed to send searching message: %v", err)
 		return tg.ErrEndGroup
 	}
 

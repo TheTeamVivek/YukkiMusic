@@ -63,7 +63,8 @@ var handlers = []MsgHandlerDef{
 	{Pattern: "(maintenance|maint)", Handler: handleMaintenance, Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter}},
 	{Pattern: "logger", Handler: handleLogger, Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter}},
 	{Pattern: "autoleave", Handler: autoLeaveHandler, Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter}},
-
+	{Pattern: "(log|logs)", Handler: logsHandler, Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter}},
+	
 	{Pattern: "help", Handler: helpHandler, Filters: []telegram.Filter{ignoreChannelFilter}},
 	{Pattern: "ping", Handler: pingHandler, Filters: []telegram.Filter{ignoreChannelFilter}},
 	{Pattern: "start", Handler: startHandler, Filters: []telegram.Filter{ignoreChannelFilter}},

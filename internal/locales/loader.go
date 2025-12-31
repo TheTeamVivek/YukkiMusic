@@ -36,7 +36,6 @@ import (
 var locales embed.FS
 
 var (
-	logger        = gologging.GetLogger("locales")
 	loadedLocales = make(map[string]map[string]string)
 )
 
@@ -45,7 +44,7 @@ type Arg map[string]any
 func init() {
 	files, err := locales.ReadDir(".")
 	if err != nil {
-		logger.Fatal("Failed to read embedded locales:", err)
+		gologging.Fatal("Failed to read embedded locales:", err)
 		return
 	}
 	for _, f := range files {
@@ -55,20 +54,20 @@ func init() {
 		lang := f.Name()[:len(f.Name())-len(path.Ext(f.Name()))]
 		file, err := locales.ReadFile(f.Name())
 		if err != nil {
-			logger.Fatal("Failed to read locale file:", f.Name(), err)
+			gologging.Fatal("Failed to read locale file:", f.Name(), err)
 			continue
 		}
 		var locale map[string]string
 		if err := yaml.Unmarshal(file, &locale); err != nil {
-			logger.Fatal("Failed to unmarshal locale file:", f.Name(), err)
+			gologging.Fatal("Failed to unmarshal locale file:", f.Name(), err)
 			continue
 		}
 		loadedLocales[lang] = locale
 	}
 	if _, ok := loadedLocales[config.DefaultLang]; !ok {
-		logger.Fatal("Default language not found:", config.DefaultLang)
+		gologging.Fatal("Default language not found:", config.DefaultLang)
 	}
-	logger.Info("Loaded", len(loadedLocales), "locales.")
+	gologging.Info("Loaded", len(loadedLocales), "locales.")
 }
 
 func Get(lang, key string, values Arg) string {

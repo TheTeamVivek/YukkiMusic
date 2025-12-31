@@ -68,13 +68,34 @@ var (
 
 	StartImage = getString("START_IMG_URL", "https://raw.githubusercontent.com/Vivekkumar-IN/assets/master/images.png")
 	PingImage  = getString("PING_IMG_URL", "https://telegra.ph/file/91533956c91d0fd7c9f20.jpg")
+	
+	LogFileName = "logs.txt"
+	LogWriter io.Writer
+	logFile   *os.File
+	
 )
 
 func init() {
+  initLogging()
 	validateRequired()
 	validateToken()
 	validateSessions()
 	validateSpotify()
+}
+
+func initLogging() {
+  os.Remove(LogFileName)
+	file, err := os.OpenFile(
+		LogFileName,
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		0644,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	logFile = file
+	LogWriter = io.MultiWriter(file, os.Stderr)
 }
 
 func validateRequired() {
@@ -202,5 +223,11 @@ func variants(base string) []string {
 		strings.ToLower(base),
 		strings.ReplaceAll(base, "_", ""),
 		cases.Title(language.Und, cases.NoLower).String(strings.ReplaceAll(base, "_", " ")),
+	}
+}
+
+func CloseLogging() {
+	if logFile != nil {
+		logFile.Close()
 	}
 }

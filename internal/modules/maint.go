@@ -116,7 +116,7 @@ func handleMaintenance(m *tg.NewMessage) error {
 
 	// apply new state
 	database.SetMaintenance(enable, reason)
-	logger.InfoF("User %d set maintenance: %v (reason: %s)", m.SenderID(), enable, reason)
+	gologging.InfoF("User %d set maintenance: %v (reason: %s)", m.SenderID(), enable, reason)
 
 	if enable {
 		maintCancel.Lock()

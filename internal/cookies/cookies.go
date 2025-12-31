@@ -36,7 +36,6 @@ import (
 )
 
 var (
-	logger      = gologging.GetLogger("cookies")
 	cachedFiles []string
 	cacheOnce   sync.Once
 )
@@ -48,13 +47,13 @@ func init() {
 	gologging.Debug("🔹 Initializing cookies...")
 
 	if err := copyEmbeddedCookies(); err != nil {
-		logger.Fatal("Failed to copy embedded cookies:", err)
+		gologging.Fatal("Failed to copy embedded cookies:", err)
 	}
 
 	urls := strings.Fields(config.CookiesLink)
 	for _, url := range urls {
 		if err := downloadCookieFile(url); err != nil {
-			logger.WarnF("Failed to download cookie file from %s: %v", url, err)
+			gologging.WarnF("Failed to download cookie file from %s: %v", url, err)
 		}
 	}
 }
@@ -130,13 +129,13 @@ func GetRandomCookieFile() (string, error) {
 	})
 
 	if err != nil {
-		logger.WarnF("Failed to load cookie cache: %v", err)
+		gologging.WarnF("Failed to load cookie cache: %v", err)
 		cacheOnce = sync.Once{}
 		return "", err
 	}
 
 	if len(cachedFiles) == 0 {
-		logger.Warn("No cookie files available")
+		gologging.Warn("No cookie files available")
 		return "", nil
 	}
 
