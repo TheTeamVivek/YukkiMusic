@@ -73,11 +73,17 @@ func GetPlayMarkup(chatID int64, r *RoomState, queued bool) tg.ReplyMarkup {
 	if r.IsCPlay() {
 		prefix = "croom:"
 	}
-	progress := utils.GetProgressBar(r.Position(), r.Track().Duration)
+	track := r.Track()
+	duration := 0
+	if track != nil {
+		duration = track.Duration
+	}
+
+	progress := utils.GetProgressBar(r.Position(), duration)
 	progress = formatDuration(
 		r.Position(),
 	) + " " + progress + " " + formatDuration(
-		r.Track().Duration,
+		duration,
 	)
 
 	if !queued {
