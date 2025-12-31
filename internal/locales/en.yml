@@ -911,6 +911,7 @@ help_sudo: |
   <b>/autoleave</b> - Toggle automatic chat leaving
   <b>/logger</b> - Enable or disable logger
   <b>/stats</b> - Display the bot & system stats
+  <b>/logs</b> - Get the system logs 
 
 help_admin: |
   🛠 <b>Admin Commands</b>
