@@ -39,8 +39,6 @@ import (
 	"main/internal/core"
 )
 
-var evalLogger = gologging.GetLogger("Eval")
-
 func evalCommandHandler(m *telegram.NewMessage) error {
 	if m.SenderID() != config.OwnerID {
 		return telegram.ErrEndGroup
@@ -70,7 +68,9 @@ Examples:
 	}
 
 	if code == "" {
-		m.Reply("No code provided.\nUse <code>/eval --help</code> for usage info.")
+		m.Reply(
+			"No code provided.\nUse <code>/eval --help</code> for usage info.",
+		)
 		return nil
 	}
 
@@ -102,7 +102,7 @@ Examples:
 		},
 	}
 	if err := i.Use(symbols); err != nil {
-		evalLogger.ErrorF("failed to use custom symbols: %v", err)
+		gologging.ErrorF("failed to use custom symbols: %v", err)
 	}
 	ctx := context.Background()
 
@@ -182,6 +182,11 @@ func main() {
 		return nil
 	}
 
-	m.Reply(fmt.Sprintf("<b>#EVALOut:</b>\n<code>%s</code>", strings.TrimSpace(output)))
+	m.Reply(
+		fmt.Sprintf(
+			"<b>#EVALOut:</b>\n<code>%s</code>",
+			strings.TrimSpace(output),
+		),
+	)
 	return nil
 }

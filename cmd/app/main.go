@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package main
 
 /*
@@ -43,21 +44,18 @@ import (
 	"main/internal/modules"
 )
 
-var l = gologging.GetLogger("Main")
-
 func main() {
-	gologging.SetLevel(gologging.DebugLevel)
-	gologging.GetLogger("ntgcalls").SetLevel(gologging.ErrorLevel)
-	gologging.GetLogger("webrtc").SetLevel(gologging.FatalLevel)
+	initLogger()
+	defer config.CloseLogging()
 
 	checkFFmpegAndFFprobe()
 	refreshCacheAndDownloads()
 
-	l.Debug("🔹 Initializing MongoDB...")
+	gologging.Debug("🔹 Initializing MongoDB...")
 	dbCleanup := database.Init(config.MongoURI)
 	defer dbCleanup()
-	l.Info("✅ Database connected successfully")
-	l.Debug("🔹 Initializing clients...")
+	gologging.Info("✅ Database connected successfully")
+	gologging.Debug("🔹 Initializing clients...")
 	cleanup := core.Init(
 		config.ApiID,
 		config.ApiHash,
@@ -72,11 +70,26 @@ func main() {
 	core.GetChatLanguage = database.GetChatLanguage
 
 	if err := database.RebalanceAssistantIndexes(core.Assistants.Count()); err != nil {
-		l.Fatal("Failed to rebalance Assistants: " + err.Error())
+		gologging.Fatal("Failed to rebalance Assistants: " + err.Error())
 	}
 
 	modules.Init(core.Bot, core.Assistants)
 	core.Bot.Idle()
+}
+
+func initLogger() {
+	gologging.SetLevel(gologging.DebugLevel)
+	gologging.SetOutput(config.LogWriter)
+
+	l := gologging.GetLogger("ntgcalls")
+	l.SetLevel(gologging.ErrorLevel)
+	l.SetOutput(config.LogWriter)
+
+	l = gologging.GetLogger("webrtc")
+	l.SetLevel(gologging.FatalLevel)
+	l.SetOutput(config.LogWriter)
+
+	gologging.GetLogger("Database").SetOutput(config.LogWriter)
 }
 
 func refreshCacheAndDownloads() error {

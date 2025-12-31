@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package modules
 
 import (
@@ -47,7 +48,11 @@ func startHandler(m *tg.NewMessage) error {
 	database.AddServed(m.ChannelID(), true)
 
 	if arg != "" {
-		gologging.Info("Got Start parameter: " + arg + " in ChatID: " + utils.IntToStr(m.ChannelID()))
+		gologging.Info(
+			"Got Start parameter: " + arg + " in ChatID: " + utils.IntToStr(
+				m.ChannelID(),
+			),
+		)
 	}
 
 	switch arg {
@@ -70,7 +75,9 @@ func startHandler(m *tg.NewMessage) error {
 			ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
 		})
 		if err != nil {
-			gologging.Error("[start] InputMediaWebPage Reply failed: " + err.Error())
+			gologging.Error(
+				"[start] InputMediaWebPage Reply failed: " + err.Error(),
+			)
 
 			_, err = m.RespondMedia(config.StartImage, &tg.MediaOptions{
 				Caption:     caption,
@@ -78,7 +85,9 @@ func startHandler(m *tg.NewMessage) error {
 				ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
 			})
 			if err != nil {
-				gologging.Error("[start] URL media reply failed: " + err.Error())
+				gologging.Error(
+					"[start] URL media reply failed: " + err.Error(),
+				)
 
 				_, err = m.RespondMedia(caption, &tg.MediaOptions{
 					NoForwards:  true,
@@ -101,7 +110,9 @@ func startHandler(m *tg.NewMessage) error {
 		})
 		_, err := m.Client.SendMessage(config.LoggerID, msg)
 		if err != nil {
-			gologging.Error("Failed to send logger_bot_started msg, Err: " + err.Error())
+			gologging.Error(
+				"Failed to send logger_bot_started msg, Err: " + err.Error(),
+			)
 		}
 	}
 	return tg.ErrEndGroup

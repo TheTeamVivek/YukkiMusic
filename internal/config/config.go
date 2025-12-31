@@ -1,25 +1,27 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package config
 
 import (
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -41,13 +43,22 @@ var (
 	Token          = getString("TOKEN")
 	MongoURI       = getString("MONGO_DB_URI")
 	StringSessions = getStringSlice("STRING_SESSIONS")
-	SessionType    = getString("SESSION_TYPE", "pyrogram") // pyrogram, telethon, gogram
+	SessionType    = getString(
+		"SESSION_TYPE",
+		"pyrogram",
+	) // pyrogram, telethon, gogram
 	// Optional Vars
 	OwnerID  = getInt64("OWNER_ID")
 	LoggerID = getInt64("LOGGER_ID")
 
-	SpotifyClientID     = getString("SPOTIFY_CLIENT_ID", "40b91facfdee4c6e9456906613e7ca6b")
-	SpotifyClientSecret = getString("SPOTIFY_CLIENT_SECRET", "e8d7847ccdf545b9ac5051d2c456c5d2")
+	SpotifyClientID = getString(
+		"SPOTIFY_CLIENT_ID",
+		"40b91facfdee4c6e9456906613e7ca6b",
+	)
+	SpotifyClientSecret = getString(
+		"SPOTIFY_CLIENT_SECRET",
+		"e8d7847ccdf545b9ac5051d2c456c5d2",
+	)
 
 	FallenAPIURL = getString("FALLEN_API_URL", "https://tgmusic.fallenapi.fun")
 	FallenAPIKey = getString("FALLEN_API_KEY")
@@ -66,15 +77,41 @@ var (
 	SetCmds        = getBool("SET_CMDS", false)
 	MaxAuthUsers   = int(getInt64("MAX_AUTH_USERS", 25))
 
-	StartImage = getString("START_IMG_URL", "https://raw.githubusercontent.com/Vivekkumar-IN/assets/master/images.png")
-	PingImage  = getString("PING_IMG_URL", "https://telegra.ph/file/91533956c91d0fd7c9f20.jpg")
+	StartImage = getString(
+		"START_IMG_URL",
+		"https://raw.githubusercontent.com/Vivekkumar-IN/assets/master/images.png",
+	)
+	PingImage = getString(
+		"PING_IMG_URL",
+		"https://telegra.ph/file/91533956c91d0fd7c9f20.jpg",
+	)
+
+	LogFileName = "logs.txt"
+	LogWriter   io.Writer
+	logFile     *os.File
 )
 
 func init() {
+	initLogging()
 	validateRequired()
 	validateToken()
 	validateSessions()
 	validateSpotify()
+}
+
+func initLogging() {
+	os.Remove(LogFileName)
+	file, err := os.OpenFile(
+		LogFileName,
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		0o644,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	logFile = file
+	LogWriter = io.MultiWriter(file, os.Stderr)
 }
 
 func validateRequired() {
@@ -98,7 +135,9 @@ func validateToken() {
 
 	Token = getString("BOT_TOKEN")
 	if Token == "" {
-		logger.Fatal("TOKEN is required but missing! Please set it in .env or environment.")
+		logger.Fatal(
+			"TOKEN is required but missing! Please set it in .env or environment.",
+		)
 	}
 }
 
@@ -118,7 +157,9 @@ func validateSessions() {
 
 func validateSpotify() {
 	if SpotifyClientID == "" || SpotifyClientSecret == "" {
-		logger.Warn("Spotify credentials not configured - Spotify links won't work")
+		logger.Warn(
+			"Spotify credentials not configured - Spotify links won't work",
+		)
 	}
 }
 
@@ -201,6 +242,13 @@ func variants(base string) []string {
 		strings.ToUpper(base),
 		strings.ToLower(base),
 		strings.ReplaceAll(base, "_", ""),
-		cases.Title(language.Und, cases.NoLower).String(strings.ReplaceAll(base, "_", " ")),
+		cases.Title(language.Und, cases.NoLower).
+			String(strings.ReplaceAll(base, "_", " ")),
+	}
+}
+
+func CloseLogging() {
+	if logFile != nil {
+		logFile.Close()
 	}
 }

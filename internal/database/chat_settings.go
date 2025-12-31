@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package database
 
 import (
@@ -60,7 +61,8 @@ func getChatSettings(chatID int64) (*ChatSettings, error) {
 	}
 
 	var settings ChatSettings
-	err := chatSettingsColl.FindOne(ctx, bson.M{"_id": chatID}).Decode(&settings)
+	err := chatSettingsColl.FindOne(ctx, bson.M{"_id": chatID}).
+		Decode(&settings)
 	if err == mongo.ErrNoDocuments {
 		def := defaultChatSettings(chatID)
 		dbCache.Set(cacheKey, def)
@@ -87,9 +89,19 @@ func updateChatSettings(newSettings *ChatSettings) error {
 	defer cancel()
 
 	opts := options.UpdateOne().SetUpsert(true)
-	_, err := chatSettingsColl.UpdateOne(ctx, bson.M{"_id": newSettings.ChatID}, bson.M{"$set": newSettings}, opts)
+	_, err := chatSettingsColl.UpdateOne(
+		ctx,
+		bson.M{"_id": newSettings.ChatID},
+		bson.M{"$set": newSettings},
+		opts,
+	)
 	if err != nil {
-		logger.Error("Failed to update chat settings for chat " + strconv.FormatInt(newSettings.ChatID, 10) + " :" + err.Error())
+		logger.Error(
+			"Failed to update chat settings for chat " + strconv.FormatInt(
+				newSettings.ChatID,
+				10,
+			) + " :" + err.Error(),
+		)
 		return err
 	}
 

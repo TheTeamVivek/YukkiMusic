@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package modules
 
 import (
@@ -60,7 +61,8 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 }
 
 func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
-	if config.LoggerID == 0 || config.LoggerID == m.ChatID() || config.LoggerID == m.ChannelID() {
+	if config.LoggerID == 0 || config.LoggerID == m.ChatID() ||
+		config.LoggerID == m.ChannelID() {
 		return
 	}
 
@@ -155,7 +157,11 @@ func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 func F(chatID int64, key string, values ...locales.Arg) string {
 	lang, err := database.GetChatLanguage(chatID)
 	if err != nil {
-		gologging.Error("Failed to get language for " + utils.IntToStr(chatID) + " Got error " + err.Error())
+		gologging.Error(
+			"Failed to get language for " + utils.IntToStr(
+				chatID,
+			) + " Got error " + err.Error(),
+		)
 		lang = config.DefaultLang
 	}
 	return FWithLang(lang, key, values...)
@@ -178,12 +184,17 @@ func isLogger() (l bool) {
 	return l
 }
 
-func SafeCallbackHandler(handler func(*tg.CallbackQuery) error) func(*tg.CallbackQuery) error {
+func SafeCallbackHandler(
+	handler func(*tg.CallbackQuery) error,
+) func(*tg.CallbackQuery) error {
 	return func(cb *tg.CallbackQuery) (err error) {
 		if is, _ := database.IsMaintenance(); is {
 			if cb.Sender.ID != config.OwnerID {
 				if ok, _ := database.IsSudo(cb.Sender.ID); !ok {
-					cb.Answer(F(cb.ChannelID(), "maint", locales.Arg{"reason": ""}), &tg.CallbackOptions{Alert: true})
+					cb.Answer(
+						F(cb.ChannelID(), "maint", locales.Arg{"reason": ""}),
+						&tg.CallbackOptions{Alert: true},
+					)
 					return tg.ErrEndGroup
 				}
 			}
@@ -205,20 +216,41 @@ func SafeCallbackHandler(handler func(*tg.CallbackQuery) error) func(*tg.Callbac
 	}
 }
 
-func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage) error {
+func SafeMessageHandler(
+	handler func(*tg.NewMessage) error,
+) func(*tg.NewMessage) error {
 	return func(m *tg.NewMessage) (err error) {
-		gologging.Info("Handling message from " + fmt.Sprint(m.SenderID()) + " in chat " + fmt.Sprint(m.ChannelID()))
+		gologging.Info(
+			"Handling message from " + fmt.Sprint(
+				m.SenderID(),
+			) + " in chat " + fmt.Sprint(
+				m.ChannelID(),
+			),
+		)
 
 		if is, _ := database.IsMaintenance(); is {
 			gologging.Debug("Maintenance mode active")
 			if m.SenderID() != config.OwnerID {
 				if ok, _ := database.IsSudo(m.SenderID()); !ok {
-					if m.ChatType() == tg.EntityUser || strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
+					if m.ChatType() == tg.EntityUser ||
+						strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
 						reason, _ := database.GetMaintReason()
-						reason = F(m.ChannelID(), "maint_reason", locales.Arg{"reason": reason})
-						msg := F(m.ChannelID(), "maint", locales.Arg{"reason": reason})
+						reason = F(
+							m.ChannelID(),
+							"maint_reason",
+							locales.Arg{"reason": reason},
+						)
+						msg := F(
+							m.ChannelID(),
+							"maint",
+							locales.Arg{"reason": reason},
+						)
 						m.Reply(msg)
-						gologging.Info("Sent maintenance notice to " + fmt.Sprint(m.SenderID()))
+						gologging.Info(
+							"Sent maintenance notice to " + fmt.Sprint(
+								m.SenderID(),
+							),
+						)
 					}
 					return tg.ErrEndGroup
 				}
@@ -259,7 +291,6 @@ func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage)
 }
 
 func handlePanic(r, ctx interface{}, isPanic bool) {
-	logger := gologging.GetLogger("Handlers")
 	stack := html.EscapeString(string(debug.Stack()))
 
 	var userMention, handlerType, chatInfo, messageInfo, errorMessage string
@@ -292,22 +323,41 @@ func handlePanic(r, ctx interface{}, isPanic bool) {
 	}
 
 	if isPanic {
-		logger.ErrorF(logMsg, handlerType, userMention, chatInfo, messageInfo, r, stack)
+		gologging.ErrorF(
+			logMsg,
+			handlerType,
+			userMention,
+			chatInfo,
+			messageInfo,
+			r,
+			stack,
+		)
 	} else {
-		logger.ErrorF(logMsg, handlerType, userMention, chatInfo, messageInfo, r)
+		gologging.ErrorF(logMsg, handlerType, userMention, chatInfo, messageInfo, r)
 	}
 
 	if config.LoggerID != 0 && client != nil {
 		var short string
 		if isPanic {
-			short = fmt.Sprintf(shortMsg, handlerType, userMention, chatInfo, messageInfo, errorMessage, stack)
+			short = fmt.Sprintf(
+				shortMsg,
+				handlerType,
+				userMention,
+				chatInfo,
+				messageInfo,
+				errorMessage,
+				stack,
+			)
 		} else {
 			short = fmt.Sprintf(shortMsg, handlerType, userMention, chatInfo, messageInfo, errorMessage)
 		}
 
 		gologging.Error(short)
 		if _, sendErr := client.SendMessage(config.LoggerID, short, &tg.SendOptions{ParseMode: "HTML"}); sendErr != nil {
-			logger.ErrorF("Failed to send panic message to log chat: %v", sendErr)
+			gologging.ErrorF(
+				"Failed to send panic message to log chat: %v",
+				sendErr,
+			)
 		}
 	}
 }
@@ -323,16 +373,27 @@ func warnAndLeave(client *tg.Client, chatID int64) {
 		},
 	)
 	if err != nil {
-		gologging.ErrorF("Failed to send supergroup conversion message to chat %d: %v", chatID, err)
+		gologging.ErrorF(
+			"Failed to send supergroup conversion message to chat %d: %v",
+			chatID,
+			err,
+		)
 		return
 	}
 
 	go func() {
 		time.Sleep(1 * time.Second)
 		if err := client.LeaveChannel(chatID); err != nil {
-			gologging.ErrorF("Failed to leave non-supergroup chatID=%d: %v", chatID, err)
+			gologging.ErrorF(
+				"Failed to leave non-supergroup chatID=%d: %v",
+				chatID,
+				err,
+			)
 		}
-		core.Assistants.WithAssistant(chatID, func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) })
+		core.Assistants.WithAssistant(
+			chatID,
+			func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) },
+		)
 	}()
 }
 

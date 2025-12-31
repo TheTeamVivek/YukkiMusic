@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package platforms
 
 import (
@@ -47,8 +48,10 @@ type YouTubePlatform struct {
 
 var (
 	playlistRegex    = regexp.MustCompile(`(?i)(?:list=)([A-Za-z0-9_-]+)`)
-	youtubeLinkRegex = regexp.MustCompile(`(?i)^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|music\.youtube\.com)\/`)
-	youtubeCache     = utils.NewCache[string, []*state.Track](1 * time.Hour)
+	youtubeLinkRegex = regexp.MustCompile(
+		`(?i)^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|music\.youtube\.com)\/`,
+	)
+	youtubeCache = utils.NewCache[string, []*state.Track](1 * time.Hour)
 )
 
 const PlatformYouTube state.PlatformName = "YouTube"
@@ -67,7 +70,10 @@ func (yp *YouTubePlatform) IsValid(link string) bool {
 	return youtubeLinkRegex.MatchString(link)
 }
 
-func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, error) {
+func (yp *YouTubePlatform) GetTracks(
+	input string,
+	video bool,
+) ([]*state.Track, error) {
 	trimmed := strings.TrimSpace(input)
 	if trimmed == "" {
 		return nil, errors.New("empty query")
@@ -88,12 +94,16 @@ func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, 
 
 			var tracks []*state.Track
 			for _, videoID := range videoIDs {
-				if cached, ok := youtubeCache.Get("track:" + videoID); ok && len(cached) > 0 {
+				if cached, ok := youtubeCache.Get("track:" + videoID); ok &&
+					len(cached) > 0 {
 					tracks = append(tracks, cached[0])
 					continue
 				}
 
-				trackList, err := yp.VideoSearch("https://youtube.com/watch?v="+videoID, true)
+				trackList, err := yp.VideoSearch(
+					"https://youtube.com/watch?v="+videoID,
+					true,
+				)
 				if err != nil || len(trackList) == 0 {
 					continue
 				}
@@ -115,7 +125,8 @@ func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, 
 			return nil, err
 		}
 
-		if cached, ok := youtubeCache.Get("track:" + videoID); ok && len(cached) > 0 {
+		if cached, ok := youtubeCache.Get("track:" + videoID); ok &&
+			len(cached) > 0 {
 			return updateCached(cached, video), nil
 		}
 
@@ -146,11 +157,18 @@ func (yp *YouTubePlatform) IsDownloadSupported(source state.PlatformName) bool {
 	return false
 }
 
-func (yt *YouTubePlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
+func (yt *YouTubePlatform) Download(
+	ctx context.Context,
+	track *state.Track,
+	mystic *telegram.NewMessage,
+) (string, error) {
 	return "", errors.New("youtube platform does not support downloading")
 }
 
-func (yp *YouTubePlatform) VideoSearch(query string, singleOpt ...bool) ([]*state.Track, error) {
+func (yp *YouTubePlatform) VideoSearch(
+	query string,
+	singleOpt ...bool,
+) ([]*state.Track, error) {
 	single := false
 	if len(singleOpt) > 0 && singleOpt[0] {
 		single = true
@@ -234,7 +252,9 @@ func (yp *YouTubePlatform) VideoSearch(query string, singleOpt ...bool) ([]*stat
 	return tracks, nil
 }
 
-func (yt *YouTubePlatform) normalizeYouTubeURL(input string) (string, string, error) {
+func (yt *YouTubePlatform) normalizeYouTubeURL(
+	input string,
+) (string, string, error) {
 	u, err := url.Parse(strings.TrimSpace(input))
 	if err != nil {
 		return "", "", err
@@ -278,7 +298,18 @@ func getPlaylist(pUrl string) ([]string, error) {
 		pUrl = strings.Split(pUrl, "&")[0]
 	}
 
-	cmd := exec.Command("yt-dlp", "-i", "--compat-options", "no-youtube-unavailable-videos", "--get-id", "--flat-playlist", "--skip-download", "--playlist-end", strconv.Itoa(config.QueueLimit), pUrl)
+	cmd := exec.Command(
+		"yt-dlp",
+		"-i",
+		"--compat-options",
+		"no-youtube-unavailable-videos",
+		"--get-id",
+		"--flat-playlist",
+		"--skip-download",
+		"--playlist-end",
+		strconv.Itoa(config.QueueLimit),
+		pUrl,
+	)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out

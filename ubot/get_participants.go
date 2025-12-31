@@ -8,7 +8,9 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 )
 
-func (ctx *Context) GetParticipants(chatId int64) ([]*tg.GroupCallParticipant, error) {
+func (ctx *Context) GetParticipants(
+	chatId int64,
+) ([]*tg.GroupCallParticipant, error) {
 	ctx.participantsMutex.Lock()
 	defer ctx.participantsMutex.Unlock()
 	if ctx.callParticipants[chatId] == nil {
@@ -16,12 +18,16 @@ func (ctx *Context) GetParticipants(chatId int64) ([]*tg.GroupCallParticipant, e
 			CallParticipants: make(map[int64]*tg.GroupCallParticipant),
 		}
 	}
-	if time.Since(ctx.callParticipants[chatId].LastMtprotoUpdate) > time.Minute {
+	if time.Since(
+		ctx.callParticipants[chatId].LastMtprotoUpdate,
+	) > time.Minute {
 		groupCall, err := ctx.GetInputGroupCall(chatId)
 		if err != nil {
 			return nil, err
 		}
-		ctx.callParticipants[chatId].CallParticipants = make(map[int64]*tg.GroupCallParticipant)
+		ctx.callParticipants[chatId].CallParticipants = make(
+			map[int64]*tg.GroupCallParticipant,
+		)
 		var nextOffset string
 		for {
 			res, err := ctx.app.PhoneGetGroupParticipants(
@@ -44,5 +50,7 @@ func (ctx *Context) GetParticipants(chatId int64) ([]*tg.GroupCallParticipant, e
 		}
 		ctx.callParticipants[chatId].LastMtprotoUpdate = time.Now()
 	}
-	return slices.Collect(maps.Values(ctx.callParticipants[chatId].CallParticipants)), nil
+	return slices.Collect(
+		maps.Values(ctx.callParticipants[chatId].CallParticipants),
+	), nil
 }

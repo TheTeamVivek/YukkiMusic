@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package modules
 
 import (
@@ -99,7 +100,11 @@ func roomHandle(cb *tg.CallbackQuery) error {
 	if strings.HasPrefix(cb.DataString(), "croom:") {
 		realChatID, err := database.GetCPlayID(chatID)
 		if err != nil {
-			gologging.ErrorF("Failed to get chat ID for cplay ID %d: %v", chatID, err)
+			gologging.ErrorF(
+				"Failed to get chat ID for cplay ID %d: %v",
+				chatID,
+				err,
+			)
 			cb.Answer(F(chatID, "room_not_linked"), opt)
 			return tg.ErrEndGroup
 		}
@@ -159,7 +164,11 @@ func getRoomForCallback(chatID int64) (*core.RoomState, error) {
 	return r, nil
 }
 
-func checkAdminOrAuth(cb *tg.CallbackQuery, chatID int64, opt *tg.CallbackOptions) bool {
+func checkAdminOrAuth(
+	cb *tg.CallbackQuery,
+	chatID int64,
+	opt *tg.CallbackOptions,
+) bool {
 	isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID)
 	if err != nil || !isAdmin {
 		cb.Answer(F(cb.ChannelID(), "only_admin_or_auth_cb"), opt)
@@ -168,7 +177,11 @@ func checkAdminOrAuth(cb *tg.CallbackQuery, chatID int64, opt *tg.CallbackOption
 	return true
 }
 
-func checkFloodControl(cb *tg.CallbackQuery, chatID int64, opt *tg.CallbackOptions) bool {
+func checkFloodControl(
+	cb *tg.CallbackQuery,
+	chatID int64,
+	opt *tg.CallbackOptions,
+) bool {
 	key := fmt.Sprintf("room:%d:%d", cb.Sender.ID, chatID)
 	if remaining := utils.GetFlood(key); remaining > 0 {
 		cb.Answer(F(cb.ChannelID(), "flood_seconds", locales.Arg{
@@ -196,7 +209,11 @@ func replyToCallback(cb *tg.CallbackQuery, text string) {
 
 // Action handlers
 
-func handlePauseAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+func handlePauseAction(
+	cb *tg.CallbackQuery,
+	r *core.RoomState,
+	chatID int64,
+) error {
 	opt := &tg.CallbackOptions{Alert: true}
 
 	gologging.InfoF("Callback → pause, chatID=%d", chatID)
@@ -234,7 +251,11 @@ func handlePauseAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) er
 	return tg.ErrEndGroup
 }
 
-func handleResumeAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+func handleResumeAction(
+	cb *tg.CallbackQuery,
+	r *core.RoomState,
+	chatID int64,
+) error {
 	opt := &tg.CallbackOptions{Alert: true}
 
 	gologging.InfoF("Callback → resume, chatID=%d", chatID)
@@ -258,7 +279,11 @@ func handleResumeAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) e
 	return tg.ErrEndGroup
 }
 
-func handleReplayAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+func handleReplayAction(
+	cb *tg.CallbackQuery,
+	r *core.RoomState,
+	chatID int64,
+) error {
 	opt := &tg.CallbackOptions{Alert: true}
 
 	gologging.InfoF("Callback → replay, chatID=%d", chatID)
@@ -307,7 +332,11 @@ func handleReplayAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) e
 	return tg.ErrEndGroup
 }
 
-func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+func handleSkipAction(
+	cb *tg.CallbackQuery,
+	r *core.RoomState,
+	chatID int64,
+) error {
 	opt := &tg.CallbackOptions{Alert: true}
 
 	gologging.InfoF("Callback → skip, chatID=%d", chatID)
@@ -375,7 +404,11 @@ func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) err
 	return tg.ErrEndGroup
 }
 
-func handleStopAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+func handleStopAction(
+	cb *tg.CallbackQuery,
+	r *core.RoomState,
+	chatID int64,
+) error {
 	opt := &tg.CallbackOptions{Alert: true}
 
 	gologging.InfoF("Callback → stop, chatID=%d", chatID)
@@ -390,7 +423,11 @@ func handleStopAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) err
 	return tg.ErrEndGroup
 }
 
-func handleMuteAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+func handleMuteAction(
+	cb *tg.CallbackQuery,
+	r *core.RoomState,
+	chatID int64,
+) error {
 	opt := &tg.CallbackOptions{Alert: true}
 
 	if r.IsMuted() {
@@ -418,7 +455,11 @@ func handleMuteAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) err
 	return tg.ErrEndGroup
 }
 
-func handleUnmuteAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) error {
+func handleUnmuteAction(
+	cb *tg.CallbackQuery,
+	r *core.RoomState,
+	chatID int64,
+) error {
 	opt := &tg.CallbackOptions{Alert: true}
 
 	if !r.IsMuted() {
@@ -438,7 +479,12 @@ func handleUnmuteAction(cb *tg.CallbackQuery, r *core.RoomState, chatID int64) e
 	return tg.ErrEndGroup
 }
 
-func handleSeekAction(cb *tg.CallbackQuery, r *core.RoomState, action string, opt *tg.CallbackOptions) error {
+func handleSeekAction(
+	cb *tg.CallbackQuery,
+	r *core.RoomState,
+	action string,
+	opt *tg.CallbackOptions,
+) error {
 	parts := strings.Split(action, "_")
 	if len(parts) != 2 {
 		cb.Answer(F(cb.ChannelID(), "invalid_request"), opt)
@@ -486,7 +532,11 @@ func handleSeekAction(cb *tg.CallbackQuery, r *core.RoomState, action string, op
 	return tg.ErrEndGroup
 }
 
-func updatePlaybackMessage(cb *tg.CallbackQuery, r *core.RoomState, state string) {
+func updatePlaybackMessage(
+	cb *tg.CallbackQuery,
+	r *core.RoomState,
+	state string,
+) {
 	track := r.Track()
 	safeTitle := html.EscapeString(utils.ShortTitle(track.Title, 25))
 	mention := utils.MentionHTML(cb.Sender)

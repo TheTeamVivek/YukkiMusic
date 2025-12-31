@@ -504,14 +504,13 @@ func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage)
 
 ```go
 func handlePanic(r interface{}, m *telegram.NewMessage, isPanic bool) {
-    logger := gologging.GetLogger("Handlers")
     stack := html.EscapeString(string(debug.Stack()))
     
     userMention := utils.MentionHTML(m.Sender)
     errorMessage := html.EscapeString(fmt.Sprint(r))
     
     if isPanic {
-        logger.ErrorF("Panic: %v\nStack: %s", r, stack)
+        gologging.ErrorF("Panic: %v\nStack: %s", r, stack)
         
         // Send to logger
         if config.LoggerID != 0 {
@@ -519,7 +518,7 @@ func handlePanic(r interface{}, m *telegram.NewMessage, isPanic bool) {
                 fmt.Sprintf("Panic from %s: %s", userMention, errorMessage))
         }
     } else {
-        logger.ErrorF("Error: %v", r)
+        gologging.ErrorF("Error: %v", r)
     }
 }
 ```

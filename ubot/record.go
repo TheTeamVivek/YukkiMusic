@@ -2,7 +2,10 @@ package ubot
 
 import "main/ntgcalls"
 
-func (ctx *Context) Record(chatId any, mediaDescription ntgcalls.MediaDescription) error {
+func (ctx *Context) Record(
+	chatId any,
+	mediaDescription ntgcalls.MediaDescription,
+) error {
 	parsedChatId, err := ctx.parseChatId(chatId)
 	if err != nil {
 		return err
@@ -13,5 +16,9 @@ func (ctx *Context) Record(chatId any, mediaDescription ntgcalls.MediaDescriptio
 			return err
 		}
 	}
-	return ctx.binding.SetStreamSources(parsedChatId, ntgcalls.PlaybackStream, mediaDescription)
+	return ctx.binding.SetStreamSources(
+		parsedChatId,
+		ntgcalls.PlaybackStream,
+		mediaDescription,
+	)
 }

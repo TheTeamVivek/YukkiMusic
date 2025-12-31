@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package modules
 
 import (
@@ -236,10 +237,12 @@ func cplayHandler(m *telegram.NewMessage) error {
 			return telegram.ErrEndGroup
 		}
 
-		fullChat, err := m.Client.ChannelsGetFullChannel(&telegram.InputChannelObj{
-			ChannelID:  chPeer.ChannelID,
-			AccessHash: chPeer.AccessHash,
-		})
+		fullChat, err := m.Client.ChannelsGetFullChannel(
+			&telegram.InputChannelObj{
+				ChannelID:  chPeer.ChannelID,
+				AccessHash: chPeer.AccessHash,
+			},
+		)
 		if err != nil || fullChat == nil {
 			gologging.ErrorF(
 				"Failed to get full channel for cplay ID %d: %v",
@@ -283,7 +286,12 @@ func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
 		return telegram.ErrEndGroup
 	}
 
-	tracks, isActive, err := fetchTracksAndCheckStatus(m, replyMsg, r, opts.Video)
+	tracks, isActive, err := fetchTracksAndCheckStatus(
+		m,
+		replyMsg,
+		r,
+		opts.Video,
+	)
 	if err != nil {
 		return telegram.ErrEndGroup
 	}
@@ -303,7 +311,10 @@ func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
 	return telegram.ErrEndGroup
 }
 
-func prepareRoomAndSearchMessage(m *telegram.NewMessage, cplay bool) (*core.RoomState, *telegram.NewMessage, error) {
+func prepareRoomAndSearchMessage(
+	m *telegram.NewMessage,
+	cplay bool,
+) (*core.RoomState, *telegram.NewMessage, error) {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
@@ -451,27 +462,34 @@ func filterAndTrimTracks(
 
 		// CASE 1: Only one track and it was skipped
 		if len(tracks) == 1 && len(filteredTracks) == 0 {
-			utils.EOR(replyMsg, F(chatID, "play_single_track_too_long", locales.Arg{
-				"limit_mins": formatDuration(config.DurationLimit),
-				"title":      skippedTracks[0],
-			}))
+			utils.EOR(
+				replyMsg,
+				F(chatID, "play_single_track_too_long", locales.Arg{
+					"limit_mins": formatDuration(config.DurationLimit),
+					"title":      skippedTracks[0],
+				}),
+			)
 			return nil, 0, fmt.Errorf("single long track skipped")
 		}
 
 		// CASE 2: Multiple tracks skipped
 		var b strings.Builder
 
-		b.WriteString(F(chatID, "play_multiple_tracks_too_long_header", locales.Arg{
-			"count":      len(skippedTracks),
-			"limit_mins": config.DurationLimit / 60,
-		}))
+		b.WriteString(
+			F(chatID, "play_multiple_tracks_too_long_header", locales.Arg{
+				"count":      len(skippedTracks),
+				"limit_mins": config.DurationLimit / 60,
+			}),
+		)
 		b.WriteString("\n")
 
 		for i, title := range skippedTracks {
 			if i < 5 {
-				b.WriteString(F(chatID, "play_multiple_tracks_too_long_item", locales.Arg{
-					"title": title,
-				}) + "\n")
+				b.WriteString(
+					F(chatID, "play_multiple_tracks_too_long_item", locales.Arg{
+						"title": title,
+					}) + "\n",
+				)
 			} else {
 				b.WriteString(F(chatID, "play_multiple_tracks_too_long_more", locales.Arg{
 					"remaining": len(skippedTracks) - i,
@@ -497,7 +515,10 @@ func filterAndTrimTracks(
 	availableSlots := config.QueueLimit - len(r.Queue())
 	if availableSlots < len(tracks) {
 		tracks = tracks[:availableSlots]
-		gologging.WarnF("Queue full — adding only %d tracks out of requested.", availableSlots)
+		gologging.WarnF(
+			"Queue full — adding only %d tracks out of requested.",
+			availableSlots,
+		)
 	}
 
 	return tracks, availableSlots, nil
@@ -523,7 +544,9 @@ func playTracksAndRespond(
 		if i == 0 && (!isActive || force) {
 			var opt *telegram.SendOptions
 			if track.Duration > 420 {
-				opt = &telegram.SendOptions{ReplyMarkup: core.GetCancelKeyboard(chatID)}
+				opt = &telegram.SendOptions{
+					ReplyMarkup: core.GetCancelKeyboard(chatID),
+				}
 			}
 
 			downloadingText := F(chatID, "play_downloading_song", locales.Arg{
@@ -543,9 +566,12 @@ func playTracksAndRespond(
 			path, err := safeDownload(ctx, track, replyMsg, chatID)
 			if err != nil {
 				if errors.Is(err, context.Canceled) {
-					utils.EOR(replyMsg, F(chatID, "play_download_canceled", locales.Arg{
-						"user": mention,
-					}))
+					utils.EOR(
+						replyMsg,
+						F(chatID, "play_download_canceled", locales.Arg{
+							"user": mention,
+						}),
+					)
 				} else {
 					utils.EOR(replyMsg, F(chatID, "play_download_failed", locales.Arg{
 						"title": title,
@@ -669,20 +695,36 @@ func playTrackWithRetry(
 		err := r.Play(track, filePath, force)
 		if err == nil {
 			if attempt > 1 {
-				gologging.Info("Successfully played after retry attempt " + utils.IntToStr(attempt))
+				gologging.Info(
+					"Successfully played after retry attempt " + utils.IntToStr(
+						attempt,
+					),
+				)
 			}
 			return nil
 		}
 
 		// FloodWait
 		if wait := telegram.GetFloodWait(err); wait > 0 {
-			gologging.Error("FloodWait detected (" + strconv.Itoa(wait) + "s). Retrying... (attempt " + utils.IntToStr(attempt) + ")")
+			gologging.Error(
+				"FloodWait detected (" + strconv.Itoa(
+					wait,
+				) + "s). Retrying... (attempt " + utils.IntToStr(
+					attempt,
+				) + ")",
+			)
 			time.Sleep(time.Duration(wait) * time.Second)
 			continue
 		}
 
-		if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
-			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "rtmp_streaming_not_supported"))
+		if strings.Contains(
+			err.Error(),
+			"Streaming is not supported when using RTMP",
+		) {
+			utils.EOR(
+				replyMsg,
+				F(replyMsg.ChannelID(), "rtmp_streaming_not_supported"),
+			)
 			r.Destroy()
 			return telegram.ErrEndGroup
 		}
@@ -696,19 +738,38 @@ func playTrackWithRetry(
 
 		// INTERDC_X_CALL_ERROR → retry
 		if tg.MatchError(err, "INTERDC_X_CALL_ERROR") {
-			gologging.Error("INTERDC_X_CALL_ERROR occurred. Retrying... (attempt " + utils.IntToStr(attempt) + ")")
+			gologging.Error(
+				"INTERDC_X_CALL_ERROR occurred. Retrying... (attempt " + utils.IntToStr(
+					attempt,
+				) + ")",
+			)
 			time.Sleep(2 * time.Second)
 			continue
 		}
 
 		// Last attempt failed
 		if attempt == playMaxRetries {
-			gologging.Error("❌ Failed to play after " + utils.IntToStr(playMaxRetries) + " attempts. Error: " + err.Error())
-			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_failed", locales.Arg{"error": err.Error()}))
+			gologging.Error(
+				"❌ Failed to play after " + utils.IntToStr(
+					playMaxRetries,
+				) + " attempts. Error: " + err.Error(),
+			)
+			utils.EOR(
+				replyMsg,
+				F(
+					replyMsg.ChannelID(),
+					"play_failed",
+					locales.Arg{"error": err.Error()},
+				),
+			)
 			return err
 		}
 
-		gologging.Error("Unexpected error occurred. Retrying... (attempt " + utils.IntToStr(attempt) + "): " + err.Error())
+		gologging.Error(
+			"Unexpected error occurred. Retrying... (attempt " + utils.IntToStr(
+				attempt,
+			) + "): " + err.Error(),
+		)
 	}
 
 	return nil

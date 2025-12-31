@@ -106,7 +106,10 @@ func (d *DirectStreamPlatform) IsValid(query string) bool {
 	return true
 }
 
-func (d *DirectStreamPlatform) GetTracks(query string, video bool) ([]*state.Track, error) {
+func (d *DirectStreamPlatform) GetTracks(
+	query string,
+	video bool,
+) ([]*state.Track, error) {
 	query = strings.TrimSpace(query)
 
 	info, err := d.validateStream(query)
@@ -131,14 +134,23 @@ func (d *DirectStreamPlatform) GetTracks(query string, video bool) ([]*state.Tra
 	return []*state.Track{track}, nil
 }
 
-func (d *DirectStreamPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
+func (d *DirectStreamPlatform) Download(
+	ctx context.Context,
+	track *state.Track,
+	mystic *telegram.NewMessage,
+) (string, error) {
 	// For direct streams, we don't download - just return the URL
 	// The streaming system will handle it directly
-	gologging.InfoF("DirectStream: Returning URL for direct streaming: %s", track.URL)
+	gologging.InfoF(
+		"DirectStream: Returning URL for direct streaming: %s",
+		track.URL,
+	)
 	return track.URL, nil
 }
 
-func (d *DirectStreamPlatform) IsDownloadSupported(source state.PlatformName) bool {
+func (d *DirectStreamPlatform) IsDownloadSupported(
+	source state.PlatformName,
+) bool {
 	return source == PlatformDirectStream
 }
 
@@ -173,7 +185,9 @@ func (d *DirectStreamPlatform) looksLikeStream(urlStr string) bool {
 }
 
 // validateStream makes a HEAD request to validate the URL
-func (d *DirectStreamPlatform) validateStream(urlStr string) (*streamInfo, error) {
+func (d *DirectStreamPlatform) validateStream(
+	urlStr string,
+) (*streamInfo, error) {
 	client := resty.New().
 		SetTimeout(10*time.Second).
 		SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
@@ -217,7 +231,10 @@ func (d *DirectStreamPlatform) validateStream(urlStr string) (*streamInfo, error
 	}
 
 	if !isAudio && !isVideo {
-		return nil, fmt.Errorf("not a valid audio/video stream (content-type: %s)", contentType)
+		return nil, fmt.Errorf(
+			"not a valid audio/video stream (content-type: %s)",
+			contentType,
+		)
 	}
 
 	size := int64(0)
@@ -267,7 +284,8 @@ func (d *DirectStreamPlatform) extractTitle(urlStr string) string {
 	filename = strings.ReplaceAll(filename, "-", " ")
 	filename = strings.TrimSpace(filename)
 
-	if filename == "" || filename == "." || filename == "index" || filename == "stream" {
+	if filename == "" || filename == "." || filename == "index" ||
+		filename == "stream" {
 		filename = parsedURL.Host
 	}
 
@@ -279,7 +297,10 @@ func (d *DirectStreamPlatform) extractTitle(urlStr string) string {
 }
 
 // enrichMetadata tries to extract more metadata
-func (d *DirectStreamPlatform) enrichMetadata(track *state.Track, info *streamInfo) {
+func (d *DirectStreamPlatform) enrichMetadata(
+	track *state.Track,
+	info *streamInfo,
+) {
 	filename := d.extractTitle(track.URL)
 	track.Title = strings.TrimSpace(filename)
 
@@ -302,6 +323,10 @@ func (d *DirectStreamPlatform) enrichMetadata(track *state.Track, info *streamIn
 
 	gologging.InfoF(
 		"DirectStream metadata: %s (audio: %v, video: %v, size: %d, duration: %d)",
-		track.Title, info.IsAudio, info.IsVideo, info.Size, track.Duration,
+		track.Title,
+		info.IsAudio,
+		info.IsVideo,
+		info.Size,
+		track.Duration,
 	)
 }

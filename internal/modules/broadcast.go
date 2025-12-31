@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package modules
 
 import (
@@ -243,7 +244,16 @@ func broadcastHandler(m *tg.NewMessage) error {
 			broadcastMu.Unlock()
 		}()
 
-		startBroadcast(broadcastCtx, m, progressMsg, flags, content, servedChats, servedUsers, stats)
+		startBroadcast(
+			broadcastCtx,
+			m,
+			progressMsg,
+			flags,
+			content,
+			servedChats,
+			servedUsers,
+			stats,
+		)
 	}()
 
 	return tg.ErrEndGroup
@@ -289,7 +299,10 @@ func parseBroadcastCommand(m *tg.NewMessage) (*BroadcastFlags, string, error) {
 			if i+1 < len(words) {
 				limit, err := strconv.Atoi(words[i+1])
 				if err != nil {
-					return nil, "", fmt.Errorf("invalid limit value: %s", words[i+1])
+					return nil, "", fmt.Errorf(
+						"invalid limit value: %s",
+						words[i+1],
+					)
 				}
 				if limit < 0 {
 					return nil, "", fmt.Errorf("limit must be non-negative")
@@ -303,7 +316,10 @@ func parseBroadcastCommand(m *tg.NewMessage) (*BroadcastFlags, string, error) {
 			if i+1 < len(words) {
 				delay, err := strconv.ParseFloat(words[i+1], 64)
 				if err != nil {
-					return nil, "", fmt.Errorf("invalid delay value: %s", words[i+1])
+					return nil, "", fmt.Errorf(
+						"invalid delay value: %s",
+						words[i+1],
+					)
 				}
 				if delay < 0 {
 					return nil, "", fmt.Errorf("delay must be non-negative")
@@ -411,7 +427,13 @@ func startBroadcast(
 	finalizeBroadcast(progressMsg, stats, false)
 }
 
-func sendBroadcastMessage(ctx context.Context, m *tg.NewMessage, targetID int64, content string, flags *BroadcastFlags) bool {
+func sendBroadcastMessage(
+	ctx context.Context,
+	m *tg.NewMessage,
+	targetID int64,
+	content string,
+	flags *BroadcastFlags,
+) bool {
 	var (
 		sentMsg *tg.NewMessage
 		err     error
@@ -423,7 +445,12 @@ func sendBroadcastMessage(ctx context.Context, m *tg.NewMessage, targetID int64,
 			if flags.Copy {
 				fOpts.HideAuthor = true
 			}
-			fMsgs, ferr := m.Client.Forward(targetID, m.Peer, []int32{m.ReplyID()}, fOpts)
+			fMsgs, ferr := m.Client.Forward(
+				targetID,
+				m.Peer,
+				[]int32{m.ReplyID()},
+				fOpts,
+			)
 			if ferr != nil {
 				return ferr
 			}
@@ -449,7 +476,11 @@ func sendBroadcastMessage(ctx context.Context, m *tg.NewMessage, targetID int64,
 		}
 
 		if wait := tg.GetFloodWait(err); wait > 0 {
-			gologging.ErrorF("FloodWait detected (%ds). Retrying (attempt %d).", wait, attempt)
+			gologging.ErrorF(
+				"FloodWait detected (%ds). Retrying (attempt %d).",
+				wait,
+				attempt,
+			)
 			if !sleepCtx(ctx, time.Duration(wait)*time.Second) {
 				return false
 			}
@@ -476,14 +507,22 @@ func sendBroadcastMessage(ctx context.Context, m *tg.NewMessage, targetID int64,
 	return true
 }
 
-func handleBroadcastDelay(ctx context.Context, count int, baseDelay float64) bool {
+func handleBroadcastDelay(
+	ctx context.Context,
+	count int,
+	baseDelay float64,
+) bool {
 	if count%30 == 0 {
 		return sleepCtx(ctx, 7500*time.Millisecond)
 	}
 	return sleepCtx(ctx, time.Duration(baseDelay*float64(time.Second)))
 }
 
-func updateBroadcastProgress(ctx context.Context, progressMsg *tg.NewMessage, stats *BroadcastStats) {
+func updateBroadcastProgress(
+	ctx context.Context,
+	progressMsg *tg.NewMessage,
+	stats *BroadcastStats,
+) {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
@@ -497,17 +536,27 @@ func updateBroadcastProgress(ctx context.Context, progressMsg *tg.NewMessage, st
 				stats.mu.Unlock()
 				return
 			}
-			text := formatBroadcastProgress(stats, false, progressMsg.ChannelID())
+			text := formatBroadcastProgress(
+				stats,
+				false,
+				progressMsg.ChannelID(),
+			)
 			stats.mu.Unlock()
 
 			progressMsg.Edit(text, &tg.SendOptions{
-				ReplyMarkup: core.GetBroadcastCancelKeyboard(progressMsg.ChannelID()),
+				ReplyMarkup: core.GetBroadcastCancelKeyboard(
+					progressMsg.ChannelID(),
+				),
 			})
 		}
 	}
 }
 
-func finalizeBroadcast(progressMsg *tg.NewMessage, stats *BroadcastStats, cancelled bool) {
+func finalizeBroadcast(
+	progressMsg *tg.NewMessage,
+	stats *BroadcastStats,
+	cancelled bool,
+) {
 	stats.mu.Lock()
 	stats.Finished = true
 	text := formatBroadcastProgress(stats, true, progressMsg.ChannelID())
@@ -522,7 +571,11 @@ func finalizeBroadcast(progressMsg *tg.NewMessage, stats *BroadcastStats, cancel
 	progressMsg.Edit(text)
 }
 
-func formatBroadcastProgress(stats *BroadcastStats, final bool, chatID int64) string {
+func formatBroadcastProgress(
+	stats *BroadcastStats,
+	final bool,
+	chatID int64,
+) string {
 	elapsed := time.Since(stats.StartTime)
 
 	var sb strings.Builder
@@ -533,12 +586,20 @@ func formatBroadcastProgress(stats *BroadcastStats, final bool, chatID int64) st
 
 	chatProgress := 0.0
 	if stats.TotalChats > 0 {
-		chatProgress = float64(stats.DoneChats) / float64(stats.TotalChats) * 100
+		chatProgress = float64(
+			stats.DoneChats,
+		) / float64(
+			stats.TotalChats,
+		) * 100
 	}
 
 	userProgress := 0.0
 	if stats.TotalUsers > 0 {
-		userProgress = float64(stats.DoneUsers) / float64(stats.TotalUsers) * 100
+		userProgress = float64(
+			stats.DoneUsers,
+		) / float64(
+			stats.TotalUsers,
+		) * 100
 	}
 
 	sb.WriteString(F(chatID, "broadcast_total_chats", locales.Arg{
@@ -598,7 +659,11 @@ func formatBroadcastProgress(stats *BroadcastStats, final bool, chatID int64) st
 
 		successRate := 0.0
 		if totalTargets > 0 {
-			successRate = float64(totalSent-totalFailed) / float64(totalTargets) * 100
+			successRate = float64(
+				totalSent-totalFailed,
+			) / float64(
+				totalTargets,
+			) * 100
 		}
 
 		sb.WriteString("\n\n" + F(chatID, "broadcast_success_rate", locales.Arg{
@@ -633,7 +698,10 @@ func handleBroadcastCancel(m *tg.NewMessage) error {
 
 func broadcastCancelCB(cb *tg.CallbackQuery) error {
 	if cb.SenderID != config.OwnerID {
-		cb.Answer(F(cb.ChannelID(), "broadcast_cancel_owner_only"), &tg.CallbackOptions{Alert: true})
+		cb.Answer(
+			F(cb.ChannelID(), "broadcast_cancel_owner_only"),
+			&tg.CallbackOptions{Alert: true},
+		)
 		return tg.ErrEndGroup
 	}
 
@@ -641,7 +709,10 @@ func broadcastCancelCB(cb *tg.CallbackQuery) error {
 	defer broadcastMu.Unlock()
 
 	if !broadcastActive {
-		cb.Answer(F(cb.ChannelID(), "broadcast_cancel_none_running"), &tg.CallbackOptions{Alert: true})
+		cb.Answer(
+			F(cb.ChannelID(), "broadcast_cancel_none_running"),
+			&tg.CallbackOptions{Alert: true},
+		)
 		return tg.ErrEndGroup
 	}
 
@@ -652,7 +723,10 @@ func broadcastCancelCB(cb *tg.CallbackQuery) error {
 	broadcastActive = false
 	broadcastCtx = nil
 	broadcastCancel = nil
-	cb.Answer(F(cb.ChannelID(), "broadcast_cancel_done"), &tg.CallbackOptions{Alert: true})
+	cb.Answer(
+		F(cb.ChannelID(), "broadcast_cancel_done"),
+		&tg.CallbackOptions{Alert: true},
+	)
 	cb.Edit(F(cb.ChannelID(), "broadcast_cancel_done"))
 	return tg.ErrEndGroup
 }

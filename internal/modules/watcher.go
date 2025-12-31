@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package modules
 
 import (
@@ -85,7 +86,8 @@ func handleActions(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()
 
 	// Only allow in super groups
-	if m.ChatType() == telegram.EntityChat && (m.Channel == nil || !m.Channel.Megagroup) {
+	if m.ChatType() == telegram.EntityChat &&
+		(m.Channel == nil || !m.Channel.Megagroup) {
 		warnAndLeave(m.Client, chatID)
 		return telegram.ErrEndGroup
 	}
@@ -109,7 +111,8 @@ func handleBotState(p *telegram.ParticipantUpdate, chatID int64) {
 	if p.IsLeft() {
 		action = "left"
 	}
-	if !p.IsLeft() && !p.IsBanned() && !p.IsKicked() && !(p.New != nil && isRestricted(p.New)) {
+	if !p.IsLeft() && !p.IsBanned() && !p.IsKicked() &&
+		!(p.New != nil && isRestricted(p.New)) {
 		return
 	}
 
@@ -145,7 +148,9 @@ func handleBotState(p *telegram.ParticipantUpdate, chatID int64) {
 			"group_id":       chatID,
 			"group_username": group_username,
 
-			"removed_by_name":     strings.TrimSpace(p.Actor.FirstName + " " + p.Actor.LastName),
+			"removed_by_name": strings.TrimSpace(
+				p.Actor.FirstName + " " + p.Actor.LastName,
+			),
 			"removed_by_id":       p.ActorID(),
 			"removed_by_username": removed_by_username,
 
@@ -154,7 +159,9 @@ func handleBotState(p *telegram.ParticipantUpdate, chatID int64) {
 
 		_, err := p.Client.SendMessage(config.LoggerID, msg)
 		if err != nil {
-			gologging.Error("Failed to send logger_bot_removed msg, Error: " + err.Error())
+			gologging.Error(
+				"Failed to send logger_bot_removed msg, Error: " + err.Error(),
+			)
 		}
 	}
 	gologging.Debug("Bot left chat " + utils.IntToStr(chatID))
@@ -162,7 +169,11 @@ func handleBotState(p *telegram.ParticipantUpdate, chatID int64) {
 	return
 }
 
-func handleAssistantState(p *telegram.ParticipantUpdate, s *core.ChatState, chatID int64) {
+func handleAssistantState(
+	p *telegram.ParticipantUpdate,
+	s *core.ChatState,
+	chatID int64,
+) {
 	// Joined / Left
 	if p.IsLeft() {
 		s.SetAssistantPresent(false)
@@ -184,7 +195,11 @@ func handleAssistantState(p *telegram.ParticipantUpdate, s *core.ChatState, chat
 	}
 }
 
-func handleAssistantRestriction(p *telegram.ParticipantUpdate, chatID int64, s *core.ChatState) {
+func handleAssistantRestriction(
+	p *telegram.ParticipantUpdate,
+	chatID int64,
+	s *core.ChatState,
+) {
 	gologging.Debug("Assistant restricted in chatID " + utils.IntToStr(chatID))
 
 	s.SetAssistantPresent(false)
@@ -204,14 +219,20 @@ func handleAssistantRestriction(p *telegram.ParticipantUpdate, chatID int64, s *
 			)
 
 			if sendErr != nil {
-				gologging.Error("Failed to send assistant restricted warning in ChatID: " +
-					utils.IntToStr(chatID) + " Error: " + sendErr.Error())
+				gologging.Error(
+					"Failed to send assistant restricted warning in ChatID: " +
+						utils.IntToStr(chatID) + " Error: " + sendErr.Error(),
+				)
 			}
 		}
 	}
 }
 
-func handleAssistantFallback(p *telegram.ParticipantUpdate, chatID int64, s *core.ChatState) {
+func handleAssistantFallback(
+	p *telegram.ParticipantUpdate,
+	chatID int64,
+	s *core.ChatState,
+) {
 	member, err := p.Client.GetChatMember(chatID, s.Assistant.User.ID)
 	if err != nil {
 		if telegram.MatchError(err, "USER_NOT_PARTICIPANT") {
@@ -237,7 +258,11 @@ func handleAssistantFallback(p *telegram.ParticipantUpdate, chatID int64, s *cor
 	}
 }
 
-func handleDemotion(p *telegram.ParticipantUpdate, s *core.ChatState, chatID int64) {
+func handleDemotion(
+	p *telegram.ParticipantUpdate,
+	s *core.ChatState,
+	chatID int64,
+) {
 	if p.UserID() == core.BUser.ID && config.LeaveOnDemoted {
 
 		core.DeleteRoom(chatID)
@@ -258,7 +283,9 @@ func handleDemotion(p *telegram.ParticipantUpdate, s *core.ChatState, chatID int
 func handleSudoJoin(p *telegram.ParticipantUpdate, chatID int64) {
 	var text string
 
-	if !p.IsJoined() { return }
+	if !p.IsJoined() {
+		return
+	}
 
 	if p.UserID() == config.OwnerID {
 		text = F(chatID, "sudo_join_owner", locales.Arg{
@@ -277,7 +304,12 @@ func handleSudoJoin(p *telegram.ParticipantUpdate, chatID int64) {
 	}
 }
 
-func handleGroupCallAction(m *telegram.NewMessage, chatID int64, action *telegram.MessageActionGroupCall, isMaintenance bool) error {
+func handleGroupCallAction(
+	m *telegram.NewMessage,
+	chatID int64,
+	action *telegram.MessageActionGroupCall,
+	isMaintenance bool,
+) error {
 	if isMaintenance {
 		return telegram.ErrEndGroup
 	}
@@ -304,9 +336,20 @@ func handleGroupCallAction(m *telegram.NewMessage, chatID int64, action *telegra
 	return telegram.ErrEndGroup
 }
 
-func handleAddUserAction(m *telegram.NewMessage, chatID int64, action *telegram.MessageActionChatAddUser, isMaintenance bool) error {
+func handleAddUserAction(
+	m *telegram.NewMessage,
+	chatID int64,
+	action *telegram.MessageActionChatAddUser,
+	isMaintenance bool,
+) error {
 	for _, uid := range action.Users {
-		gologging.Debug("User added to chatID " + utils.IntToStr(chatID) + ": " + utils.IntToStr(uid))
+		gologging.Debug(
+			"User added to chatID " + utils.IntToStr(
+				chatID,
+			) + ": " + utils.IntToStr(
+				uid,
+			),
+		)
 
 		// Not the bot, skip
 		if uid != core.BUser.ID {
@@ -319,16 +362,25 @@ func handleAddUserAction(m *telegram.NewMessage, chatID int64, action *telegram.
 			if ok, _ := database.IsSudo(m.SenderID()); !ok {
 
 				msg := F(chatID, "bot_added_maintenance")
-				if reason, err := database.GetMaintReason(); err == nil && reason != "" {
-					msg += "\n\n" + F(chatID, "maint_reason_generic", locales.Arg{
-						"reason": reason,
-					})
+				if reason, err := database.GetMaintReason(); err == nil &&
+					reason != "" {
+					msg += "\n\n" + F(
+						chatID,
+						"maint_reason_generic",
+						locales.Arg{
+							"reason": reason,
+						},
+					)
 				}
 
 				m.Reply(msg)
 				m.Client.LeaveChannel(chatID)
 
-				gologging.Debug("Bot left chatID " + utils.IntToStr(chatID) + " due to maintenance")
+				gologging.Debug(
+					"Bot left chatID " + utils.IntToStr(
+						chatID,
+					) + " due to maintenance",
+				)
 				return telegram.ErrEndGroup
 			}
 		}
@@ -352,7 +404,9 @@ func handleAddUserAction(m *telegram.NewMessage, chatID int64, action *telegram.
 				"group_id":       chatID,
 				"group_username": group_username,
 
-				"added_by_name":     strings.TrimSpace(m.Sender.FirstName + " " + m.Sender.LastName),
+				"added_by_name": strings.TrimSpace(
+					m.Sender.FirstName + " " + m.Sender.LastName,
+				),
 				"added_by_id":       m.SenderID(),
 				"added_by_username": removed_by_username,
 
@@ -362,7 +416,9 @@ func handleAddUserAction(m *telegram.NewMessage, chatID int64, action *telegram.
 
 			_, err := m.Client.SendMessage(config.LoggerID, msg)
 			if err != nil {
-				gologging.Error("Failed to send logger_bot_added msg, Error: " + err.Error())
+				gologging.Error(
+					"Failed to send logger_bot_added msg, Error: " + err.Error(),
+				)
 			}
 		}
 

@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package core
 
 import (
@@ -44,15 +45,23 @@ type ChatState struct {
 }
 
 var (
-	ErrAdminPermissionRequired  = errors.New("admin permission required")
-	ErrFetchFailed              = errors.New("failed to fetch chat info")
-	ErrAssistantGetFailed       = errors.New("failed to assistant for your chat")
+	ErrAdminPermissionRequired = errors.New("admin permission required")
+	ErrFetchFailed             = errors.New("failed to fetch chat info")
+	ErrAssistantGetFailed      = errors.New(
+		"failed to assistant for your chat",
+	)
 	ErrAssistantInviteLinkFetch = errors.New("failed to fetch invite link")
-	ErrAssistantJoinRejected    = errors.New("invite link is invalid or expired")
-	ErrAssistantJoinRateLimited = errors.New("assistant cannot join, rate limited")
+	ErrAssistantJoinRejected    = errors.New(
+		"invite link is invalid or expired",
+	)
+	ErrAssistantJoinRateLimited = errors.New(
+		"assistant cannot join, rate limited",
+	)
 	ErrAssistantJoinRequestSent = errors.New("assistant join request sent")
 	ErrPeerResolveFailed        = errors.New("failed to resolve peer")
-	ErrAssistantInviteFailed    = errors.New("assistant failed to join this chat")
+	ErrAssistantInviteFailed    = errors.New(
+		"assistant failed to join this chat",
+	)
 )
 
 var (
@@ -184,7 +193,10 @@ func (cs *ChatState) TryJoin() error {
 	if telegram.MatchError(err, "INVITE_HASH_EXPIRED") {
 		cs.SetInviteLink("")
 		if retryErr := tryJoin(); retryErr != nil {
-			return fmt.Errorf("assistant join failed after refreshing invite: %v", retryErr)
+			return fmt.Errorf(
+				"assistant join failed after refreshing invite: %v",
+				retryErr,
+			)
 		}
 		return nil
 	}
@@ -240,7 +252,8 @@ func (cs *ChatState) ensureVoiceState(force bool) error {
 	cs.SetVoiceChatActive(isVCActive)
 
 	if isVCActive && fullChat.ExportedInvite != nil {
-		if l, ok := fullChat.ExportedInvite.(*telegram.ChatInviteExported); ok && l.Link != "" {
+		if l, ok := fullChat.ExportedInvite.(*telegram.ChatInviteExported); ok &&
+			l.Link != "" {
 			cs.SetInviteLink(l.Link)
 		}
 	}
@@ -259,7 +272,9 @@ func (cs *ChatState) ensureAssistantState(force bool) error {
 
 	member, err := Bot.GetChatMember(cs.ChatID, cs.Assistant.User.ID)
 	if err != nil {
-		gologging.Error("raw error of GetChatMember in core.ChatState" + err.Error())
+		gologging.Error(
+			"raw error of GetChatMember in core.ChatState" + err.Error(),
+		)
 		if strings.Contains(err.Error(), "there is no peer with id") {
 
 			cs.triggerAssistantStart()
@@ -356,7 +371,10 @@ func handleMemberFetchError(s *ChatState, err error) error {
 }
 
 func fetchAndSetInviteLink(s *ChatState, chatID int64) error {
-	invLink, err := Bot.GetChatInviteLink(chatID, &telegram.InviteLinkOptions{RequestNeeded: false})
+	invLink, err := Bot.GetChatInviteLink(
+		chatID,
+		&telegram.InviteLinkOptions{RequestNeeded: false},
+	)
 	if err != nil {
 		switch {
 		case telegram.MatchError(err, "CHAT_ID_INVALID"),
@@ -373,7 +391,10 @@ func fetchAndSetInviteLink(s *ChatState, chatID int64) error {
 		s.SetInviteLink(l.Link)
 		return nil
 	}
-	return fmt.Errorf("%w: no valid invite link retrieved", ErrAssistantInviteLinkFetch)
+	return fmt.Errorf(
+		"%w: no valid invite link retrieved",
+		ErrAssistantInviteLinkFetch,
+	)
 }
 
 func handleJoinError(err error, chatID int64, s *ChatState) error {
@@ -407,18 +428,26 @@ func handleJoinRequestPending(chatID int64, s *ChatState) error {
 
 	iu, ok := iUser.(*telegram.InputPeerUser)
 	if !ok {
-		return fmt.Errorf("%w: failed to cast user to InputPeerUser", ErrPeerResolveFailed)
+		return fmt.Errorf(
+			"%w: failed to cast user to InputPeerUser",
+			ErrPeerResolveFailed,
+		)
 	}
 
-	pUser := &telegram.InputUserObj{UserID: iu.UserID, AccessHash: iu.AccessHash}
+	pUser := &telegram.InputUserObj{
+		UserID:     iu.UserID,
+		AccessHash: iu.AccessHash,
+	}
 	_, acceptErr := Bot.MessagesHideChatJoinRequest(true, iChat, pUser)
-	if acceptErr == nil || telegram.MatchError(acceptErr, "USER_ALREADY_PARTICIPANT") {
+	if acceptErr == nil ||
+		telegram.MatchError(acceptErr, "USER_ALREADY_PARTICIPANT") {
 		s.SetAssistantPresent(true)
 		s.SetAssistantBanned(false)
 		return nil
 	}
 
-	if telegram.MatchError(acceptErr, "CHAT_ADMIN_REQUIRED") || telegram.MatchError(acceptErr, "CHANNEL_PRIVATE") {
+	if telegram.MatchError(acceptErr, "CHAT_ADMIN_REQUIRED") ||
+		telegram.MatchError(acceptErr, "CHANNEL_PRIVATE") {
 		return ErrAdminPermissionRequired
 	}
 	return ErrAssistantJoinRequestSent

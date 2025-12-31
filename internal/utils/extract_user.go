@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package utils
 
 import (
@@ -59,11 +60,15 @@ func extractFromReply(m *telegram.NewMessage) (int64, error) {
 	}
 
 	if r.Message.FromID == nil {
-		return 0, fmt.Errorf("replied message's sender is not a user (may be anon admin)")
+		return 0, fmt.Errorf(
+			"replied message's sender is not a user (may be anon admin)",
+		)
 	}
 
 	if _, ok := r.Message.FromID.(*telegram.PeerUser); !ok {
-		return 0, fmt.Errorf("replied message's sender is not a user (maybe channel/group)")
+		return 0, fmt.Errorf(
+			"replied message's sender is not a user (maybe channel/group)",
+		)
 	}
 
 	return r.SenderID(), nil
@@ -115,7 +120,9 @@ func extractFromPlainText(m *telegram.NewMessage, text string) (int64, error) {
 
 	userPeer, ok := peer.(*telegram.InputPeerUser)
 	if !ok {
-		return 0, fmt.Errorf("resolved peer is not a user (maybe channel/group)")
+		return 0, fmt.Errorf(
+			"resolved peer is not a user (maybe channel/group)",
+		)
 	}
 
 	return userPeer.UserID, nil

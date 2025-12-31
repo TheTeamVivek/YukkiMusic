@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package platforms
 
 import (
@@ -47,13 +48,23 @@ type SpotifyPlatform struct {
 }
 
 var (
-	spotifyTrackRegex    = regexp.MustCompile(`(?i)spotify\.com/track/([a-zA-Z0-9]+)`)
-	spotifyPlaylistRegex = regexp.MustCompile(`(?i)spotify\.com/playlist/([a-zA-Z0-9]+)`)
-	spotifyAlbumRegex    = regexp.MustCompile(`(?i)spotify\.com/album/([a-zA-Z0-9]+)`)
-	spotifyArtistRegex   = regexp.MustCompile(`(?i)spotify\.com/artist/([a-zA-Z0-9]+)`)
-	spotifyLinkRegex     = regexp.MustCompile(`(?i)^(https?:\/\/)?(open\.)?spotify\.com\/`)
-	nameCleanupRe        = regexp.MustCompile(`[\(\[].*?[\)\]]`)
-	spotifyCache         = utils.NewCache[string, []*state.Track](1 * time.Hour)
+	spotifyTrackRegex = regexp.MustCompile(
+		`(?i)spotify\.com/track/([a-zA-Z0-9]+)`,
+	)
+	spotifyPlaylistRegex = regexp.MustCompile(
+		`(?i)spotify\.com/playlist/([a-zA-Z0-9]+)`,
+	)
+	spotifyAlbumRegex = regexp.MustCompile(
+		`(?i)spotify\.com/album/([a-zA-Z0-9]+)`,
+	)
+	spotifyArtistRegex = regexp.MustCompile(
+		`(?i)spotify\.com/artist/([a-zA-Z0-9]+)`,
+	)
+	spotifyLinkRegex = regexp.MustCompile(
+		`(?i)^(https?:\/\/)?(open\.)?spotify\.com\/`,
+	)
+	nameCleanupRe = regexp.MustCompile(`[\(\[].*?[\)\]]`)
+	spotifyCache  = utils.NewCache[string, []*state.Track](1 * time.Hour)
 )
 
 const PlatformSpotify state.PlatformName = "Spotify"
@@ -76,9 +87,14 @@ func (s *SpotifyPlatform) IsDownloadSupported(source state.PlatformName) bool {
 	return source == s.name
 }
 
-func (s *SpotifyPlatform) GetTracks(query string, video bool) ([]*state.Track, error) {
+func (s *SpotifyPlatform) GetTracks(
+	query string,
+	video bool,
+) ([]*state.Track, error) {
 	if config.SpotifyClientID == "" || config.SpotifyClientSecret == "" {
-		return nil, errors.New("Spotify client credentials not configured. Set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET")
+		return nil, errors.New(
+			"Spotify client credentials not configured. Set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET",
+		)
 	}
 
 	// Check cache first
@@ -98,7 +114,9 @@ func (s *SpotifyPlatform) GetTracks(query string, video bool) ([]*state.Track, e
 	ctx := context.Background()
 
 	// Handle different Spotify URL types
-	if matches := spotifyTrackRegex.FindStringSubmatch(query); len(matches) > 1 {
+	if matches := spotifyTrackRegex.FindStringSubmatch(query); len(
+		matches,
+	) > 1 {
 		trackID := spotify.ID(matches[1])
 		tracks, err = s.getTrack(ctx, trackID)
 	} else if matches := spotifyPlaylistRegex.FindStringSubmatch(query); len(matches) > 1 {
@@ -231,18 +249,27 @@ func (s *SpotifyPlatform) ensureClient() error {
 }
 
 // getTrack fetches a single track by ID
-func (s *SpotifyPlatform) getTrack(ctx context.Context, trackID spotify.ID) ([]*state.Track, error) {
+func (s *SpotifyPlatform) getTrack(
+	ctx context.Context,
+	trackID spotify.ID,
+) ([]*state.Track, error) {
 	fullTrack, err := s.client.GetTrack(ctx, trackID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch Spotify track: %w", err)
 	}
 
-	track := s.convertSpotifyTrack(&fullTrack.SimpleTrack, fullTrack.Album.Images)
+	track := s.convertSpotifyTrack(
+		&fullTrack.SimpleTrack,
+		fullTrack.Album.Images,
+	)
 	return []*state.Track{track}, nil
 }
 
 // getPlaylist fetches all tracks from a playlist
-func (s *SpotifyPlatform) getPlaylist(ctx context.Context, playlistID spotify.ID) ([]*state.Track, error) {
+func (s *SpotifyPlatform) getPlaylist(
+	ctx context.Context,
+	playlistID spotify.ID,
+) ([]*state.Track, error) {
 	var tracks []*state.Track
 	offset := 0
 	limit := 100
@@ -282,7 +309,10 @@ func (s *SpotifyPlatform) getPlaylist(ctx context.Context, playlistID spotify.ID
 }
 
 // getAlbum fetches all tracks from an album
-func (s *SpotifyPlatform) getAlbum(ctx context.Context, albumID spotify.ID) ([]*state.Track, error) {
+func (s *SpotifyPlatform) getAlbum(
+	ctx context.Context,
+	albumID spotify.ID,
+) ([]*state.Track, error) {
 	album, err := s.client.GetAlbum(ctx, albumID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch Spotify album: %w", err)
@@ -299,7 +329,10 @@ func (s *SpotifyPlatform) getAlbum(ctx context.Context, albumID spotify.ID) ([]*
 }
 
 // getArtistTopTracks fetches an artist's top tracks
-func (s *SpotifyPlatform) getArtistTopTracks(ctx context.Context, artistID spotify.ID) ([]*state.Track, error) {
+func (s *SpotifyPlatform) getArtistTopTracks(
+	ctx context.Context,
+	artistID spotify.ID,
+) ([]*state.Track, error) {
 	topTracks, err := s.client.GetArtistsTopTracks(ctx, artistID, "US")
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch artist's top tracks: %w", err)
@@ -312,7 +345,10 @@ func (s *SpotifyPlatform) getArtistTopTracks(ctx context.Context, artistID spoti
 	var tracks []*state.Track
 
 	for _, fullTrack := range topTracks {
-		track := s.convertSpotifyTrack(&fullTrack.SimpleTrack, fullTrack.Album.Images)
+		track := s.convertSpotifyTrack(
+			&fullTrack.SimpleTrack,
+			fullTrack.Album.Images,
+		)
 		tracks = append(tracks, track)
 	}
 

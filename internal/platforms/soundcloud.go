@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package platforms
 
 import (
@@ -44,8 +45,10 @@ type SoundCloudPlatform struct {
 }
 
 var (
-	soundcloudLinkRegex = regexp.MustCompile(`(?i)^(https?://)?(www\.)?(soundcloud\.com|snd\.sc)/`)
-	soundcloudCache     = utils.NewCache[string, []*state.Track](1 * time.Hour)
+	soundcloudLinkRegex = regexp.MustCompile(
+		`(?i)^(https?://)?(www\.)?(soundcloud\.com|snd\.sc)/`,
+	)
+	soundcloudCache = utils.NewCache[string, []*state.Track](1 * time.Hour)
 )
 
 const PlatformSoundCloud state.PlatformName = "SoundCloud"
@@ -64,7 +67,10 @@ func (s *SoundCloudPlatform) IsValid(query string) bool {
 	return soundcloudLinkRegex.MatchString(strings.TrimSpace(query))
 }
 
-func (s *SoundCloudPlatform) GetTracks(query string, _ bool) ([]*state.Track, error) {
+func (s *SoundCloudPlatform) GetTracks(
+	query string,
+	_ bool,
+) ([]*state.Track, error) {
 	query = strings.TrimSpace(query)
 	if query == "" {
 		err := errors.New("empty query")
@@ -89,7 +95,10 @@ func (s *SoundCloudPlatform) GetTracks(query string, _ bool) ([]*state.Track, er
 	var tracks []*state.Track
 
 	if len(info.Entries) > 0 {
-		gologging.InfoF("SoundCloud: Found playlist with %d tracks", len(info.Entries))
+		gologging.InfoF(
+			"SoundCloud: Found playlist with %d tracks",
+			len(info.Entries),
+		)
 		for _, entry := range info.Entries {
 			track := s.infoToTrack(&entry)
 			tracks = append(tracks, track)
@@ -101,17 +110,26 @@ func (s *SoundCloudPlatform) GetTracks(query string, _ bool) ([]*state.Track, er
 
 	if len(tracks) > 0 {
 		soundcloudCache.Set(cacheKey, tracks)
-		gologging.InfoF("SoundCloud: Successfully extracted %d track(s)", len(tracks))
+		gologging.InfoF(
+			"SoundCloud: Successfully extracted %d track(s)",
+			len(tracks),
+		)
 	}
 
 	return tracks, nil
 }
 
-func (s *SoundCloudPlatform) IsDownloadSupported(source state.PlatformName) bool {
+func (s *SoundCloudPlatform) IsDownloadSupported(
+	source state.PlatformName,
+) bool {
 	return source == PlatformSoundCloud
 }
 
-func (s *SoundCloudPlatform) Download(ctx context.Context, track *state.Track, _ *telegram.NewMessage) (string, error) {
+func (s *SoundCloudPlatform) Download(
+	ctx context.Context,
+	track *state.Track,
+	_ *telegram.NewMessage,
+) (string, error) {
 	if path, err := checkDownloadedFile(track.ID); err == nil {
 		gologging.InfoF("SoundCloud: Using cached file for %s", track.ID)
 		return path, nil
@@ -120,7 +138,10 @@ func (s *SoundCloudPlatform) Download(ctx context.Context, track *state.Track, _
 	gologging.InfoF("SoundCloud: Downloading %s", track.Title)
 
 	if err := ensureDownloadsDir(); err != nil {
-		gologging.ErrorF("SoundCloud: Failed to create downloads directory: %v", err)
+		gologging.ErrorF(
+			"SoundCloud: Failed to create downloads directory: %v",
+			err,
+		)
 		return "", fmt.Errorf("failed to create downloads directory: %w", err)
 	}
 
@@ -153,16 +174,25 @@ func (s *SoundCloudPlatform) Download(ctx context.Context, track *state.Track, _
 		errStr := stderr.String()
 		gologging.ErrorF(
 			"SoundCloud: yt-dlp download failed for %s: %v\nSTDOUT:\n%s\nSTDERR:\n%s",
-			track.URL, err, outStr, errStr,
+			track.URL,
+			err,
+			outStr,
+			errStr,
 		)
 
 		os.Remove(filePath)
 
-		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		if errors.Is(err, context.Canceled) ||
+			errors.Is(err, context.DeadlineExceeded) {
 			return "", err
 		}
 
-		return "", fmt.Errorf("download failed: %w\nstdout: %s\nstderr: %s", err, outStr, errStr)
+		return "", fmt.Errorf(
+			"download failed: %w\nstdout: %s\nstderr: %s",
+			err,
+			outStr,
+			errStr,
+		)
 	}
 
 	if _, err := os.Stat(filePath); err != nil {
@@ -191,7 +221,11 @@ func (s *SoundCloudPlatform) extractMetadata(url string) (*ytdlpInfo, error) {
 
 	if err := cmd.Run(); err != nil {
 		errStr := stderr.String()
-		gologging.ErrorF("SoundCloud: yt-dlp metadata extraction failed: %v\n%s", err, errStr)
+		gologging.ErrorF(
+			"SoundCloud: yt-dlp metadata extraction failed: %v\n%s",
+			err,
+			errStr,
+		)
 		return nil, fmt.Errorf("metadata extraction failed: %w", err)
 	}
 
@@ -205,7 +239,10 @@ func (s *SoundCloudPlatform) extractMetadata(url string) (*ytdlpInfo, error) {
 		for _, line := range lines {
 			var entry ytdlpInfo
 			if err := json.Unmarshal([]byte(line), &entry); err != nil {
-				gologging.ErrorF("SoundCloud: Failed to parse entry JSON: %v", err)
+				gologging.ErrorF(
+					"SoundCloud: Failed to parse entry JSON: %v",
+					err,
+				)
 				continue
 			}
 			info.Entries = append(info.Entries, entry)

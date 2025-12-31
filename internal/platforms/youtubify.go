@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 	"resty.dev/v3"
 
@@ -53,11 +54,16 @@ func (y *YoutubifyPlatform) IsValid(query string) bool {
 	return false
 }
 
-func (y *YoutubifyPlatform) GetTracks(_ string, _ bool) ([]*state.Track, error) {
+func (y *YoutubifyPlatform) GetTracks(
+	_ string,
+	_ bool,
+) ([]*state.Track, error) {
 	return nil, errors.New("youtubify is a direct download platform")
 }
 
-func (y *YoutubifyPlatform) IsDownloadSupported(source state.PlatformName) bool {
+func (y *YoutubifyPlatform) IsDownloadSupported(
+	source state.PlatformName,
+) bool {
 	return source == PlatformYouTube && config.YoutubifyApiKey != ""
 }
 
@@ -98,19 +104,26 @@ func (y *YoutubifyPlatform) Download(
 		Get(url)
 	if err != nil {
 		os.Remove(filepath)
-		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		if errors.Is(err, context.Canceled) ||
+			errors.Is(err, context.DeadlineExceeded) {
 			return "", err
 		}
-		return "", err
+		gologging.Error(
+			"Failed to download song using YoutubifyPlatform: " + sanitizeAPIError(
+				err,
+				config.YoutubifyApiKey,
+			).Error(),
+		)
+		return "", sanitizeAPIError(err, config.YoutubifyApiKey)
 	}
 
 	if resp.IsError() {
-		_ = os.Remove(filepath)
+		os.Remove(filepath)
 		return "", fmt.Errorf("API returned %s", resp.Status())
 	}
 
 	if ctx.Err() != nil {
-		_ = os.Remove(filepath)
+		os.Remove(filepath)
 		return "", ctx.Err()
 	}
 

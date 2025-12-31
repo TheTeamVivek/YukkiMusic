@@ -56,7 +56,12 @@ func (p *NtgPlayer) Unmute(r *RoomState) (bool, error) {
 	return p.Ntg.Unmute(r.chatID)
 }
 
-func getMediaDescription(url string, pos int, speed float64, isVideo bool) ntgcalls.MediaDescription {
+func getMediaDescription(
+	url string,
+	pos int,
+	speed float64,
+	isVideo bool,
+) ntgcalls.MediaDescription {
 	if speed < 0.5 {
 		speed = 0.5
 	} else if speed > 4.0 {
@@ -83,7 +88,12 @@ func getMediaDescription(url string, pos int, speed float64, isVideo bool) ntgca
 
 	// Audio pipeline
 	audioCmd := baseCmd
-	audioCmd += "-filter:a \"atempo=" + strconv.FormatFloat(speed, 'f', 2, 64) + "\" "
+	audioCmd += "-filter:a \"atempo=" + strconv.FormatFloat(
+		speed,
+		'f',
+		2,
+		64,
+	) + "\" "
 	audioCmd += "-f s16le -ac " + strconv.Itoa(int(audio.ChannelCount)) + " "
 	audioCmd += "-ar " + strconv.Itoa(int(audio.SampleRate)) + " "
 	audioCmd += "pipe:1"

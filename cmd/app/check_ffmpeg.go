@@ -22,14 +22,16 @@ package main
 
 import (
 	"os/exec"
+
+	"github.com/Laky-64/gologging"
 )
 
 func checkFFmpegAndFFprobe() {
 	if _, err := exec.LookPath("ffmpeg"); err != nil {
-		l.Fatal("❌ ffmpeg not found in PATH. Please install ffmpeg.")
+		gologging.Fatal("❌ ffmpeg not found in PATH. Please install ffmpeg.")
 	}
 
 	if _, err := exec.LookPath("ffprobe"); err != nil {
-		l.Fatal("❌ ffprobe not found in PATH. Please install ffprobe.")
+		gologging.Fatal("❌ ffprobe not found in PATH. Please install ffprobe.")
 	}
 }

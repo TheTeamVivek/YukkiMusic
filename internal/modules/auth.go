@@ -1,22 +1,23 @@
 /*
- * This file is part of YukkiMusic.
- *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package modules
 
 import (
@@ -33,7 +34,8 @@ import (
 )
 
 func init() {
-	helpTexts["/addauth"] = fmt.Sprintf(`<i>Grant permission to a regular user to control playback and other admin-level features without making them a Telegram admin.</i>
+	helpTexts["/addauth"] = fmt.Sprintf(
+		`<i>Grant permission to a regular user to control playback and other admin-level features without making them a Telegram admin.</i>
 
 <u>Usage:</u>
 <b>/addauth [reply to user]</b> — Add a user by replying to their message.  
@@ -46,7 +48,9 @@ func init() {
 • 🔢 You can have up to <b>%d</b> auth users per chat.  
 • 👑 The <b>Bot Owner</b>, <b>Assistant</b>, and all <b>Sudoers</b> are <b>already authorized by default</b> — they do not appear in the list and cannot be removed.
 
-For related commands, see <code>/delauth</code> and <code>/authlist</code>.`, config.MaxAuthUsers)
+For related commands, see <code>/delauth</code> and <code>/authlist</code>.`,
+		config.MaxAuthUsers,
+	)
 
 	helpTexts["/delauth"] = `<i>Revoke permission from a user who was previously authorized to control playback.</i>
 
@@ -93,7 +97,8 @@ func addAuthHandler(m *telegram.NewMessage) error {
 	}
 
 	// owner, bot, self, already auth, or admin — all treated the same
-	if userID == config.OwnerID || userID == core.BUser.ID || userID == m.SenderID() {
+	if userID == config.OwnerID || userID == core.BUser.ID ||
+		userID == m.SenderID() {
 		m.Reply(F(chatID, "cannot_authorize_user"))
 		return telegram.ErrEndGroup
 	}
