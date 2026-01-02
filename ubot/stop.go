@@ -1,36 +1,18 @@
 package ubot
 
-func (ctx *Context) Stop(chatId any) error {
-	parsedChatId, err := ctx.parseChatId(chatId)
+func (ctx *Context) Stop(chatId int64) error {
+	ctx.presentations = stdRemove(ctx.presentations, chatId)
+	delete(ctx.callSources, chatId)
+	err := ctx.binding.Stop(chatId)
 	if err != nil {
 		return err
 	}
-
-	ctx.presentationsMutex.Lock()
-	ctx.presentations = stdRemove(ctx.presentations, parsedChatId)
-	ctx.presentationsMutex.Unlock()
-
-	ctx.pendingPresentationMutex.Lock()
-	delete(ctx.pendingPresentation, parsedChatId)
-	ctx.pendingPresentationMutex.Unlock()
-
-	ctx.callSourcesMutex.Lock()
-	delete(ctx.callSources, parsedChatId)
-	ctx.callSourcesMutex.Unlock()
-
-	stopErr := ctx.binding.Stop(parsedChatId)
-
 	ctx.inputGroupCallsMutex.RLock()
-	inputGroupCall, ok := ctx.inputGroupCalls[parsedChatId]
+	inputGroupCall := ctx.inputGroupCalls[chatId]
 	ctx.inputGroupCallsMutex.RUnlock()
-
-	if !ok { return stopErr }
-	_, leaveErr := ctx.app.PhoneLeaveGroupCall(inputGroupCall, 0)
-	if stopErr != nil {
-		return stopErr
-	}
-	if leaveErr != nil {
-		return leaveErr
+	_, err = ctx.app.PhoneLeaveGroupCall(inputGroupCall, 0)
+	if err != nil {
+		return err
 	}
 	return nil
 }

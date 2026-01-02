@@ -3,21 +3,17 @@ package ubot
 import "main/ntgcalls"
 
 func (ctx *Context) Record(
-	chatId any,
+	chatId int64,
 	mediaDescription ntgcalls.MediaDescription,
 ) error {
-	parsedChatId, err := ctx.parseChatId(chatId)
-	if err != nil {
-		return err
-	}
-	if ctx.binding.Calls()[parsedChatId] == nil {
-		err = ctx.Play(chatId, ntgcalls.MediaDescription{})
+	if ctx.binding.Calls()[chatId] == nil {
+		err := ctx.Play(chatId, ntgcalls.MediaDescription{})
 		if err != nil {
 			return err
 		}
 	}
 	return ctx.binding.SetStreamSources(
-		parsedChatId,
+		chatId,
 		ntgcalls.PlaybackStream,
 		mediaDescription,
 	)

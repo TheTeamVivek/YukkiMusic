@@ -8,28 +8,30 @@ import (
 
 func parseRTCServers(connections []tg.PhoneConnection) []ntgcalls.RTCServer {
 	rtcServers := make([]ntgcalls.RTCServer, len(connections))
-	for i, c := range connections {
-		switch connection := c.(type) {
+	for i, connection := range connections {
+		switch connection.(type) {
 		case *tg.PhoneConnectionWebrtc:
+			rtcServer := connection.(*tg.PhoneConnectionWebrtc)
 			rtcServers[i] = ntgcalls.RTCServer{
-				ID:       connection.ID,
-				Ipv4:     connection.Ip,
-				Ipv6:     connection.Ipv6,
-				Username: connection.Username,
-				Password: connection.Password,
-				Port:     connection.Port,
-				Turn:     connection.Turn,
-				Stun:     connection.Stun,
+				ID:       rtcServer.ID,
+				Ipv4:     rtcServer.Ip,
+				Ipv6:     rtcServer.Ipv6,
+				Username: rtcServer.Username,
+				Password: rtcServer.Password,
+				Port:     rtcServer.Port,
+				Turn:     rtcServer.Turn,
+				Stun:     rtcServer.Stun,
 			}
 		case *tg.PhoneConnectionObj:
+			phoneServer := connection.(*tg.PhoneConnectionObj)
 			rtcServers[i] = ntgcalls.RTCServer{
-				ID:      connection.ID,
-				Ipv4:    connection.Ip,
-				Ipv6:    connection.Ipv6,
-				Port:    connection.Port,
+				ID:      phoneServer.ID,
+				Ipv4:    phoneServer.Ip,
+				Ipv6:    phoneServer.Ipv6,
+				Port:    phoneServer.Port,
 				Turn:    true,
-				Tcp:     connection.Tcp,
-				PeerTag: connection.PeerTag,
+				Tcp:     phoneServer.Tcp,
+				PeerTag: phoneServer.PeerTag,
 			}
 		}
 	}

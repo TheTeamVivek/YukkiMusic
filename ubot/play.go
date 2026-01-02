@@ -5,30 +5,26 @@ import (
 )
 
 func (ctx *Context) Play(
-	chatId any,
+	chatId int64,
 	mediaDescription ntgcalls.MediaDescription,
 ) error {
-	parsedChatId, err := ctx.parseChatId(chatId)
-	if err != nil {
-		return err
-	}
-	if ctx.binding.Calls()[parsedChatId] != nil {
+	if ctx.binding.Calls()[chatId] != nil {
 		return ctx.binding.SetStreamSources(
-			parsedChatId,
+			chatId,
 			ntgcalls.CaptureStream,
 			mediaDescription,
 		)
 	}
-	err = ctx.connectCall(parsedChatId, mediaDescription, "")
+	err := ctx.connectCall(chatId, mediaDescription, "")
 	if err != nil {
 		return err
 	}
-	if parsedChatId < 0 {
-		err = ctx.joinPresentation(parsedChatId, mediaDescription.Screen != nil)
+	if chatId < 0 {
+		err = ctx.joinPresentation(chatId, mediaDescription.Screen != nil)
 		if err != nil {
 			return err
 		}
-		return ctx.updateSources(parsedChatId)
+		return ctx.updateSources(chatId)
 	}
 	return nil
 }

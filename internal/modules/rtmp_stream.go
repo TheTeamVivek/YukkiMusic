@@ -369,7 +369,7 @@ func setRTMPHandler(m *tg.NewMessage) error {
 	switch m.ChatType() {
 	case tg.EntityChat:
 		m.Reply(F(m.ChannelID(), "rtmp_dm_only", locales.Arg{
-			"cmd": "/setrtmp",
+			"cmd":          "/setrtmp",
 			"bot_username": core.BUser.Username,
 		}))
 		return tg.ErrEndGroup

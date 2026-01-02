@@ -7,8 +7,21 @@ import (
 )
 
 func (ctx *Context) parseChatId(chatId any) (int64, error) {
+	if chatId == nil {
+		return 0, fmt.Errorf("chatId cannot be nil")
+	}
+
 	var parsedChatId int64
 	switch v := chatId.(type) {
+	case tg.Peer:
+		switch v.(type) {
+		case *tg.PeerUser:
+			parsedChatId = v.(*tg.PeerUser).UserID
+		case *tg.PeerChat:
+			parsedChatId = -v.(*tg.PeerChat).ChatID
+		case *tg.PeerChannel:
+			parsedChatId = -1000000000000 - v.(*tg.PeerChannel).ChannelID
+		}
 	case int64:
 		parsedChatId = v
 	case int:
@@ -24,22 +37,13 @@ func (ctx *Context) parseChatId(chatId any) (int64, error) {
 		if err != nil {
 			return 0, fmt.Errorf("failed to resolve username: %w", err)
 		}
-		switch chat := rawChat.(type) {
+		switch rawChat.(type) {
 		case *tg.UserObj:
-			parsedChatId = chat.ID
+			parsedChatId = rawChat.(*tg.UserObj).ID
 		case *tg.ChatObj:
-			parsedChatId = -chat.ID
+			parsedChatId = -rawChat.(*tg.ChatObj).ID
 		case *tg.Channel:
-			parsedChatId = -1000000000000 - chat.ID
-		}
-	case tg.Peer:
-		switch v.(type) {
-		case *tg.PeerUser:
-			parsedChatId = v.(*tg.PeerUser).UserID
-		case *tg.PeerChat:
-			parsedChatId = -v.(*tg.PeerChat).ChatID
-		case *tg.PeerChannel:
-			parsedChatId = -1000000000000 - v.(*tg.PeerChannel).ChannelID
+			parsedChatId = -1000000000000 - rawChat.(*tg.Channel).ID
 		}
 	default:
 		return 0, fmt.Errorf("unsupported chatId type: %T", chatId)
@@ -51,13 +55,13 @@ func (ctx *Context) parseChatId(chatId any) (int64, error) {
 		if err != nil {
 			return 0, fmt.Errorf("failed to resolve peer: %w", err)
 		}
-		switch chat := rawChat.(type) {
+		switch rawChat.(type) {
 		case *tg.InputPeerUser:
-			parsedChatId = chat.UserID
+			parsedChatId = rawChat.(*tg.InputPeerUser).UserID
 		case *tg.InputPeerChat:
-			parsedChatId = -chat.ChatID
+			parsedChatId = -rawChat.(*tg.InputPeerChat).ChatID
 		case *tg.InputPeerChannel:
-			parsedChatId = -1000000000000 - chat.ChannelID
+			parsedChatId = -1000000000000 - rawChat.(*tg.InputPeerChannel).ChannelID
 		}
 	}
 	return parsedChatId, nil

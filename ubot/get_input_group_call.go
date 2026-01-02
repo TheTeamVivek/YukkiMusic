@@ -6,25 +6,21 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 )
 
-func (ctx *Context) GetInputGroupCall(chatId int64) (tg.InputGroupCall, error) {
+func (ctx *Context) getInputGroupCall(chatId int64) (tg.InputGroupCall, error) {
 	ctx.inputGroupCallsMutex.RLock()
-	call, ok := ctx.inputGroupCalls[chatId]
-	ctx.inputGroupCallsMutex.RUnlock()
-
-	if ok {
+	if call, ok := ctx.inputGroupCalls[chatId]; ok {
+		ctx.inputGroupCallsMutex.RUnlock()
 		if call == nil {
 			return nil, fmt.Errorf("group call for chatId %d is closed", chatId)
 		}
 		return call, nil
 	}
+	ctx.inputGroupCallsMutex.RUnlock()
 
 	peer, err := ctx.app.ResolvePeer(chatId)
 	if err != nil {
 		return nil, err
 	}
-
-	var retrievedCall tg.InputGroupCall
-
 	switch chatPeer := peer.(type) {
 	case *tg.InputPeerChannel:
 		fullChat, err := ctx.app.ChannelsGetFullChannel(
@@ -36,23 +32,28 @@ func (ctx *Context) GetInputGroupCall(chatId int64) (tg.InputGroupCall, error) {
 		if err != nil {
 			return nil, err
 		}
-		retrievedCall = fullChat.FullChat.(*tg.ChannelFull).Call
+		ctx.inputGroupCallsMutex.Lock()
+		ctx.inputGroupCalls[chatId] = fullChat.FullChat.(*tg.ChannelFull).Call
+		ctx.inputGroupCallsMutex.Unlock()
 	case *tg.InputPeerChat:
 		fullChat, err := ctx.app.MessagesGetFullChat(chatPeer.ChatID)
 		if err != nil {
 			return nil, err
 		}
-		retrievedCall = fullChat.FullChat.(*tg.ChatFullObj).Call
+		ctx.inputGroupCallsMutex.Lock()
+		ctx.inputGroupCalls[chatId] = fullChat.FullChat.(*tg.ChatFullObj).Call
+		ctx.inputGroupCallsMutex.Unlock()
 	default:
 		return nil, fmt.Errorf("chatId %d is not a group call", chatId)
 	}
 
-	ctx.inputGroupCallsMutex.Lock()
-	ctx.inputGroupCalls[chatId] = retrievedCall
-	ctx.inputGroupCallsMutex.Unlock()
-
-	if retrievedCall == nil {
+	ctx.inputGroupCallsMutex.RLock()
+	defer ctx.inputGroupCallsMutex.RUnlock()
+	if call, ok := ctx.inputGroupCalls[chatId]; ok && call == nil {
 		return nil, fmt.Errorf("group call for chatId %d is closed", chatId)
+	} else if ok {
+		return call, nil
 	}
-	return retrievedCall, nil
+
+	return nil, fmt.Errorf("group call for chatId %d not found", chatId)
 }
