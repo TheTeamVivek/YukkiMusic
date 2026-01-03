@@ -210,7 +210,7 @@ func handleAssistantRestriction(
 		s.SetAssistantBanned(true)
 
 		if !shouldIgnoreParticipant(p) {
-			_, sendErr := s.Assistant.Client.SendMessage(
+			_, sendErr := p.Client.SendMessage(
 				chatID,
 				F(chatID, "assistant_restricted_warning", locales.Arg{
 					"assistant": utils.MentionHTML(s.Assistant.User),
