@@ -82,11 +82,11 @@ func initLogger() {
 	gologging.SetOutput(config.LogWriter)
 
 	l := gologging.GetLogger("ntgcalls")
-	l.SetLevel(gologging.InfoLevel)
+	l.SetLevel(gologging.ErrorLevel)
 	l.SetOutput(config.LogWriter)
 
 	l = gologging.GetLogger("webrtc")
-	l.SetLevel(gologging.InfoLevel)
+	l.SetLevel(gologging.ErrorLevel)
 	l.SetOutput(config.LogWriter)
 
 	gologging.GetLogger("Database").SetOutput(config.LogWriter)
