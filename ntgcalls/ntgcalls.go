@@ -755,7 +755,7 @@ func (ctx *Client) Mute(chatId int64) (bool, error) {
 	return parseBool(f)
 }
 
-func (ctx *Client) UnMute(chatId int64) (bool, error) {
+func (ctx *Client) Unmute(chatId int64) (bool, error) {
 	f := CreateFuture()
 	C.ntg_unmute(C.uintptr_t(ctx.ptr), C.int64_t(chatId), f.ParseToC())
 	f.wait()
