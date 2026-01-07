@@ -23,432 +23,435 @@ package core
 import (
 	"errors"
 	"fmt"
-	"strconv"
-	"strings"
 	"sync"
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/config"
 	"main/internal/utils"
 )
 
+var (
+	ErrAdminPermissionRequired  = errors.New("admin permission required")
+	ErrFetchFailed              = errors.New("failed to fetch chat info")
+	ErrAssistantGetFailed       = errors.New("failed to get assistant")
+	ErrAssistantInviteLinkFetch = errors.New("failed to fetch invite link")
+	ErrAssistantJoinRejected    = errors.New("invite link invalid or expired")
+	ErrAssistantJoinRateLimited = errors.New("rate limited")
+	ErrAssistantJoinRequestSent = errors.New("join request sent")
+	ErrAssistantInviteFailed    = errors.New("failed to join chat")
+	ErrPeerResolveFailed        = errors.New("failed to resolve peer")
+)
+
+// =============================================================================
+// CHAT STATE
+// =============================================================================
+
 type ChatState struct {
-	mu               *sync.RWMutex
-	ChatID           int64
-	Assistant        *Assistant
-	AssistantPresent *bool
-	AssistantBanned  *bool
-	VoiceChatActive  *bool
-	InviteLink       string
+	mu        *sync.RWMutex
+	ChatID    int64
+	Assistant *Assistant
+
+	isPresent  *bool
+	isBanned   *bool
+	isVCActive *bool
+	inviteLink string
 }
 
 var (
-	ErrAdminPermissionRequired = errors.New("admin permission required")
-	ErrFetchFailed             = errors.New("failed to fetch chat info")
-	ErrAssistantGetFailed      = errors.New(
-		"failed to assistant for your chat",
-	)
-	ErrAssistantInviteLinkFetch = errors.New("failed to fetch invite link")
-	ErrAssistantJoinRejected    = errors.New(
-		"invite link is invalid or expired",
-	)
-	ErrAssistantJoinRateLimited = errors.New(
-		"assistant cannot join, rate limited",
-	)
-	ErrAssistantJoinRequestSent = errors.New("assistant join request sent")
-	ErrPeerResolveFailed        = errors.New("failed to resolve peer")
-	ErrAssistantInviteFailed    = errors.New(
-		"assistant failed to join this chat",
-	)
+	stateMutex = &sync.Mutex{}
+	states     = make(map[int64]*ChatState)
 )
 
-var (
-	chMutex    = &sync.Mutex{}
-	ChatStates = make(map[int64]*ChatState)
-)
+// =============================================================================
+// STATE MANAGEMENT
+// =============================================================================
 
 func GetChatState(chatID int64) (*ChatState, error) {
-	chMutex.Lock()
-	defer chMutex.Unlock()
+	stateMutex.Lock()
+	defer stateMutex.Unlock()
 
-	state, ok := ChatStates[chatID]
-
-	if !ok {
-		state = &ChatState{
+	s, exists := states[chatID]
+	if !exists {
+		s = &ChatState{
 			mu:     &sync.RWMutex{},
 			ChatID: chatID,
 		}
-		ChatStates[chatID] = state
+		states[chatID] = s
 	}
-	if _, err := state.getAssistant(); err != nil {
+
+	if _, err := s.ensureAssistant(); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrAssistantGetFailed, err)
 	}
-	return state, nil
+
+	return s, nil
 }
 
 func DeleteChatState(chatID int64) {
-	chMutex.Lock()
-	defer chMutex.Unlock()
-	delete(ChatStates, chatID)
+	stateMutex.Lock()
+	defer stateMutex.Unlock()
+	delete(states, chatID)
 }
 
-func (cs *ChatState) SetAssistantPresent(v bool) {
-	cs.mu.Lock()
-	defer cs.mu.Unlock()
-	cs.AssistantPresent = &v
+// =============================================================================
+// STATE SETTERS
+// =============================================================================
+
+func (s *ChatState) SetAssistantPresent(v bool) {
+	s.mu.Lock()
+	s.isPresent = &v
+	s.mu.Unlock()
 }
 
-func (cs *ChatState) SetAssistantBanned(v bool) {
-	cs.mu.Lock()
-	defer cs.mu.Unlock()
-	cs.AssistantBanned = &v
+func (s *ChatState) SetAssistantBanned(v bool) {
+	s.mu.Lock()
+	s.isBanned = &v
+	s.mu.Unlock()
 }
 
-func (cs *ChatState) SetVoiceChatActive(v bool) {
-	cs.mu.Lock()
-	defer cs.mu.Unlock()
-	cs.VoiceChatActive = &v
+func (s *ChatState) SetVoiceChatActive(v bool) {
+	s.mu.Lock()
+	s.isVCActive = &v
+	s.mu.Unlock()
 }
 
-func (cs *ChatState) SetInviteLink(link string) {
-	cs.mu.Lock()
-	defer cs.mu.Unlock()
-	cs.InviteLink = link
+func (s *ChatState) SetInviteLink(link string) {
+	s.mu.Lock()
+	s.inviteLink = link
+	s.mu.Unlock()
 }
 
-func (cs *ChatState) IsActiveVC(force ...bool) (bool, error) {
-	isForce := len(force) > 0 && force[0]
+// =============================================================================
+// STATE GETTERS
+// =============================================================================
 
-	if err := cs.ensureVoiceState(isForce); err != nil {
-		return false, err
-	}
-
-	cs.mu.RLock()
-	defer cs.mu.RUnlock()
-	return cs.VoiceChatActive != nil && *cs.VoiceChatActive, nil
+func (s *ChatState) GetAssistantPresence() *bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.isPresent
 }
 
-func (cs *ChatState) GetAssistantPresence() *bool {
-	cs.mu.RLock()
-	defer cs.mu.RUnlock()
-	return cs.AssistantPresent
+func (s *ChatState) GetAssistantBanned() *bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.isBanned
 }
 
-func (cs *ChatState) GetAssistantBanned() *bool {
-	cs.mu.RLock()
-	defer cs.mu.RUnlock()
-	return cs.AssistantBanned
+func (s *ChatState) IsStateUnknown() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.isPresent == nil || s.isBanned == nil
 }
 
-func (cs *ChatState) IsAssistantBanned(force ...bool) (bool, error) {
-	isForce := len(force) > 0 && force[0]
+// =============================================================================
+// STATE QUERIES
+// =============================================================================
 
-	if err := cs.ensureAssistantState(isForce); err != nil {
-		return false, err
-	}
-
-	cs.mu.RLock()
-	defer cs.mu.RUnlock()
-	return cs.AssistantBanned != nil && *cs.AssistantBanned, nil
-}
-
-func (cs *ChatState) IsAssistantPresent(force ...bool) (bool, error) {
-	isForce := len(force) > 0 && force[0]
-
-	if err := cs.ensureAssistantState(isForce); err != nil {
-		return false, err
-	}
-
-	cs.mu.RLock()
-	defer cs.mu.RUnlock()
-	return cs.AssistantPresent != nil && *cs.AssistantPresent, nil
-}
-
-func (cs *ChatState) TryJoin() error {
-	tryJoin := func() error {
-		cs.mu.RLock()
-		link := cs.InviteLink
-		cs.mu.RUnlock()
-		if link == "" {
-			if err := fetchAndSetInviteLink(cs, cs.ChatID); err != nil {
-				return err
-			}
+func (s *ChatState) IsAssistantPresent(force ...bool) (bool, error) {
+	if s.shouldRefresh(s.isPresent, force) {
+		if err := s.RefreshAssistantState(); err != nil {
+			return false, err
 		}
-		cs.mu.RLock()
-		link = cs.InviteLink
-		cs.mu.RUnlock()
-
-		_, err := cs.Assistant.Client.JoinChannel(link)
-		if err == nil || telegram.MatchError(err, "USER_ALREADY_PARTICIPANT") {
-			cs.SetAssistantPresent(true)
-			cs.SetAssistantBanned(false)
-			return nil
-		}
-		return err
 	}
 
-	err := tryJoin()
-	if telegram.MatchError(err, "INVITE_HASH_EXPIRED") {
-		cs.SetInviteLink("")
-		if retryErr := tryJoin(); retryErr != nil {
-			return fmt.Errorf(
-				"assistant join failed after refreshing invite: %v",
-				retryErr,
-			)
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.isPresent != nil && *s.isPresent, nil
+}
+
+func (s *ChatState) IsAssistantBanned(force ...bool) (bool, error) {
+	if s.shouldRefresh(s.isBanned, force) {
+		if err := s.RefreshAssistantState(); err != nil {
+			return false, err
 		}
-		return nil
 	}
 
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.isBanned != nil && *s.isBanned, nil
+}
+
+func (s *ChatState) IsActiveVC(force ...bool) (bool, error) {
+	if s.shouldRefresh(s.isVCActive, force) {
+		if err := s.refreshVCState(); err != nil {
+			return false, err
+		}
+	}
+
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.isVCActive != nil && *s.isVCActive, nil
+}
+
+func (s *ChatState) shouldRefresh(flag *bool, force []bool) bool {
+	if flag == nil {
+		return true
+	}
+	return len(force) > 0 && force[0]
+}
+
+// =============================================================================
+// STATE REFRESH
+// =============================================================================
+
+func (s *ChatState) RefreshAssistantState() error {
+	member, err := Bot.GetChatMember(s.ChatID, s.Assistant.User.ID)
 	if err != nil {
-		return handleJoinError(err, cs.ChatID, cs)
+		return s.handleMemberFetchError(err)
 	}
+
+	s.applyMemberStatus(member)
 	return nil
 }
 
-func (cs *ChatState) getAssistant() (*Assistant, error) {
-	cs.mu.RLock()
-	ass := cs.Assistant
-	cs.mu.RUnlock()
+func (s *ChatState) refreshVCState() error {
+	full, err := s.fetchFullChat()
+	if err != nil {
+		return err
+	}
+
+	s.SetVoiceChatActive(full.Call != nil)
+
+	if full.Call != nil && full.ExportedInvite != nil {
+		if inv, ok := full.ExportedInvite.(*telegram.ChatInviteExported); ok {
+			s.SetInviteLink(inv.Link)
+		}
+	}
+
+	return nil
+}
+
+func (s *ChatState) applyMemberStatus(m *telegram.Participant) {
+	if m == nil {
+		s.SetAssistantPresent(false)
+		s.SetAssistantBanned(false)
+		return
+	}
+
+	if m.Status == telegram.Restricted {
+		// Status is "restricted" - could be muted OR banned
+		// Check the actual participant type
+		if banned, ok := m.Participant.(*telegram.ChannelParticipantBanned); ok {
+			// Check ViewMessages to distinguish ban from mute
+			if banned.BannedRights.ViewMessages {
+				// ViewMessages=true means truly banned (can't access)
+				s.SetAssistantPresent(false)
+				s.SetAssistantBanned(true)
+			} else {
+				// ViewMessages=false means muted (can access but restricted)
+				s.SetAssistantPresent(true)
+				s.SetAssistantBanned(false)
+			}
+		} else {
+			// Shouldn't happen, but default to accessible
+			s.SetAssistantPresent(true)
+			s.SetAssistantBanned(false)
+		}
+		return
+	}
+
+	// Handle other statuses
+	statusMap := map[string]struct{ present, banned bool }{
+		telegram.Left:    {false, false},
+		telegram.Admin:   {true, false},
+		telegram.Member:  {true, false},
+		telegram.Creator: {true, false},
+	}
+
+	if state, ok := statusMap[m.Status]; ok {
+		s.SetAssistantPresent(state.present)
+		s.SetAssistantBanned(state.banned)
+	}
+}
+
+func (s *ChatState) handleMemberFetchError(err error) error {
+	if telegram.MatchError(err, "USER_NOT_PARTICIPANT") ||
+		telegram.MatchError(err, "PARTICIPANT_ID_INVALID") {
+		s.SetAssistantPresent(false)
+		s.SetAssistantBanned(false)
+		return nil
+	}
+
+	if telegram.MatchError(err, "CHAT_ADMIN_REQUIRED") ||
+		telegram.MatchError(err, "CHANNEL_PRIVATE") {
+		return ErrAdminPermissionRequired
+	}
+
+	gologging.Error("Member fetch error: " + err.Error())
+	return fmt.Errorf("%w: %v", ErrFetchFailed, err)
+}
+
+// =============================================================================
+// ASSISTANT JOIN
+// =============================================================================
+
+func (s *ChatState) TryJoin() error {
+	err := s.attemptJoin()
+
+	if telegram.MatchError(err, "INVITE_HASH_EXPIRED") {
+		s.SetInviteLink("")
+		return s.attemptJoin()
+	}
+
+	return err
+}
+
+func (s *ChatState) attemptJoin() error {
+	link, err := s.getOrFetchInviteLink()
+	if err != nil {
+		return err
+	}
+
+	_, err = s.Assistant.Client.JoinChannel(link)
+	if err == nil || telegram.MatchError(err, "USER_ALREADY_PARTICIPANT") {
+		s.setJoinSuccess()
+		return nil
+	}
+
+	return s.handleJoinError(err)
+}
+
+func (s *ChatState) getOrFetchInviteLink() (string, error) {
+	s.mu.RLock()
+	link := s.inviteLink
+	s.mu.RUnlock()
+
+	if link != "" {
+		return link, nil
+	}
+
+	if err := s.fetchInviteLink(); err != nil {
+		return "", err
+	}
+
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.inviteLink, nil
+}
+
+func (s *ChatState) setJoinSuccess() {
+	s.SetAssistantPresent(true)
+	s.SetAssistantBanned(false)
+}
+
+func (s *ChatState) handleJoinError(err error) error {
+	errorMap := map[string]error{
+		"CHANNEL_PRIVATE":        ErrAssistantJoinRejected,
+		"CHANNEL_INVALID":        ErrAssistantJoinRejected,
+		"CHANNELS_TOO_MUCH":      ErrAssistantJoinRateLimited,
+		"USER_CHANNELS_TOO_MUCH": ErrAssistantJoinRateLimited,
+	}
+
+	for pattern, mappedErr := range errorMap {
+		if telegram.MatchError(err, pattern) {
+			return mappedErr
+		}
+	}
+
+	if telegram.MatchError(err, "INVITE_REQUEST_SENT") {
+		return s.approveJoinRequest()
+	}
+
+	return fmt.Errorf("%w: %v", ErrAssistantInviteFailed, err)
+}
+
+func (s *ChatState) approveJoinRequest() error {
+	chatPeer, err := Bot.ResolvePeer(s.ChatID)
+	if err != nil {
+		return err
+	}
+
+	userPeer, err := Bot.ResolvePeer(s.Assistant.User.ID)
+	if err != nil {
+		return err
+	}
+
+	inputUser, ok := userPeer.(*telegram.InputPeerUser)
+	if !ok {
+		return errors.New("invalid user peer")
+	}
+
+	user := &telegram.InputUserObj{
+		UserID:     inputUser.UserID,
+		AccessHash: inputUser.AccessHash,
+	}
+
+	_, err = Bot.MessagesHideChatJoinRequest(true, chatPeer, user)
+
+	if err == nil || telegram.MatchError(err, "USER_ALREADY_PARTICIPANT") {
+		s.setJoinSuccess()
+		return nil
+	}
+
+	if telegram.MatchError(err, "CHAT_ADMIN_REQUIRED") ||
+		telegram.MatchError(err, "CHANNEL_PRIVATE") {
+		return ErrAdminPermissionRequired
+	}
+
+	return ErrAssistantJoinRequestSent
+}
+
+// =============================================================================
+// HELPERS
+// =============================================================================
+
+func (s *ChatState) ensureAssistant() (*Assistant, error) {
+	s.mu.RLock()
+	ass := s.Assistant
+	s.mu.RUnlock()
 
 	if ass != nil {
 		return ass, nil
 	}
 
 	if Assistants == nil || Assistants.Count() == 0 {
-		return nil, fmt.Errorf("no assistants available")
+		return nil, errors.New("no assistants available")
 	}
 
-	ass, err := Assistants.ForChat(cs.ChatID)
+	ass, err := Assistants.ForChat(s.ChatID)
 	if err != nil {
 		return nil, err
 	}
 
-	cs.mu.Lock()
-	cs.Assistant = ass
-	cs.mu.Unlock()
+	s.mu.Lock()
+	s.Assistant = ass
+	s.mu.Unlock()
 
 	return ass, nil
 }
 
-// --- helpers ---
-
-func (cs *ChatState) ensureVoiceState(force bool) error {
-	cs.mu.RLock()
-	need := cs.VoiceChatActive == nil || force
-	cs.mu.RUnlock()
-
-	if !need {
-		return nil
-	}
-
-	fullChat, err := fetchFullChat(cs.ChatID)
+func (s *ChatState) fetchInviteLink() error {
+	inv, err := Bot.GetChatInviteLink(s.ChatID,
+		&telegram.InviteLinkOptions{RequestNeeded: false})
 	if err != nil {
-		return err
-	}
-
-	isVCActive := fullChat.Call != nil
-	cs.SetVoiceChatActive(isVCActive)
-
-	if isVCActive && fullChat.ExportedInvite != nil {
-		if l, ok := fullChat.ExportedInvite.(*telegram.ChatInviteExported); ok &&
-			l.Link != "" {
-			cs.SetInviteLink(l.Link)
-		}
-	}
-
-	return nil
-}
-
-func (cs *ChatState) ensureAssistantState(force bool) error {
-	cs.mu.RLock()
-	need := cs.AssistantPresent == nil || cs.AssistantBanned == nil || force
-	cs.mu.RUnlock()
-
-	if !need {
-		return nil
-	}
-
-	member, err := Bot.GetChatMember(cs.ChatID, cs.Assistant.User.ID)
-	if err != nil {
-		gologging.Error(
-			"raw error of GetChatMember in core.ChatState" + err.Error(),
-		)
-		if strings.Contains(err.Error(), "there is no peer with id") {
-
-			cs.triggerAssistantStart()
-			member, err = Bot.GetChatMember(cs.ChatID, cs.Assistant.User.ID)
-			if err != nil {
-				return handleMemberFetchError(cs, err)
-			}
-			applyMemberStatus(cs, member)
-			return nil
-
-		}
-		return handleMemberFetchError(cs, err)
-	}
-
-	applyMemberStatus(cs, member)
-	return nil
-}
-
-func (cs *ChatState) triggerAssistantStart() {
-	_, sendErr := cs.Assistant.Client.SendMessage(BUser.Username, "/start")
-	if sendErr == nil {
-		return
-	}
-
-	msg := "⚠️ Unable to get assistant state for chat " +
-		strconv.FormatInt(cs.ChatID, 10) +
-		". Please start the assistant manually."
-
-	if config.LoggerID != 0 {
-		cs.Assistant.Client.SendMessage(config.LoggerID, msg)
-	}
-
-	if config.OwnerID != 0 {
-		cs.Assistant.Client.SendMessage(config.OwnerID, msg)
-	}
-}
-
-func fetchFullChat(chatID int64) (*telegram.ChannelFull, error) {
-	fullChat, err := utils.GetFullChannel(Bot, chatID)
-	if err != nil {
-		switch {
-		case telegram.MatchError(err, "CHANNEL_INVALID"),
-			telegram.MatchError(err, "CHANNEL_PRIVATE"):
-			return nil, ErrAdminPermissionRequired
-		default:
-			return nil, fmt.Errorf("%w: %v", ErrFetchFailed, err)
-		}
-	}
-	return fullChat, nil
-}
-
-func applyMemberStatus(s *ChatState, member *telegram.Participant) {
-	if member == nil {
-		s.SetAssistantPresent(false)
-		s.SetAssistantBanned(false)
-
-		return
-	}
-	var p, b bool
-
-	switch member.Status {
-	case telegram.Kicked, telegram.Restricted:
-		p = false
-		b = true
-	case telegram.Left:
-		p = false
-		b = false
-
-	case telegram.Admin, telegram.Member:
-		p = true
-		b = false
-	}
-
-	s.SetAssistantPresent(p)
-	s.SetAssistantBanned(b)
-	return
-}
-
-func handleMemberFetchError(s *ChatState, err error) error {
-	switch {
-	case telegram.MatchError(err, "USER_NOT_PARTICIPANT"),
-		telegram.MatchError(err, "PARTICIPANT_ID_INVALID"):
-		s.SetAssistantPresent(false)
-		s.SetAssistantBanned(false)
-		return nil
-
-	case telegram.MatchError(err, "CHAT_ADMIN_REQUIRED"),
-		telegram.MatchError(err, "CHANNEL_PRIVATE"):
-		return ErrAdminPermissionRequired
-
-	default:
-		return fmt.Errorf("%w: %v", ErrFetchFailed, err)
-	}
-}
-
-func fetchAndSetInviteLink(s *ChatState, chatID int64) error {
-	invLink, err := Bot.GetChatInviteLink(
-		chatID,
-		&telegram.InviteLinkOptions{RequestNeeded: false},
-	)
-	if err != nil {
-		switch {
-		case telegram.MatchError(err, "CHAT_ID_INVALID"),
-			telegram.MatchError(err, "CHAT_ADMIN_REQUIRED"),
-			telegram.MatchError(err, "CHANNEL_PRIVATE"),
-			telegram.MatchError(err, "CHANNEL_INVALID"):
+		if s.isAdminError(err) {
 			return ErrAdminPermissionRequired
-		default:
-			return fmt.Errorf("%w: %v", ErrAssistantInviteLinkFetch, err)
 		}
+		return fmt.Errorf("%w: %v", ErrAssistantInviteLinkFetch, err)
 	}
 
-	if l, ok := invLink.(*telegram.ChatInviteExported); ok && l.Link != "" {
-		s.SetInviteLink(l.Link)
-		return nil
-	}
-	return fmt.Errorf(
-		"%w: no valid invite link retrieved",
-		ErrAssistantInviteLinkFetch,
-	)
-}
-
-func handleJoinError(err error, chatID int64, s *ChatState) error {
-	switch {
-	case telegram.MatchError(err, "INVITE_REQUEST_SENT"):
-		return handleJoinRequestPending(chatID, s)
-
-	case telegram.MatchError(err, "CHANNEL_PRIVATE"),
-		telegram.MatchError(err, "CHANNEL_INVALID"):
-		return ErrAssistantJoinRejected
-
-	case telegram.MatchError(err, "CHANNELS_TOO_MUCH"),
-		telegram.MatchError(err, "USER_CHANNELS_TOO_MUCH"):
-		return ErrAssistantJoinRateLimited
-
-	default:
-		return fmt.Errorf("%w: %v", ErrAssistantInviteFailed, err)
-	}
-}
-
-func handleJoinRequestPending(chatID int64, s *ChatState) error {
-	iChat, errChat := Bot.ResolvePeer(chatID)
-	if errChat != nil {
-		return fmt.Errorf("%w: %v", ErrPeerResolveFailed, errChat)
-	}
-
-	iUser, errUser := Bot.ResolvePeer(s.Assistant.User.ID)
-	if errUser != nil {
-		return fmt.Errorf("%w: %v", ErrPeerResolveFailed, errUser)
-	}
-
-	iu, ok := iUser.(*telegram.InputPeerUser)
-	if !ok {
-		return fmt.Errorf(
-			"%w: failed to cast user to InputPeerUser",
-			ErrPeerResolveFailed,
-		)
-	}
-
-	pUser := &telegram.InputUserObj{
-		UserID:     iu.UserID,
-		AccessHash: iu.AccessHash,
-	}
-	_, acceptErr := Bot.MessagesHideChatJoinRequest(true, iChat, pUser)
-	if acceptErr == nil ||
-		telegram.MatchError(acceptErr, "USER_ALREADY_PARTICIPANT") {
-		s.SetAssistantPresent(true)
-		s.SetAssistantBanned(false)
+	if link, ok := inv.(*telegram.ChatInviteExported); ok && link.Link != "" {
+		s.SetInviteLink(link.Link)
 		return nil
 	}
 
-	if telegram.MatchError(acceptErr, "CHAT_ADMIN_REQUIRED") ||
-		telegram.MatchError(acceptErr, "CHANNEL_PRIVATE") {
-		return ErrAdminPermissionRequired
+	return ErrAssistantInviteLinkFetch
+}
+
+func (s *ChatState) fetchFullChat() (*telegram.ChannelFull, error) {
+	full, err := utils.GetFullChannel(Bot, s.ChatID)
+	if err != nil {
+		if s.isAdminError(err) {
+			return nil, ErrAdminPermissionRequired
+		}
+		return nil, fmt.Errorf("%w: %v", ErrFetchFailed, err)
 	}
-	return ErrAssistantJoinRequestSent
+	return full, nil
+}
+
+func (s *ChatState) isAdminError(err error) bool {
+	return telegram.MatchError(err, "CHAT_ID_INVALID") ||
+		telegram.MatchError(err, "CHAT_ADMIN_REQUIRED") ||
+		telegram.MatchError(err, "CHANNEL_PRIVATE") ||
+		telegram.MatchError(err, "CHANNEL_INVALID")
 }

@@ -86,7 +86,7 @@ func initLogger() {
 	l.SetOutput(config.LogWriter)
 
 	l = gologging.GetLogger("webrtc")
-	l.SetLevel(gologging.FatalLevel)
+	l.SetLevel(gologging.ErrorLevel)
 	l.SetOutput(config.LogWriter)
 
 	gologging.GetLogger("Database").SetOutput(config.LogWriter)

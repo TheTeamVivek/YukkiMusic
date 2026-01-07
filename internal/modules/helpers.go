@@ -60,6 +60,48 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	return r, nil
 }
 
+func isMaintenanceBlocked(userID int64) bool {
+	isMaint, _ := database.IsMaintenance()
+	if !isMaint {
+		return false
+	}
+	if userID == config.OwnerID {
+		return false
+	}
+	ok, _ := database.IsSudo(userID)
+	return !ok
+}
+
+func F(chatID int64, key string, values ...locales.Arg) string {
+	lang, err := database.GetChatLanguage(chatID)
+	if err != nil {
+		gologging.Error(
+			"Failed to get language for " + utils.IntToStr(
+				chatID,
+			) + " Got error " + err.Error(),
+		)
+		lang = config.DefaultLang
+	}
+	return FWithLang(lang, key, values...)
+}
+
+func FWithLang(lang, key string, values ...locales.Arg) string {
+	var val locales.Arg
+	if len(values) > 0 {
+		val = values[0]
+	}
+	return locales.Get(lang, key, val)
+}
+
+func isLogger() (l bool) {
+	var err error
+	l, err = database.IsLoggerEnabled()
+	if err != nil {
+		gologging.Error("Failed to get IsLoggerEnabled, Err: " + err.Error())
+	}
+	return l
+}
+
 func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 	if config.LoggerID == 0 || config.LoggerID == m.ChatID() ||
 		config.LoggerID == m.ChannelID() {
@@ -152,36 +194,6 @@ func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 	if err != nil {
 		gologging.Error("Failed to send logger msg: " + err.Error())
 	}
-}
-
-func F(chatID int64, key string, values ...locales.Arg) string {
-	lang, err := database.GetChatLanguage(chatID)
-	if err != nil {
-		gologging.Error(
-			"Failed to get language for " + utils.IntToStr(
-				chatID,
-			) + " Got error " + err.Error(),
-		)
-		lang = config.DefaultLang
-	}
-	return FWithLang(lang, key, values...)
-}
-
-func FWithLang(lang, key string, values ...locales.Arg) string {
-	var val locales.Arg
-	if len(values) > 0 {
-		val = values[0]
-	}
-	return locales.Get(lang, key, val)
-}
-
-func isLogger() (l bool) {
-	var err error
-	l, err = database.IsLoggerEnabled()
-	if err != nil {
-		gologging.Error("Failed to get IsLoggerEnabled, Err: " + err.Error())
-	}
-	return l
 }
 
 func SafeCallbackHandler(

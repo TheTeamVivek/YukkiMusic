@@ -208,7 +208,7 @@ YukkiMusic supports multiple methods for downloading YouTube tracks. You can use
 
 #### `FALLEN_API_KEY`
 - **Type:** String
-- **Description:** API key for the [Fallen API](https://tgmusic.fallenapi.fun/) YouTube downloader service.
+- **Description:** API key for the [Fallen API](https://beta.fallenapi.fun/) YouTube downloader service.
 - **Default:** *(empty)*
 - **How to get:** Message [@FallenApiBot](https://t.me/FallenApiBot) on Telegram
 - **Note:** If using cookies method, you can leave this empty.
@@ -216,7 +216,7 @@ YukkiMusic supports multiple methods for downloading YouTube tracks. You can use
 #### `FALLEN_API_URL`
 - **Type:** String
 - **Description:** Base URL for the Fallen API service.
-- **Default:** `https://tgmusic.fallenapi.fun`
+- **Default:** `https://beta.fallenapi.fun`
 
 ---
 #### `YOUTUBIFY_API_KEY`
@@ -305,7 +305,7 @@ COOKIES_LINK=https://batbin.me/paste_id1 https://batbin.me/paste_id2
 
 # Fallen API Downloader
 FALLEN_API_KEY=your_api_key_here
-FALLEN_API_URL=https://tgmusic.fallenapi.fun
+FALLEN_API_URL=https://beta.fallenapi.fun
 
 # Youtubify API Downloader
 YOUTUBIFY_API_URL=https://youtubify.me

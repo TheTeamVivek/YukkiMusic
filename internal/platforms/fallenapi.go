@@ -129,7 +129,7 @@ func (f *FallenApiPlatform) getDownloadURL(
 	mediaURL string,
 ) (string, error) {
 	apiReqURL := fmt.Sprintf(
-		"%s/track?api_key=%s&url=%s",
+		"%s/api/track?api_key=%s&url=%s",
 		config.FallenAPIURL,
 		config.FallenAPIKey,
 		url.QueryEscape(mediaURL),
