@@ -8,8 +8,8 @@
   <a href="https://go.dev/">
     <img src="https://img.shields.io/badge/Go-1.25-00ADD8?style=for-the-badge&logo=go&labelColor=000000&logoColor=white" alt="Go Version">
   </a>
-  <a href="https://github.com/TheTeamVivek/YukkiMusic/releases/tag/v2.0">
-    <img src="https://img.shields.io/badge/Version-v2.0-FF9800?style=for-the-badge&logo=semver&labelColor=000000&logoColor=white" alt="Version">
+  <a href="https://github.com/TheTeamVivek/YukkiMusic/releases/tag/v3.0">
+    <img src="https://img.shields.io/badge/Version-v3.0-FF9800?style=for-the-badge&logo=semver&labelColor=000000&logoColor=white" alt="Version">
   </a>
   <a href="../LICENSE">
     <img src="https://img.shields.io/badge/License-GPLv3-FF3860?style=for-the-badge&logo=gnu&labelColor=000000&logoColor=white" alt="License: GPLv3">
