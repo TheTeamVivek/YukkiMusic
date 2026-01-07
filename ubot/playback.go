@@ -22,7 +22,6 @@ func (ctx *Context) Play(
 	chatID int64,
 	mediaDescription ntgcalls.MediaDescription,
 ) error {
-  
 	if ctx.binding.Calls()[chatID] != nil {
 		return ctx.binding.SetStreamSources(
 			chatID,
@@ -30,37 +29,36 @@ func (ctx *Context) Play(
 			mediaDescription,
 		)
 	}
-	
+
 	err := ctx.connectCall(chatID, mediaDescription, "")
 	if err != nil {
 		return err
 	}
-	
+
 	if chatID < 0 {
-	  
+
 		err = ctx.joinPresentation(chatID, mediaDescription.Screen != nil)
 		if err != nil {
 			return err
 		}
 		return ctx.updateSources(chatID)
-		
+
 	}
 	return nil
 }
-
 
 func (ctx *Context) Record(
 	chatID int64,
 	mediaDescription ntgcalls.MediaDescription,
 ) error {
-  if ctx.binding.Calls()[chatID] != nil {
-    return ctx.binding.SetStreamSources(
-      chatID,
-      ntgcalls.PlaybackStream,
-      mediaDescription,
-    )
-  }
-  
+	if ctx.binding.Calls()[chatID] != nil {
+		return ctx.binding.SetStreamSources(
+			chatID,
+			ntgcalls.PlaybackStream,
+			mediaDescription,
+		)
+	}
+
 	return ctx.Play(chatID, ntgcalls.MediaDescription{})
 }
 
@@ -85,17 +83,14 @@ func (ctx *Context) Stop(chatID int64) error {
 	ctx.inputGroupCallsMutex.RLock()
 	inputGroupCall, ok := ctx.inputGroupCalls[chatID]
 	ctx.inputGroupCallsMutex.RUnlock()
-	
-	if !ok { return nil }
-	
+
+	if !ok {
+		return nil
+	}
+
 	_, err = ctx.app.PhoneLeaveGroupCall(inputGroupCall, 0)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-
-
-
-
-
