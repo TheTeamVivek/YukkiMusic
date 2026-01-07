@@ -18,21 +18,20 @@ func (ctx *Context) Stop(chatId any) error {
 	delete(ctx.callSources, parsedChatId)
 	ctx.callSourcesMutex.Unlock()
 
-	stopErr := ctx.binding.Stop(parsedChatId)
+	err := ctx.binding.Stop(parsedChatId)
+
+	if err != nil {
+		return err
+	}
 
 	ctx.inputGroupCallsMutex.RLock()
 	inputGroupCall, ok := ctx.inputGroupCalls[parsedChatId]
 	ctx.inputGroupCallsMutex.RUnlock()
 
-	if !ok {
-		return stopErr
-	}
-	_, leaveErr := ctx.app.PhoneLeaveGroupCall(inputGroupCall, 0)
-	if stopErr != nil {
-		return stopErr
-	}
-	if leaveErr != nil {
-		return leaveErr
+	_, err = ctx.app.PhoneLeaveGroupCall(inputGroupCall, 0)
+
+	if err != nil {
+		return err
 	}
 	return nil
 }
