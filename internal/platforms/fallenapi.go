@@ -24,8 +24,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
-        "net/url"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -132,7 +132,7 @@ func (f *FallenApiPlatform) getDownloadURL(
 		"%s/api/track?api_key=%s&url=%s",
 		config.FallenAPIURL,
 		config.FallenAPIKey,
-                url.QueryEscape(mediaURL),
+		url.QueryEscape(mediaURL),
 	)
 
 	client := resty.New()

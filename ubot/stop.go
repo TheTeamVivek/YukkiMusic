@@ -19,7 +19,6 @@ func (ctx *Context) Stop(chatId any) error {
 	ctx.callSourcesMutex.Unlock()
 
 	err := ctx.binding.Stop(parsedChatId)
-
 	if err != nil {
 		return err
 	}
@@ -29,7 +28,6 @@ func (ctx *Context) Stop(chatId any) error {
 	ctx.inputGroupCallsMutex.RUnlock()
 
 	_, err = ctx.app.PhoneLeaveGroupCall(inputGroupCall, 0)
-
 	if err != nil {
 		return err
 	}

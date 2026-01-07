@@ -48,9 +48,9 @@ var (
 // =============================================================================
 
 type ChatState struct {
-	mu         *sync.RWMutex
-	ChatID     int64
-	Assistant  *Assistant
+	mu        *sync.RWMutex
+	ChatID    int64
+	Assistant *Assistant
 
 	isPresent  *bool
 	isBanned   *bool
@@ -423,7 +423,6 @@ func (s *ChatState) ensureAssistant() (*Assistant, error) {
 func (s *ChatState) fetchInviteLink() error {
 	inv, err := Bot.GetChatInviteLink(s.ChatID,
 		&telegram.InviteLinkOptions{RequestNeeded: false})
-
 	if err != nil {
 		if s.isAdminError(err) {
 			return ErrAdminPermissionRequired
