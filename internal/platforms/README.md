@@ -238,7 +238,7 @@ Premium API for YouTube downloads (audio only).
 
 **Configuration**:
 ```bash
-FALLEN_API_URL=https://tgmusic.fallenapi.fun
+FALLEN_API_URL=https://beta.fallenapi.fun
 FALLEN_API_KEY=your_key_here
 ```
 

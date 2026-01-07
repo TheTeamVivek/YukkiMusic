@@ -32,13 +32,13 @@
             "required": true
         },
         "FALLEN_API_KEY": {
-            "description": "API key for Fallen API (optional). You can get one from @FallenApiBot or https://tgmusic.fallenapi.fun/. If you are using cookies, you can leave this empty.",
+            "description": "API key for Fallen API (optional). You can get one from @FallenApiBot or https://beta.fallenapi.fun/. If you are using cookies, you can leave this empty.",
             "value": "",
             "required": false
         },
         "FALLEN_API_URL": {
-            "description": "Base URL for the Fallen API. For more info, visit @FallenApiBot or https://tgmusic.fallenapi.fun/.",
-            "value": "https://tgmusic.fallenapi.fun",
+            "description": "Base URL for the Fallen API. For more info, visit @FallenApiBot or https://beta.fallenapi.fun/.",
+            "value": "https://beta.fallenapi.fun",
             "required": false
         },
         "OWNER_ID": {

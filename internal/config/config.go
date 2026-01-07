@@ -60,7 +60,7 @@ var (
 		"e8d7847ccdf545b9ac5051d2c456c5d2",
 	)
 
-	FallenAPIURL = getString("FALLEN_API_URL", "https://tgmusic.fallenapi.fun")
+	FallenAPIURL = getString("FALLEN_API_URL", "https://beta.fallenapi.fun")
 	FallenAPIKey = getString("FALLEN_API_KEY")
 
 	YoutubifyApiURL = getString("YOUTUBIFY_API_URL", "https://youtubify.me")
