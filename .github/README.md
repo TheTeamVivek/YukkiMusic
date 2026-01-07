@@ -25,48 +25,6 @@
 
 ---
 
-## ✨ Features
-
-### 🎵 Music Playback
-- **YouTube Integration** - Search and stream YouTube videos directly
-- **Telegram Media** - Play audio/video files shared in Telegram
-- **Speed Control** - Adjust playback speed (0.5x - 4.0x)
-- **Quality Streaming** - High-quality audio output with adaptive bitrates
-
-### 🎮 Playback Control
-- ▶️ Play / Resume / Pause
-- ⏭️ Skip / Jump to position
-- 🔁 Loop current track / Replay
-- 🔀 Shuffle queue
-- 🔇 Mute / Unmute with auto-resume
-- ⏱️ Seek forward/backward
-
-### 👥 User Management
-- **Admin Controls** - Full playback management for group admins
-- **Auth Users** - Grant non-admin users playback permissions
-- **Multi-Account Support** - Multiple assistant accounts for load balancing
-- **Permission System** - Owner, Sudoers, Admins, Auth Users hierarchy
-
-### 📊 Queue Management
-- Move tracks in queue
-- Remove specific tracks
-- Clear entire queue
-- View queue with pagination
-
-### 🌍 Localization
-- **Multi-Language Support** - English, Hindi, and more
-- **Per-Chat Language Settings** - Different languages for different groups
-- User-friendly messages in preferred language
-
-### 🔐 Advanced Features
-- **Maintenance Mode** - Temporarily disable bot with custom message
-- **Auto-Leave** - Automatically leave inactive chats
-- **Broadcast** - Send messages to all users/chats at once
-- **Logger Channel** - Log all bot activities and errors
-- **Channel Play** - Stream to linked channels with separate control
-
----
-
 ## 🚀 Quick Start
 
 
