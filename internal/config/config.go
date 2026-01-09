@@ -41,15 +41,16 @@ var (
 	ApiID          = int32(getInt64("API_ID"))
 	ApiHash        = getString("API_HASH")
 	Token          = getString("TOKEN")
+	LoggerID       = getInt64("LOGGER_ID")
 	MongoURI       = getString("MONGO_DB_URI")
 	StringSessions = getStringSlice("STRING_SESSIONS")
 	SessionType    = getString(
 		"SESSION_TYPE",
 		"pyrogram",
 	) // pyrogram, telethon, gogram
+	
 	// Optional Vars
 	OwnerID  = getInt64("OWNER_ID")
-	LoggerID = getInt64("LOGGER_ID")
 
 	SpotifyClientID = getString(
 		"SPOTIFY_CLIENT_ID",
@@ -121,6 +122,10 @@ func validateRequired() {
 
 	if ApiHash == "" {
 		logger.Fatal("API_HASH is required but missing!")
+	}
+	
+	if LoggerID == "" {
+		logger.Fatal("LOGGER_ID is required but missing!")
 	}
 
 	if MongoURI == "" {
@@ -242,8 +247,6 @@ func variants(base string) []string {
 		strings.ToUpper(base),
 		strings.ToLower(base),
 		strings.ReplaceAll(base, "_", ""),
-		cases.Title(language.Und, cases.NoLower).
-			String(strings.ReplaceAll(base, "_", " ")),
 	}
 }
 

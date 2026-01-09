@@ -31,7 +31,7 @@ var adminCache = NewCache[int64, []int64](30 * time.Minute)
 
 // Checks if a user is an admin in a chat
 func IsChatAdmin(c *telegram.Client, chatID, userID int64) (bool, error) {
-	if chatID == userID { // chat anon admin
+	if chatID == userID { // chat anon admin or pvt chat
 		return true, nil
 	}
 

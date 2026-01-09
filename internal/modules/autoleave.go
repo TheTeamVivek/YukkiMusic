@@ -164,14 +164,18 @@ func autoLeaveAssistant(
 		if d.IsUser() {
 			return nil
 		}
+		var chatID int64
+		
+		switch p := d.Peer.(type) {
+    case *tg.PeerChat:
+      chatID = -p.ChatID
+    case *tg.PeerChannel:
+      chatID = -1000000000000 - p.ChannelID
+    default:
+      return nil
+    }
 
-		chatID, err := utils.GetPeerID(ass.Client, d.Peer)
-		if err != nil {
-			gologging.Error("[Autoleave] Peer error: " + err.Error())
-			return nil
-		}
-
-		if chatID == 0 || chatID == config.LoggerID {
+		if chatID == 0 || chatID == config.LoggerID || d.GetID() == config.LoggerID {
 			return nil
 		}
 

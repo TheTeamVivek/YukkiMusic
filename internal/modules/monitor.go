@@ -60,12 +60,6 @@ func MonitorRooms() {
 					return
 				}
 				if !r.IsActiveChat() {
-					// recheck after delay before deleting
-					time.Sleep(7 * time.Second)
-					if r2, ok2 := core.GetRoom(id, ass); ok2 &&
-						!r2.IsActiveChat() {
-						core.DeleteRoom(id)
-					}
 					return
 				}
 
