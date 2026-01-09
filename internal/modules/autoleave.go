@@ -165,17 +165,18 @@ func autoLeaveAssistant(
 			return nil
 		}
 		var chatID int64
-		
-		switch p := d.Peer.(type) {
-    case *tg.PeerChat:
-      chatID = -p.ChatID
-    case *tg.PeerChannel:
-      chatID = -1000000000000 - p.ChannelID
-    default:
-      return nil
-    }
 
-		if chatID == 0 || chatID == config.LoggerID || d.GetID() == config.LoggerID {
+		switch p := d.Peer.(type) {
+		case *tg.PeerChat:
+			chatID = -p.ChatID
+		case *tg.PeerChannel:
+			chatID = -1000000000000 - p.ChannelID
+		default:
+			return nil
+		}
+
+		if chatID == 0 || chatID == config.LoggerID ||
+			d.GetID() == config.LoggerID {
 			return nil
 		}
 

@@ -29,8 +29,6 @@ import (
 
 	"github.com/Laky-64/gologging"
 	_ "github.com/joho/godotenv/autoload"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 var (
@@ -48,9 +46,9 @@ var (
 		"SESSION_TYPE",
 		"pyrogram",
 	) // pyrogram, telethon, gogram
-	
+
 	// Optional Vars
-	OwnerID  = getInt64("OWNER_ID")
+	OwnerID = getInt64("OWNER_ID")
 
 	SpotifyClientID = getString(
 		"SPOTIFY_CLIENT_ID",
@@ -123,7 +121,7 @@ func validateRequired() {
 	if ApiHash == "" {
 		logger.Fatal("API_HASH is required but missing!")
 	}
-	
+
 	if LoggerID == "" {
 		logger.Fatal("LOGGER_ID is required but missing!")
 	}
