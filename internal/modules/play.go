@@ -729,7 +729,7 @@ func playTrackWithRetry(
 			return telegram.ErrEndGroup
 		}
 		
-		if if strings.Contains(err.Error(), "group call") &&
+		if strings.Contains(err.Error(), "group call") &&
        strings.Contains(err.Error(), "is closed") {
       utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_no_active_voicechat"))
 		return telegram.ErrEndGroup
