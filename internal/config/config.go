@@ -122,7 +122,7 @@ func validateRequired() {
 		logger.Fatal("API_HASH is required but missing!")
 	}
 
-	if LoggerID == "" {
+	if LoggerID == 0 {
 		logger.Fatal("LOGGER_ID is required but missing!")
 	}
 
