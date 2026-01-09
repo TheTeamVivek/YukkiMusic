@@ -82,7 +82,7 @@ func Init(
 				fmt.Sprintf("Assistant %d Started", i+1),
 			)
 		}
-
+		client.SendMessage(BUser.Username, "/start")
 		gologging.InfoF("assistant[%d] ready: %s", i, user.FirstName)
 	}
 

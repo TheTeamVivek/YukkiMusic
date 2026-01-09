@@ -42,6 +42,15 @@ These variables **must** be set for the bot to function properly.
   2. Send `/newbot` and follow the instructions
   3. Copy the token provided
 
+#### `LOGGER_ID`
+- **Type:** Integer (int64)
+- **Description:** Chat ID where the bot sends error logs and important events.
+- **Example:** `-1001234567890` (for groups/channels)
+- **How to get:**
+  1. Add [@MissRose_bot](https://t.me/MissRose_bot) to your group/channel
+  2. Send `/id` to get the chat ID
+- **Note:** Logs include errors, bug reports, and system events.
+
 ### `MONGO_DB_URI`
 - **Type:** String
 - **Description:** MongoDB connection string for database storage.
@@ -82,15 +91,6 @@ These variables are optional but recommended for enhanced functionality.
   1. Message [@userinfobot](https://t.me/userinfobot) on Telegram
   2. Copy your User ID
 - **Permissions:** Full access to all bot commands and features.
-
-#### `LOGGER_ID`
-- **Type:** Integer (int64)
-- **Description:** Chat ID where the bot sends error logs and important events.
-- **Example:** `-1001234567890` (for groups/channels)
-- **How to get:**
-  1. Add [@MissRose_bot](https://t.me/MissRose_bot) to your group/channel
-  2. Send `/id` to get the chat ID
-- **Note:** Logs include errors, bug reports, and system events.
 
 ---
 
@@ -155,7 +155,26 @@ These variables are optional but recommended for enhanced functionality.
 - **Example:** `DEFAULT_LANG=hi`
 
 ---
+## 🎵 Spotify Configuration
 
+These variables are used to enable Spotify link support (tracks, playlists, albums).
+Spotify is used **only for metadata** (title, artist, duration). Audio is still played from YouTube or other sources.
+
+If these variables are not set, **Spotify links will not work**, but the bot will run normally.
+
+### SPOTIFY_CLIENT_ID
+- Type: String
+- Required: No (only needed for Spotify support)
+- Description: Spotify API Client ID from the Spotify Developer Dashboard.
+- Example:
+  SPOTIFY_CLIENT_ID=your_spotify_client_id_here
+
+### SPOTIFY_CLIENT_SECRET
+- Type: String
+- Required: No (only needed for Spotify support)
+- Description: Spotify API Client Secret from the Spotify Developer Dashboard.
+- Example:
+  SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
 ### Customization
 
 #### `START_IMG_URL`
@@ -263,18 +282,18 @@ Some variables support **multiple values** separated by:
 # ==========================================
 # REQUIRED VARIABLES
 # ==========================================
-API_ID=12345678
-API_HASH=abcdef1234567890abcdef1234567890
-TOKEN=1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
-MONGO_DB_URI=mongodb://localhost:27017/YukkiMusic
-STRING_SESSIONS=session_string_1 session_string_2
-SESSION_TYPE=pyrogram
+API_ID=
+API_HASH=
+TOKEN=                # or BOT_TOKEN
+LOGGER_ID=
+MONGO_DB_URI=
+STRING_SESSIONS=      # space / comma / semicolon separated
+SESSION_TYPE=pyrogram # pyrogram | telethon | gogram
 
 # ==========================================
 # OPTIONAL - OWNERSHIP
 # ==========================================
-OWNER_ID=123456789
-LOGGER_ID=-1001234567890
+OWNER_ID=
 
 # ==========================================
 # OPTIONAL - LIMITS & RESTRICTIONS
@@ -293,24 +312,31 @@ DEFAULT_LANG=en
 # ==========================================
 # OPTIONAL - CUSTOMIZATION
 # ==========================================
-START_IMG_URL=https://example.com/start-image.png
-PING_IMG_URL=https://example.com/ping-image.png
-SUPPORT_CHAT=https://t.me/YourSupportGroup
-SUPPORT_CHANNEL=https://t.me/YourChannel
+START_IMG_URL=https://raw.githubusercontent.com/Vivekkumar-IN/assets/master/images.png
+PING_IMG_URL=https://telegra.ph/file/91533956c91d0fd7c9f20.jpg
+SUPPORT_CHAT=https://t.me/TheTeamVk
+SUPPORT_CHANNEL=https://t.me/TheTeamVivek
 
 # ==========================================
-# OPTIONAL - YOUTUBE DOWNLOADS
+# OPTIONAL - SPOTIFY (METADATA ONLY)
 # ==========================================
-COOKIES_LINK=https://batbin.me/paste_id1 https://batbin.me/paste_id2
+SPOTIFY_CLIENT_ID=
+SPOTIFY_CLIENT_SECRET=
+
+# ==========================================
+# OPTIONAL - DOWNLOADERS
+# ==========================================
+
+# YouTube Cookies (yt-dlp)
+COOKIES_LINK=
 
 # Fallen API Downloader
-FALLEN_API_KEY=your_api_key_here
+FALLEN_API_KEY=
 FALLEN_API_URL=https://beta.fallenapi.fun
 
 # Youtubify API Downloader
-YOUTUBIFY_API_URL=https://youtubify.me
-YOUTUBIFY_API_KEY=your_api_key_here
-```
+YOUTUBIFY_API_KEY=
+YOUTUBIFY_API_URL=https://youtubify.me```
 
 ---
 
@@ -326,7 +352,7 @@ The configuration system follows this priority order:
 
 The loader automatically tries multiple variants of each variable name:
 ```
-API_ID → api_id → apiid → Api Id
+API_ID → api_id → apiid
 ```
 
 This means you can use any of these naming styles, and the bot will find it.
