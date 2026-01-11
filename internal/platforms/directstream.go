@@ -93,17 +93,12 @@ func (d *DirectStreamPlatform) IsValid(query string) bool {
 		return false
 	}
 
-	// Quick check: does it look like a stream URL?
-	if !d.looksLikeStream(query) {
-		return false
+	if d.looksLikeStream(query) {
+		return true
 	}
 
-	// Validate by making HEAD request
 	_, err = d.validateStream(query)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func (d *DirectStreamPlatform) GetTracks(

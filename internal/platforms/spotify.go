@@ -93,7 +93,7 @@ func (s *SpotifyPlatform) GetTracks(
 ) ([]*state.Track, error) {
 	if config.SpotifyClientID == "" || config.SpotifyClientSecret == "" {
 		return nil, errors.New(
-			"Spotify client credentials not configured. Set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET",
+			"spotify client credentials not configured. Set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET",
 		)
 	}
 

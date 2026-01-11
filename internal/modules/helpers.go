@@ -54,7 +54,7 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	}
 	ass, err := core.Assistants.ForChat(chatID)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get assistant for you chat: %w", err)
+		return nil, fmt.Errorf("failed to get assistant for you chat: %w", err)
 	}
 	r, _ := core.GetRoom(chatID, ass, true)
 	return r, nil
@@ -214,7 +214,8 @@ func SafeCallbackHandler(
 		defer func() {
 			if r := recover(); r != nil {
 				handlePanic(r, cb, true)
-				err = fmt.Errorf("Some panics handled")
+				// err = fmt.Errorf("some panics handled")
+				err = tg.ErrEndGroup
 			}
 		}()
 		err = handler(cb)

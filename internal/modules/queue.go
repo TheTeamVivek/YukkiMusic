@@ -26,7 +26,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/amarnathcjd/gogram/telegram"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/locales"
@@ -117,35 +116,35 @@ This action cannot be undone. Use <code>/remove</code> for selective removal.`
 • Cannot move currently playing track`
 }
 
-func queueHandler(m *telegram.NewMessage) error {
+func queueHandler(m *tg.NewMessage) error {
 	return handleQueue(m, false)
 }
 
-func cqueueHandler(m *telegram.NewMessage) error {
+func cqueueHandler(m *tg.NewMessage) error {
 	return handleQueue(m, true)
 }
 
-func removeHandler(m *telegram.NewMessage) error {
+func removeHandler(m *tg.NewMessage) error {
 	return handleRemove(m, false)
 }
 
-func cremoveHandler(m *telegram.NewMessage) error {
+func cremoveHandler(m *tg.NewMessage) error {
 	return handleRemove(m, true)
 }
 
-func moveHandler(m *telegram.NewMessage) error {
+func moveHandler(m *tg.NewMessage) error {
 	return handleMove(m, false)
 }
 
-func cmoveHandler(m *telegram.NewMessage) error {
+func cmoveHandler(m *tg.NewMessage) error {
 	return handleMove(m, true)
 }
 
-func clearHandler(m *telegram.NewMessage) error {
+func clearHandler(m *tg.NewMessage) error {
 	return handleClear(m, false)
 }
 
-func cclearHandler(m *telegram.NewMessage) error {
+func cclearHandler(m *tg.NewMessage) error {
 	return handleClear(m, true)
 }
 

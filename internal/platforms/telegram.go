@@ -83,7 +83,7 @@ func (t *TelegramPlatform) GetTracks(
 ) ([]*state.Track, error) {
 	if !telegramLinkRegex.MatchString(query) {
 		return nil, fmt.Errorf(
-			"Provide a valid Telegram link (e.g., https://t.me/channel/12345).",
+			"provide a valid Telegram link (e.g., https://t.me/channel/12345)",
 		)
 	}
 
@@ -155,7 +155,7 @@ func (t *TelegramPlatform) GetTracksByMessage(
 	file := rmsg.File
 	if file == nil || file.FileID == "" {
 		return nil, fmt.Errorf(
-			"⚠️ Oops! This <a href=\"%s\">message</> doesn't contain any media.",
+			"⚠️ Oops! This <a href=\"%s\">message</> doesn't contain any media",
 			rmsg.Link(),
 		)
 	}

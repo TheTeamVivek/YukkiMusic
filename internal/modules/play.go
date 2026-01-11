@@ -30,7 +30,6 @@ import (
 	"time"
 
 	"github.com/Laky-64/gologging"
-	"github.com/amarnathcjd/gogram/telegram"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
@@ -163,40 +162,40 @@ All c* commands work the same as regular commands but affect the linked channel.
 	helpTexts["/cvplay"] = helpTexts["/vcplay"]
 }
 
-func channelPlayHandler(m *telegram.NewMessage) error {
+func channelPlayHandler(m *tg.NewMessage) error {
 	m.Reply(F(m.ChannelID(), "channel_play_depreciated"))
-	return telegram.ErrEndGroup
+	return tg.ErrEndGroup
 }
 
-func playHandler(m *telegram.NewMessage) error {
+func playHandler(m *tg.NewMessage) error {
 	return handlePlay(m, &playOpts{})
 }
 
-func fplayHandler(m *telegram.NewMessage) error {
+func fplayHandler(m *tg.NewMessage) error {
 	return handlePlay(m, &playOpts{Force: true})
 }
 
-func cfplayHandler(m *telegram.NewMessage) error {
+func cfplayHandler(m *tg.NewMessage) error {
 	return handlePlay(m, &playOpts{Force: true, CPlay: true})
 }
 
-func vplayHandler(m *telegram.NewMessage) error {
+func vplayHandler(m *tg.NewMessage) error {
 	return handlePlay(m, &playOpts{Video: true})
 }
 
-func fvplayHandler(m *telegram.NewMessage) error {
+func fvplayHandler(m *tg.NewMessage) error {
 	return handlePlay(m, &playOpts{Force: true, Video: true})
 }
 
-func vcplayHandler(m *telegram.NewMessage) error {
+func vcplayHandler(m *tg.NewMessage) error {
 	return handlePlay(m, &playOpts{CPlay: true, Video: true})
 }
 
-func fvcplayHandler(m *telegram.NewMessage) error {
+func fvcplayHandler(m *tg.NewMessage) error {
 	return handlePlay(m, &playOpts{Force: true, CPlay: true, Video: true})
 }
 
-func cplayHandler(m *telegram.NewMessage) error {
+func cplayHandler(m *tg.NewMessage) error {
 	args := strings.Fields(m.Text())
 	chatID := m.ChannelID()
 
@@ -204,9 +203,9 @@ func cplayHandler(m *telegram.NewMessage) error {
 		if len(args) < 3 {
 			m.Reply(
 				F(chatID, "cplay_usage"),
-				&telegram.SendOptions{ParseMode: "HTML"},
+				&tg.SendOptions{ParseMode: "HTML"},
 			)
-			return telegram.ErrEndGroup
+			return tg.ErrEndGroup
 		}
 
 		cplayIDStr := args[2]
@@ -214,31 +213,31 @@ func cplayHandler(m *telegram.NewMessage) error {
 		if err != nil {
 			m.Reply(
 				F(chatID, "cplay_invalid_chat_id"),
-				&telegram.SendOptions{ParseMode: "HTML"},
+				&tg.SendOptions{ParseMode: "HTML"},
 			)
-			return telegram.ErrEndGroup
+			return tg.ErrEndGroup
 		}
 
 		peer, err := m.Client.ResolvePeer(cplayID)
 		if err != nil {
 			m.Reply(
 				F(chatID, "cplay_resolve_peer_fail"),
-				&telegram.SendOptions{ParseMode: "HTML"},
+				&tg.SendOptions{ParseMode: "HTML"},
 			)
-			return telegram.ErrEndGroup
+			return tg.ErrEndGroup
 		}
 
-		chPeer, ok := peer.(*telegram.InputPeerChannel)
+		chPeer, ok := peer.(*tg.InputPeerChannel)
 		if !ok {
 			m.Reply(
 				F(chatID, "cplay_invalid_target"),
-				&telegram.SendOptions{ParseMode: "HTML"},
+				&tg.SendOptions{ParseMode: "HTML"},
 			)
-			return telegram.ErrEndGroup
+			return tg.ErrEndGroup
 		}
 
 		fullChat, err := m.Client.ChannelsGetFullChannel(
-			&telegram.InputChannelObj{
+			&tg.InputChannelObj{
 				ChannelID:  chPeer.ChannelID,
 				AccessHash: chPeer.AccessHash,
 			},
@@ -250,9 +249,9 @@ func cplayHandler(m *telegram.NewMessage) error {
 			)
 			m.Reply(
 				F(chatID, "cplay_channel_not_accessible"),
-				&telegram.SendOptions{ParseMode: "HTML"},
+				&tg.SendOptions{ParseMode: "HTML"},
 			)
-			return telegram.ErrEndGroup
+			return tg.ErrEndGroup
 		}
 
 		if err := database.SetCPlayID(m.ChannelID(), cplayID); err != nil {
@@ -262,7 +261,7 @@ func cplayHandler(m *telegram.NewMessage) error {
 			)
 			m.Reply(
 				F(chatID, "cplay_save_error"),
-				&telegram.SendOptions{ParseMode: "HTML"},
+				&tg.SendOptions{ParseMode: "HTML"},
 			)
 			return err
 		}
@@ -271,19 +270,19 @@ func cplayHandler(m *telegram.NewMessage) error {
 			F(chatID, "cplay_enabled", locales.Arg{
 				"channel_id": cplayID,
 			}),
-			&telegram.SendOptions{ParseMode: "HTML"},
+			&tg.SendOptions{ParseMode: "HTML"},
 		)
-		return telegram.ErrEndGroup
+		return tg.ErrEndGroup
 	}
 	return handlePlay(m, &playOpts{CPlay: true})
 }
 
-func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
+func handlePlay(m *tg.NewMessage, opts *playOpts) error {
 	mention := utils.MentionHTML(m.Sender)
 
 	r, replyMsg, err := prepareRoomAndSearchMessage(m, opts.CPlay)
 	if err != nil {
-		return telegram.ErrEndGroup
+		return tg.ErrEndGroup
 	}
 
 	tracks, isActive, err := fetchTracksAndCheckStatus(
@@ -293,12 +292,12 @@ func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
 		opts.Video,
 	)
 	if err != nil {
-		return telegram.ErrEndGroup
+		return tg.ErrEndGroup
 	}
 
 	tracks, availableSlots, err := filterAndTrimTracks(replyMsg, r, tracks)
 	if err != nil {
-		return telegram.ErrEndGroup
+		return tg.ErrEndGroup
 	}
 
 	if err := playTracksAndRespond(
@@ -308,13 +307,13 @@ func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
 		return err
 	}
 
-	return telegram.ErrEndGroup
+	return tg.ErrEndGroup
 }
 
 func prepareRoomAndSearchMessage(
-	m *telegram.NewMessage,
+	m *tg.NewMessage,
 	cplay bool,
-) (*core.RoomState, *telegram.NewMessage, error) {
+) (*core.RoomState, *tg.NewMessage, error) {
 	r, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
@@ -365,8 +364,8 @@ func prepareRoomAndSearchMessage(
 }
 
 func fetchTracksAndCheckStatus(
-	m *telegram.NewMessage,
-	replyMsg *telegram.NewMessage,
+	m *tg.NewMessage,
+	replyMsg *tg.NewMessage,
 	r *core.RoomState,
 	video bool,
 ) ([]*state.Track, bool, error) {
@@ -437,7 +436,7 @@ func fetchTracksAndCheckStatus(
 }
 
 func filterAndTrimTracks(
-	replyMsg *telegram.NewMessage,
+	replyMsg *tg.NewMessage,
 	r *core.RoomState,
 	tracks []*state.Track,
 ) ([]*state.Track, int, error) {
@@ -525,8 +524,8 @@ func filterAndTrimTracks(
 }
 
 func playTracksAndRespond(
-	m *telegram.NewMessage,
-	replyMsg *telegram.NewMessage,
+	m *tg.NewMessage,
+	replyMsg *tg.NewMessage,
 	r *core.RoomState,
 	tracks []*state.Track,
 	mention string,
@@ -542,9 +541,9 @@ func playTracksAndRespond(
 
 		// Download first track if needed
 		if i == 0 && (!isActive || force) {
-			var opt *telegram.SendOptions
+			var opt *tg.SendOptions
 			if track.Duration > 420 {
-				opt = &telegram.SendOptions{
+				opt = &tg.SendOptions{
 					ReplyMarkup: core.GetCancelKeyboard(chatID),
 				}
 			}
@@ -578,7 +577,7 @@ func playTracksAndRespond(
 						"error": html.EscapeString(err.Error()),
 					}))
 				}
-				return telegram.ErrEndGroup
+				return tg.ErrEndGroup
 			}
 
 			filePath = path
@@ -600,7 +599,7 @@ func playTracksAndRespond(
 		title := html.EscapeString(utils.ShortTitle(mainTrack.Title, 25))
 		btn := core.GetPlayMarkup(chatID, r, false)
 
-		var opt telegram.SendOptions
+		var opt tg.SendOptions
 		opt.ParseMode = "HTML"
 		opt.ReplyMarkup = btn
 
@@ -647,7 +646,7 @@ func playTracksAndRespond(
 		if len(tracks) == 1 {
 			title := html.EscapeString(utils.ShortTitle(mainTrack.Title, 25))
 			btn := core.GetPlayMarkup(chatID, r, true)
-			opt := &telegram.SendOptions{
+			opt := &tg.SendOptions{
 				ParseMode:   "HTML",
 				ReplyMarkup: btn,
 			}
@@ -662,7 +661,7 @@ func playTracksAndRespond(
 				"by":       mention,
 			})
 
-			replyMsg, _ = utils.EOR(replyMsg, addedText, opt)
+			utils.EOR(replyMsg, addedText, opt)
 		} else {
 			var b strings.Builder
 			b.WriteString(F(chatID, "play_added_multiple_header", locales.Arg{
@@ -689,7 +688,7 @@ func playTrackWithRetry(
 	track *state.Track,
 	filePath string,
 	force bool,
-	replyMsg *telegram.NewMessage,
+	replyMsg *tg.NewMessage,
 ) error {
 	for attempt := 1; attempt <= playMaxRetries; attempt++ {
 		err := r.Play(track, filePath, force)
@@ -705,7 +704,7 @@ func playTrackWithRetry(
 		}
 
 		// FloodWait
-		if wait := telegram.GetFloodWait(err); wait > 0 {
+		if wait := tg.GetFloodWait(err); wait > 0 {
 			gologging.Error(
 				"FloodWait detected (" + strconv.Itoa(
 					wait,
@@ -726,7 +725,7 @@ func playTrackWithRetry(
 				F(replyMsg.ChannelID(), "rtmp_streaming_not_supported"),
 			)
 			r.Destroy()
-			return telegram.ErrEndGroup
+			return tg.ErrEndGroup
 		}
 
 		if strings.Contains(err.Error(), "group call") &&
@@ -735,14 +734,14 @@ func playTrackWithRetry(
 				replyMsg,
 				F(replyMsg.ChannelID(), "err_no_active_voicechat"),
 			)
-			return telegram.ErrEndGroup
+			return tg.ErrEndGroup
 		}
 
 		if tg.MatchError(err, "GROUPCALL_INVALID") {
 			gologging.Error("GROUPCALL_INVALID err occurred. Returning...")
 			r.Destroy()
 			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_unable"))
-			return telegram.ErrEndGroup
+			return tg.ErrEndGroup
 		}
 
 		// INTERDC_X_CALL_ERROR → retry
@@ -848,7 +847,7 @@ func getErrorMessage(chatID int64, err error) string {
 // the debug trace to the logger and the owner.
 
 func safeGetTracks(
-	m, replyMsg *telegram.NewMessage,
+	m, replyMsg *tg.NewMessage,
 	chatID int64,
 	video bool,
 ) (tracks []*state.Track, err error) {
@@ -866,7 +865,7 @@ func safeGetTracks(
 func safeDownload(
 	ctx context.Context,
 	track *state.Track,
-	replyMsg *telegram.NewMessage,
+	replyMsg *tg.NewMessage,
 	chatID int64,
 ) (path string, err error) {
 	defer func() {

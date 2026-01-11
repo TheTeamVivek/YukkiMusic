@@ -123,7 +123,16 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 			gologging.Debug("Found platform: " + string(platform.Name()))
 
 			tracks, err := platform.GetTracks(url, video)
+			// ytdlp didn't support or unable to extract, skip silently
 			if err != nil {
+
+				if strings.Contains(
+					err.Error(),
+					"failed to extract metadata: metadata extraction failed",
+				) {
+					continue
+				}
+
 				errMsg := string(platform.Name()) + ": " + err.Error()
 				gologging.Error(errMsg)
 				errorsL = append(errorsL, errMsg)
@@ -141,7 +150,7 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 		}
 
 		if len(errorsL) == 0 {
-			return nil, errors.New("No supported platform for given URL(s)")
+			return nil, errors.New("no supported platform for given URL(s)")
 		}
 		return nil, formatErrors(errorsL)
 

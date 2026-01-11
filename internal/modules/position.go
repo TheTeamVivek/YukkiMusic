@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"html"
 
-	"github.com/amarnathcjd/gogram/telegram"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/locales"
@@ -47,11 +46,11 @@ func init() {
 Quick position check without full queue display.`
 }
 
-func positionHandler(m *telegram.NewMessage) error {
+func positionHandler(m *tg.NewMessage) error {
 	return handlePosition(m, false)
 }
 
-func cpositionHandler(m *telegram.NewMessage) error {
+func cpositionHandler(m *tg.NewMessage) error {
 	return handlePosition(m, true)
 }
 

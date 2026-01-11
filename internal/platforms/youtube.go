@@ -197,7 +197,7 @@ func (yp *YouTubePlatform) VideoSearch(
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
-					err = fmt.Errorf("Search failed: %v", r)
+					err = fmt.Errorf("search failed: %v", r)
 				}
 			}()
 			search := ytsearch.VideoSearch(query)

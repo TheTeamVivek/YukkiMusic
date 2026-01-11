@@ -32,7 +32,7 @@ func (r *RoomState) NextTrack() *state.Track {
 	r.Lock()
 	defer r.Unlock()
 
-	if r.shouldLoopCurrentTrack() {
+	if r.track != nil && r.loop > 0 {
 		return r.loopCurrentTrack()
 	}
 
@@ -43,10 +43,6 @@ func (r *RoomState) NextTrack() *state.Track {
 	}
 
 	return r.dequeueNextTrack()
-}
-
-func (r *RoomState) shouldLoopCurrentTrack() bool {
-	return r.track != nil && r.loop > 0
 }
 
 func (r *RoomState) loopCurrentTrack() *state.Track {

@@ -562,11 +562,13 @@ func finalizeBroadcast(
 	text := formatBroadcastProgress(stats, true, progressMsg.ChannelID())
 	stats.mu.Unlock()
 
-	if cancelled {
-		text = F(progressMsg.ChannelID(), "broadcast_cancelled_header")
-	} else {
-		text = F(progressMsg.ChannelID(), "broadcast_completed_header")
-	}
+	/*
+		if cancelled {
+			text = F(progressMsg.ChannelID(), "broadcast_cancelled_header")
+		} else {
+			text = F(progressMsg.ChannelID(), "broadcast_completed_header")
+		}
+	*/
 
 	progressMsg.Edit(text)
 }

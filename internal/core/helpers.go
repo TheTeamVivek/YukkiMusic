@@ -27,24 +27,6 @@ import (
 	"main/internal/utils"
 )
 
-func buildAudioFilter(speed float64) string {
-	if speed == 1.0 {
-		return ""
-	}
-	filters := []string{}
-	if speed > 1.0 {
-		remaining := speed
-		for remaining > 2.0+1e-6 {
-			filters = append(filters, "atempo=2.0")
-			remaining /= 2.0
-		}
-		filters = append(filters, fmt.Sprintf("atempo=%.2f", remaining))
-	} else {
-		filters = append(filters, fmt.Sprintf("atempo=%.2f", speed))
-	}
-	return strings.Join(filters, ",")
-}
-
 func normalizeVideo(path string, speed float64) (int, int, int, string) {
 	if speed <= 0 {
 		speed = 1.0
