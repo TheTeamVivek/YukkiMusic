@@ -93,28 +93,7 @@ Output: Streams audio/video directly from Telegram
 
 ---
 
-### 2. **Youtubify API** (Priority: 100)
-**Status**: ✅ Requires API Key
-
-Premium API for YouTube downloads with video support.
-
-**Features**:
-- Fast and stable downloads
-- Video + Audio support
-- API-based access
-- High reliability
-
-**Configuration**:
-```bash
-YOUTUBIFY_API_URL=https://youtubify.me
-YOUTUBIFY_API_KEY=your_key_here
-```
-
-**Notes**: Paid service, requires valid API key
-
----
-
-### 3. **Spotify** (Priority: 95)
+### 2. **Spotify** (Priority: 95)
 **Status**: ✅ Fully Supported
 
 Fetches Spotify metadata and downloads via YouTube fallback.
@@ -145,7 +124,7 @@ SPOTIFY_CLIENT_SECRET=your_client_secret
 
 ---
 
-### 4. **YouTube** (Priority: 90)
+### 3. **YouTube** (Priority: 90)
 **Status**: ✅ Fully Supported
 
 Fetches YouTube video metadata **only** (not download).
@@ -172,44 +151,8 @@ Output: Track metadata (title, duration, thumbnail)
 **Note**: YouTube platform **doesn't download**. Downloads handled by other platforms.
 
 ---
-### 5. **JioSaavn** (Priority: 88)
-**Status**: ✅ Fully Supported
 
-Fetches and downloads tracks from JioSaavn (Indian music streaming service).
-
-```
-Input: JioSaavn track/album/playlist URL
-↓
-Fetch metadata → Decrypt download URL → Download 320kbps audio
-```
-
-**Features**:
-- Track, album, and playlist support
-- 320kbps audio quality downloads
-- Automatic image quality enhancement (500x500)
-- URL decryption using DES ECB cipher
-- 2-hour metadata caching
-
-**When Used**:
-- JioSaavn song links (`jiosaavn.com/song/*/TOKEN`)
-- JioSaavn album links (`jiosaavn.com/album/*/TOKEN`)
-- JioSaavn playlist links (`jiosaavn.com/featured/*/TOKEN`)
-
-**Example URLs**:
-```
-https://www.jiosaavn.com/song/believer/QwB2AzhoA3I
-https://www.jiosaavn.com/album/evolve/Rq47dL29uZo_
-https://www.jiosaavn.com/featured/its-indie-english/AMoxtXyKHoU_
-```
-
-**Notes**: 
-- Audio only, no video support
-- API logic based on [jiosaavn-api](https://github.com/sumitkolhe/jiosaavn-api/) by Sumit Kolhe (MIT License)
-- Works with both `jiosaavn.com` and `saavn.com` domains
-
----
-
-### 6. **SoundCloud** (Priority: 85)
+### 4. **SoundCloud** (Priority: 85)
 **Status**: ✅ Fully Supported
 
 Fetches and downloads SoundCloud tracks using yt-dlp.
@@ -226,7 +169,7 @@ Fetches and downloads SoundCloud tracks using yt-dlp.
 
 ---
 
-### 7. **Fallen API** (Priority: 80)
+### 5. **Fallen API** (Priority: 80)
 **Status**: ✅ Requires API Key
 
 Premium API for YouTube downloads (audio only).
@@ -246,7 +189,7 @@ FALLEN_API_KEY=your_key_here
 
 ---
 
-### 8. **DirectStream** (Priority: 65)
+### 6. **DirectStream** (Priority: 65)
 **Status**: ✅ Fully Supported
 
 Handles direct audio/video URLs and streaming links.
@@ -274,7 +217,7 @@ Validate → Return URL for streaming
 
 ---
 
-### 9. **YT-DLP** (Priority: 60)
+### 7. **YT-DLP** (Priority: 60)
 **Status**: ✅ Free Method
 
 Universal downloader for YouTube and other platforms.
@@ -340,10 +283,8 @@ pip install yt-dlp
 | Priority | Platform | Purpose |
 |----------|----------|---------|
 | **100** | Telegram | Direct media files |
-| **100** | Youtubify API | YouTube video downloads |
 | **95** | Spotify | Spotify metadata + YouTube fallback |
 | **90** | YouTube | Video metadata & search |
-| **88** | JioSaavn | JioSaavn audio downloads |
 | **85** | SoundCloud | SoundCloud downloads |
 | **80** | Fallen API | YouTube audio downloads |
 | **65** | DirectStream | Direct URLs & streams |
@@ -359,8 +300,6 @@ Example flow for direct stream URL:
 Direct stream URL received
 ↓
 Check Telegram (100) → ❌ Not valid for URL
-↓
-Check Youtubify (100) → ❌ Download-only
 ↓
 Check Spotify (95) → ❌ Not Spotify
 ↓
@@ -381,13 +320,11 @@ YouTube URL received
 ↓
 Check Telegram (100) → ❌ Not valid for YouTube
 ↓
-Check Youtubify (100) → ❌ Download-only
-↓
 Check Spotify (95) → ❌ Not Spotify
 ↓
 Check YouTube (90) → ✅ Fetch metadata
 ↓
-Download needed → Check Youtubify (100) or Fallen (80) or YtDlp (60)
+Download needed → Check Fallen (80) or YtDlp (60)
 ```
 
 ---
@@ -428,7 +365,7 @@ func (p *MyPlatform) Name() state.PlatformName {
     return p.name
 }
 
-func (p *MyPlatform) IsValid(query string) bool {
+func (p *MyPlatform) CanGetTracks(query string) bool {
     // Return true if this platform can handle the query
     return strings.HasPrefix(query, "https://myservice.com/")
 }
@@ -438,7 +375,7 @@ func (p *MyPlatform) GetTracks(query string, video bool) ([]*state.Track, error)
     // video flag indicates if user wants video playback
 }
 
-func (p *MyPlatform) IsDownloadSupported(source state.PlatformName) bool {
+func (p *MyPlatform) CanDownload(source state.PlatformName) bool {
     // Return true if we can download from this source
     return source == PlatformMyPlatform
 }
@@ -500,7 +437,7 @@ func (a *AppleMusicPlatform) Name() state.PlatformName {
     return a.name
 }
 
-func (a *AppleMusicPlatform) IsValid(query string) bool {
+func (a *AppleMusicPlatform) CanGetTracks(query string) bool {
     return strings.Contains(query, "music.apple.com")
 }
 
@@ -515,7 +452,7 @@ func (a *AppleMusicPlatform) GetTracks(query string, video bool) ([]*state.Track
     return nil, nil
 }
 
-func (a *AppleMusicPlatform) IsDownloadSupported(source state.PlatformName) bool {
+func (a *AppleMusicPlatform) CanDownload(source state.PlatformName) bool {
     return false // Apple Music doesn't allow downloads
 }
 
@@ -534,9 +471,12 @@ func (a *AppleMusicPlatform) Download(ctx context.Context, _ *state.Track, _ *te
 type Platform interface {
     // Unique platform identifier
     Name() state.PlatformName
-
+    
+    // cleanup functios
+    Close()
+    
     // Check if platform can handle this query
-    IsValid(query string) bool
+    CanGetTracks(query string) bool
 
     // Fetch track metadata
     // video: true if video playback requested
@@ -544,7 +484,7 @@ type Platform interface {
     GetTracks(query string, video bool) ([]*state.Track, error)
 
     // Check if we can download from specific source
-    IsDownloadSupported(source state.PlatformName) bool
+    CanDownload(source state.PlatformName) bool
 
     // Download track and return local file path
     // Use mystic for progress updates (if provided)
@@ -615,139 +555,20 @@ func (p *MyPlatform) Download(ctx context.Context, track *state.Track, mystic *t
 // Use shared helper functions from base_platform.go
 func (p *MyPlatform) Download(ctx context.Context, track *state.Track, _ *telegram.NewMessage) (string, error) {
     // Check if already downloaded
-    if path, err := CheckDownloadedFile(track.ID); err == nil {
-        return path, nil
+    if track.IsExists(){
+      return track.FilePath(), nil
     }
-
-    // Ensure downloads directory exists
-    if err := EnsureDownloadsDir(); err != nil {
-        return "", err
-    }
-
+    
+    path := track.FilePath() // download 'n write in this file
+    
     // Your download logic here...
 }
 ```
 
 ---
-
-## 🐛 Troubleshooting
-
-### Platform Not Being Used
-
-**Problem**: Your platform is registered but not being called.
-
-**Solution**:
-1. Check `IsValid()` - Does it return `true` for your input?
-2. Check priority - Is it higher than blocking platforms?
-3. Add logging: `gologging.Debug("Platform check for: " + query)`
-
-### Download Fails
-
-**Problem**: `GetTracks()` works but `Download()` fails.
-
-**Solution**:
-1. Check `IsDownloadSupported()` - Returns `true` for source?
-2. Check network access - Can you reach external APIs?
-3. Check file permissions - Can you write to `downloads/` directory?
-
-### Context Cancellation
-
-**Problem**: Download doesn't stop when user cancels.
-
-**Solution**:
-```go
-// Always check context in Download()
-select {
-case <-ctx.Done():
-    return "", ctx.Err()
-default:
-    // Download here
-}
-```
-
-### YtDlp Not Extracting Info
-
-**Problem**: YtDlp fails to extract metadata from URL.
-
-**Solution**:
-1. Check if URL is a live stream (not supported)
-2. Check if it's a direct stream (use DirectStream instead)
-3. Verify yt-dlp is installed: `yt-dlp --version`
-4. Update yt-dlp: `pip install --upgrade yt-dlp`
-
----
-
-
-
-## 📊 Platform Comparison
-
-| Feature | Telegram | Youtubify | Spotify | YouTube | JioSaavn | SoundCloud | Fallen | DirectStream | YT-DLP |
-|---------|----------|-----------|---------|---------|----------|------------|--------|--------------|--------|
-| **Setup** | Built-in | API Key | API Key | Built-in | Built-in | Binary | API Key | Built-in | Binary |
-| **Audio** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Video** | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| **Cost** | Free | Paid | Free | Free | Free | Free | Paid | Free | Free |
-| **Metadata** | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ | Basic | ✅ |
-| **Quality** | Original | High | High | High | 320kbps | Best | Best | Varies | Best |
-
----
-
-## 🎯 Best Practices
-
-### 1. Validate Input Early
-
-```go
-func (p *MyPlatform) GetTracks(query string, _ bool) ([]*state.Track, error) {
-    if query == "" {
-        return nil, errors.New("empty query")
-    }
-    
-    if !p.IsValid(query) {
-        return nil, fmt.Errorf("invalid format: %s", query)
-    }
-    
-    // Now process safely
-}
-```
-
-### 2. Handle Context Cancellation
-
-```go
-func (p *MyPlatform) Download(ctx context.Context, track *state.Track, _ *telegram.NewMessage) (string, error) {
-    // Create request with context
-    req, _ := http.NewRequestWithContext(ctx, "GET", url, nil)
-    
-    // Automatically cancelled if context done
-    resp, err := http.DefaultClient.Do(req)
-    
-    // Check context
-    if ctx.Err() != nil {
-        return "", ctx.Err()
-    }
-}
-```
-
-### 3. Use Logging
-
-```go
-import "github.com/Laky-64/gologging"
-
-func (p *MyPlatform) Download(...) (string, error) {
-    gologging.InfoF("Starting download for: %s", track.ID)
-    gologging.ErrorF("Download failed: %v", err)
-}
-```
-
----
-
 ## 🎯 Credits
 
 ### Third-Party Libraries & APIs
-
-- **JioSaavn API Logic**: Adapted from [jiosaavn-api](https://github.com/sumitkolhe/jiosaavn-api/) by [Sumit Kolhe](https://github.com/sumitkolhe)
-  - License: MIT License
-  - Copyright (c) 2024 Sumit Kolhe
-  - Used for: API endpoints, URL decryption, and metadata extraction logic
 
 - **YouTube Search**: Web scraping logic adapted from [TgMusicBot](https://github.com/AshokShau/TgMusicBot)
   - License: GNU GPL v3

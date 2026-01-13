@@ -32,6 +32,7 @@ import (
 
 type DirectStreamPlatform struct {
 	name state.PlatformName
+	client *resty.Client
 }
 
 var (
@@ -77,6 +78,7 @@ func init() {
 	// Lowest priority - acts as fallback
 	Register(10, &DirectStreamPlatform{
 		name: PlatformDirectStream,
+		client: resty.New(),
 	})
 }
 
@@ -84,7 +86,14 @@ func (d *DirectStreamPlatform) Name() state.PlatformName {
 	return d.name
 }
 
-func (d *DirectStreamPlatform) IsValid(query string) bool {
+func (d *DirectStreamPlatform) Close() {
+	if d != nil && d.client != nil {
+	  d.client.Close()
+	}
+}
+
+
+func (d *DirectStreamPlatform) CanGetTracks(query string) bool {
 	query = strings.TrimSpace(query)
 
 	// Must be a valid URL
@@ -143,7 +152,7 @@ func (d *DirectStreamPlatform) Download(
 	return track.URL, nil
 }
 
-func (d *DirectStreamPlatform) IsDownloadSupported(
+func (d *DirectStreamPlatform) CanDownload(
 	source state.PlatformName,
 ) bool {
 	return source == PlatformDirectStream
@@ -183,11 +192,9 @@ func (d *DirectStreamPlatform) looksLikeStream(urlStr string) bool {
 func (d *DirectStreamPlatform) validateStream(
 	urlStr string,
 ) (*streamInfo, error) {
-	client := resty.New().
+	client := d.client.
 		SetTimeout(10*time.Second).
 		SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-
-	defer client.Close()
 
 	// Try HEAD request first (faster)
 	resp, err := client.R().Head(urlStr)

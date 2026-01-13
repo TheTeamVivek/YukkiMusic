@@ -51,11 +51,13 @@ type apiResponse struct {
 
 type FallenApiPlatform struct {
 	name state.PlatformName
+	client *resty.Client
 }
 
 func init() {
 	Register(80, &FallenApiPlatform{
 		name: PlatformFallenApi,
+		client: resty.New(),
 	})
 }
 
@@ -63,8 +65,14 @@ func (f *FallenApiPlatform) Name() state.PlatformName {
 	return f.name
 }
 
-func (f *FallenApiPlatform) IsValid(query string) bool {
+func (f *FallenApiPlatform) CanGetTracks(query string) bool {
 	return false
+}
+
+func (f *FallenApiPlatform) Close() {
+	if f != nil && f.client != nil {
+	  f.client.Close()
+	}
 }
 
 func (f *FallenApiPlatform) GetTracks(
@@ -74,7 +82,7 @@ func (f *FallenApiPlatform) GetTracks(
 	return nil, errors.New("fallenapi is a download-only platform")
 }
 
-func (f *FallenApiPlatform) IsDownloadSupported(
+func (f *FallenApiPlatform) CanDownload(
 	source state.PlatformName,
 ) bool {
 	if config.FallenAPIURL == "" || config.FallenAPIKey == "" {
@@ -90,13 +98,14 @@ func (f *FallenApiPlatform) Download(
 ) (string, error) {
 	// fallen api didn't support video downloads so disable it
 	track.Video = false
+	
+	if track.IsExists() {
+	  return track.FilePath(), nil
+	}
+	
 	var pm *telegram.ProgressManager
 	if mystic != nil {
 		pm = utils.GetProgress(mystic)
-	}
-
-	if path, err := checkDownloadedFile(track.ID); err == nil {
-		return path, nil
 	}
 
 	dlURL, err := f.getDownloadURL(ctx, track.URL)
@@ -104,24 +113,20 @@ func (f *FallenApiPlatform) Download(
 		return "", err
 	}
 
-	os.MkdirAll("downloads", os.ModePerm)
-	filePath := filepath.Join("downloads", track.ID+".webm")
+	path := track.FilePath()
 
 	var downloadErr error
 	if telegramDLRegex.MatchString(dlURL) {
-		filePath, downloadErr = f.downloadFromTelegram(ctx, dlURL, track.ID, pm)
+		path, downloadErr = f.downloadFromTelegram(ctx, dlURL, path, pm)
 	} else {
-		downloadErr = f.downloadFromURL(ctx, dlURL, filePath)
+		downloadErr = f.downloadFromURL(ctx, dlURL, path)
 	}
 
 	if downloadErr != nil {
-		if _, err := os.Stat(filePath); err == nil {
-			os.Remove(filePath)
-		}
 		return "", downloadErr
 	}
 
-	return filePath, nil
+	return path, nil
 }
 
 func (f *FallenApiPlatform) getDownloadURL(
@@ -135,11 +140,9 @@ func (f *FallenApiPlatform) getDownloadURL(
 		url.QueryEscape(mediaURL),
 	)
 
-	client := resty.New()
-	defer client.Close()
 	var apiResp apiResponse
 
-	resp, err := client.R().
+	resp, err := f.client.R().
 		SetContext(ctx).
 		SetResult(&apiResp).
 		Get(apiReqURL)
@@ -171,15 +174,15 @@ func (f *FallenApiPlatform) getDownloadURL(
 
 func (f *FallenApiPlatform) downloadFromURL(
 	ctx context.Context,
-	dlURL, filePath string,
+	dlURL, path string,
 ) error {
 	client := resty.New()
 	resp, err := client.R().
 		SetContext(ctx).
-		SetOutputFileName(filePath).
+		SetOutputFileName(path).
 		Get(dlURL)
 	if err != nil {
-		os.Remove(filePath)
+		os.Remove(path)
 		if errors.Is(err, context.Canceled) ||
 			errors.Is(err, context.DeadlineExceeded) {
 			return err
@@ -196,7 +199,7 @@ func (f *FallenApiPlatform) downloadFromURL(
 
 func (f *FallenApiPlatform) downloadFromTelegram(
 	ctx context.Context,
-	dlURL, videoId string,
+	dlURL, path string,
 	pm *telegram.ProgressManager,
 ) (string, error) {
 	matches := telegramDLRegex.FindStringSubmatch(dlURL)
@@ -215,11 +218,8 @@ func (f *FallenApiPlatform) downloadFromTelegram(
 		return "", fmt.Errorf("failed to fetch Telegram message: %w", err)
 	}
 
-	rawFile := filepath.Join("downloads", videoId+msg.File.Ext)
-
 	dOpts := &telegram.DownloadOptions{
-		FileName: rawFile,
-		Threads:  3,
+		FileName: path,
 		Ctx:      ctx,
 	}
 	if pm != nil {
@@ -227,8 +227,8 @@ func (f *FallenApiPlatform) downloadFromTelegram(
 	}
 	_, err = msg.Download(dOpts)
 	if err != nil {
-		os.Remove(rawFile)
+		os.Remove(path)
 		return "", err
 	}
-	return rawFile, nil
+	return path, nil
 }

@@ -88,7 +88,7 @@ func FindPlatform(url string) state.Platform {
 	defer registry.mu.RUnlock()
 
 	for _, entry := range registry.platforms {
-		if entry.platform.IsValid(url) {
+		if entry.platform.CanGetTracks(url) {
 			return entry.platform
 		}
 	}
@@ -268,7 +268,7 @@ func Download(
 	var errs []string
 
 	for _, p := range GetOrderedPlatforms() {
-		if !p.IsDownloadSupported(track.Source) {
+		if !p.CanDownload(track.Source) {
 			continue
 		}
 
@@ -292,6 +292,12 @@ func Download(
 	}
 
 	return "", errors.New("no downloader available for " + string(track.Source))
+}
+
+func Close(){
+  for _, p := range GetOrderedPlatforms() {
+    p.Close()
+  }
 }
 
 func formatErrors(errs []string) error {

@@ -64,8 +64,9 @@ func init() {
 func (t *TelegramPlatform) Name() state.PlatformName {
 	return t.name
 }
+func (*TelegramPlatform) Close(){}
 
-func (t *TelegramPlatform) IsValid(query string) bool {
+func (t *TelegramPlatform) CanGetTracks(query string) bool {
 	query = strings.TrimSpace(query)
 	if query == "" {
 		return false
@@ -73,7 +74,7 @@ func (t *TelegramPlatform) IsValid(query string) bool {
 	return telegramLinkRegex.MatchString(query)
 }
 
-func (t *TelegramPlatform) IsDownloadSupported(source state.PlatformName) bool {
+func (t *TelegramPlatform) CanDownload(source state.PlatformName) bool {
 	return source == t.name
 }
 
@@ -180,35 +181,25 @@ func (t *TelegramPlatform) Download(
 	track *state.Track,
 	mystic *telegram.NewMessage,
 ) (string, error) {
-	downloadsDir := "downloads"
-	if err := os.MkdirAll(downloadsDir, os.ModePerm); err != nil {
-		return "", fmt.Errorf("can't create downloads folder: %v", err)
-	}
-
-	ext := ".webm"
-	if ext2 := filepath.Ext(track.Title); ext2 != "" {
-		ext = ext2
-	}
-	rawFile := filepath.Join(downloadsDir, fmt.Sprintf("%s%s", track.ID, ext))
-
-	if path, err := checkDownloadedFile(track.ID); err == nil && path != "" {
-		if track.Duration == 0 {
-			if dur, err := utils.GetDurationByFFProbe(path); err == nil {
+  
+  path := track.FilePath()
+  
+  if track.IsExists() {
+    if track.Duration == 0 {
+      if dur, err := utils.GetDurationByFFProbe(path); err == nil {
 				track.Duration = dur
 			}
-		}
-		return path, nil
-	}
+    }
+    return path, nil
+  }
 
 	dOpts := &telegram.DownloadOptions{
-		FileName: rawFile,
+		FileName: path,
 		Ctx:      ctx,
 	}
 	if mystic != nil {
 		dOpts.ProgressManager = utils.GetProgress(mystic)
 	}
-
-	var path string
 	var err error
 
 	if msg, ok := telegramMsgCache[track.ID]; ok {
@@ -222,7 +213,7 @@ func (t *TelegramPlatform) Download(
 	}
 
 	if err != nil {
-		os.Remove(rawFile)
+		os.Remove(path)
 
 		if errors.Is(err, context.Canceled) {
 			return "", err
@@ -230,7 +221,7 @@ func (t *TelegramPlatform) Download(
 		return "", fmt.Errorf("download failed: %v", err)
 	}
 
-	if _, statErr := os.Stat(rawFile); statErr != nil {
+	if _, statErr := os.Stat(path); statErr != nil {
 		return "", fmt.Errorf("unable to get downloaded file: %v", statErr)
 	}
 

@@ -44,6 +44,7 @@ import (
 
 type YouTubePlatform struct {
 	name state.PlatformName
+	client *resty.Client
 }
 
 var (
@@ -59,14 +60,23 @@ const PlatformYouTube state.PlatformName = "YouTube"
 func init() {
 	Register(90, &YouTubePlatform{
 		name: PlatformYouTube,
+		client: resty.New().
+				SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36").
+	     	SetHeader("Accept-Language", "en-US,en;q=0.9").
+		    SetHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
 	})
 }
 
 func (yp *YouTubePlatform) Name() state.PlatformName {
 	return yp.name
 }
+func (yp *YouTubePlatform) Close() {
+	if yp != nil && yp.client != nil {
+	  yp.client.Close()
+	}
+}
 
-func (yp *YouTubePlatform) IsValid(link string) bool {
+func (yp *YouTubePlatform) CanGetTracks(link string) bool {
 	return youtubeLinkRegex.MatchString(link)
 }
 
@@ -153,7 +163,7 @@ func (yp *YouTubePlatform) GetTracks(
 	return updateCached(tracks, video), nil
 }
 
-func (yp *YouTubePlatform) IsDownloadSupported(source state.PlatformName) bool {
+func (yp *YouTubePlatform) CanDownload(source state.PlatformName) bool {
 	return false
 }
 
@@ -190,7 +200,7 @@ func (yp *YouTubePlatform) VideoSearch(
 	var err error
 
 	// Try scraping first
-	tracks, err = searchYouTube(query)
+	tracks, err = searchYouTube(yp.client, query)
 
 	// If scraping failed or found no results, fallback to ytsearch
 	if err != nil || len(tracks) == 0 {
@@ -346,14 +356,7 @@ func updateCached(arr []*state.Track, video bool) []*state.Track {
 //
 // searchYouTube scrapes YouTube results page
 
-func searchYouTube(query string) ([]*state.Track, error) {
-	client := resty.New().
-		SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36").
-		SetHeader("Accept-Language", "en-US,en;q=0.9").
-		SetHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-
-	defer client.Close()
-
+func searchYouTube(client *resty.Client, query string) ([]*state.Track, error) {
 	encodedQuery := url.QueryEscape(query)
 	searchURL := "https://www.youtube.com/results?search_query=" + encodedQuery
 

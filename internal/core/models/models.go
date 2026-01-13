@@ -21,6 +21,8 @@
 package state
 
 import (
+  "os"
+  "path/filepath"
 	"context"
 
 	"github.com/amarnathcjd/gogram/telegram"
@@ -40,14 +42,48 @@ type (
 	PlatformName string
 
 	Platform interface {
+	  Close() // cleanup
 		Name() PlatformName
-		IsValid(query string) bool
+		CanGetTracks(query string) bool
 		GetTracks(query string, video bool) ([]*Track, error)
 		Download(
 			ctx context.Context,
 			track *Track,
 			mystic *telegram.NewMessage,
 		) (string, error)
-		IsDownloadSupported(source PlatformName) bool
+		CanDownload(source PlatformName) bool
 	}
 )
+
+// returns filepath where song should be Downloaded
+func (t *Track) FilePath() string {
+	if t == nil {
+		return ""
+	}
+
+	_ = os.MkdirAll("downloads", os.ModePerm)
+
+	if t.Video {
+		return filepath.Join("downloads", "video_"+t.ID+".mp4")
+	}
+	return filepath.Join("downloads", "audio_"+t.ID+".m4a")
+}
+
+// returns true if the track is downloaded
+func (t *Track) IsExists() bool {
+	if t == nil {
+		return false
+	}
+
+	info, err := os.Stat(t.FilePath())
+	return err == nil && info.Size() > 0
+}
+
+// remove the track if downloaded
+func (t *Track) Remove() (r bool) {
+  if t != nil {
+   err := os.Remove(t.FilePath())
+   r = err == nil
+  }
+  return
+}

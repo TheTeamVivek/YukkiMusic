@@ -63,9 +63,12 @@ func (s *SoundCloudPlatform) Name() state.PlatformName {
 	return s.name
 }
 
-func (s *SoundCloudPlatform) IsValid(query string) bool {
+func (s *SoundCloudPlatform) CanGetTracks(query string) bool {
 	return soundcloudLinkRegex.MatchString(strings.TrimSpace(query))
 }
+
+func (s *SoundCloudPlatform) Close(){}
+
 
 func (s *SoundCloudPlatform) GetTracks(
 	query string,
@@ -119,7 +122,7 @@ func (s *SoundCloudPlatform) GetTracks(
 	return tracks, nil
 }
 
-func (s *SoundCloudPlatform) IsDownloadSupported(
+func (s *SoundCloudPlatform) CanDownload(
 	source state.PlatformName,
 ) bool {
 	return source == PlatformSoundCloud
@@ -130,22 +133,16 @@ func (s *SoundCloudPlatform) Download(
 	track *state.Track,
 	_ *telegram.NewMessage,
 ) (string, error) {
-	if path, err := checkDownloadedFile(track.ID); err == nil {
-		gologging.InfoF("SoundCloud: Using cached file for %s", track.ID)
-		return path, nil
+  
+  track.Video = false
+  
+	if track.IsExists() {
+	  return track.FilePath(), nil
 	}
-
+	
 	gologging.InfoF("SoundCloud: Downloading %s", track.Title)
 
-	if err := ensureDownloadsDir(); err != nil {
-		gologging.ErrorF(
-			"SoundCloud: Failed to create downloads directory: %v",
-			err,
-		)
-		return "", fmt.Errorf("failed to create downloads directory: %w", err)
-	}
-
-	filePath := filepath.Join("downloads", track.ID+".mp3")
+	filePath := track.FilePath()
 
 	args := []string{
 		"-f", "bestaudio/best",

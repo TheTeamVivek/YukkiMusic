@@ -79,11 +79,12 @@ func (s *SpotifyPlatform) Name() state.PlatformName {
 	return s.name
 }
 
-func (s *SpotifyPlatform) IsValid(query string) bool {
+func (s *SpotifyPlatform) CanGetTracks(query string) bool {
 	return spotifyLinkRegex.MatchString(query)
 }
+func (s *SpotifyPlatform) Close(){}
 
-func (s *SpotifyPlatform) IsDownloadSupported(source state.PlatformName) bool {
+func (s *SpotifyPlatform) CanDownload(source state.PlatformName) bool {
 	return source == s.name
 }
 
@@ -202,7 +203,7 @@ func (s *SpotifyPlatform) Download(
 	}
 
 	for _, p := range GetOrderedPlatforms() {
-		if p.IsDownloadSupported(PlatformYouTube) {
+		if p.CanDownload(PlatformYouTube) {
 			path, err := p.Download(ctx, ytTrack, mystic)
 			if err == nil {
 				gologging.InfoF(

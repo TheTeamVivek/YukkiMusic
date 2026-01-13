@@ -27,24 +27,6 @@ import (
 	"strings"
 )
 
-// checkDownloadedFile checks if a file already exists in downloads folder
-func checkDownloadedFile(trackID string) (string, error) {
-	pattern := filepath.Join("./downloads", trackID+".*")
-	matches, err := filepath.Glob(pattern)
-	if err != nil {
-		return "", err
-	}
-	if len(matches) == 0 {
-		return "", errors.New("file not found")
-	}
-	return matches[0], nil
-}
-
-// EnsureDownloadsDir creates the downloads directory if it doesn't exist
-func ensureDownloadsDir() error {
-	return os.MkdirAll("downloads", os.ModePerm)
-}
-
 func sanitizeAPIError(err error, apiKey string) error {
 	if err == nil || apiKey == "" {
 		return err

@@ -47,7 +47,8 @@ import (
 func main() {
 	initLogger()
 	defer config.CloseLogging()
-
+	defer platforms.Close()
+	
 	checkFFmpegAndFFprobe()
 	refreshCacheAndDownloads()
 
