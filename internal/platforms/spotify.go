@@ -149,7 +149,6 @@ func (s *SpotifyPlatform) Download(
 	track *state.Track,
 	mystic *telegram.NewMessage,
 ) (string, error) {
-	yt := &YouTubePlatform{}
 
 	clean := cleanTitle(track.Title)
 	trimmed := trimTitleLen(clean, 25, 40)

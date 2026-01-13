@@ -57,14 +57,15 @@ var (
 
 const PlatformYouTube state.PlatformName = "YouTube"
 
-func init() {
-	Register(90, &YouTubePlatform{
+var yt = &YouTubePlatform{
 		name: PlatformYouTube,
 		client: resty.New().
 			SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36").
 			SetHeader("Accept-Language", "en-US,en;q=0.9").
 			SetHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
-	})
+	}
+func init() {
+	Register(90, yt)
 }
 
 func (yp *YouTubePlatform) Name() state.PlatformName {

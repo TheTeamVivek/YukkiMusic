@@ -175,8 +175,8 @@ func (f *FallenApiPlatform) downloadFromURL(
 	ctx context.Context,
 	dlURL, path string,
 ) error {
-	client := resty.New()
-	resp, err := client.R().
+
+	resp, err := f.client.R().
 		SetContext(ctx).
 		SetOutputFileName(path).
 		Get(dlURL)

@@ -160,7 +160,6 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 	if query != "" {
 		gologging.Info("No URLs found, searching YouTube with query: " + query)
 
-		yt := &YouTubePlatform{}
 		tracks, err := yt.GetTracks(query, video)
 		if err != nil {
 			gologging.Error("YouTube search failed: " + err.Error())

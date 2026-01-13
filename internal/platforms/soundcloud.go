@@ -144,7 +144,8 @@ func (s *SoundCloudPlatform) Download(
 	args := []string{
 		"-f", "bestaudio/best",
 		"--extract-audio",
-		"--audio-format", "mp3",
+		"--audio-format", "m4a",
+		"--merge-output-format m4a",
 		"--audio-quality", "0",
 		"--no-playlist",
 		"-o", filePath,
