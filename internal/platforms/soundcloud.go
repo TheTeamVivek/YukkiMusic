@@ -28,7 +28,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -67,8 +66,7 @@ func (s *SoundCloudPlatform) CanGetTracks(query string) bool {
 	return soundcloudLinkRegex.MatchString(strings.TrimSpace(query))
 }
 
-func (s *SoundCloudPlatform) Close(){}
-
+func (s *SoundCloudPlatform) Close() {}
 
 func (s *SoundCloudPlatform) GetTracks(
 	query string,
@@ -133,13 +131,12 @@ func (s *SoundCloudPlatform) Download(
 	track *state.Track,
 	_ *telegram.NewMessage,
 ) (string, error) {
-  
-  track.Video = false
-  
+	track.Video = false
+
 	if track.IsExists() {
-	  return track.FilePath(), nil
+		return track.FilePath(), nil
 	}
-	
+
 	gologging.InfoF("SoundCloud: Downloading %s", track.Title)
 
 	filePath := track.FilePath()

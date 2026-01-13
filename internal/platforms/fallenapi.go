@@ -26,7 +26,6 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strconv"
 
@@ -50,13 +49,13 @@ type apiResponse struct {
 }
 
 type FallenApiPlatform struct {
-	name state.PlatformName
+	name   state.PlatformName
 	client *resty.Client
 }
 
 func init() {
 	Register(80, &FallenApiPlatform{
-		name: PlatformFallenApi,
+		name:   PlatformFallenApi,
 		client: resty.New(),
 	})
 }
@@ -71,7 +70,7 @@ func (f *FallenApiPlatform) CanGetTracks(query string) bool {
 
 func (f *FallenApiPlatform) Close() {
 	if f != nil && f.client != nil {
-	  f.client.Close()
+		f.client.Close()
 	}
 }
 
@@ -98,11 +97,11 @@ func (f *FallenApiPlatform) Download(
 ) (string, error) {
 	// fallen api didn't support video downloads so disable it
 	track.Video = false
-	
+
 	if track.IsExists() {
-	  return track.FilePath(), nil
+		return track.FilePath(), nil
 	}
-	
+
 	var pm *telegram.ProgressManager
 	if mystic != nil {
 		pm = utils.GetProgress(mystic)

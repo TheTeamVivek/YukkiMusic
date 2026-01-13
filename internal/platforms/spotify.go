@@ -82,7 +82,7 @@ func (s *SpotifyPlatform) Name() state.PlatformName {
 func (s *SpotifyPlatform) CanGetTracks(query string) bool {
 	return spotifyLinkRegex.MatchString(query)
 }
-func (s *SpotifyPlatform) Close(){}
+func (s *SpotifyPlatform) Close() {}
 
 func (s *SpotifyPlatform) CanDownload(source state.PlatformName) bool {
 	return source == s.name

@@ -294,10 +294,10 @@ func Download(
 	return "", errors.New("no downloader available for " + string(track.Source))
 }
 
-func Close(){
-  for _, p := range GetOrderedPlatforms() {
-    p.Close()
-  }
+func Close() {
+	for _, p := range GetOrderedPlatforms() {
+		p.Close()
+	}
 }
 
 func formatErrors(errs []string) error {

@@ -27,9 +27,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -74,7 +72,7 @@ func (y *YtDlpDownloader) Name() state.PlatformName {
 	return y.name
 }
 
-func (*YtDlpDownloader) Close(){}
+func (*YtDlpDownloader) Close() {}
 
 // CanGetTracks checks if this is a valid URL that yt-dlp might handle
 func (y *YtDlpDownloader) CanGetTracks(query string) bool {
@@ -147,16 +145,16 @@ func (y *YtDlpDownloader) CanDownload(source state.PlatformName) bool {
 	// and from YouTube platform
 	return source == y.name || source == PlatformYouTube
 }
+
 func (y *YtDlpDownloader) Download(
 	ctx context.Context,
 	track *state.Track,
 	_ *telegram.NewMessage,
 ) (string, error) {
-
 	if track.IsExists() {
 		return track.FilePath(), nil
 	}
-	
+
 	path := track.FilePath()
 	gologging.InfoF("YtDlp: Downloading %s", track.Title)
 
@@ -188,7 +186,8 @@ func (y *YtDlpDownloader) Download(
 
 	// Cookies (YouTube only)
 	if y.isYouTubeURL(track.URL) {
-		if cookieFile, err := cookies.GetRandomCookieFile(); err == nil && cookieFile != "" {
+		if cookieFile, err := cookies.GetRandomCookieFile(); err == nil &&
+			cookieFile != "" {
 			args = append(args, "--cookies", cookieFile)
 		}
 	}
@@ -205,10 +204,10 @@ func (y *YtDlpDownloader) Download(
 		errStr := strings.TrimSpace(stderr.String())
 		outStr := strings.TrimSpace(stdout.String())
 
-    gologging.ErrorF(
-      "YtDlp: Download failed for %s: %v\nSTDOUT:\n%s\nSTDERR:\n%s",
-      track.URL, err, outStr, errStr,
-    )
+		gologging.ErrorF(
+			"YtDlp: Download failed for %s: %v\nSTDOUT:\n%s\nSTDERR:\n%s",
+			track.URL, err, outStr, errStr,
+		)
 		track.Remove()
 
 		if errors.Is(err, context.Canceled) ||
@@ -219,7 +218,6 @@ func (y *YtDlpDownloader) Download(
 		return "", fmt.Errorf("yt-dlp error: %w", err)
 	}
 
-	
 	if !track.IsExists() {
 		return "", errors.New("yt-dlp did not return output file path")
 	}
@@ -227,7 +225,6 @@ func (y *YtDlpDownloader) Download(
 	gologging.InfoF("YtDlp: Successfully downloaded %s", path)
 	return path, nil
 }
-
 
 // extractMetadata uses yt-dlp to extract video/audio metadata
 func (y *YtDlpDownloader) extractMetadata(urlStr string) (*ytdlpInfo, error) {

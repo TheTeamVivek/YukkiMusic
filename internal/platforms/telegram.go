@@ -64,7 +64,7 @@ func init() {
 func (t *TelegramPlatform) Name() state.PlatformName {
 	return t.name
 }
-func (*TelegramPlatform) Close(){}
+func (*TelegramPlatform) Close() {}
 
 func (t *TelegramPlatform) CanGetTracks(query string) bool {
 	query = strings.TrimSpace(query)
@@ -181,17 +181,16 @@ func (t *TelegramPlatform) Download(
 	track *state.Track,
 	mystic *telegram.NewMessage,
 ) (string, error) {
-  
-  path := track.FilePath()
-  
-  if track.IsExists() {
-    if track.Duration == 0 {
-      if dur, err := utils.GetDurationByFFProbe(path); err == nil {
+	path := track.FilePath()
+
+	if track.IsExists() {
+		if track.Duration == 0 {
+			if dur, err := utils.GetDurationByFFProbe(path); err == nil {
 				track.Duration = dur
 			}
-    }
-    return path, nil
-  }
+		}
+		return path, nil
+	}
 
 	dOpts := &telegram.DownloadOptions{
 		FileName: path,

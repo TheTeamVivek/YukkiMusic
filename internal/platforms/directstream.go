@@ -31,7 +31,7 @@ import (
 )
 
 type DirectStreamPlatform struct {
-	name state.PlatformName
+	name   state.PlatformName
 	client *resty.Client
 }
 
@@ -77,7 +77,7 @@ type streamInfo struct {
 func init() {
 	// Lowest priority - acts as fallback
 	Register(10, &DirectStreamPlatform{
-		name: PlatformDirectStream,
+		name:   PlatformDirectStream,
 		client: resty.New(),
 	})
 }
@@ -88,10 +88,9 @@ func (d *DirectStreamPlatform) Name() state.PlatformName {
 
 func (d *DirectStreamPlatform) Close() {
 	if d != nil && d.client != nil {
-	  d.client.Close()
+		d.client.Close()
 	}
 }
-
 
 func (d *DirectStreamPlatform) CanGetTracks(query string) bool {
 	query = strings.TrimSpace(query)

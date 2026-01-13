@@ -21,9 +21,9 @@
 package state
 
 import (
-  "os"
-  "path/filepath"
 	"context"
+	"os"
+	"path/filepath"
 
 	"github.com/amarnathcjd/gogram/telegram"
 )
@@ -42,7 +42,7 @@ type (
 	PlatformName string
 
 	Platform interface {
-	  Close() // cleanup
+		Close() // cleanup
 		Name() PlatformName
 		CanGetTracks(query string) bool
 		GetTracks(query string, video bool) ([]*Track, error)
@@ -81,9 +81,9 @@ func (t *Track) IsExists() bool {
 
 // remove the track if downloaded
 func (t *Track) Remove() (r bool) {
-  if t != nil {
-   err := os.Remove(t.FilePath())
-   r = err == nil
-  }
-  return
+	if t != nil {
+		err := os.Remove(t.FilePath())
+		r = err == nil
+	}
+	return r
 }

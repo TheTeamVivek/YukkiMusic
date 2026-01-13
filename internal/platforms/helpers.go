@@ -22,8 +22,6 @@ package platforms
 
 import (
 	"errors"
-	"os"
-	"path/filepath"
 	"strings"
 )
 
