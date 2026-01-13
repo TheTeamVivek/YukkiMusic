@@ -472,7 +472,7 @@ type Platform interface {
     // Unique platform identifier
     Name() state.PlatformName
     
-    // cleanup functios
+    // cleanup functions
     Close()
     
     // Check if platform can handle this query
