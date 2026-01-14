@@ -30,7 +30,6 @@ import (
 	"strconv"
 
 	"github.com/amarnathcjd/gogram/telegram"
-	"resty.dev/v3"
 
 	"main/internal/config"
 	"main/internal/core"
@@ -49,12 +48,12 @@ type apiResponse struct {
 }
 
 type FallenApiPlatform struct {
-	name   state.PlatformName
+	name state.PlatformName
 }
 
 func init() {
 	Register(80, &FallenApiPlatform{
-		name:   PlatformFallenApi,
+		name: PlatformFallenApi,
 	})
 }
 
@@ -120,8 +119,14 @@ func (f *FallenApiPlatform) Download(
 	return path, nil
 }
 
-func (*PlatformFallenApi) CanSearch() bool { return false } 
-func (*FallenApiPlatform) Search(string, bool) ([]*Track, error) { return nil, nil }
+func (*PlatformFallenApi) CanSearch() bool { return false }
+
+func (*FallenApiPlatform) Search(
+	string,
+	bool,
+) ([]*Track, error) {
+	return nil, nil
+}
 
 func (f *FallenApiPlatform) getDownloadURL(
 	ctx context.Context,
@@ -170,7 +175,6 @@ func (f *FallenApiPlatform) downloadFromURL(
 	ctx context.Context,
 	dlURL, path string,
 ) error {
-
 	resp, err := rc.R().
 		SetContext(ctx).
 		SetOutputFileName(path).

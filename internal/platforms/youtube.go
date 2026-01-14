@@ -35,7 +35,6 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 	"github.com/raitonoberu/ytsearch"
-	"resty.dev/v3"
 
 	"main/internal/config"
 	state "main/internal/core/models"
@@ -43,7 +42,7 @@ import (
 )
 
 type YouTubePlatform struct {
-	name   state.PlatformName
+	name state.PlatformName
 }
 
 var (
@@ -57,7 +56,7 @@ var (
 const PlatformYouTube state.PlatformName = "YouTube"
 
 var yt = &YouTubePlatform{
-		name: PlatformYouTube,
+	name: PlatformYouTube,
 }
 
 func init() {
@@ -168,7 +167,9 @@ func (yt *YouTubePlatform) Download(
 }
 
 func (*YouTubePlatform) CanSearch() bool { return true }
-func (y *YouTubePlatform) Search(q string, video bool) ([]*Track, error) { return y.GetTracks(q, video)}
+func (y *YouTubePlatform) Search(q string, video bool) ([]*Track, error) {
+	return y.GetTracks(q, video)
+}
 
 func (yp *YouTubePlatform) VideoSearch(
 	query string,
@@ -355,12 +356,12 @@ func searchYouTube(query string) ([]*state.Track, error) {
 	encodedQuery := url.QueryEscape(query)
 	searchURL := "https://www.youtube.com/results?search_query=" + encodedQuery
 
-	resp, err := rc.			
-	    SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36").
-			SetHeader("Accept-Language", "en-US,en;q=0.9").
-			SetHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8").
-			R().
-			Get(searchURL)
+	resp, err := rc.
+		SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36").
+		SetHeader("Accept-Language", "en-US,en;q=0.9").
+		SetHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8").
+		R().
+		Get(searchURL)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}

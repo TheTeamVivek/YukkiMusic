@@ -33,30 +33,31 @@ import (
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"resty.dev/v3"
 
 	state "main/internal/core/models"
 	"main/internal/utils"
 )
 
 // PlatformRegistry manages all registered platforms
-type ( 
-  PlatformRegistry struct {
-	  platforms []platformEntry
-  	mu        sync.RWMutex
-  }
+type (
+	PlatformRegistry struct {
+		platforms []platformEntry
+		mu        sync.RWMutex
+	}
 
-  platformEntry struct {
-	 platform state.Platform
-	 priority int
-  }
+	platformEntry struct {
+		platform state.Platform
+		priority int
+	}
 )
 
 var (
-  registry = &PlatformRegistry{
-    platforms: make([]platformEntry, 0),
-  }
-  
-  rc = resty.New() 
+	registry = &PlatformRegistry{
+		platforms: make([]platformEntry, 0),
+	}
+
+	rc = resty.New()
 )
 
 // Register adds a platform to the registry with given priority
@@ -300,7 +301,7 @@ func Download(
 }
 
 func Close() {
-        rc.Close()
+	rc.Close()
 }
 
 func formatErrors(errs []string) error {

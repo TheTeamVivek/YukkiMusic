@@ -224,8 +224,14 @@ func (y *YtdlpPlatform) Download(
 	return path, nil
 }
 
-func (*YtdlpPlatform) CanSearch() bool { return false } 
-func (*YtdlpPlatform) Search(string, bool) ([]*models.Track, error) { return nil, nil }
+func (*YtdlpPlatform) CanSearch() bool { return false }
+
+func (*YtdlpPlatform) Search(
+	string,
+	bool,
+) ([]*models.Track, error) {
+	return nil, nil
+}
 
 // extractMetadata uses yt-dlp to extract video/audio metadata
 func (y *YtdlpPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {

@@ -25,13 +25,12 @@ import (
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
-	"resty.dev/v3"
 
 	state "main/internal/core/models"
 )
 
 type DirectStreamPlatform struct {
-	name   state.PlatformName
+	name state.PlatformName
 }
 
 var (
@@ -76,7 +75,7 @@ type streamInfo struct {
 func init() {
 	// Lowest priority - acts as fallback
 	Register(10, &DirectStreamPlatform{
-		name:   PlatformDirectStream,
+		name: PlatformDirectStream,
 	})
 }
 
@@ -179,8 +178,14 @@ func (d *DirectStreamPlatform) looksLikeStream(urlStr string) bool {
 	return false
 }
 
-func (*DirectStreamPlatform) CanSearch() bool { return false } 
-func (*DirectStreamPlatform) Search(string, bool) ([]*Track, error) { return nil, nil }
+func (*DirectStreamPlatform) CanSearch() bool { return false }
+
+func (*DirectStreamPlatform) Search(
+	string,
+	bool,
+) ([]*Track, error) {
+	return nil, nil
+}
 
 // validateStream makes a HEAD request to validate the URL
 func (d *DirectStreamPlatform) validateStream(

@@ -198,8 +198,13 @@ func (s *SoundCloudPlatform) Download(
 }
 
 func (*SoundCloudPlatform) CanSearch() bool { return false } // can but for now not needed
-func (*SoundCloudPlatform) Search(string, bool) ([]*Track, error) { return nil, nil }
-		
+func (*SoundCloudPlatform) Search(
+	string,
+	bool,
+) ([]*Track, error) {
+	return nil, nil
+}
+
 func (s *SoundCloudPlatform) extractMetadata(url string) (*ytdlpInfo, error) {
 	args := []string{
 		"-j",

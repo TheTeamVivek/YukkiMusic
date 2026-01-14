@@ -83,7 +83,6 @@ func (s *SpotifyPlatform) CanGetTracks(query string) bool {
 	return spotifyLinkRegex.MatchString(query)
 }
 
-
 func (s *SpotifyPlatform) GetTracks(
 	query string,
 	video bool,
@@ -149,7 +148,6 @@ func (s *SpotifyPlatform) Download(
 	track *state.Track,
 	mystic *telegram.NewMessage,
 ) (string, error) {
-
 	clean := cleanTitle(track.Title)
 	trimmed := trimTitleLen(clean, 25, 40)
 
@@ -224,8 +222,14 @@ func (s *SpotifyPlatform) Download(
 	return "", errors.New("no YouTube downloader available")
 }
 
-func (*SpotifyPlatform) CanSearch() bool { return false } 
-func (*SpotifyPlatform) Search(string, bool) ([]*Track, error) { return nil, nil }
+func (*SpotifyPlatform) CanSearch() bool { return false }
+
+func (*SpotifyPlatform) Search(
+	string,
+	bool,
+) ([]*Track, error) {
+	return nil, nil
+}
 
 // ensureClient initializes the Spotify client (once)
 func (s *SpotifyPlatform) ensureClient() error {
