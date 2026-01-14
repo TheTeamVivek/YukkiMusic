@@ -32,7 +32,6 @@ import (
 
 type DirectStreamPlatform struct {
 	name   state.PlatformName
-	client *resty.Client
 }
 
 var (
@@ -78,18 +77,11 @@ func init() {
 	// Lowest priority - acts as fallback
 	Register(10, &DirectStreamPlatform{
 		name:   PlatformDirectStream,
-		client: resty.New(),
 	})
 }
 
 func (d *DirectStreamPlatform) Name() state.PlatformName {
 	return d.name
-}
-
-func (d *DirectStreamPlatform) Close() {
-	if d != nil && d.client != nil {
-		d.client.Close()
-	}
 }
 
 func (d *DirectStreamPlatform) CanGetTracks(query string) bool {
@@ -187,11 +179,14 @@ func (d *DirectStreamPlatform) looksLikeStream(urlStr string) bool {
 	return false
 }
 
+func (*DirectStreamPlatform) CanSearch() bool { return false } 
+func (*DirectStreamPlatform) Search(string, bool) ([]*Track, error) { return nil, nil }
+
 // validateStream makes a HEAD request to validate the URL
 func (d *DirectStreamPlatform) validateStream(
 	urlStr string,
 ) (*streamInfo, error) {
-	client := d.client.
+	client := rc.
 		SetTimeout(10*time.Second).
 		SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
 

@@ -44,7 +44,6 @@ import (
 
 type YouTubePlatform struct {
 	name   state.PlatformName
-	client *resty.Client
 }
 
 var (
@@ -59,23 +58,14 @@ const PlatformYouTube state.PlatformName = "YouTube"
 
 var yt = &YouTubePlatform{
 		name: PlatformYouTube,
-		client: resty.New().
-			SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36").
-			SetHeader("Accept-Language", "en-US,en;q=0.9").
-			SetHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
-	}
+}
+
 func init() {
 	Register(90, yt)
 }
 
 func (yp *YouTubePlatform) Name() state.PlatformName {
 	return yp.name
-}
-
-func (yp *YouTubePlatform) Close() {
-	if yp != nil && yp.client != nil {
-		yp.client.Close()
-	}
 }
 
 func (yp *YouTubePlatform) CanGetTracks(link string) bool {
@@ -177,6 +167,9 @@ func (yt *YouTubePlatform) Download(
 	return "", errors.New("youtube platform does not support downloading")
 }
 
+func (*YouTubePlatform) CanSearch() bool { return true }
+func (y *YouTubePlatform) Search(q string, video bool) ([]*Track, error) { return y.GetTracks(q, video)}
+
 func (yp *YouTubePlatform) VideoSearch(
 	query string,
 	singleOpt ...bool,
@@ -202,7 +195,7 @@ func (yp *YouTubePlatform) VideoSearch(
 	var err error
 
 	// Try scraping first
-	tracks, err = searchYouTube(yp.client, query)
+	tracks, err = searchYouTube(query)
 
 	// If scraping failed or found no results, fallback to ytsearch
 	if err != nil || len(tracks) == 0 {
@@ -358,11 +351,16 @@ func updateCached(arr []*state.Track, video bool) []*state.Track {
 //
 // searchYouTube scrapes YouTube results page
 
-func searchYouTube(client *resty.Client, query string) ([]*state.Track, error) {
+func searchYouTube(query string) ([]*state.Track, error) {
 	encodedQuery := url.QueryEscape(query)
 	searchURL := "https://www.youtube.com/results?search_query=" + encodedQuery
 
-	resp, err := client.R().Get(searchURL)
+	resp, err := rc.			
+	    SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36").
+			SetHeader("Accept-Language", "en-US,en;q=0.9").
+			SetHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8").
+			R().
+			Get(searchURL)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}

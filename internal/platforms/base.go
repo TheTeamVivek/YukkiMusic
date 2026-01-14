@@ -39,19 +39,25 @@ import (
 )
 
 // PlatformRegistry manages all registered platforms
-type PlatformRegistry struct {
-	platforms []platformEntry
-	mu        sync.RWMutex
-}
+type ( 
+  PlatformRegistry struct {
+	  platforms []platformEntry
+  	mu        sync.RWMutex
+  }
 
-type platformEntry struct {
-	platform state.Platform
-	priority int
-}
+  platformEntry struct {
+	 platform state.Platform
+	 priority int
+  }
+)
 
-var registry = &PlatformRegistry{
-	platforms: make([]platformEntry, 0),
-}
+var (
+  registry = &PlatformRegistry{
+    platforms: make([]platformEntry, 0),
+  }
+  
+  rc = resty.New() 
+)
 
 // Register adds a platform to the registry with given priority
 // Higher priority = checked first for URL validation
@@ -294,9 +300,7 @@ func Download(
 }
 
 func Close() {
-	for _, p := range GetOrderedPlatforms() {
-		p.Close()
-	}
+        rc.Close()
 }
 
 func formatErrors(errs []string) error {

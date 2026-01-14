@@ -40,7 +40,7 @@ import (
 
 const PlatformYtDlp state.PlatformName = "YtDlp"
 
-type YtDlpDownloader struct {
+type YtdlpPlatform struct {
 	name state.PlatformName
 }
 
@@ -63,19 +63,17 @@ var youtubePatterns = []*regexp.Regexp{
 }
 
 func init() {
-	Register(60, &YtDlpDownloader{
+	Register(60, &YtdlpPlatform{
 		name: PlatformYtDlp,
 	})
 }
 
-func (y *YtDlpDownloader) Name() state.PlatformName {
+func (y *YtdlpPlatform) Name() state.PlatformName {
 	return y.name
 }
 
-func (*YtDlpDownloader) Close() {}
-
 // CanGetTracks checks if this is a valid URL that yt-dlp might handle
-func (y *YtDlpDownloader) CanGetTracks(query string) bool {
+func (y *YtdlpPlatform) CanGetTracks(query string) bool {
 	query = strings.TrimSpace(query)
 
 	// Must be a URL
@@ -88,7 +86,7 @@ func (y *YtDlpDownloader) CanGetTracks(query string) bool {
 }
 
 // GetTracks extracts metadata using yt-dlp
-func (y *YtDlpDownloader) GetTracks(
+func (y *YtdlpPlatform) GetTracks(
 	query string,
 	video bool,
 ) ([]*state.Track, error) {
@@ -140,13 +138,13 @@ func (y *YtDlpDownloader) GetTracks(
 	return tracks, nil
 }
 
-func (y *YtDlpDownloader) CanDownload(source state.PlatformName) bool {
+func (y *YtdlpPlatform) CanDownload(source state.PlatformName) bool {
 	// YtDlp can download from itself (when it extracts info)
 	// and from YouTube platform
 	return source == y.name || source == PlatformYouTube
 }
 
-func (y *YtDlpDownloader) Download(
+func (y *YtdlpPlatform) Download(
 	ctx context.Context,
 	track *state.Track,
 	_ *telegram.NewMessage,
@@ -226,8 +224,11 @@ func (y *YtDlpDownloader) Download(
 	return path, nil
 }
 
+func (*YtdlpPlatform) CanSearch() bool { return false } 
+func (*YtdlpPlatform) Search(string, bool) ([]*models.Track, error) { return nil, nil }
+
 // extractMetadata uses yt-dlp to extract video/audio metadata
-func (y *YtDlpDownloader) extractMetadata(urlStr string) (*ytdlpInfo, error) {
+func (y *YtdlpPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 	args := []string{
 		"-j",
 		"--flat-playlist",
@@ -296,7 +297,7 @@ func (y *YtDlpDownloader) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 }
 
 // infoToTrack converts yt-dlp info to Track
-func (y *YtDlpDownloader) infoToTrack(
+func (y *YtdlpPlatform) infoToTrack(
 	info *ytdlpInfo,
 	video bool,
 ) *state.Track {
@@ -320,7 +321,7 @@ func (y *YtDlpDownloader) infoToTrack(
 }
 
 // isYouTubeURL checks if the URL is from YouTube
-func (y *YtDlpDownloader) isYouTubeURL(urlStr string) bool {
+func (y *YtdlpPlatform) isYouTubeURL(urlStr string) bool {
 	for _, pattern := range youtubePatterns {
 		if pattern.MatchString(urlStr) {
 			return true

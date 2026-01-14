@@ -66,8 +66,6 @@ func (s *SoundCloudPlatform) CanGetTracks(query string) bool {
 	return soundcloudLinkRegex.MatchString(strings.TrimSpace(query))
 }
 
-func (s *SoundCloudPlatform) Close() {}
-
 func (s *SoundCloudPlatform) GetTracks(
 	query string,
 	_ bool,
@@ -199,6 +197,9 @@ func (s *SoundCloudPlatform) Download(
 	return filePath, nil
 }
 
+func (*SoundCloudPlatform) CanSearch() bool { return false } // can but for now not needed
+func (*SoundCloudPlatform) Search(string, bool) ([]*Track, error) { return nil, nil }
+		
 func (s *SoundCloudPlatform) extractMetadata(url string) (*ytdlpInfo, error) {
 	args := []string{
 		"-j",

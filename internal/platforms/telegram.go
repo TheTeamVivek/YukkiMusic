@@ -64,7 +64,6 @@ func init() {
 func (t *TelegramPlatform) Name() state.PlatformName {
 	return t.name
 }
-func (*TelegramPlatform) Close() {}
 
 func (t *TelegramPlatform) CanGetTracks(query string) bool {
 	query = strings.TrimSpace(query)
@@ -149,6 +148,9 @@ func (t *TelegramPlatform) GetTracks(
 
 	return []*state.Track{track}, nil
 }
+
+func (*TelegramPlatform) CanSearch() bool { return false } 
+func (*TelegramPlatform) Search(string, bool) ([]*Track, error) { return nil, nil }
 
 func (t *TelegramPlatform) GetTracksByMessage(
 	rmsg *telegram.NewMessage,

@@ -50,13 +50,11 @@ type apiResponse struct {
 
 type FallenApiPlatform struct {
 	name   state.PlatformName
-	client *resty.Client
 }
 
 func init() {
 	Register(80, &FallenApiPlatform{
 		name:   PlatformFallenApi,
-		client: resty.New(),
 	})
 }
 
@@ -66,12 +64,6 @@ func (f *FallenApiPlatform) Name() state.PlatformName {
 
 func (f *FallenApiPlatform) CanGetTracks(query string) bool {
 	return false
-}
-
-func (f *FallenApiPlatform) Close() {
-	if f != nil && f.client != nil {
-		f.client.Close()
-	}
 }
 
 func (f *FallenApiPlatform) GetTracks(
@@ -128,6 +120,9 @@ func (f *FallenApiPlatform) Download(
 	return path, nil
 }
 
+func (*PlatformFallenApi) CanSearch() bool { return false } 
+func (*FallenApiPlatform) Search(string, bool) ([]*Track, error) { return nil, nil }
+
 func (f *FallenApiPlatform) getDownloadURL(
 	ctx context.Context,
 	mediaURL string,
@@ -141,7 +136,7 @@ func (f *FallenApiPlatform) getDownloadURL(
 
 	var apiResp apiResponse
 
-	resp, err := f.client.R().
+	resp, err := rc.R().
 		SetContext(ctx).
 		SetResult(&apiResp).
 		Get(apiReqURL)
@@ -176,7 +171,7 @@ func (f *FallenApiPlatform) downloadFromURL(
 	dlURL, path string,
 ) error {
 
-	resp, err := f.client.R().
+	resp, err := rc.R().
 		SetContext(ctx).
 		SetOutputFileName(path).
 		Get(dlURL)

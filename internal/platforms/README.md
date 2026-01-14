@@ -11,8 +11,8 @@
 3. [Available Platforms](#-available-platforms)
 4. [Priority System](#-priority-system)
 5. [Adding New Platforms](#-adding-new-platforms)
-6. [Platform Interface](#-platform-interface)
-7. [Troubleshooting](#-troubleshooting)
+6. [Models](#-models)
+7. [Credits](#-credits)
 
 ---
 
@@ -463,108 +463,74 @@ func (a *AppleMusicPlatform) Download(ctx context.Context, _ *state.Track, _ *te
 
 ---
 
-## 🔌 Platform Interface
-
-### Full Interface Definition
+## 🔌 Models
 
 ```go
-type Platform interface {
-    // Unique platform identifier
-    Name() state.PlatformName
-    
-    // cleanup functions
-    Close()
-    
-    // Check if platform can handle this query
-    CanGetTracks(query string) bool
+type (
+	Track struct {
+		ID        string       // track unique id
+		Title     string       // title
+		Duration  int          // track duration in seconds
+		Artwork   string       // thumbnail url of the track
+		URL       string       // track url
+		Requester string       // html mention or @username who requested this track
+		Video     bool         // whether this track will be played as video
+		Source    PlatformName // unique PlatformName
+	}
+	PlatformName string
+	// Platform defines a common contract for all supported platforms
+	// (e.g. YouTube, SoundCloud, Spotify, etc.).
+	//
+	// Each platform is responsible for determining whether it can
+	// search, resolve, or download tracks from a given query or source.
+	Platform interface {
+	  // Name returns the unique identifier of the platform.
+  	Name() PlatformName
 
-    // Fetch track metadata
-    // video: true if video playback requested
-    // Return tracks even if video not supported (set track.Video = false)
-    GetTracks(query string, video bool) ([]*state.Track, error)
+  	// CanSearch reports whether this platform supports search.
+	  CanSearch() bool
 
-    // Check if we can download from specific source
-    CanDownload(source state.PlatformName) bool
+  	// Search searches the platform for tracks matching the query.
+  	//
+  	// query: the search string
+  	// video:
+  	//   - If the platform supports both audio and video, propagate this
+  	//     value into Track.Video
+  	//   - If the platform is audio-only, always set Track.Video = false
+  	//   - If the platform is video-only, always set Track.Video = true
+  	//
+  	// This method is primarily used for video playback workflows.
+  	Search(query string, video bool) ([]*Track, error)
 
-    // Download track and return local file path
-    // Use mystic for progress updates (if provided)
-    Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error)
-}
+  	// CanDownload reports whether this platform can download tracks
+  	// originating from the given source platform.
+  	CanDownload(source PlatformName) bool
+
+  	// Download downloads the given track and returns the local file path.
+  	//
+  	// ctx is used for cancellation and timeouts.
+  	// track is the track to download.
+  	// mystic used to send progress updates (if not nil).
+  	// if your platform support video playback so return local path of video when track.Video is true
+  	Download(
+	  	ctx context.Context,
+	  	track *Track,
+	  	mystic *telegram.NewMessage,
+  	) (string, error)
+
+  	// CanGetTracks reports whether this platform can resolve
+  	// tracks from the given query search term.
+  	CanGetTracks(query string) bool
+
+  	// GetTracks fetches track metadata for the given query.
+  	//
+  	// video indicates whether video playback is requested.
+  	// Platforms that do not support video should still return tracks,
+  	// but must set Track.Video = false.
+  	GetTracks(query string, video bool) ([]*Track, error)
+  }
+)
 ```
-
-### Track Model
-
-```go
-type Track struct {
-    ID        string          // Unique track ID
-    Title     string          // Track name
-    Duration  int             // Length in seconds
-    Artwork   string          // Thumbnail URL
-    URL       string          // Source URL
-    Requester string          // User mention (HTML)
-    Video     bool            // Video playback flag
-    Source    PlatformName    // Which platform found this
-}
-```
-
----
-
-## 🔧 Implementation Tips
-
-### Error Handling
-
-```go
-// Always provide meaningful error messages
-func (p *MyPlatform) GetTracks(query string, _ bool) ([]*state.Track, error) {
-    if query == "" {
-        return nil, errors.New("query cannot be empty")
-    }
-    
-    if !p.IsValid(query) {
-        return nil, fmt.Errorf("unsupported URL format: %s", query)
-    }
-    
-    // Handle network errors gracefully
-    // Don't crash, just return error
-}
-```
-
-### Progress Updates
-
-```go
-func (p *MyPlatform) Download(ctx context.Context, track *state.Track, mystic *telegram.NewMessage) (string, error) {
-    // Get progress manager from message
-    pm := utils.GetProgress(mystic)
-    
-    // Download with progress updates
-    // Progress will be sent to Telegram automatically
-    
-    // Handle cancellation
-    select {
-    case <-ctx.Done():
-        return "", ctx.Err() // User cancelled
-    default:
-        // Continue download
-    }
-}
-```
-
-### Helper Functions
-
-```go
-// Use shared helper functions from base_platform.go
-func (p *MyPlatform) Download(ctx context.Context, track *state.Track, _ *telegram.NewMessage) (string, error) {
-    // Check if already downloaded
-    if track.IsExists(){
-      return track.FilePath(), nil
-    }
-    
-    path := track.FilePath() // download 'n write in this file
-    
-    // Your download logic here...
-}
-```
-
 ---
 ## 🎯 Credits
 

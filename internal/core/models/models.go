@@ -40,19 +40,58 @@ type (
 		Source    PlatformName // unique PlatformName
 	}
 	PlatformName string
-
+	// Platform defines a common contract for all supported platforms
+	// (e.g. YouTube, SoundCloud, Spotify, etc.).
+	//
+	// Each platform is responsible for determining whether it can
+	// search, resolve, or download tracks from a given query or source.
 	Platform interface {
-		Close() // cleanup
-		Name() PlatformName
-		CanGetTracks(query string) bool
-		GetTracks(query string, video bool) ([]*Track, error)
-		Download(
-			ctx context.Context,
-			track *Track,
-			mystic *telegram.NewMessage,
-		) (string, error)
-		CanDownload(source PlatformName) bool
-	}
+	  // Name returns the unique identifier of the platform.
+  	Name() PlatformName
+
+  	// CanSearch reports whether this platform supports search.
+	  CanSearch() bool
+
+  	// Search searches the platform for tracks matching the query.
+  	//
+  	// query: the search string
+  	// video:
+  	//   - If the platform supports both audio and video, propagate this
+  	//     value into Track.Video
+  	//   - If the platform is audio-only, always set Track.Video = false
+  	//   - If the platform is video-only, always set Track.Video = true
+  	//
+  	// This method is primarily used for video playback workflows.
+  	Search(query string, video bool) ([]*Track, error)
+
+  	// CanDownload reports whether this platform can download tracks
+  	// originating from the given source platform.
+  	CanDownload(source PlatformName) bool
+
+  	// Download downloads the given track and returns the local file path.
+  	//
+  	// ctx is used for cancellation and timeouts.
+  	// track is the track to download.
+  	// mystic used to send progress updates (if not nil).
+  	// if your platform support video playback so return local path of video when track.Video is true
+  	Download(
+	  	ctx context.Context,
+	  	track *Track,
+	  	mystic *telegram.NewMessage,
+  	) (string, error)
+
+  	// CanGetTracks reports whether this platform can resolve
+  	// tracks from the given query search term.
+  	CanGetTracks(query string) bool
+
+  	// GetTracks fetches track metadata for the given query.
+  	//
+  	// video indicates whether video playback is requested.
+  	// Platforms that do not support video should still return tracks,
+  	// but must set Track.Video = false.
+  	GetTracks(query string, video bool) ([]*Track, error)
+  }
+
 )
 
 // returns filepath where song should be Downloaded
