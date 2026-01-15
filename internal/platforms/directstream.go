@@ -183,7 +183,7 @@ func (*DirectStreamPlatform) CanSearch() bool { return false }
 func (*DirectStreamPlatform) Search(
 	string,
 	bool,
-) ([]*models.Track, error) {
+) ([]*state.Track, error) {
 	return nil, nil
 }
 

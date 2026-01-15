@@ -171,7 +171,7 @@ func (*YouTubePlatform) CanSearch() bool { return true }
 func (y *YouTubePlatform) Search(
 	q string,
 	video bool,
-) ([]*models.Track, error) {
+) ([]*state.Track, error) {
 	return y.GetTracks(q, video)
 }
 

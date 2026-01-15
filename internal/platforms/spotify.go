@@ -227,7 +227,7 @@ func (*SpotifyPlatform) CanSearch() bool { return false }
 func (*SpotifyPlatform) Search(
 	string,
 	bool,
-) ([]*models.Track, error) {
+) ([]*state.Track, error) {
 	return nil, nil
 }
 

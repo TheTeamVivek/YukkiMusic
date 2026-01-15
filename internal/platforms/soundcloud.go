@@ -200,7 +200,7 @@ func (*SoundCloudPlatform) CanSearch() bool { return false } // can but for now 
 func (*SoundCloudPlatform) Search(
 	string,
 	bool,
-) ([]*models.Track, error) {
+) ([]*state.Track, error) {
 	return nil, nil
 }
 

@@ -229,7 +229,7 @@ func (*YtdlpPlatform) CanSearch() bool { return false }
 func (*YtdlpPlatform) Search(
 	string,
 	bool,
-) ([]*models.Track, error) {
+) ([]*state.Track, error) {
 	return nil, nil
 }
 

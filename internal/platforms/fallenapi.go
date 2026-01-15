@@ -124,7 +124,7 @@ func (*FallenApiPlatform) CanSearch() bool { return false }
 func (*FallenApiPlatform) Search(
 	string,
 	bool,
-) ([]*models.Track, error) {
+) ([]*state.Track, error) {
 	return nil, nil
 }
 
