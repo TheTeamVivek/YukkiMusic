@@ -154,7 +154,7 @@ func (*TelegramPlatform) CanSearch() bool { return false }
 func (*TelegramPlatform) Search(
 	string,
 	bool,
-) ([]*Track, error) {
+) ([]*models.Track, error) {
 	return nil, nil
 }
 

@@ -167,7 +167,7 @@ func (yt *YouTubePlatform) Download(
 }
 
 func (*YouTubePlatform) CanSearch() bool { return true }
-func (y *YouTubePlatform) Search(q string, video bool) ([]*Track, error) {
+func (y *YouTubePlatform) Search(q string, video bool) ([]*models.Track, error) {
 	return y.GetTracks(q, video)
 }
 

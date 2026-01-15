@@ -119,12 +119,12 @@ func (f *FallenApiPlatform) Download(
 	return path, nil
 }
 
-func (*PlatformFallenApi) CanSearch() bool { return false }
+func (*FallenApiPlatform) CanSearch() bool { return false }
 
 func (*FallenApiPlatform) Search(
 	string,
 	bool,
-) ([]*Track, error) {
+) ([]*models.Track, error) {
 	return nil, nil
 }
 
