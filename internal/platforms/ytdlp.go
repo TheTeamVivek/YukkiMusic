@@ -170,15 +170,13 @@ func (y *YtdlpPlatform) Download(
 	// Format selection
 	if track.Video {
 		args = append(args,
-			"-f", "bestvideo[height<=720]+bestaudio/best",
-			"--merge-output-format", "mp4",
+    		"-f", "(b[height>=360][height<=1080]/bv*[height>=360][height<=1080]/bv*)+(ba[abr>=180][abr<=360]/ba)/b",
 		)
 	} else {
 		args = append(args,
-			"-f", "bestaudio",
-			"--extract-audio",
-			"--audio-format", "m4a",
-			"--merge-output-format", "m4a",
+    		"-f", "ba[abr>=180][abr<=360]/ba",
+  		  "-x",
+    		"--concurrent-fragments", "4",
 		)
 	}
 
