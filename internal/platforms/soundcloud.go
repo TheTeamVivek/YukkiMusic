@@ -140,18 +140,17 @@ func (s *SoundCloudPlatform) Download(
 	filePath := track.FilePath()
 
 	args := []string{
-		"-f", "bestaudio/best",
-		"--extract-audio",
-		"--audio-format", "m4a",
-		"--merge-output-format m4a",
-		"--audio-quality", "0",
+		"-f", "ba[abr>=160]/ba",
+		"-x",
+		"--concurrent-fragments", "4",
 		"--no-playlist",
-		"-o", filePath,
+		"--no-part",
 		"--no-warnings",
 		"--no-overwrites",
 		"--ignore-errors",
 		"--no-check-certificate",
 		"-q",
+		"-o", filePath,
 	}
 
 	args = append(args, track.URL)
