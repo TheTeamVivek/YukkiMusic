@@ -21,6 +21,9 @@
 package core
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/Laky-64/gologging"
 
 	state "main/internal/core/models"
@@ -73,18 +76,14 @@ func (r *RoomState) releaseFile() {
 
 	if used {
 		gologging.DebugF(
-			"file still in use, skipped remove: %s",
-			track.FilePath(),
+			"file still in use, skipped remove: %s:%s",
+			string(track.Source),
+			track.ID,
 		)
 		return
 	}
 
-	if track.Remove() {
-		gologging.DebugF(
-			"removed unused file: %s",
-			track.FilePath(),
-		)
-	}
+	findAndRemove(track)
 }
 
 // cleanup current + queued track files if unused
@@ -104,7 +103,7 @@ func (r *RoomState) cleanupFile() {
 	}
 
 	for _, t := range tracks {
-		if t == nil || t.ID == "" || !t.IsExists() {
+		if t == nil || t.ID == "" {
 			continue
 		}
 
@@ -114,17 +113,33 @@ func (r *RoomState) cleanupFile() {
 
 		if used {
 			gologging.DebugF(
-				"track still in use, skip delete: %s",
-				t.FilePath(),
+				"track still in use, skip delete: %s:%s",
+				string(t.Source),
+				t.ID,
 			)
 			continue
 		}
 
-		if t.Remove() {
-			gologging.DebugF(
-				"removed unused file: %s",
-				t.FilePath(),
-			)
-		}
+		findAndRemove(t)
+	}
+}
+
+func findAndRemove(track *state.Track) {
+	t := "audio"
+	if track.Video {
+		t = "video"
+	}
+
+	files, err := filepath.Glob(filepath.Join("downloads", t+"_"+track.ID+"*"))
+	if err != nil {
+		return
+	}
+
+	for _, f := range files {
+		os.Remove(f)
+		gologging.DebugF(
+			"removed unused file: %s",
+			f,
+		)
 	}
 }

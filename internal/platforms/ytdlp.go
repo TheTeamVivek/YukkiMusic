@@ -149,11 +149,11 @@ func (y *YtdlpPlatform) Download(
 	track *state.Track,
 	_ *telegram.NewMessage,
 ) (string, error) {
-	if track.IsExists() {
-		return track.FilePath(), nil
+	if f := findFile(track); f != "" {
+		gologging.Debug("Ytdlp: Download -> Cached File -> " + f)
+		return f, nil
 	}
 
-	path := track.FilePath()
 	gologging.InfoF("YtDlp: Downloading %s", track.Title)
 
 	args := []string{
@@ -164,7 +164,7 @@ func (y *YtdlpPlatform) Download(
 		"--ignore-errors",
 		"--no-check-certificate",
 		"-q",
-		"-o", path,
+		"-o", getPath(track, ".%(ext)s"),
 	}
 
 	// Format selection
@@ -206,7 +206,7 @@ func (y *YtdlpPlatform) Download(
 			"YtDlp: Download failed for %s: %v\nSTDOUT:\n%s\nSTDERR:\n%s",
 			track.URL, err, outStr, errStr,
 		)
-		track.Remove()
+		findAndRemove(track)
 
 		if errors.Is(err, context.Canceled) ||
 			errors.Is(err, context.DeadlineExceeded) {
@@ -216,7 +216,8 @@ func (y *YtdlpPlatform) Download(
 		return "", fmt.Errorf("yt-dlp error: %w", err)
 	}
 
-	if !track.IsExists() {
+	path := findFile(track)
+	if path == "" {
 		return "", errors.New("yt-dlp did not return output file path")
 	}
 

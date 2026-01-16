@@ -125,7 +125,14 @@ func loadCookieCache() error {
 	if err != nil {
 		return err
 	}
-	cachedFiles = files
+	var filtered []string
+	for _, f := range files {
+		if filepath.Base(f) == "example.txt" {
+			continue
+		}
+		filtered = append(filtered, f)
+	}
+	cachedFiles = filtered
 	return nil
 }
 

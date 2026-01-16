@@ -189,9 +189,12 @@ func (t *TelegramPlatform) Download(
 	track *state.Track,
 	mystic *telegram.NewMessage,
 ) (string, error) {
-	path := track.FilePath()
+	path := getPath(track, ".mp3")
+	if track.Video {
+		path = getPath(track, ".mp4")
+	}
 
-	if track.IsExists() {
+	if fileExists(path) {
 		if track.Duration == 0 {
 			if dur, err := utils.GetDurationByFFProbe(path); err == nil {
 				track.Duration = dur

@@ -29,6 +29,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
@@ -89,8 +90,9 @@ func (f *FallenApiPlatform) Download(
 	// fallen api didn't support video downloads so disable it
 	track.Video = false
 
-	if track.IsExists() {
-		return track.FilePath(), nil
+	if f := findFile(track); f != "" {
+		gologging.Debug("FallenApi: Download -> Cached File -> " + f)
+		return f, nil
 	}
 
 	var pm *telegram.ProgressManager
@@ -103,7 +105,7 @@ func (f *FallenApiPlatform) Download(
 		return "", err
 	}
 
-	path := track.FilePath()
+	path := getPath(track, ".mp3")
 
 	var downloadErr error
 	if telegramDLRegex.MatchString(dlURL) {
@@ -115,7 +117,9 @@ func (f *FallenApiPlatform) Download(
 	if downloadErr != nil {
 		return "", downloadErr
 	}
-
+	if !fileExists(path) {
+		return "", errors.New("empty file returned by API")
+	}
 	return path, nil
 }
 
