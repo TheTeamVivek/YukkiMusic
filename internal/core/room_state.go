@@ -370,9 +370,10 @@ func (r *RoomState) Destroy() {
 	_, file, line, _ := runtime.Caller(1)
 	gologging.DebugF("Destroy Called from %s:%d", file, line)
 
-	if !r.destroyed.CompareAndSwap(false, true) {
+	if r.destroyed.Load() {
 		return
 	}
+
 
 	if err := r.Stop(); err != nil {
 		gologging.ErrorF(
@@ -386,4 +387,6 @@ func (r *RoomState) Destroy() {
 	roomsMu.Lock()
 	delete(rooms, r.chatID)
 	roomsMu.Unlock()
+
+r.destroyed.Store(true)
 }
