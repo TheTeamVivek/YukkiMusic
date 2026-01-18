@@ -233,9 +233,9 @@ func (r *RoomState) IsCPlay() bool {
 }
 
 func (r *RoomState) IsActiveChat() bool {
-	r.Parse()
 	r.RLock()
 	defer r.RUnlock()
+r.parse()
 	return r.track != nil && r.playing
 }
 
