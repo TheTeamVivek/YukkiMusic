@@ -35,6 +35,10 @@ import "C"
 
 import (
 	"os"
+	"net/http"
+	_ "net/http/pprof"
+	"runtime"
+
 
 	"github.com/Laky-64/gologging"
 
@@ -107,4 +111,15 @@ func refreshCacheAndDownloads() error {
 		}
 	}
 	return nil
+}
+
+func startPprofServer() {
+	runtime.SetMutexProfileFraction(1)
+	runtime.SetBlockProfileRate(1)
+
+	go func() {
+		if err := http.ListenAndServe(":6060", nil); err != nil {
+			gologging.Error("Failed to start pprof server: " + err.Error())
+		}
+	}()
 }
