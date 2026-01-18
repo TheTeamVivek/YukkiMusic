@@ -34,7 +34,9 @@ import (
 func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 	r.Lock()
 	defer r.Unlock()
-
+	if r.destroyed {
+		return ErrRoomDestroyed
+	}
 	forcePlay := len(force) > 0 && force[0]
 
 	if !forcePlay && r.playing && r.track != nil {
@@ -51,18 +53,14 @@ func (r *RoomState) startPlayback(t *state.Track, path string) error {
 	r.fpath = path
 
 	if err := r.p.Play(r); err != nil {
-		r.cleanupFailedPlayback()
+		r.track = nil
+		r.playing = false
+		r.fpath = ""
 		return err
 	}
 
 	r.resetPlaybackState()
 	return nil
-}
-
-func (r *RoomState) cleanupFailedPlayback() {
-	r.track = nil
-	r.playing = false
-	r.fpath = ""
 }
 
 func (r *RoomState) resetPlaybackState() {
@@ -74,6 +72,10 @@ func (r *RoomState) resetPlaybackState() {
 
 // Pause pauses playback with optional auto-resume
 func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
+	if r.Destroyed() {
+		return false, ErrRoomDestroyed
+	}
+
 	if r.IsPaused() {
 		return true, nil
 	}
@@ -90,16 +92,13 @@ func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	r.updatePauseState()
-	r.scheduleAutoResume(autoResumeAfter)
-
-	return paused, nil
-}
-
-func (r *RoomState) updatePauseState() {
 	r.parse()
 	r.paused = true
 	r.muted = false
+
+	r.scheduleAutoResume(autoResumeAfter)
+
+	return paused, nil
 }
 
 func (r *RoomState) scheduleAutoResume(autoResumeAfter []time.Duration) {
@@ -112,13 +111,19 @@ func (r *RoomState) scheduleAutoResume(autoResumeAfter []time.Duration) {
 		d := autoResumeAfter[0]
 		r.scheduledResumeUntil = time.Now().Add(d)
 		r.scheduledResumeTimer = time.AfterFunc(d, func() {
-			r.Resume()
+			if !r.Destroyed() {
+				r.Resume()
+			}
 		})
 	}
 }
 
 // Resume resumes playback
 func (r *RoomState) Resume() (bool, error) {
+	if r.Destroyed() {
+		return false, ErrRoomDestroyed
+	}
+
 	if !r.IsActiveChat() {
 		return false, fmt.Errorf("there are no active music playing")
 	}
@@ -149,6 +154,10 @@ func (r *RoomState) updateResumeState() {
 
 // Replay restarts the current track
 func (r *RoomState) Replay() error {
+	if r.Destroyed() {
+		return ErrRoomDestroyed
+	}
+
 	r.Lock()
 	defer r.Unlock()
 
@@ -178,6 +187,10 @@ func (r *RoomState) executeReplay() error {
 
 // Stop stops playback completely
 func (r *RoomState) Stop() error {
+	if r.Destroyed() {
+		return ErrRoomDestroyed
+	}
+
 	r.Lock()
 	defer r.Unlock()
 

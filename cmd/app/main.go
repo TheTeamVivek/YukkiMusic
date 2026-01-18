@@ -34,11 +34,10 @@ package main
 import "C"
 
 import (
-	"os"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
 	"runtime"
-
 
 	"github.com/Laky-64/gologging"
 

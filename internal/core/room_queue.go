@@ -31,7 +31,9 @@ import (
 func (r *RoomState) NextTrack() *state.Track {
 	r.Lock()
 	defer r.Unlock()
-
+	if r.destroyed {
+		return nil
+	}
 	if r.shouldLoopCurrentTrack() {
 		return r.loopCurrentTrack()
 	}
@@ -92,6 +94,9 @@ func (r *RoomState) RemoveFromQueue(index int) {
 	r.Lock()
 	defer r.Unlock()
 
+	if r.destroyed {
+		return
+	}
 	if index == -1 {
 		r.clearQueue()
 		return
@@ -114,7 +119,9 @@ func (r *RoomState) isValidQueueIndex(index int) bool {
 func (r *RoomState) MoveInQueue(from, to int) {
 	r.Lock()
 	defer r.Unlock()
-
+	if r.destroyed {
+		return
+	}
 	if !r.isValidMove(from, to) {
 		return
 	}
