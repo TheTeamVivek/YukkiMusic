@@ -374,7 +374,6 @@ func (r *RoomState) Destroy() {
 		return
 	}
 
-
 	if err := r.Stop(); err != nil {
 		gologging.ErrorF(
 			"Error during room stop for chat %d: %v",
@@ -388,5 +387,5 @@ func (r *RoomState) Destroy() {
 	delete(rooms, r.chatID)
 	roomsMu.Unlock()
 
-r.destroyed.Store(true)
+	r.destroyed.Store(true)
 }
