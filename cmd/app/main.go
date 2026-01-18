@@ -54,6 +54,7 @@ func main() {
 
 	checkFFmpegAndFFprobe()
 	refreshCacheAndDownloads()
+	startPprofServer()
 
 	gologging.Debug("🔹 Initializing MongoDB...")
 	dbCleanup := database.Init(config.MongoURI)
