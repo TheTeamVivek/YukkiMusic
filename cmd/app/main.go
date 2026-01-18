@@ -34,10 +34,7 @@ package main
 import "C"
 
 import (
-	"net/http"
-	_ "net/http/pprof"
 	"os"
-	"runtime"
 
 	"github.com/Laky-64/gologging"
 
@@ -53,7 +50,6 @@ func main() {
 
 	checkFFmpegAndFFprobe()
 	refreshCacheAndDownloads()
-	startPprofServer()
 
 	gologging.Debug("🔹 Initializing MongoDB...")
 	dbCleanup := database.Init(config.MongoURI)
@@ -111,15 +107,4 @@ func refreshCacheAndDownloads() error {
 		}
 	}
 	return nil
-}
-
-func startPprofServer() {
-	runtime.SetMutexProfileFraction(1)
-	runtime.SetBlockProfileRate(1)
-
-	go func() {
-		if err := http.ListenAndServe(":6060", nil); err != nil {
-			gologging.Error("Failed to start pprof server: " + err.Error())
-		}
-	}()
 }
