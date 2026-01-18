@@ -1,6 +1,11 @@
 package ubot
 
-import "main/ntgcalls"
+import (
+	"fmt"
+	"time"
+
+	"main/ntgcalls"
+)
 
 func (ctx *Context) Mute(chatID int64) (bool, error) {
 	return ctx.binding.Mute(chatID)
@@ -30,20 +35,30 @@ func (ctx *Context) Play(
 		)
 	}
 
-	err := ctx.connectCall(chatID, mediaDescription, "")
-	if err != nil {
-		return err
+	errChan := make(chan error, 1)
+
+	go func() {
+		err := ctx.connectCall(chatID, mediaDescription, "")
+		errChan <- err
+	}()
+
+	select {
+	case err := <-errChan:
+		if err != nil {
+			return err
+		}
+	case <-time.After(35 * time.Second):
+		return fmt.Errorf("timed out")
 	}
 
 	if chatID < 0 {
-
-		err = ctx.joinPresentation(chatID, mediaDescription.Screen != nil)
+		err := ctx.joinPresentation(chatID, mediaDescription.Screen != nil)
 		if err != nil {
 			return err
 		}
 		return ctx.updateSources(chatID)
-
 	}
+
 	return nil
 }
 
@@ -63,6 +78,7 @@ func (ctx *Context) Record(
 }
 
 func (ctx *Context) Stop(chatID int64) error {
+	// Clean up presentations
 	ctx.presentationsMutex.Lock()
 	ctx.presentations = stdRemove(ctx.presentations, chatID)
 	ctx.presentationsMutex.Unlock()
@@ -74,6 +90,16 @@ func (ctx *Context) Stop(chatID int64) error {
 	ctx.callSourcesMutex.Lock()
 	delete(ctx.callSources, chatID)
 	ctx.callSourcesMutex.Unlock()
+
+	ctx.waitConnectMutex.Lock()
+	if waitChan, exists := ctx.waitConnect[chatID]; exists {
+		select {
+		case waitChan <- fmt.Errorf("call stopped"):
+		default:
+		}
+		delete(ctx.waitConnect, chatID)
+	}
+	ctx.waitConnectMutex.Unlock()
 
 	err := ctx.binding.Stop(chatID)
 	if err != nil {

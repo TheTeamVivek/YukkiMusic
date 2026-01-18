@@ -29,11 +29,13 @@ import (
 
 // NextTrack retrieves and prepares the next track in queue
 func (r *RoomState) NextTrack() *state.Track {
-	r.Lock()
-	defer r.Unlock()
-	if r.destroyed {
+	if r.destroyed.Load() {
 		return nil
 	}
+
+	r.Lock()
+	defer r.Unlock()
+
 	if r.shouldLoopCurrentTrack() {
 		return r.loopCurrentTrack()
 	}
@@ -91,37 +93,32 @@ func (r *RoomState) prepareNextTrack(track *state.Track) {
 
 // RemoveFromQueue removes track(s) from queue
 func (r *RoomState) RemoveFromQueue(index int) {
+	if r.destroyed.Load() {
+		return
+	}
+
 	r.Lock()
 	defer r.Unlock()
 
-	if r.destroyed {
-		return
-	}
 	if index == -1 {
-		r.clearQueue()
+		r.queue = []*state.Track{}
 		return
 	}
 
-	if r.isValidQueueIndex(index) {
-		r.removeTrackAtIndex(index)
+	if index >= 0 && index < len(r.queue) {
+		r.queue = append(r.queue[:index], r.queue[index+1:]...)
 	}
-}
-
-func (r *RoomState) clearQueue() {
-	r.queue = []*state.Track{}
-}
-
-func (r *RoomState) isValidQueueIndex(index int) bool {
-	return index >= 0 && index < len(r.queue)
 }
 
 // MoveInQueue moves a track from one position to another
 func (r *RoomState) MoveInQueue(from, to int) {
-	r.Lock()
-	defer r.Unlock()
-	if r.destroyed {
+	if r.destroyed.Load() {
 		return
 	}
+
+	r.Lock()
+	defer r.Unlock()
+
 	if !r.isValidMove(from, to) {
 		return
 	}
@@ -130,8 +127,8 @@ func (r *RoomState) MoveInQueue(from, to int) {
 }
 
 func (r *RoomState) isValidMove(from, to int) bool {
-	return r.isValidQueueIndex(from) &&
-		r.isValidQueueIndex(to) &&
+	return from >= 0 && from < len(r.queue) &&
+		to >= 0 && to < len(r.queue) &&
 		from != to
 }
 

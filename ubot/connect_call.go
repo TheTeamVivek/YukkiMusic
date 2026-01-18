@@ -260,5 +260,10 @@ func (ctx *Context) connectCall(
 		}
 	}
 
-	return <-waitChan
+	select {
+	case err := <-waitChan:
+		return err
+	case <-time.After(20 * time.Second):
+		return fmt.Errorf("connection timeout: no response from ntgcalls")
+	}
 }
