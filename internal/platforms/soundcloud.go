@@ -26,9 +26,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -63,7 +61,7 @@ func (s *SoundCloudPlatform) Name() state.PlatformName {
 	return s.name
 }
 
-func (s *SoundCloudPlatform) IsValid(query string) bool {
+func (s *SoundCloudPlatform) CanGetTracks(query string) bool {
 	return soundcloudLinkRegex.MatchString(strings.TrimSpace(query))
 }
 
@@ -72,11 +70,6 @@ func (s *SoundCloudPlatform) GetTracks(
 	_ bool,
 ) ([]*state.Track, error) {
 	query = strings.TrimSpace(query)
-	if query == "" {
-		err := errors.New("empty query")
-		gologging.Error("SoundCloud: " + err.Error())
-		return nil, err
-	}
 
 	cacheKey := "soundcloud:" + strings.ToLower(query)
 	if cached, ok := soundcloudCache.Get(cacheKey); ok {
@@ -119,7 +112,7 @@ func (s *SoundCloudPlatform) GetTracks(
 	return tracks, nil
 }
 
-func (s *SoundCloudPlatform) IsDownloadSupported(
+func (s *SoundCloudPlatform) CanDownload(
 	source state.PlatformName,
 ) bool {
 	return source == PlatformSoundCloud
@@ -130,35 +123,25 @@ func (s *SoundCloudPlatform) Download(
 	track *state.Track,
 	_ *telegram.NewMessage,
 ) (string, error) {
-	if path, err := checkDownloadedFile(track.ID); err == nil {
-		gologging.InfoF("SoundCloud: Using cached file for %s", track.ID)
-		return path, nil
+	track.Video = false
+	if p := findFile(track); p != "" {
+		return p, nil
 	}
 
 	gologging.InfoF("SoundCloud: Downloading %s", track.Title)
 
-	if err := ensureDownloadsDir(); err != nil {
-		gologging.ErrorF(
-			"SoundCloud: Failed to create downloads directory: %v",
-			err,
-		)
-		return "", fmt.Errorf("failed to create downloads directory: %w", err)
-	}
-
-	filePath := filepath.Join("downloads", track.ID+".mp3")
-
 	args := []string{
-		"-f", "bestaudio/best",
-		"--extract-audio",
-		"--audio-format", "mp3",
-		"--audio-quality", "0",
+		"-f", "ba[abr>=128]/ba",
+		"-x",
+		"--concurrent-fragments", "4",
 		"--no-playlist",
-		"-o", filePath,
+		"--no-part",
 		"--no-warnings",
 		"--no-overwrites",
 		"--ignore-errors",
 		"--no-check-certificate",
 		"-q",
+		"-o", getPath(track, ".%(ext)s"),
 	}
 
 	args = append(args, track.URL)
@@ -180,7 +163,7 @@ func (s *SoundCloudPlatform) Download(
 			errStr,
 		)
 
-		os.Remove(filePath)
+		findAndRemove(track)
 
 		if errors.Is(err, context.Canceled) ||
 			errors.Is(err, context.DeadlineExceeded) {
@@ -195,13 +178,21 @@ func (s *SoundCloudPlatform) Download(
 		)
 	}
 
-	if _, err := os.Stat(filePath); err != nil {
-		gologging.ErrorF("SoundCloud: Downloaded file not found: %v", err)
-		return "", fmt.Errorf("downloaded file not found: %w", err)
+	path := findFile(track)
+	if path == "" {
+		return "", errors.New("yt-dlp did not return output file path")
 	}
 
 	gologging.InfoF("SoundCloud: Successfully downloaded %s", track.Title)
-	return filePath, nil
+	return path, nil
+}
+
+func (*SoundCloudPlatform) CanSearch() bool { return false } // can but for now not needed
+func (*SoundCloudPlatform) Search(
+	string,
+	bool,
+) ([]*state.Track, error) {
+	return nil, nil
 }
 
 func (s *SoundCloudPlatform) extractMetadata(url string) (*ytdlpInfo, error) {

@@ -33,8 +33,7 @@ import (
 )
 
 func init() {
-	helpTexts["bug"] = fmt.Sprintf(
-		`<i>Report a bug, issue, or unexpected behavior directly to the bot developers.</i>
+	helpTexts["bug"] = `<i>Report a bug, issue, or unexpected behavior directly to the bot developers.</i>
 
 <u>Usage:</u>
 <b>/bug &lt;description&gt;</b> — Send a bug report with a short explanation.  
@@ -45,8 +44,7 @@ When used, the bot automatically forwards your report (and the replied message i
 Flood protection is applied — you can only send one report every <b>5 minutes</b> per chat.
 
 <b>⚠️ Note:</b>  
-Reports are logged for debugging purposes only. Misuse (like spam) may restrict your access to this command.`,
-	)
+Reports are logged for debugging purposes only. Misuse (like spam) may restrict your access to this command.`
 }
 
 // TODO: Add support for bug answers, misuse bans

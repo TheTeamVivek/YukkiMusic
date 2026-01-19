@@ -32,7 +32,7 @@ import (
 // check if a track is used in any room (other than the given room)
 func isTrackUsed(trackID string, skipChatID int64) bool {
 	for _, room := range rooms {
-		if !isRoomEligible(room, skipChatID) {
+		if room == nil || room.track == nil || room.chatID == skipChatID {
 			continue
 		}
 
@@ -40,58 +40,59 @@ func isTrackUsed(trackID string, skipChatID int64) bool {
 			return true
 		}
 
-		if isTrackInQueue(trackID, room.queue, 2) {
+		if isTrackInQueue(trackID, room.queue) {
 			return true
 		}
 	}
 	return false
 }
 
-func isRoomEligible(room *RoomState, skipChatID int64) bool {
-	return room != nil &&
-		room.track != nil &&
-		room.chatID != skipChatID
-}
-
-func isTrackInQueue(trackID string, queue []*state.Track, limit int) bool {
+// checks first N (2) queued tracks
+func isTrackInQueue(trackID string, queue []*state.Track) bool {
+	limit := 2
 	if len(queue) < limit {
 		limit = len(queue)
 	}
 
 	for _, q := range queue[:limit] {
-		if q.ID == trackID {
+		if q != nil && q.ID == trackID {
 			return true
 		}
 	}
 	return false
 }
 
+// release current track file if unused elsewhere
 func (r *RoomState) releaseFile() {
-	if r == nil || r.track == nil || r.fpath == "" {
+	if r == nil || r.track == nil {
 		return
 	}
 
+	track := r.track
+
 	roomsMu.RLock()
-	used := isTrackUsed(r.track.ID, r.chatID)
+	used := isTrackUsed(track.ID, r.chatID)
 	roomsMu.RUnlock()
 
-	if !used {
-		if err := os.Remove(r.fpath); err != nil && !os.IsNotExist(err) {
-			gologging.ErrorF("failed to remove file %s: %v", r.fpath, err)
-		} else {
-			gologging.DebugF("removed unused file: %s", r.fpath)
-		}
-	} else {
-		gologging.DebugF("file still in use, skipped remove: %s", r.fpath)
+	if used {
+		gologging.DebugF(
+			"file still in use, skipped remove: %s:%s",
+			string(track.Source),
+			track.ID,
+		)
+		return
 	}
+
+	findAndRemove(track)
 }
 
+// cleanup current + queued track files if unused
 func (r *RoomState) cleanupFile() {
 	if r == nil {
 		return
 	}
 
-	// Collect current + queued tracks, up to 5
+	// collect current + next tracks (max 2)
 	tracks := []*state.Track{}
 	if r.track != nil {
 		tracks = append(tracks, r.track)
@@ -101,27 +102,44 @@ func (r *RoomState) cleanupFile() {
 		tracks = tracks[:2]
 	}
 
-	roomsMu.RLock()
 	for _, t := range tracks {
-		if t == nil || t.ID == "" || isTrackUsed(t.ID, r.chatID) {
-			gologging.DebugF("track %s still in use, skip delete", t.ID)
+		if t == nil || t.ID == "" {
 			continue
 		}
 
-		pattern := filepath.Join("downloads", t.ID+".*")
-		matches, err := filepath.Glob(pattern)
-		if err != nil {
-			gologging.ErrorF("glob failed for %s: %v", pattern, err)
+		roomsMu.RLock()
+		used := isTrackUsed(t.ID, r.chatID)
+		roomsMu.RUnlock()
+
+		if used {
+			gologging.DebugF(
+				"track still in use, skip delete: %s:%s",
+				string(t.Source),
+				t.ID,
+			)
 			continue
 		}
 
-		for _, f := range matches {
-			if err := os.Remove(f); err != nil && !os.IsNotExist(err) {
-				gologging.ErrorF("failed to remove file %s: %v", f, err)
-			} else {
-				gologging.DebugF("removed unused file: %s", f)
-			}
-		}
+		findAndRemove(t)
 	}
-	roomsMu.RUnlock()
+}
+
+func findAndRemove(track *state.Track) {
+	t := "audio"
+	if track.Video {
+		t = "video"
+	}
+
+	files, err := filepath.Glob(filepath.Join("downloads", t+"_"+track.ID+"*"))
+	if err != nil {
+		return
+	}
+
+	for _, f := range files {
+		os.Remove(f)
+		gologging.DebugF(
+			"removed unused file: %s",
+			f,
+		)
+	}
 }

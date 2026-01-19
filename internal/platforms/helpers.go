@@ -25,24 +25,72 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/Laky-64/gologging"
+
+	state "main/internal/core/models"
 )
 
-// checkDownloadedFile checks if a file already exists in downloads folder
-func checkDownloadedFile(trackID string) (string, error) {
-	pattern := filepath.Join("./downloads", trackID+".*")
-	matches, err := filepath.Glob(pattern)
-	if err != nil {
-		return "", err
+func getPath(track *state.Track, ext string) string {
+	if ext != "" && !strings.HasPrefix(ext, ".") {
+		ext = "." + ext
 	}
-	if len(matches) == 0 {
-		return "", errors.New("file not found")
+
+	mediaType := "audio"
+	if track.Video {
+		mediaType = "video"
 	}
-	return matches[0], nil
+
+	filename := mediaType + "_" + track.ID + ext
+
+	return filepath.Join("downloads", filename)
 }
 
-// EnsureDownloadsDir creates the downloads directory if it doesn't exist
-func ensureDownloadsDir() error {
-	return os.MkdirAll("downloads", os.ModePerm)
+func fileExists(path string) bool {
+	i, err := os.Stat(path)
+	if err != nil {
+		gologging.ErrorF("os.Stat: %v", err)
+		return false
+	}
+
+	return i.Size() > 0
+}
+
+func findFile(track *state.Track) string {
+	t := "audio"
+	if track.Video {
+		t = "video"
+	}
+
+	files, err := filepath.Glob(filepath.Join("downloads", t+"_"+track.ID+"*"))
+	if err != nil {
+		gologging.ErrorF("filepath.Glob: %v", err)
+		return ""
+	}
+
+	for _, f := range files {
+		if i, err := os.Stat(f); err == nil && i.Size() > 0 {
+			return f
+		}
+	}
+
+	return ""
+}
+
+func findAndRemove(track *state.Track) {
+	t := "audio"
+	if track.Video {
+		t = "video"
+	}
+
+	files, err := filepath.Glob(filepath.Join("downloads", t+"_"+track.ID+"*"))
+	if err != nil {
+		return
+	}
+
+	for _, f := range files {
+		os.Remove(f)
+	}
 }
 
 func sanitizeAPIError(err error, apiKey string) error {

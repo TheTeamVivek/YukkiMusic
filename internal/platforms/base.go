@@ -33,25 +33,32 @@ import (
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"resty.dev/v3"
 
 	state "main/internal/core/models"
 	"main/internal/utils"
 )
 
 // PlatformRegistry manages all registered platforms
-type PlatformRegistry struct {
-	platforms []platformEntry
-	mu        sync.RWMutex
-}
+type (
+	PlatformRegistry struct {
+		platforms []platformEntry
+		mu        sync.RWMutex
+	}
 
-type platformEntry struct {
-	platform state.Platform
-	priority int
-}
+	platformEntry struct {
+		platform state.Platform
+		priority int
+	}
+)
 
-var registry = &PlatformRegistry{
-	platforms: make([]platformEntry, 0),
-}
+var (
+	registry = &PlatformRegistry{
+		platforms: make([]platformEntry, 0),
+	}
+
+	rc = resty.New()
+)
 
 // Register adds a platform to the registry with given priority
 // Higher priority = checked first for URL validation
@@ -88,7 +95,7 @@ func FindPlatform(url string) state.Platform {
 	defer registry.mu.RUnlock()
 
 	for _, entry := range registry.platforms {
-		if entry.platform.IsValid(url) {
+		if entry.platform.CanGetTracks(url) {
 			return entry.platform
 		}
 	}
@@ -123,7 +130,16 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 			gologging.Debug("Found platform: " + string(platform.Name()))
 
 			tracks, err := platform.GetTracks(url, video)
+			// ytdlp didn't support or unable to extract, skip silently
 			if err != nil {
+
+				if strings.Contains(
+					err.Error(),
+					"failed to extract metadata: metadata extraction failed",
+				) {
+					continue
+				}
+
 				errMsg := string(platform.Name()) + ": " + err.Error()
 				gologging.Error(errMsg)
 				errorsL = append(errorsL, errMsg)
@@ -141,7 +157,7 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 		}
 
 		if len(errorsL) == 0 {
-			return nil, errors.New("No supported platform for given URL(s)")
+			return nil, errors.New("no supported platform for given URL(s)")
 		}
 		return nil, formatErrors(errorsL)
 
@@ -151,7 +167,6 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 	if query != "" {
 		gologging.Info("No URLs found, searching YouTube with query: " + query)
 
-		yt := &YouTubePlatform{}
 		tracks, err := yt.GetTracks(query, video)
 		if err != nil {
 			gologging.Error("YouTube search failed: " + err.Error())
@@ -259,7 +274,7 @@ func Download(
 	var errs []string
 
 	for _, p := range GetOrderedPlatforms() {
-		if !p.IsDownloadSupported(track.Source) {
+		if !p.CanDownload(track.Source) {
 			continue
 		}
 
@@ -283,6 +298,10 @@ func Download(
 	}
 
 	return "", errors.New("no downloader available for " + string(track.Source))
+}
+
+func Close() {
+	rc.Close()
 }
 
 func formatErrors(errs []string) error {

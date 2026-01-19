@@ -25,7 +25,6 @@ import (
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
-	"resty.dev/v3"
 
 	state "main/internal/core/models"
 )
@@ -84,7 +83,7 @@ func (d *DirectStreamPlatform) Name() state.PlatformName {
 	return d.name
 }
 
-func (d *DirectStreamPlatform) IsValid(query string) bool {
+func (d *DirectStreamPlatform) CanGetTracks(query string) bool {
 	query = strings.TrimSpace(query)
 
 	// Must be a valid URL
@@ -93,17 +92,12 @@ func (d *DirectStreamPlatform) IsValid(query string) bool {
 		return false
 	}
 
-	// Quick check: does it look like a stream URL?
-	if !d.looksLikeStream(query) {
-		return false
+	if d.looksLikeStream(query) {
+		return true
 	}
 
-	// Validate by making HEAD request
 	_, err = d.validateStream(query)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func (d *DirectStreamPlatform) GetTracks(
@@ -148,7 +142,7 @@ func (d *DirectStreamPlatform) Download(
 	return track.URL, nil
 }
 
-func (d *DirectStreamPlatform) IsDownloadSupported(
+func (d *DirectStreamPlatform) CanDownload(
 	source state.PlatformName,
 ) bool {
 	return source == PlatformDirectStream
@@ -184,15 +178,22 @@ func (d *DirectStreamPlatform) looksLikeStream(urlStr string) bool {
 	return false
 }
 
+func (*DirectStreamPlatform) CanSearch() bool { return false }
+
+func (*DirectStreamPlatform) Search(
+	string,
+	bool,
+) ([]*state.Track, error) {
+	return nil, nil
+}
+
 // validateStream makes a HEAD request to validate the URL
 func (d *DirectStreamPlatform) validateStream(
 	urlStr string,
 ) (*streamInfo, error) {
-	client := resty.New().
+	client := rc.
 		SetTimeout(10*time.Second).
 		SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-
-	defer client.Close()
 
 	// Try HEAD request first (faster)
 	resp, err := client.R().Head(urlStr)

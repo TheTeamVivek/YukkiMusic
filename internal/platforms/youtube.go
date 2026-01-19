@@ -23,7 +23,6 @@ package platforms
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
@@ -34,8 +33,6 @@ import (
 	"time"
 
 	"github.com/amarnathcjd/gogram/telegram"
-	"github.com/raitonoberu/ytsearch"
-	"resty.dev/v3"
 
 	"main/internal/config"
 	state "main/internal/core/models"
@@ -56,17 +53,19 @@ var (
 
 const PlatformYouTube state.PlatformName = "YouTube"
 
+var yt = &YouTubePlatform{
+	name: PlatformYouTube,
+}
+
 func init() {
-	Register(90, &YouTubePlatform{
-		name: PlatformYouTube,
-	})
+	Register(90, yt)
 }
 
 func (yp *YouTubePlatform) Name() state.PlatformName {
 	return yp.name
 }
 
-func (yp *YouTubePlatform) IsValid(link string) bool {
+func (yp *YouTubePlatform) CanGetTracks(link string) bool {
 	return youtubeLinkRegex.MatchString(link)
 }
 
@@ -153,7 +152,7 @@ func (yp *YouTubePlatform) GetTracks(
 	return updateCached(tracks, video), nil
 }
 
-func (yp *YouTubePlatform) IsDownloadSupported(source state.PlatformName) bool {
+func (yp *YouTubePlatform) CanDownload(source state.PlatformName) bool {
 	return false
 }
 
@@ -163,6 +162,15 @@ func (yt *YouTubePlatform) Download(
 	mystic *telegram.NewMessage,
 ) (string, error) {
 	return "", errors.New("youtube platform does not support downloading")
+}
+
+func (*YouTubePlatform) CanSearch() bool { return true }
+
+func (y *YouTubePlatform) Search(
+	q string,
+	video bool,
+) ([]*state.Track, error) {
+	return y.GetTracks(q, video)
 }
 
 func (yp *YouTubePlatform) VideoSearch(
@@ -191,52 +199,8 @@ func (yp *YouTubePlatform) VideoSearch(
 
 	// Try scraping first
 	tracks, err = searchYouTube(query)
-
-	// If scraping failed or found no results, fallback to ytsearch
-	if err != nil || len(tracks) == 0 {
-		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("Search failed: %v", r)
-				}
-			}()
-			search := ytsearch.VideoSearch(query)
-			for i := 0; i < 2; i++ {
-				result, searchErr := search.Next()
-				if searchErr != nil {
-					err = searchErr
-					return
-				}
-				if result == nil {
-					continue
-				}
-				for _, v := range result.Videos {
-					if len(v.Thumbnails) == 0 || v.Duration == 0 {
-						continue
-					}
-					thumb := v.Thumbnails[len(v.Thumbnails)-1].URL
-					t := &state.Track{
-						ID:       v.ID,
-						Title:    v.Title,
-						Duration: v.Duration,
-						Artwork:  thumb,
-						URL:      v.URL,
-						Source:   PlatformYouTube,
-					}
-					tracks = append(tracks, t)
-					youtubeCache.Set("track:"+t.ID, []*state.Track{t})
-					if single {
-						break
-					}
-				}
-				if single && len(tracks) > 0 {
-					break
-				}
-			}
-		}()
-		if err != nil {
-			return nil, fmt.Errorf("ytsearch failed: %w", err)
-		}
+	if err != nil {
+		return nil, fmt.Errorf("ytsearch failed: %w", err)
 	}
 
 	if len(tracks) == 0 {
@@ -347,39 +311,69 @@ func updateCached(arr []*state.Track, video bool) []*state.Track {
 // searchYouTube scrapes YouTube results page
 
 func searchYouTube(query string) ([]*state.Track, error) {
-	client := resty.New().
-		SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36").
-		SetHeader("Accept-Language", "en-US,en;q=0.9").
-		SetHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-
-	defer client.Close()
-
 	encodedQuery := url.QueryEscape(query)
-	searchURL := "https://www.youtube.com/results?search_query=" + encodedQuery
+	searchURL := "https://m.youtube.com/youtubei/v1/search?key=AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"
+	var result map[string]any
 
-	resp, err := client.R().Get(searchURL)
+	resp, err := rc.
+		R().
+		SetResult(&result).
+		SetBody(map[string]any{
+			"context": map[string]any{
+				"client": map[string]any{
+					"clientName":       "WEB",
+					"clientVersion":    "2.20250101.01.00",
+					"newVisitorCookie": true,
+					"acceptHeader":     "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+					"hl":               "en-IN",
+					"gl":               "IN",
+				},
+			},
+			"request": map[string]any{
+				"useSsl": true,
+			},
+			"user": map[string]any{
+				"lockedSafetyMode": false,
+			},
+			"params": "CAASAhAB",
+			"query":  encodedQuery,
+		}).
+		SetHeaderMultiValues(map[string][]string{
+			"User-Agent": {
+				"Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36",
+			},
+			"Accept": {
+				"*/*",
+			},
+			"Content-Type": {
+				"application/json",
+			},
+			"x-origin": {
+				"https://m.youtube.com",
+			},
+			"origin": {
+				"https://m.youtube.com",
+			},
+			"accept-language": {
+				"en-US,en;q=0.9,hi-IN;q=0.8,hi;q=0.7",
+			},
+		}).Post(searchURL)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
 
-	if resp.StatusCode() != 200 {
+	if resp.StatusCode() < 200 || resp.StatusCode() >= 300 {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode())
 	}
 
-	body := resp.String()
-	re := regexp.MustCompile(`var ytInitialData = (.*?);\s*</script>`)
-	match := re.FindStringSubmatch(body)
-	if len(match) < 2 {
-		return nil, fmt.Errorf("ytInitialData not found")
-	}
-
-	var data map[string]interface{}
-	if err := json.Unmarshal([]byte(match[1]), &data); err != nil {
-		return nil, err
-	}
-
-	contents := dig(data, "contents", "twoColumnSearchResultsRenderer",
-		"primaryContents", "sectionListRenderer", "contents")
+	contents := dig(
+		result,
+		"contents",
+		"twoColumnSearchResultsRenderer",
+		"primaryContents",
+		"sectionListRenderer",
+		"contents",
+	)
 	if contents == nil {
 		return nil, fmt.Errorf("no contents found")
 	}
@@ -389,14 +383,16 @@ func searchYouTube(query string) ([]*state.Track, error) {
 	return tracks, nil
 }
 
-func parseSearchResults(node interface{}, tracks *[]*state.Track) {
+func parseSearchResults(node any, tracks *[]*state.Track) {
 	switch v := node.(type) {
-	case []interface{}:
+
+	case []any:
 		for _, item := range v {
 			parseSearchResults(item, tracks)
 		}
-	case map[string]interface{}:
-		if vid, ok := dig(v, "videoRenderer").(map[string]interface{}); ok {
+
+	case map[string]any:
+		if vid, ok := dig(v, "videoRenderer").(map[string]any); ok {
 
 			if isLiveVideo(vid) {
 				return
@@ -404,7 +400,7 @@ func parseSearchResults(node interface{}, tracks *[]*state.Track) {
 
 			id := safeString(vid["videoId"])
 			title := safeString(dig(vid, "title", "runs", 0, "text"))
-			thumb := safeString(dig(vid, "thumbnail", "thumbnails", 0, "url"))
+			thumb := getThumbnailURL(vid)
 			durationText := safeString(dig(vid, "lengthText", "simpleText"))
 
 			if durationText == "" {
@@ -430,11 +426,11 @@ func parseSearchResults(node interface{}, tracks *[]*state.Track) {
 	}
 }
 
-func isLiveVideo(videoRenderer map[string]interface{}) bool {
-	if badges, ok := dig(videoRenderer, "badges").([]interface{}); ok {
+func isLiveVideo(videoRenderer map[string]any) bool {
+	if badges, ok := dig(videoRenderer, "badges").([]any); ok {
 		for _, badge := range badges {
-			if badgeMap, ok := badge.(map[string]interface{}); ok {
-				if metadataBadge, ok := dig(badgeMap, "metadataBadgeRenderer").(map[string]interface{}); ok {
+			if badgeMap, ok := badge.(map[string]any); ok {
+				if metadataBadge, ok := dig(badgeMap, "metadataBadgeRenderer").(map[string]any); ok {
 
 					style := safeString(metadataBadge["style"])
 					label := safeString(metadataBadge["label"])
@@ -447,9 +443,9 @@ func isLiveVideo(videoRenderer map[string]interface{}) bool {
 		}
 	}
 
-	if viewCountText, ok := dig(videoRenderer, "viewCountText", "runs").([]interface{}); ok {
+	if viewCountText, ok := dig(videoRenderer, "viewCountText", "runs").([]any); ok {
 		for _, run := range viewCountText {
-			if runMap, ok := run.(map[string]interface{}); ok {
+			if runMap, ok := run.(map[string]any); ok {
 				text := safeString(runMap["text"])
 				if strings.Contains(strings.ToLower(text), "watching") {
 					return true
@@ -460,18 +456,30 @@ func isLiveVideo(videoRenderer map[string]interface{}) bool {
 	return false
 }
 
-func dig(m interface{}, path ...interface{}) interface{} {
+func getThumbnailURL(vid map[string]any) string {
+    thumbs, ok := dig(vid, "thumbnail", "thumbnails").([]any)
+    if !ok || len(thumbs) == 0 {
+        return ""
+    }
+
+    last := thumbs[len(thumbs)-1]
+    if m, ok := last.(map[string]any); ok {
+        return safeString(m["url"])
+    }
+    return ""
+}
+func dig(m any, path ...any) any {
 	curr := m
 	for _, p := range path {
 		switch key := p.(type) {
 		case string:
-			if mm, ok := curr.(map[string]interface{}); ok {
+			if mm, ok := curr.(map[string]any); ok {
 				curr = mm[key]
 			} else {
 				return nil
 			}
 		case int:
-			if arr, ok := curr.([]interface{}); ok && len(arr) > key {
+			if arr, ok := curr.([]any); ok && len(arr) > key {
 				curr = arr[key]
 			} else {
 				return nil
@@ -481,7 +489,7 @@ func dig(m interface{}, path ...interface{}) interface{} {
 	return curr
 }
 
-func safeString(v interface{}) string {
+func safeString(v any) string {
 	if s, ok := v.(string); ok {
 		return s
 	}

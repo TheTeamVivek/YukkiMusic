@@ -42,11 +42,13 @@ import (
 	"main/internal/core"
 	"main/internal/database"
 	"main/internal/modules"
+	"main/internal/platforms"
 )
 
 func main() {
 	initLogger()
 	defer config.CloseLogging()
+	defer platforms.Close()
 
 	checkFFmpegAndFFprobe()
 	refreshCacheAndDownloads()

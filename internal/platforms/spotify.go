@@ -79,12 +79,8 @@ func (s *SpotifyPlatform) Name() state.PlatformName {
 	return s.name
 }
 
-func (s *SpotifyPlatform) IsValid(query string) bool {
+func (s *SpotifyPlatform) CanGetTracks(query string) bool {
 	return spotifyLinkRegex.MatchString(query)
-}
-
-func (s *SpotifyPlatform) IsDownloadSupported(source state.PlatformName) bool {
-	return source == s.name
 }
 
 func (s *SpotifyPlatform) GetTracks(
@@ -93,7 +89,7 @@ func (s *SpotifyPlatform) GetTracks(
 ) ([]*state.Track, error) {
 	if config.SpotifyClientID == "" || config.SpotifyClientSecret == "" {
 		return nil, errors.New(
-			"Spotify client credentials not configured. Set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET",
+			"spotify client credentials not configured. Set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET",
 		)
 	}
 
@@ -143,13 +139,15 @@ func (s *SpotifyPlatform) GetTracks(
 	return updateVideoFlag(tracks, video), nil
 }
 
+func (s *SpotifyPlatform) CanDownload(source state.PlatformName) bool {
+	return source == s.name
+}
+
 func (s *SpotifyPlatform) Download(
 	ctx context.Context,
 	track *state.Track,
 	mystic *telegram.NewMessage,
 ) (string, error) {
-	yt := &YouTubePlatform{}
-
 	clean := cleanTitle(track.Title)
 	trimmed := trimTitleLen(clean, 25, 40)
 
@@ -202,7 +200,7 @@ func (s *SpotifyPlatform) Download(
 	}
 
 	for _, p := range GetOrderedPlatforms() {
-		if p.IsDownloadSupported(PlatformYouTube) {
+		if p.CanDownload(PlatformYouTube) {
 			path, err := p.Download(ctx, ytTrack, mystic)
 			if err == nil {
 				gologging.InfoF(
@@ -222,6 +220,15 @@ func (s *SpotifyPlatform) Download(
 	}
 
 	return "", errors.New("no YouTube downloader available")
+}
+
+func (*SpotifyPlatform) CanSearch() bool { return false }
+
+func (*SpotifyPlatform) Search(
+	string,
+	bool,
+) ([]*state.Track, error) {
+	return nil, nil
 }
 
 // ensureClient initializes the Spotify client (once)
