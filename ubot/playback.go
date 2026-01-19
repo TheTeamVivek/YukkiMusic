@@ -2,7 +2,6 @@ package ubot
 
 import (
 	"fmt"
-	"time"
 
 	"main/ntgcalls"
 )
@@ -39,24 +38,13 @@ func (ctx *Context) Play(
 		)
 	}
 
-	errChan := make(chan error, 1)
-
-	go func() {
-		err := ctx.connectCall(chatID, mediaDescription, "")
-		errChan <- err
-	}()
-
-	select {
-	case err := <-errChan:
-		if err != nil {
-			return err
-		}
-	case <-time.After(35 * time.Second):
-		return fmt.Errorf("timed out")
+	err := ctx.connectCall(chatID, mediaDescription, "")
+	if err != nil {
+		return err
 	}
 
 	if chatID < 0 {
-		err := ctx.joinPresentation(chatID, mediaDescription.Screen != nil)
+		err = ctx.joinPresentation(chatID, mediaDescription.Screen != nil)
 		if err != nil {
 			return err
 		}
