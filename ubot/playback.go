@@ -7,6 +7,10 @@ import (
 	"main/ntgcalls"
 )
 
+func (ctx *Context) Calls() map[int64]*ntgcalls.CallInfo {
+	return ctx.binding.Calls()
+}
+
 func (ctx *Context) Mute(chatID int64) (bool, error) {
 	return ctx.binding.Mute(chatID)
 }

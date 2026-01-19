@@ -538,6 +538,10 @@ func updatePlaybackMessage(
 	state string,
 ) {
 	track := r.Track()
+
+	if track == nil {
+		return
+	}
 	safeTitle := html.EscapeString(utils.ShortTitle(track.Title, 25))
 	mention := utils.MentionHTML(cb.Sender)
 
