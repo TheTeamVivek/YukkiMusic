@@ -688,7 +688,7 @@ func playTrackWithRetry(
 		if r.Destroyed() {
 			gologging.Info("Room destroyed during retry, aborting")
 			replyMsg.Delete()
-			return telegram.ErrEndGroup
+			return tg.ErrEndGroup
 		}
 
 		err := r.Play(track, filePath, force)
