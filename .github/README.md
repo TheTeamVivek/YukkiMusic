@@ -181,6 +181,9 @@ YukkiMusic uses a **modular platform system** to support multiple music sources:
 YukkiMusic/
 ├── .github/
 │   └── README.md              # Main documentation (you are here)
+├── cmd/app/
+│   └── main.go                # Entry point
+│   └──...
 ├── internal/
 │   ├── config/                # Configuration management
 │   │   ├── config.go
@@ -205,14 +208,12 @@ YukkiMusic/
 │   │   └── ...
 │   ├── locales/               # Multi-language support
 │   │   ├── en.yml            # English
-│   │   ├── hi.yml            # Hindi
 │   │   └── ...
 │   ├── utils/                 # Utility functions
 │   ├── cookies/               # YouTube cookie files
 │   └── ...
 ├── go.mod                     # Go module definition
 ├── go.sum                     # Dependency checksums
-└── main.go                    # Entry point
 ```
 
 ---
