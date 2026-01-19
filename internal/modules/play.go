@@ -604,13 +604,6 @@ func playTracksAndRespond(
 		opt.ParseMode = "HTML"
 		opt.ReplyMarkup = btn
 
-		/*thumb, err := utils.GenerateThumbnail(context.Background(), mainTrack, core.BUser.Username)
-		if err != nil {
-			fmt.Println("Thumb err", err)
-		} else {
-			mainTrack.Artwork = thumb
-		}*/
-
 		if mainTrack.Artwork != "" {
 			opt.Media = utils.CleanURL(mainTrack.Artwork)
 		}
@@ -692,6 +685,13 @@ func playTrackWithRetry(
 	replyMsg *telegram.NewMessage,
 ) error {
 	for attempt := 1; attempt <= playMaxRetries; attempt++ {
+
+		if r.Destroyed() {
+			gologging.Info("Room destroyed during retry, aborting")
+			replyMsg.Delete()
+			return telegram.ErrEndGroup
+		}
+
 		err := r.Play(track, filePath, force)
 		if err == nil {
 			if attempt > 1 {

@@ -439,6 +439,7 @@ func (ctx *Context) handleUpdates() {
 			ctx.waitConnectMutex.RLock()
 			waitChan := ctx.waitConnect[chatId]
 			ctx.waitConnectMutex.RUnlock()
+
 			if waitChan != nil {
 				switch state.State {
 				case ntgcalls.Connected:

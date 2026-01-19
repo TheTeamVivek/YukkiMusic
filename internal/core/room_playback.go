@@ -32,49 +32,56 @@ import (
 
 // Play starts playback of a track
 func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
-	r.Lock()
-	defer r.Unlock()
+	if r.destroyed.Load() {
+		return ErrRoomDestroyed
+	}
 
 	forcePlay := len(force) > 0 && force[0]
 
-	if !forcePlay && r.playing && r.track != nil {
+	r.Lock()
+	shouldQueue := !forcePlay && r.playing && r.track != nil
+	if shouldQueue {
 		r.queue = append(r.queue, t)
+		r.Unlock()
 		return nil
 	}
 
-	return r.startPlayback(t, path)
-}
-
-func (r *RoomState) startPlayback(t *state.Track, path string) error {
 	r.track = t
 	r.playing = true
 	r.fpath = path
+	r.Unlock()
 
-	if err := r.p.Play(r); err != nil {
-		r.cleanupFailedPlayback()
+	err := r.p.Play(r)
+	if err != nil {
+		r.Lock()
+		r.track = nil
+		r.playing = false
+		r.fpath = ""
+		r.Unlock()
 		return err
 	}
 
-	r.resetPlaybackState()
-	return nil
-}
-
-func (r *RoomState) cleanupFailedPlayback() {
-	r.track = nil
-	r.playing = false
-	r.fpath = ""
-}
-
-func (r *RoomState) resetPlaybackState() {
+	r.Lock()
 	r.position = 0
 	r.paused = false
 	r.muted = false
 	r.updatedAt = time.Now().Unix()
+	r.Unlock()
+
+	return nil
 }
 
 // Pause pauses playback with optional auto-resume
 func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
-	if r.IsPaused() {
+	if r.destroyed.Load() {
+		return false, ErrRoomDestroyed
+	}
+
+	r.RLock()
+	alreadyPaused := r.paused
+	r.RUnlock()
+
+	if alreadyPaused {
 		return true, nil
 	}
 
@@ -83,23 +90,22 @@ func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
 		return false, err
 	}
 
-	if r.IsMuted() {
+	r.RLock()
+	isMuted := r.muted
+	r.RUnlock()
+
+	if isMuted {
 		r.Unmute()
 	}
 
 	r.Lock()
-	defer r.Unlock()
-
-	r.updatePauseState()
-	r.scheduleAutoResume(autoResumeAfter)
-
-	return paused, nil
-}
-
-func (r *RoomState) updatePauseState() {
 	r.parse()
 	r.paused = true
 	r.muted = false
+	r.scheduleAutoResume(autoResumeAfter)
+	r.Unlock()
+
+	return paused, nil
 }
 
 func (r *RoomState) scheduleAutoResume(autoResumeAfter []time.Duration) {
@@ -112,92 +118,115 @@ func (r *RoomState) scheduleAutoResume(autoResumeAfter []time.Duration) {
 		d := autoResumeAfter[0]
 		r.scheduledResumeUntil = time.Now().Add(d)
 		r.scheduledResumeTimer = time.AfterFunc(d, func() {
-			r.Resume()
+			if !r.destroyed.Load() {
+				r.Resume()
+			}
 		})
 	}
 }
 
 // Resume resumes playback
 func (r *RoomState) Resume() (bool, error) {
+	if r.destroyed.Load() {
+		return false, ErrRoomDestroyed
+	}
+
 	if !r.IsActiveChat() {
 		return false, fmt.Errorf("there are no active music playing")
 	}
-	if !r.IsPaused() {
+
+	r.RLock()
+	alreadyPlaying := !r.paused
+	r.RUnlock()
+
+	if alreadyPlaying {
 		return true, nil
 	}
-
-	r.Lock()
-	defer r.Unlock()
 
 	resumed, err := r.p.Resume(r)
 	if err != nil {
 		return false, err
 	}
 
-	r.updateResumeState()
-	r.scheduledTimers.cancelScheduledResume()
-
-	return resumed, nil
-}
-
-func (r *RoomState) updateResumeState() {
+	r.Lock()
 	r.paused = false
 	r.muted = false
 	r.playing = true
 	r.updatedAt = time.Now().Unix()
+	if r.scheduledTimers != nil {
+		r.scheduledTimers.cancelScheduledResume()
+	}
+	r.Unlock()
+
+	return resumed, nil
 }
 
 // Replay restarts the current track
 func (r *RoomState) Replay() error {
-	r.Lock()
-	defer r.Unlock()
+	if r.destroyed.Load() {
+		return ErrRoomDestroyed
+	}
 
-	if r.track == nil || r.fpath == "" {
+	r.RLock()
+	hasTrack := r.track != nil && r.fpath != ""
+	r.RUnlock()
+
+	if !hasTrack {
 		return fmt.Errorf("no track to replay")
 	}
 
-	return r.executeReplay()
-}
-
-func (r *RoomState) executeReplay() error {
-	old := r.position
+	r.Lock()
+	oldPos := r.position
 	r.position = 0
+	r.Unlock()
 
-	if err := r.p.Play(r); err != nil {
-		r.position = old
+	err := r.p.Play(r)
+	if err != nil {
+		r.Lock()
+		r.position = oldPos
+		r.Unlock()
 		return err
 	}
 
-	r.resetPlaybackState()
+	r.Lock()
+	r.position = 0
+	r.paused = false
+	r.muted = false
 	r.playing = true
-	r.scheduledTimers.cancelScheduledResume()
-	r.scheduledTimers.cancelScheduledUnmute()
+	r.updatedAt = time.Now().Unix()
+	if r.scheduledTimers != nil {
+		r.scheduledTimers.cancelScheduledResume()
+		r.scheduledTimers.cancelScheduledUnmute()
+	}
+	r.Unlock()
 
 	return nil
 }
 
 // Stop stops playback completely
 func (r *RoomState) Stop() error {
-	r.Lock()
-	defer r.Unlock()
+	if r.destroyed.Load() {
+		return ErrRoomDestroyed
+	}
 
 	_, file, line, _ := runtime.Caller(1)
 	gologging.DebugF("Stop Called from %s:%d", file, line)
 
 	err := r.p.Stop(r)
-	r.clearPlaybackState()
 
-	return err
-}
-
-func (r *RoomState) clearPlaybackState() {
+	r.Lock()
 	r.track = nil
 	r.position = 0
 	r.playing = false
 	r.paused = false
 	r.muted = false
 	r.updatedAt = 0
-	r.scheduledTimers.cancelScheduledUnmute()
-	r.scheduledTimers.cancelScheduledResume()
-	r.scheduledTimers.cancelScheduledSpeed()
+	if r.scheduledTimers != nil {
+		r.scheduledTimers.cancelScheduledUnmute()
+		r.scheduledTimers.cancelScheduledResume()
+		r.scheduledTimers.cancelScheduledSpeed()
+	}
+	r.Unlock()
+
+	return err
 }

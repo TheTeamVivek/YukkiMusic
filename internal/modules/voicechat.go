@@ -21,6 +21,8 @@
 package modules
 
 import (
+	"time"
+
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
@@ -51,19 +53,30 @@ func handleVoiceChatAction(
 	}
 
 	chatID := m.ChannelID()
-	core.DeleteRoom(chatID)
+	isActive := action.Duration == 0
 
 	s, err := core.GetChatState(chatID)
 	if err != nil {
-		gologging.Error("Failed to get chat state: " + err.Error())
+		gologging.ErrorF("Failed to get chat state for %d: %v", chatID, err)
 		return telegram.ErrEndGroup
 	}
-	isActive := action.Duration == 0
-	msgKey := utils.IfElse(isActive, "voicechat_started", "voicechat_ended")
 
 	s.SetVoiceChatActive(isActive)
+
+	msgKey := utils.IfElse(isActive, "voicechat_started", "voicechat_ended")
 	m.Respond(F(chatID, msgKey))
-	gologging.Debug("Voice chat " + msgKey + " in " + utils.IntToStr(chatID))
+	gologging.DebugF("Voice chat %s in %d", msgKey, chatID)
+
+	if !isActive {
+		go func() {
+			time.Sleep(500 * time.Millisecond)
+			core.DeleteRoom(chatID)
+			gologging.DebugF(
+				"Room destroyed for ended voice chat in %d",
+				chatID,
+			)
+		}()
+	}
 
 	return telegram.ErrEndGroup
 }

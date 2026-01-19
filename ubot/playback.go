@@ -1,6 +1,14 @@
 package ubot
 
-import "main/ntgcalls"
+import (
+	"fmt"
+
+	"main/ntgcalls"
+)
+
+func (ctx *Context) Calls() map[int64]*ntgcalls.CallInfo {
+	return ctx.binding.Calls()
+}
 
 func (ctx *Context) Mute(chatID int64) (bool, error) {
 	return ctx.binding.Mute(chatID)
@@ -36,14 +44,13 @@ func (ctx *Context) Play(
 	}
 
 	if chatID < 0 {
-
 		err = ctx.joinPresentation(chatID, mediaDescription.Screen != nil)
 		if err != nil {
 			return err
 		}
 		return ctx.updateSources(chatID)
-
 	}
+
 	return nil
 }
 
@@ -63,6 +70,7 @@ func (ctx *Context) Record(
 }
 
 func (ctx *Context) Stop(chatID int64) error {
+	// Clean up presentations
 	ctx.presentationsMutex.Lock()
 	ctx.presentations = stdRemove(ctx.presentations, chatID)
 	ctx.presentationsMutex.Unlock()
@@ -74,6 +82,16 @@ func (ctx *Context) Stop(chatID int64) error {
 	ctx.callSourcesMutex.Lock()
 	delete(ctx.callSources, chatID)
 	ctx.callSourcesMutex.Unlock()
+
+	ctx.waitConnectMutex.Lock()
+	if waitChan, exists := ctx.waitConnect[chatID]; exists {
+		select {
+		case waitChan <- fmt.Errorf("call stopped"):
+		default:
+		}
+		delete(ctx.waitConnect, chatID)
+	}
+	ctx.waitConnectMutex.Unlock()
 
 	err := ctx.binding.Stop(chatID)
 	if err != nil {

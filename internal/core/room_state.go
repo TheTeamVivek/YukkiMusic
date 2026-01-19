@@ -21,8 +21,10 @@
 package core
 
 import (
+	"errors"
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/Laky-64/gologging"
@@ -34,6 +36,8 @@ import (
 var (
 	rooms   = make(map[int64]*RoomState)
 	roomsMu sync.RWMutex
+
+	ErrRoomDestroyed = errors.New("room destroyed")
 )
 
 type Player interface {
@@ -48,20 +52,27 @@ type Player interface {
 type RoomState struct {
 	sync.RWMutex
 
-	chatID    int64
-	track     *state.Track
-	position  int
-	playing   bool
-	muted     bool
-	paused    bool
-	updatedAt int64
-	fpath     string
-	queue     []*state.Track
-	speed     float64
-	shuffle   bool
+	chatID int64
 
-	loop   int
-	cplay  bool
+	fpath string
+
+	track *state.Track
+	queue []*state.Track
+
+	loop      int
+	position  int
+	updatedAt int64
+
+	speed float64
+
+	shuffle bool
+	playing bool
+	muted   bool
+	paused  bool
+	cplay   bool
+
+	destroyed atomic.Bool
+
 	mystic *telegram.NewMessage
 
 	p Player
@@ -113,6 +124,7 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 				Ntg: ass.Ntg,
 			},
 		}
+		room.destroyed.Store(false)
 		rooms[chatID] = room
 	}
 
@@ -124,7 +136,10 @@ func GetAllRoomIDs() []int64 {
 	defer roomsMu.RUnlock()
 
 	ids := make([]int64, 0, len(rooms))
-	for chatID := range rooms {
+	for chatID, r := range rooms {
+		if r.destroyed.Load() {
+			continue
+		}
 		ids = append(ids, chatID)
 	}
 	return ids
@@ -133,6 +148,9 @@ func GetAllRoomIDs() []int64 {
 // Getters
 
 func (r *RoomState) ChatID() int64 {
+	if r.destroyed.Load() {
+		return 0
+	}
 	r.RLock()
 	defer r.RUnlock()
 	return r.chatID
@@ -145,18 +163,30 @@ func (r *RoomState) FilePath() string {
 }
 
 func (r *RoomState) Loop() int {
+	if r.destroyed.Load() {
+		return 0
+	}
+
 	r.RLock()
 	defer r.RUnlock()
 	return r.loop
 }
 
 func (r *RoomState) Position() int {
+	if r.destroyed.Load() {
+		return 0
+	}
+
 	r.RLock()
 	defer r.RUnlock()
 	return r.position
 }
 
 func (r *RoomState) Queue() []*state.Track {
+	if r.destroyed.Load() {
+		return nil
+	}
+
 	r.RLock()
 	defer r.RUnlock()
 
@@ -166,56 +196,96 @@ func (r *RoomState) Queue() []*state.Track {
 }
 
 func (r *RoomState) Shuffle() bool {
+	if r.destroyed.Load() {
+		return false
+	}
+
 	r.RLock()
 	defer r.RUnlock()
 	return r.shuffle
 }
 
 func (r *RoomState) Speed() float64 {
+	if r.destroyed.Load() {
+		return 0
+	}
+
 	r.RLock()
 	defer r.RUnlock()
 	return r.speed
 }
 
 func (r *RoomState) Track() *state.Track {
+	if r.destroyed.Load() {
+		return nil
+	}
+
 	r.RLock()
 	defer r.RUnlock()
 	return r.track
 }
 
 func (r *RoomState) GetSpeed() float64 {
+	if r.destroyed.Load() {
+		return 0
+	}
+
 	r.RLock()
 	defer r.RUnlock()
 	return r.speed
 }
 
 func (r *RoomState) GetMystic() *telegram.NewMessage {
+	if r.destroyed.Load() {
+		return nil
+	}
+
 	r.RLock()
 	defer r.RUnlock()
 	return r.mystic
 }
 
+func (r *RoomState) Destroyed() bool {
+	return r.destroyed.Load()
+}
+
 // Setters
 
 func (r *RoomState) SetCPlay(isCPlay bool) {
+	if r.destroyed.Load() {
+		return
+	}
+
 	r.Lock()
 	defer r.Unlock()
 	r.cplay = isCPlay
 }
 
 func (r *RoomState) SetLoop(loop int) {
+	if r.destroyed.Load() {
+		return
+	}
+
 	r.Lock()
 	defer r.Unlock()
 	r.loop = loop
 }
 
 func (r *RoomState) SetShuffle(enabled bool) {
+	if r.destroyed.Load() {
+		return
+	}
+
 	r.Lock()
 	defer r.Unlock()
 	r.shuffle = enabled
 }
 
 func (r *RoomState) SetMystic(m *telegram.NewMessage) {
+	if r.destroyed.Load() {
+		return
+	}
+
 	r.Lock()
 	defer r.Unlock()
 	if r.mystic != nil {
@@ -227,33 +297,52 @@ func (r *RoomState) SetMystic(m *telegram.NewMessage) {
 // State checks
 
 func (r *RoomState) IsCPlay() bool {
+	if r.destroyed.Load() {
+		return false
+	}
+
 	r.RLock()
 	defer r.RUnlock()
 	return r.cplay
 }
 
 func (r *RoomState) IsActiveChat() bool {
-	r.Parse()
-	r.RLock()
-	defer r.RUnlock()
+	if r.destroyed.Load() {
+		return false
+	}
+
+	r.Lock()
+	defer r.Unlock()
+	r.parse()
 	return r.track != nil && r.playing
 }
 
 func (r *RoomState) IsPaused() bool {
+	if r.destroyed.Load() {
+		return false
+	}
+
 	r.RLock()
 	defer r.RUnlock()
 	return r.paused && r.track != nil && r.playing
 }
 
 func (r *RoomState) IsMuted() bool {
+	if r.destroyed.Load() {
+		return false
+	}
+
 	r.RLock()
 	defer r.RUnlock()
 	return r.muted && r.track != nil && r.playing
 }
 
 // State management
-
 func (r *RoomState) Parse() {
+	if r.destroyed.Load() {
+		return
+	}
+
 	r.Lock()
 	defer r.Unlock()
 	r.parse()
@@ -281,9 +370,22 @@ func (r *RoomState) Destroy() {
 	_, file, line, _ := runtime.Caller(1)
 	gologging.DebugF("Destroy Called from %s:%d", file, line)
 
-	r.Stop()
+	if r.destroyed.Load() {
+		return
+	}
+
+	if err := r.Stop(); err != nil {
+		gologging.ErrorF(
+			"Error during room stop for chat %d: %v",
+			r.chatID,
+			err,
+		)
+	}
 	r.cleanupFile()
+
 	roomsMu.Lock()
-	defer roomsMu.Unlock()
 	delete(rooms, r.chatID)
+	roomsMu.Unlock()
+
+	r.destroyed.Store(true)
 }

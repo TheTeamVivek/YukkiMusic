@@ -41,70 +41,64 @@ type playbackSnapshot struct {
 
 // Seek moves playback position by specified seconds
 func (r *RoomState) Seek(seconds int) error {
-	r.Lock()
-	defer r.Unlock()
+	if r.destroyed.Load() {
+		return ErrRoomDestroyed
+	}
 
+	r.Lock()
 	if r.track == nil || r.fpath == "" {
+		r.Unlock()
 		return fmt.Errorf("no track to seek")
 	}
 
 	r.parse()
 
 	if seconds > 0 && r.track.Duration-r.position <= seekEndThreshold {
+		r.Unlock()
 		return fmt.Errorf("cannot seek, track is about to end")
 	}
 
-	return r.executeSeek(seconds)
-}
-
-func (r *RoomState) executeSeek(seconds int) error {
-	snapshot := r.createPlaybackSnapshot()
-	newPos := r.calculateNewPosition(seconds)
-
-	r.position = newPos
-	r.paused = false
-	r.muted = false
-	r.updatedAt = time.Now().Unix()
-
-	if err := r.p.Play(r); err != nil {
-		r.restorePlaybackSnapshot(snapshot)
-		return err
-	}
-
-	if snapshot.muted {
-		r.p.Unmute(r)
-	}
-
-	return nil
-}
-
-func (r *RoomState) calculateNewPosition(seconds int) int {
-	newPos := r.position + seconds
-
-	if newPos >= r.track.Duration {
-		return r.track.Duration - seekSafetyMargin
-	}
-	if newPos < 0 {
-		return 0
-	}
-
-	return newPos
-}
-
-func (r *RoomState) createPlaybackSnapshot() playbackSnapshot {
-	return playbackSnapshot{
+	snapshot := playbackSnapshot{
 		position: r.position,
 		paused:   r.paused,
 		muted:    r.muted,
 		updated:  r.updatedAt,
 	}
-}
 
-func (r *RoomState) restorePlaybackSnapshot(snap playbackSnapshot) {
-	r.position = snap.position
-	r.paused = snap.paused
-	r.muted = snap.muted
-	r.updatedAt = snap.updated
+	newPos := r.position + seconds
+	if newPos >= r.track.Duration {
+		newPos = r.track.Duration - seekSafetyMargin
+	}
+	if newPos < 0 {
+		newPos = 0
+	}
+
+	r.position = newPos
+	r.paused = false
+	r.muted = false
+	r.updatedAt = time.Now().Unix()
+	r.Unlock()
+
+	err := r.p.Play(r)
+	if err != nil {
+		r.Lock()
+		r.position = snapshot.position
+		r.paused = snapshot.paused
+		r.muted = snapshot.muted
+		r.updatedAt = snapshot.updated
+		r.Unlock()
+		return err
+	}
+
+	r.RLock()
+	wasMuted := snapshot.muted
+	r.RUnlock()
+
+	if wasMuted {
+		r.p.Unmute(r)
+	}
+
+	return nil
 }
 
 // SetSpeed adjusts playback speed with optional auto-reset
@@ -112,22 +106,16 @@ func (r *RoomState) SetSpeed(
 	speed float64,
 	timeAfterNormal ...time.Duration,
 ) error {
-	r.Lock()
-	defer r.Unlock()
-
-	if err := r.validateSpeedChange(speed); err != nil {
-		return err
+	if r.destroyed.Load() {
+		return ErrRoomDestroyed
 	}
 
-	if r.speed == speed {
-		return nil
-	}
+	r.RLock()
+	hasTrack := r.track != nil && r.fpath != ""
+	currentSpeed := r.speed
+	r.RUnlock()
 
-	return r.executeSpeedChange(speed, timeAfterNormal)
-}
-
-func (r *RoomState) validateSpeedChange(speed float64) error {
-	if r.track == nil || r.fpath == "" {
+	if !hasTrack {
 		return fmt.Errorf("no track to adjust speed")
 	}
 
@@ -139,68 +127,74 @@ func (r *RoomState) validateSpeedChange(speed float64) error {
 		)
 	}
 
-	return nil
-}
+	if currentSpeed == speed {
+		return nil
+	}
 
-func (r *RoomState) executeSpeedChange(
-	speed float64,
-	timeAfterNormal []time.Duration,
-) error {
+	r.Lock()
 	r.parse()
 	r.speed = speed
 	r.playing = true
 	r.paused = false
 	r.muted = false
 	r.updatedAt = time.Now().Unix()
+	r.Unlock()
 
-	if err := r.p.Play(r); err != nil {
+	err := r.p.Play(r)
+	if err != nil {
 		return err
 	}
 
-	r.scheduleSpeedReset(speed, timeAfterNormal)
-	return nil
-}
-
-func (r *RoomState) scheduleSpeedReset(
-	speed float64,
-	timeAfterNormal []time.Duration,
-) {
+	r.Lock()
 	if r.scheduledTimers == nil {
 		r.scheduledTimers = &scheduledTimers{}
 	}
 	r.scheduledTimers.cancelScheduledSpeed()
 
-	if !r.shouldScheduleSpeedReset(speed, timeAfterNormal) {
-		return
+	shouldSchedule := len(timeAfterNormal) > 0 && timeAfterNormal[0] > 0 &&
+		speed != 1.0
+	if shouldSchedule {
+		d := timeAfterNormal[0]
+		r.scheduledSpeedUntil = time.Now().Add(d)
+		r.scheduledSpeedTimer = time.AfterFunc(d, func() {
+			r.resetSpeedToNormal()
+		})
 	}
+	r.Unlock()
 
-	d := timeAfterNormal[0]
-	r.scheduledSpeedUntil = time.Now().Add(d)
-	r.scheduledSpeedTimer = time.AfterFunc(d, r.resetSpeedToNormal)
-}
-
-func (r *RoomState) shouldScheduleSpeedReset(
-	speed float64,
-	timeAfterNormal []time.Duration,
-) bool {
-	return len(timeAfterNormal) > 0 && timeAfterNormal[0] > 0 && speed != 1.0
+	return nil
 }
 
 func (r *RoomState) resetSpeedToNormal() {
-	r.Lock()
-	defer r.Unlock()
-
-	if r.track != nil && r.playing && r.speed != 1.0 {
-		r.parse()
-		r.speed = 1.0
-		r.p.Play(r)
-		r.updatedAt = time.Now().Unix()
+	if r.destroyed.Load() {
+		return
 	}
+
+	r.Lock()
+	if r.track == nil || !r.playing || r.speed == 1.0 {
+		r.Unlock()
+		return
+	}
+
+	r.parse()
+	r.speed = 1.0
+	r.updatedAt = time.Now().Unix()
+	r.Unlock()
+
+	r.p.Play(r)
 }
 
 // Mute mutes playback with optional auto-unmute
 func (r *RoomState) Mute(unmuteAfter ...time.Duration) (bool, error) {
-	if r.IsMuted() {
+	if r.destroyed.Load() {
+		return false, ErrRoomDestroyed
+	}
+
+	r.RLock()
+	alreadyMuted := r.muted
+	r.RUnlock()
+
+	if alreadyMuted {
 		return true, nil
 	}
 
@@ -209,28 +203,18 @@ func (r *RoomState) Mute(unmuteAfter ...time.Duration) (bool, error) {
 		return false, err
 	}
 
-	r.handleMuteStateTransition()
-	r.scheduleAutoUnmute(unmuteAfter)
+	r.RLock()
+	isPaused := r.paused
+	r.RUnlock()
 
-	return muted, nil
-}
-
-func (r *RoomState) handleMuteStateTransition() {
-	if r.IsPaused() {
+	if isPaused {
 		r.Resume()
 	} else {
 		r.Parse()
 	}
 
 	r.Lock()
-	defer r.Unlock()
 	r.muted = true
-}
-
-func (r *RoomState) scheduleAutoUnmute(unmuteAfter []time.Duration) {
-	r.Lock()
-	defer r.Unlock()
-
 	if r.scheduledTimers == nil {
 		r.scheduledTimers = &scheduledTimers{}
 	}
@@ -240,26 +224,36 @@ func (r *RoomState) scheduleAutoUnmute(unmuteAfter []time.Duration) {
 		duration := unmuteAfter[0]
 		r.scheduledUnmuteUntil = time.Now().Add(duration)
 		r.scheduledUnmuteTimer = time.AfterFunc(duration, func() {
-			r.Parse()
-			r.Unmute()
+			if !r.destroyed.Load() {
+				r.Parse()
+				r.Unmute()
+			}
 		})
 	}
+	r.Unlock()
+
+	return muted, nil
 }
 
 // Unmute unmutes playback
 func (r *RoomState) Unmute() (bool, error) {
-	r.Lock()
-	defer r.Unlock()
+	if r.destroyed.Load() {
+		return false, ErrRoomDestroyed
+	}
 
 	unmuted, err := r.p.Unmute(r)
 	if err != nil {
 		return false, err
 	}
 
+	r.Lock()
 	r.parse()
 	r.muted = false
 	r.paused = false
-	r.scheduledTimers.cancelScheduledUnmute()
+	if r.scheduledTimers != nil {
+		r.scheduledTimers.cancelScheduledUnmute()
+	}
+	r.Unlock()
 
 	return unmuted, nil
 }

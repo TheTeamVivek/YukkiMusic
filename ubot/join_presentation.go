@@ -43,7 +43,7 @@ func (ctx *Context) joinPresentation(chatId int64, join bool) error {
 		}
 
 		ctx.waitConnectMutex.Lock()
-		waitChan := make(chan error, 1)
+		waitChan := make(chan error)
 		ctx.waitConnect[chatId] = waitChan
 		ctx.waitConnectMutex.Unlock()
 
@@ -80,12 +80,7 @@ func (ctx *Context) joinPresentation(chatId int64, join bool) error {
 			return err
 		}
 
-		select {
-		case err = <-waitChan:
-			if err != nil {
-				return err
-			}
-		}
+		<-waitChan
 
 		ctx.presentationsMutex.Lock()
 		ctx.presentations = append(ctx.presentations, chatId)

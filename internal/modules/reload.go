@@ -187,7 +187,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 				err,
 			)
 		} else {
-			if room, ok := core.GetRoom(actualChatID, ass); ok {
+			if room, ok := core.GetRoom(actualChatID, ass, true); ok {
 				room.Destroy()
 				summary += F(chatID, "reload_room_reset") + "\n"
 			}
