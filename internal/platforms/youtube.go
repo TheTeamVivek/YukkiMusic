@@ -456,17 +456,18 @@ func isLiveVideo(videoRenderer map[string]any) bool {
 }
 
 func getThumbnailURL(vid map[string]any) string {
-    thumbs, ok := dig(vid, "thumbnail", "thumbnails").([]any)
-    if !ok || len(thumbs) == 0 {
-        return ""
-    }
+	thumbs, ok := dig(vid, "thumbnail", "thumbnails").([]any)
+	if !ok || len(thumbs) == 0 {
+		return ""
+	}
 
-    last := thumbs[len(thumbs)-1]
-    if m, ok := last.(map[string]any); ok {
-        return safeString(m["url"])
-    }
-    return ""
+	last := thumbs[len(thumbs)-1]
+	if m, ok := last.(map[string]any); ok {
+		return safeString(m["url"])
+	}
+	return ""
 }
+
 func dig(m any, path ...any) any {
 	curr := m
 	for _, p := range path {
