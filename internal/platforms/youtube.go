@@ -311,7 +311,6 @@ func updateCached(arr []*state.Track, video bool) []*state.Track {
 // searchYouTube scrapes YouTube results page
 
 func searchYouTube(query string) ([]*state.Track, error) {
-	encodedQuery := url.QueryEscape(query)
 	searchURL := "https://m.youtube.com/youtubei/v1/search?key=AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"
 	var result map[string]any
 
@@ -336,7 +335,7 @@ func searchYouTube(query string) ([]*state.Track, error) {
 				"lockedSafetyMode": false,
 			},
 			"params": "CAASAhAB",
-			"query":  encodedQuery,
+			"query":  query,
 		}).
 		SetHeaderMultiValues(map[string][]string{
 			"User-Agent": {
@@ -355,7 +354,7 @@ func searchYouTube(query string) ([]*state.Track, error) {
 				"https://m.youtube.com",
 			},
 			"accept-language": {
-				"en-US,en;q=0.9,hi-IN;q=0.8,hi;q=0.7",
+				"en-IN",
 			},
 		}).Post(searchURL)
 	if err != nil {
@@ -457,17 +456,18 @@ func isLiveVideo(videoRenderer map[string]any) bool {
 }
 
 func getThumbnailURL(vid map[string]any) string {
-    thumbs, ok := dig(vid, "thumbnail", "thumbnails").([]any)
-    if !ok || len(thumbs) == 0 {
-        return ""
-    }
+	thumbs, ok := dig(vid, "thumbnail", "thumbnails").([]any)
+	if !ok || len(thumbs) == 0 {
+		return ""
+	}
 
-    last := thumbs[len(thumbs)-1]
-    if m, ok := last.(map[string]any); ok {
-        return safeString(m["url"])
-    }
-    return ""
+	last := thumbs[len(thumbs)-1]
+	if m, ok := last.(map[string]any); ok {
+		return safeString(m["url"])
+	}
+	return ""
 }
+
 func dig(m any, path ...any) any {
 	curr := m
 	for _, p := range path {
