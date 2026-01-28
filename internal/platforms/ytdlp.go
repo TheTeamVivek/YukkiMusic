@@ -82,6 +82,16 @@ func (y *YtdlpPlatform) CanGetTracks(query string) bool {
 		return false
 	}
 
+	host := strings.ToLower(parsedURL.Host)
+
+	// Ignore Telegram URLs ( already handled by TeleramPlatform)
+	if host == "t.me" ||
+		host == "telegram.me" ||
+		host == "telegram.dog" ||
+		strings.HasSuffix(host, ".t.me") {
+		return false
+	}
+
 	return true
 }
 

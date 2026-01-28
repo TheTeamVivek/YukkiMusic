@@ -23,7 +23,6 @@ package platforms
 import (
 	"context"
 	"errors"
-	"mime"
 	"os"
 	"path/filepath"
 	"sort"
@@ -156,11 +155,21 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 			return allTracks, nil
 		}
 
+		// URLs were present but none succeeded.
+		// If the command is a reply AND replied message contains playable media,
+		// fall back to reply handling instead of failing immediately.
+		if m.IsReply() {
+			isVideo, isAudio := playableMedia(m)
+			if isVideo || isAudio {
+				gologging.Debug("URLs failed, falling back to reply media")
+				goto ReplyCheck
+			}
+		}
+
 		if len(errorsL) == 0 {
 			return nil, errors.New("no supported platform for given URL(s)")
 		}
 		return nil, formatErrors(errorsL)
-
 	}
 
 	// If no URLs but have query, search YouTube
@@ -178,10 +187,12 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 			return []*state.Track{tracks[0]}, nil
 		}
 	}
-
-	// Handle reply messages
+ReplyCheck:
 	if m.IsReply() {
-		gologging.Debug("Message is a reply, checking media")
+		gologging.Debug("Message is a reply, resolving playable media")
+
+		var target *telegram.NewMessage
+		var isVideo bool
 
 		rmsg, err := m.GetReplyMessage()
 		if err != nil {
@@ -191,69 +202,61 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 			)
 		}
 
-		if !(rmsg.IsMedia() &&
-			(rmsg.Audio() != nil || rmsg.Video() != nil || rmsg.Voice() != nil || rmsg.Document() != nil)) {
-			gologging.Info("Reply does not contain valid media")
+		if v, a := playableMedia(rmsg); v || a {
+			target = rmsg
+			isVideo = v
+		}
+
+		if target == nil && rmsg.IsReply() {
+			rrmsg, err := rmsg.GetReplyMessage()
+			if err == nil {
+				if v, a := playableMedia(rrmsg); v || a {
+					target = rrmsg
+					isVideo = v
+				}
+			}
+		}
+
+		if target == nil {
+			gologging.Info("Reply chain does not contain valid media")
 			return nil, errors.New("⚠️ Reply with a valid media (audio/video)")
 		}
 
 		tg := &TelegramPlatform{}
-		isAudio := false
-		isVideo := false
-
-		if rmsg.Audio() != nil || rmsg.Voice() != nil {
-			isAudio = true
-		} else if rmsg.Video() != nil {
-			isVideo = true
-		} else if rmsg.Document() != nil {
-			ext := strings.ToLower(rmsg.File.Ext)
-			if !strings.HasPrefix(ext, ".") {
-				ext = "." + ext
-			}
-			mimeType := mime.TypeByExtension(ext)
-			isAudio = strings.HasPrefix(mimeType, "audio/")
-			isVideo = strings.HasPrefix(mimeType, "video/")
-		}
-
-		if !isAudio && !isVideo {
-			gologging.Info("Replied media is neither audio nor video")
-			return nil, errors.New("⚠️ Reply with a valid media (audio/video)")
-		}
-
-		t, err := tg.GetTracksByMessage(rmsg)
+		t, err := tg.GetTracksByMessage(target)
 		if err != nil {
 			errMsg := "Failed to get track from reply: " + err.Error()
 			gologging.Error(errMsg)
-			errorsL = append(errorsL, errMsg)
-		} else {
-			t.Video = isVideo
+			return nil, err
+		}
 
-			if isVideo {
-				gologging.Debug("Reply media is video, preparing thumbnail")
+		t.Video = isVideo
 
-				if err := os.MkdirAll("cache", os.ModePerm); err != nil {
-					gologging.Error("Failed to create cache folder: " + err.Error())
-					return []*state.Track{t}, nil
-				}
+		if isVideo {
+			gologging.Debug("Reply media is video, preparing thumbnail")
 
-				thumbPath := filepath.Join("cache", "thumb_"+t.ID+".jpg")
-				if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-					path, err := rmsg.Download(&telegram.DownloadOptions{
-						ThumbOnly: true,
-						FileName:  thumbPath,
-					})
-					if err == nil {
-						if _, err := os.Stat(path); err == nil {
-							t.Artwork = path
-							gologging.Debug("Thumbnail saved: " + path)
-						}
+			if err := os.MkdirAll("cache", os.ModePerm); err != nil {
+				gologging.Error("Failed to create cache folder: " + err.Error())
+				return []*state.Track{t}, nil
+			}
+
+			thumbPath := filepath.Join("cache", "thumb_"+t.ID+".jpg")
+			if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
+				path, err := target.Download(&telegram.DownloadOptions{
+					ThumbOnly: true,
+					FileName:  thumbPath,
+				})
+				if err == nil {
+					if _, err := os.Stat(path); err == nil {
+						t.Artwork = path
+						gologging.Debug("Thumbnail saved: " + path)
 					}
 				}
 			}
-
-			gologging.Info("Returning track from reply message")
-			return []*state.Track{t}, nil
 		}
+
+		gologging.Info("Returning track from reply chain")
+		return []*state.Track{t}, nil
 	}
 
 	if len(errorsL) > 0 {

@@ -24,7 +24,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"mime"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -88,7 +87,6 @@ func (t *TelegramPlatform) GetTracks(
 	}
 
 	matches := telegramExtractRegex.FindStringSubmatch(query)
-
 	if len(matches) < 4 {
 		return nil, fmt.Errorf(
 			"provide a valid Telegram link (e.g., https://t.me/channel/12345)",
@@ -106,33 +104,27 @@ func (t *TelegramPlatform) GetTracks(
 		return nil, fmt.Errorf("failed to fetch Telegram message: %w", err)
 	}
 
-	isVideo := false
-
-	if msg.Video() != nil {
-		isVideo = true
-	} else if msg.Document() != nil {
-		ext := strings.ToLower(msg.File.Ext)
-		if !strings.HasPrefix(ext, ".") {
-			ext = "." + ext
-		}
-		mimeType := mime.TypeByExtension(ext)
-		isVideo = strings.HasPrefix(mimeType, "video/")
+	isVideo, isAudio := playableMedia(msg)
+	if !isVideo && !isAudio {
+		return nil, fmt.Errorf(
+			"telegram message does not contain playable media",
+		)
 	}
 
-	track, tErr := t.GetTracksByMessage(msg)
-	if tErr != nil {
-		return nil, tErr
+	track, err := t.GetTracksByMessage(msg)
+	if err != nil {
+		return nil, err
 	}
+
 	track.Video = isVideo
+
 	if isVideo {
-		err := os.MkdirAll("cache", os.ModePerm)
-		if err != nil {
+		if err := os.MkdirAll("cache", os.ModePerm); err != nil {
 			gologging.Error("Failed to create cache folder: " + err.Error())
 			return []*state.Track{track}, nil
 		}
 
 		thumbPath := filepath.Join("cache", "thumb_"+track.ID+".jpg")
-
 		if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
 			path, err := msg.Download(&telegram.DownloadOptions{
 				ThumbOnly: true,
@@ -159,25 +151,50 @@ func (*TelegramPlatform) Search(
 }
 
 func (t *TelegramPlatform) GetTracksByMessage(
-	rmsg *telegram.NewMessage,
+	msg *telegram.NewMessage,
 ) (*state.Track, error) {
-	file := rmsg.File
-	if file == nil || file.FileID == "" {
+	if msg == nil {
+		return nil, fmt.Errorf("invalid telegram message")
+	}
+
+	var target *telegram.NewMessage
+
+	// First: check current message itself
+	if msg.File != nil && msg.File.FileID != "" {
+		target = msg
+	} else {
+		// Second: if no media in current message, check reply
+		if msg.IsReply() {
+			rmsg, err := msg.GetReplyMessage()
+			if err == nil {
+				if rmsg.File != nil && rmsg.File.FileID != "" {
+					target = rmsg
+				}
+			}
+		}
+	}
+
+	// Still nothing? Then fail.
+	if target == nil {
 		return nil, fmt.Errorf(
-			"⚠️ Oops! This <a href=\"%s\">message</> doesn't contain any media",
-			rmsg.Link(),
+			"⚠️ Oops! This <a href=\"%s\">message</a> doesn't contain any media",
+			msg.Link(),
 		)
 	}
 
-	duration := utils.GetDuration(rmsg.Media().(*telegram.MessageMediaDocument))
+	file := target.File
 
-	telegramMsgCache[file.FileID] = rmsg
+	duration := utils.GetDuration(
+		target.Media().(*telegram.MessageMediaDocument),
+	)
+
+	telegramMsgCache[file.FileID] = target
 
 	track := &state.Track{
 		ID:       file.FileID,
 		Title:    file.Name,
 		Duration: duration,
-		URL:      rmsg.Link(),
+		URL:      target.Link(),
 		Source:   PlatformTelegram,
 	}
 

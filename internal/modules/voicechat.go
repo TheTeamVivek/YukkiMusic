@@ -55,6 +55,7 @@ func handleVoiceChatAction(
 	chatID := m.ChannelID()
 	isActive := action.Duration == 0
 
+	go clearRTMPState(chatID)
 	s, err := core.GetChatState(chatID)
 	if err != nil {
 		gologging.ErrorF("Failed to get chat state for %d: %v", chatID, err)

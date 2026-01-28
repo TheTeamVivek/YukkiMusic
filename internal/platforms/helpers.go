@@ -22,11 +22,13 @@ package platforms
 
 import (
 	"errors"
+	"mime"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/Laky-64/gologging"
+	"github.com/amarnathcjd/gogram/telegram"
 
 	state "main/internal/core/models"
 )
@@ -99,4 +101,48 @@ func sanitizeAPIError(err error, apiKey string) error {
 	}
 	masked := strings.ReplaceAll(err.Error(), apiKey, "***REDACTED***")
 	return errors.New(masked)
+}
+
+func playableMedia(m *telegram.NewMessage) (bool, bool) {
+	if m == nil {
+		return false, false
+	}
+
+	check := func(msg *telegram.NewMessage) (bool, bool) {
+		if msg.Audio() != nil || msg.Voice() != nil {
+			return false, true
+		}
+
+		if msg.Video() != nil {
+			return true, false
+		}
+
+		if msg.Document() != nil {
+			ext := strings.ToLower(msg.File.Ext)
+			if !strings.HasPrefix(ext, ".") {
+				ext = "." + ext
+			}
+
+			mimeType := mime.TypeByExtension(ext)
+
+			if strings.HasPrefix(mimeType, "audio/") {
+				return false, true
+			}
+			if strings.HasPrefix(mimeType, "video/") {
+				return true, false
+			}
+		}
+
+		return false, false
+	}
+
+	if m.IsReply() {
+		rmsg, err := m.GetReplyMessage()
+		if err != nil {
+			return false, false
+		}
+		return check(rmsg)
+	}
+
+	return check(m)
 }

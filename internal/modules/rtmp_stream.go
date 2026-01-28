@@ -447,6 +447,16 @@ func setRTMPHandler(m *tg.NewMessage) error {
 	return tg.ErrEndGroup
 }
 
+func clearRTMPState(chatID int64) {
+	rtmpStreamsMu.Lock()
+	defer rtmpStreamsMu.Unlock()
+
+	if stream, ok := rtmpStreams[chatID]; ok {
+		_ = stream.Stop()
+		delete(rtmpStreams, chatID)
+	}
+}
+
 func maskRTMPURL(url string) string {
 	if idx := strings.Index(url, "://"); idx != -1 {
 		proto := url[:idx+3]
