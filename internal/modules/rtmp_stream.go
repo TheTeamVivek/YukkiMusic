@@ -138,7 +138,7 @@ func getOrCreateRTMPStream(chatID int64) (*tg.RTMPStream, error) {
 	stream.SetURL(url)
 	stream.SetKey(key)
 
-	stream.OnError(func(err error) {
+	stream.OnError(func(chatID int64, err error) {
 		gologging.ErrorF("RTMP error in chat %d: %v", chatID, err)
 		core.Bot.SendMessage(
 			chatID,

@@ -724,7 +724,7 @@ func playTrackWithRetry(
 				replyMsg,
 				F(replyMsg.ChannelID(), "rtmp_streaming_not_supported"),
 			)
-			r.Destroy()
+			core.DeleteRoom(r.ChatID())
 			return tg.ErrEndGroup
 		}
 
@@ -739,7 +739,7 @@ func playTrackWithRetry(
 
 		if tg.MatchError(err, "GROUPCALL_INVALID") {
 			gologging.Error("GROUPCALL_INVALID err occurred. Returning...")
-			r.Destroy()
+			core.DeleteRoom(r.ChatID())
 			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_unable"))
 			return tg.ErrEndGroup
 		}

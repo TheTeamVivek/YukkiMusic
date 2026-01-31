@@ -53,8 +53,8 @@ Monitor bot usage and identify issues.`
 func activeHandler(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()
 
-	allChats := core.GetAllRoomIDs()
-	activeCount := len(allChats)
+	allRooms := core.GetAllRooms()
+	activeCount := len(allRooms)
 
 	ntgChats := make(map[int64]struct{})
 
@@ -68,7 +68,7 @@ func activeHandler(m *telegram.NewMessage) error {
 	})
 
 	brokenCount := 0
-	for _, id := range allChats {
+	for id := range allRooms {
 		if _, ok := ntgChats[id]; !ok {
 			brokenCount++
 		}

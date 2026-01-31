@@ -22,7 +22,6 @@ package modules
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -137,16 +136,12 @@ func startAutoLeave() {
 		}
 		autoLeaveMu.Unlock()
 
-		activeRooms := make(map[int64]struct{})
-		for _, id := range core.GetAllRoomIDs() {
-			activeRooms[id] = struct{}{}
-		}
-
+		activeRooms := core.GetAllRooms()
 		core.Assistants.ForEach(func(a *core.Assistant) {
 			if a == nil || a.Client == nil {
 				return
 			}
-			go autoLeaveAssistant(a, activeRooms, limit)
+			go autoLeaveAssistant(a, activeRooms)
 		})
 
 		<-ticker.C
@@ -155,25 +150,14 @@ func startAutoLeave() {
 
 func autoLeaveAssistant(
 	ass *core.Assistant,
-	activeRooms map[int64]struct{},
-	limit int,
+	activeRooms map[int64]*core.RoomState,
 ) {
 	leaveCount := 0
-
 	err := ass.Client.IterDialogs(func(d *tg.TLDialog) error {
 		if d.IsUser() {
 			return nil
 		}
-		var chatID int64
-
-		switch p := d.Peer.(type) {
-		case *tg.PeerChat:
-			chatID = -p.ChatID
-		case *tg.PeerChannel:
-			chatID = -1000000000000 - p.ChannelID
-		default:
-			return nil
-		}
+		chatID := d.GetChannelID()
 
 		if chatID == 0 || chatID == config.LoggerID ||
 			d.GetID() == config.LoggerID {
@@ -186,10 +170,8 @@ func autoLeaveAssistant(
 
 		if err := ass.Client.LeaveChannel(chatID); err != nil {
 			if wait := tg.GetFloodWait(err); wait > 0 {
-				gologging.Error(
-					"FloodWait detected (" + strconv.Itoa(
-						wait,
-					) + "s). Sleeping...",
+				gologging.ErrorF(
+					"FloodWait detected (%ds). Sleeping...", wait,
 				)
 				time.Sleep(time.Duration(wait) * time.Second)
 				return nil

@@ -50,14 +50,14 @@ func onStreamEndHandler(chatID int64) {
 		cid, err := database.GetChatIDFromCPlayID(chatID)
 		if err != nil {
 			core.Bot.SendMessage(chatID, F(chatID, "stream_channelid_fail"))
-			r.Destroy()
+			core.DeleteRoom(r.ChatID())
 			return
 		}
 		chatID = cid
 	}
 
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
-		r.Destroy()
+		core.DeleteRoom(r.ChatID())
 		core.Bot.SendMessage(chatID, F(chatID, "stream_queue_finished"))
 		return
 	}
@@ -77,11 +77,15 @@ func onStreamEndHandler(chatID int64) {
 		utils.EOR(mystic, F(chatID, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
 		}))
+		core.DeleteRoom(r.ChatID())
+
 		return
 	}
 
 	if err := r.Play(t, filePath); err != nil {
 		utils.EOR(mystic, F(chatID, "stream_play_fail"))
+		core.DeleteRoom(r.ChatID())
+
 		return
 	}
 

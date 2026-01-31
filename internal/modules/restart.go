@@ -24,6 +24,7 @@ import (
 	"os"
 	"path/filepath"
 	"syscall"
+	"time"
 
 	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
@@ -76,24 +77,19 @@ func handleRestart(m *tg.NewMessage) error {
 		return tg.ErrEndGroup
 	}
 
-	for _, id := range core.GetAllRoomIDs() {
-		ass, err := core.Assistants.ForChat(id)
-		if err != nil {
-			gologging.ErrorF("Failed to get Assistant for %d: %v", id, err)
-			continue
-		}
+	for chatID := range core.GetAllRooms() {
+		core.DeleteRoom(chatID)
+		m.Client.SendMessage(chatID, F(chatID, "restart_service", locales.Arg{
+			"bot": utils.MentionHTML(core.BUser),
+		}))
+		time.Sleep(time.Second)
 
-		if r, _ := core.GetRoom(id, ass); r != nil {
-			r.Stop()
-			m.Client.SendMessage(id, F(id, "restart_service", locales.Arg{
-				"bot": utils.MentionHTML(core.BUser),
-			}))
-		}
 	}
 
 	utils.EOR(mystic, F(chatID, "restart_initiated"))
 
 	_ = os.RemoveAll("downloads")
+	_ = os.RemoveAll("cache")
 
 	if err := syscall.Exec(exePath, os.Args, os.Environ()); err != nil {
 		utils.EOR(mystic, F(chatID, "restart_fail", locales.Arg{
