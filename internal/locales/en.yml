@@ -884,8 +884,8 @@ unmute_success: |
 
 
 # 🔊 Voice Chat Events
-voicechat_ended: "📴 Voice chat ended!\nAll queues cleared."
-voicechat_started: "📢 Voice chat started!\nUse /play <song> to play music."
+voicechat_ended: "<b>⚠️ Video chat ended</b>\n\n<i>⏰ Duration: {duration}</i>"
+voicechat_started: "<b>♻️ Voice chat started!</b>\n\n<i>Use /play [song name] to play music.</i>"
 
 # Commands help
 help_owner: |

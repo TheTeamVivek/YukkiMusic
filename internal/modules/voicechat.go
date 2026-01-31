@@ -28,6 +28,7 @@ import (
 
 	"main/internal/core"
 	"main/internal/database"
+	"main/internal/locales"
 	"main/internal/utils"
 )
 
@@ -65,7 +66,13 @@ func handleVoiceChatAction(
 	s.SetVoiceChatActive(isActive)
 
 	msgKey := utils.IfElse(isActive, "voicechat_started", "voicechat_ended")
-	m.Respond(F(chatID, msgKey))
+	m.Respond(
+		F(
+			chatID,
+			msgKey,
+			locales.Arg{"duration": formatDuration(int(action.Duration))},
+		),
+	)
 	gologging.DebugF("Voice chat %s in %d", msgKey, chatID)
 
 	if !isActive {

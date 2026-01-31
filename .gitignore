@@ -9,7 +9,7 @@ libntgcalls.*
 
 /app
 downloads/
-cache.db
+*.db
 *.dat
 *.session
 

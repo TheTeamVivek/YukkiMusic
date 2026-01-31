@@ -411,14 +411,31 @@ func warnAndLeave(client *tg.Client, chatID int64) {
 }
 
 func formatDuration(sec int) string {
-	h := sec / 3600
-	m := (sec % 3600) / 60
-	s := sec % 60
-
-	if h > 0 {
-		return fmt.Sprintf("%d:%02d:%02d", h, m, s) // HH:MM:SS
+	if sec < 0 {
+		sec = 0
 	}
-	return fmt.Sprintf("%02d:%02d", m, s) // MM:SS
+
+	const (
+		day  = 86400
+		hour = 3600
+		min  = 60
+	)
+
+	if sec < min {
+		return fmt.Sprintf("%ds", sec)
+	}
+	if sec < hour {
+		return fmt.Sprintf("%dm %ds", sec/min, sec%min)
+	}
+	if sec < day {
+		return fmt.Sprintf("%dh %dm", sec/hour, (sec%hour)/min)
+	}
+
+	return fmt.Sprintf(
+		"%dd %dh",
+		sec/day,
+		(sec%day)/hour,
+	)
 }
 
 func getCommand(m *tg.NewMessage) string {
