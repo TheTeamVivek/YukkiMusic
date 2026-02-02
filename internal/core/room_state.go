@@ -137,26 +137,32 @@ func GetRoomCounts() int {
 }
 
 func GetAllRooms() map[int64]*RoomState {
-	roomsMu.Lock()
-	defer roomsMu.Unlock()
+    roomsMu.RLock()
 
-	out := make(map[int64]*RoomState, len(rooms))
+    out := make(map[int64]*RoomState, len(rooms))
+    var dead []int64
 
-	for chatID, room := range rooms {
-		if room == nil {
-			delete(rooms, chatID)
-			continue
-		}
+    for chatID, room := range rooms {
+        if room == nil || room.destroyed.Load() {
+            dead = append(dead, chatID)
+            continue
+        }
+        out[chatID] = room
+    }
 
-		if room.destroyed.Load() {
-			delete(rooms, chatID)
-			continue
-		}
+    roomsMu.RUnlock()
 
-		out[chatID] = room
-	}
+    if len(dead) > 0 {
+        roomsMu.Lock()
+        for _, chatID := range dead {
+            if room := rooms[chatID]; room == nil || room.destroyed.Load() {
+                delete(rooms, chatID)
+            }
+        }
+        roomsMu.Unlock()
+    }
 
-	return out
+    return out
 }
 
 // Getters
