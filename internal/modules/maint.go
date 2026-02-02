@@ -141,36 +141,26 @@ func handleMaintenance(m *tg.NewMessage) error {
 		maintCancel.Unlock()
 
 		go func(c *tg.Client, reason string) {
-			for _, id := range core.GetAllRoomIDs() {
+			for chatID := range core.GetAllRooms() {
 				maintCancel.Lock()
 				if maintCancel.cancel {
 					maintCancel.Unlock()
 					break
 				}
 				maintCancel.Unlock()
-				ass, err := core.Assistants.ForChat(id)
-				if err != nil {
-					gologging.ErrorF(
-						"Failed to get Assistant for %d: %v",
-						id,
-						err,
-					)
-					continue
-				}
 
-				if r, ok := core.GetRoom(id, ass); ok {
-					r.Destroy()
-					msg := F(id, "maint_entering")
-					if reason != "" {
-						msg += "\n" + F(
-							id,
-							"maint_reason",
-							locales.Arg{"reason": reason},
-						)
-					}
-					c.SendMessage(id, msg)
-					time.Sleep(time.Second)
+				core.DeleteRoom(chatID)
+				msg := F(chatID, "maint_entering")
+				if reason != "" {
+					msg += "\n" + F(
+						chatID,
+						"maint_reason",
+						locales.Arg{"reason": reason},
+					)
 				}
+				c.SendMessage(chatID, msg)
+				time.Sleep(time.Second)
+
 			}
 		}(m.Client, reason)
 

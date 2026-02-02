@@ -851,7 +851,7 @@ start_group: "<b>💫 I’m here!</b> Try a command… if you think you can hand
 stream_channelid_fail: "⚠️ Failed to get your connected channel’s ID."
 stream_queue_finished: "🎵 <b>Queue Finished!</b>\n\nNo more songs to play. Use /play to add more tracks! 🎶"
 stream_downloading_next: "📥 Downloading your next track..."
-stream_download_fail: "❌ Failed to download.\nError: <code>{error}</code>\nUse /skip to skip playback."
+stream_download_fail: "❌ Failed to download.\nError: <code>{error}</code>"
 stream_play_fail: "❌ Failed to play the song."
 stream_now_playing: |
   <b>🎵 Now Playing:</b>
@@ -884,8 +884,8 @@ unmute_success: |
 
 
 # 🔊 Voice Chat Events
-voicechat_ended: "📴 Voice chat ended!\nAll queues cleared."
-voicechat_started: "📢 Voice chat started!\nUse /play <song> to play music."
+voicechat_ended: "<b>⚠️ Video chat ended</b>\n\n<i>⏰ Duration: {duration}</i>"
+voicechat_started: "<b>♻️ Voice chat started!</b>\n\n<i>Use /play [song name] to play music.</i>"
 
 # Commands help
 help_owner: |

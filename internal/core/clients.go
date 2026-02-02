@@ -223,7 +223,7 @@ func decodePyrogramSessionString(
 	}
 
 	return &telegram.Session{
-		Hostname: telegram.ResolveDataCenterIP(
+		Hostname: telegram.ResolveDC(
 			int(uint8(packedData[0])),
 			packedData[5] != 0,
 			false,

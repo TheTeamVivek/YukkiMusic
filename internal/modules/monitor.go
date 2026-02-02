@@ -23,7 +23,6 @@ package modules
 import (
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"
@@ -37,48 +36,38 @@ func MonitorRooms() {
 	sem := make(chan struct{}, 20)
 
 	for range ticker.C {
-		for _, chatID := range core.GetAllRoomIDs() {
-			sem <- struct{}{}
-			go func(id int64) {
-				defer func() { <-sem }()
-				ass, err := core.Assistants.ForChat(id)
-				if err != nil {
-					gologging.ErrorF(
-						"Failed to get Assistant for %d: %v",
-						id,
-						err,
-					)
-					return
-				}
+		for chatID, room := range core.GetAllRooms() {
 
-				r, ok := core.GetRoom(id, ass)
-				if !ok {
-					gologging.DebugF(
-						"Room not exists for %d returning..",
-						chatID,
-					)
-					return
-				}
+			sem <- struct{}{}
+
+			go func(chatID int64, r *core.RoomState) {
+				defer func() { <-sem }()
+
 				if !r.IsActiveChat() {
+					/*
+						// TODO: TEST IT AND INCREASE SLEEP TIME
+						time.Sleep(5 * time.Second)
+
+						if !r.IsActiveChat() {
+							core.DeleteRoom(chatID)
+							return
+						}
+					*/
 					return
 				}
 
 				if r.IsPaused() {
-					gologging.DebugF("Room paused for %d returning..", chatID)
-
 					return
 				}
 
 				r.Parse()
 				mystic := r.GetMystic()
 				if mystic == nil {
-					gologging.DebugF("mystic is nil for %d returning..", chatID)
-
 					return
 				}
-				chatID := id
+
 				if r.IsCPlay() {
-					cid, err := database.GetChatIDFromCPlayID(id)
+					cid, err := database.GetChatIDFromCPlayID(chatID)
 					if err == nil {
 						chatID = cid
 					}
@@ -89,7 +78,7 @@ func MonitorRooms() {
 					Entities:    mystic.Message.Entities,
 				}
 				mystic.Edit(mystic.Text(), opts)
-			}(chatID)
+			}(chatID, room)
 		}
 	}
 }

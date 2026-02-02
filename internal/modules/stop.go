@@ -23,6 +23,7 @@ package modules
 import (
 	"github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/core"
 	"main/internal/locales"
 	"main/internal/utils"
 )
@@ -64,7 +65,7 @@ func handleStop(m *telegram.NewMessage, cplay bool) error {
 		m.Reply(F(m.ChannelID(), "room_no_active"))
 		return telegram.ErrEndGroup
 	}
-	r.Destroy()
+	core.DeleteRoom(r.ChatID())
 	m.Reply(
 		F(
 			m.ChannelID(),

@@ -52,24 +52,16 @@ type Player interface {
 type RoomState struct {
 	sync.RWMutex
 
-	chatID int64
+	fpath             string
+	track             *state.Track
+	queue             []*state.Track
+	loop, position    int
+	updatedAt, chatID int64
+	speed             float64
 
-	fpath string
-
-	track *state.Track
-	queue []*state.Track
-
-	loop      int
-	position  int
-	updatedAt int64
-
-	speed float64
-
-	shuffle bool
-	playing bool
-	muted   bool
-	paused  bool
-	cplay   bool
+	shuffle, playing,
+	muted, paused,
+	cplay bool
 
 	destroyed atomic.Bool
 
@@ -81,17 +73,24 @@ type RoomState struct {
 
 // Room management functions
 
-func DeleteRoom(chatID int64) {
+func DeleteRoom(chatID int64) bool {
 	_, file, line, _ := runtime.Caller(1)
-	gologging.DebugF("DeleteRoom Called from %s:%d", file, line)
+	gologging.DebugF("DeleteRoom called from %s:%d", file, line)
 
-	roomsMu.RLock()
-	room, exists := rooms[chatID]
-	roomsMu.RUnlock()
-
-	if exists {
-		room.Destroy()
+	roomsMu.Lock()
+	room, ok := rooms[chatID]
+	if !ok || room == nil || room.destroyed.Load() {
+		roomsMu.Unlock()
+		return false
 	}
+
+	delete(rooms, chatID)
+	roomsMu.Unlock()
+
+	room.cleanupFile()
+	room.Stop()
+	room.destroyed.Store(true)
+	return true
 }
 
 func GetRoom(chatID int64, ass *Assistant, create ...bool) (*RoomState, bool) {
@@ -131,18 +130,39 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 	return room, true
 }
 
-func GetAllRoomIDs() []int64 {
+func GetRoomCounts() int {
 	roomsMu.RLock()
 	defer roomsMu.RUnlock()
+	return len(rooms)
+}
 
-	ids := make([]int64, 0, len(rooms))
-	for chatID, r := range rooms {
-		if r.destroyed.Load() {
-			continue
-		}
-		ids = append(ids, chatID)
-	}
-	return ids
+func GetAllRooms() map[int64]*RoomState {
+    roomsMu.RLock()
+
+    out := make(map[int64]*RoomState, len(rooms))
+    var dead []int64
+
+    for chatID, room := range rooms {
+        if room == nil || room.destroyed.Load() {
+            dead = append(dead, chatID)
+            continue
+        }
+        out[chatID] = room
+    }
+
+    roomsMu.RUnlock()
+
+    if len(dead) > 0 {
+        roomsMu.Lock()
+        for _, chatID := range dead {
+            if room := rooms[chatID]; room == nil || room.destroyed.Load() {
+                delete(rooms, chatID)
+            }
+        }
+        roomsMu.Unlock()
+    }
+
+    return out
 }
 
 // Getters
@@ -364,28 +384,4 @@ func (r *RoomState) parse() {
 		}
 	}
 	r.updatedAt = current
-}
-
-func (r *RoomState) Destroy() {
-	_, file, line, _ := runtime.Caller(1)
-	gologging.DebugF("Destroy Called from %s:%d", file, line)
-
-	if r.destroyed.Load() {
-		return
-	}
-
-	if err := r.Stop(); err != nil {
-		gologging.ErrorF(
-			"Error during room stop for chat %d: %v",
-			r.chatID,
-			err,
-		)
-	}
-	r.cleanupFile()
-
-	roomsMu.Lock()
-	delete(rooms, r.chatID)
-	roomsMu.Unlock()
-
-	r.destroyed.Store(true)
 }
