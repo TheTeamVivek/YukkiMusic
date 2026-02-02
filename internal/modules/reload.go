@@ -178,7 +178,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	if isAdmin {
-		if core.DeleteRoom(m.ChannelID()) {
+		if core.DeleteRoom(actualChatID) {
 			summary += F(chatID, "reload_room_reset") + "\n"
 		}
 	}
