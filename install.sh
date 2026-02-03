@@ -24,17 +24,18 @@ INSTALL_PIP=false
 INSTALL_FFMPEG=false
 INSTALL_YTDLP=false
 INSTALL_NTGCALLS=false
-INSTALL_LIBS=false
 SKIP_SUMMARY=false
 QUIET_MODE=false
 
+NTGCALLS_VERSION="v2.0.9"
+    
 # ========================
 # HELPER FUNCTIONS
 # ========================
 
 show_help() {
-    cat << EOF
-${CYAN}${BOLD}Usage:${RESET} $0 [OPTIONS]
+    printf "%b\n" \
+"${CYAN}${BOLD}Usage:${RESET} $0 [OPTIONS]
 
 ${CYAN}${BOLD}Options:${RESET}
   -h, --help              Show this help message
@@ -46,7 +47,6 @@ ${CYAN}${BOLD}Options:${RESET}
   -f, --ffmpeg            Install FFmpeg only
   -y, --yt-dlp            Install yt-dlp only
   -n, --ntgcalls          Install ntgcalls only
-  -l, --libs              Install additional libraries only
   -q, --quiet             Quiet mode (minimal output)
   --skip-summary          Skip final summary
 
@@ -57,21 +57,8 @@ ${CYAN}${BOLD}Examples:${RESET}
   $0 --go --ffmpeg        # Install only Go and FFmpeg
   $0 --python --pip       # Install only Python and pip
   $0 --all --quiet        # Install everything in quiet mode
-
-${CYAN}${BOLD}Docker Usage:${RESET}
-  RUN chmod +x install.sh && ./install.sh --ntgcalls
-  RUN ./install.sh --go --ffmpeg --yt-dlp
-
-EOF
+"
     exit 0
-}
-
-print_banner() {
-    [[ "$QUIET_MODE" == true ]] && return
-
-    printf "%s\n" "${CYAN}╔════════════════════════════════════════════════════════════╗"
-    printf "%s\n" "║           🚀 Application Setup & Installation 🚀           ║"
-    printf "%s\n\n" "╚════════════════════════════════════════════════════════════╝${RESET}"
 }
 
 print_step() { 
@@ -176,16 +163,8 @@ parse_arguments() {
                 INSTALL_NTGCALLS=true
                 shift
                 ;;
-            -l|--libs)
-                INSTALL_LIBS=true
-                shift
-                ;;
             -q|--quiet)
                 QUIET_MODE=true
-                shift
-                ;;
-            --skip-summary)
-                SKIP_SUMMARY=true
                 shift
                 ;;
             *)
@@ -212,7 +191,6 @@ should_install() {
         ffmpeg) [[ "$INSTALL_FFMPEG" == true ]] && return 0 ;;
         ytdlp) [[ "$INSTALL_YTDLP" == true ]] && return 0 ;;
         ntgcalls) [[ "$INSTALL_NTGCALLS" == true ]] && return 0 ;;
-        libs) [[ "$INSTALL_LIBS" == true ]] && return 0 ;;
     esac
     
     return 1
@@ -804,20 +782,18 @@ install_ntgcalls() {
     
     print_step "Installing ntgcalls..."
     
-    VERSION="v2.0.6"
-    
     command -v unzip >/dev/null 2>&1 || install_package "unzip" "unzip" || print_error "unzip required" "install unzip"
     
     case "$OS_TYPE" in
         linux)
-            [[ "$ARCH_TYPE" == "amd64" ]] && URL="https://github.com/pytgcalls/ntgcalls/releases/download/$VERSION/ntgcalls.linux-x86_64-static_libs.zip"
-            [[ "$ARCH_TYPE" == "arm64" ]] && URL="https://github.com/pytgcalls/ntgcalls/releases/download/$VERSION/ntgcalls.linux-arm64-static_libs.zip"
+            [[ "$ARCH_TYPE" == "amd64" ]] && URL="https://github.com/pytgcalls/ntgcalls/releases/download/$NTGCALLS_VERSION/ntgcalls.linux-x86_64-static_libs.zip"
+            [[ "$ARCH_TYPE" == "arm64" ]] && URL="https://github.com/pytgcalls/ntgcalls/releases/download/$NTGCALLS_VERSION/ntgcalls.linux-arm64-static_libs.zip"
             ;;
         macos)
-            [[ "$ARCH_TYPE" == "arm64" ]] && URL="https://github.com/pytgcalls/ntgcalls/releases/download/$VERSION/ntgcalls.macos-arm64-static_libs.zip"
+            [[ "$ARCH_TYPE" == "arm64" ]] && URL="https://github.com/pytgcalls/ntgcalls/releases/download/$NTGCALLS_VERSION/ntgcalls.macos-arm64-static_libs.zip"
             [[ "$ARCH_TYPE" == "amd64" ]] && print_error "ntgcalls unavailable for macOS x86_64" "use arm64 or build from source"
             ;;
-        windows) URL="https://github.com/pytgcalls/ntgcalls/releases/download/$VERSION/ntgcalls.windows-x86_64-static_libs.zip" ;;
+        windows) URL="https://github.com/pytgcalls/ntgcalls/releases/download/$NTGCALLS_VERSION/ntgcalls.windows-x86_64-static_libs.zip" ;;
     esac
     
     [[ -z "$URL" ]] && print_error "Could not determine ntgcalls URL" "check system compatibility"
@@ -862,25 +838,6 @@ install_ntgcalls() {
     log_info "ntgcalls successfully installed"
 }
 
-install_additional_libs() {
-    should_install libs || return 0
-    
-    print_step "Checking additional libraries..."
-    
-    case "$OS_TYPE" in
-        linux) LIBS=("gcc" "zlib1g-dev" "git") ;;
-        macos) LIBS=("gcc" "git") ;;
-        *) return 0 ;;
-    esac
-    
-    for lib in "${LIBS[@]}"; do
-        command -v "${lib%%-dev}" >/dev/null 2>&1 && continue
-        dpkg -l | grep -q "^ii  $lib" 2>/dev/null && continue
-        rpm -qa | grep -q "$lib" 2>/dev/null && continue
-        install_package "$lib" "$lib" || print_soft_error "Could not install $lib"
-    done
-}
-
 # ========================
 # CLEANUP
 # ========================
@@ -894,11 +851,7 @@ cleanup_temp_files() {
 # FINAL SUMMARY
 # ========================
 print_summary() {
-    [[ "$SKIP_SUMMARY" == true ]] && return
-    
-    echo -e "\n${CYAN}${BOLD}╔════════════════════════════════════════════════════════════╗${RESET}"
-    echo -e "${CYAN}${BOLD}║                    Installation Summary                   ║${RESET}"
-    echo -e "${CYAN}${BOLD}╚════════════════════════════════════════════════════════════╝${RESET}\n"
+    [[ "$QUIET_MODE" == true ]] && return
     
     # Check each component
     if should_install go; then
@@ -943,7 +896,7 @@ print_summary() {
     
     if should_install ntgcalls; then
         if [[ -f "ntgcalls/ntgcalls.h" ]]; then
-            echo -e "${GREEN}✓ ntgcalls: Installed${RESET}"
+            echo -e "${GREEN}✓ ntgcalls: $NTGCALLS_VERSION ${RESET}"
         else
             echo -e "${RED}✗ ntgcalls: Not installed${RESET}"
         fi
@@ -957,8 +910,7 @@ print_summary() {
 # ========================
 main() {
     parse_arguments "$@"
-    
-    print_banner
+  
     log_info "Installation started with arguments: $*"
     
     detect_system
@@ -973,7 +925,6 @@ main() {
     check_install_go
     check_install_ffmpeg
     check_install_ytdlp
-    install_additional_libs
     install_ntgcalls
     
     cleanup_temp_files
@@ -982,13 +933,13 @@ main() {
     
     log_info "Installation completed with $WARNINGS warnings"
     
-    echo -e "\n${GREEN}${BOLD}╔════════════════════════════════════════════════════════════╗${RESET}"
     if [[ $WARNINGS -eq 0 ]]; then
-        echo -e "${GREEN}${BOLD}║          ✓ Installation completed successfully! ✓          ║${RESET}"
+        if [[ "$QUIET_MODE" == false ]]; then
+            echo -e "\n${GREEN}${BOLD}✓ Installation completed successfully! ✓${RESET}"
+        fi
     else
-        echo -e "${YELLOW}${BOLD}║     ⚠ Installation completed with $WARNINGS warning(s) ⚠      ║${RESET}"
+        echo -e "\n${YELLOW}${BOLD}⚠ Installation completed with $WARNINGS warning(s) ⚠${RESET}"
     fi
-    echo -e "${GREEN}${BOLD}╚════════════════════════════════════════════════════════════╝${RESET}"
     
     if [[ $WARNINGS -gt 0 ]]; then
         echo -e "${YELLOW}⚠ Some components failed. Check messages above.${RESET}"
