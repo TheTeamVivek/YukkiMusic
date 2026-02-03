@@ -73,13 +73,6 @@ func getChatSettings(chatID int64) (*ChatSettings, error) {
 	}
 
 	dbCache.Set(cacheKey, &settings)
-
-	// Proactively cache the cplayID -> chatID mapping
-	if settings.CPlayID != 0 {
-		cplayCacheKey := "cplayid_" + strconv.FormatInt(settings.CPlayID, 10)
-		dbCache.Set(cplayCacheKey, settings.ChatID)
-	}
-
 	return &settings, nil
 }
 
@@ -106,10 +99,5 @@ func updateChatSettings(newSettings *ChatSettings) error {
 	}
 
 	dbCache.Set(cacheKey, newSettings)
-	if newSettings.CPlayID != 0 {
-		cplayCacheKey := "cplayid_" + strconv.FormatInt(newSettings.CPlayID, 10)
-		dbCache.Set(cplayCacheKey, newSettings.ChatID)
-	}
-
 	return nil
 }

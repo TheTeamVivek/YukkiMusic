@@ -70,7 +70,7 @@ func SuppMarkup(chatID int64) tg.ReplyMarkup {
 func GetPlayMarkup(chatID int64, r *RoomState, queued bool) tg.ReplyMarkup {
 	btn := tg.NewKeyboard()
 	prefix := "room:"
-	if r.IsCPlay() {
+	if r.CplayID() != 0 {
 		prefix = "croom:"
 	}
 	track := r.Track()

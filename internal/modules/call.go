@@ -28,7 +28,6 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"
-	"main/internal/database"
 	"main/internal/locales"
 	"main/internal/platforms"
 	"main/internal/utils"
@@ -44,17 +43,9 @@ func onStreamEndHandler(chatID int64) {
 	if !ok {
 		return
 	}
-	r.Parse()
 
-	if r.IsCPlay() {
-		cid, err := database.GetChatIDFromCPlayID(chatID)
-		if err != nil {
-			core.Bot.SendMessage(chatID, F(chatID, "stream_channelid_fail"))
-			core.DeleteRoom(r.ChatID())
-			return
-		}
-		chatID = cid
-	}
+	chatID = r.EffectiveChatID()
+	r.Parse()
 
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
 		core.DeleteRoom(r.ChatID())
