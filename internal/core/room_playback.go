@@ -49,6 +49,10 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 	r.track = t
 	r.playing = true
 	r.fpath = path
+	r.position = 0
+	r.paused = false
+	r.muted = false
+	r.updatedAt = time.Now().Unix()
 	r.mu.Unlock()
 
 	err := r.p.Play(r)
@@ -60,13 +64,6 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 		r.mu.Unlock()
 		return err
 	}
-
-	r.mu.Lock()
-	r.position = 0
-	r.paused = false
-	r.muted = false
-	r.updatedAt = time.Now().Unix()
-	r.mu.Unlock()
 
 	return nil
 }

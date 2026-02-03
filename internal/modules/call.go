@@ -44,19 +44,19 @@ func onStreamEndHandler(chatID int64) {
 		return
 	}
 
-	chatID = r.EffectiveChatID()
+	cid := r.EffectiveChatID()
 	r.Parse()
 
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
-		core.DeleteRoom(r.ChatID())
-		core.Bot.SendMessage(chatID, F(chatID, "stream_queue_finished"))
+		core.DeleteRoom(chatID)
+		core.Bot.SendMessage(cid, F(cid, "stream_queue_finished"))
 		return
 	}
 
 	t := r.NextTrack()
 	mystic, err := core.Bot.SendMessage(
-		chatID,
-		F(chatID, "stream_downloading_next"),
+		cid,
+		F(cid, "stream_downloading_next"),
 	)
 	if err != nil {
 		gologging.ErrorF("[call.go] Failed to send msg: %v", err)
@@ -65,17 +65,17 @@ func onStreamEndHandler(chatID int64) {
 	filePath, err := platforms.Download(context.Background(), t, mystic)
 	if err != nil {
 		gologging.ErrorF("Download failed for %s: %v", t.URL, err)
-		utils.EOR(mystic, F(chatID, "stream_download_fail", locales.Arg{
+		utils.EOR(mystic, F(cid, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		core.DeleteRoom(r.ChatID())
+		core.DeleteRoom(chatID)
 
 		return
 	}
 
 	if err := r.Play(t, filePath); err != nil {
-		utils.EOR(mystic, F(chatID, "stream_play_fail"))
-		core.DeleteRoom(r.ChatID())
+		utils.EOR(mystic, F(cid, "stream_play_fail"))
+		core.DeleteRoom(chatID)
 
 		return
 	}
@@ -83,7 +83,7 @@ func onStreamEndHandler(chatID int64) {
 	title := utils.ShortTitle(t.Title, 25)
 	safeTitle := html.EscapeString(title)
 
-	msgText := F(chatID, "stream_now_playing", locales.Arg{
+	msgText := F(cid, "stream_now_playing", locales.Arg{
 		"url":      t.URL,
 		"title":    safeTitle,
 		"duration": formatDuration(t.Duration),
@@ -92,7 +92,7 @@ func onStreamEndHandler(chatID int64) {
 
 	opt := &telegram.SendOptions{
 		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
+		ReplyMarkup: core.GetPlayMarkup(cid, r, false),
 	}
 
 	if t.Artwork != "" {

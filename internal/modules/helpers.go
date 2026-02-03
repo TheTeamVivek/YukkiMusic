@@ -59,7 +59,7 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	r, _ := core.GetRoom(chatID, ass, true)
 
 	if cplay {
-		r.SetCplayID(chatID)
+		r.SetCplayID(m.ChannelID())
 	}
 	return r, nil
 }
