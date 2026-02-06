@@ -72,7 +72,7 @@ cp sample.env .env
 
 5. **Start the Bot**
 ```bash
-go run main.go
+go run ./cmd/app
 ```
 
 ---
