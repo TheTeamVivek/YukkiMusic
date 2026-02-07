@@ -414,7 +414,7 @@ mute_success_with_time: |
 no_song_query: |
   <b>🎵 Whoops! No song detected.</b>
 
-  <i>Type <b><code>{cmd} [song name]</code></b> or reply to a <b>media</b> to start playing!</i>
+  <i>Type <b>{cmd} [song name]</b> or reply to a <b>media</b> to start playing!</i>
 
 no_song_found: "❌ No tracks found."
 only_admin: "⚠️ <b>Permission Denied!</b>\nOnly <b>admins</b> can control this actions. You can still play songs 🎵.\n\nIf you believe you are an admin, please use /reload to refresh your admin status."
