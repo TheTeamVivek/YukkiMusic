@@ -35,7 +35,7 @@ func EOR(
 ) (m *telegram.NewMessage, err error) {
 
 	if msg == nil {
-		gologging.Error("[EOR] nil msg at " + callerInfo(1))
+		gologging.Error("[EOR] nil msg at " + callerInfo(2))
 		return nil, nil
 	}
 
@@ -48,7 +48,7 @@ func EOR(
 	if err != nil {
 		gologging.Error(
 			"[EOR] " + err.Error() +
-				" | called from " + callerInfo(1),
+				" | called from " + callerInfo(2),
 		)
 	}
 	return m, err
