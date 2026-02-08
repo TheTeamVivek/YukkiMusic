@@ -425,7 +425,7 @@ nothumb_status: |
   
   <b>📊 Usage: {cmd} [enable|disable]</b>
   
-  <i>Thumbnail is {action} currently.
+  <i>Thumbnail is {action} currently.</i>
   
 nothumb_fetch_fail: "⚠️ <b>Failed to fetch thumbnail setting.</b>"
 nothumb_already: "ℹ️ Thumbnail display is already {action}."
