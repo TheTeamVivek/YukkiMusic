@@ -27,7 +27,7 @@ INSTALL_NTGCALLS=false
 SKIP_SUMMARY=false
 QUIET_MODE=false
 
-NTGCALLS_VERSION="v2.0.9"
+NTGCALLS_VERSION="v2.1.0"
     
 # ========================
 # HELPER FUNCTIONS

@@ -321,7 +321,6 @@ func prepareRoomAndSearchMessage(
 	}
 
 	chatID := m.ChannelID()
-	r.SetCPlay(cplay)
 	r.Parse()
 
 	if len(r.Queue()) >= config.QueueLimit {

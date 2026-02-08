@@ -26,7 +26,6 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"
-	"main/internal/database"
 )
 
 func MonitorRooms() {
@@ -66,13 +65,7 @@ func MonitorRooms() {
 					return
 				}
 
-				if r.IsCPlay() {
-					cid, err := database.GetChatIDFromCPlayID(chatID)
-					if err == nil {
-						chatID = cid
-					}
-				}
-				markup := core.GetPlayMarkup(chatID, r, false)
+				markup := core.GetPlayMarkup(r.EffectiveChatID(), r, false)
 				opts := &telegram.SendOptions{
 					ReplyMarkup: markup,
 					Entities:    mystic.Message.Entities,

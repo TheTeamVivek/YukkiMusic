@@ -322,13 +322,6 @@ If Hit: Return cached value ⚡
 If Miss: Query MongoDB → Update cache
 ```
 
-**Cache Keys**:
-```go
-"bot_state"                           // Global state
-"chat_settings_" + chatID            // Per-chat settings
-"cplayid_" + cplayID                 // Channel play mapping
-```
-
 **Manual Cache Invalidation**:
 ```go
 dbCache.Delete("bot_state")

@@ -38,35 +38,32 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 
 	forcePlay := len(force) > 0 && force[0]
 
-	r.Lock()
+	r.mu.Lock()
 	shouldQueue := !forcePlay && r.playing && r.track != nil
 	if shouldQueue {
 		r.queue = append(r.queue, t)
-		r.Unlock()
+		r.mu.Unlock()
 		return nil
 	}
 
 	r.track = t
 	r.playing = true
 	r.fpath = path
-	r.Unlock()
-
-	err := r.p.Play(r)
-	if err != nil {
-		r.Lock()
-		r.track = nil
-		r.playing = false
-		r.fpath = ""
-		r.Unlock()
-		return err
-	}
-
-	r.Lock()
 	r.position = 0
 	r.paused = false
 	r.muted = false
 	r.updatedAt = time.Now().Unix()
-	r.Unlock()
+	r.mu.Unlock()
+
+	err := r.p.Play(r)
+	if err != nil {
+		r.mu.Lock()
+		r.track = nil
+		r.playing = false
+		r.fpath = ""
+		r.mu.Unlock()
+		return err
+	}
 
 	return nil
 }
@@ -77,9 +74,9 @@ func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
 		return false, ErrRoomDestroyed
 	}
 
-	r.RLock()
+	r.mu.RLock()
 	alreadyPaused := r.paused
-	r.RUnlock()
+	r.mu.RUnlock()
 
 	if alreadyPaused {
 		return true, nil
@@ -90,20 +87,20 @@ func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
 		return false, err
 	}
 
-	r.RLock()
+	r.mu.RLock()
 	isMuted := r.muted
-	r.RUnlock()
+	r.mu.RUnlock()
 
 	if isMuted {
 		r.Unmute()
 	}
 
-	r.Lock()
+	r.mu.Lock()
 	r.parse()
 	r.paused = true
 	r.muted = false
 	r.scheduleAutoResume(autoResumeAfter)
-	r.Unlock()
+	r.mu.Unlock()
 
 	return paused, nil
 }
@@ -135,9 +132,9 @@ func (r *RoomState) Resume() (bool, error) {
 		return false, fmt.Errorf("there are no active music playing")
 	}
 
-	r.RLock()
+	r.mu.RLock()
 	alreadyPlaying := !r.paused
-	r.RUnlock()
+	r.mu.RUnlock()
 
 	if alreadyPlaying {
 		return true, nil
@@ -148,7 +145,7 @@ func (r *RoomState) Resume() (bool, error) {
 		return false, err
 	}
 
-	r.Lock()
+	r.mu.Lock()
 	r.paused = false
 	r.muted = false
 	r.playing = true
@@ -156,7 +153,7 @@ func (r *RoomState) Resume() (bool, error) {
 	if r.scheduledTimers != nil {
 		r.scheduledTimers.cancelScheduledResume()
 	}
-	r.Unlock()
+	r.mu.Unlock()
 
 	return resumed, nil
 }
@@ -167,28 +164,28 @@ func (r *RoomState) Replay() error {
 		return ErrRoomDestroyed
 	}
 
-	r.RLock()
+	r.mu.RLock()
 	hasTrack := r.track != nil && r.fpath != ""
-	r.RUnlock()
+	r.mu.RUnlock()
 
 	if !hasTrack {
 		return fmt.Errorf("no track to replay")
 	}
 
-	r.Lock()
+	r.mu.Lock()
 	oldPos := r.position
 	r.position = 0
-	r.Unlock()
+	r.mu.Unlock()
 
 	err := r.p.Play(r)
 	if err != nil {
-		r.Lock()
+		r.mu.Lock()
 		r.position = oldPos
-		r.Unlock()
+		r.mu.Unlock()
 		return err
 	}
 
-	r.Lock()
+	r.mu.Lock()
 	r.position = 0
 	r.paused = false
 	r.muted = false
@@ -198,7 +195,7 @@ func (r *RoomState) Replay() error {
 		r.scheduledTimers.cancelScheduledResume()
 		r.scheduledTimers.cancelScheduledUnmute()
 	}
-	r.Unlock()
+	r.mu.Unlock()
 
 	return nil
 }
@@ -214,7 +211,7 @@ func (r *RoomState) Stop() error {
 
 	err := r.p.Stop(r)
 
-	r.Lock()
+	r.mu.Lock()
 	r.track = nil
 	r.position = 0
 	r.playing = false
@@ -226,7 +223,7 @@ func (r *RoomState) Stop() error {
 		r.scheduledTimers.cancelScheduledResume()
 		r.scheduledTimers.cancelScheduledSpeed()
 	}
-	r.Unlock()
+	r.mu.Unlock()
 
 	return err
 }

@@ -33,8 +33,8 @@ func (r *RoomState) NextTrack() *state.Track {
 		return nil
 	}
 
-	r.Lock()
-	defer r.Unlock()
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
 	if r.track != nil && r.loop > 0 {
 		return r.loopCurrentTrack()
@@ -93,8 +93,8 @@ func (r *RoomState) RemoveFromQueue(index int) {
 		return
 	}
 
-	r.Lock()
-	defer r.Unlock()
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
 	if index == -1 {
 		r.queue = []*state.Track{}
@@ -112,8 +112,8 @@ func (r *RoomState) MoveInQueue(from, to int) {
 		return
 	}
 
-	r.Lock()
-	defer r.Unlock()
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
 	if !r.isValidMove(from, to) {
 		return

@@ -57,6 +57,10 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 		return nil, fmt.Errorf("failed to get assistant for you chat: %w", err)
 	}
 	r, _ := core.GetRoom(chatID, ass, true)
+
+	if cplay {
+		r.SetCplayID(m.ChannelID())
+	}
 	return r, nil
 }
 
