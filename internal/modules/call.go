@@ -95,7 +95,7 @@ func onStreamEndHandler(chatID int64) {
 		ReplyMarkup: core.GetPlayMarkup(cid, r, false),
 	}
 
-	if t.Artwork != "" {
+	if t.Artwork != "" && shouldShowThumb(chatID) {
 		opt.Media = utils.CleanURL(t.Artwork)
 	}
 

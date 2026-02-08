@@ -417,6 +417,21 @@ no_song_query: |
   <i>Type <b>{cmd} [song name]</b> or reply to a <b>media</b> to start playing!</i>
 
 no_song_found: "❌ No tracks found."
+
+nothumb_status: |
+  🖼️ <b>Thumbnail Control</b>
+  
+  <i>When enabled, playback messages won't show artwork/thumbnails.</i>
+  
+  <b>📊 Usage: {cmd} [enable|disable]</b>
+  
+  <i>Thumbnail is {action} currently.
+  
+nothumb_fetch_fail: "⚠️ <b>Failed to fetch thumbnail setting.</b>"
+nothumb_already: "ℹ️ Thumbnail display is already {action}."
+nothumb_update_fail: "⚠️ <b>Failed to update thumbnail setting.</b>"
+nothumb_updated: "🖼️ Thumbnail display has been {action}."
+
 only_admin: "⚠️ <b>Permission Denied!</b>\nOnly <b>admins</b> can control this actions. You can still play songs 🎵.\n\nIf you believe you are an admin, please use /reload to refresh your admin status."
 only_admin_or_auth: "⚠️ <b>Access Denied</b>\nOnly <b>admins</b> or <b>authorized users</b> can control this actions.\n\nIf you recently became an admin, use /reload to refresh your permissions."
 only_admin_or_auth_cb: "⚠️ Only admins can do this actions."
@@ -936,6 +951,7 @@ help_admin: |
   <b>/shuffle</b> - Shuffle all queued tracks
   <b>/loop</b> - Enable or disable looping
   <b>/stop</b> - Stop playback and leave VC
+  <b>/nothumb</b> - Enable or disable artwork/thumbnail in playback messages
 
 help_public: |
   🌍 <b>Public Commands</b>

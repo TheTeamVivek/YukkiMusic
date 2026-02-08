@@ -33,7 +33,6 @@ func EOR(
 	text string,
 	opts ...*telegram.SendOptions,
 ) (m *telegram.NewMessage, err error) {
-
 	if msg == nil {
 		gologging.Error("[EOR] nil msg at " + callerInfo(2))
 		return nil, nil

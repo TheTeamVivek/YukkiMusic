@@ -135,7 +135,8 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		ParseMode:   "HTML",
 		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
 	}
-	if t.Artwork != "" {
+
+	if t.Artwork != "" && shouldShowThumb(chatID) {
 		opt.Media = utils.CleanURL(t.Artwork)
 	}
 
