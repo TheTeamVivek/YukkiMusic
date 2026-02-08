@@ -41,9 +41,6 @@ func init() {
 • <b>Disabled (default):</b> Shows track artwork/thumbnail
 • <b>Enabled:</b> Hides artwork, text-only messages
 
-<b>🔒 Restrictions:</b>
-• Only <b>chat admins</b> can use this
-
 <b>💡 Examples:</b>
 <code>/nothumb enable</code> — Disable thumbnails
 <code>/nothumb disable</code> — Enable thumbnails
