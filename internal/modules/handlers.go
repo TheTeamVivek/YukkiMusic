@@ -436,6 +436,12 @@ var handlers = []MsgHandlerDef{
 		Handler: creloadHandler,
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
+
+	{
+		Pattern: "(nothumb|nothumbs)",
+		Handler: nothumbHandler,
+		Filters: []telegram.Filter{superGroupFilter, authFilter},
+	},
 }
 
 var cbHandlers = []CbHandlerDef{

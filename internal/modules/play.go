@@ -598,11 +598,12 @@ func playTracksAndRespond(
 		title := html.EscapeString(utils.ShortTitle(mainTrack.Title, 25))
 		btn := core.GetPlayMarkup(chatID, r, false)
 
-		var opt tg.SendOptions
-		opt.ParseMode = "HTML"
-		opt.ReplyMarkup = btn
+		opt := &tg.SendOptions{
+			ParseMode:   "HTML",
+			ReplyMarkup: btn,
+		}
 
-		if mainTrack.Artwork != "" {
+		if mainTrack.Artwork != "" && shouldShowThumb(chatID) {
 			opt.Media = utils.CleanURL(mainTrack.Artwork)
 		}
 
@@ -613,7 +614,7 @@ func playTracksAndRespond(
 			"by":       mention,
 		})
 
-		replyMsg, _ = utils.EOR(replyMsg, nowPlayingText, &opt)
+		replyMsg, _ = utils.EOR(replyMsg, nowPlayingText, opt)
 		r.SetMystic(replyMsg)
 
 		if len(tracks) > 1 {
@@ -642,7 +643,7 @@ func playTracksAndRespond(
 				ParseMode:   "HTML",
 				ReplyMarkup: btn,
 			}
-			if mainTrack.Artwork != "" {
+			if mainTrack.Artwork != "" && shouldShowThumb(chatID) {
 				opt.Media = utils.CleanURL(mainTrack.Artwork)
 			}
 

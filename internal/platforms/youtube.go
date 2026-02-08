@@ -46,7 +46,7 @@ type YouTubePlatform struct {
 var (
 	playlistRegex    = regexp.MustCompile(`(?i)(?:list=)([A-Za-z0-9_-]+)`)
 	youtubeLinkRegex = regexp.MustCompile(
-		`(?i)^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|music\.youtube\.com)\/`,
+		`(?i)^(?:https?:\/\/)?(?:www\.|m\.|music\.)?(?:youtube\.com|youtu\.be)\/\S+`,
 	)
 	youtubeCache = utils.NewCache[string, []*state.Track](1 * time.Hour)
 )

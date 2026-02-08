@@ -76,6 +76,17 @@ func isMaintenanceBlocked(userID int64) bool {
 	return !ok
 }
 
+func shouldShowThumb(chatID int64) bool {
+	noThumb, err := database.GetNoThumb(chatID)
+	if err != nil {
+		// On error, default to showing thumbnails
+		return true
+	}
+	// NoThumb = true means DON'T show thumb
+	// So we return the inverse
+	return !noThumb
+}
+
 func F(chatID int64, key string, values ...locales.Arg) string {
 	lang, err := database.GetChatLanguage(chatID)
 	if err != nil {

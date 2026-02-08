@@ -28,7 +28,6 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-// TODO: reflect deepequal checked removed so handle caching of same opt in high-level
 type RTMPConfig struct {
 	RtmpURL string `bson:"rtmp_url"`
 	RtmpKey string `bson:"rtmp_key"`
@@ -40,12 +39,14 @@ type ChatSettings struct {
 	Language       string     `bson:"language"`
 	RTMPConfig     RTMPConfig `bson:"rtmp_config"`
 	AssistantIndex int        `bson:"ass_index,omitempty"`
+	NoThumb        bool       `bson:"no_thumb,omitempty"`
 }
 
 func defaultChatSettings(chatID int64) *ChatSettings {
 	return &ChatSettings{
 		ChatID:    chatID,
 		AuthUsers: []int64{},
+		NoThumb:   false, // Thumbnails enabled by default
 	}
 }
 
