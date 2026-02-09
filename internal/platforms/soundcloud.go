@@ -273,3 +273,14 @@ func (s *SoundCloudPlatform) infoToTrack(info *ytdlpInfo) *state.Track {
 
 	return track
 }
+
+func (s *SoundCloudPlatform) CanGetRecommendations() bool {
+	return false
+}
+
+func (s *SoundCloudPlatform) GetRecommendations(
+	track *state.Track,
+	hl, gl string,
+) ([]*state.Track, error) {
+	return nil, errors.New("recommendations not supported on soundcloud")
+}

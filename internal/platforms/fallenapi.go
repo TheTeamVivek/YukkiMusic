@@ -123,6 +123,17 @@ func (f *FallenApiPlatform) Download(
 	return path, nil
 }
 
+func (f *FallenApiPlatform) CanGetRecommendations() bool {
+	return false
+}
+
+func (f *FallenApiPlatform) GetRecommendations(
+	track *state.Track,
+	hl, gl string,
+) ([]*state.Track, error) {
+	return nil, errors.New("recommendations not supported on fallenapi")
+}
+
 func (*FallenApiPlatform) CanSearch() bool { return false }
 
 func (*FallenApiPlatform) Search(
@@ -162,14 +173,19 @@ func (f *FallenApiPlatform) getDownloadURL(
 	}
 
 	if resp.IsError() {
-		return "", fmt.Errorf(
-			"api request failed with status: %d",
+		err = fmt.Errorf(
+			"api request failed with status: %d body: %s",
 			resp.StatusCode(),
+			resp.String(),
 		)
+		gologging.Error(err.Error())
+		return "", err
 	}
 
 	if apiResp.CdnUrl == "" {
-		return "", fmt.Errorf("empty API response")
+		err = fmt.Errorf("empty API response body: %s", resp.String())
+		gologging.Error(err.Error())
+		return "", err
 	}
 
 	return apiResp.CdnUrl, nil

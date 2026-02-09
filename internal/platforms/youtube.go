@@ -51,7 +51,12 @@ var (
 	youtubeCache = utils.NewCache[string, []*state.Track](1 * time.Hour)
 )
 
-const PlatformYouTube state.PlatformName = "YouTube"
+const (
+	PlatformYouTube        state.PlatformName = "YouTube"
+	innerTubeKey                              = "AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"
+	innerTubeClientVersion                    = "2.20250101.01.00"
+	innerTubeClientName                       = "WEB"
+)
 
 var yt = &YouTubePlatform{
 	name: PlatformYouTube,
@@ -164,6 +169,180 @@ func (yt *YouTubePlatform) Download(
 	return "", errors.New("youtube platform does not support downloading")
 }
 
+func (yp *YouTubePlatform) CanGetRecommendations() bool {
+	return true
+}
+
+func (yp *YouTubePlatform) GetRecommendations(
+	track *state.Track,
+	hl, gl string,
+) ([]*state.Track, error) {
+	if hl == "" {
+		hl = "en"
+	}
+	if gl == "" {
+		gl = "IN"
+	}
+
+	nextURL := "https://m.youtube.com/youtubei/v1/next?key=" + innerTubeKey
+	var result map[string]any
+
+	resp, err := rc.R().
+		SetResult(&result).
+		SetBody(map[string]any{
+			"context": map[string]any{
+				"client": map[string]any{
+					"clientName":    innerTubeClientName,
+					"clientVersion": innerTubeClientVersion,
+					"hl":            hl,
+					"gl":            gl,
+				},
+			},
+			"videoId": track.ID,
+		}).
+		SetHeader("Content-Type", "application/json").
+		Post(nextURL)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	if resp.StatusCode() < 200 || resp.StatusCode() >= 300 {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode())
+	}
+
+	contents := dig(
+		result,
+		"contents",
+		"twoColumnWatchNextResults",
+		"secondaryResults",
+		"secondaryResults",
+		"results",
+	)
+	if contents == nil {
+		return nil, fmt.Errorf("no contents found")
+	}
+
+	var tracks []*state.Track
+	yp.parseNextResults(contents, &tracks, track.Video, track.Requester)
+
+	if len(tracks) == 0 {
+		return nil, errors.New("no recommendations found")
+	}
+
+	return tracks, nil
+}
+
+func (yp *YouTubePlatform) parseNextResults(
+	node any,
+	tracks *[]*state.Track,
+	video bool,
+	requester string,
+) {
+	switch v := node.(type) {
+	case []any:
+		for _, item := range v {
+			yp.parseNextResults(item, tracks, video, requester)
+		}
+	case map[string]any:
+		if _, ok := v["continuationItemRenderer"]; ok {
+			return
+		}
+		if _, ok := v["itemSectionRenderer"]; ok {
+			return
+		}
+
+		if lockup, ok := dig(v, "lockupViewModel").(map[string]any); ok {
+			contentType := safeString(lockup["contentType"])
+			if contentType != "LOCKUP_CONTENT_TYPE_VIDEO" {
+				return
+			}
+
+			id := safeString(lockup["contentId"])
+			if id == "" {
+				return
+			}
+
+			meta := dig(lockup, "metadata", "lockupMetadataViewModel")
+			title := safeString(dig(meta, "title", "content"))
+
+			thumbVM := dig(lockup, "contentImage", "thumbnailViewModel")
+			sources, _ := dig(thumbVM, "image", "sources").([]any)
+			thumb := ""
+			if len(sources) > 0 {
+				if lastSource, ok := sources[len(sources)-1].(map[string]any); ok {
+					thumb = safeString(lastSource["url"])
+				}
+			}
+
+			durationText := ""
+			overlays, _ := dig(thumbVM, "overlays").([]any)
+			for _, overlay := range overlays {
+				if overlayMap, ok := overlay.(map[string]any); ok {
+					if badgeVM, ok := dig(overlayMap, "thumbnailOverlayBadgeViewModel").(map[string]any); ok {
+						badges, _ := dig(badgeVM, "thumbnailBadges").([]any)
+						if len(badges) > 0 {
+							if badge, ok := badges[0].(map[string]any); ok {
+								if badgeData, ok := dig(badge, "thumbnailBadgeViewModel").(map[string]any); ok {
+									durationText = safeString(badgeData["text"])
+									break
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if durationText == "" || id == "" {
+				return
+			}
+
+			duration := parseDuration(durationText)
+			t := &state.Track{
+				URL:       "https://www.youtube.com/watch?v=" + id,
+				Title:     title,
+				ID:        id,
+				Artwork:   thumb,
+				Duration:  duration,
+				Source:    PlatformYouTube,
+				Video:     video,
+				Requester: requester,
+			}
+			*tracks = append(*tracks, t)
+			youtubeCache.Set("track:"+t.ID, []*state.Track{t})
+		} else if vid, ok := dig(v, "compactVideoRenderer").(map[string]any); ok {
+			id := safeString(vid["videoId"])
+			title := safeString(dig(vid, "title", "simpleText"))
+			if title == "" {
+				title = safeString(dig(vid, "title", "runs", 0, "text"))
+			}
+			thumb := getThumbnailURL(vid)
+			durationText := safeString(dig(vid, "lengthText", "simpleText"))
+
+			if durationText == "" || id == "" {
+				return
+			}
+
+			duration := parseDuration(durationText)
+			t := &state.Track{
+				URL:       "https://www.youtube.com/watch?v=" + id,
+				Title:     title,
+				ID:        id,
+				Artwork:   thumb,
+				Duration:  duration,
+				Source:    PlatformYouTube,
+				Video:     video,
+				Requester: requester,
+			}
+			*tracks = append(*tracks, t)
+			youtubeCache.Set("track:"+t.ID, []*state.Track{t})
+		} else {
+			for _, child := range v {
+				yp.parseNextResults(child, tracks, video, requester)
+			}
+		}
+	}
+}
+
 func (*YouTubePlatform) CanSearch() bool { return true }
 
 func (y *YouTubePlatform) Search(
@@ -197,7 +376,6 @@ func (yp *YouTubePlatform) VideoSearch(
 	var tracks []*state.Track
 	var err error
 
-	// Try scraping first
 	tracks, err = searchYouTube(query)
 	if err != nil {
 		return nil, fmt.Errorf("ytsearch failed: %w", err)
@@ -311,7 +489,7 @@ func updateCached(arr []*state.Track, video bool) []*state.Track {
 // searchYouTube scrapes YouTube results page
 
 func searchYouTube(query string) ([]*state.Track, error) {
-	searchURL := "https://m.youtube.com/youtubei/v1/search?key=AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"
+	searchURL := "https://m.youtube.com/youtubei/v1/search?key=" + innerTubeKey
 	var result map[string]any
 
 	resp, err := rc.
@@ -320,8 +498,8 @@ func searchYouTube(query string) ([]*state.Track, error) {
 		SetBody(map[string]any{
 			"context": map[string]any{
 				"client": map[string]any{
-					"clientName":       "WEB",
-					"clientVersion":    "2.20250101.01.00",
+					"clientName":       innerTubeClientName,
+					"clientVersion":    innerTubeClientVersion,
 					"newVisitorCookie": true,
 					"acceptHeader":     "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 					"hl":               "en-IN",

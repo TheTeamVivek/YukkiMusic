@@ -362,6 +362,17 @@ func (s *SpotifyPlatform) getArtistTopTracks(
 	return tracks, nil
 }
 
+func (s *SpotifyPlatform) CanGetRecommendations() bool {
+	return false
+}
+
+func (s *SpotifyPlatform) GetRecommendations(
+	track *state.Track,
+	hl, gl string,
+) ([]*state.Track, error) {
+	return nil, errors.New("recommendations not supported on spotify")
+}
+
 func (s *SpotifyPlatform) convertSpotifyTrack(
 	simpleTrack *spotify.SimpleTrack,
 	images []spotify.Image,

@@ -76,6 +76,19 @@ func Register(priority int, platform state.Platform) {
 	})
 }
 
+// GetPlatform returns the platform with the given name
+func GetPlatform(name state.PlatformName) state.Platform {
+	registry.mu.RLock()
+	defer registry.mu.RUnlock()
+
+	for _, entry := range registry.platforms {
+		if entry.platform.Name() == name {
+			return entry.platform
+		}
+	}
+	return nil
+}
+
 // GetOrderedPlatforms returns all platforms sorted by priority
 func GetOrderedPlatforms() []state.Platform {
 	registry.mu.RLock()

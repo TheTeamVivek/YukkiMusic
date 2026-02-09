@@ -28,6 +28,7 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"
+	state "main/internal/core/models"
 	"main/internal/locales"
 	"main/internal/platforms"
 	"main/internal/utils"
@@ -47,13 +48,37 @@ func onStreamEndHandler(chatID int64) {
 	cid := r.EffectiveChatID()
 	r.Parse()
 
+	var t *state.Track
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
-		core.DeleteRoom(chatID)
-		core.Bot.SendMessage(cid, F(cid, "stream_queue_finished"))
-		return
-	}
+		if r.Autoplay() {
+			lastTrack := r.Track()
+			if lastTrack != nil {
+				p := platforms.GetPlatform(lastTrack.Source)
+				if p != nil && p.CanGetRecommendations() {
+					recs, err := p.GetRecommendations(
+						lastTrack,
+						r.AutoplayHL(),
+						r.AutoplayGL(),
+					)
+					if err == nil && len(recs) > 0 {
+						t = recs[0]
+						t.Requester = "AutoPlay"
+						r.PrepareForAutoPlay()
+					} else {
+						gologging.ErrorF("got error: %v", err)
+					}
+				}
+			}
+		}
 
-	t := r.NextTrack()
+		if t == nil {
+			core.DeleteRoom(chatID)
+			core.Bot.SendMessage(cid, F(cid, "stream_queue_finished"))
+			return
+		}
+	} else {
+		t = r.NextTrack()
+	}
 	mystic, err := core.Bot.SendMessage(
 		cid,
 		F(cid, "stream_downloading_next"),

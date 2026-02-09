@@ -260,3 +260,14 @@ func (t *TelegramPlatform) Download(
 
 	return path, nil
 }
+
+func (t *TelegramPlatform) CanGetRecommendations() bool {
+	return false
+}
+
+func (t *TelegramPlatform) GetRecommendations(
+	track *state.Track,
+	hl, gl string,
+) ([]*state.Track, error) {
+	return nil, errors.New("recommendations not supported on telegram")
+}

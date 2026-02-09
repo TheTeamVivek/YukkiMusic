@@ -70,6 +70,10 @@ type RoomState struct {
 	muted   bool // audio muted
 	paused  bool // playback paused
 
+	autoplay   bool   // autoplay recommendations
+	autoplayHL string // autoplay language
+	autoplayGL string // autoplay country
+
 	destroyed atomic.Bool // room destroyed flag
 
 	mystic *telegram.NewMessage // active telegram message
@@ -116,6 +120,7 @@ func GetRoom(chatID int64, ass *Assistant, create ...bool) (*RoomState, bool) {
 	return nil, false
 }
 
+// TODO: Take hl, gl as input
 func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 	roomsMu.Lock()
 	defer roomsMu.Unlock()
@@ -123,9 +128,11 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 	room, exists := rooms[chatID]
 	if !exists {
 		room = &RoomState{
-			chatID: chatID,
-			queue:  []*state.Track{},
-			speed:  1.0,
+			chatID:     chatID,
+			queue:      []*state.Track{},
+			speed:      1.0,
+			autoplayHL: "en",
+			autoplayGL: "IN",
 			p: &NtgPlayer{
 				Ntg: ass.Ntg,
 			},
@@ -294,6 +301,33 @@ func (r *RoomState) GetMystic() *telegram.NewMessage {
 	return r.mystic
 }
 
+func (r *RoomState) Autoplay() bool {
+	if r.destroyed.Load() {
+		return false
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.autoplay
+}
+
+func (r *RoomState) AutoplayHL() string {
+	if r.destroyed.Load() {
+		return ""
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.autoplayHL
+}
+
+func (r *RoomState) AutoplayGL() string {
+	if r.destroyed.Load() {
+		return ""
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.autoplayGL
+}
+
 func (r *RoomState) Destroyed() bool {
 	return r.destroyed.Load()
 }
@@ -341,6 +375,40 @@ func (r *RoomState) SetMystic(m *telegram.NewMessage) {
 		r.mystic.Delete()
 	}
 	r.mystic = m
+}
+
+func (r *RoomState) SetAutoplay(enabled bool) {
+	if r.destroyed.Load() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.autoplay = enabled
+}
+
+func (r *RoomState) SetAutoplayHL(hl string) {
+	if r.destroyed.Load() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.autoplayHL = hl
+}
+
+func (r *RoomState) SetAutoplayGL(gl string) {
+	if r.destroyed.Load() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.autoplayGL = gl
+}
+
+func (r *RoomState) PrepareForAutoPlay() {
+	if r.destroyed.Load() {
+		return
+	}
+	r.releaseFile()
 }
 
 // State checks
