@@ -338,7 +338,6 @@ func (d *DirectStreamPlatform) CanGetRecommendations() bool {
 
 func (d *DirectStreamPlatform) GetRecommendations(
 	track *state.Track,
-	hl, gl string,
 ) ([]*state.Track, error) {
 	return nil, fmt.Errorf("recommendations not supported on directstream")
 }

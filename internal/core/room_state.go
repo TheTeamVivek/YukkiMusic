@@ -70,9 +70,7 @@ type RoomState struct {
 	muted   bool // audio muted
 	paused  bool // playback paused
 
-	autoplay   bool   // autoplay recommendations
-	autoplayHL string // autoplay language
-	autoplayGL string // autoplay country
+	autoplay bool // autoplay recommendations
 
 	destroyed atomic.Bool // room destroyed flag
 
@@ -128,11 +126,9 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 	room, exists := rooms[chatID]
 	if !exists {
 		room = &RoomState{
-			chatID:     chatID,
-			queue:      []*state.Track{},
-			speed:      1.0,
-			autoplayHL: "en",
-			autoplayGL: "IN",
+			chatID: chatID,
+			queue:  []*state.Track{},
+			speed:  1.0,
 			p: &NtgPlayer{
 				Ntg: ass.Ntg,
 			},
@@ -310,24 +306,6 @@ func (r *RoomState) Autoplay() bool {
 	return r.autoplay
 }
 
-func (r *RoomState) AutoplayHL() string {
-	if r.destroyed.Load() {
-		return ""
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.autoplayHL
-}
-
-func (r *RoomState) AutoplayGL() string {
-	if r.destroyed.Load() {
-		return ""
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.autoplayGL
-}
-
 func (r *RoomState) Destroyed() bool {
 	return r.destroyed.Load()
 }
@@ -386,23 +364,7 @@ func (r *RoomState) SetAutoplay(enabled bool) {
 	r.autoplay = enabled
 }
 
-func (r *RoomState) SetAutoplayHL(hl string) {
-	if r.destroyed.Load() {
-		return
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.autoplayHL = hl
-}
-
-func (r *RoomState) SetAutoplayGL(gl string) {
-	if r.destroyed.Load() {
-		return
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.autoplayGL = gl
-}
+// State checks
 
 func (r *RoomState) PrepareForAutoPlay() {
 	if r.destroyed.Load() {
@@ -410,8 +372,6 @@ func (r *RoomState) PrepareForAutoPlay() {
 	}
 	r.releaseFile()
 }
-
-// State checks
 
 func (r *RoomState) IsActiveChat() bool {
 	if r.destroyed.Load() {

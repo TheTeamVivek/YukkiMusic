@@ -388,6 +388,19 @@ func (p *MyPlatform) Download(
     // Download and return file path
     // Use mystic for progress updates
 }
+
+
+func (s *MyPlatform) CanGetRecommendations() bool {
+	return false
+}
+
+func (s *MyPlatform) GetRecommendations(
+	track *state.Track,
+) ([]*state.Track, error) { 
+  
+  // your actual logic
+  
+}
 ```
 
 ### Step 4: Register Platform
@@ -459,6 +472,17 @@ func (a *AppleMusicPlatform) CanDownload(source state.PlatformName) bool {
 func (a *AppleMusicPlatform) Download(ctx context.Context, _ *state.Track, _ *telegram.NewMessage) (string, error) {
     return "", errors.New("Apple Music downloads not supported")
 }
+
+
+func (s *AppleMusicPlatform) CanGetRecommendations() bool {
+	return true
+}
+
+func (s *AppleMusicPlatform) GetRecommendations(
+	track *state.Track,
+) ([]*state.Track, error) {
+  // your logic for getting recommendations for track
+}
 ```
 
 ---
@@ -528,6 +552,14 @@ type (
   	// Platforms that do not support video should still return tracks,
   	// but must set Track.Video = false.
   	GetTracks(query string, video bool) ([]*Track, error)
+  	
+  	// CanGetRecommendations reports whether this platform can
+		// provide track recommendations based on a given track.
+		CanGetRecommendations() bool
+
+		// GetRecommendations fetches recommended tracks for the given track.
+		GetRecommendations(track *Track) ([]*Track, error)
+	
   }
 )
 ```

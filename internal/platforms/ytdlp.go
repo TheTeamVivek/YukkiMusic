@@ -353,7 +353,6 @@ func (y *YtdlpPlatform) CanGetRecommendations() bool {
 
 func (y *YtdlpPlatform) GetRecommendations(
 	track *state.Track,
-	hl, gl string,
 ) ([]*state.Track, error) {
 	return nil, errors.New("recommendations not supported on ytdlp")
 }

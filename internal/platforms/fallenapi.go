@@ -129,7 +129,6 @@ func (f *FallenApiPlatform) CanGetRecommendations() bool {
 
 func (f *FallenApiPlatform) GetRecommendations(
 	track *state.Track,
-	hl, gl string,
 ) ([]*state.Track, error) {
 	return nil, errors.New("recommendations not supported on fallenapi")
 }

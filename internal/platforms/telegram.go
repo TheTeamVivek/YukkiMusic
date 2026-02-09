@@ -267,7 +267,6 @@ func (t *TelegramPlatform) CanGetRecommendations() bool {
 
 func (t *TelegramPlatform) GetRecommendations(
 	track *state.Track,
-	hl, gl string,
 ) ([]*state.Track, error) {
 	return nil, errors.New("recommendations not supported on telegram")
 }

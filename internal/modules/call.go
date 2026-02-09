@@ -57,8 +57,6 @@ func onStreamEndHandler(chatID int64) {
 				if p != nil && p.CanGetRecommendations() {
 					recs, err := p.GetRecommendations(
 						lastTrack,
-						r.AutoplayHL(),
-						r.AutoplayGL(),
 					)
 					if err == nil && len(recs) > 0 {
 						t = recs[0]

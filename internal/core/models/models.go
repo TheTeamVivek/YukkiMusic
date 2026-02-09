@@ -94,9 +94,6 @@ type (
 		CanGetRecommendations() bool
 
 		// GetRecommendations fetches recommended tracks for the given track.
-		//
-		// hl: language code (e.g. "en")
-		// gl: country code (e.g. "IN")
-		GetRecommendations(track *Track, hl, gl string) ([]*Track, error)
+		GetRecommendations(track *Track) ([]*Track, error)
 	}
 )

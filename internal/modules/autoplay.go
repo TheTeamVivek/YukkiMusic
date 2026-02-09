@@ -82,20 +82,7 @@ func handleAutoplay(m *tg.NewMessage, cplay bool) error {
 		return telegram.ErrEndGroup
 	}
 
-	// TODO: Add btns for taking hl, gl
-	hl := r.AutoplayHL()
-	gl := r.AutoplayGL()
-
-	if len(args) >= 3 {
-		hl = args[2]
-	}
-	if len(args) >= 4 {
-		gl = args[3]
-	}
-
 	r.SetAutoplay(enabled)
-	r.SetAutoplayHL(hl)
-	r.SetAutoplayGL(gl)
 
 	action := F(chatID, "disabled")
 	if enabled {

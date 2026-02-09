@@ -175,15 +175,7 @@ func (yp *YouTubePlatform) CanGetRecommendations() bool {
 
 func (yp *YouTubePlatform) GetRecommendations(
 	track *state.Track,
-	hl, gl string,
 ) ([]*state.Track, error) {
-	if hl == "" {
-		hl = "en"
-	}
-	if gl == "" {
-		gl = "IN"
-	}
-
 	nextURL := "https://m.youtube.com/youtubei/v1/next?key=" + innerTubeKey
 	var result map[string]any
 
@@ -194,8 +186,8 @@ func (yp *YouTubePlatform) GetRecommendations(
 				"client": map[string]any{
 					"clientName":    innerTubeClientName,
 					"clientVersion": innerTubeClientVersion,
-					"hl":            hl,
-					"gl":            gl,
+					"hl":            "en",
+					"gl":            "IN",
 				},
 			},
 			"videoId": track.ID,

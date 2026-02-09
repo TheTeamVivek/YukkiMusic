@@ -280,7 +280,6 @@ func (s *SoundCloudPlatform) CanGetRecommendations() bool {
 
 func (s *SoundCloudPlatform) GetRecommendations(
 	track *state.Track,
-	hl, gl string,
 ) ([]*state.Track, error) {
 	return nil, errors.New("recommendations not supported on soundcloud")
 }
