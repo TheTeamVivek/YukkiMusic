@@ -188,11 +188,32 @@ func (yp *YouTubePlatform) GetRecommendations(
 					"clientVersion": innerTubeClientVersion,
 					"hl":            "en",
 					"gl":            "IN",
+					"utcOffsetMinutes": 330,
+				},
+				"user": map[string]any{
+					"lockedSafetyMode": false,
 				},
 			},
-			"videoId": track.ID,
+			"videoId":    track.ID,
+			"playlistId": "RD" + track.ID,
 		}).
-		SetHeader("Content-Type", "application/json").
+		SetHeaderMultiValues(map[string][]string{
+			"User-Agent": {
+				"Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36",
+			},
+			"Accept": {
+				"*/*",
+			},
+			"Content-Type": {
+				"application/json",
+			},
+			"Origin": {
+				"https://www.youtube.com",
+			},
+			"Referer": {
+				"https://www.youtube.com/watch?v=" + track.ID,
+			},
+		}).
 		Post(nextURL)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
@@ -202,7 +223,16 @@ func (yp *YouTubePlatform) GetRecommendations(
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode())
 	}
 
-	contents := dig(
+	var tracks []*state.Track
+
+	if playlist := dig(result, "contents", "twoColumnWatchNextResults", "playlist", "playlist", "contents"); playlist != nil {
+		yp.parseNextResults(playlist, &tracks, track.Video, track.Requester)
+		if len(tracks) > 0 {
+			return tracks, nil
+		}
+	}
+
+	secondaryContents := dig(
 		result,
 		"contents",
 		"twoColumnWatchNextResults",
@@ -210,18 +240,33 @@ func (yp *YouTubePlatform) GetRecommendations(
 		"secondaryResults",
 		"results",
 	)
-	if contents == nil {
-		return nil, fmt.Errorf("no contents found")
+	if secondaryContents != nil {
+		yp.parseNextResults(secondaryContents, &tracks, track.Video, track.Requester)
 	}
-
-	var tracks []*state.Track
-	yp.parseNextResults(contents, &tracks, track.Video, track.Requester)
 
 	if len(tracks) == 0 {
 		return nil, errors.New("no recommendations found")
 	}
 
-	return tracks, nil
+	seen := make(map[string]bool)
+	seen[track.ID] = true
+
+	var filtered []*state.Track
+	for _, t := range tracks {
+		if t == nil {
+			continue
+		}
+		if !seen[t.ID] {
+			filtered = append(filtered, t)
+			seen[t.ID] = true
+		}
+	}
+
+	if len(filtered) == 0 {
+		return nil, errors.New("no new recommendations found")
+	}
+
+	return filtered, nil
 }
 
 func (yp *YouTubePlatform) parseNextResults(
@@ -243,7 +288,33 @@ func (yp *YouTubePlatform) parseNextResults(
 			return
 		}
 
-		if lockup, ok := dig(v, "lockupViewModel").(map[string]any); ok {
+		if vid, ok := dig(v, "playlistPanelVideoRenderer").(map[string]any); ok {
+			id := safeString(vid["videoId"])
+			title := safeString(dig(vid, "title", "simpleText"))
+			if title == "" {
+				title = safeString(dig(vid, "title", "runs", 0, "text"))
+			}
+			thumb := getThumbnailURL(vid)
+			durationText := safeString(dig(vid, "lengthText", "simpleText"))
+
+			if durationText == "" || id == "" {
+				return
+			}
+
+			duration := parseDuration(durationText)
+			t := &state.Track{
+				URL:       "https://www.youtube.com/watch?v=" + id,
+				Title:     title,
+				ID:        id,
+				Artwork:   thumb,
+				Duration:  duration,
+				Source:    PlatformYouTube,
+				Video:     video,
+				Requester: requester,
+			}
+			*tracks = append(*tracks, t)
+			youtubeCache.Set("track:"+t.ID, []*state.Track{t})
+		} else if lockup, ok := dig(v, "lockupViewModel").(map[string]any); ok {
 			contentType := safeString(lockup["contentType"])
 			if contentType != "LOCKUP_CONTENT_TYPE_VIDEO" {
 				return
