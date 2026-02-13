@@ -227,9 +227,6 @@ func (yp *YouTubePlatform) GetRecommendations(
 
 	if playlist := dig(result, "contents", "twoColumnWatchNextResults", "playlist", "playlist", "contents"); playlist != nil {
 		yp.parseNextResults(playlist, &tracks, track.Video, track.Requester)
-		if len(tracks) > 0 {
-			return tracks, nil
-		}
 	}
 
 	secondaryContents := dig(
@@ -240,7 +237,7 @@ func (yp *YouTubePlatform) GetRecommendations(
 		"secondaryResults",
 		"results",
 	)
-	if secondaryContents != nil {
+	if secondaryContents != nil && len(tracks) == 0 {
 		yp.parseNextResults(secondaryContents, &tracks, track.Video, track.Requester)
 	}
 
