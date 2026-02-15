@@ -34,6 +34,48 @@ import (
 	"main/internal/utils"
 )
 
+type RecCache struct {
+	Tracks []*state.Track
+	Index  int
+}
+
+func getRecCache(r *core.RoomState) (*RecCache, bool) {
+	ok, v := r.GetData("rec_cache")
+	if !ok {
+		return nil, false
+	}
+
+	cache, ok := v.(*RecCache)
+	return cache, ok
+}
+
+func setRecCache(r *core.RoomState, tracks []*state.Track, start int) {
+	r.SetData("rec_cache", &RecCache{
+		Tracks: tracks,
+		Index:  start,
+	})
+}
+
+func nextCachedRec(r *core.RoomState) *state.Track {
+	cache, ok := getRecCache(r)
+	if !ok || cache == nil {
+		return nil
+	}
+
+	if cache.Index >= len(cache.Tracks) {
+		r.DeleteData("rec_cache")
+		return nil
+	}
+
+	t := cache.Tracks[cache.Index]
+	r.SetData("rec_cache", &RecCache{
+		Tracks: cache.Tracks,
+		Index:  cache.Index + 1,
+	})
+
+	return t
+}
+
 func onStreamEndHandler(chatID int64) {
 	ass, err := core.Assistants.ForChat(chatID)
 	if err != nil {
@@ -51,22 +93,37 @@ func onStreamEndHandler(chatID int64) {
 	var t *state.Track
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
 		if r.Autoplay() {
-			lastTrack := r.Track()
-			if lastTrack != nil {
-				p := platforms.GetPlatform(lastTrack.Source)
-				if p != nil && p.CanGetRecommendations() {
-					recs, err := p.GetRecommendations(
-						lastTrack,
-					)
-					if err == nil && len(recs) > 0 {
-						t = recs[0]
-						t.Requester = "AutoPlay"
-						r.PrepareForAutoPlay()
-					} else {
-						gologging.ErrorF("got error: %v", err)
+
+			t = nextCachedRec(r)
+			if t != nil {
+				t.Requester = "AutoPlay"
+				r.PrepareForAutoPlay()
+			}
+
+			if t == nil {
+				lastTrack := r.Track()
+				if lastTrack != nil {
+
+					p := platforms.GetPlatform(lastTrack.Source)
+					if p != nil && p.CanGetRecommendations() {
+
+						recs, err := p.GetRecommendations(lastTrack)
+						if err == nil && len(recs) > 0 {
+
+							setRecCache(r, recs, 1)
+
+							// play first
+							t = recs[0]
+							t.Requester = "AutoPlay"
+							r.PrepareForAutoPlay()
+
+						} else {
+							gologging.ErrorF("recommendation error: %v", err)
+						}
 					}
 				}
 			}
+
 		}
 
 		if t == nil {

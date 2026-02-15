@@ -184,10 +184,10 @@ func (yp *YouTubePlatform) GetRecommendations(
 		SetBody(map[string]any{
 			"context": map[string]any{
 				"client": map[string]any{
-					"clientName":    innerTubeClientName,
-					"clientVersion": innerTubeClientVersion,
-					"hl":            "en",
-					"gl":            "IN",
+					"clientName":       innerTubeClientName,
+					"clientVersion":    innerTubeClientVersion,
+					"hl":               "en",
+					"gl":               "IN",
 					"utcOffsetMinutes": 330,
 				},
 				"user": map[string]any{
@@ -229,7 +229,7 @@ func (yp *YouTubePlatform) GetRecommendations(
 		yp.parseNextResults(playlist, &tracks, track.Video, track.Requester)
 	}
 
-	secondaryContents := dig(
+	/* secondaryContents := dig(
 		result,
 		"contents",
 		"twoColumnWatchNextResults",
@@ -240,6 +240,7 @@ func (yp *YouTubePlatform) GetRecommendations(
 	if secondaryContents != nil && len(tracks) == 0 {
 		yp.parseNextResults(secondaryContents, &tracks, track.Video, track.Requester)
 	}
+	*/
 
 	if len(tracks) == 0 {
 		return nil, errors.New("no recommendations found")

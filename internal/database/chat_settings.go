@@ -39,7 +39,7 @@ type ChatSettings struct {
 	Language       string     `bson:"language"`
 	RTMPConfig     RTMPConfig `bson:"rtmp_config"`
 	AssistantIndex int        `bson:"ass_index,omitempty"`
-	NoThumb        bool       `bson:"no_thumb,omitempty"`
+	NoThumb        bool       `bson:"no_thumb"`
 }
 
 func defaultChatSettings(chatID int64) *ChatSettings {

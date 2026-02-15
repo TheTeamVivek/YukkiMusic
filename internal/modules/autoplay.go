@@ -82,6 +82,7 @@ func handleAutoplay(m *tg.NewMessage, cplay bool) error {
 		return telegram.ErrEndGroup
 	}
 
+	r.DeleteData("rec_cache")
 	r.SetAutoplay(enabled)
 
 	action := F(chatID, "disabled")

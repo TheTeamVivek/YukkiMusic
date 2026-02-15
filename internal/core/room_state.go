@@ -78,6 +78,8 @@ type RoomState struct {
 
 	p                Player // player
 	*scheduledTimers        // playback timers
+
+	Data map[string]any
 }
 
 // Room management functions
@@ -118,7 +120,6 @@ func GetRoom(chatID int64, ass *Assistant, create ...bool) (*RoomState, bool) {
 	return nil, false
 }
 
-// TODO: Take hl, gl as input
 func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 	roomsMu.Lock()
 	defer roomsMu.Unlock()
@@ -132,6 +133,7 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 			p: &NtgPlayer{
 				Ntg: ass.Ntg,
 			},
+			Data: make(map[string]any),
 		}
 		room.destroyed.Store(false)
 		rooms[chatID] = room
@@ -277,6 +279,17 @@ func (r *RoomState) Track() *state.Track {
 	return r.track
 }
 
+func (r *RoomState) GetData(k string) (bool, any) {
+	if r.destroyed.Load() {
+		return false, nil
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	v, ok := r.Data[k]
+	return ok, v
+}
+
 func (r *RoomState) GetSpeed() float64 {
 	if r.destroyed.Load() {
 		return 0
@@ -332,6 +345,30 @@ func (r *RoomState) SetCplayID(chatID int64) {
 	r.cplayID = chatID
 }
 
+func (r *RoomState) SetData(k string, v any) {
+	if r.destroyed.Load() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if r.Data == nil {
+		r.Data = make(map[string]any)
+	}
+
+	r.Data[k] = v
+}
+
+func (r *RoomState) DeleteData(k string) {
+	if r.destroyed.Load() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	delete(r.Data, k)
+}
+
 func (r *RoomState) SetShuffle(enabled bool) {
 	if r.destroyed.Load() {
 		return
@@ -350,7 +387,7 @@ func (r *RoomState) SetMystic(m *telegram.NewMessage) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if r.mystic != nil {
-		r.mystic.Delete()
+		// r.mystic.Delete()
 	}
 	r.mystic = m
 }
