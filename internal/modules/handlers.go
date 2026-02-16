@@ -30,7 +30,6 @@ import (
 	"main/internal/config"
 	"main/internal/core"
 	"main/internal/database"
-	"main/ntgcalls"
 )
 
 type MsgHandlerDef struct {
@@ -491,7 +490,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 	bot.AddActionHandler(handleActions).SetGroup(60)
 
 	assistants.ForEach(func(a *core.Assistant) {
-		a.Ntg.OnStreamEnd(ntgOnStreamEnd)
+		a.Ntg.OnStreamEnd(streamEndHandler)
 	})
 
 	go MonitorRooms()
@@ -527,14 +526,6 @@ First configure channel using: <code>/channelplay --set [channel_id]</code>
 This command affects the linked channel's voice chat, not the current group.`, baseCmd, baseHelp)
 		}
 	}
-}
-
-func ntgOnStreamEnd(
-	chatID int64,
-	_ ntgcalls.StreamType,
-	_ ntgcalls.StreamDevice,
-) {
-	onStreamEndHandler(chatID)
 }
 
 func setBotCommands(bot *telegram.Client) {

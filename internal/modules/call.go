@@ -32,6 +32,7 @@ import (
 	"main/internal/locales"
 	"main/internal/platforms"
 	"main/internal/utils"
+	"main/ntgcalls"
 )
 
 type RecCache struct {
@@ -76,7 +77,16 @@ func nextCachedRec(r *core.RoomState) *state.Track {
 	return t
 }
 
-func onStreamEndHandler(chatID int64) {
+func streamEndHandler(
+	chatID int64,
+	streamType ntgcalls.StreamType,
+	_ ntgcalls.StreamDevice,
+) {
+	if streamType == ntgcalls.VideoStream {
+		gologging.Debug("[onStreamEndHandler] Video stream ended, returning")
+		return
+	}
+
 	gologging.DebugF("[onStreamEndHandler] Stream ended in chat %d", chatID)
 	ass, err := core.Assistants.ForChat(chatID)
 	if err != nil {
@@ -88,17 +98,32 @@ func onStreamEndHandler(chatID int64) {
 		return
 	}
 
+	if ok, v := r.GetData("is_transitioning"); ok {
+		if ok, v := v.(bool); ok && v {
+			return
+		}
+	}
+
+	r.SetData("is_transitioning", true)
+	defer r.DeleteData("is_transitioning")
+
 	cid := r.EffectiveChatID()
 	r.Parse()
 
 	var t *state.Track
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
 		if r.Autoplay() {
-			gologging.DebugF("[onStreamEndHandler] AutoPlay is ON for chat %d", chatID)
+			gologging.DebugF(
+				"[onStreamEndHandler] AutoPlay is ON for chat %d",
+				chatID,
+			)
 
 			t = nextCachedRec(r)
 			if t != nil {
-				gologging.DebugF("[onStreamEndHandler] Found next track in cache: %s", t.Title)
+				gologging.DebugF(
+					"[onStreamEndHandler] Found next track in cache: %s",
+					t.Title,
+				)
 				t.Requester = "AutoPlay"
 				r.PrepareForAutoPlay()
 			}
@@ -106,14 +131,20 @@ func onStreamEndHandler(chatID int64) {
 			if t == nil {
 				lastTrack := r.Track()
 				if lastTrack != nil {
-					gologging.DebugF("[onStreamEndHandler] Cache empty, fetching recommendations for: %s", lastTrack.Title)
+					gologging.DebugF(
+						"[onStreamEndHandler] Cache empty, fetching recommendations for: %s",
+						lastTrack.Title,
+					)
 
 					p := platforms.GetPlatform(lastTrack.Source)
 					if p != nil && p.CanGetRecommendations() {
 
 						recs, err := p.GetRecommendations(lastTrack)
 						if err == nil && len(recs) > 0 {
-							gologging.DebugF("[onStreamEndHandler] Fetched %d new recommendations", len(recs))
+							gologging.DebugF(
+								"[onStreamEndHandler] Fetched %d new recommendations",
+								len(recs),
+							)
 
 							setRecCache(r, recs, 1)
 
@@ -151,7 +182,11 @@ func onStreamEndHandler(chatID int64) {
 
 	filePath, err := platforms.Download(context.Background(), t, mystic)
 	if err != nil {
-		gologging.ErrorF("[onStreamEndHandler] Download failed for %s: %v", t.URL, err)
+		gologging.ErrorF(
+			"[onStreamEndHandler] Download failed for %s: %v",
+			t.URL,
+			err,
+		)
 		utils.EOR(mystic, F(cid, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
 		}))
@@ -161,7 +196,11 @@ func onStreamEndHandler(chatID int64) {
 	}
 
 	if err := r.Play(t, filePath); err != nil {
-		gologging.ErrorF("[onStreamEndHandler] Play failed for %s: %v", t.URL, err)
+		gologging.ErrorF(
+			"[onStreamEndHandler] Play failed for %s: %v",
+			t.URL,
+			err,
+		)
 		utils.EOR(mystic, F(cid, "stream_play_fail"))
 		core.DeleteRoom(chatID)
 
