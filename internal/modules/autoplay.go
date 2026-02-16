@@ -39,6 +39,7 @@ func init() {
 <b>⚙️ Behavior:</b>
 • When enabled, the bot automatically plays recommended tracks when the queue is empty.
 • Recommendations are currently only supported for YouTube tracks.
+• AutoPlay honors the <b>Queue Limit</b>; it will play up to the limit and then stop.
 • AutoPlay is room-level and needs to be enabled for each session.`
 }
 

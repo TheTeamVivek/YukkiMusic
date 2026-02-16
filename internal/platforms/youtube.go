@@ -255,8 +255,11 @@ func (yp *YouTubePlatform) GetRecommendations(
 			continue
 		}
 		if !seen[t.ID] {
-			filtered = append(filtered, t)
-			seen[t.ID] = true
+			if t.Duration > 0 &&
+				(config.DurationLimit < 0 || t.Duration <= config.DurationLimit) {
+				filtered = append(filtered, t)
+				seen[t.ID] = true
+			}
 		}
 	}
 

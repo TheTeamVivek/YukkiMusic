@@ -407,6 +407,11 @@ func (r *RoomState) PrepareForAutoPlay() {
 	if r.destroyed.Load() {
 		return
 	}
+	r.mu.Lock()
+	r.playing = false
+	r.position = 0
+	r.mu.Unlock()
+
 	r.releaseFile()
 }
 

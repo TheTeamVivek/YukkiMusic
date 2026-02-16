@@ -351,7 +351,6 @@ func handleSkipAction(
 	}
 	r.SetLoop(0)
 	t := r.NextTrack()
-	
 
 	mystic, err := cb.Respond(F(cb.ChannelID(), "stream_downloading_next"))
 	if err != nil {

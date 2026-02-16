@@ -27,6 +27,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/config"
 	"main/internal/core"
 	state "main/internal/core/models"
 	"main/internal/locales"
@@ -132,33 +133,45 @@ func streamEndHandler(
 			if t == nil {
 				lastTrack := r.Track()
 				if lastTrack != nil {
-					gologging.DebugF(
-						"[onStreamEndHandler] Cache empty, fetching recommendations for: %s",
-						lastTrack.Title,
-					)
-
-					p := platforms.GetPlatform(lastTrack.Source)
-					if p != nil && p.CanGetRecommendations() {
-
-						recs, err := p.GetRecommendations(lastTrack)
-						if err == nil && len(recs) > 0 {
-							gologging.DebugF(
-								"[onStreamEndHandler] Fetched %d new recommendations",
-								len(recs),
-							)
-
-							setRecCache(r, recs, 1)
-
-							// play first
-							t = recs[0]
-							t.Requester = "AutoPlay"
-							r.PrepareForAutoPlay()
-
-						} else {
-							gologging.ErrorF("[onStreamEndHandler] recommendation error: %v", err)
-						}
+					if lastTrack.Requester == "AutoPlay" {
+						gologging.DebugF(
+							"[onStreamEndHandler] AutoPlay batch finished for chat %d, stopping as per request",
+							chatID,
+						)
 					} else {
-						gologging.DebugF("[onStreamEndHandler] Platform %s does not support recommendations", lastTrack.Source)
+						gologging.DebugF(
+							"[onStreamEndHandler] Cache empty, fetching recommendations for: %s",
+							lastTrack.Title,
+						)
+
+						p := platforms.GetPlatform(lastTrack.Source)
+						if p != nil && p.CanGetRecommendations() {
+
+							recs, err := p.GetRecommendations(lastTrack)
+							if err == nil && len(recs) > 0 {
+								gologging.DebugF(
+									"[onStreamEndHandler] Fetched %d new recommendations",
+									len(recs),
+								)
+
+								if config.QueueLimit > 0 && len(recs) > config.QueueLimit {
+									recs = recs[:config.QueueLimit]
+									gologging.DebugF("[onStreamEndHandler] Truncated recommendations to %d (QueueLimit)", config.QueueLimit)
+								}
+
+								setRecCache(r, recs, 1)
+
+								// play first
+								t = recs[0]
+								t.Requester = "AutoPlay"
+								r.PrepareForAutoPlay()
+
+							} else {
+								gologging.ErrorF("[onStreamEndHandler] recommendation error: %v", err)
+							}
+						} else {
+							gologging.DebugF("[onStreamEndHandler] Platform %s does not support recommendations", lastTrack.Source)
+						}
 					}
 				}
 			}
@@ -209,7 +222,7 @@ func streamEndHandler(
 		return
 	}
 
-	if err := r.Play(t, filePath); err != nil {
+	if err := r.Play(t, filePath, true); err != nil {
 		gologging.ErrorF(
 			"[onStreamEndHandler] Play failed for %s: %v",
 			t.URL,

@@ -83,7 +83,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		}))
 		return telegram.ErrEndGroup
 	}
-	
+
 	r.SetLoop(0)
 	t := r.NextTrack()
 
@@ -111,7 +111,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		return telegram.ErrEndGroup
 	}
 
-	if err := r.Play(t, path); err != nil {
+	if err := r.Play(t, path, true); err != nil {
 		txt := F(chatID, "stream_play_fail")
 		if mystic != nil {
 			utils.EOR(mystic, txt)
