@@ -478,11 +478,11 @@ func (s *AppleMusicPlatform) CanGetRecommendations() bool {
 	return true
 }
 
-func (s *AppleMusicPlatform) GetRecommendations(
-	track *state.Track,
-) ([]*state.Track, error) {
-  // your logic for getting recommendations for track
-}
++func (s *AppleMusicPlatform) GetRecommendations(
++	track *state.Track,
++) ([]*state.Track, error) {
++  // your logic for getting recommendations for the track
++}
 ```
 
 ---
