@@ -22,6 +22,7 @@ package modules
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/amarnathcjd/gogram/telegram"
@@ -176,13 +177,7 @@ func delAuthHandler(m *telegram.NewMessage) error {
 		return telegram.ErrEndGroup
 	}
 
-	user, err := m.Client.GetUser(userID)
-	if err != nil || user == nil {
-		m.Reply(F(chatID, "user_extract_fail", locales.Arg{
-			"error": utils.IfElse(err != nil, err.Error(), "unknown error"),
-		}))
-		return telegram.ErrEndGroup
-	}
+	user, _ := m.Client.GetUser(userID)
 
 	if err := database.RemoveAuthUser(chatID, userID); err != nil {
 		m.Reply(F(chatID, "del_auth_remove_fail", locales.Arg{
@@ -191,9 +186,14 @@ func delAuthHandler(m *telegram.NewMessage) error {
 		return telegram.ErrEndGroup
 	}
 
-	uname := utils.MentionHTML(user)
-	if user.Username != "" {
-		uname += " (@" + user.Username + ")"
+	var uname string
+	if user != nil {
+		uname = utils.MentionHTML(user)
+		if user.Username != "" {
+			uname += " (@" + user.Username + ")"
+		}
+	} else {
+		uname = "User (<code>" + strconv.FormatInt(userID, 10) + "</code>)"
 	}
 
 	m.Reply(F(chatID, "del_auth_success", locales.Arg{
