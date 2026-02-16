@@ -183,17 +183,16 @@ func handleDelSudo(m *telegram.NewMessage) error {
 		}
 	}
 	// Fetch user info
-	user, err := m.Client.GetUser(targetID)
-	if err != nil {
-		m.Reply(F(chatID, "sudo_fetch_user_fail", locales.Arg{
-			"error": err.Error(),
-		}))
-		return telegram.ErrEndGroup
-	}
+	user, _ := m.Client.GetUser(targetID)
 
-	uname := utils.MentionHTML(user)
-	if user.Username != "" {
-		uname = "@" + user.Username
+	var uname string
+	if user != nil {
+		uname = utils.MentionHTML(user)
+		if user.Username != "" {
+			uname = "@" + user.Username
+		}
+	} else {
+		uname = "User"
 	}
 	idStr := strconv.FormatInt(targetID, 10)
 
