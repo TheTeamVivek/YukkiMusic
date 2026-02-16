@@ -111,6 +111,7 @@ func streamEndHandler(
 	r.Parse()
 
 	var t *state.Track
+	var wasLooping bool
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
 		if r.Autoplay() {
 			gologging.DebugF(
@@ -170,17 +171,30 @@ func streamEndHandler(
 			return
 		}
 	} else {
+		wasLooping = r.Loop() > 0
 		t = r.NextTrack()
 	}
+
+	statusMsg := F(cid, "stream_downloading_next")
+	if wasLooping && t != nil && r.FilePath() != "" {
+		statusMsg = F(cid, "cb_replaying")
+	}
+
 	mystic, err := core.Bot.SendMessage(
 		cid,
-		F(cid, "stream_downloading_next"),
+		statusMsg,
 	)
 	if err != nil {
 		gologging.ErrorF("[call.go] Failed to send msg: %v", err)
 	}
 
-	filePath, err := platforms.Download(context.Background(), t, mystic)
+	var filePath string
+	if wasLooping && t != nil && r.FilePath() != "" {
+		filePath = r.FilePath()
+	} else {
+		filePath, err = platforms.Download(context.Background(), t, mystic)
+	}
+
 	if err != nil {
 		gologging.ErrorF(
 			"[onStreamEndHandler] Download failed for %s: %v",

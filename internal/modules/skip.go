@@ -76,14 +76,15 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 
 	mention := utils.MentionHTML(m.Sender)
 
-	if len(r.Queue()) == 0 && r.Loop() == 0 {
+	if len(r.Queue()) == 0 {
 		core.DeleteRoom(r.ChatID())
 		m.Reply(F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
 		}))
 		return telegram.ErrEndGroup
 	}
-
+	
+	r.SetLoop(0)
 	t := r.NextTrack()
 
 	mystic, err := core.Bot.SendMessage(

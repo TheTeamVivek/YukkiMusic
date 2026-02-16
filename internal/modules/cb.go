@@ -341,7 +341,7 @@ func handleSkipAction(
 
 	gologging.InfoF("Callback → skip, chatID=%d", chatID)
 
-	if len(r.Queue()) == 0 && r.Loop() == 0 {
+	if len(r.Queue()) == 0 {
 		core.DeleteRoom(r.ChatID())
 		editMessage(cb, F(cb.ChannelID(), "skip_stopped", locales.Arg{
 			"user": utils.MentionHTML(cb.Sender),
@@ -349,8 +349,9 @@ func handleSkipAction(
 		cb.Answer(F(cb.ChannelID(), "cb_skip_queue_empty"), opt)
 		return tg.ErrEndGroup
 	}
-
+	r.SetLoop(0)
 	t := r.NextTrack()
+	
 
 	mystic, err := cb.Respond(F(cb.ChannelID(), "stream_downloading_next"))
 	if err != nil {

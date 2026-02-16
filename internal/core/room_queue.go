@@ -51,7 +51,7 @@ func (r *RoomState) NextTrack() *state.Track {
 
 func (r *RoomState) loopCurrentTrack() *state.Track {
 	r.position = 0
-	r.playing = true
+	r.playing = false
 	r.paused = false
 	r.muted = false
 	r.loop--

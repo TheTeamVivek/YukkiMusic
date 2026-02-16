@@ -42,9 +42,6 @@ func init() {
 • 1-10 = Repeat track that many times
 • Loop counter decrements after each playback
 
-<b>🔒 Restrictions:</b>
-• Only <b>chat admins</b> or <b>authorized users</b> can use this
-
 <b>💡 Examples:</b>
 <code>/loop 0</code> — Disable loop
 <code>/loop 3</code> — Loop current track 3 times
@@ -53,7 +50,8 @@ func init() {
 <b>⚠️ Notes:</b>
 • Maximum loop count: 10
 • Loop affects only current track
-• After loops complete, plays next in queue`
+• After loops complete, plays next in queue
+• If the track is forcefully skipped using <code>/skip</code>, the loop will stop and reset automatically`
 }
 
 func loopHandler(m *tg.NewMessage) error {
