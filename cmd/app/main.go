@@ -36,6 +36,9 @@ import "C"
 import (
 	"os"
 
+_ "net/http/pprof"
+    "net/http"
+
 	"github.com/Laky-64/gologging"
 
 	"main/internal/config"
@@ -76,6 +79,9 @@ func main() {
 	}
 
 	modules.Init(core.Bot, core.Assistants)
+go func() {
+        http.ListenAndServe("0.0.0.0:6060", nil)
+    }()
 	core.Bot.Idle()
 }
 
