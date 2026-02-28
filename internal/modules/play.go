@@ -695,61 +695,68 @@ func playTrackWithRetry(
 		if err == nil {
 			if attempt > 1 {
 				gologging.Info(
-					"Successfully played after retry attempt " + utils.IntToStr(
-						attempt,
-					),
+					"Successfully played after retry attempt " +
+						utils.IntToStr(attempt),
 				)
 			}
 			return nil
 		}
 
+		switch {
+
 		// FloodWait
-		if wait := tg.GetFloodWait(err); wait > 0 {
+		case tg.GetFloodWait(err) > 0:
+			wait := tg.GetFloodWait(err)
 			gologging.Error(
-				"FloodWait detected (" + strconv.Itoa(
-					wait,
-				) + "s). Retrying... (attempt " + utils.IntToStr(
-					attempt,
-				) + ")",
+				"FloodWait detected (" + strconv.Itoa(wait) +
+					"s). Retrying... (attempt " + utils.IntToStr(attempt) + ")",
 			)
 			time.Sleep(time.Duration(wait) * time.Second)
 			continue
-		}
 
-		if strings.Contains(
+		// Connection timeout
+		case errors.Is(err, ubot.ErrConnectionTimeout):
+			gologging.Error("Voice connection timeout. Recreating call session...")
+			utils.EOR(
+				replyMsg,
+				F(replyMsg.ChannelID(), "err_connection_timeout"),
+			)
+			core.DeleteRoom(r.ChatID())
+			return tg.ErrEndGroup
+
+		// RTMP unsupported
+		case strings.Contains(
 			err.Error(),
 			"Streaming is not supported when using RTMP",
-		) {
+		):
 			utils.EOR(
 				replyMsg,
 				F(replyMsg.ChannelID(), "rtmp_streaming_not_supported"),
 			)
 			core.DeleteRoom(r.ChatID())
 			return tg.ErrEndGroup
-		}
 
-		if strings.Contains(err.Error(), "group call") &&
-			strings.Contains(err.Error(), "is closed") {
+		// No active voice chat
+		case strings.Contains(err.Error(), "group call") &&
+			strings.Contains(err.Error(), "is closed"):
 			utils.EOR(
 				replyMsg,
 				F(replyMsg.ChannelID(), "err_no_active_voicechat"),
 			)
 			return tg.ErrEndGroup
-		}
 
-		if tg.MatchError(err, "GROUPCALL_INVALID") {
+		// GROUPCALL_INVALID
+		case tg.MatchError(err, "GROUPCALL_INVALID"):
 			gologging.Error("GROUPCALL_INVALID err occurred. Returning...")
 			core.DeleteRoom(r.ChatID())
 			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_unable"))
 			return tg.ErrEndGroup
-		}
 
-		// INTERDC_X_CALL_ERROR → retry
-		if tg.MatchError(err, "INTERDC_X_CALL_ERROR") {
+		// INTERDC retry
+		case tg.MatchError(err, "INTERDC_X_CALL_ERROR"):
 			gologging.Error(
-				"INTERDC_X_CALL_ERROR occurred. Retrying... (attempt " + utils.IntToStr(
-					attempt,
-				) + ")",
+				"INTERDC_X_CALL_ERROR occurred. Retrying... (attempt " +
+					utils.IntToStr(attempt) + ")",
 			)
 			time.Sleep(2 * time.Second)
 			continue
@@ -758,9 +765,8 @@ func playTrackWithRetry(
 		// Last attempt failed
 		if attempt == playMaxRetries {
 			gologging.Error(
-				"❌ Failed to play after " + utils.IntToStr(
-					playMaxRetries,
-				) + " attempts. Error: " + err.Error(),
+				"❌ Failed to play after " + utils.IntToStr(playMaxRetries) +
+					" attempts. Error: " + err.Error(),
 			)
 			utils.EOR(
 				replyMsg,
@@ -774,9 +780,8 @@ func playTrackWithRetry(
 		}
 
 		gologging.Error(
-			"Unexpected error occurred. Retrying... (attempt " + utils.IntToStr(
-				attempt,
-			) + "): " + err.Error(),
+			"Unexpected error occurred. Retrying... (attempt " +
+				utils.IntToStr(attempt) + "): " + err.Error(),
 		)
 	}
 
