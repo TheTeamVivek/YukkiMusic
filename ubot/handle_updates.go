@@ -27,9 +27,8 @@ type participantUpdate struct {
 }
 
 const (
-
-ErrConnectionTimeout = errors.New("connection timeout")
-ErrConnectionFailed = errors.New("connection failed")
+	ErrConnectionTimeout = errors.New("connection timeout")
+	ErrConnectionFailed  = errors.New("connection failed")
 )
 
 func (ctx *Context) handleUpdates() {

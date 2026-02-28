@@ -39,6 +39,7 @@ import (
 	"main/internal/locales"
 	"main/internal/platforms"
 	"main/internal/utils"
+	"main/ubot"
 )
 
 type playOpts struct {
@@ -716,7 +717,9 @@ func playTrackWithRetry(
 
 		// Connection timeout
 		case errors.Is(err, ubot.ErrConnectionTimeout):
-			gologging.Error("Voice connection timeout. Recreating call session...")
+			gologging.Error(
+				"Voice connection timeout. Recreating call session...",
+			)
 			utils.EOR(
 				replyMsg,
 				F(replyMsg.ChannelID(), "err_connection_timeout"),
