@@ -718,7 +718,7 @@ func playTrackWithRetry(
 		// Connection timeout
 		case errors.Is(err, ubot.ErrConnectionTimeout):
 			gologging.Error(
-				"Voice connection timeout. Recreating call session...",
+				"Voice connection timeout. Stopping call session...",
 			)
 			utils.EOR(
 				replyMsg,
