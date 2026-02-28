@@ -26,7 +26,7 @@ type participantUpdate struct {
 	oldScreenEndpoint  string
 }
 
-const (
+var (
 	ErrConnectionTimeout = errors.New("connection timeout")
 	ErrConnectionFailed  = errors.New("connection failed")
 )
