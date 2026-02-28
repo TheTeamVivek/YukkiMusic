@@ -26,6 +26,12 @@ type participantUpdate struct {
 	oldScreenEndpoint  string
 }
 
+const (
+
+ErrConnectionTimeout = errors.New("connection timeout")
+ErrConnectionFailed = errors.New("connection failed")
+)
+
 func (ctx *Context) handleUpdates() {
 	ctx.app.AddRawHandler(
 		&tg.UpdatePhoneCallSignalingData{},
@@ -445,9 +451,9 @@ func (ctx *Context) handleUpdates() {
 				case ntgcalls.Connected:
 					waitChan <- nil
 				case ntgcalls.Closed, ntgcalls.Failed:
-					waitChan <- fmt.Errorf("connection failed")
+					waitChan <- ErrConnectionFailed
 				case ntgcalls.Timeout:
-					waitChan <- fmt.Errorf("connection timeout")
+					waitChan <- ErrConnectionTimeout
 				default:
 				}
 			}
