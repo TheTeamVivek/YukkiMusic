@@ -125,7 +125,7 @@ parse_arguments() {
         shift
     done
 
-    [[ "$any_component" == true && "$INSTALL_ALL" != true ]] && INSTALL_ALL=false
+    [[ "$any_component" == true && "$INSTALL_ALL" == true ]] && INSTALL_ALL=false
 }
 
 should_install() {
@@ -678,7 +678,8 @@ install_ntgcalls() {
 
     print_step "Installing ntgcalls..."
 
-    command -v unzip >/dev/null 2>&1 || install_package "unzip" "unzip"
+    command -v unzip >/dev/null 2>&1 || install_package "unzip" "unzip" || \
+        print_error "unzip is required to install ntgcalls" "install unzip and re-run the installer"
 
     local url=""
     case "$OS_TYPE" in
