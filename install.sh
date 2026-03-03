@@ -101,21 +101,21 @@ ${CYAN}${BOLD}Examples:${RESET}
 }
 
 parse_arguments() {
-    [[ $# -gt 0 ]] && INSTALL_ALL=false
+    local any_component=false
 
     while [[ $# -gt 0 ]]; do
         case $1 in
-            -h|--help)        show_help ;;
-            -a|--all)         INSTALL_ALL=true ;;
-            -g|--go)          INSTALL_GO=true ;;
-            -d|--deno)        INSTALL_DENO=true ;;
-            -p|--python)      INSTALL_PYTHON=true ;;
-            --pip)            INSTALL_PIP=true ;;
-            -f|--ffmpeg)      INSTALL_FFMPEG=true ;;
-            -y|--yt-dlp|--ytdlp) INSTALL_YTDLP=true ;;
-            -n|--ntgcalls)    INSTALL_NTGCALLS=true ;;
-            -q|--quiet)       QUIET_MODE=true ;;
-            --skip-summary)   SKIP_SUMMARY=true ;;
+            -h|--help)            show_help ;;
+            -a|--all)             INSTALL_ALL=true ;;
+            -g|--go)              INSTALL_GO=true;       any_component=true ;;
+            -d|--deno)            INSTALL_DENO=true;     any_component=true ;;
+            -p|--python)          INSTALL_PYTHON=true;   any_component=true ;;
+            --pip)                INSTALL_PIP=true;      any_component=true ;;
+            -f|--ffmpeg)          INSTALL_FFMPEG=true;   any_component=true ;;
+            -y|--yt-dlp|--ytdlp) INSTALL_YTDLP=true;   any_component=true ;;
+            -n|--ntgcalls)        INSTALL_NTGCALLS=true; any_component=true ;;
+            -q|--quiet)           QUIET_MODE=true ;;
+            --skip-summary)       SKIP_SUMMARY=true ;;
             *)
                 echo -e "${RED}Unknown option: $1${RESET}"
                 echo "Use --help for usage information"
@@ -124,6 +124,8 @@ parse_arguments() {
         esac
         shift
     done
+
+    [[ "$any_component" == true && "$INSTALL_ALL" != true ]] && INSTALL_ALL=false
 }
 
 should_install() {
@@ -643,9 +645,11 @@ check_install_ytdlp() {
     local url=""
     case "$OS_TYPE" in
         linux)
-            [[ "$ARCH_TYPE" == "amd64" ]] \
-                && url="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux" \
-                || url="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux_aarch64"
+            if [[ "$ARCH_TYPE" == "amd64" ]]; then
+                url="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux"
+            else
+                url="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux_aarch64"
+            fi
             ;;
         macos)   url="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos" ;;
         windows) url="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe" ;;
@@ -679,14 +683,18 @@ install_ntgcalls() {
     local url=""
     case "$OS_TYPE" in
         linux)
-            [[ "$ARCH_TYPE" == "amd64" ]] \
-                && url="https://github.com/pytgcalls/ntgcalls/releases/download/$NTGCALLS_VERSION/ntgcalls.linux-x86_64-static_libs.zip" \
-                || url="https://github.com/pytgcalls/ntgcalls/releases/download/$NTGCALLS_VERSION/ntgcalls.linux-arm64-static_libs.zip"
+            if [[ "$ARCH_TYPE" == "amd64" ]]; then
+                url="https://github.com/pytgcalls/ntgcalls/releases/download/$NTGCALLS_VERSION/ntgcalls.linux-x86_64-static_libs.zip"
+            else
+                url="https://github.com/pytgcalls/ntgcalls/releases/download/$NTGCALLS_VERSION/ntgcalls.linux-arm64-static_libs.zip"
+            fi
             ;;
         macos)
-            [[ "$ARCH_TYPE" == "arm64" ]] \
-                && url="https://github.com/pytgcalls/ntgcalls/releases/download/$NTGCALLS_VERSION/ntgcalls.macos-arm64-static_libs.zip" \
-                || print_error "ntgcalls unavailable for macOS x86_64" "build from source"
+            if [[ "$ARCH_TYPE" == "arm64" ]]; then
+                url="https://github.com/pytgcalls/ntgcalls/releases/download/$NTGCALLS_VERSION/ntgcalls.macos-arm64-static_libs.zip"
+            else
+                print_error "ntgcalls unavailable for macOS x86_64" "build from source"
+            fi
             ;;
         windows)
             url="https://github.com/pytgcalls/ntgcalls/releases/download/$NTGCALLS_VERSION/ntgcalls.windows-x86_64-static_libs.zip"
