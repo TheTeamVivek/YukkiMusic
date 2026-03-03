@@ -251,6 +251,13 @@ err_assistant_invite_failed: |
   ⚠️ Assistant failed to join this chat:
   <i>{error}</i>
 
+err_connection_timeout: |
+  ⚠️ <b>VoiceChat Connection Timeout</b>
+
+  Telegram is not responding properly to the voice chat connection right now.
+
+  <i>If this keeps happening, end the voice chat and start it again, then retry.</i>
+
 err_no_active_voicechat: |
   🎙️ <b>No Active Voice Chat</b>
 
