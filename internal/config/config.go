@@ -129,6 +129,9 @@ func validateRequired() {
 	if MongoURI == "" {
 		logger.Fatal("MONGO_DB_URI is required but missing!")
 	}
+	if len(StringSessions) == 0 {
+		gologging.Fatal("No STRING_SESSIONS provided for assistant client.")
+	}
 }
 
 func validateToken() {

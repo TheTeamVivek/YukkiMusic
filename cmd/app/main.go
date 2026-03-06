@@ -51,25 +51,22 @@ func main() {
 	defer platforms.Close()
 
 	checkFFmpegAndFFprobe()
-	refreshCacheAndDownloads()
+	refreshDirs()
 
 	gologging.Debug("🔹 Initializing MongoDB...")
+
 	dbCleanup := database.Init(config.MongoURI)
 	defer dbCleanup()
+
 	gologging.Info("✅ Database connected successfully")
+
 	gologging.Debug("🔹 Initializing clients...")
-	cleanup := core.Init(
-		config.ApiID,
-		config.ApiHash,
-		config.Token,
-		config.StringSessions, // list of sessions
-		config.SessionType,    // pyrogram / telethon / gogram
-		config.LoggerID,
-	)
+
+	cleanup := core.Init()
 	defer cleanup()
 
-	core.AssistantIndexFunc = database.GetAssistantIndex
-	core.GetChatLanguage = database.GetChatLanguage
+	core.GetAssistantIndexFunc = database.GetAssistantIndex
+	core.F = modules.F
 
 	if err := database.RebalanceAssistantIndexes(core.Assistants.Count()); err != nil {
 		gologging.Fatal("Failed to rebalance Assistants: " + err.Error())
@@ -94,7 +91,7 @@ func initLogger() {
 	gologging.GetLogger("Database").SetOutput(config.LogWriter)
 }
 
-func refreshCacheAndDownloads() error {
+func refreshDirs() error {
 	dirs := []string{
 		"./cache",
 		"./downloads",

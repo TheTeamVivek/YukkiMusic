@@ -138,3 +138,15 @@ func (r *RoomState) executeMoveOperation(from, to int) {
 		r.queue = append(r.queue[:to], append([]*state.Track{item}, r.queue[to:]...)...)
 	}
 }
+
+// AddTracksToQueue appends multiple tracks to the queue
+func (r *RoomState) AddTracksToQueue(tracks []*state.Track) {
+	if r.destroyed.Load() {
+		return
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.queue = append(r.queue, tracks...)
+}

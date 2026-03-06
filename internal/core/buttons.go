@@ -23,7 +23,6 @@ package core
 import (
 	"fmt"
 
-	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
@@ -31,7 +30,7 @@ import (
 	"main/internal/utils"
 )
 
-var GetChatLanguage func(chatID int64) (string, error) // overwritten from main.go
+var F func(chatID int64, key string, values ...locales.Arg) string // overwritten from main.go
 
 func AddMeMarkup(chatID int64) tg.ReplyMarkup {
 	return tg.NewKeyboard().
@@ -197,27 +196,4 @@ func formatDuration(sec int) string {
 		return fmt.Sprintf("%d:%02d:%02d", h, m, s) // HH:MM:SS
 	}
 	return fmt.Sprintf("%02d:%02d", m, s) // MM:SS
-}
-
-func F(chatID int64, key string, values ...locales.Arg) string {
-	lang := config.DefaultLang
-	if GetChatLanguage != nil {
-		l, err := GetChatLanguage(chatID)
-		if err != nil {
-			gologging.Error(
-				"Failed to get language for " + utils.IntToStr(
-					chatID,
-				) + " Got error " + err.Error(),
-			)
-		} else {
-			lang = l
-		}
-	}
-
-	var val locales.Arg
-
-	if len(values) > 0 {
-		val = values[0]
-	}
-	return locales.Get(lang, key, val)
 }

@@ -313,6 +313,11 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter},
 	},
 	{
+		Pattern: "restore",
+		Handler: restoreHandler,
+		Filters: []telegram.Filter{superGroupFilter, authFilter},
+	},
+	{
 		Pattern: "addauth",
 		Handler: addAuthHandler,
 		Filters: []telegram.Filter{superGroupFilter, adminFilter},
@@ -440,6 +445,11 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
+		Pattern: "crestore",
+		Handler: crestoreHandler,
+		Filters: []telegram.Filter{superGroupFilter, authFilter},
+	},
+	{
 		Pattern: "cautoplay",
 		Handler: cautoplayHandler,
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
@@ -486,6 +496,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 	bot.On("edit:/ev", evalCommandHandler).SetGroup(80)
 
 	bot.On("participant", handleParticipantUpdate).SetGroup(70)
+	bot.On("action", handleChatAction).SetGroup(70)
 
 	bot.AddActionHandler(handleActions).SetGroup(60)
 
@@ -510,6 +521,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 		"/cjump", "/cremove", "/cclear", "/cmove",
 		"/cspeed", "/creplay", "/cposition", "/cshuffle",
 		"/cloop", "/cqueue", "/creload", "/cautoplay",
+		"/crestore",
 	}
 
 	for _, cmd := range cplayCommands {

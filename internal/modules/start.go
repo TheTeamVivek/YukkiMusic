@@ -70,7 +70,7 @@ func startHandler(m *tg.NewMessage) error {
 			URL:             config.StartImage,
 			ForceLargeMedia: true,
 		}, &tg.MediaOptions{
-			Caption:     caption,
+			Caption: caption,
 			NoForwards:  true,
 			ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
 		})
@@ -89,7 +89,7 @@ func startHandler(m *tg.NewMessage) error {
 					"[start] URL media reply failed: " + err.Error(),
 				)
 
-				_, err = m.RespondMedia(caption, &tg.MediaOptions{
+				_, err = m.Respond(caption, &tg.SendOptions{
 					NoForwards:  true,
 					ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
 				})
