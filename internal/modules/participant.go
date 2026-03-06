@@ -142,7 +142,7 @@ func handleAssistantEvent(
 		return
 	}
 
-	if s.IsStateUnknown() {
+	if s.GetAssistantPresence() == nil || s.GetAssistantBanned() == nil {
 		s.RefreshAssistantState()
 	}
 }
