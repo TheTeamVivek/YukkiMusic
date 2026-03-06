@@ -38,32 +38,26 @@ var (
 	BUser *telegram.UserObj
 
 	Assistants         *AssistantManager
-	AssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // AssistantIndexFunc = database.GetAssistantIndex
+	GetAssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // GetAssistantIndexFunc = database.GetAssistantIndex
 )
 
 func Init(
-	apiID int32,
-	apiHash, token string,
-	sessions []string,
-	sessionType string,
-	loggerID int64,
+	
 ) func() {
-	if len(sessions) == 0 {
-		gologging.Fatal("No STRING_SESSIONS provided for assistant client.")
-	}
+	
 
 	gologging.Info("Starting bot client...")
-	Bot = initBotClient(apiID, apiHash, token)
+	Bot = initBotClient( )
 	BUser = getSelfOrFatal(Bot, "bot")
 
 	gologging.Info("Starting assistant clients...")
 
-	assistants := make([]*Assistant, 0, len(sessions))
+	assistants := make([]*Assistant, 0, len(config.StringSessions))
 
-	for i, sess := range sessions {
+	for i, sess := range config.StringSessions {
 		gologging.InfoF("Initializing assistant[%d]...", i)
 
-		client := initAssistantClient(apiID, apiHash, sess, sessionType, i)
+		client := initAssistantClient( sess, i)
 		user := getSelfOrFatal(client, fmt.Sprintf("assistant[%d]", i))
 		ctx := ubot.NewContext(client)
 
@@ -76,9 +70,9 @@ func Init(
 			Ntg:    ctx,
 		})
 
-		if loggerID != 0 {
+		if config.LoggerID != 0 {
 			_, _ = client.SendMessage(
-				loggerID,
+				config.LoggerID,
 				fmt.Sprintf("Assistant %d Started", i+1),
 			)
 		}
@@ -95,27 +89,24 @@ func Init(
 	gologging.Info("All assistants initialized successfully.")
 
 	return func() {
-		gologging.Info("Shutting down assistant contexts...")
-		for _, a := range Assistants.list {
-			a.Ntg.Close()
-		}
-
-		gologging.Info("Stopping bot...")
+        
+        gologging.Info("Stopping bot...")
 		Bot.Stop()
 
-		gologging.Info("Stopping assistants...")
-		for _, a := range Assistants.list {
-			a.Client.Stop()
-		}
+		gologging.Info("Shutting down assistants...")
+        Assistants.ForEach(func(a *Assistant){
+            a.Ntg.Close()
+            a.Client.Stop())
+        })
 
 		gologging.Info("Shutdown complete.")
 	}
 }
 
-func initBotClient(apiID int32, apiHash, token string) *telegram.Client {
+func initBotClient() *telegram.Client {
 	client, err := telegram.NewClient(telegram.ClientConfig{
-		AppID:   apiID,
-		AppHash: apiHash,
+		AppID:   config.ApiID,
+		AppHash: config.ApiHash,
 		Logger: telegram.WrapSimpleLogger(
 			GetTgLogger("gogram", telegram.LogError),
 		),
@@ -127,7 +118,7 @@ func initBotClient(apiID int32, apiHash, token string) *telegram.Client {
 		gologging.Fatal("❌ Failed to create bot: " + err.Error())
 	}
 
-	if err := client.LoginBot(token); err != nil {
+	if err := client.LoginBot(config.Token); err != nil {
 		if strings.Contains(err.Error(), "ACCESS_TOKEN_EXPIRED") {
 			gologging.Fatal("❌ Bot token has been revoked or expired.")
 		} else {
@@ -138,13 +129,12 @@ func initBotClient(apiID int32, apiHash, token string) *telegram.Client {
 }
 
 func initAssistantClient(
-	apiID int32,
-	apiHash, session, sessionType string,
+	session, 
 	idx int,
 ) *telegram.Client {
 	var stringSession string
 
-	switch strings.ToLower(sessionType) {
+	switch strings.ToLower(config.SessionType) {
 	case "pyrogram", "pyro":
 		sess, err := decodePyrogramSessionString(session)
 		if err != nil {
@@ -163,12 +153,12 @@ func initAssistantClient(
 		stringSession = session
 
 	default:
-		gologging.Fatal("Invalid SESSION_TYPE: " + sessionType)
+		gologging.Fatal("Invalid SESSION_TYPE: " + config.SessionType)
 	}
 
 	client, err := telegram.NewClient(telegram.ClientConfig{
-		AppID:         apiID,
-		AppHash:       apiHash,
+		AppID:         config.ApiID,
+		AppHash:       config.ApiHash,
 		LogLevel:      telegram.LogError,
 		ParseMode:     "HTML",
 		StringSession: stringSession,

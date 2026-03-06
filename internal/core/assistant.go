@@ -95,8 +95,8 @@ func (m *AssistantManager) ForChat(chatID int64) (*Assistant, error) {
 	if m == nil || len(m.list) == 0 {
 		return nil, fmt.Errorf("no assistants available")
 	}
-	if AssistantIndexFunc == nil {
-		return nil, fmt.Errorf("AssistantIndexFunc is not set")
+	if GetAssistantIndexFunc == nil {
+		return nil, fmt.Errorf("GetAssistantIndexFunc is not set")
 	}
 
 	m.cacheMu.RLock()
@@ -106,7 +106,7 @@ func (m *AssistantManager) ForChat(chatID int64) (*Assistant, error) {
 	}
 	m.cacheMu.RUnlock()
 
-	idx1, err := AssistantIndexFunc(chatID, len(m.list))
+	idx1, err := GetAssistantIndexFunc(chatID, len(m.list))
 	if err != nil {
 		return nil, err
 	}
