@@ -125,7 +125,7 @@ func initBotClient() *telegram.Client {
 }
 
 func initAssistantClient(
-	session,
+	session string,
 	idx int,
 ) *telegram.Client {
 	var stringSession string
