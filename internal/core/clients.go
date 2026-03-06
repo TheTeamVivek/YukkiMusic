@@ -30,6 +30,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/config"
 	"main/ubot"
 )
 
@@ -37,17 +38,13 @@ var (
 	Bot   *telegram.Client
 	BUser *telegram.UserObj
 
-	Assistants         *AssistantManager
+	Assistants            *AssistantManager
 	GetAssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // GetAssistantIndexFunc = database.GetAssistantIndex
 )
 
-func Init(
-	
-) func() {
-	
-
+func Init() func() {
 	gologging.Info("Starting bot client...")
-	Bot = initBotClient( )
+	Bot = initBotClient()
 	BUser = getSelfOrFatal(Bot, "bot")
 
 	gologging.Info("Starting assistant clients...")
@@ -57,7 +54,7 @@ func Init(
 	for i, sess := range config.StringSessions {
 		gologging.InfoF("Initializing assistant[%d]...", i)
 
-		client := initAssistantClient( sess, i)
+		client := initAssistantClient(sess, i)
 		user := getSelfOrFatal(client, fmt.Sprintf("assistant[%d]", i))
 		ctx := ubot.NewContext(client)
 
@@ -89,15 +86,14 @@ func Init(
 	gologging.Info("All assistants initialized successfully.")
 
 	return func() {
-        
-        gologging.Info("Stopping bot...")
+		gologging.Info("Stopping bot...")
 		Bot.Stop()
 
 		gologging.Info("Shutting down assistants...")
-        Assistants.ForEach(func(a *Assistant){
-            a.Ntg.Close()
-            a.Client.Stop()
-        })
+		Assistants.ForEach(func(a *Assistant) {
+			a.Ntg.Close()
+			a.Client.Stop()
+		})
 
 		gologging.Info("Shutdown complete.")
 	}
@@ -129,7 +125,7 @@ func initBotClient() *telegram.Client {
 }
 
 func initAssistantClient(
-	session, 
+	session,
 	idx int,
 ) *telegram.Client {
 	var stringSession string

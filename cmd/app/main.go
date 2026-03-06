@@ -54,15 +54,15 @@ func main() {
 	refreshDirs()
 
 	gologging.Debug("🔹 Initializing MongoDB...")
-	
-    dbCleanup := database.Init(config.MongoURI)
+
+	dbCleanup := database.Init(config.MongoURI)
 	defer dbCleanup()
-	
-    gologging.Info("✅ Database connected successfully")
-	
-    gologging.Debug("🔹 Initializing clients...")
-	
-    cleanup := core.Init()
+
+	gologging.Info("✅ Database connected successfully")
+
+	gologging.Debug("🔹 Initializing clients...")
+
+	cleanup := core.Init()
 	defer cleanup()
 
 	core.GetAssistantIndexFunc = database.GetAssistantIndex
