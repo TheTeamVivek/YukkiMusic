@@ -137,12 +137,6 @@ func (s *ChatState) GetAssistantBanned() *bool {
 	return s.isBanned
 }
 
-func (s *ChatState) IsStateUnknown() bool {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.isPresent == nil || s.isBanned == nil
-}
-
 // =============================================================================
 // STATE QUERIES
 // =============================================================================
