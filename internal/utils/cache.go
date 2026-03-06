@@ -63,17 +63,38 @@ func (c *Cache[K, V]) Set(key K, value V, ttl ...time.Duration) {
 }
 
 func (c *Cache[K, V]) Get(key K) (V, bool) {
-	c.mu.Lock()
+	c.mu.RLock()
 	item, ok := c.items[key]
-	if !ok || item.Expired() {
-		if ok {
-			delete(c.items, key)
-		}
-		c.mu.Unlock()
+	if !ok {
+		c.mu.RUnlock()
 		var zero V
 		return zero, false
 	}
-	c.mu.Unlock()
+
+	if !item.Expired() {
+		val := item.Value
+		c.mu.RUnlock()
+		return val, true
+	}
+	c.mu.RUnlock()
+
+	// Item is expired, need to acquire write lock to delete it
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// Double-checked locking: verify it's still there and still expired
+	item, ok = c.items[key]
+	if ok && item.Expired() {
+		delete(c.items, key)
+		var zero V
+		return zero, false
+	}
+
+	if !ok {
+		var zero V
+		return zero, false
+	}
+
 	return item.Value, true
 }
 
