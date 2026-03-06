@@ -31,7 +31,7 @@ import (
 	"main/internal/utils"
 )
 
-var F (chatID int64, key string, values ...locales.Arg) string // overwritten from main.go
+var F func(chatID int64, key string, values ...locales.Arg) string // overwritten from main.go
 
 func AddMeMarkup(chatID int64) tg.ReplyMarkup {
 	return tg.NewKeyboard().
