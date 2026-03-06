@@ -96,7 +96,7 @@ func Init(
 		gologging.Info("Shutting down assistants...")
         Assistants.ForEach(func(a *Assistant){
             a.Ntg.Close()
-            a.Client.Stop())
+            a.Client.Stop()
         })
 
 		gologging.Info("Shutdown complete.")
