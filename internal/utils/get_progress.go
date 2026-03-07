@@ -93,6 +93,6 @@ func GetProgressBar(playedSec, durationSec int) string {
 		bar = "—————————◉"
 	}
     
-    fmt.Prinln("Progress: ", umm)
+    fmt.Println("Progress: ", umm)
 	return bar
 }
