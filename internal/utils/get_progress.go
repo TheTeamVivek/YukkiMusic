@@ -43,10 +43,10 @@ func GetProgress(mystic *telegram.NewMessage) *telegram.ProgressManager {
     text := fmt.Sprintf(
         "<b>📥 Downloading</b>\n\n"+
             "<pre>"+
-            "progress : %6.2f%%\n"+
-            "speed    : %s\n"+
-            "eta      : %s\n"+
-            "elapsed  : %s"+
+            "Progress : %6.2f%%\n"+
+            "Speed    : %s\n"+
+            "Eta      : %s\n"+
+            "Elapsed  : %s"+
             "</pre>",
         pi.Percentage,
         pi.SpeedString(),
