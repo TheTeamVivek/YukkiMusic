@@ -34,6 +34,8 @@ import (
 	"main/internal/utils"
 )
 
+// TODO: Bot added/kicked logger not working inspect or switch to ChatAddUser
+
 func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 	if isMaintenanceBlocked(p.ActorID()) {
 		return nil
