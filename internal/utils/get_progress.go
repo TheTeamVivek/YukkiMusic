@@ -40,22 +40,65 @@ func GetProgress(mystic *telegram.NewMessage) *telegram.ProgressManager {
 	}
 
 	pm.WithCallback(func(pi *telegram.ProgressInfo) {
-		text := fmt.Sprintf(
-			"📥 Downloading your track...\n\n"+
-				"Progress: %.1f%%\n"+
-				"Speed: %s\n"+
-				"ETA: %s\n"+
-				"Elapsed: %s",
-			pi.Percentage,
-			pi.SpeedString(),
-			pi.ETAString(),
-			pi.ElapsedString(),
-		)
-
-		mystic.Edit(text, opts)
+		mystic.Edit(buildProgressUI(pi), opts)
 	})
 
 	return pm
+}
+
+func buildProgressUI(pi *telegram.ProgressInfo) string {
+	filled := int(pi.Percentage / 100 * 12)
+	if filled > 12 {
+		filled = 12
+	}
+	bar := strings.Repeat("▰", filled) + strings.Repeat("▱", 12-filled)
+
+	var phase string
+	switch {
+	case pi.Percentage == 0:
+		phase = "🔗 Connecting..."
+	case pi.Percentage < 10:
+		phase = "🚀 Starting"
+	case pi.Percentage < 50:
+		phase = "📥 Downloading"
+	case pi.Percentage < 90:
+		phase = "⚙️ Transferring"
+	case pi.Percentage < 100:
+		phase = "🏁 Almost done"
+	default:
+		phase = "✅ Complete"
+	}
+
+	return fmt.Sprintf(
+		"%s <b>%s</b>\n\n"+
+			"<code>%s</code>  <b>%.1f%%</b>\n\n"+
+			"📦 <b>Size:</b>  <code>%s / %s</code>\n"+
+			"⚡ <b>Speed:</b>  <code>%s</code>  │  <i>avg</i> <code>%s</code>\n"+
+			"⏱ <b>ETA:</b>  <code>%s</code>  │  <b>elapsed</b> <code>%s</code>",
+		phase,
+		ShortTitle(pi.FileName, 32),
+		bar,
+		pi.Percentage,
+		humanBytes(pi.Current),
+		humanBytes(pi.TotalSize),
+		pi.SpeedString(),
+		pi.AvgSpeedString(),
+		pi.ETAString(),
+		pi.ElapsedString(),
+	)
+}
+
+func humanBytes(b int64) string {
+	const unit = 1024
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.2f %s", float64(b)/float64(div), []string{"KB", "MB", "GB", "TB"}[exp])
 }
 
 func GetProgressBar(playedSec, durationSec int) string {
