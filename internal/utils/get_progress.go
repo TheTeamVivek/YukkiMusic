@@ -69,7 +69,7 @@ func GetProgressBar(playedSec, durationSec int) string {
 	var bar string
     
 	switch {
-	case umm > 0 && umm <= 10:
+	case umm >= 0 && umm <= 10:
 		bar = "◉—————————"
 	case umm > 10 && umm < 20:
 		bar = "—◉————————"
@@ -92,7 +92,5 @@ func GetProgressBar(playedSec, durationSec int) string {
 	default:
 		bar = "—————————◉"
 	}
-    
-    fmt.Println("Progress: ", umm)
 	return bar
 }
