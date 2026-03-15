@@ -42,8 +42,8 @@ func ShortTitle(title string, max ...int) string {
 }
 
 func CleanURL(raw string) string {
-	parts := strings.SplitN(raw, "?", 2)
-	return parts[0]
+	before, _, _ := strings.Cut(raw, "?")
+	return before
 }
 
 func MentionHTML(u *tg.UserObj) string {
@@ -51,19 +51,13 @@ func MentionHTML(u *tg.UserObj) string {
 		return "Unknown"
 	}
 
-	fullName := u.FirstName
-	if u.LastName != "" {
-		fullName += " " + u.LastName
-	}
-
+	fullName := strings.TrimSpace(u.FirstName + " " + u.LastName)
 	if fullName == "" {
 		fullName = "User"
 	}
 	fullName = html.EscapeString(ShortTitle(fullName, 15))
 
-	return "<a href=\"tg://user?id=" + IntToStr(
-		u.ID,
-	) + "\">" + fullName + "</a>"
+	return fmt.Sprintf("<a href=\"tg://user?id=%d\">%s</a>", u.ID, fullName)
 }
 
 // IfElse returns `a` if condition is true, else returns `b`.
@@ -88,29 +82,6 @@ func ParseBool(s string) (bool, error) {
 }
 
 // IntToStr converts any signed integer type to string.
-// Returns empty string if type is unsupported.
-func IntToStr(v any) string {
-	switch n := v.(type) {
-	case int:
-		return strconv.Itoa(n)
-	case int8, int16, int32, int64:
-		return strconv.FormatInt(toInt64(n), 10)
-	default:
-		return ""
-	}
-}
-
-func toInt64(v any) int64 {
-	switch n := v.(type) {
-	case int8:
-		return int64(n)
-	case int16:
-		return int64(n)
-	case int32:
-		return int64(n)
-	case int64:
-		return n
-	default:
-		return 0
-	}
+func IntToStr[T ~int | ~int8 | ~int16 | ~int32 | ~int64](v T) string {
+	return strconv.FormatInt(int64(v), 10)
 }
