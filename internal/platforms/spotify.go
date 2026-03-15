@@ -376,12 +376,6 @@ func (s *SpotifyPlatform) convertSpotifyTrack(
 	simpleTrack *spotify.SimpleTrack,
 	images []spotify.Image,
 ) *state.Track {
-	var artists []string
-	for _, artist := range simpleTrack.Artists {
-		artists = append(artists, artist.Name)
-	}
-	artistStr := strings.Join(artists, ", ")
-	_ = artistStr
 
 	thumbnail := ""
 	if len(images) > 0 {

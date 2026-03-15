@@ -98,7 +98,7 @@ func startHandler(m *tg.NewMessage) error {
 		}
 	}
 
-	if config.LoggerID != 0 && isLogger() {
+	if config.LoggerID != 0 && isLoggerEnabled() {
 		uName := "N/A"
 		if m.Sender.Username != "" {
 			uName = "@" + m.Sender.Username

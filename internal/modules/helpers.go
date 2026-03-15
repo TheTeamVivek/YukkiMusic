@@ -90,11 +90,7 @@ func shouldShowThumb(chatID int64) bool {
 func F(chatID int64, key string, values ...locales.Arg) string {
 	lang, err := database.GetChatLanguage(chatID)
 	if err != nil {
-		gologging.Error(
-			"Failed to get language for " + utils.IntToStr(
-				chatID,
-			) + " Got error " + err.Error(),
-		)
+		gologging.ErrorF("Failed to get language for %d: %v", chatID, err)
 		lang = config.DefaultLang
 	}
 	return FWithLang(lang, key, values...)
@@ -108,11 +104,11 @@ func FWithLang(lang, key string, values ...locales.Arg) string {
 	return locales.Get(lang, key, val)
 }
 
-func isLogger() (l bool) {
-	var err error
-	l, err = database.IsLoggerEnabled()
+func isLoggerEnabled() bool {
+	l, err := database.IsLoggerEnabled()
 	if err != nil {
-		gologging.Error("Failed to get IsLoggerEnabled, Err: " + err.Error())
+		gologging.ErrorF("Failed to check if logger is enabled: %v", err)
+		return false
 	}
 	return l
 }
@@ -215,29 +211,27 @@ func SafeCallbackHandler(
 	handler func(*tg.CallbackQuery) error,
 ) func(*tg.CallbackQuery) error {
 	return func(cb *tg.CallbackQuery) (err error) {
-		if is, _ := database.IsMaintenance(); is {
-			if cb.Sender.ID != config.OwnerID {
-				if ok, _ := database.IsSudo(cb.Sender.ID); !ok {
-					cb.Answer(
-						F(cb.ChannelID(), "maint", locales.Arg{"reason": ""}),
-						&tg.CallbackOptions{Alert: true},
-					)
-					return tg.ErrEndGroup
-				}
+		if isMaint, _ := database.IsMaintenance(); isMaint {
+			isOwner := cb.SenderID == config.OwnerID
+			isSudo, _ := database.IsSudo(cb.SenderID)
+			if !isOwner && !isSudo {
+				cb.Answer(
+					F(cb.ChannelID(), "maint", locales.Arg{"reason": ""}),
+					&tg.CallbackOptions{Alert: true},
+				)
+				return tg.ErrEndGroup
 			}
 		}
+
 		defer func() {
 			if r := recover(); r != nil {
 				handlePanic(r, cb, true)
-				// err = fmt.Errorf("some panics handled")
 				err = tg.ErrEndGroup
 			}
 		}()
+
 		err = handler(cb)
-		if err != nil {
-			if errors.Is(err, tg.ErrEndGroup) {
-				return err
-			}
+		if err != nil && !errors.Is(err, tg.ErrEndGroup) {
 			handlePanic(err, cb, false)
 		}
 		return err
@@ -248,58 +242,41 @@ func SafeMessageHandler(
 	handler func(*tg.NewMessage) error,
 ) func(*tg.NewMessage) error {
 	return func(m *tg.NewMessage) (err error) {
-		gologging.Info(
-			"Handling message from " + fmt.Sprint(
-				m.SenderID(),
-			) + " in chat " + fmt.Sprint(
-				m.ChannelID(),
-			),
-		)
+		gologging.InfoF("Handling message from %d in chat %d", m.SenderID(), m.ChannelID())
 
-		if is, _ := database.IsMaintenance(); is {
+		if isMaint, _ := database.IsMaintenance(); isMaint {
 			gologging.Debug("Maintenance mode active")
-			if m.SenderID() != config.OwnerID {
-				if ok, _ := database.IsSudo(m.SenderID()); !ok {
-					if m.ChatType() == tg.EntityUser ||
-						strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
-						reason, _ := database.GetMaintReason()
-						reason = F(
-							m.ChannelID(),
-							"maint_reason",
-							locales.Arg{"reason": reason},
-						)
-						msg := F(
-							m.ChannelID(),
-							"maint",
-							locales.Arg{"reason": reason},
-						)
-						m.Reply(msg)
-						gologging.Info(
-							"Sent maintenance notice to " + fmt.Sprint(
-								m.SenderID(),
-							),
-						)
-					}
-					return tg.ErrEndGroup
+			isOwner := m.SenderID() == config.OwnerID
+			isSudo, _ := database.IsSudo(m.SenderID())
+
+			if !isOwner && !isSudo {
+				if m.ChatType() == tg.EntityUser ||
+					strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
+					reason, _ := database.GetMaintReason()
+					msg := F(m.ChannelID(), "maint", locales.Arg{
+						"reason": F(m.ChannelID(), "maint_reason", locales.Arg{"reason": reason}),
+					})
+					m.Reply(msg)
+					gologging.InfoF("Sent maintenance notice to %d", m.SenderID())
 				}
+				return tg.ErrEndGroup
 			}
 		}
 
 		defer func() {
 			if r := recover(); r != nil {
-				gologging.Error("Recovered from panic: " + fmt.Sprint(r))
+				gologging.ErrorF("Recovered from panic: %v", r)
 				handlePanic(r, m, true)
 				err = fmt.Errorf("internal panic occurred")
 			}
 		}()
 
+		cmd := getCommand(m)
 		if checkForHelpFlag(m) {
-			cmd := getCommand(m)
-			gologging.Debug("Help flag detected for command " + cmd)
+			gologging.DebugF("Help flag detected for command %s", cmd)
 			err = showHelpFor(m, cmd)
 		} else {
-			cmd := getCommand(m)
-			gologging.Debug("Executing handler for command " + cmd)
+			gologging.DebugF("Executing handler for command %s", cmd)
 			err = handler(m)
 		}
 
@@ -308,10 +285,10 @@ func SafeMessageHandler(
 				gologging.Debug("Handler exited early (ErrEndGroup)")
 				return err
 			}
-			gologging.Error("Handler error: " + err.Error())
+			gologging.ErrorF("Handler error: %v", err)
 			handlePanic(err, m, false)
 		} else {
-			gologging.Info("Handler completed successfully for command " + getCommand(m))
+			gologging.InfoF("Handler completed successfully for command %s", cmd)
 		}
 
 		return err
@@ -454,6 +431,6 @@ func formatDuration(sec int) string {
 }
 
 func getCommand(m *tg.NewMessage) string {
-	cmd := strings.SplitN(m.GetCommand(), "@", 2)[0]
+	cmd, _, _ := strings.Cut(m.GetCommand(), "@")
 	return cmd
 }

@@ -142,12 +142,6 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 	return room, true
 }
 
-func GetRoomCounts() int {
-	roomsMu.RLock()
-	defer roomsMu.RUnlock()
-	return len(rooms)
-}
-
 func GetAllRooms() map[int64]*RoomState {
 	roomsMu.RLock()
 

@@ -68,25 +68,36 @@ func getMediaDescription(
 		speed = 4.0
 	}
 
+	baseCmd := "ffmpeg "
+	if isStreamURL(url) {
+		baseCmd += "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 "
+	}
+	if pos > 0 {
+		baseCmd += "-ss " + strconv.Itoa(pos) + " "
+	}
+	baseCmd += "-v warning -i \"" + url + "\" "
+
+	audio := getAudioPipeline(baseCmd, speed)
+	if !isVideo {
+		return ntgcalls.MediaDescription{
+			Microphone: audio,
+		}
+	}
+
+	video := getVideoPipeline(baseCmd, url, speed)
+	return ntgcalls.MediaDescription{
+		Microphone: audio,
+		Camera:     video,
+	}
+}
+
+func getAudioPipeline(baseCmd string, speed float64) *ntgcalls.AudioDescription {
 	audio := &ntgcalls.AudioDescription{
 		MediaSource:  ntgcalls.MediaSourceShell,
 		SampleRate:   96000,
 		ChannelCount: 2,
 	}
 
-	baseCmd := "ffmpeg "
-
-	if isStreamURL(url) {
-		baseCmd += "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 "
-	}
-
-	if pos > 0 {
-		baseCmd += "-ss " + strconv.Itoa(pos) + " "
-	}
-
-	baseCmd += "-v warning -i \"" + url + "\" "
-
-	// Audio pipeline
 	audioCmd := baseCmd
 	audioCmd += "-filter:a \"atempo=" + strconv.FormatFloat(
 		speed,
@@ -99,12 +110,14 @@ func getMediaDescription(
 	audioCmd += "pipe:1"
 	audio.Input = audioCmd
 
-	if !isVideo {
-		return ntgcalls.MediaDescription{
-			Microphone: audio,
-		}
-	}
+	return audio
+}
 
+func getVideoPipeline(
+	baseCmd string,
+	url string,
+	speed float64,
+) *ntgcalls.VideoDescription {
 	w, h, fps, filter := normalizeVideo(url, speed)
 
 	video := &ntgcalls.VideoDescription{
@@ -114,15 +127,11 @@ func getMediaDescription(
 		Fps:         uint8(fps),
 	}
 
-	// Video pipeline
 	videoCmd := baseCmd
 	videoCmd += "-filter:v \"" + filter + "\" "
 	videoCmd += "-f rawvideo -r " + strconv.Itoa(fps) + " -pix_fmt yuv420p "
 	videoCmd += "pipe:1"
 	video.Input = videoCmd
 
-	return ntgcalls.MediaDescription{
-		Microphone: audio,
-		Camera:     video,
-	}
+	return video
 }

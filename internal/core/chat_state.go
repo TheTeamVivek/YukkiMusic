@@ -125,13 +125,13 @@ func (s *ChatState) SetInviteLink(link string) {
 // STATE GETTERS
 // =============================================================================
 
-func (s *ChatState) GetAssistantPresence() *bool {
+func (s *ChatState) AssistantPresence() *bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.isPresent
 }
 
-func (s *ChatState) GetAssistantBanned() *bool {
+func (s *ChatState) AssistantBanned() *bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.isBanned

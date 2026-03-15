@@ -139,8 +139,8 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 			return nil
 		}
 
-		if state.GetAssistantPresence() == nil ||
-			state.GetAssistantBanned() == nil {
+		if state.AssistantPresence() == nil ||
+			state.AssistantBanned() == nil {
 			state.RefreshAssistantState()
 		}
 	}
