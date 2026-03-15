@@ -332,11 +332,7 @@ COOKIES_LINK=
 
 # Fallen API Downloader
 FALLEN_API_KEY=
-FALLEN_API_URL=https://beta.fallenapi.fun
-
-# Youtubify API Downloader
-YOUTUBIFY_API_KEY=
-YOUTUBIFY_API_URL=https://youtubify.me```
+FALLEN_API_URL=https://beta.fallenapi.fun```
 
 ---
 
@@ -411,10 +407,6 @@ This means you can use any of these naming styles, and the bot will find it.
    - Check API quota hasn't been exceeded
    - Ensure `FALLEN_API_URL` is reachable
 
-3. **Using Youtubify API:**
-   - Verify `YOUTUBIFY_API_URL` is reachable (default: `https://youtubify.me`)
-   - Check the Youtubify service status at: https://youtubify.me
-   - Try switching between Cookies, Fallen API, and Youtubify as fallback methods
    
 ---
 
