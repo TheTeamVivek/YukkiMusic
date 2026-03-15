@@ -25,7 +25,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 type RTMPConfig struct {
@@ -82,12 +81,11 @@ func updateChatSettings(newSettings *ChatSettings) error {
 	ctx, cancel := mongoCtx()
 	defer cancel()
 
-	opts := options.UpdateOne().SetUpsert(true)
 	_, err := chatSettingsColl.UpdateOne(
 		ctx,
 		bson.M{"_id": newSettings.ChatID},
 		bson.M{"$set": newSettings},
-		opts,
+		upsertOpt,
 	)
 	if err != nil {
 		logger.Error(

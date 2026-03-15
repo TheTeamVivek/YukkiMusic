@@ -25,6 +25,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 const (
@@ -50,7 +51,7 @@ type (
 	}
 )
 
-func migrateData(mongoURI string) {
+func migrateData() {
 	logger.Info("Checking for old database to migrate...")
 
 	oldDB := client.Database(oldDBName)
@@ -83,10 +84,13 @@ func migrateData(mongoURI string) {
 
 func migrateCPlay(db *mongo.Database) {
 	coll := db.Collection("cplaymode")
+
 	ctx, cancel := mongoCtx()
 	defer cancel()
 
-	cursor, err := coll.Find(ctx, bson.M{})
+	opts := options.Find().SetBatchSize(500)
+
+	cursor, err := coll.Find(ctx, bson.M{}, opts)
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
 			logger.ErrorF("Failed to query old cplaymode collection: %v", err)
@@ -95,18 +99,48 @@ func migrateCPlay(db *mongo.Database) {
 	}
 	defer cursor.Close(ctx)
 
+	var models []mongo.WriteModel
+
 	for cursor.Next(ctx) {
 		var old oldCPlay
+
 		if err := cursor.Decode(&old); err != nil {
 			logger.ErrorF("Failed to decode old cplay document: %v", err)
 			continue
 		}
-		if err := SetCPlayID(old.ChatID, old.Mode); err != nil {
-			logger.ErrorF(
-				"Failed to migrate cplay for chat %d: %v",
-				old.ChatID,
-				err,
-			)
+
+		model := mongo.NewUpdateOneModel().
+			SetFilter(bson.M{"_id": old.ChatID}).
+			SetUpdate(bson.M{
+				"$set": bson.M{
+					"cplay_id": old.Mode,
+				},
+			}).
+			SetUpsert(true)
+
+		models = append(models, model)
+
+		if len(models) >= 1000 {
+			_, err := chatSettingsColl.BulkWrite(ctx, models)
+			if err != nil {
+				logger.ErrorF("Bulk migration for cplay failed: %v", err)
+				return
+			}
+
+			models = models[:0]
+		}
+	}
+
+	if err := cursor.Err(); err != nil {
+		logger.ErrorF("Cursor error while migrating cplay: %v", err)
+		return
+	}
+
+	if len(models) > 0 {
+		_, err := chatSettingsColl.BulkWrite(ctx, models)
+		if err != nil {
+			logger.ErrorF("Bulk migration for cplay failed: %v", err)
+			return
 		}
 	}
 
@@ -119,10 +153,13 @@ func migrateCPlay(db *mongo.Database) {
 
 func migrateServedUsers(db *mongo.Database) {
 	coll := db.Collection("tgusersdb")
+
 	ctx, cancel := mongoCtx()
 	defer cancel()
 
-	cursor, err := coll.Find(ctx, bson.M{"user_id": bson.M{"$gt": 0}})
+	opts := options.Find().SetBatchSize(500)
+
+	cursor, err := coll.Find(ctx, bson.M{"user_id": bson.M{"$gt": 0}}, opts)
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
 			logger.ErrorF("Failed to query old tgusersdb collection: %v", err)
@@ -131,18 +168,40 @@ func migrateServedUsers(db *mongo.Database) {
 	}
 	defer cursor.Close(ctx)
 
+	var users []int64
+
 	for cursor.Next(ctx) {
 		var old oldServedUser
+
 		if err := cursor.Decode(&old); err != nil {
 			logger.ErrorF("Failed to decode old user document: %v", err)
 			continue
 		}
-		if err := AddServed(old.UserID, true); err != nil {
-			logger.ErrorF(
-				"Failed to migrate served user %d: %v",
-				old.UserID,
-				err,
-			)
+
+		users = append(users, old.UserID)
+	}
+
+	if err := cursor.Err(); err != nil {
+		logger.ErrorF("Cursor error while migrating served users: %v", err)
+		return
+	}
+
+	if len(users) > 0 {
+		_, err := settingsColl.UpdateOne(
+			ctx,
+			bson.M{"_id": "global"},
+			bson.M{
+				"$addToSet": bson.M{
+					"served.users": bson.M{
+						"$each": users,
+					},
+				},
+			},
+			upsertOpt,
+		)
+		if err != nil {
+			logger.ErrorF("Bulk migration for served users failed: %v", err)
+			return
 		}
 	}
 
@@ -155,10 +214,13 @@ func migrateServedUsers(db *mongo.Database) {
 
 func migrateServedChats(db *mongo.Database) {
 	coll := db.Collection("chats")
+
 	ctx, cancel := mongoCtx()
 	defer cancel()
 
-	cursor, err := coll.Find(ctx, bson.M{"chat_id": bson.M{"$lt": 0}})
+	opts := options.Find().SetBatchSize(500)
+
+	cursor, err := coll.Find(ctx, bson.M{"chat_id": bson.M{"$lt": 0}}, opts)
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
 			logger.ErrorF("Failed to query old chats collection: %v", err)
@@ -167,18 +229,40 @@ func migrateServedChats(db *mongo.Database) {
 	}
 	defer cursor.Close(ctx)
 
+	var chats []int64
+
 	for cursor.Next(ctx) {
 		var old oldServedChat
+
 		if err := cursor.Decode(&old); err != nil {
 			logger.ErrorF("Failed to decode old chat document: %v", err)
 			continue
 		}
-		if err := AddServed(old.ChatID, false); err != nil {
-			logger.ErrorF(
-				"Failed to migrate served chat %d: %v",
-				old.ChatID,
-				err,
-			)
+
+		chats = append(chats, old.ChatID)
+	}
+
+	if err := cursor.Err(); err != nil {
+		logger.ErrorF("Cursor error while migrating served chats: %v", err)
+		return
+	}
+
+	if len(chats) > 0 {
+		_, err := settingsColl.UpdateOne(
+			ctx,
+			bson.M{"_id": "global"},
+			bson.M{
+				"$addToSet": bson.M{
+					"served.chats": bson.M{
+						"$each": chats,
+					},
+				},
+			},
+			upsertOpt,
+		)
+		if err != nil {
+			logger.ErrorF("Bulk migration for served chats failed: %v", err)
+			return
 		}
 	}
 
@@ -191,6 +275,7 @@ func migrateServedChats(db *mongo.Database) {
 
 func migrateSudoers(db *mongo.Database) {
 	coll := db.Collection("sudoers")
+
 	ctx, cancel := mongoCtx()
 	defer cancel()
 
@@ -203,9 +288,22 @@ func migrateSudoers(db *mongo.Database) {
 		return
 	}
 
-	for _, sudoerID := range doc.Sudoers {
-		if err := AddSudo(sudoerID); err != nil {
-			logger.ErrorF("Failed to migrate sudoer %d: %v", sudoerID, err)
+	if len(doc.Sudoers) > 0 {
+		_, err := settingsColl.UpdateOne(
+			ctx,
+			bson.M{"_id": "global"},
+			bson.M{
+				"$addToSet": bson.M{
+					"sudoers": bson.M{
+						"$each": doc.Sudoers,
+					},
+				},
+			},
+			upsertOpt,
+		)
+		if err != nil {
+			logger.ErrorF("Bulk migration for sudoers failed: %v", err)
+			return
 		}
 	}
 

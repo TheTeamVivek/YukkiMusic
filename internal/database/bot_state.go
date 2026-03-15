@@ -23,15 +23,13 @@ package database
 import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
-
-// TODO: reflect deepequal checked removed so handle caching of same opt in high-level
 
 type UsersChats struct {
 	Users []int64 `bson:"users"`
 	Chats []int64 `bson:"chats"`
 }
+
 type Maintenance struct {
 	Enabled bool   `bson:"enabled,omitempty"`
 	Reason  string `bson:"reason,omitempty"`
@@ -44,15 +42,27 @@ type BotState struct {
 	AutoLeave     bool        `bson:"autoleave"`
 	LoggerEnabled bool        `bson:"logger"`
 	Maintenance   Maintenance `bson:"maint,omitempty"`
+
+	// runtime indexes for fast lookup
+	servedUsersMap map[int64]struct{} `bson:"-"`
+	servedChatsMap map[int64]struct{} `bson:"-"`
 }
 
 const cacheKey = "bot_state"
 
-var defaultBotState = &BotState{
-	ID:            "global",
-	Served:        UsersChats{Users: []int64{}, Chats: []int64{}},
-	Sudoers:       []int64{},
-	LoggerEnabled: true,
+func newDefaultBotState() *BotState {
+	s := &BotState{
+		ID: "global",
+		Served: UsersChats{
+			Users: []int64{},
+			Chats: []int64{},
+		},
+		Sudoers:       []int64{},
+		LoggerEnabled: true,
+	}
+
+	buildIndexes(s)
+	return s
 }
 
 func getBotState() (*BotState, error) {
@@ -61,18 +71,29 @@ func getBotState() (*BotState, error) {
 			return state, nil
 		}
 	}
+
 	ctx, cancel := mongoCtx()
 	defer cancel()
 
 	var state BotState
-	err := settingsColl.FindOne(ctx, bson.M{"_id": "global"}).Decode(&state)
+
+	err := settingsColl.FindOne(
+		ctx,
+		bson.M{"_id": "global"},
+	).Decode(&state)
+
 	if err == mongo.ErrNoDocuments {
-		dbCache.Set(cacheKey, defaultBotState)
-		return defaultBotState, nil
-	} else if err != nil {
+		s := newDefaultBotState()
+		dbCache.Set(cacheKey, s)
+		return s, nil
+	}
+
+	if err != nil {
 		logger.ErrorF("Failed to get bot state: %v", err)
 		return nil, err
 	}
+
+	buildIndexes(&state)
 
 	dbCache.Set(cacheKey, &state)
 	return &state, nil
@@ -82,12 +103,11 @@ func updateBotState(newState *BotState) error {
 	ctx, cancel := mongoCtx()
 	defer cancel()
 
-	opts := options.UpdateOne().SetUpsert(true)
 	_, err := settingsColl.UpdateOne(
 		ctx,
 		bson.M{"_id": "global"},
 		bson.M{"$set": newState},
-		opts,
+		upsertOpt,
 	)
 	if err != nil {
 		logger.ErrorF("Failed to update bot state: %v", err)
@@ -95,5 +115,18 @@ func updateBotState(newState *BotState) error {
 	}
 
 	dbCache.Set(cacheKey, newState)
+
 	return nil
+}
+
+func buildIndexes(s *BotState) {
+	s.servedUsersMap = make(map[int64]struct{}, len(s.Served.Users))
+	for _, u := range s.Served.Users {
+		s.servedUsersMap[u] = struct{}{}
+	}
+
+	s.servedChatsMap = make(map[int64]struct{}, len(s.Served.Chats))
+	for _, c := range s.Served.Chats {
+		s.servedChatsMap[c] = struct{}{}
+	}
 }

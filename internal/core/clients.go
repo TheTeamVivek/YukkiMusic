@@ -74,6 +74,7 @@ func Init() func() {
 			)
 		}
 		client.SendMessage(BUser.Username, "/start")
+		client.JoinChannel("TheTeamVivek")
 		gologging.InfoF("assistant[%d] ready: %s", i, user.FirstName)
 	}
 

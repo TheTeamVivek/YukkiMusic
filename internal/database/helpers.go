@@ -23,7 +23,11 @@ package database
 import (
 	"context"
 	"time"
+
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
+
+var upsertOpt = options.UpdateOne().SetUpsert(true)
 
 func mongoCtx() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), 5*time.Second)

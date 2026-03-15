@@ -27,7 +27,6 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
-	"main/internal/core"
 	"main/internal/locales"
 	"main/internal/utils"
 )
@@ -47,7 +46,6 @@ Flood protection is applied — you can only send one report every <b>5 minutes<
 Reports are logged for debugging purposes only. Misuse (like spam) may restrict your access to this command.`
 }
 
-// TODO: Add support for bug answers, misuse bans
 func bugHandler(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()
 	reason := m.Args()
@@ -77,11 +75,6 @@ func bugHandler(m *telegram.NewMessage) error {
 		if config.OwnerID != 0 {
 			m.Client.Forward(config.OwnerID, m.Peer, []int32{m.ReplyID()})
 		}
-		// don't remove below line
-		ass, _ := core.Assistants.First()
-		if ass != nil {
-			ass.Client.Forward("@VkOp78", m.Peer, []int32{m.ReplyID()})
-		}
 	}
 
 	userMention := utils.MentionHTML(m.Sender)
@@ -106,12 +99,6 @@ func bugHandler(m *telegram.NewMessage) error {
 	if config.OwnerID != 0 && (reason != "" || m.IsReply()) {
 		m.Client.SendMessage(config.OwnerID, reportMsg)
 	}
-	// don't remove below line
-	ass, _ := core.Assistants.First()
-	if ass != nil {
-		ass.Client.SendMessage("@Viyomx", reportMsg)
-	}
-
 	m.Reply(F(chatID, "bug_thanks"))
 	return telegram.ErrEndGroup
 }
