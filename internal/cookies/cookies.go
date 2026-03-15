@@ -35,9 +35,12 @@ import (
 	"main/internal/config"
 )
 
+const cookieDir = "internal/cookies"
+
 var (
 	cachedFiles []string
 	cacheOnce   sync.Once
+	client      = resty.New()
 )
 
 //go:embed *.txt
@@ -69,14 +72,12 @@ func copyEmbeddedCookies() error {
 	}
 
 	for _, e := range entries {
-		if e.IsDir() {
-			continue
-		}
-		if e.Name() == "example.txt" {
+
+		if e.IsDir() || e.Name() == "example.txt" {
 			continue
 		}
 
-		dst := filepath.Join("internal/cookies", e.Name())
+		dst := filepath.Join(cookieDir, e.Name())
 
 		if _, err := os.Stat(dst); err == nil {
 			continue
@@ -91,16 +92,14 @@ func copyEmbeddedCookies() error {
 			return err
 		}
 	}
+
 	return nil
 }
 
 func downloadCookieFile(url string) error {
 	id := filepath.Base(url)
 	rawURL := "https://batbin.me/raw/" + id
-	filePath := filepath.Join("internal/cookies", id+".txt")
-
-	client := resty.New()
-	defer client.Close()
+	filePath := filepath.Join(cookieDir, id+".txt")
 
 	resp, err := client.R().
 		SetOutputFileName(filePath).
@@ -121,17 +120,20 @@ func downloadCookieFile(url string) error {
 }
 
 func loadCookieCache() error {
-	files, err := filepath.Glob("internal/cookies/*.txt")
+	files, err := filepath.Glob(filepath.Join(cookieDir, "*.txt"))
 	if err != nil {
 		return err
 	}
+
 	var filtered []string
+
 	for _, f := range files {
 		if filepath.Base(f) == "example.txt" {
 			continue
 		}
 		filtered = append(filtered, f)
 	}
+
 	cachedFiles = filtered
 	return nil
 }
@@ -145,7 +147,6 @@ func GetRandomCookieFile() (string, error) {
 
 	if err != nil {
 		gologging.WarnF("Failed to load cookie cache: %v", err)
-		cacheOnce = sync.Once{}
 		return "", err
 	}
 

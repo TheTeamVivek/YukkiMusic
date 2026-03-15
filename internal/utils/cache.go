@@ -27,53 +27,60 @@ import (
 
 type CacheItem[V any] struct {
 	Value      V
-	Expiration int64
+	Expiration time.Time
 }
 
 func (i CacheItem[V]) Expired() bool {
-	return i.Expiration > 0 && time.Now().UnixMilli() > i.Expiration
+	return !i.Expiration.IsZero() && time.Now().After(i.Expiration)
 }
 
 type Cache[K comparable, V any] struct {
 	mu         sync.RWMutex
 	items      map[K]CacheItem[V]
-	defaultTTL int64
+	defaultTTL time.Duration
 }
 
 func NewCache[K comparable, V any](defaultTTL time.Duration) *Cache[K, V] {
 	return &Cache[K, V]{
 		items:      make(map[K]CacheItem[V]),
-		defaultTTL: defaultTTL.Milliseconds(),
+		defaultTTL: defaultTTL,
 	}
 }
 
-func (c *Cache[K, V]) Set(key K, value V, ttl ...time.Duration) {
-	var exp int64
-	now := time.Now().UnixMilli()
+func (c *Cache[K, V]) Set(key K, value V) {
+	var exp time.Time
 
-	if len(ttl) > 0 && ttl[0] > 0 {
-		exp = now + ttl[0].Milliseconds()
-	} else if c.defaultTTL > 0 {
-		exp = now + c.defaultTTL
+	if c.defaultTTL > 0 {
+		exp = time.Now().Add(c.defaultTTL)
 	}
 
 	c.mu.Lock()
-	c.items[key] = CacheItem[V]{Value: value, Expiration: exp}
+	c.items[key] = CacheItem[V]{
+		Value:      value,
+		Expiration: exp,
+	}
 	c.mu.Unlock()
 }
 
 func (c *Cache[K, V]) Get(key K) (V, bool) {
-	c.mu.Lock()
+	c.mu.RLock()
 	item, ok := c.items[key]
-	if !ok || item.Expired() {
-		if ok {
-			delete(c.items, key)
-		}
-		c.mu.Unlock()
+	c.mu.RUnlock()
+
+	if !ok {
 		var zero V
 		return zero, false
 	}
-	c.mu.Unlock()
+
+	if item.Expired() {
+		c.mu.Lock()
+		delete(c.items, key)
+		c.mu.Unlock()
+
+		var zero V
+		return zero, false
+	}
+
 	return item.Value, true
 }
 

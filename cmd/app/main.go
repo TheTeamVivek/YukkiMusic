@@ -34,6 +34,8 @@ package main
 import "C"
 
 import (
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 
 	"github.com/Laky-64/gologging"
@@ -41,6 +43,7 @@ import (
 	"main/internal/config"
 	"main/internal/core"
 	"main/internal/database"
+	"main/internal/locales"
 	"main/internal/modules"
 	"main/internal/platforms"
 )
@@ -51,19 +54,26 @@ func main() {
 	defer platforms.Close()
 
 	checkFFmpegAndFFprobe()
-	refreshDirs()
 
-	gologging.Debug("🔹 Initializing MongoDB...")
+	if err := refreshDirs(); err != nil {
+		gologging.Fatal("Failed to refresh directories: " + err.Error())
+	}
 
-	dbCleanup := database.Init(config.MongoURI)
-	defer dbCleanup()
+	gologging.Debug("Initializing MongoDB...")
 
-	gologging.Info("✅ Database connected successfully")
+	closeDB := database.Init(config.MongoURI)
+	defer closeDB()
 
-	gologging.Debug("🔹 Initializing clients...")
+	gologging.Info("Database connected successfully")
 
-	cleanup := core.Init()
-	defer cleanup()
+	if err := locales.Load(); err != nil {
+		gologging.Fatal("Failed to load locales: " + err.Error())
+	}
+
+	gologging.Debug("Initializing clients...")
+
+	shutdownCore := core.Init()
+	defer shutdownCore()
 
 	core.GetAssistantIndexFunc = database.GetAssistantIndex
 	core.F = modules.F
@@ -73,7 +83,20 @@ func main() {
 	}
 
 	modules.Init(core.Bot, core.Assistants)
+
+	startHTTPServer()
+
 	core.Bot.Idle()
+}
+
+func startHTTPServer() {
+	go func() {
+		addr := "0.0.0.0:" + config.Port
+
+		if err := http.ListenAndServe(addr, nil); err != nil {
+			gologging.Error("HTTP server error: " + err.Error())
+		}
+	}()
 }
 
 func initLogger() {
@@ -98,12 +121,15 @@ func refreshDirs() error {
 	}
 
 	for _, dir := range dirs {
+
 		if err := os.RemoveAll(dir); err != nil {
 			return err
 		}
+
 		if err := os.MkdirAll(dir, 0o755); err != nil {
 			return err
 		}
 	}
+
 	return nil
 }

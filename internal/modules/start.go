@@ -70,7 +70,7 @@ func startHandler(m *tg.NewMessage) error {
 			URL:             config.StartImage,
 			ForceLargeMedia: true,
 		}, &tg.MediaOptions{
-			Caption: caption,
+			Caption:     caption,
 			NoForwards:  true,
 			ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
 		})

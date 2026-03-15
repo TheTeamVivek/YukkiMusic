@@ -84,6 +84,10 @@ var (
 		"PING_IMG_URL",
 		"https://telegra.ph/file/91533956c91d0fd7c9f20.jpg",
 	)
+	Port = getString(
+		"PORT",
+		"8000",
+	)
 
 	LogFileName = "logs.txt"
 	LogWriter   io.Writer
@@ -128,9 +132,6 @@ func validateRequired() {
 
 	if MongoURI == "" {
 		logger.Fatal("MONGO_DB_URI is required but missing!")
-	}
-	if len(StringSessions) == 0 {
-		gologging.Fatal("No STRING_SESSIONS provided for assistant client.")
 	}
 }
 
