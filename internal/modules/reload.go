@@ -160,7 +160,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 	} else if banned {
 		summary += F(chatID, "reload_assistant_banned") + "\n"
 	} else {
-		present, assErr2 := cs.IsAssistantPresent()
+		present, assErr2 := cs.IsAssistantPresent(false)
 		if assErr2 != nil {
 			switch {
 			case errors.Is(assErr2, core.ErrAdminPermissionRequired):

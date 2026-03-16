@@ -388,7 +388,7 @@ func fetchTracksAndCheckStatus(
 		return nil, false, err
 	}
 
-	activeVC, err := cs.IsActiveVC()
+	activeVC, err := cs.IsActiveVC(false)
 	if err != nil {
 		gologging.ErrorF("Error checking voicechat state: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
@@ -400,7 +400,7 @@ func fetchTracksAndCheckStatus(
 		return nil, false, fmt.Errorf("no active voice chat")
 	}
 
-	banned, err := cs.IsAssistantBanned()
+	banned, err := cs.IsAssistantBanned(false)
 	if err != nil {
 		gologging.ErrorF("Error checking assistant banned state: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
@@ -417,7 +417,7 @@ func fetchTracksAndCheckStatus(
 		return nil, false, fmt.Errorf("assistant banned")
 	}
 
-	present, err := cs.IsAssistantPresent()
+	present, err := cs.IsAssistantPresent(false)
 	if err != nil {
 		gologging.ErrorF("Error checking assistant presence: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
