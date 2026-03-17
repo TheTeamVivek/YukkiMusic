@@ -167,7 +167,7 @@ func handleChatAction(m *telegram.NewMessage) error {
 
 				m.Reply(F(chatID, "bot_added_normal"))
 
-				database.AddServed(chatID)
+				database.AddServedChat(chatID)
 
 				if config.LoggerID != 0 {
 					m.Client.SendMessage(
@@ -188,7 +188,7 @@ func handleChatAction(m *telegram.NewMessage) error {
 
 			core.DeleteRoom(chatID)
 			core.DeleteChatState(chatID)
-			database.DeleteServed(chatID)
+			database.DeleteServedChat(chatID)
 
 			if config.LoggerID != 0 {
 				m.Client.SendMessage(

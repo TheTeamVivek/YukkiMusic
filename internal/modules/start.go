@@ -37,7 +37,7 @@ func init() {
 
 func startHandler(m *tg.NewMessage) error {
 	if m.ChatType() != tg.EntityUser {
-		database.AddServed(m.ChannelID())
+		database.AddServedChat(m.ChannelID())
 		m.Reply(
 			F(m.ChannelID(), "start_group"),
 		)
@@ -45,7 +45,7 @@ func startHandler(m *tg.NewMessage) error {
 	}
 
 	arg := m.Args()
-	database.AddServed(m.ChannelID(), true)
+	database.AddServedUser(m.ChannelID())
 
 	if arg != "" {
 		gologging.Info(

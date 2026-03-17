@@ -169,8 +169,8 @@ func getServerStats(chatID int64) string {
 func getServedStats(chatID int64) string {
 	var sb strings.Builder
 
-	servedChats, err1 := database.GetServed()
-	servedUsers, err2 := database.GetServed(true)
+	servedChats, err1 := database.GetServedChats()
+	servedUsers, err2 := database.GetServedUsers()
 
 	sb.WriteString(F(chatID, "stats_served_header") + "\n")
 

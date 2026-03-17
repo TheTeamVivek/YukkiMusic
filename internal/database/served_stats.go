@@ -21,50 +21,51 @@
 
 package database
 
-func GetServed(user ...bool) ([]int64, error) {
+import "slices"
+
+// GetServedChats returns all chats that have used the bot.
+func GetServedChats() ([]int64, error) {
 	state, err := getBotState()
 	if err != nil {
 		return nil, err
 	}
-
-	if len(user) > 0 && user[0] {
-		return state.Served.Users, nil
-	}
-
 	return state.Served.Chats, nil
 }
 
-func IsServed(id int64, user ...bool) (bool, error) {
+// GetServedUsers returns all users that have used the bot in private.
+func GetServedUsers() ([]int64, error) {
+	state, err := getBotState()
+	if err != nil {
+		return nil, err
+	}
+	return state.Served.Users, nil
+}
+
+// IsServedChat checks if the chat is already in the served list.
+func IsServedChat(id int64) (bool, error) {
 	state, err := getBotState()
 	if err != nil {
 		return false, err
 	}
-
-	if len(user) > 0 && user[0] {
-		_, ok := state.servedUsersMap[id]
-		return ok, nil
-	}
-
 	_, ok := state.servedChatsMap[id]
 	return ok, nil
 }
 
-func AddServed(id int64, user ...bool) error {
+// IsServedUser checks if the user is already in the served list.
+func IsServedUser(id int64) (bool, error) {
+	state, err := getBotState()
+	if err != nil {
+		return false, err
+	}
+	_, ok := state.servedUsersMap[id]
+	return ok, nil
+}
+
+// AddServedChat adds a chat to the served list.
+func AddServedChat(id int64) error {
 	state, err := getBotState()
 	if err != nil {
 		return err
-	}
-
-	if len(user) > 0 && user[0] {
-
-		if _, ok := state.servedUsersMap[id]; ok {
-			return nil
-		}
-
-		state.Served.Users = append(state.Served.Users, id)
-		state.servedUsersMap[id] = struct{}{}
-
-		return updateBotState(state)
 	}
 
 	if _, ok := state.servedChatsMap[id]; ok {
@@ -77,29 +78,28 @@ func AddServed(id int64, user ...bool) error {
 	return updateBotState(state)
 }
 
-func DeleteServed(id int64, user ...bool) error {
+// AddServedUser adds a user to the served list.
+func AddServedUser(id int64) error {
 	state, err := getBotState()
 	if err != nil {
 		return err
 	}
 
-	if len(user) > 0 && user[0] {
+	if _, ok := state.servedUsersMap[id]; ok {
+		return nil
+	}
 
-		if _, ok := state.servedUsersMap[id]; !ok {
-			return nil
-		}
+	state.Served.Users = append(state.Served.Users, id)
+	state.servedUsersMap[id] = struct{}{}
 
-		delete(state.servedUsersMap, id)
+	return updateBotState(state)
+}
 
-		newSlice := make([]int64, 0, len(state.Served.Users))
-		for _, v := range state.Served.Users {
-			if v != id {
-				newSlice = append(newSlice, v)
-			}
-		}
-
-		state.Served.Users = newSlice
-		return updateBotState(state)
+// DeleteServedChat removes a chat from the served list.
+func DeleteServedChat(id int64) error {
+	state, err := getBotState()
+	if err != nil {
+		return err
 	}
 
 	if _, ok := state.servedChatsMap[id]; !ok {
@@ -107,15 +107,28 @@ func DeleteServed(id int64, user ...bool) error {
 	}
 
 	delete(state.servedChatsMap, id)
+	state.Served.Chats = slices.DeleteFunc(state.Served.Chats, func(v int64) bool {
+		return v == id
+	})
 
-	newSlice := make([]int64, 0, len(state.Served.Chats))
-	for _, v := range state.Served.Chats {
-		if v != id {
-			newSlice = append(newSlice, v)
-		}
+	return updateBotState(state)
+}
+
+// DeleteServedUser removes a user from the served list.
+func DeleteServedUser(id int64) error {
+	state, err := getBotState()
+	if err != nil {
+		return err
 	}
 
-	state.Served.Chats = newSlice
+	if _, ok := state.servedUsersMap[id]; !ok {
+		return nil
+	}
+
+	delete(state.servedUsersMap, id)
+	state.Served.Users = slices.DeleteFunc(state.Served.Users, func(v int64) bool {
+		return v == id
+	})
 
 	return updateBotState(state)
 }

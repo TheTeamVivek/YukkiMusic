@@ -198,19 +198,19 @@ sudoers, err := database.GetSudoers()
 
 ```go
 // Get all served users
-users, err := database.GetServed(true)  // true = get users
+users, err := database.GetServedUsers()
 
 // Get all served chats
-chats, err := database.GetServed()      // false = get chats
+chats, err := database.GetServedChats()
 
 // Check if served
-isServed, err := database.IsServed(userID, true)
+isServed, err := database.IsServedUser(userID)
 
 // Mark as served
-err := database.AddServed(userID, true)
+err := database.AddServedUser(userID)
 
 // Remove from served
-err := database.DeleteServed(userID, true)
+err := database.DeleteServedUser(userID)
 ```
 
 ### Auth Users
@@ -613,8 +613,8 @@ lang, _ := database.GetChatLanguage(chatID)
 database.SetChatLanguage(chatID, "hi")
 
 // Served tracking
-database.AddServed(userID, true)  // Mark user
-database.AddServed(chatID)        // Mark chat
+database.AddServedUser(userID)  // Mark user
+database.AddServedChat(chatID)  // Mark chat
 
 // Maintenance
 database.SetMaintenance(true, "reason")

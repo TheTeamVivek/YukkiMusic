@@ -49,11 +49,11 @@ func filterSuperGroup(m *tg.NewMessage) bool {
 	case tg.EntityChat:
 		// EntityChat can be basic group or supergroup — allow only supergroup
 		if m.Channel != nil && !m.Channel.Broadcast {
-			database.AddServed(m.ChannelID())
+			database.AddServedChat(m.ChannelID())
 			return true // Supergroup
 		}
 		warnAndLeave(m.Client, m.ChannelID()) // Basic group → leave
-		database.DeleteServed(m.ChannelID())
+		database.DeleteServedChat(m.ChannelID())
 		return false
 
 	case tg.EntityChannel:
@@ -61,7 +61,7 @@ func filterSuperGroup(m *tg.NewMessage) bool {
 
 	case tg.EntityUser:
 		m.Reply(F(m.ChannelID(), "only_supergroup"))
-		database.AddServed(m.ChannelID(), true)
+		database.AddServedUser(m.ChannelID())
 		return false // Private chat → warn
 	}
 

@@ -79,9 +79,9 @@ func formatUptime(d time.Duration) string {
 func pingHandler(m *tg.NewMessage) error {
 	if m.IsPrivate() {
 		m.Delete()
-		database.AddServed(m.ChannelID(), true)
+		database.AddServedUser(m.ChannelID())
 	} else {
-		database.AddServed(m.ChannelID())
+		database.AddServedChat(m.ChannelID())
 	}
 
 	start := time.Now()
