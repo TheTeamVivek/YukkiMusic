@@ -94,7 +94,7 @@ func streamEndHandler(
 		gologging.ErrorF("Failed to get Assistant for %d: %v", chatID, err)
 		return
 	}
-	r, ok := core.GetRoom(chatID, ass)
+	r, ok := core.GetRoom(chatID, ass, false)
 	if !ok {
 		return
 	}
@@ -114,7 +114,7 @@ func streamEndHandler(
 	var t *state.Track
 	var wasLooping bool
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
-		if r.Autoplay() {
+		if r.IsAutoplayEnabled() {
 			gologging.DebugF(
 				"[onStreamEndHandler] AutoPlay is ON for chat %d",
 				chatID,
@@ -188,14 +188,14 @@ func streamEndHandler(
 		t = r.NextTrack()
 	}
 
-	statusMsg := F(cid, "stream_downloading_next")
+	statusText := F(cid, "stream_downloading_next")
 	if wasLooping && t != nil && r.FilePath() != "" {
-		statusMsg = F(cid, "cb_replaying")
+		statusText = F(cid, "cb_replaying")
 	}
 
-	mystic, err := core.Bot.SendMessage(
+	statusMsg, err := core.Bot.SendMessage(
 		cid,
-		statusMsg,
+		statusText,
 	)
 	if err != nil {
 		gologging.ErrorF("[call.go] Failed to send msg: %v", err)
@@ -205,7 +205,7 @@ func streamEndHandler(
 	if wasLooping && t != nil && r.FilePath() != "" {
 		filePath = r.FilePath()
 	} else {
-		filePath, err = platforms.Download(context.Background(), t, mystic)
+		filePath, err = platforms.Download(context.Background(), t, statusMsg)
 	}
 
 	if err != nil {
@@ -214,7 +214,7 @@ func streamEndHandler(
 			t.URL,
 			err,
 		)
-		utils.EOR(mystic, F(cid, "stream_download_fail", locales.Arg{
+		utils.EOR(statusMsg, F(cid, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
 		}))
 		core.DeleteRoom(chatID)
@@ -228,7 +228,7 @@ func streamEndHandler(
 			t.URL,
 			err,
 		)
-		utils.EOR(mystic, F(cid, "stream_play_fail"))
+		utils.EOR(statusMsg, F(cid, "stream_play_fail"))
 		core.DeleteRoom(chatID)
 
 		return
@@ -253,6 +253,6 @@ func streamEndHandler(
 		opt.Media = utils.CleanURL(t.Artwork)
 	}
 
-	mystic, _ = utils.EOR(mystic, msgText, opt)
-	r.SetMystic(mystic)
+	statusMsg, _ = utils.EOR(statusMsg, msgText, opt)
+	r.SetStatusMsg(statusMsg)
 }

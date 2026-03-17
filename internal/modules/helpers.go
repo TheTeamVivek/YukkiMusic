@@ -59,7 +59,7 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	r, _ := core.GetRoom(chatID, ass, true)
 
 	if cplay {
-		r.SetCplayID(m.ChannelID())
+		r.SetChannelPlayID(m.ChannelID())
 	}
 	return r, nil
 }
@@ -251,7 +251,7 @@ func SafeMessageHandler(
 
 			if !isOwner && !isSudo {
 				if m.ChatType() == tg.EntityUser ||
-					strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
+					strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
 					reason, _ := database.GetMaintReason()
 					msg := F(m.ChannelID(), "maint", locales.Arg{
 						"reason": F(m.ChannelID(), "maint_reason", locales.Arg{"reason": reason}),

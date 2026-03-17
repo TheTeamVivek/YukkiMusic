@@ -97,7 +97,7 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 		newStatus != "administrator" &&
 		newStatus != "creator":
 
-		if userID == core.BUser.ID && config.LeaveOnDemoted {
+		if userID == p.Client.Me().ID && config.LeaveOnDemoted {
 
 			core.DeleteRoom(chatID)
 			core.DeleteChatState(chatID)
@@ -120,7 +120,7 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 		handleSudoJoin(p, chatID)
 	}
 
-	if state != nil && userID == state.Assistant.User.ID {
+	if state != nil && userID == state.Assistant.Self.ID {
 
 		if p.IsJoined() {
 			state.SetAssistantPresent(true)
@@ -217,7 +217,7 @@ func handleSudoJoin(p *telegram.ParticipantUpdate, chatID int64) {
 
 	text := F(chatID, msgKey, locales.Arg{
 		"user": utils.MentionHTML(p.User),
-		"bot":  utils.MentionHTML(core.BUser),
+		"bot":  utils.MentionHTML(p.Client.Me()),
 	})
 
 	p.Client.SendMessage(chatID, text)
@@ -251,8 +251,8 @@ func handleAssistantRestriction(
 		s.SetAssistantBanned(true)
 
 		msg := F(chatID, "assistant_restricted_warning", locales.Arg{
-			"assistant": utils.MentionHTML(s.Assistant.User),
-			"id":        s.Assistant.User.ID,
+			"assistant": utils.MentionHTML(s.Assistant.Self),
+			"id":        s.Assistant.Self.ID,
 		})
 
 		p.Client.SendMessage(chatID, msg)

@@ -131,7 +131,7 @@ func (d *DirectStreamPlatform) GetTracks(
 func (d *DirectStreamPlatform) Download(
 	ctx context.Context,
 	track *state.Track,
-	mystic *telegram.NewMessage,
+	statusMsg *telegram.NewMessage,
 ) (string, error) {
 	// For direct streams, we don't download - just return the URL
 	// The streaming system will handle it directly

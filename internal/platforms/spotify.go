@@ -146,7 +146,7 @@ func (s *SpotifyPlatform) CanDownload(source state.PlatformName) bool {
 func (s *SpotifyPlatform) Download(
 	ctx context.Context,
 	track *state.Track,
-	mystic *telegram.NewMessage,
+	statusMsg *telegram.NewMessage,
 ) (string, error) {
 	clean := cleanTitle(track.Title)
 	trimmed := trimTitleLen(clean, 25, 40)
@@ -201,7 +201,7 @@ func (s *SpotifyPlatform) Download(
 
 	for _, p := range GetOrderedPlatforms() {
 		if p.CanDownload(PlatformYouTube) {
-			path, err := p.Download(ctx, ytTrack, mystic)
+			path, err := p.Download(ctx, ytTrack, statusMsg)
 			if err == nil {
 				gologging.InfoF(
 					"Downloaded Spotify track '%s' from YouTube: %s",

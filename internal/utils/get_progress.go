@@ -27,15 +27,15 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 )
 
-func GetProgress(mystic *telegram.NewMessage) *telegram.ProgressManager {
+func GetProgress(statusMsg *telegram.NewMessage) *telegram.ProgressManager {
 	pm := telegram.NewProgressManager(2)
 
-	if mystic == nil {
+	if statusMsg == nil {
 		return pm
 	}
 
 	var opts *telegram.SendOptions
-	if replyMarkup := mystic.ReplyMarkup(); replyMarkup != nil {
+	if replyMarkup := statusMsg.ReplyMarkup(); replyMarkup != nil {
 		opts = &telegram.SendOptions{ReplyMarkup: *replyMarkup}
 	}
 
@@ -53,7 +53,7 @@ func GetProgress(mystic *telegram.NewMessage) *telegram.ProgressManager {
 			pi.ETAString(),
 			pi.ElapsedString(),
 		)
-		mystic.Edit(text, opts)
+		statusMsg.Edit(text, opts)
 	})
 
 	return pm

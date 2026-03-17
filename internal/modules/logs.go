@@ -163,7 +163,7 @@ func sendLogFile(
 	info os.FileInfo,
 	chatID int64,
 ) error {
-	mystic, _ := m.Reply(F(chatID, "logs_uploading"))
+	statusMsg, _ := m.Reply(F(chatID, "logs_uploading"))
 
 	fileSizeMB := float64(info.Size()) / 1024 / 1024
 	caption := F(chatID, "logs_file_caption", locales.Arg{
@@ -176,8 +176,8 @@ func sendLogFile(
 		Caption: caption,
 	})
 
-	if mystic != nil {
-		mystic.Delete()
+	if statusMsg != nil {
+		statusMsg.Delete()
 	}
 
 	if err != nil {

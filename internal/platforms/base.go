@@ -285,7 +285,7 @@ ReplyCheck:
 func Download(
 	ctx context.Context,
 	track *state.Track,
-	mystic *telegram.NewMessage,
+	statusMsg *telegram.NewMessage,
 ) (string, error) {
 	var errs []string
 
@@ -294,7 +294,7 @@ func Download(
 			continue
 		}
 
-		path, err := p.Download(ctx, track, mystic)
+		path, err := p.Download(ctx, track, statusMsg)
 		if err == nil {
 			// Special case: DirectStream returns the URL itself, not a file path
 			// The streaming system will handle it

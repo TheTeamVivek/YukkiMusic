@@ -28,7 +28,6 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
-	"main/internal/core"
 	"main/internal/database"
 	"main/internal/locales"
 	"main/internal/utils"
@@ -98,7 +97,7 @@ func addAuthHandler(m *telegram.NewMessage) error {
 	}
 
 	// owner, bot, self, already auth, or admin — all treated the same
-	if userID == config.OwnerID || userID == core.BUser.ID ||
+	if userID == config.OwnerID || userID == m.Client.Me().ID ||
 		userID == m.SenderID() {
 		m.Reply(F(chatID, "cannot_authorize_user"))
 		return telegram.ErrEndGroup
@@ -218,7 +217,7 @@ func authListHandler(m *telegram.NewMessage) error {
 		return nil
 	}
 
-	mystic, err := m.Reply(F(chatID, "authlist_fetching", nil))
+	statusMsg, err := m.Reply(F(chatID, "authlist_fetching", nil))
 	if err != nil {
 		return err
 	}
@@ -252,6 +251,6 @@ func authListHandler(m *telegram.NewMessage) error {
 		"count": len(authUsers),
 	}))
 
-	utils.EOR(mystic, sb.String())
+	utils.EOR(statusMsg, sb.String())
 	return telegram.ErrEndGroup
 }

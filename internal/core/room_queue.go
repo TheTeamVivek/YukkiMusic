@@ -29,7 +29,7 @@ import (
 
 // NextTrack retrieves and prepares the next track in queue
 func (r *RoomState) NextTrack() *state.Track {
-	if r.destroyed.Load() {
+	if r.IsDestroyed() {
 		return nil
 	}
 
@@ -37,7 +37,13 @@ func (r *RoomState) NextTrack() *state.Track {
 	defer r.mu.Unlock()
 
 	if r.track != nil && r.loop > 0 {
-		return r.loopCurrentTrack()
+		r.position = 0
+		r.playing = false
+		r.paused = false
+		r.muted = false
+		r.loop--
+		r.updatedAt = time.Now().Unix()
+		return r.track
 	}
 
 	r.releaseFile()
@@ -46,50 +52,27 @@ func (r *RoomState) NextTrack() *state.Track {
 		return nil
 	}
 
-	return r.dequeueNextTrack()
-}
-
-func (r *RoomState) loopCurrentTrack() *state.Track {
-	r.position = 0
-	r.playing = false
-	r.paused = false
-	r.muted = false
-	r.loop--
-	r.updatedAt = time.Now().Unix()
-	return r.track
-}
-
-func (r *RoomState) dequeueNextTrack() *state.Track {
-	index := r.selectNextTrackIndex()
-	next := r.queue[index]
-	r.removeTrackAtIndex(index)
-	r.prepareNextTrack(next)
-	return next
-}
-
-func (r *RoomState) selectNextTrackIndex() int {
+	index := 0
 	if r.shuffle {
-		return rand.Intn(len(r.queue))
+		index = rand.Intn(len(r.queue))
 	}
-	return 0
-}
 
-func (r *RoomState) removeTrackAtIndex(index int) {
+	next := r.queue[index]
 	r.queue = append(r.queue[:index], r.queue[index+1:]...)
-}
 
-func (r *RoomState) prepareNextTrack(track *state.Track) {
-	r.track = track
+	r.track = next
 	r.position = 0
 	r.playing = false
 	r.paused = false
 	r.muted = false
 	r.updatedAt = time.Now().Unix()
+
+	return next
 }
 
 // RemoveFromQueue removes track(s) from queue
 func (r *RoomState) RemoveFromQueue(index int) {
-	if r.destroyed.Load() {
+	if r.IsDestroyed() {
 		return
 	}
 
@@ -108,27 +91,19 @@ func (r *RoomState) RemoveFromQueue(index int) {
 
 // MoveInQueue moves a track from one position to another
 func (r *RoomState) MoveInQueue(from, to int) {
-	if r.destroyed.Load() {
+	if r.IsDestroyed() {
 		return
 	}
 
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if !r.isValidMove(from, to) {
+	if from < 0 || from >= len(r.queue) ||
+		to < 0 || to >= len(r.queue) ||
+		from == to {
 		return
 	}
 
-	r.executeMoveOperation(from, to)
-}
-
-func (r *RoomState) isValidMove(from, to int) bool {
-	return from >= 0 && from < len(r.queue) &&
-		to >= 0 && to < len(r.queue) &&
-		from != to
-}
-
-func (r *RoomState) executeMoveOperation(from, to int) {
 	item := r.queue[from]
 	r.queue = append(r.queue[:from], r.queue[from+1:]...)
 
@@ -141,7 +116,7 @@ func (r *RoomState) executeMoveOperation(from, to int) {
 
 // AddTracksToQueue appends multiple tracks to the queue
 func (r *RoomState) AddTracksToQueue(tracks []*state.Track) {
-	if r.destroyed.Load() {
+	if r.IsDestroyed() {
 		return
 	}
 

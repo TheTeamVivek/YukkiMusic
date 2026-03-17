@@ -87,7 +87,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 	r.SetLoop(0)
 	t := r.NextTrack()
 
-	mystic, err := core.Bot.SendMessage(
+	statusMsg, err := core.Bot.SendMessage(
 		chatID,
 		F(chatID, "stream_downloading_next"),
 	)
@@ -95,14 +95,14 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		gologging.ErrorF("[skip.go] err: %v", err)
 	}
 
-	path, err := platforms.Download(context.Background(), t, mystic)
+	path, err := platforms.Download(context.Background(), t, statusMsg)
 	if err != nil {
 		txt := F(chatID, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
 		})
 
-		if mystic != nil {
-			utils.EOR(mystic, txt)
+		if statusMsg != nil {
+			utils.EOR(statusMsg, txt)
 		} else {
 			core.Bot.SendMessage(chatID, txt)
 		}
@@ -113,8 +113,8 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 
 	if err := r.Play(t, path, true); err != nil {
 		txt := F(chatID, "stream_play_fail")
-		if mystic != nil {
-			utils.EOR(mystic, txt)
+		if statusMsg != nil {
+			utils.EOR(statusMsg, txt)
 		} else {
 			core.Bot.SendMessage(chatID, txt)
 		}
@@ -141,15 +141,15 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		opt.Media = utils.CleanURL(t.Artwork)
 	}
 
-	var newMystic *telegram.NewMessage
-	if mystic != nil {
-		newMystic, _ = utils.EOR(mystic, msg, opt)
+	var newStatusMsg *telegram.NewMessage
+	if statusMsg != nil {
+		newStatusMsg, _ = utils.EOR(statusMsg, msg, opt)
 	} else {
-		newMystic, _ = core.Bot.SendMessage(chatID, msg, opt)
+		newStatusMsg, _ = core.Bot.SendMessage(chatID, msg, opt)
 	}
 
-	if newMystic != nil {
-		r.SetMystic(newMystic)
+	if newStatusMsg != nil {
+		r.SetStatusMsg(newStatusMsg)
 	}
 
 	return telegram.ErrEndGroup

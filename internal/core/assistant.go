@@ -33,7 +33,7 @@ import (
 type Assistant struct {
 	Index  int
 	Client *telegram.Client
-	User   *telegram.UserObj
+	Self   *telegram.UserObj
 	Ntg    *ubot.Context
 }
 

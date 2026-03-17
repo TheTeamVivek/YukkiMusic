@@ -62,7 +62,7 @@ func handleAutoplay(m *tg.NewMessage, cplay bool) error {
 
 	if len(args) == 1 {
 		action := F(chatID, "disabled")
-		if r.Autoplay() {
+		if r.IsAutoplayEnabled() {
 			action = F(chatID, "enabled")
 		}
 		m.Reply(F(chatID, "autoplay_usage", locales.Arg{

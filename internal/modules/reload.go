@@ -89,7 +89,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		return err
 	}
 
-	mystic, err := m.Reply(F(chatID, "reload_start"))
+	statusMsg, err := m.Reply(F(chatID, "reload_start"))
 	if err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		summary += F(chatID, "reload_assistant_fail", locales.Arg{
 			"error": err.Error(),
 		}) + "\n"
-		utils.EOR(mystic, F(chatID, "reload_done", locales.Arg{
+		utils.EOR(statusMsg, F(chatID, "reload_done", locales.Arg{
 			"summary": summary,
 		}))
 		return nil
@@ -183,7 +183,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		}
 	}
 
-	utils.EOR(mystic, F(chatID, "reload_done", locales.Arg{
+	utils.EOR(statusMsg, F(chatID, "reload_done", locales.Arg{
 		"summary": summary,
 	}))
 

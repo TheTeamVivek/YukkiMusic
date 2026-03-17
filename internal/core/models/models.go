@@ -70,12 +70,12 @@ type (
 		//
 		// ctx is used for cancellation and timeouts.
 		// track is the track to download.
-		// mystic used to send progress updates (if not nil).
+		// statusMsg used to send progress updates (if not nil).
 		// if your platform support video playback so return local path of video when track.Video is true
 		Download(
 			ctx context.Context,
 			track *Track,
-			mystic *telegram.NewMessage,
+			statusMsg *telegram.NewMessage,
 		) (string, error)
 
 		// CanGetTracks reports whether this platform can resolve

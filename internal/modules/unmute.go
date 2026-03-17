@@ -84,7 +84,7 @@ func handleUnmute(m *tg.NewMessage, cplay bool) error {
 
 	// optional speed line
 	var speedOpt string
-	if sp := r.GetSpeed(); sp != 1.0 {
+	if sp := r.Speed(); sp != 1.0 {
 		speedOpt = F(chatID, "speed_line", locales.Arg{
 			"speed": fmt.Sprintf("%.2f", sp),
 		})

@@ -56,14 +56,14 @@ All playback will be interrupted. Bot will be offline for a few seconds.`
 func handleRestart(m *tg.NewMessage) error {
 	chatID := m.ChannelID()
 
-	mystic, err := m.Reply(F(chatID, "restart"))
+	statusMsg, err := m.Reply(F(chatID, "restart"))
 	if err != nil {
 		gologging.Error("Failed to send restart message: " + err.Error())
 	}
 
 	exePath, err := os.Executable()
 	if err != nil {
-		utils.EOR(mystic, F(chatID, "restart_exepath_fail", locales.Arg{
+		utils.EOR(statusMsg, F(chatID, "restart_exepath_fail", locales.Arg{
 			"error": err.Error(),
 		}))
 		return tg.ErrEndGroup
@@ -71,7 +71,7 @@ func handleRestart(m *tg.NewMessage) error {
 
 	exePath, err = filepath.EvalSymlinks(exePath)
 	if err != nil {
-		utils.EOR(mystic, F(chatID, "restart_symlink_fail", locales.Arg{
+		utils.EOR(statusMsg, F(chatID, "restart_symlink_fail", locales.Arg{
 			"error": err.Error(),
 		}))
 		return tg.ErrEndGroup
@@ -80,19 +80,19 @@ func handleRestart(m *tg.NewMessage) error {
 	for chatID := range core.GetAllRooms() {
 		core.DeleteRoom(chatID)
 		m.Client.SendMessage(chatID, F(chatID, "restart_service", locales.Arg{
-			"bot": utils.MentionHTML(core.BUser),
+			"bot": utils.MentionHTML(m.Client.Me()),
 		}))
 		time.Sleep(time.Second)
 
 	}
 
-	utils.EOR(mystic, F(chatID, "restart_initiated"))
+	utils.EOR(statusMsg, F(chatID, "restart_initiated"))
 
 	_ = os.RemoveAll("downloads")
 	_ = os.RemoveAll("cache")
 
 	if err := syscall.Exec(exePath, os.Args, os.Environ()); err != nil {
-		utils.EOR(mystic, F(chatID, "restart_fail", locales.Arg{
+		utils.EOR(statusMsg, F(chatID, "restart_fail", locales.Arg{
 			"error": err.Error(),
 		}))
 	}

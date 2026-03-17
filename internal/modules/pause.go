@@ -135,7 +135,7 @@ func handlePause(m *tg.NewMessage, cplay bool) error {
 		"auto_resume_line": autoResumeLine,
 	})
 
-	if sp := r.GetSpeed(); sp != 1.0 {
+	if sp := r.Speed(); sp != 1.0 {
 		msg += "\n" + F(chatID, "speed_line", locales.Arg{
 			"speed": fmt.Sprintf("%.2f", sp),
 		})

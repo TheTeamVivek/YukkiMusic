@@ -26,7 +26,6 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
-	"main/internal/core"
 	"main/internal/database"
 	"main/internal/utils"
 )
@@ -97,7 +96,7 @@ func filterSudo(m *tg.NewMessage) bool {
 
 	if config.OwnerID == 0 || (m.SenderID() != config.OwnerID && !is) {
 		if m.IsPrivate() ||
-			strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
+			strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
 			m.Reply(F(m.ChannelID(), "only_sudo"))
 		}
 		return false
@@ -116,7 +115,7 @@ func filterChannel(m *tg.NewMessage) bool {
 func filterOwner(m *tg.NewMessage) bool {
 	if config.OwnerID == 0 || m.SenderID() != config.OwnerID {
 		if m.IsPrivate() ||
-			strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
+			strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
 			m.Reply(F(m.ChannelID(), "only_owner"))
 		}
 		return false

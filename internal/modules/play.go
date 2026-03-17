@@ -410,8 +410,8 @@ func fetchTracksAndCheckStatus(
 	if banned {
 		utils.EOR(replyMsg,
 			F(m.ChannelID(), "err_assistant_banned", locales.Arg{
-				"user": utils.MentionHTML(cs.Assistant.User),
-				"id":   utils.IntToStr(cs.Assistant.User.ID),
+				"user": utils.MentionHTML(cs.Assistant.Self),
+				"id":   utils.IntToStr(cs.Assistant.Self.ID),
 			}),
 		)
 		return nil, false, fmt.Errorf("assistant banned")
@@ -616,7 +616,7 @@ func playTracksAndRespond(
 		})
 
 		replyMsg, _ = utils.EOR(replyMsg, nowPlayingText, opt)
-		r.SetMystic(replyMsg)
+		r.SetStatusMsg(replyMsg)
 
 		if len(tracks) > 1 {
 			addedCount := len(tracks) - 1
@@ -687,7 +687,7 @@ func playTrackWithRetry(
 ) error {
 	for attempt := 1; attempt <= playMaxRetries; attempt++ {
 
-		if r.Destroyed() {
+		if r.IsDestroyed() {
 			gologging.Info("Room destroyed during retry, aborting")
 			replyMsg.Delete()
 			return tg.ErrEndGroup

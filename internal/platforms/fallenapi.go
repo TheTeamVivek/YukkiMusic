@@ -85,7 +85,7 @@ func (f *FallenApiPlatform) CanDownload(
 func (f *FallenApiPlatform) Download(
 	ctx context.Context,
 	track *state.Track,
-	mystic *telegram.NewMessage,
+	statusMsg *telegram.NewMessage,
 ) (string, error) {
 	// fallen api didn't support video downloads so disable it
 	track.Video = false
@@ -96,8 +96,8 @@ func (f *FallenApiPlatform) Download(
 	}
 
 	var pm *telegram.ProgressManager
-	if mystic != nil {
-		pm = utils.GetProgress(mystic)
+	if statusMsg != nil {
+		pm = utils.GetProgress(statusMsg)
 	}
 
 	dlURL, err := f.getDownloadURL(ctx, track.URL)

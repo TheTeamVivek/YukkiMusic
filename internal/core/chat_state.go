@@ -192,7 +192,7 @@ func (s *ChatState) IsActiveVC(force bool) (bool, error) {
 }
 
 func (s *ChatState) RefreshAssistantState() error {
-	member, err := Bot.GetChatMember(s.ChatID, s.Assistant.User.ID)
+	member, err := Bot.GetChatMember(s.ChatID, s.Assistant.Self.ID)
 	if err != nil {
 		return s.handleMemberFetchError(err)
 	}
@@ -354,7 +354,7 @@ func (s *ChatState) approveJoinRequest() error {
 		return err
 	}
 
-	userPeer, err := Bot.ResolvePeer(s.Assistant.User.ID)
+	userPeer, err := Bot.ResolvePeer(s.Assistant.Self.ID)
 	if err != nil {
 		return err
 	}

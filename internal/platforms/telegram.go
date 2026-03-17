@@ -204,7 +204,7 @@ func (t *TelegramPlatform) GetTracksByMessage(
 func (t *TelegramPlatform) Download(
 	ctx context.Context,
 	track *state.Track,
-	mystic *telegram.NewMessage,
+	statusMsg *telegram.NewMessage,
 ) (string, error) {
 	path := getPath(track, ".mp3")
 	if track.Video {
@@ -224,8 +224,8 @@ func (t *TelegramPlatform) Download(
 		FileName: path,
 		Ctx:      ctx,
 	}
-	if mystic != nil {
-		dOpts.ProgressManager = utils.GetProgress(mystic)
+	if statusMsg != nil {
+		dOpts.ProgressManager = utils.GetProgress(statusMsg)
 	}
 	var err error
 

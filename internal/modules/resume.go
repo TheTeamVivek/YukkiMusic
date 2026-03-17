@@ -85,9 +85,9 @@ func handleResume(m *telegram.NewMessage, cplay bool) error {
 		mention := utils.MentionHTML(m.Sender)
 
 		speedLine := ""
-		if sp := r.GetSpeed(); sp != 1.0 {
+		if sp := r.Speed(); sp != 1.0 {
 			speedLine = F(chatID, "speed_line", locales.Arg{
-				"speed": fmt.Sprintf("%.2f", r.GetSpeed()),
+				"speed": fmt.Sprintf("%.2f", r.Speed()),
 			})
 		}
 

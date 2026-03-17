@@ -35,8 +35,7 @@ import (
 )
 
 var (
-	Bot   *telegram.Client
-	BUser *telegram.UserObj
+	Bot *telegram.Client
 
 	Assistants            *AssistantManager
 	GetAssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // GetAssistantIndexFunc = database.GetAssistantIndex
@@ -45,7 +44,9 @@ var (
 func Init() func() {
 	gologging.Info("Starting bot client...")
 	Bot = initBotClient()
-	BUser = getSelfOrFatal(Bot, "bot")
+	if _, err := Bot.GetMe(); err != nil {
+		gologging.Fatal("❌ Failed to GetMe for bot: " + err.Error())
+	}
 
 	gologging.Info("Starting assistant clients...")
 
@@ -55,7 +56,10 @@ func Init() func() {
 		gologging.InfoF("Initializing assistant[%d]...", i)
 
 		client := initAssistantClient(sess, i)
-		user := getSelfOrFatal(client, fmt.Sprintf("assistant[%d]", i))
+		user, err := client.GetMe()
+		if err != nil {
+			gologging.Fatal(fmt.Sprintf("❌ Failed to GetMe for assistant[%d]: %v", i, err))
+		}
 		ctx := ubot.NewContext(client)
 
 		client.SetCommandPrefixes(".")
@@ -63,7 +67,7 @@ func Init() func() {
 		assistants = append(assistants, &Assistant{
 			Index:  i,
 			Client: client,
-			User:   user,
+			Self:   user,
 			Ntg:    ctx,
 		})
 
@@ -73,7 +77,7 @@ func Init() func() {
 				fmt.Sprintf("Assistant %d Started", i+1),
 			)
 		}
-		client.SendMessage(BUser.Username, "/start")
+		client.SendMessage(Bot.Me().Username, "/start")
 		client.JoinChannel("TheTeamVivek")
 		gologging.InfoF("assistant[%d] ready: %s", i, user.FirstName)
 	}
@@ -166,15 +170,6 @@ func initAssistantClient(
 	}
 
 	return client
-}
-
-func getSelfOrFatal(c *telegram.Client, label string) *telegram.UserObj {
-	me, err := c.GetMe()
-	if err != nil {
-		gologging.Fatal("❌ Failed to GetMe for " + label + ": " + err.Error())
-	}
-	gologging.Info("Logged in as " + label + ": " + me.FirstName)
-	return me
 }
 
 func decodePyrogramSessionString(

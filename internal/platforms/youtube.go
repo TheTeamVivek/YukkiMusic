@@ -166,7 +166,7 @@ func (yp *YouTubePlatform) CanDownload(source state.PlatformName) bool {
 func (yt *YouTubePlatform) Download(
 	ctx context.Context,
 	track *state.Track,
-	mystic *telegram.NewMessage,
+	statusMsg *telegram.NewMessage,
 ) (string, error) {
 	return "", errors.New("youtube platform does not support downloading")
 }

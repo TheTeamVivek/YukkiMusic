@@ -60,17 +60,17 @@ func MonitorRooms() {
 				}
 
 				r.Parse()
-				mystic := r.GetMystic()
-				if mystic == nil {
+				statusMsg := r.StatusMsg()
+				if statusMsg == nil {
 					return
 				}
 
 				markup := core.GetPlayMarkup(r.EffectiveChatID(), r, false)
 				opts := &telegram.SendOptions{
 					ReplyMarkup: markup,
-					Entities:    mystic.Message.Entities,
+					Entities:    statusMsg.Message.Entities,
 				}
-				mystic.Edit(mystic.Text(), opts)
+				statusMsg.Edit(statusMsg.Text(), opts)
 			}(chatID, room)
 		}
 	}

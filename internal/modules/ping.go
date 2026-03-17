@@ -125,7 +125,7 @@ func pingHandler(m *tg.NewMessage) error {
 
 	msg := F(m.ChannelID(), "ping_result", locales.Arg{
 		"latency":    latency,
-		"bot":        utils.MentionHTML(core.BUser),
+		"bot":        utils.MentionHTML(m.Client.Me()),
 		"uptime":     uptimeStr,
 		"ram_info":   ramInfo,
 		"cpu_usage":  cpuUsage,

@@ -40,46 +40,49 @@ var (
 	ErrRoomDestroyed = errors.New("room destroyed")
 )
 
-type Player interface {
-	Play(r *RoomState) error
-	Pause(r *RoomState) (bool, error)
-	Resume(r *RoomState) (bool, error)
-	Stop(r *RoomState) error
-	Mute(r *RoomState) (bool, error)
-	Unmute(r *RoomState) (bool, error)
-}
-
 type RoomState struct {
 	mu sync.RWMutex
 
-	fpath string         // current track file path
-	track *state.Track   // current track metadata
-	queue []*state.Track // playback queue
+	// Identity
+	chatID        int64
+	channelPlayID int64
 
-	loop     int // number of times to replay current track
-	position int // current playback position
+	// Playback State
+	filePath  string
+	track     *state.Track
+	playing   bool
+	paused    bool
+	muted     bool
+	speed     float64
+	position  int
+	updatedAt int64
+	loop      int
 
-	updatedAt int64 // last update timestamp
-	chatID    int64 // chat where audio is streamed
-	cplayID   int64 // chat for service messages ( when channelplay then it will be provided to send service msg in that chat)
+	// Queue State
+	queue   []*state.Track
+	shuffle bool
 
-	speed float64 // playback speed (0.5–4.0)
+	// Automation
+	autoplay bool
+	*scheduledTimers
 
-	shuffle bool // pick random track from queue
-	playing bool // currently playing
-	muted   bool // audio muted
-	paused  bool // playback paused
+	// Metadata & UI
+	statusMsg *telegram.NewMessage
+	Data      map[string]any
 
-	autoplay bool // autoplay recommendations
+	// Internal Components
+	Assistant *Assistant
+	destroyed atomic.Bool
+}
 
-	destroyed atomic.Bool // room destroyed flag
+type scheduledTimers struct {
+	scheduledUnmuteTimer *time.Timer
+	scheduledResumeTimer *time.Timer
+	scheduledSpeedTimer  *time.Timer
 
-	mystic *telegram.NewMessage // active telegram message
-
-	p                Player // player
-	*scheduledTimers        // playback timers
-
-	Data map[string]any
+	scheduledUnmuteUntil time.Time
+	scheduledResumeUntil time.Time
+	scheduledSpeedUntil  time.Time
 }
 
 // Room management functions
@@ -104,7 +107,8 @@ func DeleteRoom(chatID int64) bool {
 	return true
 }
 
-func GetRoom(chatID int64, ass *Assistant, create ...bool) (*RoomState, bool) {
+// GetRoom retrieves an existing room or creates a new one if requested.
+func GetRoom(chatID int64, ass *Assistant, create bool) (*RoomState, bool) {
 	roomsMu.RLock()
 	room, exists := rooms[chatID]
 	roomsMu.RUnlock()
@@ -113,7 +117,7 @@ func GetRoom(chatID int64, ass *Assistant, create ...bool) (*RoomState, bool) {
 		return room, true
 	}
 
-	if len(create) > 0 && create[0] {
+	if create {
 		return createNewRoom(chatID, ass)
 	}
 
@@ -127,13 +131,11 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 	room, exists := rooms[chatID]
 	if !exists {
 		room = &RoomState{
-			chatID: chatID,
-			queue:  []*state.Track{},
-			speed:  1.0,
-			p: &NtgPlayer{
-				Ntg: ass.Ntg,
-			},
-			Data: make(map[string]any),
+			chatID:    chatID,
+			queue:     []*state.Track{},
+			speed:     1.0,
+			Assistant: ass,
+			Data:      make(map[string]any),
 		}
 		room.destroyed.Store(false)
 		rooms[chatID] = room
@@ -171,287 +173,13 @@ func GetAllRooms() map[int64]*RoomState {
 	return out
 }
 
-// Getters
+// Helpers
 
-// EffectiveChatID returns the chat ID that should be used for sending messages.
-func (r *RoomState) EffectiveChatID() int64 {
-	if r.destroyed.Load() {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	if r.cplayID != 0 {
-		return r.cplayID
-	}
-	return r.chatID
-}
-
-func (r *RoomState) CplayID() int64 {
-	if r.destroyed.Load() {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.cplayID
-}
-
-func (r *RoomState) ChatID() int64 {
-	if r.destroyed.Load() {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.chatID
-}
-
-func (r *RoomState) FilePath() string {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.fpath
-}
-
-func (r *RoomState) Loop() int {
-	if r.destroyed.Load() {
-		return 0
-	}
-
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.loop
-}
-
-func (r *RoomState) Position() int {
-	if r.destroyed.Load() {
-		return 0
-	}
-
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.position
-}
-
-func (r *RoomState) Queue() []*state.Track {
-	if r.destroyed.Load() {
-		return nil
-	}
-
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	q := make([]*state.Track, len(r.queue))
-	copy(q, r.queue)
-	return q
-}
-
-func (r *RoomState) Shuffle() bool {
-	if r.destroyed.Load() {
-		return false
-	}
-
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.shuffle
-}
-
-func (r *RoomState) Speed() float64 {
-	if r.destroyed.Load() {
-		return 0
-	}
-
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.speed
-}
-
-func (r *RoomState) Track() *state.Track {
-	if r.destroyed.Load() {
-		return nil
-	}
-
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.track
-}
-
-func (r *RoomState) GetData(k string) (bool, any) {
-	if r.destroyed.Load() {
-		return false, nil
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	v, ok := r.Data[k]
-	return ok, v
-}
-
-func (r *RoomState) GetSpeed() float64 {
-	if r.destroyed.Load() {
-		return 0
-	}
-
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.speed
-}
-
-func (r *RoomState) GetMystic() *telegram.NewMessage {
-	if r.destroyed.Load() {
-		return nil
-	}
-
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.mystic
-}
-
-func (r *RoomState) Autoplay() bool {
-	if r.destroyed.Load() {
-		return false
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.autoplay
-}
-
-func (r *RoomState) Destroyed() bool {
+func (r *RoomState) IsDestroyed() bool {
 	return r.destroyed.Load()
 }
 
-// Setters
-
-func (r *RoomState) SetLoop(loop int) {
-	if r.destroyed.Load() {
-		return
-	}
-
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.loop = loop
-}
-
-func (r *RoomState) SetCplayID(chatID int64) {
-	if r.destroyed.Load() {
-		return
-	}
-
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.cplayID = chatID
-}
-
-func (r *RoomState) SetData(k string, v any) {
-	if r.destroyed.Load() {
-		return
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	if r.Data == nil {
-		r.Data = make(map[string]any)
-	}
-
-	r.Data[k] = v
-}
-
-func (r *RoomState) DeleteData(k string) {
-	if r.destroyed.Load() {
-		return
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	delete(r.Data, k)
-}
-
-func (r *RoomState) SetShuffle(enabled bool) {
-	if r.destroyed.Load() {
-		return
-	}
-
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.shuffle = enabled
-}
-
-func (r *RoomState) SetMystic(m *telegram.NewMessage) {
-	if r.destroyed.Load() {
-		return
-	}
-
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	if r.mystic != nil {
-		// r.mystic.Delete()
-	}
-	r.mystic = m
-}
-
-func (r *RoomState) SetAutoplay(enabled bool) {
-	if r.destroyed.Load() {
-		return
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.autoplay = enabled
-}
-
-// State checks
-
-func (r *RoomState) PrepareForAutoPlay() {
-	if r.destroyed.Load() {
-		return
-	}
-	r.mu.Lock()
-	r.playing = false
-	r.position = 0
-	r.mu.Unlock()
-
-	r.releaseFile()
-}
-
-func (r *RoomState) IsActiveChat() bool {
-	if r.destroyed.Load() {
-		return false
-	}
-
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.parse()
-	return r.track != nil && r.playing
-}
-
-func (r *RoomState) IsPaused() bool {
-	if r.destroyed.Load() {
-		return false
-	}
-
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.paused && r.track != nil && r.playing
-}
-
-func (r *RoomState) IsMuted() bool {
-	if r.destroyed.Load() {
-		return false
-	}
-
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.muted && r.track != nil && r.playing
-}
-
-// State management
-func (r *RoomState) Parse() {
-	if r.destroyed.Load() {
-		return
-	}
-
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.parse()
-}
-
-func (r *RoomState) parse() {
+func (r *RoomState) updatePosition() {
 	if r == nil || r.track == nil || r.updatedAt == 0 {
 		return
 	}
@@ -467,4 +195,289 @@ func (r *RoomState) parse() {
 		}
 	}
 	r.updatedAt = current
+}
+
+func (st *scheduledTimers) RemainingUnmuteDuration() time.Duration {
+	if st == nil || st.scheduledUnmuteUntil.IsZero() {
+		return 0
+	}
+	return time.Until(st.scheduledUnmuteUntil)
+}
+
+func (st *scheduledTimers) RemainingResumeDuration() time.Duration {
+	if st == nil || st.scheduledResumeUntil.IsZero() {
+		return 0
+	}
+	return time.Until(st.scheduledResumeUntil)
+}
+
+func (st *scheduledTimers) RemainingSpeedDuration() time.Duration {
+	if st == nil || st.scheduledSpeedUntil.IsZero() {
+		return 0
+	}
+	return time.Until(st.scheduledSpeedUntil)
+}
+
+func (st *scheduledTimers) cancelScheduledUnmute() {
+	if st != nil && st.scheduledUnmuteTimer != nil {
+		st.scheduledUnmuteTimer.Stop()
+		st.scheduledUnmuteTimer = nil
+		st.scheduledUnmuteUntil = time.Time{}
+	}
+}
+
+func (st *scheduledTimers) cancelScheduledResume() {
+	if st != nil && st.scheduledResumeTimer != nil {
+		st.scheduledResumeTimer.Stop()
+		st.scheduledResumeTimer = nil
+		st.scheduledResumeUntil = time.Time{}
+	}
+}
+
+func (st *scheduledTimers) cancelScheduledSpeed() {
+	if st != nil && st.scheduledSpeedTimer != nil {
+		st.scheduledSpeedTimer.Stop()
+		st.scheduledSpeedTimer = nil
+		st.scheduledSpeedUntil = time.Time{}
+	}
+}
+
+// Getters
+
+func (r *RoomState) EffectiveChatID() int64 {
+	if r.IsDestroyed() {
+		return 0
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if r.channelPlayID != 0 {
+		return r.channelPlayID
+	}
+	return r.chatID
+}
+
+func (r *RoomState) ChannelPlayID() int64 {
+	if r.IsDestroyed() {
+		return 0
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.channelPlayID
+}
+
+func (r *RoomState) ChatID() int64 {
+	if r.IsDestroyed() {
+		return 0
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.chatID
+}
+
+func (r *RoomState) FilePath() string {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.filePath
+}
+
+func (r *RoomState) Loop() int {
+	if r.IsDestroyed() {
+		return 0
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.loop
+}
+
+func (r *RoomState) Position() int {
+	if r.IsDestroyed() {
+		return 0
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.position
+}
+
+func (r *RoomState) Queue() []*state.Track {
+	if r.IsDestroyed() {
+		return nil
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	q := make([]*state.Track, len(r.queue))
+	copy(q, r.queue)
+	return q
+}
+
+func (r *RoomState) Shuffle() bool {
+	if r.IsDestroyed() {
+		return false
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.shuffle
+}
+
+func (r *RoomState) Speed() float64 {
+	if r.IsDestroyed() {
+		return 0
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.speed
+}
+
+func (r *RoomState) Track() *state.Track {
+	if r.IsDestroyed() {
+		return nil
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.track
+}
+
+func (r *RoomState) StatusMsg() *telegram.NewMessage {
+	if r.IsDestroyed() {
+		return nil
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.statusMsg
+}
+
+func (r *RoomState) IsAutoplayEnabled() bool {
+	if r.IsDestroyed() {
+		return false
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.autoplay
+}
+
+func (r *RoomState) GetData(k string) (bool, any) {
+	if r.IsDestroyed() {
+		return false, nil
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	v, ok := r.Data[k]
+	return ok, v
+}
+
+// Setters
+
+func (r *RoomState) SetLoop(loop int) {
+	if r.IsDestroyed() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.loop = loop
+}
+
+func (r *RoomState) SetChannelPlayID(chatID int64) {
+	if r.IsDestroyed() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.channelPlayID = chatID
+}
+
+func (r *RoomState) SetData(k string, v any) {
+	if r.IsDestroyed() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.Data == nil {
+		r.Data = make(map[string]any)
+	}
+	r.Data[k] = v
+}
+
+func (r *RoomState) DeleteData(k string) {
+	if r.IsDestroyed() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	delete(r.Data, k)
+}
+
+func (r *RoomState) SetShuffle(enabled bool) {
+	if r.IsDestroyed() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.shuffle = enabled
+}
+
+func (r *RoomState) SetStatusMsg(m *telegram.NewMessage) {
+	if r.IsDestroyed() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.statusMsg = m
+}
+
+func (r *RoomState) SetAutoplay(enabled bool) {
+	if r.IsDestroyed() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.autoplay = enabled
+}
+
+// State checks
+
+func (r *RoomState) PrepareForAutoPlay() {
+	if r.IsDestroyed() {
+		return
+	}
+	r.mu.Lock()
+	r.playing = false
+	r.position = 0
+	r.mu.Unlock()
+	r.releaseFile()
+}
+
+func (r *RoomState) IsActiveChat() bool {
+	if r.IsDestroyed() {
+		return false
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.updatePosition()
+	return r.track != nil && r.playing
+}
+
+func (r *RoomState) IsPaused() bool {
+	if r.IsDestroyed() {
+		return false
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.paused && r.track != nil && r.playing
+}
+
+func (r *RoomState) IsMuted() bool {
+	if r.IsDestroyed() {
+		return false
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.muted && r.track != nil && r.playing
+}
+
+func (r *RoomState) Parse() {
+	if r.IsDestroyed() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.updatePosition()
 }
