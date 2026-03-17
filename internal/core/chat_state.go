@@ -46,15 +46,15 @@ var (
 type assistantState struct {
 	present        bool
 	presentFetched bool
-    
-	banned         bool
-	bannedFetched  bool
+
+	banned        bool
+	bannedFetched bool
 }
 
 type voiceChatState struct {
-	active     bool
-	fetched    bool
-    
+	active  bool
+	fetched bool
+
 	inviteLink string
 }
 
@@ -96,7 +96,6 @@ func DeleteChatState(chatID int64) {
 	defer stateMutex.Unlock()
 	delete(states, chatID)
 }
-
 
 func (s *ChatState) SetAssistantPresent(v bool) {
 	s.mu.Lock()
@@ -383,7 +382,6 @@ func (s *ChatState) approveJoinRequest() error {
 
 	return ErrAssistantJoinRequestSent
 }
-
 
 func (s *ChatState) ensureAssistant() (*Assistant, error) {
 	s.mu.RLock()

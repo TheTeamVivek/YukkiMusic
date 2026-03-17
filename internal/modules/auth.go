@@ -81,7 +81,9 @@ func addAuthHandler(m *telegram.NewMessage) error {
 		return telegram.ErrEndGroup
 	}
 
-	if au, _ := database.AuthorizedUsers(chatID); len(au) >= config.MaxAuthUsers {
+	if au, _ := database.AuthorizedUsers(chatID); len(
+		au,
+	) >= config.MaxAuthUsers {
 		m.Reply(F(chatID, "auth_limit_reached", locales.Arg{
 			"limit": config.MaxAuthUsers,
 		}))

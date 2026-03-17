@@ -46,7 +46,8 @@ func AssistantIndex(chatID int64, assistantCount int) (int, error) {
 		return 0, err
 	}
 
-	if settings.AssistantIndex >= 1 && settings.AssistantIndex <= assistantCount {
+	if settings.AssistantIndex >= 1 &&
+		settings.AssistantIndex <= assistantCount {
 		return settings.AssistantIndex, nil
 	}
 

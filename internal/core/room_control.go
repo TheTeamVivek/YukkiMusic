@@ -503,7 +503,10 @@ func getMediaDescription(
 	}
 }
 
-func getAudioPipeline(baseCmd string, speed float64) *ntgcalls.AudioDescription {
+func getAudioPipeline(
+	baseCmd string,
+	speed float64,
+) *ntgcalls.AudioDescription {
 	audio := &ntgcalls.AudioDescription{
 		MediaSource:  ntgcalls.MediaSourceShell,
 		SampleRate:   96000,

@@ -52,7 +52,10 @@ const defaultDelay = 1.5
 
 // TryStart attempts to start a new broadcast. It returns true if successful,
 // or false if a broadcast is already running.
-func (bm *BroadcastManager) TryStart(ctx context.Context, cancel context.CancelFunc) bool {
+func (bm *BroadcastManager) TryStart(
+	ctx context.Context,
+	cancel context.CancelFunc,
+) bool {
 	bm.mu.Lock()
 	defer bm.mu.Unlock()
 	if bm.active {
@@ -299,7 +302,10 @@ func parseBroadcastCommand(m *tg.NewMessage) (*BroadcastFlags, string, error) {
 			}
 			limit, err := strconv.Atoi(words[i+1])
 			if err != nil || limit < 0 {
-				return nil, "", fmt.Errorf("invalid limit value: %s", words[i+1])
+				return nil, "", fmt.Errorf(
+					"invalid limit value: %s",
+					words[i+1],
+				)
 			}
 			flags.Limit = limit
 			i++
@@ -309,7 +315,10 @@ func parseBroadcastCommand(m *tg.NewMessage) (*BroadcastFlags, string, error) {
 			}
 			delay, err := strconv.ParseFloat(words[i+1], 64)
 			if err != nil || delay < 0 {
-				return nil, "", fmt.Errorf("invalid delay value: %s", words[i+1])
+				return nil, "", fmt.Errorf(
+					"invalid delay value: %s",
+					words[i+1],
+				)
 			}
 			flags.Delay = delay
 			i++
@@ -687,7 +696,10 @@ func broadcastCancelCB(cb *tg.CallbackQuery) error {
 	return tg.ErrEndGroup
 }
 
-func (bm *BroadcastManager) sleepCtx(ctx context.Context, d time.Duration) bool {
+func (bm *BroadcastManager) sleepCtx(
+	ctx context.Context,
+	d time.Duration,
+) bool {
 	select {
 	case <-ctx.Done():
 		return false

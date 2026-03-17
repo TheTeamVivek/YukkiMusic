@@ -52,13 +52,19 @@ var AllCommands = BotCommands{
 	PrivateOwnerCommands: []*telegram.BotCommand{
 		{Command: "addsudo", Description: "Add a sudo user."},
 		{Command: "delsudo", Description: "Remove a sudo user."},
-		{Command: "maintenance", Description: "Enable/disable maintenance mode."},
+		{
+			Command:     "maintenance",
+			Description: "Enable/disable maintenance mode.",
+		},
 	},
 	// Commands for group chats
 	GroupUserCommands: []*telegram.BotCommand{
 		{Command: "play", Description: "Play a song."},
 		{Command: "queue", Description: "Show the queue."},
-		{Command: "position", Description: "Show the current position of the song."},
+		{
+			Command:     "position",
+			Description: "Show the current position of the song.",
+		},
 
 		{Command: "reload", Description: "Reload the admin cache."},
 		{Command: "authlist", Description: "List authorized users."},
@@ -67,7 +73,10 @@ var AllCommands = BotCommands{
 	},
 	GroupAdminCommands: []*telegram.BotCommand{
 		{Command: "cplay", Description: "Play a song in the linked channel."},
-		{Command: "cqueue", Description: "Show the queue in the linked channel."},
+		{
+			Command:     "cqueue",
+			Description: "Show the queue in the linked channel.",
+		},
 		{
 			Command:     "cposition",
 			Description: "Show the current position of the song in the linked channel.",
@@ -80,8 +89,14 @@ var AllCommands = BotCommands{
 		{Command: "replay", Description: "Replay the current song."},
 		{Command: "mute", Description: "Mute the bot in the voice chat."},
 		{Command: "unmute", Description: "Unmute the bot in the voice chat."},
-		{Command: "seek", Description: "Seek to a specific position in the song."},
-		{Command: "seekback", Description: "Seek back to a specific position in the song."},
+		{
+			Command:     "seek",
+			Description: "Seek to a specific position in the song.",
+		},
+		{
+			Command:     "seekback",
+			Description: "Seek back to a specific position in the song.",
+		},
 		{Command: "jump", Description: "Jump to a specific song in the queue."},
 		{Command: "clear", Description: "Clear the queue."},
 		{Command: "remove", Description: "Remove a song from the queue."},
@@ -90,19 +105,46 @@ var AllCommands = BotCommands{
 		{Command: "loop", Description: "Loop the current song."},
 		{Command: "end", Description: "Stop the song."},
 		{Command: "addauth", Description: "Add a user to the authorized list."},
-		{Command: "delauth", Description: "Remove a user from the authorized list."},
-		{Command: "channelplay", Description: "Set a channel as the play channel."},
-		{Command: "cfplay", Description: "Force play a song in the linked channel."},
-		{Command: "cpause", Description: "Pause the current song in the linked channel."},
-		{Command: "cresume", Description: "Resume the current song in the linked channel."},
-		{Command: "cmute", Description: "Mute the bot in the linked channel's voice chat."},
-		{Command: "cunmute", Description: "Unmute the bot in the linked channel's voice chat."},
+		{
+			Command:     "delauth",
+			Description: "Remove a user from the authorized list.",
+		},
+		{
+			Command:     "channelplay",
+			Description: "Set a channel as the play channel.",
+		},
+		{
+			Command:     "cfplay",
+			Description: "Force play a song in the linked channel.",
+		},
+		{
+			Command:     "cpause",
+			Description: "Pause the current song in the linked channel.",
+		},
+		{
+			Command:     "cresume",
+			Description: "Resume the current song in the linked channel.",
+		},
+		{
+			Command:     "cmute",
+			Description: "Mute the bot in the linked channel's voice chat.",
+		},
+		{
+			Command:     "cunmute",
+			Description: "Unmute the bot in the linked channel's voice chat.",
+		},
 		{
 			Command:     "cstop",
 			Description: "Stop the current song and leave the linked channel's voice chat.",
 		},
-		{Command: "cskip", Description: "Skip the current song in the linked channel."},
-		{Command: "cloop", Description: "Loop the current song in the linked channel."},
+		{
+			Command:     "cskip",
+			Description: "Skip the current song in the linked channel.",
+		},
+		{
+			Command:     "cloop",
+			Description: "Loop the current song in the linked channel.",
+		},
 		{
 			Command:     "cseek",
 			Description: "Seek to a specific position in the song in the linked channel.",
@@ -111,13 +153,34 @@ var AllCommands = BotCommands{
 			Command:     "cseekback",
 			Description: "Seek back to a specific position in the song in the linked channel.",
 		},
-		{Command: "cjump", Description: "Jump to a specific song in the linked channel's queue."},
-		{Command: "cremove", Description: "Remove a song from the linked channel's queue."},
+		{
+			Command:     "cjump",
+			Description: "Jump to a specific song in the linked channel's queue.",
+		},
+		{
+			Command:     "cremove",
+			Description: "Remove a song from the linked channel's queue.",
+		},
 		{Command: "cclear", Description: "Clear the linked channel's queue."},
-		{Command: "cmove", Description: "Move a song in the linked channel's queue."},
-		{Command: "cspeed", Description: "Set the speed of the song in the linked channel."},
-		{Command: "creplay", Description: "Replay the current song in the linked channel."},
-		{Command: "cshuffle", Description: "Shuffle the linked channel's queue."},
-		{Command: "creload", Description: "Reload the admin cache in the linked channel."},
+		{
+			Command:     "cmove",
+			Description: "Move a song in the linked channel's queue.",
+		},
+		{
+			Command:     "cspeed",
+			Description: "Set the speed of the song in the linked channel.",
+		},
+		{
+			Command:     "creplay",
+			Description: "Replay the current song in the linked channel.",
+		},
+		{
+			Command:     "cshuffle",
+			Description: "Shuffle the linked channel's queue.",
+		},
+		{
+			Command:     "creload",
+			Description: "Reload the admin cache in the linked channel.",
+		},
 	},
 }

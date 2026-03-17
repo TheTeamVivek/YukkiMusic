@@ -63,7 +63,8 @@ func getChatSettings(chatID int64) (*ChatSettings, error) {
 	defer cancel()
 
 	var settings ChatSettings
-	err := chatSettingsColl.FindOne(ctx, bson.M{"_id": chatID}).Decode(&settings)
+	err := chatSettingsColl.FindOne(ctx, bson.M{"_id": chatID}).
+		Decode(&settings)
 
 	if err == mongo.ErrNoDocuments {
 		def := defaultChatSettings(chatID)
@@ -72,7 +73,11 @@ func getChatSettings(chatID int64) (*ChatSettings, error) {
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to get chat settings for %d: %w", chatID, err)
+		return nil, fmt.Errorf(
+			"failed to get chat settings for %d: %w",
+			chatID,
+			err,
+		)
 	}
 
 	dbCache.Set(cacheKey, &settings)
@@ -92,7 +97,11 @@ func updateChatSettings(settings *ChatSettings) error {
 		upsertOpt,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to update chat settings for %d: %w", settings.ChatID, err)
+		return fmt.Errorf(
+			"failed to update chat settings for %d: %w",
+			settings.ChatID,
+			err,
+		)
 	}
 
 	dbCache.Set(cacheKey, settings)

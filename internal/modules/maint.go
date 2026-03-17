@@ -63,7 +63,9 @@ func handleMaintenance(m *tg.NewMessage) error {
 	chatID := m.ChannelID()
 	current, err := database.IsMaintenanceEnabled()
 	if err != nil {
-		m.Reply(F(chatID, "maint_check_fail", locales.Arg{"error": err.Error()}))
+		m.Reply(
+			F(chatID, "maint_check_fail", locales.Arg{"error": err.Error()}),
+		)
 		return tg.ErrEndGroup
 	}
 
@@ -91,7 +93,11 @@ func showMaintenanceStatus(m *tg.NewMessage, current bool) error {
 	status := F(chatID, "disabled")
 	if current {
 		if reason != "" {
-			status = F(chatID, "enabled_with_reason", locales.Arg{"reason": reason})
+			status = F(
+				chatID,
+				"enabled_with_reason",
+				locales.Arg{"reason": reason},
+			)
 		} else {
 			status = F(chatID, "enabled")
 		}
@@ -103,7 +109,11 @@ func showMaintenanceStatus(m *tg.NewMessage, current bool) error {
 	return tg.ErrEndGroup
 }
 
-func handleSameMaintenanceState(m *tg.NewMessage, enable bool, reason string) error {
+func handleSameMaintenanceState(
+	m *tg.NewMessage,
+	enable bool,
+	reason string,
+) error {
 	chatID := m.ChannelID()
 	if !enable {
 		m.Reply(F(chatID, "maint_already_disabled"))
@@ -119,7 +129,9 @@ func handleSameMaintenanceState(m *tg.NewMessage, enable bool, reason string) er
 		m.Reply(F(chatID, "maint_reason_removed"))
 	case reason != "" && reason != oldReason:
 		_ = database.SetMaintenance(true, reason)
-		m.Reply(F(chatID, "maint_reason_updated", locales.Arg{"reason": reason}))
+		m.Reply(
+			F(chatID, "maint_reason_updated", locales.Arg{"reason": reason}),
+		)
 	default:
 		m.Reply(F(chatID, "maint_already_enabled"))
 	}
@@ -129,7 +141,12 @@ func handleSameMaintenanceState(m *tg.NewMessage, enable bool, reason string) er
 func applyMaintenanceState(m *tg.NewMessage, enable bool, reason string) error {
 	chatID := m.ChannelID()
 	database.SetMaintenance(enable, reason)
-	gologging.InfoF("User %d set maintenance: %v (reason: %s)", m.SenderID(), enable, reason)
+	gologging.InfoF(
+		"User %d set maintenance: %v (reason: %s)",
+		m.SenderID(),
+		enable,
+		reason,
+	)
 
 	maintCancel.Lock()
 	maintCancel.cancel = !enable
@@ -164,7 +181,11 @@ func notifyMaintenanceStart(c *tg.Client, reason string) {
 		core.DeleteRoom(chatID)
 		msg := F(chatID, "maint_entering")
 		if reason != "" {
-			msg += "\n" + F(chatID, "maint_reason", locales.Arg{"reason": reason})
+			msg += "\n" + F(
+				chatID,
+				"maint_reason",
+				locales.Arg{"reason": reason},
+			)
 		}
 		c.SendMessage(chatID, msg)
 		time.Sleep(time.Second)

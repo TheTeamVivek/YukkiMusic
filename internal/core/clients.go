@@ -58,7 +58,9 @@ func Init() func() {
 		client := initAssistantClient(sess, i)
 		user, err := client.GetMe()
 		if err != nil {
-			gologging.Fatal(fmt.Sprintf("❌ Failed to GetMe for assistant[%d]: %v", i, err))
+			gologging.Fatal(
+				fmt.Sprintf("❌ Failed to GetMe for assistant[%d]: %v", i, err),
+			)
 		}
 		ctx := ubot.NewContext(client)
 

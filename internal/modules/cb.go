@@ -360,9 +360,12 @@ func handleSkipAction(
 	path, err := platforms.Download(context.Background(), t, statusMsg)
 	if err != nil {
 		gologging.ErrorF("Download failed for %s: %v", t.URL, err)
-		utils.EOR(statusMsg, F(cb.ChannelID(), "stream_download_fail", locales.Arg{
-			"error": err.Error(),
-		}))
+		utils.EOR(
+			statusMsg,
+			F(cb.ChannelID(), "stream_download_fail", locales.Arg{
+				"error": err.Error(),
+			}),
+		)
 		cb.Answer(F(cb.ChannelID(), "cb_skip_download_failed"), opt)
 		core.DeleteRoom(r.ChatID())
 

@@ -241,7 +241,11 @@ func SafeMessageHandler(
 	handler func(*tg.NewMessage) error,
 ) func(*tg.NewMessage) error {
 	return func(m *tg.NewMessage) (err error) {
-		gologging.InfoF("Handling message from %d in chat %d", m.SenderID(), m.ChannelID())
+		gologging.InfoF(
+			"Handling message from %d in chat %d",
+			m.SenderID(),
+			m.ChannelID(),
+		)
 
 		if isMaint, _ := database.IsMaintenanceEnabled(); isMaint {
 			gologging.Debug("Maintenance mode active")
@@ -253,10 +257,17 @@ func SafeMessageHandler(
 					strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
 					reason, _ := database.MaintenanceReason()
 					msg := F(m.ChannelID(), "maint", locales.Arg{
-						"reason": F(m.ChannelID(), "maint_reason", locales.Arg{"reason": reason}),
+						"reason": F(
+							m.ChannelID(),
+							"maint_reason",
+							locales.Arg{"reason": reason},
+						),
 					})
 					m.Reply(msg)
-					gologging.InfoF("Sent maintenance notice to %d", m.SenderID())
+					gologging.InfoF(
+						"Sent maintenance notice to %d",
+						m.SenderID(),
+					)
 				}
 				return tg.ErrEndGroup
 			}

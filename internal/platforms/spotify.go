@@ -376,7 +376,6 @@ func (s *SpotifyPlatform) convertSpotifyTrack(
 	simpleTrack *spotify.SimpleTrack,
 	images []spotify.Image,
 ) *state.Track {
-
 	thumbnail := ""
 	if len(images) > 0 {
 		thumbnail = images[0].URL

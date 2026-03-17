@@ -78,7 +78,6 @@ func migrateData() {
 		"migrated":  true,
 		"timestamp": time.Now(),
 	})
-
 	if err != nil {
 		logger.ErrorF("Failed to write migration flag: %v", err)
 	}
@@ -304,4 +303,3 @@ func migrateSudoers(ctx context.Context, db *mongo.Database) {
 
 	logger.Info("Finished migrating sudoers.")
 }
-
