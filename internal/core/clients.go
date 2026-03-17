@@ -38,7 +38,7 @@ var (
 	Bot *telegram.Client
 
 	Assistants            *AssistantManager
-	GetAssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // GetAssistantIndexFunc = database.GetAssistantIndex
+	GetAssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // GetAssistantIndexFunc = database.AssistantIndex
 )
 
 func Init() func() {

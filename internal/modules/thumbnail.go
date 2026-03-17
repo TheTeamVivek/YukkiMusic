@@ -53,7 +53,7 @@ func nothumbHandler(m *tg.NewMessage) error {
 	chatID := m.ChannelID()
 	args := strings.Fields(m.Text())
 
-	current, err := database.GetNoThumb(chatID)
+	current, err := database.ThumbnailsDisabled(chatID)
 	if err != nil {
 		m.Reply(F(chatID, "nothumb_fetch_fail"))
 		return tg.ErrEndGroup
@@ -82,7 +82,7 @@ func nothumbHandler(m *tg.NewMessage) error {
 		return tg.ErrEndGroup
 	}
 
-	if err := database.SetNoThumb(chatID, value); err != nil {
+	if err := database.SetThumbnailsDisabled(chatID, value); err != nil {
 		m.Reply(F(chatID, "nothumb_update_fail"))
 		return tg.ErrEndGroup
 	}

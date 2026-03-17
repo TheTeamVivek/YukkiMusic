@@ -198,7 +198,7 @@ func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
 
 ---
 
-### 2. Queue Management
+## 📂 Queue Management
 
 **Files**: `queue.go`, `remove.go`, `clear.go`, `move.go`, `shuffle.go`, `loop.go`
 
@@ -214,7 +214,7 @@ func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
 
 ---
 
-### 3. User Management
+## 📂 User Management
 
 **Files**: `auth.go`, `sudoers.go`
 
@@ -229,7 +229,7 @@ func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
 
 ---
 
-### 4. Bot Management
+## 📂 Bot Management
 
 **Files**: `maint.go`, `logger.go`, `autoleave.go`, `active.go`
 
@@ -242,7 +242,7 @@ func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
 
 ---
 
-### 5. Channel Play (CPlay)
+## 📂 Channel Play (CPlay)
 
 **Files**: `play.go` (cplay variants)
 
@@ -351,6 +351,7 @@ func filterSuperGroup(m *telegram.NewMessage) bool {
             return true  // Supergroup ✓
         }
         warnAndLeave(m.Client, m.ChannelID())  // Basic group ✗
+        database.RemoveServedChat(m.ChannelID())
         return false
         
     case telegram.EntityChannel:
@@ -366,94 +367,6 @@ func filterSuperGroup(m *telegram.NewMessage) bool {
 }
 ```
 
-### Permission Hierarchy
-
-```
-Owner (OWNER_ID)
-├─ Full access to all commands
-├─ /addsudo, /delsudo, /maintenance, /restart
-└─ Override all other checks
-
-Sudoers (/sudolist)
-├─ Admin commands in groups
-├─ /logger, /autoleave, /ac, /stats
-└─ Can bypass some restrictions
-
-Chat Admins (Telegram admins)
-├─ Playback control commands
-├─ /skip, /pause, /clear, /seek, etc.
-└─ Can manage auth users
-
-Auth Users (/authlist)
-├─ Limited playback control
-├─ /skip, /seek, /pause, /mute
-└─ Per-chat permission
-
-Regular Users
-├─ View-only commands
-├─ /queue, /position, /help, /ping
-└─ Can request songs (/play)
-```
-
----
-
-## 💻 Command Implementation
-
-### Step 1: Create Handler File
-
-```go
-// internal/modules/myfeature.go
-package modules
-
-import (
-    "github.com/amarnathcjd/gogram/telegram"
-    "main/internal/locales"
-)
-
-// Add help text
-func init() {
-    helpTexts["mycommand"] = "Description of command"
-}
-
-// Handler function
-func mycommandHandler(m *telegram.NewMessage) error {
-    chatID := m.ChannelID()
-    
-    // Implementation
-    
-    return telegram.ErrEndGroup
-}
-```
-
-### Step 2: Register Handler
-
-```go
-// internal/modules/handlers.go
-var handlers = []MsgHandlerDef{
-    {
-        Pattern: "mycommand",
-        Handler: mycommandHandler,
-        Filters: []telegram.Filter{superGroupFilter, authFilter}
-    },
-}
-```
-
-### Step 3: Add Localization
-
-```yaml
-# internal/locales/en.yml
-mycommand_usage: "Usage: /mycommand <arg>"
-mycommand_success: "Command executed: {result}"
-mycommand_error: "Error: {error}"
-```
-
-```yaml
-# internal/locales/hi.yml
-mycommand_usage: "उपयोग: /mycommand <arg>"
-mycommand_success: "कमांड निष्पादित: {result}"
-mycommand_error: "त्रुटि: {error}"
-```
-
 ---
 
 ## 🛡️ Error Handling
@@ -464,10 +377,10 @@ mycommand_error: "त्रुटि: {error}"
 func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage) error {
     return func(m *tg.NewMessage) (err error) {
         // Check maintenance mode
-        if is, _ := database.IsMaintenance(); is {
+        if is, _ := database.IsMaintenanceEnabled(); is {
             if m.SenderID() != config.OwnerID {
                 if ok, _ := database.IsSudo(m.SenderID()); !ok {
-                    reason, _ := database.GetMaintReason()
+                    reason, _ := database.MaintenanceReason()
                     msg := F(m.ChannelID(), "maint", locales.Arg{"reason": reason})
                     m.Reply(msg)
                     return tg.ErrEndGroup
@@ -483,185 +396,30 @@ func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage)
             }
         }()
         
-        // Check for help flag
-        if checkForHelpFlag(m) {
-            cmd := getCommand(m)
-            return showHelpFor(m, cmd)
-        }
-        
-        // Execute handler
-        err = handler(m)
-        if err != nil && !errors.Is(err, tg.ErrEndGroup) {
-            handlePanic(err, m, false)  // Log error
-        }
-        
-        return err
+        // ... execute handler ...
     }
 }
-```
-
-### Panic Handling
-
-```go
-func handlePanic(r interface{}, m *telegram.NewMessage, isPanic bool) {
-    stack := html.EscapeString(string(debug.Stack()))
-    
-    userMention := utils.MentionHTML(m.Sender)
-    errorMessage := html.EscapeString(fmt.Sprint(r))
-    
-    if isPanic {
-        gologging.ErrorF("Panic: %v\nStack: %s", r, stack)
-        
-        // Send to logger
-        if config.LoggerID != 0 {
-            m.Client.SendMessage(config.LoggerID, 
-                fmt.Sprintf("Panic from %s: %s", userMention, errorMessage))
-        }
-    } else {
-        gologging.ErrorF("Error: %v", r)
-    }
-}
-```
-
----
-
-## 📚 Best Practices
-
-### ✅ Do's
-
-```go
-✅ Always check context/maintenance
-✅ Validate user input
-✅ Use localized messages (F function)
-✅ Return telegram.ErrEndGroup when done
-✅ Handle errors gracefully
-✅ Cache frequently-accessed data
-✅ Use appropriate filters
-✅ Provide helpful error messages
-✅ Add help text in init()
-```
-
-### ❌ Don'ts
-
-```go
-❌ Don't panic on invalid input
-❌ Don't skip permission checks
-❌ Don't use hardcoded strings
-❌ Don't access database without error handling
-❌ Don't block on long operations
-❌ Don't ignore context cancellation
-❌ Don't return generic errors
-❌ Don't modify global state unsafely
 ```
 
 ---
 
 ## 🎯 Common Patterns
 
-### Pattern 1: Input Validation
-
-```go
-func mycommandHandler(m *telegram.NewMessage) error {
-    chatID := m.ChannelID()
-    args := strings.Fields(m.Text())
-    
-    // Validate argument count
-    if len(args) < 2 {
-        m.Reply(F(chatID, "mycommand_usage"))
-        return telegram.ErrEndGroup
-    }
-    
-    // Parse arguments
-    userID, err := utils.ExtractUser(m)
-    if err != nil {
-        m.Reply(F(chatID, "user_extract_fail", locales.Arg{
-            "error": err.Error(),
-        }))
-        return telegram.ErrEndGroup
-    }
-    
-    return telegram.ErrEndGroup
-}
-```
-
-### Pattern 2: Database Operation
+### Pattern 1: Database Operation
 
 ```go
 func mycommandHandler(m *telegram.NewMessage) error {
     chatID := m.ChannelID()
     
-    // Fetch from database
-    settings, err := database.GetChatSettings(chatID)
-    if err != nil {
-        m.Reply(F(chatID, "db_fetch_fail", locales.Arg{
-            "error": err.Error(),
-        }))
-        return telegram.ErrEndGroup
-    }
+    // No context needed in signatures! Managed internally by database package.
     
-    // Modify
-    settings.SomeField = newValue
+    // Example: Toggle setting
+    current, _ := database.ThumbnailsDisabled(chatID)
+    err := database.SetThumbnailsDisabled(chatID, !current)
     
-    // Update
-    if err := database.UpdateChatSettings(settings); err != nil {
-        m.Reply(F(chatID, "db_update_fail", locales.Arg{
-            "error": err.Error(),
-        }))
-        return telegram.ErrEndGroup
-    }
-    
-    m.Reply(F(chatID, "mycommand_success"))
     return telegram.ErrEndGroup
 }
 ```
-
-### Pattern 3: Room Operation
-
-```go
-func mycommandHandler(m *telegram.NewMessage) error {
-    chatID := m.ChannelID()
-    
-    // Get room
-    r, err := getEffectiveRoom(m, false)
-    if err != nil {
-        m.Reply(err.Error()) // channel command not set but (c)commands used or failed to get assistant for that chat
-        return telegram.ErrEndGroup
-    }
-    
-    // Check room is active
-    if !r.IsActiveChat() {
-        m.Reply(F(chatID, "room_no_active"))
-        return telegram.ErrEndGroup
-    }
-    
-    // Perform operation
-    if err := r.SomeOperation(); err != nil {
-        m.Reply(F(chatID, "operation_failed", locales.Arg{
-            "error": err.Error(),
-        }))
-        return telegram.ErrEndGroup
-    }
-    
-    m.Reply(F(chatID, "mycommand_success"))
-    return telegram.ErrEndGroup
-}
-```
-
----
-
-## 🔧 Module Files Reference
-
-### Key Files
-
-| File | Purpose |
-|------|---------|
-| `handlers.go` | Handler registration & initialization |
-| `helpers.go` | Shared utilities (formatting, etc.) |
-| `filters.go` | Permission checking |
-| `flag_help.go` | Help system implementation |
-| `comm.go` | Command definitions for UI |
-| `monitor.go` | Room state monitoring |
-| `watcher.go` | Event handling (participants, actions) |
 
 ---
 

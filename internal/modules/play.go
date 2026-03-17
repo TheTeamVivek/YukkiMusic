@@ -255,7 +255,7 @@ func cplayHandler(m *tg.NewMessage) error {
 			return tg.ErrEndGroup
 		}
 
-		if err := database.SetCPlayID(m.ChannelID(), cplayID); err != nil {
+		if err := database.LinkChannel(m.ChannelID(), cplayID); err != nil {
 			gologging.ErrorF(
 				"Failed to set cplay ID for chat %d: %v",
 				m.ChannelID(), err,

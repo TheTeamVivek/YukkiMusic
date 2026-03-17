@@ -81,7 +81,7 @@ func addAuthHandler(m *telegram.NewMessage) error {
 		return telegram.ErrEndGroup
 	}
 
-	if au, _ := database.GetAuthUsers(chatID); len(au) >= config.MaxAuthUsers {
+	if au, _ := database.AuthorizedUsers(chatID); len(au) >= config.MaxAuthUsers {
 		m.Reply(F(chatID, "auth_limit_reached", locales.Arg{
 			"limit": config.MaxAuthUsers,
 		}))
@@ -103,7 +103,7 @@ func addAuthHandler(m *telegram.NewMessage) error {
 		return telegram.ErrEndGroup
 	}
 
-	if ok, _ := database.IsAuthUser(chatID, userID); ok {
+	if ok, _ := database.IsAuthorized(chatID, userID); ok {
 		m.Reply(F(chatID, "already_authed"))
 		return telegram.ErrEndGroup
 	}
@@ -126,7 +126,7 @@ func addAuthHandler(m *telegram.NewMessage) error {
 		return telegram.ErrEndGroup
 	}
 
-	if err := database.AddAuthUser(chatID, userID); err != nil {
+	if err := database.Authorize(chatID, userID); err != nil {
 		m.Reply(F(chatID, "addauth_add_fail", locales.Arg{
 			"error": err.Error(),
 		}))
@@ -138,7 +138,7 @@ func addAuthHandler(m *telegram.NewMessage) error {
 		uname += " (@" + user.Username + ")"
 	}
 
-	if au, _ := database.GetAuthUsers(chatID); len(au) > 0 {
+	if au, _ := database.AuthorizedUsers(chatID); len(au) > 0 {
 		m.Reply(F(chatID, "addauth_success_with_count", locales.Arg{
 			"user":  uname,
 			"count": len(au),
@@ -171,14 +171,14 @@ func delAuthHandler(m *telegram.NewMessage) error {
 		return telegram.ErrEndGroup
 	}
 
-	if ok, err := database.IsAuthUser(chatID, userID); !ok && err == nil {
+	if ok, err := database.IsAuthorized(chatID, userID); !ok && err == nil {
 		m.Reply(F(chatID, "del_auth_not_authorized", nil))
 		return telegram.ErrEndGroup
 	}
 
 	user, _ := m.Client.GetUser(userID)
 
-	if err := database.RemoveAuthUser(chatID, userID); err != nil {
+	if err := database.Unauthorize(chatID, userID); err != nil {
 		m.Reply(F(chatID, "del_auth_remove_fail", locales.Arg{
 			"error": err.Error(),
 		}))
@@ -204,7 +204,7 @@ func delAuthHandler(m *telegram.NewMessage) error {
 func authListHandler(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()
 
-	authUsers, err := database.GetAuthUsers(chatID)
+	authUsers, err := database.AuthorizedUsers(chatID)
 	if err != nil {
 		m.Reply(F(chatID, "authlist_fetch_fail", locales.Arg{
 			"error": err.Error(),

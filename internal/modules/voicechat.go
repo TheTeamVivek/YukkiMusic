@@ -49,7 +49,7 @@ func handleVoiceChatAction(
 	m *telegram.NewMessage,
 	action *telegram.MessageActionGroupCall,
 ) error {
-	if isMaint, _ := database.IsMaintenance(); isMaint {
+	if isMaint, _ := database.IsMaintenanceEnabled(); isMaint {
 		return telegram.ErrEndGroup
 	}
 

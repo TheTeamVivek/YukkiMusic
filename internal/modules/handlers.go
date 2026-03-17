@@ -506,7 +506,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 
 	go MonitorRooms()
 
-	if is, _ := database.GetAutoLeave(); is {
+	if is, _ := database.AutoLeave(); is {
 		go startAutoLeave()
 	}
 
@@ -561,7 +561,7 @@ func setBotCommands(bot *telegram.Client) {
 	}
 
 	// Set commands for sudo users in their private chat
-	sudoers, err := database.GetSudoers()
+	sudoers, err := database.Sudoers()
 	if err != nil {
 		log.Printf("Failed to get sudoers for setting commands: %v", err)
 	} else {

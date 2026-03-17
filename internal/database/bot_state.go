@@ -18,9 +18,12 @@
   - You should have received a copy of the GNU General Public License
   - along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
+
 package database
 
 import (
+	"fmt"
+
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
@@ -48,7 +51,7 @@ type BotState struct {
 	servedChatsMap map[int64]struct{} `bson:"-"`
 }
 
-const cacheKey = "bot_state"
+const botStateCacheKey = "bot_state"
 
 func newDefaultBotState() *BotState {
 	s := &BotState{
@@ -66,41 +69,35 @@ func newDefaultBotState() *BotState {
 }
 
 func getBotState() (*BotState, error) {
-	if cached, found := dbCache.Get(cacheKey); found {
+	if cached, found := dbCache.Get(botStateCacheKey); found {
 		if state, ok := cached.(*BotState); ok {
 			return state, nil
 		}
 	}
 
-	ctx, cancel := mongoCtx()
+	ctx, cancel := ctx()
 	defer cancel()
 
 	var state BotState
-
-	err := settingsColl.FindOne(
-		ctx,
-		bson.M{"_id": "global"},
-	).Decode(&state)
+	err := settingsColl.FindOne(ctx, bson.M{"_id": "global"}).Decode(&state)
 
 	if err == mongo.ErrNoDocuments {
 		s := newDefaultBotState()
-		dbCache.Set(cacheKey, s)
+		dbCache.Set(botStateCacheKey, s)
 		return s, nil
 	}
 
 	if err != nil {
-		logger.ErrorF("Failed to get bot state: %v", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to get bot state: %w", err)
 	}
 
 	buildIndexes(&state)
-
-	dbCache.Set(cacheKey, &state)
+	dbCache.Set(botStateCacheKey, &state)
 	return &state, nil
 }
 
 func updateBotState(newState *BotState) error {
-	ctx, cancel := mongoCtx()
+	ctx, cancel := ctx()
 	defer cancel()
 
 	_, err := settingsColl.UpdateOne(
@@ -110,11 +107,22 @@ func updateBotState(newState *BotState) error {
 		upsertOpt,
 	)
 	if err != nil {
-		logger.ErrorF("Failed to update bot state: %v", err)
+		return fmt.Errorf("failed to update bot state: %w", err)
+	}
+
+	dbCache.Set(botStateCacheKey, newState)
+	return nil
+}
+
+func modifyBotState(fn func(*BotState) bool) error {
+	state, err := getBotState()
+	if err != nil {
 		return err
 	}
 
-	dbCache.Set(cacheKey, newState)
+	if fn(state) {
+		return updateBotState(state)
+	}
 
 	return nil
 }

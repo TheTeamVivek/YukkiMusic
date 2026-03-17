@@ -18,26 +18,23 @@
   - You should have received a copy of the GNU General Public License
   - along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
+
 package database
 
-func GetCPlayID(chatID int64) (int64, error) {
+func LinkedChannel(chatID int64) (int64, error) {
 	settings, err := getChatSettings(chatID)
 	if err != nil {
 		return 0, err
 	}
-	return settings.CPlayID, nil
+	return settings.ChannelPlayID, nil
 }
 
-func SetCPlayID(chatID, cplayID int64) error {
-	settings, err := getChatSettings(chatID)
-	if err != nil {
-		return err
-	}
-
-	if settings.CPlayID == cplayID {
-		return nil
-	}
-
-	settings.CPlayID = cplayID
-	return updateChatSettings(settings)
+func LinkChannel(chatID, channelID int64) error {
+	return modifyChatSettings(chatID, func(s *ChatSettings) bool {
+		if s.ChannelPlayID == channelID {
+			return false
+		}
+		s.ChannelPlayID = channelID
+		return true
+	})
 }

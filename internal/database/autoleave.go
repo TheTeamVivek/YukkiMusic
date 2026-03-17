@@ -17,9 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package database
 
-func GetAutoLeave() (bool, error) {
+func AutoLeave() (bool, error) {
 	state, err := getBotState()
 	if err != nil {
 		return false, err
@@ -28,19 +29,11 @@ func GetAutoLeave() (bool, error) {
 }
 
 func SetAutoLeave(value bool) error {
-	state, err := getBotState()
-	if err != nil {
-		logger.ErrorF("Failed to get bot state for setting AutoEnd: %v", err)
-		return err
-	}
-	if state.AutoLeave == value {
-		return nil
-	}
-
-	state.AutoLeave = value
-	if err := updateBotState(state); err != nil {
-		logger.ErrorF("Failed to update AutoEnd: %v", err)
-		return err
-	}
-	return nil
+	return modifyBotState(func(s *BotState) bool {
+		if s.AutoLeave == value {
+			return false
+		}
+		s.AutoLeave = value
+		return true
+	})
 }

@@ -98,7 +98,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 
 	// Handle cplay mode
 	if strings.HasPrefix(cb.DataString(), "croom:") {
-		realChatID, err := database.GetCPlayID(chatID)
+		realChatID, err := database.LinkedChannel(chatID)
 		if err != nil {
 			gologging.ErrorF(
 				"Failed to get chat ID for cplay ID %d: %v",

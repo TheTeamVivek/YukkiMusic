@@ -17,65 +17,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package database
 
-func IsAuthUser(chatID, userID int64) (bool, error) {
+func IsAuthorized(chatID, userID int64) (bool, error) {
 	settings, err := getChatSettings(chatID)
 	if err != nil {
 		return false, err
 	}
-
-	for _, user := range settings.AuthUsers {
-		if user == userID {
-			return true, nil
-		}
-	}
-	return false, nil
+	return contains(settings.AuthUsers, userID), nil
 }
 
-func AddAuthUser(chatID, userID int64) error {
-	if is, err := IsAuthUser(chatID, userID); is || err != nil {
-		return err
-	}
-
-	settings, err := getChatSettings(chatID)
-	if err != nil {
-		return err
-	}
-
-	settings.AuthUsers = append(settings.AuthUsers, userID)
-	return updateChatSettings(settings)
+func Authorize(chatID, userID int64) error {
+	return modifyChatSettings(chatID, func(s *ChatSettings) bool {
+		var added bool
+		s.AuthUsers, added = addUnique(s.AuthUsers, userID)
+		return added
+	})
 }
 
-func RemoveAuthUser(chatID, userID int64) error {
-	settings, err := getChatSettings(chatID)
-	if err != nil {
-		return err
-	}
-
-	var newAuthUsers []int64
-	var found bool
-	for _, user := range settings.AuthUsers {
-		if user == userID {
-			found = true
-			continue
-		}
-		newAuthUsers = append(newAuthUsers, user)
-	}
-
-	if !found {
-		return nil // User not in the auth list
-	}
-
-	settings.AuthUsers = newAuthUsers
-	return updateChatSettings(settings)
+func Unauthorize(chatID, userID int64) error {
+	return modifyChatSettings(chatID, func(s *ChatSettings) bool {
+		var removed bool
+		s.AuthUsers, removed = removeElement(s.AuthUsers, userID)
+		return removed
+	})
 }
 
-func GetAuthUsers(chatID int64) ([]int64, error) {
+func AuthorizedUsers(chatID int64) ([]int64, error) {
 	settings, err := getChatSettings(chatID)
 	if err != nil {
 		return nil, err
 	}
-
 	return settings.AuthUsers, nil
 }

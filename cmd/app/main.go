@@ -75,7 +75,7 @@ func main() {
 	shutdownCore := core.Init()
 	defer shutdownCore()
 
-	core.GetAssistantIndexFunc = database.GetAssistantIndex
+	core.GetAssistantIndexFunc = database.AssistantIndex
 	core.F = modules.F
 
 	if err := database.RebalanceAssistantIndexes(core.Assistants.Count()); err != nil {

@@ -21,7 +21,6 @@
 package modules
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"html"
@@ -40,13 +39,13 @@ import (
 	"main/internal/utils"
 )
 
-var downloadCancels = make(map[int64]context.CancelFunc)
+var downloadCancels = make(map[int64]func())
 
 func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	chatID := m.ChannelID()
 
 	if cplay {
-		cplayID, err := database.GetCPlayID(chatID)
+		cplayID, err := database.LinkedChannel(chatID)
 		if err != nil || cplayID == 0 {
 			return nil, errors.New(F(chatID, "cplay_id_not_set"))
 		}
@@ -65,7 +64,7 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 }
 
 func isMaintenanceBlocked(userID int64) bool {
-	isMaint, _ := database.IsMaintenance()
+	isMaint, _ := database.IsMaintenanceEnabled()
 	if !isMaint {
 		return false
 	}
@@ -77,18 +76,18 @@ func isMaintenanceBlocked(userID int64) bool {
 }
 
 func shouldShowThumb(chatID int64) bool {
-	noThumb, err := database.GetNoThumb(chatID)
+	noThumb, err := database.ThumbnailsDisabled(chatID)
 	if err != nil {
 		// On error, default to showing thumbnails
 		return true
 	}
-	// NoThumb = true means DON'T show thumb
+	// ThumbnailsDisabled = true means DON'T show thumb
 	// So we return the inverse
 	return !noThumb
 }
 
 func F(chatID int64, key string, values ...locales.Arg) string {
-	lang, err := database.GetChatLanguage(chatID)
+	lang, err := database.Language(chatID)
 	if err != nil {
 		gologging.ErrorF("Failed to get language for %d: %v", chatID, err)
 		lang = config.DefaultLang
@@ -211,7 +210,7 @@ func SafeCallbackHandler(
 	handler func(*tg.CallbackQuery) error,
 ) func(*tg.CallbackQuery) error {
 	return func(cb *tg.CallbackQuery) (err error) {
-		if isMaint, _ := database.IsMaintenance(); isMaint {
+		if isMaint, _ := database.IsMaintenanceEnabled(); isMaint {
 			isOwner := cb.SenderID == config.OwnerID
 			isSudo, _ := database.IsSudo(cb.SenderID)
 			if !isOwner && !isSudo {
@@ -244,7 +243,7 @@ func SafeMessageHandler(
 	return func(m *tg.NewMessage) (err error) {
 		gologging.InfoF("Handling message from %d in chat %d", m.SenderID(), m.ChannelID())
 
-		if isMaint, _ := database.IsMaintenance(); isMaint {
+		if isMaint, _ := database.IsMaintenanceEnabled(); isMaint {
 			gologging.Debug("Maintenance mode active")
 			isOwner := m.SenderID() == config.OwnerID
 			isSudo, _ := database.IsSudo(m.SenderID())
@@ -252,7 +251,7 @@ func SafeMessageHandler(
 			if !isOwner && !isSudo {
 				if m.ChatType() == tg.EntityUser ||
 					strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
-					reason, _ := database.GetMaintReason()
+					reason, _ := database.MaintenanceReason()
 					msg := F(m.ChannelID(), "maint", locales.Arg{
 						"reason": F(m.ChannelID(), "maint_reason", locales.Arg{"reason": reason}),
 					})

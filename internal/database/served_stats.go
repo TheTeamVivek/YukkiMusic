@@ -21,10 +21,7 @@
 
 package database
 
-import "slices"
-
-// GetServedChats returns all chats that have used the bot.
-func GetServedChats() ([]int64, error) {
+func ServedChats() ([]int64, error) {
 	state, err := getBotState()
 	if err != nil {
 		return nil, err
@@ -32,8 +29,7 @@ func GetServedChats() ([]int64, error) {
 	return state.Served.Chats, nil
 }
 
-// GetServedUsers returns all users that have used the bot in private.
-func GetServedUsers() ([]int64, error) {
+func ServedUsers() ([]int64, error) {
 	state, err := getBotState()
 	if err != nil {
 		return nil, err
@@ -41,7 +37,6 @@ func GetServedUsers() ([]int64, error) {
 	return state.Served.Users, nil
 }
 
-// IsServedChat checks if the chat is already in the served list.
 func IsServedChat(id int64) (bool, error) {
 	state, err := getBotState()
 	if err != nil {
@@ -51,7 +46,6 @@ func IsServedChat(id int64) (bool, error) {
 	return ok, nil
 }
 
-// IsServedUser checks if the user is already in the served list.
 func IsServedUser(id int64) (bool, error) {
 	state, err := getBotState()
 	if err != nil {
@@ -61,74 +55,46 @@ func IsServedUser(id int64) (bool, error) {
 	return ok, nil
 }
 
-// AddServedChat adds a chat to the served list.
 func AddServedChat(id int64) error {
-	state, err := getBotState()
-	if err != nil {
-		return err
-	}
-
-	if _, ok := state.servedChatsMap[id]; ok {
-		return nil
-	}
-
-	state.Served.Chats = append(state.Served.Chats, id)
-	state.servedChatsMap[id] = struct{}{}
-
-	return updateBotState(state)
+	return modifyBotState(func(s *BotState) bool {
+		var added bool
+		s.Served.Chats, added = addUnique(s.Served.Chats, id)
+		if added {
+			s.servedChatsMap[id] = struct{}{}
+		}
+		return added
+	})
 }
 
-// AddServedUser adds a user to the served list.
 func AddServedUser(id int64) error {
-	state, err := getBotState()
-	if err != nil {
-		return err
-	}
-
-	if _, ok := state.servedUsersMap[id]; ok {
-		return nil
-	}
-
-	state.Served.Users = append(state.Served.Users, id)
-	state.servedUsersMap[id] = struct{}{}
-
-	return updateBotState(state)
+	return modifyBotState(func(s *BotState) bool {
+		var added bool
+		s.Served.Users, added = addUnique(s.Served.Users, id)
+		if added {
+			s.servedUsersMap[id] = struct{}{}
+		}
+		return added
+	})
 }
 
-// DeleteServedChat removes a chat from the served list.
-func DeleteServedChat(id int64) error {
-	state, err := getBotState()
-	if err != nil {
-		return err
-	}
-
-	if _, ok := state.servedChatsMap[id]; !ok {
-		return nil
-	}
-
-	delete(state.servedChatsMap, id)
-	state.Served.Chats = slices.DeleteFunc(state.Served.Chats, func(v int64) bool {
-		return v == id
+func RemoveServedChat(id int64) error {
+	return modifyBotState(func(s *BotState) bool {
+		var removed bool
+		s.Served.Chats, removed = removeElement(s.Served.Chats, id)
+		if removed {
+			delete(s.servedChatsMap, id)
+		}
+		return removed
 	})
-
-	return updateBotState(state)
 }
 
-// DeleteServedUser removes a user from the served list.
-func DeleteServedUser(id int64) error {
-	state, err := getBotState()
-	if err != nil {
-		return err
-	}
-
-	if _, ok := state.servedUsersMap[id]; !ok {
-		return nil
-	}
-
-	delete(state.servedUsersMap, id)
-	state.Served.Users = slices.DeleteFunc(state.Served.Users, func(v int64) bool {
-		return v == id
+func RemoveServedUser(id int64) error {
+	return modifyBotState(func(s *BotState) bool {
+		var removed bool
+		s.Served.Users, removed = removeElement(s.Served.Users, id)
+		if removed {
+			delete(s.servedUsersMap, id)
+		}
+		return removed
 	})
-
-	return updateBotState(state)
 }

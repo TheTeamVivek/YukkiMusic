@@ -17,23 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package database
 
 import "main/internal/config"
 
-func GetChatLanguage(chatID int64) (string, error) {
+func Language(chatID int64) (string, error) {
 	settings, err := getChatSettings(chatID)
-	if err != nil || settings.Language == "" {
+	if err != nil {
 		return config.DefaultLang, err
+	}
+	if settings.Language == "" {
+		return config.DefaultLang, nil
 	}
 	return settings.Language, nil
 }
 
-func SetChatLanguage(chatID int64, lang string) error {
-	settings, err := getChatSettings(chatID)
-	if err != nil || settings.Language == lang {
-		return err
-	}
-	settings.Language = lang
-	return updateChatSettings(settings)
+func SetLanguage(chatID int64, lang string) error {
+	return modifyChatSettings(chatID, func(s *ChatSettings) bool {
+		if s.Language == lang {
+			return false
+		}
+		s.Language = lang
+		return true
+	})
 }

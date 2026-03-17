@@ -188,7 +188,7 @@ func handleChatAction(m *telegram.NewMessage) error {
 
 			core.DeleteRoom(chatID)
 			core.DeleteChatState(chatID)
-			database.DeleteServedChat(chatID)
+			database.RemoveServedChat(chatID)
 
 			if config.LoggerID != 0 {
 				m.Client.SendMessage(

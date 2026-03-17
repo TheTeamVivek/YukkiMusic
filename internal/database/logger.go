@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package database
 
 func IsLoggerEnabled() (bool, error) {
@@ -28,11 +29,11 @@ func IsLoggerEnabled() (bool, error) {
 }
 
 func SetLoggerEnabled(enabled bool) error {
-	state, err := getBotState()
-	if err != nil || state.LoggerEnabled == enabled {
-		return err
-	}
-
-	state.LoggerEnabled = enabled
-	return updateBotState(state)
+	return modifyBotState(func(s *BotState) bool {
+		if s.LoggerEnabled == enabled {
+			return false
+		}
+		s.LoggerEnabled = enabled
+		return true
+	})
 }

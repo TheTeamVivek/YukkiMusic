@@ -1,3 +1,23 @@
+/*
+  - This file is part of YukkiMusic.
+    *
+
+  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
+  - Copyright (C) 2025 TheTeamVivek
+    *
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+    *
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU General Public License for more details.
+    *
+  - You should have received a copy of the GNU General Public License
+  - along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 package modules
 
 import (
@@ -122,7 +142,7 @@ func getOrCreateRTMPStream(chatID int64) (*tg.RTMPStream, error) {
 		return stream, nil
 	}
 
-	url, key, err := database.GetRTMP(chatID)
+	url, key, err := database.RTMP(chatID)
 	if err != nil || url == "" || key == "" {
 		return nil, fmt.Errorf(
 			"RTMP not configured. Admin must use /setrtmp in bot DM first",
@@ -157,7 +177,7 @@ func streamHandler(m *tg.NewMessage) error {
 func handleStream(m *tg.NewMessage, force bool) error {
 	chatID := m.ChannelID()
 
-	url, key, err := database.GetRTMP(chatID)
+	url, key, err := database.RTMP(chatID)
 	if err != nil || url == "" || key == "" {
 		m.Reply(F(chatID, "rtmp_not_configured", locales.Arg{
 			"cmd": "/setrtmp",
@@ -314,7 +334,7 @@ func streamStatusHandler(m *tg.NewMessage) error {
 	chatID := m.ChannelID()
 
 	// Check if RTMP is configured (without exposing credentials)
-	url, _, err := database.GetRTMP(chatID)
+	url, _, err := database.RTMP(chatID)
 	if err != nil || url == "" {
 		m.Reply(F(chatID, "rtmp_not_configured", locales.Arg{
 			"cmd": "/setrtmp",

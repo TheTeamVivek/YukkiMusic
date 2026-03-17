@@ -18,9 +18,11 @@
   - You should have received a copy of the GNU General Public License
   - along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
+
 package database
 
 import (
+	"fmt"
 	"strconv"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -28,31 +30,28 @@ import (
 )
 
 type RTMPConfig struct {
-	RtmpURL string `bson:"rtmp_url"`
-	RtmpKey string `bson:"rtmp_key"`
+	URL string `bson:"rtmp_url"`
+	Key string `bson:"rtmp_key"`
 }
+
 type ChatSettings struct {
-	ChatID         int64      `bson:"_id"`
-	CPlayID        int64      `bson:"cplay_id"`
-	AuthUsers      []int64    `bson:"auth_users"`
-	Language       string     `bson:"language"`
-	RTMPConfig     RTMPConfig `bson:"rtmp_config"`
-	AssistantIndex int        `bson:"ass_index,omitempty"`
-	NoThumb        bool       `bson:"no_thumb"`
+	ChatID             int64      `bson:"_id"`
+	ChannelPlayID      int64      `bson:"cplay_id"`
+	AuthUsers          []int64    `bson:"auth_users"`
+	Language           string     `bson:"language"`
+	RTMP               RTMPConfig `bson:"rtmp_config"`
+	AssistantIndex     int        `bson:"ass_index,omitempty"`
+	ThumbnailsDisabled bool       `bson:"no_thumb"`
 }
 
 func defaultChatSettings(chatID int64) *ChatSettings {
 	return &ChatSettings{
 		ChatID:    chatID,
 		AuthUsers: []int64{},
-		NoThumb:   false, // Thumbnails enabled by default
 	}
 }
 
 func getChatSettings(chatID int64) (*ChatSettings, error) {
-	ctx, cancel := mongoCtx()
-	defer cancel()
-
 	cacheKey := "chat_settings_" + strconv.FormatInt(chatID, 10)
 	if cached, found := dbCache.Get(cacheKey); found {
 		if settings, ok := cached.(*ChatSettings); ok {
@@ -60,43 +59,55 @@ func getChatSettings(chatID int64) (*ChatSettings, error) {
 		}
 	}
 
+	ctx, cancel := ctx()
+	defer cancel()
+
 	var settings ChatSettings
-	err := chatSettingsColl.FindOne(ctx, bson.M{"_id": chatID}).
-		Decode(&settings)
+	err := chatSettingsColl.FindOne(ctx, bson.M{"_id": chatID}).Decode(&settings)
+
 	if err == mongo.ErrNoDocuments {
 		def := defaultChatSettings(chatID)
 		dbCache.Set(cacheKey, def)
 		return def, nil
-	} else if err != nil {
-		logger.Error("Failed to get chat settings for chat " + strconv.FormatInt(chatID, 10) + " :" + err.Error())
-		return nil, err
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get chat settings for %d: %w", chatID, err)
 	}
 
 	dbCache.Set(cacheKey, &settings)
 	return &settings, nil
 }
 
-func updateChatSettings(newSettings *ChatSettings) error {
-	cacheKey := "chat_settings_" + strconv.FormatInt(newSettings.ChatID, 10)
-	ctx, cancel := mongoCtx()
+func updateChatSettings(settings *ChatSettings) error {
+	cacheKey := "chat_settings_" + strconv.FormatInt(settings.ChatID, 10)
+
+	ctx, cancel := ctx()
 	defer cancel()
 
 	_, err := chatSettingsColl.UpdateOne(
 		ctx,
-		bson.M{"_id": newSettings.ChatID},
-		bson.M{"$set": newSettings},
+		bson.M{"_id": settings.ChatID},
+		bson.M{"$set": settings},
 		upsertOpt,
 	)
 	if err != nil {
-		logger.Error(
-			"Failed to update chat settings for chat " + strconv.FormatInt(
-				newSettings.ChatID,
-				10,
-			) + " :" + err.Error(),
-		)
+		return fmt.Errorf("failed to update chat settings for %d: %w", settings.ChatID, err)
+	}
+
+	dbCache.Set(cacheKey, settings)
+	return nil
+}
+
+func modifyChatSettings(chatID int64, fn func(*ChatSettings) bool) error {
+	settings, err := getChatSettings(chatID)
+	if err != nil {
 		return err
 	}
 
-	dbCache.Set(cacheKey, newSettings)
+	if fn(settings) {
+		return updateChatSettings(settings)
+	}
+
 	return nil
 }

@@ -224,7 +224,7 @@ func handleDelSudo(m *telegram.NewMessage) error {
 	}
 
 	// Delete from DB
-	if err := database.DeleteSudo(targetID); err != nil {
+	if err := database.RemoveSudo(targetID); err != nil {
 		m.Reply(F(chatID, "sudo_remove_fail", locales.Arg{
 			"error": err.Error(),
 		}))
@@ -255,7 +255,7 @@ func handleGetSudoers(m *telegram.NewMessage) error {
 	// "⏳ Fetching sudoers list..."
 	statusMsg, _ := m.Reply(F(chatID, "sudo_list_fetching"))
 
-	list, err := database.GetSudoers()
+	list, err := database.Sudoers()
 	if err != nil {
 		utils.EOR(statusMsg, F(chatID, "sudo_list_fetch_fail", locales.Arg{
 			"error": err.Error(),

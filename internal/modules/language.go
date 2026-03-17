@@ -35,7 +35,7 @@ import (
 func langHandler(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()
 
-	lang, err := database.GetChatLanguage(chatID)
+	lang, err := database.Language(chatID)
 	if err != nil {
 		lang = config.DefaultLang
 	}
@@ -78,7 +78,7 @@ func langCallbackHandler(cb *telegram.CallbackQuery) error {
 		return telegram.ErrEndGroup
 	}
 
-	currentLang, _ := database.GetChatLanguage(chatID)
+	currentLang, _ := database.Language(chatID)
 
 	if lang == currentLang {
 		cb.Answer(F(chatID, "lang_same"), opt)
@@ -87,7 +87,7 @@ func langCallbackHandler(cb *telegram.CallbackQuery) error {
 
 	langName := locales.Get(lang, "name", nil)
 
-	if err := database.SetChatLanguage(chatID, lang); err != nil {
+	if err := database.SetLanguage(chatID, lang); err != nil {
 		gologging.ErrorF("SetChatLanguage error: %v", err)
 		cb.Answer(F(chatID, "lang_fail"), opt)
 		return telegram.ErrEndGroup

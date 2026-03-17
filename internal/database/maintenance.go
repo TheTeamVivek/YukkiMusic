@@ -17,40 +17,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package database
 
-// SetMaintenance sets the maintenance mode.
-// If enabling, you can provide an optional reason.
-// If disabling, it clears any existing reason.
 func SetMaintenance(enabled bool, reason ...string) error {
-	state, err := getBotState()
-	if err != nil {
-		return err
-	}
-
-	// If the state is already the same, maybe just update reason
-	if state.Maintenance.Enabled == enabled {
-		if enabled && len(reason) > 0 && state.Maintenance.Reason != reason[0] {
-			state.Maintenance.Reason = reason[0]
-			return updateBotState(state)
-		} else if !enabled && state.Maintenance.Reason != "" {
-			state.Maintenance.Reason = ""
-			return updateBotState(state)
+	return modifyBotState(func(s *BotState) bool {
+		changed := false
+		if s.Maintenance.Enabled != enabled {
+			s.Maintenance.Enabled = enabled
+			changed = true
 		}
-		return nil
-	}
 
-	state.Maintenance.Enabled = enabled
-	if enabled && len(reason) > 0 {
-		state.Maintenance.Reason = reason[0]
-	} else if !enabled {
-		state.Maintenance.Reason = ""
-	}
+		newReason := ""
+		if enabled && len(reason) > 0 {
+			newReason = reason[0]
+		}
 
-	return updateBotState(state)
+		if s.Maintenance.Reason != newReason {
+			s.Maintenance.Reason = newReason
+			changed = true
+		}
+		return changed
+	})
 }
 
-func GetMaintReason() (string, error) {
+func MaintenanceReason() (string, error) {
 	state, err := getBotState()
 	if err != nil {
 		return "", err
@@ -58,7 +49,7 @@ func GetMaintReason() (string, error) {
 	return state.Maintenance.Reason, nil
 }
 
-func IsMaintenance() (bool, error) {
+func IsMaintenanceEnabled() (bool, error) {
 	state, err := getBotState()
 	if err != nil {
 		return false, err

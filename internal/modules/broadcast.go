@@ -152,7 +152,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 	var servedChatErr, servedUserErr error
 
 	if !flags.NoChat {
-		servedChats, servedChatErr = database.GetServedChats()
+		servedChats, servedChatErr = database.ServedChats()
 		if servedChatErr != nil {
 			broadcastMu.Lock()
 			broadcastActive = false
@@ -166,7 +166,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 	}
 
 	if !flags.NoUser {
-		servedUsers, servedUserErr = database.GetServedUsers()
+		servedUsers, servedUserErr = database.ServedUsers()
 		if servedUserErr != nil {
 			broadcastMu.Lock()
 			broadcastActive = false

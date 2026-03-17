@@ -17,13 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package database
 
-// GetSudoers returns all sudoers.
-func GetSudoers() ([]int64, error) {
+func Sudoers() ([]int64, error) {
 	state, err := getBotState()
 	if err != nil {
-		logger.ErrorF("Failed to get current sudoers: %v", err)
 		return nil, err
 	}
 	return state.Sudoers, nil
@@ -34,77 +33,26 @@ func IsSudoWithoutError(id int64) bool {
 	return is
 }
 
-// IsSudo checks if the given ID is a sudoer.
 func IsSudo(id int64) (bool, error) {
 	state, err := getBotState()
 	if err != nil {
-		logger.ErrorF("Failed to get current sudoers: %v", err)
 		return false, err
 	}
-
-	for _, v := range state.Sudoers {
-		if v == id {
-			return true, nil
-		}
-	}
-	return false, nil
+	return contains(state.Sudoers, id), nil
 }
 
-// AddSudo adds a new sudoer if not already present.
 func AddSudo(id int64) error {
-	exists, err := IsSudo(id)
-	if err != nil {
-		logger.ErrorF("Failed to check sudo existence: %v", err)
-		return err
-	}
-	if exists {
-		return nil
-	}
-
-	state, err := getBotState()
-	if err != nil {
-		logger.ErrorF("Failed to get current sudoers: %v", err)
-		return err
-	}
-
-	state.Sudoers = append(state.Sudoers, id)
-	if err := updateBotState(state); err != nil {
-		logger.ErrorF("Failed to update sudoers: %v", err)
-		return err
-	}
-
-	return nil
+	return modifyBotState(func(s *BotState) bool {
+		var added bool
+		s.Sudoers, added = addUnique(s.Sudoers, id)
+		return added
+	})
 }
 
-// DeleteSudo removes a sudoer by ID.
-func DeleteSudo(id int64) error {
-	exists, err := IsSudo(id)
-	if err != nil {
-		logger.ErrorF("Failed to check sudo existence: %v", err)
-		return err
-	}
-	if !exists {
-		return nil
-	}
-
-	state, err := getBotState()
-	if err != nil {
-		logger.ErrorF("Failed to get current sudoers: %v", err)
-		return err
-	}
-
-	newSudoers := make([]int64, 0, len(state.Sudoers))
-	for _, v := range state.Sudoers {
-		if v != id {
-			newSudoers = append(newSudoers, v)
-		}
-	}
-	state.Sudoers = newSudoers
-
-	if err := updateBotState(state); err != nil {
-		logger.ErrorF("Failed to update sudoers: %v", err)
-		return err
-	}
-
-	return nil
+func RemoveSudo(id int64) error {
+	return modifyBotState(func(s *BotState) bool {
+		var removed bool
+		s.Sudoers, removed = removeElement(s.Sudoers, id)
+		return removed
+	})
 }

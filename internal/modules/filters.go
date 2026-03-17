@@ -52,7 +52,7 @@ func filterSuperGroup(m *tg.NewMessage) bool {
 			return true // Supergroup
 		}
 		warnAndLeave(m.Client, m.ChannelID()) // Basic group → leave
-		database.DeleteServedChat(m.ChannelID())
+		database.RemoveServedChat(m.ChannelID())
 		return false
 
 	case tg.EntityChannel:
@@ -82,7 +82,7 @@ func filterAuthUsers(m *tg.NewMessage) bool {
 		return true
 	}
 
-	isAuth, err := database.IsAuthUser(m.ChannelID(), m.SenderID())
+	isAuth, err := database.IsAuthorized(m.ChannelID(), m.SenderID())
 	if err == nil && isAuth {
 		return true
 	}

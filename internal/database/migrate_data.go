@@ -18,9 +18,11 @@
   - You should have received a copy of the GNU General Public License
   - along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
+
 package database
 
 import (
+	"context"
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -55,38 +57,36 @@ func migrateData() {
 	logger.Info("Checking for old database to migrate...")
 
 	oldDB := client.Database(oldDBName)
-	ctx, cancel := mongoCtx()
-	defer cancel()
+	ctx := context.Background()
 
 	flagColl := oldDB.Collection("migration_status")
 	var result bson.M
 	err := flagColl.FindOne(ctx, bson.M{"migrated": true}).Decode(&result)
+
 	if err == nil {
 		logger.Info("Migration already completed previously. Skipping.")
 		return
 	}
 
 	// perform migration
-	migrateCPlay(oldDB)
-	migrateServedUsers(oldDB)
-	migrateServedChats(oldDB)
-	migrateSudoers(oldDB)
+	migrateCPlay(ctx, oldDB)
+	migrateServedUsers(ctx, oldDB)
+	migrateServedChats(ctx, oldDB)
+	migrateSudoers(ctx, oldDB)
 
 	_, err = flagColl.InsertOne(ctx, bson.M{
 		"migrated":  true,
 		"timestamp": time.Now(),
 	})
+
 	if err != nil {
 		logger.ErrorF("Failed to write migration flag: %v", err)
 	}
 	logger.Info("Data migration complete.")
 }
 
-func migrateCPlay(db *mongo.Database) {
+func migrateCPlay(ctx context.Context, db *mongo.Database) {
 	coll := db.Collection("cplaymode")
-
-	ctx, cancel := mongoCtx()
-	defer cancel()
 
 	opts := options.Find().SetBatchSize(500)
 
@@ -151,11 +151,8 @@ func migrateCPlay(db *mongo.Database) {
 	logger.Info("Finished migrating cplay settings.")
 }
 
-func migrateServedUsers(db *mongo.Database) {
+func migrateServedUsers(ctx context.Context, db *mongo.Database) {
 	coll := db.Collection("tgusersdb")
-
-	ctx, cancel := mongoCtx()
-	defer cancel()
 
 	opts := options.Find().SetBatchSize(500)
 
@@ -212,11 +209,8 @@ func migrateServedUsers(db *mongo.Database) {
 	logger.Info("Finished migrating served users.")
 }
 
-func migrateServedChats(db *mongo.Database) {
+func migrateServedChats(ctx context.Context, db *mongo.Database) {
 	coll := db.Collection("chats")
-
-	ctx, cancel := mongoCtx()
-	defer cancel()
 
 	opts := options.Find().SetBatchSize(500)
 
@@ -273,11 +267,8 @@ func migrateServedChats(db *mongo.Database) {
 	logger.Info("Finished migrating served chats.")
 }
 
-func migrateSudoers(db *mongo.Database) {
+func migrateSudoers(ctx context.Context, db *mongo.Database) {
 	coll := db.Collection("sudoers")
-
-	ctx, cancel := mongoCtx()
-	defer cancel()
 
 	var doc oldSudoers
 	err := coll.FindOne(ctx, bson.M{"sudo": "sudo"}).Decode(&doc)
@@ -313,3 +304,4 @@ func migrateSudoers(db *mongo.Database) {
 
 	logger.Info("Finished migrating sudoers.")
 }
+

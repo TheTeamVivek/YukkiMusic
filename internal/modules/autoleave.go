@@ -64,7 +64,7 @@ func autoLeaveHandler(m *tg.NewMessage) error {
 	args := strings.Fields(m.Text())
 	chatID := m.ChannelID()
 
-	currentState, err := database.GetAutoLeave()
+	currentState, err := database.AutoLeave()
 	if err != nil {
 		m.Reply(F(chatID, "autoleave_fetch_fail"))
 		return tg.ErrEndGroup

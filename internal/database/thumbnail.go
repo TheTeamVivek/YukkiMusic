@@ -17,29 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package database
 
-// GetNoThumb returns whether thumbnails are disabled for the chat.
+// ThumbnailsDisabled returns whether thumbnails are disabled for the chat.
 // Returns false by default (thumbnails enabled).
-func GetNoThumb(chatID int64) (bool, error) {
+func ThumbnailsDisabled(chatID int64) (bool, error) {
 	settings, err := getChatSettings(chatID)
 	if err != nil {
 		return false, err
 	}
-	return settings.NoThumb, nil
+	return settings.ThumbnailsDisabled, nil
 }
 
-// SetNoThumb sets whether thumbnails should be disabled for the chat.
-func SetNoThumb(chatID int64, noThumb bool) error {
-	settings, err := getChatSettings(chatID)
-	if err != nil {
-		return err
-	}
-
-	if settings.NoThumb == noThumb {
-		return nil
-	}
-
-	settings.NoThumb = noThumb
-	return updateChatSettings(settings)
+// SetThumbnailsDisabled sets whether thumbnails should be disabled for the chat.
+func SetThumbnailsDisabled(chatID int64, disabled bool) error {
+	return modifyChatSettings(chatID, func(s *ChatSettings) bool {
+		if s.ThumbnailsDisabled == disabled {
+			return false
+		}
+		s.ThumbnailsDisabled = disabled
+		return true
+	})
 }

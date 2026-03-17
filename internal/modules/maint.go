@@ -61,7 +61,7 @@ var maintCancel = struct {
 func handleMaintenance(m *tg.NewMessage) error {
 	args := strings.Fields(m.Text())
 	chatID := m.ChannelID()
-	current, err := database.IsMaintenance()
+	current, err := database.IsMaintenanceEnabled()
 	if err != nil {
 		m.Reply(
 			F(chatID, "maint_check_fail", locales.Arg{"error": err.Error()}),
@@ -71,7 +71,7 @@ func handleMaintenance(m *tg.NewMessage) error {
 
 	// show current status if no args
 	if len(args) < 2 {
-		reason, _ := database.GetMaintReason()
+		reason, _ := database.MaintenanceReason()
 		status := F(chatID, "disabled")
 		if current {
 			if reason != "" {
@@ -97,7 +97,7 @@ func handleMaintenance(m *tg.NewMessage) error {
 		return tg.ErrEndGroup
 	}
 	reason := strings.Join(args[2:], " ")
-	oldReason, _ := database.GetMaintReason()
+	oldReason, _ := database.MaintenanceReason()
 
 	// no change in state
 	if current == enable {
