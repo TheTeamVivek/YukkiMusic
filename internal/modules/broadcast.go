@@ -48,7 +48,7 @@ type BroadcastManager struct {
 
 var bManager = &BroadcastManager{}
 
-const defaultDelay = 1.5
+const defaultDelay = 0.7
 
 // TryStart attempts to start a new broadcast. It returns true if successful,
 // or false if a broadcast is already running.
