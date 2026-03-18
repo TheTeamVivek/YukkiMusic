@@ -588,7 +588,6 @@ func playTracksAndRespond(
 		if err := playTrackWithRetry(r, track, filePath, force && i == 0, replyMsg); err != nil {
 			return err
 		}
-		r.DeleteData("rec_cache")
 		sendPlayLogs(m, track, (isActive && !force) || i > 0)
 	}
 

@@ -170,11 +170,6 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter},
 	},
 	{Pattern: "(rtmp|setrtmp)", Handler: setRTMPHandler},
-	{
-		Pattern: "autoplay",
-		Handler: autoplayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
 	// play/cplay/vplay/fplay commands
 	{
 		Pattern: "play",
@@ -449,11 +444,6 @@ var handlers = []MsgHandlerDef{
 		Handler: crestoreHandler,
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
-	{
-		Pattern: "cautoplay",
-		Handler: cautoplayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
 
 	{
 		Pattern: "(nothumb|nothumbs)",
@@ -520,7 +510,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 		"/cmute", "/cunmute", "/cseek", "/cseekback",
 		"/cjump", "/cremove", "/cclear", "/cmove",
 		"/cspeed", "/creplay", "/cposition", "/cshuffle",
-		"/cloop", "/cqueue", "/creload", "/cautoplay",
+		"/cloop", "/cqueue", "/creload",
 		"/crestore",
 	}
 

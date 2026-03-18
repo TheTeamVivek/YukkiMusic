@@ -63,7 +63,6 @@ type RoomState struct {
 	shuffle bool
 
 	// Automation
-	autoplay bool
 	*scheduledTimers
 
 	// Metadata & UI
@@ -345,15 +344,6 @@ func (r *RoomState) StatusMsg() *telegram.NewMessage {
 	return r.statusMsg
 }
 
-func (r *RoomState) IsAutoplayEnabled() bool {
-	if r.IsDestroyed() {
-		return false
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.autoplay
-}
-
 func (r *RoomState) GetData(k string) (bool, any) {
 	if r.IsDestroyed() {
 		return false, nil
@@ -423,27 +413,7 @@ func (r *RoomState) SetStatusMsg(m *telegram.NewMessage) {
 	r.statusMsg = m
 }
 
-func (r *RoomState) SetAutoplay(enabled bool) {
-	if r.IsDestroyed() {
-		return
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.autoplay = enabled
-}
-
 // State checks
-
-func (r *RoomState) PrepareForAutoPlay() {
-	if r.IsDestroyed() {
-		return
-	}
-	r.mu.Lock()
-	r.playing = false
-	r.position = 0
-	r.mu.Unlock()
-	r.releaseFile()
-}
 
 func (r *RoomState) IsActiveChat() bool {
 	if r.IsDestroyed() {

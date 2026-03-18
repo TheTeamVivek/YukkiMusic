@@ -27,7 +27,6 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/config"
 	"main/internal/core"
 	state "main/internal/core/models"
 	"main/internal/locales"
@@ -35,48 +34,6 @@ import (
 	"main/internal/utils"
 	"main/ntgcalls"
 )
-
-type RecCache struct {
-	Tracks []*state.Track
-	Index  int
-}
-
-func getRecCache(r *core.RoomState) (*RecCache, bool) {
-	ok, v := r.GetData("rec_cache")
-	if !ok {
-		return nil, false
-	}
-
-	cache, ok := v.(*RecCache)
-	return cache, ok
-}
-
-func setRecCache(r *core.RoomState, tracks []*state.Track, start int) {
-	r.SetData("rec_cache", &RecCache{
-		Tracks: tracks,
-		Index:  start,
-	})
-}
-
-func nextCachedRec(r *core.RoomState) *state.Track {
-	cache, ok := getRecCache(r)
-	if !ok || cache == nil {
-		return nil
-	}
-
-	if cache.Index >= len(cache.Tracks) {
-		r.DeleteData("rec_cache")
-		return nil
-	}
-
-	t := cache.Tracks[cache.Index]
-	r.SetData("rec_cache", &RecCache{
-		Tracks: cache.Tracks,
-		Index:  cache.Index + 1,
-	})
-
-	return t
-}
 
 func streamEndHandler(
 	chatID int64,
@@ -114,75 +71,9 @@ func streamEndHandler(
 	var t *state.Track
 	var wasLooping bool
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
-		if r.IsAutoplayEnabled() {
-			gologging.DebugF(
-				"[onStreamEndHandler] AutoPlay is ON for chat %d",
-				chatID,
-			)
-
-			t = nextCachedRec(r)
-			if t != nil {
-				gologging.DebugF(
-					"[onStreamEndHandler] Found next track in cache: %s",
-					t.Title,
-				)
-				t.Requester = "AutoPlay"
-				r.PrepareForAutoPlay()
-			}
-
-			if t == nil {
-				lastTrack := r.Track()
-				if lastTrack != nil {
-					if lastTrack.Requester == "AutoPlay" {
-						gologging.DebugF(
-							"[onStreamEndHandler] AutoPlay batch finished for chat %d, stopping as per request",
-							chatID,
-						)
-					} else {
-						gologging.DebugF(
-							"[onStreamEndHandler] Cache empty, fetching recommendations for: %s",
-							lastTrack.Title,
-						)
-
-						p := platforms.GetPlatform(lastTrack.Source)
-						if p != nil && p.CanGetRecommendations() {
-
-							recs, err := p.GetRecommendations(lastTrack)
-							if err == nil && len(recs) > 0 {
-								gologging.DebugF(
-									"[onStreamEndHandler] Fetched %d new recommendations",
-									len(recs),
-								)
-
-								if config.QueueLimit > 0 && len(recs) > config.QueueLimit {
-									recs = recs[:config.QueueLimit]
-									gologging.DebugF("[onStreamEndHandler] Truncated recommendations to %d (QueueLimit)", config.QueueLimit)
-								}
-
-								setRecCache(r, recs, 1)
-
-								// play first
-								t = recs[0]
-								t.Requester = "AutoPlay"
-								r.PrepareForAutoPlay()
-
-							} else {
-								gologging.ErrorF("[onStreamEndHandler] recommendation error: %v", err)
-							}
-						} else {
-							gologging.DebugF("[onStreamEndHandler] Platform %s does not support recommendations", lastTrack.Source)
-						}
-					}
-				}
-			}
-
-		}
-
-		if t == nil {
-			core.DeleteRoom(chatID)
-			core.Bot.SendMessage(cid, F(cid, "stream_queue_finished"))
-			return
-		}
+		core.DeleteRoom(chatID)
+		core.Bot.SendMessage(cid, F(cid, "stream_queue_finished"))
+		return
 	} else {
 		wasLooping = r.Loop() > 0
 		t = r.NextTrack()

@@ -123,15 +123,6 @@ func (f *FallenApiPlatform) Download(
 	return path, nil
 }
 
-func (f *FallenApiPlatform) CanGetRecommendations() bool {
-	return false
-}
-
-func (f *FallenApiPlatform) GetRecommendations(
-	track *state.Track,
-) ([]*state.Track, error) {
-	return nil, errors.New("recommendations not supported on fallenapi")
-}
 
 func (*FallenApiPlatform) CanSearch() bool { return false }
 

@@ -35,21 +35,6 @@ assistant_restricted_warning: |
 
   <i>Unban the assistant to restore all music features 🎵</i>
 
-autoplay_usage: |
-  ⚙️ <b>AutoPlay Control</b>
-
-  <i>When enabled, the bot will automatically play recommended tracks when the queue is empty.</i>
-  
-  Usage: {cmd} [enable|disable]
-
-  <i><b>Current state:</b> {action}</i>
-
-autoplay_updated: |
-  ⚙️ <b>AutoPlay Updated</b>
-  
-  <i>AutoPlay has been <b>{action}</b> by {user}.</i>
-
-
 # 🧩 Common auth messages
 auth_no_user: "⚠️ Please provide a user — use:\n{cmd} [user_id] or reply to a user's message."
 user_extract_fail: "⚠️ Unable to get that user: <i>{error}</i>"

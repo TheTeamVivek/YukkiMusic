@@ -89,11 +89,5 @@ type (
 		// but must set Track.Video = false.
 		GetTracks(query string, video bool) ([]*Track, error)
 
-		// CanGetRecommendations reports whether this platform can
-		// provide track recommendations based on a given track.
-		CanGetRecommendations() bool
-
-		// GetRecommendations fetches recommended tracks for the given track.
-		GetRecommendations(track *Track) ([]*Track, error)
 	}
 )
