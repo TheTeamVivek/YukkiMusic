@@ -52,11 +52,9 @@ var (
 
 	SpotifyClientID = getString(
 		"SPOTIFY_CLIENT_ID",
-		"40b91facfdee4c6e9456906613e7ca6b",
 	)
 	SpotifyClientSecret = getString(
 		"SPOTIFY_CLIENT_SECRET",
-		"e8d7847ccdf545b9ac5051d2c456c5d2",
 	)
 
 	FallenAPIURL = getString("FALLEN_API_URL", "https://beta.fallenapi.fun")
