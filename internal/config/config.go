@@ -60,9 +60,6 @@ var (
 	FallenAPIURL = getString("FALLEN_API_URL", "https://beta.fallenapi.fun")
 	FallenAPIKey = getString("FALLEN_API_KEY")
 
-	YoutubifyApiURL = getString("YOUTUBIFY_API_URL", "https://youtubify.me")
-	YoutubifyApiKey = getString("YOUTUBIFY_API_KEY")
-
 	DefaultLang    = getString("DEFAULT_LANG", "en")
 	DurationLimit  = int(getInt64("DURATION_LIMIT", 4200)) // in seconds
 	LeaveOnDemoted = getBool("LEAVE_ON_DEMOTED", false)
