@@ -125,7 +125,7 @@ func (yp *YouTubePlatform) GetTracks(
 				return updateCached(tracks, video), nil
 			}
 
-			normalizedURL, videoID, err := yp.normalizeYouTubeURL(trimmed)
+			_, videoID, err := yp.normalizeYouTubeURL(trimmed)
 			if err != nil {
 				return nil, err
 			}
@@ -135,16 +135,21 @@ func (yp *YouTubePlatform) GetTracks(
 				return updateCached(cached, video), nil
 			}
 
-			trackList, err := yp.VideoSearch(normalizedURL, true)
-			if err != nil {
-				return nil, err
-			}
-			if len(trackList) == 0 {
-				return nil, errors.New("track not found for the given url")
+			for _, query := range []string{videoID, trimmed} {
+				tracks, err := yp.VideoSearch(query, video)
+				if err != nil {
+					continue
+				}
+
+				for _, t := range tracks {
+					if t.ID == videoID {
+						youtubeCache.Set("track:"+videoID, []*state.Track{t})
+						return updateCached([]*state.Track{t}, video), nil
+					}
+				}
 			}
 
-			youtubeCache.Set("track:"+videoID, trackList)
-			return updateCached(trackList, video), nil
+			return nil, errors.New("track not found for the given url")
 		}
 	}
 
