@@ -1,433 +1,101 @@
 # 🎮 YukkiMusic Modules & Commands System
 
-> **Comprehensive Command Handler Architecture**
-
----
-
-## 📋 Table of Contents
-
-1. [Overview](#-overview)
-2. [Module Structure](#-module-structure)
-3. [Command Categories](#-command-categories)
-4. [Handler Pipeline](#-handler-pipeline)
-5. [Filters & Permissions](#-filters--permissions)
-6. [Command Implementation](#-command-implementation)
-7. [Error Handling](#-error-handling)
-8. [Best Practices](#-best-practices)
-
----
+The **Modules System** implements all bot commands and features through a modular handler pipeline. It is responsible for parsing user input, enforcing permissions via filters, and orchestrating high-level bot behavior by interacting with the `core`, `database`, and `platforms` packages.
 
 ## 🌟 Overview
 
-The **Modules System** implements all bot commands and features through a handler pipeline.
+Each file in this package typically handles a specific feature area (e.g., `play.go`, `skip.go`, `sudoers.go`). The system follows a decentralized architecture where individual modules register their own handlers during initialization.
 
-**Location**: `internal/modules/`
+### ✅ Key Concepts
 
-### Key Concepts
+- **Modular Design**: Each feature is isolated in its own file.
+- **Filter Pipeline**: Permissions and context (e.g., "must be admin") are checked before handler execution.
+- **Panic Recovery**: Every handler is wrapped in a safe execution block that logs crashes and sends debug info to the owner.
+- **Localization**: All user-facing messages are translated using the `F(chatID, key)` helper.
 
-✅ **Modular Design** - Each file handles specific feature area  
-✅ **Filter Pipeline** - Permissions checked before execution  
-✅ **Error Recovery** - Panics caught and logged safely  
-✅ **Help System** - Built-in help for every command  
-✅ **Localization** - All messages translated  
+## 📝 Module registration
 
-### Module Organization
+The central registration point is `handlers.go`. It defines lists of message handlers (`handlers`) and callback query handlers (`cbHandlers`). These are initialized and registered with the bot client in the `Init()` function.
 
-```
-internal/modules/
-├── handlers.go              # Command registration & setup
-├── helpers.go               # Shared utilities
-├── filters.go               # Permission filters
-├── flag_help.go             # Help flag handling
-│
-├── PLAYBACK CONTROL
-├── play.go                  # Play command
-├── skip.go                  # Skip command
-├── pause.go                 # Pause command
-├── resume.go                # Resume command
-├── mute.go                  # Mute command
-├── unmute.go                # Unmute command
-├── seek.go                  # Seek/seekback/jump
-├── replay.go                # Replay command
-├── speed.go                 # Speed control
-│
-├── QUEUE MANAGEMENT
-├── queue.go                 # Queue listing
-├── remove.go                # Remove from queue
-├── clear.go                 # Clear queue
-├── move.go                  # Move in queue
-├── shuffle.go               # Shuffle queue
-├── loop.go                  # Loop tracking
-│
-├── ADMIN FEATURES
-├── auth.go                  # Auth user management
-├── stop.go                  # Stop playback
-├── reload.go                # Reload admin cache
-├── position.go              # Show position
-│
-├── BOT CONTROL
-├── sudoers.go               # Sudo user management
-├── maint.go                 # Maintenance mode
-├── logger.go                # Logger control
-├── autoleave.go             # Auto-leave config
-├── active.go                # Active chats
-├── stats.go                 # Bot statistics
-│
-├── UTILITIES
-├── help.go                  # Help system
-├── ping.go                  # Ping/status
-├── start.go                 # Start command
-├── bug.go                   # Bug reporting
-├── language.go              # Language selection
-├── broadcast.go             # Broadcast messages
-│
-├── DEVELOPER
-├── dev.go                   # Shell/JSON commands
-├── eval.go                  # Code evaluation
-├── watcher.go               # Event watchers
-├── monitor.go               # Room monitoring
-├── restart.go               # Restart command
-│
-└── CHANNEL PLAY
-    └── Various c* commands
-```
+### 🏗️ Adding a new command
 
----
-
-## 🏗️ Module Structure
-
-### Standard Module Pattern
+To add a new command, define its logic in a handler function and add it to the `handlers` slice in `handlers.go`.
 
 ```go
-package modules
-
-import (
-    "github.com/amarnathcjd/gogram/telegram"
-    "main/internal/locales"
-)
-
-// Help text (optional)
-func init() {
-    helpTexts["mycommand"] = "Description and usage"
-}
-
-// Main handler
-func mycommandHandler(m *telegram.NewMessage) error {
+// 1. Create your handler in a new or existing module file
+func myCommandHandler(m *telegram.NewMessage) error {
     chatID := m.ChannelID()
     
-    // 1. Validation
-    if m.Args() == "" {
-        m.Reply(F(chatID, "usage_message"))
-        return telegram.ErrEndGroup
-    }
-    
-    // 2. Business logic
-    result, err := performAction(m.Args())
-    if err != nil {
-        m.Reply(F(chatID, "error_key", locales.Arg{
-            "error": err.Error(),
-        }))
-        return telegram.ErrEndGroup
-    }
-    
-    // 3. Response
-    m.Reply(F(chatID, "success_key", locales.Arg{
-        "result": result,
-    }))
+    // Command logic here
+    m.Reply(F(chatID, "success_message"))
     
     return telegram.ErrEndGroup
 }
+
+// 2. Register it in handlers.go
+var handlers = []MsgHandlerDef{
+    {
+        Pattern: "mycommand",
+        Handler: myCommandHandler,
+        Filters: []telegram.Filter{superGroupFilter, authFilter},
+    },
+    // ...
+}
 ```
 
----
+## 📐 Standard Module Structure
 
-## 📂 Command Categories
+Modules typically follow this lifecycle:
+1. **Validation**: Check arguments and permissions.
+2. **State Retrieval**: Get the relevant `core.RoomState` or `core.ChatState`.
+3. **Action**: Invoke methods on `core` types or `database` helpers.
+4. **Response**: Send a translated message back to the user.
 
-### 1. Playback Control
-
-**Files**: `play.go`, `skip.go`, `pause.go`, `resume.go`, `mute.go`, `unmute.go`, `seek.go`, `replay.go`, `speed.go`
-
-#### Available Commands
-
-| Command | Description | Admin Only |
-|---------|-------------|-----------|
-| `/play` | Play song from URL/search | ❌ |
-| `/fplay` | Force play (skip queue) | ✅ |
-| `/skip` | Skip to next track | ✅ |
-| `/pause [seconds]` | Pause playback | ✅ |
-| `/resume` | Resume playback | ✅ |
-| `/mute [seconds]` | Mute audio | ✅ |
-| `/unmute` | Unmute audio | ✅ |
-| `/seek <seconds>` | Seek forward | ✅ |
-| `/seekback <seconds>` | Seek backward | ✅ |
-| `/jump <position>` | Jump to position | ✅ |
-| `/replay` | Replay current track | ✅ |
-| `/speed <speed>` | Set speed (0.5-4.0x) | ✅ |
-
-#### Implementation Example: Play
+### 🎵 Example: Skip Command (`skip.go`)
 
 ```go
-func handlePlay(m *telegram.NewMessage, opts *playOpts) error {
-    // 1. Prepare room
-    r, replyMsg, err := prepareRoomAndSearchMessage(m, opts.CPlay)
-    if err != nil {
-        return telegram.ErrEndGroup
-    }
-    
-    // 2. Fetch tracks
-    tracks, isActive, err := fetchTracksAndCheckStatus(m, replyMsg, r, opts.Video)
-    if err != nil {
-        return telegram.ErrEndGroup
-    }
-    
-    // 3. Filter and validate
-    tracks, availableSlots, err := filterAndTrimTracks(replyMsg, r, tracks)
-    if err != nil {
-        return telegram.ErrEndGroup
-    }
-    
-    // 4. Play tracks
-    err := playTracksAndRespond(m, replyMsg, r, tracks, mention, isActive, opts.Force, availableSlots)
+func skipHandler(m *tg.NewMessage) error {
+    r, err := getEffectiveRoom(m, false) // helper from helpers.go
     if err != nil {
         return err
     }
-    
-    return telegram.ErrEndGroup
+
+    next := r.NextTrack()
+    if next == nil {
+        m.Reply(F(m.ChannelID(), "queue_empty"))
+        return r.Stop()
+    }
+
+    // Play handles the internal orchestration
+    return r.Play(next, "", false)
 }
 ```
-
----
-
-## 📂 Queue Management
-
-**Files**: `queue.go`, `remove.go`, `clear.go`, `move.go`, `shuffle.go`, `loop.go`
-
-| Command | Description | Admin Only |
-|---------|-------------|-----------|
-| `/queue` | Show queue | ❌ |
-| `/position` | Current position | ❌ |
-| `/remove <index>` | Remove track | ✅ |
-| `/clear` | Clear all tracks | ✅ |
-| `/move <from> <to>` | Reorder tracks | ✅ |
-| `/shuffle [on/off]` | Toggle shuffle | ✅ |
-| `/loop <count>` | Set loop count | ✅ |
-
----
-
-## 📂 User Management
-
-**Files**: `auth.go`, `sudoers.go`
-
-| Command | Description | Requires |
-|---------|-------------|----------|
-| `/addauth <user>` | Add auth user | Admin |
-| `/delauth <user>` | Remove auth user | Admin |
-| `/authlist` | List auth users | Any |
-| `/addsudo <user>` | Add sudo | Owner |
-| `/delsudo <user>` | Remove sudo | Owner |
-| `/sudolist` | List sudoers | Any |
-
----
-
-## 📂 Bot Management
-
-**Files**: `maint.go`, `logger.go`, `autoleave.go`, `active.go`
-
-| Command | Description | Requires |
-|---------|-------------|----------|
-| `/maintenance` | Maintenance mode | Owner |
-| `/logger` | Logger control | Sudo |
-| `/autoleave` | Auto-leave config | Sudo |
-| `/ac` | Active chats | Sudo |
-
----
-
-## 📂 Channel Play (CPlay)
-
-**Files**: `play.go` (cplay variants)
-
-| Command | Description | Admin Only |
-|---------|-------------|-----------|
-| `/cplay <query>` | Play in channel | ✅ |
-| `/cfplay <query>` | Force play in channel | ✅ |
-| `/cpause` | Pause in channel | ✅ |
-| `/cresume` | Resume in channel | ✅ |
-| `/cskip` | Skip in channel | ✅ |
-| `/cqueue` | Queue in channel | ✅ |
-| `/cspeed` | Speed in channel | ✅ |
-
----
-
-## 🔄 Handler Pipeline
-
-### Request Flow
-
-```
-User Command
-    ↓
-1. MESSAGE RECEIVED (telegram.NewMessage)
-    ↓
-2. FILTER CHECK (Permissions)
-    ├─ Owner filter
-    ├─ Sudo filter
-    ├─ Admin filter
-    ├─ Auth user filter
-    ├─ Supergroup filter
-    └─ Channel filter
-    ↓
-3. PANIC RECOVERY (SafeMessageHandler)
-    └─ Catches panics, logs them
-    ↓
-4. HELP FLAG CHECK
-    ├─ If "-h" or "--help" flag present
-    └─ Show command help
-    ↓
-5. MAINTENANCE CHECK
-    ├─ If maintenance mode on
-    └─ Block non-owner/sudo users
-    ↓
-6. COMMAND HANDLER
-    ├─ Validate input
-    ├─ Execute business logic
-    ├─ Generate response
-    └─ Send reply
-    ↓
-7. ERROR HANDLING
-    ├─ Log errors
-    ├─ Send error message
-    └─ Continue
-```
-
-### Code Flow
-
-```go
-// handlers.go
-var handlers = []MsgHandlerDef{
-    {
-        Pattern: "play",
-        Handler: playHandler,
-        Filters: []telegram.Filter{superGroupFilter, authFilter}
-    },
-    // ... more handlers
-}
-
-// In Init()
-for _, h := range handlers {
-    bot.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...)
-}
-```
-
----
 
 ## 🔐 Filters & Permissions
 
-### Available Filters
+Filters are located in `filters.go` and are used to restrict command access. Common filters include:
 
-```go
-// filters.go
-var (
-    superGroupFilter    = Custom(filterSuperGroup)    // Must be supergroup
-    adminFilter         = Custom(filterChatAdmins)    // Must be chat admin
-    authFilter          = Custom(filterAuthUsers)     // Admin or auth user
-    ignoreChannelFilter = Custom(filterChannel)       // Not from channel
-    sudoOnlyFilter      = Custom(filterSudo)          // Must be sudo/owner
-    ownerFilter         = Custom(filterOwner)         // Must be owner
-)
-```
+- `ownerFilter`: Only the bot owner.
+- `sudoOnlyFilter`: Owner or sudo users.
+- `adminFilter`: Only chat administrators.
+- `authFilter`: Administrators or users authorized via `/addauth`.
+- `superGroupFilter`: Restricts command to supergroups and automatically handles bot leaving basic groups.
 
-### Filter Implementation
+## 🌉 Dependencies and Boundaries
 
-```go
-func filterSuperGroup(m *telegram.NewMessage) bool {
-    if !filterChannel(m) {
-        return false
-    }
-    
-    switch m.ChatType() {
-    case telegram.EntityChat:
-        // EntityChat can be basic group or supergroup
-        if m.Channel != nil && !m.Channel.Broadcast {
-            database.AddServedChat(m.ChannelID())
-            return true  // Supergroup ✓
-        }
-        warnAndLeave(m.Client, m.ChannelID())  // Basic group ✗
-        database.RemoveServedChat(m.ChannelID())
-        return false
-        
-    case telegram.EntityChannel:
-        return false  // Pure channel ✗
-        
-    case telegram.EntityUser:
-        m.Reply(F(m.ChannelID(), "only_supergroup"))
-        database.AddServedUser(m.ChannelID())
-        return false  // Private chat ✗
-    }
-    
-    return false
-}
-```
+- **Imports `core`**: Modules rely on the `core` package for all real-time playback and state management.
+- **Imports `database`**: Uses the database for persistent settings, auth lists, and statistics.
+- **Imports `platforms`**: Uses platforms for resolving search queries and URLs into track metadata.
 
----
+> [!CAUTION]
+> **No Direct State Storage**: Modules should never store state themselves; all transient state must live in `core` and persistent state in `database`.
 
 ## 🛡️ Error Handling
 
-### Safe Handler Wrapper
+> [!NOTE]
+> All handlers must be wrapped with `SafeMessageHandler` or `SafeCallbackHandler` in `handlers.go`. 
 
-```go
-func SafeMessageHandler(handler func(*tg.NewMessage) error) func(*tg.NewMessage) error {
-    return func(m *tg.NewMessage) (err error) {
-        // Check maintenance mode
-        if is, _ := database.IsMaintenanceEnabled(); is {
-            if m.SenderID() != config.OwnerID {
-                if ok, _ := database.IsSudo(m.SenderID()); !ok {
-                    reason, _ := database.MaintenanceReason()
-                    msg := F(m.ChannelID(), "maint", locales.Arg{"reason": reason})
-                    m.Reply(msg)
-                    return tg.ErrEndGroup
-                }
-            }
-        }
-        
-        // Panic recovery
-        defer func() {
-            if r := recover(); r != nil {
-                handlePanic(r, m, true)  // Log panic
-                err = fmt.Errorf("internal panic occurred")
-            }
-        }()
-        
-        // ... execute handler ...
-    }
-}
-```
-
----
-
-## 🎯 Common Patterns
-
-### Pattern 1: Database Operation
-
-```go
-func mycommandHandler(m *telegram.NewMessage) error {
-    chatID := m.ChannelID()
-    
-    // No context needed in signatures! Managed internally by database package.
-    
-    // Example: Toggle setting
-    current, _ := database.ThumbnailsDisabled(chatID)
-    err := database.SetThumbnailsDisabled(chatID, !current)
-    
-    return telegram.ErrEndGroup
-}
-```
-
----
-
-## 📞 Support
-
-- **Issues?** Use `/bug` command in bot
-- **Help?** Join [Support Chat](https://t.me/TheTeamVk)
-- **Report?** [GitHub Issues](https://github.com/TheTeamVivek/YukkiMusic/issues)
-
----
-**Build amazing commands! 🎮**
+This provides:
+- Automatic maintenance mode blocking.
+- Panic recovery and stack trace logging.
+- Consistent error logging to the bot's logger chat.
