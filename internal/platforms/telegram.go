@@ -152,7 +152,7 @@ func (t *TelegramPlatform) GetTracks(
 		if err != nil {
 			return nil, err
 		}
-
+track.URL = "https://t.me/" + username
 		telegramDocCache.Set(track.ID, doc)
 
 		return []*state.Track{track}, nil
@@ -169,7 +169,6 @@ func (t *TelegramPlatform) GetTrackFromDocument(doc *telegram.DocumentObj) (*sta
 
 	track := &state.Track{
 		ID:     telegram.PackBotFileID(d),
-		URL:    fmt.Sprintf("https://t.me/c/0/%d_%d", d.ID, d.AccessHash), // placeholder with profile info
 		Source: PlatformTelegram,
 	}
 
