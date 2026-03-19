@@ -45,13 +45,13 @@ type TelegramPlatform struct {
 
 var (
 	telegramLinkRegex = regexp.MustCompile(
-		`^(https?://)?t\.me/((c/)?[\w\d_-]+/\d+|[\w\d_-]+)$`,
+		`^(?:(?:https?://)?t\.me/((c/)?[\w\d_-]+/\d+|[\w\d_-]+)|@[\w\d_-]+)$`,
 	)
 	telegramExtractRegex = regexp.MustCompile(
 		`^(?:https?://)?t\.me/(c/)?([\w\d_-]+)/(\d+)$`,
 	)
 	telegramProfileRegex = regexp.MustCompile(
-		`^(?:https?://)?t\.me/([\w\d_-]{4,})/?$`,
+		`^(?:(?:https?://)?t\.me/|@)([\w\d_-]{4,})/?$`,
 	)
 	telegramMsgCache = utils.NewCache[string, *telegram.NewMessage](1 * time.Hour)
 	telegramDocCache = utils.NewCache[string, *telegram.DocumentObj](1 * time.Hour)
@@ -152,7 +152,7 @@ func (t *TelegramPlatform) GetTracks(
 		if err != nil {
 			return nil, err
 		}
-track.URL = "https://t.me/" + username
+		track.URL = "https://t.me/"+ username
 		telegramDocCache.Set(track.ID, doc)
 
 		return []*state.Track{track}, nil
