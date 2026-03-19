@@ -29,6 +29,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
@@ -44,12 +45,16 @@ type TelegramPlatform struct {
 
 var (
 	telegramLinkRegex = regexp.MustCompile(
-		`^(https?://)?t\.me/(c/)?[\w\d_-]+/\d+$`,
+		`^(https?://)?t\.me/((c/)?[\w\d_-]+/\d+|[\w\d_-]+)$`,
 	)
 	telegramExtractRegex = regexp.MustCompile(
-		`https?://t\.me/(c/)?([\w\d_-]+)/(\d+)`,
+		`^(?:https?://)?t\.me/(c/)?([\w\d_-]+)/(\d+)$`,
 	)
-	telegramMsgCache = make(map[string]*telegram.NewMessage)
+	telegramProfileRegex = regexp.MustCompile(
+		`^(?:https?://)?t\.me/([\w\d_-]{4,})/?$`,
+	)
+	telegramMsgCache = utils.NewCache[string, *telegram.NewMessage](1 * time.Hour)
+	telegramDocCache = utils.NewCache[string, *telegram.DocumentObj](1 * time.Hour)
 )
 
 const PlatformTelegram state.PlatformName = "Telegram"
@@ -80,65 +85,150 @@ func (t *TelegramPlatform) GetTracks(
 	query string,
 	_ bool,
 ) ([]*state.Track, error) {
+	query = strings.TrimSpace(query)
 	if !telegramLinkRegex.MatchString(query) {
 		return nil, fmt.Errorf(
-			"provide a valid Telegram link (e.g., https://t.me/channel/12345)",
+			"provide a valid Telegram link (e.g., https://t.me/channel/12345 or https://t.me/username)",
 		)
 	}
 
-	matches := telegramExtractRegex.FindStringSubmatch(query)
-	if len(matches) < 4 {
-		return nil, fmt.Errorf(
-			"provide a valid Telegram link (e.g., https://t.me/channel/12345)",
-		)
-	}
-
-	username := matches[2]
-	messageID, err := strconv.Atoi(matches[3])
-	if err != nil {
-		return nil, fmt.Errorf("invalid Telegram link: bad message ID")
-	}
-
-	msg, err := core.Bot.GetMessageByID(username, int32(messageID))
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch Telegram message: %w", err)
-	}
-
-	isVideo, isAudio := playableMedia(msg)
-	if !isVideo && !isAudio {
-		return nil, fmt.Errorf(
-			"telegram message does not contain playable media",
-		)
-	}
-
-	track, err := t.GetTracksByMessage(msg)
-	if err != nil {
-		return nil, err
-	}
-
-	track.Video = isVideo
-
-	if isVideo {
-		if err := os.MkdirAll("cache", os.ModePerm); err != nil {
-			gologging.Error("Failed to create cache folder: " + err.Error())
-			return []*state.Track{track}, nil
+	if matches := telegramExtractRegex.FindStringSubmatch(query); len(matches) >= 4 {
+		username := matches[2]
+		messageID, err := strconv.Atoi(matches[3])
+		if err != nil {
+			return nil, fmt.Errorf("invalid Telegram link: bad message ID")
 		}
 
-		thumbPath := filepath.Join("cache", "thumb_"+track.ID+".jpg")
-		if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-			path, err := msg.Download(&telegram.DownloadOptions{
-				ThumbOnly: true,
-				FileName:  thumbPath,
-			})
-			if err == nil {
-				if _, err := os.Stat(path); err == nil {
-					track.Artwork = path
+		msg, err := core.Bot.GetMessageByID(username, int32(messageID))
+		if err != nil {
+			return nil, fmt.Errorf("failed to fetch Telegram message: %w", err)
+		}
+
+		isVideo, isAudio := playableMedia(msg)
+		if !isVideo && !isAudio {
+			return nil, fmt.Errorf(
+				"telegram message does not contain playable media",
+			)
+		}
+
+		track, err := t.GetTracksByMessage(msg)
+		if err != nil {
+			return nil, err
+		}
+
+		track.Video = isVideo
+
+		if isVideo {
+			if err := os.MkdirAll("cache", os.ModePerm); err != nil {
+				gologging.Error("Failed to create cache folder: " + err.Error())
+				return []*state.Track{track}, nil
+			}
+
+			thumbPath := filepath.Join("cache", "thumb_"+track.ID+".jpg")
+			if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
+				path, err := msg.Download(&telegram.DownloadOptions{
+					ThumbOnly: true,
+					FileName:  thumbPath,
+				})
+				if err == nil {
+					if _, err := os.Stat(path); err == nil {
+						track.Artwork = path
+					}
 				}
 			}
 		}
+
+		return []*state.Track{track}, nil
 	}
 
-	return []*state.Track{track}, nil
+	if matches := telegramProfileRegex.FindStringSubmatch(query); len(matches) >= 2 {
+		username := matches[1]
+		doc, err := t.resolveUserProfileMusic(username)
+		if err != nil {
+			return nil, err
+		}
+
+		track, err := t.GetTrackFromDocument(doc)
+		if err != nil {
+			return nil, err
+		}
+
+		telegramDocCache.Set(track.ID, doc)
+
+		return []*state.Track{track}, nil
+	}
+
+	return nil, fmt.Errorf("invalid Telegram link")
+}
+
+func (t *TelegramPlatform) GetTrackFromDocument(doc *telegram.DocumentObj) (*state.Track, error) {
+	d := doc
+	if d == nil {
+		return nil, fmt.Errorf("invalid document")
+	}
+
+	track := &state.Track{
+		ID:     telegram.PackBotFileID(d),
+		URL:    fmt.Sprintf("https://t.me/c/0/%d_%d", d.ID, d.AccessHash), // placeholder with profile info
+		Source: PlatformTelegram,
+	}
+
+	var audioTitle, fileName string
+	for _, attr := range d.Attributes {
+		switch a := attr.(type) {
+		case *telegram.DocumentAttributeAudio:
+			audioTitle = a.Title
+			track.Duration = int(a.Duration)
+		case *telegram.DocumentAttributeVideo:
+			track.Video = true
+			track.Duration = int(a.Duration)
+		case *telegram.DocumentAttributeFilename:
+			fileName = a.FileName
+		}
+	}
+
+	if audioTitle != "" {
+		track.Title = audioTitle
+	} else if fileName != "" {
+		track.Title = fileName
+	}
+
+	if track.Title == "" {
+		track.Title = "Telegram File"
+	}
+
+	return track, nil
+}
+
+func (t *TelegramPlatform) resolveUserProfileMusic(username string) (*telegram.DocumentObj, error) {
+	peer, err := core.Bot.ResolvePeer(username)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve user: %w", err)
+	}
+
+	inputUser, ok := peer.(*telegram.InputPeerUser)
+	if !ok {
+		return nil, fmt.Errorf("resolved peer is not a user")
+	}
+
+	fullUser, err := core.Bot.UsersGetFullUser(&telegram.InputUserObj{
+		UserID:     inputUser.UserID,
+		AccessHash: inputUser.AccessHash,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch full user info: %w", err)
+	}
+
+	if fullUser.FullUser.SavedMusic == nil {
+		return nil, fmt.Errorf("user does not have any saved music on profile")
+	}
+
+	doc, ok := fullUser.FullUser.SavedMusic.(*telegram.DocumentObj)
+	if !ok {
+		return nil, fmt.Errorf("invalid saved music document type")
+	}
+
+	return doc, nil
 }
 
 func (*TelegramPlatform) CanSearch() bool { return false }
@@ -188,7 +278,7 @@ func (t *TelegramPlatform) GetTracksByMessage(
 		target.Media().(*telegram.MessageMediaDocument),
 	)
 
-	telegramMsgCache[file.FileID] = target
+	telegramMsgCache.Set(file.FileID, target)
 
 	track := &state.Track{
 		ID:       file.FileID,
@@ -229,8 +319,13 @@ func (t *TelegramPlatform) Download(
 	}
 	var err error
 
-	if msg, ok := telegramMsgCache[track.ID]; ok {
+	msg, msgOk := telegramMsgCache.Get(track.ID)
+	doc, docOk := telegramDocCache.Get(track.ID)
+
+	if msgOk {
 		path, err = msg.Download(dOpts)
+	} else if docOk {
+		path, err = core.Bot.DownloadMedia(doc, dOpts)
 	} else {
 		file, ferr := telegram.ResolveBotFileID(track.ID)
 		if ferr != nil {
