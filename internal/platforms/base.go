@@ -185,10 +185,19 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 		return nil, formatErrors(errorsL)
 	}
 
-	// If no URLs but have query, search YouTube
+	// If no URLs but have query, check other platforms first, then fallback to YouTube
 	if query != "" {
-		gologging.Info("No URLs found, searching YouTube with query: " + query)
+		gologging.Info("No URLs found, checking query: " + query)
 
+		if p := FindPlatform(query); p != nil && p.Name() != PlatformYouTube {
+			tracks, err := p.GetTracks(query, video)
+			if err == nil && len(tracks) > 0 {
+				gologging.Info("Query handled by platform: " + string(p.Name()))
+				return tracks, nil
+			}
+		}
+
+		gologging.Info("Searching YouTube with query: " + query)
 		tracks, err := yt.GetTracks(query, video)
 		if err != nil {
 			gologging.Error("YouTube search failed: " + err.Error())
