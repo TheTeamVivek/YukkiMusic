@@ -362,7 +362,6 @@ func (s *SpotifyPlatform) getArtistTopTracks(
 	return tracks, nil
 }
 
-
 func (s *SpotifyPlatform) convertSpotifyTrack(
 	simpleTrack *spotify.SimpleTrack,
 	images []spotify.Image,

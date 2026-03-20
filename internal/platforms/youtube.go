@@ -32,6 +32,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
@@ -73,7 +74,10 @@ func (yp *YouTubePlatform) CanGetTracks(link string) bool {
 	return youtubeLinkRegex.MatchString(link)
 }
 
-func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, error) {
+func (yp *YouTubePlatform) GetTracks(
+	input string,
+	video bool,
+) ([]*state.Track, error) {
 	trimmed := strings.TrimSpace(input)
 	if trimmed == "" {
 		return nil, errors.New("empty query")
@@ -84,10 +88,10 @@ func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, 
 
 	if youtubeLinkRegex.MatchString(trimmed) {
 		u, err := url.Parse(trimmed)
-        if err != nil {
-            return nil, fmt.Errorf("failed to parse url %w", err)
-        }
-        
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse url %w", err)
+		}
+
 		q := u.Query()
 
 		if q.Get("list") != "" && q.Get("v") == "" {
@@ -109,7 +113,9 @@ func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, 
 	return updateCached(tracks, video), nil
 }
 
-func (yp *YouTubePlatform) handlePlaylist(rawURL string) ([]*state.Track, error) {
+func (yp *YouTubePlatform) handlePlaylist(
+	rawURL string,
+) ([]*state.Track, error) {
 	cacheKey := "playlist:" + strings.ToLower(rawURL)
 	if cached, ok := youtubeCache.Get(cacheKey); ok {
 		return cached, nil
@@ -127,13 +133,14 @@ func (yp *YouTubePlatform) handlePlaylist(rawURL string) ([]*state.Track, error)
 
 	resChan := make(chan result, len(videoIDs))
 	sem := make(chan struct{}, 3) // Semantic 3 concurrency
-	
+
 	for i, id := range videoIDs {
 		go func(idx int, vID string) {
 			sem <- struct{}{}
 			defer func() { <-sem }()
 
-			if cached, ok := youtubeCache.Get("track:" + vID); ok && len(cached) > 0 {
+			if cached, ok := youtubeCache.Get("track:" + vID); ok &&
+				len(cached) > 0 {
 				resChan <- result{idx, cached[0]}
 				return
 			}
@@ -159,7 +166,10 @@ func (yp *YouTubePlatform) handlePlaylist(rawURL string) ([]*state.Track, error)
 				}
 			}
 			if !found {
-				gologging.ErrorF("[YouTube] Failed to resolve track metadata for ID: %s\n", vID)
+				gologging.ErrorF(
+					"[YouTube] Failed to resolve track metadata for ID: %s\n",
+					vID,
+				)
 				resChan <- result{idx, nil}
 			}
 		}(i, id)
@@ -184,13 +194,16 @@ func (yp *YouTubePlatform) handlePlaylist(rawURL string) ([]*state.Track, error)
 	return finalTracks, nil
 }
 
-func (yp *YouTubePlatform) handleTrackURL(rawURL string) ([]*state.Track, error) {
+func (yp *YouTubePlatform) handleTrackURL(
+	rawURL string,
+) ([]*state.Track, error) {
 	_, videoID, err := yp.normalizeYouTubeURL(rawURL)
 	if err != nil {
 		return nil, err
 	}
 
-	if cached, ok := youtubeCache.Get("track:" + videoID); ok && len(cached) > 0 {
+	if cached, ok := youtubeCache.Get("track:" + videoID); ok &&
+		len(cached) > 0 {
 		return cached, nil
 	}
 
@@ -373,7 +386,7 @@ func updateCached(tracks []*state.Track, video bool) []*state.Track {
 
 		trackCopy := *t
 		trackCopy.Video = video
-		
+
 		out = append(out, &trackCopy)
 	}
 

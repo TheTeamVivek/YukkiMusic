@@ -346,4 +346,3 @@ func (y *YtdlpPlatform) isYouTubeURL(urlStr string) bool {
 	}
 	return false
 }
-

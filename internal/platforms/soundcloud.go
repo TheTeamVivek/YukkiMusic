@@ -273,4 +273,3 @@ func (s *SoundCloudPlatform) infoToTrack(info *ytdlpInfo) *state.Track {
 
 	return track
 }
-

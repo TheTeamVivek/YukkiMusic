@@ -123,7 +123,6 @@ func (f *FallenApiPlatform) Download(
 	return path, nil
 }
 
-
 func (*FallenApiPlatform) CanSearch() bool { return false }
 
 func (*FallenApiPlatform) Search(

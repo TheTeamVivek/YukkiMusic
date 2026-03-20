@@ -79,7 +79,11 @@ func init() {
 func initLogging() {
 	_ = os.Remove(LogFileName)
 
-	file, err := os.OpenFile(LogFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	file, err := os.OpenFile(
+		LogFileName,
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		0o644,
+	)
 	if err != nil {
 		logger.FatalF("Failed to open log file: %v", err)
 	}
@@ -94,11 +98,17 @@ func loadConfig() {
 	// Load Required
 	APIID = int32(getInt64("API_ID", 0))
 	APIHash = getString("API_HASH", "")
-	Token = getString("TOKEN", getString("BOT_TOKEN", "")) // Checks TOKEN, fallbacks to BOT_TOKEN
+	Token = getString(
+		"TOKEN",
+		getString("BOT_TOKEN", ""),
+	) // Checks TOKEN, fallbacks to BOT_TOKEN
 	LoggerID = getInt64("LOGGER_ID", 0)
 	MongoURI = getString("MONGO_DB_URI", "")
 	SessionType = getString("SESSION_TYPE", "pyrogram")
-	StringSessions = getStringSlice("STRING_SESSIONS", getStringSlice("STRING_SESSION", nil))
+	StringSessions = getStringSlice(
+		"STRING_SESSIONS",
+		getStringSlice("STRING_SESSION", nil),
+	)
 
 	// Load Optional
 	OwnerID = getInt64("OWNER_ID", 0)
@@ -117,8 +127,14 @@ func loadConfig() {
 	SetCmds = getBool("SET_CMDS", false)
 	MaxAuthUsers = int(getInt64("MAX_AUTH_USERS", 25))
 
-	StartImage = getString("START_IMG_URL", "https://raw.githubusercontent.com/Vivekkumar-IN/assets/master/images.png")
-	PingImage = getString("PING_IMG_URL", "https://telegra.ph/file/91533956c91d0fd7c9f20.jpg")
+	StartImage = getString(
+		"START_IMG_URL",
+		"https://raw.githubusercontent.com/Vivekkumar-IN/assets/master/images.png",
+	)
+	PingImage = getString(
+		"PING_IMG_URL",
+		"https://telegra.ph/file/91533956c91d0fd7c9f20.jpg",
+	)
 	Port = getString("PORT", "8000")
 }
 
@@ -136,13 +152,20 @@ func validateConfig() {
 		logger.Fatal("MONGO_DB_URI is required but missing!")
 	}
 	if Token == "" {
-		logger.Fatal("TOKEN or BOT_TOKEN is required but missing! Please set it in .env or environment.")
+		logger.Fatal(
+			"TOKEN or BOT_TOKEN is required but missing! Please set it in .env or environment.",
+		)
 	}
 	if len(StringSessions) == 0 {
-		logger.FatalF("STRING_SESSIONS is empty — at least one %s session string is required.", SessionType)
+		logger.FatalF(
+			"STRING_SESSIONS is empty — at least one %s session string is required.",
+			SessionType,
+		)
 	}
 	if SpotifyClientID == "" || SpotifyClientSecret == "" {
-		logger.Warn("Spotify credentials not configured - Spotify links won't work")
+		logger.Warn(
+			"Spotify credentials not configured - Spotify links won't work",
+		)
 	}
 }
 
@@ -168,7 +191,7 @@ func lookupEnv(baseKey string) (string, bool) {
 	return "", false
 }
 
-func getString(key string, fallback string) string {
+func getString(key, fallback string) string {
 	if val, ok := lookupEnv(key); ok {
 		return val
 	}
@@ -209,7 +232,7 @@ func getStringSlice(key string, fallback []string) []string {
 
 	normalized := strings.NewReplacer(",", " ", ";", " ").Replace(val)
 	parts := strings.Fields(normalized)
-	
+
 	if len(parts) > 0 {
 		return parts
 	}

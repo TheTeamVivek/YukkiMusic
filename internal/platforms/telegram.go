@@ -53,8 +53,12 @@ var (
 	telegramProfileRegex = regexp.MustCompile(
 		`^(?:(?:https?://)?t\.me/|@)([\w\d_-]{4,})/?$`,
 	)
-	telegramMsgCache = utils.NewCache[string, *telegram.NewMessage](1 * time.Hour)
-	telegramDocCache = utils.NewCache[string, *telegram.DocumentObj](1 * time.Hour)
+	telegramMsgCache = utils.NewCache[string, *telegram.NewMessage](
+		1 * time.Hour,
+	)
+	telegramDocCache = utils.NewCache[string, *telegram.DocumentObj](
+		1 * time.Hour,
+	)
 )
 
 const PlatformTelegram state.PlatformName = "Telegram"
@@ -92,7 +96,9 @@ func (t *TelegramPlatform) GetTracks(
 		)
 	}
 
-	if matches := telegramExtractRegex.FindStringSubmatch(query); len(matches) >= 4 {
+	if matches := telegramExtractRegex.FindStringSubmatch(query); len(
+		matches,
+	) >= 4 {
 		username := matches[2]
 		messageID, err := strconv.Atoi(matches[3])
 		if err != nil {
@@ -141,7 +147,9 @@ func (t *TelegramPlatform) GetTracks(
 		return []*state.Track{track}, nil
 	}
 
-	if matches := telegramProfileRegex.FindStringSubmatch(query); len(matches) >= 2 {
+	if matches := telegramProfileRegex.FindStringSubmatch(query); len(
+		matches,
+	) >= 2 {
 		username := matches[1]
 		doc, err := t.resolveUserProfileMusic(username)
 		if err != nil {
@@ -152,7 +160,7 @@ func (t *TelegramPlatform) GetTracks(
 		if err != nil {
 			return nil, err
 		}
-		track.URL = "https://t.me/"+ username
+		track.URL = "https://t.me/" + username
 		telegramDocCache.Set(track.ID, doc)
 
 		return []*state.Track{track}, nil
@@ -161,7 +169,9 @@ func (t *TelegramPlatform) GetTracks(
 	return nil, fmt.Errorf("invalid Telegram link")
 }
 
-func (t *TelegramPlatform) GetTrackFromDocument(doc *telegram.DocumentObj) (*state.Track, error) {
+func (t *TelegramPlatform) GetTrackFromDocument(
+	doc *telegram.DocumentObj,
+) (*state.Track, error) {
 	d := doc
 	if d == nil {
 		return nil, fmt.Errorf("invalid document")
@@ -199,7 +209,9 @@ func (t *TelegramPlatform) GetTrackFromDocument(doc *telegram.DocumentObj) (*sta
 	return track, nil
 }
 
-func (t *TelegramPlatform) resolveUserProfileMusic(username string) (*telegram.DocumentObj, error) {
+func (t *TelegramPlatform) resolveUserProfileMusic(
+	username string,
+) (*telegram.DocumentObj, error) {
 	peer, err := core.Bot.ResolvePeer(username)
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve user: %w", err)
@@ -354,4 +366,3 @@ func (t *TelegramPlatform) Download(
 
 	return path, nil
 }
-
