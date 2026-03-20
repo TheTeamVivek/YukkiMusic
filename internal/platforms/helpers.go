@@ -106,26 +106,24 @@ func playableMedia(m *telegram.NewMessage) (bool, bool) {
 	}
 
 	check := func(msg *telegram.NewMessage) (bool, bool) {
-		if msg.Audio() != nil || msg.Voice() != nil {
+		switch {
+		case msg.Audio() != nil, msg.Voice() != nil:
 			return false, true
-		}
 
-		if msg.Video() != nil {
+		case msg.Video() != nil:
 			return true, false
-		}
 
-		if msg.Document() != nil {
-			ext := strings.ToLower(msg.File.Ext)
-			if !strings.HasPrefix(ext, ".") {
-				ext = "." + ext
-			}
-
-			mimeType := mime.TypeByExtension(ext)
-
-			if strings.HasPrefix(mimeType, "audio/") {
+		case msg.Document() != nil:
+			mimeType := strings.ToLower(msg.Document().MimeType)
+            
+            if mimeType == "" {
+                return false, false
+            }
+            
+			switch {
+			case strings.HasPrefix(mimeType, "audio/"):
 				return false, true
-			}
-			if strings.HasPrefix(mimeType, "video/") {
+			case strings.HasPrefix(mimeType, "video/"):
 				return true, false
 			}
 		}
