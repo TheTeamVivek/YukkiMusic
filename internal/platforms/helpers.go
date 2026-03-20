@@ -19,7 +19,6 @@ package platforms
 
 import (
 	"errors"
-	"mime"
 	"os"
 	"path/filepath"
 	"strings"
@@ -115,11 +114,11 @@ func playableMedia(m *telegram.NewMessage) (bool, bool) {
 
 		case msg.Document() != nil:
 			mimeType := strings.ToLower(msg.Document().MimeType)
-            
-            if mimeType == "" {
-                return false, false
-            }
-            
+
+			if mimeType == "" {
+				return false, false
+			}
+
 			switch {
 			case strings.HasPrefix(mimeType, "audio/"):
 				return false, true

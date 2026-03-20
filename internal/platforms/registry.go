@@ -14,8 +14,8 @@
  *
  * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
- 
- package platforms
+
+package platforms
 
 import (
 	"context"
@@ -33,6 +33,7 @@ import (
 	"resty.dev/v3"
 
 	state "main/internal/core/models"
+	"main/internal/database"
 	"main/internal/utils"
 )
 
@@ -200,26 +201,43 @@ func processReplyChain(m *telegram.NewMessage) ([]*state.Track, error) {
 
 	track.Video = isVideo
 	if isVideo {
-        noThumb, err := database.ThumbnailsDisabled(m.ChannelID())
-if err != nil || !noThumb {
+		noThumb, err := database.ThumbnailsDisabled(m.ChannelID())
+		if err != nil || !noThumb {
 
-		gologging.Debug("Reply media is video, handling thumbnail for ID: " + track.ID)
-		downloadThumbnail(target, track)
-	}}
+			gologging.Debug(
+				"Reply media is video, handling thumbnail for ID: " + track.ID,
+			)
+			downloadThumbnail(target, track)
+		}
+	}
 
 	gologging.Info("Returning track from Telegram reply")
 	return []*state.Track{track}, nil
 }
 
 // Download attempts to download a track using available downloaders
-func Download(ctx context.Context, track *state.Track, statusMsg *telegram.NewMessage) (string, error) {
-	gologging.Debug("Download requested for track: " + track.ID + " | Source: " + string(track.Source))
+func Download(
+	ctx context.Context,
+	track *state.Track,
+	statusMsg *telegram.NewMessage,
+) (string, error) {
+	gologging.Debug(
+		"Download requested for track: " + track.ID + " | Source: " + string(
+			track.Source,
+		),
+	)
 	var errs []string
 
 	platforms := GetOrderedPlatforms()
 	for _, p := range platforms {
 		if !p.CanDownload(track.Source) {
-			gologging.Debug("Platform [" + string(p.Name()) + "] cannot download source: " + string(track.Source))
+			gologging.Debug(
+				"Platform [" + string(
+					p.Name(),
+				) + "] cannot download source: " + string(
+					track.Source,
+				),
+			)
 			continue
 		}
 
@@ -257,9 +275,13 @@ func findMediaInReply(m *telegram.NewMessage) (*telegram.NewMessage, bool, error
 	}
 
 	for i := 0; i < 2; i++ {
-		gologging.Debug("Checking reply level " + strconv.Itoa(i+1) + " for playable media")
+		gologging.Debug(
+			"Checking reply level " + strconv.Itoa(i+1) + " for playable media",
+		)
 		if v, a := playableMedia(curr); v || a {
-			gologging.Debug("Found media in reply chain | isVideo: " + strconv.FormatBool(v))
+			gologging.Debug(
+				"Found media in reply chain | isVideo: " + strconv.FormatBool(v),
+			)
 			return curr, v, nil
 		}
 
