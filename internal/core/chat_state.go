@@ -1,7 +1,6 @@
 /*
  * ● YukkiMusic
  * ○ A high-performance engine for streaming music in Telegram voicechats.
- * ________________________________________________________________________________________
  *
  * Copyright (C) 2026 TheTeamVivek
  *
@@ -14,7 +13,6 @@
  * PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
  * Repository: https://github.com/TheTeamVivek/YukkiMusic
- * ________________________________________________________________________________________
  */
 
 package core
