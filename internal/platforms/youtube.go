@@ -83,7 +83,11 @@ func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, 
 	var err error
 
 	if youtubeLinkRegex.MatchString(trimmed) {
-		u, _ := url.Parse(trimmed)
+		u, err := url.Parse(trimmed)
+        if err != nil {
+            return nil, fmt.Errorf("failed to parse url %w", err)
+        }
+        
 		q := u.Query()
 
 		if q.Get("list") != "" && q.Get("v") == "" {

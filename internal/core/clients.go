@@ -108,8 +108,8 @@ func Init() func() {
 
 func initBotClient() *telegram.Client {
 	client, err := telegram.NewClient(telegram.ClientConfig{
-		AppID:   config.ApiID,
-		AppHash: config.ApiHash,
+		AppID:   config.APIID,
+		AppHash: config.APIHash,
 		Logger: telegram.WrapSimpleLogger(
 			GetTgLogger("gogram", telegram.LogError),
 		),
@@ -160,8 +160,8 @@ func initAssistantClient(
 	}
 
 	client, err := telegram.NewClient(telegram.ClientConfig{
-		AppID:         config.ApiID,
-		AppHash:       config.ApiHash,
+		AppID:         config.APIID,
+		AppHash:       config.APIHash,
 		LogLevel:      telegram.LogError,
 		ParseMode:     "HTML",
 		StringSession: stringSession,
