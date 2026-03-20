@@ -16,7 +16,7 @@
  * Repository: https://github.com/TheTeamVivek/YukkiMusic
  * ________________________________________________________________________________________
  */
-
+ 
 package platforms
 
 import (
@@ -118,6 +118,15 @@ func (yp *YouTubePlatform) handlePlaylist(
 	cacheKey := "playlist:" + strings.ToLower(rawURL)
 	if cached, ok := youtubeCache.Get(cacheKey); ok {
 		return cached, nil
+	}
+
+	playlistID := yp.extractPlaylistID(rawURL)
+	if playlistID != "" {
+		tracks, err := scrapePlaylistYouTube(playlistID, config.QueueLimit)
+		if err == nil && len(tracks) > 0 {
+			youtubeCache.Set(cacheKey, tracks)
+			return tracks, nil
+		}
 	}
 
 	videoIDs, err := getPlaylist(rawURL)
@@ -249,8 +258,10 @@ func (yp *YouTubePlatform) VideoSearch(
 	singleOpt ...bool,
 ) ([]*state.Track, error) {
 	single := false
+	limit := config.QueueLimit
 	if len(singleOpt) > 0 && singleOpt[0] {
 		single = true
+		limit = 1
 	}
 
 	cacheKey := "search:" + strings.TrimSpace(strings.ToLower(query))
@@ -268,7 +279,7 @@ func (yp *YouTubePlatform) VideoSearch(
 	var tracks []*state.Track
 	var err error
 
-	tracks, err = searchYouTube(query)
+	tracks, err = searchYouTube(query, limit)
 	if err != nil {
 		return nil, fmt.Errorf("ytsearch failed: %w", err)
 	}
@@ -284,6 +295,14 @@ func (yp *YouTubePlatform) VideoSearch(
 	}
 
 	return tracks, nil
+}
+
+func (yt *YouTubePlatform) extractPlaylistID(input string) string {
+	u, err := url.Parse(strings.TrimSpace(input))
+	if err != nil {
+		return ""
+	}
+	return u.Query().Get("list")
 }
 
 func (yt *YouTubePlatform) normalizeYouTubeURL(
@@ -399,7 +418,8 @@ func updateCached(tracks []*state.Track, video bool) []*state.Track {
 //
 // searchYouTube scrapes YouTube results page
 
-func searchYouTube(query string) ([]*state.Track, error) {
+func searchYouTube(query string, limit int) ([]*state.Track, error) {
+	gologging.DebugF("[YouTube] Searching for: %s (limit: %d)", query, limit)
 	searchURL := "https://m.youtube.com/youtubei/v1/search?key=" + innerTubeKey
 	var result map[string]any
 
@@ -467,16 +487,127 @@ func searchYouTube(query string) ([]*state.Track, error) {
 	}
 
 	var tracks []*state.Track
-	parseSearchResults(contents, &tracks)
+	parseSearchResults(contents, &tracks, limit)
+	gologging.DebugF("[YouTube] Search found %d tracks", len(tracks))
 	return tracks, nil
 }
 
-func parseSearchResults(node any, tracks *[]*state.Track) {
+func scrapePlaylistYouTube(playlistID string, limit int) ([]*state.Track, error) {
+	gologging.DebugF("[YouTube] Scraping playlist: %s (limit: %d)", playlistID, limit)
+	browseURL := "https://m.youtube.com/youtubei/v1/browse?key=" + innerTubeKey
+	var result map[string]any
+
+	browseId := playlistID
+	if !strings.HasPrefix(playlistID, "VL") {
+		browseId = "VL" + playlistID
+	}
+
+	resp, err := rc.
+		R().
+		SetResult(&result).
+		SetBody(map[string]any{
+			"context": map[string]any{
+				"client": map[string]any{
+					"clientName":       innerTubeClientName,
+					"clientVersion":    innerTubeClientVersion,
+					"newVisitorCookie": true,
+					"acceptHeader":     "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+					"hl":               "en-IN",
+					"gl":               "IN",
+				},
+			},
+			"browseId": browseId,
+		}).
+		SetHeaderMultiValues(map[string][]string{
+			"User-Agent": {
+				"Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36",
+			},
+			"Accept": {
+				"*/*",
+			},
+			"Content-Type": {
+				"application/json",
+			},
+			"x-origin": {
+				"https://m.youtube.com",
+			},
+			"origin": {
+				"https://m.youtube.com",
+			},
+			"accept-language": {
+				"en-IN",
+			},
+		}).Post(browseURL)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	if resp.StatusCode() < 200 || resp.StatusCode() >= 300 {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode())
+	}
+
+	var tracks []*state.Track
+	parsePlaylistContents(result, &tracks, limit)
+	gologging.DebugF("[YouTube] Playlist scraper found %d tracks", len(tracks))
+	return tracks, nil
+}
+
+func parsePlaylistContents(node any, tracks *[]*state.Track, limit int) {
+	if limit > 0 && len(*tracks) >= limit {
+		return
+	}
+
+	switch v := node.(type) {
+	case []any:
+		for _, item := range v {
+			if limit > 0 && len(*tracks) >= limit {
+				return
+			}
+			parsePlaylistContents(item, tracks, limit)
+		}
+	case map[string]any:
+		if vid, ok := dig(v, "playlistVideoRenderer").(map[string]any); ok {
+			id := safeString(vid["videoId"])
+			title := safeString(dig(vid, "title", "runs", 0, "text"))
+			thumb := getThumbnailURL(vid)
+			durationText := safeString(dig(vid, "lengthText", "simpleText"))
+
+			if durationText == "" {
+				return
+			}
+
+			duration := parseDuration(durationText)
+			t := &state.Track{
+				URL:      "https://www.youtube.com/watch?v=" + id,
+				Title:    title,
+				ID:       id,
+				Artwork:  thumb,
+				Duration: duration,
+				Source:   PlatformYouTube,
+			}
+			*tracks = append(*tracks, t)
+			youtubeCache.Set("track:"+t.ID, []*state.Track{t})
+		} else {
+			for _, child := range v {
+				parsePlaylistContents(child, tracks, limit)
+			}
+		}
+	}
+}
+
+func parseSearchResults(node any, tracks *[]*state.Track, limit int) {
+	if limit > 0 && len(*tracks) >= limit {
+		return
+	}
+
 	switch v := node.(type) {
 
 	case []any:
 		for _, item := range v {
-			parseSearchResults(item, tracks)
+			if limit > 0 && len(*tracks) >= limit {
+				return
+			}
+			parseSearchResults(item, tracks, limit)
 		}
 
 	case map[string]any:
@@ -508,7 +639,7 @@ func parseSearchResults(node any, tracks *[]*state.Track) {
 			youtubeCache.Set("track:"+t.ID, []*state.Track{t})
 		} else {
 			for _, child := range v {
-				parseSearchResults(child, tracks)
+				parseSearchResults(child, tracks, limit)
 			}
 		}
 	}
