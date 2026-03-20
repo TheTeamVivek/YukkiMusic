@@ -1,16 +1,22 @@
 /*
- * This file is part of YukkiMusic.
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ * ________________________________________________________________________________________
  *
- * DirectStream Platform - Handles direct audio/video URLs and M3U8 streams
- * This platform acts as a fallback when no other platform recognizes the URL
+ * Copyright (C) 2026 TheTeamVivek
  *
- * Copyright (C) 2025 TheTeamVivek
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ * ________________________________________________________________________________________
  */
+
 package platforms
 
 import (
