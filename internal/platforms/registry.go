@@ -199,7 +199,7 @@ func processReplyChain(m *telegram.NewMessage) ([]*state.Track, error) {
 	}
 
 	track.Video = isVideo
-	if isVideo && shouldShowThumb(m.ChannelID())) {
+	if isVideo && shouldShowThumb(m.ChannelID()) {
 		gologging.Debug("Reply media is video, handling thumbnail for ID: " + track.ID)
 		downloadThumbnail(target, track)
 	}
