@@ -73,95 +73,138 @@ func (yp *YouTubePlatform) CanGetTracks(link string) bool {
 	return youtubeLinkRegex.MatchString(link)
 }
 
-func (yp *YouTubePlatform) GetTracks(
-	input string,
-	video bool,
-) ([]*state.Track, error) {
+func (yp *YouTubePlatform) GetTracks(input string, video bool) ([]*state.Track, error) {
 	trimmed := strings.TrimSpace(input)
 	if trimmed == "" {
 		return nil, errors.New("empty query")
 	}
+
+	var tracks []*state.Track
+	var err error
+
 	if youtubeLinkRegex.MatchString(trimmed) {
-		u, err := url.Parse(trimmed)
-		if err == nil {
-			q := u.Query()
+		u, _ := url.Parse(trimmed)
+		q := u.Query()
 
-			if q.Get("list") != "" && q.Get("v") == "" {
-				cacheKey := "playlist:" + strings.ToLower(trimmed)
-				if cached, ok := youtubeCache.Get(cacheKey); ok {
-					return updateCached(cached, video), nil
-				}
-
-				videoIDs, err := getPlaylist(trimmed)
-				if err != nil {
-					return nil, err
-				}
-
-				var tracks []*state.Track
-				for _, videoID := range videoIDs {
-					if cached, ok := youtubeCache.Get("track:" + videoID); ok &&
-						len(cached) > 0 {
-						tracks = append(tracks, cached[0])
-						continue
-					}
-
-					trackList, err := yp.VideoSearch(
-						"https://youtube.com/watch?v="+videoID,
-						true,
-					)
-					if err != nil || len(trackList) == 0 {
-						continue
-					}
-
-					t := trackList[0]
-					youtubeCache.Set("track:"+videoID, []*state.Track{t})
-					tracks = append(tracks, t)
-				}
-
-				if len(tracks) > 0 {
-					youtubeCache.Set(cacheKey, tracks)
-				}
-
-				return updateCached(tracks, video), nil
-			}
-
-			_, videoID, err := yp.normalizeYouTubeURL(trimmed)
-			if err != nil {
-				return nil, err
-			}
-
-			if cached, ok := youtubeCache.Get("track:" + videoID); ok &&
-				len(cached) > 0 {
-				return updateCached(cached, video), nil
-			}
-
-			for _, query := range []string{videoID, trimmed} {
-				tracks, err := yp.VideoSearch(query, video)
-				if err != nil {
-					continue
-				}
-
-				for _, t := range tracks {
-					if t.ID == videoID {
-						youtubeCache.Set("track:"+videoID, []*state.Track{t})
-						return updateCached([]*state.Track{t}, video), nil
-					}
-				}
-			}
-
-			return nil, errors.New("track not found for the given url")
+		if q.Get("list") != "" && q.Get("v") == "" {
+			tracks, err = yp.handlePlaylist(trimmed)
+		} else {
+			tracks, err = yp.handleTrackURL(trimmed)
 		}
+	} else {
+		tracks, err = yp.VideoSearch(trimmed, false)
 	}
 
-	tracks, err := yp.VideoSearch(trimmed, true)
 	if err != nil {
 		return nil, err
 	}
 	if len(tracks) == 0 {
-		return nil, errors.New("no tracks found for the given query")
+		return nil, errors.New("no tracks found")
 	}
 
 	return updateCached(tracks, video), nil
+}
+
+func (yp *YouTubePlatform) handlePlaylist(rawURL string) ([]*state.Track, error) {
+	cacheKey := "playlist:" + strings.ToLower(rawURL)
+	if cached, ok := youtubeCache.Get(cacheKey); ok {
+		return cached, nil
+	}
+
+	videoIDs, err := getPlaylist(rawURL)
+	if err != nil {
+		return nil, err
+	}
+
+	type result struct {
+		index int
+		track *state.Track
+	}
+
+	resChan := make(chan result, len(videoIDs))
+	sem := make(chan struct{}, 3) // Semantic 3 concurrency
+	
+	for i, id := range videoIDs {
+		go func(idx int, vID string) {
+			sem <- struct{}{}
+			defer func() { <-sem }()
+
+			if cached, ok := youtubeCache.Get("track:" + vID); ok && len(cached) > 0 {
+				resChan <- result{idx, cached[0]}
+				return
+			}
+
+			fullURL := "https://youtube.com/watch?v=" + vID
+			found := false
+			for _, query := range []string{vID, fullURL} {
+				searchResult, err := yp.VideoSearch(query, true)
+				if err != nil || len(searchResult) == 0 {
+					continue
+				}
+
+				for _, t := range searchResult {
+					if t.ID == vID {
+						youtubeCache.Set("track:"+vID, []*state.Track{t})
+						resChan <- result{idx, t}
+						found = true
+						break
+					}
+				}
+				if found {
+					break
+				}
+			}
+			if !found {
+				gologging.ErrorF("[YouTube] Failed to resolve track metadata for ID: %s\n", vID)
+				resChan <- result{idx, nil}
+			}
+		}(i, id)
+	}
+
+	orderedTracks := make([]*state.Track, len(videoIDs))
+	for i := 0; i < len(videoIDs); i++ {
+		res := <-resChan
+		orderedTracks[res.index] = res.track
+	}
+
+	var finalTracks []*state.Track
+	for _, t := range orderedTracks {
+		if t != nil {
+			finalTracks = append(finalTracks, t)
+		}
+	}
+
+	if len(finalTracks) > 0 {
+		youtubeCache.Set(cacheKey, finalTracks)
+	}
+	return finalTracks, nil
+}
+
+func (yp *YouTubePlatform) handleTrackURL(rawURL string) ([]*state.Track, error) {
+	_, videoID, err := yp.normalizeYouTubeURL(rawURL)
+	if err != nil {
+		return nil, err
+	}
+
+	if cached, ok := youtubeCache.Get("track:" + videoID); ok && len(cached) > 0 {
+		return cached, nil
+	}
+
+	for _, query := range []string{videoID, rawURL} {
+		results, err := yp.VideoSearch(query, true)
+		if err != nil {
+			continue
+		}
+
+		for _, t := range results {
+			if t.ID == videoID {
+				youtubeCache.Set("track:"+videoID, []*state.Track{t})
+				return []*state.Track{t}, nil
+			}
+		}
+	}
+
+	return nil, errors.New("track not found")
 }
 
 func (yp *YouTubePlatform) CanDownload(source state.PlatformName) bool {
@@ -313,19 +356,23 @@ func getPlaylist(pUrl string) ([]string, error) {
 	return strings.Split(strings.TrimSpace(out.String()), "\n"), nil
 }
 
-func updateCached(arr []*state.Track, video bool) []*state.Track {
-	if len(arr) == 0 {
+func updateCached(tracks []*state.Track, video bool) []*state.Track {
+	if len(tracks) == 0 {
 		return nil
 	}
-	out := make([]*state.Track, len(arr))
-	for i, t := range arr {
+
+	out := make([]*state.Track, 0, len(tracks))
+	for _, t := range tracks {
 		if t == nil {
 			continue
 		}
-		clone := *t
-		clone.Video = video
-		out[i] = &clone
+
+		trackCopy := *t
+		trackCopy.Video = video
+		
+		out = append(out, &trackCopy)
 	}
+
 	return out
 }
 
