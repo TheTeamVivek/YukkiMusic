@@ -38,58 +38,22 @@ var (
 	GetAssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // GetAssistantIndexFunc = database.AssistantIndex
 )
 
-func Init() func() {
+// Init initializes the bot and assistant clients.
+// It returns a shutdown function and an error if initialization fails.
+func Init() (func(), error) {
 	gologging.Info("Starting bot client...")
-	Bot = initBotClient()
-	if _, err := Bot.GetMe(); err != nil {
-		gologging.Fatal("❌ Failed to GetMe for bot: " + err.Error())
+	if err := initBot(); err != nil {
+		return nil, fmt.Errorf("bot initialization: %w", err)
 	}
 
 	gologging.Info("Starting assistant clients...")
-
-	assistants := make([]*Assistant, 0, len(config.StringSessions))
-
-	for i, sess := range config.StringSessions {
-		gologging.InfoF("Initializing assistant[%d]...", i)
-
-		client := initAssistantClient(sess, i)
-		user, err := client.GetMe()
-		if err != nil {
-			gologging.Fatal(
-				fmt.Sprintf("❌ Failed to GetMe for assistant[%d]: %v", i, err),
-			)
-		}
-		ctx := ubot.NewContext(client)
-
-		client.SetCommandPrefixes(".")
-
-		assistants = append(assistants, &Assistant{
-			Index:  i,
-			Client: client,
-			Self:   user,
-			Ntg:    ctx,
-		})
-
-		if config.LoggerID != 0 {
-			_, _ = client.SendMessage(
-				config.LoggerID,
-				fmt.Sprintf("Assistant %d Started", i+1),
-			)
-		}
-		client.SendMessage(Bot.Me().Username, "/start")
-		client.JoinChannel("TheTeamVivek")
-		gologging.InfoF("assistant[%d] ready: %s", i, user.FirstName)
+	if err := initAssistants(); err != nil {
+		return nil, fmt.Errorf("assistants initialization: %w", err)
 	}
 
 	Bot.SetCommandPrefixes("/")
 
-	Assistants = &AssistantManager{
-		list:       assistants,
-		indexCache: make(map[int64]int),
-	}
-	gologging.Info("All assistants initialized successfully.")
-
-	return func() {
+	shutdown := func() {
 		gologging.Info("Stopping bot...")
 		Bot.Stop()
 
@@ -101,9 +65,11 @@ func Init() func() {
 
 		gologging.Info("Shutdown complete.")
 	}
+
+	return shutdown, nil
 }
 
-func initBotClient() *telegram.Client {
+func initBot() error {
 	client, err := telegram.NewClient(telegram.ClientConfig{
 		AppID:   config.APIID,
 		AppHash: config.APIHash,
@@ -115,45 +81,75 @@ func initBotClient() *telegram.Client {
 		Session:   "bot.session",
 	})
 	if err != nil {
-		gologging.Fatal("❌ Failed to create bot: " + err.Error())
+		return fmt.Errorf("failed to create bot client: %w", err)
 	}
 
 	if err := client.LoginBot(config.Token); err != nil {
 		if strings.Contains(err.Error(), "ACCESS_TOKEN_EXPIRED") {
-			gologging.Fatal("❌ Bot token has been revoked or expired.")
-		} else {
-			gologging.Fatal("❌ Failed to start the bot: " + err.Error())
+			return fmt.Errorf("bot token has been revoked or expired")
 		}
+		return fmt.Errorf("failed to start the bot: %w", err)
 	}
-	return client
+
+	user, err := client.GetMe()
+	if err != nil {
+		return fmt.Errorf("failed to fetch bot identity: %w", err)
+	}
+
+	gologging.InfoF("Bot started as @%s", user.Username)
+
+	Bot = client
+	return nil
 }
 
-func initAssistantClient(
-	session string,
-	idx int,
-) *telegram.Client {
-	var stringSession string
+func initAssistants() error {
+	assistantList := make([]*Assistant, 0, len(config.StringSessions))
 
-	switch strings.ToLower(config.SessionType) {
-	case "pyrogram", "pyro":
-		sess, err := decodePyrogramSessionString(session)
+	for i, sessionStr := range config.StringSessions {
+		gologging.InfoF("Initializing assistant[%d]...", i)
+
+		assistant, err := initAssistant(sessionStr, i)
 		if err != nil {
-			gologging.Fatal("Failed to decode Pyrogram session: " + err.Error())
+			return fmt.Errorf("failed to initialize assistant[%d]: %w", i, err)
 		}
-		stringSession = sess.Encode()
 
-	case "telethon":
-		sess, err := decodeTelethonSessionString(session)
-		if err != nil {
-			gologging.Fatal("Failed to decode Telethon session: " + err.Error())
+		assistantList = append(assistantList, assistant)
+
+		if config.LoggerID != 0 {
+			_, _ = assistant.Client.SendMessage(
+				config.LoggerID,
+				fmt.Sprintf("Assistant %d Started", i+1),
+			)
 		}
-		stringSession = sess.Encode()
 
-	case "gogram":
-		stringSession = session
+		assistant.Client.SendMessage(Bot.Me().Username, "/start")
+		assistant.Client.JoinChannel("TheTeamVivek")
 
-	default:
-		gologging.Fatal("Invalid SESSION_TYPE: " + config.SessionType)
+		if assistant.Self.Username != "" {
+			gologging.InfoF(
+				"Assistant[%d] started as @%s",
+				i,
+				assistant.Self.Username,
+			)
+		} else {
+			gologging.InfoF("Assistant[%d] started as %s", i, assistant.Self.FirstName)
+		}
+	}
+
+	Assistants = &AssistantManager{
+		list:       assistantList,
+		indexCache: make(map[int64]int),
+	}
+	return nil
+}
+
+func initAssistant(
+	sessionStr string,
+	index int,
+) (*Assistant, error) {
+	stringSession, err := resolveSession(sessionStr)
+	if err != nil {
+		return nil, fmt.Errorf("resolving session: %w", err)
 	}
 
 	client, err := telegram.NewClient(telegram.ClientConfig{
@@ -162,13 +158,49 @@ func initAssistantClient(
 		LogLevel:      telegram.LogError,
 		ParseMode:     "HTML",
 		StringSession: stringSession,
-		Session:       fmt.Sprintf("ass%d.session", idx),
+		Session:       fmt.Sprintf("ass%d.session", index),
 	})
 	if err != nil {
-		gologging.Fatal("Failed to create assistant: " + err.Error())
+		return nil, fmt.Errorf("creating client: %w", err)
 	}
 
-	return client
+	user, err := client.GetMe()
+	if err != nil {
+		return nil, fmt.Errorf("fetching identity: %w", err)
+	}
+
+	client.SetCommandPrefixes(".")
+
+	return &Assistant{
+		Index:  index,
+		Client: client,
+		Self:   user,
+		Ntg:    ubot.NewContext(client),
+	}, nil
+}
+
+func resolveSession(session string) (string, error) {
+	switch strings.ToLower(config.SessionType) {
+	case "pyrogram", "pyro":
+		sess, err := decodePyrogramSessionString(session)
+		if err != nil {
+			return "", fmt.Errorf("decoding Pyrogram session: %w", err)
+		}
+		return sess.Encode(), nil
+
+	case "telethon":
+		sess, err := decodeTelethonSessionString(session)
+		if err != nil {
+			return "", fmt.Errorf("decoding Telethon session: %w", err)
+		}
+		return sess.Encode(), nil
+
+	case "gogram":
+		return session, nil
+
+	default:
+		return "", fmt.Errorf("invalid SESSION_TYPE: %s", config.SessionType)
+	}
 }
 
 func decodePyrogramSessionString(

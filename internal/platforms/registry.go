@@ -344,6 +344,8 @@ func combineErrors(prefix string, errs []string) error {
 	return errors.New(prefix + "\n• " + strings.Join(errs, "\n• "))
 }
 
-func Close() {
-	rc.Close()
+func Init() (func(), error) {
+	return func() {
+		rc.Close()
+	}, nil
 }

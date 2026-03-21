@@ -48,7 +48,12 @@ import (
 func main() {
 	initLogger()
 	defer config.CloseLogging()
-	defer platforms.Close()
+
+	shutdownPlatforms, err := platforms.Init()
+	if err != nil {
+		gologging.Fatal("Failed to initialize platforms: " + err.Error())
+	}
+	defer shutdownPlatforms()
 
 	checkFFmpegAndFFprobe()
 
@@ -58,7 +63,10 @@ func main() {
 
 	gologging.Debug("Initializing MongoDB...")
 
-	closeDB := database.Init(config.MongoURI)
+	closeDB, err := database.Init(config.MongoURI)
+	if err != nil {
+		gologging.Fatal("Failed to initialize database: " + err.Error())
+	}
 	defer closeDB()
 
 	gologging.Info("Database connected successfully")
@@ -69,7 +77,10 @@ func main() {
 
 	gologging.Debug("Initializing clients...")
 
-	shutdownCore := core.Init()
+	shutdownCore, err := core.Init()
+	if err != nil {
+		gologging.Fatal("Failed to initialize core: " + err.Error())
+	}
 	defer shutdownCore()
 
 	core.GetAssistantIndexFunc = database.AssistantIndex

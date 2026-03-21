@@ -68,7 +68,7 @@ All state types (`RoomState`, `ChatState`, `AssistantManager`) are thread-safe. 
 ## 💡 Notes
 
 > [!IMPORTANT]
-> **Initialization**: `core.Init()` must be called during bot startup to initialize the bot client and all configured assistants.
+> **Initialization**: `core.Init()` must be called during bot startup to initialize the bot client and all configured assistants. It returns a shutdown function and an error.
 
 > [!IMPORTANT]
 > **Cleanup**: `DeleteRoom(chatID)` must be called when a session ends to stop playback, clean up temporary files, and release resources.

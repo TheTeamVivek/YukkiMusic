@@ -38,12 +38,12 @@ var (
 	dbCache = utils.NewCache[string, any](60 * time.Minute)
 )
 
-func Init(mongoURL string) func() {
+func Init(mongoURL string) (func(), error) {
 	var err error
 	logger.Debug("Initializing MongoDB...")
 	client, err = mongo.Connect(options.Client().ApplyURI(mongoURL))
 	if err != nil {
-		logger.Fatal("Failed to connect to MongoDB: %v", err)
+		return nil, err
 	}
 
 	logger.Debug("Successfully connected to MongoDB.")
@@ -62,5 +62,5 @@ func Init(mongoURL string) func() {
 		} else {
 			logger.Info("MongoDB disconnected successfully")
 		}
-	}
+	}, nil
 }
