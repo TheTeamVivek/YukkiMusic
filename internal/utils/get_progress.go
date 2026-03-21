@@ -19,7 +19,7 @@ package utils
 
 import (
 	"fmt"
-	"math"
+	"strings"
 
 	"github.com/amarnathcjd/gogram/telegram"
 )
@@ -56,6 +56,7 @@ func GetProgress(statusMsg *telegram.NewMessage) *telegram.ProgressManager {
 	return pm
 }
 
+/*
 func GetProgressBar(playedSec, durationSec int) string {
 	if durationSec == 0 || playedSec <= 0 {
 		return "◉—————————"
@@ -91,4 +92,22 @@ func GetProgressBar(playedSec, durationSec int) string {
 		bar = "—————————◉"
 	}
 	return bar
+}
+*/
+
+func GetProgressBar(playedSec, durationSec int) string {
+	if durationSec <= 0 || playedSec <= 0 {
+		return "◉—————————"
+	}
+
+	if playedSec >= durationSec {
+		return "—————————◉"
+	}
+
+	index := (playedSec * 10) / durationSec
+	if index > 9 {
+		index = 9
+	}
+
+	return strings.Repeat("—", index) + "◉" + strings.Repeat("—", 9-index)
 }
