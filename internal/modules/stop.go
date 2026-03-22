@@ -70,13 +70,11 @@ func handleStop(m *telegram.NewMessage, cplay bool) error {
 
 	if isPaused || isMuted {
 		msgKey := "stop_confirm_paused"
-		if isPaused && isMuted {
-			msgKey = "stop_confirm_both"
-		} else if isMuted {
+		if isMuted {
 			msgKey = "stop_confirm_muted"
 		}
 		m.Reply(F(m.ChannelID(), msgKey), &telegram.SendOptions{
-			ReplyMarkup: core.GetStopConfirmMarkup(m.ChannelID(), r, isPaused, isMuted),
+			ReplyMarkup: core.GetStopConfirmMarkup(m.ChannelID(), r, isPaused),
 		})
 		return telegram.ErrEndGroup
 	}

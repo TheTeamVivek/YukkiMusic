@@ -68,7 +68,6 @@ func GetStopConfirmMarkup(
 	chatID int64,
 	r *RoomState,
 	isPaused bool,
-	isMuted bool,
 ) tg.ReplyMarkup {
 	btn := tg.NewKeyboard()
 	prefix := "room:"
@@ -78,17 +77,16 @@ func GetStopConfirmMarkup(
 
 	if isPaused {
 		btn.AddRow(
-			tg.Button.Data(F(chatID, "CONFIRM_RESUME_BTN"), prefix+"resume"),
+			tg.Button.Data(F(chatID, "CONFIRM_RESUME_BTN"), prefix+"resume").Primary(),
 		)
-	}
-	if isMuted {
+	} else {
 		btn.AddRow(
-			tg.Button.Data(F(chatID, "CONFIRM_UNMUTE_BTN"), prefix+"unmute"),
+			tg.Button.Data(F(chatID, "CONFIRM_UNMUTE_BTN"), prefix+"unmute").Primary(),
 		)
 	}
 
 	btn.AddRow(
-		tg.Button.Data(F(chatID, "CONFIRM_STOP_BTN"), prefix+"stop"),
+		tg.Button.Data(F(chatID, "CONFIRM_STOP_BTN"), prefix+"stop").Danger(),
 	)
 
 	return btn.Build()
