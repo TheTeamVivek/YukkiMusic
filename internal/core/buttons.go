@@ -64,6 +64,36 @@ func SuppMarkup(chatID int64) tg.ReplyMarkup {
 		Build()
 }
 
+func GetStopConfirmMarkup(
+	chatID int64,
+	r *RoomState,
+	isPaused bool,
+	isMuted bool,
+) tg.ReplyMarkup {
+	btn := tg.NewKeyboard()
+	prefix := "room:"
+	if r.ChannelPlayID() != 0 {
+		prefix = "croom:"
+	}
+
+	if isPaused {
+		btn.AddRow(
+			tg.Button.Data(F(chatID, "CONFIRM_RESUME_BTN"), prefix+"resume"),
+		)
+	}
+	if isMuted {
+		btn.AddRow(
+			tg.Button.Data(F(chatID, "CONFIRM_UNMUTE_BTN"), prefix+"unmute"),
+		)
+	}
+
+	btn.AddRow(
+		tg.Button.Data(F(chatID, "CONFIRM_STOP_BTN"), prefix+"stop"),
+	)
+
+	return btn.Build()
+}
+
 func GetPlayMarkup(chatID int64, r *RoomState, queued bool) tg.ReplyMarkup {
 	btn := tg.NewKeyboard()
 	prefix := "room:"

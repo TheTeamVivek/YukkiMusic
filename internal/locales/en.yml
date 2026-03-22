@@ -1,6 +1,9 @@
 name: "🇺🇸 English"
 
 # buttons
+CONFIRM_RESUME_BTN: "▶️ Resume"
+CONFIRM_UNMUTE_BTN: "🔊 Unmute"
+CONFIRM_STOP_BTN: "⏹️ Stop"
 ADD_ME_BTN: "⚡ Add Me to Your group"
 BROADCAST_CANCEL_BTN: "🚫 Cancel Broadcast"
 CLOSE_BTN: "Close"
@@ -794,6 +797,18 @@ seek_too_close_end: "⚠️ Cannot seek forward <b>{seconds}</b> seconds — tha
 seek_failed: "❌ Failed to seek {direction} <b>{seconds}</b> seconds.\nError: <code>{error}</code>"
 seek_success: "{emoji} Jumped {direction} to <u>{position}</u> of <u>{duration}</u>."
 
+stop_confirm_paused: |
+  ⏸️ <b>Playback is currently paused.</b>
+
+  Do you want to resume playing or stop it completely?
+stop_confirm_muted: |
+  🔇 <b>Playback is currently muted.</b>
+
+  Do you want to unmute or stop it completely?
+stop_confirm_both: |
+  ⏸️🔇 <b>Playback is currently paused and muted.</b>
+
+  Do you want to resume and unmute, or stop it completely?
 stopped: "⏹️ <b>Playback stopped and cleared by {user}.</b>"
 
 shuffle_current_state: "🔀 Currently shuffle is <b>{state}</b> for this chat.\n\nUse <code>{cmd}</code> to toggle it."

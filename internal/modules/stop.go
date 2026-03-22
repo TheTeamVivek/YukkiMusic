@@ -64,6 +64,23 @@ func handleStop(m *telegram.NewMessage, cplay bool) error {
 		m.Reply(F(m.ChannelID(), "room_no_active"))
 		return telegram.ErrEndGroup
 	}
+
+	isPaused := r.IsPaused()
+	isMuted := r.IsMuted()
+
+	if isPaused || isMuted {
+		msgKey := "stop_confirm_paused"
+		if isPaused && isMuted {
+			msgKey = "stop_confirm_both"
+		} else if isMuted {
+			msgKey = "stop_confirm_muted"
+		}
+		m.Reply(F(m.ChannelID(), msgKey), &telegram.SendOptions{
+			ReplyMarkup: core.GetStopConfirmMarkup(m.ChannelID(), r, isPaused, isMuted),
+		})
+		return telegram.ErrEndGroup
+	}
+
 	core.DeleteRoom(r.ChatID())
 	m.Reply(
 		F(
