@@ -1,21 +1,18 @@
 /*
- * This file is part of YukkiMusic.
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
  *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
+ * Copyright (C) 2026 TheTeamVivek
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
 
 package cookies
@@ -35,9 +32,12 @@ import (
 	"main/internal/config"
 )
 
+const cookieDir = "internal/cookies"
+
 var (
 	cachedFiles []string
 	cacheOnce   sync.Once
+	client      = resty.New()
 )
 
 //go:embed *.txt
@@ -69,14 +69,12 @@ func copyEmbeddedCookies() error {
 	}
 
 	for _, e := range entries {
-		if e.IsDir() {
-			continue
-		}
-		if e.Name() == "example.txt" {
+
+		if e.IsDir() || e.Name() == "example.txt" {
 			continue
 		}
 
-		dst := filepath.Join("internal/cookies", e.Name())
+		dst := filepath.Join(cookieDir, e.Name())
 
 		if _, err := os.Stat(dst); err == nil {
 			continue
@@ -91,16 +89,14 @@ func copyEmbeddedCookies() error {
 			return err
 		}
 	}
+
 	return nil
 }
 
 func downloadCookieFile(url string) error {
 	id := filepath.Base(url)
 	rawURL := "https://batbin.me/raw/" + id
-	filePath := filepath.Join("internal/cookies", id+".txt")
-
-	client := resty.New()
-	defer client.Close()
+	filePath := filepath.Join(cookieDir, id+".txt")
 
 	resp, err := client.R().
 		SetOutputFileName(filePath).
@@ -121,17 +117,20 @@ func downloadCookieFile(url string) error {
 }
 
 func loadCookieCache() error {
-	files, err := filepath.Glob("internal/cookies/*.txt")
+	files, err := filepath.Glob(filepath.Join(cookieDir, "*.txt"))
 	if err != nil {
 		return err
 	}
+
 	var filtered []string
+
 	for _, f := range files {
 		if filepath.Base(f) == "example.txt" {
 			continue
 		}
 		filtered = append(filtered, f)
 	}
+
 	cachedFiles = filtered
 	return nil
 }
@@ -145,7 +144,6 @@ func GetRandomCookieFile() (string, error) {
 
 	if err != nil {
 		gologging.WarnF("Failed to load cookie cache: %v", err)
-		cacheOnce = sync.Once{}
 		return "", err
 	}
 

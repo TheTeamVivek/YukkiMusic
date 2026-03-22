@@ -1,6 +1,9 @@
 name: "🇺🇸 English"
 
 # buttons
+CONFIRM_RESUME_BTN: "▶️ Resume"
+CONFIRM_UNMUTE_BTN: "🔊 Unmute"
+CONFIRM_STOP_BTN: "⏹️ Stop"
 ADD_ME_BTN: "⚡ Add Me to Your group"
 BROADCAST_CANCEL_BTN: "🚫 Cancel Broadcast"
 CLOSE_BTN: "Close"
@@ -34,21 +37,6 @@ assistant_restricted_warning: |
   I cannot play music, manage the queue, or clean up tracks while this continues.
 
   <i>Unban the assistant to restore all music features 🎵</i>
-
-autoplay_usage: |
-  ⚙️ <b>AutoPlay Control</b>
-
-  <i>When enabled, the bot will automatically play recommended tracks when the queue is empty.</i>
-  
-  Usage: {cmd} [enable|disable]
-
-  <i><b>Current state:</b> {action}</i>
-
-autoplay_updated: |
-  ⚙️ <b>AutoPlay Updated</b>
-  
-  <i>AutoPlay has been <b>{action}</b> by {user}.</i>
-
 
 # 🧩 Common auth messages
 auth_no_user: "⚠️ Please provide a user — use:\n{cmd} [user_id] or reply to a user's message."
@@ -210,7 +198,7 @@ bug_report_format: |
   <pre>{report}</pre>
   
 clear_no_active: "⚠️ <b>No active playback or queue to clear.</b>"
-clear_success: "✅ The queue has been cleared by {user}."
+clear_success: "✅ The queue has been cleared by {user}.\n<i>You can restore it using <code>/{cmd}</code> before adding new songs</i>"
 
 err_assistant_banned: |
   <b>🚫 Assistant Restricted</b>
@@ -301,7 +289,7 @@ flood_minutes: "⏳ Please wait {duration} minutes before using this command aga
 help_private_only: "🤖 Hi! For bot help and commands, please DM me directly — I'm more responsive in private chats!"
 help_main: "📚 <b>Help Menu</b>\n\nSelect a category below to explore detailed commands and their usage for managing, controlling, and customizing the bot."
 
-jump_no_active: "⚠️ <b>No active track to jump within.</b>"
+jump_no_active: "⚠️ No active track to jump within."
 jump_usage: "⚠️ Please provide seconds.\nExample: <code>{cmd} 120</code>"
 jump_invalid_position: "⚠️ Invalid position.\nExample: <code>{cmd} 120</code>"
 jump_too_close_end: "⚠️ Cannot jump to <b>{position}</b> — that’s too close to the end of the track."
@@ -485,7 +473,7 @@ play_download_failed: |
   Error: <code>{error}</code>
 
 play_added_to_queue_single: |
-  <b>🎵 Added to Queue:</b>
+  <b>🎵 Added to Queue:</b> #{index}
 
   <b>▫ Track:</b> <a href="{url}">{title}</a>
   <b>▫ Duration:</b> {duration}
@@ -522,13 +510,15 @@ position_now: |
   ⚙️ Speed: <b>{speed}x</b>
 
 queue_limit_reached: "⚠️ Queue limit reached ({limit} tracks max). Use /clear to clear queue."
-queue_no_active: "⚠️ <b>No active playback.</b>\nNothing is queued right now."
+queue_no_active: "⚠️ <b>No active playback.</b>\n\n<i>Nothing is queued right now.</i>"
 queue_header: "🎶 <b>Current Queue</b>"
 queue_now_playing: "▶️ <b>Now Playing:</b>"
 queue_up_next: "⏭️ <b>Up Next:</b>"
 queue_more_line: "\n… and {remaining} more"
 queue_empty_tail: "📭 <i>No more songs in queue.</i>"
 queue_empty: "⚠️ <b>The queue is already empty.</b>"
+queue_restored: "✅ Successfully restored <b>{count}</b> tracks to the queue."
+queue_restore_no_data: "❌ No cleared queue found to restore, or a new song has already been added."
 
 # 🔄 Reload
 reload_start: "⚙️ Reloading admin cache, voice chat status, and assistant status..."
@@ -586,7 +576,7 @@ restart_fail: "❌ Failed to restart: {error}"
 
 
 room_not_active_cb: "⚠️ Nothing playing right now."
-room_no_active: "⚠️ <b>No active playback.</b>\nThere's nothing playing right now."
+room_no_active: "⚠️ <b>No active playback.</b>\n\n<i>There's nothing playing right now.</i>"
 room_not_linked: "⚠️ This channel isn't linked to any group."
 
 room_already_paused: "⏸️ Track is already paused. Tap ▶️ Resume to continue."
@@ -807,6 +797,16 @@ seek_too_close_end: "⚠️ Cannot seek forward <b>{seconds}</b> seconds — tha
 seek_failed: "❌ Failed to seek {direction} <b>{seconds}</b> seconds.\nError: <code>{error}</code>"
 seek_success: "{emoji} Jumped {direction} to <u>{position}</u> of <u>{duration}</u>."
 
+stop_confirm_paused: |
+  ⏸️ <b>Playback is currently paused.</b>
+
+  Do you want to resume playing or stop it completely?
+
+stop_confirm_muted: |
+  🔇 <b>Playback is currently muted.</b>
+
+  Do you want to unmute or stop it completely?
+
 stopped: "⏹️ <b>Playback stopped and cleared by {user}.</b>"
 
 shuffle_current_state: "🔀 Currently shuffle is <b>{state}</b> for this chat.\n\nUse <code>{cmd}</code> to toggle it."
@@ -990,3 +990,4 @@ help_public: |
   <b>/reload</b> - Reload admin or cache data
   <b>/json</b> - Show message JSON structure
   <b>/sudolist</b> - View sudo user list
+

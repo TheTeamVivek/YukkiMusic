@@ -1,21 +1,18 @@
 /*
- * This file is part of YukkiMusic.
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
  *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
+ * Copyright (C) 2026 TheTeamVivek
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
 
 package state
@@ -70,12 +67,12 @@ type (
 		//
 		// ctx is used for cancellation and timeouts.
 		// track is the track to download.
-		// mystic used to send progress updates (if not nil).
+		// statusMsg used to send progress updates (if not nil).
 		// if your platform support video playback so return local path of video when track.Video is true
 		Download(
 			ctx context.Context,
 			track *Track,
-			mystic *telegram.NewMessage,
+			statusMsg *telegram.NewMessage,
 		) (string, error)
 
 		// CanGetTracks reports whether this platform can resolve
@@ -88,12 +85,5 @@ type (
 		// Platforms that do not support video should still return tracks,
 		// but must set Track.Video = false.
 		GetTracks(query string, video bool) ([]*Track, error)
-
-		// CanGetRecommendations reports whether this platform can
-		// provide track recommendations based on a given track.
-		CanGetRecommendations() bool
-
-		// GetRecommendations fetches recommended tracks for the given track.
-		GetRecommendations(track *Track) ([]*Track, error)
 	}
 )

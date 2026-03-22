@@ -1,63 +1,62 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package utils
 
 import (
 	"fmt"
-	"math"
+	"strings"
 
 	"github.com/amarnathcjd/gogram/telegram"
 )
 
-func GetProgress(mystic *telegram.NewMessage) *telegram.ProgressManager {
+func GetProgress(statusMsg *telegram.NewMessage) *telegram.ProgressManager {
 	pm := telegram.NewProgressManager(2)
 
-	if mystic == nil {
+	if statusMsg == nil {
 		return pm
 	}
 
 	var opts *telegram.SendOptions
-	if replyMarkup := mystic.ReplyMarkup(); replyMarkup != nil {
+	if replyMarkup := statusMsg.ReplyMarkup(); replyMarkup != nil {
 		opts = &telegram.SendOptions{ReplyMarkup: *replyMarkup}
 	}
 
 	pm.WithCallback(func(pi *telegram.ProgressInfo) {
 		text := fmt.Sprintf(
-			"📥 Downloading your track...\n\n"+
-				"Progress: %.1f%%\n"+
-				"Speed: %s\n"+
-				"ETA: %s\n"+
-				"Elapsed: %s",
+			"<b>📥 Downloading your track...</b>\n"+
+				"<pre>"+
+				"Progress : %6.2f%%\n"+
+				"Speed    : %s\n"+
+				"Eta      : %s\n"+
+				"Elapsed  : %s"+
+				"</pre>",
 			pi.Percentage,
 			pi.SpeedString(),
 			pi.ETAString(),
 			pi.ElapsedString(),
 		)
-
-		mystic.Edit(text, opts)
+		statusMsg.Edit(text, opts)
 	})
 
 	return pm
 }
 
+/*
 func GetProgressBar(playedSec, durationSec int) string {
 	if durationSec == 0 || playedSec <= 0 {
 		return "◉—————————"
@@ -69,7 +68,7 @@ func GetProgressBar(playedSec, durationSec int) string {
 	var bar string
 
 	switch {
-	case umm > 0 && umm <= 10:
+	case umm >= 0 && umm <= 10:
 		bar = "◉—————————"
 	case umm > 10 && umm < 20:
 		bar = "—◉————————"
@@ -92,6 +91,23 @@ func GetProgressBar(playedSec, durationSec int) string {
 	default:
 		bar = "—————————◉"
 	}
-
 	return bar
+}
+*/
+
+func GetProgressBar(playedSec, durationSec int) string {
+	if durationSec <= 0 || playedSec <= 0 {
+		return "◉—————————"
+	}
+
+	if playedSec >= durationSec {
+		return "—————————◉"
+	}
+
+	index := (playedSec * 10) / durationSec
+	if index > 9 {
+		index = 9
+	}
+
+	return strings.Repeat("—", index) + "◉" + strings.Repeat("—", 9-index)
 }

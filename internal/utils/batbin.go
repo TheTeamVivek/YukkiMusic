@@ -19,41 +19,42 @@ package utils
 
 import (
 	"fmt"
-	"runtime"
 
 	"github.com/Laky-64/gologging"
-	"github.com/amarnathcjd/gogram/telegram"
+	"resty.dev/v3"
 )
 
-func EOR(
-	msg *telegram.NewMessage,
-	text string,
-	opts ...*telegram.SendOptions,
-) (m *telegram.NewMessage, err error) {
-	if msg == nil {
-		gologging.Error("[EOR] nil msg at " + callerInfo(2))
-		return nil, nil
-	}
+const batbinBaseURL = "https://batbin.me/"
 
-	m, err = msg.Edit(text, opts...)
-	if err != nil {
-		msg.Delete()
-		m, err = msg.Respond(text, opts...)
-	}
+var httpClient = resty.New()
 
-	if err != nil {
-		gologging.Error(
-			"[EOR] " + err.Error() +
-				" | called from " + callerInfo(2),
-		)
-	}
-	return m, err
+type batbinResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
 }
 
-func callerInfo(skip int) string {
-	_, file, line, ok := runtime.Caller(skip)
-	if !ok {
-		return "unknown:0"
+func CreatePaste(content string) (string, error) {
+	var result batbinResponse
+
+	resp, err := httpClient.R().
+		SetBody(content).
+		SetResult(&result).
+		Post(batbinBaseURL + "api/v2/paste")
+	if err != nil {
+		gologging.Error("batbin request error: " + err.Error())
+		return "", err
 	}
-	return fmt.Sprintf("%s:%d", file, line)
+
+	if resp.StatusCode() != 200 {
+		gologging.Error("batbin bad response: " + resp.String())
+		return "", fmt.Errorf("batbin returned status %d", resp.StatusCode())
+	}
+
+	if !result.Success {
+		err := fmt.Errorf("batbin paste failed")
+		gologging.Error(err.Error())
+		return "", err
+	}
+
+	return batbinBaseURL + result.Message, nil
 }

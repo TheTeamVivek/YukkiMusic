@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package modules
 
 import (
@@ -79,9 +76,9 @@ func formatUptime(d time.Duration) string {
 func pingHandler(m *tg.NewMessage) error {
 	if m.IsPrivate() {
 		m.Delete()
-		database.AddServed(m.ChannelID(), true)
+		database.AddServedUser(m.ChannelID())
 	} else {
-		database.AddServed(m.ChannelID())
+		database.AddServedChat(m.ChannelID())
 	}
 
 	start := time.Now()
@@ -125,7 +122,7 @@ func pingHandler(m *tg.NewMessage) error {
 
 	msg := F(m.ChannelID(), "ping_result", locales.Arg{
 		"latency":    latency,
-		"bot":        utils.MentionHTML(core.BUser),
+		"bot":        utils.MentionHTML(m.Client.Me()),
 		"uptime":     uptimeStr,
 		"ram_info":   ramInfo,
 		"cpu_usage":  cpuUsage,

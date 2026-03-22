@@ -1,103 +1,96 @@
 /*
- * This file is part of YukkiMusic.
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
  *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
+ * Copyright (C) 2026 TheTeamVivek
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
+
 package database
 
-func GetServed(user ...bool) ([]int64, error) {
+func ServedChats() ([]int64, error) {
 	state, err := getBotState()
 	if err != nil {
 		return nil, err
 	}
-
-	if len(user) > 0 && user[0] {
-		return state.Served.Users, nil
-	}
 	return state.Served.Chats, nil
 }
 
-func IsServed(id int64, user ...bool) (bool, error) {
+func ServedUsers() ([]int64, error) {
+	state, err := getBotState()
+	if err != nil {
+		return nil, err
+	}
+	return state.Served.Users, nil
+}
+
+func IsServedChat(id int64) (bool, error) {
 	state, err := getBotState()
 	if err != nil {
 		return false, err
 	}
-
-	target := state.Served.Chats
-	if len(user) > 0 && user[0] {
-		target = state.Served.Users
-	}
-
-	for _, v := range target {
-		if v == id {
-			return true, nil
-		}
-	}
-	return false, nil
+	_, ok := state.servedChatsMap[id]
+	return ok, nil
 }
 
-func AddServed(id int64, user ...bool) error {
-	exists, err := IsServed(id, user...)
-	if err != nil {
-		return err
-	}
-	if exists {
-		return nil
-	}
-
+func IsServedUser(id int64) (bool, error) {
 	state, err := getBotState()
 	if err != nil {
-		return err
+		return false, err
 	}
-
-	target := &state.Served.Chats
-	if len(user) > 0 && user[0] {
-		target = &state.Served.Users
-	}
-
-	*target = append(*target, id)
-	return updateBotState(state)
+	_, ok := state.servedUsersMap[id]
+	return ok, nil
 }
 
-func DeleteServed(id int64, user ...bool) error {
-	exists, err := IsServed(id, user...)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return nil
-	}
-
-	state, err := getBotState()
-	if err != nil {
-		return err
-	}
-
-	target := &state.Served.Chats
-	if len(user) > 0 && user[0] {
-		target = &state.Served.Users
-	}
-
-	newSlice := make([]int64, 0, len(*target))
-	for _, v := range *target {
-		if v != id {
-			newSlice = append(newSlice, v)
+func AddServedChat(id int64) error {
+	return modifyBotState(func(s *BotState) bool {
+		var added bool
+		s.Served.Chats, added = addUnique(s.Served.Chats, id)
+		if added {
+			s.servedChatsMap[id] = struct{}{}
 		}
-	}
-	*target = newSlice
-	return updateBotState(state)
+		return added
+	})
+}
+
+func AddServedUser(id int64) error {
+	return modifyBotState(func(s *BotState) bool {
+		var added bool
+		s.Served.Users, added = addUnique(s.Served.Users, id)
+		if added {
+			s.servedUsersMap[id] = struct{}{}
+		}
+		return added
+	})
+}
+
+func RemoveServedChat(id int64) error {
+	return modifyBotState(func(s *BotState) bool {
+		var removed bool
+		s.Served.Chats, removed = removeElement(s.Served.Chats, id)
+		if removed {
+			delete(s.servedChatsMap, id)
+		}
+		return removed
+	})
+}
+
+func RemoveServedUser(id int64) error {
+	return modifyBotState(func(s *BotState) bool {
+		var removed bool
+		s.Served.Users, removed = removeElement(s.Served.Users, id)
+		if removed {
+			delete(s.servedUsersMap, id)
+		}
+		return removed
+	})
 }

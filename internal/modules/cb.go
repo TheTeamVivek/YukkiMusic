@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package modules
 
 import (
@@ -98,7 +95,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 
 	// Handle cplay mode
 	if strings.HasPrefix(cb.DataString(), "croom:") {
-		realChatID, err := database.GetCPlayID(chatID)
+		realChatID, err := database.LinkedChannel(chatID)
 		if err != nil {
 			gologging.ErrorF(
 				"Failed to get chat ID for cplay ID %d: %v",
@@ -156,7 +153,7 @@ func getRoomForCallback(chatID int64) (*core.RoomState, error) {
 		return nil, fmt.Errorf("failed to get assistant: %w", err)
 	}
 
-	r, ok := core.GetRoom(chatID, ass)
+	r, ok := core.GetRoom(chatID, ass, false)
 	if !ok || !r.IsActiveChat() {
 		return nil, fmt.Errorf("no active room")
 	}
@@ -288,7 +285,7 @@ func handleReplayAction(
 
 	gologging.InfoF("Callback → replay, chatID=%d", chatID)
 
-	mystic, err := cb.Respond(F(cb.ChannelID(), "cb_replaying"))
+	statusMsg, err := cb.Respond(F(cb.ChannelID(), "cb_replaying"))
 	if err != nil {
 		gologging.ErrorF("Failed to send replay message: %v", err)
 		return tg.ErrEndGroup
@@ -296,7 +293,7 @@ func handleReplayAction(
 
 	if err := r.Replay(); err != nil {
 		gologging.ErrorF("Replay failed: %v", err)
-		utils.EOR(mystic, F(cb.ChannelID(), "replay_failed", locales.Arg{
+		utils.EOR(statusMsg, F(cb.ChannelID(), "replay_failed", locales.Arg{
 			"error": err.Error(),
 		}))
 		cb.Answer(F(cb.ChannelID(), "cb_replay_failed"), opt)
@@ -323,8 +320,8 @@ func handleReplayAction(
 		optSend.Media = utils.CleanURL(track.Artwork)
 	}
 
-	mystic, _ = utils.EOR(mystic, msgText, optSend)
-	r.SetMystic(mystic)
+	statusMsg, _ = utils.EOR(statusMsg, msgText, optSend)
+	r.SetStatusMsg(statusMsg)
 
 	editMessage(cb, F(cb.ChannelID(), "cb_replay_edited", locales.Arg{
 		"user": utils.MentionHTML(cb.Sender),
@@ -352,17 +349,20 @@ func handleSkipAction(
 	r.SetLoop(0)
 	t := r.NextTrack()
 
-	mystic, err := cb.Respond(F(cb.ChannelID(), "stream_downloading_next"))
+	statusMsg, err := cb.Respond(F(cb.ChannelID(), "stream_downloading_next"))
 	if err != nil {
 		gologging.ErrorF("Failed to send message: %v", err)
 	}
 
-	path, err := platforms.Download(context.Background(), t, mystic)
+	path, err := platforms.Download(context.Background(), t, statusMsg)
 	if err != nil {
 		gologging.ErrorF("Download failed for %s: %v", t.URL, err)
-		utils.EOR(mystic, F(cb.ChannelID(), "stream_download_fail", locales.Arg{
-			"error": err.Error(),
-		}))
+		utils.EOR(
+			statusMsg,
+			F(cb.ChannelID(), "stream_download_fail", locales.Arg{
+				"error": err.Error(),
+			}),
+		)
 		cb.Answer(F(cb.ChannelID(), "cb_skip_download_failed"), opt)
 		core.DeleteRoom(r.ChatID())
 
@@ -371,7 +371,7 @@ func handleSkipAction(
 
 	if err := r.Play(t, path); err != nil {
 		gologging.ErrorF("Play error: %v", err)
-		utils.EOR(mystic, F(cb.ChannelID(), "stream_play_fail"))
+		utils.EOR(statusMsg, F(cb.ChannelID(), "stream_play_fail"))
 		cb.Answer(F(cb.ChannelID(), "cb_skip_play_failed"), opt)
 		core.DeleteRoom(r.ChatID())
 
@@ -399,12 +399,12 @@ func handleSkipAction(
 		sendOpt.Media = utils.CleanURL(t.Artwork)
 	}
 
-	mystic, _ = utils.EOR(mystic, msgText, sendOpt)
+	statusMsg, _ = utils.EOR(statusMsg, msgText, sendOpt)
 	replyToCallback(cb, F(cb.ChannelID(), "cb_skip_edited", locales.Arg{
 		"user": utils.MentionHTML(cb.Sender),
 	}))
 
-	r.SetMystic(mystic)
+	r.SetStatusMsg(statusMsg)
 	return tg.ErrEndGroup
 }
 

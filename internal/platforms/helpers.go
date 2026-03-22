@@ -1,28 +1,24 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package platforms
 
 import (
 	"errors"
-	"mime"
 	"os"
 	"path/filepath"
 	"strings"
@@ -109,26 +105,24 @@ func playableMedia(m *telegram.NewMessage) (bool, bool) {
 	}
 
 	check := func(msg *telegram.NewMessage) (bool, bool) {
-		if msg.Audio() != nil || msg.Voice() != nil {
+		switch {
+		case msg.Audio() != nil, msg.Voice() != nil:
 			return false, true
-		}
 
-		if msg.Video() != nil {
+		case msg.Video() != nil:
 			return true, false
-		}
 
-		if msg.Document() != nil {
-			ext := strings.ToLower(msg.File.Ext)
-			if !strings.HasPrefix(ext, ".") {
-				ext = "." + ext
+		case msg.Document() != nil:
+			mimeType := strings.ToLower(msg.Document().MimeType)
+
+			if mimeType == "" {
+				return false, false
 			}
 
-			mimeType := mime.TypeByExtension(ext)
-
-			if strings.HasPrefix(mimeType, "audio/") {
+			switch {
+			case strings.HasPrefix(mimeType, "audio/"):
 				return false, true
-			}
-			if strings.HasPrefix(mimeType, "video/") {
+			case strings.HasPrefix(mimeType, "video/"):
 				return true, false
 			}
 		}

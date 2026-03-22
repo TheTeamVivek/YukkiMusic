@@ -36,7 +36,7 @@ The **Database System** manages all persistent data for YukkiMusic using MongoDB
 - **Database**: MongoDB (Cloud or Local)
 - **Driver**: `go.mongodb.org/mongo-driver/v2`
 - **Caching**: In-memory with TTL expiration
-- **Timeout**: 5-30 seconds per operation
+- **Timeout**: Internal context management (5s default)
 
 ---
 
@@ -82,7 +82,8 @@ YukkiMusic (Database)
     "rtmp_url": "rtmps://...",
     "rtmp_key": "..."
   },
-  "ass_index": 2
+  "ass_index": 2,
+  "no_thumb": false
 }
 ```
 
@@ -129,8 +130,9 @@ YukkiMusic (Database)
 
 **Operations**:
 ```go
-getBotState()           // Fetch current state
-updateBotState(state)   // Update state
+getBotState()           // Fetch current state (internal)
+updateBotState(state)   // Update state (internal)
+modifyBotState(fn)      // atomic-like modification (internal)
 ```
 
 ---
@@ -150,6 +152,7 @@ updateBotState(state)   // Update state
 | `rtmp_config.rtmp_url` | String | RTMP streaming URL |
 | `rtmp_config.rtmp_key` | String | RTMP stream key |
 | `ass_index` | Int | Assigned assistant index |
+| `no_thumb` | Boolean | Disable thumbnails |
 
 **Example**:
 ```javascript
@@ -162,7 +165,8 @@ updateBotState(state)   // Update state
     "rtmp_url": "rtmps://dc5-1.rtmp.t.me/s/",
     "rtmp_key": "2146211959:yJaXZGb7KXp..."
   },
-  "ass_index": 1
+  "ass_index": 1,
+  "no_thumb": false
 }
 ```
 
@@ -170,8 +174,9 @@ updateBotState(state)   // Update state
 
 **Operations**:
 ```go
-getChatSettings(chatID)          // Fetch settings
-updateChatSettings(settings)     // Update settings
+getChatSettings(chatID)          // Fetch settings (internal)
+updateChatSettings(settings)     // Update settings (internal)
+modifyChatSettings(chatID, fn)   // atomic-like modification (internal)
 ```
 
 ---
@@ -188,76 +193,76 @@ isSudo, err := database.IsSudo(userID)
 err := database.AddSudo(userID)
 
 // Remove sudo user
-err := database.DeleteSudo(userID)
+err := database.RemoveSudo(userID)
 
 // Get all sudoers
-sudoers, err := database.GetSudoers()
+sudoers, err := database.Sudoers()
 ```
 
 ### Served Statistics
 
 ```go
 // Get all served users
-users, err := database.GetServed(true)  // true = get users
+users, err := database.ServedUsers()
 
 // Get all served chats
-chats, err := database.GetServed()      // false = get chats
+chats, err := database.ServedChats()
 
 // Check if served
-isServed, err := database.IsServed(userID, true)
+isServed, err := database.IsServedUser(userID)
+isServed, err := database.IsServedChat(chatID)
 
 // Mark as served
-err := database.AddServed(userID, true)
+err := database.AddServedUser(userID)
+err := database.AddServedChat(chatID)
 
 // Remove from served
-err := database.DeleteServed(userID, true)
+err := database.RemoveServedUser(userID)
+err := database.RemoveServedChat(chatID)
 ```
 
 ### Auth Users
 
 ```go
 // Check if auth user
-isAuth, err := database.IsAuthUser(chatID, userID)
+isAuth, err := database.IsAuthorized(chatID, userID)
 
 // Add auth user
-err := database.AddAuthUser(chatID, userID)
+err := database.Authorize(chatID, userID)
 
 // Remove auth user
-err := database.RemoveAuthUser(chatID, userID)
+err := database.Unauthorize(chatID, userID)
 
 // Get all auth users for chat
-users, err := database.GetAuthUsers(chatID)
+users, err := database.AuthorizedUsers(chatID)
 ```
 
 ### Chat Language
 
 ```go
 // Get chat language
-lang, err := database.GetChatLanguage(chatID)
-// Returns: chat language ("en", "hi", etc.), if not found defaults to config.DEFAULT_LANG
+lang, err := database.Language(chatID)
+// Returns: chat language ("en", "hi", etc.), if not found defaults to config.DefaultLang
 
 // Set chat language
-err := database.SetChatLanguage(chatID, "hi")
+err := database.SetLanguage(chatID, "hi")
 ```
 
 ### Channel Play (CPlay)
 
 ```go
 // Get linked channel ID
-cplayID, err := database.GetCPlayID(chatID)
+cplayID, err := database.LinkedChannel(chatID)
 
 // Set linked channel
-err := database.SetCPlayID(chatID, cplayID)
-
-// Get chat from channel ID
-chatID, err := database.GetChatIDFromCPlayID(cplayID)
+err := database.LinkChannel(chatID, channelID)
 ```
 
 ### RTMP Configuration
 
 ```go
 // Get RTMP settings
-url, key, err := database.GetRTMP(chatID)
+url, key, err := database.RTMP(chatID)
 
 // Set RTMP settings
 err := database.SetRTMP(chatID, url, key)
@@ -267,10 +272,10 @@ err := database.SetRTMP(chatID, url, key)
 
 ```go
 // Check if maintenance enabled
-isMaint, err := database.IsMaintenance()
+isMaint, err := database.IsMaintenanceEnabled()
 
 // Get maintenance reason
-reason, err := database.GetMaintReason()
+reason, err := database.MaintenanceReason()
 
 // Set maintenance mode
 err := database.SetMaintenance(true, "Server maintenance")
@@ -291,7 +296,7 @@ err := database.SetLoggerEnabled(true)
 
 ```go
 // Check if auto-leave enabled
-enabled, err := database.GetAutoLeave()
+enabled, err := database.AutoLeave()
 
 // Set auto-leave status
 err := database.SetAutoLeave(true)
@@ -301,7 +306,7 @@ err := database.SetAutoLeave(true)
 
 ```go
 // Get assigned assistant for chat
-index, err := database.GetAssistantIndex(chatID, totalAssistants)
+index, err := database.AssistantIndex(chatID, totalAssistants)
 
 // Rebalance assistants across all chats
 err := database.RebalanceAssistantIndexes(totalAssistants)
@@ -322,12 +327,6 @@ If Hit: Return cached value ⚡
 If Miss: Query MongoDB → Update cache
 ```
 
-**Manual Cache Invalidation**:
-```go
-dbCache.Delete("bot_state")
-dbCache.Delete("chat_settings_" + chatID)
-```
-
 ---
 
 ### 2. Data Migration
@@ -335,7 +334,7 @@ dbCache.Delete("chat_settings_" + chatID)
 **Automatic Migration from v1 to v2**:
 
 ```go
-func migrateData(mongoURI string) {
+func migrateData() {
     // Runs once on startup
     // Checks if old database exists
     // Migrates old collections
@@ -343,12 +342,6 @@ func migrateData(mongoURI string) {
     // No manual action needed
 }
 ```
-
-**Migrates**:
-- ✅ cplaymode → cplay_id
-- ✅ tgusersdb → served.users
-- ✅ chats → served.chats
-- ✅ sudoers → sudoers array
 
 ---
 
@@ -383,56 +376,18 @@ database.RebalanceAssistantIndexes(newAssistantCount)
 
 ## 💾 Caching Strategy
 
-### Cache Hierarchy
-
-```
-User Request
-    ↓
-Level 1: In-Memory Cache (< 1ms)
-    ├─ If Hit: Return immediately
-    └─ If Miss: Go to Level 2
-    ↓
-Level 2: MongoDB Query (50-500ms)
-    ├─ If Found: Cache result
-    └─ If Not Found: Use default
-    ↓
-Return Result
-```
-
-### Cache Configuration
-
-```go
-// Default cache expiration
-const defaultTTL = 60 * time.Minute
-
-// Create cache
-dbCache := utils.NewCache[string, any](defaultTTL)
-
-// Set value with default TTL
-dbCache.Set("key", value)
-
-// Set value with custom TTL
-dbCache.Set("key", value, 30*time.Minute)
-
-// Get value
-val, exists := dbCache.Get("key")
-
-// Delete value
-dbCache.Delete("key")
-```
-
 ### Cache Invalidation
 
 Automatic on updates:
 
 ```go
 func updateBotState(state *BotState) error {
-    // Update MongoDB
-    _, err := settingsColl.UpdateOne(ctx, filter, update)
+    // Update MongoDB (internal)
+    // ...
     
     if err == nil {
-        // Invalidate cache
-        dbCache.Set("bot_state", state)  // Update
+        // Update cache
+        dbCache.Set(botStateCacheKey, state)
     }
     
     return err
@@ -456,21 +411,6 @@ chat_settings:
 core.Assistants.Get(2)  ← The actual assistant
 ```
 
-### Chat ↔ CPlay (Channel)
-
-```
-One Chat ↔ Zero or One Channel (one-to-zero-or-one)
-
-Example:
-chat_settings:
-  _id: -1001234567890 (main chat)
-  cplay_id: -1001111111111 (linked channel)
-
-Then:
-- Play in main chat
-- Stream outputs to linked channel
-```
-
 ### User Hierarchies
 
 ```
@@ -487,85 +427,13 @@ Owner (1)
 
 ### 1. Query Optimization
 
-```go
-// ❌ Bad: Multiple queries
-for chatID := range chatIDs {
-    settings, _ := getChatSettings(chatID)  // N queries
-}
+The system uses `BulkWrite` for rebalancing and efficient internal fetching to minimize roundtrips.
 
-// ✅ Good: Batch query
-chats, _ := chatSettingsColl.Find(ctx, bson.M{
-    "_id": bson.M{"$in": chatIDs},
-})
-```
-
-### 2. Cache Tuning
-
-```go
-// Default: 60 minutes
-// Increase for stable data:
-cache := utils.NewCache(2 * time.Hour)
-
-// Decrease for frequently-changing data:
-cache := utils.NewCache(5 * time.Minute)
-```
 ---
 
 ## 📊 Database Statistics
 
-### Typical Document Sizes
-
-| Collection | Avg Size | Count | Total |
-|-----------|----------|-------|-------|
-| bot_settings | 2 KB | 1 | 2 KB |
-| chat_settings | 500 B | 1000 | 500 KB |
-| **Total** | - | - | ~502 KB |
-
-### Typical Query Times
-
-| Operation | Time | Cached |
-|-----------|------|--------|
-| Get bot state | 100ms | < 1ms |
-| Get chat settings | 50ms | < 1ms |
-| List sudoers | 60ms | < 1ms |
-| Rebalance (1000 chats) | 5s | N/A |
-
----
-
-## 🔐 Security Best Practices
-
-### 1. Environment Variables
-
-```bash
-# ✅ Good
-MONGO_DB_URI=mongodb+srv://user:pass@cluster.mongodb.net/YukkiMusic
-
-# ❌ Bad (in code)
-mongoURI := "mongodb+srv://user:pass@..."
-```
-
-### 2. Connection Security
-
-```bash
-# ✅ Use MongoDB Atlas with:
-# - IP Whitelisting enabled
-# - TLS/SSL required
-# - Strong password
-
-# ❌ Avoid local MongoDB without auth
-```
-
-### 3. Data Access
-
-```go
-// ✅ Validate user before data access
-if userID != config.OwnerID && !isSudo(userID) {
-    return fmt.Errorf("unauthorized")
-}
-
-// ❌ Don't expose sensitive data
-_ = database.GetSudoers()  // Public query
-```
+Typical document size is ~2KB for bot state and ~500B for chat settings. Standard operations are cached, providing sub-millisecond read times.
 
 ---
 
@@ -575,7 +443,7 @@ _ = database.GetSudoers()  // Public query
 internal/database/
 ├── README.md                  # This file
 ├── database.go                # Initialization & setup
-├── helpers.go                 # Utility functions
+├── helpers.go                 # Internal context & slice utilities
 ├── bot_state.go              # Global state management
 ├── chat_settings.go          # Per-chat settings
 ├── auth_users.go             # Authorization management
@@ -601,20 +469,20 @@ internal/database/
 // Check/Add/Remove sudo user
 isSudo, _ := database.IsSudo(userID)
 database.AddSudo(userID)
-database.DeleteSudo(userID)
+database.RemoveSudo(userID)
 
 // Manage auth users per chat
-isAuth, _ := database.IsAuthUser(chatID, userID)
-database.AddAuthUser(chatID, userID)
-database.RemoveAuthUser(chatID, userID)
+isAuth, _ := database.IsAuthorized(chatID, userID)
+database.Authorize(chatID, userID)
+database.Unauthorize(chatID, userID)
 
 // Language management
-lang, _ := database.GetChatLanguage(chatID)
-database.SetChatLanguage(chatID, "hi")
+lang, _ := database.Language(chatID)
+database.SetLanguage(chatID, "hi")
 
 // Served tracking
-database.AddServed(userID, true)  // Mark user
-database.AddServed(chatID)        // Mark chat
+database.AddServedUser(userID)
+database.AddServedChat(chatID)
 
 // Maintenance
 database.SetMaintenance(true, "reason")

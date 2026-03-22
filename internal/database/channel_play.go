@@ -17,20 +17,20 @@
 
 package database
 
-func AutoLeave() (bool, error) {
-	state, err := getBotState()
+func LinkedChannel(chatID int64) (int64, error) {
+	settings, err := getChatSettings(chatID)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
-	return state.AutoLeave, nil
+	return settings.ChannelPlayID, nil
 }
 
-func SetAutoLeave(value bool) error {
-	return modifyBotState(func(s *BotState) bool {
-		if s.AutoLeave == value {
+func LinkChannel(chatID, channelID int64) error {
+	return modifyChatSettings(chatID, func(s *ChatSettings) bool {
+		if s.ChannelPlayID == channelID {
 			return false
 		}
-		s.AutoLeave = value
+		s.ChannelPlayID = channelID
 		return true
 	})
 }

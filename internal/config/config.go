@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package config
 
 import (
@@ -32,49 +29,100 @@ import (
 )
 
 var (
-	logger = gologging.GetLogger("config")
+	// Required Variables
+	APIID          int32
+	APIHash        string
+	Token          string
+	LoggerID       int64
+	MongoURI       string
+	StringSessions []string
+	SessionType    string
 
-	// To learn more about what each variable does, see README.md
-	// Required Vars
-	ApiID          = int32(getInt64("API_ID"))
-	ApiHash        = getString("API_HASH")
-	Token          = getString("TOKEN")
-	LoggerID       = getInt64("LOGGER_ID")
-	MongoURI       = getString("MONGO_DB_URI")
-	StringSessions = getStringSlice("STRING_SESSIONS")
-	SessionType    = getString(
-		"SESSION_TYPE",
-		"pyrogram",
-	) // pyrogram, telethon, gogram
+	// Optional Variables
+	OwnerID             int64
+	SpotifyClientID     string
+	SpotifyClientSecret string
+	FallenAPIURL        string
+	FallenAPIKey        string
+	DefaultLang         string
+	DurationLimit       int
+	LeaveOnDemoted      bool
+	QueueLimit          int
+	SupportChat         string
+	SupportChannel      string
+	CookiesLink         string
+	SetCmds             bool
+	MaxAuthUsers        int
+	StartImage          string
+	PingImage           string
+	Port                string
 
-	// Optional Vars
-	OwnerID = getInt64("OWNER_ID")
+	// System & Logging
+	StartTime   time.Time
+	LogFileName = "logs.txt"
+	LogWriter   io.Writer
 
-	SpotifyClientID = getString(
-		"SPOTIFY_CLIENT_ID",
-		"40b91facfdee4c6e9456906613e7ca6b",
+	// Internal
+	logger  = gologging.GetLogger("config")
+	logFile *os.File
+)
+
+func init() {
+	initLogging()
+	loadConfig()
+	validateConfig()
+}
+
+func initLogging() {
+	_ = os.Remove(LogFileName)
+
+	file, err := os.OpenFile(
+		LogFileName,
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		0o644,
 	)
-	SpotifyClientSecret = getString(
-		"SPOTIFY_CLIENT_SECRET",
-		"e8d7847ccdf545b9ac5051d2c456c5d2",
+	if err != nil {
+		logger.FatalF("Failed to open log file: %v", err)
+	}
+
+	logFile = file
+	LogWriter = io.MultiWriter(file, os.Stderr)
+}
+
+func loadConfig() {
+	StartTime = time.Now()
+
+	// Load Required
+	APIID = int32(getInt64("API_ID", 0))
+	APIHash = getString("API_HASH", "")
+	Token = getString(
+		"TOKEN",
+		getString("BOT_TOKEN", ""),
+	) // Checks TOKEN, fallbacks to BOT_TOKEN
+	LoggerID = getInt64("LOGGER_ID", 0)
+	MongoURI = getString("MONGO_DB_URI", "")
+	SessionType = getString("SESSION_TYPE", "pyrogram")
+	StringSessions = getStringSlice(
+		"STRING_SESSIONS",
+		getStringSlice("STRING_SESSION", nil),
 	)
 
+	// Load Optional
+	OwnerID = getInt64("OWNER_ID", 0)
+	SpotifyClientID = getString("SPOTIFY_CLIENT_ID", "")
+	SpotifyClientSecret = getString("SPOTIFY_CLIENT_SECRET", "")
 	FallenAPIURL = getString("FALLEN_API_URL", "https://beta.fallenapi.fun")
-	FallenAPIKey = getString("FALLEN_API_KEY")
+	FallenAPIKey = getString("FALLEN_API_KEY", "")
 
-	YoutubifyApiURL = getString("YOUTUBIFY_API_URL", "https://youtubify.me")
-	YoutubifyApiKey = getString("YOUTUBIFY_API_KEY")
-
-	DefaultLang    = getString("DEFAULT_LANG", "en")
-	DurationLimit  = int(getInt64("DURATION_LIMIT", 4200)) // in seconds
+	DefaultLang = getString("DEFAULT_LANG", "en")
+	DurationLimit = int(getInt64("DURATION_LIMIT", 4200)) // In seconds
 	LeaveOnDemoted = getBool("LEAVE_ON_DEMOTED", false)
-	QueueLimit     = int(getInt64("QUEUE_LIMIT", 7))
-	SupportChat    = getString("SUPPORT_CHAT", "https://t.me/TheTeamVk")
+	QueueLimit = int(getInt64("QUEUE_LIMIT", 7))
+	SupportChat = getString("SUPPORT_CHAT", "https://t.me/TheTeamVk")
 	SupportChannel = getString("SUPPORT_CHANNEL", "https://t.me/TheTeamVivek")
-	StartTime      = time.Now()
-	CookiesLink    = getString("COOKIES_LINK")
-	SetCmds        = getBool("SET_CMDS", false)
-	MaxAuthUsers   = int(getInt64("MAX_AUTH_USERS", 25))
+	CookiesLink = getString("COOKIES_LINK", "")
+	SetCmds = getBool("SET_CMDS", false)
+	MaxAuthUsers = int(getInt64("MAX_AUTH_USERS", 25))
 
 	StartImage = getString(
 		"START_IMG_URL",
@@ -84,81 +132,33 @@ var (
 		"PING_IMG_URL",
 		"https://telegra.ph/file/91533956c91d0fd7c9f20.jpg",
 	)
-
-	LogFileName = "logs.txt"
-	LogWriter   io.Writer
-	logFile     *os.File
-)
-
-func init() {
-	initLogging()
-	validateRequired()
-	validateToken()
-	validateSessions()
-	validateSpotify()
+	Port = getString("PORT", "8000")
 }
 
-func initLogging() {
-	os.Remove(LogFileName)
-	file, err := os.OpenFile(
-		LogFileName,
-		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-		0o644,
-	)
-	if err != nil {
-		panic(err)
-	}
-
-	logFile = file
-	LogWriter = io.MultiWriter(file, os.Stderr)
-}
-
-func validateRequired() {
-	if ApiID == 0 {
+func validateConfig() {
+	if APIID == 0 {
 		logger.Fatal("API_ID is required but missing!")
 	}
-
-	if ApiHash == "" {
+	if APIHash == "" {
 		logger.Fatal("API_HASH is required but missing!")
 	}
-
 	if LoggerID == 0 {
 		logger.Fatal("LOGGER_ID is required but missing!")
 	}
-
 	if MongoURI == "" {
 		logger.Fatal("MONGO_DB_URI is required but missing!")
 	}
-}
-
-func validateToken() {
-	if Token != "" {
-		return
-	}
-
-	Token = getString("BOT_TOKEN")
 	if Token == "" {
 		logger.Fatal(
-			"TOKEN is required but missing! Please set it in .env or environment.",
+			"TOKEN or BOT_TOKEN is required but missing! Please set it in .env or environment.",
 		)
 	}
-}
-
-func validateSessions() {
-	if len(StringSessions) > 0 {
-		return
-	}
-
-	StringSessions = getStringSlice("STRING_SESSION")
 	if len(StringSessions) == 0 {
 		logger.FatalF(
 			"STRING_SESSIONS is empty — at least one %s session string is required.",
 			SessionType,
 		)
 	}
-}
-
-func validateSpotify() {
 	if SpotifyClientID == "" || SpotifyClientSecret == "" {
 		logger.Warn(
 			"Spotify credentials not configured - Spotify links won't work",
@@ -166,69 +166,18 @@ func validateSpotify() {
 	}
 }
 
-func getString(key string, def ...string) string {
-	if val, ok := getEnvAny(variants(key)...); ok {
-		return val
-	}
-	if len(def) > 0 {
-		return def[0]
-	}
-	return ""
-}
+// --- Helper Functions ---
 
-func getBool(key string, def ...bool) bool {
-	val, ok := getEnvAny(variants(key)...)
-	defaultValue := len(def) > 0 && def[0]
-
-	if ok {
-		boolVal, err := strconv.ParseBool(val)
-		if err != nil {
-			logger.FatalF("Invalid boolean for %s: %v", key, err)
-			return defaultValue // never runs
-		}
-		return boolVal
-	}
-	return defaultValue
-}
-
-func getInt64(key string, def ...int64) int64 {
-	defaultValue := int64(0)
-	if len(def) > 0 {
-		defaultValue = def[0]
+// lookupEnv checks multiple variations of a key (e.g., lowercase, uppercase, no underscore)
+func lookupEnv(baseKey string) (string, bool) {
+	variants := []string{
+		baseKey,
+		strings.ToUpper(baseKey),
+		strings.ToLower(baseKey),
+		strings.ReplaceAll(baseKey, "_", ""),
 	}
 
-	if val, ok := getEnvAny(variants(key)...); ok {
-		num, err := strconv.ParseInt(val, 10, 64)
-		if err != nil {
-			logger.FatalF("Invalid int64 for %s: %v", key, err)
-			return defaultValue
-		}
-		return num
-	}
-	return defaultValue
-}
-
-func getStringSlice(key string, def ...[]string) []string {
-	if val, ok := getEnvAny(variants(key)...); ok {
-		normalized := strings.NewReplacer(
-			",", " ",
-			";", " ",
-		).Replace(val)
-
-		parts := strings.Fields(normalized)
-		if len(parts) > 0 {
-			return parts
-		}
-	}
-
-	if len(def) > 0 {
-		return def[0]
-	}
-	return nil
-}
-
-func getEnvAny(keys ...string) (string, bool) {
-	for _, key := range keys {
+	for _, key := range variants {
 		if val, ok := os.LookupEnv(key); ok {
 			val = strings.TrimSpace(val)
 			if val != "" {
@@ -239,17 +188,56 @@ func getEnvAny(keys ...string) (string, bool) {
 	return "", false
 }
 
-func variants(base string) []string {
-	return []string{
-		base,
-		strings.ToUpper(base),
-		strings.ToLower(base),
-		strings.ReplaceAll(base, "_", ""),
+func getString(key, fallback string) string {
+	if val, ok := lookupEnv(key); ok {
+		return val
 	}
+	return fallback
+}
+
+func getBool(key string, fallback bool) bool {
+	val, ok := lookupEnv(key)
+	if !ok {
+		return fallback
+	}
+
+	boolVal, err := strconv.ParseBool(val)
+	if err != nil {
+		logger.FatalF("Invalid boolean for %s: %v", key, err)
+	}
+	return boolVal
+}
+
+func getInt64(key string, fallback int64) int64 {
+	val, ok := lookupEnv(key)
+	if !ok {
+		return fallback
+	}
+
+	num, err := strconv.ParseInt(val, 10, 64)
+	if err != nil {
+		logger.FatalF("Invalid int64 for %s: %v", key, err)
+	}
+	return num
+}
+
+func getStringSlice(key string, fallback []string) []string {
+	val, ok := lookupEnv(key)
+	if !ok {
+		return fallback
+	}
+
+	normalized := strings.NewReplacer(",", " ", ";", " ").Replace(val)
+	parts := strings.Fields(normalized)
+
+	if len(parts) > 0 {
+		return parts
+	}
+	return fallback
 }
 
 func CloseLogging() {
 	if logFile != nil {
-		logFile.Close()
+		_ = logFile.Close()
 	}
 }

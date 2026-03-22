@@ -1,21 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package modules
 
 import (
@@ -89,7 +88,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		return err
 	}
 
-	mystic, err := m.Reply(F(chatID, "reload_start"))
+	statusMsg, err := m.Reply(F(chatID, "reload_start"))
 	if err != nil {
 		return err
 	}
@@ -125,7 +124,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		summary += F(chatID, "reload_assistant_fail", locales.Arg{
 			"error": err.Error(),
 		}) + "\n"
-		utils.EOR(mystic, F(chatID, "reload_done", locales.Arg{
+		utils.EOR(statusMsg, F(chatID, "reload_done", locales.Arg{
 			"summary": summary,
 		}))
 		return nil
@@ -160,7 +159,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 	} else if banned {
 		summary += F(chatID, "reload_assistant_banned") + "\n"
 	} else {
-		present, assErr2 := cs.IsAssistantPresent()
+		present, assErr2 := cs.IsAssistantPresent(false)
 		if assErr2 != nil {
 			switch {
 			case errors.Is(assErr2, core.ErrAdminPermissionRequired):
@@ -183,7 +182,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		}
 	}
 
-	utils.EOR(mystic, F(chatID, "reload_done", locales.Arg{
+	utils.EOR(statusMsg, F(chatID, "reload_done", locales.Arg{
 		"summary": summary,
 	}))
 

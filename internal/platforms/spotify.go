@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package platforms
 
 import (
@@ -146,7 +143,7 @@ func (s *SpotifyPlatform) CanDownload(source state.PlatformName) bool {
 func (s *SpotifyPlatform) Download(
 	ctx context.Context,
 	track *state.Track,
-	mystic *telegram.NewMessage,
+	statusMsg *telegram.NewMessage,
 ) (string, error) {
 	clean := cleanTitle(track.Title)
 	trimmed := trimTitleLen(clean, 25, 40)
@@ -201,7 +198,7 @@ func (s *SpotifyPlatform) Download(
 
 	for _, p := range GetOrderedPlatforms() {
 		if p.CanDownload(PlatformYouTube) {
-			path, err := p.Download(ctx, ytTrack, mystic)
+			path, err := p.Download(ctx, ytTrack, statusMsg)
 			if err == nil {
 				gologging.InfoF(
 					"Downloaded Spotify track '%s' from YouTube: %s",
@@ -362,27 +359,10 @@ func (s *SpotifyPlatform) getArtistTopTracks(
 	return tracks, nil
 }
 
-func (s *SpotifyPlatform) CanGetRecommendations() bool {
-	return false
-}
-
-func (s *SpotifyPlatform) GetRecommendations(
-	track *state.Track,
-) ([]*state.Track, error) {
-	return nil, errors.New("recommendations not supported on spotify")
-}
-
 func (s *SpotifyPlatform) convertSpotifyTrack(
 	simpleTrack *spotify.SimpleTrack,
 	images []spotify.Image,
 ) *state.Track {
-	var artists []string
-	for _, artist := range simpleTrack.Artists {
-		artists = append(artists, artist.Name)
-	}
-	artistStr := strings.Join(artists, ", ")
-	_ = artistStr
-
 	thumbnail := ""
 	if len(images) > 0 {
 		thumbnail = images[0].URL

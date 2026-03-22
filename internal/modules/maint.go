@@ -1,13 +1,18 @@
 /*
- * This file is part of YukkiMusic.
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
  *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
+ * Copyright (C) 2026 TheTeamVivek
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
 
 package modules
@@ -61,7 +66,7 @@ var maintCancel = struct {
 func handleMaintenance(m *tg.NewMessage) error {
 	args := strings.Fields(m.Text())
 	chatID := m.ChannelID()
-	current, err := database.IsMaintenance()
+	current, err := database.IsMaintenanceEnabled()
 	if err != nil {
 		m.Reply(
 			F(chatID, "maint_check_fail", locales.Arg{"error": err.Error()}),
@@ -69,26 +74,8 @@ func handleMaintenance(m *tg.NewMessage) error {
 		return tg.ErrEndGroup
 	}
 
-	// show current status if no args
 	if len(args) < 2 {
-		reason, _ := database.GetMaintReason()
-		status := F(chatID, "disabled")
-		if current {
-			if reason != "" {
-				status = F(
-					chatID,
-					"enabled_with_reason",
-					locales.Arg{"reason": reason},
-				)
-			} else {
-				status = F(chatID, "enabled")
-			}
-		}
-		m.Reply(F(chatID, "maint_usage", locales.Arg{
-			"cmd":    getCommand(m),
-			"status": status,
-		}))
-		return tg.ErrEndGroup
+		return showMaintenanceStatus(m, current)
 	}
 
 	enable, err := utils.ParseBool(args[1])
@@ -96,37 +83,68 @@ func handleMaintenance(m *tg.NewMessage) error {
 		m.Reply(F(chatID, "invalid_bool"))
 		return tg.ErrEndGroup
 	}
-	reason := strings.Join(args[2:], " ")
-	oldReason, _ := database.GetMaintReason()
 
-	// no change in state
+	reason := strings.Join(args[2:], " ")
 	if current == enable {
-		if enable {
-			switch {
-			case reason == oldReason:
-				m.Reply(F(chatID, "maint_already_reason_same"))
-			case reason == "" && oldReason != "":
-				_ = database.SetMaintenance(true, "")
-				m.Reply(F(chatID, "maint_reason_removed"))
-			case reason != "" && reason != oldReason:
-				_ = database.SetMaintenance(true, reason)
-				m.Reply(
-					F(
-						chatID,
-						"maint_reason_updated",
-						locales.Arg{"reason": reason},
-					),
-				)
-			default:
-				m.Reply(F(chatID, "maint_already_enabled"))
-			}
+		return handleSameMaintenanceState(m, enable, reason)
+	}
+
+	return applyMaintenanceState(m, enable, reason)
+}
+
+func showMaintenanceStatus(m *tg.NewMessage, current bool) error {
+	chatID := m.ChannelID()
+	reason, _ := database.MaintenanceReason()
+	status := F(chatID, "disabled")
+	if current {
+		if reason != "" {
+			status = F(
+				chatID,
+				"enabled_with_reason",
+				locales.Arg{"reason": reason},
+			)
 		} else {
-			m.Reply(F(chatID, "maint_already_disabled"))
+			status = F(chatID, "enabled")
 		}
+	}
+	m.Reply(F(chatID, "maint_usage", locales.Arg{
+		"cmd":    getCommand(m),
+		"status": status,
+	}))
+	return tg.ErrEndGroup
+}
+
+func handleSameMaintenanceState(
+	m *tg.NewMessage,
+	enable bool,
+	reason string,
+) error {
+	chatID := m.ChannelID()
+	if !enable {
+		m.Reply(F(chatID, "maint_already_disabled"))
 		return tg.ErrEndGroup
 	}
 
-	// apply new state
+	oldReason, _ := database.MaintenanceReason()
+	switch {
+	case reason == oldReason:
+		m.Reply(F(chatID, "maint_already_reason_same"))
+	case reason == "" && oldReason != "":
+		_ = database.SetMaintenance(true, "")
+		m.Reply(F(chatID, "maint_reason_removed"))
+	case reason != "" && reason != oldReason:
+		_ = database.SetMaintenance(true, reason)
+		m.Reply(
+			F(chatID, "maint_reason_updated", locales.Arg{"reason": reason}),
+		)
+	default:
+		m.Reply(F(chatID, "maint_already_enabled"))
+	}
+	return tg.ErrEndGroup
+}
+
+func applyMaintenanceState(m *tg.NewMessage, enable bool, reason string) error {
+	chatID := m.ChannelID()
 	database.SetMaintenance(enable, reason)
 	gologging.InfoF(
 		"User %d set maintenance: %v (reason: %s)",
@@ -135,50 +153,46 @@ func handleMaintenance(m *tg.NewMessage) error {
 		reason,
 	)
 
-	if enable {
-		maintCancel.Lock()
-		maintCancel.cancel = false
-		maintCancel.Unlock()
-
-		go func(c *tg.Client, reason string) {
-			for chatID := range core.GetAllRooms() {
-				maintCancel.Lock()
-				if maintCancel.cancel {
-					maintCancel.Unlock()
-					break
-				}
-				maintCancel.Unlock()
-
-				core.DeleteRoom(chatID)
-				msg := F(chatID, "maint_entering")
-				if reason != "" {
-					msg += "\n" + F(
-						chatID,
-						"maint_reason",
-						locales.Arg{"reason": reason},
-					)
-				}
-				c.SendMessage(chatID, msg)
-				time.Sleep(time.Second)
-
-			}
-		}(m.Client, reason)
-
-		args := locales.Arg{}
-		if reason != "" {
-			args["reason"] = reason
-			m.Reply(F(chatID, "maint_enabled_reason", args))
-		} else {
-			m.Reply(F(chatID, "maint_enabled"))
-		}
-		return tg.ErrEndGroup
-	}
-
-	// disable maintenance
 	maintCancel.Lock()
-	maintCancel.cancel = true
+	maintCancel.cancel = !enable
 	maintCancel.Unlock()
 
-	m.Reply(F(chatID, "maint_disabled"))
+	if enable {
+		go notifyMaintenanceStart(m.Client, reason)
+		msgKey := "maint_enabled"
+		args := locales.Arg{}
+		if reason != "" {
+			msgKey = "maint_enabled_reason"
+			args["reason"] = reason
+		}
+		m.Reply(F(chatID, msgKey, args))
+	} else {
+		m.Reply(F(chatID, "maint_disabled"))
+	}
+
 	return tg.ErrEndGroup
+}
+
+func notifyMaintenanceStart(c *tg.Client, reason string) {
+	for chatID := range core.GetAllRooms() {
+		maintCancel.Lock()
+		cancelled := maintCancel.cancel
+		maintCancel.Unlock()
+
+		if cancelled {
+			break
+		}
+
+		core.DeleteRoom(chatID)
+		msg := F(chatID, "maint_entering")
+		if reason != "" {
+			msg += "\n" + F(
+				chatID,
+				"maint_reason",
+				locales.Arg{"reason": reason},
+			)
+		}
+		c.SendMessage(chatID, msg)
+		time.Sleep(time.Second)
+	}
 }

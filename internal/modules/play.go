@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package modules
 
 import (
@@ -255,7 +252,7 @@ func cplayHandler(m *tg.NewMessage) error {
 			return tg.ErrEndGroup
 		}
 
-		if err := database.SetCPlayID(m.ChannelID(), cplayID); err != nil {
+		if err := database.LinkChannel(m.ChannelID(), cplayID); err != nil {
 			gologging.ErrorF(
 				"Failed to set cplay ID for chat %d: %v",
 				m.ChannelID(), err,
@@ -388,7 +385,7 @@ func fetchTracksAndCheckStatus(
 		return nil, false, err
 	}
 
-	activeVC, err := cs.IsActiveVC()
+	activeVC, err := cs.IsActiveVC(false)
 	if err != nil {
 		gologging.ErrorF("Error checking voicechat state: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
@@ -400,7 +397,7 @@ func fetchTracksAndCheckStatus(
 		return nil, false, fmt.Errorf("no active voice chat")
 	}
 
-	banned, err := cs.IsAssistantBanned()
+	banned, err := cs.IsAssistantBanned(false)
 	if err != nil {
 		gologging.ErrorF("Error checking assistant banned state: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
@@ -410,14 +407,14 @@ func fetchTracksAndCheckStatus(
 	if banned {
 		utils.EOR(replyMsg,
 			F(m.ChannelID(), "err_assistant_banned", locales.Arg{
-				"user": utils.MentionHTML(cs.Assistant.User),
-				"id":   utils.IntToStr(cs.Assistant.User.ID),
+				"user": utils.MentionHTML(cs.Assistant.Self),
+				"id":   utils.IntToStr(cs.Assistant.Self.ID),
 			}),
 		)
 		return nil, false, fmt.Errorf("assistant banned")
 	}
 
-	present, err := cs.IsAssistantPresent()
+	present, err := cs.IsAssistantPresent(false)
 	if err != nil {
 		gologging.ErrorF("Error checking assistant presence: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
@@ -588,7 +585,6 @@ func playTracksAndRespond(
 		if err := playTrackWithRetry(r, track, filePath, force && i == 0, replyMsg); err != nil {
 			return err
 		}
-		r.DeleteData("rec_cache")
 		sendPlayLogs(m, track, (isActive && !force) || i > 0)
 	}
 
@@ -616,7 +612,7 @@ func playTracksAndRespond(
 		})
 
 		replyMsg, _ = utils.EOR(replyMsg, nowPlayingText, opt)
-		r.SetMystic(replyMsg)
+		r.SetStatusMsg(replyMsg)
 
 		if len(tracks) > 1 {
 			addedCount := len(tracks) - 1
@@ -649,6 +645,7 @@ func playTracksAndRespond(
 			}
 
 			addedText := F(chatID, "play_added_to_queue_single", locales.Arg{
+				"index":    len(r.Queue()),
 				"url":      mainTrack.URL,
 				"title":    title,
 				"duration": formatDuration(mainTrack.Duration),
@@ -686,7 +683,7 @@ func playTrackWithRetry(
 ) error {
 	for attempt := 1; attempt <= playMaxRetries; attempt++ {
 
-		if r.Destroyed() {
+		if r.IsDestroyed() {
 			gologging.Info("Room destroyed during retry, aborting")
 			replyMsg.Delete()
 			return tg.ErrEndGroup

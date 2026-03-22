@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package main
 
 /*
@@ -34,6 +31,8 @@ package main
 import "C"
 
 import (
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 
 	"github.com/Laky-64/gologging"
@@ -41,6 +40,7 @@ import (
 	"main/internal/config"
 	"main/internal/core"
 	"main/internal/database"
+	"main/internal/locales"
 	"main/internal/modules"
 	"main/internal/platforms"
 )
@@ -48,35 +48,63 @@ import (
 func main() {
 	initLogger()
 	defer config.CloseLogging()
-	defer platforms.Close()
+
+	shutdownPlatforms, err := platforms.Init()
+	if err != nil {
+		gologging.Fatal("Failed to initialize platforms: " + err.Error())
+	}
+	defer shutdownPlatforms()
 
 	checkFFmpegAndFFprobe()
-	refreshCacheAndDownloads()
 
-	gologging.Debug("🔹 Initializing MongoDB...")
-	dbCleanup := database.Init(config.MongoURI)
-	defer dbCleanup()
-	gologging.Info("✅ Database connected successfully")
-	gologging.Debug("🔹 Initializing clients...")
-	cleanup := core.Init(
-		config.ApiID,
-		config.ApiHash,
-		config.Token,
-		config.StringSessions, // list of sessions
-		config.SessionType,    // pyrogram / telethon / gogram
-		config.LoggerID,
-	)
-	defer cleanup()
+	if err := refreshDirs(); err != nil {
+		gologging.Fatal("Failed to refresh directories: " + err.Error())
+	}
 
-	core.AssistantIndexFunc = database.GetAssistantIndex
-	core.GetChatLanguage = database.GetChatLanguage
+	gologging.Debug("Initializing MongoDB...")
+
+	closeDB, err := database.Init(config.MongoURI)
+	if err != nil {
+		gologging.Fatal("Failed to initialize database: " + err.Error())
+	}
+	defer closeDB()
+
+	gologging.Info("Database connected successfully")
+
+	if err := locales.Load(); err != nil {
+		gologging.Fatal("Failed to load locales: " + err.Error())
+	}
+
+	gologging.Debug("Initializing clients...")
+
+	shutdownCore, err := core.Init()
+	if err != nil {
+		gologging.Fatal("Failed to initialize core: " + err.Error())
+	}
+	defer shutdownCore()
+
+	core.GetAssistantIndexFunc = database.AssistantIndex
+	core.F = modules.F
 
 	if err := database.RebalanceAssistantIndexes(core.Assistants.Count()); err != nil {
 		gologging.Fatal("Failed to rebalance Assistants: " + err.Error())
 	}
 
 	modules.Init(core.Bot, core.Assistants)
+
+	startHTTPServer()
+
 	core.Bot.Idle()
+}
+
+func startHTTPServer() {
+	go func() {
+		addr := "0.0.0.0:" + config.Port
+
+		if err := http.ListenAndServe(addr, nil); err != nil {
+			gologging.Error("HTTP server error: " + err.Error())
+		}
+	}()
 }
 
 func initLogger() {
@@ -94,19 +122,22 @@ func initLogger() {
 	gologging.GetLogger("Database").SetOutput(config.LogWriter)
 }
 
-func refreshCacheAndDownloads() error {
+func refreshDirs() error {
 	dirs := []string{
 		"./cache",
 		"./downloads",
 	}
 
 	for _, dir := range dirs {
+
 		if err := os.RemoveAll(dir); err != nil {
 			return err
 		}
+
 		if err := os.MkdirAll(dir, 0o755); err != nil {
 			return err
 		}
 	}
+
 	return nil
 }

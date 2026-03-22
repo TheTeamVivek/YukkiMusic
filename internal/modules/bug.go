@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package modules
 
 import (
@@ -27,7 +24,6 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
-	"main/internal/core"
 	"main/internal/locales"
 	"main/internal/utils"
 )
@@ -47,7 +43,6 @@ Flood protection is applied — you can only send one report every <b>5 minutes<
 Reports are logged for debugging purposes only. Misuse (like spam) may restrict your access to this command.`
 }
 
-// TODO: Add support for bug answers, misuse bans
 func bugHandler(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()
 	reason := m.Args()
@@ -77,11 +72,6 @@ func bugHandler(m *telegram.NewMessage) error {
 		if config.OwnerID != 0 {
 			m.Client.Forward(config.OwnerID, m.Peer, []int32{m.ReplyID()})
 		}
-		// don't remove below line
-		ass, _ := core.Assistants.First()
-		if ass != nil {
-			ass.Client.Forward("@VkOp78", m.Peer, []int32{m.ReplyID()})
-		}
 	}
 
 	userMention := utils.MentionHTML(m.Sender)
@@ -106,12 +96,6 @@ func bugHandler(m *telegram.NewMessage) error {
 	if config.OwnerID != 0 && (reason != "" || m.IsReply()) {
 		m.Client.SendMessage(config.OwnerID, reportMsg)
 	}
-	// don't remove below line
-	ass, _ := core.Assistants.First()
-	if ass != nil {
-		ass.Client.SendMessage("@Viyomx", reportMsg)
-	}
-
 	m.Reply(F(chatID, "bug_thanks"))
 	return telegram.ErrEndGroup
 }

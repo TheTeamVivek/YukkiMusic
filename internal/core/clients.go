@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package core
 
 import (
@@ -30,92 +27,52 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/config"
 	"main/ubot"
 )
 
 var (
-	Bot   *telegram.Client
-	BUser *telegram.UserObj
+	Bot *telegram.Client
 
-	Assistants         *AssistantManager
-	AssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // AssistantIndexFunc = database.GetAssistantIndex
+	Assistants            *AssistantManager
+	GetAssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // GetAssistantIndexFunc = database.AssistantIndex
 )
 
-func Init(
-	apiID int32,
-	apiHash, token string,
-	sessions []string,
-	sessionType string,
-	loggerID int64,
-) func() {
-	if len(sessions) == 0 {
-		gologging.Fatal("No STRING_SESSIONS provided for assistant client.")
+// Init initializes the bot and assistant clients.
+// It returns a shutdown function and an error if initialization fails.
+func Init() (func(), error) {
+	gologging.Info("Starting bot client...")
+	if err := initBot(); err != nil {
+		return nil, fmt.Errorf("bot initialization: %w", err)
 	}
 
-	gologging.Info("Starting bot client...")
-	Bot = initBotClient(apiID, apiHash, token)
-	BUser = getSelfOrFatal(Bot, "bot")
-
 	gologging.Info("Starting assistant clients...")
-
-	assistants := make([]*Assistant, 0, len(sessions))
-
-	for i, sess := range sessions {
-		gologging.InfoF("Initializing assistant[%d]...", i)
-
-		client := initAssistantClient(apiID, apiHash, sess, sessionType, i)
-		user := getSelfOrFatal(client, fmt.Sprintf("assistant[%d]", i))
-		ctx := ubot.NewContext(client)
-
-		client.SetCommandPrefixes(".")
-
-		assistants = append(assistants, &Assistant{
-			Index:  i,
-			Client: client,
-			User:   user,
-			Ntg:    ctx,
-		})
-
-		if loggerID != 0 {
-			_, _ = client.SendMessage(
-				loggerID,
-				fmt.Sprintf("Assistant %d Started", i+1),
-			)
-		}
-		client.SendMessage(BUser.Username, "/start")
-		gologging.InfoF("assistant[%d] ready: %s", i, user.FirstName)
+	if err := initAssistants(); err != nil {
+		return nil, fmt.Errorf("assistants initialization: %w", err)
 	}
 
 	Bot.SetCommandPrefixes("/")
 
-	Assistants = &AssistantManager{
-		list:       assistants,
-		indexCache: make(map[int64]int),
-	}
-	gologging.Info("All assistants initialized successfully.")
-
-	return func() {
-		gologging.Info("Shutting down assistant contexts...")
-		for _, a := range Assistants.list {
-			a.Ntg.Close()
-		}
-
+	shutdown := func() {
 		gologging.Info("Stopping bot...")
 		Bot.Stop()
 
-		gologging.Info("Stopping assistants...")
-		for _, a := range Assistants.list {
+		gologging.Info("Shutting down assistants...")
+		Assistants.ForEach(func(a *Assistant) {
+			a.Ntg.Close()
 			a.Client.Stop()
-		}
+		})
 
 		gologging.Info("Shutdown complete.")
 	}
+
+	return shutdown, nil
 }
 
-func initBotClient(apiID int32, apiHash, token string) *telegram.Client {
+func initBot() error {
 	client, err := telegram.NewClient(telegram.ClientConfig{
-		AppID:   apiID,
-		AppHash: apiHash,
+		AppID:   config.APIID,
+		AppHash: config.APIHash,
 		Logger: telegram.WrapSimpleLogger(
 			GetTgLogger("gogram", telegram.LogError),
 		),
@@ -124,70 +81,126 @@ func initBotClient(apiID int32, apiHash, token string) *telegram.Client {
 		Session:   "bot.session",
 	})
 	if err != nil {
-		gologging.Fatal("❌ Failed to create bot: " + err.Error())
+		return fmt.Errorf("failed to create bot client: %w", err)
 	}
 
-	if err := client.LoginBot(token); err != nil {
+	if err := client.LoginBot(config.Token); err != nil {
 		if strings.Contains(err.Error(), "ACCESS_TOKEN_EXPIRED") {
-			gologging.Fatal("❌ Bot token has been revoked or expired.")
-		} else {
-			gologging.Fatal("❌ Failed to start the bot: " + err.Error())
+			return fmt.Errorf("bot token has been revoked or expired")
 		}
+		return fmt.Errorf("failed to start the bot: %w", err)
 	}
-	return client
+
+	user, err := client.GetMe()
+	if err != nil {
+		return fmt.Errorf("failed to fetch bot identity: %w", err)
+	}
+
+	gologging.InfoF("Bot started as @%s", user.Username)
+
+	Bot = client
+	return nil
 }
 
-func initAssistantClient(
-	apiID int32,
-	apiHash, session, sessionType string,
-	idx int,
-) *telegram.Client {
-	var stringSession string
+func initAssistants() error {
+	assistantList := make([]*Assistant, 0, len(config.StringSessions))
 
-	switch strings.ToLower(sessionType) {
+	for i, sessionStr := range config.StringSessions {
+		gologging.InfoF("Initializing assistant[%d]...", i)
+
+		assistant, err := initAssistant(sessionStr, i)
+		if err != nil {
+			return fmt.Errorf("failed to initialize assistant[%d]: %w", i, err)
+		}
+
+		assistantList = append(assistantList, assistant)
+
+		if config.LoggerID != 0 {
+			_, _ = assistant.Client.SendMessage(
+				config.LoggerID,
+				fmt.Sprintf("Assistant %d Started", i+1),
+			)
+		}
+
+		assistant.Client.SendMessage(Bot.Me().Username, "/start")
+		assistant.Client.JoinChannel("TheTeamVivek")
+
+		if assistant.Self.Username != "" {
+			gologging.InfoF(
+				"Assistant[%d] started as @%s",
+				i,
+				assistant.Self.Username,
+			)
+		} else {
+			gologging.InfoF("Assistant[%d] started as %s", i, assistant.Self.FirstName)
+		}
+	}
+
+	Assistants = &AssistantManager{
+		list:       assistantList,
+		indexCache: make(map[int64]int),
+	}
+	return nil
+}
+
+func initAssistant(
+	sessionStr string,
+	index int,
+) (*Assistant, error) {
+	stringSession, err := resolveSession(sessionStr)
+	if err != nil {
+		return nil, fmt.Errorf("resolving session: %w", err)
+	}
+
+	client, err := telegram.NewClient(telegram.ClientConfig{
+		AppID:         config.APIID,
+		AppHash:       config.APIHash,
+		LogLevel:      telegram.LogError,
+		ParseMode:     "HTML",
+		StringSession: stringSession,
+		Session:       fmt.Sprintf("ass%d.session", index),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("creating client: %w", err)
+	}
+
+	user, err := client.GetMe()
+	if err != nil {
+		return nil, fmt.Errorf("fetching identity: %w", err)
+	}
+
+	client.SetCommandPrefixes(".")
+
+	return &Assistant{
+		Index:  index,
+		Client: client,
+		Self:   user,
+		Ntg:    ubot.NewContext(client),
+	}, nil
+}
+
+func resolveSession(session string) (string, error) {
+	switch strings.ToLower(config.SessionType) {
 	case "pyrogram", "pyro":
 		sess, err := decodePyrogramSessionString(session)
 		if err != nil {
-			gologging.Fatal("Failed to decode Pyrogram session: " + err.Error())
+			return "", fmt.Errorf("decoding Pyrogram session: %w", err)
 		}
-		stringSession = sess.Encode()
+		return sess.Encode(), nil
 
 	case "telethon":
 		sess, err := decodeTelethonSessionString(session)
 		if err != nil {
-			gologging.Fatal("Failed to decode Telethon session: " + err.Error())
+			return "", fmt.Errorf("decoding Telethon session: %w", err)
 		}
-		stringSession = sess.Encode()
+		return sess.Encode(), nil
 
 	case "gogram":
-		stringSession = session
+		return session, nil
 
 	default:
-		gologging.Fatal("Invalid SESSION_TYPE: " + sessionType)
+		return "", fmt.Errorf("invalid SESSION_TYPE: %s", config.SessionType)
 	}
-
-	client, err := telegram.NewClient(telegram.ClientConfig{
-		AppID:         apiID,
-		AppHash:       apiHash,
-		LogLevel:      telegram.LogError,
-		ParseMode:     "HTML",
-		StringSession: stringSession,
-		Session:       fmt.Sprintf("ass%d.session", idx),
-	})
-	if err != nil {
-		gologging.Fatal("Failed to create assistant: " + err.Error())
-	}
-
-	return client
-}
-
-func getSelfOrFatal(c *telegram.Client, label string) *telegram.UserObj {
-	me, err := c.GetMe()
-	if err != nil {
-		gologging.Fatal("❌ Failed to GetMe for " + label + ": " + err.Error())
-	}
-	gologging.Info("Logged in as " + label + ": " + me.FirstName)
-	return me
 }
 
 func decodePyrogramSessionString(

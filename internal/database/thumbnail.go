@@ -17,20 +17,23 @@
 
 package database
 
-func AutoLeave() (bool, error) {
-	state, err := getBotState()
+// ThumbnailsDisabled returns whether thumbnails are disabled for the chat.
+// Returns false by default (thumbnails enabled).
+func ThumbnailsDisabled(chatID int64) (bool, error) {
+	settings, err := getChatSettings(chatID)
 	if err != nil {
 		return false, err
 	}
-	return state.AutoLeave, nil
+	return settings.ThumbnailsDisabled, nil
 }
 
-func SetAutoLeave(value bool) error {
-	return modifyBotState(func(s *BotState) bool {
-		if s.AutoLeave == value {
+// SetThumbnailsDisabled sets whether thumbnails should be disabled for the chat.
+func SetThumbnailsDisabled(chatID int64, disabled bool) error {
+	return modifyChatSettings(chatID, func(s *ChatSettings) bool {
+		if s.ThumbnailsDisabled == disabled {
 			return false
 		}
-		s.AutoLeave = value
+		s.ThumbnailsDisabled = disabled
 		return true
 	})
 }

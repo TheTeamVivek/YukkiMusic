@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package modules
 
 import (
@@ -37,7 +34,7 @@ func init() {
 
 func startHandler(m *tg.NewMessage) error {
 	if m.ChatType() != tg.EntityUser {
-		database.AddServed(m.ChannelID())
+		database.AddServedChat(m.ChannelID())
 		m.Reply(
 			F(m.ChannelID(), "start_group"),
 		)
@@ -45,7 +42,7 @@ func startHandler(m *tg.NewMessage) error {
 	}
 
 	arg := m.Args()
-	database.AddServed(m.ChannelID(), true)
+	database.AddServedUser(m.ChannelID())
 
 	if arg != "" {
 		gologging.Info(
@@ -63,7 +60,7 @@ func startHandler(m *tg.NewMessage) error {
 	default:
 		caption := F(m.ChannelID(), "start_private", locales.Arg{
 			"user": utils.MentionHTML(m.Sender),
-			"bot":  utils.MentionHTML(core.BUser),
+			"bot":  utils.MentionHTML(m.Client.Me()),
 		})
 
 		_, err := m.RespondMedia(&tg.InputMediaWebPage{
@@ -89,7 +86,7 @@ func startHandler(m *tg.NewMessage) error {
 					"[start] URL media reply failed: " + err.Error(),
 				)
 
-				_, err = m.RespondMedia(caption, &tg.MediaOptions{
+				_, err = m.Respond(caption, &tg.SendOptions{
 					NoForwards:  true,
 					ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
 				})
@@ -98,7 +95,7 @@ func startHandler(m *tg.NewMessage) error {
 		}
 	}
 
-	if config.LoggerID != 0 && isLogger() {
+	if config.LoggerID != 0 && isLoggerEnabled() {
 		uName := "N/A"
 		if m.Sender.Username != "" {
 			uName = "@" + m.Sender.Username
@@ -123,7 +120,7 @@ func startCB(cb *tg.CallbackQuery) error {
 
 	caption := F(cb.ChannelID(), "start_private", locales.Arg{
 		"user": utils.MentionHTML(cb.Sender),
-		"bot":  utils.MentionHTML(core.BUser),
+		"bot":  utils.MentionHTML(cb.Client.Me()),
 	})
 
 	sendOpt := &tg.SendOptions{

@@ -1,33 +1,30 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package database
 
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"sync"
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 var (
@@ -35,22 +32,13 @@ var (
 	usageMu        sync.RWMutex
 )
 
-// IMPORTANT: RebalanceAssistantIndexes must be called first before calling GetAssistantIndex
-
-func GetAssistantIndex(chatID int64, assistantCount int) (int, error) {
+func AssistantIndex(chatID int64, assistantCount int) (int, error) {
 	if assistantCount <= 0 {
-		logger.Error("assistantCount must be positive")
 		return 0, fmt.Errorf("assistantCount must be positive")
 	}
 
 	settings, err := getChatSettings(chatID)
 	if err != nil {
-		logger.Error(
-			"Failed to get chat settings for chat " + strconv.FormatInt(
-				chatID,
-				10,
-			) + ": " + err.Error(),
-		)
 		return 0, err
 	}
 
@@ -66,17 +54,8 @@ func GetAssistantIndex(chatID int64, assistantCount int) (int, error) {
 
 	newIndex := pickLeastUsedAssistant(countsCopy)
 
-	logger.Debug(
-		"Assigning assistant index " + strconv.Itoa(newIndex) +
-			" to chat " + strconv.FormatInt(chatID, 10),
-	)
-
 	settings.AssistantIndex = newIndex
 	if err := updateChatSettings(settings); err != nil {
-		logger.Error(
-			"Failed to update assistant index for chat " +
-				strconv.FormatInt(chatID, 10) + ": " + err.Error(),
-		)
 		return 0, err
 	}
 
@@ -91,53 +70,51 @@ func GetAssistantIndex(chatID int64, assistantCount int) (int, error) {
 
 func RebalanceAssistantIndexes(assistantCount int) error {
 	if assistantCount <= 0 {
-		logger.Error("assistantCount must be positive")
 		return fmt.Errorf("assistantCount must be positive")
 	}
 
+	all, err := fetchAllChatSettings()
+	if err != nil {
+		return err
+	}
+
+	if len(all) == 0 {
+		usageMu.Lock()
+		assistantUsage = make([]int64, assistantCount+1)
+		usageMu.Unlock()
+		return nil
+	}
+
+	redistributeAssistants(all, assistantCount)
+
+	if err := saveChangedSettings(all); err != nil {
+		return err
+	}
+
+	updateAssistantUsage(all, assistantCount)
+	return nil
+}
+
+func fetchAllChatSettings() ([]*ChatSettings, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	cursor, err := chatSettingsColl.Find(ctx, bson.M{})
 	if err != nil {
-		logger.Error(
-			"Failed to fetch chat settings for rebalance: " + err.Error(),
-		)
-		return err
+		return nil, fmt.Errorf("failed to fetch chat settings: %w", err)
 	}
 	defer cursor.Close(ctx)
 
 	var all []*ChatSettings
-	original := make(map[int64]int)
-
-	for cursor.Next(ctx) {
-		var s ChatSettings
-		if err := cursor.Decode(&s); err != nil {
-			logger.Error(
-				"Failed to decode chat setting during rebalance: " + err.Error(),
-			)
-			return err
-		}
-		all = append(all, &s)
-		original[s.ChatID] = s.AssistantIndex
+	if err := cursor.All(ctx, &all); err != nil {
+		return nil, fmt.Errorf("failed to decode chat settings: %w", err)
 	}
 
-	if err := cursor.Err(); err != nil {
-		logger.Error("Rebalance cursor error: " + err.Error())
-		return err
-	}
+	return all, nil
+}
 
+func redistributeAssistants(all []*ChatSettings, assistantCount int) {
 	total := len(all)
-	if total == 0 {
-		logger.Debug("Rebalance: no chats found")
-
-		usageMu.Lock()
-		assistantUsage = make([]int64, assistantCount+1)
-		usageMu.Unlock()
-
-		return nil
-	}
-
 	base := total / assistantCount
 	rem := total % assistantCount
 
@@ -150,95 +127,74 @@ func RebalanceAssistantIndexes(assistantCount int) error {
 	}
 
 	currentCounts := make([]int, assistantCount+1)
-	var unassigned []*ChatSettings
-
-	for _, s := range all {
-		idx := s.AssistantIndex
-		if idx < 1 || idx > assistantCount {
-			unassigned = append(unassigned, s)
-			continue
-		}
-		currentCounts[idx]++
-	}
-
 	keepCount := make([]int, assistantCount+1)
-	var excess []*ChatSettings
+	var pool []*ChatSettings
 
+	// Phase 1: Identify who can stay
 	for _, s := range all {
 		idx := s.AssistantIndex
-		if idx < 1 || idx > assistantCount {
-			continue
-		}
-		if keepCount[idx] < desired[idx] {
+		if idx >= 1 && idx <= assistantCount && keepCount[idx] < desired[idx] {
 			keepCount[idx]++
+			currentCounts[idx]++
 		} else {
-			excess = append(excess, s)
+			pool = append(pool, s)
 		}
 	}
 
-	pool := make([]*ChatSettings, 0, len(excess)+len(unassigned))
-	pool = append(pool, excess...)
-	pool = append(pool, unassigned...)
-
-	poolIndex := 0
+	// Phase 2: Assign from pool to fill gaps
+	poolIdx := 0
 	for i := 1; i <= assistantCount; i++ {
-		need := desired[i] - keepCount[i]
-		for need > 0 && poolIndex < len(pool) {
-			s := pool[poolIndex]
-			poolIndex++
-			if s.AssistantIndex == i {
-				continue
-			}
-			s.AssistantIndex = i
-			need--
+		for keepCount[i] < desired[i] && poolIdx < len(pool) {
+			pool[poolIdx].AssistantIndex = i
+			keepCount[i]++
+			poolIdx++
 		}
 	}
+}
 
-	updated := 0
+func saveChangedSettings(all []*ChatSettings) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
+	var models []mongo.WriteModel
 	for _, s := range all {
-		oldIdx := original[s.ChatID]
-		if s.AssistantIndex == oldIdx {
-			continue
-		}
+		models = append(models, mongo.NewUpdateOneModel().
+			SetFilter(bson.M{"_id": s.ChatID}).
+			SetUpdate(bson.M{"$set": bson.M{"ass_index": s.AssistantIndex}}))
 
-		logger.Debug(
-			"Rebalance: updating chat " + strconv.FormatInt(s.ChatID, 10) +
-				" from index " + strconv.Itoa(oldIdx) +
-				" to " + strconv.Itoa(s.AssistantIndex),
-		)
-
-		if err := updateChatSettings(s); err != nil {
-			logger.Error(
-				"Rebalance: failed updating chat " +
-					strconv.FormatInt(s.ChatID, 10) + ": " + err.Error(),
-			)
-			return err
+		if len(models) >= 500 {
+			if _, err := chatSettingsColl.BulkWrite(ctx, models); err != nil {
+				return fmt.Errorf("bulk update failed: %w", err)
+			}
+			models = nil
 		}
-		updated++
 	}
 
+	if len(models) > 0 {
+		if _, err := chatSettingsColl.BulkWrite(ctx, models); err != nil {
+			return fmt.Errorf("bulk update failed: %w", err)
+		}
+	}
+	return nil
+}
+
+func updateAssistantUsage(all []*ChatSettings, assistantCount int) {
 	counts := make([]int64, assistantCount+1)
 	for _, s := range all {
-		idx := s.AssistantIndex
-		if idx >= 1 && idx <= assistantCount {
-			counts[idx]++
+		if s.AssistantIndex >= 1 && s.AssistantIndex <= assistantCount {
+			counts[s.AssistantIndex]++
 		}
 	}
 
 	usageMu.Lock()
 	assistantUsage = counts
 	usageMu.Unlock()
-
-	logger.Debug(
-		"Rebalance complete. total_chats=" + strconv.Itoa(total) +
-			", updated_chats=" + strconv.Itoa(updated),
-	)
-
-	return nil
 }
 
 func pickLeastUsedAssistant(counts []int64) int {
+	if len(counts) <= 1 {
+		return 1
+	}
 	newIndex := 1
 	minCount := counts[1]
 
@@ -248,6 +204,5 @@ func pickLeastUsedAssistant(counts []int64) int {
 			newIndex = i
 		}
 	}
-
 	return newIndex
 }

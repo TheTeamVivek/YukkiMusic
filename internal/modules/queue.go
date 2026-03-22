@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package modules
 
 import (
@@ -28,6 +25,7 @@ import (
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
+	state "main/internal/core/models"
 	"main/internal/locales"
 	"main/internal/utils"
 )
@@ -54,6 +52,19 @@ func init() {
 • <code>/remove</code> - Remove specific track
 • <code>/clear</code> - Clear all tracks
 • <code>/move</code> - Reorder tracks`
+
+	helpTexts["/restore"] = `<i>Restore a previously cleared music queue.</i>
+
+<u>Usage:</u>
+<b>/restore</b> — Recover tracks
+
+<b>⚙️ Behavior:</b>
+• Recovers tracks cleared by the last <code>/clear</code> command
+• Only works if no new songs have been added since the clear
+• Restored tracks are appended to the current queue
+
+<b>🔒 Restrictions:</b>
+• Only <b>chat admins</b> or <b>authorized users</b> can use this`
 
 	helpTexts["/remove"] = `<i>Remove a specific track from the queue.</i>
 
@@ -90,8 +101,8 @@ func init() {
 <b>🔒 Restrictions:</b>
 • Only <b>chat admins</b> or <b>authorized users</b> can use this
 
-<b>⚠️ Warning:</b>
-This action cannot be undone. Use <code>/remove</code> for selective removal.`
+<b>💡 Tips:</b>
+If you cleared the queue by mistake, use <code>/restore</code> or <code>/crestore</code> immediately to recover it (before adding any new songs).`
 
 	helpTexts["/move"] = `<i>Reorder tracks in the queue.</i>
 
@@ -148,6 +159,14 @@ func cclearHandler(m *tg.NewMessage) error {
 	return handleClear(m, true)
 }
 
+func restoreHandler(m *tg.NewMessage) error {
+	return handleRestoreQueue(m, false)
+}
+
+func crestoreHandler(m *tg.NewMessage) error {
+	return handleRestoreQueue(m, true)
+}
+
 func handleQueue(m *tg.NewMessage, cplay bool) error {
 	chatID := m.ChannelID()
 
@@ -156,8 +175,8 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 		m.Reply(err.Error())
 		return tg.ErrEndGroup
 	}
-	t := r.Track()
 
+	t := r.Track()
 	if !r.IsActiveChat() || t == nil {
 		m.Reply(F(chatID, "queue_no_active"))
 		return tg.ErrEndGroup
@@ -168,38 +187,99 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 	b.WriteString(F(chatID, "queue_header"))
 	b.WriteString("\n\n")
 
-	// Now Playing
 	b.WriteString(F(chatID, "queue_now_playing"))
 	b.WriteString("\n")
-	b.WriteString(fmt.Sprintf(
+
+	fmt.Fprintf(
+		&b,
 		"🎧 <a href=\"%s\">%s</a> — %s [%s]\n\n",
 		t.URL,
 		html.EscapeString(utils.ShortTitle(t.Title, 35)),
 		t.Requester,
 		formatDuration(t.Duration),
-	))
+	)
 
-	// Up Next
-	if len(r.Queue()) > 0 {
+	queue := r.Queue()
+	q := len(queue)
+	useQuote := q >= 3
+
+	if q > 0 {
 		b.WriteString(F(chatID, "queue_up_next"))
-		b.WriteString("\n\n")
+		n := "\n"
+		if !useQuote {
+			n += "\n"
+		}
+		b.WriteString(n)
 
-		for i, track := range r.Queue() {
+		if useQuote {
+			b.WriteString("<blockquote>")
+		}
+
+		for i, track := range queue {
 			if i >= 10 {
-				b.WriteString(F(chatID, "queue_more_line", locales.Arg{
-					"remaining": len(r.Queue()) - 10,
-				}))
 				break
 			}
 
-			b.WriteString(fmt.Sprintf(
+			fmt.Fprintf(
+				&b,
 				"%d. 🎵 <a href=\"%s\">%s</a> — %s [%s]\n",
 				i+1,
 				track.URL,
 				html.EscapeString(utils.ShortTitle(track.Title, 35)),
 				track.Requester,
 				formatDuration(track.Duration),
-			))
+			)
+		}
+
+		if useQuote {
+			b.WriteString("</blockquote>")
+		}
+
+		if q > 10 {
+			var full strings.Builder
+
+			full.WriteString(F(chatID, "queue_header"))
+			full.WriteString("\n\n")
+
+			full.WriteString(F(chatID, "queue_now_playing"))
+			full.WriteString("\n")
+
+			fmt.Fprintf(
+				&full,
+				"🎧 %s — %s [%s]\n\n",
+				t.Title,
+				t.Requester,
+				formatDuration(t.Duration),
+			)
+
+			full.WriteString(F(chatID, "queue_up_next"))
+			full.WriteString("\n\n")
+
+			for i, track := range queue {
+				fmt.Fprintf(
+					&full,
+					"%d. %s — %s [%s]\n",
+					i+1,
+					track.Title,
+					track.Requester,
+					formatDuration(track.Duration),
+				)
+			}
+
+			link, err := utils.CreatePaste(full.String())
+			remaining := q - 10
+
+			if err == nil && link != "" {
+				more := fmt.Sprintf("<a href=\"%s\">%d</a>", link, remaining)
+
+				b.WriteString(F(chatID, "queue_more_line", locales.Arg{
+					"remaining": more,
+				}))
+			} else {
+				b.WriteString(F(chatID, "queue_more_line", locales.Arg{
+					"remaining": remaining,
+				}))
+			}
 		}
 	} else {
 		b.WriteString(F(chatID, "queue_empty_tail"))
@@ -265,6 +345,41 @@ func handleRemove(m *tg.NewMessage, cplay bool) error {
 	return tg.ErrEndGroup
 }
 
+func handleRestoreQueue(m *tg.NewMessage, cplay bool) error {
+	chatID := m.ChannelID()
+	if !filterAuthUsers(m) {
+		return tg.ErrEndGroup
+	}
+
+	r, err := getEffectiveRoom(m, cplay)
+	if err != nil {
+		m.Reply(err.Error())
+		return tg.ErrEndGroup
+	}
+
+	ok, v := r.GetData("last_queue")
+	if !ok || v == nil {
+		m.Reply(F(chatID, "queue_restore_no_data"))
+		return tg.ErrEndGroup
+	}
+
+	tracks, ok := v.([]*state.Track)
+	if !ok {
+		r.DeleteData("last_queue")
+		m.Reply(F(chatID, "queue_restore_no_data"))
+		return tg.ErrEndGroup
+	}
+
+	r.AddTracksToQueue(tracks)
+	r.DeleteData("last_queue")
+
+	m.Reply(F(chatID, "queue_restored", locales.Arg{
+		"count": len(tracks),
+	}))
+
+	return tg.ErrEndGroup
+}
+
 func handleClear(m *tg.NewMessage, cplay bool) error {
 	chatID := m.ChannelID()
 
@@ -284,10 +399,17 @@ func handleClear(m *tg.NewMessage, cplay bool) error {
 		return tg.ErrEndGroup
 	}
 
+	r.SetData("last_queue", r.Queue())
 	r.RemoveFromQueue(-1)
+
+	restoreCmd := "restore"
+	if cplay {
+		restoreCmd = "crestore"
+	}
 
 	m.Reply(F(chatID, "clear_success", locales.Arg{
 		"user": utils.MentionHTML(m.Sender),
+		"cmd":  restoreCmd,
 	}))
 
 	return tg.ErrEndGroup

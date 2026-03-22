@@ -1,16 +1,20 @@
 /*
- * This file is part of YukkiMusic.
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
  *
- * DirectStream Platform - Handles direct audio/video URLs and M3U8 streams
- * This platform acts as a fallback when no other platform recognizes the URL
+ * Copyright (C) 2026 TheTeamVivek
  *
- * Copyright (C) 2025 TheTeamVivek
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
+
 package platforms
 
 import (
@@ -131,7 +135,7 @@ func (d *DirectStreamPlatform) GetTracks(
 func (d *DirectStreamPlatform) Download(
 	ctx context.Context,
 	track *state.Track,
-	mystic *telegram.NewMessage,
+	statusMsg *telegram.NewMessage,
 ) (string, error) {
 	// For direct streams, we don't download - just return the URL
 	// The streaming system will handle it directly
@@ -330,14 +334,4 @@ func (d *DirectStreamPlatform) enrichMetadata(
 		info.Size,
 		track.Duration,
 	)
-}
-
-func (d *DirectStreamPlatform) CanGetRecommendations() bool {
-	return false
-}
-
-func (d *DirectStreamPlatform) GetRecommendations(
-	track *state.Track,
-) ([]*state.Track, error) {
-	return nil, fmt.Errorf("recommendations not supported on directstream")
 }

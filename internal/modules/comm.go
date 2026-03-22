@@ -1,22 +1,20 @@
 /*
- * This file is part of YukkiMusic.
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
  *
- * YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
- * Copyright (C) 2025 TheTeamVivek
+ * Copyright (C) 2026 TheTeamVivek
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
+
 package modules
 
 import "github.com/amarnathcjd/gogram/telegram"
@@ -37,87 +35,150 @@ type BotCommands struct {
 var AllCommands = BotCommands{
 	// Commands for private chats
 	PrivateUserCommands: []*telegram.BotCommand{
-		{"start", "Start the bot."},
-		{"help", "Show help menu."},
-		{"ping", "Check if the bot is alive."},
-		{"sudolist", "List sudo users."},
+		{Command: "start", Description: "Start the bot."},
+		{Command: "help", Description: "Show help menu."},
+		{Command: "ping", Description: "Check if the bot is alive."},
+		{Command: "sudolist", Description: "List sudo users."},
 	},
 	PrivateSudoCommands: []*telegram.BotCommand{
-		{"ac", "Show active voice chats."},
-		{"stats", "Show bot stats."},
+		{Command: "ac", Description: "Show active voice chats."},
+		{Command: "stats", Description: "Show bot stats."},
 
-		{"logger", "Enable/disable logger channel."},
-		{"autoleave", "Enable/disable auto leave."},
+		{Command: "logger", Description: "Enable/disable logger channel."},
+		{Command: "autoleave", Description: "Enable/disable auto leave."},
 	},
 	PrivateOwnerCommands: []*telegram.BotCommand{
-		{"addsudo", "Add a sudo user."},
-		{"delsudo", "Remove a sudo user."},
-		{"maintenance", "Enable/disable maintenance mode."},
+		{Command: "addsudo", Description: "Add a sudo user."},
+		{Command: "delsudo", Description: "Remove a sudo user."},
+		{
+			Command:     "maintenance",
+			Description: "Enable/disable maintenance mode.",
+		},
 	},
 	// Commands for group chats
 	GroupUserCommands: []*telegram.BotCommand{
-		{"play", "Play a song."},
-		{"queue", "Show the queue."},
-		{"position", "Show the current position of the song."},
+		{Command: "play", Description: "Play a song."},
+		{Command: "queue", Description: "Show the queue."},
+		{
+			Command:     "position",
+			Description: "Show the current position of the song.",
+		},
 
-		{"reload", "Reload the admin cache."},
-		{"authlist", "List authorized users."},
-		{"help", "Show help menu."},
-		{"ping", "Check if the bot is alive."},
+		{Command: "reload", Description: "Reload the admin cache."},
+		{Command: "authlist", Description: "List authorized users."},
+		{Command: "help", Description: "Show help menu."},
+		{Command: "ping", Description: "Check if the bot is alive."},
 	},
 	GroupAdminCommands: []*telegram.BotCommand{
-		{"cplay", "Play a song in the linked channel."},
-		{"cqueue", "Show the queue in the linked channel."},
+		{Command: "cplay", Description: "Play a song in the linked channel."},
 		{
-			"cposition",
-			"Show the current position of the song in the linked channel.",
-		},
-		{"fplay", "Force play a song."},
-		{"speed", "Set the speed of the song."},
-		{"skip", "Skip the current song."},
-		{"pause", "Pause the current song."},
-		{"resume", "Resume the current song."},
-		{"replay", "Replay the current song."},
-		{"mute", "Mute the bot in the voice chat."},
-		{"unmute", "Unmute the bot in the voice chat."},
-		{"seek", "Seek to a specific position in the song."},
-		{"seekback", "Seek back to a specific position in the song."},
-		{"jump", "Jump to a specific song in the queue."},
-		{"clear", "Clear the queue."},
-		{"remove", "Remove a song from the queue."},
-		{"move", "Move a song in the queue."},
-		{"shuffle", "Shuffle the queue."},
-		{"loop", "Loop the current song."},
-		{"end", "Stop the song."},
-		{"addauth", "Add a user to the authorized list."},
-		{"delauth", "Remove a user from the authorized list."},
-		{"channelplay", "Set a channel as the play channel."},
-		{"cfplay", "Force play a song in the linked channel."},
-		{"cpause", "Pause the current song in the linked channel."},
-		{"cresume", "Resume the current song in the linked channel."},
-		{"cmute", "Mute the bot in the linked channel's voice chat."},
-		{"cunmute", "Unmute the bot in the linked channel's voice chat."},
-		{
-			"cstop",
-			"Stop the current song and leave the linked channel's voice chat.",
-		},
-		{"cskip", "Skip the current song in the linked channel."},
-		{"cloop", "Loop the current song in the linked channel."},
-		{
-			"cseek",
-			"Seek to a specific position in the song in the linked channel.",
+			Command:     "cqueue",
+			Description: "Show the queue in the linked channel.",
 		},
 		{
-			"cseekback",
-			"Seek back to a specific position in the song in the linked channel.",
+			Command:     "cposition",
+			Description: "Show the current position of the song in the linked channel.",
 		},
-		{"cjump", "Jump to a specific song in the linked channel's queue."},
-		{"cremove", "Remove a song from the linked channel's queue."},
-		{"cclear", "Clear the linked channel's queue."},
-		{"cmove", "Move a song in the linked channel's queue."},
-		{"cspeed", "Set the speed of the song in the linked channel."},
-		{"creplay", "Replay the current song in the linked channel."},
-		{"cshuffle", "Shuffle the linked channel's queue."},
-		{"creload", "Reload the admin cache in the linked channel."},
+		{Command: "fplay", Description: "Force play a song."},
+		{Command: "speed", Description: "Set the speed of the song."},
+		{Command: "skip", Description: "Skip the current song."},
+		{Command: "pause", Description: "Pause the current song."},
+		{Command: "resume", Description: "Resume the current song."},
+		{Command: "replay", Description: "Replay the current song."},
+		{Command: "mute", Description: "Mute the bot in the voice chat."},
+		{Command: "unmute", Description: "Unmute the bot in the voice chat."},
+		{
+			Command:     "seek",
+			Description: "Seek to a specific position in the song.",
+		},
+		{
+			Command:     "seekback",
+			Description: "Seek back to a specific position in the song.",
+		},
+		{Command: "jump", Description: "Jump to a specific song in the queue."},
+		{Command: "clear", Description: "Clear the queue."},
+		{Command: "remove", Description: "Remove a song from the queue."},
+		{Command: "move", Description: "Move a song in the queue."},
+		{Command: "shuffle", Description: "Shuffle the queue."},
+		{Command: "loop", Description: "Loop the current song."},
+		{Command: "end", Description: "Stop the song."},
+		{Command: "addauth", Description: "Add a user to the authorized list."},
+		{
+			Command:     "delauth",
+			Description: "Remove a user from the authorized list.",
+		},
+		{
+			Command:     "channelplay",
+			Description: "Set a channel as the play channel.",
+		},
+		{
+			Command:     "cfplay",
+			Description: "Force play a song in the linked channel.",
+		},
+		{
+			Command:     "cpause",
+			Description: "Pause the current song in the linked channel.",
+		},
+		{
+			Command:     "cresume",
+			Description: "Resume the current song in the linked channel.",
+		},
+		{
+			Command:     "cmute",
+			Description: "Mute the bot in the linked channel's voice chat.",
+		},
+		{
+			Command:     "cunmute",
+			Description: "Unmute the bot in the linked channel's voice chat.",
+		},
+		{
+			Command:     "cstop",
+			Description: "Stop the current song and leave the linked channel's voice chat.",
+		},
+		{
+			Command:     "cskip",
+			Description: "Skip the current song in the linked channel.",
+		},
+		{
+			Command:     "cloop",
+			Description: "Loop the current song in the linked channel.",
+		},
+		{
+			Command:     "cseek",
+			Description: "Seek to a specific position in the song in the linked channel.",
+		},
+		{
+			Command:     "cseekback",
+			Description: "Seek back to a specific position in the song in the linked channel.",
+		},
+		{
+			Command:     "cjump",
+			Description: "Jump to a specific song in the linked channel's queue.",
+		},
+		{
+			Command:     "cremove",
+			Description: "Remove a song from the linked channel's queue.",
+		},
+		{Command: "cclear", Description: "Clear the linked channel's queue."},
+		{
+			Command:     "cmove",
+			Description: "Move a song in the linked channel's queue.",
+		},
+		{
+			Command:     "cspeed",
+			Description: "Set the speed of the song in the linked channel.",
+		},
+		{
+			Command:     "creplay",
+			Description: "Replay the current song in the linked channel.",
+		},
+		{
+			Command:     "cshuffle",
+			Description: "Shuffle the linked channel's queue.",
+		},
+		{
+			Command:     "creload",
+			Description: "Reload the admin cache in the linked channel.",
+		},
 	},
 }

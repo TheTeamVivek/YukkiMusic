@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package locales
 
 import (
@@ -27,54 +24,58 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/Laky-64/gologging"
 	"gopkg.in/yaml.v3"
 
 	"main/internal/config"
 )
 
 //go:embed *.yml
-var locales embed.FS
+var localesFS embed.FS
 
 var loadedLocales = make(map[string]map[string]string)
 
 type Arg map[string]any
 
-func init() {
-	files, err := locales.ReadDir(".")
+func Load() error {
+	files, err := localesFS.ReadDir(".")
 	if err != nil {
-		gologging.Fatal("Failed to read embedded locales:", err)
-		return
+		return fmt.Errorf("read locales dir: %w", err)
 	}
+
 	for _, f := range files {
 		if f.IsDir() {
 			continue
 		}
-		lang := f.Name()[:len(f.Name())-len(path.Ext(f.Name()))]
-		file, err := locales.ReadFile(f.Name())
+
+		lang := strings.TrimSuffix(f.Name(), path.Ext(f.Name()))
+
+		data, err := localesFS.ReadFile(f.Name())
 		if err != nil {
-			gologging.Fatal("Failed to read locale file:", f.Name(), err)
-			continue
+			return fmt.Errorf("read locale %s: %w", f.Name(), err)
 		}
+
 		var locale map[string]string
-		if err := yaml.Unmarshal(file, &locale); err != nil {
-			gologging.Fatal("Failed to unmarshal locale file:", f.Name(), err)
-			continue
+		if err := yaml.Unmarshal(data, &locale); err != nil {
+			return fmt.Errorf("parse locale %s: %w", f.Name(), err)
 		}
+
 		loadedLocales[lang] = locale
 	}
+
 	if _, ok := loadedLocales[config.DefaultLang]; !ok {
-		gologging.Fatal("Default language not found:", config.DefaultLang)
+		return fmt.Errorf("default language %s not found", config.DefaultLang)
 	}
-	gologging.Info("Loaded", len(loadedLocales), "locales.")
+
+	return nil
 }
 
 func Get(lang, key string, values Arg) string {
-	if _, ok := loadedLocales[lang]; !ok {
-		lang = config.DefaultLang
+	locale, ok := loadedLocales[lang]
+	if !ok {
+		locale = loadedLocales[config.DefaultLang]
 	}
 
-	val, ok := loadedLocales[lang][key]
+	val, ok := locale[key]
 	if !ok {
 		val = loadedLocales[config.DefaultLang][key]
 	}
@@ -83,22 +84,20 @@ func Get(lang, key string, values Arg) string {
 		return val
 	}
 
-	var buf strings.Builder
-
 	for k, v := range values {
-		buf.Reset()
-		fmt.Fprintf(&buf, "%v", v)
-		val = strings.ReplaceAll(val, "{"+k+"}", buf.String())
+		val = strings.ReplaceAll(val, "{"+k+"}", fmt.Sprint(v))
 	}
 
 	return val
 }
 
 func GetAvailableLanguages() []string {
-	var langs []string
+	langs := make([]string, 0, len(loadedLocales))
+
 	for lang := range loadedLocales {
 		langs = append(langs, lang)
 	}
+
 	sort.Strings(langs)
 	return langs
 }

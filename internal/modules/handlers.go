@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package modules
 
 import (
@@ -170,11 +167,6 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter},
 	},
 	{Pattern: "(rtmp|setrtmp)", Handler: setRTMPHandler},
-	{
-		Pattern: "autoplay",
-		Handler: autoplayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
 	// play/cplay/vplay/fplay commands
 	{
 		Pattern: "play",
@@ -313,6 +305,11 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter},
 	},
 	{
+		Pattern: "restore",
+		Handler: restoreHandler,
+		Filters: []telegram.Filter{superGroupFilter, authFilter},
+	},
+	{
 		Pattern: "addauth",
 		Handler: addAuthHandler,
 		Filters: []telegram.Filter{superGroupFilter, adminFilter},
@@ -440,8 +437,8 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
-		Pattern: "cautoplay",
-		Handler: cautoplayHandler,
+		Pattern: "crestore",
+		Handler: crestoreHandler,
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 
@@ -486,6 +483,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 	bot.On("edit:/ev", evalCommandHandler).SetGroup(80)
 
 	bot.On("participant", handleParticipantUpdate).SetGroup(70)
+	bot.On("action", handleChatAction).SetGroup(70)
 
 	bot.AddActionHandler(handleActions).SetGroup(60)
 
@@ -495,7 +493,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 
 	go MonitorRooms()
 
-	if is, _ := database.GetAutoLeave(); is {
+	if is, _ := database.AutoLeave(); is {
 		go startAutoLeave()
 	}
 
@@ -509,7 +507,8 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 		"/cmute", "/cunmute", "/cseek", "/cseekback",
 		"/cjump", "/cremove", "/cclear", "/cmove",
 		"/cspeed", "/creplay", "/cposition", "/cshuffle",
-		"/cloop", "/cqueue", "/creload", "/cautoplay",
+		"/cloop", "/cqueue", "/creload",
+		"/crestore",
 	}
 
 	for _, cmd := range cplayCommands {
@@ -549,7 +548,7 @@ func setBotCommands(bot *telegram.Client) {
 	}
 
 	// Set commands for sudo users in their private chat
-	sudoers, err := database.GetSudoers()
+	sudoers, err := database.Sudoers()
 	if err != nil {
 		log.Printf("Failed to get sudoers for setting commands: %v", err)
 	} else {

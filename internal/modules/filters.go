@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package modules
 
 import (
@@ -26,7 +23,6 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
-	"main/internal/core"
 	"main/internal/database"
 	"main/internal/utils"
 )
@@ -49,11 +45,11 @@ func filterSuperGroup(m *tg.NewMessage) bool {
 	case tg.EntityChat:
 		// EntityChat can be basic group or supergroup — allow only supergroup
 		if m.Channel != nil && !m.Channel.Broadcast {
-			database.AddServed(m.ChannelID())
+			database.AddServedChat(m.ChannelID())
 			return true // Supergroup
 		}
 		warnAndLeave(m.Client, m.ChannelID()) // Basic group → leave
-		database.DeleteServed(m.ChannelID())
+		database.RemoveServedChat(m.ChannelID())
 		return false
 
 	case tg.EntityChannel:
@@ -61,7 +57,7 @@ func filterSuperGroup(m *tg.NewMessage) bool {
 
 	case tg.EntityUser:
 		m.Reply(F(m.ChannelID(), "only_supergroup"))
-		database.AddServed(m.ChannelID(), true)
+		database.AddServedUser(m.ChannelID())
 		return false // Private chat → warn
 	}
 
@@ -83,7 +79,7 @@ func filterAuthUsers(m *tg.NewMessage) bool {
 		return true
 	}
 
-	isAuth, err := database.IsAuthUser(m.ChannelID(), m.SenderID())
+	isAuth, err := database.IsAuthorized(m.ChannelID(), m.SenderID())
 	if err == nil && isAuth {
 		return true
 	}
@@ -97,7 +93,7 @@ func filterSudo(m *tg.NewMessage) bool {
 
 	if config.OwnerID == 0 || (m.SenderID() != config.OwnerID && !is) {
 		if m.IsPrivate() ||
-			strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
+			strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
 			m.Reply(F(m.ChannelID(), "only_sudo"))
 		}
 		return false
@@ -116,7 +112,7 @@ func filterChannel(m *tg.NewMessage) bool {
 func filterOwner(m *tg.NewMessage) bool {
 	if config.OwnerID == 0 || m.SenderID() != config.OwnerID {
 		if m.IsPrivate() ||
-			strings.HasSuffix(m.GetCommand(), core.BUser.Username) {
+			strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
 			m.Reply(F(m.ChannelID(), "only_owner"))
 		}
 		return false

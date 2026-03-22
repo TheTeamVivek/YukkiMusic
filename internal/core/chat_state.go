@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package core
 
 import (
@@ -43,29 +40,34 @@ var (
 	ErrPeerResolveFailed        = errors.New("failed to resolve peer")
 )
 
-// =============================================================================
-// CHAT STATE
-// =============================================================================
+type assistantState struct {
+	present        bool
+	presentFetched bool
+
+	banned        bool
+	bannedFetched bool
+}
+
+type voiceChatState struct {
+	active  bool
+	fetched bool
+
+	inviteLink string
+}
 
 type ChatState struct {
-	mu        *sync.RWMutex
+	mu        sync.RWMutex
 	ChatID    int64
 	Assistant *Assistant
 
-	isPresent  *bool
-	isBanned   *bool
-	isVCActive *bool
-	inviteLink string
+	assistant assistantState
+	vc        voiceChatState
 }
 
 var (
 	stateMutex = &sync.Mutex{}
 	states     = make(map[int64]*ChatState)
 )
-
-// =============================================================================
-// STATE MANAGEMENT
-// =============================================================================
 
 func GetChatState(chatID int64) (*ChatState, error) {
 	stateMutex.Lock()
@@ -74,7 +76,6 @@ func GetChatState(chatID int64) (*ChatState, error) {
 	s, exists := states[chatID]
 	if !exists {
 		s = &ChatState{
-			mu:     &sync.RWMutex{},
 			ChatID: chatID,
 		}
 		states[chatID] = s
@@ -93,62 +94,57 @@ func DeleteChatState(chatID int64) {
 	delete(states, chatID)
 }
 
-// =============================================================================
-// STATE SETTERS
-// =============================================================================
-
 func (s *ChatState) SetAssistantPresent(v bool) {
 	s.mu.Lock()
-	s.isPresent = &v
-	s.mu.Unlock()
+	defer s.mu.Unlock()
+	s.assistant.present = v
+	s.assistant.presentFetched = true
 }
 
 func (s *ChatState) SetAssistantBanned(v bool) {
 	s.mu.Lock()
-	s.isBanned = &v
-	s.mu.Unlock()
+	defer s.mu.Unlock()
+	s.assistant.banned = v
+	s.assistant.bannedFetched = true
 }
 
 func (s *ChatState) SetVoiceChatActive(v bool) {
 	s.mu.Lock()
-	s.isVCActive = &v
-	s.mu.Unlock()
+	defer s.mu.Unlock()
+	s.vc.active = v
+	s.vc.fetched = true
 }
 
 func (s *ChatState) SetInviteLink(link string) {
 	s.mu.Lock()
-	s.inviteLink = link
-	s.mu.Unlock()
+	defer s.mu.Unlock()
+	s.vc.inviteLink = link
 }
 
-// =============================================================================
-// STATE GETTERS
-// =============================================================================
-
-func (s *ChatState) GetAssistantPresence() *bool {
+func (s *ChatState) AssistantPresent() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.isPresent
+	return s.assistant.present
 }
 
-func (s *ChatState) GetAssistantBanned() *bool {
+func (s *ChatState) AssistantBanned() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.isBanned
+	return s.assistant.banned
 }
 
-func (s *ChatState) IsStateUnknown() bool {
+func (s *ChatState) AssistantFetched() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.isPresent == nil || s.isBanned == nil
+	return s.assistant.presentFetched && s.assistant.bannedFetched
 }
 
-// =============================================================================
-// STATE QUERIES
-// =============================================================================
+func (s *ChatState) IsAssistantPresent(force bool) (bool, error) {
+	s.mu.RLock()
+	shouldRefresh := !s.assistant.presentFetched || force
+	s.mu.RUnlock()
 
-func (s *ChatState) IsAssistantPresent(force ...bool) (bool, error) {
-	if s.shouldRefresh(s.isPresent, force) {
+	if shouldRefresh {
 		if err := s.RefreshAssistantState(); err != nil {
 			return false, err
 		}
@@ -156,11 +152,15 @@ func (s *ChatState) IsAssistantPresent(force ...bool) (bool, error) {
 
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.isPresent != nil && *s.isPresent, nil
+	return s.assistant.present, nil
 }
 
-func (s *ChatState) IsAssistantBanned(force ...bool) (bool, error) {
-	if s.shouldRefresh(s.isBanned, force) {
+func (s *ChatState) IsAssistantBanned(force bool) (bool, error) {
+	s.mu.RLock()
+	shouldRefresh := !s.assistant.bannedFetched || force
+	s.mu.RUnlock()
+
+	if shouldRefresh {
 		if err := s.RefreshAssistantState(); err != nil {
 			return false, err
 		}
@@ -168,11 +168,15 @@ func (s *ChatState) IsAssistantBanned(force ...bool) (bool, error) {
 
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.isBanned != nil && *s.isBanned, nil
+	return s.assistant.banned, nil
 }
 
-func (s *ChatState) IsActiveVC(force ...bool) (bool, error) {
-	if s.shouldRefresh(s.isVCActive, force) {
+func (s *ChatState) IsActiveVC(force bool) (bool, error) {
+	s.mu.RLock()
+	shouldRefresh := !s.vc.fetched || force
+	s.mu.RUnlock()
+
+	if shouldRefresh {
 		if err := s.refreshVCState(); err != nil {
 			return false, err
 		}
@@ -180,22 +184,11 @@ func (s *ChatState) IsActiveVC(force ...bool) (bool, error) {
 
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.isVCActive != nil && *s.isVCActive, nil
+	return s.vc.active, nil
 }
-
-func (s *ChatState) shouldRefresh(flag *bool, force []bool) bool {
-	if flag == nil {
-		return true
-	}
-	return len(force) > 0 && force[0]
-}
-
-// =============================================================================
-// STATE REFRESH
-// =============================================================================
 
 func (s *ChatState) RefreshAssistantState() error {
-	member, err := Bot.GetChatMember(s.ChatID, s.Assistant.User.ID)
+	member, err := Bot.GetChatMember(s.ChatID, s.Assistant.Self.ID)
 	if err != nil {
 		return s.handleMemberFetchError(err)
 	}
@@ -281,10 +274,6 @@ func (s *ChatState) handleMemberFetchError(err error) error {
 	return fmt.Errorf("%w: %v", ErrFetchFailed, err)
 }
 
-// =============================================================================
-// ASSISTANT JOIN
-// =============================================================================
-
 func (s *ChatState) TryJoin() error {
 	err := s.attemptJoin()
 
@@ -313,7 +302,7 @@ func (s *ChatState) attemptJoin() error {
 
 func (s *ChatState) getOrFetchInviteLink() (string, error) {
 	s.mu.RLock()
-	link := s.inviteLink
+	link := s.vc.inviteLink
 	s.mu.RUnlock()
 
 	if link != "" {
@@ -326,7 +315,7 @@ func (s *ChatState) getOrFetchInviteLink() (string, error) {
 
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.inviteLink, nil
+	return s.vc.inviteLink, nil
 }
 
 func (s *ChatState) setJoinSuccess() {
@@ -361,7 +350,7 @@ func (s *ChatState) approveJoinRequest() error {
 		return err
 	}
 
-	userPeer, err := Bot.ResolvePeer(s.Assistant.User.ID)
+	userPeer, err := Bot.ResolvePeer(s.Assistant.Self.ID)
 	if err != nil {
 		return err
 	}
@@ -391,10 +380,6 @@ func (s *ChatState) approveJoinRequest() error {
 	return ErrAssistantJoinRequestSent
 }
 
-// =============================================================================
-// HELPERS
-// =============================================================================
-
 func (s *ChatState) ensureAssistant() (*Assistant, error) {
 	s.mu.RLock()
 	ass := s.Assistant
@@ -414,8 +399,8 @@ func (s *ChatState) ensureAssistant() (*Assistant, error) {
 	}
 
 	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.Assistant = ass
-	s.mu.Unlock()
 
 	return ass, nil
 }

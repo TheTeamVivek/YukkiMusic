@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package modules
 
 import (
@@ -53,7 +50,7 @@ func nothumbHandler(m *tg.NewMessage) error {
 	chatID := m.ChannelID()
 	args := strings.Fields(m.Text())
 
-	current, err := database.GetNoThumb(chatID)
+	current, err := database.ThumbnailsDisabled(chatID)
 	if err != nil {
 		m.Reply(F(chatID, "nothumb_fetch_fail"))
 		return tg.ErrEndGroup
@@ -82,7 +79,7 @@ func nothumbHandler(m *tg.NewMessage) error {
 		return tg.ErrEndGroup
 	}
 
-	if err := database.SetNoThumb(chatID, value); err != nil {
+	if err := database.SetThumbnailsDisabled(chatID, value); err != nil {
 		m.Reply(F(chatID, "nothumb_update_fail"))
 		return tg.ErrEndGroup
 	}

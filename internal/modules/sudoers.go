@@ -1,23 +1,20 @@
 /*
-  - This file is part of YukkiMusic.
-    *
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
 
-  - YukkiMusic — A Telegram bot that streams music into group voice chats with seamless playback and control.
-  - Copyright (C) 2025 TheTeamVivek
-    *
-  - This program is free software: you can redistribute it and/or modify
-  - it under the terms of the GNU General Public License as published by
-  - the Free Software Foundation, either version 3 of the License, or
-  - (at your option) any later version.
-    *
-  - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  - GNU General Public License for more details.
-    *
-  - You should have received a copy of the GNU General Public License
-  - along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
 package modules
 
 import (
@@ -63,14 +60,14 @@ func handleAddSudo(m *telegram.NewMessage) error {
 	}
 
 	// Trying to add the bot itself
-	if targetID == core.BUser.ID {
+	if targetID == m.Client.Me().ID {
 		m.Reply(F(chatID, "sudo_bot_self"))
 		return telegram.ErrEndGroup
 	}
 
 	// Trying to add the assistant
 	if ass, err := core.Assistants.ForChat(chatID); err == nil {
-		if targetID == ass.User.ID {
+		if targetID == ass.Self.ID {
 			m.Reply(F(chatID, "sudo_assistant_self"))
 			return telegram.ErrEndGroup
 		}
@@ -177,7 +174,7 @@ func handleDelSudo(m *telegram.NewMessage) error {
 
 	// Cannot remove assistant (UbUser)
 	if ass, err := core.Assistants.ForChat(chatID); err == nil {
-		if targetID == ass.User.ID {
+		if targetID == ass.Self.ID {
 			m.Reply(F(chatID, "sudo_assistant_cannot_remove"))
 			return telegram.ErrEndGroup
 		}
@@ -224,7 +221,7 @@ func handleDelSudo(m *telegram.NewMessage) error {
 	}
 
 	// Delete from DB
-	if err := database.DeleteSudo(targetID); err != nil {
+	if err := database.RemoveSudo(targetID); err != nil {
 		m.Reply(F(chatID, "sudo_remove_fail", locales.Arg{
 			"error": err.Error(),
 		}))
@@ -253,11 +250,11 @@ func handleGetSudoers(m *telegram.NewMessage) error {
 	utils.SetFlood(floodKey, 30*time.Second)
 
 	// "⏳ Fetching sudoers list..."
-	mystic, _ := m.Reply(F(chatID, "sudo_list_fetching"))
+	statusMsg, _ := m.Reply(F(chatID, "sudo_list_fetching"))
 
-	list, err := database.GetSudoers()
+	list, err := database.Sudoers()
 	if err != nil {
-		utils.EOR(mystic, F(chatID, "sudo_list_fetch_fail", locales.Arg{
+		utils.EOR(statusMsg, F(chatID, "sudo_list_fetch_fail", locales.Arg{
 			"error": err.Error(),
 		}))
 		return telegram.ErrEndGroup
@@ -321,6 +318,6 @@ func handleGetSudoers(m *telegram.NewMessage) error {
 		sb.WriteString("\n")
 	}
 
-	utils.EOR(mystic, sb.String())
+	utils.EOR(statusMsg, sb.String())
 	return telegram.ErrEndGroup
 }

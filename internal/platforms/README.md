@@ -6,579 +6,187 @@
 
 ## 📋 Table of Contents
 
-1. [Overview](#-overview)
-2. [How It Works](#%EF%B8%8F-how-it-works)
-3. [Available Platforms](#-available-platforms)
-4. [Priority System](#-priority-system)
-5. [Adding New Platforms](#-adding-new-platforms)
-6. [Models](#-models)
-7. [Credits](#-credits)
+- [Overview](#-overview)
+- [How It Works](#%EF%B8%8F-how-it-works)
+- [Available Platforms](#-available-platforms)
+- [Priority System](#-priority-system)
+- [Adding New Platforms](#-adding-new-platforms)
+- [Models](#-models)
+- [Credits](#-credits)
 
 ---
 
 ## 🌟 Overview
 
-The **Platform System** is the heart of YukkiMusic's music fetching and downloading capabilities. Each platform is a self-contained module that:
+The **Platform System** is the engine driving YukkiMusic's music fetching and downloading. Each platform is a self-contained module designed for a specific source.
 
-✅ **Validates** if it can handle a given query  
-✅ **Fetches** track metadata (title, duration, artwork)  
-✅ **Downloads** the actual media file  
-✅ **Handles errors** gracefully with fallbacks  
-
-When a user requests a song, YukkiMusic:
-1. Iterates through all registered platforms (by priority)
-2. Checks if the first platform can handle the request
-3. Uses the first valid platform
-4. Falls back to next platform if fetch/download fails
+### Key Capabilities:
+- ✅ **Validation**: Smartly determines if a query/URL belongs to the platform.
+- ✅ **Metadata**: Fetches titles, durations, and high-quality artwork.
+- ✅ **Download**: Handles local caching and efficient media retrieval.
+- ✅ **Resilience**: Integrated fallback system ensures playback even if a primary source fails.
 
 ---
 
 ## ⚙️ How It Works
 
-### Registration Flow
+### 🔄 The Lifecycle
+1. **User Request**: A query or URL is received.
+2. **Platform Selection**: The registry iterates through platforms by **Priority** (Highest first).
+3. **Capability Check**: The first platform that returns `true` for `CanGetTracks` or `CanSearch` is selected.
+4. **Resolution**: Metadata is fetched. If it fails, the system tries the next available platform.
+5. **Execution**: The media is downloaded and passed to the playback engine.
 
-```
-Platform Registration (init())
-         ↓
-Priority-Based Registry
-         ↓
-User Requests Song
-         ↓
-Check Platforms (High → Low Priority)
-         ↓
-First Valid Platform Handles
-         ↓
-Fetch Metadata → Download → Play
-         ↓
-If Error → Try Next Platform
-```
-
-### Internal Mechanism
-
-Each platform is stored in a **registry** with:
-- `PlatformName` - Unique identifier
-- `Priority` - Integer (higher = checked first)
-- `Platform` - Implementation of the interface
-
-When you call `GetOrderedPlatforms()`:
-1. All platforms are sorted by priority (descending)
-2. Returned in order of importance
-3. Bot checks first valid one
+### 🛠 Internal Registry
+Platforms are registered during `init()` with a unique `PlatformName` and a `Priority` integer. Higher integers take precedence.
 
 ---
 
 ## 📱 Available Platforms
 
-### 1. **Telegram** (Priority: 100)
-**Status**: ✅ Fully Supported
+### 📡 Telegram (Priority: 100)
+Handles native Telegram media files (Audio, Video, Voice).
+- **Features**: Fast direct streaming, no external API dependencies.
+- **When to Use**: Direct `t.me` links or replies to files.
 
-Handles direct Telegram audio/video files.
+### 🎧 Spotify (Priority: 95)
+Resolves Spotify metadata and falls back to YouTube for downloads.
+- **Features**: Seamless support for Tracks, Playlists, Albums, and Artists.
+- **Configuration**: Requires `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET`.
 
-```
-Input: Telegram link (t.me/channel/12345)
-↓
-Output: Streams audio/video directly from Telegram
-```
+### 🎥 YouTube (Priority: 90)
+Powerful metadata resolver and search engine.
+- **Features**: Playlist support, advanced search, and high-accuracy results.
+- **Note**: Does not handle direct downloads; serves as a metadata source for other downloaders.
 
-**Features**:
-- Download Telegram media files
-- Support for voice messages, audio, video
-- Auto-detect duration and metadata
-- Fast streaming without extra processing
+### 🎵 SoundCloud (Priority: 85)
+Native support for SoundCloud tracks and playlists via `yt-dlp`.
+- **Features**: High-quality audio extraction and cookie support.
 
-**When Used**:
-- Direct Telegram links
-- Reply to Telegram media
-- Telegram document files
+### ⚡ Fallen API (Priority: 80)
+Premium, high-speed API for YouTube audio downloads.
+- **Features**: Stable performance and Telegram CDN integration.
+- **Configuration**: Requires `FALLEN_API_URL` and `FALLEN_API_KEY`.
 
----
+### 🔗 DirectStream (Priority: 65)
+Fallback for direct media URLs (`.mp3`, `.mp4`, `.m3u8`, etc.).
+- **Features**: Support for HLS/M3U8 streams and MPEG-DASH.
+- **When to Use**: CDN links and live broadcast streams.
 
-### 2. **Spotify** (Priority: 95)
-**Status**: ✅ Fully Supported
-
-Fetches Spotify metadata and downloads via YouTube fallback.
-
-```
-Input: Spotify track/playlist/album/artist URL
-↓
-Fetch Spotify metadata → Search YouTube → Download
-```
-
-**Features**:
-- Track, playlist, album, artist support
-- Automatic YouTube search for downloads
-- High-quality metadata extraction
-- Smart title matching
-
-**Configuration**:
-```bash
-SPOTIFY_CLIENT_ID=your_client_id
-SPOTIFY_CLIENT_SECRET=your_client_secret
-```
-
-**When Used**:
-- Spotify track links
-- Spotify playlist links
-- Spotify album links
-- Spotify artist links
-
----
-
-### 3. **YouTube** (Priority: 90)
-**Status**: ✅ Fully Supported
-
-Fetches YouTube video metadata **only** (not download).
-
-```
-Input: YouTube URL or Search Query
-↓
-Output: Track metadata (title, duration, thumbnail)
-         (Actual download via fallback platform)
-```
-
-**Features**:
-- YouTube URL validation
-- Playlist support
-- Video search
-- Web scraping for accurate data
-- YTSearch fallback for reliability
-
-**When Used**:
-- YouTube links (youtube.com, youtu.be)
-- Text search queries
-- Playlist URLs
-
-**Note**: YouTube platform **doesn't download**. Downloads handled by other platforms.
-
----
-
-### 4. **SoundCloud** (Priority: 85)
-**Status**: ✅ Fully Supported
-
-Fetches and downloads SoundCloud tracks using yt-dlp.
-
-**Features**:
-- Track and playlist support
-- Metadata extraction via yt-dlp
-- Direct audio downloads
-- Cookie-based authentication
-
-**When Used**:
-- SoundCloud track links
-- SoundCloud playlist links
-
----
-
-### 5. **Fallen API** (Priority: 80)
-**Status**: ✅ Requires API Key
-
-Premium API for YouTube downloads (audio only).
-
-**Features**:
-- Stable audio downloads
-- API-based access
-- Telegram CDN support
-
-**Configuration**:
-```bash
-FALLEN_API_URL=https://beta.fallenapi.fun
-FALLEN_API_KEY=your_key_here
-```
-
-**Notes**: Paid service, audio only, no video support
-
----
-
-### 6. **DirectStream** (Priority: 65)
-**Status**: ✅ Fully Supported
-
-Handles direct audio/video URLs and streaming links.
-
-```
-Input: Direct URL (.mp3, .mp4, .m3u8, etc.)
-↓
-Validate → Return URL for streaming
-```
-
-**Features**:
-- Direct streaming without download
-- M3U8/HLS stream support
-- MPEG-DASH support
-- Automatic format detection
-- Live stream detection
-
-**When Used**:
-- Direct audio/video URLs
-- CDN links
-- HLS/DASH streams
-- Any direct media URL
-
-**Priority Note**: Runs **before** YtDlp to handle direct streams that yt-dlp might fail on.
-
----
-
-### 7. **YT-DLP** (Priority: 60)
-**Status**: ✅ Free Method
-
-Universal downloader for YouTube and other platforms.
-
-```
-Input: Any URL
-↓
-yt-dlp (local binary)
-↓
-Output: Audio/Video file
-```
-
-**Features**:
-- Universal platform support
-- Metadata extraction
-- Complete local control
-- Cookie-based authentication
-- Smart URL detection
-- Live stream detection
-- Automatic fallback
-
-**Configuration**:
-```bash
-COOKIES_LINK=https://batbin.me/paste_id1 https://batbin.me/paste_id2
-```
-
-**Installation**:
-```bash
-# macOS
-brew install yt-dlp
-
-# Linux
-sudo apt install yt-dlp
-
-# Windows
-pip install yt-dlp
-```
-
-**New Features**:
-- ✅ Can extract metadata from any URL
-- ✅ Validates URLs using yt-dlp JSON extraction
-- ✅ Skips direct streams (handled by DirectStream)
-- ✅ Detects and rejects live streams
-- ✅ Smart cookie usage (only for YouTube)
-- ✅ Playlist support
-
-**Pros**:
-- ✅ Free forever
-- ✅ Full control
-- ✅ Works with most platforms
-- ✅ Universal fallback
-
-**Cons**:
-- ⚠️ Requires yt-dlp installed
-- ⚠️ Needs updated cookies for YouTube
-- ⚠️ More resource-intensive
-- ⚠️ Cannot handle live streams
+### 🧰 YT-DLP (Priority: 60)
+The ultimate universal fallback downloader.
+- **Features**: Supports 1000+ sites, local control, and smart cookie rotation.
+- **Pros**: Free, extremely versatile, and reliable.
 
 ---
 
 ## 📊 Priority System
 
-| Priority | Platform | Purpose |
-|----------|----------|---------|
-| **100** | Telegram | Direct media files |
-| **95** | Spotify | Spotify metadata + YouTube fallback |
-| **90** | YouTube | Video metadata & search |
-| **85** | SoundCloud | SoundCloud downloads |
-| **80** | Fallen API | YouTube audio downloads |
-| **65** | DirectStream | Direct URLs & streams |
-| **60** | YT-DLP | Universal fallback |
+| Priority | Platform | Primary Purpose |
+| :--- | :--- | :--- |
+| **100** | **Telegram** | Direct app-native media |
+| **95** | **Spotify** | Premium metadata matching |
+| **90** | **YouTube** | Global search & metadata |
+| **85** | **SoundCloud** | Native indie music support |
+| **80** | **Fallen API** | Optimized audio downloads |
+| **65** | **DirectStream** | Direct URLs & HLS streams |
+| **60** | **YT-DLP** | Universal compatibility layer |
 
 ---
-### Why Priority Matters
 
-**Higher priority = checked first**
+### 💡 Why Priority Matters
 
-Example flow for direct stream URL:
-```
-Direct stream URL received
-↓
-Check Telegram (100) → ❌ Not valid for URL
-↓
-Check Spotify (95) → ❌ Not Spotify
-↓
-Check YouTube (90) → ❌ Not YouTube
-↓
-Check SoundCloud (85) → ❌ Not SoundCloud
-↓
-Check Fallen API (80) → ❌ Download-only
-↓
-Check DirectStream (65) → ✅ Valid! Extract metadata
-↓
-Download needed → DirectStream returns URL
-```
+**High priority ensures the best tool for the job is used first.**
 
-Example flow for YouTube video:
-```
-YouTube URL received
-↓
-Check Telegram (100) → ❌ Not valid for YouTube
-↓
-Check Spotify (95) → ❌ Not Spotify
-↓
-Check YouTube (90) → ✅ Fetch metadata
-↓
-Download needed → Check Fallen (80) or YtDlp (60)
-```
+1. **Direct Stream URL**:
+   - Checked by Telegram (100) → ❌
+   - Checked by Spotify (95) → ❌
+   - ...
+   - Checked by **DirectStream (65)** → ✅ **Handled!**
+
+2. **YouTube Link**:
+   - Checked by Telegram (100) → ❌
+   - ...
+   - Checked by **YouTube (90)** → ✅ **Metadata Resolved!**
+   - Download phase → Uses **Fallen API (80)** or **YT-DLP (60)**.
 
 ---
 
 ## 🧠 Adding New Platforms
 
-### Step 1: Create New File
+Creating a new platform is straightforward. Follow this boilerplate to get started:
 
-```bash
-# Create file for your platform
-touch internal/platforms/myplatform.go
-```
+### 1. Create the File
+`internal/platforms/myplatform.go`
 
-### Step 2: Define Struct
-
-```go
-package platforms
-
-import (
-    "context"
-    state "main/internal/core/models"
-    "github.com/amarnathcjd/gogram/telegram"
-)
-
-const PlatformMyPlatform state.PlatformName = "MyPlatform"
-
-type MyPlatform struct {
-    name state.PlatformName
-    // Add API key, client, etc. if needed
-    APIKey string
-}
-```
-
-### Step 3: Implement Interface
-
-```go
-func (p *MyPlatform) Name() state.PlatformName {
-    return p.name
-}
-
-func (p *MyPlatform) CanGetTracks(query string) bool {
-    // Return true if this platform can handle the query
-    return strings.HasPrefix(query, "https://myservice.com/")
-}
-
-func (p *MyPlatform) GetTracks(query string, video bool) ([]*state.Track, error) {
-    // Fetch and return track metadata
-    // video flag indicates if user wants video playback
-}
-
-func (p *MyPlatform) CanDownload(source state.PlatformName) bool {
-    // Return true if we can download from this source
-    return source == PlatformMyPlatform
-}
-
-func (p *MyPlatform) Download(
-    ctx context.Context,
-    track *state.Track,
-    mystic *telegram.NewMessage,
-) (string, error) {
-    // Download and return file path
-    // Use mystic for progress updates
-}
-
-
-func (s *MyPlatform) CanGetRecommendations() bool {
-	return false
-}
-
-func (s *MyPlatform) GetRecommendations(
-	track *state.Track,
-) ([]*state.Track, error) { 
-  
-  // your actual logic
-  
-}
-```
-
-### Step 4: Register Platform
-
-```go
-func init() {
-    // Pick a priority (higher = checked first)
-    priority := 85
-    Register(priority, &MyPlatform{
-        name: PlatformMyPlatform,
-        APIKey: os.Getenv("MY_API_KEY"),
-    })
-}
-```
-
-### Complete Example
-
+### 2. Implementation Boilerplate
 ```go
 package platforms
 
 import (
     "context"
     "errors"
-    "fmt"
-    "os"
-    "strings"
-    
+    "main/internal/core/models"
     "github.com/amarnathcjd/gogram/telegram"
-    state "main/internal/core/models"
 )
 
-const PlatformAppleMusic state.PlatformName = "AppleMusic"
-
-type AppleMusicPlatform struct {
-    name state.PlatformName
-    token string
+type MyPlatform struct {
+    name models.PlatformName
 }
 
 func init() {
-    Register(87, &AppleMusicPlatform{
-        name: PlatformAppleMusic,
-        token: os.Getenv("APPLE_MUSIC_TOKEN"),
-    })
+    // Priority: Higher = Checked earlier
+    Register(50, &MyPlatform{name: "MyPlatform"})
 }
 
-func (a *AppleMusicPlatform) Name() state.PlatformName {
-    return a.name
+func (p *MyPlatform) Name() models.PlatformName { return p.name }
+
+func (p *MyPlatform) CanGetTracks(query string) bool {
+    return strings.Contains(query, "myservice.com")
 }
 
-func (a *AppleMusicPlatform) CanGetTracks(query string) bool {
-    return strings.Contains(query, "music.apple.com")
-}
-
-func (a *AppleMusicPlatform) GetTracks(query string, video bool) ([]*state.Track, error) {
-    if a.token == "" {
-        return nil, errors.New("Apple Music token not configured")
-    }
-    
-    // Implement Apple Music API integration
-    // Return track metadata
-    
+func (p *MyPlatform) GetTracks(query string, video bool) ([]*models.Track, error) {
+    // Logic to fetch metadata
     return nil, nil
 }
 
-func (a *AppleMusicPlatform) CanDownload(source state.PlatformName) bool {
-    return false // Apple Music doesn't allow downloads
+func (p *MyPlatform) CanDownload(source models.PlatformName) bool {
+    return source == p.name
 }
 
-func (a *AppleMusicPlatform) Download(ctx context.Context, _ *state.Track, _ *telegram.NewMessage) (string, error) {
-    return "", errors.New("Apple Music downloads not supported")
+func (p *MyPlatform) Download(ctx context.Context, t *models.Track, m *telegram.NewMessage) (string, error) {
+    // Logic to download file
+    return "", errors.New("not implemented")
 }
 
-
-func (s *AppleMusicPlatform) CanGetRecommendations() bool {
-	return true
-}
-
-+func (s *AppleMusicPlatform) GetRecommendations(
-+	track *state.Track,
-+) ([]*state.Track, error) {
-+  // your logic for getting recommendations for the track
-+}
+func (p *MyPlatform) CanSearch() bool { return false }
+func (p *MyPlatform) Search(q string, v bool) ([]*models.Track, error) { return nil, nil }
 ```
 
 ---
 
-## 🔌 Models
+## 🔌 Core Models
 
 ```go
-type (
-	Track struct {
-		ID        string       // track unique id
-		Title     string       // title
-		Duration  int          // track duration in seconds
-		Artwork   string       // thumbnail url of the track
-		URL       string       // track url
-		Requester string       // html mention or @username who requested this track
-		Video     bool         // whether this track will be played as video
-		Source    PlatformName // unique PlatformName
-	}
-	PlatformName string
-	// Platform defines a common contract for all supported platforms
-	// (e.g. YouTube, SoundCloud, Spotify, etc.).
-	//
-	// Each platform is responsible for determining whether it can
-	// search, resolve, or download tracks from a given query or source.
-	Platform interface {
-	  // Name returns the unique identifier of the platform.
-  	Name() PlatformName
-
-  	// CanSearch reports whether this platform supports search.
-	  CanSearch() bool
-
-  	// Search searches the platform for tracks matching the query.
-  	//
-  	// query: the search string
-  	// video:
-  	//   - If the platform supports both audio and video, propagate this
-  	//     value into Track.Video
-  	//   - If the platform is audio-only, always set Track.Video = false
-  	//   - If the platform is video-only, always set Track.Video = true
-  	//
-  	// This method is primarily used for video playback workflows.
-  	Search(query string, video bool) ([]*Track, error)
-
-  	// CanDownload reports whether this platform can download tracks
-  	// originating from the given source platform.
-  	CanDownload(source PlatformName) bool
-
-  	// Download downloads the given track and returns the local file path.
-  	//
-  	// ctx is used for cancellation and timeouts.
-  	// track is the track to download.
-  	// mystic used to send progress updates (if not nil).
-  	// if your platform support video playback so return local path of video when track.Video is true
-  	Download(
-	  	ctx context.Context,
-	  	track *Track,
-	  	mystic *telegram.NewMessage,
-  	) (string, error)
-
-  	// CanGetTracks reports whether this platform can resolve
-  	// tracks from the given query search term.
-  	CanGetTracks(query string) bool
-
-  	// GetTracks fetches track metadata for the given query.
-  	//
-  	// video indicates whether video playback is requested.
-  	// Platforms that do not support video should still return tracks,
-  	// but must set Track.Video = false.
-  	GetTracks(query string, video bool) ([]*Track, error)
-  	
-  	// CanGetRecommendations reports whether this platform can
-		// provide track recommendations based on a given track.
-		CanGetRecommendations() bool
-
-		// GetRecommendations fetches recommended tracks for the given track.
-		GetRecommendations(track *Track) ([]*Track, error)
-	
-  }
-)
+type Track struct {
+    ID        string       // Unique track identifier
+    Title     string       // Display title
+    Duration  int          // Length in seconds
+    Artwork   string       // Thumbnail URL or local path
+    URL       string       // Original source URL
+    Requester string       // User who added the track (HTML)
+    Video     bool         // Toggle for video playback
+    Source    PlatformName // Originating platform
+}
 ```
----
-## 🎯 Credits
-
-### Third-Party Libraries & APIs
-
-- **YouTube Search**: Web scraping logic adapted from [TgMusicBot](https://github.com/AshokShau/TgMusicBot)
-  - License: GNU GPL v3
-  - Copyright (c) 2025 Ashok Shau
-  - Used for: YouTube search result parsing and metadata extraction
-
-## 📞 Support
-
-- Found a bug in a platform? Use `/bug` command
-- Want to add a platform? Check examples above
-- Join [Support Chat](https://t.me/TheTeamVk) for help
 
 ---
 
-**Happy Platform Development! 🎼**
+## 🎯 Credits & Support
+
+- **Core Logic**: Adapted from various open-source music bots.
+- **Search**: YouTube scraping logic inspired by [TgMusicBot](https://github.com/AshokShau/TgMusicBot).
+- **Support**: Join our [Support Group](https://t.me/TheTeamVk) for integration help.
+
+---
+**Happy Coding! 🎼**
