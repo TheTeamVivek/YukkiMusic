@@ -25,6 +25,8 @@ import (
 	"main/internal/utils"
 )
 
+// TODO: jab song muted ya paused ho to stop mein user ko batao ki song [muted/paused] hai to tumhe [resume/unmute] karna hai ya stop??
+
 func init() {
 	helpTexts["/end"] = `<i>Stop playback and leave the voice chat.</i>
 
