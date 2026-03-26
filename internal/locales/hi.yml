@@ -481,7 +481,7 @@ play_added_to_queue_single: |
   <b>▫ अवधि:</b> {duration}
   <b>▫ अनुरुद्धकर्ता:</b> {by}
 
-channel_play_depreciated: "⚠️ यह नियन्त्रक अब पुराना हो चुका है। संगीत के लिए अपना प्रणाल निर्धारित करने हेतु <code><a>/cplay --set [channel_id] </code></a> का प्रयोग करें।"
+channel_play_depreciated: "⚠️ यह नियन्त्रक अब पुराना हो चुका है। संगीत के लिए अपना प्रणाल निर्धारित करने हेतु <code>/cplay --set [channel_id]</code> का प्रयोग करें।"
 play_multiple_tracks_too_long_header: "<b>⚠️ {count} संगीत छोड़ दिए गए (अधिकतम अवधि {limit_mins} मिनट):</b>"
 play_multiple_tracks_too_long_item: "— <i>{title}</i>"
 play_multiple_tracks_too_long_more: "... और {remaining} अन्य।"
