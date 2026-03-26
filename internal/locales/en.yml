@@ -479,7 +479,7 @@ play_added_to_queue_single: |
   <b>▫ Duration:</b> {duration}
   <b>▫ Requested by:</b> {by}
 
-channel_play_depreciated: "⚠️ This handler is deprecated. Use <code><a>/cplay --set channel_id </code></a> to set your channel for playback."
+channel_play_depreciated: "⚠️ This handler is deprecated. Use <code>/cplay --set channel_id</code> to set your channel for playback."
 play_multiple_tracks_too_long_header: "<b>⚠️ {count} tracks were skipped (max duration {limit_mins} mins):</b>"
 play_multiple_tracks_too_long_item: "— <i>{title}</i>"
 play_multiple_tracks_too_long_more: "... and {remaining} more."
@@ -931,12 +931,14 @@ help_owner: |
   <i>Exclusive tools for managing sudoers, executing system code, and performing bot administration securely.</i>
 
   <b>Commands:</b>
+  <blockquote>
   <b>/addsudo</b> - Add a new user to bot's sudolist
   <b>/delsudo</b> - Remove a user from bot's sudolist
   <b>/eval</b> - Execute Go code snippets
   <b>/maintenance</b> — Manage the bot’s maintenance mode
   <b>/restart</b> — Restart the bot
   <b>/sh</b> - Run shell commands
+  </blockquote>
 
 help_sudo: |
   ⚡ <b>Sudoer Commands</b>
@@ -944,11 +946,13 @@ help_sudo: |
   <i>Advanced tools for managing bot behavior, monitoring performance, and controlling logging and automation.</i>
 
   <b>Commands:</b>
+  <blockquote>
   <b>/active</b> - Shows total active chats
   <b>/autoleave</b> - Toggle automatic chat leaving
   <b>/logger</b> - Enable or disable logger
   <b>/stats</b> - Display the bot & system stats
   <b>/logs</b> - Get the system logs 
+  </blockquote>
 
 help_admin: |
   🛠 <b>Admin Commands</b>
@@ -956,6 +960,7 @@ help_admin: |
   <i>Music and playback control tools for admins to handle playback easily.</i>
 
   <b>Commands:</b>
+  <blockquote>
   <b>/speed</b> - Change playback speed
   <b>/skip</b> - Skip the current song
   <b>/pause</b> - Pause the current playback
@@ -973,13 +978,15 @@ help_admin: |
   <b>/loop</b> - Enable or disable looping
   <b>/stop</b> - Stop playback and leave VC
   <b>/nothumb</b> - Enable or disable artwork/thumbnail in playback messages
-
+  </blockquote>
+  
 help_public: |
   🌍 <b>Public Commands</b>
 
   <i>Features for playing songs, viewing queues, checking latency, and reporting bugs.</i>
 
   <b>Commands:</b>
+  <blockquote>
   <b>/play</b> - Play a song
   <b>/queue</b> - View all tracks currently queued
   <b>/ping</b> - Check bot’s network latency
@@ -990,4 +997,5 @@ help_public: |
   <b>/reload</b> - Reload admin or cache data
   <b>/json</b> - Show message JSON structure
   <b>/sudolist</b> - View sudo user list
-
+  </blockquote>
+  

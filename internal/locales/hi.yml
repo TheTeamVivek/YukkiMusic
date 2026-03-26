@@ -1,0 +1,1003 @@
+name: "🇮🇳 हिन्दी"
+
+# buttons
+CONFIRM_RESUME_BTN: "▶️ पुनः चलाएँ"
+CONFIRM_UNMUTE_BTN: "🔊 सशब्द"
+CONFIRM_STOP_BTN: "⏹️ रोकें"
+ADD_ME_BTN: "⚡ मुझे अपने समूह में जोड़ें"
+BROADCAST_CANCEL_BTN: "🚫 प्रसारण रद्द करें"
+CLOSE_BTN: "बन्द करें"
+DOWNLOAD_CANCEL_BTN: "🚦 डाउनलोड रद्द करें"
+GC_HELP_BTN: "📒 आदेश"
+
+START_HELP_BTN: "❓ सहायता एवं आदेश"
+
+UPDATES_BTN: "📢 अद्यतन"
+SUPPORT_BTN: "💬 सहायता"
+
+HELP_ADMINS_BTN: "🛠 प्रशासक"
+HELP_PUBLIC_BTN: "🌍 सार्वजनिक"
+HELP_OWNER_BTN: "👑 स्वामी"
+HELP_SUDOERS_BTN: "⚡ विशेषाधिकारी"
+
+BACK_BTN: "⬅️ पीछे"
+
+# basically this string used in /command [bool]
+invalid_bool: "⚠️ <b>अमान्य मान।</b>\n\n<i>कृपया '<code>enable</code>' अथवा '<code>disable</code>' का प्रयोग करें।</i>"
+
+active_chats_info: "📊 <b>सक्रिय वार्तालाप:</b>\n\nसम्पूर्ण प्रणाली में <i>{count}</i> सक्रिय वार्तालाप हैं।"
+active_chats_info_with_broken: "📊 <b>सक्रिय वार्तालाप:</b>\n\nसम्पूर्ण प्रणाली में <i>{count}</i> सक्रिय वार्तालाप हैं, किन्तु उनमें से <i>{broken}</i> के प्रदर्शन में त्रुटि हो सकती है।"
+
+
+# 🚫 Assistant Restricted / Banned
+assistant_restricted_warning: |
+  ⚠️ <b>सहायक प्रतिबन्धित</b>
+
+  सहायक {assistant} (परिचय पत्र: <code>{id}</code>) इस वार्तालाप में <b>वर्जित</b> या प्रतिबन्धित कर दिया गया है।
+  जब तक यह स्थिति बनी रहेगी, मैं संगीत नहीं चला सकता, प्रतीक्षा सूची का प्रबन्धन नहीं कर सकता, या संगीत संचिकाओं को हटा नहीं सकता।
+
+  <i>संगीत की समस्त सुविधाओं को पुनर्स्थापित करने के लिए सहायक को वर्जित सूची से हटाएँ 🎵</i>
+
+# 🧩 Common auth messages
+auth_no_user: "⚠️ कृपया एक उपयोगकर्ता प्रदान करें — प्रयोग करें:\n{cmd} [उपयोगकर्ता_परिचय_पत्र] या किसी उपयोगकर्ता के सन्देश के उत्तर में {cmd} का प्रयोग करें।"
+user_extract_fail: "⚠️ उस उपयोगकर्ता को प्राप्त करने में असमर्थ: <i>{error}</i>"
+auth_limit_reached: "⚠️ इस वार्तालाप ने अधिकतम अधिकृत उपयोगकर्ता सीमा ({limit}) प्राप्त कर ली है। कृपया नया जोड़ने से पूर्व किसी को हटाएँ।"
+already_authed: "⚠️ वह उपयोगकर्ता पूर्व से ही अधिकृत है — पुनः जोड़ने की आवश्यकता नहीं है।"
+
+# 🤖 Add auth
+cannot_authorize_user: "⚠️ इस उपयोगकर्ता को अधिकृत नहीं किया जा सकता।\nबोट के स्वामी, स्वयं सहायक, या आपको अधिकार की आवश्यकता नहीं है।"
+addauth_user_is_admin: "⚠️ यह उपयोगकर्ता पूर्व से ही समूह का प्रशासक है। किसी अधिकार की आवश्यकता नहीं है।"
+addauth_bot_user: "🤖 आप एक बोट को अधिकार सूची में नहीं जोड़ सकते — अधिकृत उपयोगकर्ता मनुष्य होने चाहिए!"
+addauth_add_fail: "❌ अधिकृत उपयोगकर्ता को जोड़ने में विफल: {error}"
+addauth_success_with_count: "✅ {user} को जोड़ा गया।\nअब {count}/{limit} अधिकृत उपयोगकर्ता।"
+addauth_success: "✅ {user} को अधिकृत उपयोगकर्ताओं की सूची में सफलतापूर्वक जोड़ा गया।"
+
+# 🤖 Bot Added to Chat
+bot_added_normal: "🎵 मुझे जोड़ने के लिए धन्यवाद! संगीत आरम्भ करने के लिए /play [गीत] का प्रयोग करें।"
+
+# 🛠️ Bot Added During Maintenance
+bot_added_maintenance: "⚠️ मैं वर्तमान में अनुरक्षण के अधीन हूँ और शीघ्र ही वापस आऊँगा। आपके धैर्य के लिए धन्यवाद! ⏰"
+maint_reason_generic: "<i>📝 कारण: {reason}</i>"
+
+# ⚠️ Bot Demotion
+bot_demotion_goodbye: |
+  <b>⚠️ अनुमति लुप्त</b>
+
+  मुझे <b>प्रशासक पद से हटा</b> दिया गया है और अब मैं अपने कर्तव्यों का पालन नहीं कर सकता।
+  उचित अधिकारों के बिना, मैं यहाँ कार्य करने में अक्षम हूँ, अतः मैं अब यह <i>वार्तालाप छोड़ रहा हूँ</i>।
+
+  <b>अलविदा 👋</b>
+
+broadcast_already_running: "⚠️ एक प्रसारण पूर्व से ही चल रहा है।\n\nकृपया इसके पूर्ण होने की प्रतीक्षा करें या इसे पहले निम्न माध्यम से रद्द करें:\n• <code>/broadcast -cancel</code>\n• अथवा प्रगति सन्देश पर 'प्रसारण रद्द करें' बटन दबाएँ"
+broadcast_parse_failed: "❌ प्रसारण आदेश के विश्लेषण में विफल:\n<code>{error}</code>"
+broadcast_no_content: "⚠️ प्रसारण के लिए कोई सामग्री प्रदान नहीं की गई।\n\n<b>प्रयोग:</b> <code>{cmd} [पाठ या सन्देश का उत्तर दें]</code>\n\n<b>उदाहरण:</b>\n<code>{cmd} नमस्कार सभी को!</code>"
+broadcast_fetch_chats_failed: "❌ सेवा प्राप्त वार्तालापों को प्राप्त करने में विफल:\n<code>{error}</code>"
+broadcast_fetch_users_failed: "❌ सेवा प्राप्त उपयोगकर्ताओं को प्राप्त करने में विफल:\n<code>{error}</code>"
+broadcast_no_targets: "⚠️ प्रसारण के लिए कोई लक्ष्य नहीं मिला।\n\nसुनिश्चित करें कि आपने संकेतों द्वारा सभी लक्ष्यों को वर्जित नहीं किया है।"
+broadcast_initializing: "📡 प्रसारण आरम्भ किया जा रहा है...\n\nकृपया प्रतीक्षा करें..."
+broadcast_cancelled_header: "🚫 प्रसारण रद्द किया गया"
+broadcast_completed_header: "✅ प्रसारण पूर्ण हुआ"
+broadcast_progress_header: "📡 प्रसारण हो रहा है..."
+broadcast_total_chats: "📊 कुल वार्तालाप: {done}/{total} ({progress}%)"
+broadcast_total_users: "👥 कुल उपयोगकर्ता: {done}/{total} ({progress}%)"
+broadcast_failed_chats: "❌ विफल वार्तालाप: {count}"
+broadcast_failed_users: "❌ विफल उपयोगकर्ता: {count}"
+broadcast_delay: "⏱ विलम्ब: {delay}s"
+broadcast_elapsed: "⏰ व्यतीत समय: {elapsed}"
+broadcast_eta: "⏳ अनुमानित समय: {eta}"
+broadcast_success_rate: "✨ सफलता दर: {rate}% ({sent}/{total})"
+broadcast_not_running: "ℹ️ वर्तमान में कोई प्रसारण नहीं चल रहा है।"
+broadcast_cancel_success: "🚫 प्रसारण सफलतापूर्वक रद्द किया गया।"
+broadcast_cancel_owner_only: "⚠️ केवल स्वामी ही प्रसारण रद्द कर सकता है।"
+broadcast_cancel_none_running: "ℹ️ वर्तमान में कोई प्रसारण नहीं चल रहा है।"
+broadcast_cancel_done: "🚫 प्रसारण रद्द कर दिया गया।"
+
+# 🎧 CPlay (Channel Play)
+
+cplay_id_not_set: "⚠️ चैनल प्ले निर्धारित नहीं है।\nइसे निर्धारित करने के लिए <code>/cplay --set [channel_id]</code> का प्रयोग करें।"
+cplay_usage: "<b>प्रयोग:</b> <code>/cplay --set [channel_id]</code>"
+cplay_invalid_chat_id: "<b>अमान्य वार्तालाप परिचय पत्र:</b> कृपया चैनलप्ले के लिए एक मान्य पूर्णांक परिचय पत्र प्रदान करें।"
+cplay_resolve_peer_fail: "<b>चैनल जानकारी प्राप्त करने में विफल:</b> चैनल विवरण प्राप्त नहीं किया जा सका। सुनिश्चित करें कि मेरी इस चैनल तक पहुँच है।"
+cplay_invalid_target: "<b>अमान्य लक्ष्य:</b> प्रदान किया गया परिचय पत्र एक मान्य चैनल नहीं है।"
+cplay_channel_not_accessible: "<b>चैनल तक पहुँच नहीं:</b> चैनल की सूचना प्राप्त नहीं की जा सकी। कृपया सुनिश्चित करें कि मैं लक्ष्य चैनल में एक प्रशासक हूँ।"
+cplay_save_error: "<b>त्रुटि:</b> चैनल प्ले विन्यास सुरक्षित करने में विफल।"
+cplay_enabled: "✅ <b>चैनल प्ले सक्षम।</b> अब समस्त <code>/c</code> आदेश चैनल <code>{channel_id}</code> में कार्य करेंगे।"
+
+# Callback handler messages
+invalid_request: "⚠️ अमान्य अनुरोध।"
+unknown_action: "⚠️ अज्ञात क्रिया।"
+download_cancelled: "✅ डाउनलोड रद्द किया गया।"
+no_download_to_cancel: "ℹ️ रद्द करने के लिए कोई डाउनलोड नहीं है।"
+
+# Pause callback
+cb_pause_success: "⏸️ संगीत {position} पर रोका गया"
+cb_pause_message: |
+  <b>⏸️ संगीत विराम</b>
+
+  <b>▫ संगीत:</b> <a href="{url}">{title}</a>
+  <b>▫ स्थिति:</b> {position} / {duration}
+  <b>▫ विरामकर्ता:</b> {user}
+
+# Resume callback
+cb_already_playing: "ℹ️ संगीत पूर्व से ही चल रहा है।"
+cb_resume_failed: "❌ संगीत पुनः आरम्भ करने में विफल।"
+cb_resume_success: "▶️ {position} पर पुनः आरम्भ।"
+cb_resume_message: |
+  <b>🎵 अब चल रहा है:</b>
+
+  <b>▫ संगीत:</b> <a href="{url}">{title}</a>
+  <b>▫ अवधि:</b> {duration}
+  <b>▫ पुनः आरम्भकर्ता:</b> {user}
+
+# Replay callback
+cb_replaying: "🔁 <b>वर्तमान संगीत पुनः चलाया जा रहा है...</b>"
+cb_replay_failed: "❌ संगीत पुनः चलाने में विफल।"
+cb_replay_success: "🔁 संगीत पुनः चलाया गया।"
+cb_replay_edited: "🔁 संगीत {user} द्वारा पुनः चलाया गया।"
+
+# Skip callback
+cb_skip_queue_empty: "⏹️ संगीत बन्द — प्रतीक्षा सूची रिक्त है।"
+cb_skip_download_failed: "❌ अगला संगीत डाउनलोड करने में विफल।"
+cb_skip_play_failed: "❌ अगला संगीत चलाने में विफल।"
+cb_skip_success: "⏭️ संगीत छोड़ दिया गया।"
+cb_skip_edited: "⏭️ {user} द्वारा छोड़ा गया"
+
+# Stop callback
+cb_stop_success: "⏹️ संगीत बन्द।"
+
+# Mute/Unmute callback
+cb_mute_success: "🔇 निःशब्द किया गया।"
+cb_mute_message: |
+  <b>🔇 संगीत निःशब्द</b>
+
+  <b>▫ संगीत:</b> <a href="{url}">{title}</a>
+  <b>▫ निःशब्दकर्ता:</b> {user}
+
+cb_unmute_success: "🔊 सशब्द किया गया।"
+
+cb_seek_success: "⏩ {seconds} क्षण आगे बढ़ाया गया"
+cb_seek_near_end: "⚠️ {seconds} क्षण आगे नहीं बढ़ाया जा सकता — संगीत समाप्ति के निकट है।"
+cb_seek_edited: "⏩ {seconds} क्षण आगे बढ़ाया गया — {user} द्वारा"
+
+cb_seekback_success: "⏪ {seconds} क्षण पीछे हटाया गया"
+cb_seekback_edited: "⏪ {seconds} क्षण पीछे हटाया गया — {user} द्वारा"
+
+# 🗑️ Delete auth
+del_auth_not_authorized: "⚠️ वह उपयोगकर्ता अधिकृत नहीं है — हटाने के लिए कुछ भी नहीं है।"
+del_auth_remove_fail: "❌ अधिकृत उपयोगकर्ता को हटाने में विफल: <code>{error}</code>"
+del_auth_success: "✅ {user} को अधिकृत उपयोगकर्ताओं की सूची से सफलतापूर्वक हटाया गया।"
+
+# 📜 Auth list
+authlist_fetch_fail: "❌ अधिकृत उपयोगकर्ताओं की सूची प्राप्त करने में विफल: <code>{error}</code>"
+authlist_empty: "ℹ️ इस वार्तालाप में कोई अधिकृत उपयोगकर्ता नहीं है।"
+authlist_fetching: "⏳ अधिकृत उपयोगकर्ताओं की सूची प्राप्त की जा रही है..."
+authlist_header: "<b>अधिकृत उपयोगकर्ता:</b>"
+authlist_user_fail: "{index}. <code>{user_id}</code> (उपयोगकर्ता सूचना प्राप्त नहीं की जा सकी)"
+authlist_user_entry: "{index}. {user} (<code>{user_id}</code>)"
+authlist_total: "<b>कुल:</b> {count} उपयोगकर्ता"
+
+autoleave_fetch_fail: "⚠️ <b>स्वचालित प्रस्थान स्थिति प्राप्त करने में विफल।</b>"
+autoleave_status: "🏃‍♂️ <b>स्वचालित प्रस्थान नियन्त्रण</b>\n\nसक्षम होने पर, सहायक स्वचालित रूप से वार्तालाप छोड़ देगा।\nप्रयोग: {cmd} [enable|disable]\nवर्तमान स्थिति: {action}"
+autoleave_already: "⚠️ स्वचालित प्रस्थान पूर्व से ही {action} है"
+autoleave_update_fail: "⚠️ <b>स्वचालित प्रस्थान स्थिति अद्यतन करने में विफल।</b>"
+autoleave_updated: "🏃‍♂️ स्वचालित प्रस्थान {action} कर दिया गया है"
+
+enabled: "सक्षम"
+disabled: "अक्षम"
+
+bug_usasge: "⚠️ कृपया त्रुटि का वर्णन करें। प्रयोग: {cmd} <समस्या> या किसी सन्देश का उत्तर दें।"
+bug_thanks: "✅ आपकी त्रुटि सूचना के लिए धन्यवाद! इसे विकासकर्ताओं को भेज दिया गया है।"
+
+bug_report_format: |
+  <b>🐞 नवीन त्रुटि सूचना</b>
+
+  <b>प्रेषक:</b> {user} (<code>{user_id}</code>)
+  <b>वार्तालाप:</b> {chat} (<code>{chat_id}</code>)
+
+  <b>सूचना:</b>
+  <pre>{report}</pre>
+  
+clear_no_active: "⚠️ <b>रिक्त करने के लिए कोई सक्रिय संगीत या प्रतीक्षा सूची नहीं है।</b>"
+clear_success: "✅ {user} द्वारा प्रतीक्षा सूची रिक्त कर दी गई है।\n<i>आप नवीन गीत जोड़ने से पूर्व <code>/{cmd}</code> का प्रयोग कर इसे पुनर्स्थापित कर सकते हैं</i>"
+
+err_assistant_banned: |
+  <b>🚫 सहायक प्रतिबन्धित</b>
+
+  मैं संगीत नहीं चला सकता क्योंकि {user} (उपयोगकर्ता परिचय पत्र: <code>{id}</code>) इस वार्तालाप से <b>वर्जित</b> या <b>हटा</b> दिया गया है।
+
+  <i>✅ क्या आपने उन्हें पूर्व में ही वर्जित सूची से हटा दिया है? अद्यतन करने के लिए /reload का प्रयोग करें।</i>
+
+err_admin_permission_required: |
+  ⚠️ <b>प्रशासक अनुमति आवश्यक</b>
+
+  मुझे इस वार्तालाप के सदस्यों के प्रबन्धन और जाँच के लिए <i>प्रशासक पहुँच</i> की आवश्यकता है।
+  
+  ➤ <b>मुझे <code>वार्तालाप प्रबन्धन / उपयोगकर्ताओं को आमन्त्रित करें</code> अनुमति के साथ पदोन्नत करें।</b>
+
+err_assistant_get_failed: |
+  ⚠️ प्रणाली इस वार्तालाप के लिए एक सहायक नियुक्त नहीं कर सकी।
+
+  <i>यह सामान्यतः एक अस्थायी समस्या है और पुनः प्रयास करने पर हल हो जानी चाहिए।</i>
+
+  <b>➡️ कृपया अपने आदेश का पुनः प्रयास करें।</b>
+
+  <i>यदि यह निरन्तर होता रहता है, तो कृपया सहायता समूह से सम्पर्क करें ताकि हम आपकी सहायता कर सकें।</i>
+  
+err_assistant_join_rate_limited: |
+  ⚠️ सहायक इस वार्तालाप में सम्मिलित नहीं हो सकता क्योंकि इसने अनुमत समूहों की अधिकतम संख्या प्राप्त कर ली है।
+
+err_assistant_join_request_sent: |
+  ⚠️ सहायक ने सम्मिलित होने का अनुरोध भेजा है, किन्तु मैं इसे स्वचालित रूप से अनुमोदित नहीं कर सका।
+
+  <i>✅ कृपया अनुरोध को स्वयं अनुमोदित करें, फिर पुनः प्रयास करें।</i>
+
+  <b>➡️ कृपया अपने आदेश का पुनः प्रयास करें।</b>
+
+err_assistant_invite_link_fetch: |
+  ⚠️ आमन्त्रण सूत्र प्राप्त करने में विफल:
+  <i>{error}</i>
+
+err_assistant_invite_failed: |
+  ⚠️ सहायक इस वार्तालाप में सम्मिलित होने में विफल रहा:
+  <i>{error}</i>
+
+err_connection_timeout: |
+  ⚠️ <b>ध्वनि वार्तालाप सम्पर्क समय-सीमा समाप्त</b>
+
+  टेलीग्राम वर्तमान में ध्वनि वार्तालाप सम्पर्क का उचित उत्तर नहीं दे रहा है।
+
+  <i>यदि यह निरन्तर होता रहता है, तो ध्वनि वार्तालाप समाप्त करें और पुनः आरम्भ करें, फिर पुनः प्रयास करें।</i>
+
+err_no_active_voicechat: |
+  🎙️ <b>कोई सक्रिय ध्वनि वार्तालाप नहीं</b>
+
+  मैं सम्मिलित नहीं हो सकता — कृपया पहले एक ध्वनि वार्तालाप आरम्भ करें।
+
+  <i>पूर्व में ही आरम्भ कर दिया है? अद्यतन करने के लिए /reload का प्रयोग करें।</i>
+
+err_fetch_failed: |
+  ⚠️ वार्तालाप सूचना प्राप्त करने में विफल:
+  <i>{error}</i>
+
+err_peer_resolve_failed: |
+  ⚠️ सहकर्मी सूचना संकल्प में विफल। कृपया कुछ समय पश्चात प्रयास करें या सहायक को पुनः जोड़ें।
+
+err_rtmp_missing_params: |
+  <b>⚠️ RTMP विवरण अनुपस्थित</b>
+
+  <i>प्रतीत होता है कि इस वार्तालाप में एक <b>RTMP प्रवाह</b> सक्रिय है, किन्तु आपने आवश्यक
+  <b>RTMP यू.आर.एल.</b> या <b>प्रवाह कुञ्जी</b> प्रदान नहीं की है। इनके बिना, मैं RTMP पर संगीत प्रवाह आरम्भ नहीं कर सकता।</i>
+
+  <b>प्रयोग करें:</b> <code>/setrtmp [वार्तालाप_परिचय_पत्र] [यू.आर.एल.+कुञ्जी]</code>
+
+  <i>📌 एक बार RTMP विवरण निर्धारित हो जाने पर, आप प्रवाह आरम्भ कर सकते हैं।</i>  
+  <i>➡️ यदि आप RTMP का प्रयोग नहीं करना चाहते, तो इसके स्थान पर सामान्य ध्वनि वार्तालाप का प्रयोग करें।</i>
+  
+err_unknown: |
+  ⚠️ अज्ञात त्रुटि उत्पन्न हुई:
+  <i>{error}</i>
+
+err_fetch_tracks: |
+  ⚠️ <b>संगीत विवरण प्राप्त करने में विफल।</b>
+  कृपया कुछ समय पश्चात प्रयास करें।
+
+err_download_internal: |
+  ⚠️ एक अप्रत्याशित आन्तरिक त्रुटि के कारण <b>डाउनलोड विफल</b> रहा।
+  कृपया कुछ समय पश्चात प्रयास करें।
+  
+flood_seconds: "⏳ गति मन्द करें! {duration} क्षण पश्चात पुनः प्रयास करें।"
+flood_minutes: "⏳ कृपया इस आदेश का पुनः प्रयोग करने से पूर्व {duration} मिनट प्रतीक्षा करें।"
+
+help_private_only: "🤖 नमस्कार! सहायता और आदेशों के लिए, कृपया मुझे सीधे व्यक्तिगत सन्देश भेजें — मैं व्यक्तिगत वार्तालाप में अधिक उत्तरदायी हूँ!"
+help_main: "📚 <b>सहायता सूची</b>\n\nप्रबन्धन, नियन्त्रण और सहायक को अनुकूलित करने के विस्तृत आदेशों को जानने के लिए नीचे एक श्रेणी का चयन करें।"
+
+jump_no_active: "⚠️ कूदने के लिए कोई सक्रिय संगीत नहीं है।"
+jump_usage: "⚠️ कृपया क्षण प्रदान करें।\nउदाहरण: <code>{cmd} 120</code>"
+jump_invalid_position: "⚠️ अमान्य स्थिति।\nउदाहरण: <code>{cmd} 120</code>"
+jump_too_close_end: "⚠️ <b>{position}</b> पर नहीं कूदा जा सकता — यह संगीत के अन्त के बहुत निकट है।"
+jump_failed: "❌ <b>{position}</b> पर कूदने में विफल।\nत्रुटि: <code>{error}</code>"
+jump_success: "⏩ <u>{duration}</u> में से <u>{position}</u> पर कूदे।"
+
+lang_same: "ℹ️ आप पूर्व से ही इस भाषा का प्रयोग कर रहे हैं।"
+lang_select: "🌐 अपनी अभीष्ट भाषा चुनें:"
+lang_fail: "❌ भाषा अद्यतन करने में विफल। कृपया कुछ समय पश्चात प्रयास करें।"
+lang_success: "✅ भाषा सफलतापूर्वक {lang_name} में अद्यतन कर दी गई।"
+
+logger_playback_started: "संगीत आरम्भ"
+logger_playback_queued: "संगीत प्रतीक्षा सूची में"
+
+logger_bot_added: |
+  🤖 <b>बोट नवीन समूह में जोड़ा गया</b>
+  
+  <blockquote>
+  <b>समूह नाम:</b> {group_name}
+  <b>समूह परिचय पत्र:</b> {group_id}
+  <b>समूह उपयोगकर्ता नाम:</b> {group_username}
+
+  <b>जोड़ने वाला:</b> {added_by_name}
+  <b>उपयोगकर्ता परिचय पत्र:</b> {added_by_id}
+  <b>उपयोगकर्ता नाम:</b> {added_by_username}
+
+  <b>समय:</b> {date_time}
+  </blockquote>
+#  👥 <b>सदस्य संख्या:</b> {members_count}
+
+logger_bot_removed: |
+
+  🤖 <b>बोट समूह से हटाया गया</b>
+  <blockquote>
+  <b>समूह नाम:</b> {group_name}
+  <b>समूह परिचय पत्र:</b> {group_id}
+  <b>समूह उपयोगकर्ता नाम:</b> {group_username}
+
+  <b>हटाने वाला:</b> {removed_by_name}
+  <b>उपयोगकर्ता परिचय पत्र:</b> {removed_by_id}
+  <b>उपयोगकर्ता नाम:</b> {removed_by_username}
+
+  <b>समय:</b> {date_time}
+  </blockquote>
+  
+logger_bot_started: |
+  ▶️ <b>{mention} ने सहायक आरम्भ किया</b>
+
+  <b>उपयोगकर्ता नाम:</b> {user_username}
+  <b>परिचय पत्र:</b> {user_id}
+  
+logger_track: "🎧 संगीत:"
+logger_source: "🔗 स्रोत:"
+logger_group: "📌 समूह:"
+logger_requested_by: "👤 अनुरुद्धकर्ता:"
+logger_timestamp: "⏳ समय-चिह्न:"
+
+loop_usage: "🔁 <b>आवृत्ति नियन्त्रण</b>\n\nप्रयोग: {cmd} [संख्या]\n• 0 - आवृत्ति अक्षम करें\n• 1-10 - आवृत्ति संख्या\n\n<i>{count_line}</i>"
+loop_invalid: "⚠️ <b>अमान्य आवृत्ति संख्या।</b>\nअक्षम करने के लिए 0 या आवृत्ति निर्धारित करने के लिए 1-10 का प्रयोग करें।"
+loop_already_set: "⚠️ आवृत्ति पूर्व से ही <b>{count}</b> बार निर्धारित है।"
+loop_disabled: "🔁 आवृत्ति {user} द्वारा <b>अक्षम</b> कर दी गई है"
+loop_set: "🔁 <b>{count}</b> बार आवृत्ति निर्धारित की गई\n└ परिवर्तक: {user}"
+loop_current: "• वर्तमान आवृत्ति: <b>{count}</b> बार"
+
+logger_usage: "⚙️ प्रयोग: <code>{cmd} [enable|disable]</code> - अभिलेखक को सक्षम या अक्षम करने के लिए\n\n{status}"
+logger_status: "📜 वर्तमान स्थिति: {action}"
+logger_check_fail: "❌ अभिलेखक स्थिति जाँचने में विफल: {error}"
+logger_already: "ℹ️ अभिलेखक पूर्व से ही {action} है।"
+logger_update_fail: "❌ अभिलेखक विन्यास अद्यतन करने में विफल: {error}"
+logger_updated: "✅ अभिलेखक सफलतापूर्वक {action} कर दिया गया है।"
+
+# Logs module
+logs_invalid_number: "⚠️ <b>अमान्य संख्या</b>\n\nमान <code>{value}</code> एक मान्य धनात्मक संख्या नहीं है।\n\n<b>प्रयोग:</b> <code>/logs [संख्या]</code> या <code>/logs -old [संख्या]</code>"
+logs_invalid_flag: "⚠️ <b>अमान्य संकेत</b>\n\nअज्ञात संकेत या अमान्य निवेश: <code>{flag}</code>\n\n<b>मान्य विकल्प:</b>\n• <code>/logs</code> - पूर्ण अभिलेख\n• <code>/logs [n]</code> - अन्तिम N पंक्तियाँ\n• <code>/logs -old [n]</code> - प्राचीनतम अभिलेख\n• <code>/logs -clear</code> - अभिलेख रिक्त करें"
+logs_file_error: "❌ <b>अभिलेख संचिका त्रुटि</b>\n\nअभिलेख संचिका तक पहुँचने में त्रुटि उत्पन्न हुई:\n<code>{error}</code>"
+logs_send_error: "❌ <b>अभिलेख प्रेषण विफल</b>\n\nअभिलेख संचिका तैयार करने या भेजने में असमर्थ।\n<code>{error}</code>"
+logs_clear_failed: "❌ <b>रिक्त करना विफल</b>\n\nअभिलेख संचिका रिक्त करने में विफल:\n<code>{error}</code>"
+logs_empty: "📭 <b>कोई अभिलेख उपलब्ध नहीं</b>\n\nअभिलेख संचिका या तो अभी अस्तित्व में नहीं है या उसमें कोई सूचना नहीं है।\n\nअभिलेख उत्पन्न करने के लिए सहायक को कुछ समय तक चलाएँ।"
+logs_preview_header: "📋 <b>वर्तमान अभिलेख पूर्वावलोकन:</b>"
+logs_lines_header: "📋 <b>नवीनतम अभिलेख पंक्तियाँ</b> (अन्तिम {count})"
+logs_old_header: "📋 <b>प्राचीनतम अभिलेख पंक्तियाँ</b> (प्रथम {count})"
+logs_uploading: "⏳ <b>अभिलेख संचिका ऊपर भेजी जा रही है...</b>\n\nजब तक संचिका तैयार हो रही है, कृपया प्रतीक्षा करें।"
+logs_file_caption: "📄 <b>अभिलेख संचिका विवरण</b>\n\n<b>संचिका नाम:</b> <code>{filename}</code>\n<b>आकार:</b> {size_mb} एम.बी.\n<b>अन्तिम संशोधित:</b> {modified}"
+logs_lines_caption: "📋 <b>नवीनतम अभिलेख पंक्तियाँ</b>\n\nवर्तमान अभिलेख की अन्तिम {count} पंक्तियाँ प्रदर्शित।"
+logs_old_caption: "📋 <b>प्राचीनतम अभिलेख पंक्तियाँ</b>\n\nअभिलेख के आरम्भ से प्रथम {count} पंक्तियाँ प्रदर्शित।"
+logs_cleared: "✅ <b>अभिलेख संचिका रिक्त की गई</b>\n\nअभिलेख संचिका सफलतापूर्वक रिक्त कर दी गई।\n<b>पूर्व आकार:</b> {size_mb} एम.बी."
+
+# reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
+maint: "⚠️ मैं वर्तमान में अनुरक्षण के अधीन हूँ और अस्थायी रूप से अनुपलब्ध हूँ। कृपया कुछ समय पश्चात पुनः देखें।\n\n{reason}"
+maint_reason: "<i>📝 कारण: {reason}</i>"
+
+# ⚙️ Maintenance control
+maint_usage: "⚙️ <b>अनुरक्षण नियन्त्रण</b>\n\nप्रयोग: {cmd} [enable|disable] [कारण]\n📜 वर्तमान स्थिति: {status}"
+maint_check_fail: "❌ अनुरक्षण स्थिति जाँचने में विफल: <code>{error}</code>"
+maint_already_enabled: "ℹ️ अनुरक्षण विधा पूर्व से ही सक्षम 🟢 है।"
+maint_already_disabled: "ℹ️ अनुरक्षण विधा पूर्व से ही अक्षम 🔴 है।"
+maint_already_reason_same: "ℹ️ अनुरक्षण उसी कारण के साथ पूर्व से ही सक्षम है।"
+maint_reason_removed: "✅ अनुरक्षण कारण सफलतापूर्वक हटा दिया गया।"
+maint_reason_updated: "✅ अनुरक्षण कारण अद्यतन किया गया।\n📝 कारण: {reason}"
+maint_enabled: "✅ अनुरक्षण विधा सफलतापूर्वक <b>सक्षम</b> कर दी गई है।"
+maint_enabled_reason: "✅ अनुरक्षण विधा सक्षम की गई।\n📝 कारण: {reason}"
+maint_disabled: "✅ अनुरक्षण विधा सफलतापूर्वक <b>अक्षम</b> कर दी गई है।"
+maint_entering: "⚠️ सहायक अनुरक्षण विधा में प्रवेश कर रहा है..."
+enabled_with_reason: "🟢 सक्षम\n📝 कारण: {reason}"
+
+move_usage: "⚠️ प्रयोग: <code>{cmd} [कहाँ से] [कहाँ को]</code>"
+move_invalid_numbers: "⚠️ अमान्य संख्याएँ। उदाहरण: <code>/{cmd} 2 1</code>"
+move_invalid_indexes_min: "⚠️ सूचकाङ्क 0 से अधिक होने चाहिए।"
+move_invalid_indexes_max: "⚠️ प्रतीक्षा सूची में केवल {queue_len} संगीत हैं।"
+move_success: "✅ संगीत को स्थिति {from} से {to} पर {user} द्वारा स्थानान्तरित किया गया।"
+
+# 🔇 Mute messages
+mute_already_muted: "🔇 <b>पूर्व से ही निःशब्द</b>\nइस वार्तालाप में संगीत पूर्व से ही निःशब्द है।\nक्या आप इसे सशब्द करना चाहेंगे?"
+mute_already_muted_with_time: "🔇 <b>पूर्व से ही निःशब्द</b>\nसंगीत निःशब्द है।\n<b>{duration}</b> में स्वतः सशब्द हो जाएगा।"
+mute_invalid_duration: "⚠️ स्वतः सशब्द के लिए अमान्य अवधि।\nयह <b>5</b> और <b>3600</b> क्षण के मध्य होनी चाहिए।"
+mute_invalid_format: "⚠️ अमान्य प्रारूप।\nप्रयोग करें: <code>/{cmd} 30</code> या <code>/{cmd} 30s</code>"
+mute_failed: "❌ <b>संगीत निःशब्द करना विफल</b>\nत्रुटि: <code>{error}</code>"
+mute_success: |
+  🔇 <b>संगीत निःशब्द किया गया</b>
+
+  🎵 संगीत: {title}
+  👤 निःशब्दकर्ता: {user}
+
+mute_success_with_time: |
+  🔇 <b>संगीत निःशब्द किया गया</b>
+
+  🎵 संगीत: {title}
+  👤 निःशब्दकर्ता: {user}
+  <i>⏳ <b>{duration}</b> क्षण में स्वतः सशब्द हो जाएगा</i>
+
+no_song_query: |
+  <b>🎵 क्षमा करें! कोई संगीत नहीं मिला।</b>
+
+  <i>संगीत आरम्भ करने के लिए <b>{cmd} [संगीत का नाम]</b> लिखें या किसी <b>श्रव्य-दृश्य सामग्री</b> का उत्तर दें!</i>
+
+no_song_found: "❌ कोई संगीत नहीं मिला।"
+
+nothumb_status: |
+  🖼️ <b>लघु-चित्र नियन्त्रण</b>
+  
+  <i>सक्षम होने पर, संगीत सन्देश कलाकृति/लघु-चित्र नहीं दिखाएँगे।</i>
+  
+  <b>📊 प्रयोग: {cmd} [enable|disable]</b>
+  
+  <i>लघु-चित्र वर्तमान में {action} है।</i>
+  
+nothumb_fetch_fail: "⚠️ <b>लघु-चित्र विन्यास प्राप्त करने में विफल।</b>"
+nothumb_already: "ℹ️ लघु-चित्र प्रदर्शन पूर्व से ही {action} है।"
+nothumb_update_fail: "⚠️ <b>लघु-चित्र विन्यास अद्यतन करने में विफल।</b>"
+nothumb_updated: "🖼️ लघु-चित्र प्रदर्शन {action} कर दिया गया है।"
+
+only_admin: "⚠️ <b>अनुमति अस्वीकृत!</b>\nकेवल <b>प्रशासक</b> ही इन क्रियाओं को नियन्त्रित कर सकते हैं। आप अब भी गीत चला सकते हैं 🎵।\n\nयदि आप मानते हैं कि आप प्रशासक हैं, तो कृपया अपनी प्रशासक स्थिति अद्यतन करने के लिए /reload का प्रयोग करें।"
+only_admin_or_auth: "⚠️ <b>पहुँच अस्वीकृत</b>\nकेवल <b>प्रशासक</b> या <b>अधिकृत उपयोगकर्ता</b> ही इन क्रियाओं को नियन्त्रित कर सकते हैं।\n\nयदि आप हाल ही में प्रशासक बने हैं, तो अपनी अनुमतियों को अद्यतन करने के लिए /reload का प्रयोग करें।"
+only_admin_or_auth_cb: "⚠️ केवल प्रशासक ही ये क्रियाएँ कर सकते हैं।"
+only_supergroup: "⚠️ यह आदेश केवल समूहों में प्रयुक्त किया जा सकता है।"
+only_owner: "⚠️ केवल सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
+only_sudo: "⚠️ केवल विशेषाधिकारी या सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
+
+pause_invalid_duration: "⚠️ स्वतः पुनः आरम्भ के लिए अमान्य अवधि।\nयह <b>5</b> और <b>3600</b> क्षण के मध्य होनी चाहिए।"
+pause_invalid_format: "⚠️ अमान्य प्रारूप।\nप्रयोग करें: <code>/{cmd} 30</code> या <code>/{cmd} 30s</code>"
+auto_resume_line: "\n<i>⏳ <b>{seconds}</b> क्षण में स्वतः पुनः आरम्भ</i>"
+
+pause_already: |
+  ⏸️ <b>पूर्व से ही विराम</b>
+  संगीत पूर्व से ही विराम स्थिति में है।{auto_resume_line}
+
+pause_success: |
+  ⏸️ <b>संगीत विराम</b>
+
+  🎵 संगीत: {title}
+  ⏱️ स्थिति: {position} / {duration}
+  👤 विरामकर्ता: {user}
+  {auto_resume_line}
+
+play_single_track_too_long: |
+  ⚠️ आप {limit_mins} मिनट से अधिक लम्बे गीत नहीं चला सकते।
+  <i>{title}</i> को छोड़ दिया गया।
+
+play_download_failed: |
+  ❌ "<i>{title}</i>" को अभिलेखित करने में विफल।
+  त्रुटि: <code>{error}</code>
+
+play_added_to_queue_single: |
+  <b>🎵 प्रतीक्षा सूची में जोड़ा गया:</b> #{index}
+
+  <b>▫ संगीत:</b> <a href="{url}">{title}</a>
+  <b>▫ अवधि:</b> {duration}
+  <b>▫ अनुरुद्धकर्ता:</b> {by}
+
+channel_play_depreciated: "⚠️ यह नियन्त्रक अब पुराना हो चुका है। संगीत के लिए अपना प्रणाल निर्धारित करने हेतु <code>/cplay --set [channel_id]</code> का प्रयोग करें।"
+play_multiple_tracks_too_long_header: "<b>⚠️ {count} संगीत छोड़ दिए गए (अधिकतम अवधि {limit_mins} मिनट):</b>"
+play_multiple_tracks_too_long_item: "— <i>{title}</i>"
+play_multiple_tracks_too_long_more: "... और {remaining} अन्य।"
+play_all_tracks_skipped: "❌ अवधि सीमा के कारण सभी पाए गए संगीत छोड़ दिए गए।"
+play_failed: "❌ चलाने में विफल\nत्रुटि: {error}"
+play_unable: "<b> ❌ चलाने में असमर्थ </b>\n\n<i>कृपया <b>ध्वनि वार्तालाप पुनः आरम्भ</b> करें।</i>"
+play_downloading_song: "📥 संगीत \"{title}\" डाउनलोड किया जा रहा है"
+play_download_canceled: "⚠️ {user} द्वारा डाउनलोड रद्द।"
+play_added_multiple_header: "➕ {user} द्वारा <b>{count} संगीत जोड़े गए</b>"
+play_queue_limit_hint: "⚠️ <i>प्रतीक्षा सूची की सीमा पूर्ण — कुछ संगीत छोड़ दिए गए।</i>"
+play_queue_view_hint: "<i>पूर्ण सूची देखने के लिए /queue का प्रयोग करें।</i>"
+
+# 🏓 Ping messages
+ping_start: "🏓 पिंग किया जा रहा है..."
+ping_result: |
+  <b>🏓 पोंग</b>: <code>{latency}मि.से.</code>
+  
+  <b><u>🤖 {bot} प्रणाली आँकड़े:</u></b>
+  
+  <b>सक्रियता समय:</b> {uptime}
+  <b>मुख्य स्मृति प्रयोग:</b> {ram_info}
+  <b>प्रक्रमक प्रयोग:</b> {cpu_usage}
+  <b>डिस्क प्रयोग:</b> {disk_usage}
+
+position_now: |
+  🎵 <b>{title}</b>
+  📍 <code>{position} / {duration}</code>
+  ⚙️ गति: <b>{speed}x</b>
+
+queue_limit_reached: "⚠️ प्रतीक्षा सूची की सीमा पूर्ण ({limit} संगीत अधिकतम)। सूची रिक्त करने के लिए /clear का प्रयोग करें।"
+queue_no_active: "⚠️ <b>कोई सक्रिय संगीत नहीं।</b>\n\n<i>वर्तमान में प्रतीक्षा सूची में कुछ भी नहीं है।</i>"
+queue_header: "🎶 <b>वर्तमान प्रतीक्षा सूची</b>"
+queue_now_playing: "▶️ <b>अब चल रहा है:</b>"
+queue_up_next: "⏭️ <b>अगला:</b>"
+queue_more_line: "\n… और {remaining} अन्य"
+queue_empty_tail: "📭 <i>प्रतीक्षा सूची में कोई और संगीत नहीं है।</i>"
+queue_empty: "⚠️ <b>प्रतीक्षा सूची पूर्व से ही रिक्त है।</b>"
+queue_restored: "✅ प्रतीक्षा सूची में <b>{count}</b> संगीत सफलतापूर्वक पुनर्स्थापित किए गए।"
+queue_restore_no_data: "❌ पुनर्स्थापित करने के लिए कोई रिक्त प्रतीक्षा सूची नहीं मिली, अथवा एक नया गीत पूर्व में ही जोड़ा जा चुका है।"
+
+# 🔄 Reload
+reload_start: "⚙️ प्रशासक संचित-स्मृति, ध्वनि वार्तालाप स्थिति, और सहायक स्थिति को पुनः लोड किया जा रहा है..."
+
+reload_done: "<b>⚙️ पुनः लोड पूर्ण:</b>\n\n{summary}"
+
+reload_admin_cache_ok: "<b>• प्रशासक संचित-स्मृति:</b> <i>✅ पूर्ण</i>"
+reload_admin_cache_fail: "<b>• प्रशासक संचित-स्मृति:</b> <i>❌ ({error})</i>"
+
+reload_voice_inactive: "<b>• ध्वनि वार्तालाप:</b> <i>⚪ निष्क्रिय</i>"
+reload_voice_admin_required: "<b>• ध्वनि वार्तालाप:</b> <i>❌ प्रशासक अनुमति आवश्यक</i>"
+reload_voice_fail: "<b>• ध्वनि वार्तालाप:</b> <i>❌ ({error})</i>"
+reload_voice_active: "<b>• ध्वनि वार्तालाप:</b> <i>✅ सक्रिय</i>"
+
+reload_assistant_banned: "<b>• सहायक:</b> <i>❌ वर्जित</i>"
+reload_assistant_admin_required: "<b>• सहायक:</b> <i>❌ प्रशासक अनुमति आवश्यक</i>"
+reload_assistant_fail: "<b>• सहायक:</b> <i>❌ ({error})</i>"
+reload_assistant_present: "<b>• सहायक:</b> <i>✅ उपस्थित</i>"
+reload_assistant_not_present: "<b>• सहायक:</b> <i>⚪ उपस्थित नहीं</i>"
+reload_room_reset: "<b>• कक्ष:</b> <i>पुनर्निर्धारित ✅</i>"
+
+
+remove_usage: "⚠️ <b>अमान्य प्रयोग।</b>\nप्रयोग: <code>{cmd} [सूचकाङ्क]</code>"
+remove_invalid_index: "⚠️ <b>अमान्य सूचकाङ्क।</b> यह एक <b>संख्या</b> होनी चाहिए।"
+remove_index_too_small: "⚠️ <b>सूचकाङ्क 0 से अधिक होना चाहिए।</b>"
+remove_index_too_big: "⚠️ अमान्य सूचकाङ्क। प्रतीक्षा सूची में केवल <b>{total}</b> संगीत हैं।"
+remove_success: "✅ प्रतीक्षा सूची से स्थिति <b>{index}</b> पर संगीत हटा दिया गया।\n👤 द्वारा: {user}"
+
+# 🔁 Replay
+replay_failed: "❌ <b>पुनः चलाना विफल</b>\nत्रुटि: <code>{error}</code>"
+replay_success: |
+  🔁 <b>अब पुनः चलाया जा रहा है</b>
+
+  🎵 शीर्षक: {title}
+  ⏱️ अवधि: <code>{duration}</code>
+  ⚙️ गति: <b>{speed}x</b>
+
+# ▶️ Resume
+resume_already_playing: "ℹ️ <b>पूर्व से ही चल रहा है</b>\nइस वार्तालाप में संगीत पूर्व से ही चल रहा है।\nक्या आप इसे विराम देना चाहेंगे?"
+resume_failed: "❌ <b>संगीत पुनः आरम्भ विफल</b>\nत्रुटि: <code>{error}</code>"
+resume_success: |
+  ▶️ <b>संगीत पुनः आरम्भ किया जा रहा है</b>
+
+  🎵 शीर्षक: {title}
+  📍 स्थिति: {position} / {duration}
+  👤 पुनः आरम्भकर्ता: {user}
+  {speed_line}
+
+restart: "♻️ पुनः आरम्भ हो रहा है..."
+restart_exepath_fail: "❌ निष्पादन योग्य पथ प्राप्त करने में विफल: {error}"
+restart_symlink_fail: "❌ निष्पादन योग्य पथ संकल्प में विफल: {error}"
+restart_service: "{bot} अभी पुनः आरम्भ हुआ है। असुविधा के लिए क्षमा करें।\n\n10–15 क्षण पश्चात पुनः चलाना आरम्भ करें।"
+restart_initiated: "✅ पुनः आरम्भ सफलतापूर्वक आरम्भ किया गया!"
+restart_fail: "❌ पुनः आरम्भ करने में विफल: {error}"
+
+
+room_not_active_cb: "⚠️ वर्तमान में कुछ भी नहीं चल रहा है।"
+room_no_active: "⚠️ <b>कोई सक्रिय संगीत नहीं।</b>\n\n<i>वर्तमान में कुछ भी नहीं चल रहा है।</i>"
+room_not_linked: "⚠️ यह प्रणाल किसी समूह से सम्बद्ध नहीं है।"
+
+room_already_paused: "⏸️ संगीत पूर्व से ही विराम स्थिति में है। निरन्तरता के लिए ▶️ 'पुनः चलाएँ' दबाएँ।"
+room_already_paused_auto: "⏸️ संगीत पूर्व से ही विराम स्थिति में है — {duration} में स्वतः पुनः आरम्भ होगा।"
+room_pause_failed: "❌ संगीत विराम विफल।\n\n<i>{error}</i>"
+
+rtmp_not_configured: |
+  ⚠️ <b>RTMP विन्यस्त नहीं है!</b>
+  
+  कृपया पहले RTMP सर्वर निर्धारित करें:
+  <code>{cmd} rtmps://server/s/streamkey</code>
+
+rtmp_already_streaming: |
+  📡 <b>प्रवाह पूर्व से ही चल रहा है!</b>
+  
+  वर्तमान प्रवाह समाप्त करने के लिए <code>/streamstop</code> का प्रयोग करें।
+
+rtmp_init_failed: |
+  ❌ <b>RTMP प्रवाह आरम्भ करने में विफल:</b>
+  <code>{error}</code>
+
+rtmp_starting_stream: "📡 <b>RTMP प्रवाह आरम्भ किया जा रहा है...</b>"
+
+rtmp_play_failed: |
+  ❌ <b>प्रवाह आरम्भ करने में विफल:</b>
+  <code>{error}</code>
+
+rtmp_now_streaming: |
+  📡 <b>अब प्रवाह हो रहा है (RTMP):</b>
+  
+  <b>▫ संगीत:</b> <a href="{url}">{title}</a>
+  <b>▫ अवधि:</b> {duration}
+  <b>▫ आरम्भकर्ता:</b> {by}
+  
+  ⚠️ <i>सूचना: RTMP में ~15-30 क्षण का संचयन विलम्ब होता है</i>
+
+rtmp_not_streaming: "ℹ️ कोई सक्रिय RTMP प्रवाह नहीं।"
+
+rtmp_stop_failed: |
+  ❌ <b>प्रवाह रोकने में विफल:</b>
+  <code>{error}</code>
+
+rtmp_stopped: |
+  ⏹️ <b>RTMP प्रवाह {user} द्वारा रोका गया</b>
+
+rtmp_configured_not_started: |
+  ℹ️ <b>RTMP स्थिति:</b> आरम्भ नहीं हुआ
+  
+  <b>▫ सर्वर:</b> <code>{server}</code>
+  <b>▫ अवस्था:</b> प्रवाह के लिए तत्पर
+  
+  प्रवाह आरम्भ करने के लिए <code>/stream &lt;अनुसंधान&gt;</code> का प्रयोग करें।
+
+rtmp_status_playing: |
+  📡 <b>RTMP प्रवाह स्थिति</b>
+  
+  <b>▫ अवस्था:</b> ▶️ प्रवाहित हो रहा है
+  <b>▫ स्थिति:</b> {position}
+  <b>▫ सर्वर:</b> <code>{server}</code>
+
+rtmp_status_paused: |
+  📡 <b>RTMP प्रवाह स्थिति</b>
+  
+  <b>▫ अवस्था:</b> ⏸️ विराम
+  <b>▫ सर्वर:</b> <code>{server}</code>
+
+rtmp_status_idle: |
+  📡 <b>RTMP प्रवाह स्थिति</b>
+  
+  <b>▫ अवस्था:</b> ⏹️ निष्क्रिय
+  <b>▫ सर्वर:</b> <code>{server}</code>
+
+rtmp_dm_only: |
+  🔒 <b>सुरक्षा सूचना</b>
+  
+  RTMP परिचय पत्रों को समूहों में कभी भी साझा नहीं किया जाना चाहिए!
+  
+  <b>📩 RTMP विन्यस्त करने के लिए:</b>
+  1. मेरा व्यक्तिगत वार्तालाप खोलें: @{bot_username}
+  2. भेजें: <code>{cmd} &lt;वार्तालाप_परिचय_पत्र&gt; &lt;RTMP_यू.आर.एल.&gt;</code>
+  
+  <b>💡 उदाहरण:</b>
+  <code>/setrtmp -1001234567890 rtmps://server/s/key</code>
+
+rtmp_setup_usage: |
+  ⚙️ <b>RTMP विन्यास</b>
+  
+  <u>प्रयोग:</u>
+  <code>/setrtmp &lt;वार्तालाप_परिचय_पत्र&gt; &lt;पूर्ण_RTMP_यू.आर.एल.&gt;</code>
+  
+  <b>📋 पैरामीटर्स:</b>
+  • <code>वार्तालाप_परिचय_पत्र</code> - लक्ष्य वार्तालाप/प्रणाल का परिचय पत्र
+  • <code>पूर्ण_RTMP_यू.आर.एल.</code> - प्रवाह कुञ्जी के साथ पूर्ण RTMP यू.आर.एल.
+  
+  <b>📝 उदाहरण:</b>
+  <code>/setrtmp -1001234567890 rtmps://dc5-1.rtmp.t.me/s/123:key</code>
+  
+  <b>🔍 वार्तालाप परिचय पत्र कैसे प्राप्त करें:</b>
+  • वार्तालाप से कोई भी सन्देश @userinfobot पर अग्रेषित करें
+  • अथवा वार्तालाप में <code>/id</code> आदेश का प्रयोग करें
+  
+  <b>🔐 सुरक्षा:</b>
+  • विन्यास केवल व्यक्तिगत वार्तालाप में कार्य करता है
+  • आपको लक्ष्य वार्तालाप में प्रशासक होना चाहिए
+  • विवरण सुरक्षित रूप से संचित किए जाते हैं।
+
+rtmp_invalid_chat_id: |
+  ❌ <b>अमान्य वार्तालाप परिचय पत्र!</b>
+  
+  कृपया एक मान्य संख्यात्मक वार्तालाप परिचय पत्र प्रदान करें।
+  
+  <b>💡 उदाहरण:</b>
+  <code>/setrtmp -1001234567890 rtmps://...</code>
+
+rtmp_check_admin_failed: |
+  ❌ <b>प्रशासक स्थिति सत्यापित करने में विफल:</b>
+  <code>{error}</code>
+  
+  <b>⚠️ सुनिश्चित करें:</b>
+  • मैं लक्ष्य वार्तालाप में प्रशासक हूँ
+  • वार्तालाप परिचय पत्र सही है
+  • आपके पास प्रशासक अनुमतियाँ हैं
+
+rtmp_not_admin: |
+  ⚠️ <b>अनुमति अस्वीकृत</b>
+  
+  RTMP विन्यस्त करने के लिए आपको लक्ष्य वार्तालाप में <b>प्रशासक</b> होना चाहिए।
+
+rtmp_parse_failed: |
+  ❌ <b>RTMP यू.आर.एल. के विश्लेषण में विफल:</b>
+  <code>{error}</code>
+  
+  <b>📋 सही प्रारूप:</b>
+  <code>rtmp://server/app/streamkey</code>
+  या
+  <code>rtmps://server/s/streamkey</code>
+
+rtmp_streaming_not_supported: |
+  ⚠️ <b>प्रवाह समर्थित नहीं है</b>
+  
+  <b>RTMP विधा</b> का प्रयोग करते समय यह क्रिया उपलब्ध नहीं है।
+  
+  RTMP के माध्यम से सामग्री चलाने के लिए <code>/stream</code> का प्रयोग करें।
+  
+rtmp_configured_success: |
+  ✅ <b>RTMP सफलतापूर्वक विन्यस्त!</b>
+  
+  <b>🆔 वार्तालाप परिचय पत्र:</b> <code>{chat_id}</code>
+  <b>🔗 यू.आर.एल.:</b> <code>{url}</code>
+  <b>🔑 कुञ्जी:</b> <code>{key}</code>
+  
+  <b>✨ अगले चरण:</b>
+  अपने वार्तालाप में जाएँ और प्रयोग करें:
+  <code>/stream &lt;गीत का नाम&gt;</code>
+  
+  <b>🔒 सुरक्षा सूचना:</b>
+  विवरण सुरक्षित रूप से संचित किए जाते हैं और समूह में कभी नहीं दिखाए जाते।
+
+
+searching: "🔍🎶 अन्वेषण किया जा रहा है... ⚡✨"
+searching_query: "🔍🎶 <b>{query}</b> के लिए अन्वेषण किया जा रहा है... ⚡✨"
+
+speed_line: "⚙️ गति: <b>{speed}x</b>"
+
+stats_system_header: "🔧 <b>प्रणाली:</b>"
+stats_go_mem_header: "📦 <b>आन्तरिक स्मृति (Go):</b>"
+stats_server_header: "💻 <b>सर्वर आँकड़े:</b>"
+stats_served_header: "📊 <b>सेवित:</b>"
+
+stats_system_os_arch: "• प्रचालन तन्त्र: <code>{os}</code>, स्थापत्य: <code>{arch}</code>"
+stats_system_cpu_goroutines: "• प्रक्रमक: <code>{cpus}</code>, गो-रूटिन्स: <code>{goroutines}</code>"
+
+stats_go_alloc: "• आवंटित: <code>{alloc} एम.बी.</code>"
+stats_go_sys: "• प्रणाल्याधीन: <code>{sys} एम.बी.</code>"
+stats_go_gc: "• अपशिष्ट संग्रहण संख्या: <code>{gc_count}</code> ({emoji} {gc_rate}/मिनट)"
+
+stats_server_cpu: "• प्रक्रमक प्रयोग: {emoji} <code>{cpu}%</code>"
+stats_server_ram: "• स्मृति प्रयोग: {emoji} <code>{used_gib} जी.आई.बी.</code> | <code>{total_gib} जी.आई.बी.</code>"
+stats_server_storage: "• भण्डारण: <code>{used_gib} जी.आई.बी.</code> | <code>{total_gib} जी.आई.बी.</code>"
+
+stats_served_chats: "• वार्तालाप: <code>{count}</code>"
+stats_served_chats_err: "• वार्तालाप: <code>त्रुटि: {error}</code>"
+
+stats_served_users: "• उपयोगकर्ता: <code>{count}</code>"
+stats_served_users_err: "• उपयोगकर्ता: <code>त्रुटि: {error}</code>"
+
+# 👑 Sudo users
+
+sudo_owner_self: "😂 हाहा, आप पूर्व से ही स्वामी हैं! आप स्वयं को पुनः जोड़ने का प्रयास क्यों कर रहे हैं?"
+sudo_bot_self: "🤖 हाहा, मैं स्वयं एक सहायक हूँ! मैं स्वयं को विशेषाधिकारी सूची में नहीं जोड़ सकता — यहाँ तक कि स्वामी भी मुझे धोखा नहीं दे सकते 😎"
+sudo_bot_user: "🤖 आप विशेषाधिकारी सूची में एक सहायक को नहीं जोड़ सकते — विशेषाधिकारी मनुष्य होने चाहिए!"
+
+sudo_fetch_user_fail: "❌ उपयोगकर्ता सूचना प्राप्त करने में विफल। सम्भवतः उपयोगकर्ता तक पहुँच नहीं है।\n<i>{error}</i>"
+sudo_check_fail: "❌ विशेषाधिकारी उपस्थिति जाँचने में विफल: <i>{error}</i>"
+sudo_already: "⚠️ उपयोगकर्ता {user} (परिचय पत्र: <code>{id}</code>) पूर्व से ही विशेषाधिकारी है।"
+sudo_add_fail: "❌ विशेषाधिकारी जोड़ने में विफल: <i>{error}</i>"
+sudo_add_success: "✅ {user} (<code>{id}</code>) को विशेषाधिकारियों में जोड़ा गया।"
+sudo_assistant_self: "🤖 सहायक पूर्व-निर्धारित रूप से सदैव विशेषाधिकारी सूची में होता है — इसे पुनः नहीं जोड़ा जा सकता।"
+
+sudo_owner_remove_block: "😎 अच्छा प्रयास! आप स्वामी को नहीं हटा सकते — वे अछूत हैं।"
+sudo_assistant_cannot_remove: "🤖 सहायक आवश्यक है और इसे विशेषाधिकारी सूची से नहीं हटाया जा सकता।"
+sudo_not_exists: "⚠️ उपयोगकर्ता {user} (<code>{id}</code>) विशेषाधिकारी नहीं है।"
+sudo_remove_fail: "❌ विशेषाधिकारी को हटाने में विफल: <i>{error}</i>"
+sudo_remove_success: "🗑️ {user} (परिचय पत्र: <code>{id}</code>) को विशेषाधिकारियों से हटाया गया।"
+
+sudo_list_fetching: "⏳ विशेषाधिकारियों की सूची प्राप्त की जा रही है..."
+sudo_list_fetch_fail: "❌ विशेषाधिकारियों को प्राप्त करने में विफल: <code>{error}</code>"
+sudo_list_header: "👑 <b>वर्तमान विशेषाधिकारी:</b>"
+sudo_list_owner: "{index}. {user} — <b>स्वामी</b>"
+sudo_list_entry: "{index}. {user}"
+sudo_list_no_extra: "⚠️ कोई अतिरिक्त विशेषाधिकारी नहीं मिला।"
+
+seek_no_active: "⚠️ <b>वर्तमान में कोई संगीत नहीं चल रहा है।</b>"
+seek_usage: "⚠️ कृपया क्षण प्रदान करें।\nउदाहरण: <code>{cmd} 40</code>"
+seek_invalid_seconds: "⚠️ क्षणों का अमान्य मान।\nउदाहरण: <code>{cmd} 40</code>"
+seek_too_close_start: "⚠️ <b>{seconds}</b> क्षण पीछे नहीं हटाया जा सकता — यह संगीत के आरम्भ के बहुत निकट होगा।"
+seek_too_close_end: "⚠️ <b>{seconds}</b> क्षण आगे नहीं बढ़ाया जा सकता — यह संगीत के अन्त के बहुत निकट होगा।"
+seek_failed: "❌ {direction} <b>{seconds}</b> क्षण खिसकाने में विफल।\nत्रुटि: <code>{error}</code>"
+seek_success: "{emoji} {direction} <u>{duration}</u> में से <u>{position}</u> पर कूदे।"
+
+stop_confirm_paused: |
+  ⏸️ <b>संगीत वर्तमान में विराम स्थिति में है।</b>
+
+  क्या आप इसे पुनः आरम्भ करना चाहते हैं या पूर्णतः बन्द करना चाहते हैं?
+
+stop_confirm_muted: |
+  🔇 <b>संगीत वर्तमान में निःशब्द है।</b>
+
+  क्या आप इसे सशब्द करना चाहते हैं या पूर्णतः बन्द करना चाहते हैं?
+
+stopped: "⏹️ <b>संगीत बन्द किया गया और प्रतीक्षा सूची {user} द्वारा रिक्त की गई।</b>"
+
+shuffle_current_state: "🔀 इस वार्तालाप के लिए वर्तमान में यादृच्छिक क्रम <b>{state}</b> है।\n\nइसे बदलने के लिए <code>{cmd}</code> का प्रयोग करें।"
+shuffle_updated: "🔀 {user} द्वारा यादृच्छिक क्रम <b>{state}</b> किया गया।"
+
+skip_stopped: "⏹️ संगीत बन्द। प्रतीक्षा सूची रिक्त है।\nछोड़ने वाला: {user}"
+
+speed_usage: |
+  💡 <b>प्रयोग:</b>
+  <code>{cmd} [गति] [अवधि]</code> — चलाने की गति बदलें
+  
+  अनुमत गति सीमा: <b>0.50x → 4.00x</b>
+  अवधि (वैकल्पिक) दिए गए क्षणों के पश्चात गति को पुनर्निर्धारित करती है।
+  
+  उदाहरण:
+  <code>{cmd} 1.25 45</code> — 45 क्षणों के लिए 1.25x की गति से चलाएँ।
+
+speed_current: "🎧 <b>वर्तमान गति:</b> 🎵 <u>{title}</u> के लिए <code>{speed}x</code>\n\n💡 सामान्य गति पर लौटने के लिए <code>{cmd} reset</code> का प्रयोग करें।"
+
+speed_current_with_reset: |
+  🎧 <b>वर्तमान गति:</b> <code>{speed}x</code>
+
+  🎵 <b>संगीत:</b> <i>{title}</i>
+  ⏳ <b>स्वतः पुनर्निर्धारण:</b> {duration} में
+  
+  💡 सामान्य गति पर तत्काल लौटने के लिए <code>{cmd} reset</code> का प्रयोग करें।
+
+speed_invalid_value: "❌ अमान्य गति मान।\nउदाहरण: <code>{cmd} 1.5</code> या <code>{cmd} 2x</code>"
+speed_invalid_range: "⚠️ गति <b>0.50x</b> और <b>4.00x</b> के मध्य होनी चाहिए।"
+speed_invalid_duration: "⚠️ अमान्य अवधि। यह <b>5</b> और <b>3600</b> क्षण के मध्य होनी चाहिए।"
+
+speed_already_set: "ℹ️ 🎵 <b>{title}</b> के लिए चलाने की गति पूर्व से ही <b>{speed}x</b> है।"
+
+speed_already_set_reset_hint: "ℹ️ 🎵 <b>{title}</b> के लिए चलाने की गति पूर्व से ही <b>{speed}x</b> है।\n\n💡 सामान्य गति पर लौटने के लिए <code>{cmd} reset</code> का प्रयोग करें।"
+
+speed_failed: |
+  ❌ गति को <b>{speed}x</b> में बदलने में विफल।
+  त्रुटि: <code>{error}</code>
+
+speed_reset_success: "✅ {user} द्वारा चलाने की गति <b>1.0x</b> पर पुनर्निर्धारित"
+
+speed_set: "🚀 {user} द्वारा चलाने की गति <b>{speed}x</b> निर्धारित।"
+speed_set_with_reset: |
+  🚀 {user} द्वारा चलाने की गति <b>{speed}x</b> निर्धारित।
+  ⏳ <b>{duration}</b> क्षणों के पश्चात स्वतः सामान्य हो जाएगी।
+
+
+spt_fetch_fail: "⚠️ संजाल सूचना प्राप्त करने में विफल: <code>{error}</code>"
+spt_servers_fetch_fail: "⚠️ सर्वर प्राप्त करने में विफल: <code>{error}</code>"
+spt_best_server_fail: "⚠️ सर्वोत्तम सर्वर खोजने में विफल: <code>{error}</code>"
+
+spt_running_download: "🚀 डाउनलोड गति परीक्षण चल रहा है..."
+spt_running_upload: "📤 प्रेषण गति परीक्षण चल रहा है..."
+
+spt_result: |
+  <b>📡 गति-परीक्षण परिणाम</b>
+
+  <b><u>👤 उपभोक्ता</u></b>
+  आई.पी.: <code>{ip}</code>
+  सेवा प्रदाता: {isp}
+  अक्षांश: <code>{lat}</code>
+  देशान्तर: <code>{lon}</code>
+
+  <b><u>🛰️ सर्वर</u></b>
+  नाम: {server_name}
+  देश: {country}
+  प्रायोजक: {sponsor}
+  दूरी: {distance_km} कि.मी.
+  विलम्बता: {latency_ms} मि.से.
+
+  <b><u>⚡ गति</u></b>
+  अभिलेखन (Download): <code>{dl_mbps} एम.बी.पी.एस.</code>
+  प्रेषण (Upload): <code>{ul_mbps} एम.बी.पी.एस.</code>
+
+start_private: "नमस्कार {user}, मेरा नाम {bot} है।\n\nमैं कुछ उपयोगी सुविधाओं के साथ एक टेलीग्राम प्रवाह सहायक हूँ। मैं यूट्यूब, स्पॉटिफाई, जियो-सावन, साउण्ड-क्लाउड आदि जैसे मंचों का समर्थन करता हूँ।\n\nनिसंकोच मुझे अपने समूहों में जोड़ें।"
+
+start_group: "<b>💫 मैं यहाँ हूँ!</b> कोई आदेश दें... यदि आपको लगता है कि आप मुझे नियन्त्रित कर सकते हैं 😉"
+
+stream_channelid_fail: "⚠️ आपके सम्बद्ध प्रणाल का परिचय पत्र प्राप्त करने में विफल।"
+stream_queue_finished: "🎵 <b>प्रतीक्षा सूची समाप्त!</b>\n\nचलाने के लिए कोई और गीत नहीं है। अधिक संगीत जोड़ने के लिए /play का प्रयोग करें! 🎶"
+stream_downloading_next: "📥 आपका अगला संगीत अभिलेखित किया जा रहा है..."
+stream_download_fail: "❌ डाउनलोड में विफल।\nत्रुटि: <code>{error}</code>"
+stream_play_fail: "❌ संगीत चलाने में विफल।"
+stream_now_playing: |
+  <b>🎵 अब चल रहा है:</b>
+
+  <b>▫ संगीत:</b> <a href="{url}">{title}</a>
+  <b>▫ अवधि:</b> {duration}
+  <b>▫ अनुरुद्धकर्ता:</b> {by}
+
+# 👑 Sudo / Owner Join Messages
+sudo_join_owner: "👑 {user} — {bot} के स्वामी — अभी वार्तालाप में प्रविष्ट हुए।"
+sudo_join_sudo: "🛡️ {user}, {bot} के एक विशेषाधिकारी, अभी वार्तालाप में सम्मिलित हुए।"
+
+supergroup_needed: |
+  यह वार्तालाप (परिचय पत्र: <code>{chat_id}</code>) अभी तक एक वृहत समूह (supergroup) नहीं है।
+  <b>⚠️ कृपया इस वार्तालाप को वृहत समूह में परिवर्तित करें और फिर मुझे प्रशासक के रूप में जोड़ें।</b>
+  
+  यदि आप नहीं जानते कि कैसे परिवर्तित करना है, तो इस मार्गदर्शिका का प्रयोग करें:
+  🔗 <a href=\"https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02\">समूह को वृहत समूह में कैसे परिवर्तित करें</a>
+  
+  यदि आपके कोई प्रश्न हैं, तो हमारे सहायता समूह में सम्मिलित हों:
+  
+unmute_already: "ℹ️ <b>पूर्व से ही सशब्द</b>\nइस वार्तालाप में संगीत निःशब्द नहीं है।"
+unmute_failed: "❌ <b>संगीत सशब्द करना विफल</b>\nत्रुटि: <code>{error}</code>"
+unmute_success: |
+  🔊 <b>संगीत सशब्द किया गया</b>
+
+  🎵 संगीत: {title}
+  👤 सशब्दकर्ता: {user}
+  {speed_line}
+
+
+# 🔊 Voice Chat Events
+voicechat_ended: "<b>⚠️ दृश्य-ध्वनि वार्तालाप समाप्त</b>\n\n<i>⏰ अवधि: {duration}</i>"
+voicechat_started: "<b>♻️ ध्वनि वार्तालाप आरम्भ!</b>\n\n<i>संगीत चलाने के लिए /play [गीत का नाम] का प्रयोग करें।</i>"
+
+# Commands help
+help_owner: |
+  👑 <b>स्वामी आदेश</b>
+
+  <i>विशेषाधिकारियों के प्रबन्धन, प्रणाल्याधीन कोड निष्पादन और सहायक प्रशासन को सुरक्षित रूप से संचालित करने के लिए अनन्य साधन।</i>
+
+  <b>आदेश:</b>
+  <blockquote>
+  <b>/addsudo</b> - सहायक की विशेषाधिकारी सूची में नवीन उपयोगकर्ता जोड़ें
+  <b>/delsudo</b> - सहायक की विशेषाधिकारी सूची से उपयोगकर्ता हटाएँ
+  <b>/eval</b> - गो (Go) कोड खण्डों का निष्पादन करें
+  <b>/maintenance</b> — सहायक की अनुरक्षण विधा का प्रबन्धन करें
+  <b>/restart</b> — सहायक को पुनः आरम्भ करें
+  <b>/sh</b> - शैल (shell) आदेश चलाएँ
+  </blockquote>
+
+help_sudo: |
+  ⚡ <b>विशेषाधिकारी आदेश</b>
+
+  <i>सहायक के व्यवहार प्रबन्धन, प्रदर्शन की निगरानी और डाउनलोड एवं स्वचालन के नियन्त्रण के लिए उन्नत साधन।</i>
+
+  <b>आदेश:</b>
+  <blockquote>
+  <b>/active</b> - कुल सक्रिय वार्तालाप दिखाता है
+  <b>/autoleave</b> - स्वचालित प्रस्थान को बदलें
+  <b>/logger</b> - अभिलेखक को सक्षम या अक्षम करें
+  <b>/stats</b> - सहायक एवं प्रणाली के आँकड़े प्रदर्शित करें
+  <b>/logs</b> - प्रणाली के अभिलेख प्राप्त करें 
+  </blockquote>
+
+help_admin: |
+  🛠 <b>प्रशासक आदेश</b>
+
+  <i>प्रशासकों के लिए संगीत और पुनः प्रसारण को सुगमता से नियन्त्रित करने के साधन।</i>
+
+  <b>आदेश:</b>
+  <blockquote>
+  <b>/speed</b> - चलाने की गति बदलें
+  <b>/skip</b> - वर्तमान गीत छोड़ें
+  <b>/pause</b> - वर्तमान संगीत को विराम दें
+  <b>/resume</b> - विराम दिए गए संगीत को पुनः आरम्भ करें
+  <b>/replay</b> - वर्तमान गीत पुनः चलाएँ
+  <b>/mute</b> - संगीत निःशब्द करें
+  <b>/unmute</b> - संगीत सशब्द करें
+  <b>/seek</b> - कुछ क्षण आगे बढ़ाएँ
+  <b>/seekback</b> - कुछ क्षण पीछे हटाएँ
+  <b>/jump</b> - संगीत में दिए गए समय पर कूदें
+  <b>/move</b> - प्रतीक्षा सूची के गीत को अन्य स्थिति पर ले जाएँ
+  <b>/clear</b> - प्रतीक्षा सूची से सभी गीत हटाएँ
+  <b>/remove</b> - प्रतीक्षा सूची से विशिष्ट संगीत हटाएँ
+  <b>/shuffle</b> - प्रतीक्षा सूची के सभी गीतों को यादृच्छिक क्रम में करें
+  <b>/loop</b> - आवृत्ति को सक्षम या अक्षम करें
+  <b>/stop</b> - संगीत बन्द करें और ध्वनि वार्तालाप छोड़ें
+  <b>/nothumb</b> - संगीत सन्देशों में कलाकृति/लघु-चित्र सक्षम या अक्षम करें
+  </blockquote>
+
+help_public: |
+  🌍 <b>सार्वजनिक आदेश</b>
+
+  <i>गीत चलाने, प्रतीक्षा सूची देखने, विलम्बता जाँचने और त्रुटि सूचना देने की सुविधाएँ।</i>
+
+  <b>आदेश:</b>
+  <blockquote>
+  <b>/play</b> - गीत चलाएँ
+  <b>/queue</b> - वर्तमान में प्रतीक्षा सूची के सभी संगीत देखें
+  <b>/ping</b> - सहायक की संजाल विलम्बता जाँचें
+  <b>/start</b> - सहायक आरम्भ करें
+  <b>/help</b> - सहायता सूची दिखाएँ
+  <b>/bug</b> - किसी समस्या या त्रुटि की सूचना दें
+  <b>/position</b> - वर्तमान संगीत का समय-चिह्न दिखाएँ
+  <b>/reload</b> - प्रशासक या संचित सूचना को पुनः लोड करें
+  <b>/json</b> - सन्देश की जे.एस.ओ.एन. संरचना दिखाएँ
+  <b>/sudolist</b> - विशेषाधिकारी उपयोगकर्ताओं की सूची देखें
+  </blockquote>
+  
