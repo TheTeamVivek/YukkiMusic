@@ -834,7 +834,7 @@ speed_current_with_reset: |
   🎵 <b>संगीत:</b> <i>{title}</i>
   ⏳ <b>स्वतः पुनर्निर्धारण:</b> {duration} में
   
-  💡 सामान्य गति पर तत्काल लौटने के लिए <code>{cmd} reset</code> का प्रयोग करें।"
+  💡 सामान्य गति पर तत्काल लौटने के लिए <code>{cmd} reset</code> का प्रयोग करें।
 
 speed_invalid_value: "❌ अमान्य गति मान।\nउदाहरण: <code>{cmd} 1.5</code> या <code>{cmd} 2x</code>"
 speed_invalid_range: "⚠️ गति <b>0.50x</b> और <b>4.00x</b> के मध्य होनी चाहिए।"
