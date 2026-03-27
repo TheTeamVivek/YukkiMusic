@@ -48,7 +48,7 @@ func bugHandler(m *telegram.NewMessage) error {
 	reason := m.Args()
 
 	if reason == "" && !m.IsReply() {
-		m.Reply(F(chatID, "bug_usasge", locales.Arg{
+		m.Reply(F(chatID, "bug_usage", locales.Arg{
 			"cmd": getCommand(m),
 		}))
 		return telegram.ErrEndGroup

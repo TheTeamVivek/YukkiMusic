@@ -185,7 +185,7 @@ autoleave_updated: "🏃‍♂️ AutoLeave has been {action}"
 enabled: "Enabled"
 disabled: "Disabled"
 
-bug_usasge: "⚠️ Please describe the bug. Usage: {cmd} <problem> or reply to a message."
+bug_usage: "⚠️ Please describe the bug. Usage: {cmd} <problem> or reply to a message."
 bug_thanks: "✅ Thank you for your bug report! It has been sent to the developers."
 
 bug_report_format: |

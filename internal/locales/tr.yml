@@ -1,0 +1,996 @@
+name: "🇹🇷 Türkçe"
+
+# buttons
+CONFIRM_RESUME_BTN: "▶️ Devam Et"
+CONFIRM_UNMUTE_BTN: "🔊 Sesi Aç"
+CONFIRM_STOP_BTN: "⏹️ Durdur"
+ADD_ME_BTN: "⚡ Beni Grubuna Ekle"
+BROADCAST_CANCEL_BTN: "🚫 Yayını İptal Et"
+CLOSE_BTN: "Kapat"
+DOWNLOAD_CANCEL_BTN: "🚦 İndirmeyi İptal Et"
+GC_HELP_BTN: "📒 Komutlar"
+
+START_HELP_BTN: "❓ Yardım ve Komutlar"
+
+UPDATES_BTN: "📢 Güncellemeler"
+SUPPORT_BTN: "💬 Destek"
+
+HELP_ADMINS_BTN: "🛠 Yöneticiler"
+HELP_PUBLIC_BTN: "🌍 Genel"
+HELP_OWNER_BTN: "👑 Sahibi"
+HELP_SUDOERS_BTN: "⚡ Sudo Kullanıcılar"
+
+BACK_BTN: "⬅️ Geri"
+
+# basically this string used in /command [bool]
+invalid_bool: "⚠️ <b>Geçersiz değer.</b>\n'enable' veya 'disable' kullan."
+
+active_chats_info: "📊 <b>Aktif Sohbetler:</b>\n\nBot sisteminde <i>{count}</i> aktif sohbet var."
+active_chats_info_with_broken: "📊 <b>Aktif Sohbetler:</b>\n\nBot sisteminde <i>{count}</i> aktif sohbet var, ancak bunların <i>{broken}</i> tanesi düzgün görüntülenemiyor olabilir."
+
+
+# 🚫 Assistant Restricted / Banned
+assistant_restricted_warning: |
+  ⚠️ <b>Asistan Kısıtlandı</b>
+
+  {assistant} asistanı (ID: <code>{id}</code>) bu sohbette <b>yasaklandı</b> veya kısıtlandı.
+  Bu durum devam ederken müzik çalamam, sırayı yönetemem veya parçaları temizleyemem.
+
+  <i>Tüm müzik özelliklerini geri yüklemek için asistanın yasağını kaldır 🎵</i>
+
+# 🧩 Common auth messages
+auth_no_user: "⚠️ Lütfen bir kullanıcı belirt — şunu kullan:\n{cmd} [kullanıcı_id] veya bir kullanıcının mesajını yanıtla."
+user_extract_fail: "⚠️ Kullanıcı alınamadı: <i>{error}</i>"
+auth_limit_reached: "⚠️ Bu sohbet maksimum yetkili kullanıcı sınırına ({limit}) ulaştı. Yeni birini eklemeden önce lütfen birini çıkar."
+already_authed: "⚠️ Bu kullanıcı zaten yetkili — tekrar eklemeye gerek yok."
+
+# 🤖 Add auth
+cannot_authorize_user: "⚠️ Bu kullanıcı yetkilendirilemez.\nBot sahibi, botun kendisi veya sen yetkilendirme gerektirmezsin."
+addauth_user_is_admin: "⚠️ Bu kullanıcı zaten bir sohbet yöneticisi. Yetkilendirme gerekmiyor."
+addauth_bot_user: "🤖 Yetki listesine bir bot ekleyemezsin — yetkili kullanıcılar insan olmalı!"
+addauth_add_fail: "❌ Yetkili kullanıcı eklenemedi: {error}"
+addauth_success_with_count: "✅ {user} eklendi.\nŞu an {count}/{limit} yetkili kullanıcı var."
+addauth_success: "✅ {user} başarıyla yetkili kullanıcılar listesine eklendi."
+
+# 🤖 Bot Added to Chat
+bot_added_normal: "🎵 Beni eklediğin için teşekkürler! Müzik çalmaya başlamak için /play [şarkı] komutunu kullan."
+
+# 🛠️ Bot Added During Maintenance
+bot_added_maintenance: "⚠️ Şu anda bakımdayım ve yakında döneceğim. Sabrın için teşekkürler! ⏰"
+maint_reason_generic: "<i>📝 Sebep: {reason}</i>"
+
+# ⚠️ Bot Demotion
+bot_demotion_goodbye: |
+  <b>⚠️ Yetki Kaybedildi</b>
+
+  <b>Yöneticilikten çıkarıldım</b> ve artık görevlerimi yerine getiremiyorum.
+  Gerekli haklar olmadan burada çalışamam, bu yüzden <i>şimdi sohbetten ayrılıyorum</i>.
+
+  <b>Hoşça kal 👋</b>
+
+broadcast_already_running: "⚠️ Bir yayın zaten çalışıyor.\n\nLütfen tamamlanmasını bekle veya şunu kullanarak iptal et:\n• <code>/broadcast -cancel</code>\n• Ya da ilerleme mesajındaki İptal Et düğmesine tıkla"
+broadcast_parse_failed: "❌ Yayın komutu ayrıştırılamadı:\n<code>{error}</code>"
+broadcast_no_content: "⚠️ Yayın için içerik sağlanmadı.\n\n<b>Kullanım:</b> <code>{cmd} [metin veya mesajı yanıtla]</code>\n\n<b>Örnek:</b>\n<code>{cmd} Herkese merhaba!</code>"
+broadcast_fetch_chats_failed: "❌ Sunulan sohbetler alınamadı:\n<code>{error}</code>"
+broadcast_fetch_users_failed: "❌ Sunulan kullanıcılar alınamadı:\n<code>{error}</code>"
+broadcast_no_targets: "⚠️ Yayın için hedef bulunamadı.\n\nTüm hedefleri bayraklarla hariç tutmadığından emin ol."
+broadcast_initializing: "📡 Yayın başlatılıyor...\n\nLütfen bekle..."
+broadcast_cancelled_header: "🚫 Yayın İptal Edildi"
+broadcast_completed_header: "✅ Yayın Tamamlandı"
+broadcast_progress_header: "📡 Yayınlanıyor..."
+broadcast_total_chats: "📊 Toplam Sohbet: {done}/{total} ({progress}%)"
+broadcast_total_users: "👥 Toplam Kullanıcı: {done}/{total} ({progress}%)"
+broadcast_failed_chats: "❌ Başarısız Sohbet: {count}"
+broadcast_failed_users: "❌ Başarısız Kullanıcı: {count}"
+broadcast_delay: "⏱ Gecikme: {delay}s"
+broadcast_elapsed: "⏰ Geçen Süre: {elapsed}"
+broadcast_eta: "⏳ Tahmini Varış: {eta}"
+broadcast_success_rate: "✨ Başarı Oranı: %{rate} ({sent}/{total})"
+broadcast_not_running: "ℹ️ Şu anda çalışan bir yayın yok."
+broadcast_cancel_success: "🚫 Yayın başarıyla iptal edildi."
+broadcast_cancel_owner_only: "⚠️ Yayınları yalnızca bot sahibi iptal edebilir."
+broadcast_cancel_none_running: "ℹ️ Şu anda çalışan bir yayın yok."
+broadcast_cancel_done: "🚫 Yayın iptal edildi."
+
+# 🎧 CPlay (Channel Play)
+
+cplay_id_not_set: "⚠️ Kanal oynatma (cplay) ID'si ayarlanmamış.\nAyarlamak için <code>/cplay --set &lt;sohbet_id&gt;</code> komutunu kullan."
+cplay_usage: "<b>Kullanım:</b> <code>/cplay --set &lt;kanal_id&gt;</code>"
+cplay_invalid_chat_id: "<b>Geçersiz Sohbet ID:</b> Lütfen kanal için geçerli bir tamsayı ID gir."
+cplay_resolve_peer_fail: "<b>Kanal çözülemedi:</b> Kanal detayları alınamadı. Bu kanala erişimim olduğundan emin ol."
+cplay_invalid_target: "<b>Geçersiz Hedef:</b> Sağlanan ID geçerli bir kanal değil."
+cplay_channel_not_accessible: "<b>Kanala Erişilemiyor:</b> Kanal bilgileri alınamadı. Lütfen hedef kanalda yönetici olduğumdan emin ol."
+cplay_save_error: "<b>Hata:</b> Kanal oynatma ayarları kaydedilemedi."
+cplay_enabled: "✅ <b>Kanal Oynatma etkinleştirildi.</b> Tüm <code>/c</code> komutları artık <code>{channel_id}</code> kanalında çalışacak."
+
+# Callback handler messages
+invalid_request: "⚠️ Geçersiz istek."
+unknown_action: "⚠️ Bilinmeyen eylem."
+download_cancelled: "✅ İndirme iptal edildi."
+no_download_to_cancel: "ℹ️ İptal edilecek bir indirme yok."
+
+# Pause callback
+cb_pause_success: "⏸️ Parça {position} konumunda duraklatıldı"
+cb_pause_message: |
+  <b>⏸️ Parça Duraklatıldı</b>
+
+  <b>▫ Parça:</b> <a href="{url}">{title}</a>
+  <b>▫ Konum:</b> {position} / {duration}
+  <b>▫ Duraklatan:</b> {user}
+
+# Resume callback
+cb_already_playing: "ℹ️ Parça zaten çalıyor."
+cb_resume_failed: "❌ Oynatma devam ettirilemedi."
+cb_resume_success: "▶️ {position} konumunda devam ediliyor."
+cb_resume_message: |
+  <b>🎵 Şimdi Çalıyor:</b>
+
+  <b>▫ Parça:</b> <a href="{url}">{title}</a>
+  <b>▫ Süre:</b> {duration}
+  <b>▫ Devam Ettiren:</b> {user}
+
+# Replay callback
+cb_replaying: "🔁 <b>Mevcut parça yeniden oynatılıyor...</b>"
+cb_replay_failed: "❌ Parça yeniden oynatılamadı."
+cb_replay_success: "🔁 Parça yeniden oynatıldı."
+cb_replay_edited: "🔁 Parça {user} tarafından yeniden oynatıldı."
+
+# Skip callback
+cb_skip_queue_empty: "⏹️ Oynatma durduruldu — sıra boş."
+cb_skip_download_failed: "❌ Sonraki parça indirilemedi."
+cb_skip_play_failed: "❌ Sonraki parça oynatılamadı."
+cb_skip_success: "⏭️ Parça atlandı."
+cb_skip_edited: "⏭️ {user} tarafından atlandı"
+
+# Stop callback
+cb_stop_success: "⏹️ Oynatma durduruldu."
+
+# Mute/Unmute callback
+cb_mute_success: "🔇 Sessize alındı."
+cb_mute_message: |
+  <b>🔇 Oynatma Sessize Alındı</b>
+
+  <b>▫ Parça:</b> <a href="{url}">{title}</a>
+  <b>▫ Sessize Alan:</b> {user}
+
+cb_unmute_success: "🔊 Ses açıldı."
+
+cb_seek_success: "⏩ {seconds} saniye ileri sarıldı"
+cb_seek_near_end: "⚠️ {seconds} saniye ileri sarılamaz — parça bitmek üzere."
+cb_seek_edited: "⏩ {seconds} saniye ileri sarıldı — {user} tarafından"
+
+cb_seekback_success: "⏪ {seconds} saniye geri sarıldı"
+cb_seekback_edited: "⏪ {seconds} saniye geri sarıldı — {user} tarafından"
+
+# 🗑️ Delete auth
+del_auth_not_authorized: "⚠️ Bu kullanıcı yetkili değil — kaldırılacak bir şey yok."
+del_auth_remove_fail: "❌ Yetkili kullanıcı kaldırılamadı: <code>{error}</code>"
+del_auth_success: "✅ {user} başarıyla yetkili kullanıcılar listesinden çıkarıldı."
+
+# 📜 Auth list
+authlist_fetch_fail: "❌ Yetkili kullanıcı listesi alınamadı: <code>{error}</code>"
+authlist_empty: "ℹ️ Bu sohbette yetkili kullanıcı yok."
+authlist_fetching: "⏳ Yetkili kullanıcı listesi getiriliyor..."
+authlist_header: "<b>Yetkili Kullanıcılar:</b>"
+authlist_user_fail: "{index}. <code>{user_id}</code> (Kullanıcı bilgileri alınamadı)"
+authlist_user_entry: "{index}. {user} (<code>{user_id}</code>)"
+authlist_total: "<b>Toplam:</b> {count} kullanıcı"
+
+autoleave_fetch_fail: "⚠️ <b>Otomatik Ayrılma (AutoLeave) durumu alınamadı.</b>"
+autoleave_status: "🏃‍♂️ <b>Otomatik Ayrılma Kontrolü</b>\n\nEtkinleştirildiğinde, asistan sohbetten otomatik olarak ayrılır.\nKullanım: {cmd} [enable|disable]\nMevcut durum: {action}"
+autoleave_already: "⚠️ Otomatik Ayrılma zaten {action}"
+autoleave_update_fail: "⚠️ <b>Otomatik Ayrılma durumu güncellenemedi.</b>"
+autoleave_updated: "🏃‍♂️ Otomatik Ayrılma {action} konumuna getirildi."
+
+enabled: "Etkin"
+disabled: "Devre Dışı"
+
+bug_usage: "⚠️ Lütfen hatayı açıkla. Kullanım: {cmd} <problem> veya bir mesajı yanıtla."
+bug_thanks: "✅ Hata raporun için teşekkürler! Geliştiricilere gönderildi."
+
+bug_report_format: |
+  <b>🐞 Yeni Hata Raporu</b>
+
+  <b>Gönderen:</b> {user} (<code>{user_id}</code>)
+  <b>Sohbet:</b> {chat} (<code>{chat_id}</code>)
+
+  <b>Rapor:</b>
+  <pre>{report}</pre>
+  
+clear_no_active: "⚠️ <b>Temizlenecek aktif bir oynatma veya sıra yok.</b>"
+clear_success: "✅ Sıra {user} tarafından temizlendi.\n<i>Yeni şarkılar eklemeden önce <code>/{cmd}</code> kullanarak geri yükleyebilirsin.</i>"
+
+err_assistant_banned: |
+  <b>🚫 Asistan Kısıtlandı</b>
+
+  Müzik çalamıyorum çünkü {user} (Kullanıcı ID: <code>{id}</code>) bu sohbetten <b>yasaklanmış</b> veya <b>çıkarılmış</b>.
+
+  <i>✅ Zaten yasağını kaldırdın mı? Yenilemek için /reload kullan.</i>
+
+err_admin_permission_required: |
+  ⚠️ <b>Yönetici İzni Gerekli</b>
+
+  Bu sohbetteki üyeleri yönetmek ve kontrol etmek için <i>yönetici erişimine</i> ihtiyacım var.
+  
+  ➤ <b>Beni <code>Sohbeti Yönet / Kullanıcıları Davet Et</code> yetkisiyle yönetici yap.</b>
+
+err_assistant_get_failed: |
+  ⚠️ Sistem bu sohbet için bir asistan atayamadı.
+
+  <i>Bu genellikle geçici bir sorundur ve tekrar denendiğinde çözülmelidir.</i>
+
+  <b>➡️ Lütfen komutunu tekrar dene.</b>
+
+  <i>Bu durum devam ederse, sana yardımcı olabilmemiz için lütfen destekle iletişime geç.</i>
+  
+err_assistant_join_rate_limited: |
+  ⚠️ Asistan bu sohbete katılamıyor çünkü katılabileceği maksimum grup sayısına ulaştı.
+
+err_assistant_join_request_sent: |
+  ⚠️ Asistan katılım isteği gönderdi, ancak otomatik olarak onaylayamadım.
+
+  <i>✅ Lütfen isteği manuel olarak onayla ve tekrar dene.</i>
+
+err_assistant_invite_link_fetch: |
+  ⚠️ Davet bağlantısı alınamadı:
+  <i>{error}</i>
+
+err_assistant_invite_failed: |
+  ⚠️ Asistan bu sohbete katılamadı:
+  <i>{error}</i>
+
+err_connection_timeout: |
+  ⚠️ <b>Sesli Sohbet Bağlantı Zaman Aşımı</b>
+
+  Telegram şu anda sesli sohbet bağlantısına düzgün yanıt vermiyor.
+
+  <i>Bu durum devam ederse, sesli sohbeti sonlandırıp tekrar başlat ve yeniden dene.</i>
+
+err_no_active_voicechat: |
+  🎙️ <b>Aktif Sesli Sohbet Yok</b>
+
+  Katılamıyorum — lütfen önce bir sesli sohbet başlat.
+
+  <i>Zaten bir tane başlattın mı? Yenilemek için /reload kullan.</i>
+
+err_fetch_failed: |
+  ⚠️ Sohbet bilgileri alınamadı:
+  <i>{error}</i>
+
+err_peer_resolve_failed: |
+  ⚠️ Bilgiler çözülemedi. Daha sonra tekrar dene veya asistanı yeniden ekle.
+
+err_rtmp_missing_params: |
+  <b>⚠️ RTMP Detayları Eksik</b>
+
+  <i>Bu sohbette bir <b>RTMP yayını</b> aktif görünüyor, ancak gerekli <b>RTMP URL</b> veya <b>Yayın Anahtarını</b> sağlamadın. Bunlar olmadan RTMP'ye müzik akışı başlatamam.</i>
+
+  <b>Kullanım:</b> <code>/setrtmp [sohbet_id] [url+anahtar]</code>
+
+  <i>📌 RTMP detayları ayarlandıktan sonra yayına başlayabilirsin.</i>  
+  <i>➡️ RTMP kullanmak istemiyorsan, normal sesli sohbete geç.</i>
+  
+err_unknown: |
+  ⚠️ Bilinmeyen Bir Hata Oluştu:
+  <i>{error}</i>
+
+err_fetch_tracks: |
+  ⚠️ <b>Parça detayları alınamadı.</b>
+  Lütfen daha sonra tekrar dene.
+
+err_download_internal: |
+  ⚠️ Beklenmedik bir dahili hata nedeniyle <b>indirme başarısız oldu</b>.
+  Lütfen daha sonra tekrar dene.
+  
+flood_seconds: "⏳ Yavaşla! {duration} saniye sonra tekrar dene."
+flood_minutes: "⏳ Bu komutu tekrar kullanmadan önce lütfen {duration} dakika bekle."
+
+help_private_only: "🤖 Merhaba! Bot yardımı ve komutlar için lütfen bana doğrudan özel mesaj gönder — özel sohbetlerde daha hızlı yanıt veririm!"
+help_main: "📚 <b>Yardım Menüsü</b>\n\nBotu yönetmek, kontrol etmek ve özelleştirmek için kullanılan detaylı komutları keşfetmek için aşağıdan bir kategori seç."
+
+jump_no_active: "⚠️ İçinde atlanacak aktif bir parça yok."
+jump_usage: "⚠️ Lütfen saniye belirt.\nÖrnek: <code>{cmd} 120</code>"
+jump_invalid_position: "⚠️ Geçersiz konum.\nÖrnek: <code>{cmd} 120</code>"
+jump_too_close_end: "⚠️ <b>{position}</b> konumuna atlanamaz — parçanın sonuna çok yakın."
+jump_failed: "❌ <b>{position}</b> konumuna atlanamadı.\nHata: <code>{error}</code>"
+jump_success: "⏩ <u>{duration}</u> süreli parçanın <u>{position}</u> konumuna atlandı."
+
+lang_same: "ℹ️ Zaten bu dili kullanıyorsun."
+lang_select: "🌐 Tercih ettiğin dili seç:"
+lang_fail: "❌ Dil güncellenemedi. Lütfen daha sonra tekrar dene."
+lang_success: "✅ Dil başarıyla {lang_name} olarak güncellendi."
+
+logger_playback_started: "Oynatma Başlatıldı"
+logger_playback_queued: "Oynatma Sıraya Alındı"
+
+logger_bot_added: |
+  🤖 <b>Bot Yeni Gruba Eklendi</b>
+  
+  <blockquote>
+  <b>Grup Adı:</b> {group_name}
+  <b>Grup ID:</b> {group_id}
+  <b>Grup Kullanıcı Adı:</b> {group_username}
+
+  <b>Ekleyen:</b> {added_by_name}
+  <b>Kullanıcı ID:</b> {added_by_id}
+  <b>Kullanıcı Adı:</b> {added_by_username}
+
+  <b>Zaman:</b> {date_time}
+  </blockquote>
+#  👥 <b>Üye Sayısı:</b> {members_count}
+
+logger_bot_removed: |
+
+  🤖 <b>Bot Gruptan Çıkarıldı</b>
+  <blockquote>
+  <b>Grup Adı:</b> {group_name}
+  <b>Grup ID:</b> {group_id}
+  <b>Grup Kullanıcı Adı:</b> {group_username}
+
+  <b>Çıkaran:</b> {removed_by_name}
+  <b>Kullanıcı ID:</b> {removed_by_id}
+  <b>Kullanıcı Adı:</b> {removed_by_username}
+
+  <b>Zaman:</b> {date_time}
+  </blockquote>
+  
+logger_bot_started: |
+  ▶️ <b>{mention} botu başlattı</b>
+
+  <b>Kullanıcı Adı:</b> {user_username}
+  <b>ID:</b> {user_id}
+  
+logger_track: "🎧 Parça:"
+logger_source: "🔗 Kaynak:"
+logger_group: "📌 Grup:"
+logger_requested_by: "👤 İsteyen:"
+logger_timestamp: "⏳ Zaman Damgası:"
+
+loop_usage: "🔁 <b>Döngü Kontrolü</b>\n\nKullanım: {cmd} [sayı]\n• 0 - Döngüyü devre dışı bırak\n• 1-10 - Döngü sayısı\n\n<i>{count_line}</i>"
+loop_invalid: "⚠️ <b>Geçersiz döngü sayısı.</b>\nDevre dışı bırakmak için 0, döngü sayısını ayarlamak için 1-10 arası bir değer kullan."
+loop_already_set: "⚠️ Döngü sayısı zaten <b>{count}</b> olarak ayarlanmış."
+loop_disabled: "🔁 Döngü {user} tarafından <b>devre dışı bırakıldı</b>"
+loop_set: "🔁 <b>{count}</b> kez döngüye ayarlandı\n└ Değiştiren: {user}"
+loop_current: "• Mevcut döngü: <b>{count}</b> kez"
+
+logger_usage: "⚙️ Kullanım: <code>{cmd} [enable|disable]</code> - Günlüğü etkinleştirir veya devre dışı bırakır\n\n{status}"
+logger_status: "📜 Mevcut durum: {action}"
+logger_check_fail: "❌ Günlük durumu kontrol edilemedi: {error}"
+logger_already: "ℹ️ Günlük zaten {action}."
+logger_update_fail: "❌ Günlük ayarı güncellenemedi: {error}"
+logger_updated: "✅ Günlük başarıyla {action} konumuna getirildi."
+
+# Logs module
+logs_invalid_number: "⚠️ <b>Geçersiz Sayı</b>\n\n<code>{value}</code> değeri geçerli bir pozitif sayı değil.\n\n<b>Kullanım:</b> <code>/logs [sayı]</code> veya <code>/logs -old [sayı]</code>"
+logs_invalid_flag: "⚠️ <b>Geçersiz Bayrak</b>\n\nBilinmeyen bayrak veya geçersiz giriş: <code>{flag}</code>\n\n<b>Geçerli seçenekler:</b>\n• <code>/logs</code> - Tam günlük\n• <code>/logs [n]</code> - Son N satır\n• <code>/logs -old [n]</code> - En eski günlük\n• <code>/logs -clear</code> - Günlükleri temizle"
+logs_file_error: "❌ <b>Günlük Dosyası Hatası</b>\n\nGünlük dosyasına erişilirken bir hata oluştu:\n<code>{error}</code>"
+logs_send_error: "❌ <b>Günlük Gönderilemedi</b>\n\nGünlük dosyası hazırlanamadı veya gönderilemedi.\n<code>{error}</code>"
+logs_clear_failed: "❌ <b>Temizleme Başarısız</b>\n\nGünlük dosyası temizlenemedi:\n<code>{error}</code>"
+logs_empty: "📭 <b>Günlük Yok</b>\n\nGünlük dosyası henüz mevcut değil veya boş.\n\nGünlük oluşturmak için botu bir süre çalıştır."
+logs_preview_header: "📋 <b>Mevcut Günlük Önizlemesi:</b>"
+logs_lines_header: "📋 <b>Son Günlük Satırları</b> (Son {count})"
+logs_old_header: "📋 <b>En Eski Günlük Satırları</b> (İlk {count})"
+logs_uploading: "⏳ <b>Günlük dosyası yükleniyor...</b>\n\nLütfen dosya hazırlanırken bekle."
+logs_file_caption: "📄 <b>Günlük Dosyası Detayları</b>\n\n<b>Dosya Adı:</b> <code>{filename}</code>\n<b>Boyut:</b> {size_mb} MB\n<b>Son Değişiklik:</b> {modified}"
+logs_lines_caption: "📋 <b>Son Günlük Satırları</b>\n\nMevcut günlükten son {count} satır gösteriliyor."
+logs_old_caption: "📋 <b>En Eski Günlük Satırları</b>\n\nGünlüğün başından itibaren ilk {count} satır gösteriliyor."
+logs_cleared: "✅ <b>Günlük Dosyası Temizlendi</b>\n\nGünlük dosyası başarıyla temizlendi.\n<b>Önceki Boyut:</b> {size_mb} MB"
+
+# reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
+maint: "⚠️ Şu anda bakımdayım ve geçici olarak hizmet veremiyorum. Lütfen daha sonra tekrar kontrol et.\n\n{reason}"
+maint_reason: "<i>📝 Sebep: {reason}</i>"
+
+# ⚙️ Maintenance control
+maint_usage: "⚙️ <b>Bakım Kontrolü</b>\n\nKullanım: {cmd} [enable|disable] [sebep]\n📜 Mevcut durum: {status}"
+maint_check_fail: "❌ Bakım durumu kontrol edilemedi: <code>{error}</code>"
+maint_already_enabled: "ℹ️ Bakım modu zaten etkin 🟢."
+maint_already_disabled: "ℹ️ Bakım modu zaten devre dışı 🔴."
+maint_already_reason_same: "ℹ️ Bakım zaten aynı sebeple etkin."
+maint_reason_removed: "✅ Bakım sebebi başarıyla kaldırıldı."
+maint_reason_updated: "✅ Bakım sebebi güncellendi.\n📝 Sebep: {reason}"
+maint_enabled: "✅ Bakım modu başarıyla <b>etkinleştirildi</b>."
+maint_enabled_reason: "✅ Bakım modu etkinleştirildi.\n📝 Sebep: {reason}"
+maint_disabled: "✅ Bakım modu başarıyla <b>devre dışı bırakıldı</b>."
+maint_entering: "⚠️ Bot bakım moduna giriyor..."
+enabled_with_reason: "🟢 Etkin\n📝 Sebep: {reason}"
+
+move_usage: "⚠️ Kullanım: <code>{cmd} [nereden] [nereye]</code>"
+move_invalid_numbers: "⚠️ Geçersiz sayılar. Örnek: <code>/{cmd} 2 1</code>"
+move_invalid_indexes_min: "⚠️ İndeksler 0'dan büyük olmalı."
+move_invalid_indexes_max: "⚠️ Sıra yalnızca {queue_len} parça içeriyor."
+move_success: "✅ Parça, {user} tarafından {from} konumundan {to} konumuna taşındı."
+
+# 🔇 Mute messages
+mute_already_muted: "🔇 <b>Zaten Sessizde</b>\nMüzik bu sohbette zaten sessize alınmış.\nSesi açmak ister misin?"
+mute_already_muted_with_time: "🔇 <b>Zaten Sessizde</b>\nMüzik sessize alınmış.\n<b>{duration}</b> içinde otomatik olarak ses açılacak."
+mute_invalid_duration: "⚠️ Otomatik ses açma için geçersiz süre.\nSüre <b>5</b> ile <b>3600</b> saniye arasında olmalıdır."
+mute_invalid_format: "⚠️ Geçersiz biçim.\nŞunu kullan: <code>/{cmd} 30</code> veya <code>/{cmd} 30s</code>"
+mute_failed: "❌ <b>Oynatma Sessize Alınamadı</b>\nHata: <code>{error}</code>"
+mute_success: |
+  🔇 <b>Oynatma sessize alındı</b>
+
+  🎵 Parça: {title}
+  👤 Sessize Alan: {user}
+
+mute_success_with_time: |
+  🔇 <b>Oynatma sessize alındı</b>
+
+  🎵 Parça: {title}
+  👤 Sessize Alan: {user}
+  <i>⏳ <b>{duration}</b> saniye içinde otomatik olarak ses açılacak</i>
+
+no_song_query: |
+  <b>🎵 Hop! Hiçbir şarkı tespit edilemedi.</b>
+
+  <i>Oynatmaya başlamak için <b>{cmd} [şarkı adı]</b> yaz veya bir <b>medyayı</b> yanıtla!</i>
+
+no_song_found: "❌ Parça bulunamadı."
+
+nothumb_status: |
+  🖼️ <b>Küçük Resim Kontrolü</b>
+  
+  <i>Etkinleştirildiğinde, oynatma mesajlarında kapak resmi/küçük resim gösterilmez.</i>
+  
+  <b>📊 Kullanım: {cmd} [enable|disable]</b>
+  
+  <i>Küçük resim şu an {action}.</i>
+  
+nothumb_fetch_fail: "⚠️ <b>Küçük resim ayarı alınamadı.</b>"
+nothumb_already: "ℹ️ Küçük resim gösterimi zaten {action}."
+nothumb_update_fail: "⚠️ <b>Küçük resim ayarı güncellenemedi.</b>"
+nothumb_updated: "🖼️ Küçük resim gösterimi {action} konumuna getirildi."
+
+only_admin: "⚠️ <b>Yetki Reddedildi!</b>\nBu eylemi yalnızca <b>yöneticiler</b> kontrol edebilir. Yine de şarkı çalabilirsin 🎵.\n\nEğer yönetici olduğunu düşünüyorsan, lütfen yönetici durumunu yenilemek için /reload kullan."
+only_admin_or_auth: "⚠️ <b>Erişim Engellendi</b>\nBu eylemi yalnızca <b>yöneticiler</b> veya <b>yetkili kullanıcılar</b> kontrol edebilir.\n\nYakın zamanda yönetici olduysan, izinlerini yenilemek için /reload kullan."
+only_admin_or_auth_cb: "⚠️ Bu eylemi yalnızca yöneticiler yapabilir."
+only_supergroup: "⚠️ Bu komut yalnızca gruplarda kullanılabilir."
+only_owner: "⚠️ Bu komutu yalnızca bot sahibi kullanabilir."
+only_sudo: "⚠️ Bu komutu yalnızca sudo kullanıcıları veya bot sahibi kullanabilir."
+
+pause_invalid_duration: "⚠️ Otomatik devam etme için geçersiz süre.\nSüre <b>5</b> ile <b>3600</b> saniye arasında olmalıdır."
+pause_invalid_format: "⚠️ Geçersiz biçim.\nŞunu kullan: <code>/{cmd} 30</code> veya <code>/{cmd} 30s</code>"
+auto_resume_line: "\n<i>⏳ <b>{seconds}</b> saniye içinde otomatik olarak devam edecek</i>"
+
+pause_already: |
+  ⏸️ <b>Zaten Duraklatıldı</b>
+  Müzik zaten duraklatılmış durumda.{auto_resume_line}
+
+pause_success: |
+  ⏸️ <b>Oynatma duraklatıldı</b>
+
+  🎵 Parça: {title}
+  ⏱️ Konum: {position} / {duration}
+  👤 Duraklatan: {user}
+  {auto_resume_line}
+
+play_single_track_too_long: |
+  ⚠️ {limit_mins} dakikadan uzun şarkıları oynatamazsın.
+  <i>{title}</i> atlandı.
+
+play_download_failed: |
+  ❌ "<i>{title}</i>" indirilemedi.
+  Hata: <code>{error}</code>
+
+play_added_to_queue_single: |
+  <b>🎵 Sıraya Eklendi:</b> #{index}
+
+  <b>▫ Parça:</b> <a href="{url}">{title}</a>
+  <b>▫ Süre:</b> {duration}
+  <b>▫ İsteyen:</b> {by}
+
+channel_play_depreciated: "⚠️ Bu işleyici artık kullanılmıyor. Oynatma kanalını ayarlamak için <code>/cplay --set kanal_id</code> kullan."
+play_multiple_tracks_too_long_header: "<b>⚠️ {count} parça atlandı (maksimum süre {limit_mins} dk):</b>"
+play_multiple_tracks_too_long_item: "— <i>{title}</i>"
+play_multiple_tracks_too_long_more: "... ve {remaining} tane daha."
+play_all_tracks_skipped: "❌ Bulunan tüm parçalar süre sınırı nedeniyle atlandı."
+play_failed: "❌ Oynatılamadı\nHata: {error}"
+play_unable: "<b> ❌ Oynatılamıyor </b>\n\n<i>Lütfen <b>sesli sohbeti yeniden başlat</b>.</i>"
+play_downloading_song: "📥 \"{title}\" şarkısı indiriliyor"
+play_download_canceled: "⚠️ İndirme {user} tarafından iptal edildi."
+play_added_multiple_header: "➕ {user} tarafından <b>{count} parça eklendi</b>"
+play_queue_limit_hint: "⚠️ <i>Sıra sınırına ulaşıldı — bazı parçalar atlandı.</i>"
+play_queue_view_hint: "<i>Listenin tamamını görmek için /queue kullan.</i>"
+
+# 🏓 Ping messages
+ping_start: "🏓 Pingleniyor..."
+ping_result: |
+  <b>🏓 PONG</b>: <code>{latency}ms</code>
+  
+  <b><u>🤖 {bot} sistem istatistikleri:</u></b>
+  <b>Çalışma Süresi:</b> {uptime}
+  <b>RAM Kullanımı:</b> {ram_info}
+  <b>CPU Kullanımı:</b> {cpu_usage}
+  <b>Disk Kullanımı:</b> {disk_usage}
+
+position_now: |
+  🎵 <b>{title}</b>
+  📍 <code>{position} / {duration}</code>
+  ⚙️ Hız: <b>{speed}x</b>
+
+queue_limit_reached: "⚠️ Sıra sınırına ulaşıldı (maksimum {limit} parça). Sırayı temizlemek için /clear kullan."
+queue_no_active: "⚠️ <b>Aktif oynatma yok.</b>\n\n<i>Şu anda sırada bir şey yok.</i>"
+queue_header: "🎶 <b>Mevcut Sıra</b>"
+queue_now_playing: "▶️ <b>Şimdi Çalıyor:</b>"
+queue_up_next: "⏭️ <b>Sıradaki:</b>"
+queue_more_line: "\n… ve {remaining} tane daha"
+queue_empty_tail: "📭 <i>Sırada başka şarkı yok.</i>"
+queue_empty: "⚠️ <b>Sıra zaten boş.</b>"
+queue_restored: "✅ <b>{count}</b> parça başarıyla sıraya geri yüklendi."
+queue_restore_no_data: "❌ Geri yüklenecek temizlenmiş bir sıra bulunamadı veya zaten yeni bir şarkı eklendi."
+
+# 🔄 Reload
+reload_start: "⚙️ Yönetici önbelleği, sesli sohbet durumu ve asistan durumu yenileniyor..."
+
+reload_done: "<b>⚙️ Yenileme tamamlandı:</b>\n\n{summary}"
+
+reload_admin_cache_ok: "<b>• Yönetici önbelleği:</b> <i>✅ Tamam</i>"
+reload_admin_cache_fail: "<b>• Yönetici önbelleği:</b> <i>❌ ({error})</i>"
+
+reload_voice_inactive: "<b>• Sesli sohbet:</b> <i>⚪ Devre dışı</i>"
+reload_voice_admin_required: "<b>• Sesli sohbet:</b> <i>❌ Yönetici izni gerekli</i>"
+reload_voice_fail: "<b>• Sesli sohbet:</b> <i>❌ ({error})</i>"
+reload_voice_active: "<b>• Sesli sohbet:</b> <i>✅ Aktif</i>"
+
+reload_assistant_banned: "<b>• Asistan:</b> <i>❌ Yasaklı</i>"
+reload_assistant_admin_required: "<b>• Asistan:</b> <i>❌ Yönetici izni gerekli</i>"
+reload_assistant_fail: "<b>• Asistan:</b> <i>❌ ({error})</i>"
+reload_assistant_present: "<b>• Asistan:</b> <i>✅ Mevcut</i>"
+reload_assistant_not_present: "<b>• Asistan:</b> <i>⚪ Mevcut değil</i>"
+reload_room_reset: "<b>• Oda:</b> <i>Sıfırlandı ✅</i>"
+
+
+remove_usage: "⚠️ <b>Geçersiz kullanım.</b>\nKullanım: <code>{cmd} [indeks]</code>"
+remove_invalid_index: "⚠️ <b>Geçersiz indeks.</b> Bir <b>sayı</b> olmalıdır."
+remove_index_too_small: "⚠️ <b>İndeks 0'dan büyük olmalıdır.</b>"
+remove_index_too_big: "⚠️ Geçersiz indeks. Sırada yalnızca <b>{total}</b> parça var."
+remove_success: "✅ Sırada <b>{index}</b> konumundaki parça çıkarıldı.\n👤 Çıkaran: {user}"
+
+# 🔁 Replay
+replay_failed: "❌ <b>Yeniden Oynatma Başarısız</b>\nHata: <code>{error}</code>"
+replay_success: |
+  🔁 <b>Şimdi yeniden oynatılıyor</b>
+
+  🎵 Başlık: {title}
+  ⏱️ Süre: <code>{duration}</code>
+  ⚙️ Hız: <b>{speed}x</b>
+
+# ▶️ Resume
+resume_already_playing: "ℹ️ <b>Zaten Çalıyor</b>\nMüzik bu sohbette zaten çalıyor.\nDuraklatmak ister misin?"
+resume_failed: "❌ <b>Oynatma Devam Ettirilemedi</b>\nHata: <code>{error}</code>"
+resume_success: |
+  ▶️ <b>Oynatma devam ettiriliyor</b>
+
+  🎵 Başlık: {title}
+  📍 Konum: {position} / {duration}
+  👤 Devam Ettiren: {user}
+  {speed_line}
+
+restart: "♻️ Yeniden başlatılıyor..."
+restart_exepath_fail: "❌ Çalıştırılabilir dosya yolu alınamadı: {error}"
+restart_symlink_fail: "❌ Çalıştırılabilir dosya yolu çözülemedi: {error}"
+restart_service: "{bot} az önce yeniden başlatıldı. Sorunlar için üzgünüz.\n\n10–15 saniye sonra tekrar çalmaya başlayabilirsin."
+restart_initiated: "✅ Yeniden başlatma başarıyla başlatıldı!"
+restart_fail: "❌ Yeniden başlatılamadı: {error}"
+
+room_not_active_cb: "⚠️ Şu an hiçbir şey çalmıyor."
+room_no_active: "⚠️ <b>Aktif oynatma yok.</b>\n\n<i>Şu an hiçbir şey çalmıyor.</i>"
+room_not_linked: "⚠️ Bu kanal herhangi bir gruba bağlı değil."
+
+room_already_paused: "⏸️ Parça zaten duraklatılmış. Devam etmek için ▶️ Devam Et düğmesine dokun."
+room_already_paused_auto: "⏸️ Parça zaten duraklatılmış — {duration} içinde otomatik olarak devam edecek."
+room_pause_failed: "❌ Oynatma duraklatılamadı.\n\n<i>{error}</i>"
+
+rtmp_not_configured: |
+  ⚠️ <b>RTMP yapılandırılmamış!</b>
+  
+  Lütfen önce RTMP sunucusunu ayarla:
+  <code>{cmd} rtmps://sunucu/s/yayinanahtari</code>
+
+rtmp_already_streaming: |
+  📡 <b>Zaten yayında!</b>
+  
+  Mevcut yayını sonlandırmak için <code>/streamstop</code> kullan.
+
+rtmp_init_failed: |
+  ❌ <b>RTMP yayını başlatılamadı:</b>
+  <code>{error}</code>
+
+rtmp_starting_stream: "📡 <b>RTMP yayını başlatılıyor...</b>"
+
+rtmp_play_failed: |
+  ❌ <b>Yayın başlatılamadı:</b>
+  <code>{error}</code>
+
+rtmp_now_streaming: |
+  📡 <b>Şimdi Yayınlanıyor (RTMP):</b>
+  
+  <b>▫ Parça:</b> <a href="{url}">{title}</a>
+  <b>▫ Süre:</b> {duration}
+  <b>▫ Başlatan:</b> {by}
+  
+  ⚠️ <i>Not: RTMP'de ~15-30 saniyelik bir ara bellek gecikmesi vardır</i>
+
+rtmp_not_streaming: "ℹ️ Aktif bir RTMP yayını yok."
+
+rtmp_stop_failed: |
+  ❌ <b>Yayın durdurulamadı:</b>
+  <code>{error}</code>
+
+rtmp_stopped: |
+  ⏹️ <b>RTMP yayını {user} tarafından durduruldu</b>
+
+rtmp_configured_not_started: |
+  ℹ️ <b>RTMP Durumu:</b> Başlatılmadı
+  
+  <b>▫ Sunucu:</b> <code>{server}</code>
+  <b>▫ Durum:</b> Yayına hazır
+  
+  Yayını başlatmak için <code>/stream &lt;sorgu&gt;</code> kullan.
+
+rtmp_status_playing: |
+  📡 <b>RTMP Yayın Durumu</b>
+  
+  <b>▫ Durum:</b> ▶️ Yayınlanıyor
+  <b>▫ Konum:</b> {position}
+  <b>▫ Sunucu:</b> <code>{server}</code>
+
+rtmp_status_paused: |
+  📡 <b>RTMP Yayın Durumu</b>
+  
+  <b>▫ Durum:</b> ⏸️ Duraklatıldı
+  <b>▫ Sunucu:</b> <code>{server}</code>
+
+rtmp_status_idle: |
+  📡 <b>RTMP Yayın Durumu</b>
+  
+  <b>▫ Durum:</b> ⏹️ Boşta
+  <b>▫ Sunucu:</b> <code>{server}</code>
+
+rtmp_dm_only: |
+  🔒 <b>Güvenlik Bildirimi</b>
+  
+  RTMP kimlik bilgileri ASLA gruplarda paylaşılmamalıdır!
+  
+  <b>📩 RTMP'yi yapılandırmak için:</b>
+  1. Özel sohbetimi aç: @{bot_username}
+  2. Gönder: <code>{cmd} &lt;sohbet_id&gt; &lt;rtmp_url&gt;</code>
+  
+  <b>💡 Örnek:</b>
+  <code>/setrtmp -1001234567890 rtmps://sunucu/s/anahtar</code>
+
+rtmp_setup_usage: |
+  ⚙️ <b>RTMP Yapılandırması</b>
+  
+  <u>Kullanım:</u>
+  <code>/setrtmp &lt;sohbet_id&gt; &lt;tam_rtmp_url&gt;</code>
+  
+  <b>📋 Parametreler:</b>
+  • <code>sohbet_id</code> - Hedef sohbet/kanal ID'si
+  • <code>tam_rtmp_url</code> - Yayın anahtarı ile birlikte tam RTMP URL'si
+  
+  <b>📝 Örnek:</b>
+  <code>/setrtmp -1001234567890 rtmps://dc5-1.rtmp.t.me/s/123:anahtar</code>
+  
+  <b>🔍 Sohbet ID'si nasıl alınır:</b>
+  • Sohbetten herhangi bir mesajı @userinfobot'a ilet
+  • Veya sohbette <code>/id</code> komutunu kullan
+  
+  <b>🔐 Güvenlik:</b>
+  • Yapılandırma yalnızca ÖM (özel mesaj) üzerinden çalışır
+  • Hedef sohbette yönetici olmalısın
+  • Kimlik bilgileri güvenli bir şekilde saklanır
+
+rtmp_invalid_chat_id: |
+  ❌ <b>Geçersiz sohbet ID!</b>
+  
+  Lütfen geçerli bir sayısal sohbet ID'si sağla.
+  
+  <b>💡 Örnek:</b>
+  <code>/setrtmp -1001234567890 rtmps://...</code>
+
+rtmp_check_admin_failed: |
+  ❌ <b>Yönetici durumu doğrulanamadı:</b>
+  <code>{error}</code>
+  
+  <b>⚠️ Şunlardan emin ol:</b>
+  • Hedef sohbette yöneticiyim
+  • Sohbet ID'si doğru
+  • Yönetici izinlerine sahipsin
+
+rtmp_not_admin: |
+  ⚠️ <b>Yetki Reddedildi</b>
+  
+  RTMP yapılandırmak için hedef sohbette bir <b>yönetici</b> olmalısın.
+
+rtmp_parse_failed: |
+  ❌ <b>RTMP URL'si ayrıştırılamadı:</b>
+  <code>{error}</code>
+  
+  <b>📋 Doğru biçim:</b>
+  <code>rtmp://sunucu/uygulama/yayinanahtari</code>
+  veya
+  <code>rtmps://sunucu/s/yayinanahtari</code>
+
+rtmp_streaming_not_supported: |
+  ⚠️ <b>Yayın desteklenmiyor</b>
+  
+  Bu eylem <b>RTMP modu</b> kullanılırken kullanılamaz.
+  
+  RTMP üzerinden medya oynatmak için <code>/stream</code> kullan.
+  
+rtmp_configured_success: |
+  ✅ <b>RTMP Başarıyla Yapılandırıldı!</b>
+  
+  <b>🆔 Sohbet ID:</b> <code>{chat_id}</code>
+  <b>🔗 URL:</b> <code>{url}</code>
+  <b>🔑 Anahtar:</b> <code>{key}</code>
+  
+  <b>✨ Sonraki Adımlar:</b>
+  Sohbetine git ve şunu kullan:
+  <code>/stream &lt;şarkı adı&gt;</code>
+  
+  <b>🔒 Güvenlik Notu:</b>
+  Kimlik bilgileri güvenli bir şekilde saklanır ve asla grupta gösterilmez.
+
+
+searching: "🔍🎶 Aranıyor... ⚡✨"
+searching_query: "🔍🎶 Aranan: <b>{query}</b>... ⚡✨"
+
+speed_line: "⚙️ Hız: <b>{speed}x</b>"
+
+stats_system_header: "🔧 <b>Sistem:</b>"
+stats_go_mem_header: "📦 <b>Dahili Bellek (Go):</b>"
+stats_server_header: "💻 <b>Sunucu İstatistikleri:</b>"
+stats_served_header: "📊 <b>Hizmet Verilen:</b>"
+
+stats_system_os_arch: "• İşletim Sistemi: <code>{os}</code>, Mimari: <code>{arch}</code>"
+stats_system_cpu_goroutines: "• İşlemciler: <code>{cpus}</code>, Goroutine Sayısı: <code>{goroutines}</code>"
+
+stats_go_alloc: "• Ayrılan (Alloc): <code>{alloc} MB</code>"
+stats_go_sys: "• Sistem (Sys): <code>{sys} MB</code>"
+stats_go_gc: "• NumGC: <code>{gc_count}</code> ({emoji} {gc_rate}/dk)"
+
+stats_server_cpu: "• CPU Kullanımı: {emoji} <code>%{cpu}</code>"
+stats_server_ram: "• RAM Kullanımı: {emoji} <code>{used_gib} GiB</code> | <code>{total_gib} GiB</code>"
+stats_server_storage: "• Depolama: <code>{used_gib} GiB</code> | <code>{total_gib} GiB</code>"
+
+stats_served_chats: "• Sohbetler: <code>{count}</code>"
+stats_served_chats_err: "• Sohbetler: <code>Hata: {error}</code>"
+
+stats_served_users: "• Kullanıcılar: <code>{count}</code>"
+stats_served_users_err: "• Kullanıcılar: <code>Hata: {error}</code>"
+
+# 👑 Sudo users
+
+sudo_owner_self: "😂 Haha, zaten patronsun! Neden kendini eklemeye çalışıyorsun ki?"
+sudo_bot_self: "🤖 Haha, ben bir botum! Kendimi sudo listesine ekleyemem — sahibi bile beni kandıramaz 😎"
+sudo_bot_user: "🤖 Sudo listesine bir bot ekleyemezsin — sudo kullanıcıları insan olmalı!"
+
+sudo_fetch_user_fail: "❌ Kullanıcı bilgileri alınamadı. Belki kullanıcıya erişilemiyordur.\n<i>{error}</i>"
+sudo_check_fail: "❌ Sudo varlığı kontrol edilemedi: <i>{error}</i>"
+sudo_already: "⚠️ {user} kullanıcısı (ID:<code>{id}</code>) zaten bir sudo kullanıcısı."
+sudo_add_fail: "❌ Sudo eklenemedi: <i>{error}</i>"
+sudo_add_success: "✅ {user} (<code>{id}</code>) sudo listesine eklendi."
+sudo_assistant_self: "🤖 Asistan varsayılan olarak her zaman sudo listesindedir — tekrar eklenemez."
+
+sudo_owner_remove_block: "😎 Güzel deneme! Sahibini kaldıramazsın — o dokunulmazdır."
+sudo_assistant_cannot_remove: "🤖 Asistan gereklidir ve sudo listesinden çıkarılamaz."
+sudo_not_exists: "⚠️ {user} kullanıcısı (<code>{id}</code>) bir sudo kullanıcısı değil."
+sudo_remove_fail: "❌ Sudo kaldırılamadı: <i>{error}</i>"
+sudo_remove_success: "🗑️ {user} (ID: <code>{id}</code>) sudo listesinden çıkarıldı."
+
+sudo_list_fetching: "⏳ Sudo listesi getiriliyor..."
+sudo_list_fetch_fail: "❌ Sudo kullanıcıları alınamadı: <code>{error}</code>"
+sudo_list_header: "👑 <b>Mevcut Sudo Kullanıcıları:</b>"
+sudo_list_owner: "{index}. {user} — <b>Sahip</b>"
+sudo_list_entry: "{index}. {user}"
+sudo_list_no_extra: "⚠️ Ek sudo kullanıcısı bulunamadı."
+
+seek_no_active: "⚠️ <b>Şu anda çalan bir parça yok.</b>"
+seek_usage: "⚠️ Lütfen saniye belirt.\nÖrnek: <code>{cmd} 40</code>"
+seek_invalid_seconds: "⚠️ Geçersiz saniye değeri.\nÖrnek: <code>{cmd} 40</code>"
+seek_too_close_start: "⚠️ <b>{seconds}</b> saniye geri sarılamaz — parçanın başlangıcına çok yakın."
+seek_too_close_end: "⚠️ <b>{seconds}</b> saniye ileri sarılamaz — parçanın sonuna çok yakın."
+seek_failed: "❌ {direction} yönüne <b>{seconds}</b> saniye sarılamadı.\nHata: <code>{error}</code>"
+seek_success: "{emoji} {direction} yönüne sarılarak <u>{duration}</u> süreli parçanın <u>{position}</u> konumuna gelindi."
+
+stop_confirm_paused: |
+  ⏸️ <b>Oynatma şu an duraklatılmış durumda.</b>
+
+  Çalmaya devam mı etmek istersin yoksa tamamen durdurmak mı?
+
+stop_confirm_muted: |
+  🔇 <b>Oynatma şu an sessize alınmış durumda.</b>
+
+  Sesi açmak mı istersin yoksa tamamen durdurmak mı?
+
+stopped: "⏹️ <b>Oynatma {user} tarafından durduruldu ve sıra temizlendi.</b>"
+
+shuffle_current_state: "🔀 Bu sohbet için karıştırma şu an <b>{state}</b>.\n\nDeğiştirmek için <code>{cmd}</code> kullan."
+shuffle_updated: "🔀 Karıştırma, {user} tarafından <b>{state}</b> konumuna getirildi."
+
+skip_stopped: "⏹️ Oynatma durduruldu. Sıra boş.\nAtlayan: {user}"
+
+speed_usage: |
+  💡 <b>Kullanım:</b>
+  <code>{cmd} [hız] [süre]</code> — oynatma hızını değiştirir
+  
+  İzin verilen hız aralığı: <b>0.50x → 4.00x</b>
+  Süre (isteğe bağlı), belirtilen saniye dolduğunda hızı normale döndürür.
+  
+  Örnek:
+  <code>{cmd} 1.25 45</code> — 45 saniye boyunca 1.25x hızında çal.
+
+speed_current: "🎧 <b>Mevcut Hız:</b> 🎵 <u>{title}</u> için <code>{speed}x</code>\n\n💡 Normal oynatmaya dönmek için <code>{cmd} reset</code> kullan."
+
+speed_current_with_reset: |
+  🎧 <b>Mevcut Hız:</b> <code>{speed}x</code>
+
+  🎵 <b>Parça:</b> <i>{title}</i>
+  ⏳ <b>Otomatik sıfırlama süresi:</b> {duration}
+  
+  💡 Normal oynatmaya anında dönmek için <code>{cmd} reset</code> kullan.
+
+speed_invalid_value: "❌ Geçersiz hız değeri.\nÖrnek: <code>{cmd} 1.5</code> veya <code>{cmd} 2x</code>"
+speed_invalid_range: "⚠️ Hız <b>0.50x</b> ile <b>4.00x</b> arasında olmalıdır."
+speed_invalid_duration: "⚠️ Geçersiz süre. <b>5</b> ile <b>3600</b> saniye arasında olmalıdır."
+
+speed_already_set: "ℹ️ 🎵 <b>{title}</b> için oynatma hızı zaten <b>{speed}x</b>"
+
+speed_already_set_reset_hint: "ℹ️ 🎵 <b>{title}</b> için oynatma hızı zaten <b>{speed}x</b>\n\n💡 Normal hıza dönmek için <code>{cmd} reset</code> kullan."
+
+speed_failed: |
+  ❌ Hız <b>{speed}x</b> olarak değiştirilemedi.
+  Hata: <code>{error}</code>
+
+speed_reset_success: "✅ Oynatma hızı {user} tarafından <b>1.0x</b> olarak sıfırlandı."
+
+speed_set: "🚀 Oynatma hızı {user} tarafından <b>{speed}x</b> olarak ayarlandı."
+speed_set_with_reset: |
+  🚀 Oynatma hızı {user} tarafından <b>{speed}x</b> olarak ayarlandı.
+  ⏳ <b>{duration}</b> saniye sonra normale dönecek.
+
+
+spt_fetch_fail: "⚠️ Ağ bilgileri alınamadı: <code>{error}</code>"
+spt_servers_fetch_fail: "⚠️ Sunucular alınamadı: <code>{error}</code>"
+spt_best_server_fail: "⚠️ En iyi sunucu bulunamadı: <code>{error}</code>"
+
+spt_running_download: "🚀 İndirme testi yapılıyor..."
+spt_running_upload: "📤 Yükleme testi yapılıyor..."
+
+spt_result: |
+  <b>📡 Hız Testi Sonucu</b>
+
+  <b><u>👤 İstemci</u></b>
+  IP: <code>{ip}</code>
+  İSS: {isp}
+  Enlem: <code>{lat}</code>
+  Boylam: <code>{lon}</code>
+
+  <b><u>🛰️ Sunucu</u></b>
+  Ad: {server_name}
+  Ülke: {country}
+  Sponsor: {sponsor}
+  Mesafe: {distance_km} km
+  Gecikme: {latency_ms} ms
+
+  <b><u>⚡ Hız</u></b>
+  İndirme: <code>{dl_mbps} Mbps</code>
+  Yükleme: <code>{ul_mbps} Mbps</code>
+
+start_private: "Merhaba {user}, Benim adım {bot}.\n\nBen bazı kullanışlı özelliklere sahip bir Telegram akış botuyum. Youtube, Spotify, JioSaavn, Soundcloud vb. platformları destekliyorum.\n\nBeni gruplarına eklemekten çekinme."
+
+start_group: "<b>💫 Buradayım!</b> Bir komut dene... Tabi benimle başa çıkabileceğini düşünüyorsan 😉"
+
+stream_channelid_fail: "⚠️ Bağlı kanalın ID'si alınamadı."
+stream_queue_finished: "🎵 <b>Sıra Bitti!</b>\n\nÇalacak başka şarkı kalmadı. Daha fazla parça eklemek için /play kullan! 🎶"
+stream_downloading_next: "📥 Sonraki parçan indiriliyor..."
+stream_download_fail: "❌ İndirme başarısız.\nHata: <code>{error}</code>"
+stream_play_fail: "❌ Şarkı oynatılamadı."
+stream_now_playing: |
+  <b>🎵 Şimdi Çalıyor:</b>
+
+  <b>▫ Parça:</b> <a href="{url}">{title}</a>
+  <b>▫ Süre:</b> {duration}
+  <b>▫ İsteyen:</b> {by}
+
+# 👑 Sudo / Owner Join Messages
+sudo_join_owner: "👑 {bot} sahibi — {user} — az önce sohbete katıldı."
+sudo_join_sudo: "🛡️ {bot} sudo kullanıcısı — {user} — az önce sohbete katıldı."
+
+supergroup_needed: |
+  Bu sohbet (ID: <code>{chat_id}</code>) henüz bir süper grup değil.
+  <b>⚠️ Lütfen bu sohbeti süper gruba dönüştür ve ardından beni yönetici olarak ekle.</b>
+  
+  Nasıl dönüştüreceğini bilmiyorsan bu rehberi kullanabilirsin:
+  🔗 <a href=\"https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02\">Grubu Süper Gruba Dönüştürme</a>
+  
+  Soruların varsa destek grubumuza katıl.
+unmute_already: "ℹ️ <b>Zaten Sesi Açık</b>\nMüzik bu sohbette sessize alınmamış."
+unmute_failed: "❌ <b>Oynatma Sesi Açılamadı</b>\nHata: <code>{error}</code>"
+unmute_success: |
+  🔊 <b>Oynatma sesi açıldı</b>
+
+  🎵 Parça: {title}
+  👤 Sesi Açan: {user}
+  {speed_line}
+
+
+# 🔊 Sesli Sohbet Etkinlikleri
+voicechat_ended: "<b>⚠️ Görüntülü sohbet sona erdi</b>\n\n<i>⏰ Süre: {duration}</i>"
+voicechat_started: "<b>♻️ Sesli sohbet başladı!</b>\n\n<i>Müzik çalmak için /play [şarkı adı] kullan.</i>"
+
+# Commands help
+help_owner: |
+  👑 <b>Sahip Komutları</b>
+
+  <i>Sudo kullanıcılarını yönetmek, sistem kodu yürütmek ve bot yönetimini güvenli bir şekilde gerçekleştirmek için özel araçlar.</i>
+
+  <b>Komutlar:</b>
+  <blockquote>
+  <b>/addsudo</b> - Botun sudo listesine yeni bir kullanıcı ekle
+  <b>/delsudo</b> - Botun sudo listesinden bir kullanıcı çıkar
+  <b>/eval</b> - Go kod parçacıklarını yürüt
+  <b>/maintenance</b> — Botun bakım modunu yönet
+  <b>/restart</b> — Botu yeniden başlat
+  <b>/sh</b> - Kabuk (shell) komutlarını çalıştır
+  </blockquote>
+
+help_sudo: |
+  ⚡ <b>Sudo Komutları</b>
+
+  <i>Bot davranışını yönetmek, performansı izlemek, günlükleri ve otomasyonu kontrol etmek için gelişmiş araçlar.</i>
+
+  <b>Komutlar:</b>
+  <blockquote>
+  <b>/active</b> - Toplam aktif sohbetleri gösterir
+  <b>/autoleave</b> - Otomatik sohbetten ayrılma özelliğini değiştir
+  <b>/logger</b> - Günlüğü etkinleştir veya devre dışı bırak
+  <b>/stats</b> - Bot ve sistem istatistiklerini görüntüle
+  <b>/logs</b> - Sistem günlüklerini al 
+  </blockquote>
+
+help_admin: |
+  🛠 <b>Yönetici Komutları</b>
+
+  <i>Yöneticilerin oynatmayı kolayca yönetmesi için müzik ve oynatma kontrol araçları.</i>
+
+  <b>Komutlar:</b>
+  <blockquote>
+  <b>/speed</b> - Oynatma hızını değiştir
+  <b>/skip</b> - Mevcut şarkıyı atla
+  <b>/pause</b> - Mevcut oynatmayı duraklat
+  <b>/resume</b> - Duraklatılan oynatmayı devam ettir
+  <b>/replay</b> - Mevcut şarkıyı yeniden oynat
+  <b>/mute</b> - Oynatmayı sessize al
+  <b>/unmute</b> - Oynatma sesini aç
+  <b>/seek</b> - Birkaç saniye ileri sar
+  <b>/seekback</b> - Birkaç saniye geri sar
+  <b>/jump</b> - Parçada belirli bir zamana atla
+  <b>/move</b> - Sıradaki bir parçayı başka bir konuma taşı
+  <b>/clear</b> - Tüm şarkıları sıradan temizle
+  <b>/remove</b> - Sıradan belirli bir parçayı çıkar
+  <b>/shuffle</b> - Sıradaki tüm parçaları karıştır
+  <b>/loop</b> - Döngüyü etkinleştir veya devre dışı bırak
+  <b>/stop</b> - Oynatmayı durdur ve sesli sohbetten ayrıl
+  <b>/nothumb</b> - Oynatma mesajlarında kapak resmi/küçük resmi etkinleştir veya devre dışı bırak
+  </blockquote>
+  
+help_public: |
+  🌍 <b>Genel Komutlar</b>
+
+  <i>Şarkı çalma, sıraları görüntüleme, gecikme kontrolü ve hata bildirme özellikleri.</i>
+
+  <b>Komutlar:</b>
+  <blockquote>
+  <b>/play</b> - Bir şarkı çal
+  <b>/queue</b> - Şu an sırada olan tüm parçaları görüntüle
+  <b>/ping</b> - Botun ağ gecikmesini kontrol et
+  <b>/start</b> - Botu başlat
+  <b>/help</b> - Yardım menüsünü göster
+  <b>/bug</b> - Bir sorun veya hata bildir
+  <b>/position</b> - Mevcut parçanın zaman damgasını göster
+  <b>/reload</b> - Yönetici veya önbellek verilerini yenile
+  <b>/json</b> - Mesajın JSON yapısını göster
+  <b>/sudolist</b> - Sudo kullanıcı listesini görüntüle
+  </blockquote>

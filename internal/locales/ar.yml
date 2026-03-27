@@ -1,0 +1,999 @@
+name: "🇸🇦 العربية"
+
+# buttons
+CONFIRM_RESUME_BTN: "▶️ استئناف"
+CONFIRM_UNMUTE_BTN: "🔊 إلغاء الكتم"
+CONFIRM_STOP_BTN: "⏹️ إيقاف"
+ADD_ME_BTN: "⚡ أضفني إلى مجموعتك"
+BROADCAST_CANCEL_BTN: "🚫 إلغاء البث"
+CLOSE_BTN: "إغلاق"
+DOWNLOAD_CANCEL_BTN: "🚦 إلغاء التنزيل"
+GC_HELP_BTN: "📒 الأوامر"
+
+START_HELP_BTN: "❓ المساعدة والأوامر"
+
+UPDATES_BTN: "📢 التحديثات"
+SUPPORT_BTN: "💬 الدعم"
+
+HELP_ADMINS_BTN: "🛠 المشرفون"
+HELP_PUBLIC_BTN: "🌍 عام"
+HELP_OWNER_BTN: "👑 المالك"
+HELP_SUDOERS_BTN: "⚡ المساعدون"
+
+BACK_BTN: "⬅️ عودة"
+
+# basically this string used in /command [bool]
+invalid_bool: "⚠️ <b>قيمة غير صالحة.</b>\nاستخدم 'enable' (تفعيل) أو 'disable' (تعطيل)."
+
+active_chats_info: "📊 <b>المحادثات النشطة:</b>\n\nيوجد <i>{count}</i> من المحادثات النشطة عبر نظام المساعد الآلي."
+active_chats_info_with_broken: "📊 <b>المحادثات النشطة:</b>\n\nيوجد <i>{count}</i> من المحادثات النشطة عبر نظام المساعد الآلي، ولكن <i>{broken}</i> منها قد تواجه مشكلات في العرض بشكل صحيح."
+
+
+# 🚫 Assistant Restricted / Banned
+assistant_restricted_warning: |
+  ⚠️ <b>المساعد الآلي مقيد</b>
+
+  المساعد {assistant} (المعرف: <code>{id}</code>) <b>محظور</b> أو مقيد في هذه المحادثة.
+  لا يمكنني تشغيل الموسيقى، أو إدارة قائمة الانتظار، أو تنظيف المسارات طالما استمر هذا الوضع.
+
+  <i>قم بإلغاء حظر المساعد لاستعادة كافة ميزات الموسيقى 🎵</i>
+
+# 🧩 Common auth messages
+auth_no_user: "⚠️ يرجى تحديد مستخدم — استخدم:\n{cmd} [user_id] أو قم بالرد على رسالة المستخدم."
+user_extract_fail: "⚠️ تعذر العثور على هذا المستخدم: <i>{error}</i>"
+auth_limit_reached: "⚠️ وصلت هذه المحادثة إلى الحد الأقصى للمستخدمين المصرح لهم ({limit}). يرجى إزالة شخص ما قبل إضافة مستخدم جديد."
+already_authed: "⚠️ هذا المستخدم مصرح له بالفعل — لا داعي لإضافته مرة أخرى."
+
+# 🤖 Add auth
+cannot_authorize_user: "⚠️ لا يمكن التصريح لهذا المستخدم.\nمالك المساعد الآلي، المساعد الآلي نفسه، أو أنت لا تحتاجون إلى تصريح."
+addauth_user_is_admin: "⚠️ هذا المستخدم هو بالفعل مشرف في المحادثة. لا حاجة للتصريح."
+addauth_bot_user: "🤖 لا يمكنك إضافة مساعد آلي إلى قائمة التصريح — يجب أن يكون المستخدمون المصرح لهم بشراً!"
+addauth_add_fail: "❌ فشل إضافة المستخدم المصرح له: {error}"
+addauth_success_with_count: "✅ تمت إضافة {user}.\nالآن يوجد {count}/{limit} مستخدم مصرح له."
+addauth_success: "✅ تمت إضافة {user} بنجاح إلى قائمة المستخدمين المصرح لهم."
+
+# 🤖 Bot Added to Chat
+bot_added_normal: "🎵 شكراً لإضافتي! استخدم /play [اسم الأغنية] لبدء تشغيل الموسيقى."
+
+# 🛠️ Bot Added During Maintenance
+bot_added_maintenance: "⚠️ أنا حالياً قيد الصيانة وسأعود قريباً. شكراً لصبرك! ⏰"
+maint_reason_generic: "<i>📝 السبب: {reason}</i>"
+
+# ⚠️ Bot Demotion
+bot_demotion_goodbye: |
+  <b>⚠️ فقدان الصلاحيات</b>
+
+  لقد تمت <b>إقالتي من منصب المشرف</b> ولا يمكنني أداء مهامي بعد الآن.
+  بدون الحقوق المناسبة، لا يمكنني العمل هنا، لذا <i>سأغادر المحادثة الآن</i>.
+
+  <b>وداعاً 👋</b>
+
+broadcast_already_running: "⚠️ هناك بث جارٍ بالفعل.\n\nيرجى الانتظار حتى يكتمل أو إلغاؤه أولاً باستخدام:\n• <code>/broadcast -cancel</code>\n• أو انقر فوق زر الإلغاء في رسالة التقدم"
+broadcast_parse_failed: "❌ فشل تحليل أمر البث:\n<code>{error}</code>"
+broadcast_no_content: "⚠️ لم يتم توفير محتوى للبث.\n\n<b>الاستخدام:</b> <code>{cmd} [النص أو الرد على رسالة]</code>\n\n<b>مثال:</b>\n<code>{cmd} مرحباً بالجميع!</code>"
+broadcast_fetch_chats_failed: "❌ فشل جلب المحادثات المخدومة:\n<code>{error}</code>"
+broadcast_fetch_users_failed: "❌ فشل جلب المستخدمين المخدومين:\n<code>{error}</code>"
+broadcast_no_targets: "⚠️ لم يتم العثور على أهداف للبث.\n\nتأكد من أنك لم تستبعد جميع الأهداف باستخدام الأعلام."
+broadcast_initializing: "📡 جاري تهيئة البث...\n\nيرجى الانتظار..."
+broadcast_cancelled_header: "🚫 تم إلغاء البث"
+broadcast_completed_header: "✅ اكتمل البث"
+broadcast_progress_header: "📡 جاري البث..."
+broadcast_total_chats: "📊 إجمالي المحادثات: {done}/{total} ({progress}%)"
+broadcast_total_users: "👥 إجمالي المستخدمين: {done}/{total} ({progress}%)"
+broadcast_failed_chats: "❌ المحادثات الفاشلة: {count}"
+broadcast_failed_users: "❌ المستخدمون الفاشلون: {count}"
+broadcast_delay: "⏱ التأخير: {delay} ثانية"
+broadcast_elapsed: "⏰ الوقت المنقضي: {elapsed}"
+broadcast_eta: "⏳ الوقت المتوقع: {eta}"
+broadcast_success_rate: "✨ نسبة النجاح: {rate}% ({sent}/{total})"
+broadcast_not_running: "ℹ️ لا يوجد بث جارٍ حالياً."
+broadcast_cancel_success: "🚫 تم إلغاء البث بنجاح."
+broadcast_cancel_owner_only: "⚠️ يمكن للمالك فقط إلغاء البث."
+broadcast_cancel_none_running: "ℹ️ لا يوجد بث جارٍ حالياً."
+broadcast_cancel_done: "🚫 تم إلغاء البث."
+
+# 🎧 CPlay (Channel Play)
+
+cplay_id_not_set: "⚠️ لم يتم تعيين معرف cplay.\nاستخدم <code>/cplay --set &lt;chat_id&gt;</code> لتعيينه."
+cplay_usage: "<b>الاستخدام:</b> <code>/cplay --set &lt;channel_id&gt;</code>"
+cplay_invalid_chat_id: "<b>معرف محادثة غير صالح:</b> يرجى تقديم معرف رقمي صحيح للقناة."
+cplay_resolve_peer_fail: "<b>فشل جلب الأطراف:</b> تعذر جلب تفاصيل القناة. تأكد من أنني أملك صلاحية الوصول إلى هذه القناة."
+cplay_invalid_target: "<b>هدف غير صالح:</b> المعرف المقدم ليس قناة صالحة."
+cplay_channel_not_accessible: "<b>لا يمكن الوصول إلى القناة:</b> تعذر استرداد معلومات القناة. يرجى التأكد من أنني مشرف في القناة المستهدفة."
+cplay_save_error: "<b>خطأ:</b> فشل حفظ إعدادات CPlay."
+cplay_enabled: "✅ <b>تم تفعيل تشغيل القناة.</b> جميع أوامر <code>/c</code> ستعمل الآن في القناة <code>{channel_id}</code>."
+
+# Callback handler messages
+invalid_request: "⚠️ طلب غير صالح."
+unknown_action: "⚠️ إجراء غير معروف."
+download_cancelled: "✅ تم إلغاء التنزيل."
+no_download_to_cancel: "ℹ️ لا يوجد تنزيل لإلغائه."
+
+# Pause callback
+cb_pause_success: "⏸️ تم إيقاف المقطع مؤقتاً عند {position}"
+cb_pause_message: |
+  <b>⏸️ تم إيقاف المقطع مؤقتاً</b>
+
+  <b>▫ المقطع:</b> <a href="{url}">{title}</a>
+  <b>▫ الموضع:</b> {position} / {duration}
+  <b>▫ أوقف بواسطة:</b> {user}
+
+# Resume callback
+cb_already_playing: "ℹ️ المقطع قيد التشغيل بالفعل."
+cb_resume_failed: "❌ فشل استئناف التشغيل."
+cb_resume_success: "▶️ تم الاستئناف عند {position}."
+cb_resume_message: |
+  <b>🎵 جاري التشغيل الآن:</b>
+
+  <b>▫ المقطع:</b> <a href="{url}">{title}</a>
+  <b>▫ المدة:</b> {duration}
+  <b>▫ استؤنف بواسطة:</b> {user}
+
+# Replay callback
+cb_replaying: "🔁 <b>جاري إعادة تشغيل المقطع الحالي...</b>"
+cb_replay_failed: "❌ فشل إعادة تشغيل المقطع."
+cb_replay_success: "🔁 تمت إعادة تشغيل المقطع."
+cb_replay_edited: "🔁 تمت إعادة تشغيل المقطع بواسطة {user}."
+
+# Skip callback
+cb_skip_queue_empty: "⏹️ توقف التشغيل — قائمة الانتظار فارغة."
+cb_skip_download_failed: "❌ فشل تنزيل المقطع التالي."
+cb_skip_play_failed: "❌ فشل تشغيل المقطع التالي."
+cb_skip_success: "⏭️ تم تخطي المقطع."
+cb_skip_edited: "⏭️ تم التخطي بواسطة {user}"
+
+# Stop callback
+cb_stop_success: "⏹️ توقف التشغيل."
+
+# Mute/Unmute callback
+cb_mute_success: "🔇 تم كتم الصوت."
+cb_mute_message: |
+  <b>🔇 تم كتم التشغيل</b>
+
+  <b>▫ المقطع:</b> <a href="{url}">{title}</a>
+  <b>▫ كُتم بواسطة:</b> {user}
+
+cb_unmute_success: "🔊 تم إلغاء الكتم."
+
+cb_seek_success: "⏩ تم التقديم بمقدار {seconds} ثانية"
+cb_seek_near_end: "⚠️ لا يمكن التقديم بمقدار {seconds} ثانية — شارف المقطع على الانتهاء."
+cb_seek_edited: "⏩ تم التقديم بمقدار {seconds} ثانية — بواسطة {user}"
+
+cb_seekback_success: "⏪ تم الرجوع بمقدار {seconds} ثانية"
+cb_seekback_edited: "⏪ تم الرجوع بمقدار {seconds} ثانية — بواسطة {user}"
+
+# 🗑️ Delete auth
+del_auth_not_authorized: "⚠️ هذا المستخدم غير مصرح له أصلاً — لا يوجد ما يتم حذفه."
+del_auth_remove_fail: "❌ فشل حذف المستخدم المصرح له: <code>{error}</code>"
+del_auth_success: "✅ تمت إزالة {user} بنجاح من قائمة المستخدمين المصرح لهم."
+
+# 📜 Auth list
+authlist_fetch_fail: "❌ فشل جلب قائمة المستخدمين المصرح لهم: <code>{error}</code>"
+authlist_empty: "ℹ️ لا يوجد مستخدمون مصرح لهم في هذه المحادثة."
+authlist_fetching: "⏳ جاري جلب قائمة المستخدمين المصرح لهم..."
+authlist_header: "<b>المستخدمون المصرح لهم:</b>"
+authlist_user_fail: "{index}. <code>{user_id}</code> (تعذر جلب معلومات المستخدم)"
+authlist_user_entry: "{index}. {user} (<code>{user_id}</code>)"
+authlist_total: "<b>الإجمالي:</b> {count} مستخدمين"
+
+autoleave_fetch_fail: "⚠️ <b>فشل جلب حالة المغادرة التلقائية.</b>"
+autoleave_status: "🏃‍♂️ <b>التحكم في المغادرة التلقائية</b>\n\nعند التفعيل، سيغادر المساعد المحادثة تلقائياً.\nالاستخدام: {cmd} [enable|disable]\nالحالة الحالية: {action}"
+autoleave_already: "⚠️ المغادرة التلقائية {action} بالفعل"
+autoleave_update_fail: "⚠️ <b>فشل تحديث حالة المغادرة التلقائية.</b>"
+autoleave_updated: "🏃‍♂️ المغادرة التلقائية أصبحت {action}"
+
+enabled: "مفعلة"
+disabled: "معطلة"
+
+bug_usage: "⚠️ يرجى وصف الخطأ. الاستخدام: {cmd} <الوصف> أو قم بالرد على رسالة."
+bug_thanks: "✅ شكراً لإبلاغك عن الخطأ! لقد تم إرساله إلى المطورين."
+
+bug_report_format: |
+  <b>🐞 بلاغ جديد عن خطأ</b>
+
+  <b>من:</b> {user} (<code>{user_id}</code>)
+  <b>المحادثة:</b> {chat} (<code>{chat_id}</code>)
+
+  <b>البلاغ:</b>
+  <pre>{report}</pre>
+
+clear_no_active: "⚠️ <b>لا يوجد تشغيل نشط أو قائمة انتظار لتنظيفها.</b>"
+clear_success: "✅ تم تنظيف قائمة الانتظار بواسطة {user}.\n<i>يمكنك استعادتها باستخدام <code>/{cmd}</code> قبل إضافة أغاني جديدة</i>"
+
+err_assistant_banned: |
+  <b>🚫 المساعد الآلي مقيد</b>
+
+  لا يمكنني تشغيل الموسيقى لأن {user} (المعرف: <code>{id}</code>) <b>محظور</b> أو <b>تمت إزالته</b> من هذه المحادثة.
+
+  <i>✅ هل قمت بإلغاء حظره بالفعل؟ استخدم /reload للتحديث.</i>
+
+err_admin_permission_required: |
+  ⚠️ <b>إذن المشرف مطلوب</b>
+
+  أحتاج إلى <i>صلاحية المشرف</i> لإدارة والتحقق من الأعضاء في هذه المحادثة.
+  
+  ➤ <b>قم بترقيتي مع</b> إذن <code>إدارة المحادثة / دعوة المستخدمين</code>.
+
+err_assistant_get_failed: |
+  ⚠️ لم يتمكن النظام من تعيين مساعد لهذه المحادثة.
+
+  <i>هذه عادةً مشكلة مؤقتة ويجب أن تحل بإعادة المحاولة.</i>
+
+  <b>➡️ يرجى إعادة محاولة الأمر.</b>
+
+  <i>إذا استمر حدوث ذلك، يرجى الاتصال بالدعم حتى نتمكن من مساعدتك.</i>
+  
+err_assistant_join_rate_limited: |
+  ⚠️ لا يمكن للمساعد الانضمام إلى هذه المحادثة لأنها وصلت إلى الحد الأقصى من المجموعات المسموح بها.
+
+err_assistant_join_request_sent: |
+  ⚠️ أرسل المساعد طلباً للانضمام، لكن لم أتمكن من الموافقة عليه تلقائياً.
+
+  <i>✅ يرجى الموافقة على الطلب يدوياً، ثم حاول مرة أخرى.</i>
+
+err_assistant_invite_link_fetch: |
+  ⚠️ فشل جلب رابط الدعوة:
+  <i>{error}</i>
+
+err_assistant_invite_failed: |
+  ⚠️ فشل انضمام المساعد إلى هذه المحادثة:
+  <i>{error}</i>
+
+err_connection_timeout: |
+  ⚠️ <b>انتهت مهلة اتصال المحادثة الصوتية</b>
+
+  تيليجرام لا يستجيب بشكل صحيح لاتصال المحادثة الصوتية حالياً.
+
+  <i>إذا استمر حدوث ذلك، قم بإنهاء المحادثة الصوتية وابدأها مرة أخرى، ثم أعد المحاولة.</i>
+
+err_no_active_voicechat: |
+  🎙️ <b>لا توجد محادثة صوتية نشطة</b>
+
+  لا يمكنني الانضمام — يرجى بدء محادثة صوتية أولاً.
+
+  <i>بدأت واحدة بالفعل؟ استخدم /reload للتحديث.</i>
+
+err_fetch_failed: |
+  ⚠️ فشل جلب معلومات المحادثة:
+  <i>{error}</i>
+
+err_peer_resolve_failed: |
+  ⚠️ فشل جلب معلومات الطرف. حاول مرة أخرى لاحقاً أو أعد إضافة المساعد.
+
+err_rtmp_missing_params: |
+  <b>⚠️ بيانات RTMP مفقودة</b>
+
+  <i>يبدو أن <b>بث RTMP</b> نشط في هذه المحادثة، لكنك لم تقدم <b>رابط RTMP</b> المطلوب أو <b>مفتاح البث</b>. بدون هذه البيانات، لا يمكنني بدء تشغيل الموسيقى عبر RTMP.</i>
+
+  <b>الاستخدام:</b> <code>/setrtmp [chat_id] [url+key]</code>
+
+  <i>📌 بمجرد تعيين بيانات RTMP، يمكنك بدء البث.</i>  
+  <i>➡️ إذا كنت لا ترغب في استخدام RTMP، انتقل إلى المحادثة الصوتية العادية بدلاً من ذلك.</i>
+  
+err_unknown: |
+  ⚠️ حدث خطأ غير معروف:
+  <i>{error}</i>
+
+err_fetch_tracks: |
+  ⚠️ <b>فشل جلب تفاصيل المقطع.</b>
+  يرجى المحاولة مرة أخرى لاحقاً.
+
+err_download_internal: |
+  ⚠️ <b>فشل التنزيل</b> بسبب خطأ داخلي غير متوقع.
+  يرجى المحاولة مرة أخرى لاحقاً.
+  
+flood_seconds: "⏳ خفف السرعة! حاول مرة أخرى خلال {duration} ثانية."
+flood_minutes: "⏳ يرجى الانتظار {duration} دقيقة قبل استخدام هذا الأمر مرة أخرى."
+
+help_private_only: "🤖 مرحباً! للحصول على المساعدة والأوامر، يرجى مراسلتي مباشرة — أنا أكثر استجابة في المحادثات الخاصة!"
+help_main: "📚 <b>قائمة المساعدة</b>\n\nاختر فئة أدناه لاستكشاف الأوامر التفصيلية واستخداماتها لإدارة المساعد والتحكم فيه وتخصيصه."
+
+jump_no_active: "⚠️ لا يوجد مقطع نشط للقفز بداخله."
+jump_usage: "⚠️ يرجى تحديد الثواني.\nمثال: <code>{cmd} 120</code>"
+jump_invalid_position: "⚠️ موضع غير صالح.\nمثال: <code>{cmd} 120</code>"
+jump_too_close_end: "⚠️ لا يمكن القفز إلى <b>{position}</b> — هذا قريب جداً من نهاية المقطع."
+jump_failed: "❌ فشل القفز إلى <b>{position}</b>.\nالخطأ: <code>{error}</code>"
+jump_success: "⏩ قفز إلى <u>{position}</u> من <u>{duration}</u>."
+
+lang_same: "ℹ️ أنت تستخدم هذه اللغة بالفعل."
+lang_select: "🌐 اختر لغتك المفضلة:"
+lang_fail: "❌ فشل تحديث اللغة. يرجى المحاولة مرة أخرى لاحقاً."
+lang_success: "✅ تم تحديث اللغة بنجاح إلى {lang_name}."
+
+logger_playback_started: "بدأ التشغيل"
+logger_playback_queued: "أُضيف للانتظار"
+
+logger_bot_added: |
+  🤖 <b>تمت إضافة المساعد لمجموعة جديدة</b>
+  
+  <blockquote>
+  <b>اسم المجموعة:</b> {group_name}
+  <b>معرف المجموعة:</b> {group_id}
+  <b>يوزر المجموعة:</b> {group_username}
+
+  <b>أضيف بواسطة:</b> {added_by_name}
+  <b>معرف المستخدم:</b> {added_by_id}
+  <b>يوزر المستخدم:</b> {added_by_username}
+
+  <b>الوقت:</b> {date_time}
+  </blockquote>
+#  👥 <b>عدد الأعضاء:</b> {members_count}
+
+logger_bot_removed: |
+
+  🤖 <b>تمت إزالة المساعد من مجموعة</b>
+  <blockquote>
+  <b>اسم المجموعة:</b> {group_name}
+  <b>معرف المجموعة:</b> {group_id}
+  <b>يوزر المجموعة:</b> {group_username}
+
+  <b>أزيل بواسطة:</b> {removed_by_name}
+  <b>معرف المستخدم:</b> {removed_by_id}
+  <b>يوزر المستخدم:</b> {removed_by_username}
+
+  <b>الوقت:</b> {date_time}
+  </blockquote>
+  
+logger_bot_started: |
+  ▶️ <b>{mention} بدأ المساعد</b>
+
+  <b>اليوزر:</b> {user_username}
+  <b>المعرف:</b> {user_id}
+  
+logger_track: "🎧 المقطع:"
+logger_source: "🔗 المصدر:"
+logger_group: "📌 المجموعة:"
+logger_requested_by: "👤 طلب بواسطة:"
+logger_timestamp: "⏳ التاريخ:"
+
+loop_usage: "🔁 <b>التحكم في التكرار</b>\n\nالاستخدام: {cmd} [العدد]\n• 0 - تعطيل التكرار\n• 1-10 - عدد مرات التكرار\n\n<i>{count_line}</i>"
+loop_invalid: "⚠️ <b>عدد تكرار غير صالح.</b>\nاستخدم 0 للتعطيل أو 1-10 لتحديد عدد مرات التكرار."
+loop_already_set: "⚠️ تم تعيين التكرار بالفعل على <b>{count}</b> مرة."
+loop_disabled: "🔁 تم <b>تعطيل</b> التكرار بواسطة {user}"
+loop_set: "🔁 تم تعيين التكرار <b>{count}</b> مرة\n└ غُير بواسطة: {user}"
+loop_current: "• التكرار الحالي: <b>{count}</b> مرة"
+
+logger_usage: "⚙️ الاستخدام: <code>{cmd} [enable|disable]</code> - لتفعيل أو تعطيل السجل\n\n{status}"
+logger_status: "📜 الحالة الحالية: {action}"
+logger_check_fail: "❌ فشل التحقق من حالة السجل: {error}"
+logger_already: "ℹ️ السجل {action} بالفعل."
+logger_update_fail: "❌ فشل تحديث إعدادات السجل: {error}"
+logger_updated: "✅ أصبح السجل {action} بنجاح."
+
+# Logs module
+logs_invalid_number: "⚠️ <b>رقم غير صالح</b>\n\nالقيمة <code>{value}</code> ليست عدداً موجباً صالحاً.\n\n<b>الاستخدام:</b> <code>/logs [number]</code> أو <code>/logs -old [number]</code>"
+logs_invalid_flag: "⚠️ <b>علامة غير صالحة</b>\n\nعلامة مجهولة أو مدخل غير صالح: <code>{flag}</code>\n\n<b>الخيارات الصالحة:</b>\n• <code>/logs</code> - السجل الكامل\n• <code>/logs [n]</code> - آخر N أسطر\n• <code>/logs -old [n]</code> - أقدم سجل\n• <code>/logs -clear</code> - مسح السجلات"
+logs_file_error: "❌ <b>خطأ في ملف السجل</b>\n\nحدث خطأ أثناء الوصول إلى ملف السجل:\n<code>{error}</code>"
+logs_send_error: "❌ <b>فشل إرسال السجل</b>\n\nتعذر إعداد أو إرسال ملف السجل.\n<code>{error}</code>"
+logs_clear_failed: "❌ <b>فشل المسح</b>\n\nفشل مسح ملف السجل:\n<code>{error}</code>"
+logs_empty: "📭 <b>لا توجد سجلات متاحة</b>\n\nملف السجل إما غير موجود بعد أو موجود ولكنه فارغ.\n\nقم بتشغيل المساعد لفترة لتوليد السجلات."
+logs_preview_header: "📋 <b>معاينة السجل الحالي:</b>"
+logs_lines_header: "📋 <b>آخر أسطر السجل</b> (آخر {count})"
+logs_old_header: "📋 <b>أقدم أسطر السجل</b> (أول {count})"
+logs_uploading: "⏳ <b>جاري رفع ملف السجل...</b>\n\nيرجى الانتظار حتى يتم إعداد الملف."
+logs_file_caption: "📄 <b>تفاصيل ملف السجل</b>\n\n<b>اسم الملف:</b> <code>{filename}</code>\n<b>الحجم:</b> {size_mb} ميجا\n<b>آخر تعديل:</b> {modified}"
+logs_lines_caption: "📋 <b>آخر أسطر السجل</b>\n\nعرض آخر {count} أسطر من السجل الحالي."
+logs_old_caption: "📋 <b>أقدم أسطر السجل</b>\n\nعرض أول {count} أسطر من بداية السجل."
+logs_cleared: "✅ <b>تم مسح ملف السجل</b>\n\nتم مسح ملف السجل بنجاح.\n<b>الحجم السابق:</b> {size_mb} ميجا"
+
+# reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
+maint: "⚠️ أنا قيد الصيانة حالياً وغير متاح مؤقتاً. يرجى العودة لاحقاً.\n\n{reason}"
+maint_reason: "<i>📝 السبب: {reason}</i>"
+
+# ⚙️ Maintenance control
+maint_usage: "⚙️ <b>التحكم في الصيانة</b>\n\nالاستخدام: {cmd} [enable|disable] [reason]\n📜 الحالة الحالية: {status}"
+maint_check_fail: "❌ فشل التحقق من حالة الصيانة: <code>{error}</code>"
+maint_already_enabled: "ℹ️ وضع الصيانة مفعل بالفعل 🟢."
+maint_already_disabled: "ℹ️ وضع الصيانة معطل بالفعل 🔴."
+maint_already_reason_same: "ℹ️ الصيانة مفعلة بالفعل بنفس السبب."
+maint_reason_removed: "✅ تم حذف سبب الصيانة بنجاح."
+maint_reason_updated: "✅ تم تحديث سبب الصيانة.\n📝 السبب: {reason}"
+maint_enabled: "✅ تم <b>تفعيل</b> وضع الصيانة بنجاح."
+maint_enabled_reason: "✅ تم تفعيل وضع الصيانة.\n📝 السبب: {reason}"
+maint_disabled: "✅ تم <b>تعطيل</b> وضع الصيانة بنجاح."
+maint_entering: "⚠️ المساعد يدخل وضع الصيانة..."
+enabled_with_reason: "🟢 مفعل\n📝 السبب: {reason}"
+
+move_usage: "⚠️ الاستخدام: <code>{cmd} [from] [to]</code>"
+move_invalid_numbers: "⚠️ أرقام غير صالحة. مثال: <code>/{cmd} 2 1</code>"
+move_invalid_indexes_min: "⚠️ يجب أن تكون الفهارس أكبر من 0."
+move_invalid_indexes_max: "⚠️ قائمة الانتظار تحتوي على {queue_len} مقطعاً فقط."
+move_success: "✅ تم نقل المقطع من المركز {from} إلى {to} بواسطة {user}."
+
+# 🔇 Mute messages
+mute_already_muted: "🔇 <b>مكتوم بالفعل</b>\nالموسيقى مكتومة بالفعل في هذه المحادثة.\nهل ترغب في إلغاء الكتم؟"
+mute_already_muted_with_time: "🔇 <b>مكتوم بالفعل</b>\nالموسيقى مكتومة.\nسيتم إلغاء الكتم تلقائياً خلال <b>{duration}</b>."
+mute_invalid_duration: "⚠️ مدة غير صالحة لإلغاء الكتم التلقائي.\nيجب أن تكون بين <b>5</b> و <b>3600</b> ثانية."
+mute_invalid_format: "⚠️ تنسيق غير صالح.\nاستخدم: <code>/{cmd} 30</code> أو <code>/{cmd} 30s</code>"
+mute_failed: "❌ <b>فشل كتم التشغيل</b>\nالخطأ: <code>{error}</code>"
+mute_success: |
+  🔇 <b>تم كتم التشغيل</b>
+
+  🎵 المقطع: {title}
+  👤 كُتم بواسطة: {user}
+
+mute_success_with_time: |
+  🔇 <b>تم كتم التشغيل</b>
+
+  🎵 المقطع: {title}
+  👤 كُتم بواسطة: {user}
+  <i>⏳ سيتم إلغاء الكتم خلال <b>{duration}</b> ثانية</i>
+
+no_song_query: |
+  <b>🎵 أوبس! لم يتم اكتشاف أغنية.</b>
+
+  <i>اكتب <b>{cmd} [اسم الأغنية]</b> أو قم بالرد على <b>ملف</b> لبدء التشغيل!</i>
+
+no_song_found: "❌ لم يتم العثور على مقاطع."
+
+nothumb_status: |
+  🖼️ <b>التحكم في الغلاف</b>
+  
+  <i>عند التفعيل، لن تعرض رسائل التشغيل الغلاف/الصور المصغرة.</i>
+  
+  <b>📊 الاستخدام: {cmd} [enable|disable]</b>
+  
+  <i>الغلاف {action} حالياً.</i>
+  
+nothumb_fetch_fail: "⚠️ <b>فشل جلب إعدادات الغلاف.</b>"
+nothumb_already: "ℹ️ عرض الغلاف {action} بالفعل."
+nothumb_update_fail: "⚠️ <b>فشل تحديث إعدادات الغلاف.</b>"
+nothumb_updated: "🖼️ أصبح عرض الغلاف {action}."
+
+only_admin: "⚠️ <b>تم رفض الإذن!</b>\nفقط <b>المشرفون</b> يمكنهم التحكم في هذه الإجراءات. لا يزال بإمكانك تشغيل الأغاني 🎵.\n\nإذا كنت تعتقد أنك مشرف، يرجى استخدام /reload لتحديث حالة الإشراف."
+only_admin_or_auth: "⚠️ <b>تم رفض الوصول</b>\nفقط <b>المشرفون</b> أو <b>المستخدمون المصرح لهم</b> يمكنهم التحكم في هذه الإجراءات.\n\nإذا أصبحت مشرفاً مؤخراً، استخدم /reload لتحديث صلاحياتك."
+only_admin_or_auth_cb: "⚠️ فقط المشرفون يمكنهم القيام بهذه الإجراءات."
+only_supergroup: "⚠️ هذا الأمر يمكن استخدامه في المجموعات فقط."
+only_owner: "⚠️ فقط مالك المساعد يمكنه استخدام هذا الأمر."
+only_sudo: "⚠️ فقط المساعدون أو مالك المساعد يمكنهم استخدام هذا الأمر."
+
+pause_invalid_duration: "⚠️ مدة غير صالحة للاستئناف التلقائي.\nيجب أن تكون بين <b>5</b> و <b>3600</b> ثانية."
+pause_invalid_format: "⚠️ تنسيق غير صالح.\nاستخدم: <code>/{cmd} 30</code> أو <code>/{cmd} 30s</code>"
+auto_resume_line: "\n<i>⏳ سيتم الاستئناف تلقائياً خلال <b>{seconds}</b> ثانية</i>"
+
+pause_already: |
+  ⏸️ <b>متوقف مؤقتاً بالفعل</b>
+  الموسيقى متوقفة مؤقتاً بالفعل.{auto_resume_line}
+
+pause_success: |
+  ⏸️ <b>تم إيقاف التشغيل مؤقتاً</b>
+
+  🎵 المقطع: {title}
+  ⏱️ الموضع: {position} / {duration}
+  👤 أوقف بواسطة: {user}
+  {auto_resume_line}
+
+play_single_track_too_long: |
+  ⚠️ لا يمكنك تشغيل أغاني أطول من {limit_mins} دقيقة.
+  تم تخطي <i>{title}</i>.
+
+play_download_failed: |
+  ❌ فشل تنزيل \"<i>{title}</i>\".
+  الخطأ: <code>{error}</code>
+
+play_added_to_queue_single: |
+  <b>🎵 تمت الإضافة لقائمة الانتظار:</b> #{index}
+
+  <b>▫ المقطع:</b> <a href="{url}">{title}</a>
+  <b>▫ المدة:</b> {duration}
+  <b>▫ طلب بواسطة:</b> {by}
+
+channel_play_depreciated: "⚠️ هذا المعالج قديم. استخدم <code>/cplay --set channel_id</code> لتعيين قناتك للتشغيل."
+play_multiple_tracks_too_long_header: "<b>⚠️ تم تخطي {count} مقاطع (المدة القصوى {limit_mins} دقيقة):</b>"
+play_multiple_tracks_too_long_item: "— <i>{title}</i>"
+play_multiple_tracks_too_long_more: "... و {remaining} أكثر."
+play_all_tracks_skipped: "❌ تم تخطي جميع المقاطع التي تم العثور عليها بسبب قيود المدة."
+play_failed: "❌ فشل التشغيل\nالخطأ: {error}"
+play_unable: "<b> ❌ تعذر التشغيل </b>\n\n<i>يرجى <b>إعادة بدء</b> المحادثة الصوتية.</i>"
+play_downloading_song: "📥 جاري تنزيل الأغنية \"{title}\""
+play_download_canceled: "⚠️ تم إلغاء التنزيل بواسطة {user}."
+play_added_multiple_header: "➕ <b>تمت إضافة {count} مقاطع</b> بواسطة {user}"
+play_queue_limit_hint: "⚠️ <i>وصلت قائمة الانتظار للحد الأقصى — تم تخطي بعض المقاطع.</i>"
+play_queue_view_hint: "<i>استخدم /queue لعرض القائمة الكاملة.</i>"
+
+# 🏓 Ping messages
+ping_start: "🏓 جاري الفحص..."
+ping_result: |
+  <b>🏓 PONG</b>: <code>{latency}ms</code>
+  
+  <b><u>🤖 إحصائيات نظام {bot}:</u></b>
+
+  <b>وقت التشغيل:</b> {uptime}
+  <b>استهلاك الرام:</b> {ram_info}
+  <b>استهلاك المعالج:</b> {cpu_usage}
+  <b>استهلاك القرص:</b> {disk_usage}
+
+position_now: |
+  🎵 <b>{title}</b>
+  📍 <code>{position} / {duration}</code>
+  ⚙️ السرعة: <b>{speed}x</b>
+
+queue_limit_reached: "⚠️ وصلت قائمة الانتظار للحد الأقصى ({limit} مقاطع كحد أقصى). استخدم /clear لتفريغ القائمة."
+queue_no_active: "⚠️ <b>لا يوجد تشغيل نشط.</b>\n\n<i>لا يوجد شيء في قائمة الانتظار حالياً.</i>"
+queue_header: "🎶 <b>قائمة الانتظار الحالية</b>"
+queue_now_playing: "▶️ <b>جاري التشغيل الآن:</b>"
+queue_up_next: "⏭️ <b>التالي:</b>"
+queue_more_line: "\n… و {remaining} أكثر"
+queue_empty_tail: "📭 <i>لا توجد أغاني أخرى في قائمة الانتظار.</i>"
+queue_empty: "⚠️ <b>قائمة الانتظار فارغة بالفعل.</b>"
+queue_restored: "✅ تم استعادة <b>{count}</b> مقاطع إلى قائمة الانتظار بنجاح."
+queue_restore_no_data: "❌ لم يتم العثور على قائمة انتظار ممسوحة لاستعادتها، أو تمت إضافة أغنية جديدة بالفعل."
+
+# 🔄 Reload
+reload_start: "⚙️ جاري إعادة تحميل ذاكرة المشرفين، وحالة المحادثة الصوتية، وحالة المساعد..."
+
+reload_done: "<b>⚙️ اكتملت إعادة التحميل:</b>\n\n{summary}"
+
+reload_admin_cache_ok: "<b>• ذاكرة المشرفين:</b> <i>✅ تم</i>"
+reload_admin_cache_fail: "<b>• ذاكرة المشرفين:</b> <i>❌ ({error})</i>"
+
+reload_voice_inactive: "<b>• المحادثة الصوتية:</b> <i>⚪ غير نشطة</i>"
+reload_voice_admin_required: "<b>• المحادثة الصوتية:</b> <i>❌ إذن المشرف مطلوب</i>"
+reload_voice_fail: "<b>• المحادثة الصوتية:</b> <i>❌ ({error})</i>"
+reload_voice_active: "<b>• المحادثة الصوتية:</b> <i>✅ نشطة</i>"
+
+reload_assistant_banned: "<b>• المساعد:</b> <i>❌ محظور</i>"
+reload_assistant_admin_required: "<b>• المساعد:</b> <i>❌ إذن المشرف مطلوب</i>"
+reload_assistant_fail: "<b>• المساعد:</b> <i>❌ ({error})</i>"
+reload_assistant_present: "<b>• المساعد:</b> <i>✅ موجود</i>"
+reload_assistant_not_present: "<b>• المساعد:</b> <i>⚪ غير موجود</i>"
+reload_room_reset: "<b>• الغرفة:</b> <i>تمت إعادة التعيين ✅</i>"
+
+
+remove_usage: "⚠️ <b>استخدام غير صالح.</b>\nالاستخدام: <code>{cmd} [index]</code>"
+remove_invalid_index: "⚠️ <b>مركز غير صالح.</b> يجب أن يكون <b>رقماً</b>."
+remove_index_too_small: "⚠️ <b>يجب أن يكون المركز أكبر من 0.</b>"
+remove_index_too_big: "⚠️ مركز غير صالح. قائمة الانتظار تحتوي على <b>{total}</b> مقاطع فقط."
+remove_success: "✅ تمت إزالة المقطع من المركز <b>{index}</b> في قائمة الانتظار.\n👤 بواسطة: {user}"
+
+# 🔁 Replay
+replay_failed: "❌ <b>فشلت إعادة التشغيل</b>\nالخطأ: <code>{error}</code>"
+replay_success: |
+  🔁 <b>جاري إعادة التشغيل الآن</b>
+
+  🎵 العنوان: {title}
+  ⏱️ المدة: <code>{duration}</code>
+  ⚙️ السرعة: <b>{speed}x</b>
+
+# ▶️ Resume
+resume_already_playing: "ℹ️ <b>قيد التشغيل بالفعل</b>\nالموسيقى قيد التشغيل بالفعل في هذه المحادثة.\nهل ترغب في إيقافها مؤقتاً؟"
+resume_failed: "❌ <b>فشل استئناف التشغيل</b>\nالخطأ: <code>{error}</code>"
+resume_success: |
+  ▶️ <b>جاري استئناف التشغيل</b>
+
+  🎵 العنوان: {title}
+  📍 الموضع: {position} / {duration}
+  👤 استؤنف بواسطة: {user}
+  {speed_line}
+
+restart: "♻️ جاري إعادة التشغيل..."
+restart_exepath_fail: "❌ فشل الحصول على مسار الملف التنفيذي: {error}"
+restart_symlink_fail: "❌ فشل تحليل مسار الملف التنفيذي: {error}"
+restart_service: "لقد تمت إعادة تشغيل {bot} للتو. نعتذر عن الإزعاج.\n\nابدأ التشغيل مرة أخرى بعد 10-15 ثانية."
+restart_initiated: "✅ تم بدء إعادة التشغيل بنجاح!"
+restart_fail: "❌ فشل إعادة التشغيل: {error}"
+
+
+room_not_active_cb: "⚠️ لا يوجد شيء قيد التشغيل حالياً."
+room_no_active: "⚠️ <b>لا يوجد تشغيل نشط.</b>\n\n<i>لا يوجد شيء قيد التشغيل حالياً.</i>"
+room_not_linked: "⚠️ هذه القناة ليست مرتبطة بأي مجموعة."
+
+room_already_paused: "⏸️ المقطع متوقف مؤقتاً بالفعل. اضغط على ▶️ استئناف للمتابعة."
+room_already_paused_auto: "⏸️ المقطع متوقف مؤقتاً بالفعل — سيتم الاستئناف تلقائياً خلال {duration}."
+room_pause_failed: "❌ فشل إيقاف التشغيل مؤقتاً.\n\n<i>{error}</i>"
+
+rtmp_not_configured: |
+  ⚠️ <b>RTMP غير مهيأ!</b>
+  
+  يرجى تعيين خادم RTMP أولاً:
+  <code>{cmd} rtmps://server/s/streamkey</code>
+
+rtmp_already_streaming: |
+  📡 <b>البث جارٍ بالفعل!</b>
+  
+  استخدم <code>/streamstop</code> لإنهاء البث الحالي.
+
+rtmp_init_failed: |
+  ❌ <b>فشل تهيئة بث RTMP:</b>
+  <code>{error}</code>
+
+rtmp_starting_stream: "📡 <b>جاري بدء بث RTMP...</b>"
+
+rtmp_play_failed: |
+  ❌ <b>فشل بدء البث:</b>
+  <code>{error}</code>
+
+rtmp_now_streaming: |
+  📡 <b>جاري البث الآن (RTMP):</b>
+  
+  <b>▫ المقطع:</b> <a href="{url}">{title}</a>
+  <b>▫ المدة:</b> {duration}
+  <b>▫ بدأ بواسطة:</b> {by}
+  
+  ⚠️ <i>ملاحظة: يحتوي RTMP على تأخير تخزين مؤقت يتراوح بين 15-30 ثانية</i>
+
+rtmp_not_streaming: "ℹ️ لا يوجد بث RTMP نشط."
+
+rtmp_stop_failed: |
+  ❌ <b>فشل إيقاف البث:</b>
+  <code>{error}</code>
+
+rtmp_stopped: |
+  ⏹️ <b>تم إيقاف بث RTMP</b> بواسطة {user}
+
+rtmp_configured_not_started: |
+  ℹ️ <b>حالة RTMP:</b> لم يبدأ
+  
+  <b>▫ الخادم:</b> <code>{server}</code>
+  <b>▫ الحالة:</b> جاهز للبث
+  
+  استخدم <code>/stream &lt;query&gt;</code> لبدء البث.
+
+rtmp_status_playing: |
+  📡 <b>حالة بث RTMP</b>
+  
+  <b>▫ الحالة:</b> ▶️ جاري البث
+  <b>▫ الموضع:</b> {position}
+  <b>▫ الخادم:</b> <code>{server}</code>
+
+rtmp_status_paused: |
+  📡 <b>حالة بث RTMP</b>
+  
+  <b>▫ الحالة:</b> ⏸️ متوقف مؤقتاً
+  <b>▫ الخادم:</b> <code>{server}</code>
+
+rtmp_status_idle: |
+  📡 <b>حالة بث RTMP</b>
+  
+  <b>▫ الحالة:</b> ⏹️ خامل
+  <b>▫ الخادم:</b> <code>{server}</code>
+
+rtmp_dm_only: |
+  🔒 <b>تنبيه أمني</b>
+  
+  يجب عدم مشاركة بيانات RTMP في المجموعات أبداً!
+  
+  <b>📩 لتهيئة RTMP:</b>
+  1. افتح محادثتي الخاصة: @{bot_username}
+  2. أرسل: <code>{cmd} &lt;chat_id&gt; &lt;rtmp_url&gt;</code>
+  
+  <b>💡 مثال:</b>
+  <code>/setrtmp -1001234567890 rtmps://server/s/key</code>
+
+rtmp_setup_usage: |
+  ⚙️ <b>تهيئة RTMP</b>
+  
+  <u>الاستخدام:</u>
+  <code>/setrtmp &lt;chat_id&gt; &lt;full_rtmp_url&gt;</code>
+  
+  <b>📋 المعايير:</b>
+  • <code>chat_id</code> - معرف المحادثة/القناة المستهدفة
+  • <code>full_rtmp_url</code> - رابط RTMP الكامل مع مفتاح البث
+  
+  <b>📝 مثال:</b>
+  <code>/setrtmp -1001234567890 rtmps://dc5-1.rtmp.t.me/s/123:key</code>
+  
+  <b>🔍 كيفية الحصول على معرف المحادثة:</b>
+  • قم بتوجيه أي رسالة من المحادثة إلى @userinfobot
+  • أو استخدم أمر <code>/id</code> في المحادثة
+  
+  <b>🔐 الأمان:</b>
+  • التهيئة تعمل فقط في الخاص (المحادثة السرية)
+  • يجب أن تكون مشرفاً في المحادثة المستهدفة
+  • تُخزن البيانات بشكل آمن
+
+rtmp_invalid_chat_id: |
+  ❌ <b>معرف محادثة غير صالح!</b>
+  
+  يرجى تقديم معرف محادثة رقمي صحيح.
+  
+  <b>💡 مثال:</b>
+  <code>/setrtmp -1001234567890 rtmps://...</code>
+
+rtmp_check_admin_failed: |
+  ❌ <b>فشل التحقق من حالة الإشراف:</b>
+  <code>{error}</code>
+  
+  <b>⚠️ تأكد من:</b>
+  • أنني مشرف في المحادثة المستهدفة
+  • أن معرف المحادثة صحيح
+  • أنك تملك صلاحيات المشرف
+
+rtmp_not_admin: |
+  ⚠️ <b>تم رفض الإذن</b>
+  
+  يجب أن تكون <b>مشرفاً</b> في المحادثة المستهدفة لتهيئة RTMP.
+
+rtmp_parse_failed: |
+  ❌ <b>فشل تحليل رابط RTMP:</b>
+  <code>{error}</code>
+  
+  <b>📋 التنسيق الصحيح:</b>
+  <code>rtmp://server/app/streamkey</code>
+  أو
+  <code>rtmps://server/s/streamkey</code>
+
+rtmp_streaming_not_supported: |
+  ⚠️ <b>البث غير مدعوم</b>
+  
+  هذا الإجراء غير متاح أثناء استخدام <b>وضع RTMP</b>.
+  
+  استخدم <code>/stream</code> لتشغيل الوسائط عبر RTMP.
+  
+rtmp_configured_success: |
+  ✅ <b>تمت تهيئة RTMP بنجاح!</b>
+  
+  <b>🆔 معرف المحادثة:</b> <code>{chat_id}</code>
+  <b>🔗 الرابط:</b> <code>{url}</code>
+  <b>🔑 المفتاح:</b> <code>{key}</code>
+  
+  <b>✨ الخطوات التالية:</b>
+  اذهب إلى محادثتك واستخدم:
+  <code>/stream &lt;song name&gt;</code>
+  
+  <b>🔒 ملاحظة أمنية:</b>
+  تُخزن البيانات بشكل آمن ولا تُعرض أبداً في المجموعة.
+
+
+searching: "🔍🎶 جاري البحث... ⚡✨"
+searching_query: "🔍🎶 جاري البحث عن: <b>{query}</b>... ⚡✨"
+
+speed_line: "⚙️ السرعة: <b>{speed}x</b>"
+
+stats_system_header: "🔧 <b>النظام:</b>"
+stats_go_mem_header: "📦 <b>الذاكرة الداخلية (Go):</b>"
+stats_server_header: "💻 <b>إحصائيات الخادم:</b>"
+stats_served_header: "📊 <b>المخدومة:</b>"
+
+stats_system_os_arch: "• النظام: <code>{os}</code>، المعمارية: <code>{arch}</code>"
+stats_system_cpu_goroutines: "• المعالجات: <code>{cpus}</code>، عدد Goroutines: <code>{goroutines}</code>"
+
+stats_go_alloc: "• المحجوزة: <code>{alloc} ميجا</code>"
+stats_go_sys: "• النظام: <code>{sys} ميجا</code>"
+stats_go_gc: "• عمليات تنظيف الذاكرة: <code>{gc_count}</code> ({emoji} {gc_rate}/دقيقة)"
+
+stats_server_cpu: "• استهلاك المعالج: {emoji} <code>{cpu}%</code>"
+stats_server_ram: "• استهلاك الرام: {emoji} <code>{used_gib} جيجا</code> | <code>{total_gib} جيجا</code>"
+stats_server_storage: "• التخزين: <code>{used_gib} جيجا</code> | <code>{total_gib} جيجا</code>"
+
+stats_served_chats: "• المحادثات: <code>{count}</code>"
+stats_served_chats_err: "• المحادثات: <code>خطأ: {error}</code>"
+
+stats_served_users: "• المستخدمون: <code>{count}</code>"
+stats_served_users_err: "• المستخدمون: <code>خطأ: {error}</code>"
+
+# 👑 Sudo users
+
+sudo_owner_self: "😂 ههه، أنت المدير بالفعل! لماذا تحاول إضافة نفسك؟"
+sudo_bot_self: "🤖 ههه، أنا المساعد الآلي! لا يمكنني إضافة نفسي لقائمة المساعدين — حتى المالك لا يمكنه خداعي 😎"
+sudo_bot_user: "🤖 لا يمكنك إضافة مساعد آلي لقائمة المساعدين — يجب أن يكونوا بشراً!"
+
+sudo_fetch_user_fail: "❌ فشل جلب معلومات المستخدم. قد يكون من الصعب الوصول إليه.\n<i>{error}</i>"
+sudo_check_fail: "❌ فشل التحقق من وجود المساعد: <i>{error}</i>"
+sudo_already: "⚠️ المستخدم {user} (المعرف: <code>{id}</code>) مساعد بالفعل."
+sudo_add_fail: "❌ فشل إضافة مساعد: <i>{error}</i>"
+sudo_add_success: "✅ تمت إضافة {user} (<code>{id}</code>) إلى المساعدين."
+sudo_assistant_self: "🤖 مساعد التشغيل موجود دائماً في قائمة المساعدين افتراضياً — لا يمكن إضافته مرة أخرى."
+
+sudo_owner_remove_block: "😎 محاولة جيدة! لا يمكنك إزالة المالك — فهو فوق كل الصلاحيات."
+sudo_assistant_cannot_remove: "🤖 المساعد ضروري ولا يمكن إزالته من قائمة المساعدين."
+sudo_not_exists: "⚠️ المستخدم {user} (<code>{id}</code>) ليس مساعداً."
+sudo_remove_fail: "❌ فشل إزالة المساعد: <i>{error}</i>"
+sudo_remove_success: "🗑️ تمت إزالة {user} (المعرف: <code>{id}</code>) من المساعدين."
+
+sudo_list_fetching: "⏳ جاري جلب قائمة المساعدين..."
+sudo_list_fetch_fail: "❌ فشل جلب المساعدين: <code>{error}</code>"
+sudo_list_header: "👑 <b>المساعدون الحاليون:</b>"
+sudo_list_owner: "{index}. {user} — <b>المالك</b>"
+sudo_list_entry: "{index}. {user}"
+sudo_list_no_extra: "⚠️ لم يتم العثور على مساعدين إضافيين."
+
+seek_no_active: "⚠️ <b>لا يوجد مقطع قيد التشغيل حالياً.</b>"
+seek_usage: "⚠️ يرجى تحديد الثواني.\nمثال: <code>{cmd} 40</code>"
+seek_invalid_seconds: "⚠️ قيمة ثوانٍ غير صالحة.\nمثال: <code>{cmd} 40</code>"
+seek_too_close_start: "⚠️ لا يمكن الرجوع بمقدار <b>{seconds}</b> ثانية — سيكون ذلك قريباً جداً من بداية المقطع."
+seek_too_close_end: "⚠️ لا يمكن التقديم بمقدار <b>{seconds}</b> ثانية — سيكون ذلك قريباً جداً من نهاية المقطع."
+seek_failed: "❌ فشل التقديم/الرجوع {direction} بمقدار <b>{seconds}</b> ثانية.\nالخطأ: <code>{error}</code>"
+seek_success: "{emoji} قفز {direction} إلى <u>{position}</u> من <u>{duration}</u>."
+
+stop_confirm_paused: |
+  ⏸️ <b>التشغيل متوقف مؤقتاً حالياً.</b>
+
+  هل تريد استئناف التشغيل أم إيقافه نهائياً؟
+
+stop_confirm_muted: |
+  🔇 <b>الصوت مكتوم حالياً.</b>
+
+  هل تريد إلغاء الكتم أم إيقاف التشغيل نهائياً؟
+
+stopped: "⏹️ <b>تم إيقاف التشغيل وتفريغ القائمة بواسطة {user}.</b>"
+
+shuffle_current_state: "🔀 وضع الترتيب العشوائي حالياً هو <b>{state}</b> لهذه المحادثة.\n\nاستخدم <code>{cmd}</code> للتبديل."
+shuffle_updated: "🔀 الترتيب العشوائي <b>{state}</b> بواسطة {user}."
+
+skip_stopped: "⏹️ توقف التشغيل. قائمة الانتظار فارغة.\nتخطى بواسطة: {user}"
+
+speed_usage: |
+  💡 <b>الاستخدام:</b>
+  <code>{cmd} [speed] [duration]</code> — تغيير سرعة التشغيل
+  
+  نطاق السرعة المسموح به: <b>0.50x ← 4.00x</b>
+  المدة (اختيارية) تعيد السرعة إلى وضعها الطبيعي بعد ثوانٍ محددة.
+  
+  مثال:
+  <code>{cmd} 1.25 45</code> — التشغيل بسرعة 1.25x لمدة 45 ثانية.
+
+speed_current: "🎧 <b>السرعة الحالية:</b> <code>{speed}x</code> للمقطع 🎵 <u>{title}</u>\n\n💡 استخدم <code>{cmd} reset</code> لاستعادة التشغيل الطبيعي."
+
+speed_current_with_reset: |
+  🎧 <b>السرعة الحالية:</b> <code>{speed}x</code>
+
+  🎵 <b>المقطع:</b> <i>{title}</i>
+  ⏳ <b>إعادة تعيين تلقائي خلال:</b> {duration}
+  
+  💡 استخدم <code>{cmd} reset</code> لاستعادة التشغيل الطبيعي فوراً.
+
+speed_invalid_value: "❌ قيمة سرعة غير صالحة.\nمثال: <code>{cmd} 1.5</code> أو <code>{cmd} 2x</code>"
+speed_invalid_range: "⚠️ يجب أن تكون السرعة بين <b>0.50x</b> و <b>4.00x</b>."
+speed_invalid_duration: "⚠️ مدة غير صالحة. يجب أن تكون بين <b>5</b> و <b>3600</b> ثانية."
+
+speed_already_set: "ℹ️ سرعة التشغيل هي <b>{speed}x</b> بالفعل للمقطع 🎵 <b>{title}</b>"
+
+speed_already_set_reset_hint: "ℹ️ سرعة التشغيل هي <b>{speed}x</b> بالفعل للمقطع 🎵 <b>{title}</b>\n\n💡 استخدم <code>{cmd} reset</code> للعودة للسرعة الطبيعية."
+
+speed_failed: |
+  ❌ فشل تغيير السرعة إلى <b>{speed}x</b>.
+  الخطأ: <code>{error}</code>
+
+speed_reset_success: "✅ تمت إعادة تعيين سرعة التشغيل إلى <b>1.0x</b> بواسطة {user}"
+
+speed_set: "🚀 تم تعيين سرعة التشغيل إلى <b>{speed}x</b> بواسطة {user}."
+speed_set_with_reset: |
+  🚀 تم تعيين سرعة التشغيل إلى <b>{speed}x</b> بواسطة {user}.
+  ⏳ ستعود للوضع الطبيعي بعد <b>{duration}</b> ثانية.
+
+
+spt_fetch_fail: "⚠️ فشل جلب معلومات الشبكة: <code>{error}</code>"
+spt_servers_fetch_fail: "⚠️ فشل جلب الخوادم: <code>{error}</code>"
+spt_best_server_fail: "⚠️ فشل العثور على أفضل خادم: <code>{error}</code>"
+
+spt_running_download: "🚀 جاري اختبار سرعة التنزيل..."
+spt_running_upload: "📤 جاري اختبار سرعة الرفع..."
+
+spt_result: |
+  <b>📡 نتيجة اختبار السرعة</b>
+
+  <b><u>👤 العميل</u></b>
+  IP: <code>{ip}</code>
+  المزود: {isp}
+  خط العرض: <code>{lat}</code>
+  خط الطول: <code>{lon}</code>
+
+  <b><u>🛰️ الخادم</u></b>
+  الاسم: {server_name}
+  الدولة: {country}
+  الراعي: {sponsor}
+  المسافة: {distance_km} كم
+  التأخير: {latency_ms} مللي ثانية
+
+  <b><u>⚡ السرعة</u></b>
+  التنزيل: <code>{dl_mbps} ميجا/ث</code>
+  الرفع: <code>{ul_mbps} ميجا/ث</code>
+
+start_private: "مرحباً {user}، اسمي {bot}.\n\nأنا مساعد آلي لبث الموسيقى على تيليجرام مع ميزات مفيدة. أدعم منصات مثل Youtube و Spotify و JioSaavn و Soundcloud وغيرها.\n\nلا تتردد في إضافتي إلى مجموعاتك."
+
+start_group: "<b>💫 أنا هنا!</b> جرب أمراً ما... إذا كنت تظن أنك تستطيع السيطرة علي 😉"
+
+stream_channelid_fail: "⚠️ فشل الحصول على معرف القناة المرتبطة."
+stream_queue_finished: "🎵 <b>انتهت قائمة الانتظار!</b>\n\nلا توجد أغاني أخرى للتشغيل. استخدم /play لإضافة المزيد! 🎶"
+stream_downloading_next: "📥 جاري تنزيل المقطع التالي..."
+stream_download_fail: "❌ فشل التنزيل.\nالخطأ: <code>{error}</code>"
+stream_play_fail: "❌ فشل تشغيل الأغنية."
+stream_now_playing: |
+  <b>🎵 جاري التشغيل الآن:</b>
+
+  <b>▫ المقطع:</b> <a href="{url}">{title}</a>
+  <b>▫ المدة:</b> {duration}
+  <b>▫ طلب بواسطة:</b> {by}
+
+# 👑 Sudo / Owner Join Messages
+sudo_join_owner: "👑 {user} — مالك {bot} — دخل المحادثة للتو."
+sudo_join_sudo: "🛡️ {user}، وهو مساعد في {bot}، انضم للمحادثة للتو."
+
+supergroup_needed: |
+  هذه المحادثة (المعرف: <code>{chat_id}</code>) ليست مجموعة خارقة بعد.
+  <b>⚠️ يرجى تحويل هذه المحادثة إلى مجموعة خارقة ثم إضافتي كمشرف.</b>
+  
+  إذا كنت لا تعرف كيفية التحويل، استخدم هذا الدليل:
+  🔗 <a href=\"https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02\">كيفية التحويل إلى مجموعة خارقة</a>
+  
+  إذا كان لديك أي أسئلة، انضم إلى مجموعة الدعم الخاصة بنا.
+
+unmute_already: "ℹ️ <b>تم إلغاء الكتم بالفعل</b>\nالموسيقى ليست مكتومة في هذه المحادثة."
+unmute_failed: "❌ <b>فشل إلغاء كتم التشغيل</b>\nالخطأ: <code>{error}</code>"
+unmute_success: |
+  🔊 <b>تم إلغاء كتم التشغيل</b>
+
+  🎵 المقطع: {title}
+  👤 ألغي الكتم بواسطة: {user}
+  {speed_line}
+
+
+# 🔊 Voice Chat Events
+voicechat_ended: "<b>⚠️ انتهت مكالمة الفيديو</b>\n\n<i>⏰ المدة: {duration}</i>"
+voicechat_started: "<b>♻️ بدأت المحادثة الصوتية!</b>\n\n<i>استخدم /play [اسم الأغنية] لتشغيل الموسيقى.</i>"
+
+# Commands help
+help_owner: |
+  👑 <b>أوامر المالك</b>
+
+  <i>أدوات حصرية لإدارة المساعدين وتنفيذ أوامر النظام وإدارة المساعد الآلي بشكل آمن.</i>
+
+  <b>الأوامر:</b>
+  <blockquote>
+  <b>/addsudo</b> - إضافة مستخدم جديد لقائمة المساعدين
+  <b>/delsudo</b> - إزالة مستخدم من قائمة المساعدين
+  <b>/eval</b> - تنفيذ شيفرات Go
+  <b>/maintenance</b> — إدارة وضع الصيانة
+  <b>/restart</b> — إعادة تشغيل المساعد الآلي
+  <b>/sh</b> - تشغيل أوامر القشرة (Shell)
+  </blockquote>
+
+help_sudo: |
+  ⚡ <b>أوامر المساعدين</b>
+
+  <i>أدوات متقدمة لإدارة سلوك المساعد ومراقبة الأداء والتحكم في السجلات والأتمتة.</i>
+
+  <b>الأوامر:</b>
+  <blockquote>
+  <b>/active</b> - عرض المحادثات النشطة
+  <b>/autoleave</b> - تبديل المغادرة التلقائية
+  <b>/logger</b> - تفعيل أو تعطيل السجل
+  <b>/stats</b> - عرض إحصائيات النظام والمساعد
+  <b>/logs</b> - الحصول على سجلات النظام
+  </blockquote>
+
+help_admin: |
+  🛠 <b>أوامر المشرفين</b>
+
+  <i>أدوات التحكم في الموسيقى والتشغيل للمشرفين للتحكم في التشغيل بسهولة.</i>
+
+  <b>الأوامر:</b>
+  <blockquote>
+  <b>/speed</b> - تغيير سرعة التشغيل
+  <b>/skip</b> - تخطي الأغنية الحالية
+  <b>/pause</b> - إيقاف التشغيل مؤقتاً
+  <b>/resume</b> - استئناف التشغيل المتوقف مؤقتاً
+  <b>/replay</b> - إعادة تشغيل الأغنية الحالية
+  <b>/mute</b> - كتم الصوت
+  <b>/unmute</b> - إلغاء كتم الصوت
+  <b>/seek</b> - تقديم التشغيل بضع ثوانٍ
+  <b>/seekback</b> - إرجاع التشغيل بضع ثوانٍ
+  <b>/jump</b> - القفز إلى وقت محدد في المقطع
+  <b>/move</b> - نقل مقطع منتظر إلى مركز آخر
+  <b>/clear</b> - إزالة جميع الأغاني من قائمة الانتظار
+  <b>/remove</b> - إزالة مقطع محدد من قائمة الانتظار
+  <b>/shuffle</b> - ترتيب عشوائي لقائمة الانتظار
+  <b>/loop</b> - تفعيل أو تعطيل التكرار
+  <b>/stop</b> - إيقاف التشغيل ومغادرة المحادثة الصوتية
+  <b>/nothumb</b> - تفعيل أو تعطيل الغلاف في رسائل التشغيل
+  </blockquote>
+  
+help_public: |
+  🌍 <b>الأوامر العامة</b>
+
+  <i>ميزات لتشغيل الأغاني وعرض قوائم الانتظار والتحقق من التأخير والإبلاغ عن الأخطاء.</i>
+
+  <b>الأوامر:</b>
+  <blockquote>
+  <b>/play</b> - تشغيل أغنية
+  <b>/queue</b> - عرض المقاطع المنتظرة حالياً
+  <b>/ping</b> - التحقق من تأخير الشبكة
+  <b>/start</b> - بدء المساعد الآلي
+  <b>/help</b> - عرض قائمة المساعدة
+  <b>/bug</b> - الإبلاغ عن مشكلة أو خطأ
+  <b>/position</b> - عرض التوقيت الحالي للمقطع
+  <b>/reload</b> - إعادة تحميل بيانات المشرفين أو الذاكرة المؤقتة
+  <b>/json</b> - عرض بنية JSON للرسالة
+  <b>/sudolist</b> - عرض قائمة المساعدين
+  </blockquote>

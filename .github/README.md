@@ -3,288 +3,145 @@
 <p align="center">
   <i>⚡ A blazing-fast, reliable, and feature-packed Telegram bot for streaming music in group voice chats — built with Go.</i>
 </p>
-<p align="center">
 
-  <a href="https://go.dev/">
-    <img src="https://img.shields.io/badge/Go-1.25-00ADD8?style=for-the-badge&logo=go&labelColor=000000&logoColor=white" alt="Go Version">
-  </a>
-  <a href="https://github.com/TheTeamVivek/YukkiMusic/releases/tag/v3.2.0">
-    <img src="https://img.shields.io/badge/Version-v3.2-FF9800?style=for-the-badge&logo=semver&labelColor=000000&logoColor=white" alt="Version">
-  </a>
-  <a href="../LICENSE">
-    <img src="https://img.shields.io/badge/License-GPLv3-FF3860?style=for-the-badge&logo=gnu&labelColor=000000&logoColor=white" alt="License: GPLv3">
-  </a>
+<p align="center">
   <a href="https://github.com/TheTeamVivek/YukkiMusic/stargazers">
-    <img src="https://img.shields.io/github/stars/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Stars&labelColor=000000&color=FFD700&logo=github&logoColor=white" alt="GitHub Stars">
+    <img src="https://img.shields.io/github/stars/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Stars&color=FFD700&logo=github&logoColor=white" alt="GitHub Stars">
   </a>
   <a href="https://github.com/TheTeamVivek/YukkiMusic/fork">
-    <img src="https://img.shields.io/github/forks/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Forks&labelColor=000000&color=00C853&logo=github&logoColor=white" alt="GitHub Forks">
+    <img src="https://img.shields.io/github/forks/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Forks&color=00C853&logo=github&logoColor=white" alt="GitHub Forks">
   </a>
-
+  <a href="https://go.dev/">
+    <img src="https://img.shields.io/badge/Go-1.25+-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go Version">
+  </a>
+  <a href="https://github.com/TheTeamVivek/YukkiMusic/releases">
+    <img src="https://img.shields.io/badge/Version-v3.2.0-FF9800?style=for-the-badge&logo=semver&logoColor=white" alt="Release Version">
+  </a>
+  <a href="https://t.me/TheTeamVk">
+    <img src="https://img.shields.io/badge/Telegram-Support-26A69A?style=for-the-badge&logo=telegram&logoColor=white" alt="Support Group">
+  </a>
 </p>
 
----
+<hr>
 
-## 🚀 Quick Start
+<h2>✨ Key Features</h2>
+<ul>
+  <li>🚀 <b>High Performance:</b> Optimized Go-based engine for ultra-low latency.</li>
+  <li>🎼 <b>Smart Provider System:</b> Supports YouTube, Telegram Files, and custom APIs.</li>
+  <li>🔄 <b>Intelligent Fallback:</b> Automatically switches sources if one fails.</li>
+  <li>🌍 <b>Localization:</b> Robust multi-language support (YAML-based).</li>
+  <li>🛠 <b>Admin Suite:</b> Speed control, seeking, looping, and advanced queueing.</li>
+</ul>
 
+<hr>
 
-### ☁️ Deploy to Heroku (One-Click)
+<h2>🚀 Quick Start</h2>
 
-Click the button below to deploy **YukkiMusic** instantly on Heroku:
+<h3>☁️ One-Click Deploy</h3>
+<p>
+  <a href="https://heroku.com/deploy?template=https://github.com/TheTeamVivek/YukkiMusic">
+    <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy to Heroku">
+  </a>
+</p>
 
-<a href="https://heroku.com/deploy?template=https://github.com/TheTeamVivek/YukkiMusic">
-  <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy to Heroku">
-</a>
-
----
-
-### Prerequisites
-- Go 1.25 or higher
-- MongoDB (Cloud or Local)
-- Telegram Bot Token (from [@BotFather](https://t.me/BotFather))
-- API ID & Hash (from [my.telegram.org](https://my.telegram.org))
-- Assistant Account Session String
-
-### Installation
-
-1. **Clone Repository**
-```bash
-git clone https://github.com/TheTeamVivek/YukkiMusic.git
-cd YukkiMusic
-```
-
-2. **Install Dependencies**
-```bash
-bash install.sh && go mod tidy
-```
-
-3. **Configure Environment**
-```bash
-cp sample.env .env
-# Edit .env with your credentials
-```
-
-4. **Get Required Credentials**
-- **Bot Token**: Message [@BotFather](https://t.me/BotFather), use `/newbot`
-- **API ID & Hash**: Visit [my.telegram.org](https://my.telegram.org)
-- **Session String**: Use [@StringFatherBot](https://t.me/StringFatherBot) or online generator
-- **MongoDB**: Free tier at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-
-5. **Start the Bot**
-```bash
+<h3>💻 Manual Installation</h3>
+<pre><code>
+# 1. Clone & Enter
+git clone https://github.com/TheTeamVivek/YukkiMusic.git && cd YukkiMusic
+<br>
+# 2. Setup Environment
+bash install.sh
+cp sample.env .env  # Edit your API_ID, TOKEN, etc.
+<br>
+# 3. Tidy & Run
+go mod tidy
 go run ./cmd/app
-```
+</code></pre>
 
----
+<hr>
 
-## ⚙️ Configuration
+<h2>⚙️ Configuration</h2>
+<p>All settings are managed via environment variables. See the <b><a href="../internal/config/README.md">Configuration Guide</a></b> for full details.</p>
 
-All configuration is managed through environment variables. For detailed configuration instructions, see:
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>API_ID</code> / <code>API_HASH</code></td>
+      <td>Obtained from <a href="https://my.telegram.org">my.telegram.org</a></td>
+    </tr>
+    <tr>
+      <td><code>TOKEN</code></td>
+      <td>Bot token from <a href="https://t.me/BotFather">@BotFather</a></td>
+    </tr>
+    <tr>
+      <td><code>LOGGER_ID</code></td>
+      <td>Channel ID for bot logs (Must start with -100)</td>
+    </tr>
+    <tr>
+      <td><code>MONGO_DB_URI</code></td>
+      <td>MongoDB Atlas or local connection string</td>
+    </tr>
+    <tr>
+      <td><code>STRING_SESSIONS</code></td>
+      <td>Assistant account sessions (Pyrogram/Telethon/Gogram)</td>
+    </tr>
+  </tbody>
+</table>
 
-📖 **[Configuration Guide](../internal/config/README.md)**
+<hr>
 
-### Key Variables
-| Variable | Required | Purpose |
-|----------|----------|---------|
-| `API_ID` | ✅ | Telegram API ID |
-| `API_HASH` | ✅ | Telegram API Hash |
-| `TOKEN` | ✅ | Bot token from @BotFather |
-| `MONGO_DB_URI` | ✅ | MongoDB connection string |
-| `STRING_SESSIONS` | ✅ | Assistant account session strings |
-| `OWNER_ID` | ❌ | Your Telegram User ID |
-| `LOGGER_ID` | ❌ | Log channel ID |
+<h2>🎮 Commands Reference</h2>
 
-See **[Configuration Reference](../internal/config/README.md)** for complete list of variables with examples.
+<h3>🎵 Playback & Queue</h3>
+<ul>
+  <li><code>/play &lt;query&gt;</code> — Play from YouTube/Telegram</li>
+  <li><code>/fplay &lt;query&gt;</code> — Force play (skips current track)</li>
+  <li><code>/pause</code> | <code>/resume</code> — Toggle playback state</li>
+  <li><code>/queue</code> — View the upcoming list</li>
+  <li><code>/seek &lt;seconds&gt;</code> — Jump to a specific time</li>
+</ul>
 
----
+<h3>🛡️ Admin & Owner</h3>
+<ul>
+  <li><code>/addsudo</code> | <code>/delsudo</code> — Manage authorized controllers</li>
+  <li><code>/stats</code> — View system and database metrics</li>
+  <li><code>/broadcast</code> — Send a message to all active chats</li>
+  <li><code>/maintenance</code> — Toggle global maintenance mode</li>
+</ul>
 
-## 📚 Commands
+<hr>
 
-### User Commands
-| Command | Description |
-|---------|-------------|
-| `/play <query>` | Play a song from YouTube or Telegram |
-| `/queue` | Show current queue |
-| `/position` | Show current track position |
-| `/help` | Show command help |
-| `/ping` | Check bot status |
-
-### Admin Commands
-| Command | Description |
-|---------|-------------|
-| `/pause [seconds]` | Pause for playback (optionally auto-resume) |
-| `/resume` | Resume paused track |
-| `/mute [seconds]` | Mute playback (optionally auto-unmute) |
-| `/unmute` | Unmute playback |
-| `/seek <seconds>` | Seek to specific position |
-| `/loop <count>` | Loop track N times |
-| `/shuffle` | Toggle shuffle mode |
-| `/speed <speed>` | Set playback speed (0.5-4.0x) |
-| `/skip` | Skip to next track |
-| `/fplay <query>` | Force play (skip queue) |
-| `/clear` | Clear entire queue |
-| `/remove <index>` | Remove track from queue |
-| `/move <from> <to>` | Move track in queue |
-| `/jump <position>` | Jump to position in current track |
-| `/replay` | Replay current track |
-| `/addauth <user>` | Grant user playback permission |
-| `/delauth <user>` | Revoke user playback permission |
-| `/authlist` | List authorized users |
-| `/reload` | Reload admin cache |
-| `/cplay` | Channel play mode |
-
-### Owner Commands
-| Command | Description |
-|---------|-------------|
-| `/addsudo <user>` | Add sudo user |
-| `/delsudo <user>` | Remove sudo user |
-| `/sudolist` | List all sudo users |
-| `/maintenance <on/off>` | Toggle maintenance mode |
-| `/broadcast <message>` | Broadcast to all chats |
-| `/stats` | Show bot statistics |
-| `/restart` | Restart bot |
-
----
-
-## 🎼 Platform System
-
-YukkiMusic uses a **modular platform system** to support multiple music sources:
-
-### Supported Platforms
-1. **Telegram** (Priority: 100) - Direct Telegram audio/video files
-2. **YouTube** (Priority: 90) - YouTube videos and playlists
-3. **Youtubify API** (Priority: 80) - Premium YouTube downloads
-4. **Fallen API** (Priority: 75) - YouTube downloads via Fallen API
-5. **YT-DLP** (Priority: 70) - Direct yt-dlp integration
-
-### How It Works
-- When you request a song, the bot checks each platform by **priority**
-- **First valid platform handles the request**
-- Automatic fallback if one method fails
-- Seamless track fetching and downloading
-
-📖 **[Platform System Guide](../internal/platforms/README.md)** - Learn how to add custom platforms
-
----
-
-## 📖 Documentation
-
-- **[Configuration Guide](../internal/config/README.md)** - All environment variables explained
-- **[Platform System](../internal/platforms/README.md)** - How platforms work and add custom sources
-- **[Database Layer](../internal/database/README.md)** - MongoDB schemas, queries, and bot data management
-- **[Modules System](../internal/modules/README.md)** - Command handlers, permissions, and feature modules
----
-
-## 🏗️ Project Structure
-
-```
-YukkiMusic/
-├── .github/
-│   └── README.md              # Main documentation (you are here)
-├── cmd/app/
-│   └── main.go                # Entry point
-│   └──...
+<h2>🏗️ Project Structure</h2>
+<pre><code>YukkiMusic/
+├── cmd/app/            # Main entry point
+├── config/             # Configuration & Environment loader
 ├── internal/
-│   ├── config/                # Configuration management
-│   │   ├── config.go
-│   │   └── README.md          # Detailed config guide
-│   ├── core/                  # Core bot logic
-│   │   ├── clients.go         # Bot & assistant initialization
-│   │   ├── room_state.go      # Playback state management
-│   │   ├── chat_state.go      # Chat & assistant state
-│   │   └── ...
-│   ├── database/              # MongoDB operations
-│   │   ├── bot_state.go
-│   │   ├── chat_settings.go
-│   │   └── ...
-│   ├── modules/               # Command handlers
-│   │   ├── play.go            # Play command
-│   │   ├── queue.go           # Queue management
-│   │   └── ...
-│   ├── platforms/             # Music sources
-│   │   ├── youtube.go         # YouTube integration
-│   │   ├── telegram.go        # Telegram media
-│   │   ├── ytdlp.go           # YT-DLP downloader
-│   │   └── ...
-│   ├── locales/               # Multi-language support
-│   │   ├── en.yml            # English
-│   │   └── ...
-│   ├── utils/                 # Utility functions
-│   ├── cookies/               # YouTube cookie files
-│   └── ...
-├── go.mod                     # Go module definition
-├── go.sum                     # Dependency checksums
-```
+│   ├── core/           # Bot initialization & playback logic
+│   ├── database/       # MongoDB schemas & operations
+│   ├── locales/        # YAML-based translation files
+│   ├── modules/        # Command handlers (play, skip, etc.)
+│   ├── platforms/      # Source providers (YouTube, TG, etc.)
+│   └── utils/          # Global helper functions
+└── go.mod              # Dependency management</code></pre>
 
----
+<hr>
 
-## 🐛 Bug Reports & Features
+<h2>🤝 Contributing & Support</h2>
+<ul>
+  <li><b>Issues:</b> Found a bug or have a suggestion? Open a <b><a href="https://github.com/TheTeamVivek/YukkiMusic/issues">GitHub Issue</a></b>.</li>
+  <li><b>Support:</b> Join our Telegram community for help: <b><a href="https://t.me/TheTeamVk">@TheTeamVk</a></b>.</li>
+  <li><b>Updates:</b> Follow <b><a href="https://t.me/TheTeamVivek">@TheTeamVivek</a></b> for news.</li>
+</ul>
 
-Found a bug? Have a feature request?
+<hr>
 
-- **Use `/bug` command** in the bot to report directly
-- **Join our [Support Chat](https://t.me/TheTeamVk)** for discussions
-- **Open an [Issue on GitHub](https://github.com/TheTeamVivek/YukkiMusic/issues)**
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how to help:
-
-1. **Fork the repository**
-2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
-3. **Commit changes** (`git commit -m 'Add amazing feature'`)
-4. **Push to branch** (`git push origin feature/amazing-feature`)
-5. **Open a Pull Request**
-
-### Adding a New Platform
-See **[Platform System Guide](../internal/platforms/README.md#-how-to-add-a-new-platform)** for step-by-step instructions.
-
----
-
-## 📜 License
-
-This project is licensed under the **GNU General Public License v3.0** - see the [LICENSE](LICENSE) file for details.
-
-```
-YukkiMusic — A Telegram bot that streams music into group voice chats
-Copyright (C) 2025 TheTeamVivek
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-```
-
----
-
-## 🙌 Credits
-
-- **Maintainer**: [Vivek Kumar](https://github.com/Vivekkumar-in)
-- **Contributors**: All amazing developers who contributed to this project
-- **Libraries**: Built with [gogram](https://github.com/AmarnathCJD/gogram), [ntgcalls](https://github.com/pytgcalls/ntgcalls), and more
-
----
-
-## 📞 Support
-
-- **Telegram Support Chat**: [@TheTeamVk](https://t.me/TheTeamVk)
-- **Updates Channel**: [@TheTeamVivek](https://t.me/TheTeamVivek)
-- **GitHub Issues**: [Report bugs](https://github.com/TheTeamVivek/YukkiMusic/issues)
-
----
-
-## ⚡ Performance Tips
-
-1. **Use multiple assistant accounts** - Distributes load across accounts
-2. **Set appropriate limits** - Adjust `QUEUE_LIMIT` and `DURATION_LIMIT`
-3. **Enable auto-leave** - Removes bot from inactive chats automatically
-4. **Use MongoDB Atlas** - Better performance than local MongoDB
-5. **Set up logger** - Monitor errors and optimize accordingly
-
----
-
-**Made with ❤️ by TheTeamVivek**
-
-**Happy Streaming! 🎶**
+<p align="center">
+  <b>Made with ❤️ by <a href="https://github.com/Vivekkumar-in">Vivek Kumar</a></b><br>
+  <i>Licensed under the GNU General Public License v3.0</i>
+</p>
