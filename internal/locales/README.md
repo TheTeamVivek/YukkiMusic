@@ -28,6 +28,7 @@ Use these helpers instead of calling the loader directly:
 | :--- | :--- | :--- |
 | 🇺🇸 English | `en` | [@Vivekkumar-IN](https://github.com/Vivekkumar-IN) |
 | 🇮🇳 Hindi | `hi` | [@Vivekkumar-IN](https://github.com/Vivekkumar-IN) |
-
+| 🇸🇦 Arabic | `ar` | [@Vivekkumar-IN](https://github.com/Vivekkumar-IN) |
+| 🇹🇷 Turkish | `tr` | [@Vivekkumar-IN](https://github.com/Vivekkumar-IN) |
 ---
 *All YAML files in `internal/locales/` are automatically embedded into the binary during compilation.*
