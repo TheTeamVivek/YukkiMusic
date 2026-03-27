@@ -41,11 +41,11 @@
 # 1. Clone & Enter
 git clone https://github.com/TheTeamVivek/YukkiMusic.git && cd YukkiMusic
 
-# 2. Setup Environment
+\# 2. Setup Environment
 bash install.sh
 cp sample.env .env  # Edit your API_ID, TOKEN, etc.
 
-# 3. Tidy & Run
+\# 3. Tidy & Run
 go mod tidy
 go run ./cmd/app
 </code></pre>
