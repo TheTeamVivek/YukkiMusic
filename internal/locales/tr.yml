@@ -185,7 +185,7 @@ autoleave_updated: "🏃‍♂️ Otomatik Ayrılma {action} konumuna getirildi.
 enabled: "Etkin"
 disabled: "Devre Dışı"
 
-bug_usasge: "⚠️ Lütfen hatayı açıkla. Kullanım: {cmd} <problem> veya bir mesajı yanıtla."
+bug_usage: "⚠️ Lütfen hatayı açıkla. Kullanım: {cmd} <problem> veya bir mesajı yanıtla."
 bug_thanks: "✅ Hata raporun için teşekkürler! Geliştiricilere gönderildi."
 
 bug_report_format: |
