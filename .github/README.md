@@ -5,7 +5,6 @@
 </p>
 
 <p align="center">
-
   <a href="https://github.com/TheTeamVivek/YukkiMusic/stargazers">
     <img src="https://img.shields.io/github/stars/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Stars&color=FFD700&logo=github&logoColor=white" alt="GitHub Stars">
   </a>
@@ -49,12 +48,12 @@
 <pre><code>
 # 1. Clone & Enter
 git clone https://github.com/TheTeamVivek/YukkiMusic.git && cd YukkiMusic
-
-\# 2. Setup Environment
+<br>
+# 2. Setup Environment
 bash install.sh
 cp sample.env .env  # Edit your API_ID, TOKEN, etc.
-
-\# 3. Tidy & Run
+<br>
+# 3. Tidy & Run
 go mod tidy
 go run ./cmd/app
 </code></pre>
