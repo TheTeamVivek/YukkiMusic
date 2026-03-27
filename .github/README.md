@@ -5,17 +5,18 @@
 </p>
 
 <p align="center">
-  <a href="https://go.dev/">
-    <img src="https://img.shields.io/badge/Go-1.25+-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go Version">
-  </a>
-  <a href="https://github.com/TheTeamVivek/YukkiMusic/releases">
-    <img src="https://img.shields.io/badge/Version-v3.2.0-FF9800?style=for-the-badge&logo=semver&logoColor=white" alt="Release Version">
-  </a>
+
   <a href="https://github.com/TheTeamVivek/YukkiMusic/stargazers">
     <img src="https://img.shields.io/github/stars/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Stars&color=FFD700&logo=github&logoColor=white" alt="GitHub Stars">
   </a>
   <a href="https://github.com/TheTeamVivek/YukkiMusic/fork">
     <img src="https://img.shields.io/github/forks/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Forks&color=00C853&logo=github&logoColor=white" alt="GitHub Forks">
+  </a>
+  <a href="https://go.dev/">
+    <img src="https://img.shields.io/badge/Go-1.25+-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go Version">
+  </a>
+  <a href="https://github.com/TheTeamVivek/YukkiMusic/releases">
+    <img src="https://img.shields.io/badge/Version-v3.2.0-FF9800?style=for-the-badge&logo=semver&logoColor=white" alt="Release Version">
   </a>
   <a href="https://t.me/TheTeamVk">
     <img src="https://img.shields.io/badge/Telegram-Support-26A69A?style=for-the-badge&logo=telegram&logoColor=white" alt="Support Group">
