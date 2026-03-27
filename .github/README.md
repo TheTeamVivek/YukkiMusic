@@ -1,6 +1,8 @@
-<h1 align="center">
-  <img src="https://socialify.git.ci/TheTeamVivek/YukkiMusic/image?description=1&descriptionEditable=%E2%9A%A1%EF%B8%8F%20A%20blazing-fast%2C%20feature-packed%20Telegram%20Music%20Bot%20built%20with%20Go.&font=Inter&forks=1&name=1&owner=1&pattern=Solid&stargazers=1&theme=Dark" alt="YukkiMusic Banner" />
-</h1>
+<h1 align="center">🎧 <b>YukkiMusic</b></h1>
+
+<p align="center">
+  <i>⚡ A blazing-fast, reliable, and feature-packed Telegram bot for streaming music in group voice chats — built with Go.</i>
+</p>
 
 <p align="center">
   <a href="https://go.dev/">
@@ -8,6 +10,12 @@
   </a>
   <a href="https://github.com/TheTeamVivek/YukkiMusic/releases">
     <img src="https://img.shields.io/badge/Version-v3.2.0-FF9800?style=for-the-badge&logo=semver&logoColor=white" alt="Release Version">
+  </a>
+  <a href="https://github.com/TheTeamVivek/YukkiMusic/stargazers">
+    <img src="https://img.shields.io/github/stars/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Stars&color=FFD700&logo=github&logoColor=white" alt="GitHub Stars">
+  </a>
+  <a href="https://github.com/TheTeamVivek/YukkiMusic/fork">
+    <img src="https://img.shields.io/github/forks/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Forks&color=00C853&logo=github&logoColor=white" alt="GitHub Forks">
   </a>
   <a href="https://t.me/TheTeamVk">
     <img src="https://img.shields.io/badge/Telegram-Support-26A69A?style=for-the-badge&logo=telegram&logoColor=white" alt="Support Group">
