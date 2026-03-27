@@ -51,7 +51,63 @@ type ytdlpInfo struct {
 	Uploader    string      `json:"uploader"`
 	Description string      `json:"description"`
 	IsLive      bool        `json:"is_live"`
+	Extractor   string      `json:"extractor"`
 	Entries     []ytdlpInfo `json:"entries"`
+}
+
+var bannedExtractors = map[string]bool{
+	"alphaporno":     true,
+	"beeg":           true,
+	"behindkink":     true,
+	"bongacams":      true,
+	"cam4":           true,
+	"cammodels":      true,
+	"camsoda":        true,
+	"chaturbate":     true,
+	"drtuber":        true,
+	"eporner":        true,
+	"erocast":        true,
+	"eroprofile":     true,
+	"fourtube":       true,
+	"goshgay":        true,
+	"hellporno":      true,
+	"iwara":          true,
+	"lovehomeporn":   true,
+	"manyvids":       true,
+	"motherless":     true,
+	"murrtube":       true,
+	"nonktube":       true,
+	"noodlemagazine": true,
+	"nubilesporn":    true,
+	"nuvid":          true,
+	"oftv":           true,
+	"peekvids":       true,
+	"pornbox":        true,
+	"pornflip":       true,
+	"pornhub":        true,
+	"pornotube":      true,
+	"pornovoisines":  true,
+	"pornoxo":        true,
+	"redgifs":        true,
+	"redtube":        true,
+	"rule34video":    true,
+	"sauceplus":      true,
+	"sexu":           true,
+	"slutload":       true,
+	"spankbang":      true,
+	"stripchat":      true,
+	"sunporno":       true,
+	"thisvid":        true,
+	"tnaflix":        true,
+	"toypics":        true,
+	"txxx":           true,
+	"xhamster":       true,
+	"xnxx":           true,
+	"xvideos":        true,
+	"xxxymovies":     true,
+	"youjizz":        true,
+	"youporn":        true,
+	"zenporn":        true,
 }
 
 // URLs that are likely handled by YouTube
@@ -115,6 +171,12 @@ func (y *YtdlpPlatform) GetTracks(
 		)
 	}
 
+	// Check for banned extractor
+	if bannedExtractors[strings.ToLower(info.Extractor)] {
+		gologging.InfoF("YtDlp: Blocked adult content from extractor: %s", info.Extractor)
+		return nil, errors.New("adult content is not allowed")
+	}
+
 	var tracks []*state.Track
 
 	// Handle playlists
@@ -126,6 +188,11 @@ func (y *YtdlpPlatform) GetTracks(
 		for _, entry := range info.Entries {
 			if entry.IsLive {
 				continue // Skip live entries
+			}
+			// Check entry extractor if present (sometimes entries have their own extractor info)
+			if entry.Extractor != "" && bannedExtractors[strings.ToLower(entry.Extractor)] {
+				gologging.InfoF("YtDlp: Skipping banned entry from extractor: %s", entry.Extractor)
+				continue
 			}
 			track := y.infoToTrack(&entry, video)
 			tracks = append(tracks, track)
