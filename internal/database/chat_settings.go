@@ -38,6 +38,7 @@ type ChatSettings struct {
 	RTMP               RTMPConfig `bson:"rtmp_config"`
 	AssistantIndex     int        `bson:"ass_index,omitempty"`
 	ThumbnailsDisabled bool       `bson:"no_thumb"`
+	PlayModeAdminsOnly bool       `bson:"play_mode"`
 }
 
 func defaultChatSettings(chatID int64) *ChatSettings {
