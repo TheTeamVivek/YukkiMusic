@@ -487,6 +487,18 @@ play_failed: "❌ Oynatılamadı\nHata: {error}"
 play_unable: "<b> ❌ Oynatılamıyor </b>\n\n<i>Lütfen <b>sesli sohbeti yeniden başlat</b>.</i>"
 play_downloading_song: "📥 \"{title}\" şarkısı indiriliyor"
 play_download_canceled: "⚠️ İndirme {user} tarafından iptal edildi."
+
+playmode_help: |
+  🛠️ <b>Oynatma Modu</b>
+
+  <b>Durum:</b> {status}
+  <b>Kullanım:</b> <code>/playmode [enable|disable]</code>
+
+playmode_status_admins: "<b>Yalnızca Yöneticiler</b> 🔐"
+playmode_status_everyone: "<b>Herkes</b> 🌍"
+playmode_success_admins: "🛡️ <b>Oynatma modu</b> artık yalnızca <b>yöneticiler ve yetkili kullanıcılar</b> ile sınırlıdır. 🎧"
+playmode_success_everyone: "✅ <b>Oynatma modu</b> artık <b>herkes için açık</b>. Müziğin tadını çıkarın! 🎶"
+playmode_restricted: "🚫 Oynatma modu etkin. Sadece yöneticiler ve yetkili kullanıcılar şarkı çalabilir."
 play_added_multiple_header: "➕ {user} tarafından <b>{count} parça eklendi</b>"
 play_queue_limit_hint: "⚠️ <i>Sıra sınırına ulaşıldı — bazı parçalar atlandı.</i>"
 play_queue_view_hint: "<i>Listenin tamamını görmek için /queue kullan.</i>"
@@ -957,6 +969,7 @@ help_admin: |
 
   <b>Komutlar:</b>
   <blockquote>
+  <b>/playmode</b> - /play komutunu kimin kullanacağını kontrol et
   <b>/speed</b> - Oynatma hızını değiştir
   <b>/skip</b> - Mevcut şarkıyı atla
   <b>/pause</b> - Mevcut oynatmayı duraklat

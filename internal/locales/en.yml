@@ -488,6 +488,18 @@ play_failed: "❌ Failed to play\nError: {error}"
 play_unable: "<b> ❌ Unable to Play </b>\n\n<i>Please <b>restart the voice</b> chat.</i>"
 play_downloading_song: "📥 Downloading song \"{title}\""
 play_download_canceled: "⚠️ Download canceled by {user}."
+
+playmode_help: |
+  🛠️ <b>Play Mode</b>
+
+  <b>Status:</b> {status}
+  <b>Usage:</b> <code>/playmode [enable|disable]</code>
+
+playmode_status_admins: "<b>Admins Only</b> 🔐"
+playmode_status_everyone: "<b>Everyone</b> 🌍"
+playmode_success_admins: "🛡️ <b>Play mode</b> is now restricted to <b>Admins & DJs</b> only. 🎧"
+playmode_success_everyone: "✅ <b>Play mode</b> is now <b>Open to Everyone</b>. Let the music flow! 🎶"
+playmode_restricted: "🚫 Play mode is enabled. Only admins and authorized users can play."
 play_added_multiple_header: "➕ <b>Added {count} tracks</b> by {user}"
 play_queue_limit_hint: "⚠️ <i>Queue limit reached — some tracks were skipped.</i>"
 play_queue_view_hint: "<i>Use /queue to view full list.</i>"
@@ -961,6 +973,7 @@ help_admin: |
 
   <b>Commands:</b>
   <blockquote>
+  <b>/playmode</b> - Control who can use /play
   <b>/speed</b> - Change playback speed
   <b>/skip</b> - Skip the current song
   <b>/pause</b> - Pause the current playback

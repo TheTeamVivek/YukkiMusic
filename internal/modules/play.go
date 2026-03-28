@@ -276,6 +276,19 @@ func cplayHandler(m *tg.NewMessage) error {
 }
 
 func handlePlay(m *tg.NewMessage, opts *playOpts) error {
+	chatID := m.ChannelID()
+	adminsOnly, _ := database.PlayModeAdminsOnly(chatID)
+	if adminsOnly {
+		isAdmin, err := utils.IsChatAdmin(m.Client, chatID, m.SenderID())
+		if err != nil || !isAdmin {
+			isAuth, _ := database.IsAuthorized(chatID, m.SenderID())
+			if !isAuth {
+				m.Reply(F(chatID, "playmode_restricted"))
+				return tg.ErrEndGroup
+			}
+		}
+	}
+
 	mention := utils.MentionHTML(m.Sender)
 
 	r, replyMsg, err := prepareRoomAndSearchMessage(m, opts.CPlay)

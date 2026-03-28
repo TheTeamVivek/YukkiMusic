@@ -490,6 +490,18 @@ play_failed: "❌ चलाने में विफल\nत्रुटि: {e
 play_unable: "<b> ❌ चलाने में असमर्थ </b>\n\n<i>कृपया <b>ध्वनि वार्तालाप पुनः आरम्भ</b> करें।</i>"
 play_downloading_song: "📥 संगीत \"{title}\" डाउनलोड किया जा रहा है"
 play_download_canceled: "⚠️ {user} द्वारा डाउनलोड रद्द।"
+
+playmode_help: |
+  🛠️ <b>संगीत संचालन विधा</b>
+
+  <b>स्थिति:</b> {status}
+  <b>प्रयोग:</b> <code>/playmode [enable|disable]</code>
+
+playmode_status_admins: "<b>केवल प्रशासक</b> 🔐"
+playmode_status_everyone: "<b>प्रत्येक व्यक्ति</b> 🌍"
+playmode_success_admins: "🛡️ <b>संगीत संचालन</b> अब केवल <b>प्रशासकों एवं अधिकृत उपयोगकर्ताओं</b> तक सीमित है। 🎧"
+playmode_success_everyone: "✅ <b>संगीत संचालन</b> अब <b>सभी के लिए खुला</b> है। संगीत का आनंद लें! 🎶"
+playmode_restricted: "🚫 संगीत संचालन विधा सक्षम है। केवल प्रशासक अथवा अधिकृत उपयोगकर्ता ही संगीत चला सकते हैं।"
 play_added_multiple_header: "➕ {user} द्वारा <b>{count} संगीत जोड़े गए</b>"
 play_queue_limit_hint: "⚠️ <i>प्रतीक्षा सूची की सीमा पूर्ण — कुछ संगीत छोड़ दिए गए।</i>"
 play_queue_view_hint: "<i>पूर्ण सूची देखने के लिए /queue का प्रयोग करें।</i>"
@@ -963,6 +975,7 @@ help_admin: |
 
   <b>आदेश:</b>
   <blockquote>
+  <b>/playmode</b> - संगीत संचालन विधा नियन्त्रित करें
   <b>/speed</b> - चलाने की गति बदलें
   <b>/skip</b> - वर्तमान गीत छोड़ें
   <b>/pause</b> - वर्तमान संगीत को विराम दें
