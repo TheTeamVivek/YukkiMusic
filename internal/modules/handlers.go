@@ -452,6 +452,11 @@ var handlers = []MsgHandlerDef{
 		Handler: playmodeHandler,
 		Filters: []telegram.Filter{superGroupFilter, adminFilter},
 	},
+	{
+		Pattern: "(cmddelete|commanddelete)",
+		Handler: cmdDeleteHandler,
+		Filters: []telegram.Filter{superGroupFilter, adminFilter},
+	},
 }
 
 var cbHandlers = []CbHandlerDef{

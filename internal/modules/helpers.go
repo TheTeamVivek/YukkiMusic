@@ -278,6 +278,12 @@ func SafeMessageHandler(
 			}
 		}()
 
+		if m.IsCommand() {
+			if isEnabled, _ := database.CommandDelete(m.ChannelID()); isEnabled {
+				_, _ = m.Delete()
+			}
+		}
+
 		cmd := getCommand(m)
 		if checkForHelpFlag(m) {
 			gologging.DebugF("Help flag detected for command %s", cmd)

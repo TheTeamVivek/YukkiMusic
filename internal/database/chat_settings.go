@@ -39,6 +39,7 @@ type ChatSettings struct {
 	AssistantIndex     int        `bson:"ass_index,omitempty"`
 	ThumbnailsDisabled bool       `bson:"no_thumb"`
 	PlayModeAdminsOnly bool       `bson:"play_mode"`
+	CommandDelete      bool       `bson:"cmd_delete"`
 }
 
 func defaultChatSettings(chatID int64) *ChatSettings {

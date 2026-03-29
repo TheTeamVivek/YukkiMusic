@@ -85,6 +85,14 @@ var AllCommands = BotCommands{
 		{Command: "pause", Description: "Pause the current song."},
 		{Command: "resume", Description: "Resume the current song."},
 		{Command: "replay", Description: "Replay the current song."},
+		{
+			Command:     "playmode",
+			Description: "Control who can use /play command.",
+		},
+		{
+			Command:     "cmddelete",
+			Description: "Toggle automatic deletion of bot commands.",
+		},
 		{Command: "mute", Description: "Mute the bot in the voice chat."},
 		{Command: "unmute", Description: "Unmute the bot in the voice chat."},
 		{

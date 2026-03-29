@@ -441,6 +441,9 @@ nothumb_already: "ℹ️ Thumbnail display is already {action}."
 nothumb_update_fail: "⚠️ <b>Failed to update thumbnail setting.</b>"
 nothumb_updated: "🖼️ Thumbnail display has been {action}."
 
+cmddelete_status: "🗑️ <b>Command Delete Control</b>\n\nWhen enabled, I will automatically delete command messages.\nUsage: {cmd} [enable|disable]\nCurrent state: {action}"
+cmddelete_updated: "🗑️ Command deletion has been {action}."
+
 only_admin: "⚠️ <b>Permission Denied!</b>\nOnly <b>admins</b> can control this actions. You can still play songs 🎵.\n\nIf you believe you are an admin, please use /reload to refresh your admin status."
 only_admin_or_auth: "⚠️ <b>Access Denied</b>\nOnly <b>admins</b> or <b>authorized users</b> can control this actions.\n\nIf you recently became an admin, use /reload to refresh your permissions."
 only_admin_or_auth_cb: "⚠️ Only admins can do this actions."
@@ -974,6 +977,7 @@ help_admin: |
   <b>Commands:</b>
   <blockquote>
   <b>/playmode</b> - Control who can use /play
+  <b>/cmddelete</b> - Toggle automatic deletion of bot commands
   <b>/speed</b> - Change playback speed
   <b>/skip</b> - Skip the current song
   <b>/pause</b> - Pause the current playback

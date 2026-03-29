@@ -440,6 +440,9 @@ nothumb_already: "ℹ️ Küçük resim gösterimi zaten {action}."
 nothumb_update_fail: "⚠️ <b>Küçük resim ayarı güncellenemedi.</b>"
 nothumb_updated: "🖼️ Küçük resim gösterimi {action} konumuna getirildi."
 
+cmddelete_status: "🗑️ <b>Komut Silme Kontrolü</b>\n\nEtkinleştirildiğinde, komut mesajlarını otomatik olarak sileceğim.\nKullanım: {cmd} [enable|disable]\nMevcut durum: {action}"
+cmddelete_updated: "🗑️ Komut silme {action} konuma getirildi."
+
 only_admin: "⚠️ <b>Yetki Reddedildi!</b>\nBu eylemi yalnızca <b>yöneticiler</b> kontrol edebilir. Yine de şarkı çalabilirsin 🎵.\n\nEğer yönetici olduğunu düşünüyorsan, lütfen yönetici durumunu yenilemek için /reload kullan."
 only_admin_or_auth: "⚠️ <b>Erişim Engellendi</b>\nBu eylemi yalnızca <b>yöneticiler</b> veya <b>yetkili kullanıcılar</b> kontrol edebilir.\n\nYakın zamanda yönetici olduysan, izinlerini yenilemek için /reload kullan."
 only_admin_or_auth_cb: "⚠️ Bu eylemi yalnızca yöneticiler yapabilir."
@@ -970,6 +973,7 @@ help_admin: |
   <b>Komutlar:</b>
   <blockquote>
   <b>/playmode</b> - /play komutunu kimin kullanacağını kontrol et
+  <b>/cmddelete</b> - Bot komutlarının otomatik silinmesini aç/kapat
   <b>/speed</b> - Oynatma hızını değiştir
   <b>/skip</b> - Mevcut şarkıyı atla
   <b>/pause</b> - Mevcut oynatmayı duraklat
