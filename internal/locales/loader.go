@@ -24,6 +24,7 @@ import (
 	"sort"
 	"strings"
 
+        "github.com/Laky-64/gologging"
 	"gopkg.in/yaml.v3"
 
 	"main/internal/config"
@@ -33,6 +34,7 @@ import (
 var localesFS embed.FS
 
 var loadedLocales = make(map[string]map[string]string)
+const baseLang = "en"
 
 type Arg map[string]any
 
@@ -70,25 +72,38 @@ func Load() error {
 }
 
 func Get(lang, key string, values Arg) string {
-	locale, ok := loadedLocales[lang]
-	if !ok {
-		locale = loadedLocales[config.DefaultLang]
-	}
+    tryLangs := []string{
+        lang,
+        config.DefaultLang,
+        baseLang,
+    }
 
-	val, ok := locale[key]
-	if !ok {
-		val = loadedLocales[config.DefaultLang][key]
-	}
+    var val string
+    var found bool
 
-	if values == nil {
-		return val
-	}
+    for _, l := range tryLangs {
+        if locale, ok := loadedLocales[l]; ok {
+            if v, ok := locale[key]; ok {
+                val = v
+                found = true
+                break
+            }
+        }
+    }
 
-	for k, v := range values {
-		val = strings.ReplaceAll(val, "{"+k+"}", fmt.Sprint(v))
-	}
+    if !found {
+        gologging.ErrorF("Missing translation → lang=%s key=%s", lang, key)
 
-	return val
+        return fmt.Sprintf("[%s]", key)
+    }
+
+    if values != nil {
+        for k, v := range values {
+            val = strings.ReplaceAll(val, "{"+k+"}", fmt.Sprint(v))
+        }
+    }
+
+    return val
 }
 
 func GetAvailableLanguages() []string {
