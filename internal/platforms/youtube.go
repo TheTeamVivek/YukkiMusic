@@ -79,25 +79,32 @@ func (p *YouTubePlatform) GetTracks(
 	input string,
 	video bool,
 ) ([]*state.Track, error) {
-	trimmed := strings.TrimSpace(input)
-	if trimmed == "" {
+	query := strings.TrimSpace(input)
+	if query == "" {
 		return nil, errors.New("empty query")
 	}
 
-	var tracks []*state.Track
-	var err error
+	var (
+		tracks []*state.Track
+		err    error
+	)
 
-	if youtubeLinkRegex.MatchString(trimmed) {
-		playlistID := p.extractPlaylistID(trimmed)
-		videoID := p.extractVideoID(trimmed)
-
-		if playlistID != "" && videoID == "" {
-			tracks, err = p.handlePlaylist(trimmed)
-		} else {
-			tracks, err = p.handleTrackURL(trimmed)
-		}
+	if !youtubeLinkRegex.MatchString(query) {
+		tracks, err = p.VideoSearch(query, false)
 	} else {
-		tracks, err = p.VideoSearch(trimmed, false)
+		playlistID := p.extractPlaylistID(query)
+		videoID := p.extractVideoID(query)
+
+		switch {
+		case playlistID != "" && videoID != "":
+			tracks, err = p.handleCombined(query, videoID)
+
+		case playlistID != "":
+			tracks, err = p.handlePlaylist(query)
+
+		default:
+			tracks, err = p.handleTrackURL(query)
+		}
 	}
 
 	if err != nil {
@@ -140,6 +147,33 @@ func (p *YouTubePlatform) handlePlaylist(
 	}
 
 	return nil, fmt.Errorf("failed to fetch playlist: %w", err)
+}
+
+func (p *YouTubePlatform) handleCombined(rawURL, videoID string) ([]*state.Track, error) {
+	vTracks, vErr := p.handleTrackURL(rawURL)
+	pTracks, pErr := p.handlePlaylist(rawURL)
+
+	if vErr == nil && pErr == nil && len(vTracks) > 0 {
+		vid := vTracks[0].ID
+		finalTracks := []*state.Track{vTracks[0]}
+		for _, t := range pTracks {
+			if t.ID != vid {
+				finalTracks = append(finalTracks, t)
+			}
+		}
+		return finalTracks, nil
+	}
+
+	if vErr == nil {
+		return vTracks, nil
+	}
+
+	if pErr == nil {
+		gologging.WarnF("[YouTube] Failed to fetch video %s in combined URL: %v", videoID, vErr)
+		return pTracks, nil
+	}
+
+	return nil, fmt.Errorf("failed to fetch video (%v) and playlist (%v)", vErr, pErr)
 }
 
 func (p *YouTubePlatform) handleTrackURL(
