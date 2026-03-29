@@ -160,7 +160,7 @@ func initAssistant(
 		LogLevel:      telegram.LogError,
 		ParseMode:     "HTML",
 		StringSession: stringSession,
-		Session:       fmt.Sprintf("ass%d.session", index),
+		Session:       fmt.Sprintf("ass_%d.session", index),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("creating client: %w", err)
