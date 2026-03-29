@@ -169,7 +169,11 @@ func (p *YouTubePlatform) handleCombined(rawURL, videoID string) ([]*state.Track
 	}
 
 	if pErr == nil {
-		gologging.WarnF("[YouTube] Failed to fetch video %s in combined URL: %v", videoID, vErr)
+		gologging.WarnF(
+			"[YouTube] Failed to fetch video %s in combined URL: %v",
+			videoID,
+			vErr,
+		)
 		return pTracks, nil
 	}
 
@@ -375,7 +379,10 @@ func (p *YouTubePlatform) fetchVideo(videoID string) (*state.Track, error) {
 	}, nil
 }
 
-func (p *YouTubePlatform) fetchPlaylist(playlistID string, limit int) ([]*state.Track, error) {
+func (p *YouTubePlatform) fetchPlaylist(
+	playlistID string,
+	limit int,
+) ([]*state.Track, error) {
 	gologging.DebugF("[YouTube] Fetching playlist: %s", playlistID)
 	var result map[string]any
 
@@ -404,7 +411,10 @@ func (p *YouTubePlatform) fetchPlaylist(playlistID string, limit int) ([]*state.
 	return tracks, nil
 }
 
-func (p *YouTubePlatform) fetchMixPlaylist(playlistID string, limit int) ([]*state.Track, error) {
+func (p *YouTubePlatform) fetchMixPlaylist(
+	playlistID string,
+	limit int,
+) ([]*state.Track, error) {
 	gologging.DebugF("[YouTube] Fetching mix: %s", playlistID)
 	var result map[string]any
 
@@ -468,15 +478,18 @@ func (p *YouTubePlatform) fetchMixPlaylist(playlistID string, limit int) ([]*sta
 	return tracks, nil
 }
 
-func (p *YouTubePlatform) callInnerTube(endpoint string, body any, result any) error {
-	apiURL := fmt.Sprintf("https://m.youtube.com/youtubei/v1/%s?key=%s", endpoint, innerTubeKey)
+func (p *YouTubePlatform) callInnerTube(endpoint string, body, result any) error {
+	apiURL := fmt.Sprintf(
+		"https://m.youtube.com/youtubei/v1/%s?key=%s",
+		endpoint,
+		innerTubeKey,
+	)
 	resp, err := rc.R().
 		SetBody(body).
 		SetResult(result).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("User-Agent", "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36").
 		Post(apiURL)
-
 	if err != nil {
 		return fmt.Errorf("innertube request failed: %w", err)
 	}
@@ -488,7 +501,12 @@ func (p *YouTubePlatform) callInnerTube(endpoint string, body any, result any) e
 	return nil
 }
 
-func (p *YouTubePlatform) parseNodes(node any, tracks *[]*state.Track, limit int, rendererKey string) {
+func (p *YouTubePlatform) parseNodes(
+	node any,
+	tracks *[]*state.Track,
+	limit int,
+	rendererKey string,
+) {
 	if limit > 0 && len(*tracks) >= limit {
 		return
 	}
@@ -542,7 +560,10 @@ func isLiveVideo(vid map[string]any) bool {
 			}
 		}
 	}
-	return strings.Contains(strings.ToLower(safeString(dig(vid, "viewCountText", "runs", 0, "text"))), "watching")
+	return strings.Contains(
+		strings.ToLower(safeString(dig(vid, "viewCountText", "runs", 0, "text"))),
+		"watching",
+	)
 }
 
 func getThumbnailURL(vid map[string]any) string {

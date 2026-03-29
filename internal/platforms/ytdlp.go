@@ -190,8 +190,12 @@ func (y *YtdlpPlatform) GetTracks(
 				continue // Skip live entries
 			}
 			// Check entry extractor if present (sometimes entries have their own extractor info)
-			if entry.Extractor != "" && bannedExtractors[strings.ToLower(entry.Extractor)] {
-				gologging.InfoF("YtDlp: Skipping banned entry from extractor: %s", entry.Extractor)
+			if entry.Extractor != "" &&
+				bannedExtractors[strings.ToLower(entry.Extractor)] {
+				gologging.InfoF(
+					"YtDlp: Skipping banned entry from extractor: %s",
+					entry.Extractor,
+				)
 				continue
 			}
 			track := y.infoToTrack(&entry, video)
