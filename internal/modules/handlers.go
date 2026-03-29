@@ -260,7 +260,7 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
-		Pattern: "position",
+		Pattern: "(pos|position)",
 		Handler: positionHandler,
 		Filters: []telegram.Filter{superGroupFilter},
 	},
@@ -422,7 +422,7 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
-		Pattern: "cposition",
+		Pattern: "(cpos|cposition)",
 		Handler: cpositionHandler,
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
