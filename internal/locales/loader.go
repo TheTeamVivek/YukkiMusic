@@ -24,7 +24,7 @@ import (
 	"sort"
 	"strings"
 
-        "github.com/Laky-64/gologging"
+	"github.com/Laky-64/gologging"
 	"gopkg.in/yaml.v3"
 
 	"main/internal/config"
@@ -34,6 +34,7 @@ import (
 var localesFS embed.FS
 
 var loadedLocales = make(map[string]map[string]string)
+
 const baseLang = "en"
 
 type Arg map[string]any
@@ -72,38 +73,38 @@ func Load() error {
 }
 
 func Get(lang, key string, values Arg) string {
-    tryLangs := []string{
-        lang,
-        config.DefaultLang,
-        baseLang,
-    }
+	tryLangs := []string{
+		lang,
+		config.DefaultLang,
+		baseLang,
+	}
 
-    var val string
-    var found bool
+	var val string
+	var found bool
 
-    for _, l := range tryLangs {
-        if locale, ok := loadedLocales[l]; ok {
-            if v, ok := locale[key]; ok {
-                val = v
-                found = true
-                break
-            }
-        }
-    }
+	for _, l := range tryLangs {
+		if locale, ok := loadedLocales[l]; ok {
+			if v, ok := locale[key]; ok {
+				val = v
+				found = true
+				break
+			}
+		}
+	}
 
-    if !found {
-        gologging.ErrorF("Missing translation → lang=%s key=%s", lang, key)
+	if !found {
+		gologging.ErrorF("Missing translation → lang=%s key=%s", lang, key)
 
-        return fmt.Sprintf("[%s]", key)
-    }
+		return fmt.Sprintf("[%s]", key)
+	}
 
-    if values != nil {
-        for k, v := range values {
-            val = strings.ReplaceAll(val, "{"+k+"}", fmt.Sprint(v))
-        }
-    }
+	if values != nil {
+		for k, v := range values {
+			val = strings.ReplaceAll(val, "{"+k+"}", fmt.Sprint(v))
+		}
+	}
 
-    return val
+	return val
 }
 
 func GetAvailableLanguages() []string {
