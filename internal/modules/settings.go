@@ -107,7 +107,7 @@ func cmdDeleteHandler(m *tg.NewMessage) error {
 		}
 
 		m.Reply(F(chatID, "cmddelete_status", locales.Arg{
-			"cmd":    "/" + cmd,
+			"cmd":    cmd,
 			"action": F(chatID, actionKey),
 		}), &tg.SendOptions{ParseMode: "HTML"})
 		return tg.ErrEndGroup
