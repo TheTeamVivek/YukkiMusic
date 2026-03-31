@@ -20,7 +20,6 @@ package modules
 import (
 	"context"
 	"fmt"
-	"html"
 	"strconv"
 	"strings"
 	"time"
@@ -301,7 +300,7 @@ func handleReplayAction(
 	}
 
 	track := r.Track()
-	trackTitle := html.EscapeString(utils.ShortTitle(track.Title, 25))
+	trackTitle := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
 
 	msgText := F(cb.ChannelID(), "stream_now_playing", locales.Arg{
 		"url":      track.URL,
@@ -382,7 +381,7 @@ func handleSkipAction(
 	cb.Delete()
 
 	title := utils.ShortTitle(t.Title, 25)
-	safeTitle := html.EscapeString(title)
+	safeTitle := utils.EscapeHTML(title)
 
 	msgText := F(cb.ChannelID(), "stream_now_playing", locales.Arg{
 		"url":      t.URL,
@@ -546,7 +545,7 @@ func updatePlaybackMessage(
 	if track == nil {
 		return
 	}
-	safeTitle := html.EscapeString(utils.ShortTitle(track.Title, 25))
+	safeTitle := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
 	mention := utils.MentionHTML(cb.Sender)
 
 	var msgText string

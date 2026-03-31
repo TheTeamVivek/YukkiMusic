@@ -19,7 +19,6 @@ package modules
 
 import (
 	"fmt"
-	"html"
 	"strconv"
 	"strings"
 	"time"
@@ -115,7 +114,7 @@ func handlePause(m *tg.NewMessage, cplay bool) error {
 	}
 
 	mention := utils.MentionHTML(m.Sender)
-	title := html.EscapeString(utils.ShortTitle(r.Track().Title, 25))
+	title := utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25))
 
 	autoResumeLine := ""
 	if autoResumeDuration > 0 {

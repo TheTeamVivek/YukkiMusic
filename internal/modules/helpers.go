@@ -152,7 +152,7 @@ func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 		"<b>%s</b> <a href=\"%s\">%s</a>\n",
 		F(chatID, "logger_track"),
 		track.URL,
-		utils.ShortTitle(track.Title),
+		utils.EscapeHTML(utils.ShortTitle(track.Title)),
 	)
 
 	// Source

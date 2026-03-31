@@ -19,7 +19,6 @@ package modules
 
 import (
 	"context"
-	"html"
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
@@ -120,7 +119,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	title := utils.ShortTitle(t.Title, 25)
-	safeTitle := html.EscapeString(title)
+	safeTitle := utils.EscapeHTML(title)
 
 	msg := F(chatID, "stream_now_playing", locales.Arg{
 		"url":      t.URL,

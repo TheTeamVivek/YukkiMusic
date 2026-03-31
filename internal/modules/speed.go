@@ -19,7 +19,6 @@ package modules
 
 import (
 	"fmt"
-	"html"
 	"strconv"
 	"strings"
 	"time"
@@ -92,7 +91,7 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 			if remaining > 0 {
 				m.Reply(F(chatID, "speed_current_with_reset", locales.Arg{
 					"speed": fmt.Sprintf("%.2f", r.Speed()),
-					"title": html.EscapeString(
+					"title": utils.EscapeHTML(
 						utils.ShortTitle(t.Title, 25),
 					),
 					"duration": formatDuration(int(remaining.Seconds())),
@@ -101,7 +100,7 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 			} else {
 				m.Reply(F(chatID, "speed_current", locales.Arg{
 					"speed": fmt.Sprintf("%.2f", r.Speed()),
-					"title": html.EscapeString(utils.ShortTitle(t.Title, 25)),
+					"title": utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
 					"cmd":   getCommand(m),
 				}))
 			}
@@ -155,12 +154,12 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 		if resetDuration == 0 {
 			m.Reply(F(chatID, "speed_already_set", locales.Arg{
 				"speed": fmt.Sprintf("%.2f", newSpeed),
-				"title": html.EscapeString(utils.ShortTitle(t.Title, 25)),
+				"title": utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
 			}))
 		} else if newSpeed != 1.0 {
 			m.Reply(F(chatID, "speed_already_set_reset_hint", locales.Arg{
 				"speed": fmt.Sprintf("%.2f", newSpeed),
-				"title": html.EscapeString(utils.ShortTitle(t.Title, 25)),
+				"title": utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
 				"cmd":   getCommand(m),
 			}))
 		}

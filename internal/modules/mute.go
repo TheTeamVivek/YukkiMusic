@@ -18,7 +18,6 @@
 package modules
 
 import (
-	"html"
 	"strconv"
 	"strings"
 	"time"
@@ -119,7 +118,7 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 	}
 
 	msgArgs := locales.Arg{
-		"title": html.EscapeString(utils.ShortTitle(r.Track().Title, 25)),
+		"title": utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25)),
 		"user":  mention,
 	}
 

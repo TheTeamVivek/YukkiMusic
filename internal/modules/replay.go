@@ -19,7 +19,6 @@ package modules
 
 import (
 	"fmt"
-	"html"
 
 	"github.com/amarnathcjd/gogram/telegram"
 
@@ -71,7 +70,7 @@ func handleReplay(m *telegram.NewMessage, cplay bool) error {
 			"error": err,
 		}))
 	} else {
-		trackTitle := html.EscapeString(utils.ShortTitle(t.Title, 25))
+		trackTitle := utils.EscapeHTML(utils.ShortTitle(t.Title, 25))
 		totalDuration := formatDuration(t.Duration)
 		m.Reply(F(chatID, "replay_success", locales.Arg{
 			"title":    trackTitle,

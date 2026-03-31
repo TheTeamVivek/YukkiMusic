@@ -19,7 +19,6 @@ package modules
 
 import (
 	"fmt"
-	"html"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
@@ -69,7 +68,7 @@ func handleUnmute(m *tg.NewMessage, cplay bool) error {
 		return tg.ErrEndGroup
 	}
 
-	title := html.EscapeString(utils.ShortTitle(r.Track().Title, 25))
+	title := utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25))
 	mention := utils.MentionHTML(m.Sender)
 
 	if _, err := r.Unmute(); err != nil {

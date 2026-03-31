@@ -27,6 +27,7 @@ import (
 )
 
 func ShortTitle(title string, max ...int) string {
+	title = html.UnescapeString(title)
 	limit := 25
 	if len(max) > 0 {
 		limit = max[0]
@@ -36,6 +37,14 @@ func ShortTitle(title string, max ...int) string {
 		return title
 	}
 	return string(runes[:limit]) + "..."
+}
+
+// EscapeHTML escapes characters for Telegram HTML mode (only &, <, >).
+func EscapeHTML(s string) string {
+	s = strings.ReplaceAll(s, "&", "&amp;")
+	s = strings.ReplaceAll(s, "<", "&lt;")
+	s = strings.ReplaceAll(s, ">", "&gt;")
+	return s
 }
 
 func CleanURL(raw string) string {
@@ -52,7 +61,7 @@ func MentionHTML(u *tg.UserObj) string {
 	if fullName == "" {
 		fullName = "User"
 	}
-	fullName = html.EscapeString(ShortTitle(fullName, 15))
+	fullName = EscapeHTML(ShortTitle(fullName, 15))
 
 	return fmt.Sprintf("<a href=\"tg://user?id=%d\">%s</a>", u.ID, fullName)
 }
