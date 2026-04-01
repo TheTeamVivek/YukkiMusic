@@ -244,10 +244,9 @@ func handleStream(m *tg.NewMessage, force bool) error {
 	replyMsg, _ = utils.EOR(replyMsg, downloadingText)
 
 	ctx, cancel := context.WithCancel(context.Background())
-	downloadCancels[chatID] = cancel
+	downloadCancels.Set(chatID, cancel)
 	defer func() {
-		if _, ok := downloadCancels[chatID]; ok {
-			delete(downloadCancels, chatID)
+		if cancel, ok := downloadCancels.LoadAndDelete(chatID); ok {
 			cancel()
 		}
 	}()

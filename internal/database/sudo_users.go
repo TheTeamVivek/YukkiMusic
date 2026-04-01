@@ -25,11 +25,6 @@ func Sudoers() ([]int64, error) {
 	return state.Sudoers, nil
 }
 
-func IsSudoWithoutError(id int64) bool {
-	is, _ := IsSudo(id)
-	return is
-}
-
 func IsSudo(id int64) (bool, error) {
 	state, err := getBotState()
 	if err != nil {

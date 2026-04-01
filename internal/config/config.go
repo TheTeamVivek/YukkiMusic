@@ -99,7 +99,7 @@ func loadConfig() {
 		"TOKEN",
 		getString("BOT_TOKEN", ""),
 	) // Checks TOKEN, fallbacks to BOT_TOKEN
-	LoggerID = getInt64("LOGGER_ID", 0)
+	LoggerID = getInt64("LOGGER_ID", getInt64("LOG_GROUP_ID", 0))
 	MongoURI = getString("MONGO_DB_URI", "")
 	SessionType = getString("SESSION_TYPE", "pyrogram")
 	StringSessions = getStringSlice(
@@ -117,7 +117,7 @@ func loadConfig() {
 	DefaultLang = getString("DEFAULT_LANG", "en")
 	DurationLimit = int(getInt64("DURATION_LIMIT", 4200)) // In seconds
 	LeaveOnDemoted = getBool("LEAVE_ON_DEMOTED", false)
-	QueueLimit = int(getInt64("QUEUE_LIMIT", 7))
+	QueueLimit = int(getInt64("QUEUE_LIMIT", 24))
 	SupportChat = getString("SUPPORT_CHAT", "https://t.me/TheTeamVk")
 	SupportChannel = getString("SUPPORT_CHANNEL", "https://t.me/TheTeamVivek")
 	CookiesLink = getString("COOKIES_LINK", "")

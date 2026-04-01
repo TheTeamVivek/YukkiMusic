@@ -18,6 +18,7 @@
 package modules
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"html"
@@ -36,7 +37,7 @@ import (
 	"main/internal/utils"
 )
 
-var downloadCancels = make(map[int64]func())
+var downloadCancels = utils.NewCache[int64, context.CancelFunc](utils.NoExpiry)
 
 func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	chatID := m.ChannelID()

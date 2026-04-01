@@ -55,9 +55,8 @@ func cancelHandler(cb *tg.CallbackQuery) error {
 		return tg.ErrEndGroup
 	}
 
-	if cancel, ok := downloadCancels[chatID]; ok {
+	if cancel, ok := downloadCancels.LoadAndDelete(chatID); ok {
 		cancel()
-		delete(downloadCancels, chatID)
 		cb.Answer(F(chatID, "download_cancelled"), opt)
 	} else {
 		cb.Answer(F(chatID, "no_download_to_cancel"), opt)

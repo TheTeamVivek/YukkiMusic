@@ -563,10 +563,9 @@ func playTracksAndRespond(
 			replyMsg, _ = utils.EOR(replyMsg, downloadingText, opt)
 
 			ctx, cancel := context.WithCancel(context.Background())
-			downloadCancels[m.ChannelID()] = cancel
+			downloadCancels.Set(m.ChannelID(), cancel)
 			defer func() {
-				if _, ok := downloadCancels[m.ChannelID()]; ok {
-					delete(downloadCancels, m.ChannelID())
+				if cancel, ok := downloadCancels.LoadAndDelete(m.ChannelID()); ok {
 					cancel()
 				}
 			}()

@@ -457,6 +457,11 @@ var handlers = []MsgHandlerDef{
 		Handler: cmdDeleteHandler,
 		Filters: []telegram.Filter{superGroupFilter, adminFilter},
 	},
+	{
+		Pattern: "privacy",
+		Handler: privacyHandler,
+		Filters: []telegram.Filter{ignoreChannelFilter},
+	},
 }
 
 var cbHandlers = []CbHandlerDef{

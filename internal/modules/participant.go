@@ -202,14 +202,22 @@ func handleChatAction(m *telegram.NewMessage) error {
 }
 
 func handleSudoJoin(p *telegram.ParticipantUpdate, chatID int64) {
+	userID := p.UserID()
+
 	var msgKey string
 
-	if p.UserID() == config.OwnerID {
+	if userID == config.OwnerID {
 		msgKey = "sudo_join_owner"
-	} else if database.IsSudoWithoutError(p.UserID()) {
-		msgKey = "sudo_join_sudo"
 	} else {
-		return
+		isSudo, err := database.IsSudo(userID)
+		if err != nil {
+			gologging.ErrorF("IsSudo failed for user %d: %v", userID, err)
+			return
+		}
+		if !isSudo {
+			return
+		}
+		msgKey = "sudo_join_sudo"
 	}
 
 	text := F(chatID, msgKey, locales.Arg{
