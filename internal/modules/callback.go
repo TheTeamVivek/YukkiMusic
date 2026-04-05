@@ -55,8 +55,9 @@ func cancelHandler(cb *tg.CallbackQuery) error {
 		return tg.ErrEndGroup
 	}
 
-	if cancel, ok := downloadCancels.LoadAndDelete(chatID); ok {
+	if cancel, ok := downloadCancels[chatID]; ok {
 		cancel()
+		delete(downloadCancels, chatID)
 		cb.Answer(F(chatID, "download_cancelled"), opt)
 	} else {
 		cb.Answer(F(chatID, "no_download_to_cancel"), opt)
@@ -218,7 +219,7 @@ func handlePauseAction(
 		msg := utils.IfElse(
 			remaining > 0,
 			F(cb.ChannelID(), "room_already_paused_auto", locales.Arg{
-				"duration": formatDuration(int(remaining.Seconds())),
+				"duration": utils.FormatDuration(int(remaining.Seconds())),
 			}),
 			F(cb.ChannelID(), "room_already_paused"),
 		)
@@ -239,7 +240,7 @@ func handlePauseAction(
 	}
 
 	cb.Answer(F(cb.ChannelID(), "cb_pause_success", locales.Arg{
-		"position": formatDuration(r.Position()),
+		"position": utils.FormatDuration(r.Position()),
 	}), opt)
 
 	updatePlaybackMessage(cb, r, "paused")
@@ -267,7 +268,7 @@ func handleResumeAction(
 	}
 
 	cb.Answer(F(cb.ChannelID(), "cb_resume_success", locales.Arg{
-		"position": formatDuration(r.Position()),
+		"position": utils.FormatDuration(r.Position()),
 	}), opt)
 
 	updatePlaybackMessage(cb, r, "playing")
@@ -304,7 +305,7 @@ func handleReplayAction(
 	msgText := F(cb.ChannelID(), "stream_now_playing", locales.Arg{
 		"url":      track.URL,
 		"title":    trackTitle,
-		"duration": formatDuration(track.Duration),
+		"duration": utils.FormatDuration(track.Duration),
 		"by":       track.Requester,
 	})
 
@@ -385,7 +386,7 @@ func handleSkipAction(
 	msgText := F(cb.ChannelID(), "stream_now_playing", locales.Arg{
 		"url":      t.URL,
 		"title":    safeTitle,
-		"duration": formatDuration(t.Duration),
+		"duration": utils.FormatDuration(t.Duration),
 		"by":       t.Requester,
 	})
 
@@ -437,7 +438,7 @@ func handleMuteAction(
 		msg := utils.IfElse(
 			remaining > 0,
 			F(cb.ChannelID(), "mute_already_muted_with_time", locales.Arg{
-				"duration": formatDuration(int(remaining.Seconds())),
+				"duration": utils.FormatDuration(int(remaining.Seconds())),
 			}),
 			F(cb.ChannelID(), "mute_already_muted"),
 		)
@@ -553,15 +554,15 @@ func updatePlaybackMessage(
 		msgText = F(cb.ChannelID(), "cb_pause_message", locales.Arg{
 			"url":      track.URL,
 			"title":    safeTitle,
-			"position": formatDuration(r.Position()),
-			"duration": formatDuration(track.Duration),
+			"position": utils.FormatDuration(r.Position()),
+			"duration": utils.FormatDuration(track.Duration),
 			"user":     mention,
 		})
 	case "playing":
 		msgText = F(cb.ChannelID(), "cb_resume_message", locales.Arg{
 			"url":      track.URL,
 			"title":    safeTitle,
-			"duration": formatDuration(track.Duration),
+			"duration": utils.FormatDuration(track.Duration),
 			"user":     mention,
 		})
 	case "muted":

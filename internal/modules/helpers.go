@@ -18,7 +18,6 @@
 package modules
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"html"
@@ -37,7 +36,7 @@ import (
 	"main/internal/utils"
 )
 
-var downloadCancels = utils.NewCache[int64, context.CancelFunc](utils.NoExpiry)
+var downloadCancels = make(map[int64]func())
 
 func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	chatID := m.ChannelID()
@@ -414,34 +413,6 @@ func warnAndLeave(client *tg.Client, chatID int64) {
 			func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) },
 		)
 	}()
-}
-
-func formatDuration(sec int) string {
-	if sec < 0 {
-		sec = 0
-	}
-
-	const (
-		day  = 86400
-		hour = 3600
-		min  = 60
-	)
-
-	if sec < min {
-		return fmt.Sprintf("%ds", sec)
-	}
-	if sec < hour {
-		return fmt.Sprintf("%dm %ds", sec/min, sec%min)
-	}
-	if sec < day {
-		return fmt.Sprintf("%dh %dm", sec/hour, (sec%hour)/min)
-	}
-
-	return fmt.Sprintf(
-		"%dd %dh",
-		sec/day,
-		(sec%day)/hour,
-	)
 }
 
 func getCommand(m *tg.NewMessage) string {

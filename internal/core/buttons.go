@@ -18,8 +18,6 @@
 package core
 
 import (
-	"fmt"
-
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
@@ -105,9 +103,9 @@ func GetPlayMarkup(chatID int64, r *RoomState, queued bool) tg.ReplyMarkup {
 	}
 
 	progress := utils.GetProgressBar(r.Position(), duration)
-	progress = formatDuration(
+	progress = utils.FormatTime(
 		r.Position(),
-	) + " " + progress + " " + formatDuration(
+	) + " " + progress + " " + utils.FormatTime(
 		duration,
 	)
 
@@ -213,13 +211,3 @@ func GetBackKeyboard(chatID int64) *tg.ReplyInlineMarkup {
 		Build()
 }
 
-func formatDuration(sec int) string {
-	h := sec / 3600
-	m := (sec % 3600) / 60
-	s := sec % 60
-
-	if h > 0 {
-		return fmt.Sprintf("%d:%02d:%02d", h, m, s) // HH:MM:SS
-	}
-	return fmt.Sprintf("%02d:%02d", m, s) // MM:SS
-}

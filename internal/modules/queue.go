@@ -195,7 +195,7 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 		t.URL,
 		utils.EscapeHTML(utils.ShortTitle(t.Title, 35)),
 		t.Requester,
-		formatDuration(t.Duration),
+		utils.FormatDuration(t.Duration),
 	)
 
 	queue := r.Queue()
@@ -226,7 +226,7 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 				track.URL,
 				utils.EscapeHTML(utils.ShortTitle(track.Title, 35)),
 				track.Requester,
-				formatDuration(track.Duration),
+				utils.FormatDuration(track.Duration),
 			)
 		}
 
@@ -248,7 +248,7 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 				"🎧 %s — %s [%s]\n\n",
 				t.Title,
 				t.Requester,
-				formatDuration(t.Duration),
+				utils.FormatDuration(t.Duration),
 			)
 
 			full.WriteString(F(chatID, "queue_up_next"))
@@ -261,7 +261,7 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 					i+1,
 					track.Title,
 					track.Requester,
-					formatDuration(track.Duration),
+					utils.FormatDuration(track.Duration),
 				)
 			}
 

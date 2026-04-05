@@ -67,7 +67,7 @@ func handleVoiceChatAction(
 		F(
 			chatID,
 			msgKey,
-			locales.Arg{"duration": formatDuration(int(action.Duration))},
+			locales.Arg{"duration": utils.FormatDuration(int(action.Duration))},
 		),
 	)
 	gologging.DebugF("Voice chat %s in %d", msgKey, chatID)

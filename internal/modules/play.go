@@ -473,7 +473,7 @@ func filterAndTrimTracks(
 			utils.EOR(
 				replyMsg,
 				F(chatID, "play_single_track_too_long", locales.Arg{
-					"limit_mins": formatDuration(config.DurationLimit),
+					"limit_mins": utils.FormatDuration(config.DurationLimit),
 					"title":      skippedTracks[0],
 				}),
 			)
@@ -563,9 +563,10 @@ func playTracksAndRespond(
 			replyMsg, _ = utils.EOR(replyMsg, downloadingText, opt)
 
 			ctx, cancel := context.WithCancel(context.Background())
-			downloadCancels.Set(m.ChannelID(), cancel)
+			downloadCancels[m.ChannelID()] = cancel
 			defer func() {
-				if cancel, ok := downloadCancels.LoadAndDelete(m.ChannelID()); ok {
+				if _, ok := downloadCancels[m.ChannelID()]; ok {
+					delete(downloadCancels, m.ChannelID())
 					cancel()
 				}
 			}()
@@ -618,7 +619,7 @@ func playTracksAndRespond(
 		nowPlayingText := F(chatID, "stream_now_playing", locales.Arg{
 			"url":      mainTrack.URL,
 			"title":    title,
-			"duration": formatDuration(mainTrack.Duration),
+			"duration": utils.FormatDuration(mainTrack.Duration),
 			"by":       mention,
 		})
 
@@ -659,7 +660,7 @@ func playTracksAndRespond(
 				"index":    len(r.Queue()),
 				"url":      mainTrack.URL,
 				"title":    title,
-				"duration": formatDuration(mainTrack.Duration),
+				"duration": utils.FormatDuration(mainTrack.Duration),
 				"by":       mention,
 			})
 

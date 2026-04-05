@@ -73,7 +73,7 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 		remaining := r.RemainingUnmuteDuration()
 		if remaining > 0 {
 			m.Reply(F(chatID, "mute_already_muted_with_time", locales.Arg{
-				"duration": formatDuration(int(remaining.Seconds())),
+				"duration": utils.FormatDuration(int(remaining.Seconds())),
 			}))
 		} else {
 			m.Reply(F(chatID, "mute_already_muted"))

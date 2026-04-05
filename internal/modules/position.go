@@ -70,8 +70,8 @@ func handlePosition(m *tg.NewMessage, cplay bool) error {
 
 	m.Reply(F(chatID, "position_now", locales.Arg{
 		"title":    title,
-		"position": formatDuration(r.Position()),
-		"duration": formatDuration(r.Track().Duration),
+		"position": utils.FormatDuration(r.Position()),
+		"duration": utils.FormatDuration(r.Track().Duration),
 		"speed":    fmt.Sprintf("%.2f", r.Speed()),
 	}))
 

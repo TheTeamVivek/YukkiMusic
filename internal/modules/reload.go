@@ -82,7 +82,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 			chatID,
 			"flood_minutes",
 			locales.Arg{
-				"duration": formatDuration(int(remaining.Seconds())),
+				"duration": utils.FormatDuration(int(remaining.Seconds())),
 			},
 		))
 		return err

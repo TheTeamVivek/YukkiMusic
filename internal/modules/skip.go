@@ -124,7 +124,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 	msg := F(chatID, "stream_now_playing", locales.Arg{
 		"url":      t.URL,
 		"title":    safeTitle,
-		"duration": formatDuration(t.Duration),
+		"duration": utils.FormatDuration(t.Duration),
 		"by":       t.Requester,
 	})
 

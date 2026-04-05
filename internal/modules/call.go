@@ -127,7 +127,7 @@ func streamEndHandler(
 	msgText := F(cid, "stream_now_playing", locales.Arg{
 		"url":      t.URL,
 		"title":    safeTitle,
-		"duration": formatDuration(t.Duration),
+		"duration": utils.FormatDuration(t.Duration),
 		"by":       t.Requester,
 	})
 

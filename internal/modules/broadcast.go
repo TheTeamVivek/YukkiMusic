@@ -33,6 +33,7 @@ import (
 	"main/internal/core"
 	"main/internal/database"
 	"main/internal/locales"
+	"main/internal/utils"
 )
 
 // BroadcastManager manages the state and lifecycle of a broadcast operation.
@@ -620,14 +621,14 @@ func formatBroadcastProgress(
 	}) + "\n")
 
 	sb.WriteString(F(chatID, "broadcast_elapsed", locales.Arg{
-		"elapsed": formatDuration(int(elapsed.Seconds())),
+		"elapsed": utils.FormatDuration(int(elapsed.Seconds())),
 	}) + "\n")
 
 	if !final && avgSpeed > 0 && totalDone < totalTargets {
 		remaining := totalTargets - totalDone
 		etaSeconds := float64(remaining) / avgSpeed
 		sb.WriteString("\n" + F(chatID, "broadcast_eta", locales.Arg{
-			"eta": formatDuration(int(etaSeconds)),
+			"eta": utils.FormatDuration(int(etaSeconds)),
 		}))
 	}
 

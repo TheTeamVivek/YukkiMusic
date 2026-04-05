@@ -244,9 +244,10 @@ func handleStream(m *tg.NewMessage, force bool) error {
 	replyMsg, _ = utils.EOR(replyMsg, downloadingText)
 
 	ctx, cancel := context.WithCancel(context.Background())
-	downloadCancels.Set(chatID, cancel)
+	downloadCancels[chatID] = cancel
 	defer func() {
-		if cancel, ok := downloadCancels.LoadAndDelete(chatID); ok {
+		if _, ok := downloadCancels[chatID]; ok {
+			delete(downloadCancels, chatID)
 			cancel()
 		}
 	}()
@@ -281,7 +282,7 @@ func handleStream(m *tg.NewMessage, force bool) error {
 	msgText := F(chatID, "rtmp_now_streaming", locales.Arg{
 		"url":      track.URL,
 		"title":    title,
-		"duration": formatDuration(track.Duration),
+		"duration": utils.FormatDuration(track.Duration),
 		"by":       mention,
 	})
 
@@ -356,7 +357,7 @@ func streamStatusHandler(m *tg.NewMessage) error {
 	switch state {
 	case tg.StreamStatePlaying:
 		statusText = F(chatID, "rtmp_status_playing", locales.Arg{
-			"position": formatDuration(int(pos.Seconds())),
+			"position": utils.FormatDuration(int(pos.Seconds())),
 			"server":   maskRTMPURL(url),
 		})
 	case tg.StreamStatePaused:

@@ -58,7 +58,7 @@ func bugHandler(m *telegram.NewMessage) error {
 	key := fmt.Sprintf("room:%d:%d", m.SenderID(), m.ChannelID())
 	if remaining := utils.GetFlood(key); remaining > 0 {
 		m.Reply(F(chatID, "flood_minutes", locales.Arg{
-			"minutes": formatDuration(int(remaining.Seconds())),
+			"minutes": utils.FormatDuration(int(remaining.Seconds())),
 		}))
 		return telegram.ErrEndGroup
 	}
