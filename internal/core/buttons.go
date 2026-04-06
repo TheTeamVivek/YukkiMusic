@@ -210,4 +210,3 @@ func GetBackKeyboard(chatID int64) *tg.ReplyInlineMarkup {
 		).
 		Build()
 }
-

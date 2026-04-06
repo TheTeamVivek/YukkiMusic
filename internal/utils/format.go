@@ -19,7 +19,6 @@ package utils
 
 import (
 	"fmt"
-	"time"
 )
 
 // FormatDuration returns a duration string (e.g., "1d 2h", "3h 4m", "5m 6s").

@@ -10,7 +10,7 @@ This method keeps your sensitive cookies out of your Git history and allows for 
 
 1. **Export Cookies:** Use a browser extension like [Get cookies.txt](https://chrome.google.com/webstore/detail/get-cookiestxt/) to export your YouTube cookies in Netscape format.
 2. **Upload to Batbin:** Paste the cookie text into [batbin.me](https://batbin.me) and create a paste.
-3. **Configure Bot:** Copy the paste URL and set it in your environment:
+3. **Configure Bot:** Copy the paste link and set it in your environment:
    ```bash
    COOKIES_LINK="https://batbin.me/paste_id"
    ```

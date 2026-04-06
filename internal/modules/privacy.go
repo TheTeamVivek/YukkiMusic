@@ -61,4 +61,3 @@ This bot is an <a href="https://github.com/TheTeamVivek/YukkiMusic">open-source 
 	_, err := m.Reply(privacyText)
 	return err
 }
-
