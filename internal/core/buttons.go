@@ -73,17 +73,14 @@ func GetStopConfirmMarkup(
 		prefix = "croom:"
 	}
 
+text, cb := "CONFIRM_UNMUTE_BTN", prefix+"unmute"
+
 	if isPaused {
-		btn.AddRow(
-			tg.Button.Data(F(chatID, "CONFIRM_RESUME_BTN"), prefix+"resume"),
-		)
-	} else {
-		btn.AddRow(
-			tg.Button.Data(F(chatID, "CONFIRM_UNMUTE_BTN"), prefix+"unmute"),
-		)
+		text, cb = "CONFIRM_RESUME_BTN", prefix+"resume"
 	}
 
 	btn.AddRow(
+			tg.Button.Data(F(chatID, text), cb),
 		tg.Button.Data(F(chatID, "CONFIRM_STOP_BTN"), prefix+"stop"),
 	)
 
