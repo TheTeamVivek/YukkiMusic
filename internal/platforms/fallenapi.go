@@ -159,22 +159,22 @@ func (f *FallenApiPlatform) getDownloadURL(
 	}
 
 	if resp.IsError() {
-		err = fmt.Errorf(
+		err = sanitizeAPIError(fmt.Errorf(
 			"failed to download %s, api request failed with status: %d body: %s",
 			mediaURL,
 			resp.StatusCode(),
 			resp.String(),
-		)
+		), config.FallenAPIKey)
 		gologging.Error(err.Error())
 		return "", err
 	}
 
 	if apiResp.CdnUrl == "" {
-		err = fmt.Errorf(
+		err = sanitizeAPIError(fmt.Errorf(
 			"failed to download %s, empty API response body: %s",
 			mediaURL,
 			resp.String(),
-		)
+		), config.FallenAPIKey)
 		gologging.Error(err.Error())
 		return "", err
 	}

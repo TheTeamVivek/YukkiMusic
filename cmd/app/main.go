@@ -31,9 +31,11 @@ package main
 import "C"
 
 import (
+	"fmt"
 	"net/http"
-	_ "net/http/pprof"
+	"net/http/pprof"
 	"os"
+	"time"
 
 	"github.com/Laky-64/gologging"
 
@@ -100,8 +102,35 @@ func main() {
 func startHTTPServer() {
 	go func() {
 		addr := "0.0.0.0:" + config.Port
+		mux := http.NewServeMux()
 
-		if err := http.ListenAndServe(addr, nil); err != nil {
+		mux.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte("ok"))
+		})
+
+		if config.EnablePprof {
+			gologging.Warn("pprof endpoints enabled - do not expose publicly")
+			mux.HandleFunc("/debug/pprof/", pprof.Index)
+			mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+			mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+			mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+			mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+			mux.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
+			mux.Handle("/debug/pprof/heap", pprof.Handler("heap"))
+			mux.Handle("/debug/pprof/threadcreate", pprof.Handler("threadcreate"))
+			mux.Handle("/debug/pprof/block", pprof.Handler("block"))
+			mux.Handle("/debug/pprof/mutex", pprof.Handler("mutex"))
+		}
+
+		server := &http.Server{
+			Addr:              addr,
+			Handler:           mux,
+			ReadHeaderTimeout: 5 * time.Second,
+		}
+
+		gologging.Info(fmt.Sprintf("HTTP server listening on %s", addr))
+		if err := server.ListenAndServe(); err != nil {
 			gologging.Error("HTTP server error: " + err.Error())
 		}
 	}()

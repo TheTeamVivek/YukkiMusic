@@ -128,6 +128,9 @@ func (y *YtdlpPlatform) Name() state.PlatformName {
 // CanGetTracks checks if this is a valid URL that yt-dlp might handle
 func (y *YtdlpPlatform) CanGetTracks(query string) bool {
 	query = strings.TrimSpace(query)
+	if _, err := sanitizeMediaURL(query); err != nil {
+		return false
+	}
 
 	// Must be a URL
 	parsedURL, err := url.Parse(query)
@@ -154,10 +157,14 @@ func (y *YtdlpPlatform) GetTracks(
 	video bool,
 ) ([]*state.Track, error) {
 	query = strings.TrimSpace(query)
+	safeURL, err := sanitizeMediaURL(query)
+	if err != nil {
+		return nil, errUnsafeURL
+	}
 
 	gologging.InfoF("YtDlp: Extracting metadata for %s", query)
 
-	info, err := y.extractMetadata(query)
+	info, err := y.extractMetadata(safeURL)
 	if err != nil {
 		gologging.ErrorF("YtDlp: Failed to extract metadata: %v", err)
 		return nil, fmt.Errorf("failed to extract metadata: %w", err)
@@ -268,7 +275,12 @@ func (y *YtdlpPlatform) Download(
 		}
 	}
 
-	args = append(args, track.URL)
+	safeURL, err := sanitizeMediaURL(track.URL)
+	if err != nil {
+		return "", errUnsafeURL
+	}
+
+	args = append(args, "--", safeURL)
 
 	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
 
@@ -314,6 +326,11 @@ func (*YtdlpPlatform) Search(
 
 // extractMetadata uses yt-dlp to extract video/audio metadata
 func (y *YtdlpPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
+	safeURL, err := sanitizeMediaURL(urlStr)
+	if err != nil {
+		return nil, errUnsafeURL
+	}
+
 	args := []string{
 		"-j",
 		"--flat-playlist",
@@ -329,7 +346,7 @@ func (y *YtdlpPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 		}
 	}
 
-	args = append(args, urlStr)
+	args = append(args, "--", safeURL)
 
 	cmd := exec.Command("yt-dlp", args...)
 

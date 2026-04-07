@@ -56,6 +56,7 @@ var (
 	StartImage          string
 	PingImage           string
 	Port                string
+	EnablePprof         bool
 
 	// System & Logging
 	StartTime   time.Time
@@ -133,6 +134,7 @@ func loadConfig() {
 		"https://telegra.ph/file/91533956c91d0fd7c9f20.jpg",
 	)
 	Port = getString("PORT", "8000")
+	EnablePprof = getBool("ENABLE_PPROF", false)
 }
 
 func validateConfig() {

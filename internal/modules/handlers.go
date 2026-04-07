@@ -154,7 +154,7 @@ var handlers = []MsgHandlerDef{
 	{
 		Pattern: "stream",
 		Handler: streamHandler,
-		Filters: []telegram.Filter{superGroupFilter},
+		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
 		Pattern: "streamstop",
