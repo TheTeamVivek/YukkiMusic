@@ -163,12 +163,37 @@ func channelPlayHandler(m *tg.NewMessage) error {
 	return tg.ErrEndGroup
 }
 
-func playHandler(m *tg.NewMessage) error   { return handlePlay(m, &playOpts{}) }
-func fplayHandler(m *tg.NewMessage) error  { return handlePlay(m, &playOpts{Force: true}) }
-func cfplayHandler(m *tg.NewMessage) error { return handlePlay(m, &playOpts{Force: true, CPlay: true}) }
-func vplayHandler(m *tg.NewMessage) error  { return handlePlay(m, &playOpts{Video: true}) }
-func fvplayHandler(m *tg.NewMessage) error { return handlePlay(m, &playOpts{Force: true, Video: true}) }
-func vcplayHandler(m *tg.NewMessage) error { return handlePlay(m, &playOpts{CPlay: true, Video: true}) }
+func playHandler(m *tg.NewMessage) error { return handlePlay(m, &playOpts{}) }
+
+func fplayHandler(
+	m *tg.NewMessage,
+) error {
+	return handlePlay(m, &playOpts{Force: true})
+}
+
+func cfplayHandler(
+	m *tg.NewMessage,
+) error {
+	return handlePlay(m, &playOpts{Force: true, CPlay: true})
+}
+
+func vplayHandler(
+	m *tg.NewMessage,
+) error {
+	return handlePlay(m, &playOpts{Video: true})
+}
+
+func fvplayHandler(
+	m *tg.NewMessage,
+) error {
+	return handlePlay(m, &playOpts{Force: true, Video: true})
+}
+
+func vcplayHandler(
+	m *tg.NewMessage,
+) error {
+	return handlePlay(m, &playOpts{CPlay: true, Video: true})
+}
 func fvcplayHandler(m *tg.NewMessage) error {
 	return handlePlay(m, &playOpts{Force: true, CPlay: true, Video: true})
 }
@@ -209,7 +234,10 @@ func trySetChannelPlay(m *tg.NewMessage) bool {
 		return true
 	}
 
-	m.Reply(F(chatID, "cplay_enabled", locales.Arg{"channel_id": channelID}), &tg.SendOptions{ParseMode: "HTML"})
+	m.Reply(
+		F(chatID, "cplay_enabled", locales.Arg{"channel_id": channelID}),
+		&tg.SendOptions{ParseMode: "HTML"},
+	)
 	return true
 }
 
@@ -284,7 +312,10 @@ func canUsePlayCommand(m *tg.NewMessage, chatID int64) bool {
 	return isAuth
 }
 
-func prepareRoomAndSearchMessage(m *tg.NewMessage, cplay bool) (*core.RoomState, *tg.NewMessage, error) {
+func prepareRoomAndSearchMessage(
+	m *tg.NewMessage,
+	cplay bool,
+) (*core.RoomState, *tg.NewMessage, error) {
 	room, err := getEffectiveRoom(m, cplay)
 	if err != nil {
 		m.Reply(err.Error())
@@ -307,7 +338,11 @@ func prepareRoomAndSearchMessage(m *tg.NewMessage, cplay bool) (*core.RoomState,
 
 	statusText := F(chatID, "searching")
 	if query != "" {
-		statusText = F(chatID, "searching_query", locales.Arg{"query": utils.EscapeHTML(query)})
+		statusText = F(
+			chatID,
+			"searching_query",
+			locales.Arg{"query": utils.EscapeHTML(query)},
+		)
 	}
 
 	replyMsg, err := m.Reply(statusText)
@@ -357,7 +392,11 @@ func fetchTracksAndCheckStatus(
 	return tracks, r.IsActiveChat(), nil
 }
 
-func ensureVoiceChatReady(chatID int64, replyMsg *tg.NewMessage, cs *core.ChatState) error {
+func ensureVoiceChatReady(
+	chatID int64,
+	replyMsg *tg.NewMessage,
+	cs *core.ChatState,
+) error {
 	activeVC, err := cs.IsActiveVC(false)
 	if err != nil {
 		gologging.ErrorF("Error checking voicechat state: %v", err)
@@ -405,14 +444,21 @@ func ensureVoiceChatReady(chatID int64, replyMsg *tg.NewMessage, cs *core.ChatSt
 	return nil
 }
 
-func filterAndTrimTracks(replyMsg *tg.NewMessage, r *core.RoomState, tracks []*state.Track) ([]*state.Track, int, error) {
+func filterAndTrimTracks(
+	replyMsg *tg.NewMessage,
+	r *core.RoomState,
+	tracks []*state.Track,
+) ([]*state.Track, int, error) {
 	chatID := replyMsg.ChannelID()
 	accepted := make([]*state.Track, 0, len(tracks))
 	skippedTitles := make([]string, 0)
 
 	for _, track := range tracks {
 		if track.Duration > config.DurationLimit {
-			skippedTitles = append(skippedTitles, utils.EscapeHTML(utils.ShortTitle(track.Title, 35)))
+			skippedTitles = append(
+				skippedTitles,
+				utils.EscapeHTML(utils.ShortTitle(track.Title, 35)),
+			)
 			continue
 		}
 		accepted = append(accepted, track)
@@ -439,7 +485,10 @@ func filterAndTrimTracks(replyMsg *tg.NewMessage, r *core.RoomState, tracks []*s
 	availableSlots := config.QueueLimit - len(r.Queue())
 	if availableSlots < len(accepted) {
 		accepted = accepted[:availableSlots]
-		gologging.WarnF("Queue full — adding only %d tracks out of requested.", availableSlots)
+		gologging.WarnF(
+			"Queue full — adding only %d tracks out of requested.",
+			availableSlots,
+		)
 	}
 
 	return accepted, availableSlots, nil
@@ -455,11 +504,23 @@ func buildSkippedTracksText(chatID int64, skippedTitles []string) string {
 
 	for i, title := range skippedTitles {
 		if i < 5 {
-			b.WriteString(F(chatID, "play_multiple_tracks_too_long_item", locales.Arg{"title": title}) + "\n")
+			b.WriteString(
+				F(
+					chatID,
+					"play_multiple_tracks_too_long_item",
+					locales.Arg{"title": title},
+				) + "\n",
+			)
 			continue
 		}
 
-		b.WriteString(F(chatID, "play_multiple_tracks_too_long_more", locales.Arg{"remaining": len(skippedTitles) - i}) + "\n")
+		b.WriteString(
+			F(
+				chatID,
+				"play_multiple_tracks_too_long_more",
+				locales.Arg{"remaining": len(skippedTitles) - i},
+			) + "\n",
+		)
 		break
 	}
 
@@ -496,7 +557,16 @@ func playTracksAndRespond(
 		sendPlayLogs(m, track, (isActive && !force) || i > 0)
 	}
 
-	return finalizePlayReply(m, replyMsg, r, tracks, mention, isActive, force, availableSlots)
+	return finalizePlayReply(
+		m,
+		replyMsg,
+		r,
+		tracks,
+		mention,
+		isActive,
+		force,
+		availableSlots,
+	)
 }
 
 func downloadFirstTrack(
@@ -512,7 +582,11 @@ func downloadFirstTrack(
 		opt = &tg.SendOptions{ReplyMarkup: core.GetCancelKeyboard(chatID)}
 	}
 
-	replyMsg, _ = utils.EOR(replyMsg, F(chatID, "play_downloading_song", locales.Arg{"title": title}), opt)
+	replyMsg, _ = utils.EOR(
+		replyMsg,
+		F(chatID, "play_downloading_song", locales.Arg{"title": title}),
+		opt,
+	)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	downloadCancels[chatID] = cancel
@@ -526,7 +600,10 @@ func downloadFirstTrack(
 	path, err := safeDownload(ctx, track, replyMsg, chatID)
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
-			utils.EOR(replyMsg, F(chatID, "play_download_canceled", locales.Arg{"user": mention}))
+			utils.EOR(
+				replyMsg,
+				F(chatID, "play_download_canceled", locales.Arg{"user": mention}),
+			)
 		} else {
 			utils.EOR(replyMsg, F(chatID, "play_download_failed", locales.Arg{
 				"title": title,
@@ -559,7 +636,15 @@ func finalizePlayReply(
 		r.SetStatusMsg(replyMsg)
 
 		if len(tracks) > 1 {
-			replyMsg.Respond(buildMultiAddedText(chatID, len(tracks)-1, mention, availableSlots, len(tracks)))
+			replyMsg.Respond(
+				buildMultiAddedText(
+					chatID,
+					len(tracks)-1,
+					mention,
+					availableSlots,
+					len(tracks),
+				),
+			)
 		}
 		return nil
 	}
@@ -570,11 +655,19 @@ func finalizePlayReply(
 		return nil
 	}
 
-	utils.EOR(replyMsg, buildMultiAddedText(chatID, len(tracks), mention, availableSlots, len(tracks)))
+	utils.EOR(
+		replyMsg,
+		buildMultiAddedText(chatID, len(tracks), mention, availableSlots, len(tracks)),
+	)
 	return nil
 }
 
-func buildNowPlayingReply(chatID int64, r *core.RoomState, track *state.Track, mention string) (string, *tg.SendOptions) {
+func buildNowPlayingReply(
+	chatID int64,
+	r *core.RoomState,
+	track *state.Track,
+	mention string,
+) (string, *tg.SendOptions) {
 	title := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
 	opt := &tg.SendOptions{
 		ParseMode:   "HTML",
@@ -593,7 +686,12 @@ func buildNowPlayingReply(chatID int64, r *core.RoomState, track *state.Track, m
 	return msg, opt
 }
 
-func buildSingleQueueReply(chatID int64, r *core.RoomState, track *state.Track, mention string) (string, *tg.SendOptions) {
+func buildSingleQueueReply(
+	chatID int64,
+	r *core.RoomState,
+	track *state.Track,
+	mention string,
+) (string, *tg.SendOptions) {
 	title := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
 	opt := &tg.SendOptions{
 		ParseMode:   "HTML",
@@ -613,9 +711,20 @@ func buildSingleQueueReply(chatID int64, r *core.RoomState, track *state.Track, 
 	return msg, opt
 }
 
-func buildMultiAddedText(chatID int64, count int, mention string, availableSlots int, trackCount int) string {
+func buildMultiAddedText(
+	chatID int64,
+	count int,
+	mention string,
+	availableSlots, trackCount int,
+) string {
 	var b strings.Builder
-	b.WriteString(F(chatID, "play_added_multiple_header", locales.Arg{"count": count, "user": mention}))
+	b.WriteString(
+		F(
+			chatID,
+			"play_added_multiple_header",
+			locales.Arg{"count": count, "user": mention},
+		),
+	)
 	b.WriteString("\n\n")
 
 	if availableSlots <= trackCount {
@@ -644,7 +753,9 @@ func playTrackWithRetry(
 		err := r.Play(track, filePath, force)
 		if err == nil {
 			if attempt > 1 {
-				gologging.Info("Successfully played after retry attempt " + utils.IntToStr(attempt))
+				gologging.Info(
+					"Successfully played after retry attempt " + utils.IntToStr(attempt),
+				)
 			}
 			return nil
 		}
@@ -658,20 +769,42 @@ func playTrackWithRetry(
 		}
 
 		if attempt == playMaxRetries {
-			gologging.Error("❌ Failed to play after " + utils.IntToStr(playMaxRetries) + " attempts. Error: " + err.Error())
-			utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_failed", locales.Arg{"error": err.Error()}))
+			gologging.Error(
+				"❌ Failed to play after " + utils.IntToStr(
+					playMaxRetries,
+				) + " attempts. Error: " + err.Error(),
+			)
+			utils.EOR(
+				replyMsg,
+				F(replyMsg.ChannelID(), "play_failed", locales.Arg{"error": err.Error()}),
+			)
 			return err
 		}
 
-		gologging.Error("Unexpected error occurred. Retrying... (attempt " + utils.IntToStr(attempt) + "): " + err.Error())
+		gologging.Error(
+			"Unexpected error occurred. Retrying... (attempt " + utils.IntToStr(
+				attempt,
+			) + "): " + err.Error(),
+		)
 	}
 
 	return nil
 }
 
-func handlePlayAttemptError(err error, attempt int, replyMsg *tg.NewMessage, room *core.RoomState) (bool, error) {
+func handlePlayAttemptError(
+	err error,
+	attempt int,
+	replyMsg *tg.NewMessage,
+	room *core.RoomState,
+) (bool, error) {
 	if wait := tg.GetFloodWait(err); wait > 0 {
-		gologging.Error("FloodWait detected (" + strconv.Itoa(wait) + "s). Retrying... (attempt " + utils.IntToStr(attempt) + ")")
+		gologging.Error(
+			"FloodWait detected (" + strconv.Itoa(
+				wait,
+			) + "s). Retrying... (attempt " + utils.IntToStr(
+				attempt,
+			) + ")",
+		)
 		time.Sleep(time.Duration(wait) * time.Second)
 		return true, nil
 	}
@@ -689,7 +822,8 @@ func handlePlayAttemptError(err error, attempt int, replyMsg *tg.NewMessage, roo
 		return true, tg.ErrEndGroup
 	}
 
-	if strings.Contains(err.Error(), "group call") && strings.Contains(err.Error(), "is closed") {
+	if strings.Contains(err.Error(), "group call") &&
+		strings.Contains(err.Error(), "is closed") {
 		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_no_active_voicechat"))
 		return true, tg.ErrEndGroup
 	}
@@ -702,7 +836,11 @@ func handlePlayAttemptError(err error, attempt int, replyMsg *tg.NewMessage, roo
 	}
 
 	if tg.MatchError(err, "INTERDC_X_CALL_ERROR") {
-		gologging.Error("INTERDC_X_CALL_ERROR occurred. Retrying... (attempt " + utils.IntToStr(attempt) + ")")
+		gologging.Error(
+			"INTERDC_X_CALL_ERROR occurred. Retrying... (attempt " + utils.IntToStr(
+				attempt,
+			) + ")",
+		)
 		time.Sleep(2 * time.Second)
 		return true, nil
 	}
@@ -727,7 +865,11 @@ var errMessageMap = map[error]msgFn{
 		return F(chatID, "err_assistant_join_request_sent")
 	},
 	core.ErrAssistantInviteLinkFetch: func(chatID int64, e error) string {
-		return F(chatID, "err_assistant_invite_link_fetch", locales.Arg{"error": e.Error()})
+		return F(
+			chatID,
+			"err_assistant_invite_link_fetch",
+			locales.Arg{"error": e.Error()},
+		)
 	},
 	core.ErrAssistantInviteFailed: func(chatID int64, e error) string {
 		return F(chatID, "err_assistant_invite_failed", locales.Arg{"error": e.Error()})
@@ -757,7 +899,11 @@ func getErrorMessage(chatID int64, err error) string {
 // Both safeDownload and safeGetTracks re-raise panic because all command
 // handlers are wrapped by SafeMessageHandler, which catches panics and sends
 // the debug trace to the logger and the owner.
-func safeGetTracks(m, replyMsg *tg.NewMessage, chatID int64, video bool) (tracks []*state.Track, err error) {
+func safeGetTracks(
+	m, replyMsg *tg.NewMessage,
+	chatID int64,
+	video bool,
+) (tracks []*state.Track, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			utils.EOR(replyMsg, F(chatID, "err_fetch_tracks"))
