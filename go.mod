@@ -4,7 +4,7 @@ go 1.25.7
 
 require (
 	github.com/Laky-64/gologging v1.1.0
-	github.com/amarnathcjd/gogram v1.7.3
+	github.com/amarnathcjd/gogram v1.7.4-0.20260407173610-340767236b4c
 	github.com/joho/godotenv v1.5.1
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/showwin/speedtest-go v1.7.10
