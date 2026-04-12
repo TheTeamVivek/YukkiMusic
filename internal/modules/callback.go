@@ -398,12 +398,18 @@ func handleSkipAction(
 		sendOpt.Media = utils.CleanURL(t.Artwork)
 	}
 
-	statusMsg, _ = utils.EOR(statusMsg, msgText, sendOpt)
-	replyToCallback(cb, F(cb.ChannelID(), "cb_skip_edited", locales.Arg{
+	statusMsg, err = utils.EOR(statusMsg, msgText, sendOpt)
+if err != nil {
+cb.Respond(F(cb.ChannelID(), "cb_skip_edited", locales.Arg{
 		"user": utils.MentionHTML(cb.Sender),
 	}))
+return tg.ErrEndGroup
+}
 
 	r.SetStatusMsg(statusMsg)
+statusMsg.Reply(F(cb.ChannelID(), "cb_skip_edited", locales.Arg{
+		"user": utils.MentionHTML(cb.Sender),
+	}))
 	return tg.ErrEndGroup
 }
 
