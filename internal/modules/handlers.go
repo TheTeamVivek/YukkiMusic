@@ -508,9 +508,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 
 	go MonitorRooms()
 
-	if is, _ := database.AutoLeave(); is {
-		go startAutoLeave()
-	}
+	autoLeaveSvc.Start()
 
 	if config.SetCmds && config.OwnerID != 0 {
 		go setBotCommands(bot)

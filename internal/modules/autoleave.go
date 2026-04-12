@@ -34,10 +34,31 @@ import (
 )
 
 var (
-	autoLeaveMu      sync.Mutex
-	autoLeaveRunning bool
-	limit            = 50
+	limit        = 50
+	autoLeaveSvc = newAutoLeaveService(limit, 10*time.Minute, 3*time.Second)
 )
+
+type autoLeaveService struct {
+	mu          sync.Mutex
+	loopRunning bool
+	stopCh      chan struct{}
+
+	limit         int
+	interval      time.Duration
+	preLeaveDelay time.Duration
+}
+
+func newAutoLeaveService(
+	limit int,
+	interval time.Duration,
+	preLeaveDelay time.Duration,
+) *autoLeaveService {
+	return &autoLeaveService{
+		limit:         limit,
+		interval:      interval,
+		preLeaveDelay: preLeaveDelay,
+	}
+}
 
 func init() {
 	helpTexts["autoleave"] = fmt.Sprintf(
@@ -100,52 +121,74 @@ func autoLeaveHandler(m *tg.NewMessage) error {
 		"action": newStatus,
 	}))
 
-	autoLeaveMu.Lock()
-	if newState {
-		if !autoLeaveRunning {
-			go startAutoLeave()
-		}
-	} else {
-		autoLeaveRunning = false
-	}
-	autoLeaveMu.Unlock()
+	autoLeaveSvc.SetEnabled(newState)
 
 	return tg.ErrEndGroup
 }
 
-func startAutoLeave() {
-	autoLeaveMu.Lock()
-	if autoLeaveRunning {
-		autoLeaveMu.Unlock()
+func (s *autoLeaveService) Start() {
+	enabled, err := database.AutoLeave()
+	if err != nil || !enabled {
 		return
 	}
-	autoLeaveRunning = true
-	autoLeaveMu.Unlock()
 
-	ticker := time.NewTicker(10 * time.Minute)
-	defer ticker.Stop()
+	s.SetEnabled(true)
+}
 
-	for {
-		autoLeaveMu.Lock()
-		if !autoLeaveRunning {
-			autoLeaveMu.Unlock()
+func (s *autoLeaveService) SetEnabled(enabled bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if enabled {
+		if s.loopRunning {
 			return
 		}
-		autoLeaveMu.Unlock()
+		s.loopRunning = true
+		s.stopCh = make(chan struct{})
+		go s.runLoop()
+		return
+	}
 
-		activeRooms := core.GetAllRooms()
-		core.Assistants.ForEach(func(a *core.Assistant) {
-			if a == nil || a.Client == nil {
-				return
-			}
-			go autoLeaveAssistant(a, activeRooms)
-		})
-
-		<-ticker.C
+	if s.stopCh != nil {
+		close(s.stopCh)
+		s.stopCh = nil
 	}
 }
 
-func autoLeaveAssistant(
+func (s *autoLeaveService) runLoop() {
+	s.mu.Lock()
+	stopCh := s.stopCh
+	s.mu.Unlock()
+
+	timer := time.NewTimer(s.interval)
+	defer timer.Stop()
+
+	for {
+		select {
+		case <-stopCh:
+			s.mu.Lock()
+			s.stopCh = nil
+			s.loopRunning = false
+			s.mu.Unlock()
+			return
+		case <-timer.C:
+			s.runCycle()
+			timer.Reset(s.interval)
+		}
+	}
+}
+
+func (s *autoLeaveService) runCycle() {
+	activeRooms := core.GetAllRooms()
+	core.Assistants.ForEach(func(a *core.Assistant) {
+		if a == nil || a.Client == nil {
+			return
+		}
+		go s.autoLeaveAssistant(a, activeRooms)
+	})
+}
+
+func (s *autoLeaveService) autoLeaveAssistant(
 	ass *core.Assistant,
 	activeRooms map[int64]*core.RoomState,
 ) {
@@ -165,6 +208,7 @@ func autoLeaveAssistant(
 			return nil
 		}
 
+		time.Sleep(s.preLeaveDelay)
 		if err := ass.Client.LeaveChannel(chatID); err != nil {
 			if wait := tg.GetFloodWait(err); wait > 0 {
 				gologging.ErrorF(
@@ -189,12 +233,10 @@ func autoLeaveAssistant(
 		leaveCount++
 		gologging.InfoF(
 			"AutoLeave: Assistant %d left %d (%d/%d)",
-			ass.Index, chatID, leaveCount, limit,
+			ass.Index, chatID, leaveCount, s.limit,
 		)
 
-		time.Sleep(3 * time.Second)
-
-		if leaveCount >= limit {
+		if leaveCount >= s.limit {
 			return tg.ErrStopIteration
 		}
 
