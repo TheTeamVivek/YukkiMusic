@@ -145,6 +145,9 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 }
 
 func handleChatAction(m *telegram.NewMessage) error {
+
+gologging.Info(m.Marshal())
+
 	if !isValidChatType(m) {
 		warnAndLeave(m.Client, m.ChannelID())
 		return telegram.ErrEndGroup
