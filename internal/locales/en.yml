@@ -444,9 +444,10 @@ nothumb_updated: "🖼️ Thumbnail display has been {action}."
 cmddelete_status: "🗑️ <b>Command Delete Control</b>\n\nWhen enabled, I will automatically delete command messages.\nUsage: {cmd} [enable|disable]\nCurrent state: {action}"
 cmddelete_updated: "🗑️ Command deletion has been {action}."
 
-only_admin: "⚠️ <b>Permission Denied!</b>\nOnly <b>admins</b> can control this actions. You can still play songs 🎵.\n\nIf you believe you are an admin, please use /reload to refresh your admin status."
-only_admin_or_auth: "⚠️ <b>Access Denied</b>\nOnly <b>admins</b> or <b>authorized users</b> can control this actions.\n\nIf you recently became an admin, use /reload to refresh your permissions."
-only_admin_or_auth_cb: "⚠️ Only admins can do this actions."
+only_admin: "⚠️ <b>Permission Denied!</b>\nOnly <b>admins</b> can control these actions. You can still play songs 🎵.\n\nIf you believe you are an admin, please use /reload to refresh your admin status."
+only_admin_cb: "⚠️ Only admins can do these actions."
+only_admin_or_auth: "⚠️ <b>Access Denied</b>\nOnly <b>admins</b> or <b>authorized users</b> can control these actions.\n\nIf you recently became an admin, use /reload to refresh your permissions."
+only_admin_or_auth_cb: "⚠️ Only admins or authorized users can do these actions."
 only_supergroup: "⚠️ This command can only be used in groups."
 only_owner: "⚠️ Only the bot owner can use this command."
 only_sudo: "⚠️ Only sudo users or the bot owner can use this command."
@@ -491,6 +492,7 @@ play_failed: "❌ Failed to play\nError: {error}"
 play_unable: "<b> ❌ Unable to Play </b>\n\n<i>Please <b>restart the voice</b> chat.</i>"
 play_downloading_song: "📥 Downloading song \"{title}\""
 play_download_canceled: "⚠️ Download canceled by {user}."
+play_already_in_queue: "✅ <b>Track already added!</b>\n\n<i>{title}</i> is already playing or in the queue."
 
 playmode_help: |
   🛠️ <b>Play Mode</b>
@@ -503,6 +505,16 @@ playmode_status_everyone: "<b>Everyone</b> 🌍"
 playmode_success_admins: "🛡️ <b>Play mode</b> is now restricted to <b>Admins & DJs</b> only. 🎧"
 playmode_success_everyone: "✅ <b>Play mode</b> is now <b>Open to Everyone</b>. Let the music flow! 🎶"
 playmode_restricted: "🚫 Play mode is enabled. Only admins and authorized users can play."
+adminmode_help: |
+  🛡️ <b>Admin Command Mode</b>
+
+  <b>Status:</b> {status}
+  <b>Usage:</b> <code>/adminmode [admin|adminauth|everyone]</code>
+adminmode_status_admin: "<b>Admins Only</b> 🔐"
+adminmode_status_adminauth: "<b>Admins + Auth Users</b> 🎧"
+adminmode_status_everyone: "<b>Everyone</b> 🌍"
+adminmode_updated: "✅ <b>Admin command mode</b> updated to: {status}"
+adminmode_invalid: "⚠️ Invalid mode. Use: <code>admin</code>, <code>adminauth</code>, or <code>everyone</code>."
 play_added_multiple_header: "➕ <b>Added {count} tracks</b> by {user}"
 play_queue_limit_hint: "⚠️ <i>Queue limit reached — some tracks were skipped.</i>"
 play_queue_view_hint: "<i>Use /queue to view full list.</i>"
@@ -977,6 +989,7 @@ help_admin: |
   <b>Commands:</b>
   <blockquote>
   <b>/playmode</b> - Control who can use /play
+  <b>/adminmode</b> - Control who can use admin commands
   <b>/cmddelete</b> - Toggle automatic deletion of bot commands
   <b>/speed</b> - Change playback speed
   <b>/skip</b> - Skip the current song

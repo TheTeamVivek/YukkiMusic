@@ -48,6 +48,16 @@ func init() {
 
 	helpTexts["/cmddelete"] = cmdDeleteHelp
 	helpTexts["/commanddelete"] = cmdDeleteHelp
+
+	helpTexts["/adminmode"] = `<i>Control who can use admin-level music commands in this chat.</i>
+
+<u>Usage:</u>
+<b>/adminmode [admin|adminauth|everyone]</b> — Set admin command access
+
+<b>⚙️ Options:</b>
+• <b>admin</b> — Only chat admins can use admin commands
+• <b>adminauth</b> — Chat admins + authorized users can use admin commands (default)
+• <b>everyone</b> — Everyone can use admin commands`
 }
 
 func playmodeHandler(m *tg.NewMessage) error {
@@ -132,4 +142,60 @@ func cmdDeleteHandler(m *tg.NewMessage) error {
 		"action": F(chatID, actionKey),
 	}), &tg.SendOptions{ParseMode: "HTML"})
 	return tg.ErrEndGroup
+}
+
+func adminModeHandler(m *tg.NewMessage) error {
+	args := strings.Fields(m.Text())
+	chatID := m.ChannelID()
+
+	current, err := database.GetAdminMode(chatID)
+	if err != nil {
+		return err
+	}
+
+	if len(args) < 2 {
+		m.Reply(F(chatID, "adminmode_help", locales.Arg{
+			"status": F(chatID, adminModeStatusKey(current)),
+		}), &tg.SendOptions{ParseMode: "HTML"})
+		return tg.ErrEndGroup
+	}
+
+	mode, ok := parseAdminMode(args[1])
+	if !ok {
+		m.Reply(F(chatID, "adminmode_invalid"))
+		return tg.ErrEndGroup
+	}
+
+	if err := database.SetAdminMode(chatID, mode); err != nil {
+		return err
+	}
+
+	m.Reply(F(chatID, "adminmode_updated", locales.Arg{
+		"status": F(chatID, adminModeStatusKey(mode)),
+	}), &tg.SendOptions{ParseMode: "HTML"})
+	return tg.ErrEndGroup
+}
+
+func adminModeStatusKey(mode database.AdminMode) string {
+	switch mode {
+	case database.AdminModeAdminsOnly:
+		return "adminmode_status_admin"
+	case database.AdminModeEveryone:
+		return "adminmode_status_everyone"
+	default:
+		return "adminmode_status_adminauth"
+	}
+}
+
+func parseAdminMode(input string) (database.AdminMode, bool) {
+	switch strings.ToLower(strings.TrimSpace(input)) {
+	case "admin", "admins", "adminonly", "adminsonly", "admins_only":
+		return database.AdminModeAdminsOnly, true
+	case "adminauth", "auth", "admin+auth", "dj", "admin_auth":
+		return database.AdminModeAdminAuth, true
+	case "everyone", "all":
+		return database.AdminModeEveryone, true
+	default:
+		return "", false
+	}
 }

@@ -444,8 +444,9 @@ cmddelete_status: "🗑️ <b>Komut Silme Kontrolü</b>\n\nEtkinleştirildiğind
 cmddelete_updated: "🗑️ Komut silme {action} konuma getirildi."
 
 only_admin: "⚠️ <b>Yetki Reddedildi!</b>\nBu eylemi yalnızca <b>yöneticiler</b> kontrol edebilir. Yine de şarkı çalabilirsin 🎵.\n\nEğer yönetici olduğunu düşünüyorsan, lütfen yönetici durumunu yenilemek için /reload kullan."
+only_admin_cb: "⚠️ Bu eylemi yalnızca yöneticiler yapabilir."
 only_admin_or_auth: "⚠️ <b>Erişim Engellendi</b>\nBu eylemi yalnızca <b>yöneticiler</b> veya <b>yetkili kullanıcılar</b> kontrol edebilir.\n\nYakın zamanda yönetici olduysan, izinlerini yenilemek için /reload kullan."
-only_admin_or_auth_cb: "⚠️ Bu eylemi yalnızca yöneticiler yapabilir."
+only_admin_or_auth_cb: "⚠️ Bu eylemi yalnızca yöneticiler veya yetkili kullanıcılar yapabilir."
 only_supergroup: "⚠️ Bu komut yalnızca gruplarda kullanılabilir."
 only_owner: "⚠️ Bu komutu yalnızca bot sahibi kullanabilir."
 only_sudo: "⚠️ Bu komutu yalnızca sudo kullanıcıları veya bot sahibi kullanabilir."
@@ -490,6 +491,7 @@ play_failed: "❌ Oynatılamadı\nHata: {error}"
 play_unable: "<b> ❌ Oynatılamıyor </b>\n\n<i>Lütfen <b>sesli sohbeti yeniden başlat</b>.</i>"
 play_downloading_song: "📥 \"{title}\" şarkısı indiriliyor"
 play_download_canceled: "⚠️ İndirme {user} tarafından iptal edildi."
+play_already_in_queue: "✅ <b>Parça zaten ekli!</b>\n\n<i>{title}</i> zaten çalıyor veya sırada bekliyor."
 
 playmode_help: |
   🛠️ <b>Oynatma Modu</b>
@@ -502,6 +504,16 @@ playmode_status_everyone: "<b>Herkes</b> 🌍"
 playmode_success_admins: "🛡️ <b>Oynatma modu</b> artık yalnızca <b>yöneticiler ve yetkili kullanıcılar</b> ile sınırlıdır. 🎧"
 playmode_success_everyone: "✅ <b>Oynatma modu</b> artık <b>herkes için açık</b>. Müziğin tadını çıkarın! 🎶"
 playmode_restricted: "🚫 Oynatma modu etkin. Sadece yöneticiler ve yetkili kullanıcılar şarkı çalabilir."
+adminmode_help: |
+  🛡️ <b>Yönetici Komut Modu</b>
+
+  <b>Durum:</b> {status}
+  <b>Kullanım:</b> <code>/adminmode [admin|adminauth|everyone]</code>
+adminmode_status_admin: "<b>Yalnızca Yöneticiler</b> 🔐"
+adminmode_status_adminauth: "<b>Yöneticiler + Yetkili Kullanıcılar</b> 🎧"
+adminmode_status_everyone: "<b>Herkes</b> 🌍"
+adminmode_updated: "✅ <b>Yönetici komut modu</b> güncellendi: {status}"
+adminmode_invalid: "⚠️ Geçersiz mod. Şunları kullan: <code>admin</code>, <code>adminauth</code> veya <code>everyone</code>."
 play_added_multiple_header: "➕ {user} tarafından <b>{count} parça eklendi</b>"
 play_queue_limit_hint: "⚠️ <i>Sıra sınırına ulaşıldı — bazı parçalar atlandı.</i>"
 play_queue_view_hint: "<i>Listenin tamamını görmek için /queue kullan.</i>"
@@ -973,6 +985,7 @@ help_admin: |
   <b>Komutlar:</b>
   <blockquote>
   <b>/playmode</b> - /play komutunu kimin kullanacağını kontrol et
+  <b>/adminmode</b> - Yönetici komutlarını kimin kullanacağını kontrol et
   <b>/cmddelete</b> - Bot komutlarının otomatik silinmesini aç/kapat
   <b>/speed</b> - Oynatma hızını değiştir
   <b>/skip</b> - Mevcut şarkıyı atla

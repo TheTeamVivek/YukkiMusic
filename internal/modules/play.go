@@ -284,6 +284,15 @@ func handlePlay(m *tg.NewMessage, opts *playOpts) error {
 		return tg.ErrEndGroup
 	}
 
+	if len(tracks) == 1 && !opts.Force {
+		if isTrackInQueue(room, tracks[0]) {
+			utils.EOR(searchMsg, F(m.ChannelID(), "play_already_in_queue", locales.Arg{
+				"title": utils.EscapeHTML(utils.ShortTitle(tracks[0].Title, 35)),
+			}))
+			return tg.ErrEndGroup
+		}
+	}
+
 	tracks, availableSlots, err := filterAndTrimTracks(searchMsg, room, tracks)
 	if err != nil {
 		return tg.ErrEndGroup
@@ -390,6 +399,20 @@ func fetchTracksAndCheckStatus(
 	}
 
 	return tracks, r.IsActiveChat(), nil
+}
+
+func isTrackInQueue(r *core.RoomState, t *state.Track) bool {
+	activeTrack := r.Track()
+	if activeTrack != nil && (activeTrack.URL == t.URL || activeTrack.ID == t.ID) {
+		return true
+	}
+
+	for _, qt := range r.Queue() {
+		if qt.URL == t.URL || qt.ID == t.ID {
+			return true
+		}
+	}
+	return false
 }
 
 func ensureVoiceChatReady(

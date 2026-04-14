@@ -34,6 +34,7 @@ type ChatSettings struct {
 	ChatID             int64      `bson:"_id"`
 	ChannelPlayID      int64      `bson:"cplay_id"`
 	AuthUsers          []int64    `bson:"auth_users"`
+	AdminMode          AdminMode  `bson:"admin_mode,omitempty"`
 	Language           string     `bson:"language"`
 	RTMP               RTMPConfig `bson:"rtmp_config"`
 	AssistantIndex     int        `bson:"ass_index,omitempty"`

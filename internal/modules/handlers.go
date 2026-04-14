@@ -146,7 +146,7 @@ var handlers = []MsgHandlerDef{
 	{
 		Pattern: "(lang|language)",
 		Handler: langHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
+		Filters: []telegram.Filter{superGroupFilter, adminFilter},
 	},
 
 	// SuperGroup & Admin Filters
@@ -455,6 +455,11 @@ var handlers = []MsgHandlerDef{
 	{
 		Pattern: "(cmddelete|commanddelete)",
 		Handler: cmdDeleteHandler,
+		Filters: []telegram.Filter{superGroupFilter, adminFilter},
+	},
+	{
+		Pattern: "adminmode",
+		Handler: adminModeHandler,
 		Filters: []telegram.Filter{superGroupFilter, adminFilter},
 	},
 	{

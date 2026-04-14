@@ -165,9 +165,13 @@ func checkAdminOrAuth(
 	chatID int64,
 	opt *tg.CallbackOptions,
 ) bool {
-	isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID)
-	if err != nil || !isAdmin {
-		cb.Answer(F(cb.ChannelID(), "only_admin_or_auth_cb"), opt)
+	if !canUseAdminCommand(cb.Client, chatID, cb.SenderID) {
+		mode, err := database.GetAdminMode(chatID)
+		if err == nil && mode == database.AdminModeAdminsOnly {
+			cb.Answer(F(cb.ChannelID(), "only_admin_cb"), opt)
+		} else {
+			cb.Answer(F(cb.ChannelID(), "only_admin_or_auth_cb"), opt)
+		}
 		return false
 	}
 	return true
