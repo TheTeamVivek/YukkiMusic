@@ -19,15 +19,21 @@ package utils
 
 import (
 	"bytes"
+	"context"
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/amarnathcjd/gogram/telegram"
 )
 
 func GetDurationByFFProbe(filePath string) (int, error) {
-	cmd := exec.Command(
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(
+		ctx,
 		"ffprobe",
 		"-v", "error",
 		"-show_entries", "format=duration",

@@ -202,6 +202,9 @@ func (*SoundCloudPlatform) Search(
 }
 
 func (s *SoundCloudPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+
 	safeURL, err := sanitizeMediaURL(urlStr)
 	if err != nil {
 		return nil, errUnsafeURL
@@ -216,7 +219,7 @@ func (s *SoundCloudPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) 
 		safeURL,
 	}
 
-	cmd := exec.Command("yt-dlp", args...)
+	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
