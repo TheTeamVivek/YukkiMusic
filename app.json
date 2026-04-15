@@ -68,7 +68,6 @@
         },
         "START_IMG_URL": {
             "description": "URL of the image to be displayed on the start message.",
-            "value": "https://raw.githubusercontent.com/Vivekkumar-IN/assets/master/images.png",
             "required": false
         },
         "SUPPORT_CHAT": {

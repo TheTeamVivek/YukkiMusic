@@ -31,7 +31,7 @@ import (
 
 func handleActions(m *telegram.NewMessage) error {
 
-gologging.Info(m.Marshal())
+	gologging.Info(m.Marshal())
 
 	if !isValidChatType(m) {
 		warnAndLeave(m.Client, m.ChannelID())

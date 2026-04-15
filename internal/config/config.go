@@ -18,6 +18,8 @@
 package config
 
 import (
+	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -25,11 +27,10 @@ import (
 	"time"
 
 	"github.com/Laky-64/gologging"
-	_ "github.com/joho/godotenv/autoload"
+	"github.com/joho/godotenv"
 )
 
 var (
-	// Required Variables
 	APIID          int32
 	APIHash        string
 	Token          string
@@ -38,7 +39,6 @@ var (
 	StringSessions []string
 	SessionType    string
 
-	// Optional Variables
 	OwnerID             int64
 	SpotifyClientID     string
 	SpotifyClientSecret string
@@ -58,23 +58,31 @@ var (
 	Port                string
 	EnablePprof         bool
 
-	// System & Logging
 	StartTime   time.Time
 	LogFileName = "logs.txt"
 	LogWriter   io.Writer
 
-	// Internal
 	logger  = gologging.GetLogger("config")
 	logFile *os.File
 )
 
-func init() {
-	initLogging()
+func Load() (func(), error) {
+	godotenv.Load()
+	if err := initLogging(); err != nil {
+		return nil, fmt.Errorf("config: logging init failed: %w", err)
+	}
+
 	loadConfig()
-	validateConfig()
+
+	if err := validateConfig(); err != nil {
+		closeLogging()
+		return nil, fmt.Errorf("config: validation failed: %w", err)
+	}
+
+	return closeLogging, nil
 }
 
-func initLogging() {
+func initLogging() error {
 	_ = os.Remove(LogFileName)
 
 	file, err := os.OpenFile(
@@ -83,23 +91,21 @@ func initLogging() {
 		0o644,
 	)
 	if err != nil {
-		logger.FatalF("Failed to open log file: %v", err)
+		return fmt.Errorf("open log file %q: %w", LogFileName, err)
 	}
 
 	logFile = file
 	LogWriter = io.MultiWriter(file, os.Stderr)
+
+	return nil
 }
 
 func loadConfig() {
 	StartTime = time.Now()
 
-	// Load Required
 	APIID = int32(getInt64("API_ID", 0))
 	APIHash = getString("API_HASH", "")
-	Token = getString(
-		"TOKEN",
-		getString("BOT_TOKEN", ""),
-	) // Checks TOKEN, fallbacks to BOT_TOKEN
+	Token = getString("TOKEN", getString("BOT_TOKEN", ""))
 	LoggerID = getInt64("LOGGER_ID", getInt64("LOG_GROUP_ID", 0))
 	MongoURI = getString("MONGO_DB_URI", "")
 	SessionType = getString("SESSION_TYPE", "pyrogram")
@@ -108,15 +114,13 @@ func loadConfig() {
 		getStringSlice("STRING_SESSION", nil),
 	)
 
-	// Load Optional
 	OwnerID = getInt64("OWNER_ID", 0)
 	SpotifyClientID = getString("SPOTIFY_CLIENT_ID", "")
 	SpotifyClientSecret = getString("SPOTIFY_CLIENT_SECRET", "")
 	FallenAPIURL = getString("FALLEN_API_URL", "https://beta.fallenapi.fun")
 	FallenAPIKey = getString("FALLEN_API_KEY", "")
-
 	DefaultLang = getString("DEFAULT_LANG", "en")
-	DurationLimit = int(getInt64("DURATION_LIMIT", 4200)) // In seconds
+	DurationLimit = int(getInt64("DURATION_LIMIT", 4200))
 	LeaveOnDemoted = getBool("LEAVE_ON_DEMOTED", false)
 	QueueLimit = int(getInt64("QUEUE_LIMIT", 24))
 	SupportChat = getString("SUPPORT_CHAT", "https://t.me/TheTeamVk")
@@ -124,11 +128,7 @@ func loadConfig() {
 	CookiesLink = getString("COOKIES_LINK", "")
 	SetCmds = getBool("SET_CMDS", false)
 	MaxAuthUsers = int(getInt64("MAX_AUTH_USERS", 25))
-
-	StartImage = getString(
-		"START_IMG_URL",
-		"https://raw.githubusercontent.com/Vivekkumar-IN/assets/master/images.png",
-	)
+	StartImage = getString("START_IMG_URL", "")
 	PingImage = getString(
 		"PING_IMG_URL",
 		"https://telegra.ph/file/91533956c91d0fd7c9f20.jpg",
@@ -137,40 +137,46 @@ func loadConfig() {
 	EnablePprof = getBool("ENABLE_PPROF", false)
 }
 
-func validateConfig() {
-	if APIID == 0 {
-		logger.Fatal("API_ID is required but missing!")
+func validateConfig() error {
+	type check struct {
+		ok  bool
+		msg string
 	}
-	if APIHash == "" {
-		logger.Fatal("API_HASH is required but missing!")
+
+	required := []check{
+		{APIID != 0, "API_ID is required but missing"},
+		{APIHash != "", "API_HASH is required but missing"},
+		{LoggerID != 0, "LOGGER_ID is required but missing"},
+		{MongoURI != "", "MONGO_DB_URI is required but missing"},
+		{Token != "", "TOKEN (or BOT_TOKEN) is required but missing"},
+		{
+			len(StringSessions) > 0,
+			fmt.Sprintf(
+				"STRING_SESSIONS is empty — at least one %s session string is required",
+				SessionType,
+			),
+		},
 	}
-	if LoggerID == 0 {
-		logger.Fatal("LOGGER_ID is required but missing!")
+
+	for _, c := range required {
+		if !c.ok {
+			return errors.New(c.msg)
+		}
 	}
-	if MongoURI == "" {
-		logger.Fatal("MONGO_DB_URI is required but missing!")
-	}
-	if Token == "" {
-		logger.Fatal(
-			"TOKEN or BOT_TOKEN is required but missing! Please set it in .env or environment.",
-		)
-	}
-	if len(StringSessions) == 0 {
-		logger.FatalF(
-			"STRING_SESSIONS is empty — at least one %s session string is required.",
-			SessionType,
-		)
-	}
+
 	if SpotifyClientID == "" || SpotifyClientSecret == "" {
-		logger.Warn(
-			"Spotify credentials not configured - Spotify links won't work",
-		)
+		logger.Warn("Spotify credentials not configured — Spotify links won't work")
+	}
+
+	return nil
+}
+
+func closeLogging() {
+	if logFile != nil {
+		_ = logFile.Close()
 	}
 }
 
-// --- Helper Functions ---
-
-// lookupEnv checks multiple variations of a key (e.g., lowercase, uppercase, no underscore)
 func lookupEnv(baseKey string) (string, bool) {
 	variants := []string{
 		baseKey,
@@ -181,12 +187,12 @@ func lookupEnv(baseKey string) (string, bool) {
 
 	for _, key := range variants {
 		if val, ok := os.LookupEnv(key); ok {
-			val = strings.TrimSpace(val)
-			if val != "" {
+			if val = strings.TrimSpace(val); val != "" {
 				return val, true
 			}
 		}
 	}
+
 	return "", false
 }
 
@@ -203,11 +209,12 @@ func getBool(key string, fallback bool) bool {
 		return fallback
 	}
 
-	boolVal, err := strconv.ParseBool(val)
+	b, err := strconv.ParseBool(val)
 	if err != nil {
-		logger.FatalF("Invalid boolean for %s: %v", key, err)
+		logger.FatalF("config: invalid boolean value for %s=%q: %v", key, val, err)
 	}
-	return boolVal
+
+	return b
 }
 
 func getInt64(key string, fallback int64) int64 {
@@ -216,11 +223,12 @@ func getInt64(key string, fallback int64) int64 {
 		return fallback
 	}
 
-	num, err := strconv.ParseInt(val, 10, 64)
+	n, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
-		logger.FatalF("Invalid int64 for %s: %v", key, err)
+		logger.FatalF("config: invalid integer value for %s=%q: %v", key, val, err)
 	}
-	return num
+
+	return n
 }
 
 func getStringSlice(key string, fallback []string) []string {
@@ -229,17 +237,13 @@ func getStringSlice(key string, fallback []string) []string {
 		return fallback
 	}
 
-	normalized := strings.NewReplacer(",", " ", ";", " ").Replace(val)
-	parts := strings.Fields(normalized)
+	parts := strings.Fields(
+		strings.NewReplacer(",", " ", ";", " ").Replace(val),
+	)
 
 	if len(parts) > 0 {
 		return parts
 	}
-	return fallback
-}
 
-func CloseLogging() {
-	if logFile != nil {
-		_ = logFile.Close()
-	}
+	return fallback
 }

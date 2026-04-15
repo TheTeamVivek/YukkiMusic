@@ -59,7 +59,7 @@ These must be set for the bot to start.
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
-| `START_IMG_URL` | `https://...` | Image URL displayed in the `/start` command response. |
+| `START_IMG_URL` | `""` | Image URL displayed in the `/start` command response. |
 | `PING_IMG_URL` | `https://...` | Image URL displayed in the `/ping` command response. |
 | `SUPPORT_CHAT` | `https://t.me/TheTeamVk` | **Full URL** to the support group. |
 | `SUPPORT_CHANNEL`| `https://t.me/TheTeamVivek` | **Full URL** to the announcement channel. |

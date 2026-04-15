@@ -403,15 +403,15 @@ func handleSkipAction(
 	}
 
 	statusMsg, err = utils.EOR(statusMsg, msgText, sendOpt)
-if err != nil {
-cb.Respond(F(cb.ChannelID(), "cb_skip_edited", locales.Arg{
-		"user": utils.MentionHTML(cb.Sender),
-	}))
-return tg.ErrEndGroup
-}
+	if err != nil {
+		cb.Respond(F(cb.ChannelID(), "cb_skip_edited", locales.Arg{
+			"user": utils.MentionHTML(cb.Sender),
+		}))
+		return tg.ErrEndGroup
+	}
 
 	r.SetStatusMsg(statusMsg)
-statusMsg.Reply(F(cb.ChannelID(), "cb_skip_edited", locales.Arg{
+	statusMsg.Reply(F(cb.ChannelID(), "cb_skip_edited", locales.Arg{
 		"user": utils.MentionHTML(cb.Sender),
 	}))
 	return tg.ErrEndGroup

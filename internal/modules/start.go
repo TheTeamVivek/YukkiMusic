@@ -63,33 +63,24 @@ func startHandler(m *tg.NewMessage) error {
 			"bot":  utils.MentionHTML(m.Client.Me()),
 		})
 
-		_, err := m.RespondMedia(&tg.InputMediaWebPage{
-			URL:             config.StartImage,
-			ForceLargeMedia: true,
-		}, &tg.MediaOptions{
-			Caption:     caption,
-			NoForwards:  true,
-			ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
-		})
-		if err != nil {
-			gologging.Error(
-				"[start] InputMediaWebPage Reply failed: " + err.Error(),
-			)
+		var err error
 
+		if config.StartImage != "" {
 			_, err = m.RespondMedia(config.StartImage, &tg.MediaOptions{
 				Caption:     caption,
-				NoForwards:  true,
 				ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
 			})
 			if err != nil {
-				gologging.Error(
-					"[start] URL media reply failed: " + err.Error(),
-				)
+				gologging.ErrorF("[start] image send failed: %v", err)
+			}
+		}
 
-				_, err = m.Respond(caption, &tg.SendOptions{
-					NoForwards:  true,
-					ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
-				})
+		if config.StartImage == "" || err != nil {
+			_, err = m.Respond(caption, &tg.SendOptions{
+				ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
+			})
+			if err != nil {
+				gologging.ErrorF("[start] text send failed: %v", err)
 				return err
 			}
 		}
@@ -100,18 +91,20 @@ func startHandler(m *tg.NewMessage) error {
 		if m.Sender.Username != "" {
 			uName = "@" + m.Sender.Username
 		}
+
 		msg := F(m.ChannelID(), "logger_bot_started", locales.Arg{
 			"mention":       utils.MentionHTML(m.Sender),
 			"user_id":       m.SenderID(),
 			"user_username": uName,
 		})
-		_, err := m.Client.SendMessage(config.LoggerID, msg)
+
+		var err error
+		_, err = m.Client.SendMessage(config.LoggerID, msg)
 		if err != nil {
-			gologging.Error(
-				"Failed to send logger_bot_started msg, Err: " + err.Error(),
-			)
+			gologging.ErrorF("[start] logger send failed: %v", err)
 		}
 	}
+
 	return tg.ErrEndGroup
 }
 
@@ -125,12 +118,13 @@ func startCB(cb *tg.CallbackQuery) error {
 
 	sendOpt := &tg.SendOptions{
 		ReplyMarkup: core.GetStartMarkup(cb.ChannelID()),
-		NoForwards:  true,
 	}
 
-	if config.StartImage != "" {
-		sendOpt.Media = config.StartImage
-	}
+	/*
+		    if config.StartImage != "" {
+				sendOpt.Media = config.StartImage
+			}
+	*/
 
 	cb.Edit(caption, sendOpt)
 	return tg.ErrEndGroup

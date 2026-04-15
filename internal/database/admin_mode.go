@@ -21,7 +21,7 @@ type AdminMode string
 
 const (
 	AdminModeAdminsOnly AdminMode = "admin"
-	AdminModeAdminAuth AdminMode = "adminauth"
+	AdminModeAdminAuth  AdminMode = "adminauth"
 	AdminModeEveryone   AdminMode = "everyone"
 )
 
@@ -45,4 +45,3 @@ func SetAdminMode(chatID int64, mode AdminMode) error {
 		return true
 	})
 }
-

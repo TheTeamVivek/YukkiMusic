@@ -48,8 +48,14 @@ import (
 )
 
 func main() {
+	cfgCleanup, err := config.Load()
+
+	if err != nil {
+		gologging.FatalF(err.Error())
+		return
+	}
+	defer cfgCleanup()
 	initLogger()
-	defer config.CloseLogging()
 
 	shutdownPlatforms, err := platforms.Init()
 	if err != nil {

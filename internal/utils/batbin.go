@@ -19,6 +19,7 @@ package utils
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Laky-64/gologging"
 	"resty.dev/v3"
@@ -26,7 +27,7 @@ import (
 
 const batbinBaseURL = "https://batbin.me/"
 
-var httpClient = resty.New()
+var httpClient = resty.New().SetTimeout(10 * time.Second)
 
 type batbinResponse struct {
 	Success bool   `json:"success"`
