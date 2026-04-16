@@ -293,15 +293,6 @@ func settingsCallbackHandler(cb *tg.CallbackQuery) error {
 func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *tg.ReplyInlineMarkup {
 	kb := tg.NewKeyboard()
 
-	// Play Mode
-	playModeStatus := F(chatID, "playmode_status_everyone")
-	if s.PlayModeAdminsOnly {
-		playModeStatus = F(chatID, "playmode_status_admins")
-	}
-	kb.AddRow(
-		tg.Button.Data(F(chatID, "settings_btn_playmode"), "info:playmode"),
-		tg.Button.Data(playModeStatus, "set:playmode"),
-	)
 
 	// Admin Mode
 	adminModeStatus := F(chatID, adminModeStatusKey(s.AdminMode))
@@ -315,6 +306,15 @@ func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *tg.ReplyInline
 	kb.AddRow(
 		tg.Button.Data(F(chatID, "settings_btn_cmddelete"), "info:cmddelete"),
 		tg.Button.Data(F(chatID, cmdDeleteStatus), "set:cmddelete"),
+	)
+
+
+	// Play Mode
+playModeStatus := F(chatID, utils.IfElse(s.PlayModeAdminsOnly,"playmode_status_admins","playmode_status_everyone" ))
+
+	kb.AddRow(
+		tg.Button.Data(F(chatID, "settings_btn_playmode"), "info:playmode"),
+		tg.Button.Data(playModeStatus, "set:playmode"),
 	)
 
 	// Thumbnails
