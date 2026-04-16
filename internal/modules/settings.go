@@ -199,3 +199,139 @@ func parseAdminMode(input string) (database.AdminMode, bool) {
 		return "", false
 	}
 }
+
+func settingsHandler(m *tg.NewMessage) error {
+	chatID := m.ChannelID()
+	settings, err := database.GetChatSettings(chatID)
+	if err != nil {
+		return err
+	}
+
+	title := "Chat"
+	if m.Channel != nil {
+		title = m.Channel.Title
+	}
+
+	kb := buildSettingsMarkup(chatID, settings)
+	_, err = m.Reply(F(chatID, "settings_main", locales.Arg{
+		"title": title,
+		"id":    chatID,
+	}), &tg.SendOptions{ParseMode: "HTML", ReplyMarkup: kb})
+	return err
+}
+
+func settingsCallbackHandler(cb *tg.CallbackQuery) error {
+	chatID := cb.ChannelID()
+	data := cb.DataString()
+	parts := strings.Split(data, ":")
+	title := "Chat"
+	if cb.Channel != nil {
+		title = cb.Channel.Title
+	}
+
+	if len(parts) < 2 {
+		return nil
+	}
+
+	// Check permissions
+	if isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); err != nil ||
+		!isAdmin {
+		cb.Answer(F(chatID, "only_admin_cb"), &tg.CallbackOptions{Alert: true})
+		return nil
+	}
+
+	settings, err := database.GetChatSettings(chatID)
+	if err != nil {
+		return err
+	}
+
+	action := parts[1]
+	if strings.HasPrefix(data, "info:") {
+		cb.Answer(F(chatID, "settings_info_"+action), &tg.CallbackOptions{Alert: true})
+		return nil
+	}
+	if action == "main" {
+		kb := buildSettingsMarkup(chatID, settings)
+		cb.Edit(F(chatID, "settings_main", locales.Arg{
+			"title": title,
+			"id":    chatID,
+		}), &tg.SendOptions{ParseMode: "HTML", ReplyMarkup: kb})
+		return nil
+	}
+	switch action {
+	case "playmode":
+		settings.PlayModeAdminsOnly = !settings.PlayModeAdminsOnly
+	case "adminmode":
+		switch settings.AdminMode {
+		case database.AdminModeAdminsOnly:
+			settings.AdminMode = database.AdminModeAdminAuth
+		case database.AdminModeAdminAuth:
+			settings.AdminMode = database.AdminModeEveryone
+		default:
+			settings.AdminMode = database.AdminModeAdminsOnly
+		}
+	case "cmddelete":
+		settings.CommandDelete = !settings.CommandDelete
+	case "nothumb":
+		settings.ThumbnailsDisabled = !settings.ThumbnailsDisabled
+	}
+
+	if err := database.UpdateChatSettings(settings); err != nil {
+		return err
+	}
+
+	cb.Answer(F(chatID, "settings_updated"))
+	kb := buildSettingsMarkup(chatID, settings)
+
+	cb.Edit(F(chatID, "settings_main", locales.Arg{
+		"title": title,
+		"id":    chatID,
+	}), &tg.SendOptions{ParseMode: "HTML", ReplyMarkup: kb})
+	return nil
+}
+
+func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *tg.ReplyInlineMarkup {
+	kb := tg.NewKeyboard()
+
+	// Play Mode
+	playModeStatus := F(chatID, "playmode_status_everyone")
+	if s.PlayModeAdminsOnly {
+		playModeStatus = F(chatID, "playmode_status_admins")
+	}
+	kb.AddRow(
+		tg.Button.Data(F(chatID, "settings_btn_playmode"), "info:playmode"),
+		tg.Button.Data(playModeStatus, "set:playmode"),
+	)
+
+	// Admin Mode
+	adminModeStatus := F(chatID, adminModeStatusKey(s.AdminMode))
+	kb.AddRow(
+		tg.Button.Data(F(chatID, "settings_btn_adminmode"), "info:adminmode"),
+		tg.Button.Data(adminModeStatus, "set:adminmode"),
+	)
+
+	// Cmd Delete
+	cmdDeleteStatus := utils.IfElse(s.CommandDelete, "enabled", "disabled")
+	kb.AddRow(
+		tg.Button.Data(F(chatID, "settings_btn_cmddelete"), "info:cmddelete"),
+		tg.Button.Data(cmdDeleteStatus, "set:cmddelete"),
+	)
+
+	// Thumbnails
+	thumbStatus := utils.IfElse(!s.ThumbnailsDisabled, "enabled", "disabled")
+
+	kb.AddRow(
+		tg.Button.Data(F(chatID, "settings_btn_nothumb"), "info:nothumb"),
+		tg.Button.Data(thumbStatus, "set:nothumb"),
+	)
+
+	// Language
+	kb.AddRow(
+		tg.Button.Data(F(chatID, "settings_btn_lang"), "info:lang"),
+		tg.Button.Data(F(chatID, "name"), "lang:select"),
+	)
+
+	kb.AddRow(tg.Button.Data(F(chatID, "CLOSE_BTN"), "close"))
+
+	return kb.Build()
+}

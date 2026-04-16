@@ -97,6 +97,10 @@ var AllCommands = BotCommands{
 			Command:     "adminmode",
 			Description: "Control who can use admin music commands.",
 		},
+		{
+			Command:     "settings",
+			Description: "Configure chat settings.",
+		},
 		{Command: "mute", Description: "Mute the bot in the voice chat."},
 		{Command: "unmute", Description: "Unmute the bot in the voice chat."},
 		{

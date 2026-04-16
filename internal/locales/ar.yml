@@ -28,6 +28,17 @@ invalid_bool: "⚠️ <b>قيمة غير صالحة.</b>\nاستخدم 'enable' 
 active_chats_info: "📊 <b>المكالمات النشطة:</b> <i>{count}</i>"
 active_chats_info_with_broken: "📊 <b>المكالمات النشطة:</b>\n\nيوجد <i>{count}</i> من المكالمات النشطة عبر حساب المساعد، ولكن <i>{broken}</i> منها قد تواجه مشكلات في العرض بشكل صحيح."
 
+adminmode_help: |
+  🛡️ <b>وضع أوامر الإدارة</b>
+
+  <b>الحالة:</b> {status}
+  <b>الاستخدام:</b> <code>/adminmode [admin|adminauth|everyone]</code>
+adminmode_status_admin: "<b>المشرفون فقط</b> 🔐"
+adminmode_status_adminauth: "<b>المشرفون + المصرح لهم</b> 🎧"
+adminmode_status_everyone: "<b>الجميع</b> 🌍"
+adminmode_updated: "✅ تم تحديث <b>وضع أوامر الإدارة</b> إلى: {status}"
+adminmode_invalid: "⚠️ وضع غير صالح. استخدم: <code>admin</code>، <code>adminauth</code>، أو <code>everyone</code>."
+
 
 # 🚫 Assistant Restricted / Banned
 assistant_restricted_warning: |
@@ -492,6 +503,9 @@ play_unable: "<b> ❌ تعذر التشغيل </b>\n\n<i>يرجى <b>إعادة 
 play_downloading_song: "📥 جاري تنزيل الأغنية \"{title}\""
 play_download_canceled: "⚠️ تم إلغاء التنزيل بواسطة {user}."
 play_already_in_queue: "✅ <b>المقطع مضاف بالفعل!</b>\n\n<i>{title}</i> قيد التشغيل بالفعل أو في قائمة الانتظار."
+play_added_multiple_header: "➕ <b>تمت إضافة {count} مقاطع</b> بواسطة {user}"
+play_queue_limit_hint: "⚠️ <i>وصلت قائمة الانتظار للحد الأقصى — تم تخطي بعض المقاطع.</i>"
+play_queue_view_hint: "<i>استخدم /queue لعرض القائمة الكاملة.</i>"
 
 playmode_help: |
   🛠️ <b>وضع التشغيل</b>
@@ -504,19 +518,6 @@ playmode_status_everyone: "<b>الجميع</b> 🌍"
 playmode_success_admins: "🛡️ <b>وضع التشغيل</b> أصبح الآن مقتصرًا على <b>المشرفين والمستخدمين المصرح لهم</b> فقط. 🎧"
 playmode_success_everyone: "✅ <b>وضع التشغيل</b> أصبح الآن <b>متاحًا للجميع</b>. استمتعوا بالموسيقى! 🎶"
 playmode_restricted: "🚫 وضع التشغيل مفعّل. المشرفون والمستخدمون المصرح لهم فقط يمكنهم التشغيل."
-adminmode_help: |
-  🛡️ <b>وضع أوامر الإدارة</b>
-
-  <b>الحالة:</b> {status}
-  <b>الاستخدام:</b> <code>/adminmode [admin|adminauth|everyone]</code>
-adminmode_status_admin: "<b>المشرفون فقط</b> 🔐"
-adminmode_status_adminauth: "<b>المشرفون + المصرح لهم</b> 🎧"
-adminmode_status_everyone: "<b>الجميع</b> 🌍"
-adminmode_updated: "✅ تم تحديث <b>وضع أوامر الإدارة</b> إلى: {status}"
-adminmode_invalid: "⚠️ وضع غير صالح. استخدم: <code>admin</code>، <code>adminauth</code>، أو <code>everyone</code>."
-play_added_multiple_header: "➕ <b>تمت إضافة {count} مقاطع</b> بواسطة {user}"
-play_queue_limit_hint: "⚠️ <i>وصلت قائمة الانتظار للحد الأقصى — تم تخطي بعض المقاطع.</i>"
-play_queue_view_hint: "<i>استخدم /queue لعرض القائمة الكاملة.</i>"
 
 # 🏓 Ping messages
 ping_start: "🏓 جاري الفحص..."
@@ -761,6 +762,46 @@ rtmp_configured_success: |
   <b>🔒 ملاحظة أمنية:</b>
   تُخزن البيانات بشكل آمن ولا تُعرض أبداً في المجموعة.
 
+settings_btn_adminmode: "🛡️ وضع الإدارة"
+settings_btn_cmddelete: "🗑️ حذف الأوامر"
+settings_btn_lang: "🌐 اللغة"
+settings_btn_nothumb: "🖼️ الغلاف"
+settings_btn_playmode: "🎵 وضع التشغيل"
+
+settings_info_adminmode: |
+  🛡️ ما هذا؟
+
+  يتحكم في من يمكنه استخدام أوامر الإدارة الخاصة بالبوت (تخطي، إيقاف مؤقت، إلخ).
+
+settings_info_cmddelete: |
+  🗑️ ما هذا؟
+
+  عند التفعيل، سيتم حذف رسائل الأوامر تلقائياً بعد تنفيذها للحفاظ على نظافة الدردشة.
+
+settings_info_lang: |
+  🌐 ما هذا؟
+
+  اختر لغة رسائل وواجهة البوت في هذه المجموعة.
+
+settings_info_nothumb: |
+  🖼️ ما هذا؟
+
+  تشغيل/إيقاف عرض صورة الغلاف في رسائل التشغيل.
+
+settings_info_playmode: |
+  🎵 ما هذا؟
+
+  يتحكم في من يمكنه استخدام أمر /play لبدء التشغيل.
+
+settings_main: |
+  ⚙️ <b>إعدادات الدردشة</b>
+
+  <b>المجموعة:</b> {title}
+  <b>معرف المجموعة:</b> <code>{id}</code>
+
+  قم بتخصيص سلوك البوت في هذه المجموعة باستخدام الأزرار أدناه.
+
+settings_updated: "✅ تم تحديث الإعدادات!"
 
 searching: "🔍🎶 جاري البحث... ⚡✨"
 searching_query: "🔍🎶 جاري البحث عن: <b>{query}</b>... ⚡✨"
@@ -990,6 +1031,7 @@ help_admin: |
   <b>/playmode</b> - التحكم في من يمكنه استخدام /play
   <b>/adminmode</b> - التحكم في من يمكنه استخدام أوامر الإدارة
   <b>/cmddelete</b> - تبديل الحذف التلقائي لأوامر البوت
+  <b>/settings</b> - تكوين إعدادات الدردشة
   <b>/speed</b> - تغيير سرعة التشغيل
   <b>/skip</b> - تخطي الأغنية الحالية
   <b>/pause</b> - إيقاف التشغيل مؤقتاً

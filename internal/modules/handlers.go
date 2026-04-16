@@ -148,6 +148,11 @@ var handlers = []MsgHandlerDef{
 		Handler: langHandler,
 		Filters: []telegram.Filter{superGroupFilter, adminFilter},
 	},
+	{
+		Pattern: "settings",
+		Handler: settingsHandler,
+		Filters: []telegram.Filter{superGroupFilter, adminFilter},
+	},
 
 	// SuperGroup & Admin Filters
 
@@ -481,6 +486,7 @@ var cbHandlers = []CbHandlerDef{
 
 	{Pattern: `^room:(\w+)$`, Handler: roomHandle},
 	{Pattern: "progress", Handler: emptyCBHandler},
+	{Pattern: "^(set|info):", Handler: settingsCallbackHandler},
 }
 
 func Init(bot *telegram.Client, assistants *core.AssistantManager) {

@@ -107,6 +107,14 @@ func updateChatSettings(settings *ChatSettings) error {
 	return nil
 }
 
+func GetChatSettings(chatID int64) (*ChatSettings, error) {
+	return getChatSettings(chatID)
+}
+
+func UpdateChatSettings(settings *ChatSettings) error {
+	return updateChatSettings(settings)
+}
+
 func modifyChatSettings(chatID int64, fn func(*ChatSettings) bool) error {
 	settings, err := getChatSettings(chatID)
 	if err != nil {

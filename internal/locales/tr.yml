@@ -28,6 +28,16 @@ invalid_bool: "⚠️ <b>Geçersiz değer.</b>\n'enable' veya 'disable' kullan."
 active_chats_info: "📊 <b>Aktif Sohbetler:</b>\n\nBot sisteminde <i>{count}</i> aktif sohbet var."
 active_chats_info_with_broken: "📊 <b>Aktif Sohbetler:</b>\n\nBot sisteminde <i>{count}</i> aktif sohbet var, ancak bunların <i>{broken}</i> tanesi düzgün görüntülenemiyor olabilir."
 
+adminmode_help: |
+  🛡️ <b>Yönetici Komut Modu</b>
+
+  <b>Durum:</b> {status}
+  <b>Kullanım:</b> <code>/adminmode [admin|adminauth|everyone]</code>
+adminmode_status_admin: "<b>Yalnızca Yöneticiler</b> 🔐"
+adminmode_status_adminauth: "<b>Yöneticiler + Yetkili Kullanıcılar</b> 🎧"
+adminmode_status_everyone: "<b>Herkes</b> 🌍"
+adminmode_updated: "✅ <b>Yönetici komut modu</b> güncellendi: {status}"
+adminmode_invalid: "⚠️ Geçersiz mod. Şunları kullan: <code>admin</code>, <code>adminauth</code> veya <code>everyone</code>."
 
 # 🚫 Assistant Restricted / Banned
 assistant_restricted_warning: |
@@ -492,6 +502,9 @@ play_unable: "<b> ❌ Oynatılamıyor </b>\n\n<i>Lütfen <b>sesli sohbeti yenide
 play_downloading_song: "📥 \"{title}\" şarkısı indiriliyor"
 play_download_canceled: "⚠️ İndirme {user} tarafından iptal edildi."
 play_already_in_queue: "✅ <b>Parça zaten ekli!</b>\n\n<i>{title}</i> zaten çalıyor veya sırada bekliyor."
+play_added_multiple_header: "➕ {user} tarafından <b>{count} parça eklendi</b>"
+play_queue_limit_hint: "⚠️ <i>Sıra sınırına ulaşıldı — bazı parçalar atlandı.</i>"
+play_queue_view_hint: "<i>Listenin tamamını görmek için /queue kullan.</i>"
 
 playmode_help: |
   🛠️ <b>Oynatma Modu</b>
@@ -504,19 +517,6 @@ playmode_status_everyone: "<b>Herkes</b> 🌍"
 playmode_success_admins: "🛡️ <b>Oynatma modu</b> artık yalnızca <b>yöneticiler ve yetkili kullanıcılar</b> ile sınırlıdır. 🎧"
 playmode_success_everyone: "✅ <b>Oynatma modu</b> artık <b>herkes için açık</b>. Müziğin tadını çıkarın! 🎶"
 playmode_restricted: "🚫 Oynatma modu etkin. Sadece yöneticiler ve yetkili kullanıcılar şarkı çalabilir."
-adminmode_help: |
-  🛡️ <b>Yönetici Komut Modu</b>
-
-  <b>Durum:</b> {status}
-  <b>Kullanım:</b> <code>/adminmode [admin|adminauth|everyone]</code>
-adminmode_status_admin: "<b>Yalnızca Yöneticiler</b> 🔐"
-adminmode_status_adminauth: "<b>Yöneticiler + Yetkili Kullanıcılar</b> 🎧"
-adminmode_status_everyone: "<b>Herkes</b> 🌍"
-adminmode_updated: "✅ <b>Yönetici komut modu</b> güncellendi: {status}"
-adminmode_invalid: "⚠️ Geçersiz mod. Şunları kullan: <code>admin</code>, <code>adminauth</code> veya <code>everyone</code>."
-play_added_multiple_header: "➕ {user} tarafından <b>{count} parça eklendi</b>"
-play_queue_limit_hint: "⚠️ <i>Sıra sınırına ulaşıldı — bazı parçalar atlandı.</i>"
-play_queue_view_hint: "<i>Listenin tamamını görmek için /queue kullan.</i>"
 
 # 🏓 Ping messages
 ping_start: "🏓 Pingleniyor..."
@@ -759,6 +759,46 @@ rtmp_configured_success: |
   <b>🔒 Güvenlik Notu:</b>
   Kimlik bilgileri güvenli bir şekilde saklanır ve asla grupta gösterilmez.
 
+settings_btn_adminmode: "🛡️ Yönetici Modu"
+settings_btn_cmddelete: "🗑️ Komut Silme"
+settings_btn_lang: "🌐 Dil"
+settings_btn_nothumb: "🖼️ Küçük Resimler"
+settings_btn_playmode: "🎵 Oynatma Modu"
+
+settings_info_adminmode: |
+  🛡️ Bu nedir?
+
+  Botun yönetici komutlarını (skip, pause vb.) kimlerin kullanabileceğini kontrol eder.
+
+settings_info_cmddelete: |
+  🗑️ Bu nedir?
+
+  Etkinleştirildiğinde, bot komut mesajlarını işledikten sonra otomatik olarak siler.
+
+settings_info_lang: |
+  🌐 Bu nedir?
+
+  Bu grupta botun dilini seçin.
+
+settings_info_nothumb: |
+  🖼️ Bu nedir?
+
+  Oynatma mesajlarında küçük resimlerin gösterilmesini açıp kapatır.
+
+settings_info_playmode: |
+  🎵 Bu nedir?
+
+  /play komutunu kimlerin kullanabileceğini kontrol eder.
+
+settings_main: |
+  ⚙️ <b>Sohbet Ayarları</b>
+
+  <b>Grup:</b> {title}
+  <b>Grup ID:</b> <code>{id}</code>
+
+  Aşağıdaki butonları kullanarak bot ayarlarını yapılandırın.
+
+settings_updated: "✅ Ayarlar güncellendi!"
 
 searching: "🔍🎶 Aranıyor... ⚡✨"
 searching_query: "🔍🎶 Aranan: <b>{query}</b>... ⚡✨"
@@ -987,6 +1027,7 @@ help_admin: |
   <b>/playmode</b> - /play komutunu kimin kullanacağını kontrol et
   <b>/adminmode</b> - Yönetici komutlarını kimin kullanacağını kontrol et
   <b>/cmddelete</b> - Bot komutlarının otomatik silinmesini aç/kapat
+  <b>/settings</b> - Sohbet ayarlarını yapılandır
   <b>/speed</b> - Oynatma hızını değiştir
   <b>/skip</b> - Mevcut şarkıyı atla
   <b>/pause</b> - Mevcut oynatmayı duraklat

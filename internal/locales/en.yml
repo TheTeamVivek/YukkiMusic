@@ -28,6 +28,16 @@ invalid_bool: "⚠️ <b>Invalid value.</b>\nUse 'enable' or 'disable'."
 active_chats_info: "📊 <b>Active Chats:</b>\n\nThere are <i>{count}</i> active chats across the bot system."
 active_chats_info_with_broken: "📊 <b>Active Chats:</b>\n\nThere are <i>{count}</i> active chats across the bot system, but <i>{broken}</i> of them may have issues displaying correctly."
 
+adminmode_help: |
+  🛡️ <b>Admin Command Mode</b>
+
+  <b>Status:</b> {status}
+  <b>Usage:</b> <code>/adminmode [admin|adminauth|everyone]</code>
+adminmode_status_admin: "<b>Admins Only</b> 🔐"
+adminmode_status_adminauth: "<b>Admins + Auth Users</b> 🎧"
+adminmode_status_everyone: "<b>Everyone</b> 🌍"
+adminmode_updated: "✅ <b>Admin command mode</b> updated to: {status}"
+adminmode_invalid: "⚠️ Invalid mode. Use: <code>admin</code>, <code>adminauth</code>, or <code>everyone</code>."
 
 # 🚫 Assistant Restricted / Banned
 assistant_restricted_warning: |
@@ -493,6 +503,9 @@ play_unable: "<b> ❌ Unable to Play </b>\n\n<i>Please <b>restart the voice</b> 
 play_downloading_song: "📥 Downloading song \"{title}\""
 play_download_canceled: "⚠️ Download canceled by {user}."
 play_already_in_queue: "✅ <b>Track already added!</b>\n\n<i>{title}</i> is already playing or in the queue."
+play_added_multiple_header: "➕ <b>Added {count} tracks</b> by {user}"
+play_queue_limit_hint: "⚠️ <i>Queue limit reached — some tracks were skipped.</i>"
+play_queue_view_hint: "<i>Use /queue to view full list.</i>"
 
 playmode_help: |
   🛠️ <b>Play Mode</b>
@@ -505,19 +518,6 @@ playmode_status_everyone: "<b>Everyone</b> 🌍"
 playmode_success_admins: "🛡️ <b>Play mode</b> is now restricted to <b>Admins & DJs</b> only. 🎧"
 playmode_success_everyone: "✅ <b>Play mode</b> is now <b>Open to Everyone</b>. Let the music flow! 🎶"
 playmode_restricted: "🚫 Play mode is enabled. Only admins and authorized users can play."
-adminmode_help: |
-  🛡️ <b>Admin Command Mode</b>
-
-  <b>Status:</b> {status}
-  <b>Usage:</b> <code>/adminmode [admin|adminauth|everyone]</code>
-adminmode_status_admin: "<b>Admins Only</b> 🔐"
-adminmode_status_adminauth: "<b>Admins + Auth Users</b> 🎧"
-adminmode_status_everyone: "<b>Everyone</b> 🌍"
-adminmode_updated: "✅ <b>Admin command mode</b> updated to: {status}"
-adminmode_invalid: "⚠️ Invalid mode. Use: <code>admin</code>, <code>adminauth</code>, or <code>everyone</code>."
-play_added_multiple_header: "➕ <b>Added {count} tracks</b> by {user}"
-play_queue_limit_hint: "⚠️ <i>Queue limit reached — some tracks were skipped.</i>"
-play_queue_view_hint: "<i>Use /queue to view full list.</i>"
 
 # 🏓 Ping messages
 ping_start: "🏓 Pinging..."
@@ -766,6 +766,49 @@ rtmp_configured_success: |
 searching: "🔍🎶 Searching... ⚡✨"
 searching_query: "🔍🎶 Searching for: <b>{query}</b>... ⚡✨"
 
+
+settings_btn_adminmode: "🛡️ Admin Mode"
+settings_btn_cmddelete: "🗑️ Cmd Delete"
+settings_btn_lang: "🌐 Language"
+settings_btn_nothumb: "🖼️ Thumbnails"
+settings_btn_playmode: "🎵 Play Mode"
+
+settings_info_adminmode: |
+  🛡️ What is this?
+
+  Controls who can use admin commands of the bot (skip, pause, etc.).
+  
+settings_info_cmddelete: |
+  🗑️ What is this?
+
+  When enabled, the bot will automatically delete command messages after processing them to keep the chat clean.
+
+settings_info_lang: |
+  🌐 What is this?
+
+  Select the language for the bot's messages and interface in this group.
+
+settings_info_nothumb: |
+  🖼️ What is this?
+
+  Toggle whether to show track artwork/thumbnails in playback messages.
+
+settings_info_playmode: |
+  🎵 What is this?
+
+  Control who can use the /play command. If enabled, only administrators and authorized users can start playback.
+
+settings_main: |
+  ⚙️ <b>Chat Settings</b>
+
+  <b>Group:</b> {title}
+  <b>Group ID:</b> <code>{id}</code>
+
+  Configure the bot's behavior in this group using the buttons below.
+
+settings_updated: "✅ Settings updated!"
+
+
 speed_line: "⚙️ Speed: <b>{speed}x</b>"
 
 stats_system_header: "🔧 <b>System:</b>"
@@ -991,6 +1034,7 @@ help_admin: |
   <b>/playmode</b> - Control who can use /play
   <b>/adminmode</b> - Control who can use admin commands
   <b>/cmddelete</b> - Toggle automatic deletion of bot commands
+  <b>/settings</b> - Configure chat settings
   <b>/speed</b> - Change playback speed
   <b>/skip</b> - Skip the current song
   <b>/pause</b> - Pause the current playback
