@@ -33,9 +33,9 @@ adminmode_help: |
 
   <b>الحالة:</b> {status}
   <b>الاستخدام:</b> <code>/adminmode [admin|adminauth|everyone]</code>
-adminmode_status_admin: "<b>المشرفون فقط</b> 🔐"
-adminmode_status_adminauth: "<b>المشرفون + المصرح لهم</b> 🎧"
-adminmode_status_everyone: "<b>الجميع</b> 🌍"
+adminmode_status_admin: "المشرفون 🔐"
+adminmode_status_adminauth: "المصرح لهم 🎧"
+adminmode_status_everyone: "الجميع 🌍"
 adminmode_updated: "✅ تم تحديث <b>وضع أوامر الإدارة</b> إلى: {status}"
 adminmode_invalid: "⚠️ وضع غير صالح. استخدم: <code>admin</code>، <code>adminauth</code>، أو <code>everyone</code>."
 
@@ -513,8 +513,8 @@ playmode_help: |
   <b>الحالة:</b> {status}
   <b>الاستخدام:</b> <code>/playmode [enable|disable]</code>
 
-playmode_status_admins: "<b>المشرفون فقط</b> 🔐"
-playmode_status_everyone: "<b>الجميع</b> 🌍"
+playmode_status_admins: "المشرفون 🔐"
+playmode_status_everyone: "الجميع 🌍"
 playmode_success_admins: "🛡️ <b>وضع التشغيل</b> أصبح الآن مقتصرًا على <b>المشرفين والمستخدمين المصرح لهم</b> فقط. 🎧"
 playmode_success_everyone: "✅ <b>وضع التشغيل</b> أصبح الآن <b>متاحًا للجميع</b>. استمتعوا بالموسيقى! 🎶"
 playmode_restricted: "🚫 وضع التشغيل مفعّل. المشرفون والمستخدمون المصرح لهم فقط يمكنهم التشغيل."

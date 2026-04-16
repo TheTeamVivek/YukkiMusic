@@ -33,9 +33,9 @@ adminmode_help: |
 
   <b>Durum:</b> {status}
   <b>Kullanım:</b> <code>/adminmode [admin|adminauth|everyone]</code>
-adminmode_status_admin: "<b>Yalnızca Yöneticiler</b> 🔐"
-adminmode_status_adminauth: "<b>Yöneticiler + Yetkili Kullanıcılar</b> 🎧"
-adminmode_status_everyone: "<b>Herkes</b> 🌍"
+adminmode_status_admin: "Yöneticiler 🔐"
+adminmode_status_adminauth: "Yetkili Kullanıcılar 🎧"
+adminmode_status_everyone: "Herkes 🌍"
 adminmode_updated: "✅ <b>Yönetici komut modu</b> güncellendi: {status}"
 adminmode_invalid: "⚠️ Geçersiz mod. Şunları kullan: <code>admin</code>, <code>adminauth</code> veya <code>everyone</code>."
 
@@ -512,8 +512,8 @@ playmode_help: |
   <b>Durum:</b> {status}
   <b>Kullanım:</b> <code>/playmode [enable|disable]</code>
 
-playmode_status_admins: "<b>Yalnızca Yöneticiler</b> 🔐"
-playmode_status_everyone: "<b>Herkes</b> 🌍"
+playmode_status_admins: "Yöneticiler 🔐"
+playmode_status_everyone: "Herkes 🌍"
 playmode_success_admins: "🛡️ <b>Oynatma modu</b> artık yalnızca <b>yöneticiler ve yetkili kullanıcılar</b> ile sınırlıdır. 🎧"
 playmode_success_everyone: "✅ <b>Oynatma modu</b> artık <b>herkes için açık</b>. Müziğin tadını çıkarın! 🎶"
 playmode_restricted: "🚫 Oynatma modu etkin. Sadece yöneticiler ve yetkili kullanıcılar şarkı çalabilir."

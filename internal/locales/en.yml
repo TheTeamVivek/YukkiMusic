@@ -33,9 +33,9 @@ adminmode_help: |
 
   <b>Status:</b> {status}
   <b>Usage:</b> <code>/adminmode [admin|adminauth|everyone]</code>
-adminmode_status_admin: "<b>Admins Only</b> 🔐"
-adminmode_status_adminauth: "<b>Admins + Auth Users</b> 🎧"
-adminmode_status_everyone: "<b>Everyone</b> 🌍"
+adminmode_status_admin: "Admins 🔐"
+adminmode_status_adminauth: "Auth Users 🎧"
+adminmode_status_everyone: "Everyone 🌍"
 adminmode_updated: "✅ <b>Admin command mode</b> updated to: {status}"
 adminmode_invalid: "⚠️ Invalid mode. Use: <code>admin</code>, <code>adminauth</code>, or <code>everyone</code>."
 
@@ -513,8 +513,8 @@ playmode_help: |
   <b>Status:</b> {status}
   <b>Usage:</b> <code>/playmode [enable|disable]</code>
 
-playmode_status_admins: "<b>Admins Only</b> 🔐"
-playmode_status_everyone: "<b>Everyone</b> 🌍"
+playmode_status_admins: "Admins 🔐"
+playmode_status_everyone: "Everyone 🌍"
 playmode_success_admins: "🛡️ <b>Play mode</b> is now restricted to <b>Admins & DJs</b> only. 🎧"
 playmode_success_everyone: "✅ <b>Play mode</b> is now <b>Open to Everyone</b>. Let the music flow! 🎶"
 playmode_restricted: "🚫 Play mode is enabled. Only admins and authorized users can play."

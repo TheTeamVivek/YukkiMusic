@@ -33,9 +33,9 @@ adminmode_help: |
 
   <b>स्थिति:</b> {status}
   <b>प्रयोग:</b> <code>/adminmode [admin|adminauth|everyone]</code>
-adminmode_status_admin: "<b>केवल प्रशासक</b> 🔐"
-adminmode_status_adminauth: "<b>प्रशासक + अधिकृत उपयोगकर्ता</b> 🎧"
-adminmode_status_everyone: "<b>प्रत्येक व्यक्ति</b> 🌍"
+adminmode_status_admin: "प्रशासक 🔐"
+adminmode_status_adminauth: "अधिकृत उपयोगकर्ता 🎧"
+adminmode_status_everyone: "प्रत्येक व्यक्ति 🌍"
 adminmode_updated: "✅ <b>प्रशासकीय आदेश विधा</b> अद्यतन की गई: {status}"
 adminmode_invalid: "⚠️ अमान्य विधा। प्रयोग करें: <code>admin</code>, <code>adminauth</code>, अथवा <code>everyone</code>।"
 
@@ -515,8 +515,8 @@ playmode_help: |
   <b>स्थिति:</b> {status}
   <b>प्रयोग:</b> <code>/playmode [enable|disable]</code>
 
-playmode_status_admins: "<b>केवल प्रशासक</b> 🔐"
-playmode_status_everyone: "<b>प्रत्येक व्यक्ति</b> 🌍"
+playmode_status_admins: "प्रशासक 🔐"
+playmode_status_everyone: "प्रत्येक व्यक्ति 🌍"
 playmode_success_admins: "🛡️ <b>संगीत संचालन</b> अब केवल <b>प्रशासकों एवं अधिकृत उपयोगकर्ताओं</b> तक सीमित है। 🎧"
 playmode_success_everyone: "✅ <b>संगीत संचालन</b> अब <b>सभी के लिए खुला</b> है। संगीत का आनंद लें! 🎶"
 playmode_restricted: "🚫 संगीत संचालन विधा सक्षम है। केवल प्रशासक अथवा अधिकृत उपयोगकर्ता ही संगीत चला सकते हैं।"
