@@ -194,6 +194,7 @@ func vcplayHandler(
 ) error {
 	return handlePlay(m, &playOpts{CPlay: true, Video: true})
 }
+
 func fvcplayHandler(m *tg.NewMessage) error {
 	return handlePlay(m, &playOpts{Force: true, CPlay: true, Video: true})
 }
