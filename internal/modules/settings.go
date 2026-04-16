@@ -300,12 +300,6 @@ func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *tg.ReplyInline
 		tg.Button.Data(adminModeStatus, "set:adminmode"),
 	)
 
-	// Cmd Delete
-	cmdDeleteStatus := utils.IfElse(s.CommandDelete, "enabled", "disabled")
-	kb.AddRow(
-		tg.Button.Data(F(chatID, "settings_btn_cmddelete"), "info:cmddelete"),
-		tg.Button.Data(F(chatID, cmdDeleteStatus), "set:cmddelete"),
-	)
 
 	// Play Mode
 	playModeStatus := F(
@@ -320,6 +314,13 @@ func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *tg.ReplyInline
 	kb.AddRow(
 		tg.Button.Data(F(chatID, "settings_btn_playmode"), "info:playmode"),
 		tg.Button.Data(playModeStatus, "set:playmode"),
+	)
+
+	// Cmd Delete
+	cmdDeleteStatus := utils.IfElse(s.CommandDelete, "enabled", "disabled")
+	kb.AddRow(
+		tg.Button.Data(F(chatID, "settings_btn_cmddelete"), "info:cmddelete"),
+		tg.Button.Data(F(chatID, cmdDeleteStatus), "set:cmddelete"),
 	)
 
 	// Thumbnails
