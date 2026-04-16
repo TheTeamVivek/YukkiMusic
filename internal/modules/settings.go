@@ -314,7 +314,7 @@ func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *tg.ReplyInline
 	cmdDeleteStatus := utils.IfElse(s.CommandDelete, "enabled", "disabled")
 	kb.AddRow(
 		tg.Button.Data(F(chatID, "settings_btn_cmddelete"), "info:cmddelete"),
-		tg.Button.Data(cmdDeleteStatus, "set:cmddelete"),
+		tg.Button.Data(F(chatID, cmdDeleteStatus), "set:cmddelete"),
 	)
 
 	// Thumbnails
@@ -322,7 +322,7 @@ func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *tg.ReplyInline
 
 	kb.AddRow(
 		tg.Button.Data(F(chatID, "settings_btn_nothumb"), "info:nothumb"),
-		tg.Button.Data(thumbStatus, "set:nothumb"),
+		tg.Button.Data(F(chatID, thumbStatus), "set:nothumb"),
 	)
 
 	// Language
