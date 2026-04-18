@@ -583,8 +583,6 @@ func updatePlaybackMessage(
 		})
 	}
 
-	editMessage(cb, msgText)
-
 	if _, err := cb.Edit(msgText, &tg.SendOptions{
 		ParseMode:   "HTML",
 		ReplyMarkup: core.GetPlayMarkup(cb.ChannelID(), r, false),
