@@ -513,6 +513,9 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 
 	bot.AddActionHandler(handleActions)
 
+	bot.On("action", func(m *telegram.NewMessage)error{ fmt.Println(m.Marshal()); return nil})
+
+
 	assistants.ForEach(func(a *core.Assistant) {
 		a.Ntg.OnStreamEnd(streamEndHandler)
 	})
