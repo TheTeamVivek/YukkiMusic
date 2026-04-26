@@ -300,7 +300,6 @@ func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *tg.ReplyInline
 		tg.Button.Data(adminModeStatus, "set:adminmode"),
 	)
 
-
 	// Play Mode
 	playModeStatus := F(
 		chatID,

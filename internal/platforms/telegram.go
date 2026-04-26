@@ -239,15 +239,6 @@ func (t *TelegramPlatform) resolveUserProfileMusic(
 	return doc, nil
 }
 
-func (*TelegramPlatform) CanSearch() bool { return false }
-
-func (*TelegramPlatform) Search(
-	string,
-	bool,
-) ([]*state.Track, error) {
-	return nil, nil
-}
-
 func (t *TelegramPlatform) GetTracksByMessage(
 	msg *telegram.NewMessage,
 ) (*state.Track, error) {

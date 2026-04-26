@@ -19,14 +19,11 @@ package modules
 
 import (
 	"fmt"
-	"log"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
 	"main/internal/core"
-	"main/internal/database"
 )
 
 type MsgHandlerDef struct {
@@ -513,8 +510,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 
 	bot.AddActionHandler(handleActions)
 
-	bot.On("action", func(m *telegram.NewMessage)error{ fmt.Println(m.Marshal()); return nil})
-
+	bot.On("action", func(m *telegram.NewMessage) error { fmt.Println(m.Marshal()); return nil })
 
 	assistants.ForEach(func(a *core.Assistant) {
 		a.Ntg.OnStreamEnd(streamEndHandler)
@@ -551,54 +547,5 @@ First configure channel using: <code>/channelplay --set [channel_id]</code>
 <b>💡 Note:</b>
 This command affects the linked channel's voice chat, not the current group.`, baseCmd, baseHelp)
 		}
-	}
-}
-
-func setBotCommands(bot *telegram.Client) {
-	// Set commands for normal users in private chats
-	if _, err := bot.BotsSetBotCommands(&telegram.BotCommandScopeUsers{}, "", AllCommands.PrivateUserCommands); err != nil {
-		gologging.Error("Failed to set PrivateUserCommands " + err.Error())
-	}
-
-	// Set commands for normal users in group chats
-	if _, err := bot.BotsSetBotCommands(&telegram.BotCommandScopeChats{}, "", AllCommands.GroupUserCommands); err != nil {
-		gologging.Error("Failed to set GroupUserCommands " + err.Error())
-	}
-
-	// Set commands for chat admins
-	if _, err := bot.BotsSetBotCommands(
-		&telegram.BotCommandScopeChatAdmins{},
-		"",
-		append(AllCommands.GroupUserCommands, AllCommands.GroupAdminCommands...),
-	); err != nil {
-		gologging.Error("Failed to set GroupAdminCommands " + err.Error())
-	}
-
-	// Set commands for sudo users in their private chat
-	sudoers, err := database.Sudoers()
-	if err != nil {
-		log.Printf("Failed to get sudoers for setting commands: %v", err)
-	} else {
-		sudoCommands := append(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands...)
-		for _, sudoer := range sudoers {
-			if _, err := bot.BotsSetBotCommands(&telegram.BotCommandScopePeer{
-				Peer: &telegram.InputPeerUser{UserID: sudoer, AccessHash: 0},
-			},
-				"",
-				sudoCommands,
-			); err != nil {
-				gologging.Error("Failed to set PrivateSudoCommands " + err.Error())
-			}
-		}
-	}
-
-	ownerCommands := append(
-		AllCommands.PrivateUserCommands,
-		AllCommands.PrivateSudoCommands...)
-	ownerCommands = append(ownerCommands, AllCommands.PrivateOwnerCommands...)
-	if _, err := bot.BotsSetBotCommands(&telegram.BotCommandScopePeer{
-		Peer: &telegram.InputPeerUser{UserID: config.OwnerID, AccessHash: 0},
-	}, "", ownerCommands); err != nil {
-		gologging.Error("Failed to set PrivateOwnerCommands " + err.Error())
 	}
 }

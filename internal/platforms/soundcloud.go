@@ -193,14 +193,6 @@ func (s *SoundCloudPlatform) Download(
 	return path, nil
 }
 
-func (*SoundCloudPlatform) CanSearch() bool { return false } // can but for now not needed
-func (*SoundCloudPlatform) Search(
-	string,
-	bool,
-) ([]*state.Track, error) {
-	return nil, nil
-}
-
 func (s *SoundCloudPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()

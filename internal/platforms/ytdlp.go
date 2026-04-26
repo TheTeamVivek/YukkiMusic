@@ -316,15 +316,6 @@ func (y *YtdlpPlatform) Download(
 	return path, nil
 }
 
-func (*YtdlpPlatform) CanSearch() bool { return false }
-
-func (*YtdlpPlatform) Search(
-	string,
-	bool,
-) ([]*state.Track, error) {
-	return nil, nil
-}
-
 // extractMetadata uses yt-dlp to extract video/audio metadata
 func (y *YtdlpPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)

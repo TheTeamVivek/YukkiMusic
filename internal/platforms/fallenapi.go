@@ -120,15 +120,6 @@ func (f *FallenApiPlatform) Download(
 	return path, nil
 }
 
-func (*FallenApiPlatform) CanSearch() bool { return false }
-
-func (*FallenApiPlatform) Search(
-	string,
-	bool,
-) ([]*state.Track, error) {
-	return nil, nil
-}
-
 func (f *FallenApiPlatform) getDownloadURL(
 	ctx context.Context,
 	mediaURL string,

@@ -34,10 +34,9 @@ var (
 	settingsColl     *mongo.Collection
 	chatSettingsColl *mongo.Collection
 
-	logger  = gologging.GetLogger("Database")
-	dbCache = utils.NewCache[string, any](60 * time.Minute)
+	logger            = gologging.GetLogger("Database")
+	dbCache           = utils.NewCache[string, any](60 * time.Minute)
 	chatSettingsCache = utils.NewCache[int64, *ChatSettings](60 * time.Minute)
-
 )
 
 func Init(mongoURL string) (func(), error) {

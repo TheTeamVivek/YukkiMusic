@@ -79,10 +79,7 @@ func emptyCBHandler(cb *tg.CallbackQuery) error {
 func roomHandle(cb *tg.CallbackQuery) error {
 	opt := &tg.CallbackOptions{Alert: true}
 	data := cb.DataString()
-
-	// Parse action type
-	action := strings.TrimPrefix(data, "croom:")
-	action = strings.TrimPrefix(action, "room:")
+	action := parseRoomAction(data)
 
 	if action == "" {
 		gologging.WarnF("Missing action in data: %s", data)
@@ -112,7 +109,9 @@ func roomHandle(cb *tg.CallbackQuery) error {
 	if err != nil {
 		if strings.Contains(err.Error(), "no active room") {
 			cb.Answer(F(cb.ChannelID(), "room_not_active_cb"), opt)
-			editMessage(cb, F(cb.ChannelID(), "room_no_active"))
+			if _, editErr := cb.Edit(F(cb.ChannelID(), "room_no_active")); editErr != nil {
+				gologging.ErrorF("Edit error: %v", editErr)
+			}
 		} else {
 			cb.Answer(err.Error(), opt)
 		}
@@ -193,18 +192,15 @@ func checkFloodControl(
 	return true
 }
 
-func editMessage(cb *tg.CallbackQuery, text string) {
-	if _, err := cb.Edit(text); err != nil {
-		gologging.ErrorF("Edit error: %v", err)
+func parseRoomAction(data string) string {
+	switch {
+	case strings.HasPrefix(data, "croom:"):
+		return strings.TrimPrefix(data, "croom:")
+	case strings.HasPrefix(data, "room:"):
+		return strings.TrimPrefix(data, "room:")
+	default:
+		return ""
 	}
-}
-
-func replyToCallback(cb *tg.CallbackQuery, text string) {
-	msg, err := cb.GetMessage()
-	if err != nil {
-		return
-	}
-	msg.Reply(text)
 }
 
 // Action handlers
@@ -326,9 +322,11 @@ func handleReplayAction(
 	statusMsg, _ = utils.EOR(statusMsg, msgText, optSend)
 	r.SetStatusMsg(statusMsg)
 
-	editMessage(cb, F(cb.ChannelID(), "cb_replay_edited", locales.Arg{
+	if _, err := cb.Edit(F(cb.ChannelID(), "cb_replay_edited", locales.Arg{
 		"user": utils.MentionHTML(cb.Sender),
-	}))
+	})); err != nil {
+		gologging.ErrorF("Edit error: %v", err)
+	}
 	return tg.ErrEndGroup
 }
 
@@ -343,9 +341,11 @@ func handleSkipAction(
 
 	if len(r.Queue()) == 0 {
 		core.DeleteRoom(r.ChatID())
-		editMessage(cb, F(cb.ChannelID(), "skip_stopped", locales.Arg{
+		if _, err := cb.Edit(F(cb.ChannelID(), "skip_stopped", locales.Arg{
 			"user": utils.MentionHTML(cb.Sender),
-		}))
+		})); err != nil {
+			gologging.ErrorF("Edit error: %v", err)
+		}
 		cb.Answer(F(cb.ChannelID(), "cb_skip_queue_empty"), opt)
 		return tg.ErrEndGroup
 	}
@@ -429,9 +429,11 @@ func handleStopAction(
 	core.DeleteRoom(r.ChatID())
 
 	cb.Answer(F(cb.ChannelID(), "cb_stop_success"), opt)
-	editMessage(cb, F(cb.ChannelID(), "stopped", locales.Arg{
+	if _, err := cb.Edit(F(cb.ChannelID(), "stopped", locales.Arg{
 		"user": utils.MentionHTML(cb.Sender),
-	}))
+	})); err != nil {
+		gologging.ErrorF("Edit error: %v", err)
+	}
 
 	return tg.ErrEndGroup
 }
@@ -521,7 +523,7 @@ func handleSeekAction(
 		cb.Answer(F(cb.ChannelID(), "cb_seekback_success", locales.Arg{
 			"seconds": seconds,
 		}), opt)
-		replyToCallback(cb, F(cb.ChannelID(), "cb_seekback_edited", locales.Arg{
+		cb.Reply(F(cb.ChannelID(), "cb_seekback_edited", locales.Arg{
 			"seconds": seconds,
 			"user":    utils.MentionHTML(cb.Sender),
 		}))
@@ -536,7 +538,7 @@ func handleSeekAction(
 		cb.Answer(F(cb.ChannelID(), "cb_seek_success", locales.Arg{
 			"seconds": seconds,
 		}), opt)
-		replyToCallback(cb, F(cb.ChannelID(), "cb_seek_edited", locales.Arg{
+		cb.Reply(F(cb.ChannelID(), "cb_seek_edited", locales.Arg{
 			"seconds": seconds,
 			"user":    utils.MentionHTML(cb.Sender),
 		}))
