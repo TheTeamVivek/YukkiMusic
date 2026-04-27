@@ -118,7 +118,7 @@ func fetchAdmins(c *telegram.Client, chatID int64) ([]int64, error) {
 		return nil, err
 	}
 
-	var ids []int64
+	ids := make([]int64, 0, len(admins))
 	for _, p := range admins {
 		if p.User.Bot || p.User.Deleted {
 			continue
