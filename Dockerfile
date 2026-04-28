@@ -9,7 +9,7 @@ RUN apt-get update && \
         gcc \
         unzip \
         curl \
-    #    zlib1g-dev && \
+        zlib1g-dev && \
     && rm -rf /var/lib/apt/lists/*
 
 COPY go.mod go.sum ./
