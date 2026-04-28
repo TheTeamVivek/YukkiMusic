@@ -27,6 +27,25 @@ import (
 
 var F func(chatID int64, key string, values ...locales.Arg) string // overwritten from main.go
 
+func styleBtn(text, cb string, colour string) (tg.KeyboardButton) {
+    
+    b := tg.Button.Data(text, cb)
+    
+    if config.DisableColour {
+        return b
+    }
+    
+    switch strings.ToLower(colour){
+        case "red":
+          b.Danger()
+        case "blue":
+          b.Primary()
+        case "green":
+          b.Success()
+    }
+    return b
+}
+
 func AddMeMarkup(chatID int64) tg.ReplyMarkup {
 	return tg.NewKeyboard().
 		AddRow(
@@ -189,10 +208,7 @@ func GetHelpKeyboard(chatID int64) *tg.ReplyInlineMarkup {
 			),
 		).
 		AddRow(
-			tg.Button.Data(
-				F(chatID, "BACK_BTN"),
-				"start",
-			),
+			styleBtn(F(chatID, "BACK_BTN"), "start", "blue"),
 		).
 		Build()
 }
@@ -200,10 +216,7 @@ func GetHelpKeyboard(chatID int64) *tg.ReplyInlineMarkup {
 func GetBackKeyboard(chatID int64) *tg.ReplyInlineMarkup {
 	return tg.NewKeyboard().
 		AddRow(
-			tg.Button.Data(
-				F(chatID, "BACK_BTN"),
-				"help:main",
-			),
+			styleBtn(F(chatID, "BACK_BTN"), "help:main", "blue"),
 		).
 		Build()
 }

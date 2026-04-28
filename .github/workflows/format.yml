@@ -41,7 +41,7 @@ jobs:
           goimports -w .
           gci write . -s standard -s default -s "prefix(main)"
           gofumpt -w -extra .
-          golines -w --max-len=90 .
+          golines -w --max-len=120 .
           go mod tidy
 
       - name: Commit changes
