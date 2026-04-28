@@ -5,7 +5,6 @@ WORKDIR /build
 # hadolint ignore=DL3015
 RUN apt-get update && \
     apt-get install -y \
-       # gcc \
         unzip \
         curl \
         zlib1g-dev && \
@@ -28,9 +27,9 @@ RUN apt-get update && \
     apt-get install -y \
         ffmpeg \
         curl \
-        unzip \
-        zlib1g && \
-    rm -rf /var/lib/apt/lists/*
+       # unzip \
+       # zlib1g && \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 
