@@ -53,6 +53,7 @@ These must be set for the bot to start.
 | `MAX_AUTH_USERS` | `25` | Max number of non-admin users allowed to control playback. |
 | `LEAVE_ON_DEMOTED`| `false` | If `true`, the bot leaves the group if its admin rights are removed. |
 | `SET_CMDS` | `false` | Automatically set bot commands in Telegram UI on startup. |
+| `DISABLE_COLOUR` | `false` | If `true`, disables Telegram inline button colour styling (`Primary/Success/Danger`). |
 | `COOKIES_LINK` | `""` | URL to a `yt-dlp` cookies file (e.g., via batbin). |
 
 ## 🎨 Customization

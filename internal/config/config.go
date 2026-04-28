@@ -30,7 +30,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// TODO: Update docs and upd sample.env app.json
 var (
 	APIID          int32
 	APIHash        string

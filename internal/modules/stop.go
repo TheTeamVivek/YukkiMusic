@@ -18,6 +18,9 @@
 package modules
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"
@@ -25,7 +28,7 @@ import (
 	"main/internal/utils"
 )
 
-// TODO: jab song muted ya paused ho to stop mein user ko batao ki song [muted/paused] hai to tumhe [resume/unmute] karna hai ya stop??
+const stopConfirmSuggestionCooldown = 4 * time.Second
 
 func init() {
 	helpTexts["/end"] = `<i>Stop playback and leave the voice chat.</i>
@@ -69,17 +72,24 @@ func handleStop(m *telegram.NewMessage, cplay bool) error {
 	isMuted := r.IsMuted()
 
 	if isPaused || isMuted {
-		msgKey := "stop_confirm_paused"
-		if isMuted {
-			msgKey = "stop_confirm_muted"
+		stopSuggestFloodKey := fmt.Sprintf(
+			"stop_suggest:%d",
+			r.ID(),
+		)
+		if utils.GetFlood(stopSuggestFloodKey) <= 0 {
+			utils.SetFlood(stopSuggestFloodKey, stopConfirmSuggestionCooldown)
+			msgKey := "stop_confirm_paused"
+			if isMuted {
+				msgKey = "stop_confirm_muted"
+			}
+			m.Reply(F(m.ChannelID(), msgKey), &telegram.SendOptions{
+				ReplyMarkup: core.GetStopConfirmMarkup(m.ChannelID(), r, isPaused),
+			})
+			return telegram.ErrEndGroup
 		}
-		m.Reply(F(m.ChannelID(), msgKey), &telegram.SendOptions{
-			ReplyMarkup: core.GetStopConfirmMarkup(m.ChannelID(), r, isPaused),
-		})
-		return telegram.ErrEndGroup
 	}
 
-	core.DeleteRoom(r.ChatID())
+	core.DeleteRoom(r.ID())
 	m.Reply(
 		F(
 			m.ChannelID(),

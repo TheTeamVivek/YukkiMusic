@@ -79,33 +79,19 @@ func emptyCBHandler(cb *tg.CallbackQuery) error {
 func roomHandle(cb *tg.CallbackQuery) error {
 	opt := &tg.CallbackOptions{Alert: true}
 	data := cb.DataString()
-	action := parseRoomAction(data)
+	roomID, action := parseRoomAction(data)
 
-	if action == "" {
-		gologging.WarnF("Missing action in data: %s", data)
+	if roomID == 0 || action == "" {
+		gologging.WarnF("Invalid room callback payload: %s", data)
 		cb.Answer(F(cb.ChannelID(), "invalid_request"), opt)
+		cb.Delete()
 		return tg.ErrEndGroup
 	}
 
 	chatID := cb.ChannelID()
 
-	// Handle cplay mode
-	if strings.HasPrefix(cb.DataString(), "croom:") {
-		realChatID, err := database.LinkedChannel(chatID)
-		if err != nil {
-			gologging.ErrorF(
-				"Failed to get chat ID for cplay ID %d: %v",
-				chatID,
-				err,
-			)
-			cb.Answer(F(chatID, "room_not_linked"), opt)
-			return tg.ErrEndGroup
-		}
-		chatID = realChatID
-	}
-
 	// Get room
-	r, err := getRoomForCallback(chatID)
+	r, err := getRoomForCallback(roomID)
 	if err != nil {
 		if strings.Contains(err.Error(), "no active room") {
 			cb.Answer(F(cb.ChannelID(), "room_not_active_cb"), opt)
@@ -192,15 +178,23 @@ func checkFloodControl(
 	return true
 }
 
-func parseRoomAction(data string) string {
-	switch {
-	case strings.HasPrefix(data, "croom:"):
-		return strings.TrimPrefix(data, "croom:")
-	case strings.HasPrefix(data, "room:"):
-		return strings.TrimPrefix(data, "room:")
-	default:
-		return ""
+func parseRoomAction(data string) (int64, string) {
+	if !strings.HasPrefix(data, "room:") {
+		return 0, ""
 	}
+
+	body := strings.TrimPrefix(data, "room:")
+	parts := strings.SplitN(body, ":", 2)
+	if len(parts) != 2 {
+		return 0, body
+	}
+
+	roomID, err := strconv.ParseInt(parts[0], 10, 64)
+	if err != nil {
+		return 0, parts[1]
+	}
+
+	return roomID, parts[1]
 }
 
 // Action handlers
@@ -340,7 +334,7 @@ func handleSkipAction(
 	gologging.InfoF("Callback → skip, chatID=%d", chatID)
 
 	if len(r.Queue()) == 0 {
-		core.DeleteRoom(r.ChatID())
+		core.DeleteRoom(r.ID())
 		if _, err := cb.Edit(F(cb.ChannelID(), "skip_stopped", locales.Arg{
 			"user": utils.MentionHTML(cb.Sender),
 		})); err != nil {
@@ -367,7 +361,7 @@ func handleSkipAction(
 			}),
 		)
 		cb.Answer(F(cb.ChannelID(), "cb_skip_download_failed"), opt)
-		core.DeleteRoom(r.ChatID())
+		core.DeleteRoom(r.ID())
 
 		return tg.ErrEndGroup
 	}
@@ -376,7 +370,7 @@ func handleSkipAction(
 		gologging.ErrorF("Play error: %v", err)
 		utils.EOR(statusMsg, F(cb.ChannelID(), "stream_play_fail"))
 		cb.Answer(F(cb.ChannelID(), "cb_skip_play_failed"), opt)
-		core.DeleteRoom(r.ChatID())
+		core.DeleteRoom(r.ID())
 
 		return tg.ErrEndGroup
 	}
@@ -426,7 +420,7 @@ func handleStopAction(
 
 	gologging.InfoF("Callback → stop, chatID=%d", chatID)
 
-	core.DeleteRoom(r.ChatID())
+	core.DeleteRoom(r.ID())
 
 	cb.Answer(F(cb.ChannelID(), "cb_stop_success"), opt)
 	if _, err := cb.Edit(F(cb.ChannelID(), "stopped", locales.Arg{

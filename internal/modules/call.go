@@ -61,7 +61,7 @@ func streamEndHandler(
 	r.SetData("is_transitioning", true)
 	defer r.DeleteData("is_transitioning")
 
-	cid := r.EffectiveChatID()
+	cid := r.ChatID()
 	r.Parse()
 
 	var t *state.Track

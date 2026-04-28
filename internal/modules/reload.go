@@ -73,7 +73,7 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	chatID := m.ChannelID()
-	roomID := r.ChatID()
+	roomID := r.ID()
 
 	if handled, err := checkReloadFlood(m, chatID, roomID); handled {
 		return err

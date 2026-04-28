@@ -66,6 +66,11 @@
             "value": "7",
             "required": false
         },
+        "DISABLE_COLOUR": {
+            "description": "Disable coloured inline button styles in Telegram when set to true.",
+            "value": "false",
+            "required": false
+        },
         "START_IMG_URL": {
             "description": "URL of the image to be displayed on the start message.",
             "required": false

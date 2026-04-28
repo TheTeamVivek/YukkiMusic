@@ -18,6 +18,7 @@
 package core
 
 import (
+	"fmt"
 	"strings"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
@@ -88,10 +89,7 @@ func GetStopConfirmMarkup(
 	isPaused bool,
 ) tg.ReplyMarkup {
 	btn := tg.NewKeyboard()
-	prefix := "room:"
-	if r.ChannelPlayID() != 0 {
-		prefix = "croom:"
-	}
+	prefix := fmt.Sprintf("room:%d:", r.ID())
 
 	text, cb := "CONFIRM_UNMUTE_BTN", prefix+"unmute"
 
@@ -109,10 +107,7 @@ func GetStopConfirmMarkup(
 
 func GetPlayMarkup(chatID int64, r *RoomState, queued bool) tg.ReplyMarkup {
 	btn := tg.NewKeyboard()
-	prefix := "room:"
-	if r.ChannelPlayID() != 0 {
-		prefix = "croom:"
-	}
+	prefix := fmt.Sprintf("room:%d:", r.ID())
 	track := r.Track()
 	duration := 0
 	if track != nil {
@@ -139,9 +134,9 @@ func GetPlayMarkup(chatID int64, r *RoomState, queued bool) tg.ReplyMarkup {
 	)
 
 	btn.AddRow(
-		tg.Button.Data("↩ 15s", "room:seekback_15"),
-		tg.Button.Data("⟳", "room:replay"),
-		tg.Button.Data("15s ↪", "room:seek_15"),
+		tg.Button.Data("↩ 15s", prefix+"seekback_15"),
+		tg.Button.Data("⟳", prefix+"replay"),
+		tg.Button.Data("15s ↪", prefix+"seek_15"),
 	)
 
 	btn.AddRow(

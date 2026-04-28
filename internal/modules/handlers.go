@@ -409,8 +409,8 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
-		Pattern: "channelplay",
-		Handler: channelPlayHandler,
+		Pattern: "(channelplay|setcplay)",
+		Handler: setCPlayHandler,
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
@@ -481,7 +481,7 @@ var cbHandlers = []CbHandlerDef{
 	{Pattern: "^cancel$", Handler: cancelHandler},
 	{Pattern: "^bcast_cancel$", Handler: broadcastCancelCB},
 
-	{Pattern: `^room:(\w+)$`, Handler: roomHandle},
+	{Pattern: `^room:-?\d+:\w+$`, Handler: roomHandle},
 	{Pattern: "progress", Handler: emptyCBHandler},
 	{Pattern: "^(set|info):", Handler: settingsCallbackHandler},
 }
@@ -540,7 +540,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 			helpTexts[cmd] = fmt.Sprintf(`<i>Channel play variant of %s</i>
 
 <b>⚙️ Requires:</b>
-First configure channel using: <code>/channelplay --set [channel_id]</code>
+First configure channel using: <code>/setcplay [channel_id]</code>
 
 %s
 

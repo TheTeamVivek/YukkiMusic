@@ -105,8 +105,8 @@ broadcast_cancel_done: "🚫 تم إلغاء البث."
 
 # 🎧 CPlay (Channel Play)
 
-cplay_id_not_set: "⚠️ لم يتم تعيين معرف cplay.\nاستخدم <code>/cplay --set &lt;chat_id&gt;</code> لتعيينه."
-cplay_usage: "<b>الاستخدام:</b> <code>/cplay --set &lt;channel_id&gt;</code>"
+cplay_id_not_set: "⚠️ لم يتم تعيين معرف cplay.\nاستخدم <code>/setcplay &lt;chat_id&gt;</code> لتعيينه."
+cplay_usage: "<b>الاستخدام:</b> <code>/setcplay &lt;channel_id&gt;</code>"
 cplay_invalid_chat_id: "<b>معرف محادثة غير صالح:</b> يرجى تقديم معرف رقمي صحيح للقناة."
 cplay_resolve_peer_fail: "<b>فشل جلب الأطراف:</b> تعذر جلب تفاصيل القناة. تأكد من أنني أملك صلاحية الوصول إلى هذه القناة."
 cplay_invalid_target: "<b>هدف غير صالح:</b> المعرف المقدم ليس قناة صالحة."
@@ -493,7 +493,6 @@ play_added_to_queue_single: |
   <b>▫ المدة:</b> {duration}
   <b>▫ طلب بواسطة:</b> {by}
 
-channel_play_depreciated: "⚠️ هذا المعالج قديم. استخدم <code>/cplay --set channel_id</code> لتعيين قناتك للتشغيل."
 play_multiple_tracks_too_long_header: "<b>⚠️ تم تخطي {count} مقاطع (المدة القصوى {limit_mins} دقيقة):</b>"
 play_multiple_tracks_too_long_item: "— <i>{title}</i>"
 play_multiple_tracks_too_long_more: "... و {remaining} أكثر."
@@ -1029,6 +1028,7 @@ help_admin: |
   <b>الأوامر:</b>
   <blockquote>
   <b>/playmode</b> - التحكم في من يمكنه استخدام /play
+  <b>/cplay</b> - تشغيل في المحادثة الصوتية للقناة المرتبطة
   <b>/adminmode</b> - التحكم في من يمكنه استخدام أوامر الإدارة
   <b>/cmddelete</b> - تبديل الحذف التلقائي لأوامر البوت
   <b>/settings</b> - تكوين إعدادات الدردشة

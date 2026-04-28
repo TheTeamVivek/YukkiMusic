@@ -104,8 +104,8 @@ broadcast_cancel_done: "🚫 प्रसारण रद्द कर दिय
 
 # 🎧 CPlay (Channel Play)
 
-cplay_id_not_set: "⚠️ चैनल प्ले निर्धारित नहीं है।\nइसे निर्धारित करने के लिए <code>/cplay --set [channel_id]</code> का प्रयोग करें।"
-cplay_usage: "<b>प्रयोग:</b> <code>/cplay --set [channel_id]</code>"
+cplay_id_not_set: "⚠️ चैनल प्ले निर्धारित नहीं है।\nइसे निर्धारित करने के लिए <code>/setcplay [channel_id]</code> का प्रयोग करें।"
+cplay_usage: "<b>प्रयोग:</b> <code>/setcplay [channel_id]</code>"
 cplay_invalid_chat_id: "<b>अमान्य वार्तालाप परिचय पत्र:</b> कृपया चैनलप्ले के लिए एक मान्य पूर्णांक परिचय पत्र प्रदान करें।"
 cplay_resolve_peer_fail: "<b>चैनल जानकारी प्राप्त करने में विफल:</b> चैनल विवरण प्राप्त नहीं किया जा सका। सुनिश्चित करें कि मेरी इस चैनल तक पहुँच है।"
 cplay_invalid_target: "<b>अमान्य लक्ष्य:</b> प्रदान किया गया परिचय पत्र एक मान्य चैनल नहीं है।"
@@ -495,7 +495,6 @@ play_added_to_queue_single: |
   <b>▫ अवधि:</b> {duration}
   <b>▫ अनुरुद्धकर्ता:</b> {by}
 
-channel_play_depreciated: "⚠️ यह नियन्त्रक अब पुराना हो चुका है। संगीत के लिए अपना प्रणाल निर्धारित करने हेतु <code>/cplay --set [channel_id]</code> का प्रयोग करें।"
 play_multiple_tracks_too_long_header: "<b>⚠️ {count} संगीत छोड़ दिए गए (अधिकतम अवधि {limit_mins} मिनट):</b>"
 play_multiple_tracks_too_long_item: "— <i>{title}</i>"
 play_multiple_tracks_too_long_more: "... और {remaining} अन्य।"
@@ -1031,6 +1030,7 @@ help_admin: |
   <b>आदेश:</b>
   <blockquote>
   <b>/playmode</b> - संगीत संचालन विधा नियन्त्रित करें
+  <b>/cplay</b> - सम्बद्ध चैनल के ध्वनि वार्तालाप में चलाएँ
   <b>/adminmode</b> - प्रशासकीय आदेश विधा नियन्त्रित करें
   <b>/cmddelete</b> - आदेशों के स्वचालित विलोपन को सक्षम या अक्षम करें
   <b>/settings</b> - वार्तालाप विन्यास विन्यस्त करें

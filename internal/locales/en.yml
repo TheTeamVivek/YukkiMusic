@@ -104,8 +104,8 @@ broadcast_cancel_done: "🚫 Broadcast cancelled."
 
 # 🎧 CPlay (Channel Play)
 
-cplay_id_not_set: "⚠️ cplay ID not set.\nUse <code>/cplay --set &lt;chat_id&gt;</code> to set it."
-cplay_usage: "<b>Usage:</b> <code>/cplay --set &lt;channel_id&gt;</code>"
+cplay_id_not_set: "⚠️ cplay ID not set.\nUse <code>/setcplay &lt;chat_id&gt;</code> to set it."
+cplay_usage: "<b>Usage:</b> <code>/setcplay &lt;channel_id&gt;</code>"
 cplay_invalid_chat_id: "<b>Invalid Chat ID:</b> Please provide a valid integer ID for the channel."
 cplay_resolve_peer_fail: "<b>Failed to resolve peer:</b> Could not fetch channel details. Ensure I can access this channel."
 cplay_invalid_target: "<b>Invalid Target:</b> The provided ID is not a valid channel."
@@ -493,7 +493,6 @@ play_added_to_queue_single: |
   <b>▫ Duration:</b> {duration}
   <b>▫ Requested by:</b> {by}
 
-channel_play_depreciated: "⚠️ This handler is deprecated. Use <code>/cplay --set channel_id</code> to set your channel for playback."
 play_multiple_tracks_too_long_header: "<b>⚠️ {count} tracks were skipped (max duration {limit_mins} mins):</b>"
 play_multiple_tracks_too_long_item: "— <i>{title}</i>"
 play_multiple_tracks_too_long_more: "... and {remaining} more."
@@ -1032,6 +1031,7 @@ help_admin: |
   <b>Commands:</b>
   <blockquote>
   <b>/playmode</b> - Control who can use /play
+  <b>/cplay</b> - Play in linked channel voice chat
   <b>/adminmode</b> - Control who can use admin commands
   <b>/cmddelete</b> - Toggle automatic deletion of bot commands
   <b>/settings</b> - Configure chat settings

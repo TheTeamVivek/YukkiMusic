@@ -68,7 +68,7 @@ func (r *RoomState) releaseFile() {
 	track := r.track
 
 	roomsMu.RLock()
-	used := isTrackUsed(track.ID, r.chatID)
+	used := isTrackUsed(track.ID, r.id)
 	roomsMu.RUnlock()
 
 	if used {
@@ -105,7 +105,7 @@ func (r *RoomState) cleanupFile() {
 		}
 
 		roomsMu.RLock()
-		used := isTrackUsed(t.ID, r.chatID)
+		used := isTrackUsed(t.ID, r.id)
 		roomsMu.RUnlock()
 
 		if used {

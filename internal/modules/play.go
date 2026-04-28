@@ -127,7 +127,7 @@ Immediate video playback when something urgent needs to be shown.`
 <b>/cplay [query]</b> — Play in linked channel
 
 <b>⚙️ Setup Required:</b>
-First use <code>/channelplay --set [channel_id]</code>
+First use <code>/setcplay [channel_id]</code>
 
 <b>⚠️ Note:</b>
 All c* commands work the same as regular commands but affect the linked channel.`
@@ -135,7 +135,7 @@ All c* commands work the same as regular commands but affect the linked channel.
 	helpTexts["/channelplay"] = `<i>Configure linked channel for channel play mode.</i>
 
 <u>Usage:</u>
-<b>/channelplay --set [channel_id]</b> — Set linked channel
+<b>/channelplay [channel_id]</b> — Set linked channel
 
 <b>⚙️ Behavior:</b>
 • Links a channel to current group
@@ -146,21 +146,17 @@ All c* commands work the same as regular commands but affect the linked channel.
 • Only <b>chat admins</b> can configure
 
 <b>💡 Examples:</b>
-<code>/channelplay --set -1001234567890</code>
+<code>/setcplay -1001234567890</code>
 
 <b>⚠️ Notes:</b>
 • Get channel ID using forward + @userinfobot
 • Bot must be admin in linked channel
 • Use <code>/cplay</code> after setup`
+	helpTexts["/setcplay"] = helpTexts["/channelplay"]
 
 	helpTexts["/playforce"] = helpTexts["/fplay"]
 	helpTexts["/fcplay"] = helpTexts["/cfplay"]
 	helpTexts["/cvplay"] = helpTexts["/vcplay"]
-}
-
-func channelPlayHandler(m *tg.NewMessage) error {
-	m.Reply(F(m.ChannelID(), "channel_play_depreciated"))
-	return tg.ErrEndGroup
 }
 
 func playHandler(m *tg.NewMessage) error { return handlePlay(m, &playOpts{}) }
@@ -200,71 +196,7 @@ func fvcplayHandler(m *tg.NewMessage) error {
 }
 
 func cplayHandler(m *tg.NewMessage) error {
-	if handled := trySetChannelPlay(m); handled {
-		return tg.ErrEndGroup
-	}
 	return handlePlay(m, &playOpts{CPlay: true})
-}
-
-func trySetChannelPlay(m *tg.NewMessage) bool {
-	args := strings.Fields(m.Text())
-	if len(args) <= 1 || args[1] != "--set" {
-		return false
-	}
-
-	chatID := m.ChannelID()
-	if len(args) < 3 {
-		m.Reply(F(chatID, "cplay_usage"), &tg.SendOptions{ParseMode: "HTML"})
-		return true
-	}
-
-	channelID, err := strconv.ParseInt(args[2], 10, 64)
-	if err != nil {
-		m.Reply(F(chatID, "cplay_invalid_chat_id"), &tg.SendOptions{ParseMode: "HTML"})
-		return true
-	}
-
-	if err := assertChannelAccessible(m, channelID); err != nil {
-		m.Reply(err.Error(), &tg.SendOptions{ParseMode: "HTML"})
-		return true
-	}
-
-	if err := database.LinkChannel(chatID, channelID); err != nil {
-		gologging.ErrorF("Failed to set cplay ID for chat %d: %v", chatID, err)
-		m.Reply(F(chatID, "cplay_save_error"), &tg.SendOptions{ParseMode: "HTML"})
-		return true
-	}
-
-	m.Reply(
-		F(chatID, "cplay_enabled", locales.Arg{"channel_id": channelID}),
-		&tg.SendOptions{ParseMode: "HTML"},
-	)
-	return true
-}
-
-func assertChannelAccessible(m *tg.NewMessage, channelID int64) error {
-	chatID := m.ChannelID()
-
-	peer, err := m.Client.ResolvePeer(channelID)
-	if err != nil {
-		return fmt.Errorf(F(chatID, "cplay_resolve_peer_fail"))
-	}
-
-	chPeer, ok := peer.(*tg.InputPeerChannel)
-	if !ok {
-		return fmt.Errorf(F(chatID, "cplay_invalid_target"))
-	}
-
-	fullChat, err := m.Client.ChannelsGetFullChannel(&tg.InputChannelObj{
-		ChannelID:  chPeer.ChannelID,
-		AccessHash: chPeer.AccessHash,
-	})
-	if err != nil || fullChat == nil {
-		gologging.ErrorF("Failed to get full channel for cplay ID %d: %v", channelID, err)
-		return fmt.Errorf(F(chatID, "cplay_channel_not_accessible"))
-	}
-
-	return nil
 }
 
 func handlePlay(m *tg.NewMessage, opts *playOpts) error {
@@ -388,7 +320,7 @@ func fetchTracksAndCheckStatus(
 		return nil, false, fmt.Errorf("no tracks found")
 	}
 
-	chatState, err := core.GetChatState(r.ChatID())
+	chatState, err := core.GetChatState(r.ID())
 	if err != nil {
 		gologging.ErrorF("Error getting chat state: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
@@ -836,13 +768,13 @@ func handlePlayAttemptError(
 	if errors.Is(err, ubot.ErrConnectionTimeout) {
 		gologging.Error("Voice connection timeout. Stopping call session...")
 		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_connection_timeout"))
-		core.DeleteRoom(room.ChatID())
+		core.DeleteRoom(room.ID())
 		return true, tg.ErrEndGroup
 	}
 
 	if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
 		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "rtmp_streaming_not_supported"))
-		core.DeleteRoom(room.ChatID())
+		core.DeleteRoom(room.ID())
 		return true, tg.ErrEndGroup
 	}
 
@@ -854,7 +786,7 @@ func handlePlayAttemptError(
 
 	if tg.MatchError(err, "GROUPCALL_INVALID") {
 		gologging.Error("GROUPCALL_INVALID err occurred. Returning...")
-		core.DeleteRoom(room.ChatID())
+		core.DeleteRoom(room.ID())
 		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_unable"))
 		return true, tg.ErrEndGroup
 	}
