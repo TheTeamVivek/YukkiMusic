@@ -209,7 +209,7 @@ func GetHelpKeyboard(chatID int64) *tg.ReplyInlineMarkup {
 			),
 		).
 		AddRow(
-			styleBtn(F(chatID, "BACK_BTN"), "start", "blue"),
+			styleBtn(F(chatID, "BACK_BTN"), "start", ""),
 		).
 		Build()
 }
