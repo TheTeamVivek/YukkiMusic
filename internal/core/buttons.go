@@ -100,8 +100,8 @@ func GetStopConfirmMarkup(
 	}
 
 	btn.AddRow(
-		tg.Button.Data(F(chatID, text), cb),
-		tg.Button.Data(F(chatID, "CONFIRM_STOP_BTN"), prefix+"stop"),
+		styleBtn(F(chatID, text), cb, "green"),
+		styleBtn(F(chatID, "CONFIRM_STOP_BTN"), prefix+"stop", "red"),
 	)
 
 	return btn.Build()
