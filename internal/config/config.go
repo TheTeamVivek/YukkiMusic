@@ -29,6 +29,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/joho/godotenv"
 )
+
 // TODO: Update docs and upd sample.env app.json
 var (
 	APIID          int32
@@ -38,8 +39,8 @@ var (
 	MongoURI       string
 	StringSessions []string
 	SessionType    string
-    
-    DisableColour bool
+
+	DisableColour       bool
 	OwnerID             int64
 	SpotifyClientID     string
 	SpotifyClientSecret string
@@ -114,8 +115,8 @@ func loadConfig() {
 		"STRING_SESSIONS",
 		getStringSlice("STRING_SESSION", nil),
 	)
-    
-    DisableColour = getBool("DISABLE_COLOUR", false)
+
+	DisableColour = getBool("DISABLE_COLOUR", false)
 	OwnerID = getInt64("OWNER_ID", 0)
 	SpotifyClientID = getString("SPOTIFY_CLIENT_ID", "")
 	SpotifyClientSecret = getString("SPOTIFY_CLIENT_SECRET", "")

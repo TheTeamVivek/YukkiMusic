@@ -19,11 +19,12 @@ package modules
 
 import (
 	"log"
-	"main/internal/config"
-	"main/internal/database"
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+
+	"main/internal/config"
+	"main/internal/database"
 )
 
 // BotCommands holds all bot commands separated by user type and chat type.

@@ -18,6 +18,8 @@
 package core
 
 import (
+	"strings"
+
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
@@ -27,23 +29,22 @@ import (
 
 var F func(chatID int64, key string, values ...locales.Arg) string // overwritten from main.go
 
-func styleBtn(text, cb string, colour string) (tg.KeyboardButton) {
-    
-    b := tg.Button.Data(text, cb)
-    
-    if config.DisableColour {
-        return b
-    }
-    
-    switch strings.ToLower(colour){
-        case "red":
-          b.Danger()
-        case "blue":
-          b.Primary()
-        case "green":
-          b.Success()
-    }
-    return b
+func styleBtn(text, cb, colour string) tg.KeyboardButton {
+	b := tg.Button.Data(text, cb)
+
+	if config.DisableColour {
+		return b
+	}
+
+	switch strings.ToLower(colour) {
+	case "red":
+		b.Danger()
+	case "blue":
+		b.Primary()
+	case "green":
+		b.Success()
+	}
+	return b
 }
 
 func AddMeMarkup(chatID int64) tg.ReplyMarkup {

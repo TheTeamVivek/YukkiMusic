@@ -298,7 +298,7 @@ type panicInfo struct {
 	client       *tg.Client
 }
 
-func getPanicInfo(ctx any, r any) panicInfo {
+func getPanicInfo(ctx, r any) panicInfo {
 	var info panicInfo
 	info.errorMessage = html.EscapeString(fmt.Sprint(r))
 
