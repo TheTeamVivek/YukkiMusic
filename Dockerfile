@@ -5,11 +5,11 @@ WORKDIR /build
 # hadolint ignore=DL3015
 RUN apt-get update && \
     apt-get install -y \
-        git \
-        gcc \
+    #    git \
+    #    gcc \
         unzip \
         curl \
-        zlib1g-dev && \
+    #    zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
 
 COPY go.mod go.sum ./
