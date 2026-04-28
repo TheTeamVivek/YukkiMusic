@@ -24,12 +24,11 @@ RUN chmod +x install.sh && \
 FROM debian:bookworm-slim
 
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
         ffmpeg \
         curl \
-        unzip \
-       # zlib1g && \
-    && rm -rf /var/lib/apt/lists/*
+        unzip && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 
