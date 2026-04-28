@@ -83,7 +83,7 @@ func pingHandler(m *tg.NewMessage) error {
 	}
 
 	start := time.Now()
-	reply, err := m.Respond(F(m.ChannelID(), "ping_start"))
+	reply, err := m.Reply(F(m.ChannelID(), "ping_start"))
 	if err != nil {
 		return err
 	}
