@@ -220,9 +220,7 @@ err_assistant_banned: |
 err_admin_permission_required: |
   ⚠️ <b>Admin Permission Required</b>
 
-  I need <i>admin access</i> to manage and check members in this chat.
-  
-  ➤ <b>Promote me with</b> <code>Manage Chat / Invite Users</code> permission.
+  I need admin access with Invite Users permission to manage and invite assistant in this chat.
 
 err_assistant_get_failed: |
   ⚠️ The system could not assign an assistant to this chat.

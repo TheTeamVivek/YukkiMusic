@@ -220,9 +220,7 @@ err_assistant_banned: |
 err_admin_permission_required: |
   ⚠️ <b>Yönetici İzni Gerekli</b>
 
-  Bu sohbetteki üyeleri yönetmek ve kontrol etmek için <i>yönetici erişimine</i> ihtiyacım var.
-  
-  ➤ <b>Beni <code>Sohbeti Yönet / Kullanıcıları Davet Et</code> yetkisiyle yönetici yap.</b>
+  Bu sohbeti yönetmek ve asistanı davet etmek için <i>Kullanıcıları Davet Et</i> izniyle birlikte yönetici erişimine ihtiyacım var.
 
 err_assistant_get_failed: |
   ⚠️ Sistem bu sohbet için bir asistan atayamadı.
