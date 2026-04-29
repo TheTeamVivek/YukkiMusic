@@ -98,6 +98,13 @@ func initBot() error {
 		return fmt.Errorf("failed to fetch bot identity: %w", err)
 	}
 
+                if config.LoggerID != 0 {
+                        _, _ = client.SendMessage(
+                                config.LoggerID,
+                                "Bot Started",
+                        )
+                }
+
 	gologging.InfoF("Bot started as @%s", user.Username)
 
 	Bot = client
