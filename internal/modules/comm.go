@@ -127,7 +127,7 @@ var AllCommands = BotCommands{
 		cmd("loop", "Loop the current song."),
 		cmd("cloop", "Loop the current song in the linked channel."),
 
-                cmd("setcplay", "Configure channelplay for your chat."),
+		cmd("setcplay", "Configure channelplay for your chat."),
 
 		// Settings & access
 		cmd("playmode", "Control who can use /play."),
