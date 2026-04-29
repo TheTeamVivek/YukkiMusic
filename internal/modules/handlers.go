@@ -494,19 +494,19 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 	})
 
 	for _, h := range handlers {
-		bot.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...)/*.
-			SetGroup(100)*/
+		bot.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...) /*.
+		SetGroup(100)*/
 	}
 
 	for _, h := range cbHandlers {
-		bot.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler), h.Filters...)/*.
-			SetGroup(90)*/
+		bot.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler), h.Filters...) /*.
+		SetGroup(90)*/
 	}
 
-	bot.On("edit:/eval", evalHandle)//.SetGroup(80)
-	bot.On("edit:/ev", evalCommandHandler)//.SetGroup(80)
+	bot.On("edit:/eval", evalHandle)       //.SetGroup(80)
+	bot.On("edit:/ev", evalCommandHandler) //.SetGroup(80)
 
-	bot.On("participant", handleParticipantUpdate)//.SetGroup(70)
+	bot.On("participant", handleParticipantUpdate) //.SetGroup(70)
 	bot.On("action", handleChatAction)
 
 	bot.AddActionHandler(handleActions)
