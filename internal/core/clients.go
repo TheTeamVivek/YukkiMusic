@@ -131,7 +131,10 @@ func initAssistants() error {
 			)
 		}
 
-		assistant.Client.SendMessage(Bot.Me().Username, "/start")
+		m , _ := assistant.Client.SendMessage(Bot.Me().Username, "/start")
+if m != nil {
+_,_ = m.Delete()
+}
 		assistant.Client.JoinChannel("TheTeamVivek")
 
 		if assistant.Self.Username != "" {
