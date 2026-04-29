@@ -333,8 +333,6 @@ func setRTMPHandler(m *tg.NewMessage) error {
 		return tg.ErrEndGroup
 	}
 
-	m.Delete()
-
 	switch m.ChatType() {
 	case tg.EntityChat:
 		m.Reply(F(m.ChannelID(), "rtmp_dm_only"))
