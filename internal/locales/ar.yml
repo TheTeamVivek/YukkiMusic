@@ -351,11 +351,8 @@ logger_bot_started: |
   <b>اليوزر:</b> {user_username}
   <b>المعرف:</b> {user_id}
   
-logger_track: "🎧 المقطع:"
-logger_source: "🔗 المصدر:"
-logger_group: "📌 المجموعة:"
-logger_requested_by: "👤 طلب بواسطة:"
-logger_timestamp: "⏳ التاريخ:"
+
+logger_playback_template: "<b>🎧 المقطع:</b> <a href=\"{track_url}\">{track}</a>\n<b>🔗 المصدر:</b> {source}\n<b>📌 المجموعة:</b> {group} ({group_id})\n<b>👤 طلب بواسطة:</b> {requested_by} (<code>{requested_by_id}</code>)"
 
 loop_usage: "🔁 <b>التحكم في التكرار</b>\n\nالاستخدام: {cmd} [العدد]\n• 0 - تعطيل التكرار\n• 1-10 - عدد مرات التكرار\n\n<i>{count_line}</i>"
 loop_invalid: "⚠️ <b>عدد تكرار غير صالح.</b>\nاستخدم 0 للتعطيل أو 1-10 لتحديد عدد مرات التكرار."
@@ -372,20 +369,7 @@ logger_update_fail: "❌ فشل تحديث إعدادات السجل: {error}"
 logger_updated: "✅ أصبح السجل {action} بنجاح."
 
 # Logs module
-logs_invalid_number: "⚠️ <b>رقم غير صالح</b>\n\nالقيمة <code>{value}</code> ليست عدداً موجباً صالحاً.\n\n<b>الاستخدام:</b> <code>/logs [number]</code> أو <code>/logs -old [number]</code>"
-logs_invalid_flag: "⚠️ <b>علامة غير صالحة</b>\n\nعلامة مجهولة أو مدخل غير صالح: <code>{flag}</code>\n\n<b>الخيارات الصالحة:</b>\n• <code>/logs</code> - السجل الكامل\n• <code>/logs [n]</code> - آخر N أسطر\n• <code>/logs -old [n]</code> - أقدم سجل\n• <code>/logs -clear</code> - مسح السجلات"
-logs_file_error: "❌ <b>خطأ في ملف السجل</b>\n\nحدث خطأ أثناء الوصول إلى ملف السجل:\n<code>{error}</code>"
-logs_send_error: "❌ <b>فشل إرسال السجل</b>\n\nتعذر إعداد أو إرسال ملف السجل.\n<code>{error}</code>"
-logs_clear_failed: "❌ <b>فشل المسح</b>\n\nفشل مسح ملف السجل:\n<code>{error}</code>"
-logs_empty: "📭 <b>لا توجد سجلات متاحة</b>\n\nملف السجل إما غير موجود بعد أو موجود ولكنه فارغ.\n\nقم بتشغيل المساعد لفترة لتوليد السجلات."
-logs_preview_header: "📋 <b>معاينة السجل الحالي:</b>"
-logs_lines_header: "📋 <b>آخر أسطر السجل</b> (آخر {count})"
-logs_old_header: "📋 <b>أقدم أسطر السجل</b> (أول {count})"
-logs_uploading: "⏳ <b>جاري رفع ملف السجل...</b>\n\nيرجى الانتظار حتى يتم إعداد الملف."
-logs_file_caption: "📄 <b>تفاصيل ملف السجل</b>\n\n<b>اسم الملف:</b> <code>{filename}</code>\n<b>الحجم:</b> {size_mb} ميجا\n<b>آخر تعديل:</b> {modified}"
-logs_lines_caption: "📋 <b>آخر أسطر السجل</b>\n\nعرض آخر {count} أسطر من السجل الحالي."
-logs_old_caption: "📋 <b>أقدم أسطر السجل</b>\n\nعرض أول {count} أسطر من بداية السجل."
-logs_cleared: "✅ <b>تم مسح ملف السجل</b>\n\nتم مسح ملف السجل بنجاح.\n<b>الحجم السابق:</b> {size_mb} ميجا"
+logs_empty: "لا توجد سجلات"
 
 # reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
 maint: "⚠️ أنا قيد الصيانة حالياً وغير متاح مؤقتاً. يرجى العودة لاحقاً.\n\n{reason}"

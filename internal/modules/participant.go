@@ -56,7 +56,7 @@ func getParticipantStatus(p telegram.ChannelParticipant) string {
 }
 
 func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
-	if isMaintenanceBlocked(p.ActorID()) {
+	if !canBypassMaintenence(p.ActorID()) {
 		return nil
 	}
 

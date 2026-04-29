@@ -23,7 +23,6 @@ import (
 	"html"
 	"runtime/debug"
 	"strings"
-	"time"
 
 	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
@@ -60,16 +59,16 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	return r, nil
 }
 
-func isMaintenanceBlocked(userID int64) bool {
+func canBypassMaintenence(userID int64) bool {
 	isMaint, _ := database.IsMaintenanceEnabled()
 	if !isMaint {
-		return false
+		return true
 	}
 	if userID == config.OwnerID {
-		return false
+		return true
 	}
 	ok, _ := database.IsSudo(userID)
-	return !ok
+	return ok
 }
 
 func shouldShowThumb(chatID int64) bool {
@@ -115,15 +114,12 @@ func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 		return
 	}
 
-	var sb strings.Builder
-	chatID := m.ChannelID()
-
-	header := F(chatID, "logger_playback_started")
+	header := F(m.ChannelID(), "logger_playback_started")
 	if queued {
-		header = F(chatID, "logger_playback_queued")
+		header = F(m.ChannelID(), "logger_playback_queued")
 	}
 
-	// Header
+	var sb strings.Builder
 	sb.WriteString("🎵 ")
 	if m.Channel.Username != "" {
 		fmt.Fprintf(&sb, "<b><a href=\"%s\">%s</a></b>\n\n", m.Link(), header)
@@ -131,63 +127,41 @@ func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 		fmt.Fprintf(&sb, "<b><u>%s</u></b>\n\n", header)
 	}
 
-	// artwork block
+	groupName := m.Channel.Title
+	if m.Channel.Username != "" {
+		groupName = "@" + m.Channel.Username
+	}
+
+	requestedBy := utils.MentionHTML(m.Sender)
+	if m.Sender.Username != "" {
+		requestedBy = "@" + m.Sender.Username
+	}
+
 	if track.Artwork != "" {
 		sb.WriteString("<blockquote>")
 	}
 
-	// Track
-	fmt.Fprintf(&sb,
-		"<b>%s</b> <a href=\"%s\">%s</a>\n",
-		F(chatID, "logger_track"),
-		track.URL,
-		utils.EscapeHTML(utils.ShortTitle(track.Title)),
-	)
+	sb.WriteString(F(m.ChannelID(), "logger_playback_template", locales.Arg{
+		"track_url":       track.URL,
+		"track":           utils.EscapeHTML(utils.ShortTitle(track.Title)),
+		"source":          string(track.Source),
+		"group":           groupName,
+		"group_id":        m.ChannelID(),
+		"requested_by":    requestedBy,
+		"requested_by_id": m.SenderID(),
+	}))
 
-	// Source
-	fmt.Fprintf(&sb,
-		"<b>%s</b> %s\n",
-		F(chatID, "logger_source"),
-		string(track.Source),
-	)
-
-	// Group
-	fmt.Fprintf(&sb, "<b>%s</b> ", F(chatID, "logger_group"))
-	if m.Channel.Username != "" {
-		fmt.Fprintf(&sb, "@%s", m.Channel.Username)
-	} else {
-		sb.WriteString(m.Channel.Title)
-	}
-	fmt.Fprintf(&sb, " (%d)\n", m.ChannelID())
-
-	// Requested by
-	fmt.Fprintf(&sb, "<b>%s</b> ", F(chatID, "logger_requested_by"))
-	if m.Sender.Username != "" {
-		fmt.Fprintf(&sb, "@%s", m.Sender.Username)
-	} else {
-		sb.WriteString(utils.MentionHTML(m.Sender))
-	}
-	fmt.Fprintf(&sb, " (<code>%d</code>)\n", m.Sender.ID)
-
-	// Timestamp
-	fmt.Fprintf(&sb, "<b>%s</b> %s",
-		F(chatID, "logger_timestamp"),
-		time.Now().Format("2006-01-02 15:04:05"),
-	)
-
-	var err error
-	// Sending
 	if track.Artwork != "" {
 		sb.WriteString("\n</blockquote>")
-		_, err = core.Bot.SendMedia(
-			config.LoggerID,
-			utils.CleanURL(track.Artwork),
-			&tg.MediaOptions{Caption: sb.String()},
-		)
-	} else {
-		_, err = core.Bot.SendMessage(config.LoggerID, sb.String())
 	}
 
+	text := sb.String()
+	opts := &tg.SendOptions{ParseMode: "HTML"}
+	if shouldShowThumb(config.LoggerID) && track.Artwork != "" {
+		opts.Media = utils.CleanURL(track.Artwork)
+	}
+
+	_, err := core.Bot.SendMessage(config.LoggerID, text, opts)
 	if err != nil {
 		gologging.Error("failed to send logger msg: " + err.Error())
 	}
@@ -197,7 +171,7 @@ func SafeCallbackHandler(
 	handler func(*tg.CallbackQuery) error,
 ) func(*tg.CallbackQuery) error {
 	return func(cb *tg.CallbackQuery) (err error) {
-		if isMaintenanceBlocked(cb.SenderID) {
+		if !canBypassMaintenence(cb.SenderID) {
 			cb.Answer(
 				F(cb.ChannelID(), "maint", locales.Arg{"reason": ""}),
 				&tg.CallbackOptions{Alert: true},
@@ -230,7 +204,7 @@ func SafeMessageHandler(
 			m.ChannelID(),
 		)
 
-		if isMaintenanceBlocked(m.SenderID()) {
+		if !canBypassMaintenence(m.SenderID()) {
 			gologging.Debug("Maintenance mode active")
 			if m.ChatType() == tg.EntityUser ||
 				strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {

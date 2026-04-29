@@ -350,11 +350,8 @@ logger_bot_started: |
   <b>Kullanıcı Adı:</b> {user_username}
   <b>ID:</b> {user_id}
   
-logger_track: "🎧 Parça:"
-logger_source: "🔗 Kaynak:"
-logger_group: "📌 Grup:"
-logger_requested_by: "👤 İsteyen:"
-logger_timestamp: "⏳ Zaman Damgası:"
+
+logger_playback_template: "<b>🎧 Parça:</b> <a href=\"{track_url}\">{track}</a>\n<b>🔗 Kaynak:</b> {source}\n<b>📌 Grup:</b> {group} ({group_id})\n<b>👤 İsteyen:</b> {requested_by} (<code>{requested_by_id}</code>)"
 
 loop_usage: "🔁 <b>Döngü Kontrolü</b>\n\nKullanım: {cmd} [sayı]\n• 0 - Döngüyü devre dışı bırak\n• 1-10 - Döngü sayısı\n\n<i>{count_line}</i>"
 loop_invalid: "⚠️ <b>Geçersiz döngü sayısı.</b>\nDevre dışı bırakmak için 0, döngü sayısını ayarlamak için 1-10 arası bir değer kullan."
@@ -371,20 +368,7 @@ logger_update_fail: "❌ Günlük ayarı güncellenemedi: {error}"
 logger_updated: "✅ Günlük başarıyla {action} konumuna getirildi."
 
 # Logs module
-logs_invalid_number: "⚠️ <b>Geçersiz Sayı</b>\n\n<code>{value}</code> değeri geçerli bir pozitif sayı değil.\n\n<b>Kullanım:</b> <code>/logs [sayı]</code> veya <code>/logs -old [sayı]</code>"
-logs_invalid_flag: "⚠️ <b>Geçersiz Bayrak</b>\n\nBilinmeyen bayrak veya geçersiz giriş: <code>{flag}</code>\n\n<b>Geçerli seçenekler:</b>\n• <code>/logs</code> - Tam günlük\n• <code>/logs [n]</code> - Son N satır\n• <code>/logs -old [n]</code> - En eski günlük\n• <code>/logs -clear</code> - Günlükleri temizle"
-logs_file_error: "❌ <b>Günlük Dosyası Hatası</b>\n\nGünlük dosyasına erişilirken bir hata oluştu:\n<code>{error}</code>"
-logs_send_error: "❌ <b>Günlük Gönderilemedi</b>\n\nGünlük dosyası hazırlanamadı veya gönderilemedi.\n<code>{error}</code>"
-logs_clear_failed: "❌ <b>Temizleme Başarısız</b>\n\nGünlük dosyası temizlenemedi:\n<code>{error}</code>"
-logs_empty: "📭 <b>Günlük Yok</b>\n\nGünlük dosyası henüz mevcut değil veya boş.\n\nGünlük oluşturmak için botu bir süre çalıştır."
-logs_preview_header: "📋 <b>Mevcut Günlük Önizlemesi:</b>"
-logs_lines_header: "📋 <b>Son Günlük Satırları</b> (Son {count})"
-logs_old_header: "📋 <b>En Eski Günlük Satırları</b> (İlk {count})"
-logs_uploading: "⏳ <b>Günlük dosyası yükleniyor...</b>\n\nLütfen dosya hazırlanırken bekle."
-logs_file_caption: "📄 <b>Günlük Dosyası Detayları</b>\n\n<b>Dosya Adı:</b> <code>{filename}</code>\n<b>Boyut:</b> {size_mb} MB\n<b>Son Değişiklik:</b> {modified}"
-logs_lines_caption: "📋 <b>Son Günlük Satırları</b>\n\nMevcut günlükten son {count} satır gösteriliyor."
-logs_old_caption: "📋 <b>En Eski Günlük Satırları</b>\n\nGünlüğün başından itibaren ilk {count} satır gösteriliyor."
-logs_cleared: "✅ <b>Günlük Dosyası Temizlendi</b>\n\nGünlük dosyası başarıyla temizlendi.\n<b>Önceki Boyut:</b> {size_mb} MB"
+logs_empty: "Kayıt bulunamadı"
 
 # reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
 maint: "⚠️ Şu anda bakımdayım ve geçici olarak hizmet veremiyorum. Lütfen daha sonra tekrar kontrol et.\n\n{reason}"
