@@ -480,6 +480,7 @@ var cbHandlers = []CbHandlerDef{
 	{Pattern: "^close$", Handler: closeHandler},
 	{Pattern: "^cancel$", Handler: cancelHandler},
 	{Pattern: "^bcast_cancel$", Handler: broadcastCancelCB},
+	{Pattern: "^rtmp_stop$", Handler: rtmpStopCallbackHandler},
 
 	{Pattern: `^room:-?\d+:\w+$`, Handler: roomHandle},
 	{Pattern: "progress", Handler: emptyCBHandler},

@@ -591,22 +591,14 @@ room_already_paused: "⏸️ Track is already paused. Tap ▶️ Resume to conti
 room_already_paused_auto: "⏸️ Track is already paused — auto-resuming in {duration}."
 room_pause_failed: "❌ Failed to pause playback.\n\n<i>{error}</i>"
 
-rtmp_not_configured: |
-  ⚠️ <b>RTMP not configured!</b>
-  
-  Please set RTMP server first:
-  <code>{cmd} rtmps://server/s/streamkey</code>
+rtmp_not_configured: "⚠️ RTMP not configured. Use <code>/setrtmp &lt;chat_id&gt; &lt;rtmp_url&gt;</code> in DM."
 
 rtmp_already_streaming: |
   📡 <b>Already streaming!</b>
   
   Use <code>/streamstop</code> to end current stream.
 
-rtmp_init_failed: |
-  ❌ <b>Failed to initialize RTMP stream:</b>
-  <code>{error}</code>
 
-rtmp_starting_stream: "📡 <b>Starting RTMP stream...</b>"
 
 rtmp_play_failed: |
   ❌ <b>Failed to start stream:</b>
@@ -621,7 +613,6 @@ rtmp_now_streaming: |
   
   ⚠️ <i>Note: RTMP has ~15-30s buffering delay</i>
 
-rtmp_not_streaming: "ℹ️ No active RTMP stream."
 
 rtmp_stop_failed: |
   ❌ <b>Failed to stop stream:</b>
@@ -630,97 +621,27 @@ rtmp_stop_failed: |
 rtmp_stopped: |
   ⏹️ <b>RTMP stream stopped</b> by {user}
 
-rtmp_configured_not_started: |
-  ℹ️ <b>RTMP Status:</b> Not started
-  
-  <b>▫ Server:</b> <code>{server}</code>
-  <b>▫ State:</b> Ready to stream
-  
-  Use <code>/stream &lt;query&gt;</code> to start streaming.
 
 rtmp_status_playing: |
-  📡 <b>RTMP Stream Status</b>
+  📡 <b>RTMP Status</b>
   
   <b>▫ State:</b> ▶️ Streaming
   <b>▫ Position:</b> {position}
-  <b>▫ Server:</b> <code>{server}</code>
 
-rtmp_status_paused: |
-  📡 <b>RTMP Stream Status</b>
-  
-  <b>▫ State:</b> ⏸️ Paused
-  <b>▫ Server:</b> <code>{server}</code>
 
-rtmp_status_idle: |
-  📡 <b>RTMP Stream Status</b>
-  
-  <b>▫ State:</b> ⏹️ Idle
-  <b>▫ Server:</b> <code>{server}</code>
 
-rtmp_dm_only: |
-  🔒 <b>Security Notice</b>
-  
-  RTMP credentials should NEVER be shared in groups!
-  
-  <b>📩 To configure RTMP:</b>
-  1. Open my private chat: @{bot_username}
-  2. Send: <code>{cmd} &lt;chat_id&gt; &lt;rtmp_url&gt;</code>
-  
-  <b>💡 Example:</b>
-  <code>/setrtmp -1001234567890 rtmps://server/s/key</code>
 
-rtmp_setup_usage: |
-  ⚙️ <b>RTMP Configuration</b>
-  
-  <u>Usage:</u>
-  <code>/setrtmp &lt;chat_id&gt; &lt;full_rtmp_url&gt;</code>
-  
-  <b>📋 Parameters:</b>
-  • <code>chat_id</code> - Target chat/channel ID
-  • <code>full_rtmp_url</code> - Complete RTMP URL with stream key
-  
-  <b>📝 Example:</b>
-  <code>/setrtmp -1001234567890 rtmps://dc5-1.rtmp.t.me/s/123:key</code>
-  
-  <b>🔍 How to get chat ID:</b>
-  • Forward any message from chat to @userinfobot
-  • Or use <code>/id</code> command in the chat
-  
-  <b>🔐 Security:</b>
-  • Configuration only works in DM (private chat)
-  • You must be admin in target chat
-  • Credentials are stored securely
+rtmp_dm_only: "⚠️ Use this command in DM."
 
-rtmp_invalid_chat_id: |
-  ❌ <b>Invalid chat ID!</b>
-  
-  Please provide a valid numeric chat ID.
-  
-  <b>💡 Example:</b>
-  <code>/setrtmp -1001234567890 rtmps://...</code>
+rtmp_setup_usage: "⚙️ /setrtmp <chat_id> <rtmp_url>"
 
-rtmp_check_admin_failed: |
-  ❌ <b>Failed to verify admin status:</b>
-  <code>{error}</code>
-  
-  <b>⚠️ Make sure:</b>
-  • I am admin in the target chat
-  • Chat ID is correct
-  • You have admin permissions
+generic_error: "❌ Something went wrong: <code>{error}</code>"
 
-rtmp_not_admin: |
-  ⚠️ <b>Permission Denied</b>
-  
-  You must be an <b>administrator</b> in the target chat to configure RTMP.
+rtmp_invalid_chat_id: "❌ Invalid chat ID. Example: <code>-1001234567890</code>"
 
-rtmp_parse_failed: |
-  ❌ <b>Failed to parse RTMP URL:</b>
-  <code>{error}</code>
-  
-  <b>📋 Correct format:</b>
-  <code>rtmp://server/app/streamkey</code>
-  or
-  <code>rtmps://server/s/streamkey</code>
+
+
+rtmp_parse_failed: "❌ Invalid RTMP URL. Use: <code>/setrtmp <chat_id> <rtmp_url></code>"
 
 rtmp_streaming_not_supported: |
   ⚠️ <b>Streaming not supported</b>
@@ -729,19 +650,7 @@ rtmp_streaming_not_supported: |
   
   Use <code>/stream</code> to play media via RTMP.
   
-rtmp_configured_success: |
-  ✅ <b>RTMP Configured Successfully!</b>
-  
-  <b>🆔 Chat ID:</b> <code>{chat_id}</code>
-  <b>🔗 URL:</b> <code>{url}</code>
-  <b>🔑 Key:</b> <code>{key}</code>
-  
-  <b>✨ Next Steps:</b>
-  Go to your chat and use:
-  <code>/stream &lt;song name&gt;</code>
-  
-  <b>🔒 Security Note:</b>
-  Credentials are stored securely and never shown in the group.
+rtmp_configured_success: "✅ RTMP configured successfully for Chat ID: <code>{chat_id}</code>"
 
 
 searching: "🔍🎶 Searching... ⚡✨"

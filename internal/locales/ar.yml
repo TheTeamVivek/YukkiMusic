@@ -591,22 +591,14 @@ room_already_paused: "⏸️ المقطع متوقف مؤقتاً بالفعل. 
 room_already_paused_auto: "⏸️ المقطع متوقف مؤقتاً بالفعل — سيتم الاستئناف تلقائياً خلال {duration}."
 room_pause_failed: "❌ فشل إيقاف التشغيل مؤقتاً.\n\n<i>{error}</i>"
 
-rtmp_not_configured: |
-  ⚠️ <b>RTMP غير مهيأ!</b>
-  
-  يرجى تعيين خادم RTMP أولاً:
-  <code>{cmd} rtmps://server/s/streamkey</code>
+rtmp_not_configured: "⚠️ RTMP غير مُعد. استخدم <code>/setrtmp &lt;chat_id&gt; &lt;rtmp_url&gt;</code> في الخاص."
 
 rtmp_already_streaming: |
   📡 <b>البث جارٍ بالفعل!</b>
   
   استخدم <code>/streamstop</code> لإنهاء البث الحالي.
 
-rtmp_init_failed: |
-  ❌ <b>فشل تهيئة بث RTMP:</b>
-  <code>{error}</code>
 
-rtmp_starting_stream: "📡 <b>جاري بدء بث RTMP...</b>"
 
 rtmp_play_failed: |
   ❌ <b>فشل بدء البث:</b>
@@ -621,7 +613,6 @@ rtmp_now_streaming: |
   
   ⚠️ <i>ملاحظة: يحتوي RTMP على تأخير تخزين مؤقت يتراوح بين 15-30 ثانية</i>
 
-rtmp_not_streaming: "ℹ️ لا يوجد بث RTMP نشط."
 
 rtmp_stop_failed: |
   ❌ <b>فشل إيقاف البث:</b>
@@ -630,97 +621,27 @@ rtmp_stop_failed: |
 rtmp_stopped: |
   ⏹️ <b>تم إيقاف بث RTMP</b> بواسطة {user}
 
-rtmp_configured_not_started: |
-  ℹ️ <b>حالة RTMP:</b> لم يبدأ
-  
-  <b>▫ الخادم:</b> <code>{server}</code>
-  <b>▫ الحالة:</b> جاهز للبث
-  
-  استخدم <code>/stream &lt;query&gt;</code> لبدء البث.
 
 rtmp_status_playing: |
-  📡 <b>حالة بث RTMP</b>
+  📡 <b>حالة RTMP</b>
   
-  <b>▫ الحالة:</b> ▶️ جاري البث
+  <b>▫ الحالة:</b> ▶️ بث مباشر
   <b>▫ الموضع:</b> {position}
-  <b>▫ الخادم:</b> <code>{server}</code>
 
-rtmp_status_paused: |
-  📡 <b>حالة بث RTMP</b>
-  
-  <b>▫ الحالة:</b> ⏸️ متوقف مؤقتاً
-  <b>▫ الخادم:</b> <code>{server}</code>
 
-rtmp_status_idle: |
-  📡 <b>حالة بث RTMP</b>
-  
-  <b>▫ الحالة:</b> ⏹️ خامل
-  <b>▫ الخادم:</b> <code>{server}</code>
 
-rtmp_dm_only: |
-  🔒 <b>تنبيه أمني</b>
-  
-  يجب عدم مشاركة بيانات RTMP في المجموعات أبداً!
-  
-  <b>📩 لتهيئة RTMP:</b>
-  1. افتح محادثتي الخاصة: @{bot_username}
-  2. أرسل: <code>{cmd} &lt;chat_id&gt; &lt;rtmp_url&gt;</code>
-  
-  <b>💡 مثال:</b>
-  <code>/setrtmp -1001234567890 rtmps://server/s/key</code>
 
-rtmp_setup_usage: |
-  ⚙️ <b>تهيئة RTMP</b>
-  
-  <u>الاستخدام:</u>
-  <code>/setrtmp &lt;chat_id&gt; &lt;full_rtmp_url&gt;</code>
-  
-  <b>📋 المعايير:</b>
-  • <code>chat_id</code> - معرف المحادثة/القناة المستهدفة
-  • <code>full_rtmp_url</code> - رابط RTMP الكامل مع مفتاح البث
-  
-  <b>📝 مثال:</b>
-  <code>/setrtmp -1001234567890 rtmps://dc5-1.rtmp.t.me/s/123:key</code>
-  
-  <b>🔍 كيفية الحصول على معرف المحادثة:</b>
-  • قم بتوجيه أي رسالة من المحادثة إلى @userinfobot
-  • أو استخدم أمر <code>/id</code> في المحادثة
-  
-  <b>🔐 الأمان:</b>
-  • التهيئة تعمل فقط في الخاص (المحادثة السرية)
-  • يجب أن تكون مشرفاً في المحادثة المستهدفة
-  • تُخزن البيانات بشكل آمن
+rtmp_dm_only: "⚠️ استخدم هذا الأمر في الرسائل الخاصة."
 
-rtmp_invalid_chat_id: |
-  ❌ <b>معرف محادثة غير صالح!</b>
-  
-  يرجى تقديم معرف محادثة رقمي صحيح.
-  
-  <b>💡 مثال:</b>
-  <code>/setrtmp -1001234567890 rtmps://...</code>
+rtmp_setup_usage: "⚙️ /setrtmp <chat_id> <rtmp_url>"
 
-rtmp_check_admin_failed: |
-  ❌ <b>فشل التحقق من حالة الإشراف:</b>
-  <code>{error}</code>
-  
-  <b>⚠️ تأكد من:</b>
-  • أنني مشرف في المحادثة المستهدفة
-  • أن معرف المحادثة صحيح
-  • أنك تملك صلاحيات المشرف
+generic_error: "❌ حدث خطأ: <code>{error}</code>"
 
-rtmp_not_admin: |
-  ⚠️ <b>تم رفض الإذن</b>
-  
-  يجب أن تكون <b>مشرفاً</b> في المحادثة المستهدفة لتهيئة RTMP.
+rtmp_invalid_chat_id: "❌ معرّف الدردشة غير صالح. مثال: <code>-1001234567890</code>"
 
-rtmp_parse_failed: |
-  ❌ <b>فشل تحليل رابط RTMP:</b>
-  <code>{error}</code>
-  
-  <b>📋 التنسيق الصحيح:</b>
-  <code>rtmp://server/app/streamkey</code>
-  أو
-  <code>rtmps://server/s/streamkey</code>
+
+
+rtmp_parse_failed: "❌ رابط RTMP غير صالح. استخدم: <code>/setrtmp <chat_id> <rtmp_url></code>"
 
 rtmp_streaming_not_supported: |
   ⚠️ <b>البث غير مدعوم</b>
@@ -729,19 +650,7 @@ rtmp_streaming_not_supported: |
   
   استخدم <code>/stream</code> لتشغيل الوسائط عبر RTMP.
   
-rtmp_configured_success: |
-  ✅ <b>تمت تهيئة RTMP بنجاح!</b>
-  
-  <b>🆔 معرف المحادثة:</b> <code>{chat_id}</code>
-  <b>🔗 الرابط:</b> <code>{url}</code>
-  <b>🔑 المفتاح:</b> <code>{key}</code>
-  
-  <b>✨ الخطوات التالية:</b>
-  اذهب إلى محادثتك واستخدم:
-  <code>/stream &lt;song name&gt;</code>
-  
-  <b>🔒 ملاحظة أمنية:</b>
-  تُخزن البيانات بشكل آمن ولا تُعرض أبداً في المجموعة.
+rtmp_configured_success: "✅ RTMP configured successfully for Chat ID: <code>{chat_id}</code>"
 
 settings_btn_adminmode: "🛡️ وضع الإدارة"
 settings_btn_cmddelete: "🗑️ حذف الأوامر"
