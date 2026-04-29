@@ -695,27 +695,28 @@ searching_query: "🔍🎶 Aranan: <b>{query}</b>... ⚡✨"
 
 speed_line: "⚙️ Hız: <b>{speed}x</b>"
 
-stats_system_header: "🔧 <b>Sistem:</b>"
-stats_go_mem_header: "📦 <b>Dahili Bellek (Go):</b>"
-stats_server_header: "💻 <b>Sunucu İstatistikleri:</b>"
-stats_served_header: "📊 <b>Hizmet Verilen:</b>"
+stats_overview: |
+  🔧 <b>Sistem:</b>
+  • İşletim Sistemi: <code>{os}</code>, Mimari: <code>{arch}</code>
+  • İşlemciler: <code>{cpus}</code>, Goroutine Sayısı: <code>{goroutines}</code>
 
-stats_system_os_arch: "• İşletim Sistemi: <code>{os}</code>, Mimari: <code>{arch}</code>"
-stats_system_cpu_goroutines: "• İşlemciler: <code>{cpus}</code>, Goroutine Sayısı: <code>{goroutines}</code>"
+  📦 <b>Dahili Bellek (Go):</b>
+  • Ayrılan (Alloc): <code>{alloc} MB</code>
+  • Sistem (Sys): <code>{sys} MB</code>
+  • NumGC: <code>{gc_count}</code> ({gc_emoji} {gc_rate}/dk)
 
-stats_go_alloc: "• Ayrılan (Alloc): <code>{alloc} MB</code>"
-stats_go_sys: "• Sistem (Sys): <code>{sys} MB</code>"
-stats_go_gc: "• NumGC: <code>{gc_count}</code> ({emoji} {gc_rate}/dk)"
+  💻 <b>Sunucu İstatistikleri:</b>
+  • CPU Kullanımı: {cpu_emoji} <code>%{cpu}</code>
+  • RAM Kullanımı: {ram_emoji} <code>{ram_used_gib} GiB</code> | <code>{ram_total_gib} GiB</code>
+  • Depolama: <code>{storage_used_gib} GiB</code> | <code>{storage_total_gib} GiB</code>
 
-stats_server_cpu: "• CPU Kullanımı: {emoji} <code>%{cpu}</code>"
-stats_server_ram: "• RAM Kullanımı: {emoji} <code>{used_gib} GiB</code> | <code>{total_gib} GiB</code>"
-stats_server_storage: "• Depolama: <code>{used_gib} GiB</code> | <code>{total_gib} GiB</code>"
-
-stats_served_chats: "• Sohbetler: <code>{count}</code>"
-stats_served_chats_err: "• Sohbetler: <code>Hata: {error}</code>"
-
-stats_served_users: "• Kullanıcılar: <code>{count}</code>"
-stats_served_users_err: "• Kullanıcılar: <code>Hata: {error}</code>"
+  📊 <b>Hizmet Verilen:</b>
+  {chats_line}
+  {users_line}
+stats_served_chats_line: "• Sohbetler: <code>{count}</code>"
+stats_served_chats_line_err: "• Sohbetler: <code>Hata: {error}</code>"
+stats_served_users_line: "• Kullanıcılar: <code>{count}</code>"
+stats_served_users_line_err: "• Kullanıcılar: <code>Hata: {error}</code>"
 
 # 👑 Sudo users
 
@@ -749,7 +750,7 @@ seek_invalid_seconds: "⚠️ Geçersiz saniye değeri.\nÖrnek: <code>{cmd} 40<
 seek_too_close_start: "⚠️ <b>{seconds}</b> saniye geri sarılamaz — parçanın başlangıcına çok yakın."
 seek_too_close_end: "⚠️ <b>{seconds}</b> saniye ileri sarılamaz — parçanın sonuna çok yakın."
 seek_failed: "❌ {direction} yönüne <b>{seconds}</b> saniye sarılamadı.\nHata: <code>{error}</code>"
-seek_success: "{emoji} {direction} yönüne sarılarak <u>{duration}</u> süreli parçanın <u>{position}</u> konumuna gelindi."
+seek_success: "{emoji} {direction} yönüne sarılarak <b>{duration}</b> süreli parçanın <b>{position}</b> konumuna gelindi."
 
 stop_confirm_paused: |
   ⏸️ <b>Oynatma şu an duraklatılmış durumda.</b>

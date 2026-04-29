@@ -698,27 +698,28 @@ searching_query: "🔍🎶 جاري البحث عن: <b>{query}</b>... ⚡✨"
 
 speed_line: "⚙️ السرعة: <b>{speed}x</b>"
 
-stats_system_header: "🔧 <b>النظام:</b>"
-stats_go_mem_header: "📦 <b>الذاكرة الداخلية (Go):</b>"
-stats_server_header: "💻 <b>إحصائيات الخادم:</b>"
-stats_served_header: "📊 <b>المخدومة:</b>"
+stats_overview: |
+  🔧 <b>النظام:</b>
+  • النظام: <code>{os}</code>، المعمارية: <code>{arch}</code>
+  • المعالجات: <code>{cpus}</code>، عدد Goroutines: <code>{goroutines}</code>
 
-stats_system_os_arch: "• النظام: <code>{os}</code>، المعمارية: <code>{arch}</code>"
-stats_system_cpu_goroutines: "• المعالجات: <code>{cpus}</code>، عدد Goroutines: <code>{goroutines}</code>"
+  📦 <b>الذاكرة الداخلية (Go):</b>
+  • المحجوزة: <code>{alloc} ميجا</code>
+  • النظام: <code>{sys} ميجا</code>
+  • عمليات تنظيف الذاكرة: <code>{gc_count}</code> ({gc_emoji} {gc_rate}/دقيقة)
 
-stats_go_alloc: "• المحجوزة: <code>{alloc} ميجا</code>"
-stats_go_sys: "• النظام: <code>{sys} ميجا</code>"
-stats_go_gc: "• عمليات تنظيف الذاكرة: <code>{gc_count}</code> ({emoji} {gc_rate}/دقيقة)"
+  💻 <b>إحصائيات الخادم:</b>
+  • استهلاك المعالج: {cpu_emoji} <code>{cpu}%</code>
+  • استهلاك الرام: {ram_emoji} <code>{ram_used_gib} جيجا</code> | <code>{ram_total_gib} جيجا</code>
+  • التخزين: <code>{storage_used_gib} جيجا</code> | <code>{storage_total_gib} جيجا</code>
 
-stats_server_cpu: "• استهلاك المعالج: {emoji} <code>{cpu}%</code>"
-stats_server_ram: "• استهلاك الرام: {emoji} <code>{used_gib} جيجا</code> | <code>{total_gib} جيجا</code>"
-stats_server_storage: "• التخزين: <code>{used_gib} جيجا</code> | <code>{total_gib} جيجا</code>"
-
-stats_served_chats: "• المحادثات: <code>{count}</code>"
-stats_served_chats_err: "• المحادثات: <code>خطأ: {error}</code>"
-
-stats_served_users: "• المستخدمون: <code>{count}</code>"
-stats_served_users_err: "• المستخدمون: <code>خطأ: {error}</code>"
+  📊 <b>المخدومة:</b>
+  {chats_line}
+  {users_line}
+stats_served_chats_line: "• المحادثات: <code>{count}</code>"
+stats_served_chats_line_err: "• المحادثات: <code>خطأ: {error}</code>"
+stats_served_users_line: "• المستخدمون: <code>{count}</code>"
+stats_served_users_line_err: "• المستخدمون: <code>خطأ: {error}</code>"
 
 # 👑 Sudo users
 
@@ -752,7 +753,7 @@ seek_invalid_seconds: "⚠️ قيمة ثوانٍ غير صالحة.\nمثال: 
 seek_too_close_start: "⚠️ لا يمكن الرجوع بمقدار <b>{seconds}</b> ثانية — سيكون ذلك قريباً جداً من بداية المقطع."
 seek_too_close_end: "⚠️ لا يمكن التقديم بمقدار <b>{seconds}</b> ثانية — سيكون ذلك قريباً جداً من نهاية المقطع."
 seek_failed: "❌ فشل التقديم/الرجوع {direction} بمقدار <b>{seconds}</b> ثانية.\nالخطأ: <code>{error}</code>"
-seek_success: "{emoji} قفز {direction} إلى <u>{position}</u> من <u>{duration}</u>."
+seek_success: "{emoji} قفز {direction} إلى <b>{position}</b> من <b>{duration}</b>."
 
 stop_confirm_paused: |
   ⏸️ <b>التشغيل متوقف مؤقتاً حالياً.</b>

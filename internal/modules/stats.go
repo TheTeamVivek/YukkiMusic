@@ -51,39 +51,7 @@ func init() {
 }
 
 func statsHandler(m *telegram.NewMessage) error {
-	var sb strings.Builder
-	sb.Grow(512)
 	chatID := m.ChannelID()
-
-	sb.WriteString(getSystemStats(chatID))
-	sb.WriteString(getGoMemStats(chatID))
-	sb.WriteString(getServerStats(chatID))
-	sb.WriteString(getServedStats(chatID))
-
-	m.Reply(sb.String())
-	return telegram.ErrEndGroup
-}
-
-// ---- Sub Functions ----
-
-func getSystemStats(chatID int64) string {
-	var sb strings.Builder
-
-	sb.WriteString(F(chatID, "stats_system_header") + "\n")
-	sb.WriteString(F(chatID, "stats_system_os_arch", locales.Arg{
-		"os":   runtime.GOOS,
-		"arch": runtime.GOARCH,
-	}) + "\n")
-	sb.WriteString(F(chatID, "stats_system_cpu_goroutines", locales.Arg{
-		"cpus":       runtime.NumCPU(),
-		"goroutines": runtime.NumGoroutine(),
-	}) + "\n\n")
-
-	return sb.String()
-}
-
-func getGoMemStats(chatID int64) string {
-	var sb strings.Builder
 	var memStats runtime.MemStats
 
 	runtime.ReadMemStats(&memStats)
@@ -98,26 +66,6 @@ func getGoMemStats(chatID int64) string {
 	case gcPerMin > 10:
 		gcEmoji = "🟠"
 	}
-
-	sb.WriteString(F(chatID, "stats_go_mem_header") + "\n")
-
-	sb.WriteString(F(chatID, "stats_go_alloc", locales.Arg{
-		"alloc": memStats.Alloc / 1024 / 1024,
-	}) + "\n")
-	sb.WriteString(F(chatID, "stats_go_sys", locales.Arg{
-		"sys": memStats.Sys / 1024 / 1024,
-	}) + "\n")
-	sb.WriteString(F(chatID, "stats_go_gc", locales.Arg{
-		"gc_count": memStats.NumGC,
-		"emoji":    gcEmoji,
-		"gc_rate":  fmt.Sprintf("%.1f", gcPerMin),
-	}) + "\n\n")
-
-	return sb.String()
-}
-
-func getServerStats(chatID int64) string {
-	var sb strings.Builder
 
 	sysMem, _ := mem.VirtualMemory()
 	cpuPercent, _ := cpu.Percent(0, false)
@@ -142,54 +90,50 @@ func getServerStats(chatID int64) string {
 		ramEmoji = "🟡"
 	}
 
-	sb.WriteString(F(chatID, "stats_server_header") + "\n")
-
-	sb.WriteString(F(chatID, "stats_server_cpu", locales.Arg{
-		"emoji": cpuEmoji,
-		"cpu":   fmt.Sprintf("%.2f", cpuPercent[0]),
-	}) + "\n")
-
-	sb.WriteString(F(chatID, "stats_server_ram", locales.Arg{
-		"emoji":     ramEmoji,
-		"used_gib":  fmt.Sprintf("%.2f", float64(sysMem.Used)/1073741824),
-		"total_gib": fmt.Sprintf("%.2f", float64(sysMem.Total)/1073741824),
-	}) + "\n")
-
-	sb.WriteString(F(chatID, "stats_server_storage", locales.Arg{
-		"used_gib":  fmt.Sprintf("%.2f", float64(diskStat.Used)/1073741824),
-		"total_gib": fmt.Sprintf("%.2f", float64(diskStat.Total)/1073741824),
-	}) + "\n\n")
-
-	return sb.String()
-}
-
-func getServedStats(chatID int64) string {
-	var sb strings.Builder
-
 	servedChats, err1 := database.ServedChats()
 	servedUsers, err2 := database.ServedUsers()
 
-	sb.WriteString(F(chatID, "stats_served_header") + "\n")
-
+	chatsLine := ""
 	if err1 != nil {
-		sb.WriteString(F(chatID, "stats_served_chats_err", locales.Arg{
+		chatsLine = F(chatID, "stats_served_chats_line_err", locales.Arg{
 			"error": err1.Error(),
-		}) + "\n")
+		})
 	} else {
-		sb.WriteString(F(chatID, "stats_served_chats", locales.Arg{
+		chatsLine = F(chatID, "stats_served_chats_line", locales.Arg{
 			"count": len(servedChats),
-		}) + "\n")
+		})
 	}
 
+	usersLine := ""
 	if err2 != nil {
-		sb.WriteString(F(chatID, "stats_served_users_err", locales.Arg{
+		usersLine = F(chatID, "stats_served_users_line_err", locales.Arg{
 			"error": err2.Error(),
-		}) + "\n")
+		})
 	} else {
-		sb.WriteString(F(chatID, "stats_served_users", locales.Arg{
+		usersLine = F(chatID, "stats_served_users_line", locales.Arg{
 			"count": len(servedUsers),
-		}) + "\n")
+		})
 	}
 
-	return sb.String()
+	m.Reply(F(chatID, "stats_overview", locales.Arg{
+		"os":                runtime.GOOS,
+		"arch":              runtime.GOARCH,
+		"cpus":              runtime.NumCPU(),
+		"goroutines":        runtime.NumGoroutine(),
+		"alloc":             memStats.Alloc / 1024 / 1024,
+		"sys":               memStats.Sys / 1024 / 1024,
+		"gc_count":          memStats.NumGC,
+		"gc_emoji":          gcEmoji,
+		"gc_rate":           fmt.Sprintf("%.1f", gcPerMin),
+		"cpu_emoji":         cpuEmoji,
+		"cpu":               fmt.Sprintf("%.2f", cpuPercent[0]),
+		"ram_emoji":         ramEmoji,
+		"ram_used_gib":      fmt.Sprintf("%.2f", float64(sysMem.Used)/1073741824),
+		"ram_total_gib":     fmt.Sprintf("%.2f", float64(sysMem.Total)/1073741824),
+		"storage_used_gib":  fmt.Sprintf("%.2f", float64(diskStat.Used)/1073741824),
+		"storage_total_gib": fmt.Sprintf("%.2f", float64(diskStat.Total)/1073741824),
+		"chats_line":        chatsLine,
+		"users_line":        usersLine,
+	}))
+	return telegram.ErrEndGroup
 }

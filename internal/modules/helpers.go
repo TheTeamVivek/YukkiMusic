@@ -241,13 +241,8 @@ func SafeMessageHandler(
 		}
 
 		cmd := getCommand(m)
-		if checkForHelpFlag(m) {
-			gologging.DebugF("Help flag detected for command %s", cmd)
-			err = showHelpFor(m, cmd)
-		} else {
-			gologging.DebugF("Executing handler for command %s", cmd)
-			err = handler(m)
-		}
+		gologging.DebugF("Executing handler for command %s", cmd)
+		err = handler(m)
 
 		if err != nil {
 			if errors.Is(err, tg.ErrEndGroup) {
