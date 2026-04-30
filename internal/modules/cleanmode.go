@@ -19,9 +19,10 @@ const (
 )
 
 var (
-    cleanModeDurationOptions = []int{15, 30, 60, 5}
-    cleanScheduler = &cleanScheduler{pending: make(map[int64][]cleanEntry)}
+	cleanModeDurationOptions = []int{15, 30, 60, 5}
+	cleanScheduler           = &CleanScheduler{pending: make(map[int64][]cleanEntry)}
 )
+
 
 func cleanModeReadHandler(u tg.Update, _ *tg.Client) error {
 	upd, ok := u.(*tg.UpdateReadChannelOutbox)
@@ -34,11 +35,11 @@ func cleanModeReadHandler(u tg.Update, _ *tg.Client) error {
 		return nil
 	}
 
-	scheduler.schedule(chatID, upd.MaxID)
+	cleanScheduler.schedule(chatID, upd.MaxID)
 	return nil
 }
 
-func currentPlayingMessageID(chatID int64) int32 {
+func currentPlayingStatusMessageID(chatID int64) int32 {
 	room, ok := core.GetRoom(chatID, nil, false)
 	if !ok || room == nil {
 		return 0
@@ -72,13 +73,12 @@ type cleanEntry struct {
 	dueAt     time.Time
 }
 
-type cleanScheduler struct {
+type CleanScheduler struct {
 	mu      sync.Mutex
 	pending map[int64][]cleanEntry
 }
 
-
-func (s *cleanScheduler) start() {
+func (s *CleanScheduler) start() {
 	go func() {
 		ticker := time.NewTicker(cleanModeBatchWindow)
 		defer ticker.Stop()
@@ -88,7 +88,7 @@ func (s *cleanScheduler) start() {
 	}()
 }
 
-func (s *cleanScheduler) schedule(chatID int64, messageID int32) {
+func (s *CleanScheduler) schedule(chatID int64, messageID int32) {
 	if messageID == 0 {
 		return
 	}
@@ -100,13 +100,13 @@ func (s *cleanScheduler) schedule(chatID int64, messageID int32) {
 	s.mu.Unlock()
 }
 
-func (s *cleanScheduler) cancel(chatID int64) {
+func (s *CleanScheduler) cancel(chatID int64) {
 	s.mu.Lock()
 	delete(s.pending, chatID)
 	s.mu.Unlock()
 }
 
-func (s *cleanScheduler) flushDue(deadline time.Time) {
+func (s *CleanScheduler) flushDue(deadline time.Time) {
 	s.mu.Lock()
 	batches := make(map[int64][]int32)
 
@@ -141,8 +141,8 @@ func (s *cleanScheduler) flushDue(deadline time.Time) {
 	}
 }
 
-func scheduleOldPlayingMessage(r *RoomState) {
+func scheduleOldPlayingMessage(r *core.RoomState) {
 	if m := r.StatusMsg(); m != nil {
-	  cleanScheduler.schedule(m.ChannelID(), m.ID)
+		cleanScheduler.schedule(m.ChannelID(), m.ID)
 	}
 }

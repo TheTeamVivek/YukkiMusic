@@ -18,7 +18,7 @@
 package modules
 
 import (
-	"fmt"
+	"errors"
 	"strconv"
 	"strings"
 
@@ -66,12 +66,12 @@ func assertChannelAccessible(m *tg.NewMessage, channelID int64) error {
 
 	peer, err := m.Client.ResolvePeer(channelID)
 	if err != nil {
-		return fmt.Errorf(F(chatID, "cplay_resolve_peer_fail"))
+		return errors.New(F(chatID, "cplay_resolve_peer_fail"))
 	}
 
 	chPeer, ok := peer.(*tg.InputPeerChannel)
 	if !ok {
-		return fmt.Errorf(F(chatID, "cplay_invalid_target"))
+		return errors.New(F(chatID, "cplay_invalid_target"))
 	}
 
 	fullChat, err := m.Client.ChannelsGetFullChannel(&tg.InputChannelObj{
@@ -80,7 +80,7 @@ func assertChannelAccessible(m *tg.NewMessage, channelID int64) error {
 	})
 	if err != nil || fullChat == nil {
 		gologging.ErrorF("Failed to get full channel for cplay ID %d: %v", channelID, err)
-		return fmt.Errorf(F(chatID, "cplay_channel_not_accessible"))
+		return errors.New(F(chatID, "cplay_channel_not_accessible"))
 	}
 
 	return nil

@@ -165,11 +165,6 @@ func cleanModeHandler(m *tg.NewMessage) error {
 	}
 
 	if len(args) < 2 {
-		actionKey := "disabled"
-		if current {
-			actionKey = "enabled"
-		}
-
 		m.Reply(cleanModeStatusText(chatID, current)+"\n\n"+F(chatID, "cleanmode_hint"), &tg.SendOptions{ParseMode: "HTML"})
 		return tg.ErrEndGroup
 	}
@@ -185,11 +180,6 @@ func cleanModeHandler(m *tg.NewMessage) error {
 	}
 	if !enabled {
 		cleanScheduler.cancel(chatID)
-	}
-
-	actionKey := "disabled"
-	if enabled {
-		actionKey = "enabled"
 	}
 
 	m.Reply(cleanModeStatusText(chatID, enabled)+"\n\n"+F(chatID, "cleanmode_hint"), &tg.SendOptions{ParseMode: "HTML"})
@@ -327,7 +317,7 @@ func settingsCallbackHandler(cb *tg.CallbackQuery) error {
 	case "cleanmode":
 		settings.CleanMode = !settings.CleanMode
 		if !settings.CleanMode {
-			cleanScheduler.schedule(chatID)
+			cleanScheduler.cancel(chatID)
 		}
 	case "cleanduration":
 		next := cleanModeDurationOptions[0]
@@ -395,7 +385,7 @@ func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *tg.ReplyInline
 		tg.Button.Data(F(chatID, cleanModeStatus), "set:cleanmode"),
 	)
 
-	cleanDuration := settings.CleanModeDurationMins
+	cleanDuration := s.CleanModeDurationMins
 	if cleanDuration <= 0 {
 		cleanDuration = 15
 	}

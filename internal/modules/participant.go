@@ -250,7 +250,9 @@ func handleAssistantRestriction(
 	gologging.Debug("Assistant banned in " + utils.IntToStr(chatID))
 
 	s.SetAssistantPresent(false)
-    scheduleOldPlayingMessage(r)
+	if room, ok := core.GetRoom(chatID, nil, false); ok {
+		scheduleOldPlayingMessage(room)
+	}
 	core.DeleteRoom(chatID)
 
 	if ok, _ := p.Unban(); ok {
