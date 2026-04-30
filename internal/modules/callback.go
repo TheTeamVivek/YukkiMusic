@@ -334,6 +334,7 @@ func handleSkipAction(
 	gologging.InfoF("Callback → skip, chatID=%d", chatID)
 
 	if len(r.Queue()) == 0 {
+        scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID())
 		if _, err := cb.Edit(F(cb.ChannelID(), "skip_stopped", locales.Arg{
 			"user": utils.MentionHTML(cb.Sender),
@@ -361,6 +362,8 @@ func handleSkipAction(
 			}),
 		)
 		cb.Answer(F(cb.ChannelID(), "cb_skip_download_failed"), opt)
+        
+                scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID())
 
 		return tg.ErrEndGroup
@@ -370,6 +373,8 @@ func handleSkipAction(
 		gologging.ErrorF("Play error: %v", err)
 		utils.EOR(statusMsg, F(cb.ChannelID(), "stream_play_fail"))
 		cb.Answer(F(cb.ChannelID(), "cb_skip_play_failed"), opt)
+        
+                scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID())
 
 		return tg.ErrEndGroup
@@ -420,6 +425,7 @@ func handleStopAction(
 
 	gologging.InfoF("Callback → stop, chatID=%d", chatID)
 
+        scheduleOldPlayingMessage(r)
 	core.DeleteRoom(r.ID())
 
 	cb.Answer(F(cb.ChannelID(), "cb_stop_success"), opt)

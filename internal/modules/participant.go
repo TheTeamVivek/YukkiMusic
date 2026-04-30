@@ -95,7 +95,8 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 		newStatus != "creator":
 
 		if userID == p.Client.Me().ID && config.LeaveOnDemoted {
-
+            
+            cleanScheduler.cancel(chatID)
 			core.DeleteRoom(chatID)
 			core.DeleteChatState(chatID)
 
@@ -184,7 +185,8 @@ func handleChatAction(m *telegram.NewMessage) error {
 		if action.UserID == botID {
 
 			gologging.Debug("Bot removed from " + utils.IntToStr(chatID))
-
+            
+            cleanScheduler.cancel(chatID)
 			core.DeleteRoom(chatID)
 			core.DeleteChatState(chatID)
 			database.RemoveServedChat(chatID)
@@ -248,7 +250,7 @@ func handleAssistantRestriction(
 	gologging.Debug("Assistant banned in " + utils.IntToStr(chatID))
 
 	s.SetAssistantPresent(false)
-
+    scheduleOldPlayingMessage(r)
 	core.DeleteRoom(chatID)
 
 	if ok, _ := p.Unban(); ok {

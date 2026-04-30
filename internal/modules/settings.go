@@ -49,6 +49,17 @@ func init() {
 	helpTexts["/cmddelete"] = cmdDeleteHelp
 	helpTexts["/commanddelete"] = cmdDeleteHelp
 
+	cleanModeHelp := `<i>Enable timed cleanup for command/service messages in this chat.</i>
+
+<u>Usage:</u>
+<b>/cleanmode [enable|disable]</b> — Set clean mode status
+
+<b>⚙️ Behavior:</b>
+• <b>enable</b> — Bot replies and command messages are auto-deleted after a short delay
+• <b>disable</b> — Keep messages in chat (default)`
+
+	helpTexts["/cleanmode"] = cleanModeHelp
+
 	helpTexts["/adminmode"] = `<i>Control who can use admin-level music commands in this chat.</i>
 
 <u>Usage:</u>
@@ -141,6 +152,47 @@ func cmdDeleteHandler(m *tg.NewMessage) error {
 	m.Reply(F(chatID, "cmddelete_updated", locales.Arg{
 		"action": F(chatID, actionKey),
 	}), &tg.SendOptions{ParseMode: "HTML"})
+	return tg.ErrEndGroup
+}
+
+func cleanModeHandler(m *tg.NewMessage) error {
+	args := strings.Fields(m.Text())
+	chatID := m.ChannelID()
+
+	current, err := database.CleanMode(chatID)
+	if err != nil {
+		return err
+	}
+
+	if len(args) < 2 {
+		actionKey := "disabled"
+		if current {
+			actionKey = "enabled"
+		}
+
+		m.Reply(cleanModeStatusText(chatID, current)+"\n\n"+F(chatID, "cleanmode_hint"), &tg.SendOptions{ParseMode: "HTML"})
+		return tg.ErrEndGroup
+	}
+
+	enabled, err := utils.ParseBool(args[1])
+	if err != nil {
+		m.Reply(F(chatID, "invalid_bool"))
+		return tg.ErrEndGroup
+	}
+
+	if err := database.SetCleanMode(chatID, enabled); err != nil {
+		return err
+	}
+	if !enabled {
+		cleanScheduler.cancel(chatID)
+	}
+
+	actionKey := "disabled"
+	if enabled {
+		actionKey = "enabled"
+	}
+
+	m.Reply(cleanModeStatusText(chatID, enabled)+"\n\n"+F(chatID, "cleanmode_hint"), &tg.SendOptions{ParseMode: "HTML"})
 	return tg.ErrEndGroup
 }
 
@@ -272,6 +324,20 @@ func settingsCallbackHandler(cb *tg.CallbackQuery) error {
 		}
 	case "cmddelete":
 		settings.CommandDelete = !settings.CommandDelete
+	case "cleanmode":
+		settings.CleanMode = !settings.CleanMode
+		if !settings.CleanMode {
+			cleanScheduler.schedule(chatID)
+		}
+	case "cleanduration":
+		next := cleanModeDurationOptions[0]
+		for i, v := range cleanModeDurationOptions {
+			if v == settings.CleanModeDurationMins {
+				next = cleanModeDurationOptions[(i+1)%len(cleanModeDurationOptions)]
+				break
+			}
+		}
+		settings.CleanModeDurationMins = next
 	case "nothumb":
 		settings.ThumbnailsDisabled = !settings.ThumbnailsDisabled
 	}
@@ -320,6 +386,22 @@ func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *tg.ReplyInline
 	kb.AddRow(
 		tg.Button.Data(F(chatID, "settings_btn_cmddelete"), "info:cmddelete"),
 		tg.Button.Data(F(chatID, cmdDeleteStatus), "set:cmddelete"),
+	)
+
+	// Clean Mode
+	cleanModeStatus := utils.IfElse(s.CleanMode, "enabled", "disabled")
+	kb.AddRow(
+		tg.Button.Data(F(chatID, "settings_btn_cleanmode"), "info:cleanmode"),
+		tg.Button.Data(F(chatID, cleanModeStatus), "set:cleanmode"),
+	)
+
+	cleanDuration := settings.CleanModeDurationMins
+	if cleanDuration <= 0 {
+		cleanDuration = 15
+	}
+	kb.AddRow(
+		tg.Button.Data(F(chatID, "settings_btn_cleanduration"), "info:cleanduration"),
+		tg.Button.Data(utils.IntToStr(cleanDuration)+"m", "set:cleanduration"),
 	)
 
 	// Thumbnails

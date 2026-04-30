@@ -150,6 +150,11 @@ var handlers = []MsgHandlerDef{
 		Handler: settingsHandler,
 		Filters: []telegram.Filter{superGroupFilter, adminFilter},
 	},
+	{
+		Pattern: "cleanmode",
+		Handler: cleanModeHandler,
+		Filters: []telegram.Filter{superGroupFilter, adminFilter},
+	},
 
 	// SuperGroup & Admin Filters
 
@@ -490,6 +495,8 @@ var cbHandlers = []CbHandlerDef{
 
 func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 	bot.UpdatesGetState()
+	startCleanMode()
+	bot.AddRawHandler(&telegram.UpdateReadChannelOutbox{}, cleanModeReadHandler)
 	assistants.ForEach(func(a *core.Assistant) {
 		a.Client.UpdatesGetState()
 	})

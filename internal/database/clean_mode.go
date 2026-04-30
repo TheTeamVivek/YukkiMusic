@@ -14,15 +14,15 @@
  *
  * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
-
-package database
+ 
+ package database
 
 func CommandDelete(chatID int64) (bool, error) {
-	settings, err := getChatSettings(chatID)
+	s, err := getChatSettings(chatID)
 	if err != nil {
 		return false, err
 	}
-	return settings.CommandDelete, nil
+	return s.CommandDelete, nil
 }
 
 func SetCommandDelete(chatID int64, enabled bool) error {
@@ -31,6 +31,24 @@ func SetCommandDelete(chatID int64, enabled bool) error {
 			return false
 		}
 		s.CommandDelete = enabled
+		return true
+	})
+}
+
+func CleanMode(chatID int64) (bool, error) {
+	s, err := getChatSettings(chatID)
+	if err != nil {
+		return false, err
+	}
+	return s.CleanMode, nil
+}
+
+func SetCleanMode(chatID int64, enabled bool) error {
+	return modifyChatSettings(chatID, func(s *ChatSettings) bool {
+		if s.CleanMode == enabled {
+			return false
+		}
+		s.CleanMode = enabled
 		return true
 	})
 }

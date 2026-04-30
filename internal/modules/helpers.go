@@ -235,8 +235,14 @@ func SafeMessageHandler(
 		}()
 
 		if m.IsCommand() {
-			if isEnabled, _ := database.CommandDelete(m.ChannelID()); isEnabled {
+			isEnabled, _ := database.CommandDelete(m.ChannelID())
+			if isEnabled {
 				_, _ = m.Delete()
+			} else {
+				cleanMode, _ := database.CleanMode(m.ChannelID())
+				if cleanMode {
+					cleanScheduler.schedule(m.ChannelID(), m.ID)
+				}
 			}
 		}
 

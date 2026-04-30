@@ -51,6 +51,7 @@ func streamEndHandler(
 	if !ok {
 		return
 	}
+	scheduleOldPlayingMessage(r)
 
 	if ok, v := r.GetData("is_transitioning"); ok {
 		if ok, v := v.(bool); ok && v {
