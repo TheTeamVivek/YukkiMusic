@@ -772,7 +772,8 @@ shuffle_updated: "🔀 Karıştırma, {user} tarafından <b>{state}</b> konumuna
 
 skip_stopped: "⏹️ Oynatma durduruldu. Sıra boş.\nAtlayan: {user}"
 skip_invalid_number: "⚠️ Lütfen /skip komutundan sonra geçerli bir sayı verin.\nÖrnek: <code>/skip 3</code>"
-skip_invalid_range: "⚠️ Geçersiz atlama sayısı. İzin verilen aralık: <code>{min}</code> - <code>{max}</code>."
+skip_queue_empty_for_count: "⚠️ Atlanacak sıradaki parça yok."
+skip_count_exceeds_queue: "⚠️ <code>{requested}</code> parça atlamak istediniz, ancak sırada yalnızca <code>{available}</code> parça var."
 
 speed_usage: |
   💡 <b>Kullanım:</b>

@@ -777,7 +777,8 @@ shuffle_updated: "🔀 {user} द्वारा यादृच्छिक क
 
 skip_stopped: "⏹️ संगीत बन्द। प्रतीक्षा सूची रिक्त है।\nछोड़ने वाला: {user}"
 skip_invalid_number: "⚠️ कृपया /skip के बाद मान्य संख्या दें।\nउदाहरण: <code>/skip 3</code>"
-skip_invalid_range: "⚠️ अमान्य स्किप संख्या। अनुमत सीमा: <code>{min}</code> से <code>{max}</code>."
+skip_queue_empty_for_count: "⚠️ स्किप करने के लिए कतार में कोई अगला ट्रैक नहीं है।"
+skip_count_exceeds_queue: "⚠️ आपने <code>{requested}</code> ट्रैक स्किप करने को कहा, लेकिन कतार में सिर्फ <code>{available}</code> ट्रैक है।"
 
 speed_usage: |
   💡 <b>प्रयोग:</b>

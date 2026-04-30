@@ -81,15 +81,22 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 			return telegram.ErrEndGroup
 		}
 
-		maxSkip := len(r.Queue())
-		if parsed < 1 || parsed > maxSkip {
-			m.Reply(F(chatID, "skip_invalid_range", locales.Arg{
-				"min": 1,
-				"max": maxSkip,
+		queuedTracks := len(r.Queue())
+		if queuedTracks == 0 {
+			m.Reply(F(chatID, "skip_queue_empty_for_count"))
+			return telegram.ErrEndGroup
+		}
+
+		if parsed < 1 || parsed > queuedTracks {
+			m.Reply(F(chatID, "skip_count_exceeds_queue", locales.Arg{
+				"requested": parsed,
+				"available": queuedTracks,
 			}))
 			return telegram.ErrEndGroup
 		}
-		skipCount = parsed
+
+		// /skip N means: skip current + N queued tracks.
+		skipCount = parsed + 1
 	}
 
 	if len(r.Queue()) == 0 {
@@ -113,7 +120,22 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		_ = r.NextTrack()
 	}
 
+	if len(r.Queue()) == 0 {
+		core.DeleteRoom(r.ID())
+		m.Reply(F(chatID, "skip_stopped", locales.Arg{
+			"user": mention,
+		}))
+		return telegram.ErrEndGroup
+	}
+
 	t := r.NextTrack()
+	if t == nil {
+		core.DeleteRoom(r.ID())
+		m.Reply(F(chatID, "skip_stopped", locales.Arg{
+			"user": mention,
+		}))
+		return telegram.ErrEndGroup
+	}
 
 	statusMsg, err := core.Bot.SendMessage(
 		chatID,

@@ -47,7 +47,7 @@
             "required": true
         },
         "LOGGER_ID": {
-            "description": "The Telegram chat ID where logs will be sent.",
+            "description": "(Optional) Telegram chat ID where logs/errors will be sent. Leave empty to disable chat logging.",
             "value": "",
             "required": false
         },

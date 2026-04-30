@@ -18,7 +18,6 @@ These must be set for the bot to start.
 | `API_ID` | `int32` | Your Telegram API ID from [my.telegram.org](https://my.telegram.org). |
 | `API_HASH` | `string` | Your Telegram API Hash from [my.telegram.org](https://my.telegram.org). |
 | `TOKEN` | `string` | Your Telegram Bot Token from [@BotFather](https://t.me/BotFather). Also accepts `BOT_TOKEN`. |
-| `LOGGER_ID` | `int64` | Chat ID where the bot will send logs and error reports. Also accepts `LOG_GROUP_ID`.|
 | `MONGO_DB_URI` | `string` | MongoDB connection string (e.g., `mongodb+srv://...`). |
 | `STRING_SESSIONS`| `[]string`| Space, comma, or semicolon separated session strings for assistant accounts. Also accepts `STRING_SESSION`. |
 
@@ -55,6 +54,7 @@ These must be set for the bot to start.
 | `SET_CMDS` | `false` | Automatically set bot commands in Telegram UI on startup. |
 | `DISABLE_COLOUR` | `false` | If `true`, disables Telegram inline button colour styling (`Primary/Success/Danger`). |
 | `COOKIES_LINK` | `""` | URL to a `yt-dlp` cookies file (e.g., via batbin). |
+| `LOGGER_ID` | `0` | Chat ID where the bot will send logs and error reports. Also accepts `LOG_GROUP_ID`. If unset, logging-to-chat is disabled. |
 
 ## 🎨 Customization
 

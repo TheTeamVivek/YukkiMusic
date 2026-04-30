@@ -148,7 +148,6 @@ func validateConfig() error {
 	required := []check{
 		{APIID != 0, "API_ID is required but missing"},
 		{APIHash != "", "API_HASH is required but missing"},
-		{LoggerID != 0, "LOGGER_ID is required but missing"},
 		{MongoURI != "", "MONGO_DB_URI is required but missing"},
 		{Token != "", "TOKEN (or BOT_TOKEN) is required but missing"},
 		{

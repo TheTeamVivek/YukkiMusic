@@ -775,7 +775,8 @@ shuffle_updated: "🔀 الترتيب العشوائي <b>{state}</b> بواسط
 
 skip_stopped: "⏹️ توقف التشغيل. قائمة الانتظار فارغة.\nتخطى بواسطة: {user}"
 skip_invalid_number: "⚠️ يرجى إدخال رقم صحيح بعد /skip.\nمثال: <code>/skip 3</code>"
-skip_invalid_range: "⚠️ عدد التخطي غير صالح. النطاق المسموح: من <code>{min}</code> إلى <code>{max}</code>."
+skip_queue_empty_for_count: "⚠️ لا توجد مقاطع قادمة في قائمة الانتظار لتخطيها."
+skip_count_exceeds_queue: "⚠️ طلبت تخطي <code>{requested}</code> من المقاطع، لكن المتاح في القائمة هو <code>{available}</code> فقط."
 
 speed_usage: |
   💡 <b>الاستخدام:</b>

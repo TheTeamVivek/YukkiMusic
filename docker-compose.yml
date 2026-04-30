@@ -1,0 +1,9 @@
+services:
+  yukkimusic:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yukkimusic
+    env_file:
+      - .env
+    restart: unless-stopped

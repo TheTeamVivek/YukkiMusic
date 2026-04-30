@@ -1,0 +1,15 @@
+.git
+.github
+.gitignore
+
+.env
+*.log
+logs.txt
+
+tmp
+temp
+.cache
+
+bin
+dist
+build

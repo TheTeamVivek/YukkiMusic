@@ -778,7 +778,8 @@ shuffle_updated: "🔀 Shuffle <b>{state}</b> by {user}."
 
 skip_stopped: "⏹️ Playback stopped. Queue is empty.\nSkipped by: {user}"
 skip_invalid_number: "⚠️ Please provide a valid number after /skip.\nExample: <code>/skip 3</code>"
-skip_invalid_range: "⚠️ Invalid skip count. Allowed range: <code>{min}</code> to <code>{max}</code>."
+skip_queue_empty_for_count: "⚠️ Queue has no upcoming tracks to skip."
+skip_count_exceeds_queue: "⚠️ You requested to skip <code>{requested}</code> queued tracks, but only <code>{available}</code> track(s) are in queue."
 
 speed_usage: |
   💡 <b>Usage:</b>
