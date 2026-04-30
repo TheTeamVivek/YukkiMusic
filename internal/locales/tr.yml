@@ -579,6 +579,11 @@ restart_symlink_fail: "❌ Çalıştırılabilir dosya yolu çözülemedi: {erro
 restart_service: "{bot} az önce yeniden başlatıldı. Sorunlar için üzgünüz.\n\n10–15 saniye sonra tekrar çalmaya başlayabilirsin."
 restart_initiated: "✅ Yeniden başlatma başarıyla başlatıldı!"
 restart_fail: "❌ Yeniden başlatılamadı: {error}"
+restart_confirm_running: "⚠️ Bu sohbette şu anda bir şarkı çalıyor.\nLütfen aşağıdan bir işlem seç."
+restart_btn_bot: "Botu Yeniden Başlat"
+restart_btn_replay: "Şarkıyı Yeniden Oynat"
+restart_confirm_bot: "♻️ Bot yeniden başlatılıyor..."
+restart_confirm_replay_done: "⏮️ Mevcut şarkı başarıyla yeniden oynatıldı."
 
 room_not_active_cb: "⚠️ Şu an hiçbir şey çalmıyor."
 room_no_active: "⚠️ <b>Aktif oynatma yok.</b>\n\n<i>Şu an hiçbir şey çalmıyor.</i>"
@@ -729,10 +734,8 @@ sudo_check_fail: "❌ Sudo varlığı kontrol edilemedi: <i>{error}</i>"
 sudo_already: "⚠️ {user} kullanıcısı (ID:<code>{id}</code>) zaten bir sudo kullanıcısı."
 sudo_add_fail: "❌ Sudo eklenemedi: <i>{error}</i>"
 sudo_add_success: "✅ {user} (<code>{id}</code>) sudo listesine eklendi."
-sudo_assistant_self: "🤖 Asistan varsayılan olarak her zaman sudo listesindedir — tekrar eklenemez."
 
 sudo_owner_remove_block: "😎 Güzel deneme! Sahibini kaldıramazsın — o dokunulmazdır."
-sudo_assistant_cannot_remove: "🤖 Asistan gereklidir ve sudo listesinden çıkarılamaz."
 sudo_not_exists: "⚠️ {user} kullanıcısı (<code>{id}</code>) bir sudo kullanıcısı değil."
 sudo_remove_fail: "❌ Sudo kaldırılamadı: <i>{error}</i>"
 sudo_remove_success: "🗑️ {user} (ID: <code>{id}</code>) sudo listesinden çıkarıldı."
@@ -768,6 +771,8 @@ shuffle_current_state: "🔀 Bu sohbet için karıştırma şu an <b>{state}</b>
 shuffle_updated: "🔀 Karıştırma, {user} tarafından <b>{state}</b> konumuna getirildi."
 
 skip_stopped: "⏹️ Oynatma durduruldu. Sıra boş.\nAtlayan: {user}"
+skip_invalid_number: "⚠️ Lütfen /skip komutundan sonra geçerli bir sayı verin.\nÖrnek: <code>/skip 3</code>"
+skip_invalid_range: "⚠️ Geçersiz atlama sayısı. İzin verilen aralık: <code>{min}</code> - <code>{max}</code>."
 
 speed_usage: |
   💡 <b>Kullanım:</b>

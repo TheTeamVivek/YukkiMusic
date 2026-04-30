@@ -479,6 +479,7 @@ var cbHandlers = []CbHandlerDef{
 
 	{Pattern: "^close$", Handler: closeHandler},
 	{Pattern: "^cancel$", Handler: cancelHandler},
+	{Pattern: "^restart:(bot|replay)$", Handler: restartConfirmHandler},
 	{Pattern: "^bcast_cancel$", Handler: broadcastCancelCB},
 	{Pattern: "^rtmp_stop$", Handler: rtmpStopCallbackHandler},
 

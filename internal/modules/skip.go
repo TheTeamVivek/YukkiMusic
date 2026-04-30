@@ -19,6 +19,7 @@ package modules
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
@@ -71,6 +72,25 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	mention := utils.MentionHTML(m.Sender)
+	skipCount := 1
+
+	if args := m.Args(); args != "" {
+		parsed, parseErr := strconv.Atoi(args)
+		if parseErr != nil {
+			m.Reply(F(chatID, "skip_invalid_number"))
+			return telegram.ErrEndGroup
+		}
+
+		maxSkip := len(r.Queue()) + 1
+		if parsed < 1 || parsed > maxSkip {
+			m.Reply(F(chatID, "skip_invalid_range", locales.Arg{
+				"min": 1,
+				"max": maxSkip,
+			}))
+			return telegram.ErrEndGroup
+		}
+		skipCount = parsed
+	}
 
 	if len(r.Queue()) == 0 {
 		core.DeleteRoom(r.ID())
@@ -81,6 +101,18 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	r.SetLoop(0)
+
+	for i := 1; i < skipCount; i++ {
+		if len(r.Queue()) == 0 {
+			core.DeleteRoom(r.ID())
+			m.Reply(F(chatID, "skip_stopped", locales.Arg{
+				"user": mention,
+			}))
+			return telegram.ErrEndGroup
+		}
+		_ = r.NextTrack()
+	}
+
 	t := r.NextTrack()
 
 	statusMsg, err := core.Bot.SendMessage(

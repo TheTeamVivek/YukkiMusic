@@ -216,3 +216,12 @@ func GetBackKeyboard(chatID int64) *tg.ReplyInlineMarkup {
 		).
 		Build()
 }
+
+func GetRestartConfirmMarkup(chatID int64) *tg.ReplyInlineMarkup {
+	return tg.NewKeyboard().
+		AddRow(
+			styleBtn(F(chatID, "restart_btn_bot"), "restart:bot", "red"),
+			styleBtn(F(chatID, "restart_btn_replay"), "restart:replay", "green"),
+		).
+		Build()
+}
