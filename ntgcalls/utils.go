@@ -58,7 +58,7 @@ func parseStringVector(data unsafe.Pointer, size C.int) []string {
 		result[i] = C.GoString(pointer)
 		C.free(unsafe.Pointer(pointer))
 	}
-	defer C.free(data)
+	C.free(data)
 	return result
 }
 
@@ -108,15 +108,17 @@ func freeStringVectorC(data **C.char, size C.int) {
 
 func parseErrorCode(futureResult *Future) error {
 	errorCode := int32(*futureResult.errCode)
-	if errorCode < 0 {
-		var message string
-		if futureResult.errMessage != nil {
-			cMessage := *futureResult.errMessage
-			if cMessage != nil {
-				defer C.free(unsafe.Pointer(cMessage))
-				message = C.GoString(cMessage)
-			}
+	var message string
+	if futureResult.errMessage != nil {
+		cMessage := *futureResult.errMessage
+		if cMessage != nil {
+			message = C.GoString(cMessage)
+			C.free(unsafe.Pointer(cMessage))
+			*futureResult.errMessage = nil
 		}
+	}
+
+	if errorCode < 0 {
 		if len(message) == 0 {
 			message = fmt.Sprintf("Error code: %d", errorCode)
 		}
