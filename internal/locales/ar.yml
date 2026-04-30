@@ -232,9 +232,6 @@ err_assistant_get_failed: |
 
   <i>إذا استمر حدوث ذلك، يرجى الاتصال بالدعم حتى نتمكن من مساعدتك.</i>
   
-err_assistant_join_rate_limited: |
-  ⚠️ لا يمكن للمساعد الانضمام إلى هذه المحادثة لأنها وصلت إلى الحد الأقصى من المجموعات المسموح بها.
-
 err_assistant_join_request_sent: |
   ⚠️ أرسل المساعد طلباً للانضمام، لكن لم أتمكن من الموافقة عليه تلقائياً.
 
@@ -265,9 +262,6 @@ err_no_active_voicechat: |
 err_fetch_failed: |
   ⚠️ فشل جلب معلومات المحادثة:
   <i>{error}</i>
-
-err_peer_resolve_failed: |
-  ⚠️ فشل جلب معلومات الطرف. حاول مرة أخرى لاحقاً أو أعد إضافة المساعد.
 
 err_rtmp_missing_params: |
   <b>⚠️ بيانات RTMP مفقودة</b>

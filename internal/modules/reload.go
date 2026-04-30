@@ -104,8 +104,9 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		return nil
 	}
 
-	summary += reloadVoiceChatStatus(chatID, cs)
-	summary += reloadAssistantStatus(chatID, cs)
+	snapshot, snapErr := cs.Snapshot(true)
+	summary += reloadVoiceChatStatus(chatID, snapshot, snapErr)
+	summary += reloadAssistantStatus(chatID, snapshot, snapErr)
 
 	if isAdmin {
 		if core.DeleteRoom(roomID) {
@@ -145,8 +146,7 @@ func reloadAdminCache(c *telegram.Client, chatID, roomID int64) ([]int64, string
 	return admins, F(chatID, "reload_admin_cache_ok") + "\n"
 }
 
-func reloadVoiceChatStatus(chatID int64, cs *core.ChatState) string {
-	activeVC, err := cs.IsActiveVC(true)
+func reloadVoiceChatStatus(chatID int64, snap core.StateSnapshot, err error) string {
 	if err != nil {
 		if errors.Is(err, core.ErrAdminPermissionRequired) {
 			return F(chatID, "reload_voice_admin_required") + "\n"
@@ -156,14 +156,13 @@ func reloadVoiceChatStatus(chatID int64, cs *core.ChatState) string {
 		}) + "\n"
 	}
 
-	if activeVC {
+	if snap.VoiceChatActive {
 		return F(chatID, "reload_voice_active") + "\n"
 	}
 	return F(chatID, "reload_voice_inactive") + "\n"
 }
 
-func reloadAssistantStatus(chatID int64, cs *core.ChatState) string {
-	banned, err := cs.IsAssistantBanned(true)
+func reloadAssistantStatus(chatID int64, snap core.StateSnapshot, err error) string {
 	if err != nil {
 		if errors.Is(err, core.ErrAdminPermissionRequired) {
 			return F(chatID, "reload_assistant_admin_required") + "\n"
@@ -173,21 +172,11 @@ func reloadAssistantStatus(chatID int64, cs *core.ChatState) string {
 		}) + "\n"
 	}
 
-	if banned {
+	if snap.AssistantBanned {
 		return F(chatID, "reload_assistant_banned") + "\n"
 	}
 
-	present, err := cs.IsAssistantPresent(false)
-	if err != nil {
-		if errors.Is(err, core.ErrAdminPermissionRequired) {
-			return F(chatID, "reload_assistant_admin_required") + "\n"
-		}
-		return F(chatID, "reload_assistant_fail", locales.Arg{
-			"error": err.Error(),
-		}) + "\n"
-	}
-
-	if present {
+	if snap.AssistantPresent {
 		return F(chatID, "reload_assistant_present") + "\n"
 	}
 	return F(chatID, "reload_assistant_not_present") + "\n"

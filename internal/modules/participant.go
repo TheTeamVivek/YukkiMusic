@@ -137,7 +137,7 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 		}
 
 		if !state.AssistantFetched() {
-			state.RefreshAssistantState()
+			state.Snapshot(true)
 		}
 	}
 

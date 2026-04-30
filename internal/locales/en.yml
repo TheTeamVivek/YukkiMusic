@@ -231,9 +231,6 @@ err_assistant_get_failed: |
 
   <i>If this keeps happening, please contact support so we can assist you.</i>
   
-err_assistant_join_rate_limited: |
-  ⚠️ Assistant cannot join this chat because it has reached the maximum number of allowed groups.
-
 err_assistant_join_request_sent: |
   ⚠️ Assistant sent a join request, but I could not auto-approve it.
 
@@ -264,9 +261,6 @@ err_no_active_voicechat: |
 err_fetch_failed: |
   ⚠️ Failed to fetch chat info:
   <i>{error}</i>
-
-err_peer_resolve_failed: |
-  ⚠️ Failed to resolve peer information. Try again later or re-add the assistant.
 
 err_rtmp_missing_params: |
   <b>⚠️ RTMP Details Missing</b>

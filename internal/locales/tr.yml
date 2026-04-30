@@ -231,9 +231,6 @@ err_assistant_get_failed: |
 
   <i>Bu durum devam ederse, sana yardımcı olabilmemiz için lütfen destekle iletişime geç.</i>
   
-err_assistant_join_rate_limited: |
-  ⚠️ Asistan bu sohbete katılamıyor çünkü katılabileceği maksimum grup sayısına ulaştı.
-
 err_assistant_join_request_sent: |
   ⚠️ Asistan katılım isteği gönderdi, ancak otomatik olarak onaylayamadım.
 
@@ -264,9 +261,6 @@ err_no_active_voicechat: |
 err_fetch_failed: |
   ⚠️ Sohbet bilgileri alınamadı:
   <i>{error}</i>
-
-err_peer_resolve_failed: |
-  ⚠️ Bilgiler çözülemedi. Daha sonra tekrar dene veya asistanı yeniden ekle.
 
 err_rtmp_missing_params: |
   <b>⚠️ RTMP Detayları Eksik</b>

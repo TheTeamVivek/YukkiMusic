@@ -160,44 +160,13 @@ All c* commands work the same as regular commands but affect the linked channel.
 }
 
 func playHandler(m *tg.NewMessage) error { return handlePlay(m, &playOpts{}) }
-
-func fplayHandler(
-	m *tg.NewMessage,
-) error {
-	return handlePlay(m, &playOpts{Force: true})
-}
-
-func cfplayHandler(
-	m *tg.NewMessage,
-) error {
-	return handlePlay(m, &playOpts{Force: true, CPlay: true})
-}
-
-func vplayHandler(
-	m *tg.NewMessage,
-) error {
-	return handlePlay(m, &playOpts{Video: true})
-}
-
-func fvplayHandler(
-	m *tg.NewMessage,
-) error {
-	return handlePlay(m, &playOpts{Force: true, Video: true})
-}
-
-func vcplayHandler(
-	m *tg.NewMessage,
-) error {
-	return handlePlay(m, &playOpts{CPlay: true, Video: true})
-}
-
-func fvcplayHandler(m *tg.NewMessage) error {
-	return handlePlay(m, &playOpts{Force: true, CPlay: true, Video: true})
-}
-
-func cplayHandler(m *tg.NewMessage) error {
-	return handlePlay(m, &playOpts{CPlay: true})
-}
+func fplayHandler(	m *tg.NewMessage,) error {	return handlePlay(m, &playOpts{Force: true})}
+func cfplayHandler(m *tg.NewMessage,) error {	return handlePlay(m, &playOpts{Force: true, CPlay: true})}
+func vplayHandler(	m *tg.NewMessage,) error {	return handlePlay(m, &playOpts{Video: true})}
+func fvplayHandler(	m *tg.NewMessage,) error {	return handlePlay(m, &playOpts{Force: true, Video: true})}
+func vcplayHandler(	m *tg.NewMessage,) error {	return handlePlay(m, &playOpts{CPlay: true, Video: true})}
+func fvcplayHandler(m *tg.NewMessage) error {	return handlePlay(m, &playOpts{Force: true, CPlay: true, Video: true})}
+func cplayHandler(m *tg.NewMessage) error {	return handlePlay(m, &playOpts{CPlay: true})}
 
 func handlePlay(m *tg.NewMessage, opts *playOpts) error {
 	chatID := m.ChannelID()
@@ -353,25 +322,19 @@ func ensureVoiceChatReady(
 	replyMsg *tg.NewMessage,
 	cs *core.ChatState,
 ) error {
-	activeVC, err := cs.IsActiveVC(false)
+	snap, err := cs.Snapshot(false)
 	if err != nil {
 		gologging.ErrorF("Error checking voicechat state: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(chatID, err))
 		return err
 	}
-	if !activeVC {
+	if !snap.VoiceChatActive {
 		err := fmt.Errorf("no active voice chat")
 		utils.EOR(replyMsg, F(chatID, "err_no_active_voicechat"))
 		return err
 	}
 
-	banned, err := cs.IsAssistantBanned(false)
-	if err != nil {
-		gologging.ErrorF("Error checking assistant banned state: %v", err)
-		utils.EOR(replyMsg, getErrorMessage(chatID, err))
-		return err
-	}
-	if banned {
+	if snap.AssistantBanned {
 		err := fmt.Errorf("assistant banned")
 		utils.EOR(replyMsg, F(chatID, "err_assistant_banned", locales.Arg{
 			"user": utils.MentionHTML(cs.Assistant.Self),
@@ -380,17 +343,15 @@ func ensureVoiceChatReady(
 		return err
 	}
 
-	present, err := cs.IsAssistantPresent(false)
-	if err != nil {
-		gologging.ErrorF("Error checking assistant presence: %v", err)
-		utils.EOR(replyMsg, getErrorMessage(chatID, err))
-		return err
-	}
-	if present {
+	if snap.AssistantPresent {
 		return nil
 	}
 
-	if err := cs.TryJoin(); err != nil {
+	username := ""
+	if replyMsg.Channel != nil {
+		username = replyMsg.Channel.Username
+	}
+	if err := cs.EnsureAssistantJoined(username); err != nil {
 		gologging.ErrorF("Error joining assistant: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(chatID, err))
 		return err
@@ -810,14 +771,10 @@ var errMessageMap = map[error]msgFn{
 	core.ErrAdminPermissionRequired: func(chatID int64, _ error) string {
 		return F(chatID, "err_admin_permission_required")
 	},
-	core.ErrAssistantGetFailed: func(chatID int64, e error) string {
-		gologging.Error(e)
+	core.ErrAssistantNotAvailable: func(chatID int64, e error) string {
 		return F(chatID, "err_assistant_get_failed", locales.Arg{"error": e.Error()})
 	},
-	core.ErrAssistantJoinRateLimited: func(chatID int64, _ error) string {
-		return F(chatID, "err_assistant_join_rate_limited")
-	},
-	core.ErrAssistantJoinRequestSent: func(chatID int64, _ error) string {
+	core.ErrInviteRequestSent: func(chatID int64, _ error) string {
 		return F(chatID, "err_assistant_join_request_sent")
 	},
 	core.ErrAssistantInviteLinkFetch: func(chatID int64, e error) string {
@@ -827,14 +784,11 @@ var errMessageMap = map[error]msgFn{
 			locales.Arg{"error": e.Error()},
 		)
 	},
-	core.ErrAssistantInviteFailed: func(chatID int64, e error) string {
+	core.ErrJoinFailed: func(chatID int64, e error) string {
 		return F(chatID, "err_assistant_invite_failed", locales.Arg{"error": e.Error()})
 	},
-	core.ErrFetchFailed: func(chatID int64, e error) string {
+	core.ErrStateFetchFailed: func(chatID int64, e error) string {
 		return F(chatID, "err_fetch_failed", locales.Arg{"error": e.Error()})
-	},
-	core.ErrPeerResolveFailed: func(chatID int64, _ error) string {
-		return F(chatID, "err_peer_resolve_failed")
 	},
 }
 
