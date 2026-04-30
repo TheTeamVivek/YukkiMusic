@@ -81,7 +81,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 			return telegram.ErrEndGroup
 		}
 
-		maxSkip := len(r.Queue()) + 1
+		maxSkip := len(r.Queue())
 		if parsed < 1 || parsed > maxSkip {
 			m.Reply(F(chatID, "skip_invalid_range", locales.Arg{
 				"min": 1,
