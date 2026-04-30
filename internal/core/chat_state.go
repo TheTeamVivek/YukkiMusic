@@ -25,6 +25,7 @@ import (
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+
 	"main/internal/database"
 	"main/internal/utils"
 )
@@ -284,7 +285,11 @@ func (s *ChatState) approveJoinRequest() error {
 	if !ok {
 		return ErrJoinFailed
 	}
-	_, err = Bot.MessagesHideChatJoinRequest(true, chatPeer, &telegram.InputUserObj{UserID: u.UserID, AccessHash: u.AccessHash})
+	_, err = Bot.MessagesHideChatJoinRequest(
+		true,
+		chatPeer,
+		&telegram.InputUserObj{UserID: u.UserID, AccessHash: u.AccessHash},
+	)
 	if err == nil || telegram.MatchError(err, "USER_ALREADY_PARTICIPANT") {
 		s.applySnapshot(true, false, s.snapshot.VoiceChatActive)
 		return nil
@@ -352,5 +357,7 @@ func (s *ChatState) leaveInactiveAssistantChats(limit int) {
 }
 
 func isAdminError(err error) bool {
-	return telegram.MatchError(err, "CHAT_ID_INVALID") || telegram.MatchError(err, "CHAT_ADMIN_REQUIRED") || telegram.MatchError(err, "CHANNEL_PRIVATE") || telegram.MatchError(err, "CHANNEL_INVALID")
+	return telegram.MatchError(err, "CHAT_ID_INVALID") || telegram.MatchError(err, "CHAT_ADMIN_REQUIRED") ||
+		telegram.MatchError(err, "CHANNEL_PRIVATE") ||
+		telegram.MatchError(err, "CHANNEL_INVALID")
 }
