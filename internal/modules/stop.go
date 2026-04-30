@@ -88,8 +88,8 @@ func handleStop(m *telegram.NewMessage, cplay bool) error {
 			return telegram.ErrEndGroup
 		}
 	}
-    
-    scheduleOldPlayingMessage(r)
+
+	scheduleOldPlayingMessage(r)
 	core.DeleteRoom(r.ID())
 	m.Reply(
 		F(

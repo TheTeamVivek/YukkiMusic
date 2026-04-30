@@ -165,7 +165,10 @@ func cleanModeHandler(m *tg.NewMessage) error {
 	}
 
 	if len(args) < 2 {
-		m.Reply(cleanModeStatusText(chatID, current)+"\n\n"+F(chatID, "cleanmode_hint"), &tg.SendOptions{ParseMode: "HTML"})
+		m.Reply(
+			cleanModeStatusText(chatID, current)+"\n\n"+F(chatID, "cleanmode_hint"),
+			&tg.SendOptions{ParseMode: "HTML"},
+		)
 		return tg.ErrEndGroup
 	}
 

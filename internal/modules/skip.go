@@ -100,8 +100,8 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	if len(r.Queue()) == 0 {
-        
-                scheduleOldPlayingMessage(r)
+
+		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID())
 		m.Reply(F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
@@ -113,8 +113,8 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 
 	for i := 1; i < skipCount; i++ {
 		if len(r.Queue()) == 0 {
-            
-                    scheduleOldPlayingMessage(r)
+
+			scheduleOldPlayingMessage(r)
 			core.DeleteRoom(r.ID())
 			m.Reply(F(chatID, "skip_stopped", locales.Arg{
 				"user": mention,
@@ -125,8 +125,8 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	if len(r.Queue()) == 0 {
-        
-                scheduleOldPlayingMessage(r)
+
+		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID())
 		m.Reply(F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
@@ -136,8 +136,8 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 
 	t := r.NextTrack()
 	if t == nil {
-        
-                scheduleOldPlayingMessage(r)
+
+		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID())
 		m.Reply(F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
@@ -165,7 +165,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 			core.Bot.SendMessage(chatID, txt)
 		}
 
-        scheduleOldPlayingMessage(r)
+		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID())
 		return telegram.ErrEndGroup
 	}
@@ -177,7 +177,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		} else {
 			core.Bot.SendMessage(chatID, txt)
 		}
-        scheduleOldPlayingMessage(r)
+		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID())
 		return telegram.ErrEndGroup
 	}

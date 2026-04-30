@@ -14,8 +14,8 @@
  *
  * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
- 
- package database
+
+package database
 
 func CommandDelete(chatID int64) (bool, error) {
 	s, err := getChatSettings(chatID)

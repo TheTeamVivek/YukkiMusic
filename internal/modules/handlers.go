@@ -508,7 +508,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 		bot.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler), h.Filters...) /*.
 		SetGroup(90)*/
 	}
-    
+
 	bot.On("edit:/eval", evalHandle)       //.SetGroup(80)
 	bot.On("edit:/ev", evalCommandHandler) //.SetGroup(80)
 
@@ -516,8 +516,8 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 	bot.On("action", handleChatAction)
 
 	bot.AddActionHandler(handleActions)
-    bot.AddRawHandler(&telegram.UpdateReadChannelOutbox{}, cleanModeReadHandler)
-	
+	bot.AddRawHandler(&telegram.UpdateReadChannelOutbox{}, cleanModeReadHandler)
+
 	bot.On("action", func(m *telegram.NewMessage) error { fmt.Println(m.Marshal()); return nil })
 
 	assistants.ForEach(func(a *core.Assistant) {
@@ -527,8 +527,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 	go MonitorRooms()
 
 	autoLeaveSvc.Start()
-    cleanScheduler.start()
-	
+	cleanScheduler.start()
 
 	if config.SetCmds && config.OwnerID != 0 {
 		go setBotCommands(bot)

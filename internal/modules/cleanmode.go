@@ -23,7 +23,6 @@ var (
 	cleanScheduler           = &CleanScheduler{pending: make(map[int64][]cleanEntry)}
 )
 
-
 func cleanModeReadHandler(u tg.Update, _ *tg.Client) error {
 	upd, ok := u.(*tg.UpdateReadChannelOutbox)
 	if !ok || upd.MaxID == 0 {
@@ -65,7 +64,11 @@ func cleanModeStatusText(chatID int64, enabled bool) string {
 	if settings != nil && settings.CleanModeDurationMins > 0 {
 		duration = settings.CleanModeDurationMins
 	}
-	return F(chatID, "cleanmode_status", locales.Arg{"action": F(chatID, utils.IfElse(enabled, "enabled", "disabled")), "duration": duration})
+	return F(
+		chatID,
+		"cleanmode_status",
+		locales.Arg{"action": F(chatID, utils.IfElse(enabled, "enabled", "disabled")), "duration": duration},
+	)
 }
 
 type cleanEntry struct {
