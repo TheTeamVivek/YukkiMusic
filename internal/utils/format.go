@@ -18,7 +18,7 @@
 package utils
 
 import (
-	"fmt"
+	"strconv"
 )
 
 // FormatDuration returns a duration string (e.g., "1d 2h", "3h 4m", "5m 6s").
@@ -34,20 +34,16 @@ func FormatDuration(sec int) string {
 	)
 
 	if sec < min {
-		return fmt.Sprintf("%ds", sec)
+		return strconv.Itoa(sec) + "s"
 	}
 	if sec < hour {
-		return fmt.Sprintf("%dm %ds", sec/min, sec%min)
+		return strconv.Itoa(sec/min) + "m " + strconv.Itoa(sec%min) + "s"
 	}
 	if sec < day {
-		return fmt.Sprintf("%dh %dm", sec/hour, (sec%hour)/min)
+		return strconv.Itoa(sec/hour) + "h " + strconv.Itoa((sec%hour)/min) + "m"
 	}
 
-	return fmt.Sprintf(
-		"%dd %dh",
-		sec/day,
-		(sec%day)/hour,
-	)
+	return strconv.Itoa(sec/day) + "d " + strconv.Itoa((sec%day)/hour) + "h"
 }
 
 // FormatTime returns a clock-style duration string (e.g., "HH:MM:SS" or "MM:SS").
@@ -60,7 +56,14 @@ func FormatTime(sec int) string {
 	s := sec % 60
 
 	if h > 0 {
-		return fmt.Sprintf("%d:%02d:%02d", h, m, s)
+		return strconv.Itoa(h) + ":" + padZero(m) + ":" + padZero(s)
 	}
-	return fmt.Sprintf("%02d:%02d", m, s)
+	return padZero(m) + ":" + padZero(s)
+}
+
+func padZero(v int) string {
+	if v < 10 {
+		return "0" + strconv.Itoa(v)
+	}
+	return strconv.Itoa(v)
 }
