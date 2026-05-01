@@ -709,39 +709,30 @@ searching_query: "🔍🎶 Aranan: <b>{query}</b>... ⚡✨"
 speed_line: "⚙️ Hız: <b>{speed}x</b>"
 
 stats_overview: |
-  🔧 <b>Sistem:</b>
-  <blockquote>
+  🔧 <b>Sistem:</b><blockquote>
   • İşletim Sistemi: <code>{os}</code>, Mimari: <code>{arch}</code>
-  • İşlemciler: <code>{cpus}</code>, Goroutine Sayısı: <code>{goroutines}</code>
-  </blockquote>
+  • İşlemciler: <code>{cpus}</code>, Goroutine Sayısı: <code>{goroutines}</code></blockquote>
 
-  📦 <b>Dahili Bellek (Go):</b>
-  <blockquote>
+  📦 <b>Dahili Bellek (Go):</b><blockquote>
   • Ayrılan (Alloc): <code>{alloc} MB</code>
   • Sistem (Sys): <code>{sys} MB</code>
-  • NumGC: <code>{gc_count}</code> ({gc_emoji} {gc_rate}/dk)
-  </blockquote>
+  • NumGC: <code>{gc_count}</code> ({gc_emoji} {gc_rate}/dk)</blockquote>
 
-  💻 <b>Sunucu İstatistikleri:</b>
-  <blockquote>
+  💻 <b>Sunucu İstatistikleri:</b><blockquote>
   • CPU Kullanımı: {cpu_emoji} <code>%{cpu}</code>
   • RAM Kullanımı: {ram_emoji} <code>{ram_used_gib} GiB</code> | <code>{ram_total_gib} GiB</code>
-  • Depolama: <code>{storage_used_gib} GiB</code> | <code>{storage_total_gib} GiB</code>
-  </blockquote>
+  • Depolama: <code>{storage_used_gib} GiB</code> | <code>{storage_total_gib} GiB</code></blockquote>
 
-  📊 <b>Hizmet Verilen:</b>
-  <blockquote>
+  📊 <b>Hizmet Verilen:</b><blockquote>
   {chats_line}
-  {users_line}
-  </blockquote>
+  {users_line}</blockquote>
 
-  🧩 <b>Çalışma Zamanı Sürümleri:</b>
-  <blockquote>
+  🧩 <b>Çalışma Zamanı Sürümleri:</b><blockquote>
   • Go: <code>{go_version}</code>
   • Gogram API Layer: <code>{gogram_api_layer}</code>
   • Gogram Version: <code>{gogram_version}</code>
-  • NTgCalls Version: <code>{ntgcalls_version}</code>
-  </blockquote>
+  • NTgCalls Version: <code>{ntgcalls_version}</code></blockquote>
+  
 stats_served_chats_line: "• Sohbetler: <code>{count}</code>"
 stats_served_chats_line_err: "• Sohbetler: <code>Hata: {error}</code>"
 stats_served_users_line: "• Kullanıcılar: <code>{count}</code>"
