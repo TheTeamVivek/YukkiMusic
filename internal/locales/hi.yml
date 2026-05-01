@@ -508,6 +508,7 @@ ping_result: |
   <b>प्रक्रमक प्रयोग:</b> {cpu_usage}
   <b>डिस्क प्रयोग:</b> {disk_usage}
 
+
 position_now: |
   🎵 <b>{title}</b>
   📍 <code>{position} / {duration}</code>
@@ -714,22 +715,38 @@ speed_line: "⚙️ गति: <b>{speed}x</b>"
 
 stats_overview: |
   🔧 <b>प्रणाली:</b>
+  <blockquote>
   • प्रचालन तन्त्र: <code>{os}</code>, स्थापत्य: <code>{arch}</code>
   • प्रक्रमक: <code>{cpus}</code>, गो-रूटिन्स: <code>{goroutines}</code>
+  </blockquote>
 
   📦 <b>आन्तरिक स्मृति (Go):</b>
+  <blockquote>
   • आवंटित: <code>{alloc} एम.बी.</code>
   • प्रणाल्याधीन: <code>{sys} एम.बी.</code>
   • अपशिष्ट संग्रहण संख्या: <code>{gc_count}</code> ({gc_emoji} {gc_rate}/मिनट)
+  </blockquote>
 
   💻 <b>सर्वर आँकड़े:</b>
+  <blockquote>
   • प्रक्रमक प्रयोग: {cpu_emoji} <code>{cpu}%</code>
   • स्मृति प्रयोग: {ram_emoji} <code>{ram_used_gib} जी.आई.बी.</code> | <code>{ram_total_gib} जी.आई.बी.</code>
   • भण्डारण: <code>{storage_used_gib} जी.आई.बी.</code> | <code>{storage_total_gib} जी.आई.बी.</code>
+  </blockquote>
 
   📊 <b>सेवित:</b>
+  <blockquote>
   {chats_line}
   {users_line}
+  </blockquote>
+
+  🧩 <b>रनटाइम संस्करण:</b>
+  <blockquote>
+  • Go: <code>{go_version}</code>
+  • Gogram API Layer: <code>{gogram_api_layer}</code>
+  • Gogram Version: <code>{gogram_version}</code>
+  • NTgCalls Version: <code>{ntgcalls_version}</code>
+  </blockquote>
 stats_served_chats_line: "• वार्तालाप: <code>{count}</code>"
 stats_served_chats_line_err: "• वार्तालाप: <code>त्रुटि: {error}</code>"
 stats_served_users_line: "• उपयोगकर्ता: <code>{count}</code>"

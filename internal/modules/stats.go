@@ -20,6 +20,7 @@ package modules
 import (
 	"fmt"
 	"runtime"
+	"runtime/debug"
 	"time"
 
 	"github.com/amarnathcjd/gogram/telegram"
@@ -30,6 +31,7 @@ import (
 	"main/internal/config"
 	"main/internal/database"
 	"main/internal/locales"
+	"main/ntgcalls"
 )
 
 func init() {
@@ -47,6 +49,23 @@ func init() {
 
 <b>🔒 Restrictions:</b>
 • <b>Sudo users</b> only`
+}
+
+func resolveBuildDependencyVersion(modulePath string) string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, dep := range info.Deps {
+			if dep.Path == modulePath {
+				if dep.Replace != nil && dep.Replace.Version != "" {
+					return dep.Replace.Version
+				}
+				if dep.Version != "" {
+					return dep.Version
+				}
+			}
+		}
+	}
+
+	return "unknown"
 }
 
 func statsHandler(m *telegram.NewMessage) error {
@@ -133,6 +152,10 @@ func statsHandler(m *telegram.NewMessage) error {
 		"storage_total_gib": fmt.Sprintf("%.2f", float64(diskStat.Total)/1073741824),
 		"chats_line":        chatsLine,
 		"users_line":        usersLine,
+		"go_version":        runtime.Version(),
+		"gogram_api_layer":  telegram.ApiVersion,
+		"gogram_version":    resolveBuildDependencyVersion("github.com/amarnathcjd/gogram"),
+		"ntgcalls_version":  ntgcalls.Version(),
 	}))
 	return telegram.ErrEndGroup
 }

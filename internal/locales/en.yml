@@ -505,6 +505,7 @@ ping_result: |
   <b>RAM Usage:</b> {ram_info}
   <b>CPU Usage:</b> {cpu_usage}
   <b>Disk Usage:</b> {disk_usage}
+  
 
 position_now: |
   🎵 <b>{title}</b>
@@ -715,22 +716,38 @@ speed_line: "⚙️ Speed: <b>{speed}x</b>"
 
 stats_overview: |
   🔧 <b>System:</b>
+  <blockquote>
   • OS: <code>{os}</code>, Arch: <code>{arch}</code>
   • CPUs: <code>{cpus}</code>, Goroutines: <code>{goroutines}</code>
+  </blockquote>
 
   📦 <b>Internal Memory (Go):</b>
+  <blockquote>
   • Alloc: <code>{alloc} MB</code>
   • Sys: <code>{sys} MB</code>
   • NumGC: <code>{gc_count}</code> ({gc_emoji} {gc_rate}/min)
+  </blockquote>
 
   💻 <b>Server Stats:</b>
+  <blockquote>
   • CPU Usage: {cpu_emoji} <code>{cpu}%</code>
   • RAM Usage: {ram_emoji} <code>{ram_used_gib} GiB</code> | <code>{ram_total_gib} GiB</code>
   • Storage: <code>{storage_used_gib} GiB</code> | <code>{storage_total_gib} GiB</code>
+  </blockquote>
 
   📊 <b>Served:</b>
+  <blockquote>
   {chats_line}
   {users_line}
+  </blockquote>
+
+  🧩 <b>Runtime Versions:</b>
+  <blockquote>
+  • Go: <code>{go_version}</code>
+  • Gogram API Layer: <code>{gogram_api_layer}</code>
+  • Gogram Version: <code>{gogram_version}</code>
+  • NTgCalls Version: <code>{ntgcalls_version}</code>
+  </blockquote>
 stats_served_chats_line: "• Chats: <code>{count}</code>"
 stats_served_chats_line_err: "• Chats: <code>Error: {error}</code>"
 stats_served_users_line: "• Users: <code>{count}</code>"

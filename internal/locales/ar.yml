@@ -506,6 +506,7 @@ ping_result: |
   <b>استهلاك المعالج:</b> {cpu_usage}
   <b>استهلاك القرص:</b> {disk_usage}
 
+
 position_now: |
   🎵 <b>{title}</b>
   📍 <code>{position} / {duration}</code>
@@ -712,22 +713,38 @@ speed_line: "⚙️ السرعة: <b>{speed}x</b>"
 
 stats_overview: |
   🔧 <b>النظام:</b>
+  <blockquote>
   • النظام: <code>{os}</code>، المعمارية: <code>{arch}</code>
   • المعالجات: <code>{cpus}</code>، عدد Goroutines: <code>{goroutines}</code>
+  </blockquote>
 
   📦 <b>الذاكرة الداخلية (Go):</b>
+  <blockquote>
   • المحجوزة: <code>{alloc} ميجا</code>
   • النظام: <code>{sys} ميجا</code>
   • عمليات تنظيف الذاكرة: <code>{gc_count}</code> ({gc_emoji} {gc_rate}/دقيقة)
+  </blockquote>
 
   💻 <b>إحصائيات الخادم:</b>
+  <blockquote>
   • استهلاك المعالج: {cpu_emoji} <code>{cpu}%</code>
   • استهلاك الرام: {ram_emoji} <code>{ram_used_gib} جيجا</code> | <code>{ram_total_gib} جيجا</code>
   • التخزين: <code>{storage_used_gib} جيجا</code> | <code>{storage_total_gib} جيجا</code>
+  </blockquote>
 
   📊 <b>المخدومة:</b>
+  <blockquote>
   {chats_line}
   {users_line}
+  </blockquote>
+
+  🧩 <b>إصدارات وقت التشغيل:</b>
+  <blockquote>
+  • Go: <code>{go_version}</code>
+  • Gogram API Layer: <code>{gogram_api_layer}</code>
+  • Gogram Version: <code>{gogram_version}</code>
+  • NTgCalls Version: <code>{ntgcalls_version}</code>
+  </blockquote>
 stats_served_chats_line: "• المحادثات: <code>{count}</code>"
 stats_served_chats_line_err: "• المحادثات: <code>خطأ: {error}</code>"
 stats_served_users_line: "• المستخدمون: <code>{count}</code>"
