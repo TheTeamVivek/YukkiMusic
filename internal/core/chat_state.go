@@ -26,7 +26,6 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/database"
 	"main/internal/utils"
 )
 
@@ -333,26 +332,45 @@ func (s *ChatState) applySnapshot(p, b, v bool) {
 
 func (s *ChatState) leaveInactiveAssistantChats(limit int) {
 	gologging.DebugF("chat_state: leaveInactiveAssistantChats(chat=%d, limit=%d)", s.ChatID, limit)
-	served, err := database.ServedChats()
-	if err != nil || len(served) == 0 {
+	if s.Assistant == nil || s.Assistant.Client == nil || limit <= 0 {
 		return
 	}
 
 	activeRooms := GetAllRooms()
-	left := 0
-	for _, chatID := range served {
-		if chatID == s.ChatID {
-			continue
+	leftCount := 0
+	err := s.Assistant.Client.IterDialogs(func(d *telegram.TLDialog) error {
+		if d == nil || d.IsUser() {
+			return nil
 		}
+
+		chatID := d.GetChannelID()
+		if chatID == 0 || chatID == s.ChatID {
+			return nil
+		}
+
 		if _, active := activeRooms[chatID]; active {
-			continue
+			return nil
 		}
-		if leaveErr := s.Assistant.Client.LeaveChannel(chatID); leaveErr == nil {
-			left++
+
+		leaveErr := s.Assistant.Client.LeaveChannel(chatID)
+		if leaveErr != nil {
+			if wait := telegram.GetFloodWait(leaveErr); wait > 0 {
+				time.Sleep(time.Duration(wait) * time.Second)
+			}
+			return nil
 		}
-		if left >= limit {
-			return
+
+		leftCount++
+		if leftCount >= limit {
+			return telegram.ErrStopIteration
 		}
+		return nil
+	}, &telegram.DialogOptions{
+		Limit: limit * 20,
+	})
+
+	if err != nil && err != telegram.ErrStopIteration {
+		gologging.WarnF("chat_state: IterDialogs failed while auto-leaving chats: %v", err)
 	}
 }
 
