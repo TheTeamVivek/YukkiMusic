@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/rand/v2"
 	"os"
 	"strconv"
 	"strings"
@@ -54,7 +55,7 @@ var (
 	CookiesLink         string
 	SetCmds             bool
 	MaxAuthUsers        int
-	StartImage          string
+	StartImages         []string
 	PingImage           string
 	Port                string
 	EnablePprof         bool
@@ -130,13 +131,31 @@ func loadConfig() {
 	CookiesLink = getString("COOKIES_LINK", "")
 	SetCmds = getBool("SET_CMDS", false)
 	MaxAuthUsers = int(getInt64("MAX_AUTH_USERS", 25))
-	StartImage = getString("START_IMG_URL", "")
+	StartImages = getStringSlice("START_IMAGES", nil)
+	if len(StartImages) == 0 {
+		StartImage := getString("START_IMG_URL", "")
+		if StartImage != "" {
+			StartImages = []string{StartImage}
+		}
+	}
 	PingImage = getString(
 		"PING_IMG_URL",
 		"https://telegra.ph/file/91533956c91d0fd7c9f20.jpg",
 	)
 	Port = getString("PORT", "8000")
 	EnablePprof = getBool("ENABLE_PPROF", false)
+}
+
+func GetRandomStartImage() string {
+	if len(StartImages) == 0 {
+		return ""
+	}
+
+	if len(StartImages) == 1 {
+		return StartImages[0]
+	}
+
+	return StartImages[rand.IntN(len(StartImages))]
 }
 
 func validateConfig() error {

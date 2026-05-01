@@ -63,25 +63,25 @@ func startHandler(m *tg.NewMessage) error {
 			"bot":  utils.MentionHTML(m.Client.Me()),
 		})
 
-		var err error
-
-		if config.StartImage != "" {
-			_, err = m.RespondMedia(config.StartImage, &tg.MediaOptions{
-				Caption:     caption,
-				ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
-			})
-			if err != nil {
-				gologging.ErrorF("[start] image send failed: %v", err)
-			}
+		sendOpt := &tg.SendOptions{
+			ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
 		}
 
-		if config.StartImage == "" || err != nil {
-			_, err = m.Respond(caption, &tg.SendOptions{
-				ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
-			})
-			if err != nil {
+		if startImage := config.GetRandomStartImage(); startImage != "" {
+			sendOpt.Media = startImage
+		}
+
+		if _, err := m.Respond(caption, sendOpt); err != nil {
+			if sendOpt.Media == "" {
 				gologging.ErrorF("[start] text send failed: %v", err)
 				return err
+			}
+
+			gologging.ErrorF("[start] image send failed: %v", err)
+			sendOpt.Media = ""
+			if _, textErr := m.Respond(caption, sendOpt); textErr != nil {
+				gologging.ErrorF("[start] text send failed: %v", textErr)
+				return textErr
 			}
 		}
 	}
@@ -119,12 +119,6 @@ func startCB(cb *tg.CallbackQuery) error {
 	sendOpt := &tg.SendOptions{
 		ReplyMarkup: core.GetStartMarkup(cb.ChannelID()),
 	}
-
-	/*
-		    if config.StartImage != "" {
-				sendOpt.Media = config.StartImage
-			}
-	*/
 
 	cb.Edit(caption, sendOpt)
 	return tg.ErrEndGroup

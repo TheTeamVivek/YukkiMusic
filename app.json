@@ -71,8 +71,9 @@
             "value": "false",
             "required": false
         },
-        "START_IMG_URL": {
-            "description": "URL of the image to be displayed on the start message.",
+        "START_IMAGES": {
+            "description": "Optional list of /start image URLs separated by spaces, commas, or semicolons. A random image is used each time.",
+            "value": "",
             "required": false
         },
         "SUPPORT_CHAT": {
