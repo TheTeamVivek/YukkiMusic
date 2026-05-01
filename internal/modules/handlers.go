@@ -317,12 +317,12 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
-		Pattern: "addauth",
+		Pattern: "(auth|addauth)",
 		Handler: addAuthHandler,
 		Filters: []telegram.Filter{superGroupFilter, adminFilter},
 	},
 	{
-		Pattern: "delauth",
+		Pattern: "(removeauth|delauth)",
 		Handler: delAuthHandler,
 		Filters: []telegram.Filter{superGroupFilter, adminFilter},
 	},
