@@ -65,7 +65,7 @@ func resolveBuildDependencyVersion(modulePath string) string {
 		}
 	}
 
-	return "unknown"
+	return telegram.Version
 }
 
 func statsHandler(m *telegram.NewMessage) error {
