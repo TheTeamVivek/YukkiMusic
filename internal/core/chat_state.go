@@ -366,7 +366,7 @@ func (s *ChatState) leaveInactiveAssistantChats(limit int) {
 		}
 		return nil
 	}, &telegram.DialogOptions{
-		Limit: limit * 20,
+		Limit: int32(limit * 20),
 	})
 
 	if err != nil && err != telegram.ErrStopIteration {
