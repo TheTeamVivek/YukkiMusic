@@ -110,28 +110,22 @@ func statsHandler(m *telegram.NewMessage) error {
 
 	servedChats, err1 := database.ServedChats()
 	servedUsers, err2 := database.ServedUsers()
+	dbStats, _ := database.GetMongoDBStats()
 
-	chatsLine := ""
+	var servedChatsVal any = len(servedChats)
 	if err1 != nil {
-		chatsLine = F(chatID, "stats_served_chats_line_err", locales.Arg{
-			"error": err1.Error(),
-		})
-	} else {
-		chatsLine = F(chatID, "stats_served_chats_line", locales.Arg{
-			"count": len(servedChats),
-		})
+		servedChatsVal = err1.Error()
 	}
 
-	usersLine := ""
+	var servedUsersVal any = len(servedUsers)
 	if err2 != nil {
-		usersLine = F(chatID, "stats_served_users_line_err", locales.Arg{
-			"error": err2.Error(),
-		})
-	} else {
-		usersLine = F(chatID, "stats_served_users_line", locales.Arg{
-			"count": len(servedUsers),
-		})
+		servedUsersVal = err2.Error()
 	}
+
+	dbDataSize := dbStats["dataSize"]
+	dbStorageSize := dbStats["storageSize"]
+	dbCollections := dbStats["collections"]
+	dbObjects := dbStats["objects"]
 
 	m.Reply(F(chatID, "stats_overview", locales.Arg{
 		"os":                runtime.GOOS,
@@ -150,12 +144,33 @@ func statsHandler(m *telegram.NewMessage) error {
 		"ram_total_gib":     fmt.Sprintf("%.2f", float64(sysMem.Total)/1073741824),
 		"storage_used_gib":  fmt.Sprintf("%.2f", float64(diskStat.Used)/1073741824),
 		"storage_total_gib": fmt.Sprintf("%.2f", float64(diskStat.Total)/1073741824),
-		"chats_line":        chatsLine,
-		"users_line":        usersLine,
+		"db_storage":        fmt.Sprintf("%.2f", interfaceToFloat(dbStorageSize)/1024/1024),
+		"db_data":           fmt.Sprintf("%.2f", interfaceToFloat(dbDataSize)/1024/1024),
+		"db_collections":    dbCollections,
+		"db_objects":        dbObjects,
+		"served_chats":      servedChatsVal,
+		"served_users":      servedUsersVal,
 		"go_version":        runtime.Version(),
 		"gogram_api_layer":  telegram.ApiVersion,
 		"gogram_version":    resolveBuildDependencyVersion("github.com/amarnathcjd/gogram"),
 		"ntgcalls_version":  ntgcalls.Version(),
 	}))
 	return telegram.ErrEndGroup
+}
+
+func interfaceToFloat(v any) float64 {
+	switch i := v.(type) {
+	case float64:
+		return i
+	case float32:
+		return float64(i)
+	case int64:
+		return float64(i)
+	case int32:
+		return float64(i)
+	case int:
+		return float64(i)
+	default:
+		return 0
+	}
 }

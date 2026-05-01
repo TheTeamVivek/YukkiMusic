@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/Laky-64/gologging"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
@@ -64,4 +65,12 @@ func Init(mongoURL string) (func(), error) {
 			logger.Info("MongoDB disconnected successfully")
 		}
 	}, nil
+}
+
+func GetMongoDBStats() (bson.M, error) {
+	ctx, cancel := ctx()
+	defer cancel()
+	var result bson.M
+	err := database.RunCommand(ctx, bson.D{{Key: "dbStats", Value: 1}}).Decode(&result)
+	return result, err
 }

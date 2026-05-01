@@ -726,20 +726,20 @@ stats_overview: |
   • استهلاك الرام: {ram_emoji} <code>{ram_used_gib} جيجا</code> | <code>{ram_total_gib} جيجا</code>
   • التخزين: <code>{storage_used_gib} جيجا</code> | <code>{storage_total_gib} جيجا</code></blockquote>
 
+  🍃 <b>إحصائيات MongoDB:</b><blockquote>
+  • التخزين: <code>{db_data} / {db_storage} ميجابايت</code>
+  • المجموعات: <code>{db_collections}</code>
+  • الكائنات: <code>{db_objects}</code></blockquote>
+
   📊 <b>المخدومة:</b><blockquote>
-  {chats_line}
-  {users_line}</blockquote>
+  • المحادثات: <code>{served_chats}</code>
+  • المستخدمون: <code>{served_users}</code></blockquote>
 
   🧩 <b>إصدارات وقت التشغيل:</b><blockquote>
   • Go: <code>{go_version}</code>
   • Gogram API Layer: <code>{gogram_api_layer}</code>
   • Gogram Version: <code>{gogram_version}</code>
   • NTgCalls Version: <code>{ntgcalls_version}</code></blockquote>
-  
-stats_served_chats_line: "• المحادثات: <code>{count}</code>"
-stats_served_chats_line_err: "• المحادثات: <code>خطأ: {error}</code>"
-stats_served_users_line: "• المستخدمون: <code>{count}</code>"
-stats_served_users_line_err: "• المستخدمون: <code>خطأ: {error}</code>"
 
 # 👑 Sudo users
 

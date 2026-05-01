@@ -728,20 +728,20 @@ stats_overview: |
   • स्मृति प्रयोग: {ram_emoji} <code>{ram_used_gib} जी.आई.बी.</code> | <code>{ram_total_gib} जी.आई.बी.</code>
   • भण्डारण: <code>{storage_used_gib} जी.आई.बी.</code> | <code>{storage_total_gib} जी.आई.बी.</code></blockquote>
 
+  🍃 <b>मोंगोडीबी आंकड़े:</b><blockquote>
+  • भंडारण: <code>{db_data} / {db_storage} MB</code>
+  • संग्रह: <code>{db_collections}</code>
+  • वस्तुएं: <code>{db_objects}</code></blockquote>
+
   📊 <b>सेवित:</b><blockquote>
-  {chats_line}
-  {users_line}</blockquote>
+  • वार्तालाप: <code>{served_chats}</code>
+  • उपयोगकर्ता: <code>{served_users}</code></blockquote>
 
   🧩 <b>रनटाइम संस्करण:</b><blockquote>
   • Go: <code>{go_version}</code>
   • Gogram API Layer: <code>{gogram_api_layer}</code>
   • Gogram Version: <code>{gogram_version}</code>
   • NTgCalls Version: <code>{ntgcalls_version}</code></blockquote>
-  
-stats_served_chats_line: "• वार्तालाप: <code>{count}</code>"
-stats_served_chats_line_err: "• वार्तालाप: <code>त्रुटि: {error}</code>"
-stats_served_users_line: "• उपयोगकर्ता: <code>{count}</code>"
-stats_served_users_line_err: "• उपयोगकर्ता: <code>त्रुटि: {error}</code>"
 
 # 👑 Sudo users
 

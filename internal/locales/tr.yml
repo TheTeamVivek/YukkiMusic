@@ -723,20 +723,20 @@ stats_overview: |
   • RAM Kullanımı: {ram_emoji} <code>{ram_used_gib} GiB</code> | <code>{ram_total_gib} GiB</code>
   • Depolama: <code>{storage_used_gib} GiB</code> | <code>{storage_total_gib} GiB</code></blockquote>
 
+  🍃 <b>MongoDB İstatistikleri:</b><blockquote>
+  • Depolama: <code>{db_data} / {db_storage} MB</code>
+  • Koleksiyonlar: <code>{db_collections}</code>
+  • Nesneler: <code>{db_objects}</code></blockquote>
+
   📊 <b>Hizmet Verilen:</b><blockquote>
-  {chats_line}
-  {users_line}</blockquote>
+  • Sohbetler: <code>{served_chats}</code>
+  • Kullanıcılar: <code>{served_users}</code></blockquote>
 
   🧩 <b>Çalışma Zamanı Sürümleri:</b><blockquote>
   • Go: <code>{go_version}</code>
   • Gogram API Layer: <code>{gogram_api_layer}</code>
   • Gogram Version: <code>{gogram_version}</code>
   • NTgCalls Version: <code>{ntgcalls_version}</code></blockquote>
-  
-stats_served_chats_line: "• Sohbetler: <code>{count}</code>"
-stats_served_chats_line_err: "• Sohbetler: <code>Hata: {error}</code>"
-stats_served_users_line: "• Kullanıcılar: <code>{count}</code>"
-stats_served_users_line_err: "• Kullanıcılar: <code>Hata: {error}</code>"
 
 # 👑 Sudo users
 
