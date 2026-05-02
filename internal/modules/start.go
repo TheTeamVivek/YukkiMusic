@@ -92,7 +92,7 @@ func startHandler(m *tg.NewMessage) error {
 			uName = "@" + m.Sender.Username
 		}
 
-		msg := F(m.ChannelID(), "logger_bot_started", locales.Arg{
+		msg := F(config.LoggerID, "logger_bot_started", locales.Arg{
 			"mention":       utils.MentionHTML(m.Sender),
 			"user_id":       m.SenderID(),
 			"user_username": uName,
