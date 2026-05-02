@@ -499,6 +499,11 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 		a.Client.UpdatesGetState()
 	})
 
+bot.On("action", func (m *telegram.NewMessage) error {
+    fmt.Println("Received message:", bot.JSON(m.Action))
+    return nil
+  })
+
 	for _, h := range handlers {
 		bot.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...) /*.
 		SetGroup(100)*/
@@ -517,8 +522,6 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 
 	bot.AddActionHandler(handleActions)
 	bot.AddRawHandler(&telegram.UpdateReadChannelOutbox{}, cleanModeReadHandler)
-
-	bot.On("action", func(m *telegram.NewMessage) error { fmt.Println(m.Marshal()); return nil })
 
 	assistants.ForEach(func(a *core.Assistant) {
 		a.Ntg.OnStreamEnd(streamEndHandler)
