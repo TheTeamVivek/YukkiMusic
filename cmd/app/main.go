@@ -142,7 +142,7 @@ func startHTTPServer() {
 }
 
 func initLogger() {
-	gologging.SetLevel(gologging.ErrorLevel)
+	gologging.SetLevel(gologging.DebugLevel)
 	gologging.SetOutput(config.LogWriter)
 
 	l := gologging.GetLogger("ntgcalls")
