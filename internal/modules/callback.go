@@ -34,24 +34,11 @@ import (
 	"main/internal/utils"
 )
 
-// Action handlers map for cleaner dispatch
-type actionHandler func(*tg.CallbackQuery, *core.RoomState, int64) error
-
-var actionHandlers = map[string]actionHandler{
-	"pause":  handlePauseAction,
-	"resume": handleResumeAction,
-	"replay": handleReplayAction,
-	"skip":   handleSkipAction,
-	"stop":   handleStopAction,
-	"mute":   handleMuteAction,
-	"unmute": handleUnmuteAction,
-}
-
 func cancelHandler(cb *tg.CallbackQuery) error {
 	chatID := cb.ChannelID()
 	opt := &tg.CallbackOptions{Alert: true}
 
-	if !checkAdminOrAuth(cb, chatID, opt) {
+	if !checkAdminOrAuth(cb, chatID) {
 		return tg.ErrEndGroup
 	}
 
@@ -79,6 +66,8 @@ func emptyCBHandler(cb *tg.CallbackQuery) error {
 func roomHandle(cb *tg.CallbackQuery) error {
 	opt := &tg.CallbackOptions{Alert: true}
 	data := cb.DataString()
+	chatID := cb.ChannelID()
+
 	roomID, action := parseRoomAction(data)
 
 	if roomID == 0 || action == "" {
@@ -88,94 +77,73 @@ func roomHandle(cb *tg.CallbackQuery) error {
 		return tg.ErrEndGroup
 	}
 
-	chatID := cb.ChannelID()
-
-	// Get room
-	r, err := getRoomForCallback(roomID)
-	if err != nil {
-		if strings.Contains(err.Error(), "no active room") {
-			cb.Answer(F(cb.ChannelID(), "room_not_active_cb"), opt)
-			if _, editErr := cb.Edit(F(cb.ChannelID(), "room_no_active")); editErr != nil {
-				gologging.ErrorF("Edit error: %v", editErr)
-			}
-		} else {
-			cb.Answer(err.Error(), opt)
-		}
-		return tg.ErrEndGroup
+	r, ok := core.GetRoom(roomID, nil, false)
+	if !ok || !r.IsActiveChat() {
+		cb.Answer(F(cb.ChannelID(), "room_not_active_cb"), opt)
+		cb.Edit(F(cb.ChannelID(), "room_no_active"))
 	}
 
-	// Check permissions
 	if !checkAdminOrAuth(cb, chatID, opt) {
 		return tg.ErrEndGroup
 	}
 
-	// Flood control
-	if !checkFloodControl(cb, chatID, opt) {
-		return tg.ErrEndGroup
+	key := fmt.Sprintf("room:%d:%d", cb.Sender.ID, chatID)
+	if remaining := utils.GetFlood(key); remaining > 0 {
+		cb.Answer(F(chatID, "flood_seconds", locales.Arg{
+			"duration": int(remaining.Seconds()),
+		}), opt)
+		return telgram.ErrEndGroup
 	}
+	utils.SetFlood(key, 5*time.Second)
 
-	// Handle seek actions
-	if strings.HasPrefix(action, "seek") {
+	switch {
+	case strings.HasPrefix(action, "seek"):
 		return handleSeekAction(cb, r, action, opt)
+
+	case action == "pause":
+		return handlePauseAction(cb, r)
+
+	case action == "resume":
+		return handleResumeAction(cb, r)
+
+	case action == "replay":
+		return handleReplayAction(cb, r)
+
+	case action == "skip":
+		return handleSkipAction(cb, r)
+
+	case action == "stop":
+		return handleStopAction(cb, r)
+
+	case action == "mute":
+		return handleMuteAction(cb, r)
+
+	case action == "unmute":
+		return handleUnmuteAction(cb, r)
+	default:
+		gologging.WarnF("Unknown callback type: %s", action)
+		cb.Answer(F(cb.ChannelID(), "unknown_action"), opt)
+
 	}
 
-	// Dispatch to handler
-	if handler, ok := actionHandlers[action]; ok {
-		return handler(cb, r, chatID)
-	}
-
-	gologging.WarnF("Unknown callback type: %s", action)
-	cb.Answer(F(cb.ChannelID(), "unknown_action"), opt)
 	return tg.ErrEndGroup
 }
 
 // Helper functions
 
-func getRoomForCallback(chatID int64) (*core.RoomState, error) {
-	ass, err := core.Assistants.ForChat(chatID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get assistant: %w", err)
+func checkAdminOrAuth(cb *tg.CallbackQuery, chatID int64) bool {
+	if canUseAdminCommand(cb.Client, chatID, cb.SenderID) {
+		return true
 	}
 
-	r, ok := core.GetRoom(chatID, ass, false)
-	if !ok || !r.IsActiveChat() {
-		return nil, fmt.Errorf("no active room")
+	mode, err := database.GetAdminMode(chatID)
+	if err == nil && mode == database.AdminModeAdminsOnly {
+		cb.Answer(F(cb.ChannelID(), "only_admin_cb"), opt)
+	} else {
+		cb.Answer(F(cb.ChannelID(), "only_admin_or_auth_cb"), opt)
 	}
+	return false
 
-	return r, nil
-}
-
-func checkAdminOrAuth(
-	cb *tg.CallbackQuery,
-	chatID int64,
-	opt *tg.CallbackOptions,
-) bool {
-	if !canUseAdminCommand(cb.Client, chatID, cb.SenderID) {
-		mode, err := database.GetAdminMode(chatID)
-		if err == nil && mode == database.AdminModeAdminsOnly {
-			cb.Answer(F(cb.ChannelID(), "only_admin_cb"), opt)
-		} else {
-			cb.Answer(F(cb.ChannelID(), "only_admin_or_auth_cb"), opt)
-		}
-		return false
-	}
-	return true
-}
-
-func checkFloodControl(
-	cb *tg.CallbackQuery,
-	chatID int64,
-	opt *tg.CallbackOptions,
-) bool {
-	key := fmt.Sprintf("room:%d:%d", cb.Sender.ID, chatID)
-	if remaining := utils.GetFlood(key); remaining > 0 {
-		cb.Answer(F(cb.ChannelID(), "flood_seconds", locales.Arg{
-			"duration": int(remaining.Seconds()),
-		}), opt)
-		return false
-	}
-	utils.SetFlood(key, 5*time.Second)
-	return true
 }
 
 func parseRoomAction(data string) (int64, string) {
@@ -202,10 +170,9 @@ func parseRoomAction(data string) (int64, string) {
 func handlePauseAction(
 	cb *tg.CallbackQuery,
 	r *core.RoomState,
-	chatID int64,
 ) error {
 	opt := &tg.CallbackOptions{Alert: true}
-
+	chatID := cb.ChannelID()
 	gologging.InfoF("Callback → pause, chatID=%d", chatID)
 
 	if r.IsPaused() {
