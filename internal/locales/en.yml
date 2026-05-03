@@ -105,13 +105,18 @@ broadcast_cancel_done: "🚫 Broadcast cancelled."
 # 🎧 CPlay (Channel Play)
 
 cplay_id_not_set: "⚠️ cplay ID not set.\nUse <code>/setcplay &lt;chat_id&gt;</code> to set it."
+cplay_alias_help: "ℹ️ If channelplay is configured, use <code>c</code> before play commands (like <code>/cplay</code>, <code>/cskip</code>) to control playback in the linked channel."
 cplay_usage: "<b>Usage:</b> <code>/setcplay &lt;channel_id&gt;</code>"
 cplay_invalid_chat_id: "<b>Invalid Chat ID:</b> Please provide a valid integer ID for the channel."
 cplay_resolve_peer_fail: "<b>Failed to resolve peer:</b> Could not fetch channel details. Ensure I can access this channel."
 cplay_invalid_target: "<b>Invalid Target:</b> The provided ID is not a valid channel."
 cplay_channel_not_accessible: "<b>Channel Not Accessible:</b> Could not retrieve channel information. Please ensure I am an administrator in the target channel."
+cplay_channel_not_linked: "⚠️ <b>Linked channel not found:</b> This chat is not linked to any channel/group."
 cplay_save_error: "<b>Error:</b> Failed to save CPlay settings."
 cplay_enabled: "✅ <b>Channel Play enabled.</b> All <code>/c</code> commands will now work in channel <code>{channel_id}</code>."
+cplay_owner_required: "⚠️ Only the owner of this chat or the target channel can use this setup."
+cplay_owner_check_failed: "⚠️ Could not verify chat ownership right now. Please try again."
+cplay_disabled: "✅ <b>Channel Play disabled.</b> <code>/c</code> commands are now turned off for this chat."
 
 # Callback handler messages
 invalid_request: "⚠️ Invalid request."

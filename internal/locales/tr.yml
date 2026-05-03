@@ -105,12 +105,17 @@ broadcast_cancel_done: "🚫 Yayın iptal edildi."
 # 🎧 CPlay (Channel Play)
 
 cplay_id_not_set: "⚠️ Kanal oynatma (cplay) ID'si ayarlanmamış.\nAyarlamak için <code>/setcplay &lt;sohbet_id&gt;</code> komutunu kullan."
+cplay_alias_help: "ℹ️ Channelplay yapılandırıldıysa, bağlı kanalda oynatmayı kontrol etmek için oynatma komutlarının başına <code>c</code> ekleyin (örn. <code>/cplay</code>, <code>/cskip</code>)."
 cplay_usage: "<b>Kullanım:</b> <code>/setcplay &lt;kanal_id&gt;</code>"
 cplay_invalid_chat_id: "<b>Geçersiz Sohbet ID:</b> Lütfen kanal için geçerli bir tamsayı ID gir."
 cplay_resolve_peer_fail: "<b>Kanal çözülemedi:</b> Kanal detayları alınamadı. Bu kanala erişimim olduğundan emin ol."
 cplay_invalid_target: "<b>Geçersiz Hedef:</b> Sağlanan ID geçerli bir kanal değil."
 cplay_channel_not_accessible: "<b>Kanala Erişilemiyor:</b> Kanal bilgileri alınamadı. Lütfen hedef kanalda yönetici olduğumdan emin ol."
+cplay_channel_not_linked: "⚠️ <b>Bağlı kanal bulunamadı:</b> Bu sohbet herhangi bir kanal/gruba bağlı değil."
 cplay_save_error: "<b>Hata:</b> Kanal oynatma ayarları kaydedilemedi."
+cplay_owner_required: "⚠️ Bu ayarı yalnızca bu sohbetin sahibi veya hedef kanalın sahibi yapabilir."
+cplay_owner_check_failed: "⚠️ Sohbet sahipliği şu anda doğrulanamadı. Lütfen tekrar deneyin."
+cplay_disabled: "✅ <b>Kanal Oynatma devre dışı bırakıldı.</b> Bu sohbet için <code>/c</code> komutları artık kapalı."
 cplay_enabled: "✅ <b>Kanal Oynatma etkinleştirildi.</b> Tüm <code>/c</code> komutları artık <code>{channel_id}</code> kanalında çalışacak."
 
 # Callback handler messages

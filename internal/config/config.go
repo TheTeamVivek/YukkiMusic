@@ -31,6 +31,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// TODO: Add EFFECT_IDS documentation in internal/config/README.md.
+
 var (
 	APIID          int32
 	APIHash        string
@@ -56,6 +58,7 @@ var (
 	SetCmds             bool
 	MaxAuthUsers        int
 	StartImages         []string
+	EffectIDs           []int64
 	PingImage           string
 	Port                string
 	EnablePprof         bool
@@ -132,6 +135,7 @@ func loadConfig() {
 	SetCmds = getBool("SET_CMDS", false)
 	MaxAuthUsers = int(getInt64("MAX_AUTH_USERS", 25))
 	StartImages = getStringSlice("START_IMAGES", nil)
+	EffectIDs = getInt64Slice("EFFECT_IDS", nil)
 	if len(StartImages) == 0 {
 		StartImage := getString("START_IMG_URL", "")
 		if StartImage != "" {
@@ -156,6 +160,16 @@ func GetRandomStartImage() string {
 	}
 
 	return StartImages[rand.IntN(len(StartImages))]
+}
+
+func GetRandomEffectID() int64 {
+	if len(EffectIDs) == 0 {
+		return 0
+	}
+	if len(EffectIDs) == 1 {
+		return EffectIDs[0]
+	}
+	return EffectIDs[rand.IntN(len(EffectIDs))]
 }
 
 func validateConfig() error {
@@ -221,6 +235,34 @@ func getString(key, fallback string) string {
 		return val
 	}
 	return fallback
+}
+
+func getInt64Slice(key string, fallback []int64) []int64 {
+	raw, ok := lookupEnv(key)
+	if !ok {
+		return fallback
+	}
+
+	parts := strings.FieldsFunc(raw, func(r rune) bool {
+		return r == ',' || r == ';' || r == ' ' || r == '\n' || r == '\t'
+	})
+	if len(parts) == 0 {
+		return fallback
+	}
+
+	out := make([]int64, 0, len(parts))
+	for _, p := range parts {
+		n, err := strconv.ParseInt(strings.TrimSpace(p), 10, 64)
+		if err != nil {
+			logger.WarnF("Skipping invalid %s value %q: %v", key, p, err)
+			continue
+		}
+		out = append(out, n)
+	}
+	if len(out) == 0 {
+		return fallback
+	}
+	return out
 }
 
 func getBool(key string, fallback bool) bool {

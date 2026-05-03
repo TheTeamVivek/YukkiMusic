@@ -419,6 +419,11 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
+		Pattern: "^c$",
+		Handler: cAliasHandler,
+		Filters: []telegram.Filter{superGroupFilter},
+	},
+	{
 		Pattern: "(cspeed|csetspeed|cspeedup)",
 		Handler: cspeedHandler,
 		Filters: []telegram.Filter{superGroupFilter, authFilter},

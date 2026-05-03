@@ -137,7 +137,7 @@ func checkReloadFlood(m *telegram.NewMessage, chatID, roomID int64) (bool, error
 }
 
 func reloadAdminCache(c *telegram.Client, chatID, roomID int64) ([]int64, string) {
-	admins, err := utils.ReloadChatAdmin(c, roomID)
+	admins, err := utils.RefreshChatAdmin(c, roomID)
 	if err != nil {
 		return nil, F(chatID, "reload_admin_cache_fail", locales.Arg{
 			"error": err.Error(),

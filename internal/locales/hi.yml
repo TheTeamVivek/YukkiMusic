@@ -105,12 +105,17 @@ broadcast_cancel_done: "🚫 प्रसारण रद्द कर दिय
 # 🎧 CPlay (Channel Play)
 
 cplay_id_not_set: "⚠️ चैनल प्ले निर्धारित नहीं है।\nइसे निर्धारित करने के लिए <code>/setcplay [channel_id]</code> का प्रयोग करें।"
+cplay_alias_help: "ℹ️ यदि channelplay कॉन्फ़िगर है, तो प्लेबैक को लिंक्ड चैनल में नियंत्रित करने के लिए प्ले कमांड्स से पहले <code>c</code> लगाएँ (जैसे <code>/cplay</code>, <code>/cskip</code>)।"
 cplay_usage: "<b>प्रयोग:</b> <code>/setcplay [channel_id]</code>"
 cplay_invalid_chat_id: "<b>अमान्य वार्तालाप परिचय पत्र:</b> कृपया चैनलप्ले के लिए एक मान्य पूर्णांक परिचय पत्र प्रदान करें।"
 cplay_resolve_peer_fail: "<b>चैनल जानकारी प्राप्त करने में विफल:</b> चैनल विवरण प्राप्त नहीं किया जा सका। सुनिश्चित करें कि मेरी इस चैनल तक पहुँच है।"
 cplay_invalid_target: "<b>अमान्य लक्ष्य:</b> प्रदान किया गया परिचय पत्र एक मान्य चैनल नहीं है।"
 cplay_channel_not_accessible: "<b>चैनल तक पहुँच नहीं:</b> चैनल की सूचना प्राप्त नहीं की जा सकी। कृपया सुनिश्चित करें कि मैं लक्ष्य चैनल में एक प्रशासक हूँ।"
+cplay_channel_not_linked: "⚠️ <b>लिंक्ड चैनल नहीं मिला:</b> यह चैट किसी चैनल/समूह से जुड़ी नहीं है।"
 cplay_save_error: "<b>त्रुटि:</b> चैनल प्ले विन्यास सुरक्षित करने में विफल।"
+cplay_owner_required: "⚠️ यह सेटअप केवल इस चैट के स्वामी या लक्ष्य चैनल के स्वामी द्वारा किया जा सकता है।"
+cplay_owner_check_failed: "⚠️ अभी स्वामित्व सत्यापित नहीं हो सका। कृपया पुनः प्रयास करें।"
+cplay_disabled: "✅ <b>चैनल प्ले अक्षम।</b> इस चैट के लिए <code>/c</code> आदेश अब बंद हैं।"
 cplay_enabled: "✅ <b>चैनल प्ले सक्षम।</b> अब समस्त <code>/c</code> आदेश चैनल <code>{channel_id}</code> में कार्य करेंगे।"
 
 # Callback handler messages

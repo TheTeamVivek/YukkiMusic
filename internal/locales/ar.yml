@@ -106,12 +106,17 @@ broadcast_cancel_done: "🚫 تم إلغاء البث."
 # 🎧 CPlay (Channel Play)
 
 cplay_id_not_set: "⚠️ لم يتم تعيين معرف cplay.\nاستخدم <code>/setcplay &lt;chat_id&gt;</code> لتعيينه."
+cplay_alias_help: "ℹ️ إذا تم إعداد channelplay، أضف <code>c</code> قبل أوامر التشغيل (مثل <code>/cplay</code> و <code>/cskip</code>) للتحكم بالتشغيل في القناة المرتبطة."
 cplay_usage: "<b>الاستخدام:</b> <code>/setcplay &lt;channel_id&gt;</code>"
 cplay_invalid_chat_id: "<b>معرف محادثة غير صالح:</b> يرجى تقديم معرف رقمي صحيح للقناة."
 cplay_resolve_peer_fail: "<b>فشل جلب الأطراف:</b> تعذر جلب تفاصيل القناة. تأكد من أنني أملك صلاحية الوصول إلى هذه القناة."
 cplay_invalid_target: "<b>هدف غير صالح:</b> المعرف المقدم ليس قناة صالحة."
 cplay_channel_not_accessible: "<b>لا يمكن الوصول إلى القناة:</b> تعذر استرداد معلومات القناة. يرجى التأكد من أنني مشرف في القناة المستهدفة."
+cplay_channel_not_linked: "⚠️ <b>لم يتم العثور على قناة مرتبطة:</b> هذه الدردشة غير مرتبطة بأي قناة/مجموعة."
 cplay_save_error: "<b>خطأ:</b> فشل حفظ إعدادات CPlay."
+cplay_owner_required: "⚠️ يمكن فقط لمالك هذه الدردشة أو مالك القناة الهدف استخدام هذا الإعداد."
+cplay_owner_check_failed: "⚠️ تعذر التحقق من ملكية الدردشة الآن. حاول مرة أخرى."
+cplay_disabled: "✅ <b>تم تعطيل تشغيل القناة.</b> أوامر <code>/c</code> متوقفة الآن لهذه الدردشة."
 cplay_enabled: "✅ <b>تم تفعيل تشغيل القناة.</b> جميع أوامر <code>/c</code> ستعمل الآن في القناة <code>{channel_id}</code>."
 
 # Callback handler messages

@@ -63,26 +63,8 @@ func startHandler(m *tg.NewMessage) error {
 			"bot":  utils.MentionHTML(m.Client.Me()),
 		})
 
-		sendOpt := &tg.SendOptions{
-			ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
-		}
-
-		if startImage := config.GetRandomStartImage(); startImage != "" {
-			sendOpt.Media = startImage
-		}
-
-		if _, err := m.Respond(caption, sendOpt); err != nil {
-			if sendOpt.Media == "" {
-				gologging.ErrorF("[start] text send failed: %v", err)
-				return err
-			}
-
-			gologging.ErrorF("[start] image send failed: %v", err)
-			sendOpt.Media = ""
-			if _, textErr := m.Respond(caption, sendOpt); textErr != nil {
-				gologging.ErrorF("[start] text send failed: %v", textErr)
-				return textErr
-			}
+		if err := sendStartResponse(m, caption); err != nil {
+			return err
 		}
 	}
 
@@ -106,6 +88,39 @@ func startHandler(m *tg.NewMessage) error {
 	}
 
 	return tg.ErrEndGroup
+}
+
+func sendStartResponse(m *tg.NewMessage, caption string) error {
+	sendOpt := &tg.SendOptions{ReplyMarkup: core.GetStartMarkup(m.ChannelID())}
+	if effectID := config.GetRandomEffectID(); effectID != 0 {
+		sendOpt.Effect = effectID
+	}
+	if startImage := config.GetRandomStartImage(); startImage != "" {
+		sendOpt.Media = startImage
+	}
+
+	_, err := m.Respond(caption, sendOpt)
+	if err != nil && sendOpt.Effect != 0 && tg.MatchError(err, "EFFECT_ID_INVALID") {
+		gologging.WarnF("[start] invalid effect id %d, retrying without effect", sendOpt.Effect)
+		sendOpt.Effect = 0
+		_, err = m.Respond(caption, sendOpt)
+	}
+	if err == nil {
+		return nil
+	}
+	if sendOpt.Media == "" {
+		gologging.ErrorF("[start] text send failed: %v", err)
+		return err
+	}
+
+	gologging.ErrorF("[start] image send failed: %v", err)
+	sendOpt.Media = ""
+	_, textErr := m.Respond(caption, sendOpt)
+	if textErr != nil {
+		gologging.ErrorF("[start] text send failed: %v", textErr)
+		return textErr
+	}
+	return nil
 }
 
 func startCB(cb *tg.CallbackQuery) error {

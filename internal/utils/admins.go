@@ -25,6 +25,7 @@ import (
 )
 
 var adminCache = NewCache[int64, []int64](30 * time.Minute)
+var ownerCache = NewCache[int64, int64](30 * time.Minute)
 
 // Checks if a user is an admin in a chat
 func IsChatAdmin(c *telegram.Client, chatID, userID int64) (bool, error) {
@@ -37,7 +38,7 @@ func IsChatAdmin(c *telegram.Client, chatID, userID int64) (bool, error) {
 		return slices.Contains(ids, userID), nil
 	}
 
-	ids, err := ReloadChatAdmin(c, chatID)
+	ids, err := RefreshChatAdmin(c, chatID)
 	if err != nil {
 		return false, err
 	}
@@ -46,19 +47,25 @@ func IsChatAdmin(c *telegram.Client, chatID, userID int64) (bool, error) {
 }
 
 // Reloads the chat admins from Telegram and updates the cache
-func ReloadChatAdmin(c *telegram.Client, chatID int64) ([]int64, error) {
-	ids, err := fetchAdmins(c, chatID)
+func RefreshChatAdmin(c *telegram.Client, chatID int64) ([]int64, error) {
+	ids, _, err := fetchAdmins(c, chatID)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(ids) == 0 {
-		adminCache.Delete(chatID)
-	} else {
-		adminCache.Set(chatID, ids)
+	return ids, nil
+}
+
+func GetChatOwner(c *telegram.Client, chatID int64) (int64, error) {
+	if ownerID, ok := ownerCache.Get(chatID); ok && ownerID != 0 {
+		return ownerID, nil
 	}
 
-	return ids, nil
+	_, ownerID, err := fetchAdmins(c, chatID)
+	if err != nil {
+		return 0, err
+	}
+	return ownerID, nil
 }
 
 // Adds a user to the cached admin list, auto-reloading if cache is missing
@@ -66,7 +73,7 @@ func AddChatAdmin(c *telegram.Client, chatID, userID int64) error {
 	ids, ok := adminCache.Get(chatID)
 	if !ok || len(ids) == 0 {
 		var err error
-		ids, err = ReloadChatAdmin(c, chatID)
+		ids, err = RefreshChatAdmin(c, chatID)
 		if err != nil {
 			return err
 		}
@@ -85,7 +92,7 @@ func RemoveChatAdmin(c *telegram.Client, chatID, userID int64) error {
 	ids, ok := adminCache.Get(chatID)
 	if !ok || len(ids) == 0 {
 		var err error
-		ids, err = ReloadChatAdmin(c, chatID)
+		ids, err = RefreshChatAdmin(c, chatID)
 		if err != nil {
 			return err
 		}
@@ -108,22 +115,38 @@ func RemoveChatAdmin(c *telegram.Client, chatID, userID int64) error {
 }
 
 // Fetches admins from Telegram
-func fetchAdmins(c *telegram.Client, chatID int64) ([]int64, error) {
+func fetchAdmins(c *telegram.Client, chatID int64) ([]int64, int64, error) {
 	admins, _, err := c.GetChatMembers(chatID, &telegram.ParticipantOptions{
 		Filter:           &telegram.ChannelParticipantsAdmins{},
 		SleepThresholdMs: 3000,
 		Limit:            -1,
 	})
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	ids := make([]int64, 0, len(admins))
+	var ownerID int64
 	for _, p := range admins {
 		if p.User.Bot || p.User.Deleted {
 			continue
 		}
 		ids = append(ids, p.User.ID)
+		if p.Status == telegram.Creator {
+			ownerID = p.User.ID
+		}
 	}
-	return ids, nil
+
+	if len(ids) == 0 {
+		adminCache.Delete(chatID)
+	} else {
+		adminCache.Set(chatID, ids)
+	}
+	if ownerID != 0 {
+		ownerCache.Set(chatID, ownerID)
+	} else {
+		ownerCache.Delete(chatID)
+	}
+
+	return ids, ownerID, nil
 }

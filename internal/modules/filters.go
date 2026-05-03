@@ -65,6 +65,9 @@ func filterSuperGroup(m *tg.NewMessage) bool {
 }
 
 func filterChatAdmins(m *tg.NewMessage) bool {
+	if isOwnerOrSudo(m.SenderID()) {
+		return true
+	}
 	isAdmin, err := utils.IsChatAdmin(m.Client, m.ChannelID(), m.SenderID())
 	if err != nil || !isAdmin {
 		m.Reply(F(m.ChannelID(), "only_admin"))
@@ -109,6 +112,10 @@ func filterChannel(m *tg.NewMessage) bool {
 }
 
 func canUseAdminCommand(c *tg.Client, chatID, userID int64) bool {
+	if isOwnerOrSudo(userID) {
+		return true
+	}
+
 	mode, err := database.GetAdminMode(chatID)
 	if err != nil {
 		mode = database.AdminModeAdminAuth
@@ -140,4 +147,12 @@ func filterOwner(m *tg.NewMessage) bool {
 		return false
 	}
 	return true
+}
+
+func isOwnerOrSudo(userID int64) bool {
+	if config.OwnerID != 0 && userID == config.OwnerID {
+		return true
+	}
+	isSudo, err := database.IsSudo(userID)
+	return err == nil && isSudo
 }
