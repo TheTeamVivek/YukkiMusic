@@ -24,8 +24,10 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 )
 
-var adminCache = NewCache[int64, []int64](30 * time.Minute)
-var ownerCache = NewCache[int64, int64](30 * time.Minute)
+var (
+	adminCache = NewCache[int64, []int64](30 * time.Minute)
+	ownerCache = NewCache[int64, int64](30 * time.Minute)
+)
 
 // Checks if a user is an admin in a chat
 func IsChatAdmin(c *telegram.Client, chatID, userID int64) (bool, error) {

@@ -14,8 +14,8 @@
  *
  * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
- 
- package database
+
+package database
 
 func BlacklistedUsers() ([]int64, error) {
 	state, err := getBotState()

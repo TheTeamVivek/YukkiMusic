@@ -19,7 +19,6 @@ package core
 
 import (
 	"fmt"
-	"strings"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
@@ -36,16 +35,16 @@ func styleBtn(text, cb, colour string) tg.KeyboardButton {
 	if config.DisableColour {
 		return b
 	}
-    /*
-	switch strings.ToLower(colour) {
-	case "red":
-		b.Danger()
-	case "blue":
-		b.Primary()
-	case "green":
-		b.Success()
-	}
-    */
+	/*
+		switch strings.ToLower(colour) {
+		case "red":
+			b.Danger()
+		case "blue":
+			b.Primary()
+		case "green":
+			b.Success()
+		}
+	*/
 	return b
 }
 
@@ -77,13 +76,13 @@ func GetBroadcastCancelKeyboard(chatID int64) *tg.ReplyInlineMarkup {
 }
 
 func SuppMarkup(chatID int64) tg.ReplyMarkup {
-	kb :=  tg.NewKeyboard()
-btn := tg.Button.URL(F(chatID, "SUPPORT_BTN"), config.SupportChat)
-if !config.DisableColour{
-// btn.Primary()
-}
+	kb := tg.NewKeyboard()
+	btn := tg.Button.URL(F(chatID, "SUPPORT_BTN"), config.SupportChat)
+	if !config.DisableColour {
+		// btn.Primary()
+	}
 
-		return kb.AddRow(btn).
+	return kb.AddRow(btn).
 		Build()
 }
 

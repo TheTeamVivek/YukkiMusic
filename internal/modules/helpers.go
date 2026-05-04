@@ -112,7 +112,7 @@ func isLoggerEnabled() bool {
 func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 	if config.LoggerID == 0 || config.LoggerID == m.ChatID() ||
 		config.LoggerID == m.ChannelID() || m.SenderID() == config.OwnerID ||
-          !isLoggerEnabled() {
+		!isLoggerEnabled() {
 		return
 	}
 

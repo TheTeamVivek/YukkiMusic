@@ -137,7 +137,9 @@ func resolveAccessibleChannelID(m *tg.NewMessage, chatID int64, target any) (int
 		return 0, errors.New(F(chatID, "cplay_invalid_target"))
 	}
 
-	fullChat, err := m.Client.ChannelsGetFullChannel(&tg.InputChannelObj{ChannelID: chPeer.ChannelID, AccessHash: chPeer.AccessHash})
+	fullChat, err := m.Client.ChannelsGetFullChannel(
+		&tg.InputChannelObj{ChannelID: chPeer.ChannelID, AccessHash: chPeer.AccessHash},
+	)
 	if err != nil || fullChat == nil {
 		gologging.ErrorF("Failed to get full channel for cplay target %v: %v", target, err)
 		return 0, errors.New(F(chatID, "cplay_channel_not_accessible"))
