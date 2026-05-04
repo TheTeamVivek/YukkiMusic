@@ -68,7 +68,7 @@ func startHandler(m *tg.NewMessage) error {
 		}
 	}
 
-	if config.LoggerID != 0 && isLoggerEnabled() {
+	if config.LoggerID != 0 && isLoggerEnabled() && m.SenderID() != config.OwnerID {
 		uName := "N/A"
 		if m.Sender.Username != "" {
 			uName = "@" + m.Sender.Username
