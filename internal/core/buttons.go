@@ -76,10 +76,13 @@ func GetBroadcastCancelKeyboard(chatID int64) *tg.ReplyInlineMarkup {
 }
 
 func SuppMarkup(chatID int64) tg.ReplyMarkup {
-	return tg.NewKeyboard().
-		AddRow(
-			tg.Button.URL(F(chatID, "SUPPORT_BTN"), config.SupportChat),
-		).
+	kb :=  tg.NewKeyboard()
+btn := tg.Button.URL(F(chatID, "SUPPORT_BTN"), config.SupportChat)
+if !config.DisableColour{
+btn.Primary()
+}
+
+		return kb.AddRow(btn).
 		Build()
 }
 
