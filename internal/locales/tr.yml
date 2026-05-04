@@ -102,6 +102,26 @@ broadcast_cancel_owner_only: "⚠️ Yayınları yalnızca bot sahibi iptal edeb
 broadcast_cancel_none_running: "ℹ️ Şu anda çalışan bir yayın yok."
 broadcast_cancel_done: "🚫 Yayın iptal edildi."
 
+# Blacklist
+
+blacklist_chat_blocked: "🚫 Bu sohbet bu botu kullanmaktan engellenmiştir."
+blacklist_owner_blocked_leave: "🚫 Bu sohbetin sahibi bu botu kullanmaktan engellenmiştir. Sohbetten ayrılıyorum."
+blacklist_user_blocked: "🚫 Bu botu kullanmanız engellendi."
+blacklist_usage_blockchat: "Kullanım: <code>/blockchat [chat_id|@username]</code>"
+blacklist_usage_unblockchat: "Kullanım: <code>/unblockchat [chat_id|@username]</code>"
+blacklist_invalid_chat_identifier: "Geçersiz sohbet kimliği: {error}"
+blacklist_block_user_success: "✅ Kullanıcı engellendi: <code>{id}</code>"
+blacklist_unblock_user_success: "✅ Kullanıcının engeli kaldırıldı: <code>{id}</code>"
+blacklist_block_chat_success: "✅ Sohbet engellendi: <code>{id}</code>"
+blacklist_unblock_chat_success: "✅ Sohbetin engeli kaldırıldı: <code>{id}</code>"
+blacklist_unblock_user_fail: "⚠️ Kullanıcının engeli kaldırılamadı: {error}"
+blacklist_unblock_chat_fail: "⚠️ Sohbetin engeli kaldırılamadı: {error}"
+blacklist_fetch_chats_fail: "⚠️ Engellenen sohbetler alınamadı: {error}"
+blacklist_fetch_users_fail: "⚠️ Engellenen kullanıcılar alınamadı: {error}"
+blacklist_list_title: "📛 <b>Kara Liste</b>"
+blacklist_list_chats: "💬 <b>Sohbetler:</b>"
+blacklist_list_users: "👤 <b>Kullanıcılar:</b>"
+
 # 🎧 CPlay (Channel Play)
 
 cplay_id_not_set: "⚠️ Kanal oynatma (cplay) ID'si ayarlanmamış.\nAyarlamak için <code>/setcplay &lt;sohbet_id&gt;</code> komutunu kullan."
@@ -914,6 +934,11 @@ help_owner: |
   <blockquote>
   <b>/addsudo</b> - Botun sudo listesine yeni bir kullanıcı ekle
   <b>/delsudo</b> - Botun sudo listesinden bir kullanıcı çıkar
+  <b>/blockuser</b> - Kullanıcının botu kullanmasını engelle
+  <b>/unblockuser</b> - Kullanıcının botu tekrar kullanmasına izin ver
+  <b>/blockchat</b> - Sohbette botun kullanılmasını engelle
+  <b>/unblockchat</b> - Sohbette botun tekrar kullanılmasına izin ver
+  <b>/blacklisted</b> - Genel kara listeyi göster
   <b>/eval</b> - Go kod parçacıklarını yürüt
   <b>/maintenance</b> — Botun bakım modunu yönet
   <b>/restart</b> — Botu yeniden başlat

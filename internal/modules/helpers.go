@@ -55,7 +55,7 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	r, _ := core.GetRoom(chatID, ass, true)
 
 	if cplay {
-		r.SetChatID(m.ChannelID())
+		r.ChatID = m.ChannelID()
 	}
 	return r, nil
 }
@@ -110,7 +110,7 @@ func isLoggerEnabled() bool {
 }
 
 func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
-	if config.LoggerID == 0 || config.LoggerID == m.ChatID() ||
+	if config.LoggerID == 0 || config.LoggerID == m.ChatID ||
 		config.LoggerID == m.ChannelID() || !isLoggerEnabled() {
 		return
 	}
@@ -265,6 +265,51 @@ func SafeMessageHandler(
 	}
 }
 
+func blacklistMessageMiddleware(next tg.MessageHandler) tg.MessageHandler {
+	return func(m *tg.NewMessage) error {
+		if blockedChat, _ := database.IsBlacklistedChat(m.ChannelID()); blockedChat {
+			if isOwnerOrSudo(m.SenderID()) {
+				return next(m)
+			}
+			m.Reply(F(m.ChannelID(), "blacklist_chat_blocked"))
+			leaveChat(m.Client, m.ChannelID())
+			return tg.ErrEndGroup
+		}
+		if blocked, _ := database.IsBlacklistedUser(m.SenderID()); blocked {
+			if m.IsChannel() {
+				chatOwnerID, err := utils.GetChatOwner(m.Client, m.ChannelID())
+				if err == nil && chatOwnerID == m.SenderID() {
+					m.Reply(F(m.ChannelID(), "blacklist_owner_blocked_leave"))
+					leaveChat(m.Client, m.ChannelID())
+					return tg.ErrEndGroup
+				}
+			}
+			if m.IsPrivate() || strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
+				m.Reply(F(m.ChannelID(), "blacklist_user_blocked"))
+			}
+			return tg.ErrEndGroup
+		}
+		return next(m)
+	}
+}
+
+func WithBlacklistCallback(
+	handler func(*tg.CallbackQuery) error,
+) func(*tg.CallbackQuery) error {
+	return func(cb *tg.CallbackQuery) error {
+		if blocked, _ := database.IsBlacklistedUser(cb.SenderID); blocked {
+			return tg.ErrEndGroup
+		}
+		if blockedChat, _ := database.IsBlacklistedChat(cb.ChannelID()); blockedChat {
+			if isOwnerOrSudo(cb.SenderID) {
+				return handler(cb)
+			}
+			return tg.ErrEndGroup
+		}
+		return handler(cb)
+	}
+}
+
 type panicInfo struct {
 	userMention  string
 	handlerType  string
@@ -332,31 +377,25 @@ func handlePanic(r, ctx any, isPanic bool) {
 
 func warnAndLeave(client *tg.Client, chatID int64) {
 	text := F(chatID, "supergroup_needed", locales.Arg{"chat_id": chatID})
-	_, err := client.SendMessage(
-		chatID,
-		text,
-		&tg.SendOptions{
-			ReplyMarkup: core.AddMeMarkup(chatID),
-			LinkPreview: false,
-		},
-	)
+	_, err := client.SendMessage(chatID, text, &tg.SendOptions{
+		ReplyMarkup: core.AddMeMarkup(chatID),
+		LinkPreview: false,
+	})
 	if err != nil {
-		gologging.ErrorF(
-			"failed to send supergroup conversion message to chat %d: %v",
-			chatID,
-			err,
-		)
+		gologging.ErrorF("failed to send supergroup conversion message to chat %d: %v", chatID, err)
 		return
 	}
 
 	go func() {
+		leaveChat(client, chatID)
+	}()
+}
+
+func leaveChat(client *tg.Client, chatID int64) {
+	go func() {
 		time.Sleep(1 * time.Second)
 		if err := client.LeaveChannel(chatID); err != nil {
-			gologging.ErrorF(
-				"failed to leave non-supergroup chatID=%d: %v",
-				chatID,
-				err,
-			)
+			gologging.ErrorF("failed to leave blacklisted chatID=%d: %v", chatID, err)
 		}
 		core.Assistants.WithAssistant(
 			chatID,

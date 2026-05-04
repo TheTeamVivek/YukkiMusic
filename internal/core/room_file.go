@@ -29,7 +29,7 @@ import (
 // check if a track is used in any room (other than the given room)
 func isTrackUsed(trackID string, skipChatID int64) bool {
 	for _, room := range rooms {
-		if room == nil || room.track == nil || room.chatID == skipChatID {
+		if room == nil || room.track == nil || room.ChatID == skipChatID {
 			continue
 		}
 
@@ -68,7 +68,7 @@ func (r *RoomState) releaseFile() {
 	track := r.track
 
 	roomsMu.RLock()
-	used := isTrackUsed(track.ID, r.id)
+	used := isTrackUsed(track.ID, r.ID)
 	roomsMu.RUnlock()
 
 	if used {
@@ -105,7 +105,7 @@ func (r *RoomState) cleanupFile() {
 		}
 
 		roomsMu.RLock()
-		used := isTrackUsed(t.ID, r.id)
+		used := isTrackUsed(t.ID, r.ID)
 		roomsMu.RUnlock()
 
 		if used {

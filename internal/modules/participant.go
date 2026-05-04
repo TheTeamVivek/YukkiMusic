@@ -162,6 +162,19 @@ func handleChatAction(m *telegram.NewMessage) error {
 
 		for _, uid := range action.Users {
 			if uid == botID {
+				if blockedChat, _ := database.IsBlacklistedChat(chatID); blockedChat && !isOwnerOrSudo(m.SenderID()) {
+					m.Reply(F(chatID, "blacklist_chat_blocked"))
+					leaveChat(m.Client, chatID)
+					return telegram.ErrEndGroup
+				}
+				ownerID, err := utils.GetChatOwner(m.Client, chatID)
+				if err == nil {
+					if blockedOwner, _ := database.IsBlacklistedUser(ownerID); blockedOwner && !isOwnerOrSudo(m.SenderID()) {
+						m.Reply(F(chatID, "blacklist_owner_blocked_leave"))
+						leaveChat(m.Client, chatID)
+						return telegram.ErrEndGroup
+					}
+				}
 
 				gologging.Debug("Bot added to " + utils.IntToStr(chatID))
 

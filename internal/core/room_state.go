@@ -40,10 +40,10 @@ var (
 type RoomState struct {
 	mu sync.RWMutex
 
-	// id is the canonical playback target id (group or linked channel).
-	id int64
-	// chatID is the UI/context chat id where messages and controls are sent.
-	chatID int64
+	// ID is the canonical playback target id (group or linked channel).
+	ID int64
+	// ChatID is the UI/context chat id where messages and controls are sent.
+	ChatID int64
 
 	// filePath is the currently playing local media file.
 	filePath string
@@ -139,8 +139,8 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 	room, exists := rooms[chatID]
 	if !exists {
 		room = &RoomState{
-			id:        chatID,
-			chatID:    chatID,
+			ID:        chatID,
+			ChatID:    chatID,
 			queue:     []*state.Track{},
 			speed:     1.0,
 			Assistant: ass,
@@ -253,24 +253,6 @@ func (st *scheduledTimers) cancelScheduledSpeed() {
 
 // Getters
 
-func (r *RoomState) ChatID() int64 {
-	if r.IsDestroyed() {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.chatID
-}
-
-func (r *RoomState) ID() int64 {
-	if r.IsDestroyed() {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.id
-}
-
 func (r *RoomState) FilePath() string {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -361,15 +343,6 @@ func (r *RoomState) SetLoop(loop int) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.loop = loop
-}
-
-func (r *RoomState) SetChatID(chatID int64) {
-	if r.IsDestroyed() {
-		return
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.chatID = chatID
 }
 
 func (r *RoomState) SetData(k string, v any) {

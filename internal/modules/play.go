@@ -291,7 +291,7 @@ func fetchTracksAndCheckStatus(
 		return nil, false, fmt.Errorf("no tracks found")
 	}
 
-	chatState, err := core.GetChatState(r.ID())
+	chatState, err := core.GetChatState(r.ID)
 	if err != nil {
 		gologging.ErrorF("Error getting chat state: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
@@ -731,13 +731,13 @@ func handlePlayAttemptError(
 	if errors.Is(err, ubot.ErrConnectionTimeout) {
 		gologging.Error("Voice connection timeout. Stopping call session...")
 		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_connection_timeout"))
-		core.DeleteRoom(room.ID())
+		core.DeleteRoom(room.ID)
 		return true, tg.ErrEndGroup
 	}
 
 	if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
 		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "rtmp_streaming_not_supported"))
-		core.DeleteRoom(room.ID())
+		core.DeleteRoom(room.ID)
 		return true, tg.ErrEndGroup
 	}
 
@@ -749,7 +749,7 @@ func handlePlayAttemptError(
 
 	if tg.MatchError(err, "GROUPCALL_INVALID") {
 		gologging.Error("GROUPCALL_INVALID err occurred. Returning...")
-		core.DeleteRoom(room.ID())
+		core.DeleteRoom(room.ID)
 		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_unable"))
 		return true, tg.ErrEndGroup
 	}

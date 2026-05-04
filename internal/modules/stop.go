@@ -74,7 +74,7 @@ func handleStop(m *telegram.NewMessage, cplay bool) error {
 	if isPaused || isMuted {
 		stopSuggestFloodKey := fmt.Sprintf(
 			"stop_suggest:%d",
-			r.ID(),
+			r.ID,
 		)
 		if utils.GetFlood(stopSuggestFloodKey) <= 0 {
 			utils.SetFlood(stopSuggestFloodKey, stopConfirmSuggestionCooldown)
@@ -90,7 +90,7 @@ func handleStop(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	scheduleOldPlayingMessage(r)
-	core.DeleteRoom(r.ID())
+	core.DeleteRoom(r.ID)
 	m.Reply(
 		F(
 			m.ChannelID(),

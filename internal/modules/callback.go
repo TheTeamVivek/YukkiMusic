@@ -258,7 +258,7 @@ func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 
 	if len(r.Queue()) == 0 {
 		scheduleOldPlayingMessage(r)
-		core.DeleteRoom(r.ID())
+		core.DeleteRoom(r.ID)
 		if _, err := cb.Edit(F(chatID, "skip_stopped", locales.Arg{
 			"user": utils.MentionHTML(cb.Sender),
 		})); err != nil {
@@ -284,7 +284,7 @@ func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 		}))
 		cb.Answer(F(chatID, "cb_skip_download_failed"), opt)
 		scheduleOldPlayingMessage(r)
-		core.DeleteRoom(r.ID())
+		core.DeleteRoom(r.ID)
 		return tg.ErrEndGroup
 	}
 
@@ -293,7 +293,7 @@ func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 		utils.EOR(statusMsg, F(chatID, "stream_play_fail"))
 		cb.Answer(F(chatID, "cb_skip_play_failed"), opt)
 		scheduleOldPlayingMessage(r)
-		core.DeleteRoom(r.ID())
+		core.DeleteRoom(r.ID)
 		return tg.ErrEndGroup
 	}
 
@@ -336,7 +336,7 @@ func handleStopAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	gologging.InfoF("Callback → stop, chatID=%d", chatID)
 
 	scheduleOldPlayingMessage(r)
-	core.DeleteRoom(r.ID())
+	core.DeleteRoom(r.ID)
 
 	cb.Answer(F(chatID, "cb_stop_success"), opt)
 	if _, err := cb.Edit(F(chatID, "stopped", locales.Arg{

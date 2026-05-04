@@ -89,7 +89,7 @@ func GetStopConfirmMarkup(
 	isPaused bool,
 ) tg.ReplyMarkup {
 	btn := tg.NewKeyboard()
-	prefix := fmt.Sprintf("room:%d:", r.ID())
+	prefix := fmt.Sprintf("room:%d:", r.ID)
 
 	text, cb := "CONFIRM_UNMUTE_BTN", prefix+"unmute"
 
@@ -107,7 +107,7 @@ func GetStopConfirmMarkup(
 
 func GetPlayMarkup(chatID int64, r *RoomState, queued bool) tg.ReplyMarkup {
 	btn := tg.NewKeyboard()
-	prefix := fmt.Sprintf("room:%d:", r.ID())
+	prefix := fmt.Sprintf("room:%d:", r.ID)
 	track := r.Track()
 	duration := 0
 	if track != nil {

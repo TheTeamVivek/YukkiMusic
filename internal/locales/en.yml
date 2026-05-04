@@ -102,6 +102,26 @@ broadcast_cancel_owner_only: "⚠️ Only the owner can cancel broadcasts."
 broadcast_cancel_none_running: "ℹ️ No broadcast is currently running."
 broadcast_cancel_done: "🚫 Broadcast cancelled."
 
+# Blocklist
+
+blacklist_chat_blocked: "🚫 This chat is blocked from using this bot."
+blacklist_owner_blocked_leave: "🚫 This chat owner is blocked from using this bot. Leaving chat."
+blacklist_user_blocked: "🚫 You are blocked from using this bot."
+blacklist_usage_blockchat: "Usage: <code>/blockchat [chat_id|@username]</code>"
+blacklist_usage_unblockchat: "Usage: <code>/unblockchat [chat_id|@username]</code>"
+blacklist_invalid_chat_identifier: "Invalid chat identifier: {error}"
+blacklist_block_user_success: "✅ User blocked: <code>{id}</code>"
+blacklist_unblock_user_success: "✅ User unblocked: <code>{id}</code>"
+blacklist_block_chat_success: "✅ Chat blocked: <code>{id}</code>"
+blacklist_unblock_chat_success: "✅ Chat unblocked: <code>{id}</code>"
+blacklist_unblock_user_fail: "⚠️ Failed to unblock user: {error}"
+blacklist_unblock_chat_fail: "⚠️ Failed to unblock chat: {error}"
+blacklist_fetch_chats_fail: "⚠️ Failed to fetch blocked chats: {error}"
+blacklist_fetch_users_fail: "⚠️ Failed to fetch blocked users: {error}"
+blacklist_list_title: "📛 <b>Blacklisted</b>"
+blacklist_list_chats: "💬 <b>Chats:</b>"
+blacklist_list_users: "👤 <b>Users:</b>"
+
 # 🎧 CPlay (Channel Play)
 
 cplay_id_not_set: "⚠️ cplay ID not set.\nUse <code>/setcplay &lt;chat_id&gt;</code> to set it."
@@ -921,6 +941,11 @@ help_owner: |
   <blockquote>
   <b>/addsudo</b> - Add a new user to bot's sudolist
   <b>/delsudo</b> - Remove a user from bot's sudolist
+  <b>/blockuser</b> - Prevent user from using bot
+  <b>/unblockuser</b> - Allow user to use bot again
+  <b>/blockchat</b> - Prevent chat from using bot
+  <b>/unblockchat</b> - Allow chat to use bot again
+  <b>/blacklisted</b> - Show global blacklist
   <b>/eval</b> - Execute Go code snippets
   <b>/maintenance</b> — Manage the bot’s maintenance mode
   <b>/restart</b> — Restart the bot
@@ -990,4 +1015,3 @@ help_public: |
   <b>/json</b> - Show message JSON structure
   <b>/sudolist</b> - View sudo user list
   </blockquote>
-  

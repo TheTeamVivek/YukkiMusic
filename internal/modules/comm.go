@@ -57,6 +57,11 @@ var AllCommands = BotCommands{
 	PrivateOwnerCommands: []*telegram.BotCommand{
 		cmd("addsudo", "Add a sudo user."),
 		cmd("delsudo", "Remove a sudo user."),
+		cmd("blockuser", "Block a user."),
+		cmd("unblockuser", "Unblock a user."),
+		cmd("blockchat", "Block a chat."),
+		cmd("unblockchat", "Unblock a chat."),
+		cmd("blacklisted", "List blacklisted chats and users."),
 		cmd("maintenance", "Enable/disable maintenance mode."),
 	},
 

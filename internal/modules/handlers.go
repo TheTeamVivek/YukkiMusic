@@ -72,6 +72,31 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
 	},
 	{
+		Pattern: "(blockuser|blacklistuser|blackuser|bluser)",
+		Handler: handleBlockUser,
+		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
+	},
+	{
+		Pattern: "(unblockuser|unblacklistuser|unbluser|whitelistuser)",
+		Handler: handleUnblockUser,
+		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
+	},
+	{
+		Pattern: "(blockchat|blacklistchat|blackchat|blchat)",
+		Handler: handleBlockChat,
+		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
+	},
+	{
+		Pattern: "(unblockchat|unblacklistchat|unblackchat|whitechat|unblchat)",
+		Handler: handleUnblockChat,
+		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
+	},
+	{
+		Pattern: "(blocked|blacklisted)",
+		Handler: handleBlacklisted,
+		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
+	},
+	{
 		Pattern: "(sudoers|listsudo|sudolist)",
 		Handler: handleGetSudoers,
 		Filters: []telegram.Filter{ignoreChannelFilter},
@@ -500,22 +525,31 @@ var cbHandlers = []CbHandlerDef{
 
 func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 	bot.UpdatesGetState()
+	bot.Use(blacklistMessageMiddleware)
 	assistants.ForEach(func(a *core.Assistant) {
 		a.Client.UpdatesGetState()
 	})
 
-bot.On("action", func (m *telegram.NewMessage) error {
-    fmt.Println("Received message:", bot.JSON(m.Action))
-    return nil
-  })
+	bot.On("action", func(m *telegram.NewMessage) error {
+		fmt.Println("Received message:", bot.JSON(m.Action))
+		return nil
+	})
 
 	for _, h := range handlers {
-		bot.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...) /*.
+		bot.AddCommandHandler(
+			h.Pattern,
+			SafeMessageHandler(h.Handler),
+			h.Filters...,
+		) /*.
 		SetGroup(100)*/
 	}
 
 	for _, h := range cbHandlers {
-		bot.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler), h.Filters...) /*.
+		bot.AddCallbackHandler(
+			h.Pattern,
+			WithBlacklistCallback(SafeCallbackHandler(h.Handler)),
+			h.Filters...,
+		) /*.
 		SetGroup(90)*/
 	}
 
