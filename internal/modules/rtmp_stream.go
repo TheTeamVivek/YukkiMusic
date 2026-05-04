@@ -260,7 +260,7 @@ func rtmpStopCallbackHandler(cb *tg.CallbackQuery) error {
 	chatID := cb.ChannelID()
 	opt := &tg.CallbackOptions{Alert: true}
 
-	if !checkAdminOrAuth(cb, chatID, opt) {
+	if !checkAdminOrAuth(cb, chatID) {
 		return tg.ErrEndGroup
 	}
 
