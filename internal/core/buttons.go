@@ -36,7 +36,7 @@ func styleBtn(text, cb, colour string) tg.KeyboardButton {
 	if config.DisableColour {
 		return b
 	}
-
+    /*
 	switch strings.ToLower(colour) {
 	case "red":
 		b.Danger()
@@ -45,6 +45,7 @@ func styleBtn(text, cb, colour string) tg.KeyboardButton {
 	case "green":
 		b.Success()
 	}
+    */
 	return b
 }
 
@@ -79,7 +80,7 @@ func SuppMarkup(chatID int64) tg.ReplyMarkup {
 	kb :=  tg.NewKeyboard()
 btn := tg.Button.URL(F(chatID, "SUPPORT_BTN"), config.SupportChat)
 if !config.DisableColour{
-btn.Primary()
+// btn.Primary()
 }
 
 		return kb.AddRow(btn).
