@@ -8,32 +8,26 @@
     "env": {
         "API_ID": {
             "description": "Your Telegram API ID from my.telegram.org.",
-            "value": "",
             "required": true
         },
         "API_HASH": {
             "description": "Your Telegram API Hash from my.telegram.org.",
-            "value": "",
             "required": true
         },
         "TOKEN": {
             "description": "Your Telegram bot token from @BotFather.",
-            "value": "",
             "required": true
         },
         "MONGO_DB_URI": {
             "description": "Your MongoDB connection string.",
-            "value": "",
             "required": true
         },
         "STRING_SESSION": {
             "description": "A Pyrogram string session for the assistant.",
-            "value": "",
             "required": true
         },
         "FALLEN_API_KEY": {
             "description": "API key for Fallen API (optional). You can get one from @FallenApiBot or https://beta.fallenapi.fun/. If you are using cookies, you can leave this empty.",
-            "value": "",
             "required": false
         },
         "FALLEN_API_URL": {
@@ -43,12 +37,10 @@
         },
         "OWNER_ID": {
             "description": "The Telegram user ID of the bot's owner.",
-            "value": "",
             "required": true
         },
         "LOGGER_ID": {
             "description": "(Optional) Telegram chat ID where logs/errors will be sent. Leave empty to disable chat logging.",
-            "value": "",
             "required": false
         },
         "DURATION_LIMIT": {
@@ -73,7 +65,10 @@
         },
         "START_IMAGES": {
             "description": "Optional list of /start image URLs separated by spaces, commas, or semicolons. A random image is used each time.",
-            "value": "",
+            "required": false
+        },
+        "EFFECT_IDS": {
+            "description": "List of Telegram message effect IDs separated by spaces, commas, or semicolons. A random effect is applied when the /start command is used. If unsure, try 5104841245755180586.",
             "required": false
         },
         "SUPPORT_CHAT": {
@@ -88,7 +83,6 @@
         },
         "COOKIES_LINK": {
             "description": "A space-separated list of batbin.me URLs for cookies.",
-            "value": "",
             "required": false
         },
         "SET_CMDS": {

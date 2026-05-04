@@ -31,8 +31,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// TODO: Add EFFECT_IDS documentation in internal/config/README.md.
-
 var (
 	APIID          int32
 	APIHash        string

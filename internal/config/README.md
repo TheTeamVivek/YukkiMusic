@@ -60,6 +60,7 @@ These must be set for the bot to start.
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
+|`EFFECT_IDS`| `""` | List of Telegram message effect IDs (space/comma/semicolon separated). One random effect ID is selected and applied when the `/start` command is used. These effects are shown visually by Telegram (e.g., animations). If you're unsure what to use, try `5104841245755180586` and run `/start` to see an example effect.|
 | `START_IMAGES` | `""` | Start images list (space/comma/semicolon separated URLs). If multiple URLs are provided, one is chosen randomly for each `/start`. |
 | `PING_IMG_URL` | `https://...` | Image URL displayed in the `/ping` command response. |
 | `SUPPORT_CHAT` | `https://t.me/TheTeamVk` | **Full URL** to the support group. |
