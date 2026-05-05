@@ -131,6 +131,7 @@ cplay_invalid_chat_id: "<b>Invalid Chat ID:</b> Please provide a valid integer I
 cplay_resolve_peer_fail: "<b>Failed to resolve peer:</b> Could not fetch channel details. Ensure I can access this channel."
 cplay_invalid_target: "<b>Invalid Target:</b> The provided ID is not a valid channel."
 cplay_channel_not_accessible: "<b>Channel Not Accessible:</b> Could not retrieve channel information. Please ensure I am an administrator in the target channel."
+cplay_bot_invite_permission_missing: "⚠️ <b>Missing Permission:</b> I am admin in target channel but <code>Invite Users</code> permission is disabled. Please enable it and try again."
 cplay_channel_not_linked: "⚠️ <b>Linked channel not found:</b> This chat is not linked to any channel/group."
 cplay_save_error: "<b>Error:</b> Failed to save CPlay settings."
 cplay_enabled: "✅ <b>Channel Play enabled.</b> All <code>/c</code> commands will now work in channel <code>{channel_id}</code>."

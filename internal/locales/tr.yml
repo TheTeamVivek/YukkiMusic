@@ -131,6 +131,7 @@ cplay_invalid_chat_id: "<b>Geçersiz Sohbet ID:</b> Lütfen kanal için geçerli
 cplay_resolve_peer_fail: "<b>Kanal çözülemedi:</b> Kanal detayları alınamadı. Bu kanala erişimim olduğundan emin ol."
 cplay_invalid_target: "<b>Geçersiz Hedef:</b> Sağlanan ID geçerli bir kanal değil."
 cplay_channel_not_accessible: "<b>Kanala Erişilemiyor:</b> Kanal bilgileri alınamadı. Lütfen hedef kanalda yönetici olduğumdan emin ol."
+cplay_bot_invite_permission_missing: "⚠️ <b>Eksik İzin:</b> Hedef kanalda yöneticiyim ancak <code>Kullanıcı Davet Et</code> izni kapalı. Lütfen açıp tekrar deneyin."
 cplay_channel_not_linked: "⚠️ <b>Bağlı kanal bulunamadı:</b> Bu sohbet herhangi bir kanal/gruba bağlı değil."
 cplay_save_error: "<b>Hata:</b> Kanal oynatma ayarları kaydedilemedi."
 cplay_owner_required: "⚠️ Bu ayarı yalnızca bu sohbetin sahibi veya hedef kanalın sahibi yapabilir."
