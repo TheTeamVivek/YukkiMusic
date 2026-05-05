@@ -216,11 +216,6 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter},
 	},
 	{
-		Pattern: "(cfplay|fcplay|cplayforce)",
-		Handler: cfplayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
 		Pattern: "vplay",
 		Handler: vplayHandler,
 		Filters: []telegram.Filter{superGroupFilter},
@@ -358,13 +353,9 @@ var handlers = []MsgHandlerDef{
 	},
 
 	// CPlay commands
+	
 	{
-		Pattern: "(cplay|cvplay)",
-		Handler: cplayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "(cfplay|fcplay|cforceplay)",
+		Pattern: "(cfplay|fcplay|cforceplay|cplayforce)",
 		Handler: cfplayHandler,
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
@@ -530,18 +521,13 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 		a.Client.UpdatesGetState()
 	})
 
-	bot.On("action", func(m *telegram.NewMessage) error {
-		fmt.Println("Received message:", bot.JSON(m.Action))
-		return nil
-	})
-
 	for _, h := range handlers {
 		bot.AddCommandHandler(
 			h.Pattern,
 			SafeMessageHandler(h.Handler),
 			h.Filters...,
-		) /*.
-		SetGroup(100)*/
+		).
+		SetGroup(100)
 	}
 
 	for _, h := range cbHandlers {
@@ -549,16 +535,14 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 			h.Pattern,
 			WithBlacklistCallback(SafeCallbackHandler(h.Handler)),
 			h.Filters...,
-		) /*.
-		SetGroup(90)*/
+		).
+		SetGroup(90)
 	}
 
-	bot.On("edit:/eval", evalHandle)       //.SetGroup(80)
-	bot.On("edit:/ev", evalCommandHandler) //.SetGroup(80)
+	bot.On("edit:/eval", evalHandle)       .SetGroup(80)
+	bot.On("edit:/ev", evalCommandHandler) .SetGroup(80)
 
-	bot.On("participant", handleParticipantUpdate) //.SetGroup(70)
-	bot.On("action", handleChatAction)
-
+	bot.On("participant", handleParticipantUpdate).SetGroup(70)
 	bot.AddActionHandler(handleActions)
 	bot.AddRawHandler(&telegram.UpdateReadChannelOutbox{}, cleanModeReadHandler)
 

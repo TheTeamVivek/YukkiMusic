@@ -92,7 +92,7 @@ func handleLinkedCPlay(m *tg.NewMessage, chatID int64) error {
 			m.Reply(F(chatID, "cplay_channel_not_linked"))
 			return tg.ErrEndGroup
 		}
-		linkedID = cf.LinkedChatID
+		linkedID = -100_000_000_0000 - cf.LinkedChatID
 	case *tg.InputPeerChat:
 		m.Reply(F(chatID, "supergroup_needed", locales.Arg{"chat_id": p.ChatID}))
 		return tg.ErrEndGroup
@@ -145,7 +145,7 @@ func resolveAccessibleChannelID(m *tg.NewMessage, chatID int64, target any) (int
 		return 0, errors.New(F(chatID, "cplay_channel_not_accessible"))
 	}
 
-	return chPeer.ChannelID, nil
+	return -100_000_000_0000 - chPeer.ChannelID, nil
 }
 
 func canSetCPlayTarget(m *tg.NewMessage, sourceChatID, targetChatID int64) (bool, error) {
