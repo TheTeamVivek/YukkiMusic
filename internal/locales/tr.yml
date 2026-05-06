@@ -125,7 +125,6 @@ blacklist_list_users: "👤 <b>Kullanıcılar:</b>"
 # 🎧 CPlay (Channel Play)
 
 cplay_id_not_set: "⚠️ Kanal oynatma (cplay) ID'si ayarlanmamış.\nAyarlamak için <code>/setcplay &lt;sohbet_id&gt;</code> komutunu kullan."
-cplay_alias_help: "ℹ️ Channelplay yapılandırıldıysa, bağlı kanalda oynatmayı kontrol etmek için oynatma komutlarının başına <code>c</code> ekleyin (örn. <code>/cplay</code>, <code>/cskip</code>)."
 cplay_usage: "<b>Kullanım:</b> <code>/setcplay &lt;kanal_id&gt;</code>"
 cplay_invalid_chat_id: "<b>Geçersiz Sohbet ID:</b> Lütfen kanal için geçerli bir tamsayı ID gir."
 cplay_resolve_peer_fail: "<b>Kanal çözülemedi:</b> Kanal detayları alınamadı. Bu kanala erişimim olduğundan emin ol."
@@ -136,8 +135,8 @@ cplay_channel_not_linked: "⚠️ <b>Bağlı kanal bulunamadı:</b> Bu sohbet he
 cplay_save_error: "<b>Hata:</b> Kanal oynatma ayarları kaydedilemedi."
 cplay_owner_required: "⚠️ Bu ayarı yalnızca bu sohbetin sahibi veya hedef kanalın sahibi yapabilir."
 cplay_owner_check_failed: "⚠️ Sohbet sahipliği şu anda doğrulanamadı. Lütfen tekrar deneyin."
-cplay_disabled: "✅ <b>Kanal Oynatma devre dışı bırakıldı.</b> Bu sohbet için <code>/c</code> komutları artık kapalı."
-cplay_enabled: "✅ <b>Kanal Oynatma etkinleştirildi.</b> Tüm <code>/c</code> komutları artık <code>{channel_id}</code> kanalında çalışacak."
+cplay_disabled: "✅ <b>Kanal Oynatma devre dışı bırakıldı.</b> Bu sohbet için kanal oynatma komutları (örn. <code>/cplay</code>, <code>/cskip</code>) artık kapalı."
+cplay_enabled: "✅ <b>Kanal Oynatma etkinleştirildi.</b> Tüm kanal oynatma komutları (örn. <code>/cplay</code>, <code>/cskip</code>) artık <code>{channel_id}</code> kanalında çalışacak."
 
 # Callback handler messages
 invalid_request: "⚠️ Geçersiz istek."
@@ -904,13 +903,15 @@ sudo_join_owner: "👑 {bot} sahibi — {user} — az önce sohbete katıldı."
 sudo_join_sudo: "🛡️ {bot} sudo kullanıcısı — {user} — az önce sohbete katıldı."
 
 supergroup_needed: |
-  Bu sohbet (ID: <code>{chat_id}</code>) henüz bir süper grup değil.
-  <b>⚠️ Lütfen bu sohbeti süper gruba dönüştür ve ardından beni yönetici olarak ekle.</b>
-  
-  Nasıl dönüştüreceğini bilmiyorsan bu rehberi kullanabilirsin:
-  🔗 <a href=\"https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02\">Grubu Süper Gruba Dönüştürme</a>
-  
-  Soruların varsa destek grubumuza katıl.
+  Bu sohbet (ID: <code>{chat_id}</code>) henüz bir SuperGroup değil.
+
+  <i>⚠️ Lütfen bu grubu SuperGroup'a dönüştür, sonra beni tekrar yönetici olarak ekle.</i>
+
+  <b>Nasıl dönüştürülür?</b>
+  <a href="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">🔗 Rehbere git</a>
+
+  Hâlâ sorun yaşıyorsan <a href="{support_group}">destek grubumuza</a> katıl.
+
 unmute_already: "ℹ️ <b>Zaten Sesi Açık</b>\nMüzik bu sohbette sessize alınmamış."
 unmute_failed: "❌ <b>Oynatma Sesi Açılamadı</b>\nHata: <code>{error}</code>"
 unmute_success: |

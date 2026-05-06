@@ -377,7 +377,7 @@ func handlePanic(r, ctx any, isPanic bool) {
 }
 
 func warnAndLeave(client *tg.Client, chatID int64) {
-	text := F(chatID, "supergroup_needed", locales.Arg{"chat_id": chatID})
+	text := F(chatID, "supergroup_needed", locales.Arg{"chat_id": chatID, "support_group": config.SupportChat})
 	_, err := client.SendMessage(chatID, text, &tg.SendOptions{
 		ReplyMarkup: core.AddMeMarkup(chatID),
 		LinkPreview: false,

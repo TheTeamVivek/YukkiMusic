@@ -125,7 +125,6 @@ blacklist_list_users: "👤 <b>Users:</b>"
 # 🎧 CPlay (Channel Play)
 
 cplay_id_not_set: "⚠️ cplay ID not set.\nUse <code>/setcplay &lt;chat_id&gt;</code> to set it."
-cplay_alias_help: "ℹ️ If channelplay is configured, use <code>c</code> before play commands (like <code>/cplay</code>, <code>/cskip</code>) to control playback in the linked channel."
 cplay_usage: "<b>Usage:</b> <code>/setcplay &lt;channel_id&gt;</code>"
 cplay_invalid_chat_id: "<b>Invalid Chat ID:</b> Please provide a valid integer ID for the channel."
 cplay_resolve_peer_fail: "<b>Failed to resolve peer:</b> Could not fetch channel details. Ensure I can access this channel."
@@ -134,10 +133,10 @@ cplay_channel_not_accessible: "<b>Channel Not Accessible:</b> Could not retrieve
 cplay_bot_invite_permission_missing: "⚠️ <b>Missing Permission:</b> I am admin in target channel but <code>Invite Users</code> permission is disabled. Please enable it and try again."
 cplay_channel_not_linked: "⚠️ <b>Linked channel not found:</b> This chat is not linked to any channel/group."
 cplay_save_error: "<b>Error:</b> Failed to save CPlay settings."
-cplay_enabled: "✅ <b>Channel Play enabled.</b> All <code>/c</code> commands will now work in channel <code>{channel_id}</code>."
+cplay_enabled: "✅ <b>Channel Play enabled.</b> All channel-play commands (like <code>/cplay</code>, <code>/cskip</code>) will now work in channel <code>{channel_id}</code>."
 cplay_owner_required: "⚠️ Only the owner of this chat or the target channel can use this setup."
 cplay_owner_check_failed: "⚠️ Could not verify chat ownership right now. Please try again."
-cplay_disabled: "✅ <b>Channel Play disabled.</b> <code>/c</code> commands are now turned off for this chat."
+cplay_disabled: "✅ <b>Channel Play disabled.</b> Channel-play commands (like <code>/cplay</code>, <code>/cskip</code>) are now turned off for this chat."
 
 # Callback handler messages
 invalid_request: "⚠️ Invalid request."
@@ -910,14 +909,15 @@ sudo_join_owner: "👑 {user} — owner of {bot} — just entered the chat."
 sudo_join_sudo: "🛡️ {user}, a sudo user of {bot}, just joined the chat."
 
 supergroup_needed: |
-  This chat (ID: <code>{chat_id}</code>) is not a supergroup yet.
-  <b>⚠️ Please convert this chat to a supergroup then add me as admin.</b>
-  
-  If you don't know how to convert, use this guide:
-  🔗 <a href=\"https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02\">How to convert to a SuperGroup</a>
-  
-  If you have any questions, join our support group:
-  
+  This chat (ID: <code>{chat_id}</code>) is not a SuperGroup yet.
+
+  <i>⚠️ Please convert this group into a SuperGroup, then add me again as an admin.</i>
+
+  <b>How to convert?</b>
+  <a href="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">🔗 Go to the guide</a>
+
+  If you still face any issues, join our <a href="{support_group}">support group.</a>
+
 unmute_already: "ℹ️ <b>Already Unmuted</b>\nThe music is not muted in this chat."
 unmute_failed: "❌ <b>Playback Unmute Failed</b>\nError: <code>{error}</code>"
 unmute_success: |

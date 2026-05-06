@@ -24,6 +24,7 @@ import (
 	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/config"
 	"main/internal/database"
 	"main/internal/locales"
 	"main/internal/utils"
@@ -77,11 +78,6 @@ func setCPlayHandler(m *tg.NewMessage) error {
 	return saveCPlayTarget(m, chatID, targetChannelID)
 }
 
-func cAliasHandler(m *tg.NewMessage) error {
-	chatID := m.ChannelID()
-	m.Reply(F(chatID, "cplay_alias_help"))
-	return tg.ErrEndGroup
-}
 
 func disableCPlay(m *tg.NewMessage, chatID int64) error {
 	allowed, err := canSetCPlayTarget(m, chatID, chatID)
@@ -122,7 +118,7 @@ func getLinkedChannelID(m *tg.NewMessage, chatID int64) (int64, error) {
 		}
 		return -100_000_000_0000 - cf.LinkedChatID, nil
 	case *tg.InputPeerChat:
-		return 0, errors.New(F(chatID, "supergroup_needed", locales.Arg{"chat_id": p.ChatID}))
+		return 0, errors.New(F(chatID, "supergroup_needed", locales.Arg{"chat_id": p.ChatID, "support_group": config.SupportChat}))
 	default:
 		return 0, errors.New(F(chatID, "cplay_invalid_target"))
 	}
