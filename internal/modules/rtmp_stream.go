@@ -204,7 +204,7 @@ func handleStream(m *tg.NewMessage, force bool) error {
 	btn := tg.NewKeyboard()
 	stopBtn := tg.Button.Data(F(chatID, "CONFIRM_STOP_BTN"), "rtmp_stop")
 	if !config.DisableColour {
-		//	stopBtn.Danger()
+			stopBtn.Danger()
 	}
 	btn.AddRow(stopBtn)
 
