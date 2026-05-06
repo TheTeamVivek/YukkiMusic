@@ -78,7 +78,6 @@ func setCPlayHandler(m *tg.NewMessage) error {
 	return saveCPlayTarget(m, chatID, targetChannelID)
 }
 
-
 func disableCPlay(m *tg.NewMessage, chatID int64) error {
 	allowed, err := canSetCPlayTarget(m, chatID, chatID)
 	if err != nil {
@@ -136,7 +135,9 @@ func resolveChannelPlay(m *tg.NewMessage, chatID int64, target any) (int64, erro
 		return 0, errors.New(F(chatID, "cplay_invalid_target"))
 	}
 
-	fullChat, err := m.Client.ChannelsGetFullChannel(&tg.InputChannelObj{ChannelID: chPeer.ChannelID, AccessHash: chPeer.AccessHash})
+	fullChat, err := m.Client.ChannelsGetFullChannel(
+		&tg.InputChannelObj{ChannelID: chPeer.ChannelID, AccessHash: chPeer.AccessHash},
+	)
 	if err != nil || fullChat == nil {
 		gologging.ErrorF("Failed to get full channel for cplay target %v: %v", target, err)
 		return 0, errors.New(F(chatID, "cplay_channel_not_accessible"))

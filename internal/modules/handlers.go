@@ -353,7 +353,7 @@ var handlers = []MsgHandlerDef{
 	},
 
 	// CPlay commands
-	
+
 	{
 		Pattern: "(cfplay|fcplay|cforceplay|cplayforce)",
 		Handler: cfplayHandler,
@@ -522,7 +522,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 			SafeMessageHandler(h.Handler),
 			h.Filters...,
 		).
-		SetGroup(100)
+			SetGroup(100)
 	}
 
 	for _, h := range cbHandlers {
@@ -531,11 +531,11 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 			WithBlacklistCallback(SafeCallbackHandler(h.Handler)),
 			h.Filters...,
 		).
-		SetGroup(90)
+			SetGroup(90)
 	}
 
-	bot.On("edit:/eval", evalHandle)       .SetGroup(80)
-	bot.On("edit:/ev", evalCommandHandler) .SetGroup(80)
+	bot.On("edit:/eval", evalHandle).SetGroup(80)
+	bot.On("edit:/ev", evalCommandHandler).SetGroup(80)
 
 	bot.On("participant", handleParticipantUpdate).SetGroup(70)
 	bot.AddActionHandler(handleActions)

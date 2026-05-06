@@ -19,6 +19,7 @@ package core
 
 import (
 	"fmt"
+	"strings"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
@@ -35,16 +36,16 @@ func styleBtn(text, cb, colour string) tg.KeyboardButton {
 	if config.DisableColour {
 		return b
 	}
-	
+
 	switch strings.ToLower(colour) {
-		case "red":
-			b.Danger()
-		case "blue":
-			b.Primary()
-		case "green":
-			b.Success()
+	case "red":
+		b.Danger()
+	case "blue":
+		b.Primary()
+	case "green":
+		b.Success()
 	}
-	
+
 	return b
 }
 
