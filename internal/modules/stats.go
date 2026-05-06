@@ -51,10 +51,10 @@ func init() {
 • <b>Sudo users</b> only`
 }
 
-func resolveBuildDependencyVersion(modulePath string) string {
+func resolveGogramVersion() string {
 	if info, ok := debug.ReadBuildInfo(); ok {
 		for _, dep := range info.Deps {
-			if dep.Path == modulePath {
+			if dep.Path == "github.com/amarnathcjd/gogram" {
 				if dep.Replace != nil && dep.Replace.Version != "" {
 					return dep.Replace.Version
 				}
@@ -152,7 +152,7 @@ func statsHandler(m *telegram.NewMessage) error {
 		"served_users":      servedUsersVal,
 		"go_version":        runtime.Version(),
 		"gogram_api_layer":  telegram.ApiVersion,
-		"gogram_version":    resolveBuildDependencyVersion("github.com/amarnathcjd/gogram"),
+		"gogram_version":    resolveGogramVersion(),
 		"ntgcalls_version":  ntgcalls.Version(),
 	}))
 	return telegram.ErrEndGroup
