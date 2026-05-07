@@ -15,7 +15,7 @@
     <img src="https://img.shields.io/badge/Go-1.26+-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go Version">
   </a>
   <a href="https://github.com/TheTeamVivek/YukkiMusic/releases">
-    <img src="https://img.shields.io/badge/Version-v3.2.0-FF9800?style=for-the-badge&logo=semver&logoColor=white" alt="Release Version">
+    <img src="https://img.shields.io/badge/Version-v3.3.0-FF9800?style=for-the-badge&logo=semver&logoColor=white" alt="Release Version">
   </a>
   <a href="https://t.me/TheTeamVk">
     <img src="https://img.shields.io/badge/Telegram-Support-26A69A?style=for-the-badge&logo=telegram&logoColor=white" alt="Support Group">
