@@ -5,8 +5,6 @@ WORKDIR /build
 # hadolint ignore=DL3015
 RUN apt-get update && \
     apt-get install -y \
-        git \
-        gcc \
         unzip \
         curl \
         zlib1g-dev && \
@@ -26,11 +24,10 @@ RUN chmod +x install.sh && \
 FROM debian:bookworm-slim
 
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
         ffmpeg \
         curl \
-        unzip \
-        zlib1g && \
+        unzip && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /etc/ssl/certs /etc/ssl/certs

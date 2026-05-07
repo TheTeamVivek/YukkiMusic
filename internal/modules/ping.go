@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
@@ -82,7 +83,7 @@ func pingHandler(m *tg.NewMessage) error {
 	}
 
 	start := time.Now()
-	reply, err := m.Respond(F(m.ChannelID(), "ping_start"))
+	reply, err := m.Reply(F(m.ChannelID(), "ping_start"))
 	if err != nil {
 		return err
 	}
@@ -129,6 +130,18 @@ func pingHandler(m *tg.NewMessage) error {
 		"disk_usage": diskUsage,
 	})
 
-	reply.Edit(msg, opt)
+	_, err = reply.Edit(msg, opt)
+	if err != nil {
+		gologging.ErrorF("[ping] edit failed: %v", err)
+
+		if config.PingImage != "" {
+			opt.Media = ""
+			_, err = reply.Edit(msg, opt)
+			if err != nil {
+				gologging.ErrorF("[ping] fallback text edit failed: %v", err)
+				return err
+			}
+		}
+	}
 	return tg.ErrEndGroup
 }

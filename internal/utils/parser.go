@@ -39,12 +39,15 @@ func ShortTitle(title string, max ...int) string {
 	return string(runes[:limit]) + "..."
 }
 
+var htmlReplacer = strings.NewReplacer(
+	"&", "&amp;",
+	"<", "&lt;",
+	">", "&gt;",
+)
+
 // EscapeHTML escapes characters for Telegram HTML mode (only &, <, >).
 func EscapeHTML(s string) string {
-	s = strings.ReplaceAll(s, "&", "&amp;")
-	s = strings.ReplaceAll(s, "<", "&lt;")
-	s = strings.ReplaceAll(s, ">", "&gt;")
-	return s
+	return htmlReplacer.Replace(s)
 }
 
 func CleanURL(raw string) string {

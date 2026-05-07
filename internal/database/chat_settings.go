@@ -19,7 +19,6 @@ package database
 
 import (
 	"fmt"
-	"strconv"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -31,30 +30,31 @@ type RTMPConfig struct {
 }
 
 type ChatSettings struct {
-	ChatID             int64      `bson:"_id"`
-	ChannelPlayID      int64      `bson:"cplay_id"`
-	AuthUsers          []int64    `bson:"auth_users"`
-	Language           string     `bson:"language"`
-	RTMP               RTMPConfig `bson:"rtmp_config"`
-	AssistantIndex     int        `bson:"ass_index,omitempty"`
-	ThumbnailsDisabled bool       `bson:"no_thumb"`
-	PlayModeAdminsOnly bool       `bson:"play_mode"`
-	CommandDelete      bool       `bson:"cmd_delete"`
+	ChatID                int64      `bson:"_id"`
+	ChannelPlayID         int64      `bson:"cplay_id"`
+	AuthUsers             []int64    `bson:"auth_users"`
+	AdminMode             AdminMode  `bson:"admin_mode,omitempty"`
+	Language              string     `bson:"language"`
+	RTMP                  RTMPConfig `bson:"rtmp_config"`
+	AssistantIndex        int        `bson:"ass_index,omitempty"`
+	ThumbnailsDisabled    bool       `bson:"no_thumb"`
+	PlayModeAdminsOnly    bool       `bson:"play_mode"`
+	CommandDelete         bool       `bson:"cmd_delete"`
+	CleanMode             bool       `bson:"clean_mode"`
+	CleanModeDurationMins int        `bson:"clean_mode_duration_mins"`
 }
 
 func defaultChatSettings(chatID int64) *ChatSettings {
 	return &ChatSettings{
-		ChatID:    chatID,
-		AuthUsers: []int64{},
+		ChatID:                chatID,
+		AuthUsers:             []int64{},
+		CleanModeDurationMins: 15,
 	}
 }
 
 func getChatSettings(chatID int64) (*ChatSettings, error) {
-	cacheKey := "chat_settings_" + strconv.FormatInt(chatID, 10)
-	if cached, found := dbCache.Get(cacheKey); found {
-		if settings, ok := cached.(*ChatSettings); ok {
-			return settings, nil
-		}
+	if settings, found := chatSettingsCache.Get(chatID); found {
+		return settings, nil
 	}
 
 	ctx, cancel := ctx()
@@ -66,7 +66,7 @@ func getChatSettings(chatID int64) (*ChatSettings, error) {
 
 	if err == mongo.ErrNoDocuments {
 		def := defaultChatSettings(chatID)
-		dbCache.Set(cacheKey, def)
+		chatSettingsCache.Set(chatID, def)
 		return def, nil
 	}
 
@@ -78,13 +78,11 @@ func getChatSettings(chatID int64) (*ChatSettings, error) {
 		)
 	}
 
-	dbCache.Set(cacheKey, &settings)
+	chatSettingsCache.Set(chatID, &settings)
 	return &settings, nil
 }
 
 func updateChatSettings(settings *ChatSettings) error {
-	cacheKey := "chat_settings_" + strconv.FormatInt(settings.ChatID, 10)
-
 	ctx, cancel := ctx()
 	defer cancel()
 
@@ -102,8 +100,16 @@ func updateChatSettings(settings *ChatSettings) error {
 		)
 	}
 
-	dbCache.Set(cacheKey, settings)
+	chatSettingsCache.Set(settings.ChatID, settings)
 	return nil
+}
+
+func GetChatSettings(chatID int64) (*ChatSettings, error) {
+	return getChatSettings(chatID)
+}
+
+func UpdateChatSettings(settings *ChatSettings) error {
+	return updateChatSettings(settings)
 }
 
 func modifyChatSettings(chatID int64, fn func(*ChatSettings) bool) error {

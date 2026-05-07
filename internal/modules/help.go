@@ -19,6 +19,7 @@ package modules
 
 import (
 	"fmt"
+	"html"
 	"strings"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
@@ -27,6 +28,8 @@ import (
 	"main/internal/core"
 )
 
+var helpTexts = map[string]string{}
+
 func init() {
 	helpTexts["/help"] = fmt.Sprintf(`ℹ️ <b>Help Command</b>
 <i>Displays general bot help or detailed information about a specific command.</i>
@@ -34,13 +37,6 @@ func init() {
 <u>Usage:</u>
 <code>/help</code> — Show the main help menu.  
 <code>/help &lt;command&gt;</code> — Show help for a specific command.
-
-<b>💡 Tip:</b> You can view help for any command directly by adding a <code>-h</code> or <code>--help</code> flag, e.g. <code>/play -h</code>
-
-<b>⚠️ Note:</b> Some commands are <b>restricted</b> to specific contexts (like <b>Groups</b>, <b>Admins</b>, <b>Sudoers</b>, or the <b>Owner</b>).  
-If you try using <code>-h</code> or <code>--help</code> inside a restricted chat or PM, the bot may not respond.  
-To still view help for those commands, use the global format instead:
-<code>/help &lt;command&gt;</code>
 
 For more info, visit our <a href="%s">Support Chat</a>.`, config.SupportChat)
 }
@@ -113,5 +109,35 @@ func helpCallbackHandler(c *tg.CallbackQuery) error {
 	}
 
 	c.Edit(text, &tg.SendOptions{ReplyMarkup: btn})
+	return tg.ErrEndGroup
+}
+
+func showHelpFor(m *tg.NewMessage, cmd string) error {
+	helpText, ok := helpTexts[cmd]
+	if !ok {
+		trimmed := strings.TrimPrefix(cmd, "/")
+		if value, exists := helpTexts[trimmed]; exists {
+			helpText = value
+		}
+	}
+
+	if helpText == "" {
+		_, err := m.Reply(
+			"⚠️ <i>No help found for command <code>" +
+				html.EscapeString(cmd) +
+				"</code></i>",
+		)
+		if err != nil {
+			return err
+		}
+		return tg.ErrEndGroup
+	}
+
+	_, err := m.Reply(
+		"📘 <b>Help for</b> <code>" + cmd + "</code>:\n\n" + helpText,
+	)
+	if err != nil {
+		return err
+	}
 	return tg.ErrEndGroup
 }

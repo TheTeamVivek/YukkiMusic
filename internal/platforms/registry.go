@@ -27,6 +27,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
@@ -53,7 +54,7 @@ var (
 	registry = &PlatformRegistry{
 		platforms: make([]platformEntry, 0),
 	}
-	rc = resty.New()
+	rc = resty.New().SetTimeout(20 * time.Second)
 )
 
 // Register adds a platform to the registry with given priority

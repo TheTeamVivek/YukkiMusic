@@ -219,15 +219,6 @@ func (s *SpotifyPlatform) Download(
 	return "", errors.New("no YouTube downloader available")
 }
 
-func (*SpotifyPlatform) CanSearch() bool { return false }
-
-func (*SpotifyPlatform) Search(
-	string,
-	bool,
-) ([]*state.Track, error) {
-	return nil, nil
-}
-
 // ensureClient initializes the Spotify client (once)
 func (s *SpotifyPlatform) ensureClient() error {
 	s.clientOnce.Do(func() {

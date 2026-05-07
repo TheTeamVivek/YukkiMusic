@@ -24,6 +24,7 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/locales"
+	"main/internal/utils"
 )
 
 func init() {
@@ -171,8 +172,8 @@ func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
 		m.Reply(F(chatID, "seek_success", locales.Arg{
 			"emoji":     emoji,
 			"direction": direction,
-			"position":  formatDuration(r.Position()),
-			"duration":  formatDuration(t.Duration),
+			"position":  utils.FormatDuration(r.Position()),
+			"duration":  utils.FormatDuration(t.Duration),
 		}))
 	}
 
@@ -212,20 +213,20 @@ func handleJump(m *telegram.NewMessage, cplay bool) error {
 
 	if t.Duration-seconds <= 10 {
 		m.Reply(F(chatID, "jump_too_close_end", locales.Arg{
-			"position": formatDuration(seconds),
+			"position": utils.FormatDuration(seconds),
 		}))
 		return telegram.ErrEndGroup
 	}
 
 	if err := r.Seek(seconds - r.Position()); err != nil {
 		m.Reply(F(chatID, "jump_failed", locales.Arg{
-			"position": formatDuration(seconds),
+			"position": utils.FormatDuration(seconds),
 			"error":    err,
 		}))
 	} else {
 		m.Reply(F(chatID, "jump_success", locales.Arg{
-			"position": formatDuration(seconds),
-			"duration": formatDuration(t.Duration),
+			"position": utils.FormatDuration(seconds),
+			"duration": utils.FormatDuration(t.Duration),
 		}))
 	}
 

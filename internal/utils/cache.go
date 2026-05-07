@@ -22,6 +22,8 @@ import (
 	"time"
 )
 
+const NoExpiry = time.Duration(-1)
+
 type CacheItem[V any] struct {
 	Value      V
 	Expiration time.Time
@@ -85,4 +87,24 @@ func (c *Cache[K, V]) Delete(key K) {
 	c.mu.Lock()
 	delete(c.items, key)
 	c.mu.Unlock()
+}
+
+func (c *Cache[K, V]) LoadAndDelete(key K) (V, bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	item, ok := c.items[key]
+	if !ok {
+		var zero V
+		return zero, false
+	}
+
+	delete(c.items, key)
+
+	if item.Expired() {
+		var zero V
+		return zero, false
+	}
+
+	return item.Value, true
 }

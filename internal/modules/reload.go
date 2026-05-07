@@ -20,6 +20,7 @@ package modules
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/amarnathcjd/gogram/telegram"
@@ -72,19 +73,9 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	chatID := m.ChannelID()
-	actualChatID := r.ChatID()
-	userID := m.SenderID()
-	floodKey := fmt.Sprintf("reload:%d%d", actualChatID, userID)
-	floodDuration := 5 * time.Minute
+	roomID := r.ID
 
-	if remaining := utils.GetFlood(floodKey); remaining > 0 {
-		_, err := m.Reply(F(
-			chatID,
-			"flood_minutes",
-			locales.Arg{
-				"duration": formatDuration(int(remaining.Seconds())),
-			},
-		))
+	if handled, err := checkReloadFlood(m, chatID, roomID); handled {
 		return err
 	}
 
@@ -95,31 +86,14 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 
 	summary := ""
 
-	admins, adminErr := utils.ReloadChatAdmin(m.Client, actualChatID)
-	if adminErr != nil {
-		summary += F(chatID, "reload_admin_cache_fail", locales.Arg{
-			"error": adminErr.Error(),
-		}) + "\n"
-	} else {
-		summary += F(chatID, "reload_admin_cache_ok") + "\n"
-	}
+	admins, adminSummary := reloadAdminCache(m.Client, chatID, roomID)
+	summary += adminSummary
 
-	isAdmin := false
-	if adminErr == nil {
-		for _, id := range admins {
-			if id == userID {
-				isAdmin = true
-				break
-			}
-		}
-	}
+	isAdmin := slices.Contains(admins, m.SenderID())
+	floodDuration := utils.IfElse(isAdmin, 2*time.Minute, 5*time.Minute)
+	utils.SetFlood(fmt.Sprintf("reload:%d%d", roomID, m.SenderID()), floodDuration)
 
-	if isAdmin {
-		floodDuration = 2 * time.Minute
-	}
-	utils.SetFlood(floodKey, floodDuration)
-
-	cs, err := core.GetChatState(actualChatID)
+	cs, err := core.GetChatState(roomID)
 	if err != nil {
 		summary += F(chatID, "reload_assistant_fail", locales.Arg{
 			"error": err.Error(),
@@ -130,54 +104,12 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		return nil
 	}
 
-	activeVC, vcErr := cs.IsActiveVC(true)
-	if vcErr != nil {
-		switch {
-		case errors.Is(vcErr, core.ErrAdminPermissionRequired):
-			summary += F(chatID, "reload_voice_admin_required") + "\n"
-		default:
-			summary += F(chatID, "reload_voice_fail", locales.Arg{
-				"error": vcErr.Error(),
-			}) + "\n"
-		}
-	} else if activeVC {
-		summary += F(chatID, "reload_voice_active") + "\n"
-	} else {
-		summary += F(chatID, "reload_voice_inactive") + "\n"
-	}
-
-	banned, assErr := cs.IsAssistantBanned(true)
-	if assErr != nil {
-		switch {
-		case errors.Is(assErr, core.ErrAdminPermissionRequired):
-			summary += F(chatID, "reload_assistant_admin_required") + "\n"
-		default:
-			summary += F(chatID, "reload_assistant_fail", locales.Arg{
-				"error": assErr.Error(),
-			}) + "\n"
-		}
-	} else if banned {
-		summary += F(chatID, "reload_assistant_banned") + "\n"
-	} else {
-		present, assErr2 := cs.IsAssistantPresent(false)
-		if assErr2 != nil {
-			switch {
-			case errors.Is(assErr2, core.ErrAdminPermissionRequired):
-				summary += F(chatID, "reload_assistant_admin_required") + "\n"
-			default:
-				summary += F(chatID, "reload_assistant_fail", locales.Arg{
-					"error": assErr2.Error(),
-				}) + "\n"
-			}
-		} else if present {
-			summary += F(chatID, "reload_assistant_present") + "\n"
-		} else {
-			summary += F(chatID, "reload_assistant_not_present") + "\n"
-		}
-	}
+	snapshot, snapErr := cs.Snapshot(true)
+	summary += reloadVoiceChatStatus(chatID, snapshot, snapErr)
+	summary += reloadAssistantStatus(chatID, snapshot, snapErr)
 
 	if isAdmin {
-		if core.DeleteRoom(actualChatID) {
+		if core.DeleteRoom(roomID) {
 			summary += F(chatID, "reload_room_reset") + "\n"
 		}
 	}
@@ -187,4 +119,65 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 	}))
 
 	return nil
+}
+
+func checkReloadFlood(m *telegram.NewMessage, chatID, roomID int64) (bool, error) {
+	floodKey := fmt.Sprintf("reload:%d%d", roomID, m.SenderID())
+	if remaining := utils.GetFlood(floodKey); remaining > 0 {
+		_, err := m.Reply(F(
+			chatID,
+			"flood_minutes",
+			locales.Arg{
+				"duration": utils.FormatDuration(int(remaining.Seconds())),
+			},
+		))
+		return true, err
+	}
+	return false, nil
+}
+
+func reloadAdminCache(c *telegram.Client, chatID, roomID int64) ([]int64, string) {
+	admins, err := utils.RefreshChatAdmin(c, roomID)
+	if err != nil {
+		return nil, F(chatID, "reload_admin_cache_fail", locales.Arg{
+			"error": err.Error(),
+		}) + "\n"
+	}
+	return admins, F(chatID, "reload_admin_cache_ok") + "\n"
+}
+
+func reloadVoiceChatStatus(chatID int64, snap core.StateSnapshot, err error) string {
+	if err != nil {
+		if errors.Is(err, core.ErrAdminPermissionRequired) {
+			return F(chatID, "reload_voice_admin_required") + "\n"
+		}
+		return F(chatID, "reload_voice_fail", locales.Arg{
+			"error": err.Error(),
+		}) + "\n"
+	}
+
+	if snap.VoiceChatActive {
+		return F(chatID, "reload_voice_active") + "\n"
+	}
+	return F(chatID, "reload_voice_inactive") + "\n"
+}
+
+func reloadAssistantStatus(chatID int64, snap core.StateSnapshot, err error) string {
+	if err != nil {
+		if errors.Is(err, core.ErrAdminPermissionRequired) {
+			return F(chatID, "reload_assistant_admin_required") + "\n"
+		}
+		return F(chatID, "reload_assistant_fail", locales.Arg{
+			"error": err.Error(),
+		}) + "\n"
+	}
+
+	if snap.AssistantBanned {
+		return F(chatID, "reload_assistant_banned") + "\n"
+	}
+
+	if snap.AssistantPresent {
+		return F(chatID, "reload_assistant_present") + "\n"
+	}
+	return F(chatID, "reload_assistant_not_present") + "\n"
 }

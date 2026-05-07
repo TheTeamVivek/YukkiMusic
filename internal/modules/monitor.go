@@ -62,7 +62,7 @@ func MonitorRooms() {
 					return
 				}
 
-				markup := core.GetPlayMarkup(r.EffectiveChatID(), r, false)
+				markup := core.GetPlayMarkup(r.ChatID, r, false)
 				opts := &telegram.SendOptions{
 					ReplyMarkup: markup,
 					Entities:    statusMsg.Message.Entities,

@@ -15,22 +15,41 @@
  * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
 
-package database
+package platforms
 
-func CommandDelete(chatID int64) (bool, error) {
-	settings, err := getChatSettings(chatID)
-	if err != nil {
-		return false, err
+import (
+	"errors"
+	"net/url"
+	"strings"
+	"unicode"
+)
+
+var errUnsafeURL = errors.New("invalid or unsafe url")
+
+func sanitizeMediaURL(raw string) (string, error) {
+	u := strings.TrimSpace(raw)
+	if u == "" {
+		return "", errUnsafeURL
 	}
-	return settings.CommandDelete, nil
-}
 
-func SetCommandDelete(chatID int64, enabled bool) error {
-	return modifyChatSettings(chatID, func(s *ChatSettings) bool {
-		if s.CommandDelete == enabled {
-			return false
+	for _, r := range u {
+		if unicode.IsControl(r) {
+			return "", errUnsafeURL
 		}
-		s.CommandDelete = enabled
-		return true
-	})
+	}
+
+	parsed, err := url.Parse(u)
+	if err != nil {
+		return "", errUnsafeURL
+	}
+
+	if parsed.Scheme != "http" && parsed.Scheme != "https" {
+		return "", errUnsafeURL
+	}
+
+	if parsed.Host == "" || parsed.User != nil {
+		return "", errUnsafeURL
+	}
+
+	return parsed.String(), nil
 }

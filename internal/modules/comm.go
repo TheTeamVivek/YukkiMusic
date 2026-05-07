@@ -17,176 +17,179 @@
 
 package modules
 
-import "github.com/amarnathcjd/gogram/telegram"
+import (
+	"log"
 
-// BotCommands is a struct that holds all the bot commands
-// separated by user type and chat type.
+	"github.com/Laky-64/gologging"
+	"github.com/amarnathcjd/gogram/telegram"
+
+	"main/internal/config"
+	"main/internal/database"
+)
+
+// BotCommands holds all bot commands separated by user type and chat type.
 type BotCommands struct {
-	// For private chats
 	PrivateUserCommands  []*telegram.BotCommand
 	PrivateSudoCommands  []*telegram.BotCommand
 	PrivateOwnerCommands []*telegram.BotCommand
-	// For group chats
-	GroupUserCommands  []*telegram.BotCommand
-	GroupAdminCommands []*telegram.BotCommand
+	GroupUserCommands    []*telegram.BotCommand
+	GroupAdminCommands   []*telegram.BotCommand
 }
 
-// AllCommands holds all the bot commands.
+func cmd(command, description string) *telegram.BotCommand {
+	return &telegram.BotCommand{Command: command, Description: description}
+}
+
 var AllCommands = BotCommands{
-	// Commands for private chats
 	PrivateUserCommands: []*telegram.BotCommand{
-		{Command: "start", Description: "Start the bot."},
-		{Command: "help", Description: "Show help menu."},
-		{Command: "ping", Description: "Check if the bot is alive."},
-		{Command: "sudolist", Description: "List sudo users."},
+		cmd("start", "Start the bot."),
+		cmd("help", "Show help menu."),
+		cmd("ping", "Check if the bot is alive."),
 	},
+
 	PrivateSudoCommands: []*telegram.BotCommand{
-		{Command: "ac", Description: "Show active voice chats."},
-		{Command: "stats", Description: "Show bot stats."},
-
-		{Command: "logger", Description: "Enable/disable logger channel."},
-		{Command: "autoleave", Description: "Enable/disable auto leave."},
+		cmd("ac", "Show active voice chats."),
+		cmd("stats", "Show bot stats."),
+		cmd("logger", "Enable/disable logger channel."),
+		cmd("autoleave", "Enable/disable auto leave."),
 	},
+
 	PrivateOwnerCommands: []*telegram.BotCommand{
-		{Command: "addsudo", Description: "Add a sudo user."},
-		{Command: "delsudo", Description: "Remove a sudo user."},
-		{
-			Command:     "maintenance",
-			Description: "Enable/disable maintenance mode.",
-		},
+		cmd("addsudo", "Add a sudo user."),
+		cmd("delsudo", "Remove a sudo user."),
+		cmd("blockuser", "Block a user."),
+		cmd("unblockuser", "Unblock a user."),
+		cmd("blockchat", "Block a chat."),
+		cmd("unblockchat", "Unblock a chat."),
+		cmd("blacklisted", "List blacklisted chats and users."),
+		cmd("maintenance", "Enable/disable maintenance mode."),
 	},
-	// Commands for group chats
-	GroupUserCommands: []*telegram.BotCommand{
-		{Command: "play", Description: "Play a song."},
-		{Command: "queue", Description: "Show the queue."},
-		{
-			Command:     "position",
-			Description: "Show the current position of the song.",
-		},
 
-		{Command: "reload", Description: "Reload the admin cache."},
-		{Command: "authlist", Description: "List authorized users."},
-		{Command: "help", Description: "Show help menu."},
-		{Command: "ping", Description: "Check if the bot is alive."},
+	GroupUserCommands: []*telegram.BotCommand{
+		cmd("play", "Play a song."),
+		cmd("queue", "Show the queue."),
+		cmd("position", "Show the current position of the song."),
+		cmd("reload", "Reload the admin cache."),
+		cmd("authlist", "List authorized users."),
 	},
+
 	GroupAdminCommands: []*telegram.BotCommand{
-		{Command: "cplay", Description: "Play a song in the linked channel."},
-		{
-			Command:     "cqueue",
-			Description: "Show the queue in the linked channel.",
-		},
-		{
-			Command:     "cposition",
-			Description: "Show the current position of the song in the linked channel.",
-		},
-		{Command: "fplay", Description: "Force play a song."},
-		{Command: "speed", Description: "Set the speed of the song."},
-		{Command: "skip", Description: "Skip the current song."},
-		{Command: "pause", Description: "Pause the current song."},
-		{Command: "resume", Description: "Resume the current song."},
-		{Command: "replay", Description: "Replay the current song."},
-		{
-			Command:     "playmode",
-			Description: "Control who can use /play command.",
-		},
-		{
-			Command:     "cmddelete",
-			Description: "Toggle automatic deletion of bot commands.",
-		},
-		{Command: "mute", Description: "Mute the bot in the voice chat."},
-		{Command: "unmute", Description: "Unmute the bot in the voice chat."},
-		{
-			Command:     "seek",
-			Description: "Seek to a specific position in the song.",
-		},
-		{
-			Command:     "seekback",
-			Description: "Seek back to a specific position in the song.",
-		},
-		{Command: "jump", Description: "Jump to a specific song in the queue."},
-		{Command: "clear", Description: "Clear the queue."},
-		{Command: "remove", Description: "Remove a song from the queue."},
-		{Command: "move", Description: "Move a song in the queue."},
-		{Command: "shuffle", Description: "Shuffle the queue."},
-		{Command: "loop", Description: "Loop the current song."},
-		{Command: "end", Description: "Stop the song."},
-		{Command: "addauth", Description: "Add a user to the authorized list."},
-		{
-			Command:     "delauth",
-			Description: "Remove a user from the authorized list.",
-		},
-		{
-			Command:     "channelplay",
-			Description: "Set a channel as the play channel.",
-		},
-		{
-			Command:     "cfplay",
-			Description: "Force play a song in the linked channel.",
-		},
-		{
-			Command:     "cpause",
-			Description: "Pause the current song in the linked channel.",
-		},
-		{
-			Command:     "cresume",
-			Description: "Resume the current song in the linked channel.",
-		},
-		{
-			Command:     "cmute",
-			Description: "Mute the bot in the linked channel's voice chat.",
-		},
-		{
-			Command:     "cunmute",
-			Description: "Unmute the bot in the linked channel's voice chat.",
-		},
-		{
-			Command:     "cstop",
-			Description: "Stop the current song and leave the linked channel's voice chat.",
-		},
-		{
-			Command:     "cskip",
-			Description: "Skip the current song in the linked channel.",
-		},
-		{
-			Command:     "cloop",
-			Description: "Loop the current song in the linked channel.",
-		},
-		{
-			Command:     "cseek",
-			Description: "Seek to a specific position in the song in the linked channel.",
-		},
-		{
-			Command:     "cseekback",
-			Description: "Seek back to a specific position in the song in the linked channel.",
-		},
-		{
-			Command:     "cjump",
-			Description: "Jump to a specific song in the linked channel's queue.",
-		},
-		{
-			Command:     "cremove",
-			Description: "Remove a song from the linked channel's queue.",
-		},
-		{Command: "cclear", Description: "Clear the linked channel's queue."},
-		{
-			Command:     "cmove",
-			Description: "Move a song in the linked channel's queue.",
-		},
-		{
-			Command:     "cspeed",
-			Description: "Set the speed of the song in the linked channel.",
-		},
-		{
-			Command:     "creplay",
-			Description: "Replay the current song in the linked channel.",
-		},
-		{
-			Command:     "cshuffle",
-			Description: "Shuffle the linked channel's queue.",
-		},
-		{
-			Command:     "creload",
-			Description: "Reload the admin cache in the linked channel.",
-		},
+		// Playback
+		cmd("play", "Play a song."),
+		cmd("cplay", "Play a song in the linked channel."),
+		cmd("fplay", "Force play a song."),
+		cmd("cfplay", "Force play a song in the linked channel."),
+
+		// Pause / Resume
+		cmd("pause", "Pause the current song."),
+		cmd("cpause", "Pause the current song in the linked channel."),
+		cmd("resume", "Resume the current song."),
+		cmd("cresume", "Resume the current song in the linked channel."),
+
+		// Skip
+		cmd("skip", "Skip the current song."),
+		cmd("cskip", "Skip the current song in the linked channel."),
+
+		// Replay
+		cmd("replay", "Replay the current song."),
+		cmd("creplay", "Replay the current song in the linked channel."),
+
+		// End / Stop
+		cmd("end", "Stop the song and leave voice chat."),
+		cmd("cstop", "Stop the song and leave the linked channel's voice chat."),
+
+		// Mute / Unmute
+		cmd("mute", "Mute the bot in the voice chat."),
+		cmd("unmute", "Unmute the bot in the voice chat."),
+		cmd("cmute", "Mute the bot in the linked channel's voice chat."),
+		cmd("cunmute", "Unmute the bot in the linked channel's voice chat."),
+
+		// Seek
+		cmd("seek", "Seek to a specific position in the song."),
+		cmd("seekback", "Seek back in the song."),
+		cmd("cseek", "Seek to a position in the linked channel's song."),
+		cmd("cseekback", "Seek back in the linked channel's song."),
+
+		// Speed
+		cmd("speed", "Set the playback speed."),
+		cmd("cspeed", "Set the playback speed in the linked channel."),
+
+		// Queue management
+		cmd("queue", "Show the queue."),
+		cmd("cqueue", "Show the linked channel's queue."),
+		cmd("position", "Show the current position of the song."),
+		cmd("cposition", "Show the current position in the linked channel."),
+		cmd("jump", "Jump to a specific song in the queue."),
+		cmd("cjump", "Jump to a song in the linked channel's queue."),
+		cmd("remove", "Remove a song from the queue."),
+		cmd("cremove", "Remove a song from the linked channel's queue."),
+		cmd("move", "Move a song in the queue."),
+		cmd("cmove", "Move a song in the linked channel's queue."),
+		cmd("clear", "Clear the queue."),
+		cmd("cclear", "Clear the linked channel's queue."),
+		cmd("shuffle", "Shuffle the queue."),
+		cmd("cshuffle", "Shuffle the linked channel's queue."),
+		cmd("loop", "Loop the current song."),
+		cmd("cloop", "Loop the current song in the linked channel."),
+
+		cmd("setcplay", "Configure channelplay for your chat."),
+
+		// Settings & access
+		cmd("playmode", "Control who can use /play."),
+		cmd("adminmode", "Control who can use admin music commands."),
+		cmd("cmddelete", "Toggle automatic deletion of bot commands."),
+		cmd("settings", "Configure chat settings."),
+		cmd("addauth", "Add a user to the authorized list."),
+		cmd("delauth", "Remove a user from the authorized list."),
+		cmd("reload", "Reload the admin cache."),
+		cmd("creload", "Reload the admin cache in the linked channel."),
 	},
+}
+
+func setBotCommands(bot *telegram.Client) {
+	type scopedCmds struct {
+		scope telegram.BotCommandScope
+		cmds  []*telegram.BotCommand
+	}
+
+	entries := []scopedCmds{
+		{&telegram.BotCommandScopeUsers{}, AllCommands.PrivateUserCommands},
+		{&telegram.BotCommandScopeChats{}, AllCommands.GroupUserCommands},
+		{
+			&telegram.BotCommandScopeChatAdmins{},
+			append(AllCommands.GroupUserCommands, AllCommands.GroupAdminCommands...),
+		},
+		{
+			&telegram.BotCommandScopePeer{
+				Peer: &telegram.InputPeerUser{UserID: config.OwnerID},
+			},
+			append(
+				append(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands...),
+				AllCommands.PrivateOwnerCommands...,
+			),
+		},
+	}
+
+	for _, e := range entries {
+		if _, err := bot.BotsSetBotCommands(e.scope, "", e.cmds); err != nil {
+			gologging.Error("Failed to set bot commands: " + err.Error())
+		}
+	}
+
+	// Sudo users get their own command scope in private.
+	sudoers, err := database.Sudoers()
+	if err != nil {
+		log.Printf("Failed to fetch sudoers: %v", err)
+		return
+	}
+
+	sudoCmds := append(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands...)
+	for _, id := range sudoers {
+		peer := &telegram.BotCommandScopePeer{
+			Peer: &telegram.InputPeerUser{UserID: id},
+		}
+		if _, err := bot.BotsSetBotCommands(peer, "", sudoCmds); err != nil {
+			gologging.Error("Failed to set sudo commands: " + err.Error())
+		}
+	}
 }

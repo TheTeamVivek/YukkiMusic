@@ -182,15 +182,6 @@ func (d *DirectStreamPlatform) looksLikeStream(urlStr string) bool {
 	return false
 }
 
-func (*DirectStreamPlatform) CanSearch() bool { return false }
-
-func (*DirectStreamPlatform) Search(
-	string,
-	bool,
-) ([]*state.Track, error) {
-	return nil, nil
-}
-
 // validateStream makes a HEAD request to validate the URL
 func (d *DirectStreamPlatform) validateStream(
 	urlStr string,

@@ -67,6 +67,10 @@ func (s *SoundCloudPlatform) GetTracks(
 	_ bool,
 ) ([]*state.Track, error) {
 	query = strings.TrimSpace(query)
+	safeURL, err := sanitizeMediaURL(query)
+	if err != nil {
+		return nil, errUnsafeURL
+	}
 
 	cacheKey := "soundcloud:" + strings.ToLower(query)
 	if cached, ok := soundcloudCache.Get(cacheKey); ok {
@@ -76,7 +80,7 @@ func (s *SoundCloudPlatform) GetTracks(
 
 	gologging.InfoF("SoundCloud: Fetching metadata for %s", query)
 
-	info, err := s.extractMetadata(query)
+	info, err := s.extractMetadata(safeURL)
 	if err != nil {
 		gologging.ErrorF("SoundCloud: Failed to extract metadata: %v", err)
 		return nil, fmt.Errorf("failed to extract metadata: %w", err)
@@ -141,7 +145,12 @@ func (s *SoundCloudPlatform) Download(
 		"-o", getPath(track, ".%(ext)s"),
 	}
 
-	args = append(args, track.URL)
+	safeURL, err := sanitizeMediaURL(track.URL)
+	if err != nil {
+		return "", errUnsafeURL
+	}
+
+	args = append(args, "--", safeURL)
 
 	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
 
@@ -184,24 +193,25 @@ func (s *SoundCloudPlatform) Download(
 	return path, nil
 }
 
-func (*SoundCloudPlatform) CanSearch() bool { return false } // can but for now not needed
-func (*SoundCloudPlatform) Search(
-	string,
-	bool,
-) ([]*state.Track, error) {
-	return nil, nil
-}
+func (s *SoundCloudPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
 
-func (s *SoundCloudPlatform) extractMetadata(url string) (*ytdlpInfo, error) {
+	safeURL, err := sanitizeMediaURL(urlStr)
+	if err != nil {
+		return nil, errUnsafeURL
+	}
+
 	args := []string{
 		"-j",
 		"--flat-playlist",
 		"--no-warnings",
 		"--no-check-certificate",
-		url,
+		"--",
+		safeURL,
 	}
 
-	cmd := exec.Command("yt-dlp", args...)
+	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout

@@ -19,6 +19,7 @@ package core
 
 import (
 	"fmt"
+	"strings"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
@@ -28,6 +29,25 @@ import (
 )
 
 var F func(chatID int64, key string, values ...locales.Arg) string // overwritten from main.go
+
+func styleBtn(text, cb, colour string) tg.KeyboardButton {
+	b := tg.Button.Data(text, cb)
+
+	if config.DisableColour {
+		return b
+	}
+
+	switch strings.ToLower(colour) {
+	case "red":
+		b.Danger()
+	case "blue":
+		b.Primary()
+	case "green":
+		b.Success()
+	}
+
+	return b
+}
 
 func AddMeMarkup(chatID int64) tg.ReplyMarkup {
 	return tg.NewKeyboard().
@@ -57,10 +77,13 @@ func GetBroadcastCancelKeyboard(chatID int64) *tg.ReplyInlineMarkup {
 }
 
 func SuppMarkup(chatID int64) tg.ReplyMarkup {
-	return tg.NewKeyboard().
-		AddRow(
-			tg.Button.URL(F(chatID, "SUPPORT_BTN"), config.SupportChat),
-		).
+	kb := tg.NewKeyboard()
+	btn := tg.Button.URL(F(chatID, "SUPPORT_BTN"), config.SupportChat)
+	if !config.DisableColour {
+		btn.Primary()
+	}
+
+	return kb.AddRow(btn).
 		Build()
 }
 
@@ -70,23 +93,17 @@ func GetStopConfirmMarkup(
 	isPaused bool,
 ) tg.ReplyMarkup {
 	btn := tg.NewKeyboard()
-	prefix := "room:"
-	if r.ChannelPlayID() != 0 {
-		prefix = "croom:"
-	}
+	prefix := fmt.Sprintf("room:%d:", r.ID)
+
+	text, cb := "CONFIRM_UNMUTE_BTN", prefix+"unmute"
 
 	if isPaused {
-		btn.AddRow(
-			tg.Button.Data(F(chatID, "CONFIRM_RESUME_BTN"), prefix+"resume"),
-		)
-	} else {
-		btn.AddRow(
-			tg.Button.Data(F(chatID, "CONFIRM_UNMUTE_BTN"), prefix+"unmute"),
-		)
+		text, cb = "CONFIRM_RESUME_BTN", prefix+"resume"
 	}
 
 	btn.AddRow(
-		tg.Button.Data(F(chatID, "CONFIRM_STOP_BTN"), prefix+"stop"),
+		styleBtn(F(chatID, text), cb, "green"),
+		styleBtn(F(chatID, "CONFIRM_STOP_BTN"), prefix+"stop", "red"),
 	)
 
 	return btn.Build()
@@ -94,10 +111,7 @@ func GetStopConfirmMarkup(
 
 func GetPlayMarkup(chatID int64, r *RoomState, queued bool) tg.ReplyMarkup {
 	btn := tg.NewKeyboard()
-	prefix := "room:"
-	if r.ChannelPlayID() != 0 {
-		prefix = "croom:"
-	}
+	prefix := fmt.Sprintf("room:%d:", r.ID)
 	track := r.Track()
 	duration := 0
 	if track != nil {
@@ -105,9 +119,9 @@ func GetPlayMarkup(chatID int64, r *RoomState, queued bool) tg.ReplyMarkup {
 	}
 
 	progress := utils.GetProgressBar(r.Position(), duration)
-	progress = formatDuration(
+	progress = utils.FormatTime(
 		r.Position(),
-	) + " " + progress + " " + formatDuration(
+	) + " " + progress + " " + utils.FormatTime(
 		duration,
 	)
 
@@ -124,9 +138,9 @@ func GetPlayMarkup(chatID int64, r *RoomState, queued bool) tg.ReplyMarkup {
 	)
 
 	btn.AddRow(
-		tg.Button.Data("↩ 15s", "room:seekback_15"),
-		tg.Button.Data("⟳", "room:replay"),
-		tg.Button.Data("15s ↪", "room:seek_15"),
+		tg.Button.Data("↩ 15s", prefix+"seekback_15"),
+		tg.Button.Data("⟳", prefix+"replay"),
+		tg.Button.Data("15s ↪", prefix+"seek_15"),
 	)
 
 	btn.AddRow(
@@ -194,10 +208,7 @@ func GetHelpKeyboard(chatID int64) *tg.ReplyInlineMarkup {
 			),
 		).
 		AddRow(
-			tg.Button.Data(
-				F(chatID, "BACK_BTN"),
-				"start",
-			),
+			styleBtn(F(chatID, "BACK_BTN"), "start", ""),
 		).
 		Build()
 }
@@ -205,21 +216,16 @@ func GetHelpKeyboard(chatID int64) *tg.ReplyInlineMarkup {
 func GetBackKeyboard(chatID int64) *tg.ReplyInlineMarkup {
 	return tg.NewKeyboard().
 		AddRow(
-			tg.Button.Data(
-				F(chatID, "BACK_BTN"),
-				"help:main",
-			),
+			styleBtn(F(chatID, "BACK_BTN"), "help:main", "blue"),
 		).
 		Build()
 }
 
-func formatDuration(sec int) string {
-	h := sec / 3600
-	m := (sec % 3600) / 60
-	s := sec % 60
-
-	if h > 0 {
-		return fmt.Sprintf("%d:%02d:%02d", h, m, s) // HH:MM:SS
-	}
-	return fmt.Sprintf("%02d:%02d", m, s) // MM:SS
+func GetRestartConfirmMarkup(chatID int64) *tg.ReplyInlineMarkup {
+	return tg.NewKeyboard().
+		AddRow(
+			styleBtn(F(chatID, "restart_btn_bot"), "restart:bot", "red"),
+			styleBtn(F(chatID, "restart_btn_replay"), "restart:replay", "green"),
+		).
+		Build()
 }

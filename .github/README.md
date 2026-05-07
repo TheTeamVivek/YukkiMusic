@@ -12,7 +12,7 @@
     <img src="https://img.shields.io/github/forks/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Forks&color=00C853&logo=github&logoColor=white" alt="GitHub Forks">
   </a>
   <a href="https://go.dev/">
-    <img src="https://img.shields.io/badge/Go-1.25+-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go Version">
+    <img src="https://img.shields.io/badge/Go-1.26+-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go Version">
   </a>
   <a href="https://github.com/TheTeamVivek/YukkiMusic/releases">
     <img src="https://img.shields.io/badge/Version-v3.2.0-FF9800?style=for-the-badge&logo=semver&logoColor=white" alt="Release Version">
@@ -58,6 +58,48 @@ go mod tidy
 go run ./cmd/app
 </code></pre>
 
+<h3>🐳 Docker Deployment</h3>
+<pre><code>
+# 1. Clone & Enter
+git clone https://github.com/TheTeamVivek/YukkiMusic.git && cd YukkiMusic
+<br>
+# 2. Prepare environment
+cp sample.env .env  # Fill required values: API_ID, API_HASH, TOKEN, MONGO_DB_URI, STRING_SESSIONS
+<br>
+# 3. Build and start in background
+docker compose up -d --build
+</code></pre>
+
+<h4>📜 Logs & Useful Container Commands</h4>
+<pre><code>
+# Follow live logs
+docker compose logs -f yukkimusic
+<br>
+# Show last 200 lines
+docker compose logs --tail=200 yukkimusic
+<br>
+# Check running state
+docker compose ps
+<br>
+# Restart service
+docker compose restart yukkimusic
+<br>
+# Stop service (keeps containers, network, and image)
+docker compose stop yukkimusic
+<br>
+# Start again after stop
+docker compose start yukkimusic
+<br>
+# Remove stopped container only (keeps image and network)
+docker compose rm -f yukkimusic
+<br>
+# Full cleanup (removes containers + network)
+docker compose down
+<br>
+# Update after pulling latest code
+git pull && docker compose up -d --build
+</code></pre>
+
 <hr>
 
 <h2>⚙️ Configuration</h2>
@@ -78,10 +120,6 @@ go run ./cmd/app
     <tr>
       <td><code>TOKEN</code></td>
       <td>Bot token from <a href="https://t.me/BotFather">@BotFather</a></td>
-    </tr>
-    <tr>
-      <td><code>LOGGER_ID</code></td>
-      <td>Channel ID for bot logs (Must start with -100)</td>
     </tr>
     <tr>
       <td><code>MONGO_DB_URI</code></td>
@@ -120,7 +158,8 @@ go run ./cmd/app
 <h2>🏗️ Project Structure</h2>
 <pre><code>YukkiMusic/
 ├── cmd/app/            # Main entry point
-├── config/             # Configuration & Environment loader
+├── docker-compose.yml  # Container deployment recipe
+├── internal/config/    # Configuration & Environment loader
 ├── internal/
 │   ├── core/           # Bot initialization & playback logic
 │   ├── database/       # MongoDB schemas & operations

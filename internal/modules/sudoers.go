@@ -27,7 +27,6 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
-	"main/internal/core"
 	"main/internal/database"
 	"main/internal/locales"
 	"main/internal/utils"
@@ -63,14 +62,6 @@ func handleAddSudo(m *telegram.NewMessage) error {
 	if targetID == m.Client.Me().ID {
 		m.Reply(F(chatID, "sudo_bot_self"))
 		return telegram.ErrEndGroup
-	}
-
-	// Trying to add the assistant
-	if ass, err := core.Assistants.ForChat(chatID); err == nil {
-		if targetID == ass.Self.ID {
-			m.Reply(F(chatID, "sudo_assistant_self"))
-			return telegram.ErrEndGroup
-		}
 	}
 
 	// Fetch user info
@@ -172,13 +163,6 @@ func handleDelSudo(m *telegram.NewMessage) error {
 		return telegram.ErrEndGroup
 	}
 
-	// Cannot remove assistant (UbUser)
-	if ass, err := core.Assistants.ForChat(chatID); err == nil {
-		if targetID == ass.Self.ID {
-			m.Reply(F(chatID, "sudo_assistant_cannot_remove"))
-			return telegram.ErrEndGroup
-		}
-	}
 	// Fetch user info
 	user, _ := m.Client.GetUser(targetID)
 

@@ -71,6 +71,32 @@ Powerful command - use with caution.`
 
 <b>💡 Use Case:</b>
 Debugging and development.`
+
+	helpTexts["/logs"] = `<i>Send current bot logs file.</i>
+
+<u>Usage:</u>
+<b>/logs</b> — Send current log file
+
+<b>🔒 Restrictions:</b>
+• <b>Sudo users only</b>`
+}
+
+func logsHandler(m *telegram.NewMessage) error {
+	chatID := m.ChannelID()
+	logFile := config.LogFileName
+
+	info, err := os.Stat(logFile)
+	if err != nil || info.Size() == 0 {
+		m.Reply(F(chatID, "logs_empty"))
+		return telegram.ErrEndGroup
+	}
+
+	_, err = m.ReplyMedia(logFile, &telegram.MediaOptions{})
+	if err != nil {
+		m.Reply(err.Error())
+	}
+
+	return telegram.ErrEndGroup
 }
 
 func shellHandle(m *telegram.NewMessage) error {

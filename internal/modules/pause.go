@@ -72,7 +72,7 @@ func handlePause(m *tg.NewMessage, cplay bool) error {
 		autoResumeLine := ""
 		if remaining > 0 {
 			autoResumeLine = F(chatID, "auto_resume_line", locales.Arg{
-				"seconds": formatDuration(int(remaining.Seconds())),
+				"seconds": utils.FormatDuration(int(remaining.Seconds())),
 			})
 		}
 		m.Reply(F(chatID, "pause_already", locales.Arg{
@@ -125,8 +125,8 @@ func handlePause(m *tg.NewMessage, cplay bool) error {
 
 	msg := F(chatID, "pause_success", locales.Arg{
 		"title":            title,
-		"position":         formatDuration(r.Position()),
-		"duration":         formatDuration(r.Track().Duration),
+		"position":         utils.FormatDuration(r.Position()),
+		"duration":         utils.FormatDuration(r.Track().Duration),
 		"user":             mention,
 		"auto_resume_line": autoResumeLine,
 	})

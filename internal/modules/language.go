@@ -30,7 +30,18 @@ import (
 )
 
 func langHandler(m *telegram.NewMessage) error {
-	chatID := m.ChannelID()
+	return showLangMenu(m, false)
+}
+
+func showLangMenu(m interface{}, isCallback bool) error {
+	var chatID int64
+	if isCallback {
+		cb := m.(*telegram.CallbackQuery)
+		chatID = cb.ChannelID()
+	} else {
+		msg := m.(*telegram.NewMessage)
+		chatID = msg.ChannelID()
+	}
 
 	lang, err := database.Language(chatID)
 	if err != nil {
@@ -48,12 +59,17 @@ func langHandler(m *telegram.NewMessage) error {
 	}
 	kb.NewColumn(2, btns...)
 
-	_, err = m.Reply(
-		F(chatID, "lang_select"),
-		&telegram.SendOptions{ReplyMarkup: kb.Build()},
-	)
-	if err != nil {
-		return err
+	if isCallback {
+		kb.AddRow(telegram.Button.Data(F(chatID, "BACK_BTN"), "set:main"))
+	}
+
+	text := F(chatID, "lang_select")
+	if isCallback {
+		cb := m.(*telegram.CallbackQuery)
+		cb.Edit(text, &telegram.SendOptions{ParseMode: "HTML", ReplyMarkup: kb.Build()})
+	} else {
+		msg := m.(*telegram.NewMessage)
+		msg.Reply(text, &telegram.SendOptions{ParseMode: "HTML", ReplyMarkup: kb.Build()})
 	}
 	return telegram.ErrEndGroup
 }
@@ -69,9 +85,12 @@ func langCallbackHandler(cb *telegram.CallbackQuery) error {
 	lang := parts[1]
 
 	chatID := cb.ChannelID()
-	if isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); err != nil ||
-		!isAdmin {
-		cb.Answer(F(chatID, "only_admin_or_auth_cb"), opt)
+	if lang == "select" {
+		return showLangMenu(cb, true)
+	}
+
+	if isAdmin, _ := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); !isAdmin {
+		cb.Answer(F(chatID, "only_admin_cb"), opt)
 		return telegram.ErrEndGroup
 	}
 

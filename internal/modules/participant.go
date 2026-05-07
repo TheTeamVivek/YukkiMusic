@@ -56,7 +56,7 @@ func getParticipantStatus(p telegram.ChannelParticipant) string {
 }
 
 func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
-	if isMaintenanceBlocked(p.ActorID()) {
+	if !canBypassMaintenence(p.ActorID()) {
 		return nil
 	}
 
@@ -76,12 +76,12 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 	oldStatus := getParticipantStatus(p.Old)
 	newStatus := getParticipantStatus(p.New)
 
-	gologging.DebugF(
+	/*gologging.DebugF(
 		"participant change %d: %s -> %s",
 		userID,
 		oldStatus,
 		newStatus,
-	)
+	)*/
 
 	switch {
 
@@ -96,6 +96,7 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 
 		if userID == p.Client.Me().ID && config.LeaveOnDemoted {
 
+			cleanScheduler.cancel(chatID)
 			core.DeleteRoom(chatID)
 			core.DeleteChatState(chatID)
 
@@ -137,64 +138,7 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 		}
 
 		if !state.AssistantFetched() {
-			state.RefreshAssistantState()
-		}
-	}
-
-	return nil
-}
-
-func handleChatAction(m *telegram.NewMessage) error {
-	if !isValidChatType(m) {
-		warnAndLeave(m.Client, m.ChannelID())
-		return telegram.ErrEndGroup
-	}
-
-	chatID := m.ChannelID()
-	botID := m.Client.Me().ID
-
-	switch action := m.Action.(type) {
-
-	case *telegram.MessageActionChatAddUser:
-
-		for _, uid := range action.Users {
-			if uid == botID {
-
-				gologging.Debug("Bot added to " + utils.IntToStr(chatID))
-
-				m.Reply(F(chatID, "bot_added_normal"))
-
-				database.AddServedChat(chatID)
-
-				if config.LoggerID != 0 {
-					m.Client.SendMessage(
-						config.LoggerID,
-						F(config.LoggerID, "logger_bot_added", buildLogArgs(m, chatID, "added")),
-					)
-				}
-
-				return nil
-			}
-		}
-
-	case *telegram.MessageActionChatDeleteUser:
-
-		if action.UserID == botID {
-
-			gologging.Debug("Bot removed from " + utils.IntToStr(chatID))
-
-			core.DeleteRoom(chatID)
-			core.DeleteChatState(chatID)
-			database.RemoveServedChat(chatID)
-
-			if config.LoggerID != 0 {
-				m.Client.SendMessage(
-					config.LoggerID,
-					F(config.LoggerID, "logger_bot_removed", buildLogArgs(m, chatID, "removed")),
-				)
-			}
-
-			return nil
+			state.Snapshot(true)
 		}
 	}
 
@@ -202,14 +146,22 @@ func handleChatAction(m *telegram.NewMessage) error {
 }
 
 func handleSudoJoin(p *telegram.ParticipantUpdate, chatID int64) {
+	userID := p.UserID()
+
 	var msgKey string
 
-	if p.UserID() == config.OwnerID {
+	if userID == config.OwnerID {
 		msgKey = "sudo_join_owner"
-	} else if database.IsSudoWithoutError(p.UserID()) {
-		msgKey = "sudo_join_sudo"
 	} else {
-		return
+		isSudo, err := database.IsSudo(userID)
+		if err != nil {
+			gologging.ErrorF("IsSudo failed for user %d: %v", userID, err)
+			return
+		}
+		if !isSudo {
+			return
+		}
+		msgKey = "sudo_join_sudo"
 	}
 
 	text := F(chatID, msgKey, locales.Arg{
@@ -238,7 +190,9 @@ func handleAssistantRestriction(
 	gologging.Debug("Assistant banned in " + utils.IntToStr(chatID))
 
 	s.SetAssistantPresent(false)
-
+	if room, ok := core.GetRoom(chatID, nil, false); ok {
+		scheduleOldPlayingMessage(room)
+	}
 	core.DeleteRoom(chatID)
 
 	if ok, _ := p.Unban(); ok {

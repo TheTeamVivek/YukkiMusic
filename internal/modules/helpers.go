@@ -50,26 +50,26 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	}
 	ass, err := core.Assistants.ForChat(chatID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get assistant for you chat: %w", err)
+		return nil, fmt.Errorf("failed to get assistant for your chat: %w", err)
 	}
 	r, _ := core.GetRoom(chatID, ass, true)
 
 	if cplay {
-		r.SetChannelPlayID(m.ChannelID())
+		r.ChatID = m.ChannelID()
 	}
 	return r, nil
 }
 
-func isMaintenanceBlocked(userID int64) bool {
+func canBypassMaintenence(userID int64) bool {
 	isMaint, _ := database.IsMaintenanceEnabled()
 	if !isMaint {
-		return false
+		return true
 	}
 	if userID == config.OwnerID {
-		return false
+		return true
 	}
 	ok, _ := database.IsSudo(userID)
-	return !ok
+	return ok
 }
 
 func shouldShowThumb(chatID int64) bool {
@@ -86,7 +86,7 @@ func shouldShowThumb(chatID int64) bool {
 func F(chatID int64, key string, values ...locales.Arg) string {
 	lang, err := database.Language(chatID)
 	if err != nil {
-		gologging.ErrorF("Failed to get language for %d: %v", chatID, err)
+		gologging.ErrorF("failed to get language for %d: %v", chatID, err)
 		lang = config.DefaultLang
 	}
 	return FWithLang(lang, key, values...)
@@ -103,7 +103,7 @@ func FWithLang(lang, key string, values ...locales.Arg) string {
 func isLoggerEnabled() bool {
 	l, err := database.IsLoggerEnabled()
 	if err != nil {
-		gologging.ErrorF("Failed to check if logger is enabled: %v", err)
+		gologging.ErrorF("failed to check if logger is enabled: %v", err)
 		return false
 	}
 	return l
@@ -111,30 +111,17 @@ func isLoggerEnabled() bool {
 
 func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 	if config.LoggerID == 0 || config.LoggerID == m.ChatID() ||
-		config.LoggerID == m.ChannelID() {
+		config.LoggerID == m.ChannelID() || m.SenderID() == config.OwnerID ||
+		!isLoggerEnabled() {
 		return
 	}
 
-	if is, err := database.IsLoggerEnabled(); err != nil {
-		gologging.Error("Failed to get IsLoggerEnabled: " + err.Error())
-		return
-	} else if !is {
-		return
-	}
-
-	var (
-		sb  strings.Builder
-		err error
-	)
-
-	chatID := m.ChannelID()
-
-	header := F(chatID, "logger_playback_started")
+	header := F(m.ChannelID(), "logger_playback_started")
 	if queued {
-		header = F(chatID, "logger_playback_queued")
+		header = F(m.ChannelID(), "logger_playback_queued")
 	}
 
-	// Header
+	var sb strings.Builder
 	sb.WriteString("🎵 ")
 	if m.Channel.Username != "" {
 		fmt.Fprintf(&sb, "<b><a href=\"%s\">%s</a></b>\n\n", m.Link(), header)
@@ -142,64 +129,43 @@ func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 		fmt.Fprintf(&sb, "<b><u>%s</u></b>\n\n", header)
 	}
 
-	// artwork block
+	groupName := m.Channel.Title
+	if m.Channel.Username != "" {
+		groupName = "@" + m.Channel.Username
+	}
+
+	requestedBy := utils.MentionHTML(m.Sender)
+	if m.Sender.Username != "" {
+		requestedBy = "@" + m.Sender.Username
+	}
+
 	if track.Artwork != "" {
 		sb.WriteString("<blockquote>")
 	}
 
-	// Track
-	fmt.Fprintf(&sb,
-		"<b>%s</b> <a href=\"%s\">%s</a>\n",
-		F(chatID, "logger_track"),
-		track.URL,
-		utils.EscapeHTML(utils.ShortTitle(track.Title)),
-	)
+	sb.WriteString(F(m.ChannelID(), "logger_playback_template", locales.Arg{
+		"track_url":       track.URL,
+		"track":           utils.EscapeHTML(utils.ShortTitle(track.Title)),
+		"source":          string(track.Source),
+		"group":           groupName,
+		"group_id":        m.ChannelID(),
+		"requested_by":    requestedBy,
+		"requested_by_id": m.SenderID(),
+	}))
 
-	// Source
-	fmt.Fprintf(&sb,
-		"<b>%s</b> %s\n",
-		F(chatID, "logger_source"),
-		string(track.Source),
-	)
-
-	// Group
-	fmt.Fprintf(&sb, "<b>%s</b> ", F(chatID, "logger_group"))
-	if m.Channel.Username != "" {
-		fmt.Fprintf(&sb, "@%s", m.Channel.Username)
-	} else {
-		sb.WriteString(m.Channel.Title)
-	}
-	fmt.Fprintf(&sb, " (%d)\n", m.ChannelID())
-
-	// Requested by
-	fmt.Fprintf(&sb, "<b>%s</b> ", F(chatID, "logger_requested_by"))
-	if m.Sender.Username != "" {
-		fmt.Fprintf(&sb, "@%s", m.Sender.Username)
-	} else {
-		sb.WriteString(utils.MentionHTML(m.Sender))
-	}
-	fmt.Fprintf(&sb, " (<code>%d</code>)\n", m.Sender.ID)
-
-	// Timestamp
-	fmt.Fprintf(&sb, "<b>%s</b> %s",
-		F(chatID, "logger_timestamp"),
-		time.Now().Format("2006-01-02 15:04:05"),
-	)
-
-	// Sending
 	if track.Artwork != "" {
 		sb.WriteString("\n</blockquote>")
-		_, err = core.Bot.SendMedia(
-			config.LoggerID,
-			utils.CleanURL(track.Artwork),
-			&tg.MediaOptions{Caption: sb.String()},
-		)
-	} else {
-		_, err = core.Bot.SendMessage(config.LoggerID, sb.String())
 	}
 
+	text := sb.String()
+	opts := &tg.SendOptions{ParseMode: "HTML"}
+	if shouldShowThumb(config.LoggerID) && track.Artwork != "" {
+		opts.Media = utils.CleanURL(track.Artwork)
+	}
+
+	_, err := core.Bot.SendMessage(config.LoggerID, text, opts)
 	if err != nil {
-		gologging.Error("Failed to send logger msg: " + err.Error())
+		gologging.Error("failed to send logger msg: " + err.Error())
 	}
 }
 
@@ -207,16 +173,12 @@ func SafeCallbackHandler(
 	handler func(*tg.CallbackQuery) error,
 ) func(*tg.CallbackQuery) error {
 	return func(cb *tg.CallbackQuery) (err error) {
-		if isMaint, _ := database.IsMaintenanceEnabled(); isMaint {
-			isOwner := cb.SenderID == config.OwnerID
-			isSudo, _ := database.IsSudo(cb.SenderID)
-			if !isOwner && !isSudo {
-				cb.Answer(
-					F(cb.ChannelID(), "maint", locales.Arg{"reason": ""}),
-					&tg.CallbackOptions{Alert: true},
-				)
-				return tg.ErrEndGroup
-			}
+		if !canBypassMaintenence(cb.SenderID) {
+			cb.Answer(
+				F(cb.ChannelID(), "maint", locales.Arg{"reason": ""}),
+				&tg.CallbackOptions{Alert: true},
+			)
+			return tg.ErrEndGroup
 		}
 
 		defer func() {
@@ -244,136 +206,170 @@ func SafeMessageHandler(
 			m.ChannelID(),
 		)
 
-		if isMaint, _ := database.IsMaintenanceEnabled(); isMaint {
+		if !canBypassMaintenence(m.SenderID()) {
 			gologging.Debug("Maintenance mode active")
-			isOwner := m.SenderID() == config.OwnerID
-			isSudo, _ := database.IsSudo(m.SenderID())
-
-			if !isOwner && !isSudo {
-				if m.ChatType() == tg.EntityUser ||
-					strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
-					reason, _ := database.MaintenanceReason()
-					msg := F(m.ChannelID(), "maint", locales.Arg{
-						"reason": F(
-							m.ChannelID(),
-							"maint_reason",
-							locales.Arg{"reason": reason},
-						),
-					})
-					m.Reply(msg)
-					gologging.InfoF(
-						"Sent maintenance notice to %d",
-						m.SenderID(),
-					)
-				}
-				return tg.ErrEndGroup
+			if m.ChatType() == tg.EntityUser ||
+				strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
+				reason, _ := database.MaintenanceReason()
+				msg := F(m.ChannelID(), "maint", locales.Arg{
+					"reason": F(
+						m.ChannelID(),
+						"maint_reason",
+						locales.Arg{"reason": reason},
+					),
+				})
+				m.Reply(msg)
+				gologging.InfoF(
+					"Sent maintenance notice to %d",
+					m.SenderID(),
+				)
 			}
+			return tg.ErrEndGroup
 		}
 
 		defer func() {
 			if r := recover(); r != nil {
-				gologging.ErrorF("Recovered from panic: %v", r)
+				gologging.ErrorF("recovered from panic: %v", r)
 				handlePanic(r, m, true)
 				err = fmt.Errorf("internal panic occurred")
 			}
 		}()
 
 		if m.IsCommand() {
-			if isEnabled, _ := database.CommandDelete(m.ChannelID()); isEnabled {
+			isEnabled, _ := database.CommandDelete(m.ChannelID())
+			if isEnabled {
 				_, _ = m.Delete()
+			} else {
+				cleanMode, _ := database.CleanMode(m.ChannelID())
+				if cleanMode {
+					cleanScheduler.schedule(m.ChannelID(), m.ID)
+				}
 			}
 		}
 
 		cmd := getCommand(m)
-		if checkForHelpFlag(m) {
-			gologging.DebugF("Help flag detected for command %s", cmd)
-			err = showHelpFor(m, cmd)
-		} else {
-			gologging.DebugF("Executing handler for command %s", cmd)
-			err = handler(m)
-		}
+		gologging.DebugF("Executing handler for command %s", cmd)
+		err = handler(m)
 
 		if err != nil {
 			if errors.Is(err, tg.ErrEndGroup) {
-				gologging.Debug("Handler exited early (ErrEndGroup)")
+				gologging.Debug("handler exited early (ErrEndGroup)")
 				return err
 			}
-			gologging.ErrorF("Handler error: %v", err)
+			gologging.ErrorF("handler error: %v", err)
 			handlePanic(err, m, false)
 		} else {
-			gologging.InfoF("Handler completed successfully for command %s", cmd)
+			gologging.InfoF("handler completed successfully for command %s", cmd)
 		}
 
 		return err
 	}
 }
 
-func handlePanic(r, ctx interface{}, isPanic bool) {
-	stack := html.EscapeString(string(debug.Stack()))
+func blacklistMessageMiddleware(next tg.MessageHandler) tg.MessageHandler {
+	return func(m *tg.NewMessage) error {
+		if blockedChat, _ := database.IsBlacklistedChat(m.ChannelID()); blockedChat {
+			if isOwnerOrSudo(m.SenderID()) {
+				return next(m)
+			}
+			m.Reply(F(m.ChannelID(), "blacklist_chat_blocked"))
+			leaveChat(m.Client, m.ChannelID())
+			return tg.ErrEndGroup
+		}
+		if blocked, _ := database.IsBlacklistedUser(m.SenderID()); blocked {
+			if m.IsChannel() {
+				chatOwnerID, err := utils.GetChatOwner(m.Client, m.ChannelID())
+				if err == nil && chatOwnerID == m.SenderID() {
+					m.Reply(F(m.ChannelID(), "blacklist_owner_blocked_leave"))
+					leaveChat(m.Client, m.ChannelID())
+					return tg.ErrEndGroup
+				}
+			}
+			if m.IsPrivate() || strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
+				m.Reply(F(m.ChannelID(), "blacklist_user_blocked"))
+			}
+			return tg.ErrEndGroup
+		}
+		return next(m)
+	}
+}
 
-	var userMention, handlerType, chatInfo, messageInfo, errorMessage string
-	var client *tg.Client
+func WithBlacklistCallback(
+	handler func(*tg.CallbackQuery) error,
+) func(*tg.CallbackQuery) error {
+	return func(cb *tg.CallbackQuery) error {
+		if blocked, _ := database.IsBlacklistedUser(cb.SenderID); blocked {
+			return tg.ErrEndGroup
+		}
+		if blockedChat, _ := database.IsBlacklistedChat(cb.ChannelID()); blockedChat {
+			if isOwnerOrSudo(cb.SenderID) {
+				return handler(cb)
+			}
+			return tg.ErrEndGroup
+		}
+		return handler(cb)
+	}
+}
+
+type panicInfo struct {
+	userMention  string
+	handlerType  string
+	chatInfo     string
+	messageInfo  string
+	errorMessage string
+	client       *tg.Client
+}
+
+func getPanicInfo(ctx, r any) panicInfo {
+	var info panicInfo
+	info.errorMessage = html.EscapeString(fmt.Sprint(r))
 
 	switch c := ctx.(type) {
 	case *tg.NewMessage:
-		userMention = utils.MentionHTML(c.Sender)
-		handlerType = "message"
-		chatInfo = "ChatID: " + utils.IntToStr(c.ChannelID())
-		messageInfo = "Message: " + html.EscapeString(c.Text()) + "\nLink: " + c.Link()
-		errorMessage = html.EscapeString(fmt.Sprint(r))
-		client = c.Client
+		info.userMention = utils.MentionHTML(c.Sender)
+		info.handlerType = "message"
+		info.chatInfo = "ChatID: " + utils.IntToStr(c.ChannelID())
+		info.messageInfo = "Message: " + html.EscapeString(c.Text()) + "\nLink: " + c.Link()
+		info.client = c.Client
 
 	case *tg.CallbackQuery:
-		userMention = utils.MentionHTML(c.Sender)
-		handlerType = "callback"
-		chatInfo = "ChatID: " + utils.IntToStr(c.ChatID)
-		messageInfo = "Data: " + html.EscapeString(c.DataString())
-		errorMessage = html.EscapeString(fmt.Sprint(r))
-		client = c.Client
+		info.userMention = utils.MentionHTML(c.Sender)
+		info.handlerType = "callback"
+		info.chatInfo = "ChatID: " + utils.IntToStr(c.ChatID)
+		info.messageInfo = "Data: " + html.EscapeString(c.DataString())
+		info.client = c.Client
+	}
+	return info
+}
+
+func handlePanic(r, ctx any, isPanic bool) {
+	info := getPanicInfo(ctx, r)
+	stackRaw := debug.Stack()
+	stackEsc := html.EscapeString(string(stackRaw))
+
+	logPrefix := "🚨 Error"
+	shortPrefix := "<b>Error</b>"
+	if isPanic {
+		logPrefix = "⚠️ Panic recovered"
+		shortPrefix = "<b>⚠️ Panic</b>"
 	}
 
-	logMsg := "🚨 Error in %s handler:\nFrom: %s\n%s\n%s\nError: `%v`"
-	shortMsg := "<b>Error in %s handler</b>\n<b>From:</b> %s\n%s\n%s\n<b>Error:</b>\n<code>%s</code>"
+	logMsg := fmt.Sprintf("%s in %s handler:\nFrom: %s\n%s\n%s\nError: `%v`",
+		logPrefix, info.handlerType, info.userMention, info.chatInfo, info.messageInfo, r)
+	shortMsg := fmt.Sprintf("%s in %s handler\n<b>From:</b> %s\n%s\n%s\n<b>Error:</b>\n<code>%s</code>",
+		shortPrefix, info.handlerType, info.userMention, info.chatInfo, info.messageInfo, info.errorMessage)
 
 	if isPanic {
-		logMsg = "⚠️ Panic recovered in %s handler:\nFrom: %s\n%s\n%s\nError: `%v`\nStack:\n%s"
-		shortMsg = "<b>⚠️ Panic in %s handler</b>\n<b>From:</b> %s\n%s\n%s\n<b>Error:</b>\n<code>%s</code>\n<pre>%s</pre>"
+		logMsg += "\nStack:\n" + string(stackRaw)
+		shortMsg += "\n<pre>" + stackEsc + "</pre>"
 	}
 
-	if isPanic {
-		gologging.ErrorF(
-			logMsg,
-			handlerType,
-			userMention,
-			chatInfo,
-			messageInfo,
-			r,
-			stack,
-		)
-	} else {
-		gologging.ErrorF(logMsg, handlerType, userMention, chatInfo, messageInfo, r)
-	}
+	gologging.Error(logMsg)
 
-	if config.LoggerID != 0 && client != nil {
-		var short string
-		if isPanic {
-			short = fmt.Sprintf(
-				shortMsg,
-				handlerType,
-				userMention,
-				chatInfo,
-				messageInfo,
-				errorMessage,
-				stack,
-			)
-		} else {
-			short = fmt.Sprintf(shortMsg, handlerType, userMention, chatInfo, messageInfo, errorMessage)
-		}
-
-		gologging.Error(short)
-		if _, sendErr := client.SendMessage(config.LoggerID, short, &tg.SendOptions{ParseMode: "HTML"}); sendErr != nil {
+	if config.LoggerID != 0 && info.client != nil {
+		if _, sendErr := info.client.SendMessage(config.LoggerID, shortMsg, &tg.SendOptions{ParseMode: "HTML"}); sendErr != nil {
 			gologging.ErrorF(
-				"Failed to send panic message to log chat: %v",
+				"failed to send panic message to log chat: %v",
 				sendErr,
 			)
 		}
@@ -381,66 +377,32 @@ func handlePanic(r, ctx interface{}, isPanic bool) {
 }
 
 func warnAndLeave(client *tg.Client, chatID int64) {
-	text := F(chatID, "supergroup_needed", locales.Arg{"chat_id": chatID})
-	_, err := client.SendMessage(
-		chatID,
-		text,
-		&tg.SendOptions{
-			ReplyMarkup: core.AddMeMarkup(chatID),
-			LinkPreview: false,
-		},
-	)
+	text := F(chatID, "supergroup_needed", locales.Arg{"chat_id": chatID, "support_group": config.SupportChat})
+	_, err := client.SendMessage(chatID, text, &tg.SendOptions{
+		ReplyMarkup: core.AddMeMarkup(chatID),
+		LinkPreview: false,
+	})
 	if err != nil {
-		gologging.ErrorF(
-			"Failed to send supergroup conversion message to chat %d: %v",
-			chatID,
-			err,
-		)
+		gologging.ErrorF("failed to send supergroup conversion message to chat %d: %v", chatID, err)
 		return
 	}
 
 	go func() {
+		leaveChat(client, chatID)
+	}()
+}
+
+func leaveChat(client *tg.Client, chatID int64) {
+	go func() {
 		time.Sleep(1 * time.Second)
 		if err := client.LeaveChannel(chatID); err != nil {
-			gologging.ErrorF(
-				"Failed to leave non-supergroup chatID=%d: %v",
-				chatID,
-				err,
-			)
+			gologging.ErrorF("failed to leave blacklisted chatID=%d: %v", chatID, err)
 		}
 		core.Assistants.WithAssistant(
 			chatID,
 			func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) },
 		)
 	}()
-}
-
-func formatDuration(sec int) string {
-	if sec < 0 {
-		sec = 0
-	}
-
-	const (
-		day  = 86400
-		hour = 3600
-		min  = 60
-	)
-
-	if sec < min {
-		return fmt.Sprintf("%ds", sec)
-	}
-	if sec < hour {
-		return fmt.Sprintf("%dm %ds", sec/min, sec%min)
-	}
-	if sec < day {
-		return fmt.Sprintf("%dh %dm", sec/hour, (sec%hour)/min)
-	}
-
-	return fmt.Sprintf(
-		"%dd %dh",
-		sec/day,
-		(sec%day)/hour,
-	)
 }
 
 func getCommand(m *tg.NewMessage) string {

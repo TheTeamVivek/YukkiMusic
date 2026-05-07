@@ -83,7 +83,9 @@ YukkiMusic (Database)
     "rtmp_key": "..."
   },
   "ass_index": 2,
-  "no_thumb": false
+  "no_thumb": false,
+  "play_mode": false,
+  "cmd_delete": false
 }
 ```
 
@@ -153,6 +155,8 @@ modifyBotState(fn)      // atomic-like modification (internal)
 | `rtmp_config.rtmp_key` | String | RTMP stream key |
 | `ass_index` | Int | Assigned assistant index |
 | `no_thumb` | Boolean | Disable thumbnails |
+| `play_mode` | Boolean | Play mode (admins only) |
+| `cmd_delete` | Boolean | Auto-delete commands |
 
 **Example**:
 ```javascript
@@ -166,7 +170,9 @@ modifyBotState(fn)      // atomic-like modification (internal)
     "rtmp_key": "2146211959:yJaXZGb7KXp..."
   },
   "ass_index": 1,
-  "no_thumb": false
+  "no_thumb": false,
+  "play_mode": false,
+  "cmd_delete": false
 }
 ```
 
@@ -312,6 +318,36 @@ index, err := database.AssistantIndex(chatID, totalAssistants)
 err := database.RebalanceAssistantIndexes(totalAssistants)
 ```
 
+### Thumbnails
+
+```go
+// Check if thumbnails disabled
+disabled, err := database.ThumbnailsDisabled(chatID)
+
+// Set thumbnails status
+err := database.SetThumbnailsDisabled(chatID, true)
+```
+
+### Play Mode
+
+```go
+// Check if play mode is admins only
+adminsOnly, err := database.PlayModeAdminsOnly(chatID)
+
+// Set play mode status
+err := database.SetPlayModeAdminsOnly(chatID, true)
+```
+
+### Command Delete
+
+```go
+// Check if command delete enabled
+enabled, err := database.CommandDelete(chatID)
+
+// Set command delete status
+err := database.SetCommandDelete(chatID, true)
+```
+
 ---
 
 ## 🚀 Advanced Features
@@ -452,7 +488,10 @@ internal/database/
 ├── autoleave.go              # Auto-leave configuration
 ├── logger.go                 # Logger status
 ├── language.go               # Language preferences
-├── cplay.go                  # Channel play management
+├── channel_play.go           # Channel play management
+├── play_mode.go              # Play mode management
+├── command_delete.go         # Command delete management
+├── thumbnail.go              # Thumbnail management
 ├── rtmp_cfg.go               # RTMP configuration
 ├── assistant.go              # Assistant assignment
 ├── maintenance.go            # Maintenance mode
@@ -486,15 +525,22 @@ database.AddServedChat(chatID)
 
 // Maintenance
 database.SetMaintenance(true, "reason")
+
+// Thumbnails, Play Mode, Command Delete
+database.ThumbnailsDisabled(chatID)
+database.SetThumbnailsDisabled(chatID, true)
+database.PlayModeAdminsOnly(chatID)
+database.SetPlayModeAdminsOnly(chatID, true)
+database.CommandDelete(chatID)
+database.SetCommandDelete(chatID, true)
 ```
 
 ---
 
 ## 🆘 Support
 
-- **Issues?** Use `/bug` command
+- **Issues?** Open an issue on [GitHub Issues](https://github.com/TheTeamVivek/YukkiMusic/issues)
 - **Help needed?** Join [Support Chat](https://t.me/TheTeamVk)
-- **Report bug?** [GitHub Issues](https://github.com/TheTeamVivek/YukkiMusic/issues)
 
 ---
 

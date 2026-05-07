@@ -19,6 +19,7 @@ package modules
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
@@ -71,9 +72,37 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	mention := utils.MentionHTML(m.Sender)
+	skipCount := 1
+
+	if args := m.Args(); args != "" {
+		parsed, parseErr := strconv.Atoi(args)
+		if parseErr != nil {
+			m.Reply(F(chatID, "skip_invalid_number"))
+			return telegram.ErrEndGroup
+		}
+
+		queuedTracks := len(r.Queue())
+		if queuedTracks == 0 {
+			m.Reply(F(chatID, "skip_queue_empty_for_count"))
+			return telegram.ErrEndGroup
+		}
+
+		if parsed < 1 || parsed > queuedTracks {
+			m.Reply(F(chatID, "skip_count_exceeds_queue", locales.Arg{
+				"requested": parsed,
+				"available": queuedTracks,
+			}))
+			return telegram.ErrEndGroup
+		}
+
+		// /skip N means: skip current + N queued tracks.
+		skipCount = parsed + 1
+	}
 
 	if len(r.Queue()) == 0 {
-		core.DeleteRoom(r.ChatID())
+
+		scheduleOldPlayingMessage(r)
+		core.DeleteRoom(r.ID)
 		m.Reply(F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
 		}))
@@ -81,7 +110,40 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 	}
 
 	r.SetLoop(0)
+
+	for i := 1; i < skipCount; i++ {
+		if len(r.Queue()) == 0 {
+
+			scheduleOldPlayingMessage(r)
+			core.DeleteRoom(r.ID)
+			m.Reply(F(chatID, "skip_stopped", locales.Arg{
+				"user": mention,
+			}))
+			return telegram.ErrEndGroup
+		}
+		_ = r.NextTrack()
+	}
+
+	if len(r.Queue()) == 0 {
+
+		scheduleOldPlayingMessage(r)
+		core.DeleteRoom(r.ID)
+		m.Reply(F(chatID, "skip_stopped", locales.Arg{
+			"user": mention,
+		}))
+		return telegram.ErrEndGroup
+	}
+
 	t := r.NextTrack()
+	if t == nil {
+
+		scheduleOldPlayingMessage(r)
+		core.DeleteRoom(r.ID)
+		m.Reply(F(chatID, "skip_stopped", locales.Arg{
+			"user": mention,
+		}))
+		return telegram.ErrEndGroup
+	}
 
 	statusMsg, err := core.Bot.SendMessage(
 		chatID,
@@ -103,7 +165,8 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 			core.Bot.SendMessage(chatID, txt)
 		}
 
-		core.DeleteRoom(r.ChatID())
+		scheduleOldPlayingMessage(r)
+		core.DeleteRoom(r.ID)
 		return telegram.ErrEndGroup
 	}
 
@@ -114,7 +177,8 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		} else {
 			core.Bot.SendMessage(chatID, txt)
 		}
-		core.DeleteRoom(r.ChatID())
+		scheduleOldPlayingMessage(r)
+		core.DeleteRoom(r.ID)
 		return telegram.ErrEndGroup
 	}
 
@@ -124,7 +188,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 	msg := F(chatID, "stream_now_playing", locales.Arg{
 		"url":      t.URL,
 		"title":    safeTitle,
-		"duration": formatDuration(t.Duration),
+		"duration": utils.FormatDuration(t.Duration),
 		"by":       t.Requester,
 	})
 

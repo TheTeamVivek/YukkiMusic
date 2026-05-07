@@ -51,6 +51,7 @@ func streamEndHandler(
 	if !ok {
 		return
 	}
+	scheduleOldPlayingMessage(r)
 
 	if ok, v := r.GetData("is_transitioning"); ok {
 		if ok, v := v.(bool); ok && v {
@@ -61,7 +62,7 @@ func streamEndHandler(
 	r.SetData("is_transitioning", true)
 	defer r.DeleteData("is_transitioning")
 
-	cid := r.EffectiveChatID()
+	cid := r.ChatID
 	r.Parse()
 
 	var t *state.Track
@@ -127,7 +128,7 @@ func streamEndHandler(
 	msgText := F(cid, "stream_now_playing", locales.Arg{
 		"url":      t.URL,
 		"title":    safeTitle,
-		"duration": formatDuration(t.Duration),
+		"duration": utils.FormatDuration(t.Duration),
 		"by":       t.Requester,
 	})
 

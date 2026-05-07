@@ -94,7 +94,7 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 					"title": utils.EscapeHTML(
 						utils.ShortTitle(t.Title, 25),
 					),
-					"duration": formatDuration(int(remaining.Seconds())),
+					"duration": utils.FormatDuration(int(remaining.Seconds())),
 					"cmd":      getCommand(m),
 				}))
 			} else {

@@ -28,12 +28,12 @@ import (
 )
 
 var (
-	superGroupFilter    = tg.Custom(filterSuperGroup)
-	adminFilter         = tg.Custom(filterChatAdmins)
-	authFilter          = tg.Custom(filterAuthUsers)
-	ignoreChannelFilter = tg.Custom(filterChannel)
-	sudoOnlyFilter      = tg.Custom(filterSudo)
-	ownerFilter         = tg.Custom(filterOwner)
+	superGroupFilter    = tg.CustomFilter(filterSuperGroup)
+	adminFilter         = tg.CustomFilter(filterChatAdmins)
+	authFilter          = tg.CustomFilter(filterAuthUsers)
+	ignoreChannelFilter = tg.CustomFilter(filterChannel)
+	sudoOnlyFilter      = tg.CustomFilter(filterSudo)
+	ownerFilter         = tg.CustomFilter(filterOwner)
 )
 
 func filterSuperGroup(m *tg.NewMessage) bool {
@@ -65,6 +65,9 @@ func filterSuperGroup(m *tg.NewMessage) bool {
 }
 
 func filterChatAdmins(m *tg.NewMessage) bool {
+	if isOwnerOrSudo(m.SenderID()) {
+		return true
+	}
 	isAdmin, err := utils.IsChatAdmin(m.Client, m.ChannelID(), m.SenderID())
 	if err != nil || !isAdmin {
 		m.Reply(F(m.ChannelID(), "only_admin"))
@@ -74,17 +77,16 @@ func filterChatAdmins(m *tg.NewMessage) bool {
 }
 
 func filterAuthUsers(m *tg.NewMessage) bool {
-	isAdmin, err := utils.IsChatAdmin(m.Client, m.ChannelID(), m.SenderID())
-	if err == nil && isAdmin {
+	if canUseAdminCommand(m.Client, m.ChannelID(), m.SenderID()) {
 		return true
 	}
 
-	isAuth, err := database.IsAuthorized(m.ChannelID(), m.SenderID())
-	if err == nil && isAuth {
-		return true
+	mode, err := database.GetAdminMode(m.ChannelID())
+	if err == nil && mode == database.AdminModeAdminsOnly {
+		m.Reply(F(m.ChannelID(), "only_admin"))
+	} else {
+		m.Reply(F(m.ChannelID(), "only_admin_or_auth"))
 	}
-
-	m.Reply(F(m.ChannelID(), "only_admin_or_auth"))
 	return false
 }
 
@@ -109,6 +111,33 @@ func filterChannel(m *tg.NewMessage) bool {
 	return true
 }
 
+func canUseAdminCommand(c *tg.Client, chatID, userID int64) bool {
+	if isOwnerOrSudo(userID) {
+		return true
+	}
+
+	mode, err := database.GetAdminMode(chatID)
+	if err != nil {
+		mode = database.AdminModeAdminAuth
+	}
+
+	if mode == database.AdminModeEveryone {
+		return true
+	}
+
+	isAdmin, err := utils.IsChatAdmin(c, chatID, userID)
+	if err == nil && isAdmin {
+		return true
+	}
+
+	if mode == database.AdminModeAdminsOnly {
+		return false
+	}
+
+	isAuth, err := database.IsAuthorized(chatID, userID)
+	return err == nil && isAuth
+}
+
 func filterOwner(m *tg.NewMessage) bool {
 	if config.OwnerID == 0 || m.SenderID() != config.OwnerID {
 		if m.IsPrivate() ||
@@ -118,4 +147,12 @@ func filterOwner(m *tg.NewMessage) bool {
 		return false
 	}
 	return true
+}
+
+func isOwnerOrSudo(userID int64) bool {
+	if config.OwnerID != 0 && userID == config.OwnerID {
+		return true
+	}
+	isSudo, err := database.IsSudo(userID)
+	return err == nil && isSudo
 }

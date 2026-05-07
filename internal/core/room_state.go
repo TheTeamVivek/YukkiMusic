@@ -40,34 +40,46 @@ var (
 type RoomState struct {
 	mu sync.RWMutex
 
-	// Identity
-	chatID        int64
-	channelPlayID int64
+	// ID is the canonical playback target id (group or linked channel).
+	ID int64
+	// ChatID is the UI/context chat id where messages and controls are sent.
+	ChatID int64
 
-	// Playback State
-	filePath  string
-	track     *state.Track
-	playing   bool
-	paused    bool
-	muted     bool
-	speed     float64
-	position  int
+	// filePath is the currently playing local media file.
+	filePath string
+	// track is the active track metadata.
+	track *state.Track
+	// playing reports whether playback is active.
+	playing bool
+	// paused reports whether playback is currently paused.
+	paused bool
+	// muted reports whether playback is currently muted.
+	muted bool
+	// speed is the active playback speed multiplier.
+	speed float64
+	// position is the current playback position in seconds.
+	position int
+	// updatedAt tracks the last state-update timestamp (unix seconds).
 	updatedAt int64
-	loop      int
+	// loop is the loop mode/state value.
+	loop int
 
-	// Queue State
-	queue   []*state.Track
+	// queue holds upcoming tracks.
+	queue []*state.Track
+	// shuffle indicates queue shuffle mode.
 	shuffle bool
 
-	// Automation
+	// scheduledTimers manages auto-resume/unmute/speed timers.
 	*scheduledTimers
 
-	// Metadata & UI
+	// statusMsg is the latest room status message in chat.
 	statusMsg *telegram.NewMessage
-	Data      map[string]any
+	// Data stores extensible per-room metadata.
+	Data map[string]any
 
-	// Internal Components
+	// Assistant is the assistant client bound to this room.
 	Assistant *Assistant
+	// destroyed marks whether room cleanup has completed.
 	destroyed atomic.Bool
 }
 
@@ -127,7 +139,8 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 	room, exists := rooms[chatID]
 	if !exists {
 		room = &RoomState{
-			chatID:    chatID,
+			ID:        chatID,
+			ChatID:    chatID,
 			queue:     []*state.Track{},
 			speed:     1.0,
 			Assistant: ass,
@@ -240,36 +253,6 @@ func (st *scheduledTimers) cancelScheduledSpeed() {
 
 // Getters
 
-func (r *RoomState) EffectiveChatID() int64 {
-	if r.IsDestroyed() {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	if r.channelPlayID != 0 {
-		return r.channelPlayID
-	}
-	return r.chatID
-}
-
-func (r *RoomState) ChannelPlayID() int64 {
-	if r.IsDestroyed() {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.channelPlayID
-}
-
-func (r *RoomState) ChatID() int64 {
-	if r.IsDestroyed() {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.chatID
-}
-
 func (r *RoomState) FilePath() string {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -360,15 +343,6 @@ func (r *RoomState) SetLoop(loop int) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.loop = loop
-}
-
-func (r *RoomState) SetChannelPlayID(chatID int64) {
-	if r.IsDestroyed() {
-		return
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.channelPlayID = chatID
 }
 
 func (r *RoomState) SetData(k string, v any) {

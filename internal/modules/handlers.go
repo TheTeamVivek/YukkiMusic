@@ -19,14 +19,11 @@ package modules
 
 import (
 	"fmt"
-	"log"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
 	"main/internal/core"
-	"main/internal/database"
 )
 
 type MsgHandlerDef struct {
@@ -72,6 +69,31 @@ var handlers = []MsgHandlerDef{
 	{
 		Pattern: "(delsudo|delsudoer|sudodel|remsudo|rmsudo|sudorem|dropsudo|unsudo)",
 		Handler: handleDelSudo,
+		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
+	},
+	{
+		Pattern: "(blockuser|blacklistuser|blackuser|bluser)",
+		Handler: handleBlockUser,
+		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
+	},
+	{
+		Pattern: "(unblockuser|unblacklistuser|unbluser|whitelistuser)",
+		Handler: handleUnblockUser,
+		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
+	},
+	{
+		Pattern: "(blockchat|blacklistchat|blackchat|blchat)",
+		Handler: handleBlockChat,
+		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
+	},
+	{
+		Pattern: "(unblockchat|unblacklistchat|unblackchat|whitechat|unblchat)",
+		Handler: handleUnblockChat,
+		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
+	},
+	{
+		Pattern: "(blocked|blacklisted)",
+		Handler: handleBlacklisted,
 		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
 	},
 	{
@@ -146,7 +168,17 @@ var handlers = []MsgHandlerDef{
 	{
 		Pattern: "(lang|language)",
 		Handler: langHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
+		Filters: []telegram.Filter{superGroupFilter, adminFilter},
+	},
+	{
+		Pattern: "settings",
+		Handler: settingsHandler,
+		Filters: []telegram.Filter{superGroupFilter, adminFilter},
+	},
+	{
+		Pattern: "cleanmode",
+		Handler: cleanModeHandler,
+		Filters: []telegram.Filter{superGroupFilter, adminFilter},
 	},
 
 	// SuperGroup & Admin Filters
@@ -154,7 +186,7 @@ var handlers = []MsgHandlerDef{
 	{
 		Pattern: "stream",
 		Handler: streamHandler,
-		Filters: []telegram.Filter{superGroupFilter},
+		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
 		Pattern: "streamstop",
@@ -182,11 +214,6 @@ var handlers = []MsgHandlerDef{
 		Pattern: "cplay",
 		Handler: cplayHandler,
 		Filters: []telegram.Filter{superGroupFilter},
-	},
-	{
-		Pattern: "(cfplay|fcplay|cplayforce)",
-		Handler: cfplayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
 		Pattern: "vplay",
@@ -310,12 +337,12 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
-		Pattern: "addauth",
+		Pattern: "(auth|addauth)",
 		Handler: addAuthHandler,
 		Filters: []telegram.Filter{superGroupFilter, adminFilter},
 	},
 	{
-		Pattern: "delauth",
+		Pattern: "(removeauth|delauth|unauth)",
 		Handler: delAuthHandler,
 		Filters: []telegram.Filter{superGroupFilter, adminFilter},
 	},
@@ -326,13 +353,9 @@ var handlers = []MsgHandlerDef{
 	},
 
 	// CPlay commands
+
 	{
-		Pattern: "(cplay|cvplay)",
-		Handler: cplayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "(cfplay|fcplay|cforceplay)",
+		Pattern: "(cfplay|fcplay|cforceplay|cplayforce)",
 		Handler: cfplayHandler,
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
@@ -407,8 +430,8 @@ var handlers = []MsgHandlerDef{
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
-		Pattern: "channelplay",
-		Handler: channelPlayHandler,
+		Pattern: "(channelplay|setcplay)",
+		Handler: setCPlayHandler,
 		Filters: []telegram.Filter{superGroupFilter, authFilter},
 	},
 	{
@@ -457,6 +480,16 @@ var handlers = []MsgHandlerDef{
 		Handler: cmdDeleteHandler,
 		Filters: []telegram.Filter{superGroupFilter, adminFilter},
 	},
+	{
+		Pattern: "adminmode",
+		Handler: adminModeHandler,
+		Filters: []telegram.Filter{superGroupFilter, adminFilter},
+	},
+	{
+		Pattern: "privacy",
+		Handler: privacyHandler,
+		Filters: []telegram.Filter{ignoreChannelFilter},
+	},
 }
 
 var cbHandlers = []CbHandlerDef{
@@ -467,25 +500,37 @@ var cbHandlers = []CbHandlerDef{
 
 	{Pattern: "^close$", Handler: closeHandler},
 	{Pattern: "^cancel$", Handler: cancelHandler},
+	{Pattern: "^restart:(bot|replay)$", Handler: restartConfirmHandler},
 	{Pattern: "^bcast_cancel$", Handler: broadcastCancelCB},
+	{Pattern: "^rtmp_stop$", Handler: rtmpStopCallbackHandler},
 
-	{Pattern: `^room:(\w+)$`, Handler: roomHandle},
+	{Pattern: `^room:-?\d+:\w+$`, Handler: roomHandle},
 	{Pattern: "progress", Handler: emptyCBHandler},
+	{Pattern: "^(set|info):", Handler: settingsCallbackHandler},
 }
 
 func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 	bot.UpdatesGetState()
+	bot.Use(blacklistMessageMiddleware)
 	assistants.ForEach(func(a *core.Assistant) {
 		a.Client.UpdatesGetState()
 	})
 
 	for _, h := range handlers {
-		bot.AddCommandHandler(h.Pattern, SafeMessageHandler(h.Handler), h.Filters...).
+		bot.AddCommandHandler(
+			h.Pattern,
+			SafeMessageHandler(h.Handler),
+			h.Filters...,
+		).
 			SetGroup(100)
 	}
 
 	for _, h := range cbHandlers {
-		bot.AddCallbackHandler(h.Pattern, SafeCallbackHandler(h.Handler), h.Filters...).
+		bot.AddCallbackHandler(
+			h.Pattern,
+			WithBlacklistCallback(SafeCallbackHandler(h.Handler)),
+			h.Filters...,
+		).
 			SetGroup(90)
 	}
 
@@ -493,9 +538,8 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 	bot.On("edit:/ev", evalCommandHandler).SetGroup(80)
 
 	bot.On("participant", handleParticipantUpdate).SetGroup(70)
-	bot.On("action", handleChatAction).SetGroup(70)
-
-	bot.AddActionHandler(handleActions).SetGroup(60)
+	bot.AddActionHandler(handleActions)
+	bot.AddRawHandler(&telegram.UpdateReadChannelOutbox{}, cleanModeReadHandler)
 
 	assistants.ForEach(func(a *core.Assistant) {
 		a.Ntg.OnStreamEnd(streamEndHandler)
@@ -503,9 +547,8 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 
 	go MonitorRooms()
 
-	if is, _ := database.AutoLeave(); is {
-		go startAutoLeave()
-	}
+	autoLeaveSvc.Start()
+	cleanScheduler.start()
 
 	if config.SetCmds && config.OwnerID != 0 {
 		go setBotCommands(bot)
@@ -527,61 +570,12 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 			helpTexts[cmd] = fmt.Sprintf(`<i>Channel play variant of %s</i>
 
 <b>⚙️ Requires:</b>
-First configure channel using: <code>/channelplay --set [channel_id]</code>
+First configure channel using: <code>/setcplay [channel_id]</code>
 
 %s
 
 <b>💡 Note:</b>
 This command affects the linked channel's voice chat, not the current group.`, baseCmd, baseHelp)
 		}
-	}
-}
-
-func setBotCommands(bot *telegram.Client) {
-	// Set commands for normal users in private chats
-	if _, err := bot.BotsSetBotCommands(&telegram.BotCommandScopeUsers{}, "", AllCommands.PrivateUserCommands); err != nil {
-		gologging.Error("Failed to set PrivateUserCommands " + err.Error())
-	}
-
-	// Set commands for normal users in group chats
-	if _, err := bot.BotsSetBotCommands(&telegram.BotCommandScopeChats{}, "", AllCommands.GroupUserCommands); err != nil {
-		gologging.Error("Failed to set GroupUserCommands " + err.Error())
-	}
-
-	// Set commands for chat admins
-	if _, err := bot.BotsSetBotCommands(
-		&telegram.BotCommandScopeChatAdmins{},
-		"",
-		append(AllCommands.GroupUserCommands, AllCommands.GroupAdminCommands...),
-	); err != nil {
-		gologging.Error("Failed to set GroupAdminCommands " + err.Error())
-	}
-
-	// Set commands for sudo users in their private chat
-	sudoers, err := database.Sudoers()
-	if err != nil {
-		log.Printf("Failed to get sudoers for setting commands: %v", err)
-	} else {
-		sudoCommands := append(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands...)
-		for _, sudoer := range sudoers {
-			if _, err := bot.BotsSetBotCommands(&telegram.BotCommandScopePeer{
-				Peer: &telegram.InputPeerUser{UserID: sudoer, AccessHash: 0},
-			},
-				"",
-				sudoCommands,
-			); err != nil {
-				gologging.Error("Failed to set PrivateSudoCommands " + err.Error())
-			}
-		}
-	}
-
-	ownerCommands := append(
-		AllCommands.PrivateUserCommands,
-		AllCommands.PrivateSudoCommands...)
-	ownerCommands = append(ownerCommands, AllCommands.PrivateOwnerCommands...)
-	if _, err := bot.BotsSetBotCommands(&telegram.BotCommandScopePeer{
-		Peer: &telegram.InputPeerUser{UserID: config.OwnerID, AccessHash: 0},
-	}, "", ownerCommands); err != nil {
-		gologging.Error("Failed to set PrivateOwnerCommands " + err.Error())
 	}
 }

@@ -20,12 +20,14 @@ package modules
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/config"
 	"main/internal/core"
 	"main/internal/locales"
 	"main/internal/utils"
@@ -52,12 +54,69 @@ All playback will be interrupted. Bot will be offline for a few seconds.`
 
 func handleRestart(m *tg.NewMessage) error {
 	chatID := m.ChannelID()
+	r, ok := getActiveRoomForChat(chatID)
+	if ok && r.Track() != nil {
+		_, _ = m.Reply(F(chatID, "restart_confirm_running"), &tg.SendOptions{
+			ReplyMarkup: core.GetRestartConfirmMarkup(chatID),
+		})
+		return tg.ErrEndGroup
+	}
+	return performRestart(m, chatID)
+}
 
+func performRestart(m *tg.NewMessage, chatID int64) error {
 	statusMsg, err := m.Reply(F(chatID, "restart"))
 	if err != nil {
 		gologging.Error("Failed to send restart message: " + err.Error())
 	}
+	return executeRestart(m.Client, chatID, statusMsg)
+}
 
+func getActiveRoomForChat(chatID int64) (*core.RoomState, bool) {
+	r, ok := core.GetRoom(chatID, nil, false)
+	if !ok || !r.IsActiveChat() || r.Track() == nil {
+		return nil, false
+	}
+	return r, true
+}
+
+func restartConfirmHandler(cb *tg.CallbackQuery) error {
+	chatID := cb.ChannelID()
+	opt := &tg.CallbackOptions{Alert: true}
+
+	if cb.SenderID != config.OwnerID {
+		cb.Answer(F(chatID, "only_owner"), opt)
+		return tg.ErrEndGroup
+	}
+
+	action := strings.TrimPrefix(cb.DataString(), "restart:")
+	switch action {
+	case "bot":
+		cb.Answer(F(chatID, "restart_confirm_bot"))
+		statusMsg, _ := cb.Edit(F(chatID, "restart"))
+		return executeRestart(cb.Client, chatID, statusMsg)
+	case "replay":
+		r, ok := getActiveRoomForChat(chatID)
+		if !ok {
+			cb.Answer(F(chatID, "room_no_active"), opt)
+			return tg.ErrEndGroup
+		}
+		if err := r.Replay(); err != nil {
+			cb.Answer(F(chatID, "replay_failed", locales.Arg{"error": err}), opt)
+			return tg.ErrEndGroup
+		}
+		_, _ = cb.Edit(F(chatID, "restart_confirm_replay_done"))
+		cb.Answer(F(chatID, "restart_confirm_replay_done"))
+	}
+
+	return tg.ErrEndGroup
+}
+
+func executeRestart(
+	client *tg.Client,
+	chatID int64,
+	statusMsg *tg.NewMessage,
+) error {
 	exePath, err := os.Executable()
 	if err != nil {
 		utils.EOR(statusMsg, F(chatID, "restart_exepath_fail", locales.Arg{
@@ -74,13 +133,12 @@ func handleRestart(m *tg.NewMessage) error {
 		return tg.ErrEndGroup
 	}
 
-	for chatID := range core.GetAllRooms() {
-		core.DeleteRoom(chatID)
-		m.Client.SendMessage(chatID, F(chatID, "restart_service", locales.Arg{
-			"bot": utils.MentionHTML(m.Client.Me()),
+	for roomChatID := range core.GetAllRooms() {
+		core.DeleteRoom(roomChatID)
+		client.SendMessage(roomChatID, F(roomChatID, "restart_service", locales.Arg{
+			"bot": utils.MentionHTML(client.Me()),
 		}))
 		time.Sleep(time.Second)
-
 	}
 
 	utils.EOR(statusMsg, F(chatID, "restart_initiated"))

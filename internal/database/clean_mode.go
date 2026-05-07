@@ -17,34 +17,38 @@
 
 package database
 
-func Sudoers() ([]int64, error) {
-	state, err := getBotState()
-	if err != nil {
-		return nil, err
-	}
-	return state.Sudoers, nil
-}
-
-func IsSudo(id int64) (bool, error) {
-	state, err := getBotState()
+func CommandDelete(chatID int64) (bool, error) {
+	s, err := getChatSettings(chatID)
 	if err != nil {
 		return false, err
 	}
-	return contains(state.Sudoers, id), nil
+	return s.CommandDelete, nil
 }
 
-func AddSudo(id int64) error {
-	return modifyBotState(func(s *BotState) bool {
-		var added bool
-		s.Sudoers, added = addUnique(s.Sudoers, id)
-		return added
+func SetCommandDelete(chatID int64, enabled bool) error {
+	return modifyChatSettings(chatID, func(s *ChatSettings) bool {
+		if s.CommandDelete == enabled {
+			return false
+		}
+		s.CommandDelete = enabled
+		return true
 	})
 }
 
-func RemoveSudo(id int64) error {
-	return modifyBotState(func(s *BotState) bool {
-		var removed bool
-		s.Sudoers, removed = removeElement(s.Sudoers, id)
-		return removed
+func CleanMode(chatID int64) (bool, error) {
+	s, err := getChatSettings(chatID)
+	if err != nil {
+		return false, err
+	}
+	return s.CleanMode, nil
+}
+
+func SetCleanMode(chatID int64, enabled bool) error {
+	return modifyChatSettings(chatID, func(s *ChatSettings) bool {
+		if s.CleanMode == enabled {
+			return false
+		}
+		s.CleanMode = enabled
+		return true
 	})
 }

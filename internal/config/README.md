@@ -18,7 +18,6 @@ These must be set for the bot to start.
 | `API_ID` | `int32` | Your Telegram API ID from [my.telegram.org](https://my.telegram.org). |
 | `API_HASH` | `string` | Your Telegram API Hash from [my.telegram.org](https://my.telegram.org). |
 | `TOKEN` | `string` | Your Telegram Bot Token from [@BotFather](https://t.me/BotFather). Also accepts `BOT_TOKEN`. |
-| `LOGGER_ID` | `int64` | Chat ID where the bot will send logs and error reports. |
 | `MONGO_DB_URI` | `string` | MongoDB connection string (e.g., `mongodb+srv://...`). |
 | `STRING_SESSIONS`| `[]string`| Space, comma, or semicolon separated session strings for assistant accounts. Also accepts `STRING_SESSION`. |
 
@@ -49,17 +48,20 @@ These must be set for the bot to start.
 | :--- | :--- | :--- |
 | `DEFAULT_LANG` | `en` | Default language for bot responses (see `internal/locales/`). |
 | `DURATION_LIMIT` | `4200` | Maximum track duration in seconds (70 minutes). |
-| `QUEUE_LIMIT` | `7` | Maximum number of tracks in queue per chat. |
+| `QUEUE_LIMIT` | `24` | Maximum number of tracks in queue per chat. |
 | `MAX_AUTH_USERS` | `25` | Max number of non-admin users allowed to control playback. |
 | `LEAVE_ON_DEMOTED`| `false` | If `true`, the bot leaves the group if its admin rights are removed. |
 | `SET_CMDS` | `false` | Automatically set bot commands in Telegram UI on startup. |
+| `DISABLE_COLOUR` | `false` | If `true`, disables Telegram inline button colour styling (`Primary/Success/Danger`). |
 | `COOKIES_LINK` | `""` | URL to a `yt-dlp` cookies file (e.g., via batbin). |
+| `LOGGER_ID` | `0` | Chat ID where the bot will send logs and error reports. Also accepts `LOG_GROUP_ID`. If unset, logging-to-chat is disabled. |
 
 ## 🎨 Customization
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
-| `START_IMG_URL` | `https://...` | Image URL displayed in the `/start` command response. |
+|`EFFECT_IDS`| `""` | List of Telegram message effect IDs (space/comma/semicolon separated). One random effect ID is selected and applied when the `/start` command is used. These effects are shown visually by Telegram (e.g., animations). If you're unsure what to use, try `5104841245755180586` and run `/start` to see an example effect.|
+| `START_IMAGES` | `""` | Start images list (space/comma/semicolon separated URLs). If multiple URLs are provided, one is chosen randomly for each `/start`. |
 | `PING_IMG_URL` | `https://...` | Image URL displayed in the `/ping` command response. |
 | `SUPPORT_CHAT` | `https://t.me/TheTeamVk` | **Full URL** to the support group. |
 | `SUPPORT_CHANNEL`| `https://t.me/TheTeamVivek` | **Full URL** to the announcement channel. |

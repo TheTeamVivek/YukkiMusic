@@ -95,7 +95,7 @@ func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
 		return true, nil
 	}
 
-	paused, err := r.Assistant.Ntg.Pause(r.chatID)
+	paused, err := r.Assistant.Ntg.Pause(r.ID)
 	if err != nil {
 		return false, err
 	}
@@ -150,7 +150,7 @@ func (r *RoomState) Resume() (bool, error) {
 		return true, nil
 	}
 
-	resumed, err := r.Assistant.Ntg.Resume(r.chatID)
+	resumed, err := r.Assistant.Ntg.Resume(r.ID)
 	if err != nil {
 		return false, err
 	}
@@ -219,7 +219,7 @@ func (r *RoomState) Stop() error {
 	_, file, line, _ := runtime.Caller(1)
 	gologging.DebugF("Stop Called from %s:%d", file, line)
 
-	err := r.Assistant.Ntg.Stop(r.chatID)
+	err := r.Assistant.Ntg.Stop(r.ID)
 
 	r.mu.Lock()
 	r.track = nil
@@ -299,7 +299,7 @@ func (r *RoomState) Seek(seconds int) error {
 	r.mu.RUnlock()
 
 	if wasMuted {
-		r.Assistant.Ntg.Unmute(r.chatID)
+		r.Assistant.Ntg.Unmute(r.ID)
 	}
 
 	return nil
@@ -402,7 +402,7 @@ func (r *RoomState) Mute(unmuteAfter ...time.Duration) (bool, error) {
 		return true, nil
 	}
 
-	muted, err := r.Assistant.Ntg.Mute(r.chatID)
+	muted, err := r.Assistant.Ntg.Mute(r.ID)
 	if err != nil {
 		return false, err
 	}
@@ -445,7 +445,7 @@ func (r *RoomState) Unmute() (bool, error) {
 		return false, ErrRoomDestroyed
 	}
 
-	unmuted, err := r.Assistant.Ntg.Unmute(r.chatID)
+	unmuted, err := r.Assistant.Ntg.Unmute(r.ID)
 	if err != nil {
 		return false, err
 	}
@@ -464,7 +464,7 @@ func (r *RoomState) Unmute() (bool, error) {
 
 func (r *RoomState) play() error {
 	desc := getMediaDescription(r.filePath, r.position, r.speed, r.track.Video)
-	return r.Assistant.Ntg.Play(r.chatID, desc)
+	return r.Assistant.Ntg.Play(r.ID, desc)
 }
 
 func getMediaDescription(

@@ -17,34 +17,31 @@
 
 package database
 
-func Sudoers() ([]int64, error) {
-	state, err := getBotState()
+type AdminMode string
+
+const (
+	AdminModeAdminsOnly AdminMode = "admin"
+	AdminModeAdminAuth  AdminMode = "adminauth"
+	AdminModeEveryone   AdminMode = "everyone"
+)
+
+func GetAdminMode(chatID int64) (AdminMode, error) {
+	settings, err := getChatSettings(chatID)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return state.Sudoers, nil
-}
-
-func IsSudo(id int64) (bool, error) {
-	state, err := getBotState()
-	if err != nil {
-		return false, err
+	if settings.AdminMode == "" {
+		return AdminModeAdminAuth, nil
 	}
-	return contains(state.Sudoers, id), nil
+	return settings.AdminMode, nil
 }
 
-func AddSudo(id int64) error {
-	return modifyBotState(func(s *BotState) bool {
-		var added bool
-		s.Sudoers, added = addUnique(s.Sudoers, id)
-		return added
-	})
-}
-
-func RemoveSudo(id int64) error {
-	return modifyBotState(func(s *BotState) bool {
-		var removed bool
-		s.Sudoers, removed = removeElement(s.Sudoers, id)
-		return removed
+func SetAdminMode(chatID int64, mode AdminMode) error {
+	return modifyChatSettings(chatID, func(s *ChatSettings) bool {
+		if s.AdminMode == mode {
+			return false
+		}
+		s.AdminMode = mode
+		return true
 	})
 }

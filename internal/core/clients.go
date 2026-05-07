@@ -75,9 +75,9 @@ func initBot() error {
 		AppID:   config.APIID,
 		AppHash: config.APIHash,
 		Logger: telegram.WrapSimpleLogger(
-			GetTgLogger("gogram", telegram.LogError),
+			GetTgLogger("gogram", telegram.LogDebug),
 		),
-		LogLevel:     telegram.LogError,
+		LogLevel:     telegram.LogDebug,
 		ParseMode:    "HTML",
 		Session:      "bot.session",
 		FloodHandler: handleFlood,
@@ -96,6 +96,13 @@ func initBot() error {
 	user, err := client.GetMe()
 	if err != nil {
 		return fmt.Errorf("failed to fetch bot identity: %w", err)
+	}
+
+	if config.LoggerID != 0 {
+		_, _ = client.SendMessage(
+			config.LoggerID,
+			"Bot Started",
+		)
 	}
 
 	gologging.InfoF("Bot started as @%s", user.Username)
@@ -124,7 +131,10 @@ func initAssistants() error {
 			)
 		}
 
-		assistant.Client.SendMessage(Bot.Me().Username, "/start")
+		m, _ := assistant.Client.SendMessage(Bot.Me().Username, "/start")
+		if m != nil {
+			_, _ = m.Delete()
+		}
 		assistant.Client.JoinChannel("TheTeamVivek")
 
 		if assistant.Self.Username != "" {

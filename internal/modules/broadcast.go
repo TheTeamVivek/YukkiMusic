@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"html"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -33,6 +34,7 @@ import (
 	"main/internal/core"
 	"main/internal/database"
 	"main/internal/locales"
+	"main/internal/utils"
 )
 
 // BroadcastManager manages the state and lifecycle of a broadcast operation.
@@ -90,6 +92,7 @@ type BroadcastStats struct {
 	DoneUsers   int
 	FailedChats []int64
 	FailedUsers []int64
+	errorLog    strings.Builder
 	Delay       float64
 	StartTime   time.Time
 	LastUpdate  time.Time
@@ -366,13 +369,14 @@ func (bm *BroadcastManager) start(
 		default:
 		}
 
-		success := bm.sendMessage(ctx, m, chatID, content, flags)
+		err := bm.sendMessage(ctx, m, chatID, content, flags)
 
 		stats.mu.Lock()
 		stats.DoneChats++
 		stats.LastUpdate = time.Now()
-		if !success {
+		if err != nil {
 			stats.FailedChats = append(stats.FailedChats, chatID)
+			fmt.Fprintf(&stats.errorLog, "[%d] - [%v]\n", chatID, err)
 		}
 		stats.mu.Unlock()
 
@@ -392,13 +396,14 @@ func (bm *BroadcastManager) start(
 		default:
 		}
 
-		success := bm.sendMessage(ctx, m, userID, content, flags)
+		err := bm.sendMessage(ctx, m, userID, content, flags)
 
 		stats.mu.Lock()
 		stats.DoneUsers++
 		stats.LastUpdate = time.Now()
-		if !success {
+		if err != nil {
 			stats.FailedUsers = append(stats.FailedUsers, userID)
+			fmt.Fprintf(&stats.errorLog, "[%d] - [%v]\n", userID, err)
 		}
 		stats.mu.Unlock()
 
@@ -418,7 +423,7 @@ func (bm *BroadcastManager) sendMessage(
 	targetID int64,
 	content string,
 	flags *BroadcastFlags,
-) bool {
+) error {
 	var (
 		sentMsg *tg.NewMessage
 		err     error
@@ -467,7 +472,7 @@ func (bm *BroadcastManager) sendMessage(
 				attempt,
 			)
 			if !bm.sleepCtx(ctx, time.Duration(wait)*time.Second) {
-				return false
+				return context.Canceled
 			}
 			continue
 		} else {
@@ -481,7 +486,7 @@ func (bm *BroadcastManager) sendMessage(
 			!tg.MatchError(err, "USER_IS_DEACTIVATED") {
 			gologging.ErrorF("Broadcast failed for %d: %v", targetID, err)
 		}
-		return false
+		return err
 	}
 
 	if sentMsg != nil && (flags.Pin || flags.PinLoud) {
@@ -489,7 +494,7 @@ func (bm *BroadcastManager) sendMessage(
 			gologging.ErrorF("Pin failed for %d: %v", targetID, perr)
 		}
 	}
-	return true
+	return nil
 }
 
 func (bm *BroadcastManager) handleDelay(
@@ -528,7 +533,7 @@ func (bm *BroadcastManager) updateProgress(
 			)
 			stats.mu.Unlock()
 
-			progressMsg.Edit(text, &tg.SendOptions{
+			_, _ = progressMsg.Edit(text, &tg.SendOptions{
 				ReplyMarkup: core.GetBroadcastCancelKeyboard(
 					progressMsg.ChannelID(),
 				),
@@ -544,9 +549,21 @@ func (bm *BroadcastManager) finalize(
 	stats.mu.Lock()
 	stats.Finished = true
 	text := formatBroadcastProgress(stats, true, progressMsg.ChannelID())
+	errs := stats.errorLog.String()
 	stats.mu.Unlock()
 
-	progressMsg.Edit(text)
+	_, _ = progressMsg.Edit(text)
+
+	if errs != "" {
+		tmpFile := "broadcast_errors.txt"
+		if err := os.WriteFile(tmpFile, []byte(errs), 0o600); err != nil {
+			gologging.ErrorF("Failed to write broadcast errors: %v", err)
+			return
+		}
+		defer os.Remove(tmpFile)
+
+		_, _ = progressMsg.ReplyMedia(tmpFile)
+	}
 }
 
 func formatBroadcastProgress(
@@ -620,14 +637,14 @@ func formatBroadcastProgress(
 	}) + "\n")
 
 	sb.WriteString(F(chatID, "broadcast_elapsed", locales.Arg{
-		"elapsed": formatDuration(int(elapsed.Seconds())),
+		"elapsed": utils.FormatDuration(int(elapsed.Seconds())),
 	}) + "\n")
 
 	if !final && avgSpeed > 0 && totalDone < totalTargets {
 		remaining := totalTargets - totalDone
 		etaSeconds := float64(remaining) / avgSpeed
 		sb.WriteString("\n" + F(chatID, "broadcast_eta", locales.Arg{
-			"eta": formatDuration(int(etaSeconds)),
+			"eta": utils.FormatDuration(int(etaSeconds)),
 		}))
 	}
 

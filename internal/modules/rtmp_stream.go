@@ -20,7 +20,6 @@ package modules
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -28,6 +27,7 @@ import (
 	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
+	"main/internal/config"
 	"main/internal/core"
 	"main/internal/database"
 	"main/internal/locales"
@@ -40,114 +40,40 @@ var (
 )
 
 func init() {
-	helpTexts["stream"] = `<i>Start RTMP live streaming to configured server.</i>
+	helpTexts["stream"] = `<i>Start RTMP stream in this chat.</i>
 
 <u>Usage:</u>
-<b>/stream &lt;query/URL&gt;</b> — Start streaming a track
-<b>/stream [reply to audio/video]</b> — Stream replied media
+<b>/stream &lt;query/URL&gt;</b>
+<b>/stream [reply to audio/video]</b>`
 
-<b>🎥 Features:</b>
-• Live streaming to your RTMP server
-• Supports audio and video
-• Queue support (like /play)
-• Real-time status monitoring
-
-<b>⚙️ Setup Required:</b>
-Before using this command, an admin must configure RTMP:
-1. Open bot's private chat (DM)
-2. Send: <code>/setrtmp &lt;chat_id&gt; &lt;rtmp_url&gt;</code>
-
-<b>📝 Example Setup:</b>
-In bot DM:
-<code>/setrtmp -1001234567890 rtmps://dc5-1.rtmp.t.me/s/123:key</code>
-
-Then in your chat:
-<code>/stream never gonna give you up</code>
-
-<b>⚠️ Important Notes:</b>
-• RTMP streams have ~15-30s buffering delay
-• Setup ONLY works in bot DM (for security)
-• Use <code>/streamstop</code> to end stream
-• Only admin/auth users can control streams
-• We do NOT use Telegram's RTMP API - you provide your own server`
-
-	helpTexts["streamstop"] = `<i>Stop current RTMP stream.</i>
+	helpTexts["streamstop"] = `<i>Stop the current RTMP stream.</i>
 
 <u>Usage:</u>
-<b>/streamstop</b> — Stop the active stream
+<b>/streamstop</b>`
 
-<b>⚠️ Note:</b>
-Only admin/auth users can stop streams.`
-
-	helpTexts["streamstatus"] = `<i>Check current RTMP stream status.</i>
+	helpTexts["streamstatus"] = `<i>Check RTMP stream status.</i>
 
 <u>Usage:</u>
-<b>/streamstatus</b> — Show stream information
+<b>/streamstatus</b>`
 
-<b>📊 Shows:</b>
-• Stream state (playing/stopped)
-• Current position
-• RTMP server (masked for security)
-• Configuration status`
-
-	helpTexts["setrtmp"] = `<i>Configure RTMP streaming server (DM only).</i>
+	helpTexts["setrtmp"] = `<i>Set RTMP URL in bot DM.</i>
 
 <u>Usage:</u>
-<b>/setrtmp &lt;chat_id&gt; &lt;rtmp_url&gt;</b> — Set RTMP for a chat
-
-<b>🔒 Security:</b>
-• <b>This command ONLY works in DM</b> (private chat with bot)
-• NEVER share RTMP credentials in groups
-• Credentials are stored securely in database
-• We do NOT use Telegram's RTMP API
-
-<b>📋 URL Format:</b>
-<code>rtmp://server/app/streamkey</code>
-or
-<code>rtmps://server/s/streamkey</code>
-
-<b>📝 Examples:</b>
-
-<b>Telegram Voice Chat:</b>
-1. Start voice chat in your channel
-2. Telegram gives you: <code>rtmps://dc5-1.rtmp.t.me/s/123:key</code>
-3. In bot DM send: <code>/setrtmp -1001234567890 rtmps://dc5-1.rtmp.t.me/s/123:key</code>
-
-<b>Custom RTMP Server:</b>
-<code>/setrtmp -1001234567890 rtmp://live.example.com/stream/mykey</code>
-
-<b>🔍 Getting Chat ID:</b>
-• Forward message from chat to @userinfobot
-• Or use <code>/id</code> command in the chat
-
-<b>⚠️ Requirements:</b>
-• You must be admin in target chat
-• Bot must be member of target chat
-• Command only works in bot's private chat
-
-<b>💡 Why DM only?</b>
-RTMP stream keys are like passwords. Configuring in DM prevents accidental exposure in group chats.`
+<b>/setrtmp &lt;chat_id&gt; &lt;rtmp_url&gt;</b>`
 }
 
 // Get or create RTMP stream for chat
-func getOrCreateRTMPStream(chatID int64) (*tg.RTMPStream, error) {
+func getOrCreateRTMPStream(chatID int64, url, key string) *tg.RTMPStream {
 	rtmpStreamsMu.Lock()
 	defer rtmpStreamsMu.Unlock()
 
 	if stream, exists := rtmpStreams[chatID]; exists {
-		return stream, nil
-	}
-
-	url, key, err := database.RTMP(chatID)
-	if err != nil || url == "" || key == "" {
-		return nil, fmt.Errorf(
-			"RTMP not configured. Admin must use /setrtmp in bot DM first",
-		)
+		return stream
 	}
 
 	stream, err := core.Bot.NewRTMPStream(chatID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create RTMP stream: %w", err)
+		return nil
 	}
 
 	stream.SetLoopCount(0)
@@ -163,7 +89,7 @@ func getOrCreateRTMPStream(chatID int64) (*tg.RTMPStream, error) {
 	})
 
 	rtmpStreams[chatID] = stream
-	return stream, nil
+	return stream
 }
 
 func streamHandler(m *tg.NewMessage) error {
@@ -194,11 +120,9 @@ func handleStream(m *tg.NewMessage, force bool) error {
 		return tg.ErrEndGroup
 	}
 
-	stream, err := getOrCreateRTMPStream(chatID)
-	if err != nil {
-		m.Reply(F(chatID, "rtmp_init_failed", locales.Arg{
-			"error": err.Error(),
-		}))
+	stream := getOrCreateRTMPStream(chatID, url, key)
+	if stream == nil {
+		m.Reply("failed to create rtmp stream")
 		return tg.ErrEndGroup
 	}
 
@@ -268,7 +192,6 @@ func handleStream(m *tg.NewMessage, force bool) error {
 	}
 
 	// Start streaming
-	utils.EOR(replyMsg, F(chatID, "rtmp_starting_stream"))
 
 	if err := stream.Play(filePath); err != nil {
 		utils.EOR(replyMsg, F(chatID, "rtmp_play_failed", locales.Arg{
@@ -278,16 +201,24 @@ func handleStream(m *tg.NewMessage, force bool) error {
 	}
 
 	// Success message
+	btn := tg.NewKeyboard()
+	stopBtn := tg.Button.Data(F(chatID, "CONFIRM_STOP_BTN"), "rtmp_stop")
+	if !config.DisableColour {
+		stopBtn.Danger()
+	}
+	btn.AddRow(stopBtn)
+
 	title := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
 	msgText := F(chatID, "rtmp_now_streaming", locales.Arg{
 		"url":      track.URL,
 		"title":    title,
-		"duration": formatDuration(track.Duration),
+		"duration": utils.FormatDuration(track.Duration),
 		"by":       mention,
 	})
 
 	opt := &tg.SendOptions{
-		ParseMode: "HTML",
+		ParseMode:   "HTML",
+		ReplyMarkup: btn.Build(),
 	}
 
 	if track.Artwork != "" {
@@ -307,7 +238,7 @@ func streamStopHandler(m *tg.NewMessage) error {
 	rtmpStreamsMu.RUnlock()
 
 	if !exists || stream.State() != tg.StreamStatePlaying {
-		m.Reply(F(chatID, "rtmp_not_streaming"))
+		m.Reply(F(chatID, "room_no_active"))
 		return tg.ErrEndGroup
 	}
 
@@ -322,6 +253,37 @@ func streamStopHandler(m *tg.NewMessage) error {
 		"user": utils.MentionHTML(m.Sender),
 	}))
 
+	return tg.ErrEndGroup
+}
+
+func rtmpStopCallbackHandler(cb *tg.CallbackQuery) error {
+	chatID := cb.ChannelID()
+	opt := &tg.CallbackOptions{Alert: true}
+
+	if !checkAdminOrAuth(cb, chatID) {
+		return tg.ErrEndGroup
+	}
+
+	rtmpStreamsMu.RLock()
+	stream, exists := rtmpStreams[chatID]
+	rtmpStreamsMu.RUnlock()
+
+	if !exists || stream.State() != tg.StreamStatePlaying {
+		cb.Answer(F(chatID, "room_no_active"), opt)
+		return tg.ErrEndGroup
+	}
+
+	if err := stream.Stop(); err != nil {
+		cb.Answer(F(chatID, "rtmp_stop_failed", locales.Arg{
+			"error": err.Error(),
+		}), opt)
+		return tg.ErrEndGroup
+	}
+
+	_, _ = cb.Edit(F(chatID, "rtmp_stopped", locales.Arg{
+		"user": utils.MentionHTML(cb.Sender),
+	}))
+	cb.Answer(F(chatID, "cb_stop_success"), &tg.CallbackOptions{})
 	return tg.ErrEndGroup
 }
 
@@ -344,9 +306,7 @@ func streamStatusHandler(m *tg.NewMessage) error {
 
 	if !exists {
 		// RTMP configured but not initialized yet
-		m.Reply(F(chatID, "rtmp_configured_not_started", locales.Arg{
-			"server": maskRTMPURL(url),
-		}))
+		m.Reply(F(chatID, "room_no_active"))
 		return tg.ErrEndGroup
 	}
 
@@ -357,17 +317,10 @@ func streamStatusHandler(m *tg.NewMessage) error {
 	switch state {
 	case tg.StreamStatePlaying:
 		statusText = F(chatID, "rtmp_status_playing", locales.Arg{
-			"position": formatDuration(int(pos.Seconds())),
-			"server":   maskRTMPURL(url),
-		})
-	case tg.StreamStatePaused:
-		statusText = F(chatID, "rtmp_status_paused", locales.Arg{
-			"server": maskRTMPURL(url),
+			"position": utils.FormatDuration(int(pos.Seconds())),
 		})
 	default:
-		statusText = F(chatID, "rtmp_status_idle", locales.Arg{
-			"server": maskRTMPURL(url),
-		})
+		statusText = F(chatID, "room_no_active")
 	}
 
 	m.Reply(statusText)
@@ -380,14 +333,9 @@ func setRTMPHandler(m *tg.NewMessage) error {
 		return tg.ErrEndGroup
 	}
 
-	m.Delete()
-
 	switch m.ChatType() {
 	case tg.EntityChat:
-		m.Reply(F(m.ChannelID(), "rtmp_dm_only", locales.Arg{
-			"cmd":          "/setrtmp",
-			"bot_username": m.Client.Me().Username,
-		}))
+		m.Reply(F(m.ChannelID(), "rtmp_dm_only"))
 		return tg.ErrEndGroup
 	case tg.EntityUser:
 	default:
@@ -428,22 +376,8 @@ func setRTMPHandler(m *tg.NewMessage) error {
 		return tg.ErrEndGroup
 	}
 
-	isAdmin, err := utils.IsChatAdmin(m.Client, targetChatID, m.SenderID())
-	if err != nil {
-		m.Reply(F(m.ChannelID(), "rtmp_check_admin_failed", locales.Arg{
-			"error": err.Error(),
-		}))
-		return tg.ErrEndGroup
-	}
-	if !isAdmin {
-		m.Reply(F(m.ChannelID(), "rtmp_not_admin"))
-		return tg.ErrEndGroup
-	}
-
 	if err := database.SetRTMP(targetChatID, url, key); err != nil {
-		m.Reply(F(m.ChannelID(), "rtmp_init_failed", locales.Arg{
-			"error": err.Error(),
-		}))
+		m.Reply(F(m.ChannelID(), "generic_error", locales.Arg{"error": err.Error()}))
 		return tg.ErrEndGroup
 	}
 
@@ -454,11 +388,7 @@ func setRTMPHandler(m *tg.NewMessage) error {
 	}
 	rtmpStreamsMu.Unlock()
 
-	m.Reply(F(m.ChannelID(), "rtmp_configured_success", locales.Arg{
-		"chat_id": targetChatID,
-		"url":     url,
-		"key":     maskKey(key),
-	}))
+	m.Reply(F(m.ChannelID(), "rtmp_configured_success", locales.Arg{"chat_id": targetChatID}))
 
 	return tg.ErrEndGroup
 }
@@ -471,26 +401,4 @@ func clearRTMPState(chatID int64) {
 		_ = stream.Stop()
 		delete(rtmpStreams, chatID)
 	}
-}
-
-func maskRTMPURL(url string) string {
-	if idx := strings.Index(url, "://"); idx != -1 {
-		proto := url[:idx+3]
-		rest := url[idx+3:]
-		if len(rest) > 10 {
-			return proto + rest[:10] + "***"
-		}
-	}
-	return url
-}
-
-func maskKey(k string) string {
-	l := len(k)
-	if l <= 4 {
-		return "****"
-	}
-	if l <= 8 {
-		return k[:2] + "****" + k[l-2:]
-	}
-	return k[:4] + "****" + k[l-4:]
 }

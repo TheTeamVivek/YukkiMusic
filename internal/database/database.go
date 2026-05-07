@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/Laky-64/gologging"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
@@ -34,8 +35,9 @@ var (
 	settingsColl     *mongo.Collection
 	chatSettingsColl *mongo.Collection
 
-	logger  = gologging.GetLogger("Database")
-	dbCache = utils.NewCache[string, any](60 * time.Minute)
+	logger            = gologging.GetLogger("Database")
+	dbCache           = utils.NewCache[string, any](60 * time.Minute)
+	chatSettingsCache = utils.NewCache[int64, *ChatSettings](60 * time.Minute)
 )
 
 func Init(mongoURL string) (func(), error) {
@@ -63,4 +65,12 @@ func Init(mongoURL string) (func(), error) {
 			logger.Info("MongoDB disconnected successfully")
 		}
 	}, nil
+}
+
+func GetMongoDBStats() (bson.M, error) {
+	ctx, cancel := ctx()
+	defer cancel()
+	var result bson.M
+	err := database.RunCommand(ctx, bson.D{{Key: "dbStats", Value: 1}}).Decode(&result)
+	return result, err
 }

@@ -228,15 +228,6 @@ func (p *YouTubePlatform) Download(
 	return "", errors.New("youtube platform does not support downloading")
 }
 
-func (*YouTubePlatform) CanSearch() bool { return true }
-
-func (p *YouTubePlatform) Search(
-	q string,
-	video bool,
-) ([]*state.Track, error) {
-	return p.GetTracks(q, video)
-}
-
 func (p *YouTubePlatform) VideoSearch(
 	query string,
 	singleOpt ...bool,

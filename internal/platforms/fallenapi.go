@@ -120,15 +120,6 @@ func (f *FallenApiPlatform) Download(
 	return path, nil
 }
 
-func (*FallenApiPlatform) CanSearch() bool { return false }
-
-func (*FallenApiPlatform) Search(
-	string,
-	bool,
-) ([]*state.Track, error) {
-	return nil, nil
-}
-
 func (f *FallenApiPlatform) getDownloadURL(
 	ctx context.Context,
 	mediaURL string,
@@ -159,22 +150,22 @@ func (f *FallenApiPlatform) getDownloadURL(
 	}
 
 	if resp.IsError() {
-		err = fmt.Errorf(
+		err = sanitizeAPIError(fmt.Errorf(
 			"failed to download %s, api request failed with status: %d body: %s",
 			mediaURL,
 			resp.StatusCode(),
 			resp.String(),
-		)
+		), config.FallenAPIKey)
 		gologging.Error(err.Error())
 		return "", err
 	}
 
 	if apiResp.CdnUrl == "" {
-		err = fmt.Errorf(
+		err = sanitizeAPIError(fmt.Errorf(
 			"failed to download %s, empty API response body: %s",
 			mediaURL,
 			resp.String(),
-		)
+		), config.FallenAPIKey)
 		gologging.Error(err.Error())
 		return "", err
 	}

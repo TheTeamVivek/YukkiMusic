@@ -71,7 +71,7 @@ func handleReplay(m *telegram.NewMessage, cplay bool) error {
 		}))
 	} else {
 		trackTitle := utils.EscapeHTML(utils.ShortTitle(t.Title, 25))
-		totalDuration := formatDuration(t.Duration)
+		totalDuration := utils.FormatDuration(t.Duration)
 		m.Reply(F(chatID, "replay_success", locales.Arg{
 			"title":    trackTitle,
 			"duration": totalDuration,
