@@ -55,7 +55,7 @@
         },
         "QUEUE_LIMIT": {
             "description": "The maximum number of tracks allowed in the queue.",
-            "value": "7",
+            "value": "24",
             "required": false
         },
         "DISABLE_COLOUR": {
