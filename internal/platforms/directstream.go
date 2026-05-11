@@ -88,11 +88,8 @@ func (d *DirectStreamPlatform) Name() state.PlatformName {
 }
 
 func (d *DirectStreamPlatform) CanGetTracks(query string) bool {
-	query = strings.TrimSpace(query)
-
-	// Must be a valid URL
-	parsedURL, err := url.Parse(query)
-	if err != nil || parsedURL.Scheme == "" || parsedURL.Host == "" {
+	query, err := sanitizeMediaURL(query)
+	if err != nil {
 		return false
 	}
 
@@ -108,7 +105,10 @@ func (d *DirectStreamPlatform) GetTracks(
 	query string,
 	video bool,
 ) ([]*state.Track, error) {
-	query = strings.TrimSpace(query)
+	query, err := sanitizeMediaURL(query)
+	if err != nil {
+		return nil, err
+	}
 
 	info, err := d.validateStream(query)
 	if err != nil {

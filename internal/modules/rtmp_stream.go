@@ -168,13 +168,9 @@ func handleStream(m *tg.NewMessage, force bool) error {
 	replyMsg, _ = utils.EOR(replyMsg, downloadingText)
 
 	ctx, cancel := context.WithCancel(context.Background())
-	downloadCancels[chatID] = cancel
-	defer func() {
-		if _, ok := downloadCancels[chatID]; ok {
-			delete(downloadCancels, chatID)
-			cancel()
-		}
-	}()
+	downloads.Add(chatID, cancel)
+	defer cancel()
+	defer downloads.Remove(chatID)
 
 	filePath, err := safeDownload(ctx, track, replyMsg, chatID)
 	if err != nil {
@@ -375,7 +371,12 @@ func setRTMPHandler(m *tg.NewMessage) error {
 		m.Reply(F(m.ChannelID(), "rtmp_invalid_chat_id"))
 		return tg.ErrEndGroup
 	}
-
+    
+    if !canUseAdminCommand(m.Client, targetChatID, m.SenderID()) {
+		m.Reply(F(m.ChannelID(), "only_admin"))
+		return tg.ErrEndGroup
+    }    
+    
 	if err := database.SetRTMP(targetChatID, url, key); err != nil {
 		m.Reply(F(m.ChannelID(), "generic_error", locales.Arg{"error": err.Error()}))
 		return tg.ErrEndGroup

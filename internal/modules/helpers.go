@@ -18,11 +18,13 @@
 package modules
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"html"
 	"runtime/debug"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Laky-64/gologging"
@@ -36,7 +38,32 @@ import (
 	"main/internal/utils"
 )
 
-var downloadCancels = make(map[int64]func())
+var downloads = &downloadManager{
+	cancels: make(map[int64]context.CancelFunc),
+}
+
+type downloadManager struct {
+	mu      sync.RWMutex
+	cancels map[int64]context.CancelFunc
+}
+
+func (dm *downloadManager) Add(chatID int64, cancel context.CancelFunc) {
+	dm.mu.Lock()
+	defer dm.mu.Unlock()
+	dm.cancels[chatID] = cancel
+}
+
+func (dm *downloadManager) Remove(chatID int64) bool {
+	dm.mu.Lock()
+	defer dm.mu.Unlock()
+	if cancel, ok := dm.cancels[chatID]; ok {
+		cancel()
+		delete(dm.cancels, chatID)
+		return true
+	}
+	return false
+}
+
 
 func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	chatID := m.ChannelID()

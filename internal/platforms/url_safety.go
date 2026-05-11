@@ -19,6 +19,7 @@ package platforms
 
 import (
 	"errors"
+	"net"
 	"net/url"
 	"strings"
 	"unicode"
@@ -33,7 +34,7 @@ func sanitizeMediaURL(raw string) (string, error) {
 	}
 
 	for _, r := range u {
-		if unicode.IsControl(r) {
+		if unicode.IsControl(r) || unicode.IsSpace(r) {
 			return "", errUnsafeURL
 		}
 	}
@@ -47,8 +48,19 @@ func sanitizeMediaURL(raw string) (string, error) {
 		return "", errUnsafeURL
 	}
 
-	if parsed.Host == "" || parsed.User != nil {
+	host := parsed.Hostname()
+	if host == "" || parsed.User != nil {
 		return "", errUnsafeURL
+	}
+
+	if strings.EqualFold(host, "localhost") {
+		return "", errUnsafeURL
+	}
+
+	if ip := net.ParseIP(host); ip != nil {
+		if ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsPrivate() || ip.IsUnspecified(){
+			return "", errUnsafeURL
+		}
 	}
 
 	return parsed.String(), nil
