@@ -133,11 +133,7 @@ func (y *YtdlpPlatform) CanGetTracks(query string) bool {
 		return false
 	}
 
-	// Must be a URL
-	parsedURL, err := url.Parse(query)
-	if err != nil || parsedURL.Scheme == "" || parsedURL.Host == "" {
-		return false
-	}
+	parsedURL, _ := url.Parse(query)
 
 	host := strings.ToLower(parsedURL.Host)
 
