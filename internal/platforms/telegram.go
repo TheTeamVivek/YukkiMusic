@@ -121,26 +121,6 @@ func (t *TelegramPlatform) GetTracks(
 
 		track.Video = isVideo
 
-		if isVideo {
-			if err := os.MkdirAll("cache", os.ModePerm); err != nil {
-				gologging.Error("Failed to create cache folder: " + err.Error())
-				return []*state.Track{track}, nil
-			}
-
-			thumbPath := filepath.Join("cache", "thumb_"+track.ID+".jpg")
-			if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-				path, err := msg.Download(&telegram.DownloadOptions{
-					ThumbOnly: true,
-					FileName:  thumbPath,
-				})
-				if err == nil {
-					if _, err := os.Stat(path); err == nil {
-						track.Artwork = path
-					}
-				}
-			}
-		}
-
 		return []*state.Track{track}, nil
 	}
 
