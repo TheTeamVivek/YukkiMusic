@@ -29,7 +29,7 @@ var clientRegistry = struct {
 
 func init() {
 	C.ntg_register_logger(
-		(C.ntg_log_message_callback)(unsafe.Pointer(C.handleLogs)),
+		C.ntg_log_message_callback(unsafe.Pointer(C.handleLogs)),
 	)
 }
 
@@ -46,46 +46,46 @@ func NTgCalls() *Client {
 
 	C.ntg_on_stream_end(
 		C.uintptr_t(instance.ptr),
-		(C.ntg_stream_callback)(unsafe.Pointer(C.handleStreamEnd)),
+		C.ntg_stream_callback(unsafe.Pointer(C.handleStreamEnd)),
 		userDataToken,
 	)
 	C.ntg_on_upgrade(
 		C.uintptr_t(instance.ptr),
-		(C.ntg_upgrade_callback)(unsafe.Pointer(C.handleUpgrade)),
+		C.ntg_upgrade_callback(unsafe.Pointer(C.handleUpgrade)),
 		userDataToken,
 	)
 	C.ntg_on_signaling_data(
 		C.uintptr_t(instance.ptr),
-		(C.ntg_signaling_callback)(unsafe.Pointer(C.handleSignal)),
+		C.ntg_signaling_callback(unsafe.Pointer(C.handleSignal)),
 		userDataToken,
 	)
 	C.ntg_on_connection_change(
 		C.uintptr_t(instance.ptr),
-		(C.ntg_connection_callback)(unsafe.Pointer(C.handleConnectionChange)),
+		C.ntg_connection_callback(unsafe.Pointer(C.handleConnectionChange)),
 		userDataToken,
 	)
 	C.ntg_on_frames(
 		C.uintptr_t(instance.ptr),
-		(C.ntg_frame_callback)(unsafe.Pointer(C.handleFrames)),
+		C.ntg_frame_callback(unsafe.Pointer(C.handleFrames)),
 		userDataToken,
 	)
 	C.ntg_on_remote_source_change(
 		C.uintptr_t(instance.ptr),
-		(C.ntg_remote_source_callback)(
+		C.ntg_remote_source_callback(
 			unsafe.Pointer(C.handleRemoteSourceChange),
 		),
 		userDataToken,
 	)
 	C.ntg_on_request_broadcast_timestamp(
 		C.uintptr_t(instance.ptr),
-		(C.ntg_broadcast_timestamp_callback)(
+		C.ntg_broadcast_timestamp_callback(
 			unsafe.Pointer(C.handleRequestBroadcastTimestamp),
 		),
 		userDataToken,
 	)
 	C.ntg_on_request_broadcast_part(
 		C.uintptr_t(instance.ptr),
-		(C.ntg_broadcast_part_callback)(
+		C.ntg_broadcast_part_callback(
 			unsafe.Pointer(C.handleRequestBroadcastPart),
 		),
 		userDataToken,

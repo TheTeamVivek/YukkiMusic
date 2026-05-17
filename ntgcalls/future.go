@@ -28,7 +28,7 @@ func CreateFuture() *Future {
 func (ctx *Future) ParseToC() C.ntg_async_struct {
 	var x C.ntg_async_struct
 	x.userData = unsafe.Pointer(ctx.mutex)
-	x.promise = (C.ntg_async_callback)(unsafe.Pointer(C.unlockMutex))
+	x.promise = C.ntg_async_callback(unsafe.Pointer(C.unlockMutex))
 	x.errorCode = (*C.int)(unsafe.Pointer(ctx.errCode))
 	x.errorMessage = ctx.errMessage
 	return x

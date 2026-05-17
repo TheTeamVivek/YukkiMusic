@@ -371,12 +371,12 @@ func setRTMPHandler(m *tg.NewMessage) error {
 		m.Reply(F(m.ChannelID(), "rtmp_invalid_chat_id"))
 		return tg.ErrEndGroup
 	}
-    
-    if !canUseAdminCommand(m.Client, targetChatID, m.SenderID()) {
+
+	if !canUseAdminCommand(m.Client, targetChatID, m.SenderID()) {
 		m.Reply(F(m.ChannelID(), "only_admin"))
 		return tg.ErrEndGroup
-    }    
-    
+	}
+
 	if err := database.SetRTMP(targetChatID, url, key); err != nil {
 		m.Reply(F(m.ChannelID(), "generic_error", locales.Arg{"error": err.Error()}))
 		return tg.ErrEndGroup

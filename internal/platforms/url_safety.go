@@ -58,7 +58,8 @@ func sanitizeMediaURL(raw string) (string, error) {
 	}
 
 	if ip := net.ParseIP(host); ip != nil {
-		if ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsPrivate() || ip.IsUnspecified(){
+		if ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsPrivate() ||
+			ip.IsUnspecified() {
 			return "", errUnsafeURL
 		}
 	}

@@ -257,7 +257,8 @@ func (y *YtdlpPlatform) Download(
 			"(b[height>=360][height<=1080]/bv*[height>=360][height<=1080]/bv*)+(ba[abr>=180][abr<=360]/ba)/b",
 		)
 	} else {
-		args = append(args,
+		args = append(
+			args,
 			"-f", "ba[abr>=180][abr<=360]/ba",
 			"-x",
 			"--concurrent-fragments", "4",

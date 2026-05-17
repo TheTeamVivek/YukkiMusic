@@ -64,7 +64,6 @@ func (dm *downloadManager) Remove(chatID int64) bool {
 	return false
 }
 
-
 func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	chatID := m.ChannelID()
 

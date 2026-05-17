@@ -22,13 +22,11 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/core"

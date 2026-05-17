@@ -121,7 +121,8 @@ func handleAddSudo(m *telegram.NewMessage) error {
 		// Update commands for this sudo user
 		sudoCommands := append(
 			AllCommands.PrivateUserCommands,
-			AllCommands.PrivateSudoCommands...)
+			AllCommands.PrivateSudoCommands...,
+		)
 
 		if _, err := m.Client.BotsSetBotCommands(
 			&telegram.BotCommandScopePeer{
