@@ -51,8 +51,8 @@ func init() {
 		gologging.Fatal("Failed to copy embedded cookies:", err)
 	}
 
-	urls := strings.Fields(config.CookiesLink)
-	for _, url := range urls {
+	urls := strings.FieldsSeq(config.CookiesLink)
+	for url := range urls {
 		if err := downloadCookieFile(url); err != nil {
 			gologging.WarnF(
 				"Failed to download cookie file from %s: %v",

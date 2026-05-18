@@ -275,7 +275,7 @@ func findMediaInReply(m *telegram.NewMessage) (*telegram.NewMessage, bool, error
 		return nil, false, fmt.Errorf("failed to get replied message: %w", err)
 	}
 
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		gologging.Debug(
 			"Checking reply level " + strconv.Itoa(i+1) + " for playable media",
 		)

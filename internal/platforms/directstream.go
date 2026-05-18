@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"path"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -158,10 +159,8 @@ func (d *DirectStreamPlatform) looksLikeStream(urlStr string) bool {
 	parsedURL, _ := url.Parse(urlStr)
 	ext := strings.ToLower(path.Ext(parsedURL.Path))
 
-	for _, streamExt := range streamExtensions {
-		if ext == streamExt {
-			return true
-		}
+	if slices.Contains(streamExtensions, ext) {
+		return true
 	}
 
 	// Check URL patterns

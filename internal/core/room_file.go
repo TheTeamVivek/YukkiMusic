@@ -46,10 +46,7 @@ func isTrackUsed(trackID string, skipChatID int64) bool {
 
 // checks first N (2) queued tracks
 func isTrackInQueue(trackID string, queue []*state.Track) bool {
-	limit := 2
-	if len(queue) < limit {
-		limit = len(queue)
-	}
+	limit := min(len(queue), 2)
 
 	for _, q := range queue[:limit] {
 		if q != nil && q.ID == trackID {

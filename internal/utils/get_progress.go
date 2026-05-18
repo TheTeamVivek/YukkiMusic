@@ -77,10 +77,7 @@ func GetProgressBar(playedSec, durationSec int) string {
 		return progressBarCache[9]
 	}
 
-	index := (playedSec * 10) / durationSec
-	if index > 9 {
-		index = 9
-	}
+	index := min((playedSec*10)/durationSec, 9)
 
 	return progressBarCache[index]
 }

@@ -151,7 +151,7 @@ func main() {
 	if result.IsValid() && result.Kind() != reflect.Invalid {
 		val := result.Interface()
 		rv := reflect.ValueOf(val)
-		for rv.Kind() == reflect.Ptr {
+		for rv.Kind() == reflect.Pointer {
 			if rv.IsNil() {
 				break
 			}

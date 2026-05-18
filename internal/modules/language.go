@@ -33,7 +33,7 @@ func langHandler(m *telegram.NewMessage) error {
 	return showLangMenu(m, false)
 }
 
-func showLangMenu(m interface{}, isCallback bool) error {
+func showLangMenu(m any, isCallback bool) error {
 	var chatID int64
 	if isCallback {
 		cb := m.(*telegram.CallbackQuery)
