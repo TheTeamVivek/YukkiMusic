@@ -28,7 +28,6 @@ import (
 	"time"
 
 	"github.com/Laky-64/gologging"
-	"github.com/joho/godotenv"
 )
 
 var (
@@ -70,7 +69,7 @@ var (
 )
 
 func Load() (func(), error) {
-	godotenv.Load()
+	loadEnv(".env")
 	if err := initLogging(); err != nil {
 		return nil, fmt.Errorf("config: logging init failed: %w", err)
 	}
