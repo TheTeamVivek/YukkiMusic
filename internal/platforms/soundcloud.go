@@ -52,7 +52,7 @@ func init() {
 }
 
 func (s *SoundCloudPlatform) Name() state.PlatformName { return PlatformSoundCloud }
-func (s *SoundCloudPlatform) Priority() int             { return 85 }
+func (s *SoundCloudPlatform) Priority() int            { return 85 }
 
 func (s *SoundCloudPlatform) CanGet(query string) bool {
 	return soundcloudLinkRe.MatchString(strings.TrimSpace(query))

@@ -86,7 +86,7 @@ func init() {
 }
 
 func (d *DirectStreamPlatform) Name() state.PlatformName { return PlatformDirectStream }
-func (d *DirectStreamPlatform) Priority() int             { return 65 }
+func (d *DirectStreamPlatform) Priority() int            { return 65 }
 
 func (d *DirectStreamPlatform) CanGet(query string) bool {
 	if _, err := sanitizeMediaURL(query); err != nil {
@@ -191,7 +191,7 @@ func (d *DirectStreamPlatform) looksLikeStream(urlStr string) bool {
 
 func (d *DirectStreamPlatform) validateStream(urlStr string) (*streamInfo, error) {
 	client := rc.
-		SetTimeout(10 * time.Second).
+		SetTimeout(10*time.Second).
 		SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
 
 	resp, err := client.R().Head(urlStr)
@@ -246,7 +246,7 @@ func (d *DirectStreamPlatform) validateStream(urlStr string) (*streamInfo, error
 func (d *DirectStreamPlatform) generateID(urlStr string) string {
 	h := 0
 	for _, c := range urlStr {
-		h = (h<<5) - h + int(c)
+		h = (h << 5) - h + int(c)
 	}
 	if h < 0 {
 		h = -h

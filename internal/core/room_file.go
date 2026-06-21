@@ -27,7 +27,7 @@ import (
 	state "main/internal/core/models"
 )
 
-var FileCacheDuration = 1 *time.Minute
+var FileCacheDuration = 1 * time.Minute
 
 func isTrackUsed(trackID string, skipChatID int64) bool {
 	for _, room := range rooms {
@@ -46,7 +46,7 @@ func isTrackUsed(trackID string, skipChatID int64) bool {
 
 func isTrackInQueue(trackID string, queue []*state.Track) bool {
 	limit := min(len(queue), 2)
-    for _, q := range queue[:limit] {
+	for _, q := range queue[:limit] {
 		if q != nil && q.ID == trackID {
 			return true
 		}

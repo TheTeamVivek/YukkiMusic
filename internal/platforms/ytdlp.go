@@ -79,7 +79,7 @@ func init() {
 }
 
 func (y *YtdlpPlatform) Name() state.PlatformName { return PlatformYtDlp }
-func (y *YtdlpPlatform) Priority() int             { return 60 }
+func (y *YtdlpPlatform) Priority() int            { return 60 }
 
 func (y *YtdlpPlatform) CanGet(query string) bool {
 	if _, err := sanitizeMediaURL(query); err != nil {

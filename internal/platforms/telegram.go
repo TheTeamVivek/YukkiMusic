@@ -57,7 +57,7 @@ func init() {
 }
 
 func (t *TelegramPlatform) Name() state.PlatformName { return PlatformTelegram }
-func (t *TelegramPlatform) Priority() int             { return 100 }
+func (t *TelegramPlatform) Priority() int            { return 100 }
 
 func (t *TelegramPlatform) CanGet(query string) bool {
 	return telegramLinkRegex.MatchString(strings.TrimSpace(query))

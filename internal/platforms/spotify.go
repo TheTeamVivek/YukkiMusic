@@ -60,7 +60,7 @@ func init() {
 }
 
 func (s *SpotifyPlatform) Name() state.PlatformName { return PlatformSpotify }
-func (s *SpotifyPlatform) Priority() int             { return 95 }
+func (s *SpotifyPlatform) Priority() int            { return 95 }
 
 func (s *SpotifyPlatform) CanGet(query string) bool {
 	return spotifyLinkRe.MatchString(query)

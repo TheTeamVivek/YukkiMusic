@@ -52,7 +52,7 @@ func init() {
 }
 
 func (f *FallenApiPlatform) Name() state.PlatformName { return PlatformFallenApi }
-func (f *FallenApiPlatform) Priority() int             { return 80 }
+func (f *FallenApiPlatform) Priority() int            { return 80 }
 
 func (f *FallenApiPlatform) CanGet(_ string) bool { return false }
 
