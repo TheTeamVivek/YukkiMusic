@@ -39,7 +39,7 @@ import (
 
 	"github.com/Laky-64/gologging"
 
-	"main/internal/config"
+	"main/config"
 	"main/internal/core"
 	"main/internal/database"
 	"main/internal/locales"

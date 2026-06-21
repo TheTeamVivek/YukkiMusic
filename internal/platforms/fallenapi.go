@@ -29,7 +29,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/config"
+	"main/config"
 	"main/internal/core"
 	state "main/internal/core/models"
 	"main/internal/utils"

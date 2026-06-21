@@ -30,7 +30,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"resty.dev/v3"
 
-	"main/internal/config"
+	"main/config"
 )
 
 const cookieDir = "internal/cookies"

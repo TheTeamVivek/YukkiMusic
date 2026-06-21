@@ -17,7 +17,7 @@
 
 package database
 
-import "main/internal/config"
+import "main/config"
 
 func Language(chatID int64) (string, error) {
 	settings, err := getChatSettings(chatID)

@@ -22,7 +22,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/config"
+	"main/config"
 	"main/internal/core"
 	"main/internal/database"
 	"main/internal/locales"

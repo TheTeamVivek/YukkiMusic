@@ -28,7 +28,7 @@ import (
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/mem"
 
-	"main/internal/config"
+	"main/config"
 	"main/internal/database"
 	"main/internal/locales"
 	"main/ntgcalls"

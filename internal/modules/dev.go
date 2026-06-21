@@ -30,7 +30,7 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/config"
+	"main/config"
 	"main/internal/core"
 )
 

@@ -23,7 +23,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/config"
+	"main/config"
 )
 
 type TgLogger struct {
