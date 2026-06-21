@@ -5,7 +5,6 @@ go 1.26
 require (
 	github.com/Laky-64/gologging v1.1.0
 	github.com/amarnathcjd/gogram v1.7.3-0.20260314054505-186e726d4d88
-	github.com/joho/godotenv v1.5.1
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/showwin/speedtest-go v1.7.10
 	github.com/traefik/yaegi v0.16.1
