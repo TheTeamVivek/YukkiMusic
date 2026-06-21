@@ -857,34 +857,6 @@ speed_set_with_reset: |
   🚀 تم تعيين سرعة التشغيل إلى <b>{speed}x</b> بواسطة {user}.
   ⏳ ستعود للوضع الطبيعي بعد <b>{duration}</b> ثانية.
 
-
-spt_fetch_fail: "⚠️ فشل جلب معلومات الشبكة: <code>{error}</code>"
-spt_servers_fetch_fail: "⚠️ فشل جلب الخوادم: <code>{error}</code>"
-spt_best_server_fail: "⚠️ فشل العثور على أفضل خادم: <code>{error}</code>"
-
-spt_running_download: "🚀 جاري اختبار سرعة التنزيل..."
-spt_running_upload: "📤 جاري اختبار سرعة الرفع..."
-
-spt_result: |
-  <b>📡 نتيجة اختبار السرعة</b>
-
-  <b><u>👤 العميل</u></b>
-  IP: <code>{ip}</code>
-  المزود: {isp}
-  خط العرض: <code>{lat}</code>
-  خط الطول: <code>{lon}</code>
-
-  <b><u>🛰️ الخادم</u></b>
-  الاسم: {server_name}
-  الدولة: {country}
-  الراعي: {sponsor}
-  المسافة: {distance_km} كم
-  التأخير: {latency_ms} مللي ثانية
-
-  <b><u>⚡ السرعة</u></b>
-  التنزيل: <code>{dl_mbps} ميجا/ث</code>
-  الرفع: <code>{ul_mbps} ميجا/ث</code>
-
 start_private: "مرحباً {user}، اسمي {bot}.\n\nأنا مساعد آلي لبث الموسيقى على تيليجرام مع ميزات مفيدة. أدعم منصات مثل Youtube و Spotify و JioSaavn و Soundcloud وغيرها.\n\nلا تتردد في إضافتي إلى مجموعاتك."
 
 start_group: "<b>💫 أنا هنا!</b> جرب أمراً ما... إذا كنت تظن أنك تستطيع السيطرة علي 😉"

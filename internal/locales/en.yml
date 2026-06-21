@@ -860,34 +860,6 @@ speed_set_with_reset: |
   🚀 Playback speed set to <b>{speed}x</b> by {user}.
   ⏳ Will reset to normal after <b>{duration}</b> seconds.
 
-
-spt_fetch_fail: "⚠️ Failed to fetch network info: <code>{error}</code>"
-spt_servers_fetch_fail: "⚠️ Failed to fetch servers: <code>{error}</code>"
-spt_best_server_fail: "⚠️ Failed to find best server: <code>{error}</code>"
-
-spt_running_download: "🚀 Running download test..."
-spt_running_upload: "📤 Running upload test..."
-
-spt_result: |
-  <b>📡 SpeedTest Result</b>
-
-  <b><u>👤 Client</u></b>
-  IP: <code>{ip}</code>
-  ISP: {isp}
-  Lat: <code>{lat}</code>
-  Lon: <code>{lon}</code>
-
-  <b><u>🛰️ Server</u></b>
-  Name: {server_name}
-  Country: {country}
-  Sponsor: {sponsor}
-  Distance: {distance_km} km
-  Latency: {latency_ms} ms
-
-  <b><u>⚡ Speed</u></b>
-  Download: <code>{dl_mbps} Mbps</code>
-  Upload: <code>{ul_mbps} Mbps</code>
-
 start_private: "Hello {user}, My name is {bot}.\n\nI'm a telegram streaming bot with some useful features. Supporting platforms like Youtube, Spotify, JioSaavn, Soundcloud etc.\n\nFeel free to add me to your groups."
 
 start_group: "<b>💫 I’m here!</b> Try a command… if you think you can handle me 😉"

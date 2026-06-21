@@ -103,12 +103,6 @@ var handlers = []MsgHandlerDef{
 	},
 
 	{
-		Pattern: "(speedtest|spt)",
-		Handler: sptHandle,
-		Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter},
-	},
-
-	{
 		Pattern: "(broadcast|gcast|bcast)",
 		Handler: broadcastHandler,
 		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},

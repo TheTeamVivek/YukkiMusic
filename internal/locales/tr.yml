@@ -854,34 +854,6 @@ speed_set_with_reset: |
   🚀 Oynatma hızı {user} tarafından <b>{speed}x</b> olarak ayarlandı.
   ⏳ <b>{duration}</b> saniye sonra normale dönecek.
 
-
-spt_fetch_fail: "⚠️ Ağ bilgileri alınamadı: <code>{error}</code>"
-spt_servers_fetch_fail: "⚠️ Sunucular alınamadı: <code>{error}</code>"
-spt_best_server_fail: "⚠️ En iyi sunucu bulunamadı: <code>{error}</code>"
-
-spt_running_download: "🚀 İndirme testi yapılıyor..."
-spt_running_upload: "📤 Yükleme testi yapılıyor..."
-
-spt_result: |
-  <b>📡 Hız Testi Sonucu</b>
-
-  <b><u>👤 İstemci</u></b>
-  IP: <code>{ip}</code>
-  İSS: {isp}
-  Enlem: <code>{lat}</code>
-  Boylam: <code>{lon}</code>
-
-  <b><u>🛰️ Sunucu</u></b>
-  Ad: {server_name}
-  Ülke: {country}
-  Sponsor: {sponsor}
-  Mesafe: {distance_km} km
-  Gecikme: {latency_ms} ms
-
-  <b><u>⚡ Hız</u></b>
-  İndirme: <code>{dl_mbps} Mbps</code>
-  Yükleme: <code>{ul_mbps} Mbps</code>
-
 start_private: "Merhaba {user}, Benim adım {bot}.\n\nBen bazı kullanışlı özelliklere sahip bir Telegram akış botuyum. Youtube, Spotify, JioSaavn, Soundcloud vb. platformları destekliyorum.\n\nBeni gruplarına eklemekten çekinme."
 
 start_group: "<b>💫 Buradayım!</b> Bir komut dene... Tabi benimle başa çıkabileceğini düşünüyorsan 😉"
