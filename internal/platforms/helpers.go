@@ -29,29 +29,26 @@ import (
 	state "main/internal/core/models"
 )
 
+var errUnsafeURL = errors.New("invalid or unsafe url")
+
 func getPath(track *state.Track, ext string) string {
 	if ext != "" && !strings.HasPrefix(ext, ".") {
 		ext = "." + ext
 	}
-
-	mediaType := "audio"
+	t := "audio"
 	if track.Video {
-		mediaType = "video"
+		t = "video"
 	}
-
-	filename := mediaType + "_" + track.ID + ext
-
-	return filepath.Join("downloads", filename)
+	return filepath.Join("downloads", t+"_"+track.ID+ext)
 }
 
 func fileExists(path string) bool {
-	i, err := os.Stat(path)
+	info, err := os.Stat(path)
 	if err != nil {
-		gologging.ErrorF("os.Stat: %v", err)
+		gologging.Debug("fileExists: " + path + " not found")
 		return false
 	}
-
-	return i.Size() > 0
+	return info.Size() > 0
 }
 
 func findFile(track *state.Track) string {
@@ -59,19 +56,15 @@ func findFile(track *state.Track) string {
 	if track.Video {
 		t = "video"
 	}
-
 	files, err := filepath.Glob(filepath.Join("downloads", t+"_"+track.ID+"*"))
 	if err != nil {
-		gologging.ErrorF("filepath.Glob: %v", err)
 		return ""
 	}
-
 	for _, f := range files {
-		if i, err := os.Stat(f); err == nil && i.Size() > 0 {
+		if info, err := os.Stat(f); err == nil && info.Size() > 0 {
 			return f
 		}
 	}
-
 	return ""
 }
 
@@ -80,12 +73,10 @@ func findAndRemove(track *state.Track) {
 	if track.Video {
 		t = "video"
 	}
-
 	files, err := filepath.Glob(filepath.Join("downloads", t+"_"+track.ID+"*"))
 	if err != nil {
 		return
 	}
-
 	for _, f := range files {
 		os.Remove(f)
 	}
@@ -95,48 +86,85 @@ func sanitizeAPIError(err error, apiKey string) error {
 	if err == nil || apiKey == "" {
 		return err
 	}
-	masked := strings.ReplaceAll(err.Error(), apiKey, "***REDACTED***")
-	return errors.New(masked)
+	return errors.New(strings.ReplaceAll(err.Error(), apiKey, "***REDACTED***"))
 }
 
-func playableMedia(m *telegram.NewMessage) (bool, bool) {
-	if m == nil {
-		return false, false
+func firstNonEmpty(vals ...string) string {
+	for _, v := range vals {
+		if v != "" {
+			return v
+		}
 	}
+	return ""
+}
 
+func playableMedia(m *telegram.NewMessage) (isVideo, isAudio bool) {
+	if m == nil {
+		return
+	}
 	check := func(msg *telegram.NewMessage) (bool, bool) {
 		switch {
 		case msg.Audio() != nil, msg.Voice() != nil:
 			return false, true
-
 		case msg.Video() != nil:
 			return true, false
-
 		case msg.Document() != nil:
-			mimeType := strings.ToLower(msg.Document().MimeType)
-
-			if mimeType == "" {
-				return false, false
-			}
-
+			mt := strings.ToLower(msg.Document().MimeType)
 			switch {
-			case strings.HasPrefix(mimeType, "audio/"):
+			case strings.HasPrefix(mt, "audio/"):
 				return false, true
-			case strings.HasPrefix(mimeType, "video/"):
+			case strings.HasPrefix(mt, "video/"):
 				return true, false
 			}
 		}
-
 		return false, false
 	}
-
 	if m.IsReply() {
 		rmsg, err := m.GetReplyMessage()
 		if err != nil {
-			return false, false
+			return
 		}
 		return check(rmsg)
 	}
-
 	return check(m)
+}
+
+func sanitizeMediaURL(raw string) (string, error) {
+	u := strings.TrimSpace(raw)
+	if u == "" {
+		return "", errUnsafeURL
+	}
+
+	for _, r := range u {
+		if unicode.IsControl(r) || unicode.IsSpace(r) {
+			return "", errUnsafeURL
+		}
+	}
+
+	parsed, err := url.Parse(u)
+	if err != nil {
+		return "", errUnsafeURL
+	}
+
+	if parsed.Scheme != "http" && parsed.Scheme != "https" {
+		return "", errUnsafeURL
+	}
+
+	host := parsed.Hostname()
+	if host == "" || parsed.User != nil {
+		return "", errUnsafeURL
+	}
+
+	if strings.EqualFold(host, "localhost") {
+		return "", errUnsafeURL
+	}
+
+	if ip := net.ParseIP(host); ip != nil {
+		if ip.IsLoopback() || ip.IsLinkLocalUnicast() ||
+			ip.IsLinkLocalMulticast() || ip.IsPrivate() || ip.IsUnspecified() {
+			return "", errUnsafeURL
+		}
+	}
+
+	return parsed.String(), nil
 }

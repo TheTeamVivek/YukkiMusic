@@ -1,10 +1,13 @@
 name: format codes
 
+permissions:
+  contents: write
+  
 on:
   workflow_dispatch:
 
 jobs:
-  format_and_lint:
+  format:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,19 +32,13 @@ jobs:
         if: steps.cache-tools.outputs.cache-hit != 'true'
         run: |
           go install golang.org/x/tools/cmd/goimports@latest
-          go install mvdan.cc/gofumpt@latest
-          go install github.com/segmentio/golines@latest
-          go install github.com/daixiang0/gci@latest
-          go install honnef.co/go/tools/cmd/staticcheck@latest
-
+          
       - name: Format Code
         run: |
           go mod tidy
           gofmt -w .
           goimports -w .
-          gci write . -s standard -s default -s "prefix(main)"
-          gofumpt -w -extra .
-          golines -w --max-len=120 .
+          go fix ./...
           go mod tidy
 
       - name: Commit changes
@@ -52,8 +49,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
           BRANCH_NAME="${GITHUB_REF##*/}"
-
-          # git add $(find . -name '*.go' -not -path './ntgcalls/*') go.mod go.sum
 
           git add $(find . -name '*.go') go.mod go.sum
           git diff --cached --quiet || git commit -m "style: format codes"

@@ -37,92 +37,66 @@ import (
 	"main/internal/utils"
 )
 
+const PlatformSpotify state.PlatformName = "Spotify"
+
 type SpotifyPlatform struct {
-	name       state.PlatformName
 	client     *spotify.Client
 	clientOnce sync.Once
 	initErr    error
 }
 
 var (
-	spotifyTrackRegex = regexp.MustCompile(
-		`(?i)spotify\.com/track/([a-zA-Z0-9]+)`,
-	)
-	spotifyPlaylistRegex = regexp.MustCompile(
-		`(?i)spotify\.com/playlist/([a-zA-Z0-9]+)`,
-	)
-	spotifyAlbumRegex = regexp.MustCompile(
-		`(?i)spotify\.com/album/([a-zA-Z0-9]+)`,
-	)
-	spotifyArtistRegex = regexp.MustCompile(
-		`(?i)spotify\.com/artist/([a-zA-Z0-9]+)`,
-	)
-	spotifyLinkRegex = regexp.MustCompile(
-		`(?i)^(https?:\/\/)?(open\.)?spotify\.com\/`,
-	)
-	nameCleanupRe = regexp.MustCompile(`[\(\[].*?[\)\]]`)
-	spotifyCache  = utils.NewCache[string, []*state.Track](1 * time.Hour)
+	spotifyTrackRe    = regexp.MustCompile(`(?i)spotify\.com/track/([a-zA-Z0-9]+)`)
+	spotifyPlaylistRe = regexp.MustCompile(`(?i)spotify\.com/playlist/([a-zA-Z0-9]+)`)
+	spotifyAlbumRe    = regexp.MustCompile(`(?i)spotify\.com/album/([a-zA-Z0-9]+)`)
+	spotifyArtistRe   = regexp.MustCompile(`(?i)spotify\.com/artist/([a-zA-Z0-9]+)`)
+	spotifyLinkRe     = regexp.MustCompile(`(?i)^(https?:\/\/)?(open\.)?spotify\.com\/`)
+	nameCleanupRe     = regexp.MustCompile(`[\(\[].*?[\)\]]`)
+	spotifyCache      = utils.NewCache[string, []*state.Track](1 * time.Hour)
 )
 
-const PlatformSpotify state.PlatformName = "Spotify"
-
 func init() {
-	Register(95, &SpotifyPlatform{
-		name: PlatformSpotify,
-	})
+	Register(&SpotifyPlatform{})
 }
 
-func (s *SpotifyPlatform) Name() state.PlatformName {
-	return s.name
+func (s *SpotifyPlatform) Name() state.PlatformName { return PlatformSpotify }
+func (s *SpotifyPlatform) Priority() int             { return 95 }
+
+func (s *SpotifyPlatform) CanGet(query string) bool {
+	return spotifyLinkRe.MatchString(query)
 }
 
-func (s *SpotifyPlatform) CanGetTracks(query string) bool {
-	return spotifyLinkRegex.MatchString(query)
-}
-
-func (s *SpotifyPlatform) GetTracks(
-	query string,
-	video bool,
-) ([]*state.Track, error) {
+func (s *SpotifyPlatform) Get(query string, video bool) ([]*state.Track, error) {
 	if config.SpotifyClientID == "" || config.SpotifyClientSecret == "" {
-		return nil, errors.New(
-			"spotify client credentials not configured. Set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET",
-		)
+		return nil, errors.New("SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET not configured")
 	}
 
-	// Check cache first
 	cacheKey := "spotify:" + strings.ToLower(query)
 	if cached, ok := spotifyCache.Get(cacheKey); ok {
-		return updateVideoFlag(cached, video), nil
+		return withVideo(cached, video), nil
 	}
 
-	// Initialize client if needed
 	if err := s.ensureClient(); err != nil {
-		return nil, fmt.Errorf("failed to initialize Spotify client: %w", err)
+		return nil, fmt.Errorf("spotify client init failed: %w", err)
 	}
-
-	var tracks []*state.Track
-	var err error
 
 	ctx := context.Background()
+	var (
+		tracks []*state.Track
+		err    error
+	)
 
-	// Handle different Spotify URL types
-	if matches := spotifyTrackRegex.FindStringSubmatch(query); len(
-		matches,
-	) > 1 {
-		trackID := spotify.ID(matches[1])
-		tracks, err = s.getTrack(ctx, trackID)
-	} else if matches := spotifyPlaylistRegex.FindStringSubmatch(query); len(matches) > 1 {
-		playlistID := spotify.ID(matches[1])
-		tracks, err = s.getPlaylist(ctx, playlistID)
-	} else if matches := spotifyAlbumRegex.FindStringSubmatch(query); len(matches) > 1 {
-		albumID := spotify.ID(matches[1])
-		tracks, err = s.getAlbum(ctx, albumID)
-	} else if matches := spotifyArtistRegex.FindStringSubmatch(query); len(matches) > 1 {
-		artistID := spotify.ID(matches[1])
-		tracks, err = s.getArtistTopTracks(ctx, artistID)
-	} else {
-		return nil, errors.New("invalid Spotify URL format. Supported: tracks, playlists, albums, artists")
+	switch {
+	case spotifyTrackRe.MatchString(query):
+		tracks, err = s.getTrack(ctx, spotify.ID(spotifyTrackRe.FindStringSubmatch(query)[1]))
+	case spotifyPlaylistRe.MatchString(query):
+		tracks, err = s.getPlaylist(ctx, spotify.ID(spotifyPlaylistRe.FindStringSubmatch(query)[1]))
+	case spotifyAlbumRe.MatchString(query):
+		tracks, err = s.getAlbum(ctx, spotify.ID(spotifyAlbumRe.FindStringSubmatch(query)[1]))
+	case spotifyArtistRe.MatchString(query):
+		tracks, err = s.getArtistTop(ctx, spotify.ID(spotifyArtistRe.FindStringSubmatch(query)[1]))
+	default:
+		return nil, errors.New("unsupported Spotify URL (track/playlist/album/artist only)")
 	}
 
 	if err != nil {
@@ -133,293 +107,186 @@ func (s *SpotifyPlatform) GetTracks(
 		spotifyCache.Set(cacheKey, tracks)
 	}
 
-	return updateVideoFlag(tracks, video), nil
+	return withVideo(tracks, video), nil
 }
 
 func (s *SpotifyPlatform) CanDownload(source state.PlatformName) bool {
-	return source == s.name
+	return source == PlatformSpotify
 }
 
+// Download resolves the Spotify track to a YouTube URL and redispatches.
+// The registry's Download loop will then pick FallenApi or YtDlp.
 func (s *SpotifyPlatform) Download(
-	ctx context.Context,
+	_ context.Context,
 	track *state.Track,
-	statusMsg *telegram.NewMessage,
+	_ *telegram.NewMessage,
 ) (string, error) {
-	clean := cleanTitle(track.Title)
-	trimmed := trimTitleLen(clean, 25, 40)
+	ytTrack, err := s.resolveToYouTube(track)
+	if err != nil {
+		return "", err
+	}
+	return "", &RedispatchError{Track: ytTrack}
+}
 
-	var queries []string
-
-	if clean != "" {
-		queries = append(queries, clean)
+func (s *SpotifyPlatform) resolveToYouTube(track *state.Track) (*state.Track, error) {
+	yt, ok := GetPlatform(PlatformYouTube)
+	if !ok {
+		return nil, errors.New("youtube platform not registered")
 	}
 
-	if clean != "" && trimmed != "" && trimmed != clean {
-		queries = append(queries, clean+" "+trimmed)
-	}
+	ytp := yt.(*YouTubePlatform)
 
-	if trimTitleLen(track.Title, 25, 40) != "" {
-		queries = append(queries, trimTitleLen(track.Title, 25, 40))
-	}
-
-	var ytTrack *state.Track
-
+	queries := buildSearchQueries(track.Title)
 	for i, q := range queries {
-		gologging.DebugF(
-			"[Spotify→YouTube] Search attempt %d: %q",
-			i+1,
-			q,
-		)
-
-		ytTracks, err := yt.VideoSearch(q, true)
-		if err != nil || len(ytTracks) == 0 {
-			gologging.DebugF(
-				"[Spotify→YouTube] No result for %q (err=%v)",
-				q,
-				err,
-			)
+		gologging.DebugF("[Spotify→YouTube] attempt %d: %q", i+1, q)
+		results, err := ytp.VideoSearch(q, true)
+		if err != nil || len(results) == 0 {
 			continue
 		}
-
-		ytTrack = ytTracks[0]
-		ytTrack.Video = track.Video
-
-		gologging.DebugF(
-			"[Spotify→YouTube] Match found using %q → %s",
-			q,
-			ytTrack.URL,
-		)
-		break
+		t := results[0]
+		t.Video = track.Video
+		gologging.DebugF("[Spotify→YouTube] matched %q → %s", q, t.URL)
+		return t, nil
 	}
 
-	if ytTrack == nil {
-		return "", errors.New("failed to find track on YouTube")
-	}
-
-	for _, p := range GetOrderedPlatforms() {
-		if p.CanDownload(PlatformYouTube) {
-			path, err := p.Download(ctx, ytTrack, statusMsg)
-			if err == nil {
-				gologging.InfoF(
-					"Downloaded Spotify track '%s' from YouTube: %s",
-					track.Title,
-					ytTrack.URL,
-				)
-				return path, nil
-			}
-
-			gologging.DebugF(
-				"[Spotify→YouTube] Downloader %T failed: %v",
-				p,
-				err,
-			)
-		}
-	}
-
-	return "", errors.New("no YouTube downloader available")
+	return nil, errors.New("could not find track on YouTube")
 }
 
-// ensureClient initializes the Spotify client (once)
+func buildSearchQueries(title string) []string {
+	clean := cleanTitle(title)
+	trimmed := trimTitle(clean, 25, 40)
+
+	seen := map[string]bool{}
+	var out []string
+	for _, q := range []string{clean, trimmed, trimTitle(title, 25, 40)} {
+		if q != "" && !seen[q] {
+			seen[q] = true
+			out = append(out, q)
+		}
+	}
+	return out
+}
+
 func (s *SpotifyPlatform) ensureClient() error {
 	s.clientOnce.Do(func() {
-		config := &clientcredentials.Config{
+		cfg := &clientcredentials.Config{
 			ClientID:     config.SpotifyClientID,
 			ClientSecret: config.SpotifyClientSecret,
 			TokenURL:     spotifyauth.TokenURL,
 		}
-
-		token, err := config.Token(context.Background())
+		token, err := cfg.Token(context.Background())
 		if err != nil {
-			s.initErr = fmt.Errorf("failed to get Spotify token: %w", err)
+			s.initErr = fmt.Errorf("spotify token: %w", err)
 			return
 		}
-
-		httpClient := spotifyauth.New().Client(context.Background(), token)
-		s.client = spotify.New(httpClient)
-
-		gologging.Info("Spotify client initialized successfully")
+		s.client = spotify.New(spotifyauth.New().Client(context.Background(), token))
 	})
-
 	return s.initErr
 }
 
-// getTrack fetches a single track by ID
-func (s *SpotifyPlatform) getTrack(
-	ctx context.Context,
-	trackID spotify.ID,
-) ([]*state.Track, error) {
-	fullTrack, err := s.client.GetTrack(ctx, trackID)
+func (s *SpotifyPlatform) getTrack(ctx context.Context, id spotify.ID) ([]*state.Track, error) {
+	ft, err := s.client.GetTrack(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch Spotify track: %w", err)
+		return nil, fmt.Errorf("spotify GetTrack: %w", err)
 	}
-
-	track := s.convertSpotifyTrack(
-		&fullTrack.SimpleTrack,
-		fullTrack.Album.Images,
-	)
-	return []*state.Track{track}, nil
+	return []*state.Track{s.convert(&ft.SimpleTrack, ft.Album.Images)}, nil
 }
 
-// getPlaylist fetches all tracks from a playlist
-func (s *SpotifyPlatform) getPlaylist(
-	ctx context.Context,
-	playlistID spotify.ID,
-) ([]*state.Track, error) {
+func (s *SpotifyPlatform) getPlaylist(ctx context.Context, id spotify.ID) ([]*state.Track, error) {
 	var tracks []*state.Track
 	offset := 0
-	limit := 100
-
 	for {
-		playlistPage, err := s.client.GetPlaylistItems(
-			ctx,
-			playlistID,
-			spotify.Limit(limit),
-			spotify.Offset(offset),
-		)
+		page, err := s.client.GetPlaylistItems(ctx, id, spotify.Limit(100), spotify.Offset(offset))
 		if err != nil {
-			return nil, fmt.Errorf("failed to fetch Spotify playlist: %w", err)
+			return nil, fmt.Errorf("spotify GetPlaylist: %w", err)
 		}
-
-		for _, item := range playlistPage.Items {
+		for _, item := range page.Items {
 			if item.Track.Track == nil {
 				continue
 			}
-
-			track := s.convertSpotifyTrack(
-				&item.Track.Track.SimpleTrack,
-				item.Track.Track.Album.Images,
-			)
-			tracks = append(tracks, track)
+			tracks = append(tracks, s.convert(&item.Track.Track.SimpleTrack, item.Track.Track.Album.Images))
 		}
-
-		if playlistPage.Next == "" {
+		if page.Next == "" {
 			break
 		}
-
-		offset += limit
-
+		offset += 100
 	}
-
 	return tracks, nil
 }
 
-// getAlbum fetches all tracks from an album
-func (s *SpotifyPlatform) getAlbum(
-	ctx context.Context,
-	albumID spotify.ID,
-) ([]*state.Track, error) {
-	album, err := s.client.GetAlbum(ctx, albumID)
+func (s *SpotifyPlatform) getAlbum(ctx context.Context, id spotify.ID) ([]*state.Track, error) {
+	album, err := s.client.GetAlbum(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch Spotify album: %w", err)
+		return nil, fmt.Errorf("spotify GetAlbum: %w", err)
 	}
-
-	var tracks []*state.Track
-
-	for _, simpleTrack := range album.Tracks.Tracks {
-		track := s.convertSpotifyTrack(&simpleTrack, album.Images)
-		tracks = append(tracks, track)
+	tracks := make([]*state.Track, 0, len(album.Tracks.Tracks))
+	for _, st := range album.Tracks.Tracks {
+		tracks = append(tracks, s.convert(&st, album.Images))
 	}
-
 	return tracks, nil
 }
 
-// getArtistTopTracks fetches an artist's top tracks
-func (s *SpotifyPlatform) getArtistTopTracks(
-	ctx context.Context,
-	artistID spotify.ID,
-) ([]*state.Track, error) {
-	topTracks, err := s.client.GetArtistsTopTracks(ctx, artistID, "US")
+func (s *SpotifyPlatform) getArtistTop(ctx context.Context, id spotify.ID) ([]*state.Track, error) {
+	top, err := s.client.GetArtistsTopTracks(ctx, id, "US")
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch artist's top tracks: %w", err)
+		return nil, fmt.Errorf("spotify GetArtistTopTracks: %w", err)
 	}
-
-	if len(topTracks) == 0 {
-		return nil, errors.New("no tracks found for this artist")
+	if len(top) == 0 {
+		return nil, errors.New("no tracks found for artist")
 	}
-
-	var tracks []*state.Track
-
-	for _, fullTrack := range topTracks {
-		track := s.convertSpotifyTrack(
-			&fullTrack.SimpleTrack,
-			fullTrack.Album.Images,
-		)
-		tracks = append(tracks, track)
+	tracks := make([]*state.Track, 0, len(top))
+	for _, ft := range top {
+		tracks = append(tracks, s.convert(&ft.SimpleTrack, ft.Album.Images))
 	}
-
 	return tracks, nil
 }
 
-func (s *SpotifyPlatform) convertSpotifyTrack(
-	simpleTrack *spotify.SimpleTrack,
-	images []spotify.Image,
-) *state.Track {
-	thumbnail := ""
+func (s *SpotifyPlatform) convert(st *spotify.SimpleTrack, images []spotify.Image) *state.Track {
+	thumb := ""
 	if len(images) > 0 {
-		thumbnail = images[0].URL
+		thumb = images[0].URL
 	}
-
-	title := simpleTrack.Name
-	duration := int(simpleTrack.Duration) / 1000
-
-	track := &state.Track{
-		ID:       string(simpleTrack.ID),
-		Title:    title,
-		Duration: duration,
-		Artwork:  thumbnail,
-		URL:      simpleTrack.ExternalURLs["spotify"],
+	return &state.Track{
+		ID:       string(st.ID),
+		Title:    st.Name,
+		Duration: int(st.Duration) / 1000,
+		Artwork:  thumb,
+		URL:      st.ExternalURLs["spotify"],
 		Source:   PlatformSpotify,
 	}
-
-	return track
 }
 
-func updateVideoFlag(tracks []*state.Track, video bool) []*state.Track {
-	if len(tracks) == 0 {
-		return nil
-	}
-
-	result := make([]*state.Track, len(tracks))
-	for i, t := range tracks {
+func withVideo(tracks []*state.Track, video bool) []*state.Track {
+	out := make([]*state.Track, 0, len(tracks))
+	for _, t := range tracks {
 		if t == nil {
 			continue
 		}
 		clone := *t
 		clone.Video = video
-		result[i] = &clone
+		out = append(out, &clone)
 	}
-
-	return result
+	return out
 }
 
 func cleanTitle(title string) string {
 	title = strings.TrimSpace(title)
 	title = nameCleanupRe.ReplaceAllString(title, "")
-
-	title = strings.Join(strings.Fields(title), " ")
-	return title
+	return strings.Join(strings.Fields(title), " ")
 }
 
-func trimTitleLen(title string, min, max int) string {
+func trimTitle(title string, min, max int) string {
 	title = strings.TrimSpace(title)
-
 	runes := []rune(title)
-	length := len(runes)
-
-	if length <= max {
+	if len(runes) <= max {
 		return title
 	}
-
-	trimmed := runes[:max]
-
-	// avoid cutting mid-word (space based)
 	cut := max
 	for i := max - 1; i >= min; i-- {
-		if trimmed[i] == ' ' {
+		if runes[i] == ' ' {
 			cut = i
 			break
 		}
 	}
-
-	return strings.TrimSpace(string(trimmed[:cut]))
+	return strings.TrimSpace(string(runes[:cut]))
 }

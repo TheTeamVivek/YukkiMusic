@@ -35,44 +35,32 @@ import (
 	"main/internal/utils"
 )
 
+const PlatformFallenApi state.PlatformName = "FallenApi"
+
+type FallenApiPlatform struct{}
+
 var telegramDLRegex = regexp.MustCompile(
 	`https:\/\/t\.me\/([a-zA-Z0-9_]{5,})\/(\d+)`,
 )
 
-const PlatformFallenApi state.PlatformName = "FallenApi"
-
-type apiResponse struct {
+type fallenAPIResponse struct {
 	CdnUrl string `json:"cdnurl"`
 }
 
-type FallenApiPlatform struct {
-	name state.PlatformName
-}
-
 func init() {
-	Register(80, &FallenApiPlatform{
-		name: PlatformFallenApi,
-	})
+	Register(&FallenApiPlatform{})
 }
 
-func (f *FallenApiPlatform) Name() state.PlatformName {
-	return f.name
+func (f *FallenApiPlatform) Name() state.PlatformName { return PlatformFallenApi }
+func (f *FallenApiPlatform) Priority() int             { return 80 }
+
+func (f *FallenApiPlatform) CanGet(_ string) bool { return false }
+
+func (f *FallenApiPlatform) Get(_ string, _ bool) ([]*state.Track, error) {
+	return nil, errors.New("fallenapi is download-only")
 }
 
-func (f *FallenApiPlatform) CanGetTracks(query string) bool {
-	return false
-}
-
-func (f *FallenApiPlatform) GetTracks(
-	_ string,
-	_ bool,
-) ([]*state.Track, error) {
-	return nil, errors.New("fallenapi is a download-only platform")
-}
-
-func (f *FallenApiPlatform) CanDownload(
-	source state.PlatformName,
-) bool {
+func (f *FallenApiPlatform) CanDownload(source state.PlatformName) bool {
 	if config.FallenAPIURL == "" || config.FallenAPIKey == "" {
 		return false
 	}
@@ -84,12 +72,11 @@ func (f *FallenApiPlatform) Download(
 	track *state.Track,
 	statusMsg *telegram.NewMessage,
 ) (string, error) {
-	// fallen api didn't support video downloads so disable it
 	track.Video = false
 
-	if f := findFile(track); f != "" {
-		gologging.Debug("FallenApi: Download -> Cached File -> " + f)
-		return f, nil
+	if p := findFile(track); p != "" {
+		gologging.Debug("FallenApi: cache hit " + p)
+		return p, nil
 	}
 
 	var pm *telegram.ProgressManager
@@ -104,96 +91,75 @@ func (f *FallenApiPlatform) Download(
 
 	path := getPath(track, ".mp3")
 
-	var downloadErr error
 	if telegramDLRegex.MatchString(dlURL) {
-		path, downloadErr = f.downloadFromTelegram(ctx, dlURL, path, pm)
-	} else {
-		downloadErr = f.downloadFromURL(ctx, dlURL, path)
+		return f.downloadFromTelegram(ctx, dlURL, path, pm)
 	}
 
-	if downloadErr != nil {
-		return "", downloadErr
+	if err := f.downloadFromURL(ctx, dlURL, path); err != nil {
+		return "", err
 	}
+
 	if !fileExists(path) {
-		return "", errors.New("empty file returned by API")
+		return "", errors.New("API returned empty file")
 	}
+
 	return path, nil
 }
 
-func (f *FallenApiPlatform) getDownloadURL(
-	ctx context.Context,
-	mediaURL string,
-) (string, error) {
-	apiReqURL := fmt.Sprintf(
+func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string) (string, error) {
+	apiURL := fmt.Sprintf(
 		"%s/api/track?api_key=%s&url=%s",
 		config.FallenAPIURL,
 		config.FallenAPIKey,
 		url.QueryEscape(mediaURL),
 	)
 
-	var apiResp apiResponse
-
-	resp, err := rc.R().
+	var resp fallenAPIResponse
+	r, err := rc.R().
 		SetContext(ctx).
-		SetResult(&apiResp).
-		Get(apiReqURL)
+		SetResult(&resp).
+		Get(apiURL)
 	if err != nil {
-		if errors.Is(err, context.Canceled) ||
-			errors.Is(err, context.DeadlineExceeded) {
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 			return "", err
 		}
-
-		return "", fmt.Errorf(
-			"failed to download %s, api request failed: %w", mediaURL,
-			sanitizeAPIError(err, config.FallenAPIKey),
+		return "", sanitizeAPIError(
+			fmt.Errorf("API request failed: %w", err),
+			config.FallenAPIKey,
 		)
 	}
 
-	if resp.IsError() {
-		err = sanitizeAPIError(fmt.Errorf(
-			"failed to download %s, api request failed with status: %d body: %s",
-			mediaURL,
-			resp.StatusCode(),
-			resp.String(),
+	if r.IsError() {
+		return "", sanitizeAPIError(fmt.Errorf(
+			"API returned %d: %s", r.StatusCode(), r.String(),
 		), config.FallenAPIKey)
-		gologging.Error(err.Error())
-		return "", err
 	}
 
-	if apiResp.CdnUrl == "" {
-		err = sanitizeAPIError(fmt.Errorf(
-			"failed to download %s, empty API response body: %s",
-			mediaURL,
-			resp.String(),
-		), config.FallenAPIKey)
-		gologging.Error(err.Error())
-		return "", err
+	if resp.CdnUrl == "" {
+		return "", sanitizeAPIError(
+			fmt.Errorf("empty cdnurl in response: %s", r.String()),
+			config.FallenAPIKey,
+		)
 	}
 
-	return apiResp.CdnUrl, nil
+	return resp.CdnUrl, nil
 }
 
-func (f *FallenApiPlatform) downloadFromURL(
-	ctx context.Context,
-	dlURL, path string,
-) error {
-	resp, err := rc.R().
+func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, path string) error {
+	r, err := rc.R().
 		SetContext(ctx).
 		SetOutputFileName(path).
 		Get(dlURL)
 	if err != nil {
 		os.Remove(path)
-		if errors.Is(err, context.Canceled) ||
-			errors.Is(err, context.DeadlineExceeded) {
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 			return err
 		}
 		return fmt.Errorf("http download failed: %w", err)
 	}
-
-	if resp.IsError() {
-		return fmt.Errorf("download failed with status: %d", resp.StatusCode())
+	if r.IsError() {
+		return fmt.Errorf("download returned %d", r.StatusCode())
 	}
-
 	return nil
 }
 
@@ -208,25 +174,22 @@ func (f *FallenApiPlatform) downloadFromTelegram(
 	}
 
 	username := matches[1]
-	messageID, err := strconv.Atoi(matches[2])
+	msgID, err := strconv.Atoi(matches[2])
 	if err != nil {
-		return "", fmt.Errorf("invalid message ID: %v", err)
+		return "", fmt.Errorf("invalid message ID: %w", err)
 	}
 
-	msg, err := core.Bot.GetMessageByID(username, int32(messageID))
+	msg, err := core.Bot.GetMessageByID(username, int32(msgID))
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch Telegram message: %w", err)
 	}
 
-	dOpts := &telegram.DownloadOptions{
-		FileName: path,
-		Ctx:      ctx,
-	}
+	dOpts := &telegram.DownloadOptions{FileName: path, Ctx: ctx}
 	if pm != nil {
 		dOpts.ProgressManager = pm
 	}
-	_, err = msg.Download(dOpts)
-	if err != nil {
+
+	if _, err = msg.Download(dOpts); err != nil {
 		os.Remove(path)
 		return "", err
 	}

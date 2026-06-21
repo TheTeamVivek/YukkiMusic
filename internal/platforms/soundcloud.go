@@ -35,87 +35,64 @@ import (
 	"main/internal/utils"
 )
 
-type SoundCloudPlatform struct {
-	name state.PlatformName
-}
-
-var (
-	soundcloudLinkRegex = regexp.MustCompile(
-		`(?i)^(https?://)?(www\.)?(soundcloud\.com|snd\.sc)/`,
-	)
-	soundcloudCache = utils.NewCache[string, []*state.Track](1 * time.Hour)
-)
-
 const PlatformSoundCloud state.PlatformName = "SoundCloud"
 
+type SoundCloudPlatform struct {
+	cache *utils.Cache[string, []*state.Track]
+}
+
+var soundcloudLinkRe = regexp.MustCompile(
+	`(?i)^(https?://)?(www\.)?(soundcloud\.com|snd\.sc)/`,
+)
+
 func init() {
-	Register(85, &SoundCloudPlatform{
-		name: PlatformSoundCloud,
+	Register(&SoundCloudPlatform{
+		cache: utils.NewCache[string, []*state.Track](1 * time.Hour),
 	})
 }
 
-func (s *SoundCloudPlatform) Name() state.PlatformName {
-	return s.name
+func (s *SoundCloudPlatform) Name() state.PlatformName { return PlatformSoundCloud }
+func (s *SoundCloudPlatform) Priority() int             { return 85 }
+
+func (s *SoundCloudPlatform) CanGet(query string) bool {
+	return soundcloudLinkRe.MatchString(strings.TrimSpace(query))
 }
 
-func (s *SoundCloudPlatform) CanGetTracks(query string) bool {
-	return soundcloudLinkRegex.MatchString(strings.TrimSpace(query))
-}
-
-func (s *SoundCloudPlatform) GetTracks(
-	query string,
-	_ bool,
-) ([]*state.Track, error) {
+func (s *SoundCloudPlatform) Get(query string, _ bool) ([]*state.Track, error) {
 	query = strings.TrimSpace(query)
+
 	safeURL, err := sanitizeMediaURL(query)
 	if err != nil {
 		return nil, errUnsafeURL
 	}
 
-	cacheKey := "soundcloud:" + strings.ToLower(query)
-	if cached, ok := soundcloudCache.Get(cacheKey); ok {
-		gologging.Debug("SoundCloud: Using cached tracks")
+	cacheKey := "sc:" + strings.ToLower(query)
+	if cached, ok := s.cache.Get(cacheKey); ok {
 		return cached, nil
 	}
 
-	gologging.InfoF("SoundCloud: Fetching metadata for %s", query)
-
 	info, err := s.extractMetadata(safeURL)
 	if err != nil {
-		gologging.ErrorF("SoundCloud: Failed to extract metadata: %v", err)
 		return nil, fmt.Errorf("failed to extract metadata: %w", err)
 	}
 
 	var tracks []*state.Track
-
 	if len(info.Entries) > 0 {
-		gologging.InfoF(
-			"SoundCloud: Found playlist with %d tracks",
-			len(info.Entries),
-		)
 		for _, entry := range info.Entries {
-			track := s.infoToTrack(&entry)
-			tracks = append(tracks, track)
+			tracks = append(tracks, s.toTrack(&entry))
 		}
 	} else {
-		track := s.infoToTrack(info)
-		tracks = []*state.Track{track}
+		tracks = []*state.Track{s.toTrack(info)}
 	}
 
 	if len(tracks) > 0 {
-		soundcloudCache.Set(cacheKey, tracks)
-		gologging.InfoF(
-			"SoundCloud: Successfully extracted %d track(s)",
-			len(tracks),
-		)
+		s.cache.Set(cacheKey, tracks)
 	}
 
 	return tracks, nil
 }
 
-func (s *SoundCloudPlatform) CanDownload(
-	source state.PlatformName,
-) bool {
+func (s *SoundCloudPlatform) CanDownload(source state.PlatformName) bool {
 	return source == PlatformSoundCloud
 }
 
@@ -125,11 +102,15 @@ func (s *SoundCloudPlatform) Download(
 	_ *telegram.NewMessage,
 ) (string, error) {
 	track.Video = false
+
 	if p := findFile(track); p != "" {
 		return p, nil
 	}
 
-	gologging.InfoF("SoundCloud: Downloading %s", track.Title)
+	safeURL, err := sanitizeMediaURL(track.URL)
+	if err != nil {
+		return "", errUnsafeURL
+	}
 
 	args := []string{
 		"-f", "ba[abr>=128]/ba",
@@ -143,140 +124,86 @@ func (s *SoundCloudPlatform) Download(
 		"--no-check-certificate",
 		"-q",
 		"-o", getPath(track, ".%(ext)s"),
+		"--", safeURL,
 	}
-
-	safeURL, err := sanitizeMediaURL(track.URL)
-	if err != nil {
-		return "", errUnsafeURL
-	}
-
-	args = append(args, "--", safeURL)
-
-	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
 
 	var stdout, stderr bytes.Buffer
+	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 
 	if err := cmd.Run(); err != nil {
-		outStr := stdout.String()
-		errStr := stderr.String()
-		gologging.ErrorF(
-			"SoundCloud: yt-dlp download failed for %s: %v\nSTDOUT:\n%s\nSTDERR:\n%s",
-			track.URL,
-			err,
-			outStr,
-			errStr,
-		)
-
 		findAndRemove(track)
-
-		if errors.Is(err, context.Canceled) ||
-			errors.Is(err, context.DeadlineExceeded) {
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 			return "", err
 		}
-
 		return "", fmt.Errorf(
-			"download failed: %w\nstdout: %s\nstderr: %s",
-			err,
-			outStr,
-			errStr,
+			"yt-dlp failed: %w\nstdout: %s\nstderr: %s",
+			err, stdout.String(), stderr.String(),
 		)
 	}
 
-	path := findFile(track)
-	if path == "" {
-		return "", errors.New("yt-dlp did not return output file path")
+	p := findFile(track)
+	if p == "" {
+		return "", errors.New("yt-dlp produced no output file")
 	}
 
-	gologging.InfoF("SoundCloud: Successfully downloaded %s", track.Title)
-	return path, nil
+	gologging.InfoF("SoundCloud: downloaded %s", track.Title)
+	return p, nil
 }
 
 func (s *SoundCloudPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 
-	safeURL, err := sanitizeMediaURL(urlStr)
-	if err != nil {
-		return nil, errUnsafeURL
-	}
-
 	args := []string{
-		"-j",
-		"--flat-playlist",
-		"--no-warnings",
-		"--no-check-certificate",
-		"--",
-		safeURL,
+		"-j", "--flat-playlist",
+		"--no-warnings", "--no-check-certificate",
+		"--", urlStr,
 	}
-
-	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
 
 	var stdout, stderr bytes.Buffer
+	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 
 	if err := cmd.Run(); err != nil {
-		errStr := stderr.String()
-		gologging.ErrorF(
-			"SoundCloud: yt-dlp metadata extraction failed: %v\n%s",
-			err,
-			errStr,
-		)
-		return nil, fmt.Errorf("metadata extraction failed: %w", err)
+		return nil, fmt.Errorf("metadata extraction failed: %w\n%s", err, stderr.String())
 	}
 
-	output := stdout.String()
-	lines := strings.Split(strings.TrimSpace(output), "\n")
+	lines := strings.Split(strings.TrimSpace(stdout.String()), "\n")
 
 	if len(lines) > 1 {
 		var info ytdlpInfo
-		info.Entries = make([]ytdlpInfo, 0, len(lines))
-
 		for _, line := range lines {
 			var entry ytdlpInfo
 			if err := json.Unmarshal([]byte(line), &entry); err != nil {
-				gologging.ErrorF(
-					"SoundCloud: Failed to parse entry JSON: %v",
-					err,
-				)
+				gologging.DebugF("SoundCloud: skip bad entry: %v", err)
 				continue
 			}
 			info.Entries = append(info.Entries, entry)
 		}
-
 		if len(info.Entries) == 0 {
-			err := errors.New("no valid entries found in playlist")
-			gologging.Error("SoundCloud: " + err.Error())
-			return nil, err
+			return nil, errors.New("no valid entries in playlist")
 		}
-
 		return &info, nil
 	}
 
 	var info ytdlpInfo
-	if err := json.Unmarshal([]byte(output), &info); err != nil {
-		gologging.ErrorF("SoundCloud: Failed to parse JSON: %v", err)
-		return nil, fmt.Errorf("failed to parse JSON: %w", err)
+	if err := json.Unmarshal([]byte(stdout.String()), &info); err != nil {
+		return nil, fmt.Errorf("failed to parse metadata JSON: %w", err)
 	}
-
 	return &info, nil
 }
 
-func (s *SoundCloudPlatform) infoToTrack(info *ytdlpInfo) *state.Track {
-	title := info.Title
-	duration := int(info.Duration)
-
-	track := &state.Track{
+func (s *SoundCloudPlatform) toTrack(info *ytdlpInfo) *state.Track {
+	return &state.Track{
 		ID:       info.ID,
-		Title:    title,
-		Duration: duration,
+		Title:    info.Title,
+		Duration: int(info.Duration),
 		Artwork:  info.Thumbnail,
-		URL:      info.URL,
+		URL:      firstNonEmpty(info.OriginalURL, info.URL),
 		Source:   PlatformSoundCloud,
 		Video:    false,
 	}
-
-	return track
 }
