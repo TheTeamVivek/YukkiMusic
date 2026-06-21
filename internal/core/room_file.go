@@ -86,7 +86,7 @@ func (r *RoomState) cleanupFile() {
 		return
 	}
 
-    tracks := make([]*state.Track, 0, 3)
+	tracks := make([]*state.Track, 0, 3)
 	if r.track != nil {
 		tracks = append(tracks, r.track)
 	}
