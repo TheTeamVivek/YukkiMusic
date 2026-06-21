@@ -96,7 +96,7 @@ func scheduleRemove(track *state.Track, skipChatID int64) {
 	}
 
 	t := *track
-	time.AfterFunc(d, func() {
+	time.AfterFunc(FileCacheDuration, func() {
 		doRemove(&t, skipChatID)
 	})
 
