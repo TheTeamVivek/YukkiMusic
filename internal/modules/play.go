@@ -28,14 +28,14 @@ import (
 	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
-	"main/internal/core"
-	state "main/internal/core/models"
-	"main/internal/database"
-	"main/internal/locales"
-	"main/internal/platforms"
-	"main/internal/utils"
-	"main/ubot"
+	"yukkimusic/config"
+	"yukkimusic/internal/core"
+	state "yukkimusic/internal/core/models"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/platforms"
+	"yukkimusic/internal/utils"
+	"yukkimusic/ubot"
 )
 
 type playOpts struct {

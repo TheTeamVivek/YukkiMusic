@@ -23,8 +23,8 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
-	"main/internal/database"
+	"yukkimusic/config"
+	"yukkimusic/internal/database"
 )
 
 // BotCommands holds all bot commands separated by user type and chat type.

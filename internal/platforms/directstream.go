@@ -32,7 +32,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	state "main/internal/core/models"
+	state "yukkimusic/internal/core/models"
 )
 
 const PlatformDirectStream state.PlatformName = "DirectStream"

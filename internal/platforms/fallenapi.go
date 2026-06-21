@@ -29,10 +29,10 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
-	"main/internal/core"
-	state "main/internal/core/models"
-	"main/internal/utils"
+	"yukkimusic/config"
+	"yukkimusic/internal/core"
+	state "yukkimusic/internal/core/models"
+	"yukkimusic/internal/utils"
 )
 
 const PlatformFallenApi state.PlatformName = "FallenApi"

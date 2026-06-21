@@ -33,9 +33,9 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 	"resty.dev/v3"
 
-	state "main/internal/core/models"
-	"main/internal/database"
-	"main/internal/utils"
+	state "yukkimusic/internal/core/models"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/utils"
 )
 
 type RedispatchError struct {

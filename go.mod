@@ -1,4 +1,4 @@
-module main
+module yukkimusic
 
 go 1.26
 

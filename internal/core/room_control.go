@@ -25,8 +25,8 @@ import (
 
 	"github.com/Laky-64/gologging"
 
-	state "main/internal/core/models"
-	"main/ntgcalls"
+	state "yukkimusic/internal/core/models"
+	"yukkimusic/ntgcalls"
 )
 
 const (

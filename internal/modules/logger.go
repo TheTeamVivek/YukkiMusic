@@ -22,9 +22,9 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/database"
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/utils"
 )
 
 func handleLogger(m *telegram.NewMessage) error {

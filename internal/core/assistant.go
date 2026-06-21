@@ -24,7 +24,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/ubot"
+	"yukkimusic/ubot"
 )
 
 type Assistant struct {

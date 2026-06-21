@@ -3,7 +3,7 @@ package ubot
 import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/ntgcalls"
+	"yukkimusic/ntgcalls"
 )
 
 func parseVideoSources(

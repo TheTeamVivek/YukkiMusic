@@ -24,7 +24,7 @@ import (
 
 	"github.com/Laky-64/gologging"
 
-	state "main/internal/core/models"
+	state "yukkimusic/internal/core/models"
 )
 
 var FileCacheDuration = 1 * time.Minute

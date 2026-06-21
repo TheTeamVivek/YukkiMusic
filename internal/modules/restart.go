@@ -27,10 +27,10 @@ import (
 	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
-	"main/internal/core"
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/config"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/utils"
 )
 
 func init() {

@@ -17,7 +17,7 @@
 
 package database
 
-import "main/config"
+import "yukkimusic/config"
 
 func Language(chatID int64) (string, error) {
 	settings, err := getChatSettings(chatID)

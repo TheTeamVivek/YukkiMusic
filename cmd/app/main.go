@@ -39,12 +39,12 @@ import (
 
 	"github.com/Laky-64/gologging"
 
-	"main/config"
-	"main/internal/core"
-	"main/internal/database"
-	"main/internal/locales"
-	"main/internal/modules"
-	"main/internal/platforms"
+	"yukkimusic/config"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/modules"
+	"yukkimusic/internal/platforms"
 )
 
 func main() {

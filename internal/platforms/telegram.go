@@ -29,9 +29,9 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/core"
-	state "main/internal/core/models"
-	"main/internal/utils"
+	"yukkimusic/internal/core"
+	state "yukkimusic/internal/core/models"
+	"yukkimusic/internal/utils"
 )
 
 const PlatformTelegram state.PlatformName = "Telegram"

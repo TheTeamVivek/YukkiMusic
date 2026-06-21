@@ -20,8 +20,8 @@ package modules
 import (
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/core"
-	"main/internal/locales"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/locales"
 )
 
 func init() {

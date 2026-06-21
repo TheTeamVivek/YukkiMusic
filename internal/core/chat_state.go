@@ -26,7 +26,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/utils"
+	"yukkimusic/internal/utils"
 )
 
 var (

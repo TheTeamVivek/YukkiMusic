@@ -7,7 +7,7 @@ import (
 	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/ntgcalls"
+	"yukkimusic/ntgcalls"
 )
 
 type Context struct {

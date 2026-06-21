@@ -28,8 +28,8 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
-	"main/ubot"
+	"yukkimusic/config"
+	"yukkimusic/ubot"
 )
 
 var (

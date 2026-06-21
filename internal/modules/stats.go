@@ -28,10 +28,10 @@ import (
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/mem"
 
-	"main/config"
-	"main/internal/database"
-	"main/internal/locales"
-	"main/ntgcalls"
+	"yukkimusic/config"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/locales"
+	"yukkimusic/ntgcalls"
 )
 
 func init() {

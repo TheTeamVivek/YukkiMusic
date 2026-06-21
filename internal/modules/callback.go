@@ -27,11 +27,11 @@ import (
 	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/core"
-	"main/internal/database"
-	"main/internal/locales"
-	"main/internal/platforms"
-	"main/internal/utils"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/platforms"
+	"yukkimusic/internal/utils"
 )
 
 func cancelHandler(cb *tg.CallbackQuery) error {

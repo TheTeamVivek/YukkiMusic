@@ -22,8 +22,8 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/utils"
 )
 
 func init() {

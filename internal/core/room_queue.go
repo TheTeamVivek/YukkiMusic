@@ -21,7 +21,7 @@ import (
 	"math/rand"
 	"time"
 
-	state "main/internal/core/models"
+	state "yukkimusic/internal/core/models"
 )
 
 // NextTrack retrieves and prepares the next track in queue

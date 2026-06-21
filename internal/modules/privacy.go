@@ -22,7 +22,7 @@ import (
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
+	"yukkimusic/config"
 )
 
 func init() {

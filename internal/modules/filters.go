@@ -22,9 +22,9 @@ import (
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
-	"main/internal/database"
-	"main/internal/utils"
+	"yukkimusic/config"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/utils"
 )
 
 var (

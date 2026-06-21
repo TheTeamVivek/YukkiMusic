@@ -32,9 +32,9 @@ import (
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 	"golang.org/x/oauth2/clientcredentials"
 
-	"main/config"
-	state "main/internal/core/models"
-	"main/internal/utils"
+	"yukkimusic/config"
+	state "yukkimusic/internal/core/models"
+	"yukkimusic/internal/utils"
 )
 
 const PlatformSpotify state.PlatformName = "Spotify"

@@ -30,8 +30,8 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
-	"main/internal/core"
+	"yukkimusic/config"
+	"yukkimusic/internal/core"
 )
 
 func init() {

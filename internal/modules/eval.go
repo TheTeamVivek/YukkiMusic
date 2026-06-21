@@ -32,8 +32,8 @@ import (
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 
-	"main/config"
-	"main/internal/core"
+	"yukkimusic/config"
+	"yukkimusic/internal/core"
 )
 
 func evalCommandHandler(m *telegram.NewMessage) error {

@@ -31,8 +31,8 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	state "main/internal/core/models"
-	"main/internal/utils"
+	state "yukkimusic/internal/core/models"
+	"yukkimusic/internal/utils"
 )
 
 const PlatformSoundCloud state.PlatformName = "SoundCloud"

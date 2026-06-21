@@ -5,7 +5,7 @@ import (
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/ntgcalls"
+	"yukkimusic/ntgcalls"
 )
 
 type (

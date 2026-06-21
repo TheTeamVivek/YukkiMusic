@@ -24,10 +24,10 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/core"
-	"main/internal/locales"
-	"main/internal/platforms"
-	"main/internal/utils"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/platforms"
+	"yukkimusic/internal/utils"
 )
 
 func init() {

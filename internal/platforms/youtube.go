@@ -28,9 +28,9 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
-	state "main/internal/core/models"
-	"main/internal/utils"
+	"yukkimusic/config"
+	state "yukkimusic/internal/core/models"
+	"yukkimusic/internal/utils"
 )
 
 const (

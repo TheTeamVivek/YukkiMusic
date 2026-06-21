@@ -27,7 +27,7 @@ import (
 	"github.com/Laky-64/gologging"
 	"gopkg.in/yaml.v3"
 
-	"main/config"
+	"yukkimusic/config"
 )
 
 //go:embed *.yml

@@ -24,8 +24,8 @@ import (
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
-	"main/internal/core"
+	"yukkimusic/config"
+	"yukkimusic/internal/core"
 )
 
 var helpTexts = map[string]string{}

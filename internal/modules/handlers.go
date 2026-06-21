@@ -22,8 +22,8 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
-	"main/internal/core"
+	"yukkimusic/config"
+	"yukkimusic/internal/core"
 )
 
 type MsgHandlerDef struct {

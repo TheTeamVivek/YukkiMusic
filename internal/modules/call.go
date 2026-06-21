@@ -23,12 +23,12 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/core"
-	state "main/internal/core/models"
-	"main/internal/locales"
-	"main/internal/platforms"
-	"main/internal/utils"
-	"main/ntgcalls"
+	"yukkimusic/internal/core"
+	state "yukkimusic/internal/core/models"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/platforms"
+	"yukkimusic/internal/utils"
+	"yukkimusic/ntgcalls"
 )
 
 func streamEndHandler(

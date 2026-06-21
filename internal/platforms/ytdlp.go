@@ -32,8 +32,8 @@ import (
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"main/internal/cookies"
-	state "main/internal/core/models"
+	"yukkimusic/internal/cookies"
+	state "yukkimusic/internal/core/models"
 )
 
 const PlatformYtDlp state.PlatformName = "YtDlp"

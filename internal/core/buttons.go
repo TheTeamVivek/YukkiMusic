@@ -23,9 +23,9 @@ import (
 
 	tg "github.com/amarnathcjd/gogram/telegram"
 
-	"main/config"
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/config"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/utils"
 )
 
 var F func(chatID int64, key string, values ...locales.Arg) string // overwritten from main.go
