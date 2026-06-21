@@ -49,18 +49,8 @@ type RoomState struct {
 	filePath string
 	// track is the active track metadata.
 	track *state.Track
-	// playing reports whether playback is active.
-	playing bool
-	// paused reports whether playback is currently paused.
-	paused bool
 	// muted reports whether playback is currently muted.
 	muted bool
-	// speed is the active playback speed multiplier.
-	speed float64
-	// position is the current playback position in seconds.
-	position int
-	// updatedAt tracks the last state-update timestamp (unix seconds).
-	updatedAt int64
 	// loop is the loop mode/state value.
 	loop int
 
@@ -68,7 +58,8 @@ type RoomState struct {
 	queue []*state.Track
 	// shuffle indicates queue shuffle mode.
 	shuffle bool
-
+     // speed is the active playback speed multiplier.
+    speed float64
 	// scheduledTimers manages auto-resume/unmute/speed timers.
 	*scheduledTimers
 
@@ -79,6 +70,8 @@ type RoomState struct {
 
 	// Assistant is the assistant client bound to this room.
 	Assistant *Assistant
+	// Call is the gortc-backed voice call connection for this room.
+	Call *VoiceCall
 	// destroyed marks whether room cleanup has completed.
 	destroyed atomic.Bool
 }
@@ -110,7 +103,7 @@ func DeleteRoom(chatID int64) bool {
 	roomsMu.Unlock()
 
 	room.cleanupFile()
-	room.Stop()
+	room.LeaveCall()
 	room.destroyed.Store(true)
 	return true
 }
@@ -142,8 +135,8 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 			ID:        chatID,
 			ChatID:    chatID,
 			queue:     []*state.Track{},
-			speed:     1.0,
 			Assistant: ass,
+            speed:     1.0,
 			Data:      make(map[string]any),
 		}
 		room.destroyed.Store(false)
@@ -186,24 +179,6 @@ func GetAllRooms() map[int64]*RoomState {
 
 func (r *RoomState) IsDestroyed() bool {
 	return r.destroyed.Load()
-}
-
-func (r *RoomState) updatePosition() {
-	if r == nil || r.track == nil || r.updatedAt == 0 {
-		return
-	}
-
-	current := time.Now().Unix()
-	elapsed := float64(current - r.updatedAt)
-
-	if r.playing && !r.paused {
-		r.position += int(elapsed * r.speed)
-		if r.position >= r.track.Duration {
-			r.position = r.track.Duration
-			r.playing = false
-		}
-	}
-	r.updatedAt = current
 }
 
 func (st *scheduledTimers) RemainingUnmuteDuration() time.Duration {
@@ -268,15 +243,6 @@ func (r *RoomState) Loop() int {
 	return r.loop
 }
 
-func (r *RoomState) Position() int {
-	if r.IsDestroyed() {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.position
-}
-
 func (r *RoomState) Queue() []*state.Track {
 	if r.IsDestroyed() {
 		return nil
@@ -295,15 +261,6 @@ func (r *RoomState) Shuffle() bool {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.shuffle
-}
-
-func (r *RoomState) Speed() float64 {
-	if r.IsDestroyed() {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.speed
 }
 
 func (r *RoomState) Track() *state.Track {
@@ -387,22 +344,23 @@ func (r *RoomState) SetStatusMsg(m *telegram.NewMessage) {
 // State checks
 
 func (r *RoomState) IsActiveChat() bool {
-	if r.IsDestroyed() {
-		return false
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.updatePosition()
-	return r.track != nil && r.playing
-}
-
-func (r *RoomState) IsPaused() bool {
-	if r.IsDestroyed() {
+	if r.IsDestroyed() || r.Call == nil {
 		return false
 	}
 	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.paused && r.track != nil && r.playing
+	track := r.track
+	r.mu.RUnlock()
+	return track != nil && r.Call.IsPlaying()
+}
+
+func (r *RoomState) IsPaused() bool {
+	if r.IsDestroyed() || r.Call == nil {
+		return false
+	}
+	r.mu.RLock()
+	track := r.track
+	r.mu.RUnlock()
+	return track != nil && r.Call.IsPlaying() && r.Call.Paused()
 }
 
 func (r *RoomState) IsMuted() bool {
@@ -411,14 +369,72 @@ func (r *RoomState) IsMuted() bool {
 	}
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	return r.muted && r.track != nil && r.playing
+	return r.muted && r.track != nil
 }
 
-func (r *RoomState) Parse() {
+func (r *RoomState) SetMuted(muted bool) {
 	if r.IsDestroyed() {
 		return
 	}
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.updatePosition()
+	r.muted = muted
+}
+
+// Voice-call delegating methods
+
+func (r *RoomState) JoinCall() error {
+	if r.IsDestroyed() || r.Call == nil {
+		return ErrRoomDestroyed
+	}
+	return r.Call.Join()
+}
+
+func (r *RoomState) PlayTrack(src media.Source) error {
+	if r.IsDestroyed() || r.Call == nil {
+		return ErrRoomDestroyed
+	}
+	return r.Call.Play(src)
+}
+
+func (r *RoomState) PauseCall() {
+	if r.IsDestroyed() || r.Call == nil {
+		return
+	}
+	r.Call.Pause()
+}
+
+func (r *RoomState) ResumeCall() {
+	if r.IsDestroyed() || r.Call == nil {
+		return
+	}
+	r.Call.Resume()
+}
+
+func (r *RoomState) StopCall() {
+	if r.IsDestroyed() || r.Call == nil {
+		return
+	}
+	r.Call.Stop()
+}
+
+func (r *RoomState) LeaveCall() error {
+	if r.Call == nil {
+		return nil
+	}
+	return r.Call.Leave()
+}
+
+func (r *RoomState) CallPosition() time.Duration {
+	if r.IsDestroyed() || r.Call == nil {
+		return 0
+	}
+	return r.Call.Position()
+}
+
+func (r *RoomState) CallDuration() time.Duration {
+	if r.IsDestroyed() || r.Call == nil {
+		return 0
+	}
+	return r.Call.Duration()
 }

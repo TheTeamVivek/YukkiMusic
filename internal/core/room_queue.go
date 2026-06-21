@@ -24,7 +24,7 @@ import (
 	state "yukkimusic/internal/core/models"
 )
 
-// NextTrack retrieves and prepares the next track in queue
+// NextTrack retrieves and prepares the next track in queue.
 func (r *RoomState) NextTrack() *state.Track {
 	if r.IsDestroyed() {
 		return nil
@@ -34,12 +34,8 @@ func (r *RoomState) NextTrack() *state.Track {
 	defer r.mu.Unlock()
 
 	if r.track != nil && r.loop > 0 {
-		r.position = 0
-		r.playing = false
-		r.paused = false
 		r.muted = false
 		r.loop--
-		r.updatedAt = time.Now().Unix()
 		return r.track
 	}
 
@@ -58,16 +54,12 @@ func (r *RoomState) NextTrack() *state.Track {
 	r.queue = append(r.queue[:index], r.queue[index+1:]...)
 
 	r.track = next
-	r.position = 0
-	r.playing = false
-	r.paused = false
 	r.muted = false
-	r.updatedAt = time.Now().Unix()
 
 	return next
 }
 
-// RemoveFromQueue removes track(s) from queue
+// RemoveFromQueue removes track(s) from queue.
 func (r *RoomState) RemoveFromQueue(index int) {
 	if r.IsDestroyed() {
 		return
@@ -86,7 +78,7 @@ func (r *RoomState) RemoveFromQueue(index int) {
 	}
 }
 
-// MoveInQueue moves a track from one position to another
+// MoveInQueue moves a track from one position to another.
 func (r *RoomState) MoveInQueue(from, to int) {
 	if r.IsDestroyed() {
 		return
@@ -111,7 +103,7 @@ func (r *RoomState) MoveInQueue(from, to int) {
 	}
 }
 
-// AddTracksToQueue appends multiple tracks to the queue
+// AddTracksToQueue appends multiple tracks to the queue.
 func (r *RoomState) AddTracksToQueue(tracks []*state.Track) {
 	if r.IsDestroyed() {
 		return

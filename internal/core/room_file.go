@@ -20,23 +20,23 @@ package core
 import (
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/Laky-64/gologging"
 
 	state "yukkimusic/internal/core/models"
 )
 
-var FileCacheDuration = 1 * time.Minute
-
+// check if a track is used in any room (other than the given room)
 func isTrackUsed(trackID string, skipChatID int64) bool {
 	for _, room := range rooms {
 		if room == nil || room.track == nil || room.ChatID == skipChatID {
 			continue
 		}
+
 		if room.track.ID == trackID {
 			return true
 		}
+
 		if isTrackInQueue(trackID, room.queue) {
 			return true
 		}
@@ -44,8 +44,10 @@ func isTrackUsed(trackID string, skipChatID int64) bool {
 	return false
 }
 
+// checks first N (2) queued tracks
 func isTrackInQueue(trackID string, queue []*state.Track) bool {
 	limit := min(len(queue), 2)
+
 	for _, q := range queue[:limit] {
 		if q != nil && q.ID == trackID {
 			return true
@@ -54,19 +56,37 @@ func isTrackInQueue(trackID string, queue []*state.Track) bool {
 	return false
 }
 
+// release current track file if unused elsewhere
 func (r *RoomState) releaseFile() {
 	if r == nil || r.track == nil {
 		return
 	}
-	scheduleRemove(r.track, r.ID)
+
+	track := r.track
+
+	roomsMu.RLock()
+	used := isTrackUsed(track.ID, r.ID)
+	roomsMu.RUnlock()
+
+	if used {
+		gologging.DebugF(
+			"file still in use, skipped remove: %s:%s",
+			string(track.Source),
+			track.ID,
+		)
+		return
+	}
+
+	findAndRemove(track)
 }
 
+// cleanup current + queued track files if unused
 func (r *RoomState) cleanupFile() {
 	if r == nil {
 		return
 	}
 
-	tracks := make([]*state.Track, 0, 3)
+    tracks := make([]*state.Track, 0, 3)
 	if r.track != nil {
 		tracks = append(tracks, r.track)
 	}
@@ -79,47 +99,22 @@ func (r *RoomState) cleanupFile() {
 		if t == nil || t.ID == "" {
 			continue
 		}
-		scheduleRemove(t, r.ID)
+
+		roomsMu.RLock()
+		used := isTrackUsed(t.ID, r.ID)
+		roomsMu.RUnlock()
+
+		if used {
+			gologging.DebugF(
+				"track still in use, skip delete: %s:%s",
+				string(t.Source),
+				t.ID,
+			)
+			continue
+		}
+
+		findAndRemove(t)
 	}
-}
-
-// scheduleRemove deletes the track file after FileCacheDuration,
-// but only if no other room is using it at deletion time.
-func scheduleRemove(track *state.Track, skipChatID int64) {
-	if track == nil {
-		return
-	}
-
-	if FileCacheDuration <= 0 {
-		doRemove(track, skipChatID)
-		return
-	}
-
-	t := *track
-	time.AfterFunc(FileCacheDuration, func() {
-		doRemove(&t, skipChatID)
-	})
-
-	gologging.DebugF(
-		"scheduled file removal in %s: %s:%s",
-		FileCacheDuration, string(track.Source), track.ID,
-	)
-}
-
-func doRemove(track *state.Track, skipChatID int64) {
-	roomsMu.RLock()
-	used := isTrackUsed(track.ID, skipChatID)
-	roomsMu.RUnlock()
-
-	if used {
-		gologging.DebugF(
-			"file still in use, skipped remove: %s:%s",
-			string(track.Source), track.ID,
-		)
-		return
-	}
-
-	findAndRemove(track)
 }
 
 func findAndRemove(track *state.Track) {
@@ -135,6 +130,6 @@ func findAndRemove(track *state.Track) {
 
 	for _, f := range files {
 		os.Remove(f)
-		gologging.DebugF("removed file: %s", f)
+		gologging.DebugF("removed unused file: %s", f)
 	}
 }
