@@ -20,13 +20,12 @@ package core
 import (
 	"fmt"
 	"runtime"
-	"strconv"
 	"time"
 
 	"github.com/Laky-64/gologging"
+	"github.com/amarnathcjd/gortc/media"
 
 	state "yukkimusic/internal/core/models"
-	"yukkimusic/ntgcalls"
 )
 
 const (
@@ -36,7 +35,7 @@ const (
 	seekSafetyMargin = 5
 )
 
-// Play starts playback of a track
+// Play starts playback of a track.
 func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 	if r.IsDestroyed() {
 		return ErrRoomDestroyed
@@ -49,7 +48,7 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 		delete(r.Data, "last_queue")
 	}
 
-	shouldQueue := !forcePlay && r.playing && r.track != nil
+	shouldQueue := !forcePlay && r.Call != nil && r.Call.IsPlaying() && r.track != nil
 	if shouldQueue {
 		r.queue = append(r.queue, t)
 		r.mu.Unlock()
@@ -60,19 +59,14 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 		r.loop = 0
 	}
 	r.track = t
-	r.playing = true
 	r.filePath = path
-	r.position = 0
-	r.paused = false
 	r.muted = false
-	r.updatedAt = time.Now().Unix()
+	r.speed = 1.0
 	r.mu.Unlock()
 
-	err := r.play()
-	if err != nil {
+	if err := r.play(); err != nil {
 		r.mu.Lock()
 		r.track = nil
-		r.playing = false
 		r.filePath = ""
 		r.mu.Unlock()
 		return err
@@ -81,36 +75,22 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 	return nil
 }
 
-// Pause pauses playback with optional auto-resume
+// Pause pauses playback with optional auto-resume.
 func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
 	if r.IsDestroyed() {
 		return false, ErrRoomDestroyed
 	}
+	if r.Call == nil {
+		return false, ErrCallNotJoined
+	}
 
-	r.mu.RLock()
-	alreadyPaused := r.paused
-	r.mu.RUnlock()
-
-	if alreadyPaused {
+	if r.Call.Paused() {
 		return true, nil
 	}
 
-	paused, err := r.Assistant.Ntg.Pause(r.ID)
-	if err != nil {
-		return false, err
-	}
-
-	r.mu.RLock()
-	isMuted := r.muted
-	r.mu.RUnlock()
-
-	if isMuted {
-		r.Unmute()
-	}
+	r.Call.Pause()
 
 	r.mu.Lock()
-	r.updatePosition()
-	r.paused = true
 	r.muted = false
 
 	if r.scheduledTimers == nil {
@@ -129,46 +109,34 @@ func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
 	}
 	r.mu.Unlock()
 
-	return paused, nil
+	return true, nil
 }
 
-// Resume resumes playback
+// Resume resumes playback.
 func (r *RoomState) Resume() (bool, error) {
 	if r.IsDestroyed() {
 		return false, ErrRoomDestroyed
 	}
-
 	if !r.IsActiveChat() {
 		return false, fmt.Errorf("there are no active music playing")
 	}
-
-	r.mu.RLock()
-	alreadyPlaying := !r.paused
-	r.mu.RUnlock()
-
-	if alreadyPlaying {
+	if !r.Call.Paused() {
 		return true, nil
 	}
 
-	resumed, err := r.Assistant.Ntg.Resume(r.ID)
-	if err != nil {
-		return false, err
-	}
+	r.Call.Resume()
 
 	r.mu.Lock()
-	r.paused = false
 	r.muted = false
-	r.playing = true
-	r.updatedAt = time.Now().Unix()
 	if r.scheduledTimers != nil {
 		r.scheduledTimers.cancelScheduledResume()
 	}
 	r.mu.Unlock()
 
-	return resumed, nil
+	return true, nil
 }
 
-// Replay restarts the current track
+// Replay restarts the current track from the beginning.
 func (r *RoomState) Replay() error {
 	if r.IsDestroyed() {
 		return ErrRoomDestroyed
@@ -177,30 +145,16 @@ func (r *RoomState) Replay() error {
 	r.mu.RLock()
 	hasTrack := r.track != nil && r.filePath != ""
 	r.mu.RUnlock()
-
 	if !hasTrack {
 		return fmt.Errorf("no track to replay")
 	}
 
-	r.mu.Lock()
-	oldPos := r.position
-	r.position = 0
-	r.mu.Unlock()
-
-	err := r.play()
-	if err != nil {
-		r.mu.Lock()
-		r.position = oldPos
-		r.mu.Unlock()
+	if err := r.play(); err != nil {
 		return err
 	}
 
 	r.mu.Lock()
-	r.position = 0
-	r.paused = false
 	r.muted = false
-	r.playing = true
-	r.updatedAt = time.Now().Unix()
 	if r.scheduledTimers != nil {
 		r.scheduledTimers.cancelScheduledResume()
 		r.scheduledTimers.cancelScheduledUnmute()
@@ -210,7 +164,7 @@ func (r *RoomState) Replay() error {
 	return nil
 }
 
-// Stop stops playback completely
+// Stop stops playback completely.
 func (r *RoomState) Stop() error {
 	if r.IsDestroyed() {
 		return ErrRoomDestroyed
@@ -219,15 +173,14 @@ func (r *RoomState) Stop() error {
 	_, file, line, _ := runtime.Caller(1)
 	gologging.DebugF("Stop Called from %s:%d", file, line)
 
-	err := r.Assistant.Ntg.Stop(r.ID)
+	if r.Call != nil {
+		r.Call.Leave()
+	}
 
 	r.mu.Lock()
 	r.track = nil
-	r.position = 0
-	r.playing = false
-	r.paused = false
 	r.muted = false
-	r.updatedAt = 0
+	r.speed = 1.0
 	if r.scheduledTimers != nil {
 		r.scheduledTimers.cancelScheduledUnmute()
 		r.scheduledTimers.cancelScheduledResume()
@@ -235,128 +188,91 @@ func (r *RoomState) Stop() error {
 	}
 	r.mu.Unlock()
 
-	return err
+	return nil
 }
 
-// Seek moves playback position by specified seconds
+// Seek moves playback position by specified seconds.
 func (r *RoomState) Seek(seconds int) error {
 	if r.IsDestroyed() {
 		return ErrRoomDestroyed
 	}
+	if r.Call == nil {
+		return ErrCallNotJoined
+	}
 
-	r.mu.Lock()
-	if r.track == nil || r.filePath == "" {
-		r.mu.Unlock()
+	r.mu.RLock()
+	track := r.track
+	r.mu.RUnlock()
+	if track == nil {
 		return fmt.Errorf("no track to seek")
 	}
 
-	r.updatePosition()
-
-	if seconds > 0 && r.track.Duration-r.position <= seekEndThreshold {
-		r.mu.Unlock()
+	currentPos := r.Call.Position()
+	if seconds > 0 && track.Duration-int(currentPos.Seconds()) <= seekEndThreshold {
 		return fmt.Errorf("cannot seek, track is about to end")
 	}
 
-	snapshot := struct {
-		position int
-		paused   bool
-		muted    bool
-		updated  int64
-	}{
-		position: r.position,
-		paused:   r.paused,
-		muted:    r.muted,
-		updated:  r.updatedAt,
-	}
-
-	newPos := r.position + seconds
-	if newPos >= r.track.Duration {
-		newPos = r.track.Duration - seekSafetyMargin
+	newPos := int(currentPos.Seconds()) + seconds
+	if newPos >= track.Duration {
+		newPos = track.Duration - seekSafetyMargin
 	}
 	if newPos < 0 {
 		newPos = 0
 	}
 
-	r.position = newPos
-	r.paused = false
+	if err := r.Call.SeekTo(time.Duration(newPos) * time.Second); err != nil {
+		return fmt.Errorf("seek failed: %w", err)
+	}
+
+	r.mu.Lock()
 	r.muted = false
-	r.updatedAt = time.Now().Unix()
 	r.mu.Unlock()
-
-	err := r.play()
-	if err != nil {
-		r.mu.Lock()
-		r.position = snapshot.position
-		r.paused = snapshot.paused
-		r.muted = snapshot.muted
-		r.updatedAt = snapshot.updated
-		r.mu.Unlock()
-		return err
-	}
-
-	r.mu.RLock()
-	wasMuted := snapshot.muted
-	r.mu.RUnlock()
-
-	if wasMuted {
-		r.Assistant.Ntg.Unmute(r.ID)
-	}
 
 	return nil
 }
 
-// SetSpeed adjusts playback speed with optional auto-reset
-func (r *RoomState) SetSpeed(
-	speed float64,
-	timeAfterNormal ...time.Duration,
-) error {
+// SetSpeed adjusts playback speed with optional auto-reset.
+func (r *RoomState) SetSpeed(speed float64, timeAfterNormal ...time.Duration) error {
 	if r.IsDestroyed() {
 		return ErrRoomDestroyed
 	}
+	if r.Call == nil {
+		return ErrCallNotJoined
+	}
 
 	r.mu.RLock()
-	hasTrack := r.track != nil && r.filePath != ""
+	track := r.track
+	path := r.filePath
 	currentSpeed := r.speed
 	r.mu.RUnlock()
 
-	if !hasTrack {
+	if track == nil || path == "" {
 		return fmt.Errorf("no track to adjust speed")
 	}
-
 	if speed < minSpeed || speed > maxSpeed {
-		return fmt.Errorf(
-			"invalid speed: must be between %.2fx and %.1fx",
-			minSpeed,
-			maxSpeed,
-		)
+		return fmt.Errorf("invalid speed: must be between %.2fx and %.1fx", minSpeed, maxSpeed)
 	}
-
 	if currentSpeed == speed {
 		return nil
 	}
 
-	r.mu.Lock()
-	r.updatePosition()
-	r.speed = speed
-	r.playing = true
-	r.paused = false
-	r.muted = false
-	r.updatedAt = time.Now().Unix()
-	r.mu.Unlock()
+	currentPos := r.Call.Position()
+	src := newSpeedSource(path, track.Video, speed)
 
-	err := r.play()
-	if err != nil {
+	if err := r.Call.PlayAt(src, currentPos); err != nil {
 		return err
 	}
 
 	r.mu.Lock()
+	r.speed = speed
+	r.muted = false
+
 	if r.scheduledTimers == nil {
 		r.scheduledTimers = &scheduledTimers{}
 	}
 	r.scheduledTimers.cancelScheduledSpeed()
 
-	shouldSchedule := len(timeAfterNormal) > 0 && timeAfterNormal[0] > 0 &&
-		speed != 1.0
+	shouldSchedule := len(timeAfterNormal) > 0 && timeAfterNormal[0] > 0 && speed != 1.0
 	if shouldSchedule {
 		d := timeAfterNormal[0]
 		r.scheduledSpeedUntil = time.Now().Add(d)
@@ -373,179 +289,47 @@ func (r *RoomState) resetSpeedToNormal() {
 	if r.IsDestroyed() {
 		return
 	}
-
-	r.mu.Lock()
-	if r.track == nil || !r.playing || r.speed == 1.0 {
-		r.mu.Unlock()
-		return
-	}
-
-	r.updatePosition()
-	r.speed = 1.0
-	r.updatedAt = time.Now().Unix()
-	r.mu.Unlock()
-
-	r.play()
+	_ = r.SetSpeed(1.0)
 }
 
-// Mute mutes playback with optional auto-unmute
+// Mute mutes playback with optional auto-unmute.
+//
+// TODO: gortc didn't support.
 func (r *RoomState) Mute(unmuteAfter ...time.Duration) (bool, error) {
 	if r.IsDestroyed() {
 		return false, ErrRoomDestroyed
 	}
-
-	r.mu.RLock()
-	alreadyMuted := r.muted
-	r.mu.RUnlock()
-
-	if alreadyMuted {
-		return true, nil
-	}
-
-	muted, err := r.Assistant.Ntg.Mute(r.ID)
-	if err != nil {
-		return false, err
-	}
-
-	r.mu.RLock()
-	isPaused := r.paused
-	r.mu.RUnlock()
-
-	if isPaused {
-		r.Resume()
-	} else {
-		r.Parse()
-	}
-
-	r.mu.Lock()
-	r.muted = true
-	if r.scheduledTimers == nil {
-		r.scheduledTimers = &scheduledTimers{}
-	}
-	r.scheduledTimers.cancelScheduledUnmute()
-
-	if len(unmuteAfter) > 0 && unmuteAfter[0] > 0 {
-		duration := unmuteAfter[0]
-		r.scheduledUnmuteUntil = time.Now().Add(duration)
-		r.scheduledUnmuteTimer = time.AfterFunc(duration, func() {
-			if !r.IsDestroyed() {
-				r.Parse()
-				r.Unmute()
-			}
-		})
-	}
-	r.mu.Unlock()
-
-	return muted, nil
+	return false, nil
 }
 
-// Unmute unmutes playback
+// Unmute unmutes playback.
+//
+// TODO: gortc didn't support.
 func (r *RoomState) Unmute() (bool, error) {
 	if r.IsDestroyed() {
 		return false, ErrRoomDestroyed
 	}
-
-	unmuted, err := r.Assistant.Ntg.Unmute(r.ID)
-	if err != nil {
-		return false, err
-	}
-
-	r.mu.Lock()
-	r.updatePosition()
-	r.muted = false
-	r.paused = false
-	if r.scheduledTimers != nil {
-		r.scheduledTimers.cancelScheduledUnmute()
-	}
-	r.mu.Unlock()
-
-	return unmuted, nil
+	return false, nil
 }
 
 func (r *RoomState) play() error {
-	desc := getMediaDescription(r.filePath, r.position, r.speed, r.track.Video)
-	return r.Assistant.Ntg.Play(r.ID, desc)
-}
+	r.mu.RLock()
+	path := r.filePath
+	isVideo := r.track != nil && r.track.Video
+	speed := r.speed
+	r.mu.RUnlock()
 
-func getMediaDescription(
-	url string,
-	pos int,
-	speed float64,
-	isVideo bool,
-) ntgcalls.MediaDescription {
-	if speed < 0.5 {
-		speed = 0.5
-	} else if speed > 4.0 {
-		speed = 4.0
+	if speed != 0 && speed != 1.0 {
+		src := newSpeedSource(path, isVideo, speed)
+		return r.PlayTrack(src)
 	}
 
-	baseCmd := "ffmpeg "
-	if isStreamURL(url) {
-		baseCmd += "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 "
-	}
-	if pos > 0 {
-		baseCmd += "-ss " + strconv.Itoa(pos) + " "
-	}
-	baseCmd += "-v warning -i \"" + url + "\" "
-
-	audio := getAudioPipeline(baseCmd, speed)
-	if !isVideo {
-		return ntgcalls.MediaDescription{
-			Microphone: audio,
-		}
+	var src media.Source
+	if isVideo {
+		src = media.FromFile(path, media.Res720)
+	} else {
+		src = media.FromFile(path, media.EncodeOptions{Tracks: media.TrackAudio})
 	}
 
-	video := getVideoPipeline(baseCmd, url, speed)
-	return ntgcalls.MediaDescription{
-		Microphone: audio,
-		Camera:     video,
-	}
-}
-
-func getAudioPipeline(
-	baseCmd string,
-	speed float64,
-) *ntgcalls.AudioDescription {
-	audio := &ntgcalls.AudioDescription{
-		MediaSource:  ntgcalls.MediaSourceShell,
-		SampleRate:   96000,
-		ChannelCount: 2,
-	}
-
-	audioCmd := baseCmd
-	audioCmd += "-filter:a \"atempo=" + strconv.FormatFloat(
-		speed,
-		'f',
-		2,
-		64,
-	) + "\" "
-	audioCmd += "-f s16le -ac " + strconv.Itoa(int(audio.ChannelCount)) + " "
-	audioCmd += "-ar " + strconv.Itoa(int(audio.SampleRate)) + " "
-	audioCmd += "pipe:1"
-	audio.Input = audioCmd
-
-	return audio
-}
-
-func getVideoPipeline(
-	baseCmd string,
-	url string,
-	speed float64,
-) *ntgcalls.VideoDescription {
-	w, h, fps, filter := normalizeVideo(url, speed)
-
-	video := &ntgcalls.VideoDescription{
-		MediaSource: ntgcalls.MediaSourceShell,
-		Width:       int16(w),
-		Height:      int16(h),
-		Fps:         uint8(fps),
-	}
-
-	videoCmd := baseCmd
-	videoCmd += "-filter:v \"" + filter + "\" "
-	videoCmd += "-f rawvideo -r " + strconv.Itoa(fps) + " -pix_fmt yuv420p "
-	videoCmd += "pipe:1"
-	video.Input = videoCmd
-
-	return video
+	return r.PlayTrack(src)
 }

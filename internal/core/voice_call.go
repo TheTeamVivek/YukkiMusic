@@ -1,3 +1,20 @@
+/*
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
+
 package core
 
 import (
@@ -6,9 +23,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/amarnathcjd/gogram/telegram"
 	"github.com/amarnathcjd/gortc/groupcall"
 	"github.com/amarnathcjd/gortc/media"
-	"github.com/amarnathcjd/gogram/telegram"
 )
 
 var ErrCallNotJoined = errors.New("voice call: not joined")
@@ -68,6 +85,42 @@ func (v *VoiceCall) Play(src media.Source) error {
 	return nil
 }
 
+// PlayAt starts streaming src from a given offset, if src is seekable.
+// Falls back to playing from the start if it is not seekable.
+func (v *VoiceCall) PlayAt(src media.Source, offset time.Duration) error {
+	v.mu.Lock()
+	defer v.mu.Unlock()
+
+	if v.gc == nil {
+		return ErrCallNotJoined
+	}
+	v.stopPlayerLocked()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	v.playCancel = cancel
+
+	player := v.gc.Play(ctx, src)
+	if offset > 0 {
+		if err := player.Seek(offset); err != nil && err != media.ErrNotSeekable {
+			cancel()
+			return err
+		}
+	}
+	v.player = player
+	return nil
+}
+
+// SeekTo seeks the current player to an absolute offset
+func (v *VoiceCall) SeekTo(offset time.Duration) error {
+	v.mu.RLock()
+	player := v.player
+	v.mu.RUnlock()
+	if player == nil {
+		return ErrCallNotJoined
+	}
+	return player.Seek(offset)
+}
+
 // Pause pauses the active player, if any.
 func (v *VoiceCall) Pause() {
 	v.mu.RLock()
@@ -106,8 +159,7 @@ func (v *VoiceCall) stopPlayerLocked() {
 	}
 }
 
-// Leave stops playback (if any), leaves the group call, and releases the
-// join context. Safe to call even if nothing was ever joined.
+// Leave stops playback (if any), leaves the group call.
 func (v *VoiceCall) Leave() error {
 	v.mu.Lock()
 	v.stopPlayerLocked()
@@ -139,6 +191,7 @@ func (v *VoiceCall) IsPlaying() bool {
 	return v.player != nil
 }
 
+// Paused reports whether the active player is paused.
 func (v *VoiceCall) Paused() bool {
 	v.mu.RLock()
 	defer v.mu.RUnlock()

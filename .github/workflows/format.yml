@@ -38,8 +38,8 @@ jobs:
           go mod tidy
           gofmt -w .
           goimports -w .
-          bash install.sh -n
-          go fix ./...
+          #bash install.sh -n
+          #go fix ./...
           go mod tidy
 
       - name: Commit changes

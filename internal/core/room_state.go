@@ -26,6 +26,7 @@ import (
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"github.com/amarnathcjd/gortc/media"
 
 	state "yukkimusic/internal/core/models"
 )
@@ -49,17 +50,19 @@ type RoomState struct {
 	filePath string
 	// track is the active track metadata.
 	track *state.Track
-	// muted reports whether playback is currently muted.
+	// muted reports whether playback is currently muted. gortc has no
+	// server-side mute primitive, so this is tracked manually only.
 	muted bool
 	// loop is the loop mode/state value.
 	loop int
+	// speed is the active playback speed multiplier.
+	speed float64
 
 	// queue holds upcoming tracks.
 	queue []*state.Track
 	// shuffle indicates queue shuffle mode.
 	shuffle bool
-     // speed is the active playback speed multiplier.
-    speed float64
+
 	// scheduledTimers manages auto-resume/unmute/speed timers.
 	*scheduledTimers
 
@@ -136,7 +139,7 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 			ChatID:    chatID,
 			queue:     []*state.Track{},
 			Assistant: ass,
-            speed:     1.0,
+			speed:     1.0,
 			Data:      make(map[string]any),
 		}
 		room.destroyed.Store(false)
