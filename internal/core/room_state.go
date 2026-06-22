@@ -35,6 +35,7 @@ var (
 	rooms   = make(map[int64]*RoomState)
 	roomsMu sync.RWMutex
 
+	OnStreamEnd func(chatID int64)
 	ErrRoomDestroyed = errors.New("room destroyed")
 )
 
@@ -139,8 +140,14 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 			ChatID:    chatID,
 			queue:     []*state.Track{},
 			Assistant: ass,
+			Call:      NewVoiceCall(ass.Client, chatID),
 			speed:     1.0,
 			Data:      make(map[string]any),
+		}
+		room.Call.OnStreamEnd = func(chatID int64) {
+			if OnStreamEnd != nil {
+				OnStreamEnd(chatID)
+			}
 		}
 		room.destroyed.Store(false)
 		rooms[chatID] = room
@@ -440,4 +447,14 @@ func (r *RoomState) CallDuration() time.Duration {
 		return 0
 	}
 	return r.Call.Duration()
+}
+
+func (r *RoomState) Position() int {
+	return int(r.CallPosition().Seconds())
+}
+
+func (r *RoomState) Speed() float64 {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.speed
 }

@@ -23,6 +23,7 @@ import (
 	"io"
 	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/amarnathcjd/gortc/media"
@@ -176,9 +177,10 @@ func atempoFilter(speed float64) string {
 	}
 	stages = append(stages, fmt.Sprintf("atempo=%.3f", remaining))
 
-	out := stages[0]
+	var out strings.Builder
+	out.WriteString(stages[0])
 	for _, st := range stages[1:] {
-		out += "," + st
+		out.WriteString("," + st)
 	}
-	return out
+	return out.String()
 }

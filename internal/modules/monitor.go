@@ -56,7 +56,6 @@ func MonitorRooms() {
 					return
 				}
 
-				r.Parse()
 				statusMsg := r.StatusMsg()
 				if statusMsg == nil {
 					return

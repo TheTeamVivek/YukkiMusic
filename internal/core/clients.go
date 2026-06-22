@@ -29,7 +29,6 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/config"
-	"yukkimusic/ubot"
 )
 
 var (
@@ -60,7 +59,6 @@ func Init() (func(), error) {
 
 		gologging.Info("Shutting down assistants...")
 		Assistants.ForEach(func(a *Assistant) {
-			a.Ntg.Close()
 			a.Client.Stop()
 		})
 
@@ -187,7 +185,6 @@ func initAssistant(
 		Index:  index,
 		Client: client,
 		Self:   user,
-		Ntg:    ubot.NewContext(client),
 	}, nil
 }
 

@@ -53,20 +53,9 @@ func activeHandler(m *telegram.NewMessage) error {
 	allRooms := core.GetAllRooms()
 	activeCount := len(allRooms)
 
-	ntgChats := make(map[int64]struct{})
-
-	core.Assistants.ForEach(func(a *core.Assistant) {
-		if a == nil || a.Ntg == nil {
-			return
-		}
-		for id := range a.Ntg.Calls() {
-			ntgChats[id] = struct{}{}
-		}
-	})
-
 	brokenCount := 0
-	for id := range allRooms {
-		if _, ok := ntgChats[id]; !ok {
+	for _, r := range allRooms {
+		if !r.IsActiveChat() {
 			brokenCount++
 		}
 	}

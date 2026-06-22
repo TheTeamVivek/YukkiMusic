@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/amarnathcjd/gogram/telegram"
@@ -28,7 +29,10 @@ import (
 	"github.com/amarnathcjd/gortc/media"
 )
 
-var ErrCallNotJoined = errors.New("voice call: not joined")
+var (
+	ErrCallNotJoined     = errors.New("voice call: not joined")
+	ErrConnectionTimeout = errors.New("voice call: connection timeout")
+)
 
 // VoiceCall wraps a single chat's gortc group-call connection and active
 // player. One VoiceCall belongs to one RoomState.
@@ -40,6 +44,11 @@ type VoiceCall struct {
 
 	joinCancel context.CancelFunc
 	playCancel context.CancelFunc
+
+	// playID is the current playback sequence number.
+	playID atomic.Uint64
+	// OnStreamEnd is called when a track finishes playing naturally.
+	OnStreamEnd func(chatID int64)
 
 	chatID int64
 }
@@ -82,6 +91,21 @@ func (v *VoiceCall) Play(src media.Source) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	v.playCancel = cancel
 	v.player = v.gc.Play(ctx, src)
+
+	id := v.playID.Add(1)
+	go func() {
+		done := v.player.Done()
+		if done == nil {
+			return
+		}
+		<-done
+		v.mu.RLock()
+		callback := v.OnStreamEnd
+		v.mu.RUnlock()
+		if callback != nil && v.playID.Load() == id {
+			callback(v.chatID)
+		}
+	}()
 	return nil
 }
 
@@ -107,6 +131,21 @@ func (v *VoiceCall) PlayAt(src media.Source, offset time.Duration) error {
 		}
 	}
 	v.player = player
+
+	id := v.playID.Add(1)
+	go func() {
+		done := player.Done()
+		if done == nil {
+			return
+		}
+		<-done
+		v.mu.RLock()
+		callback := v.OnStreamEnd
+		v.mu.RUnlock()
+		if callback != nil && v.playID.Load() == id {
+			callback(v.chatID)
+		}
+	}()
 	return nil
 }
 
@@ -146,6 +185,7 @@ func (v *VoiceCall) Stop() {
 	v.mu.Lock()
 	defer v.mu.Unlock()
 	v.stopPlayerLocked()
+	v.playID.Add(1)
 }
 
 func (v *VoiceCall) stopPlayerLocked() {
@@ -163,6 +203,7 @@ func (v *VoiceCall) stopPlayerLocked() {
 func (v *VoiceCall) Leave() error {
 	v.mu.Lock()
 	v.stopPlayerLocked()
+	v.playID.Add(1)
 	gc := v.gc
 	v.gc = nil
 	if v.joinCancel != nil {

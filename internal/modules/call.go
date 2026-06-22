@@ -28,18 +28,9 @@ import (
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/platforms"
 	"yukkimusic/internal/utils"
-	"yukkimusic/ntgcalls"
 )
 
-func streamEndHandler(
-	chatID int64,
-	streamType ntgcalls.StreamType,
-	_ ntgcalls.StreamDevice,
-) {
-	if streamType == ntgcalls.VideoStream {
-		gologging.Debug("[onStreamEndHandler] Video stream ended, returning")
-		return
-	}
+func streamEndHandler(chatID int64) {
 
 	gologging.DebugF("[onStreamEndHandler] Stream ended in chat %d", chatID)
 	ass, err := core.Assistants.ForChat(chatID)
@@ -52,21 +43,10 @@ func streamEndHandler(
 		return
 	}
 	scheduleOldPlayingMessage(r)
-
-	if ok, v := r.GetData("is_transitioning"); ok {
-		if ok, v := v.(bool); ok && v {
-			return
-		}
-	}
-
-	r.SetData("is_transitioning", true)
-	defer r.DeleteData("is_transitioning")
-
 	cid := r.ChatID
-	r.Parse()
-
 	var t *state.Track
 	var wasLooping bool
+
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
 		core.DeleteRoom(chatID)
 		core.Bot.SendMessage(cid, F(cid, "stream_queue_finished"))

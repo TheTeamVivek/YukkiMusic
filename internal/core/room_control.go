@@ -319,17 +319,19 @@ func (r *RoomState) play() error {
 	speed := r.speed
 	r.mu.RUnlock()
 
+	var err error
 	if speed != 0 && speed != 1.0 {
 		src := newSpeedSource(path, isVideo, speed)
-		return r.PlayTrack(src)
-	}
-
-	var src media.Source
-	if isVideo {
-		src = media.FromFile(path, media.Res720)
+		err = r.PlayTrack(src)
 	} else {
-		src = media.FromFile(path, media.EncodeOptions{Tracks: media.TrackAudio})
+		var src media.Source
+		if isVideo {
+			src = media.FromFile(path, media.Res720)
+		} else {
+			src = media.FromFile(path, media.EncodeOptions{Tracks: media.TrackAudio})
+		}
+		err = r.PlayTrack(src)
 	}
 
-	return r.PlayTrack(src)
+	return err
 }

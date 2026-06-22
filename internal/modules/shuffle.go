@@ -73,8 +73,6 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 		return telegram.ErrEndGroup
 	}
 
-	r.Parse()
-
 	if arg == "" {
 		state := F(chatID, "disabled")
 		cmd := getCommand(m) + " on"

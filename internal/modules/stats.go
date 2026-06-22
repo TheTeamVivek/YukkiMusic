@@ -31,7 +31,6 @@ import (
 	"yukkimusic/config"
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
-	"yukkimusic/ntgcalls"
 )
 
 func init() {
@@ -153,7 +152,7 @@ func statsHandler(m *telegram.NewMessage) error {
 		"go_version":        runtime.Version(),
 		"gogram_api_layer":  telegram.ApiVersion,
 		"gogram_version":    resolveGogramVersion(),
-		"ntgcalls_version":  ntgcalls.Version(),
+		"ntgcalls_version":  "gortc",
 	}))
 	return telegram.ErrEndGroup
 }

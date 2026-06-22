@@ -35,7 +35,6 @@ import (
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/platforms"
 	"yukkimusic/internal/utils"
-	"yukkimusic/ubot"
 )
 
 type playOpts struct {
@@ -238,8 +237,6 @@ func prepareRoomAndSearchMessage(
 	}
 
 	chatID := m.ChannelID()
-	room.Parse()
-
 	if len(room.Queue()) >= config.QueueLimit {
 		m.Reply(F(chatID, "queue_limit_reached", locales.Arg{"limit": config.QueueLimit}))
 		return nil, nil, fmt.Errorf("queue limit reached")
@@ -725,7 +722,7 @@ func handlePlayAttemptError(
 		return true, nil
 	}
 
-	if errors.Is(err, ubot.ErrConnectionTimeout) {
+	if errors.Is(err, core.ErrConnectionTimeout) {
 		gologging.Error("Voice connection timeout. Stopping call session...")
 		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_connection_timeout"))
 		core.DeleteRoom(room.ID)

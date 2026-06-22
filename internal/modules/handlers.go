@@ -535,9 +535,7 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 	bot.AddActionHandler(handleActions)
 	bot.AddRawHandler(&telegram.UpdateReadChannelOutbox{}, cleanModeReadHandler)
 
-	assistants.ForEach(func(a *core.Assistant) {
-		a.Ntg.OnStreamEnd(streamEndHandler)
-	})
+	core.OnStreamEnd = streamEndHandler
 
 	go MonitorRooms()
 

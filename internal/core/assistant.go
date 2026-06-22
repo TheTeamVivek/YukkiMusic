@@ -23,15 +23,12 @@ import (
 
 	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
-
-	"yukkimusic/ubot"
 )
 
 type Assistant struct {
 	Index  int
 	Client *telegram.Client
 	Self   *telegram.UserObj
-	Ntg    *ubot.Context
 }
 
 type AssistantManager struct {
