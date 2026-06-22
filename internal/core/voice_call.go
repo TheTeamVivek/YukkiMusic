@@ -23,7 +23,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
-        "github.com/Laky-64/gologging"
+
+	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 	"github.com/amarnathcjd/gortc/groupcall"
 	"github.com/amarnathcjd/gortc/media"
@@ -120,16 +121,21 @@ func (v *VoiceCall) PlayAt(src media.Source, offset time.Duration) error {
 	id := v.playID.Add(1)
 	v.mu.Unlock()
 
+	v.watch(player, id)
+	return nil
+}
+
+func (v *VoiceCall) watch(player *media.Player, id uint64) {
 	go func() {
 		done := player.Done()
 		if done == nil {
 			return
 		}
 		err := <-done
-if err != nil {
-gologging.Error(err)
-return 
-}
+		if err != nil {
+			gologging.Error(err)
+			return
+		}
 		v.mu.RLock()
 		callback := v.OnStreamEnd
 		chatID := v.chatID
@@ -138,7 +144,6 @@ return
 			callback(chatID)
 		}
 	}()
-	return nil
 }
 
 func (v *VoiceCall) SeekTo(offset time.Duration) error {
@@ -159,26 +164,9 @@ func (v *VoiceCall) SeekTo(offset time.Duration) error {
 	id := v.playID.Add(1)
 	v.mu.Unlock()
 
-	go func() {
-		done := player.Done()
-		if done == nil {
-			return
-		}
-		err := <-done
-		if err != nil {
-			return
-		}
-		v.mu.RLock()
-		callback := v.OnStreamEnd
-		chatID := v.chatID
-		v.mu.RUnlock()
-		if callback != nil && v.playID.Load() == id {
-			callback(chatID)
-		}
-	}()
+	v.watch(player, id)
 	return nil
 }
-
 
 func (v *VoiceCall) Pause() {
 	v.mu.RLock()
