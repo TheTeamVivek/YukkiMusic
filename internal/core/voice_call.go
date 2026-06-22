@@ -142,14 +142,43 @@ return
 }
 
 func (v *VoiceCall) SeekTo(offset time.Duration) error {
-	v.mu.RLock()
+	v.mu.Lock()
 	player := v.player
-	v.mu.RUnlock()
 	if player == nil {
+		v.mu.Unlock()
 		return ErrCallNotJoined
 	}
-	return player.Seek(offset)
+	v.playID.Add(1)
+	v.mu.Unlock()
+
+	if err := player.Seek(offset); err != nil {
+		return err
+	}
+
+	v.mu.Lock()
+	id := v.playID.Add(1)
+	v.mu.Unlock()
+
+	go func() {
+		done := player.Done()
+		if done == nil {
+			return
+		}
+		err := <-done
+		if err != nil {
+			return
+		}
+		v.mu.RLock()
+		callback := v.OnStreamEnd
+		chatID := v.chatID
+		v.mu.RUnlock()
+		if callback != nil && v.playID.Load() == id {
+			callback(chatID)
+		}
+	}()
+	return nil
 }
+
 
 func (v *VoiceCall) Pause() {
 	v.mu.RLock()
