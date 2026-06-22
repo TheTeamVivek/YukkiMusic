@@ -34,26 +34,23 @@ var (
 	ErrConnectionTimeout = errors.New("voice call: connection timeout")
 )
 
-// VoiceCall wraps a single chat's gortc group-call connection and active
-// player. One VoiceCall belongs to one RoomState.
 type VoiceCall struct {
 	mu sync.RWMutex
 
 	gc     *groupcall.GroupCall
 	player *media.Player
+	joined bool
 
 	joinCancel context.CancelFunc
 	playCancel context.CancelFunc
 
-	// playID is the current playback sequence number.
 	playID atomic.Uint64
-	// OnStreamEnd is called when a track finishes playing naturally.
+
 	OnStreamEnd func(chatID int64)
 
 	chatID int64
 }
 
-// NewVoiceCall builds a VoiceCall bound to client, but does not join yet.
 func NewVoiceCall(client *telegram.Client, chatID int64, opts ...groupcall.Option) *VoiceCall {
 	return &VoiceCall{
 		gc:     groupcall.New(client, opts...),
@@ -61,7 +58,6 @@ func NewVoiceCall(client *telegram.Client, chatID int64, opts ...groupcall.Optio
 	}
 }
 
-// Join connects to the group call. Blocking; retries internally.
 func (v *VoiceCall) Join() error {
 	v.mu.Lock()
 	if v.gc == nil {
@@ -74,48 +70,37 @@ func (v *VoiceCall) Join() error {
 	chatID := v.chatID
 	v.mu.Unlock()
 
-	return gc.JoinCall(ctx, chatID)
+	err := gc.JoinCall(ctx, chatID)
+
+	v.mu.Lock()
+	v.joined = err == nil
+	v.mu.Unlock()
+
+	return err
 }
 
-// Play starts streaming src in the background. Any previous player is
-// stopped first.
 func (v *VoiceCall) Play(src media.Source) error {
-	v.mu.Lock()
-	defer v.mu.Unlock()
+	return v.PlayAt(src, 0)
+}
 
-	if v.gc == nil {
+func (v *VoiceCall) PlayAt(src media.Source, offset time.Duration) error {
+	v.mu.RLock()
+	hasGC := v.gc != nil
+	joined := v.joined
+	v.mu.RUnlock()
+
+	if !hasGC {
 		return ErrCallNotJoined
 	}
-	v.stopPlayerLocked()
-
-	ctx, cancel := context.WithCancel(context.Background())
-	v.playCancel = cancel
-	v.player = v.gc.Play(ctx, src)
-
-	id := v.playID.Add(1)
-	go func() {
-		done := v.player.Done()
-		if done == nil {
-			return
+	if !joined {
+		if err := v.Join(); err != nil {
+			return err
 		}
-		<-done
-		v.mu.RLock()
-		callback := v.OnStreamEnd
-		v.mu.RUnlock()
-		if callback != nil && v.playID.Load() == id {
-			callback(v.chatID)
-		}
-	}()
-	return nil
-}
+	}
 
-// PlayAt starts streaming src from a given offset, if src is seekable.
-// Falls back to playing from the start if it is not seekable.
-func (v *VoiceCall) PlayAt(src media.Source, offset time.Duration) error {
 	v.mu.Lock()
-	defer v.mu.Unlock()
-
 	if v.gc == nil {
+		v.mu.Unlock()
 		return ErrCallNotJoined
 	}
 	v.stopPlayerLocked()
@@ -127,12 +112,14 @@ func (v *VoiceCall) PlayAt(src media.Source, offset time.Duration) error {
 	if offset > 0 {
 		if err := player.Seek(offset); err != nil && err != media.ErrNotSeekable {
 			cancel()
+			v.mu.Unlock()
 			return err
 		}
 	}
 	v.player = player
-
 	id := v.playID.Add(1)
+	v.mu.Unlock()
+
 	go func() {
 		done := player.Done()
 		if done == nil {
@@ -141,15 +128,15 @@ func (v *VoiceCall) PlayAt(src media.Source, offset time.Duration) error {
 		<-done
 		v.mu.RLock()
 		callback := v.OnStreamEnd
+		chatID := v.chatID
 		v.mu.RUnlock()
 		if callback != nil && v.playID.Load() == id {
-			callback(v.chatID)
+			callback(chatID)
 		}
 	}()
 	return nil
 }
 
-// SeekTo seeks the current player to an absolute offset
 func (v *VoiceCall) SeekTo(offset time.Duration) error {
 	v.mu.RLock()
 	player := v.player
@@ -160,7 +147,6 @@ func (v *VoiceCall) SeekTo(offset time.Duration) error {
 	return player.Seek(offset)
 }
 
-// Pause pauses the active player, if any.
 func (v *VoiceCall) Pause() {
 	v.mu.RLock()
 	defer v.mu.RUnlock()
@@ -170,7 +156,6 @@ func (v *VoiceCall) Pause() {
 	v.player.Pause()
 }
 
-// Resume resumes the active player, if any.
 func (v *VoiceCall) Resume() {
 	v.mu.RLock()
 	defer v.mu.RUnlock()
@@ -180,7 +165,6 @@ func (v *VoiceCall) Resume() {
 	v.player.Resume()
 }
 
-// Stop halts the current playback only; the call connection stays alive.
 func (v *VoiceCall) Stop() {
 	v.mu.Lock()
 	defer v.mu.Unlock()
@@ -199,11 +183,11 @@ func (v *VoiceCall) stopPlayerLocked() {
 	}
 }
 
-// Leave stops playback (if any), leaves the group call.
 func (v *VoiceCall) Leave() error {
 	v.mu.Lock()
 	v.stopPlayerLocked()
 	v.playID.Add(1)
+	v.joined = false
 	gc := v.gc
 	v.gc = nil
 	if v.joinCancel != nil {
@@ -218,21 +202,18 @@ func (v *VoiceCall) Leave() error {
 	return gc.Leave()
 }
 
-// IsJoined reports whether the underlying group-call connection still exists.
 func (v *VoiceCall) IsJoined() bool {
 	v.mu.RLock()
 	defer v.mu.RUnlock()
-	return v.gc != nil
+	return v.joined
 }
 
-// IsPlaying reports whether a player is currently active.
 func (v *VoiceCall) IsPlaying() bool {
 	v.mu.RLock()
 	defer v.mu.RUnlock()
 	return v.player != nil
 }
 
-// Paused reports whether the active player is paused.
 func (v *VoiceCall) Paused() bool {
 	v.mu.RLock()
 	defer v.mu.RUnlock()
@@ -242,7 +223,6 @@ func (v *VoiceCall) Paused() bool {
 	return v.player.Paused()
 }
 
-// Position returns current playback position.
 func (v *VoiceCall) Position() time.Duration {
 	v.mu.RLock()
 	defer v.mu.RUnlock()
@@ -252,7 +232,6 @@ func (v *VoiceCall) Position() time.Duration {
 	return v.player.Position()
 }
 
-// Duration returns the total duration of the current track.
 func (v *VoiceCall) Duration() time.Duration {
 	v.mu.RLock()
 	defer v.mu.RUnlock()
@@ -262,8 +241,6 @@ func (v *VoiceCall) Duration() time.Duration {
 	return v.player.Duration()
 }
 
-// Done returns the active player's completion channel, or nil if nothing
-// is playing.
 func (v *VoiceCall) Done() <-chan error {
 	v.mu.RLock()
 	defer v.mu.RUnlock()
