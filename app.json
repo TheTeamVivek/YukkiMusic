@@ -103,13 +103,19 @@
     },
     "buildpacks": [
     {
-      "url": "heroku-community/apt"
+      "url": "heroku/python"
+    },
+    {
+      "url": "heroku/go"
     },
     {
       "url": "https://github.com/chibat/heroku-buildpack-deno.git"
     },
     {
-      "url": "heroku/go"
+      "url": "https://github.com/heroku/heroku-buildpack-activestorage-preview"
+    },
+    {
+      "url": "https://github.com/Vivekkumar-IN/heroku-buildpack-yt-dlp"
     }
   ]
 }
