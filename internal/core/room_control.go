@@ -29,8 +29,6 @@ import (
 )
 
 const (
-	minSpeed         = 0.50
-	maxSpeed         = 4.0
 	seekEndThreshold = 10
 	seekSafetyMargin = 5
 )
@@ -61,7 +59,6 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 	r.track = t
 	r.filePath = path
 	r.muted = false
-	r.speed = 1.0
 	r.mu.Unlock()
 
 	if err := r.play(); err != nil {
@@ -180,7 +177,6 @@ func (r *RoomState) Stop() error {
 	r.mu.Lock()
 	r.track = nil
 	r.muted = false
-	r.speed = 1.0
 	if r.scheduledTimers != nil {
 		r.scheduledTimers.cancelScheduledUnmute()
 		r.scheduledTimers.cancelScheduledResume()
@@ -232,56 +228,12 @@ func (r *RoomState) Seek(seconds int) error {
 }
 
 // SetSpeed adjusts playback speed with optional auto-reset.
+//
+// TODO: gortc didn't support.
 func (r *RoomState) SetSpeed(speed float64, timeAfterNormal ...time.Duration) error {
 	if r.IsDestroyed() {
 		return ErrRoomDestroyed
 	}
-	if r.Call == nil {
-		return ErrCallNotJoined
-	}
-
-	r.mu.RLock()
-	track := r.track
-	path := r.filePath
-	currentSpeed := r.speed
-	r.mu.RUnlock()
-
-	if track == nil || path == "" {
-		return fmt.Errorf("no track to adjust speed")
-	}
-	if speed < minSpeed || speed > maxSpeed {
-		return fmt.Errorf("invalid speed: must be between %.2fx and %.1fx", minSpeed, maxSpeed)
-	}
-	if currentSpeed == speed {
-		return nil
-	}
-
-	currentPos := r.Call.Position()
-	src := newSpeedSource(path, track.Video, speed)
-
-	if err := r.Call.PlayAt(src, currentPos); err != nil {
-		return err
-	}
-
-	r.mu.Lock()
-	r.speed = speed
-	r.muted = false
-
-	if r.scheduledTimers == nil {
-		r.scheduledTimers = &scheduledTimers{}
-	}
-	r.scheduledTimers.cancelScheduledSpeed()
-
-	shouldSchedule := len(timeAfterNormal) > 0 && timeAfterNormal[0] > 0 && speed != 1.0
-	if shouldSchedule {
-		d := timeAfterNormal[0]
-		r.scheduledSpeedUntil = time.Now().Add(d)
-		r.scheduledSpeedTimer = time.AfterFunc(d, func() {
-			r.resetSpeedToNormal()
-		})
-	}
-	r.mu.Unlock()
-
 	return nil
 }
 
@@ -289,7 +241,6 @@ func (r *RoomState) resetSpeedToNormal() {
 	if r.IsDestroyed() {
 		return
 	}
-	_ = r.SetSpeed(1.0)
 }
 
 // Mute mutes playback with optional auto-unmute.
@@ -316,22 +267,14 @@ func (r *RoomState) play() error {
 	r.mu.RLock()
 	path := r.filePath
 	isVideo := r.track != nil && r.track.Video
-	speed := r.speed
 	r.mu.RUnlock()
 
-	var err error
-	if speed != 0 && speed != 1.0 {
-		src := newSpeedSource(path, isVideo, speed)
-		err = r.PlayTrack(src)
+	var src media.Source
+	if isVideo {
+		src = media.FromFile(path, media.Res720)
 	} else {
-		var src media.Source
-		if isVideo {
-			src = media.FromFile(path, media.Res720)
-		} else {
-			src = media.FromFile(path, media.EncodeOptions{Tracks: media.TrackAudio})
-		}
-		err = r.PlayTrack(src)
+		src = media.FromFile(path, media.EncodeOptions{Tracks: media.TrackAudio})
 	}
 
-	return err
+	return r.PlayTrack(src)
 }
