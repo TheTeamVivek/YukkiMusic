@@ -1,1 +1,1 @@
-worker: /app/myapp
+worker: ./bin/yukkimusic

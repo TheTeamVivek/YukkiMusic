@@ -118,7 +118,7 @@ func GetPlayMarkup(chatID int64, r *RoomState, queued bool) tg.ReplyMarkup {
 		duration = track.Duration
 	}
 
-	progress := utils.GetProgressBar(r.Position(), duration)
+	progress := utils.GetProgressBar(r.CallPosition(), duration)
 	progress = utils.FormatTime(
 		r.Position(),
 	) + " " + progress + " " + utils.FormatTime(
