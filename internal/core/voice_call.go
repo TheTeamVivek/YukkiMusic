@@ -23,7 +23,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
-
+        "github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 	"github.com/amarnathcjd/gortc/groupcall"
 	"github.com/amarnathcjd/gortc/media"
@@ -125,7 +125,11 @@ func (v *VoiceCall) PlayAt(src media.Source, offset time.Duration) error {
 		if done == nil {
 			return
 		}
-		<-done
+		err := <-done
+if err != nil {
+gologging.Error(err)
+return 
+}
 		v.mu.RLock()
 		callback := v.OnStreamEnd
 		chatID := v.chatID
