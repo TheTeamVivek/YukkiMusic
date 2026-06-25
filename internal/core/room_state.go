@@ -213,6 +213,52 @@ func (r *RoomState) IsDestroyed() bool {
 	return r.destroyed.Load()
 }
 
+func (st *scheduledTimers) RemainingUnmuteDuration() time.Duration {
+        if st == nil || st.scheduledUnmuteUntil.IsZero() {
+                return 0
+        }
+        return time.Until(st.scheduledUnmuteUntil)
+}
+
+func (st *scheduledTimers) RemainingResumeDuration() time.Duration {
+        if st == nil || st.scheduledResumeUntil.IsZero() {
+                return 0
+        }
+        return time.Until(st.scheduledResumeUntil)
+}
+
+func (st *scheduledTimers) RemainingSpeedDuration() time.Duration {
+        if st == nil || st.scheduledSpeedUntil.IsZero() {
+                return 0
+        }
+        return time.Until(st.scheduledSpeedUntil)
+}
+
+func (st *scheduledTimers) cancelScheduledUnmute() {
+        if st != nil && st.scheduledUnmuteTimer != nil {
+                st.scheduledUnmuteTimer.Stop()
+                st.scheduledUnmuteTimer = nil
+                st.scheduledUnmuteUntil = time.Time{}
+        }
+}
+
+func (st *scheduledTimers) cancelScheduledResume() {
+        if st != nil && st.scheduledResumeTimer != nil {
+                st.scheduledResumeTimer.Stop()
+                st.scheduledResumeTimer = nil
+                st.scheduledResumeUntil = time.Time{}
+        }
+}
+
+func (st *scheduledTimers) cancelScheduledSpeed() {
+        if st != nil && st.scheduledSpeedTimer != nil {
+                st.scheduledSpeedTimer.Stop()
+                st.scheduledSpeedTimer = nil
+                st.scheduledSpeedUntil = time.Time{}
+        }
+}
+
+
 // Getters
 
 func (r *RoomState) FilePath() string {
