@@ -5,7 +5,7 @@ go 1.26
 require (
 	github.com/Laky-64/gologging v1.1.0
 	github.com/amarnathcjd/gogram v1.7.4-0.20260606175506-6f0ab5b5b60f
-	github.com/amarnathcjd/gortc v0.1.4
+	github.com/amarnathcjd/gortc v0.1.5
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/traefik/yaegi v0.16.1
 	github.com/zmb3/spotify/v2 v2.4.3
@@ -16,6 +16,7 @@ require (
 )
 
 require (
+	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/colorprofile v0.4.1 // indirect
 	github.com/charmbracelet/lipgloss v1.1.0 // indirect
