@@ -51,9 +51,6 @@ type RoomState struct {
 	filePath string
 	// track is the active track metadata.
 	track *state.Track
-	// muted reports whether playback is currently muted. gortc has no
-	// server-side mute primitive, so this is tracked manually only.
-	muted bool
 	// loop is the loop mode/state value.
 	loop int
 	// speed is the active playback speed multiplier.
@@ -374,12 +371,13 @@ func (r *RoomState) IsPaused() bool {
 }
 
 func (r *RoomState) IsMuted() bool {
-	if r.IsDestroyed() {
+	if r.IsDestroyed() || r.Call == nil {
 		return false
 	}
 	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.muted && r.track != nil
+	track := r.track
+	r.mu.RUnlock()
+	return track != nil && r.Call.IsPlaying() && r.Call.Muted()
 }
 
 func (r *RoomState) SetMuted(muted bool) {
@@ -426,6 +424,20 @@ func (r *RoomState) StopCall() {
 		return
 	}
 	r.Call.Stop()
+}
+
+func (r *RoomState) MuteCall() {
+	if r.IsDestroyed() || r.Call == nil {
+		return
+	}
+	r.Call.Mute()
+}
+
+func (r *RoomState) UnmuteCall() {
+	if r.IsDestroyed() || r.Call == nil {
+		return
+	}
+	r.Call.Unmute()
 }
 
 func (r *RoomState) LeaveCall() error {

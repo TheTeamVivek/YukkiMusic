@@ -34,6 +34,8 @@ const (
 )
 
 // Play starts playback of a track.
+
+//TODO auto unmute for fplay
 func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 	if r.IsDestroyed() {
 		return ErrRoomDestroyed
@@ -58,7 +60,7 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 	}
 	r.track = t
 	r.filePath = path
-	r.muted = false
+	// r.muted = false
 	r.mu.Unlock()
 
 	if err := r.play(); err != nil {
@@ -86,14 +88,15 @@ func (r *RoomState) Pause(autoResumeAfter ...time.Duration) (bool, error) {
 	}
 
 	r.Call.Pause()
+	r.UnmuteCall()
 
 	r.mu.Lock()
-	r.muted = false
 
 	if r.scheduledTimers == nil {
 		r.scheduledTimers = &scheduledTimers{}
 	}
 	r.scheduledTimers.cancelScheduledResume()
+	r.scheduledTimers.cancelScheduledUnmute()
 
 	if len(autoResumeAfter) > 0 && autoResumeAfter[0] > 0 {
 		d := autoResumeAfter[0]
@@ -124,7 +127,6 @@ func (r *RoomState) Resume() (bool, error) {
 	r.Call.Resume()
 
 	r.mu.Lock()
-	r.muted = false
 	if r.scheduledTimers != nil {
 		r.scheduledTimers.cancelScheduledResume()
 	}
@@ -151,7 +153,9 @@ func (r *RoomState) Replay() error {
 	}
 
 	r.mu.Lock()
-	r.muted = false
+	r.ResumeCall()
+    r.UnmuteCall()
+    
 	if r.scheduledTimers != nil {
 		r.scheduledTimers.cancelScheduledResume()
 		r.scheduledTimers.cancelScheduledUnmute()
@@ -176,7 +180,6 @@ func (r *RoomState) Stop() error {
 
 	r.mu.Lock()
 	r.track = nil
-	r.muted = false
 	if r.scheduledTimers != nil {
 		r.scheduledTimers.cancelScheduledUnmute()
 		r.scheduledTimers.cancelScheduledResume()
@@ -220,10 +223,6 @@ func (r *RoomState) Seek(seconds int) error {
 		return fmt.Errorf("seek failed: %w", err)
 	}
 
-	r.mu.Lock()
-	r.muted = false
-	r.mu.Unlock()
-
 	return nil
 }
 
@@ -243,24 +242,65 @@ func (r *RoomState) resetSpeedToNormal() {
 	}
 }
 
-// Mute mutes playback with optional auto-unmute.
-//
-// TODO: gortc didn't support.
+// Mute mutes the bot's outgoing audio with optional auto-unmute.
 func (r *RoomState) Mute(unmuteAfter ...time.Duration) (bool, error) {
 	if r.IsDestroyed() {
 		return false, ErrRoomDestroyed
 	}
-	return false, nil
+	if r.Call == nil {
+		return false, ErrCallNotJoined
+	}
+
+	if r.IsMuted() {
+		return true, nil
+	}
+
+	r.MuteCall()
+    r.ResumeCall()
+
+	r.mu.Lock()
+	if r.scheduledTimers == nil {
+		r.scheduledTimers = &scheduledTimers{}
+	}
+	r.scheduledTimers.cancelScheduledUnmute()
+    r.scheduledTimers.cancelScheduledResume()
+    
+	if len(unmuteAfter) > 0 && unmuteAfter[0] > 0 {
+		d := unmuteAfter[0]
+		r.scheduledUnmuteUntil = time.Now().Add(d)
+		r.scheduledUnmuteTimer = time.AfterFunc(d, func() {
+			if !r.IsDestroyed() {
+				r.Unmute()
+			}
+		})
+	}
+	r.mu.Unlock()
+
+	return true, nil
 }
 
-// Unmute unmutes playback.
-//
-// TODO: gortc didn't support.
+// Unmute restores the bot's outgoing audio.
 func (r *RoomState) Unmute() (bool, error) {
 	if r.IsDestroyed() {
 		return false, ErrRoomDestroyed
 	}
-	return false, nil
+	if r.Call == nil {
+		return false, ErrCallNotJoined
+	}
+
+	if !r.IsMuted() {
+		return true, nil
+	}
+
+	r.UnmuteCall()
+
+	r.mu.Lock()
+	if r.scheduledTimers != nil {
+		r.scheduledTimers.cancelScheduledUnmute()
+	}
+	r.mu.Unlock()
+
+	return true, nil
 }
 
 func (r *RoomState) play() error {

@@ -167,10 +167,6 @@ func handlePauseAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 		return tg.ErrEndGroup
 	}
 
-	if r.IsMuted() {
-		r.Unmute()
-	}
-
 	cb.Answer(F(chatID, "cb_pause_success", locales.Arg{
 		"position": utils.FormatDuration(r.Position()),
 	}), opt)

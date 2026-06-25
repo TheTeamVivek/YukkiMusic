@@ -223,6 +223,24 @@ func (v *VoiceCall) Leave() error {
 	return gc.Leave()
 }
 
+func (v *VoiceCall) Mute() {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	if v.player == nil {
+		return
+	}
+	v.player.Mute()
+}
+
+func (v *VoiceCall) Unmute() {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	if v.player == nil {
+		return
+	}
+	v.player.Unmute()
+}
+
 func (v *VoiceCall) IsJoined() bool {
 	v.mu.RLock()
 	defer v.mu.RUnlock()
@@ -242,6 +260,15 @@ func (v *VoiceCall) Paused() bool {
 		return false
 	}
 	return v.player.Paused()
+}
+
+func (v *VoiceCall) Muted() bool {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	if v.player == nil {
+		return false
+	}
+	return v.player.Muted()
 }
 
 func (v *VoiceCall) Position() time.Duration {

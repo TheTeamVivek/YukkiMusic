@@ -33,7 +33,6 @@ func (r *RoomState) NextTrack() *state.Track {
 	defer r.mu.Unlock()
 
 	if r.track != nil && r.loop > 0 {
-		r.muted = false
 		r.loop--
 		return r.track
 	}
@@ -53,7 +52,6 @@ func (r *RoomState) NextTrack() *state.Track {
 	r.queue = append(r.queue[:index], r.queue[index+1:]...)
 
 	r.track = next
-	r.muted = false
 
 	return next
 }
