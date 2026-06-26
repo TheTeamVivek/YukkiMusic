@@ -727,7 +727,7 @@ func (r *RoomState) play() error {
 	r.player = player
 	gen := r.playGen.Add(1)
 	r.mu.Unlock()
-
+gc.SetVideoStopped(!isVideo)
 	r.watch(player, gen)
 	return nil
 }
