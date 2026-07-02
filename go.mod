@@ -4,8 +4,8 @@ go 1.26
 
 require (
 	github.com/Laky-64/gologging v1.1.0
-	github.com/amarnathcjd/gogram v1.7.4-0.20260606175506-6f0ab5b5b60f
-	github.com/amarnathcjd/gortc v0.1.5
+	github.com/amarnathcjd/gogram v1.7.6
+	github.com/amarnathcjd/gortc v0.1.6-0.20260630080951-d0f72c1a6088
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/traefik/yaegi v0.16.1
 	github.com/zmb3/spotify/v2 v2.4.3
@@ -45,10 +45,10 @@ require (
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	golang.org/x/crypto v0.52.0 // indirect
-	golang.org/x/net v0.55.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.45.0 // indirect
-	golang.org/x/term v0.43.0 // indirect
-	golang.org/x/text v0.37.0 // indirect
+	golang.org/x/crypto v0.53.0 // indirect
+	golang.org/x/net v0.56.0 // indirect
+	golang.org/x/sync v0.21.0 // indirect
+	golang.org/x/sys v0.46.0 // indirect
+	golang.org/x/term v0.44.0 // indirect
+	golang.org/x/text v0.38.0 // indirect
 )
