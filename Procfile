@@ -1,1 +1,1 @@
-worker: /app/myapp
+worker: /app/app
