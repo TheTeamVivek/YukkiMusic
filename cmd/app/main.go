@@ -107,36 +107,11 @@ func main() {
 func startHTTPServer() {
 	go func() {
 		addr := "0.0.0.0:" + config.Port
-		mux := http.NewServeMux()
 
-		mux.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte("ok"))
-		})
+		gologging.InfoF("HTTP server listening on %s", addr)
 
-		if config.EnablePprof {
-			gologging.Warn("pprof endpoints enabled - do not expose publicly")
-			mux.HandleFunc("/debug/pprof/", pprof.Index)
-			mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
-			mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
-			mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
-			mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
-			mux.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
-			mux.Handle("/debug/pprof/heap", pprof.Handler("heap"))
-			mux.Handle("/debug/pprof/threadcreate", pprof.Handler("threadcreate"))
-			mux.Handle("/debug/pprof/block", pprof.Handler("block"))
-			mux.Handle("/debug/pprof/mutex", pprof.Handler("mutex"))
-		}
-
-		server := &http.Server{
-			Addr:              addr,
-			Handler:           mux,
-			ReadHeaderTimeout: 5 * time.Second,
-		}
-
-		gologging.Info(fmt.Sprintf("HTTP server listening on %s", addr))
-		if err := server.ListenAndServe(); err != nil {
-			gologging.Error("HTTP server error: " + err.Error())
+		if err := http.ListenAndServe(addr, nil); err != nil {
+			gologging.FatalF("HTTP server failed: %v", err)
 		}
 	}()
 }
@@ -145,13 +120,14 @@ func initLogger() {
 	gologging.SetLevel(gologging.DebugLevel)
 	gologging.SetOutput(config.LogWriter)
 
-	l := gologging.GetLogger("ntgcalls")
-	l.SetLevel(gologging.ErrorLevel)
-	l.SetOutput(config.LogWriter)
-
-	l = gologging.GetLogger("webrtc")
-	l.SetLevel(gologging.ErrorLevel)
-	l.SetOutput(config.LogWriter)
+	for _, name := range []string{
+		"ntgcalls",
+		"webrtc",
+	} {
+		l := gologging.GetLogger(name)
+		l.SetLevel(gologging.ErrorLevel)
+		l.SetOutput(config.LogWriter)
+	}
 
 	gologging.GetLogger("Database").SetOutput(config.LogWriter)
 }

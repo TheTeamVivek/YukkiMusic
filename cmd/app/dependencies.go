@@ -23,11 +23,16 @@ import (
 	"github.com/Laky-64/gologging"
 )
 
-func checkFFmpegAndFFprobe() {
-	for _, bin := range []string{"ffmpeg", "ffprobe"} {
+func checkDependencies() {
+	for _, bin := range []string{
+		"ffmpeg",
+		"ffprobe",
+		"yt-dlp",
+	} {
 		if _, err := exec.LookPath(bin); err != nil {
 			gologging.FatalF(
-				"❌ %s not found in PATH. Please install %s.",
+				"Required dependency %q was not found in your PATH.\n\n"+
+					"Please install %s and ensure it is accessible from PATH before starting YukkiMusic.",
 				bin,
 				bin,
 			)

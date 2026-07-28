@@ -28,39 +28,50 @@ import (
 	"time"
 
 	"github.com/Laky-64/gologging"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 var (
-	APIID          int32
-	APIHash        string
-	Token          string
-	LoggerID       int64
-	MongoURI       string
-	StringSessions []string
-	SessionType    string
+	// Required
+	APIID          = int32(getEnvInt64("API_ID"))
+	APIHash        = getEnv("API_HASH")
+	Token          = getEnv("TOKEN")
+	MongoURI       = getEnv("MONGO_DB_URI")
+	StringSessions = getEnvStrings("STRING_SESSIONS")
 
-	DisableColour       bool
-	OwnerID             int64
-	SpotifyClientID     string
-	SpotifyClientSecret string
-	FallenAPIURL        string
-	FallenAPIKey        string
-	DefaultLang         string
-	DurationLimit       int
-	LeaveOnDemoted      bool
-	QueueLimit          int
-	SupportChat         string
-	SupportChannel      string
-	CookiesLink         string
-	SetCmds             bool
-	MaxAuthUsers        int
-	StartImages         []string
-	EffectIDs           []int64
-	PingImage           string
-	Port                string
-	EnablePprof         bool
+	// Optional
+	SessionType        = getEnv("SESSION_TYPE", "pyrogram")
+	LoggerID           = getEnvInt64("LOGGER_ID", 0)
+	OwnerID            = getEnvInt64("OWNER_ID", 0)
+	DisableColour      = getEnvBool("DISABLE_COLOUR", false)
+	SpotifyClientID    = getEnv("SPOTIFY_CLIENT_ID")
+	SpotifyClientSecret = getEnv("SPOTIFY_CLIENT_SECRET")
+	FallenAPIURL       = getEnv("FALLEN_API_URL", "https://beta.fallenapi.fun")
+	FallenAPIKey       = getEnv("FALLEN_API_KEY")
 
-	StartTime   time.Time
+	DefaultLang    = getEnv("DEFAULT_LANG", "en")
+	DurationLimit  = getEnvInt("DURATION_LIMIT", 4200)
+	LeaveOnDemoted = getEnvBool("LEAVE_ON_DEMOTED", false)
+	QueueLimit     = getEnvInt("QUEUE_LIMIT", 24)
+
+	SupportChat    = getEnv("SUPPORT_CHAT", "https://t.me/TheTeamVk")
+	SupportChannel = getEnv("SUPPORT_CHANNEL", "https://t.me/TheTeamVivek")
+	CookiesLink    = getEnv("COOKIES_LINK", "")
+	SetCmds        = getEnvBool("SET_CMDS", false)
+	MaxAuthUsers   = getEnvInt("MAX_AUTH_USERS", 25)
+
+	StartImages = getEnvStrings("START_IMAGES")
+	EffectIDs   = getEnvInt64s("EFFECT_IDS")
+
+	PingImage = getEnv(
+		"PING_IMG_URL",
+		"https://telegra.ph/file/91533956c91d0fd7c9f20.jpg",
+	)
+
+	Port = getEnv("PORT", "8000")
+
+	StartTime = time.Now()
+
 	LogFileName = "logs.txt"
 	LogWriter   io.Writer
 
@@ -69,16 +80,32 @@ var (
 )
 
 func Load() (func(), error) {
-	loadEnv(".env")
-	if err := initLogging(); err != nil {
-		return nil, fmt.Errorf("config: logging init failed: %w", err)
+	// Legacy compatibility
+	if Token == "" {
+		Token = getEnv("BOT_TOKEN")
 	}
 
-	loadConfig()
+	if LoggerID == 0 {
+		LoggerID = getEnvInt64("LOG_GROUP_ID")
+	}
+
+	if len(StringSessions) == 0 {
+		StringSessions = getEnvStrings("STRING_SESSION")
+	}
+
+	if len(StartImages) == 0 {
+		if img := getEnv("START_IMG_URL"); img != "" {
+			StartImages = []string{img}
+		}
+	}
+
+	if err := initLogging(); err != nil {
+		return nil, fmt.Errorf("init logging: %w", err)
+	}
 
 	if err := validateConfig(); err != nil {
 		closeLogging()
-		return nil, fmt.Errorf("config: validation failed: %w", err)
+		return nil, err
 	}
 
 	return closeLogging, nil
@@ -87,117 +114,13 @@ func Load() (func(), error) {
 func initLogging() error {
 	_ = os.Remove(LogFileName)
 
-	file, err := os.OpenFile(
-		LogFileName,
-		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-		0o644,
-	)
+	f, err := os.Create(LogFileName)
 	if err != nil {
-		return fmt.Errorf("open log file %q: %w", LogFileName, err)
+		return err
 	}
 
-	logFile = file
-	LogWriter = io.MultiWriter(file, os.Stderr)
-
-	return nil
-}
-
-func loadConfig() {
-	StartTime = time.Now()
-
-	APIID = int32(getInt64("API_ID", 0))
-	APIHash = getString("API_HASH", "")
-	Token = getString("TOKEN", getString("BOT_TOKEN", ""))
-	LoggerID = getInt64("LOGGER_ID", getInt64("LOG_GROUP_ID", 0))
-	MongoURI = getString("MONGO_DB_URI", "")
-	SessionType = getString("SESSION_TYPE", "pyrogram")
-	StringSessions = getStringSlice(
-		"STRING_SESSIONS",
-		getStringSlice("STRING_SESSION", nil),
-	)
-
-	DisableColour = getBool("DISABLE_COLOUR", false)
-	OwnerID = getInt64("OWNER_ID", 0)
-	SpotifyClientID = getString("SPOTIFY_CLIENT_ID", "")
-	SpotifyClientSecret = getString("SPOTIFY_CLIENT_SECRET", "")
-	FallenAPIURL = getString("FALLEN_API_URL", "https://beta.fallenapi.fun")
-	FallenAPIKey = getString("FALLEN_API_KEY", "")
-	DefaultLang = getString("DEFAULT_LANG", "en")
-	DurationLimit = int(getInt64("DURATION_LIMIT", 4200))
-	LeaveOnDemoted = getBool("LEAVE_ON_DEMOTED", false)
-	QueueLimit = int(getInt64("QUEUE_LIMIT", 24))
-	SupportChat = getString("SUPPORT_CHAT", "https://t.me/TheTeamVk")
-	SupportChannel = getString("SUPPORT_CHANNEL", "https://t.me/TheTeamVivek")
-	CookiesLink = getString("COOKIES_LINK", "")
-	SetCmds = getBool("SET_CMDS", false)
-	MaxAuthUsers = int(getInt64("MAX_AUTH_USERS", 25))
-	StartImages = getStringSlice("START_IMAGES", nil)
-	EffectIDs = getInt64Slice("EFFECT_IDS", nil)
-	if len(StartImages) == 0 {
-		StartImage := getString("START_IMG_URL", "")
-		if StartImage != "" {
-			StartImages = []string{StartImage}
-		}
-	}
-	PingImage = getString(
-		"PING_IMG_URL",
-		"https://telegra.ph/file/91533956c91d0fd7c9f20.jpg",
-	)
-	Port = getString("PORT", "8000")
-	EnablePprof = getBool("ENABLE_PPROF", false)
-}
-
-func GetRandomStartImage() string {
-	if len(StartImages) == 0 {
-		return ""
-	}
-
-	if len(StartImages) == 1 {
-		return StartImages[0]
-	}
-
-	return StartImages[rand.IntN(len(StartImages))]
-}
-
-func GetRandomEffectID() int64 {
-	if len(EffectIDs) == 0 {
-		return 0
-	}
-	if len(EffectIDs) == 1 {
-		return EffectIDs[0]
-	}
-	return EffectIDs[rand.IntN(len(EffectIDs))]
-}
-
-func validateConfig() error {
-	type check struct {
-		ok  bool
-		msg string
-	}
-
-	required := []check{
-		{APIID != 0, "API_ID is required but missing"},
-		{APIHash != "", "API_HASH is required but missing"},
-		{MongoURI != "", "MONGO_DB_URI is required but missing"},
-		{Token != "", "TOKEN (or BOT_TOKEN) is required but missing"},
-		{
-			len(StringSessions) > 0,
-			fmt.Sprintf(
-				"STRING_SESSIONS is empty — at least one %s session string is required",
-				SessionType,
-			),
-		},
-	}
-
-	for _, c := range required {
-		if !c.ok {
-			return errors.New(c.msg)
-		}
-	}
-
-	if SpotifyClientID == "" || SpotifyClientSecret == "" {
-		logger.Warn("Spotify credentials not configured — Spotify links won't work")
-	}
+	logFile = f
+	LogWriter = io.MultiWriter(f, os.Stderr)
 
 	return nil
 }
@@ -208,101 +131,45 @@ func closeLogging() {
 	}
 }
 
-func lookupEnv(baseKey string) (string, bool) {
-	variants := []string{
-		baseKey,
-		strings.ToUpper(baseKey),
-		strings.ToLower(baseKey),
-		strings.ReplaceAll(baseKey, "_", ""),
+
+
+func validateConfig() error {
+	checks := []struct {
+		ok  bool
+		msg string
+	}{
+		{APIID != 0, "API_ID is required"},
+		{APIHash != "", "API_HASH is required"},
+		{Token != "", "TOKEN (or BOT_TOKEN) is required"},
+		{MongoURI != "", "MONGO_DB_URI is required"},
+		{len(StringSessions) > 0, "STRING_SESSIONS (or STRING_SESSION) is required"},
 	}
 
-	for _, key := range variants {
-		if val, ok := os.LookupEnv(key); ok {
-			if val = strings.TrimSpace(val); val != "" {
-				return val, true
-			}
+	for _, check := range checks {
+		if !check.ok {
+			return errors.New(check.msg)
 		}
 	}
 
-	return "", false
+	if SpotifyClientID == "" || SpotifyClientSecret == "" {
+		logger.Warn("Spotify credentials not configured; Spotify links will be unavailable")
+	}
+
+	return nil
 }
 
-func getString(key, fallback string) string {
-	if val, ok := lookupEnv(key); ok {
-		return val
+func StartImage() string {
+	if len(StartImages) == 0 {
+		return ""
 	}
-	return fallback
+
+	return StartImages[rand.IntN(len(StartImages))]
 }
 
-func getInt64Slice(key string, fallback []int64) []int64 {
-	raw, ok := lookupEnv(key)
-	if !ok {
-		return fallback
+func EffectID() int64 {
+	if len(EffectIDs) == 0 {
+		return 0
 	}
 
-	parts := strings.FieldsFunc(raw, func(r rune) bool {
-		return r == ',' || r == ';' || r == ' ' || r == '\n' || r == '\t'
-	})
-	if len(parts) == 0 {
-		return fallback
-	}
-
-	out := make([]int64, 0, len(parts))
-	for _, p := range parts {
-		n, err := strconv.ParseInt(strings.TrimSpace(p), 10, 64)
-		if err != nil {
-			logger.WarnF("Skipping invalid %s value %q: %v", key, p, err)
-			continue
-		}
-		out = append(out, n)
-	}
-	if len(out) == 0 {
-		return fallback
-	}
-	return out
-}
-
-func getBool(key string, fallback bool) bool {
-	val, ok := lookupEnv(key)
-	if !ok {
-		return fallback
-	}
-
-	b, err := strconv.ParseBool(val)
-	if err != nil {
-		logger.FatalF("config: invalid boolean value for %s=%q: %v", key, val, err)
-	}
-
-	return b
-}
-
-func getInt64(key string, fallback int64) int64 {
-	val, ok := lookupEnv(key)
-	if !ok {
-		return fallback
-	}
-
-	n, err := strconv.ParseInt(val, 10, 64)
-	if err != nil {
-		logger.FatalF("config: invalid integer value for %s=%q: %v", key, val, err)
-	}
-
-	return n
-}
-
-func getStringSlice(key string, fallback []string) []string {
-	val, ok := lookupEnv(key)
-	if !ok {
-		return fallback
-	}
-
-	parts := strings.Fields(
-		strings.NewReplacer(",", " ", ";", " ").Replace(val),
-	)
-
-	if len(parts) > 0 {
-		return parts
-	}
-
-	return fallback
+	return EffectIDs[rand.IntN(len(EffectIDs))]
 }
