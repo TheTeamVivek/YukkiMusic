@@ -65,10 +65,6 @@ addauth_success: "✅ {user} को अधिकृत उपयोगकर्�
 # 🤖 Bot Added to Chat
 bot_added_normal: "🎵 मुझे जोड़ने के लिए धन्यवाद! संगीत आरम्भ करने के लिए /play [गीत] का प्रयोग करें।"
 
-# 🛠️ Bot Added During Maintenance
-bot_added_maintenance: "⚠️ मैं वर्तमान में अनुरक्षण के अधीन हूँ और शीघ्र ही वापस आऊँगा। आपके धैर्य के लिए धन्यवाद! ⏰"
-maint_reason_generic: "<i>📝 कारण: {reason}</i>"
-
 # ⚠️ Bot Demotion
 bot_demotion_goodbye: |
   <b>⚠️ अनुमति लुप्त</b>
@@ -85,8 +81,6 @@ broadcast_fetch_chats_failed: "❌ सेवा प्राप्त वार�
 broadcast_fetch_users_failed: "❌ सेवा प्राप्त उपयोगकर्ताओं को प्राप्त करने में विफल:\n<code>{error}</code>"
 broadcast_no_targets: "⚠️ प्रसारण के लिए कोई लक्ष्य नहीं मिला।\n\nसुनिश्चित करें कि आपने संकेतों द्वारा सभी लक्ष्यों को वर्जित नहीं किया है।"
 broadcast_initializing: "📡 प्रसारण आरम्भ किया जा रहा है...\n\nकृपया प्रतीक्षा करें..."
-broadcast_cancelled_header: "🚫 प्रसारण रद्द किया गया"
-broadcast_completed_header: "✅ प्रसारण पूर्ण हुआ"
 broadcast_progress_header: "📡 प्रसारण हो रहा है..."
 broadcast_total_chats: "📊 कुल वार्तालाप: {done}/{total} ({progress}%)"
 broadcast_total_users: "👥 कुल उपयोगकर्ता: {done}/{total} ({progress}%)"
@@ -125,7 +119,6 @@ blacklist_list_users: "👤 <b>उपयोगकर्ता:</b>"
 
 cplay_id_not_set: "⚠️ चैनल प्ले निर्धारित नहीं है।\nइसे निर्धारित करने के लिए <code>/setcplay [channel_id]</code> का प्रयोग करें।"
 cplay_usage: "<b>प्रयोग:</b> <code>/setcplay [channel_id]</code>"
-cplay_invalid_chat_id: "<b>अमान्य वार्तालाप परिचय पत्र:</b> कृपया चैनलप्ले के लिए एक मान्य पूर्णांक परिचय पत्र प्रदान करें।"
 cplay_resolve_peer_fail: "<b>चैनल जानकारी प्राप्त करने में विफल:</b> चैनल विवरण प्राप्त नहीं किया जा सका। सुनिश्चित करें कि मेरी इस चैनल तक पहुँच है।"
 cplay_invalid_target: "<b>अमान्य लक्ष्य:</b> प्रदान किया गया परिचय पत्र एक मान्य चैनल नहीं है।"
 cplay_channel_not_accessible: "<b>चैनल तक पहुँच नहीं:</b> चैनल की सूचना प्राप्त नहीं की जा सकी। कृपया सुनिश्चित करें कि मैं लक्ष्य चैनल में एक प्रशासक हूँ।"
@@ -219,18 +212,6 @@ autoleave_updated: "🏃‍♂️ स्वचालित प्रस्था
 enabled: "सक्षम"
 disabled: "अक्षम"
 
-bug_usage: "⚠️ कृपया त्रुटि का वर्णन करें। प्रयोग: {cmd} <समस्या> या किसी सन्देश का उत्तर दें।"
-bug_thanks: "✅ आपकी त्रुटि सूचना के लिए धन्यवाद! इसे विकासकर्ताओं को भेज दिया गया है।"
-
-bug_report_format: |
-  <b>🐞 नवीन त्रुटि सूचना</b>
-
-  <b>प्रेषक:</b> {user} (<code>{user_id}</code>)
-  <b>वार्तालाप:</b> {chat} (<code>{chat_id}</code>)
-
-  <b>सूचना:</b>
-  <pre>{report}</pre>
-  
 clear_no_active: "⚠️ <b>रिक्त करने के लिए कोई सक्रिय संगीत या प्रतीक्षा सूची नहीं है।</b>"
 clear_success: "✅ {user} द्वारा प्रतीक्षा सूची रिक्त कर दी गई है।\n<i>आप नवीन गीत जोड़ने से पूर्व <code>/{cmd}</code> का प्रयोग कर इसे पुनर्स्थापित कर सकते हैं</i>"
 
@@ -288,17 +269,6 @@ err_fetch_failed: |
   ⚠️ वार्तालाप सूचना प्राप्त करने में विफल:
   <i>{error}</i>
 
-err_rtmp_missing_params: |
-  <b>⚠️ RTMP विवरण अनुपस्थित</b>
-
-  <i>प्रतीत होता है कि इस वार्तालाप में एक <b>RTMP प्रवाह</b> सक्रिय है, किन्तु आपने आवश्यक
-  <b>RTMP यू.आर.एल.</b> या <b>प्रवाह कुञ्जी</b> प्रदान नहीं की है। इनके बिना, मैं RTMP पर संगीत प्रवाह आरम्भ नहीं कर सकता।</i>
-
-  <b>प्रयोग करें:</b> <code>/setrtmp [वार्तालाप_परिचय_पत्र] [यू.आर.एल.+कुञ्जी]</code>
-
-  <i>📌 एक बार RTMP विवरण निर्धारित हो जाने पर, आप प्रवाह आरम्भ कर सकते हैं।</i>  
-  <i>➡️ यदि आप RTMP का प्रयोग नहीं करना चाहते, तो इसके स्थान पर सामान्य ध्वनि वार्तालाप का प्रयोग करें।</i>
-  
 err_unknown: |
   ⚠️ अज्ञात त्रुटि उत्पन्न हुई:
   <i>{error}</i>
@@ -390,7 +360,6 @@ logger_updated: "✅ अभिलेखक सफलतापूर्वक {ac
 logs_empty: "कोई लॉग्स नहीं मिले"
 
 # reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
-maint: "⚠️ मैं वर्तमान में अनुरक्षण के अधीन हूँ और अस्थायी रूप से अनुपलब्ध हूँ। कृपया कुछ समय पश्चात पुनः देखें।\n\n{reason}"
 maint_reason: "<i>📝 कारण: {reason}</i>"
 
 # ⚙️ Maintenance control
@@ -415,22 +384,12 @@ move_success: "✅ संगीत को स्थिति {from} से {to} 
 
 # 🔇 Mute messages
 mute_already_muted: "🔇 <b>पूर्व से ही निःशब्द</b>\nइस वार्तालाप में संगीत पूर्व से ही निःशब्द है।\nक्या आप इसे सशब्द करना चाहेंगे?"
-mute_already_muted_with_time: "🔇 <b>पूर्व से ही निःशब्द</b>\nसंगीत निःशब्द है।\n<b>{duration}</b> में स्वतः सशब्द हो जाएगा।"
-mute_invalid_duration: "⚠️ स्वतः सशब्द के लिए अमान्य अवधि।\nयह <b>5</b> और <b>3600</b> क्षण के मध्य होनी चाहिए।"
-mute_invalid_format: "⚠️ अमान्य प्रारूप।\nप्रयोग करें: <code>/{cmd} 30</code> या <code>/{cmd} 30s</code>"
 mute_failed: "❌ <b>संगीत निःशब्द करना विफल</b>\nत्रुटि: <code>{error}</code>"
 mute_success: |
   🔇 <b>संगीत निःशब्द किया गया</b>
 
   🎵 संगीत: {title}
   👤 निःशब्दकर्ता: {user}
-
-mute_success_with_time: |
-  🔇 <b>संगीत निःशब्द किया गया</b>
-
-  🎵 संगीत: {title}
-  👤 निःशब्दकर्ता: {user}
-  <i>⏳ <b>{duration}</b> क्षण में स्वतः सशब्द हो जाएगा</i>
 
 no_song_query: |
   <b>🎵 क्षमा करें! कोई संगीत नहीं मिला।</b>
@@ -464,13 +423,9 @@ only_supergroup: "⚠️ यह आदेश केवल समूहों म
 only_owner: "⚠️ केवल सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
 only_sudo: "⚠️ केवल विशेषाधिकारी या सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
 
-pause_invalid_duration: "⚠️ स्वतः पुनः आरम्भ के लिए अमान्य अवधि।\nयह <b>5</b> और <b>3600</b> क्षण के मध्य होनी चाहिए।"
-pause_invalid_format: "⚠️ अमान्य प्रारूप।\nप्रयोग करें: <code>/{cmd} 30</code> या <code>/{cmd} 30s</code>"
-auto_resume_line: "\n<i>⏳ <b>{seconds}</b> क्षण में स्वतः पुनः आरम्भ</i>"
-
 pause_already: |
   ⏸️ <b>पूर्व से ही विराम</b>
-  संगीत पूर्व से ही विराम स्थिति में है।{auto_resume_line}
+  संगीत पूर्व से ही विराम स्थिति में है।
 
 pause_success: |
   ⏸️ <b>संगीत विराम</b>
@@ -478,7 +433,6 @@ pause_success: |
   🎵 संगीत: {title}
   ⏱️ स्थिति: {position} / {duration}
   👤 विरामकर्ता: {user}
-  {auto_resume_line}
 
 play_single_track_too_long: |
   ⚠️ आप {limit_mins} मिनट से अधिक लम्बे गीत नहीं चला सकते।
@@ -546,8 +500,6 @@ queue_up_next: "⏭️ <b>अगला:</b>"
 queue_more_line: "\n… और {remaining} अन्य"
 queue_empty_tail: "📭 <i>प्रतीक्षा सूची में कोई और संगीत नहीं है।</i>"
 queue_empty: "⚠️ <b>प्रतीक्षा सूची पूर्व से ही रिक्त है।</b>"
-queue_restored: "✅ प्रतीक्षा सूची में <b>{count}</b> संगीत सफलतापूर्वक पुनर्स्थापित किए गए।"
-queue_restore_no_data: "❌ पुनर्स्थापित करने के लिए कोई रिक्त प्रतीक्षा सूची नहीं मिली, अथवा एक नया गीत पूर्व में ही जोड़ा जा चुका है।"
 
 # 🔄 Reload
 reload_start: "⚙️ प्रशासक संचित-स्मृति, ध्वनि वार्तालाप स्थिति, और सहायक स्थिति को पुनः लोड किया जा रहा है..."
@@ -611,10 +563,8 @@ restart_confirm_replay_done: "⏮️ वर्तमान गीत सफल�
 
 room_not_active_cb: "⚠️ वर्तमान में कुछ भी नहीं चल रहा है।"
 room_no_active: "⚠️ <b>कोई सक्रिय संगीत नहीं।</b>\n\n<i>वर्तमान में कुछ भी नहीं चल रहा है।</i>"
-room_not_linked: "⚠️ यह प्रणाल किसी समूह से सम्बद्ध नहीं है।"
 
 room_already_paused: "⏸️ संगीत पूर्व से ही विराम स्थिति में है। निरन्तरता के लिए ▶️ 'पुनः चलाएँ' दबाएँ।"
-room_already_paused_auto: "⏸️ संगीत पूर्व से ही विराम स्थिति में है — {duration} में स्वतः पुनः आरम्भ होगा।"
 room_pause_failed: "❌ संगीत विराम विफल।\n\n<i>{error}</i>"
 
 rtmp_not_configured: "⚠️ RTMP configured नहीं है। DM में <code>/setrtmp &lt;chat_id&gt; &lt;rtmp_url&gt;</code> इस्तेमाल करें।"
@@ -704,8 +654,6 @@ settings_info_cleanmode: |
   प्लेइंग स्टेटस संदेश अपने तय समय तक बने रहते हैं।
 cleanmode_status: "🧹 <b>क्लीन मोड</b>\n\nकमांड और सर्विस संदेशों की स्वचालित सफाई।\nवर्तमान स्थिति: {action}"
 cleanmode_hint: "Use /settings to change auto-delete duration."
-cleanmode_duration_updated: "🧹 Auto-delete duration set to {duration} minutes."
-cleanmode_updated: "🧹 क्लीन मोड {action} कर दिया गया है।"
 
 settings_info_lang: |
   🌐 यह क्या है?
@@ -821,31 +769,20 @@ skip_count_exceeds_queue: "⚠️ आपने <code>{requested}</code> ट्�
 
 speed_usage: |
   💡 <b>प्रयोग:</b>
-  <code>{cmd} [गति] [अवधि]</code> — चलाने की गति बदलें
+  <code>{cmd} [गति]</code> — चलाने की गति बदलें
   
   अनुमत गति सीमा: <b>0.50x → 4.00x</b>
-  अवधि (वैकल्पिक) दिए गए क्षणों के पश्चात गति को पुनर्निर्धारित करती है।
   
   उदाहरण:
-  <code>{cmd} 1.25 45</code> — 45 क्षणों के लिए 1.25x की गति से चलाएँ।
+  <code>{cmd} 1.5</code> — 1.5x की गति से चलाएँ।
+  <code>{cmd} normal</code> — सामान्य गति पर लौटें।
 
 speed_current: "🎧 <b>वर्तमान गति:</b> 🎵 <u>{title}</u> के लिए <code>{speed}x</code>\n\n💡 सामान्य गति पर लौटने के लिए <code>{cmd} reset</code> का प्रयोग करें।"
 
-speed_current_with_reset: |
-  🎧 <b>वर्तमान गति:</b> <code>{speed}x</code>
-
-  🎵 <b>संगीत:</b> <i>{title}</i>
-  ⏳ <b>स्वतः पुनर्निर्धारण:</b> {duration} में
-  
-  💡 सामान्य गति पर तत्काल लौटने के लिए <code>{cmd} reset</code> का प्रयोग करें।
-
 speed_invalid_value: "❌ अमान्य गति मान।\nउदाहरण: <code>{cmd} 1.5</code> या <code>{cmd} 2x</code>"
 speed_invalid_range: "⚠️ गति <b>0.50x</b> और <b>4.00x</b> के मध्य होनी चाहिए।"
-speed_invalid_duration: "⚠️ अमान्य अवधि। यह <b>5</b> और <b>3600</b> क्षण के मध्य होनी चाहिए।"
 
 speed_already_set: "ℹ️ 🎵 <b>{title}</b> के लिए चलाने की गति पूर्व से ही <b>{speed}x</b> है।"
-
-speed_already_set_reset_hint: "ℹ️ 🎵 <b>{title}</b> के लिए चलाने की गति पूर्व से ही <b>{speed}x</b> है।\n\n💡 सामान्य गति पर लौटने के लिए <code>{cmd} reset</code> का प्रयोग करें।"
 
 speed_failed: |
   ❌ गति को <b>{speed}x</b> में बदलने में विफल।
@@ -854,15 +791,11 @@ speed_failed: |
 speed_reset_success: "✅ {user} द्वारा चलाने की गति <b>1.0x</b> पर पुनर्निर्धारित"
 
 speed_set: "🚀 {user} द्वारा चलाने की गति <b>{speed}x</b> निर्धारित।"
-speed_set_with_reset: |
-  🚀 {user} द्वारा चलाने की गति <b>{speed}x</b> निर्धारित।
-  ⏳ <b>{duration}</b> क्षणों के पश्चात स्वतः सामान्य हो जाएगी।
 
 start_private: "नमस्कार {user}, मेरा नाम {bot} है।\n\nमैं कुछ उपयोगी सुविधाओं के साथ एक टेलीग्राम प्रवाह सहायक हूँ। मैं यूट्यूब, स्पॉटिफाई, जियो-सावन, साउण्ड-क्लाउड आदि जैसे मंचों का समर्थन करता हूँ।\n\nनिसंकोच मुझे अपने समूहों में जोड़ें।"
 
 start_group: "<b>💫 मैं यहाँ हूँ!</b> कोई आदेश दें... यदि आपको लगता है कि आप मुझे नियन्त्रित कर सकते हैं 😉"
 
-stream_channelid_fail: "⚠️ आपके सम्बद्ध प्रणाल का परिचय पत्र प्राप्त करने में विफल।"
 stream_queue_finished: "🎵 <b>प्रतीक्षा सूची समाप्त!</b>\n\nचलाने के लिए कोई और गीत नहीं है। अधिक संगीत जोड़ने के लिए /play का प्रयोग करें! 🎶"
 stream_downloading_next: "📥 आपका अगला संगीत अभिलेखित किया जा रहा है..."
 stream_download_fail: "❌ डाउनलोड में विफल।\nत्रुटि: <code>{error}</code>"

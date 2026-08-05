@@ -65,10 +65,6 @@ addauth_success: "✅ Successfully added {user} to the authorized users list."
 # 🤖 Bot Added to Chat
 bot_added_normal: "🎵 Thanks for adding me! Use /play [song] to start playing music."
 
-# 🛠️ Bot Added During Maintenance
-bot_added_maintenance: "⚠️ I'm currently under maintenance and will be back soon. Thanks for your patience! ⏰"
-maint_reason_generic: "<i>📝 Reason: {reason}</i>"
-
 # ⚠️ Bot Demotion
 bot_demotion_goodbye: |
   <b>⚠️ Permission Lost</b>
@@ -85,8 +81,6 @@ broadcast_fetch_chats_failed: "❌ Failed to fetch served chats:\n<code>{error}<
 broadcast_fetch_users_failed: "❌ Failed to fetch served users:\n<code>{error}</code>"
 broadcast_no_targets: "⚠️ No targets found for broadcast.\n\nMake sure you haven't excluded all targets with flags."
 broadcast_initializing: "📡 Initializing broadcast...\n\nPlease wait..."
-broadcast_cancelled_header: "🚫 Broadcast Cancelled"
-broadcast_completed_header: "✅ Broadcast Completed"
 broadcast_progress_header: "📡 Broadcasting..."
 broadcast_total_chats: "📊 Total Chats: {done}/{total} ({progress}%)"
 broadcast_total_users: "👥 Total Users: {done}/{total} ({progress}%)"
@@ -126,7 +120,6 @@ blacklist_list_users: "👤 <b>Users:</b>"
 
 cplay_id_not_set: "⚠️ cplay ID not set.\nUse <code>/setcplay &lt;chat_id&gt;</code> to set it."
 cplay_usage: "<b>Usage:</b> <code>/setcplay &lt;channel_id&gt;</code>"
-cplay_invalid_chat_id: "<b>Invalid Chat ID:</b> Please provide a valid integer ID for the channel."
 cplay_resolve_peer_fail: "<b>Failed to resolve peer:</b> Could not fetch channel details. Ensure I can access this channel."
 cplay_invalid_target: "<b>Invalid Target:</b> The provided ID is not a valid channel."
 cplay_channel_not_accessible: "<b>Channel Not Accessible:</b> Could not retrieve channel information. Please ensure I am an administrator in the target channel."
@@ -220,18 +213,6 @@ autoleave_updated: "🏃‍♂️ AutoLeave has been {action}"
 enabled: "Enabled"
 disabled: "Disabled"
 
-bug_usage: "⚠️ Please describe the bug. Usage: {cmd} <problem> or reply to a message."
-bug_thanks: "✅ Thank you for your bug report! It has been sent to the developers."
-
-bug_report_format: |
-  <b>🐞 New Bug Report</b>
-
-  <b>From:</b> {user} (<code>{user_id}</code>)
-  <b>Chat:</b> {chat} (<code>{chat_id}</code>)
-
-  <b>Report:</b>
-  <pre>{report}</pre>
-  
 clear_no_active: "⚠️ <b>No active playback or queue to clear.</b>"
 clear_success: "✅ The queue has been cleared by {user}.\n<i>You can restore it using <code>/{cmd}</code> before adding new songs</i>"
 
@@ -287,17 +268,6 @@ err_fetch_failed: |
   ⚠️ Failed to fetch chat info:
   <i>{error}</i>
 
-err_rtmp_missing_params: |
-  <b>⚠️ RTMP Details Missing</b>
-
-  <i>It looks like an <b>RTMP stream</b> is active in this chat, but you have not provided the required
-  <b>RTMP URL</b> or <b>Stream Key</b>. Without these, I cannot start streaming music to RTMP.</i>
-
-  <b>Use:</b> <code>/setrtmp [chat_id] [url+key]</code>
-
-  <i>📌 Once the RTMP details are set, you may start streaming.</i>  
-  <i>➡️ If you do not wish to use RTMP, switch to regular voice chat instead.</i>
-  
 err_unknown: |
   ⚠️ Unknown Error Occurred:
   <i>{error}</i>
@@ -389,7 +359,6 @@ logger_updated: "✅ Logger has been {action} successfully."
 logs_empty: "No logs found"
 
 # reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
-maint: "⚠️ I'm under maintenance at the moment and temporarily unavailable. Please check back later.\n\n{reason}"
 maint_reason: "<i>📝 Reason: {reason}</i>"
 
 # ⚙️ Maintenance control
@@ -414,22 +383,12 @@ move_success: "✅ Moved track from position {from} to {to} by {user}."
 
 # 🔇 Mute messages
 mute_already_muted: "🔇 <b>Already Muted</b>\nThe music is already muted in this chat.\nWould you like to unmute it?"
-mute_already_muted_with_time: "🔇 <b>Already Muted</b>\nThe music is muted.\nAuto-unmute in <b>{duration}</b>."
-mute_invalid_duration: "⚠️ Invalid duration for auto-unmute.\nIt must be between <b>5</b> and <b>3600</b> seconds."
-mute_invalid_format: "⚠️ Invalid format.\nUse: <code>/{cmd} 30</code> or <code>/{cmd} 30s</code>"
 mute_failed: "❌ <b>Playback Mute Failed</b>\nError: <code>{error}</code>"
 mute_success: |
   🔇 <b>Muted playback</b>
 
   🎵 Track: {title}
   👤 Muted by: {user}
-
-mute_success_with_time: |
-  🔇 <b>Muted playback</b>
-
-  🎵 Track: {title}
-  👤 Muted by: {user}
-  <i>⏳ Auto-unmute in <b>{duration}</b> seconds</i>
 
 no_song_query: |
   <b>🎵 Whoops! No song detected.</b>
@@ -463,13 +422,9 @@ only_supergroup: "⚠️ This command can only be used in groups."
 only_owner: "⚠️ Only the bot owner can use this command."
 only_sudo: "⚠️ Only sudo users or the bot owner can use this command."
 
-pause_invalid_duration: "⚠️ Invalid duration for auto-resume.\nIt must be between <b>5</b> and <b>3600</b> seconds."
-pause_invalid_format: "⚠️ Invalid format.\nUse: <code>/{cmd} 30</code> or <code>/{cmd} 30s</code>"
-auto_resume_line: "\n<i>⏳ Auto-resume in <b>{seconds}</b> seconds</i>"
-
 pause_already: |
   ⏸️ <b>Already Paused</b>
-  The music is already paused.{auto_resume_line}
+  The music is already paused.
 
 pause_success: |
   ⏸️ <b>Paused playback</b>
@@ -477,7 +432,6 @@ pause_success: |
   🎵 Track: {title}
   ⏱️ Position: {position} / {duration}
   👤 Paused by: {user}
-  {auto_resume_line}
 
 play_single_track_too_long: |
   ⚠️ You can't play songs longer than {limit_mins} minutes.
@@ -545,8 +499,6 @@ queue_up_next: "⏭️ <b>Up Next:</b>"
 queue_more_line: "\n… and {remaining} more"
 queue_empty_tail: "📭 <i>No more songs in queue.</i>"
 queue_empty: "⚠️ <b>The queue is already empty.</b>"
-queue_restored: "✅ Successfully restored <b>{count}</b> tracks to the queue."
-queue_restore_no_data: "❌ No cleared queue found to restore, or a new song has already been added."
 
 # 🔄 Reload
 reload_start: "⚙️ Reloading admin cache, voice chat status, and assistant status..."
@@ -610,10 +562,8 @@ restart_confirm_replay_done: "⏮️ Current song replayed successfully."
 
 room_not_active_cb: "⚠️ Nothing playing right now."
 room_no_active: "⚠️ <b>No active playback.</b>\n\n<i>There's nothing playing right now.</i>"
-room_not_linked: "⚠️ This channel isn't linked to any group."
 
 room_already_paused: "⏸️ Track is already paused. Tap ▶️ Resume to continue."
-room_already_paused_auto: "⏸️ Track is already paused — auto-resuming in {duration}."
 room_pause_failed: "❌ Failed to pause playback.\n\n<i>{error}</i>"
 
 rtmp_not_configured: "⚠️ RTMP not configured. Use <code>/setrtmp &lt;chat_id&gt; &lt;rtmp_url&gt;</code> in DM."
@@ -708,8 +658,6 @@ settings_info_cleanmode: |
   Playing status messages are kept until they naturally expire.
 cleanmode_status: "🧹 <b>Clean Mode</b>\n\nAuto-cleanup of command and service messages.\nCurrent state: {action}\nDelete after: {duration}m"
 cleanmode_hint: "Use /settings to change auto-delete duration."
-cleanmode_duration_updated: "🧹 Auto-delete duration set to {duration} minutes."
-cleanmode_updated: "🧹 Clean mode has been {action}."
 
 settings_info_lang: |
   🌐 What is this?
@@ -823,31 +771,20 @@ skip_count_exceeds_queue: "⚠️ You requested to skip <code>{requested}</code>
 
 speed_usage: |
   💡 <b>Usage:</b>
-  <code>{cmd} [speed] [duration]</code> — change playback speed
+  <code>{cmd} [speed]</code> — change playback speed
   
   Allowed speed range: <b>0.50x → 4.00x</b>
-  Duration (optional) resets the speed after given seconds.
   
   Example:
-  <code>{cmd} 1.25 45</code> — play at 1.25x for 45 seconds.
+  <code>{cmd} 1.5</code> — play at 1.5x
+  <code>{cmd} normal</code> — reset to normal speed
 
 speed_current: "🎧 <b>Current Speed:</b> <code>{speed}x</code> for 🎵 <u>{title}</u>\n\n💡 Use <code>{cmd} reset</code> to restore normal playback."
 
-speed_current_with_reset: |
-  🎧 <b>Current Speed:</b> <code>{speed}x</code>
-
-  🎵 <b>Track:</b> <i>{title}</i>
-  ⏳ <b>Auto-reset in:</b> {duration}
-  
-  💡 Use <code>{cmd} reset</code> to restore normal playback instantly.
-
 speed_invalid_value: "❌ Invalid speed value.\nExample: <code>{cmd} 1.5</code> or <code>{cmd} 2x</code>"
 speed_invalid_range: "⚠️ Speed must be between <b>0.50x</b> and <b>4.00x</b>."
-speed_invalid_duration: "⚠️ Invalid duration. It must be between <b>5</b> and <b>3600</b> seconds."
 
 speed_already_set: "ℹ️ Playback speed is already <b>{speed}x</b> for 🎵 <b>{title}</b>"
-
-speed_already_set_reset_hint: "ℹ️ Playback speed is already <b>{speed}x</b> for 🎵 <b>{title}</b>\n\n💡 Use <code>{cmd} reset</code> to return to normal speed."
 
 speed_failed: |
   ❌ Failed to change speed to <b>{speed}x</b>.
@@ -856,15 +793,11 @@ speed_failed: |
 speed_reset_success: "✅ Playback speed reset to <b>1.0x</b> by {user}"
 
 speed_set: "🚀 Playback speed set to <b>{speed}x</b> by {user}."
-speed_set_with_reset: |
-  🚀 Playback speed set to <b>{speed}x</b> by {user}.
-  ⏳ Will reset to normal after <b>{duration}</b> seconds.
 
 start_private: "Hello {user}, My name is {bot}.\n\nI'm a telegram streaming bot with some useful features. Supporting platforms like Youtube, Spotify, JioSaavn, Soundcloud etc.\n\nFeel free to add me to your groups."
 
 start_group: "<b>💫 I’m here!</b> Try a command… if you think you can handle me 😉"
 
-stream_channelid_fail: "⚠️ Failed to get your connected channel’s ID."
 stream_queue_finished: "🎵 <b>Queue Finished!</b>\n\nNo more songs to play. Use /play to add more tracks! 🎶"
 stream_downloading_next: "📥 Downloading your next track..."
 stream_download_fail: "❌ Failed to download.\nError: <code>{error}</code>"

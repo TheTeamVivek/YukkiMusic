@@ -65,10 +65,6 @@ addauth_success: "✅ {user} başarıyla yetkili kullanıcılar listesine eklend
 # 🤖 Bot Added to Chat
 bot_added_normal: "🎵 Beni eklediğin için teşekkürler! Müzik çalmaya başlamak için /play [şarkı] komutunu kullan."
 
-# 🛠️ Bot Added During Maintenance
-bot_added_maintenance: "⚠️ Şu anda bakımdayım ve yakında döneceğim. Sabrın için teşekkürler! ⏰"
-maint_reason_generic: "<i>📝 Sebep: {reason}</i>"
-
 # ⚠️ Bot Demotion
 bot_demotion_goodbye: |
   <b>⚠️ Yetki Kaybedildi</b>
@@ -85,8 +81,6 @@ broadcast_fetch_chats_failed: "❌ Sunulan sohbetler alınamadı:\n<code>{error}
 broadcast_fetch_users_failed: "❌ Sunulan kullanıcılar alınamadı:\n<code>{error}</code>"
 broadcast_no_targets: "⚠️ Yayın için hedef bulunamadı.\n\nTüm hedefleri bayraklarla hariç tutmadığından emin ol."
 broadcast_initializing: "📡 Yayın başlatılıyor...\n\nLütfen bekle..."
-broadcast_cancelled_header: "🚫 Yayın İptal Edildi"
-broadcast_completed_header: "✅ Yayın Tamamlandı"
 broadcast_progress_header: "📡 Yayınlanıyor..."
 broadcast_total_chats: "📊 Toplam Sohbet: {done}/{total} ({progress}%)"
 broadcast_total_users: "👥 Toplam Kullanıcı: {done}/{total} ({progress}%)"
@@ -126,7 +120,6 @@ blacklist_list_users: "👤 <b>Kullanıcılar:</b>"
 
 cplay_id_not_set: "⚠️ Kanal oynatma (cplay) ID'si ayarlanmamış.\nAyarlamak için <code>/setcplay &lt;sohbet_id&gt;</code> komutunu kullan."
 cplay_usage: "<b>Kullanım:</b> <code>/setcplay &lt;kanal_id&gt;</code>"
-cplay_invalid_chat_id: "<b>Geçersiz Sohbet ID:</b> Lütfen kanal için geçerli bir tamsayı ID gir."
 cplay_resolve_peer_fail: "<b>Kanal çözülemedi:</b> Kanal detayları alınamadı. Bu kanala erişimim olduğundan emin ol."
 cplay_invalid_target: "<b>Geçersiz Hedef:</b> Sağlanan ID geçerli bir kanal değil."
 cplay_channel_not_accessible: "<b>Kanala Erişilemiyor:</b> Kanal bilgileri alınamadı. Lütfen hedef kanalda yönetici olduğumdan emin ol."
@@ -220,18 +213,6 @@ autoleave_updated: "🏃‍♂️ Otomatik Ayrılma {action} konumuna getirildi.
 enabled: "Etkin"
 disabled: "Devre Dışı"
 
-bug_usage: "⚠️ Lütfen hatayı açıkla. Kullanım: {cmd} <problem> veya bir mesajı yanıtla."
-bug_thanks: "✅ Hata raporun için teşekkürler! Geliştiricilere gönderildi."
-
-bug_report_format: |
-  <b>🐞 Yeni Hata Raporu</b>
-
-  <b>Gönderen:</b> {user} (<code>{user_id}</code>)
-  <b>Sohbet:</b> {chat} (<code>{chat_id}</code>)
-
-  <b>Rapor:</b>
-  <pre>{report}</pre>
-  
 clear_no_active: "⚠️ <b>Temizlenecek aktif bir oynatma veya sıra yok.</b>"
 clear_success: "✅ Sıra {user} tarafından temizlendi.\n<i>Yeni şarkılar eklemeden önce <code>/{cmd}</code> kullanarak geri yükleyebilirsin.</i>"
 
@@ -287,16 +268,6 @@ err_fetch_failed: |
   ⚠️ Sohbet bilgileri alınamadı:
   <i>{error}</i>
 
-err_rtmp_missing_params: |
-  <b>⚠️ RTMP Detayları Eksik</b>
-
-  <i>Bu sohbette bir <b>RTMP yayını</b> aktif görünüyor, ancak gerekli <b>RTMP URL</b> veya <b>Yayın Anahtarını</b> sağlamadın. Bunlar olmadan RTMP'ye müzik akışı başlatamam.</i>
-
-  <b>Kullanım:</b> <code>/setrtmp [sohbet_id] [url+anahtar]</code>
-
-  <i>📌 RTMP detayları ayarlandıktan sonra yayına başlayabilirsin.</i>  
-  <i>➡️ RTMP kullanmak istemiyorsan, normal sesli sohbete geç.</i>
-  
 err_unknown: |
   ⚠️ Bilinmeyen Bir Hata Oluştu:
   <i>{error}</i>
@@ -388,7 +359,6 @@ logger_updated: "✅ Günlük başarıyla {action} konumuna getirildi."
 logs_empty: "Kayıt bulunamadı"
 
 # reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
-maint: "⚠️ Şu anda bakımdayım ve geçici olarak hizmet veremiyorum. Lütfen daha sonra tekrar kontrol et.\n\n{reason}"
 maint_reason: "<i>📝 Sebep: {reason}</i>"
 
 # ⚙️ Maintenance control
@@ -413,22 +383,12 @@ move_success: "✅ Parça, {user} tarafından {from} konumundan {to} konumuna ta
 
 # 🔇 Mute messages
 mute_already_muted: "🔇 <b>Zaten Sessizde</b>\nMüzik bu sohbette zaten sessize alınmış.\nSesi açmak ister misin?"
-mute_already_muted_with_time: "🔇 <b>Zaten Sessizde</b>\nMüzik sessize alınmış.\n<b>{duration}</b> içinde otomatik olarak ses açılacak."
-mute_invalid_duration: "⚠️ Otomatik ses açma için geçersiz süre.\nSüre <b>5</b> ile <b>3600</b> saniye arasında olmalıdır."
-mute_invalid_format: "⚠️ Geçersiz biçim.\nŞunu kullan: <code>/{cmd} 30</code> veya <code>/{cmd} 30s</code>"
 mute_failed: "❌ <b>Oynatma Sessize Alınamadı</b>\nHata: <code>{error}</code>"
 mute_success: |
   🔇 <b>Oynatma sessize alındı</b>
 
   🎵 Parça: {title}
   👤 Sessize Alan: {user}
-
-mute_success_with_time: |
-  🔇 <b>Oynatma sessize alındı</b>
-
-  🎵 Parça: {title}
-  👤 Sessize Alan: {user}
-  <i>⏳ <b>{duration}</b> saniye içinde otomatik olarak ses açılacak</i>
 
 no_song_query: |
   <b>🎵 Hop! Hiçbir şarkı tespit edilemedi.</b>
@@ -462,13 +422,9 @@ only_supergroup: "⚠️ Bu komut yalnızca gruplarda kullanılabilir."
 only_owner: "⚠️ Bu komutu yalnızca bot sahibi kullanabilir."
 only_sudo: "⚠️ Bu komutu yalnızca sudo kullanıcıları veya bot sahibi kullanabilir."
 
-pause_invalid_duration: "⚠️ Otomatik devam etme için geçersiz süre.\nSüre <b>5</b> ile <b>3600</b> saniye arasında olmalıdır."
-pause_invalid_format: "⚠️ Geçersiz biçim.\nŞunu kullan: <code>/{cmd} 30</code> veya <code>/{cmd} 30s</code>"
-auto_resume_line: "\n<i>⏳ <b>{seconds}</b> saniye içinde otomatik olarak devam edecek</i>"
-
 pause_already: |
   ⏸️ <b>Zaten Duraklatıldı</b>
-  Müzik zaten duraklatılmış durumda.{auto_resume_line}
+  Müzik zaten duraklatılmış durumda.
 
 pause_success: |
   ⏸️ <b>Oynatma duraklatıldı</b>
@@ -476,7 +432,6 @@ pause_success: |
   🎵 Parça: {title}
   ⏱️ Konum: {position} / {duration}
   👤 Duraklatan: {user}
-  {auto_resume_line}
 
 play_single_track_too_long: |
   ⚠️ {limit_mins} dakikadan uzun şarkıları oynatamazsın.
@@ -543,8 +498,6 @@ queue_up_next: "⏭️ <b>Sıradaki:</b>"
 queue_more_line: "\n… ve {remaining} tane daha"
 queue_empty_tail: "📭 <i>Sırada başka şarkı yok.</i>"
 queue_empty: "⚠️ <b>Sıra zaten boş.</b>"
-queue_restored: "✅ <b>{count}</b> parça başarıyla sıraya geri yüklendi."
-queue_restore_no_data: "❌ Geri yüklenecek temizlenmiş bir sıra bulunamadı veya zaten yeni bir şarkı eklendi."
 
 # 🔄 Reload
 reload_start: "⚙️ Yönetici önbelleği, sesli sohbet durumu ve asistan durumu yenileniyor..."
@@ -607,10 +560,8 @@ restart_confirm_replay_done: "⏮️ Mevcut şarkı başarıyla yeniden oynatıl
 
 room_not_active_cb: "⚠️ Şu an hiçbir şey çalmıyor."
 room_no_active: "⚠️ <b>Aktif oynatma yok.</b>\n\n<i>Şu an hiçbir şey çalmıyor.</i>"
-room_not_linked: "⚠️ Bu kanal herhangi bir gruba bağlı değil."
 
 room_already_paused: "⏸️ Parça zaten duraklatılmış. Devam etmek için ▶️ Devam Et düğmesine dokun."
-room_already_paused_auto: "⏸️ Parça zaten duraklatılmış — {duration} içinde otomatik olarak devam edecek."
 room_pause_failed: "❌ Oynatma duraklatılamadı.\n\n<i>{error}</i>"
 
 rtmp_not_configured: "⚠️ RTMP yapılandırılmamış. DM'de <code>/setrtmp &lt;chat_id&gt; &lt;rtmp_url&gt;</code> kullanın."
@@ -700,8 +651,6 @@ settings_info_cleanmode: |
   Çalıyor durum mesajları kendi süresi dolana kadar korunur.
 cleanmode_status: "🧹 <b>Temiz Mod</b>\n\nKomut ve servis mesajlarını otomatik temizler.\nMevcut durum: {action}"
 cleanmode_hint: "Use /settings to change auto-delete duration."
-cleanmode_duration_updated: "🧹 Auto-delete duration set to {duration} minutes."
-cleanmode_updated: "🧹 Temiz mod {action} olarak ayarlandı."
 
 settings_info_lang: |
   🌐 Bu nedir?
@@ -817,31 +766,20 @@ skip_count_exceeds_queue: "⚠️ <code>{requested}</code> parça atlamak istedi
 
 speed_usage: |
   💡 <b>Kullanım:</b>
-  <code>{cmd} [hız] [süre]</code> — oynatma hızını değiştirir
+  <code>{cmd} [hız]</code> — oynatma hızını değiştirir
   
   İzin verilen hız aralığı: <b>0.50x → 4.00x</b>
-  Süre (isteğe bağlı), belirtilen saniye dolduğunda hızı normale döndürür.
   
   Örnek:
-  <code>{cmd} 1.25 45</code> — 45 saniye boyunca 1.25x hızında çal.
+  <code>{cmd} 1.5</code> — 1.5x hızında çal.
+  <code>{cmd} normal</code> — normal hıza dön.
 
 speed_current: "🎧 <b>Mevcut Hız:</b> 🎵 <u>{title}</u> için <code>{speed}x</code>\n\n💡 Normal oynatmaya dönmek için <code>{cmd} reset</code> kullan."
 
-speed_current_with_reset: |
-  🎧 <b>Mevcut Hız:</b> <code>{speed}x</code>
-
-  🎵 <b>Parça:</b> <i>{title}</i>
-  ⏳ <b>Otomatik sıfırlama süresi:</b> {duration}
-  
-  💡 Normal oynatmaya anında dönmek için <code>{cmd} reset</code> kullan.
-
 speed_invalid_value: "❌ Geçersiz hız değeri.\nÖrnek: <code>{cmd} 1.5</code> veya <code>{cmd} 2x</code>"
 speed_invalid_range: "⚠️ Hız <b>0.50x</b> ile <b>4.00x</b> arasında olmalıdır."
-speed_invalid_duration: "⚠️ Geçersiz süre. <b>5</b> ile <b>3600</b> saniye arasında olmalıdır."
 
 speed_already_set: "ℹ️ 🎵 <b>{title}</b> için oynatma hızı zaten <b>{speed}x</b>"
-
-speed_already_set_reset_hint: "ℹ️ 🎵 <b>{title}</b> için oynatma hızı zaten <b>{speed}x</b>\n\n💡 Normal hıza dönmek için <code>{cmd} reset</code> kullan."
 
 speed_failed: |
   ❌ Hız <b>{speed}x</b> olarak değiştirilemedi.
@@ -850,15 +788,11 @@ speed_failed: |
 speed_reset_success: "✅ Oynatma hızı {user} tarafından <b>1.0x</b> olarak sıfırlandı."
 
 speed_set: "🚀 Oynatma hızı {user} tarafından <b>{speed}x</b> olarak ayarlandı."
-speed_set_with_reset: |
-  🚀 Oynatma hızı {user} tarafından <b>{speed}x</b> olarak ayarlandı.
-  ⏳ <b>{duration}</b> saniye sonra normale dönecek.
 
 start_private: "Merhaba {user}, Benim adım {bot}.\n\nBen bazı kullanışlı özelliklere sahip bir Telegram akış botuyum. Youtube, Spotify, JioSaavn, Soundcloud vb. platformları destekliyorum.\n\nBeni gruplarına eklemekten çekinme."
 
 start_group: "<b>💫 Buradayım!</b> Bir komut dene... Tabi benimle başa çıkabileceğini düşünüyorsan 😉"
 
-stream_channelid_fail: "⚠️ Bağlı kanalın ID'si alınamadı."
 stream_queue_finished: "🎵 <b>Sıra Bitti!</b>\n\nÇalacak başka şarkı kalmadı. Daha fazla parça eklemek için /play kullan! 🎶"
 stream_downloading_next: "📥 Sonraki parçan indiriliyor..."
 stream_download_fail: "❌ İndirme başarısız.\nHata: <code>{error}</code>"

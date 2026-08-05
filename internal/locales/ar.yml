@@ -66,10 +66,6 @@ addauth_success: "✅ تمت إضافة {user} بنجاح إلى قائمة ال
 # 🤖 Bot Added to Chat
 bot_added_normal: "🎵 شكراً لإضافتي! استخدم /play [اسم الأغنية] لبدء تشغيل الموسيقى."
 
-# 🛠️ Bot Added During Maintenance
-bot_added_maintenance: "⚠️ البوت حاليا تحت الصيانة يرجى العودة لاحقاً! ⏰"
-maint_reason_generic: "<i>📝 السبب: {reason}</i>"
-
 # ⚠️ Bot Demotion
 bot_demotion_goodbye: |
   <b>⚠️ ليس لدي صلاحيات</b>
@@ -86,8 +82,6 @@ broadcast_fetch_chats_failed: "❌ فشل جلب المحادثات المخدو
 broadcast_fetch_users_failed: "❌ فشل جلب المستخدمين المخدومين:\n<code>{error}</code>"
 broadcast_no_targets: "⚠️ لم يتم العثور على أهداف للبث.\n\nتأكد من أنك لم تستبعد جميع الأهداف باستخدام الأعلام."
 broadcast_initializing: "📡 جاري تهيئة البث...\n\nيرجى الانتظار..."
-broadcast_cancelled_header: "🚫 تم إلغاء البث"
-broadcast_completed_header: "✅ اكتمل البث"
 broadcast_progress_header: "📡 جاري البث..."
 broadcast_total_chats: "📊 إجمالي المحادثات: {done}/{total} ({progress}%)"
 broadcast_total_users: "👥 إجمالي المستخدمين: {done}/{total} ({progress}%)"
@@ -127,7 +121,6 @@ blacklist_list_users: "👤 <b>المستخدمون:</b>"
 
 cplay_id_not_set: "⚠️ لم يتم تعيين معرف cplay.\nاستخدم <code>/setcplay &lt;chat_id&gt;</code> لتعيينه."
 cplay_usage: "<b>الاستخدام:</b> <code>/setcplay &lt;channel_id&gt;</code>"
-cplay_invalid_chat_id: "<b>معرف محادثة غير صالح:</b> يرجى تقديم معرف رقمي صحيح للقناة."
 cplay_resolve_peer_fail: "<b>فشل جلب الأطراف:</b> تعذر جلب تفاصيل القناة. تأكد من أنني أملك صلاحية الوصول إلى هذه القناة."
 cplay_invalid_target: "<b>هدف غير صالح:</b> المعرف المقدم ليس قناة صالحة."
 cplay_channel_not_accessible: "<b>لا يمكن الوصول إلى القناة:</b> تعذر استرداد معلومات القناة. يرجى التأكد من أنني مشرف في القناة المستهدفة."
@@ -221,18 +214,6 @@ autoleave_updated: "🏃‍♂️ المغادرة التلقائية أصبحت
 enabled: "مفعلة"
 disabled: "معطلة"
 
-bug_usage: "⚠️ يرجى وصف الخطأ. الاستخدام: {cmd} <الوصف> أو قم بالرد على رسالة."
-bug_thanks: "✅ شكراً لإبلاغك عن الخطأ! لقد تم إرساله إلى المطورين."
-
-bug_report_format: |
-  <b>🐞 بلاغ جديد عن خطأ</b>
-
-  <b>من:</b> {user} (<code>{user_id}</code>)
-  <b>المحادثة:</b> {chat} (<code>{chat_id}</code>)
-
-  <b>البلاغ:</b>
-  <pre>{report}</pre>
-
 clear_no_active: "⚠️ <b>لا يوجد تشغيل نشط أو قائمة انتظار لتنظيفها.</b>"
 clear_success: "✅ تم تنظيف قائمة الانتظار بواسطة {user}.\n<i>يمكنك استعادتها باستخدام <code>/{cmd}</code> قبل إضافة أغاني جديدة</i>"
 
@@ -288,16 +269,6 @@ err_fetch_failed: |
   ⚠️ فشل جلب معلومات المحادثة:
   <i>{error}</i>
 
-err_rtmp_missing_params: |
-  <b>⚠️ بيانات RTMP مفقودة</b>
-
-  <i>يبدو أن <b>بث RTMP</b> نشط في هذه المحادثة، لكنك لم تقدم <b>رابط RTMP</b> المطلوب أو <b>مفتاح البث</b>. بدون هذه البيانات، لا يمكنني بدء تشغيل الموسيقى عبر RTMP.</i>
-
-  <b>الاستخدام:</b> <code>/setrtmp [chat_id] [url+key]</code>
-
-  <i>📌 بمجرد تعيين بيانات RTMP، يمكنك بدء البث.</i>  
-  <i>➡️ إذا كنت لا ترغب في استخدام RTMP، انتقل إلى المحادثة الصوتية العادية بدلاً من ذلك.</i>
-  
 err_unknown: |
   ⚠️ حدث خطأ غير معروف:
   <i>{error}</i>
@@ -389,7 +360,6 @@ logger_updated: "✅ أصبح السجل {action} بنجاح."
 logs_empty: "لا توجد سجلات"
 
 # reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
-maint: "⚠️ أنا قيد الصيانة حالياً وغير متاح مؤقتاً. يرجى العودة لاحقاً.\n\n{reason}"
 maint_reason: "<i>📝 السبب: {reason}</i>"
 
 # ⚙️ Maintenance control
@@ -414,22 +384,12 @@ move_success: "✅ تم نقل المقطع من المركز {from} إلى {to}
 
 # 🔇 Mute messages
 mute_already_muted: "🔇 <b>مكتوم بالفعل</b>\nالموسيقى مكتومة بالفعل في هذه المحادثة.\nهل ترغب في إلغاء الكتم؟"
-mute_already_muted_with_time: "🔇 <b>مكتوم بالفعل</b>\nالموسيقى مكتومة.\nسيتم إلغاء الكتم تلقائياً خلال <b>{duration}</b>."
-mute_invalid_duration: "⚠️ مدة غير صالحة لإلغاء الكتم التلقائي.\nيجب أن تكون بين <b>5</b> و <b>3600</b> ثانية."
-mute_invalid_format: "⚠️ تنسيق غير صالح.\nاستخدم: <code>/{cmd} 30</code> أو <code>/{cmd} 30s</code>"
 mute_failed: "❌ <b>فشل كتم التشغيل</b>\nالخطأ: <code>{error}</code>"
 mute_success: |
   🔇 <b>تم كتم التشغيل</b>
 
   🎵 المقطع: {title}
   👤 كُتم بواسطة: {user}
-
-mute_success_with_time: |
-  🔇 <b>تم كتم التشغيل</b>
-
-  🎵 المقطع: {title}
-  👤 كُتم بواسطة: {user}
-  <i>⏳ سيتم إلغاء الكتم خلال <b>{duration}</b> ثانية</i>
 
 no_song_query: |
   <b>🎵 أوبس! لم يتم اكتشاف أغنية.</b>
@@ -463,13 +423,9 @@ only_supergroup: "⚠️ هذا الأمر يمكن استخدامه في الم
 only_owner: "⚠️ فقط مالك المساعد يمكنه استخدام هذا الأمر."
 only_sudo: "⚠️ فقط المساعدون أو مالك المساعد يمكنهم استخدام هذا الأمر."
 
-pause_invalid_duration: "⚠️ مدة غير صالحة للاستئناف التلقائي.\nيجب أن تكون بين <b>5</b> و <b>3600</b> ثانية."
-pause_invalid_format: "⚠️ تنسيق غير صالح.\nاستخدم: <code>/{cmd} 30</code> أو <code>/{cmd} 30s</code>"
-auto_resume_line: "\n<i>⏳ سيتم الاستئناف تلقائياً خلال <b>{seconds}</b> ثانية</i>"
-
 pause_already: |
   ⏸️ <b>متوقف مؤقتاً بالفعل</b>
-  الموسيقى متوقفة مؤقتاً بالفعل.{auto_resume_line}
+  الموسيقى متوقفة مؤقتاً بالفعل.
 
 pause_success: |
   ⏸️ <b>تم إيقاف التشغيل مؤقتاً</b>
@@ -477,7 +433,6 @@ pause_success: |
   🎵 المقطع: {title}
   ⏱️ الموضع: {position} / {duration}
   👤 أوقف بواسطة: {user}
-  {auto_resume_line}
 
 play_single_track_too_long: |
   ⚠️ لا يمكنك تشغيل أغاني أطول من {limit_mins} دقيقة.
@@ -545,8 +500,6 @@ queue_up_next: "⏭️ <b>التالي:</b>"
 queue_more_line: "\n… و {remaining} أكثر"
 queue_empty_tail: "📭 <i>لا توجد أغاني أخرى في قائمة الانتظار.</i>"
 queue_empty: "⚠️ <b>قائمة الانتظار فارغة بالفعل.</b>"
-queue_restored: "✅ تم استعادة <b>{count}</b> مقاطع إلى قائمة الانتظار بنجاح."
-queue_restore_no_data: "❌ لم يتم العثور على قائمة انتظار ممسوحة لاستعادتها، أو تمت إضافة أغنية جديدة بالفعل."
 
 # 🔄 Reload
 reload_start: "⚙️ جاري إعادة تحميل ذاكرة المشرفين، وحالة المحادثة الصوتية، وحالة المساعد..."
@@ -610,10 +563,8 @@ restart_confirm_replay_done: "⏮️ تمت إعادة تشغيل الأغنية
 
 room_not_active_cb: "⚠️ لا يوجد شيء قيد التشغيل حالياً."
 room_no_active: "⚠️ <b>لا يوجد تشغيل نشط.</b>\n\n<i>لا يوجد شيء قيد التشغيل حالياً.</i>"
-room_not_linked: "⚠️ هذه القناة ليست مرتبطة بأي مجموعة."
 
 room_already_paused: "⏸️ المقطع متوقف مؤقتاً بالفعل. اضغط على ▶️ استئناف للمتابعة."
-room_already_paused_auto: "⏸️ المقطع متوقف مؤقتاً بالفعل — سيتم الاستئناف تلقائياً خلال {duration}."
 room_pause_failed: "❌ فشل إيقاف التشغيل مؤقتاً.\n\n<i>{error}</i>"
 
 rtmp_not_configured: "⚠️ RTMP غير مُعد. استخدم <code>/setrtmp &lt;chat_id&gt; &lt;rtmp_url&gt;</code> في الخاص."
@@ -703,8 +654,6 @@ settings_info_cleanmode: |
   تظل رسائل حالة التشغيل حتى تنتهي مدتها تلقائياً.
 cleanmode_status: "🧹 <b>الوضع النظيف</b>\n\nتنظيف تلقائي لرسائل الأوامر والخدمة.\nالحالة الحالية: {action}"
 cleanmode_hint: "Use /settings to change auto-delete duration."
-cleanmode_duration_updated: "🧹 Auto-delete duration set to {duration} minutes."
-cleanmode_updated: "🧹 تم {action} الوضع النظيف."
 
 settings_info_lang: |
   🌐 ما هذا؟
@@ -820,31 +769,20 @@ skip_count_exceeds_queue: "⚠️ طلبت تخطي <code>{requested}</code> م�
 
 speed_usage: |
   💡 <b>الاستخدام:</b>
-  <code>{cmd} [speed] [duration]</code> — تغيير سرعة التشغيل
+  <code>{cmd} [speed]</code> — تغيير سرعة التشغيل
   
   نطاق السرعة المسموح به: <b>0.50x ← 4.00x</b>
-  المدة (اختيارية) تعيد السرعة إلى وضعها الطبيعي بعد ثوانٍ محددة.
   
   مثال:
-  <code>{cmd} 1.25 45</code> — التشغيل بسرعة 1.25x لمدة 45 ثانية.
+  <code>{cmd} 1.5</code> — التشغيل بسرعة 1.5x
+  <code>{cmd} normal</code> — العودة للسرعة الطبيعية.
 
 speed_current: "🎧 <b>السرعة الحالية:</b> <code>{speed}x</code> للمقطع 🎵 <u>{title}</u>\n\n💡 استخدم <code>{cmd} reset</code> لاستعادة التشغيل الطبيعي."
 
-speed_current_with_reset: |
-  🎧 <b>السرعة الحالية:</b> <code>{speed}x</code>
-
-  🎵 <b>المقطع:</b> <i>{title}</i>
-  ⏳ <b>إعادة تعيين تلقائي خلال:</b> {duration}
-  
-  💡 استخدم <code>{cmd} reset</code> لاستعادة التشغيل الطبيعي فوراً.
-
 speed_invalid_value: "❌ قيمة سرعة غير صالحة.\nمثال: <code>{cmd} 1.5</code> أو <code>{cmd} 2x</code>"
 speed_invalid_range: "⚠️ يجب أن تكون السرعة بين <b>0.50x</b> و <b>4.00x</b>."
-speed_invalid_duration: "⚠️ مدة غير صالحة. يجب أن تكون بين <b>5</b> و <b>3600</b> ثانية."
 
 speed_already_set: "ℹ️ سرعة التشغيل هي <b>{speed}x</b> بالفعل للمقطع 🎵 <b>{title}</b>"
-
-speed_already_set_reset_hint: "ℹ️ سرعة التشغيل هي <b>{speed}x</b> بالفعل للمقطع 🎵 <b>{title}</b>\n\n💡 استخدم <code>{cmd} reset</code> للعودة للسرعة الطبيعية."
 
 speed_failed: |
   ❌ فشل تغيير السرعة إلى <b>{speed}x</b>.
@@ -853,15 +791,11 @@ speed_failed: |
 speed_reset_success: "✅ تمت إعادة تعيين سرعة التشغيل إلى <b>1.0x</b> بواسطة {user}"
 
 speed_set: "🚀 تم تعيين سرعة التشغيل إلى <b>{speed}x</b> بواسطة {user}."
-speed_set_with_reset: |
-  🚀 تم تعيين سرعة التشغيل إلى <b>{speed}x</b> بواسطة {user}.
-  ⏳ ستعود للوضع الطبيعي بعد <b>{duration}</b> ثانية.
 
 start_private: "مرحباً {user}، اسمي {bot}.\n\nأنا مساعد آلي لبث الموسيقى على تيليجرام مع ميزات مفيدة. أدعم منصات مثل Youtube و Spotify و JioSaavn و Soundcloud وغيرها.\n\nلا تتردد في إضافتي إلى مجموعاتك."
 
 start_group: "<b>💫 أنا هنا!</b> جرب أمراً ما... إذا كنت تظن أنك تستطيع السيطرة علي 😉"
 
-stream_channelid_fail: "⚠️ فشل الحصول على معرف القناة المرتبطة."
 stream_queue_finished: "🎵 <b>انتهت قائمة الانتظار!</b>\n\nلا توجد أغاني أخرى للتشغيل. استخدم /play لإضافة المزيد! 🎶"
 stream_downloading_next: "📥 جاري تنزيل المقطع التالي..."
 stream_download_fail: "❌ فشل التنزيل.\nالخطأ: <code>{error}</code>"
