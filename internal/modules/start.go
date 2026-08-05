@@ -42,13 +42,11 @@ func startHandler(c *td.Client, m *td.Message) error {
 	database.AddServedUser(m.ChatID())
 	sender, _ := m.GetUser(c)
 
-	var err error
 	if m.Args() == "pm_help" {
-		err = helpHandler(c, m)
-	} else {
-		err = handlePmStart(c, m, sender)
-	}
-	if err != nil {
+		if err := helpHandler(c, m); err != nil {
+			return err
+		}
+	} else if err := handlePmStart(c, m, sender); err != nil {
 		return err
 	}
 
@@ -56,11 +54,15 @@ func startHandler(c *td.Client, m *td.Message) error {
 	return nil
 }
 
-func handlePmStart(c *td.Client, m *td.Message, sender *td.User) error {
-	caption := F(m.ChatID(), "start_private", locales.Arg{
-		"user": mentionOf(sender, m.SenderID()),
+func startCaption(c *td.Client, chatID int64, sender *td.User, fallbackID int64) string {
+	return F(chatID, "start_private", locales.Arg{
+		"user": mentionOf(sender, fallbackID),
 		"bot":  td.Mention(c.Me.FirstName, c.Me.Id, true, true),
 	})
+}
+
+func handlePmStart(c *td.Client, m *td.Message, sender *td.User) error {
+	caption := startCaption(c, m.ChatID(), sender, m.SenderID())
 
 	if image := config.StartImage(); image != "" {
 		if _, err := m.ReplyPhoto(c, td.InputFileRemote{Id: image}, &td.SendPhotoOpts{
@@ -86,10 +88,7 @@ func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 	}
 	sender, _ := msg.GetUser(c)
 
-	caption := F(cb.ChatId, "start_private", locales.Arg{
-		"user": mentionOf(sender, msg.SenderID()),
-		"bot":  td.Mention(c.Me.FirstName, c.Me.Id, true, true),
-	})
+	caption := startCaption(c, cb.ChatId, sender, msg.SenderID())
 
 	_, err = cb.EditMessageText(c, caption, &td.EditTextMessageOpts{
 		ReplyMarkup: core.GetStartMarkup(cb.ChatId),
@@ -110,14 +109,15 @@ func isChannel(c *td.Client, m *td.Message) bool {
 // mentionOf builds an HTML mention, falling back to a plain "user" mention
 // if sender is nil (e.g. GetUser failed).
 func mentionOf(sender *td.User, fallbackId int64) string {
-	if sender == nil {
-		return td.Mention("user", fallbackId, true, true)
+	name := "user"
+	id := fallbackId
+	if sender != nil {
+		if full := strings.TrimSpace(sender.FirstName + " " + sender.LastName); full != "" {
+			name = full
+		}
+		id = sender.Id
 	}
-	name := strings.TrimSpace(sender.FirstName + " " + sender.LastName)
-	if name == "" {
-		name = "user"
-	}
-	return td.Mention(name, sender.Id, true, true)
+	return td.Mention(name, id, true, true)
 }
 
 // logStart reports a bot start to the configured logger chat, if enabled.

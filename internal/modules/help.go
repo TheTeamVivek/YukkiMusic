@@ -22,7 +22,7 @@ import (
 	"html"
 	"strings"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -41,7 +41,7 @@ func init() {
 For more info, visit our <a href="%s">Support Chat</a>.`, config.SupportChat)
 }
 
-func helpHandler(m *tg.NewMessage) error {
+func helpHandler(c *td.Client, m *td.Message) error {
 	args := strings.Fields(m.Text())
 	if len(args) > 1 {
 		cmd := args[1]
@@ -49,46 +49,41 @@ func helpHandler(m *tg.NewMessage) error {
 			if !strings.HasPrefix(cmd, "/") {
 				cmd = "/" + cmd
 			}
-			return showHelpFor(m, cmd)
+			return showHelpFor(c, m, cmd)
 		}
 	}
 
-	if m.ChatType() != tg.EntityUser {
-		m.Reply(
-			F(m.ChannelID(), "help_private_only"),
-			&tg.SendOptions{
-				ReplyMarkup: core.GetGroupHelpKeyboard(m.ChannelID()),
-			},
-		)
-		return tg.ErrEndGroup
+	if !m.IsPrivate() {
+		m.ReplyText(c, F(m.ChatID(), "help_private_only"), &td.SendTextMessageOpts{
+			ReplyMarkup: core.GetGroupHelpKeyboard(m.ChatID()),
+		})
+		return nil
 	}
 
-	m.Reply(
-		F(m.ChannelID(), "help_main"),
-		&tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard(m.ChannelID())},
-	)
-	return tg.ErrEndGroup
+	_, err := m.ReplyText(c, F(m.ChatID(), "help_main"), &td.SendTextMessageOpts{
+		ReplyMarkup: core.GetHelpKeyboard(m.ChatID()),
+	})
+	return err
 }
 
-func helpCB(c *tg.CallbackQuery) error {
-	c.Edit(
-		F(c.ChannelID(), "help_main"),
-		&tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard(c.ChannelID())},
-	)
-	c.Answer("")
-	return tg.ErrEndGroup
+func helpCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
+	cb.Answer(c, 0, false, "", "")
+	_, err := cb.EditMessageText(c, F(cb.ChatId, "help_main"), &td.EditTextMessageOpts{
+		ReplyMarkup: core.GetHelpKeyboard(cb.ChatId),
+	})
+	return err
 }
 
-func helpCallbackHandler(c *tg.CallbackQuery) error {
-	data := c.DataString()
-	c.Answer("")
+func helpCallbackHandler(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
+	data := cb.DataString()
+	cb.Answer(c, 0, false, "", "")
 	if data == "" {
-		return tg.ErrEndGroup
+		return nil
 	}
-	chatID := c.ChannelID()
+	chatID := cb.ChatId
 	parts := strings.SplitN(data, ":", 2)
 	if len(parts) < 2 {
-		return tg.ErrEndGroup
+		return nil
 	}
 
 	var text string
@@ -108,11 +103,11 @@ func helpCallbackHandler(c *tg.CallbackQuery) error {
 		btn = core.GetHelpKeyboard(chatID)
 	}
 
-	c.Edit(text, &tg.SendOptions{ReplyMarkup: btn})
-	return tg.ErrEndGroup
+	_, err := cb.EditMessageText(c, text, &td.EditTextMessageOpts{ReplyMarkup: btn})
+	return err
 }
 
-func showHelpFor(m *tg.NewMessage, cmd string) error {
+func showHelpFor(c *td.Client, m *td.Message, cmd string) error {
 	helpText, ok := helpTexts[cmd]
 	if !ok {
 		trimmed := strings.TrimPrefix(cmd, "/")
@@ -122,22 +117,20 @@ func showHelpFor(m *tg.NewMessage, cmd string) error {
 	}
 
 	if helpText == "" {
-		_, err := m.Reply(
-			"⚠️ <i>No help found for command <code>" +
-				html.EscapeString(cmd) +
+		_, err := m.ReplyText(
+			c,
+			"⚠️ <i>No help found for command <code>"+
+				html.EscapeString(cmd)+
 				"</code></i>",
+			nil,
 		)
-		if err != nil {
-			return err
-		}
-		return tg.ErrEndGroup
-	}
-
-	_, err := m.Reply(
-		"📘 <b>Help for</b> <code>" + cmd + "</code>:\n\n" + helpText,
-	)
-	if err != nil {
 		return err
 	}
-	return tg.ErrEndGroup
+
+	_, err := m.ReplyText(
+		c,
+		"📘 <b>Help for</b> <code>"+cmd+"</code>:\n\n"+helpText,
+		nil,
+	)
+	return err
 }

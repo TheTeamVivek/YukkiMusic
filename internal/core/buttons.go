@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strings"
 
+	td "github.com/AshokShau/gotdbot"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/config"
@@ -150,75 +151,112 @@ func GetPlayMarkup(chatID int64, r *RoomState, queued bool) tg.ReplyMarkup {
 	return btn.Build()
 }
 
-func GetGroupHelpKeyboard(chatID int64) *tg.ReplyInlineMarkup {
-	return tg.NewKeyboard().
-		AddRow(
-			tg.Button.URL(F(chatID, "GC_HELP_BTN"), "https://t.me/"+Bot.Me().Username+"?start=pm_help"),
-		).
-		Build()
+func tdStyleBtn(text, cb, colour string) td.InlineKeyboardButton {
+	b := td.InlineKeyboardButton{
+		Text: text,
+		Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte(cb)},
+	}
+
+	if config.DisableColour {
+		return b
+	}
+
+	switch strings.ToLower(colour) {
+	case "red":
+		b.Style = td.ButtonStyleDanger{}
+	case "blue":
+		b.Style = td.ButtonStylePrimary{}
+	case "green":
+		b.Style = td.ButtonStyleSuccess{}
+	}
+
+	return b
 }
 
-func GetStartMarkup(chatID int64) tg.ReplyMarkup {
-	return tg.NewKeyboard().
-		AddRow(
-			tg.Button.URL(
-				F(chatID, "ADD_ME_BTN"),
-				"https://t.me/"+Bot.Me().Username+"?startgroup&admin=invite_users",
-			),
-		).
-		AddRow(
-			tg.Button.Data(
-				F(chatID, "START_HELP_BTN"),
-				"help_cb",
-			),
-		).
-		AddRow(
-			tg.Button.URL(
-				F(chatID, "UPDATES_BTN"),
-				config.SupportChannel,
-			),
-			tg.Button.URL(
-				F(chatID, "SUPPORT_BTN"),
-				config.SupportChat,
-			),
-		).
-		Build()
+func GetGroupHelpKeyboard(chatID int64) td.ReplyMarkup {
+	return &td.ReplyMarkupInlineKeyboard{
+		Rows: [][]td.InlineKeyboardButton{
+			{
+				{
+					Text: F(chatID, "GC_HELP_BTN"),
+					Type: &td.InlineKeyboardButtonTypeUrl{
+						Url: "https://t.me/" + Bot.Me().Username + "?start=pm_help",
+					},
+				},
+			},
+		},
+	}
 }
 
-func GetHelpKeyboard(chatID int64) *tg.ReplyInlineMarkup {
-	return tg.NewKeyboard().
-		AddRow(
-			tg.Button.Data(
-				F(chatID, "HELP_ADMINS_BTN"),
-				"help:admins",
-			),
-			tg.Button.Data(
-				F(chatID, "HELP_PUBLIC_BTN"),
-				"help:public",
-			),
-		).
-		AddRow(
-			tg.Button.Data(
-				F(chatID, "HELP_OWNER_BTN"),
-				"help:owner",
-			),
-			tg.Button.Data(
-				F(chatID, "HELP_SUDOERS_BTN"),
-				"help:sudoers",
-			),
-		).
-		AddRow(
-			styleBtn(F(chatID, "BACK_BTN"), "start", ""),
-		).
-		Build()
+func GetStartMarkup(chatID int64) td.ReplyMarkup {
+	return &td.ReplyMarkupInlineKeyboard{
+		Rows: [][]td.InlineKeyboardButton{
+			{
+				{
+					Text: F(chatID, "ADD_ME_BTN"),
+					Type: &td.InlineKeyboardButtonTypeUrl{
+						Url: "https://t.me/" + Bot.Me().Username + "?startgroup&admin=invite_users",
+					},
+				},
+			},
+			{
+				{
+					Text: F(chatID, "START_HELP_BTN"),
+					Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("help_cb")},
+				},
+			},
+			{
+				{
+					Text: F(chatID, "UPDATES_BTN"),
+					Type: &td.InlineKeyboardButtonTypeUrl{Url: config.SupportChannel},
+				},
+				{
+					Text: F(chatID, "SUPPORT_BTN"),
+					Type: &td.InlineKeyboardButtonTypeUrl{Url: config.SupportChat},
+				},
+			},
+		},
+	}
 }
 
-func GetBackKeyboard(chatID int64) *tg.ReplyInlineMarkup {
-	return tg.NewKeyboard().
-		AddRow(
-			styleBtn(F(chatID, "BACK_BTN"), "help:main", "blue"),
-		).
-		Build()
+func GetHelpKeyboard(chatID int64) td.ReplyMarkup {
+	return &td.ReplyMarkupInlineKeyboard{
+		Rows: [][]td.InlineKeyboardButton{
+			{
+				{
+					Text: F(chatID, "HELP_ADMINS_BTN"),
+					Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("help:admins")},
+				},
+				{
+					Text: F(chatID, "HELP_PUBLIC_BTN"),
+					Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("help:public")},
+				},
+			},
+			{
+				{
+					Text: F(chatID, "HELP_OWNER_BTN"),
+					Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("help:owner")},
+				},
+				{
+					Text: F(chatID, "HELP_SUDOERS_BTN"),
+					Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("help:sudoers")},
+				},
+			},
+			{
+				tdStyleBtn(F(chatID, "BACK_BTN"), "start", ""),
+			},
+		},
+	}
+}
+
+func GetBackKeyboard(chatID int64) td.ReplyMarkup {
+	return &td.ReplyMarkupInlineKeyboard{
+		Rows: [][]td.InlineKeyboardButton{
+			{
+				tdStyleBtn(F(chatID, "BACK_BTN"), "help:main", "blue"),
+			},
+		},
+	}
 }
 
 func GetRestartConfirmMarkup(chatID int64) *tg.ReplyInlineMarkup {

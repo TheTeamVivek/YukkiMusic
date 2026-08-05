@@ -19,13 +19,14 @@ package modules
 
 import (
 	td "github.com/AshokShau/gotdbot"
+	"github.com/AshokShau/gotdbot/filters/callbackquery"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
 )
 
-func Init(_ *td.Client, bot *telegram.Client, assistants *core.AssistantManager) {
+func Init(tdbot *td.Client, bot *telegram.Client, assistants *core.AssistantManager) {
 	bot.UpdatesGetState()
 	bot.Use(blacklistMessageMiddleware)
 	assistants.ForEach(func(a *core.Assistant) {
@@ -50,12 +51,10 @@ func Init(_ *td.Client, bot *telegram.Client, assistants *core.AssistantManager)
 	bot.AddCommandHandler("(unblockuser|unblacklistuser|unbluser|whitelistuser)", handleUnblockUser, ownerFilter, ignoreChannelFilter).SetGroup(100)
 	bot.AddCommandHandler("autoleave", autoLeaveHandler, sudoOnlyFilter, ignoreChannelFilter).SetGroup(100)
 	bot.AddCommandHandler("adminmode", adminModeHandler, superGroupFilter, adminFilter).SetGroup(100)
-	bot.AddCommandHandler("bug", bugHandler, ignoreChannelFilter).SetGroup(100)
 	bot.AddCommandHandler("cleanmode", cleanModeHandler, superGroupFilter, adminFilter).SetGroup(100)
 	bot.AddCommandHandler("clear", clearHandler, superGroupFilter, authFilter).SetGroup(100)
 	bot.AddCommandHandler("eval", evalHandle, ownerFilter).SetGroup(100)
 	bot.AddCommandHandler("ev", evalCommandHandler, ownerFilter).SetGroup(100)
-	bot.AddCommandHandler("help", helpHandler, ignoreChannelFilter).SetGroup(100)
 	bot.AddCommandHandler("json", jsonHandle).SetGroup(100)
 	bot.AddCommandHandler("logger", handleLogger, sudoOnlyFilter, ignoreChannelFilter).SetGroup(100)
 	bot.AddCommandHandler("mute", muteHandler, superGroupFilter, authFilter).SetGroup(100)
@@ -71,7 +70,6 @@ func Init(_ *td.Client, bot *telegram.Client, assistants *core.AssistantManager)
 	bot.AddCommandHandler("resume", resumeHandler, superGroupFilter, authFilter).SetGroup(100)
 	bot.AddCommandHandler("settings", settingsHandler, superGroupFilter, adminFilter).SetGroup(100)
 	bot.AddCommandHandler("skip", skipHandler, superGroupFilter, authFilter).SetGroup(100)
-	bot.AddCommandHandler("start", startHandler, ignoreChannelFilter).SetGroup(100)
 	bot.AddCommandHandler("stats", statsHandler, ignoreChannelFilter, sudoOnlyFilter).SetGroup(100)
 	bot.AddCommandHandler("stream", streamHandler, superGroupFilter, authFilter).SetGroup(100)
 	bot.AddCommandHandler("streamstatus", streamStatusHandler, superGroupFilter).SetGroup(100)
@@ -154,15 +152,19 @@ func Init(_ *td.Client, bot *telegram.Client, assistants *core.AssistantManager)
 	bot.AddCallbackHandler("^bcast_cancel$", broadcastCancelCB).SetGroup(90)
 	bot.AddCallbackHandler("^cancel$", cancelHandler).SetGroup(90)
 	bot.AddCallbackHandler("^close$", closeHandler).SetGroup(90)
-	bot.AddCallbackHandler("^help:(.+)$", helpCallbackHandler).SetGroup(90)
 	bot.AddCallbackHandler("^lang:[a-z]$", langCallbackHandler).SetGroup(90)
 	bot.AddCallbackHandler("^restart:(bot|replay)$", restartConfirmHandler).SetGroup(90)
 	bot.AddCallbackHandler("^room:-?\\d+:\\w+$", roomHandle).SetGroup(90)
 	bot.AddCallbackHandler("^rtmp_stop$", rtmpStopCallbackHandler).SetGroup(90)
 	bot.AddCallbackHandler("^set|info:", settingsCallbackHandler).SetGroup(90)
-	bot.AddCallbackHandler("help_cb", helpCB).SetGroup(90)
 	bot.AddCallbackHandler("progress", emptyCBHandler).SetGroup(90)
-	bot.AddCallbackHandler("start", startCB).SetGroup(90)
+
+	// td client handlers
+	tdbot.OnCommand("start", startHandler)
+	tdbot.OnCommand("help", helpHandler)
+	tdbot.OnUpdateNewCallbackQuery(startCB, callbackquery.Equal("start"))
+	tdbot.OnUpdateNewCallbackQuery(helpCB, callbackquery.Equal("help_cb"))
+	tdbot.OnUpdateNewCallbackQuery(helpCallbackHandler, callbackquery.Regex("^help:(.+)$"))
 
 	bot.On("edit:/eval", evalHandle).SetGroup(80)
 	bot.On("edit:/ev", evalCommandHandler).SetGroup(80)
