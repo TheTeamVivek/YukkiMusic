@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"time"
 
+	td "github.com/AshokShau/gotdbot"
 	"github.com/Laky-64/gologging"
-	tg "github.com/amarnathcjd/gogram/telegram"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/mem"
@@ -31,7 +31,6 @@ import (
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
-	"yukkimusic/internal/utils"
 )
 
 func init() {
@@ -74,16 +73,22 @@ func formatUptime(d time.Duration) string {
 	return result
 }
 
-func pingHandler(m *tg.NewMessage) error {
+func pingHandler(c *td.Client, m *td.Message) error {
+	if isChannel(c, m) {
+		return nil
+	}
+
+	chatID := m.ChatID()
+
 	if m.IsPrivate() {
-		m.Delete()
-		database.AddServedUser(m.ChannelID())
+		m.Delete(c, true)
+		database.AddServedUser(chatID)
 	} else {
-		database.AddServedChat(m.ChannelID())
+		database.AddServedChat(chatID)
 	}
 
 	start := time.Now()
-	reply, err := m.Reply(F(m.ChannelID(), "ping_start"))
+	reply, err := m.ReplyText(c, F(chatID, "ping_start"), nil)
 	if err != nil {
 		return err
 	}
@@ -94,13 +99,6 @@ func pingHandler(m *tg.NewMessage) error {
 	ramInfo := "N/A"
 	cpuUsage := "N/A"
 	diskUsage := "N/A"
-
-	opt := &tg.SendOptions{
-		ReplyMarkup: core.SuppMarkup(m.ChannelID()),
-	}
-	if config.PingImage != "" {
-		opt.Media = config.PingImage
-	}
 
 	v, err := mem.VirtualMemory()
 	if err == nil {
@@ -121,27 +119,55 @@ func pingHandler(m *tg.NewMessage) error {
 		diskUsage = fmt.Sprintf("%.2f / %.2f GB", usedGB, totalGB)
 	}
 
-	msg := F(m.ChannelID(), "ping_result", locales.Arg{
+	msg := F(chatID, "ping_result", locales.Arg{
 		"latency":    latency,
-		"bot":        utils.MentionHTML(m.Client.Me()),
+		"bot":        td.Mention(c.Me.FirstName, c.Me.Id, true, true),
 		"uptime":     uptimeStr,
 		"ram_info":   ramInfo,
 		"cpu_usage":  cpuUsage,
 		"disk_usage": diskUsage,
 	})
 
-	_, err = reply.Edit(msg, opt)
-	if err != nil {
+	markup := core.SuppMarkup(chatID)
+
+	edit := func() error {
+		if config.PingImage == "" {
+			_, err := reply.EditText(c, msg, &td.EditTextMessageOpts{
+				ParseMode:   td.ParseModeHTML,
+				ReplyMarkup: markup,
+			})
+			return err
+		}
+
+		caption, err := c.GetFormattedText(msg, nil, td.ParseModeHTML)
+		if err != nil {
+			return err
+		}
+
+		_, err = reply.EditMedia(c, &td.InputMessagePhoto{
+			Photo: &td.InputPhoto{
+				Photo: td.InputFileRemote{Id: config.PingImage},
+			},
+			Caption: caption,
+		}, &td.EditMessageMediaOpts{
+			ReplyMarkup: markup,
+		})
+		return err
+	}
+
+	if err := edit(); err != nil {
 		gologging.ErrorF("[ping] edit failed: %v", err)
 
 		if config.PingImage != "" {
-			opt.Media = ""
-			_, err = reply.Edit(msg, opt)
+			_, err = reply.EditText(c, msg, &td.EditTextMessageOpts{
+				ParseMode:   td.ParseModeHTML,
+				ReplyMarkup: markup,
+			})
 			if err != nil {
 				gologging.ErrorF("[ping] fallback text edit failed: %v", err)
 				return err
 			}
 		}
 	}
-	return tg.ErrEndGroup
+	return nil
 }

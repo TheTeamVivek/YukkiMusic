@@ -93,6 +93,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	core.TDBot = tdbot
 	modules.Init(tdbot, core.Bot, core.Assistants)
 
 	startHTTPServer()

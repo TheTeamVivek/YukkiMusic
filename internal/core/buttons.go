@@ -22,7 +22,6 @@ import (
 	"strings"
 
 	td "github.com/AshokShau/gotdbot"
-	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/locales"
@@ -31,131 +30,36 @@ import (
 
 var F func(chatID int64, key string, values ...locales.Arg) string // overwritten from main.go
 
-func styleBtn(text, cb, colour string) tg.KeyboardButton {
-	b := tg.Button.Data(text, cb)
+// TDBot is the gotdbot client, set from main.go.
+var TDBot *td.Client
 
-	if config.DisableColour {
-		return b
+func botUsername() string {
+	if TDBot == nil || TDBot.Me == nil || TDBot.Me.Usernames == nil {
+		return ""
 	}
-
-	switch strings.ToLower(colour) {
-	case "red":
-		b.Danger()
-	case "blue":
-		b.Primary()
-	case "green":
-		b.Success()
+	usernames := TDBot.Me.Usernames.ActiveUsernames
+	if len(usernames) == 0 {
+		return ""
 	}
-
-	return b
+	return usernames[0]
 }
 
-func AddMeMarkup(chatID int64) tg.ReplyMarkup {
-	return tg.NewKeyboard().
-		AddRow(
-			tg.Button.URL(
-				F(chatID, "ADD_ME_BTN"),
-				"https://t.me/"+Bot.Me().Username+"?startgroup&admin=invite_users",
-			),
-		).
-		Build()
-}
-
-func GetCancelKeyboard(chatID int64) *tg.ReplyInlineMarkup {
-	return tg.NewKeyboard().
-		AddRow(
-			tg.Button.Data(F(chatID, "DOWNLOAD_CANCEL_BTN"), "cancel"),
-		).
-		Build()
-}
-
-func GetBroadcastCancelKeyboard(chatID int64) *tg.ReplyInlineMarkup {
-	return tg.NewKeyboard().
-		AddRow(
-			tg.Button.Data(F(chatID, "BROADCAST_CANCEL_BTN"), "bcast_cancel"),
-		).
-		Build()
-}
-
-func SuppMarkup(chatID int64) tg.ReplyMarkup {
-	kb := tg.NewKeyboard()
-	btn := tg.Button.URL(F(chatID, "SUPPORT_BTN"), config.SupportChat)
-	if !config.DisableColour {
-		btn.Primary()
+func urlBtn(text, url string) td.InlineKeyboardButton {
+	return td.InlineKeyboardButton{
+		Text: text,
+		Type: &td.InlineKeyboardButtonTypeUrl{Url: url},
 	}
-
-	return kb.AddRow(btn).
-		Build()
 }
 
-func GetStopConfirmMarkup(
-	chatID int64,
-	r *RoomState,
-	isPaused bool,
-) tg.ReplyMarkup {
-	btn := tg.NewKeyboard()
-	prefix := fmt.Sprintf("room:%d:", r.ID)
-
-	text, cb := "CONFIRM_UNMUTE_BTN", prefix+"unmute"
-
-	if isPaused {
-		text, cb = "CONFIRM_RESUME_BTN", prefix+"resume"
-	}
-
-	btn.AddRow(
-		styleBtn(F(chatID, text), cb, "green"),
-		styleBtn(F(chatID, "CONFIRM_STOP_BTN"), prefix+"stop", "red"),
-	)
-
-	return btn.Build()
-}
-
-func GetPlayMarkup(chatID int64, r *RoomState, queued bool) tg.ReplyMarkup {
-	btn := tg.NewKeyboard()
-	prefix := fmt.Sprintf("room:%d:", r.ID)
-	track := r.Track()
-	duration := 0
-	if track != nil {
-		duration = track.Duration
-	}
-
-	progress := utils.GetProgressBar(r.Position(), duration)
-	progress = utils.FormatTime(
-		r.Position(),
-	) + " " + progress + " " + utils.FormatTime(
-		duration,
-	)
-
-	if !queued {
-		btn.AddRow(
-			tg.Button.Data(progress, "progress"),
-		)
-	}
-	btn.AddRow(
-		tg.Button.Data("▷", prefix+"resume"),
-		tg.Button.Data("II", prefix+"pause"),
-		tg.Button.Data("‣‣I", prefix+"skip"),
-		tg.Button.Data("▢", prefix+"stop"),
-	)
-
-	btn.AddRow(
-		tg.Button.Data("↩ 15s", prefix+"seekback_15"),
-		tg.Button.Data("⟳", prefix+"replay"),
-		tg.Button.Data("15s ↪", prefix+"seek_15"),
-	)
-
-	btn.AddRow(
-		tg.Button.Data(F(chatID, "CLOSE_BTN"), "close"),
-	)
-
-	return btn.Build()
-}
-
-func tdStyleBtn(text, cb, colour string) td.InlineKeyboardButton {
-	b := td.InlineKeyboardButton{
+func dataBtn(text, cb string) td.InlineKeyboardButton {
+	return td.InlineKeyboardButton{
 		Text: text,
 		Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte(cb)},
 	}
+}
+
+func styleBtn(text, cb, colour string) td.InlineKeyboardButton {
+	b := dataBtn(text, cb)
 
 	if config.DisableColour {
 		return b
@@ -173,16 +77,123 @@ func tdStyleBtn(text, cb, colour string) td.InlineKeyboardButton {
 	return b
 }
 
+func AddMeMarkup(chatID int64) td.ReplyMarkup {
+	return &td.ReplyMarkupInlineKeyboard{
+		Rows: [][]td.InlineKeyboardButton{
+			{
+				urlBtn(
+					F(chatID, "ADD_ME_BTN"),
+					"https://t.me/"+botUsername()+"?startgroup&admin=invite_users",
+				),
+			},
+		},
+	}
+}
+
+func GetCancelKeyboard(chatID int64) td.ReplyMarkup {
+	return &td.ReplyMarkupInlineKeyboard{
+		Rows: [][]td.InlineKeyboardButton{
+			{
+				dataBtn(F(chatID, "DOWNLOAD_CANCEL_BTN"), "cancel"),
+			},
+		},
+	}
+}
+
+func GetBroadcastCancelKeyboard(chatID int64) td.ReplyMarkup {
+	return &td.ReplyMarkupInlineKeyboard{
+		Rows: [][]td.InlineKeyboardButton{
+			{
+				dataBtn(F(chatID, "BROADCAST_CANCEL_BTN"), "bcast_cancel"),
+			},
+		},
+	}
+}
+
+func SuppMarkup(chatID int64) td.ReplyMarkup {
+	btn := urlBtn(F(chatID, "SUPPORT_BTN"), config.SupportChat)
+	if !config.DisableColour {
+		btn.Style = td.ButtonStylePrimary{}
+	}
+
+	return &td.ReplyMarkupInlineKeyboard{
+		Rows: [][]td.InlineKeyboardButton{{btn}},
+	}
+}
+
+func GetStopConfirmMarkup(
+	chatID int64,
+	r *RoomState,
+	isPaused bool,
+) td.ReplyMarkup {
+	prefix := fmt.Sprintf("room:%d:", r.ID)
+
+	text, cb := "CONFIRM_UNMUTE_BTN", prefix+"unmute"
+
+	if isPaused {
+		text, cb = "CONFIRM_RESUME_BTN", prefix+"resume"
+	}
+
+	return &td.ReplyMarkupInlineKeyboard{
+		Rows: [][]td.InlineKeyboardButton{
+			{
+				styleBtn(F(chatID, text), cb, "green"),
+				styleBtn(F(chatID, "CONFIRM_STOP_BTN"), prefix+"stop", "red"),
+			},
+		},
+	}
+}
+
+func GetPlayMarkup(chatID int64, r *RoomState, queued bool) td.ReplyMarkup {
+	prefix := fmt.Sprintf("room:%d:", r.ID)
+	track := r.Track()
+	duration := 0
+	if track != nil {
+		duration = track.Duration
+	}
+
+	progress := utils.GetProgressBar(r.Position(), duration)
+	progress = utils.FormatTime(
+		r.Position(),
+	) + " " + progress + " " + utils.FormatTime(
+		duration,
+	)
+
+	rows := make([][]td.InlineKeyboardButton, 0, 4)
+
+	if !queued {
+		rows = append(rows, []td.InlineKeyboardButton{
+			dataBtn(progress, "progress"),
+		})
+	}
+	rows = append(rows, []td.InlineKeyboardButton{
+		dataBtn("▷", prefix+"resume"),
+		dataBtn("II", prefix+"pause"),
+		dataBtn("‣‣I", prefix+"skip"),
+		dataBtn("▢", prefix+"stop"),
+	})
+
+	rows = append(rows, []td.InlineKeyboardButton{
+		dataBtn("↩ 15s", prefix+"seekback_15"),
+		dataBtn("⟳", prefix+"replay"),
+		dataBtn("15s ↪", prefix+"seek_15"),
+	})
+
+	rows = append(rows, []td.InlineKeyboardButton{
+		dataBtn(F(chatID, "CLOSE_BTN"), "close"),
+	})
+
+	return &td.ReplyMarkupInlineKeyboard{Rows: rows}
+}
+
 func GetGroupHelpKeyboard(chatID int64) td.ReplyMarkup {
 	return &td.ReplyMarkupInlineKeyboard{
 		Rows: [][]td.InlineKeyboardButton{
 			{
-				{
-					Text: F(chatID, "GC_HELP_BTN"),
-					Type: &td.InlineKeyboardButtonTypeUrl{
-						Url: "https://t.me/" + Bot.Me().Username + "?start=pm_help",
-					},
-				},
+				urlBtn(
+					F(chatID, "GC_HELP_BTN"),
+					"https://t.me/"+botUsername()+"?start=pm_help",
+				),
 			},
 		},
 	}
@@ -192,28 +203,17 @@ func GetStartMarkup(chatID int64) td.ReplyMarkup {
 	return &td.ReplyMarkupInlineKeyboard{
 		Rows: [][]td.InlineKeyboardButton{
 			{
-				{
-					Text: F(chatID, "ADD_ME_BTN"),
-					Type: &td.InlineKeyboardButtonTypeUrl{
-						Url: "https://t.me/" + Bot.Me().Username + "?startgroup&admin=invite_users",
-					},
-				},
+				urlBtn(
+					F(chatID, "ADD_ME_BTN"),
+					"https://t.me/"+botUsername()+"?startgroup&admin=invite_users",
+				),
 			},
 			{
-				{
-					Text: F(chatID, "START_HELP_BTN"),
-					Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("help_cb")},
-				},
+				dataBtn(F(chatID, "START_HELP_BTN"), "help_cb"),
 			},
 			{
-				{
-					Text: F(chatID, "UPDATES_BTN"),
-					Type: &td.InlineKeyboardButtonTypeUrl{Url: config.SupportChannel},
-				},
-				{
-					Text: F(chatID, "SUPPORT_BTN"),
-					Type: &td.InlineKeyboardButtonTypeUrl{Url: config.SupportChat},
-				},
+				urlBtn(F(chatID, "UPDATES_BTN"), config.SupportChannel),
+				urlBtn(F(chatID, "SUPPORT_BTN"), config.SupportChat),
 			},
 		},
 	}
@@ -223,27 +223,15 @@ func GetHelpKeyboard(chatID int64) td.ReplyMarkup {
 	return &td.ReplyMarkupInlineKeyboard{
 		Rows: [][]td.InlineKeyboardButton{
 			{
-				{
-					Text: F(chatID, "HELP_ADMINS_BTN"),
-					Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("help:admins")},
-				},
-				{
-					Text: F(chatID, "HELP_PUBLIC_BTN"),
-					Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("help:public")},
-				},
+				dataBtn(F(chatID, "HELP_ADMINS_BTN"), "help:admins"),
+				dataBtn(F(chatID, "HELP_PUBLIC_BTN"), "help:public"),
 			},
 			{
-				{
-					Text: F(chatID, "HELP_OWNER_BTN"),
-					Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("help:owner")},
-				},
-				{
-					Text: F(chatID, "HELP_SUDOERS_BTN"),
-					Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("help:sudoers")},
-				},
+				dataBtn(F(chatID, "HELP_OWNER_BTN"), "help:owner"),
+				dataBtn(F(chatID, "HELP_SUDOERS_BTN"), "help:sudoers"),
 			},
 			{
-				tdStyleBtn(F(chatID, "BACK_BTN"), "start", ""),
+				styleBtn(F(chatID, "BACK_BTN"), "start", ""),
 			},
 		},
 	}
@@ -253,17 +241,19 @@ func GetBackKeyboard(chatID int64) td.ReplyMarkup {
 	return &td.ReplyMarkupInlineKeyboard{
 		Rows: [][]td.InlineKeyboardButton{
 			{
-				tdStyleBtn(F(chatID, "BACK_BTN"), "help:main", "blue"),
+				styleBtn(F(chatID, "BACK_BTN"), "help:main", "blue"),
 			},
 		},
 	}
 }
 
-func GetRestartConfirmMarkup(chatID int64) *tg.ReplyInlineMarkup {
-	return tg.NewKeyboard().
-		AddRow(
-			styleBtn(F(chatID, "restart_btn_bot"), "restart:bot", "red"),
-			styleBtn(F(chatID, "restart_btn_replay"), "restart:replay", "green"),
-		).
-		Build()
+func GetRestartConfirmMarkup(chatID int64) td.ReplyMarkup {
+	return &td.ReplyMarkupInlineKeyboard{
+		Rows: [][]td.InlineKeyboardButton{
+			{
+				styleBtn(F(chatID, "restart_btn_bot"), "restart:bot", "red"),
+				styleBtn(F(chatID, "restart_btn_replay"), "restart:replay", "green"),
+			},
+		},
+	}
 }

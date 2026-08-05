@@ -61,7 +61,6 @@ func Init(tdbot *td.Client, bot *telegram.Client, assistants *core.AssistantMana
 	bot.AddCommandHandler("pause", pauseHandler, superGroupFilter, authFilter).SetGroup(100)
 	bot.AddCommandHandler("play", playHandler, superGroupFilter).SetGroup(100)
 	bot.AddCommandHandler("playmode", playmodeHandler, superGroupFilter, adminFilter).SetGroup(100)
-	bot.AddCommandHandler("ping", pingHandler, ignoreChannelFilter).SetGroup(100)
 	bot.AddCommandHandler("queue", queueHandler, superGroupFilter).SetGroup(100)
 	bot.AddCommandHandler("replay", replayHandler, superGroupFilter, authFilter).SetGroup(100)
 	bot.AddCommandHandler("reload", reloadHandler, superGroupFilter).SetGroup(100)
@@ -162,6 +161,7 @@ func Init(tdbot *td.Client, bot *telegram.Client, assistants *core.AssistantMana
 	// td client handlers
 	tdbot.OnCommand("start", startHandler)
 	tdbot.OnCommand("help", helpHandler)
+	tdbot.OnCommand("ping", pingHandler)
 	tdbot.OnUpdateNewCallbackQuery(startCB, callbackquery.Equal("start"))
 	tdbot.OnUpdateNewCallbackQuery(helpCB, callbackquery.Equal("help_cb"))
 	tdbot.OnUpdateNewCallbackQuery(helpCallbackHandler, callbackquery.Regex("^help:(.+)$"))
