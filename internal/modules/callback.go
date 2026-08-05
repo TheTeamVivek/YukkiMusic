@@ -147,15 +147,7 @@ func handlePauseAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	gologging.InfoF("Callback → pause, chatID=%d", chatID)
 
 	if r.IsPaused() {
-		remaining := r.RemainingResumeDuration()
-		msg := utils.IfElse(
-			remaining > 0,
-			F(chatID, "room_already_paused_auto", locales.Arg{
-				"duration": utils.FormatDuration(int(remaining.Seconds())),
-			}),
-			F(chatID, "room_already_paused"),
-		)
-		cb.Answer(msg, opt)
+		cb.Answer(F(chatID, "room_already_paused"), opt)
 		return tg.ErrEndGroup
 	}
 
@@ -350,15 +342,7 @@ func handleMuteAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	chatID := cb.ChannelID()
 
 	if r.IsMuted() {
-		remaining := r.RemainingUnmuteDuration()
-		msg := utils.IfElse(
-			remaining > 0,
-			F(chatID, "mute_already_muted_with_time", locales.Arg{
-				"duration": utils.FormatDuration(int(remaining.Seconds())),
-			}),
-			F(chatID, "mute_already_muted"),
-		)
-		cb.Answer(msg, opt)
+		cb.Answer(F(chatID, "mute_already_muted"), opt)
 		return tg.ErrEndGroup
 	}
 

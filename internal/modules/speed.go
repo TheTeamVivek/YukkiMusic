@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/amarnathcjd/gogram/telegram"
 
@@ -35,12 +34,10 @@ func init() {
 <u>Usage:</u>
 <b>/speed</b> — Show current speed
 <b>/speed [multiplier]</b> — Set speed (0.5-4.0x)
-<b>/speed [multiplier] [seconds]</b> — Set with auto-reset timer
 <b>/speed normal</b> or <b>/speed reset</b> — Reset to 1.0x
 
 <b>⚙️ Features:</b>
 • Range: 0.50x to 4.00x
-• Auto-reset timer (5-3600 seconds)
 • Pitch preservation
 • Real-time adjustment
 
@@ -50,12 +47,10 @@ func init() {
 <b>💡 Examples:</b>
 <code>/speed 1.5</code> — Play 1.5x faster
 <code>/speed 0.75</code> — Play slower (0.75x)
-<code>/speed 2.0 300</code> — 2x speed for 5 minutes, then reset
 <code>/speed normal</code> — Reset to normal speed
 
 <b>⚠️ Notes:</b>
 • Speed affects duration calculations
-• Auto-reset only works for non-1.0x speeds
 • Suffix 'x' is optional: <code>1.5</code> = <code>1.5x</code>`
 }
 
@@ -87,23 +82,11 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 	// No args -> show current speed or usage hint
 	if len(args) < 2 {
 		if r.Speed() != 1.0 {
-			remaining := r.RemainingSpeedDuration()
-			if remaining > 0 {
-				m.Reply(F(chatID, "speed_current_with_reset", locales.Arg{
-					"speed": fmt.Sprintf("%.2f", r.Speed()),
-					"title": utils.EscapeHTML(
-						utils.ShortTitle(t.Title, 25),
-					),
-					"duration": utils.FormatDuration(int(remaining.Seconds())),
-					"cmd":      getCommand(m),
-				}))
-			} else {
-				m.Reply(F(chatID, "speed_current", locales.Arg{
-					"speed": fmt.Sprintf("%.2f", r.Speed()),
-					"title": utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
-					"cmd":   getCommand(m),
-				}))
-			}
+			m.Reply(F(chatID, "speed_current", locales.Arg{
+				"speed": fmt.Sprintf("%.2f", r.Speed()),
+				"title": utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
+				"cmd":   getCommand(m),
+			}))
 		} else {
 			m.Reply(F(chatID, "speed_usage", locales.Arg{
 				"cmd": getCommand(m),
@@ -135,49 +118,20 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 		newSpeed = s
 	}
 
-	// Parse auto-reset duration
-	var resetDuration time.Duration
-	if len(args) >= 3 {
-		d := strings.ToLower(strings.TrimSpace(args[2]))
-		d = strings.TrimSuffix(d, "s")
-
-		seconds, err := strconv.Atoi(d)
-		if err != nil || seconds < 5 || seconds > 3600 {
-			m.Reply(F(chatID, "speed_invalid_duration"))
-			return telegram.ErrEndGroup
-		}
-		resetDuration = time.Duration(seconds) * time.Second
-	}
-
 	// Same speed → give info
 	if newSpeed == r.Speed() {
-		if resetDuration == 0 {
-			m.Reply(F(chatID, "speed_already_set", locales.Arg{
-				"speed": fmt.Sprintf("%.2f", newSpeed),
-				"title": utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
-			}))
-		} else if newSpeed != 1.0 {
-			m.Reply(F(chatID, "speed_already_set_reset_hint", locales.Arg{
-				"speed": fmt.Sprintf("%.2f", newSpeed),
-				"title": utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
-				"cmd":   getCommand(m),
-			}))
-		}
+		m.Reply(F(chatID, "speed_already_set", locales.Arg{
+			"speed": fmt.Sprintf("%.2f", newSpeed),
+			"title": utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
+		}))
 		return telegram.ErrEndGroup
 	}
 
 	// Apply speed
-	var setErr error
-	if resetDuration > 0 && newSpeed != 1.0 {
-		setErr = r.SetSpeed(newSpeed, resetDuration)
-	} else {
-		setErr = r.SetSpeed(newSpeed)
-	}
-
-	if setErr != nil {
+	if err := r.SetSpeed(newSpeed); err != nil {
 		m.Reply(F(chatID, "speed_failed", locales.Arg{
 			"speed": fmt.Sprintf("%.2f", newSpeed),
-			"error": setErr.Error(),
+			"error": err.Error(),
 		}))
 		return telegram.ErrEndGroup
 	}
@@ -189,18 +143,10 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 			"user": mention,
 		}))
 	} else {
-		if resetDuration > 0 {
-			m.Reply(F(chatID, "speed_set_with_reset", locales.Arg{
-				"speed":    fmt.Sprintf("%.2f", newSpeed),
-				"user":     mention,
-				"duration": int(resetDuration.Seconds()),
-			}))
-		} else {
-			m.Reply(F(chatID, "speed_set", locales.Arg{
-				"speed": fmt.Sprintf("%.2f", newSpeed),
-				"user":  mention,
-			}))
-		}
+		m.Reply(F(chatID, "speed_set", locales.Arg{
+			"speed": fmt.Sprintf("%.2f", newSpeed),
+			"user":  mention,
+		}))
 	}
 
 	return telegram.ErrEndGroup

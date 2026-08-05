@@ -18,10 +18,6 @@
 package modules
 
 import (
-	"strconv"
-	"strings"
-	"time"
-
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/internal/locales"
@@ -33,15 +29,12 @@ func init() {
 
 <u>Usage:</u>
 <b>/mute</b> — Mute indefinitely
-<b>/mute [seconds]</b> — Mute with auto-unmute timer
 
 <b>⚙️ Features:</b>
 • Audio continues playing (progress tracked)
-• Auto-unmute timer support (5-3600 seconds)
 
 <b>💡 Examples:</b>
 <code>/mute</code> — Mute until manual unmute
-<code>/mute 60</code> — Mute for 60 seconds
 
 <b>⚠️ Notes:</b>
 • Track continues playing in background
@@ -70,45 +63,13 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 	}
 
 	if r.IsMuted() {
-		remaining := r.RemainingUnmuteDuration()
-		if remaining > 0 {
-			m.Reply(F(chatID, "mute_already_muted_with_time", locales.Arg{
-				"duration": utils.FormatDuration(int(remaining.Seconds())),
-			}))
-		} else {
-			m.Reply(F(chatID, "mute_already_muted"))
-		}
+		m.Reply(F(chatID, "mute_already_muted"))
 		return tg.ErrEndGroup
 	}
 
 	mention := utils.MentionHTML(m.Sender)
-	args := strings.Fields(m.Text())
-	var autoUnmuteDuration time.Duration
 
-	if len(args) >= 2 {
-		rawDuration := strings.ToLower(strings.TrimSpace(args[1]))
-		rawDuration = strings.TrimSuffix(rawDuration, "s")
-
-		if seconds, err := strconv.Atoi(rawDuration); err == nil {
-			if seconds < 5 || seconds > 3600 {
-				m.Reply(F(chatID, "mute_invalid_duration"))
-				return tg.ErrEndGroup
-			}
-			autoUnmuteDuration = time.Duration(seconds) * time.Second
-		} else {
-			m.Reply(F(chatID, "mute_invalid_format", locales.Arg{
-				"cmd": getCommand(m),
-			}))
-			return tg.ErrEndGroup
-		}
-	}
-
-	var muteErr error
-	if autoUnmuteDuration > 0 {
-		_, muteErr = r.Mute(autoUnmuteDuration)
-	} else {
-		_, muteErr = r.Mute()
-	}
+	_, muteErr := r.Mute()
 
 	if muteErr != nil {
 		m.Reply(F(chatID, "mute_failed", locales.Arg{
@@ -117,17 +78,10 @@ func handleMute(m *tg.NewMessage, cplay bool) error {
 		return tg.ErrEndGroup
 	}
 
-	msgArgs := locales.Arg{
+	m.Reply(F(chatID, "mute_success", locales.Arg{
 		"title": utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25)),
 		"user":  mention,
-	}
-
-	if autoUnmuteDuration > 0 {
-		msgArgs["duration"] = int(autoUnmuteDuration.Seconds())
-		m.Reply(F(chatID, "mute_success_with_time", msgArgs))
-	} else {
-		m.Reply(F(chatID, "mute_success", msgArgs))
-	}
+	}))
 
 	return tg.ErrEndGroup
 }

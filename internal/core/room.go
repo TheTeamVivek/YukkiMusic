@@ -19,6 +19,9 @@ package core
 
 import (
 	"errors"
+	"math/rand"
+	"os"
+	"path/filepath"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -35,8 +38,11 @@ var (
 	roomsMu sync.RWMutex
 
 	ErrRoomDestroyed = errors.New("room destroyed")
+
+	FileCacheDuration = 1 * time.Minute
 )
 
+// RoomState holds all playback state for a single chat.
 type RoomState struct {
 	mu sync.RWMutex
 
@@ -45,55 +51,27 @@ type RoomState struct {
 	// ChatID is the UI/context chat id where messages and controls are sent.
 	ChatID int64
 
-	// filePath is the currently playing local media file.
-	filePath string
-	// track is the active track metadata.
-	track *state.Track
-	// playing reports whether playback is active.
-	playing bool
-	// paused reports whether playback is currently paused.
-	paused bool
-	// muted reports whether playback is currently muted.
-	muted bool
-	// speed is the active playback speed multiplier.
-	speed float64
-	// position is the current playback position in seconds.
-	position int
-	// updatedAt tracks the last state-update timestamp (unix seconds).
-	updatedAt int64
-	// loop is the loop mode/state value.
-	loop int
+	filePath  string       // currently playing local media file
+	track     *state.Track // active track metadata
+	playing   bool         // whether playback is active
+	paused    bool         // whether playback is paused
+	muted     bool         // whether playback is muted
+	speed     float64      // playback speed multiplier
+	position  int          // current playback position in seconds
+	updatedAt int64        // last state-update timestamp (unix seconds)
+	loop      int          // loop mode/state value
 
-	// queue holds upcoming tracks.
-	queue []*state.Track
-	// shuffle indicates queue shuffle mode.
-	shuffle bool
+	queue   []*state.Track // upcoming tracks
+	shuffle bool           // queue shuffle mode
 
-	// scheduledTimers manages auto-resume/unmute/speed timers.
-	*scheduledTimers
+	statusMsg *telegram.NewMessage // latest status message in chat
+	Data      map[string]any       // extensible per-room metadata
 
-	// statusMsg is the latest room status message in chat.
-	statusMsg *telegram.NewMessage
-	// Data stores extensible per-room metadata.
-	Data map[string]any
-
-	// Assistant is the assistant client bound to this room.
-	Assistant *Assistant
-	// destroyed marks whether room cleanup has completed.
-	destroyed atomic.Bool
+	Assistant *Assistant  // assistant client bound to this room
+	destroyed atomic.Bool // whether room cleanup has completed
 }
 
-type scheduledTimers struct {
-	scheduledUnmuteTimer *time.Timer
-	scheduledResumeTimer *time.Timer
-	scheduledSpeedTimer  *time.Timer
-
-	scheduledUnmuteUntil time.Time
-	scheduledResumeUntil time.Time
-	scheduledSpeedUntil  time.Time
-}
-
-// Room management functions
+// Room management
 
 func DeleteRoom(chatID int64) bool {
 	_, file, line, _ := runtime.Caller(1)
@@ -124,11 +102,9 @@ func GetRoom(chatID int64, ass *Assistant, create bool) (*RoomState, bool) {
 	if exists {
 		return room, true
 	}
-
 	if create {
 		return createNewRoom(chatID, ass)
 	}
-
 	return nil, false
 }
 
@@ -146,7 +122,6 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 			Assistant: ass,
 			Data:      make(map[string]any),
 		}
-		room.destroyed.Store(false)
 		rooms[chatID] = room
 	}
 
@@ -206,54 +181,12 @@ func (r *RoomState) updatePosition() {
 	r.updatedAt = current
 }
 
-func (st *scheduledTimers) RemainingUnmuteDuration() time.Duration {
-	if st == nil || st.scheduledUnmuteUntil.IsZero() {
-		return 0
-	}
-	return time.Until(st.scheduledUnmuteUntil)
-}
-
-func (st *scheduledTimers) RemainingResumeDuration() time.Duration {
-	if st == nil || st.scheduledResumeUntil.IsZero() {
-		return 0
-	}
-	return time.Until(st.scheduledResumeUntil)
-}
-
-func (st *scheduledTimers) RemainingSpeedDuration() time.Duration {
-	if st == nil || st.scheduledSpeedUntil.IsZero() {
-		return 0
-	}
-	return time.Until(st.scheduledSpeedUntil)
-}
-
-func (st *scheduledTimers) cancelScheduledUnmute() {
-	if st != nil && st.scheduledUnmuteTimer != nil {
-		st.scheduledUnmuteTimer.Stop()
-		st.scheduledUnmuteTimer = nil
-		st.scheduledUnmuteUntil = time.Time{}
-	}
-}
-
-func (st *scheduledTimers) cancelScheduledResume() {
-	if st != nil && st.scheduledResumeTimer != nil {
-		st.scheduledResumeTimer.Stop()
-		st.scheduledResumeTimer = nil
-		st.scheduledResumeUntil = time.Time{}
-	}
-}
-
-func (st *scheduledTimers) cancelScheduledSpeed() {
-	if st != nil && st.scheduledSpeedTimer != nil {
-		st.scheduledSpeedTimer.Stop()
-		st.scheduledSpeedTimer = nil
-		st.scheduledSpeedUntil = time.Time{}
-	}
-}
-
 // Getters
 
 func (r *RoomState) FilePath() string {
+	if r.IsDestroyed() {
+		return ""
+	}
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.filePath
@@ -421,4 +354,217 @@ func (r *RoomState) Parse() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.updatePosition()
+}
+
+// Queue
+
+// NextTrack retrieves and prepares the next track in queue
+func (r *RoomState) NextTrack() *state.Track {
+	if r.IsDestroyed() {
+		return nil
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if r.track != nil && r.loop > 0 {
+		r.position = 0
+		r.playing = false
+		r.paused = false
+		r.muted = false
+		r.loop--
+		r.updatedAt = time.Now().Unix()
+		return r.track
+	}
+
+	r.releaseFile()
+
+	if len(r.queue) == 0 {
+		return nil
+	}
+
+	index := 0
+	if r.shuffle {
+		index = rand.Intn(len(r.queue))
+	}
+
+	next := r.queue[index]
+	r.queue = append(r.queue[:index], r.queue[index+1:]...)
+
+	r.track = next
+	r.position = 0
+	r.playing = false
+	r.paused = false
+	r.muted = false
+	r.updatedAt = time.Now().Unix()
+
+	return next
+}
+
+// RemoveFromQueue removes track(s) from queue
+func (r *RoomState) RemoveFromQueue(index int) {
+	if r.IsDestroyed() {
+		return
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if index == -1 {
+		r.queue = []*state.Track{}
+		return
+	}
+
+	if index >= 0 && index < len(r.queue) {
+		r.queue = append(r.queue[:index], r.queue[index+1:]...)
+	}
+}
+
+// MoveInQueue moves a track from one position to another
+func (r *RoomState) MoveInQueue(from, to int) {
+	if r.IsDestroyed() {
+		return
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if from < 0 || from >= len(r.queue) ||
+		to < 0 || to >= len(r.queue) ||
+		from == to {
+		return
+	}
+
+	item := r.queue[from]
+	r.queue = append(r.queue[:from], r.queue[from+1:]...)
+
+	if to >= len(r.queue) {
+		r.queue = append(r.queue, item)
+	} else {
+		r.queue = append(r.queue[:to], append([]*state.Track{item}, r.queue[to:]...)...)
+	}
+}
+
+// AddTracksToQueue appends multiple tracks to the queue
+func (r *RoomState) AddTracksToQueue(tracks []*state.Track) {
+	if r.IsDestroyed() {
+		return
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.queue = append(r.queue, tracks...)
+}
+
+// Files
+
+func isTrackUsed(trackID string, skipChatID int64) bool {
+	for _, room := range rooms {
+		if room == nil || room.track == nil || room.ChatID == skipChatID {
+			continue
+		}
+		if room.track.ID == trackID {
+			return true
+		}
+		if isTrackInQueue(trackID, room.queue) {
+			return true
+		}
+	}
+	return false
+}
+
+func isTrackInQueue(trackID string, queue []*state.Track) bool {
+	limit := min(len(queue), 2)
+	for _, q := range queue[:limit] {
+		if q != nil && q.ID == trackID {
+			return true
+		}
+	}
+	return false
+}
+
+func (r *RoomState) releaseFile() {
+	if r == nil || r.track == nil {
+		return
+	}
+	scheduleRemove(r.track, r.ID)
+}
+
+func (r *RoomState) cleanupFile() {
+	if r == nil {
+		return
+	}
+
+	tracks := make([]*state.Track, 0, 3)
+	if r.track != nil {
+		tracks = append(tracks, r.track)
+	}
+	tracks = append(tracks, r.queue...)
+	if len(tracks) > 2 {
+		tracks = tracks[:2]
+	}
+
+	for _, t := range tracks {
+		if t == nil || t.ID == "" {
+			continue
+		}
+		scheduleRemove(t, r.ID)
+	}
+}
+
+// scheduleRemove deletes the track file after FileCacheDuration,
+// but only if no other room is using it at deletion time.
+func scheduleRemove(track *state.Track, skipChatID int64) {
+	if track == nil {
+		return
+	}
+
+	if FileCacheDuration <= 0 {
+		doRemove(track, skipChatID)
+		return
+	}
+
+	t := *track
+	time.AfterFunc(FileCacheDuration, func() {
+		doRemove(&t, skipChatID)
+	})
+
+	gologging.DebugF(
+		"scheduled file removal in %s: %s:%s",
+		FileCacheDuration, string(track.Source), track.ID,
+	)
+}
+
+func doRemove(track *state.Track, skipChatID int64) {
+	roomsMu.RLock()
+	used := isTrackUsed(track.ID, skipChatID)
+	roomsMu.RUnlock()
+
+	if used {
+		gologging.DebugF(
+			"file still in use, skipped remove: %s:%s",
+			string(track.Source), track.ID,
+		)
+		return
+	}
+
+	findAndRemove(track)
+}
+
+func findAndRemove(track *state.Track) {
+	t := "audio"
+	if track.Video {
+		t = "video"
+	}
+
+	files, err := filepath.Glob(filepath.Join("downloads", t+"_"+track.ID+"*"))
+	if err != nil {
+		return
+	}
+
+	for _, f := range files {
+		os.Remove(f)
+		gologging.DebugF("removed file: %s", f)
+	}
 }
