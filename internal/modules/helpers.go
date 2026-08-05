@@ -21,8 +21,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"html"
-	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -195,103 +193,6 @@ func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 	}
 }
 
-func SafeCallbackHandler(
-	handler func(*tg.CallbackQuery) error,
-) func(*tg.CallbackQuery) error {
-	return func(cb *tg.CallbackQuery) (err error) {
-		if !canBypassMaintenence(cb.SenderID) {
-			cb.Answer(
-				F(cb.ChannelID(), "maint", locales.Arg{"reason": ""}),
-				&tg.CallbackOptions{Alert: true},
-			)
-			return tg.ErrEndGroup
-		}
-
-		defer func() {
-			if r := recover(); r != nil {
-				handlePanic(r, cb, true)
-				err = tg.ErrEndGroup
-			}
-		}()
-
-		err = handler(cb)
-		if err != nil && !errors.Is(err, tg.ErrEndGroup) {
-			handlePanic(err, cb, false)
-		}
-		return err
-	}
-}
-
-func SafeMessageHandler(
-	handler func(*tg.NewMessage) error,
-) func(*tg.NewMessage) error {
-	return func(m *tg.NewMessage) (err error) {
-		gologging.InfoF(
-			"Handling message from %d in chat %d",
-			m.SenderID(),
-			m.ChannelID(),
-		)
-
-		if !canBypassMaintenence(m.SenderID()) {
-			gologging.Debug("Maintenance mode active")
-			if m.ChatType() == tg.EntityUser ||
-				strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
-				reason, _ := database.MaintenanceReason()
-				msg := F(m.ChannelID(), "maint", locales.Arg{
-					"reason": F(
-						m.ChannelID(),
-						"maint_reason",
-						locales.Arg{"reason": reason},
-					),
-				})
-				m.Reply(msg)
-				gologging.InfoF(
-					"Sent maintenance notice to %d",
-					m.SenderID(),
-				)
-			}
-			return tg.ErrEndGroup
-		}
-
-		defer func() {
-			if r := recover(); r != nil {
-				gologging.ErrorF("recovered from panic: %v", r)
-				handlePanic(r, m, true)
-				err = fmt.Errorf("internal panic occurred")
-			}
-		}()
-
-		if m.IsCommand() {
-			isEnabled, _ := database.CommandDelete(m.ChannelID())
-			if isEnabled {
-				_, _ = m.Delete()
-			} else {
-				cleanMode, _ := database.CleanMode(m.ChannelID())
-				if cleanMode {
-					cleanScheduler.schedule(m.ChannelID(), m.ID)
-				}
-			}
-		}
-
-		cmd := getCommand(m)
-		gologging.DebugF("Executing handler for command %s", cmd)
-		err = handler(m)
-
-		if err != nil {
-			if errors.Is(err, tg.ErrEndGroup) {
-				gologging.Debug("handler exited early (ErrEndGroup)")
-				return err
-			}
-			gologging.ErrorF("handler error: %v", err)
-			handlePanic(err, m, false)
-		} else {
-			gologging.InfoF("handler completed successfully for command %s", cmd)
-		}
-
-		return err
-	}
-}
-
 func blacklistMessageMiddleware(next tg.MessageHandler) tg.MessageHandler {
 	return func(m *tg.NewMessage) error {
 		if blockedChat, _ := database.IsBlacklistedChat(m.ChannelID()); blockedChat {
@@ -334,71 +235,6 @@ func WithBlacklistCallback(
 			return tg.ErrEndGroup
 		}
 		return handler(cb)
-	}
-}
-
-type panicInfo struct {
-	userMention  string
-	handlerType  string
-	chatInfo     string
-	messageInfo  string
-	errorMessage string
-	client       *tg.Client
-}
-
-func getPanicInfo(ctx, r any) panicInfo {
-	var info panicInfo
-	info.errorMessage = html.EscapeString(fmt.Sprint(r))
-
-	switch c := ctx.(type) {
-	case *tg.NewMessage:
-		info.userMention = utils.MentionHTML(c.Sender)
-		info.handlerType = "message"
-		info.chatInfo = "ChatID: " + utils.IntToStr(c.ChannelID())
-		info.messageInfo = "Message: " + html.EscapeString(c.Text()) + "\nLink: " + c.Link()
-		info.client = c.Client
-
-	case *tg.CallbackQuery:
-		info.userMention = utils.MentionHTML(c.Sender)
-		info.handlerType = "callback"
-		info.chatInfo = "ChatID: " + utils.IntToStr(c.ChatID)
-		info.messageInfo = "Data: " + html.EscapeString(c.DataString())
-		info.client = c.Client
-	}
-	return info
-}
-
-func handlePanic(r, ctx any, isPanic bool) {
-	info := getPanicInfo(ctx, r)
-	stackRaw := debug.Stack()
-	stackEsc := html.EscapeString(string(stackRaw))
-
-	logPrefix := "🚨 Error"
-	shortPrefix := "<b>Error</b>"
-	if isPanic {
-		logPrefix = "⚠️ Panic recovered"
-		shortPrefix = "<b>⚠️ Panic</b>"
-	}
-
-	logMsg := fmt.Sprintf("%s in %s handler:\nFrom: %s\n%s\n%s\nError: `%v`",
-		logPrefix, info.handlerType, info.userMention, info.chatInfo, info.messageInfo, r)
-	shortMsg := fmt.Sprintf("%s in %s handler\n<b>From:</b> %s\n%s\n%s\n<b>Error:</b>\n<code>%s</code>",
-		shortPrefix, info.handlerType, info.userMention, info.chatInfo, info.messageInfo, info.errorMessage)
-
-	if isPanic {
-		logMsg += "\nStack:\n" + string(stackRaw)
-		shortMsg += "\n<pre>" + stackEsc + "</pre>"
-	}
-
-	gologging.Error(logMsg)
-
-	if config.LoggerID != 0 && info.client != nil {
-		if _, sendErr := info.client.SendMessage(config.LoggerID, shortMsg, &tg.SendOptions{ParseMode: "HTML"}); sendErr != nil {
-			gologging.ErrorF(
-				"failed to send panic message to log chat: %v",
-				sendErr,
-			)
-		}
 	}
 }
 

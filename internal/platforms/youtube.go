@@ -35,9 +35,9 @@ import (
 
 const (
 	PlatformYouTube        state.PlatformName = "YouTube"
-	innerTubeKey                              = "AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"
-	innerTubeClientVersion                    = "2.20250101.01.00"
-	innerTubeClientName                       = "WEB"
+	innerTubeKey           string             = "AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"
+	innerTubeClientVersion string             = "2.20250101.01.00"
+	innerTubeClientName    string             = "WEB"
 )
 
 type YouTubePlatform struct {

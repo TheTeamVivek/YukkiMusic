@@ -805,9 +805,7 @@ func getErrorMessage(chatID int64, err error) string {
 	return F(chatID, "err_unknown", locales.Arg{"error": err.Error()})
 }
 
-// Both safeDownload and safeGetTracks re-raise panic because all command
-// handlers are wrapped by SafeMessageHandler, which catches panics and sends
-// the debug trace to the logger and the owner.
+// safeDownload and safeGetTracks re-raise panics on failure.
 func safeGetTracks(
 	m, replyMsg *tg.NewMessage,
 	chatID int64,

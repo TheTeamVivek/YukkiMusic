@@ -19,12 +19,9 @@ package config
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"math/rand/v2"
 	"os"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/Laky-64/gologging"
@@ -40,14 +37,14 @@ var (
 	StringSessions = getEnvStrings("STRING_SESSIONS")
 
 	// Optional
-	SessionType        = getEnv("SESSION_TYPE", "pyrogram")
-	LoggerID           = getEnvInt64("LOGGER_ID", 0)
-	OwnerID            = getEnvInt64("OWNER_ID", 0)
-	DisableColour      = getEnvBool("DISABLE_COLOUR", false)
-	SpotifyClientID    = getEnv("SPOTIFY_CLIENT_ID")
+	SessionType         = getEnv("SESSION_TYPE", "pyrogram")
+	LoggerID            = getEnvInt64("LOGGER_ID", 0)
+	OwnerID             = getEnvInt64("OWNER_ID", 0)
+	DisableColour       = getEnvBool("DISABLE_COLOUR", false)
+	SpotifyClientID     = getEnv("SPOTIFY_CLIENT_ID")
 	SpotifyClientSecret = getEnv("SPOTIFY_CLIENT_SECRET")
-	FallenAPIURL       = getEnv("FALLEN_API_URL", "https://beta.fallenapi.fun")
-	FallenAPIKey       = getEnv("FALLEN_API_KEY")
+	FallenAPIURL        = getEnv("FALLEN_API_URL", "https://beta.fallenapi.fun")
+	FallenAPIKey        = getEnv("FALLEN_API_KEY")
 
 	DefaultLang    = getEnv("DEFAULT_LANG", "en")
 	DurationLimit  = getEnvInt("DURATION_LIMIT", 4200)
@@ -61,7 +58,6 @@ var (
 	MaxAuthUsers   = getEnvInt("MAX_AUTH_USERS", 25)
 
 	StartImages = getEnvStrings("START_IMAGES")
-	EffectIDs   = getEnvInt64s("EFFECT_IDS")
 
 	PingImage = getEnv(
 		"PING_IMG_URL",
@@ -79,7 +75,7 @@ var (
 	logFile *os.File
 )
 
-func Load() (func(), error) {
+func Load() error {
 	// Legacy compatibility
 	if Token == "" {
 		Token = getEnv("BOT_TOKEN")
@@ -99,39 +95,12 @@ func Load() (func(), error) {
 		}
 	}
 
-	if err := initLogging(); err != nil {
-		return nil, fmt.Errorf("init logging: %w", err)
-	}
-
 	if err := validateConfig(); err != nil {
-		closeLogging()
-		return nil, err
-	}
-
-	return closeLogging, nil
-}
-
-func initLogging() error {
-	_ = os.Remove(LogFileName)
-
-	f, err := os.Create(LogFileName)
-	if err != nil {
 		return err
 	}
 
-	logFile = f
-	LogWriter = io.MultiWriter(f, os.Stderr)
-
 	return nil
 }
-
-func closeLogging() {
-	if logFile != nil {
-		_ = logFile.Close()
-	}
-}
-
-
 
 func validateConfig() error {
 	checks := []struct {
@@ -164,12 +133,4 @@ func StartImage() string {
 	}
 
 	return StartImages[rand.IntN(len(StartImages))]
-}
-
-func EffectID() int64 {
-	if len(EffectIDs) == 0 {
-		return 0
-	}
-
-	return EffectIDs[rand.IntN(len(EffectIDs))]
 }

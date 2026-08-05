@@ -190,7 +190,7 @@ func (s *SoundCloudPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) 
 	}
 
 	var info ytdlpInfo
-	if err := json.Unmarshal([]byte(stdout.String()), &info); err != nil {
+	if err := json.Unmarshal(stdout.Bytes(), &info); err != nil {
 		return nil, fmt.Errorf("failed to parse metadata JSON: %w", err)
 	}
 	return &info, nil

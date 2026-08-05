@@ -18,19 +18,18 @@
 package main
 
 import (
+	"fmt"
 	"os/exec"
-
-	"github.com/Laky-64/gologging"
 )
 
-func checkDependencies() {
+func checkDependencies() error {
 	for _, bin := range []string{
 		"ffmpeg",
 		"ffprobe",
 		"yt-dlp",
 	} {
 		if _, err := exec.LookPath(bin); err != nil {
-			gologging.FatalF(
+			return fmt.Errorf(
 				"Required dependency %q was not found in your PATH.\n\n"+
 					"Please install %s and ensure it is accessible from PATH before starting YukkiMusic.",
 				bin,
@@ -38,4 +37,5 @@ func checkDependencies() {
 			)
 		}
 	}
+	return nil
 }

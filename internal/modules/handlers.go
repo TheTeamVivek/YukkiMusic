@@ -18,515 +18,151 @@
 package modules
 
 import (
-	"fmt"
-
+	td "github.com/AshokShau/gotdbot"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
 )
 
-type MsgHandlerDef struct {
-	Pattern string
-	Handler telegram.MessageHandler
-	Filters []telegram.Filter
-}
-
-type CbHandlerDef struct {
-	Pattern string
-	Handler telegram.CallbackHandler
-	Filters []telegram.Filter
-}
-
-var handlers = []MsgHandlerDef{
-	{Pattern: "json", Handler: jsonHandle},
-	{
-		Pattern: "eval",
-		Handler: evalHandle,
-		Filters: []telegram.Filter{ownerFilter},
-	},
-	{
-		Pattern: "ev",
-		Handler: evalCommandHandler,
-		Filters: []telegram.Filter{ownerFilter},
-	},
-	{
-		Pattern: "(bash|sh)",
-		Handler: shellHandle,
-		Filters: []telegram.Filter{ownerFilter},
-	},
-	{
-		Pattern: "restart",
-		Handler: handleRestart,
-		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
-	},
-
-	{
-		Pattern: "(addsudo|addsudoer|sudoadd)",
-		Handler: handleAddSudo,
-		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
-	},
-	{
-		Pattern: "(delsudo|delsudoer|sudodel|remsudo|rmsudo|sudorem|dropsudo|unsudo)",
-		Handler: handleDelSudo,
-		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
-	},
-	{
-		Pattern: "(blockuser|blacklistuser|blackuser|bluser)",
-		Handler: handleBlockUser,
-		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
-	},
-	{
-		Pattern: "(unblockuser|unblacklistuser|unbluser|whitelistuser)",
-		Handler: handleUnblockUser,
-		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
-	},
-	{
-		Pattern: "(blockchat|blacklistchat|blackchat|blchat)",
-		Handler: handleBlockChat,
-		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
-	},
-	{
-		Pattern: "(unblockchat|unblacklistchat|unblackchat|whitechat|unblchat)",
-		Handler: handleUnblockChat,
-		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
-	},
-	{
-		Pattern: "(blocked|blacklisted)",
-		Handler: handleBlacklisted,
-		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
-	},
-	{
-		Pattern: "(sudoers|listsudo|sudolist)",
-		Handler: handleGetSudoers,
-		Filters: []telegram.Filter{ignoreChannelFilter},
-	},
-
-	{
-		Pattern: "(broadcast|gcast|bcast)",
-		Handler: broadcastHandler,
-		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
-	},
-
-	{
-		Pattern: "(ac|active|activevc|activevoice)",
-		Handler: activeHandler,
-		Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter},
-	},
-	{
-		Pattern: "(maintenance|maint)",
-		Handler: handleMaintenance,
-		Filters: []telegram.Filter{ownerFilter, ignoreChannelFilter},
-	},
-	{
-		Pattern: "logger",
-		Handler: handleLogger,
-		Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter},
-	},
-	{
-		Pattern: "autoleave",
-		Handler: autoLeaveHandler,
-		Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter},
-	},
-	{
-		Pattern: "(log|logs)",
-		Handler: logsHandler,
-		Filters: []telegram.Filter{sudoOnlyFilter, ignoreChannelFilter},
-	},
-
-	{
-		Pattern: "help",
-		Handler: helpHandler,
-		Filters: []telegram.Filter{ignoreChannelFilter},
-	},
-	{
-		Pattern: "ping",
-		Handler: pingHandler,
-		Filters: []telegram.Filter{ignoreChannelFilter},
-	},
-	{
-		Pattern: "start",
-		Handler: startHandler,
-		Filters: []telegram.Filter{ignoreChannelFilter},
-	},
-	{
-		Pattern: "stats",
-		Handler: statsHandler,
-		Filters: []telegram.Filter{ignoreChannelFilter, sudoOnlyFilter},
-	},
-	{
-		Pattern: "bug",
-		Handler: bugHandler,
-		Filters: []telegram.Filter{ignoreChannelFilter},
-	},
-	{
-		Pattern: "(lang|language)",
-		Handler: langHandler,
-		Filters: []telegram.Filter{superGroupFilter, adminFilter},
-	},
-	{
-		Pattern: "settings",
-		Handler: settingsHandler,
-		Filters: []telegram.Filter{superGroupFilter, adminFilter},
-	},
-	{
-		Pattern: "cleanmode",
-		Handler: cleanModeHandler,
-		Filters: []telegram.Filter{superGroupFilter, adminFilter},
-	},
-
-	// SuperGroup & Admin Filters
-
-	{
-		Pattern: "stream",
-		Handler: streamHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "streamstop",
-		Handler: streamStopHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "streamstatus",
-		Handler: streamStatusHandler,
-		Filters: []telegram.Filter{superGroupFilter},
-	},
-	{Pattern: "(rtmp|setrtmp)", Handler: setRTMPHandler},
-	// play/cplay/vplay/fplay commands
-	{
-		Pattern: "play",
-		Handler: playHandler,
-		Filters: []telegram.Filter{superGroupFilter},
-	},
-	{
-		Pattern: "(fplay|playforce)",
-		Handler: fplayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cplay",
-		Handler: cplayHandler,
-		Filters: []telegram.Filter{superGroupFilter},
-	},
-	{
-		Pattern: "vplay",
-		Handler: vplayHandler,
-		Filters: []telegram.Filter{superGroupFilter},
-	},
-	{
-		Pattern: "(fvplay|vfplay|vplayforce)",
-		Handler: fvplayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "(vcplay|cvplay)",
-		Handler: vcplayHandler,
-		Filters: []telegram.Filter{superGroupFilter},
-	},
-	{
-		Pattern: "(fvcplay|fvcpay|vcplayforce)",
-		Handler: fvcplayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-
-	{
-		Pattern: "(speed|setspeed|speedup)",
-		Handler: speedHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "skip",
-		Handler: skipHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "pause",
-		Handler: pauseHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "resume",
-		Handler: resumeHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "replay",
-		Handler: replayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "mute",
-		Handler: muteHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "unmute",
-		Handler: unmuteHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "seek",
-		Handler: seekHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "seekback",
-		Handler: seekbackHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "jump",
-		Handler: jumpHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "(pos|position)",
-		Handler: positionHandler,
-		Filters: []telegram.Filter{superGroupFilter},
-	},
-	{
-		Pattern: "queue",
-		Handler: queueHandler,
-		Filters: []telegram.Filter{superGroupFilter},
-	},
-	{
-		Pattern: "clear",
-		Handler: clearHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "remove",
-		Handler: removeHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "move",
-		Handler: moveHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "shuffle",
-		Handler: shuffleHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "(loop|setloop)",
-		Handler: loopHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "(end|stop)",
-		Handler: stopHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "reload",
-		Handler: reloadHandler,
-		Filters: []telegram.Filter{superGroupFilter},
-	},
-	{
-		Pattern: "restore",
-		Handler: restoreHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "(auth|addauth)",
-		Handler: addAuthHandler,
-		Filters: []telegram.Filter{superGroupFilter, adminFilter},
-	},
-	{
-		Pattern: "(removeauth|delauth|unauth)",
-		Handler: delAuthHandler,
-		Filters: []telegram.Filter{superGroupFilter, adminFilter},
-	},
-	{
-		Pattern: "authlist",
-		Handler: authListHandler,
-		Filters: []telegram.Filter{superGroupFilter},
-	},
-
-	// CPlay commands
-
-	{
-		Pattern: "(cfplay|fcplay|cforceplay|cplayforce)",
-		Handler: cfplayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cpause",
-		Handler: cpauseHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cresume",
-		Handler: cresumeHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cmute",
-		Handler: cmuteHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cunmute",
-		Handler: cunmuteHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "(cstop|cend)",
-		Handler: cstopHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cqueue",
-		Handler: cqueueHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cskip",
-		Handler: cskipHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "(cloop|csetloop)",
-		Handler: cloopHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cseek",
-		Handler: cseekHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cseekback",
-		Handler: cseekbackHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cjump",
-		Handler: cjumpHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cremove",
-		Handler: cremoveHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cclear",
-		Handler: cclearHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cmove",
-		Handler: cmoveHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "(channelplay|setcplay)",
-		Handler: setCPlayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "(cspeed|csetspeed|cspeedup)",
-		Handler: cspeedHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "creplay",
-		Handler: creplayHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "(cpos|cposition)",
-		Handler: cpositionHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "cshuffle",
-		Handler: cshuffleHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "creload",
-		Handler: creloadHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "crestore",
-		Handler: crestoreHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-
-	{
-		Pattern: "(nothumb|nothumbs)",
-		Handler: nothumbHandler,
-		Filters: []telegram.Filter{superGroupFilter, authFilter},
-	},
-	{
-		Pattern: "playmode",
-		Handler: playmodeHandler,
-		Filters: []telegram.Filter{superGroupFilter, adminFilter},
-	},
-	{
-		Pattern: "(cmddelete|commanddelete)",
-		Handler: cmdDeleteHandler,
-		Filters: []telegram.Filter{superGroupFilter, adminFilter},
-	},
-	{
-		Pattern: "adminmode",
-		Handler: adminModeHandler,
-		Filters: []telegram.Filter{superGroupFilter, adminFilter},
-	},
-	{
-		Pattern: "privacy",
-		Handler: privacyHandler,
-		Filters: []telegram.Filter{ignoreChannelFilter},
-	},
-}
-
-var cbHandlers = []CbHandlerDef{
-	{Pattern: "start", Handler: startCB},
-	{Pattern: "help_cb", Handler: helpCB},
-	{Pattern: "^lang:[a-z]", Handler: langCallbackHandler},
-	{Pattern: `^help:(.+)`, Handler: helpCallbackHandler},
-
-	{Pattern: "^close$", Handler: closeHandler},
-	{Pattern: "^cancel$", Handler: cancelHandler},
-	{Pattern: "^restart:(bot|replay)$", Handler: restartConfirmHandler},
-	{Pattern: "^bcast_cancel$", Handler: broadcastCancelCB},
-	{Pattern: "^rtmp_stop$", Handler: rtmpStopCallbackHandler},
-
-	{Pattern: `^room:-?\d+:\w+$`, Handler: roomHandle},
-	{Pattern: "progress", Handler: emptyCBHandler},
-	{Pattern: "^(set|info):", Handler: settingsCallbackHandler},
-}
-
-func Init(bot *telegram.Client, assistants *core.AssistantManager) {
+func Init(_ *td.Client, bot *telegram.Client, assistants *core.AssistantManager) {
 	bot.UpdatesGetState()
 	bot.Use(blacklistMessageMiddleware)
 	assistants.ForEach(func(a *core.Assistant) {
 		a.Client.UpdatesGetState()
 	})
 
-	for _, h := range handlers {
-		bot.AddCommandHandler(
-			h.Pattern,
-			SafeMessageHandler(h.Handler),
-			h.Filters...,
-		).
-			SetGroup(100)
-	}
+	// Basic commands
+	bot.AddCommandHandler("(ac|active|activevc|activevoice)", activeHandler, sudoOnlyFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("(addsudo|addsudoer|sudoadd)", handleAddSudo, ownerFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("(bash|sh)", shellHandle, ownerFilter).SetGroup(100)
+	bot.AddCommandHandler("(blocked|blacklisted)", handleBlacklisted, ownerFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("(blockchat|blacklistchat|blackchat|blchat)", handleBlockChat, ownerFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("(blockuser|blacklistuser|blackuser|bluser)", handleBlockUser, ownerFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("(broadcast|gcast|bcast)", broadcastHandler, ownerFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("(delsudo|delsudoer|sudodel|remsudo|rmsudo|sudorem|dropsudo|unsudo)", handleDelSudo, ownerFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("(lang|language)", langHandler, superGroupFilter, adminFilter).SetGroup(100)
+	bot.AddCommandHandler("(log|logs)", logsHandler, sudoOnlyFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("(maintenance|maint)", handleMaintenance, ownerFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("(rtmp|setrtmp)", setRTMPHandler).SetGroup(100)
+	bot.AddCommandHandler("(sudoers|listsudo|sudolist)", handleGetSudoers, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("(unblockchat|unblacklistchat|unblackchat|whitechat|unblchat)", handleUnblockChat, ownerFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("(unblockuser|unblacklistuser|unbluser|whitelistuser)", handleUnblockUser, ownerFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("autoleave", autoLeaveHandler, sudoOnlyFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("adminmode", adminModeHandler, superGroupFilter, adminFilter).SetGroup(100)
+	bot.AddCommandHandler("bug", bugHandler, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("cleanmode", cleanModeHandler, superGroupFilter, adminFilter).SetGroup(100)
+	bot.AddCommandHandler("clear", clearHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("eval", evalHandle, ownerFilter).SetGroup(100)
+	bot.AddCommandHandler("ev", evalCommandHandler, ownerFilter).SetGroup(100)
+	bot.AddCommandHandler("help", helpHandler, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("json", jsonHandle).SetGroup(100)
+	bot.AddCommandHandler("logger", handleLogger, sudoOnlyFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("mute", muteHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("pause", pauseHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("play", playHandler, superGroupFilter).SetGroup(100)
+	bot.AddCommandHandler("playmode", playmodeHandler, superGroupFilter, adminFilter).SetGroup(100)
+	bot.AddCommandHandler("ping", pingHandler, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("queue", queueHandler, superGroupFilter).SetGroup(100)
+	bot.AddCommandHandler("replay", replayHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("reload", reloadHandler, superGroupFilter).SetGroup(100)
+	bot.AddCommandHandler("remove", removeHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("restart", handleRestart, ownerFilter, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("resume", resumeHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("settings", settingsHandler, superGroupFilter, adminFilter).SetGroup(100)
+	bot.AddCommandHandler("skip", skipHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("start", startHandler, ignoreChannelFilter).SetGroup(100)
+	bot.AddCommandHandler("stats", statsHandler, ignoreChannelFilter, sudoOnlyFilter).SetGroup(100)
+	bot.AddCommandHandler("stream", streamHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("streamstatus", streamStatusHandler, superGroupFilter).SetGroup(100)
+	bot.AddCommandHandler("streamstop", streamStopHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("unmute", unmuteHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("vplay", vplayHandler, superGroupFilter).SetGroup(100)
 
-	for _, h := range cbHandlers {
-		bot.AddCallbackHandler(
-			h.Pattern,
-			WithBlacklistCallback(SafeCallbackHandler(h.Handler)),
-			h.Filters...,
-		).
-			SetGroup(90)
-	}
+	// CPlay commands
+	bot.AddCommandHandler("(auth|addauth)", addAuthHandler, superGroupFilter, adminFilter).SetGroup(100)
+	bot.AddCommandHandler("(cpos|cposition)", cpositionHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(cfplay|fcplay|cforceplay|cplayforce)", cfplayHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(channelplay|setcplay)", setCPlayHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(cloop|csetloop)", cloopHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(cpos|cposition)", cpositionHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(cstop|cend)", cstopHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(cspeed|csetspeed|cspeedup)", cspeedHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(cmddelete|commanddelete)", cmdDeleteHandler, superGroupFilter, adminFilter).SetGroup(100)
+	bot.AddCommandHandler("cclear", cclearHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cjump", cjumpHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cmove", cmoveHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cmute", cmuteHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cqueue", cqueueHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("creload", creloadHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cremove", cremoveHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("creplay", creplayHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("crestore", crestoreHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cresume", cresumeHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cseek", cseekHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cseekback", cseekbackHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cshuffle", cshuffleHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cskip", cskipHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cunmute", cunmuteHandler, superGroupFilter, authFilter).SetGroup(100)
+
+	bot.AddCommandHandler("(end|stop)", stopHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(fplay|playforce)", fplayHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(fvplay|vfplay|vplayforce)", fvplayHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(fvcplay|fvcpay|vcplayforce)", fvcplayHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(loop|setloop)", loopHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(nothumb|nothumbs)", nothumbHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(pos|position)", positionHandler, superGroupFilter).SetGroup(100)
+	bot.AddCommandHandler("(speed|setspeed|speedup)", speedHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("(vcplay|cvplay)", vcplayHandler, superGroupFilter).SetGroup(100)
+	bot.AddCommandHandler("(vplay|vfplay|vplayforce)", vplayHandler, superGroupFilter).SetGroup(100)
+	bot.AddCommandHandler("cclear", cclearHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("clear", clearHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cmove", cmoveHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cplay", cplayHandler, superGroupFilter).SetGroup(100)
+	bot.AddCommandHandler("cremove", cremoveHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("creplay", creplayHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("crestore", crestoreHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cspeed", cspeedHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("ctime", cunmuteHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cqueue", cqueueHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cresume", cresumeHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cseek", cseekHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cseekback", cseekbackHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cshuffle", cshuffleHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cskip", cskipHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("cunmute", cunmuteHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("end", stopHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("fplay", fplayHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("fvplay", fvplayHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("fvcplay", fvcplayHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("loop", loopHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("nothumb", nothumbHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("pause", pauseHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("playmode", playmodeHandler, superGroupFilter, adminFilter).SetGroup(100)
+	bot.AddCommandHandler("pos", positionHandler, superGroupFilter).SetGroup(100)
+	bot.AddCommandHandler("queue", queueHandler, superGroupFilter).SetGroup(100)
+	bot.AddCommandHandler("reload", reloadHandler, superGroupFilter).SetGroup(100)
+	bot.AddCommandHandler("remove", removeHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("resume", resumeHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("restore", restoreHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("seek", seekHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("seekback", seekbackHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("shuffle", shuffleHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("skip", skipHandler, superGroupFilter, authFilter).SetGroup(100)
+	bot.AddCommandHandler("unmute", unmuteHandler, superGroupFilter, authFilter).SetGroup(100)
+
+	bot.AddCallbackHandler("^bcast_cancel$", broadcastCancelCB).SetGroup(90)
+	bot.AddCallbackHandler("^cancel$", cancelHandler).SetGroup(90)
+	bot.AddCallbackHandler("^close$", closeHandler).SetGroup(90)
+	bot.AddCallbackHandler("^help:(.+)$", helpCallbackHandler).SetGroup(90)
+	bot.AddCallbackHandler("^lang:[a-z]$", langCallbackHandler).SetGroup(90)
+	bot.AddCallbackHandler("^restart:(bot|replay)$", restartConfirmHandler).SetGroup(90)
+	bot.AddCallbackHandler("^room:-?\\d+:\\w+$", roomHandle).SetGroup(90)
+	bot.AddCallbackHandler("^rtmp_stop$", rtmpStopCallbackHandler).SetGroup(90)
+	bot.AddCallbackHandler("^set|info:", settingsCallbackHandler).SetGroup(90)
+	bot.AddCallbackHandler("help_cb", helpCB).SetGroup(90)
+	bot.AddCallbackHandler("progress", emptyCBHandler).SetGroup(90)
+	bot.AddCallbackHandler("start", startCB).SetGroup(90)
 
 	bot.On("edit:/eval", evalHandle).SetGroup(80)
 	bot.On("edit:/ev", evalCommandHandler).SetGroup(80)
@@ -546,30 +182,5 @@ func Init(bot *telegram.Client, assistants *core.AssistantManager) {
 
 	if config.SetCmds && config.OwnerID != 0 {
 		go setBotCommands(bot)
-	}
-
-	cplayCommands := []string{
-		"/cfplay", "/vcplay", "/fvcplay",
-		"/cpause", "/cresume", "/cskip", "/cstop",
-		"/cmute", "/cunmute", "/cseek", "/cseekback",
-		"/cjump", "/cremove", "/cclear", "/cmove",
-		"/cspeed", "/creplay", "/cposition", "/cshuffle",
-		"/cloop", "/cqueue", "/creload",
-		"/crestore",
-	}
-
-	for _, cmd := range cplayCommands {
-		baseCmd := "/" + cmd[2:] // Remove 'c' prefix
-		if baseHelp, exists := helpTexts[baseCmd]; exists {
-			helpTexts[cmd] = fmt.Sprintf(`<i>Channel play variant of %s</i>
-
-<b>⚙️ Requires:</b>
-First configure channel using: <code>/setcplay [channel_id]</code>
-
-%s
-
-<b>💡 Note:</b>
-This command affects the linked channel's voice chat, not the current group.`, baseCmd, baseHelp)
-		}
 	}
 }

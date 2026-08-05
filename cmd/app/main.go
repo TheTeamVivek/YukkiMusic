@@ -31,41 +31,32 @@ package main
 import "C"
 
 import (
-	"fmt"
+	"log"
 	"net/http"
-	"net/http/pprof"
 	"os"
-	"time"
-
-	"github.com/Laky-64/gologging"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/modules"
-	"yukkimusic/internal/platforms"
+
+	td "github.com/AshokShau/gotdbot"
+	"github.com/Laky-64/gologging"
 )
 
 func main() {
-	cfgCleanup, err := config.Load()
-	if err != nil {
-		gologging.Fatal(err.Error())
+	if err := config.Load(); err != nil {
+		log.Fatal(err)
 		return
 	}
-	defer cfgCleanup()
-	initLogger()
 
-	shutdownPlatforms, err := platforms.Init()
-	if err != nil {
-		gologging.Fatal("Failed to initialize platforms: " + err.Error())
+	if err := checkDependencies(); err != nil {
+		log.Fatal(err)
 	}
-	defer shutdownPlatforms()
-
-	checkFFmpegAndFFprobe()
 
 	if err := refreshDirs(); err != nil {
-		gologging.Fatal("Failed to refresh directories: " + err.Error())
+		log.Fatalf("Failed to refresh directories: " + err.Error())
 	}
 
 	gologging.Debug("Initializing MongoDB...")
@@ -97,7 +88,12 @@ func main() {
 		gologging.Fatal("Failed to rebalance Assistants: " + err.Error())
 	}
 
-	modules.Init(core.Bot, core.Assistants)
+	tdbot, err := td.NewClient(config.APIID, config.APIHash, config.Token, &td.ClientOpts{LibraryPath: "./libtdjson.so.1.8.66"})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	modules.Init(tdbot, core.Bot, core.Assistants)
 
 	startHTTPServer()
 
@@ -114,22 +110,6 @@ func startHTTPServer() {
 			gologging.FatalF("HTTP server failed: %v", err)
 		}
 	}()
-}
-
-func initLogger() {
-	gologging.SetLevel(gologging.DebugLevel)
-	gologging.SetOutput(config.LogWriter)
-
-	for _, name := range []string{
-		"ntgcalls",
-		"webrtc",
-	} {
-		l := gologging.GetLogger(name)
-		l.SetLevel(gologging.ErrorLevel)
-		l.SetOutput(config.LogWriter)
-	}
-
-	gologging.GetLogger("Database").SetOutput(config.LogWriter)
 }
 
 func refreshDirs() error {
