@@ -42,6 +42,10 @@ For more info, visit our <a href="%s">Support Chat</a>.`, config.SupportChat)
 }
 
 func helpHandler(c *td.Client, m *td.Message) error {
+	if isChannel(c, m) {
+		return nil
+	}
+
 	args := strings.Fields(m.Text())
 	if len(args) > 1 {
 		cmd := args[1]
