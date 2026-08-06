@@ -19,9 +19,7 @@ package config
 
 import (
 	"errors"
-	"io"
 	"math/rand/v2"
-	"os"
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -68,11 +66,7 @@ var (
 
 	StartTime = time.Now()
 
-	LogFileName = "logs.txt"
-	LogWriter   io.Writer
-
-	logr    = logger.GetLogger("config")
-	logFile *os.File
+	logr = logger.GetLogger("config")
 )
 
 func Load() error {

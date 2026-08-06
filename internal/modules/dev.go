@@ -83,7 +83,7 @@ Debugging and development.`
 
 func logsHandler(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()
-	logFile := config.LogFileName
+	logFile := "logs.txt"
 
 	info, err := os.Stat(logFile)
 	if err != nil || info.Size() == 0 {

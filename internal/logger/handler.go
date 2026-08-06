@@ -29,28 +29,26 @@ import (
 	"sync"
 )
 
-// NewHandler returns a slog.Handler that formats records with the same
-// colored layout as Logger. It lets external libraries (e.g. gotdbot) route
-// their logs through this package. A nil writer defaults to os.Stderr.
+// NewHandler returns a slog.Handler that formats records with the same layout
+// as Logger. It lets external libraries (e.g. gotdbot) route their logs
+// through this package. A nil writer defaults to os.Stderr.
 func NewHandler(w io.Writer, level Level) slog.Handler {
 	if w == nil {
 		w = os.Stderr
 	}
 	return &slogHandler{
-		level:   level,
-		w:       w,
-		colored: isTerminal(w) && !colorDisabled(),
-		mu:      &sync.Mutex{},
+		level: level,
+		w:     w,
+		mu:    &sync.Mutex{},
 	}
 }
 
 type slogHandler struct {
-	mu      *sync.Mutex
-	level   Level
-	w       io.Writer
-	colored bool
-	attrs   []slog.Attr
-	group   string
+	mu    *sync.Mutex
+	level Level
+	w     io.Writer
+	attrs []slog.Attr
+	group string
 }
 
 func (h *slogHandler) Enabled(_ context.Context, level slog.Level) bool {
@@ -66,19 +64,11 @@ func (h *slogHandler) Handle(_ context.Context, r slog.Record) error {
 	level := levelOf(r.Level)
 
 	timestamp := r.Time.Format("2006-01-02 15:04:05")
-	if h.colored {
-		fmt.Fprintf(&b, "%s%s%s", ansiDim, timestamp, ansiReset)
-	} else {
-		b.WriteString(timestamp)
-	}
+	b.WriteString(timestamp)
 
 	b.WriteString(" [")
 	levelTag := fmt.Sprintf("%-5s", level.String())
-	if h.colored {
-		fmt.Fprintf(&b, "%s%s%s", levelColor(level), levelTag, ansiReset)
-	} else {
-		b.WriteString(levelTag)
-	}
+	b.WriteString(levelTag)
 	b.WriteByte(']')
 
 	if h.group != "" {
@@ -91,9 +81,6 @@ func (h *slogHandler) Handle(_ context.Context, r slog.Record) error {
 	if r.PC != 0 {
 		if fr, ok := runtime.CallersFrames([]uintptr{r.PC}).Next(); ok {
 			callerStr := fmt.Sprintf("(%s:%d)", path.Base(fr.File), fr.Line)
-			if h.colored {
-				callerStr = ansiDim + callerStr + ansiReset
-			}
 			b.WriteByte(' ')
 			b.WriteString(callerStr)
 		}
@@ -109,6 +96,9 @@ func (h *slogHandler) Handle(_ context.Context, r slog.Record) error {
 
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	if h.w == io.Discard {
+		return nil
+	}
 	_, err := io.WriteString(h.w, b.String()+"\n")
 	return err
 }

@@ -31,7 +31,7 @@ package main
 import "C"
 
 import (
-	"log"
+	"io"
 	"net/http"
 	"os"
 
@@ -47,38 +47,45 @@ import (
 )
 
 func main() {
+	f, err := os.OpenFile("logs.txt", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
+	if err != nil {
+		logger.Fatalf("failed to open logs.txt: %v", err)
+	}
+	defer f.Close()
+
+	logger.SetOutput(io.MultiWriter(os.Stderr, f))
+
 	if err := config.Load(); err != nil {
-		log.Fatal(err)
-		return
+		logger.Fatalf("failed to load config: %v", err)
 	}
 
 	if err := checkDependencies(); err != nil {
-		log.Fatal(err)
+		logger.Fatalf("dependency check failed: %v", err)
 	}
 
 	if err := refreshDirs(); err != nil {
-		log.Fatalf("Failed to refresh directories: " + err.Error())
+		logger.Fatalf("failed to refresh directories: %v", err)
 	}
 
 	logger.Debug("Initializing MongoDB...")
 
 	closeDB, err := database.Init(config.MongoURI)
 	if err != nil {
-		logger.Fatal("Failed to initialize database: " + err.Error())
+		logger.Fatalf("failed to initialize database: %v", err)
 	}
 	defer closeDB()
 
 	logger.Info("Database connected successfully")
 
 	if err := locales.Load(); err != nil {
-		logger.Fatal("Failed to load locales: " + err.Error())
+		logger.Fatalf("failed to load locales: %v", err)
 	}
 
 	logger.Debug("Initializing clients...")
 
 	shutdownCore, err := core.Init()
 	if err != nil {
-		logger.Fatal("Failed to initialize core: " + err.Error())
+		logger.Fatalf("failed to initialize core: %v", err)
 	}
 	defer shutdownCore()
 
@@ -86,17 +93,17 @@ func main() {
 	core.F = modules.F
 
 	if err := database.RebalanceAssistantIndexes(core.Assistants.Count()); err != nil {
-		logger.Fatal("Failed to rebalance Assistants: " + err.Error())
+		logger.Fatalf("failed to rebalance assistants: %v", err)
 	}
 
 	tdbot, err := td.NewClient(config.APIID, config.APIHash, config.Token, &td.ClientOpts{
 		LibraryPath: "./libtdjson.so.1.8.66",
 		Logger: gotdlogger.New(gotdlogger.WithHandler(
-			logger.NewHandler(nil, logger.InfoLevel),
+			logger.NewHandler(io.MultiWriter(os.Stderr, f), logger.InfoLevel),
 		)),
 	})
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatalf("failed to create tdbot client: %v", err)
 	}
 
 	core.TDBot = tdbot

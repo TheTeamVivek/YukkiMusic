@@ -15,8 +15,7 @@
  * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
 
-// Package logger provides a lightweight, standard-library-only logger with
-// ANSI colors when the output is a terminal and plain text otherwise.
+// Package logger provides a lightweight, standard-library-only logger.
 package logger
 
 import (
@@ -25,7 +24,6 @@ import (
 	"os"
 	"path"
 	"runtime"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -64,23 +62,22 @@ func (l Level) String() string {
 	}
 }
 
-// ANSI escape codes. Only used when colored output is enabled.
-const (
-	ansiReset   = "\x1b[0m"
-	ansiDim     = "\x1b[2m"
-	ansiCyan    = "\x1b[36m"
-	ansiGreen   = "\x1b[32m"
-	ansiYellow  = "\x1b[33m"
-	ansiRed     = "\x1b[31m"
-	ansiBoldRed = "\x1b[1;31m"
-)
-
 var (
+	outputMu sync.RWMutex
+	output   io.Writer = os.Stderr
+
 	registryMu   sync.Mutex
 	namedLoggers = map[string]*Logger{}
 
 	defaultLogger = newLogger("")
 )
+
+// currentOutput returns the shared output that new loggers default to.
+func currentOutput() io.Writer {
+	outputMu.RLock()
+	defer outputMu.RUnlock()
+	return output
+}
 
 // Logger writes formatted log lines to an io.Writer.
 type callSite struct {
@@ -95,17 +92,14 @@ type Logger struct {
 	w          io.Writer
 	name       string
 	timeFormat string
-	colored    bool
-	colorSet   bool
 }
 
 func newLogger(name string) *Logger {
 	return &Logger{
 		level:      InfoLevel,
-		w:          os.Stderr,
+		w:          currentOutput(),
 		name:       name,
 		timeFormat: "2006-01-02 15:04:05",
-		colored:    colorEnabled(),
 	}
 }
 
@@ -132,14 +126,24 @@ func GetLevel() Level {
 	return defaultLogger.GetLevel()
 }
 
-// SetOutput sets the output writer of the default logger.
+// SetOutput sets the output writer used by the default logger, all existing
+// named loggers and any logger created later. A nil writer defaults to
+// os.Stderr.
 func SetOutput(w io.Writer) {
-	defaultLogger.SetOutput(w)
-}
+	if w == nil {
+		w = os.Stderr
+	}
+	outputMu.Lock()
+	output = w
+	outputMu.Unlock()
 
-// SetColored forces color on or off for the default logger.
-func SetColored(enabled bool) {
-	defaultLogger.SetColored(enabled)
+	registryMu.Lock()
+	for _, l := range namedLoggers {
+		l.SetOutput(w)
+	}
+	registryMu.Unlock()
+
+	defaultLogger.SetOutput(w)
 }
 
 func Debug(message ...any) {
@@ -204,17 +208,6 @@ func (ctx *Logger) SetOutput(w io.Writer) {
 		w = os.Stderr
 	}
 	ctx.w = w
-	if !ctx.colorSet {
-		ctx.colored = isTerminal(w) && !colorDisabled()
-	}
-}
-
-// SetColored forces color on or off regardless of terminal detection.
-func (ctx *Logger) SetColored(enabled bool) {
-	ctx.mu.Lock()
-	defer ctx.mu.Unlock()
-	ctx.colored = enabled
-	ctx.colorSet = true
 }
 
 // GetOutput returns the current output writer.
@@ -296,19 +289,11 @@ func (ctx *Logger) log(level Level, cs callSite, msg string) {
 
 func (ctx *Logger) formatLine(b *strings.Builder, level Level, file string, fn string, line int, msg string) {
 	timestamp := time.Now().Format(ctx.timeFormat)
-	if ctx.colored {
-		fmt.Fprintf(b, "%s%s%s", ansiDim, timestamp, ansiReset)
-	} else {
-		b.WriteString(timestamp)
-	}
+	b.WriteString(timestamp)
 
 	b.WriteString(" [")
 	levelTag := fmt.Sprintf("%-5s", level.String())
-	if ctx.colored {
-		fmt.Fprintf(b, "%s%s%s", levelColor(level), levelTag, ansiReset)
-	} else {
-		b.WriteString(levelTag)
-	}
+	b.WriteString(levelTag)
 	b.WriteByte(']')
 
 	if ctx.name != "" {
@@ -324,9 +309,6 @@ func (ctx *Logger) formatLine(b *strings.Builder, level Level, file string, fn s
 			callerStr += " " + fn
 		}
 		callerStr += ")"
-		if ctx.colored {
-			callerStr = ansiDim + callerStr + ansiReset
-		}
 		b.WriteByte(' ')
 		b.WriteString(callerStr)
 	}
@@ -362,50 +344,4 @@ func trimFunc(name string) string {
 		name = name[i+1:]
 	}
 	return name
-}
-
-func levelColor(level Level) string {
-	switch level {
-	case DebugLevel:
-		return ansiCyan
-	case InfoLevel:
-		return ansiGreen
-	case WarnLevel:
-		return ansiYellow
-	case ErrorLevel:
-		return ansiRed
-	case FatalLevel:
-		return ansiBoldRed
-	default:
-		return ""
-	}
-}
-
-func colorEnabled() bool {
-	return isTerminal(os.Stderr) && !colorDisabled()
-}
-
-func colorDisabled() bool {
-	if os.Getenv("NO_COLOR") != "" {
-		return true
-	}
-	if strings.EqualFold(os.Getenv("TERM"), "dumb") {
-		return true
-	}
-	if v, _ := strconv.ParseBool(os.Getenv("DISABLE_COLOUR")); v {
-		return true
-	}
-	return false
-}
-
-func isTerminal(w io.Writer) bool {
-	f, ok := w.(*os.File)
-	if !ok {
-		return false
-	}
-	fi, err := f.Stat()
-	if err != nil {
-		return false
-	}
-	return fi.Mode()&os.ModeCharDevice != 0
 }

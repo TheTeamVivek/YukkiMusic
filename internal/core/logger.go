@@ -22,7 +22,6 @@ import (
 
 	"github.com/amarnathcjd/gogram/telegram"
 
-	"yukkimusic/config"
 	"yukkimusic/internal/logger"
 )
 
@@ -37,7 +36,6 @@ func GetTgLogger(name string, lvl telegram.LogLevel) *TgLogger {
 		lvl: lvl,
 	}
 	l.SetLevel(lvl)
-	l.SetOutput(config.LogWriter)
 	return l
 }
 
