@@ -27,8 +27,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"resty.dev/v3"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 )
@@ -45,16 +45,16 @@ var (
 var embeddedCookies embed.FS
 
 func init() {
-	gologging.Debug("🔹 Initializing cookies...")
+	logger.Debug("🔹 Initializing cookies...")
 
 	if err := copyEmbeddedCookies(); err != nil {
-		gologging.Fatal("Failed to copy embedded cookies:", err)
+		logger.Fatal("Failed to copy embedded cookies:", err)
 	}
 
 	urls := strings.FieldsSeq(config.CookiesLink)
 	for url := range urls {
 		if err := downloadCookieFile(url); err != nil {
-			gologging.WarnF(
+			logger.Warnf(
 				"Failed to download cookie file from %s: %v",
 				url,
 				err,
@@ -144,12 +144,12 @@ func GetRandomCookieFile() (string, error) {
 	})
 
 	if err != nil {
-		gologging.WarnF("Failed to load cookie cache: %v", err)
+		logger.Warnf("Failed to load cookie cache: %v", err)
 		return "", err
 	}
 
 	if len(cachedFiles) == 0 {
-		gologging.Warn("No cookie files available")
+		logger.Warn("No cookie files available")
 		return "", nil
 	}
 

@@ -42,7 +42,8 @@ import (
 	"yukkimusic/internal/modules"
 
 	td "github.com/AshokShau/gotdbot"
-	"github.com/Laky-64/gologging"
+	gotdlogger "github.com/AshokShau/gotdbot/logger"
+	"yukkimusic/internal/logger"
 )
 
 func main() {
@@ -59,25 +60,25 @@ func main() {
 		log.Fatalf("Failed to refresh directories: " + err.Error())
 	}
 
-	gologging.Debug("Initializing MongoDB...")
+	logger.Debug("Initializing MongoDB...")
 
 	closeDB, err := database.Init(config.MongoURI)
 	if err != nil {
-		gologging.Fatal("Failed to initialize database: " + err.Error())
+		logger.Fatal("Failed to initialize database: " + err.Error())
 	}
 	defer closeDB()
 
-	gologging.Info("Database connected successfully")
+	logger.Info("Database connected successfully")
 
 	if err := locales.Load(); err != nil {
-		gologging.Fatal("Failed to load locales: " + err.Error())
+		logger.Fatal("Failed to load locales: " + err.Error())
 	}
 
-	gologging.Debug("Initializing clients...")
+	logger.Debug("Initializing clients...")
 
 	shutdownCore, err := core.Init()
 	if err != nil {
-		gologging.Fatal("Failed to initialize core: " + err.Error())
+		logger.Fatal("Failed to initialize core: " + err.Error())
 	}
 	defer shutdownCore()
 
@@ -85,10 +86,15 @@ func main() {
 	core.F = modules.F
 
 	if err := database.RebalanceAssistantIndexes(core.Assistants.Count()); err != nil {
-		gologging.Fatal("Failed to rebalance Assistants: " + err.Error())
+		logger.Fatal("Failed to rebalance Assistants: " + err.Error())
 	}
 
-	tdbot, err := td.NewClient(config.APIID, config.APIHash, config.Token, &td.ClientOpts{LibraryPath: "./libtdjson.so.1.8.66"})
+	tdbot, err := td.NewClient(config.APIID, config.APIHash, config.Token, &td.ClientOpts{
+		LibraryPath: "./libtdjson.so.1.8.66",
+		Logger: gotdlogger.New(gotdlogger.WithHandler(
+			logger.NewHandler(nil, logger.InfoLevel),
+		)),
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -105,10 +111,10 @@ func startHTTPServer() {
 	go func() {
 		addr := "0.0.0.0:" + config.Port
 
-		gologging.InfoF("HTTP server listening on %s", addr)
+		logger.Infof("HTTP server listening on %s", addr)
 
 		if err := http.ListenAndServe(addr, nil); err != nil {
-			gologging.FatalF("HTTP server failed: %v", err)
+			logger.Fatalf("HTTP server failed: %v", err)
 		}
 	}()
 }

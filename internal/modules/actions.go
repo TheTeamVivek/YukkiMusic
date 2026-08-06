@@ -19,8 +19,8 @@ package modules
 import (
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -30,7 +30,7 @@ import (
 )
 
 func handleActions(m *telegram.NewMessage) error {
-	gologging.Info(m.Marshal())
+	logger.Info(m.Marshal())
 
 	if !isValidChatType(m) {
 		warnAndLeave(m.Client, m.ChannelID())
@@ -66,7 +66,7 @@ func handleChatMemberAction(m *telegram.NewMessage) error {
 					}
 				}
 
-				gologging.Debug("Bot added to " + utils.IntToStr(chatID))
+				logger.Debug("Bot added to " + utils.IntToStr(chatID))
 				m.Reply(F(chatID, "bot_added_normal"))
 				database.AddServedChat(chatID)
 
@@ -79,7 +79,7 @@ func handleChatMemberAction(m *telegram.NewMessage) error {
 
 	case *telegram.MessageActionChatDeleteUser:
 		if action.UserID == botID {
-			gologging.Debug("Bot removed from " + utils.IntToStr(chatID))
+			logger.Debug("Bot removed from " + utils.IntToStr(chatID))
 
 			cleanScheduler.cancel(chatID)
 			core.DeleteRoom(chatID)
@@ -107,7 +107,7 @@ func handleVoiceChatAction(m *telegram.NewMessage, action *telegram.MessageActio
 	go clearRTMPState(chatID)
 	s, err := core.GetChatState(chatID)
 	if err != nil {
-		gologging.ErrorF("Failed to get chat state for %d: %v", chatID, err)
+		logger.Errorf("Failed to get chat state for %d: %v", chatID, err)
 		return telegram.ErrEndGroup
 	}
 
@@ -115,7 +115,7 @@ func handleVoiceChatAction(m *telegram.NewMessage, action *telegram.MessageActio
 
 	msgKey := utils.IfElse(isActive, "voicechat_started", "voicechat_ended")
 	m.Respond(F(chatID, msgKey, locales.Arg{"duration": utils.FormatDuration(int(action.Duration))}))
-	gologging.DebugF("Voice chat %s in %d", msgKey, chatID)
+	logger.Debugf("Voice chat %s in %d", msgKey, chatID)
 
 	if !isActive {
 		room, ok := core.GetRoom(chatID, nil, false)
@@ -125,7 +125,7 @@ func handleVoiceChatAction(m *telegram.NewMessage, action *telegram.MessageActio
 				scheduleOldPlayingMessage(room)
 			}
 			core.DeleteRoom(chatID)
-			gologging.DebugF("Room destroyed for ended voice chat in %d", chatID)
+			logger.Debugf("Room destroyed for ended voice chat in %d", chatID)
 		}()
 	}
 

@@ -4,8 +4,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/database"
@@ -139,7 +139,7 @@ func (s *CleanScheduler) flushDue(deadline time.Time) {
 			continue
 		}
 		if _, err := core.Bot.DeleteMessages(chatID, ids); err != nil {
-			gologging.DebugF("cleanmode delete failed chat=%d err=%v", chatID, err)
+			logger.Debugf("cleanmode delete failed chat=%d err=%v", chatID, err)
 		}
 	}
 }

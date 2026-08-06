@@ -26,8 +26,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	state "yukkimusic/internal/core/models"
 )
@@ -48,7 +48,7 @@ func getPath(track *state.Track, ext string) string {
 func fileExists(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
-		gologging.Debug("fileExists: " + path + " not found")
+		logger.Debug("fileExists: " + path + " not found")
 		return false
 	}
 	return info.Size() > 0

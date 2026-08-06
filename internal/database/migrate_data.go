@@ -50,7 +50,7 @@ type (
 )
 
 func migrateData() {
-	logger.Info("Checking for old database to migrate...")
+	logr.Info("Checking for old database to migrate...")
 
 	oldDB := client.Database(oldDBName)
 	ctx := context.Background()
@@ -60,7 +60,7 @@ func migrateData() {
 	err := flagColl.FindOne(ctx, bson.M{"migrated": true}).Decode(&result)
 
 	if err == nil {
-		logger.Info("Migration already completed previously. Skipping.")
+		logr.Info("Migration already completed previously. Skipping.")
 		return
 	}
 
@@ -75,9 +75,9 @@ func migrateData() {
 		"timestamp": time.Now(),
 	})
 	if err != nil {
-		logger.ErrorF("Failed to write migration flag: %v", err)
+		logr.Errorf("Failed to write migration flag: %v", err)
 	}
-	logger.Info("Data migration complete.")
+	logr.Info("Data migration complete.")
 }
 
 func migrateCPlay(ctx context.Context, db *mongo.Database) {
@@ -88,7 +88,7 @@ func migrateCPlay(ctx context.Context, db *mongo.Database) {
 	cursor, err := coll.Find(ctx, bson.M{}, opts)
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
-			logger.ErrorF("Failed to query old cplaymode collection: %v", err)
+			logr.Errorf("Failed to query old cplaymode collection: %v", err)
 		}
 		return
 	}
@@ -100,7 +100,7 @@ func migrateCPlay(ctx context.Context, db *mongo.Database) {
 		var old oldCPlay
 
 		if err := cursor.Decode(&old); err != nil {
-			logger.ErrorF("Failed to decode old cplay document: %v", err)
+			logr.Errorf("Failed to decode old cplay document: %v", err)
 			continue
 		}
 
@@ -118,7 +118,7 @@ func migrateCPlay(ctx context.Context, db *mongo.Database) {
 		if len(models) >= 1000 {
 			_, err := chatSettingsColl.BulkWrite(ctx, models)
 			if err != nil {
-				logger.ErrorF("Bulk migration for cplay failed: %v", err)
+				logr.Errorf("Bulk migration for cplay failed: %v", err)
 				return
 			}
 
@@ -127,23 +127,23 @@ func migrateCPlay(ctx context.Context, db *mongo.Database) {
 	}
 
 	if err := cursor.Err(); err != nil {
-		logger.ErrorF("Cursor error while migrating cplay: %v", err)
+		logr.Errorf("Cursor error while migrating cplay: %v", err)
 		return
 	}
 
 	if len(models) > 0 {
 		_, err := chatSettingsColl.BulkWrite(ctx, models)
 		if err != nil {
-			logger.ErrorF("Bulk migration for cplay failed: %v", err)
+			logr.Errorf("Bulk migration for cplay failed: %v", err)
 			return
 		}
 	}
 
 	if err := coll.Drop(ctx); err != nil {
-		logger.ErrorF("Failed to drop cplaymode collection: %v", err)
+		logr.Errorf("Failed to drop cplaymode collection: %v", err)
 	}
 
-	logger.Info("Finished migrating cplay settings.")
+	logr.Info("Finished migrating cplay settings.")
 }
 
 func migrateServedUsers(ctx context.Context, db *mongo.Database) {
@@ -154,7 +154,7 @@ func migrateServedUsers(ctx context.Context, db *mongo.Database) {
 	cursor, err := coll.Find(ctx, bson.M{"user_id": bson.M{"$gt": 0}}, opts)
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
-			logger.ErrorF("Failed to query old tgusersdb collection: %v", err)
+			logr.Errorf("Failed to query old tgusersdb collection: %v", err)
 		}
 		return
 	}
@@ -166,7 +166,7 @@ func migrateServedUsers(ctx context.Context, db *mongo.Database) {
 		var old oldServedUser
 
 		if err := cursor.Decode(&old); err != nil {
-			logger.ErrorF("Failed to decode old user document: %v", err)
+			logr.Errorf("Failed to decode old user document: %v", err)
 			continue
 		}
 
@@ -174,7 +174,7 @@ func migrateServedUsers(ctx context.Context, db *mongo.Database) {
 	}
 
 	if err := cursor.Err(); err != nil {
-		logger.ErrorF("Cursor error while migrating served users: %v", err)
+		logr.Errorf("Cursor error while migrating served users: %v", err)
 		return
 	}
 
@@ -192,16 +192,16 @@ func migrateServedUsers(ctx context.Context, db *mongo.Database) {
 			upsertOpt,
 		)
 		if err != nil {
-			logger.ErrorF("Bulk migration for served users failed: %v", err)
+			logr.Errorf("Bulk migration for served users failed: %v", err)
 			return
 		}
 	}
 
 	if err := coll.Drop(ctx); err != nil {
-		logger.ErrorF("Failed to drop tgusersdb collection: %v", err)
+		logr.Errorf("Failed to drop tgusersdb collection: %v", err)
 	}
 
-	logger.Info("Finished migrating served users.")
+	logr.Info("Finished migrating served users.")
 }
 
 func migrateServedChats(ctx context.Context, db *mongo.Database) {
@@ -212,7 +212,7 @@ func migrateServedChats(ctx context.Context, db *mongo.Database) {
 	cursor, err := coll.Find(ctx, bson.M{"chat_id": bson.M{"$lt": 0}}, opts)
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
-			logger.ErrorF("Failed to query old chats collection: %v", err)
+			logr.Errorf("Failed to query old chats collection: %v", err)
 		}
 		return
 	}
@@ -224,7 +224,7 @@ func migrateServedChats(ctx context.Context, db *mongo.Database) {
 		var old oldServedChat
 
 		if err := cursor.Decode(&old); err != nil {
-			logger.ErrorF("Failed to decode old chat document: %v", err)
+			logr.Errorf("Failed to decode old chat document: %v", err)
 			continue
 		}
 
@@ -232,7 +232,7 @@ func migrateServedChats(ctx context.Context, db *mongo.Database) {
 	}
 
 	if err := cursor.Err(); err != nil {
-		logger.ErrorF("Cursor error while migrating served chats: %v", err)
+		logr.Errorf("Cursor error while migrating served chats: %v", err)
 		return
 	}
 
@@ -250,16 +250,16 @@ func migrateServedChats(ctx context.Context, db *mongo.Database) {
 			upsertOpt,
 		)
 		if err != nil {
-			logger.ErrorF("Bulk migration for served chats failed: %v", err)
+			logr.Errorf("Bulk migration for served chats failed: %v", err)
 			return
 		}
 	}
 
 	if err := coll.Drop(ctx); err != nil {
-		logger.ErrorF("Failed to drop chats collection: %v", err)
+		logr.Errorf("Failed to drop chats collection: %v", err)
 	}
 
-	logger.Info("Finished migrating served chats.")
+	logr.Info("Finished migrating served chats.")
 }
 
 func migrateSudoers(ctx context.Context, db *mongo.Database) {
@@ -269,7 +269,7 @@ func migrateSudoers(ctx context.Context, db *mongo.Database) {
 	err := coll.FindOne(ctx, bson.M{"sudo": "sudo"}).Decode(&doc)
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
-			logger.ErrorF("Failed to query old sudoers collection: %v", err)
+			logr.Errorf("Failed to query old sudoers collection: %v", err)
 		}
 		return
 	}
@@ -288,14 +288,14 @@ func migrateSudoers(ctx context.Context, db *mongo.Database) {
 			upsertOpt,
 		)
 		if err != nil {
-			logger.ErrorF("Bulk migration for sudoers failed: %v", err)
+			logr.Errorf("Bulk migration for sudoers failed: %v", err)
 			return
 		}
 	}
 
 	if err := coll.Drop(ctx); err != nil {
-		logger.ErrorF("Failed to drop empty sudoers collection: %v", err)
+		logr.Errorf("Failed to drop empty sudoers collection: %v", err)
 	}
 
-	logger.Info("Finished migrating sudoers.")
+	logr.Info("Finished migrating sudoers.")
 }

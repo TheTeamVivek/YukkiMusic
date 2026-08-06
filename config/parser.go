@@ -30,7 +30,7 @@ func getEnvBool(key string, def ...bool) bool {
 
 	b, err := strconv.ParseBool(v)
 	if err != nil {
-		logger.FatalF("invalid boolean value for %s: %q", key, v)
+		logr.Fatalf("invalid boolean value for %s: %q", key, v)
 	}
 
 	return b
@@ -44,7 +44,7 @@ func getEnvInt(key string, def ...int) int {
 
 	n, err := strconv.Atoi(v)
 	if err != nil {
-		logger.FatalF("invalid integer value for %s: %q", key, v)
+		logr.Fatalf("invalid integer value for %s: %q", key, v)
 	}
 
 	return n
@@ -58,7 +58,7 @@ func getEnvInt64(key string, def ...int64) int64 {
 
 	n, err := strconv.ParseInt(v, 10, 64)
 	if err != nil {
-		logger.FatalF("invalid int64 value for %s: %q", key, v)
+		logr.Fatalf("invalid int64 value for %s: %q", key, v)
 	}
 
 	return n
@@ -104,7 +104,7 @@ func getEnvInt64s(key string, def ...[]int64) []int64 {
 	for _, field := range fields {
 		n, err := strconv.ParseInt(field, 10, 64)
 		if err != nil {
-			logger.WarnF("ignoring invalid %s value %q", key, field)
+			logr.Warnf("ignoring invalid %s value %q", key, field)
 			continue
 		}
 		out = append(out, n)

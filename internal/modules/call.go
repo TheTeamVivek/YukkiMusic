@@ -20,8 +20,8 @@ package modules
 import (
 	"context"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/internal/core"
 	state "yukkimusic/internal/core/models"
@@ -37,14 +37,14 @@ func streamEndHandler(
 	_ ntgcalls.StreamDevice,
 ) {
 	if streamType == ntgcalls.VideoStream {
-		gologging.Debug("[onStreamEndHandler] Video stream ended, returning")
+		logger.Debug("[onStreamEndHandler] Video stream ended, returning")
 		return
 	}
 
-	gologging.DebugF("[onStreamEndHandler] Stream ended in chat %d", chatID)
+	logger.Debugf("[onStreamEndHandler] Stream ended in chat %d", chatID)
 	ass, err := core.Assistants.ForChat(chatID)
 	if err != nil {
-		gologging.ErrorF("Failed to get Assistant for %d: %v", chatID, err)
+		logger.Errorf("Failed to get Assistant for %d: %v", chatID, err)
 		return
 	}
 	r, ok := core.GetRoom(chatID, ass, false)
@@ -86,7 +86,7 @@ func streamEndHandler(
 		statusText,
 	)
 	if err != nil {
-		gologging.ErrorF("[call.go] Failed to send msg: %v", err)
+		logger.Errorf("[call.go] Failed to send msg: %v", err)
 	}
 
 	var filePath string
@@ -97,7 +97,7 @@ func streamEndHandler(
 	}
 
 	if err != nil {
-		gologging.ErrorF(
+		logger.Errorf(
 			"[onStreamEndHandler] Download failed for %s: %v",
 			t.URL,
 			err,
@@ -111,7 +111,7 @@ func streamEndHandler(
 	}
 
 	if err := r.Play(t, filePath, true); err != nil {
-		gologging.ErrorF(
+		logger.Errorf(
 			"[onStreamEndHandler] Play failed for %s: %v",
 			t.URL,
 			err,

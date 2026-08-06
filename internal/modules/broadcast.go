@@ -27,8 +27,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -244,7 +244,7 @@ func broadcastHandler(m *tg.NewMessage) error {
 		})
 	if err != nil {
 		bManager.Stop()
-		gologging.ErrorF("Failed to send broadcast progress message: %v", err)
+		logger.Errorf("Failed to send broadcast progress message: %v", err)
 		return tg.ErrEndGroup
 	}
 
@@ -353,7 +353,7 @@ func (bm *BroadcastManager) start(
 	defer bm.Stop()
 	defer func() {
 		if r := recover(); r != nil {
-			gologging.ErrorF("Broadcast panic recovered: %v", r)
+			logger.Errorf("Broadcast panic recovered: %v", r)
 			bm.finalize(progressMsg, stats)
 		}
 	}()
@@ -466,7 +466,7 @@ func (bm *BroadcastManager) sendMessage(
 		}
 
 		if wait := tg.GetFloodWait(err); wait > 0 {
-			gologging.ErrorF(
+			logger.Errorf(
 				"FloodWait detected (%ds). Retrying (attempt %d).",
 				wait,
 				attempt,
@@ -484,14 +484,14 @@ func (bm *BroadcastManager) sendMessage(
 		if !tg.MatchError(err, "USER_IS_BLOCKED") &&
 			!tg.MatchError(err, "CHAT_WRITE_FORBIDDEN") &&
 			!tg.MatchError(err, "USER_IS_DEACTIVATED") {
-			gologging.ErrorF("Broadcast failed for %d: %v", targetID, err)
+			logger.Errorf("Broadcast failed for %d: %v", targetID, err)
 		}
 		return err
 	}
 
 	if sentMsg != nil && (flags.Pin || flags.PinLoud) {
 		if _, perr := m.Client.PinMessage(targetID, sentMsg.ID, &tg.PinOptions{Silent: !flags.PinLoud}); perr != nil {
-			gologging.ErrorF("Pin failed for %d: %v", targetID, perr)
+			logger.Errorf("Pin failed for %d: %v", targetID, perr)
 		}
 	}
 	return nil
@@ -557,7 +557,7 @@ func (bm *BroadcastManager) finalize(
 	if errs != "" {
 		tmpFile := "broadcast_errors.txt"
 		if err := os.WriteFile(tmpFile, []byte(errs), 0o600); err != nil {
-			gologging.ErrorF("Failed to write broadcast errors: %v", err)
+			logger.Errorf("Failed to write broadcast errors: %v", err)
 			return
 		}
 		defer os.Remove(tmpFile)

@@ -21,8 +21,8 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/locales"
@@ -150,7 +150,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		F(chatID, "stream_downloading_next"),
 	)
 	if err != nil {
-		gologging.ErrorF("[skip.go] err: %v", err)
+		logger.Errorf("[skip.go] err: %v", err)
 	}
 
 	path, err := platforms.Download(context.Background(), t, statusMsg)

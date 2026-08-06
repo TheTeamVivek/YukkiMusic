@@ -23,8 +23,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/internal/utils"
 )
@@ -70,7 +70,7 @@ func GetChatState(chatID int64) (*ChatState, error) {
 	}
 	chatStatesMu.Unlock()
 	if err := state.ensureAssistant(); err != nil {
-		gologging.ErrorF("chat_state: ensureAssistant failed for %d: %v", chatID, err)
+		logger.Errorf("chat_state: ensureAssistant failed for %d: %v", chatID, err)
 		return nil, err
 	}
 	return state, nil
@@ -91,7 +91,7 @@ func (s *ChatState) Snapshot(force bool) (StateSnapshot, error) {
 		return cached, nil
 	}
 	if err := s.refresh(); err != nil {
-		gologging.ErrorF("chat_state: refresh failed for %d: %v", s.ChatID, err)
+		logger.Errorf("chat_state: refresh failed for %d: %v", s.ChatID, err)
 		return StateSnapshot{}, err
 	}
 	s.mu.RLock()
@@ -111,7 +111,7 @@ func (s *ChatState) EnsureAssistantJoined(username string) error {
 		return nil
 	}
 	if telegram.MatchError(err, "INVITE_HASH_EXPIRED") {
-		gologging.ErrorF("chat_state: invite expired for %d, retrying with refreshed link", s.ChatID)
+		logger.Errorf("chat_state: invite expired for %d, retrying with refreshed link", s.ChatID)
 		s.setInviteLink("")
 		return s.joinByInviteLink()
 	}
@@ -146,7 +146,7 @@ func (s *ChatState) AssistantFetched() bool {
 }
 
 func (s *ChatState) refresh() error {
-	gologging.DebugF("chat_state: refresh(chat=%d)", s.ChatID)
+	logger.Debugf("chat_state: refresh(chat=%d)", s.ChatID)
 	if s.Assistant == nil {
 		if err := s.ensureAssistant(); err != nil {
 			return err
@@ -154,7 +154,7 @@ func (s *ChatState) refresh() error {
 	}
 	full, err := utils.GetFullChannel(Bot, s.ChatID)
 	if err != nil {
-		gologging.ErrorF("chat_state: GetFullChannel failed for %d: %v", s.ChatID, err)
+		logger.Errorf("chat_state: GetFullChannel failed for %d: %v", s.ChatID, err)
 		if isAdminError(err) {
 			return ErrAdminPermissionRequired
 		}
@@ -165,11 +165,11 @@ func (s *ChatState) refresh() error {
 	if err != nil {
 		if telegram.MatchError(err, "USER_NOT_PARTICIPANT") || telegram.MatchError(err, "PARTICIPANT_ID_INVALID") {
 			s.applySnapshot(false, false, full.Call != nil)
-			gologging.DebugF("chat_state: assistant not participant in %d", s.ChatID)
+			logger.Debugf("chat_state: assistant not participant in %d", s.ChatID)
 			return nil
 		}
 		if isAdminError(err) {
-			gologging.ErrorF("chat_state: admin permission required for GetChatMember in %d", s.ChatID)
+			logger.Errorf("chat_state: admin permission required for GetChatMember in %d", s.ChatID)
 			return ErrAdminPermissionRequired
 		}
 		return fmt.Errorf("%w: %v", ErrStateFetchFailed, err)
@@ -203,7 +203,7 @@ func membership(m *telegram.Participant) (bool, bool) {
 }
 
 func (s *ChatState) joinBy(username string) error {
-	gologging.DebugF("chat_state: joinBy username=%s chat=%d", username, s.ChatID)
+	logger.Debugf("chat_state: joinBy username=%s chat=%d", username, s.ChatID)
 	_, err := s.Assistant.Client.JoinChannel(username)
 	if err == nil || telegram.MatchError(err, "USER_ALREADY_PARTICIPANT") {
 		s.applySnapshot(true, false, s.snapshot.VoiceChatActive)
@@ -213,7 +213,7 @@ func (s *ChatState) joinBy(username string) error {
 }
 
 func (s *ChatState) joinByInviteLink() error {
-	gologging.DebugF("chat_state: joinByInviteLink(chat=%d)", s.ChatID)
+	logger.Debugf("chat_state: joinByInviteLink(chat=%d)", s.ChatID)
 	link, err := s.resolveInviteLink()
 	if err != nil {
 		return err
@@ -224,14 +224,14 @@ func (s *ChatState) joinByInviteLink() error {
 		return nil
 	}
 	if telegram.MatchError(err, "INVITE_REQUEST_SENT") {
-		gologging.InfoF("chat_state: invite request sent for %d, attempting approval", s.ChatID)
+		logger.Infof("chat_state: invite request sent for %d, attempting approval", s.ChatID)
 		if err := s.approveJoinRequest(); err != nil {
 			return ErrInviteRequestSent
 		}
 		return nil
 	}
 	if telegram.MatchError(err, "USER_CHANNELS_TOO_MUCH") || telegram.MatchError(err, "CHANNELS_TOO_MUCH") {
-		gologging.InfoF("chat_state: join limit reached for %d, leaving inactive chats", s.ChatID)
+		logger.Infof("chat_state: join limit reached for %d, leaving inactive chats", s.ChatID)
 		s.leaveInactiveAssistantChats(5)
 		time.Sleep(1 * time.Second)
 		_, retryErr := s.Assistant.Client.JoinChannel(link)
@@ -248,7 +248,7 @@ func (s *ChatState) joinByInviteLink() error {
 }
 
 func (s *ChatState) resolveInviteLink() (string, error) {
-	gologging.DebugF("chat_state: resolveInviteLink(chat=%d)", s.ChatID)
+	logger.Debugf("chat_state: resolveInviteLink(chat=%d)", s.ChatID)
 	s.mu.RLock()
 	cached := s.inviteLink
 	s.mu.RUnlock()
@@ -271,7 +271,7 @@ func (s *ChatState) resolveInviteLink() (string, error) {
 }
 
 func (s *ChatState) approveJoinRequest() error {
-	gologging.DebugF("chat_state: approveJoinRequest(chat=%d)", s.ChatID)
+	logger.Debugf("chat_state: approveJoinRequest(chat=%d)", s.ChatID)
 	chatPeer, err := Bot.ResolvePeer(s.ChatID)
 	if err != nil {
 		return err
@@ -307,15 +307,15 @@ func (s *ChatState) ensureAssistant() error {
 		return nil
 	}
 	if Assistants == nil || Assistants.Count() == 0 {
-		gologging.ErrorF("chat_state: no assistants available for %d", s.ChatID)
+		logger.Errorf("chat_state: no assistants available for %d", s.ChatID)
 		return ErrAssistantNotAvailable
 	}
 	ass, err := Assistants.ForChat(s.ChatID)
 	if err != nil {
-		gologging.ErrorF("chat_state: Assistants.ForChat failed for %d: %v", s.ChatID, err)
+		logger.Errorf("chat_state: Assistants.ForChat failed for %d: %v", s.ChatID, err)
 		return fmt.Errorf("%w: %v", ErrAssistantNotAvailable, err)
 	}
-	gologging.InfoF("chat_state: assistant assigned for %d", s.ChatID)
+	logger.Infof("chat_state: assistant assigned for %d", s.ChatID)
 	s.mu.Lock()
 	s.Assistant = ass
 	s.mu.Unlock()
@@ -331,7 +331,7 @@ func (s *ChatState) applySnapshot(p, b, v bool) {
 }
 
 func (s *ChatState) leaveInactiveAssistantChats(limit int) {
-	gologging.DebugF("chat_state: leaveInactiveAssistantChats(chat=%d, limit=%d)", s.ChatID, limit)
+	logger.Debugf("chat_state: leaveInactiveAssistantChats(chat=%d, limit=%d)", s.ChatID, limit)
 	if s.Assistant == nil || s.Assistant.Client == nil || limit <= 0 {
 		return
 	}
@@ -370,7 +370,7 @@ func (s *ChatState) leaveInactiveAssistantChats(limit int) {
 	})
 
 	if err != nil && err != telegram.ErrStopIteration {
-		gologging.WarnF("chat_state: IterDialogs failed while auto-leaving chats: %v", err)
+		logger.Warnf("chat_state: IterDialogs failed while auto-leaving chats: %v", err)
 	}
 }
 

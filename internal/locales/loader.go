@@ -24,8 +24,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/Laky-64/gologging"
 	"gopkg.in/yaml.v3"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 )
@@ -93,7 +93,7 @@ func Get(lang, key string, values Arg) string {
 	}
 
 	if !found {
-		gologging.ErrorF("Missing translation → lang=%s key=%s", lang, key)
+		logger.Errorf("Missing translation → lang=%s key=%s", lang, key)
 
 		return fmt.Sprintf("[%s]", key)
 	}

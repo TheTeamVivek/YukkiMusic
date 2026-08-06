@@ -26,8 +26,8 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -75,7 +75,7 @@ func (f *FallenApiPlatform) Download(
 	track.Video = false
 
 	if p := findFile(track); p != "" {
-		gologging.Debug("FallenApi: cache hit " + p)
+		logger.Debug("FallenApi: cache hit " + p)
 		return p, nil
 	}
 

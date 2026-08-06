@@ -28,8 +28,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	state "yukkimusic/internal/core/models"
 	"yukkimusic/internal/utils"
@@ -148,7 +148,7 @@ func (s *SoundCloudPlatform) Download(
 		return "", errors.New("yt-dlp produced no output file")
 	}
 
-	gologging.InfoF("SoundCloud: downloaded %s", track.Title)
+	logger.Infof("SoundCloud: downloaded %s", track.Title)
 	return p, nil
 }
 
@@ -178,7 +178,7 @@ func (s *SoundCloudPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) 
 		for _, line := range lines {
 			var entry ytdlpInfo
 			if err := json.Unmarshal([]byte(line), &entry); err != nil {
-				gologging.DebugF("SoundCloud: skip bad entry: %v", err)
+				logger.Debugf("SoundCloud: skip bad entry: %v", err)
 				continue
 			}
 			info.Entries = append(info.Entries, entry)

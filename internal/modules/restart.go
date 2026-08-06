@@ -24,8 +24,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -67,7 +67,7 @@ func handleRestart(m *tg.NewMessage) error {
 func performRestart(m *tg.NewMessage, chatID int64) error {
 	statusMsg, err := m.Reply(F(chatID, "restart"))
 	if err != nil {
-		gologging.Error("Failed to send restart message: " + err.Error())
+		logger.Error("Failed to send restart message: " + err.Error())
 	}
 	return executeRestart(m.Client, chatID, statusMsg)
 }

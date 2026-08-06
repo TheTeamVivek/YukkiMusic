@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"resty.dev/v3"
+	"yukkimusic/internal/logger"
 )
 
 const batbinBaseURL = "https://batbin.me/"
@@ -42,18 +42,18 @@ func CreatePaste(content string) (string, error) {
 		SetResult(&result).
 		Post(batbinBaseURL + "api/v2/paste")
 	if err != nil {
-		gologging.Error("batbin request error: " + err.Error())
+		logger.Error("batbin request error: " + err.Error())
 		return "", err
 	}
 
 	if resp.StatusCode() != 200 {
-		gologging.Error("batbin bad response: " + resp.String())
+		logger.Error("batbin bad response: " + resp.String())
 		return "", fmt.Errorf("batbin returned status %d", resp.StatusCode())
 	}
 
 	if !result.Success {
 		err := fmt.Errorf("batbin paste failed")
-		gologging.Error(err.Error())
+		logger.Error(err.Error())
 		return "", err
 	}
 

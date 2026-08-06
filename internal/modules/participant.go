@@ -21,8 +21,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -67,7 +67,7 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 
 	state, err := core.GetChatState(chatID)
 	if err != nil {
-		gologging.Error("Failed to get chat state: " + err.Error())
+		logger.Error("Failed to get chat state: " + err.Error())
 		state = nil
 	}
 
@@ -76,7 +76,7 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 	oldStatus := getParticipantStatus(p.Old)
 	newStatus := getParticipantStatus(p.New)
 
-	/*gologging.DebugF(
+	/*logger.Debugf(
 		"participant change %d: %s -> %s",
 		userID,
 		oldStatus,
@@ -155,7 +155,7 @@ func handleSudoJoin(p *telegram.ParticipantUpdate, chatID int64) {
 	} else {
 		isSudo, err := database.IsSudo(userID)
 		if err != nil {
-			gologging.ErrorF("IsSudo failed for user %d: %v", userID, err)
+			logger.Errorf("IsSudo failed for user %d: %v", userID, err)
 			return
 		}
 		if !isSudo {
@@ -182,12 +182,12 @@ func handleAssistantRestriction(
 		s.SetAssistantPresent(true)
 		s.SetAssistantBanned(false)
 
-		gologging.Debug("Assistant muted in " + utils.IntToStr(chatID))
+		logger.Debug("Assistant muted in " + utils.IntToStr(chatID))
 
 		return
 	}
 
-	gologging.Debug("Assistant banned in " + utils.IntToStr(chatID))
+	logger.Debug("Assistant banned in " + utils.IntToStr(chatID))
 
 	s.SetAssistantPresent(false)
 	if room, ok := core.GetRoom(chatID, nil, false); ok {

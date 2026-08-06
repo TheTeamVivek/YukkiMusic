@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 )
 
 func EOR(
@@ -31,7 +31,7 @@ func EOR(
 	opts ...*telegram.SendOptions,
 ) (m *telegram.NewMessage, err error) {
 	if msg == nil {
-		gologging.Error("[EOR] nil msg at " + callerInfo(2))
+		logger.Error("[EOR] nil msg at " + callerInfo(2))
 		return nil, nil
 	}
 
@@ -42,7 +42,7 @@ func EOR(
 	}
 
 	if err != nil {
-		gologging.Error(
+		logger.Error(
 			"[EOR] " + err.Error() +
 				" | called from " + callerInfo(2),
 		)

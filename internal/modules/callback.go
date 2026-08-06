@@ -24,8 +24,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/database"
@@ -67,14 +67,14 @@ func roomHandle(cb *tg.CallbackQuery) error {
 
 	parts := strings.SplitN(cb.DataString(), ":", 3)
 	if len(parts) != 3 || parts[0] != "room" {
-		gologging.WarnF("Invalid room callback payload: %s", cb.DataString())
+		logger.Warnf("Invalid room callback payload: %s", cb.DataString())
 		cb.Answer(F(chatID, "invalid_request"), opt)
 		cb.Delete()
 		return tg.ErrEndGroup
 	}
 	roomID, err := strconv.ParseInt(parts[1], 10, 64)
 	if err != nil {
-		gologging.WarnF("Invalid roomID in callback: %s", parts[1])
+		logger.Warnf("Invalid roomID in callback: %s", parts[1])
 		cb.Answer(F(chatID, "invalid_request"), opt)
 		cb.Delete()
 		return tg.ErrEndGroup
@@ -119,7 +119,7 @@ func roomHandle(cb *tg.CallbackQuery) error {
 	case action == "unmute":
 		return handleUnmuteAction(cb, r)
 	default:
-		gologging.WarnF("Unknown callback action: %s", action)
+		logger.Warnf("Unknown callback action: %s", action)
 		cb.Answer(F(chatID, "unknown_action"), opt)
 	}
 
@@ -144,7 +144,7 @@ func checkAdminOrAuth(cb *tg.CallbackQuery, chatID int64) bool {
 func handlePauseAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	opt := &tg.CallbackOptions{Alert: true}
 	chatID := cb.ChannelID()
-	gologging.InfoF("Callback → pause, chatID=%d", chatID)
+	logger.Infof("Callback → pause, chatID=%d", chatID)
 
 	if r.IsPaused() {
 		cb.Answer(F(chatID, "room_already_paused"), opt)
@@ -152,7 +152,7 @@ func handlePauseAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	}
 
 	if _, err := r.Pause(); err != nil {
-		gologging.ErrorF("Pause failed: %v", err)
+		logger.Errorf("Pause failed: %v", err)
 		cb.Answer(F(chatID, "room_pause_failed", locales.Arg{
 			"error": err.Error(),
 		}), opt)
@@ -173,7 +173,7 @@ func handlePauseAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 func handleResumeAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	opt := &tg.CallbackOptions{Alert: true}
 	chatID := cb.ChannelID()
-	gologging.InfoF("Callback → resume, chatID=%d", chatID)
+	logger.Infof("Callback → resume, chatID=%d", chatID)
 
 	if !r.IsPaused() {
 		cb.Answer(F(chatID, "cb_already_playing"), opt)
@@ -181,7 +181,7 @@ func handleResumeAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	}
 
 	if _, err := r.Resume(); err != nil {
-		gologging.ErrorF("Resume failed: %v", err)
+		logger.Errorf("Resume failed: %v", err)
 		cb.Answer(F(chatID, "cb_resume_failed"), opt)
 		return tg.ErrEndGroup
 	}
@@ -196,16 +196,16 @@ func handleResumeAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 func handleReplayAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	opt := &tg.CallbackOptions{Alert: true}
 	chatID := cb.ChannelID()
-	gologging.InfoF("Callback → replay, chatID=%d", chatID)
+	logger.Infof("Callback → replay, chatID=%d", chatID)
 
 	statusMsg, err := cb.Respond(F(chatID, "cb_replaying"))
 	if err != nil {
-		gologging.ErrorF("Failed to send replay status: %v", err)
+		logger.Errorf("Failed to send replay status: %v", err)
 		return tg.ErrEndGroup
 	}
 
 	if err := r.Replay(); err != nil {
-		gologging.ErrorF("Replay failed: %v", err)
+		logger.Errorf("Replay failed: %v", err)
 		utils.EOR(statusMsg, F(chatID, "replay_failed", locales.Arg{
 			"error": err.Error(),
 		}))
@@ -236,7 +236,7 @@ func handleReplayAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	if _, err := cb.Edit(F(chatID, "cb_replay_edited", locales.Arg{
 		"user": utils.MentionHTML(cb.Sender),
 	})); err != nil {
-		gologging.ErrorF("Edit error: %v", err)
+		logger.Errorf("Edit error: %v", err)
 	}
 	return tg.ErrEndGroup
 }
@@ -244,7 +244,7 @@ func handleReplayAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	opt := &tg.CallbackOptions{Alert: true}
 	chatID := cb.ChannelID()
-	gologging.InfoF("Callback → skip, chatID=%d", chatID)
+	logger.Infof("Callback → skip, chatID=%d", chatID)
 
 	if len(r.Queue()) == 0 {
 		scheduleOldPlayingMessage(r)
@@ -252,7 +252,7 @@ func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 		if _, err := cb.Edit(F(chatID, "skip_stopped", locales.Arg{
 			"user": utils.MentionHTML(cb.Sender),
 		})); err != nil {
-			gologging.ErrorF("Edit error: %v", err)
+			logger.Errorf("Edit error: %v", err)
 		}
 		cb.Answer(F(chatID, "cb_skip_queue_empty"), opt)
 		return tg.ErrEndGroup
@@ -263,12 +263,12 @@ func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 
 	statusMsg, err := cb.Respond(F(chatID, "stream_downloading_next"))
 	if err != nil {
-		gologging.ErrorF("Failed to send status message: %v", err)
+		logger.Errorf("Failed to send status message: %v", err)
 	}
 
 	path, err := platforms.Download(context.Background(), t, statusMsg)
 	if err != nil {
-		gologging.ErrorF("Download failed for %s: %v", t.URL, err)
+		logger.Errorf("Download failed for %s: %v", t.URL, err)
 		utils.EOR(statusMsg, F(chatID, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
 		}))
@@ -279,7 +279,7 @@ func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	}
 
 	if err := r.Play(t, path); err != nil {
-		gologging.ErrorF("Play error: %v", err)
+		logger.Errorf("Play error: %v", err)
 		utils.EOR(statusMsg, F(chatID, "stream_play_fail"))
 		cb.Answer(F(chatID, "cb_skip_play_failed"), opt)
 		scheduleOldPlayingMessage(r)
@@ -323,7 +323,7 @@ func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 func handleStopAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	opt := &tg.CallbackOptions{Alert: true}
 	chatID := cb.ChannelID()
-	gologging.InfoF("Callback → stop, chatID=%d", chatID)
+	logger.Infof("Callback → stop, chatID=%d", chatID)
 
 	scheduleOldPlayingMessage(r)
 	core.DeleteRoom(r.ID)
@@ -332,7 +332,7 @@ func handleStopAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	if _, err := cb.Edit(F(chatID, "stopped", locales.Arg{
 		"user": utils.MentionHTML(cb.Sender),
 	})); err != nil {
-		gologging.ErrorF("Edit error: %v", err)
+		logger.Errorf("Edit error: %v", err)
 	}
 	return tg.ErrEndGroup
 }
@@ -470,6 +470,6 @@ func updatePlaybackMessage(cb *tg.CallbackQuery, r *core.RoomState, state string
 		ParseMode:   "HTML",
 		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
 	}); err != nil {
-		gologging.ErrorF("Edit error: %v", err)
+		logger.Errorf("Edit error: %v", err)
 	}
 }

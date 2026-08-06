@@ -21,8 +21,8 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/database"
@@ -62,7 +62,7 @@ func setCPlayHandler(m *tg.NewMessage) error {
 
 	member, err := m.Client.GetChatMember(targetChannelID, m.Client.Me().ID)
 	if err != nil {
-		gologging.ErrorF("Failed to fetch bot member state for cplay target %d: %v", targetChannelID, err)
+		logger.Errorf("Failed to fetch bot member state for cplay target %d: %v", targetChannelID, err)
 		m.Reply(F(chatID, "cplay_channel_not_accessible"))
 		return tg.ErrEndGroup
 	}
@@ -90,7 +90,7 @@ func disableCPlay(m *tg.NewMessage, chatID int64) error {
 	}
 
 	if err := database.LinkChannel(chatID, 0); err != nil {
-		gologging.ErrorF("Failed to disable cplay for chat %d: %v", chatID, err)
+		logger.Errorf("Failed to disable cplay for chat %d: %v", chatID, err)
 		m.Reply(F(chatID, "cplay_save_error"))
 		return tg.ErrEndGroup
 	}
@@ -126,7 +126,7 @@ func getLinkedChannelID(m *tg.NewMessage, chatID int64) (int64, error) {
 func resolveChannelPlay(m *tg.NewMessage, chatID int64, target any) (int64, error) {
 	peer, err := m.Client.ResolvePeer(target)
 	if err != nil {
-		gologging.ErrorF("Failed to resolve cplay target %v for chat %d: %v", target, chatID, err)
+		logger.Errorf("Failed to resolve cplay target %v for chat %d: %v", target, chatID, err)
 		return 0, errors.New(F(chatID, "cplay_channel_not_accessible"))
 	}
 
@@ -139,7 +139,7 @@ func resolveChannelPlay(m *tg.NewMessage, chatID int64, target any) (int64, erro
 		&tg.InputChannelObj{ChannelID: chPeer.ChannelID, AccessHash: chPeer.AccessHash},
 	)
 	if err != nil || fullChat == nil {
-		gologging.ErrorF("Failed to get full channel for cplay target %v: %v", target, err)
+		logger.Errorf("Failed to get full channel for cplay target %v: %v", target, err)
 		return 0, errors.New(F(chatID, "cplay_channel_not_accessible"))
 	}
 
@@ -158,7 +158,7 @@ func saveCPlayTarget(m *tg.NewMessage, chatID, channelID int64) error {
 	}
 
 	if err := database.LinkChannel(chatID, channelID); err != nil {
-		gologging.ErrorF("Failed to set cplay ID for chat %d: %v", chatID, err)
+		logger.Errorf("Failed to set cplay ID for chat %d: %v", chatID, err)
 		m.Reply(F(chatID, "cplay_save_error"))
 		return tg.ErrEndGroup
 	}
@@ -175,7 +175,7 @@ func canSetCPlayTarget(m *tg.NewMessage, sourceChatID, targetChatID int64) (bool
 
 	sourceOwnerID, err := utils.GetChatOwner(m.Client, sourceChatID)
 	if err != nil {
-		gologging.ErrorF("Failed to get source chat owner for %d: %v", sourceChatID, err)
+		logger.Errorf("Failed to get source chat owner for %d: %v", sourceChatID, err)
 		return false, errors.New(F(sourceChatID, "cplay_owner_check_failed"))
 	}
 	if sourceOwnerID != 0 && sourceOwnerID == userID {
@@ -184,7 +184,7 @@ func canSetCPlayTarget(m *tg.NewMessage, sourceChatID, targetChatID int64) (bool
 
 	targetOwnerID, err := utils.GetChatOwner(m.Client, targetChatID)
 	if err != nil {
-		gologging.ErrorF("Failed to get target chat owner for %d: %v", targetChatID, err)
+		logger.Errorf("Failed to get target chat owner for %d: %v", targetChatID, err)
 		return false, errors.New(F(sourceChatID, "cplay_owner_check_failed"))
 	}
 	return targetOwnerID != 0 && targetOwnerID == userID, nil

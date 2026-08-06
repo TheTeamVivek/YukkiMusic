@@ -23,8 +23,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/database"
@@ -70,7 +70,7 @@ func handleAddSudo(m *telegram.NewMessage) error {
 		m.Reply(F(chatID, "sudo_fetch_user_fail", locales.Arg{
 			"error": err.Error(),
 		}))
-		gologging.Error("Failed to get user: " + err.Error())
+		logger.Error("Failed to get user: " + err.Error())
 		return telegram.ErrEndGroup
 	}
 
@@ -131,7 +131,7 @@ func handleAddSudo(m *telegram.NewMessage) error {
 			"",
 			sudoCommands,
 		); err != nil {
-			gologging.Error("Failed to set PrivateSudoCommands " + err.Error())
+			logger.Error("Failed to set PrivateSudoCommands " + err.Error())
 		}
 	}
 
@@ -202,7 +202,7 @@ func handleDelSudo(m *telegram.NewMessage) error {
 		},
 		"",
 	); err != nil {
-		gologging.Error("Failed to reset sudo commands: " + err.Error())
+		logger.Error("Failed to reset sudo commands: " + err.Error())
 	}
 
 	// Delete from DB

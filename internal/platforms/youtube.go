@@ -25,8 +25,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	state "yukkimusic/internal/core/models"
@@ -198,7 +198,7 @@ func (p *YouTubePlatform) handleCombined(rawURL, videoID string) ([]*state.Track
 		return vTracks, nil
 	}
 	if pErr == nil {
-		gologging.WarnF("[YouTube] video fetch failed for %s: %v", videoID, vErr)
+		logger.Warnf("[YouTube] video fetch failed for %s: %v", videoID, vErr)
 		return pTracks, nil
 	}
 	return nil, fmt.Errorf("video (%v) and playlist (%v) both failed", vErr, pErr)
@@ -257,7 +257,7 @@ func (p *YouTubePlatform) extractVideoID(u string) string {
 }
 
 func (p *YouTubePlatform) performSearch(query string, limit int) ([]*state.Track, error) {
-	gologging.DebugF("[YouTube] search: %s", query)
+	logger.Debugf("[YouTube] search: %s", query)
 	var result map[string]any
 
 	payload := map[string]any{
@@ -292,7 +292,7 @@ func (p *YouTubePlatform) performSearch(query string, limit int) ([]*state.Track
 }
 
 func (p *YouTubePlatform) fetchVideo(videoID string) (*state.Track, error) {
-	gologging.DebugF("[YouTube] fetchVideo: %s", videoID)
+	logger.Debugf("[YouTube] fetchVideo: %s", videoID)
 	var result map[string]any
 
 	payload := map[string]any{
@@ -326,7 +326,7 @@ func (p *YouTubePlatform) fetchVideo(videoID string) (*state.Track, error) {
 }
 
 func (p *YouTubePlatform) fetchPlaylist(playlistID string, limit int) ([]*state.Track, error) {
-	gologging.DebugF("[YouTube] fetchPlaylist: %s", playlistID)
+	logger.Debugf("[YouTube] fetchPlaylist: %s", playlistID)
 	var result map[string]any
 
 	browseID := playlistID
@@ -354,7 +354,7 @@ func (p *YouTubePlatform) fetchPlaylist(playlistID string, limit int) ([]*state.
 }
 
 func (p *YouTubePlatform) fetchMixPlaylist(playlistID string, limit int) ([]*state.Track, error) {
-	gologging.DebugF("[YouTube] fetchMix: %s", playlistID)
+	logger.Debugf("[YouTube] fetchMix: %s", playlistID)
 	var result map[string]any
 
 	payload := map[string]any{

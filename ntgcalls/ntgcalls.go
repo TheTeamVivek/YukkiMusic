@@ -19,7 +19,7 @@ import (
 	"sync"
 	"unsafe"
 
-	"github.com/Laky-64/gologging"
+	"yukkimusic/internal/logger"
 )
 
 var clientRegistry = struct {
@@ -113,7 +113,7 @@ func handleLogs(logMessage C.ntg_log_message_struct) {
 	} else {
 		loggerName = "ntgcalls"
 	}
-	loggerInstance := gologging.GetLogger(loggerName)
+	loggerInstance := logger.GetLogger(loggerName)
 	switch logMessage.level {
 	case C.NTG_LOG_DEBUG:
 		loggerInstance.Debug(message)

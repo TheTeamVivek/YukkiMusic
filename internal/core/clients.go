@@ -25,8 +25,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/ubot"
@@ -42,12 +42,12 @@ var (
 // Init initializes the bot and assistant clients.
 // It returns a shutdown function and an error if initialization fails.
 func Init() (func(), error) {
-	gologging.Info("Starting bot client...")
+	logger.Info("Starting bot client...")
 	if err := initBot(); err != nil {
 		return nil, fmt.Errorf("bot initialization: %w", err)
 	}
 
-	gologging.Info("Starting assistant clients...")
+	logger.Info("Starting assistant clients...")
 	if err := initAssistants(); err != nil {
 		return nil, fmt.Errorf("assistants initialization: %w", err)
 	}
@@ -55,16 +55,16 @@ func Init() (func(), error) {
 	Bot.SetCommandPrefixes("/")
 
 	shutdown := func() {
-		gologging.Info("Stopping bot...")
+		logger.Info("Stopping bot...")
 		Bot.Stop()
 
-		gologging.Info("Shutting down assistants...")
+		logger.Info("Shutting down assistants...")
 		Assistants.ForEach(func(a *Assistant) {
 			a.Ntg.Close()
 			a.Client.Stop()
 		})
 
-		gologging.Info("Shutdown complete.")
+		logger.Info("Shutdown complete.")
 	}
 
 	return shutdown, nil
@@ -105,7 +105,7 @@ func initBot() error {
 		)
 	}
 
-	gologging.InfoF("Bot started as @%s", user.Username)
+	logger.Infof("Bot started as @%s", user.Username)
 
 	Bot = client
 	return nil
@@ -115,7 +115,7 @@ func initAssistants() error {
 	assistantList := make([]*Assistant, 0, len(config.StringSessions))
 
 	for i, sessionStr := range config.StringSessions {
-		gologging.InfoF("Initializing assistant[%d]...", i)
+		logger.Infof("Initializing assistant[%d]...", i)
 
 		assistant, err := initAssistant(sessionStr, i)
 		if err != nil {
@@ -138,13 +138,13 @@ func initAssistants() error {
 		assistant.Client.JoinChannel("TheTeamVivek")
 
 		if assistant.Self.Username != "" {
-			gologging.InfoF(
+			logger.Infof(
 				"Assistant[%d] started as @%s",
 				i,
 				assistant.Self.Username,
 			)
 		} else {
-			gologging.InfoF("Assistant[%d] started as %s", i, assistant.Self.FirstName)
+			logger.Infof("Assistant[%d] started as %s", i, assistant.Self.FirstName)
 		}
 	}
 
@@ -198,11 +198,11 @@ func handleFlood(err error) bool {
 	}
 
 	if wait > 10 {
-		gologging.WarnF("Flood wait too long, skipping sleep %d seconds", wait)
+		logger.Warnf("Flood wait too long, skipping sleep %d seconds", wait)
 		return false
 	}
 
-	gologging.WarnF("Flood wait detected, sleeping %d seconds", wait)
+	logger.Warnf("Flood wait detected, sleeping %d seconds", wait)
 	time.Sleep(time.Duration(wait) * time.Second)
 	return true
 }

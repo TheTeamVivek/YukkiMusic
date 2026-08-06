@@ -23,7 +23,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Laky-64/gologging"
+	"yukkimusic/internal/logger"
 
 	state "yukkimusic/internal/core/models"
 	"yukkimusic/ntgcalls"
@@ -195,7 +195,7 @@ func (r *RoomState) Stop() error {
 	}
 
 	_, file, line, _ := runtime.Caller(1)
-	gologging.DebugF("Stop Called from %s:%d", file, line)
+	logger.Debugf("Stop Called from %s:%d", file, line)
 
 	err := r.Assistant.Ntg.Stop(r.ID)
 

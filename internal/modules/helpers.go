@@ -25,8 +25,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -110,7 +110,7 @@ func shouldShowThumb(chatID int64) bool {
 func F(chatID int64, key string, values ...locales.Arg) string {
 	lang, err := database.Language(chatID)
 	if err != nil {
-		gologging.ErrorF("failed to get language for %d: %v", chatID, err)
+		logger.Errorf("failed to get language for %d: %v", chatID, err)
 		lang = config.DefaultLang
 	}
 	return FWithLang(lang, key, values...)
@@ -127,7 +127,7 @@ func FWithLang(lang, key string, values ...locales.Arg) string {
 func isLoggerEnabled() bool {
 	l, err := database.IsLoggerEnabled()
 	if err != nil {
-		gologging.ErrorF("failed to check if logger is enabled: %v", err)
+		logger.Errorf("failed to check if logger is enabled: %v", err)
 		return false
 	}
 	return l
@@ -189,7 +189,7 @@ func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
 
 	_, err := core.Bot.SendMessage(config.LoggerID, text, opts)
 	if err != nil {
-		gologging.Error("failed to send logger msg: " + err.Error())
+		logger.Error("failed to send logger msg: " + err.Error())
 	}
 }
 
@@ -245,7 +245,7 @@ func warnAndLeave(client *tg.Client, chatID int64) {
 		LinkPreview: false,
 	})
 	if err != nil {
-		gologging.ErrorF("failed to send supergroup conversion message to chat %d: %v", chatID, err)
+		logger.Errorf("failed to send supergroup conversion message to chat %d: %v", chatID, err)
 		return
 	}
 
@@ -258,7 +258,7 @@ func leaveChat(client *tg.Client, chatID int64) {
 	go func() {
 		time.Sleep(1 * time.Second)
 		if err := client.LeaveChannel(chatID); err != nil {
-			gologging.ErrorF("failed to leave blacklisted chatID=%d: %v", chatID, err)
+			logger.Errorf("failed to leave blacklisted chatID=%d: %v", chatID, err)
 		}
 		core.Assistants.WithAssistant(
 			chatID,

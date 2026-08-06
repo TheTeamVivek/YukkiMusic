@@ -25,8 +25,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -262,7 +262,7 @@ func prepareRoomAndSearchMessage(
 
 	replyMsg, err := m.Reply(statusText)
 	if err != nil {
-		gologging.ErrorF("Failed to send searching message: %v", err)
+		logger.Errorf("Failed to send searching message: %v", err)
 		return nil, nil, err
 	}
 
@@ -295,7 +295,7 @@ func fetchTracksAndCheckStatus(
 
 	chatState, err := core.GetChatState(r.ID)
 	if err != nil {
-		gologging.ErrorF("Error getting chat state: %v", err)
+		logger.Errorf("Error getting chat state: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
 		return nil, false, err
 	}
@@ -328,7 +328,7 @@ func ensureVoiceChatReady(
 ) error {
 	snap, err := cs.Snapshot(false)
 	if err != nil {
-		gologging.ErrorF("Error checking voicechat state: %v", err)
+		logger.Errorf("Error checking voicechat state: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(chatID, err))
 		return err
 	}
@@ -356,7 +356,7 @@ func ensureVoiceChatReady(
 		username = replyMsg.Channel.Username
 	}
 	if err := cs.EnsureAssistantJoined(username); err != nil {
-		gologging.ErrorF("Error joining assistant: %v", err)
+		logger.Errorf("Error joining assistant: %v", err)
 		utils.EOR(replyMsg, getErrorMessage(chatID, err))
 		return err
 	}
@@ -406,7 +406,7 @@ func filterAndTrimTracks(
 	availableSlots := config.QueueLimit - len(r.Queue())
 	if availableSlots < len(accepted) {
 		accepted = accepted[:availableSlots]
-		gologging.WarnF(
+		logger.Warnf(
 			"Queue full — adding only %d tracks out of requested.",
 			availableSlots,
 		)
@@ -529,7 +529,7 @@ func downloadFirstTrack(
 		return "", err
 	}
 
-	gologging.InfoF("Downloaded track to %s", path)
+	logger.Infof("Downloaded track to %s", path)
 	return path, nil
 }
 
@@ -661,7 +661,7 @@ func playTrackWithRetry(
 ) error {
 	for attempt := 1; attempt <= playMaxRetries; attempt++ {
 		if r.IsDestroyed() {
-			gologging.Info("Room destroyed during retry, aborting")
+			logger.Info("Room destroyed during retry, aborting")
 			replyMsg.Delete()
 			return tg.ErrEndGroup
 		}
@@ -669,7 +669,7 @@ func playTrackWithRetry(
 		err := r.Play(track, filePath, force)
 		if err == nil {
 			if attempt > 1 {
-				gologging.Info(
+				logger.Info(
 					"Successfully played after retry attempt " + utils.IntToStr(attempt),
 				)
 			}
@@ -685,7 +685,7 @@ func playTrackWithRetry(
 		}
 
 		if attempt == playMaxRetries {
-			gologging.Error(
+			logger.Error(
 				"❌ Failed to play after " + utils.IntToStr(
 					playMaxRetries,
 				) + " attempts. Error: " + err.Error(),
@@ -697,7 +697,7 @@ func playTrackWithRetry(
 			return err
 		}
 
-		gologging.Error(
+		logger.Error(
 			"Unexpected error occurred. Retrying... (attempt " + utils.IntToStr(
 				attempt,
 			) + "): " + err.Error(),
@@ -714,7 +714,7 @@ func handlePlayAttemptError(
 	room *core.RoomState,
 ) (bool, error) {
 	if wait := tg.GetFloodWait(err); wait > 0 {
-		gologging.Error(
+		logger.Error(
 			"FloodWait detected (" + strconv.Itoa(
 				wait,
 			) + "s). Retrying... (attempt " + utils.IntToStr(
@@ -726,7 +726,7 @@ func handlePlayAttemptError(
 	}
 
 	if errors.Is(err, ubot.ErrConnectionTimeout) {
-		gologging.Error("Voice connection timeout. Stopping call session...")
+		logger.Error("Voice connection timeout. Stopping call session...")
 		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_connection_timeout"))
 		core.DeleteRoom(room.ID)
 		return true, tg.ErrEndGroup
@@ -745,14 +745,14 @@ func handlePlayAttemptError(
 	}
 
 	if tg.MatchError(err, "GROUPCALL_INVALID") {
-		gologging.Error("GROUPCALL_INVALID err occurred. Returning...")
+		logger.Error("GROUPCALL_INVALID err occurred. Returning...")
 		core.DeleteRoom(room.ID)
 		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_unable"))
 		return true, tg.ErrEndGroup
 	}
 
 	if tg.MatchError(err, "INTERDC_X_CALL_ERROR") {
-		gologging.Error(
+		logger.Error(
 			"INTERDC_X_CALL_ERROR occurred. Retrying... (attempt " + utils.IntToStr(
 				attempt,
 			) + ")",

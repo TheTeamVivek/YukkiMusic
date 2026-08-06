@@ -24,8 +24,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	_ "github.com/joho/godotenv/autoload"
+	"yukkimusic/internal/logger"
 )
 
 var (
@@ -71,7 +71,7 @@ var (
 	LogFileName = "logs.txt"
 	LogWriter   io.Writer
 
-	logger  = gologging.GetLogger("config")
+	logr    = logger.GetLogger("config")
 	logFile *os.File
 )
 
@@ -121,7 +121,7 @@ func validateConfig() error {
 	}
 
 	if SpotifyClientID == "" || SpotifyClientSecret == "" {
-		logger.Warn("Spotify credentials not configured; Spotify links will be unavailable")
+		logr.Warn("Spotify credentials not configured; Spotify links will be unavailable")
 	}
 
 	return nil

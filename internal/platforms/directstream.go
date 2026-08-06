@@ -29,8 +29,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	state "yukkimusic/internal/core/models"
 )
@@ -130,7 +130,7 @@ func (d *DirectStreamPlatform) Get(query string, video bool) ([]*state.Track, er
 		}
 	}
 
-	gologging.InfoF("DirectStream: %s (audio:%v video:%v size:%d dur:%d)",
+	logger.Infof("DirectStream: %s (audio:%v video:%v size:%d dur:%d)",
 		track.Title, info.IsAudio, info.IsVideo, info.Size, track.Duration)
 
 	return []*state.Track{track}, nil
@@ -145,7 +145,7 @@ func (d *DirectStreamPlatform) Download(
 	track *state.Track,
 	_ *telegram.NewMessage,
 ) (string, error) {
-	gologging.InfoF("DirectStream: returning URL for streaming: %s", track.URL)
+	logger.Infof("DirectStream: returning URL for streaming: %s", track.URL)
 	return track.URL, nil
 }
 

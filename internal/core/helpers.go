@@ -25,7 +25,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Laky-64/gologging"
+	"yukkimusic/internal/logger"
 )
 
 func normalizeVideo(path string, speed float64) (int, int, int, string) {
@@ -82,13 +82,13 @@ func getVideoDimensions(filePath string) (int, int) {
 
 	out, err := cmd.Output()
 	if ctx.Err() == context.DeadlineExceeded {
-		gologging.Error(
+		logger.Error(
 			"[getVideoDimensions] ffprobe timed out for " + filePath,
 		)
 		return 0, 0
 	}
 	if err != nil {
-		gologging.Error(
+		logger.Error(
 			"[getVideoDimensions] ffprobe failed for " + filePath + " : " + err.Error(),
 		)
 		return 0, 0
@@ -96,7 +96,7 @@ func getVideoDimensions(filePath string) (int, int) {
 
 	var probe ffprobeOutput
 	if err := json.Unmarshal(out, &probe); err != nil {
-		gologging.Error(
+		logger.Error(
 			"[getVideoDimensions] failed to parse ffprobe JSON for " + filePath + " : " + err.Error(),
 		)
 		return 0, 0
@@ -114,7 +114,7 @@ func getVideoDimensions(filePath string) (int, int) {
 		}
 	}
 
-	gologging.Error(
+	logger.Error(
 		"[getVideoDimensions] no valid video stream found for " + filePath,
 	)
 	return 0, 0

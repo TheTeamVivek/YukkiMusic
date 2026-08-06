@@ -20,8 +20,8 @@ package modules
 import (
 	"strings"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/database"
@@ -104,7 +104,7 @@ func langCallbackHandler(cb *telegram.CallbackQuery) error {
 	langName := locales.Get(lang, "name", nil)
 
 	if err := database.SetLanguage(chatID, lang); err != nil {
-		gologging.ErrorF("SetChatLanguage error: %v", err)
+		logger.Errorf("SetChatLanguage error: %v", err)
 		cb.Answer(F(chatID, "lang_fail"), opt)
 		return telegram.ErrEndGroup
 	}

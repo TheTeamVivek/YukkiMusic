@@ -26,11 +26,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 	"golang.org/x/oauth2/clientcredentials"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	state "yukkimusic/internal/core/models"
@@ -138,14 +138,14 @@ func (s *SpotifyPlatform) resolveToYouTube(track *state.Track) (*state.Track, er
 
 	queries := buildSearchQueries(track.Title)
 	for i, q := range queries {
-		gologging.DebugF("[Spotify→YouTube] attempt %d: %q", i+1, q)
+		logger.Debugf("[Spotify→YouTube] attempt %d: %q", i+1, q)
 		results, err := ytp.VideoSearch(q, true)
 		if err != nil || len(results) == 0 {
 			continue
 		}
 		t := results[0]
 		t.Video = track.Video
-		gologging.DebugF("[Spotify→YouTube] matched %q → %s", q, t.URL)
+		logger.Debugf("[Spotify→YouTube] matched %q → %s", q, t.URL)
 		return t, nil
 	}
 

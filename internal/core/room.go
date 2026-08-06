@@ -27,8 +27,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	state "yukkimusic/internal/core/models"
 )
@@ -75,7 +75,7 @@ type RoomState struct {
 
 func DeleteRoom(chatID int64) bool {
 	_, file, line, _ := runtime.Caller(1)
-	gologging.DebugF("DeleteRoom called from %s:%d", file, line)
+	logger.Debugf("DeleteRoom called from %s:%d", file, line)
 
 	roomsMu.Lock()
 	room, ok := rooms[chatID]
@@ -530,7 +530,7 @@ func scheduleRemove(track *state.Track, skipChatID int64) {
 		doRemove(&t, skipChatID)
 	})
 
-	gologging.DebugF(
+	logger.Debugf(
 		"scheduled file removal in %s: %s:%s",
 		FileCacheDuration, string(track.Source), track.ID,
 	)
@@ -542,7 +542,7 @@ func doRemove(track *state.Track, skipChatID int64) {
 	roomsMu.RUnlock()
 
 	if used {
-		gologging.DebugF(
+		logger.Debugf(
 			"file still in use, skipped remove: %s:%s",
 			string(track.Source), track.ID,
 		)
@@ -565,6 +565,6 @@ func findAndRemove(track *state.Track) {
 
 	for _, f := range files {
 		os.Remove(f)
-		gologging.DebugF("removed file: %s", f)
+		logger.Debugf("removed file: %s", f)
 	}
 }

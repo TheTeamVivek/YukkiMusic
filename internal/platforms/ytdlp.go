@@ -29,8 +29,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config/cookies"
 	state "yukkimusic/internal/core/models"
@@ -140,7 +140,7 @@ func (y *YtdlpPlatform) Download(
 	_ *telegram.NewMessage,
 ) (string, error) {
 	if f := findFile(track); f != "" {
-		gologging.Debug("YtDlp: cache hit " + f)
+		logger.Debug("YtDlp: cache hit " + f)
 		return f, nil
 	}
 
@@ -201,7 +201,7 @@ func (y *YtdlpPlatform) Download(
 		return "", errors.New("yt-dlp produced no output file")
 	}
 
-	gologging.InfoF("YtDlp: downloaded %s", p)
+	logger.Infof("YtDlp: downloaded %s", p)
 	return p, nil
 }
 
@@ -238,7 +238,7 @@ func (y *YtdlpPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 		for _, line := range lines {
 			var entry ytdlpInfo
 			if err := json.Unmarshal([]byte(line), &entry); err != nil {
-				gologging.DebugF("YtDlp: skip bad entry: %v", err)
+				logger.Debugf("YtDlp: skip bad entry: %v", err)
 				continue
 			}
 			info.Entries = append(info.Entries, entry)

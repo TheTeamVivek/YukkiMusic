@@ -27,10 +27,10 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -99,7 +99,7 @@ Examples:
 		},
 	}
 	if err := i.Use(symbols); err != nil {
-		gologging.ErrorF("failed to use custom symbols: %v", err)
+		logger.Errorf("failed to use custom symbols: %v", err)
 	}
 	ctx := context.Background()
 

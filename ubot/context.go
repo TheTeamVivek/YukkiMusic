@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/ntgcalls"
 )
@@ -72,7 +72,7 @@ func NewContext(app *tg.Client) *Context {
 			var err error
 			me, err = app.GetMe()
 			if err != nil {
-				gologging.Fatal(err)
+				logger.Fatal(err)
 			}
 		}
 

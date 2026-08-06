@@ -20,20 +20,20 @@ package core
 import (
 	"io"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/config"
+	"yukkimusic/internal/logger"
 )
 
 type TgLogger struct {
-	gl  *gologging.Logger
+	gl  *logger.Logger
 	lvl telegram.LogLevel
 }
 
 func GetTgLogger(name string, lvl telegram.LogLevel) *TgLogger {
 	l := &TgLogger{
-		gl:  gologging.GetLogger(name),
+		gl:  logger.GetLogger(name),
 		lvl: lvl,
 	}
 	l.SetLevel(lvl)
@@ -43,25 +43,25 @@ func GetTgLogger(name string, lvl telegram.LogLevel) *TgLogger {
 
 func (l *TgLogger) Debug(msg any, a ...any) {
 	if l.lvl <= telegram.DebugLevel {
-		l.gl.DebugF("%v %v", msg, a)
+		l.gl.Debugf("%v %v", msg, a)
 	}
 }
 
 func (l *TgLogger) Info(msg any, a ...any) {
 	if l.lvl <= telegram.InfoLevel {
-		l.gl.InfoF("%v %v", msg, a)
+		l.gl.Infof("%v %v", msg, a)
 	}
 }
 
 func (l *TgLogger) Warn(msg any, a ...any) {
 	if l.lvl <= telegram.WarnLevel {
-		l.gl.WarnF("%v %v", msg, a)
+		l.gl.Warnf("%v %v", msg, a)
 	}
 }
 
 func (l *TgLogger) Error(msg any, a ...any) {
 	if l.lvl <= telegram.ErrorLevel {
-		l.gl.ErrorF("%v %v", msg, a)
+		l.gl.Errorf("%v %v", msg, a)
 	}
 }
 
@@ -69,17 +69,17 @@ func (l *TgLogger) SetLevel(v telegram.LogLevel) {
 	l.lvl = v
 	switch v {
 	case telegram.TraceLevel, telegram.DebugLevel:
-		l.gl.SetLevel(gologging.DebugLevel)
+		l.gl.SetLevel(logger.DebugLevel)
 	case telegram.InfoLevel:
-		l.gl.SetLevel(gologging.InfoLevel)
+		l.gl.SetLevel(logger.InfoLevel)
 	case telegram.WarnLevel:
-		l.gl.SetLevel(gologging.WarnLevel)
+		l.gl.SetLevel(logger.WarnLevel)
 	case telegram.ErrorLevel, telegram.PanicLevel:
-		l.gl.SetLevel(gologging.ErrorLevel)
+		l.gl.SetLevel(logger.ErrorLevel)
 	case telegram.FatalLevel:
-		l.gl.SetLevel(gologging.FatalLevel)
+		l.gl.SetLevel(logger.FatalLevel)
 	default:
-		l.gl.SetLevel(gologging.InfoLevel)
+		l.gl.SetLevel(logger.InfoLevel)
 	}
 }
 

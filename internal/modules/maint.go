@@ -22,8 +22,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/database"
@@ -146,7 +146,7 @@ func handleSameMaintenanceState(
 func applyMaintenanceState(m *tg.NewMessage, enable bool, reason string) error {
 	chatID := m.ChannelID()
 	database.SetMaintenance(enable, reason)
-	gologging.InfoF(
+	logger.Infof(
 		"User %d set maintenance: %v (reason: %s)",
 		m.SenderID(),
 		enable,

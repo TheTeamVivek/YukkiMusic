@@ -24,8 +24,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Laky-64/gologging"
 	tg "github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -81,7 +81,7 @@ func getOrCreateRTMPStream(chatID int64, url, key string) *tg.RTMPStream {
 	stream.SetKey(key)
 
 	stream.OnError(func(chatID int64, err error) {
-		gologging.ErrorF("RTMP error in chat %d: %v", chatID, err)
+		logger.Errorf("RTMP error in chat %d: %v", chatID, err)
 		core.Bot.SendMessage(
 			chatID,
 			"⚠️ RTMP stream encountered an error. Check logs for details.",
@@ -142,7 +142,7 @@ func handleStream(m *tg.NewMessage, force bool) error {
 
 	replyMsg, err := m.Reply(searchStr)
 	if err != nil {
-		gologging.ErrorF("Failed to send searching message: %v", err)
+		logger.Errorf("Failed to send searching message: %v", err)
 		return tg.ErrEndGroup
 	}
 

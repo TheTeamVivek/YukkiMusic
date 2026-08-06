@@ -29,9 +29,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
 	"resty.dev/v3"
+	"yukkimusic/internal/logger"
 
 	state "yukkimusic/internal/core/models"
 	"yukkimusic/internal/database"
@@ -95,7 +95,7 @@ func findFor(query string) state.Platform {
 }
 
 func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
-	gologging.Debug("GetTracks | video:" + strconv.FormatBool(video))
+	logger.Debug("GetTracks | video:" + strconv.FormatBool(video))
 
 	if urls, _ := utils.ExtractURLs(m); len(urls) > 0 {
 		tracks, errs := fetchFromURLs(urls, video)
@@ -142,10 +142,10 @@ func download(
 			continue
 		}
 
-		gologging.Debug("Download attempt: " + string(p.Name()))
+		logger.Debug("Download attempt: " + string(p.Name()))
 		path, err := p.Download(ctx, track, msg)
 		if err == nil {
-			gologging.Info("Download ok via " + string(p.Name()) + " -> " + path)
+			logger.Info("Download ok via " + string(p.Name()) + " -> " + path)
 			return path, nil
 		}
 
@@ -155,7 +155,7 @@ func download(
 
 		var rd *RedispatchError
 		if !redispatched && errors.As(err, &rd) {
-			gologging.Debug("Redispatch to source: " + string(rd.Track.Source))
+			logger.Debug("Redispatch to source: " + string(rd.Track.Source))
 			return download(ctx, rd.Track, msg, true)
 		}
 
@@ -179,7 +179,7 @@ func fetchFromURLs(urls []string, video bool) ([]*state.Track, []string) {
 			continue
 		}
 
-		gologging.Debug("URL matched " + string(p.Name()) + ": " + u)
+		logger.Debug("URL matched " + string(p.Name()) + ": " + u)
 		got, err := p.Get(u, video)
 		if err != nil {
 			if strings.Contains(err.Error(), "failed to extract metadata") {

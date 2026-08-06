@@ -20,8 +20,8 @@ package modules
 import (
 	"log"
 
-	"github.com/Laky-64/gologging"
 	"github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/database"
@@ -172,7 +172,7 @@ func setBotCommands(bot *telegram.Client) {
 
 	for _, e := range entries {
 		if _, err := bot.BotsSetBotCommands(e.scope, "", e.cmds); err != nil {
-			gologging.Error("Failed to set bot commands: " + err.Error())
+			logger.Error("Failed to set bot commands: " + err.Error())
 		}
 	}
 
@@ -189,7 +189,7 @@ func setBotCommands(bot *telegram.Client) {
 			Peer: &telegram.InputPeerUser{UserID: id},
 		}
 		if _, err := bot.BotsSetBotCommands(peer, "", sudoCmds); err != nil {
-			gologging.Error("Failed to set sudo commands: " + err.Error())
+			logger.Error("Failed to set sudo commands: " + err.Error())
 		}
 	}
 }

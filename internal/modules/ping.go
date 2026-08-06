@@ -22,10 +22,10 @@ import (
 	"time"
 
 	td "github.com/AshokShau/gotdbot"
-	"github.com/Laky-64/gologging"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/mem"
+	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -156,7 +156,7 @@ func pingHandler(c *td.Client, m *td.Message) error {
 	}
 
 	if err := edit(); err != nil {
-		gologging.ErrorF("[ping] edit failed: %v", err)
+		logger.Errorf("[ping] edit failed: %v", err)
 
 		if config.PingImage != "" {
 			_, err = reply.EditText(c, msg, &td.EditTextMessageOpts{
@@ -164,7 +164,7 @@ func pingHandler(c *td.Client, m *td.Message) error {
 				ReplyMarkup: markup,
 			})
 			if err != nil {
-				gologging.ErrorF("[ping] fallback text edit failed: %v", err)
+				logger.Errorf("[ping] fallback text edit failed: %v", err)
 				return err
 			}
 		}
