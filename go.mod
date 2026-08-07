@@ -7,7 +7,7 @@ require (
 	github.com/amarnathcjd/gogram v1.7.3-0.20260314054505-186e726d4d88
 	github.com/joho/godotenv v1.5.1
 	github.com/shirou/gopsutil/v3 v3.24.5
-	github.com/showwin/speedtest-go v1.7.10
+	github.com/showwin/speedtest-go v1.7.11
 	github.com/traefik/yaegi v0.16.1
 	github.com/zmb3/spotify/v2 v2.4.3
 	go.mongodb.org/mongo-driver/v2 v2.8.0
@@ -36,6 +36,7 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/shoenig/go-m1cpu v0.1.7 // indirect
+	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.16 // indirect
 	github.com/tklauser/numcpus v0.11.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
