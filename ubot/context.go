@@ -147,7 +147,6 @@ func (ctx *Context) Record(
 }
 
 func (ctx *Context) Stop(chatID int64) error {
-	// Clean up presentations
 	ctx.presentationsMutex.Lock()
 	ctx.presentations = stdRemove(ctx.presentations, chatID)
 	ctx.presentationsMutex.Unlock()

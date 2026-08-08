@@ -732,6 +732,13 @@ func handlePlayAttemptError(
 		return true, tg.ErrEndGroup
 	}
 
+	if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
+		logger.Error("RTMP/live-stream voice chat detected, cannot play. Cleaning up...")
+		core.DeleteRoom(room.ID)
+		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "rtmp_play_unsupported"))
+		return true, tg.ErrEndGroup
+	}
+
 	if strings.Contains(err.Error(), "group call") &&
 		strings.Contains(err.Error(), "is closed") {
 		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_no_active_voicechat"))

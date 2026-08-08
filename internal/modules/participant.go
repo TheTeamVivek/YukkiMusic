@@ -95,7 +95,7 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 	case (newStatus == "administrator" || newStatus == "creator") &&
 		(oldStatus != "administrator" && oldStatus != "creator"):
 
-		utils.AddChatAdmin(chatID, userID)
+		utils.AddChatAdmin(c, chatID, userID)
 
 	case oldStatus == "administrator" &&
 		newStatus != "administrator" &&
@@ -116,7 +116,7 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 			return nil
 		}
 
-		utils.RemoveChatAdmin(chatID, userID)
+		utils.RemoveChatAdmin(c, chatID, userID)
 
 	case oldStatus == "left" &&
 		(newStatus == "member" || newStatus == "administrator" || newStatus == "creator"):
