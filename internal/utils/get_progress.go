@@ -17,44 +17,6 @@
 
 package utils
 
-import (
-	"fmt"
-
-	"github.com/amarnathcjd/gogram/telegram"
-)
-
-func GetProgress(statusMsg *telegram.NewMessage) *telegram.ProgressManager {
-	pm := telegram.NewProgressManager(2)
-
-	if statusMsg == nil {
-		return pm
-	}
-
-	var opts *telegram.SendOptions
-	if replyMarkup := statusMsg.ReplyMarkup(); replyMarkup != nil {
-		opts = &telegram.SendOptions{ReplyMarkup: *replyMarkup}
-	}
-
-	pm.WithCallback(func(pi *telegram.ProgressInfo) {
-		text := fmt.Sprintf(
-			"<b>📥 Downloading your track...</b>\n"+
-				"<pre>"+
-				"Progress : %6.2f%%\n"+
-				"Speed    : %s\n"+
-				"Eta      : %s\n"+
-				"Elapsed  : %s"+
-				"</pre>",
-			pi.Percentage,
-			pi.SpeedString(),
-			pi.ETAString(),
-			pi.ElapsedString(),
-		)
-		statusMsg.Edit(text, opts)
-	})
-
-	return pm
-}
-
 var progressBarCache = [10]string{
 	"◉—————————",
 	"—◉————————",

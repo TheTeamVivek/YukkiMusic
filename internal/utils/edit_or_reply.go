@@ -21,34 +21,10 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
+
 	"yukkimusic/internal/logger"
 )
-
-func EOR(
-	msg *telegram.NewMessage,
-	text string,
-	opts ...*telegram.SendOptions,
-) (m *telegram.NewMessage, err error) {
-	if msg == nil {
-		logger.Error("[EOR] nil msg at " + callerInfo(2))
-		return nil, nil
-	}
-
-	m, err = msg.Edit(text, opts...)
-	if err != nil {
-		msg.Delete()
-		m, err = msg.Respond(text, opts...)
-	}
-
-	if err != nil {
-		logger.Error(
-			"[EOR] " + err.Error() +
-				" | called from " + callerInfo(2),
-		)
-	}
-	return m, err
-}
 
 func callerInfo(skip int) string {
 	_, file, line, ok := runtime.Caller(skip)
@@ -56,4 +32,44 @@ func callerInfo(skip int) string {
 		return "unknown:0"
 	}
 	return fmt.Sprintf("%s:%d", file, line)
+}
+
+// EOR edits a message, falling back to delete + reply on edit failure.
+func EOR(
+	c *td.Client,
+	msg *td.Message,
+	text string,
+	opts *td.EditTextMessageOpts,
+) (*td.Message, error) {
+	if msg == nil {
+		logger.Error("[EOR] nil msg at " + callerInfo(2))
+		return nil, nil
+	}
+
+	m, err := msg.EditText(c, text, opts)
+	if err != nil {
+		_ = msg.Delete(c, true)
+		replyOpts := &td.SendTextMessageOpts{}
+		if opts != nil {
+			replyOpts.ParseMode = opts.ParseMode
+			replyOpts.ReplyMarkup = opts.ReplyMarkup
+		}
+		m, err = msg.ReplyText(c, text, replyOpts)
+	}
+
+	if err != nil {
+		logger.Error(
+			"[EOR] " + err.Error() + " | called from " + callerInfo(2),
+		)
+	}
+	return m, err
+}
+
+// ToInt64s converts a slice of int32 message IDs to a slice of int64.
+func ToInt64s(ids []int32) []int64 {
+	out := make([]int64, len(ids))
+	for i, id := range ids {
+		out[i] = int64(id)
+	}
+	return out
 }

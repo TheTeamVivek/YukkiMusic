@@ -29,7 +29,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	state "yukkimusic/internal/core/models"
@@ -143,7 +143,7 @@ func (d *DirectStreamPlatform) CanDownload(source state.PlatformName) bool {
 func (d *DirectStreamPlatform) Download(
 	_ context.Context,
 	track *state.Track,
-	_ *telegram.NewMessage,
+	_ *td.Message,
 ) (string, error) {
 	logger.Infof("DirectStream: returning URL for streaming: %s", track.URL)
 	return track.URL, nil

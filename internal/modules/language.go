@@ -20,7 +20,7 @@ package modules
 import (
 	"strings"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
@@ -29,88 +29,106 @@ import (
 	"yukkimusic/internal/utils"
 )
 
-func langHandler(m *telegram.NewMessage) error {
-	return showLangMenu(m, false)
+func langHandler(c *td.Client, m *td.Message) error {
+	return showLangMenu(c, m)
 }
 
-func showLangMenu(m any, isCallback bool) error {
-	var chatID int64
-	if isCallback {
-		cb := m.(*telegram.CallbackQuery)
-		chatID = cb.ChannelID()
-	} else {
-		msg := m.(*telegram.NewMessage)
-		chatID = msg.ChannelID()
-	}
+func showLangMenu(c *td.Client, m *td.Message) error {
+	chatID := m.ChatID()
 
 	lang, err := database.Language(chatID)
 	if err != nil {
 		lang = config.DefaultLang
 	}
 
-	kb := telegram.NewKeyboard()
-	var btns []telegram.KeyboardButton
+	markup := buildLangMarkup(chatID, lang, false)
+
+	_, err = m.ReplyText(c, F(chatID, "lang_select"), &td.SendTextMessageOpts{
+		ParseMode:   td.ParseModeHTML,
+		ReplyMarkup: markup,
+	})
+	return err
+}
+
+func buildLangMarkup(chatID int64, lang string, isCallback bool) *td.ReplyMarkupInlineKeyboard {
+	var rows [][]td.InlineKeyboardButton
+	var row []td.InlineKeyboardButton
+
 	for _, l := range locales.GetAvailableLanguages() {
 		name := locales.Get(l, "name", nil)
 		if l == lang {
 			name = "✔️ " + name
 		}
-		btns = append(btns, telegram.Button.Data(name, "lang:"+l))
+		row = append(row, td.InlineKeyboardButton{
+			Text: name,
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("lang:" + l)},
+		})
+		if len(row) == 2 {
+			rows = append(rows, row)
+			row = nil
+		}
 	}
-	kb.NewColumn(2, btns...)
+	if len(row) > 0 {
+		rows = append(rows, row)
+	}
 
 	if isCallback {
-		kb.AddRow(telegram.Button.Data(F(chatID, "BACK_BTN"), "set:main"))
+		rows = append(rows, []td.InlineKeyboardButton{
+			{
+				Text: F(chatID, "BACK_BTN"),
+				Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:main")},
+			},
+		})
 	}
 
-	text := F(chatID, "lang_select")
-	if isCallback {
-		cb := m.(*telegram.CallbackQuery)
-		cb.Edit(text, &telegram.SendOptions{ParseMode: "HTML", ReplyMarkup: kb.Build()})
-	} else {
-		msg := m.(*telegram.NewMessage)
-		msg.Reply(text, &telegram.SendOptions{ParseMode: "HTML", ReplyMarkup: kb.Build()})
-	}
-	return telegram.ErrEndGroup
+	return &td.ReplyMarkupInlineKeyboard{Rows: rows}
 }
 
-func langCallbackHandler(cb *telegram.CallbackQuery) error {
-	data := cb.DataString()
-	opt := &telegram.CallbackOptions{Alert: true}
+func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
+	data := u.DataString()
 	parts := strings.SplitN(data, ":", 2)
 	if len(parts) != 2 {
-		cb.Answer("⚠️ Invalid data.", opt)
-		return telegram.ErrEndGroup
+		_ = u.Answer(c, 0, true, "⚠️ Invalid data.", "")
+		return nil
 	}
 	lang := parts[1]
 
-	chatID := cb.ChannelID()
+	chatID := u.ChatId
 	if lang == "select" {
-		return showLangMenu(cb, true)
+		cur, err := database.Language(chatID)
+		if err != nil {
+			cur = config.DefaultLang
+		}
+		markup := buildLangMarkup(chatID, cur, true)
+		_, _ = u.EditMessageText(c, F(chatID, "lang_select"), &td.EditTextMessageOpts{
+			ParseMode:   td.ParseModeHTML,
+			ReplyMarkup: markup,
+		})
+		return nil
 	}
 
-	if isAdmin, _ := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); !isAdmin {
-		cb.Answer(F(chatID, "only_admin_cb"), opt)
-		return telegram.ErrEndGroup
+	if isAdmin, _ := utils.IsChatAdmin(c, chatID, u.SenderUserId); !isAdmin {
+		_ = u.Answer(c, 0, true, F(chatID, "only_admin_cb"), "")
+		return nil
 	}
 
 	currentLang, _ := database.Language(chatID)
 
 	if lang == currentLang {
-		cb.Answer(F(chatID, "lang_same"), opt)
-		return telegram.ErrEndGroup
+		_ = u.Answer(c, 0, true, F(chatID, "lang_same"), "")
+		return nil
 	}
 
 	langName := locales.Get(lang, "name", nil)
 
 	if err := database.SetLanguage(chatID, lang); err != nil {
 		logger.Errorf("SetChatLanguage error: %v", err)
-		cb.Answer(F(chatID, "lang_fail"), opt)
-		return telegram.ErrEndGroup
+		_ = u.Answer(c, 0, true, F(chatID, "lang_fail"), "")
+		return nil
 	}
 
 	msg := F(chatID, "lang_success", locales.Arg{"lang_name": langName})
-	cb.Answer(msg, opt)
-	cb.Edit(msg)
-	return telegram.ErrEndGroup
+	_ = u.Answer(c, 0, true, msg, "")
+	_, _ = u.EditMessageText(c, msg, &td.EditTextMessageOpts{ParseMode: td.ParseModeHTML})
+	return nil
 }

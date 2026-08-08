@@ -20,7 +20,7 @@ package models
 import (
 	"context"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 )
 
 type (
@@ -72,6 +72,6 @@ type (
 		// msg is used to send progress updates (if not nil).
 		// If the platform supports video playback, return the local path
 		// of the video file when track.Video is true.
-		Download(ctx context.Context, track *Track, msg *telegram.NewMessage) (string, error)
+		Download(ctx context.Context, track *Track, msg *td.Message) (string, error)
 	}
 )

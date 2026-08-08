@@ -63,11 +63,11 @@ func cspeedHandler(c *td.Client, m *td.Message) error {
 }
 
 func handleSpeed(c *td.Client, m *td.Message, cplay bool) error {
-	if !isSuperGroupTd(c, m) {
+	if !isSuperGroup(c, m) {
 		return nil
 	}
 
-	if !filterAuthUsersTd(c, m) {
+	if !filterAuthUsers(c, m) {
 		return nil
 	}
 
@@ -93,11 +93,11 @@ func handleSpeed(c *td.Client, m *td.Message, cplay bool) error {
 			m.ReplyText(c, F(chatID, "speed_current", locales.Arg{
 				"speed": fmt.Sprintf("%.2f", r.Speed()),
 				"title": utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
-				"cmd":   getCommandTd(m),
+				"cmd":   getCommand(m),
 			}), nil)
 		} else {
 			m.ReplyText(c, F(chatID, "speed_usage", locales.Arg{
-				"cmd": getCommandTd(m),
+				"cmd": getCommand(m),
 			}), nil)
 		}
 		return nil
@@ -115,7 +115,7 @@ func handleSpeed(c *td.Client, m *td.Message, cplay bool) error {
 		s, err := strconv.ParseFloat(raw, 64)
 		if err != nil {
 			m.ReplyText(c, F(chatID, "speed_invalid_value", locales.Arg{
-				"cmd": getCommandTd(m),
+				"cmd": getCommand(m),
 			}), nil)
 			return nil
 		}

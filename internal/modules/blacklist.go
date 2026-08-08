@@ -21,105 +21,106 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
 
-func handleBlockUser(m *telegram.NewMessage) error {
-	if m.Args() == "" && !m.IsReply() {
-		m.Reply(F(m.ChannelID(), "auth_no_user", locales.Arg{"cmd": getCommand(m)}))
-		return telegram.ErrEndGroup
+func handleBlockUser(c *td.Client, m *td.Message) error {
+	if m.Args() == "" && m.ReplyToMessageID() == 0 {
+		_, _ = m.ReplyText(c, F(m.ChatID(), "auth_no_user", locales.Arg{"cmd": getCommand(m)}), nil)
+		return nil
 	}
 
-	userID, err := utils.ExtractUser(m)
+	userID, err := utils.ExtractUser(c, m)
 	if err != nil {
-		m.Reply(F(m.ChannelID(), "user_extract_fail", locales.Arg{"error": err.Error()}))
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, F(m.ChatID(), "user_extract_fail", locales.Arg{"error": err.Error()}), nil)
+		return nil
 	}
 	if err := database.AddBlacklistedUser(userID); err != nil {
-		m.Reply("Failed to block user: " + err.Error())
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, "Failed to block user: "+err.Error(), nil)
+		return nil
 	}
-	m.Reply(F(m.ChannelID(), "blacklist_block_user_success", locales.Arg{"id": userID}))
-	return telegram.ErrEndGroup
+	_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_block_user_success", locales.Arg{"id": userID}), nil)
+	return nil
 }
 
-func handleUnblockUser(m *telegram.NewMessage) error {
-	if m.Args() == "" && !m.IsReply() {
-		m.Reply(F(m.ChannelID(), "auth_no_user", locales.Arg{"cmd": getCommand(m)}))
-		return telegram.ErrEndGroup
+func handleUnblockUser(c *td.Client, m *td.Message) error {
+	if m.Args() == "" && m.ReplyToMessageID() == 0 {
+		_, _ = m.ReplyText(c, F(m.ChatID(), "auth_no_user", locales.Arg{"cmd": getCommand(m)}), nil)
+		return nil
 	}
 
-	userID, err := utils.ExtractUser(m)
+	userID, err := utils.ExtractUser(c, m)
 	if err != nil {
-		m.Reply(F(m.ChannelID(), "user_extract_fail", locales.Arg{"error": err.Error()}))
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, F(m.ChatID(), "user_extract_fail", locales.Arg{"error": err.Error()}), nil)
+		return nil
 	}
 	if err := database.RemoveBlacklistedUser(userID); err != nil {
-		m.Reply(F(m.ChannelID(), "blacklist_unblock_user_fail", locales.Arg{"error": err.Error()}))
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_unblock_user_fail", locales.Arg{"error": err.Error()}), nil)
+		return nil
 	}
-	m.Reply(F(m.ChannelID(), "blacklist_unblock_user_success", locales.Arg{"id": userID}))
-	return telegram.ErrEndGroup
+	_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_unblock_user_success", locales.Arg{"id": userID}), nil)
+	return nil
 }
 
-func handleBlockChat(m *telegram.NewMessage) error {
+func handleBlockChat(c *td.Client, m *td.Message) error {
 	if m.Args() == "" {
-		m.Reply(F(m.ChannelID(), "blacklist_usage_blockchat"))
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_usage_blockchat"), nil)
+		return nil
 	}
-	chatID, err := utils.ExtractChat(m)
+	chatID, err := utils.ExtractChat(c, m)
 	if err != nil {
-		m.Reply(F(m.ChannelID(), "blacklist_invalid_chat_identifier", locales.Arg{"error": err.Error()}))
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_invalid_chat_identifier", locales.Arg{"error": err.Error()}), nil)
+		return nil
 	}
 	if err := database.AddBlacklistedChat(chatID); err != nil {
-		m.Reply("Failed to block chat: " + err.Error())
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, "Failed to block chat: "+err.Error(), nil)
+		return nil
 	}
-	m.Reply(F(m.ChannelID(), "blacklist_block_chat_success", locales.Arg{"id": chatID}))
-	return telegram.ErrEndGroup
+	_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_block_chat_success", locales.Arg{"id": chatID}), nil)
+	return nil
 }
 
-func handleUnblockChat(m *telegram.NewMessage) error {
+func handleUnblockChat(c *td.Client, m *td.Message) error {
 	if m.Args() == "" {
-		m.Reply(F(m.ChannelID(), "blacklist_usage_unblockchat"))
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_usage_unblockchat"), nil)
+		return nil
 	}
-	chatID, err := utils.ExtractChat(m)
+	chatID, err := utils.ExtractChat(c, m)
 	if err != nil {
-		m.Reply(F(m.ChannelID(), "blacklist_invalid_chat_identifier", locales.Arg{"error": err.Error()}))
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_invalid_chat_identifier", locales.Arg{"error": err.Error()}), nil)
+		return nil
 	}
 	if err := database.RemoveBlacklistedChat(chatID); err != nil {
-		m.Reply(F(m.ChannelID(), "blacklist_unblock_chat_fail", locales.Arg{"error": err.Error()}))
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_unblock_chat_fail", locales.Arg{"error": err.Error()}), nil)
+		return nil
 	}
-	m.Reply(F(m.ChannelID(), "blacklist_unblock_chat_success", locales.Arg{"id": chatID}))
-	return telegram.ErrEndGroup
+	_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_unblock_chat_success", locales.Arg{"id": chatID}), nil)
+	return nil
 }
 
-func handleBlacklisted(m *telegram.NewMessage) error {
+func handleBlacklisted(c *td.Client, m *td.Message) error {
+	chatID := m.ChatID()
 	chats, err := database.BlacklistedChats()
 	if err != nil {
-		m.Reply(F(m.ChannelID(), "blacklist_fetch_chats_fail", locales.Arg{"error": err.Error()}))
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, F(chatID, "blacklist_fetch_chats_fail", locales.Arg{"error": err.Error()}), nil)
+		return nil
 	}
 	users, err := database.BlacklistedUsers()
 	if err != nil {
-		m.Reply(F(m.ChannelID(), "blacklist_fetch_users_fail", locales.Arg{"error": err.Error()}))
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, F(chatID, "blacklist_fetch_users_fail", locales.Arg{"error": err.Error()}), nil)
+		return nil
 	}
 
 	var b strings.Builder
 
-	b.WriteString(F(m.ChannelID(), "blacklist_list_title"))
+	b.WriteString(F(chatID, "blacklist_list_title"))
 	b.WriteString("\n\n")
 
-	b.WriteString(F(m.ChannelID(), "blacklist_list_chats"))
+	b.WriteString(F(chatID, "blacklist_list_chats"))
 	b.WriteString("\n")
 
 	if len(chats) == 0 {
@@ -131,7 +132,7 @@ func handleBlacklisted(m *telegram.NewMessage) error {
 	}
 
 	b.WriteString("\n")
-	b.WriteString(F(m.ChannelID(), "blacklist_list_users"))
+	b.WriteString(F(chatID, "blacklist_list_users"))
 	b.WriteString("\n")
 
 	if len(users) == 0 {
@@ -142,6 +143,6 @@ func handleBlacklisted(m *telegram.NewMessage) error {
 		}
 	}
 
-	m.Reply(b.String())
-	return telegram.ErrEndGroup
+	_, _ = m.ReplyText(c, b.String(), nil)
+	return nil
 }

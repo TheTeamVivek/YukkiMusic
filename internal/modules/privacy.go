@@ -20,7 +20,7 @@ package modules
 import (
 	"fmt"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
 )
@@ -29,7 +29,7 @@ func init() {
 	helpTexts["/privacy"] = `<i>Show the bot's privacy policy.</i>`
 }
 
-func privacyHandler(m *tg.NewMessage) error {
+func privacyHandler(c *td.Client, m *td.Message) error {
 	privacyText := fmt.Sprintf(`<b>🛡 Privacy Policy &amp; Data Handling</b>
 
 Your privacy is important to us. This bot is designed with privacy in mind.
@@ -57,6 +57,6 @@ This bot is an <a href="https://github.com/TheTeamVivek/YukkiMusic">open-source 
 
 <i>If you have any questions, feel free to join our <a href="%s">Support Chat</a>.</i>`, config.SupportChat)
 
-	_, err := m.Reply(privacyText)
+	_, err := m.ReplyText(c, privacyText, nil)
 	return err
 }

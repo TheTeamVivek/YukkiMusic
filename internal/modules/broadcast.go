@@ -27,7 +27,7 @@ import (
 	"sync"
 	"time"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
@@ -146,34 +146,34 @@ func init() {
 	helpTexts["bcast"] = helpTexts["broadcast"]
 }
 
-func broadcastHandler(m *tg.NewMessage) error {
+func broadcastHandler(c *td.Client, m *td.Message) error {
 	// Check for cancel flag
 	text := strings.ToLower(m.Text())
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 	if strings.Contains(text, "-cancel") || strings.Contains(text, "--cancel") {
-		return handleBroadcastCancel(m)
+		return handleBroadcastCancel(c, m)
 	}
 
 	// Check if broadcast is already running
 	if bManager.IsActive() {
-		m.Reply(F(chatID, "broadcast_already_running"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "broadcast_already_running"), nil)
+		return nil
 	}
 
 	// Parse flags and content
 	flags, content, err := parseBroadcastCommand(m)
 	if err != nil {
-		m.Reply(F(chatID, "broadcast_parse_failed", locales.Arg{
+		m.ReplyText(c, F(chatID, "broadcast_parse_failed", locales.Arg{
 			"error": html.EscapeString(err.Error()),
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
-	if content == "" && !m.IsReply() {
-		m.Reply(F(chatID, "broadcast_no_content", locales.Arg{
+	if content == "" && m.ReplyToMessageID() == 0 {
+		m.ReplyText(c, F(chatID, "broadcast_no_content", locales.Arg{
 			"cmd": getCommand(m),
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
 	// Get served chats and users
@@ -183,28 +183,28 @@ func broadcastHandler(m *tg.NewMessage) error {
 	if !flags.NoChat {
 		servedChats, servedChatErr = database.ServedChats()
 		if servedChatErr != nil {
-			m.Reply(F(chatID, "broadcast_fetch_chats_failed", locales.Arg{
+			m.ReplyText(c, F(chatID, "broadcast_fetch_chats_failed", locales.Arg{
 				"error": html.EscapeString(servedChatErr.Error()),
-			}))
+			}), nil)
 
-			return tg.ErrEndGroup
+			return nil
 		}
 	}
 
 	if !flags.NoUser {
 		servedUsers, servedUserErr = database.ServedUsers()
 		if servedUserErr != nil {
-			m.Reply(F(chatID, "broadcast_fetch_users_failed", locales.Arg{
+			m.ReplyText(c, F(chatID, "broadcast_fetch_users_failed", locales.Arg{
 				"error": html.EscapeString(servedUserErr.Error()),
-			}))
-			return tg.ErrEndGroup
+			}), nil)
+			return nil
 		}
 	}
 
 	// Check if there are any targets
 	if len(servedChats) == 0 && len(servedUsers) == 0 {
-		m.Reply(F(chatID, "broadcast_no_targets"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "broadcast_no_targets"), nil)
+		return nil
 	}
 
 	// Apply limit if specified
@@ -234,26 +234,27 @@ func broadcastHandler(m *tg.NewMessage) error {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	if !bManager.TryStart(ctx, cancel) {
-		m.Reply(F(chatID, "broadcast_already_running"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "broadcast_already_running"), nil)
+		return nil
 	}
 
-	progressMsg, err := m.Reply(F(chatID, "broadcast_initializing"),
-		&tg.SendOptions{
+	progressMsg, err := m.ReplyText(c, F(chatID, "broadcast_initializing"),
+		&td.SendTextMessageOpts{
 			ReplyMarkup: core.GetBroadcastCancelKeyboard(chatID),
 		})
 	if err != nil {
 		bManager.Stop()
 		logger.Errorf("Failed to send broadcast progress message: %v", err)
-		return tg.ErrEndGroup
+		return nil
 	}
 
 	// Start progress updater in goroutine
-	go bManager.updateProgress(ctx, progressMsg, stats)
+	go bManager.updateProgress(ctx, c, progressMsg, stats)
 
 	// Start broadcast in goroutine
 	go bManager.start(
 		ctx,
+		c,
 		m,
 		progressMsg,
 		flags,
@@ -263,16 +264,16 @@ func broadcastHandler(m *tg.NewMessage) error {
 		stats,
 	)
 
-	return tg.ErrEndGroup
+	return nil
 }
 
-func parseBroadcastCommand(m *tg.NewMessage) (*BroadcastFlags, string, error) {
+func parseBroadcastCommand(m *td.Message) (*BroadcastFlags, string, error) {
 	flags := &BroadcastFlags{
 		Delay: defaultDelay,
 	}
 
 	text := strings.TrimSpace(m.Text())
-	text = strings.TrimPrefix(text, m.GetCommand())
+	text = strings.TrimPrefix(text, getCommand(m))
 	text = strings.TrimSpace(text)
 
 	lines := strings.Split(text, "\n")
@@ -344,7 +345,8 @@ func parseBroadcastCommand(m *tg.NewMessage) (*BroadcastFlags, string, error) {
 
 func (bm *BroadcastManager) start(
 	ctx context.Context,
-	m, progressMsg *tg.NewMessage,
+	c *td.Client,
+	m, progressMsg *td.Message,
 	flags *BroadcastFlags,
 	content string,
 	chats, users []int64,
@@ -354,7 +356,7 @@ func (bm *BroadcastManager) start(
 	defer func() {
 		if r := recover(); r != nil {
 			logger.Errorf("Broadcast panic recovered: %v", r)
-			bm.finalize(progressMsg, stats)
+			bm.finalize(c, progressMsg, stats)
 		}
 	}()
 
@@ -364,12 +366,12 @@ func (bm *BroadcastManager) start(
 	for _, chatID := range chats {
 		select {
 		case <-ctx.Done():
-			bm.finalize(progressMsg, stats)
+			bm.finalize(c, progressMsg, stats)
 			return
 		default:
 		}
 
-		err := bm.sendMessage(ctx, m, chatID, content, flags)
+		err := bm.sendMessage(ctx, c, m, chatID, content, flags)
 
 		stats.mu.Lock()
 		stats.DoneChats++
@@ -382,7 +384,7 @@ func (bm *BroadcastManager) start(
 
 		messagesSent++
 		if !bm.handleDelay(ctx, messagesSent, flags.Delay) {
-			bm.finalize(progressMsg, stats)
+			bm.finalize(c, progressMsg, stats)
 			return
 		}
 	}
@@ -391,12 +393,12 @@ func (bm *BroadcastManager) start(
 	for _, userID := range users {
 		select {
 		case <-ctx.Done():
-			bm.finalize(progressMsg, stats)
+			bm.finalize(c, progressMsg, stats)
 			return
 		default:
 		}
 
-		err := bm.sendMessage(ctx, m, userID, content, flags)
+		err := bm.sendMessage(ctx, c, m, userID, content, flags)
 
 		stats.mu.Lock()
 		stats.DoneUsers++
@@ -409,48 +411,45 @@ func (bm *BroadcastManager) start(
 
 		messagesSent++
 		if !bm.handleDelay(ctx, messagesSent, flags.Delay) {
-			bm.finalize(progressMsg, stats)
+			bm.finalize(c, progressMsg, stats)
 			return
 		}
 	}
 
-	bm.finalize(progressMsg, stats)
+	bm.finalize(c, progressMsg, stats)
 }
 
 func (bm *BroadcastManager) sendMessage(
 	ctx context.Context,
-	m *tg.NewMessage,
+	c *td.Client,
+	m *td.Message,
 	targetID int64,
 	content string,
 	flags *BroadcastFlags,
 ) error {
 	var (
-		sentMsg *tg.NewMessage
+		sentMsg *td.Message
 		err     error
 	)
 
 	try := func() error {
-		if m.IsReply() {
-			fOpts := &tg.ForwardOptions{}
-			if flags.Copy {
-				fOpts.HideAuthor = true
-			}
-			fMsgs, ferr := m.Client.Forward(
+		if m.ReplyToMessageID() > 0 {
+			fMsgs, ferr := c.ForwardMessages(
 				targetID,
-				m.Peer,
-				[]int32{m.ReplyID()},
-				fOpts,
+				m.ChatID(),
+				[]int64{m.ReplyToMessageID()},
+				&td.ForwardMessagesOpts{SendCopy: flags.Copy},
 			)
 			if ferr != nil {
 				return ferr
 			}
-			if len(fMsgs) > 0 {
-				sentMsg = &fMsgs[0]
+			if fMsgs != nil && len(fMsgs.Messages) > 0 {
+				sentMsg = &fMsgs.Messages[0]
 			}
 			return nil
 		}
 
-		sent, ferr := m.Client.SendMessage(targetID, content)
+		sent, ferr := c.SendTextMessage(targetID, content, nil)
 		if ferr != nil {
 			return ferr
 		}
@@ -458,39 +457,23 @@ func (bm *BroadcastManager) sendMessage(
 		return nil
 	}
 
-	maxAttempts := 3
-	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		err = try()
-		if err == nil {
-			break
-		}
-
-		if wait := tg.GetFloodWait(err); wait > 0 {
-			logger.Errorf(
-				"FloodWait detected (%ds). Retrying (attempt %d).",
-				wait,
-				attempt,
-			)
-			if !bm.sleepCtx(ctx, time.Duration(wait)*time.Second) {
-				return context.Canceled
-			}
-			continue
-		} else {
-			break
-		}
-	}
+	err = try()
 
 	if err != nil {
-		if !tg.MatchError(err, "USER_IS_BLOCKED") &&
-			!tg.MatchError(err, "CHAT_WRITE_FORBIDDEN") &&
-			!tg.MatchError(err, "USER_IS_DEACTIVATED") {
+		if !strings.Contains(err.Error(), "USER_IS_BLOCKED") &&
+			!strings.Contains(err.Error(), "CHAT_WRITE_FORBIDDEN") &&
+			!strings.Contains(err.Error(), "USER_IS_DEACTIVATED") {
 			logger.Errorf("Broadcast failed for %d: %v", targetID, err)
 		}
 		return err
 	}
 
 	if sentMsg != nil && (flags.Pin || flags.PinLoud) {
-		if _, perr := m.Client.PinMessage(targetID, sentMsg.ID, &tg.PinOptions{Silent: !flags.PinLoud}); perr != nil {
+		if perr := c.PinChatMessage(
+			targetID,
+			sentMsg.Id,
+			&td.PinChatMessageOpts{DisableNotification: !flags.PinLoud},
+		); perr != nil {
 			logger.Errorf("Pin failed for %d: %v", targetID, perr)
 		}
 	}
@@ -510,7 +493,8 @@ func (bm *BroadcastManager) handleDelay(
 
 func (bm *BroadcastManager) updateProgress(
 	ctx context.Context,
-	progressMsg *tg.NewMessage,
+	c *td.Client,
+	progressMsg *td.Message,
 	stats *BroadcastStats,
 ) {
 	ticker := time.NewTicker(5 * time.Second)
@@ -529,13 +513,13 @@ func (bm *BroadcastManager) updateProgress(
 			text := formatBroadcastProgress(
 				stats,
 				false,
-				progressMsg.ChannelID(),
+				progressMsg.ChatID(),
 			)
 			stats.mu.Unlock()
 
-			_, _ = progressMsg.Edit(text, &tg.SendOptions{
+			_, _ = progressMsg.EditText(c, text, &td.EditTextMessageOpts{
 				ReplyMarkup: core.GetBroadcastCancelKeyboard(
-					progressMsg.ChannelID(),
+					progressMsg.ChatID(),
 				),
 			})
 		}
@@ -543,16 +527,17 @@ func (bm *BroadcastManager) updateProgress(
 }
 
 func (bm *BroadcastManager) finalize(
-	progressMsg *tg.NewMessage,
+	c *td.Client,
+	progressMsg *td.Message,
 	stats *BroadcastStats,
 ) {
 	stats.mu.Lock()
 	stats.Finished = true
-	text := formatBroadcastProgress(stats, true, progressMsg.ChannelID())
+	text := formatBroadcastProgress(stats, true, progressMsg.ChatID())
 	errs := stats.errorLog.String()
 	stats.mu.Unlock()
 
-	_, _ = progressMsg.Edit(text)
+	_, _ = progressMsg.EditText(c, text, nil)
 
 	if errs != "" {
 		tmpFile := "broadcast_errors.txt"
@@ -562,7 +547,11 @@ func (bm *BroadcastManager) finalize(
 		}
 		defer os.Remove(tmpFile)
 
-		_, _ = progressMsg.ReplyMedia(tmpFile)
+		_, _ = progressMsg.ReplyDocument(
+			c,
+			&td.InputFileLocal{Path: tmpFile},
+			nil,
+		)
 	}
 }
 
@@ -671,43 +660,34 @@ func formatBroadcastProgress(
 	return sb.String()
 }
 
-func handleBroadcastCancel(m *tg.NewMessage) error {
+func handleBroadcastCancel(c *td.Client, m *td.Message) error {
 	if !bManager.IsActive() {
-		m.Reply(F(m.ChannelID(), "broadcast_not_running"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(m.ChatID(), "broadcast_not_running"), nil)
+		return nil
 	}
 
 	bManager.Stop()
 
-	m.Reply(F(m.ChannelID(), "broadcast_cancel_success"))
-	return tg.ErrEndGroup
+	m.ReplyText(c, F(m.ChatID(), "broadcast_cancel_success"), nil)
+	return nil
 }
 
-func broadcastCancelCB(cb *tg.CallbackQuery) error {
-	if cb.SenderID != config.OwnerID {
-		cb.Answer(
-			F(cb.ChannelID(), "broadcast_cancel_owner_only"),
-			&tg.CallbackOptions{Alert: true},
-		)
-		return tg.ErrEndGroup
+func broadcastCancelCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
+	if cb.SenderUserId != config.OwnerID {
+		cb.Answer(c, 0, true, F(cb.ChatId, "broadcast_cancel_owner_only"), "")
+		return nil
 	}
 
 	if !bManager.IsActive() {
-		cb.Answer(
-			F(cb.ChannelID(), "broadcast_cancel_none_running"),
-			&tg.CallbackOptions{Alert: true},
-		)
-		return tg.ErrEndGroup
+		cb.Answer(c, 0, true, F(cb.ChatId, "broadcast_cancel_none_running"), "")
+		return nil
 	}
 
 	bManager.Stop()
 
-	cb.Answer(
-		F(cb.ChannelID(), "broadcast_cancel_done"),
-		&tg.CallbackOptions{Alert: true},
-	)
-	cb.Edit(F(cb.ChannelID(), "broadcast_cancel_done"))
-	return tg.ErrEndGroup
+	cb.Answer(c, 0, true, F(cb.ChatId, "broadcast_cancel_done"), "")
+	cb.EditMessageText(c, F(cb.ChatId, "broadcast_cancel_done"), nil)
+	return nil
 }
 
 func (bm *BroadcastManager) sleepCtx(

@@ -741,6 +741,13 @@ start_group: "<b>💫 أنا هنا!</b> جرب أمراً ما... إذا كنت
 stream_queue_finished: "🎵 <b>انتهت قائمة الانتظار!</b>\n\nلا توجد أغاني أخرى للتشغيل. استخدم /play لإضافة المزيد! 🎶"
 stream_downloading_next: "📥 جاري تنزيل المقطع التالي..."
 stream_download_fail: "❌ فشل التنزيل.\nالخطأ: <code>{error}</code>"
+download_progress: |
+  📥 جاري تنزيل أغنيتك...
+
+  <b>التقدم:</b> {percentage}%
+  <b>السرعة:</b> {speed}
+  <b>الوقت المتبقي:</b> {eta}
+  <b>الوقت المنقضي:</b> {elapsed}
 stream_play_fail: "❌ فشل تشغيل الأغنية."
 stream_now_playing: |
   <b>🎵 جاري التشغيل الآن:</b>

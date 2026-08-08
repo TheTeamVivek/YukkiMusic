@@ -23,7 +23,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/locales"
@@ -57,36 +57,36 @@ func init() {
 `
 }
 
-func reloadHandler(m *telegram.NewMessage) error {
-	return handleReload(m, false)
+func reloadHandler(c *td.Client, m *td.Message) error {
+	return handleReload(c, m, false)
 }
 
-func creloadHandler(m *telegram.NewMessage) error {
-	return handleReload(m, true)
+func creloadHandler(c *td.Client, m *td.Message) error {
+	return handleReload(c, m, true)
 }
 
-func handleReload(m *telegram.NewMessage, cplay bool) error {
-	r, err := getEffectiveRoom(m.ChannelID(), cplay)
+func handleReload(c *td.Client, m *td.Message, cplay bool) error {
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, err.Error(), nil)
+		return nil
 	}
 
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 	roomID := r.ID
 
-	if handled, err := checkReloadFlood(m, chatID, roomID); handled {
+	if handled, err := checkReloadFlood(c, m, chatID, roomID); handled {
 		return err
 	}
 
-	statusMsg, err := m.Reply(F(chatID, "reload_start"))
+	statusMsg, err := m.ReplyText(c, F(chatID, "reload_start"), nil)
 	if err != nil {
 		return err
 	}
 
 	summary := ""
 
-	admins, adminSummary := reloadAdminCache(m.Client, chatID, roomID)
+	admins, adminSummary := reloadAdminCache(c, chatID, roomID)
 	summary += adminSummary
 
 	isAdmin := slices.Contains(admins, m.SenderID())
@@ -98,9 +98,9 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		summary += F(chatID, "reload_assistant_fail", locales.Arg{
 			"error": err.Error(),
 		}) + "\n"
-		utils.EOR(statusMsg, F(chatID, "reload_done", locales.Arg{
+		_, _ = utils.EOR(c, statusMsg, F(chatID, "reload_done", locales.Arg{
 			"summary": summary,
-		}))
+		}), &td.EditTextMessageOpts{ParseMode: td.ParseModeHTML})
 		return nil
 	}
 
@@ -114,29 +114,29 @@ func handleReload(m *telegram.NewMessage, cplay bool) error {
 		}
 	}
 
-	utils.EOR(statusMsg, F(chatID, "reload_done", locales.Arg{
+	_, _ = utils.EOR(c, statusMsg, F(chatID, "reload_done", locales.Arg{
 		"summary": summary,
-	}))
+	}), &td.EditTextMessageOpts{ParseMode: td.ParseModeHTML})
 
 	return nil
 }
 
-func checkReloadFlood(m *telegram.NewMessage, chatID, roomID int64) (bool, error) {
+func checkReloadFlood(c *td.Client, m *td.Message, chatID, roomID int64) (bool, error) {
 	floodKey := fmt.Sprintf("reload:%d%d", roomID, m.SenderID())
 	if remaining := utils.GetFlood(floodKey); remaining > 0 {
-		_, err := m.Reply(F(
+		_, err := m.ReplyText(c, F(
 			chatID,
 			"flood_minutes",
 			locales.Arg{
 				"duration": utils.FormatDuration(int(remaining.Seconds())),
 			},
-		))
+		), nil)
 		return true, err
 	}
 	return false, nil
 }
 
-func reloadAdminCache(c *telegram.Client, chatID, roomID int64) ([]int64, string) {
+func reloadAdminCache(c *td.Client, chatID, roomID int64) ([]int64, string) {
 	admins, err := utils.RefreshChatAdmin(c, roomID)
 	if err != nil {
 		return nil, F(chatID, "reload_admin_cache_fail", locales.Arg{

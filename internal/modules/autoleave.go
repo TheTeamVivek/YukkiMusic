@@ -24,6 +24,7 @@ import (
 	"time"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
@@ -78,52 +79,52 @@ This command can only be used by <b>owners</b> or <b>sudo users</b>.`,
 	)
 }
 
-func autoLeaveHandler(m *tg.NewMessage) error {
+func autoLeaveHandler(c *td.Client, m *td.Message) error {
 	args := strings.Fields(m.Text())
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 
 	currentState, err := database.AutoLeave()
 	if err != nil {
-		m.Reply(F(chatID, "autoleave_fetch_fail"))
-		return tg.ErrEndGroup
+		_, _ = m.ReplyText(c, F(chatID, "autoleave_fetch_fail"), nil)
+		return nil
 	}
 
 	status := F(chatID, utils.IfElse(currentState, "enabled", "disabled"))
 
 	if len(args) < 2 {
-		m.Reply(F(chatID, "autoleave_status", locales.Arg{
+		_, _ = m.ReplyText(c, F(chatID, "autoleave_status", locales.Arg{
 			"cmd":    getCommand(m),
 			"action": status,
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
 	newState, err := utils.ParseBool(args[1])
 	if err != nil {
-		m.Reply(F(chatID, "invalid_bool"))
-		return tg.ErrEndGroup
+		_, _ = m.ReplyText(c, F(chatID, "invalid_bool"), nil)
+		return nil
 	}
 
 	if newState == currentState {
-		m.Reply(F(chatID, "autoleave_already", locales.Arg{
+		_, _ = m.ReplyText(c, F(chatID, "autoleave_already", locales.Arg{
 			"action": status,
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
 	if err := database.SetAutoLeave(newState); err != nil {
-		m.Reply(F(chatID, "autoleave_update_fail"))
-		return tg.ErrEndGroup
+		_, _ = m.ReplyText(c, F(chatID, "autoleave_update_fail"), nil)
+		return nil
 	}
 
 	newStatus := F(chatID, utils.IfElse(newState, "enabled", "disabled"))
-	m.Reply(F(chatID, "autoleave_updated", locales.Arg{
+	_, _ = m.ReplyText(c, F(chatID, "autoleave_updated", locales.Arg{
 		"action": newStatus,
-	}))
+	}), nil)
 
 	autoLeaveSvc.SetEnabled(newState)
 
-	return tg.ErrEndGroup
+	return nil
 }
 
 func (s *autoLeaveService) Start() {

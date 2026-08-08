@@ -20,16 +20,19 @@ package modules
 import (
 	"strings"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
 
-func handleLogger(m *telegram.NewMessage) error {
+func handleLogger(c *td.Client, m *td.Message) error {
+	if !checkSudo(c, m) {
+		return nil
+	}
 	args := strings.Fields(m.Text())
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 
 	current, dbErr := database.IsLoggerEnabled()
 
@@ -37,48 +40,52 @@ func handleLogger(m *telegram.NewMessage) error {
 
 	if len(args) < 2 {
 		if dbErr == nil {
-			m.Reply(F(chatID, "logger_usage", locales.Arg{
+			_, _ = m.ReplyText(c, F(chatID, "logger_usage", locales.Arg{
 				"cmd": getCommand(m),
 				"status": F(chatID, "logger_status", locales.Arg{
 					"action": action,
 				}),
-			}))
+			}), nil)
 		} else {
-			m.Reply(F(chatID, "logger_usage", locales.Arg{
+			_, _ = m.ReplyText(c, F(chatID, "logger_usage", locales.Arg{
 				"cmd":    getCommand(m),
 				"status": "",
-			}))
+			}), nil)
 		}
-		return telegram.ErrEndGroup
+		return nil
 	}
 
 	enable, err := utils.ParseBool(args[1])
 	if err != nil {
-		m.Reply(F(chatID, "invalid_bool"))
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, F(chatID, "invalid_bool"), nil)
+		return nil
 	}
 
 	action = F(chatID, utils.IfElse(enable, "enabled", "disabled"))
 	if dbErr != nil {
-		m.Reply(
+		_, _ = m.ReplyText(
+			c,
 			F(chatID, "logger_check_fail", locales.Arg{"error": dbErr.Error()}),
+			nil,
 		)
-		return telegram.ErrEndGroup
+		return nil
 	}
 
 	if current == enable {
-		m.Reply(F(chatID, "logger_already", locales.Arg{"action": action}))
-		return telegram.ErrEndGroup
+		_, _ = m.ReplyText(c, F(chatID, "logger_already", locales.Arg{"action": action}), nil)
+		return nil
 	}
 
 	if err := database.SetLoggerEnabled(enable); err != nil {
-		m.Reply(
+		_, _ = m.ReplyText(
+			c,
 			F(chatID, "logger_update_fail", locales.Arg{"error": err.Error()}),
+			nil,
 		)
-		return telegram.ErrEndGroup
+		return nil
 	}
 
-	m.Reply(F(chatID, "logger_updated", locales.Arg{"action": action}))
+	_, _ = m.ReplyText(c, F(chatID, "logger_updated", locales.Arg{"action": action}), nil)
 
-	return telegram.ErrEndGroup
+	return nil
 }

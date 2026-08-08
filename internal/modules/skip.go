@@ -71,7 +71,7 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		return telegram.ErrEndGroup
 	}
 
-	mention := utils.MentionHTML(m.Sender)
+	mention := mentionOfTg(m.Sender)
 	skipCount := 1
 
 	if args := m.Args(); args != "" {

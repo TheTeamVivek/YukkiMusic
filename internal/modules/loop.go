@@ -60,11 +60,11 @@ func cloopHandler(c *td.Client, m *td.Message) error {
 }
 
 func handleLoop(c *td.Client, m *td.Message, cplay bool) error {
-	if !isSuperGroupTd(c, m) {
+	if !isSuperGroup(c, m) {
 		return nil
 	}
 
-	if !filterAuthUsersTd(c, m) {
+	if !filterAuthUsers(c, m) {
 		return nil
 	}
 
@@ -91,7 +91,7 @@ func handleLoop(c *td.Client, m *td.Message, cplay bool) error {
 		}
 
 		msg := F(chatID, "loop_usage", locales.Arg{
-			"cmd":        getCommandTd(m),
+			"cmd":        getCommand(m),
 			"count_line": countLine,
 		})
 

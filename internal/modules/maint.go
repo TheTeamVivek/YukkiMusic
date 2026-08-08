@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/internal/core"
@@ -63,37 +63,42 @@ var maintCancel = struct {
 	cancel bool
 }{}
 
-func handleMaintenance(m *tg.NewMessage) error {
+func handleMaintenance(c *td.Client, m *td.Message) error {
+	if !checkOwner(c, m) {
+		return nil
+	}
 	args := strings.Fields(m.Text())
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 	current, err := database.IsMaintenanceEnabled()
 	if err != nil {
-		m.Reply(
+		_, _ = m.ReplyText(
+			c,
 			F(chatID, "maint_check_fail", locales.Arg{"error": err.Error()}),
+			nil,
 		)
-		return tg.ErrEndGroup
+		return nil
 	}
 
 	if len(args) < 2 {
-		return showMaintenanceStatus(m, current)
+		return showMaintenanceStatus(c, m, current)
 	}
 
 	enable, err := utils.ParseBool(args[1])
 	if err != nil {
-		m.Reply(F(chatID, "invalid_bool"))
-		return tg.ErrEndGroup
+		_, _ = m.ReplyText(c, F(chatID, "invalid_bool"), nil)
+		return nil
 	}
 
 	reason := strings.Join(args[2:], " ")
 	if current == enable {
-		return handleSameMaintenanceState(m, enable, reason)
+		return handleSameMaintenanceState(c, m, enable, reason)
 	}
 
-	return applyMaintenanceState(m, enable, reason)
+	return applyMaintenanceState(c, m, enable, reason)
 }
 
-func showMaintenanceStatus(m *tg.NewMessage, current bool) error {
-	chatID := m.ChannelID()
+func showMaintenanceStatus(c *td.Client, m *td.Message, current bool) error {
+	chatID := m.ChatID()
 	reason, _ := database.MaintenanceReason()
 	status := F(chatID, "disabled")
 	if current {
@@ -107,44 +112,47 @@ func showMaintenanceStatus(m *tg.NewMessage, current bool) error {
 			status = F(chatID, "enabled")
 		}
 	}
-	m.Reply(F(chatID, "maint_usage", locales.Arg{
+	_, _ = m.ReplyText(c, F(chatID, "maint_usage", locales.Arg{
 		"cmd":    getCommand(m),
 		"status": status,
-	}))
-	return tg.ErrEndGroup
+	}), nil)
+	return nil
 }
 
 func handleSameMaintenanceState(
-	m *tg.NewMessage,
+	c *td.Client,
+	m *td.Message,
 	enable bool,
 	reason string,
 ) error {
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 	if !enable {
-		m.Reply(F(chatID, "maint_already_disabled"))
-		return tg.ErrEndGroup
+		_, _ = m.ReplyText(c, F(chatID, "maint_already_disabled"), nil)
+		return nil
 	}
 
 	oldReason, _ := database.MaintenanceReason()
 	switch {
 	case reason == oldReason:
-		m.Reply(F(chatID, "maint_already_reason_same"))
+		_, _ = m.ReplyText(c, F(chatID, "maint_already_reason_same"), nil)
 	case reason == "" && oldReason != "":
 		_ = database.SetMaintenance(true, "")
-		m.Reply(F(chatID, "maint_reason_removed"))
+		_, _ = m.ReplyText(c, F(chatID, "maint_reason_removed"), nil)
 	case reason != "" && reason != oldReason:
 		_ = database.SetMaintenance(true, reason)
-		m.Reply(
+		_, _ = m.ReplyText(
+			c,
 			F(chatID, "maint_reason_updated", locales.Arg{"reason": reason}),
+			nil,
 		)
 	default:
-		m.Reply(F(chatID, "maint_already_enabled"))
+		_, _ = m.ReplyText(c, F(chatID, "maint_already_enabled"), nil)
 	}
-	return tg.ErrEndGroup
+	return nil
 }
 
-func applyMaintenanceState(m *tg.NewMessage, enable bool, reason string) error {
-	chatID := m.ChannelID()
+func applyMaintenanceState(c *td.Client, m *td.Message, enable bool, reason string) error {
+	chatID := m.ChatID()
 	database.SetMaintenance(enable, reason)
 	logger.Infof(
 		"User %d set maintenance: %v (reason: %s)",
@@ -158,22 +166,22 @@ func applyMaintenanceState(m *tg.NewMessage, enable bool, reason string) error {
 	maintCancel.Unlock()
 
 	if enable {
-		go notifyMaintenanceStart(m.Client, reason)
+		go notifyMaintenanceStart(c, reason)
 		msgKey := "maint_enabled"
 		args := locales.Arg{}
 		if reason != "" {
 			msgKey = "maint_enabled_reason"
 			args["reason"] = reason
 		}
-		m.Reply(F(chatID, msgKey, args))
+		_, _ = m.ReplyText(c, F(chatID, msgKey, args), nil)
 	} else {
-		m.Reply(F(chatID, "maint_disabled"))
+		_, _ = m.ReplyText(c, F(chatID, "maint_disabled"), nil)
 	}
 
-	return tg.ErrEndGroup
+	return nil
 }
 
-func notifyMaintenanceStart(c *tg.Client, reason string) {
+func notifyMaintenanceStart(c *td.Client, reason string) {
 	for chatID := range core.GetAllRooms() {
 		maintCancel.Lock()
 		cancelled := maintCancel.cancel
@@ -192,7 +200,7 @@ func notifyMaintenanceStart(c *tg.Client, reason string) {
 				locales.Arg{"reason": reason},
 			)
 		}
-		c.SendMessage(chatID, msg)
+		_, _ = c.SendTextMessage(chatID, msg, nil)
 		time.Sleep(time.Second)
 	}
 }

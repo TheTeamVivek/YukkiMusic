@@ -25,7 +25,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 )
 
 func GetDurationByFFProbe(filePath string) (int, error) {
@@ -57,24 +57,42 @@ func GetDurationByFFProbe(filePath string) (int, error) {
 	return int(seconds), nil
 }
 
-func GetDuration(f *telegram.MessageMediaDocument) int {
-	if f.Document == nil {
+func GetDuration(m *td.Message) int {
+	if m == nil || m.Content == nil {
 		return 0
 	}
-	d, ok := f.Document.(*telegram.DocumentObj)
-
-	if !ok {
-		return 0
-	}
-
-	for _, attr := range d.Attributes {
-		switch a := attr.(type) {
-		case *telegram.DocumentAttributeAudio:
-			return int(a.Duration)
-		case *telegram.DocumentAttributeVideo:
-			return int(a.Duration)
+	switch c := m.Content.(type) {
+	case *td.MessageAudio:
+		if c.Audio != nil {
+			return int(c.Audio.Duration)
+		}
+	case *td.MessageVideo:
+		if c.Video != nil {
+			return int(c.Video.Duration)
+		}
+	case *td.MessageVoiceNote:
+		if c.VoiceNote != nil {
+			return int(c.VoiceNote.Duration)
+		}
+	case *td.MessageVideoNote:
+		if c.VideoNote != nil {
+			return int(c.VideoNote.Duration)
+		}
+	case *td.MessageDocument:
+		if c.Document != nil {
+			return int(GetDurationByFFProbeSafe(c.Document.FileName))
 		}
 	}
-
 	return 0
+}
+
+func GetDurationByFFProbeSafe(fileName string) int {
+	if fileName == "" {
+		return 0
+	}
+	dur, err := GetDurationByFFProbe(fileName)
+	if err != nil {
+		return 0
+	}
+	return dur
 }

@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	td "github.com/AshokShau/gotdbot"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -109,15 +110,27 @@ func isChannel(c *td.Client, m *td.Message) bool {
 // mentionOf builds an HTML mention, falling back to a plain "user" mention
 // if sender is nil (e.g. GetUser failed).
 func mentionOf(sender *td.User, fallbackId int64) string {
-	name := "user"
-	id := fallbackId
-	if sender != nil {
-		if full := strings.TrimSpace(sender.FirstName + " " + sender.LastName); full != "" {
-			name = full
-		}
-		id = sender.Id
+	if sender == nil {
+		return mentionOfName("user", fallbackId)
+	}
+	return mentionOfName(strings.TrimSpace(sender.FirstName+" "+sender.LastName), sender.Id)
+}
+
+// mentionOfName builds an HTML mention for a raw name and user ID.
+func mentionOfName(name string, id int64) string {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		name = "user"
 	}
 	return td.Mention(name, id, true, true)
+}
+
+// mentionOfTg builds an HTML mention for a gogram UserObj.
+func mentionOfTg(u *tg.UserObj) string {
+	if u == nil {
+		return "Unknown"
+	}
+	return mentionOfName(strings.TrimSpace(u.FirstName+" "+u.LastName), u.ID)
 }
 
 // logStart reports a bot start to the configured logger chat, if enabled.

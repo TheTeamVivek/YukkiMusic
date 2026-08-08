@@ -95,7 +95,7 @@ func handleStop(m *telegram.NewMessage, cplay bool) error {
 		F(
 			m.ChannelID(),
 			"stopped",
-			locales.Arg{"user": utils.MentionHTML(m.Sender)},
+			locales.Arg{"user": mentionOfTg(m.Sender)},
 		),
 	)
 	return telegram.ErrEndGroup

@@ -204,7 +204,7 @@ func handlePlay(m *tg.NewMessage, opts *playOpts) error {
 		return tg.ErrEndGroup
 	}
 
-	mention := utils.MentionHTML(m.Sender)
+	mention := mentionOfTg(m.Sender)
 	if err := playTracksAndRespond(m, searchMsg, room, tracks, mention, isActive, opts.Force, availableSlots); err != nil {
 		return err
 	}
@@ -341,7 +341,7 @@ func ensureVoiceChatReady(
 	if snap.AssistantBanned {
 		err := fmt.Errorf("assistant banned")
 		utils.EOR(replyMsg, F(chatID, "err_assistant_banned", locales.Arg{
-			"user": utils.MentionHTML(cs.Assistant.Self),
+			"user": mentionOfTg(cs.Assistant.Self),
 			"id":   utils.IntToStr(cs.Assistant.Self.ID),
 		}))
 		return err

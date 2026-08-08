@@ -19,23 +19,24 @@ package utils
 
 import (
 	"fmt"
+	"unicode/utf16"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 )
 
-func ExtractURLs(m *telegram.NewMessage) ([]string, error) {
-	if m == nil || m.Message == nil {
+func ExtractURLs(c *td.Client, m *td.Message) ([]string, error) {
+	if m == nil {
 		return nil, fmt.Errorf("invalid message")
 	}
 
-	urls := make([]string, 0, estimateCapacity(m))
-	urls = append(urls, collectURLs(m.Message)...)
+	urls := make([]string, 0, len(m.Entities()))
+	urls = append(urls, collectURLs(m.Text(), m.Entities())...)
 
-	if !m.IsReply() {
+	if m.ReplyToMessageID() <= 0 {
 		return finalizeURLs(urls)
 	}
 
-	r, err := m.GetReplyMessage()
+	r, err := m.GetRepliedMessage(c)
 	if err != nil {
 		if len(urls) > 0 {
 			return urls, fmt.Errorf("failed to fetch reply message: %w", err)
@@ -43,43 +44,43 @@ func ExtractURLs(m *telegram.NewMessage) ([]string, error) {
 		return nil, fmt.Errorf("failed to fetch reply message: %w", err)
 	}
 
-	urls = append(urls, collectURLs(r.Message)...)
+	urls = append(urls, collectURLs(r.Text(), r.Entities())...)
 	return finalizeURLs(urls)
 }
 
 // --- Sub Functions ---
 
-func estimateCapacity(m *telegram.NewMessage) int {
-	capacity := len(m.Message.Entities)
-	if m.IsReply() {
-		if r, err := m.GetReplyMessage(); err == nil && r.Message != nil {
-			capacity += len(r.Message.Entities)
-		}
-	}
-	return capacity
-}
+func collectURLs(text string, entities []td.TextEntity) []string {
+	urls := make([]string, 0, len(entities))
 
-func collectURLs(msg *telegram.MessageObj) []string {
-	if msg == nil {
-		return nil
-	}
-
-	text := msg.Message
-	urls := make([]string, 0, len(msg.Entities))
-
-	for _, ent := range msg.Entities {
-		switch e := ent.(type) {
-		case *telegram.MessageEntityURL:
-			if int(e.Offset+e.Length) <= len(text) {
-				urls = append(urls, text[e.Offset:e.Offset+e.Length])
+	for _, ent := range entities {
+		switch e := ent.Type.(type) {
+		case *td.TextEntityTypeUrl:
+			if seg, ok := sliceUTF16(text, ent.Offset, ent.Length); ok {
+				urls = append(urls, seg)
 			}
-		case *telegram.MessageEntityTextURL:
-			if e.URL != "" {
-				urls = append(urls, e.URL)
+		case *td.TextEntityTypeTextUrl:
+			if e.Url != "" {
+				urls = append(urls, e.Url)
 			}
 		}
 	}
 	return urls
+}
+
+// sliceUTF16 slices the given string using UTF-16 code unit offsets,
+// which is what Telegram text entities use.
+func sliceUTF16(s string, offset, length int32) (string, bool) {
+	if offset < 0 || length < 0 {
+		return "", false
+	}
+	u16 := utf16.Encode([]rune(s))
+	start := int(offset)
+	end := start + int(length)
+	if end > len(u16) {
+		return "", false
+	}
+	return string(utf16.Decode(u16[start:end])), true
 }
 
 func finalizeURLs(urls []string) ([]string, error) {

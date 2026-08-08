@@ -24,7 +24,7 @@ import (
 	"syscall"
 	"time"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
@@ -52,24 +52,24 @@ func init() {
 All playback will be interrupted. Bot will be offline for a few seconds.`
 }
 
-func handleRestart(m *tg.NewMessage) error {
-	chatID := m.ChannelID()
+func handleRestart(c *td.Client, m *td.Message) error {
+	chatID := m.ChatID()
 	r, ok := getActiveRoomForChat(chatID)
 	if ok && r.Track() != nil {
-		_, _ = m.Reply(F(chatID, "restart_confirm_running"), &tg.SendOptions{
+		_, _ = m.ReplyText(c, F(chatID, "restart_confirm_running"), &td.SendTextMessageOpts{
 			ReplyMarkup: core.GetRestartConfirmMarkup(chatID),
 		})
-		return tg.ErrEndGroup
+		return nil
 	}
-	return performRestart(m, chatID)
+	return performRestart(c, m, chatID)
 }
 
-func performRestart(m *tg.NewMessage, chatID int64) error {
-	statusMsg, err := m.Reply(F(chatID, "restart"))
+func performRestart(c *td.Client, m *td.Message, chatID int64) error {
+	statusMsg, err := m.ReplyText(c, F(chatID, "restart"), nil)
 	if err != nil {
 		logger.Error("Failed to send restart message: " + err.Error())
 	}
-	return executeRestart(m.Client, chatID, statusMsg)
+	return executeRestart(c, chatID, statusMsg)
 }
 
 func getActiveRoomForChat(chatID int64) (*core.RoomState, bool) {
@@ -80,68 +80,67 @@ func getActiveRoomForChat(chatID int64) (*core.RoomState, bool) {
 	return r, true
 }
 
-func restartConfirmHandler(cb *tg.CallbackQuery) error {
-	chatID := cb.ChannelID()
-	opt := &tg.CallbackOptions{Alert: true}
+func restartConfirmHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
+	chatID := u.ChatId
 
-	if cb.SenderID != config.OwnerID {
-		cb.Answer(F(chatID, "only_owner"), opt)
-		return tg.ErrEndGroup
+	if u.SenderUserId != config.OwnerID {
+		_ = u.Answer(c, 0, true, F(chatID, "only_owner"), "")
+		return nil
 	}
 
-	action := strings.TrimPrefix(cb.DataString(), "restart:")
+	action := strings.TrimPrefix(u.DataString(), "restart:")
 	switch action {
 	case "bot":
-		cb.Answer(F(chatID, "restart_confirm_bot"))
-		statusMsg, _ := cb.Edit(F(chatID, "restart"))
-		return executeRestart(cb.Client, chatID, statusMsg)
+		_ = u.Answer(c, 0, false, F(chatID, "restart_confirm_bot"), "")
+		statusMsg, _ := u.EditMessageText(c, F(chatID, "restart"), nil)
+		return executeRestart(c, chatID, statusMsg)
 	case "replay":
 		r, ok := getActiveRoomForChat(chatID)
 		if !ok {
-			cb.Answer(F(chatID, "room_no_active"), opt)
-			return tg.ErrEndGroup
+			_ = u.Answer(c, 0, true, F(chatID, "room_no_active"), "")
+			return nil
 		}
 		if err := r.Replay(); err != nil {
-			cb.Answer(F(chatID, "replay_failed", locales.Arg{"error": err}), opt)
-			return tg.ErrEndGroup
+			_ = u.Answer(c, 0, true, F(chatID, "replay_failed", locales.Arg{"error": err}), "")
+			return nil
 		}
-		_, _ = cb.Edit(F(chatID, "restart_confirm_replay_done"))
-		cb.Answer(F(chatID, "restart_confirm_replay_done"))
+		_, _ = u.EditMessageText(c, F(chatID, "restart_confirm_replay_done"), nil)
+		_ = u.Answer(c, 0, true, F(chatID, "restart_confirm_replay_done"), "")
 	}
 
-	return tg.ErrEndGroup
+	return nil
 }
 
 func executeRestart(
-	client *tg.Client,
+	c *td.Client,
 	chatID int64,
-	statusMsg *tg.NewMessage,
+	statusMsg *td.Message,
 ) error {
 	exePath, err := os.Executable()
 	if err != nil {
 		utils.EOR(statusMsg, F(chatID, "restart_exepath_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
 	exePath, err = filepath.EvalSymlinks(exePath)
 	if err != nil {
 		utils.EOR(statusMsg, F(chatID, "restart_symlink_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
 	for roomChatID := range core.GetAllRooms() {
 		core.DeleteRoom(roomChatID)
-		client.SendMessage(roomChatID, F(roomChatID, "restart_service", locales.Arg{
-			"bot": utils.MentionHTML(client.Me()),
-		}))
+		_, _ = c.SendTextMessage(roomChatID, F(roomChatID, "restart_service", locales.Arg{
+			"bot": mentionOf(c.Me, c.Me.Id),
+		}), nil)
 		time.Sleep(time.Second)
 	}
 
-	utils.EOR(statusMsg, F(chatID, "restart_initiated"))
+	utils.EOR(statusMsg, F(chatID, "restart_initiated"), nil)
 
 	_ = os.RemoveAll("downloads")
 	_ = os.RemoveAll("cache")
@@ -149,8 +148,8 @@ func executeRestart(
 	if err := syscall.Exec(exePath, os.Args, os.Environ()); err != nil {
 		utils.EOR(statusMsg, F(chatID, "restart_fail", locales.Arg{
 			"error": err.Error(),
-		}))
+		}), nil)
 	}
 
-	return tg.ErrEndGroup
+	return nil
 }

@@ -23,7 +23,7 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/mem"
@@ -51,10 +51,10 @@ func init() {
 • <b>Sudo users</b> only`
 }
 
-func resolveGogramVersion() string {
+func resolveTdVersion() string {
 	if info, ok := debug.ReadBuildInfo(); ok {
 		for _, dep := range info.Deps {
-			if dep.Path == "github.com/amarnathcjd/gogram" {
+			if dep.Path == "github.com/AshokShau/gotdbot" {
 				if dep.Replace != nil && dep.Replace.Version != "" {
 					return dep.Replace.Version
 				}
@@ -65,11 +65,14 @@ func resolveGogramVersion() string {
 		}
 	}
 
-	return telegram.Version
+	return td.Version
 }
 
-func statsHandler(m *telegram.NewMessage) error {
-	chatID := m.ChannelID()
+func statsHandler(c *td.Client, m *td.Message) error {
+	if !checkSudo(c, m) {
+		return nil
+	}
+	chatID := m.ChatID()
 	var memStats runtime.MemStats
 
 	runtime.ReadMemStats(&memStats)
@@ -127,7 +130,7 @@ func statsHandler(m *telegram.NewMessage) error {
 	dbCollections := dbStats["collections"]
 	dbObjects := dbStats["objects"]
 
-	m.Reply(F(chatID, "stats_overview", locales.Arg{
+	_, _ = m.ReplyText(c, F(chatID, "stats_overview", locales.Arg{
 		"os":                runtime.GOOS,
 		"arch":              runtime.GOARCH,
 		"cpus":              runtime.NumCPU(),
@@ -151,11 +154,11 @@ func statsHandler(m *telegram.NewMessage) error {
 		"served_chats":      servedChatsVal,
 		"served_users":      servedUsersVal,
 		"go_version":        runtime.Version(),
-		"gogram_api_layer":  telegram.ApiVersion,
-		"gogram_version":    resolveGogramVersion(),
+		"gogram_api_layer":  td.TDLibVersion,
+		"gogram_version":    resolveTdVersion(),
 		"ntgcalls_version":  ntgcalls.Version(),
 	}))
-	return telegram.ErrEndGroup
+	return nil
 }
 
 func interfaceToFloat(v any) float64 {

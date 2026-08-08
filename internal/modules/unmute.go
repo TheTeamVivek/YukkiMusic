@@ -51,11 +51,11 @@ func handleUnmute(c *td.Client, m *td.Message, cplay bool) error {
 		return nil
 	}
 
-	if !isSuperGroupTd(c, m) {
+	if !isSuperGroup(c, m) {
 		return nil
 	}
 
-	if !filterAuthUsersTd(c, m) {
+	if !filterAuthUsers(c, m) {
 		return nil
 	}
 

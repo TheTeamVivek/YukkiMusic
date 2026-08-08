@@ -18,7 +18,7 @@
 package modules
 
 import (
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/locales"
@@ -47,8 +47,11 @@ Monitor bot usage and identify issues.`
 	}
 }
 
-func activeHandler(m *telegram.NewMessage) error {
-	chatID := m.ChannelID()
+func activeHandler(c *td.Client, m *td.Message) error {
+	if !checkSudo(c, m) {
+		return nil
+	}
+	chatID := m.ChatID()
 
 	allRooms := core.GetAllRooms()
 	activeCount := len(allRooms)
@@ -82,6 +85,6 @@ func activeHandler(m *telegram.NewMessage) error {
 		})
 	}
 
-	m.Reply(msg)
-	return telegram.ErrEndGroup
+	_, _ = m.ReplyText(c, msg, nil)
+	return nil
 }

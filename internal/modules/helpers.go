@@ -25,7 +25,7 @@ import (
 	"sync"
 	"time"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
@@ -133,131 +133,95 @@ func isLoggerEnabled() bool {
 	return l
 }
 
-func sendPlayLogs(m *tg.NewMessage, track *state.Track, queued bool) {
+func sendPlayLogs(c *td.Client, m *td.Message, track *state.Track, queued bool) {
 	if config.LoggerID == 0 || config.LoggerID == m.ChatID() ||
-		config.LoggerID == m.ChannelID() || m.SenderID() == config.OwnerID ||
-		!isLoggerEnabled() {
+		m.SenderID() == config.OwnerID || !isLoggerEnabled() {
 		return
 	}
 
-	header := F(m.ChannelID(), "logger_playback_started")
+	header := F(m.ChatID(), "logger_playback_started")
 	if queued {
-		header = F(m.ChannelID(), "logger_playback_queued")
+		header = F(m.ChatID(), "logger_playback_queued")
+	}
+
+	chat, _ := m.GetChat(c)
+	groupName := "N/A"
+	groupLink := ""
+	if chat != nil {
+		groupName = chat.Title
+		if l, err := m.GetLink(c); err == nil && l != nil && l.IsPublic {
+			groupLink = l.Link
+		}
 	}
 
 	var sb strings.Builder
 	sb.WriteString("🎵 ")
-	if m.Channel.Username != "" {
-		fmt.Fprintf(&sb, "<b><a href=\"%s\">%s</a></b>\n\n", m.Link(), header)
+	if groupLink != "" {
+		fmt.Fprintf(&sb, "<b><a href=\"%s\">%s</a></b>\n\n", groupLink, header)
 	} else {
 		fmt.Fprintf(&sb, "<b><u>%s</u></b>\n\n", header)
 	}
 
-	groupName := m.Channel.Title
-	if m.Channel.Username != "" {
-		groupName = "@" + m.Channel.Username
-	}
+	sender, _ := m.GetUser(c)
+	requestedBy := mentionOf(sender, m.SenderID())
 
-	requestedBy := utils.MentionHTML(m.Sender)
-	if m.Sender.Username != "" {
-		requestedBy = "@" + m.Sender.Username
-	}
-
-	if track.Artwork != "" {
-		sb.WriteString("<blockquote>")
-	}
-
-	sb.WriteString(F(m.ChannelID(), "logger_playback_template", locales.Arg{
+	sb.WriteString(F(m.ChatID(), "logger_playback_template", locales.Arg{
 		"track_url":       track.URL,
 		"track":           utils.EscapeHTML(utils.ShortTitle(track.Title)),
 		"source":          string(track.Source),
 		"group":           groupName,
-		"group_id":        m.ChannelID(),
+		"group_id":        m.ChatID(),
 		"requested_by":    requestedBy,
 		"requested_by_id": m.SenderID(),
 	}))
 
-	if track.Artwork != "" {
-		sb.WriteString("\n</blockquote>")
-	}
-
-	text := sb.String()
-	opts := &tg.SendOptions{ParseMode: "HTML"}
-	if shouldShowThumb(config.LoggerID) && track.Artwork != "" {
-		opts.Media = utils.CleanURL(track.Artwork)
-	}
-
-	_, err := core.Bot.SendMessage(config.LoggerID, text, opts)
+	_, err := core.TDBot.SendTextMessage(
+		config.LoggerID,
+		sb.String(),
+		&td.SendTextMessageOpts{ParseMode: "HTML"},
+	)
 	if err != nil {
 		logger.Error("failed to send logger msg: " + err.Error())
 	}
 }
 
-func blacklistMessageMiddleware(next tg.MessageHandler) tg.MessageHandler {
-	return func(m *tg.NewMessage) error {
-		if blockedChat, _ := database.IsBlacklistedChat(m.ChannelID()); blockedChat {
-			if isOwnerOrSudo(m.SenderID()) {
-				return next(m)
-			}
-			m.Reply(F(m.ChannelID(), "blacklist_chat_blocked"))
-			leaveChat(m.Client, m.ChannelID())
-			return tg.ErrEndGroup
-		}
-		if blocked, _ := database.IsBlacklistedUser(m.SenderID()); blocked {
-			if m.IsChannel() {
-				chatOwnerID, err := utils.GetChatOwner(m.Client, m.ChannelID())
-				if err == nil && chatOwnerID == m.SenderID() {
-					m.Reply(F(m.ChannelID(), "blacklist_owner_blocked_leave"))
-					leaveChat(m.Client, m.ChannelID())
-					return tg.ErrEndGroup
-				}
-			}
-			if m.IsPrivate() || strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
-				m.Reply(F(m.ChannelID(), "blacklist_user_blocked"))
-			}
-			return tg.ErrEndGroup
-		}
-		return next(m)
-	}
-}
-
 func WithBlacklistCallback(
-	handler func(*tg.CallbackQuery) error,
-) func(*tg.CallbackQuery) error {
-	return func(cb *tg.CallbackQuery) error {
-		if blocked, _ := database.IsBlacklistedUser(cb.SenderID); blocked {
-			return tg.ErrEndGroup
+	handler func(*td.UpdateNewCallbackQuery) error,
+) func(*td.UpdateNewCallbackQuery) error {
+	return func(cb *td.UpdateNewCallbackQuery) error {
+		if blocked, _ := database.IsBlacklistedUser(cb.SenderUserId); blocked {
+			return nil
 		}
-		if blockedChat, _ := database.IsBlacklistedChat(cb.ChannelID()); blockedChat {
-			if isOwnerOrSudo(cb.SenderID) {
+		if blockedChat, _ := database.IsBlacklistedChat(cb.ChatId); blockedChat {
+			if isOwnerOrSudo(cb.SenderUserId) {
 				return handler(cb)
 			}
-			return tg.ErrEndGroup
+			return nil
 		}
 		return handler(cb)
 	}
 }
 
-func warnAndLeave(client *tg.Client, chatID int64) {
-	text := F(chatID, "supergroup_needed", locales.Arg{"chat_id": chatID, "support_group": config.SupportChat})
-	_, err := client.SendMessage(chatID, text, &tg.SendOptions{
-		ReplyMarkup: core.AddMeMarkup(chatID),
-		LinkPreview: false,
+func warnAndLeave(c *td.Client, chatID int64) {
+	text := F(chatID, "supergroup_needed", locales.Arg{
+		"chat_id":       chatID,
+		"support_group": config.SupportChat,
 	})
-	if err != nil {
+
+	if _, err := c.SendTextMessage(chatID, text, nil); err != nil {
 		logger.Errorf("failed to send supergroup conversion message to chat %d: %v", chatID, err)
 		return
 	}
 
 	go func() {
-		leaveChat(client, chatID)
+		leaveChat(c, chatID)
 	}()
 }
 
-func leaveChat(client *tg.Client, chatID int64) {
+func leaveChat(c *td.Client, chatID int64) {
 	go func() {
 		time.Sleep(1 * time.Second)
-		if err := client.LeaveChannel(chatID); err != nil {
+		if err := c.LeaveChat(chatID); err != nil {
 			logger.Errorf("failed to leave blacklisted chatID=%d: %v", chatID, err)
 		}
 		core.Assistants.WithAssistant(
@@ -265,9 +229,4 @@ func leaveChat(client *tg.Client, chatID int64) {
 			func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) },
 		)
 	}()
-}
-
-func getCommand(m *tg.NewMessage) string {
-	cmd, _, _ := strings.Cut(m.GetCommand(), "@")
-	return cmd
 }

@@ -29,7 +29,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config/cookies"
@@ -137,7 +137,7 @@ func (y *YtdlpPlatform) CanDownload(source state.PlatformName) bool {
 func (y *YtdlpPlatform) Download(
 	ctx context.Context,
 	track *state.Track,
-	_ *telegram.NewMessage,
+	_ *td.Message,
 ) (string, error) {
 	if f := findFile(track); f != "" {
 		logger.Debug("YtDlp: cache hit " + f)

@@ -26,7 +26,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 	"golang.org/x/oauth2/clientcredentials"
@@ -119,7 +119,7 @@ func (s *SpotifyPlatform) CanDownload(source state.PlatformName) bool {
 func (s *SpotifyPlatform) Download(
 	_ context.Context,
 	track *state.Track,
-	_ *telegram.NewMessage,
+	_ *td.Message,
 ) (string, error) {
 	ytTrack, err := s.resolveToYouTube(track)
 	if err != nil {

@@ -22,105 +22,114 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 )
 
-func ExtractUser(m *telegram.NewMessage) (int64, error) {
-	if m == nil || m.Message == nil {
+// ExtractUser extracts a user ID from a message.
+// It supports replies, inline mentions, @username mentions and plain text IDs/usernames.
+func ExtractUser(c *td.Client, m *td.Message) (int64, error) {
+	if m == nil {
 		return 0, fmt.Errorf("invalid message")
 	}
 
-	if m.IsReply() {
-		return extractFromReply(m)
+	if m.ReplyToMessageID() > 0 {
+		return extractUserFromReply(c, m)
 	}
 
-	text := m.Text()
+	text := strings.TrimSpace(m.Text())
 	if text == "" {
 		return 0, fmt.Errorf("empty message text")
 	}
 
-	if id, err := extractFromEntities(m, text); err != nil {
+	if id, err := extractUserFromEntities(c, m, text); err != nil {
 		return 0, err
 	} else if id != 0 {
 		return id, nil
 	}
 
-	return extractFromPlainText(m, text)
+	return extractUserFromPlainText(c, text)
 }
 
-// --- Sub Functions ---
-
-func extractFromReply(m *telegram.NewMessage) (int64, error) {
-	r, err := m.GetReplyMessage()
+func extractUserFromReply(c *td.Client, m *td.Message) (int64, error) {
+	r, err := c.GetMessage(m.ChatID(), m.ReplyToMessageID())
 	if err != nil {
 		return 0, fmt.Errorf("failed to fetch reply message: %w", err)
 	}
-
-	if r.Message.FromID == nil {
+	if r == nil || r.SenderId == nil {
 		return 0, fmt.Errorf(
 			"replied message's sender is not a user (may be anon admin)",
 		)
 	}
-
-	if _, ok := r.Message.FromID.(*telegram.PeerUser); !ok {
+	u, ok := r.SenderId.(*td.MessageSenderUser)
+	if !ok {
 		return 0, fmt.Errorf(
 			"replied message's sender is not a user (maybe channel/group)",
 		)
 	}
-
-	return r.SenderID(), nil
+	return u.UserId, nil
 }
 
-func extractFromEntities(m *telegram.NewMessage, text string) (int64, error) {
-	for _, ent := range m.Message.Entities {
-		switch e := ent.(type) {
-
-		// Inline mention (tg://user?id=xxxx)
-		case *telegram.MessageEntityMentionName:
-			return e.UserID, nil
-
-		// @username mention → resolve peer
-		case *telegram.MessageEntityMention:
-			username := strings.TrimPrefix(text[e.Offset:e.Offset+e.Length], "@")
-			peer, err := m.Client.ResolvePeer(username)
+func extractUserFromEntities(c *td.Client, m *td.Message, text string) (int64, error) {
+	for _, ent := range m.Entities() {
+		switch e := ent.Type.(type) {
+		case *td.TextEntityTypeMentionName:
+			return e.UserId, nil
+		case *td.TextEntityTypeMention:
+			start := int(ent.Offset)
+			end := start + int(ent.Length)
+			if start < 0 || end > len(text) || start > end {
+				continue
+			}
+			username := strings.TrimPrefix(text[start:end], "@")
+			uid, err := resolveUserID(c, username)
 			if err != nil {
-				return 0, fmt.Errorf("failed to resolve peer for @%s: %w", username, err)
+				return 0, err
 			}
-
-			userPeer, ok := peer.(*telegram.InputPeerUser)
-			if !ok {
-				return 0, fmt.Errorf("resolved peer is not a user (maybe channel/group)")
+			if uid == 0 {
+				return 0, fmt.Errorf(
+					"resolved peer is not a user (maybe channel/group)",
+				)
 			}
-
-			return userPeer.UserID, nil
+			return uid, nil
 		}
 	}
 	return 0, nil
 }
 
-func extractFromPlainText(m *telegram.NewMessage, text string) (int64, error) {
+func extractUserFromPlainText(c *td.Client, text string) (int64, error) {
 	parts := strings.Fields(text)
 	if len(parts) < 2 {
 		return 0, fmt.Errorf("no user identifier found")
 	}
 
-	idStr := parts[1]
-
+	idStr := strings.TrimPrefix(strings.TrimSpace(parts[1]), "@")
 	if id, err := strconv.ParseInt(idStr, 10, 64); err == nil {
 		return id, nil
 	}
 
-	peer, err := m.Client.ResolvePeer(idStr)
+	uid, err := resolveUserID(c, idStr)
 	if err != nil {
-		return 0, fmt.Errorf("failed to resolve peer: %w", err)
+		return 0, err
 	}
-
-	userPeer, ok := peer.(*telegram.InputPeerUser)
-	if !ok {
+	if uid == 0 {
 		return 0, fmt.Errorf(
 			"resolved peer is not a user (maybe channel/group)",
 		)
 	}
+	return uid, nil
+}
 
-	return userPeer.UserID, nil
+func resolveUserID(c *td.Client, username string) (int64, error) {
+	chat, err := c.SearchPublicChat(username)
+	if err != nil {
+		return 0, fmt.Errorf("failed to resolve peer: %w", err)
+	}
+	if chat == nil {
+		return 0, fmt.Errorf("resolved peer is not a user")
+	}
+	priv, ok := chat.Type.(*td.ChatTypePrivate)
+	if !ok {
+		return 0, nil
+	}
+	return priv.UserId, nil
 }

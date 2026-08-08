@@ -25,7 +25,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
@@ -110,7 +110,7 @@ func (p *YouTubePlatform) Get(input string, video bool) ([]*state.Track, error) 
 
 func (p *YouTubePlatform) CanDownload(_ state.PlatformName) bool { return false }
 
-func (p *YouTubePlatform) Download(_ context.Context, _ *state.Track, _ *telegram.NewMessage) (string, error) {
+func (p *YouTubePlatform) Download(_ context.Context, _ *state.Track, _ *td.Message) (string, error) {
 	return "", errors.New("youtube platform does not support downloading")
 }
 

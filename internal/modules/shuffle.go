@@ -59,11 +59,11 @@ func cshuffleHandler(c *td.Client, m *td.Message) error {
 }
 
 func handleShuffle(c *td.Client, m *td.Message, cplay bool) error {
-	if !isSuperGroupTd(c, m) {
+	if !isSuperGroup(c, m) {
 		return nil
 	}
 
-	if !filterAuthUsersTd(c, m) {
+	if !filterAuthUsers(c, m) {
 		return nil
 	}
 
@@ -85,10 +85,10 @@ func handleShuffle(c *td.Client, m *td.Message, cplay bool) error {
 
 	if arg == "" {
 		state := F(chatID, "disabled")
-		cmd := getCommandTd(m) + " on"
+		cmd := getCommand(m) + " on"
 		if r.Shuffle() {
 			state = F(chatID, "enabled")
-			cmd = getCommandTd(m) + " off"
+			cmd = getCommand(m) + " off"
 		}
 
 		m.ReplyText(c, F(chatID, "shuffle_current_state", locales.Arg{

@@ -42,25 +42,25 @@ func actionFilter(m *td.Message) bool {
 	return false
 }
 
-func handleActionsTd(c *td.Client, m *td.Message) error {
-	if !isValidChatTypeTd(c, m) {
-		warnAndLeaveTd(c, m.ChatID())
+func handleActions(c *td.Client, m *td.Message) error {
+	if !isValidChatType(c, m) {
+		warnAndLeave(c, m.ChatID())
 		return nil
 	}
 
 	switch m.Content.(type) {
 	case *td.MessageChatAddMembers:
-		return handleChatMemberAddTd(c, m)
+		return handleChatMemberAdd(c, m)
 	case *td.MessageChatDeleteMember:
-		return handleChatMemberDeleteTd(c, m)
+		return handleChatMemberDelete(c, m)
 	case *td.MessageVideoChatStarted, *td.MessageVideoChatEnded:
-		return handleVoiceChatActionTd(c, m)
+		return handleVoiceChatAction(c, m)
 	}
 
 	return nil
 }
 
-func handleChatMemberAddTd(c *td.Client, m *td.Message) error {
+func handleChatMemberAdd(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 
 	if c.Me == nil {
@@ -75,7 +75,7 @@ func handleChatMemberAddTd(c *td.Client, m *td.Message) error {
 
 		if blockedChat, _ := database.IsBlacklistedChat(chatID); blockedChat && !isOwnerOrSudo(m.SenderID()) {
 			m.ReplyText(c, F(chatID, "blacklist_chat_blocked"), nil)
-			leaveChatTd(c, chatID)
+			leaveChat(c, chatID)
 			return nil
 		}
 
@@ -83,7 +83,7 @@ func handleChatMemberAddTd(c *td.Client, m *td.Message) error {
 		if err == nil {
 			if blockedOwner, _ := database.IsBlacklistedUser(ownerID); blockedOwner && !isOwnerOrSudo(m.SenderID()) {
 				m.ReplyText(c, F(chatID, "blacklist_owner_blocked_leave"), nil)
-				leaveChatTd(c, chatID)
+				leaveChat(c, chatID)
 				return nil
 			}
 		}
@@ -93,7 +93,7 @@ func handleChatMemberAddTd(c *td.Client, m *td.Message) error {
 		database.AddServedChat(chatID)
 
 		if config.LoggerID != 0 {
-			c.SendTextMessage(config.LoggerID, F(config.LoggerID, "logger_bot_added", buildLogArgsTd(c, m, chatID, "added")), nil)
+			c.SendTextMessage(config.LoggerID, F(config.LoggerID, "logger_bot_added", buildLogArgs(c, m, chatID, "added")), nil)
 		}
 
 		return nil
@@ -102,7 +102,7 @@ func handleChatMemberAddTd(c *td.Client, m *td.Message) error {
 	return nil
 }
 
-func handleChatMemberDeleteTd(c *td.Client, m *td.Message) error {
+func handleChatMemberDelete(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 
 	if c.Me == nil {
@@ -119,14 +119,14 @@ func handleChatMemberDeleteTd(c *td.Client, m *td.Message) error {
 		database.RemoveServedChat(chatID)
 
 		if config.LoggerID != 0 {
-			c.SendTextMessage(config.LoggerID, F(config.LoggerID, "logger_bot_removed", buildLogArgsTd(c, m, chatID, "removed")), nil)
+			c.SendTextMessage(config.LoggerID, F(config.LoggerID, "logger_bot_removed", buildLogArgs(c, m, chatID, "removed")), nil)
 		}
 	}
 
 	return nil
 }
 
-func handleVoiceChatActionTd(c *td.Client, m *td.Message) error {
+func handleVoiceChatAction(c *td.Client, m *td.Message) error {
 	if isMaint, _ := database.IsMaintenanceEnabled(); isMaint {
 		return nil
 	}
@@ -167,7 +167,7 @@ func handleVoiceChatActionTd(c *td.Client, m *td.Message) error {
 	return nil
 }
 
-func isValidChatTypeTd(c *td.Client, m *td.Message) bool {
+func isValidChatType(c *td.Client, m *td.Message) bool {
 	chat, err := m.GetChat(c)
 	if err != nil {
 		return false
@@ -177,36 +177,7 @@ func isValidChatTypeTd(c *td.Client, m *td.Message) bool {
 	return ok && !sg.IsChannel
 }
 
-func warnAndLeaveTd(c *td.Client, chatID int64) {
-	text := F(chatID, "supergroup_needed", locales.Arg{
-		"chat_id":       chatID,
-		"support_group": config.SupportChat,
-	})
-
-	if _, err := c.SendTextMessage(chatID, text, nil); err != nil {
-		logger.Errorf("failed to send supergroup conversion message to chat %d: %v", chatID, err)
-		return
-	}
-
-	go func() {
-		leaveChatTd(c, chatID)
-	}()
-}
-
-func leaveChatTd(c *td.Client, chatID int64) {
-	go func() {
-		time.Sleep(1 * time.Second)
-		if err := c.LeaveChat(chatID); err != nil {
-			logger.Errorf("failed to leave chatID=%d: %v", chatID, err)
-		}
-		core.Assistants.WithAssistant(
-			chatID,
-			func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) },
-		)
-	}()
-}
-
-func buildLogArgsTd(c *td.Client, m *td.Message, chatID int64, action string) locales.Arg {
+func buildLogArgs(c *td.Client, m *td.Message, chatID int64, action string) locales.Arg {
 	groupName := "N/A"
 	if chat, err := m.GetChat(c); err == nil && chat != nil {
 		groupName = chat.Title

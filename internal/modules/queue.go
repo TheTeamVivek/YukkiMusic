@@ -61,11 +61,11 @@ func cclearHandler(c *td.Client, m *td.Message) error {
 }
 
 func handleQueue(c *td.Client, m *td.Message, cplay bool) error {
-	if !isSuperGroupTd(c, m) {
+	if !isSuperGroup(c, m) {
 		return nil
 	}
 
-	if cplay && !filterAuthUsersTd(c, m) {
+	if cplay && !filterAuthUsers(c, m) {
 		return nil
 	}
 
@@ -191,11 +191,11 @@ func handleQueue(c *td.Client, m *td.Message, cplay bool) error {
 }
 
 func handleRemove(c *td.Client, m *td.Message, cplay bool) error {
-	if !isSuperGroupTd(c, m) {
+	if !isSuperGroup(c, m) {
 		return nil
 	}
 
-	if !filterAuthUsersTd(c, m) {
+	if !filterAuthUsers(c, m) {
 		return nil
 	}
 
@@ -220,7 +220,7 @@ func handleRemove(c *td.Client, m *td.Message, cplay bool) error {
 	args := strings.Fields(m.Text())
 	if len(args) < 2 {
 		m.ReplyText(c, F(chatID, "remove_usage", locales.Arg{
-			"cmd": getCommandTd(m),
+			"cmd": getCommand(m),
 		}), nil)
 		return nil
 	}
@@ -258,11 +258,11 @@ func handleRemove(c *td.Client, m *td.Message, cplay bool) error {
 }
 
 func handleClear(c *td.Client, m *td.Message, cplay bool) error {
-	if !isSuperGroupTd(c, m) {
+	if !isSuperGroup(c, m) {
 		return nil
 	}
 
-	if !filterAuthUsersTd(c, m) {
+	if !filterAuthUsers(c, m) {
 		return nil
 	}
 
@@ -304,11 +304,11 @@ func handleClear(c *td.Client, m *td.Message, cplay bool) error {
 }
 
 func handleMove(c *td.Client, m *td.Message, cplay bool) error {
-	if !isSuperGroupTd(c, m) {
+	if !isSuperGroup(c, m) {
 		return nil
 	}
 
-	if !filterAuthUsersTd(c, m) {
+	if !filterAuthUsers(c, m) {
 		return nil
 	}
 
@@ -333,7 +333,7 @@ func handleMove(c *td.Client, m *td.Message, cplay bool) error {
 	args := strings.Fields(m.Text())
 	if len(args) < 3 {
 		m.ReplyText(c, F(chatID, "move_usage", locales.Arg{
-			"cmd": getCommandTd(m),
+			"cmd": getCommand(m),
 		}), nil)
 		return nil
 	}
@@ -342,7 +342,7 @@ func handleMove(c *td.Client, m *td.Message, cplay bool) error {
 	to, err2 := strconv.Atoi(args[2])
 	if err1 != nil || err2 != nil {
 		m.ReplyText(c, F(chatID, "move_invalid_numbers", locales.Arg{
-			"cmd": getCommandTd(m),
+			"cmd": getCommand(m),
 		}), nil)
 		return nil
 	}

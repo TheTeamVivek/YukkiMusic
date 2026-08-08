@@ -24,15 +24,13 @@ import (
 	"net/url"
 	"os"
 	"regexp"
-	"strconv"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
 	state "yukkimusic/internal/core/models"
-	"yukkimusic/internal/utils"
 )
 
 const PlatformFallenApi state.PlatformName = "FallenApi"
@@ -70,18 +68,13 @@ func (f *FallenApiPlatform) CanDownload(source state.PlatformName) bool {
 func (f *FallenApiPlatform) Download(
 	ctx context.Context,
 	track *state.Track,
-	statusMsg *telegram.NewMessage,
+	statusMsg *td.Message,
 ) (string, error) {
 	track.Video = false
 
 	if p := findFile(track); p != "" {
 		logger.Debug("FallenApi: cache hit " + p)
 		return p, nil
-	}
-
-	var pm *telegram.ProgressManager
-	if statusMsg != nil {
-		pm = utils.GetProgress(statusMsg)
 	}
 
 	dlURL, err := f.getDownloadURL(ctx, track.URL)
@@ -92,7 +85,7 @@ func (f *FallenApiPlatform) Download(
 	path := getPath(track, ".mp3")
 
 	if telegramDLRegex.MatchString(dlURL) {
-		return f.downloadFromTelegram(ctx, dlURL, path, pm)
+		return f.downloadFromTelegram(ctx, dlURL, path, statusMsg)
 	}
 
 	if err := f.downloadFromURL(ctx, dlURL, path); err != nil {
@@ -166,32 +159,37 @@ func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, path str
 func (f *FallenApiPlatform) downloadFromTelegram(
 	ctx context.Context,
 	dlURL, path string,
-	pm *telegram.ProgressManager,
+	statusMsg *td.Message,
 ) (string, error) {
-	matches := telegramDLRegex.FindStringSubmatch(dlURL)
-	if len(matches) < 3 {
+	if !telegramDLRegex.MatchString(dlURL) {
 		return "", fmt.Errorf("invalid telegram download url: %s", dlURL)
 	}
 
-	username := matches[1]
-	msgID, err := strconv.Atoi(matches[2])
-	if err != nil {
-		return "", fmt.Errorf("invalid message ID: %w", err)
-	}
-
-	msg, err := core.Bot.GetMessageByID(username, int32(msgID))
+	info, err := core.TDBot.GetMessageLinkInfo(dlURL)
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch Telegram message: %w", err)
 	}
-
-	dOpts := &telegram.DownloadOptions{FileName: path, Ctx: ctx}
-	if pm != nil {
-		dOpts.ProgressManager = pm
+	if info == nil || info.Message == nil {
+		return "", errors.New("failed to fetch Telegram message")
 	}
+	msg := info.Message
 
-	if _, err = msg.Download(dOpts); err != nil {
+	fileID := msg.RemoteFileID()
+	downloadProg.Start(core.TDBot, fileID, statusMsg)
+	file, err := msg.Download(core.TDBot, 1, 0, 0, true)
+	downloadProg.Stop(fileID)
+	if err != nil {
 		os.Remove(path)
 		return "", err
 	}
+	if file == nil || file.Local == nil || file.Local.Path == "" {
+		return "", errors.New("downloaded file missing")
+	}
+
+	if err := copyFile(file.Local.Path, path); err != nil {
+		os.Remove(path)
+		return "", err
+	}
+	os.Remove(file.Local.Path)
 	return path, nil
 }

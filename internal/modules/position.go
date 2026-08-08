@@ -51,11 +51,11 @@ func cpositionHandler(c *td.Client, m *td.Message) error {
 }
 
 func handlePosition(c *td.Client, m *td.Message, cplay bool) error {
-	if !isSuperGroupTd(c, m) {
+	if !isSuperGroup(c, m) {
 		return nil
 	}
 
-	if cplay && !filterAuthUsersTd(c, m) {
+	if cplay && !filterAuthUsers(c, m) {
 		return nil
 	}
 

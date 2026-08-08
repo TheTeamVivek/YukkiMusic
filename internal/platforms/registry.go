@@ -29,7 +29,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"resty.dev/v3"
 	"yukkimusic/internal/logger"
 
@@ -94,15 +94,15 @@ func findFor(query string) state.Platform {
 	return nil
 }
 
-func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
+func GetTracks(c *td.Client, m *td.Message, video bool) ([]*state.Track, error) {
 	logger.Debug("GetTracks | video:" + strconv.FormatBool(video))
 
-	if urls, _ := utils.ExtractURLs(m); len(urls) > 0 {
+	if urls, _ := utils.ExtractURLs(c, m); len(urls) > 0 {
 		tracks, errs := fetchFromURLs(urls, video)
 		if len(tracks) > 0 {
 			return tracks, nil
 		}
-		if !hasPlayableReply(m) {
+		if !hasPlayableReply(c, m) {
 			return nil, combineErrs("no supported platform for given URL(s)", errs)
 		}
 	}
@@ -114,8 +114,8 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 		}
 	}
 
-	if m.IsReply() {
-		return fromReply(m)
+	if m.ReplyToMessageID() > 0 {
+		return fromReply(c, m)
 	}
 
 	return nil, errors.New("no tracks found")
@@ -124,7 +124,7 @@ func GetTracks(m *telegram.NewMessage, video bool) ([]*state.Track, error) {
 func Download(
 	ctx context.Context,
 	track *state.Track,
-	msg *telegram.NewMessage,
+	msg *td.Message,
 ) (string, error) {
 	return download(ctx, track, msg, false)
 }
@@ -132,7 +132,7 @@ func Download(
 func download(
 	ctx context.Context,
 	track *state.Track,
-	msg *telegram.NewMessage,
+	msg *td.Message,
 	redispatched bool,
 ) (string, error) {
 	var errs []string
@@ -217,8 +217,8 @@ func searchQuery(q string, video bool) ([]*state.Track, error) {
 	return []*state.Track{tracks[0]}, nil
 }
 
-func fromReply(m *telegram.NewMessage) ([]*state.Track, error) {
-	target, isVideo, err := mediaInReply(m)
+func fromReply(c *td.Client, m *td.Message) ([]*state.Track, error) {
+	target, isVideo, err := mediaInReply(c, m)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func fromReply(m *telegram.NewMessage) ([]*state.Track, error) {
 		return nil, errors.New("telegram platform not registered")
 	}
 
-	track, err := tgp.(*TelegramPlatform).GetTracksByMessage(target)
+	track, err := tgp.(*TelegramPlatform).GetTracksByMessage(c, target)
 	if err != nil {
 		return nil, err
 	}
@@ -236,29 +236,29 @@ func fromReply(m *telegram.NewMessage) ([]*state.Track, error) {
 	track.Video = isVideo
 
 	if isVideo {
-		noThumb, err := database.ThumbnailsDisabled(m.ChannelID())
+		noThumb, err := database.ThumbnailsDisabled(m.ChatID())
 		if err != nil || !noThumb {
-			downloadThumbnail(target, track)
+			downloadThumbnail(c, target, track)
 		}
 	}
 
 	return []*state.Track{track}, nil
 }
 
-func mediaInReply(m *telegram.NewMessage) (*telegram.NewMessage, bool, error) {
-	curr, err := m.GetReplyMessage()
+func mediaInReply(c *td.Client, m *td.Message) (*td.Message, bool, error) {
+	curr, err := m.GetRepliedMessage(c)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to get reply: %w", err)
 	}
 
 	for range 2 {
-		if v, a := playableMedia(curr); v || a {
+		if v, a := playableMedia(c, curr); v || a {
 			return curr, v, nil
 		}
-		if !curr.IsReply() {
+		if curr.ReplyToMessageID() <= 0 {
 			break
 		}
-		next, err := curr.GetReplyMessage()
+		next, err := curr.GetRepliedMessage(c)
 		if err != nil {
 			break
 		}
@@ -268,33 +268,41 @@ func mediaInReply(m *telegram.NewMessage) (*telegram.NewMessage, bool, error) {
 	return nil, false, errors.New("⚠️ Reply with a valid media (audio/video)")
 }
 
-func downloadThumbnail(m *telegram.NewMessage, t *state.Track) {
+func downloadThumbnail(c *td.Client, m *td.Message, t *state.Track) {
 	if err := os.MkdirAll("cache", os.ModePerm); err != nil {
 		return
 	}
 	dest := filepath.Join("cache", "thumb_"+t.ID+".jpg")
 	if _, err := os.Stat(dest); os.IsNotExist(err) {
-		path, err := m.Download(&telegram.DownloadOptions{
-			ThumbOnly: true,
-			FileName:  dest,
-		})
-		if err == nil {
-			t.Artwork = path
+		video, ok := m.Content.(*td.MessageVideo)
+		if !ok || video.Video == nil || video.Video.Thumbnail == nil ||
+			video.Video.Thumbnail.File == nil {
+			return
 		}
+		thumbFile, err := video.Video.Thumbnail.File.Download(
+			c, 0, 0, 1, &td.DownloadFileOpts{Synchronous: true},
+		)
+		if err != nil || thumbFile == nil || thumbFile.Local == nil || thumbFile.Local.Path == "" {
+			return
+		}
+		if err := copyFile(thumbFile.Local.Path, dest); err != nil {
+			return
+		}
+		t.Artwork = dest
 	} else {
 		t.Artwork = dest
 	}
 }
 
-func hasPlayableReply(m *telegram.NewMessage) bool {
-	if !m.IsReply() {
+func hasPlayableReply(c *td.Client, m *td.Message) bool {
+	if m.ReplyToMessageID() <= 0 {
 		return false
 	}
-	rmsg, err := m.GetReplyMessage()
+	rmsg, err := m.GetRepliedMessage(c)
 	if err != nil {
 		return false
 	}
-	v, a := playableMedia(rmsg)
+	v, a := playableMedia(c, rmsg)
 	return v || a
 }
 

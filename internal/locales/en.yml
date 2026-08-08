@@ -742,6 +742,13 @@ start_group: "<b>💫 I’m here!</b> Try a command… if you think you can hand
 stream_queue_finished: "🎵 <b>Queue Finished!</b>\n\nNo more songs to play. Use /play to add more tracks! 🎶"
 stream_downloading_next: "📥 Downloading your next track..."
 stream_download_fail: "❌ Failed to download.\nError: <code>{error}</code>"
+download_progress: |
+  📥 Downloading your track...
+
+  <b>Progress:</b> {percentage}%
+  <b>Speed:</b> {speed}
+  <b>ETA:</b> {eta}
+  <b>Elapsed:</b> {elapsed}
 stream_play_fail: "❌ Failed to play the song."
 stream_now_playing: |
   <b>🎵 Now Playing:</b>

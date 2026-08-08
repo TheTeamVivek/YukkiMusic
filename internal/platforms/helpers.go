@@ -19,6 +19,7 @@ package platforms
 
 import (
 	"errors"
+	"io"
 	"net"
 	"net/url"
 	"os"
@@ -26,7 +27,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	state "yukkimusic/internal/core/models"
@@ -101,18 +102,43 @@ func firstNonEmpty(vals ...string) string {
 	return ""
 }
 
-func playableMedia(m *telegram.NewMessage) (isVideo, isAudio bool) {
+func copyFile(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	if _, err := io.Copy(out, in); err != nil {
+		return err
+	}
+	return out.Close()
+}
+
+func playableMedia(c *td.Client, m *td.Message) (isVideo, isAudio bool) {
 	if m == nil {
 		return
 	}
-	check := func(msg *telegram.NewMessage) (bool, bool) {
-		switch {
-		case msg.Audio() != nil, msg.Voice() != nil:
+	check := func(msg *td.Message) (bool, bool) {
+		if msg == nil || msg.Content == nil {
+			return false, false
+		}
+		switch content := msg.Content.(type) {
+		case *td.MessageAudio, *td.MessageVoiceNote:
 			return false, true
-		case msg.Video() != nil:
+		case *td.MessageVideo, *td.MessageAnimation, *td.MessageVideoNote:
 			return true, false
-		case msg.Document() != nil:
-			mt := strings.ToLower(msg.Document().MimeType)
+		case *td.MessageDocument:
+			if content.Document == nil {
+				return false, false
+			}
+			mt := strings.ToLower(content.Document.MimeType)
 			switch {
 			case strings.HasPrefix(mt, "audio/"):
 				return false, true
@@ -122,14 +148,21 @@ func playableMedia(m *telegram.NewMessage) (isVideo, isAudio bool) {
 		}
 		return false, false
 	}
-	if m.IsReply() {
-		rmsg, err := m.GetReplyMessage()
-		if err != nil {
-			return
+	curr := m
+	for curr != nil {
+		if v, a := check(curr); v || a {
+			return v, a
 		}
-		return check(rmsg)
+		if curr.ReplyToMessageID() <= 0 {
+			break
+		}
+		next, err := curr.GetRepliedMessage(c)
+		if err != nil {
+			break
+		}
+		curr = next
 	}
-	return check(m)
+	return false, false
 }
 
 func sanitizeMediaURL(raw string) (string, error) {

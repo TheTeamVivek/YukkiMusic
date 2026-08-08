@@ -738,6 +738,13 @@ start_group: "<b>💫 Buradayım!</b> Bir komut dene... Tabi benimle başa çık
 stream_queue_finished: "🎵 <b>Sıra Bitti!</b>\n\nÇalacak başka şarkı kalmadı. Daha fazla parça eklemek için /play kullan! 🎶"
 stream_downloading_next: "📥 Sonraki parçan indiriliyor..."
 stream_download_fail: "❌ İndirme başarısız.\nHata: <code>{error}</code>"
+download_progress: |
+  📥 Parcan indiriliyor...
+
+  <b>İlerleme:</b> {percentage}%
+  <b>Hız:</b> {speed}
+  <b>Kalan Süre:</b> {eta}
+  <b>Geçen Süre:</b> {elapsed}
 stream_play_fail: "❌ Şarkı oynatılamadı."
 stream_now_playing: |
   <b>🎵 Şimdi Çalıyor:</b>

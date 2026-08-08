@@ -109,11 +109,11 @@ func cjumpHandler(c *td.Client, m *td.Message) error {
 }
 
 func handleSeek(c *td.Client, m *td.Message, cplay, isBack bool) error {
-	if !isSuperGroupTd(c, m) {
+	if !isSuperGroup(c, m) {
 		return nil
 	}
 
-	if !filterAuthUsersTd(c, m) {
+	if !filterAuthUsers(c, m) {
 		return nil
 	}
 
@@ -132,7 +132,7 @@ func handleSeek(c *td.Client, m *td.Message, cplay, isBack bool) error {
 	args := strings.Fields(m.Text())
 	if len(args) < 2 {
 		m.ReplyText(c, F(chatID, "seek_usage", locales.Arg{
-			"cmd": getCommandTd(m),
+			"cmd": getCommand(m),
 		}), nil)
 		return nil
 	}
@@ -140,7 +140,7 @@ func handleSeek(c *td.Client, m *td.Message, cplay, isBack bool) error {
 	seconds, err := strconv.Atoi(args[1])
 	if err != nil {
 		m.ReplyText(c, F(chatID, "seek_invalid_seconds", locales.Arg{
-			"cmd": getCommandTd(m),
+			"cmd": getCommand(m),
 		}), nil)
 		return nil
 	}
@@ -189,11 +189,11 @@ func handleSeek(c *td.Client, m *td.Message, cplay, isBack bool) error {
 }
 
 func handleJump(c *td.Client, m *td.Message, cplay bool) error {
-	if !isSuperGroupTd(c, m) {
+	if !isSuperGroup(c, m) {
 		return nil
 	}
 
-	if !filterAuthUsersTd(c, m) {
+	if !filterAuthUsers(c, m) {
 		return nil
 	}
 
@@ -214,7 +214,7 @@ func handleJump(c *td.Client, m *td.Message, cplay bool) error {
 	args := strings.Fields(m.Text())
 	if len(args) < 2 {
 		m.ReplyText(c, F(chatID, "jump_usage", locales.Arg{
-			"cmd": getCommandTd(m),
+			"cmd": getCommand(m),
 		}), nil)
 		return nil
 	}
@@ -222,7 +222,7 @@ func handleJump(c *td.Client, m *td.Message, cplay bool) error {
 	seconds, err := strconv.Atoi(args[1])
 	if err != nil || seconds < 0 {
 		m.ReplyText(c, F(chatID, "jump_invalid_position", locales.Arg{
-			"cmd": getCommandTd(m),
+			"cmd": getCommand(m),
 		}), nil)
 		return nil
 	}

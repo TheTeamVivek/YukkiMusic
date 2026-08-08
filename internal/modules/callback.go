@@ -234,7 +234,7 @@ func handleReplayAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 
 	cb.Answer(F(chatID, "cb_replay_success"), opt)
 	if _, err := cb.Edit(F(chatID, "cb_replay_edited", locales.Arg{
-		"user": utils.MentionHTML(cb.Sender),
+		"user": mentionOfTg(cb.Sender),
 	})); err != nil {
 		logger.Errorf("Edit error: %v", err)
 	}
@@ -250,7 +250,7 @@ func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)
 		if _, err := cb.Edit(F(chatID, "skip_stopped", locales.Arg{
-			"user": utils.MentionHTML(cb.Sender),
+			"user": mentionOfTg(cb.Sender),
 		})); err != nil {
 			logger.Errorf("Edit error: %v", err)
 		}
@@ -308,14 +308,14 @@ func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 	statusMsg, err = utils.EOR(statusMsg, msgText, sendOpt)
 	if err != nil {
 		cb.Respond(F(chatID, "cb_skip_edited", locales.Arg{
-			"user": utils.MentionHTML(cb.Sender),
+			"user": mentionOfTg(cb.Sender),
 		}))
 		return tg.ErrEndGroup
 	}
 
 	r.SetStatusMsg(statusMsg)
 	statusMsg.Reply(F(chatID, "cb_skip_edited", locales.Arg{
-		"user": utils.MentionHTML(cb.Sender),
+		"user": mentionOfTg(cb.Sender),
 	}))
 	return tg.ErrEndGroup
 }
@@ -330,7 +330,7 @@ func handleStopAction(cb *tg.CallbackQuery, r *core.RoomState) error {
 
 	cb.Answer(F(chatID, "cb_stop_success"), opt)
 	if _, err := cb.Edit(F(chatID, "stopped", locales.Arg{
-		"user": utils.MentionHTML(cb.Sender),
+		"user": mentionOfTg(cb.Sender),
 	})); err != nil {
 		logger.Errorf("Edit error: %v", err)
 	}
@@ -413,7 +413,7 @@ func handleSeekAction(
 		cb.Answer(F(chatID, "cb_seekback_success", locales.Arg{"seconds": seconds}), opt)
 		cb.Reply(F(chatID, "cb_seekback_edited", locales.Arg{
 			"seconds": seconds,
-			"user":    utils.MentionHTML(cb.Sender),
+			"user":    mentionOfTg(cb.Sender),
 		}))
 	} else {
 		if (r.Track().Duration - r.Position()) <= seconds {
@@ -424,7 +424,7 @@ func handleSeekAction(
 		cb.Answer(F(chatID, "cb_seek_success", locales.Arg{"seconds": seconds}), opt)
 		cb.Reply(F(chatID, "cb_seek_edited", locales.Arg{
 			"seconds": seconds,
-			"user":    utils.MentionHTML(cb.Sender),
+			"user":    mentionOfTg(cb.Sender),
 		}))
 	}
 
@@ -439,7 +439,7 @@ func updatePlaybackMessage(cb *tg.CallbackQuery, r *core.RoomState, state string
 
 	chatID := cb.ChannelID()
 	safeTitle := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
-	mention := utils.MentionHTML(cb.Sender)
+	mention := mentionOfTg(cb.Sender)
 
 	var msgText string
 	switch state {

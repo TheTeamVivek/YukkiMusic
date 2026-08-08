@@ -50,11 +50,11 @@ func cmuteHandler(c *td.Client, m *td.Message) error {
 }
 
 func handleMute(c *td.Client, m *td.Message, cplay bool) error {
-	if !isSuperGroupTd(c, m) {
+	if !isSuperGroup(c, m) {
 		return nil
 	}
 
-	if !filterAuthUsersTd(c, m) {
+	if !filterAuthUsers(c, m) {
 		return nil
 	}
 

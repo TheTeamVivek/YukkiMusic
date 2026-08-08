@@ -741,6 +741,13 @@ start_group: "<b>💫 मैं यहाँ हूँ!</b> कोई आदे�
 stream_queue_finished: "🎵 <b>प्रतीक्षा सूची समाप्त!</b>\n\nचलाने के लिए कोई और गीत नहीं है। अधिक संगीत जोड़ने के लिए /play का प्रयोग करें! 🎶"
 stream_downloading_next: "📥 आपका अगला संगीत अभिलेखित किया जा रहा है..."
 stream_download_fail: "❌ डाउनलोड में विफल।\nत्रुटि: <code>{error}</code>"
+download_progress: |
+  📥 आपका संगीत डाउनलोड किया जा रहा है...
+
+  <b>प्रगति:</b> {percentage}%
+  <b>गति:</b> {speed}
+  <b>शेष समय:</b> {eta}
+  <b>बीता समय:</b> {elapsed}
 stream_play_fail: "❌ संगीत चलाने में विफल।"
 stream_now_playing: |
   <b>🎵 अब चल रहा है:</b>

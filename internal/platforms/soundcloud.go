@@ -28,7 +28,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	state "yukkimusic/internal/core/models"
@@ -99,7 +99,7 @@ func (s *SoundCloudPlatform) CanDownload(source state.PlatformName) bool {
 func (s *SoundCloudPlatform) Download(
 	ctx context.Context,
 	track *state.Track,
-	_ *telegram.NewMessage,
+	_ *td.Message,
 ) (string, error) {
 	track.Video = false
 

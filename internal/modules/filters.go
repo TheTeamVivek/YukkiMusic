@@ -20,98 +20,74 @@ package modules
 import (
 	"strings"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/utils"
 )
 
-var (
-	superGroupFilter    = tg.CustomFilter(filterSuperGroup)
-	adminFilter         = tg.CustomFilter(filterChatAdmins)
-	authFilter          = tg.CustomFilter(filterAuthUsers)
-	ignoreChannelFilter = tg.CustomFilter(filterChannel)
-	sudoOnlyFilter      = tg.CustomFilter(filterSudo)
-	ownerFilter         = tg.CustomFilter(filterOwner)
-)
-
-func filterSuperGroup(m *tg.NewMessage) bool {
-	if !filterChannel(m) {
-		return false
+func getCommand(m *td.Message) string {
+	parts := strings.Fields(m.Text())
+	if len(parts) == 0 {
+		return ""
 	}
-
-	switch m.ChatType() {
-	case tg.EntityChat:
-		// EntityChat can be basic group or supergroup — allow only supergroup
-		if m.Channel != nil && !m.Channel.Broadcast {
-			database.AddServedChat(m.ChannelID())
-			return true // Supergroup
-		}
-		warnAndLeave(m.Client, m.ChannelID()) // Basic group → leave
-		database.RemoveServedChat(m.ChannelID())
-		return false
-
-	case tg.EntityChannel:
-		return false // Pure channel chat → ignore
-
-	case tg.EntityUser:
-		m.Reply(F(m.ChannelID(), "only_supergroup"))
-		database.AddServedUser(m.ChannelID())
-		return false // Private chat → warn
-	}
-
-	return false
+	cmd, _, _ := strings.Cut(parts[0], "@")
+	return cmd
 }
 
-func filterChatAdmins(m *tg.NewMessage) bool {
-	if isOwnerOrSudo(m.SenderID()) {
-		return true
-	}
-	isAdmin, err := utils.IsChatAdmin(m.Client, m.ChannelID(), m.SenderID())
-	if err != nil || !isAdmin {
-		m.Reply(F(m.ChannelID(), "only_admin"))
+func checkSudo(c *td.Client, m *td.Message) bool {
+	if !isOwnerOrSudo(m.SenderID()) {
+		m.ReplyText(c, F(m.ChatID(), "only_sudo"), nil)
 		return false
 	}
 	return true
 }
 
-func filterAuthUsers(m *tg.NewMessage) bool {
-	if canUseAdminCommand(m.Client, m.ChannelID(), m.SenderID()) {
+func checkOwner(c *td.Client, m *td.Message) bool {
+	if config.OwnerID == 0 || m.SenderID() != config.OwnerID {
+		m.ReplyText(c, F(m.ChatID(), "only_owner"), nil)
+		return false
+	}
+	return true
+}
+
+func isSuperGroup(c *td.Client, m *td.Message) bool {
+	if m.IsPrivate() {
+		m.ReplyText(c, F(m.ChatID(), "only_supergroup"), nil)
+		database.AddServedUser(m.ChatID())
+		return false
+	}
+
+	chat, err := m.GetChat(c)
+	if err != nil {
+		return false
+	}
+
+	sg, ok := chat.Type.(*td.ChatTypeSupergroup)
+	if !ok || sg.IsChannel {
+		return false
+	}
+
+	database.AddServedChat(m.ChatID())
+	return true
+}
+
+func filterAuthUsers(c *td.Client, m *td.Message) bool {
+	if canUseAdminCommand(c, m.ChatID(), m.SenderID()) {
 		return true
 	}
 
-	mode, err := database.GetAdminMode(m.ChannelID())
+	mode, err := database.GetAdminMode(m.ChatID())
 	if err == nil && mode == database.AdminModeAdminsOnly {
-		m.Reply(F(m.ChannelID(), "only_admin"))
+		m.ReplyText(c, F(m.ChatID(), "only_admin"), nil)
 	} else {
-		m.Reply(F(m.ChannelID(), "only_admin_or_auth"))
+		m.ReplyText(c, F(m.ChatID(), "only_admin_or_auth"), nil)
 	}
 	return false
 }
 
-func filterSudo(m *tg.NewMessage) bool {
-	is, _ := database.IsSudo(m.SenderID())
-
-	if config.OwnerID == 0 || (m.SenderID() != config.OwnerID && !is) {
-		if m.IsPrivate() ||
-			strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
-			m.Reply(F(m.ChannelID(), "only_sudo"))
-		}
-		return false
-	}
-
-	return true
-}
-
-func filterChannel(m *tg.NewMessage) bool {
-	if _, ok := m.Message.FromID.(*tg.PeerChannel); ok {
-		return false
-	}
-	return true
-}
-
-func canUseAdminCommand(c *tg.Client, chatID, userID int64) bool {
+func canUseAdminCommand(c *td.Client, chatID, userID int64) bool {
 	if isOwnerOrSudo(userID) {
 		return true
 	}
@@ -136,17 +112,6 @@ func canUseAdminCommand(c *tg.Client, chatID, userID int64) bool {
 
 	isAuth, err := database.IsAuthorized(chatID, userID)
 	return err == nil && isAuth
-}
-
-func filterOwner(m *tg.NewMessage) bool {
-	if config.OwnerID == 0 || m.SenderID() != config.OwnerID {
-		if m.IsPrivate() ||
-			strings.HasSuffix(m.GetCommand(), m.Client.Me().Username) {
-			m.Reply(F(m.ChannelID(), "only_owner"))
-		}
-		return false
-	}
-	return true
 }
 
 func isOwnerOrSudo(userID int64) bool {

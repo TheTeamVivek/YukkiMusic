@@ -1,3 +1,20 @@
+/*
+ * ● YukkiMusic
+ * ○ A high-performance engine for streaming music in Telegram voicechats.
+ *
+ * Copyright (C) 2026 TheTeamVivek
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * Repository: https://github.com/TheTeamVivek/YukkiMusic
+ */
+
 package utils
 
 import (
@@ -5,11 +22,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 )
 
-func ExtractChat(m *telegram.NewMessage) (int64, error) {
-	if m == nil || m.Message == nil {
+// ExtractChat extracts a chat ID from a message.
+// It supports plain numeric IDs and @username / username identifiers.
+func ExtractChat(c *td.Client, m *td.Message) (int64, error) {
+	if m == nil {
 		return 0, fmt.Errorf("invalid message")
 	}
 
@@ -18,7 +37,7 @@ func ExtractChat(m *telegram.NewMessage) (int64, error) {
 		return 0, fmt.Errorf("no chat identifier found")
 	}
 
-	target := strings.TrimSpace(parts[1])
+	target := strings.TrimSpace(strings.TrimPrefix(parts[1], "@"))
 	if target == "" {
 		return 0, fmt.Errorf("empty chat identifier")
 	}
@@ -27,18 +46,12 @@ func ExtractChat(m *telegram.NewMessage) (int64, error) {
 		return id, nil
 	}
 
-	target = strings.TrimPrefix(target, "@")
-	peer, err := m.Client.ResolvePeer(target)
+	chat, err := c.SearchPublicChat(target)
 	if err != nil {
 		return 0, fmt.Errorf("failed to resolve peer: %w", err)
 	}
-
-	switch p := peer.(type) {
-	case *telegram.InputPeerChannel:
-		return p.ChannelID, nil
-	case *telegram.InputPeerChat:
-		return p.ChatID, nil
-	default:
+	if chat == nil {
 		return 0, fmt.Errorf("resolved peer is not a chat")
 	}
+	return chat.Id, nil
 }
