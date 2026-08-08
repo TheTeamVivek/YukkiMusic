@@ -74,10 +74,6 @@ func initBot() error {
 	client, err := telegram.NewClient(telegram.ClientConfig{
 		AppID:   config.APIID,
 		AppHash: config.APIHash,
-		Logger: telegram.WrapSimpleLogger(
-			GetTgLogger("gogram", telegram.LogDebug),
-		),
-		LogLevel:     telegram.LogDebug,
 		ParseMode:    "HTML",
 		Session:      "bot.session",
 		FloodHandler: handleFlood,
