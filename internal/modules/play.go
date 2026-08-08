@@ -231,7 +231,7 @@ func prepareRoomAndSearchMessage(
 	m *tg.NewMessage,
 	cplay bool,
 ) (*core.RoomState, *tg.NewMessage, error) {
-	room, err := getEffectiveRoom(m, cplay)
+	room, err := getEffectiveRoom(m.ChannelID(), cplay)
 	if err != nil {
 		m.Reply(err.Error())
 		return nil, nil, err

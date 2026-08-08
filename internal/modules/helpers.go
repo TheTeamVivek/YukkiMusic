@@ -62,8 +62,8 @@ func (dm *downloadManager) Remove(chatID int64) bool {
 	return false
 }
 
-func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
-	chatID := m.ChannelID()
+func getEffectiveRoom(chatID int64, cplay bool) (*core.RoomState, error) {
+	origChatID := chatID
 
 	if cplay {
 		cplayID, err := database.LinkedChannel(chatID)
@@ -79,7 +79,7 @@ func getEffectiveRoom(m *tg.NewMessage, cplay bool) (*core.RoomState, error) {
 	r, _ := core.GetRoom(chatID, ass, true)
 
 	if cplay {
-		r.ChatID = m.ChannelID()
+		r.ChatID = origChatID
 	}
 	return r, nil
 }

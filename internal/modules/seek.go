@@ -109,7 +109,7 @@ func cjumpHandler(m *telegram.NewMessage) error {
 }
 
 func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
-	r, err := getEffectiveRoom(m, cplay)
+	r, err := getEffectiveRoom(m.ChannelID(), cplay)
 	if err != nil {
 		m.Reply(err.Error())
 		return telegram.ErrEndGroup
@@ -181,7 +181,7 @@ func handleSeek(m *telegram.NewMessage, cplay, isBack bool) error {
 }
 
 func handleJump(m *telegram.NewMessage, cplay bool) error {
-	r, err := getEffectiveRoom(m, cplay)
+	r, err := getEffectiveRoom(m.ChannelID(), cplay)
 	if err != nil {
 		m.Reply(err.Error())
 		return telegram.ErrEndGroup

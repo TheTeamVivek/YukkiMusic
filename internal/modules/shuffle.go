@@ -61,7 +61,7 @@ func cshuffleHandler(m *telegram.NewMessage) error {
 func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 	arg := strings.ToLower(m.Args())
 
-	r, err := getEffectiveRoom(m, cplay)
+	r, err := getEffectiveRoom(m.ChannelID(), cplay)
 	if err != nil {
 		m.Reply(err.Error())
 		return telegram.ErrEndGroup

@@ -20,7 +20,7 @@ package modules
 import (
 	"fmt"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
@@ -38,44 +38,54 @@ func init() {
 • Shows current playback info`
 }
 
-func unmuteHandler(m *tg.NewMessage) error {
-	return handleUnmute(m, false)
+func unmuteHandler(c *td.Client, m *td.Message) error {
+	return handleUnmute(c, m, false)
 }
 
-func cunmuteHandler(m *tg.NewMessage) error {
-	return handleUnmute(m, true)
+func cunmuteHandler(c *td.Client, m *td.Message) error {
+	return handleUnmute(c, m, true)
 }
 
-func handleUnmute(m *tg.NewMessage, cplay bool) error {
+func handleUnmute(c *td.Client, m *td.Message, cplay bool) error {
 	if m.Args() != "" {
-		return tg.ErrEndGroup
-	}
-	r, err := getEffectiveRoom(m, cplay)
-	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		return nil
 	}
 
-	chatID := m.ChannelID()
+	if !isSuperGroupTd(c, m) {
+		return nil
+	}
+
+	if !filterAuthUsersTd(c, m) {
+		return nil
+	}
+
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
+	if err != nil {
+		m.ReplyText(c, err.Error(), nil)
+		return nil
+	}
+
+	chatID := m.ChatID()
 
 	if !r.IsActiveChat() {
-		m.Reply(F(chatID, "room_no_active"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return nil
 	}
 
 	if !r.IsMuted() {
-		m.Reply(F(chatID, "unmute_already"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "unmute_already"), nil)
+		return nil
 	}
 
 	title := utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25))
-	mention := utils.MentionHTML(m.Sender)
+	sender, _ := m.GetUser(c)
+	mention := mentionOf(sender, m.SenderID())
 
 	if _, err := r.Unmute(); err != nil {
-		m.Reply(F(chatID, "unmute_failed", locales.Arg{
+		m.ReplyText(c, F(chatID, "unmute_failed", locales.Arg{
 			"error": err.Error(),
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
 	// optional speed line
@@ -92,6 +102,6 @@ func handleUnmute(m *tg.NewMessage, cplay bool) error {
 		"speed_line": speedOpt,
 	})
 
-	m.Reply(msg)
-	return tg.ErrEndGroup
+	m.ReplyText(c, msg, nil)
+	return nil
 }

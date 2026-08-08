@@ -63,7 +63,7 @@ func cclearHandler(m *tg.NewMessage) error {
 func handleQueue(m *tg.NewMessage, cplay bool) error {
 	chatID := m.ChannelID()
 
-	r, err := getEffectiveRoom(m, cplay)
+	r, err := getEffectiveRoom(m.ChannelID(), cplay)
 	if err != nil {
 		m.Reply(err.Error())
 		return tg.ErrEndGroup
@@ -185,7 +185,7 @@ func handleQueue(m *tg.NewMessage, cplay bool) error {
 func handleRemove(m *tg.NewMessage, cplay bool) error {
 	chatID := m.ChannelID()
 
-	r, err := getEffectiveRoom(m, cplay)
+	r, err := getEffectiveRoom(m.ChannelID(), cplay)
 	if err != nil {
 		m.Reply(err.Error())
 		return tg.ErrEndGroup
@@ -241,7 +241,7 @@ func handleRemove(m *tg.NewMessage, cplay bool) error {
 func handleClear(m *tg.NewMessage, cplay bool) error {
 	chatID := m.ChannelID()
 
-	r, err := getEffectiveRoom(m, cplay)
+	r, err := getEffectiveRoom(m.ChannelID(), cplay)
 	if err != nil {
 		m.Reply(err.Error())
 		return tg.ErrEndGroup
@@ -276,7 +276,7 @@ func handleClear(m *tg.NewMessage, cplay bool) error {
 func handleMove(m *tg.NewMessage, cplay bool) error {
 	chatID := m.ChannelID()
 
-	r, err := getEffectiveRoom(m, cplay)
+	r, err := getEffectiveRoom(m.ChannelID(), cplay)
 	if err != nil {
 		m.Reply(err.Error())
 		return tg.ErrEndGroup

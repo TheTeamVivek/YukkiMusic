@@ -53,7 +53,7 @@ func creplayHandler(m *telegram.NewMessage) error {
 func handleReplay(m *telegram.NewMessage, cplay bool) error {
 	chatID := m.ChannelID()
 
-	r, err := getEffectiveRoom(m, cplay)
+	r, err := getEffectiveRoom(m.ChannelID(), cplay)
 	if err != nil {
 		m.Reply(err.Error())
 		return telegram.ErrEndGroup

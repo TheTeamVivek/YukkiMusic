@@ -20,7 +20,7 @@ package modules
 import (
 	"fmt"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
@@ -42,43 +42,52 @@ func init() {
 • Speed settings remain active after resume`
 }
 
-func resumeHandler(m *telegram.NewMessage) error {
-	return handleResume(m, false)
+func resumeHandler(c *td.Client, m *td.Message) error {
+	return handleResume(c, m, false)
 }
 
-func cresumeHandler(m *telegram.NewMessage) error {
-	return handleResume(m, true)
+func cresumeHandler(c *td.Client, m *td.Message) error {
+	return handleResume(c, m, true)
 }
 
-func handleResume(m *telegram.NewMessage, cplay bool) error {
-	chatID := m.ChannelID()
+func handleResume(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroupTd(c, m) {
+		return nil
+	}
 
-	r, err := getEffectiveRoom(m, cplay)
+	if !filterAuthUsersTd(c, m) {
+		return nil
+	}
+
+	chatID := m.ChatID()
+
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return telegram.ErrEndGroup
+		m.ReplyText(c, err.Error(), nil)
+		return nil
 	}
 
 	if !r.IsActiveChat() {
-		m.Reply(F(chatID, "room_no_active"))
-		return telegram.ErrEndGroup
+		m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return nil
 	}
 
 	if !r.IsPaused() {
-		m.Reply(F(chatID, "resume_already_playing"))
-		return telegram.ErrEndGroup
+		m.ReplyText(c, F(chatID, "resume_already_playing"), nil)
+		return nil
 	}
 
 	t := r.Track()
 	if _, err := r.Resume(); err != nil {
-		m.Reply(F(chatID, "resume_failed", locales.Arg{
+		m.ReplyText(c, F(chatID, "resume_failed", locales.Arg{
 			"error": err,
-		}))
+		}), nil)
 	} else {
 		title := utils.EscapeHTML(utils.ShortTitle(t.Title, 25))
 		pos := utils.FormatDuration(r.Position())
 		total := utils.FormatDuration(t.Duration)
-		mention := utils.MentionHTML(m.Sender)
+		sender, _ := m.GetUser(c)
+		mention := mentionOf(sender, m.SenderID())
 
 		speedLine := ""
 		if sp := r.Speed(); sp != 1.0 {
@@ -87,14 +96,14 @@ func handleResume(m *telegram.NewMessage, cplay bool) error {
 			})
 		}
 
-		m.Reply(F(chatID, "resume_success", locales.Arg{
+		m.ReplyText(c, F(chatID, "resume_success", locales.Arg{
 			"title":      title,
 			"position":   pos,
 			"duration":   total,
 			"user":       mention,
 			"speed_line": speedLine,
-		}))
+		}), nil)
 	}
 
-	return telegram.ErrEndGroup
+	return nil
 }

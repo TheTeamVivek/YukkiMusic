@@ -34,6 +34,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -98,6 +99,12 @@ func main() {
 
 	tdbot, err := td.NewClient(config.APIID, config.APIHash, config.Token, &td.ClientOpts{
 		LibraryPath: "./libtdjson.so.1.8.66",
+		ParseMode:   td.ParseModeHTML,
+		AutoRetry: &td.AutoRetry{
+			ChatNotFound:    true,
+			MessageNotFound: true,
+			MaxFloodWait:    30 * time.Second,
+		},
 		Logger: gotdlogger.New(gotdlogger.WithHandler(
 			logger.NewHandler(io.MultiWriter(os.Stderr, f), logger.InfoLevel),
 		)),

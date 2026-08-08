@@ -18,7 +18,7 @@
 package modules
 
 import (
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
@@ -41,47 +41,56 @@ func init() {
 • Use <code>/unmute</code> to restore audio`
 }
 
-func muteHandler(m *tg.NewMessage) error {
-	return handleMute(m, false)
+func muteHandler(c *td.Client, m *td.Message) error {
+	return handleMute(c, m, false)
 }
 
-func cmuteHandler(m *tg.NewMessage) error {
-	return handleMute(m, true)
+func cmuteHandler(c *td.Client, m *td.Message) error {
+	return handleMute(c, m, true)
 }
 
-func handleMute(m *tg.NewMessage, cplay bool) error {
-	chatID := m.ChannelID()
-	r, err := getEffectiveRoom(m, cplay)
+func handleMute(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroupTd(c, m) {
+		return nil
+	}
+
+	if !filterAuthUsersTd(c, m) {
+		return nil
+	}
+
+	chatID := m.ChatID()
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		m.ReplyText(c, err.Error(), nil)
+		return nil
 	}
 
 	if !r.IsActiveChat() {
-		m.Reply(F(chatID, "room_no_active"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return nil
 	}
 
 	if r.IsMuted() {
-		m.Reply(F(chatID, "mute_already_muted"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "mute_already_muted"), nil)
+		return nil
 	}
 
-	mention := utils.MentionHTML(m.Sender)
+	sender, _ := m.GetUser(c)
+	mention := mentionOf(sender, m.SenderID())
 
 	_, muteErr := r.Mute()
 
 	if muteErr != nil {
-		m.Reply(F(chatID, "mute_failed", locales.Arg{
+		m.ReplyText(c, F(chatID, "mute_failed", locales.Arg{
 			"error": muteErr.Error(),
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
-	m.Reply(F(chatID, "mute_success", locales.Arg{
+	m.ReplyText(c, F(chatID, "mute_success", locales.Arg{
 		"title": utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25)),
 		"user":  mention,
-	}))
+	}), nil)
 
-	return tg.ErrEndGroup
+	return nil
 }

@@ -63,7 +63,7 @@ func cspeedHandler(m *telegram.NewMessage) error {
 }
 
 func handleSpeed(m *telegram.NewMessage, cplay bool) error {
-	r, err := getEffectiveRoom(m, cplay)
+	r, err := getEffectiveRoom(m.ChannelID(), cplay)
 	if err != nil {
 		m.Reply(err.Error())
 		return telegram.ErrEndGroup

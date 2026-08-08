@@ -20,7 +20,7 @@ package modules
 import (
 	"fmt"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
@@ -40,42 +40,51 @@ func init() {
 `
 }
 
-func pauseHandler(m *tg.NewMessage) error {
-	return handlePause(m, false)
+func pauseHandler(c *td.Client, m *td.Message) error {
+	return handlePause(c, m, false)
 }
 
-func cpauseHandler(m *tg.NewMessage) error {
-	return handlePause(m, true)
+func cpauseHandler(c *td.Client, m *td.Message) error {
+	return handlePause(c, m, true)
 }
 
-func handlePause(m *tg.NewMessage, cplay bool) error {
-	chatID := m.ChannelID()
-	r, err := getEffectiveRoom(m, cplay)
+func handlePause(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroupTd(c, m) {
+		return nil
+	}
+
+	if !filterAuthUsersTd(c, m) {
+		return nil
+	}
+
+	chatID := m.ChatID()
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		m.ReplyText(c, err.Error(), nil)
+		return nil
 	}
 
 	if !r.IsActiveChat() {
-		m.Reply(F(chatID, "room_no_active"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return nil
 	}
 
 	if r.IsPaused() {
-		m.Reply(F(chatID, "pause_already"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "pause_already"), nil)
+		return nil
 	}
 
 	var pauseErr error
 	_, pauseErr = r.Pause()
 	if pauseErr != nil {
-		m.Reply(F(chatID, "room_pause_failed", locales.Arg{
+		m.ReplyText(c, F(chatID, "room_pause_failed", locales.Arg{
 			"error": pauseErr.Error(),
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
-	mention := utils.MentionHTML(m.Sender)
+	sender, _ := m.GetUser(c)
+	mention := mentionOf(sender, m.SenderID())
 	title := utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25))
 
 	msg := F(chatID, "pause_success", locales.Arg{
@@ -91,6 +100,6 @@ func handlePause(m *tg.NewMessage, cplay bool) error {
 		})
 	}
 
-	m.Reply(msg)
-	return tg.ErrEndGroup
+	m.ReplyText(c, msg, nil)
+	return nil
 }

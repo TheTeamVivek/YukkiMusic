@@ -53,7 +53,7 @@ func cpositionHandler(m *tg.NewMessage) error {
 func handlePosition(m *tg.NewMessage, cplay bool) error {
 	chatID := m.ChannelID()
 
-	r, err := getEffectiveRoom(m, cplay)
+	r, err := getEffectiveRoom(m.ChannelID(), cplay)
 	if err != nil {
 		m.Reply(err.Error())
 		return tg.ErrEndGroup
