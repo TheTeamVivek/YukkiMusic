@@ -20,7 +20,7 @@ package modules
 import (
 	"fmt"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
@@ -42,42 +42,50 @@ func init() {
 `
 }
 
-func replayHandler(m *telegram.NewMessage) error {
-	return handleReplay(m, false)
+func replayHandler(c *td.Client, m *td.Message) error {
+	return handleReplay(c, m, false)
 }
 
-func creplayHandler(m *telegram.NewMessage) error {
-	return handleReplay(m, true)
+func creplayHandler(c *td.Client, m *td.Message) error {
+	return handleReplay(c, m, true)
 }
 
-func handleReplay(m *telegram.NewMessage, cplay bool) error {
-	chatID := m.ChannelID()
+func handleReplay(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroupTd(c, m) {
+		return nil
+	}
 
-	r, err := getEffectiveRoom(m.ChannelID(), cplay)
+	if !filterAuthUsersTd(c, m) {
+		return nil
+	}
+
+	chatID := m.ChatID()
+
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return telegram.ErrEndGroup
+		m.ReplyText(c, err.Error(), nil)
+		return nil
 	}
 
 	if !r.IsActiveChat() {
-		m.Reply(F(chatID, "room_no_active"))
-		return telegram.ErrEndGroup
+		m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return nil
 	}
 	t := r.Track()
 
 	if err := r.Replay(); err != nil {
-		m.Reply(F(chatID, "replay_failed", locales.Arg{
+		m.ReplyText(c, F(chatID, "replay_failed", locales.Arg{
 			"error": err,
-		}))
+		}), nil)
 	} else {
 		trackTitle := utils.EscapeHTML(utils.ShortTitle(t.Title, 25))
 		totalDuration := utils.FormatDuration(t.Duration)
-		m.Reply(F(chatID, "replay_success", locales.Arg{
+		m.ReplyText(c, F(chatID, "replay_success", locales.Arg{
 			"title":    trackTitle,
 			"duration": totalDuration,
 			"speed":    fmt.Sprintf("%.2f", r.Speed()),
-		}))
+		}), nil)
 	}
 
-	return telegram.ErrEndGroup
+	return nil
 }

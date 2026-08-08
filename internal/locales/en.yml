@@ -566,67 +566,7 @@ room_no_active: "⚠️ <b>No active playback.</b>\n\n<i>There's nothing playing
 room_already_paused: "⏸️ Track is already paused. Tap ▶️ Resume to continue."
 room_pause_failed: "❌ Failed to pause playback.\n\n<i>{error}</i>"
 
-rtmp_not_configured: "⚠️ RTMP not configured. Use <code>/setrtmp &lt;chat_id&gt; &lt;rtmp_url&gt;</code> in DM."
-
-rtmp_already_streaming: |
-  📡 <b>Already streaming!</b>
-  
-  Use <code>/streamstop</code> to end current stream.
-
-
-
-rtmp_play_failed: |
-  ❌ <b>Failed to start stream:</b>
-  <code>{error}</code>
-
-rtmp_now_streaming: |
-  📡 <b>Now Streaming (RTMP):</b>
-  
-  <b>▫ Track:</b> <a href="{url}">{title}</a>
-  <b>▫ Duration:</b> {duration}
-  <b>▫ Started by:</b> {by}
-  
-  ⚠️ <i>Note: RTMP has ~15-30s buffering delay</i>
-
-
-rtmp_stop_failed: |
-  ❌ <b>Failed to stop stream:</b>
-  <code>{error}</code>
-
-rtmp_stopped: |
-  ⏹️ <b>RTMP stream stopped</b> by {user}
-
-
-rtmp_status_playing: |
-  📡 <b>RTMP Status</b>
-  
-  <b>▫ State:</b> ▶️ Streaming
-  <b>▫ Position:</b> {position}
-
-
-
-
-rtmp_dm_only: "⚠️ Use this command in DM."
-
-rtmp_setup_usage: "⚙️ /setrtmp <chat_id> <rtmp_url>"
-
 generic_error: "❌ Something went wrong: <code>{error}</code>"
-
-rtmp_invalid_chat_id: "❌ Invalid chat ID. Example: <code>-1001234567890</code>"
-
-
-
-rtmp_parse_failed: "❌ Invalid RTMP URL. Use: <code>/setrtmp <chat_id> <rtmp_url></code>"
-
-rtmp_streaming_not_supported: |
-  ⚠️ <b>Streaming not supported</b>
-  
-  This action is not available while using <b>RTMP mode</b>.
-  
-  Use <code>/stream</code> to play media via RTMP.
-  
-rtmp_configured_success: "✅ RTMP configured successfully for Chat ID: <code>{chat_id}</code>"
-
 
 searching: "🔍🎶 Searching... ⚡✨"
 searching_query: "🔍🎶 Searching for: <b>{query}</b>... ⚡✨"

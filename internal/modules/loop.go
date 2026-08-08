@@ -21,7 +21,7 @@ import (
 	"strconv"
 	"strings"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
@@ -51,27 +51,35 @@ func init() {
 • If the track is forcefully skipped using <code>/skip</code>, the loop will stop and reset automatically`
 }
 
-func loopHandler(m *tg.NewMessage) error {
-	return handleLoop(m, false)
+func loopHandler(c *td.Client, m *td.Message) error {
+	return handleLoop(c, m, false)
 }
 
-func cloopHandler(m *tg.NewMessage) error {
-	return handleLoop(m, true)
+func cloopHandler(c *td.Client, m *td.Message) error {
+	return handleLoop(c, m, true)
 }
 
-func handleLoop(m *tg.NewMessage, cplay bool) error {
-	r, err := getEffectiveRoom(m.ChannelID(), cplay)
-	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+func handleLoop(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroupTd(c, m) {
+		return nil
 	}
-	chatID := m.ChannelID()
+
+	if !filterAuthUsersTd(c, m) {
+		return nil
+	}
+
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
+	if err != nil {
+		m.ReplyText(c, err.Error(), nil)
+		return nil
+	}
+	chatID := m.ChatID()
 	args := strings.Fields(m.Text())
 	currentLoop := r.Loop()
 
 	if !r.IsActiveChat() {
-		m.Reply(F(chatID, "room_no_active"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return nil
 	}
 
 	if len(args) < 2 {
@@ -82,31 +90,32 @@ func handleLoop(m *tg.NewMessage, cplay bool) error {
 			})
 		}
 
-		msg := F(m.ChannelID(), "loop_usage", locales.Arg{
-			"cmd":        getCommand(m),
+		msg := F(chatID, "loop_usage", locales.Arg{
+			"cmd":        getCommandTd(m),
 			"count_line": countLine,
 		})
 
-		m.Reply(msg)
-		return tg.ErrEndGroup
+		m.ReplyText(c, msg, nil)
+		return nil
 	}
 
 	newLoop, err := strconv.Atoi(args[1])
 	if err != nil || newLoop < 0 || newLoop > 10 {
-		m.Reply(F(chatID, "loop_invalid"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "loop_invalid"), nil)
+		return nil
 	}
 
 	if newLoop == currentLoop {
-		m.Reply(F(chatID, "loop_already_set", locales.Arg{
+		m.ReplyText(c, F(chatID, "loop_already_set", locales.Arg{
 			"count": currentLoop,
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
 	r.SetLoop(newLoop)
 
-	mention := utils.MentionHTML(m.Sender)
+	sender, _ := m.GetUser(c)
+	mention := mentionOf(sender, m.SenderID())
 	var msg string
 	if newLoop == 0 {
 		msg = F(chatID, "loop_disabled", locales.Arg{
@@ -119,6 +128,6 @@ func handleLoop(m *tg.NewMessage, cplay bool) error {
 		})
 	}
 
-	m.Reply(msg)
-	return tg.ErrEndGroup
+	m.ReplyText(c, msg, nil)
+	return nil
 }

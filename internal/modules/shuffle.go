@@ -20,7 +20,7 @@ package modules
 import (
 	"strings"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
@@ -50,44 +50,52 @@ func init() {
 Shuffle only affects queue order, not currently playing track.`
 }
 
-func shuffleHandler(m *telegram.NewMessage) error {
-	return handleShuffle(m, false)
+func shuffleHandler(c *td.Client, m *td.Message) error {
+	return handleShuffle(c, m, false)
 }
 
-func cshuffleHandler(m *telegram.NewMessage) error {
-	return handleShuffle(m, true)
+func cshuffleHandler(c *td.Client, m *td.Message) error {
+	return handleShuffle(c, m, true)
 }
 
-func handleShuffle(m *telegram.NewMessage, cplay bool) error {
+func handleShuffle(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroupTd(c, m) {
+		return nil
+	}
+
+	if !filterAuthUsersTd(c, m) {
+		return nil
+	}
+
 	arg := strings.ToLower(m.Args())
 
-	r, err := getEffectiveRoom(m.ChannelID(), cplay)
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return telegram.ErrEndGroup
+		m.ReplyText(c, err.Error(), nil)
+		return nil
 	}
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 
 	if !r.IsActiveChat() {
-		m.Reply(F(chatID, "room_no_active"))
-		return telegram.ErrEndGroup
+		m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return nil
 	}
 
 	r.Parse()
 
 	if arg == "" {
 		state := F(chatID, "disabled")
-		cmd := getCommand(m) + " on"
+		cmd := getCommandTd(m) + " on"
 		if r.Shuffle() {
 			state = F(chatID, "enabled")
-			cmd = getCommand(m) + " off"
+			cmd = getCommandTd(m) + " off"
 		}
 
-		m.Reply(F(chatID, "shuffle_current_state", locales.Arg{
+		m.ReplyText(c, F(chatID, "shuffle_current_state", locales.Arg{
 			"state": state,
 			"cmd":   cmd,
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
 	var newState bool
@@ -104,10 +112,13 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 		state = F(chatID, "enabled")
 	}
 
-	m.Reply(F(chatID, "shuffle_updated", locales.Arg{
-		"state": state,
-		"user":  utils.MentionHTML(m.Sender),
-	}))
+	sender, _ := m.GetUser(c)
+	mention := mentionOf(sender, m.SenderID())
 
-	return telegram.ErrEndGroup
+	m.ReplyText(c, F(chatID, "shuffle_updated", locales.Arg{
+		"state": state,
+		"user":  mention,
+	}), nil)
+
+	return nil
 }

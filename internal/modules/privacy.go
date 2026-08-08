@@ -38,8 +38,7 @@ Your privacy is important to us. This bot is designed with privacy in mind.
 <blockquote>We only store essential data required for the bot to function:
 • <b>User & Chat IDs:</b> To identify groups and manage settings.
 • <b>Preferences:</b> Language settings and bot configurations.
-• <b>Access Control:</b> Authorized user lists for your group.
-• <b>RTMP Config:</b> Only if you use the RTMP streaming feature.</blockquote>
+• <b>Access Control:</b> Authorized user lists for your group.</blockquote>
 
 <b>📩 Message Privacy</b>
 <blockquote>• The bot <b>only</b> reads messages that start with a command (e.g., <code>/play</code>) or interactions with its own buttons.

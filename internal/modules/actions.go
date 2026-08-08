@@ -14,12 +14,14 @@
  *
  * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
+
 package modules
 
 import (
+	"strings"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
@@ -29,92 +31,125 @@ import (
 	"yukkimusic/internal/utils"
 )
 
-func handleActions(m *telegram.NewMessage) error {
-	logger.Info(m.Marshal())
-
-	if !isValidChatType(m) {
-		warnAndLeave(m.Client, m.ChannelID())
-		return telegram.ErrEndGroup
+func actionFilter(m *td.Message) bool {
+	switch m.Content.(type) {
+	case *td.MessageChatAddMembers,
+		*td.MessageChatDeleteMember,
+		*td.MessageVideoChatStarted,
+		*td.MessageVideoChatEnded:
+		return true
 	}
-
-	if action, ok := m.Action.(*telegram.MessageActionGroupCall); ok {
-		return handleVoiceChatAction(m, action)
-	}
-
-	return handleChatMemberAction(m)
+	return false
 }
 
-func handleChatMemberAction(m *telegram.NewMessage) error {
-	chatID := m.ChannelID()
-	botID := m.Client.Me().ID
+func handleActionsTd(c *td.Client, m *td.Message) error {
+	if !isValidChatTypeTd(c, m) {
+		warnAndLeaveTd(c, m.ChatID())
+		return nil
+	}
 
-	switch action := m.Action.(type) {
-	case *telegram.MessageActionChatAddUser:
-		for _, uid := range action.Users {
-			if uid == botID {
-				if blockedChat, _ := database.IsBlacklistedChat(chatID); blockedChat && !isOwnerOrSudo(m.SenderID()) {
-					m.Reply(F(chatID, "blacklist_chat_blocked"))
-					leaveChat(m.Client, chatID)
-					return telegram.ErrEndGroup
-				}
-				ownerID, err := utils.GetChatOwner(m.Client, chatID)
-				if err == nil {
-					if blockedOwner, _ := database.IsBlacklistedUser(ownerID); blockedOwner && !isOwnerOrSudo(m.SenderID()) {
-						m.Reply(F(chatID, "blacklist_owner_blocked_leave"))
-						leaveChat(m.Client, chatID)
-						return telegram.ErrEndGroup
-					}
-				}
+	switch m.Content.(type) {
+	case *td.MessageChatAddMembers:
+		return handleChatMemberAddTd(c, m)
+	case *td.MessageChatDeleteMember:
+		return handleChatMemberDeleteTd(c, m)
+	case *td.MessageVideoChatStarted, *td.MessageVideoChatEnded:
+		return handleVoiceChatActionTd(c, m)
+	}
 
-				logger.Debug("Bot added to " + utils.IntToStr(chatID))
-				m.Reply(F(chatID, "bot_added_normal"))
-				database.AddServedChat(chatID)
+	return nil
+}
 
-				if config.LoggerID != 0 {
-					m.Client.SendMessage(config.LoggerID, F(config.LoggerID, "logger_bot_added", buildLogArgs(m, chatID, "added")))
-				}
+func handleChatMemberAddTd(c *td.Client, m *td.Message) error {
+	chatID := m.ChatID()
+
+	if c.Me == nil {
+		return nil
+	}
+	content := m.Content.(*td.MessageChatAddMembers)
+
+	for _, uid := range content.MemberUserIds {
+		if uid != c.Me.Id {
+			continue
+		}
+
+		if blockedChat, _ := database.IsBlacklistedChat(chatID); blockedChat && !isOwnerOrSudo(m.SenderID()) {
+			m.ReplyText(c, F(chatID, "blacklist_chat_blocked"), nil)
+			leaveChatTd(c, chatID)
+			return nil
+		}
+
+		ownerID, err := utils.GetChatOwner(c, chatID)
+		if err == nil {
+			if blockedOwner, _ := database.IsBlacklistedUser(ownerID); blockedOwner && !isOwnerOrSudo(m.SenderID()) {
+				m.ReplyText(c, F(chatID, "blacklist_owner_blocked_leave"), nil)
+				leaveChatTd(c, chatID)
 				return nil
 			}
 		}
 
-	case *telegram.MessageActionChatDeleteUser:
-		if action.UserID == botID {
-			logger.Debug("Bot removed from " + utils.IntToStr(chatID))
+		logger.Debug("Bot added to " + utils.IntToStr(chatID))
+		m.ReplyText(c, F(chatID, "bot_added_normal"), nil)
+		database.AddServedChat(chatID)
 
-			cleanScheduler.cancel(chatID)
-			core.DeleteRoom(chatID)
-			core.DeleteChatState(chatID)
-			database.RemoveServedChat(chatID)
+		if config.LoggerID != 0 {
+			c.SendTextMessage(config.LoggerID, F(config.LoggerID, "logger_bot_added", buildLogArgsTd(c, m, chatID, "added")), nil)
+		}
 
-			if config.LoggerID != 0 {
-				m.Client.SendMessage(config.LoggerID, F(config.LoggerID, "logger_bot_removed", buildLogArgs(m, chatID, "removed")))
-			}
-			return nil
+		return nil
+	}
+
+	return nil
+}
+
+func handleChatMemberDeleteTd(c *td.Client, m *td.Message) error {
+	chatID := m.ChatID()
+
+	if c.Me == nil {
+		return nil
+	}
+	content := m.Content.(*td.MessageChatDeleteMember)
+
+	if content.UserId == c.Me.Id {
+		logger.Debug("Bot removed from " + utils.IntToStr(chatID))
+
+		cleanScheduler.cancel(chatID)
+		core.DeleteRoom(chatID)
+		core.DeleteChatState(chatID)
+		database.RemoveServedChat(chatID)
+
+		if config.LoggerID != 0 {
+			c.SendTextMessage(config.LoggerID, F(config.LoggerID, "logger_bot_removed", buildLogArgsTd(c, m, chatID, "removed")), nil)
 		}
 	}
 
 	return nil
 }
 
-func handleVoiceChatAction(m *telegram.NewMessage, action *telegram.MessageActionGroupCall) error {
+func handleVoiceChatActionTd(c *td.Client, m *td.Message) error {
 	if isMaint, _ := database.IsMaintenanceEnabled(); isMaint {
-		return telegram.ErrEndGroup
+		return nil
 	}
 
-	chatID := m.ChannelID()
-	isActive := action.Duration == 0
+	chatID := m.ChatID()
+	isActive := true
+	var duration int32
 
-	go clearRTMPState(chatID)
+	if ended, ok := m.Content.(*td.MessageVideoChatEnded); ok {
+		isActive = false
+		duration = ended.Duration
+	}
+
 	s, err := core.GetChatState(chatID)
 	if err != nil {
 		logger.Errorf("Failed to get chat state for %d: %v", chatID, err)
-		return telegram.ErrEndGroup
+		return nil
 	}
 
 	s.SetVoiceChatActive(isActive)
 
 	msgKey := utils.IfElse(isActive, "voicechat_started", "voicechat_ended")
-	m.Respond(F(chatID, msgKey, locales.Arg{"duration": utils.FormatDuration(int(action.Duration))}))
+	c.SendTextMessage(chatID, F(chatID, msgKey, locales.Arg{"duration": utils.FormatDuration(int(duration))}), nil)
 	logger.Debugf("Voice chat %s in %d", msgKey, chatID)
 
 	if !isActive {
@@ -129,10 +164,70 @@ func handleVoiceChatAction(m *telegram.NewMessage, action *telegram.MessageActio
 		}()
 	}
 
-	return telegram.ErrEndGroup
+	return nil
 }
 
-func isValidChatType(m *telegram.NewMessage) bool {
-	return m.ChatType() != telegram.EntityChat ||
-		(m.Channel != nil && m.Channel.Megagroup)
+func isValidChatTypeTd(c *td.Client, m *td.Message) bool {
+	chat, err := m.GetChat(c)
+	if err != nil {
+		return false
+	}
+
+	sg, ok := chat.Type.(*td.ChatTypeSupergroup)
+	return ok && !sg.IsChannel
+}
+
+func warnAndLeaveTd(c *td.Client, chatID int64) {
+	text := F(chatID, "supergroup_needed", locales.Arg{
+		"chat_id":       chatID,
+		"support_group": config.SupportChat,
+	})
+
+	if _, err := c.SendTextMessage(chatID, text, nil); err != nil {
+		logger.Errorf("failed to send supergroup conversion message to chat %d: %v", chatID, err)
+		return
+	}
+
+	go func() {
+		leaveChatTd(c, chatID)
+	}()
+}
+
+func leaveChatTd(c *td.Client, chatID int64) {
+	go func() {
+		time.Sleep(1 * time.Second)
+		if err := c.LeaveChat(chatID); err != nil {
+			logger.Errorf("failed to leave chatID=%d: %v", chatID, err)
+		}
+		core.Assistants.WithAssistant(
+			chatID,
+			func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) },
+		)
+	}()
+}
+
+func buildLogArgsTd(c *td.Client, m *td.Message, chatID int64, action string) locales.Arg {
+	groupName := "N/A"
+	if chat, err := m.GetChat(c); err == nil && chat != nil {
+		groupName = chat.Title
+	}
+
+	sender, _ := m.GetUser(c)
+	actorID := m.SenderID()
+	actorName := "N/A"
+	if sender != nil {
+		if full := strings.TrimSpace(sender.FirstName + " " + sender.LastName); full != "" {
+			actorName = full
+		}
+	}
+
+	return locales.Arg{
+		"group_name":            groupName,
+		"group_id":              chatID,
+		"group_username":        "N/A",
+		action + "_by_name":     actorName,
+		action + "_by_id":       actorID,
+		action + "_by_username": mentionOf(sender, actorID),
+		"date_time":             time.Now().Format("02 Jan 2006 • 15:04"),
+	}
 }

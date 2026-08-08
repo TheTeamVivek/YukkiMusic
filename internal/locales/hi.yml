@@ -567,66 +567,7 @@ room_no_active: "⚠️ <b>कोई सक्रिय संगीत नह�
 room_already_paused: "⏸️ संगीत पूर्व से ही विराम स्थिति में है। निरन्तरता के लिए ▶️ 'पुनः चलाएँ' दबाएँ।"
 room_pause_failed: "❌ संगीत विराम विफल।\n\n<i>{error}</i>"
 
-rtmp_not_configured: "⚠️ RTMP configured नहीं है। DM में <code>/setrtmp &lt;chat_id&gt; &lt;rtmp_url&gt;</code> इस्तेमाल करें।"
-
-rtmp_already_streaming: |
-  📡 <b>प्रवाह पूर्व से ही चल रहा है!</b>
-  
-  वर्तमान प्रवाह समाप्त करने के लिए <code>/streamstop</code> का प्रयोग करें।
-
-
-
-rtmp_play_failed: |
-  ❌ <b>प्रवाह आरम्भ करने में विफल:</b>
-  <code>{error}</code>
-
-rtmp_now_streaming: |
-  📡 <b>अब प्रवाह हो रहा है (RTMP):</b>
-  
-  <b>▫ संगीत:</b> <a href="{url}">{title}</a>
-  <b>▫ अवधि:</b> {duration}
-  <b>▫ आरम्भकर्ता:</b> {by}
-  
-  ⚠️ <i>सूचना: RTMP में ~15-30 क्षण का संचयन विलम्ब होता है</i>
-
-
-rtmp_stop_failed: |
-  ❌ <b>प्रवाह रोकने में विफल:</b>
-  <code>{error}</code>
-
-rtmp_stopped: |
-  ⏹️ <b>RTMP प्रवाह {user} द्वारा रोका गया</b>
-
-
-rtmp_status_playing: |
-  📡 <b>RTMP स्टेटस</b>
-  
-  <b>▫ स्थिति:</b> ▶️ स्ट्रीमिंग
-  <b>▫ पोज़िशन:</b> {position}
-
-
-
-
-rtmp_dm_only: "⚠️ इस कमांड को DM में इस्तेमाल करें।"
-
-rtmp_setup_usage: "⚙️ /setrtmp <chat_id> <rtmp_url>"
-
 generic_error: "❌ कुछ गलत हुआ: <code>{error}</code>"
-
-rtmp_invalid_chat_id: "❌ गलत chat ID। उदाहरण: <code>-1001234567890</code>"
-
-
-
-rtmp_parse_failed: "❌ गलत RTMP URL। ऐसे इस्तेमाल करें: <code>/setrtmp <chat_id> <rtmp_url></code>"
-
-rtmp_streaming_not_supported: |
-  ⚠️ <b>प्रवाह समर्थित नहीं है</b>
-  
-  <b>RTMP विधा</b> का प्रयोग करते समय यह क्रिया उपलब्ध नहीं है।
-  
-  RTMP के माध्यम से सामग्री चलाने के लिए <code>/stream</code> का प्रयोग करें।
-  
-rtmp_configured_success: "✅ RTMP configured successfully for Chat ID: <code>{chat_id}</code>"
 
 settings_btn_adminmode: "🛡️ एडमिन मोड"
 settings_btn_cmddelete: "🗑️ कमांड डिलीट"

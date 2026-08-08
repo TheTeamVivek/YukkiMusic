@@ -18,10 +18,7 @@
 package modules
 
 import (
-	"strings"
-	"time"
-
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
@@ -31,23 +28,35 @@ import (
 	"yukkimusic/internal/utils"
 )
 
-func getParticipantStatus(p telegram.ChannelParticipant) string {
-	if p == nil {
+func memberID(m *td.ChatMember) int64 {
+	if m == nil || m.MemberId == nil {
+		return 0
+	}
+	if user, ok := m.MemberId.(*td.MessageSenderUser); ok {
+		return user.UserId
+	}
+	return 0
+}
+
+func memberStatus(m *td.ChatMember) string {
+	if m == nil || m.Status == nil {
 		return "left"
 	}
 
-	switch v := p.(type) {
-	case *telegram.ChannelParticipantCreator:
+	switch status := m.Status.(type) {
+	case *td.ChatMemberStatusCreator:
 		return "creator"
-	case *telegram.ChannelParticipantAdmin:
+	case *td.ChatMemberStatusAdministrator:
 		return "administrator"
-	case *telegram.ChannelParticipantSelf, *telegram.ChannelParticipantObj:
+	case *td.ChatMemberStatusMember:
 		return "member"
-	case *telegram.ChannelParticipantLeft:
+	case *td.ChatMemberStatusLeft:
 		return "left"
-	case *telegram.ChannelParticipantBanned:
-		if v.Left {
-			return "left"
+	case *td.ChatMemberStatusBanned:
+		return "kicked"
+	case *td.ChatMemberStatusRestricted:
+		if status.IsMember {
+			return "member"
 		}
 		return "kicked"
 	default:
@@ -55,13 +64,21 @@ func getParticipantStatus(p telegram.ChannelParticipant) string {
 	}
 }
 
-func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
-	if !canBypassMaintenence(p.ActorID()) {
+func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
+	if !canBypassMaintenence(u.ActorUserId) {
 		return nil
 	}
 
-	chatID := p.ChannelID()
+	chatID := u.ChatId
 	if chatID == 0 {
+		return nil
+	}
+
+	userID := memberID(u.NewChatMember)
+	if userID == 0 {
+		userID = memberID(u.OldChatMember)
+	}
+	if userID == 0 {
 		return nil
 	}
 
@@ -71,37 +88,26 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 		state = nil
 	}
 
-	userID := p.UserID()
-
-	oldStatus := getParticipantStatus(p.Old)
-	newStatus := getParticipantStatus(p.New)
-
-	/*logger.Debugf(
-		"participant change %d: %s -> %s",
-		userID,
-		oldStatus,
-		newStatus,
-	)*/
+	oldStatus := memberStatus(u.OldChatMember)
+	newStatus := memberStatus(u.NewChatMember)
 
 	switch {
-
 	case (newStatus == "administrator" || newStatus == "creator") &&
 		(oldStatus != "administrator" && oldStatus != "creator"):
 
-		utils.AddChatAdmin(p.Client, chatID, userID)
+		utils.AddChatAdmin(chatID, userID)
 
 	case oldStatus == "administrator" &&
 		newStatus != "administrator" &&
 		newStatus != "creator":
 
-		if userID == p.Client.Me().ID && config.LeaveOnDemoted {
-
+		if c.Me != nil && userID == c.Me.ID && config.LeaveOnDemoted {
 			cleanScheduler.cancel(chatID)
 			core.DeleteRoom(chatID)
 			core.DeleteChatState(chatID)
 
-			p.Client.SendMessage(chatID, F(chatID, "bot_demotion_goodbye"))
-			p.Client.LeaveChannel(chatID)
+			c.SendTextMessage(chatID, F(chatID, "bot_demotion_goodbye"), nil)
+			c.LeaveChat(chatID)
 
 			if state != nil && state.Assistant != nil {
 				state.Assistant.Client.LeaveChannel(chatID)
@@ -110,30 +116,28 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 			return nil
 		}
 
-		utils.RemoveChatAdmin(p.Client, chatID, userID)
+		utils.RemoveChatAdmin(chatID, userID)
 
 	case oldStatus == "left" &&
 		(newStatus == "member" || newStatus == "administrator" || newStatus == "creator"):
 
-		handleSudoJoin(p, chatID)
+		handleSudoJoin(c, chatID, userID)
 	}
 
-	if state != nil && userID == state.Assistant.Self.ID {
-
-		if p.IsJoined() {
+	if state != nil && state.Assistant != nil && userID == state.Assistant.Self.ID {
+		switch newStatus {
+		case "member", "administrator", "creator":
 			state.SetAssistantPresent(true)
 			state.SetAssistantBanned(false)
 			return nil
-		}
 
-		if p.IsLeft() {
+		case "left":
 			state.SetAssistantPresent(false)
 			state.SetAssistantBanned(false)
 			return nil
-		}
 
-		if isUserRestricted(p) {
-			handleAssistantRestriction(p, state, chatID)
+		case "kicked":
+			handleAssistantRestriction(c, u, state, chatID)
 			return nil
 		}
 
@@ -145,9 +149,7 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 	return nil
 }
 
-func handleSudoJoin(p *telegram.ParticipantUpdate, chatID int64) {
-	userID := p.UserID()
-
+func handleSudoJoin(c *td.Client, chatID, userID int64) {
 	var msgKey string
 
 	if userID == config.OwnerID {
@@ -164,21 +166,29 @@ func handleSudoJoin(p *telegram.ParticipantUpdate, chatID int64) {
 		msgKey = "sudo_join_sudo"
 	}
 
+	user, _ := c.GetUser(userID)
+	userMention := mentionOf(user, userID)
+
+	botMention := "bot"
+	if c.Me != nil {
+		botMention = mentionOf(c.Me, c.Me.ID)
+	}
+
 	text := F(chatID, msgKey, locales.Arg{
-		"user": utils.MentionHTML(p.User),
-		"bot":  utils.MentionHTML(p.Client.Me()),
+		"user": userMention,
+		"bot":  botMention,
 	})
 
-	p.Client.SendMessage(chatID, text)
+	c.SendTextMessage(chatID, text, nil)
 }
 
 func handleAssistantRestriction(
-	p *telegram.ParticipantUpdate,
+	c *td.Client,
+	u *td.UpdateChatMember,
 	s *core.ChatState,
 	chatID int64,
 ) {
-	if !isTrueBan(p) {
-
+	if !isTrueBan(u) {
 		s.SetAssistantPresent(true)
 		s.SetAssistantBanned(false)
 
@@ -195,10 +205,14 @@ func handleAssistantRestriction(
 	}
 	core.DeleteRoom(chatID)
 
-	if ok, _ := p.Unban(); ok {
+	err := c.SetChatMemberStatus(
+		chatID,
+		&td.MessageSenderUser{UserId: s.Assistant.Self.ID},
+		&td.ChatMemberStatusMember{},
+	)
+	if err == nil {
 		s.SetAssistantBanned(false)
 	} else {
-
 		s.SetAssistantBanned(true)
 
 		msg := F(chatID, "assistant_restricted_warning", locales.Arg{
@@ -206,58 +220,15 @@ func handleAssistantRestriction(
 			"id":        s.Assistant.Self.ID,
 		})
 
-		p.Client.SendMessage(chatID, msg)
+		c.SendTextMessage(chatID, msg, nil)
 	}
 }
 
-func isTrueBan(p *telegram.ParticipantUpdate) bool {
-	if p.New == nil {
+func isTrueBan(u *td.UpdateChatMember) bool {
+	if u.NewChatMember == nil {
 		return false
 	}
 
-	banned, ok := p.New.(*telegram.ChannelParticipantBanned)
-	if !ok {
-		return false
-	}
-
-	return banned.BannedRights.ViewMessages
-}
-
-func isUserRestricted(p *telegram.ParticipantUpdate) bool {
-	if p.New == nil {
-		return false
-	}
-
-	_, banned := p.New.(*telegram.ChannelParticipantBanned)
-	_, left := p.New.(*telegram.ChannelParticipantLeft)
-
-	return banned || left
-}
-
-func buildLogArgs(
-	m *telegram.NewMessage,
-	chatID int64,
-	action string,
-) locales.Arg {
-	groupUsername := "N/A"
-	if u := m.Channel.Username; u != "" {
-		groupUsername = "@" + u
-	}
-
-	actorUsername := utils.MentionHTML(m.Sender)
-	if u := m.Sender.Username; u != "" {
-		actorUsername = "@" + u
-	}
-
-	name := strings.TrimSpace(m.Sender.FirstName + " " + m.Sender.LastName)
-
-	return locales.Arg{
-		"group_name":            m.Channel.Title,
-		"group_id":              chatID,
-		"group_username":        groupUsername,
-		action + "_by_name":     name,
-		action + "_by_id":       m.SenderID(),
-		action + "_by_username": actorUsername,
-		"date_time":             time.Now().Format("02 Jan 2006 • 15:04"),
-	}
+	_, banned := u.NewChatMember.Status.(*td.ChatMemberStatusBanned)
+	return banned
 }

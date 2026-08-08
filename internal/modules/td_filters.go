@@ -18,10 +18,22 @@
 package modules
 
 import (
+	"strings"
+
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/database"
+	"yukkimusic/internal/utils"
 )
+
+func getCommandTd(m *td.Message) string {
+	parts := strings.Fields(m.Text())
+	if len(parts) == 0 {
+		return ""
+	}
+	cmd, _, _ := strings.Cut(parts[0], "@")
+	return cmd
+}
 
 func isSuperGroupTd(c *td.Client, m *td.Message) bool {
 	if m.IsPrivate() {
@@ -86,19 +98,5 @@ func canUseAdminCommandTd(c *td.Client, chatID, userID int64) bool {
 }
 
 func tdIsChatAdmin(c *td.Client, chatID, userID int64) (bool, error) {
-	if chatID == userID {
-		return true, nil
-	}
-
-	admins, err := c.GetChatAdministrators(chatID)
-	if err != nil {
-		return false, err
-	}
-
-	for _, a := range admins.Administrators {
-		if a.UserId == userID {
-			return true, nil
-		}
-	}
-	return false, nil
+	return utils.IsChatAdmin(c, chatID, userID)
 }

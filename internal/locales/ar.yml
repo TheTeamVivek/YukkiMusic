@@ -567,66 +567,7 @@ room_no_active: "⚠️ <b>لا يوجد تشغيل نشط.</b>\n\n<i>لا يو�
 room_already_paused: "⏸️ المقطع متوقف مؤقتاً بالفعل. اضغط على ▶️ استئناف للمتابعة."
 room_pause_failed: "❌ فشل إيقاف التشغيل مؤقتاً.\n\n<i>{error}</i>"
 
-rtmp_not_configured: "⚠️ RTMP غير مُعد. استخدم <code>/setrtmp &lt;chat_id&gt; &lt;rtmp_url&gt;</code> في الخاص."
-
-rtmp_already_streaming: |
-  📡 <b>البث جارٍ بالفعل!</b>
-  
-  استخدم <code>/streamstop</code> لإنهاء البث الحالي.
-
-
-
-rtmp_play_failed: |
-  ❌ <b>فشل بدء البث:</b>
-  <code>{error}</code>
-
-rtmp_now_streaming: |
-  📡 <b>جاري البث الآن (RTMP):</b>
-  
-  <b>▫ المقطع:</b> <a href="{url}">{title}</a>
-  <b>▫ المدة:</b> {duration}
-  <b>▫ بدأ بواسطة:</b> {by}
-  
-  ⚠️ <i>ملاحظة: يحتوي RTMP على تأخير تخزين مؤقت يتراوح بين 15-30 ثانية</i>
-
-
-rtmp_stop_failed: |
-  ❌ <b>فشل إيقاف البث:</b>
-  <code>{error}</code>
-
-rtmp_stopped: |
-  ⏹️ <b>تم إيقاف بث RTMP</b> بواسطة {user}
-
-
-rtmp_status_playing: |
-  📡 <b>حالة RTMP</b>
-  
-  <b>▫ الحالة:</b> ▶️ بث مباشر
-  <b>▫ الموضع:</b> {position}
-
-
-
-
-rtmp_dm_only: "⚠️ استخدم هذا الأمر في الرسائل الخاصة."
-
-rtmp_setup_usage: "⚙️ /setrtmp <chat_id> <rtmp_url>"
-
 generic_error: "❌ حدث خطأ: <code>{error}</code>"
-
-rtmp_invalid_chat_id: "❌ معرّف الدردشة غير صالح. مثال: <code>-1001234567890</code>"
-
-
-
-rtmp_parse_failed: "❌ رابط RTMP غير صالح. استخدم: <code>/setrtmp <chat_id> <rtmp_url></code>"
-
-rtmp_streaming_not_supported: |
-  ⚠️ <b>البث غير مدعوم</b>
-  
-  هذا الإجراء غير متاح أثناء استخدام <b>وضع RTMP</b>.
-  
-  استخدم <code>/stream</code> لتشغيل الوسائط عبر RTMP.
-  
-rtmp_configured_success: "✅ RTMP configured successfully for Chat ID: <code>{chat_id}</code>"
 
 settings_btn_adminmode: "🛡️ وضع الإدارة"
 settings_btn_cmddelete: "🗑️ حذف الأوامر"

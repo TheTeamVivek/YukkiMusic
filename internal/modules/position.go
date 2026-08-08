@@ -20,7 +20,7 @@ package modules
 import (
 	"fmt"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
@@ -42,38 +42,46 @@ func init() {
 Quick position check without full queue display.`
 }
 
-func positionHandler(m *tg.NewMessage) error {
-	return handlePosition(m, false)
+func positionHandler(c *td.Client, m *td.Message) error {
+	return handlePosition(c, m, false)
 }
 
-func cpositionHandler(m *tg.NewMessage) error {
-	return handlePosition(m, true)
+func cpositionHandler(c *td.Client, m *td.Message) error {
+	return handlePosition(c, m, true)
 }
 
-func handlePosition(m *tg.NewMessage, cplay bool) error {
-	chatID := m.ChannelID()
+func handlePosition(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroupTd(c, m) {
+		return nil
+	}
 
-	r, err := getEffectiveRoom(m.ChannelID(), cplay)
+	if cplay && !filterAuthUsersTd(c, m) {
+		return nil
+	}
+
+	chatID := m.ChatID()
+
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		m.ReplyText(c, err.Error(), nil)
+		return nil
 	}
 
 	if !r.IsActiveChat() || r.Track().ID == "" {
-		m.Reply(F(chatID, "room_no_active"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return nil
 	}
 
 	r.Parse()
 
 	title := utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25))
 
-	m.Reply(F(chatID, "position_now", locales.Arg{
+	m.ReplyText(c, F(chatID, "position_now", locales.Arg{
 		"title":    title,
 		"position": utils.FormatDuration(r.Position()),
 		"duration": utils.FormatDuration(r.Track().Duration),
 		"speed":    fmt.Sprintf("%.2f", r.Speed()),
-	}))
+	}), nil)
 
-	return tg.ErrEndGroup
+	return nil
 }

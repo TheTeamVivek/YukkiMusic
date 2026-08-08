@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
@@ -54,27 +54,35 @@ func init() {
 • Suffix 'x' is optional: <code>1.5</code> = <code>1.5x</code>`
 }
 
-func speedHandler(m *telegram.NewMessage) error {
-	return handleSpeed(m, false)
+func speedHandler(c *td.Client, m *td.Message) error {
+	return handleSpeed(c, m, false)
 }
 
-func cspeedHandler(m *telegram.NewMessage) error {
-	return handleSpeed(m, true)
+func cspeedHandler(c *td.Client, m *td.Message) error {
+	return handleSpeed(c, m, true)
 }
 
-func handleSpeed(m *telegram.NewMessage, cplay bool) error {
-	r, err := getEffectiveRoom(m.ChannelID(), cplay)
-	if err != nil {
-		m.Reply(err.Error())
-		return telegram.ErrEndGroup
+func handleSpeed(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroupTd(c, m) {
+		return nil
 	}
 
-	chatID := m.ChannelID()
+	if !filterAuthUsersTd(c, m) {
+		return nil
+	}
+
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
+	if err != nil {
+		m.ReplyText(c, err.Error(), nil)
+		return nil
+	}
+
+	chatID := m.ChatID()
 	t := r.Track()
 
 	if !r.IsActiveChat() || t == nil {
-		m.Reply(F(chatID, "room_no_active"))
-		return telegram.ErrEndGroup
+		m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return nil
 	}
 
 	args := strings.Fields(m.Text())
@@ -82,17 +90,17 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 	// No args -> show current speed or usage hint
 	if len(args) < 2 {
 		if r.Speed() != 1.0 {
-			m.Reply(F(chatID, "speed_current", locales.Arg{
+			m.ReplyText(c, F(chatID, "speed_current", locales.Arg{
 				"speed": fmt.Sprintf("%.2f", r.Speed()),
 				"title": utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
-				"cmd":   getCommand(m),
-			}))
+				"cmd":   getCommandTd(m),
+			}), nil)
 		} else {
-			m.Reply(F(chatID, "speed_usage", locales.Arg{
-				"cmd": getCommand(m),
-			}))
+			m.ReplyText(c, F(chatID, "speed_usage", locales.Arg{
+				"cmd": getCommandTd(m),
+			}), nil)
 		}
-		return telegram.ErrEndGroup
+		return nil
 	}
 
 	// Parse speed
@@ -106,48 +114,49 @@ func handleSpeed(m *telegram.NewMessage, cplay bool) error {
 	} else {
 		s, err := strconv.ParseFloat(raw, 64)
 		if err != nil {
-			m.Reply(F(chatID, "speed_invalid_value", locales.Arg{
-				"cmd": getCommand(m),
-			}))
-			return telegram.ErrEndGroup
+			m.ReplyText(c, F(chatID, "speed_invalid_value", locales.Arg{
+				"cmd": getCommandTd(m),
+			}), nil)
+			return nil
 		}
 		if s < 0.50 || s > 4.0 {
-			m.Reply(F(chatID, "speed_invalid_range"))
-			return telegram.ErrEndGroup
+			m.ReplyText(c, F(chatID, "speed_invalid_range"), nil)
+			return nil
 		}
 		newSpeed = s
 	}
 
 	// Same speed → give info
 	if newSpeed == r.Speed() {
-		m.Reply(F(chatID, "speed_already_set", locales.Arg{
+		m.ReplyText(c, F(chatID, "speed_already_set", locales.Arg{
 			"speed": fmt.Sprintf("%.2f", newSpeed),
 			"title": utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
 	// Apply speed
 	if err := r.SetSpeed(newSpeed); err != nil {
-		m.Reply(F(chatID, "speed_failed", locales.Arg{
+		m.ReplyText(c, F(chatID, "speed_failed", locales.Arg{
 			"speed": fmt.Sprintf("%.2f", newSpeed),
 			"error": err.Error(),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
-	mention := utils.MentionHTML(m.Sender)
+	sender, _ := m.GetUser(c)
+	mention := mentionOf(sender, m.SenderID())
 
 	if newSpeed == 1.0 {
-		m.Reply(F(chatID, "speed_reset_success", locales.Arg{
+		m.ReplyText(c, F(chatID, "speed_reset_success", locales.Arg{
 			"user": mention,
-		}))
+		}), nil)
 	} else {
-		m.Reply(F(chatID, "speed_set", locales.Arg{
+		m.ReplyText(c, F(chatID, "speed_set", locales.Arg{
 			"speed": fmt.Sprintf("%.2f", newSpeed),
 			"user":  mention,
-		}))
+		}), nil)
 	}
 
-	return telegram.ErrEndGroup
+	return nil
 }

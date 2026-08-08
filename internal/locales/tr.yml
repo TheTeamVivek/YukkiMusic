@@ -564,66 +564,7 @@ room_no_active: "⚠️ <b>Aktif oynatma yok.</b>\n\n<i>Şu an hiçbir şey çal
 room_already_paused: "⏸️ Parça zaten duraklatılmış. Devam etmek için ▶️ Devam Et düğmesine dokun."
 room_pause_failed: "❌ Oynatma duraklatılamadı.\n\n<i>{error}</i>"
 
-rtmp_not_configured: "⚠️ RTMP yapılandırılmamış. DM'de <code>/setrtmp &lt;chat_id&gt; &lt;rtmp_url&gt;</code> kullanın."
-
-rtmp_already_streaming: |
-  📡 <b>Zaten yayında!</b>
-  
-  Mevcut yayını sonlandırmak için <code>/streamstop</code> kullan.
-
-
-
-rtmp_play_failed: |
-  ❌ <b>Yayın başlatılamadı:</b>
-  <code>{error}</code>
-
-rtmp_now_streaming: |
-  📡 <b>Şimdi Yayınlanıyor (RTMP):</b>
-  
-  <b>▫ Parça:</b> <a href="{url}">{title}</a>
-  <b>▫ Süre:</b> {duration}
-  <b>▫ Başlatan:</b> {by}
-  
-  ⚠️ <i>Not: RTMP'de ~15-30 saniyelik bir ara bellek gecikmesi vardır</i>
-
-
-rtmp_stop_failed: |
-  ❌ <b>Yayın durdurulamadı:</b>
-  <code>{error}</code>
-
-rtmp_stopped: |
-  ⏹️ <b>RTMP yayını {user} tarafından durduruldu</b>
-
-
-rtmp_status_playing: |
-  📡 <b>RTMP Durumu</b>
-  
-  <b>▫ Durum:</b> ▶️ Yayında
-  <b>▫ Konum:</b> {position}
-
-
-
-
-rtmp_dm_only: "⚠️ Bu komutu DM'de kullanın."
-
-rtmp_setup_usage: "⚙️ /setrtmp <chat_id> <rtmp_url>"
-
 generic_error: "❌ Bir hata oluştu: <code>{error}</code>"
-
-rtmp_invalid_chat_id: "❌ Geçersiz chat ID. Örnek: <code>-1001234567890</code>"
-
-
-
-rtmp_parse_failed: "❌ Geçersiz RTMP URL. Şunu kullanın: <code>/setrtmp <chat_id> <rtmp_url></code>"
-
-rtmp_streaming_not_supported: |
-  ⚠️ <b>Yayın desteklenmiyor</b>
-  
-  Bu eylem <b>RTMP modu</b> kullanılırken kullanılamaz.
-  
-  RTMP üzerinden medya oynatmak için <code>/stream</code> kullan.
-  
-rtmp_configured_success: "✅ RTMP configured successfully for Chat ID: <code>{chat_id}</code>"
 
 settings_btn_adminmode: "🛡️ Yönetici Modu"
 settings_btn_cmddelete: "🗑️ Komut Silme"
