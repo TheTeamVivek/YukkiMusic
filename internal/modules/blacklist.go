@@ -29,6 +29,9 @@ import (
 )
 
 func handleBlockUser(c *td.Client, m *td.Message) error {
+	if !checkOwner(c, m) {
+		return nil
+	}
 	if m.Args() == "" && m.ReplyToMessageID() == 0 {
 		_, _ = m.ReplyText(c, F(m.ChatID(), "auth_no_user", locales.Arg{"cmd": getCommand(m)}), nil)
 		return nil
@@ -48,6 +51,9 @@ func handleBlockUser(c *td.Client, m *td.Message) error {
 }
 
 func handleUnblockUser(c *td.Client, m *td.Message) error {
+	if !checkOwner(c, m) {
+		return nil
+	}
 	if m.Args() == "" && m.ReplyToMessageID() == 0 {
 		_, _ = m.ReplyText(c, F(m.ChatID(), "auth_no_user", locales.Arg{"cmd": getCommand(m)}), nil)
 		return nil
@@ -67,6 +73,9 @@ func handleUnblockUser(c *td.Client, m *td.Message) error {
 }
 
 func handleBlockChat(c *td.Client, m *td.Message) error {
+	if !checkOwner(c, m) {
+		return nil
+	}
 	if m.Args() == "" {
 		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_usage_blockchat"), nil)
 		return nil
@@ -85,6 +94,9 @@ func handleBlockChat(c *td.Client, m *td.Message) error {
 }
 
 func handleUnblockChat(c *td.Client, m *td.Message) error {
+	if !checkOwner(c, m) {
+		return nil
+	}
 	if m.Args() == "" {
 		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_usage_unblockchat"), nil)
 		return nil
@@ -103,6 +115,9 @@ func handleUnblockChat(c *td.Client, m *td.Message) error {
 }
 
 func handleBlacklisted(c *td.Client, m *td.Message) error {
+	if !checkOwner(c, m) {
+		return nil
+	}
 	chatID := m.ChatID()
 	chats, err := database.BlacklistedChats()
 	if err != nil {

@@ -80,6 +80,9 @@ This command can only be used by <b>owners</b> or <b>sudo users</b>.`,
 }
 
 func autoLeaveHandler(c *td.Client, m *td.Message) error {
+	if !checkSudo(c, m) {
+		return nil
+	}
 	args := strings.Fields(m.Text())
 	chatID := m.ChatID()
 

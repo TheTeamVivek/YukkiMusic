@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/internal/core"
@@ -23,22 +23,21 @@ var (
 	cleanScheduler           = &CleanScheduler{pending: make(map[int64][]cleanEntry)}
 )
 
-func cleanModeReadHandler(u tg.Update, _ *tg.Client) error {
-	upd, ok := u.(*tg.UpdateReadChannelOutbox)
-	if !ok || upd.MaxID == 0 {
+func cleanModeReadHandler(c *td.Client, upd *td.UpdateChatReadOutbox) error {
+	if upd == nil || upd.LastReadOutboxMessageId == 0 {
 		return nil
 	}
 
-	chatID := int64(-1000000000000 - upd.ChannelID)
-	if upd.MaxID == currentPlayingStatusMessageID(chatID) {
+	chatID := upd.ChatId
+	if upd.LastReadOutboxMessageId == currentPlayingStatusMessageID(chatID) {
 		return nil
 	}
 
-	cleanScheduler.schedule(chatID, upd.MaxID)
+	cleanScheduler.schedule(chatID, upd.LastReadOutboxMessageId)
 	return nil
 }
 
-func currentPlayingStatusMessageID(chatID int64) int32 {
+func currentPlayingStatusMessageID(chatID int64) int64 {
 	room, ok := core.GetRoom(chatID, nil, false)
 	if !ok || room == nil {
 		return 0
@@ -47,7 +46,7 @@ func currentPlayingStatusMessageID(chatID int64) int32 {
 	if status == nil {
 		return 0
 	}
-	return status.ID
+	return status.Id
 }
 
 func cleanModeDelay(chatID int64) time.Duration {
@@ -72,7 +71,7 @@ func cleanModeStatusText(chatID int64, enabled bool) string {
 }
 
 type cleanEntry struct {
-	messageID int32
+	messageID int64
 	dueAt     time.Time
 }
 
@@ -91,7 +90,7 @@ func (s *CleanScheduler) start() {
 	}()
 }
 
-func (s *CleanScheduler) schedule(chatID int64, messageID int32) {
+func (s *CleanScheduler) schedule(chatID int64, messageID int64) {
 	if messageID == 0 {
 		return
 	}
@@ -111,7 +110,7 @@ func (s *CleanScheduler) cancel(chatID int64) {
 
 func (s *CleanScheduler) flushDue(deadline time.Time) {
 	s.mu.Lock()
-	batches := make(map[int64][]int32)
+	batches := make(map[int64][]int64)
 
 	for chatID, entries := range s.pending {
 		statusID := currentPlayingStatusMessageID(chatID)
@@ -138,7 +137,7 @@ func (s *CleanScheduler) flushDue(deadline time.Time) {
 		if err != nil || !enabled {
 			continue
 		}
-		if _, err := core.Bot.DeleteMessages(chatID, ids); err != nil {
+		if err := core.TDBot.DeleteMessages(chatID, ids, nil); err != nil {
 			logger.Debugf("cleanmode delete failed chat=%d err=%v", chatID, err)
 		}
 	}
@@ -146,6 +145,6 @@ func (s *CleanScheduler) flushDue(deadline time.Time) {
 
 func scheduleOldPlayingMessage(r *core.RoomState) {
 	if m := r.StatusMsg(); m != nil {
-		cleanScheduler.schedule(m.ChannelID(), m.ID)
+		cleanScheduler.schedule(m.ChatId, m.Id)
 	}
 }

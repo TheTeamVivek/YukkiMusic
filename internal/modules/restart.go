@@ -53,6 +53,9 @@ All playback will be interrupted. Bot will be offline for a few seconds.`
 }
 
 func handleRestart(c *td.Client, m *td.Message) error {
+	if !checkOwner(c, m) {
+		return nil
+	}
 	chatID := m.ChatID()
 	r, ok := getActiveRoomForChat(chatID)
 	if ok && r.Track() != nil {

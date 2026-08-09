@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/internal/core"
@@ -34,363 +34,337 @@ import (
 	"yukkimusic/internal/utils"
 )
 
-func cancelHandler(cb *tg.CallbackQuery) error {
-	chatID := cb.ChannelID()
-	opt := &tg.CallbackOptions{Alert: true}
+func cancelHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
+	chatID := u.ChatId
 
-	if !checkAdminOrAuth(cb, chatID) {
-		return tg.ErrEndGroup
+	if !checkAdminOrAuth(c, u, chatID) {
+		return nil
 	}
 
 	if downloads.Remove(chatID) {
-		cb.Answer(F(chatID, "download_cancelled"), opt)
+		u.Answer(c, 0, true, F(chatID, "download_cancelled"), "")
 	} else {
-		cb.Answer(F(chatID, "no_download_to_cancel"), opt)
+		u.Answer(c, 0, true, F(chatID, "no_download_to_cancel"), "")
 	}
-	return tg.ErrEndGroup
+	return nil
 }
 
-func closeHandler(cb *tg.CallbackQuery) error {
-	cb.Answer("")
-	cb.Delete()
-	return tg.ErrEndGroup
+func closeHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
+	u.Answer(c, 0, false, "", "")
+	cbDelete(c, u)
+	return nil
 }
 
-func emptyCBHandler(cb *tg.CallbackQuery) error {
-	cb.Answer("")
-	return tg.ErrEndGroup
+func emptyCBHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
+	u.Answer(c, 0, false, "", "")
+	return nil
 }
 
-func roomHandle(cb *tg.CallbackQuery) error {
-	opt := &tg.CallbackOptions{Alert: true}
-	chatID := cb.ChannelID()
+func roomHandle(c *td.Client, u *td.UpdateNewCallbackQuery) error {
+	chatID := u.ChatId
 
-	parts := strings.SplitN(cb.DataString(), ":", 3)
+	parts := strings.SplitN(u.DataString(), ":", 3)
 	if len(parts) != 3 || parts[0] != "room" {
-		logger.Warnf("Invalid room callback payload: %s", cb.DataString())
-		cb.Answer(F(chatID, "invalid_request"), opt)
-		cb.Delete()
-		return tg.ErrEndGroup
+		logger.Warnf("Invalid room callback payload: %s", u.DataString())
+		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		cbDelete(c, u)
+		return nil
 	}
 	roomID, err := strconv.ParseInt(parts[1], 10, 64)
 	if err != nil {
 		logger.Warnf("Invalid roomID in callback: %s", parts[1])
-		cb.Answer(F(chatID, "invalid_request"), opt)
-		cb.Delete()
-		return tg.ErrEndGroup
+		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		cbDelete(c, u)
+		return nil
 	}
 	action := parts[2]
 
 	r, ok := core.GetRoom(roomID, nil, false)
 	if !ok || !r.IsActiveChat() {
-		cb.Answer(F(chatID, "room_not_active_cb"), opt)
-		cb.Edit(F(chatID, "room_no_active"))
-		return tg.ErrEndGroup
+		u.Answer(c, 0, true, F(chatID, "room_not_active_cb"), "")
+		u.EditMessageText(c, F(chatID, "room_no_active"), nil)
+		return nil
 	}
 
-	if !checkAdminOrAuth(cb, chatID) {
-		return tg.ErrEndGroup
+	if !checkAdminOrAuth(c, u, chatID) {
+		return nil
 	}
 
-	key := fmt.Sprintf("room:%d:%d", cb.Sender.ID, chatID)
+	key := fmt.Sprintf("room:%d:%d", u.SenderUserId, chatID)
 	if remaining := utils.GetFlood(key); remaining > 0 {
-		cb.Answer(F(chatID, "flood_seconds", locales.Arg{
+		u.Answer(c, 0, true, F(chatID, "flood_seconds", locales.Arg{
 			"duration": int(remaining.Seconds()),
-		}), opt)
-		return tg.ErrEndGroup
+		}), "")
+		return nil
 	}
 	utils.SetFlood(key, 5*time.Second)
 
 	switch {
 	case strings.HasPrefix(action, "seek"):
-		return handleSeekAction(cb, r, action, opt)
+		return handleSeekAction(c, u, r, action)
 	case action == "pause":
-		return handlePauseAction(cb, r)
+		return handlePauseAction(c, u, r)
 	case action == "resume":
-		return handleResumeAction(cb, r)
+		return handleResumeAction(c, u, r)
 	case action == "replay":
-		return handleReplayAction(cb, r)
+		return handleReplayAction(c, u, r)
 	case action == "skip":
-		return handleSkipAction(cb, r)
+		return handleSkipAction(c, u, r)
 	case action == "stop":
-		return handleStopAction(cb, r)
+		return handleStopAction(c, u, r)
 	case action == "mute":
-		return handleMuteAction(cb, r)
+		return handleMuteAction(c, u, r)
 	case action == "unmute":
-		return handleUnmuteAction(cb, r)
+		return handleUnmuteAction(c, u, r)
 	default:
 		logger.Warnf("Unknown callback action: %s", action)
-		cb.Answer(F(chatID, "unknown_action"), opt)
+		u.Answer(c, 0, true, F(chatID, "unknown_action"), "")
 	}
 
-	return tg.ErrEndGroup
+	return nil
 }
 
-func checkAdminOrAuth(cb *tg.CallbackQuery, chatID int64) bool {
-	if canUseAdminCommand(cb.Client, chatID, cb.SenderID) {
+func checkAdminOrAuth(c *td.Client, u *td.UpdateNewCallbackQuery, chatID int64) bool {
+	if canUseAdminCommand(c, chatID, u.SenderUserId) {
 		return true
 	}
 
-	opt := &tg.CallbackOptions{Alert: true}
 	mode, err := database.GetAdminMode(chatID)
 	if err == nil && mode == database.AdminModeAdminsOnly {
-		cb.Answer(F(chatID, "only_admin_cb"), opt)
+		u.Answer(c, 0, true, F(chatID, "only_admin_cb"), "")
 	} else {
-		cb.Answer(F(chatID, "only_admin_or_auth_cb"), opt)
+		u.Answer(c, 0, true, F(chatID, "only_admin_or_auth_cb"), "")
 	}
 	return false
 }
 
-func handlePauseAction(cb *tg.CallbackQuery, r *core.RoomState) error {
-	opt := &tg.CallbackOptions{Alert: true}
-	chatID := cb.ChannelID()
+func cbDelete(c *td.Client, u *td.UpdateNewCallbackQuery) {
+	msg, err := u.GetMessage(c)
+	if err != nil || msg == nil {
+		return
+	}
+	_ = msg.Delete(c, true)
+}
+
+func cbRespond(c *td.Client, u *td.UpdateNewCallbackQuery, text string, opts *td.SendTextMessageOpts) *td.Message {
+	msg, err := u.GetMessage(c)
+	if err != nil || msg == nil {
+		logger.Errorf("cbRespond: failed to get callback message: %v", err)
+		return nil
+	}
+	m, err := msg.ReplyText(c, text, opts)
+	if err != nil {
+		logger.Errorf("cbRespond: %v", err)
+		return nil
+	}
+	return m
+}
+
+func handlePauseAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
+	chatID := u.ChatId
 	logger.Infof("Callback → pause, chatID=%d", chatID)
 
 	if r.IsPaused() {
-		cb.Answer(F(chatID, "room_already_paused"), opt)
-		return tg.ErrEndGroup
+		u.Answer(c, 0, true, F(chatID, "room_already_paused"), "")
+		return nil
 	}
 
 	if _, err := r.Pause(); err != nil {
 		logger.Errorf("Pause failed: %v", err)
-		cb.Answer(F(chatID, "room_pause_failed", locales.Arg{
+		u.Answer(c, 0, true, F(chatID, "room_pause_failed", locales.Arg{
 			"error": err.Error(),
-		}), opt)
-		return tg.ErrEndGroup
+		}), "")
+		return nil
 	}
 
 	if r.IsMuted() {
 		r.Unmute()
 	}
 
-	cb.Answer(F(chatID, "cb_pause_success", locales.Arg{
+	u.Answer(c, 0, true, F(chatID, "cb_pause_success", locales.Arg{
 		"position": utils.FormatDuration(r.Position()),
-	}), opt)
-	updatePlaybackMessage(cb, r, "paused")
-	return tg.ErrEndGroup
+	}), "")
+	updatePlaybackMessage(c, u, r, "paused")
+	return nil
 }
 
-func handleResumeAction(cb *tg.CallbackQuery, r *core.RoomState) error {
-	opt := &tg.CallbackOptions{Alert: true}
-	chatID := cb.ChannelID()
+func handleResumeAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
+	chatID := u.ChatId
 	logger.Infof("Callback → resume, chatID=%d", chatID)
 
 	if !r.IsPaused() {
-		cb.Answer(F(chatID, "cb_already_playing"), opt)
-		return tg.ErrEndGroup
+		u.Answer(c, 0, true, F(chatID, "cb_already_playing"), "")
+		return nil
 	}
 
 	if _, err := r.Resume(); err != nil {
 		logger.Errorf("Resume failed: %v", err)
-		cb.Answer(F(chatID, "cb_resume_failed"), opt)
-		return tg.ErrEndGroup
+		u.Answer(c, 0, true, F(chatID, "cb_resume_failed"), "")
+		return nil
 	}
 
-	cb.Answer(F(chatID, "cb_resume_success", locales.Arg{
+	u.Answer(c, 0, true, F(chatID, "cb_resume_success", locales.Arg{
 		"position": utils.FormatDuration(r.Position()),
-	}), opt)
-	updatePlaybackMessage(cb, r, "playing")
-	return tg.ErrEndGroup
+	}), "")
+	updatePlaybackMessage(c, u, r, "playing")
+	return nil
 }
 
-func handleReplayAction(cb *tg.CallbackQuery, r *core.RoomState) error {
-	opt := &tg.CallbackOptions{Alert: true}
-	chatID := cb.ChannelID()
+func handleReplayAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
+	chatID := u.ChatId
 	logger.Infof("Callback → replay, chatID=%d", chatID)
 
-	statusMsg, err := cb.Respond(F(chatID, "cb_replaying"))
-	if err != nil {
-		logger.Errorf("Failed to send replay status: %v", err)
-		return tg.ErrEndGroup
+	statusMsg := cbRespond(c, u, F(chatID, "cb_replaying"), nil)
+	if statusMsg == nil {
+		logger.Errorf("Failed to send replay status")
+		return nil
 	}
 
 	if err := r.Replay(); err != nil {
 		logger.Errorf("Replay failed: %v", err)
-		utils.EOR(statusMsg, F(chatID, "replay_failed", locales.Arg{
+		utils.EOR(c, statusMsg, F(chatID, "replay_failed", locales.Arg{
 			"error": err.Error(),
-		}))
-		cb.Answer(F(chatID, "cb_replay_failed"), opt)
-		return tg.ErrEndGroup
+		}), nil)
+		u.Answer(c, 0, true, F(chatID, "cb_replay_failed"), "")
+		return nil
 	}
 
-	track := r.Track()
-	msgText := F(chatID, "stream_now_playing", locales.Arg{
-		"url":      track.URL,
-		"title":    utils.EscapeHTML(utils.ShortTitle(track.Title, 25)),
-		"duration": utils.FormatDuration(track.Duration),
-		"by":       track.Requester,
-	})
-
-	sendOpt := &tg.SendOptions{
-		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
-	}
-	if track.Artwork != "" && shouldShowThumb(chatID) {
-		sendOpt.Media = utils.CleanURL(track.Artwork)
-	}
-
-	statusMsg, _ = utils.EOR(statusMsg, msgText, sendOpt)
+	statusMsg = sendNowPlaying(c, statusMsg, chatID, r, r.Track())
 	r.SetStatusMsg(statusMsg)
 
-	cb.Answer(F(chatID, "cb_replay_success"), opt)
-	if _, err := cb.Edit(F(chatID, "cb_replay_edited", locales.Arg{
-		"user": mentionOfTg(cb.Sender),
-	})); err != nil {
+	u.Answer(c, 0, true, F(chatID, "cb_replay_success"), "")
+	if _, err := u.EditMessageText(c, F(chatID, "cb_replay_edited", locales.Arg{
+		"user": mentionOf(nil, u.SenderUserId),
+	}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
 		logger.Errorf("Edit error: %v", err)
 	}
-	return tg.ErrEndGroup
+	return nil
 }
 
-func handleSkipAction(cb *tg.CallbackQuery, r *core.RoomState) error {
-	opt := &tg.CallbackOptions{Alert: true}
-	chatID := cb.ChannelID()
+func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
+	chatID := u.ChatId
 	logger.Infof("Callback → skip, chatID=%d", chatID)
 
 	if len(r.Queue()) == 0 {
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)
-		if _, err := cb.Edit(F(chatID, "skip_stopped", locales.Arg{
-			"user": mentionOfTg(cb.Sender),
-		})); err != nil {
+		if _, err := u.EditMessageText(c, F(chatID, "skip_stopped", locales.Arg{
+			"user": mentionOf(nil, u.SenderUserId),
+		}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
 			logger.Errorf("Edit error: %v", err)
 		}
-		cb.Answer(F(chatID, "cb_skip_queue_empty"), opt)
-		return tg.ErrEndGroup
+		u.Answer(c, 0, true, F(chatID, "cb_skip_queue_empty"), "")
+		return nil
 	}
 
 	r.SetLoop(0)
 	t := r.NextTrack()
 
-	statusMsg, err := cb.Respond(F(chatID, "stream_downloading_next"))
-	if err != nil {
-		logger.Errorf("Failed to send status message: %v", err)
+	statusMsg := cbRespond(c, u, F(chatID, "stream_downloading_next"), nil)
+	if statusMsg == nil {
+		logger.Errorf("Failed to send status message")
 	}
 
 	path, err := platforms.Download(context.Background(), t, statusMsg)
 	if err != nil {
 		logger.Errorf("Download failed for %s: %v", t.URL, err)
-		utils.EOR(statusMsg, F(chatID, "stream_download_fail", locales.Arg{
+		utils.EOR(c, statusMsg, F(chatID, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		cb.Answer(F(chatID, "cb_skip_download_failed"), opt)
+		}), nil)
+		u.Answer(c, 0, true, F(chatID, "cb_skip_download_failed"), "")
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)
-		return tg.ErrEndGroup
+		return nil
 	}
 
 	if err := r.Play(t, path); err != nil {
 		logger.Errorf("Play error: %v", err)
-		utils.EOR(statusMsg, F(chatID, "stream_play_fail"))
-		cb.Answer(F(chatID, "cb_skip_play_failed"), opt)
+		utils.EOR(c, statusMsg, F(chatID, "stream_play_fail"), nil)
+		u.Answer(c, 0, true, F(chatID, "cb_skip_play_failed"), "")
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)
-		return tg.ErrEndGroup
+		return nil
 	}
 
-	cb.Answer(F(chatID, "cb_skip_success"), opt)
-	cb.Delete()
+	u.Answer(c, 0, true, F(chatID, "cb_skip_success"), "")
+	cbDelete(c, u)
 
-	msgText := F(chatID, "stream_now_playing", locales.Arg{
-		"url":      t.URL,
-		"title":    utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
-		"duration": utils.FormatDuration(t.Duration),
-		"by":       t.Requester,
-	})
-
-	sendOpt := &tg.SendOptions{
-		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
-	}
-	if t.Artwork != "" && shouldShowThumb(chatID) {
-		sendOpt.Media = utils.CleanURL(t.Artwork)
-	}
-
-	statusMsg, err = utils.EOR(statusMsg, msgText, sendOpt)
-	if err != nil {
-		cb.Respond(F(chatID, "cb_skip_edited", locales.Arg{
-			"user": mentionOfTg(cb.Sender),
-		}))
-		return tg.ErrEndGroup
-	}
-
+	statusMsg = sendNowPlaying(c, statusMsg, chatID, r, t)
 	r.SetStatusMsg(statusMsg)
-	statusMsg.Reply(F(chatID, "cb_skip_edited", locales.Arg{
-		"user": mentionOfTg(cb.Sender),
-	}))
-	return tg.ErrEndGroup
+	cbRespond(c, u, F(chatID, "cb_skip_edited", locales.Arg{
+		"user": mentionOf(nil, u.SenderUserId),
+	}), &td.SendTextMessageOpts{ParseMode: "HTML"})
+	return nil
 }
 
-func handleStopAction(cb *tg.CallbackQuery, r *core.RoomState) error {
-	opt := &tg.CallbackOptions{Alert: true}
-	chatID := cb.ChannelID()
+func handleStopAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
+	chatID := u.ChatId
 	logger.Infof("Callback → stop, chatID=%d", chatID)
 
 	scheduleOldPlayingMessage(r)
 	core.DeleteRoom(r.ID)
 
-	cb.Answer(F(chatID, "cb_stop_success"), opt)
-	if _, err := cb.Edit(F(chatID, "stopped", locales.Arg{
-		"user": mentionOfTg(cb.Sender),
-	})); err != nil {
+	u.Answer(c, 0, true, F(chatID, "cb_stop_success"), "")
+	if _, err := u.EditMessageText(c, F(chatID, "stopped", locales.Arg{
+		"user": mentionOf(nil, u.SenderUserId),
+	}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
 		logger.Errorf("Edit error: %v", err)
 	}
-	return tg.ErrEndGroup
+	return nil
 }
 
-func handleMuteAction(cb *tg.CallbackQuery, r *core.RoomState) error {
-	opt := &tg.CallbackOptions{Alert: true}
-	chatID := cb.ChannelID()
+func handleMuteAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
+	chatID := u.ChatId
 
 	if r.IsMuted() {
-		cb.Answer(F(chatID, "mute_already_muted"), opt)
-		return tg.ErrEndGroup
+		u.Answer(c, 0, true, F(chatID, "mute_already_muted"), "")
+		return nil
 	}
 
 	if _, err := r.Mute(); err != nil {
-		cb.Answer(F(chatID, "mute_failed", locales.Arg{
+		u.Answer(c, 0, true, F(chatID, "mute_failed", locales.Arg{
 			"error": err.Error(),
-		}), opt)
-		return tg.ErrEndGroup
+		}), "")
+		return nil
 	}
 
-	cb.Answer(F(chatID, "cb_mute_success"), opt)
-	updatePlaybackMessage(cb, r, "muted")
-	return tg.ErrEndGroup
+	u.Answer(c, 0, true, F(chatID, "cb_mute_success"), "")
+	updatePlaybackMessage(c, u, r, "muted")
+	return nil
 }
 
-func handleUnmuteAction(cb *tg.CallbackQuery, r *core.RoomState) error {
-	opt := &tg.CallbackOptions{Alert: true}
-	chatID := cb.ChannelID()
+func handleUnmuteAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
+	chatID := u.ChatId
 
 	if !r.IsMuted() {
-		cb.Answer(F(chatID, "unmute_already"), opt)
-		return tg.ErrEndGroup
+		u.Answer(c, 0, true, F(chatID, "unmute_already"), "")
+		return nil
 	}
 
 	if _, err := r.Unmute(); err != nil {
-		cb.Answer(F(chatID, "unmute_failed", locales.Arg{
+		u.Answer(c, 0, true, F(chatID, "unmute_failed", locales.Arg{
 			"error": err.Error(),
-		}), opt)
-		return tg.ErrEndGroup
+		}), "")
+		return nil
 	}
 
-	cb.Answer(F(chatID, "cb_unmute_success"), opt)
-	updatePlaybackMessage(cb, r, "playing")
-	return tg.ErrEndGroup
+	u.Answer(c, 0, true, F(chatID, "cb_unmute_success"), "")
+	updatePlaybackMessage(c, u, r, "playing")
+	return nil
 }
 
 func handleSeekAction(
-	cb *tg.CallbackQuery,
+	c *td.Client,
+	u *td.UpdateNewCallbackQuery,
 	r *core.RoomState,
 	action string,
-	opt *tg.CallbackOptions,
 ) error {
-	chatID := cb.ChannelID()
+	chatID := u.ChatId
 
 	parts := strings.SplitN(action, "_", 2)
 	if len(parts) != 2 {
-		cb.Answer(F(chatID, "invalid_request"), opt)
-		return tg.ErrEndGroup
+		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		return nil
 	}
 
 	// action is either "seek_<N>" or "seekback_<N>"
@@ -400,8 +374,8 @@ func handleSeekAction(
 
 	seconds, err := strconv.Atoi(numStr)
 	if err != nil {
-		cb.Answer(F(chatID, "invalid_request"), opt)
-		return tg.ErrEndGroup
+		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		return nil
 	}
 
 	if isBackward {
@@ -410,36 +384,36 @@ func handleSeekAction(
 		} else {
 			r.Seek(-seconds)
 		}
-		cb.Answer(F(chatID, "cb_seekback_success", locales.Arg{"seconds": seconds}), opt)
-		cb.Reply(F(chatID, "cb_seekback_edited", locales.Arg{
+		u.Answer(c, 0, true, F(chatID, "cb_seekback_success", locales.Arg{"seconds": seconds}), "")
+		cbRespond(c, u, F(chatID, "cb_seekback_edited", locales.Arg{
 			"seconds": seconds,
-			"user":    mentionOfTg(cb.Sender),
-		}))
+			"user":    mentionOf(nil, u.SenderUserId),
+		}), &td.SendTextMessageOpts{ParseMode: "HTML"})
 	} else {
 		if (r.Track().Duration - r.Position()) <= seconds {
-			cb.Answer(F(chatID, "cb_seek_near_end", locales.Arg{"seconds": seconds}), opt)
-			return tg.ErrEndGroup
+			u.Answer(c, 0, true, F(chatID, "cb_seek_near_end", locales.Arg{"seconds": seconds}), "")
+			return nil
 		}
 		r.Seek(seconds)
-		cb.Answer(F(chatID, "cb_seek_success", locales.Arg{"seconds": seconds}), opt)
-		cb.Reply(F(chatID, "cb_seek_edited", locales.Arg{
+		u.Answer(c, 0, true, F(chatID, "cb_seek_success", locales.Arg{"seconds": seconds}), "")
+		cbRespond(c, u, F(chatID, "cb_seek_edited", locales.Arg{
 			"seconds": seconds,
-			"user":    mentionOfTg(cb.Sender),
-		}))
+			"user":    mentionOf(nil, u.SenderUserId),
+		}), &td.SendTextMessageOpts{ParseMode: "HTML"})
 	}
 
-	return tg.ErrEndGroup
+	return nil
 }
 
-func updatePlaybackMessage(cb *tg.CallbackQuery, r *core.RoomState, state string) {
+func updatePlaybackMessage(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState, state string) {
 	track := r.Track()
 	if track == nil {
 		return
 	}
 
-	chatID := cb.ChannelID()
+	chatID := u.ChatId
 	safeTitle := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
-	mention := mentionOfTg(cb.Sender)
+	mention := mentionOf(nil, u.SenderUserId)
 
 	var msgText string
 	switch state {
@@ -466,7 +440,7 @@ func updatePlaybackMessage(cb *tg.CallbackQuery, r *core.RoomState, state string
 		})
 	}
 
-	if _, err := cb.Edit(msgText, &tg.SendOptions{
+	if _, err := u.EditMessageText(c, msgText, &td.EditTextMessageOpts{
 		ParseMode:   "HTML",
 		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
 	}); err != nil {

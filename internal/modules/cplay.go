@@ -21,7 +21,7 @@ import (
 	"errors"
 	"strings"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
@@ -32,148 +32,163 @@ import (
 
 const linkedCPlayTarget = "linked"
 
-func setCPlayHandler(m *tg.NewMessage) error {
+func setCPlayHandler(c *td.Client, m *td.Message) error {
 	args := strings.Fields(m.Text())
 	if len(args) <= 1 {
-		m.Reply(F(m.ChannelID(), "cplay_usage"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(m.ChatID(), "cplay_usage"), nil)
+		return nil
 	}
 
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 	arg := strings.TrimSpace(args[1])
 
 	enabled, boolErr := utils.ParseBool(arg)
 	if boolErr == nil && !enabled {
-		return disableCPlay(m, chatID)
+		return disableCPlay(c, m, chatID)
 	}
 
 	var targetChannelID int64
 	var err error
 
 	if strings.EqualFold(arg, linkedCPlayTarget) {
-		targetChannelID, err = getLinkedChannelID(m, chatID)
+		targetChannelID, err = getLinkedChannelID(c, chatID)
 	} else {
-		targetChannelID, err = resolveChannelPlay(m, chatID, arg)
+		targetChannelID, err = resolveChannelPlay(c, chatID, arg)
 	}
 	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		m.ReplyText(c, err.Error(), nil)
+		return nil
 	}
 
-	member, err := m.Client.GetChatMember(targetChannelID, m.Client.Me().ID)
+	me := c.Me
+	if me == nil {
+		if fetched, err := c.GetMe(); err == nil && fetched != nil {
+			me = fetched
+			c.Me = me
+		}
+	}
+	if me == nil {
+		m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
+		return nil
+	}
+
+	member, err := c.GetChatMember(targetChannelID, &td.MessageSenderUser{UserId: me.Id})
 	if err != nil {
 		logger.Errorf("Failed to fetch bot member state for cplay target %d: %v", targetChannelID, err)
-		m.Reply(F(chatID, "cplay_channel_not_accessible"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
+		return nil
 	}
-	if member == nil || (member.Status != tg.Admin && member.Status != tg.Creator) {
-		m.Reply(F(chatID, "cplay_channel_not_accessible"))
-		return tg.ErrEndGroup
-	}
-	if member.Status == tg.Admin && (member.Rights == nil || !member.Rights.InviteUsers) {
-		m.Reply(F(chatID, "cplay_bot_invite_permission_missing"))
-		return tg.ErrEndGroup
+	if member == nil {
+		m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
+		return nil
 	}
 
-	return saveCPlayTarget(m, chatID, targetChannelID)
+	isAdmin := false
+	canInvite := false
+	switch st := member.Status.(type) {
+	case *td.ChatMemberStatusCreator:
+		isAdmin = true
+		canInvite = true
+	case *td.ChatMemberStatusAdministrator:
+		isAdmin = true
+		canInvite = st.Rights != nil && st.Rights.CanInviteUsers
+	}
+	if !isAdmin {
+		m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
+		return nil
+	}
+	if isAdmin && !canInvite {
+		m.ReplyText(c, F(chatID, "cplay_bot_invite_permission_missing"), nil)
+		return nil
+	}
+
+	return saveCPlayTarget(c, m, chatID, targetChannelID)
 }
 
-func disableCPlay(m *tg.NewMessage, chatID int64) error {
-	allowed, err := canSetCPlayTarget(m, chatID, chatID)
+func disableCPlay(c *td.Client, m *td.Message, chatID int64) error {
+	allowed, err := canSetCPlayTarget(c, m, chatID, chatID)
 	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		m.ReplyText(c, err.Error(), nil)
+		return nil
 	}
 	if !allowed {
-		m.Reply(F(chatID, "cplay_owner_required"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "cplay_owner_required"), nil)
+		return nil
 	}
 
 	if err := database.LinkChannel(chatID, 0); err != nil {
 		logger.Errorf("Failed to disable cplay for chat %d: %v", chatID, err)
-		m.Reply(F(chatID, "cplay_save_error"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "cplay_save_error"), nil)
+		return nil
 	}
 
-	m.Reply(F(chatID, "cplay_disabled"))
-	return tg.ErrEndGroup
+	m.ReplyText(c, F(chatID, "cplay_disabled"), nil)
+	return nil
 }
 
-func getLinkedChannelID(m *tg.NewMessage, chatID int64) (int64, error) {
-	peer, err := m.Client.ResolvePeer(chatID)
+func getLinkedChannelID(c *td.Client, chatID int64) (int64, error) {
+	chat, err := c.GetChat(chatID)
 	if err != nil {
 		return 0, errors.New(F(chatID, "cplay_resolve_peer_fail"))
 	}
 
-	switch p := peer.(type) {
-	case *tg.InputPeerChannel:
-		full, err := m.Client.ChannelsGetFullChannel(&tg.InputChannelObj{ChannelID: p.ChannelID, AccessHash: p.AccessHash})
-		if err != nil || full == nil {
-			return 0, errors.New(F(chatID, "cplay_resolve_peer_fail"))
-		}
-		cf, ok := full.FullChat.(*tg.ChannelFull)
-		if !ok || cf.LinkedChatID == 0 {
-			return 0, errors.New(F(chatID, "cplay_channel_not_linked"))
-		}
-		return -100_000_000_0000 - cf.LinkedChatID, nil
-	case *tg.InputPeerChat:
-		return 0, errors.New(F(chatID, "supergroup_needed", locales.Arg{"chat_id": p.ChatID, "support_group": config.SupportChat}))
-	default:
-		return 0, errors.New(F(chatID, "cplay_invalid_target"))
+	sg, ok := chat.Type.(*td.ChatTypeSupergroup)
+	if !ok {
+		return 0, errors.New(F(chatID, "supergroup_needed", locales.Arg{"chat_id": chatID, "support_group": config.SupportChat}))
 	}
+
+	full, err := c.GetSupergroupFullInfo(sg.SupergroupId)
+	if err != nil || full == nil || full.LinkedChatId == 0 {
+		return 0, errors.New(F(chatID, "cplay_channel_not_linked"))
+	}
+	return full.LinkedChatId, nil
 }
 
-func resolveChannelPlay(m *tg.NewMessage, chatID int64, target any) (int64, error) {
-	peer, err := m.Client.ResolvePeer(target)
+func resolveChannelPlay(c *td.Client, chatID int64, target string) (int64, error) {
+	chat, err := c.SearchPublicChat(target)
 	if err != nil {
 		logger.Errorf("Failed to resolve cplay target %v for chat %d: %v", target, chatID, err)
 		return 0, errors.New(F(chatID, "cplay_channel_not_accessible"))
 	}
-
-	chPeer, ok := peer.(*tg.InputPeerChannel)
-	if !ok {
-		return 0, errors.New(F(chatID, "cplay_invalid_target"))
-	}
-
-	fullChat, err := m.Client.ChannelsGetFullChannel(
-		&tg.InputChannelObj{ChannelID: chPeer.ChannelID, AccessHash: chPeer.AccessHash},
-	)
-	if err != nil || fullChat == nil {
-		logger.Errorf("Failed to get full channel for cplay target %v: %v", target, err)
+	if chat == nil {
 		return 0, errors.New(F(chatID, "cplay_channel_not_accessible"))
 	}
 
-	return -100_000_000_0000 - chPeer.ChannelID, nil
+	if _, ok := chat.Type.(*td.ChatTypeSupergroup); !ok {
+		return 0, errors.New(F(chatID, "cplay_invalid_target"))
+	}
+
+	return chat.Id, nil
 }
 
-func saveCPlayTarget(m *tg.NewMessage, chatID, channelID int64) error {
-	allowed, err := canSetCPlayTarget(m, chatID, channelID)
+func saveCPlayTarget(c *td.Client, m *td.Message, chatID, channelID int64) error {
+	allowed, err := canSetCPlayTarget(c, m, chatID, channelID)
 	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		m.ReplyText(c, err.Error(), nil)
+		return nil
 	}
 	if !allowed {
-		m.Reply(F(chatID, "cplay_owner_required"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "cplay_owner_required"), nil)
+		return nil
 	}
 
 	if err := database.LinkChannel(chatID, channelID); err != nil {
 		logger.Errorf("Failed to set cplay ID for chat %d: %v", chatID, err)
-		m.Reply(F(chatID, "cplay_save_error"))
-		return tg.ErrEndGroup
+		m.ReplyText(c, F(chatID, "cplay_save_error"), nil)
+		return nil
 	}
 
-	m.Reply(F(chatID, "cplay_enabled", locales.Arg{"channel_id": channelID}))
-	return tg.ErrEndGroup
+	m.ReplyText(c, F(chatID, "cplay_enabled", locales.Arg{"channel_id": channelID}), nil)
+	return nil
 }
 
-func canSetCPlayTarget(m *tg.NewMessage, sourceChatID, targetChatID int64) (bool, error) {
+func canSetCPlayTarget(c *td.Client, m *td.Message, sourceChatID, targetChatID int64) (bool, error) {
 	userID := m.SenderID()
 	if isOwnerOrSudo(userID) {
 		return true, nil
 	}
 
-	sourceOwnerID, err := utils.GetChatOwner(m.Client, sourceChatID)
+	sourceOwnerID, err := utils.GetChatOwner(c, sourceChatID)
 	if err != nil {
 		logger.Errorf("Failed to get source chat owner for %d: %v", sourceChatID, err)
 		return false, errors.New(F(sourceChatID, "cplay_owner_check_failed"))
@@ -182,7 +197,7 @@ func canSetCPlayTarget(m *tg.NewMessage, sourceChatID, targetChatID int64) (bool
 		return true, nil
 	}
 
-	targetOwnerID, err := utils.GetChatOwner(m.Client, targetChatID)
+	targetOwnerID, err := utils.GetChatOwner(c, targetChatID)
 	if err != nil {
 		logger.Errorf("Failed to get target chat owner for %d: %v", targetChatID, err)
 		return false, errors.New(F(sourceChatID, "cplay_owner_check_failed"))

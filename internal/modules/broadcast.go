@@ -147,6 +147,9 @@ func init() {
 }
 
 func broadcastHandler(c *td.Client, m *td.Message) error {
+	if !checkOwner(c, m) {
+		return nil
+	}
 	// Check for cancel flag
 	text := strings.ToLower(m.Text())
 	chatID := m.ChatID()

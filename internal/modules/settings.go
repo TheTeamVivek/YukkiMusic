@@ -72,6 +72,9 @@ func init() {
 }
 
 func playmodeHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	args := strings.Fields(m.Text())
 	chatID := m.ChatID()
 
@@ -112,6 +115,9 @@ func playmodeHandler(c *td.Client, m *td.Message) error {
 }
 
 func cmdDeleteHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	args := strings.Fields(m.Text())
 	chatID := m.ChatID()
 	cmd := getCommand(m)
@@ -156,6 +162,9 @@ func cmdDeleteHandler(c *td.Client, m *td.Message) error {
 }
 
 func cleanModeHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	args := strings.Fields(m.Text())
 	chatID := m.ChatID()
 
@@ -191,6 +200,9 @@ func cleanModeHandler(c *td.Client, m *td.Message) error {
 }
 
 func adminModeHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	args := strings.Fields(m.Text())
 	chatID := m.ChatID()
 
@@ -247,6 +259,9 @@ func parseAdminMode(input string) (database.AdminMode, bool) {
 }
 
 func settingsHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	chatID := m.ChatID()
 	settings, err := database.GetChatSettings(chatID)
 	if err != nil {

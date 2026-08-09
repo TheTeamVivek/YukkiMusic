@@ -20,7 +20,6 @@ package modules
 import (
 	"context"
 
-	"github.com/amarnathcjd/gogram/telegram"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/internal/core"
@@ -62,6 +61,7 @@ func streamEndHandler(
 	r.SetData("is_transitioning", true)
 	defer r.DeleteData("is_transitioning")
 
+	c := core.TDBot
 	cid := r.ChatID
 	r.Parse()
 
@@ -69,7 +69,7 @@ func streamEndHandler(
 	var wasLooping bool
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
 		core.DeleteRoom(chatID)
-		core.Bot.SendMessage(cid, F(cid, "stream_queue_finished"))
+		c.SendTextMessage(cid, F(cid, "stream_queue_finished"), nil)
 		return
 	} else {
 		wasLooping = r.Loop() > 0
@@ -81,10 +81,7 @@ func streamEndHandler(
 		statusText = F(cid, "cb_replaying")
 	}
 
-	statusMsg, err := core.Bot.SendMessage(
-		cid,
-		statusText,
-	)
+	statusMsg, err := c.SendTextMessage(cid, statusText, nil)
 	if err != nil {
 		logger.Errorf("[call.go] Failed to send msg: %v", err)
 	}
@@ -102,9 +99,9 @@ func streamEndHandler(
 			t.URL,
 			err,
 		)
-		utils.EOR(statusMsg, F(cid, "stream_download_fail", locales.Arg{
+		utils.EOR(c, statusMsg, F(cid, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
-		}))
+		}), nil)
 		core.DeleteRoom(chatID)
 
 		return
@@ -116,31 +113,12 @@ func streamEndHandler(
 			t.URL,
 			err,
 		)
-		utils.EOR(statusMsg, F(cid, "stream_play_fail"))
+		utils.EOR(c, statusMsg, F(cid, "stream_play_fail"), nil)
 		core.DeleteRoom(chatID)
 
 		return
 	}
 
-	title := utils.ShortTitle(t.Title, 25)
-	safeTitle := utils.EscapeHTML(title)
-
-	msgText := F(cid, "stream_now_playing", locales.Arg{
-		"url":      t.URL,
-		"title":    safeTitle,
-		"duration": utils.FormatDuration(t.Duration),
-		"by":       t.Requester,
-	})
-
-	opt := &telegram.SendOptions{
-		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(cid, r, false),
-	}
-
-	if t.Artwork != "" && shouldShowThumb(chatID) {
-		opt.Media = utils.CleanURL(t.Artwork)
-	}
-
-	statusMsg, _ = utils.EOR(statusMsg, msgText, opt)
+	statusMsg = sendNowPlaying(c, statusMsg, cid, r, t)
 	r.SetStatusMsg(statusMsg)
 }

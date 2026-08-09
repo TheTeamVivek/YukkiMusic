@@ -21,7 +21,7 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/internal/core"
@@ -50,49 +50,49 @@ func init() {
 • Loop count affects skip behavior`
 }
 
-func skipHandler(m *telegram.NewMessage) error {
-	return handleSkip(m, false)
+func skipHandler(c *td.Client, m *td.Message) error {
+	return handleSkip(c, m, false)
 }
 
-func cskipHandler(m *telegram.NewMessage) error {
-	return handleSkip(m, true)
+func cskipHandler(c *td.Client, m *td.Message) error {
+	return handleSkip(c, m, true)
 }
 
-func handleSkip(m *telegram.NewMessage, cplay bool) error {
-	r, err := getEffectiveRoom(m.ChannelID(), cplay)
+func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return telegram.ErrEndGroup
+		m.ReplyText(c, err.Error(), nil)
+		return nil
 	}
 
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 	if !r.IsActiveChat() {
-		m.Reply(F(chatID, "room_no_active"))
-		return telegram.ErrEndGroup
+		m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return nil
 	}
 
-	mention := mentionOfTg(m.Sender)
+	mention := mentionOf(nil, m.SenderID())
 	skipCount := 1
 
 	if args := m.Args(); args != "" {
 		parsed, parseErr := strconv.Atoi(args)
 		if parseErr != nil {
-			m.Reply(F(chatID, "skip_invalid_number"))
-			return telegram.ErrEndGroup
+			m.ReplyText(c, F(chatID, "skip_invalid_number"), nil)
+			return nil
 		}
 
 		queuedTracks := len(r.Queue())
 		if queuedTracks == 0 {
-			m.Reply(F(chatID, "skip_queue_empty_for_count"))
-			return telegram.ErrEndGroup
+			m.ReplyText(c, F(chatID, "skip_queue_empty_for_count"), nil)
+			return nil
 		}
 
 		if parsed < 1 || parsed > queuedTracks {
-			m.Reply(F(chatID, "skip_count_exceeds_queue", locales.Arg{
+			m.ReplyText(c, F(chatID, "skip_count_exceeds_queue", locales.Arg{
 				"requested": parsed,
 				"available": queuedTracks,
-			}))
-			return telegram.ErrEndGroup
+			}), nil)
+			return nil
 		}
 
 		// /skip N means: skip current + N queued tracks.
@@ -103,10 +103,10 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)
-		m.Reply(F(chatID, "skip_stopped", locales.Arg{
+		m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
 	r.SetLoop(0)
@@ -116,10 +116,10 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 
 			scheduleOldPlayingMessage(r)
 			core.DeleteRoom(r.ID)
-			m.Reply(F(chatID, "skip_stopped", locales.Arg{
+			m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 				"user": mention,
-			}))
-			return telegram.ErrEndGroup
+			}), nil)
+			return nil
 		}
 		_ = r.NextTrack()
 	}
@@ -128,10 +128,10 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)
-		m.Reply(F(chatID, "skip_stopped", locales.Arg{
+		m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
 	t := r.NextTrack()
@@ -139,15 +139,16 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)
-		m.Reply(F(chatID, "skip_stopped", locales.Arg{
+		m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return nil
 	}
 
-	statusMsg, err := core.Bot.SendMessage(
+	statusMsg, err := core.TDBot.SendTextMessage(
 		chatID,
 		F(chatID, "stream_downloading_next"),
+		nil,
 	)
 	if err != nil {
 		logger.Errorf("[skip.go] err: %v", err)
@@ -160,57 +161,32 @@ func handleSkip(m *telegram.NewMessage, cplay bool) error {
 		})
 
 		if statusMsg != nil {
-			utils.EOR(statusMsg, txt)
+			utils.EOR(c, statusMsg, txt, nil)
 		} else {
-			core.Bot.SendMessage(chatID, txt)
+			core.TDBot.SendTextMessage(chatID, txt, nil)
 		}
 
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)
-		return telegram.ErrEndGroup
+		return nil
 	}
 
 	if err := r.Play(t, path, true); err != nil {
 		txt := F(chatID, "stream_play_fail")
 		if statusMsg != nil {
-			utils.EOR(statusMsg, txt)
+			utils.EOR(c, statusMsg, txt, nil)
 		} else {
-			core.Bot.SendMessage(chatID, txt)
+			core.TDBot.SendTextMessage(chatID, txt, nil)
 		}
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)
-		return telegram.ErrEndGroup
+		return nil
 	}
 
-	title := utils.ShortTitle(t.Title, 25)
-	safeTitle := utils.EscapeHTML(title)
-
-	msg := F(chatID, "stream_now_playing", locales.Arg{
-		"url":      t.URL,
-		"title":    safeTitle,
-		"duration": utils.FormatDuration(t.Duration),
-		"by":       t.Requester,
-	})
-
-	opt := &telegram.SendOptions{
-		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
-	}
-
-	if t.Artwork != "" && shouldShowThumb(chatID) {
-		opt.Media = utils.CleanURL(t.Artwork)
-	}
-
-	var newStatusMsg *telegram.NewMessage
+	statusMsg = sendNowPlaying(c, statusMsg, chatID, r, t)
 	if statusMsg != nil {
-		newStatusMsg, _ = utils.EOR(statusMsg, msg, opt)
-	} else {
-		newStatusMsg, _ = core.Bot.SendMessage(chatID, msg, opt)
+		r.SetStatusMsg(statusMsg)
 	}
 
-	if newStatusMsg != nil {
-		r.SetStatusMsg(newStatusMsg)
-	}
-
-	return telegram.ErrEndGroup
+	return nil
 }

@@ -84,18 +84,6 @@ func getEffectiveRoom(chatID int64, cplay bool) (*core.RoomState, error) {
 	return r, nil
 }
 
-func canBypassMaintenence(userID int64) bool {
-	isMaint, _ := database.IsMaintenanceEnabled()
-	if !isMaint {
-		return true
-	}
-	if userID == config.OwnerID {
-		return true
-	}
-	ok, _ := database.IsSudo(userID)
-	return ok
-}
-
 func shouldShowThumb(chatID int64) bool {
 	noThumb, err := database.ThumbnailsDisabled(chatID)
 	if err != nil {
@@ -107,16 +95,66 @@ func shouldShowThumb(chatID int64) bool {
 	return !noThumb
 }
 
+// sendNowPlaying sends or edits the "now playing" playback message for the
+// given track, honoring the thumbnail/artwork setting, and returns the
+// resulting message.
+func sendNowPlaying(
+	c *td.Client,
+	statusMsg *td.Message,
+	chatID int64,
+	r *core.RoomState,
+	t *state.Track,
+) *td.Message {
+	msgText := F(chatID, "stream_now_playing", locales.Arg{
+		"url":      t.URL,
+		"title":    utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
+		"duration": utils.FormatDuration(t.Duration),
+		"by":       t.Requester,
+	})
+
+	opts := &td.SendTextMessageOpts{
+		ParseMode:   "HTML",
+		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
+	}
+
+	if t.Artwork != "" && shouldShowThumb(chatID) {
+		if statusMsg != nil {
+			_ = statusMsg.Delete(c, true)
+		}
+		photo, err := c.SendPhoto(
+			chatID,
+			td.InputFileRemote{Id: utils.CleanURL(t.Artwork)},
+			&td.SendPhotoOpts{
+				Caption:     msgText,
+				ParseMode:   "HTML",
+				ReplyMarkup: opts.ReplyMarkup,
+			},
+		)
+		if err != nil {
+			logger.Errorf("SendPhoto (now playing) failed: %v", err)
+			m, _ := c.SendTextMessage(chatID, msgText, opts)
+			return m
+		}
+		return photo
+	}
+
+	if statusMsg != nil {
+		m, _ := utils.EOR(c, statusMsg, msgText, &td.EditTextMessageOpts{
+			ParseMode:   "HTML",
+			ReplyMarkup: opts.ReplyMarkup,
+		})
+		return m
+	}
+	m, _ := c.SendTextMessage(chatID, msgText, opts)
+	return m
+}
+
 func F(chatID int64, key string, values ...locales.Arg) string {
 	lang, err := database.Language(chatID)
 	if err != nil {
 		logger.Errorf("failed to get language for %d: %v", chatID, err)
 		lang = config.DefaultLang
 	}
-	return FWithLang(lang, key, values...)
-}
-
-func FWithLang(lang, key string, values ...locales.Arg) string {
 	var val locales.Arg
 	if len(values) > 0 {
 		val = values[0]
@@ -215,36 +253,38 @@ func WithBlacklistMessage(
 			return nil
 		}
 		if blocked, _ := database.IsBlacklistedUser(m.SenderID()); blocked {
-			if isChannelChat(c, m) {
-				if chatOwnerID, err := utils.GetChatOwner(c, m.ChatID()); err == nil && chatOwnerID == m.SenderID() {
-					m.ReplyText(c, F(m.ChatID(), "blacklist_owner_blocked_leave"), nil)
-					leaveChat(c, m.ChatID())
-					return nil
+			if chat, err := m.GetChat(c); err == nil {
+				if sg, ok := chat.Type.(*td.ChatTypeSupergroup); ok && sg.IsChannel {
+					if chatOwnerID, err := utils.GetChatOwner(c, m.ChatID()); err == nil && chatOwnerID == m.SenderID() {
+						m.ReplyText(c, F(m.ChatID(), "blacklist_owner_blocked_leave"), nil)
+						leaveChat(c, m.ChatID())
+						return nil
+					}
 				}
 			}
-			if m.IsPrivate() || isCommandForBot(c, m) {
+
+			mentioned := false
+			if fields := strings.Fields(m.Text()); len(fields) > 0 {
+				if _, mention, ok := strings.Cut(fields[0], "@"); ok && mention != "" {
+					if c.Me == nil {
+						if me, err := c.GetMe(); err == nil && me != nil {
+							c.Me = me
+						}
+					}
+					username := ""
+					if c.Me != nil && c.Me.Usernames != nil && len(c.Me.Usernames.ActiveUsernames) > 0 {
+						username = strings.ToLower(c.Me.Usernames.ActiveUsernames[0])
+					}
+					mentioned = strings.EqualFold(mention, username)
+				}
+			}
+			if m.IsPrivate() || mentioned {
 				m.ReplyText(c, F(m.ChatID(), "blacklist_user_blocked"), nil)
 			}
 			return nil
 		}
 		return handler(c, m)
 	}
-}
-
-func warnAndLeave(c *td.Client, chatID int64) {
-	text := F(chatID, "supergroup_needed", locales.Arg{
-		"chat_id":       chatID,
-		"support_group": config.SupportChat,
-	})
-
-	if _, err := c.SendTextMessage(chatID, text, nil); err != nil {
-		logger.Errorf("failed to send supergroup conversion message to chat %d: %v", chatID, err)
-		return
-	}
-
-	go func() {
-		leaveChat(c, chatID)
-	}()
 }
 
 func leaveChat(c *td.Client, chatID int64) {

@@ -27,7 +27,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	state "yukkimusic/internal/core/models"
@@ -64,7 +64,7 @@ type RoomState struct {
 	queue   []*state.Track // upcoming tracks
 	shuffle bool           // queue shuffle mode
 
-	statusMsg *telegram.NewMessage // latest status message in chat
+	statusMsg *td.Message // latest status message in chat
 	Data      map[string]any       // extensible per-room metadata
 
 	Assistant *Assistant  // assistant client bound to this room
@@ -248,7 +248,7 @@ func (r *RoomState) Track() *state.Track {
 	return r.track
 }
 
-func (r *RoomState) StatusMsg() *telegram.NewMessage {
+func (r *RoomState) StatusMsg() *td.Message {
 	if r.IsDestroyed() {
 		return nil
 	}
@@ -308,7 +308,7 @@ func (r *RoomState) SetShuffle(enabled bool) {
 	r.shuffle = enabled
 }
 
-func (r *RoomState) SetStatusMsg(m *telegram.NewMessage) {
+func (r *RoomState) SetStatusMsg(m *td.Message) {
 	if r.IsDestroyed() {
 		return
 	}

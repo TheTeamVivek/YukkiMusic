@@ -58,10 +58,16 @@ func init() {
 }
 
 func reloadHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) {
+		return nil
+	}
 	return handleReload(c, m, false)
 }
 
 func creloadHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	return handleReload(c, m, true)
 }
 

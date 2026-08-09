@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/locales"
@@ -49,23 +49,23 @@ This action cannot be undone. Use <code>/pause</code> for temporary stops.`
 	helpTexts["/stop"] = helpTexts["/end"]
 }
 
-func stopHandler(m *telegram.NewMessage) error {
-	return handleStop(m, false)
+func stopHandler(c *td.Client, m *td.Message) error {
+	return handleStop(c, m, false)
 }
 
-func cstopHandler(m *telegram.NewMessage) error {
-	return handleStop(m, true)
+func cstopHandler(c *td.Client, m *td.Message) error {
+	return handleStop(c, m, true)
 }
 
-func handleStop(m *telegram.NewMessage, cplay bool) error {
-	r, err := getEffectiveRoom(m.ChannelID(), cplay)
+func handleStop(c *td.Client, m *td.Message, cplay bool) error {
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return telegram.ErrEndGroup
+		m.ReplyText(c, err.Error(), nil)
+		return nil
 	}
 	if !r.IsActiveChat() {
-		m.Reply(F(m.ChannelID(), "room_no_active"))
-		return telegram.ErrEndGroup
+		m.ReplyText(c, F(m.ChatID(), "room_no_active"), nil)
+		return nil
 	}
 
 	isPaused := r.IsPaused()
@@ -82,21 +82,23 @@ func handleStop(m *telegram.NewMessage, cplay bool) error {
 			if isMuted {
 				msgKey = "stop_confirm_muted"
 			}
-			m.Reply(F(m.ChannelID(), msgKey), &telegram.SendOptions{
-				ReplyMarkup: core.GetStopConfirmMarkup(m.ChannelID(), r, isPaused),
+			m.ReplyText(c, F(m.ChatID(), msgKey), &td.SendTextMessageOpts{
+				ReplyMarkup: core.GetStopConfirmMarkup(m.ChatID(), r, isPaused),
 			})
-			return telegram.ErrEndGroup
+			return nil
 		}
 	}
 
 	scheduleOldPlayingMessage(r)
 	core.DeleteRoom(r.ID)
-	m.Reply(
+	m.ReplyText(
+		c,
 		F(
-			m.ChannelID(),
+			m.ChatID(),
 			"stopped",
-			locales.Arg{"user": mentionOfTg(m.Sender)},
+			locales.Arg{"user": mentionOf(nil, m.SenderID())},
 		),
+		nil,
 	)
-	return telegram.ErrEndGroup
+	return nil
 }

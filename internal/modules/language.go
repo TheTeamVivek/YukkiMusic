@@ -30,6 +30,9 @@ import (
 )
 
 func langHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	return showLangMenu(c, m)
 }
 

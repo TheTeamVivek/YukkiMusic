@@ -43,8 +43,29 @@ func actionFilter(m *td.Message) bool {
 }
 
 func handleActions(c *td.Client, m *td.Message) error {
-	if !isValidChatType(c, m) {
-		warnAndLeave(c, m.ChatID())
+	chat, err := m.GetChat(c)
+	if err != nil {
+		return nil
+	}
+	switch t := chat.Type.(type) {
+	case *td.ChatTypeSupergroup:
+		if t.IsChannel {
+			return nil
+		}
+	case *td.ChatTypePrivate, *td.ChatTypeSecret:
+		return nil
+	default:
+		text := F(m.ChatID(), "supergroup_needed", locales.Arg{
+			"chat_id":       m.ChatID(),
+			"support_group": config.SupportChat,
+		})
+		if _, err := c.SendTextMessage(m.ChatID(), text, nil); err != nil {
+			logger.Errorf("failed to send supergroup conversion message to chat %d: %v", m.ChatID(), err)
+			return nil
+		}
+		go func() {
+			leaveChat(c, m.ChatID())
+		}()
 		return nil
 	}
 
@@ -165,16 +186,6 @@ func handleVoiceChatAction(c *td.Client, m *td.Message) error {
 	}
 
 	return nil
-}
-
-func isValidChatType(c *td.Client, m *td.Message) bool {
-	chat, err := m.GetChat(c)
-	if err != nil {
-		return false
-	}
-
-	sg, ok := chat.Type.(*td.ChatTypeSupergroup)
-	return ok && !sg.IsChannel
 }
 
 func buildLogArgs(c *td.Client, m *td.Message, chatID int64, action string) locales.Arg {

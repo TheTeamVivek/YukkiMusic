@@ -35,6 +35,9 @@ import (
 )
 
 func handleAddSudo(c *td.Client, m *td.Message) error {
+	if !checkOwner(c, m) {
+		return nil
+	}
 	chatID := m.ChatID()
 
 	// No args + no reply -> ask for user
@@ -143,6 +146,9 @@ func handleAddSudo(c *td.Client, m *td.Message) error {
 }
 
 func handleDelSudo(c *td.Client, m *td.Message) error {
+	if !checkOwner(c, m) {
+		return nil
+	}
 	chatID := m.ChatID()
 
 	// No args + no reply -> ask for user
