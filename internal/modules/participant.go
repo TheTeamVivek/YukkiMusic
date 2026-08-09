@@ -104,7 +104,7 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 		newStatus != "administrator" &&
 		newStatus != "creator":
 
-		if c.Me != nil && userID == c.Me.ID && config.LeaveOnDemoted {
+		if c.Me != nil && userID == c.Me.Id && config.LeaveOnDemoted {
 			cleanScheduler.cancel(chatID)
 			core.DeleteRoom(chatID)
 			core.DeleteChatState(chatID)
@@ -174,7 +174,7 @@ func handleSudoJoin(c *td.Client, chatID, userID int64) {
 
 	botMention := "bot"
 	if c.Me != nil {
-		botMention = mentionOf(c.Me, c.Me.ID)
+		botMention = mentionOf(c.Me, c.Me.Id)
 	}
 
 	text := F(chatID, msgKey, locales.Arg{

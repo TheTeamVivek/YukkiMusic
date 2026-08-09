@@ -51,10 +51,16 @@ func init() {
 }
 
 func skipHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	return handleSkip(c, m, false)
 }
 
 func cskipHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	return handleSkip(c, m, true)
 }
 

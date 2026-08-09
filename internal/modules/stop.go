@@ -50,10 +50,16 @@ This action cannot be undone. Use <code>/pause</code> for temporary stops.`
 }
 
 func stopHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	return handleStop(c, m, false)
 }
 
 func cstopHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	return handleStop(c, m, true)
 }
 

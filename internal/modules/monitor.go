@@ -20,7 +20,7 @@ package modules
 import (
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/core"
 )
@@ -63,11 +63,18 @@ func MonitorRooms() {
 				}
 
 				markup := core.GetPlayMarkup(r.ChatID, r, false)
-				opts := &telegram.SendOptions{
-					ReplyMarkup: markup,
-					Entities:    statusMsg.Message.Entities,
+
+				text := statusMsg.Text()
+				var entities []td.TextEntity
+				if mt, ok := statusMsg.Content.(*td.MessageText); ok && mt.Text != nil {
+					text = mt.Text.Text
+					entities = mt.Text.Entities
 				}
-				statusMsg.Edit(statusMsg.Text(), opts)
+
+				statusMsg.EditText(core.TDBot, text, &td.EditTextMessageOpts{
+					ReplyMarkup: markup,
+					Entities:    entities,
+				})
 			}(chatID, room)
 		}
 	}

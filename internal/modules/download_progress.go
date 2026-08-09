@@ -15,7 +15,7 @@
  * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
 
-package platforms
+package modules
 
 import (
 	"fmt"
@@ -26,83 +26,76 @@ import (
 
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
+	"yukkimusic/internal/platforms"
 	"yukkimusic/internal/utils"
 )
 
 const downloadEditInterval = 2 * time.Second
 
-type dlProgressEntry struct {
-	client   *td.Client
+// dlEntry holds the state of one active download.
+type dlEntry struct {
 	msg      *td.Message
-	total    int64
 	started  time.Time
 	lastEdit time.Time
 	lastSize int64
+	total    int64
 }
 
-type downloadProgress struct {
+type dlProgress struct {
 	mu     sync.Mutex
 	once   sync.Once
-	active map[string]*dlProgressEntry
+	active map[string]*dlEntry
 }
 
-var downloadProg = &downloadProgress{
-	active: make(map[string]*dlProgressEntry),
+var downloadProg = &dlProgress{
+	active: make(map[string]*dlEntry),
 }
 
-// Start begins tracking download progress for the given remote file ID and
-// edits statusMsg with progress updates as gotdbot emits updateFile events.
-func (dp *downloadProgress) Start(c *td.Client, fileID string, msg *td.Message) {
+func init() {
+	platforms.OnDownloadStart = downloadProg.Start
+	platforms.OnDownloadStop = downloadProg.Stop
+}
+
+// Start tracks download progress for fileID and edits msg as the file downloads.
+func (dp *dlProgress) Start(c *td.Client, fileID string, msg *td.Message) {
 	if c == nil || fileID == "" || msg == nil {
 		return
 	}
-
-	dp.once.Do(func() {
-		c.OnUpdateFile(dp.handleUpdate, nil)
-	})
+	dp.once.Do(func() { c.OnUpdateFile(dp.handleUpdate, nil) })
 
 	dp.mu.Lock()
 	defer dp.mu.Unlock()
-	dp.active[fileID] = &dlProgressEntry{
-		client:  c,
-		msg:     msg,
-		started: time.Now(),
-	}
+	dp.active[fileID] = &dlEntry{msg: msg, started: time.Now()}
 }
 
-// Stop stops tracking download progress for the given remote file ID.
-func (dp *downloadProgress) Stop(fileID string) {
+// Stop stops tracking download progress for fileID.
+func (dp *dlProgress) Stop(fileID string) {
 	if fileID == "" {
 		return
 	}
-
 	dp.mu.Lock()
 	defer dp.mu.Unlock()
 	delete(dp.active, fileID)
 }
 
-func (dp *downloadProgress) handleUpdate(c *td.Client, u *td.UpdateFile) error {
+func (dp *dlProgress) handleUpdate(c *td.Client, u *td.UpdateFile) error {
 	if u == nil || u.File == nil || u.File.Remote == nil || u.File.Local == nil {
 		return nil
 	}
 
-	fileID := u.File.Remote.Id
-	if fileID == "" {
-		return nil
-	}
-
 	dp.mu.Lock()
-	e, ok := dp.active[fileID]
+	e, ok := dp.active[u.File.Remote.Id]
 	dp.mu.Unlock()
 	if !ok {
 		return nil
 	}
 
 	now := time.Now()
-	if now.Sub(e.lastEdit) < downloadEditInterval &&
-		!u.File.Local.IsDownloadingCompleted {
+	if now.Sub(e.lastEdit) < downloadEditInterval && !u.File.Local.IsDownloadingCompleted {
 		return nil
 	}
+	interval := now.Sub(e.lastEdit).Seconds()
+	e.lastEdit = now
 
 	total := u.File.Size
 	if total <= 0 {
@@ -113,15 +106,11 @@ func (dp *downloadProgress) handleUpdate(c *td.Client, u *td.UpdateFile) error {
 	}
 
 	current := u.File.Local.DownloadedSize
-	if e.total > 0 && current > e.total {
+	if current > e.total {
 		current = e.total
 	}
 
-	interval := now.Sub(e.lastEdit).Seconds()
-	e.lastEdit = now
-
-	elapsed := now.Sub(e.started).Seconds()
-	speed := float64(0)
+	speed := 0.0
 	if interval > 0 && current >= e.lastSize {
 		speed = float64(current-e.lastSize) / interval
 	}
@@ -129,13 +118,15 @@ func (dp *downloadProgress) handleUpdate(c *td.Client, u *td.UpdateFile) error {
 
 	percentage := 0.0
 	if e.total > 0 {
-		percentage = (float64(current) / float64(e.total)) * 100
+		percentage = float64(current) / float64(e.total) * 100
 	}
 
 	eta := int64(0)
 	if speed > 0 && e.total > current {
 		eta = int64(float64(e.total-current) / speed)
 	}
+
+	elapsed := now.Sub(e.started).Seconds()
 
 	lang, err := database.Language(e.msg.ChatId)
 	if err != nil {
@@ -152,7 +143,7 @@ func (dp *downloadProgress) handleUpdate(c *td.Client, u *td.UpdateFile) error {
 	if _, err := e.msg.EditText(c, text, &td.EditTextMessageOpts{
 		ParseMode: td.ParseModeHTML,
 	}); err != nil {
-		dp.Stop(fileID)
+		dp.Stop(u.File.Remote.Id)
 	}
 
 	return nil

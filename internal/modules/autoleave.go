@@ -23,8 +23,8 @@ import (
 	"sync"
 	"time"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
 	td "github.com/AshokShau/gotdbot"
+	tg "github.com/amarnathcjd/gogram/telegram"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
@@ -34,31 +34,20 @@ import (
 	"yukkimusic/internal/utils"
 )
 
-var (
-	limit        = 50
-	autoLeaveSvc = newAutoLeaveService(limit, 10*time.Minute, 3*time.Second)
-)
+// autoLeaveSvc periodically makes the assistants leave chats that are not playing.
+var autoLeaveSvc = &autoLeaveService{
+	limit:         50,
+	interval:      10 * time.Minute,
+	preLeaveDelay: 3 * time.Second,
+}
 
 type autoLeaveService struct {
-	mu          sync.Mutex
-	loopRunning bool
-	stopCh      chan struct{}
+	mu   sync.Mutex
+	stop chan struct{} // non-nil => loop is running
 
 	limit         int
 	interval      time.Duration
 	preLeaveDelay time.Duration
-}
-
-func newAutoLeaveService(
-	limit int,
-	interval time.Duration,
-	preLeaveDelay time.Duration,
-) *autoLeaveService {
-	return &autoLeaveService{
-		limit:         limit,
-		interval:      interval,
-		preLeaveDelay: preLeaveDelay,
-	}
 }
 
 func init() {
@@ -75,7 +64,7 @@ Once enabled, the bot checks all joined groups/channels every <b>10 minutes</b> 
 
 <b>⚠️ Restrictions:</b>
 This command can only be used by <b>owners</b> or <b>sudo users</b>.`,
-		limit,
+		autoLeaveSvc.limit,
 	)
 }
 
@@ -83,171 +72,144 @@ func autoLeaveHandler(c *td.Client, m *td.Message) error {
 	if !checkSudo(c, m) {
 		return nil
 	}
-	args := strings.Fields(m.Text())
 	chatID := m.ChatID()
 
-	currentState, err := database.AutoLeave()
+	current, err := database.AutoLeave()
 	if err != nil {
 		_, _ = m.ReplyText(c, F(chatID, "autoleave_fetch_fail"), nil)
 		return nil
 	}
 
-	status := F(chatID, utils.IfElse(currentState, "enabled", "disabled"))
-
-	if len(args) < 2 {
+	args := strings.Fields(m.Text())
+	if len(args) < 2 { // no argument => show current status
 		_, _ = m.ReplyText(c, F(chatID, "autoleave_status", locales.Arg{
 			"cmd":    getCommand(m),
-			"action": status,
+			"action": F(chatID, utils.IfElse(current, "enabled", "disabled")),
 		}), nil)
 		return nil
 	}
 
-	newState, err := utils.ParseBool(args[1])
+	enabled, err := utils.ParseBool(args[1])
 	if err != nil {
 		_, _ = m.ReplyText(c, F(chatID, "invalid_bool"), nil)
 		return nil
 	}
 
-	if newState == currentState {
+	action := F(chatID, utils.IfElse(enabled, "enabled", "disabled"))
+
+	if enabled == current {
 		_, _ = m.ReplyText(c, F(chatID, "autoleave_already", locales.Arg{
-			"action": status,
+			"action": action,
 		}), nil)
 		return nil
 	}
 
-	if err := database.SetAutoLeave(newState); err != nil {
+	if err := database.SetAutoLeave(enabled); err != nil {
 		_, _ = m.ReplyText(c, F(chatID, "autoleave_update_fail"), nil)
 		return nil
 	}
 
-	newStatus := F(chatID, utils.IfElse(newState, "enabled", "disabled"))
 	_, _ = m.ReplyText(c, F(chatID, "autoleave_updated", locales.Arg{
-		"action": newStatus,
+		"action": action,
 	}), nil)
 
-	autoLeaveSvc.SetEnabled(newState)
-
+	autoLeaveSvc.SetEnabled(enabled)
 	return nil
 }
 
+// Start enables the loop if autoleave is on in the database.
 func (s *autoLeaveService) Start() {
-	enabled, err := database.AutoLeave()
-	if err != nil || !enabled {
-		return
+	on, err := database.AutoLeave()
+	if err == nil && on {
+		s.SetEnabled(true)
 	}
-
-	s.SetEnabled(true)
 }
 
-func (s *autoLeaveService) SetEnabled(enabled bool) {
+// SetEnabled starts or stops the background loop.
+func (s *autoLeaveService) SetEnabled(on bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if enabled {
-		if s.loopRunning {
-			return
-		}
-		s.loopRunning = true
-		s.stopCh = make(chan struct{})
-		go s.runLoop()
+	if on == (s.stop != nil) {
+		return // already in the requested state
+	}
+
+	if on {
+		s.stop = make(chan struct{})
+		go s.loop(s.stop)
 		return
 	}
 
-	if s.stopCh != nil {
-		close(s.stopCh)
-		s.stopCh = nil
-	}
+	close(s.stop)
+	s.stop = nil
 }
 
-func (s *autoLeaveService) runLoop() {
-	s.mu.Lock()
-	stopCh := s.stopCh
-	s.mu.Unlock()
-
-	timer := time.NewTimer(s.interval)
-	defer timer.Stop()
+func (s *autoLeaveService) loop(stop chan struct{}) {
+	ticker := time.NewTicker(s.interval)
+	defer ticker.Stop()
 
 	for {
 		select {
-		case <-stopCh:
-			s.mu.Lock()
-			s.stopCh = nil
-			s.loopRunning = false
-			s.mu.Unlock()
+		case <-stop:
 			return
-		case <-timer.C:
+		case <-ticker.C:
 			s.runCycle()
-			timer.Reset(s.interval)
 		}
 	}
 }
 
+// runCycle scans every assistant's chats and leaves the inactive ones.
 func (s *autoLeaveService) runCycle() {
 	activeRooms := core.GetAllRooms()
 	core.Assistants.ForEach(func(a *core.Assistant) {
 		if a == nil || a.Client == nil {
 			return
 		}
-		go s.autoLeaveAssistant(a, activeRooms)
+		go s.leaveInactiveChats(a, activeRooms)
 	})
 }
 
-func (s *autoLeaveService) autoLeaveAssistant(
+func (s *autoLeaveService) leaveInactiveChats(
 	ass *core.Assistant,
 	activeRooms map[int64]*core.RoomState,
 ) {
-	leaveCount := 0
+	left := 0
+
 	err := ass.Client.IterDialogs(func(d *tg.TLDialog) error {
-		if d.IsUser() {
-			return nil
-		}
 		chatID := d.GetChannelID()
-
-		if chatID == 0 || chatID == config.LoggerID ||
-			d.GetID() == config.LoggerID {
+		if d.IsUser() || chatID == 0 || chatID == config.LoggerID {
 			return nil
 		}
-
-		if _, ok := activeRooms[chatID]; ok {
+		if _, playing := activeRooms[chatID]; playing {
 			return nil
 		}
 
 		time.Sleep(s.preLeaveDelay)
 		if err := ass.Client.LeaveChannel(chatID); err != nil {
 			if wait := tg.GetFloodWait(err); wait > 0 {
-				logger.Errorf(
-					"FloodWait detected (%ds). Sleeping...", wait,
-				)
+				logger.Errorf("FloodWait detected (%ds). Sleeping...", wait)
 				time.Sleep(time.Duration(wait) * time.Second)
 				return nil
 			}
-
-			if strings.Contains(err.Error(), "USER_NOT_PARTICIPANT") ||
-				strings.Contains(err.Error(), "CHANNEL_PRIVATE") {
-				return nil
+			if !isLeaveSafeError(err) {
+				logger.Warnf(
+					"AutoLeave (Assistant %d) failed to leave %d: %v",
+					ass.Index, chatID, err,
+				)
 			}
-
-			logger.Warnf(
-				"AutoLeave (Assistant %d) failed to leave %d: %v",
-				ass.Index, chatID, err,
-			)
 			return nil
 		}
 
-		leaveCount++
+		left++
 		logger.Infof(
 			"AutoLeave: Assistant %d left %d (%d/%d)",
-			ass.Index, chatID, leaveCount, s.limit,
+			ass.Index, chatID, left, s.limit,
 		)
-
-		if leaveCount >= s.limit {
+		if left >= s.limit {
 			return tg.ErrStopIteration
 		}
-
 		return nil
-	}, &tg.DialogOptions{
-		Limit: 0,
-	})
+	}, &tg.DialogOptions{})
 
 	if err != nil && err != tg.ErrStopIteration {
 		logger.Warnf(
@@ -255,4 +217,10 @@ func (s *autoLeaveService) autoLeaveAssistant(
 			ass.Index, err,
 		)
 	}
+}
+
+// isLeaveSafeError reports leave errors that can be safely ignored.
+func isLeaveSafeError(err error) bool {
+	return strings.Contains(err.Error(), "USER_NOT_PARTICIPANT") ||
+		strings.Contains(err.Error(), "CHANNEL_PRIVATE")
 }

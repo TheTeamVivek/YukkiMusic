@@ -27,7 +27,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 	"yukkimusic/internal/logger"
@@ -36,12 +36,13 @@ import (
 	"yukkimusic/internal/core"
 )
 
-func evalCommandHandler(m *telegram.NewMessage) error {
+func evalCommandHandler(c *td.Client, m *td.Message) error {
 	if m.SenderID() != config.OwnerID {
-		return telegram.ErrEndGroup
+		return nil
 	}
 
-	parts := strings.SplitN(m.RawText(true), " ", 2)
+	html := &td.SendTextMessageOpts{ParseMode: "HTML"}
+	parts := strings.SplitN(m.Text(), " ", 2)
 	var code string
 	if len(parts) > 1 {
 		code = strings.TrimSpace(parts[1])
@@ -49,7 +50,7 @@ func evalCommandHandler(m *telegram.NewMessage) error {
 
 	// Minimal help
 	if strings.Contains(code, "--help") || strings.Contains(code, "-h") {
-		m.Reply(`<b>🧩 Eval Help</b>
+		m.ReplyText(c, `<b>🧩 Eval Help</b>
 
 <code>/eval &lt;Go code&gt;</code>
 • Run Go code dynamically.
@@ -60,13 +61,15 @@ func evalCommandHandler(m *telegram.NewMessage) error {
 
 Examples:
 <pre>/eval fmt.Println("Hi")
-/eval return 5</pre>`)
+/eval return 5</pre>`, html)
 		return nil
 	}
 
 	if code == "" {
-		m.Reply(
+		m.ReplyText(
+			c,
 			"No code provided.\nUse <code>/eval --help</code> for usage info.",
+			html,
 		)
 		return nil
 	}
@@ -83,15 +86,15 @@ Examples:
 	})
 	i.Use(stdlib.Symbols)
 
-	var reply *telegram.NewMessage
-	if m.IsReply() {
-		reply, _ = m.GetReplyMessage()
+	var reply *td.Message
+	if m.ReplyToMessageID() != 0 {
+		reply, _ = m.GetRepliedMessage(c)
 	}
 
 	symbols := map[string]map[string]reflect.Value{
 		"eval/eval": {
 			"M":          reflect.ValueOf(m),
-			"Client":     reflect.ValueOf(core.Bot),
+			"Client":     reflect.ValueOf(c),
 			"Assistants": reflect.ValueOf(core.Assistants),
 			"A":          reflect.ValueOf(core.Assistants),
 			"R":          reflect.ValueOf(reply),
@@ -116,11 +119,11 @@ func runSnippet() (res any) {
 	r := e.R
 	client, c, app, bot, Client := e.Client, e.Client, e.Client, e.Client, e.Client
 	a, ass, Assistants, A := e.A, e.A, e.A, e.A
-	j := e.Client.JSON
 
 	_ = m; _ = msg; _ = message; _ = M
 	_ = r; _ = client; _ = c; _ = app; _ = bot; _ = Client
-	_ = j; _ = fmt.Println
+	_ = a; _ = ass; _ = Assistants; _ = A
+	_ = fmt.Println
 
 	%s
 
@@ -136,7 +139,7 @@ func main() {
 
 	result, err := i.EvalWithContext(ctx, code)
 	if err != nil {
-		m.Reply(fmt.Sprintf("<b>#EVALERR:</b> <code>%s</code>", err.Error()))
+		m.ReplyText(c, fmt.Sprintf("<b>#EVALERR:</b> <code>%s</code>", err.Error()), html)
 		return nil
 	}
 
@@ -174,16 +177,22 @@ func main() {
 		file, _ := os.Create("output.txt")
 		defer file.Close()
 		io.WriteString(file, output)
-		m.ReplyMedia(file.Name(), &telegram.MediaOptions{Caption: "Output"})
+		m.ReplyDocument(
+			c,
+			&td.InputFileLocal{Path: file.Name()},
+			&td.SendDocumentOpts{Caption: "Output"},
+		)
 		os.Remove(file.Name())
 		return nil
 	}
 
-	m.Reply(
+	m.ReplyText(
+		c,
 		fmt.Sprintf(
 			"<b>#EVALOut:</b>\n<code>%s</code>",
 			strings.TrimSpace(output),
 		),
+		html,
 	)
 	return nil
 }

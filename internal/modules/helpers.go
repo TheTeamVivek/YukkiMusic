@@ -224,19 +224,19 @@ func sendPlayLogs(c *td.Client, m *td.Message, track *state.Track, queued bool) 
 }
 
 func WithBlacklistCallback(
-	handler func(*td.UpdateNewCallbackQuery) error,
-) func(*td.UpdateNewCallbackQuery) error {
-	return func(cb *td.UpdateNewCallbackQuery) error {
+	handler func(*td.Client, *td.UpdateNewCallbackQuery) error,
+) func(*td.Client, *td.UpdateNewCallbackQuery) error {
+	return func(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 		if blocked, _ := database.IsBlacklistedUser(cb.SenderUserId); blocked {
 			return nil
 		}
 		if blockedChat, _ := database.IsBlacklistedChat(cb.ChatId); blockedChat {
 			if isOwnerOrSudo(cb.SenderUserId) {
-				return handler(cb)
+				return handler(c, cb)
 			}
 			return nil
 		}
-		return handler(cb)
+		return handler(c, cb)
 	}
 }
 

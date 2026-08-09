@@ -28,6 +28,7 @@ import (
 	"runtime"
 	"strings"
 
+	td "github.com/AshokShau/gotdbot"
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/config"
@@ -81,22 +82,22 @@ Debugging and development.`
 • <b>Sudo users only</b>`
 }
 
-func logsHandler(m *telegram.NewMessage) error {
-	chatID := m.ChannelID()
+func logsHandler(c *td.Client, m *td.Message) error {
+	chatID := m.ChatID()
 	logFile := "logs.txt"
 
 	info, err := os.Stat(logFile)
 	if err != nil || info.Size() == 0 {
-		m.Reply(F(chatID, "logs_empty"))
-		return telegram.ErrEndGroup
+		m.ReplyText(c, F(chatID, "logs_empty"), nil)
+		return nil
 	}
 
-	_, err = m.ReplyMedia(logFile, &telegram.MediaOptions{})
+	_, err = m.ReplyDocument(c, &td.InputFileLocal{Path: logFile}, nil)
 	if err != nil {
-		m.Reply(err.Error())
+		m.ReplyText(c, err.Error(), nil)
 	}
 
-	return telegram.ErrEndGroup
+	return nil
 }
 
 func shellHandle(m *telegram.NewMessage) error {
@@ -421,34 +422,45 @@ func performEval(
 	return "<b>#EVALOut:</b> <code>No Output</code>", false
 }
 
-func jsonHandle(m *telegram.NewMessage) error {
+func jsonHandle(c *td.Client, m *td.Message) error {
 	var jsonString []byte
-	if !m.IsReply() {
-		if strings.Contains(m.Args(), "-s") {
-			jsonString, _ = json.MarshalIndent(m.Sender, "", "  ")
-		} else if strings.Contains(m.Args(), "-m") {
-			jsonString, _ = json.MarshalIndent(m.Media(), "", "  ")
-		} else if strings.Contains(m.Args(), "-c") {
-			jsonString, _ = json.MarshalIndent(m.Channel, "", "  ")
-		} else {
-			jsonString, _ = json.MarshalIndent(m.OriginalUpdate, "", "  ")
+	html := &td.SendTextMessageOpts{ParseMode: "HTML"}
+	if m.ReplyToMessageID() == 0 {
+		switch {
+		case strings.Contains(m.Args(), "-s"):
+			if u, err := c.GetUser(m.SenderID()); err == nil && u != nil {
+				jsonString, _ = json.MarshalIndent(u, "", "  ")
+			}
+		case strings.Contains(m.Args(), "-m"):
+			jsonString, _ = json.MarshalIndent(m.Content, "", "  ")
+		case strings.Contains(m.Args(), "-c"):
+			if ch, err := c.GetChat(m.ChatID()); err == nil && ch != nil {
+				jsonString, _ = json.MarshalIndent(ch, "", "  ")
+			}
+		default:
+			jsonString, _ = json.MarshalIndent(m, "", "  ")
 		}
 	} else {
-		r, err := m.GetReplyMessage()
-		if err != nil {
-			m.Reply("<code>Error:</code> <b>" + err.Error() + "</b>")
+		r, err := m.GetRepliedMessage(c)
+		if err != nil || r == nil {
+			m.ReplyText(c, "<code>Error:</code> <b>could not fetch replied message</b>", html)
 			return nil
 		}
-		if strings.Contains(m.Args(), "-s") {
-			jsonString, _ = json.MarshalIndent(r.Sender, "", "  ")
-		} else if strings.Contains(m.Args(), "-m") {
-			jsonString, _ = json.MarshalIndent(r.Media(), "", "  ")
-		} else if strings.Contains(m.Args(), "-c") {
-			jsonString, _ = json.MarshalIndent(r.Channel, "", "  ")
-		} else if strings.Contains(m.Args(), "-f") {
-			jsonString, _ = json.MarshalIndent(r.File, "", "  ")
-		} else {
-			jsonString, _ = json.MarshalIndent(r.OriginalUpdate, "", "  ")
+		switch {
+		case strings.Contains(m.Args(), "-s"):
+			if u, err := c.GetUser(r.SenderID()); err == nil && u != nil {
+				jsonString, _ = json.MarshalIndent(u, "", "  ")
+			}
+		case strings.Contains(m.Args(), "-m"):
+			jsonString, _ = json.MarshalIndent(r.Content, "", "  ")
+		case strings.Contains(m.Args(), "-c"):
+			if ch, err := c.GetChat(r.ChatID()); err == nil && ch != nil {
+				jsonString, _ = json.MarshalIndent(ch, "", "  ")
+			}
+		case strings.Contains(m.Args(), "-f"):
+			jsonString, _ = json.MarshalIndent(r.Content, "", "  ")
+		default:
+			jsonString, _ = json.MarshalIndent(r, "", "  ")
 		}
 	}
 
@@ -458,7 +470,7 @@ func jsonHandle(m *telegram.NewMessage) error {
 	for _, v := range dataFields {
 		decoded, err := base64.StdEncoding.DecodeString(v[1])
 		if err != nil {
-			m.Reply("Error: " + err.Error())
+			m.ReplyText(c, "Error: "+err.Error(), html)
 			return nil
 		}
 		jsonString = []byte(
@@ -474,25 +486,26 @@ func jsonHandle(m *telegram.NewMessage) error {
 		defer os.Remove("message.json")
 		tmpFile, err := os.Create("message.json")
 		if err != nil {
-			m.Reply("Error: " + err.Error())
+			m.ReplyText(c, "Error: "+err.Error(), html)
 			return nil
 		}
 
 		_, err = tmpFile.Write(jsonString)
 		if err != nil {
-			m.Reply("Error: " + err.Error())
+			m.ReplyText(c, "Error: "+err.Error(), html)
 			return nil
 		}
 
-		_, err = m.ReplyMedia(
-			tmpFile.Name(),
-			&telegram.MediaOptions{Caption: "Message JSON"},
+		_, err = m.ReplyDocument(
+			c,
+			&td.InputFileLocal{Path: tmpFile.Name()},
+			&td.SendDocumentOpts{Caption: "Message JSON"},
 		)
 		if err != nil {
-			m.Reply("Error: " + err.Error())
+			m.ReplyText(c, "Error: "+err.Error(), html)
 		}
 	} else {
-		m.Reply("<pre lang='json'>" + string(jsonString) + "</pre>")
+		m.ReplyText(c, "<pre lang='json'>"+string(jsonString)+"</pre>", html)
 	}
 
 	return nil

@@ -33,6 +33,9 @@ import (
 const linkedCPlayTarget = "linked"
 
 func setCPlayHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	args := strings.Fields(m.Text())
 	if len(args) <= 1 {
 		m.ReplyText(c, F(m.ChatID(), "cplay_usage"), nil)

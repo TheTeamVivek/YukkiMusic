@@ -24,7 +24,6 @@ import (
 	"time"
 
 	td "github.com/AshokShau/gotdbot"
-	"github.com/amarnathcjd/gogram/telegram"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
@@ -131,12 +130,12 @@ func handleAddSudo(c *td.Client, m *td.Message) error {
 			AllCommands.PrivateSudoCommands...,
 		)
 
-		if _, err := core.Bot.BotsSetBotCommands(
-			&telegram.BotCommandScopePeer{
-				Peer: &telegram.InputPeerUser{UserID: targetID, AccessHash: 0},
-			},
-			"",
+		if err := c.SetCommands(
 			sudoCommands,
+			"",
+			&td.SetCommandsOpts{
+				Scope: &td.BotCommandScopeChatMember{ChatId: targetID, UserId: targetID},
+			},
 		); err != nil {
 			logger.Error("Failed to set PrivateSudoCommands " + err.Error())
 		}
@@ -206,11 +205,11 @@ func handleDelSudo(c *td.Client, m *td.Message) error {
 	}
 
 	// Reset that user's bot commands
-	if _, err := core.Bot.BotsResetBotCommands(
-		&telegram.BotCommandScopePeer{
-			Peer: &telegram.InputPeerUser{UserID: targetID, AccessHash: 0},
-		},
+	if err := c.DeleteCommands(
 		"",
+		&td.DeleteCommandsOpts{
+			Scope: &td.BotCommandScopeChatMember{ChatId: targetID, UserId: targetID},
+		},
 	); err != nil {
 		logger.Error("Failed to reset sudo commands: " + err.Error())
 	}

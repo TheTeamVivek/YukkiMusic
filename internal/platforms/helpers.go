@@ -35,6 +35,12 @@ import (
 
 var errUnsafeURL = errors.New("invalid or unsafe url")
 
+// Download progress hooks, registered by the modules package.
+var (
+	OnDownloadStart func(c *td.Client, fileID string, statusMsg *td.Message)
+	OnDownloadStop  func(fileID string)
+)
+
 func getPath(track *state.Track, ext string) string {
 	if ext != "" && !strings.HasPrefix(ext, ".") {
 		ext = "." + ext

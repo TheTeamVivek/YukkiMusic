@@ -47,6 +47,9 @@ This setting affects all future playback messages in this chat.`
 }
 
 func nothumbHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	chatID := m.ChatID()
 	args := strings.Fields(m.Text())
 
