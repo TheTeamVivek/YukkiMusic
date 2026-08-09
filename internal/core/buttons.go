@@ -30,14 +30,14 @@ import (
 
 var F func(chatID int64, key string, values ...locales.Arg) string // overwritten from main.go
 
-// TDBot is the gotdbot client, set from main.go.
-var TDBot *td.Client
+// Bot is the gotdbot client, set from main.go.
+var Bot *td.Client
 
 func botUsername() string {
-	if TDBot == nil || TDBot.Me == nil || TDBot.Me.Usernames == nil {
+	if Bot == nil || Bot.Me == nil || Bot.Me.Usernames == nil {
 		return ""
 	}
-	usernames := TDBot.Me.Usernames.ActiveUsernames
+	usernames := Bot.Me.Usernames.ActiveUsernames
 	if len(usernames) == 0 {
 		return ""
 	}

@@ -24,7 +24,6 @@ import (
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/locales"
-	"yukkimusic/internal/utils"
 )
 
 func init() {

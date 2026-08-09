@@ -69,12 +69,12 @@ func MonitorRooms() {
 
 				switch statusMsg.Content.(type) {
 				case *td.MessagePhoto:
-					_, _ = statusMsg.EditCaption(core.TDBot, text, &td.EditCaptionOpts{
+					_, _ = statusMsg.EditCaption(core.Bot, text, &td.EditCaptionOpts{
 						ParseMode:   td.ParseModeHTML,
 						ReplyMarkup: markup,
 					})
 				default:
-					_, _ = statusMsg.EditText(core.TDBot, text, &td.EditTextMessageOpts{
+					_, _ = statusMsg.EditText(core.Bot, text, &td.EditTextMessageOpts{
 						ParseMode:   td.ParseModeHTML,
 						ReplyMarkup: markup,
 					})

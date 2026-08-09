@@ -25,7 +25,7 @@ import (
 	"strings"
 	"time"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
@@ -159,66 +159,73 @@ All c* commands work the same as regular commands but affect the linked channel.
 	helpTexts["/cvplay"] = helpTexts["/vcplay"]
 }
 
-func playHandler(m *tg.NewMessage) error   { return handlePlay(m, &playOpts{}) }
-func fplayHandler(m *tg.NewMessage) error  { return handlePlay(m, &playOpts{Force: true}) }
-func cfplayHandler(m *tg.NewMessage) error { return handlePlay(m, &playOpts{Force: true, CPlay: true}) }
-func vplayHandler(m *tg.NewMessage) error  { return handlePlay(m, &playOpts{Video: true}) }
-func fvplayHandler(m *tg.NewMessage) error { return handlePlay(m, &playOpts{Force: true, Video: true}) }
-
-func vcplayHandler(m *tg.NewMessage) error { return handlePlay(m, &playOpts{CPlay: true, Video: true}) }
-
-func fvcplayHandler(m *tg.NewMessage) error {
-	return handlePlay(m, &playOpts{Force: true, CPlay: true, Video: true})
+func playHandler(c *td.Client, m *td.Message) error  { return handlePlay(c, m, &playOpts{}) }
+func fplayHandler(c *td.Client, m *td.Message) error { return handlePlay(c, m, &playOpts{Force: true}) }
+func cfplayHandler(c *td.Client, m *td.Message) error {
+	return handlePlay(c, m, &playOpts{Force: true, CPlay: true})
 }
-func cplayHandler(m *tg.NewMessage) error { return handlePlay(m, &playOpts{CPlay: true}) }
+func vplayHandler(c *td.Client, m *td.Message) error { return handlePlay(c, m, &playOpts{Video: true}) }
+func fvplayHandler(c *td.Client, m *td.Message) error {
+	return handlePlay(c, m, &playOpts{Force: true, Video: true})
+}
 
-func handlePlay(m *tg.NewMessage, opts *playOpts) error {
-	chatID := m.ChannelID()
+func vcplayHandler(c *td.Client, m *td.Message) error {
+	return handlePlay(c, m, &playOpts{CPlay: true, Video: true})
+}
 
-	if !canUsePlayCommand(m, chatID) {
-		m.Reply(F(chatID, "playmode_restricted"))
-		return tg.ErrEndGroup
+func fvcplayHandler(c *td.Client, m *td.Message) error {
+	return handlePlay(c, m, &playOpts{Force: true, CPlay: true, Video: true})
+}
+func cplayHandler(c *td.Client, m *td.Message) error { return handlePlay(c, m, &playOpts{CPlay: true}) }
+
+func handlePlay(c *td.Client, m *td.Message, opts *playOpts) error {
+	chatID := m.ChatID()
+
+	if !canUsePlayCommand(c, m, chatID) {
+		m.ReplyText(c, F(chatID, "playmode_restricted"), nil)
+		return nil
 	}
 
-	room, searchMsg, err := prepareRoomAndSearchMessage(m, opts.CPlay)
+	room, searchMsg, err := prepareRoomAndSearchMessage(c, m, opts.CPlay)
 	if err != nil {
-		return tg.ErrEndGroup
+		return nil
 	}
 
-	tracks, isActive, err := fetchTracksAndCheckStatus(m, searchMsg, room, opts.Video)
+	tracks, isActive, err := fetchTracksAndCheckStatus(c, m, searchMsg, room, opts.Video)
 	if err != nil {
-		return tg.ErrEndGroup
+		return nil
 	}
 
 	if len(tracks) == 1 && !opts.Force {
 		if isTrackInQueue(room, tracks[0]) {
-			utils.EOR(searchMsg, F(m.ChannelID(), "play_already_in_queue", locales.Arg{
+			utils.EOR(c, searchMsg, F(m.ChatID(), "play_already_in_queue", locales.Arg{
 				"title": utils.EscapeHTML(utils.ShortTitle(tracks[0].Title, 35)),
-			}))
-			return tg.ErrEndGroup
+			}), nil)
+			return nil
 		}
 	}
 
-	tracks, availableSlots, err := filterAndTrimTracks(searchMsg, room, tracks)
+	tracks, availableSlots, err := filterAndTrimTracks(c, searchMsg, room, tracks)
 	if err != nil {
-		return tg.ErrEndGroup
+		return nil
 	}
 
-	mention := mentionOfTg(m.Sender)
-	if err := playTracksAndRespond(m, searchMsg, room, tracks, mention, isActive, opts.Force, availableSlots); err != nil {
+	sender, _ := m.GetUser(c)
+	mention := mentionOf(sender, m.SenderID())
+	if err := playTracksAndRespond(c, m, searchMsg, room, tracks, mention, isActive, opts.Force, availableSlots); err != nil {
 		return err
 	}
 
-	return tg.ErrEndGroup
+	return nil
 }
 
-func canUsePlayCommand(m *tg.NewMessage, chatID int64) bool {
+func canUsePlayCommand(c *td.Client, m *td.Message, chatID int64) bool {
 	adminsOnly, _ := database.PlayModeAdminsOnly(chatID)
 	if !adminsOnly {
 		return true
 	}
 
-	isAdmin, err := utils.IsChatAdmin(m.Client, chatID, m.SenderID())
+	isAdmin, err := utils.IsChatAdmin(c, chatID, m.SenderID())
 	if err == nil && isAdmin {
 		return true
 	}
@@ -228,26 +235,27 @@ func canUsePlayCommand(m *tg.NewMessage, chatID int64) bool {
 }
 
 func prepareRoomAndSearchMessage(
-	m *tg.NewMessage,
+	c *td.Client,
+	m *td.Message,
 	cplay bool,
-) (*core.RoomState, *tg.NewMessage, error) {
-	room, err := getEffectiveRoom(m.ChannelID(), cplay)
+) (*core.RoomState, *td.Message, error) {
+	room, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
+		m.ReplyText(c, err.Error(), nil)
 		return nil, nil, err
 	}
 
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 	room.Parse()
 
 	if len(room.Queue()) >= config.QueueLimit {
-		m.Reply(F(chatID, "queue_limit_reached", locales.Arg{"limit": config.QueueLimit}))
+		m.ReplyText(c, F(chatID, "queue_limit_reached", locales.Arg{"limit": config.QueueLimit}), nil)
 		return nil, nil, fmt.Errorf("queue limit reached")
 	}
 
 	query := extractPlayQuery(m.Text())
-	if query == "" && !m.IsReply() {
-		m.Reply(F(chatID, "no_song_query", locales.Arg{"cmd": getCommand(m)}))
+	if query == "" && m.ReplyToMessageID() == 0 {
+		m.ReplyText(c, F(chatID, "no_song_query", locales.Arg{"cmd": getCommand(m)}), nil)
 		return nil, nil, fmt.Errorf("no song query")
 	}
 
@@ -260,7 +268,7 @@ func prepareRoomAndSearchMessage(
 		)
 	}
 
-	replyMsg, err := m.Reply(statusText)
+	replyMsg, err := m.ReplyText(c, statusText, nil)
 	if err != nil {
 		logger.Errorf("Failed to send searching message: %v", err)
 		return nil, nil, err
@@ -278,29 +286,30 @@ func extractPlayQuery(text string) string {
 }
 
 func fetchTracksAndCheckStatus(
-	m *tg.NewMessage,
-	replyMsg *tg.NewMessage,
+	c *td.Client,
+	m *td.Message,
+	replyMsg *td.Message,
 	r *core.RoomState,
 	video bool,
 ) ([]*state.Track, bool, error) {
-	tracks, err := safeGetTracks(m, replyMsg, m.ChannelID(), video)
+	tracks, err := safeGetTracks(c, m, replyMsg, m.ChatID(), video)
 	if err != nil {
-		utils.EOR(replyMsg, err.Error())
+		utils.EOR(c, replyMsg, err.Error(), nil)
 		return nil, false, err
 	}
 	if len(tracks) == 0 {
-		utils.EOR(replyMsg, F(m.ChannelID(), "no_song_found"))
+		utils.EOR(c, replyMsg, F(m.ChatID(), "no_song_found"), nil)
 		return nil, false, fmt.Errorf("no tracks found")
 	}
 
 	chatState, err := core.GetChatState(r.ID)
 	if err != nil {
 		logger.Errorf("Error getting chat state: %v", err)
-		utils.EOR(replyMsg, getErrorMessage(m.ChannelID(), err))
+		utils.EOR(c, replyMsg, getErrorMessage(m.ChatID(), err), nil)
 		return nil, false, err
 	}
 
-	if err := ensureVoiceChatReady(m.ChannelID(), replyMsg, chatState); err != nil {
+	if err := ensureVoiceChatReady(c, m.ChatID(), replyMsg, chatState); err != nil {
 		return nil, false, err
 	}
 
@@ -322,28 +331,29 @@ func isTrackInQueue(r *core.RoomState, t *state.Track) bool {
 }
 
 func ensureVoiceChatReady(
+	c *td.Client,
 	chatID int64,
-	replyMsg *tg.NewMessage,
+	replyMsg *td.Message,
 	cs *core.ChatState,
 ) error {
 	snap, err := cs.Snapshot(false)
 	if err != nil {
 		logger.Errorf("Error checking voicechat state: %v", err)
-		utils.EOR(replyMsg, getErrorMessage(chatID, err))
+		utils.EOR(c, replyMsg, getErrorMessage(chatID, err), nil)
 		return err
 	}
 	if !snap.VoiceChatActive {
 		err := fmt.Errorf("no active voice chat")
-		utils.EOR(replyMsg, F(chatID, "err_no_active_voicechat"))
+		utils.EOR(c, replyMsg, F(chatID, "err_no_active_voicechat"), nil)
 		return err
 	}
 
 	if snap.AssistantBanned {
 		err := fmt.Errorf("assistant banned")
-		utils.EOR(replyMsg, F(chatID, "err_assistant_banned", locales.Arg{
-			"user": mentionOfTg(cs.Assistant.Self),
+		utils.EOR(c, replyMsg, F(chatID, "err_assistant_banned", locales.Arg{
+			"user": mentionOfAssistant(cs.Assistant),
 			"id":   utils.IntToStr(cs.Assistant.Self.ID),
-		}))
+		}), nil)
 		return err
 	}
 
@@ -352,12 +362,17 @@ func ensureVoiceChatReady(
 	}
 
 	username := ""
-	if replyMsg.Channel != nil {
-		username = replyMsg.Channel.Username
+	if chat, err := replyMsg.GetChat(c); err == nil {
+		if ct, ok := chat.Type.(*td.ChatTypeSupergroup); ok {
+			if sg, err := c.GetSupergroup(ct.SupergroupId); err == nil &&
+				sg.Usernames != nil && len(sg.Usernames.ActiveUsernames) > 0 {
+				username = sg.Usernames.ActiveUsernames[0]
+			}
+		}
 	}
 	if err := cs.EnsureAssistantJoined(username); err != nil {
 		logger.Errorf("Error joining assistant: %v", err)
-		utils.EOR(replyMsg, getErrorMessage(chatID, err))
+		utils.EOR(c, replyMsg, getErrorMessage(chatID, err), nil)
 		return err
 	}
 
@@ -366,11 +381,12 @@ func ensureVoiceChatReady(
 }
 
 func filterAndTrimTracks(
-	replyMsg *tg.NewMessage,
+	c *td.Client,
+	replyMsg *td.Message,
 	r *core.RoomState,
 	tracks []*state.Track,
 ) ([]*state.Track, int, error) {
-	chatID := replyMsg.ChannelID()
+	chatID := replyMsg.ChatID()
 	accepted := make([]*state.Track, 0, len(tracks))
 	skippedTitles := make([]string, 0)
 
@@ -387,19 +403,19 @@ func filterAndTrimTracks(
 
 	if len(skippedTitles) > 0 {
 		if len(tracks) == 1 && len(accepted) == 0 {
-			utils.EOR(replyMsg, F(chatID, "play_single_track_too_long", locales.Arg{
+			utils.EOR(c, replyMsg, F(chatID, "play_single_track_too_long", locales.Arg{
 				"limit_mins": utils.FormatDuration(config.DurationLimit),
 				"title":      skippedTitles[0],
-			}))
+			}), nil)
 			return nil, 0, fmt.Errorf("single long track skipped")
 		}
 
-		utils.EOR(replyMsg, buildSkippedTracksText(chatID, skippedTitles))
+		utils.EOR(c, replyMsg, buildSkippedTracksText(chatID, skippedTitles), nil)
 		time.Sleep(1 * time.Second)
 	}
 
 	if len(accepted) == 0 {
-		utils.EOR(replyMsg, F(chatID, "play_all_tracks_skipped"))
+		utils.EOR(c, replyMsg, F(chatID, "play_all_tracks_skipped"), nil)
 		return nil, 0, fmt.Errorf("all tracks skipped")
 	}
 
@@ -449,37 +465,38 @@ func buildSkippedTracksText(chatID int64, skippedTitles []string) string {
 }
 
 func playTracksAndRespond(
-	m *tg.NewMessage,
-	replyMsg *tg.NewMessage,
+	c *td.Client,
+	m *td.Message,
+	replyMsg *td.Message,
 	r *core.RoomState,
 	tracks []*state.Track,
 	mention string,
 	isActive, force bool,
 	availableSlots int,
 ) error {
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 
 	for i, track := range tracks {
 		track.Requester = mention
 
 		filePath := ""
 		if i == 0 && (!isActive || force) {
-			path, err := downloadFirstTrack(m, replyMsg, chatID, mention, track)
+			path, err := downloadFirstTrack(c, replyMsg, chatID, mention, track)
 			if err != nil {
-				return tg.ErrEndGroup
+				return nil
 			}
 			filePath = path
 		}
 
-		if err := playTrackWithRetry(r, track, filePath, force && i == 0, replyMsg); err != nil {
+		if err := playTrackWithRetry(r, track, filePath, force && i == 0, c, replyMsg); err != nil {
 			return err
 		}
 
-		sendPlayLogs(m, track, (isActive && !force) || i > 0)
+		sendPlayLogs(c, m, track, (isActive && !force) || i > 0)
 	}
 
 	return finalizePlayReply(
-		m,
+		c,
 		replyMsg,
 		r,
 		tracks,
@@ -491,40 +508,43 @@ func playTracksAndRespond(
 }
 
 func downloadFirstTrack(
-	m *tg.NewMessage,
-	replyMsg *tg.NewMessage,
+	c *td.Client,
+	replyMsg *td.Message,
 	chatID int64,
 	mention string,
 	track *state.Track,
 ) (string, error) {
 	title := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
-	var opt *tg.SendOptions
+	var editOpts *td.EditTextMessageOpts
 	if track.Duration > 600 {
-		opt = &tg.SendOptions{ReplyMarkup: core.GetCancelKeyboard(chatID)}
+		editOpts = &td.EditTextMessageOpts{ReplyMarkup: core.GetCancelKeyboard(chatID)}
 	}
 
 	replyMsg, _ = utils.EOR(
+		c,
 		replyMsg,
 		F(chatID, "play_downloading_song", locales.Arg{"title": title}),
-		opt,
+		editOpts,
 	)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	downloads.Add(chatID, cancel)
 	defer downloads.Remove(chatID)
 
-	path, err := safeDownload(ctx, track, replyMsg, chatID)
+	path, err := safeDownload(ctx, c, track, replyMsg, chatID)
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
 			utils.EOR(
+				c,
 				replyMsg,
 				F(chatID, "play_download_canceled", locales.Arg{"user": mention}),
+				nil,
 			)
 		} else {
-			utils.EOR(replyMsg, F(chatID, "play_download_failed", locales.Arg{
+			utils.EOR(c, replyMsg, F(chatID, "play_download_failed", locales.Arg{
 				"title": title,
 				"error": utils.EscapeHTML(err.Error()),
-			}))
+			}), nil)
 		}
 		return "", err
 	}
@@ -534,8 +554,8 @@ func downloadFirstTrack(
 }
 
 func finalizePlayReply(
-	m *tg.NewMessage,
-	replyMsg *tg.NewMessage,
+	c *td.Client,
+	replyMsg *td.Message,
 	r *core.RoomState,
 	tracks []*state.Track,
 	mention string,
@@ -543,16 +563,18 @@ func finalizePlayReply(
 	force bool,
 	availableSlots int,
 ) error {
-	chatID := m.ChannelID()
+	chatID := replyMsg.ChatID()
 	mainTrack := tracks[0]
 
 	if !isActive || force {
-		msg, opts := buildNowPlayingReply(chatID, r, mainTrack, mention)
-		replyMsg, _ = utils.EOR(replyMsg, msg, opts)
-		r.SetStatusMsg(replyMsg)
+		replyMsg = sendNowPlaying(c, replyMsg, chatID, r, mainTrack)
+		if replyMsg != nil {
+			r.SetStatusMsg(replyMsg)
+		}
 
 		if len(tracks) > 1 {
-			replyMsg.Respond(
+			replyMsg.ReplyText(
+				c,
 				buildMultiAddedText(
 					chatID,
 					len(tracks)-1,
@@ -560,46 +582,27 @@ func finalizePlayReply(
 					availableSlots,
 					len(tracks),
 				),
+				nil,
 			)
 		}
 		return nil
 	}
 
 	if len(tracks) == 1 {
-		msg, opts := buildSingleQueueReply(chatID, r, mainTrack, mention)
-		utils.EOR(replyMsg, msg, opts)
+		utils.EOR(c, replyMsg, buildSingleQueueReply(chatID, r, mainTrack, mention), &td.EditTextMessageOpts{
+			ParseMode:   "HTML",
+			ReplyMarkup: core.GetPlayMarkup(chatID, r, true),
+		})
 		return nil
 	}
 
 	utils.EOR(
+		c,
 		replyMsg,
 		buildMultiAddedText(chatID, len(tracks), mention, availableSlots, len(tracks)),
+		&td.EditTextMessageOpts{ParseMode: "HTML"},
 	)
 	return nil
-}
-
-func buildNowPlayingReply(
-	chatID int64,
-	r *core.RoomState,
-	track *state.Track,
-	mention string,
-) (string, *tg.SendOptions) {
-	title := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
-	opt := &tg.SendOptions{
-		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
-	}
-	if track.Artwork != "" && shouldShowThumb(chatID) {
-		opt.Media = utils.CleanURL(track.Artwork)
-	}
-
-	msg := F(chatID, "stream_now_playing", locales.Arg{
-		"url":      track.URL,
-		"title":    title,
-		"duration": utils.FormatDuration(track.Duration),
-		"by":       mention,
-	})
-	return msg, opt
 }
 
 func buildSingleQueueReply(
@@ -607,24 +610,16 @@ func buildSingleQueueReply(
 	r *core.RoomState,
 	track *state.Track,
 	mention string,
-) (string, *tg.SendOptions) {
+) string {
 	title := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
-	opt := &tg.SendOptions{
-		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(chatID, r, true),
-	}
-	if track.Artwork != "" && shouldShowThumb(chatID) {
-		opt.Media = utils.CleanURL(track.Artwork)
-	}
 
-	msg := F(chatID, "play_added_to_queue_single", locales.Arg{
+	return F(chatID, "play_added_to_queue_single", locales.Arg{
 		"index":    len(r.Queue()),
 		"url":      track.URL,
 		"title":    title,
 		"duration": utils.FormatDuration(track.Duration),
 		"by":       mention,
 	})
-	return msg, opt
 }
 
 func buildMultiAddedText(
@@ -657,13 +652,14 @@ func playTrackWithRetry(
 	track *state.Track,
 	filePath string,
 	force bool,
-	replyMsg *tg.NewMessage,
+	c *td.Client,
+	replyMsg *td.Message,
 ) error {
 	for attempt := 1; attempt <= playMaxRetries; attempt++ {
 		if r.IsDestroyed() {
 			logger.Info("Room destroyed during retry, aborting")
-			replyMsg.Delete()
-			return tg.ErrEndGroup
+			replyMsg.Delete(c, true)
+			return nil
 		}
 
 		err := r.Play(track, filePath, force)
@@ -676,7 +672,7 @@ func playTrackWithRetry(
 			return nil
 		}
 
-		handled, stopErr := handlePlayAttemptError(err, attempt, replyMsg, r)
+		handled, stopErr := handlePlayAttemptError(err, attempt, c, replyMsg, r)
 		if handled {
 			if stopErr != nil {
 				return stopErr
@@ -691,8 +687,10 @@ func playTrackWithRetry(
 				) + " attempts. Error: " + err.Error(),
 			)
 			utils.EOR(
+				c,
 				replyMsg,
-				F(replyMsg.ChannelID(), "play_failed", locales.Arg{"error": err.Error()}),
+				F(replyMsg.ChatID(), "play_failed", locales.Arg{"error": err.Error()}),
+				nil,
 			)
 			return err
 		}
@@ -710,10 +708,11 @@ func playTrackWithRetry(
 func handlePlayAttemptError(
 	err error,
 	attempt int,
-	replyMsg *tg.NewMessage,
+	c *td.Client,
+	replyMsg *td.Message,
 	room *core.RoomState,
 ) (bool, error) {
-	if wait := tg.GetFloodWait(err); wait > 0 {
+	if wait := getFloodWait(err); wait > 0 {
 		logger.Error(
 			"FloodWait detected (" + strconv.Itoa(
 				wait,
@@ -727,32 +726,32 @@ func handlePlayAttemptError(
 
 	if errors.Is(err, ubot.ErrConnectionTimeout) {
 		logger.Error("Voice connection timeout. Stopping call session...")
-		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_connection_timeout"))
+		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "err_connection_timeout"), nil)
 		core.DeleteRoom(room.ID)
-		return true, tg.ErrEndGroup
+		return true, nil
 	}
 
 	if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
 		logger.Error("RTMP/live-stream voice chat detected, cannot play. Cleaning up...")
 		core.DeleteRoom(room.ID)
-		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "rtmp_play_unsupported"))
-		return true, tg.ErrEndGroup
+		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "rtmp_play_unsupported"), nil)
+		return true, nil
 	}
 
 	if strings.Contains(err.Error(), "group call") &&
 		strings.Contains(err.Error(), "is closed") {
-		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "err_no_active_voicechat"))
-		return true, tg.ErrEndGroup
+		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "err_no_active_voicechat"), nil)
+		return true, nil
 	}
 
-	if tg.MatchError(err, "GROUPCALL_INVALID") {
+	if strings.Contains(err.Error(), "GROUPCALL_INVALID") {
 		logger.Error("GROUPCALL_INVALID err occurred. Returning...")
 		core.DeleteRoom(room.ID)
-		utils.EOR(replyMsg, F(replyMsg.ChannelID(), "play_unable"))
-		return true, tg.ErrEndGroup
+		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "play_unable"), nil)
+		return true, nil
 	}
 
-	if tg.MatchError(err, "INTERDC_X_CALL_ERROR") {
+	if strings.Contains(err.Error(), "INTERDC_X_CALL_ERROR") {
 		logger.Error(
 			"INTERDC_X_CALL_ERROR occurred. Retrying... (attempt " + utils.IntToStr(
 				attempt,
@@ -763,6 +762,25 @@ func handlePlayAttemptError(
 	}
 
 	return false, nil
+}
+
+// getFloodWait returns the retry-after seconds for a flood-wait error,
+// whether surfaced as a TDLib error or an MTProto/ntgcalls error.
+func getFloodWait(err error) int {
+	var tde *td.Error
+	if errors.As(err, &tde) {
+		if wait := tde.GetRetryAfter(); wait > 0 {
+			return wait
+		}
+	}
+
+	msg := err.Error()
+	if _, after, ok := strings.Cut(msg, "FLOOD_WAIT_"); ok {
+		if wait, cerr := strconv.Atoi(after); cerr == nil {
+			return wait
+		}
+	}
+	return 0
 }
 
 type msgFn func(chatID int64, err error) string
@@ -808,29 +826,31 @@ func getErrorMessage(chatID int64, err error) string {
 
 // safeDownload and safeGetTracks re-raise panics on failure.
 func safeGetTracks(
-	m, replyMsg *tg.NewMessage,
+	c *td.Client,
+	m, replyMsg *td.Message,
 	chatID int64,
 	video bool,
 ) (tracks []*state.Track, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			utils.EOR(replyMsg, F(chatID, "err_fetch_tracks"))
+			utils.EOR(c, replyMsg, F(chatID, "err_fetch_tracks"), nil)
 			panic(r)
 		}
 	}()
 
-	return platforms.GetTracks(m, video)
+	return platforms.GetTracks(c, m, video)
 }
 
 func safeDownload(
 	ctx context.Context,
+	c *td.Client,
 	track *state.Track,
-	replyMsg *tg.NewMessage,
+	replyMsg *td.Message,
 	chatID int64,
 ) (path string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			utils.EOR(replyMsg, F(chatID, "err_download_internal"))
+			utils.EOR(c, replyMsg, F(chatID, "err_download_internal"), nil)
 			panic(r)
 		}
 	}()

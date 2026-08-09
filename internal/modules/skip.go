@@ -151,7 +151,7 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 		return nil
 	}
 
-	statusMsg, err := core.TDBot.SendTextMessage(
+	statusMsg, err := core.Bot.SendTextMessage(
 		chatID,
 		F(chatID, "stream_downloading_next"),
 		nil,
@@ -169,7 +169,7 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 		if statusMsg != nil {
 			utils.EOR(c, statusMsg, txt, nil)
 		} else {
-			core.TDBot.SendTextMessage(chatID, txt, nil)
+			core.Bot.SendTextMessage(chatID, txt, nil)
 		}
 
 		scheduleOldPlayingMessage(r)
@@ -182,7 +182,7 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 		if statusMsg != nil {
 			utils.EOR(c, statusMsg, txt, nil)
 		} else {
-			core.TDBot.SendTextMessage(chatID, txt, nil)
+			core.Bot.SendTextMessage(chatID, txt, nil)
 		}
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)

@@ -55,7 +55,7 @@ func Init() (func(), error) {
 
 	shutdown := func() {
 		logger.Info("Stopping bot...")
-		TDBot.Close()
+		Bot.Close()
 
 		logger.Info("Shutting down assistants...")
 		Assistants.ForEach(func(a *Assistant) {
@@ -92,7 +92,7 @@ func initBot() error {
 	}
 	client.Me = user
 
-	TDBot = client
+	Bot = client
 
 	if config.LoggerID != 0 {
 		_, _ = client.SendTextMessage(config.LoggerID, "Bot Started", nil)

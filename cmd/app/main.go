@@ -93,11 +93,11 @@ func main() {
 		logger.Fatalf("failed to rebalance assistants: %v", err)
 	}
 
-	modules.Init(core.TDBot, core.Assistants)
+	modules.Init(core.Bot, core.Assistants)
 
 	startHTTPServer()
 
-	core.TDBot.Idle()
+	core.Bot.Idle()
 }
 
 func startHTTPServer() {

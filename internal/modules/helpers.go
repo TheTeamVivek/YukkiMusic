@@ -218,7 +218,7 @@ func sendPlayLogs(c *td.Client, m *td.Message, track *state.Track, queued bool) 
 		"requested_by_id": m.SenderID(),
 	}))
 
-	_, err := core.TDBot.SendTextMessage(
+	_, err := core.Bot.SendTextMessage(
 		config.LoggerID,
 		sb.String(),
 		&td.SendTextMessageOpts{ParseMode: "HTML"},

@@ -121,7 +121,7 @@ func executeRestart(
 ) error {
 	exePath, err := os.Executable()
 	if err != nil {
-		utils.EOR(statusMsg, F(chatID, "restart_exepath_fail", locales.Arg{
+		utils.EOR(c, statusMsg, F(chatID, "restart_exepath_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
 		return nil
@@ -129,7 +129,7 @@ func executeRestart(
 
 	exePath, err = filepath.EvalSymlinks(exePath)
 	if err != nil {
-		utils.EOR(statusMsg, F(chatID, "restart_symlink_fail", locales.Arg{
+		utils.EOR(c, statusMsg, F(chatID, "restart_symlink_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
 		return nil
@@ -143,13 +143,13 @@ func executeRestart(
 		time.Sleep(time.Second)
 	}
 
-	utils.EOR(statusMsg, F(chatID, "restart_initiated"), nil)
+	utils.EOR(c, statusMsg, F(chatID, "restart_initiated"), nil)
 
 	_ = os.RemoveAll("downloads")
 	_ = os.RemoveAll("cache")
 
 	if err := syscall.Exec(exePath, os.Args, os.Environ()); err != nil {
-		utils.EOR(statusMsg, F(chatID, "restart_fail", locales.Arg{
+		utils.EOR(c, statusMsg, F(chatID, "restart_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
 	}

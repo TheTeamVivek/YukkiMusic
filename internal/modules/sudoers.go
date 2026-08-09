@@ -27,7 +27,6 @@ import (
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
-	"yukkimusic/internal/core"
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"

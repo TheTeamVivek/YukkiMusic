@@ -27,8 +27,6 @@ import (
 	td "github.com/AshokShau/gotdbot"
 	"github.com/amarnathcjd/gogram/telegram"
 	"yukkimusic/internal/logger"
-
-	"yukkimusic/internal/utils"
 )
 
 var (
@@ -82,6 +80,13 @@ func DeleteChatState(chatID int64) {
 	chatStatesMu.Lock()
 	delete(chatStates, chatID)
 	chatStatesMu.Unlock()
+}
+
+// GetFullChat fetches the supergroup full info for a chat ID. TDLib supergroup
+// chat IDs carry a -100 prefix, while getSupergroupFullInfo expects the raw
+// supergroup id, so no separate getChat lookup is needed.
+func GetFullChat(c *td.Client, chatID int64) (*td.SupergroupFullInfo, error) {
+	return c.GetSupergroupFullInfo(-chatID - 1_000_000_000_000)
 }
 
 func (s *ChatState) Snapshot(force bool) (StateSnapshot, error) {
@@ -154,7 +159,7 @@ func (s *ChatState) refresh() error {
 			return err
 		}
 	}
-	full, err := utils.GetFullChat(TDBot, s.ChatID)
+	full, err := GetFullChat(Bot, s.ChatID)
 	if err != nil {
 		logger.Errorf("chat_state: GetFullChat failed for %d: %v", s.ChatID, err)
 		if isAdminError(err) {
@@ -163,12 +168,7 @@ func (s *ChatState) refresh() error {
 		return fmt.Errorf("%w: %v", ErrStateFetchFailed, err)
 	}
 
-	voiceActive := false
-	if full.Chat.VideoChat != nil && full.Chat.VideoChat.GroupCallId != 0 {
-		voiceActive = true
-	}
-
-	member, err := TDBot.GetChatMember(s.ChatID, &td.MessageSenderUser{UserId: s.Assistant.Self.ID})
+	member, err := Bot.GetChatMember(s.ChatID, &td.MessageSenderUser{UserId: s.Assistant.Self.ID})
 	if err != nil {
 		if isAdminError(err) {
 			logger.Errorf("chat_state: admin permission required for GetChatMember in %d", s.ChatID)
@@ -178,11 +178,14 @@ func (s *ChatState) refresh() error {
 	}
 
 	present, banned := membership(member)
-	s.applySnapshot(present, banned, voiceActive)
-	if full.SupergroupFullInfo != nil &&
-		full.SupergroupFullInfo.InviteLink != nil &&
-		full.SupergroupFullInfo.InviteLink.InviteLink != "" {
-		s.setInviteLink(full.SupergroupFullInfo.InviteLink.InviteLink)
+	// A bot cannot query the group call state (getGroupCall is user-only and
+	// the group call id is always 0 for bots), so voice chat activity is
+	// tracked through video-chat start/end updates instead.
+	s.applySnapshot(present, banned, s.snapshot.VoiceChatActive)
+	if full != nil &&
+		full.InviteLink != nil &&
+		full.InviteLink.InviteLink != "" {
+		s.setInviteLink(full.InviteLink.InviteLink)
 	}
 	return nil
 }
@@ -258,20 +261,20 @@ func (s *ChatState) resolveInviteLink() (string, error) {
 	if cached != "" {
 		return cached, nil
 	}
-	full, err := utils.GetFullChat(TDBot, s.ChatID)
+	full, err := GetFullChat(Bot, s.ChatID)
 	if err != nil {
 		if isAdminError(err) {
 			return "", ErrAdminPermissionRequired
 		}
 		return "", fmt.Errorf("%w: %v", ErrAssistantInviteLinkFetch, err)
 	}
-	if full.SupergroupFullInfo != nil &&
-		full.SupergroupFullInfo.InviteLink != nil &&
-		full.SupergroupFullInfo.InviteLink.InviteLink != "" {
-		s.setInviteLink(full.SupergroupFullInfo.InviteLink.InviteLink)
-		return full.SupergroupFullInfo.InviteLink.InviteLink, nil
+	if full != nil &&
+		full.InviteLink != nil &&
+		full.InviteLink.InviteLink != "" {
+		s.setInviteLink(full.InviteLink.InviteLink)
+		return full.InviteLink.InviteLink, nil
 	}
-	inv, err := TDBot.CreateChatInviteLink(s.ChatID, 0, 0, "", nil)
+	inv, err := Bot.CreateChatInviteLink(s.ChatID, 0, 0, "", nil)
 	if err != nil {
 		if isAdminError(err) {
 			return "", ErrAdminPermissionRequired
@@ -287,7 +290,7 @@ func (s *ChatState) resolveInviteLink() (string, error) {
 
 func (s *ChatState) approveJoinRequest() error {
 	logger.Debugf("chat_state: approveJoinRequest(chat=%d)", s.ChatID)
-	err := TDBot.ProcessChatJoinRequest(
+	err := Bot.ProcessChatJoinRequest(
 		s.ChatID,
 		s.Assistant.Self.ID,
 		&td.ProcessChatJoinRequestOpts{Approve: true},

@@ -137,7 +137,7 @@ func (s *CleanScheduler) flushDue(deadline time.Time) {
 		if err != nil || !enabled {
 			continue
 		}
-		if err := core.TDBot.DeleteMessages(chatID, ids, nil); err != nil {
+		if err := core.Bot.DeleteMessages(chatID, ids, nil); err != nil {
 			logger.Debugf("cleanmode delete failed chat=%d err=%v", chatID, err)
 		}
 	}

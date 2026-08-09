@@ -85,10 +85,7 @@ func downloadUpdateHandler(c *td.Client, u *td.UpdateFile) error {
 		e.total = total
 	}
 
-	current := u.File.Local.DownloadedSize
-	if current > e.total {
-		current = e.total
-	}
+	current := min(u.File.Local.DownloadedSize, e.total)
 
 	speed := 0.0
 	if interval > 0 && current >= e.lastSize {

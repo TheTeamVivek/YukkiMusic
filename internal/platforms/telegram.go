@@ -70,12 +70,12 @@ func (t *TelegramPlatform) Get(query string, _ bool) ([]*state.Track, error) {
 			return nil, err
 		}
 
-		isVideo, isAudio := playableMedia(core.TDBot, msg)
+		isVideo, isAudio := playableMedia(core.Bot, msg)
 		if !isVideo && !isAudio {
 			return nil, errors.New("message does not contain playable media")
 		}
 
-		track, err := t.GetTracksByMessage(core.TDBot, msg)
+		track, err := t.GetTracksByMessage(core.Bot, msg)
 		if err != nil {
 			return nil, err
 		}
@@ -97,7 +97,7 @@ func fetchTelegramMessage(query string) (*td.Message, error) {
 		query = "https://" + query
 	}
 
-	info, err := core.TDBot.GetMessageLinkInfo(query)
+	info, err := core.Bot.GetMessageLinkInfo(query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve message link: %w", err)
 	}
@@ -148,7 +148,7 @@ func (t *TelegramPlatform) Download(
 	if OnDownloadStart != nil {
 		OnDownloadStart(fileID, statusMsg)
 	}
-	file, err := msg.Download(core.TDBot, 1, 0, 0, true)
+	file, err := msg.Download(core.Bot, 1, 0, 0, true)
 	if err != nil {
 		os.Remove(path)
 		if errors.Is(err, context.Canceled) {

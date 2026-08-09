@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
@@ -29,10 +28,8 @@ import (
 	"strings"
 
 	td "github.com/AshokShau/gotdbot"
-	"github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/config"
-	"yukkimusic/internal/core"
 )
 
 func init() {
@@ -100,326 +97,53 @@ func logsHandler(c *td.Client, m *td.Message) error {
 	return nil
 }
 
-func shellHandle(m *telegram.NewMessage) error {
+func shellHandler(c *td.Client, m *td.Message) error {
 	if m.SenderID() != config.OwnerID {
-		return telegram.ErrEndGroup
+		return nil
 	}
 	cmd := m.Args()
-	var cmd_args []string
+	var cmdArgs []string
 	if cmd == "" {
-		m.Reply("No command provided")
+		m.ReplyText(c, "No command provided", nil)
 		return nil
 	}
 
 	if runtime.GOOS == "windows" {
 		cmd = "cmd"
-		cmd_args_b := strings.Split(m.Args(), " ")
-		cmd_args = []string{"/C"}
-		cmd_args = append(cmd_args, cmd_args_b...)
+		cmdArgs = append([]string{"/C"}, strings.Split(m.Args(), " ")...)
 	} else {
-		cmd = strings.Split(cmd, " ")[0]
-		cmd_args = strings.Split(m.Args(), " ")
-		cmd_args = append(cmd_args[:0], cmd_args[1:]...)
+		parts := strings.Split(cmd, " ")
+		cmd = parts[0]
+		cmdArgs = parts[1:]
 	}
-	cmx := exec.Command(cmd, cmd_args...)
+	cmx := exec.Command(cmd, cmdArgs...)
 	var out bytes.Buffer
 	cmx.Stdout = &out
 	var errx bytes.Buffer
 	cmx.Stderr = &errx
 	err := cmx.Run()
 
+	html := &td.SendTextMessageOpts{ParseMode: "HTML"}
+
 	if errx.String() == "" && out.String() == "" {
 		if err != nil {
-			m.Reply("<code>Error:</code> <b>" + err.Error() + "</b>")
+			m.ReplyText(c, "<code>Error:</code> <b>"+err.Error()+"</b>", html)
 			return nil
 		}
-		m.Reply("<code>No Output</code>")
+		m.ReplyText(c, "<code>No Output</code>", html)
 		return nil
 	}
 
 	if out.String() != "" {
-		m.Reply(
-			`<pre lang="bash">` + strings.TrimSpace(out.String()) + `</pre>`,
+		m.ReplyText(
+			c,
+			`<pre lang="bash">`+strings.TrimSpace(out.String())+`</pre>`,
+			html,
 		)
 	} else {
-		m.Reply(`<pre lang="bash">` + strings.TrimSpace(errx.String()) + `</pre>`)
+		m.ReplyText(c, `<pre lang="bash">`+strings.TrimSpace(errx.String())+`</pre>`, html)
 	}
 	return nil
-}
-
-// --------- Eval function ------------
-
-const boiler_code_for_eval = `
-package main
-
-import "fmt"
-import "github.com/amarnathcjd/gogram/telegram"
-import "encoding/json"
-
-%s
-
-var msg_id int32 = %d
-
-var client *telegram.Client
-var ub *telegram.Client
-var message *telegram.NewMessage
-var m *telegram.NewMessage
-var r *telegram.NewMessage
-` + "var msg = `%s`\nvar snd = `%s`\nvar cht = `%s`\nvar chn = `%s`\nvar cch = `%s`" + `
-
-
-func evalCode() {
-        %s
-}
-
-func main() {
-        var msg_o *telegram.MessageObj
-        var snd_o *telegram.UserObj
-        var cht_o *telegram.ChatObj
-        var chn_o *telegram.Channel
-        json.Unmarshal([]byte(msg), &msg_o)
-        json.Unmarshal([]byte(snd), &snd_o)
-        json.Unmarshal([]byte(cht), &cht_o)
-        json.Unmarshal([]byte(chn), &chn_o)
-        client, _ = telegram.NewClient(telegram.ClientConfig{
-                StringSession: "%s",
-        })
-
-        client.Cache.ImportJSON([]byte(cch))
-
-        client.Conn()
-        ub, _ = telegram.NewClient(telegram.ClientConfig{
-                StringSession: "%s",
-        })
-
-        ub.Conn()
-        
-        x := []telegram.User{}
-        y := []telegram.Chat{}
-        x = append(x, snd_o)
-        if chn_o != nil {
-                y = append(y, chn_o)
-        }
-        if cht_o != nil {
-                y = append(y, cht_o)
-        }
-        client.Cache.UpdatePeersToCache(x, y)
-        idx := 0
-        if cht_o != nil {
-                idx = int(cht_o.ID)
-        }
-        if chn_o != nil {
-                idx = int(chn_o.ID)
-        }
-        if snd_o != nil && idx == 0 {
-                idx = int(snd_o.ID)
-        }
-
-        messageX, err := client.GetMessages(idx, &telegram.SearchOption{
-                IDs: int(msg_id),
-        })
-
-        if err != nil {
-                fmt.Println(err)
-        }
-
-        message = &messageX[0]
-        m = message
-        r, _ = message.GetReplyMessage()
-
-        fmt.Println("output-start")
-        evalCode()
-}
-
-func packMessage(c *telegram.Client, message telegram.Message, sender *telegram.UserObj, channel *telegram.Channel, chat *telegram.ChatObj) *telegram.NewMessage {
-        var (
-                m = &telegram.NewMessage{}
-        )
-        switch message := message.(type) {
-        case *telegram.MessageObj:
-                m.ID = message.ID
-                m.OriginalUpdate = message
-                m.Message = message
-                m.Client = c
-        default:
-                return nil
-        }
-        m.Sender = sender
-        m.Chat = chat
-        m.Channel = channel
-        if m.Channel != nil && (m.Sender.ID == m.Channel.ID) {
-                m.SenderChat = channel
-        } else {
-                m.SenderChat = &telegram.Channel{}
-        }
-        m.Peer, _ = c.GetSendablePeer(message.(*telegram.MessageObj).PeerID)
-
-        /*if m.IsMedia() {
-                FileID := telegram.PackBotFileID(m.Media())
-                m.File = &telegram.CustomFile{
-                        FileID: FileID,
-                        Name:   getFileName(m.Media()),
-                        Size:   getFileSize(m.Media()),
-                        Ext:    getFileExt(m.Media()),
-                }
-        }*/
-        return m
-}
-`
-
-func resolveImports(code string) (string, []string) {
-	var imports []string
-	importsRegex := regexp.MustCompile(
-		`import\s*\(([\s\S]*?)\)|import\s*\"([\s\S]*?)\"`,
-	)
-	importsMatches := importsRegex.FindAllStringSubmatch(code, -1)
-	for _, v := range importsMatches {
-		if v[1] != "" {
-			imports = append(imports, v[1])
-		} else {
-			imports = append(imports, v[2])
-		}
-	}
-	code = importsRegex.ReplaceAllString(code, "")
-	return code, imports
-}
-
-func evalHandle(m *telegram.NewMessage) error {
-	if m.SenderID() != config.OwnerID {
-		return telegram.ErrEndGroup
-	}
-	code := ""
-	if x := strings.Split(m.RawText(true), " "); len(x) < 2 {
-		return telegram.ErrEndGroup
-	} else {
-		code = strings.TrimSpace(strings.Join(x[1:], " "))
-	}
-
-	code, imports := resolveImports(code)
-
-	if code == "" {
-		return nil
-	}
-
-	defer os.Remove("tmp/eval.go")
-	defer os.Remove("tmp/eval_out.txt")
-	defer os.Remove("tmp")
-
-	resp, isfile := performEval(code, m, imports)
-	if isfile {
-		if _, err := m.ReplyMedia(resp, &telegram.MediaOptions{Caption: "Output"}); err != nil {
-			m.Reply("Error: " + err.Error())
-		}
-		return nil
-	}
-	resp = strings.TrimSpace(resp)
-
-	if resp != "" {
-		if _, err := m.Reply(resp); err != nil {
-			m.Reply(err)
-		}
-	}
-	return nil
-}
-
-func performEval(
-	code string,
-	m *telegram.NewMessage,
-	imports []string,
-) (string, bool) {
-	msg_b, _ := json.Marshal(m.Message)
-	snd_b, _ := json.Marshal(m.Sender)
-	cnt_b, _ := json.Marshal(m.Chat)
-	chn_b, _ := json.Marshal(m.Channel)
-	cache_b, _ := m.Client.Cache.ExportJSON()
-	var importStatement string = ""
-	if len(imports) > 0 {
-		importStatement = "import (\n"
-		for _, v := range imports {
-			importStatement += `"` + v + `"` + "\n"
-		}
-		importStatement += ")\n"
-	}
-	ass, aErr := core.Assistants.First()
-	if aErr != nil {
-		return fmt.Sprintf("Failed to get assistant: %v", aErr), false
-	}
-	code_file := fmt.Sprintf(
-		boiler_code_for_eval,
-		importStatement,
-		m.ID,
-		msg_b,
-		snd_b,
-		cnt_b,
-		chn_b,
-		cache_b,
-		code,
-		m.Client.ExportSession(),
-		ass.Client.ExportSession(),
-	)
-	tmp_dir := "tmp"
-	_, err := os.ReadDir(tmp_dir)
-	if err != nil {
-		err = os.Mkdir(tmp_dir, 0o755)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-
-	// defer os.Remove(tmp_dir)
-
-	os.WriteFile(tmp_dir+"/eval.go", []byte(code_file), 0o644)
-	cmd := exec.Command("go", "run", "tmp/eval.go")
-	var stdOut bytes.Buffer
-	cmd.Stdout = &stdOut
-	var stdErr bytes.Buffer
-	cmd.Stderr = &stdErr
-
-	err = cmd.Run()
-	if stdOut.String() == "" && stdErr.String() == "" {
-		if err != nil {
-			return fmt.Sprintf(
-				"<b>#EVALERR:</b> <code>%s</code>",
-				err.Error(),
-			), false
-		}
-		return "<b>#EVALOut:</b> <code>No Output</code>", false
-	}
-
-	if stdOut.String() != "" {
-		if len(stdOut.String()) > 4095 {
-			os.WriteFile("tmp/eval_out.txt", stdOut.Bytes(), 0o644)
-			return "tmp/eval_out.txt", true
-		}
-
-		strDou := strings.Split(stdOut.String(), "output-start")
-
-		return fmt.Sprintf(
-			"<b>#EVALOut:</b> <code>%s</code>",
-			strings.TrimSpace(strDou[1]),
-		), false
-	}
-
-	if stdErr.String() != "" {
-		regexErr := regexp.MustCompile(`eval.go:\d+:\d+:`)
-		errMsg := regexErr.Split(stdErr.String(), -1)
-		if len(errMsg) > 1 {
-			if len(errMsg[1]) > 4095 {
-				os.WriteFile("tmp/eval_out.txt", []byte(errMsg[1]), 0o644)
-				return "tmp/eval_out.txt", true
-			}
-			return fmt.Sprintf(
-				"<b>#EVALERR:</b> <code>%s</code>",
-				strings.TrimSpace(errMsg[1]),
-			), false
-		}
-		return fmt.Sprintf(
-			"<b>#EVALERR:</b> <code>%s</code>",
-			stdErr.String(),
-		), false
-	}
-
-	return "<b>#EVALOut:</b> <code>No Output</code>", false
 }
 
 func jsonHandle(c *td.Client, m *td.Message) error {

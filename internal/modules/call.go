@@ -61,7 +61,7 @@ func streamEndHandler(
 	r.SetData("is_transitioning", true)
 	defer r.DeleteData("is_transitioning")
 
-	c := core.TDBot
+	c := core.Bot
 	cid := r.ChatID
 	r.Parse()
 

@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	td "github.com/AshokShau/gotdbot"
-	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -125,12 +124,12 @@ func mentionOfName(name string, id int64) string {
 	return td.Mention(name, id, true, true)
 }
 
-// mentionOfTg builds an HTML mention for a gogram UserObj.
-func mentionOfTg(u *tg.UserObj) string {
-	if u == nil {
+// mentionOfAssistant builds an HTML mention for an assistant account.
+func mentionOfAssistant(a *core.Assistant) string {
+	if a == nil || a.Self == nil {
 		return "Unknown"
 	}
-	return mentionOfName(strings.TrimSpace(u.FirstName+" "+u.LastName), u.ID)
+	return mentionOfName(strings.TrimSpace(a.Self.FirstName+" "+a.Self.LastName), a.Self.ID)
 }
 
 // logStart reports a bot start to the configured logger chat, if enabled.

@@ -165,7 +165,7 @@ func (f *FallenApiPlatform) downloadFromTelegram(
 		return "", fmt.Errorf("invalid telegram download url: %s", dlURL)
 	}
 
-	info, err := core.TDBot.GetMessageLinkInfo(dlURL)
+	info, err := core.Bot.GetMessageLinkInfo(dlURL)
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch Telegram message: %w", err)
 	}
@@ -178,7 +178,7 @@ func (f *FallenApiPlatform) downloadFromTelegram(
 	if OnDownloadStart != nil {
 		OnDownloadStart(fileID, statusMsg)
 	}
-	file, err := msg.Download(core.TDBot, 1, 0, 0, true)
+	file, err := msg.Download(core.Bot, 1, 0, 0, true)
 	if err != nil {
 		os.Remove(path)
 		return "", err

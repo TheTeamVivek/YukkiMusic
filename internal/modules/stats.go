@@ -157,7 +157,7 @@ func statsHandler(c *td.Client, m *td.Message) error {
 		"gogram_api_layer":  td.TDLibVersion,
 		"gogram_version":    resolveTdVersion(),
 		"ntgcalls_version":  ntgcalls.Version(),
-	}))
+	}), nil)
 	return nil
 }
 
