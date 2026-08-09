@@ -19,7 +19,6 @@ package modules
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
 	td "github.com/AshokShau/gotdbot"
@@ -41,57 +40,38 @@ type dlEntry struct {
 	total    int64
 }
 
-type dlProgress struct {
-	mu     sync.Mutex
-	once   sync.Once
-	active map[string]*dlEntry
-}
-
-var downloadProg = &dlProgress{
-	active: make(map[string]*dlEntry),
-}
+// downloadProg tracks active downloads by fileID.
+var downloadProg = utils.NewCache[string, *dlEntry](30 * time.Minute)
 
 func init() {
-	platforms.OnDownloadStart = downloadProg.Start
-	platforms.OnDownloadStop = downloadProg.Stop
+	platforms.OnDownloadStart = downloadProgressStart
 }
 
-// Start tracks download progress for fileID and edits msg as the file downloads.
-func (dp *dlProgress) Start(c *td.Client, fileID string, msg *td.Message) {
-	if c == nil || fileID == "" || msg == nil {
+// downloadProgressStart tracks download progress for fileID and edits msg
+// as the file downloads.
+func downloadProgressStart(fileID string, msg *td.Message) {
+	if fileID == "" || msg == nil {
 		return
 	}
-	dp.once.Do(func() { c.OnUpdateFile(dp.handleUpdate, nil) })
-
-	dp.mu.Lock()
-	defer dp.mu.Unlock()
-	dp.active[fileID] = &dlEntry{msg: msg, started: time.Now()}
+	downloadProg.Set(fileID, &dlEntry{msg: msg, started: time.Now()})
 }
 
-// Stop stops tracking download progress for fileID.
-func (dp *dlProgress) Stop(fileID string) {
-	if fileID == "" {
-		return
-	}
-	dp.mu.Lock()
-	defer dp.mu.Unlock()
-	delete(dp.active, fileID)
-}
-
-func (dp *dlProgress) handleUpdate(c *td.Client, u *td.UpdateFile) error {
+// downloadUpdateHandler is registered in handlers.go and drives the
+// "Downloading..." progress edits. Entries clean themselves up once the
+// download finishes or is cancelled, so no stop hook is needed.
+func downloadUpdateHandler(c *td.Client, u *td.UpdateFile) error {
 	if u == nil || u.File == nil || u.File.Remote == nil || u.File.Local == nil {
 		return nil
 	}
 
-	dp.mu.Lock()
-	e, ok := dp.active[u.File.Remote.Id]
-	dp.mu.Unlock()
+	e, ok := downloadProg.Get(u.File.Remote.Id)
 	if !ok {
 		return nil
 	}
 
 	now := time.Now()
-	if now.Sub(e.lastEdit) < downloadEditInterval && !u.File.Local.IsDownloadingCompleted {
+	done := !u.File.Local.IsDownloadingActive
+	if now.Sub(e.lastEdit) < downloadEditInterval && !done {
 		return nil
 	}
 	interval := now.Sub(e.lastEdit).Seconds()
@@ -143,7 +123,14 @@ func (dp *dlProgress) handleUpdate(c *td.Client, u *td.UpdateFile) error {
 	if _, err := e.msg.EditText(c, text, &td.EditTextMessageOpts{
 		ParseMode: td.ParseModeHTML,
 	}); err != nil {
-		dp.Stop(u.File.Remote.Id)
+		// Ignore edit errors; the download keeps going and the next
+		// update will retry. The entry is cleaned up once the download
+		// finishes or is cancelled.
+		return nil
+	}
+
+	if done {
+		downloadProg.Delete(u.File.Remote.Id)
 	}
 
 	return nil

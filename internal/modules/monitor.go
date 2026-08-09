@@ -57,24 +57,28 @@ func MonitorRooms() {
 				}
 
 				r.Parse()
+
+				track := r.Track()
 				statusMsg := r.StatusMsg()
-				if statusMsg == nil {
+				if track == nil || statusMsg == nil {
 					return
 				}
 
+				text := nowPlayingText(r.ChatID, track)
 				markup := core.GetPlayMarkup(r.ChatID, r, false)
 
-				text := statusMsg.Text()
-				var entities []td.TextEntity
-				if mt, ok := statusMsg.Content.(*td.MessageText); ok && mt.Text != nil {
-					text = mt.Text.Text
-					entities = mt.Text.Entities
+				switch statusMsg.Content.(type) {
+				case *td.MessagePhoto:
+					_, _ = statusMsg.EditCaption(core.TDBot, text, &td.EditCaptionOpts{
+						ParseMode:   td.ParseModeHTML,
+						ReplyMarkup: markup,
+					})
+				default:
+					_, _ = statusMsg.EditText(core.TDBot, text, &td.EditTextMessageOpts{
+						ParseMode:   td.ParseModeHTML,
+						ReplyMarkup: markup,
+					})
 				}
-
-				statusMsg.EditText(core.TDBot, text, &td.EditTextMessageOpts{
-					ReplyMarkup: markup,
-					Entities:    entities,
-				})
 			}(chatID, room)
 		}
 	}

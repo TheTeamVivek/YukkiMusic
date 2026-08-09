@@ -146,12 +146,9 @@ func (t *TelegramPlatform) Download(
 
 	fileID := msg.RemoteFileID()
 	if OnDownloadStart != nil {
-		OnDownloadStart(core.TDBot, fileID, statusMsg)
+		OnDownloadStart(fileID, statusMsg)
 	}
 	file, err := msg.Download(core.TDBot, 1, 0, 0, true)
-	if OnDownloadStop != nil {
-		OnDownloadStop(fileID)
-	}
 	if err != nil {
 		os.Remove(path)
 		if errors.Is(err, context.Canceled) {

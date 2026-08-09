@@ -164,6 +164,7 @@ func Init(tdbot *td.Client, bot *telegram.Client, assistants *core.AssistantMana
 	tdbot.OnUpdateNewCallbackQuery(WithBlacklistCallback(helpCallbackHandler), callbackquery.Regex("^help:(.+)$"))
 	tdbot.OnUpdateChatMember(handleParticipantUpdate, nil)
 	tdbot.OnMessage(WithBlacklistMessage(handleActions), actionFilter)
+	tdbot.OnUpdateFile(downloadUpdateHandler, nil)
 
 	bot.On("edit:/eval", evalHandle).SetGroup(80)
 

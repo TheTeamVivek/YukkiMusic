@@ -98,6 +98,16 @@ func shouldShowThumb(chatID int64) bool {
 // sendNowPlaying sends or edits the "now playing" playback message for the
 // given track, honoring the thumbnail/artwork setting, and returns the
 // resulting message.
+// nowPlayingText builds the "now playing" status text for a track.
+func nowPlayingText(chatID int64, t *state.Track) string {
+	return F(chatID, "stream_now_playing", locales.Arg{
+		"url":      t.URL,
+		"title":    utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
+		"duration": utils.FormatDuration(t.Duration),
+		"by":       t.Requester,
+	})
+}
+
 func sendNowPlaying(
 	c *td.Client,
 	statusMsg *td.Message,
@@ -105,12 +115,7 @@ func sendNowPlaying(
 	r *core.RoomState,
 	t *state.Track,
 ) *td.Message {
-	msgText := F(chatID, "stream_now_playing", locales.Arg{
-		"url":      t.URL,
-		"title":    utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
-		"duration": utils.FormatDuration(t.Duration),
-		"by":       t.Requester,
-	})
+	msgText := nowPlayingText(chatID, t)
 
 	opts := &td.SendTextMessageOpts{
 		ParseMode:   "HTML",
