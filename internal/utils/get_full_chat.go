@@ -20,33 +20,30 @@ package utils
 import (
 	"fmt"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 )
 
-func GetFullChannel(
-	client *telegram.Client,
-	chatID int64,
-) (*telegram.ChannelFull, error) {
-	peer, err := client.ResolvePeer(chatID)
-	if err != nil {
-		return nil, err
-	}
-	chPeer, ok := peer.(*telegram.InputPeerChannel)
-	if !ok {
-		return nil, fmt.Errorf(
-			"chatID %d is not an InputPeerChannel, got %T",
-			chatID,
-			peer,
-		)
-	}
+// FullChat bundles a chat with its supergroup full info (when the chat is a
+// supergroup or channel).
+type FullChat struct {
+	Chat               *td.Chat
+	SupergroupFullInfo *td.SupergroupFullInfo
+}
 
-	fullChat, err := client.ChannelsGetFullChannel(&telegram.InputChannelObj{
-		ChannelID:  chPeer.ChannelID,
-		AccessHash: chPeer.AccessHash,
-	})
+// GetFullChat fetches the chat (and its supergroup full info) for chatID.
+func GetFullChat(c *td.Client, chatID int64) (*FullChat, error) {
+	chat, err := c.GetChat(chatID)
 	if err != nil {
 		return nil, err
 	}
 
-	return fullChat.FullChat.(*telegram.ChannelFull), nil
+	fc := &FullChat{Chat: chat}
+	if ct, ok := chat.Type.(*td.ChatTypeSupergroup); ok {
+		full, err := c.GetSupergroupFullInfo(ct.SupergroupId)
+		if err != nil {
+			return nil, fmt.Errorf("get supergroup full info: %w", err)
+		}
+		fc.SupergroupFullInfo = full
+	}
+	return fc, nil
 }

@@ -34,17 +34,13 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"time"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
-	"yukkimusic/internal/modules"
-
-	td "github.com/AshokShau/gotdbot"
-	gotdlogger "github.com/AshokShau/gotdbot/logger"
 	"yukkimusic/internal/logger"
+	"yukkimusic/internal/modules"
 )
 
 func main() {
@@ -97,28 +93,11 @@ func main() {
 		logger.Fatalf("failed to rebalance assistants: %v", err)
 	}
 
-	tdbot, err := td.NewClient(config.APIID, config.APIHash, config.Token, &td.ClientOpts{
-		LibraryPath: "./libtdjson.so.1.8.66",
-		ParseMode:   td.ParseModeHTML,
-		AutoRetry: &td.AutoRetry{
-			ChatNotFound:    true,
-			MessageNotFound: true,
-			MaxFloodWait:    30 * time.Second,
-		},
-		Logger: gotdlogger.New(gotdlogger.WithHandler(
-			logger.NewHandler(io.MultiWriter(os.Stderr, f), logger.InfoLevel),
-		)),
-	})
-	if err != nil {
-		logger.Fatalf("failed to create tdbot client: %v", err)
-	}
-
-	core.TDBot = tdbot
-	modules.Init(tdbot, core.Bot, core.Assistants)
+	modules.Init(core.TDBot, core.Assistants)
 
 	startHTTPServer()
 
-	core.Bot.Idle()
+	core.TDBot.Idle()
 }
 
 func startHTTPServer() {

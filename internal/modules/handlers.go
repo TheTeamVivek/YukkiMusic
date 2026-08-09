@@ -20,29 +20,15 @@ package modules
 import (
 	td "github.com/AshokShau/gotdbot"
 	"github.com/AshokShau/gotdbot/filters/callbackquery"
-	"github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
 )
 
-func Init(tdbot *td.Client, bot *telegram.Client, assistants *core.AssistantManager) {
-	bot.UpdatesGetState()
+func Init(tdbot *td.Client, assistants *core.AssistantManager) {
 	assistants.ForEach(func(a *core.Assistant) {
 		a.Client.UpdatesGetState()
 	})
-
-	// Gogram-only handlers (pending play.go port)
-	bot.AddCommandHandler("(bash|sh)", shellHandle).SetGroup(100)
-	bot.AddCommandHandler("eval", evalHandle).SetGroup(100)
-	bot.AddCommandHandler("play", playHandler).SetGroup(100)
-	bot.AddCommandHandler("vplay", vplayHandler).SetGroup(100)
-	bot.AddCommandHandler("(cfplay|fcplay|cplayforce)", cfplayHandler).SetGroup(100)
-	bot.AddCommandHandler("(fplay|playforce)", fplayHandler).SetGroup(100)
-	bot.AddCommandHandler("(fvplay|vfplay|vplayforce)", fvplayHandler).SetGroup(100)
-	bot.AddCommandHandler("(fvcplay|fvcpay|vcplayforce)", fvcplayHandler).SetGroup(100)
-	bot.AddCommandHandler("(vcplay|cvplay)", vcplayHandler).SetGroup(100)
-	bot.AddCommandHandler("cplay", cplayHandler).SetGroup(100)
 
 	// td client handlers
 	tdbot.OnCommand("start", WithBlacklistMessage(startHandler))
@@ -165,8 +151,6 @@ func Init(tdbot *td.Client, bot *telegram.Client, assistants *core.AssistantMana
 	tdbot.OnUpdateChatMember(handleParticipantUpdate, nil)
 	tdbot.OnMessage(WithBlacklistMessage(handleActions), actionFilter)
 	tdbot.OnUpdateFile(downloadUpdateHandler, nil)
-
-	bot.On("edit:/eval", evalHandle).SetGroup(80)
 
 	tdbot.OnUpdateChatReadOutbox(cleanModeReadHandler, nil)
 	tdbot.OnUpdateNewCallbackQuery(WithBlacklistCallback(cancelHandler), callbackquery.Equal("cancel"))

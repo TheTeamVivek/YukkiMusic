@@ -20,9 +20,11 @@ package core
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
+	td "github.com/AshokShau/gotdbot"
 	"github.com/amarnathcjd/gogram/telegram"
 	"yukkimusic/internal/logger"
 
@@ -152,22 +154,22 @@ func (s *ChatState) refresh() error {
 			return err
 		}
 	}
-	full, err := utils.GetFullChannel(Bot, s.ChatID)
+	full, err := utils.GetFullChat(TDBot, s.ChatID)
 	if err != nil {
-		logger.Errorf("chat_state: GetFullChannel failed for %d: %v", s.ChatID, err)
+		logger.Errorf("chat_state: GetFullChat failed for %d: %v", s.ChatID, err)
 		if isAdminError(err) {
 			return ErrAdminPermissionRequired
 		}
 		return fmt.Errorf("%w: %v", ErrStateFetchFailed, err)
 	}
 
-	member, err := Bot.GetChatMember(s.ChatID, s.Assistant.Self.ID)
+	voiceActive := false
+	if full.Chat.VideoChat != nil && full.Chat.VideoChat.GroupCallId != 0 {
+		voiceActive = true
+	}
+
+	member, err := TDBot.GetChatMember(s.ChatID, &td.MessageSenderUser{UserId: s.Assistant.Self.ID})
 	if err != nil {
-		if telegram.MatchError(err, "USER_NOT_PARTICIPANT") || telegram.MatchError(err, "PARTICIPANT_ID_INVALID") {
-			s.applySnapshot(false, false, full.Call != nil)
-			logger.Debugf("chat_state: assistant not participant in %d", s.ChatID)
-			return nil
-		}
 		if isAdminError(err) {
 			logger.Errorf("chat_state: admin permission required for GetChatMember in %d", s.ChatID)
 			return ErrAdminPermissionRequired
@@ -176,27 +178,28 @@ func (s *ChatState) refresh() error {
 	}
 
 	present, banned := membership(member)
-	s.applySnapshot(present, banned, full.Call != nil)
-	if full.ExportedInvite != nil {
-		if inv, ok := full.ExportedInvite.(*telegram.ChatInviteExported); ok && inv.Link != "" {
-			s.setInviteLink(inv.Link)
-		}
+	s.applySnapshot(present, banned, voiceActive)
+	if full.SupergroupFullInfo != nil &&
+		full.SupergroupFullInfo.InviteLink != nil &&
+		full.SupergroupFullInfo.InviteLink.InviteLink != "" {
+		s.setInviteLink(full.SupergroupFullInfo.InviteLink.InviteLink)
 	}
 	return nil
 }
 
-func membership(m *telegram.Participant) (bool, bool) {
+func membership(m *td.ChatMember) (bool, bool) {
 	if m == nil {
 		return false, false
 	}
-	if m.Status == telegram.Restricted {
-		if b, ok := m.Participant.(*telegram.ChannelParticipantBanned); ok && b.BannedRights.ViewMessages {
+	switch st := m.Status.(type) {
+	case *td.ChatMemberStatusBanned:
+		return false, true
+	case *td.ChatMemberStatusRestricted:
+		if !st.IsMember {
 			return false, true
 		}
 		return true, false
-	}
-	switch m.Status {
-	case telegram.Member, telegram.Admin, telegram.Creator:
+	case *td.ChatMemberStatusMember, *td.ChatMemberStatusAdministrator, *td.ChatMemberStatusCreator:
 		return true, false
 	}
 	return false, false
@@ -255,41 +258,41 @@ func (s *ChatState) resolveInviteLink() (string, error) {
 	if cached != "" {
 		return cached, nil
 	}
-	inv, err := Bot.GetChatInviteLink(s.ChatID, &telegram.InviteLinkOptions{RequestNeeded: false})
+	full, err := utils.GetFullChat(TDBot, s.ChatID)
 	if err != nil {
 		if isAdminError(err) {
 			return "", ErrAdminPermissionRequired
 		}
 		return "", fmt.Errorf("%w: %v", ErrAssistantInviteLinkFetch, err)
 	}
-	link, ok := inv.(*telegram.ChatInviteExported)
-	if !ok || link.Link == "" {
+	if full.SupergroupFullInfo != nil &&
+		full.SupergroupFullInfo.InviteLink != nil &&
+		full.SupergroupFullInfo.InviteLink.InviteLink != "" {
+		s.setInviteLink(full.SupergroupFullInfo.InviteLink.InviteLink)
+		return full.SupergroupFullInfo.InviteLink.InviteLink, nil
+	}
+	inv, err := TDBot.CreateChatInviteLink(s.ChatID, 0, 0, "", nil)
+	if err != nil {
+		if isAdminError(err) {
+			return "", ErrAdminPermissionRequired
+		}
+		return "", fmt.Errorf("%w: %v", ErrAssistantInviteLinkFetch, err)
+	}
+	if inv == nil || inv.InviteLink == "" {
 		return "", ErrAssistantInviteLinkFetch
 	}
-	s.setInviteLink(link.Link)
-	return link.Link, nil
+	s.setInviteLink(inv.InviteLink)
+	return inv.InviteLink, nil
 }
 
 func (s *ChatState) approveJoinRequest() error {
 	logger.Debugf("chat_state: approveJoinRequest(chat=%d)", s.ChatID)
-	chatPeer, err := Bot.ResolvePeer(s.ChatID)
-	if err != nil {
-		return err
-	}
-	userPeer, err := Bot.ResolvePeer(s.Assistant.Self.ID)
-	if err != nil {
-		return err
-	}
-	u, ok := userPeer.(*telegram.InputPeerUser)
-	if !ok {
-		return ErrJoinFailed
-	}
-	_, err = Bot.MessagesHideChatJoinRequest(
-		true,
-		chatPeer,
-		&telegram.InputUserObj{UserID: u.UserID, AccessHash: u.AccessHash},
+	err := TDBot.ProcessChatJoinRequest(
+		s.ChatID,
+		s.Assistant.Self.ID,
+		&td.ProcessChatJoinRequestOpts{Approve: true},
 	)
-	if err == nil || telegram.MatchError(err, "USER_ALREADY_PARTICIPANT") {
+	if err == nil {
 		s.applySnapshot(true, false, s.snapshot.VoiceChatActive)
 		return nil
 	}
@@ -375,7 +378,19 @@ func (s *ChatState) leaveInactiveAssistantChats(limit int) {
 }
 
 func isAdminError(err error) bool {
-	return telegram.MatchError(err, "CHAT_ID_INVALID") || telegram.MatchError(err, "CHAT_ADMIN_REQUIRED") ||
-		telegram.MatchError(err, "CHANNEL_PRIVATE") ||
-		telegram.MatchError(err, "CHANNEL_INVALID")
+	if telegram.MatchError(err, "CHAT_ID_INVALID") || telegram.MatchError(err, "CHAT_ADMIN_REQUIRED") ||
+		telegram.MatchError(err, "CHANNEL_PRIVATE") || telegram.MatchError(err, "CHANNEL_INVALID") {
+		return true
+	}
+
+	var tde *td.Error
+	if errors.As(err, &tde) {
+		msg := strings.ToLower(tde.Message)
+		return tde.Code == 404 ||
+			strings.Contains(msg, "chat not found") ||
+			strings.Contains(msg, "chat admin privileges") ||
+			strings.Contains(msg, "not enough rights") ||
+			strings.Contains(msg, "channel private")
+	}
+	return false
 }

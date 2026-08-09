@@ -22,9 +22,12 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
+	"os"
 	"strings"
 	"time"
 
+	td "github.com/AshokShau/gotdbot"
+	gotdlogger "github.com/AshokShau/gotdbot/logger"
 	"github.com/amarnathcjd/gogram/telegram"
 	"yukkimusic/internal/logger"
 
@@ -33,8 +36,6 @@ import (
 )
 
 var (
-	Bot *telegram.Client
-
 	Assistants            *AssistantManager
 	GetAssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // GetAssistantIndexFunc = database.AssistantIndex
 )
@@ -52,11 +53,9 @@ func Init() (func(), error) {
 		return nil, fmt.Errorf("assistants initialization: %w", err)
 	}
 
-	Bot.SetCommandPrefixes("/")
-
 	shutdown := func() {
 		logger.Info("Stopping bot...")
-		Bot.Stop()
+		TDBot.Close()
 
 		logger.Info("Shutting down assistants...")
 		Assistants.ForEach(func(a *Assistant) {
@@ -71,39 +70,36 @@ func Init() (func(), error) {
 }
 
 func initBot() error {
-	client, err := telegram.NewClient(telegram.ClientConfig{
-		AppID:   config.APIID,
-		AppHash: config.APIHash,
-		ParseMode:    "HTML",
-		Session:      "bot.session",
-		FloodHandler: handleFlood,
+	client, err := td.NewClient(config.APIID, config.APIHash, config.Token, &td.ClientOpts{
+		LibraryPath: "./libtdjson.so.1.8.66",
+		ParseMode:   td.ParseModeHTML,
+		AutoRetry: &td.AutoRetry{
+			ChatNotFound:    true,
+			MessageNotFound: true,
+			MaxFloodWait:    30 * time.Second,
+		},
+		Logger: gotdlogger.New(gotdlogger.WithHandler(
+			logger.NewHandler(os.Stderr, logger.InfoLevel),
+		)),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create bot client: %w", err)
-	}
-
-	if err := client.LoginBot(config.Token); err != nil {
-		if strings.Contains(err.Error(), "ACCESS_TOKEN_EXPIRED") {
-			return fmt.Errorf("bot token has been revoked or expired")
-		}
-		return fmt.Errorf("failed to start the bot: %w", err)
 	}
 
 	user, err := client.GetMe()
 	if err != nil {
 		return fmt.Errorf("failed to fetch bot identity: %w", err)
 	}
+	client.Me = user
+
+	TDBot = client
 
 	if config.LoggerID != 0 {
-		_, _ = client.SendMessage(
-			config.LoggerID,
-			"Bot Started",
-		)
+		_, _ = client.SendTextMessage(config.LoggerID, "Bot Started", nil)
 	}
 
-	logger.Infof("Bot started as @%s", user.Username)
+	logger.Infof("Bot started as @%s", botUsername())
 
-	Bot = client
 	return nil
 }
 
@@ -127,7 +123,7 @@ func initAssistants() error {
 			)
 		}
 
-		m, _ := assistant.Client.SendMessage(Bot.Me().Username, "/start")
+		m, _ := assistant.Client.SendMessage(botUsername(), "/start")
 		if m != nil {
 			_, _ = m.Delete()
 		}
@@ -185,22 +181,6 @@ func initAssistant(
 		Self:   user,
 		Ntg:    ubot.NewContext(client),
 	}, nil
-}
-
-func handleFlood(err error) bool {
-	wait := telegram.GetFloodWait(err)
-	if wait <= 0 {
-		return false
-	}
-
-	if wait > 10 {
-		logger.Warnf("Flood wait too long, skipping sleep %d seconds", wait)
-		return false
-	}
-
-	logger.Warnf("Flood wait detected, sleeping %d seconds", wait)
-	time.Sleep(time.Duration(wait) * time.Second)
-	return true
 }
 
 func resolveSession(session string) (string, error) {
