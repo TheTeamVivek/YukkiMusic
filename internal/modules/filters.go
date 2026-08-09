@@ -36,6 +36,41 @@ func getCommand(m *td.Message) string {
 	return cmd
 }
 
+func isChannelChat(c *td.Client, m *td.Message) bool {
+	chat, err := m.GetChat(c)
+	if err != nil {
+		return false
+	}
+	sg, ok := chat.Type.(*td.ChatTypeSupergroup)
+	return ok && sg.IsChannel
+}
+
+func botUsername(c *td.Client) string {
+	if c.Me == nil {
+		me, err := c.GetMe()
+		if err != nil || me == nil {
+			return ""
+		}
+		c.Me = me
+	}
+	if c.Me.Usernames == nil || len(c.Me.Usernames.ActiveUsernames) == 0 {
+		return ""
+	}
+	return strings.ToLower(c.Me.Usernames.ActiveUsernames[0])
+}
+
+func isCommandForBot(c *td.Client, m *td.Message) bool {
+	fields := strings.Fields(m.Text())
+	if len(fields) == 0 {
+		return false
+	}
+	_, mention, ok := strings.Cut(fields[0], "@")
+	if !ok || mention == "" {
+		return false
+	}
+	return strings.EqualFold(mention, botUsername(c))
+}
+
 func checkSudo(c *td.Client, m *td.Message) bool {
 	if !isOwnerOrSudo(m.SenderID()) {
 		m.ReplyText(c, F(m.ChatID(), "only_sudo"), nil)

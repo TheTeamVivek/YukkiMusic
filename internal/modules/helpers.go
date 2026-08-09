@@ -202,6 +202,35 @@ func WithBlacklistCallback(
 	}
 }
 
+func WithBlacklistMessage(
+	handler func(*td.Client, *td.Message) error,
+) func(*td.Client, *td.Message) error {
+	return func(c *td.Client, m *td.Message) error {
+		if blockedChat, _ := database.IsBlacklistedChat(m.ChatID()); blockedChat {
+			if isOwnerOrSudo(m.SenderID()) {
+				return handler(c, m)
+			}
+			m.ReplyText(c, F(m.ChatID(), "blacklist_chat_blocked"), nil)
+			leaveChat(c, m.ChatID())
+			return nil
+		}
+		if blocked, _ := database.IsBlacklistedUser(m.SenderID()); blocked {
+			if isChannelChat(c, m) {
+				if chatOwnerID, err := utils.GetChatOwner(c, m.ChatID()); err == nil && chatOwnerID == m.SenderID() {
+					m.ReplyText(c, F(m.ChatID(), "blacklist_owner_blocked_leave"), nil)
+					leaveChat(c, m.ChatID())
+					return nil
+				}
+			}
+			if m.IsPrivate() || isCommandForBot(c, m) {
+				m.ReplyText(c, F(m.ChatID(), "blacklist_user_blocked"), nil)
+			}
+			return nil
+		}
+		return handler(c, m)
+	}
+}
+
 func warnAndLeave(c *td.Client, chatID int64) {
 	text := F(chatID, "supergroup_needed", locales.Arg{
 		"chat_id":       chatID,

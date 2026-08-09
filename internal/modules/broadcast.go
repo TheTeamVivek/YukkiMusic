@@ -460,6 +460,10 @@ func (bm *BroadcastManager) sendMessage(
 	err = try()
 
 	if err != nil {
+		// TODO: gotdbot returns td.Error which carries a numeric Code plus a Message,
+		// so the codes (USER_IS_BLOCKED / CHAT_WRITE_FORBIDDEN / USER_IS_DEACTIVATED)
+		// should ideally be matched on the error itself instead of string-matching the
+		// error message. Verify gotdbot's error surface and refactor accordingly.
 		if !strings.Contains(err.Error(), "USER_IS_BLOCKED") &&
 			!strings.Contains(err.Error(), "CHAT_WRITE_FORBIDDEN") &&
 			!strings.Contains(err.Error(), "USER_IS_DEACTIVATED") {
