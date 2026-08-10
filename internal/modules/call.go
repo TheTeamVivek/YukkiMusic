@@ -52,15 +52,6 @@ func streamEndHandler(
 	}
 	scheduleOldPlayingMessage(r)
 
-	if ok, v := r.GetData("is_transitioning"); ok {
-		if ok, v := v.(bool); ok && v {
-			return
-		}
-	}
-
-	r.SetData("is_transitioning", true)
-	defer r.DeleteData("is_transitioning")
-
 	c := core.Bot
 	cid := r.ChatID
 	r.Parse()
