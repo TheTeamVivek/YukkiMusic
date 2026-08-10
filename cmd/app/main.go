@@ -107,7 +107,7 @@ func startHTTPServer() {
 		logger.Infof("HTTP server listening on %s", addr)
 
 		if err := http.ListenAndServe(addr, nil); err != nil {
-			logger.Fatalf("HTTP server failed: %v", err)
+			// logger.Fatalf("HTTP server failed: %v", err)
 		}
 	}()
 }
