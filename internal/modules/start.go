@@ -110,7 +110,7 @@ func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 		Caption: formattedCaption,
 	}
 
-	_, err = msg.EditMessageMedia(c, content, &td.EditMessageMediaOpts{
+	_, err = c.EditMessageMedia(cb.ChatId, content, msg.Id, &td.EditMessageMediaOpts{
 		ReplyMarkup: markup,
 	})
 	return err
