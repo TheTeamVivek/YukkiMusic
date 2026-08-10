@@ -46,7 +46,7 @@ var (
 func Init() (func(), error) {
 	logger.Info("Starting bot client...")
 	if err := initBot(); err != nil {
-		return nil, fmt.Errorf("bot initialization: %w", err)
+		return nil, err
 	}
 
 	logger.Info("Starting assistant clients...")
