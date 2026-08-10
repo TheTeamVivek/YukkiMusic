@@ -92,7 +92,7 @@ func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 	markup := core.GetStartMarkup(cb.ChatId)
 
 	if isPhotoMessage(msg) {
-		_, err = cb.EditMessageCaption(c, caption, &td.EditMessageCaptionOpts{
+		_, err = cb.EditMessageCaption(c, caption, &td.EditCaptionOpts{
 			ReplyMarkup: markup,
 		})
 	} else {
