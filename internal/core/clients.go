@@ -91,12 +91,10 @@ func initBot() error {
 		return fmt.Errorf("failed to create bot client: %w", err)
 	}
 
-	user, err := client.GetMe()
+	err = client.Start()
 	if err != nil {
-		return fmt.Errorf("failed to fetch bot identity: %w", err)
+		return fmt.Errorf("failed to start bot: %w", err)
 	}
-	client.Me = user
-
 	Bot = client
 
 	if config.LoggerID != 0 {
