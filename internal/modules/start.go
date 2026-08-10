@@ -116,33 +116,6 @@ func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 	return err
 }
 
-/*
-
-func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
-	cb.Answer(c, 0, false, "", "")
-
-	msg, err := cb.GetMessage(c)
-	if err != nil {
-		return err
-	}
-	sender, _ := msg.GetUser(c)
-
-	caption := startCaption(c, cb.ChatId, sender, msg.SenderID())
-	markup := core.GetStartMarkup(cb.ChatId)
-
-	if isPhotoMessage(msg) {
-
-		_, err = cb.EditMessageCaption(c, caption, &td.EditCaptionOpts{
-			ReplyMarkup: markup,
-		})
-} else {
-
-		_, err = cb.EditMessageText(c, caption, &td.EditTextMessageOpts{
-			ReplyMarkup: markup,
-		})
-	}
-	return err
-}*/
 
 func isPhotoMessage(m *td.Message) bool {
 	_, ok := m.Content.(*td.MessagePhoto)
