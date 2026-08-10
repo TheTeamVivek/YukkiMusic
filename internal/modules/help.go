@@ -72,9 +72,23 @@ func helpHandler(c *td.Client, m *td.Message) error {
 
 func helpCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 	cb.Answer(c, 0, false, "", "")
-	_, err := cb.EditMessageText(c, F(cb.ChatId, "help_main"), &td.EditTextMessageOpts{
-		ReplyMarkup: core.GetHelpKeyboard(cb.ChatId),
-	})
+
+	msg, err := cb.GetMessage(c)
+	if err != nil {
+		return err
+	}
+
+	markup := core.GetHelpKeyboard(cb.ChatId)
+
+	if isPhotoMessage(msg) {
+		_, err = cb.EditMessageCaption(c, F(cb.ChatId, "help_main"), &td.EditCaptionOpts{
+			ReplyMarkup: markup,
+		})
+	} else {
+		_, err = cb.EditMessageText(c, F(cb.ChatId, "help_main"), &td.EditTextMessageOpts{
+			ReplyMarkup: markup,
+		})
+	}
 	return err
 }
 
