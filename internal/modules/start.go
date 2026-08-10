@@ -65,7 +65,7 @@ func handlePmStart(c *td.Client, m *td.Message, sender *td.User) error {
 	caption := startCaption(c, m.ChatID(), sender, m.SenderID())
 
 	if image := config.StartImage(); image != "" {
-		if _, err := m.ReplyPhoto(c, td.InputFileRemote{Id: image}, &td.SendPhotoOpts{
+		if _, err := c.SendPhoto(m.ChatID(), td.InputFileRemote{Id: image}, &td.SendPhotoOpts{
 			Caption:     caption,
 			ReplyMarkup: core.GetStartMarkup(m.ChatID()),
 		}); err == nil {
@@ -73,7 +73,7 @@ func handlePmStart(c *td.Client, m *td.Message, sender *td.User) error {
 		}
 	}
 
-	_, err := m.ReplyText(c, caption, &td.SendTextMessageOpts{
+	_, err := c.SendTextMessage(m.ChatID(), caption, &td.SendTextMessageOpts{
 		ReplyMarkup: core.GetStartMarkup(m.ChatID()),
 	})
 	return err
@@ -89,11 +89,24 @@ func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 	sender, _ := msg.GetUser(c)
 
 	caption := startCaption(c, cb.ChatId, sender, msg.SenderID())
+	markup := core.GetStartMarkup(cb.ChatId)
 
-	_, err = cb.EditMessageText(c, caption, &td.EditTextMessageOpts{
-		ReplyMarkup: core.GetStartMarkup(cb.ChatId),
-	})
+	if isPhotoMessage(msg) {
+		_, err = cb.EditMessageCaption(c, caption, &td.EditMessageCaptionOpts{
+			ReplyMarkup: markup,
+		})
+	} else {
+		_, err = cb.EditMessageText(c, caption, &td.EditTextMessageOpts{
+			ReplyMarkup: markup,
+		})
+	}
 	return err
+}
+
+
+func isPhotoMessage(m *td.Message) bool {
+	_, ok := m.Content.(*td.MessageContentPhoto)
+	return ok
 }
 
 // isChannelPost reports whether m came from a broadcast channel.
