@@ -121,7 +121,20 @@ func helpCallbackHandler(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 		btn = core.GetHelpKeyboard(chatID)
 	}
 
-	_, err := cb.EditMessageText(c, text, &td.EditTextMessageOpts{ReplyMarkup: btn})
+	msg, err := cb.GetMessage(c)
+	if err != nil {
+		return err
+	}
+
+	if isPhotoMessage(msg) {
+		_, err = cb.EditMessageCaption(c, text, &td.EditCaptionOpts{
+			ReplyMarkup: btn,
+		})
+	} else {
+		_, err = cb.EditMessageText(c, text, &td.EditTextMessageOpts{
+			ReplyMarkup: btn,
+		})
+	}
 	return err
 }
 
