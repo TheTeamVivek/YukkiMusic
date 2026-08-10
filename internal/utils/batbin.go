@@ -21,8 +21,9 @@ import (
 	"fmt"
 	"time"
 
-	"resty.dev/v3"
 	"yukkimusic/internal/logger"
+
+	"resty.dev/v3"
 )
 
 const batbinBaseURL = "https://batbin.me/"

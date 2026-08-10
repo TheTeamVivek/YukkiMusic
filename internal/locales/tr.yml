@@ -437,9 +437,7 @@ play_single_track_too_long: |
   ⚠️ {limit_mins} dakikadan uzun şarkıları oynatamazsın.
   <i>{title}</i> atlandı.
 
-play_download_failed: |
-  ❌ "<i>{title}</i>" indirilemedi.
-  Hata: <code>{error}</code>
+play_download_failed: "❌ İndirme başarısız. Lütfen tekrar deneyin."
 
 play_added_to_queue_single: |
   <b>🎵 Sıraya Eklendi:</b> #{index}

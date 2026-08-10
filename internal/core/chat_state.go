@@ -24,9 +24,10 @@ import (
 	"sync"
 	"time"
 
+	"yukkimusic/internal/logger"
+
 	td "github.com/AshokShau/gotdbot"
 	"github.com/amarnathcjd/gogram/telegram"
-	"yukkimusic/internal/logger"
 )
 
 var (

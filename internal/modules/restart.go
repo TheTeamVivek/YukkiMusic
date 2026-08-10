@@ -24,8 +24,9 @@ import (
 	"syscall"
 	"time"
 
-	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
+
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"

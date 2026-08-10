@@ -28,9 +28,10 @@ import (
 	"sync"
 	"time"
 
+	"yukkimusic/internal/logger"
+
 	td "github.com/AshokShau/gotdbot"
 	"resty.dev/v3"
-	"yukkimusic/internal/logger"
 
 	state "yukkimusic/internal/core/models"
 	"yukkimusic/internal/database"

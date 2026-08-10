@@ -438,9 +438,7 @@ play_single_track_too_long: |
   ⚠️ आप {limit_mins} मिनट से अधिक लम्बे गीत नहीं चला सकते।
   <i>{title}</i> को छोड़ दिया गया।
 
-play_download_failed: |
-  ❌ "<i>{title}</i>" को अभिलेखित करने में विफल।
-  त्रुटि: <code>{error}</code>
+play_download_failed: "❌ डाउनलोड विफल। कृपया पुनः प्रयास करें।"
 
 play_added_to_queue_single: |
   <b>🎵 प्रतीक्षा सूची में जोड़ा गया:</b> #{index}

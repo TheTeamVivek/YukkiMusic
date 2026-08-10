@@ -27,10 +27,11 @@ import (
 	"strings"
 	"time"
 
+	"yukkimusic/internal/logger"
+
 	td "github.com/AshokShau/gotdbot"
 	gotdlogger "github.com/AshokShau/gotdbot/logger"
 	"github.com/amarnathcjd/gogram/telegram"
-	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/ubot"

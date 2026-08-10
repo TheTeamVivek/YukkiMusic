@@ -27,8 +27,9 @@ import (
 	"sync"
 	"time"
 
-	"resty.dev/v3"
 	"yukkimusic/internal/logger"
+
+	"resty.dev/v3"
 
 	"yukkimusic/config"
 )

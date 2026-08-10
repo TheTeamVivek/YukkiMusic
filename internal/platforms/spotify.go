@@ -26,11 +26,12 @@ import (
 	"sync"
 	"time"
 
+	"yukkimusic/internal/logger"
+
 	td "github.com/AshokShau/gotdbot"
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 	"golang.org/x/oauth2/clientcredentials"
-	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	state "yukkimusic/internal/core/models"

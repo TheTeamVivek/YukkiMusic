@@ -438,9 +438,7 @@ play_single_track_too_long: |
   ⚠️ لا يمكنك تشغيل أغاني أطول من {limit_mins} دقيقة.
   تم تخطي <i>{title}</i>.
 
-play_download_failed: |
-  ❌ فشل تنزيل \"<i>{title}</i>\".
-  الخطأ: <code>{error}</code>
+play_download_failed: "❌ فشل التنزيل. حاول مرة أخرى."
 
 play_added_to_queue_single: |
   <b>🎵 تمت الإضافة لقائمة الانتظار:</b> #{index}

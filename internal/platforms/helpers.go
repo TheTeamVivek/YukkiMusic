@@ -27,8 +27,9 @@ import (
 	"strings"
 	"unicode"
 
-	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
+
+	td "github.com/AshokShau/gotdbot"
 
 	state "yukkimusic/internal/core/models"
 )

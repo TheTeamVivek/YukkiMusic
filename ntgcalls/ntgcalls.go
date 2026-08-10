@@ -31,6 +31,9 @@ func init() {
 	C.ntg_register_logger(
 		C.ntg_log_message_callback(unsafe.Pointer(C.handleLogs)),
 	)
+	// The C++ engine logs extremely verbosely; surface only errors.
+	logger.GetLogger("ntgcalls").SetLevel(logger.ErrorLevel)
+	logger.GetLogger("webrtc").SetLevel(logger.ErrorLevel)
 }
 
 func NTgCalls() *Client {

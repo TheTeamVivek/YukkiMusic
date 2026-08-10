@@ -23,9 +23,10 @@ import (
 	"sync"
 	"time"
 
+	"yukkimusic/internal/logger"
+
 	td "github.com/AshokShau/gotdbot"
 	tg "github.com/amarnathcjd/gogram/telegram"
-	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"

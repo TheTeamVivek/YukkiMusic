@@ -27,10 +27,11 @@ import (
 	"reflect"
 	"strings"
 
+	"yukkimusic/internal/logger"
+
 	td "github.com/AshokShau/gotdbot"
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
-	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"

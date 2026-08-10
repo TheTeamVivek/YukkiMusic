@@ -9,6 +9,7 @@ libtdjson.*
 
 /app
 downloads/
+database/
 *.db
 *.dat
 *.session
@@ -20,4 +21,4 @@ tmp/
 x
 index.html
 *.txt
-
+**/x.go

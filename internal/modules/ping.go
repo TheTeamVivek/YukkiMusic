@@ -21,11 +21,12 @@ import (
 	"fmt"
 	"time"
 
+	"yukkimusic/internal/logger"
+
 	td "github.com/AshokShau/gotdbot"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/mem"
-	"yukkimusic/internal/logger"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"

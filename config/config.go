@@ -22,8 +22,9 @@ import (
 	"math/rand/v2"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
 	"yukkimusic/internal/logger"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
 var (

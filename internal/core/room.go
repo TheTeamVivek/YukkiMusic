@@ -27,8 +27,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
+
+	td "github.com/AshokShau/gotdbot"
 
 	state "yukkimusic/internal/core/models"
 )
@@ -64,8 +65,8 @@ type RoomState struct {
 	queue   []*state.Track // upcoming tracks
 	shuffle bool           // queue shuffle mode
 
-	statusMsg *td.Message // latest status message in chat
-	Data      map[string]any       // extensible per-room metadata
+	statusMsg *td.Message    // latest status message in chat
+	Data      map[string]any // extensible per-room metadata
 
 	Assistant *Assistant  // assistant client bound to this room
 	destroyed atomic.Bool // whether room cleanup has completed

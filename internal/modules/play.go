@@ -25,8 +25,9 @@ import (
 	"strings"
 	"time"
 
-	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
+
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -548,10 +549,7 @@ func downloadFirstTrack(
 				nil,
 			)
 		} else {
-			utils.EOR(c, replyMsg, F(chatID, "play_download_failed", locales.Arg{
-				"title": title,
-				"error": utils.EscapeHTML(err.Error()),
-			}), nil)
+			utils.EOR(c, replyMsg, F(chatID, "play_download_failed"), nil)
 		}
 		return "", err
 	}

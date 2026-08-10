@@ -18,8 +18,9 @@
 package modules
 
 import (
-	td "github.com/AshokShau/gotdbot"
 	"yukkimusic/internal/logger"
+
+	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"

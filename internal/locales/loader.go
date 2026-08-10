@@ -24,8 +24,9 @@ import (
 	"sort"
 	"strings"
 
-	"gopkg.in/yaml.v3"
 	"yukkimusic/internal/logger"
+
+	"gopkg.in/yaml.v3"
 
 	"yukkimusic/config"
 )
