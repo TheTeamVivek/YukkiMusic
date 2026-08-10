@@ -93,7 +93,7 @@ func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 
 	switch msg.Content.(type) {
 case *td.MessagePhoto:
-		_, err = cb.EditMessaeCaption(c, caption, &td.EditCaptionOpts{
+		_, err = cb.EditMessageCaption(c, caption, &td.EditCaptionOpts{
 			ReplyMarkup: markup,
 		})
 default:
