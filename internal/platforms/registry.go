@@ -233,41 +233,7 @@ func fromReply(c *td.Client, m *td.Message) ([]*state.Track, error) {
 		return nil, err
 	}
 	track.Video = isVideo
-
-	if isVideo {
-		noThumb, err := database.ThumbnailsDisabled(m.ChatID())
-		if err != nil || !noThumb {
-			downloadThumbnail(c, target, track)
-		}
-	}
-
 	return []*state.Track{track}, nil
-}
-
-func downloadThumbnail(c *td.Client, m *td.Message, t *state.Track) {
-	if err := os.MkdirAll("cache", os.ModePerm); err != nil {
-		return
-	}
-	dest := filepath.Join("cache", "thumb_"+t.ID+".jpg")
-	if _, err := os.Stat(dest); os.IsNotExist(err) {
-		video, ok := m.Content.(*td.MessageVideo)
-		if !ok || video.Video == nil || video.Video.Thumbnail == nil ||
-			video.Video.Thumbnail.File == nil {
-			return
-		}
-		thumbFile, err := video.Video.Thumbnail.File.Download(
-			c, 0, 0, 1, &td.DownloadFileOpts{Synchronous: true},
-		)
-		if err != nil || thumbFile == nil || thumbFile.Local == nil || thumbFile.Local.Path == "" {
-			return
-		}
-		if err := copyFile(thumbFile.Local.Path, dest); err != nil {
-			return
-		}
-		t.Artwork = dest
-	} else {
-		t.Artwork = dest
-	}
 }
 
 func hasPlayableReply(c *td.Client, m *td.Message) bool {
