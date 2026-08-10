@@ -4,7 +4,7 @@
 *.so
 *.dylib
 libntgcalls.*
-
+libtdjson.*
 .env
 
 /app

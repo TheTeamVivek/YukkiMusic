@@ -67,14 +67,14 @@ func cskipHandler(c *td.Client, m *td.Message) error {
 func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
 	chatID := m.ChatID()
 	if !r.IsActiveChat() {
-		m.ReplyText(c, F(chatID, "room_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return err
 	}
 
 	mention := mentionOf(nil, m.SenderID())
@@ -83,22 +83,22 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 	if args := m.Args(); args != "" {
 		parsed, parseErr := strconv.Atoi(args)
 		if parseErr != nil {
-			m.ReplyText(c, F(chatID, "skip_invalid_number"), nil)
-			return nil
+			_, err := m.ReplyText(c, F(chatID, "skip_invalid_number"), nil)
+			return err
 		}
 
 		queuedTracks := len(r.Queue())
 		if queuedTracks == 0 {
-			m.ReplyText(c, F(chatID, "skip_queue_empty_for_count"), nil)
-			return nil
+			_, err := m.ReplyText(c, F(chatID, "skip_queue_empty_for_count"), nil)
+			return err
 		}
 
 		if parsed < 1 || parsed > queuedTracks {
-			m.ReplyText(c, F(chatID, "skip_count_exceeds_queue", locales.Arg{
+			_, err := m.ReplyText(c, F(chatID, "skip_count_exceeds_queue", locales.Arg{
 				"requested": parsed,
 				"available": queuedTracks,
 			}), nil)
-			return nil
+			return err
 		}
 
 		// /skip N means: skip current + N queued tracks.
@@ -109,10 +109,10 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)
-		m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
 		}), nil)
-		return nil
+		return err
 	}
 
 	r.SetLoop(0)
@@ -122,10 +122,10 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 
 			scheduleOldPlayingMessage(r)
 			core.DeleteRoom(r.ID)
-			m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
+			_, err := m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 				"user": mention,
 			}), nil)
-			return nil
+			return err
 		}
 		_ = r.NextTrack()
 	}
@@ -134,10 +134,10 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)
-		m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
 		}), nil)
-		return nil
+		return err
 	}
 
 	t := r.NextTrack()
@@ -145,10 +145,10 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)
-		m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
 		}), nil)
-		return nil
+		return err
 	}
 
 	statusMsg, err := core.Bot.SendTextMessage(

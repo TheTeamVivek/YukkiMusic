@@ -63,25 +63,23 @@ func handlePosition(c *td.Client, m *td.Message, cplay bool) error {
 
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
 	if !r.IsActiveChat() || r.Track().ID == "" {
-		m.ReplyText(c, F(chatID, "room_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return err
 	}
 
 	r.Parse()
 
 	title := utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25))
-
-	m.ReplyText(c, F(chatID, "position_now", locales.Arg{
+	_, rerr := m.ReplyText(c, F(chatID, "position_now", locales.Arg{
 		"title":    title,
 		"position": utils.FormatDuration(r.Position()),
 		"duration": utils.FormatDuration(r.Track().Duration),
 		"speed":    fmt.Sprintf("%.2f", r.Speed()),
 	}), nil)
-
-	return nil
+	return rerr
 }

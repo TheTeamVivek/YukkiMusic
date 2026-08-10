@@ -70,7 +70,7 @@ func (t *TelegramPlatform) Get(query string, _ bool) ([]*state.Track, error) {
 			return nil, err
 		}
 
-		isVideo, isAudio := playableMedia(core.Bot, msg)
+		_, isVideo, isAudio := playableMedia(core.Bot, msg)
 		if !isVideo && !isAudio {
 			return nil, errors.New("message does not contain playable media")
 		}

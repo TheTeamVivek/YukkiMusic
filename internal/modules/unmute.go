@@ -61,20 +61,20 @@ func handleUnmute(c *td.Client, m *td.Message, cplay bool) error {
 
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
 	chatID := m.ChatID()
 
 	if !r.IsActiveChat() {
-		m.ReplyText(c, F(chatID, "room_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return err
 	}
 
 	if !r.IsMuted() {
-		m.ReplyText(c, F(chatID, "unmute_already"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "unmute_already"), nil)
+		return err
 	}
 
 	title := utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25))
@@ -82,10 +82,10 @@ func handleUnmute(c *td.Client, m *td.Message, cplay bool) error {
 	mention := mentionOf(sender, m.SenderID())
 
 	if _, err := r.Unmute(); err != nil {
-		m.ReplyText(c, F(chatID, "unmute_failed", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "unmute_failed", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		return nil
+		return err
 	}
 
 	// optional speed line
@@ -101,7 +101,6 @@ func handleUnmute(c *td.Client, m *td.Message, cplay bool) error {
 		"user":       mention,
 		"speed_line": speedOpt,
 	})
-
-	m.ReplyText(c, msg, nil)
-	return nil
+	_, rerr := m.ReplyText(c, msg, nil)
+	return rerr
 }

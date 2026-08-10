@@ -88,17 +88,16 @@ func playmodeHandler(c *td.Client, m *td.Message) error {
 		if current {
 			statusKey = "playmode_status_admins"
 		}
-
-		_, _ = m.ReplyText(c, F(chatID, "playmode_help", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "playmode_help", locales.Arg{
 			"status": F(chatID, statusKey),
 		}), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
-		return nil
+		return err
 	}
 
 	adminsOnly, err := utils.ParseBool(args[1])
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
+		return err
 	}
 
 	if err := database.SetPlayModeAdminsOnly(chatID, adminsOnly); err != nil {
@@ -109,9 +108,8 @@ func playmodeHandler(c *td.Client, m *td.Message) error {
 	if adminsOnly {
 		successKey = "playmode_success_admins"
 	}
-
-	_, _ = m.ReplyText(c, F(chatID, successKey), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
-	return nil
+	_, rerr := m.ReplyText(c, F(chatID, successKey), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
+	return rerr
 }
 
 func cmdDeleteHandler(c *td.Client, m *td.Message) error {
@@ -132,18 +130,17 @@ func cmdDeleteHandler(c *td.Client, m *td.Message) error {
 		if current {
 			actionKey = "enabled"
 		}
-
-		_, _ = m.ReplyText(c, F(chatID, "cmddelete_status", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "cmddelete_status", locales.Arg{
 			"cmd":    cmd,
 			"action": F(chatID, actionKey),
 		}), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
-		return nil
+		return err
 	}
 
 	enabled, err := utils.ParseBool(args[1])
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
+		return err
 	}
 
 	if err := database.SetCommandDelete(chatID, enabled); err != nil {
@@ -154,11 +151,10 @@ func cmdDeleteHandler(c *td.Client, m *td.Message) error {
 	if enabled {
 		actionKey = "enabled"
 	}
-
-	_, _ = m.ReplyText(c, F(chatID, "cmddelete_updated", locales.Arg{
+	_, rerr := m.ReplyText(c, F(chatID, "cmddelete_updated", locales.Arg{
 		"action": F(chatID, actionKey),
 	}), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
-	return nil
+	return rerr
 }
 
 func cleanModeHandler(c *td.Client, m *td.Message) error {
@@ -174,18 +170,18 @@ func cleanModeHandler(c *td.Client, m *td.Message) error {
 	}
 
 	if len(args) < 2 {
-		_, _ = m.ReplyText(
+		_, err := m.ReplyText(
 			c,
 			cleanModeStatusText(chatID, current)+"\n\n"+F(chatID, "cleanmode_hint"),
 			&td.SendTextMessageOpts{ParseMode: td.ParseModeHTML},
 		)
-		return nil
+		return err
 	}
 
 	enabled, err := utils.ParseBool(args[1])
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
+		return err
 	}
 
 	if err := database.SetCleanMode(chatID, enabled); err != nil {
@@ -194,9 +190,8 @@ func cleanModeHandler(c *td.Client, m *td.Message) error {
 	if !enabled {
 		cleanScheduler.cancel(chatID)
 	}
-
-	_, _ = m.ReplyText(c, cleanModeStatusText(chatID, enabled)+"\n\n"+F(chatID, "cleanmode_hint"), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
-	return nil
+	_, rerr := m.ReplyText(c, cleanModeStatusText(chatID, enabled)+"\n\n"+F(chatID, "cleanmode_hint"), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
+	return rerr
 }
 
 func adminModeHandler(c *td.Client, m *td.Message) error {
@@ -212,26 +207,25 @@ func adminModeHandler(c *td.Client, m *td.Message) error {
 	}
 
 	if len(args) < 2 {
-		_, _ = m.ReplyText(c, F(chatID, "adminmode_help", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "adminmode_help", locales.Arg{
 			"status": F(chatID, adminModeStatusKey(current)),
 		}), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
-		return nil
+		return err
 	}
 
 	mode, ok := parseAdminMode(args[1])
 	if !ok {
-		_, _ = m.ReplyText(c, F(chatID, "adminmode_invalid"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "adminmode_invalid"), nil)
+		return err
 	}
 
 	if err := database.SetAdminMode(chatID, mode); err != nil {
 		return err
 	}
-
-	_, _ = m.ReplyText(c, F(chatID, "adminmode_updated", locales.Arg{
+	_, rerr := m.ReplyText(c, F(chatID, "adminmode_updated", locales.Arg{
 		"status": F(chatID, adminModeStatusKey(mode)),
 	}), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
-	return nil
+	return rerr
 }
 
 func adminModeStatusKey(mode database.AdminMode) string {

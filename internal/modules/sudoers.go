@@ -40,39 +40,41 @@ func handleAddSudo(c *td.Client, m *td.Message) error {
 
 	// No args + no reply -> ask for user
 	if m.Args() == "" && m.ReplyToMessageID() == 0 {
-		_, _ = m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
 			"cmd": getCommand(m),
 		}), nil)
-		return nil
+		return err
 	}
 
 	// Extract target user
 	targetID, err := utils.ExtractUser(c, m)
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		return nil
+		return err
 	}
 
 	// Owner trying to self
 	if targetID == config.OwnerID {
-		_, _ = m.ReplyText(c, F(chatID, "sudo_owner_self"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "sudo_owner_self"), nil)
+		return err
 	}
 
 	// Trying to add the bot itself
 	if targetID == c.Me.Id {
-		_, _ = m.ReplyText(c, F(chatID, "sudo_bot_self"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "sudo_bot_self"), nil)
+		return err
 	}
 
 	// Fetch user info
 	user, err := c.GetUser(targetID)
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "sudo_fetch_user_fail", locales.Arg{
+		if _, err := m.ReplyText(c, F(chatID, "sudo_fetch_user_fail", locales.Arg{
 			"error": err.Error(),
-		}), nil)
+		}), nil); err != nil {
+			return err
+		}
 		logger.Error("Failed to get user: " + err.Error())
 		return nil
 	}
@@ -80,8 +82,8 @@ func handleAddSudo(c *td.Client, m *td.Message) error {
 	// Bots cannot be sudoers
 	if user.Type != nil {
 		if _, isBot := user.Type.(*td.UserTypeBot); isBot {
-			_, _ = m.ReplyText(c, F(chatID, "sudo_bot_user"), nil)
-			return nil
+			_, err := m.ReplyText(c, F(chatID, "sudo_bot_user"), nil)
+			return err
 		}
 	}
 
@@ -95,32 +97,33 @@ func handleAddSudo(c *td.Client, m *td.Message) error {
 	// Check if already sudo
 	exists, err := database.IsSudo(targetID)
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "sudo_check_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "sudo_check_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		return nil
+		return err
 	}
 
 	if exists {
-		_, _ = m.ReplyText(c, F(chatID, "sudo_already", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "sudo_already", locales.Arg{
 			"user": uname,
 			"id":   idStr,
 		}), nil)
-		return nil
+		return err
 	}
 
 	// Add to sudo
 	if err := database.AddSudo(targetID); err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "sudo_add_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "sudo_add_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		return nil
+		return err
 	}
-
-	_, _ = m.ReplyText(c, F(chatID, "sudo_add_success", locales.Arg{
+	if _, err := m.ReplyText(c, F(chatID, "sudo_add_success", locales.Arg{
 		"user": uname,
 		"id":   idStr,
-	}), nil)
+	}), nil); err != nil {
+		return err
+	}
 
 	if config.SetCmds {
 		// Update commands for this sudo user
@@ -151,25 +154,25 @@ func handleDelSudo(c *td.Client, m *td.Message) error {
 
 	// No args + no reply -> ask for user
 	if m.Args() == "" && m.ReplyToMessageID() == 0 {
-		_, _ = m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
 			"cmd": getCommand(m),
 		}), nil)
-		return nil
+		return err
 	}
 
 	// Extract target user
 	targetID, err := utils.ExtractUser(c, m)
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		return nil
+		return err
 	}
 
 	// Cannot remove owner
 	if targetID == config.OwnerID {
-		_, _ = m.ReplyText(c, F(chatID, "sudo_owner_remove_block"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "sudo_owner_remove_block"), nil)
+		return err
 	}
 
 	// Fetch user info
@@ -189,18 +192,18 @@ func handleDelSudo(c *td.Client, m *td.Message) error {
 	// Check if sudo
 	exists, err := database.IsSudo(targetID)
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "sudo_check_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "sudo_check_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		return nil
+		return err
 	}
 
 	if !exists {
-		_, _ = m.ReplyText(c, F(chatID, "sudo_not_exists", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "sudo_not_exists", locales.Arg{
 			"user": uname,
 			"id":   idStr,
 		}), nil)
-		return nil
+		return err
 	}
 
 	// Reset that user's bot commands
@@ -215,19 +218,19 @@ func handleDelSudo(c *td.Client, m *td.Message) error {
 
 	// Delete from DB
 	if err := database.RemoveSudo(targetID); err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "sudo_remove_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "sudo_remove_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		return nil
+		return err
 	}
+	_, rerr :=
 
-	// Success
-	_, _ = m.ReplyText(c, F(chatID, "sudo_remove_success", locales.Arg{
-		"user": uname,
-		"id":   idStr,
-	}), nil)
-
-	return nil
+		// Success
+		m.ReplyText(c, F(chatID, "sudo_remove_success", locales.Arg{
+			"user": uname,
+			"id":   idStr,
+		}), nil)
+	return rerr
 }
 
 func handleGetSudoers(c *td.Client, m *td.Message) error {
@@ -235,10 +238,10 @@ func handleGetSudoers(c *td.Client, m *td.Message) error {
 
 	floodKey := fmt.Sprintf("sudoers:%d%d", chatID, m.SenderID())
 	if remaining := utils.GetFlood(floodKey); remaining > 0 {
-		_, _ = m.ReplyText(c, F(chatID, "flood_seconds", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "flood_seconds", locales.Arg{
 			"duration": int(remaining.Seconds()),
 		}), nil)
-		return nil
+		return err
 	}
 	utils.SetFlood(floodKey, 30*time.Second)
 

@@ -69,16 +69,16 @@ func handleLoop(c *td.Client, m *td.Message, cplay bool) error {
 
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 	chatID := m.ChatID()
 	args := strings.Fields(m.Text())
 	currentLoop := r.Loop()
 
 	if !r.IsActiveChat() {
-		m.ReplyText(c, F(chatID, "room_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return err
 	}
 
 	if len(args) < 2 {
@@ -93,22 +93,21 @@ func handleLoop(c *td.Client, m *td.Message, cplay bool) error {
 			"cmd":        getCommand(m),
 			"count_line": countLine,
 		})
-
-		m.ReplyText(c, msg, nil)
-		return nil
+		_, err := m.ReplyText(c, msg, nil)
+		return err
 	}
 
 	newLoop, err := strconv.Atoi(args[1])
 	if err != nil || newLoop < 0 || newLoop > 10 {
-		m.ReplyText(c, F(chatID, "loop_invalid"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "loop_invalid"), nil)
+		return err
 	}
 
 	if newLoop == currentLoop {
-		m.ReplyText(c, F(chatID, "loop_already_set", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "loop_already_set", locales.Arg{
 			"count": currentLoop,
 		}), nil)
-		return nil
+		return err
 	}
 
 	r.SetLoop(newLoop)
@@ -126,7 +125,6 @@ func handleLoop(c *td.Client, m *td.Message, cplay bool) error {
 			"user":  mention,
 		})
 	}
-
-	m.ReplyText(c, msg, nil)
-	return nil
+	_, rerr := m.ReplyText(c, msg, nil)
+	return rerr
 }

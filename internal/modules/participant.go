@@ -108,8 +108,9 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 			cleanScheduler.cancel(chatID)
 			core.DeleteRoom(chatID)
 			core.DeleteChatState(chatID)
-
-			c.SendTextMessage(chatID, F(chatID, "bot_demotion_goodbye"), nil)
+			if _, rerr := c.SendTextMessage(chatID, F(chatID, "bot_demotion_goodbye"), nil); rerr != nil {
+				logger.Error(rerr)
+			}
 			c.LeaveChat(chatID)
 
 			if state != nil && state.Assistant != nil {
@@ -182,7 +183,9 @@ func handleSudoJoin(c *td.Client, chatID, userID int64) {
 		"bot":  botMention,
 	})
 
-	c.SendTextMessage(chatID, text, nil)
+	if _, err := c.SendTextMessage(chatID, text, nil); err != nil {
+		logger.Error(err)
+	}
 }
 
 func handleAssistantRestriction(
@@ -223,7 +226,9 @@ func handleAssistantRestriction(
 			"id":        s.Assistant.Self.ID,
 		})
 
-		c.SendTextMessage(chatID, msg, nil)
+		if _, err := c.SendTextMessage(chatID, msg, nil); err != nil {
+			logger.Error(err)
+		}
 	}
 }
 

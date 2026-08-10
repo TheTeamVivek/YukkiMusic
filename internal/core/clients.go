@@ -20,6 +20,7 @@ package core
 import (
 	"encoding/base64"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"net"
 	"os"
@@ -70,18 +71,22 @@ func Init() (func(), error) {
 }
 
 func initBot() error {
-	client, err := td.NewClient(config.APIID, config.APIHash, config.Token, &td.ClientOpts{
-		LibraryPath: "./libtdjson.so.1.8.66",
-		ParseMode:   td.ParseModeHTML,
-		AutoRetry: &td.AutoRetry{
-			ChatNotFound:    true,
-			MessageNotFound: true,
-			MaxFloodWait:    30 * time.Second,
-		},
-		Logger: gotdlogger.New(gotdlogger.WithHandler(
-			logger.NewHandler(os.Stderr, logger.InfoLevel),
-		)),
-	})
+	opts := td.DefaultClientConfig()
+	opts.LibraryPath = "./libtdjson.so.1.8.66"
+	opts.ParseMode = td.ParseModeHTML
+	opts.PanicHandler = clientPanicHandler
+	opts.ErrorHandler = clientErrorHandler
+	opts.AutoRetry = &td.AutoRetry{
+		ChatNotFound:    true,
+		MessageNotFound: true,
+		MaxFloodWait:    30 * time.Second,
+	}
+	opts.DatabaseDirectory = "database"
+	opts.Logger = gotdlogger.New(gotdlogger.WithHandler(
+		logger.NewHandler(os.Stderr, logger.InfoLevel),
+	))
+
+	client, err := td.NewClient(config.APIID, config.APIHash, config.Token, opts)
 	if err != nil {
 		return fmt.Errorf("failed to create bot client: %w", err)
 	}
@@ -101,6 +106,65 @@ func initBot() error {
 	logger.Infof("Bot started as @%s", botUsername())
 
 	return nil
+}
+
+// clientPanicHandler marshals the raw update that caused a handler panic and
+// forwards it to the logger chat together with the panic value.
+func clientPanicHandler(c *td.Client, update td.TlObject, r any) {
+	sendErrorReport(c, "panic", update, r)
+}
+
+// clientErrorHandler does the same for handler errors, then lets the library
+// continue dispatching the remaining handlers.
+func clientErrorHandler(c *td.Client, update td.TlObject, err error) error {
+	sendErrorReport(c, "error", update, err)
+	return nil
+}
+
+func sendErrorReport(c *td.Client, kind string, update td.TlObject, detail any) {
+	if c == nil || config.LoggerID == 0 {
+		return
+	}
+
+	var raw string
+	if update != nil {
+		if b, err := json.MarshalIndent(update, "", "  "); err == nil {
+			raw = string(b)
+		}
+	}
+
+	text := fmt.Sprintf(
+		"Bot %s: %v\n\nRaw update:\n%s",
+		strings.ToUpper(kind), detail, raw,
+	)
+
+	go func() {
+		defer func() { _ = recover() }()
+		if len(text) > 4000 {
+			sendErrorReportFile(c, text)
+			return
+		}
+		_, _ = c.SendMessage(config.LoggerID, &td.InputMessageText{
+			Text: &td.FormattedText{Text: text},
+		}, nil)
+	}()
+}
+
+func sendErrorReportFile(c *td.Client, text string) {
+	f, err := os.CreateTemp("", "bot_error_*.txt")
+	if err != nil {
+		return
+	}
+	defer os.Remove(f.Name())
+	defer f.Close()
+
+	if _, err := f.WriteString(text); err != nil {
+		return
+	}
+
+	_, _ = c.SendMessage(config.LoggerID, &td.InputMessageDocument{
+		Document: &td.InputDocument{Document: &td.InputFileLocal{Path: f.Name()}},
+	}, nil)
 }
 
 func initAssistants() error {

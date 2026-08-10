@@ -253,7 +253,9 @@ func WithBlacklistMessage(
 			if isOwnerOrSudo(m.SenderID()) {
 				return handler(c, m)
 			}
-			m.ReplyText(c, F(m.ChatID(), "blacklist_chat_blocked"), nil)
+			if _, err := m.ReplyText(c, F(m.ChatID(), "blacklist_chat_blocked"), nil); err != nil {
+				logger.Error(err)
+			}
 			leaveChat(c, m.ChatID())
 			return nil
 		}
@@ -261,7 +263,9 @@ func WithBlacklistMessage(
 			if chat, err := m.GetChat(c); err == nil {
 				if sg, ok := chat.Type.(*td.ChatTypeSupergroup); ok && sg.IsChannel {
 					if chatOwnerID, err := utils.GetChatOwner(c, m.ChatID()); err == nil && chatOwnerID == m.SenderID() {
-						m.ReplyText(c, F(m.ChatID(), "blacklist_owner_blocked_leave"), nil)
+						if _, rerr := m.ReplyText(c, F(m.ChatID(), "blacklist_owner_blocked_leave"), nil); rerr != nil {
+							logger.Error(rerr)
+						}
 						leaveChat(c, m.ChatID())
 						return nil
 					}
@@ -284,7 +288,9 @@ func WithBlacklistMessage(
 				}
 			}
 			if m.IsPrivate() || mentioned {
-				m.ReplyText(c, F(m.ChatID(), "blacklist_user_blocked"), nil)
+				if _, rerr := m.ReplyText(c, F(m.ChatID(), "blacklist_user_blocked"), nil); rerr != nil {
+					logger.Error(rerr)
+				}
 			}
 			return nil
 		}

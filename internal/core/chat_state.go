@@ -41,7 +41,7 @@ var (
 type StateSnapshot struct {
 	AssistantPresent bool
 	AssistantBanned  bool
-	VoiceChatActive  bool
+	VoiceChatActive  *bool
 }
 
 type ChatState struct {
@@ -141,7 +141,7 @@ func (s *ChatState) SetAssistantBanned(v bool) {
 
 func (s *ChatState) SetVoiceChatActive(v bool) {
 	s.mu.Lock()
-	s.snapshot.VoiceChatActive = v
+	s.snapshot.VoiceChatActive = &v
 	s.fetched = true
 	s.mu.Unlock()
 }
@@ -178,16 +178,61 @@ func (s *ChatState) refresh() error {
 	}
 
 	present, banned := membership(member)
-	// A bot cannot query the group call state (getGroupCall is user-only and
+
+	// A bot cannot observe the group call state (getGroupCall is user-only and
 	// the group call id is always 0 for bots), so voice chat activity is
-	// tracked through video-chat start/end updates instead.
-	s.applySnapshot(present, banned, s.snapshot.VoiceChatActive)
+	// queried through the assistant like Grogram's fullChannel.Call != nil.
+	vcActive := s.snapshot.VoiceChatActive
+	if active, err := s.voiceChatActive(); err != nil {
+		logger.Warnf("chat_state: voiceChatActive failed for %d: %v", s.ChatID, err)
+	} else {
+		vcActive = &active
+	}
+	s.applySnapshot(present, banned, vcActive)
 	if full != nil &&
 		full.InviteLink != nil &&
 		full.InviteLink.InviteLink != "" {
 		s.setInviteLink(full.InviteLink.InviteLink)
 	}
 	return nil
+}
+
+// voiceChatActive reports whether an active voice/video chat is running in the
+// chat. The bot's TDLib client cannot observe this, so it is queried through
+// the assistant's MTProto client (getFullChannel -> Call != nil), mirroring
+// Grogram's ChannelFull.Call check.
+func (s *ChatState) voiceChatActive() (bool, error) {
+	if s.Assistant == nil || s.Assistant.Client == nil {
+		return false, ErrAssistantNotAvailable
+	}
+
+	peer, err := s.Assistant.Client.ResolvePeer(s.ChatID)
+	if err != nil {
+		return false, fmt.Errorf("resolve peer: %w", err)
+	}
+
+	switch p := peer.(type) {
+	case *telegram.InputPeerChannel:
+		full, err := s.Assistant.Client.ChannelsGetFullChannel(&telegram.InputChannelObj{
+			ChannelID:  p.ChannelID,
+			AccessHash: p.AccessHash,
+		})
+		if err != nil {
+			return false, fmt.Errorf("get full channel: %w", err)
+		}
+		ch, ok := full.FullChat.(*telegram.ChannelFull)
+		return ok && ch.Call != nil, nil
+
+	case *telegram.InputPeerChat:
+		full, err := s.Assistant.Client.MessagesGetFullChat(p.ChatID)
+		if err != nil {
+			return false, fmt.Errorf("get full chat: %w", err)
+		}
+		ch, ok := full.FullChat.(*telegram.ChatFullObj)
+		return ok && ch.Call != nil, nil
+	}
+
+	return false, nil
 }
 
 func membership(m *td.ChatMember) (bool, bool) {
@@ -329,7 +374,7 @@ func (s *ChatState) ensureAssistant() error {
 }
 
 func (s *ChatState) setInviteLink(link string) { s.mu.Lock(); s.inviteLink = link; s.mu.Unlock() }
-func (s *ChatState) applySnapshot(p, b, v bool) {
+func (s *ChatState) applySnapshot(p, b bool, v *bool) {
 	s.mu.Lock()
 	s.snapshot = StateSnapshot{AssistantPresent: p, AssistantBanned: b, VoiceChatActive: v}
 	s.fetched = true

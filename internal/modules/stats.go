@@ -129,8 +129,7 @@ func statsHandler(c *td.Client, m *td.Message) error {
 	dbStorageSize := dbStats["storageSize"]
 	dbCollections := dbStats["collections"]
 	dbObjects := dbStats["objects"]
-
-	_, _ = m.ReplyText(c, F(chatID, "stats_overview", locales.Arg{
+	_, err := m.ReplyText(c, F(chatID, "stats_overview", locales.Arg{
 		"os":                runtime.GOOS,
 		"arch":              runtime.GOARCH,
 		"cpus":              runtime.NumCPU(),
@@ -158,7 +157,7 @@ func statsHandler(c *td.Client, m *td.Message) error {
 		"gogram_version":    resolveTdVersion(),
 		"ntgcalls_version":  ntgcalls.Version(),
 	}), nil)
-	return nil
+	return err
 }
 
 func interfaceToFloat(v any) float64 {

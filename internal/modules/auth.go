@@ -72,66 +72,66 @@ func addAuthHandler(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 
 	if m.Args() == "" && m.ReplyToMessageID() == 0 {
-		_, _ = m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
 			"cmd": getCommand(m),
 		}), nil)
-		return nil
+		return err
 	}
 
 	if au, _ := database.AuthorizedUsers(chatID); len(
 		au,
 	) >= config.MaxAuthUsers {
-		_, _ = m.ReplyText(c, F(chatID, "auth_limit_reached", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "auth_limit_reached", locales.Arg{
 			"limit": config.MaxAuthUsers,
 		}), nil)
-		return nil
+		return err
 	}
 
 	userID, err := utils.ExtractUser(c, m)
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		return nil
+		return err
 	}
 
 	// owner, bot, self, already auth, or admin — all treated the same
 	if userID == config.OwnerID || userID == c.Me.Id ||
 		userID == m.SenderID() {
-		_, _ = m.ReplyText(c, F(chatID, "cannot_authorize_user"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "cannot_authorize_user"), nil)
+		return err
 	}
 
 	if ok, _ := database.IsAuthorized(chatID, userID); ok {
-		_, _ = m.ReplyText(c, F(chatID, "already_authed"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "already_authed"), nil)
+		return err
 	}
 
 	if ok, _ := utils.IsChatAdmin(c, chatID, userID); ok {
-		_, _ = m.ReplyText(c, F(chatID, "addauth_user_is_admin"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "addauth_user_is_admin"), nil)
+		return err
 	}
 
 	user, err := c.GetUser(userID)
 	if err != nil || user == nil {
-		_, _ = m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
 			"error": utils.IfElse(err != nil, err.Error(), ""),
 		}), nil)
-		return nil
+		return err
 	}
 
 	if user.Type != nil {
 		if _, isBot := user.Type.(*td.UserTypeBot); isBot {
-			_, _ = m.ReplyText(c, F(chatID, "addauth_bot_user"), nil)
-			return nil
+			_, err := m.ReplyText(c, F(chatID, "addauth_bot_user"), nil)
+			return err
 		}
 	}
 
 	if err := database.Authorize(chatID, userID); err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "addauth_add_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "addauth_add_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		return nil
+		return err
 	}
 
 	uname := mentionOf(user, userID)
@@ -140,15 +140,19 @@ func addAuthHandler(c *td.Client, m *td.Message) error {
 	}
 
 	if au, _ := database.AuthorizedUsers(chatID); len(au) > 0 {
-		_, _ = m.ReplyText(c, F(chatID, "addauth_success_with_count", locales.Arg{
+		if _, err := m.ReplyText(c, F(chatID, "addauth_success_with_count", locales.Arg{
 			"user":  uname,
 			"count": len(au),
 			"limit": config.MaxAuthUsers,
-		}), nil)
+		}), nil); err != nil {
+			return err
+		}
 	} else {
-		_, _ = m.ReplyText(c, F(chatID, "addauth_success", locales.Arg{
+		if _, err := m.ReplyText(c, F(chatID, "addauth_success", locales.Arg{
 			"user": uname,
-		}), nil)
+		}), nil); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -158,32 +162,32 @@ func delAuthHandler(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 
 	if m.Args() == "" && m.ReplyToMessageID() == 0 {
-		_, _ = m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
 			"cmd": getCommand(m),
 		}), nil)
-		return nil
+		return err
 	}
 
 	userID, err := utils.ExtractUser(c, m)
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
 			"error": utils.IfElse(err != nil, err.Error(), "unknown error"),
 		}), nil)
-		return nil
+		return err
 	}
 
 	if ok, err := database.IsAuthorized(chatID, userID); !ok && err == nil {
-		_, _ = m.ReplyText(c, F(chatID, "del_auth_not_authorized", nil), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "del_auth_not_authorized", nil), nil)
+		return err
 	}
 
 	user, _ := c.GetUser(userID)
 
 	if err := database.Unauthorize(chatID, userID); err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "del_auth_remove_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "del_auth_remove_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		return nil
+		return err
 	}
 
 	var uname string
@@ -195,11 +199,10 @@ func delAuthHandler(c *td.Client, m *td.Message) error {
 	} else {
 		uname = "User (<code>" + strconv.FormatInt(userID, 10) + "</code>)"
 	}
-
-	_, _ = m.ReplyText(c, F(chatID, "del_auth_success", locales.Arg{
+	_, rerr := m.ReplyText(c, F(chatID, "del_auth_success", locales.Arg{
 		"user": uname,
 	}), nil)
-	return nil
+	return rerr
 }
 
 func authListHandler(c *td.Client, m *td.Message) error {
@@ -207,15 +210,15 @@ func authListHandler(c *td.Client, m *td.Message) error {
 
 	authUsers, err := database.AuthorizedUsers(chatID)
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "authlist_fetch_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "authlist_fetch_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		return nil
+		return err
 	}
 
 	if len(authUsers) == 0 {
-		_, _ = m.ReplyText(c, F(chatID, "authlist_empty", nil), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "authlist_empty", nil), nil)
+		return err
 	}
 
 	statusMsg, err := m.ReplyText(c, F(chatID, "authlist_fetching", nil), nil)

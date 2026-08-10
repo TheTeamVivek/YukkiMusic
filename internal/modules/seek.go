@@ -119,30 +119,30 @@ func handleSeek(c *td.Client, m *td.Message, cplay, isBack bool) error {
 
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 	chatID := m.ChatID()
 	t := r.Track()
 	if !r.IsActiveChat() || t == nil {
-		m.ReplyText(c, F(chatID, "seek_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "seek_no_active"), nil)
+		return err
 	}
 
 	args := strings.Fields(m.Text())
 	if len(args) < 2 {
-		m.ReplyText(c, F(chatID, "seek_usage", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "seek_usage", locales.Arg{
 			"cmd": getCommand(m),
 		}), nil)
-		return nil
+		return err
 	}
 
 	seconds, err := strconv.Atoi(args[1])
 	if err != nil {
-		m.ReplyText(c, F(chatID, "seek_invalid_seconds", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "seek_invalid_seconds", locales.Arg{
 			"cmd": getCommand(m),
 		}), nil)
-		return nil
+		return err
 	}
 
 	var direction, emoji string
@@ -150,20 +150,20 @@ func handleSeek(c *td.Client, m *td.Message, cplay, isBack bool) error {
 
 	if isBack {
 		if (r.Position() - seconds) <= 10 {
-			m.ReplyText(c, F(chatID, "seek_too_close_start", locales.Arg{
+			_, err := m.ReplyText(c, F(chatID, "seek_too_close_start", locales.Arg{
 				"seconds": seconds,
 			}), nil)
-			return nil
+			return err
 		}
 		seekErr = r.Seek(-seconds)
 		direction = "backward"
 		emoji = "⏪"
 	} else {
 		if (t.Duration - (r.Position() + seconds)) <= 10 {
-			m.ReplyText(c, F(chatID, "seek_too_close_end", locales.Arg{
+			_, err := m.ReplyText(c, F(chatID, "seek_too_close_end", locales.Arg{
 				"seconds": seconds,
 			}), nil)
-			return nil
+			return err
 		}
 		seekErr = r.Seek(seconds)
 		direction = "forward"
@@ -171,18 +171,22 @@ func handleSeek(c *td.Client, m *td.Message, cplay, isBack bool) error {
 	}
 
 	if seekErr != nil {
-		m.ReplyText(c, F(chatID, "seek_failed", locales.Arg{
+		if _, rerr := m.ReplyText(c, F(chatID, "seek_failed", locales.Arg{
 			"direction": direction,
 			"seconds":   seconds,
 			"error":     seekErr,
-		}), nil)
+		}), nil); rerr != nil {
+			return rerr
+		}
 	} else {
-		m.ReplyText(c, F(chatID, "seek_success", locales.Arg{
+		if _, rerr := m.ReplyText(c, F(chatID, "seek_success", locales.Arg{
 			"emoji":     emoji,
 			"direction": direction,
 			"position":  utils.FormatDuration(r.Position()),
 			"duration":  utils.FormatDuration(t.Duration),
-		}), nil)
+		}), nil); rerr != nil {
+			return rerr
+		}
 	}
 
 	return nil
@@ -199,51 +203,55 @@ func handleJump(c *td.Client, m *td.Message, cplay bool) error {
 
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
 	chatID := m.ChatID()
 	t := r.Track()
 
 	if !r.IsActiveChat() || t == nil {
-		m.ReplyText(c, F(chatID, "jump_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "jump_no_active"), nil)
+		return err
 	}
 
 	args := strings.Fields(m.Text())
 	if len(args) < 2 {
-		m.ReplyText(c, F(chatID, "jump_usage", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "jump_usage", locales.Arg{
 			"cmd": getCommand(m),
 		}), nil)
-		return nil
+		return err
 	}
 
 	seconds, err := strconv.Atoi(args[1])
 	if err != nil || seconds < 0 {
-		m.ReplyText(c, F(chatID, "jump_invalid_position", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "jump_invalid_position", locales.Arg{
 			"cmd": getCommand(m),
 		}), nil)
-		return nil
+		return err
 	}
 
 	if t.Duration-seconds <= 10 {
-		m.ReplyText(c, F(chatID, "jump_too_close_end", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "jump_too_close_end", locales.Arg{
 			"position": utils.FormatDuration(seconds),
 		}), nil)
-		return nil
+		return err
 	}
 
 	if err := r.Seek(seconds - r.Position()); err != nil {
-		m.ReplyText(c, F(chatID, "jump_failed", locales.Arg{
+		if _, rerr := m.ReplyText(c, F(chatID, "jump_failed", locales.Arg{
 			"position": utils.FormatDuration(seconds),
 			"error":    err,
-		}), nil)
+		}), nil); rerr != nil {
+			return rerr
+		}
 	} else {
-		m.ReplyText(c, F(chatID, "jump_success", locales.Arg{
+		if _, rerr := m.ReplyText(c, F(chatID, "jump_success", locales.Arg{
 			"position": utils.FormatDuration(seconds),
 			"duration": utils.FormatDuration(t.Duration),
-		}), nil)
+		}), nil); rerr != nil {
+			return rerr
+		}
 	}
 
 	return nil

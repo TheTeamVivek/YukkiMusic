@@ -24,6 +24,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"yukkimusic/config"
 )
 
 const (
@@ -51,6 +52,11 @@ type (
 
 func migrateData() {
 	logr.Info("Checking for old database to migrate...")
+
+	if oldDBName == config.DBName {
+		logr.Info("Old database name matches the current database name. Skipping migration.")
+		return
+	}
 
 	oldDB := client.Database(oldDBName)
 	ctx := context.Background()

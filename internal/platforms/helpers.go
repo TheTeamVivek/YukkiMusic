@@ -126,10 +126,9 @@ func copyFile(src, dst string) error {
 	return out.Close()
 }
 
-func playableMedia(c *td.Client, m *td.Message) (isVideo, isAudio bool) {
-	if m == nil {
-		return
-	}
+// playableMedia walks a message and its reply chain, returning the first
+// message that carries playable media together with its media kind.
+func playableMedia(c *td.Client, m *td.Message) (msg *td.Message, isVideo, isAudio bool) {
 	check := func(msg *td.Message) (bool, bool) {
 		if msg == nil || msg.Content == nil {
 			return false, false
@@ -153,10 +152,11 @@ func playableMedia(c *td.Client, m *td.Message) (isVideo, isAudio bool) {
 		}
 		return false, false
 	}
+
 	curr := m
 	for curr != nil {
 		if v, a := check(curr); v || a {
-			return v, a
+			return curr, v, a
 		}
 		if curr.ReplyToMessageID() <= 0 {
 			break
@@ -167,7 +167,7 @@ func playableMedia(c *td.Client, m *td.Message) (isVideo, isAudio bool) {
 		}
 		curr = next
 	}
-	return false, false
+	return nil, false, false
 }
 
 func sanitizeMediaURL(raw string) (string, error) {

@@ -182,8 +182,8 @@ func handlePlay(c *td.Client, m *td.Message, opts *playOpts) error {
 	chatID := m.ChatID()
 
 	if !canUsePlayCommand(c, m, chatID) {
-		m.ReplyText(c, F(chatID, "playmode_restricted"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "playmode_restricted"), nil)
+		return err
 	}
 
 	room, searchMsg, err := prepareRoomAndSearchMessage(c, m, opts.CPlay)
@@ -241,7 +241,9 @@ func prepareRoomAndSearchMessage(
 ) (*core.RoomState, *td.Message, error) {
 	room, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
+		if _, rerr := m.ReplyText(c, err.Error(), nil); rerr != nil {
+			return nil, nil, rerr
+		}
 		return nil, nil, err
 	}
 
@@ -249,13 +251,17 @@ func prepareRoomAndSearchMessage(
 	room.Parse()
 
 	if len(room.Queue()) >= config.QueueLimit {
-		m.ReplyText(c, F(chatID, "queue_limit_reached", locales.Arg{"limit": config.QueueLimit}), nil)
+		if _, rerr := m.ReplyText(c, F(chatID, "queue_limit_reached", locales.Arg{"limit": config.QueueLimit}), nil); rerr != nil {
+			return nil, nil, rerr
+		}
 		return nil, nil, fmt.Errorf("queue limit reached")
 	}
 
 	query := extractPlayQuery(m.Text())
 	if query == "" && m.ReplyToMessageID() == 0 {
-		m.ReplyText(c, F(chatID, "no_song_query", locales.Arg{"cmd": getCommand(m)}), nil)
+		if _, rerr := m.ReplyText(c, F(chatID, "no_song_query", locales.Arg{"cmd": getCommand(m)}), nil); rerr != nil {
+			return nil, nil, rerr
+		}
 		return nil, nil, fmt.Errorf("no song query")
 	}
 
@@ -342,7 +348,8 @@ func ensureVoiceChatReady(
 		utils.EOR(c, replyMsg, getErrorMessage(chatID, err), nil)
 		return err
 	}
-	if !snap.VoiceChatActive {
+
+	if snap.VoiceChatActive != nil && !*snap.VoiceChatActive {
 		err := fmt.Errorf("no active voice chat")
 		utils.EOR(c, replyMsg, F(chatID, "err_no_active_voicechat"), nil)
 		return err
@@ -740,6 +747,7 @@ func handlePlayAttemptError(
 
 	if strings.Contains(err.Error(), "group call") &&
 		strings.Contains(err.Error(), "is closed") {
+		markVoiceChatInactive(room.ID)
 		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "err_no_active_voicechat"), nil)
 		return true, nil
 	}
@@ -762,6 +770,17 @@ func handlePlayAttemptError(
 	}
 
 	return false, nil
+}
+
+// markVoiceChatInactive records that no active voice chat is running in the
+// room, as reported by u-bot.play.
+func markVoiceChatInactive(roomID int64) {
+	cs, err := core.GetChatState(roomID)
+	if err != nil {
+		logger.Errorf("failed to get chat state to mark voice chat inactive: %v", err)
+		return
+	}
+	cs.SetVoiceChatActive(false)
 }
 
 // getFloodWait returns the retry-after seconds for a flood-wait error,

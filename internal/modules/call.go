@@ -69,7 +69,9 @@ func streamEndHandler(
 	var wasLooping bool
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
 		core.DeleteRoom(chatID)
-		c.SendTextMessage(cid, F(cid, "stream_queue_finished"), nil)
+		if _, err := c.SendTextMessage(cid, F(cid, "stream_queue_finished"), nil); err != nil {
+			logger.Error(err)
+		}
 		return
 	} else {
 		wasLooping = r.Loop() > 0

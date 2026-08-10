@@ -66,12 +66,12 @@ func cstopHandler(c *td.Client, m *td.Message) error {
 func handleStop(c *td.Client, m *td.Message, cplay bool) error {
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 	if !r.IsActiveChat() {
-		m.ReplyText(c, F(m.ChatID(), "room_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "room_no_active"), nil)
+		return err
 	}
 
 	isPaused := r.IsPaused()
@@ -88,16 +88,16 @@ func handleStop(c *td.Client, m *td.Message, cplay bool) error {
 			if isMuted {
 				msgKey = "stop_confirm_muted"
 			}
-			m.ReplyText(c, F(m.ChatID(), msgKey), &td.SendTextMessageOpts{
+			_, err := m.ReplyText(c, F(m.ChatID(), msgKey), &td.SendTextMessageOpts{
 				ReplyMarkup: core.GetStopConfirmMarkup(m.ChatID(), r, isPaused),
 			})
-			return nil
+			return err
 		}
 	}
 
 	scheduleOldPlayingMessage(r)
 	core.DeleteRoom(r.ID)
-	m.ReplyText(
+	_, rerr := m.ReplyText(
 		c,
 		F(
 			m.ChatID(),
@@ -106,5 +106,5 @@ func handleStop(c *td.Client, m *td.Message, cplay bool) error {
 		),
 		nil,
 	)
-	return nil
+	return rerr
 }

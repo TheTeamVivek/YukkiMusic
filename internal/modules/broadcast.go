@@ -169,32 +169,32 @@ func broadcastHandler(c *td.Client, m *td.Message) error {
 	}
 
 	if bManager.isActive() {
-		m.ReplyText(c, F(chatID, "broadcast_already_running"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "broadcast_already_running"), nil)
+		return err
 	}
 
 	flags, content, err := parseBroadcastCommand(m)
 	if err != nil {
-		m.ReplyText(c, F(chatID, "broadcast_parse_failed", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "broadcast_parse_failed", locales.Arg{
 			"error": html.EscapeString(err.Error()),
 		}), nil)
-		return nil
+		return err
 	}
 
 	if content == "" && m.ReplyToMessageID() == 0 {
-		m.ReplyText(c, F(chatID, "broadcast_no_content", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "broadcast_no_content", locales.Arg{
 			"cmd": getCommand(m),
 		}), nil)
-		return nil
+		return err
 	}
 
-	chats, users, ok := loadBroadcastTargets(c, chatID, flags, m)
-	if !ok {
-		return nil
+	chats, users, err := loadBroadcastTargets(c, chatID, flags, m)
+	if err != nil {
+		return err
 	}
 	if len(chats) == 0 && len(users) == 0 {
-		m.ReplyText(c, F(chatID, "broadcast_no_targets"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "broadcast_no_targets"), nil)
+		return err
 	}
 
 	applyBroadcastLimit(flags, &chats, &users)
@@ -210,8 +210,8 @@ func broadcastHandler(c *td.Client, m *td.Message) error {
 
 	ctx, ok := bManager.start(stats)
 	if !ok {
-		m.ReplyText(c, F(chatID, "broadcast_already_running"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "broadcast_already_running"), nil)
+		return err
 	}
 
 	progressMsg, err := m.ReplyText(c, F(chatID, "broadcast_initializing"),
@@ -296,30 +296,32 @@ func loadBroadcastTargets(
 	chatID int64,
 	flags *BroadcastFlags,
 	m *td.Message,
-) (chats, users []int64, ok bool) {
+) (chats, users []int64, err error) {
 	if !flags.NoChat {
-		var err error
 		chats, err = database.ServedChats()
 		if err != nil {
-			m.ReplyText(c, F(chatID, "broadcast_fetch_chats_failed", locales.Arg{
+			if _, rerr := m.ReplyText(c, F(chatID, "broadcast_fetch_chats_failed", locales.Arg{
 				"error": html.EscapeString(err.Error()),
-			}), nil)
-			return nil, nil, false
+			}), nil); rerr != nil {
+				return nil, nil, rerr
+			}
+			return nil, nil, err
 		}
 	}
 
 	if !flags.NoUser {
-		var err error
 		users, err = database.ServedUsers()
 		if err != nil {
-			m.ReplyText(c, F(chatID, "broadcast_fetch_users_failed", locales.Arg{
+			if _, rerr := m.ReplyText(c, F(chatID, "broadcast_fetch_users_failed", locales.Arg{
 				"error": html.EscapeString(err.Error()),
-			}), nil)
-			return nil, nil, false
+			}), nil); rerr != nil {
+				return nil, nil, rerr
+			}
+			return nil, nil, err
 		}
 	}
 
-	return chats, users, true
+	return chats, users, nil
 }
 
 func applyBroadcastLimit(flags *BroadcastFlags, chats, users *[]int64) {
@@ -618,12 +620,12 @@ func broadcastProgressLine(chatID int64, key string, done, total int) string {
 
 func handleBroadcastCancel(c *td.Client, m *td.Message) error {
 	if !bManager.isActive() {
-		m.ReplyText(c, F(m.ChatID(), "broadcast_not_running"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "broadcast_not_running"), nil)
+		return err
 	}
 	bManager.cancel()
-	m.ReplyText(c, F(m.ChatID(), "broadcast_cancel_success"), nil)
-	return nil
+	_, err := m.ReplyText(c, F(m.ChatID(), "broadcast_cancel_success"), nil)
+	return err
 }
 
 func broadcastCancelCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {

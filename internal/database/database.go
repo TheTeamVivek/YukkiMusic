@@ -24,6 +24,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"yukkimusic/config"
 	"yukkimusic/internal/logger"
 
 	"yukkimusic/internal/utils"
@@ -50,7 +51,7 @@ func Init(mongoURL string) (func(), error) {
 
 	logr.Debug("Successfully connected to MongoDB.")
 
-	database = client.Database("YukkiMusic")
+	database = client.Database(config.DBName)
 	settingsColl = database.Collection("bot_settings")
 	chatSettingsColl = database.Collection("chat_settings")
 

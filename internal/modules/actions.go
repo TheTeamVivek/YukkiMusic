@@ -95,7 +95,9 @@ func handleChatMemberAdd(c *td.Client, m *td.Message) error {
 		}
 
 		if blockedChat, _ := database.IsBlacklistedChat(chatID); blockedChat && !isOwnerOrSudo(m.SenderID()) {
-			m.ReplyText(c, F(chatID, "blacklist_chat_blocked"), nil)
+			if _, rerr := m.ReplyText(c, F(chatID, "blacklist_chat_blocked"), nil); rerr != nil {
+				logger.Error(rerr)
+			}
 			leaveChat(c, chatID)
 			return nil
 		}
@@ -103,18 +105,24 @@ func handleChatMemberAdd(c *td.Client, m *td.Message) error {
 		ownerID, err := utils.GetChatOwner(c, chatID)
 		if err == nil {
 			if blockedOwner, _ := database.IsBlacklistedUser(ownerID); blockedOwner && !isOwnerOrSudo(m.SenderID()) {
-				m.ReplyText(c, F(chatID, "blacklist_owner_blocked_leave"), nil)
+				if _, rerr := m.ReplyText(c, F(chatID, "blacklist_owner_blocked_leave"), nil); rerr != nil {
+					logger.Error(rerr)
+				}
 				leaveChat(c, chatID)
 				return nil
 			}
 		}
 
 		logger.Debug("Bot added to " + utils.IntToStr(chatID))
-		m.ReplyText(c, F(chatID, "bot_added_normal"), nil)
+		if _, rerr := m.ReplyText(c, F(chatID, "bot_added_normal"), nil); rerr != nil {
+			return rerr
+		}
 		database.AddServedChat(chatID)
 
 		if config.LoggerID != 0 {
-			c.SendTextMessage(config.LoggerID, F(config.LoggerID, "logger_bot_added", buildLogArgs(c, m, chatID, "added")), nil)
+			if _, rerr := c.SendTextMessage(config.LoggerID, F(config.LoggerID, "logger_bot_added", buildLogArgs(c, m, chatID, "added")), nil); rerr != nil {
+				return rerr
+			}
 		}
 
 		return nil
@@ -140,7 +148,9 @@ func handleChatMemberDelete(c *td.Client, m *td.Message) error {
 		database.RemoveServedChat(chatID)
 
 		if config.LoggerID != 0 {
-			c.SendTextMessage(config.LoggerID, F(config.LoggerID, "logger_bot_removed", buildLogArgs(c, m, chatID, "removed")), nil)
+			if _, rerr := c.SendTextMessage(config.LoggerID, F(config.LoggerID, "logger_bot_removed", buildLogArgs(c, m, chatID, "removed")), nil); rerr != nil {
+				return rerr
+			}
 		}
 	}
 
@@ -170,7 +180,9 @@ func handleVoiceChatAction(c *td.Client, m *td.Message) error {
 	s.SetVoiceChatActive(isActive)
 
 	msgKey := utils.IfElse(isActive, "voicechat_started", "voicechat_ended")
-	c.SendTextMessage(chatID, F(chatID, msgKey, locales.Arg{"duration": utils.FormatDuration(int(duration))}), nil)
+	if _, rerr := c.SendTextMessage(chatID, F(chatID, msgKey, locales.Arg{"duration": utils.FormatDuration(int(duration))}), nil); rerr != nil {
+		logger.Error(rerr)
+	}
 	logger.Debugf("Voice chat %s in %d", msgKey, chatID)
 
 	if !isActive {

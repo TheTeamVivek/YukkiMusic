@@ -33,21 +33,21 @@ func handleBlockUser(c *td.Client, m *td.Message) error {
 		return nil
 	}
 	if m.Args() == "" && m.ReplyToMessageID() == 0 {
-		_, _ = m.ReplyText(c, F(m.ChatID(), "auth_no_user", locales.Arg{"cmd": getCommand(m)}), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "auth_no_user", locales.Arg{"cmd": getCommand(m)}), nil)
+		return err
 	}
 
 	userID, err := utils.ExtractUser(c, m)
 	if err != nil {
-		_, _ = m.ReplyText(c, F(m.ChatID(), "user_extract_fail", locales.Arg{"error": err.Error()}), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "user_extract_fail", locales.Arg{"error": err.Error()}), nil)
+		return err
 	}
 	if err := database.AddBlacklistedUser(userID); err != nil {
-		_, _ = m.ReplyText(c, "Failed to block user: "+err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, "Failed to block user: "+err.Error(), nil)
+		return err
 	}
-	_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_block_user_success", locales.Arg{"id": userID}), nil)
-	return nil
+	_, rerr := m.ReplyText(c, F(m.ChatID(), "blacklist_block_user_success", locales.Arg{"id": userID}), nil)
+	return rerr
 }
 
 func handleUnblockUser(c *td.Client, m *td.Message) error {
@@ -55,21 +55,21 @@ func handleUnblockUser(c *td.Client, m *td.Message) error {
 		return nil
 	}
 	if m.Args() == "" && m.ReplyToMessageID() == 0 {
-		_, _ = m.ReplyText(c, F(m.ChatID(), "auth_no_user", locales.Arg{"cmd": getCommand(m)}), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "auth_no_user", locales.Arg{"cmd": getCommand(m)}), nil)
+		return err
 	}
 
 	userID, err := utils.ExtractUser(c, m)
 	if err != nil {
-		_, _ = m.ReplyText(c, F(m.ChatID(), "user_extract_fail", locales.Arg{"error": err.Error()}), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "user_extract_fail", locales.Arg{"error": err.Error()}), nil)
+		return err
 	}
 	if err := database.RemoveBlacklistedUser(userID); err != nil {
-		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_unblock_user_fail", locales.Arg{"error": err.Error()}), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "blacklist_unblock_user_fail", locales.Arg{"error": err.Error()}), nil)
+		return err
 	}
-	_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_unblock_user_success", locales.Arg{"id": userID}), nil)
-	return nil
+	_, rerr := m.ReplyText(c, F(m.ChatID(), "blacklist_unblock_user_success", locales.Arg{"id": userID}), nil)
+	return rerr
 }
 
 func handleBlockChat(c *td.Client, m *td.Message) error {
@@ -77,20 +77,20 @@ func handleBlockChat(c *td.Client, m *td.Message) error {
 		return nil
 	}
 	if m.Args() == "" {
-		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_usage_blockchat"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "blacklist_usage_blockchat"), nil)
+		return err
 	}
 	chatID, err := utils.ExtractChat(c, m)
 	if err != nil {
-		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_invalid_chat_identifier", locales.Arg{"error": err.Error()}), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "blacklist_invalid_chat_identifier", locales.Arg{"error": err.Error()}), nil)
+		return err
 	}
 	if err := database.AddBlacklistedChat(chatID); err != nil {
-		_, _ = m.ReplyText(c, "Failed to block chat: "+err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, "Failed to block chat: "+err.Error(), nil)
+		return err
 	}
-	_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_block_chat_success", locales.Arg{"id": chatID}), nil)
-	return nil
+	_, rerr := m.ReplyText(c, F(m.ChatID(), "blacklist_block_chat_success", locales.Arg{"id": chatID}), nil)
+	return rerr
 }
 
 func handleUnblockChat(c *td.Client, m *td.Message) error {
@@ -98,20 +98,20 @@ func handleUnblockChat(c *td.Client, m *td.Message) error {
 		return nil
 	}
 	if m.Args() == "" {
-		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_usage_unblockchat"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "blacklist_usage_unblockchat"), nil)
+		return err
 	}
 	chatID, err := utils.ExtractChat(c, m)
 	if err != nil {
-		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_invalid_chat_identifier", locales.Arg{"error": err.Error()}), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "blacklist_invalid_chat_identifier", locales.Arg{"error": err.Error()}), nil)
+		return err
 	}
 	if err := database.RemoveBlacklistedChat(chatID); err != nil {
-		_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_unblock_chat_fail", locales.Arg{"error": err.Error()}), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "blacklist_unblock_chat_fail", locales.Arg{"error": err.Error()}), nil)
+		return err
 	}
-	_, _ = m.ReplyText(c, F(m.ChatID(), "blacklist_unblock_chat_success", locales.Arg{"id": chatID}), nil)
-	return nil
+	_, rerr := m.ReplyText(c, F(m.ChatID(), "blacklist_unblock_chat_success", locales.Arg{"id": chatID}), nil)
+	return rerr
 }
 
 func handleBlacklisted(c *td.Client, m *td.Message) error {
@@ -121,13 +121,13 @@ func handleBlacklisted(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 	chats, err := database.BlacklistedChats()
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "blacklist_fetch_chats_fail", locales.Arg{"error": err.Error()}), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "blacklist_fetch_chats_fail", locales.Arg{"error": err.Error()}), nil)
+		return err
 	}
 	users, err := database.BlacklistedUsers()
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "blacklist_fetch_users_fail", locales.Arg{"error": err.Error()}), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "blacklist_fetch_users_fail", locales.Arg{"error": err.Error()}), nil)
+		return err
 	}
 
 	var b strings.Builder
@@ -157,7 +157,6 @@ func handleBlacklisted(c *td.Client, m *td.Message) error {
 			b.WriteString(strconv.Itoa(i+1) + ". <code>" + strconv.FormatInt(id, 10) + "</code>\n")
 		}
 	}
-
-	_, _ = m.ReplyText(c, b.String(), nil)
-	return nil
+	_, rerr := m.ReplyText(c, b.String(), nil)
+	return rerr
 }

@@ -85,13 +85,15 @@ func logsHandler(c *td.Client, m *td.Message) error {
 
 	info, err := os.Stat(logFile)
 	if err != nil || info.Size() == 0 {
-		m.ReplyText(c, F(chatID, "logs_empty"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "logs_empty"), nil)
+		return err
 	}
 
 	_, err = m.ReplyDocument(c, &td.InputFileLocal{Path: logFile}, nil)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
+		if _, rerr := m.ReplyText(c, err.Error(), nil); rerr != nil {
+			return rerr
+		}
 	}
 
 	return nil
@@ -104,8 +106,8 @@ func shellHandler(c *td.Client, m *td.Message) error {
 	cmd := m.Args()
 	var cmdArgs []string
 	if cmd == "" {
-		m.ReplyText(c, "No command provided", nil)
-		return nil
+		_, err := m.ReplyText(c, "No command provided", nil)
+		return err
 	}
 
 	if runtime.GOOS == "windows" {
@@ -127,21 +129,25 @@ func shellHandler(c *td.Client, m *td.Message) error {
 
 	if errx.String() == "" && out.String() == "" {
 		if err != nil {
-			m.ReplyText(c, "<code>Error:</code> <b>"+err.Error()+"</b>", html)
-			return nil
+			_, err := m.ReplyText(c, "<code>Error:</code> <b>"+err.Error()+"</b>", html)
+			return err
 		}
-		m.ReplyText(c, "<code>No Output</code>", html)
-		return nil
+		_, err := m.ReplyText(c, "<code>No Output</code>", html)
+		return err
 	}
 
 	if out.String() != "" {
-		m.ReplyText(
+		if _, rerr := m.ReplyText(
 			c,
 			`<pre lang="bash">`+strings.TrimSpace(out.String())+`</pre>`,
 			html,
-		)
+		); rerr != nil {
+			return rerr
+		}
 	} else {
-		m.ReplyText(c, `<pre lang="bash">`+strings.TrimSpace(errx.String())+`</pre>`, html)
+		if _, rerr := m.ReplyText(c, `<pre lang="bash">`+strings.TrimSpace(errx.String())+`</pre>`, html); rerr != nil {
+			return rerr
+		}
 	}
 	return nil
 }
@@ -167,8 +173,8 @@ func jsonHandle(c *td.Client, m *td.Message) error {
 	} else {
 		r, err := m.GetRepliedMessage(c)
 		if err != nil || r == nil {
-			m.ReplyText(c, "<code>Error:</code> <b>could not fetch replied message</b>", html)
-			return nil
+			_, err := m.ReplyText(c, "<code>Error:</code> <b>could not fetch replied message</b>", html)
+			return err
 		}
 		switch {
 		case strings.Contains(m.Args(), "-s"):
@@ -194,8 +200,8 @@ func jsonHandle(c *td.Client, m *td.Message) error {
 	for _, v := range dataFields {
 		decoded, err := base64.StdEncoding.DecodeString(v[1])
 		if err != nil {
-			m.ReplyText(c, "Error: "+err.Error(), html)
-			return nil
+			_, err := m.ReplyText(c, "Error: "+err.Error(), html)
+			return err
 		}
 		jsonString = []byte(
 			strings.ReplaceAll(
@@ -210,14 +216,14 @@ func jsonHandle(c *td.Client, m *td.Message) error {
 		defer os.Remove("message.json")
 		tmpFile, err := os.Create("message.json")
 		if err != nil {
-			m.ReplyText(c, "Error: "+err.Error(), html)
-			return nil
+			_, err := m.ReplyText(c, "Error: "+err.Error(), html)
+			return err
 		}
 
 		_, err = tmpFile.Write(jsonString)
 		if err != nil {
-			m.ReplyText(c, "Error: "+err.Error(), html)
-			return nil
+			_, err := m.ReplyText(c, "Error: "+err.Error(), html)
+			return err
 		}
 
 		_, err = m.ReplyDocument(
@@ -226,10 +232,14 @@ func jsonHandle(c *td.Client, m *td.Message) error {
 			&td.SendDocumentOpts{Caption: "Message JSON"},
 		)
 		if err != nil {
-			m.ReplyText(c, "Error: "+err.Error(), html)
+			if _, rerr := m.ReplyText(c, "Error: "+err.Error(), html); rerr != nil {
+				return rerr
+			}
 		}
 	} else {
-		m.ReplyText(c, "<pre lang='json'>"+string(jsonString)+"</pre>", html)
+		if _, rerr := m.ReplyText(c, "<pre lang='json'>"+string(jsonString)+"</pre>", html); rerr != nil {
+			return rerr
+		}
 	}
 
 	return nil

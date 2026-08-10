@@ -55,42 +55,41 @@ func nothumbHandler(c *td.Client, m *td.Message) error {
 
 	current, err := database.ThumbnailsDisabled(chatID)
 	if err != nil {
-		m.ReplyText(c, F(chatID, "nothumb_fetch_fail"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "nothumb_fetch_fail"), nil)
+		return err
 	}
 
 	if len(args) < 2 {
 		action := utils.IfElse(!current, "enabled", "disabled")
-		m.ReplyText(c, F(chatID, "nothumb_status", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "nothumb_status", locales.Arg{
 			"cmd":    getCommand(m),
 			"action": action,
 		}), nil)
-		return nil
+		return err
 	}
 
 	value, err := utils.ParseBool(args[1])
 	if err != nil {
-		m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
+		return err
 	}
 
 	if current == value {
 		action := utils.IfElse(!value, "enabled", "disabled")
-		m.ReplyText(c, F(chatID, "nothumb_already", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "nothumb_already", locales.Arg{
 			"action": action,
 		}), nil)
-		return nil
+		return err
 	}
 
 	if err := database.SetThumbnailsDisabled(chatID, value); err != nil {
-		m.ReplyText(c, F(chatID, "nothumb_update_fail"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "nothumb_update_fail"), nil)
+		return err
 	}
 
 	action := utils.IfElse(!value, "enabled", "disabled")
-
-	m.ReplyText(c, F(chatID, "nothumb_updated", locales.Arg{
+	_, rerr := m.ReplyText(c, F(chatID, "nothumb_updated", locales.Arg{
 		"action": action,
 	}), nil)
-	return nil
+	return rerr
 }

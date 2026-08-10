@@ -35,8 +35,8 @@ func startHandler(c *td.Client, m *td.Message) error {
 
 	if !m.IsPrivate() {
 		database.AddServedChat(m.ChatID())
-		m.ReplyText(c, F(m.ChatID(), "start_group"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "start_group"), nil)
+		return err
 	}
 
 	database.AddServedUser(m.ChatID())

@@ -70,14 +70,14 @@ func handleShuffle(c *td.Client, m *td.Message, cplay bool) error {
 
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 	chatID := m.ChatID()
 
 	if !r.IsActiveChat() {
-		m.ReplyText(c, F(chatID, "room_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return err
 	}
 
 	r.Parse()
@@ -89,12 +89,11 @@ func handleShuffle(c *td.Client, m *td.Message, cplay bool) error {
 			state = F(chatID, "enabled")
 			cmd = getCommand(m) + " off"
 		}
-
-		m.ReplyText(c, F(chatID, "shuffle_current_state", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "shuffle_current_state", locales.Arg{
 			"state": state,
 			"cmd":   cmd,
 		}), nil)
-		return nil
+		return err
 	}
 
 	var newState bool
@@ -113,11 +112,9 @@ func handleShuffle(c *td.Client, m *td.Message, cplay bool) error {
 
 	sender, _ := m.GetUser(c)
 	mention := mentionOf(sender, m.SenderID())
-
-	m.ReplyText(c, F(chatID, "shuffle_updated", locales.Arg{
+	_, rerr := m.ReplyText(c, F(chatID, "shuffle_updated", locales.Arg{
 		"state": state,
 		"user":  mention,
 	}), nil)
-
-	return nil
+	return rerr
 }

@@ -69,6 +69,11 @@ var (
 		"txxx": true, "xhamster": true, "xnxx": true, "xvideos": true,
 		"xxxymovies": true, "youjizz": true, "youporn": true, "zenporn": true,
 	}
+	// audioOnlyExtractors are sites without video streams; a video request is
+	// silently downgraded to audio.
+	audioOnlyExtractors = map[string]bool{
+		"soundcloud": true,
+	}
 	ytURLPatterns = []*regexp.Regexp{
 		regexp.MustCompile(`(?i)(youtube\.com|youtu\.be|music\.youtube\.com)`),
 	}
@@ -257,6 +262,9 @@ func (y *YtdlpPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 }
 
 func (y *YtdlpPlatform) toTrack(info *ytdlpInfo, video bool) *state.Track {
+	if video && audioOnlyExtractors[strings.ToLower(info.Extractor)] {
+		video = false
+	}
 	return &state.Track{
 		ID:       info.ID,
 		Title:    info.Title,

@@ -63,25 +63,27 @@ func handleResume(c *td.Client, m *td.Message, cplay bool) error {
 
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
 	if !r.IsActiveChat() {
-		m.ReplyText(c, F(chatID, "room_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return err
 	}
 
 	if !r.IsPaused() {
-		m.ReplyText(c, F(chatID, "resume_already_playing"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "resume_already_playing"), nil)
+		return err
 	}
 
 	t := r.Track()
 	if _, err := r.Resume(); err != nil {
-		m.ReplyText(c, F(chatID, "resume_failed", locales.Arg{
+		if _, rerr := m.ReplyText(c, F(chatID, "resume_failed", locales.Arg{
 			"error": err,
-		}), nil)
+		}), nil); rerr != nil {
+			return rerr
+		}
 	} else {
 		title := utils.EscapeHTML(utils.ShortTitle(t.Title, 25))
 		pos := utils.FormatDuration(r.Position())
@@ -95,14 +97,15 @@ func handleResume(c *td.Client, m *td.Message, cplay bool) error {
 				"speed": fmt.Sprintf("%.2f", r.Speed()),
 			})
 		}
-
-		m.ReplyText(c, F(chatID, "resume_success", locales.Arg{
+		if _, rerr := m.ReplyText(c, F(chatID, "resume_success", locales.Arg{
 			"title":      title,
 			"position":   pos,
 			"duration":   total,
 			"user":       mention,
 			"speed_line": speedLine,
-		}), nil)
+		}), nil); rerr != nil {
+			return rerr
+		}
 	}
 
 	return nil

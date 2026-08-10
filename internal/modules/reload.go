@@ -27,6 +27,7 @@ import (
 
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/locales"
+	"yukkimusic/internal/logger"
 	"yukkimusic/internal/utils"
 )
 
@@ -74,8 +75,8 @@ func creloadHandler(c *td.Client, m *td.Message) error {
 func handleReload(c *td.Client, m *td.Message, cplay bool) error {
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		_, _ = m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
 	chatID := m.ChatID()
@@ -108,6 +109,13 @@ func handleReload(c *td.Client, m *td.Message, cplay bool) error {
 			"summary": summary,
 		}), &td.EditTextMessageOpts{ParseMode: td.ParseModeHTML})
 		return nil
+	}
+
+	if err := cs.EnsureAssistantJoined(""); err != nil {
+		logger.Errorf("reload: failed to ensure assistant joined %d: %v", roomID, err)
+		summary += F(chatID, "reload_assistant_fail", locales.Arg{
+			"error": err.Error(),
+		}) + "\n"
 	}
 
 	snapshot, snapErr := cs.Snapshot(true)
@@ -162,7 +170,7 @@ func reloadVoiceChatStatus(chatID int64, snap core.StateSnapshot, err error) str
 		}) + "\n"
 	}
 
-	if snap.VoiceChatActive {
+	if snap.VoiceChatActive != nil && *snap.VoiceChatActive {
 		return F(chatID, "reload_voice_active") + "\n"
 	}
 	return F(chatID, "reload_voice_inactive") + "\n"

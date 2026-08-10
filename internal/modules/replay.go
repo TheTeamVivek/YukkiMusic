@@ -63,28 +63,32 @@ func handleReplay(c *td.Client, m *td.Message, cplay bool) error {
 
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
 	if !r.IsActiveChat() {
-		m.ReplyText(c, F(chatID, "room_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return err
 	}
 	t := r.Track()
 
 	if err := r.Replay(); err != nil {
-		m.ReplyText(c, F(chatID, "replay_failed", locales.Arg{
+		if _, rerr := m.ReplyText(c, F(chatID, "replay_failed", locales.Arg{
 			"error": err,
-		}), nil)
+		}), nil); rerr != nil {
+			return rerr
+		}
 	} else {
 		trackTitle := utils.EscapeHTML(utils.ShortTitle(t.Title, 25))
 		totalDuration := utils.FormatDuration(t.Duration)
-		m.ReplyText(c, F(chatID, "replay_success", locales.Arg{
+		if _, rerr := m.ReplyText(c, F(chatID, "replay_success", locales.Arg{
 			"title":    trackTitle,
 			"duration": totalDuration,
 			"speed":    fmt.Sprintf("%.2f", r.Speed()),
-		}), nil)
+		}), nil); rerr != nil {
+			return rerr
+		}
 	}
 
 	return nil

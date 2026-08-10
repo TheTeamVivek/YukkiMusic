@@ -73,14 +73,14 @@ func handleQueue(c *td.Client, m *td.Message, cplay bool) error {
 
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
 	t := r.Track()
 	if !r.IsActiveChat() || t == nil {
-		m.ReplyText(c, F(chatID, "queue_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "queue_no_active"), nil)
+		return err
 	}
 
 	var b strings.Builder
@@ -185,9 +185,8 @@ func handleQueue(c *td.Client, m *td.Message, cplay bool) error {
 	} else {
 		b.WriteString(F(chatID, "queue_empty_tail"))
 	}
-
-	m.ReplyText(c, b.String(), nil)
-	return nil
+	_, rerr := m.ReplyText(c, b.String(), nil)
+	return rerr
 }
 
 func handleRemove(c *td.Client, m *td.Message, cplay bool) error {
@@ -203,58 +202,56 @@ func handleRemove(c *td.Client, m *td.Message, cplay bool) error {
 
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 	t := r.Track()
 	if !r.IsActiveChat() || t == nil {
-		m.ReplyText(c, F(chatID, "queue_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "queue_no_active"), nil)
+		return err
 	}
 
 	if len(r.Queue()) == 0 {
-		m.ReplyText(c, F(chatID, "queue_empty"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "queue_empty"), nil)
+		return err
 	}
 
 	args := strings.Fields(m.Text())
 	if len(args) < 2 {
-		m.ReplyText(c, F(chatID, "remove_usage", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "remove_usage", locales.Arg{
 			"cmd": getCommand(m),
 		}), nil)
-		return nil
+		return err
 	}
 
 	index, err := strconv.Atoi(args[1])
 	if err != nil {
-		m.ReplyText(c, F(chatID, "remove_invalid_index"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "remove_invalid_index"), nil)
+		return err
 	}
 
 	if index <= 0 {
-		m.ReplyText(c, F(chatID, "remove_index_too_small"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "remove_index_too_small"), nil)
+		return err
 	}
 
 	total := len(r.Queue())
 	if index > total {
-		m.ReplyText(c, F(chatID, "remove_index_too_big", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "remove_index_too_big", locales.Arg{
 			"total": total,
 		}), nil)
-		return nil
+		return err
 	}
 
 	r.RemoveFromQueue(index - 1)
 
 	sender, _ := m.GetUser(c)
 	mention := mentionOf(sender, m.SenderID())
-
-	m.ReplyText(c, F(chatID, "remove_success", locales.Arg{
+	_, rerr := m.ReplyText(c, F(chatID, "remove_success", locales.Arg{
 		"index": index,
 		"user":  mention,
 	}), nil)
-
-	return nil
+	return rerr
 }
 
 func handleClear(c *td.Client, m *td.Message, cplay bool) error {
@@ -270,18 +267,18 @@ func handleClear(c *td.Client, m *td.Message, cplay bool) error {
 
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 	t := r.Track()
 	if !r.IsActiveChat() || t == nil {
-		m.ReplyText(c, F(chatID, "clear_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "clear_no_active"), nil)
+		return err
 	}
 
 	if len(r.Queue()) == 0 {
-		m.ReplyText(c, F(chatID, "queue_empty"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "queue_empty"), nil)
+		return err
 	}
 
 	r.SetData("last_queue", r.Queue())
@@ -294,13 +291,11 @@ func handleClear(c *td.Client, m *td.Message, cplay bool) error {
 
 	sender, _ := m.GetUser(c)
 	mention := mentionOf(sender, m.SenderID())
-
-	m.ReplyText(c, F(chatID, "clear_success", locales.Arg{
+	_, rerr := m.ReplyText(c, F(chatID, "clear_success", locales.Arg{
 		"user": mention,
 		"cmd":  restoreCmd,
 	}), nil)
-
-	return nil
+	return rerr
 }
 
 func handleMove(c *td.Client, m *td.Message, cplay bool) error {
@@ -316,60 +311,58 @@ func handleMove(c *td.Client, m *td.Message, cplay bool) error {
 
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
 	if !r.IsActiveChat() || r.Track() == nil {
-		m.ReplyText(c, F(chatID, "queue_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "queue_no_active"), nil)
+		return err
 	}
 
 	if len(r.Queue()) == 0 {
-		m.ReplyText(c, F(chatID, "queue_empty"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "queue_empty"), nil)
+		return err
 	}
 
 	args := strings.Fields(m.Text())
 	if len(args) < 3 {
-		m.ReplyText(c, F(chatID, "move_usage", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "move_usage", locales.Arg{
 			"cmd": getCommand(m),
 		}), nil)
-		return nil
+		return err
 	}
 
 	from, err1 := strconv.Atoi(args[1])
 	to, err2 := strconv.Atoi(args[2])
 	if err1 != nil || err2 != nil {
-		m.ReplyText(c, F(chatID, "move_invalid_numbers", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "move_invalid_numbers", locales.Arg{
 			"cmd": getCommand(m),
 		}), nil)
-		return nil
+		return err
 	}
 
 	if from <= 0 || to <= 0 {
-		m.ReplyText(c, F(chatID, "move_invalid_indexes_min"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "move_invalid_indexes_min"), nil)
+		return err
 	}
 
 	queueLen := len(r.Queue())
 	if from > queueLen || to > queueLen {
-		m.ReplyText(c, F(chatID, "move_invalid_indexes_max", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "move_invalid_indexes_max", locales.Arg{
 			"queue_len": queueLen,
 		}), nil)
-		return nil
+		return err
 	}
 
 	r.MoveInQueue(from-1, to-1)
 
 	sender, _ := m.GetUser(c)
 	mention := mentionOf(sender, m.SenderID())
-
-	m.ReplyText(c, F(chatID, "move_success", locales.Arg{
+	_, rerr := m.ReplyText(c, F(chatID, "move_success", locales.Arg{
 		"from": from,
 		"to":   to,
 		"user": mention,
 	}), nil)
-
-	return nil
+	return rerr
 }

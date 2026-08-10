@@ -71,12 +71,12 @@ func handleMaintenance(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 	current, err := database.IsMaintenanceEnabled()
 	if err != nil {
-		_, _ = m.ReplyText(
+		_, err := m.ReplyText(
 			c,
 			F(chatID, "maint_check_fail", locales.Arg{"error": err.Error()}),
 			nil,
 		)
-		return nil
+		return err
 	}
 
 	if len(args) < 2 {
@@ -85,8 +85,8 @@ func handleMaintenance(c *td.Client, m *td.Message) error {
 
 	enable, err := utils.ParseBool(args[1])
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
+		return err
 	}
 
 	reason := strings.Join(args[2:], " ")
@@ -112,11 +112,11 @@ func showMaintenanceStatus(c *td.Client, m *td.Message, current bool) error {
 			status = F(chatID, "enabled")
 		}
 	}
-	_, _ = m.ReplyText(c, F(chatID, "maint_usage", locales.Arg{
+	_, err := m.ReplyText(c, F(chatID, "maint_usage", locales.Arg{
 		"cmd":    getCommand(m),
 		"status": status,
 	}), nil)
-	return nil
+	return err
 }
 
 func handleSameMaintenanceState(
@@ -127,26 +127,34 @@ func handleSameMaintenanceState(
 ) error {
 	chatID := m.ChatID()
 	if !enable {
-		_, _ = m.ReplyText(c, F(chatID, "maint_already_disabled"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "maint_already_disabled"), nil)
+		return err
 	}
 
 	oldReason, _ := database.MaintenanceReason()
 	switch {
 	case reason == oldReason:
-		_, _ = m.ReplyText(c, F(chatID, "maint_already_reason_same"), nil)
+		if _, err := m.ReplyText(c, F(chatID, "maint_already_reason_same"), nil); err != nil {
+			return err
+		}
 	case reason == "" && oldReason != "":
 		_ = database.SetMaintenance(true, "")
-		_, _ = m.ReplyText(c, F(chatID, "maint_reason_removed"), nil)
+		if _, err := m.ReplyText(c, F(chatID, "maint_reason_removed"), nil); err != nil {
+			return err
+		}
 	case reason != "" && reason != oldReason:
 		_ = database.SetMaintenance(true, reason)
-		_, _ = m.ReplyText(
+		if _, err := m.ReplyText(
 			c,
 			F(chatID, "maint_reason_updated", locales.Arg{"reason": reason}),
 			nil,
-		)
+		); err != nil {
+			return err
+		}
 	default:
-		_, _ = m.ReplyText(c, F(chatID, "maint_already_enabled"), nil)
+		if _, err := m.ReplyText(c, F(chatID, "maint_already_enabled"), nil); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -173,9 +181,13 @@ func applyMaintenanceState(c *td.Client, m *td.Message, enable bool, reason stri
 			msgKey = "maint_enabled_reason"
 			args["reason"] = reason
 		}
-		_, _ = m.ReplyText(c, F(chatID, msgKey, args), nil)
+		if _, err := m.ReplyText(c, F(chatID, msgKey, args), nil); err != nil {
+			return err
+		}
 	} else {
-		_, _ = m.ReplyText(c, F(chatID, "maint_disabled"), nil)
+		if _, err := m.ReplyText(c, F(chatID, "maint_disabled"), nil); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -200,7 +212,9 @@ func notifyMaintenanceStart(c *td.Client, reason string) {
 				locales.Arg{"reason": reason},
 			)
 		}
-		_, _ = c.SendTextMessage(chatID, msg, nil)
+		if _, err := c.SendTextMessage(chatID, msg, nil); err != nil {
+			logger.Error(err)
+		}
 		time.Sleep(time.Second)
 	}
 }

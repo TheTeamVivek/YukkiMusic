@@ -24,6 +24,7 @@ import (
 
 	"yukkimusic/config"
 	"yukkimusic/internal/database"
+	"yukkimusic/internal/logger"
 	"yukkimusic/internal/utils"
 )
 
@@ -38,7 +39,9 @@ func getCommand(m *td.Message) string {
 
 func checkSudo(c *td.Client, m *td.Message) bool {
 	if !isOwnerOrSudo(m.SenderID()) {
-		m.ReplyText(c, F(m.ChatID(), "only_sudo"), nil)
+		if _, err := m.ReplyText(c, F(m.ChatID(), "only_sudo"), nil); err != nil {
+			logger.Error(err)
+		}
 		return false
 	}
 	return true
@@ -46,7 +49,9 @@ func checkSudo(c *td.Client, m *td.Message) bool {
 
 func checkOwner(c *td.Client, m *td.Message) bool {
 	if config.OwnerID == 0 || m.SenderID() != config.OwnerID {
-		m.ReplyText(c, F(m.ChatID(), "only_owner"), nil)
+		if _, err := m.ReplyText(c, F(m.ChatID(), "only_owner"), nil); err != nil {
+			logger.Error(err)
+		}
 		return false
 	}
 	return true
@@ -54,7 +59,9 @@ func checkOwner(c *td.Client, m *td.Message) bool {
 
 func isSuperGroup(c *td.Client, m *td.Message) bool {
 	if m.IsPrivate() {
-		m.ReplyText(c, F(m.ChatID(), "only_supergroup"), nil)
+		if _, err := m.ReplyText(c, F(m.ChatID(), "only_supergroup"), nil); err != nil {
+			logger.Error(err)
+		}
 		database.AddServedUser(m.ChatID())
 		return false
 	}
@@ -80,9 +87,13 @@ func filterAuthUsers(c *td.Client, m *td.Message) bool {
 
 	mode, err := database.GetAdminMode(m.ChatID())
 	if err == nil && mode == database.AdminModeAdminsOnly {
-		m.ReplyText(c, F(m.ChatID(), "only_admin"), nil)
+		if _, err := m.ReplyText(c, F(m.ChatID(), "only_admin"), nil); err != nil {
+			logger.Error(err)
+		}
 	} else {
-		m.ReplyText(c, F(m.ChatID(), "only_admin_or_auth"), nil)
+		if _, err := m.ReplyText(c, F(m.ChatID(), "only_admin_or_auth"), nil); err != nil {
+			logger.Error(err)
+		}
 	}
 	return false
 }

@@ -84,7 +84,6 @@ func activeHandler(c *td.Client, m *td.Message) error {
 			"broken": brokenCount,
 		})
 	}
-
-	_, _ = m.ReplyText(c, msg, nil)
-	return nil
+	_, err := m.ReplyText(c, msg, nil)
+	return err
 }

@@ -58,10 +58,10 @@ func helpHandler(c *td.Client, m *td.Message) error {
 	}
 
 	if !m.IsPrivate() {
-		m.ReplyText(c, F(m.ChatID(), "help_private_only"), &td.SendTextMessageOpts{
+		_, err := m.ReplyText(c, F(m.ChatID(), "help_private_only"), &td.SendTextMessageOpts{
 			ReplyMarkup: core.GetGroupHelpKeyboard(m.ChatID()),
 		})
-		return nil
+		return err
 	}
 
 	_, err := m.ReplyText(c, F(m.ChatID(), "help_main"), &td.SendTextMessageOpts{

@@ -38,8 +38,8 @@ func setCPlayHandler(c *td.Client, m *td.Message) error {
 	}
 	args := strings.Fields(m.Text())
 	if len(args) <= 1 {
-		m.ReplyText(c, F(m.ChatID(), "cplay_usage"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(m.ChatID(), "cplay_usage"), nil)
+		return err
 	}
 
 	chatID := m.ChatID()
@@ -59,8 +59,8 @@ func setCPlayHandler(c *td.Client, m *td.Message) error {
 		targetChannelID, err = resolveChannelPlay(c, chatID, arg)
 	}
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
 	me := c.Me
@@ -71,19 +71,19 @@ func setCPlayHandler(c *td.Client, m *td.Message) error {
 		}
 	}
 	if me == nil {
-		m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
+		return err
 	}
 
 	member, err := c.GetChatMember(targetChannelID, &td.MessageSenderUser{UserId: me.Id})
 	if err != nil {
 		logger.Errorf("Failed to fetch bot member state for cplay target %d: %v", targetChannelID, err)
-		m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
+		return err
 	}
 	if member == nil {
-		m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
+		return err
 	}
 
 	isAdmin := false
@@ -97,12 +97,12 @@ func setCPlayHandler(c *td.Client, m *td.Message) error {
 		canInvite = st.Rights != nil && st.Rights.CanInviteUsers
 	}
 	if !isAdmin {
-		m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
+		return err
 	}
 	if isAdmin && !canInvite {
-		m.ReplyText(c, F(chatID, "cplay_bot_invite_permission_missing"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "cplay_bot_invite_permission_missing"), nil)
+		return err
 	}
 
 	return saveCPlayTarget(c, m, chatID, targetChannelID)
@@ -111,22 +111,21 @@ func setCPlayHandler(c *td.Client, m *td.Message) error {
 func disableCPlay(c *td.Client, m *td.Message, chatID int64) error {
 	allowed, err := canSetCPlayTarget(c, m, chatID, chatID)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 	if !allowed {
-		m.ReplyText(c, F(chatID, "cplay_owner_required"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "cplay_owner_required"), nil)
+		return err
 	}
 
 	if err := database.LinkChannel(chatID, 0); err != nil {
 		logger.Errorf("Failed to disable cplay for chat %d: %v", chatID, err)
-		m.ReplyText(c, F(chatID, "cplay_save_error"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "cplay_save_error"), nil)
+		return err
 	}
-
-	m.ReplyText(c, F(chatID, "cplay_disabled"), nil)
-	return nil
+	_, rerr := m.ReplyText(c, F(chatID, "cplay_disabled"), nil)
+	return rerr
 }
 
 func getLinkedChannelID(c *td.Client, chatID int64) (int64, error) {
@@ -167,22 +166,21 @@ func resolveChannelPlay(c *td.Client, chatID int64, target string) (int64, error
 func saveCPlayTarget(c *td.Client, m *td.Message, chatID, channelID int64) error {
 	allowed, err := canSetCPlayTarget(c, m, chatID, channelID)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 	if !allowed {
-		m.ReplyText(c, F(chatID, "cplay_owner_required"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "cplay_owner_required"), nil)
+		return err
 	}
 
 	if err := database.LinkChannel(chatID, channelID); err != nil {
 		logger.Errorf("Failed to set cplay ID for chat %d: %v", chatID, err)
-		m.ReplyText(c, F(chatID, "cplay_save_error"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "cplay_save_error"), nil)
+		return err
 	}
-
-	m.ReplyText(c, F(chatID, "cplay_enabled", locales.Arg{"channel_id": channelID}), nil)
-	return nil
+	_, rerr := m.ReplyText(c, F(chatID, "cplay_enabled", locales.Arg{"channel_id": channelID}), nil)
+	return rerr
 }
 
 func canSetCPlayTarget(c *td.Client, m *td.Message, sourceChatID, targetChatID int64) (bool, error) {

@@ -50,7 +50,7 @@ func evalCommandHandler(c *td.Client, m *td.Message) error {
 
 	// Minimal help
 	if strings.Contains(code, "--help") || strings.Contains(code, "-h") {
-		m.ReplyText(c, `<b>🧩 Eval Help</b>
+		_, err := m.ReplyText(c, `<b>🧩 Eval Help</b>
 
 <code>/eval &lt;Go code&gt;</code>
 • Run Go code dynamically.
@@ -62,16 +62,16 @@ func evalCommandHandler(c *td.Client, m *td.Message) error {
 Examples:
 <pre>/eval fmt.Println("Hi")
 /eval return 5</pre>`, html)
-		return nil
+		return err
 	}
 
 	if code == "" {
-		m.ReplyText(
+		_, err := m.ReplyText(
 			c,
 			"No code provided.\nUse <code>/eval --help</code> for usage info.",
 			html,
 		)
-		return nil
+		return err
 	}
 
 	goPath := os.Getenv("GOPATH")
@@ -139,8 +139,8 @@ func main() {
 
 	result, err := i.EvalWithContext(ctx, code)
 	if err != nil {
-		m.ReplyText(c, fmt.Sprintf("<b>#EVALERR:</b> <code>%s</code>", err.Error()), html)
-		return nil
+		_, err := m.ReplyText(c, fmt.Sprintf("<b>#EVALERR:</b> <code>%s</code>", err.Error()), html)
+		return err
 	}
 
 	var output string
@@ -177,16 +177,17 @@ func main() {
 		file, _ := os.Create("output.txt")
 		defer file.Close()
 		io.WriteString(file, output)
-		m.ReplyDocument(
+		if _, rerr := m.ReplyDocument(
 			c,
 			&td.InputFileLocal{Path: file.Name()},
 			&td.SendDocumentOpts{Caption: "Output"},
-		)
+		); rerr != nil {
+			return rerr
+		}
 		os.Remove(file.Name())
 		return nil
 	}
-
-	m.ReplyText(
+	_, rerr := m.ReplyText(
 		c,
 		fmt.Sprintf(
 			"<b>#EVALOut:</b>\n<code>%s</code>",
@@ -194,5 +195,5 @@ func main() {
 		),
 		html,
 	)
-	return nil
+	return rerr
 }

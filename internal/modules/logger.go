@@ -40,52 +40,54 @@ func handleLogger(c *td.Client, m *td.Message) error {
 
 	if len(args) < 2 {
 		if dbErr == nil {
-			_, _ = m.ReplyText(c, F(chatID, "logger_usage", locales.Arg{
+			if _, err := m.ReplyText(c, F(chatID, "logger_usage", locales.Arg{
 				"cmd": getCommand(m),
 				"status": F(chatID, "logger_status", locales.Arg{
 					"action": action,
 				}),
-			}), nil)
+			}), nil); err != nil {
+				return err
+			}
 		} else {
-			_, _ = m.ReplyText(c, F(chatID, "logger_usage", locales.Arg{
+			if _, err := m.ReplyText(c, F(chatID, "logger_usage", locales.Arg{
 				"cmd":    getCommand(m),
 				"status": "",
-			}), nil)
+			}), nil); err != nil {
+				return err
+			}
 		}
 		return nil
 	}
 
 	enable, err := utils.ParseBool(args[1])
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
+		return err
 	}
 
 	action = F(chatID, utils.IfElse(enable, "enabled", "disabled"))
 	if dbErr != nil {
-		_, _ = m.ReplyText(
+		_, err := m.ReplyText(
 			c,
 			F(chatID, "logger_check_fail", locales.Arg{"error": dbErr.Error()}),
 			nil,
 		)
-		return nil
+		return err
 	}
 
 	if current == enable {
-		_, _ = m.ReplyText(c, F(chatID, "logger_already", locales.Arg{"action": action}), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "logger_already", locales.Arg{"action": action}), nil)
+		return err
 	}
 
 	if err := database.SetLoggerEnabled(enable); err != nil {
-		_, _ = m.ReplyText(
+		_, err := m.ReplyText(
 			c,
 			F(chatID, "logger_update_fail", locales.Arg{"error": err.Error()}),
 			nil,
 		)
-		return nil
+		return err
 	}
-
-	_, _ = m.ReplyText(c, F(chatID, "logger_updated", locales.Arg{"action": action}), nil)
-
-	return nil
+	_, rerr := m.ReplyText(c, F(chatID, "logger_updated", locales.Arg{"action": action}), nil)
+	return rerr
 }

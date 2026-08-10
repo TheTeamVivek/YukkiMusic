@@ -76,42 +76,45 @@ func autoLeaveHandler(c *td.Client, m *td.Message) error {
 
 	current, err := database.AutoLeave()
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "autoleave_fetch_fail"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "autoleave_fetch_fail"), nil)
+		return err
 	}
 
 	args := strings.Fields(m.Text())
-	if len(args) < 2 { // no argument => show current status
-		_, _ = m.ReplyText(c, F(chatID, "autoleave_status", locales.Arg{
-			"cmd":    getCommand(m),
-			"action": F(chatID, utils.IfElse(current, "enabled", "disabled")),
-		}), nil)
-		return nil
+	if len(args) < 2 {
+		_, err :=
+			// no argument => show current status
+			m.ReplyText(c, F(chatID, "autoleave_status", locales.Arg{
+				"cmd":    getCommand(m),
+				"action": F(chatID, utils.IfElse(current, "enabled", "disabled")),
+			}), nil)
+		return err
 	}
 
 	enabled, err := utils.ParseBool(args[1])
 	if err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
+		return err
 	}
 
 	action := F(chatID, utils.IfElse(enabled, "enabled", "disabled"))
 
 	if enabled == current {
-		_, _ = m.ReplyText(c, F(chatID, "autoleave_already", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "autoleave_already", locales.Arg{
 			"action": action,
 		}), nil)
-		return nil
+		return err
 	}
 
 	if err := database.SetAutoLeave(enabled); err != nil {
-		_, _ = m.ReplyText(c, F(chatID, "autoleave_update_fail"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "autoleave_update_fail"), nil)
+		return err
 	}
-
-	_, _ = m.ReplyText(c, F(chatID, "autoleave_updated", locales.Arg{
+	if _, err := m.ReplyText(c, F(chatID, "autoleave_updated", locales.Arg{
 		"action": action,
-	}), nil)
+	}), nil); err != nil {
+		return err
+	}
 
 	autoLeaveSvc.SetEnabled(enabled)
 	return nil

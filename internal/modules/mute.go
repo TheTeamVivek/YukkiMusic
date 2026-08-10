@@ -61,18 +61,18 @@ func handleMute(c *td.Client, m *td.Message, cplay bool) error {
 	chatID := m.ChatID()
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
 	if !r.IsActiveChat() {
-		m.ReplyText(c, F(chatID, "room_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return err
 	}
 
 	if r.IsMuted() {
-		m.ReplyText(c, F(chatID, "mute_already_muted"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "mute_already_muted"), nil)
+		return err
 	}
 
 	sender, _ := m.GetUser(c)
@@ -81,16 +81,14 @@ func handleMute(c *td.Client, m *td.Message, cplay bool) error {
 	_, muteErr := r.Mute()
 
 	if muteErr != nil {
-		m.ReplyText(c, F(chatID, "mute_failed", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "mute_failed", locales.Arg{
 			"error": muteErr.Error(),
 		}), nil)
-		return nil
+		return err
 	}
-
-	m.ReplyText(c, F(chatID, "mute_success", locales.Arg{
+	_, rerr := m.ReplyText(c, F(chatID, "mute_success", locales.Arg{
 		"title": utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25)),
 		"user":  mention,
 	}), nil)
-
-	return nil
+	return rerr
 }

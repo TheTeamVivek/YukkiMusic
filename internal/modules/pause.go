@@ -60,27 +60,27 @@ func handlePause(c *td.Client, m *td.Message, cplay bool) error {
 	chatID := m.ChatID()
 	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.ReplyText(c, err.Error(), nil)
-		return nil
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
 	if !r.IsActiveChat() {
-		m.ReplyText(c, F(chatID, "room_no_active"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return err
 	}
 
 	if r.IsPaused() {
-		m.ReplyText(c, F(chatID, "pause_already"), nil)
-		return nil
+		_, err := m.ReplyText(c, F(chatID, "pause_already"), nil)
+		return err
 	}
 
 	var pauseErr error
 	_, pauseErr = r.Pause()
 	if pauseErr != nil {
-		m.ReplyText(c, F(chatID, "room_pause_failed", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "room_pause_failed", locales.Arg{
 			"error": pauseErr.Error(),
 		}), nil)
-		return nil
+		return err
 	}
 
 	sender, _ := m.GetUser(c)
@@ -99,7 +99,6 @@ func handlePause(c *td.Client, m *td.Message, cplay bool) error {
 			"speed": fmt.Sprintf("%.2f", sp),
 		})
 	}
-
-	m.ReplyText(c, msg, nil)
-	return nil
+	_, rerr := m.ReplyText(c, msg, nil)
+	return rerr
 }

@@ -20,7 +20,6 @@ package platforms
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -218,9 +217,9 @@ func searchQuery(q string, video bool) ([]*state.Track, error) {
 }
 
 func fromReply(c *td.Client, m *td.Message) ([]*state.Track, error) {
-	target, isVideo, err := mediaInReply(c, m)
-	if err != nil {
-		return nil, err
+	target, isVideo, _ := playableMedia(c, m)
+	if target == nil {
+		return nil, errors.New("⚠️ Reply with a valid media (audio/video)")
 	}
 
 	tgp, ok := GetPlatform(PlatformTelegram)
@@ -232,7 +231,6 @@ func fromReply(c *td.Client, m *td.Message) ([]*state.Track, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	track.Video = isVideo
 
 	if isVideo {
@@ -243,29 +241,6 @@ func fromReply(c *td.Client, m *td.Message) ([]*state.Track, error) {
 	}
 
 	return []*state.Track{track}, nil
-}
-
-func mediaInReply(c *td.Client, m *td.Message) (*td.Message, bool, error) {
-	curr, err := m.GetRepliedMessage(c)
-	if err != nil {
-		return nil, false, fmt.Errorf("failed to get reply: %w", err)
-	}
-
-	for range 2 {
-		if v, a := playableMedia(c, curr); v || a {
-			return curr, v, nil
-		}
-		if curr.ReplyToMessageID() <= 0 {
-			break
-		}
-		next, err := curr.GetRepliedMessage(c)
-		if err != nil {
-			break
-		}
-		curr = next
-	}
-
-	return nil, false, errors.New("⚠️ Reply with a valid media (audio/video)")
 }
 
 func downloadThumbnail(c *td.Client, m *td.Message, t *state.Track) {
@@ -298,12 +273,8 @@ func hasPlayableReply(c *td.Client, m *td.Message) bool {
 	if m.ReplyToMessageID() <= 0 {
 		return false
 	}
-	rmsg, err := m.GetRepliedMessage(c)
-	if err != nil {
-		return false
-	}
-	v, a := playableMedia(c, rmsg)
-	return v || a
+	msg, _, _ := playableMedia(c, m)
+	return msg != nil
 }
 
 func combineErrs(prefix string, errs []string) error {
