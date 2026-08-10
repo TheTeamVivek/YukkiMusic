@@ -91,22 +91,18 @@ func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 	caption := startCaption(c, cb.ChatId, sender, msg.SenderID())
 	markup := core.GetStartMarkup(cb.ChatId)
 
-	if isPhotoMessage(msg) {
-		_, err = cb.EditCaption(c, caption, &td.EditCaptionOpts{
+	switch msg.Content.(type) {
+case *td.MessagePhoto:
+		_, err = cb.EditMessaeCaption(c, caption, &td.EditCaptionOpts{
 			ReplyMarkup: markup,
 		})
-	} else {
+default:
+
 		_, err = cb.EditMessageText(c, caption, &td.EditTextMessageOpts{
 			ReplyMarkup: markup,
 		})
 	}
 	return err
-}
-
-
-func isPhotoMessage(m *td.Message) bool {
-	_, ok := m.Content.(*td.MessagePhoto)
-	return ok
 }
 
 // isChannelPost reports whether m came from a broadcast channel.
