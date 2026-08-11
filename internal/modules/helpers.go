@@ -119,8 +119,9 @@ func sendNowPlaying(
 	msgText := nowPlayingText(chatID, t)
 
 	opts := &td.SendTextMessageOpts{
-		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
+		ParseMode:             "HTML",
+		ReplyMarkup:           core.GetPlayMarkup(chatID, r, false),
+		DisableWebPagePreview: true,
 	}
 
 	if t.Artwork != "" && shouldShowThumb(chatID) {
@@ -166,8 +167,9 @@ func sendNowPlaying(
 
 	if statusMsg != nil {
 		m, _ := utils.EOR(c, statusMsg, msgText, &td.EditTextMessageOpts{
-			ParseMode:   "HTML",
-			ReplyMarkup: opts.ReplyMarkup,
+			ParseMode:             "HTML",
+			ReplyMarkup:           opts.ReplyMarkup,
+			DisableWebPagePreview: true,
 		})
 		return m
 	}
@@ -242,7 +244,7 @@ func sendPlayLogs(c *td.Client, m *td.Message, track *state.Track, queued bool) 
 	_, err := core.Bot.SendTextMessage(
 		config.LoggerID,
 		sb.String(),
-		&td.SendTextMessageOpts{ParseMode: "HTML"},
+		&td.SendTextMessageOpts{ParseMode: "HTML", DisableWebPagePreview: true},
 	)
 	if err != nil {
 		logger.Error("failed to send logger msg: " + err.Error())

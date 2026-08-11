@@ -77,6 +77,7 @@ func MonitorRooms() {
 					_, _ = statusMsg.EditText(core.Bot, text, &td.EditTextMessageOpts{
 						ParseMode:   td.ParseModeHTML,
 						ReplyMarkup: markup,
+DisableWebPagePreview: true,
 					})
 				}
 			}(chatID, room)

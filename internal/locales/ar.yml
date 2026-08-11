@@ -25,9 +25,6 @@ BACK_BTN: "⬅️ عودة"
 # basically this string used in /command [bool]
 invalid_bool: "⚠️ <b>قيمة غير صالحة.</b>\nاستخدم 'enable' (تفعيل) أو 'disable' (تعطيل)."
 
-active_chats_info: "📊 <b>المكالمات النشطة:</b> <i>{count}</i>"
-active_chats_info_with_broken: "📊 <b>المكالمات النشطة:</b>\n\nيوجد <i>{count}</i> من المكالمات النشطة عبر حساب المساعد، ولكن <i>{broken}</i> منها قد تواجه مشكلات في العرض بشكل صحيح."
-
 adminmode_help: |
   🛡️ <b>وضع أوامر الإدارة</b>
 

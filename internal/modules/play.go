@@ -595,8 +595,9 @@ func finalizePlayReply(
 
 	if len(tracks) == 1 {
 		utils.EOR(c, replyMsg, buildSingleQueueReply(chatID, r, mainTrack, mention), &td.EditTextMessageOpts{
-			ParseMode:   "HTML",
-			ReplyMarkup: core.GetPlayMarkup(chatID, r, true),
+			ParseMode:             "HTML",
+			ReplyMarkup:           core.GetPlayMarkup(chatID, r, true),
+			DisableWebPagePreview: true,
 		})
 		return nil
 	}

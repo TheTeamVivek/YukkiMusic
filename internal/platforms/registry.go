@@ -20,8 +20,6 @@ package platforms
 import (
 	"context"
 	"errors"
-	"os"
-	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -34,7 +32,6 @@ import (
 	"resty.dev/v3"
 
 	state "yukkimusic/internal/core/models"
-	"yukkimusic/internal/database"
 	"yukkimusic/internal/utils"
 )
 

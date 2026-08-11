@@ -60,7 +60,7 @@ func setCPlayHandler(c *td.Client, m *td.Message) error {
 		targetChannelID, err = resolveChannelPlay(c, chatID, arg)
 	}
 	if err != nil {
-		_, err := m.ReplyText(c, err.Error(), nil)
+		_, err := m.ReplyText(c, err.Error(), &td.SendTextMessageOpts{DisableWebPagePreview: true})
 		return err
 	}
 

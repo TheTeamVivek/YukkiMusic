@@ -25,9 +25,6 @@ BACK_BTN: "⬅️ Geri"
 # basically this string used in /command [bool]
 invalid_bool: "⚠️ <b>Geçersiz değer.</b>\n'enable' veya 'disable' kullan."
 
-active_chats_info: "📊 <b>Aktif Sohbetler:</b>\n\nBot sisteminde <i>{count}</i> aktif sohbet var."
-active_chats_info_with_broken: "📊 <b>Aktif Sohbetler:</b>\n\nBot sisteminde <i>{count}</i> aktif sohbet var, ancak bunların <i>{broken}</i> tanesi düzgün görüntülenemiyor olabilir."
-
 adminmode_help: |
   🛡️ <b>Yönetici Komut Modu</b>
 

@@ -53,6 +53,7 @@ func EOR(
 		if opts != nil {
 			replyOpts.ParseMode = opts.ParseMode
 			replyOpts.ReplyMarkup = opts.ReplyMarkup
+			replyOpts.DisableWebPagePreview = opts.DisableWebPagePreview
 		}
 		m, err = msg.ReplyText(c, text, replyOpts)
 	}

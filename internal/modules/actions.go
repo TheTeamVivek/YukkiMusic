@@ -60,7 +60,7 @@ func handleActions(c *td.Client, m *td.Message) error {
 			"chat_id":       m.ChatID(),
 			"support_group": config.SupportChat,
 		})
-		if _, err := c.SendTextMessage(m.ChatID(), text, nil); err != nil {
+		if _, err := c.SendTextMessage(m.ChatID(), text, &td.SendTextMessageOpts{DisableWebPagePreview: true}); err != nil {
 			logger.Errorf("failed to send supergroup conversion message to chat %d: %v", m.ChatID(), err)
 			return nil
 		}

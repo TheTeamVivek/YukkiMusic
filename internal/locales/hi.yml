@@ -25,9 +25,6 @@ BACK_BTN: "⬅️ पीछे"
 # basically this string used in /command [bool]
 invalid_bool: "⚠️ <b>अमान्य मान।</b>\n\n<i>कृपया '<code>enable</code>' अथवा '<code>disable</code>' का प्रयोग करें।</i>"
 
-active_chats_info: "📊 <b>सक्रिय वार्तालाप:</b>\n\nसम्पूर्ण प्रणाली में <i>{count}</i> सक्रिय वार्तालाप हैं।"
-active_chats_info_with_broken: "📊 <b>सक्रिय वार्तालाप:</b>\n\nसम्पूर्ण प्रणाली में <i>{count}</i> सक्रिय वार्तालाप हैं, किन्तु उनमें से <i>{broken}</i> के प्रदर्शन में त्रुटि हो सकती है।"
-
 adminmode_help: |
   🛡️ <b>प्रशासकीय आदेश विधा</b>
 

@@ -442,8 +442,9 @@ func updatePlaybackMessage(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.R
 	}
 
 	if _, err := u.EditMessageText(c, msgText, &td.EditTextMessageOpts{
-		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(chatID, r, false),
+		ParseMode:             "HTML",
+		ReplyMarkup:           core.GetPlayMarkup(chatID, r, false),
+		DisableWebPagePreview: true,
 	}); err != nil {
 		logger.Errorf("Edit error: %v", err)
 	}

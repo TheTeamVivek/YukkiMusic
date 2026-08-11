@@ -65,8 +65,7 @@ type RoomState struct {
 	queue   []*state.Track // upcoming tracks
 	shuffle bool           // queue shuffle mode
 
-	statusMsg *td.Message    // latest status message in chat
-	Data      map[string]any // extensible per-room metadata
+	statusMsg *td.Message // latest status message in chat
 
 	Assistant *Assistant  // assistant client bound to this room
 	destroyed atomic.Bool // whether room cleanup has completed
@@ -121,7 +120,6 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 			queue:     []*state.Track{},
 			speed:     1.0,
 			Assistant: ass,
-			Data:      make(map[string]any),
 		}
 		rooms[chatID] = room
 	}
@@ -258,16 +256,6 @@ func (r *RoomState) StatusMsg() *td.Message {
 	return r.statusMsg
 }
 
-func (r *RoomState) GetData(k string) (bool, any) {
-	if r.IsDestroyed() {
-		return false, nil
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	v, ok := r.Data[k]
-	return ok, v
-}
-
 // Setters
 
 func (r *RoomState) SetLoop(loop int) {
@@ -277,27 +265,6 @@ func (r *RoomState) SetLoop(loop int) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.loop = loop
-}
-
-func (r *RoomState) SetData(k string, v any) {
-	if r.IsDestroyed() {
-		return
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	if r.Data == nil {
-		r.Data = make(map[string]any)
-	}
-	r.Data[k] = v
-}
-
-func (r *RoomState) DeleteData(k string) {
-	if r.IsDestroyed() {
-		return
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	delete(r.Data, k)
 }
 
 func (r *RoomState) SetShuffle(enabled bool) {

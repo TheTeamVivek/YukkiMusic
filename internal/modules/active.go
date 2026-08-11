@@ -18,10 +18,14 @@
 package modules
 
 import (
+	"fmt"
+	"sort"
+	"strings"
+
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/core"
-	"yukkimusic/internal/locales"
+	"yukkimusic/internal/utils"
 )
 
 func init() {
@@ -54,10 +58,14 @@ func activeHandler(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 
 	allRooms := core.GetAllRooms()
-	activeCount := len(allRooms)
+	if len(allRooms) == 0 {
+		_, err := m.ReplyText(c, "<b>🎵 Active Voice Chats</b>\n\nNo active chat sessions found.", &td.SendTextMessageOpts{
+			DisableWebPagePreview: true,
+		})
+		return err
+	}
 
 	ntgChats := make(map[int64]struct{})
-
 	core.Assistants.ForEach(func(a *core.Assistant) {
 		if a == nil || a.Ntg == nil {
 			return
@@ -67,23 +75,109 @@ func activeHandler(c *td.Client, m *td.Message) error {
 		}
 	})
 
-	brokenCount := 0
+	ids := make([]int64, 0, len(allRooms))
 	for id := range allRooms {
+		ids = append(ids, id)
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+
+	var sb strings.Builder
+	sb.WriteString("<h3>🎵 Active Voice Chats</h3>")
+	sb.WriteString("\n\nThere are currently <b>")
+	sb.WriteString(fmt.Sprintf("%d", len(allRooms)))
+	sb.WriteString("</b> active voice/video chat(s) running.")
+
+	brokenCount := 0
+	for _, id := range ids {
+		r := allRooms[id]
+		if r == nil || r.IsDestroyed() {
+			brokenCount++
+			continue
+		}
 		if _, ok := ntgChats[id]; !ok {
 			brokenCount++
 		}
 	}
 
-	msg := F(chatID, "active_chats_info", locales.Arg{
-		"count": activeCount,
-	})
+	sb.WriteString("\n\n<details>\n<summary>📊 Click to Show Active Chats</summary>\n")
+	sb.WriteString("<table bordered striped>\n")
+	sb.WriteString("<thead>\n<tr><th>#</th><th>Chat ID</th><th>Status</th><th>Now Playing Track Info</th><th>Queue</th></tr>\n</thead>\n")
+	sb.WriteString("<tbody>\n")
 
-	if brokenCount > 0 {
-		msg = F(chatID, "active_chats_info_with_broken", locales.Arg{
-			"count":  activeCount,
-			"broken": brokenCount,
-		})
+	for i, id := range ids {
+		r := allRooms[id]
+		if r == nil {
+			continue
+		}
+		broken := false
+		if _, ok := ntgChats[id]; !ok {
+			broken = true
+		}
+
+		sb.WriteString("<tr>")
+		sb.WriteString(fmt.Sprintf("<td><b>%d</b></td>", i+1))
+		sb.WriteString(fmt.Sprintf("<td><code>%d</code></td>", id))
+		sb.WriteString(fmt.Sprintf("<td>%s</td>", activeStatusCell(r, broken)))
+		sb.WriteString(fmt.Sprintf("<td>%s</td>", activeTrackCell(r)))
+		sb.WriteString(fmt.Sprintf("<td>%s</td>", activeQueueCell(r)))
+		sb.WriteString("</tr>\n")
 	}
-	_, err := m.ReplyText(c, msg, nil)
+
+	sb.WriteString("</tbody>\n</table>\n")
+	sb.WriteString(fmt.Sprintf("Total: %d • Active: %d • Broken: %d", len(ids), len(ids)-brokenCount, brokenCount))
+	sb.WriteString("</details>")
+
+	rich := &td.InputRichMessage{
+		Source: td.RichMessageSourceHtml{
+			Text: sb.String(),
+		},
+	}
+	_, err := c.SendRichMessage(chatID, rich, &td.SendTextMessageOpts{
+		DisableWebPagePreview: true,
+	})
 	return err
+}
+
+func activeStatusCell(r *core.RoomState, broken bool) string {
+	if broken {
+		return "<b>⚠️ Broken</b>"
+	}
+	if r.IsMuted() {
+		return "<b>🔇 Muted</b>"
+	}
+	if r.IsPaused() {
+		return "<b>⏸ Paused</b>"
+	}
+	if t := r.Track(); t != nil {
+		if t.Video {
+			return "<b>▶️ Playing (Video)</b>"
+		}
+		return "<b>▶️ Playing (Audio)</b>"
+	}
+	return "<b>⏹ Idle</b>"
+}
+
+func activeTrackCell(r *core.RoomState) string {
+	t := r.Track()
+	if t == nil {
+		return "<i>🔇 No song playing.</i>"
+	}
+	title := utils.EscapeHTML(utils.ShortTitle(t.Title, 25))
+	if t.URL != "" {
+		return fmt.Sprintf(
+			"<a href=\"%s\">%s</a> <i>(%s)</i>",
+			t.URL,
+			title,
+			utils.FormatDuration(t.Duration),
+		)
+	}
+	return fmt.Sprintf("%s <i>(%s)</i>", title, utils.FormatDuration(t.Duration))
+}
+
+func activeQueueCell(r *core.RoomState) string {
+	n := len(r.Queue())
+	if n == 0 {
+		return "<i>Empty</i>"
+	}
+	return fmt.Sprintf("<b>%d</b>", n)
 }

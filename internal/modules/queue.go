@@ -185,7 +185,7 @@ func handleQueue(c *td.Client, m *td.Message, cplay bool) error {
 	} else {
 		b.WriteString(F(chatID, "queue_empty_tail"))
 	}
-	_, rerr := m.ReplyText(c, b.String(), nil)
+	_, rerr := m.ReplyText(c, b.String(), &td.SendTextMessageOpts{DisableWebPagePreview: true})
 	return rerr
 }
 
@@ -281,7 +281,6 @@ func handleClear(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	r.SetData("last_queue", r.Queue())
 	r.RemoveFromQueue(-1)
 
 	restoreCmd := "restore"
