@@ -119,6 +119,7 @@ func downloadUpdateHandler(c *td.Client, u *td.UpdateFile) error {
 
 	if _, err := e.msg.EditText(c, text, &td.EditTextMessageOpts{
 		ParseMode: td.ParseModeHTML,
+   ReplyMarkup: e.msg.ReplyMarkup,
 	}); err != nil {
 		// Ignore edit errors; the download keeps going and the next
 		// update will retry. The entry is cleaned up once the download
