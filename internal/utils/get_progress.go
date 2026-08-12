@@ -17,17 +17,16 @@
 
 package utils
 
-var progressBarCache = [10]string{
-	"◉—————————",
-	"—◉————————",
-	"——◉———————",
-	"———◉——————",
-	"————◉—————",
-	"—————◉————",
-	"——————◉———",
-	"———————◉——",
-	"————————◉—",
-	"—————————◉",
+var progressBarCache = [9]string{
+	"◉———————",
+	"—◉——————",
+	"——◉—————",
+	"———◉————",
+	"————◉———",
+	"—————◉——",
+	"——————◉—",
+	"———————◉",
+	"————————◉",
 }
 
 func GetProgressBar(playedSec, durationSec int) string {
@@ -36,10 +35,10 @@ func GetProgressBar(playedSec, durationSec int) string {
 	}
 
 	if playedSec >= durationSec {
-		return progressBarCache[9]
+		return progressBarCache[8]
 	}
 
-	index := min((playedSec*10)/durationSec, 9)
+	index := min((playedSec*9)/durationSec, 8)
 
 	return progressBarCache[index]
 }

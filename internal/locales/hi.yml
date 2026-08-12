@@ -14,6 +14,7 @@ START_HELP_BTN: "❓ सहायता एवं आदेश"
 
 UPDATES_BTN: "📢 अद्यतन"
 SUPPORT_BTN: "💬 सहायता"
+SOURCE_BTN: "🔗 सोर्स कोड"
 
 HELP_ADMINS_BTN: "🛠 प्रशासक"
 HELP_PUBLIC_BTN: "🌍 सार्वजनिक"
@@ -203,7 +204,7 @@ enabled: "सक्षम"
 disabled: "अक्षम"
 
 clear_no_active: "⚠️ <b>रिक्त करने के लिए कोई सक्रिय संगीत या प्रतीक्षा सूची नहीं है।</b>"
-clear_success: "✅ {user} द्वारा प्रतीक्षा सूची रिक्त कर दी गई है।\n<i>आप नवीन गीत जोड़ने से पूर्व <code>/{cmd}</code> का प्रयोग कर इसे पुनर्स्थापित कर सकते हैं</i>"
+clear_success: "✅ {user} द्वारा प्रतीक्षा सूची रिक्त कर दी गई है।"
 
 err_assistant_banned: |
   <b>🚫 सहायक प्रतिबन्धित</b>

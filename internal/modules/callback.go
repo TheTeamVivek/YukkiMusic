@@ -20,6 +20,7 @@ package modules
 import (
 	"context"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -94,11 +95,11 @@ func roomHandle(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	key := fmt.Sprintf("room:%d:%d", u.SenderUserId, chatID)
 	if remaining := utils.GetFlood(key); remaining > 0 {
 		u.Answer(c, 0, true, F(chatID, "flood_seconds", locales.Arg{
-			"duration": int(remaining.Seconds()),
+			"duration": int(math.Ceil(remaining.Seconds())),
 		}), "")
 		return nil
 	}
-	utils.SetFlood(key, 5*time.Second)
+	utils.SetFlood(key, 3*time.Second)
 
 	switch {
 	case action == "pause":
@@ -157,6 +158,12 @@ func cbRespond(c *td.Client, u *td.UpdateNewCallbackQuery, text string, opts *td
 		return nil
 	}
 	return m
+}
+
+// mentionOfSender resolves the callback sender and builds an HTML mention.
+func mentionOfSender(c *td.Client, userID int64) string {
+	user, _ := c.GetUser(userID)
+	return mentionOf(user, userID)
 }
 
 func handlePauseAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
@@ -233,7 +240,7 @@ func handleReplayAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 
 	u.Answer(c, 0, true, F(chatID, "cb_replay_success"), "")
 	if _, err := u.EditMessageText(c, F(chatID, "cb_replay_edited", locales.Arg{
-		"user": mentionOf(nil, u.SenderUserId),
+		"user": mentionOfSender(c, u.SenderUserId),
 	}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
 		logger.Errorf("Edit error: %v", err)
 	}
@@ -248,7 +255,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 		scheduleOldPlayingMessage(r)
 		core.DeleteRoom(r.ID)
 		if _, err := u.EditMessageText(c, F(chatID, "skip_stopped", locales.Arg{
-			"user": mentionOf(nil, u.SenderUserId),
+			"user": mentionOfSender(c, u.SenderUserId),
 		}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
 			logger.Errorf("Edit error: %v", err)
 		}
@@ -291,7 +298,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 	statusMsg = sendNowPlaying(c, statusMsg, chatID, r, t)
 	r.SetStatusMsg(statusMsg)
 	cbRespond(c, u, F(chatID, "cb_skip_edited", locales.Arg{
-		"user": mentionOf(nil, u.SenderUserId),
+		"user": mentionOfSender(c, u.SenderUserId),
 	}), &td.SendTextMessageOpts{ParseMode: "HTML"})
 	return nil
 }
@@ -305,7 +312,7 @@ func handleStopAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 
 	u.Answer(c, 0, true, F(chatID, "cb_stop_success"), "")
 	if _, err := u.EditMessageText(c, F(chatID, "stopped", locales.Arg{
-		"user": mentionOf(nil, u.SenderUserId),
+		"user": mentionOfSender(c, u.SenderUserId),
 	}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
 		logger.Errorf("Edit error: %v", err)
 	}
@@ -360,7 +367,7 @@ func updatePlaybackMessage(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.R
 
 	chatID := u.ChatId
 	safeTitle := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
-	mention := mentionOf(nil, u.SenderUserId)
+	mention := mentionOfSender(c, u.SenderUserId)
 
 	var msgText string
 	switch state {
@@ -387,11 +394,27 @@ func updatePlaybackMessage(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.R
 		})
 	}
 
-	if _, err := u.EditMessageText(c, msgText, &td.EditTextMessageOpts{
-		ParseMode:             "HTML",
-		ReplyMarkup:           core.GetPlayMarkup(chatID, r, false),
-		DisableWebPagePreview: true,
-	}); err != nil {
+	markup := core.GetPlayMarkup(chatID, r, false)
+
+	msg, err := u.GetMessage(c)
+	if err != nil || msg == nil {
+		return
+	}
+
+	switch {
+	case isPhotoMessage(msg):
+		_, err = u.EditMessageCaption(c, msgText, &td.EditCaptionOpts{
+			ParseMode:   "HTML",
+			ReplyMarkup: markup,
+		})
+	default:
+		_, err = u.EditMessageText(c, msgText, &td.EditTextMessageOpts{
+			ParseMode:             "HTML",
+			ReplyMarkup:           markup,
+			DisableWebPagePreview: true,
+		})
+	}
+	if err != nil {
 		logger.Errorf("Edit error: %v", err)
 	}
 }

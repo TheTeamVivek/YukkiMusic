@@ -14,6 +14,7 @@ START_HELP_BTN: "❓ Yardım ve Komutlar"
 
 UPDATES_BTN: "📢 Güncellemeler"
 SUPPORT_BTN: "💬 Destek"
+SOURCE_BTN: "🔗 Kaynak Kodu"
 
 HELP_ADMINS_BTN: "🛠 Yöneticiler"
 HELP_PUBLIC_BTN: "🌍 Genel"
@@ -204,7 +205,7 @@ enabled: "Etkin"
 disabled: "Devre Dışı"
 
 clear_no_active: "⚠️ <b>Temizlenecek aktif bir oynatma veya sıra yok.</b>"
-clear_success: "✅ Sıra {user} tarafından temizlendi.\n<i>Yeni şarkılar eklemeden önce <code>/{cmd}</code> kullanarak geri yükleyebilirsin.</i>"
+clear_success: "✅ Sıra {user} tarafından temizlendi."
 
 err_assistant_banned: |
   <b>🚫 Asistan Kısıtlandı</b>

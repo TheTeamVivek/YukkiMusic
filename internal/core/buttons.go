@@ -174,11 +174,10 @@ func GetPlayMarkup(chatID int64, r *RoomState, queued bool) td.ReplyMarkup {
 
 	rows = append(rows, []td.InlineKeyboardButton{
 		dataBtn(toggle, toggleCB),
-dataBtn("⟳", prefix+"replay"),
+		dataBtn("⟳", prefix+"replay"),
 		dataBtn("‣‣I", prefix+"skip"),
 		dataBtn("▢", prefix+"stop"),
 	})
-
 
 	rows = append(rows, []td.InlineKeyboardButton{
 		dataBtn(F(chatID, "CLOSE_BTN"), "close"),
@@ -215,6 +214,9 @@ func GetStartMarkup(chatID int64) td.ReplyMarkup {
 			{
 				urlBtn(F(chatID, "UPDATES_BTN"), config.SupportChannel),
 				urlBtn(F(chatID, "SUPPORT_BTN"), config.SupportChat),
+			},
+			{
+				urlBtn(F(chatID, "SOURCE_BTN"), "https://github.com/TheTeamVivek/YukkiMusic"),
 			},
 		},
 	}

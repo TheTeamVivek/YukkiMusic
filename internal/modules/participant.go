@@ -95,6 +95,11 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 	oldStatus := memberStatus(u.OldChatMember)
 	newStatus := memberStatus(u.NewChatMember)
 
+	if c.Me != nil && userID == c.Me.Id && (newStatus == "left" || newStatus == "kicked") {
+		handleBotRemoved(c, u, chatID)
+		return nil
+	}
+
 	switch {
 	case (newStatus == "administrator" || newStatus == "creator") &&
 		(oldStatus != "administrator" && oldStatus != "creator"):

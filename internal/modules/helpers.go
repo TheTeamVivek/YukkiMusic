@@ -88,11 +88,26 @@ func sendNowPlaying(
 	r *core.RoomState,
 	t *state.Track,
 ) *td.Message {
-	msgText := nowPlayingText(chatID, t)
+	return showTrackMessage(c, statusMsg, chatID, r, t, nowPlayingText(chatID, t), false)
+}
+
+// showTrackMessage sends or edits a track message with optional artwork,
+// honoring the thumbnail/artwork setting for the chat, and returns the
+// resulting message.
+func showTrackMessage(
+	c *td.Client,
+	statusMsg *td.Message,
+	chatID int64,
+	r *core.RoomState,
+	t *state.Track,
+	msgText string,
+	queued bool,
+) *td.Message {
+	markup := core.GetPlayMarkup(chatID, r, queued)
 
 	opts := &td.SendTextMessageOpts{
 		ParseMode:             "HTML",
-		ReplyMarkup:           core.GetPlayMarkup(chatID, r, false),
+		ReplyMarkup:           markup,
 		DisableWebPagePreview: true,
 	}
 
@@ -109,12 +124,12 @@ func sendNowPlaying(
 					chatID,
 					content,
 					statusMsg.Id,
-					&td.EditMessageMediaOpts{ReplyMarkup: opts.ReplyMarkup},
+					&td.EditMessageMediaOpts{ReplyMarkup: markup},
 				)
 				if err == nil {
 					return m
 				}
-				logger.Errorf("EditMessageMedia (now playing) failed: %v", err)
+				logger.Errorf("EditMessageMedia (track message) failed: %v", err)
 			}
 		}
 		if statusMsg != nil {
@@ -126,11 +141,11 @@ func sendNowPlaying(
 			&td.SendPhotoOpts{
 				Caption:     msgText,
 				ParseMode:   "HTML",
-				ReplyMarkup: opts.ReplyMarkup,
+				ReplyMarkup: markup,
 			},
 		)
 		if err != nil {
-			logger.Errorf("SendPhoto (now playing) failed: %v", err)
+			logger.Errorf("SendPhoto (track message) failed: %v", err)
 			m, _ := c.SendTextMessage(chatID, msgText, opts)
 			return m
 		}
@@ -140,7 +155,7 @@ func sendNowPlaying(
 	if statusMsg != nil {
 		m, _ := utils.EOR(c, statusMsg, msgText, &td.EditTextMessageOpts{
 			ParseMode:             "HTML",
-			ReplyMarkup:           opts.ReplyMarkup,
+			ReplyMarkup:           markup,
 			DisableWebPagePreview: true,
 		})
 		return m

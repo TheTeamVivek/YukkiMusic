@@ -116,7 +116,6 @@ func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 	return err
 }
 
-
 func isPhotoMessage(m *td.Message) bool {
 	_, ok := m.Content.(*td.MessagePhoto)
 	return ok

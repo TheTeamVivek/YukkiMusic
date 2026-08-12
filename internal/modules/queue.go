@@ -283,16 +283,10 @@ func handleClear(c *td.Client, m *td.Message, cplay bool) error {
 
 	r.RemoveFromQueue(-1)
 
-	restoreCmd := "restore"
-	if cplay {
-		restoreCmd = "crestore"
-	}
-
 	sender, _ := m.GetUser(c)
 	mention := mentionOf(sender, m.SenderID())
 	_, rerr := m.ReplyText(c, F(chatID, "clear_success", locales.Arg{
 		"user": mention,
-		"cmd":  restoreCmd,
 	}), nil)
 	return rerr
 }

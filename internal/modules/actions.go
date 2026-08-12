@@ -35,7 +35,6 @@ import (
 func actionFilter(m *td.Message) bool {
 	switch m.Content.(type) {
 	case *td.MessageChatAddMembers,
-		*td.MessageChatDeleteMember,
 		*td.MessageVideoChatStarted,
 		*td.MessageVideoChatEnded:
 		return true
@@ -73,8 +72,6 @@ func handleActions(c *td.Client, m *td.Message) error {
 	switch m.Content.(type) {
 	case *td.MessageChatAddMembers:
 		return handleChatMemberAdd(c, m)
-	case *td.MessageChatDeleteMember:
-		return handleChatMemberDelete(c, m)
 	case *td.MessageVideoChatStarted, *td.MessageVideoChatEnded:
 		return handleVoiceChatAction(c, m)
 	}
@@ -132,30 +129,47 @@ func handleChatMemberAdd(c *td.Client, m *td.Message) error {
 	return nil
 }
 
-func handleChatMemberDelete(c *td.Client, m *td.Message) error {
-	chatID := m.ChatID()
+func handleBotRemoved(c *td.Client, u *td.UpdateChatMember, chatID int64) {
+	logger.Debugf("Bot removed from chat %d", chatID)
 
-	if c.Me == nil {
-		return nil
+	cleanScheduler.cancel(chatID)
+	core.DeleteRoom(chatID)
+	core.DeleteChatState(chatID)
+	database.RemoveServedChat(chatID)
+
+	if config.LoggerID == 0 || config.LoggerID == chatID {
+		return
 	}
-	content := m.Content.(*td.MessageChatDeleteMember)
 
-	if content.UserId == c.Me.Id {
-		logger.Debug("Bot removed from " + utils.IntToStr(chatID))
+	groupName := "N/A"
+	if chat, err := c.GetChat(chatID); err == nil && chat != nil {
+		groupName = chat.Title
+	}
 
-		cleanScheduler.cancel(chatID)
-		core.DeleteRoom(chatID)
-		core.DeleteChatState(chatID)
-		database.RemoveServedChat(chatID)
-
-		if config.LoggerID != 0 {
-			if _, rerr := c.SendTextMessage(config.LoggerID, F(config.LoggerID, "logger_bot_removed", buildLogArgs(c, m, chatID, "removed")), nil); rerr != nil {
-				return rerr
-			}
+	actorID := u.ActorUserId
+	actorName := "N/A"
+	actorMention := "N/A"
+	if actor, err := c.GetUser(actorID); err == nil && actor != nil {
+		actorName = strings.TrimSpace(actor.FirstName + " " + actor.LastName)
+		if actorName == "" {
+			actorName = "N/A"
 		}
+		actorMention = mentionOf(actor, actorID)
 	}
 
-	return nil
+	msg := F(config.LoggerID, "logger_bot_removed", locales.Arg{
+		"group_name":          groupName,
+		"group_id":            chatID,
+		"group_username":      "N/A",
+		"removed_by_name":     actorName,
+		"removed_by_id":       actorID,
+		"removed_by_username": actorMention,
+		"date_time":           time.Now().Format("02 Jan 2006 • 15:04"),
+	})
+
+	if _, err := c.SendTextMessage(config.LoggerID, msg, nil); err != nil {
+		logger.Errorf("failed to send bot-removed log: %v", err)
+	}
 }
 
 func handleVoiceChatAction(c *td.Client, m *td.Message) error {
