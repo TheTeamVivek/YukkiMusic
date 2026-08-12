@@ -115,7 +115,19 @@ func (p *YouTubePlatform) Download(_ context.Context, _ *state.Track, _ *td.Mess
 	return "", errors.New("youtube platform does not support downloading")
 }
 
-// VideoSearch is exported for Spotify to use.
+func withVideo(tracks []*state.Track, video bool) []*state.Track {
+	out := make([]*state.Track, 0, len(tracks))
+	for _, t := range tracks {
+		if t == nil {
+			continue
+		}
+		clone := *t
+		clone.Video = video
+		out = append(out, &clone)
+	}
+	return out
+}
+
 func (p *YouTubePlatform) VideoSearch(query string, single ...bool) ([]*state.Track, error) {
 	limit := config.QueueLimit
 	onlyOne := len(single) > 0 && single[0]

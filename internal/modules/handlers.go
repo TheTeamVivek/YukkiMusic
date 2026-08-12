@@ -174,7 +174,7 @@ func Init(bot *td.Client, assistants *core.AssistantManager) {
 	bot.OnCommand("commanddelete", WithBlacklistMessage(cmdDeleteHandler))
 	bot.OnCommand("creload", WithBlacklistMessage(creloadHandler))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(broadcastCancelCB), callbackquery.Regex("^bcast_cancel$"))
-	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(langCallbackHandler), callbackquery.Regex("^lang:[a-z]$"))
+	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(langCallbackHandler), callbackquery.Regex("^lang:(select|[a-z]{2})$"))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(restartConfirmHandler), callbackquery.Regex("^restart:(bot|replay)$"))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(settingsCallbackHandler), callbackquery.Regex("^set|info:"))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(startCB), callbackquery.Equal("start"))

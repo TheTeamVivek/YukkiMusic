@@ -37,17 +37,15 @@ type (
 		Source    PlatformName // unique PlatformName
 	}
 
-	// Platform defines a common contract for all supported platforms
-	// (e.g. YouTube, SoundCloud, Spotify, etc.).
-	//
-	// Each platform is responsible for determining whether it can
-	// search, resolve, or download tracks from a given query or source.
+	// Platform defines the common contract for all supported platforms
+	// (e.g. YouTube, Spotify, Telegram). Each platform is responsible for
+	// deciding whether it can resolve and download tracks from a query.
 	Platform interface {
 		// Name returns the unique identifier of the platform.
 		Name() PlatformName
 
 		// Priority returns the priority of this platform when multiple
-		// platforms can handle the same query. Higher values take precedence.
+		// platforms could handle the same query. Higher values take precedence.
 		Priority() int
 
 		// CanGet reports whether this platform can resolve
@@ -58,7 +56,7 @@ type (
 		//
 		// video indicates whether video playback is requested.
 		// Platforms that do not support video should still return tracks,
-		// but must set Track.Video = false.
+		// but must leave Track.Video false.
 		Get(query string, video bool) ([]*Track, error)
 
 		// CanDownload reports whether this platform can download tracks
@@ -70,8 +68,6 @@ type (
 		// ctx is used for cancellation and timeouts.
 		// track is the track to download.
 		// msg is used to send progress updates (if not nil).
-		// If the platform supports video playback, return the local path
-		// of the video file when track.Video is true.
 		Download(ctx context.Context, track *Track, msg *td.Message) (string, error)
 	}
 )

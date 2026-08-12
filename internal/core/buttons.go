@@ -166,18 +166,19 @@ func GetPlayMarkup(chatID int64, r *RoomState, queued bool) td.ReplyMarkup {
 			dataBtn(progress, "progress"),
 		})
 	}
+	// Toggle: show play when paused, pause while playing.
+	toggle, toggleCB := "II", prefix+"pause"
+	if r.IsPaused() {
+		toggle, toggleCB = "▷", prefix+"resume"
+	}
+
 	rows = append(rows, []td.InlineKeyboardButton{
-		dataBtn("▷", prefix+"resume"),
-		dataBtn("II", prefix+"pause"),
+		dataBtn(toggle, toggleCB),
+dataBtn("⟳", prefix+"replay"),
 		dataBtn("‣‣I", prefix+"skip"),
 		dataBtn("▢", prefix+"stop"),
 	})
 
-	rows = append(rows, []td.InlineKeyboardButton{
-		dataBtn("↩ 15s", prefix+"seekback_15"),
-		dataBtn("⟳", prefix+"replay"),
-		dataBtn("15s ↪", prefix+"seek_15"),
-	})
 
 	rows = append(rows, []td.InlineKeyboardButton{
 		dataBtn(F(chatID, "CLOSE_BTN"), "close"),

@@ -36,15 +36,13 @@ var (
 	StringSessions = getEnvStrings("STRING_SESSIONS")
 
 	// Optional
-	DBName              = getEnv("DB_NAME", "Yukki")
-	SessionType         = getEnv("SESSION_TYPE", "pyrogram")
-	LoggerID            = getEnvInt64("LOGGER_ID", 0)
-	OwnerID             = getEnvInt64("OWNER_ID", 0)
-	DisableColour       = getEnvBool("DISABLE_COLOUR", false)
-	SpotifyClientID     = getEnv("SPOTIFY_CLIENT_ID")
-	SpotifyClientSecret = getEnv("SPOTIFY_CLIENT_SECRET")
-	FallenAPIURL        = getEnv("FALLEN_API_URL", "https://beta.fallenapi.fun")
-	FallenAPIKey        = getEnv("FALLEN_API_KEY")
+	DBName        = getEnv("DB_NAME", "Yukki")
+	SessionType   = getEnv("SESSION_TYPE", "pyrogram")
+	LoggerID      = getEnvInt64("LOGGER_ID", 0)
+	OwnerID       = getEnvInt64("OWNER_ID", 0)
+	DisableColour = getEnvBool("DISABLE_COLOUR", false)
+	FallenAPIURL  = getEnv("FALLEN_API_URL", "https://beta.fallenapi.fun")
+	FallenAPIKey  = getEnv("FALLEN_API_KEY")
 
 	DefaultLang    = getEnv("DEFAULT_LANG", "en")
 	DurationLimit  = getEnvInt("DURATION_LIMIT", 4200)
@@ -114,10 +112,6 @@ func validateConfig() error {
 		if !check.ok {
 			return errors.New(check.msg)
 		}
-	}
-
-	if SpotifyClientID == "" || SpotifyClientSecret == "" {
-		logr.Warn("Spotify credentials not configured; Spotify links will be unavailable")
 	}
 
 	return nil

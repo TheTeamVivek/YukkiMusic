@@ -536,10 +536,10 @@ func downloadFirstTrack(
 	)
 
 	ctx, cancel := context.WithCancel(context.Background())
-	downloads.Add(chatID, cancel)
-	defer downloads.Remove(chatID)
+	downloads.begin(chatID, cancel, replyMsg)
+	defer downloads.finish(chatID)
 
-	path, err := safeDownload(ctx, c, track, replyMsg, chatID)
+	path, err := downloadTrack(ctx, c, track, replyMsg, chatID)
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
 			utils.EOR(
@@ -842,7 +842,7 @@ func getErrorMessage(chatID int64, err error) string {
 	return F(chatID, "err_unknown", locales.Arg{"error": err.Error()})
 }
 
-// safeDownload and safeGetTracks re-raise panics on failure.
+// downloadTrack and safeGetTracks re-raise panics on failure.
 func safeGetTracks(
 	c *td.Client,
 	m, replyMsg *td.Message,
@@ -859,7 +859,9 @@ func safeGetTracks(
 	return platforms.GetTracks(c, m, video)
 }
 
-func safeDownload(
+// downloadTrack runs the platform download, showing an internal-error message
+// and re-raising any panic so the caller can catch it at the top level.
+func downloadTrack(
 	ctx context.Context,
 	c *td.Client,
 	track *state.Track,

@@ -155,7 +155,7 @@ cb_resume_message: |
   <b>▫ المدة:</b> {duration}
   <b>▫ استؤنف بواسطة:</b> {user}
 
-# Replay callback
+# Replay status (loop replay)
 cb_replaying: "🔁 <b>جاري إعادة تشغيل المقطع الحالي...</b>"
 cb_replay_failed: "❌ فشل إعادة تشغيل المقطع."
 cb_replay_success: "🔁 تمت إعادة تشغيل المقطع."
@@ -180,13 +180,6 @@ cb_mute_message: |
   <b>▫ كُتم بواسطة:</b> {user}
 
 cb_unmute_success: "🔊 تم إلغاء الكتم."
-
-cb_seek_success: "⏩ تم التقديم بمقدار {seconds} ثانية"
-cb_seek_near_end: "⚠️ لا يمكن التقديم بمقدار {seconds} ثانية — شارف المقطع على الانتهاء."
-cb_seek_edited: "⏩ تم التقديم بمقدار {seconds} ثانية — بواسطة {user}"
-
-cb_seekback_success: "⏪ تم الرجوع بمقدار {seconds} ثانية"
-cb_seekback_edited: "⏪ تم الرجوع بمقدار {seconds} ثانية — بواسطة {user}"
 
 # 🗑️ Delete auth
 del_auth_not_authorized: "⚠️ هذا المستخدم غير مصرح له أصلاً — لا يوجد ما يتم حذفه."

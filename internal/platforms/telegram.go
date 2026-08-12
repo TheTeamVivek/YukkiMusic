@@ -151,8 +151,8 @@ func (t *TelegramPlatform) Download(
 	file, err := msg.Download(core.Bot, 1, 0, 0, true)
 	if err != nil {
 		os.Remove(path)
-		if errors.Is(err, context.Canceled) {
-			return "", err
+		if isDownloadCancelled(err) {
+			return "", context.Canceled
 		}
 		return "", fmt.Errorf("download failed: %w", err)
 	}

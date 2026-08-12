@@ -18,6 +18,7 @@
 package platforms
 
 import (
+	"context"
 	"errors"
 	"io"
 	"net"
@@ -40,6 +41,22 @@ var errUnsafeURL = errors.New("invalid or unsafe url")
 var (
 	OnDownloadStart func(fileID string, statusMsg *td.Message)
 )
+
+// isDownloadCancelled reports whether err signals a cancelled file download,
+// whether from a cancelled context or a TDLib "canceled" response.
+func isDownloadCancelled(err error) bool {
+	if err == nil {
+		return false
+	}
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		return true
+	}
+	var tdErr *td.Error
+	if errors.As(err, &tdErr) {
+		return strings.Contains(strings.ToLower(tdErr.Message), "cancel")
+	}
+	return false
+}
 
 func getPath(track *state.Track, ext string) string {
 	if ext != "" && !strings.HasPrefix(ext, ".") {

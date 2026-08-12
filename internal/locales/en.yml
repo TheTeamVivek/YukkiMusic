@@ -154,7 +154,7 @@ cb_resume_message: |
   <b>▫ Duration:</b> {duration}
   <b>▫ Resumed by:</b> {user}
 
-# Replay callback
+# Replay status (loop replay)
 cb_replaying: "🔁 <b>Replaying current track...</b>"
 cb_replay_failed: "❌ Failed to replay track."
 cb_replay_success: "🔁 Track replayed."
@@ -179,13 +179,6 @@ cb_mute_message: |
   <b>▫ Muted by:</b> {user}
 
 cb_unmute_success: "🔊 Unmuted."
-
-cb_seek_success: "⏩ Sought forward {seconds} seconds"
-cb_seek_near_end: "⚠️ Cannot seek forward {seconds} seconds — about to reach end."
-cb_seek_edited: "⏩ Sought {seconds} seconds — by {user}"
-
-cb_seekback_success: "⏪ Sought back {seconds} seconds"
-cb_seekback_edited: "⏪ Sought back {seconds} seconds — by {user}"
 
 # 🗑️ Delete auth
 del_auth_not_authorized: "⚠️ That user isn’t authorized — nothing to remove."

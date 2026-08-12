@@ -35,9 +35,9 @@ func init() {
 <b>/active</b> or <b>/ac</b> — List active chats
 
 <b>📊 Information Shown:</b>
-• Total active chats
-• Active NTGCalls connections
-• Broken/stale sessions
+• Total active voice chats
+• Playback status (playing/paused/muted)
+• Now playing track and queue size
 
 <b>🔒 Restrictions:</b>
 • <b>Sudo users</b> only
@@ -57,26 +57,25 @@ func activeHandler(c *td.Client, m *td.Message) error {
 	}
 	chatID := m.ChatID()
 
-	allRooms := core.GetAllRooms()
-	if len(allRooms) == 0 {
+	// Only truly active sessions are reported: skip destroyed rooms and
+	// rooms that are not actively playing anything.
+	rooms := make(map[int64]*core.RoomState)
+	for id, r := range core.GetAllRooms() {
+		if r == nil || r.IsDestroyed() || !r.IsActiveChat() {
+			continue
+		}
+		rooms[id] = r
+	}
+
+	if len(rooms) == 0 {
 		_, err := m.ReplyText(c, "<b>🎵 Active Voice Chats</b>\n\nNo active chat sessions found.", &td.SendTextMessageOpts{
 			DisableWebPagePreview: true,
 		})
 		return err
 	}
 
-	ntgChats := make(map[int64]struct{})
-	core.Assistants.ForEach(func(a *core.Assistant) {
-		if a == nil || a.Ntg == nil {
-			return
-		}
-		for id := range a.Ntg.Calls() {
-			ntgChats[id] = struct{}{}
-		}
-	})
-
-	ids := make([]int64, 0, len(allRooms))
-	for id := range allRooms {
+	ids := make([]int64, 0, len(rooms))
+	for id := range rooms {
 		ids = append(ids, id)
 	}
 	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
@@ -84,20 +83,8 @@ func activeHandler(c *td.Client, m *td.Message) error {
 	var sb strings.Builder
 	sb.WriteString("<h3>🎵 Active Voice Chats</h3>")
 	sb.WriteString("\n\nThere are currently <b>")
-	sb.WriteString(fmt.Sprintf("%d", len(allRooms)))
+	sb.WriteString(fmt.Sprintf("%d", len(ids)))
 	sb.WriteString("</b> active voice/video chat(s) running.")
-
-	brokenCount := 0
-	for _, id := range ids {
-		r := allRooms[id]
-		if r == nil || r.IsDestroyed() {
-			brokenCount++
-			continue
-		}
-		if _, ok := ntgChats[id]; !ok {
-			brokenCount++
-		}
-	}
 
 	sb.WriteString("\n\n<details>\n<summary>📊 Click to Show Active Chats</summary>\n")
 	sb.WriteString("<table bordered striped>\n")
@@ -105,26 +92,22 @@ func activeHandler(c *td.Client, m *td.Message) error {
 	sb.WriteString("<tbody>\n")
 
 	for i, id := range ids {
-		r := allRooms[id]
+		r := rooms[id]
 		if r == nil {
 			continue
-		}
-		broken := false
-		if _, ok := ntgChats[id]; !ok {
-			broken = true
 		}
 
 		sb.WriteString("<tr>")
 		sb.WriteString(fmt.Sprintf("<td><b>%d</b></td>", i+1))
 		sb.WriteString(fmt.Sprintf("<td><code>%d</code></td>", id))
-		sb.WriteString(fmt.Sprintf("<td>%s</td>", activeStatusCell(r, broken)))
+		sb.WriteString(fmt.Sprintf("<td>%s</td>", activeStatusCell(r)))
 		sb.WriteString(fmt.Sprintf("<td>%s</td>", activeTrackCell(r)))
 		sb.WriteString(fmt.Sprintf("<td>%s</td>", activeQueueCell(r)))
 		sb.WriteString("</tr>\n")
 	}
 
 	sb.WriteString("</tbody>\n</table>\n")
-	sb.WriteString(fmt.Sprintf("Total: %d • Active: %d • Broken: %d", len(ids), len(ids)-brokenCount, brokenCount))
+	sb.WriteString(fmt.Sprintf("Total active: %d", len(ids)))
 	sb.WriteString("</details>")
 
 	rich := &td.InputRichMessage{
@@ -138,10 +121,7 @@ func activeHandler(c *td.Client, m *td.Message) error {
 	return err
 }
 
-func activeStatusCell(r *core.RoomState, broken bool) string {
-	if broken {
-		return "<b>⚠️ Broken</b>"
-	}
+func activeStatusCell(r *core.RoomState) string {
 	if r.IsMuted() {
 		return "<b>🔇 Muted</b>"
 	}

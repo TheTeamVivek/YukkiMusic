@@ -193,7 +193,7 @@ func (y *YtdlpPlatform) Download(
 
 	if err := cmd.Run(); err != nil {
 		findAndRemove(track)
-		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		if isDownloadCancelled(err) {
 			return "", err
 		}
 		return "", fmt.Errorf(

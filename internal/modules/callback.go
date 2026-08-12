@@ -42,7 +42,7 @@ func cancelHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		return nil
 	}
 
-	if downloads.Remove(chatID) {
+	if downloads.cancel(chatID) {
 		u.Answer(c, 0, true, F(chatID, "download_cancelled"), "")
 	} else {
 		u.Answer(c, 0, true, F(chatID, "no_download_to_cancel"), "")
@@ -101,8 +101,6 @@ func roomHandle(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	utils.SetFlood(key, 5*time.Second)
 
 	switch {
-	case strings.HasPrefix(action, "seek"):
-		return handleSeekAction(c, u, r, action)
 	case action == "pause":
 		return handlePauseAction(c, u, r)
 	case action == "resume":
@@ -351,58 +349,6 @@ func handleUnmuteAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 
 	u.Answer(c, 0, true, F(chatID, "cb_unmute_success"), "")
 	updatePlaybackMessage(c, u, r, "playing")
-	return nil
-}
-
-func handleSeekAction(
-	c *td.Client,
-	u *td.UpdateNewCallbackQuery,
-	r *core.RoomState,
-	action string,
-) error {
-	chatID := u.ChatId
-
-	parts := strings.SplitN(action, "_", 2)
-	if len(parts) != 2 {
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
-		return nil
-	}
-
-	// action is either "seek_<N>" or "seekback_<N>"
-	// Strip the direction prefix to get the numeric suffix.
-	numStr := parts[1]
-	isBackward := strings.HasPrefix(action, "seekback_")
-
-	seconds, err := strconv.Atoi(numStr)
-	if err != nil {
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
-		return nil
-	}
-
-	if isBackward {
-		if r.Position() <= seconds {
-			r.Seek(-int(r.Position()))
-		} else {
-			r.Seek(-seconds)
-		}
-		u.Answer(c, 0, true, F(chatID, "cb_seekback_success", locales.Arg{"seconds": seconds}), "")
-		cbRespond(c, u, F(chatID, "cb_seekback_edited", locales.Arg{
-			"seconds": seconds,
-			"user":    mentionOf(nil, u.SenderUserId),
-		}), &td.SendTextMessageOpts{ParseMode: "HTML"})
-	} else {
-		if (r.Track().Duration - r.Position()) <= seconds {
-			u.Answer(c, 0, true, F(chatID, "cb_seek_near_end", locales.Arg{"seconds": seconds}), "")
-			return nil
-		}
-		r.Seek(seconds)
-		u.Answer(c, 0, true, F(chatID, "cb_seek_success", locales.Arg{"seconds": seconds}), "")
-		cbRespond(c, u, F(chatID, "cb_seek_edited", locales.Arg{
-			"seconds": seconds,
-			"user":    mentionOf(nil, u.SenderUserId),
-		}), &td.SendTextMessageOpts{ParseMode: "HTML"})
-	}
-
 	return nil
 }
 

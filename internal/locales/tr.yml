@@ -154,7 +154,7 @@ cb_resume_message: |
   <b>▫ Süre:</b> {duration}
   <b>▫ Devam Ettiren:</b> {user}
 
-# Replay callback
+# Replay status (loop replay)
 cb_replaying: "🔁 <b>Mevcut parça yeniden oynatılıyor...</b>"
 cb_replay_failed: "❌ Parça yeniden oynatılamadı."
 cb_replay_success: "🔁 Parça yeniden oynatıldı."
@@ -179,13 +179,6 @@ cb_mute_message: |
   <b>▫ Sessize Alan:</b> {user}
 
 cb_unmute_success: "🔊 Ses açıldı."
-
-cb_seek_success: "⏩ {seconds} saniye ileri sarıldı"
-cb_seek_near_end: "⚠️ {seconds} saniye ileri sarılamaz — parça bitmek üzere."
-cb_seek_edited: "⏩ {seconds} saniye ileri sarıldı — {user} tarafından"
-
-cb_seekback_success: "⏪ {seconds} saniye geri sarıldı"
-cb_seekback_edited: "⏪ {seconds} saniye geri sarıldı — {user} tarafından"
 
 # 🗑️ Delete auth
 del_auth_not_authorized: "⚠️ Bu kullanıcı yetkili değil — kaldırılacak bir şey yok."

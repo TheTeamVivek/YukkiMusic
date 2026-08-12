@@ -153,7 +153,7 @@ cb_resume_message: |
   <b>▫ अवधि:</b> {duration}
   <b>▫ पुनः आरम्भकर्ता:</b> {user}
 
-# Replay callback
+# Replay status (loop replay)
 cb_replaying: "🔁 <b>वर्तमान संगीत पुनः चलाया जा रहा है...</b>"
 cb_replay_failed: "❌ संगीत पुनः चलाने में विफल।"
 cb_replay_success: "🔁 संगीत पुनः चलाया गया।"
@@ -178,13 +178,6 @@ cb_mute_message: |
   <b>▫ निःशब्दकर्ता:</b> {user}
 
 cb_unmute_success: "🔊 सशब्द किया गया।"
-
-cb_seek_success: "⏩ {seconds} क्षण आगे बढ़ाया गया"
-cb_seek_near_end: "⚠️ {seconds} क्षण आगे नहीं बढ़ाया जा सकता — संगीत समाप्ति के निकट है।"
-cb_seek_edited: "⏩ {seconds} क्षण आगे बढ़ाया गया — {user} द्वारा"
-
-cb_seekback_success: "⏪ {seconds} क्षण पीछे हटाया गया"
-cb_seekback_edited: "⏪ {seconds} क्षण पीछे हटाया गया — {user} द्वारा"
 
 # 🗑️ Delete auth
 del_auth_not_authorized: "⚠️ वह उपयोगकर्ता अधिकृत नहीं है — हटाने के लिए कुछ भी नहीं है।"

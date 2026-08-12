@@ -35,14 +35,6 @@ import (
 	"yukkimusic/internal/utils"
 )
 
-type RedispatchError struct {
-	Track *state.Track
-}
-
-func (e *RedispatchError) Error() string {
-	return "redispatch:" + string(e.Track.Source)
-}
-
 type reg struct {
 	mu     sync.RWMutex
 	sorted []state.Platform
@@ -118,19 +110,13 @@ func GetTracks(c *td.Client, m *td.Message, video bool) ([]*state.Track, error) 
 	return nil, errors.New("no tracks found")
 }
 
+// Download fetches the given track and returns its local file path.
+// It tries every registered platform that can download the track's source,
+// in priority order, and returns the first successful file path.
 func Download(
 	ctx context.Context,
 	track *state.Track,
 	msg *td.Message,
-) (string, error) {
-	return download(ctx, track, msg, false)
-}
-
-func download(
-	ctx context.Context,
-	track *state.Track,
-	msg *td.Message,
-	redispatched bool,
 ) (string, error) {
 	var errs []string
 
@@ -146,14 +132,8 @@ func download(
 			return path, nil
 		}
 
-		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		if isDownloadCancelled(err) {
 			return "", err
-		}
-
-		var rd *RedispatchError
-		if !redispatched && errors.As(err, &rd) {
-			logger.Debug("Redispatch to source: " + string(rd.Track.Source))
-			return download(ctx, rd.Track, msg, true)
 		}
 
 		errs = append(errs, string(p.Name())+": "+err.Error())
@@ -193,8 +173,7 @@ func fetchFromURLs(urls []string, video bool) ([]*state.Track, []string) {
 
 func searchQuery(q string, video bool) ([]*state.Track, error) {
 	if p := findFor(q); p != nil && p.Name() != PlatformYouTube {
-		got, err := p.Get(q, video)
-		if err == nil && len(got) > 0 {
+		if got, err := p.Get(q, video); err == nil && len(got) > 0 {
 			return got, nil
 		}
 	}
