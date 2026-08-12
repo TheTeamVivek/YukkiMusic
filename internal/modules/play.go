@@ -206,6 +206,11 @@ func handlePlay(c *td.Client, m *td.Message, opts *playOpts) error {
 		}
 	}
 
+	if config.QueueLimit == 0 && isActive && !opts.Force {
+		utils.EOR(c, searchMsg, F(chatID, "play_already_playing"), nil)
+		return nil
+	}
+
 	tracks, availableSlots, err := filterAndTrimTracks(c, searchMsg, room, tracks)
 	if err != nil {
 		return nil
@@ -251,7 +256,7 @@ func prepareRoomAndSearchMessage(
 	chatID := m.ChatID()
 	room.Parse()
 
-	if len(room.Queue()) >= config.QueueLimit {
+	if config.QueueLimit > 0 && len(room.Queue()) >= config.QueueLimit {
 		if _, rerr := m.ReplyText(c, F(chatID, "queue_limit_reached", locales.Arg{"limit": config.QueueLimit}), nil); rerr != nil {
 			return nil, nil, rerr
 		}
@@ -428,6 +433,16 @@ func filterAndTrimTracks(
 	}
 
 	availableSlots := config.QueueLimit - len(r.Queue())
+	if config.QueueLimit < 0 {
+		availableSlots = len(accepted)
+	} else if availableSlots < 0 {
+		availableSlots = 0
+	}
+
+	if availableSlots == 0 && len(accepted) > 0 && !r.IsActiveChat() {
+		availableSlots = 1
+	}
+
 	if availableSlots < len(accepted) {
 		accepted = accepted[:availableSlots]
 		logger.Warnf(
@@ -569,6 +584,9 @@ func finalizePlayReply(
 	availableSlots int,
 ) error {
 	chatID := replyMsg.ChatID()
+	if len(tracks) == 0 {
+		return nil
+	}
 	mainTrack := tracks[0]
 
 	if !isActive || force {
@@ -648,7 +666,7 @@ func buildMultiAddedText(
 	)
 	b.WriteString("\n\n")
 
-	if availableSlots <= trackCount {
+	if config.QueueLimit > 0 && availableSlots <= trackCount {
 		b.WriteString(F(chatID, "play_queue_limit_hint"))
 		b.WriteString("\n")
 	}

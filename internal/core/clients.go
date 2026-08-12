@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -108,19 +109,19 @@ func initBot() error {
 }
 
 // clientPanicHandler marshals the raw update that caused a handler panic and
-// forwards it to the logger chat together with the panic value.
+// forwards it to the logger chat together with the panic value and stack trace.
 func clientPanicHandler(c *td.Client, update td.TlObject, r any) {
-	sendErrorReport(c, "panic", update, r)
+	sendErrorReport(c, "panic", update, r, string(debug.Stack()))
 }
 
 // clientErrorHandler does the same for handler errors, then lets the library
 // continue dispatching the remaining handlers.
 func clientErrorHandler(c *td.Client, update td.TlObject, err error) error {
-	sendErrorReport(c, "error", update, err)
+	sendErrorReport(c, "error", update, err, "")
 	return nil
 }
 
-func sendErrorReport(c *td.Client, kind string, update td.TlObject, detail any) {
+func sendErrorReport(c *td.Client, kind string, update td.TlObject, detail any, stack string) {
 	if c == nil || config.LoggerID == 0 {
 		return
 	}
@@ -132,10 +133,24 @@ func sendErrorReport(c *td.Client, kind string, update td.TlObject, detail any) 
 		}
 	}
 
-	text := fmt.Sprintf(
-		"Bot %s: %v\n\nRaw update:\n%s",
-		strings.ToUpper(kind), detail, raw,
-	)
+	var b strings.Builder
+	b.WriteString(fmt.Sprintf("<b>Bot %s:</b> %v\n\n", strings.ToUpper(kind), detail))
+
+	if raw != "" {
+		b.WriteString("<pre>")
+		b.WriteString("Raw update:\n")
+		b.WriteString(raw)
+		b.WriteString("</pre>\n\n")
+	}
+
+	if stack != "" {
+		b.WriteString("<pre>")
+		b.WriteString("Stack trace:\n")
+		b.WriteString(stack)
+		b.WriteString("</pre>")
+	}
+
+	text := b.String()
 
 	go func() {
 		defer func() { _ = recover() }()
@@ -143,9 +158,9 @@ func sendErrorReport(c *td.Client, kind string, update td.TlObject, detail any) 
 			sendErrorReportFile(c, text)
 			return
 		}
-		_, _ = c.SendMessage(config.LoggerID, &td.InputMessageText{
-			Text: &td.FormattedText{Text: text},
-		}, nil)
+		_, _ = c.SendTextMessage(config.LoggerID, text, &td.SendTextMessageOpts{
+			ParseMode: "HTML",
+		})
 	}()
 }
 

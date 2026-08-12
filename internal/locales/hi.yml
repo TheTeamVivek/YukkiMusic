@@ -448,6 +448,7 @@ rtmp_play_unsupported: "⚠️ <b>RTMP/लाइव-स्ट्रीम वॉ
 play_downloading_song: "📥 संगीत \"{title}\" डाउनलोड किया जा रहा है"
 play_download_canceled: "⚠️ {user} द्वारा डाउनलोड रद्द।"
 play_already_in_queue: "✅ <b>गीत पूर्व से ही सम्मिलित!</b>\n\n<i>{title}</i> पूर्व से ही चल रहा है अथवा प्रतीक्षा सूची में है।"
+play_already_playing: "⚠️ <b>एक संगीत पहले से ही चल रहा है.</b>\n\nकृपया इसके समाप्त होने का इंतज़ार करें या पहले इसे रोकने के लिए <code>/stop</code> का उपयोग करें."
 play_added_multiple_header: "➕ {user} द्वारा <b>{count} संगीत जोड़े गए</b>"
 play_queue_limit_hint: "⚠️ <i>प्रतीक्षा सूची की सीमा पूर्ण — कुछ संगीत छोड़ दिए गए।</i>"
 play_queue_view_hint: "<i>पूर्ण सूची देखने के लिए /queue का प्रयोग करें।</i>"

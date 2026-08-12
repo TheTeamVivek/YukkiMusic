@@ -447,6 +447,7 @@ rtmp_play_unsupported: "⚠️ <b>Can't play in an RTMP/live-stream voice chat.<
 play_downloading_song: "📥 Downloading song \"{title}\""
 play_download_canceled: "⚠️ Download canceled by {user}."
 play_already_in_queue: "✅ <b>Track already added!</b>\n\n<i>{title}</i> is already playing or in the queue."
+play_already_playing: "⚠️ <b>A song is already playing.</b>\n\nPlease wait for it to finish or use <code>/stop</code> to stop it first."
 play_added_multiple_header: "➕ <b>Added {count} tracks</b> by {user}"
 play_queue_limit_hint: "⚠️ <i>Queue limit reached — some tracks were skipped.</i>"
 play_queue_view_hint: "<i>Use /queue to view full list.</i>"

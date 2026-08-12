@@ -447,6 +447,7 @@ rtmp_play_unsupported: "⚠️ <b>RTMP/canlı yayın sesli sohbetinde çalınam�
 play_downloading_song: "📥 \"{title}\" şarkısı indiriliyor"
 play_download_canceled: "⚠️ İndirme {user} tarafından iptal edildi."
 play_already_in_queue: "✅ <b>Parça zaten ekli!</b>\n\n<i>{title}</i> zaten çalıyor veya sırada bekliyor."
+play_already_playing: "⚠️ <b>Şu anda bir parça çalıyor.</b>\n\nLütfen bitmesini bekleyin veya önce durdurmak için <code>/stop</code> kullanın."
 play_added_multiple_header: "➕ {user} tarafından <b>{count} parça eklendi</b>"
 play_queue_limit_hint: "⚠️ <i>Sıra sınırına ulaşıldı — bazı parçalar atlandı.</i>"
 play_queue_view_hint: "<i>Listenin tamamını görmek için /queue kullan.</i>"
