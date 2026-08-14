@@ -64,9 +64,9 @@ func (bm *broadcastManager) start(stats *BroadcastStats) (ctx context.Context, o
 	return ctx, true
 }
 
-// cancel stops the running broadcast and marks it as cancelled so the
+// stop stops the running broadcast and marks it as cancelled so the
 // progress message shows the cancellation instead of a summary.
-func (bm *broadcastManager) cancel() {
+func (bm *broadcastManager) stop() {
 	bm.mu.Lock()
 	defer bm.mu.Unlock()
 	if bm.cancelFn == nil {
@@ -218,7 +218,7 @@ func broadcastHandler(c *td.Client, m *td.Message) error {
 	progressMsg, err := m.ReplyText(c, F(chatID, "broadcast_initializing"),
 		&td.SendTextMessageOpts{ReplyMarkup: core.GetBroadcastCancelKeyboard(chatID)})
 	if err != nil {
-		bManager.cancel()
+		bManager.stop()
 		logger.Errorf("Failed to send broadcast progress message: %v", err)
 		return nil
 	}
@@ -349,7 +349,7 @@ func (bm *broadcastManager) run(
 	chats, users []int64,
 	stats *BroadcastStats,
 ) {
-	defer bm.cancel()
+	defer bm.stop()
 	defer func() {
 		if r := recover(); r != nil {
 			logger.Errorf("Broadcast panic recovered: %v", r)
@@ -624,7 +624,7 @@ func handleBroadcastCancel(c *td.Client, m *td.Message) error {
 		_, err := m.ReplyText(c, F(m.ChatID(), "broadcast_not_running"), nil)
 		return err
 	}
-	bManager.cancel()
+	bManager.stop()
 	_, err := m.ReplyText(c, F(m.ChatID(), "broadcast_cancel_success"), nil)
 	return err
 }
@@ -638,7 +638,7 @@ func broadcastCancelCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 		cb.Answer(c, 0, true, F(cb.ChatId, "broadcast_cancel_none_running"), "")
 		return nil
 	}
-	bManager.cancel()
+	bManager.stop()
 	cb.Answer(c, 0, true, F(cb.ChatId, "broadcast_cancel_done"), "")
 	cb.EditMessageText(c, F(cb.ChatId, "broadcast_cancel_done"), nil)
 	return nil

@@ -35,7 +35,7 @@ err := room.Play(track, localPath, false)
 `ChatState` is used to ensure the assistant is ready to stream in a chat.
 
 ```go
-state, err := core.GetChatState(chatID)
+state, err := core.ChatStateFor(chatID)
 if err != nil {
     return err
 }

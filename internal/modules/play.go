@@ -187,7 +187,7 @@ func handlePlay(c *td.Client, m *td.Message, opts *playOpts) error {
 		return err
 	}
 
-	room, searchMsg, err := prepareRoomAndSearchMessage(c, m, opts.CPlay)
+	room, searchMsg, err := preparePlayRequest(c, m, opts.CPlay)
 	if err != nil {
 		return nil
 	}
@@ -197,13 +197,8 @@ func handlePlay(c *td.Client, m *td.Message, opts *playOpts) error {
 		return nil
 	}
 
-	if len(tracks) == 1 && !opts.Force {
-		if isTrackInQueue(room, tracks[0]) {
-			utils.EOR(c, searchMsg, F(m.ChatID(), "play_already_in_queue", locales.Arg{
-				"title": utils.EscapeHTML(utils.ShortTitle(tracks[0].Title, 35)),
-			}), nil)
-			return nil
-		}
+	if rejectDuplicate(c, searchMsg, room, tracks, opts.Force) {
+		return nil
 	}
 
 	if config.QueueLimit == 0 && isActive && !opts.Force {
@@ -218,11 +213,7 @@ func handlePlay(c *td.Client, m *td.Message, opts *playOpts) error {
 
 	sender, _ := m.GetUser(c)
 	mention := mentionOf(sender, m.SenderID())
-	if err := playTracksAndRespond(c, m, searchMsg, room, tracks, mention, isActive, opts.Force, availableSlots); err != nil {
-		return err
-	}
-
-	return nil
+	return playTracksAndRespond(c, m, searchMsg, room, tracks, mention, isActive, opts.Force, availableSlots)
 }
 
 func canUsePlayCommand(c *td.Client, m *td.Message, chatID int64) bool {
@@ -240,20 +231,18 @@ func canUsePlayCommand(c *td.Client, m *td.Message, chatID int64) bool {
 	return isAuth
 }
 
-func prepareRoomAndSearchMessage(
-	c *td.Client,
-	m *td.Message,
-	cplay bool,
-) (*core.RoomState, *td.Message, error) {
-	room, err := getEffectiveRoom(m.ChatID(), cplay)
+// preparePlayRequest resolves the playback room and the "searching" status
+// message. Any error has already been shown to the user.
+func preparePlayRequest(c *td.Client, m *td.Message, cplay bool) (*core.RoomState, *td.Message, error) {
+	chatID := m.ChatID()
+
+	room, err := getEffectiveRoom(chatID, cplay)
 	if err != nil {
 		if _, rerr := m.ReplyText(c, err.Error(), nil); rerr != nil {
 			return nil, nil, rerr
 		}
 		return nil, nil, err
 	}
-
-	chatID := m.ChatID()
 	room.Parse()
 
 	if config.QueueLimit > 0 && len(room.Queue()) >= config.QueueLimit {
@@ -273,11 +262,7 @@ func prepareRoomAndSearchMessage(
 
 	statusText := F(chatID, "searching")
 	if query != "" {
-		statusText = F(
-			chatID,
-			"searching_query",
-			locales.Arg{"query": utils.EscapeHTML(query)},
-		)
+		statusText = F(chatID, "searching_query", locales.Arg{"query": utils.EscapeHTML(query)})
 	}
 
 	replyMsg, err := m.ReplyText(c, statusText, nil)
@@ -314,7 +299,7 @@ func fetchTracksAndCheckStatus(
 		return nil, false, fmt.Errorf("no tracks found")
 	}
 
-	chatState, err := core.GetChatState(r.ID)
+	chatState, err := core.ChatStateFor(r.ID)
 	if err != nil {
 		logger.Errorf("Error getting chat state: %v", err)
 		utils.EOR(c, replyMsg, getErrorMessage(m.ChatID(), err), nil)
@@ -328,12 +313,24 @@ func fetchTracksAndCheckStatus(
 	return tracks, r.IsActiveChat(), nil
 }
 
-func isTrackInQueue(r *core.RoomState, t *state.Track) bool {
-	activeTrack := r.Track()
-	if activeTrack != nil && (activeTrack.URL == t.URL || activeTrack.ID == t.ID) {
-		return true
+func rejectDuplicate(
+	c *td.Client,
+	replyMsg *td.Message,
+	r *core.RoomState,
+	tracks []*state.Track,
+	force bool,
+) bool {
+	if len(tracks) != 1 || force || !isTrackInQueue(r, tracks[0]) {
+		return false
 	}
 
+	utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "play_already_in_queue", locales.Arg{
+		"title": utils.EscapeHTML(utils.ShortTitle(tracks[0].Title, 35)),
+	}), nil)
+	return true
+}
+
+func isTrackInQueue(r *core.RoomState, t *state.Track) bool {
 	for _, qt := range r.Queue() {
 		if qt.URL == t.URL || qt.ID == t.ID {
 			return true
@@ -348,7 +345,7 @@ func ensureVoiceChatReady(
 	replyMsg *td.Message,
 	cs *core.ChatState,
 ) error {
-	snap, err := cs.Snapshot(false)
+	snap, err := cs.Snapshot()
 	if err != nil {
 		logger.Errorf("Error checking voicechat state: %v", err)
 		utils.EOR(c, replyMsg, getErrorMessage(chatID, err), nil)
@@ -356,34 +353,23 @@ func ensureVoiceChatReady(
 	}
 
 	if snap.VoiceChatActive != nil && !*snap.VoiceChatActive {
-		err := fmt.Errorf("no active voice chat")
 		utils.EOR(c, replyMsg, F(chatID, "err_no_active_voicechat"), nil)
-		return err
+		return fmt.Errorf("no active voice chat")
 	}
 
 	if snap.AssistantBanned {
-		err := fmt.Errorf("assistant banned")
 		utils.EOR(c, replyMsg, F(chatID, "err_assistant_banned", locales.Arg{
 			"user": mentionOfAssistant(cs.Assistant),
 			"id":   utils.IntToStr(cs.Assistant.Self.ID),
 		}), nil)
-		return err
+		return fmt.Errorf("assistant banned")
 	}
 
 	if snap.AssistantPresent {
 		return nil
 	}
 
-	username := ""
-	if chat, err := replyMsg.GetChat(c); err == nil {
-		if ct, ok := chat.Type.(*td.ChatTypeSupergroup); ok {
-			if sg, err := c.GetSupergroup(ct.SupergroupId); err == nil &&
-				sg.Usernames != nil && len(sg.Usernames.ActiveUsernames) > 0 {
-				username = sg.Usernames.ActiveUsernames[0]
-			}
-		}
-	}
-	if err := cs.EnsureAssistantJoined(username); err != nil {
+	if err := cs.Join(); err != nil {
 		logger.Errorf("Error joining assistant: %v", err)
 		utils.EOR(c, replyMsg, getErrorMessage(chatID, err), nil)
 		return err
@@ -796,12 +782,12 @@ func handlePlayAttemptError(
 // markVoiceChatInactive records that no active voice chat is running in the
 // room, as reported by u-bot.play.
 func markVoiceChatInactive(roomID int64) {
-	cs, err := core.GetChatState(roomID)
+	cs, err := core.ChatStateFor(roomID)
 	if err != nil {
 		logger.Errorf("failed to get chat state to mark voice chat inactive: %v", err)
 		return
 	}
-	cs.SetVoiceChatActive(false)
+	cs.SetVoiceChat(false)
 }
 
 // getFloodWait returns the retry-after seconds for a flood-wait error,
@@ -823,45 +809,40 @@ func getFloodWait(err error) int {
 	return 0
 }
 
-type msgFn func(chatID int64, err error) string
-
-var errMessageMap = map[error]msgFn{
-	core.ErrAdminPermissionRequired: func(chatID int64, _ error) string {
-		return F(chatID, "err_admin_permission_required")
-	},
-	core.ErrAssistantNotAvailable: func(chatID int64, e error) string {
-		return F(chatID, "err_assistant_get_failed", locales.Arg{"error": e.Error()})
-	},
-	core.ErrInviteRequestSent: func(chatID int64, _ error) string {
-		return F(chatID, "err_assistant_join_request_sent")
-	},
-	core.ErrAssistantInviteLinkFetch: func(chatID int64, e error) string {
-		return F(
-			chatID,
-			"err_assistant_invite_link_fetch",
-			locales.Arg{"error": e.Error()},
-		)
-	},
-	core.ErrJoinFailed: func(chatID int64, e error) string {
-		return F(chatID, "err_assistant_invite_failed", locales.Arg{"error": e.Error()})
-	},
-	core.ErrStateFetchFailed: func(chatID int64, e error) string {
-		return F(chatID, "err_fetch_failed", locales.Arg{"error": e.Error()})
-	},
-}
-
 func getErrorMessage(chatID int64, err error) string {
 	if err == nil {
 		return ""
 	}
 
-	for key, fn := range errMessageMap {
-		if errors.Is(err, key) {
-			return fn(chatID, err)
+	switch {
+	case errors.Is(err, core.ErrAdminPermissionRequired):
+		return F(chatID, "err_admin_permission_required")
+	case errors.Is(err, core.ErrAssistantNotAvailable):
+		return F(chatID, "err_assistant_get_failed", locales.Arg{"error": err.Error()})
+	case errors.Is(err, core.ErrInviteRequestSent):
+		return F(chatID, "err_assistant_join_request_sent")
+	case errors.Is(err, core.ErrAssistantInviteLinkFetch):
+		return F(chatID, "err_assistant_invite_link_fetch", locales.Arg{"error": err.Error()})
+	case errors.Is(err, core.ErrJoinFailed):
+		return F(chatID, "err_assistant_invite_failed", locales.Arg{"error": err.Error()})
+	case errors.Is(err, core.ErrStateFetchFailed):
+		return F(chatID, "err_fetch_failed", locales.Arg{"error": err.Error()})
+	default:
+		var fw *core.FloodWaitError
+		if errors.As(err, &fw) {
+			return floodWaitMessage(chatID, fw.Seconds)
 		}
+		return F(chatID, "err_unknown", locales.Arg{"error": err.Error()})
 	}
+}
 
-	return F(chatID, "err_unknown", locales.Arg{"error": err.Error()})
+// floodWaitMessage tells the user how long they must wait when the assistant
+// is flood-waiting and no other assistant can join in its place.
+func floodWaitMessage(chatID int64, wait int) string {
+	if wait >= 60 {
+		return F(chatID, "flood_minutes", locales.Arg{"duration": utils.FormatDuration(wait)})
+	}
+	return F(chatID, "flood_seconds", locales.Arg{"duration": wait})
 }
 
 // downloadTrack and safeGetTracks re-raise panics on failure.

@@ -30,6 +30,12 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 )
 
+// Flood-wait handling while the assistant joins a chat.
+const (
+	shortFloodWait = 10 // seconds: sleep and retry on the same assistant
+	longFloodWait  = 30 // seconds: above this the user is told to wait
+)
+
 var (
 	ErrAdminPermissionRequired  = errors.New("admin permission required")
 	ErrStateFetchFailed         = errors.New("state fetch failed")
@@ -39,12 +45,26 @@ var (
 	ErrJoinFailed               = errors.New("assistant join failed")
 )
 
+// FloodWaitError reports a flood wait that could not be worked around, so the
+// user has to wait before retrying.
+type FloodWaitError struct{ Seconds int }
+
+func (e *FloodWaitError) Error() string {
+	return fmt.Sprintf("flood wait: %d seconds", e.Seconds)
+}
+
+// StateSnapshot is a cached view of the assistant's membership and the
+// voice-chat status in a chat.
 type StateSnapshot struct {
 	AssistantPresent bool
 	AssistantBanned  bool
 	VoiceChatActive  *bool
 }
 
+// ChatState tracks the per-chat state needed to run the assistant in a voice
+// chat: which assistant is bound, whether it has joined, and whether a voice
+// chat is active. StateSnapshot is embedded so the snapshot fields are read
+// and written directly.
 type ChatState struct {
 	mu sync.RWMutex
 
@@ -52,8 +72,8 @@ type ChatState struct {
 
 	Assistant *Assistant
 
+	StateSnapshot
 	inviteLink string
-	snapshot   StateSnapshot
 	fetched    bool
 }
 
@@ -62,7 +82,9 @@ var (
 	chatStates   = map[int64]*ChatState{}
 )
 
-func GetChatState(chatID int64) (*ChatState, error) {
+// ChatStateFor returns the cached ChatState for a chat, binding an assistant
+// to it on first use.
+func ChatStateFor(chatID int64) (*ChatState, error) {
 	chatStatesMu.Lock()
 	state := chatStates[chatID]
 	if state == nil {
@@ -70,112 +92,133 @@ func GetChatState(chatID int64) (*ChatState, error) {
 		chatStates[chatID] = state
 	}
 	chatStatesMu.Unlock()
-	if err := state.ensureAssistant(); err != nil {
-		logger.Errorf("chat_state: ensureAssistant failed for %d: %v", chatID, err)
+	if err := state.bindAssistant(); err != nil {
+		logger.Errorf("chat_state: bindAssistant failed for %d: %v", chatID, err)
 		return nil, err
 	}
 	return state, nil
 }
 
-func DeleteChatState(chatID int64) {
+func DropChatState(chatID int64) {
 	chatStatesMu.Lock()
 	delete(chatStates, chatID)
 	chatStatesMu.Unlock()
 }
 
-// GetFullChat fetches the supergroup full info for a chat ID. TDLib supergroup
+// FullChat fetches the supergroup full info for a chat ID. TDLib supergroup
 // chat IDs carry a -100 prefix, while getSupergroupFullInfo expects the raw
 // supergroup id, so no separate getChat lookup is needed.
-func GetFullChat(c *td.Client, chatID int64) (*td.SupergroupFullInfo, error) {
+func FullChat(c *td.Client, chatID int64) (*td.SupergroupFullInfo, error) {
 	return c.GetSupergroupFullInfo(-chatID - 1_000_000_000_000)
 }
 
-func (s *ChatState) Snapshot(force bool) (StateSnapshot, error) {
-	s.mu.RLock()
-	cached := s.snapshot
-	fetched := s.fetched
-	s.mu.RUnlock()
-	if fetched && !force {
-		return cached, nil
+// Snapshot returns the cached state, refreshing it first when none is cached
+// yet.
+func (s *ChatState) Snapshot() (StateSnapshot, error) {
+	if snap, ok := s.cached(); ok {
+		return snap, nil
 	}
-	if err := s.refresh(); err != nil {
-		logger.Errorf("chat_state: refresh failed for %d: %v", s.ChatID, err)
-		return StateSnapshot{}, err
-	}
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.snapshot, nil
+	return s.refresh()
 }
 
-func (s *ChatState) EnsureAssistantJoined(username string) error {
-	if username != "" {
-		if err := s.joinBy(username); err == nil {
-			return nil
-		}
+// Refresh forces a refresh of the cached state from Telegram.
+func (s *ChatState) Refresh() (StateSnapshot, error) {
+	return s.refresh()
+}
+
+// Join makes sure the assistant is a member of the chat. For public chats the
+// resolved username is used as the join target (no admin rights needed); on
+// failure it falls back to the real invite-link flow. Short flood waits are
+// slept through, longer ones switch to another assistant, and if none can
+// join a FloodWaitError is returned so the user can be told to wait.
+func (s *ChatState) Join() error {
+	if username := s.publicUsername(); username != "" {
+		s.setLink("https://t.me/" + username)
 	}
 
-	err := s.joinByInviteLink()
+	err := s.joinWithRetry()
 	if err == nil {
 		return nil
 	}
-	if telegram.MatchError(err, "INVITE_HASH_EXPIRED") {
-		logger.Errorf("chat_state: invite expired for %d, retrying with refreshed link", s.ChatID)
-		s.setInviteLink("")
-		return s.joinByInviteLink()
+
+	wait := telegram.GetFloodWait(err)
+	if wait == 0 {
+		// Not a flood error: retry with the real invite link.
+		s.setLink("")
+		return s.joinWithRetry()
 	}
-	return err
+	if wait <= shortFloodWait {
+		logger.Errorf("chat_state: flood wait %ds while joining %d, retrying", wait, s.ChatID)
+		time.Sleep(time.Duration(wait) * time.Second)
+		return s.joinWithRetry()
+	}
+
+	// Longer flood waits: join with another assistant instead of blocking.
+	if s.switchAssistant() {
+		return nil
+	}
+
+	if wait < longFloodWait {
+		logger.Errorf("chat_state: flood wait %ds while joining %d, retrying", wait, s.ChatID)
+		time.Sleep(time.Duration(wait) * time.Second)
+		return s.joinWithRetry()
+	}
+
+	return &FloodWaitError{Seconds: wait}
 }
 
-func (s *ChatState) SetAssistantPresent(v bool) {
+func (s *ChatState) SetPresent(v bool) {
 	s.mu.Lock()
-	s.snapshot.AssistantPresent = v
+	s.AssistantPresent = v
 	s.fetched = true
 	s.mu.Unlock()
 }
 
-func (s *ChatState) SetAssistantBanned(v bool) {
+func (s *ChatState) SetBanned(v bool) {
 	s.mu.Lock()
-	s.snapshot.AssistantBanned = v
+	s.AssistantBanned = v
 	s.fetched = true
 	s.mu.Unlock()
 }
 
-func (s *ChatState) SetVoiceChatActive(v bool) {
+func (s *ChatState) SetVoiceChat(v bool) {
 	s.mu.Lock()
-	s.snapshot.VoiceChatActive = &v
+	s.VoiceChatActive = &v
 	s.fetched = true
 	s.mu.Unlock()
 }
 
-func (s *ChatState) AssistantFetched() bool {
+func (s *ChatState) Fetched() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.fetched
 }
 
-func (s *ChatState) refresh() error {
+// refresh fetches the assistant membership, voice-chat status and invite link
+// from Telegram and stores them as the new snapshot.
+func (s *ChatState) refresh() (StateSnapshot, error) {
 	logger.Debugf("chat_state: refresh(chat=%d)", s.ChatID)
 	if s.Assistant == nil {
-		if err := s.ensureAssistant(); err != nil {
-			return err
+		if err := s.bindAssistant(); err != nil {
+			return StateSnapshot{}, err
 		}
 	}
-	full, err := GetFullChat(Bot, s.ChatID)
+	full, err := FullChat(Bot, s.ChatID)
 	if err != nil {
-		logger.Errorf("chat_state: GetFullChat failed for %d: %v", s.ChatID, err)
+		logger.Errorf("chat_state: FullChat failed for %d: %v", s.ChatID, err)
 		if isAdminError(err) {
-			return ErrAdminPermissionRequired
+			return StateSnapshot{}, ErrAdminPermissionRequired
 		}
-		return fmt.Errorf("%w: %v", ErrStateFetchFailed, err)
+		return StateSnapshot{}, fmt.Errorf("%w: %v", ErrStateFetchFailed, err)
 	}
 
 	member, err := Bot.GetChatMember(s.ChatID, &td.MessageSenderUser{UserId: s.Assistant.Self.ID})
 	if err != nil {
 		if isAdminError(err) {
 			logger.Errorf("chat_state: admin permission required for GetChatMember in %d", s.ChatID)
-			return ErrAdminPermissionRequired
+			return StateSnapshot{}, ErrAdminPermissionRequired
 		}
-		return fmt.Errorf("%w: %v", ErrStateFetchFailed, err)
+		return StateSnapshot{}, fmt.Errorf("%w: %v", ErrStateFetchFailed, err)
 	}
 
 	present, banned := membership(member)
@@ -183,19 +226,19 @@ func (s *ChatState) refresh() error {
 	// A bot cannot observe the group call state (getGroupCall is user-only and
 	// the group call id is always 0 for bots), so voice chat activity is
 	// queried through the assistant like Grogram's fullChannel.Call != nil.
-	vcActive := s.snapshot.VoiceChatActive
+	vcActive := s.VoiceChatActive
 	if active, err := s.voiceChatActive(); err != nil {
 		logger.Warnf("chat_state: voiceChatActive failed for %d: %v", s.ChatID, err)
 	} else {
 		vcActive = &active
 	}
-	s.applySnapshot(present, banned, vcActive)
+	s.setState(present, banned, vcActive)
 	if full != nil &&
 		full.InviteLink != nil &&
 		full.InviteLink.InviteLink != "" {
-		s.setInviteLink(full.InviteLink.InviteLink)
+		s.setLink(full.InviteLink.InviteLink)
 	}
-	return nil
+	return s.current(), nil
 }
 
 // voiceChatActive reports whether an active voice/video chat is running in the
@@ -254,25 +297,52 @@ func membership(m *td.ChatMember) (bool, bool) {
 	return false, false
 }
 
-func (s *ChatState) joinBy(username string) error {
-	logger.Debugf("chat_state: joinBy username=%s chat=%d", username, s.ChatID)
-	_, err := s.Assistant.Client.JoinChannel(username)
-	if err == nil || telegram.MatchError(err, "USER_ALREADY_PARTICIPANT") {
-		s.applySnapshot(true, false, s.snapshot.VoiceChatActive)
-		return nil
+// publicUsername returns the chat's public username, or "" when the chat has
+// none (private group/channel). Public chats let the assistant join without
+// needing an invite link or admin rights.
+func (s *ChatState) publicUsername() string {
+	chat, err := Bot.GetChat(s.ChatID)
+	if err != nil {
+		return ""
 	}
-	return err
+	ct, ok := chat.Type.(*td.ChatTypeSupergroup)
+	if !ok {
+		return ""
+	}
+	sg, err := Bot.GetSupergroup(ct.SupergroupId)
+	if err != nil || sg == nil || sg.Usernames == nil {
+		return ""
+	}
+	if len(sg.Usernames.ActiveUsernames) == 0 {
+		return ""
+	}
+	return sg.Usernames.ActiveUsernames[0]
 }
 
-func (s *ChatState) joinByInviteLink() error {
-	logger.Debugf("chat_state: joinByInviteLink(chat=%d)", s.ChatID)
-	link, err := s.resolveInviteLink()
+// joinWithRetry joins using the cached invite link, retrying once after
+// refreshing the link when it has expired.
+func (s *ChatState) joinWithRetry() error {
+	err := s.joinByLink()
+	if err == nil {
+		return nil
+	}
+	if !telegram.MatchError(err, "INVITE_HASH_EXPIRED") {
+		return err
+	}
+	logger.Errorf("chat_state: invite expired for %d, retrying with refreshed link", s.ChatID)
+	s.setLink("")
+	return s.joinByLink()
+}
+
+func (s *ChatState) joinByLink() error {
+	logger.Debugf("chat_state: joinByLink(chat=%d)", s.ChatID)
+	link, err := s.resolveLink()
 	if err != nil {
 		return err
 	}
 	_, err = s.Assistant.Client.JoinChannel(link)
 	if err == nil || telegram.MatchError(err, "USER_ALREADY_PARTICIPANT") {
-		s.applySnapshot(true, false, s.snapshot.VoiceChatActive)
+		s.setState(true, false, s.VoiceChatActive)
 		return nil
 	}
 	if telegram.MatchError(err, "INVITE_REQUEST_SENT") {
@@ -284,11 +354,11 @@ func (s *ChatState) joinByInviteLink() error {
 	}
 	if telegram.MatchError(err, "USER_CHANNELS_TOO_MUCH") || telegram.MatchError(err, "CHANNELS_TOO_MUCH") {
 		logger.Infof("chat_state: join limit reached for %d, leaving inactive chats", s.ChatID)
-		s.leaveInactiveAssistantChats(5)
+		s.leaveInactiveChats(5)
 		time.Sleep(1 * time.Second)
 		_, retryErr := s.Assistant.Client.JoinChannel(link)
 		if retryErr == nil || telegram.MatchError(retryErr, "USER_ALREADY_PARTICIPANT") {
-			s.applySnapshot(true, false, s.snapshot.VoiceChatActive)
+			s.setState(true, false, s.VoiceChatActive)
 			return nil
 		}
 		return retryErr
@@ -299,15 +369,15 @@ func (s *ChatState) joinByInviteLink() error {
 	return fmt.Errorf("%w: %v", ErrJoinFailed, err)
 }
 
-func (s *ChatState) resolveInviteLink() (string, error) {
-	logger.Debugf("chat_state: resolveInviteLink(chat=%d)", s.ChatID)
+func (s *ChatState) resolveLink() (string, error) {
+	logger.Debugf("chat_state: resolveLink(chat=%d)", s.ChatID)
 	s.mu.RLock()
 	cached := s.inviteLink
 	s.mu.RUnlock()
 	if cached != "" {
 		return cached, nil
 	}
-	full, err := GetFullChat(Bot, s.ChatID)
+	full, err := FullChat(Bot, s.ChatID)
 	if err != nil {
 		if isAdminError(err) {
 			return "", ErrAdminPermissionRequired
@@ -317,7 +387,7 @@ func (s *ChatState) resolveInviteLink() (string, error) {
 	if full != nil &&
 		full.InviteLink != nil &&
 		full.InviteLink.InviteLink != "" {
-		s.setInviteLink(full.InviteLink.InviteLink)
+		s.setLink(full.InviteLink.InviteLink)
 		return full.InviteLink.InviteLink, nil
 	}
 	inv, err := Bot.CreateChatInviteLink(s.ChatID, 0, 0, "", nil)
@@ -330,7 +400,7 @@ func (s *ChatState) resolveInviteLink() (string, error) {
 	if inv == nil || inv.InviteLink == "" {
 		return "", ErrAssistantInviteLinkFetch
 	}
-	s.setInviteLink(inv.InviteLink)
+	s.setLink(inv.InviteLink)
 	return inv.InviteLink, nil
 }
 
@@ -342,7 +412,7 @@ func (s *ChatState) approveJoinRequest() error {
 		&td.ProcessChatJoinRequestOpts{Approve: true},
 	)
 	if err == nil {
-		s.applySnapshot(true, false, s.snapshot.VoiceChatActive)
+		s.setState(true, false, s.VoiceChatActive)
 		return nil
 	}
 	if isAdminError(err) {
@@ -351,7 +421,37 @@ func (s *ChatState) approveJoinRequest() error {
 	return err
 }
 
-func (s *ChatState) ensureAssistant() error {
+// switchAssistant tries to join the chat with each other assistant, keeping
+// the first one that succeeds. It reports whether the chat was joined.
+func (s *ChatState) switchAssistant() bool {
+	original := s.Assistant
+	if original == nil {
+		return false
+	}
+
+	for idx := 1; idx <= Assistants.Count(); idx++ {
+		if idx == original.Index+1 {
+			continue
+		}
+		ass, err := Assistants.Get(idx)
+		if err != nil {
+			continue
+		}
+		s.bind(ass)
+		if err := s.joinByLink(); err == nil {
+			Assistants.Assign(s.ChatID, idx)
+			s.rebindRoom(ass)
+			logger.Infof("chat_state: switched assistant for %d to index %d", s.ChatID, idx)
+			return true
+		}
+	}
+
+	s.bind(original)
+	return false
+}
+
+// bindAssistant binds the chat to its assistant, caching the choice.
+func (s *ChatState) bindAssistant() error {
 	s.mu.RLock()
 	has := s.Assistant != nil
 	s.mu.RUnlock()
@@ -374,16 +474,25 @@ func (s *ChatState) ensureAssistant() error {
 	return nil
 }
 
-func (s *ChatState) setInviteLink(link string) { s.mu.Lock(); s.inviteLink = link; s.mu.Unlock() }
-func (s *ChatState) applySnapshot(p, b bool, v *bool) {
+// bind switches the chat to a different assistant without touching the cached
+// assignment.
+func (s *ChatState) bind(ass *Assistant) {
 	s.mu.Lock()
-	s.snapshot = StateSnapshot{AssistantPresent: p, AssistantBanned: b, VoiceChatActive: v}
-	s.fetched = true
+	s.Assistant = ass
 	s.mu.Unlock()
 }
 
-func (s *ChatState) leaveInactiveAssistantChats(limit int) {
-	logger.Debugf("chat_state: leaveInactiveAssistantChats(chat=%d, limit=%d)", s.ChatID, limit)
+// rebindRoom points the room (if any) at the assistant now serving the chat.
+func (s *ChatState) rebindRoom(ass *Assistant) {
+	if room, ok := GetRoom(s.ChatID, nil, false); ok {
+		room.SetAssistant(ass)
+	}
+}
+
+// leaveInactiveChats makes room for joining a new chat by leaving older chats
+// that are not currently streaming.
+func (s *ChatState) leaveInactiveChats(limit int) {
+	logger.Debugf("chat_state: leaveInactiveChats(chat=%d, limit=%d)", s.ChatID, limit)
 	if s.Assistant == nil || s.Assistant.Client == nil || limit <= 0 {
 		return
 	}
@@ -425,6 +534,31 @@ func (s *ChatState) leaveInactiveAssistantChats(limit int) {
 		logger.Warnf("chat_state: IterDialogs failed while auto-leaving chats: %v", err)
 	}
 }
+
+func (s *ChatState) cached() (StateSnapshot, bool) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.StateSnapshot, s.fetched
+}
+
+func (s *ChatState) current() StateSnapshot {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.StateSnapshot
+}
+
+func (s *ChatState) setState(present, banned bool, vcActive *bool) {
+	s.mu.Lock()
+	s.StateSnapshot = StateSnapshot{
+		AssistantPresent: present,
+		AssistantBanned:  banned,
+		VoiceChatActive:  vcActive,
+	}
+	s.fetched = true
+	s.mu.Unlock()
+}
+
+func (s *ChatState) setLink(link string) { s.mu.Lock(); s.inviteLink = link; s.mu.Unlock() }
 
 func isAdminError(err error) bool {
 	if telegram.MatchError(err, "CHAT_ID_INVALID") || telegram.MatchError(err, "CHAT_ADMIN_REQUIRED") ||

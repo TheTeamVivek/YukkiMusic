@@ -127,6 +127,14 @@ func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
 	return room, true
 }
 
+// SetAssistant rebinds the room to another assistant (used after the
+// assistant for the chat was switched).
+func (r *RoomState) SetAssistant(ass *Assistant) {
+	r.mu.Lock()
+	r.Assistant = ass
+	r.mu.Unlock()
+}
+
 func GetAllRooms() map[int64]*RoomState {
 	roomsMu.RLock()
 

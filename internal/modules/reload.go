@@ -100,7 +100,7 @@ func handleReload(c *td.Client, m *td.Message, cplay bool) error {
 	floodDuration := utils.IfElse(isAdmin, 2*time.Minute, 5*time.Minute)
 	utils.SetFlood(fmt.Sprintf("reload:%d%d", roomID, m.SenderID()), floodDuration)
 
-	cs, err := core.GetChatState(roomID)
+	cs, err := core.ChatStateFor(roomID)
 	if err != nil {
 		summary += F(chatID, "reload_assistant_fail", locales.Arg{
 			"error": err.Error(),
@@ -111,14 +111,14 @@ func handleReload(c *td.Client, m *td.Message, cplay bool) error {
 		return nil
 	}
 
-	if err := cs.EnsureAssistantJoined(""); err != nil {
+	if err := cs.Join(); err != nil {
 		logger.Errorf("reload: failed to ensure assistant joined %d: %v", roomID, err)
 		summary += F(chatID, "reload_assistant_fail", locales.Arg{
 			"error": err.Error(),
 		}) + "\n"
 	}
 
-	snapshot, snapErr := cs.Snapshot(true)
+	snapshot, snapErr := cs.Refresh()
 	summary += reloadVoiceChatStatus(chatID, snapshot, snapErr)
 	summary += reloadAssistantStatus(chatID, snapshot, snapErr)
 

@@ -86,7 +86,7 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 		return nil
 	}
 
-	state, err := core.GetChatState(chatID)
+	state, err := core.ChatStateFor(chatID)
 	if err != nil {
 		logger.Error("Failed to get chat state: " + err.Error())
 		state = nil
@@ -113,7 +113,7 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 		if c.Me != nil && userID == c.Me.Id && config.LeaveOnDemoted {
 			cleanScheduler.cancel(chatID)
 			core.DeleteRoom(chatID)
-			core.DeleteChatState(chatID)
+			core.DropChatState(chatID)
 			if _, rerr := c.SendTextMessage(chatID, F(chatID, "bot_demotion_goodbye"), nil); rerr != nil {
 				logger.Error(rerr)
 			}
@@ -137,13 +137,13 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 	if state != nil && state.Assistant != nil && userID == state.Assistant.Self.ID {
 		switch newStatus {
 		case "member", "administrator", "creator":
-			state.SetAssistantPresent(true)
-			state.SetAssistantBanned(false)
+			state.SetPresent(true)
+			state.SetBanned(false)
 			return nil
 
 		case "left":
-			state.SetAssistantPresent(false)
-			state.SetAssistantBanned(false)
+			state.SetPresent(false)
+			state.SetBanned(false)
 			return nil
 
 		case "kicked":
@@ -151,8 +151,8 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 			return nil
 		}
 
-		if !state.AssistantFetched() {
-			state.Snapshot(true)
+		if !state.Fetched() {
+			state.Refresh()
 		}
 	}
 
@@ -201,8 +201,8 @@ func handleAssistantRestriction(
 	chatID int64,
 ) {
 	if !isTrueBan(u) {
-		s.SetAssistantPresent(true)
-		s.SetAssistantBanned(false)
+		s.SetPresent(true)
+		s.SetBanned(false)
 
 		logger.Debug("Assistant muted in " + utils.IntToStr(chatID))
 
@@ -211,7 +211,7 @@ func handleAssistantRestriction(
 
 	logger.Debug("Assistant banned in " + utils.IntToStr(chatID))
 
-	s.SetAssistantPresent(false)
+	s.SetPresent(false)
 	if room, ok := core.GetRoom(chatID, nil, false); ok {
 		scheduleOldPlayingMessage(room)
 	}
@@ -223,9 +223,9 @@ func handleAssistantRestriction(
 		&td.ChatMemberStatusMember{},
 	)
 	if err == nil {
-		s.SetAssistantBanned(false)
+		s.SetBanned(false)
 	} else {
-		s.SetAssistantBanned(true)
+		s.SetBanned(true)
 
 		msg := F(chatID, "assistant_restricted_warning", locales.Arg{
 			"assistant": mentionOfAssistant(s.Assistant),

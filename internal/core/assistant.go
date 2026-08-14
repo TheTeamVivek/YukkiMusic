@@ -89,6 +89,20 @@ func (m *AssistantManager) WithAssistant(chatID int64, fn func(*Assistant)) {
 	fn(ass)
 }
 
+// Assign records the assistant (1-based index) serving a chat, so future
+// ForChat calls return the same assistant.
+func (m *AssistantManager) Assign(chatID int64, idx int) {
+	if m == nil || idx < 1 || idx > len(m.list) {
+		return
+	}
+	m.cacheMu.Lock()
+	if m.indexCache == nil {
+		m.indexCache = make(map[int64]int)
+	}
+	m.indexCache[chatID] = idx
+	m.cacheMu.Unlock()
+}
+
 func (m *AssistantManager) ForChat(chatID int64) (*Assistant, error) {
 	if m == nil || len(m.list) == 0 {
 		return nil, fmt.Errorf("no assistants available")

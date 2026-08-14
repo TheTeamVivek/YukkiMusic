@@ -134,7 +134,7 @@ func handleBotRemoved(c *td.Client, u *td.UpdateChatMember, chatID int64) {
 
 	cleanScheduler.cancel(chatID)
 	core.DeleteRoom(chatID)
-	core.DeleteChatState(chatID)
+	core.DropChatState(chatID)
 	database.RemoveServedChat(chatID)
 
 	if config.LoggerID == 0 || config.LoggerID == chatID {
@@ -186,13 +186,13 @@ func handleVoiceChatAction(c *td.Client, m *td.Message) error {
 		duration = ended.Duration
 	}
 
-	s, err := core.GetChatState(chatID)
+	s, err := core.ChatStateFor(chatID)
 	if err != nil {
 		logger.Errorf("Failed to get chat state for %d: %v", chatID, err)
 		return nil
 	}
 
-	s.SetVoiceChatActive(isActive)
+	s.SetVoiceChat(isActive)
 
 	msgKey := utils.IfElse(isActive, "voicechat_started", "voicechat_ended")
 	if _, rerr := c.SendTextMessage(chatID, F(chatID, msgKey, locales.Arg{"duration": utils.FormatDuration(int(duration))}), nil); rerr != nil {
