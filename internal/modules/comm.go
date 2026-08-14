@@ -159,7 +159,7 @@ func setBotCommands(bot *td.Client) {
 			append(AllCommands.GroupUserCommands, AllCommands.GroupAdminCommands...),
 		},
 		{
-			&td.BotCommandScopeChatMember{ChatId: config.OwnerID, UserId: config.OwnerID},
+			&td.BotCommandScopeChat{ChatId: config.OwnerID},
 			append(
 				append(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands...),
 				AllCommands.PrivateOwnerCommands...,
