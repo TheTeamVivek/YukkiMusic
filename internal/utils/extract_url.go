@@ -24,13 +24,15 @@ import (
 	td "github.com/AshokShau/gotdbot"
 )
 
+// ExtractURLs collects URLs from the given message and, if it is a reply,
+// from the replied message too. Both message text and media captions are
+// inspected, since Telegram entities cover both.
 func ExtractURLs(c *td.Client, m *td.Message) ([]string, error) {
 	if m == nil {
 		return nil, fmt.Errorf("invalid message")
 	}
 
-	urls := make([]string, 0, len(m.Entities()))
-	urls = append(urls, collectURLs(m.Text(), m.Entities())...)
+	urls := collectURLsFromMessage(m)
 
 	if m.ReplyToMessageID() <= 0 {
 		return finalizeURLs(urls)
@@ -44,11 +46,22 @@ func ExtractURLs(c *td.Client, m *td.Message) ([]string, error) {
 		return nil, fmt.Errorf("failed to fetch reply message: %w", err)
 	}
 
-	urls = append(urls, collectURLs(r.Text(), r.Entities())...)
+	urls = append(urls, collectURLsFromMessage(r)...)
 	return finalizeURLs(urls)
 }
 
 // --- Sub Functions ---
+
+// collectURLsFromMessage extracts URLs from both the message text and its
+// caption, as either can carry entities.
+func collectURLsFromMessage(m *td.Message) []string {
+	if m == nil {
+		return nil
+	}
+	urls := collectURLs(m.Text(), m.Entities())
+	urls = append(urls, collectURLs(m.Caption(), m.CaptionEntities())...)
+	return urls
+}
 
 func collectURLs(text string, entities []td.TextEntity) []string {
 	urls := make([]string, 0, len(entities))
@@ -87,5 +100,15 @@ func finalizeURLs(urls []string) ([]string, error) {
 	if len(urls) == 0 {
 		return nil, fmt.Errorf("no URLs found")
 	}
-	return urls, nil
+
+	seen := make(map[string]struct{}, len(urls))
+	deduped := make([]string, 0, len(urls))
+	for _, u := range urls {
+		if _, ok := seen[u]; ok {
+			continue
+		}
+		seen[u] = struct{}{}
+		deduped = append(deduped, u)
+	}
+	return deduped, nil
 }
