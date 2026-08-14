@@ -169,7 +169,7 @@ func setBotCommands(bot *td.Client) {
 
 	for _, e := range entries {
 		if err := bot.SetCommands(e.cmds, "", &td.SetCommandsOpts{Scope: e.scope}); err != nil {
-			logger.Error("Failed to set bot commands: " + err.Error())
+			logger.Errorf("Failed to set bot commands(Scope: %T): %v", e.scope, err)
 		}
 	}
 
