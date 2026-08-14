@@ -39,7 +39,7 @@ func cleanModeReadHandler(c *td.Client, upd *td.UpdateChatReadOutbox) error {
 }
 
 func currentPlayingStatusMessageID(chatID int64) int64 {
-	room, ok := core.GetRoom(chatID, nil, false)
+	room, ok := core.RoomFor(chatID)
 	if !ok || room == nil {
 		return 0
 	}

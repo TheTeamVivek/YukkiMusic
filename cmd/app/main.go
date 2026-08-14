@@ -86,11 +86,10 @@ func main() {
 	}
 	defer shutdownCore()
 
-	core.GetAssistantIndexFunc = database.AssistantIndex
 	core.F = modules.F
 
-	if err := database.RebalanceAssistantIndexes(core.Assistants.Count()); err != nil {
-		logger.Fatalf("failed to rebalance assistants: %v", err)
+	if err := database.InitAssistantIndexes(core.Assistants.Count()); err != nil {
+		logger.Fatalf("failed to init assistants: %v", err)
 	}
 
 	modules.Init(core.Bot, core.Assistants)

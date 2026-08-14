@@ -25,7 +25,7 @@ ass, err := core.Assistants.ForChat(chatID)
 if err != nil {
     return err
 }
-room, _ := core.GetRoom(chatID, ass, true)
+room := core.CreateRoom(chatID, ass)
 
 // Add a track to the queue and start playing if idle
 err := room.Play(track, localPath, false)
@@ -71,6 +71,6 @@ All state types (`RoomState`, `ChatState`, `AssistantManager`) are thread-safe. 
 > **Initialization**: `core.Init()` must be called during bot startup to initialize the bot client and all configured assistants. It returns a shutdown function and an error.
 
 > [!IMPORTANT]
-> **Cleanup**: `DeleteRoom(chatID)` must be called when a session ends to stop playback, clean up temporary files, and release resources.
+> **Cleanup**: `DropRoom(chatID)` must be called when a session ends to stop playback, clean up temporary files, and release resources.
 
-- **Assistant Indexing**: `GetAssistantIndexFunc` must be initialized (usually to `database.AssistantIndex`) to allow the `AssistantManager` to distribute chats across the assistant pool.
+- **Assistant Indexing**: `database.InitAssistantIndexes(count)` must be called once at startup to seed the assistant pool and distribute chats evenly. All chat-to-assistant assignment and persistence lives in the `database` package (`GetAssistant`/`SaveAssistant`), which `core` calls directly.

@@ -168,7 +168,7 @@ func GetPlayMarkup(chatID int64, r *RoomState, queued bool) td.ReplyMarkup {
 	}
 	// Toggle: show play when paused, pause while playing.
 	toggle, toggleCB := "II", prefix+"pause"
-	if r.IsPaused() {
+	if r.Paused() {
 		toggle, toggleCB = "▷", prefix+"resume"
 	}
 

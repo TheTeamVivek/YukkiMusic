@@ -38,7 +38,7 @@ const (
 
 // Play starts playback of a track
 func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return ErrRoomDestroyed
 	}
 
@@ -79,7 +79,7 @@ func (r *RoomState) Play(t *state.Track, path string, force ...bool) error {
 
 // Pause pauses playback with optional auto-resume
 func (r *RoomState) Pause() (bool, error) {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return false, ErrRoomDestroyed
 	}
 
@@ -115,11 +115,11 @@ func (r *RoomState) Pause() (bool, error) {
 
 // Resume resumes playback
 func (r *RoomState) Resume() (bool, error) {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return false, ErrRoomDestroyed
 	}
 
-	if !r.IsActiveChat() {
+	if !r.Active() {
 		return false, fmt.Errorf("there are no active music playing")
 	}
 
@@ -148,7 +148,7 @@ func (r *RoomState) Resume() (bool, error) {
 
 // Replay restarts the current track
 func (r *RoomState) Replay() error {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return ErrRoomDestroyed
 	}
 
@@ -186,7 +186,7 @@ func (r *RoomState) Replay() error {
 
 // Stop stops playback completely
 func (r *RoomState) Stop() error {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return ErrRoomDestroyed
 	}
 
@@ -209,7 +209,7 @@ func (r *RoomState) Stop() error {
 
 // Seek moves playback position by specified seconds
 func (r *RoomState) Seek(seconds int) error {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return ErrRoomDestroyed
 	}
 
@@ -276,7 +276,7 @@ func (r *RoomState) Seek(seconds int) error {
 
 // SetSpeed adjusts playback speed
 func (r *RoomState) SetSpeed(speed float64) error {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return ErrRoomDestroyed
 	}
 
@@ -320,7 +320,7 @@ func (r *RoomState) SetSpeed(speed float64) error {
 
 // Mute mutes playback
 func (r *RoomState) Mute() (bool, error) {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return false, ErrRoomDestroyed
 	}
 
@@ -356,7 +356,7 @@ func (r *RoomState) Mute() (bool, error) {
 
 // Unmute unmutes playback
 func (r *RoomState) Unmute() (bool, error) {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return false, ErrRoomDestroyed
 	}
 

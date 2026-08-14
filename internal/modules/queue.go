@@ -78,7 +78,7 @@ func handleQueue(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	t := r.Track()
-	if !r.IsActiveChat() || t == nil {
+	if !r.Active() || t == nil {
 		_, err := m.ReplyText(c, F(chatID, "queue_no_active"), nil)
 		return err
 	}
@@ -206,7 +206,7 @@ func handleRemove(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 	t := r.Track()
-	if !r.IsActiveChat() || t == nil {
+	if !r.Active() || t == nil {
 		_, err := m.ReplyText(c, F(chatID, "queue_no_active"), nil)
 		return err
 	}
@@ -243,7 +243,7 @@ func handleRemove(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	r.RemoveFromQueue(index - 1)
+	r.RemoveTrack(index - 1)
 
 	sender, _ := m.GetUser(c)
 	mention := mentionOf(sender, m.SenderID())
@@ -271,7 +271,7 @@ func handleClear(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 	t := r.Track()
-	if !r.IsActiveChat() || t == nil {
+	if !r.Active() || t == nil {
 		_, err := m.ReplyText(c, F(chatID, "clear_no_active"), nil)
 		return err
 	}
@@ -281,7 +281,7 @@ func handleClear(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	r.RemoveFromQueue(-1)
+	r.RemoveTrack(-1)
 
 	sender, _ := m.GetUser(c)
 	mention := mentionOf(sender, m.SenderID())
@@ -308,7 +308,7 @@ func handleMove(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	if !r.IsActiveChat() || r.Track() == nil {
+	if !r.Active() || r.Track() == nil {
 		_, err := m.ReplyText(c, F(chatID, "queue_no_active"), nil)
 		return err
 	}
@@ -348,7 +348,7 @@ func handleMove(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	r.MoveInQueue(from-1, to-1)
+	r.MoveTrack(from-1, to-1)
 
 	sender, _ := m.GetUser(c)
 	mention := mentionOf(sender, m.SenderID())

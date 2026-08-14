@@ -39,8 +39,7 @@ import (
 )
 
 var (
-	Assistants            *AssistantManager
-	GetAssistantIndexFunc func(chatID int64, assistantCount int) (int, error) // GetAssistantIndexFunc = database.AssistantIndex
+	Assistants *AssistantManager
 )
 
 // Init initializes the bot and assistant clients.
@@ -219,8 +218,7 @@ func initAssistants() error {
 	}
 
 	Assistants = &AssistantManager{
-		list:       assistantList,
-		indexCache: make(map[int64]int),
+		list: assistantList,
 	}
 	return nil
 }

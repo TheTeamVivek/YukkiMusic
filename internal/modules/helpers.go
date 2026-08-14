@@ -49,7 +49,7 @@ func getEffectiveRoom(chatID int64, cplay bool) (*core.RoomState, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get assistant for your chat: %w", err)
 	}
-	r, _ := core.GetRoom(chatID, ass, true)
+	r := core.CreateRoom(chatID, ass)
 
 	if cplay {
 		r.ChatID = origChatID

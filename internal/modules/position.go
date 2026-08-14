@@ -67,7 +67,7 @@ func handlePosition(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	if !r.IsActiveChat() || r.Track().ID == "" {
+	if !r.Active() || r.Track().ID == "" {
 		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
 		return err
 	}

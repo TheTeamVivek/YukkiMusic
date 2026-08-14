@@ -81,8 +81,8 @@ func roomHandle(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	}
 	action := parts[2]
 
-	r, ok := core.GetRoom(roomID, nil, false)
-	if !ok || !r.IsActiveChat() {
+	r, ok := core.RoomFor(roomID)
+	if !ok || !r.Active() {
 		u.Answer(c, 0, true, F(chatID, "room_not_active_cb"), "")
 		u.EditMessageText(c, F(chatID, "room_no_active"), nil)
 		return nil
@@ -170,7 +170,7 @@ func handlePauseAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomS
 	chatID := u.ChatId
 	logger.Infof("Callback → pause, chatID=%d", chatID)
 
-	if r.IsPaused() {
+	if r.Paused() {
 		u.Answer(c, 0, true, F(chatID, "room_already_paused"), "")
 		return nil
 	}
@@ -183,7 +183,7 @@ func handlePauseAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomS
 		return nil
 	}
 
-	if r.IsMuted() {
+	if r.Muted() {
 		r.Unmute()
 	}
 
@@ -198,7 +198,7 @@ func handleResumeAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 	chatID := u.ChatId
 	logger.Infof("Callback → resume, chatID=%d", chatID)
 
-	if !r.IsPaused() {
+	if !r.Paused() {
 		u.Answer(c, 0, true, F(chatID, "cb_already_playing"), "")
 		return nil
 	}
@@ -253,7 +253,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 
 	if len(r.Queue()) == 0 {
 		scheduleOldPlayingMessage(r)
-		core.DeleteRoom(r.ID)
+		core.DropRoom(r.ID)
 		if _, err := u.EditMessageText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mentionOfSender(c, u.SenderUserId),
 		}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
@@ -279,7 +279,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 		}), nil)
 		u.Answer(c, 0, true, F(chatID, "cb_skip_download_failed"), "")
 		scheduleOldPlayingMessage(r)
-		core.DeleteRoom(r.ID)
+		core.DropRoom(r.ID)
 		return nil
 	}
 
@@ -288,7 +288,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 		utils.EOR(c, statusMsg, F(chatID, "stream_play_fail"), nil)
 		u.Answer(c, 0, true, F(chatID, "cb_skip_play_failed"), "")
 		scheduleOldPlayingMessage(r)
-		core.DeleteRoom(r.ID)
+		core.DropRoom(r.ID)
 		return nil
 	}
 
@@ -308,7 +308,7 @@ func handleStopAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 	logger.Infof("Callback → stop, chatID=%d", chatID)
 
 	scheduleOldPlayingMessage(r)
-	core.DeleteRoom(r.ID)
+	core.DropRoom(r.ID)
 
 	u.Answer(c, 0, true, F(chatID, "cb_stop_success"), "")
 	if _, err := u.EditMessageText(c, F(chatID, "stopped", locales.Arg{
@@ -322,7 +322,7 @@ func handleStopAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 func handleMuteAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
 	chatID := u.ChatId
 
-	if r.IsMuted() {
+	if r.Muted() {
 		u.Answer(c, 0, true, F(chatID, "mute_already_muted"), "")
 		return nil
 	}
@@ -342,7 +342,7 @@ func handleMuteAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 func handleUnmuteAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
 	chatID := u.ChatId
 
-	if !r.IsMuted() {
+	if !r.Muted() {
 		u.Answer(c, 0, true, F(chatID, "unmute_already"), "")
 		return nil
 	}

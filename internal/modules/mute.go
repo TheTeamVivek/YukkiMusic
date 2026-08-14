@@ -61,12 +61,12 @@ func handleMute(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	if !r.IsActiveChat() {
+	if !r.Active() {
 		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
 		return err
 	}
 
-	if r.IsMuted() {
+	if r.Muted() {
 		_, err := m.ReplyText(c, F(chatID, "mute_already_muted"), nil)
 		return err
 	}

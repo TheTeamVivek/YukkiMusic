@@ -60,8 +60,8 @@ func activeHandler(c *td.Client, m *td.Message) error {
 	// Only truly active sessions are reported: skip destroyed rooms and
 	// rooms that are not actively playing anything.
 	rooms := make(map[int64]*core.RoomState)
-	for id, r := range core.GetAllRooms() {
-		if r == nil || r.IsDestroyed() || !r.IsActiveChat() {
+	for id, r := range core.AllRooms() {
+		if r == nil || r.Destroyed() || !r.Active() {
 			continue
 		}
 		rooms[id] = r
@@ -122,10 +122,10 @@ func activeHandler(c *td.Client, m *td.Message) error {
 }
 
 func activeStatusCell(r *core.RoomState) string {
-	if r.IsMuted() {
+	if r.Muted() {
 		return "<b>🔇 Muted</b>"
 	}
-	if r.IsPaused() {
+	if r.Paused() {
 		return "<b>⏸ Paused</b>"
 	}
 	if t := r.Track(); t != nil {

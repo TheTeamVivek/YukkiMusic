@@ -124,7 +124,7 @@ func handleSeek(c *td.Client, m *td.Message, cplay, isBack bool) error {
 	}
 	chatID := m.ChatID()
 	t := r.Track()
-	if !r.IsActiveChat() || t == nil {
+	if !r.Active() || t == nil {
 		_, err := m.ReplyText(c, F(chatID, "seek_no_active"), nil)
 		return err
 	}
@@ -210,7 +210,7 @@ func handleJump(c *td.Client, m *td.Message, cplay bool) error {
 	chatID := m.ChatID()
 	t := r.Track()
 
-	if !r.IsActiveChat() || t == nil {
+	if !r.Active() || t == nil {
 		_, err := m.ReplyText(c, F(chatID, "jump_no_active"), nil)
 		return err
 	}

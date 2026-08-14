@@ -41,12 +41,7 @@ func streamEndHandler(
 	}
 
 	logger.Debugf("[onStreamEndHandler] Stream ended in chat %d", chatID)
-	ass, err := core.Assistants.ForChat(chatID)
-	if err != nil {
-		logger.Errorf("Failed to get Assistant for %d: %v", chatID, err)
-		return
-	}
-	r, ok := core.GetRoom(chatID, ass, false)
+	r, ok := core.RoomFor(chatID)
 	if !ok {
 		return
 	}
@@ -59,7 +54,7 @@ func streamEndHandler(
 	var t *state.Track
 	var wasLooping bool
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
-		core.DeleteRoom(chatID)
+		core.DropRoom(chatID)
 		if _, err := c.SendTextMessage(cid, F(cid, "stream_queue_finished"), nil); err != nil {
 			logger.Error(err)
 		}
@@ -95,7 +90,7 @@ func streamEndHandler(
 		utils.EOR(c, statusMsg, F(cid, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		core.DeleteRoom(chatID)
+		core.DropRoom(chatID)
 
 		return
 	}
@@ -107,7 +102,7 @@ func streamEndHandler(
 			err,
 		)
 		utils.EOR(c, statusMsg, F(cid, "stream_play_fail"), nil)
-		core.DeleteRoom(chatID)
+		core.DropRoom(chatID)
 
 		return
 	}

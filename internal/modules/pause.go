@@ -64,12 +64,12 @@ func handlePause(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	if !r.IsActiveChat() {
+	if !r.Active() {
 		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
 		return err
 	}
 
-	if r.IsPaused() {
+	if r.Paused() {
 		_, err := m.ReplyText(c, F(chatID, "pause_already"), nil)
 		return err
 	}

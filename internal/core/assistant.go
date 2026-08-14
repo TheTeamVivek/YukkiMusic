@@ -19,8 +19,8 @@ package core
 
 import (
 	"fmt"
-	"sync"
 
+	"yukkimusic/internal/database"
 	"yukkimusic/internal/logger"
 
 	"github.com/amarnathcjd/gogram/telegram"
@@ -36,9 +36,7 @@ type Assistant struct {
 }
 
 type AssistantManager struct {
-	list       []*Assistant
-	cacheMu    sync.RWMutex
-	indexCache map[int64]int // chatID -> assistantIndex (1-based)
+	list []*Assistant
 }
 
 func (m *AssistantManager) Count() int {
@@ -89,46 +87,15 @@ func (m *AssistantManager) WithAssistant(chatID int64, fn func(*Assistant)) {
 	fn(ass)
 }
 
-// Assign records the assistant (1-based index) serving a chat, so future
-// ForChat calls return the same assistant.
-func (m *AssistantManager) Assign(chatID int64, idx int) {
-	if m == nil || idx < 1 || idx > len(m.list) {
-		return
-	}
-	m.cacheMu.Lock()
-	if m.indexCache == nil {
-		m.indexCache = make(map[int64]int)
-	}
-	m.indexCache[chatID] = idx
-	m.cacheMu.Unlock()
-}
-
 func (m *AssistantManager) ForChat(chatID int64) (*Assistant, error) {
 	if m == nil || len(m.list) == 0 {
 		return nil, fmt.Errorf("no assistants available")
 	}
-	if GetAssistantIndexFunc == nil {
-		return nil, fmt.Errorf("GetAssistantIndexFunc is not set")
-	}
 
-	m.cacheMu.RLock()
-	if idx, ok := m.indexCache[chatID]; ok {
-		m.cacheMu.RUnlock()
-		return m.Get(idx)
-	}
-	m.cacheMu.RUnlock()
-
-	idx1, err := GetAssistantIndexFunc(chatID, len(m.list))
+	idx, err := database.GetAssistant(chatID)
 	if err != nil {
 		return nil, err
 	}
 
-	m.cacheMu.Lock()
-	if m.indexCache == nil {
-		m.indexCache = make(map[int64]int)
-	}
-	m.indexCache[chatID] = idx1
-	m.cacheMu.Unlock()
-
-	return m.Get(idx1)
+	return m.Get(idx)
 }

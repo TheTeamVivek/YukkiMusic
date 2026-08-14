@@ -310,7 +310,7 @@ func fetchTracksAndCheckStatus(
 		return nil, false, err
 	}
 
-	return tracks, r.IsActiveChat(), nil
+	return tracks, r.Active(), nil
 }
 
 func rejectDuplicate(
@@ -425,7 +425,7 @@ func filterAndTrimTracks(
 		availableSlots = 0
 	}
 
-	if availableSlots == 0 && len(accepted) > 0 && !r.IsActiveChat() {
+	if availableSlots == 0 && len(accepted) > 0 && !r.Active() {
 		availableSlots = 1
 	}
 
@@ -670,7 +670,7 @@ func playTrackWithRetry(
 	replyMsg *td.Message,
 ) error {
 	for attempt := 1; attempt <= playMaxRetries; attempt++ {
-		if r.IsDestroyed() {
+		if r.Destroyed() {
 			logger.Info("Room destroyed during retry, aborting")
 			replyMsg.Delete(c, true)
 			return nil
@@ -741,13 +741,13 @@ func handlePlayAttemptError(
 	if errors.Is(err, ubot.ErrConnectionTimeout) {
 		logger.Error("Voice connection timeout. Stopping call session...")
 		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "err_connection_timeout"), nil)
-		core.DeleteRoom(room.ID)
+		core.DropRoom(room.ID)
 		return true, nil
 	}
 
 	if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
 		logger.Error("RTMP/live-stream voice chat detected, cannot play. Cleaning up...")
-		core.DeleteRoom(room.ID)
+		core.DropRoom(room.ID)
 		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "rtmp_play_unsupported"), nil)
 		return true, nil
 	}
@@ -761,7 +761,7 @@ func handlePlayAttemptError(
 
 	if strings.Contains(err.Error(), "GROUPCALL_INVALID") {
 		logger.Error("GROUPCALL_INVALID err occurred. Returning...")
-		core.DeleteRoom(room.ID)
+		core.DropRoom(room.ID)
 		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "play_unable"), nil)
 		return true, nil
 	}

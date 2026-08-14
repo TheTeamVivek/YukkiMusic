@@ -24,6 +24,7 @@ import (
 	"sync"
 	"time"
 
+	"yukkimusic/internal/database"
 	"yukkimusic/internal/logger"
 
 	td "github.com/AshokShau/gotdbot"
@@ -439,7 +440,7 @@ func (s *ChatState) switchAssistant() bool {
 		}
 		s.bind(ass)
 		if err := s.joinByLink(); err == nil {
-			Assistants.Assign(s.ChatID, idx)
+			database.SaveAssistant(s.ChatID, idx)
 			s.rebindRoom(ass)
 			logger.Infof("chat_state: switched assistant for %d to index %d", s.ChatID, idx)
 			return true
@@ -484,7 +485,7 @@ func (s *ChatState) bind(ass *Assistant) {
 
 // rebindRoom points the room (if any) at the assistant now serving the chat.
 func (s *ChatState) rebindRoom(ass *Assistant) {
-	if room, ok := GetRoom(s.ChatID, nil, false); ok {
+	if room, ok := RoomFor(s.ChatID); ok {
 		room.SetAssistant(ass)
 	}
 }
@@ -497,7 +498,7 @@ func (s *ChatState) leaveInactiveChats(limit int) {
 		return
 	}
 
-	activeRooms := GetAllRooms()
+	activeRooms := AllRooms()
 	leftCount := 0
 	err := s.Assistant.Client.IterDialogs(func(d *telegram.TLDialog) error {
 		if d == nil || d.IsUser() {

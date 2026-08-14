@@ -69,13 +69,13 @@ func handleStop(c *td.Client, m *td.Message, cplay bool) error {
 		_, err := m.ReplyText(c, err.Error(), nil)
 		return err
 	}
-	if !r.IsActiveChat() {
+	if !r.Active() {
 		_, err := m.ReplyText(c, F(m.ChatID(), "room_no_active"), nil)
 		return err
 	}
 
-	isPaused := r.IsPaused()
-	isMuted := r.IsMuted()
+	isPaused := r.Paused()
+	isMuted := r.Muted()
 
 	if isPaused || isMuted {
 		stopSuggestFloodKey := fmt.Sprintf(
@@ -96,7 +96,7 @@ func handleStop(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	scheduleOldPlayingMessage(r)
-	core.DeleteRoom(r.ID)
+	core.DropRoom(r.ID)
 	_, rerr := m.ReplyText(
 		c,
 		F(

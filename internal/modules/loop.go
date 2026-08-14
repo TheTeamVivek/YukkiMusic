@@ -76,7 +76,7 @@ func handleLoop(c *td.Client, m *td.Message, cplay bool) error {
 	args := strings.Fields(m.Text())
 	currentLoop := r.Loop()
 
-	if !r.IsActiveChat() {
+	if !r.Active() {
 		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
 		return err
 	}

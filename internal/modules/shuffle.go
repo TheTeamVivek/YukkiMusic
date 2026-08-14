@@ -75,7 +75,7 @@ func handleShuffle(c *td.Client, m *td.Message, cplay bool) error {
 	}
 	chatID := m.ChatID()
 
-	if !r.IsActiveChat() {
+	if !r.Active() {
 		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
 		return err
 	}

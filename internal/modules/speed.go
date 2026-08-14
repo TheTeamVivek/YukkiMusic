@@ -80,7 +80,7 @@ func handleSpeed(c *td.Client, m *td.Message, cplay bool) error {
 	chatID := m.ChatID()
 	t := r.Track()
 
-	if !r.IsActiveChat() || t == nil {
+	if !r.Active() || t == nil {
 		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
 		return err
 	}

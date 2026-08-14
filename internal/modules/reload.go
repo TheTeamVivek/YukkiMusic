@@ -123,7 +123,7 @@ func handleReload(c *td.Client, m *td.Message, cplay bool) error {
 	summary += reloadAssistantStatus(chatID, snapshot, snapErr)
 
 	if isAdmin {
-		if core.DeleteRoom(roomID) {
+		if core.DropRoom(roomID) {
 			summary += F(chatID, "reload_room_reset") + "\n"
 		}
 	}

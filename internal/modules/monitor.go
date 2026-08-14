@@ -32,27 +32,27 @@ func MonitorRooms() {
 	sem := make(chan struct{}, 20)
 
 	for range ticker.C {
-		for chatID, room := range core.GetAllRooms() {
+		for chatID, room := range core.AllRooms() {
 
 			sem <- struct{}{}
 
 			go func(chatID int64, r *core.RoomState) {
 				defer func() { <-sem }()
 
-				if !r.IsActiveChat() {
+				if !r.Active() {
 					/*
 						// TODO: TEST IT AND INCREASE SLEEP TIME
 						time.Sleep(5 * time.Second)
 
-						if !r.IsActiveChat() {
-							core.DeleteRoom(chatID)
+						if !r.Active() {
+							core.DropRoom(chatID)
 							return
 						}
 					*/
 					return
 				}
 
-				if r.IsPaused() {
+				if r.Paused() {
 					return
 				}
 

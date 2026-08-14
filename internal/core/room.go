@@ -73,7 +73,7 @@ type RoomState struct {
 
 // Room management
 
-func DeleteRoom(chatID int64) bool {
+func DropRoom(chatID int64) bool {
 	_, file, line, _ := runtime.Caller(1)
 	logger.Debugf("DeleteRoom called from %s:%d", file, line)
 
@@ -93,19 +93,18 @@ func DeleteRoom(chatID int64) bool {
 	return true
 }
 
-// GetRoom retrieves an existing room or creates a new one if requested.
-func GetRoom(chatID int64, ass *Assistant, create bool) (*RoomState, bool) {
+// RoomFor returns the existing room for a chat.
+func RoomFor(chatID int64) (*RoomState, bool) {
 	roomsMu.RLock()
 	room, exists := rooms[chatID]
 	roomsMu.RUnlock()
+	return room, exists
+}
 
-	if exists {
-		return room, true
-	}
-	if create {
-		return createNewRoom(chatID, ass)
-	}
-	return nil, false
+// CreateRoom returns the room for a chat, creating it if it does not exist.
+func CreateRoom(chatID int64, ass *Assistant) *RoomState {
+	room, _ := createNewRoom(chatID, ass)
+	return room
 }
 
 func createNewRoom(chatID int64, ass *Assistant) (*RoomState, bool) {
@@ -135,7 +134,7 @@ func (r *RoomState) SetAssistant(ass *Assistant) {
 	r.mu.Unlock()
 }
 
-func GetAllRooms() map[int64]*RoomState {
+func AllRooms() map[int64]*RoomState {
 	roomsMu.RLock()
 
 	out := make(map[int64]*RoomState, len(rooms))
@@ -166,7 +165,7 @@ func GetAllRooms() map[int64]*RoomState {
 
 // Helpers
 
-func (r *RoomState) IsDestroyed() bool {
+func (r *RoomState) Destroyed() bool {
 	return r.destroyed.Load()
 }
 
@@ -191,7 +190,7 @@ func (r *RoomState) updatePosition() {
 // Getters
 
 func (r *RoomState) FilePath() string {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return ""
 	}
 	r.mu.RLock()
@@ -200,7 +199,7 @@ func (r *RoomState) FilePath() string {
 }
 
 func (r *RoomState) Loop() int {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return 0
 	}
 	r.mu.RLock()
@@ -209,7 +208,7 @@ func (r *RoomState) Loop() int {
 }
 
 func (r *RoomState) Position() int {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return 0
 	}
 	r.mu.RLock()
@@ -218,7 +217,7 @@ func (r *RoomState) Position() int {
 }
 
 func (r *RoomState) Queue() []*state.Track {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return nil
 	}
 	r.mu.RLock()
@@ -229,7 +228,7 @@ func (r *RoomState) Queue() []*state.Track {
 }
 
 func (r *RoomState) Shuffle() bool {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return false
 	}
 	r.mu.RLock()
@@ -238,7 +237,7 @@ func (r *RoomState) Shuffle() bool {
 }
 
 func (r *RoomState) Speed() float64 {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return 0
 	}
 	r.mu.RLock()
@@ -247,7 +246,7 @@ func (r *RoomState) Speed() float64 {
 }
 
 func (r *RoomState) Track() *state.Track {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return nil
 	}
 	r.mu.RLock()
@@ -256,7 +255,7 @@ func (r *RoomState) Track() *state.Track {
 }
 
 func (r *RoomState) StatusMsg() *td.Message {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return nil
 	}
 	r.mu.RLock()
@@ -267,7 +266,7 @@ func (r *RoomState) StatusMsg() *td.Message {
 // Setters
 
 func (r *RoomState) SetLoop(loop int) {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return
 	}
 	r.mu.Lock()
@@ -276,7 +275,7 @@ func (r *RoomState) SetLoop(loop int) {
 }
 
 func (r *RoomState) SetShuffle(enabled bool) {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return
 	}
 	r.mu.Lock()
@@ -285,7 +284,7 @@ func (r *RoomState) SetShuffle(enabled bool) {
 }
 
 func (r *RoomState) SetStatusMsg(m *td.Message) {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return
 	}
 	r.mu.Lock()
@@ -295,8 +294,8 @@ func (r *RoomState) SetStatusMsg(m *td.Message) {
 
 // State checks
 
-func (r *RoomState) IsActiveChat() bool {
-	if r.IsDestroyed() {
+func (r *RoomState) Active() bool {
+	if r.Destroyed() {
 		return false
 	}
 	r.mu.Lock()
@@ -305,8 +304,8 @@ func (r *RoomState) IsActiveChat() bool {
 	return r.track != nil && r.playing
 }
 
-func (r *RoomState) IsPaused() bool {
-	if r.IsDestroyed() {
+func (r *RoomState) Paused() bool {
+	if r.Destroyed() {
 		return false
 	}
 	r.mu.RLock()
@@ -314,8 +313,8 @@ func (r *RoomState) IsPaused() bool {
 	return r.paused && r.track != nil && r.playing
 }
 
-func (r *RoomState) IsMuted() bool {
-	if r.IsDestroyed() {
+func (r *RoomState) Muted() bool {
+	if r.Destroyed() {
 		return false
 	}
 	r.mu.RLock()
@@ -324,7 +323,7 @@ func (r *RoomState) IsMuted() bool {
 }
 
 func (r *RoomState) Parse() {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return
 	}
 	r.mu.Lock()
@@ -336,7 +335,7 @@ func (r *RoomState) Parse() {
 
 // NextTrack retrieves and prepares the next track in queue
 func (r *RoomState) NextTrack() *state.Track {
-	if r.IsDestroyed() {
+	if r.Destroyed() {
 		return nil
 	}
 
@@ -377,9 +376,9 @@ func (r *RoomState) NextTrack() *state.Track {
 	return next
 }
 
-// RemoveFromQueue removes track(s) from queue
-func (r *RoomState) RemoveFromQueue(index int) {
-	if r.IsDestroyed() {
+// RemoveTrack removes track(s) from queue
+func (r *RoomState) RemoveTrack(index int) {
+	if r.Destroyed() {
 		return
 	}
 
@@ -396,9 +395,9 @@ func (r *RoomState) RemoveFromQueue(index int) {
 	}
 }
 
-// MoveInQueue moves a track from one position to another
-func (r *RoomState) MoveInQueue(from, to int) {
-	if r.IsDestroyed() {
+// MoveTrack moves a track from one position to another
+func (r *RoomState) MoveTrack(from, to int) {
+	if r.Destroyed() {
 		return
 	}
 
@@ -421,9 +420,9 @@ func (r *RoomState) MoveInQueue(from, to int) {
 	}
 }
 
-// AddTracksToQueue appends multiple tracks to the queue
-func (r *RoomState) AddTracksToQueue(tracks []*state.Track) {
-	if r.IsDestroyed() {
+// AddTracks appends multiple tracks to the queue
+func (r *RoomState) AddTracks(tracks []*state.Track) {
+	if r.Destroyed() {
 		return
 	}
 

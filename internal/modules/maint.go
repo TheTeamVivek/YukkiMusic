@@ -195,7 +195,7 @@ func applyMaintenanceState(c *td.Client, m *td.Message, enable bool, reason stri
 }
 
 func notifyMaintenanceStart(c *td.Client, reason string) {
-	for chatID := range core.GetAllRooms() {
+	for chatID := range core.AllRooms() {
 		maintCancel.Lock()
 		cancelled := maintCancel.cancel
 		maintCancel.Unlock()
@@ -204,7 +204,7 @@ func notifyMaintenanceStart(c *td.Client, reason string) {
 			break
 		}
 
-		core.DeleteRoom(chatID)
+		core.DropRoom(chatID)
 		msg := F(chatID, "maint_entering")
 		if reason != "" {
 			msg += "\n" + F(

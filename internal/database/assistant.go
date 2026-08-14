@@ -28,13 +28,51 @@ import (
 )
 
 var (
-	assistantUsage []int64 // index 1..assistantCount used
+	assistantCount int     // total assistants; valid indexes are 1..assistantCount
+	assistantUsage []int64 // chats per assistant, index 1..assistantCount
 	usageMu        sync.RWMutex
+	indexCache     map[int64]int // chatID -> assistant index (1-based)
+	cacheMu        sync.RWMutex
 )
 
-func AssistantIndex(chatID int64, assistantCount int) (int, error) {
+// InitAssistantIndexes records the assistant count and redistributes all chats
+// evenly across the assistant pool. It must be called once at startup, before
+// any GetAssistant call.
+func InitAssistantIndexes(count int) error {
+	if count <= 0 {
+		return fmt.Errorf("assistantCount must be positive")
+	}
+
+	assistantCount = count
+
+	all, err := fetchAllChatSettings()
+	if err != nil {
+		return err
+	}
+
+	redistributeAssistants(all, count)
+
+	if err := saveChangedSettings(all); err != nil {
+		return err
+	}
+
+	rebuildAssistantUsage(all, count)
+	return nil
+}
+
+// GetAssistant returns the 1-based index of the assistant serving chatID.
+// It checks the in-memory cache, then the persisted chat settings, and finally
+// assigns the least-used assistant, persisting the choice.
+func GetAssistant(chatID int64) (int, error) {
 	if assistantCount <= 0 {
-		return 0, fmt.Errorf("assistantCount must be positive")
+		return 0, fmt.Errorf("assistants not initialized")
+	}
+
+	cacheMu.RLock()
+	idx, ok := indexCache[chatID]
+	cacheMu.RUnlock()
+	if ok && idx >= 1 && idx <= assistantCount {
+		return idx, nil
 	}
 
 	settings, err := getChatSettings(chatID)
@@ -42,8 +80,8 @@ func AssistantIndex(chatID int64, assistantCount int) (int, error) {
 		return 0, err
 	}
 
-	if settings.AssistantIndex >= 1 &&
-		settings.AssistantIndex <= assistantCount {
+	if settings.AssistantIndex >= 1 && settings.AssistantIndex <= assistantCount {
+		cacheAssistant(chatID, settings.AssistantIndex)
 		return settings.AssistantIndex, nil
 	}
 
@@ -60,39 +98,59 @@ func AssistantIndex(chatID int64, assistantCount int) (int, error) {
 	}
 
 	usageMu.Lock()
-	if len(assistantUsage) > newIndex {
+	if newIndex >= 1 && newIndex < len(assistantUsage) {
 		assistantUsage[newIndex]++
 	}
 	usageMu.Unlock()
 
+	cacheAssistant(chatID, newIndex)
 	return newIndex, nil
 }
 
-func RebalanceAssistantIndexes(assistantCount int) error {
-	if assistantCount <= 0 {
-		return fmt.Errorf("assistantCount must be positive")
+// SaveAssistant persists the assistant (1-based index) bound to a chat and
+// keeps the in-memory cache and usage counters in sync.
+func SaveAssistant(chatID int64, idx int) {
+	if idx < 1 || idx > assistantCount {
+		logr.Errorf("assistant index %d out of range for %d", idx, chatID)
+		return
 	}
 
-	all, err := fetchAllChatSettings()
+	settings, err := getChatSettings(chatID)
 	if err != nil {
-		return err
+		logr.Errorf("failed to save assistant index for %d: %v", chatID, err)
+		return
 	}
 
-	if len(all) == 0 {
-		usageMu.Lock()
-		assistantUsage = make([]int64, assistantCount+1)
-		usageMu.Unlock()
-		return nil
+	old := settings.AssistantIndex
+	if old != idx {
+		settings.AssistantIndex = idx
+		if err := updateChatSettings(settings); err != nil {
+			logr.Errorf("failed to save assistant index for %d: %v", chatID, err)
+			return
+		}
 	}
 
-	redistributeAssistants(all, assistantCount)
+	cacheAssistant(chatID, idx)
 
-	if err := saveChangedSettings(all); err != nil {
-		return err
+	usageMu.Lock()
+	if old != idx {
+		if old >= 1 && old < len(assistantUsage) && assistantUsage[old] > 0 {
+			assistantUsage[old]--
+		}
+		if idx >= 1 && idx < len(assistantUsage) {
+			assistantUsage[idx]++
+		}
 	}
+	usageMu.Unlock()
+}
 
-	updateAssistantUsage(all, assistantCount)
-	return nil
+func cacheAssistant(chatID int64, idx int) {
+	cacheMu.Lock()
+	if indexCache == nil {
+		indexCache = make(map[int64]int)
+	}
+	indexCache[chatID] = idx
+	cacheMu.Unlock()
 }
 
 func fetchAllChatSettings() ([]*ChatSettings, error) {
@@ -113,43 +171,45 @@ func fetchAllChatSettings() ([]*ChatSettings, error) {
 	return all, nil
 }
 
+// redistributeAssistants moves as few chats as possible so each assistant ends
+// up with an even share of the chats. Chats whose current index fits the even
+// target stay put; the rest are reassigned to fill the gaps.
 func redistributeAssistants(all []*ChatSettings, assistantCount int) {
-	total := len(all)
-	base := total / assistantCount
-	rem := total % assistantCount
+	desired := evenDistribution(len(all), assistantCount)
 
-	desired := make([]int, assistantCount+1)
+	kept := make([]int, assistantCount+1)
+	var pool []*ChatSettings
+
+	for _, s := range all {
+		if s.AssistantIndex >= 1 && s.AssistantIndex <= assistantCount &&
+			kept[s.AssistantIndex] < desired[s.AssistantIndex] {
+			kept[s.AssistantIndex]++
+			continue
+		}
+		pool = append(pool, s)
+	}
+
 	for i := 1; i <= assistantCount; i++ {
+		for kept[i] < desired[i] && len(pool) > 0 {
+			pool[0].AssistantIndex = i
+			pool = pool[1:]
+			kept[i]++
+		}
+	}
+}
+
+// evenDistribution returns the target chat count per assistant (1-based) that
+// spreads total chats as evenly as possible across assistants.
+func evenDistribution(total, assistants int) []int {
+	base, rem := total/assistants, total%assistants
+	desired := make([]int, assistants+1)
+	for i := 1; i <= assistants; i++ {
 		desired[i] = base
 		if i <= rem {
 			desired[i]++
 		}
 	}
-
-	currentCounts := make([]int, assistantCount+1)
-	keepCount := make([]int, assistantCount+1)
-	var pool []*ChatSettings
-
-	// Phase 1: Identify who can stay
-	for _, s := range all {
-		idx := s.AssistantIndex
-		if idx >= 1 && idx <= assistantCount && keepCount[idx] < desired[idx] {
-			keepCount[idx]++
-			currentCounts[idx]++
-		} else {
-			pool = append(pool, s)
-		}
-	}
-
-	// Phase 2: Assign from pool to fill gaps
-	poolIdx := 0
-	for i := 1; i <= assistantCount; i++ {
-		for keepCount[i] < desired[i] && poolIdx < len(pool) {
-			pool[poolIdx].AssistantIndex = i
-			keepCount[i]++
-			poolIdx++
-		}
-	}
+	return desired
 }
 
 func saveChangedSettings(all []*ChatSettings) error {
@@ -161,6 +221,8 @@ func saveChangedSettings(all []*ChatSettings) error {
 		models = append(models, mongo.NewUpdateOneModel().
 			SetFilter(bson.M{"_id": s.ChatID}).
 			SetUpdate(bson.M{"$set": bson.M{"ass_index": s.AssistantIndex}}))
+
+		chatSettingsCache.Delete(s.ChatID)
 
 		if len(models) >= 500 {
 			if _, err := chatSettingsColl.BulkWrite(ctx, models); err != nil {
@@ -175,10 +237,14 @@ func saveChangedSettings(all []*ChatSettings) error {
 			return fmt.Errorf("bulk update failed: %w", err)
 		}
 	}
+
+	cacheMu.Lock()
+	indexCache = make(map[int64]int)
+	cacheMu.Unlock()
 	return nil
 }
 
-func updateAssistantUsage(all []*ChatSettings, assistantCount int) {
+func rebuildAssistantUsage(all []*ChatSettings, assistantCount int) {
 	counts := make([]int64, assistantCount+1)
 	for _, s := range all {
 		if s.AssistantIndex >= 1 && s.AssistantIndex <= assistantCount {
