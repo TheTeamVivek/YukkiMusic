@@ -88,10 +88,8 @@ func (dm *downloadManager) attach(fileID string, msg *td.Message) {
 	}
 	dm.mu.Lock()
 	defer dm.mu.Unlock()
-	s, ok := dm.byChat[msg.ChatId]
-	if !ok {
-		s = &downloadSession{msg: msg, started: time.Now()}
-		dm.byChat[msg.ChatId] = s
+	if _, ok := dm.byChat[msg.ChatId]; !ok {
+		dm.byChat[msg.ChatId] = &downloadSession{msg: msg, started: time.Now()}
 	}
 	dm.byFile[fileID] = msg.ChatId
 }

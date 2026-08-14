@@ -72,7 +72,9 @@ func (h *slogHandler) Handle(_ context.Context, r slog.Record) error {
 	b.WriteByte(']')
 
 	if h.group != "" {
-		b.WriteString(" [" + h.group + "]")
+		b.WriteString(" [")
+		b.WriteString(h.group)
+		b.WriteByte(']')
 	}
 
 	b.WriteByte(' ')
@@ -87,11 +89,17 @@ func (h *slogHandler) Handle(_ context.Context, r slog.Record) error {
 	}
 
 	r.Attrs(func(a slog.Attr) bool {
-		b.WriteString(" " + a.Key + "=" + a.Value.String())
+		b.WriteByte(' ')
+		b.WriteString(a.Key)
+		b.WriteByte('=')
+		b.WriteString(a.Value.String())
 		return true
 	})
 	for _, a := range h.attrs {
-		b.WriteString(" " + a.Key + "=" + a.Value.String())
+		b.WriteByte(' ')
+		b.WriteString(a.Key)
+		b.WriteByte('=')
+		b.WriteString(a.Value.String())
 	}
 
 	h.mu.Lock()

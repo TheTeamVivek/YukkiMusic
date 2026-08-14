@@ -297,7 +297,9 @@ func (ctx *Logger) formatLine(b *strings.Builder, level Level, file string, fn s
 	b.WriteByte(']')
 
 	if ctx.name != "" {
-		b.WriteString(" [" + ctx.name + "]")
+		b.WriteString(" [")
+		b.WriteString(ctx.name)
+		b.WriteByte(']')
 	}
 
 	b.WriteByte(' ')

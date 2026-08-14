@@ -93,26 +93,3 @@ func getEnvStrings(key string, def ...[]string) []string {
 
 	return out
 }
-
-func getEnvInt64s(key string, def ...[]int64) []int64 {
-	fields := getEnvStrings(key)
-	if len(fields) == 0 {
-		return fallback(def)
-	}
-
-	out := make([]int64, 0, len(fields))
-	for _, field := range fields {
-		n, err := strconv.ParseInt(field, 10, 64)
-		if err != nil {
-			logr.Warnf("ignoring invalid %s value %q", key, field)
-			continue
-		}
-		out = append(out, n)
-	}
-
-	if len(out) == 0 {
-		return fallback(def)
-	}
-
-	return out
-}

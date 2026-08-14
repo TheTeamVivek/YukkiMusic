@@ -99,10 +99,8 @@ func Get(lang, key string, values Arg) string {
 		return fmt.Sprintf("[%s]", key)
 	}
 
-	if values != nil {
-		for k, v := range values {
-			val = strings.ReplaceAll(val, "{"+k+"}", fmt.Sprint(v))
-		}
+	for k, v := range values {
+		val = strings.ReplaceAll(val, "{"+k+"}", fmt.Sprint(v))
 	}
 
 	return val
