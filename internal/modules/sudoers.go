@@ -137,7 +137,7 @@ func handleAddSudo(c *td.Client, m *td.Message) error {
 			sudoCommands,
 			"",
 			&td.SetCommandsOpts{
-				Scope: &td.BotCommandScopeChatMember{ChatId: targetID, UserId: targetID},
+				Scope: &td.BotCommandScopeChat{ChatId: targetID},
 			},
 		); err != nil {
 			logger.Error("Failed to set PrivateSudoCommands " + err.Error())
@@ -211,7 +211,7 @@ func handleDelSudo(c *td.Client, m *td.Message) error {
 	if err := c.DeleteCommands(
 		"",
 		&td.DeleteCommandsOpts{
-			Scope: &td.BotCommandScopeChatMember{ChatId: targetID, UserId: targetID},
+			Scope: &td.BotCommandScopeChat{ChatId: targetID},
 		},
 	); err != nil {
 		logger.Error("Failed to reset sudo commands: " + err.Error())
