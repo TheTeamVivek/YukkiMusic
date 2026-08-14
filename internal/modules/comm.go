@@ -182,7 +182,7 @@ func setBotCommands(bot *td.Client) {
 
 	sudoCmds := append(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands...)
 	for _, id := range sudoers {
-		scope := &td.BotCommandScopeChatMember{ChatId: id, UserId: id}
+		scope := &td.BotCommandScopeChat{ChatId: id}
 		if err := bot.SetCommands(sudoCmds, "", &td.SetCommandsOpts{Scope: scope}); err != nil {
 			logger.Error("Failed to set sudo commands: " + err.Error())
 		}
