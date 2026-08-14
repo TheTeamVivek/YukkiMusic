@@ -350,6 +350,7 @@ logger_updated: "✅ Günlük başarıyla {action} konumuna getirildi."
 logs_empty: "Kayıt bulunamadı"
 
 # reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
+maint: "⚠️ Şu anda bakımdayım ve geçici olarak hizmet veremiyorum. Lütfen daha sonra tekrar kontrol et.\n\n{reason}"
 maint_reason: "<i>📝 Sebep: {reason}</i>"
 
 # ⚙️ Maintenance control

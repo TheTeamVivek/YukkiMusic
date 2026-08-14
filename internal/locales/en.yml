@@ -350,6 +350,7 @@ logger_updated: "✅ Logger has been {action} successfully."
 logs_empty: "No logs found"
 
 # reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
+maint: "⚠️ I'm under maintenance at the moment and temporarily unavailable. Please check back later.\n\n{reason}"
 maint_reason: "<i>📝 Reason: {reason}</i>"
 
 # ⚙️ Maintenance control

@@ -351,6 +351,7 @@ logger_updated: "✅ أصبح السجل {action} بنجاح."
 logs_empty: "لا توجد سجلات"
 
 # reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
+maint: "⚠️ أنا قيد الصيانة حالياً وغير متاح مؤقتاً. يرجى العودة لاحقاً.\n\n{reason}"
 maint_reason: "<i>📝 السبب: {reason}</i>"
 
 # ⚙️ Maintenance control

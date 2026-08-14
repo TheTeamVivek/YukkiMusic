@@ -351,6 +351,7 @@ logger_updated: "✅ अभिलेखक सफलतापूर्वक {ac
 logs_empty: "कोई लॉग्स नहीं मिले"
 
 # reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
+maint: "⚠️ मैं वर्तमान में अनुरक्षण के अधीन हूँ और अस्थायी रूप से अनुपलब्ध हूँ। कृपया कुछ समय पश्चात पुनः देखें।\n\n{reason}"
 maint_reason: "<i>📝 कारण: {reason}</i>"
 
 # ⚙️ Maintenance control
