@@ -245,8 +245,63 @@ func (p *YouTubePlatform) handleTrackURL(rawURL string) ([]*state.Track, error) 
 			}
 		}
 	}
-
+    
+    	if t, err := p.fetchTrackViaOEmbed(videoID); err == nil && t != nil {
+		p.cache.Set("track:"+videoID, []*state.Track{t})
+		return []*state.Track{t}, nil
+	}
+    
 	return nil, errors.New("track not found")
+}
+
+func (p *YouTubePlatform) fetchTrackViaOEmbed(videoID string) (*state.Track, error) {
+	logger.Debugf("[YouTube] oembed fallback: %s", videoID)
+	var result map[string]any
+
+	oembedURL := fmt.Sprintf(
+		"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=%s&format=json",
+		videoID,
+	)
+	resp, err := rc.R().SetResult(&result).Get(oembedURL)
+	if err != nil {
+		logger.Errorf("[YouTube] oembed request failed for %s: %v", videoID, err)
+		return nil, fmt.Errorf("oembed request failed: %w", err)
+	}
+	if resp.IsError() {
+		logger.Errorf("[YouTube] oembed returned status %d for %s", resp.StatusCode(), videoID)
+		return nil, fmt.Errorf("oembed error: %d", resp.StatusCode())
+	}
+
+	title := safeStr(result["title"])
+	if title == "" {
+		logger.Warnf("[YouTube] oembed: empty title for %s", videoID)
+		return nil, errors.New("oembed: title not found")
+	}
+	logger.Debugf("[YouTube] oembed title for %s: %q", videoID, title)
+
+	queries := []string{title}
+	if len(title) > 35 {
+		queries = append(queries, title[:35])
+	}
+
+	for _, q := range queries {
+		logger.Debugf("[YouTube] oembed fallback search query: %q", q)
+		tracks, err := p.VideoSearch(q)
+		if err != nil {
+			logger.Warnf("[YouTube] oembed fallback search failed for %q: %v", q, err)
+			continue
+		}
+		for _, t := range tracks {
+			if t.ID == videoID {
+				logger.Debugf("[YouTube] oembed fallback matched %s via query %q", videoID, q)
+				return t, nil
+			}
+		}
+		logger.Debugf("[YouTube] oembed fallback: no id match for %s in query %q results", videoID, q)
+	}
+
+	logger.Warnf("[YouTube] oembed fallback exhausted, no match for %s", videoID)
+	return nil, errors.New("no track found")
 }
 
 func (p *YouTubePlatform) extractPlaylistID(input string) string {
