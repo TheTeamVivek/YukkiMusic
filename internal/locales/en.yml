@@ -726,7 +726,7 @@ speed_reset_success: "✅ Playback speed reset to <b>1.0x</b> by {user}"
 
 speed_set: "🚀 Playback speed set to <b>{speed}x</b> by {user}."
 
-start_private: "Hello {user}, My name is {bot}.\n\nI'm a telegram streaming bot with some useful features. Supporting platforms like Youtube, Spotify, JioSaavn, Soundcloud etc.\n\nFeel free to add me to your groups."
+start_private: "Hello {user}, My name is {bot}.\n\nI'm a telegram streaming bot with some useful features. Supporting platforms like Youtube, Spotify, JioSaavn, Soundcloud etc.\n\nFeel free to add me to your groups. {emoji:thumbs_up}"
 
 start_group: "<b>💫 I’m here!</b> Try a command… if you think you can handle me 😉"
 

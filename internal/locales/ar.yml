@@ -725,7 +725,7 @@ speed_reset_success: "✅ تمت إعادة تعيين سرعة التشغيل �
 
 speed_set: "🚀 تم تعيين سرعة التشغيل إلى <b>{speed}x</b> بواسطة {user}."
 
-start_private: "مرحباً {user}، اسمي {bot}.\n\nأنا مساعد آلي لبث الموسيقى على تيليجرام مع ميزات مفيدة. أدعم منصات مثل Youtube و Spotify و JioSaavn و Soundcloud وغيرها.\n\nلا تتردد في إضافتي إلى مجموعاتك."
+start_private: "مرحباً {user}، اسمي {bot}.\n\nأنا مساعد آلي لبث الموسيقى على تيليجرام مع ميزات مفيدة. أدعم منصات مثل Youtube و Spotify و JioSaavn و Soundcloud وغيرها.\n\nلا تتردد في إضافتي إلى مجموعاتك. {emoji:thumbs_up}"
 
 start_group: "<b>💫 أنا هنا!</b> جرب أمراً ما... إذا كنت تظن أنك تستطيع السيطرة علي 😉"
 

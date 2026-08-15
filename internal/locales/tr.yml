@@ -722,7 +722,7 @@ speed_reset_success: "✅ Oynatma hızı {user} tarafından <b>1.0x</b> olarak s
 
 speed_set: "🚀 Oynatma hızı {user} tarafından <b>{speed}x</b> olarak ayarlandı."
 
-start_private: "Merhaba {user}, Benim adım {bot}.\n\nBen bazı kullanışlı özelliklere sahip bir Telegram akış botuyum. Youtube, Spotify, JioSaavn, Soundcloud vb. platformları destekliyorum.\n\nBeni gruplarına eklemekten çekinme."
+start_private: "Merhaba {user}, Benim adım {bot}.\n\nBen bazı kullanışlı özelliklere sahip bir Telegram akış botuyum. Youtube, Spotify, JioSaavn, Soundcloud vb. platformları destekliyorum.\n\nBeni gruplarına eklemekten çekinme. {emoji:thumbs_up}"
 
 start_group: "<b>💫 Buradayım!</b> Bir komut dene... Tabi benimle başa çıkabileceğini düşünüyorsan 😉"
 

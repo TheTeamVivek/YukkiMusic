@@ -103,7 +103,7 @@ func Get(lang, key string, values Arg) string {
 		val = strings.ReplaceAll(val, "{"+k+"}", fmt.Sprint(v))
 	}
 
-	return val
+	return expandEmojis(val)
 }
 
 func GetAvailableLanguages() []string {
