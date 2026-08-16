@@ -297,10 +297,12 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 
 	statusMsg = sendNowPlaying(c, statusMsg, chatID, r, t)
 	r.SetStatusMsg(statusMsg)
-	cbRespond(c, u, F(chatID, "cb_skip_edited", locales.Arg{
+
+_, err = statusMsg.ReplyText(c, F(chatID, "cb_skip_edited", locales.Arg{
 		"user": mentionOfSender(c, u.SenderUserId),
 	}), &td.SendTextMessageOpts{ParseMode: "HTML"})
-	return nil
+
+	return err
 }
 
 func handleStopAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
