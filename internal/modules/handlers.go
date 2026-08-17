@@ -157,6 +157,7 @@ func Init(bot *td.Client, assistants *core.AssistantManager) {
 	bot.OnCommand("cleanmode", WithBlacklistMessage(cleanModeHandler))
 	bot.OnCommand("logger", WithBlacklistMessage(handleLogger))
 	bot.OnCommand("playmode", WithBlacklistMessage(playmodeHandler))
+	bot.OnCommand("autoplay", WithBlacklistMessage(autoplayHandler))
 	bot.OnCommand("reload", WithBlacklistMessage(reloadHandler))
 	bot.OnCommand("restart", WithBlacklistMessage(handleRestart))
 	bot.OnCommand("settings", WithBlacklistMessage(settingsHandler))
@@ -189,6 +190,7 @@ func Init(bot *td.Client, assistants *core.AssistantManager) {
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(closeHandler), callbackquery.Equal("close"))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(roomHandle), callbackquery.Regex("^room:-?\\d+:\\w+$"))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(emptyCBHandler), callbackquery.Regex("progress"))
+	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(autoplayCallbackHandler), callbackquery.Equal("autoplay:toggle"))
 
 	assistants.ForEach(func(a *core.Assistant) {
 		a.Ntg.OnStreamEnd(streamEndHandler)

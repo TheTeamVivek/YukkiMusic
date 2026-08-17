@@ -171,6 +171,27 @@ func fetchFromURLs(urls []string, video bool) ([]*state.Track, []string) {
 	return tracks, errs
 }
 
+// AutoplayTracks fetches recommended tracks similar to the last played track.
+// It uses the YouTube "mix" of the given track so playback continues with
+// related songs once the user queue is empty. It returns an error when the
+// track is not a YouTube track or recommendations cannot be resolved.
+func AutoplayTracks(last *state.Track, limit int) ([]*state.Track, error) {
+	if last == nil || last.ID == "" || last.Source != PlatformYouTube {
+		return nil, errors.New("autoplay requires a YouTube track")
+	}
+
+	yt, ok := GetPlatform(PlatformYouTube)
+	if !ok {
+		return nil, errors.New("youtube platform not registered")
+	}
+
+	tracks, err := yt.(*YouTubePlatform).fetchMixPlaylist("RD"+last.ID, limit)
+	if err != nil {
+		return nil, err
+	}
+	return withVideo(tracks, last.Video), nil
+}
+
 func searchQuery(q string, video bool) ([]*state.Track, error) {
 	if p := findFor(q); p != nil && p.Name() != PlatformYouTube {
 		if got, err := p.Get(q, video); err == nil && len(got) > 0 {

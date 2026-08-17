@@ -610,6 +610,19 @@ settings_main: |
 
 settings_updated: "✅ Ayarlar güncellendi!"
 
+autoplay_no_active: "⚠️ Bot şu anda sesli sohbette yayın yapmıyor. Önce bir şarkı çalın."
+autoplay_menu: |
+  🔁 <b>Otomatik Çalma</b>
+
+  Etkinleştirildiğinde, kuyruk bittiğinde bot son çalınan şarkıya benzer önerilen şarkıları otomatik olarak çalmaya devam eder.
+
+  <b>Durum:</b> {state}
+
+autoplay_btn: "🔁 Otomatik Çalma: {state}"
+autoplay_enabled: "✅ Otomatik çalma etkinleştirildi!"
+autoplay_disabled: "❌ Otomatik çalma devre dışı!"
+autoplay_requester: "Otomatik Çalma"
+
 searching: "🔍🎶 Aranıyor... ⚡✨"
 searching_query: "🔍🎶 Aranan: <b>{query}</b>... ⚡✨"
 
@@ -728,6 +741,7 @@ start_group: "<b>💫 Buradayım!</b> Bir komut dene... Tabi benimle başa çık
 
 stream_queue_finished: "🎵 <b>Sıra Bitti!</b>\n\nÇalacak başka şarkı kalmadı. Daha fazla parça eklemek için /play kullan! 🎶"
 stream_downloading_next: "📥 Sonraki parçan indiriliyor..."
+stream_autoplay_next: "🔁 Otomatik Çalma: <b>{title}</b>"
 stream_download_fail: "❌ İndirme başarısız.\nHata: <code>{error}</code>"
 download_progress: |
   📥 Parcan indiriliyor...

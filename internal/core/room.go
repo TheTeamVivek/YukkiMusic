@@ -65,6 +65,8 @@ type RoomState struct {
 	queue   []*state.Track // upcoming tracks
 	shuffle bool           // queue shuffle mode
 
+	autoplay bool // auto-play recommendations when the queue ends
+
 	statusMsg *td.Message // latest status message in chat
 
 	Assistant *Assistant  // assistant client bound to this room
@@ -236,6 +238,15 @@ func (r *RoomState) Shuffle() bool {
 	return r.shuffle
 }
 
+func (r *RoomState) Autoplay() bool {
+	if r.Destroyed() {
+		return false
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.autoplay
+}
+
 func (r *RoomState) Speed() float64 {
 	if r.Destroyed() {
 		return 0
@@ -281,6 +292,15 @@ func (r *RoomState) SetShuffle(enabled bool) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.shuffle = enabled
+}
+
+func (r *RoomState) SetAutoplay(enabled bool) {
+	if r.Destroyed() {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.autoplay = enabled
 }
 
 func (r *RoomState) SetStatusMsg(m *td.Message) {

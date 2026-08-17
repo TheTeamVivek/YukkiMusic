@@ -54,6 +54,12 @@ func streamEndHandler(
 	var t *state.Track
 	var wasLooping bool
 	if len(r.Queue()) == 0 && r.Loop() == 0 {
+		if autoplay := pickAutoplayTrack(r, r.Track()); autoplay != nil {
+			r.AddTracks([]*state.Track{autoplay})
+		}
+	}
+
+	if len(r.Queue()) == 0 && r.Loop() == 0 {
 		core.DropRoom(chatID)
 		if _, err := c.SendTextMessage(cid, F(cid, "stream_queue_finished"), nil); err != nil {
 			logger.Error(err)
@@ -67,6 +73,10 @@ func streamEndHandler(
 	statusText := F(cid, "stream_downloading_next")
 	if wasLooping && t != nil && r.FilePath() != "" {
 		statusText = F(cid, "cb_replaying")
+	} else if t != nil && t.Requester == F(cid, "autoplay_requester") {
+		statusText = F(cid, "stream_autoplay_next", locales.Arg{
+			"title": utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
+		})
 	}
 
 	statusMsg, err := c.SendTextMessage(cid, statusText, nil)

@@ -613,6 +613,19 @@ settings_main: |
 
 settings_updated: "✅ تم تحديث الإعدادات!"
 
+autoplay_no_active: "⚠️ البوت لا يشغّل صوتاً حالياً. قم بتشغيل أغنية أولاً."
+autoplay_menu: |
+  🔁 <b>التشغيل التلقائي</b>
+
+  عند التفعيل، بعد انتهاء قائمة الانتظار سيستمر البوت في تشغيل أغانٍ مشابهة للأغنية الأخيرة تلقائياً.
+
+  <b>الحالة:</b> {state}
+
+autoplay_btn: "🔁 التشغيل التلقائي: {state}"
+autoplay_enabled: "✅ تم تفعيل التشغيل التلقائي!"
+autoplay_disabled: "❌ تم إيقاف التشغيل التلقائي!"
+autoplay_requester: "التشغيل التلقائي"
+
 searching: "🔍🎶 جاري البحث... ⚡✨"
 searching_query: "🔍🎶 جاري البحث عن: <b>{query}</b>... ⚡✨"
 
@@ -731,6 +744,7 @@ start_group: "<b>💫 أنا هنا!</b> جرب أمراً ما... إذا كنت
 
 stream_queue_finished: "🎵 <b>انتهت قائمة الانتظار!</b>\n\nلا توجد أغاني أخرى للتشغيل. استخدم /play لإضافة المزيد! 🎶"
 stream_downloading_next: "📥 جاري تنزيل المقطع التالي..."
+stream_autoplay_next: "🔁 التشغيل التلقائي: <b>{title}</b>"
 stream_download_fail: "❌ فشل التنزيل.\nالخطأ: <code>{error}</code>"
 download_progress: |
   📥 جاري تنزيل أغنيتك...

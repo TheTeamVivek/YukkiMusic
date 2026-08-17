@@ -613,6 +613,19 @@ settings_main: |
 
 settings_updated: "✅ सेटिंग्स अपडेट हो गईं!"
 
+autoplay_no_active: "⚠️ बॉट वॉइस चैट में कुछ नहीं बजा रहा है। पहले कोई गाना चलाएँ।"
+autoplay_menu: |
+  🔁 <b>ऑटोप्ले</b>
+
+  चालू होने पर, क्यू समाप्त होने के बाद बॉट पिछले गाने से मिलते-जुलते सुझाए गए गाने स्वतः चलाता रहेगा।
+
+  <b>स्थिति:</b> {state}
+
+autoplay_btn: "🔁 ऑटोप्ले: {state}"
+autoplay_enabled: "✅ ऑटोप्ले चालू हो गया!"
+autoplay_disabled: "❌ ऑटोप्ले बंद हो गया!"
+autoplay_requester: "ऑटोप्ले"
+
 searching: "🔍🎶 अन्वेषण किया जा रहा है... ⚡✨"
 searching_query: "🔍🎶 <b>{query}</b> के लिए अन्वेषण किया जा रहा है... ⚡✨"
 
@@ -731,6 +744,7 @@ start_group: "<b>💫 मैं यहाँ हूँ!</b> कोई आदे�
 
 stream_queue_finished: "🎵 <b>प्रतीक्षा सूची समाप्त!</b>\n\nचलाने के लिए कोई और गीत नहीं है। अधिक संगीत जोड़ने के लिए /play का प्रयोग करें! 🎶"
 stream_downloading_next: "📥 आपका अगला संगीत अभिलेखित किया जा रहा है..."
+stream_autoplay_next: "🔁 ऑटोप्ले: <b>{title}</b>"
 stream_download_fail: "❌ डाउनलोड में विफल।\nत्रुटि: <code>{error}</code>"
 download_progress: |
   📥 आपका संगीत डाउनलोड किया जा रहा है...

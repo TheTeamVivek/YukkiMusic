@@ -616,6 +616,19 @@ settings_main: |
 
 settings_updated: "✅ Settings updated!"
 
+autoplay_no_active: "⚠️ Bot is not streaming in a voice chat. Start playing a song first."
+autoplay_menu: |
+  🔁 <b>Autoplay</b>
+
+  When enabled, once the queue ends the bot will automatically keep playing recommended songs similar to the last played track.
+
+  <b>Status:</b> {state}
+
+autoplay_btn: "🔁 Autoplay: {state}"
+autoplay_enabled: "✅ Autoplay enabled!"
+autoplay_disabled: "❌ Autoplay disabled!"
+autoplay_requester: "Autoplay"
+
 
 speed_line: "⚙️ Speed: <b>{speed}x</b>"
 
@@ -732,6 +745,7 @@ start_group: "<b>💫 I’m here!</b> Try a command… if you think you can hand
 
 stream_queue_finished: "🎵 <b>Queue Finished!</b>\n\nNo more songs to play. Use /play to add more tracks! 🎶"
 stream_downloading_next: "📥 Downloading your next track..."
+stream_autoplay_next: "🔁 Autoplay: <b>{title}</b>"
 stream_download_fail: "❌ Failed to download.\nError: <code>{error}</code>"
 download_progress: |
   📥 Downloading your track...
