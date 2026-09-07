@@ -24,110 +24,110 @@ HELP_SUDOERS_BTN: "⚡ Sudo Kullanıcılar"
 BACK_BTN: "⬅️ Geri"
 
 # basically this string used in /command [bool]
-invalid_bool: "⚠️ <b>Geçersiz değer.</b>\n'enable' veya 'disable' kullan."
+invalid_bool: "{emoji:⚠️} <b>Geçersiz değer.</b>\n'enable' veya 'disable' kullan."
 
 adminmode_help: |
-  🛡️ <b>Yönetici Komut Modu</b>
+  {emoji:🛡️} <b>Yönetici Komut Modu</b>
 
   <b>Durum:</b> {status}
   <b>Kullanım:</b> <code>/adminmode [admin|adminauth|everyone]</code>
 adminmode_status_admin: "Yöneticiler 🔐"
 adminmode_status_adminauth: "Yetkili Kullanıcılar 🎧"
 adminmode_status_everyone: "Herkes 🌍"
-adminmode_updated: "✅ <b>Yönetici komut modu</b> güncellendi: {status}"
-adminmode_invalid: "⚠️ Geçersiz mod. Şunları kullan: <code>admin</code>, <code>adminauth</code> veya <code>everyone</code>."
+adminmode_updated: "{emoji:✅} <b>Yönetici komut modu</b> güncellendi: {status}"
+adminmode_invalid: "{emoji:⚠️} Geçersiz mod. Şunları kullan: <code>admin</code>, <code>adminauth</code> veya <code>everyone</code>."
 
 # 🚫 Assistant Restricted / Banned
 assistant_restricted_warning: |
-  ⚠️ <b>Asistan Kısıtlandı</b>
+  {emoji:⚠️} <b>Asistan Kısıtlandı</b>
 
   {assistant} asistanı (ID: <code>{id}</code>) bu sohbette <b>yasaklandı</b> veya kısıtlandı.
   Bu durum devam ederken müzik çalamam, sırayı yönetemem veya parçaları temizleyemem.
 
-  <i>Tüm müzik özelliklerini geri yüklemek için asistanın yasağını kaldır 🎵</i>
+  <i>Tüm müzik özelliklerini geri yüklemek için asistanın yasağını kaldır {emoji:🎵}</i>
 
 # 🧩 Common auth messages
-auth_no_user: "⚠️ Lütfen bir kullanıcı belirt — şunu kullan:\n{cmd} [kullanıcı_id] veya bir kullanıcının mesajını yanıtla."
-user_extract_fail: "⚠️ Kullanıcı alınamadı: <i>{error}</i>"
-auth_limit_reached: "⚠️ Bu sohbet maksimum yetkili kullanıcı sınırına ({limit}) ulaştı. Yeni birini eklemeden önce lütfen birini çıkar."
-already_authed: "⚠️ Bu kullanıcı zaten yetkili — tekrar eklemeye gerek yok."
+auth_no_user: "{emoji:⚠️} Lütfen bir kullanıcı belirt — şunu kullan:\n{cmd} [kullanıcı_id] veya bir kullanıcının mesajını yanıtla."
+user_extract_fail: "{emoji:⚠️} Kullanıcı alınamadı: <i>{error}</i>"
+auth_limit_reached: "{emoji:⚠️} Bu sohbet maksimum yetkili kullanıcı sınırına ({limit}) ulaştı. Yeni birini eklemeden önce lütfen birini çıkar."
+already_authed: "{emoji:⚠️} Bu kullanıcı zaten yetkili — tekrar eklemeye gerek yok."
 
 # 🤖 Add auth
-cannot_authorize_user: "⚠️ Bu kullanıcı yetkilendirilemez.\nBot sahibi, botun kendisi veya sen yetkilendirme gerektirmezsin."
-addauth_user_is_admin: "⚠️ Bu kullanıcı zaten bir sohbet yöneticisi. Yetkilendirme gerekmiyor."
-addauth_bot_user: "🤖 Yetki listesine bir bot ekleyemezsin — yetkili kullanıcılar insan olmalı!"
-addauth_add_fail: "❌ Yetkili kullanıcı eklenemedi: {error}"
-addauth_success_with_count: "✅ {user} eklendi.\nŞu an {count}/{limit} yetkili kullanıcı var."
-addauth_success: "✅ {user} başarıyla yetkili kullanıcılar listesine eklendi."
+cannot_authorize_user: "{emoji:⚠️} Bu kullanıcı yetkilendirilemez.\nBot sahibi, botun kendisi veya sen yetkilendirme gerektirmezsin."
+addauth_user_is_admin: "{emoji:⚠️} Bu kullanıcı zaten bir sohbet yöneticisi. Yetkilendirme gerekmiyor."
+addauth_bot_user: "{emoji:🤖} Yetki listesine bir bot ekleyemezsin — yetkili kullanıcılar insan olmalı!"
+addauth_add_fail: "{emoji:❌} Yetkili kullanıcı eklenemedi: {error}"
+addauth_success_with_count: "{emoji:✅} {user} eklendi.\nŞu an {count}/{limit} yetkili kullanıcı var."
+addauth_success: "{emoji:✅} {user} başarıyla yetkili kullanıcılar listesine eklendi."
 
 # 🤖 Bot Added to Chat
-bot_added_normal: "🎵 Beni eklediğin için teşekkürler! Müzik çalmaya başlamak için /play [şarkı] komutunu kullan."
+bot_added_normal: "{emoji:🎵} Beni eklediğin için teşekkürler! Müzik çalmaya başlamak için /play [şarkı] komutunu kullan."
 
 # ⚠️ Bot Demotion
 bot_demotion_goodbye: |
-  <b>⚠️ Yetki Kaybedildi</b>
+  <b>{emoji:⚠️} Yetki Kaybedildi</b>
 
   <b>Yöneticilikten çıkarıldım</b> ve artık görevlerimi yerine getiremiyorum.
   Gerekli haklar olmadan burada çalışamam, bu yüzden <i>şimdi sohbetten ayrılıyorum</i>.
 
-  <b>Hoşça kal 👋</b>
+  <b>Hoşça kal {emoji:👋}</b>
 
-broadcast_already_running: "⚠️ Bir yayın zaten çalışıyor.\n\nLütfen tamamlanmasını bekle veya şunu kullanarak iptal et:\n• <code>/broadcast -cancel</code>\n• Ya da ilerleme mesajındaki İptal Et düğmesine tıkla"
-broadcast_parse_failed: "❌ Yayın komutu ayrıştırılamadı:\n<code>{error}</code>"
-broadcast_no_content: "⚠️ Yayın için içerik sağlanmadı.\n\n<b>Kullanım:</b> <code>{cmd} [metin veya mesajı yanıtla]</code>\n\n<b>Örnek:</b>\n<code>{cmd} Herkese merhaba!</code>"
-broadcast_fetch_chats_failed: "❌ Sunulan sohbetler alınamadı:\n<code>{error}</code>"
-broadcast_fetch_users_failed: "❌ Sunulan kullanıcılar alınamadı:\n<code>{error}</code>"
-broadcast_no_targets: "⚠️ Yayın için hedef bulunamadı.\n\nTüm hedefleri bayraklarla hariç tutmadığından emin ol."
-broadcast_initializing: "📡 Yayın başlatılıyor...\n\nLütfen bekle..."
-broadcast_progress_header: "📡 Yayınlanıyor..."
-broadcast_total_chats: "📊 Toplam Sohbet: {done}/{total} ({progress}%)"
-broadcast_total_users: "👥 Toplam Kullanıcı: {done}/{total} ({progress}%)"
-broadcast_failed_chats: "❌ Başarısız Sohbet: {count}"
-broadcast_failed_users: "❌ Başarısız Kullanıcı: {count}"
-broadcast_delay: "⏱ Gecikme: {delay}s"
-broadcast_elapsed: "⏰ Geçen Süre: {elapsed}"
-broadcast_eta: "⏳ Tahmini Varış: {eta}"
-broadcast_success_rate: "✨ Başarı Oranı: %{rate} ({sent}/{total})"
+broadcast_already_running: "{emoji:⚠️} Bir yayın zaten çalışıyor.\n\nLütfen tamamlanmasını bekle veya şunu kullanarak iptal et:\n• <code>/broadcast -cancel</code>\n• Ya da ilerleme mesajındaki İptal Et düğmesine tıkla"
+broadcast_parse_failed: "{emoji:❌} Yayın komutu ayrıştırılamadı:\n<code>{error}</code>"
+broadcast_no_content: "{emoji:⚠️} Yayın için içerik sağlanmadı.\n\n<b>Kullanım:</b> <code>{cmd} [metin veya mesajı yanıtla]</code>\n\n<b>Örnek:</b>\n<code>{cmd} Herkese merhaba!</code>"
+broadcast_fetch_chats_failed: "{emoji:❌} Sunulan sohbetler alınamadı:\n<code>{error}</code>"
+broadcast_fetch_users_failed: "{emoji:❌} Sunulan kullanıcılar alınamadı:\n<code>{error}</code>"
+broadcast_no_targets: "{emoji:⚠️} Yayın için hedef bulunamadı.\n\nTüm hedefleri bayraklarla hariç tutmadığından emin ol."
+broadcast_initializing: "{emoji:📡} Yayın başlatılıyor...\n\nLütfen bekle..."
+broadcast_progress_header: "{emoji:📡} Yayınlanıyor..."
+broadcast_total_chats: "{emoji:📊} Toplam Sohbet: {done}/{total} ({progress}%)"
+broadcast_total_users: "{emoji:👥} Toplam Kullanıcı: {done}/{total} ({progress}%)"
+broadcast_failed_chats: "{emoji:❌} Başarısız Sohbet: {count}"
+broadcast_failed_users: "{emoji:❌} Başarısız Kullanıcı: {count}"
+broadcast_delay: "{emoji:⏱} Gecikme: {delay}s"
+broadcast_elapsed: "{emoji:⏰} Geçen Süre: {elapsed}"
+broadcast_eta: "{emoji:⏳} Tahmini Varış: {eta}"
+broadcast_success_rate: "{emoji:✨} Başarı Oranı: %{rate} ({sent}/{total})"
 broadcast_not_running: "ℹ️ Şu anda çalışan bir yayın yok."
-broadcast_cancel_success: "🚫 Yayın başarıyla iptal edildi."
+broadcast_cancel_success: "{emoji:🚫} Yayın başarıyla iptal edildi."
 broadcast_cancel_owner_only: "⚠️ Yayınları yalnızca bot sahibi iptal edebilir."
 broadcast_cancel_none_running: "ℹ️ Şu anda çalışan bir yayın yok."
 broadcast_cancel_done: "🚫 Yayın iptal edildi."
 
 # Blacklist
 
-blacklist_chat_blocked: "🚫 Bu sohbet bu botu kullanmaktan engellenmiştir."
-blacklist_owner_blocked_leave: "🚫 Bu sohbetin sahibi bu botu kullanmaktan engellenmiştir. Sohbetten ayrılıyorum."
-blacklist_user_blocked: "🚫 Bu botu kullanmanız engellendi."
+blacklist_chat_blocked: "{emoji:🚫} Bu sohbet bu botu kullanmaktan engellenmiştir."
+blacklist_owner_blocked_leave: "{emoji:🚫} Bu sohbetin sahibi bu botu kullanmaktan engellenmiştir. Sohbetten ayrılıyorum."
+blacklist_user_blocked: "{emoji:🚫} Bu botu kullanmanız engellendi."
 blacklist_usage_blockchat: "Kullanım: <code>/blockchat [chat_id|@username]</code>"
 blacklist_usage_unblockchat: "Kullanım: <code>/unblockchat [chat_id|@username]</code>"
 blacklist_invalid_chat_identifier: "Geçersiz sohbet kimliği: {error}"
-blacklist_block_user_success: "✅ Kullanıcı engellendi: <code>{id}</code>"
-blacklist_unblock_user_success: "✅ Kullanıcının engeli kaldırıldı: <code>{id}</code>"
-blacklist_block_chat_success: "✅ Sohbet engellendi: <code>{id}</code>"
-blacklist_unblock_chat_success: "✅ Sohbetin engeli kaldırıldı: <code>{id}</code>"
-blacklist_unblock_user_fail: "⚠️ Kullanıcının engeli kaldırılamadı: {error}"
-blacklist_unblock_chat_fail: "⚠️ Sohbetin engeli kaldırılamadı: {error}"
-blacklist_fetch_chats_fail: "⚠️ Engellenen sohbetler alınamadı: {error}"
-blacklist_fetch_users_fail: "⚠️ Engellenen kullanıcılar alınamadı: {error}"
-blacklist_list_title: "📛 <b>Kara Liste</b>"
-blacklist_list_chats: "💬 <b>Sohbetler:</b>"
-blacklist_list_users: "👤 <b>Kullanıcılar:</b>"
+blacklist_block_user_success: "{emoji:✅} Kullanıcı engellendi: <code>{id}</code>"
+blacklist_unblock_user_success: "{emoji:✅} Kullanıcının engeli kaldırıldı: <code>{id}</code>"
+blacklist_block_chat_success: "{emoji:✅} Sohbet engellendi: <code>{id}</code>"
+blacklist_unblock_chat_success: "{emoji:✅} Sohbetin engeli kaldırıldı: <code>{id}</code>"
+blacklist_unblock_user_fail: "{emoji:⚠️} Kullanıcının engeli kaldırılamadı: {error}"
+blacklist_unblock_chat_fail: "{emoji:⚠️} Sohbetin engeli kaldırılamadı: {error}"
+blacklist_fetch_chats_fail: "{emoji:⚠️} Engellenen sohbetler alınamadı: {error}"
+blacklist_fetch_users_fail: "{emoji:⚠️} Engellenen kullanıcılar alınamadı: {error}"
+blacklist_list_title: "{emoji:📛} <b>Kara Liste</b>"
+blacklist_list_chats: "{emoji:💬} <b>Sohbetler:</b>"
+blacklist_list_users: "{emoji:👤} <b>Kullanıcılar:</b>"
 
 # 🎧 CPlay (Channel Play)
 
-cplay_id_not_set: "⚠️ Kanal oynatma (cplay) ID'si ayarlanmamış.\nAyarlamak için <code>/setcplay &lt;sohbet_id&gt;</code> komutunu kullan."
+cplay_id_not_set: "{emoji:⚠️} Kanal oynatma (cplay) ID'si ayarlanmamış.\nAyarlamak için <code>/setcplay &lt;sohbet_id&gt;</code> komutunu kullan."
 cplay_usage: "<b>Kullanım:</b> <code>/setcplay &lt;kanal_id&gt;</code>"
 cplay_resolve_peer_fail: "<b>Kanal çözülemedi:</b> Kanal detayları alınamadı. Bu kanala erişimim olduğundan emin ol."
 cplay_invalid_target: "<b>Geçersiz Hedef:</b> Sağlanan ID geçerli bir kanal değil."
 cplay_channel_not_accessible: "<b>Kanala Erişilemiyor:</b> Kanal bilgileri alınamadı. Lütfen hedef kanalda yönetici olduğumdan emin ol."
-cplay_bot_invite_permission_missing: "⚠️ <b>Eksik İzin:</b> Hedef kanalda yöneticiyim ancak <code>Kullanıcı Davet Et</code> izni kapalı. Lütfen açıp tekrar deneyin."
-cplay_channel_not_linked: "⚠️ <b>Bağlı kanal bulunamadı:</b> Bu sohbet herhangi bir kanal/gruba bağlı değil."
+cplay_bot_invite_permission_missing: "{emoji:⚠️} <b>Eksik İzin:</b> Hedef kanalda yöneticiyim ancak <code>Kullanıcı Davet Et</code> izni kapalı. Lütfen açıp tekrar deneyin."
+cplay_channel_not_linked: "{emoji:⚠️} <b>Bağlı kanal bulunamadı:</b> Bu sohbet herhangi bir kanal/gruba bağlı değil."
 cplay_save_error: "<b>Hata:</b> Kanal oynatma ayarları kaydedilemedi."
-cplay_owner_required: "⚠️ Bu ayarı yalnızca bu sohbetin sahibi veya hedef kanalın sahibi yapabilir."
-cplay_owner_check_failed: "⚠️ Sohbet sahipliği şu anda doğrulanamadı. Lütfen tekrar deneyin."
-cplay_disabled: "✅ <b>Kanal Oynatma devre dışı bırakıldı.</b> Bu sohbet için kanal oynatma komutları (örn. <code>/cplay</code>, <code>/cskip</code>) artık kapalı."
-cplay_enabled: "✅ <b>Kanal Oynatma etkinleştirildi.</b> Tüm kanal oynatma komutları (örn. <code>/cplay</code>, <code>/cskip</code>) artık <code>{channel_id}</code> kanalında çalışacak."
+cplay_owner_required: "{emoji:⚠️} Bu ayarı yalnızca bu sohbetin sahibi veya hedef kanalın sahibi yapabilir."
+cplay_owner_check_failed: "{emoji:⚠️} Sohbet sahipliği şu anda doğrulanamadı. Lütfen tekrar deneyin."
+cplay_disabled: "{emoji:✅} <b>Kanal Oynatma devre dışı bırakıldı.</b> Bu sohbet için kanal oynatma komutları (örn. <code>/cplay</code>, <code>/cskip</code>) artık kapalı."
+cplay_enabled: "{emoji:✅} <b>Kanal Oynatma etkinleştirildi.</b> Tüm kanal oynatma komutları (örn. <code>/cplay</code>, <code>/cskip</code>) artık <code>{channel_id}</code> kanalında çalışacak."
 
 # Callback handler messages
 invalid_request: "⚠️ Geçersiz istek."
@@ -138,7 +138,7 @@ no_download_to_cancel: "ℹ️ İptal edilecek bir indirme yok."
 # Pause callback
 cb_pause_success: "⏸️ Parça {position} konumunda duraklatıldı"
 cb_pause_message: |
-  <b>⏸️ Parça Duraklatıldı</b>
+  <b>{emoji:⏸️} Parça Duraklatıldı</b>
 
   <b>▫ Parça:</b> <a href="{url}">{title}</a>
   <b>▫ Konum:</b> {position} / {duration}
@@ -149,24 +149,24 @@ cb_already_playing: "ℹ️ Parça zaten çalıyor."
 cb_resume_failed: "❌ Oynatma devam ettirilemedi."
 cb_resume_success: "▶️ {position} konumunda devam ediliyor."
 cb_resume_message: |
-  <b>🎵 Şimdi Çalıyor:</b>
+  <b>{emoji:🎵} Şimdi Çalıyor:</b>
 
   <b>▫ Parça:</b> <a href="{url}">{title}</a>
   <b>▫ Süre:</b> {duration}
   <b>▫ Devam Ettiren:</b> {user}
 
 # Replay status (loop replay)
-cb_replaying: "🔁 <b>Mevcut parça yeniden oynatılıyor...</b>"
+cb_replaying: "{emoji:🔁} <b>Mevcut parça yeniden oynatılıyor...</b>"
 cb_replay_failed: "❌ Parça yeniden oynatılamadı."
 cb_replay_success: "🔁 Parça yeniden oynatıldı."
-cb_replay_edited: "🔁 Parça {user} tarafından yeniden oynatıldı."
+cb_replay_edited: "{emoji:🔁} Parça {user} tarafından yeniden oynatıldı."
 
 # Skip callback
 cb_skip_queue_empty: "⏹️ Oynatma durduruldu — sıra boş."
 cb_skip_download_failed: "❌ Sonraki parça indirilemedi."
 cb_skip_play_failed: "❌ Sonraki parça oynatılamadı."
 cb_skip_success: "⏭️ Parça atlandı."
-cb_skip_edited: "⏭️ {user} tarafından atlandı"
+cb_skip_edited: "{emoji:⏭️} {user} tarafından atlandı"
 
 # Stop callback
 cb_stop_success: "⏹️ Oynatma durduruldu."
@@ -174,7 +174,7 @@ cb_stop_success: "⏹️ Oynatma durduruldu."
 # Mute/Unmute callback
 cb_mute_success: "🔇 Sessize alındı."
 cb_mute_message: |
-  <b>🔇 Oynatma Sessize Alındı</b>
+  <b>{emoji:🔇} Oynatma Sessize Alındı</b>
 
   <b>▫ Parça:</b> <a href="{url}">{title}</a>
   <b>▫ Sessize Alan:</b> {user}
@@ -182,118 +182,118 @@ cb_mute_message: |
 cb_unmute_success: "🔊 Ses açıldı."
 
 # 🗑️ Delete auth
-del_auth_not_authorized: "⚠️ Bu kullanıcı yetkili değil — kaldırılacak bir şey yok."
-del_auth_remove_fail: "❌ Yetkili kullanıcı kaldırılamadı: <code>{error}</code>"
-del_auth_success: "✅ {user} başarıyla yetkili kullanıcılar listesinden çıkarıldı."
+del_auth_not_authorized: "{emoji:⚠️} Bu kullanıcı yetkili değil — kaldırılacak bir şey yok."
+del_auth_remove_fail: "{emoji:❌} Yetkili kullanıcı kaldırılamadı: <code>{error}</code>"
+del_auth_success: "{emoji:✅} {user} başarıyla yetkili kullanıcılar listesinden çıkarıldı."
 
 # 📜 Auth list
-authlist_fetch_fail: "❌ Yetkili kullanıcı listesi alınamadı: <code>{error}</code>"
+authlist_fetch_fail: "{emoji:❌} Yetkili kullanıcı listesi alınamadı: <code>{error}</code>"
 authlist_empty: "ℹ️ Bu sohbette yetkili kullanıcı yok."
-authlist_fetching: "⏳ Yetkili kullanıcı listesi getiriliyor..."
+authlist_fetching: "{emoji:⏳} Yetkili kullanıcı listesi getiriliyor..."
 authlist_header: "<b>Yetkili Kullanıcılar:</b>"
 authlist_user_fail: "{index}. <code>{user_id}</code> (Kullanıcı bilgileri alınamadı)"
 authlist_user_entry: "{index}. {user} (<code>{user_id}</code>)"
 authlist_total: "<b>Toplam:</b> {count} kullanıcı"
 
-autoleave_fetch_fail: "⚠️ <b>Otomatik Ayrılma (AutoLeave) durumu alınamadı.</b>"
-autoleave_status: "🏃‍♂️ <b>Otomatik Ayrılma Kontrolü</b>\n\nEtkinleştirildiğinde, asistan sohbetten otomatik olarak ayrılır.\nKullanım: {cmd} [enable|disable]\nMevcut durum: {action}"
-autoleave_already: "⚠️ Otomatik Ayrılma zaten {action}"
-autoleave_update_fail: "⚠️ <b>Otomatik Ayrılma durumu güncellenemedi.</b>"
-autoleave_updated: "🏃‍♂️ Otomatik Ayrılma {action} konumuna getirildi."
+autoleave_fetch_fail: "{emoji:⚠️} <b>Otomatik Ayrılma (AutoLeave) durumu alınamadı.</b>"
+autoleave_status: "{emoji:🏃‍♂️} <b>Otomatik Ayrılma Kontrolü</b>\n\nEtkinleştirildiğinde, asistan sohbetten otomatik olarak ayrılır.\nKullanım: {cmd} [enable|disable]\nMevcut durum: {action}"
+autoleave_already: "{emoji:⚠️} Otomatik Ayrılma zaten {action}"
+autoleave_update_fail: "{emoji:⚠️} <b>Otomatik Ayrılma durumu güncellenemedi.</b>"
+autoleave_updated: "{emoji:🏃‍♂️} Otomatik Ayrılma {action} konumuna getirildi."
 
 enabled: "Etkin"
 disabled: "Devre Dışı"
 
-clear_no_active: "⚠️ <b>Temizlenecek aktif bir oynatma veya sıra yok.</b>"
-clear_success: "✅ Sıra {user} tarafından temizlendi."
+clear_no_active: "{emoji:⚠️} <b>Temizlenecek aktif bir oynatma veya sıra yok.</b>"
+clear_success: "{emoji:✅} Sıra {user} tarafından temizlendi."
 
 err_assistant_banned: |
-  <b>🚫 Asistan Kısıtlandı</b>
+  <b>{emoji:🚫} Asistan Kısıtlandı</b>
 
   Müzik çalamıyorum çünkü {user} (Kullanıcı ID: <code>{id}</code>) bu sohbetten <b>yasaklanmış</b> veya <b>çıkarılmış</b>.
 
-  <i>✅ Zaten yasağını kaldırdın mı? Yenilemek için /reload kullan.</i>
+  <i>{emoji:✅} Zaten yasağını kaldırdın mı? Yenilemek için /reload kullan.</i>
 
 err_admin_permission_required: |
-  ⚠️ <b>Yönetici İzni Gerekli</b>
+  {emoji:⚠️} <b>Yönetici İzni Gerekli</b>
 
   Bu sohbeti yönetmek ve asistanı davet etmek için <i>Kullanıcıları Davet Et</i> izniyle birlikte yönetici erişimine ihtiyacım var.
 
 err_assistant_get_failed: |
-  ⚠️ Sistem bu sohbet için bir asistan atayamadı.
+  {emoji:⚠️} Sistem bu sohbet için bir asistan atayamadı.
 
   <i>Bu genellikle geçici bir sorundur ve tekrar denendiğinde çözülmelidir.</i>
 
-  <b>➡️ Lütfen komutunu tekrar dene.</b>
+  <b>{emoji:➡️} Lütfen komutunu tekrar dene.</b>
 
   <i>Bu durum devam ederse, sana yardımcı olabilmemiz için lütfen destekle iletişime geç.</i>
   
 err_assistant_join_request_sent: |
-  ⚠️ Asistan katılım isteği gönderdi, ancak otomatik olarak onaylayamadım.
+  {emoji:⚠️} Asistan katılım isteği gönderdi, ancak otomatik olarak onaylayamadım.
 
-  <i>✅ Lütfen isteği manuel olarak onayla ve tekrar dene.</i>
+  <i>{emoji:✅} Lütfen isteği manuel olarak onayla ve tekrar dene.</i>
 
 err_assistant_invite_link_fetch: |
-  ⚠️ Davet bağlantısı alınamadı:
+  {emoji:⚠️} Davet bağlantısı alınamadı:
   <i>{error}</i>
 
 err_assistant_invite_failed: |
-  ⚠️ Asistan bu sohbete katılamadı:
+  {emoji:⚠️} Asistan bu sohbete katılamadı:
   <i>{error}</i>
 
 err_connection_timeout: |
-  ⚠️ <b>Sesli Sohbet Bağlantı Zaman Aşımı</b>
+  {emoji:⚠️} <b>Sesli Sohbet Bağlantı Zaman Aşımı</b>
 
   Telegram şu anda sesli sohbet bağlantısına düzgün yanıt vermiyor.
 
   <i>Bu durum devam ederse, sesli sohbeti sonlandırıp tekrar başlat ve yeniden dene.</i>
 
 err_no_active_voicechat: |
-  🎙️ <b>Aktif Sesli Sohbet Yok</b>
+  {emoji:🎙️} <b>Aktif Sesli Sohbet Yok</b>
 
   Katılamıyorum — lütfen önce bir sesli sohbet başlat.
 
   <i>Zaten bir tane başlattın mı? Yenilemek için /reload kullan.</i>
 
 err_fetch_failed: |
-  ⚠️ Sohbet bilgileri alınamadı:
+  {emoji:⚠️} Sohbet bilgileri alınamadı:
   <i>{error}</i>
 
 err_unknown: |
-  ⚠️ Bilinmeyen Bir Hata Oluştu:
+  {emoji:⚠️} Bilinmeyen Bir Hata Oluştu:
   <i>{error}</i>
 
 err_fetch_tracks: |
-  ⚠️ <b>Parça detayları alınamadı.</b>
+  {emoji:⚠️} <b>Parça detayları alınamadı.</b>
   Lütfen daha sonra tekrar dene.
 
 err_download_internal: |
-  ⚠️ Beklenmedik bir dahili hata nedeniyle <b>indirme başarısız oldu</b>.
+  {emoji:⚠️} Beklenmedik bir dahili hata nedeniyle <b>indirme başarısız oldu</b>.
   Lütfen daha sonra tekrar dene.
   
 flood_seconds: "⏳ Yavaşla! {duration} saniye sonra tekrar dene."
-flood_minutes: "⏳ Bu komutu tekrar kullanmadan önce lütfen {duration} dakika bekle."
+flood_minutes: "{emoji:⏳} Bu komutu tekrar kullanmadan önce lütfen {duration} dakika bekle."
 
-help_private_only: "🤖 Merhaba! Bot yardımı ve komutlar için lütfen bana doğrudan özel mesaj gönder — özel sohbetlerde daha hızlı yanıt veririm!"
-help_main: "📚 <b>Yardım Menüsü</b>\n\nBotu yönetmek, kontrol etmek ve özelleştirmek için kullanılan detaylı komutları keşfetmek için aşağıdan bir kategori seç."
+help_private_only: "{emoji:🤖} Merhaba! Bot yardımı ve komutlar için lütfen bana doğrudan özel mesaj gönder — özel sohbetlerde daha hızlı yanıt veririm!"
+help_main: "{emoji:📚} <b>Yardım Menüsü</b>\n\nBotu yönetmek, kontrol etmek ve özelleştirmek için kullanılan detaylı komutları keşfetmek için aşağıdan bir kategori seç."
 
-jump_no_active: "⚠️ İçinde atlanacak aktif bir parça yok."
-jump_usage: "⚠️ Lütfen saniye belirt.\nÖrnek: <code>{cmd} 120</code>"
-jump_invalid_position: "⚠️ Geçersiz konum.\nÖrnek: <code>{cmd} 120</code>"
-jump_too_close_end: "⚠️ <b>{position}</b> konumuna atlanamaz — parçanın sonuna çok yakın."
-jump_failed: "❌ <b>{position}</b> konumuna atlanamadı.\nHata: <code>{error}</code>"
-jump_success: "⏩ <u>{duration}</u> süreli parçanın <u>{position}</u> konumuna atlandı."
+jump_no_active: "{emoji:⚠️} İçinde atlanacak aktif bir parça yok."
+jump_usage: "{emoji:⚠️} Lütfen saniye belirt.\nÖrnek: <code>{cmd} 120</code>"
+jump_invalid_position: "{emoji:⚠️} Geçersiz konum.\nÖrnek: <code>{cmd} 120</code>"
+jump_too_close_end: "{emoji:⚠️} <b>{position}</b> konumuna atlanamaz — parçanın sonuna çok yakın."
+jump_failed: "{emoji:❌} <b>{position}</b> konumuna atlanamadı.\nHata: <code>{error}</code>"
+jump_success: "{emoji:⏩} <u>{duration}</u> süreli parçanın <u>{position}</u> konumuna atlandı."
 
 lang_same: "ℹ️ Zaten bu dili kullanıyorsun."
-lang_select: "🌐 Tercih ettiğin dili seç:"
+lang_select: "{emoji:🌐} Tercih ettiğin dili seç:"
 lang_fail: "❌ Dil güncellenemedi. Lütfen daha sonra tekrar dene."
-lang_success: "✅ Dil başarıyla {lang_name} olarak güncellendi."
+lang_success: "{emoji:✅} Dil başarıyla {lang_name} olarak güncellendi."
 
 logger_playback_started: "Oynatma Başlatıldı"
 logger_playback_queued: "Oynatma Sıraya Alındı"
 
 logger_bot_added: |
-  🤖 <b>Bot Yeni Gruba Eklendi</b>
+  {emoji:🤖} <b>Bot Yeni Gruba Eklendi</b>
   
   <blockquote>
   <b>Grup Adı:</b> {group_name}
@@ -310,7 +310,7 @@ logger_bot_added: |
 
 logger_bot_removed: |
 
-  🤖 <b>Bot Gruptan Çıkarıldı</b>
+  {emoji:🤖} <b>Bot Gruptan Çıkarıldı</b>
   <blockquote>
   <b>Grup Adı:</b> {group_name}
   <b>Grup ID:</b> {group_id}
@@ -324,153 +324,153 @@ logger_bot_removed: |
   </blockquote>
   
 logger_bot_started: |
-  ▶️ <b>{mention} botu başlattı</b>
+  {emoji:▶️} <b>{mention} botu başlattı</b>
 
   <b>Kullanıcı Adı:</b> {user_username}
   <b>ID:</b> {user_id}
   
 
-logger_playback_template: "<b>🎧 Parça:</b> <a href=\"{track_url}\">{track}</a>\n<b>🔗 Kaynak:</b> {source}\n<b>📌 Grup:</b> {group} ({group_id})\n<b>👤 İsteyen:</b> {requested_by} (<code>{requested_by_id}</code>)"
+logger_playback_template: "<b>{emoji:🎧} Parça:</b> <a href=\"{track_url}\">{track}</a>\n<b>{emoji:🔗} Kaynak:</b> {source}\n<b>{emoji:📌} Grup:</b> {group} ({group_id})\n<b>{emoji:👤} İsteyen:</b> {requested_by} (<code>{requested_by_id}</code>)"
 
-loop_usage: "🔁 <b>Döngü Kontrolü</b>\n\nKullanım: {cmd} [sayı]\n• 0 - Döngüyü devre dışı bırak\n• 1-10 - Döngü sayısı\n\n<i>{count_line}</i>"
-loop_invalid: "⚠️ <b>Geçersiz döngü sayısı.</b>\nDevre dışı bırakmak için 0, döngü sayısını ayarlamak için 1-10 arası bir değer kullan."
-loop_already_set: "⚠️ Döngü sayısı zaten <b>{count}</b> olarak ayarlanmış."
-loop_disabled: "🔁 Döngü {user} tarafından <b>devre dışı bırakıldı</b>"
-loop_set: "🔁 <b>{count}</b> kez döngüye ayarlandı\n└ Değiştiren: {user}"
+loop_usage: "{emoji:🔁} <b>Döngü Kontrolü</b>\n\nKullanım: {cmd} [sayı]\n• 0 - Döngüyü devre dışı bırak\n• 1-10 - Döngü sayısı\n\n<i>{count_line}</i>"
+loop_invalid: "{emoji:⚠️} <b>Geçersiz döngü sayısı.</b>\nDevre dışı bırakmak için 0, döngü sayısını ayarlamak için 1-10 arası bir değer kullan."
+loop_already_set: "{emoji:⚠️} Döngü sayısı zaten <b>{count}</b> olarak ayarlanmış."
+loop_disabled: "{emoji:🔁} Döngü {user} tarafından <b>devre dışı bırakıldı</b>"
+loop_set: "{emoji:🔁} <b>{count}</b> kez döngüye ayarlandı\n└ Değiştiren: {user}"
 loop_current: "• Mevcut döngü: <b>{count}</b> kez"
 
-logger_usage: "⚙️ Kullanım: <code>{cmd} [enable|disable]</code> - Günlüğü etkinleştirir veya devre dışı bırakır\n\n{status}"
-logger_status: "📜 Mevcut durum: {action}"
-logger_check_fail: "❌ Günlük durumu kontrol edilemedi: {error}"
+logger_usage: "{emoji:⚙️} Kullanım: <code>{cmd} [enable|disable]</code> - Günlüğü etkinleştirir veya devre dışı bırakır\n\n{status}"
+logger_status: "{emoji:📜} Mevcut durum: {action}"
+logger_check_fail: "{emoji:❌} Günlük durumu kontrol edilemedi: {error}"
 logger_already: "ℹ️ Günlük zaten {action}."
-logger_update_fail: "❌ Günlük ayarı güncellenemedi: {error}"
-logger_updated: "✅ Günlük başarıyla {action} konumuna getirildi."
+logger_update_fail: "{emoji:❌} Günlük ayarı güncellenemedi: {error}"
+logger_updated: "{emoji:✅} Günlük başarıyla {action} konumuna getirildi."
 
 # Logs module
 logs_empty: "Kayıt bulunamadı"
 
 # reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
 maint: "⚠️ Şu anda bakımdayım ve geçici olarak hizmet veremiyorum. Lütfen daha sonra tekrar kontrol et.\n\n{reason}"
-maint_reason: "<i>📝 Sebep: {reason}</i>"
+maint_reason: "<i>{emoji:📝} Sebep: {reason}</i>"
 
 # ⚙️ Maintenance control
-maint_usage: "⚙️ <b>Bakım Kontrolü</b>\n\nKullanım: {cmd} [enable|disable] [sebep]\n📜 Mevcut durum: {status}"
-maint_check_fail: "❌ Bakım durumu kontrol edilemedi: <code>{error}</code>"
-maint_already_enabled: "ℹ️ Bakım modu zaten etkin 🟢."
-maint_already_disabled: "ℹ️ Bakım modu zaten devre dışı 🔴."
+maint_usage: "{emoji:⚙️} <b>Bakım Kontrolü</b>\n\nKullanım: {cmd} [enable|disable] [sebep]\n{emoji:📜} Mevcut durum: {status}"
+maint_check_fail: "{emoji:❌} Bakım durumu kontrol edilemedi: <code>{error}</code>"
+maint_already_enabled: "ℹ️ Bakım modu zaten etkin {emoji:🟢}."
+maint_already_disabled: "ℹ️ Bakım modu zaten devre dışı {emoji:🔴}."
 maint_already_reason_same: "ℹ️ Bakım zaten aynı sebeple etkin."
-maint_reason_removed: "✅ Bakım sebebi başarıyla kaldırıldı."
-maint_reason_updated: "✅ Bakım sebebi güncellendi.\n📝 Sebep: {reason}"
-maint_enabled: "✅ Bakım modu başarıyla <b>etkinleştirildi</b>."
-maint_enabled_reason: "✅ Bakım modu etkinleştirildi.\n📝 Sebep: {reason}"
-maint_disabled: "✅ Bakım modu başarıyla <b>devre dışı bırakıldı</b>."
-maint_entering: "⚠️ Bot bakım moduna giriyor..."
-enabled_with_reason: "🟢 Etkin\n📝 Sebep: {reason}"
+maint_reason_removed: "{emoji:✅} Bakım sebebi başarıyla kaldırıldı."
+maint_reason_updated: "{emoji:✅} Bakım sebebi güncellendi.\n{emoji:📝} Sebep: {reason}"
+maint_enabled: "{emoji:✅} Bakım modu başarıyla <b>etkinleştirildi</b>."
+maint_enabled_reason: "{emoji:✅} Bakım modu etkinleştirildi.\n{emoji:📝} Sebep: {reason}"
+maint_disabled: "{emoji:✅} Bakım modu başarıyla <b>devre dışı bırakıldı</b>."
+maint_entering: "{emoji:⚠️} Bot bakım moduna giriyor..."
+enabled_with_reason: "{emoji:🟢} Etkin\n{emoji:📝} Sebep: {reason}"
 
-move_usage: "⚠️ Kullanım: <code>{cmd} [nereden] [nereye]</code>"
-move_invalid_numbers: "⚠️ Geçersiz sayılar. Örnek: <code>/{cmd} 2 1</code>"
-move_invalid_indexes_min: "⚠️ İndeksler 0'dan büyük olmalı."
-move_invalid_indexes_max: "⚠️ Sıra yalnızca {queue_len} parça içeriyor."
-move_success: "✅ Parça, {user} tarafından {from} konumundan {to} konumuna taşındı."
+move_usage: "{emoji:⚠️} Kullanım: <code>{cmd} [nereden] [nereye]</code>"
+move_invalid_numbers: "{emoji:⚠️} Geçersiz sayılar. Örnek: <code>/{cmd} 2 1</code>"
+move_invalid_indexes_min: "{emoji:⚠️} İndeksler 0'dan büyük olmalı."
+move_invalid_indexes_max: "{emoji:⚠️} Sıra yalnızca {queue_len} parça içeriyor."
+move_success: "{emoji:✅} Parça, {user} tarafından {from} konumundan {to} konumuna taşındı."
 
 # 🔇 Mute messages
 mute_already_muted: "🔇 <b>Zaten Sessizde</b>\nMüzik bu sohbette zaten sessize alınmış.\nSesi açmak ister misin?"
 mute_failed: "❌ <b>Oynatma Sessize Alınamadı</b>\nHata: <code>{error}</code>"
 mute_success: |
-  🔇 <b>Oynatma sessize alındı</b>
+  {emoji:🔇} <b>Oynatma sessize alındı</b>
 
-  🎵 Parça: {title}
-  👤 Sessize Alan: {user}
+  {emoji:🎵} Parça: {title}
+  {emoji:👤} Sessize Alan: {user}
 
 no_song_query: |
-  <b>🎵 Hop! Hiçbir şarkı tespit edilemedi.</b>
+  <b>{emoji:🎵} Hop! Hiçbir şarkı tespit edilemedi.</b>
 
   <i>Oynatmaya başlamak için <b>{cmd} [şarkı adı]</b> yaz veya bir <b>medyayı</b> yanıtla!</i>
 
-no_song_found: "❌ Parça bulunamadı."
+no_song_found: "{emoji:❌} Parça bulunamadı."
 
 nothumb_status: |
-  🖼️ <b>Küçük Resim Kontrolü</b>
+  {emoji:🖼️} <b>Küçük Resim Kontrolü</b>
   
   <i>Etkinleştirildiğinde, oynatma mesajlarında kapak resmi/küçük resim gösterilmez.</i>
   
-  <b>📊 Kullanım: {cmd} [enable|disable]</b>
+  <b>{emoji:📊} Kullanım: {cmd} [enable|disable]</b>
   
   <i>Küçük resim şu an {action}.</i>
   
-nothumb_fetch_fail: "⚠️ <b>Küçük resim ayarı alınamadı.</b>"
+nothumb_fetch_fail: "{emoji:⚠️} <b>Küçük resim ayarı alınamadı.</b>"
 nothumb_already: "ℹ️ Küçük resim gösterimi zaten {action}."
-nothumb_update_fail: "⚠️ <b>Küçük resim ayarı güncellenemedi.</b>"
-nothumb_updated: "🖼️ Küçük resim gösterimi {action} konumuna getirildi."
+nothumb_update_fail: "{emoji:⚠️} <b>Küçük resim ayarı güncellenemedi.</b>"
+nothumb_updated: "{emoji:🖼️} Küçük resim gösterimi {action} konumuna getirildi."
 
-cmddelete_status: "🗑️ <b>Komut Silme Kontrolü</b>\n\nEtkinleştirildiğinde, komut mesajlarını otomatik olarak sileceğim.\nKullanım: {cmd} [enable|disable]\nMevcut durum: {action}"
-cmddelete_updated: "🗑️ Komut silme {action} konuma getirildi."
+cmddelete_status: "{emoji:🗑️} <b>Komut Silme Kontrolü</b>\n\nEtkinleştirildiğinde, komut mesajlarını otomatik olarak sileceğim.\nKullanım: {cmd} [enable|disable]\nMevcut durum: {action}"
+cmddelete_updated: "{emoji:🗑️} Komut silme {action} konuma getirildi."
 
-only_admin: "⚠️ <b>Yetki Reddedildi!</b>\nBu eylemi yalnızca <b>yöneticiler</b> kontrol edebilir. Yine de şarkı çalabilirsin 🎵.\n\nEğer yönetici olduğunu düşünüyorsan, lütfen yönetici durumunu yenilemek için /reload kullan."
+only_admin: "{emoji:⚠️} <b>Yetki Reddedildi!</b>\nBu eylemi yalnızca <b>yöneticiler</b> kontrol edebilir. Yine de şarkı çalabilirsin {emoji:🎵}.\n\nEğer yönetici olduğunu düşünüyorsan, lütfen yönetici durumunu yenilemek için /reload kullan."
 only_admin_cb: "⚠️ Bu eylemi yalnızca yöneticiler yapabilir."
-only_admin_or_auth: "⚠️ <b>Erişim Engellendi</b>\nBu eylemi yalnızca <b>yöneticiler</b> veya <b>yetkili kullanıcılar</b> kontrol edebilir.\n\nYakın zamanda yönetici olduysan, izinlerini yenilemek için /reload kullan."
+only_admin_or_auth: "{emoji:⚠️} <b>Erişim Engellendi</b>\nBu eylemi yalnızca <b>yöneticiler</b> veya <b>yetkili kullanıcılar</b> kontrol edebilir.\n\nYakın zamanda yönetici olduysan, izinlerini yenilemek için /reload kullan."
 only_admin_or_auth_cb: "⚠️ Bu eylemi yalnızca yöneticiler veya yetkili kullanıcılar yapabilir."
-only_supergroup: "⚠️ Bu komut yalnızca gruplarda kullanılabilir."
+only_supergroup: "{emoji:⚠️} Bu komut yalnızca gruplarda kullanılabilir."
 only_owner: "⚠️ Bu komutu yalnızca bot sahibi kullanabilir."
-only_sudo: "⚠️ Bu komutu yalnızca sudo kullanıcıları veya bot sahibi kullanabilir."
+only_sudo: "{emoji:⚠️} Bu komutu yalnızca sudo kullanıcıları veya bot sahibi kullanabilir."
 
 pause_already: |
-  ⏸️ <b>Zaten Duraklatıldı</b>
+  {emoji:⏸️} <b>Zaten Duraklatıldı</b>
   Müzik zaten duraklatılmış durumda.
 
 pause_success: |
-  ⏸️ <b>Oynatma duraklatıldı</b>
+  {emoji:⏸️} <b>Oynatma duraklatıldı</b>
 
-  🎵 Parça: {title}
-  ⏱️ Konum: {position} / {duration}
-  👤 Duraklatan: {user}
+  {emoji:🎵} Parça: {title}
+  {emoji:⏱️} Konum: {position} / {duration}
+  {emoji:👤} Duraklatan: {user}
 
 play_single_track_too_long: |
-  ⚠️ {limit_mins} dakikadan uzun şarkıları oynatamazsın.
+  {emoji:⚠️} {limit_mins} dakikadan uzun şarkıları oynatamazsın.
   <i>{title}</i> atlandı.
 
-play_download_failed: "❌ İndirme başarısız. Lütfen tekrar deneyin."
+play_download_failed: "{emoji:❌} İndirme başarısız. Lütfen tekrar deneyin."
 
 play_added_to_queue_single: |
-  <b>🎵 Sıraya Eklendi:</b> #{index}
+  <b>{emoji:🎵} Sıraya Eklendi:</b> #{index}
 
   <b>▫ Parça:</b> <a href="{url}">{title}</a>
   <b>▫ Süre:</b> {duration}
   <b>▫ İsteyen:</b> {by}
 
-play_multiple_tracks_too_long_header: "<b>⚠️ {count} parça atlandı (maksimum süre {limit_mins} dk):</b>"
+play_multiple_tracks_too_long_header: "<b>{emoji:⚠️} {count} parça atlandı (maksimum süre {limit_mins} dk):</b>"
 play_multiple_tracks_too_long_item: "— <i>{title}</i>"
 play_multiple_tracks_too_long_more: "... ve {remaining} tane daha."
-play_all_tracks_skipped: "❌ Bulunan tüm parçalar süre sınırı nedeniyle atlandı."
-play_failed: "❌ Oynatılamadı\nHata: {error}"
-play_unable: "<b> ❌ Oynatılamıyor </b>\n\n<i>Lütfen <b>sesli sohbeti yeniden başlat</b>.</i>"
-rtmp_play_unsupported: "⚠️ <b>RTMP/canlı yayın sesli sohbetinde çalınamıyor.</b>\n\n<i>Oynatma durduruldu.</i>"
-play_downloading_song: "📥 \"{title}\" şarkısı indiriliyor"
-play_download_canceled: "⚠️ İndirme {user} tarafından iptal edildi."
-play_already_in_queue: "✅ <b>Parça zaten ekli!</b>\n\n<i>{title}</i> zaten çalıyor veya sırada bekliyor."
-play_already_playing: "⚠️ <b>Şu anda bir parça çalıyor.</b>\n\nLütfen bitmesini bekleyin veya önce durdurmak için <code>/stop</code> kullanın."
-play_added_multiple_header: "➕ {user} tarafından <b>{count} parça eklendi</b>"
-play_queue_limit_hint: "⚠️ <i>Sıra sınırına ulaşıldı — bazı parçalar atlandı.</i>"
+play_all_tracks_skipped: "{emoji:❌} Bulunan tüm parçalar süre sınırı nedeniyle atlandı."
+play_failed: "{emoji:❌} Oynatılamadı\nHata: {error}"
+play_unable: "<b> {emoji:❌} Oynatılamıyor </b>\n\n<i>Lütfen <b>sesli sohbeti yeniden başlat</b>.</i>"
+rtmp_play_unsupported: "{emoji:⚠️} <b>RTMP/canlı yayın sesli sohbetinde çalınamıyor.</b>\n\n<i>Oynatma durduruldu.</i>"
+play_downloading_song: "{emoji:📥} \"{title}\" şarkısı indiriliyor"
+play_download_canceled: "{emoji:⚠️} İndirme {user} tarafından iptal edildi."
+play_already_in_queue: "{emoji:✅} <b>Parça zaten ekli!</b>\n\n<i>{title}</i> zaten çalıyor veya sırada bekliyor."
+play_already_playing: "{emoji:⚠️} <b>Şu anda bir parça çalıyor.</b>\n\nLütfen bitmesini bekleyin veya önce durdurmak için <code>/stop</code> kullanın."
+play_added_multiple_header: "{emoji:➕} {user} tarafından <b>{count} parça eklendi</b>"
+play_queue_limit_hint: "{emoji:⚠️} <i>Sıra sınırına ulaşıldı — bazı parçalar atlandı.</i>"
 play_queue_view_hint: "<i>Listenin tamamını görmek için /queue kullan.</i>"
 
 playmode_help: |
-  🛠️ <b>Oynatma Modu</b>
+  {emoji:🛠️} <b>Oynatma Modu</b>
 
   <b>Durum:</b> {status}
   <b>Kullanım:</b> <code>/playmode [enable|disable]</code>
 
 playmode_status_admins: "Yöneticiler 🔐"
 playmode_status_everyone: "Herkes 🌍"
-playmode_success_admins: "🛡️ <b>Oynatma modu</b> artık yalnızca <b>yöneticiler ve yetkili kullanıcılar</b> ile sınırlıdır. 🎧"
-playmode_success_everyone: "✅ <b>Oynatma modu</b> artık <b>herkes için açık</b>. Müziğin tadını çıkarın! 🎶"
-playmode_restricted: "🚫 Oynatma modu etkin. Sadece yöneticiler ve yetkili kullanıcılar şarkı çalabilir."
+playmode_success_admins: "{emoji:🛡️} <b>Oynatma modu</b> artık yalnızca <b>yöneticiler ve yetkili kullanıcılar</b> ile sınırlıdır. {emoji:🎧}"
+playmode_success_everyone: "{emoji:✅} <b>Oynatma modu</b> artık <b>herkes için açık</b>. Müziğin tadını çıkarın! {emoji:🎶}"
+playmode_restricted: "{emoji:🚫} Oynatma modu etkin. Sadece yöneticiler ve yetkili kullanıcılar şarkı çalabilir."
 
 # 🏓 Ping messages
-ping_start: "🏓 Pingleniyor..."
+ping_start: "{emoji:🏓} Pingleniyor..."
 ping_result: |
-  <b>🏓 PONG</b>: <code>{latency}ms</code>
+  <b>{emoji:🏓} PONG</b>: <code>{latency}ms</code>
   
-  <b><u>🤖 {bot} sistem istatistikleri:</u></b>
+  <b><u>{emoji:🤖} {bot} sistem istatistikleri:</u></b>
   <b>Çalışma Süresi:</b> {uptime}
   <b>RAM Kullanımı:</b> {ram_info}
   <b>CPU Kullanımı:</b> {cpu_usage}
@@ -478,73 +478,73 @@ ping_result: |
 
 
 position_now: |
-  🎵 <b>{title}</b>
-  📍 <code>{position} / {duration}</code>
-  ⚙️ Hız: <b>{speed}x</b>
+  {emoji:🎵} <b>{title}</b>
+  {emoji:📍} <code>{position} / {duration}</code>
+  {emoji:⚙️} Hız: <b>{speed}x</b>
 
-queue_limit_reached: "⚠️ Sıra sınırına ulaşıldı (maksimum {limit} parça). Sırayı temizlemek için /clear kullan."
-queue_no_active: "⚠️ <b>Aktif oynatma yok.</b>\n\n<i>Şu anda sırada bir şey yok.</i>"
-queue_header: "🎶 <b>Mevcut Sıra</b>"
-queue_now_playing: "▶️ <b>Şimdi Çalıyor:</b>"
-queue_up_next: "⏭️ <b>Sıradaki:</b>"
+queue_limit_reached: "{emoji:⚠️} Sıra sınırına ulaşıldı (maksimum {limit} parça). Sırayı temizlemek için /clear kullan."
+queue_no_active: "{emoji:⚠️} <b>Aktif oynatma yok.</b>\n\n<i>Şu anda sırada bir şey yok.</i>"
+queue_header: "{emoji:🎶} <b>Mevcut Sıra</b>"
+queue_now_playing: "{emoji:▶️} <b>Şimdi Çalıyor:</b>"
+queue_up_next: "{emoji:⏭️} <b>Sıradaki:</b>"
 queue_more_line: "\n… ve {remaining} tane daha"
-queue_empty_tail: "📭 <i>Sırada başka şarkı yok.</i>"
-queue_empty: "⚠️ <b>Sıra zaten boş.</b>"
+queue_empty_tail: "{emoji:📭} <i>Sırada başka şarkı yok.</i>"
+queue_empty: "{emoji:⚠️} <b>Sıra zaten boş.</b>"
 
 # 🔄 Reload
-reload_start: "⚙️ Yönetici önbelleği, sesli sohbet durumu ve asistan durumu yenileniyor..."
+reload_start: "{emoji:⚙️} Yönetici önbelleği, sesli sohbet durumu ve asistan durumu yenileniyor..."
 
-reload_done: "<b>⚙️ Yenileme tamamlandı:</b>\n\n{summary}"
+reload_done: "<b>{emoji:⚙️} Yenileme tamamlandı:</b>\n\n{summary}"
 
-reload_admin_cache_ok: "<b>• Yönetici önbelleği:</b> <i>✅ Tamam</i>"
-reload_admin_cache_fail: "<b>• Yönetici önbelleği:</b> <i>❌ ({error})</i>"
+reload_admin_cache_ok: "<b>• Yönetici önbelleği:</b> <i>{emoji:✅} Tamam</i>"
+reload_admin_cache_fail: "<b>• Yönetici önbelleği:</b> <i>{emoji:❌} ({error})</i>"
 
-reload_voice_inactive: "<b>• Sesli sohbet:</b> <i>⚪ Devre dışı</i>"
-reload_voice_admin_required: "<b>• Sesli sohbet:</b> <i>❌ Yönetici izni gerekli</i>"
-reload_voice_fail: "<b>• Sesli sohbet:</b> <i>❌ ({error})</i>"
-reload_voice_active: "<b>• Sesli sohbet:</b> <i>✅ Aktif</i>"
+reload_voice_inactive: "<b>• Sesli sohbet:</b> <i>{emoji:⚪} Devre dışı</i>"
+reload_voice_admin_required: "<b>• Sesli sohbet:</b> <i>{emoji:❌} Yönetici izni gerekli</i>"
+reload_voice_fail: "<b>• Sesli sohbet:</b> <i>{emoji:❌} ({error})</i>"
+reload_voice_active: "<b>• Sesli sohbet:</b> <i>{emoji:✅} Aktif</i>"
 
-reload_assistant_banned: "<b>• Asistan:</b> <i>❌ Yasaklı</i>"
-reload_assistant_admin_required: "<b>• Asistan:</b> <i>❌ Yönetici izni gerekli</i>"
-reload_assistant_fail: "<b>• Asistan:</b> <i>❌ ({error})</i>"
-reload_assistant_present: "<b>• Asistan:</b> <i>✅ Mevcut</i>"
-reload_assistant_not_present: "<b>• Asistan:</b> <i>⚪ Mevcut değil</i>"
-reload_room_reset: "<b>• Oda:</b> <i>Sıfırlandı ✅</i>"
+reload_assistant_banned: "<b>• Asistan:</b> <i>{emoji:❌} Yasaklı</i>"
+reload_assistant_admin_required: "<b>• Asistan:</b> <i>{emoji:❌} Yönetici izni gerekli</i>"
+reload_assistant_fail: "<b>• Asistan:</b> <i>{emoji:❌} ({error})</i>"
+reload_assistant_present: "<b>• Asistan:</b> <i>{emoji:✅} Mevcut</i>"
+reload_assistant_not_present: "<b>• Asistan:</b> <i>{emoji:⚪} Mevcut değil</i>"
+reload_room_reset: "<b>• Oda:</b> <i>Sıfırlandı {emoji:✅}</i>"
 
 
-remove_usage: "⚠️ <b>Geçersiz kullanım.</b>\nKullanım: <code>{cmd} [indeks]</code>"
-remove_invalid_index: "⚠️ <b>Geçersiz indeks.</b> Bir <b>sayı</b> olmalıdır."
-remove_index_too_small: "⚠️ <b>İndeks 0'dan büyük olmalıdır.</b>"
-remove_index_too_big: "⚠️ Geçersiz indeks. Sırada yalnızca <b>{total}</b> parça var."
-remove_success: "✅ Sırada <b>{index}</b> konumundaki parça çıkarıldı.\n👤 Çıkaran: {user}"
+remove_usage: "{emoji:⚠️} <b>Geçersiz kullanım.</b>\nKullanım: <code>{cmd} [indeks]</code>"
+remove_invalid_index: "{emoji:⚠️} <b>Geçersiz indeks.</b> Bir <b>sayı</b> olmalıdır."
+remove_index_too_small: "{emoji:⚠️} <b>İndeks 0'dan büyük olmalıdır.</b>"
+remove_index_too_big: "{emoji:⚠️} Geçersiz indeks. Sırada yalnızca <b>{total}</b> parça var."
+remove_success: "{emoji:✅} Sırada <b>{index}</b> konumundaki parça çıkarıldı.\n{emoji:👤} Çıkaran: {user}"
 
 # 🔁 Replay
 replay_failed: "❌ <b>Yeniden Oynatma Başarısız</b>\nHata: <code>{error}</code>"
 replay_success: |
-  🔁 <b>Şimdi yeniden oynatılıyor</b>
+  {emoji:🔁} <b>Şimdi yeniden oynatılıyor</b>
 
-  🎵 Başlık: {title}
-  ⏱️ Süre: <code>{duration}</code>
-  ⚙️ Hız: <b>{speed}x</b>
+  {emoji:🎵} Başlık: {title}
+  {emoji:⏱️} Süre: <code>{duration}</code>
+  {emoji:⚙️} Hız: <b>{speed}x</b>
 
 # ▶️ Resume
 resume_already_playing: "ℹ️ <b>Zaten Çalıyor</b>\nMüzik bu sohbette zaten çalıyor.\nDuraklatmak ister misin?"
-resume_failed: "❌ <b>Oynatma Devam Ettirilemedi</b>\nHata: <code>{error}</code>"
+resume_failed: "{emoji:❌} <b>Oynatma Devam Ettirilemedi</b>\nHata: <code>{error}</code>"
 resume_success: |
-  ▶️ <b>Oynatma devam ettiriliyor</b>
+  {emoji:▶️} <b>Oynatma devam ettiriliyor</b>
 
-  🎵 Başlık: {title}
-  📍 Konum: {position} / {duration}
-  👤 Devam Ettiren: {user}
+  {emoji:🎵} Başlık: {title}
+  {emoji:📍} Konum: {position} / {duration}
+  {emoji:👤} Devam Ettiren: {user}
   {speed_line}
 
-restart: "♻️ Yeniden başlatılıyor..."
-restart_exepath_fail: "❌ Çalıştırılabilir dosya yolu alınamadı: {error}"
-restart_symlink_fail: "❌ Çalıştırılabilir dosya yolu çözülemedi: {error}"
+restart: "{emoji:♻️} Yeniden başlatılıyor..."
+restart_exepath_fail: "{emoji:❌} Çalıştırılabilir dosya yolu alınamadı: {error}"
+restart_symlink_fail: "{emoji:❌} Çalıştırılabilir dosya yolu çözülemedi: {error}"
 restart_service: "{bot} az önce yeniden başlatıldı. Sorunlar için üzgünüz.\n\n10–15 saniye sonra tekrar çalmaya başlayabilirsin."
-restart_initiated: "✅ Yeniden başlatma başarıyla başlatıldı!"
-restart_fail: "❌ Yeniden başlatılamadı: {error}"
-restart_confirm_running: "⚠️ Bu sohbette şu anda bir şarkı çalıyor.\nLütfen aşağıdan bir işlem seç."
+restart_initiated: "{emoji:✅} Yeniden başlatma başarıyla başlatıldı!"
+restart_fail: "{emoji:❌} Yeniden başlatılamadı: {error}"
+restart_confirm_running: "{emoji:⚠️} Bu sohbette şu anda bir şarkı çalıyor.\nLütfen aşağıdan bir işlem seç."
 restart_btn_bot: "Botu Yeniden Başlat"
 restart_btn_replay: "Şarkıyı Yeniden Oynat"
 restart_confirm_bot: "♻️ Bot yeniden başlatılıyor..."
@@ -556,7 +556,7 @@ room_no_active: "⚠️ <b>Aktif oynatma yok.</b>\n\n<i>Şu an hiçbir şey çal
 room_already_paused: "⏸️ Parça zaten duraklatılmış. Devam etmek için ▶️ Devam Et düğmesine dokun."
 room_pause_failed: "❌ Oynatma duraklatılamadı.\n\n<i>{error}</i>"
 
-generic_error: "❌ Bir hata oluştu: <code>{error}</code>"
+generic_error: "{emoji:❌} Bir hata oluştu: <code>{error}</code>"
 
 settings_btn_adminmode: "🛡️ Yönetici Modu"
 settings_btn_cmddelete: "🗑️ Komut Silme"
@@ -582,7 +582,7 @@ settings_info_cleanduration: |
 settings_info_cleanmode: |
   Komut ve bot servis mesajlarını kısa bir süre sonra otomatik siler.
   Çalıyor durum mesajları kendi süresi dolana kadar korunur.
-cleanmode_status: "🧹 <b>Temiz Mod</b>\n\nKomut ve servis mesajlarını otomatik temizler.\nMevcut durum: {action}"
+cleanmode_status: "{emoji:🧹} <b>Temiz Mod</b>\n\nKomut ve servis mesajlarını otomatik temizler.\nMevcut durum: {action}"
 cleanmode_hint: "Use /settings to change auto-delete duration."
 
 settings_info_lang: |
@@ -601,7 +601,7 @@ settings_info_playmode: |
   /play komutunu kimlerin kullanabileceğini kontrol eder.
 
 settings_main: |
-  ⚙️ <b>Sohbet Ayarları</b>
+  {emoji:⚙️} <b>Sohbet Ayarları</b>
 
   <b>Grup:</b> {title}
   <b>Grup ID:</b> <code>{id}</code>
@@ -612,47 +612,47 @@ settings_updated: "✅ Ayarlar güncellendi!"
 
 autoplay_no_active: "⚠️ Bot şu anda sesli sohbette yayın yapmıyor. Önce bir şarkı çalın."
 autoplay_menu: |
-  🔁 <b>Otomatik Çalma</b>
+  {emoji:🔁} <b>Otomatik Çalma</b>
 
   Etkinleştirildiğinde, kuyruk bittiğinde bot son çalınan şarkıya benzer önerilen şarkıları otomatik olarak çalmaya devam eder.
 
   <b>Durum:</b> {state}
 
 autoplay_btn: "🔁 Otomatik Çalma: {state}"
-autoplay_enabled: "✅ Otomatik çalma etkinleştirildi!"
-autoplay_disabled: "❌ Otomatik çalma devre dışı!"
+autoplay_enabled: "{emoji:✅} Otomatik çalma etkinleştirildi!"
+autoplay_disabled: "{emoji:❌} Otomatik çalma devre dışı!"
 autoplay_requester: "Otomatik Çalma"
 
-searching: "🔍🎶 Aranıyor... ⚡✨"
-searching_query: "🔍🎶 Aranan: <b>{query}</b>... ⚡✨"
+searching: "{emoji:🔍}{emoji:🎶} Aranıyor... {emoji:⚡}{emoji:✨}"
+searching_query: "{emoji:🔍}{emoji:🎶} Aranan: <b>{query}</b>... {emoji:⚡}{emoji:✨}"
 
-speed_line: "⚙️ Hız: <b>{speed}x</b>"
+speed_line: "{emoji:⚙️} Hız: <b>{speed}x</b>"
 
 stats_overview: |
-  🔧 <b>Sistem:</b><blockquote>
+  {emoji:🔧} <b>Sistem:</b><blockquote>
   • İşletim Sistemi: <code>{os}</code>, Mimari: <code>{arch}</code>
   • İşlemciler: <code>{cpus}</code>, Goroutine Sayısı: <code>{goroutines}</code></blockquote>
 
-  📦 <b>Dahili Bellek (Go):</b><blockquote>
+  {emoji:📦} <b>Dahili Bellek (Go):</b><blockquote>
   • Ayrılan (Alloc): <code>{alloc} MB</code>
   • Sistem (Sys): <code>{sys} MB</code>
   • NumGC: <code>{gc_count}</code> ({gc_emoji} {gc_rate}/dk)</blockquote>
 
-  💻 <b>Sunucu İstatistikleri:</b><blockquote>
+  {emoji:💻} <b>Sunucu İstatistikleri:</b><blockquote>
   • CPU Kullanımı: {cpu_emoji} <code>%{cpu}</code>
   • RAM Kullanımı: {ram_emoji} <code>{ram_used_gib} GiB</code> | <code>{ram_total_gib} GiB</code>
   • Depolama: <code>{storage_used_gib} GiB</code> | <code>{storage_total_gib} GiB</code></blockquote>
 
-  🍃 <b>MongoDB İstatistikleri:</b><blockquote>
+  {emoji:🍃} <b>MongoDB İstatistikleri:</b><blockquote>
   • Depolama: <code>{db_data} / {db_storage} MB</code>
   • Koleksiyonlar: <code>{db_collections}</code>
   • Nesneler: <code>{db_objects}</code></blockquote>
 
-  📊 <b>Hizmet Verilen:</b><blockquote>
+  {emoji:📊} <b>Hizmet Verilen:</b><blockquote>
   • Sohbetler: <code>{served_chats}</code>
   • Kullanıcılar: <code>{served_users}</code></blockquote>
 
-  🧩 <b>Çalışma Zamanı Sürümleri:</b><blockquote>
+  {emoji:🧩} <b>Çalışma Zamanı Sürümleri:</b><blockquote>
   • Go: <code>{go_version}</code>
   • Gogram API Layer: <code>{gogram_api_layer}</code>
   • Gogram Version: <code>{gogram_version}</code>
@@ -660,58 +660,58 @@ stats_overview: |
 
 # 👑 Sudo users
 
-sudo_owner_self: "😂 Haha, zaten patronsun! Neden kendini eklemeye çalışıyorsun ki?"
-sudo_bot_self: "🤖 Haha, ben bir botum! Kendimi sudo listesine ekleyemem — sahibi bile beni kandıramaz 😎"
-sudo_bot_user: "🤖 Sudo listesine bir bot ekleyemezsin — sudo kullanıcıları insan olmalı!"
+sudo_owner_self: "{emoji:😂} Haha, zaten patronsun! Neden kendini eklemeye çalışıyorsun ki?"
+sudo_bot_self: "{emoji:🤖} Haha, ben bir botum! Kendimi sudo listesine ekleyemem — sahibi bile beni kandıramaz {emoji:😎}"
+sudo_bot_user: "{emoji:🤖} Sudo listesine bir bot ekleyemezsin — sudo kullanıcıları insan olmalı!"
 
-sudo_fetch_user_fail: "❌ Kullanıcı bilgileri alınamadı. Belki kullanıcıya erişilemiyordur.\n<i>{error}</i>"
-sudo_check_fail: "❌ Sudo varlığı kontrol edilemedi: <i>{error}</i>"
-sudo_already: "⚠️ {user} kullanıcısı (ID:<code>{id}</code>) zaten bir sudo kullanıcısı."
-sudo_add_fail: "❌ Sudo eklenemedi: <i>{error}</i>"
-sudo_add_success: "✅ {user} (<code>{id}</code>) sudo listesine eklendi."
+sudo_fetch_user_fail: "{emoji:❌} Kullanıcı bilgileri alınamadı. Belki kullanıcıya erişilemiyordur.\n<i>{error}</i>"
+sudo_check_fail: "{emoji:❌} Sudo varlığı kontrol edilemedi: <i>{error}</i>"
+sudo_already: "{emoji:⚠️} {user} kullanıcısı (ID:<code>{id}</code>) zaten bir sudo kullanıcısı."
+sudo_add_fail: "{emoji:❌} Sudo eklenemedi: <i>{error}</i>"
+sudo_add_success: "{emoji:✅} {user} (<code>{id}</code>) sudo listesine eklendi."
 
-sudo_owner_remove_block: "😎 Güzel deneme! Sahibini kaldıramazsın — o dokunulmazdır."
-sudo_not_exists: "⚠️ {user} kullanıcısı (<code>{id}</code>) bir sudo kullanıcısı değil."
-sudo_remove_fail: "❌ Sudo kaldırılamadı: <i>{error}</i>"
-sudo_remove_success: "🗑️ {user} (ID: <code>{id}</code>) sudo listesinden çıkarıldı."
+sudo_owner_remove_block: "{emoji:😎} Güzel deneme! Sahibini kaldıramazsın — o dokunulmazdır."
+sudo_not_exists: "{emoji:⚠️} {user} kullanıcısı (<code>{id}</code>) bir sudo kullanıcısı değil."
+sudo_remove_fail: "{emoji:❌} Sudo kaldırılamadı: <i>{error}</i>"
+sudo_remove_success: "{emoji:🗑️} {user} (ID: <code>{id}</code>) sudo listesinden çıkarıldı."
 
-sudo_list_fetching: "⏳ Sudo listesi getiriliyor..."
-sudo_list_fetch_fail: "❌ Sudo kullanıcıları alınamadı: <code>{error}</code>"
-sudo_list_header: "👑 <b>Mevcut Sudo Kullanıcıları:</b>"
+sudo_list_fetching: "{emoji:⏳} Sudo listesi getiriliyor..."
+sudo_list_fetch_fail: "{emoji:❌} Sudo kullanıcıları alınamadı: <code>{error}</code>"
+sudo_list_header: "{emoji:👑} <b>Mevcut Sudo Kullanıcıları:</b>"
 sudo_list_owner: "{index}. {user} — <b>Sahip</b>"
 sudo_list_entry: "{index}. {user}"
-sudo_list_no_extra: "⚠️ Ek sudo kullanıcısı bulunamadı."
+sudo_list_no_extra: "{emoji:⚠️} Ek sudo kullanıcısı bulunamadı."
 
-seek_no_active: "⚠️ <b>Şu anda çalan bir parça yok.</b>"
-seek_usage: "⚠️ Lütfen saniye belirt.\nÖrnek: <code>{cmd} 40</code>"
-seek_invalid_seconds: "⚠️ Geçersiz saniye değeri.\nÖrnek: <code>{cmd} 40</code>"
-seek_too_close_start: "⚠️ <b>{seconds}</b> saniye geri sarılamaz — parçanın başlangıcına çok yakın."
-seek_too_close_end: "⚠️ <b>{seconds}</b> saniye ileri sarılamaz — parçanın sonuna çok yakın."
-seek_failed: "❌ {direction} yönüne <b>{seconds}</b> saniye sarılamadı.\nHata: <code>{error}</code>"
+seek_no_active: "{emoji:⚠️} <b>Şu anda çalan bir parça yok.</b>"
+seek_usage: "{emoji:⚠️} Lütfen saniye belirt.\nÖrnek: <code>{cmd} 40</code>"
+seek_invalid_seconds: "{emoji:⚠️} Geçersiz saniye değeri.\nÖrnek: <code>{cmd} 40</code>"
+seek_too_close_start: "{emoji:⚠️} <b>{seconds}</b> saniye geri sarılamaz — parçanın başlangıcına çok yakın."
+seek_too_close_end: "{emoji:⚠️} <b>{seconds}</b> saniye ileri sarılamaz — parçanın sonuna çok yakın."
+seek_failed: "{emoji:❌} {direction} yönüne <b>{seconds}</b> saniye sarılamadı.\nHata: <code>{error}</code>"
 seek_success: "{emoji} {direction} yönüne sarılarak <b>{duration}</b> süreli parçanın <b>{position}</b> konumuna gelindi."
 
 stop_confirm_paused: |
-  ⏸️ <b>Oynatma şu an duraklatılmış durumda.</b>
+  {emoji:⏸️} <b>Oynatma şu an duraklatılmış durumda.</b>
 
   Çalmaya devam mı etmek istersin yoksa tamamen durdurmak mı?
 
 stop_confirm_muted: |
-  🔇 <b>Oynatma şu an sessize alınmış durumda.</b>
+  {emoji:🔇} <b>Oynatma şu an sessize alınmış durumda.</b>
 
   Sesi açmak mı istersin yoksa tamamen durdurmak mı?
 
-stopped: "⏹️ <b>Oynatma {user} tarafından durduruldu ve sıra temizlendi.</b>"
+stopped: "{emoji:⏹️} <b>Oynatma {user} tarafından durduruldu ve sıra temizlendi.</b>"
 
-shuffle_current_state: "🔀 Bu sohbet için karıştırma şu an <b>{state}</b>.\n\nDeğiştirmek için <code>{cmd}</code> kullan."
-shuffle_updated: "🔀 Karıştırma, {user} tarafından <b>{state}</b> konumuna getirildi."
+shuffle_current_state: "{emoji:🔀} Bu sohbet için karıştırma şu an <b>{state}</b>.\n\nDeğiştirmek için <code>{cmd}</code> kullan."
+shuffle_updated: "{emoji:🔀} Karıştırma, {user} tarafından <b>{state}</b> konumuna getirildi."
 
-skip_stopped: "⏹️ Oynatma durduruldu. Sıra boş.\nAtlayan: {user}"
-skip_invalid_number: "⚠️ Lütfen /skip komutundan sonra geçerli bir sayı verin.\nÖrnek: <code>/skip 3</code>"
-skip_queue_empty_for_count: "⚠️ Atlanacak sıradaki parça yok."
-skip_count_exceeds_queue: "⚠️ <code>{requested}</code> parça atlamak istediniz, ancak sırada yalnızca <code>{available}</code> parça var."
+skip_stopped: "{emoji:⏹️} Oynatma durduruldu. Sıra boş.\nAtlayan: {user}"
+skip_invalid_number: "{emoji:⚠️} Lütfen /skip komutundan sonra geçerli bir sayı verin.\nÖrnek: <code>/skip 3</code>"
+skip_queue_empty_for_count: "{emoji:⚠️} Atlanacak sıradaki parça yok."
+skip_count_exceeds_queue: "{emoji:⚠️} <code>{requested}</code> parça atlamak istediniz, ancak sırada yalnızca <code>{available}</code> parça var."
 
 speed_usage: |
-  💡 <b>Kullanım:</b>
+  {emoji:💡} <b>Kullanım:</b>
   <code>{cmd} [hız]</code> — oynatma hızını değiştirir
   
   İzin verilen hız aralığı: <b>0.50x → 4.00x</b>
@@ -720,75 +720,75 @@ speed_usage: |
   <code>{cmd} 1.5</code> — 1.5x hızında çal.
   <code>{cmd} normal</code> — normal hıza dön.
 
-speed_current: "🎧 <b>Mevcut Hız:</b> 🎵 <u>{title}</u> için <code>{speed}x</code>\n\n💡 Normal oynatmaya dönmek için <code>{cmd} reset</code> kullan."
+speed_current: "{emoji:🎧} <b>Mevcut Hız:</b> {emoji:🎵} <u>{title}</u> için <code>{speed}x</code>\n\n{emoji:💡} Normal oynatmaya dönmek için <code>{cmd} reset</code> kullan."
 
-speed_invalid_value: "❌ Geçersiz hız değeri.\nÖrnek: <code>{cmd} 1.5</code> veya <code>{cmd} 2x</code>"
-speed_invalid_range: "⚠️ Hız <b>0.50x</b> ile <b>4.00x</b> arasında olmalıdır."
+speed_invalid_value: "{emoji:❌} Geçersiz hız değeri.\nÖrnek: <code>{cmd} 1.5</code> veya <code>{cmd} 2x</code>"
+speed_invalid_range: "{emoji:⚠️} Hız <b>0.50x</b> ile <b>4.00x</b> arasında olmalıdır."
 
-speed_already_set: "ℹ️ 🎵 <b>{title}</b> için oynatma hızı zaten <b>{speed}x</b>"
+speed_already_set: "ℹ️ {emoji:🎵} <b>{title}</b> için oynatma hızı zaten <b>{speed}x</b>"
 
 speed_failed: |
-  ❌ Hız <b>{speed}x</b> olarak değiştirilemedi.
+  {emoji:❌} Hız <b>{speed}x</b> olarak değiştirilemedi.
   Hata: <code>{error}</code>
 
-speed_reset_success: "✅ Oynatma hızı {user} tarafından <b>1.0x</b> olarak sıfırlandı."
+speed_reset_success: "{emoji:✅} Oynatma hızı {user} tarafından <b>1.0x</b> olarak sıfırlandı."
 
-speed_set: "🚀 Oynatma hızı {user} tarafından <b>{speed}x</b> olarak ayarlandı."
+speed_set: "{emoji:🚀} Oynatma hızı {user} tarafından <b>{speed}x</b> olarak ayarlandı."
 
-start_private: "Merhaba {user}, Benim adım {bot}.\n\nBen bazı kullanışlı özelliklere sahip bir Telegram akış botuyum. Youtube, Spotify, JioSaavn, Soundcloud vb. platformları destekliyorum.\n\nBeni gruplarına eklemekten çekinme. {emoji:thumbs_up}"
+start_private: "Merhaba {user}, Benim adım {bot}.\n\nBen bazı kullanışlı özelliklere sahip bir Telegram akış botuyum. Youtube, Spotify, JioSaavn, Soundcloud vb. platformları destekliyorum.\n\nBeni gruplarına eklemekten çekinme. {emoji:👍}"
 
-start_group: "<b>💫 Buradayım!</b> Bir komut dene... Tabi benimle başa çıkabileceğini düşünüyorsan 😉"
+start_group: "<b>{emoji:💫} Buradayım!</b> Bir komut dene... Tabi benimle başa çıkabileceğini düşünüyorsan {emoji:😉}"
 
-stream_queue_finished: "🎵 <b>Sıra Bitti!</b>\n\nÇalacak başka şarkı kalmadı. Daha fazla parça eklemek için /play kullan! 🎶"
-stream_downloading_next: "📥 Sonraki parçan indiriliyor..."
-stream_autoplay_next: "🔁 Otomatik Çalma: <b>{title}</b>"
-stream_download_fail: "❌ İndirme başarısız.\nHata: <code>{error}</code>"
+stream_queue_finished: "{emoji:🎵} <b>Sıra Bitti!</b>\n\nÇalacak başka şarkı kalmadı. Daha fazla parça eklemek için /play kullan! {emoji:🎶}"
+stream_downloading_next: "{emoji:📥} Sonraki parçan indiriliyor..."
+stream_autoplay_next: "{emoji:🔁} Otomatik Çalma: <b>{title}</b>"
+stream_download_fail: "{emoji:❌} İndirme başarısız.\nHata: <code>{error}</code>"
 download_progress: |
-  📥 Parcan indiriliyor...
+  {emoji:📥} Parcan indiriliyor...
 
   <b>İlerleme:</b> {percentage}%
   <b>Hız:</b> {speed}
   <b>Kalan Süre:</b> {eta}
   <b>Geçen Süre:</b> {elapsed}
-stream_play_fail: "❌ Şarkı oynatılamadı."
+stream_play_fail: "{emoji:❌} Şarkı oynatılamadı."
 stream_now_playing: |
-  <b>🎵 Şimdi Çalıyor:</b>
+  <b>{emoji:🎵} Şimdi Çalıyor:</b>
 
   <b>▫ Parça:</b> <a href="{url}">{title}</a>
   <b>▫ Süre:</b> {duration}
   <b>▫ İsteyen:</b> {by}
 
 # 👑 Sudo / Owner Join Messages
-sudo_join_owner: "👑 {bot} sahibi — {user} — az önce sohbete katıldı."
-sudo_join_sudo: "🛡️ {bot} sudo kullanıcısı — {user} — az önce sohbete katıldı."
+sudo_join_owner: "{emoji:👑} {bot} sahibi — {user} — az önce sohbete katıldı."
+sudo_join_sudo: "{emoji:🛡️} {bot} sudo kullanıcısı — {user} — az önce sohbete katıldı."
 
 supergroup_needed: |
   Bu sohbet (ID: <code>{chat_id}</code>) henüz bir SuperGroup değil.
 
-  <i>⚠️ Lütfen bu grubu SuperGroup'a dönüştür, sonra beni tekrar yönetici olarak ekle.</i>
+  <i>{emoji:⚠️} Lütfen bu grubu SuperGroup'a dönüştür, sonra beni tekrar yönetici olarak ekle.</i>
 
   <b>Nasıl dönüştürülür?</b>
-  <a href="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">🔗 Rehbere git</a>
+  <a href="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">{emoji:🔗} Rehbere git</a>
 
   Hâlâ sorun yaşıyorsan <a href="{support_group}">destek grubumuza</a> katıl.
 
 unmute_already: "ℹ️ <b>Zaten Sesi Açık</b>\nMüzik bu sohbette sessize alınmamış."
 unmute_failed: "❌ <b>Oynatma Sesi Açılamadı</b>\nHata: <code>{error}</code>"
 unmute_success: |
-  🔊 <b>Oynatma sesi açıldı</b>
+  {emoji:🔊} <b>Oynatma sesi açıldı</b>
 
-  🎵 Parça: {title}
-  👤 Sesi Açan: {user}
+  {emoji:🎵} Parça: {title}
+  {emoji:👤} Sesi Açan: {user}
   {speed_line}
 
 
 # 🔊 Sesli Sohbet Etkinlikleri
-voicechat_ended: "<b>⚠️ Görüntülü sohbet sona erdi</b>\n\n<i>⏰ Süre: {duration}</i>"
-voicechat_started: "<b>♻️ Sesli sohbet başladı!</b>\n\n<i>Müzik çalmak için /play [şarkı adı] kullan.</i>"
+voicechat_ended: "<b>{emoji:⚠️} Görüntülü sohbet sona erdi</b>\n\n<i>{emoji:⏰} Süre: {duration}</i>"
+voicechat_started: "<b>{emoji:♻️} Sesli sohbet başladı!</b>\n\n<i>Müzik çalmak için /play [şarkı adı] kullan.</i>"
 
 # Commands help
 help_owner: |
-  👑 <b>Sahip Komutları</b>
+  {emoji:👑} <b>Sahip Komutları</b>
 
   <i>Sudo kullanıcılarını yönetmek, sistem kodu yürütmek ve bot yönetimini güvenli bir şekilde gerçekleştirmek için özel araçlar.</i>
 
@@ -808,7 +808,7 @@ help_owner: |
   </blockquote>
 
 help_sudo: |
-  ⚡ <b>Sudo Komutları</b>
+  {emoji:⚡} <b>Sudo Komutları</b>
 
   <i>Bot davranışını yönetmek, performansı izlemek, günlükleri ve otomasyonu kontrol etmek için gelişmiş araçlar.</i>
 
@@ -822,7 +822,7 @@ help_sudo: |
   </blockquote>
 
 help_admin: |
-  🛠 <b>Yönetici Komutları</b>
+  {emoji:🛠} <b>Yönetici Komutları</b>
 
   <i>Yöneticilerin oynatmayı kolayca yönetmesi için müzik ve oynatma kontrol araçları.</i>
 
@@ -853,7 +853,7 @@ help_admin: |
   </blockquote>
   
 help_public: |
-  🌍 <b>Genel Komutlar</b>
+  {emoji:🌍} <b>Genel Komutlar</b>
 
   <i>Şarkı çalma, sıraları görüntüleme, gecikme kontrolü ve hata bildirme özellikleri.</i>
 

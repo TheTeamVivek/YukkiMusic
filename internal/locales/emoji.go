@@ -19,17 +19,90 @@ package locales
 
 import "strings"
 
-// Emoji tokens that can be used inside any locale template as {emoji:<name>}.
-// Premium emojis use Telegram's custom emoji tag: the <tg-emoji> entity renders
-// the custom emoji when the sender has Telegram Premium, otherwise the emoji
-// character inside the tag is shown as a fallback. The tag is language
-// independent, so tokens expand identically for every locale.
+// Emoji tokens that can be used inside any locale template as {emoji:<emoji>}.
+// A token whose mapped value is empty expands to the bare emoji character;
+// special tokens (premium/custom emoji) carry their Telegram entity id and the
+// <tg-emoji> tag is assembled in expandEmojis. The tag is language independent,
+// so tokens expand identically for every locale.
 var emojiTokens = map[string]string{
-	"{emoji:thumbs_up}": `<tg-emoji emoji-id="5368324170671202286">👍</tg-emoji>`,
+	"{emoji:⏩}":    "",
+	"{emoji:⏭️}":   "",
+	"{emoji:⏰}":    "",
+	"{emoji:⏱}":    "",
+	"{emoji:⏱️}":   "",
+	"{emoji:⏳}":    "",
+	"{emoji:⏸️}":   "",
+	"{emoji:⏹️}":   "",
+	"{emoji:▶️}":   "",
+	"{emoji:♻️}":   "",
+	"{emoji:⚙️}":   "",
+	"{emoji:⚠️}":   "",
+	"{emoji:⚡}":    "",
+	"{emoji:⚪}":    "",
+	"{emoji:✅}":    "",
+	"{emoji:✨}":    "",
+	"{emoji:❌}":    "",
+	"{emoji:➕}":    "",
+	"{emoji:➡️}":   "",
+	"{emoji:🌍}":    "",
+	"{emoji:🌐}":    "",
+	"{emoji:🍃}":    "",
+	"{emoji:🎙️}":   "",
+	"{emoji:🎧}":    "",
+	"{emoji:🎵}":    "",
+	"{emoji:🎶}":    "",
+	"{emoji:🏃‍♂️}": "",
+	"{emoji:🏓}":    "",
+	"{emoji:👋}":    "",
+	"{emoji:👍}":    "5368324170671202286",
+	"{emoji:👑}":    "",
+	"{emoji:👤}":    "",
+	"{emoji:👥}":    "",
+	"{emoji:💡}":    "",
+	"{emoji:💫}":    "",
+	"{emoji:💬}":    "",
+	"{emoji:💻}":    "",
+	"{emoji:📊}":    "",
+	"{emoji:📌}":    "",
+	"{emoji:📍}":    "",
+	"{emoji:📚}":    "",
+	"{emoji:📛}":    "",
+	"{emoji:📜}":    "",
+	"{emoji:📝}":    "",
+	"{emoji:📡}":    "",
+	"{emoji:📥}":    "",
+	"{emoji:📦}":    "",
+	"{emoji:📭}":    "",
+	"{emoji:🔀}":    "",
+	"{emoji:🔁}":    "",
+	"{emoji:🔇}":    "",
+	"{emoji:🔊}":    "",
+	"{emoji:🔍}":    "",
+	"{emoji:🔗}":    "",
+	"{emoji:🔧}":    "",
+	"{emoji:🔴}":    "",
+	"{emoji:🖼️}":   "",
+	"{emoji:🗑️}":   "",
+	"{emoji:😂}":    "",
+	"{emoji:😉}":    "",
+	"{emoji:😎}":    "",
+	"{emoji:🚀}":    "",
+	"{emoji:🚫}":    "",
+	"{emoji:🛠}":    "",
+	"{emoji:🛠️}":   "",
+	"{emoji:🛡️}":   "",
+	"{emoji:🟢}":    "",
+	"{emoji:🤖}":    "",
+	"{emoji:🧩}":    "",
+	"{emoji:🧹}":    "",
 }
 
 func expandEmojis(s string) string {
-	for token, emoji := range emojiTokens {
+	for token, emojiID := range emojiTokens {
+		emoji := strings.TrimSuffix(strings.TrimPrefix(token, "{emoji:"), "}")
+		if emojiID != "" {
+			emoji = `<tg-emoji emoji-id="` + emojiID + `">` + emoji + `</tg-emoji>`
+		}
 		s = strings.ReplaceAll(s, token, emoji)
 	}
 	return s

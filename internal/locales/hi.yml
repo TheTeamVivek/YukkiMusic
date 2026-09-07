@@ -24,109 +24,109 @@ HELP_SUDOERS_BTN: "⚡ विशेषाधिकारी"
 BACK_BTN: "⬅️ पीछे"
 
 # basically this string used in /command [bool]
-invalid_bool: "⚠️ <b>अमान्य मान।</b>\n\n<i>कृपया '<code>enable</code>' अथवा '<code>disable</code>' का प्रयोग करें।</i>"
+invalid_bool: "{emoji:⚠️} <b>अमान्य मान।</b>\n\n<i>कृपया '<code>enable</code>' अथवा '<code>disable</code>' का प्रयोग करें।</i>"
 
 adminmode_help: |
-  🛡️ <b>प्रशासकीय आदेश विधा</b>
+  {emoji:🛡️} <b>प्रशासकीय आदेश विधा</b>
 
   <b>स्थिति:</b> {status}
   <b>प्रयोग:</b> <code>/adminmode [admin|adminauth|everyone]</code>
 adminmode_status_admin: "प्रशासक 🔐"
 adminmode_status_adminauth: "अधिकृत उपयोगकर्ता 🎧"
 adminmode_status_everyone: "प्रत्येक व्यक्ति 🌍"
-adminmode_updated: "✅ <b>प्रशासकीय आदेश विधा</b> अद्यतन की गई: {status}"
-adminmode_invalid: "⚠️ अमान्य विधा। प्रयोग करें: <code>admin</code>, <code>adminauth</code>, अथवा <code>everyone</code>।"
+adminmode_updated: "{emoji:✅} <b>प्रशासकीय आदेश विधा</b> अद्यतन की गई: {status}"
+adminmode_invalid: "{emoji:⚠️} अमान्य विधा। प्रयोग करें: <code>admin</code>, <code>adminauth</code>, अथवा <code>everyone</code>।"
 
 # 🚫 Assistant Restricted / Banned
 assistant_restricted_warning: |
-  ⚠️ <b>सहायक प्रतिबन्धित</b>
+  {emoji:⚠️} <b>सहायक प्रतिबन्धित</b>
 
   सहायक {assistant} (परिचय पत्र: <code>{id}</code>) इस वार्तालाप में <b>वर्जित</b> या प्रतिबन्धित कर दिया गया है।
   जब तक यह स्थिति बनी रहेगी, मैं संगीत नहीं चला सकता, प्रतीक्षा सूची का प्रबन्धन नहीं कर सकता, या संगीत संचिकाओं को हटा नहीं सकता।
 
-  <i>संगीत की समस्त सुविधाओं को पुनर्स्थापित करने के लिए सहायक को वर्जित सूची से हटाएँ 🎵</i>
+  <i>संगीत की समस्त सुविधाओं को पुनर्स्थापित करने के लिए सहायक को वर्जित सूची से हटाएँ {emoji:🎵}</i>
 
 # 🧩 Common auth messages
-auth_no_user: "⚠️ कृपया एक उपयोगकर्ता प्रदान करें — प्रयोग करें:\n{cmd} [उपयोगकर्ता_परिचय_पत्र] या किसी उपयोगकर्ता के सन्देश के उत्तर में {cmd} का प्रयोग करें।"
-user_extract_fail: "⚠️ उस उपयोगकर्ता को प्राप्त करने में असमर्थ: <i>{error}</i>"
-auth_limit_reached: "⚠️ इस वार्तालाप ने अधिकतम अधिकृत उपयोगकर्ता सीमा ({limit}) प्राप्त कर ली है। कृपया नया जोड़ने से पूर्व किसी को हटाएँ।"
-already_authed: "⚠️ वह उपयोगकर्ता पूर्व से ही अधिकृत है — पुनः जोड़ने की आवश्यकता नहीं है।"
+auth_no_user: "{emoji:⚠️} कृपया एक उपयोगकर्ता प्रदान करें — प्रयोग करें:\n{cmd} [उपयोगकर्ता_परिचय_पत्र] या किसी उपयोगकर्ता के सन्देश के उत्तर में {cmd} का प्रयोग करें।"
+user_extract_fail: "{emoji:⚠️} उस उपयोगकर्ता को प्राप्त करने में असमर्थ: <i>{error}</i>"
+auth_limit_reached: "{emoji:⚠️} इस वार्तालाप ने अधिकतम अधिकृत उपयोगकर्ता सीमा ({limit}) प्राप्त कर ली है। कृपया नया जोड़ने से पूर्व किसी को हटाएँ।"
+already_authed: "{emoji:⚠️} वह उपयोगकर्ता पूर्व से ही अधिकृत है — पुनः जोड़ने की आवश्यकता नहीं है।"
 
 # 🤖 Add auth
-cannot_authorize_user: "⚠️ इस उपयोगकर्ता को अधिकृत नहीं किया जा सकता।\nबोट के स्वामी, स्वयं सहायक, या आपको अधिकार की आवश्यकता नहीं है।"
-addauth_user_is_admin: "⚠️ यह उपयोगकर्ता पूर्व से ही समूह का प्रशासक है। किसी अधिकार की आवश्यकता नहीं है।"
-addauth_bot_user: "🤖 आप एक बोट को अधिकार सूची में नहीं जोड़ सकते — अधिकृत उपयोगकर्ता मनुष्य होने चाहिए!"
-addauth_add_fail: "❌ अधिकृत उपयोगकर्ता को जोड़ने में विफल: {error}"
-addauth_success_with_count: "✅ {user} को जोड़ा गया।\nअब {count}/{limit} अधिकृत उपयोगकर्ता।"
-addauth_success: "✅ {user} को अधिकृत उपयोगकर्ताओं की सूची में सफलतापूर्वक जोड़ा गया।"
+cannot_authorize_user: "{emoji:⚠️} इस उपयोगकर्ता को अधिकृत नहीं किया जा सकता।\nबोट के स्वामी, स्वयं सहायक, या आपको अधिकार की आवश्यकता नहीं है।"
+addauth_user_is_admin: "{emoji:⚠️} यह उपयोगकर्ता पूर्व से ही समूह का प्रशासक है। किसी अधिकार की आवश्यकता नहीं है।"
+addauth_bot_user: "{emoji:🤖} आप एक बोट को अधिकार सूची में नहीं जोड़ सकते — अधिकृत उपयोगकर्ता मनुष्य होने चाहिए!"
+addauth_add_fail: "{emoji:❌} अधिकृत उपयोगकर्ता को जोड़ने में विफल: {error}"
+addauth_success_with_count: "{emoji:✅} {user} को जोड़ा गया।\nअब {count}/{limit} अधिकृत उपयोगकर्ता।"
+addauth_success: "{emoji:✅} {user} को अधिकृत उपयोगकर्ताओं की सूची में सफलतापूर्वक जोड़ा गया।"
 
 # 🤖 Bot Added to Chat
-bot_added_normal: "🎵 मुझे जोड़ने के लिए धन्यवाद! संगीत आरम्भ करने के लिए /play [गीत] का प्रयोग करें।"
+bot_added_normal: "{emoji:🎵} मुझे जोड़ने के लिए धन्यवाद! संगीत आरम्भ करने के लिए /play [गीत] का प्रयोग करें।"
 
 # ⚠️ Bot Demotion
 bot_demotion_goodbye: |
-  <b>⚠️ अनुमति लुप्त</b>
+  <b>{emoji:⚠️} अनुमति लुप्त</b>
 
   मुझे <b>प्रशासक पद से हटा</b> दिया गया है और अब मैं अपने कर्तव्यों का पालन नहीं कर सकता।
   उचित अधिकारों के बिना, मैं यहाँ कार्य करने में अक्षम हूँ, अतः मैं अब यह <i>वार्तालाप छोड़ रहा हूँ</i>।
 
-  <b>अलविदा 👋</b>
+  <b>अलविदा {emoji:👋}</b>
 
-broadcast_already_running: "⚠️ एक प्रसारण पूर्व से ही चल रहा है।\n\nकृपया इसके पूर्ण होने की प्रतीक्षा करें या इसे पहले निम्न माध्यम से रद्द करें:\n• <code>/broadcast -cancel</code>\n• अथवा प्रगति सन्देश पर 'प्रसारण रद्द करें' बटन दबाएँ"
-broadcast_parse_failed: "❌ प्रसारण आदेश के विश्लेषण में विफल:\n<code>{error}</code>"
-broadcast_no_content: "⚠️ प्रसारण के लिए कोई सामग्री प्रदान नहीं की गई।\n\n<b>प्रयोग:</b> <code>{cmd} [पाठ या सन्देश का उत्तर दें]</code>\n\n<b>उदाहरण:</b>\n<code>{cmd} नमस्कार सभी को!</code>"
-broadcast_fetch_chats_failed: "❌ सेवा प्राप्त वार्तालापों को प्राप्त करने में विफल:\n<code>{error}</code>"
-broadcast_fetch_users_failed: "❌ सेवा प्राप्त उपयोगकर्ताओं को प्राप्त करने में विफल:\n<code>{error}</code>"
-broadcast_no_targets: "⚠️ प्रसारण के लिए कोई लक्ष्य नहीं मिला।\n\nसुनिश्चित करें कि आपने संकेतों द्वारा सभी लक्ष्यों को वर्जित नहीं किया है।"
-broadcast_initializing: "📡 प्रसारण आरम्भ किया जा रहा है...\n\nकृपया प्रतीक्षा करें..."
-broadcast_progress_header: "📡 प्रसारण हो रहा है..."
-broadcast_total_chats: "📊 कुल वार्तालाप: {done}/{total} ({progress}%)"
-broadcast_total_users: "👥 कुल उपयोगकर्ता: {done}/{total} ({progress}%)"
-broadcast_failed_chats: "❌ विफल वार्तालाप: {count}"
-broadcast_failed_users: "❌ विफल उपयोगकर्ता: {count}"
-broadcast_delay: "⏱ विलम्ब: {delay}s"
-broadcast_elapsed: "⏰ व्यतीत समय: {elapsed}"
-broadcast_eta: "⏳ अनुमानित समय: {eta}"
-broadcast_success_rate: "✨ सफलता दर: {rate}% ({sent}/{total})"
+broadcast_already_running: "{emoji:⚠️} एक प्रसारण पूर्व से ही चल रहा है।\n\nकृपया इसके पूर्ण होने की प्रतीक्षा करें या इसे पहले निम्न माध्यम से रद्द करें:\n• <code>/broadcast -cancel</code>\n• अथवा प्रगति सन्देश पर 'प्रसारण रद्द करें' बटन दबाएँ"
+broadcast_parse_failed: "{emoji:❌} प्रसारण आदेश के विश्लेषण में विफल:\n<code>{error}</code>"
+broadcast_no_content: "{emoji:⚠️} प्रसारण के लिए कोई सामग्री प्रदान नहीं की गई।\n\n<b>प्रयोग:</b> <code>{cmd} [पाठ या सन्देश का उत्तर दें]</code>\n\n<b>उदाहरण:</b>\n<code>{cmd} नमस्कार सभी को!</code>"
+broadcast_fetch_chats_failed: "{emoji:❌} सेवा प्राप्त वार्तालापों को प्राप्त करने में विफल:\n<code>{error}</code>"
+broadcast_fetch_users_failed: "{emoji:❌} सेवा प्राप्त उपयोगकर्ताओं को प्राप्त करने में विफल:\n<code>{error}</code>"
+broadcast_no_targets: "{emoji:⚠️} प्रसारण के लिए कोई लक्ष्य नहीं मिला।\n\nसुनिश्चित करें कि आपने संकेतों द्वारा सभी लक्ष्यों को वर्जित नहीं किया है।"
+broadcast_initializing: "{emoji:📡} प्रसारण आरम्भ किया जा रहा है...\n\nकृपया प्रतीक्षा करें..."
+broadcast_progress_header: "{emoji:📡} प्रसारण हो रहा है..."
+broadcast_total_chats: "{emoji:📊} कुल वार्तालाप: {done}/{total} ({progress}%)"
+broadcast_total_users: "{emoji:👥} कुल उपयोगकर्ता: {done}/{total} ({progress}%)"
+broadcast_failed_chats: "{emoji:❌} विफल वार्तालाप: {count}"
+broadcast_failed_users: "{emoji:❌} विफल उपयोगकर्ता: {count}"
+broadcast_delay: "{emoji:⏱} विलम्ब: {delay}s"
+broadcast_elapsed: "{emoji:⏰} व्यतीत समय: {elapsed}"
+broadcast_eta: "{emoji:⏳} अनुमानित समय: {eta}"
+broadcast_success_rate: "{emoji:✨} सफलता दर: {rate}% ({sent}/{total})"
 broadcast_not_running: "ℹ️ वर्तमान में कोई प्रसारण नहीं चल रहा है।"
-broadcast_cancel_success: "🚫 प्रसारण सफलतापूर्वक रद्द किया गया।"
+broadcast_cancel_success: "{emoji:🚫} प्रसारण सफलतापूर्वक रद्द किया गया।"
 broadcast_cancel_owner_only: "⚠️ केवल स्वामी ही प्रसारण रद्द कर सकता है।"
 broadcast_cancel_none_running: "ℹ️ वर्तमान में कोई प्रसारण नहीं चल रहा है।"
 broadcast_cancel_done: "🚫 प्रसारण रद्द कर दिया गया।"
 
 # Blocklist
-blacklist_chat_blocked: "🚫 यह चैट इस बॉट का उपयोग करने से ब्लॉक है।"
-blacklist_owner_blocked_leave: "🚫 इस चैट का स्वामी बॉट का उपयोग करने से ब्लॉक है। मैं चैट छोड़ रहा हूँ।"
-blacklist_user_blocked: "🚫 आप इस बॉट का उपयोग करने से ब्लॉक हैं।"
+blacklist_chat_blocked: "{emoji:🚫} यह चैट इस बॉट का उपयोग करने से ब्लॉक है।"
+blacklist_owner_blocked_leave: "{emoji:🚫} इस चैट का स्वामी बॉट का उपयोग करने से ब्लॉक है। मैं चैट छोड़ रहा हूँ।"
+blacklist_user_blocked: "{emoji:🚫} आप इस बॉट का उपयोग करने से ब्लॉक हैं।"
 blacklist_usage_blockchat: "उपयोग: <code>/blockchat [chat_id|@username]</code>"
 blacklist_usage_unblockchat: "उपयोग: <code>/unblockchat [chat_id|@username]</code>"
 blacklist_invalid_chat_identifier: "अमान्य चैट पहचानकर्ता: {error}"
-blacklist_block_user_success: "✅ उपयोगकर्ता ब्लॉक किया गया: <code>{id}</code>"
-blacklist_unblock_user_success: "✅ उपयोगकर्ता अनब्लॉक किया गया: <code>{id}</code>"
-blacklist_block_chat_success: "✅ चैट ब्लॉक की गई: <code>{id}</code>"
-blacklist_unblock_chat_success: "✅ चैट अनब्लॉक की गई: <code>{id}</code>"
-blacklist_unblock_user_fail: "⚠️ उपयोगकर्ता को अनब्लॉक करने में विफल: {error}"
-blacklist_unblock_chat_fail: "⚠️ चैट को अनब्लॉक करने में विफल: {error}"
-blacklist_fetch_chats_fail: "⚠️ ब्लॉक की गई चैट्स प्राप्त करने में विफल: {error}"
-blacklist_fetch_users_fail: "⚠️ ब्लॉक किए गए उपयोगकर्ताओं को प्राप्त करने में विफल: {error}"
-blacklist_list_title: "📛 <b>ब्लॉक सूची</b>"
-blacklist_list_chats: "💬 <b>चैट्स:</b>"
-blacklist_list_users: "👤 <b>उपयोगकर्ता:</b>"
+blacklist_block_user_success: "{emoji:✅} उपयोगकर्ता ब्लॉक किया गया: <code>{id}</code>"
+blacklist_unblock_user_success: "{emoji:✅} उपयोगकर्ता अनब्लॉक किया गया: <code>{id}</code>"
+blacklist_block_chat_success: "{emoji:✅} चैट ब्लॉक की गई: <code>{id}</code>"
+blacklist_unblock_chat_success: "{emoji:✅} चैट अनब्लॉक की गई: <code>{id}</code>"
+blacklist_unblock_user_fail: "{emoji:⚠️} उपयोगकर्ता को अनब्लॉक करने में विफल: {error}"
+blacklist_unblock_chat_fail: "{emoji:⚠️} चैट को अनब्लॉक करने में विफल: {error}"
+blacklist_fetch_chats_fail: "{emoji:⚠️} ब्लॉक की गई चैट्स प्राप्त करने में विफल: {error}"
+blacklist_fetch_users_fail: "{emoji:⚠️} ब्लॉक किए गए उपयोगकर्ताओं को प्राप्त करने में विफल: {error}"
+blacklist_list_title: "{emoji:📛} <b>ब्लॉक सूची</b>"
+blacklist_list_chats: "{emoji:💬} <b>चैट्स:</b>"
+blacklist_list_users: "{emoji:👤} <b>उपयोगकर्ता:</b>"
 
 # 🎧 CPlay (Channel Play)
 
-cplay_id_not_set: "⚠️ चैनल प्ले निर्धारित नहीं है।\nइसे निर्धारित करने के लिए <code>/setcplay [channel_id]</code> का प्रयोग करें।"
+cplay_id_not_set: "{emoji:⚠️} चैनल प्ले निर्धारित नहीं है।\nइसे निर्धारित करने के लिए <code>/setcplay [channel_id]</code> का प्रयोग करें।"
 cplay_usage: "<b>प्रयोग:</b> <code>/setcplay [channel_id]</code>"
 cplay_resolve_peer_fail: "<b>चैनल जानकारी प्राप्त करने में विफल:</b> चैनल विवरण प्राप्त नहीं किया जा सका। सुनिश्चित करें कि मेरी इस चैनल तक पहुँच है।"
 cplay_invalid_target: "<b>अमान्य लक्ष्य:</b> प्रदान किया गया परिचय पत्र एक मान्य चैनल नहीं है।"
 cplay_channel_not_accessible: "<b>चैनल तक पहुँच नहीं:</b> चैनल की सूचना प्राप्त नहीं की जा सकी। कृपया सुनिश्चित करें कि मैं लक्ष्य चैनल में एक प्रशासक हूँ।"
-cplay_bot_invite_permission_missing: "⚠️ <b>अनुमति अनुपलब्ध:</b> मैं लक्ष्य चैनल में एडमिन हूँ, लेकिन <code>Invite Users</code> अनुमति बंद है। कृपया इसे सक्षम करके फिर प्रयास करें।"
-cplay_channel_not_linked: "⚠️ <b>लिंक्ड चैनल नहीं मिला:</b> यह चैट किसी चैनल/समूह से जुड़ी नहीं है।"
+cplay_bot_invite_permission_missing: "{emoji:⚠️} <b>अनुमति अनुपलब्ध:</b> मैं लक्ष्य चैनल में एडमिन हूँ, लेकिन <code>Invite Users</code> अनुमति बंद है। कृपया इसे सक्षम करके फिर प्रयास करें।"
+cplay_channel_not_linked: "{emoji:⚠️} <b>लिंक्ड चैनल नहीं मिला:</b> यह चैट किसी चैनल/समूह से जुड़ी नहीं है।"
 cplay_save_error: "<b>त्रुटि:</b> चैनल प्ले विन्यास सुरक्षित करने में विफल।"
-cplay_owner_required: "⚠️ यह सेटअप केवल इस चैट के स्वामी या लक्ष्य चैनल के स्वामी द्वारा किया जा सकता है।"
-cplay_owner_check_failed: "⚠️ अभी स्वामित्व सत्यापित नहीं हो सका। कृपया पुनः प्रयास करें।"
-cplay_disabled: "✅ <b>चैनल प्ले अक्षम।</b> इस चैट के लिए चैनल-प्ले आदेश (जैसे <code>/cplay</code>, <code>/cskip</code>) अब बंद हैं।"
-cplay_enabled: "✅ <b>चैनल प्ले सक्षम।</b> अब समस्त चैनल-प्ले आदेश (जैसे <code>/cplay</code>, <code>/cskip</code>) चैनल <code>{channel_id}</code> में कार्य करेंगे।"
+cplay_owner_required: "{emoji:⚠️} यह सेटअप केवल इस चैट के स्वामी या लक्ष्य चैनल के स्वामी द्वारा किया जा सकता है।"
+cplay_owner_check_failed: "{emoji:⚠️} अभी स्वामित्व सत्यापित नहीं हो सका। कृपया पुनः प्रयास करें।"
+cplay_disabled: "{emoji:✅} <b>चैनल प्ले अक्षम।</b> इस चैट के लिए चैनल-प्ले आदेश (जैसे <code>/cplay</code>, <code>/cskip</code>) अब बंद हैं।"
+cplay_enabled: "{emoji:✅} <b>चैनल प्ले सक्षम।</b> अब समस्त चैनल-प्ले आदेश (जैसे <code>/cplay</code>, <code>/cskip</code>) चैनल <code>{channel_id}</code> में कार्य करेंगे।"
 
 # Callback handler messages
 invalid_request: "⚠️ अमान्य अनुरोध।"
@@ -137,7 +137,7 @@ no_download_to_cancel: "ℹ️ रद्द करने के लिए को
 # Pause callback
 cb_pause_success: "⏸️ संगीत {position} पर रोका गया"
 cb_pause_message: |
-  <b>⏸️ संगीत विराम</b>
+  <b>{emoji:⏸️} संगीत विराम</b>
 
   <b>▫ संगीत:</b> <a href="{url}">{title}</a>
   <b>▫ स्थिति:</b> {position} / {duration}
@@ -148,24 +148,24 @@ cb_already_playing: "ℹ️ संगीत पूर्व से ही चल
 cb_resume_failed: "❌ संगीत पुनः आरम्भ करने में विफल।"
 cb_resume_success: "▶️ {position} पर पुनः आरम्भ।"
 cb_resume_message: |
-  <b>🎵 अब चल रहा है:</b>
+  <b>{emoji:🎵} अब चल रहा है:</b>
 
   <b>▫ संगीत:</b> <a href="{url}">{title}</a>
   <b>▫ अवधि:</b> {duration}
   <b>▫ पुनः आरम्भकर्ता:</b> {user}
 
 # Replay status (loop replay)
-cb_replaying: "🔁 <b>वर्तमान संगीत पुनः चलाया जा रहा है...</b>"
+cb_replaying: "{emoji:🔁} <b>वर्तमान संगीत पुनः चलाया जा रहा है...</b>"
 cb_replay_failed: "❌ संगीत पुनः चलाने में विफल।"
 cb_replay_success: "🔁 संगीत पुनः चलाया गया।"
-cb_replay_edited: "🔁 संगीत {user} द्वारा पुनः चलाया गया।"
+cb_replay_edited: "{emoji:🔁} संगीत {user} द्वारा पुनः चलाया गया।"
 
 # Skip callback
 cb_skip_queue_empty: "⏹️ संगीत बन्द — प्रतीक्षा सूची रिक्त है।"
 cb_skip_download_failed: "❌ अगला संगीत डाउनलोड करने में विफल।"
 cb_skip_play_failed: "❌ अगला संगीत चलाने में विफल।"
 cb_skip_success: "⏭️ संगीत छोड़ दिया गया।"
-cb_skip_edited: "⏭️ {user} द्वारा छोड़ा गया"
+cb_skip_edited: "{emoji:⏭️} {user} द्वारा छोड़ा गया"
 
 # Stop callback
 cb_stop_success: "⏹️ संगीत बन्द।"
@@ -173,7 +173,7 @@ cb_stop_success: "⏹️ संगीत बन्द।"
 # Mute/Unmute callback
 cb_mute_success: "🔇 निःशब्द किया गया।"
 cb_mute_message: |
-  <b>🔇 संगीत निःशब्द</b>
+  <b>{emoji:🔇} संगीत निःशब्द</b>
 
   <b>▫ संगीत:</b> <a href="{url}">{title}</a>
   <b>▫ निःशब्दकर्ता:</b> {user}
@@ -181,120 +181,120 @@ cb_mute_message: |
 cb_unmute_success: "🔊 सशब्द किया गया।"
 
 # 🗑️ Delete auth
-del_auth_not_authorized: "⚠️ वह उपयोगकर्ता अधिकृत नहीं है — हटाने के लिए कुछ भी नहीं है।"
-del_auth_remove_fail: "❌ अधिकृत उपयोगकर्ता को हटाने में विफल: <code>{error}</code>"
-del_auth_success: "✅ {user} को अधिकृत उपयोगकर्ताओं की सूची से सफलतापूर्वक हटाया गया।"
+del_auth_not_authorized: "{emoji:⚠️} वह उपयोगकर्ता अधिकृत नहीं है — हटाने के लिए कुछ भी नहीं है।"
+del_auth_remove_fail: "{emoji:❌} अधिकृत उपयोगकर्ता को हटाने में विफल: <code>{error}</code>"
+del_auth_success: "{emoji:✅} {user} को अधिकृत उपयोगकर्ताओं की सूची से सफलतापूर्वक हटाया गया।"
 
 # 📜 Auth list
-authlist_fetch_fail: "❌ अधिकृत उपयोगकर्ताओं की सूची प्राप्त करने में विफल: <code>{error}</code>"
+authlist_fetch_fail: "{emoji:❌} अधिकृत उपयोगकर्ताओं की सूची प्राप्त करने में विफल: <code>{error}</code>"
 authlist_empty: "ℹ️ इस वार्तालाप में कोई अधिकृत उपयोगकर्ता नहीं है।"
-authlist_fetching: "⏳ अधिकृत उपयोगकर्ताओं की सूची प्राप्त की जा रही है..."
+authlist_fetching: "{emoji:⏳} अधिकृत उपयोगकर्ताओं की सूची प्राप्त की जा रही है..."
 authlist_header: "<b>अधिकृत उपयोगकर्ता:</b>"
 authlist_user_fail: "{index}. <code>{user_id}</code> (उपयोगकर्ता सूचना प्राप्त नहीं की जा सकी)"
 authlist_user_entry: "{index}. {user} (<code>{user_id}</code>)"
 authlist_total: "<b>कुल:</b> {count} उपयोगकर्ता"
 
-autoleave_fetch_fail: "⚠️ <b>स्वचालित प्रस्थान स्थिति प्राप्त करने में विफल।</b>"
-autoleave_status: "🏃‍♂️ <b>स्वचालित प्रस्थान नियन्त्रण</b>\n\nसक्षम होने पर, सहायक स्वचालित रूप से वार्तालाप छोड़ देगा।\nप्रयोग: {cmd} [enable|disable]\nवर्तमान स्थिति: {action}"
-autoleave_already: "⚠️ स्वचालित प्रस्थान पूर्व से ही {action} है"
-autoleave_update_fail: "⚠️ <b>स्वचालित प्रस्थान स्थिति अद्यतन करने में विफल।</b>"
-autoleave_updated: "🏃‍♂️ स्वचालित प्रस्थान {action} कर दिया गया है"
+autoleave_fetch_fail: "{emoji:⚠️} <b>स्वचालित प्रस्थान स्थिति प्राप्त करने में विफल।</b>"
+autoleave_status: "{emoji:🏃‍♂️} <b>स्वचालित प्रस्थान नियन्त्रण</b>\n\nसक्षम होने पर, सहायक स्वचालित रूप से वार्तालाप छोड़ देगा।\nप्रयोग: {cmd} [enable|disable]\nवर्तमान स्थिति: {action}"
+autoleave_already: "{emoji:⚠️} स्वचालित प्रस्थान पूर्व से ही {action} है"
+autoleave_update_fail: "{emoji:⚠️} <b>स्वचालित प्रस्थान स्थिति अद्यतन करने में विफल।</b>"
+autoleave_updated: "{emoji:🏃‍♂️} स्वचालित प्रस्थान {action} कर दिया गया है"
 
 enabled: "सक्षम"
 disabled: "अक्षम"
 
-clear_no_active: "⚠️ <b>रिक्त करने के लिए कोई सक्रिय संगीत या प्रतीक्षा सूची नहीं है।</b>"
-clear_success: "✅ {user} द्वारा प्रतीक्षा सूची रिक्त कर दी गई है।"
+clear_no_active: "{emoji:⚠️} <b>रिक्त करने के लिए कोई सक्रिय संगीत या प्रतीक्षा सूची नहीं है।</b>"
+clear_success: "{emoji:✅} {user} द्वारा प्रतीक्षा सूची रिक्त कर दी गई है।"
 
 err_assistant_banned: |
-  <b>🚫 सहायक प्रतिबन्धित</b>
+  <b>{emoji:🚫} सहायक प्रतिबन्धित</b>
 
   मैं संगीत नहीं चला सकता क्योंकि {user} (उपयोगकर्ता परिचय पत्र: <code>{id}</code>) इस वार्तालाप से <b>वर्जित</b> या <b>हटा</b> दिया गया है।
 
-  <i>✅ क्या आपने उन्हें पूर्व में ही वर्जित सूची से हटा दिया है? अद्यतन करने के लिए /reload का प्रयोग करें।</i>
+  <i>{emoji:✅} क्या आपने उन्हें पूर्व में ही वर्जित सूची से हटा दिया है? अद्यतन करने के लिए /reload का प्रयोग करें।</i>
 
 err_admin_permission_required: |
-  ⚠️ <b>प्रशासक अनुमति आवश्यक</b>
+  {emoji:⚠️} <b>प्रशासक अनुमति आवश्यक</b>
 
   मुझे इस वार्तालाप को प्रबंधित करने और सहायक को आमंत्रित करने के लिए <i>उपयोगकर्ताओं को आमंत्रित करें</i> अनुमति सहित <i>प्रशासक पहुँच</i> चाहिए।
 
 err_assistant_get_failed: |
-  ⚠️ प्रणाली इस वार्तालाप के लिए एक सहायक नियुक्त नहीं कर सकी।
+  {emoji:⚠️} प्रणाली इस वार्तालाप के लिए एक सहायक नियुक्त नहीं कर सकी।
 
   <i>यह सामान्यतः एक अस्थायी समस्या है और पुनः प्रयास करने पर हल हो जानी चाहिए।</i>
 
-  <b>➡️ कृपया अपने आदेश का पुनः प्रयास करें।</b>
+  <b>{emoji:➡️} कृपया अपने आदेश का पुनः प्रयास करें।</b>
 
   <i>यदि यह निरन्तर होता रहता है, तो कृपया सहायता समूह से सम्पर्क करें ताकि हम आपकी सहायता कर सकें।</i>
   
 err_assistant_join_request_sent: |
-  ⚠️ सहायक ने सम्मिलित होने का अनुरोध भेजा है, किन्तु मैं इसे स्वचालित रूप से अनुमोदित नहीं कर सका।
+  {emoji:⚠️} सहायक ने सम्मिलित होने का अनुरोध भेजा है, किन्तु मैं इसे स्वचालित रूप से अनुमोदित नहीं कर सका।
 
-  <i>✅ कृपया अनुरोध को स्वयं अनुमोदित करें, फिर पुनः प्रयास करें।</i>
+  <i>{emoji:✅} कृपया अनुरोध को स्वयं अनुमोदित करें, फिर पुनः प्रयास करें।</i>
 
-  <b>➡️ कृपया अपने आदेश का पुनः प्रयास करें।</b>
+  <b>{emoji:➡️} कृपया अपने आदेश का पुनः प्रयास करें।</b>
 
 err_assistant_invite_link_fetch: |
-  ⚠️ आमन्त्रण सूत्र प्राप्त करने में विफल:
+  {emoji:⚠️} आमन्त्रण सूत्र प्राप्त करने में विफल:
   <i>{error}</i>
 
 err_assistant_invite_failed: |
-  ⚠️ सहायक इस वार्तालाप में सम्मिलित होने में विफल रहा:
+  {emoji:⚠️} सहायक इस वार्तालाप में सम्मिलित होने में विफल रहा:
   <i>{error}</i>
 
 err_connection_timeout: |
-  ⚠️ <b>ध्वनि वार्तालाप सम्पर्क समय-सीमा समाप्त</b>
+  {emoji:⚠️} <b>ध्वनि वार्तालाप सम्पर्क समय-सीमा समाप्त</b>
 
   टेलीग्राम वर्तमान में ध्वनि वार्तालाप सम्पर्क का उचित उत्तर नहीं दे रहा है।
 
   <i>यदि यह निरन्तर होता रहता है, तो ध्वनि वार्तालाप समाप्त करें और पुनः आरम्भ करें, फिर पुनः प्रयास करें।</i>
 
 err_no_active_voicechat: |
-  🎙️ <b>कोई सक्रिय ध्वनि वार्तालाप नहीं</b>
+  {emoji:🎙️} <b>कोई सक्रिय ध्वनि वार्तालाप नहीं</b>
 
   मैं सम्मिलित नहीं हो सकता — कृपया पहले एक ध्वनि वार्तालाप आरम्भ करें।
 
   <i>पूर्व में ही आरम्भ कर दिया है? अद्यतन करने के लिए /reload का प्रयोग करें।</i>
 
 err_fetch_failed: |
-  ⚠️ वार्तालाप सूचना प्राप्त करने में विफल:
+  {emoji:⚠️} वार्तालाप सूचना प्राप्त करने में विफल:
   <i>{error}</i>
 
 err_unknown: |
-  ⚠️ अज्ञात त्रुटि उत्पन्न हुई:
+  {emoji:⚠️} अज्ञात त्रुटि उत्पन्न हुई:
   <i>{error}</i>
 
 err_fetch_tracks: |
-  ⚠️ <b>संगीत विवरण प्राप्त करने में विफल।</b>
+  {emoji:⚠️} <b>संगीत विवरण प्राप्त करने में विफल।</b>
   कृपया कुछ समय पश्चात प्रयास करें।
 
 err_download_internal: |
-  ⚠️ एक अप्रत्याशित आन्तरिक त्रुटि के कारण <b>डाउनलोड विफल</b> रहा।
+  {emoji:⚠️} एक अप्रत्याशित आन्तरिक त्रुटि के कारण <b>डाउनलोड विफल</b> रहा।
   कृपया कुछ समय पश्चात प्रयास करें।
   
 flood_seconds: "⏳ गति मन्द करें! {duration} क्षण पश्चात पुनः प्रयास करें।"
-flood_minutes: "⏳ कृपया इस आदेश का पुनः प्रयोग करने से पूर्व {duration} मिनट प्रतीक्षा करें।"
+flood_minutes: "{emoji:⏳} कृपया इस आदेश का पुनः प्रयोग करने से पूर्व {duration} मिनट प्रतीक्षा करें।"
 
-help_private_only: "🤖 नमस्कार! सहायता और आदेशों के लिए, कृपया मुझे सीधे व्यक्तिगत सन्देश भेजें — मैं व्यक्तिगत वार्तालाप में अधिक उत्तरदायी हूँ!"
-help_main: "📚 <b>सहायता सूची</b>\n\nप्रबन्धन, नियन्त्रण और सहायक को अनुकूलित करने के विस्तृत आदेशों को जानने के लिए नीचे एक श्रेणी का चयन करें।"
+help_private_only: "{emoji:🤖} नमस्कार! सहायता और आदेशों के लिए, कृपया मुझे सीधे व्यक्तिगत सन्देश भेजें — मैं व्यक्तिगत वार्तालाप में अधिक उत्तरदायी हूँ!"
+help_main: "{emoji:📚} <b>सहायता सूची</b>\n\nप्रबन्धन, नियन्त्रण और सहायक को अनुकूलित करने के विस्तृत आदेशों को जानने के लिए नीचे एक श्रेणी का चयन करें।"
 
-jump_no_active: "⚠️ कूदने के लिए कोई सक्रिय संगीत नहीं है।"
-jump_usage: "⚠️ कृपया क्षण प्रदान करें।\nउदाहरण: <code>{cmd} 120</code>"
-jump_invalid_position: "⚠️ अमान्य स्थिति।\nउदाहरण: <code>{cmd} 120</code>"
-jump_too_close_end: "⚠️ <b>{position}</b> पर नहीं कूदा जा सकता — यह संगीत के अन्त के बहुत निकट है।"
-jump_failed: "❌ <b>{position}</b> पर कूदने में विफल।\nत्रुटि: <code>{error}</code>"
-jump_success: "⏩ <u>{duration}</u> में से <u>{position}</u> पर कूदे।"
+jump_no_active: "{emoji:⚠️} कूदने के लिए कोई सक्रिय संगीत नहीं है।"
+jump_usage: "{emoji:⚠️} कृपया क्षण प्रदान करें।\nउदाहरण: <code>{cmd} 120</code>"
+jump_invalid_position: "{emoji:⚠️} अमान्य स्थिति।\nउदाहरण: <code>{cmd} 120</code>"
+jump_too_close_end: "{emoji:⚠️} <b>{position}</b> पर नहीं कूदा जा सकता — यह संगीत के अन्त के बहुत निकट है।"
+jump_failed: "{emoji:❌} <b>{position}</b> पर कूदने में विफल।\nत्रुटि: <code>{error}</code>"
+jump_success: "{emoji:⏩} <u>{duration}</u> में से <u>{position}</u> पर कूदे।"
 
 lang_same: "ℹ️ आप पूर्व से ही इस भाषा का प्रयोग कर रहे हैं।"
-lang_select: "🌐 अपनी अभीष्ट भाषा चुनें:"
+lang_select: "{emoji:🌐} अपनी अभीष्ट भाषा चुनें:"
 lang_fail: "❌ भाषा अद्यतन करने में विफल। कृपया कुछ समय पश्चात प्रयास करें।"
-lang_success: "✅ भाषा सफलतापूर्वक {lang_name} में अद्यतन कर दी गई।"
+lang_success: "{emoji:✅} भाषा सफलतापूर्वक {lang_name} में अद्यतन कर दी गई।"
 
 logger_playback_started: "संगीत आरम्भ"
 logger_playback_queued: "संगीत प्रतीक्षा सूची में"
 
 logger_bot_added: |
-  🤖 <b>बोट नवीन समूह में जोड़ा गया</b>
+  {emoji:🤖} <b>बोट नवीन समूह में जोड़ा गया</b>
   
   <blockquote>
   <b>समूह नाम:</b> {group_name}
@@ -311,7 +311,7 @@ logger_bot_added: |
 
 logger_bot_removed: |
 
-  🤖 <b>बोट समूह से हटाया गया</b>
+  {emoji:🤖} <b>बोट समूह से हटाया गया</b>
   <blockquote>
   <b>समूह नाम:</b> {group_name}
   <b>समूह परिचय पत्र:</b> {group_id}
@@ -325,153 +325,153 @@ logger_bot_removed: |
   </blockquote>
   
 logger_bot_started: |
-  ▶️ <b>{mention} ने सहायक आरम्भ किया</b>
+  {emoji:▶️} <b>{mention} ने सहायक आरम्भ किया</b>
 
   <b>उपयोगकर्ता नाम:</b> {user_username}
   <b>परिचय पत्र:</b> {user_id}
   
 
-logger_playback_template: "<b>🎧 संगीत:</b> <a href=\"{track_url}\">{track}</a>\n<b>🔗 स्रोत:</b> {source}\n<b>📌 समूह:</b> {group} ({group_id})\n<b>👤 अनुरुद्धकर्ता:</b> {requested_by} (<code>{requested_by_id}</code>)"
+logger_playback_template: "<b>{emoji:🎧} संगीत:</b> <a href=\"{track_url}\">{track}</a>\n<b>{emoji:🔗} स्रोत:</b> {source}\n<b>{emoji:📌} समूह:</b> {group} ({group_id})\n<b>{emoji:👤} अनुरुद्धकर्ता:</b> {requested_by} (<code>{requested_by_id}</code>)"
 
-loop_usage: "🔁 <b>आवृत्ति नियन्त्रण</b>\n\nप्रयोग: {cmd} [संख्या]\n• 0 - आवृत्ति अक्षम करें\n• 1-10 - आवृत्ति संख्या\n\n<i>{count_line}</i>"
-loop_invalid: "⚠️ <b>अमान्य आवृत्ति संख्या।</b>\nअक्षम करने के लिए 0 या आवृत्ति निर्धारित करने के लिए 1-10 का प्रयोग करें।"
-loop_already_set: "⚠️ आवृत्ति पूर्व से ही <b>{count}</b> बार निर्धारित है।"
-loop_disabled: "🔁 आवृत्ति {user} द्वारा <b>अक्षम</b> कर दी गई है"
-loop_set: "🔁 <b>{count}</b> बार आवृत्ति निर्धारित की गई\n└ परिवर्तक: {user}"
+loop_usage: "{emoji:🔁} <b>आवृत्ति नियन्त्रण</b>\n\nप्रयोग: {cmd} [संख्या]\n• 0 - आवृत्ति अक्षम करें\n• 1-10 - आवृत्ति संख्या\n\n<i>{count_line}</i>"
+loop_invalid: "{emoji:⚠️} <b>अमान्य आवृत्ति संख्या।</b>\nअक्षम करने के लिए 0 या आवृत्ति निर्धारित करने के लिए 1-10 का प्रयोग करें।"
+loop_already_set: "{emoji:⚠️} आवृत्ति पूर्व से ही <b>{count}</b> बार निर्धारित है।"
+loop_disabled: "{emoji:🔁} आवृत्ति {user} द्वारा <b>अक्षम</b> कर दी गई है"
+loop_set: "{emoji:🔁} <b>{count}</b> बार आवृत्ति निर्धारित की गई\n└ परिवर्तक: {user}"
 loop_current: "• वर्तमान आवृत्ति: <b>{count}</b> बार"
 
-logger_usage: "⚙️ प्रयोग: <code>{cmd} [enable|disable]</code> - अभिलेखक को सक्षम या अक्षम करने के लिए\n\n{status}"
-logger_status: "📜 वर्तमान स्थिति: {action}"
-logger_check_fail: "❌ अभिलेखक स्थिति जाँचने में विफल: {error}"
+logger_usage: "{emoji:⚙️} प्रयोग: <code>{cmd} [enable|disable]</code> - अभिलेखक को सक्षम या अक्षम करने के लिए\n\n{status}"
+logger_status: "{emoji:📜} वर्तमान स्थिति: {action}"
+logger_check_fail: "{emoji:❌} अभिलेखक स्थिति जाँचने में विफल: {error}"
 logger_already: "ℹ️ अभिलेखक पूर्व से ही {action} है।"
-logger_update_fail: "❌ अभिलेखक विन्यास अद्यतन करने में विफल: {error}"
-logger_updated: "✅ अभिलेखक सफलतापूर्वक {action} कर दिया गया है।"
+logger_update_fail: "{emoji:❌} अभिलेखक विन्यास अद्यतन करने में विफल: {error}"
+logger_updated: "{emoji:✅} अभिलेखक सफलतापूर्वक {action} कर दिया गया है।"
 
 # Logs module
 logs_empty: "कोई लॉग्स नहीं मिले"
 
 # reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
 maint: "⚠️ मैं वर्तमान में अनुरक्षण के अधीन हूँ और अस्थायी रूप से अनुपलब्ध हूँ। कृपया कुछ समय पश्चात पुनः देखें।\n\n{reason}"
-maint_reason: "<i>📝 कारण: {reason}</i>"
+maint_reason: "<i>{emoji:📝} कारण: {reason}</i>"
 
 # ⚙️ Maintenance control
-maint_usage: "⚙️ <b>अनुरक्षण नियन्त्रण</b>\n\nप्रयोग: {cmd} [enable|disable] [कारण]\n📜 वर्तमान स्थिति: {status}"
-maint_check_fail: "❌ अनुरक्षण स्थिति जाँचने में विफल: <code>{error}</code>"
-maint_already_enabled: "ℹ️ अनुरक्षण विधा पूर्व से ही सक्षम 🟢 है।"
-maint_already_disabled: "ℹ️ अनुरक्षण विधा पूर्व से ही अक्षम 🔴 है।"
+maint_usage: "{emoji:⚙️} <b>अनुरक्षण नियन्त्रण</b>\n\nप्रयोग: {cmd} [enable|disable] [कारण]\n{emoji:📜} वर्तमान स्थिति: {status}"
+maint_check_fail: "{emoji:❌} अनुरक्षण स्थिति जाँचने में विफल: <code>{error}</code>"
+maint_already_enabled: "ℹ️ अनुरक्षण विधा पूर्व से ही सक्षम {emoji:🟢} है।"
+maint_already_disabled: "ℹ️ अनुरक्षण विधा पूर्व से ही अक्षम {emoji:🔴} है।"
 maint_already_reason_same: "ℹ️ अनुरक्षण उसी कारण के साथ पूर्व से ही सक्षम है।"
-maint_reason_removed: "✅ अनुरक्षण कारण सफलतापूर्वक हटा दिया गया।"
-maint_reason_updated: "✅ अनुरक्षण कारण अद्यतन किया गया।\n📝 कारण: {reason}"
-maint_enabled: "✅ अनुरक्षण विधा सफलतापूर्वक <b>सक्षम</b> कर दी गई है।"
-maint_enabled_reason: "✅ अनुरक्षण विधा सक्षम की गई।\n📝 कारण: {reason}"
-maint_disabled: "✅ अनुरक्षण विधा सफलतापूर्वक <b>अक्षम</b> कर दी गई है।"
-maint_entering: "⚠️ सहायक अनुरक्षण विधा में प्रवेश कर रहा है..."
-enabled_with_reason: "🟢 सक्षम\n📝 कारण: {reason}"
+maint_reason_removed: "{emoji:✅} अनुरक्षण कारण सफलतापूर्वक हटा दिया गया।"
+maint_reason_updated: "{emoji:✅} अनुरक्षण कारण अद्यतन किया गया।\n{emoji:📝} कारण: {reason}"
+maint_enabled: "{emoji:✅} अनुरक्षण विधा सफलतापूर्वक <b>सक्षम</b> कर दी गई है।"
+maint_enabled_reason: "{emoji:✅} अनुरक्षण विधा सक्षम की गई।\n{emoji:📝} कारण: {reason}"
+maint_disabled: "{emoji:✅} अनुरक्षण विधा सफलतापूर्वक <b>अक्षम</b> कर दी गई है।"
+maint_entering: "{emoji:⚠️} सहायक अनुरक्षण विधा में प्रवेश कर रहा है..."
+enabled_with_reason: "{emoji:🟢} सक्षम\n{emoji:📝} कारण: {reason}"
 
-move_usage: "⚠️ प्रयोग: <code>{cmd} [कहाँ से] [कहाँ को]</code>"
-move_invalid_numbers: "⚠️ अमान्य संख्याएँ। उदाहरण: <code>/{cmd} 2 1</code>"
-move_invalid_indexes_min: "⚠️ सूचकाङ्क 0 से अधिक होने चाहिए।"
-move_invalid_indexes_max: "⚠️ प्रतीक्षा सूची में केवल {queue_len} संगीत हैं।"
-move_success: "✅ संगीत को स्थिति {from} से {to} पर {user} द्वारा स्थानान्तरित किया गया।"
+move_usage: "{emoji:⚠️} प्रयोग: <code>{cmd} [कहाँ से] [कहाँ को]</code>"
+move_invalid_numbers: "{emoji:⚠️} अमान्य संख्याएँ। उदाहरण: <code>/{cmd} 2 1</code>"
+move_invalid_indexes_min: "{emoji:⚠️} सूचकाङ्क 0 से अधिक होने चाहिए।"
+move_invalid_indexes_max: "{emoji:⚠️} प्रतीक्षा सूची में केवल {queue_len} संगीत हैं।"
+move_success: "{emoji:✅} संगीत को स्थिति {from} से {to} पर {user} द्वारा स्थानान्तरित किया गया।"
 
 # 🔇 Mute messages
 mute_already_muted: "🔇 <b>पूर्व से ही निःशब्द</b>\nइस वार्तालाप में संगीत पूर्व से ही निःशब्द है।\nक्या आप इसे सशब्द करना चाहेंगे?"
 mute_failed: "❌ <b>संगीत निःशब्द करना विफल</b>\nत्रुटि: <code>{error}</code>"
 mute_success: |
-  🔇 <b>संगीत निःशब्द किया गया</b>
+  {emoji:🔇} <b>संगीत निःशब्द किया गया</b>
 
-  🎵 संगीत: {title}
-  👤 निःशब्दकर्ता: {user}
+  {emoji:🎵} संगीत: {title}
+  {emoji:👤} निःशब्दकर्ता: {user}
 
 no_song_query: |
-  <b>🎵 क्षमा करें! कोई संगीत नहीं मिला।</b>
+  <b>{emoji:🎵} क्षमा करें! कोई संगीत नहीं मिला।</b>
 
   <i>संगीत आरम्भ करने के लिए <b>{cmd} [संगीत का नाम]</b> लिखें या किसी <b>श्रव्य-दृश्य सामग्री</b> का उत्तर दें!</i>
 
-no_song_found: "❌ कोई संगीत नहीं मिला।"
+no_song_found: "{emoji:❌} कोई संगीत नहीं मिला।"
 
 nothumb_status: |
-  🖼️ <b>लघु-चित्र नियन्त्रण</b>
+  {emoji:🖼️} <b>लघु-चित्र नियन्त्रण</b>
   
   <i>सक्षम होने पर, संगीत सन्देश कलाकृति/लघु-चित्र नहीं दिखाएँगे।</i>
   
-  <b>📊 प्रयोग: {cmd} [enable|disable]</b>
+  <b>{emoji:📊} प्रयोग: {cmd} [enable|disable]</b>
   
   <i>लघु-चित्र वर्तमान में {action} है।</i>
   
-nothumb_fetch_fail: "⚠️ <b>लघु-चित्र विन्यास प्राप्त करने में विफल।</b>"
+nothumb_fetch_fail: "{emoji:⚠️} <b>लघु-चित्र विन्यास प्राप्त करने में विफल।</b>"
 nothumb_already: "ℹ️ लघु-चित्र प्रदर्शन पूर्व से ही {action} है।"
-nothumb_update_fail: "⚠️ <b>लघु-चित्र विन्यास अद्यतन करने में विफल।</b>"
-nothumb_updated: "🖼️ लघु-चित्र प्रदर्शन {action} कर दिया गया है।"
+nothumb_update_fail: "{emoji:⚠️} <b>लघु-चित्र विन्यास अद्यतन करने में विफल।</b>"
+nothumb_updated: "{emoji:🖼️} लघु-चित्र प्रदर्शन {action} कर दिया गया है।"
 
-cmddelete_status: "🗑️ <b>आदेश विलोपन नियन्त्रण</b>\n\nसक्षम होने पर, मैं आदेश सन्देशों को स्वचालित रूप से हटा दूँगा।\nप्रयोग: {cmd} [enable|disable]\nवर्तमान स्थिति: {action}"
-cmddelete_updated: "🗑️ आदेश विलोपन {action} कर दिया गया है।"
+cmddelete_status: "{emoji:🗑️} <b>आदेश विलोपन नियन्त्रण</b>\n\nसक्षम होने पर, मैं आदेश सन्देशों को स्वचालित रूप से हटा दूँगा।\nप्रयोग: {cmd} [enable|disable]\nवर्तमान स्थिति: {action}"
+cmddelete_updated: "{emoji:🗑️} आदेश विलोपन {action} कर दिया गया है।"
 
-only_admin: "⚠️ <b>अनुमति अस्वीकृत!</b>\nकेवल <b>प्रशासक</b> ही इन क्रियाओं को नियन्त्रित कर सकते हैं। आप अब भी गीत चला सकते हैं 🎵।\n\nयदि आप मानते हैं कि आप प्रशासक हैं, तो कृपया अपनी प्रशासक स्थिति अद्यतन करने के लिए /reload का प्रयोग करें।"
+only_admin: "{emoji:⚠️} <b>अनुमति अस्वीकृत!</b>\nकेवल <b>प्रशासक</b> ही इन क्रियाओं को नियन्त्रित कर सकते हैं। आप अब भी गीत चला सकते हैं {emoji:🎵}।\n\nयदि आप मानते हैं कि आप प्रशासक हैं, तो कृपया अपनी प्रशासक स्थिति अद्यतन करने के लिए /reload का प्रयोग करें।"
 only_admin_cb: "⚠️ केवल प्रशासक ही ये क्रियाएँ कर सकते हैं।"
-only_admin_or_auth: "⚠️ <b>पहुँच अस्वीकृत</b>\nकेवल <b>प्रशासक</b> या <b>अधिकृत उपयोगकर्ता</b> ही इन क्रियाओं को नियन्त्रित कर सकते हैं।\n\nयदि आप हाल ही में प्रशासक बने हैं, तो अपनी अनुमतियों को अद्यतन करने के लिए /reload का प्रयोग करें।"
+only_admin_or_auth: "{emoji:⚠️} <b>पहुँच अस्वीकृत</b>\nकेवल <b>प्रशासक</b> या <b>अधिकृत उपयोगकर्ता</b> ही इन क्रियाओं को नियन्त्रित कर सकते हैं।\n\nयदि आप हाल ही में प्रशासक बने हैं, तो अपनी अनुमतियों को अद्यतन करने के लिए /reload का प्रयोग करें।"
 only_admin_or_auth_cb: "⚠️ केवल प्रशासक अथवा अधिकृत उपयोगकर्ता ही ये क्रियाएँ कर सकते हैं।"
-only_supergroup: "⚠️ यह आदेश केवल समूहों में प्रयुक्त किया जा सकता है।"
+only_supergroup: "{emoji:⚠️} यह आदेश केवल समूहों में प्रयुक्त किया जा सकता है।"
 only_owner: "⚠️ केवल सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
-only_sudo: "⚠️ केवल विशेषाधिकारी या सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
+only_sudo: "{emoji:⚠️} केवल विशेषाधिकारी या सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
 
 pause_already: |
-  ⏸️ <b>पूर्व से ही विराम</b>
+  {emoji:⏸️} <b>पूर्व से ही विराम</b>
   संगीत पूर्व से ही विराम स्थिति में है।
 
 pause_success: |
-  ⏸️ <b>संगीत विराम</b>
+  {emoji:⏸️} <b>संगीत विराम</b>
 
-  🎵 संगीत: {title}
-  ⏱️ स्थिति: {position} / {duration}
-  👤 विरामकर्ता: {user}
+  {emoji:🎵} संगीत: {title}
+  {emoji:⏱️} स्थिति: {position} / {duration}
+  {emoji:👤} विरामकर्ता: {user}
 
 play_single_track_too_long: |
-  ⚠️ आप {limit_mins} मिनट से अधिक लम्बे गीत नहीं चला सकते।
+  {emoji:⚠️} आप {limit_mins} मिनट से अधिक लम्बे गीत नहीं चला सकते।
   <i>{title}</i> को छोड़ दिया गया।
 
-play_download_failed: "❌ डाउनलोड विफल। कृपया पुनः प्रयास करें।"
+play_download_failed: "{emoji:❌} डाउनलोड विफल। कृपया पुनः प्रयास करें।"
 
 play_added_to_queue_single: |
-  <b>🎵 प्रतीक्षा सूची में जोड़ा गया:</b> #{index}
+  <b>{emoji:🎵} प्रतीक्षा सूची में जोड़ा गया:</b> #{index}
 
   <b>▫ संगीत:</b> <a href="{url}">{title}</a>
   <b>▫ अवधि:</b> {duration}
   <b>▫ अनुरुद्धकर्ता:</b> {by}
 
-play_multiple_tracks_too_long_header: "<b>⚠️ {count} संगीत छोड़ दिए गए (अधिकतम अवधि {limit_mins} मिनट):</b>"
+play_multiple_tracks_too_long_header: "<b>{emoji:⚠️} {count} संगीत छोड़ दिए गए (अधिकतम अवधि {limit_mins} मिनट):</b>"
 play_multiple_tracks_too_long_item: "— <i>{title}</i>"
 play_multiple_tracks_too_long_more: "... और {remaining} अन्य।"
-play_all_tracks_skipped: "❌ अवधि सीमा के कारण सभी पाए गए संगीत छोड़ दिए गए।"
-play_failed: "❌ चलाने में विफल\nत्रुटि: {error}"
-play_unable: "<b> ❌ चलाने में असमर्थ </b>\n\n<i>कृपया <b>ध्वनि वार्तालाप पुनः आरम्भ</b> करें।</i>"
-rtmp_play_unsupported: "⚠️ <b>RTMP/लाइव-स्ट्रीम वॉइस चैट में नहीं चला सकते।</b>\n\n<i>प्लेबैक रोक दिया गया।</i>"
-play_downloading_song: "📥 संगीत \"{title}\" डाउनलोड किया जा रहा है"
-play_download_canceled: "⚠️ {user} द्वारा डाउनलोड रद्द।"
-play_already_in_queue: "✅ <b>गीत पूर्व से ही सम्मिलित!</b>\n\n<i>{title}</i> पूर्व से ही चल रहा है अथवा प्रतीक्षा सूची में है।"
-play_already_playing: "⚠️ <b>एक संगीत पहले से ही चल रहा है.</b>\n\nकृपया इसके समाप्त होने का इंतज़ार करें या पहले इसे रोकने के लिए <code>/stop</code> का उपयोग करें."
-play_added_multiple_header: "➕ {user} द्वारा <b>{count} संगीत जोड़े गए</b>"
-play_queue_limit_hint: "⚠️ <i>प्रतीक्षा सूची की सीमा पूर्ण — कुछ संगीत छोड़ दिए गए।</i>"
+play_all_tracks_skipped: "{emoji:❌} अवधि सीमा के कारण सभी पाए गए संगीत छोड़ दिए गए।"
+play_failed: "{emoji:❌} चलाने में विफल\nत्रुटि: {error}"
+play_unable: "<b> {emoji:❌} चलाने में असमर्थ </b>\n\n<i>कृपया <b>ध्वनि वार्तालाप पुनः आरम्भ</b> करें।</i>"
+rtmp_play_unsupported: "{emoji:⚠️} <b>RTMP/लाइव-स्ट्रीम वॉइस चैट में नहीं चला सकते।</b>\n\n<i>प्लेबैक रोक दिया गया।</i>"
+play_downloading_song: "{emoji:📥} संगीत \"{title}\" डाउनलोड किया जा रहा है"
+play_download_canceled: "{emoji:⚠️} {user} द्वारा डाउनलोड रद्द।"
+play_already_in_queue: "{emoji:✅} <b>गीत पूर्व से ही सम्मिलित!</b>\n\n<i>{title}</i> पूर्व से ही चल रहा है अथवा प्रतीक्षा सूची में है।"
+play_already_playing: "{emoji:⚠️} <b>एक संगीत पहले से ही चल रहा है.</b>\n\nकृपया इसके समाप्त होने का इंतज़ार करें या पहले इसे रोकने के लिए <code>/stop</code> का उपयोग करें."
+play_added_multiple_header: "{emoji:➕} {user} द्वारा <b>{count} संगीत जोड़े गए</b>"
+play_queue_limit_hint: "{emoji:⚠️} <i>प्रतीक्षा सूची की सीमा पूर्ण — कुछ संगीत छोड़ दिए गए।</i>"
 play_queue_view_hint: "<i>पूर्ण सूची देखने के लिए /queue का प्रयोग करें।</i>"
 
 playmode_help: |
-  🛠️ <b>संगीत संचालन विधा</b>
+  {emoji:🛠️} <b>संगीत संचालन विधा</b>
 
   <b>स्थिति:</b> {status}
   <b>प्रयोग:</b> <code>/playmode [enable|disable]</code>
 
 playmode_status_admins: "प्रशासक 🔐"
 playmode_status_everyone: "प्रत्येक व्यक्ति 🌍"
-playmode_success_admins: "🛡️ <b>संगीत संचालन</b> अब केवल <b>प्रशासकों एवं अधिकृत उपयोगकर्ताओं</b> तक सीमित है। 🎧"
-playmode_success_everyone: "✅ <b>संगीत संचालन</b> अब <b>सभी के लिए खुला</b> है। संगीत का आनंद लें! 🎶"
-playmode_restricted: "🚫 संगीत संचालन विधा सक्षम है। केवल प्रशासक अथवा अधिकृत उपयोगकर्ता ही संगीत चला सकते हैं।"
+playmode_success_admins: "{emoji:🛡️} <b>संगीत संचालन</b> अब केवल <b>प्रशासकों एवं अधिकृत उपयोगकर्ताओं</b> तक सीमित है। {emoji:🎧}"
+playmode_success_everyone: "{emoji:✅} <b>संगीत संचालन</b> अब <b>सभी के लिए खुला</b> है। संगीत का आनंद लें! {emoji:🎶}"
+playmode_restricted: "{emoji:🚫} संगीत संचालन विधा सक्षम है। केवल प्रशासक अथवा अधिकृत उपयोगकर्ता ही संगीत चला सकते हैं।"
 
 # 🏓 Ping messages
-ping_start: "🏓 पिंग किया जा रहा है..."
+ping_start: "{emoji:🏓} पिंग किया जा रहा है..."
 ping_result: |
-  <b>🏓 पोंग</b>: <code>{latency}मि.से.</code>
+  <b>{emoji:🏓} पोंग</b>: <code>{latency}मि.से.</code>
   
-  <b><u>🤖 {bot} प्रणाली आँकड़े:</u></b>
+  <b><u>{emoji:🤖} {bot} प्रणाली आँकड़े:</u></b>
   
   <b>सक्रियता समय:</b> {uptime}
   <b>मुख्य स्मृति प्रयोग:</b> {ram_info}
@@ -480,73 +480,73 @@ ping_result: |
 
 
 position_now: |
-  🎵 <b>{title}</b>
-  📍 <code>{position} / {duration}</code>
-  ⚙️ गति: <b>{speed}x</b>
+  {emoji:🎵} <b>{title}</b>
+  {emoji:📍} <code>{position} / {duration}</code>
+  {emoji:⚙️} गति: <b>{speed}x</b>
 
-queue_limit_reached: "⚠️ प्रतीक्षा सूची की सीमा पूर्ण ({limit} संगीत अधिकतम)। सूची रिक्त करने के लिए /clear का प्रयोग करें।"
-queue_no_active: "⚠️ <b>कोई सक्रिय संगीत नहीं।</b>\n\n<i>वर्तमान में प्रतीक्षा सूची में कुछ भी नहीं है।</i>"
-queue_header: "🎶 <b>वर्तमान प्रतीक्षा सूची</b>"
-queue_now_playing: "▶️ <b>अब चल रहा है:</b>"
-queue_up_next: "⏭️ <b>अगला:</b>"
+queue_limit_reached: "{emoji:⚠️} प्रतीक्षा सूची की सीमा पूर्ण ({limit} संगीत अधिकतम)। सूची रिक्त करने के लिए /clear का प्रयोग करें।"
+queue_no_active: "{emoji:⚠️} <b>कोई सक्रिय संगीत नहीं।</b>\n\n<i>वर्तमान में प्रतीक्षा सूची में कुछ भी नहीं है।</i>"
+queue_header: "{emoji:🎶} <b>वर्तमान प्रतीक्षा सूची</b>"
+queue_now_playing: "{emoji:▶️} <b>अब चल रहा है:</b>"
+queue_up_next: "{emoji:⏭️} <b>अगला:</b>"
 queue_more_line: "\n… और {remaining} अन्य"
-queue_empty_tail: "📭 <i>प्रतीक्षा सूची में कोई और संगीत नहीं है।</i>"
-queue_empty: "⚠️ <b>प्रतीक्षा सूची पूर्व से ही रिक्त है।</b>"
+queue_empty_tail: "{emoji:📭} <i>प्रतीक्षा सूची में कोई और संगीत नहीं है।</i>"
+queue_empty: "{emoji:⚠️} <b>प्रतीक्षा सूची पूर्व से ही रिक्त है।</b>"
 
 # 🔄 Reload
-reload_start: "⚙️ प्रशासक संचित-स्मृति, ध्वनि वार्तालाप स्थिति, और सहायक स्थिति को पुनः लोड किया जा रहा है..."
+reload_start: "{emoji:⚙️} प्रशासक संचित-स्मृति, ध्वनि वार्तालाप स्थिति, और सहायक स्थिति को पुनः लोड किया जा रहा है..."
 
-reload_done: "<b>⚙️ पुनः लोड पूर्ण:</b>\n\n{summary}"
+reload_done: "<b>{emoji:⚙️} पुनः लोड पूर्ण:</b>\n\n{summary}"
 
-reload_admin_cache_ok: "<b>• प्रशासक संचित-स्मृति:</b> <i>✅ पूर्ण</i>"
-reload_admin_cache_fail: "<b>• प्रशासक संचित-स्मृति:</b> <i>❌ ({error})</i>"
+reload_admin_cache_ok: "<b>• प्रशासक संचित-स्मृति:</b> <i>{emoji:✅} पूर्ण</i>"
+reload_admin_cache_fail: "<b>• प्रशासक संचित-स्मृति:</b> <i>{emoji:❌} ({error})</i>"
 
-reload_voice_inactive: "<b>• ध्वनि वार्तालाप:</b> <i>⚪ निष्क्रिय</i>"
-reload_voice_admin_required: "<b>• ध्वनि वार्तालाप:</b> <i>❌ प्रशासक अनुमति आवश्यक</i>"
-reload_voice_fail: "<b>• ध्वनि वार्तालाप:</b> <i>❌ ({error})</i>"
-reload_voice_active: "<b>• ध्वनि वार्तालाप:</b> <i>✅ सक्रिय</i>"
+reload_voice_inactive: "<b>• ध्वनि वार्तालाप:</b> <i>{emoji:⚪} निष्क्रिय</i>"
+reload_voice_admin_required: "<b>• ध्वनि वार्तालाप:</b> <i>{emoji:❌} प्रशासक अनुमति आवश्यक</i>"
+reload_voice_fail: "<b>• ध्वनि वार्तालाप:</b> <i>{emoji:❌} ({error})</i>"
+reload_voice_active: "<b>• ध्वनि वार्तालाप:</b> <i>{emoji:✅} सक्रिय</i>"
 
-reload_assistant_banned: "<b>• सहायक:</b> <i>❌ वर्जित</i>"
-reload_assistant_admin_required: "<b>• सहायक:</b> <i>❌ प्रशासक अनुमति आवश्यक</i>"
-reload_assistant_fail: "<b>• सहायक:</b> <i>❌ ({error})</i>"
-reload_assistant_present: "<b>• सहायक:</b> <i>✅ उपस्थित</i>"
-reload_assistant_not_present: "<b>• सहायक:</b> <i>⚪ उपस्थित नहीं</i>"
-reload_room_reset: "<b>• कक्ष:</b> <i>पुनर्निर्धारित ✅</i>"
+reload_assistant_banned: "<b>• सहायक:</b> <i>{emoji:❌} वर्जित</i>"
+reload_assistant_admin_required: "<b>• सहायक:</b> <i>{emoji:❌} प्रशासक अनुमति आवश्यक</i>"
+reload_assistant_fail: "<b>• सहायक:</b> <i>{emoji:❌} ({error})</i>"
+reload_assistant_present: "<b>• सहायक:</b> <i>{emoji:✅} उपस्थित</i>"
+reload_assistant_not_present: "<b>• सहायक:</b> <i>{emoji:⚪} उपस्थित नहीं</i>"
+reload_room_reset: "<b>• कक्ष:</b> <i>पुनर्निर्धारित {emoji:✅}</i>"
 
 
-remove_usage: "⚠️ <b>अमान्य प्रयोग।</b>\nप्रयोग: <code>{cmd} [सूचकाङ्क]</code>"
-remove_invalid_index: "⚠️ <b>अमान्य सूचकाङ्क।</b> यह एक <b>संख्या</b> होनी चाहिए।"
-remove_index_too_small: "⚠️ <b>सूचकाङ्क 0 से अधिक होना चाहिए।</b>"
-remove_index_too_big: "⚠️ अमान्य सूचकाङ्क। प्रतीक्षा सूची में केवल <b>{total}</b> संगीत हैं।"
-remove_success: "✅ प्रतीक्षा सूची से स्थिति <b>{index}</b> पर संगीत हटा दिया गया।\n👤 द्वारा: {user}"
+remove_usage: "{emoji:⚠️} <b>अमान्य प्रयोग।</b>\nप्रयोग: <code>{cmd} [सूचकाङ्क]</code>"
+remove_invalid_index: "{emoji:⚠️} <b>अमान्य सूचकाङ्क।</b> यह एक <b>संख्या</b> होनी चाहिए।"
+remove_index_too_small: "{emoji:⚠️} <b>सूचकाङ्क 0 से अधिक होना चाहिए।</b>"
+remove_index_too_big: "{emoji:⚠️} अमान्य सूचकाङ्क। प्रतीक्षा सूची में केवल <b>{total}</b> संगीत हैं।"
+remove_success: "{emoji:✅} प्रतीक्षा सूची से स्थिति <b>{index}</b> पर संगीत हटा दिया गया।\n{emoji:👤} द्वारा: {user}"
 
 # 🔁 Replay
 replay_failed: "❌ <b>पुनः चलाना विफल</b>\nत्रुटि: <code>{error}</code>"
 replay_success: |
-  🔁 <b>अब पुनः चलाया जा रहा है</b>
+  {emoji:🔁} <b>अब पुनः चलाया जा रहा है</b>
 
-  🎵 शीर्षक: {title}
-  ⏱️ अवधि: <code>{duration}</code>
-  ⚙️ गति: <b>{speed}x</b>
+  {emoji:🎵} शीर्षक: {title}
+  {emoji:⏱️} अवधि: <code>{duration}</code>
+  {emoji:⚙️} गति: <b>{speed}x</b>
 
 # ▶️ Resume
 resume_already_playing: "ℹ️ <b>पूर्व से ही चल रहा है</b>\nइस वार्तालाप में संगीत पूर्व से ही चल रहा है।\nक्या आप इसे विराम देना चाहेंगे?"
-resume_failed: "❌ <b>संगीत पुनः आरम्भ विफल</b>\nत्रुटि: <code>{error}</code>"
+resume_failed: "{emoji:❌} <b>संगीत पुनः आरम्भ विफल</b>\nत्रुटि: <code>{error}</code>"
 resume_success: |
-  ▶️ <b>संगीत पुनः आरम्भ किया जा रहा है</b>
+  {emoji:▶️} <b>संगीत पुनः आरम्भ किया जा रहा है</b>
 
-  🎵 शीर्षक: {title}
-  📍 स्थिति: {position} / {duration}
-  👤 पुनः आरम्भकर्ता: {user}
+  {emoji:🎵} शीर्षक: {title}
+  {emoji:📍} स्थिति: {position} / {duration}
+  {emoji:👤} पुनः आरम्भकर्ता: {user}
   {speed_line}
 
-restart: "♻️ पुनः आरम्भ हो रहा है..."
-restart_exepath_fail: "❌ निष्पादन योग्य पथ प्राप्त करने में विफल: {error}"
-restart_symlink_fail: "❌ निष्पादन योग्य पथ संकल्प में विफल: {error}"
+restart: "{emoji:♻️} पुनः आरम्भ हो रहा है..."
+restart_exepath_fail: "{emoji:❌} निष्पादन योग्य पथ प्राप्त करने में विफल: {error}"
+restart_symlink_fail: "{emoji:❌} निष्पादन योग्य पथ संकल्प में विफल: {error}"
 restart_service: "{bot} अभी पुनः आरम्भ हुआ है। असुविधा के लिए क्षमा करें।\n\n10–15 क्षण पश्चात पुनः चलाना आरम्भ करें।"
-restart_initiated: "✅ पुनः आरम्भ सफलतापूर्वक आरम्भ किया गया!"
-restart_fail: "❌ पुनः आरम्भ करने में विफल: {error}"
-restart_confirm_running: "⚠️ इस वार्तालाप में अभी एक गीत चल रहा है।\nकृपया नीचे से एक क्रिया चुनें।"
+restart_initiated: "{emoji:✅} पुनः आरम्भ सफलतापूर्वक आरम्भ किया गया!"
+restart_fail: "{emoji:❌} पुनः आरम्भ करने में विफल: {error}"
+restart_confirm_running: "{emoji:⚠️} इस वार्तालाप में अभी एक गीत चल रहा है।\nकृपया नीचे से एक क्रिया चुनें।"
 restart_btn_bot: "बॉट पुनः आरम्भ करें"
 restart_btn_replay: "गीत पुनः चलाएँ"
 restart_confirm_bot: "♻️ बॉट पुनः आरम्भ हो रहा है..."
@@ -559,7 +559,7 @@ room_no_active: "⚠️ <b>कोई सक्रिय संगीत नह�
 room_already_paused: "⏸️ संगीत पूर्व से ही विराम स्थिति में है। निरन्तरता के लिए ▶️ 'पुनः चलाएँ' दबाएँ।"
 room_pause_failed: "❌ संगीत विराम विफल।\n\n<i>{error}</i>"
 
-generic_error: "❌ कुछ गलत हुआ: <code>{error}</code>"
+generic_error: "{emoji:❌} कुछ गलत हुआ: <code>{error}</code>"
 
 settings_btn_adminmode: "🛡️ एडमिन मोड"
 settings_btn_cmddelete: "🗑️ कमांड डिलीट"
@@ -585,7 +585,7 @@ settings_info_cleanduration: |
 settings_info_cleanmode: |
   थोड़े समय बाद कमांड और बॉट के सर्विस संदेश अपने-आप हटाता है।
   प्लेइंग स्टेटस संदेश अपने तय समय तक बने रहते हैं।
-cleanmode_status: "🧹 <b>क्लीन मोड</b>\n\nकमांड और सर्विस संदेशों की स्वचालित सफाई।\nवर्तमान स्थिति: {action}"
+cleanmode_status: "{emoji:🧹} <b>क्लीन मोड</b>\n\nकमांड और सर्विस संदेशों की स्वचालित सफाई।\nवर्तमान स्थिति: {action}"
 cleanmode_hint: "Use /settings to change auto-delete duration."
 
 settings_info_lang: |
@@ -604,7 +604,7 @@ settings_info_playmode: |
   यह नियंत्रित करता है कि /play कमांड कौन उपयोग कर सकता है।
 
 settings_main: |
-  ⚙️ <b>चैट सेटिंग्स</b>
+  {emoji:⚙️} <b>चैट सेटिंग्स</b>
 
   <b>समूह:</b> {title}
   <b>समूह ID:</b> <code>{id}</code>
@@ -615,47 +615,47 @@ settings_updated: "✅ सेटिंग्स अपडेट हो गईं
 
 autoplay_no_active: "⚠️ बॉट वॉइस चैट में कुछ नहीं बजा रहा है। पहले कोई गाना चलाएँ।"
 autoplay_menu: |
-  🔁 <b>ऑटोप्ले</b>
+  {emoji:🔁} <b>ऑटोप्ले</b>
 
   चालू होने पर, क्यू समाप्त होने के बाद बॉट पिछले गाने से मिलते-जुलते सुझाए गए गाने स्वतः चलाता रहेगा।
 
   <b>स्थिति:</b> {state}
 
 autoplay_btn: "🔁 ऑटोप्ले: {state}"
-autoplay_enabled: "✅ ऑटोप्ले चालू हो गया!"
-autoplay_disabled: "❌ ऑटोप्ले बंद हो गया!"
+autoplay_enabled: "{emoji:✅} ऑटोप्ले चालू हो गया!"
+autoplay_disabled: "{emoji:❌} ऑटोप्ले बंद हो गया!"
 autoplay_requester: "ऑटोप्ले"
 
-searching: "🔍🎶 अन्वेषण किया जा रहा है... ⚡✨"
-searching_query: "🔍🎶 <b>{query}</b> के लिए अन्वेषण किया जा रहा है... ⚡✨"
+searching: "{emoji:🔍}{emoji:🎶} अन्वेषण किया जा रहा है... {emoji:⚡}{emoji:✨}"
+searching_query: "{emoji:🔍}{emoji:🎶} <b>{query}</b> के लिए अन्वेषण किया जा रहा है... {emoji:⚡}{emoji:✨}"
 
-speed_line: "⚙️ गति: <b>{speed}x</b>"
+speed_line: "{emoji:⚙️} गति: <b>{speed}x</b>"
 
 stats_overview: |
-  🔧 <b>प्रणाली:</b><blockquote>
+  {emoji:🔧} <b>प्रणाली:</b><blockquote>
   • प्रचालन तन्त्र: <code>{os}</code>, स्थापत्य: <code>{arch}</code>
   • प्रक्रमक: <code>{cpus}</code>, गो-रूटिन्स: <code>{goroutines}</code></blockquote>
 
-  📦 <b>आन्तरिक स्मृति (Go):</b><blockquote>
+  {emoji:📦} <b>आन्तरिक स्मृति (Go):</b><blockquote>
   • आवंटित: <code>{alloc} एम.बी.</code>
   • प्रणाल्याधीन: <code>{sys} एम.बी.</code>
   • अपशिष्ट संग्रहण संख्या: <code>{gc_count}</code> ({gc_emoji} {gc_rate}/मिनट)</blockquote>
 
-  💻 <b>सर्वर आँकड़े:</b><blockquote>
+  {emoji:💻} <b>सर्वर आँकड़े:</b><blockquote>
   • प्रक्रमक प्रयोग: {cpu_emoji} <code>{cpu}%</code>
   • स्मृति प्रयोग: {ram_emoji} <code>{ram_used_gib} जी.आई.बी.</code> | <code>{ram_total_gib} जी.आई.बी.</code>
   • भण्डारण: <code>{storage_used_gib} जी.आई.बी.</code> | <code>{storage_total_gib} जी.आई.बी.</code></blockquote>
 
-  🍃 <b>मोंगोडीबी आंकड़े:</b><blockquote>
+  {emoji:🍃} <b>मोंगोडीबी आंकड़े:</b><blockquote>
   • भंडारण: <code>{db_data} / {db_storage} MB</code>
   • संग्रह: <code>{db_collections}</code>
   • वस्तुएं: <code>{db_objects}</code></blockquote>
 
-  📊 <b>सेवित:</b><blockquote>
+  {emoji:📊} <b>सेवित:</b><blockquote>
   • वार्तालाप: <code>{served_chats}</code>
   • उपयोगकर्ता: <code>{served_users}</code></blockquote>
 
-  🧩 <b>रनटाइम संस्करण:</b><blockquote>
+  {emoji:🧩} <b>रनटाइम संस्करण:</b><blockquote>
   • Go: <code>{go_version}</code>
   • Gogram API Layer: <code>{gogram_api_layer}</code>
   • Gogram Version: <code>{gogram_version}</code>
@@ -663,58 +663,58 @@ stats_overview: |
 
 # 👑 Sudo users
 
-sudo_owner_self: "😂 हाहा, आप पूर्व से ही स्वामी हैं! आप स्वयं को पुनः जोड़ने का प्रयास क्यों कर रहे हैं?"
-sudo_bot_self: "🤖 हाहा, मैं स्वयं एक सहायक हूँ! मैं स्वयं को विशेषाधिकारी सूची में नहीं जोड़ सकता — यहाँ तक कि स्वामी भी मुझे धोखा नहीं दे सकते 😎"
-sudo_bot_user: "🤖 आप विशेषाधिकारी सूची में एक सहायक को नहीं जोड़ सकते — विशेषाधिकारी मनुष्य होने चाहिए!"
+sudo_owner_self: "{emoji:😂} हाहा, आप पूर्व से ही स्वामी हैं! आप स्वयं को पुनः जोड़ने का प्रयास क्यों कर रहे हैं?"
+sudo_bot_self: "{emoji:🤖} हाहा, मैं स्वयं एक सहायक हूँ! मैं स्वयं को विशेषाधिकारी सूची में नहीं जोड़ सकता — यहाँ तक कि स्वामी भी मुझे धोखा नहीं दे सकते {emoji:😎}"
+sudo_bot_user: "{emoji:🤖} आप विशेषाधिकारी सूची में एक सहायक को नहीं जोड़ सकते — विशेषाधिकारी मनुष्य होने चाहिए!"
 
-sudo_fetch_user_fail: "❌ उपयोगकर्ता सूचना प्राप्त करने में विफल। सम्भवतः उपयोगकर्ता तक पहुँच नहीं है।\n<i>{error}</i>"
-sudo_check_fail: "❌ विशेषाधिकारी उपस्थिति जाँचने में विफल: <i>{error}</i>"
-sudo_already: "⚠️ उपयोगकर्ता {user} (परिचय पत्र: <code>{id}</code>) पूर्व से ही विशेषाधिकारी है।"
-sudo_add_fail: "❌ विशेषाधिकारी जोड़ने में विफल: <i>{error}</i>"
-sudo_add_success: "✅ {user} (<code>{id}</code>) को विशेषाधिकारियों में जोड़ा गया।"
+sudo_fetch_user_fail: "{emoji:❌} उपयोगकर्ता सूचना प्राप्त करने में विफल। सम्भवतः उपयोगकर्ता तक पहुँच नहीं है।\n<i>{error}</i>"
+sudo_check_fail: "{emoji:❌} विशेषाधिकारी उपस्थिति जाँचने में विफल: <i>{error}</i>"
+sudo_already: "{emoji:⚠️} उपयोगकर्ता {user} (परिचय पत्र: <code>{id}</code>) पूर्व से ही विशेषाधिकारी है।"
+sudo_add_fail: "{emoji:❌} विशेषाधिकारी जोड़ने में विफल: <i>{error}</i>"
+sudo_add_success: "{emoji:✅} {user} (<code>{id}</code>) को विशेषाधिकारियों में जोड़ा गया।"
 
-sudo_owner_remove_block: "😎 अच्छा प्रयास! आप स्वामी को नहीं हटा सकते — वे अछूत हैं।"
-sudo_not_exists: "⚠️ उपयोगकर्ता {user} (<code>{id}</code>) विशेषाधिकारी नहीं है।"
-sudo_remove_fail: "❌ विशेषाधिकारी को हटाने में विफल: <i>{error}</i>"
-sudo_remove_success: "🗑️ {user} (परिचय पत्र: <code>{id}</code>) को विशेषाधिकारियों से हटाया गया।"
+sudo_owner_remove_block: "{emoji:😎} अच्छा प्रयास! आप स्वामी को नहीं हटा सकते — वे अछूत हैं।"
+sudo_not_exists: "{emoji:⚠️} उपयोगकर्ता {user} (<code>{id}</code>) विशेषाधिकारी नहीं है।"
+sudo_remove_fail: "{emoji:❌} विशेषाधिकारी को हटाने में विफल: <i>{error}</i>"
+sudo_remove_success: "{emoji:🗑️} {user} (परिचय पत्र: <code>{id}</code>) को विशेषाधिकारियों से हटाया गया।"
 
-sudo_list_fetching: "⏳ विशेषाधिकारियों की सूची प्राप्त की जा रही है..."
-sudo_list_fetch_fail: "❌ विशेषाधिकारियों को प्राप्त करने में विफल: <code>{error}</code>"
-sudo_list_header: "👑 <b>वर्तमान विशेषाधिकारी:</b>"
+sudo_list_fetching: "{emoji:⏳} विशेषाधिकारियों की सूची प्राप्त की जा रही है..."
+sudo_list_fetch_fail: "{emoji:❌} विशेषाधिकारियों को प्राप्त करने में विफल: <code>{error}</code>"
+sudo_list_header: "{emoji:👑} <b>वर्तमान विशेषाधिकारी:</b>"
 sudo_list_owner: "{index}. {user} — <b>स्वामी</b>"
 sudo_list_entry: "{index}. {user}"
-sudo_list_no_extra: "⚠️ कोई अतिरिक्त विशेषाधिकारी नहीं मिला।"
+sudo_list_no_extra: "{emoji:⚠️} कोई अतिरिक्त विशेषाधिकारी नहीं मिला।"
 
-seek_no_active: "⚠️ <b>वर्तमान में कोई संगीत नहीं चल रहा है।</b>"
-seek_usage: "⚠️ कृपया क्षण प्रदान करें।\nउदाहरण: <code>{cmd} 40</code>"
-seek_invalid_seconds: "⚠️ क्षणों का अमान्य मान।\nउदाहरण: <code>{cmd} 40</code>"
-seek_too_close_start: "⚠️ <b>{seconds}</b> क्षण पीछे नहीं हटाया जा सकता — यह संगीत के आरम्भ के बहुत निकट होगा।"
-seek_too_close_end: "⚠️ <b>{seconds}</b> क्षण आगे नहीं बढ़ाया जा सकता — यह संगीत के अन्त के बहुत निकट होगा।"
-seek_failed: "❌ {direction} <b>{seconds}</b> क्षण खिसकाने में विफल।\nत्रुटि: <code>{error}</code>"
+seek_no_active: "{emoji:⚠️} <b>वर्तमान में कोई संगीत नहीं चल रहा है।</b>"
+seek_usage: "{emoji:⚠️} कृपया क्षण प्रदान करें।\nउदाहरण: <code>{cmd} 40</code>"
+seek_invalid_seconds: "{emoji:⚠️} क्षणों का अमान्य मान।\nउदाहरण: <code>{cmd} 40</code>"
+seek_too_close_start: "{emoji:⚠️} <b>{seconds}</b> क्षण पीछे नहीं हटाया जा सकता — यह संगीत के आरम्भ के बहुत निकट होगा।"
+seek_too_close_end: "{emoji:⚠️} <b>{seconds}</b> क्षण आगे नहीं बढ़ाया जा सकता — यह संगीत के अन्त के बहुत निकट होगा।"
+seek_failed: "{emoji:❌} {direction} <b>{seconds}</b> क्षण खिसकाने में विफल।\nत्रुटि: <code>{error}</code>"
 seek_success: "{emoji} {direction} <b>{duration}</b> में से <b>{position}</b> पर कूदे।"
 
 stop_confirm_paused: |
-  ⏸️ <b>संगीत वर्तमान में विराम स्थिति में है।</b>
+  {emoji:⏸️} <b>संगीत वर्तमान में विराम स्थिति में है।</b>
 
   क्या आप इसे पुनः आरम्भ करना चाहते हैं या पूर्णतः बन्द करना चाहते हैं?
 
 stop_confirm_muted: |
-  🔇 <b>संगीत वर्तमान में निःशब्द है।</b>
+  {emoji:🔇} <b>संगीत वर्तमान में निःशब्द है।</b>
 
   क्या आप इसे सशब्द करना चाहते हैं या पूर्णतः बन्द करना चाहते हैं?
 
-stopped: "⏹️ <b>संगीत बन्द किया गया और प्रतीक्षा सूची {user} द्वारा रिक्त की गई।</b>"
+stopped: "{emoji:⏹️} <b>संगीत बन्द किया गया और प्रतीक्षा सूची {user} द्वारा रिक्त की गई।</b>"
 
-shuffle_current_state: "🔀 इस वार्तालाप के लिए वर्तमान में यादृच्छिक क्रम <b>{state}</b> है।\n\nइसे बदलने के लिए <code>{cmd}</code> का प्रयोग करें।"
-shuffle_updated: "🔀 {user} द्वारा यादृच्छिक क्रम <b>{state}</b> किया गया।"
+shuffle_current_state: "{emoji:🔀} इस वार्तालाप के लिए वर्तमान में यादृच्छिक क्रम <b>{state}</b> है।\n\nइसे बदलने के लिए <code>{cmd}</code> का प्रयोग करें।"
+shuffle_updated: "{emoji:🔀} {user} द्वारा यादृच्छिक क्रम <b>{state}</b> किया गया।"
 
-skip_stopped: "⏹️ संगीत बन्द। प्रतीक्षा सूची रिक्त है।\nछोड़ने वाला: {user}"
-skip_invalid_number: "⚠️ कृपया /skip के बाद मान्य संख्या दें।\nउदाहरण: <code>/skip 3</code>"
-skip_queue_empty_for_count: "⚠️ स्किप करने के लिए कतार में कोई अगला ट्रैक नहीं है।"
-skip_count_exceeds_queue: "⚠️ आपने <code>{requested}</code> ट्रैक स्किप करने को कहा, लेकिन कतार में सिर्फ <code>{available}</code> ट्रैक है।"
+skip_stopped: "{emoji:⏹️} संगीत बन्द। प्रतीक्षा सूची रिक्त है।\nछोड़ने वाला: {user}"
+skip_invalid_number: "{emoji:⚠️} कृपया /skip के बाद मान्य संख्या दें।\nउदाहरण: <code>/skip 3</code>"
+skip_queue_empty_for_count: "{emoji:⚠️} स्किप करने के लिए कतार में कोई अगला ट्रैक नहीं है।"
+skip_count_exceeds_queue: "{emoji:⚠️} आपने <code>{requested}</code> ट्रैक स्किप करने को कहा, लेकिन कतार में सिर्फ <code>{available}</code> ट्रैक है।"
 
 speed_usage: |
-  💡 <b>प्रयोग:</b>
+  {emoji:💡} <b>प्रयोग:</b>
   <code>{cmd} [गति]</code> — चलाने की गति बदलें
   
   अनुमत गति सीमा: <b>0.50x → 4.00x</b>
@@ -723,75 +723,75 @@ speed_usage: |
   <code>{cmd} 1.5</code> — 1.5x की गति से चलाएँ।
   <code>{cmd} normal</code> — सामान्य गति पर लौटें।
 
-speed_current: "🎧 <b>वर्तमान गति:</b> 🎵 <u>{title}</u> के लिए <code>{speed}x</code>\n\n💡 सामान्य गति पर लौटने के लिए <code>{cmd} reset</code> का प्रयोग करें।"
+speed_current: "{emoji:🎧} <b>वर्तमान गति:</b> {emoji:🎵} <u>{title}</u> के लिए <code>{speed}x</code>\n\n{emoji:💡} सामान्य गति पर लौटने के लिए <code>{cmd} reset</code> का प्रयोग करें।"
 
-speed_invalid_value: "❌ अमान्य गति मान।\nउदाहरण: <code>{cmd} 1.5</code> या <code>{cmd} 2x</code>"
-speed_invalid_range: "⚠️ गति <b>0.50x</b> और <b>4.00x</b> के मध्य होनी चाहिए।"
+speed_invalid_value: "{emoji:❌} अमान्य गति मान।\nउदाहरण: <code>{cmd} 1.5</code> या <code>{cmd} 2x</code>"
+speed_invalid_range: "{emoji:⚠️} गति <b>0.50x</b> और <b>4.00x</b> के मध्य होनी चाहिए।"
 
-speed_already_set: "ℹ️ 🎵 <b>{title}</b> के लिए चलाने की गति पूर्व से ही <b>{speed}x</b> है।"
+speed_already_set: "ℹ️ {emoji:🎵} <b>{title}</b> के लिए चलाने की गति पूर्व से ही <b>{speed}x</b> है।"
 
 speed_failed: |
-  ❌ गति को <b>{speed}x</b> में बदलने में विफल।
+  {emoji:❌} गति को <b>{speed}x</b> में बदलने में विफल।
   त्रुटि: <code>{error}</code>
 
-speed_reset_success: "✅ {user} द्वारा चलाने की गति <b>1.0x</b> पर पुनर्निर्धारित"
+speed_reset_success: "{emoji:✅} {user} द्वारा चलाने की गति <b>1.0x</b> पर पुनर्निर्धारित"
 
-speed_set: "🚀 {user} द्वारा चलाने की गति <b>{speed}x</b> निर्धारित।"
+speed_set: "{emoji:🚀} {user} द्वारा चलाने की गति <b>{speed}x</b> निर्धारित।"
 
-start_private: "नमस्कार {user}, मेरा नाम {bot} है।\n\nमैं कुछ उपयोगी सुविधाओं के साथ एक टेलीग्राम प्रवाह सहायक हूँ। मैं यूट्यूब, स्पॉटिफाई, जियो-सावन, साउण्ड-क्लाउड आदि जैसे मंचों का समर्थन करता हूँ।\n\nनिसंकोच मुझे अपने समूहों में जोड़ें। {emoji:thumbs_up}"
+start_private: "नमस्कार {user}, मेरा नाम {bot} है।\n\nमैं कुछ उपयोगी सुविधाओं के साथ एक टेलीग्राम प्रवाह सहायक हूँ। मैं यूट्यूब, स्पॉटिफाई, जियो-सावन, साउण्ड-क्लाउड आदि जैसे मंचों का समर्थन करता हूँ।\n\nनिसंकोच मुझे अपने समूहों में जोड़ें। {emoji:👍}"
 
-start_group: "<b>💫 मैं यहाँ हूँ!</b> कोई आदेश दें... यदि आपको लगता है कि आप मुझे नियन्त्रित कर सकते हैं 😉"
+start_group: "<b>{emoji:💫} मैं यहाँ हूँ!</b> कोई आदेश दें... यदि आपको लगता है कि आप मुझे नियन्त्रित कर सकते हैं {emoji:😉}"
 
-stream_queue_finished: "🎵 <b>प्रतीक्षा सूची समाप्त!</b>\n\nचलाने के लिए कोई और गीत नहीं है। अधिक संगीत जोड़ने के लिए /play का प्रयोग करें! 🎶"
-stream_downloading_next: "📥 आपका अगला संगीत अभिलेखित किया जा रहा है..."
-stream_autoplay_next: "🔁 ऑटोप्ले: <b>{title}</b>"
-stream_download_fail: "❌ डाउनलोड में विफल।\nत्रुटि: <code>{error}</code>"
+stream_queue_finished: "{emoji:🎵} <b>प्रतीक्षा सूची समाप्त!</b>\n\nचलाने के लिए कोई और गीत नहीं है। अधिक संगीत जोड़ने के लिए /play का प्रयोग करें! {emoji:🎶}"
+stream_downloading_next: "{emoji:📥} आपका अगला संगीत अभिलेखित किया जा रहा है..."
+stream_autoplay_next: "{emoji:🔁} ऑटोप्ले: <b>{title}</b>"
+stream_download_fail: "{emoji:❌} डाउनलोड में विफल।\nत्रुटि: <code>{error}</code>"
 download_progress: |
-  📥 आपका संगीत डाउनलोड किया जा रहा है...
+  {emoji:📥} आपका संगीत डाउनलोड किया जा रहा है...
 
   <b>प्रगति:</b> {percentage}%
   <b>गति:</b> {speed}
   <b>शेष समय:</b> {eta}
   <b>बीता समय:</b> {elapsed}
-stream_play_fail: "❌ संगीत चलाने में विफल।"
+stream_play_fail: "{emoji:❌} संगीत चलाने में विफल।"
 stream_now_playing: |
-  <b>🎵 अब चल रहा है:</b>
+  <b>{emoji:🎵} अब चल रहा है:</b>
 
   <b>▫ संगीत:</b> <a href="{url}">{title}</a>
   <b>▫ अवधि:</b> {duration}
   <b>▫ अनुरुद्धकर्ता:</b> {by}
 
 # 👑 Sudo / Owner Join Messages
-sudo_join_owner: "👑 {user} — {bot} के स्वामी — अभी वार्तालाप में प्रविष्ट हुए।"
-sudo_join_sudo: "🛡️ {user}, {bot} के एक विशेषाधिकारी, अभी वार्तालाप में सम्मिलित हुए।"
+sudo_join_owner: "{emoji:👑} {user} — {bot} के स्वामी — अभी वार्तालाप में प्रविष्ट हुए।"
+sudo_join_sudo: "{emoji:🛡️} {user}, {bot} के एक विशेषाधिकारी, अभी वार्तालाप में सम्मिलित हुए।"
 
 supergroup_needed: |
   यह चैट (ID: <code>{chat_id}</code>) अभी SuperGroup नहीं है।
 
-  <i>⚠️ कृपया इस ग्रुप को SuperGroup में बदलें, फिर मुझे दोबारा admin के रूप में जोड़ें।</i>
+  <i>{emoji:⚠️} कृपया इस ग्रुप को SuperGroup में बदलें, फिर मुझे दोबारा admin के रूप में जोड़ें।</i>
 
   <b>कैसे बदलें?</b>
-  <a href="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">🔗 गाइड खोलें</a>
+  <a href="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">{emoji:🔗} गाइड खोलें</a>
 
   अगर फिर भी कोई समस्या हो, तो हमारे <a href="{support_group}">support group</a> से जुड़ें।
 
 unmute_already: "ℹ️ <b>पूर्व से ही सशब्द</b>\nइस वार्तालाप में संगीत निःशब्द नहीं है।"
 unmute_failed: "❌ <b>संगीत सशब्द करना विफल</b>\nत्रुटि: <code>{error}</code>"
 unmute_success: |
-  🔊 <b>संगीत सशब्द किया गया</b>
+  {emoji:🔊} <b>संगीत सशब्द किया गया</b>
 
-  🎵 संगीत: {title}
-  👤 सशब्दकर्ता: {user}
+  {emoji:🎵} संगीत: {title}
+  {emoji:👤} सशब्दकर्ता: {user}
   {speed_line}
 
 
 # 🔊 Voice Chat Events
-voicechat_ended: "<b>⚠️ दृश्य-ध्वनि वार्तालाप समाप्त</b>\n\n<i>⏰ अवधि: {duration}</i>"
-voicechat_started: "<b>♻️ ध्वनि वार्तालाप आरम्भ!</b>\n\n<i>संगीत चलाने के लिए /play [गीत का नाम] का प्रयोग करें।</i>"
+voicechat_ended: "<b>{emoji:⚠️} दृश्य-ध्वनि वार्तालाप समाप्त</b>\n\n<i>{emoji:⏰} अवधि: {duration}</i>"
+voicechat_started: "<b>{emoji:♻️} ध्वनि वार्तालाप आरम्भ!</b>\n\n<i>संगीत चलाने के लिए /play [गीत का नाम] का प्रयोग करें।</i>"
 
 # Commands help
 help_owner: |
-  👑 <b>स्वामी आदेश</b>
+  {emoji:👑} <b>स्वामी आदेश</b>
 
   <i>विशेषाधिकारियों के प्रबन्धन, प्रणाल्याधीन कोड निष्पादन और सहायक प्रशासन को सुरक्षित रूप से संचालित करने के लिए अनन्य साधन।</i>
 
@@ -810,7 +810,7 @@ help_owner: |
   </blockquote>
 
 help_sudo: |
-  ⚡ <b>विशेषाधिकारी आदेश</b>
+  {emoji:⚡} <b>विशेषाधिकारी आदेश</b>
 
   <i>सहायक के व्यवहार प्रबन्धन, प्रदर्शन की निगरानी और डाउनलोड एवं स्वचालन के नियन्त्रण के लिए उन्नत साधन।</i>
 
@@ -824,7 +824,7 @@ help_sudo: |
   </blockquote>
 
 help_admin: |
-  🛠 <b>प्रशासक आदेश</b>
+  {emoji:🛠} <b>प्रशासक आदेश</b>
 
   <i>प्रशासकों के लिए संगीत और पुनः प्रसारण को सुगमता से नियन्त्रित करने के साधन।</i>
 
@@ -855,7 +855,7 @@ help_admin: |
   </blockquote>
 
 help_public: |
-  🌍 <b>सार्वजनिक आदेश</b>
+  {emoji:🌍} <b>सार्वजनिक आदेश</b>
 
   <i>गीत चलाने, प्रतीक्षा सूची देखने, विलम्बता जाँचने और त्रुटि सूचना देने की सुविधाएँ।</i>
 

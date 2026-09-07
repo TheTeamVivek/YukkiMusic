@@ -24,111 +24,111 @@ HELP_SUDOERS_BTN: "⚡ المساعدون"
 BACK_BTN: "⬅️ عودة"
 
 # basically this string used in /command [bool]
-invalid_bool: "⚠️ <b>قيمة غير صالحة.</b>\nاستخدم 'enable' (تفعيل) أو 'disable' (تعطيل)."
+invalid_bool: "{emoji:⚠️} <b>قيمة غير صالحة.</b>\nاستخدم 'enable' (تفعيل) أو 'disable' (تعطيل)."
 
 adminmode_help: |
-  🛡️ <b>وضع أوامر الإدارة</b>
+  {emoji:🛡️} <b>وضع أوامر الإدارة</b>
 
   <b>الحالة:</b> {status}
   <b>الاستخدام:</b> <code>/adminmode [admin|adminauth|everyone]</code>
 adminmode_status_admin: "المشرفون 🔐"
 adminmode_status_adminauth: "المصرح لهم 🎧"
 adminmode_status_everyone: "الجميع 🌍"
-adminmode_updated: "✅ تم تحديث <b>وضع أوامر الإدارة</b> إلى: {status}"
-adminmode_invalid: "⚠️ وضع غير صالح. استخدم: <code>admin</code>، <code>adminauth</code>، أو <code>everyone</code>."
+adminmode_updated: "{emoji:✅} تم تحديث <b>وضع أوامر الإدارة</b> إلى: {status}"
+adminmode_invalid: "{emoji:⚠️} وضع غير صالح. استخدم: <code>admin</code>، <code>adminauth</code>، أو <code>everyone</code>."
 
 
 # 🚫 Assistant Restricted / Banned
 assistant_restricted_warning: |
-  ⚠️ <b>الحساب المساعد مقيد</b>
+  {emoji:⚠️} <b>الحساب المساعد مقيد</b>
 
   المساعد {assistant} (المعرف: <code>{id}</code>) <b>محظور</b> أو مقيد في هذه المحادثة.
   لا يمكنني تشغيل الموسيقى، أو إدارة قائمة الانتظار، أو تنظيف المسارات طالما استمر هذا الوضع.
 
-  <i>قم بإلغاء حظر المساعد لاستعادة كافة ميزات الموسيقى 🎵</i>
+  <i>قم بإلغاء حظر المساعد لاستعادة كافة ميزات الموسيقى {emoji:🎵}</i>
 
 # 🧩 Common auth messages
-auth_no_user: "⚠️ يرجى تحديد مستخدم — استخدم:\n{cmd} [user_id] أو قم بالرد على رسالة المستخدم."
-user_extract_fail: "⚠️ تعذر العثور على هذا المستخدم: <i>{error}</i>"
-auth_limit_reached: "⚠️ وصلت هذه المحادثة إلى الحد الأقصى للمستخدمين المصرح لهم ({limit}). يرجى إزالة شخص ما قبل إضافة مستخدم جديد."
-already_authed: "⚠️ هذا المستخدم مصرح له بالفعل — لا داعي لإضافته مرة أخرى."
+auth_no_user: "{emoji:⚠️} يرجى تحديد مستخدم — استخدم:\n{cmd} [user_id] أو قم بالرد على رسالة المستخدم."
+user_extract_fail: "{emoji:⚠️} تعذر العثور على هذا المستخدم: <i>{error}</i>"
+auth_limit_reached: "{emoji:⚠️} وصلت هذه المحادثة إلى الحد الأقصى للمستخدمين المصرح لهم ({limit}). يرجى إزالة شخص ما قبل إضافة مستخدم جديد."
+already_authed: "{emoji:⚠️} هذا المستخدم مصرح له بالفعل — لا داعي لإضافته مرة أخرى."
 
 # 🤖 Add auth
-cannot_authorize_user: "⚠️ لا يمكن التصريح لهذا المستخدم.\nمالك حساب المساعد، حساب المساعد نفسه، أو أنت لا تحتاجون إلى تصريح."
-addauth_user_is_admin: "⚠️ هذا المستخدم هو بالفعل مشرف في المحادثة. لا حاجة للتصريح."
-addauth_bot_user: "🤖 لا يمكنك إضافة حساب مساعد إلى قائمة التصريح — يجب أن يكون المستخدمون المصرح لهم بشراً!"
-addauth_add_fail: "❌ فشل إضافة المستخدم المصرح له: {error}"
-addauth_success_with_count: "✅ تمت إضافة {user}.\nالآن يوجد {count}/{limit} مستخدم مصرح له."
-addauth_success: "✅ تمت إضافة {user} بنجاح إلى قائمة المستخدمين المصرح لهم."
+cannot_authorize_user: "{emoji:⚠️} لا يمكن التصريح لهذا المستخدم.\nمالك حساب المساعد، حساب المساعد نفسه، أو أنت لا تحتاجون إلى تصريح."
+addauth_user_is_admin: "{emoji:⚠️} هذا المستخدم هو بالفعل مشرف في المحادثة. لا حاجة للتصريح."
+addauth_bot_user: "{emoji:🤖} لا يمكنك إضافة حساب مساعد إلى قائمة التصريح — يجب أن يكون المستخدمون المصرح لهم بشراً!"
+addauth_add_fail: "{emoji:❌} فشل إضافة المستخدم المصرح له: {error}"
+addauth_success_with_count: "{emoji:✅} تمت إضافة {user}.\nالآن يوجد {count}/{limit} مستخدم مصرح له."
+addauth_success: "{emoji:✅} تمت إضافة {user} بنجاح إلى قائمة المستخدمين المصرح لهم."
 
 # 🤖 Bot Added to Chat
-bot_added_normal: "🎵 شكراً لإضافتي! استخدم /play [اسم الأغنية] لبدء تشغيل الموسيقى."
+bot_added_normal: "{emoji:🎵} شكراً لإضافتي! استخدم /play [اسم الأغنية] لبدء تشغيل الموسيقى."
 
 # ⚠️ Bot Demotion
 bot_demotion_goodbye: |
-  <b>⚠️ ليس لدي صلاحيات</b>
+  <b>{emoji:⚠️} ليس لدي صلاحيات</b>
 
   لقد تمت <b>إقالتي من منصب المشرف</b> ولا يمكنني أداء مهامي بعد الآن.
   بدون الحقوق المناسبة، لا يمكنني العمل هنا، لذا <i>سأغادر المحادثة الآن</i>.
 
-  <b>وداعاً 👋</b>
+  <b>وداعاً {emoji:👋}</b>
 
-broadcast_already_running: "⚠️ هناك بث جارٍ بالفعل.\n\nيرجى الانتظار حتى يكتمل أو إلغاؤه أولاً باستخدام:\n• <code>/broadcast -cancel</code>\n• أو انقر فوق زر الإلغاء في رسالة التقدم"
-broadcast_parse_failed: "❌ فشل تحليل أمر البث:\n<code>{error}</code>"
-broadcast_no_content: "⚠️ لم يتم توفير محتوى للبث.\n\n<b>الاستخدام:</b> <code>{cmd} [النص أو الرد على رسالة]</code>\n\n<b>مثال:</b>\n<code>{cmd} مرحباً بالجميع!</code>"
-broadcast_fetch_chats_failed: "❌ فشل جلب المحادثات المخدومة:\n<code>{error}</code>"
-broadcast_fetch_users_failed: "❌ فشل جلب المستخدمين المخدومين:\n<code>{error}</code>"
-broadcast_no_targets: "⚠️ لم يتم العثور على أهداف للبث.\n\nتأكد من أنك لم تستبعد جميع الأهداف باستخدام الأعلام."
-broadcast_initializing: "📡 جاري تهيئة البث...\n\nيرجى الانتظار..."
-broadcast_progress_header: "📡 جاري البث..."
-broadcast_total_chats: "📊 إجمالي المحادثات: {done}/{total} ({progress}%)"
-broadcast_total_users: "👥 إجمالي المستخدمين: {done}/{total} ({progress}%)"
-broadcast_failed_chats: "❌ المحادثات الفاشلة: {count}"
-broadcast_failed_users: "❌ المستخدمون الفاشلون: {count}"
-broadcast_delay: "⏱ التأخير: {delay} ثانية"
-broadcast_elapsed: "⏰ الوقت المنقضي: {elapsed}"
-broadcast_eta: "⏳ الوقت المتوقع: {eta}"
-broadcast_success_rate: "✨ نسبة النجاح: {rate}% ({sent}/{total})"
+broadcast_already_running: "{emoji:⚠️} هناك بث جارٍ بالفعل.\n\nيرجى الانتظار حتى يكتمل أو إلغاؤه أولاً باستخدام:\n• <code>/broadcast -cancel</code>\n• أو انقر فوق زر الإلغاء في رسالة التقدم"
+broadcast_parse_failed: "{emoji:❌} فشل تحليل أمر البث:\n<code>{error}</code>"
+broadcast_no_content: "{emoji:⚠️} لم يتم توفير محتوى للبث.\n\n<b>الاستخدام:</b> <code>{cmd} [النص أو الرد على رسالة]</code>\n\n<b>مثال:</b>\n<code>{cmd} مرحباً بالجميع!</code>"
+broadcast_fetch_chats_failed: "{emoji:❌} فشل جلب المحادثات المخدومة:\n<code>{error}</code>"
+broadcast_fetch_users_failed: "{emoji:❌} فشل جلب المستخدمين المخدومين:\n<code>{error}</code>"
+broadcast_no_targets: "{emoji:⚠️} لم يتم العثور على أهداف للبث.\n\nتأكد من أنك لم تستبعد جميع الأهداف باستخدام الأعلام."
+broadcast_initializing: "{emoji:📡} جاري تهيئة البث...\n\nيرجى الانتظار..."
+broadcast_progress_header: "{emoji:📡} جاري البث..."
+broadcast_total_chats: "{emoji:📊} إجمالي المحادثات: {done}/{total} ({progress}%)"
+broadcast_total_users: "{emoji:👥} إجمالي المستخدمين: {done}/{total} ({progress}%)"
+broadcast_failed_chats: "{emoji:❌} المحادثات الفاشلة: {count}"
+broadcast_failed_users: "{emoji:❌} المستخدمون الفاشلون: {count}"
+broadcast_delay: "{emoji:⏱} التأخير: {delay} ثانية"
+broadcast_elapsed: "{emoji:⏰} الوقت المنقضي: {elapsed}"
+broadcast_eta: "{emoji:⏳} الوقت المتوقع: {eta}"
+broadcast_success_rate: "{emoji:✨} نسبة النجاح: {rate}% ({sent}/{total})"
 broadcast_not_running: "ℹ️ لا يوجد بث جارٍ حالياً."
-broadcast_cancel_success: "🚫 تم إلغاء البث بنجاح."
+broadcast_cancel_success: "{emoji:🚫} تم إلغاء البث بنجاح."
 broadcast_cancel_owner_only: "⚠️ يمكن للمالك فقط إلغاء البث."
 broadcast_cancel_none_running: "ℹ️ لا يوجد بث جارٍ حالياً."
 broadcast_cancel_done: "🚫 تم إلغاء البث."
 
 # Blocklist
 
-blacklist_chat_blocked: "🚫 هذه الدردشة محظورة من استخدام هذا البوت."
-blacklist_owner_blocked_leave: "🚫 مالك هذه الدردشة محظور من استخدام هذا البوت. سأغادر الدردشة."
-blacklist_user_blocked: "🚫 أنت محظور من استخدام هذا البوت."
+blacklist_chat_blocked: "{emoji:🚫} هذه الدردشة محظورة من استخدام هذا البوت."
+blacklist_owner_blocked_leave: "{emoji:🚫} مالك هذه الدردشة محظور من استخدام هذا البوت. سأغادر الدردشة."
+blacklist_user_blocked: "{emoji:🚫} أنت محظور من استخدام هذا البوت."
 blacklist_usage_blockchat: "الاستخدام: <code>/blockchat [chat_id|@username]</code>"
 blacklist_usage_unblockchat: "الاستخدام: <code>/unblockchat [chat_id|@username]</code>"
 blacklist_invalid_chat_identifier: "معرّف الدردشة غير صالح: {error}"
-blacklist_block_user_success: "✅ تم حظر المستخدم: <code>{id}</code>"
-blacklist_unblock_user_success: "✅ تم إلغاء حظر المستخدم: <code>{id}</code>"
-blacklist_block_chat_success: "✅ تم حظر الدردشة: <code>{id}</code>"
-blacklist_unblock_chat_success: "✅ تم إلغاء حظر الدردشة: <code>{id}</code>"
-blacklist_unblock_user_fail: "⚠️ فشل في إلغاء حظر المستخدم: {error}"
-blacklist_unblock_chat_fail: "⚠️ فشل في إلغاء حظر الدردشة: {error}"
-blacklist_fetch_chats_fail: "⚠️ فشل في جلب الدردشات المحظورة: {error}"
-blacklist_fetch_users_fail: "⚠️ فشل في جلب المستخدمين المحظورين: {error}"
-blacklist_list_title: "📛 <b>القائمة المحظورة</b>"
-blacklist_list_chats: "💬 <b>الدردشات:</b>"
-blacklist_list_users: "👤 <b>المستخدمون:</b>"
+blacklist_block_user_success: "{emoji:✅} تم حظر المستخدم: <code>{id}</code>"
+blacklist_unblock_user_success: "{emoji:✅} تم إلغاء حظر المستخدم: <code>{id}</code>"
+blacklist_block_chat_success: "{emoji:✅} تم حظر الدردشة: <code>{id}</code>"
+blacklist_unblock_chat_success: "{emoji:✅} تم إلغاء حظر الدردشة: <code>{id}</code>"
+blacklist_unblock_user_fail: "{emoji:⚠️} فشل في إلغاء حظر المستخدم: {error}"
+blacklist_unblock_chat_fail: "{emoji:⚠️} فشل في إلغاء حظر الدردشة: {error}"
+blacklist_fetch_chats_fail: "{emoji:⚠️} فشل في جلب الدردشات المحظورة: {error}"
+blacklist_fetch_users_fail: "{emoji:⚠️} فشل في جلب المستخدمين المحظورين: {error}"
+blacklist_list_title: "{emoji:📛} <b>القائمة المحظورة</b>"
+blacklist_list_chats: "{emoji:💬} <b>الدردشات:</b>"
+blacklist_list_users: "{emoji:👤} <b>المستخدمون:</b>"
 
 # 🎧 CPlay (Channel Play)
 
-cplay_id_not_set: "⚠️ لم يتم تعيين معرف cplay.\nاستخدم <code>/setcplay &lt;chat_id&gt;</code> لتعيينه."
+cplay_id_not_set: "{emoji:⚠️} لم يتم تعيين معرف cplay.\nاستخدم <code>/setcplay &lt;chat_id&gt;</code> لتعيينه."
 cplay_usage: "<b>الاستخدام:</b> <code>/setcplay &lt;channel_id&gt;</code>"
 cplay_resolve_peer_fail: "<b>فشل جلب الأطراف:</b> تعذر جلب تفاصيل القناة. تأكد من أنني أملك صلاحية الوصول إلى هذه القناة."
 cplay_invalid_target: "<b>هدف غير صالح:</b> المعرف المقدم ليس قناة صالحة."
 cplay_channel_not_accessible: "<b>لا يمكن الوصول إلى القناة:</b> تعذر استرداد معلومات القناة. يرجى التأكد من أنني مشرف في القناة المستهدفة."
-cplay_bot_invite_permission_missing: "⚠️ <b>صلاحية مفقودة:</b> أنا مشرف في القناة المستهدفة لكن صلاحية <code>دعوة المستخدمين</code> معطلة. يرجى تفعيلها ثم المحاولة مرة أخرى."
-cplay_channel_not_linked: "⚠️ <b>لم يتم العثور على قناة مرتبطة:</b> هذه الدردشة غير مرتبطة بأي قناة/مجموعة."
+cplay_bot_invite_permission_missing: "{emoji:⚠️} <b>صلاحية مفقودة:</b> أنا مشرف في القناة المستهدفة لكن صلاحية <code>دعوة المستخدمين</code> معطلة. يرجى تفعيلها ثم المحاولة مرة أخرى."
+cplay_channel_not_linked: "{emoji:⚠️} <b>لم يتم العثور على قناة مرتبطة:</b> هذه الدردشة غير مرتبطة بأي قناة/مجموعة."
 cplay_save_error: "<b>خطأ:</b> فشل حفظ إعدادات CPlay."
-cplay_owner_required: "⚠️ يمكن فقط لمالك هذه الدردشة أو مالك القناة الهدف استخدام هذا الإعداد."
-cplay_owner_check_failed: "⚠️ تعذر التحقق من ملكية الدردشة الآن. حاول مرة أخرى."
-cplay_disabled: "✅ <b>تم تعطيل تشغيل القناة.</b> أوامر تشغيل القناة (مثل <code>/cplay</code> و<code>/cskip</code>) متوقفة الآن لهذه الدردشة."
-cplay_enabled: "✅ <b>تم تفعيل تشغيل القناة.</b> جميع أوامر تشغيل القناة (مثل <code>/cplay</code> و<code>/cskip</code>) ستعمل الآن في القناة <code>{channel_id}</code>."
+cplay_owner_required: "{emoji:⚠️} يمكن فقط لمالك هذه الدردشة أو مالك القناة الهدف استخدام هذا الإعداد."
+cplay_owner_check_failed: "{emoji:⚠️} تعذر التحقق من ملكية الدردشة الآن. حاول مرة أخرى."
+cplay_disabled: "{emoji:✅} <b>تم تعطيل تشغيل القناة.</b> أوامر تشغيل القناة (مثل <code>/cplay</code> و<code>/cskip</code>) متوقفة الآن لهذه الدردشة."
+cplay_enabled: "{emoji:✅} <b>تم تفعيل تشغيل القناة.</b> جميع أوامر تشغيل القناة (مثل <code>/cplay</code> و<code>/cskip</code>) ستعمل الآن في القناة <code>{channel_id}</code>."
 
 # Callback handler messages
 invalid_request: "⚠️ طلب غير صالح."
@@ -139,7 +139,7 @@ no_download_to_cancel: "ℹ️ لا يوجد تنزيل لإلغائه."
 # Pause callback
 cb_pause_success: "⏸️ تم إيقاف المقطع مؤقتاً عند {position}"
 cb_pause_message: |
-  <b>⏸️ تم إيقاف المقطع مؤقتاً</b>
+  <b>{emoji:⏸️} تم إيقاف المقطع مؤقتاً</b>
 
   <b>▫ العنوان :</b> <a href="{url}">{title}</a>
   <b>▫ المدة :</b> {position} / {duration}
@@ -150,24 +150,24 @@ cb_already_playing: "ℹ️ المقطع قيد التشغيل بالفعل."
 cb_resume_failed: "❌ فشل استئناف التشغيل."
 cb_resume_success: "▶️ تم الاستئناف عند {position}."
 cb_resume_message: |
-  <b>🎵 جاري التشغيل الآن:</b>
+  <b>{emoji:🎵} جاري التشغيل الآن:</b>
 
   <b>▫ العنوان :</b> <a href="{url}">{title}</a>
   <b>▫ المدة:</b> {duration}
   <b>▫ استؤنف بواسطة:</b> {user}
 
 # Replay status (loop replay)
-cb_replaying: "🔁 <b>جاري إعادة تشغيل المقطع الحالي...</b>"
+cb_replaying: "{emoji:🔁} <b>جاري إعادة تشغيل المقطع الحالي...</b>"
 cb_replay_failed: "❌ فشل إعادة تشغيل المقطع."
 cb_replay_success: "🔁 تمت إعادة تشغيل المقطع."
-cb_replay_edited: "🔁 تمت إعادة تشغيل المقطع بواسطة {user}."
+cb_replay_edited: "{emoji:🔁} تمت إعادة تشغيل المقطع بواسطة {user}."
 
 # Skip callback
 cb_skip_queue_empty: "⏹️ توقف التشغيل — قائمة الانتظار فارغة."
 cb_skip_download_failed: "❌ فشل تنزيل المقطع التالي."
 cb_skip_play_failed: "❌ فشل تشغيل المقطع التالي."
 cb_skip_success: "⏭️ تم تخطي المقطع."
-cb_skip_edited: "⏭️ تم التخطي بواسطة {user}"
+cb_skip_edited: "{emoji:⏭️} تم التخطي بواسطة {user}"
 
 # Stop callback
 cb_stop_success: "⏹️ • تـم إيقـاف البث "
@@ -175,7 +175,7 @@ cb_stop_success: "⏹️ • تـم إيقـاف البث "
 # Mute/Unmute callback
 cb_mute_success: "🔇 تم كتم الصوت."
 cb_mute_message: |
-  <b>🔇 تم كتم التشغيل</b>
+  <b>{emoji:🔇} تم كتم التشغيل</b>
 
   <b>▫ المقطع:</b> <a href="{url}">{title}</a>
   <b>▫ كُتم بواسطة:</b> {user}
@@ -183,118 +183,118 @@ cb_mute_message: |
 cb_unmute_success: "🔊 تم إلغاء الكتم."
 
 # 🗑️ Delete auth
-del_auth_not_authorized: "⚠️ هذا المستخدم غير مصرح له أصلاً — لا يوجد ما يتم حذفه."
-del_auth_remove_fail: "❌ فشل حذف المستخدم المصرح له: <code>{error}</code>"
-del_auth_success: "✅ تمت إزالة {user} بنجاح من قائمة المستخدمين المصرح لهم."
+del_auth_not_authorized: "{emoji:⚠️} هذا المستخدم غير مصرح له أصلاً — لا يوجد ما يتم حذفه."
+del_auth_remove_fail: "{emoji:❌} فشل حذف المستخدم المصرح له: <code>{error}</code>"
+del_auth_success: "{emoji:✅} تمت إزالة {user} بنجاح من قائمة المستخدمين المصرح لهم."
 
 # 📜 Auth list
-authlist_fetch_fail: "❌ فشل جلب قائمة المستخدمين المصرح لهم: <code>{error}</code>"
+authlist_fetch_fail: "{emoji:❌} فشل جلب قائمة المستخدمين المصرح لهم: <code>{error}</code>"
 authlist_empty: "ℹ️ لا يوجد مستخدمون مصرح لهم في هذه المحادثة."
-authlist_fetching: "⏳ جاري جلب قائمة المستخدمين المصرح لهم..."
+authlist_fetching: "{emoji:⏳} جاري جلب قائمة المستخدمين المصرح لهم..."
 authlist_header: "<b>المستخدمون المصرح لهم:</b>"
 authlist_user_fail: "{index}. <code>{user_id}</code> (تعذر جلب معلومات المستخدم)"
 authlist_user_entry: "{index}. {user} (<code>{user_id}</code>)"
 authlist_total: "<b>الإجمالي:</b> {count} مستخدمين"
 
-autoleave_fetch_fail: "⚠️ <b>فشل جلب حالة المغادرة التلقائية.</b>"
-autoleave_status: "🏃‍♂️ <b>التحكم في المغادرة التلقائية</b>\n\nعند التفعيل، سيغادر المساعد المحادثة تلقائياً.\nالاستخدام: {cmd} [enable|disable]\nالحالة الحالية: {action}"
-autoleave_already: "⚠️ المغادرة التلقائية {action} بالفعل"
-autoleave_update_fail: "⚠️ <b>فشل تحديث حالة المغادرة التلقائية.</b>"
-autoleave_updated: "🏃‍♂️ المغادرة التلقائية أصبحت {action}"
+autoleave_fetch_fail: "{emoji:⚠️} <b>فشل جلب حالة المغادرة التلقائية.</b>"
+autoleave_status: "{emoji:🏃‍♂️} <b>التحكم في المغادرة التلقائية</b>\n\nعند التفعيل، سيغادر المساعد المحادثة تلقائياً.\nالاستخدام: {cmd} [enable|disable]\nالحالة الحالية: {action}"
+autoleave_already: "{emoji:⚠️} المغادرة التلقائية {action} بالفعل"
+autoleave_update_fail: "{emoji:⚠️} <b>فشل تحديث حالة المغادرة التلقائية.</b>"
+autoleave_updated: "{emoji:🏃‍♂️} المغادرة التلقائية أصبحت {action}"
 
 enabled: "مفعلة"
 disabled: "معطلة"
 
-clear_no_active: "⚠️ <b>لا يوجد تشغيل نشط أو قائمة انتظار لتنظيفها.</b>"
-clear_success: "✅ تم تنظيف قائمة الانتظار بواسطة {user}."
+clear_no_active: "{emoji:⚠️} <b>لا يوجد تشغيل نشط أو قائمة انتظار لتنظيفها.</b>"
+clear_success: "{emoji:✅} تم تنظيف قائمة الانتظار بواسطة {user}."
 
 err_assistant_banned: |
-  <b>🚫 المساعد الآلي مقيد</b>
+  <b>{emoji:🚫} المساعد الآلي مقيد</b>
 
   لا يمكنني تشغيل الموسيقى لأن {user} (المعرف: <code>{id}</code>) <b>محظور</b> أو <b>تمت إزالته</b> من هذه المحادثة.
 
-  <i>✅ هل قمت بإلغاء حظره بالفعل؟ استخدم /reload للتحديث.</i>
+  <i>{emoji:✅} هل قمت بإلغاء حظره بالفعل؟ استخدم /reload للتحديث.</i>
 
 err_admin_permission_required: |
-  ⚠️ <b>إذن المشرف مطلوب</b>
+  {emoji:⚠️} <b>إذن المشرف مطلوب</b>
 
   أحتاج إلى صلاحية المشرف مع إذن <i>دعوة المستخدمين</i> لإدارة هذه المحادثة ودعوة المساعد.
 
 err_assistant_get_failed: |
-  ⚠️ لم يتمكن النظام من تعيين مساعد لهذه المحادثة.
+  {emoji:⚠️} لم يتمكن النظام من تعيين مساعد لهذه المحادثة.
 
   <i>هذه عادةً مشكلة مؤقتة ويجب أن تحل بإعادة المحاولة.</i>
 
-  <b>➡️ يرجى إعادة محاولة الأمر.</b>
+  <b>{emoji:➡️} يرجى إعادة محاولة الأمر.</b>
 
   <i>إذا استمر حدوث ذلك، يرجى الاتصال بالدعم حتى نتمكن من مساعدتك.</i>
   
 err_assistant_join_request_sent: |
-  ⚠️ أرسل المساعد طلباً للانضمام، لكن لم أتمكن من الموافقة عليه تلقائياً.
+  {emoji:⚠️} أرسل المساعد طلباً للانضمام، لكن لم أتمكن من الموافقة عليه تلقائياً.
 
-  <i>✅ يرجى الموافقة على الطلب يدوياً، ثم حاول مرة أخرى.</i>
+  <i>{emoji:✅} يرجى الموافقة على الطلب يدوياً، ثم حاول مرة أخرى.</i>
 
 err_assistant_invite_link_fetch: |
-  ⚠️ فشل جلب رابط الدعوة:
+  {emoji:⚠️} فشل جلب رابط الدعوة:
   <i>{error}</i>
 
 err_assistant_invite_failed: |
-  ⚠️ فشل انضمام المساعد إلى هذه المحادثة:
+  {emoji:⚠️} فشل انضمام المساعد إلى هذه المحادثة:
   <i>{error}</i>
 
 err_connection_timeout: |
-  ⚠️ <b>انتهت مهلة اتصال المحادثة الصوتية</b>
+  {emoji:⚠️} <b>انتهت مهلة اتصال المحادثة الصوتية</b>
 
   تيليجرام لا يستجيب بشكل صحيح لاتصال المحادثة الصوتية حالياً.
 
   <i>إذا استمر حدوث ذلك، قم بإنهاء المحادثة الصوتية وابدأها مرة أخرى، ثم أعد المحاولة.</i>
 
 err_no_active_voicechat: |
-  🎙️ <b>لا توجد محادثة صوتية نشطة</b>
+  {emoji:🎙️} <b>لا توجد محادثة صوتية نشطة</b>
 
   لا يمكنني الانضمام — يرجى بدء محادثة صوتية أولاً.
 
   <i>بدأت واحدة بالفعل؟ استخدم /reload للتحديث.</i>
 
 err_fetch_failed: |
-  ⚠️ فشل جلب معلومات المحادثة:
+  {emoji:⚠️} فشل جلب معلومات المحادثة:
   <i>{error}</i>
 
 err_unknown: |
-  ⚠️ حدث خطأ غير معروف:
+  {emoji:⚠️} حدث خطأ غير معروف:
   <i>{error}</i>
 
 err_fetch_tracks: |
-  ⚠️ <b>فشل جلب تفاصيل المقطع.</b>
+  {emoji:⚠️} <b>فشل جلب تفاصيل المقطع.</b>
   يرجى المحاولة مرة أخرى لاحقاً.
 
 err_download_internal: |
-  ⚠️ <b>فشل التنزيل</b> بسبب خطأ داخلي غير متوقع.
+  {emoji:⚠️} <b>فشل التنزيل</b> بسبب خطأ داخلي غير متوقع.
   يرجى المحاولة مرة أخرى لاحقاً.
   
 flood_seconds: "⏳ خفف السرعة! حاول مرة أخرى خلال {duration} ثانية."
-flood_minutes: "⏳ يرجى الانتظار {duration} دقيقة قبل استخدام هذا الأمر مرة أخرى."
+flood_minutes: "{emoji:⏳} يرجى الانتظار {duration} دقيقة قبل استخدام هذا الأمر مرة أخرى."
 
-help_private_only: "🤖 مرحباً! للحصول على المساعدة والأوامر، يرجى مراسلتي مباشرة — أنا أكثر استجابة في المحادثات الخاصة!"
-help_main: "📚 <b>قائمة المساعدة</b>\n\nاختر فئة أدناه لاستكشاف الأوامر التفصيلية واستخداماتها لإدارة المساعد والتحكم فيه وتخصيصه."
+help_private_only: "{emoji:🤖} مرحباً! للحصول على المساعدة والأوامر، يرجى مراسلتي مباشرة — أنا أكثر استجابة في المحادثات الخاصة!"
+help_main: "{emoji:📚} <b>قائمة المساعدة</b>\n\nاختر فئة أدناه لاستكشاف الأوامر التفصيلية واستخداماتها لإدارة المساعد والتحكم فيه وتخصيصه."
 
-jump_no_active: "⚠️ لا يوجد مقطع نشط للقفز بداخله."
-jump_usage: "⚠️ يرجى تحديد الثواني.\nمثال: <code>{cmd} 120</code>"
-jump_invalid_position: "⚠️ موضع غير صالح.\nمثال: <code>{cmd} 120</code>"
-jump_too_close_end: "⚠️ لا يمكن القفز إلى <b>{position}</b> — هذا قريب جداً من نهاية المقطع."
-jump_failed: "❌ فشل القفز إلى <b>{position}</b>.\nالخطأ: <code>{error}</code>"
-jump_success: "⏩ قفز إلى <u>{position}</u> من <u>{duration}</u>."
+jump_no_active: "{emoji:⚠️} لا يوجد مقطع نشط للقفز بداخله."
+jump_usage: "{emoji:⚠️} يرجى تحديد الثواني.\nمثال: <code>{cmd} 120</code>"
+jump_invalid_position: "{emoji:⚠️} موضع غير صالح.\nمثال: <code>{cmd} 120</code>"
+jump_too_close_end: "{emoji:⚠️} لا يمكن القفز إلى <b>{position}</b> — هذا قريب جداً من نهاية المقطع."
+jump_failed: "{emoji:❌} فشل القفز إلى <b>{position}</b>.\nالخطأ: <code>{error}</code>"
+jump_success: "{emoji:⏩} قفز إلى <u>{position}</u> من <u>{duration}</u>."
 
 lang_same: "ℹ️ أنت تستخدم هذه اللغة بالفعل."
-lang_select: "🌐 اختر لغتك المفضلة:"
+lang_select: "{emoji:🌐} اختر لغتك المفضلة:"
 lang_fail: "❌ فشل تحديث اللغة. يرجى المحاولة مرة أخرى لاحقاً."
-lang_success: "✅ تم تحديث اللغة بنجاح إلى {lang_name}."
+lang_success: "{emoji:✅} تم تحديث اللغة بنجاح إلى {lang_name}."
 
 logger_playback_started: "بدأ التشغيل"
 logger_playback_queued: "أُضيف للانتظار"
 
 logger_bot_added: |
-  🤖 <b>تمت إضافة المساعد لمجموعة جديدة</b>
+  {emoji:🤖} <b>تمت إضافة المساعد لمجموعة جديدة</b>
   
   <blockquote>
   <b>اسم المجموعة:</b> {group_name}
@@ -311,7 +311,7 @@ logger_bot_added: |
 
 logger_bot_removed: |
 
-  🤖 <b>تمت إزالة المساعد من مجموعة</b>
+  {emoji:🤖} <b>تمت إزالة المساعد من مجموعة</b>
   <blockquote>
   <b>اسم المجموعة:</b> {group_name}
   <b>معرف المجموعة:</b> {group_id}
@@ -325,153 +325,153 @@ logger_bot_removed: |
   </blockquote>
   
 logger_bot_started: |
-  ▶️ <b>{mention} بدأ المساعد</b>
+  {emoji:▶️} <b>{mention} بدأ المساعد</b>
 
   <b>اليوزر:</b> {user_username}
   <b>المعرف:</b> {user_id}
   
 
-logger_playback_template: "<b>🎧 المقطع:</b> <a href=\"{track_url}\">{track}</a>\n<b>🔗 المصدر:</b> {source}\n<b>📌 المجموعة:</b> {group} ({group_id})\n<b>👤 طلب بواسطة:</b> {requested_by} (<code>{requested_by_id}</code>)"
+logger_playback_template: "<b>{emoji:🎧} المقطع:</b> <a href=\"{track_url}\">{track}</a>\n<b>{emoji:🔗} المصدر:</b> {source}\n<b>{emoji:📌} المجموعة:</b> {group} ({group_id})\n<b>{emoji:👤} طلب بواسطة:</b> {requested_by} (<code>{requested_by_id}</code>)"
 
-loop_usage: "🔁 <b>التحكم في التكرار</b>\n\nالاستخدام: {cmd} [العدد]\n• 0 - تعطيل التكرار\n• 1-10 - عدد مرات التكرار\n\n<i>{count_line}</i>"
-loop_invalid: "⚠️ <b>عدد تكرار غير صالح.</b>\nاستخدم 0 للتعطيل أو 1-10 لتحديد عدد مرات التكرار."
-loop_already_set: "⚠️ تم تعيين التكرار بالفعل على <b>{count}</b> مرة."
-loop_disabled: "🔁 تم <b>تعطيل</b> التكرار بواسطة {user}"
-loop_set: "🔁 تم تعيين التكرار <b>{count}</b> مرة\n└ غُير بواسطة: {user}"
+loop_usage: "{emoji:🔁} <b>التحكم في التكرار</b>\n\nالاستخدام: {cmd} [العدد]\n• 0 - تعطيل التكرار\n• 1-10 - عدد مرات التكرار\n\n<i>{count_line}</i>"
+loop_invalid: "{emoji:⚠️} <b>عدد تكرار غير صالح.</b>\nاستخدم 0 للتعطيل أو 1-10 لتحديد عدد مرات التكرار."
+loop_already_set: "{emoji:⚠️} تم تعيين التكرار بالفعل على <b>{count}</b> مرة."
+loop_disabled: "{emoji:🔁} تم <b>تعطيل</b> التكرار بواسطة {user}"
+loop_set: "{emoji:🔁} تم تعيين التكرار <b>{count}</b> مرة\n└ غُير بواسطة: {user}"
 loop_current: "• التكرار الحالي: <b>{count}</b> مرة"
 
-logger_usage: "⚙️ الاستخدام: <code>{cmd} [enable|disable]</code> - لتفعيل أو تعطيل السجل\n\n{status}"
-logger_status: "📜 الحالة الحالية: {action}"
-logger_check_fail: "❌ فشل التحقق من حالة السجل: {error}"
+logger_usage: "{emoji:⚙️} الاستخدام: <code>{cmd} [enable|disable]</code> - لتفعيل أو تعطيل السجل\n\n{status}"
+logger_status: "{emoji:📜} الحالة الحالية: {action}"
+logger_check_fail: "{emoji:❌} فشل التحقق من حالة السجل: {error}"
 logger_already: "ℹ️ السجل {action} بالفعل."
-logger_update_fail: "❌ فشل تحديث إعدادات السجل: {error}"
-logger_updated: "✅ أصبح السجل {action} بنجاح."
+logger_update_fail: "{emoji:❌} فشل تحديث إعدادات السجل: {error}"
+logger_updated: "{emoji:✅} أصبح السجل {action} بنجاح."
 
 # Logs module
 logs_empty: "لا توجد سجلات"
 
 # reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
 maint: "⚠️ أنا قيد الصيانة حالياً وغير متاح مؤقتاً. يرجى العودة لاحقاً.\n\n{reason}"
-maint_reason: "<i>📝 السبب: {reason}</i>"
+maint_reason: "<i>{emoji:📝} السبب: {reason}</i>"
 
 # ⚙️ Maintenance control
-maint_usage: "⚙️ <b>التحكم في الصيانة</b>\n\nالاستخدام: {cmd} [enable|disable] [reason]\n📜 الحالة الحالية: {status}"
-maint_check_fail: "❌ فشل التحقق من حالة الصيانة: <code>{error}</code>"
-maint_already_enabled: "ℹ️ وضع الصيانة مفعل بالفعل 🟢."
-maint_already_disabled: "ℹ️ وضع الصيانة معطل بالفعل 🔴."
+maint_usage: "{emoji:⚙️} <b>التحكم في الصيانة</b>\n\nالاستخدام: {cmd} [enable|disable] [reason]\n{emoji:📜} الحالة الحالية: {status}"
+maint_check_fail: "{emoji:❌} فشل التحقق من حالة الصيانة: <code>{error}</code>"
+maint_already_enabled: "ℹ️ وضع الصيانة مفعل بالفعل {emoji:🟢}."
+maint_already_disabled: "ℹ️ وضع الصيانة معطل بالفعل {emoji:🔴}."
 maint_already_reason_same: "ℹ️ الصيانة مفعلة بالفعل بنفس السبب."
-maint_reason_removed: "✅ تم حذف سبب الصيانة بنجاح."
-maint_reason_updated: "✅ تم تحديث سبب الصيانة.\n📝 السبب: {reason}"
-maint_enabled: "✅ تم <b>تفعيل</b> وضع الصيانة بنجاح."
-maint_enabled_reason: "✅ تم تفعيل وضع الصيانة.\n📝 السبب: {reason}"
-maint_disabled: "✅ تم <b>تعطيل</b> وضع الصيانة بنجاح."
-maint_entering: "⚠️ المساعد يدخل وضع الصيانة..."
-enabled_with_reason: "🟢 مفعل\n📝 السبب: {reason}"
+maint_reason_removed: "{emoji:✅} تم حذف سبب الصيانة بنجاح."
+maint_reason_updated: "{emoji:✅} تم تحديث سبب الصيانة.\n{emoji:📝} السبب: {reason}"
+maint_enabled: "{emoji:✅} تم <b>تفعيل</b> وضع الصيانة بنجاح."
+maint_enabled_reason: "{emoji:✅} تم تفعيل وضع الصيانة.\n{emoji:📝} السبب: {reason}"
+maint_disabled: "{emoji:✅} تم <b>تعطيل</b> وضع الصيانة بنجاح."
+maint_entering: "{emoji:⚠️} المساعد يدخل وضع الصيانة..."
+enabled_with_reason: "{emoji:🟢} مفعل\n{emoji:📝} السبب: {reason}"
 
-move_usage: "⚠️ الاستخدام: <code>{cmd} [from] [to]</code>"
-move_invalid_numbers: "⚠️ أرقام غير صالحة. مثال: <code>/{cmd} 2 1</code>"
-move_invalid_indexes_min: "⚠️ يجب أن تكون الفهارس أكبر من 0."
-move_invalid_indexes_max: "⚠️ قائمة الانتظار تحتوي على {queue_len} مقطعاً فقط."
-move_success: "✅ تم نقل المقطع من المركز {from} إلى {to} بواسطة {user}."
+move_usage: "{emoji:⚠️} الاستخدام: <code>{cmd} [from] [to]</code>"
+move_invalid_numbers: "{emoji:⚠️} أرقام غير صالحة. مثال: <code>/{cmd} 2 1</code>"
+move_invalid_indexes_min: "{emoji:⚠️} يجب أن تكون الفهارس أكبر من 0."
+move_invalid_indexes_max: "{emoji:⚠️} قائمة الانتظار تحتوي على {queue_len} مقطعاً فقط."
+move_success: "{emoji:✅} تم نقل المقطع من المركز {from} إلى {to} بواسطة {user}."
 
 # 🔇 Mute messages
 mute_already_muted: "🔇 <b>مكتوم بالفعل</b>\nالموسيقى مكتومة بالفعل في هذه المحادثة.\nهل ترغب في إلغاء الكتم؟"
 mute_failed: "❌ <b>فشل كتم التشغيل</b>\nالخطأ: <code>{error}</code>"
 mute_success: |
-  🔇 <b>تم كتم التشغيل</b>
+  {emoji:🔇} <b>تم كتم التشغيل</b>
 
-  🎵 المقطع: {title}
-  👤 كُتم بواسطة: {user}
+  {emoji:🎵} المقطع: {title}
+  {emoji:👤} كُتم بواسطة: {user}
 
 no_song_query: |
-  <b>🎵 أوبس! لم يتم اكتشاف أغنية.</b>
+  <b>{emoji:🎵} أوبس! لم يتم اكتشاف أغنية.</b>
 
   <i>اكتب <b>{cmd} [اسم الأغنية]</b> أو قم بالرد على <b>ملف</b> لبدء التشغيل!</i>
 
-no_song_found: "❌ لم يتم العثور على مقاطع."
+no_song_found: "{emoji:❌} لم يتم العثور على مقاطع."
 
 nothumb_status: |
-  🖼️ <b>التحكم في الغلاف</b>
+  {emoji:🖼️} <b>التحكم في الغلاف</b>
   
   <i>عند التفعيل، لن تعرض رسائل التشغيل الغلاف/الصور المصغرة.</i>
   
-  <b>📊 الاستخدام: {cmd} [enable|disable]</b>
+  <b>{emoji:📊} الاستخدام: {cmd} [enable|disable]</b>
   
   <i>الغلاف {action} حالياً.</i>
   
-nothumb_fetch_fail: "⚠️ <b>فشل جلب إعدادات الغلاف.</b>"
+nothumb_fetch_fail: "{emoji:⚠️} <b>فشل جلب إعدادات الغلاف.</b>"
 nothumb_already: "ℹ️ عرض الغلاف {action} بالفعل."
-nothumb_update_fail: "⚠️ <b>فشل تحديث إعدادات الغلاف.</b>"
-nothumb_updated: "🖼️ أصبح عرض الغلاف {action}."
+nothumb_update_fail: "{emoji:⚠️} <b>فشل تحديث إعدادات الغلاف.</b>"
+nothumb_updated: "{emoji:🖼️} أصبح عرض الغلاف {action}."
 
-cmddelete_status: "🗑️ <b>التحكم في حذف الأوامر</b>\n\nعند التفعيل، سأقوم بحذف رسائل الأوامر تلقائياً.\nالاستخدام: {cmd} [enable|disable]\nالحالة الحالية: {action}"
-cmddelete_updated: "🗑️ تم {action} حذف الأوامر."
+cmddelete_status: "{emoji:🗑️} <b>التحكم في حذف الأوامر</b>\n\nعند التفعيل، سأقوم بحذف رسائل الأوامر تلقائياً.\nالاستخدام: {cmd} [enable|disable]\nالحالة الحالية: {action}"
+cmddelete_updated: "{emoji:🗑️} تم {action} حذف الأوامر."
 
-only_admin: "⚠️ <b>تم رفض الإذن!</b>\nفقط <b>المشرفون</b> يمكنهم التحكم في هذه الإجراءات. لا يزال بإمكانك تشغيل الأغاني 🎵.\n\nإذا كنت تعتقد أنك مشرف، يرجى استخدام /reload لتحديث حالة الإشراف."
+only_admin: "{emoji:⚠️} <b>تم رفض الإذن!</b>\nفقط <b>المشرفون</b> يمكنهم التحكم في هذه الإجراءات. لا يزال بإمكانك تشغيل الأغاني {emoji:🎵}.\n\nإذا كنت تعتقد أنك مشرف، يرجى استخدام /reload لتحديث حالة الإشراف."
 only_admin_cb: "⚠️ فقط المشرفون يمكنهم القيام بهذه الإجراءات."
-only_admin_or_auth: "⚠️ <b>تم رفض الوصول</b>\nفقط <b>المشرفون</b> أو <b>المستخدمون المصرح لهم</b> يمكنهم التحكم في هذه الإجراءات.\n\nإذا أصبحت مشرفاً مؤخراً، استخدم /reload لتحديث صلاحياتك."
+only_admin_or_auth: "{emoji:⚠️} <b>تم رفض الوصول</b>\nفقط <b>المشرفون</b> أو <b>المستخدمون المصرح لهم</b> يمكنهم التحكم في هذه الإجراءات.\n\nإذا أصبحت مشرفاً مؤخراً، استخدم /reload لتحديث صلاحياتك."
 only_admin_or_auth_cb: "⚠️ فقط المشرفون أو المصرح لهم يمكنهم القيام بهذه الإجراءات."
-only_supergroup: "⚠️ هذا الأمر يمكن استخدامه في المجموعات فقط."
+only_supergroup: "{emoji:⚠️} هذا الأمر يمكن استخدامه في المجموعات فقط."
 only_owner: "⚠️ فقط مالك المساعد يمكنه استخدام هذا الأمر."
-only_sudo: "⚠️ فقط المساعدون أو مالك المساعد يمكنهم استخدام هذا الأمر."
+only_sudo: "{emoji:⚠️} فقط المساعدون أو مالك المساعد يمكنهم استخدام هذا الأمر."
 
 pause_already: |
-  ⏸️ <b>متوقف مؤقتاً بالفعل</b>
+  {emoji:⏸️} <b>متوقف مؤقتاً بالفعل</b>
   الموسيقى متوقفة مؤقتاً بالفعل.
 
 pause_success: |
-  ⏸️ <b>تم إيقاف التشغيل مؤقتاً</b>
+  {emoji:⏸️} <b>تم إيقاف التشغيل مؤقتاً</b>
 
-  🎵 المقطع: {title}
-  ⏱️ الموضع: {position} / {duration}
-  👤 أوقف بواسطة: {user}
+  {emoji:🎵} المقطع: {title}
+  {emoji:⏱️} الموضع: {position} / {duration}
+  {emoji:👤} أوقف بواسطة: {user}
 
 play_single_track_too_long: |
-  ⚠️ لا يمكنك تشغيل أغاني أطول من {limit_mins} دقيقة.
+  {emoji:⚠️} لا يمكنك تشغيل أغاني أطول من {limit_mins} دقيقة.
   تم تخطي <i>{title}</i>.
 
-play_download_failed: "❌ فشل التنزيل. حاول مرة أخرى."
+play_download_failed: "{emoji:❌} فشل التنزيل. حاول مرة أخرى."
 
 play_added_to_queue_single: |
-  <b>🎵 تمت الإضافة لقائمة الانتظار:</b> #{index}
+  <b>{emoji:🎵} تمت الإضافة لقائمة الانتظار:</b> #{index}
 
   <b>▫ المقطع:</b> <a href="{url}">{title}</a>
   <b>▫ المدة:</b> {duration}
   <b>▫ طلب بواسطة:</b> {by}
 
-play_multiple_tracks_too_long_header: "<b>⚠️ تم تخطي {count} مقاطع (المدة القصوى {limit_mins} دقيقة):</b>"
+play_multiple_tracks_too_long_header: "<b>{emoji:⚠️} تم تخطي {count} مقاطع (المدة القصوى {limit_mins} دقيقة):</b>"
 play_multiple_tracks_too_long_item: "— <i>{title}</i>"
 play_multiple_tracks_too_long_more: "... و {remaining} أكثر."
-play_all_tracks_skipped: "❌ تم تخطي جميع المقاطع التي تم العثور عليها بسبب قيود المدة."
-play_failed: "❌ فشل التشغيل\nالخطأ: {error}"
-play_unable: "<b> ❌ تعذر التشغيل </b>\n\n<i>يرجى <b>إعادة بدء</b> المحادثة الصوتية.</i>"
-rtmp_play_unsupported: "⚠️ <b>لا يمكن التشغيل في محادثة صوتية RTMP / بث مباشر.</b>\n\n<i>تم إيقاف التشغيل.</i>"
-play_downloading_song: "📥 جاري تنزيل الأغنية \"{title}\""
-play_download_canceled: "⚠️ تم إلغاء التنزيل بواسطة {user}."
-play_already_in_queue: "✅ <b>المقطع مضاف بالفعل!</b>\n\n<i>{title}</i> قيد التشغيل بالفعل أو في قائمة الانتظار."
-play_already_playing: "⚠️ <b>هناك مقطع قيد التشغيل بالفعل.</b>\n\nيرجى الانتظار حتى ينتهي أو استخدم <code>/stop</code> لإيقافه أولاً."
-play_added_multiple_header: "➕ <b>تمت إضافة {count} مقاطع</b> بواسطة {user}"
-play_queue_limit_hint: "⚠️ <i>وصلت قائمة الانتظار للحد الأقصى — تم تخطي بعض المقاطع.</i>"
+play_all_tracks_skipped: "{emoji:❌} تم تخطي جميع المقاطع التي تم العثور عليها بسبب قيود المدة."
+play_failed: "{emoji:❌} فشل التشغيل\nالخطأ: {error}"
+play_unable: "<b> {emoji:❌} تعذر التشغيل </b>\n\n<i>يرجى <b>إعادة بدء</b> المحادثة الصوتية.</i>"
+rtmp_play_unsupported: "{emoji:⚠️} <b>لا يمكن التشغيل في محادثة صوتية RTMP / بث مباشر.</b>\n\n<i>تم إيقاف التشغيل.</i>"
+play_downloading_song: "{emoji:📥} جاري تنزيل الأغنية \"{title}\""
+play_download_canceled: "{emoji:⚠️} تم إلغاء التنزيل بواسطة {user}."
+play_already_in_queue: "{emoji:✅} <b>المقطع مضاف بالفعل!</b>\n\n<i>{title}</i> قيد التشغيل بالفعل أو في قائمة الانتظار."
+play_already_playing: "{emoji:⚠️} <b>هناك مقطع قيد التشغيل بالفعل.</b>\n\nيرجى الانتظار حتى ينتهي أو استخدم <code>/stop</code> لإيقافه أولاً."
+play_added_multiple_header: "{emoji:➕} <b>تمت إضافة {count} مقاطع</b> بواسطة {user}"
+play_queue_limit_hint: "{emoji:⚠️} <i>وصلت قائمة الانتظار للحد الأقصى — تم تخطي بعض المقاطع.</i>"
 play_queue_view_hint: "<i>استخدم /queue لعرض القائمة الكاملة.</i>"
 
 playmode_help: |
-  🛠️ <b>وضع التشغيل</b>
+  {emoji:🛠️} <b>وضع التشغيل</b>
 
   <b>الحالة:</b> {status}
   <b>الاستخدام:</b> <code>/playmode [enable|disable]</code>
 
 playmode_status_admins: "المشرفون 🔐"
 playmode_status_everyone: "الجميع 🌍"
-playmode_success_admins: "🛡️ <b>وضع التشغيل</b> أصبح الآن مقتصرًا على <b>المشرفين والمستخدمين المصرح لهم</b> فقط. 🎧"
-playmode_success_everyone: "✅ <b>وضع التشغيل</b> أصبح الآن <b>متاحًا للجميع</b>. استمتعوا بالموسيقى! 🎶"
-playmode_restricted: "🚫 وضع التشغيل مفعّل. المشرفون والمستخدمون المصرح لهم فقط يمكنهم التشغيل."
+playmode_success_admins: "{emoji:🛡️} <b>وضع التشغيل</b> أصبح الآن مقتصرًا على <b>المشرفين والمستخدمين المصرح لهم</b> فقط. {emoji:🎧}"
+playmode_success_everyone: "{emoji:✅} <b>وضع التشغيل</b> أصبح الآن <b>متاحًا للجميع</b>. استمتعوا بالموسيقى! {emoji:🎶}"
+playmode_restricted: "{emoji:🚫} وضع التشغيل مفعّل. المشرفون والمستخدمون المصرح لهم فقط يمكنهم التشغيل."
 
 # 🏓 Ping messages
-ping_start: "🏓 جاري الفحص..."
+ping_start: "{emoji:🏓} جاري الفحص..."
 ping_result: |
-  <b>🏓 PONG</b>: <code>{latency}ms</code>
+  <b>{emoji:🏓} PONG</b>: <code>{latency}ms</code>
   
-  <b><u>🤖 إحصائيات نظام {bot}:</u></b>
+  <b><u>{emoji:🤖} إحصائيات نظام {bot}:</u></b>
 
   <b>وقت التشغيل:</b> {uptime}
   <b>استهلاك الرام:</b> {ram_info}
@@ -480,73 +480,73 @@ ping_result: |
 
 
 position_now: |
-  🎵 <b>{title}</b>
-  📍 <code>{position} / {duration}</code>
-  ⚙️ السرعة: <b>{speed}x</b>
+  {emoji:🎵} <b>{title}</b>
+  {emoji:📍} <code>{position} / {duration}</code>
+  {emoji:⚙️} السرعة: <b>{speed}x</b>
 
-queue_limit_reached: "⚠️ وصلت قائمة الانتظار للحد الأقصى ({limit} مقاطع كحد أقصى). استخدم /clear لتفريغ القائمة."
-queue_no_active: "⚠️ <b>لا يوجد تشغيل نشط.</b>\n\n<i>لا يوجد شيء في قائمة الانتظار حالياً.</i>"
-queue_header: "🎶 <b>قائمة الانتظار الحالية</b>"
-queue_now_playing: "▶️ <b>جاري التشغيل الآن:</b>"
-queue_up_next: "⏭️ <b>التالي:</b>"
+queue_limit_reached: "{emoji:⚠️} وصلت قائمة الانتظار للحد الأقصى ({limit} مقاطع كحد أقصى). استخدم /clear لتفريغ القائمة."
+queue_no_active: "{emoji:⚠️} <b>لا يوجد تشغيل نشط.</b>\n\n<i>لا يوجد شيء في قائمة الانتظار حالياً.</i>"
+queue_header: "{emoji:🎶} <b>قائمة الانتظار الحالية</b>"
+queue_now_playing: "{emoji:▶️} <b>جاري التشغيل الآن:</b>"
+queue_up_next: "{emoji:⏭️} <b>التالي:</b>"
 queue_more_line: "\n… و {remaining} أكثر"
-queue_empty_tail: "📭 <i>لا توجد أغاني أخرى في قائمة الانتظار.</i>"
-queue_empty: "⚠️ <b>قائمة الانتظار فارغة بالفعل.</b>"
+queue_empty_tail: "{emoji:📭} <i>لا توجد أغاني أخرى في قائمة الانتظار.</i>"
+queue_empty: "{emoji:⚠️} <b>قائمة الانتظار فارغة بالفعل.</b>"
 
 # 🔄 Reload
-reload_start: "⚙️ جاري إعادة تحميل ذاكرة المشرفين، وحالة المحادثة الصوتية، وحالة المساعد..."
+reload_start: "{emoji:⚙️} جاري إعادة تحميل ذاكرة المشرفين، وحالة المحادثة الصوتية، وحالة المساعد..."
 
-reload_done: "<b>⚙️ اكتملت إعادة التحميل:</b>\n\n{summary}"
+reload_done: "<b>{emoji:⚙️} اكتملت إعادة التحميل:</b>\n\n{summary}"
 
-reload_admin_cache_ok: "<b>• ذاكرة المشرفين:</b> <i>✅ تم</i>"
-reload_admin_cache_fail: "<b>• ذاكرة المشرفين:</b> <i>❌ ({error})</i>"
+reload_admin_cache_ok: "<b>• ذاكرة المشرفين:</b> <i>{emoji:✅} تم</i>"
+reload_admin_cache_fail: "<b>• ذاكرة المشرفين:</b> <i>{emoji:❌} ({error})</i>"
 
-reload_voice_inactive: "<b>• المحادثة الصوتية:</b> <i>⚪ غير نشطة</i>"
-reload_voice_admin_required: "<b>• المحادثة الصوتية:</b> <i>❌ إذن المشرف مطلوب</i>"
-reload_voice_fail: "<b>• المحادثة الصوتية:</b> <i>❌ ({error})</i>"
-reload_voice_active: "<b>• المحادثة الصوتية:</b> <i>✅ نشطة</i>"
+reload_voice_inactive: "<b>• المحادثة الصوتية:</b> <i>{emoji:⚪} غير نشطة</i>"
+reload_voice_admin_required: "<b>• المحادثة الصوتية:</b> <i>{emoji:❌} إذن المشرف مطلوب</i>"
+reload_voice_fail: "<b>• المحادثة الصوتية:</b> <i>{emoji:❌} ({error})</i>"
+reload_voice_active: "<b>• المحادثة الصوتية:</b> <i>{emoji:✅} نشطة</i>"
 
-reload_assistant_banned: "<b>• المساعد:</b> <i>❌ محظور</i>"
-reload_assistant_admin_required: "<b>• المساعد:</b> <i>❌ إذن المشرف مطلوب</i>"
-reload_assistant_fail: "<b>• المساعد:</b> <i>❌ ({error})</i>"
-reload_assistant_present: "<b>• المساعد:</b> <i>✅ موجود</i>"
-reload_assistant_not_present: "<b>• المساعد:</b> <i>⚪ غير موجود</i>"
-reload_room_reset: "<b>• الغرفة:</b> <i>تمت إعادة التعيين ✅</i>"
+reload_assistant_banned: "<b>• المساعد:</b> <i>{emoji:❌} محظور</i>"
+reload_assistant_admin_required: "<b>• المساعد:</b> <i>{emoji:❌} إذن المشرف مطلوب</i>"
+reload_assistant_fail: "<b>• المساعد:</b> <i>{emoji:❌} ({error})</i>"
+reload_assistant_present: "<b>• المساعد:</b> <i>{emoji:✅} موجود</i>"
+reload_assistant_not_present: "<b>• المساعد:</b> <i>{emoji:⚪} غير موجود</i>"
+reload_room_reset: "<b>• الغرفة:</b> <i>تمت إعادة التعيين {emoji:✅}</i>"
 
 
-remove_usage: "⚠️ <b>استخدام غير صالح.</b>\nالاستخدام: <code>{cmd} [index]</code>"
-remove_invalid_index: "⚠️ <b>مركز غير صالح.</b> يجب أن يكون <b>رقماً</b>."
-remove_index_too_small: "⚠️ <b>يجب أن يكون المركز أكبر من 0.</b>"
-remove_index_too_big: "⚠️ مركز غير صالح. قائمة الانتظار تحتوي على <b>{total}</b> مقاطع فقط."
-remove_success: "✅ تمت إزالة المقطع من المركز <b>{index}</b> في قائمة الانتظار.\n👤 بواسطة: {user}"
+remove_usage: "{emoji:⚠️} <b>استخدام غير صالح.</b>\nالاستخدام: <code>{cmd} [index]</code>"
+remove_invalid_index: "{emoji:⚠️} <b>مركز غير صالح.</b> يجب أن يكون <b>رقماً</b>."
+remove_index_too_small: "{emoji:⚠️} <b>يجب أن يكون المركز أكبر من 0.</b>"
+remove_index_too_big: "{emoji:⚠️} مركز غير صالح. قائمة الانتظار تحتوي على <b>{total}</b> مقاطع فقط."
+remove_success: "{emoji:✅} تمت إزالة المقطع من المركز <b>{index}</b> في قائمة الانتظار.\n{emoji:👤} بواسطة: {user}"
 
 # 🔁 Replay
 replay_failed: "❌ <b>فشلت إعادة التشغيل</b>\nالخطأ: <code>{error}</code>"
 replay_success: |
-  🔁 <b>جاري إعادة التشغيل الآن</b>
+  {emoji:🔁} <b>جاري إعادة التشغيل الآن</b>
 
-  🎵 العنوان: {title}
-  ⏱️ المدة: <code>{duration}</code>
-  ⚙️ السرعة: <b>{speed}x</b>
+  {emoji:🎵} العنوان: {title}
+  {emoji:⏱️} المدة: <code>{duration}</code>
+  {emoji:⚙️} السرعة: <b>{speed}x</b>
 
 # ▶️ Resume
 resume_already_playing: "ℹ️ <b>قيد التشغيل بالفعل</b>\nالموسيقى قيد التشغيل بالفعل في هذه المحادثة.\nهل ترغب في إيقافها مؤقتاً؟"
-resume_failed: "❌ <b>فشل استئناف التشغيل</b>\nالخطأ: <code>{error}</code>"
+resume_failed: "{emoji:❌} <b>فشل استئناف التشغيل</b>\nالخطأ: <code>{error}</code>"
 resume_success: |
-  ▶️ <b>جاري استئناف التشغيل</b>
+  {emoji:▶️} <b>جاري استئناف التشغيل</b>
 
-  🎵 العنوان: {title}
-  📍 الموضع: {position} / {duration}
-  👤 استؤنف بواسطة: {user}
+  {emoji:🎵} العنوان: {title}
+  {emoji:📍} الموضع: {position} / {duration}
+  {emoji:👤} استؤنف بواسطة: {user}
   {speed_line}
 
-restart: "♻️ جاري إعادة التشغيل..."
-restart_exepath_fail: "❌ فشل الحصول على مسار الملف التنفيذي: {error}"
-restart_symlink_fail: "❌ فشل تحليل مسار الملف التنفيذي: {error}"
+restart: "{emoji:♻️} جاري إعادة التشغيل..."
+restart_exepath_fail: "{emoji:❌} فشل الحصول على مسار الملف التنفيذي: {error}"
+restart_symlink_fail: "{emoji:❌} فشل تحليل مسار الملف التنفيذي: {error}"
 restart_service: "لقد تمت إعادة تشغيل {bot} للتو. نعتذر عن الإزعاج.\n\nابدأ التشغيل مرة أخرى بعد 10-15 ثانية."
-restart_initiated: "✅ تم بدء إعادة التشغيل بنجاح!"
-restart_fail: "❌ فشل إعادة التشغيل: {error}"
-restart_confirm_running: "⚠️ هناك أغنية قيد التشغيل حالياً في هذه الدردشة.\nاختر إجراءً من الأسفل."
+restart_initiated: "{emoji:✅} تم بدء إعادة التشغيل بنجاح!"
+restart_fail: "{emoji:❌} فشل إعادة التشغيل: {error}"
+restart_confirm_running: "{emoji:⚠️} هناك أغنية قيد التشغيل حالياً في هذه الدردشة.\nاختر إجراءً من الأسفل."
 restart_btn_bot: "إعادة تشغيل البوت"
 restart_btn_replay: "إعادة تشغيل الأغنية"
 restart_confirm_bot: "♻️ جارٍ إعادة تشغيل البوت..."
@@ -559,7 +559,7 @@ room_no_active: "⚠️ <b>لا يوجد تشغيل نشط.</b>\n\n<i>لا يو�
 room_already_paused: "⏸️ المقطع متوقف مؤقتاً بالفعل. اضغط على ▶️ استئناف للمتابعة."
 room_pause_failed: "❌ فشل إيقاف التشغيل مؤقتاً.\n\n<i>{error}</i>"
 
-generic_error: "❌ حدث خطأ: <code>{error}</code>"
+generic_error: "{emoji:❌} حدث خطأ: <code>{error}</code>"
 
 settings_btn_adminmode: "🛡️ وضع الإدارة"
 settings_btn_cmddelete: "🗑️ حذف الأوامر"
@@ -585,7 +585,7 @@ settings_info_cleanduration: |
 settings_info_cleanmode: |
   يزيل رسائل الأوامر ورسائل خدمة البوت تلقائياً بعد مدة قصيرة.
   تظل رسائل حالة التشغيل حتى تنتهي مدتها تلقائياً.
-cleanmode_status: "🧹 <b>الوضع النظيف</b>\n\nتنظيف تلقائي لرسائل الأوامر والخدمة.\nالحالة الحالية: {action}"
+cleanmode_status: "{emoji:🧹} <b>الوضع النظيف</b>\n\nتنظيف تلقائي لرسائل الأوامر والخدمة.\nالحالة الحالية: {action}"
 cleanmode_hint: "Use /settings to change auto-delete duration."
 
 settings_info_lang: |
@@ -604,7 +604,7 @@ settings_info_playmode: |
   يتحكم في من يمكنه استخدام أمر /play لبدء التشغيل.
 
 settings_main: |
-  ⚙️ <b>إعدادات الدردشة</b>
+  {emoji:⚙️} <b>إعدادات الدردشة</b>
 
   <b>المجموعة:</b> {title}
   <b>معرف المجموعة:</b> <code>{id}</code>
@@ -615,47 +615,47 @@ settings_updated: "✅ تم تحديث الإعدادات!"
 
 autoplay_no_active: "⚠️ البوت لا يشغّل صوتاً حالياً. قم بتشغيل أغنية أولاً."
 autoplay_menu: |
-  🔁 <b>التشغيل التلقائي</b>
+  {emoji:🔁} <b>التشغيل التلقائي</b>
 
   عند التفعيل، بعد انتهاء قائمة الانتظار سيستمر البوت في تشغيل أغانٍ مشابهة للأغنية الأخيرة تلقائياً.
 
   <b>الحالة:</b> {state}
 
 autoplay_btn: "🔁 التشغيل التلقائي: {state}"
-autoplay_enabled: "✅ تم تفعيل التشغيل التلقائي!"
-autoplay_disabled: "❌ تم إيقاف التشغيل التلقائي!"
+autoplay_enabled: "{emoji:✅} تم تفعيل التشغيل التلقائي!"
+autoplay_disabled: "{emoji:❌} تم إيقاف التشغيل التلقائي!"
 autoplay_requester: "التشغيل التلقائي"
 
-searching: "🔍🎶 جاري البحث... ⚡✨"
-searching_query: "🔍🎶 جاري البحث عن: <b>{query}</b>... ⚡✨"
+searching: "{emoji:🔍}{emoji:🎶} جاري البحث... {emoji:⚡}{emoji:✨}"
+searching_query: "{emoji:🔍}{emoji:🎶} جاري البحث عن: <b>{query}</b>... {emoji:⚡}{emoji:✨}"
 
-speed_line: "⚙️ السرعة: <b>{speed}x</b>"
+speed_line: "{emoji:⚙️} السرعة: <b>{speed}x</b>"
 
 stats_overview: |
-  🔧 <b>النظام:</b><blockquote>
+  {emoji:🔧} <b>النظام:</b><blockquote>
   • النظام: <code>{os}</code>، المعمارية: <code>{arch}</code>
   • المعالجات: <code>{cpus}</code>، عدد Goroutines: <code>{goroutines}</code></blockquote>
 
-  📦 <b>الذاكرة الداخلية (Go):</b><blockquote>
+  {emoji:📦} <b>الذاكرة الداخلية (Go):</b><blockquote>
   • المحجوزة: <code>{alloc} ميجا</code>
   • النظام: <code>{sys} ميجا</code>
   • عمليات تنظيف الذاكرة: <code>{gc_count}</code> ({gc_emoji} {gc_rate}/دقيقة)</blockquote>
 
-  💻 <b>إحصائيات الخادم:</b><blockquote>
+  {emoji:💻} <b>إحصائيات الخادم:</b><blockquote>
   • استهلاك المعالج: {cpu_emoji} <code>{cpu}%</code>
   • استهلاك الرام: {ram_emoji} <code>{ram_used_gib} جيجا</code> | <code>{ram_total_gib} جيجا</code>
   • التخزين: <code>{storage_used_gib} جيجا</code> | <code>{storage_total_gib} جيجا</code></blockquote>
 
-  🍃 <b>إحصائيات MongoDB:</b><blockquote>
+  {emoji:🍃} <b>إحصائيات MongoDB:</b><blockquote>
   • التخزين: <code>{db_data} / {db_storage} ميجابايت</code>
   • المجموعات: <code>{db_collections}</code>
   • الكائنات: <code>{db_objects}</code></blockquote>
 
-  📊 <b>المخدومة:</b><blockquote>
+  {emoji:📊} <b>المخدومة:</b><blockquote>
   • المحادثات: <code>{served_chats}</code>
   • المستخدمون: <code>{served_users}</code></blockquote>
 
-  🧩 <b>إصدارات وقت التشغيل:</b><blockquote>
+  {emoji:🧩} <b>إصدارات وقت التشغيل:</b><blockquote>
   • Go: <code>{go_version}</code>
   • Gogram API Layer: <code>{gogram_api_layer}</code>
   • Gogram Version: <code>{gogram_version}</code>
@@ -663,58 +663,58 @@ stats_overview: |
 
 # 👑 Sudo users
 
-sudo_owner_self: "😂 ههه، أنت المدير بالفعل! لماذا تحاول إضافة نفسك؟"
-sudo_bot_self: "🤖 ههه، أنا المساعد الآلي! لا يمكنني إضافة نفسي لقائمة المساعدين — حتى المالك لا يمكنه خداعي 😎"
-sudo_bot_user: "🤖 لا يمكنك إضافة مساعد آلي لقائمة المساعدين — يجب أن يكونوا بشراً!"
+sudo_owner_self: "{emoji:😂} ههه، أنت المدير بالفعل! لماذا تحاول إضافة نفسك؟"
+sudo_bot_self: "{emoji:🤖} ههه، أنا المساعد الآلي! لا يمكنني إضافة نفسي لقائمة المساعدين — حتى المالك لا يمكنه خداعي {emoji:😎}"
+sudo_bot_user: "{emoji:🤖} لا يمكنك إضافة مساعد آلي لقائمة المساعدين — يجب أن يكونوا بشراً!"
 
-sudo_fetch_user_fail: "❌ فشل جلب معلومات المستخدم. قد يكون من الصعب الوصول إليه.\n<i>{error}</i>"
-sudo_check_fail: "❌ فشل التحقق من وجود المساعد: <i>{error}</i>"
-sudo_already: "⚠️ المستخدم {user} (المعرف: <code>{id}</code>) مساعد بالفعل."
-sudo_add_fail: "❌ فشل إضافة مساعد: <i>{error}</i>"
-sudo_add_success: "✅ تمت إضافة {user} (<code>{id}</code>) إلى المساعدين."
+sudo_fetch_user_fail: "{emoji:❌} فشل جلب معلومات المستخدم. قد يكون من الصعب الوصول إليه.\n<i>{error}</i>"
+sudo_check_fail: "{emoji:❌} فشل التحقق من وجود المساعد: <i>{error}</i>"
+sudo_already: "{emoji:⚠️} المستخدم {user} (المعرف: <code>{id}</code>) مساعد بالفعل."
+sudo_add_fail: "{emoji:❌} فشل إضافة مساعد: <i>{error}</i>"
+sudo_add_success: "{emoji:✅} تمت إضافة {user} (<code>{id}</code>) إلى المساعدين."
 
-sudo_owner_remove_block: "😎 محاولة جيدة! لا يمكنك إزالة المالك — فهو فوق كل الصلاحيات."
-sudo_not_exists: "⚠️ المستخدم {user} (<code>{id}</code>) ليس مساعداً."
-sudo_remove_fail: "❌ فشل إزالة المساعد: <i>{error}</i>"
-sudo_remove_success: "🗑️ تمت إزالة {user} (المعرف: <code>{id}</code>) من المساعدين."
+sudo_owner_remove_block: "{emoji:😎} محاولة جيدة! لا يمكنك إزالة المالك — فهو فوق كل الصلاحيات."
+sudo_not_exists: "{emoji:⚠️} المستخدم {user} (<code>{id}</code>) ليس مساعداً."
+sudo_remove_fail: "{emoji:❌} فشل إزالة المساعد: <i>{error}</i>"
+sudo_remove_success: "{emoji:🗑️} تمت إزالة {user} (المعرف: <code>{id}</code>) من المساعدين."
 
-sudo_list_fetching: "⏳ جاري جلب قائمة المساعدين..."
-sudo_list_fetch_fail: "❌ فشل جلب المساعدين: <code>{error}</code>"
-sudo_list_header: "👑 <b>المساعدون الحاليون:</b>"
+sudo_list_fetching: "{emoji:⏳} جاري جلب قائمة المساعدين..."
+sudo_list_fetch_fail: "{emoji:❌} فشل جلب المساعدين: <code>{error}</code>"
+sudo_list_header: "{emoji:👑} <b>المساعدون الحاليون:</b>"
 sudo_list_owner: "{index}. {user} — <b>المالك</b>"
 sudo_list_entry: "{index}. {user}"
-sudo_list_no_extra: "⚠️ لم يتم العثور على مساعدين إضافيين."
+sudo_list_no_extra: "{emoji:⚠️} لم يتم العثور على مساعدين إضافيين."
 
-seek_no_active: "⚠️ <b>لا يوجد مقطع قيد التشغيل حالياً.</b>"
-seek_usage: "⚠️ يرجى تحديد الثواني.\nمثال: <code>{cmd} 40</code>"
-seek_invalid_seconds: "⚠️ قيمة ثوانٍ غير صالحة.\nمثال: <code>{cmd} 40</code>"
-seek_too_close_start: "⚠️ لا يمكن الرجوع بمقدار <b>{seconds}</b> ثانية — سيكون ذلك قريباً جداً من بداية المقطع."
-seek_too_close_end: "⚠️ لا يمكن التقديم بمقدار <b>{seconds}</b> ثانية — سيكون ذلك قريباً جداً من نهاية المقطع."
-seek_failed: "❌ فشل التقديم/الرجوع {direction} بمقدار <b>{seconds}</b> ثانية.\nالخطأ: <code>{error}</code>"
+seek_no_active: "{emoji:⚠️} <b>لا يوجد مقطع قيد التشغيل حالياً.</b>"
+seek_usage: "{emoji:⚠️} يرجى تحديد الثواني.\nمثال: <code>{cmd} 40</code>"
+seek_invalid_seconds: "{emoji:⚠️} قيمة ثوانٍ غير صالحة.\nمثال: <code>{cmd} 40</code>"
+seek_too_close_start: "{emoji:⚠️} لا يمكن الرجوع بمقدار <b>{seconds}</b> ثانية — سيكون ذلك قريباً جداً من بداية المقطع."
+seek_too_close_end: "{emoji:⚠️} لا يمكن التقديم بمقدار <b>{seconds}</b> ثانية — سيكون ذلك قريباً جداً من نهاية المقطع."
+seek_failed: "{emoji:❌} فشل التقديم/الرجوع {direction} بمقدار <b>{seconds}</b> ثانية.\nالخطأ: <code>{error}</code>"
 seek_success: "{emoji} قفز {direction} إلى <b>{position}</b> من <b>{duration}</b>."
 
 stop_confirm_paused: |
-  ⏸️ <b>التشغيل متوقف مؤقتاً حالياً.</b>
+  {emoji:⏸️} <b>التشغيل متوقف مؤقتاً حالياً.</b>
 
   هل تريد استئناف التشغيل أم إيقافه نهائياً؟
 
 stop_confirm_muted: |
-  🔇 <b>الصوت مكتوم حالياً.</b>
+  {emoji:🔇} <b>الصوت مكتوم حالياً.</b>
 
   هل تريد إلغاء الكتم أم إيقاف التشغيل نهائياً؟
 
-stopped: "⏹️ <b>تم إيقاف التشغيل وتفريغ القائمة بواسطة {user}.</b>"
+stopped: "{emoji:⏹️} <b>تم إيقاف التشغيل وتفريغ القائمة بواسطة {user}.</b>"
 
-shuffle_current_state: "🔀 وضع الترتيب العشوائي حالياً هو <b>{state}</b> لهذه المحادثة.\n\nاستخدم <code>{cmd}</code> للتبديل."
-shuffle_updated: "🔀 الترتيب العشوائي <b>{state}</b> بواسطة {user}."
+shuffle_current_state: "{emoji:🔀} وضع الترتيب العشوائي حالياً هو <b>{state}</b> لهذه المحادثة.\n\nاستخدم <code>{cmd}</code> للتبديل."
+shuffle_updated: "{emoji:🔀} الترتيب العشوائي <b>{state}</b> بواسطة {user}."
 
-skip_stopped: "⏹️ توقف التشغيل. قائمة الانتظار فارغة.\nتخطى بواسطة: {user}"
-skip_invalid_number: "⚠️ يرجى إدخال رقم صحيح بعد /skip.\nمثال: <code>/skip 3</code>"
-skip_queue_empty_for_count: "⚠️ لا توجد مقاطع قادمة في قائمة الانتظار لتخطيها."
-skip_count_exceeds_queue: "⚠️ طلبت تخطي <code>{requested}</code> من المقاطع، لكن المتاح في القائمة هو <code>{available}</code> فقط."
+skip_stopped: "{emoji:⏹️} توقف التشغيل. قائمة الانتظار فارغة.\nتخطى بواسطة: {user}"
+skip_invalid_number: "{emoji:⚠️} يرجى إدخال رقم صحيح بعد /skip.\nمثال: <code>/skip 3</code>"
+skip_queue_empty_for_count: "{emoji:⚠️} لا توجد مقاطع قادمة في قائمة الانتظار لتخطيها."
+skip_count_exceeds_queue: "{emoji:⚠️} طلبت تخطي <code>{requested}</code> من المقاطع، لكن المتاح في القائمة هو <code>{available}</code> فقط."
 
 speed_usage: |
-  💡 <b>الاستخدام:</b>
+  {emoji:💡} <b>الاستخدام:</b>
   <code>{cmd} [speed]</code> — تغيير سرعة التشغيل
   
   نطاق السرعة المسموح به: <b>0.50x ← 4.00x</b>
@@ -723,75 +723,75 @@ speed_usage: |
   <code>{cmd} 1.5</code> — التشغيل بسرعة 1.5x
   <code>{cmd} normal</code> — العودة للسرعة الطبيعية.
 
-speed_current: "🎧 <b>السرعة الحالية:</b> <code>{speed}x</code> للمقطع 🎵 <u>{title}</u>\n\n💡 استخدم <code>{cmd} reset</code> لاستعادة التشغيل الطبيعي."
+speed_current: "{emoji:🎧} <b>السرعة الحالية:</b> <code>{speed}x</code> للمقطع {emoji:🎵} <u>{title}</u>\n\n{emoji:💡} استخدم <code>{cmd} reset</code> لاستعادة التشغيل الطبيعي."
 
-speed_invalid_value: "❌ قيمة سرعة غير صالحة.\nمثال: <code>{cmd} 1.5</code> أو <code>{cmd} 2x</code>"
-speed_invalid_range: "⚠️ يجب أن تكون السرعة بين <b>0.50x</b> و <b>4.00x</b>."
+speed_invalid_value: "{emoji:❌} قيمة سرعة غير صالحة.\nمثال: <code>{cmd} 1.5</code> أو <code>{cmd} 2x</code>"
+speed_invalid_range: "{emoji:⚠️} يجب أن تكون السرعة بين <b>0.50x</b> و <b>4.00x</b>."
 
-speed_already_set: "ℹ️ سرعة التشغيل هي <b>{speed}x</b> بالفعل للمقطع 🎵 <b>{title}</b>"
+speed_already_set: "ℹ️ سرعة التشغيل هي <b>{speed}x</b> بالفعل للمقطع {emoji:🎵} <b>{title}</b>"
 
 speed_failed: |
-  ❌ فشل تغيير السرعة إلى <b>{speed}x</b>.
+  {emoji:❌} فشل تغيير السرعة إلى <b>{speed}x</b>.
   الخطأ: <code>{error}</code>
 
-speed_reset_success: "✅ تمت إعادة تعيين سرعة التشغيل إلى <b>1.0x</b> بواسطة {user}"
+speed_reset_success: "{emoji:✅} تمت إعادة تعيين سرعة التشغيل إلى <b>1.0x</b> بواسطة {user}"
 
-speed_set: "🚀 تم تعيين سرعة التشغيل إلى <b>{speed}x</b> بواسطة {user}."
+speed_set: "{emoji:🚀} تم تعيين سرعة التشغيل إلى <b>{speed}x</b> بواسطة {user}."
 
-start_private: "مرحباً {user}، اسمي {bot}.\n\nأنا مساعد آلي لبث الموسيقى على تيليجرام مع ميزات مفيدة. أدعم منصات مثل Youtube و Spotify و JioSaavn و Soundcloud وغيرها.\n\nلا تتردد في إضافتي إلى مجموعاتك. {emoji:thumbs_up}"
+start_private: "مرحباً {user}، اسمي {bot}.\n\nأنا مساعد آلي لبث الموسيقى على تيليجرام مع ميزات مفيدة. أدعم منصات مثل Youtube و Spotify و JioSaavn و Soundcloud وغيرها.\n\nلا تتردد في إضافتي إلى مجموعاتك. {emoji:👍}"
 
-start_group: "<b>💫 أنا هنا!</b> جرب أمراً ما... إذا كنت تظن أنك تستطيع السيطرة علي 😉"
+start_group: "<b>{emoji:💫} أنا هنا!</b> جرب أمراً ما... إذا كنت تظن أنك تستطيع السيطرة علي {emoji:😉}"
 
-stream_queue_finished: "🎵 <b>انتهت قائمة الانتظار!</b>\n\nلا توجد أغاني أخرى للتشغيل. استخدم /play لإضافة المزيد! 🎶"
-stream_downloading_next: "📥 جاري تنزيل المقطع التالي..."
-stream_autoplay_next: "🔁 التشغيل التلقائي: <b>{title}</b>"
-stream_download_fail: "❌ فشل التنزيل.\nالخطأ: <code>{error}</code>"
+stream_queue_finished: "{emoji:🎵} <b>انتهت قائمة الانتظار!</b>\n\nلا توجد أغاني أخرى للتشغيل. استخدم /play لإضافة المزيد! {emoji:🎶}"
+stream_downloading_next: "{emoji:📥} جاري تنزيل المقطع التالي..."
+stream_autoplay_next: "{emoji:🔁} التشغيل التلقائي: <b>{title}</b>"
+stream_download_fail: "{emoji:❌} فشل التنزيل.\nالخطأ: <code>{error}</code>"
 download_progress: |
-  📥 جاري تنزيل أغنيتك...
+  {emoji:📥} جاري تنزيل أغنيتك...
 
   <b>التقدم:</b> {percentage}%
   <b>السرعة:</b> {speed}
   <b>الوقت المتبقي:</b> {eta}
   <b>الوقت المنقضي:</b> {elapsed}
-stream_play_fail: "❌ فشل تشغيل الأغنية."
+stream_play_fail: "{emoji:❌} فشل تشغيل الأغنية."
 stream_now_playing: |
-  <b>🎵 جاري التشغيل الآن:</b>
+  <b>{emoji:🎵} جاري التشغيل الآن:</b>
 
   <b>▫ المقطع:</b> <a href="{url}">{title}</a>
   <b>▫ المدة:</b> {duration}
   <b>▫ طلب بواسطة:</b> {by}
 
 # 👑 Sudo / Owner Join Messages
-sudo_join_owner: "👑 {user} — مالك {bot} — دخل المحادثة للتو."
-sudo_join_sudo: "🛡️ {user}، وهو مساعد في {bot}، انضم للمحادثة للتو."
+sudo_join_owner: "{emoji:👑} {user} — مالك {bot} — دخل المحادثة للتو."
+sudo_join_sudo: "{emoji:🛡️} {user}، وهو مساعد في {bot}، انضم للمحادثة للتو."
 
 supergroup_needed: |
   هذه الدردشة (ID: <code>{chat_id}</code>) ليست SuperGroup بعد.
 
-  <i>⚠️ يرجى تحويل هذه المجموعة إلى SuperGroup، ثم أضفني مرة أخرى كمشرف.</i>
+  <i>{emoji:⚠️} يرجى تحويل هذه المجموعة إلى SuperGroup، ثم أضفني مرة أخرى كمشرف.</i>
 
   <b>كيف أحوّلها؟</b>
-  <a href="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">🔗 اذهب إلى الدليل</a>
+  <a href="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">{emoji:🔗} اذهب إلى الدليل</a>
 
   إذا استمرت المشكلة، انضم إلى <a href="{support_group}">مجموعة الدعم</a>.
 
 unmute_already: "ℹ️ <b>تم إلغاء الكتم بالفعل</b>\nالموسيقى ليست مكتومة في هذه المحادثة."
 unmute_failed: "❌ <b>فشل إلغاء كتم التشغيل</b>\nالخطأ: <code>{error}</code>"
 unmute_success: |
-  🔊 <b>تم إلغاء كتم التشغيل</b>
+  {emoji:🔊} <b>تم إلغاء كتم التشغيل</b>
 
-  🎵 المقطع: {title}
-  👤 ألغي الكتم بواسطة: {user}
+  {emoji:🎵} المقطع: {title}
+  {emoji:👤} ألغي الكتم بواسطة: {user}
   {speed_line}
 
 
 # 🔊 Voice Chat Events
-voicechat_ended: "<b>⚠️ انتهت مكالمة الفيديو</b>\n\n<i>⏰ المدة: {duration}</i>"
-voicechat_started: "<b>♻️ بدأت المحادثة الصوتية!</b>\n\n<i>استخدم /play [اسم الأغنية] لتشغيل الموسيقى.</i>"
+voicechat_ended: "<b>{emoji:⚠️} انتهت مكالمة الفيديو</b>\n\n<i>{emoji:⏰} المدة: {duration}</i>"
+voicechat_started: "<b>{emoji:♻️} بدأت المحادثة الصوتية!</b>\n\n<i>استخدم /play [اسم الأغنية] لتشغيل الموسيقى.</i>"
 
 # Commands help
 help_owner: |
-  👑 <b>أوامر المالك</b>
+  {emoji:👑} <b>أوامر المالك</b>
 
   <i>أدوات حصرية لإدارة المساعدين وتنفيذ أوامر النظام وإدارة المساعد الآلي بشكل آمن.</i>
 
@@ -811,7 +811,7 @@ help_owner: |
   </blockquote>
 
 help_sudo: |
-  ⚡ <b>أوامر المساعدين</b>
+  {emoji:⚡} <b>أوامر المساعدين</b>
 
   <i>أدوات متقدمة لإدارة سلوك المساعد ومراقبة الأداء والتحكم في السجلات والأتمتة.</i>
 
@@ -825,7 +825,7 @@ help_sudo: |
   </blockquote>
 
 help_admin: |
-  🛠 <b>أوامر المشرفين</b>
+  {emoji:🛠} <b>أوامر المشرفين</b>
 
   <i>أدوات التحكم في الموسيقى والتشغيل للمشرفين للتحكم في التشغيل بسهولة.</i>
 
@@ -856,7 +856,7 @@ help_admin: |
   </blockquote>
   
 help_public: |
-  🌍 <b>الأوامر العامة</b>
+  {emoji:🌍} <b>الأوامر العامة</b>
 
   <i>ميزات لتشغيل الأغاني وعرض قوائم الانتظار والتحقق من التأخير والإبلاغ عن الأخطاء.</i>
 
