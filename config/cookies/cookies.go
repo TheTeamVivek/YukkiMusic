@@ -18,10 +18,8 @@
 package cookies
 
 import (
-	"embed"
 	"fmt"
 	"math/rand"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -34,7 +32,7 @@ import (
 	"yukkimusic/config"
 )
 
-const cookieDir = "internal/cookies"
+const cookieDir = "config/cookies"
 
 var (
 	cachedFiles []string
@@ -42,15 +40,8 @@ var (
 	client      = resty.New().SetTimeout(30 * time.Second)
 )
 
-//go:embed *.txt
-var embeddedCookies embed.FS
-
 func init() {
 	logger.Debug("🔹 Initializing cookies...")
-
-	if err := copyEmbeddedCookies(); err != nil {
-		logger.Fatal("Failed to copy embedded cookies:", err)
-	}
 
 	urls := strings.FieldsSeq(config.CookiesLink)
 	for url := range urls {
@@ -64,50 +55,19 @@ func init() {
 	}
 }
 
-func copyEmbeddedCookies() error {
-	entries, err := embeddedCookies.ReadDir(".")
-	if err != nil {
-		return err
-	}
-
-	for _, e := range entries {
-
-		if e.IsDir() || e.Name() == "example.txt" {
-			continue
-		}
-
-		dst := filepath.Join(cookieDir, e.Name())
-
-		if _, err := os.Stat(dst); err == nil {
-			continue
-		}
-
-		data, err := embeddedCookies.ReadFile(e.Name())
-		if err != nil {
-			return err
-		}
-
-		if err := os.WriteFile(dst, data, 0o600); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func downloadCookieFile(url string) error {
 	id := filepath.Base(url)
 	rawURL := "https://batbin.me/raw/" + id
 	filePath := filepath.Join(cookieDir, id+".txt")
 
 	resp, err := client.R().
-		SetOutputFileName(filePath).
+		SetResponseSaveFileName(filePath).
 		Get(rawURL)
 	if err != nil {
 		return err
 	}
 
-	if resp.IsError() {
+	if resp.IsStatusFailure() {
 		return fmt.Errorf(
 			"unexpected status %d from %s",
 			resp.StatusCode(),

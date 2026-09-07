@@ -57,18 +57,18 @@ func streamEndHandler(
 		if autoplay := pickAutoplayTrack(r, r.Track()); autoplay != nil {
 			r.AddTracks([]*state.Track{autoplay})
 		}
+
+		if len(r.Queue()) == 0 {
+			core.DropRoom(chatID)
+			if _, err := c.SendTextMessage(cid, F(cid, "stream_queue_finished"), nil); err != nil {
+				logger.Error(err)
+			}
+			return
+		}
 	}
 
-	if len(r.Queue()) == 0 && r.Loop() == 0 {
-		core.DropRoom(chatID)
-		if _, err := c.SendTextMessage(cid, F(cid, "stream_queue_finished"), nil); err != nil {
-			logger.Error(err)
-		}
-		return
-	} else {
-		wasLooping = r.Loop() > 0
-		t = r.NextTrack()
-	}
+	wasLooping = r.Loop() > 0
+	t = r.NextTrack()
 
 	statusText := F(cid, "stream_downloading_next")
 	if wasLooping && t != nil && r.FilePath() != "" {

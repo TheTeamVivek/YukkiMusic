@@ -267,7 +267,7 @@ func (p *YouTubePlatform) fetchTrackViaOEmbed(videoID string) (*state.Track, err
 		logger.Errorf("[YouTube] oembed request failed for %s: %v", videoID, err)
 		return nil, fmt.Errorf("oembed request failed: %w", err)
 	}
-	if resp.IsError() {
+	if resp.IsStatusFailure() {
 		logger.Errorf("[YouTube] oembed returned status %d for %s", resp.StatusCode(), videoID)
 		return nil, fmt.Errorf("oembed error: %d", resp.StatusCode())
 	}
@@ -490,7 +490,7 @@ func (p *YouTubePlatform) callInnerTube(endpoint string, body, result any) error
 	if err != nil {
 		return fmt.Errorf("innertube request failed: %w", err)
 	}
-	if resp.IsError() {
+	if resp.IsStatusFailure() {
 		return fmt.Errorf("innertube error: %d", resp.StatusCode())
 	}
 	return nil

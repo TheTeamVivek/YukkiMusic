@@ -122,7 +122,7 @@ func (f *FallenApiPlatform) Get(query string, _ bool) ([]*state.Track, error) {
 			config.FallenAPIKey,
 		)
 	}
-	if r.IsError() {
+	if r.IsStatusFailure() {
 		return nil, sanitizeAPIError(fmt.Errorf(
 			"API returned %d: %s", r.StatusCode(), r.String(),
 		), config.FallenAPIKey)
@@ -213,7 +213,7 @@ func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string)
 		)
 	}
 
-	if r.IsError() {
+	if r.IsStatusFailure() {
 		return "", sanitizeAPIError(fmt.Errorf(
 			"API returned %d: %s", r.StatusCode(), r.String(),
 		), config.FallenAPIKey)
@@ -232,7 +232,7 @@ func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string)
 func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, path string) error {
 	r, err := rc.R().
 		SetContext(ctx).
-		SetOutputFileName(path).
+		SetResponseSaveFileName(path).
 		Get(dlURL)
 	if err != nil {
 		os.Remove(path)
@@ -241,7 +241,7 @@ func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, path str
 		}
 		return fmt.Errorf("http download failed: %w", err)
 	}
-	if r.IsError() {
+	if r.IsStatusFailure() {
 		return fmt.Errorf("download returned %d", r.StatusCode())
 	}
 	return nil

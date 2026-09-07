@@ -16,7 +16,8 @@ RUN go mod tidy
 COPY install.sh ./
 COPY . .
 
-RUN chmod +x install.sh && \
+RUN mkdir -p /build/config/cookies && \
+    chmod +x install.sh && \
     ./install.sh -n --quiet --skip-summary && \
     CGO_ENABLED=1 go build -v -trimpath -ldflags="-w -s" -o app ./cmd/app/
 
@@ -50,7 +51,8 @@ RUN useradd -r -u 10001 appuser && \
 WORKDIR /app
 
 COPY --from=builder /build/app /app/app
-RUN chown appuser:appuser /app/app
+COPY --from=builder /build/config/cookies /app/config/cookies
+RUN chown -R appuser:appuser /app
 
 USER appuser
 

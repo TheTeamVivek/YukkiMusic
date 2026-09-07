@@ -58,9 +58,10 @@ func autoplayHandler(c *td.Client, m *td.Message) error {
 		return err
 	}
 
-	_, err := m.ReplyText(c, autoplayMenuText(chatID, r.Autoplay()), &td.SendTextMessageOpts{
+	text, markup := autoplayMenu(chatID, r.Autoplay())
+	_, err := m.ReplyText(c, text, &td.SendTextMessageOpts{
 		ParseMode:   "HTML",
-		ReplyMarkup: autoplayMarkup(chatID, r.Autoplay()),
+		ReplyMarkup: markup,
 	})
 	return err
 }
@@ -93,33 +94,31 @@ func autoplayCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	}
 	_ = u.Answer(c, 0, false, F(chatID, statusKey), "")
 
-	_, err := u.EditMessageText(c, autoplayMenuText(chatID, enabled), &td.EditTextMessageOpts{
+	text, markup := autoplayMenu(chatID, enabled)
+	_, err := u.EditMessageText(c, text, &td.EditTextMessageOpts{
 		ParseMode:   "HTML",
-		ReplyMarkup: autoplayMarkup(chatID, enabled),
+		ReplyMarkup: markup,
 	})
 	return err
 }
 
-func autoplayMenuText(chatID int64, enabled bool) string {
-	return F(chatID, "autoplay_menu", locales.Arg{
-		"state": F(chatID, autoplayStateKey(enabled)),
-	})
-}
-
-func autoplayStateKey(enabled bool) string {
+func autoplayMenu(chatID int64, enabled bool) (string, *td.ReplyMarkupInlineKeyboard) {
+	state := "disabled"
 	if enabled {
-		return "enabled"
+		state = "enabled"
 	}
-	return "disabled"
-}
 
-func autoplayMarkup(chatID int64, enabled bool) *td.ReplyMarkupInlineKeyboard {
-	return &td.ReplyMarkupInlineKeyboard{
+	stateText := F(chatID, state)
+	text := F(chatID, "autoplay_menu", locales.Arg{
+		"state": stateText,
+	})
+
+	markup := &td.ReplyMarkupInlineKeyboard{
 		Rows: [][]td.InlineKeyboardButton{
 			{
 				{
 					Text: F(chatID, "autoplay_btn", locales.Arg{
-						"state": F(chatID, autoplayStateKey(enabled)),
+						"state": stateText,
 					}),
 					Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("autoplay:toggle")},
 				},
@@ -132,13 +131,15 @@ func autoplayMarkup(chatID int64, enabled bool) *td.ReplyMarkupInlineKeyboard {
 			},
 		},
 	}
+
+	return text, markup
 }
 
 // pickAutoplayTrack resolves a recommended track to keep playback going once
 // the user queue is empty. It returns nil when autoplay is disabled, the last
 // track is not from YouTube, or no suitable recommendation was found.
 func pickAutoplayTrack(r *core.RoomState, last *state.Track) *state.Track {
-	if r == nil || !r.Autoplay() || last == nil ||
+	if r == nil || last == nil || !r.Autoplay() ||
 		last.Source != platforms.PlatformYouTube {
 		return nil
 	}
@@ -158,21 +159,30 @@ func pickAutoplayTrack(r *core.RoomState, last *state.Track) *state.Track {
 		return nil
 	}
 
+	seen := make(map[string]struct{}, limit+1)
+	seen[last.ID] = struct{}{}
+	for _, t := range r.Queue() {
+		if t == nil {
+			continue
+		}
+		seen[t.ID] = struct{}{}
+		seen[t.URL] = struct{}{}
+	}
+
+	requester := F(r.ChatID, "autoplay_requester")
 	rand.Shuffle(len(candidates), func(i, j int) {
 		candidates[i], candidates[j] = candidates[j], candidates[i]
 	})
 
 	for _, t := range candidates {
-		if t == nil || t.ID == "" || t.ID == last.ID {
+		if t == nil || t.ID == "" ||
+			config.DurationLimit > 0 && t.Duration > config.DurationLimit {
 			continue
 		}
-		if isTrackInQueue(r, t) {
+		if _, dup := seen[t.ID]; dup {
 			continue
 		}
-		if config.DurationLimit > 0 && t.Duration > config.DurationLimit {
-			continue
-		}
-		t.Requester = F(r.ChatID, "autoplay_requester")
+		t.Requester = requester
 		return t
 	}
 

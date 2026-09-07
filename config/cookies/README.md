@@ -18,7 +18,7 @@ This method keeps your sensitive cookies out of your Git history and allows for 
 
 ### Method 2: Manual Local Files
 
-Place any Netscape-formatted cookie file directly into the `internal/cookies/` directory with a `.txt` extension. The bot automatically detects and uses all `.txt` files in this folder.
+Place any Netscape-formatted cookie file directly into the `config/cookies/` directory with a `.txt` extension. The bot automatically detects and uses all `.txt` files in this folder.
 
 ## 🛠️ Troubleshooting
 
@@ -27,7 +27,7 @@ This usually means your cookies have expired or were exported incorrectly.
 - **Solution:** Re-export fresh cookies from your browser and update your Batbin paste or local files.
 
 ### "No cookie files found"
-The bot couldn't find any valid `.txt` files in `internal/cookies/`.
+The bot couldn't find any valid `.txt` files in `config/cookies/`.
 - **Solution:** Verify that your `COOKIES_LINK` is correct or that your local files have the `.txt` extension and are not named `example.txt`.
 
 ## 💡 Best Practices
