@@ -1,6 +1,6 @@
 module main
 
-go 1.26
+go 1.26.0
 
 require (
 	github.com/Laky-64/gologging v1.1.0
@@ -11,7 +11,7 @@ require (
 	github.com/traefik/yaegi v0.16.1
 	github.com/zmb3/spotify/v2 v2.4.3
 	go.mongodb.org/mongo-driver/v2 v2.8.0
-	golang.org/x/oauth2 v0.36.0
+	golang.org/x/oauth2 v0.37.0
 	gopkg.in/yaml.v3 v3.0.1
 	resty.dev/v3 v3.0.0-rc.3
 )
