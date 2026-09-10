@@ -17,7 +17,10 @@
 
 package locales
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 // Emoji tokens that can be used inside any locale template as {emoji:<emoji>}.
 // A token whose mapped value is empty expands to the bare emoji character;
@@ -42,8 +45,10 @@ var emojiTokens = map[string]string{
 	"{emoji:✅}":    "",
 	"{emoji:✨}":    "",
 	"{emoji:❌}":    "",
+	"{emoji:❓}":    "",
 	"{emoji:➕}":    "",
 	"{emoji:➡️}":   "",
+	"{emoji:⬅️}":   "",
 	"{emoji:🌍}":    "",
 	"{emoji:🌐}":    "",
 	"{emoji:🍃}":    "",
@@ -65,11 +70,13 @@ var emojiTokens = map[string]string{
 	"{emoji:📊}":    "",
 	"{emoji:📌}":    "",
 	"{emoji:📍}":    "",
+	"{emoji:📒}":    "",
 	"{emoji:📚}":    "",
 	"{emoji:📛}":    "",
 	"{emoji:📜}":    "",
 	"{emoji:📝}":    "",
 	"{emoji:📡}":    "",
+	"{emoji:📢}":    "",
 	"{emoji:📥}":    "",
 	"{emoji:📦}":    "",
 	"{emoji:📭}":    "",
@@ -88,6 +95,7 @@ var emojiTokens = map[string]string{
 	"{emoji:😎}":    "",
 	"{emoji:🚀}":    "",
 	"{emoji:🚫}":    "",
+	"{emoji:🚦}":    "",
 	"{emoji:🛠}":    "",
 	"{emoji:🛠️}":   "",
 	"{emoji:🛡️}":   "",
@@ -97,6 +105,8 @@ var emojiTokens = map[string]string{
 	"{emoji:🧹}":    "",
 }
 
+var unknownEmojiRe = regexp.MustCompile(`\{emoji:([^}]+)\}`)
+
 func expandEmojis(s string) string {
 	for token, emojiID := range emojiTokens {
 		emoji := strings.TrimSuffix(strings.TrimPrefix(token, "{emoji:"), "}")
@@ -105,5 +115,6 @@ func expandEmojis(s string) string {
 		}
 		s = strings.ReplaceAll(s, token, emoji)
 	}
+	s = unknownEmojiRe.ReplaceAllString(s, "$1")
 	return s
 }

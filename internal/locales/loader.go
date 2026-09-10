@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"path"
 	"sort"
+	"strconv"
 	"strings"
 
 	"yukkimusic/internal/logger"
@@ -104,6 +105,58 @@ func Get(lang, key string, values Arg) string {
 	}
 
 	return expandEmojis(val)
+}
+
+func GetButton(lang, key string, values Arg) (string, int64) {
+	tryLangs := []string{
+		lang,
+		config.DefaultLang,
+		baseLang,
+	}
+
+	var val string
+	var found bool
+
+	for _, l := range tryLangs {
+		if locale, ok := loadedLocales[l]; ok {
+			if v, ok := locale[key]; ok {
+				val = v
+				found = true
+				break
+			}
+		}
+	}
+
+	if !found {
+		logger.Errorf("Missing translation → lang=%s key=%s", lang, key)
+
+		return fmt.Sprintf("[%s]", key), 0
+	}
+
+	for k, v := range values {
+		val = strings.ReplaceAll(val, "{"+k+"}", fmt.Sprint(v))
+	}
+
+	if !config.HasPremium {
+		return unknownEmojiRe.ReplaceAllString(val, "$1"), 0
+	}
+
+	m := unknownEmojiRe.FindStringSubmatchIndex(val)
+	if m == nil {
+		return val, 0
+	}
+
+	token := val[m[0]:m[1]]
+
+	if id, ok := emojiTokens[token]; ok && id != "" {
+		n, err := strconv.ParseInt(id, 10, 64)
+		if err == nil {
+			rest := unknownEmojiRe.ReplaceAllString(val[:m[0]]+val[m[1]:], "$1")
+			return strings.TrimSpace(rest), n
+		}
+	}
+
+	return unknownEmojiRe.ReplaceAllString(val, "$1"), 0
 }
 
 func GetAvailableLanguages() []string {

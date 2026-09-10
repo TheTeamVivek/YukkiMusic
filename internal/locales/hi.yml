@@ -1,27 +1,27 @@
 name: "🇮🇳 हिन्दी"
 
 # buttons
-CONFIRM_RESUME_BTN: "▶️ पुनः चलाएँ"
-CONFIRM_UNMUTE_BTN: "🔊 सशब्द"
-CONFIRM_STOP_BTN: "⏹️ रोकें"
-ADD_ME_BTN: "⚡ मुझे अपने समूह में जोड़ें"
-BROADCAST_CANCEL_BTN: "🚫 प्रसारण रद्द करें"
+CONFIRM_RESUME_BTN: "{emoji:▶️} पुनः चलाएँ"
+CONFIRM_UNMUTE_BTN: "{emoji:🔊} सशब्द"
+CONFIRM_STOP_BTN: "{emoji:⏹️} रोकें"
+ADD_ME_BTN: "{emoji:⚡} मुझे अपने समूह में जोड़ें"
+BROADCAST_CANCEL_BTN: "{emoji:🚫} प्रसारण रद्द करें"
 CLOSE_BTN: "बन्द करें"
-DOWNLOAD_CANCEL_BTN: "🚦 डाउनलोड रद्द करें"
-GC_HELP_BTN: "📒 आदेश"
+DOWNLOAD_CANCEL_BTN: "{emoji:🚦} डाउनलोड रद्द करें"
+GC_HELP_BTN: "{emoji:📒} आदेश"
 
-START_HELP_BTN: "❓ सहायता एवं आदेश"
+START_HELP_BTN: "{emoji:❓} सहायता एवं आदेश"
 
-UPDATES_BTN: "📢 अद्यतन"
-SUPPORT_BTN: "💬 सहायता"
-SOURCE_BTN: "🔗 सोर्स कोड"
+UPDATES_BTN: "{emoji:📢} अद्यतन"
+SUPPORT_BTN: "{emoji:💬} सहायता"
+SOURCE_BTN: "{emoji:🔗} सोर्स कोड"
 
-HELP_ADMINS_BTN: "🛠 प्रशासक"
-HELP_PUBLIC_BTN: "🌍 सार्वजनिक"
-HELP_OWNER_BTN: "👑 स्वामी"
-HELP_SUDOERS_BTN: "⚡ विशेषाधिकारी"
+HELP_ADMINS_BTN: "{emoji:🛠} प्रशासक"
+HELP_PUBLIC_BTN: "{emoji:🌍} सार्वजनिक"
+HELP_OWNER_BTN: "{emoji:👑} स्वामी"
+HELP_SUDOERS_BTN: "{emoji:⚡} विशेषाधिकारी"
 
-BACK_BTN: "⬅️ पीछे"
+BACK_BTN: "{emoji:⬅️} पीछे"
 
 # basically this string used in /command [bool]
 invalid_bool: "{emoji:⚠️} <b>अमान्य मान।</b>\n\n<i>कृपया '<code>enable</code>' अथवा '<code>disable</code>' का प्रयोग करें।</i>"

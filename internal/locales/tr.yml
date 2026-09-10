@@ -1,27 +1,27 @@
 name: "🇹🇷 Türkçe"
 
 # buttons
-CONFIRM_RESUME_BTN: "▶️ Devam Et"
-CONFIRM_UNMUTE_BTN: "🔊 Sesi Aç"
-CONFIRM_STOP_BTN: "⏹️ Durdur"
-ADD_ME_BTN: "⚡ Beni Grubuna Ekle"
-BROADCAST_CANCEL_BTN: "🚫 Yayını İptal Et"
+CONFIRM_RESUME_BTN: "{emoji:▶️} Devam Et"
+CONFIRM_UNMUTE_BTN: "{emoji:🔊} Sesi Aç"
+CONFIRM_STOP_BTN: "{emoji:⏹️} Durdur"
+ADD_ME_BTN: "{emoji:⚡} Beni Grubuna Ekle"
+BROADCAST_CANCEL_BTN: "{emoji:🚫} Yayını İptal Et"
 CLOSE_BTN: "Kapat"
-DOWNLOAD_CANCEL_BTN: "🚦 İndirmeyi İptal Et"
-GC_HELP_BTN: "📒 Komutlar"
+DOWNLOAD_CANCEL_BTN: "{emoji:🚦} İndirmeyi İptal Et"
+GC_HELP_BTN: "{emoji:📒} Komutlar"
 
-START_HELP_BTN: "❓ Yardım ve Komutlar"
+START_HELP_BTN: "{emoji:❓} Yardım ve Komutlar"
 
-UPDATES_BTN: "📢 Güncellemeler"
-SUPPORT_BTN: "💬 Destek"
-SOURCE_BTN: "🔗 Kaynak Kodu"
+UPDATES_BTN: "{emoji:📢} Güncellemeler"
+SUPPORT_BTN: "{emoji:💬} Destek"
+SOURCE_BTN: "{emoji:🔗} Kaynak Kodu"
 
-HELP_ADMINS_BTN: "🛠 Yöneticiler"
-HELP_PUBLIC_BTN: "🌍 Genel"
-HELP_OWNER_BTN: "👑 Sahibi"
-HELP_SUDOERS_BTN: "⚡ Sudo Kullanıcılar"
+HELP_ADMINS_BTN: "{emoji:🛠} Yöneticiler"
+HELP_PUBLIC_BTN: "{emoji:🌍} Genel"
+HELP_OWNER_BTN: "{emoji:👑} Sahibi"
+HELP_SUDOERS_BTN: "{emoji:⚡} Sudo Kullanıcılar"
 
-BACK_BTN: "⬅️ Geri"
+BACK_BTN: "{emoji:⬅️} Geri"
 
 # basically this string used in /command [bool]
 invalid_bool: "{emoji:⚠️} <b>Geçersiz değer.</b>\n'enable' veya 'disable' kullan."

@@ -1,27 +1,27 @@
 name: "🇸🇦 العربية"
 
 # buttons
-CONFIRM_RESUME_BTN: "▶️ استئناف"
-CONFIRM_UNMUTE_BTN: "🔊 إلغاء الكتم"
-CONFIRM_STOP_BTN: "⏹️ إيقاف"
-ADD_ME_BTN: "⚡ أضفني إلى مجموعتك"
-BROADCAST_CANCEL_BTN: "🚫 إلغاء البث"
+CONFIRM_RESUME_BTN: "{emoji:▶️} استئناف"
+CONFIRM_UNMUTE_BTN: "{emoji:🔊} إلغاء الكتم"
+CONFIRM_STOP_BTN: "{emoji:⏹️} إيقاف"
+ADD_ME_BTN: "{emoji:⚡} أضفني إلى مجموعتك"
+BROADCAST_CANCEL_BTN: "{emoji:🚫} إلغاء البث"
 CLOSE_BTN: "إغلاق"
-DOWNLOAD_CANCEL_BTN: "🚦 إلغاء التنزيل"
-GC_HELP_BTN: "📒 الأوامر"
+DOWNLOAD_CANCEL_BTN: "{emoji:🚦} إلغاء التنزيل"
+GC_HELP_BTN: "{emoji:📒} الأوامر"
 
-START_HELP_BTN: "❓ المساعدة والأوامر"
+START_HELP_BTN: "{emoji:❓} المساعدة والأوامر"
 
-UPDATES_BTN: "📢 التحديثات"
-SUPPORT_BTN: "💬 الدعم"
-SOURCE_BTN: "🔗 الكود المصدري"
+UPDATES_BTN: "{emoji:📢} التحديثات"
+SUPPORT_BTN: "{emoji:💬} الدعم"
+SOURCE_BTN: "{emoji:🔗} الكود المصدري"
 
-HELP_ADMINS_BTN: "🛠 المشرفون"
-HELP_PUBLIC_BTN: "🌍 عام"
-HELP_OWNER_BTN: "👑 المالك"
-HELP_SUDOERS_BTN: "⚡ المساعدون"
+HELP_ADMINS_BTN: "{emoji:🛠} المشرفون"
+HELP_PUBLIC_BTN: "{emoji:🌍} عام"
+HELP_OWNER_BTN: "{emoji:👑} المالك"
+HELP_SUDOERS_BTN: "{emoji:⚡} المساعدون"
 
-BACK_BTN: "⬅️ عودة"
+BACK_BTN: "{emoji:⬅️} عودة"
 
 # basically this string used in /command [bool]
 invalid_bool: "{emoji:⚠️} <b>قيمة غير صالحة.</b>\nاستخدم 'enable' (تفعيل) أو 'disable' (تعطيل)."

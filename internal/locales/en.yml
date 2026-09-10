@@ -1,27 +1,27 @@
 name: "🇺🇸 English"
 
 # buttons
-CONFIRM_RESUME_BTN: "▶️ Resume"
-CONFIRM_UNMUTE_BTN: "🔊 Unmute"
-CONFIRM_STOP_BTN: "⏹️ Stop"
-ADD_ME_BTN: "⚡ Add Me to Your group"
-BROADCAST_CANCEL_BTN: "🚫 Cancel Broadcast"
+CONFIRM_RESUME_BTN: "{emoji:▶️} Resume"
+CONFIRM_UNMUTE_BTN: "{emoji:🔊} Unmute"
+CONFIRM_STOP_BTN: "{emoji:⏹️} Stop"
+ADD_ME_BTN: "{emoji:⚡} Add Me to Your group"
+BROADCAST_CANCEL_BTN: "{emoji:🚫} Cancel Broadcast"
 CLOSE_BTN: "Close"
-DOWNLOAD_CANCEL_BTN: "🚦 Cancel Downloading"
-GC_HELP_BTN: "📒 Commands"
+DOWNLOAD_CANCEL_BTN: "{emoji:🚦} Cancel Downloading"
+GC_HELP_BTN: "{emoji:📒} Commands"
 
-START_HELP_BTN: "❓ Help & Commands"
+START_HELP_BTN: "{emoji:❓} Help & Commands"
 
-UPDATES_BTN: "📢 Updates"
-SUPPORT_BTN: "💬 Support"
-SOURCE_BTN: "🔗 Source Code"
+UPDATES_BTN: "{emoji:📢} Updates"
+SUPPORT_BTN: "{emoji:💬} Support"
+SOURCE_BTN: "{emoji:🔗} Source Code"
 
-HELP_ADMINS_BTN: "🛠 Admins"
-HELP_PUBLIC_BTN: "🌍 Public"
-HELP_OWNER_BTN: "👑 Owner"
-HELP_SUDOERS_BTN: "⚡ Sudoers"
+HELP_ADMINS_BTN: "{emoji:🛠} Admins"
+HELP_PUBLIC_BTN: "{emoji:🌍} Public"
+HELP_OWNER_BTN: "{emoji:👑} Owner"
+HELP_SUDOERS_BTN: "{emoji:⚡} Sudoers"
 
-BACK_BTN: "⬅️ Back"
+BACK_BTN: "{emoji:⬅️} Back"
 
 # basically this string used in /command [bool]
 invalid_bool: "{emoji:⚠️} <b>Invalid value.</b>\nUse 'enable' or 'disable'."
