@@ -146,9 +146,9 @@ func GetButton(lang, key string, values Arg) (string, int64) {
 		return val, 0
 	}
 
-	token := val[m[0]:m[1]]
+	emojiChar := val[m[2]:m[3]]
 
-	if id, ok := emojiTokens[token]; ok && id != "" {
+	if id, ok := emojiTokens[emojiChar]; ok && id != "" {
 		n, err := strconv.ParseInt(id, 10, 64)
 		if err == nil {
 			rest := unknownEmojiRe.ReplaceAllString(val[:m[0]]+val[m[1]:], "$1")
