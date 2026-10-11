@@ -167,20 +167,11 @@ func handleQueue(c *td.Client, m *td.Message, cplay bool) error {
 				)
 			}
 
-			link, err := utils.CreatePaste(full.String())
 			remaining := q - 10
 
-			if err == nil && link != "" {
-				more := fmt.Sprintf("<a href=\"%s\">%d</a>", link, remaining)
-
-				b.WriteString(F(chatID, "queue_more_line", locales.Arg{
-					"remaining": more,
-				}))
-			} else {
-				b.WriteString(F(chatID, "queue_more_line", locales.Arg{
-					"remaining": remaining,
-				}))
-			}
+			b.WriteString(F(chatID, "queue_more_line", locales.Arg{
+				"remaining": remaining,
+			}))
 		}
 	} else {
 		b.WriteString(F(chatID, "queue_empty_tail"))

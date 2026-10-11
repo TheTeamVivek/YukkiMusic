@@ -29,7 +29,7 @@ import (
 	"strings"
 	"time"
 
-	"yukkimusic/internal/logger"
+	"yukkimusic/internal/utils"
 
 	td "github.com/AshokShau/gotdbot"
 
@@ -146,7 +146,7 @@ func (y *YtdlpPlatform) Download(
 	_ *td.Message,
 ) (string, error) {
 	if f := findFile(track); f != "" {
-		logger.Debug("YtDlp: cache hit " + f)
+		utils.Log.Debug("YtDlp: cache hit " + f)
 		return f, nil
 	}
 
@@ -207,7 +207,7 @@ func (y *YtdlpPlatform) Download(
 		return "", errors.New("yt-dlp produced no output file")
 	}
 
-	logger.Infof("YtDlp: downloaded %s", p)
+	utils.Log.Infof("YtDlp: downloaded %s", p)
 	return p, nil
 }
 
@@ -244,7 +244,7 @@ func (y *YtdlpPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 		for _, line := range lines {
 			var entry ytdlpInfo
 			if err := json.Unmarshal([]byte(line), &entry); err != nil {
-				logger.Debugf("YtDlp: skip bad entry: %v", err)
+				utils.Log.Debugf("YtDlp: skip bad entry: %v", err)
 				continue
 			}
 			info.Entries = append(info.Entries, entry)

@@ -27,7 +27,6 @@ import (
 
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/locales"
-	"yukkimusic/internal/logger"
 	"yukkimusic/internal/utils"
 )
 
@@ -112,7 +111,7 @@ func handleReload(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	if err := cs.Join(); err != nil {
-		logger.Errorf("reload: failed to ensure assistant joined %d: %v", roomID, err)
+		utils.Log.Errorf("reload: failed to ensure assistant joined %d: %v", roomID, err)
 		summary += F(chatID, "reload_assistant_fail", locales.Arg{
 			"error": err.Error(),
 		}) + "\n"

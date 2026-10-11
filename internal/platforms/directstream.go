@@ -29,7 +29,7 @@ import (
 	"sync"
 	"time"
 
-	"yukkimusic/internal/logger"
+	"yukkimusic/internal/utils"
 
 	td "github.com/AshokShau/gotdbot"
 
@@ -131,7 +131,7 @@ func (d *DirectStreamPlatform) Get(query string, video bool) ([]*state.Track, er
 		}
 	}
 
-	logger.Infof("DirectStream: %s (audio:%v video:%v size:%d dur:%d)",
+	utils.Log.Infof("DirectStream: %s (audio:%v video:%v size:%d dur:%d)",
 		track.Title, info.IsAudio, info.IsVideo, info.Size, track.Duration)
 
 	return []*state.Track{track}, nil
@@ -146,7 +146,7 @@ func (d *DirectStreamPlatform) Download(
 	track *state.Track,
 	_ *td.Message,
 ) (string, error) {
-	logger.Infof("DirectStream: returning URL for streaming: %s", track.URL)
+	utils.Log.Infof("DirectStream: returning URL for streaming: %s", track.URL)
 	return track.URL, nil
 }
 

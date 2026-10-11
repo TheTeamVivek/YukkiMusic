@@ -21,8 +21,6 @@ import (
 	"context"
 	"strconv"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/core"
@@ -158,7 +156,7 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 		nil,
 	)
 	if err != nil {
-		logger.Errorf("[skip.go] err: %v", err)
+		utils.Log.Errorf("[skip.go] err: %v", err)
 	}
 
 	path, err := platforms.Download(context.Background(), t, statusMsg)

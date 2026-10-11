@@ -31,7 +31,7 @@ package main
 import "C"
 
 import (
-	"io"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -39,57 +39,51 @@ import (
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
-	"yukkimusic/internal/logger"
 	"yukkimusic/internal/modules"
+	"yukkimusic/internal/utils"
 )
 
 func main() {
-	f, err := os.OpenFile("logs.txt", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
-	if err != nil {
-		logger.Fatalf("failed to open logs.txt: %v", err)
-	}
-	defer f.Close()
-
-	logger.SetOutput(io.MultiWriter(os.Stderr, f))
+	defer utils.CloseLog()
 
 	if err := config.Load(); err != nil {
-		logger.Fatalf("failed to load config: %v", err)
+		panic(fmt.Sprintf("failed to load config: %v", err))
 	}
 
 	if err := checkDependencies(); err != nil {
-		logger.Fatalf("dependency check failed: %v", err)
+		panic(fmt.Sprintf("dependency check failed: %v", err))
 	}
 
 	if err := refreshDirs(); err != nil {
-		logger.Fatalf("failed to refresh directories: %v", err)
+		panic(fmt.Sprintf("failed to refresh directories: %v", err))
 	}
 
-	logger.Debug("Initializing MongoDB...")
+	utils.Log.Debug("Initializing MongoDB...")
 
 	closeDB, err := database.Init(config.MongoURI)
 	if err != nil {
-		logger.Fatalf("failed to initialize database: %v", err)
+		panic(fmt.Sprintf("failed to initialize database: %v", err))
 	}
 	defer closeDB()
 
-	logger.Info("Database connected successfully")
+	utils.Log.Info("Database connected successfully")
 
 	if err := locales.Load(); err != nil {
-		logger.Fatalf("failed to load locales: %v", err)
+		panic(fmt.Sprintf("failed to load locales: %v", err))
 	}
 
-	logger.Debug("Initializing clients...")
+	utils.Log.Debug("Initializing clients...")
 
 	shutdownCore, err := core.Init()
 	if err != nil {
-		logger.Fatalf("failed to initialize core: %v", err)
+		panic(fmt.Sprintf("failed to initialize core: %v", err))
 	}
 	defer shutdownCore()
 
 	core.F = modules.F
 
 	if err := database.InitAssistantIndexes(core.Assistants.Count()); err != nil {
-		logger.Fatalf("failed to init assistants: %v", err)
+		panic(fmt.Sprintf("failed to init assistants: %v", err))
 	}
 
 	modules.Init(core.Bot, core.Assistants)
@@ -103,10 +97,10 @@ func startHTTPServer() {
 	go func() {
 		addr := "0.0.0.0:" + config.Port
 
-		logger.Infof("HTTP server listening on %s", addr)
+		utils.Log.Infof("HTTP server listening on %s", addr)
 
 		if err := http.ListenAndServe(addr, nil); err != nil {
-			// logger.Fatalf("HTTP server failed: %v", err)
+			utils.Log.Errorf("HTTP server failed: %v", err)
 		}
 	}()
 }

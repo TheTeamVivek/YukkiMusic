@@ -22,8 +22,6 @@ import (
 	"sync"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/core"
@@ -163,7 +161,7 @@ func handleSameMaintenanceState(
 func applyMaintenanceState(c *td.Client, m *td.Message, enable bool, reason string) error {
 	chatID := m.ChatID()
 	database.SetMaintenance(enable, reason)
-	logger.Infof(
+	utils.Log.Infof(
 		"User %d set maintenance: %v (reason: %s)",
 		m.SenderID(),
 		enable,
@@ -214,7 +212,7 @@ func notifyMaintenanceStart(c *td.Client, reason string) {
 			)
 		}
 		if _, err := c.SendTextMessage(chatID, msg, nil); err != nil {
-			logger.Error(err)
+			utils.Log.Error(err.Error())
 		}
 		time.Sleep(time.Second)
 	}

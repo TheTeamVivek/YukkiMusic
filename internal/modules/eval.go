@@ -27,7 +27,7 @@ import (
 	"reflect"
 	"strings"
 
-	"yukkimusic/internal/logger"
+	"yukkimusic/internal/utils"
 
 	td "github.com/AshokShau/gotdbot"
 	"github.com/traefik/yaegi/interp"
@@ -103,7 +103,7 @@ Examples:
 		},
 	}
 	if err := i.Use(symbols); err != nil {
-		logger.Errorf("failed to use custom symbols: %v", err)
+		utils.Log.Errorf("failed to use custom symbols: %v", err)
 	}
 	ctx := context.Background()
 

@@ -25,7 +25,7 @@ import (
 	"strconv"
 	"strings"
 
-	"yukkimusic/internal/logger"
+	"yukkimusic/internal/utils"
 
 	"gopkg.in/yaml.v3"
 
@@ -95,7 +95,7 @@ func Get(lang, key string, values Arg) string {
 	}
 
 	if !found {
-		logger.Errorf("Missing translation → lang=%s key=%s", lang, key)
+		utils.Log.Errorf("Missing translation → lang=%s key=%s", lang, key)
 
 		return fmt.Sprintf("[%s]", key)
 	}
@@ -128,7 +128,7 @@ func GetButton(lang, key string, values Arg) (string, int64) {
 	}
 
 	if !found {
-		logger.Errorf("Missing translation → lang=%s key=%s", lang, key)
+		utils.Log.Errorf("Missing translation → lang=%s key=%s", lang, key)
 
 		return fmt.Sprintf("[%s]", key), 0
 	}

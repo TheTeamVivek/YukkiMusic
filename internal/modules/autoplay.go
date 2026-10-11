@@ -27,8 +27,8 @@ import (
 	state "yukkimusic/internal/core/models"
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
-	"yukkimusic/internal/logger"
 	"yukkimusic/internal/platforms"
+	"yukkimusic/internal/utils"
 )
 
 func init() {
@@ -151,7 +151,7 @@ func pickAutoplayTrack(r *core.RoomState, last *state.Track) *state.Track {
 
 	candidates, err := platforms.AutoplayTracks(last, limit)
 	if err != nil || len(candidates) == 0 {
-		logger.Warnf(
+		utils.Log.Warnf(
 			"[autoplay] no recommendations for %s: %v",
 			last.ID,
 			err,
@@ -186,6 +186,6 @@ func pickAutoplayTrack(r *core.RoomState, last *state.Track) *state.Track {
 		return t
 	}
 
-	logger.Infof("[autoplay] all %d recommendations were unsuitable", len(candidates))
+	utils.Log.Infof("[autoplay] all %d recommendations were unsuitable", len(candidates))
 	return nil
 }

@@ -18,7 +18,7 @@
 package modules
 
 import (
-	"yukkimusic/internal/logger"
+	"yukkimusic/internal/utils"
 
 	td "github.com/AshokShau/gotdbot"
 
@@ -146,6 +146,20 @@ var AllCommands = BotCommands{
 	},
 }
 
+// concatCommands returns a new slice containing all commands from the given
+// groups. It never appends into the backing array of the source slices.
+func concatCommands(groups ...[]td.BotCommand) []td.BotCommand {
+	var n int
+	for _, g := range groups {
+		n += len(g)
+	}
+	out := make([]td.BotCommand, 0, n)
+	for _, g := range groups {
+		out = append(out, g...)
+	}
+	return out
+}
+
 func setBotCommands(bot *td.Client) {
 	type scopedCmds struct {
 		scope td.BotCommandScope
@@ -157,35 +171,36 @@ func setBotCommands(bot *td.Client) {
 		{&td.BotCommandScopeAllGroupChats{}, AllCommands.GroupUserCommands},
 		{
 			&td.BotCommandScopeAllChatAdministrators{},
-			append(AllCommands.GroupUserCommands, AllCommands.GroupAdminCommands...),
+			concatCommands(AllCommands.GroupUserCommands, AllCommands.GroupAdminCommands),
 		},
 		{
 			&td.BotCommandScopeChat{ChatId: config.OwnerID},
-			append(
-				append(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands...),
-				AllCommands.PrivateOwnerCommands...,
+			concatCommands(
+				AllCommands.PrivateUserCommands,
+				AllCommands.PrivateSudoCommands,
+				AllCommands.PrivateOwnerCommands,
 			),
 		},
 	}
 
 	for _, e := range entries {
 		if err := bot.SetCommands(e.cmds, "", &td.SetCommandsOpts{Scope: e.scope}); err != nil {
-			logger.Errorf("Failed to set bot commands(Scope: %T): %v", e.scope, err)
+			utils.Log.Errorf("Failed to set bot commands(Scope: %T): %v", e.scope, err)
 		}
 	}
 
 	// Sudo users get their own command scope in private.
 	sudoers, err := database.Sudoers()
 	if err != nil {
-		logger.Error("Failed to fetch sudoers: " + err.Error())
+		utils.Log.Error("Failed to fetch sudoers: " + err.Error())
 		return
 	}
 
-	sudoCmds := append(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands...)
+	sudoCmds := concatCommands(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands)
 	for _, id := range sudoers {
 		scope := &td.BotCommandScopeChat{ChatId: id}
 		if err := bot.SetCommands(sudoCmds, "", &td.SetCommandsOpts{Scope: scope}); err != nil {
-			logger.Error("Failed to set sudo commands: " + err.Error())
+			utils.Log.Error("Failed to set sudo commands: " + err.Error())
 		}
 	}
 }

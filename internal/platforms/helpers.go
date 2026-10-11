@@ -28,7 +28,7 @@ import (
 	"strings"
 	"unicode"
 
-	"yukkimusic/internal/logger"
+	"yukkimusic/internal/utils"
 
 	td "github.com/AshokShau/gotdbot"
 
@@ -72,7 +72,7 @@ func getPath(track *state.Track, ext string) string {
 func fileExists(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
-		logger.Debug("fileExists: " + path + " not found")
+		utils.Log.Debug("fileExists: " + path + " not found")
 		return false
 	}
 	return info.Size() > 0

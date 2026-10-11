@@ -21,8 +21,6 @@ import (
 	"errors"
 	"strings"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
@@ -78,7 +76,7 @@ func setCPlayHandler(c *td.Client, m *td.Message) error {
 
 	member, err := c.GetChatMember(targetChannelID, &td.MessageSenderUser{UserId: me.Id})
 	if err != nil {
-		logger.Errorf("Failed to fetch bot member state for cplay target %d: %v", targetChannelID, err)
+		utils.Log.Errorf("Failed to fetch bot member state for cplay target %d: %v", targetChannelID, err)
 		_, err := m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
 		return err
 	}
@@ -121,7 +119,7 @@ func disableCPlay(c *td.Client, m *td.Message, chatID int64) error {
 	}
 
 	if err := database.LinkChannel(chatID, 0); err != nil {
-		logger.Errorf("Failed to disable cplay for chat %d: %v", chatID, err)
+		utils.Log.Errorf("Failed to disable cplay for chat %d: %v", chatID, err)
 		_, err := m.ReplyText(c, F(chatID, "cplay_save_error"), nil)
 		return err
 	}
@@ -150,7 +148,7 @@ func getLinkedChannelID(c *td.Client, chatID int64) (int64, error) {
 func resolveChannelPlay(c *td.Client, chatID int64, target string) (int64, error) {
 	chat, err := c.SearchPublicChat(target)
 	if err != nil {
-		logger.Errorf("Failed to resolve cplay target %v for chat %d: %v", target, chatID, err)
+		utils.Log.Errorf("Failed to resolve cplay target %v for chat %d: %v", target, chatID, err)
 		return 0, errors.New(F(chatID, "cplay_channel_not_accessible"))
 	}
 	if chat == nil {
@@ -176,7 +174,7 @@ func saveCPlayTarget(c *td.Client, m *td.Message, chatID, channelID int64) error
 	}
 
 	if err := database.LinkChannel(chatID, channelID); err != nil {
-		logger.Errorf("Failed to set cplay ID for chat %d: %v", chatID, err)
+		utils.Log.Errorf("Failed to set cplay ID for chat %d: %v", chatID, err)
 		_, err := m.ReplyText(c, F(chatID, "cplay_save_error"), nil)
 		return err
 	}
@@ -192,7 +190,7 @@ func canSetCPlayTarget(c *td.Client, m *td.Message, sourceChatID, targetChatID i
 
 	sourceOwnerID, err := utils.GetChatOwner(c, sourceChatID)
 	if err != nil {
-		logger.Errorf("Failed to get source chat owner for %d: %v", sourceChatID, err)
+		utils.Log.Errorf("Failed to get source chat owner for %d: %v", sourceChatID, err)
 		return false, errors.New(F(sourceChatID, "cplay_owner_check_failed"))
 	}
 	if sourceOwnerID != 0 && sourceOwnerID == userID {
@@ -201,7 +199,7 @@ func canSetCPlayTarget(c *td.Client, m *td.Message, sourceChatID, targetChatID i
 
 	targetOwnerID, err := utils.GetChatOwner(c, targetChatID)
 	if err != nil {
-		logger.Errorf("Failed to get target chat owner for %d: %v", targetChatID, err)
+		utils.Log.Errorf("Failed to get target chat owner for %d: %v", targetChatID, err)
 		return false, errors.New(F(sourceChatID, "cplay_owner_check_failed"))
 	}
 	return targetOwnerID != 0 && targetOwnerID == userID, nil

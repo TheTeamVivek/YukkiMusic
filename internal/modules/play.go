@@ -25,8 +25,6 @@ import (
 	"strings"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
@@ -267,7 +265,7 @@ func preparePlayRequest(c *td.Client, m *td.Message, cplay bool) (*core.RoomStat
 
 	replyMsg, err := m.ReplyText(c, statusText, nil)
 	if err != nil {
-		logger.Errorf("Failed to send searching message: %v", err)
+		utils.Log.Errorf("Failed to send searching message: %v", err)
 		return nil, nil, err
 	}
 
@@ -301,7 +299,7 @@ func fetchTracksAndCheckStatus(
 
 	chatState, err := core.ChatStateFor(r.ID)
 	if err != nil {
-		logger.Errorf("Error getting chat state: %v", err)
+		utils.Log.Errorf("Error getting chat state: %v", err)
 		utils.EOR(c, replyMsg, getErrorMessage(m.ChatID(), err), nil)
 		return nil, false, err
 	}
@@ -347,7 +345,7 @@ func ensureVoiceChatReady(
 ) error {
 	snap, err := cs.Snapshot()
 	if err != nil {
-		logger.Errorf("Error checking voicechat state: %v", err)
+		utils.Log.Errorf("Error checking voicechat state: %v", err)
 		utils.EOR(c, replyMsg, getErrorMessage(chatID, err), nil)
 		return err
 	}
@@ -370,7 +368,7 @@ func ensureVoiceChatReady(
 	}
 
 	if err := cs.Join(); err != nil {
-		logger.Errorf("Error joining assistant: %v", err)
+		utils.Log.Errorf("Error joining assistant: %v", err)
 		utils.EOR(c, replyMsg, getErrorMessage(chatID, err), nil)
 		return err
 	}
@@ -431,7 +429,7 @@ func filterAndTrimTracks(
 
 	if availableSlots < len(accepted) {
 		accepted = accepted[:availableSlots]
-		logger.Warnf(
+		utils.Log.Warnf(
 			"Queue full — adding only %d tracks out of requested.",
 			availableSlots,
 		)
@@ -555,7 +553,7 @@ func downloadFirstTrack(
 		return "", err
 	}
 
-	logger.Infof("Downloaded track to %s", path)
+	utils.Log.Infof("Downloaded track to %s", path)
 	return path, nil
 }
 
@@ -671,7 +669,7 @@ func playTrackWithRetry(
 ) error {
 	for attempt := 1; attempt <= playMaxRetries; attempt++ {
 		if r.Destroyed() {
-			logger.Info("Room destroyed during retry, aborting")
+			utils.Log.Info("Room destroyed during retry, aborting")
 			replyMsg.Delete(c, true)
 			return nil
 		}
@@ -679,23 +677,19 @@ func playTrackWithRetry(
 		err := r.Play(track, filePath, force)
 		if err == nil {
 			if attempt > 1 {
-				logger.Info(
+				utils.Log.Info(
 					"Successfully played after retry attempt " + utils.IntToStr(attempt),
 				)
 			}
 			return nil
 		}
 
-		handled, stopErr := handlePlayAttemptError(err, attempt, c, replyMsg, r)
-		if handled {
-			if stopErr != nil {
-				return stopErr
-			}
+		if handlePlayAttemptError(err, attempt, c, replyMsg, r) {
 			continue
 		}
 
 		if attempt == playMaxRetries {
-			logger.Error(
+			utils.Log.Error(
 				"❌ Failed to play after " + utils.IntToStr(
 					playMaxRetries,
 				) + " attempts. Error: " + err.Error(),
@@ -709,7 +703,7 @@ func playTrackWithRetry(
 			return err
 		}
 
-		logger.Error(
+		utils.Log.Error(
 			"Unexpected error occurred. Retrying... (attempt " + utils.IntToStr(
 				attempt,
 			) + "): " + err.Error(),
@@ -725,9 +719,9 @@ func handlePlayAttemptError(
 	c *td.Client,
 	replyMsg *td.Message,
 	room *core.RoomState,
-) (bool, error) {
+) bool {
 	if wait := getFloodWait(err); wait > 0 {
-		logger.Error(
+		utils.Log.Error(
 			"FloodWait detected (" + strconv.Itoa(
 				wait,
 			) + "s). Retrying... (attempt " + utils.IntToStr(
@@ -735,48 +729,48 @@ func handlePlayAttemptError(
 			) + ")",
 		)
 		time.Sleep(time.Duration(wait) * time.Second)
-		return true, nil
+		return true
 	}
 
 	if errors.Is(err, ubot.ErrConnectionTimeout) {
-		logger.Error("Voice connection timeout. Stopping call session...")
+		utils.Log.Error("Voice connection timeout. Stopping call session...")
 		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "err_connection_timeout"), nil)
 		core.DropRoom(room.ID)
-		return true, nil
+		return true
 	}
 
 	if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
-		logger.Error("RTMP/live-stream voice chat detected, cannot play. Cleaning up...")
+		utils.Log.Error("RTMP/live-stream voice chat detected, cannot play. Cleaning up...")
 		core.DropRoom(room.ID)
 		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "rtmp_play_unsupported"), nil)
-		return true, nil
+		return true
 	}
 
 	if strings.Contains(err.Error(), "group call") &&
 		strings.Contains(err.Error(), "is closed") {
 		markVoiceChatInactive(room.ID)
 		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "err_no_active_voicechat"), nil)
-		return true, nil
+		return true
 	}
 
 	if strings.Contains(err.Error(), "GROUPCALL_INVALID") {
-		logger.Error("GROUPCALL_INVALID err occurred. Returning...")
+		utils.Log.Error("GROUPCALL_INVALID err occurred. Returning...")
 		core.DropRoom(room.ID)
 		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "play_unable"), nil)
-		return true, nil
+		return true
 	}
 
 	if strings.Contains(err.Error(), "INTERDC_X_CALL_ERROR") {
-		logger.Error(
+		utils.Log.Error(
 			"INTERDC_X_CALL_ERROR occurred. Retrying... (attempt " + utils.IntToStr(
 				attempt,
 			) + ")",
 		)
 		time.Sleep(2 * time.Second)
-		return true, nil
+		return true
 	}
 
-	return false, nil
+	return false
 }
 
 // markVoiceChatInactive records that no active voice chat is running in the
@@ -784,7 +778,7 @@ func handlePlayAttemptError(
 func markVoiceChatInactive(roomID int64) {
 	cs, err := core.ChatStateFor(roomID)
 	if err != nil {
-		logger.Errorf("failed to get chat state to mark voice chat inactive: %v", err)
+		utils.Log.Errorf("failed to get chat state to mark voice chat inactive: %v", err)
 		return
 	}
 	cs.SetVoiceChat(false)

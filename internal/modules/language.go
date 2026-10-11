@@ -20,8 +20,6 @@ package modules
 import (
 	"strings"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
@@ -56,7 +54,7 @@ func showLangMenu(c *td.Client, m *td.Message) error {
 
 func buildLangMarkup(chatID int64, lang string, isCallback bool) *td.ReplyMarkupInlineKeyboard {
 	var rows [][]td.InlineKeyboardButton
-	var row []td.InlineKeyboardButton
+	row := make([]td.InlineKeyboardButton, 0, 2)
 
 	for _, l := range locales.GetAvailableLanguages() {
 		name := locales.Get(l, "name", nil)
@@ -126,7 +124,7 @@ func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	langName := locales.Get(lang, "name", nil)
 
 	if err := database.SetLanguage(chatID, lang); err != nil {
-		logger.Errorf("SetChatLanguage error: %v", err)
+		utils.Log.Errorf("SetChatLanguage error: %v", err)
 		_ = u.Answer(c, 0, true, F(chatID, "lang_fail"), "")
 		return nil
 	}

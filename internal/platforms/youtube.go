@@ -25,8 +25,6 @@ import (
 	"strings"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
@@ -211,7 +209,7 @@ func (p *YouTubePlatform) handleCombined(rawURL, videoID string) ([]*state.Track
 		return vTracks, nil
 	}
 	if pErr == nil {
-		logger.Warnf("[YouTube] video fetch failed for %s: %v", videoID, vErr)
+		utils.Log.Warnf("[YouTube] video fetch failed for %s: %v", videoID, vErr)
 		return pTracks, nil
 	}
 	return nil, fmt.Errorf("video (%v) and playlist (%v) both failed", vErr, pErr)
@@ -245,17 +243,17 @@ func (p *YouTubePlatform) handleTrackURL(rawURL string) ([]*state.Track, error) 
 			}
 		}
 	}
-    
-    	if t, err := p.fetchTrackViaOEmbed(videoID); err == nil && t != nil {
+
+	if t, err := p.fetchTrackViaOEmbed(videoID); err == nil && t != nil {
 		p.cache.Set("track:"+videoID, []*state.Track{t})
 		return []*state.Track{t}, nil
 	}
-    
+
 	return nil, errors.New("track not found")
 }
 
 func (p *YouTubePlatform) fetchTrackViaOEmbed(videoID string) (*state.Track, error) {
-	logger.Debugf("[YouTube] oembed fallback: %s", videoID)
+	utils.Log.Debugf("[YouTube] oembed fallback: %s", videoID)
 	var result map[string]any
 
 	oembedURL := fmt.Sprintf(
@@ -264,20 +262,20 @@ func (p *YouTubePlatform) fetchTrackViaOEmbed(videoID string) (*state.Track, err
 	)
 	resp, err := rc.R().SetResult(&result).Get(oembedURL)
 	if err != nil {
-		logger.Errorf("[YouTube] oembed request failed for %s: %v", videoID, err)
+		utils.Log.Errorf("[YouTube] oembed request failed for %s: %v", videoID, err)
 		return nil, fmt.Errorf("oembed request failed: %w", err)
 	}
 	if resp.IsStatusFailure() {
-		logger.Errorf("[YouTube] oembed returned status %d for %s", resp.StatusCode(), videoID)
+		utils.Log.Errorf("[YouTube] oembed returned status %d for %s", resp.StatusCode(), videoID)
 		return nil, fmt.Errorf("oembed error: %d", resp.StatusCode())
 	}
 
 	title := safeStr(result["title"])
 	if title == "" {
-		logger.Warnf("[YouTube] oembed: empty title for %s", videoID)
+		utils.Log.Warnf("[YouTube] oembed: empty title for %s", videoID)
 		return nil, errors.New("oembed: title not found")
 	}
-	logger.Debugf("[YouTube] oembed title for %s: %q", videoID, title)
+	utils.Log.Debugf("[YouTube] oembed title for %s: %q", videoID, title)
 
 	queries := []string{title}
 	if len(title) > 35 {
@@ -285,22 +283,22 @@ func (p *YouTubePlatform) fetchTrackViaOEmbed(videoID string) (*state.Track, err
 	}
 
 	for _, q := range queries {
-		logger.Debugf("[YouTube] oembed fallback search query: %q", q)
+		utils.Log.Debugf("[YouTube] oembed fallback search query: %q", q)
 		tracks, err := p.VideoSearch(q)
 		if err != nil {
-			logger.Warnf("[YouTube] oembed fallback search failed for %q: %v", q, err)
+			utils.Log.Warnf("[YouTube] oembed fallback search failed for %q: %v", q, err)
 			continue
 		}
 		for _, t := range tracks {
 			if t.ID == videoID {
-				logger.Debugf("[YouTube] oembed fallback matched %s via query %q", videoID, q)
+				utils.Log.Debugf("[YouTube] oembed fallback matched %s via query %q", videoID, q)
 				return t, nil
 			}
 		}
-		logger.Debugf("[YouTube] oembed fallback: no id match for %s in query %q results", videoID, q)
+		utils.Log.Debugf("[YouTube] oembed fallback: no id match for %s in query %q results", videoID, q)
 	}
 
-	logger.Warnf("[YouTube] oembed fallback exhausted, no match for %s", videoID)
+	utils.Log.Warnf("[YouTube] oembed fallback exhausted, no match for %s", videoID)
 	return nil, errors.New("no track found")
 }
 
@@ -325,7 +323,7 @@ func (p *YouTubePlatform) extractVideoID(u string) string {
 }
 
 func (p *YouTubePlatform) performSearch(query string, limit int) ([]*state.Track, error) {
-	logger.Debugf("[YouTube] search: %s", query)
+	utils.Log.Debugf("[YouTube] search: %s", query)
 	var result map[string]any
 
 	payload := map[string]any{
@@ -360,7 +358,7 @@ func (p *YouTubePlatform) performSearch(query string, limit int) ([]*state.Track
 }
 
 func (p *YouTubePlatform) fetchVideo(videoID string) (*state.Track, error) {
-	logger.Debugf("[YouTube] fetchVideo: %s", videoID)
+	utils.Log.Debugf("[YouTube] fetchVideo: %s", videoID)
 	var result map[string]any
 
 	payload := map[string]any{
@@ -394,7 +392,7 @@ func (p *YouTubePlatform) fetchVideo(videoID string) (*state.Track, error) {
 }
 
 func (p *YouTubePlatform) fetchPlaylist(playlistID string, limit int) ([]*state.Track, error) {
-	logger.Debugf("[YouTube] fetchPlaylist: %s", playlistID)
+	utils.Log.Debugf("[YouTube] fetchPlaylist: %s", playlistID)
 	var result map[string]any
 
 	browseID := playlistID
@@ -422,7 +420,7 @@ func (p *YouTubePlatform) fetchPlaylist(playlistID string, limit int) ([]*state.
 }
 
 func (p *YouTubePlatform) fetchMixPlaylist(playlistID string, limit int) ([]*state.Track, error) {
-	logger.Debugf("[YouTube] fetchMix: %s", playlistID)
+	utils.Log.Debugf("[YouTube] fetchMix: %s", playlistID)
 	var result map[string]any
 
 	payload := map[string]any{

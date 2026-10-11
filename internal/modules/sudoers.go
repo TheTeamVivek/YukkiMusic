@@ -23,8 +23,6 @@ import (
 	"strings"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
@@ -76,7 +74,7 @@ func handleAddSudo(c *td.Client, m *td.Message) error {
 		}), nil); err != nil {
 			return err
 		}
-		logger.Error("Failed to get user: " + err.Error())
+		utils.Log.Error("Failed to get user: " + err.Error())
 		return nil
 	}
 
@@ -128,9 +126,9 @@ func handleAddSudo(c *td.Client, m *td.Message) error {
 
 	if config.SetCmds {
 		// Update commands for this sudo user
-		sudoCommands := append(
+		sudoCommands := concatCommands(
 			AllCommands.PrivateUserCommands,
-			AllCommands.PrivateSudoCommands...,
+			AllCommands.PrivateSudoCommands,
 		)
 
 		if err := c.SetCommands(
@@ -140,7 +138,7 @@ func handleAddSudo(c *td.Client, m *td.Message) error {
 				Scope: &td.BotCommandScopeChat{ChatId: targetID},
 			},
 		); err != nil {
-			logger.Error("Failed to set PrivateSudoCommands " + err.Error())
+			utils.Log.Error("Failed to set PrivateSudoCommands " + err.Error())
 		}
 	}
 
@@ -214,7 +212,7 @@ func handleDelSudo(c *td.Client, m *td.Message) error {
 			Scope: &td.BotCommandScopeChat{ChatId: targetID},
 		},
 	); err != nil {
-		logger.Error("Failed to reset sudo commands: " + err.Error())
+		utils.Log.Error("Failed to reset sudo commands: " + err.Error())
 	}
 
 	// Delete from DB

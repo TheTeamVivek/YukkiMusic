@@ -18,8 +18,6 @@
 package modules
 
 import (
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
@@ -88,7 +86,7 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 
 	state, err := core.ChatStateFor(chatID)
 	if err != nil {
-		logger.Error("Failed to get chat state: " + err.Error())
+		utils.Log.Error("Failed to get chat state: " + err.Error())
 		state = nil
 	}
 
@@ -115,7 +113,7 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 			core.DropRoom(chatID)
 			core.DropChatState(chatID)
 			if _, rerr := c.SendTextMessage(chatID, F(chatID, "bot_demotion_goodbye"), nil); rerr != nil {
-				logger.Error(rerr)
+				utils.Log.Error(rerr.Error())
 			}
 			c.LeaveChat(chatID)
 
@@ -167,7 +165,7 @@ func handleSudoJoin(c *td.Client, chatID, userID int64) {
 	} else {
 		isSudo, err := database.IsSudo(userID)
 		if err != nil {
-			logger.Errorf("IsSudo failed for user %d: %v", userID, err)
+			utils.Log.Errorf("IsSudo failed for user %d: %v", userID, err)
 			return
 		}
 		if !isSudo {
@@ -190,7 +188,7 @@ func handleSudoJoin(c *td.Client, chatID, userID int64) {
 	})
 
 	if _, err := c.SendTextMessage(chatID, text, nil); err != nil {
-		logger.Error(err)
+		utils.Log.Error(err.Error())
 	}
 }
 
@@ -204,12 +202,12 @@ func handleAssistantRestriction(
 		s.SetPresent(true)
 		s.SetBanned(false)
 
-		logger.Debug("Assistant muted in " + utils.IntToStr(chatID))
+		utils.Log.Debug("Assistant muted in " + utils.IntToStr(chatID))
 
 		return
 	}
 
-	logger.Debug("Assistant banned in " + utils.IntToStr(chatID))
+	utils.Log.Debug("Assistant banned in " + utils.IntToStr(chatID))
 
 	s.SetPresent(false)
 	if room, ok := core.RoomFor(chatID); ok {
@@ -233,7 +231,7 @@ func handleAssistantRestriction(
 		})
 
 		if _, err := c.SendTextMessage(chatID, msg, nil); err != nil {
-			logger.Error(err)
+			utils.Log.Error(err.Error())
 		}
 	}
 }

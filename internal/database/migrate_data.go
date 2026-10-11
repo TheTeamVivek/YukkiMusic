@@ -154,119 +154,96 @@ func migrateCPlay(ctx context.Context, db *mongo.Database) {
 }
 
 func migrateServedUsers(ctx context.Context, db *mongo.Database) {
-	coll := db.Collection("tgusersdb")
-
-	opts := options.Find().SetBatchSize(500)
-
-	cursor, err := coll.Find(ctx, bson.M{"user_id": bson.M{"$gt": 0}}, opts)
-	if err != nil {
-		if err != mongo.ErrNoDocuments {
-			logr.Errorf("Failed to query old tgusersdb collection: %v", err)
-		}
-		return
-	}
-	defer cursor.Close(ctx)
-
-	var users []int64
-
-	for cursor.Next(ctx) {
-		var old oldServedUser
-
-		if err := cursor.Decode(&old); err != nil {
-			logr.Errorf("Failed to decode old user document: %v", err)
-			continue
-		}
-
-		users = append(users, old.UserID)
-	}
-
-	if err := cursor.Err(); err != nil {
-		logr.Errorf("Cursor error while migrating served users: %v", err)
-		return
-	}
-
-	if len(users) > 0 {
-		_, err := settingsColl.UpdateOne(
-			ctx,
-			bson.M{"_id": "global"},
-			bson.M{
-				"$addToSet": bson.M{
-					"served.users": bson.M{
-						"$each": users,
-					},
-				},
-			},
-			upsertOpt,
-		)
-		if err != nil {
-			logr.Errorf("Bulk migration for served users failed: %v", err)
-			return
-		}
-	}
-
-	if err := coll.Drop(ctx); err != nil {
-		logr.Errorf("Failed to drop tgusersdb collection: %v", err)
-	}
-
-	logr.Info("Finished migrating served users.")
+	migrateServedIDs(
+		ctx,
+		db,
+		"tgusersdb",
+		"served.users",
+		"user",
+		"users",
+		bson.M{"user_id": bson.M{"$gt": 0}},
+		func(u oldServedUser) int64 { return u.UserID },
+	)
 }
 
 func migrateServedChats(ctx context.Context, db *mongo.Database) {
-	coll := db.Collection("chats")
+	migrateServedIDs(
+		ctx,
+		db,
+		"chats",
+		"served.chats",
+		"chat",
+		"chats",
+		bson.M{"chat_id": bson.M{"$lt": 0}},
+		func(c oldServedChat) int64 { return c.ChatID },
+	)
+}
+
+// migrateServedIDs copies IDs from an old collection into the global settings
+// document and drops the old collection. It is shared by the served-users and
+// served-chats migrations.
+func migrateServedIDs[T any](
+	ctx context.Context,
+	db *mongo.Database,
+	collName, target, docLabel, plural string,
+	filter bson.M,
+	extract func(T) int64,
+) {
+	coll := db.Collection(collName)
 
 	opts := options.Find().SetBatchSize(500)
 
-	cursor, err := coll.Find(ctx, bson.M{"chat_id": bson.M{"$lt": 0}}, opts)
+	cursor, err := coll.Find(ctx, filter, opts)
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
-			logr.Errorf("Failed to query old chats collection: %v", err)
+			logr.Errorf("Failed to query old %s collection: %v", collName, err)
 		}
 		return
 	}
 	defer cursor.Close(ctx)
 
-	var chats []int64
+	var ids []int64
 
 	for cursor.Next(ctx) {
-		var old oldServedChat
+		var old T
 
 		if err := cursor.Decode(&old); err != nil {
-			logr.Errorf("Failed to decode old chat document: %v", err)
+			logr.Errorf("Failed to decode old %s document: %v", docLabel, err)
 			continue
 		}
 
-		chats = append(chats, old.ChatID)
+		ids = append(ids, extract(old))
 	}
 
 	if err := cursor.Err(); err != nil {
-		logr.Errorf("Cursor error while migrating served chats: %v", err)
+		logr.Errorf("Cursor error while migrating served %s: %v", plural, err)
 		return
 	}
 
-	if len(chats) > 0 {
+	if len(ids) > 0 {
 		_, err := settingsColl.UpdateOne(
 			ctx,
 			bson.M{"_id": "global"},
 			bson.M{
 				"$addToSet": bson.M{
-					"served.chats": bson.M{
-						"$each": chats,
+					target: bson.M{
+						"$each": ids,
 					},
 				},
 			},
 			upsertOpt,
 		)
 		if err != nil {
-			logr.Errorf("Bulk migration for served chats failed: %v", err)
+			logr.Errorf("Bulk migration for served %s failed: %v", plural, err)
 			return
 		}
 	}
 
 	if err := coll.Drop(ctx); err != nil {
-		logr.Errorf("Failed to drop chats collection: %v", err)
+		logr.Errorf("Failed to drop %s collection: %v", collName, err)
 	}
 
-	logr.Info("Finished migrating served chats.")
+	logr.Infof("Finished migrating served %s.", plural)
 }
 
 func migrateSudoers(ctx context.Context, db *mongo.Database) {

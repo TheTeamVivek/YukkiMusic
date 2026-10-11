@@ -86,15 +86,6 @@ func styleBtn(text, cb, colour string) td.InlineKeyboardButton {
 	return b
 }
 
-func AddMeMarkup(chatID int64) td.ReplyMarkup {
-	text, iconID := buttonText(chatID, "ADD_ME_BTN")
-	btn := urlBtn(text, "https://t.me/"+botUsername()+"?startgroup&admin=invite_users")
-	btn.IconCustomEmojiId = iconID
-	return &td.ReplyMarkupInlineKeyboard{
-		Rows: [][]td.InlineKeyboardButton{{btn}},
-	}
-}
-
 func GetCancelKeyboard(chatID int64) td.ReplyMarkup {
 	text, iconID := buttonText(chatID, "DOWNLOAD_CANCEL_BTN")
 	btn := dataBtn(text, "cancel")

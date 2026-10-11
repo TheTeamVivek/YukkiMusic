@@ -21,8 +21,6 @@ import (
 	"strings"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
@@ -60,7 +58,7 @@ func handleActions(c *td.Client, m *td.Message) error {
 			"support_group": config.SupportChat,
 		})
 		if _, err := c.SendTextMessage(m.ChatID(), text, &td.SendTextMessageOpts{DisableWebPagePreview: true}); err != nil {
-			logger.Errorf("failed to send supergroup conversion message to chat %d: %v", m.ChatID(), err)
+			utils.Log.Errorf("failed to send supergroup conversion message to chat %d: %v", m.ChatID(), err)
 			return nil
 		}
 		go func() {
@@ -94,7 +92,7 @@ func handleChatMemberAdd(c *td.Client, m *td.Message) error {
 
 		if blockedChat, _ := database.IsBlacklistedChat(chatID); blockedChat && !isOwnerOrSudo(m.SenderID()) {
 			if _, rerr := m.ReplyText(c, F(chatID, "blacklist_chat_blocked"), nil); rerr != nil {
-				logger.Error(rerr)
+				utils.Log.Error(rerr.Error())
 			}
 			leaveChat(c, chatID)
 			return nil
@@ -104,14 +102,14 @@ func handleChatMemberAdd(c *td.Client, m *td.Message) error {
 		if err == nil {
 			if blockedOwner, _ := database.IsBlacklistedUser(ownerID); blockedOwner && !isOwnerOrSudo(m.SenderID()) {
 				if _, rerr := m.ReplyText(c, F(chatID, "blacklist_owner_blocked_leave"), nil); rerr != nil {
-					logger.Error(rerr)
+					utils.Log.Error(rerr.Error())
 				}
 				leaveChat(c, chatID)
 				return nil
 			}
 		}
 
-		logger.Debug("Bot added to " + utils.IntToStr(chatID))
+		utils.Log.Debug("Bot added to " + utils.IntToStr(chatID))
 		if _, rerr := m.ReplyText(c, F(chatID, "bot_added_normal"), nil); rerr != nil {
 			return rerr
 		}
@@ -130,7 +128,7 @@ func handleChatMemberAdd(c *td.Client, m *td.Message) error {
 }
 
 func handleBotRemoved(c *td.Client, u *td.UpdateChatMember, chatID int64) {
-	logger.Debugf("Bot removed from chat %d", chatID)
+	utils.Log.Debugf("Bot removed from chat %d", chatID)
 
 	cleanScheduler.cancel(chatID)
 	core.DropRoom(chatID)
@@ -168,7 +166,7 @@ func handleBotRemoved(c *td.Client, u *td.UpdateChatMember, chatID int64) {
 	})
 
 	if _, err := c.SendTextMessage(config.LoggerID, msg, nil); err != nil {
-		logger.Errorf("failed to send bot-removed log: %v", err)
+		utils.Log.Errorf("failed to send bot-removed log: %v", err)
 	}
 }
 
@@ -188,7 +186,7 @@ func handleVoiceChatAction(c *td.Client, m *td.Message) error {
 
 	s, err := core.ChatStateFor(chatID)
 	if err != nil {
-		logger.Errorf("Failed to get chat state for %d: %v", chatID, err)
+		utils.Log.Errorf("Failed to get chat state for %d: %v", chatID, err)
 		return nil
 	}
 
@@ -196,9 +194,9 @@ func handleVoiceChatAction(c *td.Client, m *td.Message) error {
 
 	msgKey := utils.IfElse(isActive, "voicechat_started", "voicechat_ended")
 	if _, rerr := c.SendTextMessage(chatID, F(chatID, msgKey, locales.Arg{"duration": utils.FormatDuration(int(duration))}), nil); rerr != nil {
-		logger.Error(rerr)
+		utils.Log.Error(rerr.Error())
 	}
-	logger.Debugf("Voice chat %s in %d", msgKey, chatID)
+	utils.Log.Debugf("Voice chat %s in %d", msgKey, chatID)
 
 	if !isActive {
 		room, ok := core.RoomFor(chatID)
@@ -208,7 +206,7 @@ func handleVoiceChatAction(c *td.Client, m *td.Message) error {
 				scheduleOldPlayingMessage(room)
 			}
 			core.DropRoom(chatID)
-			logger.Debugf("Room destroyed for ended voice chat in %d", chatID)
+			utils.Log.Debugf("Room destroyed for ended voice chat in %d", chatID)
 		}()
 	}
 

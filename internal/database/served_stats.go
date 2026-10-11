@@ -33,24 +33,6 @@ func ServedUsers() ([]int64, error) {
 	return state.Served.Users, nil
 }
 
-func IsServedChat(id int64) (bool, error) {
-	state, err := getBotState()
-	if err != nil {
-		return false, err
-	}
-	_, ok := state.servedChatsMap[id]
-	return ok, nil
-}
-
-func IsServedUser(id int64) (bool, error) {
-	state, err := getBotState()
-	if err != nil {
-		return false, err
-	}
-	_, ok := state.servedUsersMap[id]
-	return ok, nil
-}
-
 func AddServedChat(id int64) error {
 	return modifyBotState(func(s *BotState) bool {
 		var added bool
@@ -79,17 +61,6 @@ func RemoveServedChat(id int64) error {
 		s.Served.Chats, removed = removeElement(s.Served.Chats, id)
 		if removed {
 			delete(s.servedChatsMap, id)
-		}
-		return removed
-	})
-}
-
-func RemoveServedUser(id int64) error {
-	return modifyBotState(func(s *BotState) bool {
-		var removed bool
-		s.Served.Users, removed = removeElement(s.Served.Users, id)
-		if removed {
-			delete(s.servedUsersMap, id)
 		}
 		return removed
 	})

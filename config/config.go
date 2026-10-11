@@ -22,8 +22,6 @@ import (
 	"math/rand/v2"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -37,7 +35,6 @@ var (
 
 	// Optional
 	DBName        = getEnv("DB_NAME", "Yukki")
-	SessionType   = getEnv("SESSION_TYPE", "pyrogram")
 	LoggerID      = getEnvInt64("LOGGER_ID", 0)
 	OwnerID       = getEnvInt64("OWNER_ID", 0)
 	DisableColour = getEnvBool("DISABLE_COLOUR", false)
@@ -66,8 +63,6 @@ var (
 	Port = getEnv("PORT", "8000")
 
 	StartTime = time.Now()
-
-	logr = logger.GetLogger("config")
 )
 
 func Load() error {

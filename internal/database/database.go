@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"yukkimusic/config"
-	"yukkimusic/internal/logger"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -37,7 +36,7 @@ var (
 	settingsColl     *mongo.Collection
 	chatSettingsColl *mongo.Collection
 
-	logr              = logger.GetLogger("Database")
+	logr              = utils.Log.With("logger", "database")
 	dbCache           = utils.NewCache[string, any](60 * time.Minute)
 	chatSettingsCache = utils.NewCache[int64, *ChatSettings](60 * time.Minute)
 )

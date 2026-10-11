@@ -25,7 +25,7 @@ import (
 	"os"
 	"regexp"
 
-	"yukkimusic/internal/logger"
+	"yukkimusic/internal/utils"
 
 	td "github.com/AshokShau/gotdbot"
 
@@ -163,7 +163,7 @@ func (f *FallenApiPlatform) Download(
 	track.Video = false
 
 	if p := findFile(track); p != "" {
-		logger.Debug("FallenApi: cache hit " + p)
+		utils.Log.Debug("FallenApi: cache hit " + p)
 		return p, nil
 	}
 
@@ -175,7 +175,7 @@ func (f *FallenApiPlatform) Download(
 	path := getPath(track, ".mp3")
 
 	if telegramDLRegex.MatchString(dlURL) {
-		return f.downloadFromTelegram(ctx, dlURL, path, statusMsg)
+		return f.downloadFromTelegram(dlURL, path, statusMsg)
 	}
 
 	if err := f.downloadFromURL(ctx, dlURL, path); err != nil {
@@ -248,7 +248,6 @@ func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, path str
 }
 
 func (f *FallenApiPlatform) downloadFromTelegram(
-	ctx context.Context,
 	dlURL, path string,
 	statusMsg *td.Message,
 ) (string, error) {

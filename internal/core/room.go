@@ -27,7 +27,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"yukkimusic/internal/logger"
+	"yukkimusic/internal/utils"
 
 	td "github.com/AshokShau/gotdbot"
 
@@ -77,7 +77,7 @@ type RoomState struct {
 
 func DropRoom(chatID int64) bool {
 	_, file, line, _ := runtime.Caller(1)
-	logger.Debugf("DeleteRoom called from %s:%d", file, line)
+	utils.Log.Debugf("DeleteRoom called from %s:%d", file, line)
 
 	roomsMu.Lock()
 	room, ok := rooms[chatID]
@@ -525,7 +525,7 @@ func scheduleRemove(track *state.Track, skipChatID int64) {
 		doRemove(&t, skipChatID)
 	})
 
-	logger.Debugf(
+	utils.Log.Debugf(
 		"scheduled file removal in %s: %s:%s",
 		FileCacheDuration, string(track.Source), track.ID,
 	)
@@ -537,7 +537,7 @@ func doRemove(track *state.Track, skipChatID int64) {
 	roomsMu.RUnlock()
 
 	if used {
-		logger.Debugf(
+		utils.Log.Debugf(
 			"file still in use, skipped remove: %s:%s",
 			string(track.Source), track.ID,
 		)
@@ -560,6 +560,6 @@ func findAndRemove(track *state.Track) {
 
 	for _, f := range files {
 		os.Remove(f)
-		logger.Debugf("removed file: %s", f)
+		utils.Log.Debugf("removed file: %s", f)
 	}
 }

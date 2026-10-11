@@ -24,8 +24,6 @@ import (
 	"syscall"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
@@ -71,7 +69,7 @@ func handleRestart(c *td.Client, m *td.Message) error {
 func performRestart(c *td.Client, m *td.Message, chatID int64) error {
 	statusMsg, err := m.ReplyText(c, F(chatID, "restart"), nil)
 	if err != nil {
-		logger.Error("Failed to send restart message: " + err.Error())
+		utils.Log.Error("Failed to send restart message: " + err.Error())
 	}
 	return executeRestart(c, chatID, statusMsg)
 }

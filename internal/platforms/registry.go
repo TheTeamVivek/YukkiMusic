@@ -26,8 +26,6 @@ import (
 	"sync"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 	"resty.dev/v3"
 
@@ -84,7 +82,7 @@ func findFor(query string) state.Platform {
 }
 
 func GetTracks(c *td.Client, m *td.Message, video bool) ([]*state.Track, error) {
-	logger.Debug("GetTracks | video:" + strconv.FormatBool(video))
+	utils.Log.Debug("GetTracks | video:" + strconv.FormatBool(video))
 
 	if urls, _ := utils.ExtractURLs(c, m); len(urls) > 0 {
 		tracks, errs := fetchFromURLs(urls, video)
@@ -125,10 +123,10 @@ func Download(
 			continue
 		}
 
-		logger.Debug("Download attempt: " + string(p.Name()))
+		utils.Log.Debug("Download attempt: " + string(p.Name()))
 		path, err := p.Download(ctx, track, msg)
 		if err == nil {
-			logger.Info("Download ok via " + string(p.Name()) + " -> " + path)
+			utils.Log.Info("Download ok via " + string(p.Name()) + " -> " + path)
 			return path, nil
 		}
 
@@ -156,7 +154,7 @@ func fetchFromURLs(urls []string, video bool) ([]*state.Track, []string) {
 			continue
 		}
 
-		logger.Debug("URL matched " + string(p.Name()) + ": " + u)
+		utils.Log.Debug("URL matched " + string(p.Name()) + ": " + u)
 		got, err := p.Get(u, video)
 		if err != nil {
 			if strings.Contains(err.Error(), "failed to extract metadata") {

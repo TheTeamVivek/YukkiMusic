@@ -32,11 +32,11 @@ func MonitorRooms() {
 	sem := make(chan struct{}, 20)
 
 	for range ticker.C {
-		for chatID, room := range core.AllRooms() {
+		for _, room := range core.AllRooms() {
 
 			sem <- struct{}{}
 
-			go func(chatID int64, r *core.RoomState) {
+			go func(r *core.RoomState) {
 				defer func() { <-sem }()
 
 				if !r.Active() {
@@ -80,7 +80,7 @@ func MonitorRooms() {
 						DisableWebPagePreview: true,
 					})
 				}
-			}(chatID, room)
+			}(room)
 		}
 	}
 }

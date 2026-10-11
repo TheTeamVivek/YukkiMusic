@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"time"
 
-	"yukkimusic/internal/logger"
+	"yukkimusic/internal/utils"
 
 	td "github.com/AshokShau/gotdbot"
 	"github.com/shirou/gopsutil/v3/cpu"
@@ -157,7 +157,7 @@ func pingHandler(c *td.Client, m *td.Message) error {
 	}
 
 	if err := edit(); err != nil {
-		logger.Errorf("[ping] edit failed: %v", err)
+		utils.Log.Errorf("[ping] edit failed: %v", err)
 
 		if config.PingImage != "" {
 			_, err = reply.EditText(c, msg, &td.EditTextMessageOpts{
@@ -165,7 +165,7 @@ func pingHandler(c *td.Client, m *td.Message) error {
 				ReplyMarkup: markup,
 			})
 			if err != nil {
-				logger.Errorf("[ping] fallback text edit failed: %v", err)
+				utils.Log.Errorf("[ping] fallback text edit failed: %v", err)
 				return err
 			}
 		}

@@ -21,12 +21,6 @@ These must be set for the bot to start.
 | `MONGO_DB_URI` | `string` | MongoDB connection string (e.g., `mongodb+srv://...`). |
 | `STRING_SESSIONS`| `[]string`| Space, comma, or semicolon separated session strings for assistant accounts. Also accepts `STRING_SESSION`. |
 
-## 🟢 Assistant Configuration
-
-| Variable | Default | Options | Description |
-| :--- | :--- | :--- | :--- |
-| `SESSION_TYPE` | `pyrogram` | `pyrogram`, `telethon`, `gogram` | The library used to generate your `STRING_SESSIONS`. This **must** match the session format. |
-
 ## 👑 Ownership
 
 | Variable | Default | Description |

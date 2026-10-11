@@ -23,8 +23,6 @@ import (
 	"sync"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 	tg "github.com/amarnathcjd/gogram/telegram"
 
@@ -191,12 +189,12 @@ func (s *autoLeaveService) leaveInactiveChats(
 		time.Sleep(s.preLeaveDelay)
 		if err := ass.Client.LeaveChannel(chatID); err != nil {
 			if wait := tg.GetFloodWait(err); wait > 0 {
-				logger.Errorf("FloodWait detected (%ds). Sleeping...", wait)
+				utils.Log.Errorf("FloodWait detected (%ds). Sleeping...", wait)
 				time.Sleep(time.Duration(wait) * time.Second)
 				return nil
 			}
 			if !isLeaveSafeError(err) {
-				logger.Warnf(
+				utils.Log.Warnf(
 					"AutoLeave (Assistant %d) failed to leave %d: %v",
 					ass.Index, chatID, err,
 				)
@@ -205,7 +203,7 @@ func (s *autoLeaveService) leaveInactiveChats(
 		}
 
 		left++
-		logger.Infof(
+		utils.Log.Infof(
 			"AutoLeave: Assistant %d left %d (%d/%d)",
 			ass.Index, chatID, left, s.limit,
 		)
@@ -216,7 +214,7 @@ func (s *autoLeaveService) leaveInactiveChats(
 	}, &tg.DialogOptions{})
 
 	if err != nil && err != tg.ErrStopIteration {
-		logger.Warnf(
+		utils.Log.Warnf(
 			"AutoLeave: IterDialogs error (assistant %d): %v",
 			ass.Index, err,
 		)

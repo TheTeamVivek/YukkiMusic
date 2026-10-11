@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"sync"
 
-	"yukkimusic/internal/logger"
-
 	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/ntgcalls"
@@ -73,7 +71,7 @@ func NewContext(app *tg.Client) *Context {
 			var err error
 			me, err = app.GetMe()
 			if err != nil {
-				logger.Fatal(err)
+				panic(err)
 			}
 		}
 

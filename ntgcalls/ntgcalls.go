@@ -19,7 +19,7 @@ import (
 	"sync"
 	"unsafe"
 
-	"yukkimusic/internal/logger"
+	"yukkimusic/internal/utils"
 )
 
 var clientRegistry = struct {
@@ -32,8 +32,6 @@ func init() {
 		C.ntg_log_message_callback(unsafe.Pointer(C.handleLogs)),
 	)
 	// The C++ engine logs extremely verbosely; surface only errors.
-	logger.GetLogger("ntgcalls").SetLevel(logger.ErrorLevel)
-	logger.GetLogger("webrtc").SetLevel(logger.ErrorLevel)
 }
 
 func NTgCalls() *Client {
@@ -110,22 +108,19 @@ func handleLogs(logMessage C.ntg_log_message_struct) {
 		uint32(logMessage.line),
 		string(C.GoString(logMessage.message)),
 	)
-	var loggerName string
+	loggerName := "ntgcalls"
 	if logMessage.source == C.NTG_LOG_WEBRTC {
 		loggerName = "webrtc"
-	} else {
-		loggerName = "ntgcalls"
 	}
-	loggerInstance := logger.GetLogger(loggerName)
 	switch logMessage.level {
 	case C.NTG_LOG_DEBUG:
-		loggerInstance.Debug(message)
+		utils.Log.Debug(message, "logger", loggerName)
 	case C.NTG_LOG_INFO:
-		loggerInstance.Info(message)
+		utils.Log.Info(message, "logger", loggerName)
 	case C.NTG_LOG_WARNING:
-		loggerInstance.Warn(message)
+		utils.Log.Warn(message, "logger", loggerName)
 	case C.NTG_LOG_ERROR:
-		loggerInstance.Error(message)
+		utils.Log.Error(message, "logger", loggerName)
 	}
 }
 

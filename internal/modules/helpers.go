@@ -23,8 +23,6 @@ import (
 	"strings"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
@@ -129,7 +127,7 @@ func showTrackMessage(
 				if err == nil {
 					return m
 				}
-				logger.Errorf("EditMessageMedia (track message) failed: %v", err)
+				utils.Log.Errorf("EditMessageMedia (track message) failed: %v", err)
 			}
 		}
 		if statusMsg != nil {
@@ -145,7 +143,7 @@ func showTrackMessage(
 			},
 		)
 		if err != nil {
-			logger.Errorf("SendPhoto (track message) failed: %v", err)
+			utils.Log.Errorf("SendPhoto (track message) failed: %v", err)
 			m, _ := c.SendTextMessage(chatID, msgText, opts)
 			return m
 		}
@@ -167,7 +165,7 @@ func showTrackMessage(
 func F(chatID int64, key string, values ...locales.Arg) string {
 	lang, err := database.Language(chatID)
 	if err != nil {
-		logger.Errorf("failed to get language for %d: %v", chatID, err)
+		utils.Log.Errorf("failed to get language for %d: %v", chatID, err)
 		lang = config.DefaultLang
 	}
 	var val locales.Arg
@@ -180,7 +178,7 @@ func F(chatID int64, key string, values ...locales.Arg) string {
 func isLoggerEnabled() bool {
 	l, err := database.IsLoggerEnabled()
 	if err != nil {
-		logger.Errorf("failed to check if logger is enabled: %v", err)
+		utils.Log.Errorf("failed to check if logger is enabled: %v", err)
 		return false
 	}
 	return l
@@ -234,7 +232,7 @@ func sendPlayLogs(c *td.Client, m *td.Message, track *state.Track, queued bool) 
 		&td.SendTextMessageOpts{ParseMode: "HTML", DisableWebPagePreview: true},
 	)
 	if err != nil {
-		logger.Error("failed to send logger msg: " + err.Error())
+		utils.Log.Error("failed to send logger msg: " + err.Error())
 	}
 }
 
@@ -266,7 +264,7 @@ func WithBlacklistMessage(
 		if blockedChat, _ := database.IsBlacklistedChat(m.ChatID()); blockedChat &&
 			!isOwnerOrSudo(m.SenderID()) {
 			if _, err := m.ReplyText(c, F(m.ChatID(), "blacklist_chat_blocked"), nil); err != nil {
-				logger.Error(err)
+				utils.Log.Error(err.Error())
 			}
 			leaveChat(c, m.ChatID())
 			return nil
@@ -276,7 +274,7 @@ func WithBlacklistMessage(
 				if sg, ok := chat.Type.(*td.ChatTypeSupergroup); ok && sg.IsChannel {
 					if chatOwnerID, err := utils.GetChatOwner(c, m.ChatID()); err == nil && chatOwnerID == m.SenderID() {
 						if _, rerr := m.ReplyText(c, F(m.ChatID(), "blacklist_owner_blocked_leave"), nil); rerr != nil {
-							logger.Error(rerr)
+							utils.Log.Error(rerr.Error())
 						}
 						leaveChat(c, m.ChatID())
 						return nil
@@ -286,7 +284,7 @@ func WithBlacklistMessage(
 
 			if m.IsPrivate() || messageMentionsBot(c, m) {
 				if _, rerr := m.ReplyText(c, F(m.ChatID(), "blacklist_user_blocked"), nil); rerr != nil {
-					logger.Error(rerr)
+					utils.Log.Error(rerr.Error())
 				}
 			}
 			return nil
@@ -303,7 +301,7 @@ func WithBlacklistMessage(
 					),
 				})
 				if _, rerr := m.ReplyText(c, msg, nil); rerr != nil {
-					logger.Error(rerr)
+					utils.Log.Error(rerr.Error())
 				}
 			}
 			return td.EndGroups
@@ -314,7 +312,7 @@ func WithBlacklistMessage(
 		if m.IsCommand() {
 			if isEnabled, _ := database.CommandDelete(m.ChatID()); isEnabled {
 				if err := m.Delete(c, true); err != nil {
-					logger.Debugf("failed to delete command message: %v", err)
+					utils.Log.Debugf("failed to delete command message: %v", err)
 				}
 			} else {
 				cleanMode, _ := database.CleanMode(m.ChatID())
@@ -364,7 +362,7 @@ func leaveChat(c *td.Client, chatID int64) {
 	go func() {
 		time.Sleep(1 * time.Second)
 		if err := c.LeaveChat(chatID); err != nil {
-			logger.Errorf("failed to leave blacklisted chatID=%d: %v", chatID, err)
+			utils.Log.Errorf("failed to leave blacklisted chatID=%d: %v", chatID, err)
 		}
 		core.Assistants.WithAssistant(
 			chatID,

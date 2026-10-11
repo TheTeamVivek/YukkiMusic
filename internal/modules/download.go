@@ -23,8 +23,6 @@ import (
 	"sync"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/core"
@@ -113,7 +111,7 @@ func (dm *downloadManager) cancel(chatID int64) bool {
 
 	if fileID != 0 {
 		if err := core.Bot.CancelDownloadFile(fileID, &td.CancelDownloadFileOpts{}); err != nil {
-			logger.Warnf("Failed to cancel download for chat %d: %v", chatID, err)
+			utils.Log.Warnf("Failed to cancel download for chat %d: %v", chatID, err)
 		}
 	}
 	return true

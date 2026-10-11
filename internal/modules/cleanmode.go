@@ -4,8 +4,6 @@ import (
 	"sync"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/core"
@@ -139,7 +137,7 @@ func (s *CleanScheduler) flushDue(deadline time.Time) {
 			continue
 		}
 		if err := core.Bot.DeleteMessages(chatID, ids, nil); err != nil {
-			logger.Debugf("cleanmode delete failed chat=%d err=%v", chatID, err)
+			utils.Log.Debugf("cleanmode delete failed chat=%d err=%v", chatID, err)
 		}
 	}
 }

@@ -22,8 +22,6 @@ import (
 	"runtime"
 
 	td "github.com/AshokShau/gotdbot"
-
-	"yukkimusic/internal/logger"
 )
 
 func callerInfo(skip int) string {
@@ -42,7 +40,7 @@ func EOR(
 	opts *td.EditTextMessageOpts,
 ) (*td.Message, error) {
 	if msg == nil {
-		logger.Error("[EOR] nil msg at " + callerInfo(2))
+		Log.Error("[EOR] nil msg at " + callerInfo(2))
 		return nil, nil
 	}
 
@@ -59,18 +57,9 @@ func EOR(
 	}
 
 	if err != nil {
-		logger.Error(
+		Log.Error(
 			"[EOR] " + err.Error() + " | called from " + callerInfo(2),
 		)
 	}
 	return m, err
-}
-
-// ToInt64s converts a slice of int32 message IDs to a slice of int64.
-func ToInt64s(ids []int32) []int64 {
-	out := make([]int64, len(ids))
-	for i, id := range ids {
-		out[i] = int64(id)
-	}
-	return out
 }

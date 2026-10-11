@@ -127,6 +127,8 @@ func (t *TelegramPlatform) Download(
 		if track.Duration == 0 {
 			if dur, err := utils.GetDurationByFFProbe(path); err == nil {
 				track.Duration = dur
+			} else {
+				utils.Log.Errorf("GetDurationByFFProbe failed for %q: %v", path, err)
 			}
 		}
 		return path, nil
@@ -168,6 +170,8 @@ func (t *TelegramPlatform) Download(
 	if track.Duration == 0 {
 		if dur, err := utils.GetDurationByFFProbe(path); err == nil {
 			track.Duration = dur
+		} else {
+			utils.Log.Errorf("GetDurationByFFProbe failed for %q: %v", path, err)
 		}
 	}
 

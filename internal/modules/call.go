@@ -20,8 +20,6 @@ package modules
 import (
 	"context"
 
-	"yukkimusic/internal/logger"
-
 	"yukkimusic/internal/core"
 	state "yukkimusic/internal/core/models"
 	"yukkimusic/internal/locales"
@@ -36,11 +34,11 @@ func streamEndHandler(
 	_ ntgcalls.StreamDevice,
 ) {
 	if streamType == ntgcalls.VideoStream {
-		logger.Debug("[onStreamEndHandler] Video stream ended, returning")
+		utils.Log.Debug("[onStreamEndHandler] Video stream ended, returning")
 		return
 	}
 
-	logger.Debugf("[onStreamEndHandler] Stream ended in chat %d", chatID)
+	utils.Log.Debugf("[onStreamEndHandler] Stream ended in chat %d", chatID)
 	r, ok := core.RoomFor(chatID)
 	if !ok {
 		return
@@ -61,7 +59,7 @@ func streamEndHandler(
 		if len(r.Queue()) == 0 {
 			core.DropRoom(chatID)
 			if _, err := c.SendTextMessage(cid, F(cid, "stream_queue_finished"), nil); err != nil {
-				logger.Error(err)
+				utils.Log.Error(err.Error())
 			}
 			return
 		}
@@ -81,7 +79,7 @@ func streamEndHandler(
 
 	statusMsg, err := c.SendTextMessage(cid, statusText, nil)
 	if err != nil {
-		logger.Errorf("[call.go] Failed to send msg: %v", err)
+		utils.Log.Errorf("[call.go] Failed to send msg: %v", err)
 	}
 
 	var filePath string
@@ -92,7 +90,7 @@ func streamEndHandler(
 	}
 
 	if err != nil {
-		logger.Errorf(
+		utils.Log.Errorf(
 			"[onStreamEndHandler] Download failed for %s: %v",
 			t.URL,
 			err,
@@ -106,7 +104,7 @@ func streamEndHandler(
 	}
 
 	if err := r.Play(t, filePath, true); err != nil {
-		logger.Errorf(
+		utils.Log.Errorf(
 			"[onStreamEndHandler] Play failed for %s: %v",
 			t.URL,
 			err,

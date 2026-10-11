@@ -27,8 +27,6 @@ import (
 	"sync"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
@@ -219,7 +217,7 @@ func broadcastHandler(c *td.Client, m *td.Message) error {
 		&td.SendTextMessageOpts{ReplyMarkup: core.GetBroadcastCancelKeyboard(chatID)})
 	if err != nil {
 		bManager.stop()
-		logger.Errorf("Failed to send broadcast progress message: %v", err)
+		utils.Log.Errorf("Failed to send broadcast progress message: %v", err)
 		return nil
 	}
 
@@ -352,7 +350,7 @@ func (bm *broadcastManager) run(
 	defer bm.stop()
 	defer func() {
 		if r := recover(); r != nil {
-			logger.Errorf("Broadcast panic recovered: %v", r)
+			utils.Log.Errorf("Broadcast panic recovered: %v", r)
 		}
 		bm.finalize(c, progressMsg, stats)
 	}()
@@ -412,7 +410,7 @@ func (bm *broadcastManager) send(
 
 	if err != nil {
 		if !isBroadcastSkipError(err) {
-			logger.Errorf("Broadcast failed for %d: %v", targetID, err)
+			utils.Log.Errorf("Broadcast failed for %d: %v", targetID, err)
 		}
 		return err
 	}
@@ -423,7 +421,7 @@ func (bm *broadcastManager) send(
 			sent.Id,
 			&td.PinChatMessageOpts{DisableNotification: !flags.PinLoud},
 		); perr != nil {
-			logger.Errorf("Pin failed for %d: %v", targetID, perr)
+			utils.Log.Errorf("Pin failed for %d: %v", targetID, perr)
 		}
 	}
 	return nil
@@ -525,7 +523,7 @@ func (bm *broadcastManager) finalize(
 
 	const file = "broadcast_errors.txt"
 	if err := os.WriteFile(file, []byte(errs), 0o600); err != nil {
-		logger.Errorf("Failed to write broadcast errors: %v", err)
+		utils.Log.Errorf("Failed to write broadcast errors: %v", err)
 		return
 	}
 	defer os.Remove(file)

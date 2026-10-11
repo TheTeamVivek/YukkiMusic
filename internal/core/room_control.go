@@ -23,7 +23,7 @@ import (
 	"strconv"
 	"time"
 
-	"yukkimusic/internal/logger"
+	"yukkimusic/internal/utils"
 
 	state "yukkimusic/internal/core/models"
 	"yukkimusic/ntgcalls"
@@ -191,7 +191,7 @@ func (r *RoomState) Stop() error {
 	}
 
 	_, file, line, _ := runtime.Caller(1)
-	logger.Debugf("Stop Called from %s:%d", file, line)
+	utils.Log.Debugf("Stop Called from %s:%d", file, line)
 
 	err := r.Assistant.Ntg.Stop(r.ID)
 

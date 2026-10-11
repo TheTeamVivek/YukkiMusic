@@ -25,7 +25,7 @@ import (
 	"yukkimusic/internal/core"
 )
 
-func Init(bot *td.Client, assistants *core.AssistantManager) {
+func Init(bot *td.Client, assistants *core.ClientManager) {
 	assistants.ForEach(func(a *core.Assistant) {
 		a.Client.UpdatesGetState()
 	})

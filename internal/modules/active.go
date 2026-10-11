@@ -83,7 +83,7 @@ func activeHandler(c *td.Client, m *td.Message) error {
 	var sb strings.Builder
 	sb.WriteString("<h3>🎵 Active Voice Chats</h3>")
 	sb.WriteString("\n\nThere are currently <b>")
-	sb.WriteString(fmt.Sprintf("%d", len(ids)))
+	fmt.Fprintf(&sb, "%d", len(ids))
 	sb.WriteString("</b> active voice/video chat(s) running.")
 
 	sb.WriteString("\n\n<details>\n<summary>📊 Click to Show Active Chats</summary>\n")
@@ -98,16 +98,16 @@ func activeHandler(c *td.Client, m *td.Message) error {
 		}
 
 		sb.WriteString("<tr>")
-		sb.WriteString(fmt.Sprintf("<td><b>%d</b></td>", i+1))
-		sb.WriteString(fmt.Sprintf("<td><code>%d</code></td>", id))
-		sb.WriteString(fmt.Sprintf("<td>%s</td>", activeStatusCell(r)))
-		sb.WriteString(fmt.Sprintf("<td>%s</td>", activeTrackCell(r)))
-		sb.WriteString(fmt.Sprintf("<td>%s</td>", activeQueueCell(r)))
+		fmt.Fprintf(&sb, "<td><b>%d</b></td>", i+1)
+		fmt.Fprintf(&sb, "<td><code>%d</code></td>", id)
+		fmt.Fprintf(&sb, "<td>%s</td>", activeStatusCell(r))
+		fmt.Fprintf(&sb, "<td>%s</td>", activeTrackCell(r))
+		fmt.Fprintf(&sb, "<td>%s</td>", activeQueueCell(r))
 		sb.WriteString("</tr>\n")
 	}
 
 	sb.WriteString("</tbody>\n</table>\n")
-	sb.WriteString(fmt.Sprintf("Total active: %d", len(ids)))
+	fmt.Fprintf(&sb, "Total active: %d", len(ids))
 	sb.WriteString("</details>")
 
 	rich := &td.InputRichMessage{

@@ -20,6 +20,7 @@ package utils
 import (
 	"bytes"
 	"context"
+	"errors"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -29,6 +30,10 @@ import (
 )
 
 func GetDurationByFFProbe(filePath string) (int, error) {
+	if filePath == "" {
+		return 0, errors.New("empty file path")
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -80,19 +85,45 @@ func GetDuration(m *td.Message) int {
 		}
 	case *td.MessageDocument:
 		if c.Document != nil {
-			return int(GetDurationByFFProbeSafe(c.Document.FileName))
+			if c.Document.FileName == "" {
+				return 0
+			}
+			dur, err := GetDurationByFFProbe(c.Document.FileName)
+			if err != nil {
+				Log.Errorf(
+					"GetDurationByFFProbe failed for %q: %v",
+					c.Document.FileName, err,
+				)
+				return 0
+			}
+			return dur
 		}
 	}
 	return 0
 }
 
-func GetDurationByFFProbeSafe(fileName string) int {
-	if fileName == "" {
-		return 0
+var progressBarCache = [9]string{
+	"◉———————",
+	"—◉——————",
+	"——◉—————",
+	"———◉————",
+	"————◉———",
+	"—————◉——",
+	"——————◉—",
+	"———————◉",
+	"————————◉",
+}
+
+func GetProgressBar(playedSec, durationSec int) string {
+	if durationSec <= 0 || playedSec <= 0 {
+		return progressBarCache[0]
 	}
-	dur, err := GetDurationByFFProbe(fileName)
-	if err != nil {
-		return 0
+
+	if playedSec >= durationSec {
+		return progressBarCache[8]
 	}
-	return dur
+
+	index := min((playedSec*9)/durationSec, 8)
+
+	return progressBarCache[index]
 }

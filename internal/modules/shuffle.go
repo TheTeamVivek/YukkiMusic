@@ -97,9 +97,10 @@ func handleShuffle(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	var newState bool
-	if arg == "on" || arg == "enable" || arg == "true" || arg == "1" {
+	switch arg {
+	case "on", "enable", "true", "1":
 		newState = true
-	} else if arg == "off" || arg == "disable" || arg == "false" || arg == "0" {
+	case "off", "disable", "false", "0":
 		newState = false
 	}
 

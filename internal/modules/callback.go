@@ -25,8 +25,6 @@ import (
 	"strings"
 	"time"
 
-	"yukkimusic/internal/logger"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/core"
@@ -67,14 +65,14 @@ func roomHandle(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 
 	parts := strings.SplitN(u.DataString(), ":", 3)
 	if len(parts) != 3 || parts[0] != "room" {
-		logger.Warnf("Invalid room callback payload: %s", u.DataString())
+		utils.Log.Warnf("Invalid room callback payload: %s", u.DataString())
 		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
 		cbDelete(c, u)
 		return nil
 	}
 	roomID, err := strconv.ParseInt(parts[1], 10, 64)
 	if err != nil {
-		logger.Warnf("Invalid roomID in callback: %s", parts[1])
+		utils.Log.Warnf("Invalid roomID in callback: %s", parts[1])
 		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
 		cbDelete(c, u)
 		return nil
@@ -101,23 +99,23 @@ func roomHandle(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	}
 	utils.SetFlood(key, 3*time.Second)
 
-	switch {
-	case action == "pause":
+	switch action {
+	case "pause":
 		return handlePauseAction(c, u, r)
-	case action == "resume":
+	case "resume":
 		return handleResumeAction(c, u, r)
-	case action == "replay":
+	case "replay":
 		return handleReplayAction(c, u, r)
-	case action == "skip":
+	case "skip":
 		return handleSkipAction(c, u, r)
-	case action == "stop":
+	case "stop":
 		return handleStopAction(c, u, r)
-	case action == "mute":
+	case "mute":
 		return handleMuteAction(c, u, r)
-	case action == "unmute":
+	case "unmute":
 		return handleUnmuteAction(c, u, r)
 	default:
-		logger.Warnf("Unknown callback action: %s", action)
+		utils.Log.Warnf("Unknown callback action: %s", action)
 		u.Answer(c, 0, true, F(chatID, "unknown_action"), "")
 	}
 
@@ -149,12 +147,12 @@ func cbDelete(c *td.Client, u *td.UpdateNewCallbackQuery) {
 func cbRespond(c *td.Client, u *td.UpdateNewCallbackQuery, text string, opts *td.SendTextMessageOpts) *td.Message {
 	msg, err := u.GetMessage(c)
 	if err != nil || msg == nil {
-		logger.Errorf("cbRespond: failed to get callback message: %v", err)
+		utils.Log.Errorf("cbRespond: failed to get callback message: %v", err)
 		return nil
 	}
 	m, err := msg.ReplyText(c, text, opts)
 	if err != nil {
-		logger.Errorf("cbRespond: %v", err)
+		utils.Log.Errorf("cbRespond: %v", err)
 		return nil
 	}
 	return m
@@ -168,7 +166,7 @@ func mentionOfSender(c *td.Client, userID int64) string {
 
 func handlePauseAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
 	chatID := u.ChatId
-	logger.Infof("Callback → pause, chatID=%d", chatID)
+	utils.Log.Infof("Callback → pause, chatID=%d", chatID)
 
 	if r.Paused() {
 		u.Answer(c, 0, true, F(chatID, "room_already_paused"), "")
@@ -176,7 +174,7 @@ func handlePauseAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomS
 	}
 
 	if _, err := r.Pause(); err != nil {
-		logger.Errorf("Pause failed: %v", err)
+		utils.Log.Errorf("Pause failed: %v", err)
 		u.Answer(c, 0, true, F(chatID, "room_pause_failed", locales.Arg{
 			"error": err.Error(),
 		}), "")
@@ -196,7 +194,7 @@ func handlePauseAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomS
 
 func handleResumeAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
 	chatID := u.ChatId
-	logger.Infof("Callback → resume, chatID=%d", chatID)
+	utils.Log.Infof("Callback → resume, chatID=%d", chatID)
 
 	if !r.Paused() {
 		u.Answer(c, 0, true, F(chatID, "cb_already_playing"), "")
@@ -204,7 +202,7 @@ func handleResumeAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 	}
 
 	if _, err := r.Resume(); err != nil {
-		logger.Errorf("Resume failed: %v", err)
+		utils.Log.Errorf("Resume failed: %v", err)
 		u.Answer(c, 0, true, F(chatID, "cb_resume_failed"), "")
 		return nil
 	}
@@ -218,16 +216,16 @@ func handleResumeAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 
 func handleReplayAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
 	chatID := u.ChatId
-	logger.Infof("Callback → replay, chatID=%d", chatID)
+	utils.Log.Infof("Callback → replay, chatID=%d", chatID)
 
 	statusMsg := cbRespond(c, u, F(chatID, "cb_replaying"), nil)
 	if statusMsg == nil {
-		logger.Errorf("Failed to send replay status")
+		utils.Log.Errorf("Failed to send replay status")
 		return nil
 	}
 
 	if err := r.Replay(); err != nil {
-		logger.Errorf("Replay failed: %v", err)
+		utils.Log.Errorf("Replay failed: %v", err)
 		utils.EOR(c, statusMsg, F(chatID, "replay_failed", locales.Arg{
 			"error": err.Error(),
 		}), nil)
@@ -242,14 +240,14 @@ func handleReplayAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 	if _, err := u.EditMessageText(c, F(chatID, "cb_replay_edited", locales.Arg{
 		"user": mentionOfSender(c, u.SenderUserId),
 	}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
-		logger.Errorf("Edit error: %v", err)
+		utils.Log.Errorf("Edit error: %v", err)
 	}
 	return nil
 }
 
 func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
 	chatID := u.ChatId
-	logger.Infof("Callback → skip, chatID=%d", chatID)
+	utils.Log.Infof("Callback → skip, chatID=%d", chatID)
 
 	if len(r.Queue()) == 0 {
 		scheduleOldPlayingMessage(r)
@@ -257,7 +255,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 		if _, err := u.EditMessageText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mentionOfSender(c, u.SenderUserId),
 		}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
-			logger.Errorf("Edit error: %v", err)
+			utils.Log.Errorf("Edit error: %v", err)
 		}
 		u.Answer(c, 0, true, F(chatID, "cb_skip_queue_empty"), "")
 		return nil
@@ -268,12 +266,12 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 
 	statusMsg := cbRespond(c, u, F(chatID, "stream_downloading_next"), nil)
 	if statusMsg == nil {
-		logger.Errorf("Failed to send status message")
+		utils.Log.Errorf("Failed to send status message")
 	}
 
 	path, err := platforms.Download(context.Background(), t, statusMsg)
 	if err != nil {
-		logger.Errorf("Download failed for %s: %v", t.URL, err)
+		utils.Log.Errorf("Download failed for %s: %v", t.URL, err)
 		utils.EOR(c, statusMsg, F(chatID, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
@@ -284,7 +282,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 	}
 
 	if err := r.Play(t, path); err != nil {
-		logger.Errorf("Play error: %v", err)
+		utils.Log.Errorf("Play error: %v", err)
 		utils.EOR(c, statusMsg, F(chatID, "stream_play_fail"), nil)
 		u.Answer(c, 0, true, F(chatID, "cb_skip_play_failed"), "")
 		scheduleOldPlayingMessage(r)
@@ -298,7 +296,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 	statusMsg = sendNowPlaying(c, statusMsg, chatID, r, t)
 	r.SetStatusMsg(statusMsg)
 
-_, err = statusMsg.ReplyText(c, F(chatID, "cb_skip_edited", locales.Arg{
+	_, err = statusMsg.ReplyText(c, F(chatID, "cb_skip_edited", locales.Arg{
 		"user": mentionOfSender(c, u.SenderUserId),
 	}), &td.SendTextMessageOpts{ParseMode: "HTML"})
 
@@ -307,7 +305,7 @@ _, err = statusMsg.ReplyText(c, F(chatID, "cb_skip_edited", locales.Arg{
 
 func handleStopAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomState) error {
 	chatID := u.ChatId
-	logger.Infof("Callback → stop, chatID=%d", chatID)
+	utils.Log.Infof("Callback → stop, chatID=%d", chatID)
 
 	scheduleOldPlayingMessage(r)
 	core.DropRoom(r.ID)
@@ -316,7 +314,7 @@ func handleStopAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.RoomSt
 	if _, err := u.EditMessageText(c, F(chatID, "stopped", locales.Arg{
 		"user": mentionOfSender(c, u.SenderUserId),
 	}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
-		logger.Errorf("Edit error: %v", err)
+		utils.Log.Errorf("Edit error: %v", err)
 	}
 	return nil
 }
@@ -417,6 +415,6 @@ func updatePlaybackMessage(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.R
 		})
 	}
 	if err != nil {
-		logger.Errorf("Edit error: %v", err)
+		utils.Log.Errorf("Edit error: %v", err)
 	}
 }

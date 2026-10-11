@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -30,7 +31,7 @@ func getEnvBool(key string, def ...bool) bool {
 
 	b, err := strconv.ParseBool(v)
 	if err != nil {
-		logr.Fatalf("invalid boolean value for %s: %q", key, v)
+		panic(fmt.Sprintf("invalid boolean value for %s: %q", key, v))
 	}
 
 	return b
@@ -44,7 +45,7 @@ func getEnvInt(key string, def ...int) int {
 
 	n, err := strconv.Atoi(v)
 	if err != nil {
-		logr.Fatalf("invalid integer value for %s: %q", key, v)
+		panic(fmt.Sprintf("invalid integer value for %s: %q", key, v))
 	}
 
 	return n
@@ -58,7 +59,7 @@ func getEnvInt64(key string, def ...int64) int64 {
 
 	n, err := strconv.ParseInt(v, 10, 64)
 	if err != nil {
-		logr.Fatalf("invalid int64 value for %s: %q", key, v)
+		panic(fmt.Sprintf("invalid int64 value for %s: %q", key, v))
 	}
 
 	return n

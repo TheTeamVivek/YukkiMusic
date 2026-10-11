@@ -25,7 +25,7 @@ import (
 	"sync"
 	"time"
 
-	"yukkimusic/internal/logger"
+	"yukkimusic/internal/utils"
 
 	"resty.dev/v3"
 
@@ -41,12 +41,12 @@ var (
 )
 
 func init() {
-	logger.Debug("🔹 Initializing cookies...")
+	utils.Log.Debug("🔹 Initializing cookies...")
 
 	urls := strings.FieldsSeq(config.CookiesLink)
 	for url := range urls {
 		if err := downloadCookieFile(url); err != nil {
-			logger.Warnf(
+			utils.Log.Warnf(
 				"Failed to download cookie file from %s: %v",
 				url,
 				err,
@@ -105,12 +105,12 @@ func GetRandomCookieFile() (string, error) {
 	})
 
 	if err != nil {
-		logger.Warnf("Failed to load cookie cache: %v", err)
+		utils.Log.Warnf("Failed to load cookie cache: %v", err)
 		return "", err
 	}
 
 	if len(cachedFiles) == 0 {
-		logger.Warn("No cookie files available")
+		utils.Log.Warn("No cookie files available")
 		return "", nil
 	}
 
