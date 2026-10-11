@@ -256,12 +256,13 @@ func (ctx *Context) handleUpdates() {
 				if update.cameraEndpoint != "" {
 					_, _ = ctx.binding.AddIncomingVideo(
 						chatId,
+						update.participantId,
 						update.cameraEndpoint,
 						parseVideoSources(update.cameraSourceGroups),
 					)
 				}
 				if update.oldCameraEndpoint != "" {
-					_ = ctx.binding.RemoveIncomingVideo(
+					_, _ = ctx.binding.RemoveIncomingVideo(
 						chatId,
 						update.oldCameraEndpoint,
 					)
@@ -270,12 +271,13 @@ func (ctx *Context) handleUpdates() {
 				if update.screenEndpoint != "" {
 					_, _ = ctx.binding.AddIncomingVideo(
 						chatId,
+						update.participantId,
 						update.screenEndpoint,
 						parseVideoSources(update.screenSourceGroups),
 					)
 				}
 				if update.oldScreenEndpoint != "" {
-					_ = ctx.binding.RemoveIncomingVideo(
+					_, _ = ctx.binding.RemoveIncomingVideo(
 						chatId,
 						update.oldScreenEndpoint,
 					)

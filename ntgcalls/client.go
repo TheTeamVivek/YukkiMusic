@@ -1,18 +1,24 @@
 package ntgcalls
 
+//#include "ntgcalls.h"
+import "C"
 import "sync"
 
 type Client struct {
-	ptr                         uintptr
-	mu                          sync.RWMutex // Protects all callback slices
-	connectionChangeCallbacks   []ConnectionChangeCallback
-	streamEndCallbacks          []StreamEndCallback
-	upgradeCallbacks            []UpgradeCallback
-	signalCallbacks             []SignalCallback
-	frameCallbacks              []FrameCallback
-	remoteSourceCallbacks       []RemoteSourceCallback
-	broadcastTimestampCallbacks []BroadcastTimestampCallback
-	broadcastPartCallbacks      []BroadcastPartCallback
+	handle                       *C.ntg_instance
+	mu                           sync.RWMutex // Protects all callback slices
+	connectionChangeCallbacks    []ConnectionChangeCallback
+	streamEndCallbacks           []StreamEndCallback
+	upgradeCallbacks             []UpgradeCallback
+	signalCallbacks              []SignalCallback
+	frameCallbacks               []FrameCallback
+	remoteSourceCallbacks        []RemoteSourceCallback
+	broadcastTimestampCallbacks  []BroadcastTimestampCallback
+	broadcastPartCallbacks       []BroadcastPartCallback
+	emojisCallbacks              []EmojisCallback
+	requestParticipantsCallbacks []RequestParticipantsCallback
+	outboundBlockCallbacks       []OutboundBlockCallback
+	subchainRequestCallbacks     []SubchainRequestCallback
 }
 
 func (ctx *Client) OnStreamEnd(callback StreamEndCallback) {
@@ -69,6 +75,33 @@ func (ctx *Client) OnRequestBroadcastPart(callback BroadcastPartCallback) {
 	ctx.mu.Lock()
 	defer ctx.mu.Unlock()
 	ctx.broadcastPartCallbacks = append(ctx.broadcastPartCallbacks, callback)
+}
+
+func (ctx *Client) OnUpdateEmojis(callback EmojisCallback) {
+	ctx.mu.Lock()
+	defer ctx.mu.Unlock()
+	ctx.emojisCallbacks = append(ctx.emojisCallbacks, callback)
+}
+
+func (ctx *Client) OnRequestParticipants(callback RequestParticipantsCallback) {
+	ctx.mu.Lock()
+	defer ctx.mu.Unlock()
+	ctx.requestParticipantsCallbacks = append(
+		ctx.requestParticipantsCallbacks,
+		callback,
+	)
+}
+
+func (ctx *Client) OnOutboundBlock(callback OutboundBlockCallback) {
+	ctx.mu.Lock()
+	defer ctx.mu.Unlock()
+	ctx.outboundBlockCallbacks = append(ctx.outboundBlockCallbacks, callback)
+}
+
+func (ctx *Client) OnSubchainRequest(callback SubchainRequestCallback) {
+	ctx.mu.Lock()
+	defer ctx.mu.Unlock()
+	ctx.subchainRequestCallbacks = append(ctx.subchainRequestCallbacks, callback)
 }
 
 func (ctx *Client) getStreamEndCallbacks() []StreamEndCallback {
@@ -159,5 +192,52 @@ func (ctx *Client) getBroadcastPartCallbacks() []BroadcastPartCallback {
 	}
 	cbs := make([]BroadcastPartCallback, len(ctx.broadcastPartCallbacks))
 	copy(cbs, ctx.broadcastPartCallbacks)
+	return cbs
+}
+
+func (ctx *Client) getEmojisCallbacks() []EmojisCallback {
+	ctx.mu.RLock()
+	defer ctx.mu.RUnlock()
+	if len(ctx.emojisCallbacks) == 0 {
+		return nil
+	}
+	cbs := make([]EmojisCallback, len(ctx.emojisCallbacks))
+	copy(cbs, ctx.emojisCallbacks)
+	return cbs
+}
+
+func (ctx *Client) getRequestParticipantsCallbacks() []RequestParticipantsCallback {
+	ctx.mu.RLock()
+	defer ctx.mu.RUnlock()
+	if len(ctx.requestParticipantsCallbacks) == 0 {
+		return nil
+	}
+	cbs := make(
+		[]RequestParticipantsCallback,
+		len(ctx.requestParticipantsCallbacks),
+	)
+	copy(cbs, ctx.requestParticipantsCallbacks)
+	return cbs
+}
+
+func (ctx *Client) getOutboundBlockCallbacks() []OutboundBlockCallback {
+	ctx.mu.RLock()
+	defer ctx.mu.RUnlock()
+	if len(ctx.outboundBlockCallbacks) == 0 {
+		return nil
+	}
+	cbs := make([]OutboundBlockCallback, len(ctx.outboundBlockCallbacks))
+	copy(cbs, ctx.outboundBlockCallbacks)
+	return cbs
+}
+
+func (ctx *Client) getSubchainRequestCallbacks() []SubchainRequestCallback {
+	ctx.mu.RLock()
+	defer ctx.mu.RUnlock()
+	if len(ctx.subchainRequestCallbacks) == 0 {
+		return nil
+	}
+	cbs := make([]SubchainRequestCallback, len(ctx.subchainRequestCallbacks))
+	copy(cbs, ctx.subchainRequestCallbacks)
 	return cbs
 }

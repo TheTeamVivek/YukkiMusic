@@ -81,7 +81,10 @@ func (ctx *Context) connectCall(
 		p2pConfig.GAorB = newGAorB
 		ctx.p2pConfigsMutex.Unlock()
 
-		protocolRaw := ntgcalls.GetProtocol()
+		protocolRaw, err := ntgcalls.GetProtocol()
+		if err != nil {
+			return err
+		}
 		protocol := &tg.PhoneCallProtocol{
 			UdpP2P:          protocolRaw.UdpP2P,
 			UdpReflector:    protocolRaw.UdpReflector,
@@ -176,6 +179,7 @@ func (ctx *Context) connectCall(
 			parseRTCServers(phoneCall.Connections),
 			phoneCall.Protocol.LibraryVersions,
 			phoneCall.P2PAllowed,
+			"",
 		)
 		if err != nil {
 			return err

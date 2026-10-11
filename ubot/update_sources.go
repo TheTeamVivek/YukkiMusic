@@ -63,6 +63,7 @@ func (ctx *Context) updateSources(chatId int64) error {
 	for _, video := range videosToAdd {
 		_, err = ctx.binding.AddIncomingVideo(
 			chatId,
+			video.participantId,
 			video.endpoint,
 			parseVideoSources(video.sourceGroups),
 		)

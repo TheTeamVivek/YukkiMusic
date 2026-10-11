@@ -82,7 +82,7 @@ func NewContext(app *tg.Client) *Context {
 	return client
 }
 
-func (ctx *Context) Calls() map[int64]*ntgcalls.CallInfo {
+func (ctx *Context) Calls() (map[int64]ntgcalls.CallInfo, error) {
 	return ctx.binding.Calls()
 }
 
@@ -99,19 +99,21 @@ func (ctx *Context) Resume(chatID int64) (bool, error) {
 }
 
 func (ctx *Context) Unmute(chatID int64) (bool, error) {
-	return ctx.binding.Unmute(chatID)
+	return ctx.binding.UnMute(chatID)
 }
 
 func (ctx *Context) Play(
 	chatID int64,
 	mediaDescription ntgcalls.MediaDescription,
 ) error {
-	if ctx.binding.Calls()[chatID] != nil {
-		return ctx.binding.SetStreamSources(
-			chatID,
-			ntgcalls.CaptureStream,
-			mediaDescription,
-		)
+	if calls, err := ctx.binding.Calls(); err == nil {
+		if _, ok := calls[chatID]; ok {
+			return ctx.binding.SetStreamSources(
+				chatID,
+				ntgcalls.CaptureStream,
+				mediaDescription,
+			)
+		}
 	}
 
 	err := ctx.connectCall(chatID, mediaDescription, "")
@@ -134,12 +136,14 @@ func (ctx *Context) Record(
 	chatID int64,
 	mediaDescription ntgcalls.MediaDescription,
 ) error {
-	if ctx.binding.Calls()[chatID] != nil {
-		return ctx.binding.SetStreamSources(
-			chatID,
-			ntgcalls.PlaybackStream,
-			mediaDescription,
-		)
+	if calls, err := ctx.binding.Calls(); err == nil {
+		if _, ok := calls[chatID]; ok {
+			return ctx.binding.SetStreamSources(
+				chatID,
+				ntgcalls.PlaybackStream,
+				mediaDescription,
+			)
+		}
 	}
 
 	return ctx.Play(chatID, ntgcalls.MediaDescription{})
@@ -209,8 +213,10 @@ func (ctx *Context) Close() {
 		return
 	}
 
-	for chatId := range ctx.binding.Calls() {
-		ctx.binding.Stop(chatId)
+	if calls, err := ctx.binding.Calls(); err == nil {
+		for chatId := range calls {
+			ctx.binding.Stop(chatId)
+		}
 	}
 
 	ctx.p2pConfigsMutex.Lock()
