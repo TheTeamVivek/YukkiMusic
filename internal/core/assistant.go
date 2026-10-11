@@ -18,13 +18,16 @@
 package core
 
 import (
+	"encoding/base64"
+	"encoding/binary"
 	"fmt"
+	"net"
+	"strings"
 
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/utils"
 
 	"github.com/amarnathcjd/gogram/telegram"
-	tgconv "github.com/mtgo-labs/session-converter"
 
 	"yukkimusic/config"
 	"yukkimusic/ubot"
@@ -48,7 +51,7 @@ type ClientManager struct {
 // AddClient creates, connects and registers an assistant from the given
 // session string. The assistant is appended to the manager and returned.
 func (m *ClientManager) AddClient(sessionStr string) (*Assistant, error) {
-	stringSession, err := tgconv.Convert(sessionStr, tgconv.FormatGogram)
+	stringSession, err := resolveSession(sessionStr)
 	if err != nil {
 		return nil, fmt.Errorf("resolving session: %w", err)
 	}
@@ -137,4 +140,116 @@ func (m *ClientManager) ForChat(chatID int64) (*Assistant, error) {
 	}
 
 	return m.Get(idx)
+}
+
+func resolveSession(session string) (string, error) {
+	switch strings.ToLower(config.SessionType) {
+	case "pyrogram", "pyro":
+		sess, err := decodePyrogramSessionString(session)
+		if err != nil {
+			return "", fmt.Errorf("decoding Pyrogram session: %w", err)
+		}
+		return sess.Encode(), nil
+
+	case "telethon":
+		sess, err := decodeTelethonSessionString(session)
+		if err != nil {
+			return "", fmt.Errorf("decoding Telethon session: %w", err)
+		}
+		return sess.Encode(), nil
+
+	case "gogram":
+		return session, nil
+
+	default:
+		return "", fmt.Errorf("invalid SESSION_TYPE: %s", config.SessionType)
+	}
+}
+
+func decodePyrogramSessionString(
+	encodedString string,
+) (*telegram.Session, error) {
+	const (
+		dcIDSize     = 1
+		apiIDSize    = 4
+		testModeSize = 1
+		authKeySize  = 256
+		userIDSize   = 8
+		isBotSize    = 1
+	)
+
+	for len(encodedString)%4 != 0 {
+		encodedString += "="
+	}
+
+	packedData, err := base64.URLEncoding.DecodeString(encodedString)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode base64 string: %w", err)
+	}
+
+	expectedSize := dcIDSize + apiIDSize + testModeSize + authKeySize + userIDSize + isBotSize
+	if len(packedData) != expectedSize {
+		return nil, fmt.Errorf(
+			"unexpected data length: got %d, want %d",
+			len(packedData),
+			expectedSize,
+		)
+	}
+
+	return &telegram.Session{
+		Hostname: telegram.ResolveDC(
+			int(uint8(packedData[0])),
+			packedData[5] != 0,
+			false,
+		),
+		AppID: int32(
+			uint32(
+				packedData[1],
+			)<<24 | uint32(
+				packedData[2],
+			)<<16 | uint32(
+				packedData[3],
+			)<<8 | uint32(
+				packedData[4],
+			),
+		),
+		Key: packedData[6 : 6+authKeySize],
+	}, nil
+}
+
+func decodeTelethonSessionString(
+	sessionString string,
+) (*telegram.Session, error) {
+	data, err := base64.URLEncoding.DecodeString(sessionString[1:])
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode base64: %v", err)
+	}
+
+	ipLen := 4
+	if len(data) == 352 {
+		ipLen = 16
+	}
+
+	expectedLen := 1 + ipLen + 2 + 256
+	if len(data) != expectedLen {
+		return nil, fmt.Errorf("invalid session string length")
+	}
+
+	offset := 1
+
+	ipData := data[offset : offset+ipLen]
+	ip := net.IP(ipData)
+	ipAddress := ip.String()
+	offset += ipLen
+
+	port := binary.BigEndian.Uint16(data[offset : offset+2])
+	offset += 2
+
+	var authKey [256]byte
+	copy(authKey[:], data[offset:offset+256])
+
+	return &telegram.Session{
+		Hostname: ipAddress + ":" + fmt.Sprint(port),
+		Key:      authKey[:],
+	}, nil
 }
