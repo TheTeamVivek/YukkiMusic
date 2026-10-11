@@ -29,7 +29,7 @@ func (ctx *Context) joinPresentation(chatId int64, join bool) error {
 		return nil
 	}
 
-	if connectionMode != ntgcalls.RtcConnection {
+	if connectionMode != ntgcalls.RTCConnection {
 		return nil
 	}
 

@@ -13,22 +13,22 @@ func parseRTCServers(connections []tg.PhoneConnection) []ntgcalls.RTCServer {
 		case *tg.PhoneConnectionWebrtc:
 			rtcServers[i] = ntgcalls.RTCServer{
 				ID:       connection.ID,
-				Ipv4:     connection.Ip,
-				Ipv6:     connection.Ipv6,
+				IPv4:     connection.Ip,
+				IPv6:     connection.Ipv6,
 				Username: connection.Username,
 				Password: connection.Password,
 				Port:     connection.Port,
-				Turn:     connection.Turn,
-				Stun:     connection.Stun,
+				TURN:     connection.Turn,
+				STUN:     connection.Stun,
 			}
 		case *tg.PhoneConnectionObj:
 			rtcServers[i] = ntgcalls.RTCServer{
 				ID:      connection.ID,
-				Ipv4:    connection.Ip,
-				Ipv6:    connection.Ipv6,
+				IPv4:    connection.Ip,
+				IPv6:    connection.Ipv6,
 				Port:    connection.Port,
-				Turn:    true,
-				Tcp:     connection.Tcp,
+				TURN:    true,
+				TCP:     connection.Tcp,
 				PeerTag: connection.PeerTag,
 			}
 		}

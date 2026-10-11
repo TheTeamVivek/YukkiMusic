@@ -450,7 +450,7 @@ func getVideoPipeline(
 		MediaSource: ntgcalls.MediaSourceShell,
 		Width:       int16(w),
 		Height:      int16(h),
-		Fps:         uint8(fps),
+		FPS:         uint8(fps),
 	}
 
 	videoCmd := baseCmd

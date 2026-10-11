@@ -86,8 +86,8 @@ func (ctx *Context) connectCall(
 			return err
 		}
 		protocol := &tg.PhoneCallProtocol{
-			UdpP2P:          protocolRaw.UdpP2P,
-			UdpReflector:    protocolRaw.UdpReflector,
+			UdpP2P:          protocolRaw.UDPP2P,
+			UdpReflector:    protocolRaw.UDPReflector,
 			MinLayer:        protocolRaw.MinLayer,
 			MaxLayer:        protocolRaw.MaxLayer,
 			LibraryVersions: protocolRaw.Versions,

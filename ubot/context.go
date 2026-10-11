@@ -52,7 +52,7 @@ type Context struct {
 
 func NewContext(app *tg.Client) *Context {
 	client := &Context{
-		binding: ntgcalls.NTgCalls(),
+		binding: ntgcalls.NewClient(),
 		app:     app,
 
 		pendingPresentation: make(map[int64]bool),
@@ -99,7 +99,7 @@ func (ctx *Context) Resume(chatID int64) (bool, error) {
 }
 
 func (ctx *Context) Unmute(chatID int64) (bool, error) {
-	return ctx.binding.UnMute(chatID)
+	return ctx.binding.Unmute(chatID)
 }
 
 func (ctx *Context) Play(

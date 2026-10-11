@@ -13,24 +13,6 @@ type StreamStatus int
 type StreamMode int
 type StreamDevice int
 type MediaSource int
-type MediaSegmentQuality int
-type MediaSegmentStatus int
-type CallType int
-
-type StreamEndCallback func(chatId int64, streamType StreamType, streamDevice StreamDevice)
-type UpgradeCallback func(chatId int64, state MediaState)
-type ConnectionChangeCallback func(chatId int64, state NetworkInfo)
-type SignalCallback func(chatId int64, signal []byte)
-type FrameCallback func(chatId int64, mode StreamMode, device StreamDevice, frames []Frame)
-type RemoteSourceCallback func(chatId int64, source RemoteSource)
-type BroadcastTimestampCallback func(chatId int64)
-
-type BroadcastPartCallback func(chatId int64, segmentPartRequest SegmentPartRequest)
-
-type EmojisCallback func(chatId int64, emojis string)
-type RequestParticipantsCallback func(chatId int64, request ParticipantsRequest)
-type OutboundBlockCallback func(chatId int64, block []byte)
-type SubchainRequestCallback func(chatId int64, subchainRequest SubchainRequest)
 
 const (
 	MicrophoneStream StreamDevice = iota
@@ -60,7 +42,7 @@ const (
 )
 
 const (
-	RtcConnection ConnectionMode = iota
+	RTCConnection ConnectionMode = iota
 	StreamConnection
 	RTMPConnection
 )
@@ -83,6 +65,8 @@ const (
 	PlaybackStream
 )
 
+type MediaSegmentQuality int
+
 const (
 	SegmentQualityNone MediaSegmentQuality = iota - 1
 	SegmentQualityThumbnail
@@ -90,11 +74,15 @@ const (
 	SegmentQualityFull
 )
 
+type MediaSegmentStatus int
+
 const (
 	SegmentStatusNotReady MediaSegmentStatus = iota
 	SegmentStatusResyncNeeded
 	SegmentStatusSuccess
 )
+
+type CallType int
 
 const (
 	GroupCallType CallType = iota
@@ -102,63 +90,18 @@ const (
 	ConferenceCallType
 )
 
-func (ctx MediaSource) ParseToC() C.ntg_media_source {
-	switch ctx {
-	case MediaSourceFile:
-		return C.NTG_MEDIA_SOURCE_FILE
-	case MediaSourceShell:
-		return C.NTG_MEDIA_SOURCE_SHELL
-	case MediaSourceFFmpeg:
-		return C.NTG_MEDIA_SOURCE_FFMPEG
-	case MediaSourceDevice:
-		return C.NTG_MEDIA_SOURCE_DEVICE
-	case MediaSourceDesktop:
-		return C.NTG_MEDIA_SOURCE_DESKTOP
-	case MediaSourceExternal:
-		return C.NTG_MEDIA_SOURCE_EXTERNAL
-	default:
-		return C.NTG_MEDIA_SOURCE_FILE
-	}
-}
-
-func (ctx StreamMode) ParseToC() C.ntg_stream_mode {
-	switch ctx {
-	case CaptureStream:
-		return C.NTG_STREAM_MODE_CAPTURE
-	case PlaybackStream:
-		return C.NTG_STREAM_MODE_PLAYBACK
-	default:
-		return C.NTG_STREAM_MODE_CAPTURE
-	}
-}
-
-func (ctx StreamDevice) ParseToC() C.ntg_stream_device {
-	switch ctx {
-	case MicrophoneStream:
-		return C.NTG_STREAM_DEVICE_MICROPHONE
-	case SpeakerStream:
-		return C.NTG_STREAM_DEVICE_SPEAKER
-	case CameraStream:
-		return C.NTG_STREAM_DEVICE_CAMERA
-	case ScreenStream:
-		return C.NTG_STREAM_DEVICE_SCREEN
-	default:
-		return C.NTG_STREAM_DEVICE_MICROPHONE
-	}
-}
-
-func (ctx MediaSegmentStatus) ParseToC() C.ntg_media_segment_part_status {
-	switch ctx {
-	case SegmentStatusNotReady:
-		return C.NTG_MEDIA_SEGMENT_PART_STATUS_NOT_READY
-	case SegmentStatusResyncNeeded:
-		return C.NTG_MEDIA_SEGMENT_PART_STATUS_RESYNC_NEEDED
-	case SegmentStatusSuccess:
-		return C.NTG_MEDIA_SEGMENT_PART_STATUS_SUCCESS
-	default:
-		return C.NTG_MEDIA_SEGMENT_PART_STATUS_NOT_READY
-	}
-}
+type ConnectionChangeCallback func(chatID int64, state NetworkInfo)
+type StreamEndCallback func(chatID int64, streamType StreamType, streamDevice StreamDevice)
+type UpgradeCallback func(chatID int64, state MediaState)
+type SignalCallback func(chatID int64, data []byte)
+type FrameCallback func(chatID int64, mode StreamMode, device StreamDevice, frames []Frame)
+type RemoteSourceCallback func(chatID int64, source RemoteSource)
+type BroadcastTimestampCallback func(chatID int64)
+type BroadcastPartCallback func(chatID int64, request SegmentPartRequest)
+type EmojisCallback func(chatID int64, emojis string)
+type RequestParticipantsCallback func(chatID int64, request ParticipantsRequest)
+type OutboundBlockCallback func(chatID int64, block []byte)
+type SubchainRequestCallback func(chatID int64, request SubchainRequest)
 
 type AuthParams struct {
 	GAOrB          []byte
@@ -175,7 +118,7 @@ type DeviceInfo struct {
 }
 
 type Frame struct {
-	Ssrc      uint32
+	SSRC      uint32
 	Data      []byte
 	FrameData FrameData
 }
@@ -206,7 +149,7 @@ type VideoDescription struct {
 	MediaSource   MediaSource
 	Input         string
 	Width, Height int16
-	Fps           uint8
+	FPS           uint8
 	KeepOpen      bool
 }
 
@@ -239,23 +182,23 @@ type NetworkInfo struct {
 type Protocol struct {
 	MinLayer     int32
 	MaxLayer     int32
-	UdpP2P       bool
-	UdpReflector bool
+	UDPP2P       bool
+	UDPReflector bool
 	Versions     []string
 }
 
 type RemoteSource struct {
-	Ssrc   uint32
+	SSRC   uint32
 	State  StreamStatus
 	Device StreamDevice
 }
 
 type RTCServer struct {
 	ID                 int64
-	Ipv4, Ipv6         string
+	IPv4, IPv6         string
 	Username, Password string
 	Port               int32
-	Turn, Stun, Tcp    bool
+	TURN, STUN, TCP    bool
 	PeerTag            []byte
 }
 
@@ -269,9 +212,9 @@ type SegmentPartRequest struct {
 	Quality       MediaSegmentQuality
 }
 
-type SsrcGroup struct {
+type SSRCGroup struct {
 	Semantics string
-	Ssrcs     []uint32
+	SSRCs     []uint32
 }
 
 type ConferenceJoinParams struct {
@@ -281,12 +224,12 @@ type ConferenceJoinParams struct {
 }
 
 type ParticipantsRequest struct {
-	Ssrcs []uint32
+	SSRCs []uint32
 }
 
-type SsrcMapping struct {
+type SSRCMapping struct {
 	UserID int64
-	Ssrc   int32
+	SSRC   int32
 }
 
 type SubchainRequest struct {
@@ -295,43 +238,93 @@ type SubchainRequest struct {
 	Limit    int32
 }
 
-func (ctx *MediaDescription) ParseToC() C.ntg_media_description {
+func (m MediaSource) ParseToC() C.ntg_media_source {
+	switch m {
+	case MediaSourceFile:
+		return C.NTG_MEDIA_SOURCE_FILE
+	case MediaSourceShell:
+		return C.NTG_MEDIA_SOURCE_SHELL
+	case MediaSourceFFmpeg:
+		return C.NTG_MEDIA_SOURCE_FFMPEG
+	case MediaSourceDevice:
+		return C.NTG_MEDIA_SOURCE_DEVICE
+	case MediaSourceDesktop:
+		return C.NTG_MEDIA_SOURCE_DESKTOP
+	case MediaSourceExternal:
+		return C.NTG_MEDIA_SOURCE_EXTERNAL
+	default:
+		return C.NTG_MEDIA_SOURCE_FILE
+	}
+}
+
+func (m StreamMode) ParseToC() C.ntg_stream_mode {
+	switch m {
+	case CaptureStream:
+		return C.NTG_STREAM_MODE_CAPTURE
+	case PlaybackStream:
+		return C.NTG_STREAM_MODE_PLAYBACK
+	default:
+		return C.NTG_STREAM_MODE_CAPTURE
+	}
+}
+
+func (d StreamDevice) ParseToC() C.ntg_stream_device {
+	switch d {
+	case MicrophoneStream:
+		return C.NTG_STREAM_DEVICE_MICROPHONE
+	case SpeakerStream:
+		return C.NTG_STREAM_DEVICE_SPEAKER
+	case CameraStream:
+		return C.NTG_STREAM_DEVICE_CAMERA
+	case ScreenStream:
+		return C.NTG_STREAM_DEVICE_SCREEN
+	default:
+		return C.NTG_STREAM_DEVICE_MICROPHONE
+	}
+}
+
+func (s MediaSegmentStatus) ParseToC() C.ntg_media_segment_part_status {
+	switch s {
+	case SegmentStatusNotReady:
+		return C.NTG_MEDIA_SEGMENT_PART_STATUS_NOT_READY
+	case SegmentStatusResyncNeeded:
+		return C.NTG_MEDIA_SEGMENT_PART_STATUS_RESYNC_NEEDED
+	case SegmentStatusSuccess:
+		return C.NTG_MEDIA_SEGMENT_PART_STATUS_SUCCESS
+	default:
+		return C.NTG_MEDIA_SEGMENT_PART_STATUS_NOT_READY
+	}
+}
+
+func (d *MediaDescription) ParseToC() C.ntg_media_description {
 	var x C.ntg_media_description
 
-	if ctx.Microphone != nil {
-		cMic := C.malloc(
-			C.size_t(unsafe.Sizeof(C.ntg_audio_description{})),
-		)
-		micStruct := ctx.Microphone.ParseToC()
-		*(*C.ntg_audio_description)(cMic) = micStruct
-		x.microphone = (*C.ntg_audio_description)(cMic)
+	if d.Microphone != nil {
+		if cMic := C.malloc(C.size_t(unsafe.Sizeof(C.ntg_audio_description{}))); cMic != nil {
+			*(*C.ntg_audio_description)(cMic) = d.Microphone.ParseToC()
+			x.microphone = (*C.ntg_audio_description)(cMic)
+		}
 	}
 
-	if ctx.Speaker != nil {
-		cSpeaker := C.malloc(
-			C.size_t(unsafe.Sizeof(C.ntg_audio_description{})),
-		)
-		speakerStruct := ctx.Speaker.ParseToC()
-		*(*C.ntg_audio_description)(cSpeaker) = speakerStruct
-		x.speaker = (*C.ntg_audio_description)(cSpeaker)
+	if d.Speaker != nil {
+		if cSpeaker := C.malloc(C.size_t(unsafe.Sizeof(C.ntg_audio_description{}))); cSpeaker != nil {
+			*(*C.ntg_audio_description)(cSpeaker) = d.Speaker.ParseToC()
+			x.speaker = (*C.ntg_audio_description)(cSpeaker)
+		}
 	}
 
-	if ctx.Camera != nil {
-		cCamera := C.malloc(
-			C.size_t(unsafe.Sizeof(C.ntg_video_description{})),
-		)
-		cameraStruct := ctx.Camera.ParseToC()
-		*(*C.ntg_video_description)(cCamera) = cameraStruct
-		x.camera = (*C.ntg_video_description)(cCamera)
+	if d.Camera != nil {
+		if cCamera := C.malloc(C.size_t(unsafe.Sizeof(C.ntg_video_description{}))); cCamera != nil {
+			*(*C.ntg_video_description)(cCamera) = d.Camera.ParseToC()
+			x.camera = (*C.ntg_video_description)(cCamera)
+		}
 	}
 
-	if ctx.Screen != nil {
-		cScreen := C.malloc(
-			C.size_t(unsafe.Sizeof(C.ntg_video_description{})),
-		)
-		screenStruct := ctx.Screen.ParseToC()
-		*(*C.ntg_video_description)(cScreen) = screenStruct
-		x.screen = (*C.ntg_video_description)(cScreen)
+	if d.Screen != nil {
+		if cScreen := C.malloc(C.size_t(unsafe.Sizeof(C.ntg_video_description{}))); cScreen != nil {
+			*(*C.ntg_video_description)(cScreen) = d.Screen.ParseToC()
+			x.screen = (*C.ntg_video_description)(cScreen)
+		}
 	}
 
 	return x
@@ -356,53 +349,45 @@ func freeMediaDescriptionC(desc C.ntg_media_description) {
 	}
 }
 
-func (ctx *AudioDescription) ParseToC() C.ntg_audio_description {
+func (d *AudioDescription) ParseToC() C.ntg_audio_description {
 	var x C.ntg_audio_description
-	x.media_source = ctx.MediaSource.ParseToC()
-	x.input = C.CString(ctx.Input)
-	x.sample_rate = C.uint32_t(ctx.SampleRate)
-	x.channel_count = C.uint8_t(ctx.ChannelCount)
-	x.keep_open = C.bool(ctx.KeepOpen)
+	x.media_source = d.MediaSource.ParseToC()
+	x.input = C.CString(d.Input)
+	x.sample_rate = C.uint32_t(d.SampleRate)
+	x.channel_count = C.uint8_t(d.ChannelCount)
+	x.keep_open = C.bool(d.KeepOpen)
 	return x
 }
 
-func (ctx *VideoDescription) ParseToC() C.ntg_video_description {
+func (d *VideoDescription) ParseToC() C.ntg_video_description {
 	var x C.ntg_video_description
-	x.media_source = ctx.MediaSource.ParseToC()
-	x.input = C.CString(ctx.Input)
-	x.width = C.int16_t(ctx.Width)
-	x.height = C.int16_t(ctx.Height)
-	x.fps = C.uint8_t(ctx.Fps)
-	x.keep_open = C.bool(ctx.KeepOpen)
+	x.media_source = d.MediaSource.ParseToC()
+	x.input = C.CString(d.Input)
+	x.width = C.int16_t(d.Width)
+	x.height = C.int16_t(d.Height)
+	x.fps = C.uint8_t(d.FPS)
+	x.keep_open = C.bool(d.KeepOpen)
 	return x
 }
 
-func (ctx *DhConfig) ParseToC() C.ntg_dh_config {
+func (c *DhConfig) ParseToC() C.ntg_dh_config {
 	var x C.ntg_dh_config
-	x.g = C.int32_t(ctx.G)
-	pC, pSize := parseBytes(ctx.P)
-	rC, rSize := parseBytes(ctx.Random)
-	x.p = pC
-	x.p_len = pSize
-	x.random = rC
-	x.random_len = rSize
+	x.g = C.int32_t(c.G)
+	x.p, x.p_len = parseBytes(c.P)
+	x.random, x.random_len = parseBytes(c.Random)
 	return x
 }
 
 func freeDhConfig(config *C.ntg_dh_config) {
-	if config.p != nil {
-		C.free(unsafe.Pointer(config.p))
-	}
-	if config.random != nil {
-		C.free(unsafe.Pointer(config.random))
-	}
+	freeBytes(config.p)
+	freeBytes(config.random)
 }
 
-func (ctx *FrameData) ParseToC() C.ntg_frame_data {
+func (d FrameData) ParseToC() C.ntg_frame_data {
 	var x C.ntg_frame_data
-	x.absolute_capture_timestamp_ms = C.int64_t(ctx.AbsoluteCaptureTimestampMs)
-	x.width = C.uint16_t(ctx.Width)
-	x.height = C.uint16_t(ctx.Height)
-	x.rotation = C.ntg_video_rotation(ctx.Rotation)
+	x.absolute_capture_timestamp_ms = C.int64_t(d.AbsoluteCaptureTimestampMs)
+	x.width = C.uint16_t(d.Width)
+	x.height = C.uint16_t(d.Height)
+	x.rotation = C.ntg_video_rotation(d.Rotation)
 	return x
 }

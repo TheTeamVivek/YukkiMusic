@@ -8,16 +8,16 @@ import (
 
 func parseVideoSources(
 	sources []*tg.GroupCallParticipantVideoSourceGroup,
-) []ntgcalls.SsrcGroup {
-	var ssrcGroups []ntgcalls.SsrcGroup
+) []ntgcalls.SSRCGroup {
+	var ssrcGroups []ntgcalls.SSRCGroup
 	for _, source := range sources {
 		var sourceIds []uint32
 		for _, sourceId := range source.Sources {
 			sourceIds = append(sourceIds, uint32(sourceId))
 		}
-		ssrcGroups = append(ssrcGroups, ntgcalls.SsrcGroup{
+		ssrcGroups = append(ssrcGroups, ntgcalls.SSRCGroup{
 			Semantics: source.Semantics,
-			Ssrcs:     sourceIds,
+			SSRCs:     sourceIds,
 		})
 	}
 	return ssrcGroups
