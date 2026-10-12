@@ -158,12 +158,6 @@ func cbRespond(c *td.Client, u *td.UpdateNewCallbackQuery, text string, opts *td
 	return m
 }
 
-// mentionOfSender resolves the callback sender and builds an HTML mention.
-func mentionOfSender(c *td.Client, userID int64) string {
-	user, _ := c.GetUser(userID)
-	return mentionOf(user, userID)
-}
-
 func handlePauseAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) error {
 	chatID := u.ChatId
 	utils.Log.Infof("Callback → pause, chatID=%d", chatID)
@@ -216,6 +210,7 @@ func handleResumeAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 
 func handleReplayAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) error {
 	chatID := u.ChatId
+	sender, _ := c.GetUser(u.SenderUserId)
 	utils.Log.Infof("Callback → replay, chatID=%d", chatID)
 
 	statusMsg := cbRespond(c, u, F(chatID, "cb_replaying"), nil)
@@ -238,7 +233,7 @@ func handleReplayAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 
 	u.Answer(c, 0, true, F(chatID, "cb_replay_success"), "")
 	if _, err := u.EditMessageText(c, F(chatID, "cb_replay_edited", locales.Arg{
-		"user": mentionOfSender(c, u.SenderUserId),
+		"user": mentionOf(sender, u.SenderUserId),
 	}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
 		utils.Log.Errorf("Edit error: %v", err)
 	}
@@ -247,13 +242,14 @@ func handleReplayAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 
 func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) error {
 	chatID := u.ChatId
+	sender, _ := c.GetUser(u.SenderUserId)
 	utils.Log.Infof("Callback → skip, chatID=%d", chatID)
 
 	if r.QueueLen() == 0 {
 		scheduleOldPlayingMessage(r)
 		core.Rooms.Delete(r.ChatID)
 		if _, err := u.EditMessageText(c, F(chatID, "skip_stopped", locales.Arg{
-			"user": mentionOfSender(c, u.SenderUserId),
+			"user": mentionOf(sender, u.SenderUserId),
 		}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
 			utils.Log.Errorf("Edit error: %v", err)
 		}
@@ -297,7 +293,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) 
 	r.SetStatusMsg(statusMsg)
 
 	_, err = statusMsg.ReplyText(c, F(chatID, "cb_skip_edited", locales.Arg{
-		"user": mentionOfSender(c, u.SenderUserId),
+		"user": mentionOf(sender, u.SenderUserId),
 	}), &td.SendTextMessageOpts{ParseMode: "HTML"})
 
 	return err
@@ -305,6 +301,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) 
 
 func handleStopAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) error {
 	chatID := u.ChatId
+	sender, _ := c.GetUser(u.SenderUserId)
 	utils.Log.Infof("Callback → stop, chatID=%d", chatID)
 
 	scheduleOldPlayingMessage(r)
@@ -312,7 +309,7 @@ func handleStopAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) 
 
 	u.Answer(c, 0, true, F(chatID, "cb_stop_success"), "")
 	if _, err := u.EditMessageText(c, F(chatID, "stopped", locales.Arg{
-		"user": mentionOfSender(c, u.SenderUserId),
+		"user": mentionOf(sender, u.SenderUserId),
 	}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
 		utils.Log.Errorf("Edit error: %v", err)
 	}
@@ -367,7 +364,8 @@ func updatePlaybackMessage(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.R
 
 	chatID := u.ChatId
 	safeTitle := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
-	mention := mentionOfSender(c, u.SenderUserId)
+	sender, _ := c.GetUser(u.SenderUserId)
+	mention := mentionOf(sender, u.SenderUserId)
 
 	var msgText string
 	switch state {

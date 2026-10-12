@@ -226,7 +226,7 @@ func handleAssistantRestriction(
 		s.SetBanned(true)
 
 		msg := F(chatID, "assistant_restricted_warning", locales.Arg{
-			"assistant": mentionOfAssistant(s.Assistant),
+			"assistant": mentionOf(s.Assistant, 0),
 			"id":        s.Assistant.Self.ID,
 		})
 

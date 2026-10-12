@@ -113,30 +113,31 @@ func isChannel(c *td.Client, m *td.Message) bool {
 	return ok && sg.IsChannel
 }
 
-// mentionOf builds an HTML mention, falling back to a plain "user" mention
-// if sender is nil (e.g. GetUser failed).
-func mentionOf(sender *td.User, fallbackId int64) string {
-	if sender == nil {
-		return mentionOfName("user", fallbackId)
-	}
-	return mentionOfName(strings.TrimSpace(sender.FirstName+" "+sender.LastName), sender.Id)
-}
+// mentionOf builds an HTML mention for a *td.User, a *core.Assistant, a raw
+// display name, or nil (which falls back to a plain "user" mention).
+func mentionOf(subject any, fallbackId int64) string {
+	name := ""
+	id := fallbackId
 
-// mentionOfName builds an HTML mention for a raw name and user ID.
-func mentionOfName(name string, id int64) string {
-	name = strings.TrimSpace(name)
-	if name == "" {
+	switch v := subject.(type) {
+	case *td.User:
+		if v != nil {
+			id = v.Id
+			name = v.FirstName + " " + v.LastName
+		}
+	case *core.Assistant:
+		if v != nil && v.Self != nil {
+			id = v.Self.ID
+			name = v.Self.FirstName + " " + v.Self.LastName
+		}
+	case string:
+		name = v
+	}
+
+	if name = strings.TrimSpace(name); name == "" {
 		name = "user"
 	}
 	return td.Mention(name, id, true, true)
-}
-
-// mentionOfAssistant builds an HTML mention for an assistant account.
-func mentionOfAssistant(a *core.Assistant) string {
-	if a == nil || a.Self == nil {
-		return "Unknown"
-	}
-	return mentionOfName(strings.TrimSpace(a.Self.FirstName+" "+a.Self.LastName), a.Self.ID)
 }
 
 // logStart reports a bot start to the configured logger chat, if enabled.

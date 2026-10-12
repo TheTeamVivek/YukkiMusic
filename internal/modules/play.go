@@ -357,7 +357,7 @@ func ensureVoiceChatReady(
 
 	if snap.AssistantBanned {
 		utils.EOR(c, replyMsg, F(chatID, "err_assistant_banned", locales.Arg{
-			"user": mentionOfAssistant(cs.Assistant),
+			"user": mentionOf(cs.Assistant, 0),
 			"id":   utils.IntToStr(cs.Assistant.Self.ID),
 		}), nil)
 		return fmt.Errorf("assistant banned")
