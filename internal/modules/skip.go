@@ -76,7 +76,7 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	mention := mentionOf(nil, m.SenderID())
+	mention := mention(nil, m.SenderID())
 	skipCount := 1
 
 	if args := m.Args(); args != "" {

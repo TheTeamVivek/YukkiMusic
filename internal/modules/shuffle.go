@@ -112,7 +112,7 @@ func handleShuffle(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	sender, _ := m.GetUser(c)
-	mention := mentionOf(sender, m.SenderID())
+	mention := mention(sender, m.SenderID())
 	_, rerr := m.ReplyText(c, F(chatID, "shuffle_updated", locales.Arg{
 		"state": state,
 		"user":  mention,

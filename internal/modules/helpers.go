@@ -214,7 +214,7 @@ func sendPlayLogs(c *td.Client, m *td.Message, track *state.Track, queued bool) 
 	}
 
 	sender, _ := m.GetUser(c)
-	requestedBy := mentionOf(sender, m.SenderID())
+	requestedBy := mention(sender, m.SenderID())
 
 	sb.WriteString(F(m.ChatID(), "logger_playback_template", locales.Arg{
 		"track_url":       track.URL,

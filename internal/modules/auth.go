@@ -134,7 +134,7 @@ func addAuthHandler(c *td.Client, m *td.Message) error {
 		return err
 	}
 
-	uname := mentionOf(user, userID)
+	uname := mention(user, userID)
 	if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
 		uname += " (@" + user.Usernames.ActiveUsernames[0] + ")"
 	}
@@ -192,7 +192,7 @@ func delAuthHandler(c *td.Client, m *td.Message) error {
 
 	var uname string
 	if user != nil {
-		uname = mentionOf(user, userID)
+		uname = mention(user, userID)
 		if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
 			uname += " (@" + user.Usernames.ActiveUsernames[0] + ")"
 		}
@@ -239,7 +239,7 @@ func authListHandler(c *td.Client, m *td.Message) error {
 			continue
 		}
 
-		uname := mentionOf(user, userID)
+		uname := mention(user, userID)
 		if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
 			uname += " (@" + user.Usernames.ActiveUsernames[0] + ")"
 		}

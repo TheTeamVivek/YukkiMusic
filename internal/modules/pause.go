@@ -82,7 +82,7 @@ func handlePause(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	sender, _ := m.GetUser(c)
-	mention := mentionOf(sender, m.SenderID())
+	mention := mention(sender, m.SenderID())
 	title := utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25))
 
 	msg := F(chatID, "pause_success", locales.Arg{

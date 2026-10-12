@@ -87,7 +87,7 @@ func handleAddSudo(c *td.Client, m *td.Message) error {
 	}
 
 	// Username / mention
-	uname := mentionOf(user, targetID)
+	uname := mention(user, targetID)
 	if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
 		uname = "@" + user.Usernames.ActiveUsernames[0]
 	}
@@ -179,7 +179,7 @@ func handleDelSudo(c *td.Client, m *td.Message) error {
 
 	var uname string
 	if user != nil {
-		uname = mentionOf(user, user.Id)
+		uname = mention(user, user.Id)
 		if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
 			uname = "@" + user.Usernames.ActiveUsernames[0]
 		}
@@ -270,7 +270,7 @@ func handleGetSudoers(c *td.Client, m *td.Message) error {
 		if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
 			ownerStr = "@" + user.Usernames.ActiveUsernames[0] + " (ID: <code>" + ownerIDStr + "</code>)"
 		} else {
-			ownerStr = mentionOf(user, ownerID) + " (ID: <code>" + ownerIDStr + "</code>)"
+			ownerStr = mention(user, ownerID) + " (ID: <code>" + ownerIDStr + "</code>)"
 		}
 	}
 
@@ -294,7 +294,7 @@ func handleGetSudoers(c *td.Client, m *td.Message) error {
 			if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
 				userStr = "@" + user.Usernames.ActiveUsernames[0] + " (ID: <code>" + idStr + "</code>)"
 			} else {
-				userStr = mentionOf(user, id) + " (ID: <code>" + idStr + "</code>)"
+				userStr = mention(user, id) + " (ID: <code>" + idStr + "</code>)"
 			}
 		}
 

@@ -59,7 +59,7 @@ func startHandler(c *td.Client, m *td.Message) error {
 // configured start image (if any) as a media block.
 func startRich(c *td.Client, chatID int64, sender *td.User, fallbackID int64) *td.InputRichMessage {
 	text := F(chatID, "start_private", locales.Arg{
-		"user": mentionOf(sender, fallbackID),
+		"user": mention(sender, fallbackID),
 		"bot":  td.Mention(c.Me.FirstName, c.Me.Id, true, true),
 	})
 
@@ -113,25 +113,14 @@ func isChannel(c *td.Client, m *td.Message) bool {
 	return ok && sg.IsChannel
 }
 
-// mentionOf builds an HTML mention for a *td.User, a *core.Assistant, a raw
-// display name, or nil (which falls back to a plain "user" mention).
-func mentionOf(subject any, fallbackId int64) string {
+// mention builds an HTML mention for a gotdbot user, falling back to a plain
+// "user" mention when the user is nil.
+func mention(user *td.User, fallbackId int64) string {
 	name := ""
 	id := fallbackId
-
-	switch v := subject.(type) {
-	case *td.User:
-		if v != nil {
-			id = v.Id
-			name = v.FirstName + " " + v.LastName
-		}
-	case *core.Assistant:
-		if v != nil && v.Self != nil {
-			id = v.Self.ID
-			name = v.Self.FirstName + " " + v.Self.LastName
-		}
-	case string:
-		name = v
+	if user != nil {
+		id = user.Id
+		name = user.FirstName + " " + user.LastName
 	}
 
 	if name = strings.TrimSpace(name); name == "" {
@@ -152,7 +141,7 @@ func logStart(c *td.Client, m *td.Message, sender *td.User) {
 	}
 
 	msg := F(config.LoggerID, "logger_bot_started", locales.Arg{
-		"mention":       mentionOf(sender, m.SenderID()),
+		"mention":       mention(sender, m.SenderID()),
 		"user_id":       m.SenderID(),
 		"user_username": uName,
 	})

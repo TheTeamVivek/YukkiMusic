@@ -152,7 +152,7 @@ func handleBotRemoved(c *td.Client, u *td.UpdateChatMember, chatID int64) {
 		if actorName == "" {
 			actorName = "N/A"
 		}
-		actorMention = mentionOf(actor, actorID)
+		actorMention = mention(actor, actorID)
 	}
 
 	msg := F(config.LoggerID, "logger_bot_removed", locales.Arg{
@@ -234,7 +234,7 @@ func buildLogArgs(c *td.Client, m *td.Message, chatID int64, action string) loca
 		"group_username":        "N/A",
 		action + "_by_name":     actorName,
 		action + "_by_id":       actorID,
-		action + "_by_username": mentionOf(sender, actorID),
+		action + "_by_username": mention(sender, actorID),
 		"date_time":             time.Now().Format("02 Jan 2006 • 15:04"),
 	}
 }

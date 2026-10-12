@@ -113,7 +113,7 @@ func handleLoop(c *td.Client, m *td.Message, cplay bool) error {
 	r.SetLoop(newLoop)
 
 	sender, _ := m.GetUser(c)
-	mention := mentionOf(sender, m.SenderID())
+	mention := mention(sender, m.SenderID())
 	var msg string
 	if newLoop == 0 {
 		msg = F(chatID, "loop_disabled", locales.Arg{

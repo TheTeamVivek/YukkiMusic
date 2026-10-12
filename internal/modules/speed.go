@@ -149,7 +149,7 @@ func handleSpeed(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	sender, _ := m.GetUser(c)
-	mention := mentionOf(sender, m.SenderID())
+	mention := mention(sender, m.SenderID())
 
 	if newSpeed == 1.0 {
 		if _, rerr := m.ReplyText(c, F(chatID, "speed_reset_success", locales.Arg{

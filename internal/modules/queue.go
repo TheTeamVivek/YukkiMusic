@@ -237,7 +237,7 @@ func handleRemove(c *td.Client, m *td.Message, cplay bool) error {
 	r.RemoveTrack(index - 1)
 
 	sender, _ := m.GetUser(c)
-	mention := mentionOf(sender, m.SenderID())
+	mention := mention(sender, m.SenderID())
 	_, rerr := m.ReplyText(c, F(chatID, "remove_success", locales.Arg{
 		"index": index,
 		"user":  mention,
@@ -275,7 +275,7 @@ func handleClear(c *td.Client, m *td.Message, cplay bool) error {
 	r.ClearQueue()
 
 	sender, _ := m.GetUser(c)
-	mention := mentionOf(sender, m.SenderID())
+	mention := mention(sender, m.SenderID())
 	_, rerr := m.ReplyText(c, F(chatID, "clear_success", locales.Arg{
 		"user": mention,
 	}), nil)
@@ -342,7 +342,7 @@ func handleMove(c *td.Client, m *td.Message, cplay bool) error {
 	r.MoveTrack(from-1, to-1)
 
 	sender, _ := m.GetUser(c)
-	mention := mentionOf(sender, m.SenderID())
+	mention := mention(sender, m.SenderID())
 	_, rerr := m.ReplyText(c, F(chatID, "move_success", locales.Arg{
 		"from": from,
 		"to":   to,

@@ -18,6 +18,8 @@
 package modules
 
 import (
+	"strings"
+
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
@@ -175,11 +177,11 @@ func handleSudoJoin(c *td.Client, chatID, userID int64) {
 	}
 
 	user, _ := c.GetUser(userID)
-	userMention := mentionOf(user, userID)
+	userMention := mention(user, userID)
 
 	botMention := "bot"
 	if c.Me != nil {
-		botMention = mentionOf(c.Me, c.Me.Id)
+		botMention = mention(c.Me, c.Me.Id)
 	}
 
 	text := F(chatID, msgKey, locales.Arg{
@@ -226,7 +228,7 @@ func handleAssistantRestriction(
 		s.SetBanned(true)
 
 		msg := F(chatID, "assistant_restricted_warning", locales.Arg{
-			"assistant": mentionOf(s.Assistant, 0),
+			"assistant": td.Mention(strings.TrimSpace(s.Assistant.Self.FirstName+" "+s.Assistant.Self.LastName), s.Assistant.Self.ID, true, true),
 			"id":        s.Assistant.Self.ID,
 		})
 

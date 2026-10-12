@@ -102,7 +102,7 @@ func handleStop(c *td.Client, m *td.Message, cplay bool) error {
 		F(
 			m.ChatID(),
 			"stopped",
-			locales.Arg{"user": mentionOf(nil, m.SenderID())},
+			locales.Arg{"user": mention(nil, m.SenderID())},
 		),
 		nil,
 	)

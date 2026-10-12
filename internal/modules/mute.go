@@ -72,7 +72,7 @@ func handleMute(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	sender, _ := m.GetUser(c)
-	mention := mentionOf(sender, m.SenderID())
+	mention := mention(sender, m.SenderID())
 
 	muteErr := r.Mute()
 

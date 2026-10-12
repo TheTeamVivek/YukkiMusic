@@ -210,7 +210,7 @@ func handlePlay(c *td.Client, m *td.Message, opts *playOpts) error {
 	}
 
 	sender, _ := m.GetUser(c)
-	mention := mentionOf(sender, m.SenderID())
+	mention := mention(sender, m.SenderID())
 	return playTracksAndRespond(c, m, searchMsg, room, tracks, mention, isActive, opts.Force, availableSlots)
 }
 
@@ -357,7 +357,7 @@ func ensureVoiceChatReady(
 
 	if snap.AssistantBanned {
 		utils.EOR(c, replyMsg, F(chatID, "err_assistant_banned", locales.Arg{
-			"user": mentionOf(cs.Assistant, 0),
+			"user": td.Mention(strings.TrimSpace(cs.Assistant.Self.FirstName+" "+cs.Assistant.Self.LastName), cs.Assistant.Self.ID, true, true),
 			"id":   utils.IntToStr(cs.Assistant.Self.ID),
 		}), nil)
 		return fmt.Errorf("assistant banned")

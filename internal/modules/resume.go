@@ -89,7 +89,7 @@ func handleResume(c *td.Client, m *td.Message, cplay bool) error {
 		pos := utils.FormatDuration(r.Position())
 		total := utils.FormatDuration(t.Duration)
 		sender, _ := m.GetUser(c)
-		mention := mentionOf(sender, m.SenderID())
+		mention := mention(sender, m.SenderID())
 
 		speedLine := ""
 		if sp := r.Speed(); sp != 1.0 {
