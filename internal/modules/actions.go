@@ -131,7 +131,7 @@ func handleBotRemoved(c *td.Client, u *td.UpdateChatMember, chatID int64) {
 	utils.Log.Debugf("Bot removed from chat %d", chatID)
 
 	cleanScheduler.cancel(chatID)
-	core.DropRoom(chatID)
+	core.Rooms.Delete(chatID)
 	core.DropChatState(chatID)
 	database.RemoveServedChat(chatID)
 
@@ -199,13 +199,13 @@ func handleVoiceChatAction(c *td.Client, m *td.Message) error {
 	utils.Log.Debugf("Voice chat %s in %d", msgKey, chatID)
 
 	if !isActive {
-		room, ok := core.RoomFor(chatID)
+		room, ok := core.Rooms.Get(chatID)
 		go func() {
 			time.Sleep(500 * time.Millisecond)
 			if ok {
 				scheduleOldPlayingMessage(room)
 			}
-			core.DropRoom(chatID)
+			core.Rooms.Delete(chatID)
 			utils.Log.Debugf("Room destroyed for ended voice chat in %d", chatID)
 		}()
 	}

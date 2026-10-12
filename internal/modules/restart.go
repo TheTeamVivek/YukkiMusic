@@ -74,8 +74,8 @@ func performRestart(c *td.Client, m *td.Message, chatID int64) error {
 	return executeRestart(c, chatID, statusMsg)
 }
 
-func getActiveRoomForChat(chatID int64) (*core.RoomState, bool) {
-	r, ok := core.RoomFor(chatID)
+func getActiveRoomForChat(chatID int64) (*core.Room, bool) {
+	r, ok := core.Rooms.Get(chatID)
 	if !ok || !r.Active() || r.Track() == nil {
 		return nil, false
 	}
@@ -134,8 +134,8 @@ func executeRestart(
 		return nil
 	}
 
-	for roomChatID := range core.AllRooms() {
-		core.DropRoom(roomChatID)
+	for roomChatID := range core.Rooms.All() {
+		core.Rooms.Delete(roomChatID)
 		if _, err := c.SendTextMessage(roomChatID, F(roomChatID, "restart_service", locales.Arg{
 			"bot": mentionOf(c.Me, c.Me.Id),
 		}), nil); err != nil {

@@ -485,7 +485,7 @@ func (s *ChatState) bind(ass *Assistant) {
 
 // rebindRoom points the room (if any) at the assistant now serving the chat.
 func (s *ChatState) rebindRoom(ass *Assistant) {
-	if room, ok := RoomFor(s.ChatID); ok {
+	if room, ok := Rooms.Get(s.ChatID); ok {
 		room.SetAssistant(ass)
 	}
 }
@@ -498,7 +498,7 @@ func (s *ChatState) leaveInactiveChats(limit int) {
 		return
 	}
 
-	activeRooms := AllRooms()
+	activeRooms := Rooms.All()
 	leftCount := 0
 	err := s.Assistant.Client.IterDialogs(func(d *telegram.TLDialog) error {
 		if d == nil || d.IsUser() {
@@ -567,8 +567,7 @@ func isAdminError(err error) bool {
 		return true
 	}
 
-	var tde *td.Error
-	if errors.As(err, &tde) {
+	if tde, ok := errors.AsType[*td.Error](err); ok {
 		msg := strings.ToLower(tde.Message)
 		return tde.Code == 404 ||
 			strings.Contains(msg, "chat not found") ||

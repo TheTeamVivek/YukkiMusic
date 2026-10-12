@@ -86,7 +86,7 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 			return err
 		}
 
-		queuedTracks := len(r.Queue())
+		queuedTracks := r.QueueLen()
 		if queuedTracks == 0 {
 			_, err := m.ReplyText(c, F(chatID, "skip_queue_empty_for_count"), nil)
 			return err
@@ -104,10 +104,10 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 		skipCount = parsed + 1
 	}
 
-	if len(r.Queue()) == 0 {
+	if r.QueueLen() == 0 {
 
 		scheduleOldPlayingMessage(r)
-		core.DropRoom(r.ID)
+		core.Rooms.Delete(r.ChatID)
 		_, err := m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
 		}), nil)
@@ -117,10 +117,10 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 	r.SetLoop(0)
 
 	for i := 1; i < skipCount; i++ {
-		if len(r.Queue()) == 0 {
+		if r.QueueLen() == 0 {
 
 			scheduleOldPlayingMessage(r)
-			core.DropRoom(r.ID)
+			core.Rooms.Delete(r.ChatID)
 			_, err := m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 				"user": mention,
 			}), nil)
@@ -129,10 +129,10 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 		_ = r.NextTrack()
 	}
 
-	if len(r.Queue()) == 0 {
+	if r.QueueLen() == 0 {
 
 		scheduleOldPlayingMessage(r)
-		core.DropRoom(r.ID)
+		core.Rooms.Delete(r.ChatID)
 		_, err := m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
 		}), nil)
@@ -143,7 +143,7 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 	if t == nil {
 
 		scheduleOldPlayingMessage(r)
-		core.DropRoom(r.ID)
+		core.Rooms.Delete(r.ChatID)
 		_, err := m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
 		}), nil)
@@ -172,7 +172,7 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 		}
 
 		scheduleOldPlayingMessage(r)
-		core.DropRoom(r.ID)
+		core.Rooms.Delete(r.ChatID)
 		return nil
 	}
 
@@ -184,7 +184,7 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 			core.Bot.SendTextMessage(chatID, txt, nil)
 		}
 		scheduleOldPlayingMessage(r)
-		core.DropRoom(r.ID)
+		core.Rooms.Delete(r.ChatID)
 		return nil
 	}
 

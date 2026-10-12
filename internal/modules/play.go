@@ -231,7 +231,7 @@ func canUsePlayCommand(c *td.Client, m *td.Message, chatID int64) bool {
 
 // preparePlayRequest resolves the playback room and the "searching" status
 // message. Any error has already been shown to the user.
-func preparePlayRequest(c *td.Client, m *td.Message, cplay bool) (*core.RoomState, *td.Message, error) {
+func preparePlayRequest(c *td.Client, m *td.Message, cplay bool) (*core.Room, *td.Message, error) {
 	chatID := m.ChatID()
 
 	room, err := getEffectiveRoom(chatID, cplay)
@@ -241,9 +241,9 @@ func preparePlayRequest(c *td.Client, m *td.Message, cplay bool) (*core.RoomStat
 		}
 		return nil, nil, err
 	}
-	room.Parse()
+	room.Refresh()
 
-	if config.QueueLimit > 0 && len(room.Queue()) >= config.QueueLimit {
+	if config.QueueLimit > 0 && room.QueueLen() >= config.QueueLimit {
 		if _, rerr := m.ReplyText(c, F(chatID, "queue_limit_reached", locales.Arg{"limit": config.QueueLimit}), nil); rerr != nil {
 			return nil, nil, rerr
 		}
@@ -284,7 +284,7 @@ func fetchTracksAndCheckStatus(
 	c *td.Client,
 	m *td.Message,
 	replyMsg *td.Message,
-	r *core.RoomState,
+	r *core.Room,
 	video bool,
 ) ([]*state.Track, bool, error) {
 	tracks, err := safeGetTracks(c, m, replyMsg, m.ChatID(), video)
@@ -297,7 +297,7 @@ func fetchTracksAndCheckStatus(
 		return nil, false, fmt.Errorf("no tracks found")
 	}
 
-	chatState, err := core.ChatStateFor(r.ID)
+	chatState, err := core.ChatStateFor(r.ChatID)
 	if err != nil {
 		utils.Log.Errorf("Error getting chat state: %v", err)
 		utils.EOR(c, replyMsg, getErrorMessage(m.ChatID(), err), nil)
@@ -314,7 +314,7 @@ func fetchTracksAndCheckStatus(
 func rejectDuplicate(
 	c *td.Client,
 	replyMsg *td.Message,
-	r *core.RoomState,
+	r *core.Room,
 	tracks []*state.Track,
 	force bool,
 ) bool {
@@ -328,7 +328,7 @@ func rejectDuplicate(
 	return true
 }
 
-func isTrackInQueue(r *core.RoomState, t *state.Track) bool {
+func isTrackInQueue(r *core.Room, t *state.Track) bool {
 	for _, qt := range r.Queue() {
 		if qt.URL == t.URL || qt.ID == t.ID {
 			return true
@@ -380,7 +380,7 @@ func ensureVoiceChatReady(
 func filterAndTrimTracks(
 	c *td.Client,
 	replyMsg *td.Message,
-	r *core.RoomState,
+	r *core.Room,
 	tracks []*state.Track,
 ) ([]*state.Track, int, error) {
 	chatID := replyMsg.ChatID()
@@ -416,7 +416,7 @@ func filterAndTrimTracks(
 		return nil, 0, fmt.Errorf("all tracks skipped")
 	}
 
-	availableSlots := config.QueueLimit - len(r.Queue())
+	availableSlots := config.QueueLimit - r.QueueLen()
 	if config.QueueLimit < 0 {
 		availableSlots = len(accepted)
 	} else if availableSlots < 0 {
@@ -475,7 +475,7 @@ func playTracksAndRespond(
 	c *td.Client,
 	m *td.Message,
 	replyMsg *td.Message,
-	r *core.RoomState,
+	r *core.Room,
 	tracks []*state.Track,
 	mention string,
 	isActive, force bool,
@@ -560,7 +560,7 @@ func downloadFirstTrack(
 func finalizePlayReply(
 	c *td.Client,
 	replyMsg *td.Message,
-	r *core.RoomState,
+	r *core.Room,
 	tracks []*state.Track,
 	mention string,
 	isActive bool,
@@ -619,14 +619,14 @@ func finalizePlayReply(
 
 func buildSingleQueueReply(
 	chatID int64,
-	r *core.RoomState,
+	r *core.Room,
 	track *state.Track,
 	mention string,
 ) string {
 	title := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
 
 	return F(chatID, "play_added_to_queue_single", locales.Arg{
-		"index":    len(r.Queue()),
+		"index":    r.QueueLen(),
 		"url":      track.URL,
 		"title":    title,
 		"duration": utils.FormatDuration(track.Duration),
@@ -660,7 +660,7 @@ func buildMultiAddedText(
 }
 
 func playTrackWithRetry(
-	r *core.RoomState,
+	r *core.Room,
 	track *state.Track,
 	filePath string,
 	force bool,
@@ -718,7 +718,7 @@ func handlePlayAttemptError(
 	attempt int,
 	c *td.Client,
 	replyMsg *td.Message,
-	room *core.RoomState,
+	room *core.Room,
 ) bool {
 	if wait := getFloodWait(err); wait > 0 {
 		utils.Log.Error(
@@ -735,27 +735,27 @@ func handlePlayAttemptError(
 	if errors.Is(err, ubot.ErrConnectionTimeout) {
 		utils.Log.Error("Voice connection timeout. Stopping call session...")
 		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "err_connection_timeout"), nil)
-		core.DropRoom(room.ID)
+		core.Rooms.Delete(room.ChatID)
 		return true
 	}
 
 	if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
 		utils.Log.Error("RTMP/live-stream voice chat detected, cannot play. Cleaning up...")
-		core.DropRoom(room.ID)
+		core.Rooms.Delete(room.ChatID)
 		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "rtmp_play_unsupported"), nil)
 		return true
 	}
 
 	if strings.Contains(err.Error(), "group call") &&
 		strings.Contains(err.Error(), "is closed") {
-		markVoiceChatInactive(room.ID)
+		markVoiceChatInactive(room.ChatID)
 		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "err_no_active_voicechat"), nil)
 		return true
 	}
 
 	if strings.Contains(err.Error(), "GROUPCALL_INVALID") {
 		utils.Log.Error("GROUPCALL_INVALID err occurred. Returning...")
-		core.DropRoom(room.ID)
+		core.Rooms.Delete(room.ChatID)
 		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "play_unable"), nil)
 		return true
 	}
@@ -787,8 +787,7 @@ func markVoiceChatInactive(roomID int64) {
 // getFloodWait returns the retry-after seconds for a flood-wait error,
 // whether surfaced as a TDLib error or an MTProto/ntgcalls error.
 func getFloodWait(err error) int {
-	var tde *td.Error
-	if errors.As(err, &tde) {
+	if tde, ok := errors.AsType[*td.Error](err); ok {
 		if wait := tde.GetRetryAfter(); wait > 0 {
 			return wait
 		}
@@ -822,8 +821,7 @@ func getErrorMessage(chatID int64, err error) string {
 	case errors.Is(err, core.ErrStateFetchFailed):
 		return F(chatID, "err_fetch_failed", locales.Arg{"error": err.Error()})
 	default:
-		var fw *core.FloodWaitError
-		if errors.As(err, &fw) {
+		if fw, ok := errors.AsType[*core.FloodWaitError](err); ok {
 			return floodWaitMessage(chatID, fw.Seconds)
 		}
 		return F(chatID, "err_unknown", locales.Arg{"error": err.Error()})

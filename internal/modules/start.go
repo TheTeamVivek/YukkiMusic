@@ -18,6 +18,7 @@
 package modules
 
 import (
+	"html"
 	"strings"
 
 	td "github.com/AshokShau/gotdbot"
@@ -54,27 +55,28 @@ func startHandler(c *td.Client, m *td.Message) error {
 	return nil
 }
 
-func startCaption(c *td.Client, chatID int64, sender *td.User, fallbackID int64) string {
-	return F(chatID, "start_private", locales.Arg{
+// startRich builds the rich-formatted private start message, embedding the
+// configured start image (if any) as a media block.
+func startRich(c *td.Client, chatID int64, sender *td.User, fallbackID int64) *td.InputRichMessage {
+	text := F(chatID, "start_private", locales.Arg{
 		"user": mentionOf(sender, fallbackID),
 		"bot":  td.Mention(c.Me.FirstName, c.Me.Id, true, true),
 	})
+
+	if image := config.StartImage(); image != "" {
+		text = `<figure><img src="` + html.EscapeString(image) + `"/></figure>` + "\n" + text
+	}
+
+	return &td.InputRichMessage{
+		Source: &td.RichMessageSourceHtml{Text: text},
+	}
 }
 
 func handlePmStart(c *td.Client, m *td.Message, sender *td.User) error {
-	caption := startCaption(c, m.ChatID(), sender, m.SenderID())
+	chatID := m.ChatID()
 
-	if image := config.StartImage(); image != "" {
-		if _, err := c.SendPhoto(m.ChatID(), td.InputFileRemote{Id: image}, &td.SendPhotoOpts{
-			Caption:     caption,
-			ReplyMarkup: core.GetStartMarkup(m.ChatID()),
-		}); err == nil {
-			return nil
-		}
-	}
-
-	_, err := c.SendTextMessage(m.ChatID(), caption, &td.SendTextMessageOpts{
-		ReplyMarkup: core.GetStartMarkup(m.ChatID()),
+	_, err := c.SendRichMessage(chatID, startRich(c, chatID, sender, m.SenderID()), &td.SendTextMessageOpts{
+		ReplyMarkup: core.GetStartMarkup(chatID),
 	})
 	return err
 }
@@ -86,33 +88,13 @@ func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 	if err != nil {
 		return err
 	}
-	sender, _ := msg.GetUser(c)
 
-	caption := startCaption(c, cb.ChatId, sender, msg.SenderID())
-	markup := core.GetStartMarkup(cb.ChatId)
+	chatID := cb.ChatId
+	user, _ := c.GetUser(cb.SenderUserId)
 
-	if config.StartImage() == "" {
-		_, err = cb.EditMessageText(c, caption, &td.EditTextMessageOpts{
-			ReplyMarkup: markup,
-		})
-		return err
-	}
+	rich := &td.InputMessageRichMessage{Message: startRich(c, chatID, user, cb.SenderUserId)}
 
-	formattedCaption, err := c.GetFormattedText(caption, nil, "HTML")
-	if err != nil {
-		return err
-	}
-
-	content := &td.InputMessagePhoto{
-		Photo: &td.InputPhoto{
-			Photo: td.InputFileRemote{Id: config.StartImage()},
-		},
-		Caption: formattedCaption,
-	}
-
-	_, err = c.EditMessageMedia(cb.ChatId, content, msg.Id, &td.EditMessageMediaOpts{
-		ReplyMarkup: markup,
-	})
+	_, err = c.EditContent(chatID, msg.Id, rich, core.GetStartMarkup(chatID))
 	return err
 }
 

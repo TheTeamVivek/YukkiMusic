@@ -19,7 +19,7 @@ package modules
 
 import (
 	"fmt"
-	"sort"
+	"slices"
 	"strings"
 
 	td "github.com/AshokShau/gotdbot"
@@ -59,26 +59,30 @@ func activeHandler(c *td.Client, m *td.Message) error {
 
 	// Only truly active sessions are reported: skip destroyed rooms and
 	// rooms that are not actively playing anything.
-	rooms := make(map[int64]*core.RoomState)
-	for id, r := range core.AllRooms() {
-		if r == nil || r.Destroyed() || !r.Active() {
+	states := make(map[int64]core.State)
+	for id, r := range core.Rooms.All() {
+		if r == nil {
 			continue
 		}
-		rooms[id] = r
+		snap := r.Snapshot()
+		if !snap.Active() {
+			continue
+		}
+		states[id] = snap
 	}
 
-	if len(rooms) == 0 {
+	if len(states) == 0 {
 		_, err := m.ReplyText(c, "<b>🎵 Active Voice Chats</b>\n\nNo active chat sessions found.", &td.SendTextMessageOpts{
 			DisableWebPagePreview: true,
 		})
 		return err
 	}
 
-	ids := make([]int64, 0, len(rooms))
-	for id := range rooms {
+	ids := make([]int64, 0, len(states))
+	for id := range states {
 		ids = append(ids, id)
 	}
-	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+	slices.Sort(ids)
 
 	var sb strings.Builder
 	sb.WriteString("<h3>🎵 Active Voice Chats</h3>")
@@ -92,17 +96,14 @@ func activeHandler(c *td.Client, m *td.Message) error {
 	sb.WriteString("<tbody>\n")
 
 	for i, id := range ids {
-		r := rooms[id]
-		if r == nil {
-			continue
-		}
+		snap := states[id]
 
 		sb.WriteString("<tr>")
 		fmt.Fprintf(&sb, "<td><b>%d</b></td>", i+1)
 		fmt.Fprintf(&sb, "<td><code>%d</code></td>", id)
-		fmt.Fprintf(&sb, "<td>%s</td>", activeStatusCell(r))
-		fmt.Fprintf(&sb, "<td>%s</td>", activeTrackCell(r))
-		fmt.Fprintf(&sb, "<td>%s</td>", activeQueueCell(r))
+		fmt.Fprintf(&sb, "<td>%s</td>", activeStatusCell(snap))
+		fmt.Fprintf(&sb, "<td>%s</td>", activeTrackCell(snap))
+		fmt.Fprintf(&sb, "<td>%s</td>", activeQueueCell(snap))
 		sb.WriteString("</tr>\n")
 	}
 
@@ -121,14 +122,14 @@ func activeHandler(c *td.Client, m *td.Message) error {
 	return err
 }
 
-func activeStatusCell(r *core.RoomState) string {
-	if r.Muted() {
+func activeStatusCell(s core.State) string {
+	if s.Muted {
 		return "<b>🔇 Muted</b>"
 	}
-	if r.Paused() {
+	if s.Paused {
 		return "<b>⏸ Paused</b>"
 	}
-	if t := r.Track(); t != nil {
+	if t := s.Track; t != nil {
 		if t.Video {
 			return "<b>▶️ Playing (Video)</b>"
 		}
@@ -137,8 +138,8 @@ func activeStatusCell(r *core.RoomState) string {
 	return "<b>⏹ Idle</b>"
 }
 
-func activeTrackCell(r *core.RoomState) string {
-	t := r.Track()
+func activeTrackCell(s core.State) string {
+	t := s.Track
 	if t == nil {
 		return "<i>🔇 No song playing.</i>"
 	}
@@ -154,8 +155,8 @@ func activeTrackCell(r *core.RoomState) string {
 	return fmt.Sprintf("%s <i>(%s)</i>", title, utils.FormatDuration(t.Duration))
 }
 
-func activeQueueCell(r *core.RoomState) string {
-	n := len(r.Queue())
+func activeQueueCell(s core.State) string {
+	n := s.QueueLen
 	if n == 0 {
 		return "<i>Empty</i>"
 	}

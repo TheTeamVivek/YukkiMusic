@@ -79,7 +79,7 @@ func handleReload(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	chatID := m.ChatID()
-	roomID := r.ID
+	roomID := r.ChatID
 
 	if handled, err := checkReloadFlood(c, m, chatID, roomID); handled {
 		return err
@@ -122,7 +122,7 @@ func handleReload(c *td.Client, m *td.Message, cplay bool) error {
 	summary += reloadAssistantStatus(chatID, snapshot, snapErr)
 
 	if isAdmin {
-		if core.DropRoom(roomID) {
+		if core.Rooms.Delete(roomID) {
 			summary += F(chatID, "reload_room_reset") + "\n"
 		}
 	}

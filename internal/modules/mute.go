@@ -74,7 +74,7 @@ func handleMute(c *td.Client, m *td.Message, cplay bool) error {
 	sender, _ := m.GetUser(c)
 	mention := mentionOf(sender, m.SenderID())
 
-	_, muteErr := r.Mute()
+	muteErr := r.Mute()
 
 	if muteErr != nil {
 		_, err := m.ReplyText(c, F(chatID, "mute_failed", locales.Arg{

@@ -81,7 +81,7 @@ func handleUnmute(c *td.Client, m *td.Message, cplay bool) error {
 	sender, _ := m.GetUser(c)
 	mention := mentionOf(sender, m.SenderID())
 
-	if _, err := r.Unmute(); err != nil {
+	if err := r.Unmute(); err != nil {
 		_, err := m.ReplyText(c, F(chatID, "unmute_failed", locales.Arg{
 			"error": err.Error(),
 		}), nil)

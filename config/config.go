@@ -51,7 +51,7 @@ var (
 	SupportChannel = getEnv("SUPPORT_CHANNEL", "https://t.me/TheTeamVivek")
 	CookiesLink    = getEnv("COOKIES_LINK", "")
 	SetCmds        = getEnvBool("SET_CMDS", false)
-	HasPremium     = true // TODO: detect via bot API at startup
+	HasPremium     = false // TODO: detect via bot API at startup
 	MaxAuthUsers   = getEnvInt("MAX_AUTH_USERS", 25)
 
 	StartImages = getEnvStrings("START_IMAGES")

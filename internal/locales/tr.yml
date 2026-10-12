@@ -735,7 +735,12 @@ speed_reset_success: "{emoji:✅} Oynatma hızı {user} tarafından <b>1.0x</b> 
 
 speed_set: "{emoji:🚀} Oynatma hızı {user} tarafından <b>{speed}x</b> olarak ayarlandı."
 
-start_private: "Merhaba {user}, Benim adım {bot}.\n\nBen bazı kullanışlı özelliklere sahip bir Telegram akış botuyum. Youtube, Spotify, JioSaavn, Soundcloud vb. platformları destekliyorum.\n\nBeni gruplarına eklemekten çekinme. {emoji:👍}"
+
+start_private: |
+  <h3>{emoji:🎵} {bot}</h3>
+  <p>Merhaba {user} — YouTube, Spotify, SoundCloud, Apple Music ve daha fazlasından Telegram sesli ve görüntülü sohbetlerine müzik yayınlıyorum. Canlı kuyrukla kuyruk, döngü, karıştırma, sarma ve hız kontrolü yap.</p>
+  <p><b>Yüksek kaliteli ses, hızlı indirmeler ve her sohbette akıcı oynatmanın keyfini çıkar.</b></p>
+  <footer><i>Beni eklemek veya komutları görmek için aşağıdaki düğmelere dokun.</i></footer>
 
 start_group: "<b>{emoji:💫} Buradayım!</b> Bir komut dene... Tabi benimle başa çıkabileceğini düşünüyorsan {emoji:😉}"
 

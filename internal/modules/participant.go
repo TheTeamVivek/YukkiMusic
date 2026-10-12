@@ -110,7 +110,7 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 
 		if c.Me != nil && userID == c.Me.Id && config.LeaveOnDemoted {
 			cleanScheduler.cancel(chatID)
-			core.DropRoom(chatID)
+			core.Rooms.Delete(chatID)
 			core.DropChatState(chatID)
 			if _, rerr := c.SendTextMessage(chatID, F(chatID, "bot_demotion_goodbye"), nil); rerr != nil {
 				utils.Log.Error(rerr.Error())
@@ -210,10 +210,10 @@ func handleAssistantRestriction(
 	utils.Log.Debug("Assistant banned in " + utils.IntToStr(chatID))
 
 	s.SetPresent(false)
-	if room, ok := core.RoomFor(chatID); ok {
+	if room, ok := core.Rooms.Get(chatID); ok {
 		scheduleOldPlayingMessage(room)
 	}
-	core.DropRoom(chatID)
+	core.Rooms.Delete(chatID)
 
 	err := c.SetChatMemberStatus(
 		chatID,

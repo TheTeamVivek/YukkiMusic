@@ -72,7 +72,7 @@ func handlePosition(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	r.Parse()
+	r.Refresh()
 
 	title := utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25))
 	_, rerr := m.ReplyText(c, F(chatID, "position_now", locales.Arg{

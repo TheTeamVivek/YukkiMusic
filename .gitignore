@@ -8,6 +8,8 @@ libtdjson.*
 .env
 
 /app
+/yukkimusic
+/yukkimusic.log
 downloads/
 database/
 *.db

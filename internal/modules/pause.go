@@ -74,9 +74,7 @@ func handlePause(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	var pauseErr error
-	_, pauseErr = r.Pause()
-	if pauseErr != nil {
+	if pauseErr := r.Pause(); pauseErr != nil {
 		_, err := m.ReplyText(c, F(chatID, "room_pause_failed", locales.Arg{
 			"error": pauseErr.Error(),
 		}), nil)

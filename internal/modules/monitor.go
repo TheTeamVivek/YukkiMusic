@@ -32,40 +32,26 @@ func MonitorRooms() {
 	sem := make(chan struct{}, 20)
 
 	for range ticker.C {
-		for _, room := range core.AllRooms() {
+		for _, room := range core.Rooms.All() {
 
 			sem <- struct{}{}
 
-			go func(r *core.RoomState) {
+			go func(r *core.Room) {
 				defer func() { <-sem }()
 
-				if !r.Active() {
-					/*
-						// TODO: TEST IT AND INCREASE SLEEP TIME
-						time.Sleep(5 * time.Second)
-
-						if !r.Active() {
-							core.DropRoom(chatID)
-							return
-						}
-					*/
+				snap := r.Snapshot()
+				if !snap.Active() || snap.Paused {
 					return
 				}
 
-				if r.Paused() {
-					return
-				}
-
-				r.Parse()
-
-				track := r.Track()
+				track := snap.Track
 				statusMsg := r.StatusMsg()
-				if track == nil || statusMsg == nil {
+				if statusMsg == nil {
 					return
 				}
 
-				text := nowPlayingText(r.ChatID, track)
-				markup := core.GetPlayMarkup(r.ChatID, r, false)
+				text := nowPlayingText(r.ControlChatID, track)
+				markup := core.GetPlayMarkup(r.ControlChatID, r, false)
 
 				switch statusMsg.Content.(type) {
 				case *td.MessagePhoto:

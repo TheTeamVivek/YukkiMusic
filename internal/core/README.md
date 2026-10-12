@@ -8,7 +8,7 @@ This package provides thread-safe access to the bot's state across multiple goro
 
 ## 📦 Key types
 
-- **`RoomState`**: Represents an active voice chat playback session. It holds the current track, playback position, queue, and speed. It also manages scheduled timers for auto-resume and auto-unmute.
+- **`Room`**: Represents an active voice chat playback session. It holds the current track, playback position, queue, and speed. It also manages scheduled timers for auto-resume and auto-unmute.
 - **`ChatState`**: Tracks transient chat metadata such as whether the assistant is present, banned, or if the voice chat is active. It handles the logic for the assistant joining a chat.
 - **`Assistant`**: Wraps a Telegram client and its associated media context (`ntgcalls` wrapper). Each assistant represents a separate Telegram account used for streaming.
 - **`AssistantManager`**: Manages the pool of available assistants and handles their distribution across different chats.
@@ -17,7 +17,7 @@ This package provides thread-safe access to the bot's state across multiple goro
 ## 🚀 Usage
 
 ### 🎵 Room Management
-The `RoomState` is the primary entry point for playback control.
+The `Room` is the primary entry point for playback control.
 
 ```go
 // Get or create a room for a chat
@@ -25,7 +25,7 @@ ass, err := core.Assistants.ForChat(chatID)
 if err != nil {
     return err
 }
-room := core.CreateRoom(chatID, ass)
+room := core.Rooms.GetOrCreate(chatID, ass)
 
 // Add a track to the queue and start playing if idle
 err := room.Play(track, localPath, false)
@@ -53,10 +53,10 @@ if !present {
 
 ## 🔒 Concurrency
 
-All state types (`RoomState`, `ChatState`, `AssistantManager`) are thread-safe. They use internal `sync.RWMutex` locks to protect their fields. Methods that modify state (like `Play`, `Pause`, `SetLoop`) handle locking internally. 
+All state types (`Room`, `ChatState`, `AssistantManager`) are thread-safe. They use internal `sync.RWMutex` locks to protect their fields. Methods that modify state (like `Play`, `Pause`, `SetLoop`) handle locking internally. 
 
 > [!WARNING]
-> **Deadlock Avoidance**: When calling methods that modify `RoomState.Data` while holding the `RoomState` lock, use caution. Internal methods like `cleanupFile` and `updatePosition` are designed to be safe when called from within the state machine.
+> **Deadlock Avoidance**: When calling methods that modify `Room` while holding the `Room` lock, use caution. Internal helpers like `cleanupFile` and `player.sync` are designed to be safe when called from within the state machine.
 
 ## 🏗️ What core does not own
 
@@ -71,6 +71,6 @@ All state types (`RoomState`, `ChatState`, `AssistantManager`) are thread-safe. 
 > **Initialization**: `core.Init()` must be called during bot startup to initialize the bot client and all configured assistants. It returns a shutdown function and an error.
 
 > [!IMPORTANT]
-> **Cleanup**: `DropRoom(chatID)` must be called when a session ends to stop playback, clean up temporary files, and release resources.
+> **Cleanup**: `core.Rooms.Delete(chatID)` must be called when a session ends to stop playback, clean up temporary files, and release resources.
 
 - **Assistant Indexing**: `database.InitAssistantIndexes(count)` must be called once at startup to seed the assistant pool and distribute chats evenly. All chat-to-assistant assignment and persistence lives in the `database` package (`GetAssistant`/`SaveAssistant`), which `core` calls directly.

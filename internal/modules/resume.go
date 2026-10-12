@@ -78,7 +78,7 @@ func handleResume(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	t := r.Track()
-	if _, err := r.Resume(); err != nil {
+	if err := r.Resume(); err != nil {
 		if _, rerr := m.ReplyText(c, F(chatID, "resume_failed", locales.Arg{
 			"error": err,
 		}), nil); rerr != nil {

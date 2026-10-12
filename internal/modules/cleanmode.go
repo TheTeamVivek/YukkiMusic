@@ -37,7 +37,7 @@ func cleanModeReadHandler(c *td.Client, upd *td.UpdateChatReadOutbox) error {
 }
 
 func currentPlayingStatusMessageID(chatID int64) int64 {
-	room, ok := core.RoomFor(chatID)
+	room, ok := core.Rooms.Get(chatID)
 	if !ok || room == nil {
 		return 0
 	}
@@ -142,7 +142,7 @@ func (s *CleanScheduler) flushDue(deadline time.Time) {
 	}
 }
 
-func scheduleOldPlayingMessage(r *core.RoomState) {
+func scheduleOldPlayingMessage(r *core.Room) {
 	if m := r.StatusMsg(); m != nil {
 		cleanScheduler.schedule(m.ChatId, m.Id)
 	}

@@ -119,10 +119,10 @@ func SuppMarkup(chatID int64) td.ReplyMarkup {
 
 func GetStopConfirmMarkup(
 	chatID int64,
-	r *RoomState,
+	r *Room,
 	isPaused bool,
 ) td.ReplyMarkup {
-	prefix := fmt.Sprintf("room:%d:", r.ID)
+	prefix := fmt.Sprintf("room:%d:", r.ChatID)
 
 	text, cb := "CONFIRM_UNMUTE_BTN", prefix+"unmute"
 
@@ -146,8 +146,8 @@ func GetStopConfirmMarkup(
 	}
 }
 
-func GetPlayMarkup(chatID int64, r *RoomState, queued bool) td.ReplyMarkup {
-	prefix := fmt.Sprintf("room:%d:", r.ID)
+func GetPlayMarkup(chatID int64, r *Room, queued bool) td.ReplyMarkup {
+	prefix := fmt.Sprintf("room:%d:", r.ChatID)
 	track := r.Track()
 	duration := 0
 	if track != nil {

@@ -52,7 +52,7 @@ func autoplayHandler(c *td.Client, m *td.Message) error {
 	}
 
 	chatID := m.ChatID()
-	r, ok := core.RoomFor(chatID)
+	r, ok := core.Rooms.Get(chatID)
 	if !ok || !r.Active() {
 		_, err := m.ReplyText(c, F(chatID, "autoplay_no_active"), nil)
 		return err
@@ -69,7 +69,7 @@ func autoplayHandler(c *td.Client, m *td.Message) error {
 func autoplayCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	chatID := u.ChatId
 
-	r, ok := core.RoomFor(chatID)
+	r, ok := core.Rooms.Get(chatID)
 	if !ok || !r.Active() {
 		_ = u.Answer(c, 0, true, F(chatID, "autoplay_no_active"), "")
 		return nil
@@ -138,7 +138,7 @@ func autoplayMenu(chatID int64, enabled bool) (string, *td.ReplyMarkupInlineKeyb
 // pickAutoplayTrack resolves a recommended track to keep playback going once
 // the user queue is empty. It returns nil when autoplay is disabled, the last
 // track is not from YouTube, or no suitable recommendation was found.
-func pickAutoplayTrack(r *core.RoomState, last *state.Track) *state.Track {
+func pickAutoplayTrack(r *core.Room, last *state.Track) *state.Track {
 	if r == nil || last == nil || !r.Autoplay() ||
 		last.Source != platforms.PlatformYouTube {
 		return nil
@@ -169,7 +169,7 @@ func pickAutoplayTrack(r *core.RoomState, last *state.Track) *state.Track {
 		seen[t.URL] = struct{}{}
 	}
 
-	requester := F(r.ChatID, "autoplay_requester")
+	requester := F(r.ControlChatID, "autoplay_requester")
 	rand.Shuffle(len(candidates), func(i, j int) {
 		candidates[i], candidates[j] = candidates[j], candidates[i]
 	})

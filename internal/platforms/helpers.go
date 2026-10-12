@@ -51,8 +51,7 @@ func isDownloadCancelled(err error) bool {
 	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 		return true
 	}
-	var tdErr *td.Error
-	if errors.As(err, &tdErr) {
+	if tdErr, ok := errors.AsType[*td.Error](err); ok {
 		return strings.Contains(strings.ToLower(tdErr.Message), "cancel")
 	}
 	return false

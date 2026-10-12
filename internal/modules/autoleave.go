@@ -162,7 +162,7 @@ func (s *autoLeaveService) loop(stop chan struct{}) {
 
 // runCycle scans every assistant's chats and leaves the inactive ones.
 func (s *autoLeaveService) runCycle() {
-	activeRooms := core.AllRooms()
+	activeRooms := core.Rooms.All()
 	core.Assistants.ForEach(func(a *core.Assistant) {
 		if a == nil || a.Client == nil {
 			return
@@ -173,7 +173,7 @@ func (s *autoLeaveService) runCycle() {
 
 func (s *autoLeaveService) leaveInactiveChats(
 	ass *core.Assistant,
-	activeRooms map[int64]*core.RoomState,
+	activeRooms map[int64]*core.Room,
 ) {
 	left := 0
 

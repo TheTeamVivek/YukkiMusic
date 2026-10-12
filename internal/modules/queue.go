@@ -202,7 +202,7 @@ func handleRemove(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	if len(r.Queue()) == 0 {
+	if r.QueueLen() == 0 {
 		_, err := m.ReplyText(c, F(chatID, "queue_empty"), nil)
 		return err
 	}
@@ -226,7 +226,7 @@ func handleRemove(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	total := len(r.Queue())
+	total := r.QueueLen()
 	if index > total {
 		_, err := m.ReplyText(c, F(chatID, "remove_index_too_big", locales.Arg{
 			"total": total,
@@ -267,12 +267,12 @@ func handleClear(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	if len(r.Queue()) == 0 {
+	if r.QueueLen() == 0 {
 		_, err := m.ReplyText(c, F(chatID, "queue_empty"), nil)
 		return err
 	}
 
-	r.RemoveTrack(-1)
+	r.ClearQueue()
 
 	sender, _ := m.GetUser(c)
 	mention := mentionOf(sender, m.SenderID())
@@ -304,7 +304,7 @@ func handleMove(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	if len(r.Queue()) == 0 {
+	if r.QueueLen() == 0 {
 		_, err := m.ReplyText(c, F(chatID, "queue_empty"), nil)
 		return err
 	}
@@ -331,7 +331,7 @@ func handleMove(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	queueLen := len(r.Queue())
+	queueLen := r.QueueLen()
 	if from > queueLen || to > queueLen {
 		_, err := m.ReplyText(c, F(chatID, "move_invalid_indexes_max", locales.Arg{
 			"queue_len": queueLen,

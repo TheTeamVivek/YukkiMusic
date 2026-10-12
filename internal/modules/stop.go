@@ -80,7 +80,7 @@ func handleStop(c *td.Client, m *td.Message, cplay bool) error {
 	if isPaused || isMuted {
 		stopSuggestFloodKey := fmt.Sprintf(
 			"stop_suggest:%d",
-			r.ID,
+			r.ChatID,
 		)
 		if utils.GetFlood(stopSuggestFloodKey) <= 0 {
 			utils.SetFlood(stopSuggestFloodKey, stopConfirmSuggestionCooldown)
@@ -96,7 +96,7 @@ func handleStop(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	scheduleOldPlayingMessage(r)
-	core.DropRoom(r.ID)
+	core.Rooms.Delete(r.ChatID)
 	_, rerr := m.ReplyText(
 		c,
 		F(

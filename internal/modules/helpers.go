@@ -33,7 +33,7 @@ import (
 	"yukkimusic/internal/utils"
 )
 
-func getEffectiveRoom(chatID int64, cplay bool) (*core.RoomState, error) {
+func getEffectiveRoom(chatID int64, cplay bool) (*core.Room, error) {
 	origChatID := chatID
 
 	if cplay {
@@ -47,10 +47,10 @@ func getEffectiveRoom(chatID int64, cplay bool) (*core.RoomState, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get assistant for your chat: %w", err)
 	}
-	r := core.CreateRoom(chatID, ass)
+	r := core.Rooms.GetOrCreate(chatID, ass)
 
 	if cplay {
-		r.ChatID = origChatID
+		r.ControlChatID = origChatID
 	}
 	return r, nil
 }
@@ -83,7 +83,7 @@ func sendNowPlaying(
 	c *td.Client,
 	statusMsg *td.Message,
 	chatID int64,
-	r *core.RoomState,
+	r *core.Room,
 	t *state.Track,
 ) *td.Message {
 	return showTrackMessage(c, statusMsg, chatID, r, t, nowPlayingText(chatID, t), false)
@@ -96,7 +96,7 @@ func showTrackMessage(
 	c *td.Client,
 	statusMsg *td.Message,
 	chatID int64,
-	r *core.RoomState,
+	r *core.Room,
 	t *state.Track,
 	msgText string,
 	queued bool,

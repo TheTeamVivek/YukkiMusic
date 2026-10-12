@@ -39,25 +39,25 @@ func streamEndHandler(
 	}
 
 	utils.Log.Debugf("[onStreamEndHandler] Stream ended in chat %d", chatID)
-	r, ok := core.RoomFor(chatID)
+	r, ok := core.Rooms.Get(chatID)
 	if !ok {
 		return
 	}
 	scheduleOldPlayingMessage(r)
 
 	c := core.Bot
-	cid := r.ChatID
-	r.Parse()
+	cid := r.ControlChatID
+	r.Refresh()
 
 	var t *state.Track
 	var wasLooping bool
-	if len(r.Queue()) == 0 && r.Loop() == 0 {
+	if r.QueueLen() == 0 && r.Loop() == 0 {
 		if autoplay := pickAutoplayTrack(r, r.Track()); autoplay != nil {
-			r.AddTracks([]*state.Track{autoplay})
+			r.AddTracks(autoplay)
 		}
 
-		if len(r.Queue()) == 0 {
-			core.DropRoom(chatID)
+		if r.QueueLen() == 0 {
+			core.Rooms.Delete(chatID)
 			if _, err := c.SendTextMessage(cid, F(cid, "stream_queue_finished"), nil); err != nil {
 				utils.Log.Error(err.Error())
 			}
@@ -98,7 +98,7 @@ func streamEndHandler(
 		utils.EOR(c, statusMsg, F(cid, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		core.DropRoom(chatID)
+		core.Rooms.Delete(chatID)
 
 		return
 	}
@@ -110,7 +110,7 @@ func streamEndHandler(
 			err,
 		)
 		utils.EOR(c, statusMsg, F(cid, "stream_play_fail"), nil)
-		core.DropRoom(chatID)
+		core.Rooms.Delete(chatID)
 
 		return
 	}

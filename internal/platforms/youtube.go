@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -591,8 +592,8 @@ func safeStr(v any) string {
 func parseDuration(s string) int {
 	parts := strings.Split(s, ":")
 	total, mult := 0, 1
-	for i := len(parts) - 1; i >= 0; i-- {
-		total += atoi(parts[i]) * mult
+	for _, part := range slices.Backward(parts) {
+		total += atoi(part) * mult
 		mult *= 60
 	}
 	return total
