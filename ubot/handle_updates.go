@@ -12,7 +12,7 @@ import (
 )
 
 type participantUpdate struct {
-	participantId      int64
+	participantID      int64
 	participant        *tg.GroupCallParticipant
 	wasCamera          bool
 	wasScreen          bool
@@ -31,14 +31,14 @@ var (
 	ErrConnectionFailed  = errors.New("connection failed")
 )
 
-func (ctx *Context) handleUpdates() {
+func (ctx *Context) registerHandlers() {
 	ctx.app.AddRawHandler(
 		&tg.UpdatePhoneCallSignalingData{},
 		func(m tg.Update, c *tg.Client) error {
 			signalingData := m.(*tg.UpdatePhoneCallSignalingData)
-			userId, err := ctx.convertCallId(signalingData.PhoneCallID)
+			userID, err := ctx.convertCallID(signalingData.PhoneCallID)
 			if err == nil {
-				_ = ctx.binding.SendSignalingData(userId, signalingData.Data)
+				_ = ctx.binding.SendSignalingData(userID, signalingData.Data)
 			}
 			return nil
 		},
@@ -51,31 +51,31 @@ func (ctx *Context) handleUpdates() {
 
 			var ID int64
 			var AccessHash int64
-			var userId int64
+			var userID int64
 
 			switch call := phoneCall.(type) {
 			case *tg.PhoneCallAccepted:
-				userId = call.ParticipantID
+				userID = call.ParticipantID
 				ID = call.ID
 				AccessHash = call.AccessHash
 			case *tg.PhoneCallWaiting:
-				userId = call.ParticipantID
+				userID = call.ParticipantID
 				ID = call.ID
 				AccessHash = call.AccessHash
 			case *tg.PhoneCallRequested:
-				userId = call.AdminID
+				userID = call.AdminID
 				ID = call.ID
 				AccessHash = call.AccessHash
 			case *tg.PhoneCallObj:
-				userId = call.AdminID
+				userID = call.AdminID
 			case *tg.PhoneCallDiscarded:
-				userId, _ = ctx.convertCallId(call.ID)
+				userID, _ = ctx.convertCallID(call.ID)
 			}
 
 			switch phoneCall.(type) {
 			case *tg.PhoneCallAccepted, *tg.PhoneCallRequested, *tg.PhoneCallWaiting:
 				ctx.inputCallsMutex.Lock()
-				ctx.inputCalls[userId] = &tg.InputPhoneCall{
+				ctx.inputCalls[userID] = &tg.InputPhoneCall{
 					ID:         ID,
 					AccessHash: AccessHash,
 				}
@@ -83,7 +83,7 @@ func (ctx *Context) handleUpdates() {
 			}
 
 			ctx.p2pConfigsMutex.RLock()
-			p2pConfig := ctx.p2pConfigs[userId]
+			p2pConfig := ctx.p2pConfigs[userID]
 			ctx.p2pConfigsMutex.RUnlock()
 
 			switch call := phoneCall.(type) {
@@ -109,36 +109,36 @@ func (ctx *Context) handleUpdates() {
 
 				switch call.Reason.(type) {
 				case *tg.PhoneCallDiscardReasonBusy:
-					reasonMessage = fmt.Sprintf("the user %d is busy", userId)
+					reasonMessage = fmt.Sprintf("the user %d is busy", userID)
 				case *tg.PhoneCallDiscardReasonHangup:
-					reasonMessage = fmt.Sprintf("call declined by %d", userId)
+					reasonMessage = fmt.Sprintf("call declined by %d", userID)
 				}
 				if p2pConfig != nil {
 					p2pConfig.WaitData <- errors.New(reasonMessage)
 				}
 				ctx.inputCallsMutex.Lock()
-				delete(ctx.inputCalls, userId)
+				delete(ctx.inputCalls, userID)
 				ctx.inputCallsMutex.Unlock()
 
-				ctx.binding.Stop(userId)
+				ctx.binding.Stop(userID)
 
 			case *tg.PhoneCallRequested:
 				if p2pConfig == nil {
-					p2pConfigs, err := ctx.getP2PConfigs(call.GAHash)
+					p2pConfigs, err := ctx.newP2PConfig(call.GAHash)
 					if err != nil {
 						return err
 					}
 					ctx.p2pConfigsMutex.Lock()
-					ctx.p2pConfigs[userId] = p2pConfigs
+					ctx.p2pConfigs[userID] = p2pConfigs
 					ctx.p2pConfigsMutex.Unlock()
 
 					ctx.callbacksMutex.RLock()
-					callbacks := make([]func(client *Context, chatId int64), len(ctx.incomingCallCallbacks))
+					callbacks := make([]func(client *Context, chatID int64), len(ctx.incomingCallCallbacks))
 					copy(callbacks, ctx.incomingCallCallbacks)
 					ctx.callbacksMutex.RUnlock()
 
 					for _, callback := range callbacks {
-						go callback(ctx, userId)
+						go callback(ctx, userID)
 					}
 				}
 			}
@@ -150,7 +150,7 @@ func (ctx *Context) handleUpdates() {
 		&tg.UpdateGroupCallParticipants{},
 		func(m tg.Update, c *tg.Client) error {
 			participantsUpdate := m.(*tg.UpdateGroupCallParticipants)
-			chatId, err := ctx.convertGroupCallId(
+			chatID, err := ctx.convertGroupCallID(
 				participantsUpdate.Call.(*tg.InputGroupCallObj).ID,
 			)
 			if err != nil {
@@ -161,9 +161,9 @@ func (ctx *Context) handleUpdates() {
 			var selfUpdate *tg.GroupCallParticipant
 
 			ctx.participantsMutex.Lock()
-			if ctx.callParticipants[chatId] == nil {
-				ctx.callParticipants[chatId] = &CallParticipantsCache{
-					CallParticipants: make(map[int64]*tg.GroupCallParticipant),
+			if ctx.callParticipants[chatID] == nil {
+				ctx.callParticipants[chatID] = &CallParticipantsCache{
+					Participants: make(map[int64]*tg.GroupCallParticipant),
 				}
 			}
 
@@ -171,31 +171,31 @@ func (ctx *Context) handleUpdates() {
 			if ctx.callSources == nil {
 				ctx.callSources = make(map[int64]*CallSources)
 			}
-			if ctx.callSources[chatId] == nil {
-				ctx.callSources[chatId] = &CallSources{
-					CameraSources: make(map[int64]string),
-					ScreenSources: make(map[int64]string),
+			if ctx.callSources[chatID] == nil {
+				ctx.callSources[chatID] = &CallSources{
+					Camera: make(map[int64]string),
+					Screen: make(map[int64]string),
 				}
 			}
 
 			for _, participant := range participantsUpdate.Participants {
-				participantId := getParticipantId(participant.Peer)
+				participantID := getParticipantID(participant.Peer)
 
 				if participant.Left {
 					delete(
-						ctx.callParticipants[chatId].CallParticipants,
-						participantId,
+						ctx.callParticipants[chatID].Participants,
+						participantID,
 					)
 
 					var oldCamera, oldScreen string
-					oldCamera = ctx.callSources[chatId].CameraSources[participantId]
-					oldScreen = ctx.callSources[chatId].ScreenSources[participantId]
-					delete(ctx.callSources[chatId].CameraSources, participantId)
-					delete(ctx.callSources[chatId].ScreenSources, participantId)
+					oldCamera = ctx.callSources[chatID].Camera[participantID]
+					oldScreen = ctx.callSources[chatID].Screen[participantID]
+					delete(ctx.callSources[chatID].Camera, participantID)
+					delete(ctx.callSources[chatID].Screen, participantID)
 
 					if oldCamera != "" || oldScreen != "" {
 						updates = append(updates, participantUpdate{
-							participantId:     participantId,
+							participantID:     participantID,
 							participant:       participant,
 							oldCameraEndpoint: oldCamera,
 							oldScreenEndpoint: oldScreen,
@@ -204,15 +204,15 @@ func (ctx *Context) handleUpdates() {
 					continue
 				}
 
-				ctx.callParticipants[chatId].CallParticipants[participantId] = participant
+				ctx.callParticipants[chatID].Participants[participantID] = participant
 
-				wasCamera := ctx.callSources[chatId].CameraSources[participantId] != ""
-				wasScreen := ctx.callSources[chatId].ScreenSources[participantId] != ""
+				wasCamera := ctx.callSources[chatID].Camera[participantID] != ""
+				wasScreen := ctx.callSources[chatID].Screen[participantID] != ""
 				hasCamera := participant.Video != nil
 				hasScreen := participant.Presentation != nil
 
 				update := participantUpdate{
-					participantId: participantId,
+					participantID: participantID,
 					participant:   participant,
 					wasCamera:     wasCamera,
 					wasScreen:     wasScreen,
@@ -223,19 +223,19 @@ func (ctx *Context) handleUpdates() {
 				if hasCamera && !wasCamera {
 					update.cameraEndpoint = participant.Video.Endpoint
 					update.cameraSourceGroups = participant.Video.SourceGroups
-					ctx.callSources[chatId].CameraSources[participantId] = participant.Video.Endpoint
+					ctx.callSources[chatID].Camera[participantID] = participant.Video.Endpoint
 				} else if !hasCamera && wasCamera {
-					update.oldCameraEndpoint = ctx.callSources[chatId].CameraSources[participantId]
-					delete(ctx.callSources[chatId].CameraSources, participantId)
+					update.oldCameraEndpoint = ctx.callSources[chatID].Camera[participantID]
+					delete(ctx.callSources[chatID].Camera, participantID)
 				}
 
 				if hasScreen && !wasScreen {
 					update.screenEndpoint = participant.Presentation.Endpoint
 					update.screenSourceGroups = participant.Presentation.SourceGroups
-					ctx.callSources[chatId].ScreenSources[participantId] = participant.Presentation.Endpoint
+					ctx.callSources[chatID].Screen[participantID] = participant.Presentation.Endpoint
 				} else if !hasScreen && wasScreen {
-					update.oldScreenEndpoint = ctx.callSources[chatId].ScreenSources[participantId]
-					delete(ctx.callSources[chatId].ScreenSources, participantId)
+					update.oldScreenEndpoint = ctx.callSources[chatID].Screen[participantID]
+					delete(ctx.callSources[chatID].Screen, participantID)
 				}
 
 				if update.cameraEndpoint != "" || update.screenEndpoint != "" ||
@@ -243,49 +243,49 @@ func (ctx *Context) handleUpdates() {
 					updates = append(updates, update)
 				}
 
-				if participantId == ctx.self.ID {
+				if participantID == ctx.me.ID {
 					selfUpdate = participant
 				}
 			}
 
-			ctx.callParticipants[chatId].LastMtprotoUpdate = time.Now()
+			ctx.callParticipants[chatID].lastUpdate = time.Now()
 			ctx.callSourcesMutex.Unlock()
 			ctx.participantsMutex.Unlock()
 
 			for _, update := range updates {
 				if update.cameraEndpoint != "" {
 					_, _ = ctx.binding.AddIncomingVideo(
-						chatId,
-						update.participantId,
+						chatID,
+						update.participantID,
 						update.cameraEndpoint,
 						parseVideoSources(update.cameraSourceGroups),
 					)
 				}
 				if update.oldCameraEndpoint != "" {
 					_, _ = ctx.binding.RemoveIncomingVideo(
-						chatId,
+						chatID,
 						update.oldCameraEndpoint,
 					)
 				}
 
 				if update.screenEndpoint != "" {
 					_, _ = ctx.binding.AddIncomingVideo(
-						chatId,
-						update.participantId,
+						chatID,
+						update.participantID,
 						update.screenEndpoint,
 						parseVideoSources(update.screenSourceGroups),
 					)
 				}
 				if update.oldScreenEndpoint != "" {
 					_, _ = ctx.binding.RemoveIncomingVideo(
-						chatId,
+						chatID,
 						update.oldScreenEndpoint,
 					)
 				}
 			}
 
 			if selfUpdate != nil {
-				connectionMode, err := ctx.binding.GetConnectionMode(chatId)
+				connectionMode, err := ctx.binding.GetConnectionMode(chatID)
 				if err != nil {
 					return nil
 				}
@@ -293,12 +293,12 @@ func (ctx *Context) handleUpdates() {
 				if connectionMode == ntgcalls.StreamConnection &&
 					selfUpdate.CanSelfUnmute {
 					ctx.pendingConnectionsMutex.RLock()
-					pending := ctx.pendingConnections[chatId]
+					pending := ctx.pendingConnections[chatID]
 					ctx.pendingConnectionsMutex.RUnlock()
 
 					if pending != nil {
 						ctx.connectCall(
-							chatId,
+							chatID,
 							pending.MediaDescription,
 							pending.Payload,
 						)
@@ -306,21 +306,21 @@ func (ctx *Context) handleUpdates() {
 
 				} else if !selfUpdate.CanSelfUnmute {
 					ctx.mutedByAdminMutex.Lock()
-					if !slices.Contains(ctx.mutedByAdmin, chatId) {
-						ctx.mutedByAdmin = append(ctx.mutedByAdmin, chatId)
+					if !slices.Contains(ctx.mutedByAdmin, chatID) {
+						ctx.mutedByAdmin = append(ctx.mutedByAdmin, chatID)
 					}
 					ctx.mutedByAdminMutex.Unlock()
 
 				} else {
 					ctx.mutedByAdminMutex.Lock()
-					wasMuted := slices.Contains(ctx.mutedByAdmin, chatId)
+					wasMuted := slices.Contains(ctx.mutedByAdmin, chatID)
 					if wasMuted {
-						ctx.mutedByAdmin = stdRemove(ctx.mutedByAdmin, chatId)
+						ctx.mutedByAdmin = stdRemove(ctx.mutedByAdmin, chatID)
 					}
 					ctx.mutedByAdminMutex.Unlock()
 
 					if wasMuted {
-						state, err := ctx.binding.GetState(chatId)
+						state, err := ctx.binding.GetState(chatID)
 						if err != nil {
 							return nil
 						}
@@ -340,7 +340,7 @@ func (ctx *Context) handleUpdates() {
 		func(m tg.Update, c *tg.Client) error {
 			updateGroupCall := m.(*tg.UpdateGroupCall)
 			if groupCallRaw := updateGroupCall.Call; groupCallRaw != nil {
-				chatID, err := ctx.parseChatId(updateGroupCall.Peer)
+				chatID, err := ctx.parseChatID(updateGroupCall.Peer)
 				if err != nil {
 					return err
 				}
@@ -365,9 +365,9 @@ func (ctx *Context) handleUpdates() {
 		},
 	)
 
-	ctx.binding.OnRequestBroadcastTimestamp(func(chatId int64) {
+	ctx.binding.OnRequestBroadcastTimestamp(func(chatID int64) {
 		ctx.inputGroupCallsMutex.RLock()
-		inputGroupCall := ctx.inputGroupCalls[chatId]
+		inputGroupCall := ctx.inputGroupCalls[chatID]
 		ctx.inputGroupCallsMutex.RUnlock()
 
 		if inputGroupCall != nil {
@@ -376,7 +376,7 @@ func (ctx *Context) handleUpdates() {
 			)
 			if err == nil {
 				_ = ctx.binding.SendBroadcastTimestamp(
-					chatId,
+					chatID,
 					channels.Channels[0].LastTimestampMs,
 				)
 			}
@@ -384,9 +384,9 @@ func (ctx *Context) handleUpdates() {
 	})
 
 	ctx.binding.OnRequestBroadcastPart(
-		func(chatId int64, segmentPartRequest ntgcalls.SegmentPartRequest) {
+		func(chatID int64, segmentPartRequest ntgcalls.SegmentPartRequest) {
 			ctx.inputGroupCallsMutex.RLock()
-			inputGroupCall := ctx.inputGroupCalls[chatId]
+			inputGroupCall := ctx.inputGroupCalls[chatID]
 			ctx.inputGroupCallsMutex.RUnlock()
 
 			if inputGroupCall != nil {
@@ -422,7 +422,7 @@ func (ctx *Context) handleUpdates() {
 				}
 
 				_ = ctx.binding.SendBroadcastPart(
-					chatId,
+					chatID,
 					segmentPartRequest.SegmentID,
 					segmentPartRequest.PartID,
 					status,
@@ -433,18 +433,18 @@ func (ctx *Context) handleUpdates() {
 		},
 	)
 
-	ctx.binding.OnSignal(func(chatId int64, signal []byte) {
+	ctx.binding.OnSignal(func(chatID int64, signal []byte) {
 		ctx.inputCallsMutex.RLock()
-		inputCall := ctx.inputCalls[chatId]
+		inputCall := ctx.inputCalls[chatID]
 		ctx.inputCallsMutex.RUnlock()
 
 		_, _ = ctx.app.PhoneSendSignalingData(inputCall, signal)
 	})
 
 	ctx.binding.OnConnectionChange(
-		func(chatId int64, state ntgcalls.NetworkInfo) {
+		func(chatID int64, state ntgcalls.NetworkInfo) {
 			ctx.waitConnectMutex.RLock()
-			waitChan := ctx.waitConnect[chatId]
+			waitChan := ctx.waitConnect[chatID]
 			ctx.waitConnectMutex.RUnlock()
 
 			if waitChan != nil {
@@ -461,9 +461,9 @@ func (ctx *Context) handleUpdates() {
 		},
 	)
 
-	ctx.binding.OnUpgrade(func(chatId int64, state ntgcalls.MediaState) {
+	ctx.binding.OnUpgrade(func(chatID int64, state ntgcalls.MediaState) {
 		ctx.inputGroupCallsMutex.RLock()
-		inputGroupCall := ctx.inputGroupCalls[chatId]
+		inputGroupCall := ctx.inputGroupCalls[chatID]
 		ctx.inputGroupCallsMutex.RUnlock()
 
 		if err := ctx.setCallStatus(inputGroupCall, state); err != nil {
@@ -472,7 +472,7 @@ func (ctx *Context) handleUpdates() {
 	})
 
 	ctx.binding.OnStreamEnd(
-		func(chatId int64, streamType ntgcalls.StreamType, streamDevice ntgcalls.StreamDevice) {
+		func(chatID int64, streamType ntgcalls.StreamType, streamDevice ntgcalls.StreamDevice) {
 			ctx.callbacksMutex.RLock()
 			callbacks := make(
 				[]ntgcalls.StreamEndCallback,
@@ -482,20 +482,20 @@ func (ctx *Context) handleUpdates() {
 			ctx.callbacksMutex.RUnlock()
 
 			for _, callback := range callbacks {
-				go callback(chatId, streamType, streamDevice)
+				go callback(chatID, streamType, streamDevice)
 			}
 		},
 	)
 
 	ctx.binding.OnFrame(
-		func(chatId int64, mode ntgcalls.StreamMode, device ntgcalls.StreamDevice, frames []ntgcalls.Frame) {
+		func(chatID int64, mode ntgcalls.StreamMode, device ntgcalls.StreamDevice, frames []ntgcalls.Frame) {
 			ctx.callbacksMutex.RLock()
 			callbacks := make([]ntgcalls.FrameCallback, len(ctx.frameCallbacks))
 			copy(callbacks, ctx.frameCallbacks)
 			ctx.callbacksMutex.RUnlock()
 
 			for _, callback := range callbacks {
-				go callback(chatId, mode, device, frames)
+				go callback(chatID, mode, device, frames)
 			}
 		},
 	)

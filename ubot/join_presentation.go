@@ -8,22 +8,22 @@ import (
 	"yukkimusic/ntgcalls"
 )
 
-func (ctx *Context) joinPresentation(chatId int64, join bool) error {
+func (ctx *Context) joinPresentation(chatID int64, join bool) error {
 	defer func() {
 		ctx.waitConnectMutex.Lock()
-		delete(ctx.waitConnect, chatId)
+		delete(ctx.waitConnect, chatID)
 		ctx.waitConnectMutex.Unlock()
 	}()
 
-	connectionMode, err := ctx.binding.GetConnectionMode(chatId)
+	connectionMode, err := ctx.binding.GetConnectionMode(chatID)
 	if err != nil {
 		return err
 	}
 
 	if connectionMode == ntgcalls.StreamConnection {
 		ctx.pendingConnectionsMutex.Lock()
-		if ctx.pendingConnections[chatId] != nil {
-			ctx.pendingConnections[chatId].Presentation = join
+		if ctx.pendingConnections[chatID] != nil {
+			ctx.pendingConnections[chatID].Presentation = join
 		}
 		ctx.pendingConnectionsMutex.Unlock()
 		return nil
@@ -35,7 +35,7 @@ func (ctx *Context) joinPresentation(chatId int64, join bool) error {
 
 	if join {
 		ctx.presentationsMutex.Lock()
-		alreadyPresenting := slices.Contains(ctx.presentations, chatId)
+		alreadyPresenting := slices.Contains(ctx.presentations, chatID)
 		ctx.presentationsMutex.Unlock()
 
 		if alreadyPresenting {
@@ -44,16 +44,16 @@ func (ctx *Context) joinPresentation(chatId int64, join bool) error {
 
 		ctx.waitConnectMutex.Lock()
 		waitChan := make(chan error)
-		ctx.waitConnect[chatId] = waitChan
+		ctx.waitConnect[chatID] = waitChan
 		ctx.waitConnectMutex.Unlock()
 
-		jsonParams, err := ctx.binding.InitPresentation(chatId)
+		jsonParams, err := ctx.binding.InitPresentation(chatID)
 		if err != nil {
 			return err
 		}
 
 		ctx.inputGroupCallsMutex.RLock()
-		inputGroupCall := ctx.inputGroupCalls[chatId]
+		inputGroupCall := ctx.inputGroupCalls[chatID]
 		ctx.inputGroupCallsMutex.RUnlock()
 
 		resultParams := "{\"transport\": null}"
@@ -75,7 +75,7 @@ func (ctx *Context) joinPresentation(chatId int64, join bool) error {
 			}
 		}
 
-		err = ctx.binding.Connect(chatId, resultParams, true)
+		err = ctx.binding.Connect(chatID, resultParams, true)
 		if err != nil {
 			return err
 		}
@@ -83,15 +83,15 @@ func (ctx *Context) joinPresentation(chatId int64, join bool) error {
 		<-waitChan
 
 		ctx.presentationsMutex.Lock()
-		ctx.presentations = append(ctx.presentations, chatId)
+		ctx.presentations = append(ctx.presentations, chatID)
 		ctx.presentationsMutex.Unlock()
 
 	} else {
 		// Leave presentation
 		ctx.presentationsMutex.Lock()
-		isPresenting := slices.Contains(ctx.presentations, chatId)
+		isPresenting := slices.Contains(ctx.presentations, chatID)
 		if isPresenting {
-			ctx.presentations = stdRemove(ctx.presentations, chatId)
+			ctx.presentations = stdRemove(ctx.presentations, chatID)
 		}
 		ctx.presentationsMutex.Unlock()
 
@@ -99,13 +99,13 @@ func (ctx *Context) joinPresentation(chatId int64, join bool) error {
 			return nil
 		}
 
-		err = ctx.binding.StopPresentation(chatId)
+		err = ctx.binding.StopPresentation(chatID)
 		if err != nil {
 			return err
 		}
 
 		ctx.inputGroupCallsMutex.RLock()
-		inputGroupCall := ctx.inputGroupCalls[chatId]
+		inputGroupCall := ctx.inputGroupCalls[chatID]
 		ctx.inputGroupCallsMutex.RUnlock()
 
 		_, err = ctx.app.PhoneLeaveGroupCallPresentation(inputGroupCall)

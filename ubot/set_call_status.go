@@ -14,8 +14,8 @@ func (ctx *Context) setCallStatus(
 		&tg.PhoneEditGroupCallParticipantParams{
 			Call: call,
 			Participant: &tg.InputPeerUser{
-				UserID:     ctx.self.ID,
-				AccessHash: ctx.self.AccessHash,
+				UserID:     ctx.me.ID,
+				AccessHash: ctx.me.AccessHash,
 			},
 			Muted:              state.Muted,
 			VideoPaused:        state.VideoPaused,

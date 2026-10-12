@@ -10,16 +10,16 @@ import (
 
 type (
 	CallParticipantsCache struct {
-		CallParticipants  map[int64]*tg.GroupCallParticipant
-		LastMtprotoUpdate time.Time
+		Participants map[int64]*tg.GroupCallParticipant
+		lastUpdate   time.Time
 	}
 
 	CallSources struct {
-		CameraSources, ScreenSources map[int64]string
+		Camera, Screen map[int64]string
 	}
 
 	P2PConfig struct {
-		DhConfig       *tg.MessagesDhConfigObj
+		DHConfig       *tg.MessagesDhConfigObj
 		PhoneCall      *tg.PhoneCallObj
 		IsOutgoing     bool
 		KeyFingerprint int64

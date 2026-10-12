@@ -6,59 +6,59 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 )
 
-func (ctx *Context) parseChatId(chatId any) (int64, error) {
-	var parsedChatId int64
-	switch v := chatId.(type) {
+func (ctx *Context) parseChatID(chatID any) (int64, error) {
+	var parsedChatID int64
+	switch v := chatID.(type) {
 	case int64:
-		parsedChatId = v
+		parsedChatID = v
 	case int:
-		parsedChatId = int64(v)
+		parsedChatID = int64(v)
 	case int32:
-		parsedChatId = int64(v)
+		parsedChatID = int64(v)
 	case int16:
-		parsedChatId = int64(v)
+		parsedChatID = int64(v)
 	case int8:
-		parsedChatId = int64(v)
+		parsedChatID = int64(v)
 	case string:
-		rawChat, err := ctx.app.ResolveUsername(chatId.(string))
+		rawChat, err := ctx.app.ResolveUsername(chatID.(string))
 		if err != nil {
 			return 0, fmt.Errorf("failed to resolve username: %w", err)
 		}
 		switch chat := rawChat.(type) {
 		case *tg.UserObj:
-			parsedChatId = chat.ID
+			parsedChatID = chat.ID
 		case *tg.ChatObj:
-			parsedChatId = -chat.ID
+			parsedChatID = -chat.ID
 		case *tg.Channel:
-			parsedChatId = -1000000000000 - chat.ID
+			parsedChatID = -1000000000000 - chat.ID
 		}
 	case tg.Peer:
 		switch p := v.(type) {
 		case *tg.PeerUser:
-			parsedChatId = p.UserID
+			parsedChatID = p.UserID
 		case *tg.PeerChat:
-			parsedChatId = -p.ChatID
+			parsedChatID = -p.ChatID
 		case *tg.PeerChannel:
-			parsedChatId = -1000000000000 - p.ChannelID
+			parsedChatID = -1000000000000 - p.ChannelID
 		}
 	default:
-		return 0, fmt.Errorf("unsupported chatId type: %T", chatId)
+		return 0, fmt.Errorf("unsupported chatID type: %T", chatID)
 	}
 
-	switch chatId.(type) {
+	switch chatID.(type) {
 	case int64, int, int32, int16, int8:
-		rawChat, err := ctx.app.GetInputPeer(parsedChatId)
+		rawChat, err := ctx.app.GetInputPeer(parsedChatID)
 		if err != nil {
 			return 0, fmt.Errorf("failed to resolve peer: %w", err)
 		}
 		switch chat := rawChat.(type) {
 		case *tg.InputPeerUser:
-			parsedChatId = chat.UserID
+			parsedChatID = chat.UserID
 		case *tg.InputPeerChat:
-			parsedChatId = -chat.ChatID
+			parsedChatID = -chat.ChatID
 		case *tg.InputPeerChannel:
-			parsedChatId = -1000000000000 - chat.ChannelID
+			parsedChatID = -1000000000000 - chat.ChannelID
 		}
 	}
-	return parsedChatId, nil
+	return parsedChatID, nil
 }

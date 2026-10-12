@@ -6,19 +6,19 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 )
 
-func (ctx *Context) GetInputGroupCall(chatId int64) (tg.InputGroupCall, error) {
+func (ctx *Context) GetInputGroupCall(chatID int64) (tg.InputGroupCall, error) {
 	ctx.inputGroupCallsMutex.RLock()
-	call, ok := ctx.inputGroupCalls[chatId]
+	call, ok := ctx.inputGroupCalls[chatID]
 	ctx.inputGroupCallsMutex.RUnlock()
 
 	if ok {
 		if call == nil {
-			return nil, fmt.Errorf("group call for chatId %d is closed", chatId)
+			return nil, fmt.Errorf("group call for chatID %d is closed", chatID)
 		}
 		return call, nil
 	}
 
-	peer, err := ctx.app.ResolvePeer(chatId)
+	peer, err := ctx.app.ResolvePeer(chatID)
 	if err != nil {
 		return nil, err
 	}
@@ -44,15 +44,15 @@ func (ctx *Context) GetInputGroupCall(chatId int64) (tg.InputGroupCall, error) {
 		}
 		retrievedCall = fullChat.FullChat.(*tg.ChatFullObj).Call
 	default:
-		return nil, fmt.Errorf("chatId %d is not a group call", chatId)
+		return nil, fmt.Errorf("chatID %d is not a group call", chatID)
 	}
 
 	ctx.inputGroupCallsMutex.Lock()
-	ctx.inputGroupCalls[chatId] = retrievedCall
+	ctx.inputGroupCalls[chatID] = retrievedCall
 	ctx.inputGroupCallsMutex.Unlock()
 
 	if retrievedCall == nil {
-		return nil, fmt.Errorf("group call for chatId %d is closed", chatId)
+		return nil, fmt.Errorf("group call for chatID %d is closed", chatID)
 	}
 	return retrievedCall, nil
 }

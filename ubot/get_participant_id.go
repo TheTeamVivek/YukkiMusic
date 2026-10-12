@@ -2,15 +2,15 @@ package ubot
 
 import tg "github.com/amarnathcjd/gogram/telegram"
 
-func getParticipantId(peer tg.Peer) int64 {
-	var participantId int64
+func getParticipantID(peer tg.Peer) int64 {
+	var participantID int64
 	switch chatObj := peer.(type) {
 	case *tg.PeerUser:
-		participantId = chatObj.UserID
+		participantID = chatObj.UserID
 	case *tg.PeerChannel:
-		participantId = chatObj.ChannelID
+		participantID = chatObj.ChannelID
 	case *tg.PeerChat:
-		participantId = chatObj.ChatID
+		participantID = chatObj.ChatID
 	}
-	return participantId
+	return participantID
 }

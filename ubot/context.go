@@ -12,7 +12,7 @@ import (
 type Context struct {
 	binding *ntgcalls.Client
 	app     *tg.Client
-	self    *tg.UserObj
+	me      *tg.UserObj
 
 	mutedByAdminMutex sync.RWMutex
 	mutedByAdmin      []int64
@@ -45,7 +45,7 @@ type Context struct {
 	waitConnect      map[int64]chan error
 
 	callbacksMutex        sync.RWMutex
-	incomingCallCallbacks []func(client *Context, chatId int64)
+	incomingCallCallbacks []func(client *Context, chatID int64)
 	streamEndCallbacks    []ntgcalls.StreamEndCallback
 	frameCallbacks        []ntgcalls.FrameCallback
 }
@@ -75,10 +75,10 @@ func NewContext(app *tg.Client) *Context {
 			}
 		}
 
-		client.self = me
+		client.me = me
 	}
 
-	client.handleUpdates()
+	client.registerHandlers()
 	return client
 }
 
@@ -126,7 +126,7 @@ func (ctx *Context) Play(
 		if err != nil {
 			return err
 		}
-		return ctx.updateSources(chatID)
+		return ctx.addIncomingSources(chatID)
 	}
 
 	return nil
@@ -189,7 +189,7 @@ func (ctx *Context) Stop(chatID int64) error {
 }
 
 func (ctx *Context) OnIncomingCall(
-	callback func(client *Context, chatId int64),
+	callback func(client *Context, chatID int64),
 ) {
 	ctx.callbacksMutex.Lock()
 	defer ctx.callbacksMutex.Unlock()
@@ -214,8 +214,8 @@ func (ctx *Context) Close() {
 	}
 
 	if calls, err := ctx.binding.Calls(); err == nil {
-		for chatId := range calls {
-			ctx.binding.Stop(chatId)
+		for chatID := range calls {
+			ctx.binding.Stop(chatID)
 		}
 	}
 

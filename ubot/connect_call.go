@@ -10,52 +10,52 @@ import (
 )
 
 func (ctx *Context) connectCall(
-	chatId int64,
+	chatID int64,
 	mediaDescription ntgcalls.MediaDescription,
 	jsonParams string,
 ) error {
 	ctx.waitConnectMutex.Lock()
 	waitChan := make(chan error)
-	ctx.waitConnect[chatId] = waitChan
+	ctx.waitConnect[chatID] = waitChan
 	ctx.waitConnectMutex.Unlock()
 
 	defer func() {
 		ctx.waitConnectMutex.Lock()
-		delete(ctx.waitConnect, chatId)
+		delete(ctx.waitConnect, chatID)
 		ctx.waitConnectMutex.Unlock()
 	}()
 
-	if chatId >= 0 {
+	if chatID >= 0 {
 		// P2P call handling
 		defer func() {
 			ctx.p2pConfigsMutex.Lock()
-			delete(ctx.p2pConfigs, chatId)
+			delete(ctx.p2pConfigs, chatID)
 			ctx.p2pConfigsMutex.Unlock()
 		}()
 
 		// Get or create P2P config
 		ctx.p2pConfigsMutex.Lock()
-		p2pConfig := ctx.p2pConfigs[chatId]
+		p2pConfig := ctx.p2pConfigs[chatID]
 		ctx.p2pConfigsMutex.Unlock()
 
 		if p2pConfig == nil {
 			var err error
-			p2pConfig, err = ctx.getP2PConfigs(nil)
+			p2pConfig, err = ctx.newP2PConfig(nil)
 			if err != nil {
 				return err
 			}
 			ctx.p2pConfigsMutex.Lock()
-			ctx.p2pConfigs[chatId] = p2pConfig
+			ctx.p2pConfigs[chatID] = p2pConfig
 			ctx.p2pConfigsMutex.Unlock()
 		}
 
-		err := ctx.binding.CreateP2PCall(chatId)
+		err := ctx.binding.CreateP2PCall(chatID)
 		if err != nil {
 			return err
 		}
 
 		err = ctx.binding.SetStreamSources(
-			chatId,
+			chatID,
 			ntgcalls.CaptureStream,
 			mediaDescription,
 		)
@@ -65,14 +65,14 @@ func (ctx *Context) connectCall(
 
 		ctx.p2pConfigsMutex.Lock()
 		dhConfig := ntgcalls.DhConfig{
-			G:      p2pConfig.DhConfig.G,
-			P:      p2pConfig.DhConfig.P,
-			Random: p2pConfig.DhConfig.Random,
+			G:      p2pConfig.DHConfig.G,
+			P:      p2pConfig.DHConfig.P,
+			Random: p2pConfig.DHConfig.Random,
 		}
 		gaOrB := p2pConfig.GAorB
 		ctx.p2pConfigsMutex.Unlock()
 
-		newGAorB, err := ctx.binding.InitExchange(chatId, dhConfig, gaOrB)
+		newGAorB, err := ctx.binding.InitExchange(chatID, dhConfig, gaOrB)
 		if err != nil {
 			return err
 		}
@@ -93,13 +93,13 @@ func (ctx *Context) connectCall(
 			LibraryVersions: protocolRaw.Versions,
 		}
 
-		userId, err := ctx.app.GetSendableUser(chatId)
+		userID, err := ctx.app.GetSendableUser(chatID)
 		if err != nil {
 			return err
 		}
 
 		ctx.inputCallsMutex.RLock()
-		inputCall := ctx.inputCalls[chatId]
+		inputCall := ctx.inputCalls[chatID]
 		ctx.inputCallsMutex.RUnlock()
 
 		ctx.p2pConfigsMutex.RLock()
@@ -111,7 +111,7 @@ func (ctx *Context) connectCall(
 			_, err = ctx.app.PhoneRequestCall(
 				&tg.PhoneRequestCallParams{
 					Protocol: protocol,
-					UserID:   userId,
+					UserID:   userID,
 					GAHash:   gaOrBHash,
 					RandomID: int32(tg.GenRandInt()),
 					Video: mediaDescription.Camera != nil ||
@@ -146,7 +146,7 @@ func (ctx *Context) connectCall(
 		fingerprint := p2pConfig.KeyFingerprint
 		ctx.p2pConfigsMutex.RUnlock()
 
-		res, err := ctx.binding.ExchangeKeys(chatId, gaOrB, fingerprint)
+		res, err := ctx.binding.ExchangeKeys(chatID, gaOrB, fingerprint)
 		if err != nil {
 			return err
 		}
@@ -175,7 +175,7 @@ func (ctx *Context) connectCall(
 		ctx.p2pConfigsMutex.RUnlock()
 
 		err = ctx.binding.ConnectP2P(
-			chatId,
+			chatID,
 			parseRTCServers(phoneCall.Connections),
 			phoneCall.Protocol.LibraryVersions,
 			phoneCall.P2PAllowed,
@@ -188,21 +188,21 @@ func (ctx *Context) connectCall(
 	} else {
 		// Group call handling
 		var err error
-		jsonParams, err = ctx.binding.CreateCall(chatId)
+		jsonParams, err = ctx.binding.CreateCall(chatID)
 		if err != nil {
-			ctx.binding.Stop(chatId)
+			ctx.binding.Stop(chatID)
 			return err
 		}
 
-		err = ctx.binding.SetStreamSources(chatId, ntgcalls.CaptureStream, mediaDescription)
+		err = ctx.binding.SetStreamSources(chatID, ntgcalls.CaptureStream, mediaDescription)
 		if err != nil {
-			ctx.binding.Stop(chatId)
+			ctx.binding.Stop(chatID)
 			return err
 		}
 
-		inputGroupCall, err := ctx.GetInputGroupCall(chatId)
+		inputGroupCall, err := ctx.GetInputGroupCall(chatID)
 		if err != nil {
-			ctx.binding.Stop(chatId)
+			ctx.binding.Stop(chatID)
 			return err
 		}
 
@@ -216,13 +216,13 @@ func (ctx *Context) connectCall(
 					Data: jsonParams,
 				},
 				JoinAs: &tg.InputPeerUser{
-					UserID:     ctx.self.ID,
-					AccessHash: ctx.self.AccessHash,
+					UserID:     ctx.me.ID,
+					AccessHash: ctx.me.AccessHash,
 				},
 			},
 		)
 		if err != nil {
-			ctx.binding.Stop(chatId)
+			ctx.binding.Stop(chatID)
 			return err
 		}
 
@@ -234,19 +234,19 @@ func (ctx *Context) connectCall(
 			}
 		}
 
-		err = ctx.binding.Connect(chatId, resultParams, false)
+		err = ctx.binding.Connect(chatID, resultParams, false)
 		if err != nil {
 			return err
 		}
 
-		connectionMode, err := ctx.binding.GetConnectionMode(chatId)
+		connectionMode, err := ctx.binding.GetConnectionMode(chatID)
 		if err != nil {
 			return err
 		}
 
 		if connectionMode == ntgcalls.StreamConnection && len(jsonParams) > 0 {
 			ctx.pendingConnectionsMutex.Lock()
-			ctx.pendingConnections[chatId] = &PendingConnection{
+			ctx.pendingConnections[chatID] = &PendingConnection{
 				MediaDescription: mediaDescription,
 				Payload:          jsonParams,
 			}

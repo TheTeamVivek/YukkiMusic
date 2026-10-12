@@ -6,16 +6,16 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 )
 
-func (ctx *Context) convertGroupCallId(callId int64) (int64, error) {
+func (ctx *Context) convertGroupCallID(callID int64) (int64, error) {
 	ctx.inputGroupCallsMutex.RLock()
 	defer ctx.inputGroupCallsMutex.RUnlock()
 
-	for chatId, inputCallInterface := range ctx.inputGroupCalls {
+	for chatID, inputCallInterface := range ctx.inputGroupCalls {
 		if inputCall, ok := inputCallInterface.(*tg.InputGroupCallObj); ok {
-			if inputCall.ID == callId {
-				return chatId, nil
+			if inputCall.ID == callID {
+				return chatID, nil
 			}
 		}
 	}
-	return 0, fmt.Errorf("group call id %d not found", callId)
+	return 0, fmt.Errorf("group call id %d not found", callID)
 }

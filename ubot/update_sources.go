@@ -6,37 +6,37 @@ import (
 	tg "github.com/amarnathcjd/gogram/telegram"
 )
 
-type videoToAdd struct {
-	participantId int64
+type pendingVideo struct {
+	participantID int64
 	endpoint      string
 	sourceGroups  []*tg.GroupCallParticipantVideoSourceGroup
 	isCamera      bool
 }
 
-func (ctx *Context) updateSources(chatId int64) error {
-	participants, err := ctx.GetParticipants(chatId)
+func (ctx *Context) addIncomingSources(chatID int64) error {
+	participants, err := ctx.GetParticipants(chatID)
 	if err != nil {
 		return err
 	}
 
-	var videosToAdd []videoToAdd
+	var pendingVideos []pendingVideo
 	var shouldAddToMutedByAdmin bool
 
 	ctx.callSourcesMutex.Lock()
-	if ctx.callSources[chatId] == nil {
-		ctx.callSources[chatId] = &CallSources{
-			CameraSources: make(map[int64]string),
-			ScreenSources: make(map[int64]string),
+	if ctx.callSources[chatID] == nil {
+		ctx.callSources[chatID] = &CallSources{
+			Camera: make(map[int64]string),
+			Screen: make(map[int64]string),
 		}
 	}
 	for _, participant := range participants {
-		participantId := getParticipantId(participant.Peer)
+		participantID := getParticipantID(participant.Peer)
 
 		if participant.Video != nil &&
-			ctx.callSources[chatId].CameraSources[participantId] == "" {
-			ctx.callSources[chatId].CameraSources[participantId] = participant.Video.Endpoint
-			videosToAdd = append(videosToAdd, videoToAdd{
-				participantId: participantId,
+			ctx.callSources[chatID].Camera[participantID] == "" {
+			ctx.callSources[chatID].Camera[participantID] = participant.Video.Endpoint
+			pendingVideos = append(pendingVideos, pendingVideo{
+				participantID: participantID,
 				endpoint:      participant.Video.Endpoint,
 				sourceGroups:  participant.Video.SourceGroups,
 				isCamera:      true,
@@ -44,26 +44,26 @@ func (ctx *Context) updateSources(chatId int64) error {
 		}
 
 		if participant.Presentation != nil &&
-			ctx.callSources[chatId].ScreenSources[participantId] == "" {
-			ctx.callSources[chatId].ScreenSources[participantId] = participant.Presentation.Endpoint
-			videosToAdd = append(videosToAdd, videoToAdd{
-				participantId: participantId,
+			ctx.callSources[chatID].Screen[participantID] == "" {
+			ctx.callSources[chatID].Screen[participantID] = participant.Presentation.Endpoint
+			pendingVideos = append(pendingVideos, pendingVideo{
+				participantID: participantID,
 				endpoint:      participant.Presentation.Endpoint,
 				sourceGroups:  participant.Presentation.SourceGroups,
 				isCamera:      false,
 			})
 		}
 
-		if participantId == ctx.self.ID && !participant.CanSelfUnmute {
+		if participantID == ctx.me.ID && !participant.CanSelfUnmute {
 			shouldAddToMutedByAdmin = true
 		}
 	}
 	ctx.callSourcesMutex.Unlock()
 
-	for _, video := range videosToAdd {
+	for _, video := range pendingVideos {
 		_, err = ctx.binding.AddIncomingVideo(
-			chatId,
-			video.participantId,
+			chatID,
+			video.participantID,
 			video.endpoint,
 			parseVideoSources(video.sourceGroups),
 		)
@@ -74,8 +74,8 @@ func (ctx *Context) updateSources(chatId int64) error {
 
 	if shouldAddToMutedByAdmin {
 		ctx.mutedByAdminMutex.Lock()
-		if !slices.Contains(ctx.mutedByAdmin, chatId) {
-			ctx.mutedByAdmin = append(ctx.mutedByAdmin, chatId)
+		if !slices.Contains(ctx.mutedByAdmin, chatID) {
+			ctx.mutedByAdmin = append(ctx.mutedByAdmin, chatID)
 		}
 		ctx.mutedByAdminMutex.Unlock()
 	}

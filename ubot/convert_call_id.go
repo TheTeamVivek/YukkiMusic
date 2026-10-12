@@ -2,14 +2,14 @@ package ubot
 
 import "fmt"
 
-func (ctx *Context) convertCallId(callId int64) (int64, error) {
+func (ctx *Context) convertCallID(callID int64) (int64, error) {
 	ctx.inputCallsMutex.RLock()
 	defer ctx.inputCallsMutex.RUnlock()
 
-	for chatId, inputCall := range ctx.inputCalls {
-		if inputCall.ID == callId {
-			return chatId, nil
+	for chatID, inputCall := range ctx.inputCalls {
+		if inputCall.ID == callID {
+			return chatID, nil
 		}
 	}
-	return 0, fmt.Errorf("call id %d not found", callId)
+	return 0, fmt.Errorf("call id %d not found", callID)
 }
