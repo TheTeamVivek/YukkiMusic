@@ -19,7 +19,6 @@ package modules
 
 import (
 	"html"
-	"strings"
 
 	td "github.com/AshokShau/gotdbot"
 
@@ -47,8 +46,13 @@ func startHandler(c *td.Client, m *td.Message) error {
 		if err := helpHandler(c, m); err != nil {
 			return err
 		}
-	} else if err := handlePmStart(c, m, sender); err != nil {
-		return err
+	} else {
+		chatID := m.ChatID()
+		if _, err := c.SendRichMessage(chatID, startRich(c, chatID, sender, m.SenderID()), &td.SendTextMessageOpts{
+			ReplyMarkup: core.GetStartMarkup(chatID),
+		}); err != nil {
+			return err
+		}
 	}
 
 	logStart(c, m, sender)
@@ -72,15 +76,6 @@ func startRich(c *td.Client, chatID int64, sender *td.User, fallbackID int64) *t
 	}
 }
 
-func handlePmStart(c *td.Client, m *td.Message, sender *td.User) error {
-	chatID := m.ChatID()
-
-	_, err := c.SendRichMessage(chatID, startRich(c, chatID, sender, m.SenderID()), &td.SendTextMessageOpts{
-		ReplyMarkup: core.GetStartMarkup(chatID),
-	})
-	return err
-}
-
 func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 	cb.Answer(c, 0, false, "", "")
 
@@ -101,32 +96,6 @@ func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 func isPhotoMessage(m *td.Message) bool {
 	_, ok := m.Content.(*td.MessagePhoto)
 	return ok
-}
-
-// isChannelPost reports whether m came from a broadcast channel.
-func isChannel(c *td.Client, m *td.Message) bool {
-	chat, err := m.GetChat(c)
-	if err != nil {
-		return false
-	}
-	sg, ok := chat.Type.(*td.ChatTypeSupergroup)
-	return ok && sg.IsChannel
-}
-
-// mention builds an HTML mention for a gotdbot user, falling back to a plain
-// "user" mention when the user is nil.
-func mention(user *td.User, fallbackId int64) string {
-	name := ""
-	id := fallbackId
-	if user != nil {
-		id = user.Id
-		name = user.FirstName + " " + user.LastName
-	}
-
-	if name = strings.TrimSpace(name); name == "" {
-		name = "user"
-	}
-	return td.Mention(name, id, true, true)
 }
 
 // logStart reports a bot start to the configured logger chat, if enabled.

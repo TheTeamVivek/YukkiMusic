@@ -26,6 +26,7 @@ import (
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
+	"yukkimusic/internal/locales"
 )
 
 var helpTexts = map[string]string{}
@@ -64,10 +65,33 @@ func helpHandler(c *td.Client, m *td.Message) error {
 		return err
 	}
 
-	_, err := m.ReplyText(c, F(m.ChatID(), "help_main"), &td.SendTextMessageOpts{
+	_, err := m.ReplyRichMessage(c, helpRich(m.ChatID(), "help_main"), &td.SendTextMessageOpts{
 		ReplyMarkup: core.GetHelpKeyboard(m.ChatID()),
 	})
 	return err
+}
+
+// helpRich builds a rich help message for the given locale key. On the main
+// help menu it links the support chat.
+func helpRich(chatID int64, key string) *td.InputRichMessage {
+	var args locales.Arg
+
+	if key == "help_main" {
+		support := config.SupportChat
+		if support == "" {
+			support = config.SupportChannel
+		}
+		if support == "" {
+			support = "https://t.me/TheTeamVk"
+		}
+		args = locales.Arg{"support": html.EscapeString(support)}
+	}
+
+	text := F(chatID, key, args)
+
+	return &td.InputRichMessage{
+		Source: &td.RichMessageSourceHtml{Text: text},
+	}
 }
 
 func helpCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
@@ -78,17 +102,8 @@ func helpCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 		return err
 	}
 
-	markup := core.GetHelpKeyboard(cb.ChatId)
-
-	if isPhotoMessage(msg) {
-		_, err = cb.EditMessageCaption(c, F(cb.ChatId, "help_main"), &td.EditCaptionOpts{
-			ReplyMarkup: markup,
-		})
-	} else {
-		_, err = cb.EditMessageText(c, F(cb.ChatId, "help_main"), &td.EditTextMessageOpts{
-			ReplyMarkup: markup,
-		})
-	}
+	rich := &td.InputMessageRichMessage{Message: helpRich(cb.ChatId, "help_main")}
+	_, err = c.EditContent(cb.ChatId, msg.Id, rich, core.GetHelpKeyboard(cb.ChatId))
 	return err
 }
 
@@ -104,20 +119,20 @@ func helpCallbackHandler(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 		return nil
 	}
 
-	var text string
+	key := ""
 	btn := core.GetBackKeyboard(chatID)
 
 	switch parts[1] {
 	case "admins":
-		text = F(chatID, "help_admin")
+		key = "help_admin"
 	case "sudoers":
-		text = F(chatID, "help_sudo")
+		key = "help_sudo"
 	case "owner":
-		text = F(chatID, "help_owner")
+		key = "help_owner"
 	case "public":
-		text = F(chatID, "help_public")
+		key = "help_public"
 	case "main":
-		text = F(chatID, "help_main")
+		key = "help_main"
 		btn = core.GetHelpKeyboard(chatID)
 	}
 
@@ -126,15 +141,8 @@ func helpCallbackHandler(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 		return err
 	}
 
-	if isPhotoMessage(msg) {
-		_, err = cb.EditMessageCaption(c, text, &td.EditCaptionOpts{
-			ReplyMarkup: btn,
-		})
-	} else {
-		_, err = cb.EditMessageText(c, text, &td.EditTextMessageOpts{
-			ReplyMarkup: btn,
-		})
-	}
+	rich := &td.InputMessageRichMessage{Message: helpRich(chatID, key)}
+	_, err = c.EditContent(cb.ChatId, msg.Id, rich, btn)
 	return err
 }
 

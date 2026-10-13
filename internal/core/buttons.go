@@ -206,6 +206,10 @@ func GetStartMarkup(chatID int64) td.ReplyMarkup {
 	helpBtn := dataBtn(helpText, "help_cb")
 	helpBtn.IconCustomEmojiId = helpIcon
 
+	langText, langIcon := buttonText(chatID, "settings_btn_lang")
+	langBtn := dataBtn(langText, "lang:select")
+	langBtn.IconCustomEmojiId = langIcon
+
 	updatesText, updatesIcon := buttonText(chatID, "UPDATES_BTN")
 	updatesBtn := urlBtn(updatesText, config.SupportChannel)
 	updatesBtn.IconCustomEmojiId = updatesIcon
@@ -223,7 +227,7 @@ func GetStartMarkup(chatID int64) td.ReplyMarkup {
 			{addMeBtn},
 			{helpBtn},
 			{updatesBtn, supportBtn},
-			{sourceBtn},
+			{langBtn, sourceBtn},
 		},
 	}
 }

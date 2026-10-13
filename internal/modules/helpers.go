@@ -370,3 +370,29 @@ func leaveChat(c *td.Client, chatID int64) {
 		)
 	}()
 }
+
+// isChannel reports whether m came from a broadcast channel.
+func isChannel(c *td.Client, m *td.Message) bool {
+	chat, err := m.GetChat(c)
+	if err != nil {
+		return false
+	}
+	sg, ok := chat.Type.(*td.ChatTypeSupergroup)
+	return ok && sg.IsChannel
+}
+
+// mention builds an HTML mention for a gotdbot user, falling back to a plain
+// "user" mention when the user is nil.
+func mention(user *td.User, fallbackId int64) string {
+	name := ""
+	id := fallbackId
+	if user != nil {
+		id = user.Id
+		name = user.FirstName + " " + user.LastName
+	}
+
+	if name = strings.TrimSpace(name); name == "" {
+		name = "user"
+	}
+	return td.Mention(name, id, true, true)
+}

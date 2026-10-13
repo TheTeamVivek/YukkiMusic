@@ -23,6 +23,7 @@ import (
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
+	"yukkimusic/internal/core"
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
@@ -43,7 +44,7 @@ func showLangMenu(c *td.Client, m *td.Message) error {
 		lang = config.DefaultLang
 	}
 
-	markup := buildLangMarkup(chatID, lang, false)
+	markup := buildLangMarkup(chatID, lang, "")
 
 	_, err = m.ReplyText(c, F(chatID, "lang_select"), &td.SendTextMessageOpts{
 		ParseMode:   td.ParseModeHTML,
@@ -52,7 +53,7 @@ func showLangMenu(c *td.Client, m *td.Message) error {
 	return err
 }
 
-func buildLangMarkup(chatID int64, lang string, isCallback bool) *td.ReplyMarkupInlineKeyboard {
+func buildLangMarkup(chatID int64, lang string, back string) *td.ReplyMarkupInlineKeyboard {
 	var rows [][]td.InlineKeyboardButton
 	row := make([]td.InlineKeyboardButton, 0, 2)
 
@@ -74,13 +75,14 @@ func buildLangMarkup(chatID int64, lang string, isCallback bool) *td.ReplyMarkup
 		rows = append(rows, row)
 	}
 
-	if isCallback {
-		rows = append(rows, []td.InlineKeyboardButton{
-			{
-				Text: F(chatID, "BACK_BTN"),
-				Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:main")},
-			},
-		})
+	if back != "" {
+		backText, backIcon := locales.GetButton(lang, "BACK_BTN", nil)
+		backBtn := td.InlineKeyboardButton{
+			Text: backText,
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte(back)},
+		}
+		backBtn.IconCustomEmojiId = backIcon
+		rows = append(rows, []td.InlineKeyboardButton{backBtn})
 	}
 
 	return &td.ReplyMarkupInlineKeyboard{Rows: rows}
@@ -96,12 +98,16 @@ func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	lang := parts[1]
 
 	chatID := u.ChatId
+	if chatID > 0 {
+		return privateLangCallback(c, u, lang)
+	}
+
 	if lang == "select" {
 		cur, err := database.Language(chatID)
 		if err != nil {
 			cur = config.DefaultLang
 		}
-		markup := buildLangMarkup(chatID, cur, true)
+		markup := buildLangMarkup(chatID, cur, "set:main")
 		_, _ = u.EditMessageText(c, F(chatID, "lang_select"), &td.EditTextMessageOpts{
 			ParseMode:   td.ParseModeHTML,
 			ReplyMarkup: markup,
@@ -132,5 +138,42 @@ func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	msg := F(chatID, "lang_success", locales.Arg{"lang_name": langName})
 	_ = u.Answer(c, 0, true, msg, "")
 	_, _ = u.EditMessageText(c, msg, &td.EditTextMessageOpts{ParseMode: td.ParseModeHTML})
+	return nil
+}
+
+func privateLangCallback(c *td.Client, u *td.UpdateNewCallbackQuery, lang string) error {
+	chatID := u.ChatId
+
+	if lang == "select" {
+		cur, err := database.Language(chatID)
+		if err != nil {
+			cur = config.DefaultLang
+		}
+		_, _ = u.EditMessageReplyMarkup(c, buildLangMarkup(chatID, cur, "start"))
+		return nil
+	}
+
+	currentLang, _ := database.Language(chatID)
+
+	if lang == currentLang {
+		_ = u.Answer(c, 0, true, F(chatID, "lang_same"), "")
+		return nil
+	}
+
+	langName := locales.Get(lang, "name", nil)
+
+	if err := database.SetLanguage(chatID, lang); err != nil {
+		utils.Log.Errorf("SetChatLanguage error: %v", err)
+		_ = u.Answer(c, 0, true, F(chatID, "lang_fail"), "")
+		return nil
+	}
+
+	_ = u.Answer(c, 0, true, F(chatID, "lang_success", locales.Arg{"lang_name": langName}), "")
+
+	user, _ := c.GetUser(u.SenderUserId)
+	if msg, err := u.GetMessage(c); err == nil {
+		rich := &td.InputMessageRichMessage{Message: startRich(c, chatID, user, u.SenderUserId)}
+		_, _ = c.EditContent(chatID, msg.Id, rich, core.GetStartMarkup(chatID))
+	}
 	return nil
 }
