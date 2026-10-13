@@ -30,6 +30,12 @@ import (
 )
 
 func langHandler(c *td.Client, m *td.Message) error {
+	if isChannel(c, m) {
+		return nil
+	}
+	if m.IsPrivate() {
+		return showLangMenu(c, m)
+	}
 	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
 		return nil
 	}
@@ -44,7 +50,12 @@ func showLangMenu(c *td.Client, m *td.Message) error {
 		lang = config.DefaultLang
 	}
 
-	markup := buildLangMarkup(chatID, lang, "")
+	back := ""
+	if m.IsPrivate() {
+		back = "start"
+	}
+
+	markup := buildLangMarkup(chatID, lang, back)
 
 	_, err = m.ReplyText(c, F(chatID, "lang_select"), &td.SendTextMessageOpts{
 		ParseMode:   td.ParseModeHTML,
@@ -149,7 +160,11 @@ func privateLangCallback(c *td.Client, u *td.UpdateNewCallbackQuery, lang string
 		if err != nil {
 			cur = config.DefaultLang
 		}
-		_, _ = u.EditMessageReplyMarkup(c, buildLangMarkup(chatID, cur, "start"))
+		markup := buildLangMarkup(chatID, cur, "start")
+		_, _ = u.EditMessageText(c, F(chatID, "lang_select"), &td.EditTextMessageOpts{
+			ParseMode:   td.ParseModeHTML,
+			ReplyMarkup: markup,
+		})
 		return nil
 	}
 

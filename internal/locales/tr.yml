@@ -279,7 +279,6 @@ help_main: |
   <h3>{emoji:📚} Yardım Menüsü</h3>
   <p>Botu yönetmek, kontrol etmek ve özelleştirmek için kullanılan detaylı komutları keşfetmek üzere aşağıdan bir kategori seç.</p>
   <aside>İpucu: Belirli bir komut hakkında bilgi için <code>/help &lt;command&gt;</code> kullan.</aside>
-
   <footer><i>Herhangi bir sorun veya destek için <a href="{support}">destek sohbetimiz</a> ile iletişime geçin.</i></footer>
 
 jump_no_active: "{emoji:⚠️} İçinde atlanacak aktif bir parça yok."

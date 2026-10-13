@@ -43,6 +43,7 @@ var AllCommands = BotCommands{
 	PrivateUserCommands: []td.BotCommand{
 		cmd("start", "🚀 Start the bot"),
 		cmd("help", "📖 Show the help menu"),
+		cmd("language", "🌐 Change the bot language"),
 		cmd("ping", "🏓 Check if the bot is alive"),
 	},
 

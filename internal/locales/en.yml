@@ -279,7 +279,6 @@ help_main: |
   <h3>{emoji:📚} Help Menu</h3>
   <p>Select a category below to explore detailed commands for managing, controlling and customising the bot.</p>
   <aside>Tip: use <code>/help &lt;command&gt;</code> to get help about a specific command.</aside>
-
   <footer><i>For any issues or support, contact our <a href="{support}">support chat</a>.</i></footer>
 
 jump_no_active: "{emoji:⚠️} No active track to jump within."
