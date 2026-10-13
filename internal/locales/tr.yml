@@ -387,9 +387,9 @@ mute_success: |
   {emoji:👤} Sessize Alan: {user}
 
 no_song_query: |
-  <b>{emoji:🎵} Hop! Hiçbir şarkı tespit edilemedi.</b>
+  <b>{emoji:🎵} Hop! Çalınacak bir şey yok.</b>
 
-  <i>Oynatmaya başlamak için <b>{cmd} [şarkı adı]</b> yaz veya bir <b>medyayı</b> yanıtla!</i>
+  <i>Müziği başlatmak için <b>{cmd} [şarkı adı veya bağlantı]</b> gönder ya da bir <b>medya</b> mesajını yanıtla.</i>
 
 no_song_found: "{emoji:❌} Parça bulunamadı."
 

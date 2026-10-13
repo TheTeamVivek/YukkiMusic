@@ -387,9 +387,9 @@ mute_success: |
   {emoji:👤} Muted by: {user}
 
 no_song_query: |
-  <b>{emoji:🎵} Whoops! No song detected.</b>
+  <b>{emoji:🎵} Whoops! Nothing to play.</b>
 
-  <i>Type <b>{cmd} [song name]</b> or reply to a <b>media</b> to start playing!</i>
+  <i>Send <b>{cmd} [song name or link]</b>, or reply to a <b>media</b> message to start the music.</i>
 
 no_song_found: "{emoji:❌} No tracks found."
 
