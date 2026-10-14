@@ -67,7 +67,7 @@ func Init() (func(), error) {
 
 func initBot() error {
 	opts := td.DefaultClientConfig()
-	opts.LibraryPath = "./libtdjson.so.1.8.66"
+	opts.LibraryPath = "./libtdjson.so.1.8.68"
 	opts.ParseMode = td.ParseModeHTML
 	opts.PanicHandler = clientPanicHandler
 	opts.ErrorHandler = clientErrorHandler
@@ -91,7 +91,7 @@ func initBot() error {
 	Bot = client
 
 	if config.LoggerID != 0 {
-		_, _ = client.SendTextMessage(config.LoggerID, "Bot Started", nil)
+		_, _ = client.SendMessage(config.LoggerID, "Bot Started", nil)
 	}
 
 	utils.Log.Infof("Bot started as @%s", botUsername())
@@ -149,7 +149,7 @@ func sendErrorReport(c *td.Client, kind string, update td.TlObject, detail any, 
 			sendErrorReportFile(c, text)
 			return
 		}
-		_, _ = c.SendTextMessage(config.LoggerID, text, &td.SendTextMessageOpts{
+		_, _ = c.SendMessage(config.LoggerID, text, &td.SendMessageOpts{
 			ParseMode: "HTML",
 		})
 	}()
@@ -167,7 +167,7 @@ func sendErrorReportFile(c *td.Client, text string) {
 		return
 	}
 
-	_, _ = c.SendMessage(config.LoggerID, &td.InputMessageDocument{
+	_, _ = c.SendMessageContent(config.LoggerID, &td.InputMessageDocument{
 		Document: &td.InputDocument{Document: &td.InputFileLocal{Path: f.Name()}},
 	}, nil)
 }

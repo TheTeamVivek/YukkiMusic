@@ -57,7 +57,7 @@ func handleActions(c *td.Client, m *td.Message) error {
 			"chat_id":       m.ChatID(),
 			"support_group": config.SupportChat,
 		})
-		if _, err := c.SendTextMessage(m.ChatID(), text, &td.SendTextMessageOpts{DisableWebPagePreview: true}); err != nil {
+		if _, err := c.SendMessage(m.ChatID(), text, &td.SendMessageOpts{DisableWebPagePreview: true}); err != nil {
 			utils.Log.Errorf("failed to send supergroup conversion message to chat %d: %v", m.ChatID(), err)
 			return nil
 		}
@@ -116,7 +116,7 @@ func handleChatMemberAdd(c *td.Client, m *td.Message) error {
 		database.AddServedChat(chatID)
 
 		if config.LoggerID != 0 {
-			if _, rerr := c.SendTextMessage(config.LoggerID, F(config.LoggerID, "logger_bot_added", buildLogArgs(c, m, chatID, "added")), nil); rerr != nil {
+			if _, rerr := c.SendMessage(config.LoggerID, F(config.LoggerID, "logger_bot_added", buildLogArgs(c, m, chatID, "added")), nil); rerr != nil {
 				return rerr
 			}
 		}
@@ -165,7 +165,7 @@ func handleBotRemoved(c *td.Client, u *td.UpdateChatMember, chatID int64) {
 		"date_time":           time.Now().Format("02 Jan 2006 • 15:04"),
 	})
 
-	if _, err := c.SendTextMessage(config.LoggerID, msg, nil); err != nil {
+	if _, err := c.SendMessage(config.LoggerID, msg, nil); err != nil {
 		utils.Log.Errorf("failed to send bot-removed log: %v", err)
 	}
 }
@@ -193,7 +193,7 @@ func handleVoiceChatAction(c *td.Client, m *td.Message) error {
 	s.SetVoiceChat(isActive)
 
 	msgKey := utils.IfElse(isActive, "voicechat_started", "voicechat_ended")
-	if _, rerr := c.SendTextMessage(chatID, F(chatID, msgKey, locales.Arg{"duration": utils.FormatDuration(int(duration))}), nil); rerr != nil {
+	if _, rerr := c.SendMessage(chatID, F(chatID, msgKey, locales.Arg{"duration": utils.FormatDuration(int(duration))}), nil); rerr != nil {
 		utils.Log.Error(rerr.Error())
 	}
 	utils.Log.Debugf("Voice chat %s in %d", msgKey, chatID)

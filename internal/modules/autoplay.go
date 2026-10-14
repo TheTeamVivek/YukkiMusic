@@ -59,7 +59,7 @@ func autoplayHandler(c *td.Client, m *td.Message) error {
 	}
 
 	text, markup := autoplayMenu(chatID, r.Autoplay())
-	_, err := m.ReplyText(c, text, &td.SendTextMessageOpts{
+	_, err := m.ReplyText(c, text, &td.SendMessageOpts{
 		ParseMode:   "HTML",
 		ReplyMarkup: markup,
 	})
@@ -95,7 +95,7 @@ func autoplayCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	_ = u.Answer(c, 0, false, F(chatID, statusKey), "")
 
 	text, markup := autoplayMenu(chatID, enabled)
-	_, err := u.EditMessageText(c, text, &td.EditTextMessageOpts{
+	_, err := u.EditMessageText(c, text, &td.EditMessageTextOpts{
 		ParseMode:   "HTML",
 		ReplyMarkup: markup,
 	})

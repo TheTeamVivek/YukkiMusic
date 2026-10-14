@@ -490,10 +490,10 @@ position_now: |
 
 queue_limit_reached: "{emoji:⚠️} وصلت قائمة الانتظار للحد الأقصى ({limit} مقاطع كحد أقصى). استخدم /clear لتفريغ القائمة."
 queue_no_active: "{emoji:⚠️} <b>لا يوجد تشغيل نشط.</b>\n\n<i>لا يوجد شيء في قائمة الانتظار حالياً.</i>"
-queue_header: "{emoji:🎶} <b>قائمة الانتظار الحالية</b>"
-queue_now_playing: "{emoji:▶️} <b>جاري التشغيل الآن:</b>"
-queue_up_next: "{emoji:⏭️} <b>التالي:</b>"
-queue_more_line: "\n… و {remaining} أكثر"
+queue_header: "{emoji:🎶} قائمة الانتظار الحالية"
+queue_now_playing: "{emoji:▶️} جاري التشغيل الآن"
+queue_up_next: "{emoji:⏭️} التالي • {count} مقطع"
+queue_more_button: "{emoji:➕} عرض {count} أخرى"
 queue_empty_tail: "{emoji:📭} <i>لا توجد أغاني أخرى في قائمة الانتظار.</i>"
 queue_empty: "{emoji:⚠️} <b>قائمة الانتظار فارغة بالفعل.</b>"
 
@@ -523,6 +523,7 @@ remove_invalid_index: "{emoji:⚠️} <b>مركز غير صالح.</b> يجب أ
 remove_index_too_small: "{emoji:⚠️} <b>يجب أن يكون المركز أكبر من 0.</b>"
 remove_index_too_big: "{emoji:⚠️} مركز غير صالح. قائمة الانتظار تحتوي على <b>{total}</b> مقاطع فقط."
 remove_success: "{emoji:✅} تمت إزالة المقطع من المركز <b>{index}</b> في قائمة الانتظار.\n{emoji:👤} بواسطة: {user}"
+queue_delete_success: "🗑️ تمت الإزالة من قائمة الانتظار."
 
 # 🔁 Replay
 replay_failed: "❌ <b>فشلت إعادة التشغيل</b>\nالخطأ: <code>{error}</code>"

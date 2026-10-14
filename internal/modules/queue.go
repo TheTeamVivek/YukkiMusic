@@ -24,6 +24,7 @@ import (
 
 	td "github.com/AshokShau/gotdbot"
 
+	"yukkimusic/internal/core"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
@@ -83,101 +84,83 @@ func handleQueue(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	var b strings.Builder
+	_, rerr := m.ReplyRichMessage(c, queueRich(r, queueFirstPage), nil)
+	return rerr
+}
 
-	b.WriteString(F(chatID, "queue_header"))
-	b.WriteString("\n\n")
+// queueFirstPage is how many up-next tracks the first page shows before the
+// "show more" button reveals the whole remaining queue.
+const queueFirstPage = 15
 
-	b.WriteString(F(chatID, "queue_now_playing"))
-	b.WriteString("\n")
-
-	fmt.Fprintf(
-		&b,
-		"🎧 <a href=\"%s\">%s</a> — %s [%s]\n\n",
-		t.URL,
-		utils.EscapeHTML(utils.ShortTitle(t.Title, 35)),
-		t.Requester,
-		utils.FormatDuration(t.Duration),
-	)
-
+// queueRich builds the rich "current queue" card. It renders the first `shown`
+// up-next tracks, each with a danger delete button. When tracks remain hidden a
+// "more" callback button is appended to reveal the rest.
+func queueRich(r *core.Room, shown int) *td.InputRichMessage {
+	chatID := r.ControlChatID
+	t := r.Track()
 	queue := r.Queue()
 	q := len(queue)
-	useQuote := q >= 3
+
+	if shown < 1 {
+		shown = queueFirstPage
+	}
+	if shown > q {
+		shown = q
+	}
+
+	var b strings.Builder
+
+	fmt.Fprintf(&b, "<h3>%s</h3>\n", F(chatID, "queue_header"))
+	fmt.Fprintf(
+		&b,
+		"<aside><b>%s</b><br><a href=\"%s\">%s</a><br>\u23f1\ufe0f %s  \u2022  \U0001F464 %s</aside>\n",
+		F(chatID, "queue_now_playing"),
+		t.URL,
+		utils.EscapeHTML(utils.ShortTitle(t.Title, 40)),
+		utils.FormatDuration(t.Duration),
+		t.Requester,
+	)
 
 	if q > 0 {
-		b.WriteString(F(chatID, "queue_up_next"))
-		n := "\n"
-		if !useQuote {
-			n += "\n"
-		}
-		b.WriteString(n)
+		fmt.Fprintf(&b, "<p><b>%s</b></p>\n", F(chatID, "queue_up_next", locales.Arg{"count": q}))
+		b.WriteString("<table bordered striped compact>\n")
+		b.WriteString("<tr><th>#</th><th>\U0001F3B5 Track</th><th>\u23f1\ufe0f</th><th>\U0001F464</th><th>\U0001F5D1\ufe0f</th></tr>\n")
 
-		if useQuote {
-			b.WriteString("<blockquote>")
-		}
-
-		for i, track := range queue {
-			if i >= 10 {
-				break
-			}
-
+		for i := 0; i < shown; i++ {
+			track := queue[i]
 			fmt.Fprintf(
 				&b,
-				"%d. 🎵 <a href=\"%s\">%s</a> — %s [%s]\n",
+				"<tr><td>%d</td><td><a href=\"%s\">%s</a></td><td>%s</td><td>%s</td>"+
+					"<td><tg-button type=\"callback_data\" style=\"danger\" data=\"qdel:%d:%d:%d\">\u2a2f</tg-button></td></tr>\n",
 				i+1,
 				track.URL,
-				utils.EscapeHTML(utils.ShortTitle(track.Title, 35)),
-				track.Requester,
+				utils.EscapeHTML(utils.ShortTitle(track.Title, 40)),
 				utils.FormatDuration(track.Duration),
+				track.Requester,
+				r.ChatID,
+				i+1,
+				shown,
 			)
 		}
+		b.WriteString("</table>\n")
 
-		if useQuote {
-			b.WriteString("</blockquote>")
-		}
-
-		if q > 10 {
-			var full strings.Builder
-
-			full.WriteString(F(chatID, "queue_header"))
-			full.WriteString("\n\n")
-
-			full.WriteString(F(chatID, "queue_now_playing"))
-			full.WriteString("\n")
-
+		if more := q - shown; more > 0 {
 			fmt.Fprintf(
-				&full,
-				"🎧 %s — %s [%s]\n\n",
-				t.Title,
-				t.Requester,
-				utils.FormatDuration(t.Duration),
+				&b,
+				"<tg-button-row align=\"center\">"+
+					"<tg-button type=\"callback_data\" data=\"qmore:%d\">%s</tg-button>"+
+					"</tg-button-row>\n",
+				r.ChatID,
+				F(chatID, "queue_more_button", locales.Arg{"count": more}),
 			)
-
-			full.WriteString(F(chatID, "queue_up_next"))
-			full.WriteString("\n\n")
-
-			for i, track := range queue {
-				fmt.Fprintf(
-					&full,
-					"%d. %s — %s [%s]\n",
-					i+1,
-					track.Title,
-					track.Requester,
-					utils.FormatDuration(track.Duration),
-				)
-			}
-
-			remaining := q - 10
-
-			b.WriteString(F(chatID, "queue_more_line", locales.Arg{
-				"remaining": remaining,
-			}))
 		}
 	} else {
-		b.WriteString(F(chatID, "queue_empty_tail"))
+		fmt.Fprintf(&b, "<footer>%s</footer>\n", F(chatID, "queue_empty_tail"))
 	}
-	_, rerr := m.ReplyText(c, b.String(), &td.SendTextMessageOpts{DisableWebPagePreview: true})
-	return rerr
+
+	return &td.InputRichMessage{
+		Source: &td.RichMessageSourceHtml{Text: b.String()},
+	}
 }
 
 func handleRemove(c *td.Client, m *td.Message, cplay bool) error {

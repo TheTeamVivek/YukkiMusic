@@ -88,7 +88,7 @@ func handleStop(c *td.Client, m *td.Message, cplay bool) error {
 			if isMuted {
 				msgKey = "stop_confirm_muted"
 			}
-			_, err := m.ReplyText(c, F(m.ChatID(), msgKey), &td.SendTextMessageOpts{
+			_, err := m.ReplyText(c, F(m.ChatID(), msgKey), &td.SendMessageOpts{
 				ReplyMarkup: core.GetStopConfirmMarkup(m.ChatID(), r, isPaused),
 			})
 			return err

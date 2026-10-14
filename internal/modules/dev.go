@@ -125,7 +125,7 @@ func shellHandler(c *td.Client, m *td.Message) error {
 	cmx.Stderr = &errx
 	err := cmx.Run()
 
-	html := &td.SendTextMessageOpts{ParseMode: "HTML"}
+	html := &td.SendMessageOpts{ParseMode: "HTML"}
 
 	if errx.String() == "" && out.String() == "" {
 		if err != nil {
@@ -154,7 +154,7 @@ func shellHandler(c *td.Client, m *td.Message) error {
 
 func jsonHandle(c *td.Client, m *td.Message) error {
 	var jsonString []byte
-	html := &td.SendTextMessageOpts{ParseMode: "HTML"}
+	html := &td.SendMessageOpts{ParseMode: "HTML"}
 	if m.ReplyToMessageID() == 0 {
 		switch {
 		case strings.Contains(m.Args(), "-s"):

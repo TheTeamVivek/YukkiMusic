@@ -211,7 +211,7 @@ func notifyMaintenanceStart(c *td.Client, reason string) {
 				locales.Arg{"reason": reason},
 			)
 		}
-		if _, err := c.SendTextMessage(chatID, msg, nil); err != nil {
+		if _, err := c.SendMessage(chatID, msg, nil); err != nil {
 			utils.Log.Error(err.Error())
 		}
 		time.Sleep(time.Second)

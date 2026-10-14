@@ -122,6 +122,93 @@ func roomHandle(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	return nil
 }
 
+func queueDeleteHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
+	chatID := u.ChatId
+
+	parts := strings.Split(u.DataString(), ":")
+	if len(parts) != 4 || parts[0] != "qdel" {
+		utils.Log.Warnf("Invalid queue delete payload: %s", u.DataString())
+		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		return nil
+	}
+
+	roomID, err := strconv.ParseInt(parts[1], 10, 64)
+	if err != nil {
+		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		return nil
+	}
+
+	index, err := strconv.Atoi(parts[2])
+	if err != nil {
+		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		return nil
+	}
+
+	shown, err := strconv.Atoi(parts[3])
+	if err != nil {
+		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		return nil
+	}
+
+	if !checkAdminOrAuth(c, u, chatID) {
+		return nil
+	}
+
+	r, ok := core.Rooms.Get(roomID)
+	if !ok || !r.Active() {
+		u.Answer(c, 0, true, F(chatID, "room_not_active_cb"), "")
+		return nil
+	}
+
+	if index <= 0 || index > r.QueueLen() {
+		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		return nil
+	}
+
+	r.RemoveTrack(index - 1)
+
+	if _, err := c.EditContent(u.ChatId, u.MessageId, &td.InputMessageRichMessage{
+		Message: queueRich(r, shown),
+	}, nil); err != nil {
+		utils.Log.Errorf("Failed to edit queue message: %v", err)
+	}
+
+	u.Answer(c, 0, true, F(chatID, "queue_delete_success"), "")
+	return nil
+}
+
+func queueMoreHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
+	chatID := u.ChatId
+
+	parts := strings.Split(u.DataString(), ":")
+	if len(parts) != 2 || parts[0] != "qmore" {
+		utils.Log.Warnf("Invalid queue more payload: %s", u.DataString())
+		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		return nil
+	}
+
+	roomID, err := strconv.ParseInt(parts[1], 10, 64)
+	if err != nil {
+		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		return nil
+	}
+
+	r, ok := core.Rooms.Get(roomID)
+	if !ok || !r.Active() {
+		u.Answer(c, 0, true, F(chatID, "room_not_active_cb"), "")
+		return nil
+	}
+
+	if _, err := c.EditContent(u.ChatId, u.MessageId, &td.InputMessageRichMessage{
+		Message: queueRich(r, r.QueueLen()),
+	}, nil); err != nil {
+		utils.Log.Errorf("Failed to edit queue message: %v", err)
+	}
+
+	u.Answer(c, 0, false, "", "")
+	return nil
+}
+
 func checkAdminOrAuth(c *td.Client, u *td.UpdateNewCallbackQuery, chatID int64) bool {
 	if canUseAdminCommand(c, chatID, u.SenderUserId) {
 		return true
@@ -144,7 +231,7 @@ func cbDelete(c *td.Client, u *td.UpdateNewCallbackQuery) {
 	_ = msg.Delete(c, true)
 }
 
-func cbRespond(c *td.Client, u *td.UpdateNewCallbackQuery, text string, opts *td.SendTextMessageOpts) *td.Message {
+func cbRespond(c *td.Client, u *td.UpdateNewCallbackQuery, text string, opts *td.SendMessageOpts) *td.Message {
 	msg, err := u.GetMessage(c)
 	if err != nil || msg == nil {
 		utils.Log.Errorf("cbRespond: failed to get callback message: %v", err)
@@ -234,7 +321,7 @@ func handleReplayAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 	u.Answer(c, 0, true, F(chatID, "cb_replay_success"), "")
 	if _, err := u.EditMessageText(c, F(chatID, "cb_replay_edited", locales.Arg{
 		"user": mention(sender, u.SenderUserId),
-	}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
+	}), &td.EditMessageTextOpts{ParseMode: "HTML"}); err != nil {
 		utils.Log.Errorf("Edit error: %v", err)
 	}
 	return nil
@@ -250,7 +337,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) 
 		core.Rooms.Delete(r.ChatID)
 		if _, err := u.EditMessageText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mention(sender, u.SenderUserId),
-		}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
+		}), &td.EditMessageTextOpts{ParseMode: "HTML"}); err != nil {
 			utils.Log.Errorf("Edit error: %v", err)
 		}
 		u.Answer(c, 0, true, F(chatID, "cb_skip_queue_empty"), "")
@@ -294,7 +381,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) 
 
 	_, err = statusMsg.ReplyText(c, F(chatID, "cb_skip_edited", locales.Arg{
 		"user": mention(sender, u.SenderUserId),
-	}), &td.SendTextMessageOpts{ParseMode: "HTML"})
+	}), &td.SendMessageOpts{ParseMode: "HTML"})
 
 	return err
 }
@@ -310,7 +397,7 @@ func handleStopAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) 
 	u.Answer(c, 0, true, F(chatID, "cb_stop_success"), "")
 	if _, err := u.EditMessageText(c, F(chatID, "stopped", locales.Arg{
 		"user": mention(sender, u.SenderUserId),
-	}), &td.EditTextMessageOpts{ParseMode: "HTML"}); err != nil {
+	}), &td.EditMessageTextOpts{ParseMode: "HTML"}); err != nil {
 		utils.Log.Errorf("Edit error: %v", err)
 	}
 	return nil
@@ -401,12 +488,12 @@ func updatePlaybackMessage(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.R
 
 	switch {
 	case isPhotoMessage(msg):
-		_, err = u.EditMessageCaption(c, msgText, &td.EditCaptionOpts{
+		_, err = u.EditMessageCaption(c, msgText, &td.EditMessageCaptionOpts{
 			ParseMode:   "HTML",
 			ReplyMarkup: markup,
 		})
 	default:
-		_, err = u.EditMessageText(c, msgText, &td.EditTextMessageOpts{
+		_, err = u.EditMessageText(c, msgText, &td.EditMessageTextOpts{
 			ParseMode:             "HTML",
 			ReplyMarkup:           markup,
 			DisableWebPagePreview: true,

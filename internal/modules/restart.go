@@ -58,7 +58,7 @@ func handleRestart(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 	r, ok := getActiveRoomForChat(chatID)
 	if ok && r.Track() != nil {
-		_, err := m.ReplyText(c, F(chatID, "restart_confirm_running"), &td.SendTextMessageOpts{
+		_, err := m.ReplyText(c, F(chatID, "restart_confirm_running"), &td.SendMessageOpts{
 			ReplyMarkup: core.GetRestartConfirmMarkup(chatID),
 		})
 		return err
@@ -136,7 +136,7 @@ func executeRestart(
 
 	for roomChatID := range core.Rooms.All() {
 		core.Rooms.Delete(roomChatID)
-		if _, err := c.SendTextMessage(roomChatID, F(roomChatID, "restart_service", locales.Arg{
+		if _, err := c.SendMessage(roomChatID, F(roomChatID, "restart_service", locales.Arg{
 			"bot": mention(c.Me, c.Me.Id),
 		}), nil); err != nil {
 			return err

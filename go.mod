@@ -3,10 +3,9 @@ module yukkimusic
 go 1.26.2
 
 require (
-	github.com/AshokShau/gotdbot v0.9.5
+	github.com/AshokShau/gotdbot v0.9.6
 	github.com/amarnathcjd/gogram v1.7.71
 	github.com/joho/godotenv v1.5.1
-	github.com/mtgo-labs/session-converter v0.6.0
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/traefik/yaegi v0.16.1
 	go.mongodb.org/mongo-driver/v2 v2.9.2

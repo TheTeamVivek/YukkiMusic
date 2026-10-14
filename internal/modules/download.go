@@ -211,7 +211,7 @@ func (dm *downloadManager) onFileUpdate(c *td.Client, u *td.UpdateFile) error {
 		"elapsed":    utils.FormatTime(int(elapsed)),
 	})
 
-	if _, err := msg.EditText(c, text, &td.EditTextMessageOpts{
+	if _, err := msg.EditText(c, text, &td.EditMessageTextOpts{
 		ParseMode:   td.ParseModeHTML,
 		ReplyMarkup: msg.ReplyMarkup,
 	}); err != nil {

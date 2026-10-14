@@ -57,7 +57,7 @@ func showLangMenu(c *td.Client, m *td.Message) error {
 
 	markup := buildLangMarkup(chatID, lang, back)
 
-	_, err = m.ReplyText(c, F(chatID, "lang_select"), &td.SendTextMessageOpts{
+	_, err = m.ReplyText(c, F(chatID, "lang_select"), &td.SendMessageOpts{
 		ParseMode:   td.ParseModeHTML,
 		ReplyMarkup: markup,
 	})
@@ -119,7 +119,7 @@ func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 			cur = config.DefaultLang
 		}
 		markup := buildLangMarkup(chatID, cur, "set:main")
-		_, _ = u.EditMessageText(c, F(chatID, "lang_select"), &td.EditTextMessageOpts{
+		_, _ = u.EditMessageText(c, F(chatID, "lang_select"), &td.EditMessageTextOpts{
 			ParseMode:   td.ParseModeHTML,
 			ReplyMarkup: markup,
 		})
@@ -148,7 +148,7 @@ func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 
 	msg := F(chatID, "lang_success", locales.Arg{"lang_name": langName})
 	_ = u.Answer(c, 0, true, msg, "")
-	_, _ = u.EditMessageText(c, msg, &td.EditTextMessageOpts{ParseMode: td.ParseModeHTML})
+	_, _ = u.EditMessageText(c, msg, &td.EditMessageTextOpts{ParseMode: td.ParseModeHTML})
 	return nil
 }
 
@@ -161,7 +161,7 @@ func privateLangCallback(c *td.Client, u *td.UpdateNewCallbackQuery, lang string
 			cur = config.DefaultLang
 		}
 		markup := buildLangMarkup(chatID, cur, "start")
-		_, _ = u.EditMessageText(c, F(chatID, "lang_select"), &td.EditTextMessageOpts{
+		_, _ = u.EditMessageText(c, F(chatID, "lang_select"), &td.EditMessageTextOpts{
 			ParseMode:   td.ParseModeHTML,
 			ReplyMarkup: markup,
 		})

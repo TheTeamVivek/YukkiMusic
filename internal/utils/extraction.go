@@ -19,6 +19,7 @@ package utils
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 	"unicode/utf16"
@@ -36,6 +37,7 @@ func ExtractURLs(c *td.Client, m *td.Message) ([]string, error) {
 
 	urls := collectURLs(m.Text(), m.Entities())
 	urls = append(urls, collectURLs(m.Caption(), m.CaptionEntities())...)
+	urls = append(urls, collectRichURLs(m)...)
 
 	if m.ReplyToMessageID() <= 0 {
 		return finalizeURLs(urls)
@@ -51,7 +53,58 @@ func ExtractURLs(c *td.Client, m *td.Message) ([]string, error) {
 
 	urls = append(urls, collectURLs(r.Text(), r.Entities())...)
 	urls = append(urls, collectURLs(r.Caption(), r.CaptionEntities())...)
+	urls = append(urls, collectRichURLs(r)...)
 	return finalizeURLs(urls)
+}
+
+// collectRichURLs extracts links from a rich message (messageRichMessage). Rich
+// messages do not expose td.TextEntity values; their links are richTextUrl
+// nodes nested inside page blocks (headings, paragraphs, tables, ...). The
+// content is walked generically so every current and future block/rich-text
+// type is covered, and only richTextUrl carries a URL.
+func collectRichURLs(m *td.Message) []string {
+	var msg *td.RichMessage
+	switch content := m.Content.(type) {
+	case td.MessageRichMessage:
+		msg = content.Message
+	case *td.MessageRichMessage:
+		msg = content.Message
+	}
+	if msg == nil {
+		return nil
+	}
+
+	var urls []string
+	walkRichURLs(reflect.ValueOf(msg), &urls)
+	return urls
+}
+
+var richTextURLType = reflect.TypeOf(td.RichTextUrl{})
+
+func walkRichURLs(v reflect.Value, urls *[]string) {
+	switch v.Kind() {
+	case reflect.Pointer:
+		if !v.IsNil() {
+			walkRichURLs(v.Elem(), urls)
+		}
+	case reflect.Interface:
+		if !v.IsNil() {
+			walkRichURLs(v.Elem(), urls)
+		}
+	case reflect.Struct:
+		if v.Type() == richTextURLType {
+			if u := v.FieldByName("Url").String(); u != "" {
+				*urls = append(*urls, u)
+			}
+		}
+		for i := 0; i < v.NumField(); i++ {
+			walkRichURLs(v.Field(i), urls)
+		}
+	case reflect.Slice, reflect.Array:
+		for i := 0; i < v.Len(); i++ {
+			walkRichURLs(v.Index(i), urls)
+		}
+	}
 }
 
 func collectURLs(text string, entities []td.TextEntity) []string {

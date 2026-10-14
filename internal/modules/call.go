@@ -58,7 +58,7 @@ func streamEndHandler(
 
 		if r.QueueLen() == 0 {
 			core.Rooms.Delete(chatID)
-			if _, err := c.SendTextMessage(cid, F(cid, "stream_queue_finished"), nil); err != nil {
+			if _, err := c.SendMessage(cid, F(cid, "stream_queue_finished"), nil); err != nil {
 				utils.Log.Error(err.Error())
 			}
 			return
@@ -77,7 +77,7 @@ func streamEndHandler(
 		})
 	}
 
-	statusMsg, err := c.SendTextMessage(cid, statusText, nil)
+	statusMsg, err := c.SendMessage(cid, statusText, nil)
 	if err != nil {
 		utils.Log.Errorf("[call.go] Failed to send msg: %v", err)
 	}

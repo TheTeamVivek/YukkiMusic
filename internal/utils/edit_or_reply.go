@@ -37,7 +37,7 @@ func EOR(
 	c *td.Client,
 	msg *td.Message,
 	text string,
-	opts *td.EditTextMessageOpts,
+	opts *td.EditMessageTextOpts,
 ) (*td.Message, error) {
 	if msg == nil {
 		Log.Error("[EOR] nil msg at " + callerInfo(2))
@@ -47,7 +47,7 @@ func EOR(
 	m, err := msg.EditText(c, text, opts)
 	if err != nil {
 		_ = msg.Delete(c, true)
-		replyOpts := &td.SendTextMessageOpts{}
+		replyOpts := &td.SendMessageOpts{}
 		if opts != nil {
 			replyOpts.ParseMode = opts.ParseMode
 			replyOpts.ReplyMarkup = opts.ReplyMarkup

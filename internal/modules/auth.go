@@ -255,7 +255,7 @@ func authListHandler(c *td.Client, m *td.Message) error {
 		"count": len(authUsers),
 	}))
 
-	_, _ = utils.EOR(c, statusMsg, sb.String(), &td.EditTextMessageOpts{
+	_, _ = utils.EOR(c, statusMsg, sb.String(), &td.EditMessageTextOpts{
 		ParseMode: td.ParseModeHTML,
 	})
 	return nil

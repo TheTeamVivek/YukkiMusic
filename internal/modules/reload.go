@@ -106,7 +106,7 @@ func handleReload(c *td.Client, m *td.Message, cplay bool) error {
 		}) + "\n"
 		_, _ = utils.EOR(c, statusMsg, F(chatID, "reload_done", locales.Arg{
 			"summary": summary,
-		}), &td.EditTextMessageOpts{ParseMode: td.ParseModeHTML})
+		}), &td.EditMessageTextOpts{ParseMode: td.ParseModeHTML})
 		return nil
 	}
 
@@ -129,7 +129,7 @@ func handleReload(c *td.Client, m *td.Message, cplay bool) error {
 
 	_, _ = utils.EOR(c, statusMsg, F(chatID, "reload_done", locales.Arg{
 		"summary": summary,
-	}), &td.EditTextMessageOpts{ParseMode: td.ParseModeHTML})
+	}), &td.EditMessageTextOpts{ParseMode: td.ParseModeHTML})
 
 	return nil
 }

@@ -133,7 +133,7 @@ func pingHandler(c *td.Client, m *td.Message) error {
 
 	edit := func() error {
 		if config.PingImage == "" {
-			_, err := reply.EditText(c, msg, &td.EditTextMessageOpts{
+			_, err := reply.EditText(c, msg, &td.EditMessageTextOpts{
 				ParseMode:   td.ParseModeHTML,
 				ReplyMarkup: markup,
 			})
@@ -160,7 +160,7 @@ func pingHandler(c *td.Client, m *td.Message) error {
 		utils.Log.Errorf("[ping] edit failed: %v", err)
 
 		if config.PingImage != "" {
-			_, err = reply.EditText(c, msg, &td.EditTextMessageOpts{
+			_, err = reply.EditText(c, msg, &td.EditMessageTextOpts{
 				ParseMode:   td.ParseModeHTML,
 				ReplyMarkup: markup,
 			})

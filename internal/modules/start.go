@@ -48,7 +48,7 @@ func startHandler(c *td.Client, m *td.Message) error {
 		}
 	} else {
 		chatID := m.ChatID()
-		if _, err := c.SendRichMessage(chatID, startRich(c, chatID, sender, m.SenderID()), &td.SendTextMessageOpts{
+		if _, err := c.SendRichMessage(chatID, startRich(c, chatID, sender, m.SenderID()), &td.SendMessageOpts{
 			ReplyMarkup: core.GetStartMarkup(chatID),
 		}); err != nil {
 			return err
@@ -115,7 +115,7 @@ func logStart(c *td.Client, m *td.Message, sender *td.User) {
 		"user_username": uName,
 	})
 
-	if _, err := c.SendTextMessage(config.LoggerID, msg, nil); err != nil {
+	if _, err := c.SendMessage(config.LoggerID, msg, nil); err != nil {
 		c.Logger.Error("Logger send failed", "error", err)
 	}
 }

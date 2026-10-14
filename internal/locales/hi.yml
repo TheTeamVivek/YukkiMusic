@@ -490,10 +490,10 @@ position_now: |
 
 queue_limit_reached: "{emoji:⚠️} प्रतीक्षा सूची की सीमा पूर्ण ({limit} संगीत अधिकतम)। सूची रिक्त करने के लिए /clear का प्रयोग करें।"
 queue_no_active: "{emoji:⚠️} <b>कोई सक्रिय संगीत नहीं।</b>\n\n<i>वर्तमान में प्रतीक्षा सूची में कुछ भी नहीं है।</i>"
-queue_header: "{emoji:🎶} <b>वर्तमान प्रतीक्षा सूची</b>"
-queue_now_playing: "{emoji:▶️} <b>अब चल रहा है:</b>"
-queue_up_next: "{emoji:⏭️} <b>अगला:</b>"
-queue_more_line: "\n… और {remaining} अन्य"
+queue_header: "{emoji:🎶} वर्तमान कतार"
+queue_now_playing: "{emoji:▶️} अभी चल रहा है"
+queue_up_next: "{emoji:⏭️} अगला • {count} ट्रैक"
+queue_more_button: "{emoji:➕} {count} और दिखाएँ"
 queue_empty_tail: "{emoji:📭} <i>प्रतीक्षा सूची में कोई और संगीत नहीं है।</i>"
 queue_empty: "{emoji:⚠️} <b>प्रतीक्षा सूची पूर्व से ही रिक्त है।</b>"
 
@@ -523,6 +523,7 @@ remove_invalid_index: "{emoji:⚠️} <b>अमान्य सूचकाङ�
 remove_index_too_small: "{emoji:⚠️} <b>सूचकाङ्क 0 से अधिक होना चाहिए।</b>"
 remove_index_too_big: "{emoji:⚠️} अमान्य सूचकाङ्क। प्रतीक्षा सूची में केवल <b>{total}</b> संगीत हैं।"
 remove_success: "{emoji:✅} प्रतीक्षा सूची से स्थिति <b>{index}</b> पर संगीत हटा दिया गया।\n{emoji:👤} द्वारा: {user}"
+queue_delete_success: "🗑️ कतार से हटा दिया गया।"
 
 # 🔁 Replay
 replay_failed: "❌ <b>पुनः चलाना विफल</b>\nत्रुटि: <code>{error}</code>"

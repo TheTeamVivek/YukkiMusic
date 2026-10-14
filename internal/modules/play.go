@@ -522,9 +522,9 @@ func downloadFirstTrack(
 	track *state.Track,
 ) (string, error) {
 	title := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
-	var editOpts *td.EditTextMessageOpts
+	var editOpts *td.EditMessageTextOpts
 	if track.Duration > 600 {
-		editOpts = &td.EditTextMessageOpts{ReplyMarkup: core.GetCancelKeyboard(chatID)}
+		editOpts = &td.EditMessageTextOpts{ReplyMarkup: core.GetCancelKeyboard(chatID)}
 	}
 
 	replyMsg, _ = utils.EOR(
@@ -612,7 +612,7 @@ func finalizePlayReply(
 		c,
 		replyMsg,
 		buildMultiAddedText(chatID, len(tracks), mention, availableSlots, len(tracks)),
-		&td.EditTextMessageOpts{ParseMode: "HTML"},
+		&td.EditMessageTextOpts{ParseMode: "HTML"},
 	)
 	return nil
 }

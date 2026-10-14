@@ -489,10 +489,10 @@ position_now: |
 
 queue_limit_reached: "{emoji:⚠️} Queue limit reached ({limit} tracks max). Use /clear to clear queue."
 queue_no_active: "{emoji:⚠️} <b>No active playback.</b>\n\n<i>Nothing is queued right now.</i>"
-queue_header: "{emoji:🎶} <b>Current Queue</b>"
-queue_now_playing: "{emoji:▶️} <b>Now Playing:</b>"
-queue_up_next: "{emoji:⏭️} <b>Up Next:</b>"
-queue_more_line: "\n… and {remaining} more"
+queue_header: "{emoji:🎶} Current Queue"
+queue_now_playing: "{emoji:▶️} Now Playing"
+queue_up_next: "{emoji:⏭️} Up Next • {count} tracks"
+queue_more_button: "{emoji:➕} Show {count} more"
 queue_empty_tail: "{emoji:📭} <i>No more songs in queue.</i>"
 queue_empty: "{emoji:⚠️} <b>The queue is already empty.</b>"
 
@@ -522,6 +522,7 @@ remove_invalid_index: "{emoji:⚠️} <b>Invalid index.</b> It must be a <b>numb
 remove_index_too_small: "{emoji:⚠️} <b>Index must be greater than 0.</b>"
 remove_index_too_big: "{emoji:⚠️} Invalid index. Queue only has <b>{total}</b> tracks."
 remove_success: "{emoji:✅} Removed track at position <b>{index}</b> from the queue.\n{emoji:👤} By: {user}"
+queue_delete_success: "🗑️ Removed from queue."
 
 # 🔁 Replay
 replay_failed: "❌ <b>Replay Failed</b>\nError: <code>{error}</code>"

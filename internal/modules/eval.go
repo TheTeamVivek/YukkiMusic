@@ -42,7 +42,7 @@ func evalCommandHandler(c *td.Client, m *td.Message) error {
 		return nil
 	}
 
-	html := &td.SendTextMessageOpts{ParseMode: "HTML"}
+	html := &td.SendMessageOpts{ParseMode: "HTML"}
 	parts := strings.SplitN(m.Text(), " ", 2)
 	var code string
 	if len(parts) > 1 {

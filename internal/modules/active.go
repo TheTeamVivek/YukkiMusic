@@ -72,7 +72,7 @@ func activeHandler(c *td.Client, m *td.Message) error {
 	}
 
 	if len(states) == 0 {
-		_, err := m.ReplyText(c, "<b>🎵 Active Voice Chats</b>\n\nNo active chat sessions found.", &td.SendTextMessageOpts{
+		_, err := m.ReplyText(c, "<b>🎵 Active Voice Chats</b>\n\nNo active chat sessions found.", &td.SendMessageOpts{
 			DisableWebPagePreview: true,
 		})
 		return err
@@ -116,7 +116,7 @@ func activeHandler(c *td.Client, m *td.Message) error {
 			Text: sb.String(),
 		},
 	}
-	_, err := c.SendRichMessage(chatID, rich, &td.SendTextMessageOpts{
+	_, err := c.SendRichMessage(chatID, rich, &td.SendMessageOpts{
 		DisableWebPagePreview: true,
 	})
 	return err

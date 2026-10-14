@@ -90,7 +90,7 @@ func playmodeHandler(c *td.Client, m *td.Message) error {
 		}
 		_, err := m.ReplyText(c, F(chatID, "playmode_help", locales.Arg{
 			"status": F(chatID, statusKey),
-		}), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
+		}), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
 		return err
 	}
 
@@ -108,7 +108,7 @@ func playmodeHandler(c *td.Client, m *td.Message) error {
 	if adminsOnly {
 		successKey = "playmode_success_admins"
 	}
-	_, rerr := m.ReplyText(c, F(chatID, successKey), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
+	_, rerr := m.ReplyText(c, F(chatID, successKey), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
 	return rerr
 }
 
@@ -133,7 +133,7 @@ func cmdDeleteHandler(c *td.Client, m *td.Message) error {
 		_, err := m.ReplyText(c, F(chatID, "cmddelete_status", locales.Arg{
 			"cmd":    cmd,
 			"action": F(chatID, actionKey),
-		}), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
+		}), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
 		return err
 	}
 
@@ -153,7 +153,7 @@ func cmdDeleteHandler(c *td.Client, m *td.Message) error {
 	}
 	_, rerr := m.ReplyText(c, F(chatID, "cmddelete_updated", locales.Arg{
 		"action": F(chatID, actionKey),
-	}), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
+	}), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
 	return rerr
 }
 
@@ -173,7 +173,7 @@ func cleanModeHandler(c *td.Client, m *td.Message) error {
 		_, err := m.ReplyText(
 			c,
 			cleanModeStatusText(chatID, current)+"\n\n"+F(chatID, "cleanmode_hint"),
-			&td.SendTextMessageOpts{ParseMode: td.ParseModeHTML},
+			&td.SendMessageOpts{ParseMode: td.ParseModeHTML},
 		)
 		return err
 	}
@@ -190,7 +190,7 @@ func cleanModeHandler(c *td.Client, m *td.Message) error {
 	if !enabled {
 		cleanScheduler.cancel(chatID)
 	}
-	_, rerr := m.ReplyText(c, cleanModeStatusText(chatID, enabled)+"\n\n"+F(chatID, "cleanmode_hint"), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
+	_, rerr := m.ReplyText(c, cleanModeStatusText(chatID, enabled)+"\n\n"+F(chatID, "cleanmode_hint"), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
 	return rerr
 }
 
@@ -209,7 +209,7 @@ func adminModeHandler(c *td.Client, m *td.Message) error {
 	if len(args) < 2 {
 		_, err := m.ReplyText(c, F(chatID, "adminmode_help", locales.Arg{
 			"status": F(chatID, adminModeStatusKey(current)),
-		}), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
+		}), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
 		return err
 	}
 
@@ -224,7 +224,7 @@ func adminModeHandler(c *td.Client, m *td.Message) error {
 	}
 	_, rerr := m.ReplyText(c, F(chatID, "adminmode_updated", locales.Arg{
 		"status": F(chatID, adminModeStatusKey(mode)),
-	}), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML})
+	}), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
 	return rerr
 }
 
@@ -271,7 +271,7 @@ func settingsHandler(c *td.Client, m *td.Message) error {
 	_, err = m.ReplyText(c, F(chatID, "settings_main", locales.Arg{
 		"title": title,
 		"id":    chatID,
-	}), &td.SendTextMessageOpts{ParseMode: td.ParseModeHTML, ReplyMarkup: kb})
+	}), &td.SendMessageOpts{ParseMode: td.ParseModeHTML, ReplyMarkup: kb})
 	return err
 }
 
@@ -310,7 +310,7 @@ func settingsCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		_, _ = u.EditMessageText(c, F(chatID, "settings_main", locales.Arg{
 			"title": title,
 			"id":    chatID,
-		}), &td.EditTextMessageOpts{ParseMode: td.ParseModeHTML, ReplyMarkup: kb})
+		}), &td.EditMessageTextOpts{ParseMode: td.ParseModeHTML, ReplyMarkup: kb})
 		return nil
 	}
 	switch action {
@@ -355,7 +355,7 @@ func settingsCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	_, _ = u.EditMessageText(c, F(chatID, "settings_main", locales.Arg{
 		"title": title,
 		"id":    chatID,
-	}), &td.EditTextMessageOpts{ParseMode: td.ParseModeHTML, ReplyMarkup: kb})
+	}), &td.EditMessageTextOpts{ParseMode: td.ParseModeHTML, ReplyMarkup: kb})
 	return nil
 }
 

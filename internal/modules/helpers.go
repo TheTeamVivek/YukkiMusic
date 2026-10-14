@@ -103,7 +103,7 @@ func showTrackMessage(
 ) *td.Message {
 	markup := core.GetPlayMarkup(chatID, r, queued)
 
-	opts := &td.SendTextMessageOpts{
+	opts := &td.SendMessageOpts{
 		ParseMode:             "HTML",
 		ReplyMarkup:           markup,
 		DisableWebPagePreview: true,
@@ -144,21 +144,21 @@ func showTrackMessage(
 		)
 		if err != nil {
 			utils.Log.Errorf("SendPhoto (track message) failed: %v", err)
-			m, _ := c.SendTextMessage(chatID, msgText, opts)
+			m, _ := c.SendMessage(chatID, msgText, opts)
 			return m
 		}
 		return photo
 	}
 
 	if statusMsg != nil {
-		m, _ := utils.EOR(c, statusMsg, msgText, &td.EditTextMessageOpts{
+		m, _ := utils.EOR(c, statusMsg, msgText, &td.EditMessageTextOpts{
 			ParseMode:             "HTML",
 			ReplyMarkup:           markup,
 			DisableWebPagePreview: true,
 		})
 		return m
 	}
-	m, _ := c.SendTextMessage(chatID, msgText, opts)
+	m, _ := c.SendMessage(chatID, msgText, opts)
 	return m
 }
 
@@ -226,10 +226,10 @@ func sendPlayLogs(c *td.Client, m *td.Message, track *state.Track, queued bool) 
 		"requested_by_id": m.SenderID(),
 	}))
 
-	_, err := core.Bot.SendTextMessage(
+	_, err := core.Bot.SendMessage(
 		config.LoggerID,
 		sb.String(),
-		&td.SendTextMessageOpts{ParseMode: "HTML", DisableWebPagePreview: true},
+		&td.SendMessageOpts{ParseMode: "HTML", DisableWebPagePreview: true},
 	)
 	if err != nil {
 		utils.Log.Error("failed to send logger msg: " + err.Error())

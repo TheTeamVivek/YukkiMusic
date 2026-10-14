@@ -214,7 +214,7 @@ func broadcastHandler(c *td.Client, m *td.Message) error {
 	}
 
 	progressMsg, err := m.ReplyText(c, F(chatID, "broadcast_initializing"),
-		&td.SendTextMessageOpts{ReplyMarkup: core.GetBroadcastCancelKeyboard(chatID)})
+		&td.SendMessageOpts{ReplyMarkup: core.GetBroadcastCancelKeyboard(chatID)})
 	if err != nil {
 		bManager.stop()
 		utils.Log.Errorf("Failed to send broadcast progress message: %v", err)
@@ -405,7 +405,7 @@ func (bm *broadcastManager) send(
 			sent = &msgs.Messages[0]
 		}
 	} else {
-		sent, err = c.SendTextMessage(targetID, content, nil)
+		sent, err = c.SendMessage(targetID, content, nil)
 	}
 
 	if err != nil {
@@ -497,7 +497,7 @@ func (bm *broadcastManager) updateProgress(
 			default:
 			}
 
-			_, _ = progressMsg.EditText(c, text, &td.EditTextMessageOpts{
+			_, _ = progressMsg.EditText(c, text, &td.EditMessageTextOpts{
 				ReplyMarkup: core.GetBroadcastCancelKeyboard(progressMsg.ChatID()),
 			})
 		}

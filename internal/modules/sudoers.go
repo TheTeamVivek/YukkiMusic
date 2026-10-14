@@ -251,7 +251,7 @@ func handleGetSudoers(c *td.Client, m *td.Message) error {
 	if err != nil {
 		_, _ = utils.EOR(c, statusMsg, F(chatID, "sudo_list_fetch_fail", locales.Arg{
 			"error": err.Error(),
-		}), &td.EditTextMessageOpts{ParseMode: td.ParseModeHTML})
+		}), &td.EditMessageTextOpts{ParseMode: td.ParseModeHTML})
 		return nil
 	}
 
@@ -313,7 +313,7 @@ func handleGetSudoers(c *td.Client, m *td.Message) error {
 		sb.WriteString("\n")
 	}
 
-	_, _ = utils.EOR(c, statusMsg, sb.String(), &td.EditTextMessageOpts{
+	_, _ = utils.EOR(c, statusMsg, sb.String(), &td.EditMessageTextOpts{
 		ParseMode: td.ParseModeHTML,
 	})
 	return nil

@@ -488,10 +488,10 @@ position_now: |
 
 queue_limit_reached: "{emoji:⚠️} Sıra sınırına ulaşıldı (maksimum {limit} parça). Sırayı temizlemek için /clear kullan."
 queue_no_active: "{emoji:⚠️} <b>Aktif oynatma yok.</b>\n\n<i>Şu anda sırada bir şey yok.</i>"
-queue_header: "{emoji:🎶} <b>Mevcut Sıra</b>"
-queue_now_playing: "{emoji:▶️} <b>Şimdi Çalıyor:</b>"
-queue_up_next: "{emoji:⏭️} <b>Sıradaki:</b>"
-queue_more_line: "\n… ve {remaining} tane daha"
+queue_header: "{emoji:🎶} Mevcut Sıra"
+queue_now_playing: "{emoji:▶️} Şimdi Çalıyor"
+queue_up_next: "{emoji:⏭️} Sıradaki • {count} parça"
+queue_more_button: "{emoji:➕} {count} tane daha göster"
 queue_empty_tail: "{emoji:📭} <i>Sırada başka şarkı yok.</i>"
 queue_empty: "{emoji:⚠️} <b>Sıra zaten boş.</b>"
 
@@ -521,6 +521,7 @@ remove_invalid_index: "{emoji:⚠️} <b>Geçersiz indeks.</b> Bir <b>sayı</b> 
 remove_index_too_small: "{emoji:⚠️} <b>İndeks 0'dan büyük olmalıdır.</b>"
 remove_index_too_big: "{emoji:⚠️} Geçersiz indeks. Sırada yalnızca <b>{total}</b> parça var."
 remove_success: "{emoji:✅} Sırada <b>{index}</b> konumundaki parça çıkarıldı.\n{emoji:👤} Çıkaran: {user}"
+queue_delete_success: "🗑️ Kuyruktan kaldırıldı."
 
 # 🔁 Replay
 replay_failed: "❌ <b>Yeniden Oynatma Başarısız</b>\nHata: <code>{error}</code>"

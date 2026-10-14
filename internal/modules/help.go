@@ -59,13 +59,13 @@ func helpHandler(c *td.Client, m *td.Message) error {
 	}
 
 	if !m.IsPrivate() {
-		_, err := m.ReplyText(c, F(m.ChatID(), "help_private_only"), &td.SendTextMessageOpts{
+		_, err := m.ReplyText(c, F(m.ChatID(), "help_private_only"), &td.SendMessageOpts{
 			ReplyMarkup: core.GetGroupHelpKeyboard(m.ChatID()),
 		})
 		return err
 	}
 
-	_, err := m.ReplyRichMessage(c, helpRich(m.ChatID(), "help_main"), &td.SendTextMessageOpts{
+	_, err := m.ReplyRichMessage(c, helpRich(m.ChatID(), "help_main"), &td.SendMessageOpts{
 		ReplyMarkup: core.GetHelpKeyboard(m.ChatID()),
 	})
 	return err
