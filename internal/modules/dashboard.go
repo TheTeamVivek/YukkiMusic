@@ -52,7 +52,7 @@ func dashboardRich(
 	var b strings.Builder
 
 	fmt.Fprintf(&b, "<h3>%s</h3>\n", title)
-	fmt.Fprintf(&b, "<p>%s</p>\n", description)
+	fmt.Fprintf(&b, "<aside><p>%s</p></aside>\n", description)
 	fmt.Fprintf(&b, "<p>%s</p>\n", F(chatID, "dashboard_status", locales.Arg{
 		"status": F(chatID, utils.IfElse(enabled, "dashboard_enabled", "dashboard_disabled")),
 	}))
