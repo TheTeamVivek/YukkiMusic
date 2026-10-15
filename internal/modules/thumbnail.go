@@ -23,7 +23,6 @@ import (
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/database"
-	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
 
@@ -58,45 +57,16 @@ func nothumbHandler(c *td.Client, m *td.Message) error {
 		return nil
 	}
 	chatID := m.ChatID()
-	args := strings.Fields(m.Text())
 
-	current, err := database.ThumbnailsDisabled(chatID)
-	if err != nil {
-		_, err := m.ReplyText(c, F(chatID, "nothumb_fetch_fail"), nil)
-		return err
+	if args := strings.Fields(m.Text()); len(args) > 1 {
+		if enabled, err := utils.ParseBool(args[1]); err == nil {
+			if current, cerr := database.ThumbnailsDisabled(chatID); cerr == nil && enabled != current {
+				if err := database.SetThumbnailsDisabled(chatID, enabled); err != nil {
+					return err
+				}
+			}
+		}
 	}
 
-	if len(args) < 2 {
-		action := utils.IfElse(!current, "enabled", "disabled")
-		_, err := m.ReplyText(c, F(chatID, "nothumb_status", locales.Arg{
-			"cmd":    getCommand(m),
-			"action": action,
-		}), nil)
-		return err
-	}
-
-	value, err := utils.ParseBool(args[1])
-	if err != nil {
-		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return err
-	}
-
-	if current == value {
-		action := utils.IfElse(!value, "enabled", "disabled")
-		_, err := m.ReplyText(c, F(chatID, "nothumb_already", locales.Arg{
-			"action": action,
-		}), nil)
-		return err
-	}
-
-	if err := database.SetThumbnailsDisabled(chatID, value); err != nil {
-		_, err := m.ReplyText(c, F(chatID, "nothumb_update_fail"), nil)
-		return err
-	}
-
-	action := utils.IfElse(!value, "enabled", "disabled")
-	_, rerr := m.ReplyText(c, F(chatID, "nothumb_updated", locales.Arg{
-		"action": action,
-	}), nil)
-	return rerr
+	return sendDashboard(c, m, "nothumb")
 }
