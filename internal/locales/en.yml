@@ -412,7 +412,7 @@ nothumb_updated: "{emoji:🖼️} Thumbnail display has been {action}."
 cmddelete_status: "{emoji:🗑️} <b>Command Delete Control</b>\n\nWhen enabled, I will automatically delete command messages.\nUsage: {cmd} [enable|disable]\nCurrent state: {action}"
 cmddelete_updated: "{emoji:🗑️} Command deletion has been {action}."
 
-only_admin: "{emoji:⚠️} <b>Permission Denied!</b>\nOnly <b>admins</b> can control these actions. You can still play songs {emoji:🎵}.\n\nIf you believe you are an admin, please use /reload to refresh your admin status."
+only_admin: "<h4>{emoji:⚠️} Permission Denied!</h4>\n<aside>{emoji:🔒} Only <b>admins</b> can control these actions.</aside>\n<p>Don't worry — you can still play songs {emoji:🎵} and enjoy the music.</p>\n<footer><i>{emoji:ℹ️} Think you're an admin? Run <code>/reload</code> to refresh your permissions.</i></footer>"
 only_admin_cb: "⚠️ Only admins can do these actions."
 only_admin_or_auth: "{emoji:⚠️} <b>Access Denied</b>\nOnly <b>admins</b> or <b>authorized users</b> can control these actions.\n\nIf you recently became an admin, use /reload to refresh your permissions."
 only_admin_or_auth_cb: "⚠️ Only admins or authorized users can do these actions."

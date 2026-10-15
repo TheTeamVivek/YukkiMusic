@@ -86,7 +86,7 @@ func filterAuthUsers(c *td.Client, m *td.Message) bool {
 
 	mode, err := database.GetAdminMode(m.ChatID())
 	if err == nil && mode == database.AdminModeAdminsOnly {
-		if _, err := m.ReplyText(c, F(m.ChatID(), "only_admin"), nil); err != nil {
+		if _, err := m.ReplyRichMessage(c, onlyAdminRich(m.ChatID()), nil); err != nil {
 			utils.Log.Error(err.Error())
 		}
 	} else {
@@ -95,6 +95,12 @@ func filterAuthUsers(c *td.Client, m *td.Message) bool {
 		}
 	}
 	return false
+}
+
+func onlyAdminRich(chatID int64) *td.InputRichMessage {
+	return &td.InputRichMessage{
+		Source: &td.RichMessageSourceHtml{Text: F(chatID, "only_admin")},
+	}
 }
 
 func canUseAdminCommand(c *td.Client, chatID, userID int64) bool {
