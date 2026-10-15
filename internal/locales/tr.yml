@@ -414,8 +414,8 @@ nothumb_already: "ℹ️ Küçük resim gösterimi zaten {action}."
 nothumb_update_fail: "{emoji:⚠️} <b>Küçük resim ayarı güncellenemedi.</b>"
 nothumb_updated: "{emoji:🖼️} Küçük resim gösterimi {action} konumuna getirildi."
 
-cmddelete_status: "{emoji:🗑️} <b>Komut Silme Kontrolü</b>\n\nEtkinleştirildiğinde, komut mesajlarını otomatik olarak sileceğim.\nKullanım: {cmd} [enable|disable]\nMevcut durum: {action}"
-cmddelete_updated: "{emoji:🗑️} Komut silme {action} konuma getirildi."
+cmddelete_title: "{emoji:🗑️} Komut Silme"
+cmddelete_desc: "Etkinleştirildiğinde, komut mesajlarını işledikten sonra otomatik olarak sileceğim."
 
 only_admin: "<h4>{emoji:⚠️} Yetki Reddedildi!</h4>\n<aside>{emoji:🔒} Bu eylemi yalnızca <b>yöneticiler</b> kontrol edebilir.</aside>\n<p>Endişelenme — yine de şarkı çalabilir {emoji:🎵} ve müziğin tadını çıkarabilirsin.</p>\n<footer><i>{emoji:ℹ️} Yönetici misin? İzinlerini yenilemek için <code>/reload</code> çalıştır.</i></footer>"
 only_admin_cb: "⚠️ Bu eylemi yalnızca yöneticiler yapabilir."

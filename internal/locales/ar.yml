@@ -415,8 +415,8 @@ nothumb_already: "ℹ️ عرض الغلاف {action} بالفعل."
 nothumb_update_fail: "{emoji:⚠️} <b>فشل تحديث إعدادات الغلاف.</b>"
 nothumb_updated: "{emoji:🖼️} أصبح عرض الغلاف {action}."
 
-cmddelete_status: "{emoji:🗑️} <b>التحكم في حذف الأوامر</b>\n\nعند التفعيل، سأقوم بحذف رسائل الأوامر تلقائياً.\nالاستخدام: {cmd} [enable|disable]\nالحالة الحالية: {action}"
-cmddelete_updated: "{emoji:🗑️} تم {action} حذف الأوامر."
+cmddelete_title: "{emoji:🗑️} حذف الأوامر"
+cmddelete_desc: "عند التفعيل، سأقوم بحذف رسائل الأوامر تلقائياً بعد معالجتها."
 
 only_admin: "<h4>{emoji:⚠️} تم رفض الإذن!</h4>\n<aside>{emoji:🔒} فقط <b>المشرفون</b> يمكنهم التحكم في هذه الإجراءات.</aside>\n<p>لا تقلق — لا يزال بإمكانك تشغيل الأغاني {emoji:🎵} والاستمتاع بالموسيقى.</p>\n<footer><i>{emoji:ℹ️} هل أنت مشرف؟ شغّل <code>/reload</code> لتحديث صلاحياتك.</i></footer>"
 only_admin_cb: "⚠️ فقط المشرفون يمكنهم القيام بهذه الإجراءات."

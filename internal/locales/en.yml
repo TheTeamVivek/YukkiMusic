@@ -414,8 +414,8 @@ nothumb_already: "ℹ️ Thumbnail display is already {action}."
 nothumb_update_fail: "{emoji:⚠️} <b>Failed to update thumbnail setting.</b>"
 nothumb_updated: "{emoji:🖼️} Thumbnail display has been {action}."
 
-cmddelete_status: "{emoji:🗑️} <b>Command Delete Control</b>\n\nWhen enabled, I will automatically delete command messages.\nUsage: {cmd} [enable|disable]\nCurrent state: {action}"
-cmddelete_updated: "{emoji:🗑️} Command deletion has been {action}."
+cmddelete_title: "{emoji:🗑️} Command Delete"
+cmddelete_desc: "When enabled, I will automatically delete command messages after handling."
 
 only_admin: "<h4>{emoji:⚠️} Permission Denied!</h4>\n<aside>{emoji:🔒} Only <b>admins</b> can control these actions.</aside>\n<p>Don't worry — you can still play songs {emoji:🎵} and enjoy the music.</p>\n<footer><i>{emoji:ℹ️} Think you're an admin? Run <code>/reload</code> to refresh your permissions.</i></footer>"
 only_admin_cb: "⚠️ Only admins can do these actions."

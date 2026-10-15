@@ -27,7 +27,6 @@ import (
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
 	state "yukkimusic/internal/core/models"
-	"yukkimusic/internal/database"
 	"yukkimusic/internal/platforms"
 	"yukkimusic/internal/utils"
 )
@@ -54,13 +53,7 @@ func init() {
 		title:       func(chatID int64) string { return F(chatID, "autoplay_title") },
 		description: func(chatID int64) string { return F(chatID, "autoplay_desc") },
 		canUse: func(c *td.Client, u *td.UpdateNewCallbackQuery) bool {
-			if !canUseAdminCommand(c, u.ChatId, u.SenderUserId) {
-				key := "only_admin_or_auth_cb"
-				if mode, err := database.GetAdminMode(u.ChatId); err == nil &&
-					mode == database.AdminModeAdminsOnly {
-					key = "only_admin_cb"
-				}
-				u.Answer(c, 0, true, F(u.ChatId, key), "")
+			if !canUseAdminCallback(c, u) {
 				return false
 			}
 			if r, ok := core.Rooms.Get(u.ChatId); !ok || !r.Active() {

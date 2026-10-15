@@ -49,6 +49,14 @@ func init() {
 	helpTexts["/cmddelete"] = cmdDeleteHelp
 	helpTexts["/commanddelete"] = cmdDeleteHelp
 
+	dashboards["cmddelete"] = dashboardDef{
+		title:       func(chatID int64) string { return F(chatID, "cmddelete_title") },
+		description: func(chatID int64) string { return F(chatID, "cmddelete_desc") },
+		canUse:      canUseAdminCallback,
+		get:         func(chatID int64) (bool, error) { return database.CommandDelete(chatID) },
+		set:         func(chatID int64, on bool) error { return database.SetCommandDelete(chatID, on) },
+	}
+
 	cleanModeHelp := `<i>Enable timed cleanup for command/service messages in this chat.</i>
 
 <u>Usage:</u>
@@ -116,45 +124,19 @@ func cmdDeleteHandler(c *td.Client, m *td.Message) error {
 	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
 		return nil
 	}
-	args := strings.Fields(m.Text())
 	chatID := m.ChatID()
-	cmd := getCommand(m)
 
-	current, err := database.CommandDelete(chatID)
-	if err != nil {
-		return err
-	}
-
-	if len(args) < 2 {
-		actionKey := "disabled"
-		if current {
-			actionKey = "enabled"
+	if args := strings.Fields(m.Text()); len(args) > 1 {
+		if enabled, err := utils.ParseBool(args[1]); err == nil {
+			if current, cerr := database.CommandDelete(chatID); cerr == nil && enabled != current {
+				if err := database.SetCommandDelete(chatID, enabled); err != nil {
+					return err
+				}
+			}
 		}
-		_, err := m.ReplyText(c, F(chatID, "cmddelete_status", locales.Arg{
-			"cmd":    cmd,
-			"action": F(chatID, actionKey),
-		}), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
-		return err
 	}
 
-	enabled, err := utils.ParseBool(args[1])
-	if err != nil {
-		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return err
-	}
-
-	if err := database.SetCommandDelete(chatID, enabled); err != nil {
-		return err
-	}
-
-	actionKey := "disabled"
-	if enabled {
-		actionKey = "enabled"
-	}
-	_, rerr := m.ReplyText(c, F(chatID, "cmddelete_updated", locales.Arg{
-		"action": F(chatID, actionKey),
-	}), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
-	return rerr
+	return sendDashboard(c, m, "cmddelete")
 }
 
 func cleanModeHandler(c *td.Client, m *td.Message) error {

@@ -130,6 +130,23 @@ func canUseAdminCommand(c *td.Client, chatID, userID int64) bool {
 	return err == nil && isAuth
 }
 
+// canUseAdminCallback is the callback-query counterpart of filterAuthUsers: it
+// checks admin command access and, when denied, shows the proper toast (plain
+// text, since callback answers do not render HTML).
+func canUseAdminCallback(c *td.Client, u *td.UpdateNewCallbackQuery) bool {
+	if canUseAdminCommand(c, u.ChatId, u.SenderUserId) {
+		return true
+	}
+
+	key := "only_admin_or_auth_cb"
+	if mode, err := database.GetAdminMode(u.ChatId); err == nil &&
+		mode == database.AdminModeAdminsOnly {
+		key = "only_admin_cb"
+	}
+	u.Answer(c, 0, true, F(u.ChatId, key), "")
+	return false
+}
+
 func canManageAuth(c *td.Client, chatID, userID int64) bool {
 	if isOwnerOrSudo(userID) {
 		return true
