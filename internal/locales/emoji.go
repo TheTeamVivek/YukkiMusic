@@ -19,13 +19,16 @@ package locales
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 )
 
 // Emoji tokens that can be used inside any locale template as {emoji:<emoji>}.
 // A token whose mapped value is empty expands to the bare emoji character;
 // special tokens (premium/custom emoji) carry their Telegram entity id and the
-// <tg-emoji> tag is assembled in expandEmojis. The tag is language independent,
+// <tg-emoji> tag is assembled in expandEmojis. A token may also be a raw numeric
+// emoji id, e.g. {emoji:5234567890123456789}, which expands to a <tg-emoji> tag
+// carrying only that id (no fallback character). The tag is language independent,
 // so tokens expand identically for every locale.
 var emojiTokens = map[string]string{
 	"⏩":    "",
@@ -115,6 +118,12 @@ func expandEmojis(s string) string {
 		}
 		s = strings.ReplaceAll(s, token, emojiChar)
 	}
-	s = unknownEmojiRe.ReplaceAllString(s, "$1")
+	s = unknownEmojiRe.ReplaceAllStringFunc(s, func(token string) string {
+		content := token[len("{emoji:") : len(token)-1]
+		if _, err := strconv.ParseInt(content, 10, 64); err == nil {
+			return `<tg-emoji emoji-id="` + content + `"></tg-emoji>`
+		}
+		return content
+	})
 	return s
 }
