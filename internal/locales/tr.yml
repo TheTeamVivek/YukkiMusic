@@ -624,16 +624,8 @@ settings_main: |
 settings_updated: "✅ Ayarlar güncellendi!"
 
 autoplay_no_active: "⚠️ Bot şu anda sesli sohbette yayın yapmıyor. Önce bir şarkı çalın."
-autoplay_menu: |
-  {emoji:🔁} <b>Otomatik Çalma</b>
-
-  Etkinleştirildiğinde, kuyruk bittiğinde bot son çalınan şarkıya benzer önerilen şarkıları otomatik olarak çalmaya devam eder.
-
-  <b>Durum:</b> {state}
-
-autoplay_btn: "🔁 Otomatik Çalma: {state}"
-autoplay_enabled: "{emoji:✅} Otomatik çalma etkinleştirildi!"
-autoplay_disabled: "{emoji:❌} Otomatik çalma devre dışı!"
+autoplay_title: "{emoji:🔁} Otomatik Çalma"
+autoplay_desc: "Sıra bittiğinde bot, son çalan şarkıya benzer önerilen şarkıları otomatik olarak çalmaya devam eder."
 autoplay_requester: "Otomatik Çalma"
 
 searching: "{emoji:🔍}{emoji:🎶} Aranıyor... {emoji:⚡}{emoji:✨}"

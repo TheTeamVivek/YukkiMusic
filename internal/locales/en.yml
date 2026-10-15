@@ -630,16 +630,8 @@ settings_main: |
 settings_updated: "✅ Settings updated!"
 
 autoplay_no_active: "⚠️ Bot is not streaming in a voice chat. Start playing a song first."
-autoplay_menu: |
-  {emoji:🔁} <b>Autoplay</b>
-
-  When enabled, once the queue ends the bot will automatically keep playing recommended songs similar to the last played track.
-
-  <b>Status:</b> {state}
-
-autoplay_btn: "🔁 Autoplay: {state}"
-autoplay_enabled: "{emoji:✅} Autoplay enabled!"
-autoplay_disabled: "{emoji:❌} Autoplay disabled!"
+autoplay_title: "{emoji:🔁} Autoplay"
+autoplay_desc: "Once the queue ends, the bot automatically keeps playing recommended songs similar to the last played track."
 autoplay_requester: "Autoplay"
 
 

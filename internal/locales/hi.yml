@@ -627,16 +627,8 @@ settings_main: |
 settings_updated: "✅ सेटिंग्स अपडेट हो गईं!"
 
 autoplay_no_active: "⚠️ बॉट वॉइस चैट में कुछ नहीं बजा रहा है। पहले कोई गाना चलाएँ।"
-autoplay_menu: |
-  {emoji:🔁} <b>ऑटोप्ले</b>
-
-  चालू होने पर, क्यू समाप्त होने के बाद बॉट पिछले गाने से मिलते-जुलते सुझाए गए गाने स्वतः चलाता रहेगा।
-
-  <b>स्थिति:</b> {state}
-
-autoplay_btn: "🔁 ऑटोप्ले: {state}"
-autoplay_enabled: "{emoji:✅} ऑटोप्ले चालू हो गया!"
-autoplay_disabled: "{emoji:❌} ऑटोप्ले बंद हो गया!"
+autoplay_title: "{emoji:🔁} ऑटोप्ले"
+autoplay_desc: "कतार समाप्त होने पर, बॉट स्वतः अंतिम बजाए गए गाने के समान अनुशंसित गाने चलाता रहता है।"
 autoplay_requester: "ऑटोप्ले"
 
 searching: "{emoji:🔍}{emoji:🎶} अन्वेषण किया जा रहा है... {emoji:⚡}{emoji:✨}"

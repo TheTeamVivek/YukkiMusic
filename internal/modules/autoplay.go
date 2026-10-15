@@ -18,7 +18,9 @@
 package modules
 
 import (
+	"errors"
 	"math/rand"
+	"strings"
 
 	td "github.com/AshokShau/gotdbot"
 
@@ -26,16 +28,19 @@ import (
 	"yukkimusic/internal/core"
 	state "yukkimusic/internal/core/models"
 	"yukkimusic/internal/database"
-	"yukkimusic/internal/locales"
 	"yukkimusic/internal/platforms"
 	"yukkimusic/internal/utils"
 )
+
+var errNoRoom = errors.New("no active room")
 
 func init() {
 	helpTexts["/autoplay"] = `<i>Automatically play recommended songs when the queue ends.</i>
 
 <u>Usage:</u>
 <b>/autoplay</b> — Open the autoplay control panel
+<b>/autoplay enable</b> — Enable autoplay
+<b>/autoplay disable</b> — Disable autoplay
 
 <b>⚙️ Behavior:</b>
 • When enabled, once the queue finishes the bot keeps playing similar recommended tracks from YouTube.
@@ -44,6 +49,42 @@ func init() {
 
 <b>🔒 Restrictions:</b>
 • Only <b>chat admins</b> or <b>authorized users</b> can use this`
+
+	dashboards["autoplay"] = dashboardDef{
+		title:       func(chatID int64) string { return F(chatID, "autoplay_title") },
+		description: func(chatID int64) string { return F(chatID, "autoplay_desc") },
+		canUse: func(c *td.Client, u *td.UpdateNewCallbackQuery) bool {
+			if !canUseAdminCommand(c, u.ChatId, u.SenderUserId) {
+				key := "only_admin_or_auth_cb"
+				if mode, err := database.GetAdminMode(u.ChatId); err == nil &&
+					mode == database.AdminModeAdminsOnly {
+					key = "only_admin_cb"
+				}
+				u.Answer(c, 0, true, F(u.ChatId, key), "")
+				return false
+			}
+			if r, ok := core.Rooms.Get(u.ChatId); !ok || !r.Active() {
+				u.Answer(c, 0, true, F(u.ChatId, "autoplay_no_active"), "")
+				return false
+			}
+			return true
+		},
+		get: func(chatID int64) (bool, error) {
+			r, ok := core.Rooms.Get(chatID)
+			if !ok {
+				return false, errNoRoom
+			}
+			return r.Autoplay(), nil
+		},
+		set: func(chatID int64, on bool) error {
+			r, ok := core.Rooms.Get(chatID)
+			if !ok {
+				return errNoRoom
+			}
+			r.SetAutoplay(on)
+			return nil
+		},
+	}
 }
 
 func autoplayHandler(c *td.Client, m *td.Message) error {
@@ -52,87 +93,20 @@ func autoplayHandler(c *td.Client, m *td.Message) error {
 	}
 
 	chatID := m.ChatID()
+
 	r, ok := core.Rooms.Get(chatID)
 	if !ok || !r.Active() {
 		_, err := m.ReplyText(c, F(chatID, "autoplay_no_active"), nil)
 		return err
 	}
 
-	text, markup := autoplayMenu(chatID, r.Autoplay())
-	_, err := m.ReplyText(c, text, &td.SendMessageOpts{
-		ParseMode:   "HTML",
-		ReplyMarkup: markup,
-	})
-	return err
-}
-
-func autoplayCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
-	chatID := u.ChatId
-
-	r, ok := core.Rooms.Get(chatID)
-	if !ok || !r.Active() {
-		_ = u.Answer(c, 0, true, F(chatID, "autoplay_no_active"), "")
-		return nil
-	}
-
-	if !canUseAdminCommand(c, chatID, u.SenderUserId) {
-		mode, err := database.GetAdminMode(chatID)
-		if err == nil && mode == database.AdminModeAdminsOnly {
-			u.Answer(c, 0, true, F(chatID, "only_admin_cb"), "")
-		} else {
-			u.Answer(c, 0, true, F(chatID, "only_admin_or_auth_cb"), "")
+	if args := strings.Fields(m.Text()); len(args) > 1 {
+		if enabled, err := utils.ParseBool(args[1]); err == nil && enabled != r.Autoplay() {
+			r.SetAutoplay(enabled)
 		}
-		return nil
 	}
 
-	enabled := !r.Autoplay()
-	r.SetAutoplay(enabled)
-
-	statusKey := "autoplay_disabled"
-	if enabled {
-		statusKey = "autoplay_enabled"
-	}
-	_ = u.Answer(c, 0, false, F(chatID, statusKey), "")
-
-	text, markup := autoplayMenu(chatID, enabled)
-	_, err := u.EditMessageText(c, text, &td.EditMessageTextOpts{
-		ParseMode:   "HTML",
-		ReplyMarkup: markup,
-	})
-	return err
-}
-
-func autoplayMenu(chatID int64, enabled bool) (string, *td.ReplyMarkupInlineKeyboard) {
-	state := "disabled"
-	if enabled {
-		state = "enabled"
-	}
-
-	stateText := F(chatID, state)
-	text := F(chatID, "autoplay_menu", locales.Arg{
-		"state": stateText,
-	})
-
-	markup := &td.ReplyMarkupInlineKeyboard{
-		Rows: [][]td.InlineKeyboardButton{
-			{
-				{
-					Text: F(chatID, "autoplay_btn", locales.Arg{
-						"state": stateText,
-					}),
-					Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("autoplay:toggle")},
-				},
-			},
-			{
-				{
-					Text: F(chatID, "CLOSE_BTN"),
-					Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("close")},
-				},
-			},
-		},
-	}
-
-	return text, markup
+	return sendDashboard(c, m, "autoplay")
 }
 
 // pickAutoplayTrack resolves a recommended track to keep playback going once

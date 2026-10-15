@@ -33,30 +33,14 @@ import (
 type dashboardDef struct {
 	title       func(chatID int64) string
 	description func(chatID int64) string
-	canUse      func(c *td.Client, chatID, userID int64) bool
-	get         func() (bool, error)
-	set         func(bool) error
+	canUse      func(c *td.Client, u *td.UpdateNewCallbackQuery) bool
+	get         func(chatID int64) (bool, error)
+	set         func(chatID int64, on bool) error
 }
 
-// dashboards maps a callback name to the setting it controls. New toggle
-// commands only need to register an entry here.
-var dashboards = map[string]dashboardDef{
-	"autoleave": {
-		title:       func(chatID int64) string { return F(chatID, "autoleave_title") },
-		description: func(chatID int64) string { return F(chatID, "autoleave_desc") },
-		canUse: func(_ *td.Client, _, userID int64) bool {
-			return isOwnerOrSudo(userID)
-		},
-		get: database.AutoLeave,
-		set: func(on bool) error {
-			if err := database.SetAutoLeave(on); err != nil {
-				return err
-			}
-			autoLeaveSvc.SetEnabled(on)
-			return nil
-		},
-	},
-}
+// dashboards maps a callback name to the setting it controls. Each toggle
+// command registers its own entry from its init (see autoleave.go, autoplay.go).
+var dashboards = map[string]dashboardDef{}
 
 // dashboardRich renders the shared dashboard card: the given title and
 // description followed by the current on/off state.
@@ -111,7 +95,7 @@ func sendDashboard(c *td.Client, m *td.Message, name string) error {
 
 	chatID := m.ChatID()
 
-	enabled, err := def.get()
+	enabled, err := def.get(chatID)
 	if err != nil {
 		_, err := m.ReplyText(c, F(chatID, "dashboard_fail"), nil)
 		return err
@@ -138,19 +122,18 @@ func dashboardCallback(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		return nil
 	}
 
-	if !def.canUse(c, chatID, u.SenderUserId) {
-		u.Answer(c, 0, true, F(chatID, "only_sudo_cb"), "")
+	if !def.canUse(c, u) {
 		return nil
 	}
 
-	enabled, err := def.get()
+	enabled, err := def.get(chatID)
 	if err != nil {
 		u.Answer(c, 0, true, F(chatID, "dashboard_fail_cb"), "")
 		return nil
 	}
 
 	enabled = !enabled
-	if err := def.set(enabled); err != nil {
+	if err := def.set(chatID, enabled); err != nil {
 		u.Answer(c, 0, true, F(chatID, "dashboard_fail_cb"), "")
 		return nil
 	}

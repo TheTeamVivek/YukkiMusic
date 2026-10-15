@@ -61,6 +61,26 @@ Once enabled, the bot checks all joined groups/channels every <b>10 minutes</b> 
 This command can only be used by <b>owners</b> or <b>sudo users</b>.`,
 		autoLeaveLimit,
 	)
+
+	dashboards["autoleave"] = dashboardDef{
+		title:       func(chatID int64) string { return F(chatID, "autoleave_title") },
+		description: func(chatID int64) string { return F(chatID, "autoleave_desc") },
+		canUse: func(c *td.Client, u *td.UpdateNewCallbackQuery) bool {
+			if isOwnerOrSudo(u.SenderUserId) {
+				return true
+			}
+			u.Answer(c, 0, true, F(u.ChatId, "only_sudo_cb"), "")
+			return false
+		},
+		get: func(int64) (bool, error) { return database.AutoLeave() },
+		set: func(_ int64, on bool) error {
+			if err := database.SetAutoLeave(on); err != nil {
+				return err
+			}
+			autoLeaveSvc.SetEnabled(on)
+			return nil
+		},
+	}
 }
 
 func autoLeaveHandler(c *td.Client, m *td.Message) error {
@@ -81,12 +101,7 @@ func autoLeaveHandler(c *td.Client, m *td.Message) error {
 	}
 
 	enabled, err := utils.ParseBool(args[1])
-	if err != nil {
-		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return err
-	}
-
-	if enabled != current {
+	if err == nil && enabled != current {
 		if err := database.SetAutoLeave(enabled); err != nil {
 			_, err := m.ReplyText(c, F(chatID, "autoleave_update_fail"), nil)
 			return err
