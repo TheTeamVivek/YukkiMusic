@@ -401,20 +401,8 @@ no_song_query: |
 
 no_song_found: "{emoji:❌} कोई संगीत नहीं मिला।"
 
-nothumb_status: |
-  {emoji:🖼️} <b>लघु-चित्र नियन्त्रण</b>
-  
-  <i>सक्षम होने पर, संगीत सन्देश कलाकृति/लघु-चित्र नहीं दिखाएँगे।</i>
-  
-  <b>{emoji:📊} प्रयोग: {cmd} [enable|disable]</b>
-  
-  <i>लघु-चित्र वर्तमान में {action} है।</i>
-  
-nothumb_fetch_fail: "{emoji:⚠️} <b>लघु-चित्र विन्यास प्राप्त करने में विफल।</b>"
-nothumb_already: "ℹ️ लघु-चित्र प्रदर्शन पूर्व से ही {action} है।"
-nothumb_update_fail: "{emoji:⚠️} <b>लघु-चित्र विन्यास अद्यतन करने में विफल।</b>"
-nothumb_updated: "{emoji:🖼️} लघु-चित्र प्रदर्शन {action} कर दिया गया है।"
-
+nothumb_title: "{emoji:🖼️} थंबनेल"
+nothumb_desc: "सक्षम होने पर, प्लेबैक संदेशों में कला/थंबनेल नहीं दिखाए जाएंगे।"
 cmddelete_title: "{emoji:🗑️} कमांड डिलीट"
 cmddelete_desc: "सक्षम होने पर, मैं आदेश सन्देशों को संसाधित करने के बाद स्वचालित रूप से हटा दूँगा।"
 
@@ -598,8 +586,7 @@ settings_info_cleanduration: |
 settings_info_cleanmode: |
   थोड़े समय बाद कमांड और बॉट के सर्विस संदेश अपने-आप हटाता है।
   प्लेइंग स्टेटस संदेश अपने तय समय तक बने रहते हैं।
-cleanmode_status: "{emoji:🧹} <b>क्लीन मोड</b>\n\nकमांड और सर्विस संदेशों की स्वचालित सफाई।\nवर्तमान स्थिति: {action}"
-cleanmode_hint: "Use /settings to change auto-delete duration."
+
 
 settings_info_lang: |
   🌐 यह क्या है?
@@ -878,3 +865,6 @@ help_public: |
   <tr><td><code>/json</code></td><td>सन्देश की जे.एस.ओ.एन. संरचना दिखाएँ</td></tr>
   <tr><td><code>/sudolist</code></td><td>विशेषाधिकारी उपयोगकर्ताओं की सूची देखें</td></tr>
   </table>
+
+cleanmode_title: "{emoji:🧹} क्लीन मोड"
+cleanmode_desc: "सक्षम होने पर, बॉट सेवा संदेश और कमांड संदेश थोड़ी देर बाद स्वचालित रूप से हटा दिए जाते हैं।"

@@ -400,20 +400,8 @@ no_song_query: |
 
 no_song_found: "{emoji:❌} Parça bulunamadı."
 
-nothumb_status: |
-  {emoji:🖼️} <b>Küçük Resim Kontrolü</b>
-  
-  <i>Etkinleştirildiğinde, oynatma mesajlarında kapak resmi/küçük resim gösterilmez.</i>
-  
-  <b>{emoji:📊} Kullanım: {cmd} [enable|disable]</b>
-  
-  <i>Küçük resim şu an {action}.</i>
-  
-nothumb_fetch_fail: "{emoji:⚠️} <b>Küçük resim ayarı alınamadı.</b>"
-nothumb_already: "ℹ️ Küçük resim gösterimi zaten {action}."
-nothumb_update_fail: "{emoji:⚠️} <b>Küçük resim ayarı güncellenemedi.</b>"
-nothumb_updated: "{emoji:🖼️} Küçük resim gösterimi {action} konumuna getirildi."
-
+nothumb_title: "{emoji:🖼️} Küçük Resimler"
+nothumb_desc: "Etkinleştirildiğinde, oynatma mesajlarında kapak görseli/küçük resim gösterilmez."
 cmddelete_title: "{emoji:🗑️} Komut Silme"
 cmddelete_desc: "Etkinleştirildiğinde, komut mesajlarını işledikten sonra otomatik olarak sileceğim."
 
@@ -595,8 +583,7 @@ settings_info_cleanduration: |
 settings_info_cleanmode: |
   Komut ve bot servis mesajlarını kısa bir süre sonra otomatik siler.
   Çalıyor durum mesajları kendi süresi dolana kadar korunur.
-cleanmode_status: "{emoji:🧹} <b>Temiz Mod</b>\n\nKomut ve servis mesajlarını otomatik temizler.\nMevcut durum: {action}"
-cleanmode_hint: "Use /settings to change auto-delete duration."
+
 
 settings_info_lang: |
   🌐 Bu nedir?
@@ -875,3 +862,6 @@ help_public: |
   <tr><td><code>/json</code></td><td>Bir mesajın JSON yapısını göster</td></tr>
   <tr><td><code>/sudolist</code></td><td>Sudo kullanıcı listesini görüntüle</td></tr>
   </table>
+
+cleanmode_title: "{emoji:🧹} Temiz Mod"
+cleanmode_desc: "Etkinleştirildiğinde, bot hizmet mesajları ve komut mesajları kısa bir gecikmeden sonra otomatik olarak silinir."

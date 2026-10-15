@@ -401,20 +401,8 @@ no_song_query: |
 
 no_song_found: "{emoji:❌} لم يتم العثور على مقاطع."
 
-nothumb_status: |
-  {emoji:🖼️} <b>التحكم في الغلاف</b>
-  
-  <i>عند التفعيل، لن تعرض رسائل التشغيل الغلاف/الصور المصغرة.</i>
-  
-  <b>{emoji:📊} الاستخدام: {cmd} [enable|disable]</b>
-  
-  <i>الغلاف {action} حالياً.</i>
-  
-nothumb_fetch_fail: "{emoji:⚠️} <b>فشل جلب إعدادات الغلاف.</b>"
-nothumb_already: "ℹ️ عرض الغلاف {action} بالفعل."
-nothumb_update_fail: "{emoji:⚠️} <b>فشل تحديث إعدادات الغلاف.</b>"
-nothumb_updated: "{emoji:🖼️} أصبح عرض الغلاف {action}."
-
+nothumb_title: "{emoji:🖼️} الصور المصغرة"
+nothumb_desc: "عند التفعيل، لن تعرض رسائل التشغيل الصور أو الأعمال الفنية."
 cmddelete_title: "{emoji:🗑️} حذف الأوامر"
 cmddelete_desc: "عند التفعيل، سأقوم بحذف رسائل الأوامر تلقائياً بعد معالجتها."
 
@@ -598,8 +586,7 @@ settings_info_cleanduration: |
 settings_info_cleanmode: |
   يزيل رسائل الأوامر ورسائل خدمة البوت تلقائياً بعد مدة قصيرة.
   تظل رسائل حالة التشغيل حتى تنتهي مدتها تلقائياً.
-cleanmode_status: "{emoji:🧹} <b>الوضع النظيف</b>\n\nتنظيف تلقائي لرسائل الأوامر والخدمة.\nالحالة الحالية: {action}"
-cleanmode_hint: "Use /settings to change auto-delete duration."
+
 
 settings_info_lang: |
   🌐 ما هذا؟
@@ -879,3 +866,6 @@ help_public: |
   <tr><td><code>/sudolist</code></td><td>عرض قائمة المساعدين</td></tr>
   </table>
 
+
+cleanmode_title: "{emoji:🧹} وضع التنظيف"
+cleanmode_desc: "عند التفعيل، يتم حذف رسائل الخدمة وأوامر البوت تلقائياً بعد تأخير قصير."

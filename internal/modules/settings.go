@@ -57,6 +57,22 @@ func init() {
 		set:         func(chatID int64, on bool) error { return database.SetCommandDelete(chatID, on) },
 	}
 
+	dashboards["cleanmode"] = dashboardDef{
+		title:       func(chatID int64) string { return F(chatID, "cleanmode_title") },
+		description: func(chatID int64) string { return F(chatID, "cleanmode_desc") },
+		canUse:      canUseAdminCallback,
+		get:         func(chatID int64) (bool, error) { return database.CleanMode(chatID) },
+		set: func(chatID int64, on bool) error {
+			if err := database.SetCleanMode(chatID, on); err != nil {
+				return err
+			}
+			if !on {
+				cleanScheduler.cancel(chatID)
+			}
+			return nil
+		},
+	}
+
 	cleanModeHelp := `<i>Enable timed cleanup for command/service messages in this chat.</i>
 
 <u>Usage:</u>
@@ -143,37 +159,22 @@ func cleanModeHandler(c *td.Client, m *td.Message) error {
 	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
 		return nil
 	}
-	args := strings.Fields(m.Text())
 	chatID := m.ChatID()
 
-	current, err := database.CleanMode(chatID)
-	if err != nil {
-		return err
+	if args := strings.Fields(m.Text()); len(args) > 1 {
+		if enabled, err := utils.ParseBool(args[1]); err == nil {
+			if current, cerr := database.CleanMode(chatID); cerr == nil && enabled != current {
+				if err := database.SetCleanMode(chatID, enabled); err != nil {
+					return err
+				}
+				if !enabled {
+					cleanScheduler.cancel(chatID)
+				}
+			}
+		}
 	}
 
-	if len(args) < 2 {
-		_, err := m.ReplyText(
-			c,
-			cleanModeStatusText(chatID, current)+"\n\n"+F(chatID, "cleanmode_hint"),
-			&td.SendMessageOpts{ParseMode: td.ParseModeHTML},
-		)
-		return err
-	}
-
-	enabled, err := utils.ParseBool(args[1])
-	if err != nil {
-		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return err
-	}
-
-	if err := database.SetCleanMode(chatID, enabled); err != nil {
-		return err
-	}
-	if !enabled {
-		cleanScheduler.cancel(chatID)
-	}
-	_, rerr := m.ReplyText(c, cleanModeStatusText(chatID, enabled)+"\n\n"+F(chatID, "cleanmode_hint"), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
-	return rerr
+	return sendDashboard(c, m, "cleanmode")
 }
 
 func adminModeHandler(c *td.Client, m *td.Message) error {

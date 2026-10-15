@@ -400,19 +400,10 @@ no_song_query: |
 
 no_song_found: "{emoji:❌} No tracks found."
 
-nothumb_status: |
-  {emoji:🖼️} <b>Thumbnail Control</b>
+nothumb_title: "{emoji:🖼️} Thumbnails"
+nothumb_desc: "When enabled, playback messages will not show artwork/thumbnails."
+
   
-  <i>When enabled, playback messages won't show artwork/thumbnails.</i>
-  
-  <b>{emoji:📊} Usage: {cmd} [enable|disable]</b>
-  
-  <i>Thumbnail is {action} currently.</i>
-  
-nothumb_fetch_fail: "{emoji:⚠️} <b>Failed to fetch thumbnail setting.</b>"
-nothumb_already: "ℹ️ Thumbnail display is already {action}."
-nothumb_update_fail: "{emoji:⚠️} <b>Failed to update thumbnail setting.</b>"
-nothumb_updated: "{emoji:🖼️} Thumbnail display has been {action}."
 
 cmddelete_title: "{emoji:🗑️} Command Delete"
 cmddelete_desc: "When enabled, I will automatically delete command messages after handling."
@@ -601,8 +592,7 @@ settings_info_cleanduration: |
 settings_info_cleanmode: |
   Automatically removes command and bot service messages after a short delay.
   Playing status messages are kept until they naturally expire.
-cleanmode_status: "{emoji:🧹} <b>Clean Mode</b>\n\nAuto-cleanup of command and service messages.\nCurrent state: {action}\nDelete after: {duration}m"
-cleanmode_hint: "Use /settings to change auto-delete duration."
+
 
 settings_info_lang: |
   🌐 What is this?
@@ -880,3 +870,6 @@ help_public: |
   <tr><td><code>/sudolist</code></td><td>View the sudo user list</td></tr>
   </table>
   <footer>Use /help &lt;command&gt; for details on any command.</footer>
+
+cleanmode_title: "{emoji:🧹} Clean Mode"
+cleanmode_desc: "When enabled, bot service messages and command messages are auto-deleted after a short delay."
