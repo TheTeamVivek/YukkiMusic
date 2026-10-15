@@ -197,10 +197,15 @@ authlist_hint: "एक्सेस हटाने के लिए ⨯ दब�
 authlist_delete_success: "{emoji:🗑️} अधिकार हटा दिया गया।"
 
 autoleave_fetch_fail: "{emoji:⚠️} <b>स्वचालित प्रस्थान स्थिति प्राप्त करने में विफल।</b>"
-autoleave_status: "{emoji:🏃‍♂️} <b>स्वचालित प्रस्थान नियन्त्रण</b>\n\nसक्षम होने पर, सहायक स्वचालित रूप से वार्तालाप छोड़ देगा।\nप्रयोग: {cmd} [enable|disable]\nवर्तमान स्थिति: {action}"
-autoleave_already: "{emoji:⚠️} स्वचालित प्रस्थान पूर्व से ही {action} है"
+autoleave_title: "{emoji:🏃‍♂️} स्वचालित प्रस्थान नियन्त्रण"
+autoleave_desc: "सक्षम होने पर, सहायक हर 10 मिनट में निष्क्रिय या अनावश्यक चैट स्वतः छोड़ देगा।"
 autoleave_update_fail: "{emoji:⚠️} <b>स्वचालित प्रस्थान स्थिति अद्यतन करने में विफल।</b>"
-autoleave_updated: "{emoji:🏃‍♂️} स्वचालित प्रस्थान {action} कर दिया गया है"
+
+dashboard_status: "{emoji:ℹ️} स्थिति: <b>{status}</b>"
+dashboard_enabled: "{emoji:✅} सक्षम"
+dashboard_disabled: "{emoji:❌} अक्षम"
+dashboard_toggled_cb: "✅ सेटिंग {status} कर दी गई।"
+dashboard_fail_cb: "⚠️ सेटिंग अद्यतन करने में विफल।"
 
 enabled: "सक्षम"
 disabled: "अक्षम"
@@ -420,6 +425,7 @@ only_admin_or_auth_cb: "⚠️ केवल प्रशासक अथवा �
 only_supergroup: "{emoji:⚠️} यह आदेश केवल समूहों में प्रयुक्त किया जा सकता है।"
 only_owner: "⚠️ केवल सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
 only_sudo: "{emoji:⚠️} केवल विशेषाधिकारी या सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
+only_sudo_cb: "⚠️ केवल विशेषाधिकारी या सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
 
 pause_already: |
   {emoji:⏸️} <b>पूर्व से ही विराम</b>

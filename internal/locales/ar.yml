@@ -199,10 +199,15 @@ authlist_hint: "اضغط ⨯ لإلغاء الوصول."
 authlist_delete_success: "{emoji:🗑️} تم إلغاء التصريح."
 
 autoleave_fetch_fail: "{emoji:⚠️} <b>فشل جلب حالة المغادرة التلقائية.</b>"
-autoleave_status: "{emoji:🏃‍♂️} <b>التحكم في المغادرة التلقائية</b>\n\nعند التفعيل، سيغادر المساعد المحادثة تلقائياً.\nالاستخدام: {cmd} [enable|disable]\nالحالة الحالية: {action}"
-autoleave_already: "{emoji:⚠️} المغادرة التلقائية {action} بالفعل"
+autoleave_title: "{emoji:🏃‍♂️} التحكم بالمغادرة التلقائية"
+autoleave_desc: "عند التفعيل، يغادر المساعد تلقائياً المحادثات غير النشطة أو غير الضرورية كل 10 دقائق."
 autoleave_update_fail: "{emoji:⚠️} <b>فشل تحديث حالة المغادرة التلقائية.</b>"
-autoleave_updated: "{emoji:🏃‍♂️} المغادرة التلقائية أصبحت {action}"
+
+dashboard_status: "{emoji:ℹ️} الحالة: <b>{status}</b>"
+dashboard_enabled: "{emoji:✅} مفعلة"
+dashboard_disabled: "{emoji:❌} معطلة"
+dashboard_toggled_cb: "✅ تم تحديث الإعداد إلى {status}."
+dashboard_fail_cb: "⚠️ فشل تحديث الإعداد."
 
 enabled: "مفعلة"
 disabled: "معطلة"
@@ -420,6 +425,7 @@ only_admin_or_auth_cb: "⚠️ فقط المشرفون أو المصرح لهم 
 only_supergroup: "{emoji:⚠️} هذا الأمر يمكن استخدامه في المجموعات فقط."
 only_owner: "⚠️ فقط مالك المساعد يمكنه استخدام هذا الأمر."
 only_sudo: "{emoji:⚠️} فقط المساعدون أو مالك المساعد يمكنهم استخدام هذا الأمر."
+only_sudo_cb: "⚠️ فقط المساعدون أو مالك المساعد يمكنهم استخدام هذا الأمر."
 
 pause_already: |
   {emoji:⏸️} <b>متوقف مؤقتاً بالفعل</b>

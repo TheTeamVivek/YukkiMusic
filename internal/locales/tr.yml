@@ -198,10 +198,15 @@ authlist_hint: "Erişimi kaldırmak için ⨯ simgesine dokunun."
 authlist_delete_success: "{emoji:🗑️} Yetki kaldırıldı."
 
 autoleave_fetch_fail: "{emoji:⚠️} <b>Otomatik Ayrılma (AutoLeave) durumu alınamadı.</b>"
-autoleave_status: "{emoji:🏃‍♂️} <b>Otomatik Ayrılma Kontrolü</b>\n\nEtkinleştirildiğinde, asistan sohbetten otomatik olarak ayrılır.\nKullanım: {cmd} [enable|disable]\nMevcut durum: {action}"
-autoleave_already: "{emoji:⚠️} Otomatik Ayrılma zaten {action}"
+autoleave_title: "{emoji:🏃‍♂️} Otomatik Ayrılma Kontrolü"
+autoleave_desc: "Etkinleştirildiğinde asistan, her 10 dakikada bir etkin olmayan veya gereksiz sohbetlerden otomatik olarak ayrılır."
 autoleave_update_fail: "{emoji:⚠️} <b>Otomatik Ayrılma durumu güncellenemedi.</b>"
-autoleave_updated: "{emoji:🏃‍♂️} Otomatik Ayrılma {action} konumuna getirildi."
+
+dashboard_status: "{emoji:ℹ️} Durum: <b>{status}</b>"
+dashboard_enabled: "{emoji:✅} Etkin"
+dashboard_disabled: "{emoji:❌} Devre Dışı"
+dashboard_toggled_cb: "✅ Ayar {status} olarak güncellendi."
+dashboard_fail_cb: "⚠️ Ayar güncellenemedi."
 
 enabled: "Etkin"
 disabled: "Devre Dışı"
@@ -419,6 +424,7 @@ only_admin_or_auth_cb: "⚠️ Bu eylemi yalnızca yöneticiler veya yetkili kul
 only_supergroup: "{emoji:⚠️} Bu komut yalnızca gruplarda kullanılabilir."
 only_owner: "⚠️ Bu komutu yalnızca bot sahibi kullanabilir."
 only_sudo: "{emoji:⚠️} Bu komutu yalnızca sudo kullanıcıları veya bot sahibi kullanabilir."
+only_sudo_cb: "⚠️ Bu komutu yalnızca sudo kullanıcıları veya bot sahibi kullanabilir."
 
 pause_already: |
   {emoji:⏸️} <b>Zaten Duraklatıldı</b>

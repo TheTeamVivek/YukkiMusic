@@ -29,7 +29,6 @@ import (
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/database"
-	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
 
@@ -70,20 +69,14 @@ func autoLeaveHandler(c *td.Client, m *td.Message) error {
 	}
 	chatID := m.ChatID()
 
+	args := strings.Fields(m.Text())
+	if len(args) < 2 {
+		return sendDashboard(c, m, "autoleave")
+	}
+
 	current, err := database.AutoLeave()
 	if err != nil {
 		_, err := m.ReplyText(c, F(chatID, "autoleave_fetch_fail"), nil)
-		return err
-	}
-
-	args := strings.Fields(m.Text())
-	if len(args) < 2 {
-		_, err :=
-			// no argument => show current status
-			m.ReplyText(c, F(chatID, "autoleave_status", locales.Arg{
-				"cmd":    getCommand(m),
-				"action": F(chatID, utils.IfElse(current, "enabled", "disabled")),
-			}), nil)
 		return err
 	}
 
@@ -93,27 +86,15 @@ func autoLeaveHandler(c *td.Client, m *td.Message) error {
 		return err
 	}
 
-	action := F(chatID, utils.IfElse(enabled, "enabled", "disabled"))
-
-	if enabled == current {
-		_, err := m.ReplyText(c, F(chatID, "autoleave_already", locales.Arg{
-			"action": action,
-		}), nil)
-		return err
+	if enabled != current {
+		if err := database.SetAutoLeave(enabled); err != nil {
+			_, err := m.ReplyText(c, F(chatID, "autoleave_update_fail"), nil)
+			return err
+		}
+		autoLeaveSvc.SetEnabled(enabled)
 	}
 
-	if err := database.SetAutoLeave(enabled); err != nil {
-		_, err := m.ReplyText(c, F(chatID, "autoleave_update_fail"), nil)
-		return err
-	}
-	if _, err := m.ReplyText(c, F(chatID, "autoleave_updated", locales.Arg{
-		"action": action,
-	}), nil); err != nil {
-		return err
-	}
-
-	autoLeaveSvc.SetEnabled(enabled)
-	return nil
+	return sendDashboard(c, m, "autoleave")
 }
 
 // Start restores the auto-leave state from the database and launches the loop.
@@ -136,19 +117,16 @@ func (s *autoLeaveService) loop() {
 		if !s.enabled.Load() {
 			continue
 		}
-		s.runCycle()
-	}
-}
 
-// runCycle scans every assistant's chats and leaves the inactive ones.
-func (s *autoLeaveService) runCycle() {
-	activeRooms := core.Rooms.All()
-	core.Assistants.ForEach(func(a *core.Assistant) {
-		if a == nil || a.Client == nil {
-			return
-		}
-		go s.leaveInactiveChats(a, activeRooms)
-	})
+		// Scan every assistant's chats and leave the inactive ones.
+		activeRooms := core.Rooms.All()
+		core.Assistants.ForEach(func(a *core.Assistant) {
+			if a == nil || a.Client == nil {
+				return
+			}
+			go s.leaveInactiveChats(a, activeRooms)
+		})
+	}
 }
 
 func (s *autoLeaveService) leaveInactiveChats(

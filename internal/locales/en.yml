@@ -198,10 +198,15 @@ authlist_hint: "Tap ⨯ to revoke access."
 authlist_delete_success: "{emoji:🗑️} Authorization revoked."
 
 autoleave_fetch_fail: "{emoji:⚠️} <b>Failed to fetch AutoLeave state.</b>"
-autoleave_status: "{emoji:🏃‍♂️} <b>AutoLeave Control</b>\n\nWhen enabled, the assistant will automatically leave the chat.\nUsage: {cmd} [enable|disable]\nCurrent state: {action}"
-autoleave_already: "{emoji:⚠️} AutoLeave is already {action}"
+autoleave_title: "{emoji:🏃‍♂️} AutoLeave Control"
+autoleave_desc: "When enabled, the assistant automatically leaves inactive or unnecessary chats every 10 minutes."
 autoleave_update_fail: "{emoji:⚠️} <b>Failed to update AutoLeave state.</b>"
-autoleave_updated: "{emoji:🏃‍♂️} AutoLeave has been {action}"
+
+dashboard_status: "{emoji:ℹ️} Status: <b>{status}</b>"
+dashboard_enabled: "{emoji:✅} Enabled"
+dashboard_disabled: "{emoji:❌} Disabled"
+dashboard_toggled_cb: "✅ Setting updated to {status}."
+dashboard_fail_cb: "⚠️ Failed to update the setting."
 
 enabled: "Enabled"
 disabled: "Disabled"
@@ -419,6 +424,7 @@ only_admin_or_auth_cb: "⚠️ Only admins or authorized users can do these acti
 only_supergroup: "{emoji:⚠️} This command can only be used in groups."
 only_owner: "⚠️ Only the bot owner can use this command."
 only_sudo: "{emoji:⚠️} Only sudo users or the bot owner can use this command."
+only_sudo_cb: "⚠️ Only sudo users or the bot owner can use this command."
 
 pause_already: |
   {emoji:⏸️} <b>Already Paused</b>
