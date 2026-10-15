@@ -210,7 +210,7 @@ func queueMoreHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 }
 
 func checkAdminOrAuth(c *td.Client, u *td.UpdateNewCallbackQuery, chatID int64) bool {
-	if canUseAdminCommand(c, chatID, u.SenderUserId) {
+	if isAdminOrAuth(c, chatID, u.SenderUserId) {
 		return true
 	}
 

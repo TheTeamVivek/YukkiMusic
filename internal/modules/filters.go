@@ -80,7 +80,7 @@ func isSuperGroup(c *td.Client, m *td.Message) bool {
 }
 
 func filterAuthUsers(c *td.Client, m *td.Message) bool {
-	if canUseAdminCommand(c, m.ChatID(), m.SenderID()) {
+	if isAdminOrAuth(c, m.ChatID(), m.SenderID()) {
 		return true
 	}
 
@@ -103,7 +103,7 @@ func onlyAdminRich(chatID int64) *td.InputRichMessage {
 	}
 }
 
-func canUseAdminCommand(c *td.Client, chatID, userID int64) bool {
+func isAdminOrAuth(c *td.Client, chatID, userID int64) bool {
 	if isOwnerOrSudo(userID) {
 		return true
 	}
@@ -134,7 +134,7 @@ func canUseAdminCommand(c *td.Client, chatID, userID int64) bool {
 // checks admin command access and, when denied, shows the proper toast (plain
 // text, since callback answers do not render HTML).
 func canUseAdminCallback(c *td.Client, u *td.UpdateNewCallbackQuery) bool {
-	if canUseAdminCommand(c, u.ChatId, u.SenderUserId) {
+	if isAdminOrAuth(c, u.ChatId, u.SenderUserId) {
 		return true
 	}
 
