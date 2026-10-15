@@ -189,11 +189,13 @@ del_auth_success: "{emoji:✅} {user} başarıyla yetkili kullanıcılar listesi
 # 📜 Auth list
 authlist_fetch_fail: "{emoji:❌} Yetkili kullanıcı listesi alınamadı: <code>{error}</code>"
 authlist_empty: "ℹ️ Bu sohbette yetkili kullanıcı yok."
-authlist_fetching: "{emoji:⏳} Yetkili kullanıcı listesi getiriliyor..."
-authlist_header: "<b>Yetkili Kullanıcılar:</b>"
-authlist_user_fail: "{index}. <code>{user_id}</code> (Kullanıcı bilgileri alınamadı)"
-authlist_user_entry: "{index}. {user} (<code>{user_id}</code>)"
-authlist_total: "<b>Toplam:</b> {count} kullanıcı"
+authlist_title: "{emoji:🔐} Yetkili Kullanıcılar"
+authlist_count: "{emoji:👥} {count}/{limit} yetkili"
+authlist_col_user: "{emoji:👤} Kullanıcı"
+authlist_col_id: "{emoji:🆔} Kimlik"
+authlist_unknown_user: "<i>Bilinmiyor</i>"
+authlist_hint: "Erişimi kaldırmak için ⨯ simgesine dokunun."
+authlist_delete_success: "{emoji:🗑️} Yetki kaldırıldı."
 
 autoleave_fetch_fail: "{emoji:⚠️} <b>Otomatik Ayrılma (AutoLeave) durumu alınamadı.</b>"
 autoleave_status: "{emoji:🏃‍♂️} <b>Otomatik Ayrılma Kontrolü</b>\n\nEtkinleştirildiğinde, asistan sohbetten otomatik olarak ayrılır.\nKullanım: {cmd} [enable|disable]\nMevcut durum: {action}"

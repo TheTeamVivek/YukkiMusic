@@ -71,6 +71,11 @@ For related commands, see <code>/delauth</code> and <code>/authlist</code>.`,
 func addAuthHandler(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 
+	if !canManageAuth(c, chatID, m.SenderID()) {
+		_, err := m.ReplyText(c, F(chatID, "only_admin"), nil)
+		return err
+	}
+
 	if m.Args() == "" && m.ReplyToMessageID() == 0 {
 		_, err := m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
 			"cmd": getCommand(m),
@@ -161,6 +166,11 @@ func addAuthHandler(c *td.Client, m *td.Message) error {
 func delAuthHandler(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 
+	if !canManageAuth(c, chatID, m.SenderID()) {
+		_, err := m.ReplyText(c, F(chatID, "only_admin"), nil)
+		return err
+	}
+
 	if m.Args() == "" && m.ReplyToMessageID() == 0 {
 		_, err := m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
 			"cmd": getCommand(m),
@@ -216,47 +226,106 @@ func authListHandler(c *td.Client, m *td.Message) error {
 		return err
 	}
 
-	if len(authUsers) == 0 {
-		_, err := m.ReplyText(c, F(chatID, "authlist_empty", nil), nil)
-		return err
+	_, err = m.ReplyRichMessage(c, authRich(c, chatID, authUsers), nil)
+	return err
+}
+
+// authRich builds the rich "authorized users" card. Each row carries a danger
+// button that revokes that user's authorization and refreshes the card.
+func authRich(c *td.Client, chatID int64, users []int64) *td.InputRichMessage {
+	var b strings.Builder
+
+	fmt.Fprintf(&b, "<h3>%s</h3>\n", F(chatID, "authlist_title"))
+
+	if len(users) == 0 {
+		fmt.Fprintf(&b, "<p>%s</p>\n", F(chatID, "authlist_empty"))
+		return &td.InputRichMessage{
+			Source: &td.RichMessageSourceHtml{Text: b.String()},
+		}
 	}
 
-	statusMsg, err := m.ReplyText(c, F(chatID, "authlist_fetching", nil), nil)
-	if err != nil {
+	fmt.Fprintf(&b, "<p>%s</p>\n", F(chatID, "authlist_count", locales.Arg{
+		"count": len(users),
+		"limit": config.MaxAuthUsers,
+	}))
+	b.WriteString("<table bordered striped compact>\n")
+	fmt.Fprintf(
+		&b,
+		"<tr><th>%s</th><th>%s</th><th>\U0001F5D1\uFE0F</th></tr>\n",
+		F(chatID, "authlist_col_user"),
+		F(chatID, "authlist_col_id"),
+	)
+
+	for _, userID := range users {
+		name := F(chatID, "authlist_unknown_user")
+		if user, err := c.GetUser(userID); err == nil && user != nil {
+			name = mention(user, userID)
+			if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
+				name += " (@" + user.Usernames.ActiveUsernames[0] + ")"
+			}
+		}
+		fmt.Fprintf(
+			&b,
+			"<tr><td>%s</td><td><code>%d</code></td>"+
+				"<td><tg-button type=\"callback_data\" style=\"danger\" data=\"authdel:%d:%d\">\u2a2f</tg-button></td></tr>\n",
+			name,
+			userID,
+			chatID,
+			userID,
+		)
+	}
+	b.WriteString("</table>\n")
+	fmt.Fprintf(&b, "<footer>%s</footer>\n", F(chatID, "authlist_hint"))
+
+	return &td.InputRichMessage{
+		Source: &td.RichMessageSourceHtml{Text: b.String()},
+	}
+}
+
+func authDeleteHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
+	chatID := u.ChatId
+
+	parts := strings.Split(u.DataString(), ":")
+	if len(parts) != 3 || parts[0] != "authdel" {
+		utils.Log.Warnf("Invalid auth delete payload: %s", u.DataString())
+		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
 		return nil
 	}
 
-	var sb strings.Builder
-	sb.WriteString(F(chatID, "authlist_header", nil) + "\n")
-
-	for i, userID := range authUsers {
-		user, err := c.GetUser(userID)
-		if err != nil || user == nil {
-			sb.WriteString(F(chatID, "authlist_user_fail", locales.Arg{
-				"index":   i + 1,
-				"user_id": userID,
-			}) + "\n")
-			continue
-		}
-
-		uname := mention(user, userID)
-		if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
-			uname += " (@" + user.Usernames.ActiveUsernames[0] + ")"
-		}
-
-		sb.WriteString(F(chatID, "authlist_user_entry", locales.Arg{
-			"index":   i + 1,
-			"user":    uname,
-			"user_id": user.Id,
-		}) + "\n")
+	targetID, err := strconv.ParseInt(parts[2], 10, 64)
+	if err != nil {
+		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		return nil
 	}
 
-	sb.WriteString("\n" + F(chatID, "authlist_total", locales.Arg{
-		"count": len(authUsers),
-	}))
+	if !canManageAuth(c, chatID, u.SenderUserId) {
+		u.Answer(c, 0, true, F(chatID, "only_admin_cb"), "")
+		return nil
+	}
 
-	_, _ = utils.EOR(c, statusMsg, sb.String(), &td.EditMessageTextOpts{
-		ParseMode: td.ParseModeHTML,
-	})
+	if ok, err := database.IsAuthorized(chatID, targetID); !ok || err != nil {
+		u.Answer(c, 0, true, F(chatID, "del_auth_not_authorized"), "")
+		return nil
+	}
+
+	if err := database.Unauthorize(chatID, targetID); err != nil {
+		u.Answer(c, 0, true, F(chatID, "del_auth_remove_fail", locales.Arg{
+			"error": err.Error(),
+		}), "")
+		return nil
+	}
+
+	users, err := database.AuthorizedUsers(chatID)
+	if err != nil {
+		users = nil
+	}
+
+	if _, err := c.EditContent(u.ChatId, u.MessageId, &td.InputMessageRichMessage{
+		Message: authRich(c, chatID, users),
+	}, nil); err != nil {
+		utils.Log.Errorf("Failed to edit auth list: %v", err)
+	}
+
+	u.Answer(c, 0, true, F(chatID, "authlist_delete_success"), "")
 	return nil
 }

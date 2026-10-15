@@ -190,11 +190,13 @@ del_auth_success: "{emoji:✅} تمت إزالة {user} بنجاح من قائم
 # 📜 Auth list
 authlist_fetch_fail: "{emoji:❌} فشل جلب قائمة المستخدمين المصرح لهم: <code>{error}</code>"
 authlist_empty: "ℹ️ لا يوجد مستخدمون مصرح لهم في هذه المحادثة."
-authlist_fetching: "{emoji:⏳} جاري جلب قائمة المستخدمين المصرح لهم..."
-authlist_header: "<b>المستخدمون المصرح لهم:</b>"
-authlist_user_fail: "{index}. <code>{user_id}</code> (تعذر جلب معلومات المستخدم)"
-authlist_user_entry: "{index}. {user} (<code>{user_id}</code>)"
-authlist_total: "<b>الإجمالي:</b> {count} مستخدمين"
+authlist_title: "{emoji:🔐} المستخدمون المصرح لهم"
+authlist_count: "{emoji:👥} {count}/{limit} مصرح"
+authlist_col_user: "{emoji:👤} المستخدم"
+authlist_col_id: "{emoji:🆔} المعرّف"
+authlist_unknown_user: "<i>غير معروف</i>"
+authlist_hint: "اضغط ⨯ لإلغاء الوصول."
+authlist_delete_success: "{emoji:🗑️} تم إلغاء التصريح."
 
 autoleave_fetch_fail: "{emoji:⚠️} <b>فشل جلب حالة المغادرة التلقائية.</b>"
 autoleave_status: "{emoji:🏃‍♂️} <b>التحكم في المغادرة التلقائية</b>\n\nعند التفعيل، سيغادر المساعد المحادثة تلقائياً.\nالاستخدام: {cmd} [enable|disable]\nالحالة الحالية: {action}"

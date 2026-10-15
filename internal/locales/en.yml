@@ -189,11 +189,13 @@ del_auth_success: "{emoji:✅} Successfully removed {user} from the authorized u
 # 📜 Auth list
 authlist_fetch_fail: "{emoji:❌} Failed to get authorized users list: <code>{error}</code>"
 authlist_empty: "ℹ️ There are no authorized users in this chat."
-authlist_fetching: "{emoji:⏳} Fetching authorized users list..."
-authlist_header: "<b>Authorized Users:</b>"
-authlist_user_fail: "{index}. <code>{user_id}</code> (Could not fetch user info)"
-authlist_user_entry: "{index}. {user} (<code>{user_id}</code>)"
-authlist_total: "<b>Total:</b> {count} users"
+authlist_title: "{emoji:🔐} Authorized Users"
+authlist_count: "{emoji:👥} {count}/{limit} authorized"
+authlist_col_user: "{emoji:👤} User"
+authlist_col_id: "{emoji:🆔} ID"
+authlist_unknown_user: "<i>Unknown</i>"
+authlist_hint: "Tap ⨯ to revoke access."
+authlist_delete_success: "{emoji:🗑️} Authorization revoked."
 
 autoleave_fetch_fail: "{emoji:⚠️} <b>Failed to fetch AutoLeave state.</b>"
 autoleave_status: "{emoji:🏃‍♂️} <b>AutoLeave Control</b>\n\nWhen enabled, the assistant will automatically leave the chat.\nUsage: {cmd} [enable|disable]\nCurrent state: {action}"

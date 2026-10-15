@@ -188,11 +188,13 @@ del_auth_success: "{emoji:✅} {user} को अधिकृत उपयोग�
 # 📜 Auth list
 authlist_fetch_fail: "{emoji:❌} अधिकृत उपयोगकर्ताओं की सूची प्राप्त करने में विफल: <code>{error}</code>"
 authlist_empty: "ℹ️ इस वार्तालाप में कोई अधिकृत उपयोगकर्ता नहीं है।"
-authlist_fetching: "{emoji:⏳} अधिकृत उपयोगकर्ताओं की सूची प्राप्त की जा रही है..."
-authlist_header: "<b>अधिकृत उपयोगकर्ता:</b>"
-authlist_user_fail: "{index}. <code>{user_id}</code> (उपयोगकर्ता सूचना प्राप्त नहीं की जा सकी)"
-authlist_user_entry: "{index}. {user} (<code>{user_id}</code>)"
-authlist_total: "<b>कुल:</b> {count} उपयोगकर्ता"
+authlist_title: "{emoji:🔐} अधिकृत उपयोगकर्ता"
+authlist_count: "{emoji:👥} {count}/{limit} अधिकृत"
+authlist_col_user: "{emoji:👤} उपयोगकर्ता"
+authlist_col_id: "{emoji:🆔} आईडी"
+authlist_unknown_user: "<i>अज्ञात</i>"
+authlist_hint: "एक्सेस हटाने के लिए ⨯ दबाएँ।"
+authlist_delete_success: "{emoji:🗑️} अधिकार हटा दिया गया।"
 
 autoleave_fetch_fail: "{emoji:⚠️} <b>स्वचालित प्रस्थान स्थिति प्राप्त करने में विफल।</b>"
 autoleave_status: "{emoji:🏃‍♂️} <b>स्वचालित प्रस्थान नियन्त्रण</b>\n\nसक्षम होने पर, सहायक स्वचालित रूप से वार्तालाप छोड़ देगा।\nप्रयोग: {cmd} [enable|disable]\nवर्तमान स्थिति: {action}"

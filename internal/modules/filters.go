@@ -124,6 +124,15 @@ func canUseAdminCommand(c *td.Client, chatID, userID int64) bool {
 	return err == nil && isAuth
 }
 
+func canManageAuth(c *td.Client, chatID, userID int64) bool {
+	if isOwnerOrSudo(userID) {
+		return true
+	}
+
+	isAdmin, err := utils.IsChatAdmin(c, chatID, userID)
+	return err == nil && isAdmin
+}
+
 func isOwnerOrSudo(userID int64) bool {
 	if config.OwnerID != 0 && userID == config.OwnerID {
 		return true
