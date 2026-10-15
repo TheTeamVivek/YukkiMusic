@@ -44,6 +44,13 @@ func init() {
 
 <b>⚠️ Note:</b>
 This setting affects all future playback messages in this chat.`
+	dashboards["nothumb"] = dashboardDef{
+		title:       func(chatID int64) string { return F(chatID, "nothumb_title") },
+		description: func(chatID int64) string { return F(chatID, "nothumb_desc") },
+		canUse:      canUseAdminCallback,
+		get:         func(chatID int64) (bool, error) { return database.ThumbnailsDisabled(chatID) },
+		set:         func(chatID int64, on bool) error { return database.SetThumbnailsDisabled(chatID, on) },
+	}
 }
 
 func nothumbHandler(c *td.Client, m *td.Message) error {
