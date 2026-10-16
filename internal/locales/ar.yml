@@ -204,8 +204,8 @@ autoleave_desc: "عند التفعيل، يغادر المساعد تلقائي�
 autoleave_update_fail: "{emoji:⚠️} <b>فشل تحديث حالة المغادرة التلقائية.</b>"
 
 dashboard_status: "{emoji:ℹ️} الحالة: <b>{status}</b>"
-dashboard_enabled: "{emoji:✅} مفعلة"
-dashboard_disabled: "{emoji:❌} معطلة"
+dashboard_enabled: "مفعلة {emoji:✅}"
+dashboard_disabled: "معطلة {emoji:❌}"
 dashboard_toggled_cb: "✅ تم تحديث الإعداد إلى {status}."
 dashboard_fail_cb: "⚠️ فشل تحديث الإعداد."
 

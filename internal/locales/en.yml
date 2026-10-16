@@ -203,8 +203,8 @@ autoleave_desc: "When enabled, the assistant automatically leaves inactive or un
 autoleave_update_fail: "{emoji:⚠️} <b>Failed to update AutoLeave state.</b>"
 
 dashboard_status: "{emoji:ℹ️} Status: <b>{status}</b>"
-dashboard_enabled: "{emoji:✅} Enabled"
-dashboard_disabled: "{emoji:❌} Disabled"
+dashboard_enabled: "Enabled {emoji:✅}"
+dashboard_disabled: "Disabled {emoji:❌}"
 dashboard_toggled_cb: "✅ Setting updated to {status}."
 dashboard_fail_cb: "⚠️ Failed to update the setting."
 

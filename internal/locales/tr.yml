@@ -203,8 +203,8 @@ autoleave_desc: "Etkinleştirildiğinde asistan, her 10 dakikada bir etkin olmay
 autoleave_update_fail: "{emoji:⚠️} <b>Otomatik Ayrılma durumu güncellenemedi.</b>"
 
 dashboard_status: "{emoji:ℹ️} Durum: <b>{status}</b>"
-dashboard_enabled: "{emoji:✅} Etkin"
-dashboard_disabled: "{emoji:❌} Devre Dışı"
+dashboard_enabled: "Etkin {emoji:✅}"
+dashboard_disabled: "Devre Dışı {emoji:❌}"
 dashboard_toggled_cb: "✅ Ayar {status} olarak güncellendi."
 dashboard_fail_cb: "⚠️ Ayar güncellenemedi."
 

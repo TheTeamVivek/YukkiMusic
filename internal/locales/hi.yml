@@ -202,8 +202,8 @@ autoleave_desc: "सक्षम होने पर, सहायक हर 10 
 autoleave_update_fail: "{emoji:⚠️} <b>स्वचालित प्रस्थान स्थिति अद्यतन करने में विफल।</b>"
 
 dashboard_status: "{emoji:ℹ️} स्थिति: <b>{status}</b>"
-dashboard_enabled: "{emoji:✅} सक्षम"
-dashboard_disabled: "{emoji:❌} अक्षम"
+dashboard_enabled: "सक्षम {emoji:✅}"
+dashboard_disabled: "अक्षम {emoji:❌}"
 dashboard_toggled_cb: "✅ सेटिंग {status} कर दी गई।"
 dashboard_fail_cb: "⚠️ सेटिंग अद्यतन करने में विफल।"
 
