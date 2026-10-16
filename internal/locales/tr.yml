@@ -531,7 +531,7 @@ restart_confirm_bot: "♻️ Bot yeniden başlatılıyor..."
 restart_confirm_replay_done: "⏮️ Mevcut şarkı başarıyla yeniden oynatıldı."
 
 room_not_active_cb: "⚠️ Şu an hiçbir şey çalmıyor."
-room_no_active: "⚠️ <b>Aktif oynatma yok.</b>\n\n<i>Şu an hiçbir şey çalmıyor.</i>"
+room_no_active: "⚠️ Bot şu anda sesli sohbette yayın yapmıyor. Önce bir şarkı çalın."
 
 room_already_paused: "⏸️ Parça zaten duraklatılmış. Devam etmek için ▶️ Devam Et düğmesine dokun."
 room_pause_failed: "❌ Oynatma duraklatılamadı.\n\n<i>{error}</i>"
@@ -589,7 +589,6 @@ settings_main: |
 
 settings_updated: "✅ Ayarlar güncellendi!"
 
-autoplay_no_active: "⚠️ Bot şu anda sesli sohbette yayın yapmıyor. Önce bir şarkı çalın."
 autoplay_title: "{emoji:🔁} Otomatik Çalma"
 autoplay_desc: "Sıra bittiğinde bot, son çalan şarkıya benzer önerilen şarkıları otomatik olarak çalmaya devam eder."
 autoplay_requester: "Otomatik Çalma"

@@ -536,7 +536,7 @@ restart_confirm_replay_done: "⏮️ Current song replayed successfully."
 
 
 room_not_active_cb: "⚠️ Nothing playing right now."
-room_no_active: "⚠️ <b>No active playback.</b>\n\n<i>There's nothing playing right now.</i>"
+room_no_active: "⚠️ Bot is not streaming in a voice chat. Start playing a song first."
 
 room_already_paused: "⏸️ Track is already paused. Tap ▶️ Resume to continue."
 room_pause_failed: "❌ Failed to pause playback.\n\n<i>{error}</i>"
@@ -598,7 +598,6 @@ settings_main: |
 
 settings_updated: "✅ Settings updated!"
 
-autoplay_no_active: "⚠️ Bot is not streaming in a voice chat. Start playing a song first."
 autoplay_title: "{emoji:🔁} Autoplay"
 autoplay_desc: "Once the queue ends, the bot automatically keeps playing recommended songs similar to the last played track."
 autoplay_requester: "Autoplay"

@@ -57,7 +57,7 @@ func init() {
 				return false
 			}
 			if r, ok := core.Rooms.Get(u.ChatId); !ok || !r.Active() {
-				u.Answer(c, 0, true, F(u.ChatId, "autoplay_no_active"), "")
+				u.Answer(c, 0, true, F(u.ChatId, "room_no_active"), "")
 				return false
 			}
 			return true
@@ -89,7 +89,7 @@ func autoplayHandler(c *td.Client, m *td.Message) error {
 
 	r, ok := core.Rooms.Get(chatID)
 	if !ok || !r.Active() {
-		_, err := m.ReplyText(c, F(chatID, "autoplay_no_active"), nil)
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
 		return err
 	}
 
