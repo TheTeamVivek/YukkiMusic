@@ -300,6 +300,8 @@ lang_select: "{emoji:🌐} Tercih ettiğin dili seç:"
 lang_fail: "❌ Dil güncellenemedi. Lütfen daha sonra tekrar dene."
 lang_success: "{emoji:✅} Dil başarıyla {lang_name} olarak güncellendi."
 
+logger_title: "{emoji:📝} Kayıt Tutucu"
+logger_desc: "Etkinleştirildiğinde, bot oynatma etkinliğini ve olayları kayıt kanalına kaydeder."
 logger_playback_started: "Oynatma Başlatıldı"
 logger_playback_queued: "Oynatma Sıraya Alındı"
 
@@ -350,12 +352,6 @@ loop_disabled: "{emoji:🔁} Döngü {user} tarafından <b>devre dışı bırak�
 loop_set: "{emoji:🔁} <b>{count}</b> kez döngüye ayarlandı\n└ Değiştiren: {user}"
 loop_current: "• Mevcut döngü: <b>{count}</b> kez"
 
-logger_usage: "{emoji:⚙️} Kullanım: <code>{cmd} [enable|disable]</code> - Günlüğü etkinleştirir veya devre dışı bırakır\n\n{status}"
-logger_status: "{emoji:📜} Mevcut durum: {action}"
-logger_check_fail: "{emoji:❌} Günlük durumu kontrol edilemedi: {error}"
-logger_already: "ℹ️ Günlük zaten {action}."
-logger_update_fail: "{emoji:❌} Günlük ayarı güncellenemedi: {error}"
-logger_updated: "{emoji:✅} Günlük başarıyla {action} konumuna getirildi."
 
 # Logs module
 logs_empty: "Kayıt bulunamadı"
@@ -453,16 +449,10 @@ play_added_multiple_header: "{emoji:➕} {user} tarafından <b>{count} parça ek
 play_queue_limit_hint: "{emoji:⚠️} <i>Sıra sınırına ulaşıldı — bazı parçalar atlandı.</i>"
 play_queue_view_hint: "<i>Listenin tamamını görmek için /queue kullan.</i>"
 
-playmode_help: |
-  {emoji:🛠️} <b>Oynatma Modu</b>
-
-  <b>Durum:</b> {status}
-  <b>Kullanım:</b> <code>/playmode [enable|disable]</code>
-
+playmode_title: "{emoji:🎵} Oynatma Modu"
+playmode_desc: "Etkinleştirildiğinde, yalnızca yöneticiler ve yetkili kullanıcılar /play komutunu kullanabilir."
 playmode_status_admins: "Yöneticiler 🔐"
 playmode_status_everyone: "Herkes 🌍"
-playmode_success_admins: "{emoji:🛡️} <b>Oynatma modu</b> artık yalnızca <b>yöneticiler ve yetkili kullanıcılar</b> ile sınırlıdır. {emoji:🎧}"
-playmode_success_everyone: "{emoji:✅} <b>Oynatma modu</b> artık <b>herkes için açık</b>. Müziğin tadını çıkarın! {emoji:🎶}"
 playmode_restricted: "{emoji:🚫} Oynatma modu etkin. Sadece yöneticiler ve yetkili kullanıcılar şarkı çalabilir."
 
 # 🏓 Ping messages

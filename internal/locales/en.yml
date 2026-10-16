@@ -300,6 +300,8 @@ lang_select: "{emoji:🌐} Select your preferred language:"
 lang_fail: "❌ Failed to update language. Please try again later."
 lang_success: "{emoji:✅} Language successfully updated to {lang_name}."
 
+logger_title: "{emoji:📝} Logger"
+logger_desc: "When enabled, the bot logs playback activity and events to the logger channel."
 logger_playback_started: "Playback Started"
 logger_playback_queued: "Playback Queued"
 
@@ -350,12 +352,6 @@ loop_disabled: "{emoji:🔁} Loop has been <b>disabled</b> by {user}"
 loop_set: "{emoji:🔁} Set to loop <b>{count}</b> time(s)\n└ Changed by: {user}"
 loop_current: "• Current loop: <b>{count}</b> time(s)"
 
-logger_usage: "{emoji:⚙️} Usage: <code>{cmd} [enable|disable]</code> - To enable or disable the logger\n\n{status}"
-logger_status: "{emoji:📜} Current status: {action}"
-logger_check_fail: "{emoji:❌} Failed to check logger status: {error}"
-logger_already: "ℹ️ Logger is already {action}."
-logger_update_fail: "{emoji:❌} Failed to update logger setting: {error}"
-logger_updated: "{emoji:✅} Logger has been {action} successfully."
 
 # Logs module
 logs_empty: "No logs found"
@@ -456,16 +452,10 @@ play_added_multiple_header: "{emoji:➕} <b>Added {count} tracks</b> by {user}"
 play_queue_limit_hint: "{emoji:⚠️} <i>Queue limit reached — some tracks were skipped.</i>"
 play_queue_view_hint: "<i>Use /queue to view full list.</i>"
 
-playmode_help: |
-  {emoji:🛠️} <b>Play Mode</b>
-
-  <b>Status:</b> {status}
-  <b>Usage:</b> <code>/playmode [enable|disable]</code>
-
+playmode_title: "{emoji:🎵} Play Mode"
+playmode_desc: "When enabled, only admins and authorized users can use /play."
 playmode_status_admins: "Admins 🔐"
 playmode_status_everyone: "Everyone 🌍"
-playmode_success_admins: "{emoji:🛡️} <b>Play mode</b> is now restricted to <b>Admins & DJs</b> only. {emoji:🎧}"
-playmode_success_everyone: "{emoji:✅} <b>Play mode</b> is now <b>Open to Everyone</b>. Let the music flow! {emoji:🎶}"
 playmode_restricted: "{emoji:🚫} Play mode is enabled. Only admins and authorized users can play."
 
 # 🏓 Ping messages

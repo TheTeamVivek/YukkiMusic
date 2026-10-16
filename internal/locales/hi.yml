@@ -301,6 +301,8 @@ lang_select: "{emoji:🌐} अपनी अभीष्ट भाषा चु�
 lang_fail: "❌ भाषा अद्यतन करने में विफल। कृपया कुछ समय पश्चात प्रयास करें।"
 lang_success: "{emoji:✅} भाषा सफलतापूर्वक {lang_name} में अद्यतन कर दी गई।"
 
+logger_title: "{emoji:📝} लॉगर"
+logger_desc: "सक्षम होने पर, बॉट प्लेबैक गतिविधि और इवेंट्स को लॉगर चैनल में लॉग करता है।"
 logger_playback_started: "संगीत आरम्भ"
 logger_playback_queued: "संगीत प्रतीक्षा सूची में"
 
@@ -351,12 +353,6 @@ loop_disabled: "{emoji:🔁} आवृत्ति {user} द्वारा <b>
 loop_set: "{emoji:🔁} <b>{count}</b> बार आवृत्ति निर्धारित की गई\n└ परिवर्तक: {user}"
 loop_current: "• वर्तमान आवृत्ति: <b>{count}</b> बार"
 
-logger_usage: "{emoji:⚙️} प्रयोग: <code>{cmd} [enable|disable]</code> - अभिलेखक को सक्षम या अक्षम करने के लिए\n\n{status}"
-logger_status: "{emoji:📜} वर्तमान स्थिति: {action}"
-logger_check_fail: "{emoji:❌} अभिलेखक स्थिति जाँचने में विफल: {error}"
-logger_already: "ℹ️ अभिलेखक पूर्व से ही {action} है।"
-logger_update_fail: "{emoji:❌} अभिलेखक विन्यास अद्यतन करने में विफल: {error}"
-logger_updated: "{emoji:✅} अभिलेखक सफलतापूर्वक {action} कर दिया गया है।"
 
 # Logs module
 logs_empty: "कोई लॉग्स नहीं मिले"
@@ -454,16 +450,10 @@ play_added_multiple_header: "{emoji:➕} {user} द्वारा <b>{count} �
 play_queue_limit_hint: "{emoji:⚠️} <i>प्रतीक्षा सूची की सीमा पूर्ण — कुछ संगीत छोड़ दिए गए।</i>"
 play_queue_view_hint: "<i>पूर्ण सूची देखने के लिए /queue का प्रयोग करें।</i>"
 
-playmode_help: |
-  {emoji:🛠️} <b>संगीत संचालन विधा</b>
-
-  <b>स्थिति:</b> {status}
-  <b>प्रयोग:</b> <code>/playmode [enable|disable]</code>
-
+playmode_title: "{emoji:🎵} प्ले मोड"
+playmode_desc: "सक्षम होने पर, केवल एडमिन और अधिकृत उपयोगकर्ता ही /play का उपयोग कर सकते हैं।"
 playmode_status_admins: "प्रशासक 🔐"
 playmode_status_everyone: "प्रत्येक व्यक्ति 🌍"
-playmode_success_admins: "{emoji:🛡️} <b>संगीत संचालन</b> अब केवल <b>प्रशासकों एवं अधिकृत उपयोगकर्ताओं</b> तक सीमित है। {emoji:🎧}"
-playmode_success_everyone: "{emoji:✅} <b>संगीत संचालन</b> अब <b>सभी के लिए खुला</b> है। संगीत का आनंद लें! {emoji:🎶}"
 playmode_restricted: "{emoji:🚫} संगीत संचालन विधा सक्षम है। केवल प्रशासक अथवा अधिकृत उपयोगकर्ता ही संगीत चला सकते हैं।"
 
 # 🏓 Ping messages

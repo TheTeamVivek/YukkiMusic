@@ -93,47 +93,32 @@ func init() {
 • <b>admin</b> — Only chat admins can use admin commands
 • <b>adminauth</b> — Chat admins + authorized users can use admin commands (default)
 • <b>everyone</b> — Everyone can use admin commands`
+	dashboards["playmode"] = dashboardDef{
+		title:       func(chatID int64) string { return F(chatID, "playmode_title") },
+		description: func(chatID int64) string { return F(chatID, "playmode_desc") },
+		canUse:      canUseAdminCallback,
+		get:         func(chatID int64) (bool, error) { return database.PlayModeAdminsOnly(chatID) },
+		set:         func(chatID int64, on bool) error { return database.SetPlayModeAdminsOnly(chatID, on) },
+	}
 }
 
 func playmodeHandler(c *td.Client, m *td.Message) error {
 	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
 		return nil
 	}
-	args := strings.Fields(m.Text())
 	chatID := m.ChatID()
 
-	current, err := database.PlayModeAdminsOnly(chatID)
-	if err != nil {
-		return err
-	}
-
-	if len(args) < 2 {
-		statusKey := "playmode_status_everyone"
-		if current {
-			statusKey = "playmode_status_admins"
+	if args := strings.Fields(m.Text()); len(args) > 1 {
+		if enabled, err := utils.ParseBool(args[1]); err == nil {
+			if current, cerr := database.PlayModeAdminsOnly(chatID); cerr == nil && enabled != current {
+				if err := database.SetPlayModeAdminsOnly(chatID, enabled); err != nil {
+					return err
+				}
+			}
 		}
-		_, err := m.ReplyText(c, F(chatID, "playmode_help", locales.Arg{
-			"status": F(chatID, statusKey),
-		}), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
-		return err
 	}
 
-	adminsOnly, err := utils.ParseBool(args[1])
-	if err != nil {
-		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return err
-	}
-
-	if err := database.SetPlayModeAdminsOnly(chatID, adminsOnly); err != nil {
-		return err
-	}
-
-	successKey := "playmode_success_everyone"
-	if adminsOnly {
-		successKey = "playmode_success_admins"
-	}
-	_, rerr := m.ReplyText(c, F(chatID, successKey), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
-	return rerr
+	return sendDashboard(c, m, "playmode")
 }
 
 func cmdDeleteHandler(c *td.Client, m *td.Message) error {

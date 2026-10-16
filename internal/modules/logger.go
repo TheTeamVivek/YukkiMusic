@@ -23,71 +23,39 @@ import (
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/database"
-	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
+
+func init() {
+	dashboards["logger"] = dashboardDef{
+		title:       func(chatID int64) string { return F(chatID, "logger_title") },
+		description: func(chatID int64) string { return F(chatID, "logger_desc") },
+		canUse: func(c *td.Client, u *td.UpdateNewCallbackQuery) bool {
+			if isOwnerOrSudo(u.SenderUserId) {
+				return true
+			}
+			u.Answer(c, 0, true, F(u.ChatId, "only_sudo_cb"), "")
+			return false
+		},
+		get: func(int64) (bool, error) { return database.IsLoggerEnabled() },
+		set: func(_ int64, on bool) error { return database.SetLoggerEnabled(on) },
+	}
+}
 
 func handleLogger(c *td.Client, m *td.Message) error {
 	if !checkSudo(c, m) {
 		return nil
 	}
-	args := strings.Fields(m.Text())
-	chatID := m.ChatID()
 
-	current, dbErr := database.IsLoggerEnabled()
-
-	action := F(chatID, utils.IfElse(current, "enabled", "disabled"))
-
-	if len(args) < 2 {
-		if dbErr == nil {
-			if _, err := m.ReplyText(c, F(chatID, "logger_usage", locales.Arg{
-				"cmd": getCommand(m),
-				"status": F(chatID, "logger_status", locales.Arg{
-					"action": action,
-				}),
-			}), nil); err != nil {
-				return err
-			}
-		} else {
-			if _, err := m.ReplyText(c, F(chatID, "logger_usage", locales.Arg{
-				"cmd":    getCommand(m),
-				"status": "",
-			}), nil); err != nil {
-				return err
+	if args := strings.Fields(m.Text()); len(args) > 1 {
+		if enabled, err := utils.ParseBool(args[1]); err == nil {
+			if current, cerr := database.IsLoggerEnabled(); cerr == nil && enabled != current {
+				if err := database.SetLoggerEnabled(enabled); err != nil {
+					return err
+				}
 			}
 		}
-		return nil
 	}
 
-	enable, err := utils.ParseBool(args[1])
-	if err != nil {
-		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return err
-	}
-
-	action = F(chatID, utils.IfElse(enable, "enabled", "disabled"))
-	if dbErr != nil {
-		_, err := m.ReplyText(
-			c,
-			F(chatID, "logger_check_fail", locales.Arg{"error": dbErr.Error()}),
-			nil,
-		)
-		return err
-	}
-
-	if current == enable {
-		_, err := m.ReplyText(c, F(chatID, "logger_already", locales.Arg{"action": action}), nil)
-		return err
-	}
-
-	if err := database.SetLoggerEnabled(enable); err != nil {
-		_, err := m.ReplyText(
-			c,
-			F(chatID, "logger_update_fail", locales.Arg{"error": err.Error()}),
-			nil,
-		)
-		return err
-	}
-	_, rerr := m.ReplyText(c, F(chatID, "logger_updated", locales.Arg{"action": action}), nil)
-	return rerr
+	return sendDashboard(c, m, "logger")
 }

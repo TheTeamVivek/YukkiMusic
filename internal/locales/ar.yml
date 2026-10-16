@@ -301,6 +301,8 @@ lang_select: "{emoji:🌐} اختر لغتك المفضلة:"
 lang_fail: "❌ فشل تحديث اللغة. يرجى المحاولة مرة أخرى لاحقاً."
 lang_success: "{emoji:✅} تم تحديث اللغة بنجاح إلى {lang_name}."
 
+logger_title: "{emoji:📝} السجل"
+logger_desc: "عند التفعيل، يسجّل البوت نشاط التشغيل والأحداث في قناة السجل."
 logger_playback_started: "بدأ التشغيل"
 logger_playback_queued: "أُضيف للانتظار"
 
@@ -351,12 +353,6 @@ loop_disabled: "{emoji:🔁} تم <b>تعطيل</b> التكرار بواسطة 
 loop_set: "{emoji:🔁} تم تعيين التكرار <b>{count}</b> مرة\n└ غُير بواسطة: {user}"
 loop_current: "• التكرار الحالي: <b>{count}</b> مرة"
 
-logger_usage: "{emoji:⚙️} الاستخدام: <code>{cmd} [enable|disable]</code> - لتفعيل أو تعطيل السجل\n\n{status}"
-logger_status: "{emoji:📜} الحالة الحالية: {action}"
-logger_check_fail: "{emoji:❌} فشل التحقق من حالة السجل: {error}"
-logger_already: "ℹ️ السجل {action} بالفعل."
-logger_update_fail: "{emoji:❌} فشل تحديث إعدادات السجل: {error}"
-logger_updated: "{emoji:✅} أصبح السجل {action} بنجاح."
 
 # Logs module
 logs_empty: "لا توجد سجلات"
@@ -454,16 +450,10 @@ play_added_multiple_header: "{emoji:➕} <b>تمت إضافة {count} مقاطع
 play_queue_limit_hint: "{emoji:⚠️} <i>وصلت قائمة الانتظار للحد الأقصى — تم تخطي بعض المقاطع.</i>"
 play_queue_view_hint: "<i>استخدم /queue لعرض القائمة الكاملة.</i>"
 
-playmode_help: |
-  {emoji:🛠️} <b>وضع التشغيل</b>
-
-  <b>الحالة:</b> {status}
-  <b>الاستخدام:</b> <code>/playmode [enable|disable]</code>
-
+playmode_title: "{emoji:🎵} وضع التشغيل"
+playmode_desc: "عند التفعيل، يمكن للمشرفين والمستخدمين المصرح لهم فقط استخدام /play."
 playmode_status_admins: "المشرفون 🔐"
 playmode_status_everyone: "الجميع 🌍"
-playmode_success_admins: "{emoji:🛡️} <b>وضع التشغيل</b> أصبح الآن مقتصرًا على <b>المشرفين والمستخدمين المصرح لهم</b> فقط. {emoji:🎧}"
-playmode_success_everyone: "{emoji:✅} <b>وضع التشغيل</b> أصبح الآن <b>متاحًا للجميع</b>. استمتعوا بالموسيقى! {emoji:🎶}"
 playmode_restricted: "{emoji:🚫} وضع التشغيل مفعّل. المشرفون والمستخدمون المصرح لهم فقط يمكنهم التشغيل."
 
 # 🏓 Ping messages
