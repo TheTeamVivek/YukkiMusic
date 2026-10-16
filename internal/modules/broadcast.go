@@ -36,89 +36,55 @@ import (
 	"yukkimusic/internal/utils"
 )
 
-const defaultBroadcastDelay = 0.7
+const (
+	broadcastDefaultDelay = 0.7
+	broadcastBatchSize    = 30
+	broadcastBatchPause   = 7500 * time.Millisecond
+	broadcastProgressTick = 5 * time.Second
+)
 
-// bManager guarantees only one broadcast runs at a time.
-var bManager broadcastManager
+// Only one broadcast may run at a time; bcastJob holds the active one.
+var (
+	bcastMu  sync.Mutex
+	bcastJob *broadcast
+)
 
-type broadcastManager struct {
-	mu       sync.Mutex
-	cancelFn context.CancelFunc
-	stats    *BroadcastStats
+type broadcastFlags struct {
+	noChat  bool
+	noUser  bool
+	copy    bool
+	pin     bool
+	pinLoud bool
+	limit   int
+	delay   float64
 }
 
-// start reserves the broadcast slot. It returns a cancellable context,
-// or ok=false if another broadcast is already running.
-func (bm *broadcastManager) start(stats *BroadcastStats) (ctx context.Context, ok bool) {
-	bm.mu.Lock()
-	defer bm.mu.Unlock()
-
-	if bm.cancelFn != nil {
-		return nil, false
-	}
-	ctx, cancel := context.WithCancel(context.Background())
-	bm.cancelFn = cancel
-	bm.stats = stats
-	return ctx, true
-}
-
-// stop stops the running broadcast and marks it as cancelled so the
-// progress message shows the cancellation instead of a summary.
-func (bm *broadcastManager) stop() {
-	bm.mu.Lock()
-	defer bm.mu.Unlock()
-	if bm.cancelFn == nil {
-		return
-	}
-
-	if bm.stats != nil {
-		bm.stats.mu.Lock()
-		bm.stats.Cancelled = true
-		bm.stats.mu.Unlock()
-	}
-
-	bm.cancelFn()
-	bm.cancelFn = nil
-	bm.stats = nil
-}
-
-func (bm *broadcastManager) isActive() bool {
-	bm.mu.Lock()
-	defer bm.mu.Unlock()
-	return bm.cancelFn != nil
-}
-
-// BroadcastFlags holds the parsed /broadcast options.
-type BroadcastFlags struct {
-	NoChat  bool
-	NoUser  bool
-	Copy    bool
-	Limit   int
-	Delay   float64
-	Pin     bool
-	PinLoud bool
-}
-
-// BroadcastStats tracks delivery progress for the status message.
-type BroadcastStats struct {
-	mu          sync.Mutex
-	TotalChats  int
-	TotalUsers  int
-	DoneChats   int
-	DoneUsers   int
-	FailedChats []int64
-	FailedUsers []int64
-	Errors      strings.Builder
-	Delay       float64
-	StartTime   time.Time
-	Finished    bool
-	Cancelled   bool
-}
-
-// broadcastTarget is one recipient of the broadcast.
 type broadcastTarget struct {
 	id     int64
 	isUser bool
+}
+
+// broadcast is a single running broadcast and its live counters.
+type broadcast struct {
+	client   *td.Client
+	source   *td.Message
+	progress *td.Message
+	flags    broadcastFlags
+	content  string
+
+	ctx    context.Context
+	cancel context.CancelFunc
+
+	mu          sync.Mutex
+	totalChats  int
+	totalUsers  int
+	doneChats   int
+	doneUsers   int
+	failedChats []int64
+	failedUsers []int64
+	errs        strings.Builder
+	startedAt   time.Time
+	cancelled   bool
 }
 
 func init() {
@@ -135,7 +101,7 @@ func init() {
 • <code>--nouser</code> — Exclude users from broadcast
 • <code>--copy</code> — Remove forwarded tag, when broadcasting a replied message (copy mode)
 • <code>--limit [n]</code> — Limit total messages sent (default: 0 = no limit)
-• <code>--delay [seconds]</code> — Delay between messages (default: 1.5s)
+• <code>--delay [seconds]</code> — Delay between messages (default: 0.7s)
 • <code>--pin</code> — Pin the message (silent)
 • <code>--pinloud</code> — Pin the message (with notification)
 
@@ -166,8 +132,7 @@ func broadcastHandler(c *td.Client, m *td.Message) error {
 	if strings.Contains(strings.ToLower(m.Text()), "-cancel") {
 		return handleBroadcastCancel(c, m)
 	}
-
-	if bManager.isActive() {
+	if broadcastRunning() {
 		_, err := m.ReplyText(c, F(chatID, "broadcast_already_running"), nil)
 		return err
 	}
@@ -179,7 +144,6 @@ func broadcastHandler(c *td.Client, m *td.Message) error {
 		}), nil)
 		return err
 	}
-
 	if content == "" && m.ReplyToMessageID() == 0 {
 		_, err := m.ReplyText(c, F(chatID, "broadcast_no_content", locales.Arg{
 			"cmd": getCommand(m),
@@ -187,335 +151,323 @@ func broadcastHandler(c *td.Client, m *td.Message) error {
 		return err
 	}
 
-	chats, users, err := loadBroadcastTargets(c, chatID, flags, m)
+	targets, err := loadBroadcastTargets(c, m, flags)
 	if err != nil {
 		return err
 	}
-	if len(chats) == 0 && len(users) == 0 {
+	if len(targets) == 0 {
 		_, err := m.ReplyText(c, F(chatID, "broadcast_no_targets"), nil)
 		return err
 	}
 
-	applyBroadcastLimit(flags, &chats, &users)
-
-	stats := &BroadcastStats{
-		TotalChats:  len(chats),
-		TotalUsers:  len(users),
-		Delay:       flags.Delay,
-		StartTime:   time.Now(),
-		FailedChats: make([]int64, 0),
-		FailedUsers: make([]int64, 0),
+	ctx, cancel := context.WithCancel(context.Background())
+	job := &broadcast{
+		client:      c,
+		source:      m,
+		flags:       flags,
+		content:     content,
+		ctx:         ctx,
+		cancel:      cancel,
+		startedAt:   time.Now(),
+		failedChats: make([]int64, 0),
+		failedUsers: make([]int64, 0),
+	}
+	for _, t := range targets {
+		if t.isUser {
+			job.totalUsers++
+		} else {
+			job.totalChats++
+		}
 	}
 
-	ctx, ok := bManager.start(stats)
-	if !ok {
+	if !reserveBroadcast(job) {
+		cancel()
 		_, err := m.ReplyText(c, F(chatID, "broadcast_already_running"), nil)
 		return err
 	}
 
-	progressMsg, err := m.ReplyText(c, F(chatID, "broadcast_initializing"),
+	job.progress, err = m.ReplyText(c, F(chatID, "broadcast_initializing"),
 		&td.SendMessageOpts{ReplyMarkup: core.GetBroadcastCancelKeyboard(chatID)})
 	if err != nil {
-		bManager.stop()
+		job.release()
+		job.cancel()
 		utils.Log.Errorf("Failed to send broadcast progress message: %v", err)
 		return nil
 	}
 
-	go bManager.updateProgress(ctx, c, progressMsg, stats)
-	go bManager.run(ctx, c, m, progressMsg, flags, content, chats, users, stats)
-
+	go job.run(targets)
 	return nil
 }
 
-func parseBroadcastCommand(m *td.Message) (*BroadcastFlags, string, error) {
-	flags := &BroadcastFlags{Delay: defaultBroadcastDelay}
+func parseBroadcastCommand(m *td.Message) (broadcastFlags, string, error) {
+	flags := broadcastFlags{delay: broadcastDefaultDelay}
 
 	text := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(m.Text()), getCommand(m)))
 	lines := strings.Split(text, "\n")
-	if len(lines) == 0 {
-		return flags, "", nil
-	}
-
 	words := strings.Fields(lines[0])
-	var contentWords []string
 
+	var content []string
 	for i := 0; i < len(words); i++ {
-		switch strings.ToLower(words[i]) {
+		switch w := strings.ToLower(words[i]); w {
 		case "-nochat", "--nochat":
-			flags.NoChat = true
+			flags.noChat = true
 		case "-nouser", "--nouser":
-			flags.NoUser = true
+			flags.noUser = true
 		case "-copy", "--copy":
-			flags.Copy = true
+			flags.copy = true
 		case "-pin", "--pin":
-			flags.Pin = true
+			flags.pin = true
 		case "-pinloud", "--pinloud":
-			flags.PinLoud = true
-		case "-limit", "--limit":
-			limit, err := strconv.Atoi(nextValue(words, i))
-			if err != nil || limit < 0 {
-				return nil, "", fmt.Errorf("invalid limit value: %s", nextValue(words, i))
-			}
-			flags.Limit = limit
-			i++
-		case "-delay", "--delay":
-			delay, err := strconv.ParseFloat(nextValue(words, i), 64)
-			if err != nil || delay < 0 {
-				return nil, "", fmt.Errorf("invalid delay value: %s", nextValue(words, i))
-			}
-			flags.Delay = delay
-			i++
+			flags.pinLoud = true
 		case "-cancel", "--cancel":
-			// handled by the caller
+			// handled before parsing
+		case "-limit", "--limit", "-delay", "--delay":
+			if i+1 >= len(words) {
+				return flags, "", fmt.Errorf("missing value for %s", w)
+			}
+			val := words[i+1]
+			if w == "-limit" || w == "--limit" {
+				limit, err := strconv.Atoi(val)
+				if err != nil || limit < 0 {
+					return flags, "", fmt.Errorf("invalid limit value: %s", val)
+				}
+				flags.limit = limit
+			} else {
+				delay, err := strconv.ParseFloat(val, 64)
+				if err != nil || delay < 0 {
+					return flags, "", fmt.Errorf("invalid delay value: %s", val)
+				}
+				flags.delay = delay
+			}
+			i++
 		default:
-			contentWords = append(contentWords, words[i])
+			content = append(content, words[i])
 		}
 	}
 
-	content := strings.Join(contentWords, " ")
+	body := strings.Join(content, " ")
 	if len(lines) > 1 {
-		if content != "" {
-			content += "\n"
+		if body != "" {
+			body += "\n"
 		}
-		content += strings.Join(lines[1:], "\n")
+		body += strings.Join(lines[1:], "\n")
 	}
-
-	return flags, strings.TrimSpace(content), nil
+	return flags, strings.TrimSpace(body), nil
 }
 
-func nextValue(words []string, i int) string {
-	if i+1 < len(words) {
-		return words[i+1]
-	}
-	return ""
-}
+// loadBroadcastTargets collects the recipients (chats first, then users),
+// applies the limit and reports any lookup failure to the caller's chat.
+func loadBroadcastTargets(c *td.Client, m *td.Message, flags broadcastFlags) ([]broadcastTarget, error) {
+	var targets []broadcastTarget
 
-func loadBroadcastTargets(
-	c *td.Client,
-	chatID int64,
-	flags *BroadcastFlags,
-	m *td.Message,
-) (chats, users []int64, err error) {
-	if !flags.NoChat {
-		chats, err = database.ServedChats()
+	if !flags.noChat {
+		chats, err := database.ServedChats()
 		if err != nil {
-			if _, rerr := m.ReplyText(c, F(chatID, "broadcast_fetch_chats_failed", locales.Arg{
+			m.ReplyText(c, F(m.ChatID(), "broadcast_fetch_chats_failed", locales.Arg{
 				"error": html.EscapeString(err.Error()),
-			}), nil); rerr != nil {
-				return nil, nil, rerr
-			}
-			return nil, nil, err
+			}), nil)
+			return nil, err
+		}
+		for _, id := range chats {
+			targets = append(targets, broadcastTarget{id: id})
 		}
 	}
 
-	if !flags.NoUser {
-		users, err = database.ServedUsers()
+	if !flags.noUser {
+		users, err := database.ServedUsers()
 		if err != nil {
-			if _, rerr := m.ReplyText(c, F(chatID, "broadcast_fetch_users_failed", locales.Arg{
+			m.ReplyText(c, F(m.ChatID(), "broadcast_fetch_users_failed", locales.Arg{
 				"error": html.EscapeString(err.Error()),
-			}), nil); rerr != nil {
-				return nil, nil, rerr
-			}
-			return nil, nil, err
+			}), nil)
+			return nil, err
+		}
+		for _, id := range users {
+			targets = append(targets, broadcastTarget{id: id, isUser: true})
 		}
 	}
 
-	return chats, users, nil
+	if flags.limit > 0 && len(targets) > flags.limit {
+		targets = targets[:flags.limit]
+	}
+	return targets, nil
 }
 
-func applyBroadcastLimit(flags *BroadcastFlags, chats, users *[]int64) {
-	if flags.Limit <= 0 || len(*chats)+len(*users) <= flags.Limit {
-		return
+func reserveBroadcast(job *broadcast) bool {
+	bcastMu.Lock()
+	defer bcastMu.Unlock()
+	if bcastJob != nil {
+		return false
 	}
-	if len(*chats) >= flags.Limit {
-		*chats = (*chats)[:flags.Limit]
-		*users = nil
-		return
-	}
-	remaining := flags.Limit - len(*chats)
-	if len(*users) > remaining {
-		*users = (*users)[:remaining]
-	}
+	bcastJob = job
+	return true
 }
 
-func (bm *broadcastManager) run(
-	ctx context.Context,
-	c *td.Client,
-	m, progressMsg *td.Message,
-	flags *BroadcastFlags,
-	content string,
-	chats, users []int64,
-	stats *BroadcastStats,
-) {
-	defer bm.stop()
+func (b *broadcast) release() {
+	bcastMu.Lock()
+	if bcastJob == b {
+		bcastJob = nil
+	}
+	bcastMu.Unlock()
+}
+
+func broadcastRunning() bool {
+	bcastMu.Lock()
+	defer bcastMu.Unlock()
+	return bcastJob != nil
+}
+
+// stopBroadcast cancels the running broadcast so its summary shows cancelled.
+func stopBroadcast() bool {
+	bcastMu.Lock()
+	job := bcastJob
+	bcastJob = nil
+	bcastMu.Unlock()
+	if job == nil {
+		return false
+	}
+	job.mu.Lock()
+	job.cancelled = true
+	job.mu.Unlock()
+	job.cancel()
+	return true
+}
+
+func (b *broadcast) run(targets []broadcastTarget) {
+	done := make(chan struct{})
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		b.pumpProgress(done)
+	}()
+
 	defer func() {
 		if r := recover(); r != nil {
 			utils.Log.Errorf("Broadcast panic recovered: %v", r)
 		}
-		bm.finalize(c, progressMsg, stats)
+		close(done)
+		wg.Wait()
+		b.finish()
+		b.release()
 	}()
 
-	targets := make([]broadcastTarget, 0, len(chats)+len(users))
-	for _, id := range chats {
-		targets = append(targets, broadcastTarget{id: id})
-	}
-	for _, id := range users {
-		targets = append(targets, broadcastTarget{id: id, isUser: true})
-	}
-
-	sent := 0
-	for _, t := range targets {
-		select {
-		case <-ctx.Done():
+	for i, t := range targets {
+		if b.ctx.Err() != nil {
 			return
-		default:
 		}
-
-		recordTarget(t, bm.send(c, m, t.id, content, flags), stats)
-
-		sent++
-		if !bm.wait(ctx, sent, flags.Delay) {
+		b.deliver(t)
+		if !b.pause(i + 1) {
 			return
 		}
 	}
 }
 
-func (bm *broadcastManager) send(
-	c *td.Client,
-	m *td.Message,
-	targetID int64,
-	content string,
-	flags *BroadcastFlags,
-) error {
+func (b *broadcast) deliver(t broadcastTarget) {
 	var (
 		sent *td.Message
 		err  error
 	)
 
-	if m.ReplyToMessageID() > 0 {
-		msgs, ferr := c.ForwardMessages(
-			targetID,
-			m.ChatID(),
-			[]int64{m.ReplyToMessageID()},
-			&td.ForwardMessagesOpts{SendCopy: flags.Copy},
+	if b.source.ReplyToMessageID() > 0 {
+		res, ferr := b.client.ForwardMessages(
+			t.id,
+			b.source.ChatID(),
+			[]int64{b.source.ReplyToMessageID()},
+			&td.ForwardMessagesOpts{SendCopy: b.flags.copy},
 		)
 		if ferr != nil {
 			err = ferr
-		} else if len(msgs.Messages) > 0 {
-			sent = &msgs.Messages[0]
+		} else if len(res.Messages) > 0 {
+			sent = &res.Messages[0]
 		}
 	} else {
-		sent, err = c.SendMessage(targetID, content, nil)
+		sent, err = b.client.SendMessage(t.id, b.content, nil)
 	}
 
 	if err != nil {
-		if !isBroadcastSkipError(err) {
-			utils.Log.Errorf("Broadcast failed for %d: %v", targetID, err)
+		if !skipBroadcastError(err) {
+			utils.Log.Errorf("Broadcast failed for %d: %v", t.id, err)
 		}
-		return err
+	} else if sent != nil && (b.flags.pin || b.flags.pinLoud) {
+		if perr := b.client.PinChatMessage(
+			t.id,
+			sent.Id,
+			&td.PinChatMessageOpts{DisableNotification: !b.flags.pinLoud},
+		); perr != nil {
+			utils.Log.Errorf("Pin failed for %d: %v", t.id, perr)
+		}
 	}
 
-	if sent != nil && (flags.Pin || flags.PinLoud) {
-		if perr := c.PinChatMessage(
-			targetID,
-			sent.Id,
-			&td.PinChatMessageOpts{DisableNotification: !flags.PinLoud},
-		); perr != nil {
-			utils.Log.Errorf("Pin failed for %d: %v", targetID, perr)
-		}
-	}
-	return nil
+	b.record(t, err)
 }
 
-// isBroadcastSkipError reports errors that are expected for removed/blocked targets.
-func isBroadcastSkipError(err error) bool {
+func (b *broadcast) record(t broadcastTarget, err error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	if err != nil {
+		if t.isUser {
+			b.failedUsers = append(b.failedUsers, t.id)
+		} else {
+			b.failedChats = append(b.failedChats, t.id)
+		}
+		fmt.Fprintf(&b.errs, "[%d] - [%v]\n", t.id, err)
+		return
+	}
+	if t.isUser {
+		b.doneUsers++
+	} else {
+		b.doneChats++
+	}
+}
+
+// skipBroadcastError reports errors that are expected for removed/blocked targets.
+func skipBroadcastError(err error) bool {
 	return strings.Contains(err.Error(), "USER_IS_BLOCKED") ||
 		strings.Contains(err.Error(), "CHAT_WRITE_FORBIDDEN") ||
 		strings.Contains(err.Error(), "USER_IS_DEACTIVATED")
 }
 
-// wait sleeps the configured delay, pausing longer after every 30 sends.
-func (bm *broadcastManager) wait(ctx context.Context, sent int, delay float64) bool {
-	d := time.Duration(delay * float64(time.Second))
-	if sent%30 == 0 {
-		d = 7500 * time.Millisecond
+// pause sleeps the configured delay, pausing longer after every 30 sends.
+func (b *broadcast) pause(sent int) bool {
+	d := time.Duration(b.flags.delay * float64(time.Second))
+	if sent%broadcastBatchSize == 0 {
+		d = broadcastBatchPause
 	}
 	select {
-	case <-ctx.Done():
+	case <-b.ctx.Done():
 		return false
 	case <-time.After(d):
 		return true
 	}
 }
 
-func recordTarget(t broadcastTarget, err error, stats *BroadcastStats) {
-	stats.mu.Lock()
-	defer stats.mu.Unlock()
-
-	if err != nil {
-		if t.isUser {
-			stats.FailedUsers = append(stats.FailedUsers, t.id)
-		} else {
-			stats.FailedChats = append(stats.FailedChats, t.id)
-		}
-		fmt.Fprintf(&stats.Errors, "[%d] - [%v]\n", t.id, err)
-		return
-	}
-
-	if t.isUser {
-		stats.DoneUsers++
-	} else {
-		stats.DoneChats++
-	}
-}
-
-func (bm *broadcastManager) updateProgress(
-	ctx context.Context,
-	c *td.Client,
-	progressMsg *td.Message,
-	stats *BroadcastStats,
-) {
-	ticker := time.NewTicker(5 * time.Second)
+func (b *broadcast) pumpProgress(done <-chan struct{}) {
+	ticker := time.NewTicker(broadcastProgressTick)
 	defer ticker.Stop()
 
 	for {
 		select {
-		case <-ctx.Done():
+		case <-done:
 			return
 		case <-ticker.C:
-			stats.mu.Lock()
-			if stats.Finished {
-				stats.mu.Unlock()
-				return
-			}
-			text := formatBroadcastProgress(stats, false, progressMsg.ChatID())
-			stats.mu.Unlock()
-
-			select {
-			case <-ctx.Done():
-				return
-			default:
-			}
-
-			_, _ = progressMsg.EditText(c, text, &td.EditMessageTextOpts{
-				ReplyMarkup: core.GetBroadcastCancelKeyboard(progressMsg.ChatID()),
+			b.mu.Lock()
+			text := b.format(false)
+			b.mu.Unlock()
+			_, _ = b.progress.EditText(b.client, text, &td.EditMessageTextOpts{
+				ReplyMarkup: core.GetBroadcastCancelKeyboard(b.progress.ChatID()),
 			})
 		}
 	}
 }
 
-func (bm *broadcastManager) finalize(
-	c *td.Client,
-	progressMsg *td.Message,
-	stats *BroadcastStats,
-) {
-	stats.mu.Lock()
-	stats.Finished = true
-	text := formatBroadcastProgress(stats, true, progressMsg.ChatID())
-	errs := stats.Errors.String()
-	stats.mu.Unlock()
+func (b *broadcast) finish() {
+	b.mu.Lock()
+	text := b.format(true)
+	errs := b.errs.String()
+	b.mu.Unlock()
 
-	_, _ = progressMsg.EditText(c, text, nil)
+	_, _ = b.progress.EditText(b.client, text, nil)
 
 	if errs == "" {
 		return
@@ -528,77 +480,57 @@ func (bm *broadcastManager) finalize(
 	}
 	defer os.Remove(file)
 
-	_, _ = progressMsg.ReplyDocument(c, &td.InputFileLocal{Path: file}, nil)
+	_, _ = b.progress.ReplyDocument(b.client, &td.InputFileLocal{Path: file}, nil)
 }
 
-func formatBroadcastProgress(
-	stats *BroadcastStats,
-	final bool,
-	chatID int64,
-) string {
+func (b *broadcast) format(final bool) string {
 	var sb strings.Builder
+	chatID := b.progress.ChatID()
 
 	if !final {
 		sb.WriteString(F(chatID, "broadcast_progress_header") + "\n\n")
-	} else if stats.Cancelled {
+	} else if b.cancelled {
 		sb.WriteString(F(chatID, "broadcast_cancel_done") + "\n\n")
 	}
 
-	sb.WriteString(broadcastProgressLine(chatID, "broadcast_total_chats",
-		stats.DoneChats, stats.TotalChats) + "\n")
-	sb.WriteString(broadcastProgressLine(chatID, "broadcast_total_users",
-		stats.DoneUsers, stats.TotalUsers) + "\n\n")
+	sb.WriteString(broadcastProgressLine(chatID, "broadcast_total_chats", b.doneChats, b.totalChats) + "\n")
+	sb.WriteString(broadcastProgressLine(chatID, "broadcast_total_users", b.doneUsers, b.totalUsers) + "\n\n")
 
-	if len(stats.FailedChats) > 0 {
-		sb.WriteString(F(chatID, "broadcast_failed_chats", locales.Arg{
-			"count": len(stats.FailedChats),
-		}) + "\n")
+	if len(b.failedChats) > 0 {
+		sb.WriteString(F(chatID, "broadcast_failed_chats", locales.Arg{"count": len(b.failedChats)}) + "\n")
 	}
-	if len(stats.FailedUsers) > 0 {
-		sb.WriteString(F(chatID, "broadcast_failed_users", locales.Arg{
-			"count": len(stats.FailedUsers),
-		}) + "\n")
+	if len(b.failedUsers) > 0 {
+		sb.WriteString(F(chatID, "broadcast_failed_users", locales.Arg{"count": len(b.failedUsers)}) + "\n")
 	}
-	if len(stats.FailedChats) > 0 || len(stats.FailedUsers) > 0 {
+	if len(b.failedChats) > 0 || len(b.failedUsers) > 0 {
 		sb.WriteString("\n")
 	}
 
-	elapsed := time.Since(stats.StartTime)
-	totalDone := stats.DoneChats + stats.DoneUsers
-	totalTargets := stats.TotalChats + stats.TotalUsers
+	elapsed := time.Since(b.startedAt)
+	done := b.doneChats + b.doneUsers
+	total := b.totalChats + b.totalUsers
 
-	avgSpeed := 0.0
-	if elapsed.Seconds() > 0 && totalDone > 0 {
-		avgSpeed = float64(totalDone) / elapsed.Seconds()
-	}
+	sb.WriteString(F(chatID, "broadcast_delay", locales.Arg{"delay": fmt.Sprintf("%.1f", b.flags.delay)}) + "\n")
+	sb.WriteString(F(chatID, "broadcast_elapsed", locales.Arg{"elapsed": utils.FormatDuration(int(elapsed.Seconds()))}) + "\n")
 
-	sb.WriteString(F(chatID, "broadcast_delay", locales.Arg{
-		"delay": fmt.Sprintf("%.1f", stats.Delay),
-	}) + "\n")
-	sb.WriteString(F(chatID, "broadcast_elapsed", locales.Arg{
-		"elapsed": utils.FormatDuration(int(elapsed.Seconds())),
-	}) + "\n")
-
-	if !final && avgSpeed > 0 && totalDone < totalTargets {
-		eta := time.Duration(float64(totalTargets-totalDone) / avgSpeed * float64(time.Second))
-		sb.WriteString("\n" + F(chatID, "broadcast_eta", locales.Arg{
-			"eta": utils.FormatDuration(int(eta.Seconds())),
-		}))
+	if !final && done > 0 && elapsed.Seconds() > 0 && done < total {
+		rate := float64(done) / elapsed.Seconds()
+		eta := time.Duration(float64(total-done) / rate * float64(time.Second))
+		sb.WriteString("\n" + F(chatID, "broadcast_eta", locales.Arg{"eta": utils.FormatDuration(int(eta.Seconds()))}))
 	}
 
 	if final {
-		totalSent := totalDone
-		totalFailed := len(stats.FailedChats) + len(stats.FailedUsers)
+		failed := len(b.failedChats) + len(b.failedUsers)
+		sent := done - failed
 
-		successRate := 0.0
-		if totalTargets > 0 {
-			successRate = float64(totalSent-totalFailed) / float64(totalTargets) * 100
+		rate := 0.0
+		if total > 0 {
+			rate = float64(sent) / float64(total) * 100
 		}
-
 		sb.WriteString("\n\n" + F(chatID, "broadcast_success_rate", locales.Arg{
-			"rate":  fmt.Sprintf("%.1f", successRate),
-			"sent":  totalSent - totalFailed,
-			"total": totalTargets,
+			"rate":  fmt.Sprintf("%.1f", rate),
+			"sent":  sent,
+			"total": total,
 		}))
 	}
 
@@ -618,12 +550,11 @@ func broadcastProgressLine(chatID int64, key string, done, total int) string {
 }
 
 func handleBroadcastCancel(c *td.Client, m *td.Message) error {
-	if !bManager.isActive() {
-		_, err := m.ReplyText(c, F(m.ChatID(), "broadcast_not_running"), nil)
-		return err
+	key := "broadcast_not_running"
+	if stopBroadcast() {
+		key = "broadcast_cancel_success"
 	}
-	bManager.stop()
-	_, err := m.ReplyText(c, F(m.ChatID(), "broadcast_cancel_success"), nil)
+	_, err := m.ReplyText(c, F(m.ChatID(), key), nil)
 	return err
 }
 
@@ -632,11 +563,10 @@ func broadcastCancelCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 		cb.Answer(c, 0, true, F(cb.ChatId, "broadcast_cancel_owner_only"), "")
 		return nil
 	}
-	if !bManager.isActive() {
+	if !stopBroadcast() {
 		cb.Answer(c, 0, true, F(cb.ChatId, "broadcast_cancel_none_running"), "")
 		return nil
 	}
-	bManager.stop()
 	cb.Answer(c, 0, true, F(cb.ChatId, "broadcast_cancel_done"), "")
 	cb.EditMessageText(c, F(cb.ChatId, "broadcast_cancel_done"), nil)
 	return nil
