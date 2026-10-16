@@ -113,6 +113,11 @@ func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		return privateLangCallback(c, u, lang)
 	}
 
+	if isAdmin, _ := utils.IsChatAdmin(c, chatID, u.SenderUserId); !isAdmin {
+		_ = u.Answer(c, 0, true, F(chatID, "only_admin_cb"), "")
+		return nil
+	}
+
 	if lang == "select" {
 		cur, err := database.Language(chatID)
 		if err != nil {
@@ -123,11 +128,6 @@ func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 			ParseMode:   td.ParseModeHTML,
 			ReplyMarkup: markup,
 		})
-		return nil
-	}
-
-	if isAdmin, _ := utils.IsChatAdmin(c, chatID, u.SenderUserId); !isAdmin {
-		_ = u.Answer(c, 0, true, F(chatID, "only_admin_cb"), "")
 		return nil
 	}
 
