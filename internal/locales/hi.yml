@@ -357,23 +357,12 @@ loop_current: "• वर्तमान आवृत्ति: <b>{count}</b> �
 # Logs module
 logs_empty: "कोई लॉग्स नहीं मिले"
 
-# reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
-maint: "⚠️ मैं वर्तमान में अनुरक्षण के अधीन हूँ और अस्थायी रूप से अनुपलब्ध हूँ। कृपया कुछ समय पश्चात पुनः देखें।\n\n{reason}"
-maint_reason: "<i>{emoji:📝} कारण: {reason}</i>"
+maint: "⚠️ मैं वर्तमान में अनुरक्षण के अधीन हूँ और अस्थायी रूप से अनुपलब्ध हूँ। कृपया कुछ समय पश्चात पुनः देखें।"
+maint_title: "{emoji:🛠️} अनुरक्षण"
+maint_desc: "सक्षम होने पर, सभी सक्रिय रूम बंद कर दिए जाते हैं और केवल मालिक/सूडो उपयोगकर्ता ही बॉट का उपयोग कर सकते हैं।"
+only_owner_cb: "⚠️ केवल सहायक के स्वामी ही इसका प्रयोग कर सकते हैं।"
 
 # ⚙️ Maintenance control
-maint_usage: "{emoji:⚙️} <b>अनुरक्षण नियन्त्रण</b>\n\nप्रयोग: {cmd} [enable|disable] [कारण]\n{emoji:📜} वर्तमान स्थिति: {status}"
-maint_check_fail: "{emoji:❌} अनुरक्षण स्थिति जाँचने में विफल: <code>{error}</code>"
-maint_already_enabled: "ℹ️ अनुरक्षण विधा पूर्व से ही सक्षम {emoji:🟢} है।"
-maint_already_disabled: "ℹ️ अनुरक्षण विधा पूर्व से ही अक्षम {emoji:🔴} है।"
-maint_already_reason_same: "ℹ️ अनुरक्षण उसी कारण के साथ पूर्व से ही सक्षम है।"
-maint_reason_removed: "{emoji:✅} अनुरक्षण कारण सफलतापूर्वक हटा दिया गया।"
-maint_reason_updated: "{emoji:✅} अनुरक्षण कारण अद्यतन किया गया।\n{emoji:📝} कारण: {reason}"
-maint_enabled: "{emoji:✅} अनुरक्षण विधा सफलतापूर्वक <b>सक्षम</b> कर दी गई है।"
-maint_enabled_reason: "{emoji:✅} अनुरक्षण विधा सक्षम की गई।\n{emoji:📝} कारण: {reason}"
-maint_disabled: "{emoji:✅} अनुरक्षण विधा सफलतापूर्वक <b>अक्षम</b> कर दी गई है।"
-maint_entering: "{emoji:⚠️} सहायक अनुरक्षण विधा में प्रवेश कर रहा है..."
-enabled_with_reason: "{emoji:🟢} सक्षम\n{emoji:📝} कारण: {reason}"
 
 move_usage: "{emoji:⚠️} प्रयोग: <code>{cmd} [कहाँ से] [कहाँ को]</code>"
 move_invalid_numbers: "{emoji:⚠️} अमान्य संख्याएँ। उदाहरण: <code>/{cmd} 2 1</code>"

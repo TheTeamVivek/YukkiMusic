@@ -357,23 +357,12 @@ loop_current: "• التكرار الحالي: <b>{count}</b> مرة"
 # Logs module
 logs_empty: "لا توجد سجلات"
 
-# reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
-maint: "⚠️ أنا قيد الصيانة حالياً وغير متاح مؤقتاً. يرجى العودة لاحقاً.\n\n{reason}"
-maint_reason: "<i>{emoji:📝} السبب: {reason}</i>"
+maint: "⚠️ أنا قيد الصيانة حالياً وغير متاح مؤقتاً. يرجى العودة لاحقاً."
+maint_title: "{emoji:🛠️} الصيانة"
+maint_desc: "عند التفعيل، يتم إيقاف جميع الغرف النشطة ويمكن للمالك/المستخدمين المصرح لهم فقط استخدام البوت."
+only_owner_cb: "⚠️ فقط مالك المساعد يمكنه استخدام هذا الأمر."
 
 # ⚙️ Maintenance control
-maint_usage: "{emoji:⚙️} <b>التحكم في الصيانة</b>\n\nالاستخدام: {cmd} [enable|disable] [reason]\n{emoji:📜} الحالة الحالية: {status}"
-maint_check_fail: "{emoji:❌} فشل التحقق من حالة الصيانة: <code>{error}</code>"
-maint_already_enabled: "ℹ️ وضع الصيانة مفعل بالفعل {emoji:🟢}."
-maint_already_disabled: "ℹ️ وضع الصيانة معطل بالفعل {emoji:🔴}."
-maint_already_reason_same: "ℹ️ الصيانة مفعلة بالفعل بنفس السبب."
-maint_reason_removed: "{emoji:✅} تم حذف سبب الصيانة بنجاح."
-maint_reason_updated: "{emoji:✅} تم تحديث سبب الصيانة.\n{emoji:📝} السبب: {reason}"
-maint_enabled: "{emoji:✅} تم <b>تفعيل</b> وضع الصيانة بنجاح."
-maint_enabled_reason: "{emoji:✅} تم تفعيل وضع الصيانة.\n{emoji:📝} السبب: {reason}"
-maint_disabled: "{emoji:✅} تم <b>تعطيل</b> وضع الصيانة بنجاح."
-maint_entering: "{emoji:⚠️} المساعد يدخل وضع الصيانة..."
-enabled_with_reason: "{emoji:🟢} مفعل\n{emoji:📝} السبب: {reason}"
 
 move_usage: "{emoji:⚠️} الاستخدام: <code>{cmd} [from] [to]</code>"
 move_invalid_numbers: "{emoji:⚠️} أرقام غير صالحة. مثال: <code>/{cmd} 2 1</code>"

@@ -356,23 +356,12 @@ loop_current: "• Current loop: <b>{count}</b> time(s)"
 # Logs module
 logs_empty: "No logs found"
 
-# reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
-maint: "⚠️ I'm under maintenance at the moment and temporarily unavailable. Please check back later.\n\n{reason}"
-maint_reason: "<i>{emoji:📝} Reason: {reason}</i>"
+maint: "⚠️ I'm under maintenance at the moment and temporarily unavailable. Please check back later."
+maint_title: "{emoji:🛠️} Maintenance"
+maint_desc: "When enabled, all active rooms are stopped and only the owner/sudo users can use the bot."
+only_owner_cb: "⚠️ Only the bot owner can use this command."
 
 # ⚙️ Maintenance control
-maint_usage: "{emoji:⚙️} <b>Maintenance Control</b>\n\nUsage: {cmd} [enable|disable] [reason]\n{emoji:📜} Current status: {status}"
-maint_check_fail: "{emoji:❌} Failed to check maintenance status: <code>{error}</code>"
-maint_already_enabled: "ℹ️ Maintenance mode is already enabled {emoji:🟢}."
-maint_already_disabled: "ℹ️ Maintenance mode is already disabled {emoji:🔴}."
-maint_already_reason_same: "ℹ️ Maintenance is already enabled with the same reason."
-maint_reason_removed: "{emoji:✅} Maintenance reason removed successfully."
-maint_reason_updated: "{emoji:✅} Maintenance reason updated.\n{emoji:📝} Reason: {reason}"
-maint_enabled: "{emoji:✅} Maintenance mode has been <b>enabled</b> successfully."
-maint_enabled_reason: "{emoji:✅} Maintenance mode enabled.\n{emoji:📝} Reason: {reason}"
-maint_disabled: "{emoji:✅} Maintenance mode has been <b>disabled</b> successfully."
-maint_entering: "{emoji:⚠️} Bot is entering maintenance mode..."
-enabled_with_reason: "{emoji:🟢} Enabled\n{emoji:📝} Reason: {reason}"
 
 move_usage: "{emoji:⚠️} Usage: <code>{cmd} [from] [to]</code>"
 move_invalid_numbers: "{emoji:⚠️} Invalid numbers. Example: <code>/{cmd} 2 1</code>"

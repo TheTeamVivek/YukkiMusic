@@ -66,7 +66,7 @@ func memberStatus(m *td.ChatMember) string {
 }
 
 func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
-	isMaint, _ := database.IsMaintenanceEnabled()
+	isMaint, _ := database.GetMaintenance()
 	if isMaint && u.ActorUserId != config.OwnerID {
 		if ok, _ := database.IsSudo(u.ActorUserId); !ok {
 			return nil

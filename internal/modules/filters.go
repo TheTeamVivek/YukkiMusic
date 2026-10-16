@@ -47,13 +47,17 @@ func checkSudo(c *td.Client, m *td.Message) bool {
 }
 
 func checkOwner(c *td.Client, m *td.Message) bool {
-	if config.OwnerID == 0 || m.SenderID() != config.OwnerID {
+	if !isOwner(m.SenderID()) {
 		if _, err := m.ReplyText(c, F(m.ChatID(), "only_owner"), nil); err != nil {
 			utils.Log.Error(err.Error())
 		}
 		return false
 	}
 	return true
+}
+
+func isOwner(userID int64) bool {
+	return config.OwnerID != 0 && userID == config.OwnerID
 }
 
 func isSuperGroup(c *td.Client, m *td.Message) bool {

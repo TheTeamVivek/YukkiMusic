@@ -29,19 +29,14 @@ type UsersChats struct {
 	Chats []int64 `bson:"chats"`
 }
 
-type Maintenance struct {
-	Enabled bool   `bson:"enabled,omitempty"`
-	Reason  string `bson:"reason,omitempty"`
-}
-
 type BotState struct {
-	ID            string      `bson:"_id"`
-	Served        UsersChats  `bson:"served"`
-	Sudoers       []int64     `bson:"sudoers"`
-	Blacklisted   UsersChats  `bson:"blacklisted"`
-	AutoLeave     bool        `bson:"autoleave"`
-	LoggerEnabled bool        `bson:"logger"`
-	Maintenance   Maintenance `bson:"maint,omitempty"`
+	ID            string     `bson:"_id"`
+	Served        UsersChats `bson:"served"`
+	Sudoers       []int64    `bson:"sudoers"`
+	Blacklisted   UsersChats `bson:"blacklisted"`
+	AutoLeave     bool       `bson:"autoleave"`
+	LoggerEnabled bool       `bson:"logger"`
+	Maintenance   bool       `bson:"maintenance,omitempty"`
 
 	// runtime indexes for fast lookup
 	servedUsersMap map[int64]struct{} `bson:"-"`

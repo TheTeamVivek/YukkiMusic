@@ -19,14 +19,11 @@ package modules
 
 import (
 	"strings"
-	"sync"
-	"time"
 
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/core"
 	"yukkimusic/internal/database"
-	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
 
@@ -34,9 +31,9 @@ func init() {
 	helpTexts["/maintenance"] = `<i>Toggle maintenance mode.</i>
 
 <u>Usage:</u>
-<b>/maintenance</b> — Show current status
-<b>/maintenance on [reason]</b> — Enable maintenance
-<b>/maintenance off</b> — Disable maintenance
+<b>/maintenance</b> — Open the maintenance panel
+<b>/maintenance enable</b> — Enable maintenance
+<b>/maintenance disable</b> — Disable maintenance
 
 <b>⚙️ Behavior When Active:</b>
 • Stops all active rooms
@@ -44,176 +41,55 @@ func init() {
 • Shows maintenance message to users
 
 <b>🔒 Restrictions:</b>
-• <b>Owner only</b> command
-
-<b>💡 Examples:</b>
-<code>/maintenance on Server upgrade</code>
-<code>/maintenance off</code>
-
-<b>⚠️ Notes:</b>
-• Owner and sudoers can still use bot
-• All rooms are destroyed when enabled
-• Users see maintenance message with reason`
+• <b>Owner only</b> command`
 	helpTexts["/maint"] = helpTexts["/maintenance"]
-}
 
-var maintCancel = struct {
-	sync.Mutex
-	cancel bool
-}{}
+	dashboards["maintenance"] = dashboardDef{
+		title:       func(chatID int64) string { return F(chatID, "maint_title") },
+		description: func(chatID int64) string { return F(chatID, "maint_desc") },
+		canUse: func(c *td.Client, u *td.UpdateNewCallbackQuery) bool {
+			if isOwner(u.SenderUserId) {
+				return true
+			}
+			u.Answer(c, 0, true, F(u.ChatId, "only_owner_cb"), "")
+			return false
+		},
+		get: func(int64) (bool, error) { return database.GetMaintenance() },
+		set: func(_ int64, on bool) error { return applyMaintenance(on) },
+	}
+}
 
 func handleMaintenance(c *td.Client, m *td.Message) error {
 	if !checkOwner(c, m) {
 		return nil
 	}
-	args := strings.Fields(m.Text())
-	chatID := m.ChatID()
-	current, err := database.IsMaintenanceEnabled()
-	if err != nil {
-		_, err := m.ReplyText(
-			c,
-			F(chatID, "maint_check_fail", locales.Arg{"error": err.Error()}),
-			nil,
-		)
-		return err
+
+	if args := strings.Fields(m.Text()); len(args) > 1 {
+		if enabled, err := utils.ParseBool(args[1]); err == nil {
+			if current, cerr := database.GetMaintenance(); cerr == nil && enabled != current {
+				if err := applyMaintenance(enabled); err != nil {
+					return err
+				}
+			}
+		}
 	}
 
-	if len(args) < 2 {
-		return showMaintenanceStatus(c, m, current)
-	}
-
-	enable, err := utils.ParseBool(args[1])
-	if err != nil {
-		_, err := m.ReplyText(c, F(chatID, "invalid_bool"), nil)
-		return err
-	}
-
-	reason := strings.Join(args[2:], " ")
-	if current == enable {
-		return handleSameMaintenanceState(c, m, enable, reason)
-	}
-
-	return applyMaintenanceState(c, m, enable, reason)
+	return sendDashboard(c, m, "maintenance")
 }
 
-func showMaintenanceStatus(c *td.Client, m *td.Message, current bool) error {
-	chatID := m.ChatID()
-	reason, _ := database.MaintenanceReason()
-	status := F(chatID, "disabled")
-	if current {
-		if reason != "" {
-			status = F(
-				chatID,
-				"enabled_with_reason",
-				locales.Arg{"reason": reason},
-			)
-		} else {
-			status = F(chatID, "enabled")
-		}
-	}
-	_, err := m.ReplyText(c, F(chatID, "maint_usage", locales.Arg{
-		"cmd":    getCommand(m),
-		"status": status,
-	}), nil)
-	return err
-}
-
-func handleSameMaintenanceState(
-	c *td.Client,
-	m *td.Message,
-	enable bool,
-	reason string,
-) error {
-	chatID := m.ChatID()
-	if !enable {
-		_, err := m.ReplyText(c, F(chatID, "maint_already_disabled"), nil)
+func applyMaintenance(on bool) error {
+	if err := database.SetMaintenance(on); err != nil {
 		return err
 	}
-
-	oldReason, _ := database.MaintenanceReason()
-	switch {
-	case reason == oldReason:
-		if _, err := m.ReplyText(c, F(chatID, "maint_already_reason_same"), nil); err != nil {
-			return err
-		}
-	case reason == "" && oldReason != "":
-		_ = database.SetMaintenance(true, "")
-		if _, err := m.ReplyText(c, F(chatID, "maint_reason_removed"), nil); err != nil {
-			return err
-		}
-	case reason != "" && reason != oldReason:
-		_ = database.SetMaintenance(true, reason)
-		if _, err := m.ReplyText(
-			c,
-			F(chatID, "maint_reason_updated", locales.Arg{"reason": reason}),
-			nil,
-		); err != nil {
-			return err
-		}
-	default:
-		if _, err := m.ReplyText(c, F(chatID, "maint_already_enabled"), nil); err != nil {
-			return err
-		}
+	if on {
+		go stopAllRooms()
 	}
 	return nil
 }
 
-func applyMaintenanceState(c *td.Client, m *td.Message, enable bool, reason string) error {
-	chatID := m.ChatID()
-	database.SetMaintenance(enable, reason)
-	utils.Log.Infof(
-		"User %d set maintenance: %v (reason: %s)",
-		m.SenderID(),
-		enable,
-		reason,
-	)
-
-	maintCancel.Lock()
-	maintCancel.cancel = !enable
-	maintCancel.Unlock()
-
-	if enable {
-		go notifyMaintenanceStart(c, reason)
-		msgKey := "maint_enabled"
-		args := locales.Arg{}
-		if reason != "" {
-			msgKey = "maint_enabled_reason"
-			args["reason"] = reason
-		}
-		if _, err := m.ReplyText(c, F(chatID, msgKey, args), nil); err != nil {
-			return err
-		}
-	} else {
-		if _, err := m.ReplyText(c, F(chatID, "maint_disabled"), nil); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func notifyMaintenanceStart(c *td.Client, reason string) {
+// stopAllRooms destroys every active room.
+func stopAllRooms() {
 	for chatID := range core.Rooms.All() {
-		maintCancel.Lock()
-		cancelled := maintCancel.cancel
-		maintCancel.Unlock()
-
-		if cancelled {
-			break
-		}
-
 		core.Rooms.Delete(chatID)
-		msg := F(chatID, "maint_entering")
-		if reason != "" {
-			msg += "\n" + F(
-				chatID,
-				"maint_reason",
-				locales.Arg{"reason": reason},
-			)
-		}
-		if _, err := c.SendMessage(chatID, msg, nil); err != nil {
-			utils.Log.Error(err.Error())
-		}
-		time.Sleep(time.Second)
 	}
 }

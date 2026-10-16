@@ -356,23 +356,12 @@ loop_current: "• Mevcut döngü: <b>{count}</b> kez"
 # Logs module
 logs_empty: "Kayıt bulunamadı"
 
-# reason - if maintenance reason available so at the place of {reason} the maint_reason will provided
-maint: "⚠️ Şu anda bakımdayım ve geçici olarak hizmet veremiyorum. Lütfen daha sonra tekrar kontrol et.\n\n{reason}"
-maint_reason: "<i>{emoji:📝} Sebep: {reason}</i>"
+maint: "⚠️ Şu anda bakımdayım ve geçici olarak hizmet veremiyorum. Lütfen daha sonra tekrar kontrol et."
+maint_title: "{emoji:🛠️} Bakım"
+maint_desc: "Etkinleştirildiğinde, tüm etkin odalar durdurulur ve yalnızca sahip/sudo kullanıcılar botu kullanabilir."
+only_owner_cb: "⚠️ Bu komutu yalnızca bot sahibi kullanabilir."
 
 # ⚙️ Maintenance control
-maint_usage: "{emoji:⚙️} <b>Bakım Kontrolü</b>\n\nKullanım: {cmd} [enable|disable] [sebep]\n{emoji:📜} Mevcut durum: {status}"
-maint_check_fail: "{emoji:❌} Bakım durumu kontrol edilemedi: <code>{error}</code>"
-maint_already_enabled: "ℹ️ Bakım modu zaten etkin {emoji:🟢}."
-maint_already_disabled: "ℹ️ Bakım modu zaten devre dışı {emoji:🔴}."
-maint_already_reason_same: "ℹ️ Bakım zaten aynı sebeple etkin."
-maint_reason_removed: "{emoji:✅} Bakım sebebi başarıyla kaldırıldı."
-maint_reason_updated: "{emoji:✅} Bakım sebebi güncellendi.\n{emoji:📝} Sebep: {reason}"
-maint_enabled: "{emoji:✅} Bakım modu başarıyla <b>etkinleştirildi</b>."
-maint_enabled_reason: "{emoji:✅} Bakım modu etkinleştirildi.\n{emoji:📝} Sebep: {reason}"
-maint_disabled: "{emoji:✅} Bakım modu başarıyla <b>devre dışı bırakıldı</b>."
-maint_entering: "{emoji:⚠️} Bot bakım moduna giriyor..."
-enabled_with_reason: "{emoji:🟢} Etkin\n{emoji:📝} Sebep: {reason}"
 
 move_usage: "{emoji:⚠️} Kullanım: <code>{cmd} [nereden] [nereye]</code>"
 move_invalid_numbers: "{emoji:⚠️} Geçersiz sayılar. Örnek: <code>/{cmd} 2 1</code>"

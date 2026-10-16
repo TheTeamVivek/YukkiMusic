@@ -171,7 +171,7 @@ func handleBotRemoved(c *td.Client, u *td.UpdateChatMember, chatID int64) {
 }
 
 func handleVoiceChatAction(c *td.Client, m *td.Message) error {
-	if isMaint, _ := database.IsMaintenanceEnabled(); isMaint {
+	if isMaint, _ := database.GetMaintenance(); isMaint {
 		return nil
 	}
 

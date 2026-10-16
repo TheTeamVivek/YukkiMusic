@@ -249,7 +249,7 @@ func WithBlacklistCallback(
 		}
 
 		if !canBypassMaintenance(cb.SenderUserId) {
-			cb.Answer(c, 0, true, F(cb.ChatId, "maint", locales.Arg{"reason": ""}), "")
+			cb.Answer(c, 0, true, F(cb.ChatId, "maint"), "")
 			return td.EndGroups
 		}
 
@@ -292,15 +292,7 @@ func WithBlacklistMessage(
 
 		if !canBypassMaintenance(m.SenderID()) {
 			if m.IsPrivate() || messageMentionsBot(c, m) {
-				reason, _ := database.MaintenanceReason()
-				msg := F(m.ChatID(), "maint", locales.Arg{
-					"reason": F(
-						m.ChatID(),
-						"maint_reason",
-						locales.Arg{"reason": reason},
-					),
-				})
-				if _, rerr := m.ReplyText(c, msg, nil); rerr != nil {
+				if _, rerr := m.ReplyText(c, F(m.ChatID(), "maint"), nil); rerr != nil {
 					utils.Log.Error(rerr.Error())
 				}
 			}
@@ -329,7 +321,7 @@ func WithBlacklistMessage(
 // canBypassMaintenance reports whether the user is allowed to use the bot
 // while maintenance mode is active (owner or sudo users).
 func canBypassMaintenance(userID int64) bool {
-	isMaint, _ := database.IsMaintenanceEnabled()
+	isMaint, _ := database.GetMaintenance()
 	if !isMaint {
 		return true
 	}
