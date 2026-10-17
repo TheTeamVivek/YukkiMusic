@@ -57,7 +57,7 @@ func init() {
 				return false
 			}
 			if r, ok := core.Rooms.Get(u.ChatId); !ok || !r.Active() {
-				u.Answer(c, 0, true, F(u.ChatId, "room_no_active"), "")
+				u.Answer(c, F(u.ChatId, "room_no_active"), &td.CallbackAnswerOpts{ShowAlert: true})
 				return false
 			}
 			return true

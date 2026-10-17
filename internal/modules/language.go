@@ -103,7 +103,7 @@ func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	data := u.DataString()
 	parts := strings.SplitN(data, ":", 2)
 	if len(parts) != 2 {
-		_ = u.Answer(c, 0, true, "⚠️ Invalid data.", "")
+		_ = u.Answer(c, "⚠️ Invalid data.", &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 	lang := parts[1]
@@ -114,7 +114,7 @@ func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	}
 
 	if isAdmin, _ := utils.IsChatAdmin(c, chatID, u.SenderUserId); !isAdmin {
-		_ = u.Answer(c, 0, true, F(chatID, "only_admin_cb"), "")
+		_ = u.Answer(c, F(chatID, "only_admin_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
@@ -134,7 +134,7 @@ func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	currentLang, _ := database.Language(chatID)
 
 	if lang == currentLang {
-		_ = u.Answer(c, 0, true, F(chatID, "lang_same"), "")
+		_ = u.Answer(c, F(chatID, "lang_same"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
@@ -142,12 +142,12 @@ func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 
 	if err := database.SetLanguage(chatID, lang); err != nil {
 		utils.Log.Errorf("SetChatLanguage error: %v", err)
-		_ = u.Answer(c, 0, true, F(chatID, "lang_fail"), "")
+		_ = u.Answer(c, F(chatID, "lang_fail"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	msg := F(chatID, "lang_success", locales.Arg{"lang_name": langName})
-	_ = u.Answer(c, 0, true, msg, "")
+	_ = u.Answer(c, msg, &td.CallbackAnswerOpts{ShowAlert: true})
 	_, _ = u.EditMessageText(c, msg, &td.EditMessageTextOpts{ParseMode: td.ParseModeHTML})
 	return nil
 }
@@ -171,7 +171,7 @@ func privateLangCallback(c *td.Client, u *td.UpdateNewCallbackQuery, lang string
 	currentLang, _ := database.Language(chatID)
 
 	if lang == currentLang {
-		_ = u.Answer(c, 0, true, F(chatID, "lang_same"), "")
+		_ = u.Answer(c, F(chatID, "lang_same"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
@@ -179,16 +179,16 @@ func privateLangCallback(c *td.Client, u *td.UpdateNewCallbackQuery, lang string
 
 	if err := database.SetLanguage(chatID, lang); err != nil {
 		utils.Log.Errorf("SetChatLanguage error: %v", err)
-		_ = u.Answer(c, 0, true, F(chatID, "lang_fail"), "")
+		_ = u.Answer(c, F(chatID, "lang_fail"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
-	_ = u.Answer(c, 0, true, F(chatID, "lang_success", locales.Arg{"lang_name": langName}), "")
+	_ = u.Answer(c, F(chatID, "lang_success", locales.Arg{"lang_name": langName}), &td.CallbackAnswerOpts{ShowAlert: true})
 
 	user, _ := c.GetUser(u.SenderUserId)
 	if msg, err := u.GetMessage(c); err == nil {
 		rich := &td.InputMessageRichMessage{Message: startRich(c, chatID, user, u.SenderUserId)}
-		_, _ = c.EditContent(chatID, msg.Id, rich, core.GetStartMarkup(chatID))
+		_, _ = c.EditContent(chatID, msg.Id, rich, &td.EditMessageMediaOpts{ReplyMarkup: core.GetStartMarkup(chatID)})
 	}
 	return nil
 }

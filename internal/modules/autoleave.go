@@ -69,7 +69,7 @@ This command can only be used by <b>owners</b> or <b>sudo users</b>.`,
 			if isOwnerOrSudo(u.SenderUserId) {
 				return true
 			}
-			u.Answer(c, 0, true, F(u.ChatId, "only_sudo_cb"), "")
+			u.Answer(c, F(u.ChatId, "only_sudo_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
 			return false
 		},
 		get: func(int64) (bool, error) { return database.AutoLeave() },

@@ -95,7 +95,7 @@ func helpRich(chatID int64, key string) *td.InputRichMessage {
 }
 
 func helpCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
-	cb.Answer(c, 0, false, "", "")
+	cb.Answer(c, "", nil)
 
 	msg, err := cb.GetMessage(c)
 	if err != nil {
@@ -103,13 +103,13 @@ func helpCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 	}
 
 	rich := &td.InputMessageRichMessage{Message: helpRich(cb.ChatId, "help_main")}
-	_, err = c.EditContent(cb.ChatId, msg.Id, rich, core.GetHelpKeyboard(cb.ChatId))
+	_, err = c.EditContent(cb.ChatId, msg.Id, rich, &td.EditMessageMediaOpts{ReplyMarkup: core.GetHelpKeyboard(cb.ChatId)})
 	return err
 }
 
 func helpCallbackHandler(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 	data := cb.DataString()
-	cb.Answer(c, 0, false, "", "")
+	cb.Answer(c, "", nil)
 	if data == "" {
 		return nil
 	}
@@ -142,7 +142,7 @@ func helpCallbackHandler(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 	}
 
 	rich := &td.InputMessageRichMessage{Message: helpRich(chatID, key)}
-	_, err = c.EditContent(cb.ChatId, msg.Id, rich, btn)
+	_, err = c.EditContent(cb.ChatId, msg.Id, rich, &td.EditMessageMediaOpts{ReplyMarkup: btn})
 	return err
 }
 

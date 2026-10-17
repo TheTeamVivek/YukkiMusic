@@ -33,6 +33,7 @@ import "C"
 import (
 	"fmt"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 
 	"yukkimusic/config"
@@ -44,46 +45,53 @@ import (
 )
 
 func main() {
+	if err := run(); err != nil {
+		utils.Log.Errorf("fatal: %v", err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	defer utils.CloseLog()
 
 	if err := config.Load(); err != nil {
-		panic(fmt.Sprintf("failed to load config: %v", err))
+		return fmt.Errorf("failed to load config: %w", err)
 	}
 
 	if err := checkDependencies(); err != nil {
-		panic(fmt.Sprintf("dependency check failed: %v", err))
+		return fmt.Errorf("dependency check failed: %w", err)
 	}
 
 	if err := refreshDirs(); err != nil {
-		panic(fmt.Sprintf("failed to refresh directories: %v", err))
+		return fmt.Errorf("failed to refresh directories: %w", err)
 	}
 
 	utils.Log.Debug("Initializing MongoDB...")
 
 	closeDB, err := database.Init(config.MongoURI)
 	if err != nil {
-		panic(fmt.Sprintf("failed to initialize database: %v", err))
+		return fmt.Errorf("failed to initialize database: %w", err)
 	}
 	defer closeDB()
 
 	utils.Log.Info("Database connected successfully")
 
 	if err := locales.Load(); err != nil {
-		panic(fmt.Sprintf("failed to load locales: %v", err))
+		return fmt.Errorf("failed to load locales: %w", err)
 	}
 
 	utils.Log.Debug("Initializing clients...")
 
 	shutdownCore, err := core.Init()
 	if err != nil {
-		panic(fmt.Sprintf("failed to initialize core: %v", err))
+		return fmt.Errorf("failed to initialize core: %w", err)
 	}
 	defer shutdownCore()
 
 	core.F = modules.F
 
 	if err := database.InitAssistantIndexes(core.Assistants.Count()); err != nil {
-		panic(fmt.Sprintf("failed to init assistants: %v", err))
+		return fmt.Errorf("failed to init assistants: %w", err)
 	}
 
 	modules.Init(core.Bot, core.Assistants)
@@ -91,6 +99,7 @@ func main() {
 	startHTTPServer()
 
 	core.Bot.Idle()
+	return nil
 }
 
 func startHTTPServer() {

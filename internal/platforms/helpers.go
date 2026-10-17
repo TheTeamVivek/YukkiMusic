@@ -104,7 +104,9 @@ func findAndRemove(track *state.Track) {
 		return
 	}
 	for _, f := range files {
-		os.Remove(f)
+		if err := os.Remove(f); err != nil {
+			utils.Log.Debugf("findAndRemove: failed to remove %s: %v", f, err)
+		}
 	}
 }
 

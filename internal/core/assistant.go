@@ -73,11 +73,16 @@ func (m *ClientManager) AddClient(sessionStr string) (*Assistant, error) {
 		return nil, fmt.Errorf("fetching identity: %w", err)
 	}
 
+	ntg, err := ubot.NewContext(client)
+	if err != nil {
+		return nil, fmt.Errorf("creating ubot context: %w", err)
+	}
+
 	assistant := &Assistant{
 		Index:  len(m.list),
 		Client: client,
 		Self:   user,
-		Ntg:    ubot.NewContext(client),
+		Ntg:    ntg,
 	}
 
 	m.list = append(m.list, assistant)

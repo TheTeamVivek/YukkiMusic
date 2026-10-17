@@ -18,8 +18,6 @@
 package modules
 
 import (
-	"strings"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
@@ -228,7 +226,7 @@ func handleAssistantRestriction(
 		s.SetBanned(true)
 
 		msg := F(chatID, "assistant_restricted_warning", locales.Arg{
-			"assistant": td.Mention(strings.TrimSpace(s.Assistant.Self.FirstName+" "+s.Assistant.Self.LastName), s.Assistant.Self.ID, true, true),
+			"assistant": mentionHTML(s.Assistant.Self.FirstName+" "+s.Assistant.Self.LastName, s.Assistant.Self.ID),
 			"id":        s.Assistant.Self.ID,
 		})
 

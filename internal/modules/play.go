@@ -357,7 +357,7 @@ func ensureVoiceChatReady(
 
 	if snap.AssistantBanned {
 		utils.EOR(c, replyMsg, F(chatID, "err_assistant_banned", locales.Arg{
-			"user": td.Mention(strings.TrimSpace(cs.Assistant.Self.FirstName+" "+cs.Assistant.Self.LastName), cs.Assistant.Self.ID, true, true),
+			"user": mentionHTML(cs.Assistant.Self.FirstName+" "+cs.Assistant.Self.LastName, cs.Assistant.Self.ID),
 			"id":   utils.IntToStr(cs.Assistant.Self.ID),
 		}), nil)
 		return fmt.Errorf("assistant banned")
@@ -670,7 +670,7 @@ func playTrackWithRetry(
 	for attempt := 1; attempt <= playMaxRetries; attempt++ {
 		if r.Destroyed() {
 			utils.Log.Info("Room destroyed during retry, aborting")
-			replyMsg.Delete(c, true)
+			replyMsg.Delete(c, &td.DeleteMessagesOpts{Revoke: true})
 			return nil
 		}
 
@@ -837,7 +837,8 @@ func floodWaitMessage(chatID int64, wait int) string {
 	return F(chatID, "flood_seconds", locales.Arg{"duration": wait})
 }
 
-// downloadTrack and safeGetTracks re-raise panics on failure.
+// downloadTrack and safeGetTracks convert platform panics into errors so a
+// single failed lookup or download cannot take down the whole bot.
 func safeGetTracks(
 	c *td.Client,
 	m, replyMsg *td.Message,
@@ -847,7 +848,7 @@ func safeGetTracks(
 	defer func() {
 		if r := recover(); r != nil {
 			utils.EOR(c, replyMsg, F(chatID, "err_fetch_tracks"), nil)
-			panic(r)
+			err = fmt.Errorf("recovered panic while fetching tracks: %v", r)
 		}
 	}()
 
@@ -855,7 +856,7 @@ func safeGetTracks(
 }
 
 // downloadTrack runs the platform download, showing an internal-error message
-// and re-raising any panic so the caller can catch it at the top level.
+// and converting any panic into a returned error.
 func downloadTrack(
 	ctx context.Context,
 	c *td.Client,
@@ -866,7 +867,7 @@ func downloadTrack(
 	defer func() {
 		if r := recover(); r != nil {
 			utils.EOR(c, replyMsg, F(chatID, "err_download_internal"), nil)
-			panic(r)
+			err = fmt.Errorf("recovered panic while downloading: %v", r)
 		}
 	}()
 

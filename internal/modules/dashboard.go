@@ -118,7 +118,7 @@ func dashboardCallback(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	def, ok := dashboards[name]
 	if !ok {
 		utils.Log.Warnf("Unknown dashboard callback: %s", u.DataString())
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
@@ -128,13 +128,13 @@ func dashboardCallback(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 
 	enabled, err := def.get(chatID)
 	if err != nil {
-		u.Answer(c, 0, true, F(chatID, "dashboard_fail_cb"), "")
+		u.Answer(c, F(chatID, "dashboard_fail_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	enabled = !enabled
 	if err := def.set(chatID, enabled); err != nil {
-		u.Answer(c, 0, true, F(chatID, "dashboard_fail_cb"), "")
+		u.Answer(c, F(chatID, "dashboard_fail_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
@@ -145,12 +145,12 @@ func dashboardCallback(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 			def.description(chatID),
 			enabled,
 		),
-	}, dashboardMarkup(chatID, name, enabled)); err != nil {
+	}, &td.EditMessageMediaOpts{ReplyMarkup: dashboardMarkup(chatID, name, enabled)}); err != nil {
 		utils.Log.Errorf("Failed to refresh dashboard %q: %v", name, err)
 	}
 
-	u.Answer(c, 0, true, F(chatID, "dashboard_toggled_cb", locales.Arg{
+	u.Answer(c, F(chatID, "dashboard_toggled_cb", locales.Arg{
 		"status": F(chatID, utils.IfElse(enabled, "enabled", "disabled")),
-	}), "")
+	}), &td.CallbackAnswerOpts{ShowAlert: true})
 	return nil
 }

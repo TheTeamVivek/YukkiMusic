@@ -82,7 +82,7 @@ func pingHandler(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 
 	if m.IsPrivate() {
-		m.Delete(c, true)
+		m.Delete(c, &td.DeleteMessagesOpts{Revoke: true})
 		database.AddServedUser(chatID)
 	} else {
 		database.AddServedChat(chatID)
@@ -122,7 +122,7 @@ func pingHandler(c *td.Client, m *td.Message) error {
 
 	msg := F(chatID, "ping_result", locales.Arg{
 		"latency":    latency,
-		"bot":        td.Mention(c.Me.FirstName, c.Me.Id, true, true),
+		"bot":        c.Me.Mention(td.ParseModeHTML),
 		"uptime":     uptimeStr,
 		"ram_info":   ramInfo,
 		"cpu_usage":  cpuUsage,

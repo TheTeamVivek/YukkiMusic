@@ -86,28 +86,28 @@ func restartConfirmHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	chatID := u.ChatId
 
 	if u.SenderUserId != config.OwnerID {
-		_ = u.Answer(c, 0, true, F(chatID, "only_owner"), "")
+		_ = u.Answer(c, F(chatID, "only_owner"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	action := strings.TrimPrefix(u.DataString(), "restart:")
 	switch action {
 	case "bot":
-		_ = u.Answer(c, 0, false, F(chatID, "restart_confirm_bot"), "")
+		_ = u.Answer(c, F(chatID, "restart_confirm_bot"), nil)
 		statusMsg, _ := u.EditMessageText(c, F(chatID, "restart"), nil)
 		return executeRestart(c, chatID, statusMsg)
 	case "replay":
 		r, ok := getActiveRoomForChat(chatID)
 		if !ok {
-			_ = u.Answer(c, 0, true, F(chatID, "room_no_active"), "")
+			_ = u.Answer(c, F(chatID, "room_no_active"), &td.CallbackAnswerOpts{ShowAlert: true})
 			return nil
 		}
 		if err := r.Replay(); err != nil {
-			_ = u.Answer(c, 0, true, F(chatID, "replay_failed", locales.Arg{"error": err}), "")
+			_ = u.Answer(c, F(chatID, "replay_failed", locales.Arg{"error": err}), &td.CallbackAnswerOpts{ShowAlert: true})
 			return nil
 		}
 		_, _ = u.EditMessageText(c, F(chatID, "restart_confirm_replay_done"), nil)
-		_ = u.Answer(c, 0, true, F(chatID, "restart_confirm_replay_done"), "")
+		_ = u.Answer(c, F(chatID, "restart_confirm_replay_done"), &td.CallbackAnswerOpts{ShowAlert: true})
 	}
 
 	return nil

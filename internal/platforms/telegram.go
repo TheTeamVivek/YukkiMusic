@@ -150,7 +150,7 @@ func (t *TelegramPlatform) Download(
 	if OnDownloadStart != nil {
 		OnDownloadStart(fileID, statusMsg)
 	}
-	file, err := msg.Download(core.Bot, 1, 0, 0, true)
+	file, err := msg.Download(core.Bot, 1, &td.DownloadFileOpts{Synchronous: true})
 	if err != nil {
 		os.Remove(path)
 		if isDownloadCancelled(err) {

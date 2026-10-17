@@ -261,8 +261,8 @@ func (d *DirectStreamPlatform) extractTitle(urlStr string) string {
 		return "Direct Stream"
 	}
 	name := path.Base(parsed.Path)
-	if idx := strings.LastIndex(name, "."); idx > 0 {
-		name = name[:idx]
+	if before, _, found := strings.CutLast(name, "."); found && before != "" {
+		name = before
 	}
 	name = strings.NewReplacer("_", " ", "-", " ").Replace(name)
 	name = strings.TrimSpace(name)

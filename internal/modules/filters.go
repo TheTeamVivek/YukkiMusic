@@ -147,7 +147,7 @@ func canUseAdminCallback(c *td.Client, u *td.UpdateNewCallbackQuery) bool {
 		mode == database.AdminModeAdminsOnly {
 		key = "only_admin_cb"
 	}
-	u.Answer(c, 0, true, F(u.ChatId, key), "")
+	u.Answer(c, F(u.ChatId, key), &td.CallbackAnswerOpts{ShowAlert: true})
 	return false
 }
 

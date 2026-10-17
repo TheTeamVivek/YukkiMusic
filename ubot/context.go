@@ -1,6 +1,7 @@
 package ubot
 
 import (
+	"fmt"
 	"sync"
 
 	tg "github.com/amarnathcjd/gogram/telegram"
@@ -49,7 +50,7 @@ type Context struct {
 	frameCallbacks        []ntgcalls.FrameCallback
 }
 
-func NewContext(app *tg.Client) *Context {
+func NewContext(app *tg.Client) (*Context, error) {
 	client := &Context{
 		binding: ntgcalls.NewClient(),
 		app:     app,
@@ -70,7 +71,7 @@ func NewContext(app *tg.Client) *Context {
 			var err error
 			me, err = app.GetMe()
 			if err != nil {
-				panic(err)
+				return nil, fmt.Errorf("fetching own identity: %w", err)
 			}
 		}
 
@@ -78,7 +79,7 @@ func NewContext(app *tg.Client) *Context {
 	}
 
 	client.registerHandlers()
-	return client
+	return client, nil
 }
 
 func (ctx *Context) OnIncomingCall(

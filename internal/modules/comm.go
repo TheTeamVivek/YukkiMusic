@@ -185,7 +185,7 @@ func setBotCommands(bot *td.Client) {
 	}
 
 	for _, e := range entries {
-		if err := bot.SetCommands(e.cmds, "", &td.SetCommandsOpts{Scope: e.scope}); err != nil {
+		if err := bot.SetCommands(e.cmds, &td.SetCommandsOpts{Scope: e.scope}); err != nil {
 			utils.Log.Errorf("Failed to set bot commands(Scope: %T): %v", e.scope, err)
 		}
 	}
@@ -200,7 +200,7 @@ func setBotCommands(bot *td.Client) {
 	sudoCmds := concatCommands(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands)
 	for _, id := range sudoers {
 		scope := &td.BotCommandScopeChat{ChatId: id}
-		if err := bot.SetCommands(sudoCmds, "", &td.SetCommandsOpts{Scope: scope}); err != nil {
+		if err := bot.SetCommands(sudoCmds, &td.SetCommandsOpts{Scope: scope}); err != nil {
 			utils.Log.Error("Failed to set sudo commands: " + err.Error())
 		}
 	}

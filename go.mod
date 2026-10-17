@@ -1,9 +1,9 @@
 module yukkimusic
 
-go 1.26.2
+go 1.27
 
 require (
-	github.com/AshokShau/gotdbot v0.9.6
+	github.com/AshokShau/gotdbot v0.9.7-0.20261016182139-7db0a5689e8c
 	github.com/amarnathcjd/gogram v1.7.71
 	github.com/joho/godotenv v1.5.1
 	github.com/shirou/gopsutil/v3 v3.24.5
@@ -16,8 +16,8 @@ require (
 require (
 	github.com/ebitengine/purego v0.11.1 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
-	github.com/klauspost/compress v1.20.1 // indirect
-	github.com/kr/pretty v0.1.0 // indirect
+	github.com/klauspost/compress v1.20.3 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
 	github.com/lufia/plan9stats v0.0.0-20260802145828-341c2f0c90b5 // indirect
 	github.com/power-devops/perfstat v0.0.0-20260916203055-22a1a467d9f0 // indirect
 	github.com/shoenig/go-m1cpu v0.2.4 // indirect
@@ -33,5 +33,5 @@ require (
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
-	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )

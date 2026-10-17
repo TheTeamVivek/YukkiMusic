@@ -133,7 +133,6 @@ func handleAddSudo(c *td.Client, m *td.Message) error {
 
 		if err := c.SetCommands(
 			sudoCommands,
-			"",
 			&td.SetCommandsOpts{
 				Scope: &td.BotCommandScopeChat{ChatId: targetID},
 			},
@@ -207,7 +206,6 @@ func handleDelSudo(c *td.Client, m *td.Message) error {
 
 	// Reset that user's bot commands
 	if err := c.DeleteCommands(
-		"",
 		&td.DeleteCommandsOpts{
 			Scope: &td.BotCommandScopeChat{ChatId: targetID},
 		},

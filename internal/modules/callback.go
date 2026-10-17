@@ -42,21 +42,21 @@ func cancelHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	}
 
 	if downloads.cancel(chatID) {
-		u.Answer(c, 0, true, F(chatID, "download_cancelled"), "")
+		u.Answer(c, F(chatID, "download_cancelled"), &td.CallbackAnswerOpts{ShowAlert: true})
 	} else {
-		u.Answer(c, 0, true, F(chatID, "no_download_to_cancel"), "")
+		u.Answer(c, F(chatID, "no_download_to_cancel"), &td.CallbackAnswerOpts{ShowAlert: true})
 	}
 	return nil
 }
 
 func closeHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
-	u.Answer(c, 0, false, "", "")
+	u.Answer(c, "", nil)
 	cbDelete(c, u)
 	return nil
 }
 
 func emptyCBHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
-	u.Answer(c, 0, false, "", "")
+	u.Answer(c, "", nil)
 	return nil
 }
 
@@ -66,14 +66,14 @@ func roomHandle(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	parts := strings.SplitN(u.DataString(), ":", 3)
 	if len(parts) != 3 || parts[0] != "room" {
 		utils.Log.Warnf("Invalid room callback payload: %s", u.DataString())
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
 		cbDelete(c, u)
 		return nil
 	}
 	roomID, err := strconv.ParseInt(parts[1], 10, 64)
 	if err != nil {
 		utils.Log.Warnf("Invalid roomID in callback: %s", parts[1])
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
 		cbDelete(c, u)
 		return nil
 	}
@@ -81,7 +81,7 @@ func roomHandle(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 
 	r, ok := core.Rooms.Get(roomID)
 	if !ok || !r.Active() {
-		u.Answer(c, 0, true, F(chatID, "room_not_active_cb"), "")
+		u.Answer(c, F(chatID, "room_not_active_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
 		u.EditMessageText(c, F(chatID, "room_no_active"), nil)
 		return nil
 	}
@@ -92,9 +92,9 @@ func roomHandle(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 
 	key := fmt.Sprintf("room:%d:%d", u.SenderUserId, chatID)
 	if remaining := utils.GetFlood(key); remaining > 0 {
-		u.Answer(c, 0, true, F(chatID, "flood_seconds", locales.Arg{
+		u.Answer(c, F(chatID, "flood_seconds", locales.Arg{
 			"duration": int(math.Ceil(remaining.Seconds())),
-		}), "")
+		}), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 	utils.SetFlood(key, 3*time.Second)
@@ -116,7 +116,7 @@ func roomHandle(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		return handleUnmuteAction(c, u, r)
 	default:
 		utils.Log.Warnf("Unknown callback action: %s", action)
-		u.Answer(c, 0, true, F(chatID, "unknown_action"), "")
+		u.Answer(c, F(chatID, "unknown_action"), &td.CallbackAnswerOpts{ShowAlert: true})
 	}
 
 	return nil
@@ -128,25 +128,25 @@ func queueDeleteHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	parts := strings.Split(u.DataString(), ":")
 	if len(parts) != 4 || parts[0] != "qdel" {
 		utils.Log.Warnf("Invalid queue delete payload: %s", u.DataString())
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	roomID, err := strconv.ParseInt(parts[1], 10, 64)
 	if err != nil {
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	index, err := strconv.Atoi(parts[2])
 	if err != nil {
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	shown, err := strconv.Atoi(parts[3])
 	if err != nil {
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
@@ -156,12 +156,12 @@ func queueDeleteHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 
 	r, ok := core.Rooms.Get(roomID)
 	if !ok || !r.Active() {
-		u.Answer(c, 0, true, F(chatID, "room_not_active_cb"), "")
+		u.Answer(c, F(chatID, "room_not_active_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	if index <= 0 || index > r.QueueLen() {
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
@@ -173,7 +173,7 @@ func queueDeleteHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		utils.Log.Errorf("Failed to edit queue message: %v", err)
 	}
 
-	u.Answer(c, 0, true, F(chatID, "queue_delete_success"), "")
+	u.Answer(c, F(chatID, "queue_delete_success"), &td.CallbackAnswerOpts{ShowAlert: true})
 	return nil
 }
 
@@ -183,19 +183,19 @@ func queueMoreHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	parts := strings.Split(u.DataString(), ":")
 	if len(parts) != 2 || parts[0] != "qmore" {
 		utils.Log.Warnf("Invalid queue more payload: %s", u.DataString())
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	roomID, err := strconv.ParseInt(parts[1], 10, 64)
 	if err != nil {
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	r, ok := core.Rooms.Get(roomID)
 	if !ok || !r.Active() {
-		u.Answer(c, 0, true, F(chatID, "room_not_active_cb"), "")
+		u.Answer(c, F(chatID, "room_not_active_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
@@ -205,7 +205,7 @@ func queueMoreHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		utils.Log.Errorf("Failed to edit queue message: %v", err)
 	}
 
-	u.Answer(c, 0, false, "", "")
+	u.Answer(c, "", nil)
 	return nil
 }
 
@@ -216,9 +216,9 @@ func checkAdminOrAuth(c *td.Client, u *td.UpdateNewCallbackQuery, chatID int64) 
 
 	mode, err := database.GetAdminMode(chatID)
 	if err == nil && mode == database.AdminModeAdminsOnly {
-		u.Answer(c, 0, true, F(chatID, "only_admin_cb"), "")
+		u.Answer(c, F(chatID, "only_admin_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
 	} else {
-		u.Answer(c, 0, true, F(chatID, "only_admin_or_auth_cb"), "")
+		u.Answer(c, F(chatID, "only_admin_or_auth_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
 	}
 	return false
 }
@@ -228,7 +228,7 @@ func cbDelete(c *td.Client, u *td.UpdateNewCallbackQuery) {
 	if err != nil || msg == nil {
 		return
 	}
-	_ = msg.Delete(c, true)
+	_ = msg.Delete(c, &td.DeleteMessagesOpts{Revoke: true})
 }
 
 func cbRespond(c *td.Client, u *td.UpdateNewCallbackQuery, text string, opts *td.SendMessageOpts) *td.Message {
@@ -250,15 +250,15 @@ func handlePauseAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room)
 	utils.Log.Infof("Callback → pause, chatID=%d", chatID)
 
 	if r.Paused() {
-		u.Answer(c, 0, true, F(chatID, "room_already_paused"), "")
+		u.Answer(c, F(chatID, "room_already_paused"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	if err := r.Pause(); err != nil {
 		utils.Log.Errorf("Pause failed: %v", err)
-		u.Answer(c, 0, true, F(chatID, "room_pause_failed", locales.Arg{
+		u.Answer(c, F(chatID, "room_pause_failed", locales.Arg{
 			"error": err.Error(),
-		}), "")
+		}), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
@@ -266,9 +266,9 @@ func handlePauseAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room)
 		r.Unmute()
 	}
 
-	u.Answer(c, 0, true, F(chatID, "cb_pause_success", locales.Arg{
+	u.Answer(c, F(chatID, "cb_pause_success", locales.Arg{
 		"position": utils.FormatDuration(r.Position()),
-	}), "")
+	}), &td.CallbackAnswerOpts{ShowAlert: true})
 	updatePlaybackMessage(c, u, r, "paused")
 	return nil
 }
@@ -278,19 +278,19 @@ func handleResumeAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 	utils.Log.Infof("Callback → resume, chatID=%d", chatID)
 
 	if !r.Paused() {
-		u.Answer(c, 0, true, F(chatID, "cb_already_playing"), "")
+		u.Answer(c, F(chatID, "cb_already_playing"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	if err := r.Resume(); err != nil {
 		utils.Log.Errorf("Resume failed: %v", err)
-		u.Answer(c, 0, true, F(chatID, "cb_resume_failed"), "")
+		u.Answer(c, F(chatID, "cb_resume_failed"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
-	u.Answer(c, 0, true, F(chatID, "cb_resume_success", locales.Arg{
+	u.Answer(c, F(chatID, "cb_resume_success", locales.Arg{
 		"position": utils.FormatDuration(r.Position()),
-	}), "")
+	}), &td.CallbackAnswerOpts{ShowAlert: true})
 	updatePlaybackMessage(c, u, r, "playing")
 	return nil
 }
@@ -311,14 +311,14 @@ func handleReplayAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 		utils.EOR(c, statusMsg, F(chatID, "replay_failed", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		u.Answer(c, 0, true, F(chatID, "cb_replay_failed"), "")
+		u.Answer(c, F(chatID, "cb_replay_failed"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	statusMsg = sendNowPlaying(c, statusMsg, chatID, r, r.Track())
 	r.SetStatusMsg(statusMsg)
 
-	u.Answer(c, 0, true, F(chatID, "cb_replay_success"), "")
+	u.Answer(c, F(chatID, "cb_replay_success"), &td.CallbackAnswerOpts{ShowAlert: true})
 	if _, err := u.EditMessageText(c, F(chatID, "cb_replay_edited", locales.Arg{
 		"user": mention(sender, u.SenderUserId),
 	}), &td.EditMessageTextOpts{ParseMode: "HTML"}); err != nil {
@@ -340,7 +340,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) 
 		}), &td.EditMessageTextOpts{ParseMode: "HTML"}); err != nil {
 			utils.Log.Errorf("Edit error: %v", err)
 		}
-		u.Answer(c, 0, true, F(chatID, "cb_skip_queue_empty"), "")
+		u.Answer(c, F(chatID, "cb_skip_queue_empty"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
@@ -358,7 +358,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) 
 		utils.EOR(c, statusMsg, F(chatID, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
 		}), nil)
-		u.Answer(c, 0, true, F(chatID, "cb_skip_download_failed"), "")
+		u.Answer(c, F(chatID, "cb_skip_download_failed"), &td.CallbackAnswerOpts{ShowAlert: true})
 		scheduleOldPlayingMessage(r)
 		core.Rooms.Delete(r.ChatID)
 		return nil
@@ -367,13 +367,13 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) 
 	if err := r.Play(t, path); err != nil {
 		utils.Log.Errorf("Play error: %v", err)
 		utils.EOR(c, statusMsg, F(chatID, "stream_play_fail"), nil)
-		u.Answer(c, 0, true, F(chatID, "cb_skip_play_failed"), "")
+		u.Answer(c, F(chatID, "cb_skip_play_failed"), &td.CallbackAnswerOpts{ShowAlert: true})
 		scheduleOldPlayingMessage(r)
 		core.Rooms.Delete(r.ChatID)
 		return nil
 	}
 
-	u.Answer(c, 0, true, F(chatID, "cb_skip_success"), "")
+	u.Answer(c, F(chatID, "cb_skip_success"), &td.CallbackAnswerOpts{ShowAlert: true})
 	cbDelete(c, u)
 
 	statusMsg = sendNowPlaying(c, statusMsg, chatID, r, t)
@@ -394,7 +394,7 @@ func handleStopAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) 
 	scheduleOldPlayingMessage(r)
 	core.Rooms.Delete(r.ChatID)
 
-	u.Answer(c, 0, true, F(chatID, "cb_stop_success"), "")
+	u.Answer(c, F(chatID, "cb_stop_success"), &td.CallbackAnswerOpts{ShowAlert: true})
 	if _, err := u.EditMessageText(c, F(chatID, "stopped", locales.Arg{
 		"user": mention(sender, u.SenderUserId),
 	}), &td.EditMessageTextOpts{ParseMode: "HTML"}); err != nil {
@@ -407,18 +407,18 @@ func handleMuteAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) 
 	chatID := u.ChatId
 
 	if r.Muted() {
-		u.Answer(c, 0, true, F(chatID, "mute_already_muted"), "")
+		u.Answer(c, F(chatID, "mute_already_muted"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	if err := r.Mute(); err != nil {
-		u.Answer(c, 0, true, F(chatID, "mute_failed", locales.Arg{
+		u.Answer(c, F(chatID, "mute_failed", locales.Arg{
 			"error": err.Error(),
-		}), "")
+		}), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
-	u.Answer(c, 0, true, F(chatID, "cb_mute_success"), "")
+	u.Answer(c, F(chatID, "cb_mute_success"), &td.CallbackAnswerOpts{ShowAlert: true})
 	updatePlaybackMessage(c, u, r, "muted")
 	return nil
 }
@@ -427,18 +427,18 @@ func handleUnmuteAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 	chatID := u.ChatId
 
 	if !r.Muted() {
-		u.Answer(c, 0, true, F(chatID, "unmute_already"), "")
+		u.Answer(c, F(chatID, "unmute_already"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	if err := r.Unmute(); err != nil {
-		u.Answer(c, 0, true, F(chatID, "unmute_failed", locales.Arg{
+		u.Answer(c, F(chatID, "unmute_failed", locales.Arg{
 			"error": err.Error(),
-		}), "")
+		}), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
-	u.Answer(c, 0, true, F(chatID, "cb_unmute_success"), "")
+	u.Answer(c, F(chatID, "cb_unmute_success"), &td.CallbackAnswerOpts{ShowAlert: true})
 	updatePlaybackMessage(c, u, r, "playing")
 	return nil
 }

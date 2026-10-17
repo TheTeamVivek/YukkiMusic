@@ -26,6 +26,7 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
+	"uuid"
 
 	td "github.com/AshokShau/gotdbot"
 
@@ -213,22 +214,25 @@ func jsonHandle(c *td.Client, m *td.Message) error {
 	}
 
 	if len(jsonString) > 4095 {
-		defer os.Remove("message.json")
-		tmpFile, err := os.Create("message.json")
+		tmpName := "message-" + uuid.New().String() + ".json"
+		tmpFile, err := os.Create(tmpName)
 		if err != nil {
 			_, err := m.ReplyText(c, "Error: "+err.Error(), html)
 			return err
 		}
+		defer func() {
+			_ = tmpFile.Close()
+			_ = os.Remove(tmpName)
+		}()
 
-		_, err = tmpFile.Write(jsonString)
-		if err != nil {
+		if _, err = tmpFile.Write(jsonString); err != nil {
 			_, err := m.ReplyText(c, "Error: "+err.Error(), html)
 			return err
 		}
 
 		_, err = m.ReplyDocument(
 			c,
-			&td.InputFileLocal{Path: tmpFile.Name()},
+			&td.InputFileLocal{Path: tmpName},
 			&td.SendDocumentOpts{Caption: "Message JSON"},
 		)
 		if err != nil {

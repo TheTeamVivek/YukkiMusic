@@ -288,30 +288,30 @@ func authDeleteHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	parts := strings.Split(u.DataString(), ":")
 	if len(parts) != 3 || parts[0] != "authdel" {
 		utils.Log.Warnf("Invalid auth delete payload: %s", u.DataString())
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	targetID, err := strconv.ParseInt(parts[2], 10, 64)
 	if err != nil {
-		u.Answer(c, 0, true, F(chatID, "invalid_request"), "")
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	if !canManageAuth(c, chatID, u.SenderUserId) {
-		u.Answer(c, 0, true, F(chatID, "only_admin_cb"), "")
+		u.Answer(c, F(chatID, "only_admin_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	if ok, err := database.IsAuthorized(chatID, targetID); !ok || err != nil {
-		u.Answer(c, 0, true, F(chatID, "del_auth_not_authorized"), "")
+		u.Answer(c, F(chatID, "del_auth_not_authorized"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	if err := database.Unauthorize(chatID, targetID); err != nil {
-		u.Answer(c, 0, true, F(chatID, "del_auth_remove_fail", locales.Arg{
+		u.Answer(c, F(chatID, "del_auth_remove_fail", locales.Arg{
 			"error": err.Error(),
-		}), "")
+		}), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
@@ -326,6 +326,6 @@ func authDeleteHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		utils.Log.Errorf("Failed to edit auth list: %v", err)
 	}
 
-	u.Answer(c, 0, true, F(chatID, "authlist_delete_success"), "")
+	u.Answer(c, F(chatID, "authlist_delete_success"), &td.CallbackAnswerOpts{ShowAlert: true})
 	return nil
 }

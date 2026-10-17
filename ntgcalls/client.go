@@ -93,110 +93,61 @@ func (c *Client) OnSubchainRequest(callback SubchainRequestCallback) {
 	c.subchainRequestCallbacks = append(c.subchainRequestCallbacks, callback)
 }
 
-func (c *Client) getStreamEndCallbacks() []StreamEndCallback {
+// getCallbacks returns a snapshot copy of a callback slice under the client
+// lock. It is a generic method, a language feature introduced in Go 1.27.
+func (c *Client) getCallbacks[T any](src *[]T) []T {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	if len(c.streamEndCallbacks) == 0 {
+	if len(*src) == 0 {
 		return nil
 	}
-	return append([]StreamEndCallback(nil), c.streamEndCallbacks...)
+	return append([]T(nil), (*src)...)
+}
+
+func (c *Client) getStreamEndCallbacks() []StreamEndCallback {
+	return c.getCallbacks(&c.streamEndCallbacks)
 }
 
 func (c *Client) getUpgradeCallbacks() []UpgradeCallback {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if len(c.upgradeCallbacks) == 0 {
-		return nil
-	}
-	return append([]UpgradeCallback(nil), c.upgradeCallbacks...)
+	return c.getCallbacks(&c.upgradeCallbacks)
 }
 
 func (c *Client) getConnectionChangeCallbacks() []ConnectionChangeCallback {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if len(c.connectionChangeCallbacks) == 0 {
-		return nil
-	}
-	return append([]ConnectionChangeCallback(nil), c.connectionChangeCallbacks...)
+	return c.getCallbacks(&c.connectionChangeCallbacks)
 }
 
 func (c *Client) getSignalCallbacks() []SignalCallback {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if len(c.signalCallbacks) == 0 {
-		return nil
-	}
-	return append([]SignalCallback(nil), c.signalCallbacks...)
+	return c.getCallbacks(&c.signalCallbacks)
 }
 
 func (c *Client) getFrameCallbacks() []FrameCallback {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if len(c.frameCallbacks) == 0 {
-		return nil
-	}
-	return append([]FrameCallback(nil), c.frameCallbacks...)
+	return c.getCallbacks(&c.frameCallbacks)
 }
 
 func (c *Client) getRemoteSourceCallbacks() []RemoteSourceCallback {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if len(c.remoteSourceCallbacks) == 0 {
-		return nil
-	}
-	return append([]RemoteSourceCallback(nil), c.remoteSourceCallbacks...)
+	return c.getCallbacks(&c.remoteSourceCallbacks)
 }
 
 func (c *Client) getBroadcastTimestampCallbacks() []BroadcastTimestampCallback {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if len(c.broadcastTimestampCallbacks) == 0 {
-		return nil
-	}
-	return append([]BroadcastTimestampCallback(nil), c.broadcastTimestampCallbacks...)
+	return c.getCallbacks(&c.broadcastTimestampCallbacks)
 }
 
 func (c *Client) getBroadcastPartCallbacks() []BroadcastPartCallback {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if len(c.broadcastPartCallbacks) == 0 {
-		return nil
-	}
-	return append([]BroadcastPartCallback(nil), c.broadcastPartCallbacks...)
+	return c.getCallbacks(&c.broadcastPartCallbacks)
 }
 
 func (c *Client) getEmojisCallbacks() []EmojisCallback {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if len(c.emojisCallbacks) == 0 {
-		return nil
-	}
-	return append([]EmojisCallback(nil), c.emojisCallbacks...)
+	return c.getCallbacks(&c.emojisCallbacks)
 }
 
 func (c *Client) getRequestParticipantsCallbacks() []RequestParticipantsCallback {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if len(c.requestParticipantsCallbacks) == 0 {
-		return nil
-	}
-	return append([]RequestParticipantsCallback(nil), c.requestParticipantsCallbacks...)
+	return c.getCallbacks(&c.requestParticipantsCallbacks)
 }
 
 func (c *Client) getOutboundBlockCallbacks() []OutboundBlockCallback {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if len(c.outboundBlockCallbacks) == 0 {
-		return nil
-	}
-	return append([]OutboundBlockCallback(nil), c.outboundBlockCallbacks...)
+	return c.getCallbacks(&c.outboundBlockCallbacks)
 }
 
 func (c *Client) getSubchainRequestCallbacks() []SubchainRequestCallback {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if len(c.subchainRequestCallbacks) == 0 {
-		return nil
-	}
-	return append([]SubchainRequestCallback(nil), c.subchainRequestCallbacks...)
+	return c.getCallbacks(&c.subchainRequestCallbacks)
 }

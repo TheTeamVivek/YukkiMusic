@@ -46,7 +46,7 @@ func EOR(
 
 	m, err := msg.EditText(c, text, opts)
 	if err != nil {
-		_ = msg.Delete(c, true)
+		_ = msg.Delete(c, &td.DeleteMessagesOpts{Revoke: true})
 		replyOpts := &td.SendMessageOpts{}
 		if opts != nil {
 			replyOpts.ParseMode = opts.ParseMode

@@ -19,7 +19,7 @@ package core
 
 import (
 	"context"
-	"encoding/json"
+	jsonv2 "encoding/json/v2"
 	"fmt"
 	"os/exec"
 	"runtime"
@@ -528,7 +528,7 @@ func getVideoDimensions(filePath string) (int, int) {
 	}
 
 	var probe ffprobeOutput
-	if err := json.Unmarshal(out, &probe); err != nil {
+	if err := jsonv2.Unmarshal(out, &probe); err != nil {
 		utils.Log.Error(
 			"[getVideoDimensions] failed to parse ffprobe JSON for " + filePath + " : " + err.Error(),
 		)

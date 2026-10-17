@@ -20,7 +20,7 @@ package platforms
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	jsonv2 "encoding/json/v2"
 	"errors"
 	"fmt"
 	"net/url"
@@ -243,7 +243,7 @@ func (y *YtdlpPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 		var info ytdlpInfo
 		for _, line := range lines {
 			var entry ytdlpInfo
-			if err := json.Unmarshal([]byte(line), &entry); err != nil {
+			if err := jsonv2.Unmarshal([]byte(line), &entry); err != nil {
 				utils.Log.Debugf("YtDlp: skip bad entry: %v", err)
 				continue
 			}
@@ -256,7 +256,7 @@ func (y *YtdlpPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 	}
 
 	var info ytdlpInfo
-	if err := json.Unmarshal(stdout.Bytes(), &info); err != nil {
+	if err := jsonv2.Unmarshal(stdout.Bytes(), &info); err != nil {
 		return nil, fmt.Errorf("failed to parse metadata JSON: %w", err)
 	}
 	return &info, nil

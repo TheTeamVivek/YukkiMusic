@@ -259,7 +259,7 @@ func settingsCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	// Check permissions
 	if isAdmin, err := utils.IsChatAdmin(c, chatID, u.SenderUserId); err != nil ||
 		!isAdmin {
-		_ = u.Answer(c, 0, true, F(chatID, "only_admin_cb"), "")
+		_ = u.Answer(c, F(chatID, "only_admin_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
@@ -270,7 +270,7 @@ func settingsCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 
 	action := parts[1]
 	if strings.HasPrefix(data, "info:") {
-		_ = u.Answer(c, 0, true, F(chatID, "settings_info_"+action), "")
+		_ = u.Answer(c, F(chatID, "settings_info_"+action), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 	if action == "main" {
@@ -317,7 +317,7 @@ func settingsCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		return nil
 	}
 
-	_ = u.Answer(c, 0, false, F(chatID, "settings_updated"), "")
+	_ = u.Answer(c, F(chatID, "settings_updated"), nil)
 	kb := buildSettingsMarkup(chatID, settings)
 
 	_, _ = u.EditMessageText(c, F(chatID, "settings_main", locales.Arg{

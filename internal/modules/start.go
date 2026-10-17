@@ -64,7 +64,7 @@ func startHandler(c *td.Client, m *td.Message) error {
 func startRich(c *td.Client, chatID int64, sender *td.User, fallbackID int64) *td.InputRichMessage {
 	text := F(chatID, "start_private", locales.Arg{
 		"user": mention(sender, fallbackID),
-		"bot":  td.Mention(c.Me.FirstName, c.Me.Id, true, true),
+		"bot":  c.Me.Mention(td.ParseModeHTML),
 	})
 
 	if image := config.StartImage(); image != "" {
@@ -77,7 +77,7 @@ func startRich(c *td.Client, chatID int64, sender *td.User, fallbackID int64) *t
 }
 
 func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
-	cb.Answer(c, 0, false, "", "")
+	cb.Answer(c, "", nil)
 
 	msg, err := cb.GetMessage(c)
 	if err != nil {
@@ -89,7 +89,7 @@ func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 
 	rich := &td.InputMessageRichMessage{Message: startRich(c, chatID, user, cb.SenderUserId)}
 
-	_, err = c.EditContent(chatID, msg.Id, rich, core.GetStartMarkup(chatID))
+	_, err = c.EditContent(chatID, msg.Id, rich, &td.EditMessageMediaOpts{ReplyMarkup: core.GetStartMarkup(chatID)})
 	return err
 }
 

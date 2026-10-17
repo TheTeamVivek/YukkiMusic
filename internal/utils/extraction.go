@@ -79,7 +79,7 @@ func collectRichURLs(m *td.Message) []string {
 	return urls
 }
 
-var richTextURLType = reflect.TypeOf(td.RichTextUrl{})
+var richTextURLType = reflect.TypeFor[td.RichTextUrl]()
 
 func walkRichURLs(v reflect.Value, urls *[]string) {
 	switch v.Kind() {
@@ -97,8 +97,8 @@ func walkRichURLs(v reflect.Value, urls *[]string) {
 				*urls = append(*urls, u)
 			}
 		}
-		for i := 0; i < v.NumField(); i++ {
-			walkRichURLs(v.Field(i), urls)
+		for _, field := range v.Fields() {
+			walkRichURLs(field, urls)
 		}
 	case reflect.Slice, reflect.Array:
 		for i := 0; i < v.Len(); i++ {

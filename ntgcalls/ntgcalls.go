@@ -72,7 +72,7 @@ func GetMediaDevices() (MediaDevices, error) {
 		Microphone: parseDeviceInfoVector(buffer.microphone, buffer.microphone_len),
 		Speaker:    parseDeviceInfoVector(buffer.speaker, buffer.speaker_len),
 		Camera:     parseDeviceInfoVector(buffer.camera, buffer.camera_len),
-		Screen:   parseDeviceInfoVector(buffer.screen, buffer.screen_len),
+		Screen:     parseDeviceInfoVector(buffer.screen, buffer.screen_len),
 	}, nil
 }
 
@@ -512,8 +512,6 @@ func (c *Client) SendSignalingData(chatID int64, data []byte) error {
 	defer freeBytes(dataC)
 	return parseResult(C.ntg_send_signaling_data(c.handle, C.int64_t(chatID), dataC, dataSize))
 }
-
-
 
 func (c *Client) Connect(chatID int64, params string, isPresentation bool) error {
 	paramsC := C.CString(params)

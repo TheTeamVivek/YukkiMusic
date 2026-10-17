@@ -335,11 +335,9 @@ func stopBroadcast() bool {
 func (b *broadcast) run(targets []broadcastTarget) {
 	done := make(chan struct{})
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		b.pumpProgress(done)
-	}()
+	})
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -560,14 +558,14 @@ func handleBroadcastCancel(c *td.Client, m *td.Message) error {
 
 func broadcastCancelCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
 	if cb.SenderUserId != config.OwnerID {
-		cb.Answer(c, 0, true, F(cb.ChatId, "broadcast_cancel_owner_only"), "")
+		cb.Answer(c, F(cb.ChatId, "broadcast_cancel_owner_only"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 	if !stopBroadcast() {
-		cb.Answer(c, 0, true, F(cb.ChatId, "broadcast_cancel_none_running"), "")
+		cb.Answer(c, F(cb.ChatId, "broadcast_cancel_none_running"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
-	cb.Answer(c, 0, true, F(cb.ChatId, "broadcast_cancel_done"), "")
+	cb.Answer(c, F(cb.ChatId, "broadcast_cancel_done"), &td.CallbackAnswerOpts{ShowAlert: true})
 	cb.EditMessageText(c, F(cb.ChatId, "broadcast_cancel_done"), nil)
 	return nil
 }

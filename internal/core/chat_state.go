@@ -391,7 +391,7 @@ func (s *ChatState) resolveLink() (string, error) {
 		s.setLink(full.InviteLink.InviteLink)
 		return full.InviteLink.InviteLink, nil
 	}
-	inv, err := Bot.CreateChatInviteLink(s.ChatID, 0, 0, "", nil)
+	inv, err := Bot.CreateChatInviteLink(s.ChatID, nil)
 	if err != nil {
 		if isAdminError(err) {
 			return "", ErrAdminPermissionRequired

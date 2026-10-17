@@ -20,6 +20,7 @@ package modules
 import (
 	"errors"
 	"fmt"
+	"html"
 	"strings"
 	"time"
 
@@ -131,7 +132,7 @@ func showTrackMessage(
 			}
 		}
 		if statusMsg != nil {
-			_ = statusMsg.Delete(c, true)
+			_ = statusMsg.Delete(c, &td.DeleteMessagesOpts{Revoke: true})
 		}
 		photo, err := c.SendPhoto(
 			chatID,
@@ -249,7 +250,7 @@ func WithBlacklistCallback(
 		}
 
 		if !canBypassMaintenance(cb.SenderUserId) {
-			cb.Answer(c, 0, true, F(cb.ChatId, "maint"), "")
+			cb.Answer(c, F(cb.ChatId, "maint"), &td.CallbackAnswerOpts{ShowAlert: true})
 			return td.EndGroups
 		}
 
@@ -303,7 +304,7 @@ func WithBlacklistMessage(
 
 		if m.IsCommand() {
 			if isEnabled, _ := database.CommandDelete(m.ChatID()); isEnabled {
-				if err := m.Delete(c, true); err != nil {
+				if err := m.Delete(c, &td.DeleteMessagesOpts{Revoke: true}); err != nil {
 					utils.Log.Debugf("failed to delete command message: %v", err)
 				}
 			} else {
@@ -374,17 +375,23 @@ func isChannel(c *td.Client, m *td.Message) bool {
 }
 
 // mention builds an HTML mention for a gotdbot user, falling back to a plain
-// "user" mention when the user is nil.
+// "user" mention when the user is nil or has no display name.
 func mention(user *td.User, fallbackId int64) string {
-	name := ""
-	id := fallbackId
-	if user != nil {
-		id = user.Id
-		name = user.FirstName + " " + user.LastName
+	if user == nil {
+		return mentionHTML("user", fallbackId)
 	}
+	if strings.TrimSpace(user.FirstName+" "+user.LastName) == "" {
+		return mentionHTML("user", user.Id)
+	}
+	return user.Mention(td.ParseModeHTML)
+}
 
-	if name = strings.TrimSpace(name); name == "" {
+// mentionHTML builds an HTML user mention from a display name and id. It is
+// used for senders that are not represented by a gotdbot *User.
+func mentionHTML(name string, id int64) string {
+	name = strings.TrimSpace(name)
+	if name == "" {
 		name = "user"
 	}
-	return td.Mention(name, id, true, true)
+	return fmt.Sprintf(`<a href="tg://user?id=%d">%s</a>`, id, html.EscapeString(name))
 }

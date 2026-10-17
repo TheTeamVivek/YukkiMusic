@@ -34,6 +34,7 @@ import (
 // Init initializes the bot and assistant clients.
 // It returns a shutdown function and an error if initialization fails.
 func Init() (func(), error) {
+
 	utils.Log.Info("Starting bot client...")
 	if err := initBot(); err != nil {
 		return nil, err
@@ -50,6 +51,7 @@ func Init() (func(), error) {
 	Assistants = cm
 
 	shutdown := func() {
+
 		utils.Log.Info("Stopping bot...")
 		Bot.Close()
 
@@ -119,7 +121,7 @@ func sendErrorReport(c *td.Client, kind string, update td.TlObject, detail any, 
 
 	var raw string
 	if update != nil {
-		if b, err := json.MarshalIndent(update, "", "  "); err == nil {
+		if b, err := json.MarshalIndent(update, "", " "); err == nil {
 			raw = string(b)
 		}
 	}
