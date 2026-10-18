@@ -1,186 +1,170 @@
-<h1 align="center">🎧 <b>YukkiMusic</b></h1>
+<div align="center">
 
-<p align="center">
-  <i>⚡ A blazing-fast, reliable, and feature-packed Telegram bot for streaming music in group voice chats — built with Go.</i>
-</p>
+# 🎧 YukkiMusic
 
-<p align="center">
-  <a href="https://github.com/TheTeamVivek/YukkiMusic/stargazers">
-    <img src="https://img.shields.io/github/stars/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Stars&color=FFD700&logo=github&logoColor=white" alt="GitHub Stars">
-  </a>
-  <a href="https://github.com/TheTeamVivek/YukkiMusic/fork">
-    <img src="https://img.shields.io/github/forks/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Forks&color=00C853&logo=github&logoColor=white" alt="GitHub Forks">
-  </a>
-  <a href="https://go.dev/">
-    <img src="https://img.shields.io/badge/Go-1.26+-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go Version">
-  </a>
-  <a href="https://github.com/TheTeamVivek/YukkiMusic/releases">
-    <img src="https://img.shields.io/badge/Version-v3.3.0-FF9800?style=for-the-badge&logo=semver&logoColor=white" alt="Release Version">
-  </a>
-  <a href="https://t.me/TheTeamVk">
-    <img src="https://img.shields.io/badge/Telegram-Support-26A69A?style=for-the-badge&logo=telegram&logoColor=white" alt="Support Group">
-  </a>
-</p>
+**⚡ A blazing-fast, reliable Telegram bot for streaming music in group voice chats — built with Go.**
 
-<hr>
+<br>
 
-<h2>✨ Key Features</h2>
-<ul>
-  <li>🚀 <b>High Performance:</b> Optimized Go-based engine for ultra-low latency.</li>
-  <li>🎼 <b>Smart Provider System:</b> Supports YouTube, Telegram Files, and custom APIs.</li>
-  <li>🔄 <b>Intelligent Fallback:</b> Automatically switches sources if one fails.</li>
-  <li>🌍 <b>Localization:</b> Robust multi-language support (YAML-based).</li>
-  <li>🛠 <b>Admin Suite:</b> Speed control, seeking, looping, and advanced queueing.</li>
-</ul>
+[![GitHub Stars](https://img.shields.io/github/stars/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Stars&color=FFD700&logo=github&logoColor=white)](https://github.com/TheTeamVivek/YukkiMusic/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Forks&color=00C853&logo=github&logoColor=white)](https://github.com/TheTeamVivek/YukkiMusic/fork)
+[![Go Version](https://img.shields.io/badge/Go-1.26+-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
+[![Version](https://img.shields.io/badge/Version-v3.3.0-FF9800?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/TheTeamVivek/YukkiMusic/releases)
+[![Support](https://img.shields.io/badge/Telegram-Support-26A69A?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/TheTeamVk)
 
-<hr>
+<br><br>
 
-<h2>🚀 Quick Start</h2>
+**🚀 Deploy your own instance in one click:**
 
-<h3>☁️ One-Click Deploy</h3>
-<p>
-  <a href="https://heroku.com/deploy?template=https://github.com/TheTeamVivek/YukkiMusic">
-    <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy to Heroku">
-  </a>
-</p>
+<br>
 
-<h3>💻 Manual Installation</h3>
-<pre><code>
-# 1. Clone & Enter
+<a href="https://heroku.com/deploy?template=https://github.com/TheTeamVivek/YukkiMusic">
+  <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy to Heroku">
+</a>
+
+<br>
+
+</div>
+
+---
+
+## ✨ Features
+
+| | |
+| :---: | :--- |
+| 🚀 | **High Performance** — optimized Go engine for ultra-low latency playback |
+| 🎼 | **Smart Providers** — YouTube, Telegram files & custom APIs with automatic fallback |
+| 🌍 | **Localization** — English, हिन्दी, العربية, Türkçe out of the box |
+| 🤖 | **Multi-Assistant** — multiple Telegram accounts, auto-distributed across chats |
+| 🛠 | **Admin Suite** — speed, seek, loop, video mode & advanced queue management |
+| 🍪 | **Cookies Support** — bypass YouTube bot-detection with ease |
+
+---
+
+## 🚀 Quick Start
+
+### 💻 Manual Installation
+
+```bash
+# 1. Clone & enter
 git clone https://github.com/TheTeamVivek/YukkiMusic.git && cd YukkiMusic
-<br>
-# 2. Setup Environment
+
+# 2. Setup environment
 bash install.sh
-cp sample.env .env  # Edit your API_ID, TOKEN, etc.
-<br>
-# 3. Tidy & Run
+cp sample.env .env   # then fill API_ID, API_HASH, BOT_TOKEN, MONGO_DB_URI, STRING_SESSIONS
+
+# 3. Tidy & run
 go mod tidy
 go run ./cmd/app
-</code></pre>
+```
 
-<h3>🐳 Docker Deployment</h3>
-<pre><code>
-# 1. Clone & Enter
+### 🐳 Docker Deployment
+
+```bash
+# 1. Clone & enter
 git clone https://github.com/TheTeamVivek/YukkiMusic.git && cd YukkiMusic
-<br>
+
 # 2. Prepare environment
-cp sample.env .env  # Fill required values: API_ID, API_HASH, TOKEN, MONGO_DB_URI, STRING_SESSIONS
-<br>
+cp sample.env .env   # fill required values
+
 # 3. Build and start in background
 docker compose up -d --build
-</code></pre>
+```
 
-<h4>📜 Logs & Useful Container Commands</h4>
-<pre><code>
-# Follow live logs
-docker compose logs -f yukkimusic
-<br>
-# Show last 200 lines
-docker compose logs --tail=200 yukkimusic
-<br>
-# Check running state
-docker compose ps
-<br>
-# Restart service
-docker compose restart yukkimusic
-<br>
-# Stop service (keeps containers, network, and image)
-docker compose stop yukkimusic
-<br>
-# Start again after stop
-docker compose start yukkimusic
-<br>
-# Remove stopped container only (keeps image and network)
-docker compose rm -f yukkimusic
-<br>
-# Full cleanup (removes containers + network)
-docker compose down
-<br>
-# Update after pulling latest code
-git pull && docker compose up -d --build
-</code></pre>
+<details>
+<summary><b>📜 Docker commands cheat-sheet</b></summary>
 
-<hr>
+```bash
+docker compose logs -f yukkimusic          # live logs
+docker compose logs --tail=200 yukkimusic  # last 200 lines
+docker compose ps                          # running state
+docker compose restart yukkimusic          # restart
+docker compose stop yukkimusic             # stop (keeps containers)
+docker compose start yukkimusic            # start again
+docker compose down                        # full cleanup
+git pull && docker compose up -d --build   # update
+```
 
-<h2>⚙️ Configuration</h2>
-<p>All settings are managed via environment variables. See the <b><a href="../internal/config/README.md">Configuration Guide</a></b> for full details.</p>
+</details>
 
-<table>
-  <thead>
-    <tr>
-      <th>Variable</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>API_ID</code> / <code>API_HASH</code></td>
-      <td>Obtained from <a href="https://my.telegram.org">my.telegram.org</a></td>
-    </tr>
-    <tr>
-      <td><code>TOKEN</code></td>
-      <td>Bot token from <a href="https://t.me/BotFather">@BotFather</a></td>
-    </tr>
-    <tr>
-      <td><code>MONGO_DB_URI</code></td>
-      <td>MongoDB Atlas or local connection string</td>
-    </tr>
-    <tr>
-      <td><code>STRING_SESSIONS</code></td>
-      <td>Assistant account sessions (Pyrogram/Telethon/Gogram)</td>
-    </tr>
-  </tbody>
-</table>
+---
 
-<hr>
+## ⚙️ Configuration
 
-<h2>🎮 Commands Reference</h2>
+All settings are managed via environment variables in your `.env` file.
 
-<h3>🎵 Playback & Queue</h3>
-<ul>
-  <li><code>/play &lt;query&gt;</code> — Play from YouTube/Telegram</li>
-  <li><code>/fplay &lt;query&gt;</code> — Force play (skips current track)</li>
-  <li><code>/pause</code> | <code>/resume</code> — Toggle playback state</li>
-  <li><code>/queue</code> — View the upcoming list</li>
-  <li><code>/seek &lt;seconds&gt;</code> — Jump to a specific time</li>
-</ul>
+| Variable | Description |
+| :--- | :--- |
+| `API_ID` / `API_HASH` | From [my.telegram.org](https://my.telegram.org) |
+| `BOT_TOKEN` | Bot token from [@BotFather](https://t.me/BotFather) (alias: `TOKEN`) |
+| `MONGO_DB_URI` | MongoDB Atlas or local connection string |
+| `STRING_SESSIONS` | Assistant account session strings |
 
-<h3>🛡️ Admin & Owner</h3>
-<ul>
-  <li><code>/addsudo</code> | <code>/delsudo</code> — Manage authorized controllers</li>
-  <li><code>/stats</code> — View system and database metrics</li>
-  <li><code>/broadcast</code> — Send a message to all active chats</li>
-  <li><code>/maintenance</code> — Toggle global maintenance mode</li>
-</ul>
+> [!IMPORTANT]
+> 📖 **Docs you'll need**
+> - 👉 [Configuration Guide](../config/README.md) — every env variable with defaults
+> - 🍪 [Cookies Guide](../config/cookies/README.md) — set up YouTube cookies
+> - 🌍 [Languages Guide](../internal/locales/README.md) — add a new language
 
-<hr>
+---
 
-<h2>🏗️ Project Structure</h2>
-<pre><code>YukkiMusic/
-├── cmd/app/            # Main entry point
-├── docker-compose.yml  # Container deployment recipe
-├── internal/config/    # Configuration & Environment loader
+## 🎮 Commands
+
+### 🎵 Playback & Queue
+
+| Command | Description | | Command | Description |
+| :--- | :--- | :---: | :--- | :--- |
+| `/play <query>` | Play from YouTube / TG | | `/queue` | View upcoming tracks |
+| `/fplay <query>` | Force play (skip current) | | `/cqueue` | Channel queue view |
+| `/vplay` / `/fvplay` | Video mode play | | `/remove` | Remove a track |
+| `/pause` / `/resume` | Toggle playback | | `/move` | Reorder a track |
+| `/mute` / `/unmute` | Toggle audio | | `/clear` | Clear the queue |
+| `/skip` | Next in queue | | `/seek` / `/seekback` | Seek forward / back |
+| `/stop` / `/end` | Stop & leave VC | | `/loop` · `/speed` | Loop count · tempo |
+
+### 🛡️ Admin & Owner
+
+| Command | Description | | Command | Description |
+| :--- | :--- | :---: | :--- | :--- |
+| `/addsudo` / `/delsudo` | Manage sudo users | | `/playmode` | Who can use `/play` |
+| `/addauth` / `/delauth` | Manage auth users | | `/adminmode` | Who can use admin cmds |
+| `/stats` | Bot statistics | | `/cleanmode` | Auto-clean settings |
+| `/broadcast` | Message all active chats | | `/maintenance` | Global maintenance toggle |
+| `/reload` | Reload admin cache & VC | | `/lang` | Change chat language |
+
+---
+
+## 🏗️ Project Structure
+
+```text
+YukkiMusic/
+├── cmd/app/            # 🚪 Entry point
+├── config/             # ⚙️  Env loader + cookies setup
 ├── internal/
-│   ├── core/           # Bot initialization & playback logic
-│   ├── database/       # MongoDB schemas & operations
-│   ├── locales/        # YAML-based translation files
-│   ├── modules/        # Command handlers (play, skip, etc.)
-│   ├── platforms/      # Source providers (YouTube, TG, etc.)
-│   └── utils/          # Global helper functions
-└── go.mod              # Dependency management</code></pre>
+│   ├── core/           # 🎛  Bot init, rooms & playback engine
+│   ├── database/       # 🗄  MongoDB schemas & operations
+│   ├── locales/        # 🌍  YAML translations
+│   ├── modules/        # 🧩  Command handlers
+│   ├── platforms/      # 🎼  Source providers (YouTube, etc.)
+│   └── utils/          # 🔧  Helpers
+├── docker-compose.yml  # 🐳 Container deployment
+└── go.mod              # 📦 Dependencies
+```
 
-<hr>
+---
 
-<h2>🤝 Contributing & Support</h2>
-<ul>
-  <li><b>Issues:</b> Found a bug or have a suggestion? Open a <b><a href="https://github.com/TheTeamVivek/YukkiMusic/issues">GitHub Issue</a></b>.</li>
-  <li><b>Support:</b> Join our Telegram community for help: <b><a href="https://t.me/TheTeamVk">@TheTeamVk</a></b>.</li>
-  <li><b>Updates:</b> Follow <b><a href="https://t.me/TheTeamVivek">@TheTeamVivek</a></b> for news.</li>
-</ul>
+## 🤝 Contributing & Support
 
-<hr>
+- 🐛 **Bugs / ideas** → [GitHub Issues](https://github.com/TheTeamVivek/YukkiMusic/issues)
+- 💬 **Support** → [@TheTeamVk](https://t.me/TheTeamVk)
+- 📢 **Updates** → [@TheTeamVivek](https://t.me/TheTeamVivek)
 
-<p align="center">
-  <b>Made with ❤️ by <a href="https://github.com/Vivekkumar-in">Vivek Kumar</a></b><br>
-  <i>Licensed under the GNU General Public License v3.0</i>
-</p>
+---
+
+<div align="center">
+
+**Made with ❤️ by [Vivek Kumar](https://github.com/Vivekkumar-in)**
+
+<i>Licensed under the GNU General Public License v3.0</i>
+
+</div>

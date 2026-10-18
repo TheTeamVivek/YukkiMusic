@@ -14,7 +14,7 @@
             "description": "Your Telegram API Hash from my.telegram.org.",
             "required": true
         },
-        "TOKEN": {
+        "BOT_TOKEN": {
             "description": "Your Telegram bot token from @BotFather.",
             "required": true
         },

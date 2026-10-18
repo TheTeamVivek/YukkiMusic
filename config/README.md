@@ -1,71 +1,92 @@
-# ⚙️ Configuration Guide
+<div align="center">
 
-This document describes all configuration variables used in YukkiMusic. These can be set as environment variables or in a `.env` file in the project root.
+# ⚙️ Environment Variables
 
-## 🚀 Flexible Loading
+**Configure YukkiMusic using a `.env` file in the project root**
 
-The configuration loader is designed to be forgiving with naming. For any variable listed below, you can use:
-- **UPPER_CASE** (e.g., `API_ID`)
-- **lower_case** (e.g., `api_id`)
-- **No Underscores** (e.g., `APIID`)
+[![dotenv](https://img.shields.io/badge/.env-optional-yellow?style=flat-square)](https://github.com/motdotla/dotenv)
+[![restart](https://img.shields.io/badge/restart-required-red?style=flat-square)](#-note)
 
-## 🔴 Required Variables
+Variable names are **case-insensitive** and **underscores are optional** —
+`API_ID`, `api_id`, and `APIID` all work the same.
 
-These must be set for the bot to start.
+</div>
 
-| Variable | Type | Description |
-| :--- | :--- | :--- |
-| `API_ID` | `int32` | Your Telegram API ID from [my.telegram.org](https://my.telegram.org). |
-| `API_HASH` | `string` | Your Telegram API Hash from [my.telegram.org](https://my.telegram.org). |
-| `TOKEN` | `string` | Your Telegram Bot Token from [@BotFather](https://t.me/BotFather). Also accepts `BOT_TOKEN`. |
-| `MONGO_DB_URI` | `string` | MongoDB connection string (e.g., `mongodb+srv://...`). |
-| `STRING_SESSIONS`| `[]string`| Space, comma, or semicolon separated session strings for assistant accounts. Also accepts `STRING_SESSION`. |
+---
+
+## 🔴 Required
+
+> These **must** be set or the bot won't start.
+
+| Variable | Description |
+| :--- | :--- |
+| `API_ID` | Telegram API ID from [my.telegram.org](https://my.telegram.org) |
+| `API_HASH` | Telegram API Hash from [my.telegram.org](https://my.telegram.org) |
+| `BOT_TOKEN` | Bot token from [@BotFather](https://t.me/BotFather) · alias `TOKEN` |
+| `MONGO_DB_URI` | MongoDB connection string (e.g. `mongodb+srv://...`) |
+| `STRING_SESSIONS` | Assistant session strings (space/comma/semicolon separated) · alias `STRING_SESSION` |
+
+---
 
 ## 👑 Ownership
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
-| `OWNER_ID` | `0` | The Telegram User ID of the bot owner. Grants full administrative access. |
+| `OWNER_ID` | `0` | Telegram User ID of the bot owner — full admin access |
 
-## 🎵 External APIs (Optional)
+---
 
-| Variable | Default | Description |
-| :--- | :--- | :--- |
-| `SPOTIFY_CLIENT_ID` | `None` | Spotify API Client ID for metadata resolution. |
-| `SPOTIFY_CLIENT_SECRET` | `None` | Spotify API Client Secret for metadata resolution. |
-| `FALLEN_API_KEY` | `""` | API Key for [Fallen API](https://beta.fallenapi.fun) YouTube downloader. |
-| `FALLEN_API_URL` | `https://beta.fallenapi.fun` | Base URL for Fallen API. |
-
-## 🛠️ Bot Behavior & Limits
+## 🤖 Bot Behavior
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
-| `DEFAULT_LANG` | `en` | Default language for bot responses (see `internal/locales/`). |
-| `DURATION_LIMIT` | `4200` | Maximum track duration in seconds (70 minutes). |
-| `QUEUE_LIMIT` | `24` | Maximum number of tracks in queue per chat. |
-| `MAX_AUTH_USERS` | `25` | Max number of non-admin users allowed to control playback. |
-| `LEAVE_ON_DEMOTED`| `false` | If `true`, the bot leaves the group if its admin rights are removed. |
-| `SET_CMDS` | `false` | Automatically set bot commands in Telegram UI on startup. |
-| `DISABLE_COLOUR` | `false` | If `true`, disables Telegram inline button colour styling (`Primary/Success/Danger`). |
-| `COOKIES_LINK` | `""` | URL to a `yt-dlp` cookies file (e.g., via batbin). |
-| `LOGGER_ID` | `0` | Chat ID where the bot will send logs and error reports. Also accepts `LOG_GROUP_ID`. If unset, logging-to-chat is disabled. |
+| `SESSION_TYPE` | `pyrogram` | Session type for assistant accounts |
+| `DB_NAME` | `Yukki` | MongoDB database name |
+| `DEFAULT_LANG` | `en` | Default language (`en`, `hi`, `ar`, `tr`) |
+| `DURATION_LIMIT` | `4200` | Max track duration in seconds (70 min) |
+| `QUEUE_LIMIT` | `24` | Max tracks in queue per chat |
+| `MAX_AUTH_USERS` | `25` | Max non-admin users allowed to control playback |
+| `LEAVE_ON_DEMOTED` | `false` | Leave the group if admin rights are removed |
+| `SET_CMDS` | `false` | Set bot commands in Telegram UI on startup |
+| `DISABLE_COLOUR` | `false` | Disable coloured inline buttons |
+| `LOGGER_ID` | `0` | Chat ID for logs & error reports · alias `LOG_GROUP_ID` |
+
+---
+
+## 🎵 External APIs <sub><i>optional</i></sub>
+
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `FALLEN_API_KEY` | `""` | API key for [Fallen API](https://beta.fallenapi.fun) YouTube downloader |
+| `FALLEN_API_URL` | `https://beta.fallenapi.fun` | Base URL for Fallen API |
+
+---
 
 ## 🎨 Customization
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
-|`EFFECT_IDS`| `""` | List of Telegram message effect IDs (space/comma/semicolon separated). One random effect ID is selected and applied when the `/start` command is used. These effects are shown visually by Telegram (e.g., animations). If you're unsure what to use, try `5104841245755180586` and run `/start` to see an example effect.|
-| `START_IMAGES` | `""` | Start images list (space/comma/semicolon separated URLs). If multiple URLs are provided, one is chosen randomly for each `/start`. |
-| `PING_IMG_URL` | `https://...` | Image URL displayed in the `/ping` command response. |
-| `SUPPORT_CHAT` | `https://t.me/TheTeamVk` | **Full URL** to the support group. |
-| `SUPPORT_CHANNEL`| `https://t.me/TheTeamVivek` | **Full URL** to the announcement channel. |
+| `START_IMAGES` | `https://files.catbox.moe/qri2mb.jpg` | Random `/start` image URLs · alias `START_IMG_URL` |
+| `PING_IMG_URL` | `https://telegra.ph/file/91533956c91d0fd7c9f20.jpg` | Image shown in `/ping` response |
+| `SUPPORT_CHAT` | `https://t.me/TheTeamVk` | Full URL to the support group |
+| `SUPPORT_CHANNEL` | `https://t.me/TheTeamVivek` | Full URL to the announcement channel |
+| `COOKIES_LINK` | `""` | URL(s) to a `yt-dlp` cookies file → [setup guide](cookies/README.md) |
 
-## 🖥️ System Settings
+---
+
+## 🖥️ System
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
-| `PORT` | `8000` | Port for the internal debug pprof server. |
-| `LOG_FILE` | `logs.txt` | Filename for system logs. |
+| `PORT` | `8000` | Port for the debug pprof server |
 
 ---
-**Note:** Changes to the `.env` file or environment variables require a bot restart to take effect.
+
+> [!NOTE]
+> Any change to `.env` or environment variables requires a **bot restart** to take effect.
+
+<div align="center">
+
+→ Next: [🍪 Cookies Setup](cookies/README.md) · [🌍 Languages](../internal/locales/README.md)
+
+</div>

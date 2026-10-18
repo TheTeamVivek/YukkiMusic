@@ -29,7 +29,7 @@ var (
 	// Required
 	APIID          = int32(getEnvInt64("API_ID"))
 	APIHash        = getEnv("API_HASH")
-	Token          = getEnv("TOKEN")
+	Token          = getEnv("BOT_TOKEN")
 	MongoURI       = getEnv("MONGO_DB_URI")
 	StringSessions = getEnvStrings("STRING_SESSIONS")
 
@@ -54,7 +54,7 @@ var (
 	HasPremium     = false // TODO: detect via bot API at startup
 	MaxAuthUsers   = getEnvInt("MAX_AUTH_USERS", 25)
 
-	StartImages = getEnvStrings("START_IMAGES")
+	StartImages = getEnvStrings("START_IMAGES", []string{"https://files.catbox.moe/qri2mb.jpg"})
 
 	PingImage = getEnv(
 		"PING_IMG_URL",
@@ -69,7 +69,7 @@ var (
 func Load() error {
 	// Legacy compatibility
 	if Token == "" {
-		Token = getEnv("BOT_TOKEN")
+		Token = getEnv("TOKEN")
 	}
 
 	if LoggerID == 0 {
@@ -100,7 +100,7 @@ func validateConfig() error {
 	}{
 		{APIID != 0, "API_ID is required"},
 		{APIHash != "", "API_HASH is required"},
-		{Token != "", "TOKEN (or BOT_TOKEN) is required"},
+		{Token != "", "BOT_TOKEN (or TOKEN) is required"},
 		{MongoURI != "", "MONGO_DB_URI is required"},
 		{len(StringSessions) > 0, "STRING_SESSIONS (or STRING_SESSION) is required"},
 	}
