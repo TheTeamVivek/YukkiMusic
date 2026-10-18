@@ -535,8 +535,8 @@ func downloadFirstTrack(
 	)
 
 	ctx, cancel := context.WithCancel(context.Background())
-	downloads.begin(chatID, cancel, replyMsg)
-	defer downloads.finish(chatID)
+	beginDownload(chatID, cancel, replyMsg)
+	defer finishDownload(chatID)
 
 	path, err := downloadTrack(ctx, c, track, replyMsg, chatID)
 	if err != nil {

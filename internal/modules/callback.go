@@ -41,7 +41,7 @@ func cancelHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		return nil
 	}
 
-	if downloads.cancel(chatID) {
+	if cancelDownload(chatID) {
 		u.Answer(c, F(chatID, "download_cancelled"), &td.CallbackAnswerOpts{ShowAlert: true})
 	} else {
 		u.Answer(c, F(chatID, "no_download_to_cancel"), &td.CallbackAnswerOpts{ShowAlert: true})

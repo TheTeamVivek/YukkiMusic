@@ -40,74 +40,75 @@ const downloadEditInterval = 2 * time.Second
 type downloadSession struct {
 	cancel   context.CancelFunc // cancels the Go-side download (yt-dlp/http)
 	msg      *td.Message        // status message edited while downloading
+	remoteID string             // Telegram remote file id, for updateFile routing
+	fileID   int32              // TDLib file id, set once updateFile events arrive
 	started  time.Time
 	lastEdit time.Time
 	lastSize int64
 	total    int64
-	fileID   int32 // TDLib file id, set once updateFile events arrive
 }
 
-// downloadManager coordinates cancellation and progress for downloads. It is
-// keyed by chat ID (for the cancel button) and by the Telegram remote file ID
-// (because TDLib updateFile events only carry file ids, not chats).
-type downloadManager struct {
-	mu     sync.RWMutex
-	byChat map[int64]*downloadSession
-	byFile map[string]int64 // telegram remote file id -> chat id
-}
-
-var downloads = &downloadManager{
-	byChat: make(map[int64]*downloadSession),
-	byFile: make(map[string]int64),
-}
+// Downloads are keyed by chat ID (for the cancel button) and by Telegram remote
+// file ID (because TDLib updateFile events only carry file ids, not chats).
+var (
+	downloadMu     sync.RWMutex
+	downloadByChat = make(map[int64]*downloadSession)
+	downloadByFile = make(map[string]int64) // telegram remote file id -> chat id
+)
 
 func init() {
-	platforms.OnDownloadStart = func(fileID string, msg *td.Message) {
-		downloads.attach(fileID, msg)
-	}
+	platforms.OnDownloadStart = attachDownload
 }
 
-// begin registers a new download session for a chat.
-func (dm *downloadManager) begin(chatID int64, cancel context.CancelFunc, msg *td.Message) {
-	dm.mu.Lock()
-	defer dm.mu.Unlock()
-	dm.byChat[chatID] = &downloadSession{
+// beginDownload registers a new download session for a chat.
+func beginDownload(chatID int64, cancel context.CancelFunc, msg *td.Message) {
+	downloadMu.Lock()
+	defer downloadMu.Unlock()
+	downloadByChat[chatID] = &downloadSession{
 		cancel:  cancel,
 		msg:     msg,
 		started: time.Now(),
 	}
 }
 
-// attach links a Telegram remote file id to the chat that is downloading it.
-// It is called by the platforms package right before a TDLib download starts.
-func (dm *downloadManager) attach(fileID string, msg *td.Message) {
+// attachDownload links a Telegram remote file id to the chat that is downloading
+// it. It runs right before a TDLib download starts, via platforms.OnDownloadStart.
+func attachDownload(fileID string, msg *td.Message) {
 	if fileID == "" || msg == nil {
 		return
 	}
-	dm.mu.Lock()
-	defer dm.mu.Unlock()
-	if _, ok := dm.byChat[msg.ChatId]; !ok {
-		dm.byChat[msg.ChatId] = &downloadSession{msg: msg, started: time.Now()}
+
+	downloadMu.Lock()
+	defer downloadMu.Unlock()
+
+	s, ok := downloadByChat[msg.ChatId]
+	if !ok {
+		s = &downloadSession{msg: msg, started: time.Now()}
+		downloadByChat[msg.ChatId] = s
 	}
-	dm.byFile[fileID] = msg.ChatId
+	if s.remoteID != "" && s.remoteID != fileID {
+		delete(downloadByFile, s.remoteID)
+	}
+	s.remoteID = fileID
+	downloadByFile[fileID] = msg.ChatId
 }
 
-// cancel stops the download running in a chat. It cancels the Go context
+// cancelDownload stops the download running in a chat. It cancels the Go context
 // (yt-dlp/http) and, for Telegram file downloads, also asks TDLib to stop.
-// It returns false when no download is in progress for the chat.
-func (dm *downloadManager) cancel(chatID int64) bool {
-	dm.mu.Lock()
-	s, ok := dm.byChat[chatID]
+// It reports whether a download was in progress for the chat.
+func cancelDownload(chatID int64) bool {
+	downloadMu.Lock()
+	s, ok := downloadByChat[chatID]
 	if !ok {
-		dm.mu.Unlock()
+		downloadMu.Unlock()
 		return false
 	}
-	dm.removeLocked(chatID)
+	removeDownloadLocked(chatID)
 	fileID := s.fileID
 	if s.cancel != nil {
 		s.cancel()
 	}
-	dm.mu.Unlock()
+	downloadMu.Unlock()
 
 	if fileID != 0 {
 		if err := core.Bot.CancelDownloadFile(fileID, &td.CancelDownloadFileOpts{}); err != nil {
@@ -117,38 +118,37 @@ func (dm *downloadManager) cancel(chatID int64) bool {
 	return true
 }
 
-// finish drops the session once a download completes (success or failure).
-func (dm *downloadManager) finish(chatID int64) {
-	dm.mu.Lock()
-	defer dm.mu.Unlock()
-	dm.removeLocked(chatID)
+// finishDownload drops the session once a download completes (success or failure).
+func finishDownload(chatID int64) {
+	downloadMu.Lock()
+	defer downloadMu.Unlock()
+	removeDownloadLocked(chatID)
 }
 
-func (dm *downloadManager) removeLocked(chatID int64) {
-	delete(dm.byChat, chatID)
-	for id, c := range dm.byFile {
-		if c == chatID {
-			delete(dm.byFile, id)
-		}
+func removeDownloadLocked(chatID int64) {
+	if s, ok := downloadByChat[chatID]; ok && s.remoteID != "" {
+		delete(downloadByFile, s.remoteID)
 	}
+	delete(downloadByChat, chatID)
 }
 
-// onFileUpdate records the TDLib file id (needed for cancellation) and
-// refreshes the "Downloading..." progress message.
-func (dm *downloadManager) onFileUpdate(c *td.Client, u *td.UpdateFile) error {
+// downloadUpdateHandler records the TDLib file id (needed for cancellation) and
+// refreshes the "Downloading..." progress message. It is registered to run on
+// every TDLib file update.
+func downloadUpdateHandler(c *td.Client, u *td.UpdateFile) error {
 	if u == nil || u.File == nil || u.File.Remote == nil || u.File.Local == nil {
 		return nil
 	}
 
-	dm.mu.Lock()
-	chatID, ok := dm.byFile[u.File.Remote.Id]
+	downloadMu.Lock()
+	chatID, ok := downloadByFile[u.File.Remote.Id]
 	if !ok {
-		dm.mu.Unlock()
+		downloadMu.Unlock()
 		return nil
 	}
-	s := dm.byChat[chatID]
+	s := downloadByChat[chatID]
 	if s == nil {
-		dm.mu.Unlock()
+		downloadMu.Unlock()
 		return nil
 	}
 	s.fileID = u.File.Id
@@ -156,7 +156,7 @@ func (dm *downloadManager) onFileUpdate(c *td.Client, u *td.UpdateFile) error {
 	now := time.Now()
 	done := !u.File.Local.IsDownloadingActive
 	if now.Sub(s.lastEdit) < downloadEditInterval && !done {
-		dm.mu.Unlock()
+		downloadMu.Unlock()
 		return nil
 	}
 	interval := now.Sub(s.lastEdit).Seconds()
@@ -189,9 +189,9 @@ func (dm *downloadManager) onFileUpdate(c *td.Client, u *td.UpdateFile) error {
 	msg := s.msg
 	started := s.started
 	if done {
-		dm.removeLocked(chatID)
+		removeDownloadLocked(chatID)
 	}
-	dm.mu.Unlock()
+	downloadMu.Unlock()
 
 	if msg == nil {
 		return nil
@@ -219,10 +219,4 @@ func (dm *downloadManager) onFileUpdate(c *td.Client, u *td.UpdateFile) error {
 		return nil
 	}
 	return nil
-}
-
-// downloadUpdateHandler is registered in handlers.go and drives the progress
-// message of the active download.
-func downloadUpdateHandler(c *td.Client, u *td.UpdateFile) error {
-	return downloads.onFileUpdate(c, u)
 }
