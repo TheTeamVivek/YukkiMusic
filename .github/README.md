@@ -8,15 +8,13 @@
 
 [![GitHub Stars](https://img.shields.io/github/stars/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Stars&color=FFD700&logo=github&logoColor=white)](https://github.com/TheTeamVivek/YukkiMusic/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Forks&color=00C853&logo=github&logoColor=white)](https://github.com/TheTeamVivek/YukkiMusic/fork)
-[![Go Version](https://img.shields.io/badge/Go-1.26+-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
+[![Go Version](https://img.shields.io/badge/Go-1.27+-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
 [![Version](https://img.shields.io/badge/Version-v3.3.0-FF9800?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/TheTeamVivek/YukkiMusic/releases)
 [![Support](https://img.shields.io/badge/Telegram-Support-26A69A?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/TheTeamVk)
 
 <br><br>
 
 **🚀 Deploy your own instance in one click:**
-
-<br>
 
 <a href="https://heroku.com/deploy?template=https://github.com/TheTeamVivek/YukkiMusic">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy to Heroku">
