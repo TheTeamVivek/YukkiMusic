@@ -284,10 +284,9 @@ flood_minutes: "{emoji:⏳} Bu komutu tekrar kullanmadan önce lütfen {duration
 help_private_only: "{emoji:🤖} Merhaba! Bot yardımı ve komutlar için lütfen bana doğrudan özel mesaj gönder — özel sohbetlerde daha hızlı yanıt veririm!"
 help_main: |
   <h3>{emoji:📚} Yardım Menüsü</h3>
-  <p>Botu yönetmek, kontrol etmek ve özelleştirmek için kullanılan detaylı komutları keşfetmek üzere aşağıdan bir kategori seç.</p>
-  <aside>İpucu: Belirli bir komut hakkında bilgi için <code>/help &lt;command&gt;</code> kullan.</aside>
+  <p>Komutlara kategoriye göre göz at: herkes için <b>Genel</b>, üst düzey erişim için <b>Yönetici</b>, <b>Sudo</b> ve <b>Sahip</b>.</p>
+  <aside>İpucu: tek bir komutun ayrıntılı yardımı için <code>/help &lt;command&gt;</code> çalıştır.</aside>
   <footer><i>Herhangi bir sorun veya destek için <a href="{support}">destek sohbetimiz</a> ile iletişime geçin.</i></footer>
-
 jump_no_active: "{emoji:⚠️} İçinde atlanacak aktif bir parça yok."
 jump_usage: "{emoji:⚠️} Lütfen saniye belirt.\nÖrnek: <code>{cmd} 120</code>"
 jump_invalid_position: "{emoji:⚠️} Geçersiz konum.\nÖrnek: <code>{cmd} 120</code>"
@@ -732,81 +731,112 @@ voicechat_started: "<b>{emoji:♻️} Sesli sohbet başladı!</b>\n\n<i>Müzik �
 # Commands help
 help_owner: |
   <h3>{emoji:👑} Sahip Komutları</h3>
-  <p><i>Sudo kullanıcılarını yönetmek, sistem kodu yürütmek ve bot yönetimini güvenli bir şekilde gerçekleştirmek için özel araçlar.</i></p>
+  <p><i>Yalnızca sahibe ayrılmış, bot geneli yönetim komutları.</i></p>
   <table bordered striped compact>
   <tr><th>Komut</th><th>Açıklama</th></tr>
-  <tr><td><code>/addsudo</code></td><td>Botun sudo listesine yeni bir kullanıcı ekle</td></tr>
-  <tr><td><code>/delsudo</code></td><td>Botun sudo listesinden bir kullanıcı çıkar</td></tr>
-  <tr><td><code>/blockuser</code></td><td>Kullanıcının botu kullanmasını engelle</td></tr>
-  <tr><td><code>/unblockuser</code></td><td>Kullanıcının botu tekrar kullanmasına izin ver</td></tr>
-  <tr><td><code>/blockchat</code></td><td>Sohbette botun kullanılmasını engelle</td></tr>
-  <tr><td><code>/unblockchat</code></td><td>Sohbette botun tekrar kullanılmasına izin ver</td></tr>
-  <tr><td><code>/blacklisted</code></td><td>Genel kara listeyi göster</td></tr>
-  <tr><td><code>/maintenance</code></td><td>Botun bakım modunu yönet</td></tr>
-  <tr><td><code>/restart</code></td><td>Botu yeniden başlat</td></tr>
-  <tr><td><code>/sh</code></td><td>Kabuk (shell) komutlarını çalıştır</td></tr>
+  <tr><td><code>/addsudo</code></td><td>Bir kullanıcıya sudo komut erişimi ver — yanıtla veya ID gönder.</td></tr>
+  <tr><td><code>/delsudo</code></td><td>Bir kullanıcının sudo erişimini kaldır.</td></tr>
+  <tr><td><code>/blockuser</code></td><td>Bir kullanıcının botu her yerde kullanmasını engelle.</td></tr>
+  <tr><td><code>/unblockuser</code></td><td>Engellenen kullanıcının erişimini geri ver.</td></tr>
+  <tr><td><code>/blockchat</code></td><td>Bir sohbetin botu kullanmasını engelle.</td></tr>
+  <tr><td><code>/unblockchat</code></td><td>Engellenen sohbetin erişimini geri ver.</td></tr>
+  <tr><td><code>/blacklisted</code></td><td>Engellenen tüm kullanıcı ve sohbetleri listele.</td></tr>
+  <tr><td><code>/broadcast</code></td><td>Hizmet verilen tüm sohbet ve kullanıcılara mesaj gönder — yayınlamak için mesajı yanıtla.</td></tr>
+  <tr><td><code>/maintenance</code></td><td>Botu duraklat ve sahip dışındaki tüm komutları engelle.</td></tr>
+  <tr><td><code>/restart</code></td><td>Bot sürecini yeniden başlat.</td></tr>
+  <tr><td><code>/sh</code></td><td>Sunucuda bir kabuk komutu çalıştır.</td></tr>
   </table>
   <footer>Herhangi bir komut hakkında bilgi için /help &lt;command&gt; kullan.</footer>
 
 help_sudo: |
   <h3>{emoji:⚡} Sudo Komutları</h3>
-  <p><i>Bot davranışını yönetmek, performansı izlemek, günlükleri ve otomasyonu kontrol etmek için gelişmiş araçlar.</i></p>
+  <p><i>İzleme, günlükleme ve otomasyon için bot geneli araçlar; sudo kullanıcılarına açıktır.</i></p>
   <table bordered striped compact>
   <tr><th>Komut</th><th>Açıklama</th></tr>
-  <tr><td><code>/active</code></td><td>Toplam aktif sohbetleri gösterir</td></tr>
-  <tr><td><code>/autoleave</code></td><td>Otomatik sohbetten ayrılmayı değiştir</td></tr>
-  <tr><td><code>/logger</code></td><td>Günlüğü etkinleştir veya devre dışı bırak</td></tr>
-  <tr><td><code>/stats</code></td><td>Bot ve sistem istatistiklerini görüntüle</td></tr>
-  <tr><td><code>/logs</code></td><td>Sistem günlüklerini al</td></tr>
-  <tr><td><code>/json</code></td><td>Bir mesajın JSON yapısını göster</td></tr>
+  <tr><td><code>/active</code></td><td>Botun yayın yaptığı tüm sesli sohbetleri listele.</td></tr>
+  <tr><td><code>/stats</code></td><td>Ayrıntılı bot, sistem ve veritabanı istatistiklerini göster.</td></tr>
+  <tr><td><code>/logs</code></td><td>Geçerli günlük dosyasını indir.</td></tr>
+  <tr><td><code>/json</code></td><td>Yanıtlanan bir mesajın ham JSON'unu göster.</td></tr>
+  <tr><td><code>/autoleave</code></td><td>Etkin olmayan sohbetlerden otomatik ayrıl.</td></tr>
+  <tr><td><code>/logger</code></td><td>Bot etkinliğini günlük kanalına kaydet.</td></tr>
   </table>
   <footer>Herhangi bir komut hakkında bilgi için /help &lt;command&gt; kullan.</footer>
 
 help_admin: |
   <h3>{emoji:🛠} Yönetici Komutları</h3>
-  <p><i>Yöneticilerin sırayı ve sesli sohbeti kolayca yönetmesi için müzik ve oynatma kontrol araçları.</i></p>
+  <p><i>Sohbet yöneticileri ve yetkili kullanıcılar için tam oynatma ve yapılandırma kontrolü.</i></p>
+
+  <p><b>🎵 Oynatma</b></p>
   <table bordered striped compact>
   <tr><th>Komut</th><th>Açıklama</th></tr>
-  <tr><td><code>/playmode</code></td><td>/play komutunu kimin kullanacağını kontrol et</td></tr>
-  <tr><td><code>/cplay</code></td><td>Bağlı kanalın sesli sohbetinde oynat</td></tr>
-  <tr><td><code>/adminmode</code></td><td>Yönetici komutlarını kimin kullanacağını kontrol et</td></tr>
-  <tr><td><code>/cmddelete</code></td><td>Bot komutlarının otomatik silinmesini aç/kapat</td></tr>
-  <tr><td><code>/settings</code></td><td>Sohbet ayarlarını yapılandır</td></tr>
-  <tr><td><code>/speed</code></td><td>Oynatma hızını değiştir</td></tr>
-  <tr><td><code>/skip</code></td><td>Mevcut şarkıyı atla</td></tr>
-  <tr><td><code>/pause</code></td><td>Mevcut oynatmayı duraklat</td></tr>
-  <tr><td><code>/resume</code></td><td>Duraklatılan oynatmayı devam ettir</td></tr>
-  <tr><td><code>/replay</code></td><td>Mevcut şarkıyı yeniden oynat</td></tr>
-  <tr><td><code>/mute</code></td><td>Oynatmayı sessize al</td></tr>
-  <tr><td><code>/unmute</code></td><td>Oynatma sesini aç</td></tr>
-  <tr><td><code>/seek</code></td><td>Birkaç saniye ileri sar</td></tr>
-  <tr><td><code>/seekback</code></td><td>Birkaç saniye geri sar</td></tr>
-  <tr><td><code>/jump</code></td><td>Parçada belirli bir zamana atla</td></tr>
-  <tr><td><code>/move</code></td><td>Sıradaki bir parçayı başka bir konuma taşı</td></tr>
-  <tr><td><code>/clear</code></td><td>Tüm şarkıları sıradan temizle</td></tr>
-  <tr><td><code>/remove</code></td><td>Sıradan belirli bir parçayı çıkar</td></tr>
-  <tr><td><code>/shuffle</code></td><td>Sıradaki tüm parçaları karıştır</td></tr>
-  <tr><td><code>/loop</code></td><td>Döngüyü etkinleştir veya devre dışı bırak</td></tr>
-  <tr><td><code>/stop</code></td><td>Oynatmayı durdur ve sesli sohbetten ayrıl</td></tr>
-  <tr><td><code>/nothumb</code></td><td>Oynatma mesajlarında kapak resmini etkinleştir veya devre dışı bırak</td></tr>
+  <tr><td><code>/play</code></td><td>Arama, bağlantı veya yanıtlanan dosyadan şarkı çal.</td></tr>
+  <tr><td><code>/fplay</code></td><td>Zorla çal — sırayı atlayarak hemen başlat.</td></tr>
+  <tr><td><code>/vplay</code></td><td>Sonucu video olarak çal.</td></tr>
+  <tr><td><code>/cplay</code></td><td>Bağlı kanalın sesli sohbetinde çal.</td></tr>
+  <tr><td><code>/pause</code></td><td>Mevcut parçayı duraklat.</td></tr>
+  <tr><td><code>/resume</code></td><td>Duraklatılan parçayı devam ettir.</td></tr>
+  <tr><td><code>/replay</code></td><td>Mevcut parçayı baştan başlat.</td></tr>
+  <tr><td><code>/skip</code></td><td>Sıradaki parçaya geç.</td></tr>
+  <tr><td><code>/stop</code></td><td>Oynatmayı durdur, sırayı temizle ve sesli sohbetten ayrıl.</td></tr>
+  <tr><td><code>/mute</code></td><td>Sesli sohbette asistanı sessize al.</td></tr>
+  <tr><td><code>/unmute</code></td><td>Sesli sohbette asistanın sesini aç.</td></tr>
   </table>
-  <footer>Herhangi bir komut hakkında bilgi için /help &lt;command&gt; kullan.</footer>
+
+  <p><b>📜 Sıra</b></p>
+  <table bordered striped compact>
+  <tr><th>Komut</th><th>Açıklama</th></tr>
+  <tr><td><code>/queue</code></td><td>Bekleyen tüm parçaları göster.</td></tr>
+  <tr><td><code>/position</code></td><td>Geçerli zaman damgasını göster.</td></tr>
+  <tr><td><code>/remove</code></td><td>Sıradan belirli bir parçayı çıkar.</td></tr>
+  <tr><td><code>/move</code></td><td>Sıradaki bir parçayı başka bir konuma taşı.</td></tr>
+  <tr><td><code>/clear</code></td><td>Sıradaki tüm parçaları kaldır.</td></tr>
+  <tr><td><code>/shuffle</code></td><td>Sırayı rastgele karıştır.</td></tr>
+  <tr><td><code>/loop</code></td><td>Mevcut parçayı 0–10 kez tekrarla.</td></tr>
+  <tr><td><code>/jump</code></td><td>Parçada seçilen konuma doğrudan atla.</td></tr>
+  </table>
+
+  <p><b>⏩ Sarma ve Hız</b></p>
+  <table bordered striped compact>
+  <tr><th>Komut</th><th>Açıklama</th></tr>
+  <tr><td><code>/seek</code></td><td>Verilen saniye kadar ileri sar.</td></tr>
+  <tr><td><code>/seekback</code></td><td>Verilen saniye kadar geri sar.</td></tr>
+  <tr><td><code>/speed</code></td><td>Oynatma hızını değiştir (0.5x–4.0x).</td></tr>
+  </table>
+
+  <p><b>⚙️ Ayarlar ve Erişim</b></p>
+  <table bordered striped compact>
+  <tr><th>Komut</th><th>Açıklama</th></tr>
+  <tr><td><code>/settings</code></td><td>Etkileşimli ayarlar panelini aç.</td></tr>
+  <tr><td><code>/playmode</code></td><td>/play komutunu kimin kullanabileceğini seç.</td></tr>
+  <tr><td><code>/adminmode</code></td><td>Yönetici müzik komutlarını kimin kullanabileceğini seç.</td></tr>
+  <tr><td><code>/cmddelete</code></td><td>Komut mesajlarını çalıştıktan sonra otomatik sil.</td></tr>
+  <tr><td><code>/autoplay</code></td><td>Sıra bitince önerileri otomatik oynat.</td></tr>
+  <tr><td><code>/nothumb</code></td><td>Oynatma mesajlarında kapak resmini gizle.</td></tr>
+  <tr><td><code>/cleanmode</code></td><td>Botun yanıtlarını sohbette otomatik sil.</td></tr>
+  <tr><td><code>/channelplay</code></td><td>Kanal oynatma modu için bir kanal bağla.</td></tr>
+  <tr><td><code>/auth</code></td><td>Bir kullanıcıya oynatma kontrol yetkisi ver.</td></tr>
+  <tr><td><code>/delauth</code></td><td>Bir kullanıcının yetkisini kaldır.</td></tr>
+  <tr><td><code>/reload</code></td><td>Yönetici önbelleğini ve sesli sohbet durumunu yenile.</td></tr>
+  </table>
+  <footer>Kanal varyantları (ör. /cpause, /cskip) bağlı kanalın sesli sohbetinde çalışır.</footer>
 
 help_public: |
   <h3>{emoji:🌍} Genel Komutlar</h3>
-  <p><i>Şarkı çalma, sıraları görüntüleme, gecikme kontrolü ve hata bildirme özellikleri.</i></p>
+  <p><i>Müzik çalmak, sırayı takip etmek ve botu kontrol etmek için ihtiyacın olan her şey.</i></p>
   <table bordered striped compact>
   <tr><th>Komut</th><th>Açıklama</th></tr>
-  <tr><td><code>/play</code></td><td>Bir şarkı çal</td></tr>
-  <tr><td><code>/queue</code></td><td>Sırada bekleyen tüm parçaları görüntüle</td></tr>
-  <tr><td><code>/ping</code></td><td>Botun ağ gecikmesini kontrol et</td></tr>
-  <tr><td><code>/start</code></td><td>Botu başlat</td></tr>
-  <tr><td><code>/help</code></td><td>Yardım menüsünü göster</td></tr>
-  <tr><td><code>/bug</code></td><td>Bir sorun veya hatayı bildir</td></tr>
-  <tr><td><code>/position</code></td><td>Mevcut parçanın zaman damgasını göster</td></tr>
-  <tr><td><code>/reload</code></td><td>Yönetici veya önbellek verilerini yeniden yükle</td></tr>
-  <tr><td><code>/sudolist</code></td><td>Sudo kullanıcı listesini görüntüle</td></tr>
+  <tr><td><code>/play</code></td><td>Arama, bağlantı veya yanıtlanan dosyadan şarkı çal.</td></tr>
+  <tr><td><code>/queue</code></td><td>Sırada bekleyen tüm parçaları görüntüle.</td></tr>
+  <tr><td><code>/position</code></td><td>Mevcut parçanın ne kadar oynadığını gör.</td></tr>
+  <tr><td><code>/ping</code></td><td>Botun gecikmesini ve sistem durumunu kontrol et.</td></tr>
+  <tr><td><code>/reload</code></td><td>Yönetici önbelleğini ve sesli sohbet durumunu yenile.</td></tr>
+  <tr><td><code>/authlist</code></td><td>Sohbetin yetkili kullanıcılarını listele.</td></tr>
+  <tr><td><code>/sudolist</code></td><td>Botun sudo kullanıcılarını göster.</td></tr>
+  <tr><td><code>/language</code></td><td>Botun dilini değiştir.</td></tr>
+  <tr><td><code>/privacy</code></td><td>Botun gizlilik politikasını oku.</td></tr>
+  <tr><td><code>/help</code></td><td>Bu yardım menüsünü aç.</td></tr>
+  <tr><td><code>/start</code></td><td>Botu özel sohbette başlat.</td></tr>
   </table>
-
+  <footer>Herhangi bir komut hakkında bilgi için /help &lt;command&gt; kullan.</footer>
 cleanmode_title: "{emoji:🧹} Temiz Mod"
 cleanmode_desc: "Etkinleştirildiğinde, bot hizmet mesajları ve komut mesajları kısa bir gecikmeden sonra otomatik olarak silinir."

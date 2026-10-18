@@ -19,6 +19,7 @@ package modules
 
 import (
 	"fmt"
+	"html"
 
 	td "github.com/AshokShau/gotdbot"
 
@@ -26,37 +27,52 @@ import (
 )
 
 func init() {
-	helpTexts["/privacy"] = `<i>Show the bot's privacy policy.</i>`
+	helpTexts["/privacy"] = `<i>Show the bot's privacy policy and data handling.</i>`
+}
+
+// privacySupport resolves the best support link to show in the policy.
+func privacySupport() string {
+	s := config.SupportChat
+	if s == "" {
+		s = config.SupportChannel
+	}
+	if s == "" {
+		s = "https://t.me/TheTeamVk"
+	}
+	return html.EscapeString(s)
 }
 
 func privacyHandler(c *td.Client, m *td.Message) error {
-	privacyText := fmt.Sprintf(`<b>🛡 Privacy Policy &amp; Data Handling</b>
+	const repo = "https://github.com/TheTeamVivek/YukkiMusic"
 
-Your privacy is important to us. This bot is designed with privacy in mind.
+	text := fmt.Sprintf(`<h3>🛡 Privacy Policy &amp; Data Handling</h3>
+<p>YukkiMusic is built with privacy in mind. Below is exactly what it stores, why it is stored, and how you stay in control.</p>
 
-<b>📊 Data We Collect</b>
-<blockquote>We only store essential data required for the bot to function:
-• <b>User & Chat IDs:</b> To identify groups and manage settings.
-• <b>Preferences:</b> Language settings and bot configurations.
-• <b>Access Control:</b> Authorized user lists for your group.</blockquote>
+<h4>📦 Data We Store</h4>
+<p>Only the information required to run the bot — nothing more:</p>
+<table bordered striped compact>
+<tr><th>Stored</th><th>Purpose</th></tr>
+<tr><td><b>User &amp; chat IDs</b></td><td>Identify groups and users so your settings apply</td></tr>
+<tr><td><b>Preferences</b></td><td>Language, play mode, clean mode, admin mode, thumbnails</td></tr>
+<tr><td><b>Access lists</b></td><td>Authorized users, sudo users, and the blacklist</td></tr>
+</table>
 
-<b>📩 Message Privacy</b>
-<blockquote>• The bot <b>only</b> reads messages that start with a command (e.g., <code>/play</code>) or interactions with its own buttons.
-• It <b>does not</b> read, store, or monitor your private conversations or general group messages.</blockquote>
+<h4>💬 Messages</h4>
+<aside>The bot reads <b>only</b> messages that begin with one of its commands (for example <code>/play</code>) or button presses on its own messages. It <b>never</b> reads, stores, or monitors your private chats or ordinary group conversations.</aside>
 
-<b>🌐 Third-Party Services</b>
-<blockquote>• We use external services like <b>YouTube</b> and <b>Spotify</b> solely to search for and stream the music you request.
-• No personal data is shared with these services beyond the search query itself.</blockquote>
+<h4>🌐 Third-Party Services</h4>
+<p>To find and stream the music you request, the bot sends the search query to services such as <b>YouTube</b> and <b>Spotify</b>. Only the query itself is sent — <b>no personal data</b> is shared with these services.</p>
 
-<b>🤝 Data Sharing</b>
-<blockquote>• We <b>never</b> sell, share, or trade your data with third parties.
-• All data is used strictly to provide and improve the bot's music streaming features.</blockquote>
+<h4>🔒 Data Sharing</h4>
+<p>Your data is <b>never</b> sold, shared, or traded with third parties. It is used strictly to operate and improve the bot's music streaming features.</p>
 
-<b>✨ Our Commitment</b>
-This bot is an <a href="https://github.com/TheTeamVivek/YukkiMusic">open-source project</a> dedicated to providing a high-quality streaming experience while respecting user privacy.
+<h4>🗑 Data Removal</h4>
+<p>Access can be cleaned up at any time: the owner can manage authorized users, sudo users, and the blacklist. You may also contact support to request removal of stored data.</p>
 
-<i>If you have any questions, feel free to join our <a href="%s">Support Chat</a>.</i>`, config.SupportChat)
+<footer>YukkiMusic is an <a href="%s">open-source project</a>. If you have any questions, feel free to join our <a href="%s">Support Chat</a>.</footer>`, repo, privacySupport())
 
-	_, err := m.ReplyText(c, privacyText, nil)
+	_, err := m.ReplyRichMessage(c, &td.InputRichMessage{
+		Source: &td.RichMessageSourceHtml{Text: text},
+	}, nil)
 	return err
 }

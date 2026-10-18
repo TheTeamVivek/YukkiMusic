@@ -285,10 +285,9 @@ flood_minutes: "{emoji:⏳} يرجى الانتظار {duration} دقيقة قب
 help_private_only: "{emoji:🤖} مرحباً! للحصول على المساعدة والأوامر، يرجى مراسلتي مباشرة — أنا أكثر استجابة في المحادثات الخاصة!"
 help_main: |
   <h3>{emoji:📚} قائمة المساعدة</h3>
-  <p>اختر فئة أدناه لاستكشاف الأوامر التفصيلية واستخداماتها لإدارة المساعد والتحكم فيه وتخصيصه.</p>
-  <aside>نصيحة: للحصول على معلومات حول أمر معين، استخدم <code>/help &lt;command&gt;</code>.</aside>
+  <p>تصفّح الأوامر حسب الفئة: <b>العامة</b> للجميع، و<b>المشرفين</b> و<b>المساعدين</b> و<b>المالك</b> لصلاحيات أعلى.</p>
+  <aside>نصيحة: شغّل <code>/help &lt;command&gt;</code> للحصول على مساعدة مفصّلة لأي أمر.</aside>
   <footer><i>لأي مشاكل أو دعم، تواصل مع <a href="{support}">دردشة الدعم</a>.</i></footer>
-
 jump_no_active: "{emoji:⚠️} لا يوجد مقطع نشط للقفز بداخله."
 jump_usage: "{emoji:⚠️} يرجى تحديد الثواني.\nمثال: <code>{cmd} 120</code>"
 jump_invalid_position: "{emoji:⚠️} موضع غير صالح.\nمثال: <code>{cmd} 120</code>"
@@ -735,82 +734,112 @@ voicechat_started: "<b>{emoji:♻️} بدأت المحادثة الصوتية!<
 # Commands help
 help_owner: |
   <h3>{emoji:👑} أوامر المالك</h3>
-  <p><i>أدوات حصرية لإدارة المساعدين وتنفيذ أوامر النظام وإدارة المساعد الآلي بشكل آمن.</i></p>
+  <p><i>إدارة عامة للبوت مخصصة للمالك فقط.</i></p>
   <table bordered striped compact>
   <tr><th>الأمر</th><th>الوصف</th></tr>
-  <tr><td><code>/addsudo</code></td><td>إضافة مستخدم جديد لقائمة المساعدين</td></tr>
-  <tr><td><code>/delsudo</code></td><td>إزالة مستخدم من قائمة المساعدين</td></tr>
-  <tr><td><code>/blockuser</code></td><td>منع المستخدم من استخدام البوت</td></tr>
-  <tr><td><code>/unblockuser</code></td><td>السماح للمستخدم باستخدام البوت مرة أخرى</td></tr>
-  <tr><td><code>/blockchat</code></td><td>منع الدردشة من استخدام البوت</td></tr>
-  <tr><td><code>/unblockchat</code></td><td>السماح للدردشة باستخدام البوت مرة أخرى</td></tr>
-  <tr><td><code>/blacklisted</code></td><td>عرض القائمة السوداء العامة</td></tr>
-  <tr><td><code>/maintenance</code></td><td>إدارة وضع الصيانة</td></tr>
-  <tr><td><code>/restart</code></td><td>إعادة تشغيل المساعد الآلي</td></tr>
-  <tr><td><code>/sh</code></td><td>تشغيل أوامر القشرة (Shell)</td></tr>
+  <tr><td><code>/addsudo</code></td><td>امنح مستخدماً صلاحية أوامر المساعدين — بالرد عليه أو بإرسال معرّفه.</td></tr>
+  <tr><td><code>/delsudo</code></td><td>أزل صلاحية المساعد عن مستخدم.</td></tr>
+  <tr><td><code>/blockuser</code></td><td>امنع مستخدماً من استخدام البوت في كل مكان.</td></tr>
+  <tr><td><code>/unblockuser</code></td><td>أعِد الوصول لمستخدم محظور.</td></tr>
+  <tr><td><code>/blockchat</code></td><td>امنع دردشة من استخدام البوت.</td></tr>
+  <tr><td><code>/unblockchat</code></td><td>أعِد الوصول لدردشة محظورة.</td></tr>
+  <tr><td><code>/blacklisted</code></td><td>اعرض كل المستخدمين والدردشات المحظورة.</td></tr>
+  <tr><td><code>/broadcast</code></td><td>أرسل رسالة إلى جميع الدردشات والمستخدمين — بالرد على الرسالة للإذاعة.</td></tr>
+  <tr><td><code>/maintenance</code></td><td>أوقف البوت وامنع كل الأوامر عدا المالك.</td></tr>
+  <tr><td><code>/restart</code></td><td>أعد تشغيل البوت.</td></tr>
+  <tr><td><code>/sh</code></td><td>نفّذ أمر قشرة (Shell) على الخادم.</td></tr>
   </table>
   <footer>استخدم /help &lt;command&gt; للحصول على تفاصيل حول أي أمر.</footer>
 
 help_sudo: |
   <h3>{emoji:⚡} أوامر المساعدين</h3>
-  <p><i>أدوات متقدمة لإدارة سلوك المساعد ومراقبة الأداء والتحكم في السجلات والأتمتة.</i></p>
+  <p><i>أدوات عامة للبوت للمراقبة والسجلات والأتمتة، متاحة للمساعدين.</i></p>
   <table bordered striped compact>
   <tr><th>الأمر</th><th>الوصف</th></tr>
-  <tr><td><code>/active</code></td><td>عرض المحادثات النشطة</td></tr>
-  <tr><td><code>/autoleave</code></td><td>تبديل المغادرة التلقائية</td></tr>
-  <tr><td><code>/logger</code></td><td>تفعيل أو تعطيل السجل</td></tr>
-  <tr><td><code>/stats</code></td><td>عرض إحصائيات النظام والمساعد</td></tr>
-  <tr><td><code>/logs</code></td><td>الحصول على سجلات النظام</td></tr>
-  <tr><td><code>/json</code></td><td>عرض بنية JSON للرسالة</td></tr>
+  <tr><td><code>/active</code></td><td>اعرض كل المحادثات الصوتية التي يبثّ فيها البوت.</td></tr>
+  <tr><td><code>/stats</code></td><td>اعرض إحصائيات مفصّلة للبوت والنظام وقاعدة البيانات.</td></tr>
+  <tr><td><code>/logs</code></td><td>نزّل ملف السجل الحالي.</td></tr>
+  <tr><td><code>/json</code></td><td>اعرض بنية JSON الخام لرسالة تم الرد عليها.</td></tr>
+  <tr><td><code>/autoleave</code></td><td>غادر الدردشات غير النشطة تلقائياً.</td></tr>
+  <tr><td><code>/logger</code></td><td>سجّل نشاط البوت في قناة السجل.</td></tr>
   </table>
   <footer>استخدم /help &lt;command&gt; للحصول على تفاصيل حول أي أمر.</footer>
 
 help_admin: |
   <h3>{emoji:🛠} أوامر المشرفين</h3>
-  <p><i>أدوات التحكم في الموسيقى والتشغيل لمساعدة المشرفين على إدارة قائمة الانتظار والمحادثة الصوتية بسهولة.</i></p>
+  <p><i>تحكم كامل في التشغيل والإعدادات لمشرفي الدردشة والمستخدمين المصرّح لهم.</i></p>
+
+  <p><b>🎵 التشغيل</b></p>
   <table bordered striped compact>
   <tr><th>الأمر</th><th>الوصف</th></tr>
-  <tr><td><code>/playmode</code></td><td>التحكم في من يمكنه استخدام /play</td></tr>
-  <tr><td><code>/cplay</code></td><td>التشغيل في المحادثة الصوتية للقناة المرتبطة</td></tr>
-  <tr><td><code>/adminmode</code></td><td>التحكم في من يمكنه استخدام أوامر الإدارة</td></tr>
-  <tr><td><code>/cmddelete</code></td><td>تبديل الحذف التلقائي لأوامر البوت</td></tr>
-  <tr><td><code>/settings</code></td><td>تكوين إعدادات الدردشة</td></tr>
-  <tr><td><code>/speed</code></td><td>تغيير سرعة التشغيل</td></tr>
-  <tr><td><code>/skip</code></td><td>تخطي الأغنية الحالية</td></tr>
-  <tr><td><code>/pause</code></td><td>إيقاف التشغيل الحالي مؤقتاً</td></tr>
-  <tr><td><code>/resume</code></td><td>استئناف التشغيل المتوقف مؤقتاً</td></tr>
-  <tr><td><code>/replay</code></td><td>إعادة تشغيل الأغنية الحالية</td></tr>
-  <tr><td><code>/mute</code></td><td>كتم الصوت</td></tr>
-  <tr><td><code>/unmute</code></td><td>إلغاء كتم الصوت</td></tr>
-  <tr><td><code>/seek</code></td><td>التقديم بضع ثوانٍ</td></tr>
-  <tr><td><code>/seekback</code></td><td>الإرجاع بضع ثوانٍ</td></tr>
-  <tr><td><code>/jump</code></td><td>الانتقال إلى وقت معين في المقطع</td></tr>
-  <tr><td><code>/move</code></td><td>نقل مقطع في قائمة الانتظار إلى موضع آخر</td></tr>
-  <tr><td><code>/clear</code></td><td>حذف جميع الأغاني من قائمة الانتظار</td></tr>
-  <tr><td><code>/remove</code></td><td>إزالة مقطع معين من قائمة الانتظار</td></tr>
-  <tr><td><code>/shuffle</code></td><td>خلط جميع المقاطع في قائمة الانتظار</td></tr>
-  <tr><td><code>/loop</code></td><td>تفعيل أو تعطيل التكرار</td></tr>
-  <tr><td><code>/stop</code></td><td>إيقاف التشغيل ومغادرة المحادثة الصوتية</td></tr>
-  <tr><td><code>/nothumb</code></td><td>تفعيل أو تعطيل الصورة المصغرة في رسائل التشغيل</td></tr>
+  <tr><td><code>/play</code></td><td>شغّل أغنية من بحث أو رابط أو ملف تم الرد عليه.</td></tr>
+  <tr><td><code>/fplay</code></td><td>تشغيل قسري — ابدأ فوراً مع تخطّي قائمة الانتظار.</td></tr>
+  <tr><td><code>/vplay</code></td><td>شغّل النتيجة كفيديو.</td></tr>
+  <tr><td><code>/cplay</code></td><td>شغّل في المحادثة الصوتية للقناة المرتبطة.</td></tr>
+  <tr><td><code>/pause</code></td><td>أوقف المقطع الحالي مؤقتاً.</td></tr>
+  <tr><td><code>/resume</code></td><td>استأنف المقطع المتوقف مؤقتاً.</td></tr>
+  <tr><td><code>/replay</code></td><td>أعِد تشغيل المقطع الحالي من البداية.</td></tr>
+  <tr><td><code>/skip</code></td><td>انتقل إلى المقطع التالي في القائمة.</td></tr>
+  <tr><td><code>/stop</code></td><td>أوقف التشغيل وامسح القائمة وغادر المحادثة الصوتية.</td></tr>
+  <tr><td><code>/mute</code></td><td>اكتم صوت المساعد في المحادثة الصوتية.</td></tr>
+  <tr><td><code>/unmute</code></td><td>ألغِ كتم صوت المساعد في المحادثة الصوتية.</td></tr>
   </table>
-  <footer>استخدم /help &lt;command&gt; للحصول على تفاصيل حول أي أمر.</footer>
+
+  <p><b>📜 قائمة الانتظار</b></p>
+  <table bordered striped compact>
+  <tr><th>الأمر</th><th>الوصف</th></tr>
+  <tr><td><code>/queue</code></td><td>اعرض جميع المقاطع المنتظرة.</td></tr>
+  <tr><td><code>/position</code></td><td>اعرض التوقيت الحالي.</td></tr>
+  <tr><td><code>/remove</code></td><td>أزل مقطعاً معيناً من القائمة.</td></tr>
+  <tr><td><code>/move</code></td><td>انقل مقطعاً في القائمة إلى موضع آخر.</td></tr>
+  <tr><td><code>/clear</code></td><td>أزل كل المقاطع من القائمة.</td></tr>
+  <tr><td><code>/shuffle</code></td><td>اخلط القائمة عشوائياً.</td></tr>
+  <tr><td><code>/loop</code></td><td>كرّر المقطع الحالي من 0 إلى 10 مرات.</td></tr>
+  <tr><td><code>/jump</code></td><td>انتقل مباشرة إلى موضع مختار في المقطع.</td></tr>
+  </table>
+
+  <p><b>⏩ التقديم والإرجاع والسرعة</b></p>
+  <table bordered striped compact>
+  <tr><th>الأمر</th><th>الوصف</th></tr>
+  <tr><td><code>/seek</code></td><td>تقدّم بعدد الثواني المحدد.</td></tr>
+  <tr><td><code>/seekback</code></td><td>أرجع للخلف بعدد الثواني المحدد.</td></tr>
+  <tr><td><code>/speed</code></td><td>غيّر سرعة التشغيل (0.5x–4.0x).</td></tr>
+  </table>
+
+  <p><b>⚙️ الإعدادات والوصول</b></p>
+  <table bordered striped compact>
+  <tr><th>الأمر</th><th>الوصف</th></tr>
+  <tr><td><code>/settings</code></td><td>افتح لوحة الإعدادات التفاعلية.</td></tr>
+  <tr><td><code>/playmode</code></td><td>اختر من يمكنه استخدام /play.</td></tr>
+  <tr><td><code>/adminmode</code></td><td>اختر من يمكنه استخدام أوامر الموسيقى الإدارية.</td></tr>
+  <tr><td><code>/cmddelete</code></td><td>احذف رسائل الأوامر تلقائياً بعد تنفيذها.</td></tr>
+  <tr><td><code>/autoplay</code></td><td>شغّل التوصيات تلقائياً عند انتهاء القائمة.</td></tr>
+  <tr><td><code>/nothumb</code></td><td>أخفِ الصورة المصغّرة في رسائل التشغيل.</td></tr>
+  <tr><td><code>/cleanmode</code></td><td>احذف ردود البوت في الدردشة تلقائياً.</td></tr>
+  <tr><td><code>/channelplay</code></td><td>اربط قناة لوضع تشغيل القناة.</td></tr>
+  <tr><td><code>/auth</code></td><td>صرّح لمستخدم بالتحكم في التشغيل.</td></tr>
+  <tr><td><code>/delauth</code></td><td>أزل تصريح مستخدم.</td></tr>
+  <tr><td><code>/reload</code></td><td>حدّث ذاكرة المشرفين وحالة المحادثة الصوتية.</td></tr>
+  </table>
+  <footer>صيغ القناة (مثل /cpause و/cskip) تعمل على المحادثة الصوتية للقناة المرتبطة.</footer>
 
 help_public: |
   <h3>{emoji:🌍} الأوامر العامة</h3>
-  <p><i>ميزات لتشغيل الأغاني وعرض قوائم الانتظار والتحقق من التأخير والإبلاغ عن الأخطاء.</i></p>
+  <p><i>كل ما تحتاجه لتشغيل الموسيقى ومتابعة القائمة والاطلاع على حالة البوت.</i></p>
   <table bordered striped compact>
   <tr><th>الأمر</th><th>الوصف</th></tr>
-  <tr><td><code>/play</code></td><td>تشغيل أغنية</td></tr>
-  <tr><td><code>/queue</code></td><td>عرض جميع المقاطع في قائمة الانتظار</td></tr>
-  <tr><td><code>/ping</code></td><td>التحقق من تأخير شبكة البوت</td></tr>
-  <tr><td><code>/start</code></td><td>بدء تشغيل البوت</td></tr>
-  <tr><td><code>/help</code></td><td>عرض قائمة المساعدة</td></tr>
-  <tr><td><code>/bug</code></td><td>الإبلاغ عن مشكلة أو خطأ</td></tr>
-  <tr><td><code>/position</code></td><td>عرض التوقيت الحالي للمقطع</td></tr>
-  <tr><td><code>/reload</code></td><td>إعادة تحميل بيانات المشرفين أو الذاكرة المؤقتة</td></tr>
-  <tr><td><code>/sudolist</code></td><td>عرض قائمة المساعدين</td></tr>
+  <tr><td><code>/play</code></td><td>شغّل أغنية من بحث أو رابط أو ملف تم الرد عليه.</td></tr>
+  <tr><td><code>/queue</code></td><td>اعرض جميع المقاطع المنتظرة في القائمة.</td></tr>
+  <tr><td><code>/position</code></td><td>اعرض مقدار ما تم تشغيله من المقطع الحالي.</td></tr>
+  <tr><td><code>/ping</code></td><td>تحقق من تأخير البوت وحالة النظام.</td></tr>
+  <tr><td><code>/reload</code></td><td>حدّث ذاكرة المشرفين وحالة المحادثة الصوتية.</td></tr>
+  <tr><td><code>/authlist</code></td><td>اعرض المستخدمين المصرّح لهم في الدردشة.</td></tr>
+  <tr><td><code>/sudolist</code></td><td>اعرض مستخدمي السودو في البوت.</td></tr>
+  <tr><td><code>/language</code></td><td>غيّر لغة البوت.</td></tr>
+  <tr><td><code>/privacy</code></td><td>اقرأ سياسة خصوصية البوت.</td></tr>
+  <tr><td><code>/help</code></td><td>افتح قائمة المساعدة هذه.</td></tr>
+  <tr><td><code>/start</code></td><td>ابدأ البوت في محادثة خاصة.</td></tr>
   </table>
-
-
+  <footer>استخدم /help &lt;command&gt; للحصول على تفاصيل حول أي أمر.</footer>
 cleanmode_title: "{emoji:🧹} وضع التنظيف"
 cleanmode_desc: "عند التفعيل، يتم حذف رسائل الخدمة وأوامر البوت تلقائياً بعد تأخير قصير."

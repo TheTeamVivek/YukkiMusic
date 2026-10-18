@@ -284,8 +284,8 @@ flood_minutes: "{emoji:⏳} Please wait {duration} minutes before using this com
 help_private_only: "{emoji:🤖} Hi! For bot help and commands, please DM me directly — I'm more responsive in private chats!"
 help_main: |
   <h3>{emoji:📚} Help Menu</h3>
-  <p>Select a category below to explore detailed commands for managing, controlling and customising the bot.</p>
-  <aside>Tip: use <code>/help &lt;command&gt;</code> to get help about a specific command.</aside>
+  <p>Browse commands by category: <b>Public</b> for everyone, plus <b>Admin</b>, <b>Sudo</b> and <b>Owner</b> for higher access levels.</p>
+  <aside>Tip: run <code>/help &lt;command&gt;</code> to get detailed help for any single command.</aside>
   <footer><i>For any issues or support, contact our <a href="{support}">support chat</a>.</i></footer>
 
 jump_no_active: "{emoji:⚠️} No active track to jump within."
@@ -739,80 +739,111 @@ voicechat_started: "<b>{emoji:♻️} Voice chat started!</b>\n\n<i>Use /play [s
 # Commands help
 help_owner: |
   <h3>{emoji:👑} Owner Commands</h3>
-  <p><i>Exclusive tools for managing sudoers, executing system code and performing bot administration securely.</i></p>
+  <p><i>Restricted, bot-wide administration reserved for the owner.</i></p>
   <table bordered striped compact>
   <tr><th>Command</th><th>Description</th></tr>
-  <tr><td><code>/addsudo</code></td><td>Add a new user to the bot's sudo list</td></tr>
-  <tr><td><code>/delsudo</code></td><td>Remove a user from the bot's sudo list</td></tr>
-  <tr><td><code>/blockuser</code></td><td>Prevent a user from using the bot</td></tr>
-  <tr><td><code>/unblockuser</code></td><td>Allow a user to use the bot again</td></tr>
-  <tr><td><code>/blockchat</code></td><td>Prevent a chat from using the bot</td></tr>
-  <tr><td><code>/unblockchat</code></td><td>Allow a chat to use the bot again</td></tr>
-  <tr><td><code>/blacklisted</code></td><td>Show the global blacklist</td></tr>
-  <tr><td><code>/maintenance</code></td><td>Manage the bot's maintenance mode</td></tr>
-  <tr><td><code>/restart</code></td><td>Restart the bot</td></tr>
-  <tr><td><code>/sh</code></td><td>Run shell commands</td></tr>
+  <tr><td><code>/addsudo</code></td><td>Grant a user access to sudo-only commands — reply to them or pass an ID.</td></tr>
+  <tr><td><code>/delsudo</code></td><td>Revoke a user's sudo access.</td></tr>
+  <tr><td><code>/blockuser</code></td><td>Stop a user from using the bot everywhere.</td></tr>
+  <tr><td><code>/unblockuser</code></td><td>Restore a blocked user's access.</td></tr>
+  <tr><td><code>/blockchat</code></td><td>Stop a chat from using the bot.</td></tr>
+  <tr><td><code>/unblockchat</code></td><td>Restore a blocked chat's access.</td></tr>
+  <tr><td><code>/blacklisted</code></td><td>List every blocked user and chat.</td></tr>
+  <tr><td><code>/broadcast</code></td><td>Send a message to all served chats and users — reply to the message to broadcast.</td></tr>
+  <tr><td><code>/maintenance</code></td><td>Pause the bot and block all non-owner commands.</td></tr>
+  <tr><td><code>/restart</code></td><td>Restart the bot process.</td></tr>
+  <tr><td><code>/sh</code></td><td>Run a shell command on the server.</td></tr>
   </table>
   <footer>Use /help &lt;command&gt; for details on any command.</footer>
 
 help_sudo: |
   <h3>{emoji:⚡} Sudoer Commands</h3>
-  <p><i>Advanced tools for managing bot behaviour, monitoring performance and controlling logging and automation.</i></p>
+  <p><i>Bot-wide tools for monitoring, logging and automation, available to sudo users.</i></p>
   <table bordered striped compact>
   <tr><th>Command</th><th>Description</th></tr>
-  <tr><td><code>/active</code></td><td>Show total active chats</td></tr>
-  <tr><td><code>/stats</code></td><td>Display bot and system stats</td></tr>
-  <tr><td><code>/logs</code></td><td>Get the system logs</td></tr>
-  <tr><td><code>/json</code></td><td>Show a message's JSON structure</td></tr>
-  <tr><td><code>/autoleave</code></td><td>Toggle automatic chat leaving</td></tr>
-  <tr><td><code>/logger</code></td><td>Enable or disable the logger</td></tr>
+  <tr><td><code>/active</code></td><td>List every voice chat the bot is streaming in.</td></tr>
+  <tr><td><code>/stats</code></td><td>Show detailed bot, system and database statistics.</td></tr>
+  <tr><td><code>/logs</code></td><td>Download the current log file.</td></tr>
+  <tr><td><code>/json</code></td><td>Show the raw JSON of a replied message.</td></tr>
+  <tr><td><code>/autoleave</code></td><td>Automatically leave inactive chats.</td></tr>
+  <tr><td><code>/logger</code></td><td>Log bot activity to the logger channel.</td></tr>
   </table>
   <footer>Use /help &lt;command&gt; for details on any command.</footer>
 
 help_admin: |
   <h3>{emoji:🛠} Admin Commands</h3>
-  <p><i>Manage music playback and voice chat like a pro.</i></p>
+  <p><i>Full playback and configuration control for chat admins and authorized users.</i></p>
+
+  <p><b>🎵 Playback</b></p>
   <table bordered striped compact>
   <tr><th>Command</th><th>Description</th></tr>
-  <tr><td><code>/playmode</code></td><td>Control who can use /play</td></tr>
-  <tr><td><code>/cplay</code></td><td>Play in the linked channel's voice chat</td></tr>
-  <tr><td><code>/adminmode</code></td><td>Control who can use admin commands</td></tr>
-  <tr><td><code>/cmddelete</code></td><td>Toggle automatic deletion of bot commands</td></tr>
-  <tr><td><code>/settings</code></td><td>Configure chat settings</td></tr>
-  <tr><td><code>/speed</code></td><td>Change playback speed</td></tr>
-  <tr><td><code>/skip</code></td><td>Skip the current song</td></tr>
-  <tr><td><code>/pause</code></td><td>Pause the current playback</td></tr>
-  <tr><td><code>/resume</code></td><td>Resume paused playback</td></tr>
-  <tr><td><code>/replay</code></td><td>Replay the current song</td></tr>
-  <tr><td><code>/mute</code></td><td>Mute playback</td></tr>
-  <tr><td><code>/unmute</code></td><td>Unmute playback</td></tr>
-  <tr><td><code>/seek</code></td><td>Seek forward by a few seconds</td></tr>
-  <tr><td><code>/seekback</code></td><td>Seek backward by a few seconds</td></tr>
-  <tr><td><code>/jump</code></td><td>Jump to a given time in the track</td></tr>
-  <tr><td><code>/move</code></td><td>Move a queued track to another position</td></tr>
-  <tr><td><code>/clear</code></td><td>Clear all songs from the queue</td></tr>
-  <tr><td><code>/remove</code></td><td>Remove a specific track from the queue</td></tr>
-  <tr><td><code>/shuffle</code></td><td>Shuffle all queued tracks</td></tr>
-  <tr><td><code>/loop</code></td><td>Enable or disable looping</td></tr>
-  <tr><td><code>/stop</code></td><td>Stop playback and leave the voice chat</td></tr>
-  <tr><td><code>/nothumb</code></td><td>Enable or disable artwork in playback messages</td></tr>
+  <tr><td><code>/play</code></td><td>Play a song from a search query, a link or a replied-to file.</td></tr>
+  <tr><td><code>/fplay</code></td><td>Force play — start immediately, skipping the queue.</td></tr>
+  <tr><td><code>/vplay</code></td><td>Play the result as a video.</td></tr>
+  <tr><td><code>/cplay</code></td><td>Play in the linked channel's voice chat.</td></tr>
+  <tr><td><code>/pause</code></td><td>Pause the current track.</td></tr>
+  <tr><td><code>/resume</code></td><td>Resume a paused track.</td></tr>
+  <tr><td><code>/replay</code></td><td>Restart the current track from the beginning.</td></tr>
+  <tr><td><code>/skip</code></td><td>Skip to the next track in the queue.</td></tr>
+  <tr><td><code>/stop</code></td><td>Stop playback, clear the queue and leave the voice chat.</td></tr>
+  <tr><td><code>/mute</code></td><td>Mute the assistant in the voice chat.</td></tr>
+  <tr><td><code>/unmute</code></td><td>Unmute the assistant in the voice chat.</td></tr>
   </table>
-  <footer>Use /help &lt;command&gt; for details on any command.</footer>
+
+  <p><b>📜 Queue</b></p>
+  <table bordered striped compact>
+  <tr><th>Command</th><th>Description</th></tr>
+  <tr><td><code>/queue</code></td><td>Show every waiting track.</td></tr>
+  <tr><td><code>/position</code></td><td>Show the current timestamp.</td></tr>
+  <tr><td><code>/remove</code></td><td>Remove a specific track from the queue.</td></tr>
+  <tr><td><code>/move</code></td><td>Move a queued track to another position.</td></tr>
+  <tr><td><code>/clear</code></td><td>Remove every track from the queue.</td></tr>
+  <tr><td><code>/shuffle</code></td><td>Randomly reorder the queue.</td></tr>
+  <tr><td><code>/loop</code></td><td>Repeat the current track 0–10 times.</td></tr>
+  <tr><td><code>/jump</code></td><td>Skip straight to a chosen position in the track.</td></tr>
+  </table>
+
+  <p><b>⏩ Seek &amp; Speed</b></p>
+  <table bordered striped compact>
+  <tr><th>Command</th><th>Description</th></tr>
+  <tr><td><code>/seek</code></td><td>Jump forward by the given number of seconds.</td></tr>
+  <tr><td><code>/seekback</code></td><td>Jump backward by the given number of seconds.</td></tr>
+  <tr><td><code>/speed</code></td><td>Change playback speed (0.5x–4.0x).</td></tr>
+  </table>
+
+  <p><b>⚙️ Settings &amp; Access</b></p>
+  <table bordered striped compact>
+  <tr><th>Command</th><th>Description</th></tr>
+  <tr><td><code>/settings</code></td><td>Open the interactive settings panel.</td></tr>
+  <tr><td><code>/playmode</code></td><td>Choose who may use /play.</td></tr>
+  <tr><td><code>/adminmode</code></td><td>Choose who may use admin music commands.</td></tr>
+  <tr><td><code>/cmddelete</code></td><td>Auto-delete command messages after they run.</td></tr>
+  <tr><td><code>/autoplay</code></td><td>Play recommendations automatically when the queue ends.</td></tr>
+  <tr><td><code>/nothumb</code></td><td>Hide artwork in playback messages.</td></tr>
+  <tr><td><code>/cleanmode</code></td><td>Auto-delete the bot's replies in the chat.</td></tr>
+  <tr><td><code>/channelplay</code></td><td>Link a channel for channel play mode.</td></tr>
+  <tr><td><code>/auth</code></td><td>Authorize a user to control playback.</td></tr>
+  <tr><td><code>/delauth</code></td><td>Remove a user's authorization.</td></tr>
+  <tr><td><code>/reload</code></td><td>Refresh the admin cache and voice-chat state.</td></tr>
+  </table>
+  <footer>Channel variants (e.g. /cpause, /cskip) act on the linked channel's voice chat.</footer>
 
 help_public: |
   <h3>{emoji:🌍} Public Commands</h3>
-  <p><i>Everything you need to play songs, view the queue and stay in control.</i></p>
+  <p><i>Everything you need to play music, follow the queue and check on the bot.</i></p>
   <table bordered striped compact>
   <tr><th>Command</th><th>Description</th></tr>
-  <tr><td><code>/play</code></td><td>Play a song</td></tr>
-  <tr><td><code>/queue</code></td><td>View all tracks currently queued</td></tr>
-  <tr><td><code>/ping</code></td><td>Check the bot's network latency</td></tr>
-  <tr><td><code>/start</code></td><td>Start the bot</td></tr>
-  <tr><td><code>/help</code></td><td>Show the help menu</td></tr>
-  <tr><td><code>/bug</code></td><td>Report an issue or problem</td></tr>
-  <tr><td><code>/position</code></td><td>Show the current track's timestamp</td></tr>
-  <tr><td><code>/reload</code></td><td>Reload admin or cache data</td></tr>
-  <tr><td><code>/sudolist</code></td><td>View the sudo user list</td></tr>
+  <tr><td><code>/play</code></td><td>Play a song from a search query, a link or a replied-to file.</td></tr>
+  <tr><td><code>/queue</code></td><td>View all tracks currently waiting in the queue.</td></tr>
+  <tr><td><code>/position</code></td><td>See how far the current track has played.</td></tr>
+  <tr><td><code>/ping</code></td><td>Check the bot's latency and system health.</td></tr>
+  <tr><td><code>/reload</code></td><td>Refresh the admin cache and voice-chat state.</td></tr>
+  <tr><td><code>/authlist</code></td><td>List the chat's authorized users.</td></tr>
+  <tr><td><code>/sudolist</code></td><td>Show the bot's sudo users.</td></tr>
+  <tr><td><code>/language</code></td><td>Change the bot's language.</td></tr>
+  <tr><td><code>/privacy</code></td><td>Read the bot's privacy policy.</td></tr>
+  <tr><td><code>/help</code></td><td>Open this help menu.</td></tr>
+  <tr><td><code>/start</code></td><td>Start the bot in a private chat.</td></tr>
   </table>
   <footer>Use /help &lt;command&gt; for details on any command.</footer>
 
