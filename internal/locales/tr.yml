@@ -744,7 +744,6 @@ help_owner: |
   <tr><td><code>/blockchat</code></td><td>Sohbette botun kullanılmasını engelle</td></tr>
   <tr><td><code>/unblockchat</code></td><td>Sohbette botun tekrar kullanılmasına izin ver</td></tr>
   <tr><td><code>/blacklisted</code></td><td>Genel kara listeyi göster</td></tr>
-  <tr><td><code>/eval</code></td><td>Go kod parçacıklarını yürüt</td></tr>
   <tr><td><code>/maintenance</code></td><td>Botun bakım modunu yönet</td></tr>
   <tr><td><code>/restart</code></td><td>Botu yeniden başlat</td></tr>
   <tr><td><code>/sh</code></td><td>Kabuk (shell) komutlarını çalıştır</td></tr>
@@ -761,6 +760,7 @@ help_sudo: |
   <tr><td><code>/logger</code></td><td>Günlüğü etkinleştir veya devre dışı bırak</td></tr>
   <tr><td><code>/stats</code></td><td>Bot ve sistem istatistiklerini görüntüle</td></tr>
   <tr><td><code>/logs</code></td><td>Sistem günlüklerini al</td></tr>
+  <tr><td><code>/json</code></td><td>Bir mesajın JSON yapısını göster</td></tr>
   </table>
   <footer>Herhangi bir komut hakkında bilgi için /help &lt;command&gt; kullan.</footer>
 
@@ -807,7 +807,6 @@ help_public: |
   <tr><td><code>/bug</code></td><td>Bir sorun veya hatayı bildir</td></tr>
   <tr><td><code>/position</code></td><td>Mevcut parçanın zaman damgasını göster</td></tr>
   <tr><td><code>/reload</code></td><td>Yönetici veya önbellek verilerini yeniden yükle</td></tr>
-  <tr><td><code>/json</code></td><td>Bir mesajın JSON yapısını göster</td></tr>
   <tr><td><code>/sudolist</code></td><td>Sudo kullanıcı listesini görüntüle</td></tr>
   </table>
 

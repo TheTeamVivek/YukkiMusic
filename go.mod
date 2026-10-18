@@ -7,7 +7,6 @@ require (
 	github.com/amarnathcjd/gogram v1.7.71
 	github.com/joho/godotenv v1.5.1
 	github.com/shirou/gopsutil/v3 v3.24.5
-	github.com/traefik/yaegi v0.16.1
 	go.mongodb.org/mongo-driver/v2 v2.9.2
 	gopkg.in/yaml.v3 v3.0.1
 	resty.dev/v3 v3.0.0-rc.4

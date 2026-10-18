@@ -47,18 +47,6 @@ Direct system access - extremely powerful.`
 	helpTexts["/bash"] = helpTexts["/sh"]
 	helpTexts["/shell"] = helpTexts["/sh"]
 
-	helpTexts["/eval"] = helpTexts["/ev"]
-	helpTexts["/ev"] = `<i>Execute Go code dynamically (eval mode).</i>
-
-<u>Usage:</u>
-<b>/eval [code]</b> — Run Go code
-
-<b>🔒 Restrictions:</b>
-• <b>Owner only</b> command
-
-<b>⚠️ Warning:</b>
-Powerful command - use with caution.`
-
 	helpTexts["/json"] = `<i>Get JSON representation of message/user/chat.</i>
 
 <u>Usage:</u>
@@ -67,6 +55,9 @@ Powerful command - use with caution.`
 <b>/json -c</b> — Chat JSON
 <b>/json -m</b> — Media JSON
 <b>/json [reply] -f</b> — File JSON
+
+<b>🔒 Restrictions:</b>
+• <b>Sudo users only</b>
 
 <b>💡 Use Case:</b>
 Debugging and development.`
@@ -154,6 +145,10 @@ func shellHandler(c *td.Client, m *td.Message) error {
 }
 
 func jsonHandle(c *td.Client, m *td.Message) error {
+	if !checkSudo(c, m) {
+		return nil
+	}
+
 	var jsonString []byte
 	html := &td.SendMessageOpts{ParseMode: "HTML"}
 	if m.ReplyToMessageID() == 0 {

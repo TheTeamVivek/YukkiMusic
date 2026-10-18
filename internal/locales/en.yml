@@ -751,7 +751,6 @@ help_owner: |
   <tr><td><code>/blockchat</code></td><td>Prevent a chat from using the bot</td></tr>
   <tr><td><code>/unblockchat</code></td><td>Allow a chat to use the bot again</td></tr>
   <tr><td><code>/blacklisted</code></td><td>Show the global blacklist</td></tr>
-  <tr><td><code>/eval</code></td><td>Execute Go code snippets</td></tr>
   <tr><td><code>/maintenance</code></td><td>Manage the bot's maintenance mode</td></tr>
   <tr><td><code>/restart</code></td><td>Restart the bot</td></tr>
   <tr><td><code>/sh</code></td><td>Run shell commands</td></tr>
@@ -766,6 +765,7 @@ help_sudo: |
   <tr><td><code>/active</code></td><td>Show total active chats</td></tr>
   <tr><td><code>/stats</code></td><td>Display bot and system stats</td></tr>
   <tr><td><code>/logs</code></td><td>Get the system logs</td></tr>
+  <tr><td><code>/json</code></td><td>Show a message's JSON structure</td></tr>
   <tr><td><code>/autoleave</code></td><td>Toggle automatic chat leaving</td></tr>
   <tr><td><code>/logger</code></td><td>Enable or disable the logger</td></tr>
   </table>
@@ -814,7 +814,6 @@ help_public: |
   <tr><td><code>/bug</code></td><td>Report an issue or problem</td></tr>
   <tr><td><code>/position</code></td><td>Show the current track's timestamp</td></tr>
   <tr><td><code>/reload</code></td><td>Reload admin or cache data</td></tr>
-  <tr><td><code>/json</code></td><td>Show a message's JSON structure</td></tr>
   <tr><td><code>/sudolist</code></td><td>View the sudo user list</td></tr>
   </table>
   <footer>Use /help &lt;command&gt; for details on any command.</footer>

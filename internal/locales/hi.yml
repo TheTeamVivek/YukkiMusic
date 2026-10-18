@@ -747,7 +747,6 @@ help_owner: |
   <tr><td><code>/blockchat</code></td><td>चैट में बॉट का उपयोग होने से रोकें</td></tr>
   <tr><td><code>/unblockchat</code></td><td>चैट में फिर से बॉट का उपयोग होने दें</td></tr>
   <tr><td><code>/blacklisted</code></td><td>वैश्विक ब्लैकलिस्ट दिखाएँ</td></tr>
-  <tr><td><code>/eval</code></td><td>गो (Go) कोड खण्डों का निष्पादन करें</td></tr>
   <tr><td><code>/maintenance</code></td><td>सहायक की अनुरक्षण विधा का प्रबन्धन करें</td></tr>
   <tr><td><code>/restart</code></td><td>सहायक को पुनः आरम्भ करें</td></tr>
   <tr><td><code>/sh</code></td><td>शैल (shell) आदेश चलाएँ</td></tr>
@@ -764,6 +763,7 @@ help_sudo: |
   <tr><td><code>/logger</code></td><td>अभिलेखक को सक्षम या अक्षम करें</td></tr>
   <tr><td><code>/stats</code></td><td>सहायक एवं प्रणाली के आँकड़े प्रदर्शित करें</td></tr>
   <tr><td><code>/logs</code></td><td>प्रणाली के अभिलेख प्राप्त करें</td></tr>
+  <tr><td><code>/json</code></td><td>सन्देश की जे.एस.ओ.एन. संरचना दिखाएँ</td></tr>
   </table>
   <footer>किसी भी आदेश की जानकारी के लिए /help &lt;command&gt; का उपयोग करें।</footer>
 
@@ -810,7 +810,6 @@ help_public: |
   <tr><td><code>/bug</code></td><td>किसी समस्या या त्रुटि की सूचना दें</td></tr>
   <tr><td><code>/position</code></td><td>वर्तमान गाने का समय-चिह्न दिखाएँ</td></tr>
   <tr><td><code>/reload</code></td><td>प्रशासक या संचित सूचना को पुनः लोड करें</td></tr>
-  <tr><td><code>/json</code></td><td>सन्देश की जे.एस.ओ.एन. संरचना दिखाएँ</td></tr>
   <tr><td><code>/sudolist</code></td><td>विशेषाधिकारी उपयोगकर्ताओं की सूची देखें</td></tr>
   </table>
 

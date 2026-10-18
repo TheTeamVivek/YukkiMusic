@@ -747,7 +747,6 @@ help_owner: |
   <tr><td><code>/blockchat</code></td><td>منع الدردشة من استخدام البوت</td></tr>
   <tr><td><code>/unblockchat</code></td><td>السماح للدردشة باستخدام البوت مرة أخرى</td></tr>
   <tr><td><code>/blacklisted</code></td><td>عرض القائمة السوداء العامة</td></tr>
-  <tr><td><code>/eval</code></td><td>تنفيذ شيفرات Go</td></tr>
   <tr><td><code>/maintenance</code></td><td>إدارة وضع الصيانة</td></tr>
   <tr><td><code>/restart</code></td><td>إعادة تشغيل المساعد الآلي</td></tr>
   <tr><td><code>/sh</code></td><td>تشغيل أوامر القشرة (Shell)</td></tr>
@@ -764,6 +763,7 @@ help_sudo: |
   <tr><td><code>/logger</code></td><td>تفعيل أو تعطيل السجل</td></tr>
   <tr><td><code>/stats</code></td><td>عرض إحصائيات النظام والمساعد</td></tr>
   <tr><td><code>/logs</code></td><td>الحصول على سجلات النظام</td></tr>
+  <tr><td><code>/json</code></td><td>عرض بنية JSON للرسالة</td></tr>
   </table>
   <footer>استخدم /help &lt;command&gt; للحصول على تفاصيل حول أي أمر.</footer>
 
@@ -810,7 +810,6 @@ help_public: |
   <tr><td><code>/bug</code></td><td>الإبلاغ عن مشكلة أو خطأ</td></tr>
   <tr><td><code>/position</code></td><td>عرض التوقيت الحالي للمقطع</td></tr>
   <tr><td><code>/reload</code></td><td>إعادة تحميل بيانات المشرفين أو الذاكرة المؤقتة</td></tr>
-  <tr><td><code>/json</code></td><td>عرض بنية JSON للرسالة</td></tr>
   <tr><td><code>/sudolist</code></td><td>عرض قائمة المساعدين</td></tr>
   </table>
 
