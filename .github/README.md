@@ -4,8 +4,6 @@
 
 **⚡ A blazing-fast, reliable Telegram bot for streaming music in group voice chats — built with Go.**
 
-<br>
-
 [![GitHub Stars](https://img.shields.io/github/stars/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Stars&color=FFD700&logo=github&logoColor=white)](https://github.com/TheTeamVivek/YukkiMusic/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/TheTeamVivek/YukkiMusic?style=for-the-badge&label=Forks&color=00C853&logo=github&logoColor=white)](https://github.com/TheTeamVivek/YukkiMusic/fork)
 [![Go Version](https://img.shields.io/badge/Go-1.27+-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
