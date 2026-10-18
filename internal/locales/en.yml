@@ -711,8 +711,6 @@ stream_now_playing: |
   <b>▫ Requested by:</b> {by}
 
 # 👑 Sudo / Owner Join Messages
-sudo_join_owner: "{emoji:👑} {user} — owner of {bot} — just entered the chat."
-sudo_join_sudo: "{emoji:🛡️} {user}, a sudo user of {bot}, just joined the chat."
 
 supergroup_needed: |
   This chat (ID: <code>{chat_id}</code>) is not a SuperGroup yet.

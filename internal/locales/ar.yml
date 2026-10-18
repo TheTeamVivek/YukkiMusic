@@ -707,8 +707,6 @@ stream_now_playing: |
   <b>▫ طلب بواسطة:</b> {by}
 
 # 👑 Sudo / Owner Join Messages
-sudo_join_owner: "{emoji:👑} {user} — مالك {bot} — دخل المحادثة للتو."
-sudo_join_sudo: "{emoji:🛡️} {user}، وهو مساعد في {bot}، انضم للمحادثة للتو."
 
 supergroup_needed: |
   هذه الدردشة (ID: <code>{chat_id}</code>) ليست SuperGroup بعد.

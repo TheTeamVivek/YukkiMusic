@@ -707,8 +707,6 @@ stream_now_playing: |
   <b>▫ अनुरुद्धकर्ता:</b> {by}
 
 # 👑 Sudo / Owner Join Messages
-sudo_join_owner: "{emoji:👑} {user} — {bot} के स्वामी — अभी वार्तालाप में प्रविष्ट हुए।"
-sudo_join_sudo: "{emoji:🛡️} {user}, {bot} के एक विशेषाधिकारी, अभी वार्तालाप में सम्मिलित हुए।"
 
 supergroup_needed: |
   यह चैट (ID: <code>{chat_id}</code>) अभी SuperGroup नहीं है।

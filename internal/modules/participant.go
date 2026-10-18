@@ -125,11 +125,6 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 		}
 
 		utils.RemoveChatAdmin(c, chatID, userID)
-
-	case oldStatus == "left" &&
-		(newStatus == "member" || newStatus == "administrator" || newStatus == "creator"):
-
-		handleSudoJoin(c, chatID, userID)
 	}
 
 	if state != nil && state.Assistant != nil && userID == state.Assistant.Self.ID {
@@ -155,41 +150,6 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 	}
 
 	return nil
-}
-
-func handleSudoJoin(c *td.Client, chatID, userID int64) {
-	var msgKey string
-
-	if userID == config.OwnerID {
-		msgKey = "sudo_join_owner"
-	} else {
-		isSudo, err := database.IsSudo(userID)
-		if err != nil {
-			utils.Log.Errorf("IsSudo failed for user %d: %v", userID, err)
-			return
-		}
-		if !isSudo {
-			return
-		}
-		msgKey = "sudo_join_sudo"
-	}
-
-	user, _ := c.GetUser(userID)
-	userMention := mention(user, userID)
-
-	botMention := "bot"
-	if c.Me != nil {
-		botMention = mention(c.Me, c.Me.Id)
-	}
-
-	text := F(chatID, msgKey, locales.Arg{
-		"user": userMention,
-		"bot":  botMention,
-	})
-
-	if _, err := c.SendMessage(chatID, text, nil); err != nil {
-		utils.Log.Error(err.Error())
-	}
 }
 
 func handleAssistantRestriction(

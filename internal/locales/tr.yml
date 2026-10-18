@@ -704,8 +704,6 @@ stream_now_playing: |
   <b>▫ İsteyen:</b> {by}
 
 # 👑 Sudo / Owner Join Messages
-sudo_join_owner: "{emoji:👑} {bot} sahibi — {user} — az önce sohbete katıldı."
-sudo_join_sudo: "{emoji:🛡️} {bot} sudo kullanıcısı — {user} — az önce sohbete katıldı."
 
 supergroup_needed: |
   Bu sohbet (ID: <code>{chat_id}</code>) henüz bir SuperGroup değil.
