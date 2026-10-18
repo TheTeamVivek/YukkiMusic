@@ -50,6 +50,9 @@ This action cannot be undone. Use <code>/pause</code> for temporary stops.`
 }
 
 func stopHandler(c *td.Client, m *td.Message) error {
+	if m.Args() != "" {
+		return nil
+	}
 	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
 		return nil
 	}
@@ -57,6 +60,9 @@ func stopHandler(c *td.Client, m *td.Message) error {
 }
 
 func cstopHandler(c *td.Client, m *td.Message) error {
+	if m.Args() != "" {
+		return nil
+	}
 	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
 		return nil
 	}
@@ -97,12 +103,13 @@ func handleStop(c *td.Client, m *td.Message, cplay bool) error {
 
 	scheduleOldPlayingMessage(r)
 	core.Rooms.Delete(r.ChatID)
+	sender, _ := m.GetUser(c)
 	_, rerr := m.ReplyText(
 		c,
 		F(
 			m.ChatID(),
 			"stopped",
-			locales.Arg{"user": mention(nil, m.SenderID())},
+			locales.Arg{"user": mention(sender, m.SenderID())},
 		),
 		nil,
 	)
