@@ -93,7 +93,7 @@ func (r *Room) Play(t *state.Track, path string, force ...bool) error {
 	return nil
 }
 
-// Pause pauses playback with optional auto-resume
+// Pause pauses playback until Resume is called.
 func (r *Room) Pause() error {
 	if r.Destroyed() {
 		return ErrRoomDestroyed

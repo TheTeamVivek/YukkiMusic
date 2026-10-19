@@ -256,9 +256,7 @@ func handlePauseAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room)
 
 	if err := r.Pause(); err != nil {
 		utils.Log.Errorf("Pause failed: %v", err)
-		u.Answer(c, F(chatID, "room_pause_failed", locales.Arg{
-			"error": err.Error(),
-		}), &td.CallbackAnswerOpts{ShowAlert: true})
+		u.Answer(c, F(chatID, "cb_pause_failed"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
@@ -269,7 +267,7 @@ func handlePauseAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room)
 	u.Answer(c, F(chatID, "cb_pause_success", locales.Arg{
 		"position": utils.FormatDuration(r.Position()),
 	}), &td.CallbackAnswerOpts{ShowAlert: true})
-	updatePlaybackMessage(c, u, r, "paused")
+	applyActionEdit(c, u, r, "paused", "pause_success", core.GetPauseToggle(chatID, r))
 	return nil
 }
 
@@ -291,7 +289,7 @@ func handleResumeAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 	u.Answer(c, F(chatID, "cb_resume_success", locales.Arg{
 		"position": utils.FormatDuration(r.Position()),
 	}), &td.CallbackAnswerOpts{ShowAlert: true})
-	updatePlaybackMessage(c, u, r, "playing")
+	applyActionEdit(c, u, r, "playing", "resume_success", core.GetPauseToggle(chatID, r))
 	return nil
 }
 
@@ -407,19 +405,18 @@ func handleMuteAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) 
 	chatID := u.ChatId
 
 	if r.Muted() {
-		u.Answer(c, F(chatID, "mute_already_muted"), &td.CallbackAnswerOpts{ShowAlert: true})
+		u.Answer(c, F(chatID, "cb_already_muted"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	if err := r.Mute(); err != nil {
-		u.Answer(c, F(chatID, "mute_failed", locales.Arg{
-			"error": err.Error(),
-		}), &td.CallbackAnswerOpts{ShowAlert: true})
+		utils.Log.Errorf("Mute failed: %v", err)
+		u.Answer(c, F(chatID, "cb_mute_failed"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	u.Answer(c, F(chatID, "cb_mute_success"), &td.CallbackAnswerOpts{ShowAlert: true})
-	updatePlaybackMessage(c, u, r, "muted")
+	applyActionEdit(c, u, r, "muted", "mute_success", core.GetMuteToggle(chatID, r))
 	return nil
 }
 
@@ -427,32 +424,77 @@ func handleUnmuteAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room
 	chatID := u.ChatId
 
 	if !r.Muted() {
-		u.Answer(c, F(chatID, "unmute_already"), &td.CallbackAnswerOpts{ShowAlert: true})
+		u.Answer(c, F(chatID, "cb_already_unmuted"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	if err := r.Unmute(); err != nil {
-		u.Answer(c, F(chatID, "unmute_failed", locales.Arg{
-			"error": err.Error(),
-		}), &td.CallbackAnswerOpts{ShowAlert: true})
+		utils.Log.Errorf("Unmute failed: %v", err)
+		u.Answer(c, F(chatID, "cb_unmute_failed"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	u.Answer(c, F(chatID, "cb_unmute_success"), &td.CallbackAnswerOpts{ShowAlert: true})
-	updatePlaybackMessage(c, u, r, "playing")
+	applyActionEdit(c, u, r, "unmuted", "unmute_success", core.GetMuteToggle(chatID, r))
 	return nil
 }
 
-func updatePlaybackMessage(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room, state string) {
+func applyActionEdit(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room, state, successKey string, toggle td.ReplyMarkup) {
+	msg, err := u.GetMessage(c)
+	if err != nil || msg == nil {
+		return
+	}
+
+	status := r.StatusMsg()
+	if status != nil && status.Id == msg.Id && status.ChatId == msg.ChatId {
+		updatePlaybackMessageFor(c, msg, u.SenderUserId, r, state)
+		return
+	}
+
 	track := r.Track()
 	if track == nil {
+		updatePlaybackMessageFor(c, status, u.SenderUserId, r, state)
 		return
 	}
 
 	chatID := u.ChatId
-	safeTitle := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
 	sender, _ := c.GetUser(u.SenderUserId)
-	mention := mention(sender, u.SenderUserId)
+
+	speedLine := ""
+	if sp := r.Speed(); sp != 1.0 {
+		speedLine = `<tr><td colspan="2">` + F(chatID, "speed_line", locales.Arg{
+			"speed": fmt.Sprintf("%.2f", sp),
+		}) + `</td></tr>`
+	}
+
+	text := F(chatID, successKey, locales.Arg{
+		"title":      utils.EscapeHTML(utils.ShortTitle(track.Title, 25)),
+		"url":        utils.EscapeHTML(track.URL),
+		"position":   utils.FormatDuration(r.Position()),
+		"duration":   utils.FormatDuration(track.Duration),
+		"user":       mention(sender, u.SenderUserId),
+		"speed_line": speedLine,
+	})
+
+	if _, err := msg.EditRichMessageHTML(c, text, &td.EditRichTextOpts{
+		ReplyMarkup: toggle,
+	}); err != nil {
+		utils.Log.Errorf("Edit error: %v", err)
+	}
+
+	updatePlaybackMessageFor(c, status, u.SenderUserId, r, state)
+}
+
+func updatePlaybackMessageFor(c *td.Client, msg *td.Message, userID int64, r *core.Room, state string) {
+	track := r.Track()
+	if track == nil || msg == nil {
+		return
+	}
+
+	chatID := msg.ChatID()
+	safeTitle := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
+	sender, _ := c.GetUser(userID)
+	mention := mention(sender, userID)
 
 	var msgText string
 	switch state {
@@ -477,23 +519,25 @@ func updatePlaybackMessage(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.R
 			"title": safeTitle,
 			"user":  mention,
 		})
+	case "unmuted":
+		msgText = F(chatID, "cb_unmute_message", locales.Arg{
+			"url":   track.URL,
+			"title": safeTitle,
+			"user":  mention,
+		})
 	}
 
 	markup := core.GetPlayMarkup(chatID, r, false)
 
-	msg, err := u.GetMessage(c)
-	if err != nil || msg == nil {
-		return
-	}
-
+	var err error
 	switch {
 	case isPhotoMessage(msg):
-		_, err = u.EditMessageCaption(c, msgText, &td.EditMessageCaptionOpts{
+		_, err = msg.EditCaption(c, msgText, &td.EditMessageCaptionOpts{
 			ParseMode:   "HTML",
 			ReplyMarkup: markup,
 		})
 	default:
-		_, err = u.EditMessageText(c, msgText, &td.EditMessageTextOpts{
+		_, err = msg.EditText(c, msgText, &td.EditMessageTextOpts{
 			ParseMode:             "HTML",
 			ReplyMarkup:           markup,
 			DisableWebPagePreview: true,

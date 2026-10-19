@@ -18,8 +18,11 @@
 package modules
 
 import (
+	"fmt"
+
 	td "github.com/AshokShau/gotdbot"
 
+	"yukkimusic/internal/core"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
@@ -67,7 +70,9 @@ func handleMute(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	if r.Muted() {
-		_, err := m.ReplyText(c, F(chatID, "mute_already_muted"), nil)
+		_, err := m.ReplyRichMessageHTML(c, F(chatID, "mute_already_muted"), &td.SendRichTextOpts{
+			ReplyMarkup: core.GetMuteToggle(chatID, r),
+		})
 		return err
 	}
 
@@ -77,14 +82,30 @@ func handleMute(c *td.Client, m *td.Message, cplay bool) error {
 	muteErr := r.Mute()
 
 	if muteErr != nil {
-		_, err := m.ReplyText(c, F(chatID, "mute_failed", locales.Arg{
-			"error": muteErr.Error(),
+		_, err := m.ReplyRichMessageHTML(c, F(chatID, "mute_failed", locales.Arg{
+			"error": utils.EscapeHTML(muteErr.Error()),
 		}), nil)
 		return err
 	}
-	_, rerr := m.ReplyText(c, F(chatID, "mute_success", locales.Arg{
-		"title": utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25)),
-		"user":  mention,
-	}), nil)
-	return rerr
+	speedLine := ""
+	if sp := r.Speed(); sp != 1.0 {
+		speedLine = `<tr><td colspan="2">` + F(chatID, "speed_line", locales.Arg{
+			"speed": fmt.Sprintf("%.2f", sp),
+		}) + `</td></tr>`
+	}
+
+	_, rerr := m.ReplyRichMessageHTML(c, F(chatID, "mute_success", locales.Arg{
+		"title":      utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25)),
+		"url":        utils.EscapeHTML(r.Track().URL),
+		"user":       mention,
+		"speed_line": speedLine,
+	}), &td.SendRichTextOpts{
+		ReplyMarkup: core.GetMuteToggle(chatID, r),
+	})
+	if rerr != nil {
+		return rerr
+	}
+
+	updatePlaybackMessageFor(c, r.StatusMsg(), m.SenderID(), r, "muted")
+	return nil
 }

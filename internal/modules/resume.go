@@ -22,6 +22,7 @@ import (
 
 	td "github.com/AshokShau/gotdbot"
 
+	"yukkimusic/internal/core"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
@@ -34,7 +35,7 @@ func init() {
 
 <b>⚙️ Behavior:</b>
 • Continues from last paused position
-• Cancels auto-resume timer if active
+• Now playing card updates instantly
 
 <b>⚠️ Notes:</b>
 • Can only resume if currently paused
@@ -51,62 +52,54 @@ func cresumeHandler(c *td.Client, m *td.Message) error {
 }
 
 func handleResume(c *td.Client, m *td.Message, cplay bool) error {
-	if !isSuperGroup(c, m) {
-		return nil
-	}
-
-	if !filterAuthUsers(c, m) {
-		return nil
+	r, err := activeRoomFor(c, m, cplay)
+	if err != nil || r == nil {
+		return err
 	}
 
 	chatID := m.ChatID()
 
-	r, err := getEffectiveRoom(m.ChatID(), cplay)
-	if err != nil {
-		_, err := m.ReplyText(c, err.Error(), nil)
-		return err
-	}
-
-	if !r.Active() {
-		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
-		return err
-	}
-
 	if !r.Paused() {
-		_, err := m.ReplyText(c, F(chatID, "resume_already_playing"), nil)
+		_, err := m.ReplyRichMessageHTML(c, F(chatID, "resume_already_playing"), &td.SendRichTextOpts{
+			ReplyMarkup: core.GetPauseToggle(chatID, r),
+		})
 		return err
 	}
 
 	t := r.Track()
 	if err := r.Resume(); err != nil {
-		if _, rerr := m.ReplyText(c, F(chatID, "resume_failed", locales.Arg{
-			"error": err,
-		}), nil); rerr != nil {
-			return rerr
-		}
-	} else {
-		title := utils.EscapeHTML(utils.ShortTitle(t.Title, 25))
-		pos := utils.FormatDuration(r.Position())
-		total := utils.FormatDuration(t.Duration)
-		sender, _ := m.GetUser(c)
-		mention := mention(sender, m.SenderID())
-
-		speedLine := ""
-		if sp := r.Speed(); sp != 1.0 {
-			speedLine = F(chatID, "speed_line", locales.Arg{
-				"speed": fmt.Sprintf("%.2f", r.Speed()),
-			})
-		}
-		if _, rerr := m.ReplyText(c, F(chatID, "resume_success", locales.Arg{
-			"title":      title,
-			"position":   pos,
-			"duration":   total,
-			"user":       mention,
-			"speed_line": speedLine,
-		}), nil); rerr != nil {
-			return rerr
-		}
+		_, rerr := m.ReplyRichMessageHTML(c, F(chatID, "resume_failed", locales.Arg{
+			"error": utils.EscapeHTML(err.Error()),
+		}), nil)
+		return rerr
 	}
 
+	title := utils.EscapeHTML(utils.ShortTitle(t.Title, 25))
+	pos := utils.FormatDuration(r.Position())
+	total := utils.FormatDuration(t.Duration)
+	sender, _ := m.GetUser(c)
+	mention := mention(sender, m.SenderID())
+
+	speedLine := ""
+	if sp := r.Speed(); sp != 1.0 {
+		speedLine = `<tr><td colspan="2">` + F(chatID, "speed_line", locales.Arg{
+			"speed": fmt.Sprintf("%.2f", sp),
+		}) + `</td></tr>`
+	}
+
+	if _, rerr := m.ReplyRichMessageHTML(c, F(chatID, "resume_success", locales.Arg{
+		"title":      title,
+		"url":        utils.EscapeHTML(t.URL),
+		"position":   pos,
+		"duration":   total,
+		"user":       mention,
+		"speed_line": speedLine,
+	}), &td.SendRichTextOpts{
+		ReplyMarkup: core.GetPauseToggle(chatID, r),
+	}); rerr != nil {
+		return rerr
+	}
+
+	updatePlaybackMessageFor(c, r.StatusMsg(), m.SenderID(), r, "playing")
 	return nil
 }

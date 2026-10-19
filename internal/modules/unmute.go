@@ -22,6 +22,7 @@ import (
 
 	td "github.com/AshokShau/gotdbot"
 
+	"yukkimusic/internal/core"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
@@ -34,7 +35,6 @@ func init() {
 
 <b>⚙️ Behavior:</b>
 • Restores audio immediately
-• Cancels auto-unmute timer if active
 • Shows current playback info`
 }
 
@@ -73,7 +73,9 @@ func handleUnmute(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	if !r.Muted() {
-		_, err := m.ReplyText(c, F(chatID, "unmute_already"), nil)
+		_, err := m.ReplyRichMessageHTML(c, F(chatID, "unmute_already"), &td.SendRichTextOpts{
+			ReplyMarkup: core.GetMuteToggle(chatID, r),
+		})
 		return err
 	}
 
@@ -82,25 +84,32 @@ func handleUnmute(c *td.Client, m *td.Message, cplay bool) error {
 	mention := mention(sender, m.SenderID())
 
 	if err := r.Unmute(); err != nil {
-		_, err := m.ReplyText(c, F(chatID, "unmute_failed", locales.Arg{
-			"error": err.Error(),
+		_, rerr := m.ReplyRichMessageHTML(c, F(chatID, "unmute_failed", locales.Arg{
+			"error": utils.EscapeHTML(err.Error()),
 		}), nil)
-		return err
+		return rerr
 	}
 
-	// optional speed line
-	var speedOpt string
+	speedLine := ""
 	if sp := r.Speed(); sp != 1.0 {
-		speedOpt = F(chatID, "speed_line", locales.Arg{
+		speedLine = `<tr><td colspan="2">` + F(chatID, "speed_line", locales.Arg{
 			"speed": fmt.Sprintf("%.2f", sp),
-		})
+		}) + `</td></tr>`
 	}
 
 	msg := F(chatID, "unmute_success", locales.Arg{
 		"title":      title,
+		"url":        utils.EscapeHTML(r.Track().URL),
 		"user":       mention,
-		"speed_line": speedOpt,
+		"speed_line": speedLine,
 	})
-	_, rerr := m.ReplyText(c, msg, nil)
-	return rerr
+	_, rerr := m.ReplyRichMessageHTML(c, msg, &td.SendRichTextOpts{
+		ReplyMarkup: core.GetMuteToggle(chatID, r),
+	})
+	if rerr != nil {
+		return rerr
+	}
+
+	updatePlaybackMessageFor(c, r.StatusMsg(), m.SenderID(), r, "unmuted")
+	return nil
 }

@@ -4,6 +4,10 @@ name: "🇮🇳 हिन्दी"
 CONFIRM_RESUME_BTN: "{emoji:▶️} पुनः चलाएँ"
 CONFIRM_UNMUTE_BTN: "{emoji:🔊} सशब्द"
 CONFIRM_STOP_BTN: "{emoji:⏹️} रोकें"
+PAUSE_BTN: "{emoji:⏸️} विराम"
+RESUME_BTN: "{emoji:▶️} पुनः चलाएँ"
+MUTE_BTN: "{emoji:🔇} निःशब्द"
+UNMUTE_BTN: "{emoji:🔊} सशब्द"
 ADD_ME_BTN: "{emoji:⚡} मुझे अपने समूह में जोड़ें"
 BROADCAST_CANCEL_BTN: "{emoji:🚫} प्रसारण रद्द करें"
 CLOSE_BTN: "बन्द करें"
@@ -145,6 +149,7 @@ cb_pause_message: |
 # Resume callback
 cb_already_playing: "ℹ️ संगीत पूर्व से ही चल रहा है।"
 cb_resume_failed: "❌ संगीत पुनः आरम्भ करने में विफल।"
+cb_pause_failed: "❌ संगीत विराम देने में विफल।"
 cb_resume_success: "▶️ {position} पर पुनः आरम्भ।"
 cb_resume_message: |
   <b>{emoji:🎵} अब चल रहा है:</b>
@@ -178,6 +183,16 @@ cb_mute_message: |
   <b>▫ निःशब्दकर्ता:</b> {user}
 
 cb_unmute_success: "🔊 सशब्द किया गया।"
+cb_unmute_message: |
+  <b>{emoji:🔊} संगीत सशब्द</b>
+
+  <b>▫ संगीत:</b> <a href="{url}">{title}</a>
+  <b>▫ सशब्दकर्ता:</b> {user}
+
+cb_already_muted: "🔇 गाना पहले से ही निःशब्द है।"
+cb_already_unmuted: "🔊 गाना निःशब्द नहीं है।"
+cb_mute_failed: "❌ संगीत निःशब्द करने में विफल।"
+cb_unmute_failed: "❌ संगीत सशब्द करने में विफल।"
 
 # 🗑️ Delete auth
 del_auth_not_authorized: "{emoji:⚠️} वह उपयोगकर्ता अधिकृत नहीं है — हटाने के लिए कुछ भी नहीं है।"
@@ -369,13 +384,20 @@ move_invalid_indexes_max: "{emoji:⚠️} प्रतीक्षा सूच�
 move_success: "{emoji:✅} संगीत को स्थिति {from} से {to} पर {user} द्वारा स्थानान्तरित किया गया।"
 
 # 🔇 Mute messages
-mute_already_muted: "🔇 <b>पूर्व से ही निःशब्द</b>\nइस वार्तालाप में संगीत पूर्व से ही निःशब्द है।\nक्या आप इसे सशब्द करना चाहेंगे?"
-mute_failed: "❌ <b>संगीत निःशब्द करना विफल</b>\nत्रुटि: <code>{error}</code>"
+mute_already_muted: |
+  <h3>{emoji:🔇} पूर्व से ही निःशब्द</h3>
+  <p>इस वार्तालाप में संगीत पूर्व से ही निःशब्द है।</p>
+  <p>क्या आप इसे सशब्द करना चाहेंगे?</p>
+mute_failed: |
+  <h3>{emoji:❌} संगीत निःशब्द करना विफल</h3>
+  <p><b>त्रुटि:</b> <code>{error}</code></p>
 mute_success: |
-  {emoji:🔇} <b>संगीत निःशब्द किया गया</b>
-
-  {emoji:🎵} संगीत: {title}
-  {emoji:👤} निःशब्दकर्ता: {user}
+  <h3>{emoji:🔇} संगीत निःशब्द किया गया</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} संगीत</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:👤} निःशब्दकर्ता</td><td>{user}</td></tr>
+  {speed_line}
+  </table>
 
 no_song_query: |
   <b>{emoji:🎵} अरे! बजाने के लिए कुछ नहीं मिला।</b>
@@ -399,15 +421,17 @@ only_sudo: "{emoji:⚠️} केवल विशेषाधिकारी य
 only_sudo_cb: "⚠️ केवल विशेषाधिकारी या सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
 
 pause_already: |
-  {emoji:⏸️} <b>पूर्व से ही विराम</b>
-  संगीत पूर्व से ही विराम स्थिति में है।
+  <h3>{emoji:⏸️} पूर्व से ही विराम</h3>
+  <p>संगीत पूर्व से ही विराम स्थिति में है।</p>
 
 pause_success: |
-  {emoji:⏸️} <b>संगीत विराम</b>
-
-  {emoji:🎵} संगीत: {title}
-  {emoji:⏱️} स्थिति: {position} / {duration}
-  {emoji:👤} विरामकर्ता: {user}
+  <h3>{emoji:⏸️} संगीत विराम</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} संगीत</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:⏱️} स्थिति</td><td>{position} / {duration}</td></tr>
+  <tr><td>{emoji:👤} विरामकर्ता</td><td>{user}</td></tr>
+  {speed_line}
+  </table>
 
 play_single_track_too_long: |
   {emoji:⚠️} आप {limit_mins} मिनट से अधिक लम्बे गीत नहीं चला सकते।
@@ -508,15 +532,23 @@ replay_success: |
   {emoji:⚙️} गति: <b>{speed}x</b>
 
 # ▶️ Resume
-resume_already_playing: "ℹ️ <b>पूर्व से ही चल रहा है</b>\nइस वार्तालाप में संगीत पूर्व से ही चल रहा है।\nक्या आप इसे विराम देना चाहेंगे?"
-resume_failed: "{emoji:❌} <b>संगीत पुनः आरम्भ विफल</b>\nत्रुटि: <code>{error}</code>"
-resume_success: |
-  {emoji:▶️} <b>संगीत पुनः आरम्भ किया जा रहा है</b>
+resume_already_playing: |
+  <h3>ℹ️ पूर्व से ही चल रहा है</h3>
+  <p>इस वार्तालाप में संगीत पूर्व से ही चल रहा है।</p>
+  <p>क्या आप इसे विराम देना चाहेंगे?</p>
 
-  {emoji:🎵} शीर्षक: {title}
-  {emoji:📍} स्थिति: {position} / {duration}
-  {emoji:👤} पुनः आरम्भकर्ता: {user}
+resume_failed: |
+  <h3>{emoji:❌} संगीत पुनः आरम्भ विफल</h3>
+  <p><b>त्रुटि:</b> <code>{error}</code></p>
+
+resume_success: |
+  <h3>{emoji:▶️} संगीत पुनः आरम्भ किया जा रहा है</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} शीर्षक</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:📍} स्थिति</td><td>{position} / {duration}</td></tr>
+  <tr><td>{emoji:👤} पुनः आरम्भकर्ता</td><td>{user}</td></tr>
   {speed_line}
+  </table>
 
 restart: "{emoji:♻️} पुनः आरम्भ हो रहा है..."
 restart_exepath_fail: "{emoji:❌} निष्पादन योग्य पथ प्राप्त करने में विफल: {error}"
@@ -535,7 +567,9 @@ room_not_active_cb: "⚠️ वर्तमान में कुछ भी न
 room_no_active: "⚠️ बॉट वॉइस चैट में कुछ नहीं बजा रहा है। पहले कोई गाना चलाएँ।"
 
 room_already_paused: "⏸️ संगीत पूर्व से ही विराम स्थिति में है। निरन्तरता के लिए ▶️ 'पुनः चलाएँ' दबाएँ।"
-room_pause_failed: "❌ संगीत विराम विफल।\n\n<i>{error}</i>"
+room_pause_failed: |
+  <h3>❌ संगीत विराम विफल</h3>
+  <p><i>{error}</i></p>
 
 
 settings_btn_adminmode: "🛡️ एडमिन मोड"
@@ -715,15 +749,20 @@ supergroup_needed: |
 
   अगर फिर भी कोई समस्या हो, तो हमारे <a href="{support_group}">support group</a> से जुड़ें।
 
-unmute_already: "ℹ️ <b>पूर्व से ही सशब्द</b>\nइस वार्तालाप में संगीत निःशब्द नहीं है।"
-unmute_failed: "❌ <b>संगीत सशब्द करना विफल</b>\nत्रुटि: <code>{error}</code>"
+unmute_already: |
+  <h3>ℹ️ पूर्व से ही सशब्द</h3>
+  <p>इस वार्तालाप में संगीत निःशब्द नहीं है।</p>
+  <p>क्या आप इसे निःशब्द करना चाहेंगे?</p>
+unmute_failed: |
+  <h3>{emoji:❌} संगीत सशब्द करना विफल</h3>
+  <p><b>त्रुटि:</b> <code>{error}</code></p>
 unmute_success: |
-  {emoji:🔊} <b>संगीत सशब्द किया गया</b>
-
-  {emoji:🎵} संगीत: {title}
-  {emoji:👤} सशब्दकर्ता: {user}
+  <h3>{emoji:🔊} संगीत सशब्द किया गया</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} संगीत</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:👤} सशब्दकर्ता</td><td>{user}</td></tr>
   {speed_line}
-
+  </table>
 
 # 🔊 Voice Chat Events
 voicechat_ended: "<b>{emoji:⚠️} दृश्य-ध्वनि वार्तालाप समाप्त</b>\n\n<i>{emoji:⏰} अवधि: {duration}</i>"

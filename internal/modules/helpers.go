@@ -56,6 +56,31 @@ func getEffectiveRoom(chatID int64, cplay bool) (*core.Room, error) {
 	return r, nil
 }
 
+func activeRoomFor(c *td.Client, m *td.Message, cplay bool) (*core.Room, error) {
+	if !isSuperGroup(c, m) {
+		return nil, nil
+	}
+
+	if !filterAuthUsers(c, m) {
+		return nil, nil
+	}
+
+	chatID := m.ChatID()
+
+	r, err := getEffectiveRoom(chatID, cplay)
+	if err != nil {
+		_, rerr := m.ReplyText(c, err.Error(), nil)
+		return nil, rerr
+	}
+
+	if !r.Active() {
+		_, rerr := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return nil, rerr
+	}
+
+	return r, nil
+}
+
 func shouldShowThumb(chatID int64) bool {
 	noThumb, err := database.ThumbnailsDisabled(chatID)
 	if err != nil {

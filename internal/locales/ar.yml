@@ -4,6 +4,10 @@ name: "🇸🇦 العربية"
 CONFIRM_RESUME_BTN: "{emoji:▶️} استئناف"
 CONFIRM_UNMUTE_BTN: "{emoji:🔊} إلغاء الكتم"
 CONFIRM_STOP_BTN: "{emoji:⏹️} إيقاف"
+PAUSE_BTN: "{emoji:⏸️} إيقاف مؤقت"
+RESUME_BTN: "{emoji:▶️} استئناف"
+MUTE_BTN: "{emoji:🔇} كتم"
+UNMUTE_BTN: "{emoji:🔊} إلغاء الكتم"
 ADD_ME_BTN: "{emoji:⚡} أضفني إلى مجموعتك"
 BROADCAST_CANCEL_BTN: "{emoji:🚫} إلغاء البث"
 CLOSE_BTN: "إغلاق"
@@ -147,6 +151,7 @@ cb_pause_message: |
 # Resume callback
 cb_already_playing: "ℹ️ المقطع قيد التشغيل بالفعل."
 cb_resume_failed: "❌ فشل استئناف التشغيل."
+cb_pause_failed: "❌ فشل إيقاف التشغيل مؤقتاً."
 cb_resume_success: "▶️ تم الاستئناف عند {position}."
 cb_resume_message: |
   <b>{emoji:🎵} جاري التشغيل الآن:</b>
@@ -180,6 +185,16 @@ cb_mute_message: |
   <b>▫ كُتم بواسطة:</b> {user}
 
 cb_unmute_success: "🔊 تم إلغاء الكتم."
+cb_unmute_message: |
+  <b>{emoji:🔊} تم إلغاء كتم التشغيل</b>
+
+  <b>▫ المقطع:</b> <a href="{url}">{title}</a>
+  <b>▫ إلغاء الكتم بواسطة:</b> {user}
+
+cb_already_muted: "🔇 المسار مكتوم بالفعل."
+cb_already_unmuted: "🔊 المسار غير مكتوم."
+cb_mute_failed: "❌ فشل كتم التشغيل."
+cb_unmute_failed: "❌ فشل إلغاء كتم التشغيل."
 
 # 🗑️ Delete auth
 del_auth_not_authorized: "{emoji:⚠️} هذا المستخدم غير مصرح له أصلاً — لا يوجد ما يتم حذفه."
@@ -369,13 +384,20 @@ move_invalid_indexes_max: "{emoji:⚠️} قائمة الانتظار تحتوي
 move_success: "{emoji:✅} تم نقل المقطع من المركز {from} إلى {to} بواسطة {user}."
 
 # 🔇 Mute messages
-mute_already_muted: "🔇 <b>مكتوم بالفعل</b>\nالموسيقى مكتومة بالفعل في هذه المحادثة.\nهل ترغب في إلغاء الكتم؟"
-mute_failed: "❌ <b>فشل كتم التشغيل</b>\nالخطأ: <code>{error}</code>"
+mute_already_muted: |
+  <h3>{emoji:🔇} مكتوم بالفعل</h3>
+  <p>الموسيقى مكتومة بالفعل في هذه المحادثة.</p>
+  <p>هل ترغب في إلغاء الكتم؟</p>
+mute_failed: |
+  <h3>{emoji:❌} فشل كتم التشغيل</h3>
+  <p><b>الخطأ:</b> <code>{error}</code></p>
 mute_success: |
-  {emoji:🔇} <b>تم كتم التشغيل</b>
-
-  {emoji:🎵} المقطع: {title}
-  {emoji:👤} كُتم بواسطة: {user}
+  <h3>{emoji:🔇} تم كتم التشغيل</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} المقطع</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:👤} كُتم بواسطة</td><td>{user}</td></tr>
+  {speed_line}
+  </table>
 
 no_song_query: |
   <b>{emoji:🎵} أوه! لا يوجد شيء للتشغيل.</b>
@@ -399,15 +421,17 @@ only_sudo: "{emoji:⚠️} فقط المساعدون أو مالك المساع�
 only_sudo_cb: "⚠️ فقط المساعدون أو مالك المساعد يمكنهم استخدام هذا الأمر."
 
 pause_already: |
-  {emoji:⏸️} <b>متوقف مؤقتاً بالفعل</b>
-  الموسيقى متوقفة مؤقتاً بالفعل.
+  <h3>{emoji:⏸️} متوقف مؤقتاً بالفعل</h3>
+  <p>الموسيقى متوقفة مؤقتاً بالفعل.</p>
 
 pause_success: |
-  {emoji:⏸️} <b>تم إيقاف التشغيل مؤقتاً</b>
-
-  {emoji:🎵} المقطع: {title}
-  {emoji:⏱️} الموضع: {position} / {duration}
-  {emoji:👤} أوقف بواسطة: {user}
+  <h3>{emoji:⏸️} تم إيقاف التشغيل مؤقتاً</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} المقطع</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:⏱️} الموضع</td><td>{position} / {duration}</td></tr>
+  <tr><td>{emoji:👤} أوقف بواسطة</td><td>{user}</td></tr>
+  {speed_line}
+  </table>
 
 play_single_track_too_long: |
   {emoji:⚠️} لا يمكنك تشغيل أغاني أطول من {limit_mins} دقيقة.
@@ -508,15 +532,23 @@ replay_success: |
   {emoji:⚙️} السرعة: <b>{speed}x</b>
 
 # ▶️ Resume
-resume_already_playing: "ℹ️ <b>قيد التشغيل بالفعل</b>\nالموسيقى قيد التشغيل بالفعل في هذه المحادثة.\nهل ترغب في إيقافها مؤقتاً؟"
-resume_failed: "{emoji:❌} <b>فشل استئناف التشغيل</b>\nالخطأ: <code>{error}</code>"
-resume_success: |
-  {emoji:▶️} <b>جاري استئناف التشغيل</b>
+resume_already_playing: |
+  <h3>ℹ️ قيد التشغيل بالفعل</h3>
+  <p>الموسيقى قيد التشغيل بالفعل في هذه المحادثة.</p>
+  <p>هل ترغب في إيقافها مؤقتاً؟</p>
 
-  {emoji:🎵} العنوان: {title}
-  {emoji:📍} الموضع: {position} / {duration}
-  {emoji:👤} استؤنف بواسطة: {user}
+resume_failed: |
+  <h3>{emoji:❌} فشل استئناف التشغيل</h3>
+  <p><b>الخطأ:</b> <code>{error}</code></p>
+
+resume_success: |
+  <h3>{emoji:▶️} جاري استئناف التشغيل</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} العنوان</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:📍} الموضع</td><td>{position} / {duration}</td></tr>
+  <tr><td>{emoji:👤} استؤنف بواسطة</td><td>{user}</td></tr>
   {speed_line}
+  </table>
 
 restart: "{emoji:♻️} جاري إعادة التشغيل..."
 restart_exepath_fail: "{emoji:❌} فشل الحصول على مسار الملف التنفيذي: {error}"
@@ -535,7 +567,9 @@ room_not_active_cb: "⚠️ لا يوجد شيء قيد التشغيل حالي�
 room_no_active: "⚠️ البوت لا يشغّل صوتاً حالياً. قم بتشغيل أغنية أولاً."
 
 room_already_paused: "⏸️ المقطع متوقف مؤقتاً بالفعل. اضغط على ▶️ استئناف للمتابعة."
-room_pause_failed: "❌ فشل إيقاف التشغيل مؤقتاً.\n\n<i>{error}</i>"
+room_pause_failed: |
+  <h3>❌ فشل إيقاف التشغيل مؤقتاً</h3>
+  <p><i>{error}</i></p>
 
 
 settings_btn_adminmode: "🛡️ وضع الإدارة"
@@ -715,15 +749,20 @@ supergroup_needed: |
 
   إذا استمرت المشكلة، انضم إلى <a href="{support_group}">مجموعة الدعم</a>.
 
-unmute_already: "ℹ️ <b>تم إلغاء الكتم بالفعل</b>\nالموسيقى ليست مكتومة في هذه المحادثة."
-unmute_failed: "❌ <b>فشل إلغاء كتم التشغيل</b>\nالخطأ: <code>{error}</code>"
+unmute_already: |
+  <h3>ℹ️ تم إلغاء الكتم بالفعل</h3>
+  <p>الموسيقى ليست مكتومة في هذه المحادثة.</p>
+  <p>هل ترغب في كتمها؟</p>
+unmute_failed: |
+  <h3>{emoji:❌} فشل إلغاء كتم التشغيل</h3>
+  <p><b>الخطأ:</b> <code>{error}</code></p>
 unmute_success: |
-  {emoji:🔊} <b>تم إلغاء كتم التشغيل</b>
-
-  {emoji:🎵} المقطع: {title}
-  {emoji:👤} ألغي الكتم بواسطة: {user}
+  <h3>{emoji:🔊} تم إلغاء كتم التشغيل</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} المقطع</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:👤} ألغي الكتم بواسطة</td><td>{user}</td></tr>
   {speed_line}
-
+  </table>
 
 # 🔊 Voice Chat Events
 voicechat_ended: "<b>{emoji:⚠️} انتهت مكالمة الفيديو</b>\n\n<i>{emoji:⏰} المدة: {duration}</i>"

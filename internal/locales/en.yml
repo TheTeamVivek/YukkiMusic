@@ -4,6 +4,10 @@ name: "🇺🇸 English"
 CONFIRM_RESUME_BTN: "{emoji:▶️} Resume"
 CONFIRM_UNMUTE_BTN: "{emoji:🔊} Unmute"
 CONFIRM_STOP_BTN: "{emoji:⏹️} Stop"
+PAUSE_BTN: "{emoji:⏸️} Pause"
+RESUME_BTN: "{emoji:▶️} Resume"
+MUTE_BTN: "{emoji:🔇} Mute"
+UNMUTE_BTN: "{emoji:🔊} Unmute"
 ADD_ME_BTN: "{emoji:⚡} Add Me to Your group"
 BROADCAST_CANCEL_BTN: "{emoji:🚫} Cancel Broadcast"
 CLOSE_BTN: "Close"
@@ -146,6 +150,7 @@ cb_pause_message: |
 # Resume callback
 cb_already_playing: "ℹ️ Track is already playing."
 cb_resume_failed: "❌ Failed to resume playback."
+cb_pause_failed: "❌ Failed to pause playback."
 cb_resume_success: "▶️ Resumed at {position}."
 cb_resume_message: |
   <b>{emoji:🎵} Now Playing:</b>
@@ -179,6 +184,16 @@ cb_mute_message: |
   <b>▫ Muted by:</b> {user}
 
 cb_unmute_success: "🔊 Unmuted."
+cb_unmute_message: |
+  <b>{emoji:🔊} Playback Unmuted</b>
+
+  <b>▫ Track:</b> <a href="{url}">{title}</a>
+  <b>▫ Unmuted by:</b> {user}
+
+cb_already_muted: "🔇 Track is already muted."
+cb_already_unmuted: "🔊 Track is not muted."
+cb_mute_failed: "❌ Failed to mute playback."
+cb_unmute_failed: "❌ Failed to unmute playback."
 
 # 🗑️ Delete auth
 del_auth_not_authorized: "{emoji:⚠️} That user isn’t authorized — nothing to remove."
@@ -369,13 +384,20 @@ move_invalid_indexes_max: "{emoji:⚠️} Queue has only {queue_len} tracks."
 move_success: "{emoji:✅} Moved track from position {from} to {to} by {user}."
 
 # 🔇 Mute messages
-mute_already_muted: "🔇 <b>Already Muted</b>\nThe music is already muted in this chat.\nWould you like to unmute it?"
-mute_failed: "❌ <b>Playback Mute Failed</b>\nError: <code>{error}</code>"
+mute_already_muted: |
+  <h3>{emoji:🔇} Already Muted</h3>
+  <p>The music is already muted in this chat.</p>
+  <p>Would you like to unmute it?</p>
+mute_failed: |
+  <h3>{emoji:❌} Playback Mute Failed</h3>
+  <p><b>Error:</b> <code>{error}</code></p>
 mute_success: |
-  {emoji:🔇} <b>Muted playback</b>
-
-  {emoji:🎵} Track: {title}
-  {emoji:👤} Muted by: {user}
+  <h3>{emoji:🔇} Muted playback</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} Track</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:👤} Muted by</td><td>{user}</td></tr>
+  {speed_line}
+  </table>
 
 no_song_query: |
   <b>{emoji:🎵} Whoops! Nothing to play.</b>
@@ -402,15 +424,17 @@ only_sudo: "{emoji:⚠️} Only sudo users or the bot owner can use this command
 only_sudo_cb: "⚠️ Only sudo users or the bot owner can use this command."
 
 pause_already: |
-  {emoji:⏸️} <b>Already Paused</b>
-  The music is already paused.
+  <h3>{emoji:⏸️} Already Paused</h3>
+  <p>The music is already paused.</p>
 
 pause_success: |
-  {emoji:⏸️} <b>Paused playback</b>
-
-  {emoji:🎵} Track: {title}
-  {emoji:⏱️} Position: {position} / {duration}
-  {emoji:👤} Paused by: {user}
+  <h3>{emoji:⏸️} Paused playback</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} Track</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:⏱️} Position</td><td>{position} / {duration}</td></tr>
+  <tr><td>{emoji:👤} Paused by</td><td>{user}</td></tr>
+  {speed_line}
+  </table>
 
 play_single_track_too_long: |
   {emoji:⚠️} You can't play songs longer than {limit_mins} minutes.
@@ -511,15 +535,23 @@ replay_success: |
   {emoji:⚙️} Speed: <b>{speed}x</b>
 
 # ▶️ Resume
-resume_already_playing: "ℹ️ <b>Already Playing</b>\nThe music is already playing in this chat.\nWould you like to pause it?"
-resume_failed: "{emoji:❌} <b>Playback Resume Failed</b>\nError: <code>{error}</code>"
-resume_success: |
-  {emoji:▶️} <b>Resuming playback</b>
+resume_already_playing: |
+  <h3>ℹ️ Already Playing</h3>
+  <p>The music is already playing in this chat.</p>
+  <p>Would you like to pause it?</p>
 
-  {emoji:🎵} Title: {title}
-  {emoji:📍} Position: {position} / {duration}
-  {emoji:👤} Resumed by: {user}
+resume_failed: |
+  <h3>{emoji:❌} Playback Resume Failed</h3>
+  <p><b>Error:</b> <code>{error}</code></p>
+
+resume_success: |
+  <h3>{emoji:▶️} Resuming playback</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} Title</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:📍} Position</td><td>{position} / {duration}</td></tr>
+  <tr><td>{emoji:👤} Resumed by</td><td>{user}</td></tr>
   {speed_line}
+  </table>
 
 restart: "{emoji:♻️} Restarting..."
 restart_exepath_fail: "{emoji:❌} Failed to get executable path: {error}"
@@ -538,7 +570,9 @@ room_not_active_cb: "⚠️ Nothing playing right now."
 room_no_active: "⚠️ Bot is not streaming in a voice chat. Start playing a song first."
 
 room_already_paused: "⏸️ Track is already paused. Tap ▶️ Resume to continue."
-room_pause_failed: "❌ Failed to pause playback.\n\n<i>{error}</i>"
+room_pause_failed: |
+  <h3>❌ Failed to pause playback</h3>
+  <p><i>{error}</i></p>
 
 
 searching: "{emoji:🔍}{emoji:🎶} Searching... {emoji:⚡}{emoji:✨}"
@@ -720,15 +754,20 @@ supergroup_needed: |
 
   If you still face any issues, join our <a href="{support_group}">support group.</a>
 
-unmute_already: "ℹ️ <b>Already Unmuted</b>\nThe music is not muted in this chat."
-unmute_failed: "❌ <b>Playback Unmute Failed</b>\nError: <code>{error}</code>"
+unmute_already: |
+  <h3>ℹ️ Already Unmuted</h3>
+  <p>The music is not muted in this chat.</p>
+  <p>Would you like to mute it?</p>
+unmute_failed: |
+  <h3>{emoji:❌} Playback Unmute Failed</h3>
+  <p><b>Error:</b> <code>{error}</code></p>
 unmute_success: |
-  {emoji:🔊} <b>Unmuted playback</b>
-
-  {emoji:🎵} Track: {title}
-  {emoji:👤} Unmuted by: {user}
+  <h3>{emoji:🔊} Unmuted playback</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} Track</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:👤} Unmuted by</td><td>{user}</td></tr>
   {speed_line}
-
+  </table>
 
 # 🔊 Voice Chat Events
 voicechat_ended: "<b>{emoji:⚠️} Video chat ended</b>\n\n<i>{emoji:⏰} Duration: {duration}</i>"

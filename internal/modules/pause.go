@@ -22,6 +22,7 @@ import (
 
 	td "github.com/AshokShau/gotdbot"
 
+	"yukkimusic/internal/core"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
@@ -49,34 +50,23 @@ func cpauseHandler(c *td.Client, m *td.Message) error {
 }
 
 func handlePause(c *td.Client, m *td.Message, cplay bool) error {
-	if !isSuperGroup(c, m) {
-		return nil
-	}
-
-	if !filterAuthUsers(c, m) {
-		return nil
+	r, err := activeRoomFor(c, m, cplay)
+	if err != nil || r == nil {
+		return err
 	}
 
 	chatID := m.ChatID()
-	r, err := getEffectiveRoom(m.ChatID(), cplay)
-	if err != nil {
-		_, err := m.ReplyText(c, err.Error(), nil)
-		return err
-	}
-
-	if !r.Active() {
-		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
-		return err
-	}
 
 	if r.Paused() {
-		_, err := m.ReplyText(c, F(chatID, "pause_already"), nil)
+		_, err := m.ReplyRichMessageHTML(c, F(chatID, "pause_already"), &td.SendRichTextOpts{
+			ReplyMarkup: core.GetPauseToggle(chatID, r),
+		})
 		return err
 	}
 
 	if pauseErr := r.Pause(); pauseErr != nil {
-		_, err := m.ReplyText(c, F(chatID, "room_pause_failed", locales.Arg{
-			"error": pauseErr.Error(),
+		_, err := m.ReplyRichMessageHTML(c, F(chatID, "room_pause_failed", locales.Arg{
+			"error": utils.EscapeHTML(pauseErr.Error()),
 		}), nil)
 		return err
 	}
@@ -85,18 +75,28 @@ func handlePause(c *td.Client, m *td.Message, cplay bool) error {
 	mention := mention(sender, m.SenderID())
 	title := utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25))
 
+	speedLine := ""
+	if sp := r.Speed(); sp != 1.0 {
+		speedLine = `<tr><td colspan="2">` + F(chatID, "speed_line", locales.Arg{
+			"speed": fmt.Sprintf("%.2f", sp),
+		}) + `</td></tr>`
+	}
+
 	msg := F(chatID, "pause_success", locales.Arg{
-		"title":    title,
-		"position": utils.FormatDuration(r.Position()),
-		"duration": utils.FormatDuration(r.Track().Duration),
-		"user":     mention,
+		"title":      title,
+		"url":        utils.EscapeHTML(r.Track().URL),
+		"position":   utils.FormatDuration(r.Position()),
+		"duration":   utils.FormatDuration(r.Track().Duration),
+		"user":       mention,
+		"speed_line": speedLine,
 	})
 
-	if sp := r.Speed(); sp != 1.0 {
-		msg += "\n" + F(chatID, "speed_line", locales.Arg{
-			"speed": fmt.Sprintf("%.2f", sp),
-		})
+	if _, rerr := m.ReplyRichMessageHTML(c, msg, &td.SendRichTextOpts{
+		ReplyMarkup: core.GetPauseToggle(chatID, r),
+	}); rerr != nil {
+		return rerr
 	}
-	_, rerr := m.ReplyText(c, msg, nil)
-	return rerr
+
+	updatePlaybackMessageFor(c, r.StatusMsg(), m.SenderID(), r, "paused")
+	return nil
 }

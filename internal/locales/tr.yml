@@ -4,6 +4,10 @@ name: "🇹🇷 Türkçe"
 CONFIRM_RESUME_BTN: "{emoji:▶️} Devam Et"
 CONFIRM_UNMUTE_BTN: "{emoji:🔊} Sesi Aç"
 CONFIRM_STOP_BTN: "{emoji:⏹️} Durdur"
+PAUSE_BTN: "{emoji:⏸️} Duraklat"
+RESUME_BTN: "{emoji:▶️} Devam Et"
+MUTE_BTN: "{emoji:🔇} Sessize Al"
+UNMUTE_BTN: "{emoji:🔊} Sesi Aç"
 ADD_ME_BTN: "{emoji:⚡} Beni Grubuna Ekle"
 BROADCAST_CANCEL_BTN: "{emoji:🚫} Yayını İptal Et"
 CLOSE_BTN: "Kapat"
@@ -146,6 +150,7 @@ cb_pause_message: |
 # Resume callback
 cb_already_playing: "ℹ️ Parça zaten çalıyor."
 cb_resume_failed: "❌ Oynatma devam ettirilemedi."
+cb_pause_failed: "❌ Oynatma duraklatılamadı."
 cb_resume_success: "▶️ {position} konumunda devam ediliyor."
 cb_resume_message: |
   <b>{emoji:🎵} Şimdi Çalıyor:</b>
@@ -179,6 +184,16 @@ cb_mute_message: |
   <b>▫ Sessize Alan:</b> {user}
 
 cb_unmute_success: "🔊 Ses açıldı."
+cb_unmute_message: |
+  <b>{emoji:🔊} Oynatmanın Sesi Açıldı</b>
+
+  <b>▫ Parça:</b> <a href="{url}">{title}</a>
+  <b>▫ Sesi Açan:</b> {user}
+
+cb_already_muted: "🔇 Parça zaten sessize alınmış."
+cb_already_unmuted: "🔊 Parçanın sesi açık."
+cb_mute_failed: "❌ Oynatma sessize alınamadı."
+cb_unmute_failed: "❌ Oynatma sesi açılamadı."
 
 # 🗑️ Delete auth
 del_auth_not_authorized: "{emoji:⚠️} Bu kullanıcı yetkili değil — kaldırılacak bir şey yok."
@@ -368,13 +383,20 @@ move_invalid_indexes_max: "{emoji:⚠️} Sıra yalnızca {queue_len} parça iç
 move_success: "{emoji:✅} Parça, {user} tarafından {from} konumundan {to} konumuna taşındı."
 
 # 🔇 Mute messages
-mute_already_muted: "🔇 <b>Zaten Sessizde</b>\nMüzik bu sohbette zaten sessize alınmış.\nSesi açmak ister misin?"
-mute_failed: "❌ <b>Oynatma Sessize Alınamadı</b>\nHata: <code>{error}</code>"
+mute_already_muted: |
+  <h3>{emoji:🔇} Zaten Sessizde</h3>
+  <p>Müzik bu sohbette zaten sessize alınmış.</p>
+  <p>Sesi açmak ister misin?</p>
+mute_failed: |
+  <h3>{emoji:❌} Oynatma Sessize Alınamadı</h3>
+  <p><b>Hata:</b> <code>{error}</code></p>
 mute_success: |
-  {emoji:🔇} <b>Oynatma sessize alındı</b>
-
-  {emoji:🎵} Parça: {title}
-  {emoji:👤} Sessize Alan: {user}
+  <h3>{emoji:🔇} Oynatma sessize alındı</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} Parça</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:👤} Sessize Alan</td><td>{user}</td></tr>
+  {speed_line}
+  </table>
 
 no_song_query: |
   <b>{emoji:🎵} Hop! Çalınacak bir şey yok.</b>
@@ -398,15 +420,17 @@ only_sudo: "{emoji:⚠️} Bu komutu yalnızca sudo kullanıcıları veya bot sa
 only_sudo_cb: "⚠️ Bu komutu yalnızca sudo kullanıcıları veya bot sahibi kullanabilir."
 
 pause_already: |
-  {emoji:⏸️} <b>Zaten Duraklatıldı</b>
-  Müzik zaten duraklatılmış durumda.
+  <h3>{emoji:⏸️} Zaten Duraklatıldı</h3>
+  <p>Müzik zaten duraklatılmış durumda.</p>
 
 pause_success: |
-  {emoji:⏸️} <b>Oynatma duraklatıldı</b>
-
-  {emoji:🎵} Parça: {title}
-  {emoji:⏱️} Konum: {position} / {duration}
-  {emoji:👤} Duraklatan: {user}
+  <h3>{emoji:⏸️} Oynatma duraklatıldı</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} Parça</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:⏱️} Konum</td><td>{position} / {duration}</td></tr>
+  <tr><td>{emoji:👤} Duraklatan</td><td>{user}</td></tr>
+  {speed_line}
+  </table>
 
 play_single_track_too_long: |
   {emoji:⚠️} {limit_mins} dakikadan uzun şarkıları oynatamazsın.
@@ -506,15 +530,23 @@ replay_success: |
   {emoji:⚙️} Hız: <b>{speed}x</b>
 
 # ▶️ Resume
-resume_already_playing: "ℹ️ <b>Zaten Çalıyor</b>\nMüzik bu sohbette zaten çalıyor.\nDuraklatmak ister misin?"
-resume_failed: "{emoji:❌} <b>Oynatma Devam Ettirilemedi</b>\nHata: <code>{error}</code>"
-resume_success: |
-  {emoji:▶️} <b>Oynatma devam ettiriliyor</b>
+resume_already_playing: |
+  <h3>ℹ️ Zaten Çalıyor</h3>
+  <p>Müzik bu sohbette zaten çalıyor.</p>
+  <p>Duraklatmak ister misin?</p>
 
-  {emoji:🎵} Başlık: {title}
-  {emoji:📍} Konum: {position} / {duration}
-  {emoji:👤} Devam Ettiren: {user}
+resume_failed: |
+  <h3>{emoji:❌} Oynatma Devam Ettirilemedi</h3>
+  <p><b>Hata:</b> <code>{error}</code></p>
+
+resume_success: |
+  <h3>{emoji:▶️} Oynatma devam ettiriliyor</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} Başlık</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:📍} Konum</td><td>{position} / {duration}</td></tr>
+  <tr><td>{emoji:👤} Devam Ettiren</td><td>{user}</td></tr>
   {speed_line}
+  </table>
 
 restart: "{emoji:♻️} Yeniden başlatılıyor..."
 restart_exepath_fail: "{emoji:❌} Çalıştırılabilir dosya yolu alınamadı: {error}"
@@ -532,7 +564,9 @@ room_not_active_cb: "⚠️ Şu an hiçbir şey çalmıyor."
 room_no_active: "⚠️ Bot şu anda sesli sohbette yayın yapmıyor. Önce bir şarkı çalın."
 
 room_already_paused: "⏸️ Parça zaten duraklatılmış. Devam etmek için ▶️ Devam Et düğmesine dokun."
-room_pause_failed: "❌ Oynatma duraklatılamadı.\n\n<i>{error}</i>"
+room_pause_failed: |
+  <h3>❌ Oynatma duraklatılamadı</h3>
+  <p><i>{error}</i></p>
 
 
 settings_btn_adminmode: "🛡️ Yönetici Modu"
@@ -712,15 +746,20 @@ supergroup_needed: |
 
   Hâlâ sorun yaşıyorsan <a href="{support_group}">destek grubumuza</a> katıl.
 
-unmute_already: "ℹ️ <b>Zaten Sesi Açık</b>\nMüzik bu sohbette sessize alınmamış."
-unmute_failed: "❌ <b>Oynatma Sesi Açılamadı</b>\nHata: <code>{error}</code>"
+unmute_already: |
+  <h3>ℹ️ Zaten Sesi Açık</h3>
+  <p>Müzik bu sohbette sessize alınmamış.</p>
+  <p>Sessize almak ister misin?</p>
+unmute_failed: |
+  <h3>{emoji:❌} Oynatma Sesi Açılamadı</h3>
+  <p><b>Hata:</b> <code>{error}</code></p>
 unmute_success: |
-  {emoji:🔊} <b>Oynatma sesi açıldı</b>
-
-  {emoji:🎵} Parça: {title}
-  {emoji:👤} Sesi Açan: {user}
+  <h3>{emoji:🔊} Oynatma sesi açıldı</h3>
+  <table bordered striped compact>
+  <tr><td>{emoji:🎵} Parça</td><td><a href="{url}">{title}</a></td></tr>
+  <tr><td>{emoji:👤} Sesi Açan</td><td>{user}</td></tr>
   {speed_line}
-
+  </table>
 
 # 🔊 Sesli Sohbet Etkinlikleri
 voicechat_ended: "<b>{emoji:⚠️} Görüntülü sohbet sona erdi</b>\n\n<i>{emoji:⏰} Süre: {duration}</i>"

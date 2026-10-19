@@ -117,6 +117,37 @@ func SuppMarkup(chatID int64) td.ReplyMarkup {
 	}
 }
 
+// getActionToggle returns a single-button keyboard that toggles the given
+// playback action ("pause" or "mute") based on the room's current state.
+func getActionToggle(chatID int64, r *Room, action string) td.ReplyMarkup {
+	key := strings.ToUpper(action) + "_BTN"
+
+	switch {
+	case action == "pause" && r.Paused():
+		key, action = "RESUME_BTN", "resume"
+	case action == "mute" && r.Muted():
+		key, action = "UNMUTE_BTN", "unmute"
+	}
+
+	text, iconID := buttonText(chatID, key)
+	btn := dataBtn(text, fmt.Sprintf("room:%d:%s", r.ChatID, action))
+	btn.IconCustomEmojiId = iconID
+
+	return &td.ReplyMarkupInlineKeyboard{
+		Rows: [][]td.InlineKeyboardButton{{btn}},
+	}
+}
+
+// GetPauseToggle returns a pause/resume toggle keyboard for the room.
+func GetPauseToggle(chatID int64, r *Room) td.ReplyMarkup {
+	return getActionToggle(chatID, r, "pause")
+}
+
+// GetMuteToggle returns a mute/unmute toggle keyboard for the room.
+func GetMuteToggle(chatID int64, r *Room) td.ReplyMarkup {
+	return getActionToggle(chatID, r, "mute")
+}
+
 func GetStopConfirmMarkup(
 	chatID int64,
 	r *Room,
