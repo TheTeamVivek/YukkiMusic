@@ -24,7 +24,6 @@ HELP_SUDOERS_BTN: "{emoji:⚡} विशेषाधिकारी"
 BACK_BTN: "{emoji:⬅️} पीछे"
 
 # basically this string used in /command [bool]
-invalid_bool: "{emoji:⚠️} <b>अमान्य मान।</b>\n\n<i>कृपया '<code>enable</code>' अथवा '<code>disable</code>' का प्रयोग करें।</i>"
 
 adminmode_help: |
   {emoji:🛡️} <b>प्रशासकीय आदेश विधा</b>
@@ -538,7 +537,6 @@ room_no_active: "⚠️ बॉट वॉइस चैट में कुछ न
 room_already_paused: "⏸️ संगीत पूर्व से ही विराम स्थिति में है। निरन्तरता के लिए ▶️ 'पुनः चलाएँ' दबाएँ।"
 room_pause_failed: "❌ संगीत विराम विफल।\n\n<i>{error}</i>"
 
-generic_error: "{emoji:❌} कुछ गलत हुआ: <code>{error}</code>"
 
 settings_btn_adminmode: "🛡️ एडमिन मोड"
 settings_btn_cmddelete: "🗑️ कमांड डिलीट"

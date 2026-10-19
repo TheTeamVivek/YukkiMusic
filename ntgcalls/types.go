@@ -5,14 +5,16 @@ package ntgcalls
 import "C"
 import "unsafe"
 
-type StreamType int
-type ConnectionMode int
-type ConnectionKind int
-type ConnectionState int
-type StreamStatus int
-type StreamMode int
-type StreamDevice int
-type MediaSource int
+type (
+	StreamType      int
+	ConnectionMode  int
+	ConnectionKind  int
+	ConnectionState int
+	StreamStatus    int
+	StreamMode      int
+	StreamDevice    int
+	MediaSource     int
+)
 
 const (
 	MicrophoneStream StreamDevice = iota
@@ -90,18 +92,20 @@ const (
 	ConferenceCallType
 )
 
-type ConnectionChangeCallback func(chatID int64, state NetworkInfo)
-type StreamEndCallback func(chatID int64, streamType StreamType, streamDevice StreamDevice)
-type UpgradeCallback func(chatID int64, state MediaState)
-type SignalCallback func(chatID int64, data []byte)
-type FrameCallback func(chatID int64, mode StreamMode, device StreamDevice, frames []Frame)
-type RemoteSourceCallback func(chatID int64, source RemoteSource)
-type BroadcastTimestampCallback func(chatID int64)
-type BroadcastPartCallback func(chatID int64, request SegmentPartRequest)
-type EmojisCallback func(chatID int64, emojis string)
-type RequestParticipantsCallback func(chatID int64, request ParticipantsRequest)
-type OutboundBlockCallback func(chatID int64, block []byte)
-type SubchainRequestCallback func(chatID int64, request SubchainRequest)
+type (
+	ConnectionChangeCallback    func(chatID int64, state NetworkInfo)
+	StreamEndCallback           func(chatID int64, streamType StreamType, streamDevice StreamDevice)
+	UpgradeCallback             func(chatID int64, state MediaState)
+	SignalCallback              func(chatID int64, data []byte)
+	FrameCallback               func(chatID int64, mode StreamMode, device StreamDevice, frames []Frame)
+	RemoteSourceCallback        func(chatID int64, source RemoteSource)
+	BroadcastTimestampCallback  func(chatID int64)
+	BroadcastPartCallback       func(chatID int64, request SegmentPartRequest)
+	EmojisCallback              func(chatID int64, emojis string)
+	RequestParticipantsCallback func(chatID int64, request ParticipantsRequest)
+	OutboundBlockCallback       func(chatID int64, block []byte)
+	SubchainRequestCallback     func(chatID int64, request SubchainRequest)
+)
 
 type AuthParams struct {
 	GAOrB          []byte

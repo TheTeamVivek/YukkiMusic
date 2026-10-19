@@ -24,7 +24,6 @@ HELP_SUDOERS_BTN: "{emoji:⚡} Sudoers"
 BACK_BTN: "{emoji:⬅️} Back"
 
 # basically this string used in /command [bool]
-invalid_bool: "{emoji:⚠️} <b>Invalid value.</b>\nUse 'enable' or 'disable'."
 
 adminmode_help: |
   {emoji:🛡️} <b>Admin Command Mode</b>
@@ -541,7 +540,6 @@ room_no_active: "⚠️ Bot is not streaming in a voice chat. Start playing a so
 room_already_paused: "⏸️ Track is already paused. Tap ▶️ Resume to continue."
 room_pause_failed: "❌ Failed to pause playback.\n\n<i>{error}</i>"
 
-generic_error: "{emoji:❌} Something went wrong: <code>{error}</code>"
 
 searching: "{emoji:🔍}{emoji:🎶} Searching... {emoji:⚡}{emoji:✨}"
 searching_query: "{emoji:🔍}{emoji:🎶} Searching for: <b>{query}</b>... {emoji:⚡}{emoji:✨}"

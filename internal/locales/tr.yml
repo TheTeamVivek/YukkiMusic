@@ -24,7 +24,6 @@ HELP_SUDOERS_BTN: "{emoji:⚡} Sudo Kullanıcılar"
 BACK_BTN: "{emoji:⬅️} Geri"
 
 # basically this string used in /command [bool]
-invalid_bool: "{emoji:⚠️} <b>Geçersiz değer.</b>\n'enable' veya 'disable' kullan."
 
 adminmode_help: |
   {emoji:🛡️} <b>Yönetici Komut Modu</b>
@@ -535,7 +534,6 @@ room_no_active: "⚠️ Bot şu anda sesli sohbette yayın yapmıyor. Önce bir 
 room_already_paused: "⏸️ Parça zaten duraklatılmış. Devam etmek için ▶️ Devam Et düğmesine dokun."
 room_pause_failed: "❌ Oynatma duraklatılamadı.\n\n<i>{error}</i>"
 
-generic_error: "{emoji:❌} Bir hata oluştu: <code>{error}</code>"
 
 settings_btn_adminmode: "🛡️ Yönetici Modu"
 settings_btn_cmddelete: "🗑️ Komut Silme"

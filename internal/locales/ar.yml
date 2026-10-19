@@ -24,7 +24,6 @@ HELP_SUDOERS_BTN: "{emoji:⚡} المساعدون"
 BACK_BTN: "{emoji:⬅️} عودة"
 
 # basically this string used in /command [bool]
-invalid_bool: "{emoji:⚠️} <b>قيمة غير صالحة.</b>\nاستخدم 'enable' (تفعيل) أو 'disable' (تعطيل)."
 
 adminmode_help: |
   {emoji:🛡️} <b>وضع أوامر الإدارة</b>
@@ -538,7 +537,6 @@ room_no_active: "⚠️ البوت لا يشغّل صوتاً حالياً. قم
 room_already_paused: "⏸️ المقطع متوقف مؤقتاً بالفعل. اضغط على ▶️ استئناف للمتابعة."
 room_pause_failed: "❌ فشل إيقاف التشغيل مؤقتاً.\n\n<i>{error}</i>"
 
-generic_error: "{emoji:❌} حدث خطأ: <code>{error}</code>"
 
 settings_btn_adminmode: "🛡️ وضع الإدارة"
 settings_btn_cmddelete: "🗑️ حذف الأوامر"

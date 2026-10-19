@@ -18,6 +18,7 @@ extern void handleSubchainRequest(ntg_instance* handle, int64_t chatID, ntg_subc
 extern void handleLogs(ntg_log_message message, void* userData);
 */
 import "C"
+
 import (
 	"fmt"
 	"runtime"
@@ -39,7 +40,7 @@ func lookupClient(handle *C.ntg_instance) *Client {
 }
 
 func init() {
-	C.ntg_set_log_callback((C.ntg_log_cb)(unsafe.Pointer(C.handleLogs)), nil)
+	C.ntg_set_log_callback(C.ntg_log_cb(unsafe.Pointer(C.handleLogs)), nil)
 }
 
 // Package-level utility functions
@@ -97,18 +98,18 @@ func NewClient() *Client {
 	clientRegistry.Lock()
 	clientRegistry.clients[client.handle] = client
 	clientRegistry.Unlock()
-	C.ntg_on_stream_end_callback(client.handle, (C.ntg_stream_end_callback_cb)(unsafe.Pointer(C.handleStreamEnd)), nil)
-	C.ntg_on_upgrade_callback(client.handle, (C.ntg_upgrade_callback_cb)(unsafe.Pointer(C.handleUpgrade)), nil)
-	C.ntg_on_signaling_data_callback(client.handle, (C.ntg_signaling_data_callback_cb)(unsafe.Pointer(C.handleSignal)), nil)
-	C.ntg_on_connection_change_callback(client.handle, (C.ntg_connection_change_callback_cb)(unsafe.Pointer(C.handleConnectionChange)), nil)
-	C.ntg_on_frames_callback(client.handle, (C.ntg_frames_callback_cb)(unsafe.Pointer(C.handleFrames)), nil)
-	C.ntg_on_remote_source_change_callback(client.handle, (C.ntg_remote_source_change_callback_cb)(unsafe.Pointer(C.handleRemoteSourceChange)), nil)
-	C.ntg_on_request_broadcast_timestamp_callback(client.handle, (C.ntg_request_broadcast_timestamp_callback_cb)(unsafe.Pointer(C.handleRequestBroadcastTimestamp)), nil)
-	C.ntg_on_request_broadcast_part_callback(client.handle, (C.ntg_request_broadcast_part_callback_cb)(unsafe.Pointer(C.handleRequestBroadcastPart)), nil)
-	C.ntg_on_update_emojis_callback(client.handle, (C.ntg_update_emojis_callback_cb)(unsafe.Pointer(C.handleUpdateEmojis)), nil)
-	C.ntg_on_request_participants_callback(client.handle, (C.ntg_request_participants_callback_cb)(unsafe.Pointer(C.handleRequestParticipants)), nil)
-	C.ntg_on_outbound_block_callback(client.handle, (C.ntg_outbound_block_callback_cb)(unsafe.Pointer(C.handleOutboundBlock)), nil)
-	C.ntg_on_subchain_request_callback(client.handle, (C.ntg_subchain_request_callback_cb)(unsafe.Pointer(C.handleSubchainRequest)), nil)
+	C.ntg_on_stream_end_callback(client.handle, C.ntg_stream_end_callback_cb(unsafe.Pointer(C.handleStreamEnd)), nil)
+	C.ntg_on_upgrade_callback(client.handle, C.ntg_upgrade_callback_cb(unsafe.Pointer(C.handleUpgrade)), nil)
+	C.ntg_on_signaling_data_callback(client.handle, C.ntg_signaling_data_callback_cb(unsafe.Pointer(C.handleSignal)), nil)
+	C.ntg_on_connection_change_callback(client.handle, C.ntg_connection_change_callback_cb(unsafe.Pointer(C.handleConnectionChange)), nil)
+	C.ntg_on_frames_callback(client.handle, C.ntg_frames_callback_cb(unsafe.Pointer(C.handleFrames)), nil)
+	C.ntg_on_remote_source_change_callback(client.handle, C.ntg_remote_source_change_callback_cb(unsafe.Pointer(C.handleRemoteSourceChange)), nil)
+	C.ntg_on_request_broadcast_timestamp_callback(client.handle, C.ntg_request_broadcast_timestamp_callback_cb(unsafe.Pointer(C.handleRequestBroadcastTimestamp)), nil)
+	C.ntg_on_request_broadcast_part_callback(client.handle, C.ntg_request_broadcast_part_callback_cb(unsafe.Pointer(C.handleRequestBroadcastPart)), nil)
+	C.ntg_on_update_emojis_callback(client.handle, C.ntg_update_emojis_callback_cb(unsafe.Pointer(C.handleUpdateEmojis)), nil)
+	C.ntg_on_request_participants_callback(client.handle, C.ntg_request_participants_callback_cb(unsafe.Pointer(C.handleRequestParticipants)), nil)
+	C.ntg_on_outbound_block_callback(client.handle, C.ntg_outbound_block_callback_cb(unsafe.Pointer(C.handleOutboundBlock)), nil)
+	C.ntg_on_subchain_request_callback(client.handle, C.ntg_subchain_request_callback_cb(unsafe.Pointer(C.handleSubchainRequest)), nil)
 
 	runtime.SetFinalizer(client, func(c *Client) {
 		if c.handle != nil {

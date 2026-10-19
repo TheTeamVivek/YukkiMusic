@@ -160,10 +160,13 @@ All c* commands work the same as regular commands but affect the linked channel.
 
 func playHandler(c *td.Client, m *td.Message) error  { return handlePlay(c, m, &playOpts{}) }
 func fplayHandler(c *td.Client, m *td.Message) error { return handlePlay(c, m, &playOpts{Force: true}) }
+
 func cfplayHandler(c *td.Client, m *td.Message) error {
 	return handlePlay(c, m, &playOpts{Force: true, CPlay: true})
 }
+
 func vplayHandler(c *td.Client, m *td.Message) error { return handlePlay(c, m, &playOpts{Video: true}) }
+
 func fvplayHandler(c *td.Client, m *td.Message) error {
 	return handlePlay(c, m, &playOpts{Force: true, Video: true})
 }
@@ -175,6 +178,7 @@ func vcplayHandler(c *td.Client, m *td.Message) error {
 func fvcplayHandler(c *td.Client, m *td.Message) error {
 	return handlePlay(c, m, &playOpts{Force: true, CPlay: true, Video: true})
 }
+
 func cplayHandler(c *td.Client, m *td.Message) error { return handlePlay(c, m, &playOpts{CPlay: true}) }
 
 func handlePlay(c *td.Client, m *td.Message, opts *playOpts) error {
