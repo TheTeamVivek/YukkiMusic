@@ -53,7 +53,7 @@ func cmuteHandler(c *td.Client, m *td.Message) error {
 }
 
 func handleMute(c *td.Client, m *td.Message, cplay bool) error {
-	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) || m.Args() != "" {
+	if m.Args() != "" || m.ReplyToMessageID() != 0 || !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
 		return nil
 	}
 

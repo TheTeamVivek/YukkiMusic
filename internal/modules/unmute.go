@@ -47,15 +47,7 @@ func cunmuteHandler(c *td.Client, m *td.Message) error {
 }
 
 func handleUnmute(c *td.Client, m *td.Message, cplay bool) error {
-	if m.Args() != "" {
-		return nil
-	}
-
-	if !isSuperGroup(c, m) {
-		return nil
-	}
-
-	if !filterAuthUsers(c, m) {
+	if m.Args() != "" || m.ReplyToMessageID() != 0 || !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
 		return nil
 	}
 
