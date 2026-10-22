@@ -18,17 +18,18 @@
 package modules
 
 import (
+	"cmp"
+
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
-	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
 
 func memberID(m *td.ChatMember) int64 {
-	if m == nil || m.MemberId == nil {
+	if m == nil {
 		return 0
 	}
 	if user, ok := m.MemberId.(*td.MessageSenderUser); ok {
@@ -37,8 +38,10 @@ func memberID(m *td.ChatMember) int64 {
 	return 0
 }
 
+// memberStatus names the state of a chat member: creator, administrator,
+// member, left or kicked (banned, or restricted and no longer a member).
 func memberStatus(m *td.ChatMember) string {
-	if m == nil || m.Status == nil {
+	if m == nil {
 		return "left"
 	}
 
@@ -49,7 +52,7 @@ func memberStatus(m *td.ChatMember) string {
 		return "administrator"
 	case *td.ChatMemberStatusMember:
 		return "member"
-	case *td.ChatMemberStatusLeft:
+	case nil, *td.ChatMemberStatusLeft:
 		return "left"
 	case *td.ChatMemberStatusBanned:
 		return "kicked"
@@ -63,141 +66,103 @@ func memberStatus(m *td.ChatMember) string {
 	}
 }
 
+func isAdminStatus(status string) bool {
+	return status == "administrator" || status == "creator"
+}
+
 func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
-	isMaint, _ := database.GetMaintenance()
-	if isMaint && u.ActorUserId != config.OwnerID {
-		if ok, _ := database.IsSudo(u.ActorUserId); !ok {
-			return nil
-		}
+	if !canBypassMaintenance(u.ActorUserId) {
+		return nil
 	}
 
 	chatID := u.ChatId
-	if chatID == 0 {
+	userID := cmp.Or(memberID(u.NewChatMember), memberID(u.OldChatMember))
+	if chatID == 0 || userID == 0 {
 		return nil
 	}
 
-	userID := memberID(u.NewChatMember)
-	if userID == 0 {
-		userID = memberID(u.OldChatMember)
-	}
-	if userID == 0 {
-		return nil
-	}
+	oldStatus, newStatus := memberStatus(u.OldChatMember), memberStatus(u.NewChatMember)
+	isBot := c.Me != nil && userID == c.Me.Id
 
-	state, err := core.ChatStateFor(chatID)
-	if err != nil {
-		utils.Log.Error("Failed to get chat state: " + err.Error())
-		state = nil
-	}
-
-	oldStatus := memberStatus(u.OldChatMember)
-	newStatus := memberStatus(u.NewChatMember)
-
-	if c.Me != nil && userID == c.Me.Id && (newStatus == "left" || newStatus == "kicked") {
+	if isBot && (newStatus == "left" || newStatus == "kicked") {
 		handleBotRemoved(c, u, chatID)
 		return nil
 	}
 
 	switch {
-	case (newStatus == "administrator" || newStatus == "creator") &&
-		(oldStatus != "administrator" && oldStatus != "creator"):
-
+	case isAdminStatus(newStatus) && !isAdminStatus(oldStatus):
 		utils.AddChatAdmin(c, chatID, userID)
 
-	case oldStatus == "administrator" &&
-		newStatus != "administrator" &&
-		newStatus != "creator":
-
-		if c.Me != nil && userID == c.Me.Id && config.LeaveOnDemoted {
-			cleaner.Clear(chatID)
-			core.Rooms.Delete(chatID)
-			core.DropChatState(chatID)
-			if _, rerr := c.SendMessage(chatID, F(chatID, "bot_demotion_goodbye"), nil); rerr != nil {
-				utils.Log.Error(rerr.Error())
+	case isAdminStatus(oldStatus) && !isAdminStatus(newStatus):
+		if isBot && config.LeaveOnDemoted {
+			dropChat(chatID)
+			if _, err := c.SendMessage(chatID, F(chatID, "bot_demotion_goodbye"), nil); err != nil {
+				utils.Log.Error(err.Error())
 			}
-			c.LeaveChat(chatID)
-
-			if state != nil && state.Assistant != nil {
-				state.Assistant.Client.LeaveChannel(chatID)
-			}
-
+			leaveChat(c, chatID)
 			return nil
 		}
-
 		utils.RemoveChatAdmin(c, chatID, userID)
 	}
 
-	if state != nil && state.Assistant != nil && userID == state.Assistant.Self.ID {
-		switch newStatus {
-		case "member", "administrator", "creator":
-			state.SetPresent(true)
-			state.SetBanned(false)
-			return nil
-
-		case "left":
-			state.SetPresent(false)
-			state.SetBanned(false)
-			return nil
-
-		case "kicked":
-			handleAssistantRestriction(c, u, state, chatID)
-			return nil
-		}
-
-		if !state.Fetched() {
-			state.Refresh()
-		}
+	cs, err := core.ChatStateFor(chatID)
+	if err != nil {
+		utils.Log.Error("Failed to get chat state: " + err.Error())
+		return nil
+	}
+	if cs.Assistant == nil || userID != cs.Assistant.Self.ID {
+		return nil
 	}
 
+	switch newStatus {
+	case "member", "administrator", "creator":
+		cs.SetPresent(true)
+		cs.SetBanned(false)
+	case "left":
+		cs.SetPresent(false)
+		cs.SetBanned(false)
+	case "kicked":
+		handleAssistantRestriction(c, u, cs, chatID)
+	default:
+		if !cs.Fetched() {
+			cs.Refresh()
+		}
+	}
 	return nil
 }
 
+// handleAssistantRestriction reacts to the assistant being restricted or
+// banned: a plain restriction leaves it in the chat, a ban gets it unbanned
+// if the bot can, and otherwise warns the chat.
 func handleAssistantRestriction(
 	c *td.Client,
 	u *td.UpdateChatMember,
-	s *core.ChatState,
+	cs *core.ChatState,
 	chatID int64,
 ) {
-	if !isTrueBan(u) {
-		s.SetPresent(true)
-		s.SetBanned(false)
-
+	if _, banned := u.NewChatMember.Status.(*td.ChatMemberStatusBanned); !banned {
+		cs.SetPresent(true)
+		cs.SetBanned(false)
 		utils.Log.Debug("Assistant muted in " + utils.IntToStr(chatID))
-
 		return
 	}
 
 	utils.Log.Debug("Assistant banned in " + utils.IntToStr(chatID))
-
-	s.SetPresent(false)
+	cs.SetPresent(false)
 	core.Rooms.Delete(chatID)
 
-	err := c.SetChatMemberStatus(
-		chatID,
-		&td.MessageSenderUser{UserId: s.Assistant.Self.ID},
-		&td.ChatMemberStatusMember{},
-	)
+	self := cs.Assistant.Self
+	err := c.SetChatMemberStatus(chatID, &td.MessageSenderUser{UserId: self.ID}, &td.ChatMemberStatusMember{})
+	cs.SetBanned(err != nil)
 	if err == nil {
-		s.SetBanned(false)
-	} else {
-		s.SetBanned(true)
-
-		msg := F(chatID, "assistant_restricted_warning", locales.Arg{
-			"assistant": mentionHTML(s.Assistant.Self.FirstName+" "+s.Assistant.Self.LastName, s.Assistant.Self.ID),
-			"id":        s.Assistant.Self.ID,
-		})
-
-		if _, err := c.SendMessage(chatID, msg, nil); err != nil {
-			utils.Log.Error(err.Error())
-		}
-	}
-}
-
-func isTrueBan(u *td.UpdateChatMember) bool {
-	if u.NewChatMember == nil {
-		return false
+		return
 	}
 
-	_, banned := u.NewChatMember.Status.(*td.ChatMemberStatusBanned)
-	return banned
+	msg := F(chatID, "assistant_restricted_warning", locales.Arg{
+		"assistant": mentionHTML(self.FirstName+" "+self.LastName, self.ID),
+		"id":        self.ID,
+	})
+	if _, err := c.SendMessage(chatID, msg, nil); err != nil {
+		utils.Log.Error(err.Error())
+	}
 }
