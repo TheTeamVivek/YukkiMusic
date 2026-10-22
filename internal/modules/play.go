@@ -20,7 +20,6 @@ package modules
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -154,130 +153,354 @@ All c* commands work the same as regular commands but affect the linked channel.
 	helpTexts["/setcplay"] = helpTexts["/channelplay"]
 
 	helpTexts["/playforce"] = helpTexts["/fplay"]
-	helpTexts["/fcplay"] = helpTexts["/cfplay"]
-	helpTexts["/cvplay"] = helpTexts["/vcplay"]
+	helpTexts["/cfplay"] = helpTexts["/fplay"]
+	helpTexts["/fcplay"] = helpTexts["/fplay"]
+	helpTexts["/vcplay"] = helpTexts["/vplay"]
+	helpTexts["/cvplay"] = helpTexts["/vplay"]
 }
 
-func playHandler(c *td.Client, m *td.Message) error  { return handlePlay(c, m, &playOpts{}) }
-func fplayHandler(c *td.Client, m *td.Message) error { return handlePlay(c, m, &playOpts{Force: true}) }
-
-func cfplayHandler(c *td.Client, m *td.Message) error {
-	return handlePlay(c, m, &playOpts{Force: true, CPlay: true})
+func playCmd(o playOpts) func(*td.Client, *td.Message) error {
+	return func(c *td.Client, m *td.Message) error { return handlePlay(c, m, o) }
 }
 
-func vplayHandler(c *td.Client, m *td.Message) error { return handlePlay(c, m, &playOpts{Video: true}) }
+var (
+	playHandler   = playCmd(playOpts{})
+	fplayHandler  = playCmd(playOpts{Force: true})
+	cplayHandler  = playCmd(playOpts{CPlay: true})
+	cfplayHandler = playCmd(playOpts{Force: true, CPlay: true})
+	vplayHandler  = playCmd(playOpts{Video: true})
+	fvplayHandler = playCmd(playOpts{Force: true, Video: true})
+	vcplayHandler = playCmd(playOpts{CPlay: true, Video: true})
 
-func fvplayHandler(c *td.Client, m *td.Message) error {
-	return handlePlay(c, m, &playOpts{Force: true, Video: true})
+	fvcplayHandler = playCmd(playOpts{Force: true, CPlay: true, Video: true})
+)
+
+// playReq carries one /play request through its steps. A step that cannot
+// continue returns an error whose text is shown to the user as is.
+type playReq struct {
+	playOpts
+
+	c      *td.Client
+	m      *td.Message
+	chatID int64
+
+	room   *core.Room
+	status *td.Message // the "searching" message, later the player message
+	tracks []*state.Track
+	by     string // mention of the requester
+	active bool   // something was already playing
+	full   bool   // the queue limit cut the request short
 }
 
-func vcplayHandler(c *td.Client, m *td.Message) error {
-	return handlePlay(c, m, &playOpts{CPlay: true, Video: true})
-}
-
-func fvcplayHandler(c *td.Client, m *td.Message) error {
-	return handlePlay(c, m, &playOpts{Force: true, CPlay: true, Video: true})
-}
-
-func cplayHandler(c *td.Client, m *td.Message) error { return handlePlay(c, m, &playOpts{CPlay: true}) }
-
-func handlePlay(c *td.Client, m *td.Message, opts *playOpts) error {
-	chatID := m.ChatID()
-
+func handlePlay(c *td.Client, m *td.Message, o playOpts) error {
 	if !isSuperGroup(c, m) {
 		return nil
 	}
 
-	if !canUsePlayCommand(c, m, chatID) {
-		_, err := m.ReplyText(c, F(chatID, "playmode_restricted"), nil)
+	p := &playReq{playOpts: o, c: c, m: m, chatID: m.ChatID()}
+	for _, step := range []func() error{p.allow, p.prepare, p.fetch, p.admit, p.start} {
+		if err := step(); err != nil {
+			p.fail(err)
+			return nil
+		}
+	}
+	return nil
+}
+
+func (p *playReq) errf(key string, args ...locales.Arg) error {
+	return errors.New(F(p.chatID, key, args...))
+}
+
+// show edits the status message, or replies if there is none yet.
+func (p *playReq) show(text string) {
+	if p.status != nil {
+		utils.EOR(p.c, p.status, text, nil)
+		return
+	}
+	p.m.ReplyText(p.c, text, nil)
+}
+
+func (p *playReq) fail(err error) {
+	if errors.Is(err, core.ErrRoomDestroyed) {
+		if p.status != nil {
+			p.status.Delete(p.c, &td.DeleteMessagesOpts{Revoke: true})
+		}
+		return
+	}
+	p.show(err.Error())
+}
+
+// allow checks that the sender may use /play in this chat.
+func (p *playReq) allow() error {
+	adminsOnly, _ := database.PlayModeAdminsOnly(p.chatID)
+	if !adminsOnly {
+		return nil
+	}
+	if ok, err := utils.IsChatAdmin(p.c, p.chatID, p.m.SenderID()); err == nil && ok {
+		return nil
+	}
+	if ok, _ := database.IsAuthorized(p.chatID, p.m.SenderID()); ok {
+		return nil
+	}
+	return p.errf("playmode_restricted")
+}
+
+// prepare resolves the room and sends the "searching" message.
+func (p *playReq) prepare() (err error) {
+	if p.room, err = getEffectiveRoom(p.chatID, p.CPlay); err != nil {
+		return err
+	}
+	p.room.Refresh()
+
+	if config.QueueLimit > 0 && p.room.QueueLen() >= config.QueueLimit {
+		return p.errf("queue_limit_reached", locales.Arg{"limit": config.QueueLimit})
+	}
+
+	query := extractPlayQuery(p.m.Text())
+	if query == "" && p.m.ReplyToMessageID() == 0 {
+		return p.errf("no_song_query", locales.Arg{"cmd": getCommand(p.m)})
+	}
+
+	text := F(p.chatID, "searching")
+	if query != "" {
+		text = F(p.chatID, "searching_query", locales.Arg{"query": utils.EscapeHTML(query)})
+	}
+	p.status, err = p.m.ReplyText(p.c, text, nil)
+	return err
+}
+
+// fetch looks the tracks up and makes sure the assistant can join the call.
+func (p *playReq) fetch() (err error) {
+	if p.tracks, err = platforms.GetTracks(p.c, p.m, p.Video); err != nil {
+		return err
+	}
+	if len(p.tracks) == 0 {
+		return p.errf("no_song_found")
+	}
+
+	cs, err := core.ChatStateFor(p.room.ChatID)
+	if err != nil {
+		utils.Log.Errorf("Error getting chat state: %v", err)
+		return p.wrap(err)
+	}
+	if err := p.joinCall(cs); err != nil {
 		return err
 	}
 
-	room, searchMsg, err := preparePlayRequest(c, m, opts.CPlay)
-	if err != nil {
-		return nil
-	}
-
-	tracks, isActive, err := fetchTracksAndCheckStatus(c, m, searchMsg, room, opts.Video)
-	if err != nil {
-		return nil
-	}
-
-	if rejectDuplicate(c, searchMsg, room, tracks, opts.Force) {
-		return nil
-	}
-
-	if config.QueueLimit == 0 && isActive && !opts.Force {
-		utils.EOR(c, searchMsg, F(chatID, "play_already_playing"), nil)
-		return nil
-	}
-
-	tracks, availableSlots, err := filterAndTrimTracks(c, searchMsg, room, tracks)
-	if err != nil {
-		return nil
-	}
-
-	sender, _ := m.GetUser(c)
-	mention := mention(sender, m.SenderID())
-	return playTracksAndRespond(c, m, searchMsg, room, tracks, mention, isActive, opts.Force, availableSlots)
+	p.active = p.room.Active()
+	return nil
 }
 
-func canUsePlayCommand(c *td.Client, m *td.Message, chatID int64) bool {
-	adminsOnly, _ := database.PlayModeAdminsOnly(chatID)
-	if !adminsOnly {
-		return true
+func (p *playReq) joinCall(cs *core.ChatState) error {
+	snap, err := cs.Snapshot()
+	if err != nil {
+		utils.Log.Errorf("Error checking voicechat state: %v", err)
+		return p.wrap(err)
 	}
 
-	isAdmin, err := utils.IsChatAdmin(c, chatID, m.SenderID())
-	if err == nil && isAdmin {
-		return true
+	switch {
+	case snap.VoiceChatActive != nil && !*snap.VoiceChatActive:
+		return p.errf("err_no_active_voicechat")
+	case snap.AssistantBanned:
+		return p.errf("err_assistant_banned", locales.Arg{
+			"user": mentionHTML(cs.Assistant.Self.FirstName+" "+cs.Assistant.Self.LastName, cs.Assistant.Self.ID),
+			"id":   utils.IntToStr(cs.Assistant.Self.ID),
+		})
+	case snap.AssistantPresent:
+		return nil
 	}
 
-	isAuth, _ := database.IsAuthorized(chatID, m.SenderID())
-	return isAuth
+	if err := cs.Join(); err != nil {
+		utils.Log.Errorf("Error joining assistant: %v", err)
+		return p.wrap(err)
+	}
+	time.Sleep(time.Second)
+	return nil
 }
 
-// preparePlayRequest resolves the playback room and the "searching" status
-// message. Any error has already been shown to the user.
-func preparePlayRequest(c *td.Client, m *td.Message, cplay bool) (*core.Room, *td.Message, error) {
-	chatID := m.ChatID()
+// wrap turns an internal error into the message shown to the user.
+func (p *playReq) wrap(err error) error {
+	return errors.New(getErrorMessage(p.chatID, err))
+}
 
-	room, err := getEffectiveRoom(chatID, cplay)
-	if err != nil {
-		if _, rerr := m.ReplyText(c, err.Error(), nil); rerr != nil {
-			return nil, nil, rerr
+// admit applies the duplicate, duration and queue limits to the tracks.
+func (p *playReq) admit() error {
+	if len(p.tracks) == 1 && !p.Force && isTrackInQueue(p.room, p.tracks[0]) {
+		return p.errf("play_already_in_queue", locales.Arg{
+			"title": utils.EscapeHTML(utils.ShortTitle(p.tracks[0].Title, 35)),
+		})
+	}
+	if config.QueueLimit == 0 && p.active && !p.Force {
+		return p.errf("play_already_playing")
+	}
+
+	var kept []*state.Track
+	var tooLong []string
+	for _, t := range p.tracks {
+		if t.Duration > config.DurationLimit {
+			tooLong = append(tooLong, utils.EscapeHTML(utils.ShortTitle(t.Title, 35)))
+			continue
 		}
-		return nil, nil, err
+		kept = append(kept, t)
 	}
-	room.Refresh()
 
-	if config.QueueLimit > 0 && room.QueueLen() >= config.QueueLimit {
-		if _, rerr := m.ReplyText(c, F(chatID, "queue_limit_reached", locales.Arg{"limit": config.QueueLimit}), nil); rerr != nil {
-			return nil, nil, rerr
+	switch {
+	case len(tooLong) == 0:
+	case len(kept) == 0 && len(p.tracks) == 1:
+		return p.errf("play_single_track_too_long", locales.Arg{
+			"limit_mins": utils.FormatDuration(config.DurationLimit),
+			"title":      tooLong[0],
+		})
+	case len(kept) == 0:
+		return p.errf("play_all_tracks_skipped")
+	default:
+		p.show(buildSkippedTracksText(p.chatID, tooLong))
+		time.Sleep(time.Second)
+	}
+	p.tracks = kept
+
+	if config.QueueLimit >= 0 {
+		free := max(config.QueueLimit-p.room.QueueLen(), 0)
+		if free == 0 && (!p.active || p.Force) {
+			free = 1 // the track that starts playing needs no queue slot
 		}
-		return nil, nil, fmt.Errorf("queue limit reached")
+		p.full = config.QueueLimit > 0 && free <= len(p.tracks)
+		p.tracks = p.tracks[:min(free, len(p.tracks))]
 	}
+	return nil
+}
 
-	query := extractPlayQuery(m.Text())
-	if query == "" && m.ReplyToMessageID() == 0 {
-		if _, rerr := m.ReplyText(c, F(chatID, "no_song_query", locales.Arg{"cmd": getCommand(m)}), nil); rerr != nil {
-			return nil, nil, rerr
+// start plays or queues the tracks and answers the user.
+func (p *playReq) start() error {
+	sender, _ := p.m.GetUser(p.c)
+	p.by = mention(sender, p.m.SenderID())
+	starts := !p.active || p.Force
+
+	for i, t := range p.tracks {
+		t.Requester = p.by
+
+		path := ""
+		if i == 0 && starts {
+			var err error
+			if path, err = p.download(t); err != nil {
+				return err
+			}
 		}
-		return nil, nil, fmt.Errorf("no song query")
+		if err := p.playTrack(t, path, p.Force && i == 0); err != nil {
+			return err
+		}
+		sendPlayLogs(p.c, p.m, t, i > 0 || !starts)
 	}
 
-	statusText := F(chatID, "searching")
-	if query != "" {
-		statusText = F(chatID, "searching_query", locales.Arg{"query": utils.EscapeHTML(query)})
+	p.reply(starts)
+	return nil
+}
+
+func (p *playReq) reply(started bool) {
+	first, n := p.tracks[0], len(p.tracks)
+
+	switch {
+	case started:
+		msg := sendNowPlaying(p.c, p.status, p.chatID, p.room, first)
+		if msg == nil {
+			return
+		}
+		p.room.SetStatusMsg(msg)
+		if n > 1 {
+			msg.ReplyText(p.c, p.addedText(n-1), nil)
+		}
+	case n == 1:
+		showTrackMessage(p.c, p.status, p.chatID, p.room, first,
+			buildSingleQueueReply(p.chatID, p.room, first, p.by), true)
+	default:
+		utils.EOR(p.c, p.status, p.addedText(n), &td.EditMessageTextOpts{ParseMode: "HTML"})
+	}
+}
+
+func (p *playReq) addedText(count int) string {
+	var b strings.Builder
+	b.WriteString(F(p.chatID, "play_added_multiple_header", locales.Arg{"count": count, "user": p.by}))
+	b.WriteString("\n\n")
+	if p.full {
+		b.WriteString(F(p.chatID, "play_queue_limit_hint"))
+		b.WriteString("\n")
+	}
+	b.WriteString(F(p.chatID, "play_queue_view_hint"))
+	return b.String()
+}
+
+// download fetches the track that is about to start, with a cancel button for long ones.
+func (p *playReq) download(t *state.Track) (string, error) {
+	var opts *td.EditMessageTextOpts
+	if t.Duration > 600 {
+		opts = &td.EditMessageTextOpts{ReplyMarkup: core.GetCancelKeyboard(p.chatID)}
+	}
+	title := utils.EscapeHTML(utils.ShortTitle(t.Title, 25))
+	if msg, _ := utils.EOR(p.c, p.status, F(p.chatID, "play_downloading_song", locales.Arg{"title": title}), opts); msg != nil {
+		p.status = msg
 	}
 
-	replyMsg, err := m.ReplyText(c, statusText, nil)
-	if err != nil {
-		utils.Log.Errorf("Failed to send searching message: %v", err)
-		return nil, nil, err
+	ctx, cancel := context.WithCancel(context.Background())
+	beginDownload(p.chatID, cancel, p.status)
+	defer finishDownload(p.chatID)
+
+	path, err := platforms.Download(ctx, t, p.status)
+	switch {
+	case errors.Is(err, context.Canceled):
+		return "", p.errf("play_download_canceled", locales.Arg{"user": p.by})
+	case err != nil:
+		return "", p.errf("play_download_failed")
 	}
 
-	return room, replyMsg, nil
+	utils.Log.Infof("Downloaded track to %s", path)
+	return path, nil
+}
+
+// playTrack starts a track, retrying the errors that are worth a retry.
+func (p *playReq) playTrack(t *state.Track, path string, force bool) error {
+	var err error
+	for attempt := 1; attempt <= playMaxRetries; attempt++ {
+		if err = p.room.Play(t, path, force); err == nil {
+			return nil
+		}
+		utils.Log.Errorf("play attempt %d/%d failed: %v", attempt, playMaxRetries, err)
+
+		wait, stop := p.onPlayError(err)
+		if stop != nil {
+			return stop
+		}
+		time.Sleep(wait)
+	}
+	return p.errf("play_failed", locales.Arg{"error": err.Error()})
+}
+
+// onPlayError sorts a failed Room.Play: either wait and retry, or stop with
+// the error to show.
+func (p *playReq) onPlayError(err error) (wait time.Duration, stop error) {
+	msg := err.Error()
+	flood := getFloodWait(err)
+
+	switch {
+	case errors.Is(err, core.ErrRoomDestroyed):
+		return 0, err
+	case flood > 0:
+		return time.Duration(flood) * time.Second, nil
+	case strings.Contains(msg, "INTERDC_X_CALL_ERROR"), strings.Contains(msg, "GROUPCALL_INVALID"):
+		return 2 * time.Second, nil
+	case errors.Is(err, ubot.ErrConnectionTimeout):
+		return 0, p.closeRoom("err_connection_timeout")
+	case strings.Contains(msg, "Streaming is not supported when using RTMP"):
+		return 0, p.closeRoom("rtmp_play_unsupported")
+	case strings.Contains(msg, "group call") && strings.Contains(msg, "is closed"):
+		markVoiceChatInactive(p.room.ChatID)
+		return 0, p.errf("err_no_active_voicechat")
+	}
+	return 0, nil
+}
+
+func (p *playReq) closeRoom(key string) error {
+	core.Rooms.Delete(p.room.ChatID)
+	return p.errf(key)
 }
 
 func extractPlayQuery(text string) string {
@@ -288,54 +511,6 @@ func extractPlayQuery(text string) string {
 	return strings.TrimSpace(parts[1])
 }
 
-func fetchTracksAndCheckStatus(
-	c *td.Client,
-	m *td.Message,
-	replyMsg *td.Message,
-	r *core.Room,
-	video bool,
-) ([]*state.Track, bool, error) {
-	tracks, err := safeGetTracks(c, m, replyMsg, m.ChatID(), video)
-	if err != nil {
-		utils.EOR(c, replyMsg, err.Error(), nil)
-		return nil, false, err
-	}
-	if len(tracks) == 0 {
-		utils.EOR(c, replyMsg, F(m.ChatID(), "no_song_found"), nil)
-		return nil, false, fmt.Errorf("no tracks found")
-	}
-
-	chatState, err := core.ChatStateFor(r.ChatID)
-	if err != nil {
-		utils.Log.Errorf("Error getting chat state: %v", err)
-		utils.EOR(c, replyMsg, getErrorMessage(m.ChatID(), err), nil)
-		return nil, false, err
-	}
-
-	if err := ensureVoiceChatReady(c, m.ChatID(), replyMsg, chatState); err != nil {
-		return nil, false, err
-	}
-
-	return tracks, r.Active(), nil
-}
-
-func rejectDuplicate(
-	c *td.Client,
-	replyMsg *td.Message,
-	r *core.Room,
-	tracks []*state.Track,
-	force bool,
-) bool {
-	if len(tracks) != 1 || force || !isTrackInQueue(r, tracks[0]) {
-		return false
-	}
-
-	utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "play_already_in_queue", locales.Arg{
-		"title": utils.EscapeHTML(utils.ShortTitle(tracks[0].Title, 35)),
-	}), nil)
-	return true
-}
-
 func isTrackInQueue(r *core.Room, t *state.Track) bool {
 	for _, qt := range r.Queue() {
 		if qt.URL == t.URL || qt.ID == t.ID {
@@ -343,107 +518,6 @@ func isTrackInQueue(r *core.Room, t *state.Track) bool {
 		}
 	}
 	return false
-}
-
-func ensureVoiceChatReady(
-	c *td.Client,
-	chatID int64,
-	replyMsg *td.Message,
-	cs *core.ChatState,
-) error {
-	snap, err := cs.Snapshot()
-	if err != nil {
-		utils.Log.Errorf("Error checking voicechat state: %v", err)
-		utils.EOR(c, replyMsg, getErrorMessage(chatID, err), nil)
-		return err
-	}
-
-	if snap.VoiceChatActive != nil && !*snap.VoiceChatActive {
-		utils.EOR(c, replyMsg, F(chatID, "err_no_active_voicechat"), nil)
-		return fmt.Errorf("no active voice chat")
-	}
-
-	if snap.AssistantBanned {
-		utils.EOR(c, replyMsg, F(chatID, "err_assistant_banned", locales.Arg{
-			"user": mentionHTML(cs.Assistant.Self.FirstName+" "+cs.Assistant.Self.LastName, cs.Assistant.Self.ID),
-			"id":   utils.IntToStr(cs.Assistant.Self.ID),
-		}), nil)
-		return fmt.Errorf("assistant banned")
-	}
-
-	if snap.AssistantPresent {
-		return nil
-	}
-
-	if err := cs.Join(); err != nil {
-		utils.Log.Errorf("Error joining assistant: %v", err)
-		utils.EOR(c, replyMsg, getErrorMessage(chatID, err), nil)
-		return err
-	}
-
-	time.Sleep(1 * time.Second)
-	return nil
-}
-
-func filterAndTrimTracks(
-	c *td.Client,
-	replyMsg *td.Message,
-	r *core.Room,
-	tracks []*state.Track,
-) ([]*state.Track, int, error) {
-	chatID := replyMsg.ChatID()
-	accepted := make([]*state.Track, 0, len(tracks))
-	skippedTitles := make([]string, 0)
-
-	for _, track := range tracks {
-		if track.Duration > config.DurationLimit {
-			skippedTitles = append(
-				skippedTitles,
-				utils.EscapeHTML(utils.ShortTitle(track.Title, 35)),
-			)
-			continue
-		}
-		accepted = append(accepted, track)
-	}
-
-	if len(skippedTitles) > 0 {
-		if len(tracks) == 1 && len(accepted) == 0 {
-			utils.EOR(c, replyMsg, F(chatID, "play_single_track_too_long", locales.Arg{
-				"limit_mins": utils.FormatDuration(config.DurationLimit),
-				"title":      skippedTitles[0],
-			}), nil)
-			return nil, 0, fmt.Errorf("single long track skipped")
-		}
-
-		utils.EOR(c, replyMsg, buildSkippedTracksText(chatID, skippedTitles), nil)
-		time.Sleep(1 * time.Second)
-	}
-
-	if len(accepted) == 0 {
-		utils.EOR(c, replyMsg, F(chatID, "play_all_tracks_skipped"), nil)
-		return nil, 0, fmt.Errorf("all tracks skipped")
-	}
-
-	availableSlots := config.QueueLimit - r.QueueLen()
-	if config.QueueLimit < 0 {
-		availableSlots = len(accepted)
-	} else if availableSlots < 0 {
-		availableSlots = 0
-	}
-
-	if availableSlots == 0 && len(accepted) > 0 && !r.Active() {
-		availableSlots = 1
-	}
-
-	if availableSlots < len(accepted) {
-		accepted = accepted[:availableSlots]
-		utils.Log.Warnf(
-			"Queue full — adding only %d tracks out of requested.",
-			availableSlots,
-		)
-	}
-
-	return accepted, availableSlots, nil
 }
 
 func buildSkippedTracksText(chatID int64, skippedTitles []string) string {
@@ -479,152 +553,6 @@ func buildSkippedTracksText(chatID int64, skippedTitles []string) string {
 	return b.String()
 }
 
-func playTracksAndRespond(
-	c *td.Client,
-	m *td.Message,
-	replyMsg *td.Message,
-	r *core.Room,
-	tracks []*state.Track,
-	mention string,
-	isActive, force bool,
-	availableSlots int,
-) error {
-	chatID := m.ChatID()
-
-	for i, track := range tracks {
-		track.Requester = mention
-
-		filePath := ""
-		if i == 0 && (!isActive || force) {
-			path, err := downloadFirstTrack(c, replyMsg, chatID, mention, track)
-			if err != nil {
-				return nil
-			}
-			filePath = path
-		}
-
-		if err := playTrackWithRetry(r, track, filePath, force && i == 0, c, replyMsg); err != nil {
-			return err
-		}
-
-		sendPlayLogs(c, m, track, (isActive && !force) || i > 0)
-	}
-
-	return finalizePlayReply(
-		c,
-		replyMsg,
-		r,
-		tracks,
-		mention,
-		isActive,
-		force,
-		availableSlots,
-	)
-}
-
-func downloadFirstTrack(
-	c *td.Client,
-	replyMsg *td.Message,
-	chatID int64,
-	mention string,
-	track *state.Track,
-) (string, error) {
-	title := utils.EscapeHTML(utils.ShortTitle(track.Title, 25))
-	var editOpts *td.EditMessageTextOpts
-	if track.Duration > 600 {
-		editOpts = &td.EditMessageTextOpts{ReplyMarkup: core.GetCancelKeyboard(chatID)}
-	}
-
-	replyMsg, _ = utils.EOR(
-		c,
-		replyMsg,
-		F(chatID, "play_downloading_song", locales.Arg{"title": title}),
-		editOpts,
-	)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	beginDownload(chatID, cancel, replyMsg)
-	defer finishDownload(chatID)
-
-	path, err := downloadTrack(ctx, c, track, replyMsg, chatID)
-	if err != nil {
-		if errors.Is(err, context.Canceled) {
-			utils.EOR(
-				c,
-				replyMsg,
-				F(chatID, "play_download_canceled", locales.Arg{"user": mention}),
-				nil,
-			)
-		} else {
-			utils.EOR(c, replyMsg, F(chatID, "play_download_failed"), nil)
-		}
-		return "", err
-	}
-
-	utils.Log.Infof("Downloaded track to %s", path)
-	return path, nil
-}
-
-func finalizePlayReply(
-	c *td.Client,
-	replyMsg *td.Message,
-	r *core.Room,
-	tracks []*state.Track,
-	mention string,
-	isActive bool,
-	force bool,
-	availableSlots int,
-) error {
-	chatID := replyMsg.ChatID()
-	if len(tracks) == 0 {
-		return nil
-	}
-	mainTrack := tracks[0]
-
-	if !isActive || force {
-		replyMsg = sendNowPlaying(c, replyMsg, chatID, r, mainTrack)
-		if replyMsg != nil {
-			r.SetStatusMsg(replyMsg)
-		}
-
-		if len(tracks) > 1 {
-			replyMsg.ReplyText(
-				c,
-				buildMultiAddedText(
-					chatID,
-					len(tracks)-1,
-					mention,
-					availableSlots,
-					len(tracks),
-				),
-				nil,
-			)
-		}
-		return nil
-	}
-
-	if len(tracks) == 1 {
-		showTrackMessage(
-			c,
-			replyMsg,
-			chatID,
-			r,
-			mainTrack,
-			buildSingleQueueReply(chatID, r, mainTrack, mention),
-			true,
-		)
-		return nil
-	}
-
-	utils.EOR(
-		c,
-		replyMsg,
-		buildMultiAddedText(chatID, len(tracks), mention, availableSlots, len(tracks)),
-		&td.EditMessageTextOpts{ParseMode: "HTML"},
-	)
-	return nil
-}
-
 func buildSingleQueueReply(
 	chatID int64,
 	r *core.Room,
@@ -640,145 +568,6 @@ func buildSingleQueueReply(
 		"duration": utils.FormatDuration(track.Duration),
 		"by":       mention,
 	})
-}
-
-func buildMultiAddedText(
-	chatID int64,
-	count int,
-	mention string,
-	availableSlots, trackCount int,
-) string {
-	var b strings.Builder
-	b.WriteString(
-		F(
-			chatID,
-			"play_added_multiple_header",
-			locales.Arg{"count": count, "user": mention},
-		),
-	)
-	b.WriteString("\n\n")
-
-	if config.QueueLimit > 0 && availableSlots <= trackCount {
-		b.WriteString(F(chatID, "play_queue_limit_hint"))
-		b.WriteString("\n")
-	}
-
-	b.WriteString(F(chatID, "play_queue_view_hint"))
-	return b.String()
-}
-
-func playTrackWithRetry(
-	r *core.Room,
-	track *state.Track,
-	filePath string,
-	force bool,
-	c *td.Client,
-	replyMsg *td.Message,
-) error {
-	for attempt := 1; attempt <= playMaxRetries; attempt++ {
-		if r.Destroyed() {
-			utils.Log.Info("Room destroyed during retry, aborting")
-			replyMsg.Delete(c, &td.DeleteMessagesOpts{Revoke: true})
-			return nil
-		}
-
-		err := r.Play(track, filePath, force)
-		if err == nil {
-			if attempt > 1 {
-				utils.Log.Info(
-					"Successfully played after retry attempt " + utils.IntToStr(attempt),
-				)
-			}
-			return nil
-		}
-
-		if handlePlayAttemptError(err, attempt, c, replyMsg, r) {
-			continue
-		}
-
-		if attempt == playMaxRetries {
-			utils.Log.Error(
-				"❌ Failed to play after " + utils.IntToStr(
-					playMaxRetries,
-				) + " attempts. Error: " + err.Error(),
-			)
-			utils.EOR(
-				c,
-				replyMsg,
-				F(replyMsg.ChatID(), "play_failed", locales.Arg{"error": err.Error()}),
-				nil,
-			)
-			return err
-		}
-
-		utils.Log.Error(
-			"Unexpected error occurred. Retrying... (attempt " + utils.IntToStr(
-				attempt,
-			) + "): " + err.Error(),
-		)
-	}
-
-	return nil
-}
-
-func handlePlayAttemptError(
-	err error,
-	attempt int,
-	c *td.Client,
-	replyMsg *td.Message,
-	room *core.Room,
-) bool {
-	if wait := getFloodWait(err); wait > 0 {
-		utils.Log.Error(
-			"FloodWait detected (" + strconv.Itoa(
-				wait,
-			) + "s). Retrying... (attempt " + utils.IntToStr(
-				attempt,
-			) + ")",
-		)
-		time.Sleep(time.Duration(wait) * time.Second)
-		return true
-	}
-
-	if errors.Is(err, ubot.ErrConnectionTimeout) {
-		utils.Log.Error("Voice connection timeout. Stopping call session...")
-		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "err_connection_timeout"), nil)
-		core.Rooms.Delete(room.ChatID)
-		return true
-	}
-
-	if strings.Contains(err.Error(), "Streaming is not supported when using RTMP") {
-		utils.Log.Error("RTMP/live-stream voice chat detected, cannot play. Cleaning up...")
-		core.Rooms.Delete(room.ChatID)
-		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "rtmp_play_unsupported"), nil)
-		return true
-	}
-
-	if strings.Contains(err.Error(), "group call") &&
-		strings.Contains(err.Error(), "is closed") {
-		markVoiceChatInactive(room.ChatID)
-		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "err_no_active_voicechat"), nil)
-		return true
-	}
-
-	if strings.Contains(err.Error(), "GROUPCALL_INVALID") {
-		utils.Log.Error("GROUPCALL_INVALID err occurred. Returning...")
-		core.Rooms.Delete(room.ChatID)
-		utils.EOR(c, replyMsg, F(replyMsg.ChatID(), "play_unable"), nil)
-		return true
-	}
-
-	if strings.Contains(err.Error(), "INTERDC_X_CALL_ERROR") {
-		utils.Log.Error(
-			"INTERDC_X_CALL_ERROR occurred. Retrying... (attempt " + utils.IntToStr(
-				attempt,
-			) + ")",
-		)
-		time.Sleep(2 * time.Second)
-		return true
-	}
-
-	return false
 }
 
 // markVoiceChatInactive records that no active voice chat is running in the
@@ -843,41 +632,4 @@ func floodWaitMessage(chatID int64, wait int) string {
 		return F(chatID, "flood_minutes", locales.Arg{"duration": utils.FormatDuration(wait)})
 	}
 	return F(chatID, "flood_seconds", locales.Arg{"duration": wait})
-}
-
-// downloadTrack and safeGetTracks convert platform panics into errors so a
-// single failed lookup or download cannot take down the whole bot.
-func safeGetTracks(
-	c *td.Client,
-	m, replyMsg *td.Message,
-	chatID int64,
-	video bool,
-) (tracks []*state.Track, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			utils.EOR(c, replyMsg, F(chatID, "err_fetch_tracks"), nil)
-			err = fmt.Errorf("recovered panic while fetching tracks: %v", r)
-		}
-	}()
-
-	return platforms.GetTracks(c, m, video)
-}
-
-// downloadTrack runs the platform download, showing an internal-error message
-// and converting any panic into a returned error.
-func downloadTrack(
-	ctx context.Context,
-	c *td.Client,
-	track *state.Track,
-	replyMsg *td.Message,
-	chatID int64,
-) (path string, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			utils.EOR(c, replyMsg, F(chatID, "err_download_internal"), nil)
-			err = fmt.Errorf("recovered panic while downloading: %v", r)
-		}
-	}()
-
-	return platforms.Download(ctx, track, replyMsg)
 }
