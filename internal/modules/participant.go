@@ -109,7 +109,7 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 		newStatus != "creator":
 
 		if c.Me != nil && userID == c.Me.Id && config.LeaveOnDemoted {
-			cleanScheduler.cancel(chatID)
+			cleaner.Clear(chatID)
 			core.Rooms.Delete(chatID)
 			core.DropChatState(chatID)
 			if _, rerr := c.SendMessage(chatID, F(chatID, "bot_demotion_goodbye"), nil); rerr != nil {
@@ -170,9 +170,6 @@ func handleAssistantRestriction(
 	utils.Log.Debug("Assistant banned in " + utils.IntToStr(chatID))
 
 	s.SetPresent(false)
-	if room, ok := core.Rooms.Get(chatID); ok {
-		scheduleOldPlayingMessage(room)
-	}
 	core.Rooms.Delete(chatID)
 
 	err := c.SetChatMemberStatus(

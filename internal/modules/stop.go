@@ -101,7 +101,6 @@ func handleStop(c *td.Client, m *td.Message, cplay bool) error {
 		}
 	}
 
-	scheduleOldPlayingMessage(r)
 	core.Rooms.Delete(r.ChatID)
 	sender, _ := m.GetUser(c)
 	_, rerr := m.ReplyText(

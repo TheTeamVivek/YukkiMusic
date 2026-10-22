@@ -67,7 +67,7 @@ func init() {
 				return err
 			}
 			if !on {
-				cleanScheduler.cancel(chatID)
+				cleaner.Clear(chatID)
 			}
 			return nil
 		},
@@ -153,7 +153,7 @@ func cleanModeHandler(c *td.Client, m *td.Message) error {
 					return err
 				}
 				if !enabled {
-					cleanScheduler.cancel(chatID)
+					cleaner.Clear(chatID)
 				}
 			}
 		}
@@ -298,7 +298,7 @@ func settingsCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	case "cleanmode":
 		settings.CleanMode = !settings.CleanMode
 		if !settings.CleanMode {
-			cleanScheduler.cancel(chatID)
+			cleaner.Clear(chatID)
 		}
 	case "cleanduration":
 		next := cleanModeDurationOptions[0]

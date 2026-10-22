@@ -335,7 +335,7 @@ func WithBlacklistMessage(
 			} else {
 				cleanMode, _ := database.CleanMode(m.ChatID())
 				if cleanMode {
-					cleanScheduler.schedule(m.ChatID(), m.Id)
+					cleaner.Add(m.ChatID(), m.Id)
 				}
 			}
 		}

@@ -105,8 +105,6 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	if r.QueueLen() == 0 {
-
-		scheduleOldPlayingMessage(r)
 		core.Rooms.Delete(r.ChatID)
 		_, err := m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
@@ -118,8 +116,6 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 
 	for i := 1; i < skipCount; i++ {
 		if r.QueueLen() == 0 {
-
-			scheduleOldPlayingMessage(r)
 			core.Rooms.Delete(r.ChatID)
 			_, err := m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 				"user": mention,
@@ -130,8 +126,6 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	if r.QueueLen() == 0 {
-
-		scheduleOldPlayingMessage(r)
 		core.Rooms.Delete(r.ChatID)
 		_, err := m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
@@ -141,8 +135,6 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 
 	t := r.NextTrack()
 	if t == nil {
-
-		scheduleOldPlayingMessage(r)
 		core.Rooms.Delete(r.ChatID)
 		_, err := m.ReplyText(c, F(chatID, "skip_stopped", locales.Arg{
 			"user": mention,
@@ -171,7 +163,6 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 			core.Bot.SendMessage(chatID, txt, nil)
 		}
 
-		scheduleOldPlayingMessage(r)
 		core.Rooms.Delete(r.ChatID)
 		return nil
 	}
@@ -183,7 +174,6 @@ func handleSkip(c *td.Client, m *td.Message, cplay bool) error {
 		} else {
 			core.Bot.SendMessage(chatID, txt, nil)
 		}
-		scheduleOldPlayingMessage(r)
 		core.Rooms.Delete(r.ChatID)
 		return nil
 	}

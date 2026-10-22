@@ -43,7 +43,6 @@ func streamEndHandler(
 	if !ok {
 		return
 	}
-	scheduleOldPlayingMessage(r)
 
 	c := core.Bot
 	cid := r.ControlChatID

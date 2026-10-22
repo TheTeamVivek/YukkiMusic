@@ -18,6 +18,8 @@
 package modules
 
 import (
+	"context"
+
 	td "github.com/AshokShau/gotdbot"
 	"github.com/AshokShau/gotdbot/filters/callbackquery"
 
@@ -122,7 +124,19 @@ func Init(bot *td.Client, assistants *core.ClientManager) {
 	bot.OnMessage(WithBlacklistMessage(handleActions), actionFilter)
 	bot.OnUpdateFile(downloadUpdateHandler, nil)
 
-	bot.OnUpdateChatReadOutbox(cleanModeReadHandler, nil)
+	bot.OnUpdateMessageSendSucceeded(func(_ *td.Client, u *td.UpdateMessageSendSucceeded) error {
+		if m := u.Message; m != nil && m.IsOutgoing && m.SendingState == nil {
+			cleaner.Add(m.ChatId, m.Id)
+		}
+		return td.ContinueGroups
+	}, nil)
+	bot.OnUpdateDeleteMessages(func(_ *td.Client, u *td.UpdateDeleteMessages) error {
+		if !u.FromCache && u.IsPermanent {
+			cleaner.Forget(u.ChatId, u.MessageIds)
+		}
+		return td.ContinueGroups
+	}, nil)
+
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(cancelHandler), callbackquery.Equal("cancel"))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(closeHandler), callbackquery.Equal("close"))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(roomHandle), callbackquery.Regex("^room:-?\\d+:\\w+$"))
@@ -139,7 +153,7 @@ func Init(bot *td.Client, assistants *core.ClientManager) {
 	go MonitorRooms()
 
 	autoLeaveSvc.Start()
-	cleanScheduler.start()
+	go cleaner.Run(context.Background())
 
 	if config.SetCmds && config.OwnerID != 0 {
 		go setBotCommands(bot)
