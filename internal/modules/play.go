@@ -184,6 +184,10 @@ func cplayHandler(c *td.Client, m *td.Message) error { return handlePlay(c, m, &
 func handlePlay(c *td.Client, m *td.Message, opts *playOpts) error {
 	chatID := m.ChatID()
 
+	if !isSuperGroup(c, m) {
+		return nil
+	}
+
 	if !canUsePlayCommand(c, m, chatID) {
 		_, err := m.ReplyText(c, F(chatID, "playmode_restricted"), nil)
 		return err

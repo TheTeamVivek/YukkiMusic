@@ -72,7 +72,7 @@ func addAuthHandler(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 
 	if !canManageAuth(c, chatID, m.SenderID()) {
-		_, err := m.ReplyRichMessage(c, onlyAdminRich(chatID), nil)
+		_, err := m.ReplyRichMessageHTML(c, F(chatID, "only_admin"), nil)
 		return err
 	}
 
@@ -167,7 +167,7 @@ func delAuthHandler(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 
 	if !canManageAuth(c, chatID, m.SenderID()) {
-		_, err := m.ReplyRichMessage(c, onlyAdminRich(chatID), nil)
+		_, err := m.ReplyRichMessageHTML(c, F(chatID, "only_admin"), nil)
 		return err
 	}
 
