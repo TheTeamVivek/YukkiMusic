@@ -34,6 +34,138 @@ import (
 	"yukkimusic/internal/utils"
 )
 
+func getCommand(m *td.Message) string {
+	parts := strings.Fields(m.Text())
+	if len(parts) == 0 {
+		return ""
+	}
+	cmd, _, _ := strings.Cut(parts[0], "@")
+	return cmd
+}
+
+func checkSudo(c *td.Client, m *td.Message) bool {
+	return allowed(c, m, isOwnerOrSudo(m.SenderID()), "only_sudo")
+}
+
+func checkOwner(c *td.Client, m *td.Message) bool {
+	return allowed(c, m, isOwner(m.SenderID()), "only_owner")
+}
+
+// allowed returns ok and, when it is false, tells the sender why with the
+// given locale key.
+func allowed(c *td.Client, m *td.Message, ok bool, key string) bool {
+	if !ok {
+		replyKey(c, m, key)
+	}
+	return ok
+}
+
+// replyKey replies with a localized text and logs a failure to send it.
+func replyKey(c *td.Client, m *td.Message, key string) {
+	if _, err := m.ReplyText(c, F(m.ChatID(), key), nil); err != nil {
+		utils.Log.Error(err.Error())
+	}
+}
+
+func isOwner(userID int64) bool {
+	return config.OwnerID != 0 && userID == config.OwnerID
+}
+
+func isSuperGroup(c *td.Client, m *td.Message) bool {
+	if m.IsPrivate() {
+		replyKey(c, m, "only_supergroup")
+		database.AddServedUser(m.ChatID())
+		return false
+	}
+
+	chat, err := m.GetChat(c)
+	if err != nil {
+		return false
+	}
+
+	sg, ok := chat.Type.(*td.ChatTypeSupergroup)
+	if !ok || sg.IsChannel {
+		return false
+	}
+
+	database.AddServedChat(m.ChatID())
+	return true
+}
+
+func filterAuthUsers(c *td.Client, m *td.Message) bool {
+	if isAdminOrAuth(c, m.ChatID(), m.SenderID()) {
+		return true
+	}
+	if _, err := m.ReplyRichMessageHTML(c, F(m.ChatID(), adminDeniedKey(m.ChatID())), nil); err != nil {
+		utils.Log.Error(err.Error())
+	}
+	return false
+}
+
+// adminDeniedKey picks the refusal text: "admins only" when the chat is in
+// that mode, otherwise "admins or authorized users".
+func adminDeniedKey(chatID int64) string {
+	if mode, err := database.GetAdminMode(chatID); err == nil && mode == database.AdminModeAdminsOnly {
+		return "only_admin"
+	}
+	return "only_admin_or_auth"
+}
+
+func isAdminOrAuth(c *td.Client, chatID, userID int64) bool {
+	if isOwnerOrSudo(userID) {
+		return true
+	}
+
+	mode, err := database.GetAdminMode(chatID)
+	if err != nil {
+		mode = database.AdminModeAdminAuth
+	}
+
+	if mode == database.AdminModeEveryone {
+		return true
+	}
+
+	isAdmin, err := utils.IsChatAdmin(c, chatID, userID)
+	if err == nil && isAdmin {
+		return true
+	}
+
+	if mode == database.AdminModeAdminsOnly {
+		return false
+	}
+
+	isAuth, err := database.IsAuthorized(chatID, userID)
+	return err == nil && isAuth
+}
+
+// canUseAdminCallback is the callback-query counterpart of filterAuthUsers: it
+// checks admin command access and, when denied, shows the proper toast (plain
+// text, since callback answers do not render HTML).
+func canUseAdminCallback(c *td.Client, u *td.UpdateNewCallbackQuery) bool {
+	if isAdminOrAuth(c, u.ChatId, u.SenderUserId) {
+		return true
+	}
+	u.Answer(c, F(u.ChatId, adminDeniedKey(u.ChatId)+"_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
+	return false
+}
+
+func canManageAuth(c *td.Client, chatID, userID int64) bool {
+	if isOwnerOrSudo(userID) {
+		return true
+	}
+
+	isAdmin, err := utils.IsChatAdmin(c, chatID, userID)
+	return err == nil && isAdmin
+}
+
+func isOwnerOrSudo(userID int64) bool {
+	if isOwner(userID) {
+		return true
+	}
+	isSudo, err := database.IsSudo(userID)
+	return err == nil && isSudo
+}
+
 func getEffectiveRoom(chatID int64, cplay bool) (*core.Room, error) {
 	origChatID := chatID
 
@@ -81,20 +213,6 @@ func activeRoomFor(c *td.Client, m *td.Message, cplay bool) (*core.Room, error) 
 	return r, nil
 }
 
-func shouldShowThumb(chatID int64) bool {
-	noThumb, err := database.ThumbnailsDisabled(chatID)
-	if err != nil {
-		// On error, default to showing thumbnails
-		return true
-	}
-	// ThumbnailsDisabled = true means DON'T show thumb
-	// So we return the inverse
-	return !noThumb
-}
-
-// sendNowPlaying sends or edits the "now playing" playback message for the
-// given track, honoring the thumbnail/artwork setting, and returns the
-// resulting message.
 // nowPlayingText builds the "now playing" status text for a track.
 func nowPlayingText(chatID int64, t *state.Track) string {
 	return F(chatID, "stream_now_playing", locales.Arg{
@@ -105,6 +223,8 @@ func nowPlayingText(chatID int64, t *state.Track) string {
 	})
 }
 
+// sendNowPlaying sends or edits the "now playing" message for a track and
+// returns the resulting message.
 func sendNowPlaying(
 	c *td.Client,
 	statusMsg *td.Message,
@@ -135,7 +255,7 @@ func showTrackMessage(
 		DisableWebPagePreview: true,
 	}
 
-	if t.Artwork != "" && shouldShowThumb(chatID) {
+	if noThumb, _ := database.ThumbnailsDisabled(chatID); t.Artwork != "" && !noThumb {
 		content := &td.InputMessagePhoto{
 			Photo: &td.InputPhoto{
 				Photo: td.InputFileRemote{Id: utils.CleanURL(t.Artwork)},
@@ -287,40 +407,31 @@ func WithBlacklistMessage(
 	handler func(*td.Client, *td.Message) error,
 ) func(*td.Client, *td.Message) error {
 	return func(c *td.Client, m *td.Message) error {
-		if blockedChat, _ := database.IsBlacklistedChat(m.ChatID()); blockedChat &&
-			!isOwnerOrSudo(m.SenderID()) {
-			if _, err := m.ReplyText(c, F(m.ChatID(), "blacklist_chat_blocked"), nil); err != nil {
-				utils.Log.Error(err.Error())
-			}
-			leaveChat(c, m.ChatID())
+		chatID, userID := m.ChatID(), m.SenderID()
+
+		if blocked, _ := database.IsBlacklistedChat(chatID); blocked && !isOwnerOrSudo(userID) {
+			replyKey(c, m, "blacklist_chat_blocked")
+			leaveChat(c, chatID)
 			return nil
 		}
-		if blocked, _ := database.IsBlacklistedUser(m.SenderID()); blocked {
-			if chat, err := m.GetChat(c); err == nil {
-				if sg, ok := chat.Type.(*td.ChatTypeSupergroup); ok && sg.IsChannel {
-					if chatOwnerID, err := utils.GetChatOwner(c, m.ChatID()); err == nil && chatOwnerID == m.SenderID() {
-						if _, rerr := m.ReplyText(c, F(m.ChatID(), "blacklist_owner_blocked_leave"), nil); rerr != nil {
-							utils.Log.Error(rerr.Error())
-						}
-						leaveChat(c, m.ChatID())
-						return nil
-					}
+
+		if blocked, _ := database.IsBlacklistedUser(userID); blocked {
+			if isChannel(c, m) {
+				if owner, err := utils.GetChatOwner(c, chatID); err == nil && owner == userID {
+					replyKey(c, m, "blacklist_owner_blocked_leave")
+					leaveChat(c, chatID)
+					return nil
 				}
 			}
-
-			if m.IsPrivate() || messageMentionsBot(c, m) {
-				if _, rerr := m.ReplyText(c, F(m.ChatID(), "blacklist_user_blocked"), nil); rerr != nil {
-					utils.Log.Error(rerr.Error())
-				}
+			if isAddressed(c, m) {
+				replyKey(c, m, "blacklist_user_blocked")
 			}
 			return nil
 		}
 
-		if !canBypassMaintenance(m.SenderID()) {
-			if m.IsPrivate() || messageMentionsBot(c, m) {
-				if _, rerr := m.ReplyText(c, F(m.ChatID(), "maint"), nil); rerr != nil {
-					utils.Log.Error(rerr.Error())
-				}
+		if !canBypassMaintenance(userID) {
+			if isAddressed(c, m) {
+				replyKey(c, m, "maint")
 			}
 			return td.EndGroups
 		}
@@ -328,15 +439,12 @@ func WithBlacklistMessage(
 		err := handler(c, m)
 
 		if m.IsCommand() {
-			if isEnabled, _ := database.CommandDelete(m.ChatID()); isEnabled {
+			if del, _ := database.CommandDelete(chatID); del {
 				if err := m.Delete(c, &td.DeleteMessagesOpts{Revoke: true}); err != nil {
 					utils.Log.Debugf("failed to delete command message: %v", err)
 				}
 			} else {
-				cleanMode, _ := database.CleanMode(m.ChatID())
-				if cleanMode {
-					cleaner.Add(m.ChatID(), m.Id)
-				}
+				cleaner.Add(chatID, m.Id) // a no-op unless clean mode is on
 			}
 		}
 
@@ -344,36 +452,26 @@ func WithBlacklistMessage(
 	}
 }
 
-// canBypassMaintenance reports whether the user is allowed to use the bot
-// while maintenance mode is active (owner or sudo users).
+// canBypassMaintenance reports whether the user may use the bot while
+// maintenance mode is active (owner or sudo users).
 func canBypassMaintenance(userID int64) bool {
-	isMaint, _ := database.GetMaintenance()
-	if !isMaint {
-		return true
-	}
-	if userID == config.OwnerID {
-		return true
-	}
-	ok, _ := database.IsSudo(userID)
-	return ok
+	maintenance, _ := database.GetMaintenance()
+	return !maintenance || isOwnerOrSudo(userID)
 }
 
-// messageMentionsBot reports whether the first word of the message mentions
-// the bot by username (e.g. "/cmd@BotUsername").
-func messageMentionsBot(c *td.Client, m *td.Message) bool {
+// isAddressed reports whether a message is meant for this bot: it is sent in
+// private, or its first word mentions the bot (e.g. "/cmd@BotUsername").
+func isAddressed(c *td.Client, m *td.Message) bool {
+	if m.IsPrivate() {
+		return true
+	}
 	fields := strings.Fields(m.Text())
-	if len(fields) == 0 {
+	if len(fields) == 0 || c.Me == nil || c.Me.Usernames == nil ||
+		len(c.Me.Usernames.ActiveUsernames) == 0 {
 		return false
 	}
-	_, mention, ok := strings.Cut(fields[0], "@")
-	if !ok || mention == "" {
-		return false
-	}
-	username := ""
-	if c.Me != nil && c.Me.Usernames != nil && len(c.Me.Usernames.ActiveUsernames) > 0 {
-		username = strings.ToLower(c.Me.Usernames.ActiveUsernames[0])
-	}
-	return username != "" && strings.EqualFold(mention, username)
+	_, name, ok := strings.Cut(fields[0], "@")
+	return ok && name != "" && strings.EqualFold(name, c.Me.Usernames.ActiveUsernames[0])
 }
 
 func leaveChat(c *td.Client, chatID int64) {
