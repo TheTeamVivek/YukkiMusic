@@ -15,6 +15,7 @@ database/
 *.db
 *.dat
 *.session
+*.log
 
 ntgcalls/*.h
 ntgcalls.zip

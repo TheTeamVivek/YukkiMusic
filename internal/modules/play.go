@@ -20,11 +20,11 @@ package modules
 import (
 	"context"
 	"errors"
-	"strconv"
 	"strings"
 	"time"
 
 	td "github.com/AshokShau/gotdbot"
+	tg "github.com/amarnathcjd/gogram/telegram"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
@@ -485,8 +485,10 @@ func (p *playReq) onPlayError(err error) (wait time.Duration, stop error) {
 		return 0, err
 	case flood > 0:
 		return time.Duration(flood) * time.Second, nil
-	case strings.Contains(msg, "INTERDC_X_CALL_ERROR"), strings.Contains(msg, "GROUPCALL_INVALID"):
+	case strings.Contains(msg, "INTERDC_X_CALL_ERROR"):
 		return 2 * time.Second, nil
+	case strings.Contains(msg, "GROUPCALL_INVALID"):
+		return 0, p.closeRoom("play_unable")
 	case errors.Is(err, ubot.ErrConnectionTimeout):
 		return 0, p.closeRoom("err_connection_timeout")
 	case strings.Contains(msg, "Streaming is not supported when using RTMP"):
@@ -590,13 +592,7 @@ func getFloodWait(err error) int {
 		}
 	}
 
-	msg := err.Error()
-	if _, after, ok := strings.Cut(msg, "FLOOD_WAIT_"); ok {
-		if wait, cerr := strconv.Atoi(after); cerr == nil {
-			return wait
-		}
-	}
-	return 0
+	return tg.GetFloodWait(err)
 }
 
 func getErrorMessage(chatID int64, err error) string {
