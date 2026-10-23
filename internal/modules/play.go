@@ -292,21 +292,24 @@ func (p *playReq) fetch() (err error) {
 }
 
 func (p *playReq) joinCall(cs *core.ChatState) error {
-	snap, err := cs.Snapshot()
+	st, err := cs.Status()
 	if err != nil {
 		utils.Log.Errorf("Error checking voicechat state: %v", err)
 		return p.wrap(err)
 	}
 
+	// A banned assistant is checked first: the voice chat state is unknown
+	// while it is banned.
 	switch {
-	case snap.VoiceChatActive != nil && !*snap.VoiceChatActive:
-		return p.errf("err_no_active_voicechat")
-	case snap.AssistantBanned:
+	case st.Presence == core.PresenceBanned:
+		self := cs.Assistant().Self
 		return p.errf("err_assistant_banned", locales.Arg{
-			"user": mentionHTML(cs.Assistant.Self.FirstName+" "+cs.Assistant.Self.LastName, cs.Assistant.Self.ID),
-			"id":   utils.IntToStr(cs.Assistant.Self.ID),
+			"user": mentionHTML(self.FirstName+" "+self.LastName, self.ID),
+			"id":   utils.IntToStr(self.ID),
 		})
-	case snap.AssistantPresent:
+	case st.Voice == core.VoiceInactive:
+		return p.errf("err_no_active_voicechat")
+	case st.Presence == core.PresenceJoined:
 		return nil
 	}
 
@@ -580,7 +583,7 @@ func markVoiceChatInactive(roomID int64) {
 		utils.Log.Errorf("failed to get chat state to mark voice chat inactive: %v", err)
 		return
 	}
-	cs.SetVoiceChat(false)
+	cs.SetVoice(core.VoiceInactive)
 }
 
 // getFloodWait returns the retry-after seconds for a flood-wait error,

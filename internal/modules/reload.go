@@ -116,9 +116,9 @@ func handleReload(c *td.Client, m *td.Message, cplay bool) error {
 	return nil
 }
 
-// reloadAssistant refreshes the assistant's membership and the voice chat
-// state, returning the summary lines for both. A banned assistant is unbanned
-// through the bot (it cannot see the voice chat or join while banned), and an
+// reloadAssistant refreshes the assistant's presence and the voice chat state,
+// returning the summary lines for both. A banned assistant is unbanned through
+// the bot (it can neither see the voice chat nor join while banned), and an
 // assistant that is not in the chat is joined.
 func reloadAssistant(roomID int64) string {
 	cs, err := core.ChatStateFor(roomID)
@@ -126,7 +126,7 @@ func reloadAssistant(roomID int64) string {
 		return reloadLine("Assistant", "❌", "("+utils.EscapeHTML(err.Error())+")")
 	}
 
-	snap, err := cs.Refresh()
+	st, err := cs.Refresh()
 	if err != nil {
 		text := "(" + utils.EscapeHTML(err.Error()) + ")"
 		if errors.Is(err, core.ErrAdminPermissionRequired) {
@@ -135,43 +135,37 @@ func reloadAssistant(roomID int64) string {
 		return reloadLine("Voice chat", "❌", text) + reloadLine("Assistant", "❌", text)
 	}
 
-	if snap.AssistantBanned {
+	if st.Presence == core.PresenceBanned {
 		if err := cs.Unban(); err != nil {
 			// The voice chat cannot be queried without the assistant, so the
 			// cached state is shown instead.
 			utils.Log.Errorf("reload: failed to unban assistant in %d: %v", roomID, err)
-			return reloadVoice(snap) + reloadLine("Assistant", "❌", "Banned")
+			return reloadVoice(st) + reloadLine("Assistant", "❌", "Banned")
 		}
-		snap.AssistantPresent = false
+		st.Presence = core.PresenceAbsent
 	}
 
-	assistant := ""
-	if !snap.AssistantPresent {
+	if st.Presence != core.PresenceJoined {
 		if err := cs.Join(); err != nil {
 			utils.Log.Errorf("reload: failed to join assistant in %d: %v", roomID, err)
-			assistant = reloadLine("Assistant", "❌", "("+utils.EscapeHTML(err.Error())+")")
-		} else {
-			snap.AssistantPresent = true
-			if fresh, err := cs.Refresh(); err == nil {
-				snap = fresh
-			}
+			return reloadVoice(st) +
+				reloadLine("Assistant", "❌", "("+utils.EscapeHTML(err.Error())+")")
+		}
+		if fresh, err := cs.Refresh(); err == nil {
+			st = fresh
 		}
 	}
-	if assistant == "" {
-		assistant = reloadLine("Assistant", "✅", "Present")
-		if !snap.AssistantPresent {
-			assistant = reloadLine("Assistant", "⚪", "Not present")
-		}
-	}
-
-	return reloadVoice(snap) + assistant
+	return reloadVoice(st) + reloadLine("Assistant", "✅", "Present")
 }
 
-func reloadVoice(snap core.StateSnapshot) string {
-	if snap.VoiceChatActive != nil && *snap.VoiceChatActive {
+func reloadVoice(st core.Status) string {
+	switch st.Voice {
+	case core.VoiceActive:
 		return reloadLine("Voice chat", "✅", "Active")
+	case core.VoiceInactive:
+		return reloadLine("Voice chat", "⚪", "Inactive")
 	}
-	return reloadLine("Voice chat", "⚪", "Inactive")
+	return reloadLine("Voice chat", "⚪", "Unknown")
 }
 
 func reloadLine(name, icon, text string) string {

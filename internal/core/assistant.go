@@ -34,7 +34,7 @@ import (
 )
 
 type Assistant struct {
-	Index  int
+	Index  int // 1-based, as stored in the database
 	Client *telegram.Client
 	Self   *telegram.UserObj
 	Ntg    *ubot.Context
@@ -79,7 +79,7 @@ func (m *ClientManager) AddClient(sessionStr string) (*Assistant, error) {
 	}
 
 	assistant := &Assistant{
-		Index:  len(m.list),
+		Index:  len(m.list) + 1,
 		Client: client,
 		Self:   user,
 		Ntg:    ntg,

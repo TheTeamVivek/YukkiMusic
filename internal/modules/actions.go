@@ -159,7 +159,7 @@ func handleVoiceChatAction(c *td.Client, m *td.Message) error {
 		utils.Log.Errorf("Failed to get chat state for %d: %v", chatID, err)
 		return nil
 	}
-	s.SetVoiceChat(isActive)
+	s.SetVoice(utils.IfElse(isActive, core.VoiceActive, core.VoiceInactive))
 
 	msgKey := utils.IfElse(isActive, "voicechat_started", "voicechat_ended")
 	text := F(chatID, msgKey, locales.Arg{"duration": utils.FormatDuration(int(duration))})

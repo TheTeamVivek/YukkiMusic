@@ -110,53 +110,30 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 		utils.Log.Error("Failed to get chat state: " + err.Error())
 		return nil
 	}
-	if cs.Assistant == nil || userID != cs.Assistant.Self.ID {
+	if userID != cs.Assistant().Self.ID {
 		return nil
 	}
 
-	switch newStatus {
-	case "member", "administrator", "creator":
-		cs.SetPresent(true)
-		cs.SetBanned(false)
-	case "left":
-		cs.SetPresent(false)
-		cs.SetBanned(false)
-	case "kicked":
-		handleAssistantRestriction(c, u, cs, chatID)
-	default:
-		if !cs.Fetched() {
-			cs.Refresh()
-		}
+	if presence := core.PresenceOf(u.NewChatMember); presence == core.PresenceBanned {
+		handleAssistantBanned(c, cs, chatID)
+	} else {
+		cs.SetPresence(presence)
 	}
 	return nil
 }
 
-// handleAssistantRestriction reacts to the assistant being restricted or
-// banned: a plain restriction leaves it in the chat, a ban gets it unbanned
-// if the bot can, and otherwise warns the chat.
-func handleAssistantRestriction(
-	c *td.Client,
-	u *td.UpdateChatMember,
-	cs *core.ChatState,
-	chatID int64,
-) {
-	if _, banned := u.NewChatMember.Status.(*td.ChatMemberStatusBanned); !banned {
-		cs.SetPresent(true)
-		cs.SetBanned(false)
-		utils.Log.Debug("Assistant muted in " + utils.IntToStr(chatID))
-		return
-	}
-
+// handleAssistantBanned reacts to the assistant being banned: it gets
+// unbanned if the bot can, and otherwise the chat is warned.
+func handleAssistantBanned(c *td.Client, cs *core.ChatState, chatID int64) {
 	utils.Log.Debug("Assistant banned in " + utils.IntToStr(chatID))
-	cs.SetPresent(false)
+	cs.SetPresence(core.PresenceBanned)
 	core.Rooms.Delete(chatID)
 
 	if cs.Unban() == nil {
 		return
 	}
 
-	self := cs.Assistant.Self
-
+	self := cs.Assistant().Self
 	msg := F(chatID, "assistant_restricted_warning", locales.Arg{
 		"assistant": mentionHTML(self.FirstName+" "+self.LastName, self.ID),
 		"id":        self.ID,

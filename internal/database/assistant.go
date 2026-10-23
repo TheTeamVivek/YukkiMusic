@@ -33,6 +33,7 @@ var (
 	usageMu        sync.RWMutex
 	indexCache     map[int64]int // chatID -> assistant index (1-based)
 	cacheMu        sync.RWMutex
+	assignMu       sync.Mutex // serializes first-time assignment of a chat
 )
 
 // InitAssistantIndexes records the assistant count and redistributes all chats
@@ -50,9 +51,9 @@ func InitAssistantIndexes(count int) error {
 		return err
 	}
 
-	redistributeAssistants(all, count)
+	moved := redistributeAssistants(all, count)
 
-	if err := saveChangedSettings(all); err != nil {
+	if err := saveChangedSettings(moved); err != nil {
 		return err
 	}
 
@@ -68,10 +69,15 @@ func GetAssistant(chatID int64) (int, error) {
 		return 0, fmt.Errorf("assistants not initialized")
 	}
 
-	cacheMu.RLock()
-	idx, ok := indexCache[chatID]
-	cacheMu.RUnlock()
-	if ok && idx >= 1 && idx <= assistantCount {
+	if idx, ok := cachedAssistant(chatID); ok {
+		return idx, nil
+	}
+
+	// Only one chat is assigned at a time, so two concurrent first requests
+	// for a chat cannot pick different assistants or skew the usage counts.
+	assignMu.Lock()
+	defer assignMu.Unlock()
+	if idx, ok := cachedAssistant(chatID); ok {
 		return idx, nil
 	}
 
@@ -144,6 +150,13 @@ func SaveAssistant(chatID int64, idx int) {
 	usageMu.Unlock()
 }
 
+func cachedAssistant(chatID int64) (int, bool) {
+	cacheMu.RLock()
+	idx, ok := indexCache[chatID]
+	cacheMu.RUnlock()
+	return idx, ok && idx >= 1 && idx <= assistantCount
+}
+
 func cacheAssistant(chatID int64, idx int) {
 	cacheMu.Lock()
 	if indexCache == nil {
@@ -173,8 +186,9 @@ func fetchAllChatSettings() ([]*ChatSettings, error) {
 
 // redistributeAssistants moves as few chats as possible so each assistant ends
 // up with an even share of the chats. Chats whose current index fits the even
-// target stay put; the rest are reassigned to fill the gaps.
-func redistributeAssistants(all []*ChatSettings, assistantCount int) {
+// target stay put; the rest are reassigned to fill the gaps. It returns the
+// chats that were moved.
+func redistributeAssistants(all []*ChatSettings, assistantCount int) []*ChatSettings {
 	desired := evenDistribution(len(all), assistantCount)
 
 	kept := make([]int, assistantCount+1)
@@ -188,6 +202,7 @@ func redistributeAssistants(all []*ChatSettings, assistantCount int) {
 		}
 		pool = append(pool, s)
 	}
+	moved := pool
 
 	for i := 1; i <= assistantCount; i++ {
 		for kept[i] < desired[i] && len(pool) > 0 {
@@ -196,6 +211,7 @@ func redistributeAssistants(all []*ChatSettings, assistantCount int) {
 			kept[i]++
 		}
 	}
+	return moved
 }
 
 // evenDistribution returns the target chat count per assistant (1-based) that
@@ -212,12 +228,13 @@ func evenDistribution(total, assistants int) []int {
 	return desired
 }
 
-func saveChangedSettings(all []*ChatSettings) error {
+// saveChangedSettings persists the moved chats' new assistant index.
+func saveChangedSettings(moved []*ChatSettings) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	var models []mongo.WriteModel
-	for _, s := range all {
+	for _, s := range moved {
 		models = append(models, mongo.NewUpdateOneModel().
 			SetFilter(bson.M{"_id": s.ChatID}).
 			SetUpdate(bson.M{"$set": bson.M{"ass_index": s.AssistantIndex}}))
