@@ -241,7 +241,7 @@ func (s *ChatState) Unban() error {
 	err := Bot.SetChatMemberStatus(
 		s.ChatID,
 		&td.MessageSenderUser{UserId: s.Assistant().Self.ID},
-		&td.ChatMemberStatusMember{},
+		&td.ChatMemberStatusLeft{},
 	)
 	if err == nil {
 		s.SetPresence(PresenceAbsent)
@@ -258,7 +258,7 @@ func (s *ChatState) Join() error {
 
 	ass := s.Assistant()
 	err := s.joinWith(ass)
-	if wait := floodWait(err); wait > 0 {
+	if wait := telegram.GetFloodWait(err); wait > 0 {
 		err = s.afterFlood(ass, wait)
 	}
 
@@ -285,7 +285,7 @@ func (s *ChatState) afterFlood(ass *Assistant, wait int) error {
 	time.Sleep(time.Duration(wait) * time.Second)
 
 	err := s.joinWith(ass)
-	if again := floodWait(err); again > 0 {
+	if again := telegram.GetFloodWait(err); again > 0 {
 		return &FloodWaitError{Seconds: again}
 	}
 	return err
@@ -323,7 +323,7 @@ func (s *ChatState) switchAssistant(current *Assistant) bool {
 func (s *ChatState) joinWith(ass *Assistant) error {
 	if name := s.username(); name != "" {
 		err := s.attempt(ass, "https://t.me/"+name)
-		if err == nil || floodWait(err) > 0 || errors.Is(err, ErrInviteRequestSent) {
+		if err == nil || telegram.GetFloodWait(err) > 0 || errors.Is(err, ErrInviteRequestSent) {
 			return err
 		}
 	}
@@ -398,7 +398,7 @@ func (s *ChatState) inviteLink(stale string) (string, error) {
 		return link, nil
 	}
 
-	full, err := fullChat(Bot, s.ChatID)
+	full, err := Bot.GetSupergroupFullInfo(-s.ChatID - 1_000_000_000_000)
 	if err != nil {
 		if isAdminError(err) {
 			return "", ErrAdminPermissionRequired
@@ -446,7 +446,10 @@ func (s *ChatState) leaveInactiveChats(ass *Assistant, limit int) {
 			return nil
 		}
 		id := d.GetChannelID()
-		if id == 0 || sameChat(id, s.ChatID) || hasRoom(rooms, id) {
+		if id == 0 || id == s.ChatID {
+			return nil
+		}
+		if _, ok := rooms[id]; ok {
 			return nil
 		}
 
@@ -465,25 +468,6 @@ func (s *ChatState) leaveInactiveChats(ass *Assistant, limit int) {
 	if err != nil && err != telegram.ErrStopIteration {
 		utils.Log.Warnf("chat_state: IterDialogs failed while leaving chats: %v", err)
 	}
-}
-
-// markedID turns a raw channel id into the -100... form chats are keyed by.
-func markedID(id int64) int64 { return -1_000_000_000_000 - id }
-
-// A dialog may report a channel by its raw or its marked id.
-func sameChat(id, chatID int64) bool { return id == chatID || markedID(id) == chatID }
-
-func hasRoom(rooms map[int64]*Room, id int64) bool {
-	_, raw := rooms[id]
-	_, marked := rooms[markedID(id)]
-	return raw || marked
-}
-
-// fullChat fetches the supergroup full info for a chat ID. TDLib supergroup
-// chat IDs carry a -100 prefix, while getSupergroupFullInfo expects the raw
-// supergroup id, so no separate getChat lookup is needed.
-func fullChat(c *td.Client, chatID int64) (*td.SupergroupFullInfo, error) {
-	return c.GetSupergroupFullInfo(-chatID - 1_000_000_000_000)
 }
 
 // voiceActive reports whether a voice/video chat is running in the chat. The
@@ -534,14 +518,6 @@ func matches(err error, codes ...string) bool {
 		}
 	}
 	return false
-}
-
-// floodWait returns the seconds to wait if err is a flood wait, else 0.
-func floodWait(err error) int {
-	if err == nil {
-		return 0
-	}
-	return telegram.GetFloodWait(err)
 }
 
 func isAdminError(err error) bool {
