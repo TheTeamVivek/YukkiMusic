@@ -3,7 +3,7 @@ module yukkimusic
 go 1.27
 
 require (
-	github.com/AshokShau/gotdbot v0.10.1
+	github.com/AshokShau/gotdbot v0.10.2-0.20261023123153-33c7e2898d89
 	github.com/amarnathcjd/gogram v1.7.71
 	github.com/joho/godotenv v1.5.1
 	github.com/shirou/gopsutil/v3 v3.24.5
