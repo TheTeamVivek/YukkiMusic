@@ -168,6 +168,18 @@ func (s *ChatState) Join() error {
 	return &FloodWaitError{Seconds: wait}
 }
 
+// Unban lifts the assistant's ban in the chat through the bot. The assistant
+// is not a member afterwards, so it still has to Join.
+func (s *ChatState) Unban() error {
+	err := Bot.SetChatMemberStatus(
+		s.ChatID,
+		&td.MessageSenderUser{UserId: s.Assistant.Self.ID},
+		&td.ChatMemberStatusMember{},
+	)
+	s.SetBanned(err != nil)
+	return err
+}
+
 func (s *ChatState) SetPresent(v bool) {
 	s.mu.Lock()
 	s.AssistantPresent = v
@@ -227,11 +239,15 @@ func (s *ChatState) refresh() (StateSnapshot, error) {
 	// A bot cannot observe the group call state (getGroupCall is user-only and
 	// the group call id is always 0 for bots), so voice chat activity is
 	// queried through the assistant like Grogram's fullChannel.Call != nil.
+	//
+	// A banned assistant cannot query it either, so the check is skipped.
 	vcActive := s.VoiceChatActive
-	if active, err := s.voiceChatActive(); err != nil {
-		utils.Log.Warnf("chat_state: voiceChatActive failed for %d: %v", s.ChatID, err)
-	} else {
-		vcActive = &active
+	if !banned {
+		if active, err := s.voiceChatActive(); err != nil {
+			utils.Log.Warnf("chat_state: voiceChatActive failed for %d: %v", s.ChatID, err)
+		} else {
+			vcActive = &active
+		}
 	}
 	s.setState(present, banned, vcActive)
 	if full != nil &&

@@ -40,7 +40,6 @@ adminmode_status_everyone: "الجميع 🌍"
 adminmode_updated: "{emoji:✅} تم تحديث <b>وضع أوامر الإدارة</b> إلى: {status}"
 adminmode_invalid: "{emoji:⚠️} وضع غير صالح. استخدم: <code>admin</code>، <code>adminauth</code>، أو <code>everyone</code>."
 
-
 # 🚫 Assistant Restricted / Banned
 assistant_restricted_warning: |
   {emoji:⚠️} <b>الحساب المساعد مقيد</b>
@@ -366,7 +365,6 @@ loop_disabled: "{emoji:🔁} تم <b>تعطيل</b> التكرار بواسطة 
 loop_set: "{emoji:🔁} تم تعيين التكرار <b>{count}</b> مرة\n└ غُير بواسطة: {user}"
 loop_current: "• التكرار الحالي: <b>{count}</b> مرة"
 
-
 # Logs module
 logs_empty: "لا توجد سجلات"
 
@@ -479,7 +477,6 @@ ping_result: |
   <b>استهلاك المعالج:</b> {cpu_usage}
   <b>استهلاك القرص:</b> {disk_usage}
 
-
 position_now: |
   {emoji:🎵} <b>{title}</b>
   {emoji:📍} <code>{position} / {duration}</code>
@@ -498,22 +495,6 @@ queue_empty: "{emoji:⚠️} <b>قائمة الانتظار فارغة بالف�
 reload_start: "{emoji:⚙️} جاري إعادة تحميل ذاكرة المشرفين، وحالة المحادثة الصوتية، وحالة المساعد..."
 
 reload_done: "<b>{emoji:⚙️} اكتملت إعادة التحميل:</b>\n\n{summary}"
-
-reload_admin_cache_ok: "<b>• ذاكرة المشرفين:</b> <i>{emoji:✅} تم</i>"
-reload_admin_cache_fail: "<b>• ذاكرة المشرفين:</b> <i>{emoji:❌} ({error})</i>"
-
-reload_voice_inactive: "<b>• المحادثة الصوتية:</b> <i>{emoji:⚪} غير نشطة</i>"
-reload_voice_admin_required: "<b>• المحادثة الصوتية:</b> <i>{emoji:❌} إذن المشرف مطلوب</i>"
-reload_voice_fail: "<b>• المحادثة الصوتية:</b> <i>{emoji:❌} ({error})</i>"
-reload_voice_active: "<b>• المحادثة الصوتية:</b> <i>{emoji:✅} نشطة</i>"
-
-reload_assistant_banned: "<b>• المساعد:</b> <i>{emoji:❌} محظور</i>"
-reload_assistant_admin_required: "<b>• المساعد:</b> <i>{emoji:❌} إذن المشرف مطلوب</i>"
-reload_assistant_fail: "<b>• المساعد:</b> <i>{emoji:❌} ({error})</i>"
-reload_assistant_present: "<b>• المساعد:</b> <i>{emoji:✅} موجود</i>"
-reload_assistant_not_present: "<b>• المساعد:</b> <i>{emoji:⚪} غير موجود</i>"
-reload_room_reset: "<b>• الغرفة:</b> <i>تمت إعادة التعيين {emoji:✅}</i>"
-
 
 remove_usage: "{emoji:⚠️} <b>استخدام غير صالح.</b>\nالاستخدام: <code>{cmd} [index]</code>"
 remove_invalid_index: "{emoji:⚠️} <b>مركز غير صالح.</b> يجب أن يكون <b>رقماً</b>."
@@ -562,7 +543,6 @@ restart_btn_replay: "إعادة تشغيل الأغنية"
 restart_confirm_bot: "♻️ جارٍ إعادة تشغيل البوت..."
 restart_confirm_replay_done: "⏮️ تمت إعادة تشغيل الأغنية الحالية بنجاح."
 
-
 room_not_active_cb: "⚠️ لا يوجد شيء قيد التشغيل حالياً."
 room_no_active: "⚠️ البوت لا يشغّل صوتاً حالياً. قم بتشغيل أغنية أولاً."
 
@@ -570,7 +550,6 @@ room_already_paused: "⏸️ المقطع متوقف مؤقتاً بالفعل. 
 room_pause_failed: |
   <h3>❌ فشل إيقاف التشغيل مؤقتاً</h3>
   <p><i>{error}</i></p>
-
 
 settings_btn_adminmode: "🛡️ وضع الإدارة"
 settings_btn_cmddelete: "🗑️ حذف الأوامر"
@@ -596,7 +575,6 @@ settings_info_cleanduration: |
 settings_info_cleanmode: |
   يزيل رسائل الأوامر ورسائل خدمة البوت تلقائياً بعد مدة قصيرة.
   تظل رسائل حالة التشغيل حتى تنتهي مدتها تلقائياً.
-
 
 settings_info_lang: |
   🌐 ما هذا؟
@@ -708,7 +686,6 @@ speed_failed: |
 speed_reset_success: "{emoji:✅} تمت إعادة تعيين سرعة التشغيل إلى <b>1.0x</b> بواسطة {user}"
 
 speed_set: "{emoji:🚀} تم تعيين سرعة التشغيل إلى <b>{speed}x</b> بواسطة {user}."
-
 
 start_private: |
   <h3>{emoji:🎵} {bot}</h3>

@@ -40,7 +40,7 @@ func init() {
 • Chat admin list
 • Voice chat status
 • Assistant presence status
-• Assistant ban status
+• Assistant ban status (unbanned and rejoined when possible)
 
 <b>🔒 Flood Protection:</b>
 • Regular users: 5 minute cooldown
@@ -78,10 +78,13 @@ func handleReload(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	chatID := m.ChatID()
-	roomID := r.ChatID
+	chatID, roomID := m.ChatID(), r.ChatID
 
-	if handled, err := checkReloadFlood(c, m, chatID, roomID); handled {
+	floodKey := fmt.Sprintf("reload:%d%d", roomID, m.SenderID())
+	if remaining := utils.GetFlood(floodKey); remaining > 0 {
+		_, err := m.ReplyText(c, F(chatID, "flood_minutes", locales.Arg{
+			"duration": utils.FormatDuration(int(remaining.Seconds())),
+		}), nil)
 		return err
 	}
 
@@ -91,106 +94,86 @@ func handleReload(c *td.Client, m *td.Message, cplay bool) error {
 	}
 
 	summary := ""
-
-	admins, adminSummary := reloadAdminCache(c, chatID, roomID)
-	summary += adminSummary
+	admins, err := utils.RefreshChatAdmin(c, roomID)
+	if err != nil {
+		summary += reloadLine("Admin cache", "❌", "("+utils.EscapeHTML(err.Error())+")")
+	} else {
+		summary += reloadLine("Admin cache", "✅", "Done")
+	}
 
 	isAdmin := slices.Contains(admins, m.SenderID())
-	floodDuration := utils.IfElse(isAdmin, 2*time.Minute, 5*time.Minute)
-	utils.SetFlood(fmt.Sprintf("reload:%d%d", roomID, m.SenderID()), floodDuration)
+	utils.SetFlood(floodKey, utils.IfElse(isAdmin, 2*time.Minute, 5*time.Minute))
 
-	cs, err := core.ChatStateFor(roomID)
-	if err != nil {
-		summary += F(chatID, "reload_assistant_fail", locales.Arg{
-			"error": err.Error(),
-		}) + "\n"
-		_, _ = utils.EOR(c, statusMsg, F(chatID, "reload_done", locales.Arg{
-			"summary": summary,
-		}), &td.EditMessageTextOpts{ParseMode: td.ParseModeHTML})
-		return nil
-	}
+	summary += reloadAssistant(roomID)
 
-	if err := cs.Join(); err != nil {
-		utils.Log.Errorf("reload: failed to ensure assistant joined %d: %v", roomID, err)
-		summary += F(chatID, "reload_assistant_fail", locales.Arg{
-			"error": err.Error(),
-		}) + "\n"
-	}
-
-	snapshot, snapErr := cs.Refresh()
-	summary += reloadVoiceChatStatus(chatID, snapshot, snapErr)
-	summary += reloadAssistantStatus(chatID, snapshot, snapErr)
-
-	if isAdmin {
-		if core.Rooms.Delete(roomID) {
-			summary += F(chatID, "reload_room_reset") + "\n"
-		}
+	if isAdmin && core.Rooms.Delete(roomID) {
+		summary += reloadLine("Room", "✅", "Reset")
 	}
 
 	_, _ = utils.EOR(c, statusMsg, F(chatID, "reload_done", locales.Arg{
 		"summary": summary,
 	}), &td.EditMessageTextOpts{ParseMode: td.ParseModeHTML})
-
 	return nil
 }
 
-func checkReloadFlood(c *td.Client, m *td.Message, chatID, roomID int64) (bool, error) {
-	floodKey := fmt.Sprintf("reload:%d%d", roomID, m.SenderID())
-	if remaining := utils.GetFlood(floodKey); remaining > 0 {
-		_, err := m.ReplyText(c, F(
-			chatID,
-			"flood_minutes",
-			locales.Arg{
-				"duration": utils.FormatDuration(int(remaining.Seconds())),
-			},
-		), nil)
-		return true, err
-	}
-	return false, nil
-}
-
-func reloadAdminCache(c *td.Client, chatID, roomID int64) ([]int64, string) {
-	admins, err := utils.RefreshChatAdmin(c, roomID)
+// reloadAssistant refreshes the assistant's membership and the voice chat
+// state, returning the summary lines for both. A banned assistant is unbanned
+// through the bot (it cannot see the voice chat or join while banned), and an
+// assistant that is not in the chat is joined.
+func reloadAssistant(roomID int64) string {
+	cs, err := core.ChatStateFor(roomID)
 	if err != nil {
-		return nil, F(chatID, "reload_admin_cache_fail", locales.Arg{
-			"error": err.Error(),
-		}) + "\n"
+		return reloadLine("Assistant", "❌", "("+utils.EscapeHTML(err.Error())+")")
 	}
-	return admins, F(chatID, "reload_admin_cache_ok") + "\n"
-}
 
-func reloadVoiceChatStatus(chatID int64, snap core.StateSnapshot, err error) string {
+	snap, err := cs.Refresh()
 	if err != nil {
+		text := "(" + utils.EscapeHTML(err.Error()) + ")"
 		if errors.Is(err, core.ErrAdminPermissionRequired) {
-			return F(chatID, "reload_voice_admin_required") + "\n"
+			text = "Admin permission required"
 		}
-		return F(chatID, "reload_voice_fail", locales.Arg{
-			"error": err.Error(),
-		}) + "\n"
-	}
-
-	if snap.VoiceChatActive != nil && *snap.VoiceChatActive {
-		return F(chatID, "reload_voice_active") + "\n"
-	}
-	return F(chatID, "reload_voice_inactive") + "\n"
-}
-
-func reloadAssistantStatus(chatID int64, snap core.StateSnapshot, err error) string {
-	if err != nil {
-		if errors.Is(err, core.ErrAdminPermissionRequired) {
-			return F(chatID, "reload_assistant_admin_required") + "\n"
-		}
-		return F(chatID, "reload_assistant_fail", locales.Arg{
-			"error": err.Error(),
-		}) + "\n"
+		return reloadLine("Voice chat", "❌", text) + reloadLine("Assistant", "❌", text)
 	}
 
 	if snap.AssistantBanned {
-		return F(chatID, "reload_assistant_banned") + "\n"
+		if err := cs.Unban(); err != nil {
+			// The voice chat cannot be queried without the assistant, so the
+			// cached state is shown instead.
+			utils.Log.Errorf("reload: failed to unban assistant in %d: %v", roomID, err)
+			return reloadVoice(snap) + reloadLine("Assistant", "❌", "Banned")
+		}
+		snap.AssistantPresent = false
 	}
 
-	if snap.AssistantPresent {
-		return F(chatID, "reload_assistant_present") + "\n"
+	assistant := ""
+	if !snap.AssistantPresent {
+		if err := cs.Join(); err != nil {
+			utils.Log.Errorf("reload: failed to join assistant in %d: %v", roomID, err)
+			assistant = reloadLine("Assistant", "❌", "("+utils.EscapeHTML(err.Error())+")")
+		} else {
+			snap.AssistantPresent = true
+			if fresh, err := cs.Refresh(); err == nil {
+				snap = fresh
+			}
+		}
 	}
-	return F(chatID, "reload_assistant_not_present") + "\n"
+	if assistant == "" {
+		assistant = reloadLine("Assistant", "✅", "Present")
+		if !snap.AssistantPresent {
+			assistant = reloadLine("Assistant", "⚪", "Not present")
+		}
+	}
+
+	return reloadVoice(snap) + assistant
+}
+
+func reloadVoice(snap core.StateSnapshot) string {
+	if snap.VoiceChatActive != nil && *snap.VoiceChatActive {
+		return reloadLine("Voice chat", "✅", "Active")
+	}
+	return reloadLine("Voice chat", "⚪", "Inactive")
+}
+
+func reloadLine(name, icon, text string) string {
+	return fmt.Sprintf("<b>• %s:</b> <i>%s %s</i>\n", name, icon, text)
 }

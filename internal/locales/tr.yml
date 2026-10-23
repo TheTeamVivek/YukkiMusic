@@ -365,7 +365,6 @@ loop_disabled: "{emoji:🔁} Döngü {user} tarafından <b>devre dışı bırak�
 loop_set: "{emoji:🔁} <b>{count}</b> kez döngüye ayarlandı\n└ Değiştiren: {user}"
 loop_current: "• Mevcut döngü: <b>{count}</b> kez"
 
-
 # Logs module
 logs_empty: "Kayıt bulunamadı"
 
@@ -477,7 +476,6 @@ ping_result: |
   <b>CPU Kullanımı:</b> {cpu_usage}
   <b>Disk Kullanımı:</b> {disk_usage}
 
-
 position_now: |
   {emoji:🎵} <b>{title}</b>
   {emoji:📍} <code>{position} / {duration}</code>
@@ -496,22 +494,6 @@ queue_empty: "{emoji:⚠️} <b>Sıra zaten boş.</b>"
 reload_start: "{emoji:⚙️} Yönetici önbelleği, sesli sohbet durumu ve asistan durumu yenileniyor..."
 
 reload_done: "<b>{emoji:⚙️} Yenileme tamamlandı:</b>\n\n{summary}"
-
-reload_admin_cache_ok: "<b>• Yönetici önbelleği:</b> <i>{emoji:✅} Tamam</i>"
-reload_admin_cache_fail: "<b>• Yönetici önbelleği:</b> <i>{emoji:❌} ({error})</i>"
-
-reload_voice_inactive: "<b>• Sesli sohbet:</b> <i>{emoji:⚪} Devre dışı</i>"
-reload_voice_admin_required: "<b>• Sesli sohbet:</b> <i>{emoji:❌} Yönetici izni gerekli</i>"
-reload_voice_fail: "<b>• Sesli sohbet:</b> <i>{emoji:❌} ({error})</i>"
-reload_voice_active: "<b>• Sesli sohbet:</b> <i>{emoji:✅} Aktif</i>"
-
-reload_assistant_banned: "<b>• Asistan:</b> <i>{emoji:❌} Yasaklı</i>"
-reload_assistant_admin_required: "<b>• Asistan:</b> <i>{emoji:❌} Yönetici izni gerekli</i>"
-reload_assistant_fail: "<b>• Asistan:</b> <i>{emoji:❌} ({error})</i>"
-reload_assistant_present: "<b>• Asistan:</b> <i>{emoji:✅} Mevcut</i>"
-reload_assistant_not_present: "<b>• Asistan:</b> <i>{emoji:⚪} Mevcut değil</i>"
-reload_room_reset: "<b>• Oda:</b> <i>Sıfırlandı {emoji:✅}</i>"
-
 
 remove_usage: "{emoji:⚠️} <b>Geçersiz kullanım.</b>\nKullanım: <code>{cmd} [indeks]</code>"
 remove_invalid_index: "{emoji:⚠️} <b>Geçersiz indeks.</b> Bir <b>sayı</b> olmalıdır."
@@ -568,7 +550,6 @@ room_pause_failed: |
   <h3>❌ Oynatma duraklatılamadı</h3>
   <p><i>{error}</i></p>
 
-
 settings_btn_adminmode: "🛡️ Yönetici Modu"
 settings_btn_cmddelete: "🗑️ Komut Silme"
 settings_btn_lang: "🌐 Dil"
@@ -593,7 +574,6 @@ settings_info_cleanduration: |
 settings_info_cleanmode: |
   Komut ve bot servis mesajlarını kısa bir süre sonra otomatik siler.
   Çalıyor durum mesajları kendi süresi dolana kadar korunur.
-
 
 settings_info_lang: |
   🌐 Bu nedir?
@@ -705,7 +685,6 @@ speed_failed: |
 speed_reset_success: "{emoji:✅} Oynatma hızı {user} tarafından <b>1.0x</b> olarak sıfırlandı."
 
 speed_set: "{emoji:🚀} Oynatma hızı {user} tarafından <b>{speed}x</b> olarak ayarlandı."
-
 
 start_private: |
   <h3>{emoji:🎵} {bot}</h3>

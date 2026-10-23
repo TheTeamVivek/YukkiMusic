@@ -151,12 +151,11 @@ func handleAssistantRestriction(
 	cs.SetPresent(false)
 	core.Rooms.Delete(chatID)
 
-	self := cs.Assistant.Self
-	err := c.SetChatMemberStatus(chatID, &td.MessageSenderUser{UserId: self.ID}, &td.ChatMemberStatusMember{})
-	cs.SetBanned(err != nil)
-	if err == nil {
+	if cs.Unban() == nil {
 		return
 	}
+
+	self := cs.Assistant.Self
 
 	msg := F(chatID, "assistant_restricted_warning", locales.Arg{
 		"assistant": mentionHTML(self.FirstName+" "+self.LastName, self.ID),

@@ -366,7 +366,6 @@ loop_disabled: "{emoji:🔁} आवृत्ति {user} द्वारा <b>
 loop_set: "{emoji:🔁} <b>{count}</b> बार आवृत्ति निर्धारित की गई\n└ परिवर्तक: {user}"
 loop_current: "• वर्तमान आवृत्ति: <b>{count}</b> बार"
 
-
 # Logs module
 logs_empty: "कोई लॉग्स नहीं मिले"
 
@@ -479,7 +478,6 @@ ping_result: |
   <b>प्रक्रमक प्रयोग:</b> {cpu_usage}
   <b>डिस्क प्रयोग:</b> {disk_usage}
 
-
 position_now: |
   {emoji:🎵} <b>{title}</b>
   {emoji:📍} <code>{position} / {duration}</code>
@@ -498,22 +496,6 @@ queue_empty: "{emoji:⚠️} <b>प्रतीक्षा सूची पू�
 reload_start: "{emoji:⚙️} प्रशासक संचित-स्मृति, ध्वनि वार्तालाप स्थिति, और सहायक स्थिति को पुनः लोड किया जा रहा है..."
 
 reload_done: "<b>{emoji:⚙️} पुनः लोड पूर्ण:</b>\n\n{summary}"
-
-reload_admin_cache_ok: "<b>• प्रशासक संचित-स्मृति:</b> <i>{emoji:✅} पूर्ण</i>"
-reload_admin_cache_fail: "<b>• प्रशासक संचित-स्मृति:</b> <i>{emoji:❌} ({error})</i>"
-
-reload_voice_inactive: "<b>• ध्वनि वार्तालाप:</b> <i>{emoji:⚪} निष्क्रिय</i>"
-reload_voice_admin_required: "<b>• ध्वनि वार्तालाप:</b> <i>{emoji:❌} प्रशासक अनुमति आवश्यक</i>"
-reload_voice_fail: "<b>• ध्वनि वार्तालाप:</b> <i>{emoji:❌} ({error})</i>"
-reload_voice_active: "<b>• ध्वनि वार्तालाप:</b> <i>{emoji:✅} सक्रिय</i>"
-
-reload_assistant_banned: "<b>• सहायक:</b> <i>{emoji:❌} वर्जित</i>"
-reload_assistant_admin_required: "<b>• सहायक:</b> <i>{emoji:❌} प्रशासक अनुमति आवश्यक</i>"
-reload_assistant_fail: "<b>• सहायक:</b> <i>{emoji:❌} ({error})</i>"
-reload_assistant_present: "<b>• सहायक:</b> <i>{emoji:✅} उपस्थित</i>"
-reload_assistant_not_present: "<b>• सहायक:</b> <i>{emoji:⚪} उपस्थित नहीं</i>"
-reload_room_reset: "<b>• कक्ष:</b> <i>पुनर्निर्धारित {emoji:✅}</i>"
-
 
 remove_usage: "{emoji:⚠️} <b>अमान्य प्रयोग।</b>\nप्रयोग: <code>{cmd} [सूचकाङ्क]</code>"
 remove_invalid_index: "{emoji:⚠️} <b>अमान्य सूचकाङ्क।</b> यह एक <b>संख्या</b> होनी चाहिए।"
@@ -562,7 +544,6 @@ restart_btn_replay: "गीत पुनः चलाएँ"
 restart_confirm_bot: "♻️ बॉट पुनः आरम्भ हो रहा है..."
 restart_confirm_replay_done: "⏮️ वर्तमान गीत सफलतापूर्वक पुनः चलाया गया।"
 
-
 room_not_active_cb: "⚠️ वर्तमान में कुछ भी नहीं चल रहा है।"
 room_no_active: "⚠️ बॉट वॉइस चैट में कुछ नहीं बजा रहा है। पहले कोई गाना चलाएँ।"
 
@@ -570,7 +551,6 @@ room_already_paused: "⏸️ संगीत पूर्व से ही व�
 room_pause_failed: |
   <h3>❌ संगीत विराम विफल</h3>
   <p><i>{error}</i></p>
-
 
 settings_btn_adminmode: "🛡️ एडमिन मोड"
 settings_btn_cmddelete: "🗑️ कमांड डिलीट"
@@ -596,7 +576,6 @@ settings_info_cleanduration: |
 settings_info_cleanmode: |
   थोड़े समय बाद कमांड और बॉट के सर्विस संदेश अपने-आप हटाता है।
   प्लेइंग स्टेटस संदेश अपने तय समय तक बने रहते हैं।
-
 
 settings_info_lang: |
   🌐 यह क्या है?
@@ -708,7 +687,6 @@ speed_failed: |
 speed_reset_success: "{emoji:✅} {user} द्वारा चलाने की गति <b>1.0x</b> पर पुनर्निर्धारित"
 
 speed_set: "{emoji:🚀} {user} द्वारा चलाने की गति <b>{speed}x</b> निर्धारित।"
-
 
 start_private: |
   <h3>{emoji:🎵} {bot}</h3>

@@ -366,7 +366,6 @@ loop_disabled: "{emoji:🔁} Loop has been <b>disabled</b> by {user}"
 loop_set: "{emoji:🔁} Set to loop <b>{count}</b> time(s)\n└ Changed by: {user}"
 loop_current: "• Current loop: <b>{count}</b> time(s)"
 
-
 # Logs module
 logs_empty: "No logs found"
 
@@ -502,22 +501,6 @@ reload_start: "{emoji:⚙️} Reloading admin cache, voice chat status, and assi
 
 reload_done: "<b>{emoji:⚙️} Reload complete:</b>\n\n{summary}"
 
-reload_admin_cache_ok: "<b>• Admin cache:</b> <i>{emoji:✅} Done</i>"
-reload_admin_cache_fail: "<b>• Admin cache:</b> <i>{emoji:❌} ({error})</i>"
-
-reload_voice_inactive: "<b>• Voice chat:</b> <i>{emoji:⚪} Inactive</i>"
-reload_voice_admin_required: "<b>• Voice chat:</b> <i>{emoji:❌} Admin permission required</i>"
-reload_voice_fail: "<b>• Voice chat:</b> <i>{emoji:❌} ({error})</i>"
-reload_voice_active: "<b>• Voice chat:</b> <i>{emoji:✅} Active</i>"
-
-reload_assistant_banned: "<b>• Assistant:</b> <i>{emoji:❌} Banned</i>"
-reload_assistant_admin_required: "<b>• Assistant:</b> <i>{emoji:❌} Admin permission required</i>"
-reload_assistant_fail: "<b>• Assistant:</b> <i>{emoji:❌} ({error})</i>"
-reload_assistant_present: "<b>• Assistant:</b> <i>{emoji:✅} Present</i>"
-reload_assistant_not_present: "<b>• Assistant:</b> <i>{emoji:⚪} Not present</i>"
-reload_room_reset: "<b>• Room:</b> <i>Reset {emoji:✅}</i>"
-
-
 remove_usage: "{emoji:⚠️} <b>Invalid usage.</b>\nUsage: <code>{cmd} [index]</code>"
 remove_invalid_index: "{emoji:⚠️} <b>Invalid index.</b> It must be a <b>number</b>."
 remove_index_too_small: "{emoji:⚠️} <b>Index must be greater than 0.</b>"
@@ -565,7 +548,6 @@ restart_btn_replay: "Replay the Song"
 restart_confirm_bot: "♻️ Restarting the bot..."
 restart_confirm_replay_done: "⏮️ Current song replayed successfully."
 
-
 room_not_active_cb: "⚠️ Nothing playing right now."
 room_no_active: "⚠️ Bot is not streaming in a voice chat. Start playing a song first."
 
@@ -574,10 +556,8 @@ room_pause_failed: |
   <h3>❌ Failed to pause playback</h3>
   <p><i>{error}</i></p>
 
-
 searching: "{emoji:🔍}{emoji:🎶} Searching... {emoji:⚡}{emoji:✨}"
 searching_query: "{emoji:🔍}{emoji:🎶} Searching for: <b>{query}</b>... {emoji:⚡}{emoji:✨}"
-
 
 settings_btn_adminmode: "🛡️ Admin Mode"
 settings_btn_cmddelete: "🗑️ Cmd Delete"
@@ -603,7 +583,6 @@ settings_info_cleanduration: |
 settings_info_cleanmode: |
   Automatically removes command and bot service messages after a short delay.
   Playing status messages are kept until they naturally expire.
-
 
 settings_info_lang: |
   🌐 What is this?
@@ -633,7 +612,6 @@ settings_updated: "✅ Settings updated!"
 autoplay_title: "{emoji:🔁} Autoplay"
 autoplay_desc: "Once the queue ends, the bot automatically keeps playing recommended songs similar to the last played track."
 autoplay_requester: "Autoplay"
-
 
 speed_line: "{emoji:⚙️} Speed: <b>{speed}x</b>"
 
@@ -713,7 +691,6 @@ speed_failed: |
 speed_reset_success: "{emoji:✅} Playback speed reset to <b>1.0x</b> by {user}"
 
 speed_set: "{emoji:🚀} Playback speed set to <b>{speed}x</b> by {user}."
-
 
 start_private: |
   <h3>{emoji:🎵} {bot}</h3>
