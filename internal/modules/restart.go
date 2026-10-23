@@ -137,7 +137,7 @@ func executeRestart(
 	for roomChatID := range core.Rooms.All() {
 		core.Rooms.Delete(roomChatID)
 		if _, err := c.SendMessage(roomChatID, F(roomChatID, "restart_service", locales.Arg{
-			"bot": mention(c.Me, c.Me.Id),
+			"bot": mention(c.Me(), c.Me().Id),
 		}), nil); err != nil {
 			return err
 		}

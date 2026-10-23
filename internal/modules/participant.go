@@ -82,7 +82,7 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 	}
 
 	oldStatus, newStatus := memberStatus(u.OldChatMember), memberStatus(u.NewChatMember)
-	isBot := c.Me != nil && userID == c.Me.Id
+	isBot := userID == c.Me().Id
 
 	if isBot && (newStatus == "left" || newStatus == "kicked") {
 		handleBotRemoved(c, u, chatID)

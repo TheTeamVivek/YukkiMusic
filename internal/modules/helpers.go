@@ -466,12 +466,13 @@ func isAddressed(c *td.Client, m *td.Message) bool {
 		return true
 	}
 	fields := strings.Fields(m.Text())
-	if len(fields) == 0 || c.Me == nil || c.Me.Usernames == nil ||
-		len(c.Me.Usernames.ActiveUsernames) == 0 {
+	me := c.Me()
+	if len(fields) == 0 || me == nil || me.Usernames == nil ||
+		len(me.Usernames.ActiveUsernames) == 0 {
 		return false
 	}
 	_, name, ok := strings.Cut(fields[0], "@")
-	return ok && name != "" && strings.EqualFold(name, c.Me.Usernames.ActiveUsernames[0])
+	return ok && name != "" && strings.EqualFold(name, me.Usernames.ActiveUsernames[0])
 }
 
 func leaveChat(c *td.Client, chatID int64) {

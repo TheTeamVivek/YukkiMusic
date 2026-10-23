@@ -76,7 +76,8 @@ func handleActions(c *td.Client, m *td.Message) error {
 func handleChatMemberAdd(c *td.Client, m *td.Message) error {
 	chatID := m.ChatID()
 	added := m.Content.(*td.MessageChatAddMembers).MemberUserIds
-	if c.Me == nil || !slices.Contains(added, c.Me.Id) {
+	me := c.Me()
+	if me == nil || me.Id == 0 || !slices.Contains(added, me.Id) {
 		return nil
 	}
 

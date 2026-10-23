@@ -3,7 +3,7 @@ module yukkimusic
 go 1.27
 
 require (
-	github.com/AshokShau/gotdbot v0.9.7-0.20261016182139-7db0a5689e8c
+	github.com/AshokShau/gotdbot v0.10.1
 	github.com/amarnathcjd/gogram v1.7.71
 	github.com/joho/godotenv v1.5.1
 	github.com/shirou/gopsutil/v3 v3.24.5
@@ -13,7 +13,7 @@ require (
 )
 
 require (
-	github.com/ebitengine/purego v0.11.1 // indirect
+	github.com/ebitengine/purego v0.11.2 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/klauspost/compress v1.20.3 // indirect
 	github.com/kr/pretty v0.3.1 // indirect

@@ -101,7 +101,7 @@ func addAuthHandler(c *td.Client, m *td.Message) error {
 	}
 
 	// owner, bot, self, already auth, or admin — all treated the same
-	if userID == config.OwnerID || userID == c.Me.Id ||
+	if userID == config.OwnerID || userID == c.Me().Id ||
 		userID == m.SenderID() {
 		_, err := m.ReplyText(c, F(chatID, "cannot_authorize_user"), nil)
 		return err

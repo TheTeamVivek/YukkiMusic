@@ -35,10 +35,10 @@ var F func(chatID int64, key string, values ...locales.Arg) string // overwritte
 var Bot *td.Client
 
 func botUsername() string {
-	if Bot == nil || Bot.Me == nil || Bot.Me.Usernames == nil {
+	if Bot == nil || Bot.Me() == nil || Bot.Me().Usernames == nil {
 		return ""
 	}
-	usernames := Bot.Me.Usernames.ActiveUsernames
+	usernames := Bot.Me().Usernames.ActiveUsernames
 	if len(usernames) == 0 {
 		return ""
 	}

@@ -13,6 +13,8 @@ RUN apt-get update && \
 COPY go.mod go.sum ./
 RUN go mod tidy
 
+RUN go run github.com/AshokShau/gotdbot/scripts/tools@v0.10.1
+
 COPY install.sh ./
 COPY . .
 
@@ -52,8 +54,8 @@ WORKDIR /app
 
 COPY --from=builder /build/app /app/app
 COPY --from=builder /build/config/cookies /app/config/cookies
+COPY --from=builder /build/libtdjson.so* /app/
 RUN chown -R appuser:appuser /app
 
 USER appuser
-
 ENTRYPOINT ["/app/app"]

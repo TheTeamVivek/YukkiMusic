@@ -62,11 +62,10 @@ func setCPlayHandler(c *td.Client, m *td.Message) error {
 		return err
 	}
 
-	me := c.Me
-	if me == nil {
+	me := c.Me()
+	if me == nil || me.Id == 0 {
 		if fetched, err := c.GetMe(); err == nil && fetched != nil {
 			me = fetched
-			c.Me = me
 		}
 	}
 	if me == nil {

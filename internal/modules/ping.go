@@ -122,7 +122,7 @@ func pingHandler(c *td.Client, m *td.Message) error {
 
 	msg := F(chatID, "ping_result", locales.Arg{
 		"latency":    latency,
-		"bot":        c.Me.Mention(td.ParseModeHTML),
+		"bot":        c.Me().Mention(td.ParseModeHTML),
 		"uptime":     uptimeStr,
 		"ram_info":   ramInfo,
 		"cpu_usage":  cpuUsage,

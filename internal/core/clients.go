@@ -67,14 +67,14 @@ func Init() (func(), error) {
 
 func initBot() error {
 	opts := td.DefaultClientConfig()
-	opts.LibraryPath = "./libtdjson.so.1.8.68"
+	opts.LibraryPath = "./libtdjson.so.1.8.69"
 	opts.ParseMode = td.ParseModeHTML
 	opts.PanicHandler = clientPanicHandler
 	opts.ErrorHandler = clientErrorHandler
 	opts.AutoRetry = &td.AutoRetry{
 		ChatNotFound:    true,
 		MessageNotFound: true,
-		MaxFloodWait:    30 * time.Second,
+		MaxFloodWait:    15 * time.Second,
 	}
 	opts.DatabaseDirectory = "database"
 	opts.Logger = utils.Log

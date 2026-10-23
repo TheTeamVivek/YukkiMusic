@@ -64,7 +64,7 @@ func startHandler(c *td.Client, m *td.Message) error {
 func startRich(c *td.Client, chatID int64, sender *td.User, fallbackID int64) *td.InputRichMessage {
 	text := F(chatID, "start_private", locales.Arg{
 		"user": mention(sender, fallbackID),
-		"bot":  c.Me.Mention(td.ParseModeHTML),
+		"bot":  c.Me().Mention(td.ParseModeHTML),
 	})
 
 	if image := config.StartImage(); image != "" {

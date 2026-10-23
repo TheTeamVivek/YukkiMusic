@@ -61,7 +61,7 @@ func handleAddSudo(c *td.Client, m *td.Message) error {
 	}
 
 	// Trying to add the bot itself
-	if targetID == c.Me.Id {
+	if targetID == c.Me().Id {
 		_, err := m.ReplyText(c, F(chatID, "sudo_bot_self"), nil)
 		return err
 	}
