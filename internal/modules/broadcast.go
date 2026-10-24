@@ -282,8 +282,10 @@ func (b *broadcast) run() {
 func (b *broadcast) send(t broadcastTarget) error {
 	// TDLib answers "chat not found" for a target it has not loaded yet, so
 	// load it first. A user's private chat has the user's id.
-	err := b.withFloodWait(func() error {
-		_, err := b.c.GetChat(t.id)
+	err := b.withFloodWait(func() (err error) {
+if !t.user{
+		_, err = b.c.GetChat(t.id)
+}
 		return err
 	})
 	if err != nil {
