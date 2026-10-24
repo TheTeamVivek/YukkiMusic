@@ -39,7 +39,6 @@ import (
 const (
 	broadcastDelay        = 400 * time.Millisecond // pause between two sends
 	broadcastProgressTick = 5 * time.Second        // how often the progress message is edited
-	broadcastMaxFloodWait = time.Minute            // longest flood wait that is slept through
 )
 
 // activeBroadcast is the running broadcast; only one may run at a time.
@@ -139,6 +138,9 @@ func broadcastHandler(c *td.Client, m *td.Message) error {
 		var err error
 		if reply, err = m.GetRepliedMessage(c); err != nil {
 			utils.Log.Errorf("broadcast: cannot get the replied message: %v", err)
+			_, rerr := m.ReplyText(c, "❌ Failed to get the replied message:\n<code>"+
+				html.EscapeString(err.Error())+"</code>", nil)
+			return rerr
 		}
 	}
 	if reply == nil && text == "" {
@@ -261,7 +263,7 @@ func (b *broadcast) run() {
 		if err := b.send(t); err != nil {
 			counts.failed++
 			fmt.Fprintf(&b.errs, "[%d] - [%v]\n", t.id, err)
-			utils.Log.Debugf("broadcast: failed for %d: %v", t.id, err)
+			utils.Log.Errorf("broadcast: %d: %v", t.id, err)
 		} else {
 			counts.sent++
 		}
@@ -276,25 +278,64 @@ func (b *broadcast) run() {
 	}
 }
 
-// send delivers the broadcast to one target, waiting out a short flood wait.
+// send delivers the broadcast to one target.
 func (b *broadcast) send(t broadcastTarget) error {
-	sent, err := b.deliver(t.id)
+	// TDLib answers "chat not found" for a target it has not loaded yet, so
+	// load it first. A user's private chat has the user's id.
+	err := b.withFloodWait(func() error {
+		_, err := b.c.GetChat(t.id)
+		return err
+	})
 	if err != nil {
-		wait := time.Duration(getFloodWait(err)) * time.Second
-		if wait <= 0 || wait > broadcastMaxFloodWait || !b.sleep(wait) {
-			return err
-		}
-		if sent, err = b.deliver(t.id); err != nil {
-			return err
-		}
+		return fmt.Errorf("GetChat failed: %w", err)
+	}
+
+	var sent *td.Message
+	err = b.withFloodWait(func() (err error) {
+		sent, err = b.deliver(t.id)
+		return err
+	})
+	if err != nil {
+		return fmt.Errorf("%s failed: %w", b.action(), err)
 	}
 
 	if b.pin {
-		if err := b.c.PinChatMessage(t.id, sent.Id, &td.PinChatMessageOpts{DisableNotification: true}); err != nil {
-			utils.Log.Debugf("broadcast: pin failed for %d: %v", t.id, err)
+		err := b.withFloodWait(func() error {
+			return b.c.PinChatMessage(t.id, sent.Id, &td.PinChatMessageOpts{DisableNotification: true})
+		})
+		if err != nil {
+			utils.Log.Errorf("broadcast: PinChatMessage failed for %d: %v", t.id, err)
 		}
 	}
 	return nil
+}
+
+// withFloodWait runs fn and, whenever it hits a flood wait, sleeps it out
+// however long it is and runs fn again. It stops on any other error, or when
+// the broadcast is cancelled.
+func (b *broadcast) withFloodWait(fn func() error) error {
+	for {
+		err := fn()
+		if err == nil {
+			return nil
+		}
+		wait := getFloodWait(err)
+		if wait <= 0 || !b.sleep(time.Duration(wait)*time.Second) {
+			return err
+		}
+	}
+}
+
+// action names the call that delivers the broadcast, for error messages.
+func (b *broadcast) action() string {
+	switch {
+	case b.reply == nil:
+		return "SendMessage"
+	case b.copy:
+		return "Copy"
+	default:
+		return "Forward"
+	}
 }
 
 func (b *broadcast) deliver(id int64) (*td.Message, error) {
