@@ -280,20 +280,9 @@ func (b *broadcast) run() {
 
 // send delivers the broadcast to one target.
 func (b *broadcast) send(t broadcastTarget) error {
-	// TDLib answers "chat not found" for a target it has not loaded yet, so
-	// load it first. A user's private chat has the user's id.
-	err := b.withFloodWait(func() (err error) {
-if !t.user{
-		_, err = b.c.GetChat(t.id)
-}
-		return err
-	})
-	if err != nil {
-		return fmt.Errorf("GetChat failed: %w", err)
-	}
 
 	var sent *td.Message
-	err = b.withFloodWait(func() (err error) {
+	err := b.withFloodWait(func() (err error) {
 		sent, err = b.deliver(t.id)
 		return err
 	})
