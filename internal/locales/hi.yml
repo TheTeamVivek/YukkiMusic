@@ -76,7 +76,6 @@ bot_demotion_goodbye: |
   <b>अलविदा {emoji:👋}</b>
 
 broadcast_already_running: "{emoji:⚠️} एक प्रसारण पूर्व से ही चल रहा है।\n\nकृपया इसके पूर्ण होने की प्रतीक्षा करें या इसे पहले निम्न माध्यम से रद्द करें:\n• <code>/broadcast -cancel</code>\n• अथवा प्रगति सन्देश पर 'प्रसारण रद्द करें' बटन दबाएँ"
-broadcast_parse_failed: "{emoji:❌} प्रसारण आदेश के विश्लेषण में विफल:\n<code>{error}</code>"
 broadcast_no_content: "{emoji:⚠️} प्रसारण के लिए कोई सामग्री प्रदान नहीं की गई।\n\n<b>प्रयोग:</b> <code>{cmd} [पाठ या सन्देश का उत्तर दें]</code>\n\n<b>उदाहरण:</b>\n<code>{cmd} नमस्कार सभी को!</code>"
 broadcast_fetch_chats_failed: "{emoji:❌} सेवा प्राप्त वार्तालापों को प्राप्त करने में विफल:\n<code>{error}</code>"
 broadcast_fetch_users_failed: "{emoji:❌} सेवा प्राप्त उपयोगकर्ताओं को प्राप्त करने में विफल:\n<code>{error}</code>"
@@ -87,9 +86,7 @@ broadcast_total_chats: "{emoji:📊} कुल वार्तालाप: {don
 broadcast_total_users: "{emoji:👥} कुल उपयोगकर्ता: {done}/{total} ({progress}%)"
 broadcast_failed_chats: "{emoji:❌} विफल वार्तालाप: {count}"
 broadcast_failed_users: "{emoji:❌} विफल उपयोगकर्ता: {count}"
-broadcast_delay: "{emoji:⏱} विलम्ब: {delay}s"
 broadcast_elapsed: "{emoji:⏰} व्यतीत समय: {elapsed}"
-broadcast_eta: "{emoji:⏳} अनुमानित समय: {eta}"
 broadcast_success_rate: "{emoji:✨} सफलता दर: {rate}% ({sent}/{total})"
 broadcast_not_running: "ℹ️ वर्तमान में कोई प्रसारण नहीं चल रहा है।"
 broadcast_cancel_success: "{emoji:🚫} प्रसारण सफलतापूर्वक रद्द किया गया।"

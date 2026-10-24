@@ -76,7 +76,6 @@ bot_demotion_goodbye: |
   <b>Hoşça kal {emoji:👋}</b>
 
 broadcast_already_running: "{emoji:⚠️} Bir yayın zaten çalışıyor.\n\nLütfen tamamlanmasını bekle veya şunu kullanarak iptal et:\n• <code>/broadcast -cancel</code>\n• Ya da ilerleme mesajındaki İptal Et düğmesine tıkla"
-broadcast_parse_failed: "{emoji:❌} Yayın komutu ayrıştırılamadı:\n<code>{error}</code>"
 broadcast_no_content: "{emoji:⚠️} Yayın için içerik sağlanmadı.\n\n<b>Kullanım:</b> <code>{cmd} [metin veya mesajı yanıtla]</code>\n\n<b>Örnek:</b>\n<code>{cmd} Herkese merhaba!</code>"
 broadcast_fetch_chats_failed: "{emoji:❌} Sunulan sohbetler alınamadı:\n<code>{error}</code>"
 broadcast_fetch_users_failed: "{emoji:❌} Sunulan kullanıcılar alınamadı:\n<code>{error}</code>"
@@ -87,9 +86,7 @@ broadcast_total_chats: "{emoji:📊} Toplam Sohbet: {done}/{total} ({progress}%)
 broadcast_total_users: "{emoji:👥} Toplam Kullanıcı: {done}/{total} ({progress}%)"
 broadcast_failed_chats: "{emoji:❌} Başarısız Sohbet: {count}"
 broadcast_failed_users: "{emoji:❌} Başarısız Kullanıcı: {count}"
-broadcast_delay: "{emoji:⏱} Gecikme: {delay}s"
 broadcast_elapsed: "{emoji:⏰} Geçen Süre: {elapsed}"
-broadcast_eta: "{emoji:⏳} Tahmini Varış: {eta}"
 broadcast_success_rate: "{emoji:✨} Başarı Oranı: %{rate} ({sent}/{total})"
 broadcast_not_running: "ℹ️ Şu anda çalışan bir yayın yok."
 broadcast_cancel_success: "{emoji:🚫} Yayın başarıyla iptal edildi."

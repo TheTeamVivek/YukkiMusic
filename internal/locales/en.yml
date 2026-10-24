@@ -76,7 +76,6 @@ bot_demotion_goodbye: |
   <b>Goodbye {emoji:👋}</b>
 
 broadcast_already_running: "{emoji:⚠️} A broadcast is already running.\n\nPlease wait for it to complete or cancel it first using:\n• <code>/broadcast -cancel</code>\n• Or click the Cancel button on the progress message"
-broadcast_parse_failed: "{emoji:❌} Failed to parse broadcast command:\n<code>{error}</code>"
 broadcast_no_content: "{emoji:⚠️} No content provided for broadcast.\n\n<b>Usage:</b> <code>{cmd} [text or reply to message]</code>\n\n<b>Example:</b>\n<code>{cmd} Hello everyone!</code>"
 broadcast_fetch_chats_failed: "{emoji:❌} Failed to fetch served chats:\n<code>{error}</code>"
 broadcast_fetch_users_failed: "{emoji:❌} Failed to fetch served users:\n<code>{error}</code>"
@@ -87,9 +86,7 @@ broadcast_total_chats: "{emoji:📊} Total Chats: {done}/{total} ({progress}%)"
 broadcast_total_users: "{emoji:👥} Total Users: {done}/{total} ({progress}%)"
 broadcast_failed_chats: "{emoji:❌} Failed Chats: {count}"
 broadcast_failed_users: "{emoji:❌} Failed Users: {count}"
-broadcast_delay: "{emoji:⏱} Delay: {delay}s"
 broadcast_elapsed: "{emoji:⏰} Elapsed: {elapsed}"
-broadcast_eta: "{emoji:⏳} ETA: {eta}"
 broadcast_success_rate: "{emoji:✨} Success Rate: {rate}% ({sent}/{total})"
 broadcast_not_running: "ℹ️ No broadcast is currently running."
 broadcast_cancel_success: "{emoji:🚫} Broadcast cancelled successfully."

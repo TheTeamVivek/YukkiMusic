@@ -76,7 +76,6 @@ bot_demotion_goodbye: |
   <b>وداعاً {emoji:👋}</b>
 
 broadcast_already_running: "{emoji:⚠️} هناك بث جارٍ بالفعل.\n\nيرجى الانتظار حتى يكتمل أو إلغاؤه أولاً باستخدام:\n• <code>/broadcast -cancel</code>\n• أو انقر فوق زر الإلغاء في رسالة التقدم"
-broadcast_parse_failed: "{emoji:❌} فشل تحليل أمر البث:\n<code>{error}</code>"
 broadcast_no_content: "{emoji:⚠️} لم يتم توفير محتوى للبث.\n\n<b>الاستخدام:</b> <code>{cmd} [النص أو الرد على رسالة]</code>\n\n<b>مثال:</b>\n<code>{cmd} مرحباً بالجميع!</code>"
 broadcast_fetch_chats_failed: "{emoji:❌} فشل جلب المحادثات المخدومة:\n<code>{error}</code>"
 broadcast_fetch_users_failed: "{emoji:❌} فشل جلب المستخدمين المخدومين:\n<code>{error}</code>"
@@ -87,9 +86,7 @@ broadcast_total_chats: "{emoji:📊} إجمالي المحادثات: {done}/{to
 broadcast_total_users: "{emoji:👥} إجمالي المستخدمين: {done}/{total} ({progress}%)"
 broadcast_failed_chats: "{emoji:❌} المحادثات الفاشلة: {count}"
 broadcast_failed_users: "{emoji:❌} المستخدمون الفاشلون: {count}"
-broadcast_delay: "{emoji:⏱} التأخير: {delay} ثانية"
 broadcast_elapsed: "{emoji:⏰} الوقت المنقضي: {elapsed}"
-broadcast_eta: "{emoji:⏳} الوقت المتوقع: {eta}"
 broadcast_success_rate: "{emoji:✨} نسبة النجاح: {rate}% ({sent}/{total})"
 broadcast_not_running: "ℹ️ لا يوجد بث جارٍ حالياً."
 broadcast_cancel_success: "{emoji:🚫} تم إلغاء البث بنجاح."
