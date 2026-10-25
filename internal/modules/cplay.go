@@ -18,188 +18,120 @@
 package modules
 
 import (
-	"errors"
+	"strconv"
 	"strings"
 
 	td "github.com/AshokShau/gotdbot"
 
-	"yukkimusic/config"
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
 
-const linkedCPlayTarget = "linked"
-
+// setCPlayHandler handles /setcplay <chat_id | @username | username | linked | off>.
 func setCPlayHandler(c *td.Client, m *td.Message) error {
 	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
 		return nil
 	}
+
 	args := strings.Fields(m.Text())
-	if len(args) <= 1 {
-		_, err := m.ReplyText(c, F(m.ChatID(), "cplay_usage"), nil)
-		return err
+	if len(args) < 2 {
+		replyKey(c, m, "cplay_usage")
+		return nil
 	}
 
 	chatID := m.ChatID()
-	arg := strings.TrimSpace(args[1])
+	var channelID int64 // 0 turns channel play off
+	doneKey := "cplay_disabled"
 
-	enabled, boolErr := utils.ParseBool(arg)
-	if boolErr == nil && !enabled {
-		return disableCPlay(c, m, chatID)
+	if on, err := utils.ParseBool(args[1]); err != nil || on {
+		id, key := resolveChannel(c, chatID, args[1])
+		if key == "" {
+			key = checkBotRights(c, id)
+		}
+		if key != "" {
+			replyKey(c, m, key)
+			return nil
+		}
+		channelID, doneKey = id, "cplay_enabled"
 	}
 
-	var targetChannelID int64
+	if err := database.LinkChannel(chatID, channelID); err != nil {
+		utils.Log.Errorf("cplay: failed to save for chat %d: %v", chatID, err)
+		replyKey(c, m, "cplay_save_error")
+		return nil
+	}
+	_, err := m.ReplyText(c, F(chatID, doneKey, locales.Arg{"channel_id": channelID}), nil)
+	return err
+}
+
+// resolveChannel finds the channel named by arg. On failure it returns the
+// locale key explaining why.
+func resolveChannel(c *td.Client, chatID int64, arg string) (int64, string) {
+	var chat *td.Chat
 	var err error
 
-	if strings.EqualFold(arg, linkedCPlayTarget) {
-		targetChannelID, err = getLinkedChannelID(c, chatID)
-	} else {
-		targetChannelID, err = resolveChannelPlay(c, chatID, arg)
-	}
-	if err != nil {
-		_, err := m.ReplyText(c, err.Error(), &td.SendMessageOpts{DisableWebPagePreview: true})
-		return err
-	}
-
-	me := c.Me()
-	if me == nil || me.Id == 0 {
-		if fetched, err := c.GetMe(); err == nil && fetched != nil {
-			me = fetched
-		}
-	}
-	if me == nil {
-		_, err := m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
-		return err
+	switch id, parseErr := strconv.ParseInt(arg, 10, 64); {
+	case strings.EqualFold(arg, "linked"):
+		return linkedChannel(c, chatID)
+	case parseErr == nil:
+		chat, err = c.GetChat(id)
+	default:
+		chat, err = c.SearchPublicChat(strings.TrimPrefix(arg, "@"))
 	}
 
-	member, err := c.GetChatMember(targetChannelID, &td.MessageSenderUser{UserId: me.Id})
-	if err != nil {
-		utils.Log.Errorf("Failed to fetch bot member state for cplay target %d: %v", targetChannelID, err)
-		_, err := m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
-		return err
+	if err != nil || chat == nil {
+		utils.Log.Errorf("cplay: cannot resolve %q for chat %d: %v", arg, chatID, err)
+		return 0, "cplay_channel_not_accessible"
 	}
-	if member == nil {
-		_, err := m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
-		return err
+	if _, ok := chat.Type.(*td.ChatTypeSupergroup); !ok {
+		return 0, "cplay_invalid_target"
 	}
-
-	isAdmin := false
-	canInvite := false
-	switch st := member.Status.(type) {
-	case *td.ChatMemberStatusCreator:
-		isAdmin = true
-		canInvite = true
-	case *td.ChatMemberStatusAdministrator:
-		isAdmin = true
-		canInvite = st.Rights != nil && st.Rights.CanInviteUsers
-	}
-	if !isAdmin {
-		_, err := m.ReplyText(c, F(chatID, "cplay_channel_not_accessible"), nil)
-		return err
-	}
-	if isAdmin && !canInvite {
-		_, err := m.ReplyText(c, F(chatID, "cplay_bot_invite_permission_missing"), nil)
-		return err
-	}
-
-	return saveCPlayTarget(c, m, chatID, targetChannelID)
+	return chat.Id, ""
 }
 
-func disableCPlay(c *td.Client, m *td.Message, chatID int64) error {
-	allowed, err := canSetCPlayTarget(c, m, chatID, chatID)
-	if err != nil {
-		_, err := m.ReplyText(c, err.Error(), nil)
-		return err
-	}
-	if !allowed {
-		_, err := m.ReplyText(c, F(chatID, "cplay_owner_required"), nil)
-		return err
-	}
-
-	if err := database.LinkChannel(chatID, 0); err != nil {
-		utils.Log.Errorf("Failed to disable cplay for chat %d: %v", chatID, err)
-		_, err := m.ReplyText(c, F(chatID, "cplay_save_error"), nil)
-		return err
-	}
-	_, rerr := m.ReplyText(c, F(chatID, "cplay_disabled"), nil)
-	return rerr
-}
-
-func getLinkedChannelID(c *td.Client, chatID int64) (int64, error) {
+func linkedChannel(c *td.Client, chatID int64) (int64, string) {
 	chat, err := c.GetChat(chatID)
 	if err != nil {
-		return 0, errors.New(F(chatID, "cplay_resolve_peer_fail"))
+		return 0, "cplay_resolve_peer_fail"
 	}
-
 	sg, ok := chat.Type.(*td.ChatTypeSupergroup)
 	if !ok {
-		return 0, errors.New(F(chatID, "supergroup_needed", locales.Arg{"chat_id": chatID, "support_group": config.SupportChat}))
+		return 0, "cplay_resolve_peer_fail"
 	}
 
 	full, err := c.GetSupergroupFullInfo(sg.SupergroupId)
 	if err != nil || full == nil || full.LinkedChatId == 0 {
-		return 0, errors.New(F(chatID, "cplay_channel_not_linked"))
+		return 0, "cplay_channel_not_linked"
 	}
-	return full.LinkedChatId, nil
+	return full.LinkedChatId, ""
 }
 
-func resolveChannelPlay(c *td.Client, chatID int64, target string) (int64, error) {
-	chat, err := c.SearchPublicChat(target)
-	if err != nil {
-		utils.Log.Errorf("Failed to resolve cplay target %v for chat %d: %v", target, chatID, err)
-		return 0, errors.New(F(chatID, "cplay_channel_not_accessible"))
-	}
-	if chat == nil {
-		return 0, errors.New(F(chatID, "cplay_channel_not_accessible"))
-	}
-
-	if _, ok := chat.Type.(*td.ChatTypeSupergroup); !ok {
-		return 0, errors.New(F(chatID, "cplay_invalid_target"))
+// checkBotRights returns the locale key of the problem if the bot is not an
+// admin of the channel with the right to invite users, else "".
+func checkBotRights(c *td.Client, channelID int64) string {
+	me := c.Me()
+	if me == nil || me.Id == 0 {
+		var err error
+		if me, err = c.GetMe(); err != nil || me == nil {
+			return "cplay_channel_not_accessible"
+		}
 	}
 
-	return chat.Id, nil
-}
-
-func saveCPlayTarget(c *td.Client, m *td.Message, chatID, channelID int64) error {
-	allowed, err := canSetCPlayTarget(c, m, chatID, channelID)
-	if err != nil {
-		_, err := m.ReplyText(c, err.Error(), nil)
-		return err
-	}
-	if !allowed {
-		_, err := m.ReplyText(c, F(chatID, "cplay_owner_required"), nil)
-		return err
+	member, err := c.GetChatMember(channelID, &td.MessageSenderUser{UserId: me.Id})
+	if err != nil || member == nil {
+		utils.Log.Errorf("cplay: cannot get bot member of %d: %v", channelID, err)
+		return "cplay_channel_not_accessible"
 	}
 
-	if err := database.LinkChannel(chatID, channelID); err != nil {
-		utils.Log.Errorf("Failed to set cplay ID for chat %d: %v", chatID, err)
-		_, err := m.ReplyText(c, F(chatID, "cplay_save_error"), nil)
-		return err
+	switch st := member.Status.(type) {
+	case *td.ChatMemberStatusCreator:
+		return ""
+	case *td.ChatMemberStatusAdministrator:
+		if st.Rights != nil && st.Rights.CanInviteUsers {
+			return ""
+		}
+		return "cplay_bot_invite_permission_missing"
 	}
-	_, rerr := m.ReplyText(c, F(chatID, "cplay_enabled", locales.Arg{"channel_id": channelID}), nil)
-	return rerr
-}
-
-func canSetCPlayTarget(c *td.Client, m *td.Message, sourceChatID, targetChatID int64) (bool, error) {
-	userID := m.SenderID()
-	if isOwnerOrSudo(userID) {
-		return true, nil
-	}
-
-	sourceOwnerID, err := utils.GetChatOwner(c, sourceChatID)
-	if err != nil {
-		utils.Log.Errorf("Failed to get source chat owner for %d: %v", sourceChatID, err)
-		return false, errors.New(F(sourceChatID, "cplay_owner_check_failed"))
-	}
-	if sourceOwnerID != 0 && sourceOwnerID == userID {
-		return true, nil
-	}
-
-	targetOwnerID, err := utils.GetChatOwner(c, targetChatID)
-	if err != nil {
-		utils.Log.Errorf("Failed to get target chat owner for %d: %v", targetChatID, err)
-		return false, errors.New(F(sourceChatID, "cplay_owner_check_failed"))
-	}
-	return targetOwnerID != 0 && targetOwnerID == userID, nil
+	return "cplay_channel_not_accessible"
 }

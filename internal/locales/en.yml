@@ -117,7 +117,7 @@ blacklist_list_users: "{emoji:👤} <b>Users:</b>"
 # 🎧 CPlay (Channel Play)
 
 cplay_id_not_set: "{emoji:⚠️} cplay ID not set.\nUse <code>/setcplay &lt;chat_id&gt;</code> to set it."
-cplay_usage: "<b>Usage:</b> <code>/setcplay &lt;channel_id&gt;</code>"
+cplay_usage: "<b>Usage:</b> <code>/setcplay &lt;channel_id | @username | linked | off&gt;</code>"
 cplay_resolve_peer_fail: "<b>Failed to resolve peer:</b> Could not fetch channel details. Ensure I can access this channel."
 cplay_invalid_target: "<b>Invalid Target:</b> The provided ID is not a valid channel."
 cplay_channel_not_accessible: "<b>Channel Not Accessible:</b> Could not retrieve channel information. Please ensure I am an administrator in the target channel."
@@ -125,8 +125,6 @@ cplay_bot_invite_permission_missing: "{emoji:⚠️} <b>Missing Permission:</b> 
 cplay_channel_not_linked: "{emoji:⚠️} <b>Linked channel not found:</b> This chat is not linked to any channel/group."
 cplay_save_error: "<b>Error:</b> Failed to save CPlay settings."
 cplay_enabled: "{emoji:✅} <b>Channel Play enabled.</b> All channel-play commands (like <code>/cplay</code>, <code>/cskip</code>) will now work in channel <code>{channel_id}</code>."
-cplay_owner_required: "{emoji:⚠️} Only the owner of this chat or the target channel can use this setup."
-cplay_owner_check_failed: "{emoji:⚠️} Could not verify chat ownership right now. Please try again."
 cplay_disabled: "{emoji:✅} <b>Channel Play disabled.</b> Channel-play commands (like <code>/cplay</code>, <code>/cskip</code>) are now turned off for this chat."
 
 # Callback handler messages

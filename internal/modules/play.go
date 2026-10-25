@@ -133,7 +133,8 @@ All c* commands work the same as regular commands but affect the linked channel.
 	helpTexts["/channelplay"] = `<i>Configure linked channel for channel play mode.</i>
 
 <u>Usage:</u>
-<b>/channelplay [channel_id]</b> — Set linked channel
+<b>/channelplay [channel_id | @username | linked]</b> — Set linked channel
+<b>/channelplay off</b> — Turn channel play off
 
 <b>⚙️ Behavior:</b>
 • Links a channel to current group
@@ -145,6 +146,8 @@ All c* commands work the same as regular commands but affect the linked channel.
 
 <b>💡 Examples:</b>
 <code>/setcplay -1001234567890</code>
+<code>/setcplay @mychannel</code>
+<code>/setcplay linked</code>
 
 <b>⚠️ Notes:</b>
 • Get channel ID using forward + @userinfobot
