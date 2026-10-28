@@ -129,12 +129,6 @@ func handleLogs(message C.ntg_log_message, _ unsafe.Pointer) {
 	)
 
 	switch message.level {
-	case C.NTG_LOG_DEBUG:
-		utils.Log.Debug(text)
-	case C.NTG_LOG_INFO:
-		utils.Log.Info(text)
-	case C.NTG_LOG_WARNING:
-		utils.Log.Warn(text)
 	case C.NTG_LOG_ERROR:
 		utils.Log.Error(text)
 	}

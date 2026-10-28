@@ -82,7 +82,7 @@ func dashboardMarkup(chatID int64, name string, enabled bool) td.ReplyMarkup {
 	}
 
 	return &td.ReplyMarkupInlineKeyboard{
-		Rows: [][]td.InlineKeyboardButton{{toggle}, {closeBtn}},
+		Rows: [][]td.InlineKeyboardButton{{closeBtn, toggle}},
 	}
 }
 

@@ -406,7 +406,7 @@ func getMediaDescription(
 	if pos > 0 {
 		baseCmd += "-ss " + strconv.Itoa(pos) + " "
 	}
-	baseCmd += "-v warning -i \"" + url + "\" "
+	baseCmd += "-v error -i \"" + url + "\" "
 
 	audio := getAudioPipeline(baseCmd, speed)
 	if !isVideo {
