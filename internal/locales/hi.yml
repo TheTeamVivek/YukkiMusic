@@ -409,7 +409,17 @@ only_admin: "<h4>{emoji:🚫} पहुँच अस्वीकृत</h4>\n<as
 only_admin_cb: "⚠️ केवल प्रशासक ही ये क्रियाएँ कर सकते हैं।"
 only_admin_or_auth: "<h4>{emoji:🚫} पहुँच अस्वीकृत</h4>\n<aside>{emoji:🔒} इस क्रिया के लिए <b>एडमिन</b> या <b>अधिकृत उपयोगकर्ता</b> अनुमतियाँ आवश्यक हैं।</aside>\n<p>आप अब भी <code>/play</code> करके गाने सुन सकते हैं और संगीत का आनन्द ले सकते हैं।</p>"
 only_admin_or_auth_cb: "⚠️ केवल प्रशासक अथवा अधिकृत उपयोगकर्ता ही ये क्रियाएँ कर सकते हैं।"
-only_supergroup: "{emoji:⚠️} यह सुविधा केवल <b>समूह चैट</b> में ही उपयोग की जा सकती है। कृपया मुझे किसी समूह में जोड़ें और फिर कोशिश करें।"
+only_supergroup: |
+  <h2>⚠️ Supergroup आवश्यक है</h2>
+
+  यह सुविधा पूर्ण कार्यक्षमता के लिए केवल <b>Supergroup</b> में काम करती है।
+
+  <aside>इस ग्रुप को Supergroup में बदलें, फिर मुझे दोबारा एडमिन के रूप में जोड़ें।</aside>
+
+  <p><tg-button type="url" style="primary" url="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">📖 ग्रुप को Supergroup में कैसे बदलें</tg-button></p>
+
+  <footer>मदद चाहिए? हमारे सपोर्ट ग्रुप में जुड़ें।</footer>
+  <p><tg-button type="url" url="{support_group}">💬 सपोर्ट ग्रुप</tg-button></p>
 only_owner: "⚠️ केवल सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
 only_sudo: "{emoji:⚠️} केवल विशेषाधिकारी या सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
 only_sudo_cb: "⚠️ केवल विशेषाधिकारी या सहायक के स्वामी ही इस आदेश का प्रयोग कर सकते हैं।"
@@ -713,9 +723,16 @@ stream_now_playing: |
 # 👑 Sudo / Owner Join Messages
 
 supergroup_needed: |
-  यह चैट (ID: <code>{chat_id}</code>) अभी SuperGroup नहीं है।
+  <h2>⚠️ Supergroup आवश्यक है</h2>
 
-  <i>{emoji:⚠️} कृपया इस ग्रुप को SuperGroup में बदलें, फिर मुझे दोबारा admin के रूप में जोड़ें।</i>
+  यह चैट (<code>{chat_id}</code>) एक <b>साधारण ग्रुप</b> है। मैं पूर्ण कार्यक्षमता के लिए केवल <b>Supergroup</b> में काम करता हूँ।
+
+  <aside>इस ग्रुप को Supergroup में बदलें, फिर मुझे दोबारा एडमिन के रूप में जोड़ें।</aside>
+
+  <p><tg-button type="url" style="primary" url="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">📖 ग्रुप को Supergroup में कैसे बदलें</tg-button></p>
+
+  <footer>मदद चाहिए? हमारे सपोर्ट ग्रुप में जुड़ें।</footer>
+  <p><tg-button type="url" url="{support_group}">💬 सपोर्ट ग्रुप</tg-button></p>
 
   <b>कैसे बदलें?</b>
   <a href="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">{emoji:🔗} गाइड खोलें</a>

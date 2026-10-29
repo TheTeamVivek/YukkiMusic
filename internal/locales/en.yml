@@ -412,7 +412,17 @@ only_admin: "<h4>{emoji:🚫} Access Denied</h4>\n<aside>{emoji:🔒} This actio
 only_admin_cb: "⚠️ Only admins can do these actions."
 only_admin_or_auth: "<h4>{emoji:🚫} Access Denied</h4>\n<aside>{emoji:🔒} This action requires <b>admin</b> or <b>authorized user</b> rights.</aside>\n<p>You can still <code>/play</code> songs and enjoy the music.</p>"
 only_admin_or_auth_cb: "⚠️ Only admins or authorized users can do these actions."
-only_supergroup: "{emoji:⚠️} This feature can only be used in a <b>group chat</b>. Please add me to a group and try again."
+only_supergroup: |
+  <h2>⚠️ Supergroup Required</h2>
+
+  This feature only works in a <b>Supergroup</b> for full functionality.
+
+  <aside>Convert this group to a Supergroup, then add me again as an admin to continue.</aside>
+
+  <p><tg-button type="url" style="primary" url="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">📖 How to Convert a Group to Supergroup</tg-button></p>
+
+  <footer>Need help? Join our support group.</footer>
+  <p><tg-button type="url" url="{support_group}">💬 Support Group</tg-button></p>
 only_owner: "⚠️ Only the bot owner can use this command."
 only_sudo: "{emoji:⚠️} Only sudo users or the bot owner can use this command."
 only_sudo_cb: "⚠️ Only sudo users or the bot owner can use this command."
@@ -717,14 +727,16 @@ stream_now_playing: |
 # 👑 Sudo / Owner Join Messages
 
 supergroup_needed: |
-  This chat (ID: <code>{chat_id}</code>) is not a SuperGroup yet.
+  <h2>⚠️ Supergroup Required</h2>
 
-  <i>{emoji:⚠️} Please convert this group into a SuperGroup, then add me again as an admin.</i>
+  This chat (<code>{chat_id}</code>) is a <b>regular group</b>. I only work in <b>Supergroups</b> for full functionality.
 
-  <b>How to convert?</b>
-  <a href="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">{emoji:🔗} Go to the guide</a>
+  <aside>Convert this group to a Supergroup, then add me again as an admin to continue.</aside>
 
-  If you still face any issues, join our <a href="{support_group}">support group.</a>
+  <p><tg-button type="url" style="primary" url="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">📖 How to Convert a Group to Supergroup</tg-button></p>
+
+  <footer>Need help? Join our support group.</footer>
+  <p><tg-button type="url" url="{support_group}">💬 Support Group</tg-button></p>
 
 unmute_already: |
   <h3>ℹ️ Already Unmuted</h3>

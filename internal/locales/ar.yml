@@ -408,7 +408,17 @@ only_admin: "<h4>{emoji:🚫} تم رفض الوصول</h4>\n<aside>{emoji:🔒}
 only_admin_cb: "⚠️ فقط المشرفون يمكنهم القيام بهذه الإجراءات."
 only_admin_or_auth: "<h4>{emoji:🚫} تم رفض الوصول</h4>\n<aside>{emoji:🔒} يتطلب هذا الإجراء صلاحيات <b>مسؤول</b> أو <b>مستخدم مصرح له</b>.</aside>\n<p>لا يزال بإمكانك تشغيل <code>/play</code> والاستمتاع بالموسيقى.</p>"
 only_admin_or_auth_cb: "⚠️ فقط المشرفون أو المصرح لهم يمكنهم القيام بهذه الإجراءات."
-only_supergroup: "{emoji:⚠️} لا يمكن استخدام هذه الميزة إلا في <b>محادثة مجموعة</b>. يرجى إضافتي إلى مجموعة ثم المحاولة مرة أخرى."
+only_supergroup: |
+  <h2>⚠️ مطلوب سوبرمجموعة</h2>
+
+  هذه الميزة تعمل فقط في <b>سوبرمجموعة</b> للحصول على كامل الوظائف.
+
+  <aside>قم بتحويل هذه المجموعة إلى سوبرمجموعة، ثم أضفني مرة أخرى كمشرف للمتابعة.</aside>
+
+  <p><tg-button type="url" style="primary" url="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">📖 كيفية تحويل المجموعة إلى سوبرمجموعة</tg-button></p>
+
+  <footer>تحتاج مساعدة؟ انضم إلى مجموعة الدعم.</footer>
+  <p><tg-button type="url" url="{support_group}">💬 مجموعة الدعم</tg-button></p>
 only_owner: "⚠️ فقط مالك المساعد يمكنه استخدام هذا الأمر."
 only_sudo: "{emoji:⚠️} فقط المساعدون أو مالك المساعد يمكنهم استخدام هذا الأمر."
 only_sudo_cb: "⚠️ فقط المساعدون أو مالك المساعد يمكنهم استخدام هذا الأمر."
@@ -712,9 +722,16 @@ stream_now_playing: |
 # 👑 Sudo / Owner Join Messages
 
 supergroup_needed: |
-  هذه الدردشة (ID: <code>{chat_id}</code>) ليست SuperGroup بعد.
+  <h2>⚠️ مطلوب سوبرمجموعة</h2>
 
-  <i>{emoji:⚠️} يرجى تحويل هذه المجموعة إلى SuperGroup، ثم أضفني مرة أخرى كمشرف.</i>
+  هذه الدردشة (<code>{chat_id}</code>) <b>مجموعة عادية</b>. أعمل فقط في <b>السوبرمجموعات</b> للحصول على كامل الوظائف.
+
+  <aside>قم بتحويل هذه المجموعة إلى سوبرمجموعة، ثم أضفني مرة أخرى كمشرف للمتابعة.</aside>
+
+  <p><tg-button type="url" style="primary" url="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">📖 كيفية تحويل المجموعة إلى سوبرمجموعة</tg-button></p>
+
+  <footer>تحتاج مساعدة؟ انضم إلى مجموعة الدعم.</footer>
+  <p><tg-button type="url" url="{support_group}">💬 مجموعة الدعم</tg-button></p>
 
   <b>كيف أحوّلها؟</b>
   <a href="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">{emoji:🔗} اذهب إلى الدليل</a>

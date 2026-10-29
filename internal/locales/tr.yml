@@ -408,7 +408,17 @@ only_admin: "<h4>{emoji:🚫} Erişim Reddedildi</h4>\n<aside>{emoji:🔒} Bu ey
 only_admin_cb: "⚠️ Bu eylemi yalnızca yöneticiler yapabilir."
 only_admin_or_auth: "<h4>{emoji:🚫} Erişim Reddedildi</h4>\n<aside>{emoji:🔒} Bu eylem <b>yönetici</b> veya <b>yetkili kullanıcı</b> hakları gerektirir.</aside>\n<p>Yine de <code>/play</code> ile şarkı çalabilir ve müziğin tadını çıkarabilirsin.</p>"
 only_admin_or_auth_cb: "⚠️ Bu eylemi yalnızca yöneticiler veya yetkili kullanıcılar yapabilir."
-only_supergroup: "{emoji:⚠️} Bu özellik yalnızca bir <b>grup sohbetinde</b> kullanılabilir. Lütfen beni bir gruba ekle ve tekrar dene."
+only_supergroup: |
+  <h2>⚠️ Süpergrup Gerekli</h2>
+
+  Bu özellik tam işlevsellik için yalnızca <b>Süpergrup</b>'ta çalışır.
+
+  <aside>Grubu Süpergrup'a dönüştürün, ardından beni tekrar yönetici olarak ekleyin.</aside>
+
+  <p><tg-button type="url" style="primary" url="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">📖 Grubu Süpergrup'a Nasıl Dönüştürürsünüz</tg-button></p>
+
+  <footer>Yardıma mı ihtiyacınız var? Destek grubumuza katılın.</footer>
+  <p><tg-button type="url" url="{support_group}">💬 Destek Grubu</tg-button></p>
 only_owner: "⚠️ Bu komutu yalnızca bot sahibi kullanabilir."
 only_sudo: "{emoji:⚠️} Bu komutu yalnızca sudo kullanıcıları veya bot sahibi kullanabilir."
 only_sudo_cb: "⚠️ Bu komutu yalnızca sudo kullanıcıları veya bot sahibi kullanabilir."
@@ -711,9 +721,16 @@ stream_now_playing: |
 # 👑 Sudo / Owner Join Messages
 
 supergroup_needed: |
-  Bu sohbet (ID: <code>{chat_id}</code>) henüz bir SuperGroup değil.
+  <h2>⚠️ Süpergrup Gerekli</h2>
 
-  <i>{emoji:⚠️} Lütfen bu grubu SuperGroup'a dönüştür, sonra beni tekrar yönetici olarak ekle.</i>
+  Bu sohbet (<code>{chat_id}</code>) bir <b>normal grup</b>. Tam işlevsellik için yalnızca <b>Süpergruplar</b>da çalışırım.
+
+  <aside>Grubu Süpergrup'a dönüştürün, ardından beni tekrar yönetici olarak ekleyin.</aside>
+
+  <p><tg-button type="url" style="primary" url="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">📖 Grubu Süpergrup'a Nasıl Dönüştürürsünüz</tg-button></p>
+
+  <footer>Yardıma mı ihtiyacınız var? Destek grubumuza katılın.</footer>
+  <p><tg-button type="url" url="{support_group}">💬 Destek Grubu</tg-button></p>
 
   <b>Nasıl dönüştürülür?</b>
   <a href="https://te.legra.ph/How-to-Convert-a-Group-to-a-Supergroup-01-02">{emoji:🔗} Rehbere git</a>
