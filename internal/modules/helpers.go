@@ -407,6 +407,10 @@ func WithBlacklistMessage(
 	handler func(*td.Client, *td.Message) error,
 ) func(*td.Client, *td.Message) error {
 	return func(c *td.Client, m *td.Message) error {
+		if leaveBasicGroup(c, m) {
+			return nil
+		}
+
 		chatID, userID := m.ChatID(), m.SenderID()
 
 		if blocked, _ := database.IsBlacklistedChat(chatID); blocked && !isOwnerOrSudo(userID) {
@@ -486,6 +490,25 @@ func leaveChat(c *td.Client, chatID int64) {
 			func(ass *core.Assistant) { ass.Client.LeaveChannel(chatID) },
 		)
 	}()
+}
+
+// leaveBasicGroup asks a basic group to upgrade to a supergroup and leaves it,
+// reporting whether m came from one.
+func leaveBasicGroup(c *td.Client, m *td.Message) bool {
+	if !m.IsGroup() {
+		return false
+	}
+
+	text := F(m.ChatID(), "supergroup_needed", locales.Arg{
+		"chat_id":       m.ChatID(),
+		"support_group": config.SupportChat,
+	})
+	if _, err := c.SendMessage(m.ChatID(), text, &td.SendMessageOpts{DisableWebPagePreview: true}); err != nil {
+		utils.Log.Errorf("failed to send supergroup conversion message to chat %d: %v", m.ChatID(), err)
+		return true
+	}
+	leaveChat(c, m.ChatID())
+	return true
 }
 
 // isChannel reports whether m came from a broadcast channel.

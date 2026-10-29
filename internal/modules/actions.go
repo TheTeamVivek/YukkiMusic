@@ -42,28 +42,7 @@ func actionFilter(m *td.Message) bool {
 }
 
 func handleActions(c *td.Client, m *td.Message) error {
-	chat, err := m.GetChat(c)
-	if err != nil {
-		return nil
-	}
-
-	switch t := chat.Type.(type) {
-	case *td.ChatTypeSupergroup:
-		if t.IsChannel {
-			return nil
-		}
-	case *td.ChatTypePrivate, *td.ChatTypeSecret:
-		return nil
-	default: // a basic group: the bot only works in supergroups
-		text := F(m.ChatID(), "supergroup_needed", locales.Arg{
-			"chat_id":       m.ChatID(),
-			"support_group": config.SupportChat,
-		})
-		if _, err := c.SendMessage(m.ChatID(), text, &td.SendMessageOpts{DisableWebPagePreview: true}); err != nil {
-			utils.Log.Errorf("failed to send supergroup conversion message to chat %d: %v", m.ChatID(), err)
-			return nil
-		}
-		leaveChat(c, m.ChatID())
+	if m.IsPrivate() || isChannel(c, m) {
 		return nil
 	}
 
@@ -82,10 +61,12 @@ func handleChatMemberAdd(c *td.Client, m *td.Message) error {
 	}
 
 	if !isOwnerOrSudo(m.SenderID()) {
-		if key := blacklistKey(c, chatID); key != "" {
-			replyKey(c, m, key)
-			leaveChat(c, chatID)
-			return nil
+		if owner, err := utils.GetChatOwner(c, chatID); err == nil {
+			if blocked, _ := database.IsBlacklistedUser(owner); blocked {
+				replyKey(c, m, "blacklist_owner_blocked_leave")
+				leaveChat(c, chatID)
+				return nil
+			}
 		}
 	}
 
@@ -104,20 +85,6 @@ func handleChatMemberAdd(c *td.Client, m *td.Message) error {
 		nil,
 	)
 	return err
-}
-
-// blacklistKey returns the text to show before leaving a blacklisted chat or
-// a chat owned by a blacklisted user, or "" when the chat is fine.
-func blacklistKey(c *td.Client, chatID int64) string {
-	if blocked, _ := database.IsBlacklistedChat(chatID); blocked {
-		return "blacklist_chat_blocked"
-	}
-	if owner, err := utils.GetChatOwner(c, chatID); err == nil {
-		if blocked, _ := database.IsBlacklistedUser(owner); blocked {
-			return "blacklist_owner_blocked_leave"
-		}
-	}
-	return ""
 }
 
 // dropChat forgets everything the bot holds for a chat it no longer serves.
