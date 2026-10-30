@@ -18,6 +18,7 @@
 package modules
 
 import (
+	"html"
 	"strings"
 
 	td "github.com/AshokShau/gotdbot"
@@ -235,11 +236,14 @@ func settingsHandler(c *td.Client, m *td.Message) error {
 		title = chat.Title
 	}
 
-	kb := buildSettingsMarkup(chatID, settings)
-	_, err = m.ReplyText(c, F(chatID, "settings_main", locales.Arg{
-		"title": title,
+	text := F(chatID, "settings_main", locales.Arg{
+		"title": html.EscapeString(title),
 		"id":    chatID,
-	}), &td.SendMessageOpts{ParseMode: td.ParseModeHTML, ReplyMarkup: kb})
+	})
+	kb := buildSettingsMarkup(chatID, settings)
+	_, err = m.ReplyRichMessage(c, &td.InputRichMessage{
+		Source: &td.RichMessageSourceHtml{Text: text},
+	}, &td.SendMessageOpts{ReplyMarkup: kb})
 	return err
 }
 
@@ -268,17 +272,20 @@ func settingsCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		return nil
 	}
 
+	panel := F(chatID, "settings_main", locales.Arg{
+		"title": html.EscapeString(title),
+		"id":    chatID,
+	})
+
 	action := parts[1]
 	if strings.HasPrefix(data, "info:") {
 		_ = u.Answer(c, F(chatID, "settings_info_"+action), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 	if action == "main" {
-		kb := buildSettingsMarkup(chatID, settings)
-		_, _ = u.EditMessageText(c, F(chatID, "settings_main", locales.Arg{
-			"title": title,
-			"id":    chatID,
-		}), &td.EditMessageTextOpts{ParseMode: td.ParseModeHTML, ReplyMarkup: kb})
+		_, _ = c.EditContent(chatID, u.MessageId, &td.InputMessageRichMessage{
+			Message: &td.InputRichMessage{Source: &td.RichMessageSourceHtml{Text: panel}},
+		}, &td.EditMessageMediaOpts{ReplyMarkup: buildSettingsMarkup(chatID, settings)})
 		return nil
 	}
 	switch action {
@@ -318,12 +325,9 @@ func settingsCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	}
 
 	_ = u.Answer(c, F(chatID, "settings_updated"), nil)
-	kb := buildSettingsMarkup(chatID, settings)
-
-	_, _ = u.EditMessageText(c, F(chatID, "settings_main", locales.Arg{
-		"title": title,
-		"id":    chatID,
-	}), &td.EditMessageTextOpts{ParseMode: td.ParseModeHTML, ReplyMarkup: kb})
+	_, _ = c.EditContent(chatID, u.MessageId, &td.InputMessageRichMessage{
+		Message: &td.InputRichMessage{Source: &td.RichMessageSourceHtml{Text: panel}},
+	}, &td.EditMessageMediaOpts{ReplyMarkup: buildSettingsMarkup(chatID, settings)})
 	return nil
 }
 

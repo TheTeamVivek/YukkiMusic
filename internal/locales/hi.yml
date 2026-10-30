@@ -598,12 +598,9 @@ settings_info_playmode: |
   यह नियंत्रित करता है कि /play कमांड कौन उपयोग कर सकता है।
 
 settings_main: |
-  {emoji:⚙️} <b>चैट सेटिंग्स</b>
-
-  <b>समूह:</b> {title}
-  <b>समूह ID:</b> <code>{id}</code>
-
-  नीचे दिए गए बटन से बॉट की सेटिंग्स बदलें।
+  <h2>{emoji:⚙️} चैट सेटिंग्स</h2>
+  <p><b>शीर्षक:</b> {title}<br/><b>ChatID:</b> <code>{id}</code></p>
+  <p>नीचे दिए गए बटन से बॉट की सेटिंग्स बदलें।</p>
 
 settings_updated: "✅ सेटिंग्स अपडेट हो गईं!"
 
@@ -699,7 +696,14 @@ start_private: |
   <p><b>बेहतरीन ऑडियो क्वालिटी, तेज़ डाउनलोड और हर चैट में स्मूद प्लेबैक का आनंद लें।</b></p>
   <footer><i>मुझे जोड़ने या कमांड देखने के लिए नीचे के बटन दबाएँ।</i></footer>
 
-start_group: "<b>{emoji:💫} मैं यहाँ हूँ!</b> कोई आदेश दें... यदि आपको लगता है कि आप मुझे नियन्त्रित कर सकते हैं {emoji:😉}"
+start_group: |
+  <h2>{bot}</h2>
+  <p>मैं आपके टेलीग्राम वॉइस और वीडियो चैट में YouTube, Spotify, SoundCloud, Apple Music और बहुत कुछ से संगीत स्ट्रीम करता हूँ — क्यू, लूप, शफल, सीक और स्पीड नियंत्रण के साथ।</p>
+  <aside>कोई आदेश दें… यदि आपको लगता है कि आप मुझे नियन्त्रित कर सकते हैं {emoji:😉}</aside>
+  <tg-button-row align="center">
+    <tg-button type="url" style="primary" url="{support_channel}">अपडेट चैनल</tg-button>
+    <tg-button type="url" style="link" url="{support_chat}">सपोर्ट ग्रुप</tg-button>
+  </tg-button-row>
 
 stream_queue_finished: "{emoji:🎵} <b>प्रतीक्षा सूची समाप्त!</b>\n\nचलाने के लिए कोई और गीत नहीं है। अधिक संगीत जोड़ने के लिए /play का प्रयोग करें! {emoji:🎶}"
 stream_downloading_next: "{emoji:📥} आपका अगला संगीत अभिलेखित किया जा रहा है..."

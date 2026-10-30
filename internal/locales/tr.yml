@@ -596,12 +596,9 @@ settings_info_playmode: |
   /play komutunu kimlerin kullanabileceğini kontrol eder.
 
 settings_main: |
-  {emoji:⚙️} <b>Sohbet Ayarları</b>
-
-  <b>Grup:</b> {title}
-  <b>Grup ID:</b> <code>{id}</code>
-
-  Aşağıdaki butonları kullanarak bot ayarlarını yapılandırın.
+  <h2>{emoji:⚙️} Sohbet Ayarları</h2>
+  <p><b>Başlık:</b> {title}<br/><b>ChatID:</b> <code>{id}</code></p>
+  <p>Aşağıdaki butonları kullanarak bot ayarlarını yapılandırın.</p>
 
 settings_updated: "✅ Ayarlar güncellendi!"
 
@@ -697,7 +694,14 @@ start_private: |
   <p><b>Yüksek kaliteli ses, hızlı indirmeler ve her sohbette akıcı oynatmanın keyfini çıkar.</b></p>
   <footer><i>Beni eklemek veya komutları görmek için aşağıdaki düğmelere dokun.</i></footer>
 
-start_group: "<b>{emoji:💫} Buradayım!</b> Bir komut dene... Tabi benimle başa çıkabileceğini düşünüyorsan {emoji:😉}"
+start_group: |
+  <h2>{bot}</h2>
+  <p>YouTube, Spotify, SoundCloud, Apple Music ve daha fazlasından Telegram sesli ve görüntülü sohbetlerine müzik yayınlıyorum — kuyruk, döngü, karıştırma, sarma ve hız kontrolüyle.</p>
+  <aside>Bir komut dene… tabi benimle başa çıkabileceğini düşünüyorsan {emoji:😉}</aside>
+  <tg-button-row align="center">
+    <tg-button type="url" style="primary" url="{support_channel}">Güncelleme Kanalı</tg-button>
+    <tg-button type="url" style="link" url="{support_chat}">Destek Grubu</tg-button>
+  </tg-button-row>
 
 stream_queue_finished: "{emoji:🎵} <b>Sıra Bitti!</b>\n\nÇalacak başka şarkı kalmadı. Daha fazla parça eklemek için /play kullan! {emoji:🎶}"
 stream_downloading_next: "{emoji:📥} Sonraki parçan indiriliyor..."

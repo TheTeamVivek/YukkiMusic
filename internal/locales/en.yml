@@ -605,12 +605,9 @@ settings_info_playmode: |
   Control who can use the /play command. If enabled, only administrators and authorized users can start playback.
 
 settings_main: |
-  {emoji:⚙️} <b>Chat Settings</b>
-
-  <b>Group:</b> {title}
-  <b>Group ID:</b> <code>{id}</code>
-
-  Configure the bot's behavior in this group using the buttons below.
+  <h2>{emoji:⚙️} Chat Settings</h2>
+  <p><b>Title:</b> {title}<br/><b>ChatID:</b> <code>{id}</code></p>
+  <p>Configure the bot's behavior in this group using the buttons below.</p>
 
 settings_updated: "✅ Settings updated!"
 
@@ -703,7 +700,14 @@ start_private: |
   <p><b>Enjoy high-quality audio, fast downloads and smooth playback everywhere.</b></p>
   <footer><i>Tap the buttons below to add me or explore commands.</i></footer>
 
-start_group: "<b>{emoji:💫} I’m here!</b> Try a command… if you think you can handle me {emoji:😉}"
+start_group: |
+  <h2>{bot}</h2>
+  <p>I stream music in your Telegram voice &amp; video chats from YouTube, Spotify, SoundCloud, Apple Music and more — with queue, loop, shuffle, seek and speed control.</p>
+  <aside>Try a command… if you think you can handle me {emoji:😉}</aside>
+  <tg-button-row align="center">
+    <tg-button type="url" style="primary" url="{support_channel}">Updates Channel</tg-button>
+    <tg-button type="url" style="link" url="{support_chat}">Support Group</tg-button>
+  </tg-button-row>
 
 stream_queue_finished: "{emoji:🎵} <b>Queue Finished!</b>\n\nNo more songs to play. Use /play to add more tracks! {emoji:🎶}"
 stream_downloading_next: "{emoji:📥} Downloading your next track..."

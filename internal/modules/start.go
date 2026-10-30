@@ -35,7 +35,12 @@ func startHandler(c *td.Client, m *td.Message) error {
 
 	if !m.IsPrivate() {
 		database.AddServedChat(m.ChatID())
-		_, err := m.ReplyText(c, F(m.ChatID(), "start_group"), nil)
+		text := F(m.ChatID(), "start_group", locales.Arg{
+			"bot":             c.Me().Mention(td.ParseModeHTML),
+			"support_chat":    html.EscapeString(config.SupportChat),
+			"support_channel": html.EscapeString(config.SupportChannel),
+		})
+		_, err := m.ReplyRichMessageHTML(c, text, nil)
 		return err
 	}
 

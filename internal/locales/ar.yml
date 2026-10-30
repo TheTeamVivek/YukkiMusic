@@ -597,12 +597,9 @@ settings_info_playmode: |
   يتحكم في من يمكنه استخدام أمر /play لبدء التشغيل.
 
 settings_main: |
-  {emoji:⚙️} <b>إعدادات الدردشة</b>
-
-  <b>المجموعة:</b> {title}
-  <b>معرف المجموعة:</b> <code>{id}</code>
-
-  قم بتخصيص سلوك البوت في هذه المجموعة باستخدام الأزرار أدناه.
+  <h2>{emoji:⚙️} إعدادات الدردشة</h2>
+  <p><b>العنوان:</b> {title}<br/><b>ChatID:</b> <code>{id}</code></p>
+  <p>قم بتخصيص سلوك البوت في هذه المجموعة باستخدام الأزرار أدناه.</p>
 
 settings_updated: "✅ تم تحديث الإعدادات!"
 
@@ -698,7 +695,14 @@ start_private: |
   <p><b>استمتع بجودة صوت عالية وتنزيلات سريعة وتشغيل سلس في كل محادثة.</b></p>
   <footer><i>اضغط على الأزرار أدناه لإضافتي أو لاستكشاف الأوامر.</i></footer>
 
-start_group: "<b>{emoji:💫} أنا هنا!</b> جرب أمراً ما... إذا كنت تظن أنك تستطيع السيطرة علي {emoji:😉}"
+start_group: |
+  <h2>{bot}</h2>
+  <p>أنا أبث الموسيقى في محادثات الصوت والفيديو على تيليجرام من YouTube و Spotify و SoundCloud و Apple Music وغيرها — مع قائمة الانتظار والتكرار والخلط والتقديم والتحكم في السرعة.</p>
+  <aside>جرب أمراً ما… إذا كنت تظن أنك تستطيع السيطرة علي {emoji:😉}</aside>
+  <tg-button-row align="center">
+    <tg-button type="url" style="primary" url="{support_channel}">قناة التحديثات</tg-button>
+    <tg-button type="url" style="link" url="{support_chat}">مجموعة الدعم</tg-button>
+  </tg-button-row>
 
 stream_queue_finished: "{emoji:🎵} <b>انتهت قائمة الانتظار!</b>\n\nلا توجد أغاني أخرى للتشغيل. استخدم /play لإضافة المزيد! {emoji:🎶}"
 stream_downloading_next: "{emoji:📥} جاري تنزيل المقطع التالي..."

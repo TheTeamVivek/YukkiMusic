@@ -503,7 +503,7 @@ func leaveBasicGroup(c *td.Client, m *td.Message) bool {
 		"chat_id":       m.ChatID(),
 		"support_group": config.SupportChat,
 	})
-	if _, err := c.SendMessage(m.ChatID(), text, &td.SendMessageOpts{DisableWebPagePreview: true}); err != nil {
+	if _, err := m.ReplyRichMessageHTML(c, text, nil); err != nil {
 		utils.Log.Errorf("failed to send supergroup conversion message to chat %d: %v", m.ChatID(), err)
 		return true
 	}

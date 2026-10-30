@@ -105,7 +105,7 @@ func Init(bot *td.Client, assistants *core.ClientManager) {
 	bot.OnCommand("autoplay", WithBlacklistMessage(autoplayHandler))
 	bot.OnCommand("reload", WithBlacklistMessage(reloadHandler))
 	bot.OnCommand("restart", WithBlacklistMessage(handleRestart))
-	bot.OnCommand("settings", WithBlacklistMessage(settingsHandler))
+	bot.OnCommand("settings", WithBlacklistMessage(settingsHandler)).AddAliases("setting")
 	bot.OnCommand("stats", WithBlacklistMessage(statsHandler))
 	bot.OnCommand("auth", WithBlacklistMessage(addAuthHandler)).AddAliases("addauth", "authorize")
 	bot.OnCommand("delauth", WithBlacklistMessage(delAuthHandler)).AddAliases("unauth", "delauthuser")
