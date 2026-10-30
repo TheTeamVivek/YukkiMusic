@@ -127,24 +127,23 @@ func withVideo(tracks []*state.Track, video bool) []*state.Track {
 	return out
 }
 
-func (p *YouTubePlatform) VideoSearch(query string, single ...bool) ([]*state.Track, error) {
+func (p *YouTubePlatform) VideoSearch(query string) ([]*state.Track, error) {
+	cleanQuery := strings.TrimSpace(query)
+	if cleanQuery == "" {
+		return nil, errors.New("empty search query")
+	}
+
+	cacheKey := "search:" + strings.ToLower(cleanQuery)
+	if arr, ok := p.cache.Get(cacheKey); ok && len(arr) > 0 {
+		return arr, nil
+	}
+
 	limit := config.QueueLimit
-	onlyOne := len(single) > 0 && single[0]
-	if onlyOne {
-		limit = 1
+	if limit <= 0 {
+		limit = 10
 	}
 
-	cacheKey := "search:" + strings.ToLower(strings.TrimSpace(query))
-	if arr, ok := p.cache.Get(cacheKey); ok {
-		if onlyOne && len(arr) > 0 {
-			return []*state.Track{arr[0]}, nil
-		}
-		if !onlyOne && len(arr) > 1 {
-			return arr, nil
-		}
-	}
-
-	tracks, err := p.performSearch(query, limit)
+	tracks, err := p.performSearch(cleanQuery, limit)
 	if err != nil {
 		return nil, fmt.Errorf("ytsearch failed: %w", err)
 	}
@@ -153,10 +152,6 @@ func (p *YouTubePlatform) VideoSearch(query string, single ...bool) ([]*state.Tr
 	}
 
 	p.cache.Set(cacheKey, tracks)
-
-	if onlyOne {
-		return []*state.Track{tracks[0]}, nil
-	}
 	return tracks, nil
 }
 
@@ -171,15 +166,20 @@ func (p *YouTubePlatform) handlePlaylist(rawURL string) ([]*state.Track, error) 
 		return nil, errors.New("invalid playlist url")
 	}
 
+	limit := config.QueueLimit
+	if limit <= 0 {
+		limit = 24
+	}
+
 	var (
 		tracks []*state.Track
 		err    error
 	)
 
 	if strings.HasPrefix(playlistID, "RD") {
-		tracks, err = p.fetchMixPlaylist(playlistID, config.QueueLimit)
+		tracks, err = p.fetchMixPlaylist(playlistID, limit)
 	} else {
-		tracks, err = p.fetchPlaylist(playlistID, config.QueueLimit)
+		tracks, err = p.fetchPlaylist(playlistID, limit)
 	}
 
 	if err != nil {
@@ -279,8 +279,9 @@ func (p *YouTubePlatform) fetchTrackViaOEmbed(videoID string) (*state.Track, err
 	utils.Log.Debugf("[YouTube] oembed title for %s: %q", videoID, title)
 
 	queries := []string{title}
-	if len(title) > 35 {
-		queries = append(queries, title[:35])
+	runes := []rune(title)
+	if len(runes) > 35 {
+		queries = append(queries, string(runes[:35]))
 	}
 
 	for _, q := range queries {
@@ -462,10 +463,10 @@ func (p *YouTubePlatform) fetchMixPlaylist(playlistID string, limit int) ([]*sta
 		}
 		t := &state.Track{
 			URL:      "https://www.youtube.com/watch?v=" + id,
-			Title:    safeStr(dig(vid, "title", "simpleText")),
+			Title:    extractText(dig(vid, "title")),
 			ID:       id,
 			Artwork:  getThumbnailURL(vid),
-			Duration: parseDuration(safeStr(dig(vid, "lengthText", "simpleText"))),
+			Duration: parseDuration(extractText(dig(vid, "lengthText"))),
 			Source:   PlatformYouTube,
 		}
 		tracks = append(tracks, t)
@@ -514,13 +515,17 @@ func (p *YouTubePlatform) parseNodes(node any, tracks *[]*state.Track, limit int
 			if id == "" {
 				return
 			}
-			durationText := safeStr(dig(vid, "lengthText", "simpleText"))
+			durationText := extractText(dig(vid, "lengthText"))
 			if durationText == "" {
 				return
 			}
+			title := extractText(dig(vid, "title"))
+			if title == "" {
+				title = "YouTube Track"
+			}
 			t := &state.Track{
 				URL:      "https://www.youtube.com/watch?v=" + id,
-				Title:    safeStr(dig(vid, "title", "runs", 0, "text")),
+				Title:    title,
 				ID:       id,
 				Artwork:  getThumbnailURL(vid),
 				Duration: parseDuration(durationText),
@@ -536,6 +541,33 @@ func (p *YouTubePlatform) parseNodes(node any, tracks *[]*state.Track, limit int
 	}
 }
 
+func extractText(node any) string {
+	if node == nil {
+		return ""
+	}
+	switch v := node.(type) {
+	case string:
+		return v
+	case map[string]any:
+		if st := safeStr(v["simpleText"]); st != "" {
+			return st
+		}
+		if text := safeStr(v["text"]); text != "" {
+			return text
+		}
+		if runs, ok := v["runs"].([]any); ok {
+			var sb strings.Builder
+			for _, r := range runs {
+				if rm, ok := r.(map[string]any); ok {
+					sb.WriteString(safeStr(rm["text"]))
+				}
+			}
+			return sb.String()
+		}
+	}
+	return ""
+}
+
 func isLiveVideo(vid map[string]any) bool {
 	if badges, ok := dig(vid, "badges").([]any); ok {
 		for _, b := range badges {
@@ -544,10 +576,8 @@ func isLiveVideo(vid map[string]any) bool {
 			}
 		}
 	}
-	return strings.Contains(
-		strings.ToLower(safeStr(dig(vid, "viewCountText", "runs", 0, "text"))),
-		"watching",
-	)
+	viewCount := strings.ToLower(extractText(dig(vid, "viewCountText")))
+	return strings.Contains(viewCount, "watching")
 }
 
 func getThumbnailURL(vid map[string]any) string {
@@ -590,7 +620,7 @@ func safeStr(v any) string {
 }
 
 func parseDuration(s string) int {
-	parts := strings.Split(s, ":")
+	parts := strings.Split(strings.TrimSpace(s), ":")
 	total, mult := 0, 1
 	for _, part := range slices.Backward(parts) {
 		total += atoi(part) * mult

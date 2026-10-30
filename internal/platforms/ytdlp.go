@@ -29,12 +29,11 @@ import (
 	"strings"
 	"time"
 
-	"yukkimusic/internal/utils"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config/cookies"
 	state "yukkimusic/internal/core/models"
+	"yukkimusic/internal/utils"
 )
 
 const PlatformYtDlp state.PlatformName = "YtDlp"
@@ -47,6 +46,7 @@ type ytdlpInfo struct {
 	Duration    float64     `json:"duration"`
 	Thumbnail   string      `json:"thumbnail"`
 	URL         string      `json:"webpage_url"`
+	DirectURL   string      `json:"url"`
 	OriginalURL string      `json:"original_url"`
 	Uploader    string      `json:"uploader"`
 	IsLive      bool        `json:"is_live"`
@@ -157,7 +157,6 @@ func (y *YtdlpPlatform) Download(
 
 	args := []string{
 		"--no-playlist",
-		"--no-part",
 		"--geo-bypass",
 		"--no-warnings",
 		"--ignore-errors",
@@ -193,8 +192,8 @@ func (y *YtdlpPlatform) Download(
 
 	if err := cmd.Run(); err != nil {
 		findAndRemove(track)
-		if isDownloadCancelled(err) {
-			return "", err
+		if isDownloadCancelled(err) || (ctx != nil && ctx.Err() != nil) {
+			return "", context.Canceled
 		}
 		return "", fmt.Errorf(
 			"yt-dlp failed: %w\nstdout: %s\nstderr: %s",
@@ -237,11 +236,19 @@ func (y *YtdlpPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 		return nil, fmt.Errorf("metadata extraction failed: %w\n%s", err, stderr.String())
 	}
 
-	lines := strings.Split(strings.TrimSpace(stdout.String()), "\n")
+	trimmed := strings.TrimSpace(stdout.String())
+	if trimmed == "" {
+		return nil, errors.New("yt-dlp produced empty metadata")
+	}
 
+	lines := strings.Split(trimmed, "\n")
 	if len(lines) > 1 {
 		var info ytdlpInfo
 		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
 			var entry ytdlpInfo
 			if err := jsonv2.Unmarshal([]byte(line), &entry); err != nil {
 				utils.Log.Debugf("YtDlp: skip bad entry: %v", err)
@@ -256,7 +263,7 @@ func (y *YtdlpPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 	}
 
 	var info ytdlpInfo
-	if err := jsonv2.Unmarshal(stdout.Bytes(), &info); err != nil {
+	if err := jsonv2.Unmarshal([]byte(lines[0]), &info); err != nil {
 		return nil, fmt.Errorf("failed to parse metadata JSON: %w", err)
 	}
 	return &info, nil
@@ -266,12 +273,16 @@ func (y *YtdlpPlatform) toTrack(info *ytdlpInfo, video bool) *state.Track {
 	if video && audioOnlyExtractors[strings.ToLower(info.Extractor)] {
 		video = false
 	}
+	title := info.Title
+	if title == "" {
+		title = "Audio Stream"
+	}
 	return &state.Track{
 		ID:       info.ID,
-		Title:    info.Title,
+		Title:    title,
 		Duration: int(info.Duration),
 		Artwork:  info.Thumbnail,
-		URL:      firstNonEmpty(info.OriginalURL, info.URL),
+		URL:      firstNonEmpty(info.OriginalURL, info.URL, info.DirectURL),
 		Source:   PlatformYtDlp,
 		Video:    video,
 	}

@@ -42,7 +42,7 @@ var (
 		`^(?:(?:https?://)?t\.me/((c/)?[\w\d_-]+/\d+|[\w\d_-]+)|@[\w\d_-]+)$`,
 	)
 	telegramExtractRegex = regexp.MustCompile(
-		`^(?:https?://)?t\.me/(c/)?([\w\d_-]+)/(\d+)$`,
+		`^(?:https?://)?t\.me/(c/)?([\w\d_-]+)/(\d+)(?:\?.*)?$`,
 	)
 	telegramProfileRegex = regexp.MustCompile(
 		`^(?:(?:https?://)?t\.me/|@)([\w\d_-]{4,})/?$`,
@@ -90,8 +90,6 @@ func (t *TelegramPlatform) Get(query string, _ bool) ([]*state.Track, error) {
 	return nil, errors.New("invalid Telegram link")
 }
 
-// fetchTelegramMessage resolves a t.me message link via GetMessageLinkInfo
-// and returns the linked message.
 func fetchTelegramMessage(query string) (*td.Message, error) {
 	if !strings.HasPrefix(query, "http://") && !strings.HasPrefix(query, "https://") {
 		query = "https://" + query
@@ -124,13 +122,7 @@ func (t *TelegramPlatform) Download(
 	path := getPath(track, ext)
 
 	if fileExists(path) {
-		if track.Duration == 0 {
-			if dur, err := utils.GetDurationByFFProbe(path); err == nil {
-				track.Duration = dur
-			} else {
-				utils.Log.Errorf("GetDurationByFFProbe failed for %q: %v", path, err)
-			}
-		}
+		t.ensureDuration(track, path)
 		return path, nil
 	}
 
@@ -146,27 +138,16 @@ func (t *TelegramPlatform) Download(
 		return "", errors.New("failed to locate file")
 	}
 
-	fileID := msg.RemoteFileID()
-	if OnDownloadStart != nil {
-		OnDownloadStart(fileID, statusMsg)
-	}
-	file, err := msg.Download(core.Bot, 1, &td.DownloadFileOpts{Synchronous: true})
+	outPath, err := downloadTDLibMessage(ctx, msg, path, statusMsg)
 	if err != nil {
-		os.Remove(path)
-		if isDownloadCancelled(err) {
-			return "", context.Canceled
-		}
-		return "", fmt.Errorf("download failed: %w", err)
-	}
-	if file == nil || file.Local == nil || file.Local.Path == "" {
-		return "", errors.New("downloaded file missing")
+		return "", err
 	}
 
-	if err := copyFile(file.Local.Path, path); err != nil {
-		return "", fmt.Errorf("copy failed: %w", err)
-	}
-	os.Remove(file.Local.Path)
+	t.ensureDuration(track, outPath)
+	return outPath, nil
+}
 
+func (t *TelegramPlatform) ensureDuration(track *state.Track, path string) {
 	if track.Duration == 0 {
 		if dur, err := utils.GetDurationByFFProbe(path); err == nil {
 			track.Duration = dur
@@ -174,8 +155,43 @@ func (t *TelegramPlatform) Download(
 			utils.Log.Errorf("GetDurationByFFProbe failed for %q: %v", path, err)
 		}
 	}
+}
 
-	return path, nil
+func downloadTDLibMessage(
+	ctx context.Context,
+	msg *td.Message,
+	dstPath string,
+	statusMsg *td.Message,
+) (string, error) {
+	if msg == nil {
+		return "", errors.New("nil message")
+	}
+
+	fileID := msg.RemoteFileID()
+	if OnDownloadStart != nil {
+		OnDownloadStart(fileID, statusMsg)
+	}
+
+	file, err := msg.Download(core.Bot, 1, &td.DownloadFileOpts{Synchronous: true})
+	if err != nil {
+		_ = os.Remove(dstPath)
+		if isDownloadCancelled(err) || (ctx != nil && ctx.Err() != nil) {
+			return "", context.Canceled
+		}
+		return "", fmt.Errorf("download failed: %w", err)
+	}
+	if file == nil || file.Local == nil || file.Local.Path == "" {
+		_ = os.Remove(dstPath)
+		return "", errors.New("downloaded file missing")
+	}
+
+	if err := copyFile(file.Local.Path, dstPath); err != nil {
+		_ = os.Remove(dstPath)
+		return "", fmt.Errorf("copy failed: %w", err)
+	}
+	_ = os.Remove(file.Local.Path)
+
+	return dstPath, nil
 }
 
 func (t *TelegramPlatform) GetTracksByMessage(c *td.Client, msg *td.Message) (*state.Track, error) {
@@ -204,18 +220,24 @@ func (t *TelegramPlatform) GetTracksByMessage(c *td.Client, msg *td.Message) (*s
 		if content.Video != nil {
 			title = firstNonEmpty(content.Video.FileName, title)
 		}
+	case *td.MessageVoiceNote:
+		title = "Voice Note"
+	case *td.MessageDocument:
+		if content.Document != nil {
+			title = firstNonEmpty(content.Document.FileName, title)
+		}
 	}
 
-	url := ""
+	trackURL := ""
 	if link, err := msg.GetLink(c); err == nil && link != nil {
-		url = link.Link
+		trackURL = link.Link
 	}
 
 	track := &state.Track{
 		ID:       msg.RemoteFileID(),
 		Title:    title,
 		Duration: utils.GetDuration(msg),
-		URL:      url,
+		URL:      trackURL,
 		Source:   PlatformTelegram,
 	}
 	telegramMsgCache.Set(track.ID, msg)

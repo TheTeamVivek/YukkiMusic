@@ -50,8 +50,18 @@ func Register(p state.Platform) {
 	global.mu.Lock()
 	defer global.mu.Unlock()
 
+	if _, ok := global.byName[p.Name()]; ok {
+		for i, existing := range global.sorted {
+			if existing.Name() == p.Name() {
+				global.sorted[i] = p
+				break
+			}
+		}
+	} else {
+		global.sorted = append(global.sorted, p)
+	}
+
 	global.byName[p.Name()] = p
-	global.sorted = append(global.sorted, p)
 	sort.Slice(global.sorted, func(i, j int) bool {
 		return global.sorted[i].Priority() > global.sorted[j].Priority()
 	})
@@ -108,9 +118,6 @@ func GetTracks(c *td.Client, m *td.Message, video bool) ([]*state.Track, error) 
 	return nil, errors.New("no tracks found")
 }
 
-// Download fetches the given track and returns its local file path.
-// It tries every registered platform that can download the track's source,
-// in priority order, and returns the first successful file path.
 func Download(
 	ctx context.Context,
 	track *state.Track,
@@ -169,10 +176,6 @@ func fetchFromURLs(urls []string, video bool) ([]*state.Track, []string) {
 	return tracks, errs
 }
 
-// AutoplayTracks fetches recommended tracks similar to the last played track.
-// It uses the YouTube "mix" of the given track so playback continues with
-// related songs once the user queue is empty. It returns an error when the
-// track is not a YouTube track or recommendations cannot be resolved.
 func AutoplayTracks(last *state.Track, limit int) ([]*state.Track, error) {
 	if last == nil || last.ID == "" || last.Source != PlatformYouTube {
 		return nil, errors.New("autoplay requires a YouTube track")

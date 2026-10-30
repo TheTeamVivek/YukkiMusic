@@ -20,32 +20,27 @@ package platforms
 import (
 	"context"
 	"fmt"
+	"hash/fnv"
 	"net/url"
 	"path"
 	"regexp"
 	"slices"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
-
-	"yukkimusic/internal/utils"
+	"unicode"
+	"unicode/utf8"
 
 	td "github.com/AshokShau/gotdbot"
 
 	state "yukkimusic/internal/core/models"
+	"yukkimusic/internal/utils"
 )
 
 const PlatformDirectStream state.PlatformName = "DirectStream"
 
 type DirectStreamPlatform struct {
-	mu    sync.Mutex
-	cache map[string]*cachedStream
-}
-
-type cachedStream struct {
-	info    *streamInfo
-	expires time.Time
+	cache *utils.Cache[string, *streamInfo]
 }
 
 type streamInfo struct {
@@ -82,7 +77,7 @@ var (
 
 func init() {
 	Register(&DirectStreamPlatform{
-		cache: make(map[string]*cachedStream),
+		cache: utils.NewCache[string, *streamInfo](5 * time.Minute),
 	})
 }
 
@@ -116,10 +111,6 @@ func (d *DirectStreamPlatform) Get(query string, video bool) ([]*state.Track, er
 		Video:    video || info.IsVideo,
 	}
 
-	if info.IsVideo {
-		track.Video = true
-	}
-
 	if info.Size > 0 && track.Duration == 0 {
 		bitrate := int64(128000)
 		if info.IsVideo {
@@ -151,22 +142,16 @@ func (d *DirectStreamPlatform) Download(
 }
 
 func (d *DirectStreamPlatform) getStreamInfo(urlStr string) (*streamInfo, error) {
-	d.mu.Lock()
-	if c, ok := d.cache[urlStr]; ok && time.Now().Before(c.expires) {
-		d.mu.Unlock()
-		return c.info, nil
+	if info, ok := d.cache.Get(urlStr); ok && info != nil {
+		return info, nil
 	}
-	d.mu.Unlock()
 
 	info, err := d.validateStream(urlStr)
 	if err != nil {
 		return nil, err
 	}
 
-	d.mu.Lock()
-	d.cache[urlStr] = &cachedStream{info: info, expires: time.Now().Add(5 * time.Minute)}
-	d.mu.Unlock()
-
+	d.cache.Set(urlStr, info)
 	return info, nil
 }
 
@@ -191,13 +176,16 @@ func (d *DirectStreamPlatform) looksLikeStream(urlStr string) bool {
 }
 
 func (d *DirectStreamPlatform) validateStream(urlStr string) (*streamInfo, error) {
-	client := rc.
-		SetTimeout(10*time.Second).
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	req := rc.R().
+		SetContext(ctx).
 		SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
 
-	resp, err := client.R().Head(urlStr)
+	resp, err := req.Head(urlStr)
 	if err != nil || resp.StatusCode() >= 400 {
-		resp, err = client.R().
+		resp, err = req.
 			SetHeader("Range", "bytes=0-1024").
 			Get(urlStr)
 		if err != nil {
@@ -245,14 +233,9 @@ func (d *DirectStreamPlatform) validateStream(urlStr string) (*streamInfo, error
 }
 
 func (d *DirectStreamPlatform) generateID(urlStr string) string {
-	h := 0
-	for _, c := range urlStr {
-		h = (h << 5) - h + int(c)
-	}
-	if h < 0 {
-		h = -h
-	}
-	return fmt.Sprintf("direct_%d", h)
+	h := fnv.New64a()
+	_, _ = h.Write([]byte(urlStr))
+	return fmt.Sprintf("direct_%x", h.Sum64())
 }
 
 func (d *DirectStreamPlatform) extractTitle(urlStr string) string {
@@ -270,7 +253,8 @@ func (d *DirectStreamPlatform) extractTitle(urlStr string) string {
 		name = parsed.Host
 	}
 	if len(name) > 0 {
-		name = strings.ToUpper(name[:1]) + name[1:]
+		r, sz := utf8.DecodeRuneInString(name)
+		name = string(unicode.ToUpper(r)) + name[sz:]
 	}
 	return name
 }

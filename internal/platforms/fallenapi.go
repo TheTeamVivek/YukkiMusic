@@ -25,13 +25,12 @@ import (
 	"os"
 	"regexp"
 
-	"yukkimusic/internal/utils"
-
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
 	state "yukkimusic/internal/core/models"
+	"yukkimusic/internal/utils"
 )
 
 const PlatformFallenApi state.PlatformName = "FallenApi"
@@ -175,7 +174,7 @@ func (f *FallenApiPlatform) Download(
 	path := getPath(track, ".mp3")
 
 	if telegramDLRegex.MatchString(dlURL) {
-		return f.downloadFromTelegram(dlURL, path, statusMsg)
+		return f.downloadFromTelegram(ctx, dlURL, path, statusMsg)
 	}
 
 	if err := f.downloadFromURL(ctx, dlURL, path); err != nil {
@@ -204,8 +203,8 @@ func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string)
 		SetResult(&resp).
 		Get(apiURL)
 	if err != nil {
-		if isDownloadCancelled(err) {
-			return "", err
+		if isDownloadCancelled(err) || (ctx != nil && ctx.Err() != nil) {
+			return "", context.Canceled
 		}
 		return "", sanitizeAPIError(
 			fmt.Errorf("API request failed: %w", err),
@@ -235,19 +234,21 @@ func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, path str
 		SetResponseSaveFileName(path).
 		Get(dlURL)
 	if err != nil {
-		os.Remove(path)
-		if isDownloadCancelled(err) {
-			return err
+		_ = os.Remove(path)
+		if isDownloadCancelled(err) || (ctx != nil && ctx.Err() != nil) {
+			return context.Canceled
 		}
 		return fmt.Errorf("http download failed: %w", err)
 	}
 	if r.IsStatusFailure() {
+		_ = os.Remove(path)
 		return fmt.Errorf("download returned %d", r.StatusCode())
 	}
 	return nil
 }
 
 func (f *FallenApiPlatform) downloadFromTelegram(
+	ctx context.Context,
 	dlURL, path string,
 	statusMsg *td.Message,
 ) (string, error) {
@@ -256,34 +257,9 @@ func (f *FallenApiPlatform) downloadFromTelegram(
 	}
 
 	info, err := core.Bot.GetMessageLinkInfo(dlURL)
-	if err != nil {
-		return "", fmt.Errorf("failed to fetch Telegram message: %w", err)
-	}
-	if info == nil || info.Message == nil {
+	if err != nil || info == nil || info.Message == nil {
 		return "", errors.New("failed to fetch Telegram message")
 	}
-	msg := info.Message
 
-	fileID := msg.RemoteFileID()
-	if OnDownloadStart != nil {
-		OnDownloadStart(fileID, statusMsg)
-	}
-	file, err := msg.Download(core.Bot, 1, &td.DownloadFileOpts{Synchronous: true})
-	if err != nil {
-		os.Remove(path)
-		if isDownloadCancelled(err) {
-			return "", context.Canceled
-		}
-		return "", err
-	}
-	if file == nil || file.Local == nil || file.Local.Path == "" {
-		return "", errors.New("downloaded file missing")
-	}
-
-	if err := copyFile(file.Local.Path, path); err != nil {
-		os.Remove(path)
-		return "", err
-	}
-	os.Remove(file.Local.Path)
-	return path, nil
+	return downloadTDLibMessage(ctx, info.Message, path, statusMsg)
 }

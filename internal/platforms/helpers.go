@@ -28,11 +28,10 @@ import (
 	"strings"
 	"unicode"
 
-	"yukkimusic/internal/utils"
-
 	td "github.com/AshokShau/gotdbot"
 
 	state "yukkimusic/internal/core/models"
+	"yukkimusic/internal/utils"
 )
 
 var errUnsafeURL = errors.New("invalid or unsafe url")
@@ -42,8 +41,6 @@ var (
 	OnDownloadStart func(fileID string, statusMsg *td.Message)
 )
 
-// isDownloadCancelled reports whether err signals a cancelled file download,
-// whether from a cancelled context or a TDLib "canceled" response.
 func isDownloadCancelled(err error) bool {
 	if err == nil {
 		return false
@@ -54,7 +51,8 @@ func isDownloadCancelled(err error) bool {
 	if tdErr, ok := errors.AsType[*td.Error](err); ok {
 		return strings.Contains(strings.ToLower(tdErr.Message), "cancel")
 	}
-	return false
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "cancel") || strings.Contains(msg, "killed")
 }
 
 func getPath(track *state.Track, ext string) string {
@@ -82,12 +80,9 @@ func findFile(track *state.Track) string {
 	if track.Video {
 		t = "video"
 	}
-	files, err := filepath.Glob(filepath.Join("downloads", t+"_"+track.ID+"*"))
-	if err != nil {
-		return ""
-	}
+	files, _ := filepath.Glob(filepath.Join("downloads", t+"_"+track.ID+".*"))
 	for _, f := range files {
-		if info, err := os.Stat(f); err == nil && info.Size() > 0 {
+		if !strings.HasSuffix(f, ".part") && fileExists(f) {
 			return f
 		}
 	}
@@ -99,14 +94,9 @@ func findAndRemove(track *state.Track) {
 	if track.Video {
 		t = "video"
 	}
-	files, err := filepath.Glob(filepath.Join("downloads", t+"_"+track.ID+"*"))
-	if err != nil {
-		return
-	}
+	files, _ := filepath.Glob(filepath.Join("downloads", t+"_"+track.ID+".*"))
 	for _, f := range files {
-		if err := os.Remove(f); err != nil {
-			utils.Log.Debugf("findAndRemove: failed to remove %s: %v", f, err)
-		}
+		_ = os.Remove(f)
 	}
 }
 
@@ -145,8 +135,6 @@ func copyFile(src, dst string) error {
 	return out.Close()
 }
 
-// playableMedia walks a message and its reply chain, returning the first
-// message that carries playable media together with its media kind.
 func playableMedia(c *td.Client, m *td.Message) (msg *td.Message, isVideo, isAudio bool) {
 	check := func(msg *td.Message) (bool, bool) {
 		if msg == nil || msg.Content == nil {
@@ -166,6 +154,13 @@ func playableMedia(c *td.Client, m *td.Message) (msg *td.Message, isVideo, isAud
 			case strings.HasPrefix(mt, "audio/"):
 				return false, true
 			case strings.HasPrefix(mt, "video/"):
+				return true, false
+			}
+			ext := strings.ToLower(filepath.Ext(content.Document.FileName))
+			switch ext {
+			case ".mp3", ".wav", ".flac", ".ogg", ".m4a", ".aac", ".opus":
+				return false, true
+			case ".mp4", ".mkv", ".webm", ".avi", ".mov":
 				return true, false
 			}
 		}
