@@ -140,7 +140,7 @@ func Init(bot *td.Client, assistants *core.ClientManager) {
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(cancelHandler), callbackquery.Equal("cancel"))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(closeHandler), callbackquery.Equal("close"))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(roomHandle), callbackquery.Regex("^room:-?\\d+:\\w+$"))
-	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(queueDeleteHandler), callbackquery.Regex("^qdel:-?\\d+:\\d+:\\d+$"))
+	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(queueDeleteHandler), callbackquery.Regex("^qdel:-?\\d+:[^:]+:\\d+$"))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(queueMoreHandler), callbackquery.Regex("^qmore:-?\\d+$"))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(authDeleteHandler), callbackquery.Regex("^authdel:-?\\d+:-?\\d+$"))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(dashboardCallback), callbackquery.Regex("^dashboard:[a-z]+$"))

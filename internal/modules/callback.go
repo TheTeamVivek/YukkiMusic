@@ -138,8 +138,8 @@ func queueDeleteHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		return nil
 	}
 
-	index, err := strconv.Atoi(parts[2])
-	if err != nil {
+	vidID := parts[2]
+	if vidID == "" {
 		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
@@ -160,12 +160,23 @@ func queueDeleteHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		return nil
 	}
 
-	if index <= 0 || index > r.QueueLen() {
-		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
-		return nil
+	var removed bool
+	if strings.HasPrefix(vidID, "tok_") {
+		for idx, t := range r.Queue() {
+			if t != nil && trackDeleteToken(t) == vidID {
+				r.RemoveTrack(idx)
+				removed = true
+				break
+			}
+		}
+	} else {
+		removed = r.RemoveTrackByID(vidID)
 	}
 
-	r.RemoveTrack(index - 1)
+	if !removed {
+		u.Answer(c, "", nil)
+		return nil
+	}
 
 	if _, err := c.EditContent(u.ChatId, u.MessageId, &td.InputMessageRichMessage{
 		Message: queueRich(r, shown),

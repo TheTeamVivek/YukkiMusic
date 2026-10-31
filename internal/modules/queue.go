@@ -18,6 +18,8 @@
 package modules
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
@@ -25,6 +27,7 @@ import (
 	td "github.com/AshokShau/gotdbot"
 
 	"yukkimusic/internal/core"
+	models "yukkimusic/internal/core/models"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
@@ -88,6 +91,24 @@ func handleQueue(c *td.Client, m *td.Message, cplay bool) error {
 	return rerr
 }
 
+// trackDeleteToken returns a safe callback identifier for a track.
+// For short, safe IDs (like YouTube video IDs), it returns track.ID as-is.
+// For long IDs (e.g. Telegram files) or IDs with special characters, it returns "tok_<hash>".
+func trackDeleteToken(t *models.Track) string {
+	if t == nil {
+		return ""
+	}
+	id := t.ID
+	if id == "" {
+		id = t.URL
+	}
+	if len(id) > 0 && len(id) <= 20 && !strings.Contains(id, ":") {
+		return id
+	}
+	h := sha256.Sum256([]byte(id))
+	return "tok_" + hex.EncodeToString(h[:10])
+}
+
 // queueFirstPage is how many up-next tracks the first page shows before the
 // "show more" button reveals the whole remaining queue.
 const queueFirstPage = 15
@@ -128,17 +149,21 @@ func queueRich(r *core.Room, shown int) *td.InputRichMessage {
 
 		for i := 0; i < shown; i++ {
 			track := queue[i]
+			delID := trackDeleteToken(track)
+			if delID == "" {
+				delID = strconv.Itoa(i + 1)
+			}
 			fmt.Fprintf(
 				&b,
 				"<tr><td>%d</td><td><a href=\"%s\">%s</a></td><td>%s</td><td>%s</td>"+
-					"<td><tg-button type=\"callback_data\" style=\"danger\" data=\"qdel:%d:%d:%d\">\u2a2f</tg-button></td></tr>\n",
+					"<td><tg-button type=\"callback_data\" style=\"danger\" data=\"qdel:%d:%s:%d\">\u2a2f</tg-button></td></tr>\n",
 				i+1,
 				track.URL,
 				utils.EscapeHTML(utils.ShortTitle(track.Title, 40)),
 				utils.FormatDuration(track.Duration),
 				track.Requester,
 				r.ChatID,
-				i+1,
+				delID,
 				shown,
 			)
 		}

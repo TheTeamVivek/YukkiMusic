@@ -57,6 +57,17 @@ func (q *queue) remove(index int) {
 	q.tracks = slices.Delete(q.tracks, index, index+1)
 }
 
+// removeByID deletes the first track matching the given ID.
+func (q *queue) removeByID(id string) bool {
+	for i, t := range q.tracks {
+		if t != nil && t.ID == id {
+			q.tracks = slices.Delete(q.tracks, i, i+1)
+			return true
+		}
+	}
+	return false
+}
+
 // move moves the track at from to position to, both 0-based.
 func (q *queue) move(from, to int) {
 	if from < 0 || from >= len(q.tracks) ||
@@ -134,6 +145,18 @@ func (r *Room) RemoveTrack(index int) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.queue.remove(index)
+}
+
+// RemoveTrackByID removes the first queued track with the given ID.
+// It returns true if a track was found and removed, or false otherwise.
+func (r *Room) RemoveTrackByID(id string) bool {
+	if r.Destroyed() {
+		return false
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.queue.removeByID(id)
 }
 
 // MoveTrack moves the queued track at from to position to, where both indices
