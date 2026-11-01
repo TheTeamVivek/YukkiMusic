@@ -371,7 +371,7 @@ func handleSkipAction(c *td.Client, u *td.UpdateNewCallbackQuery, r *core.Room) 
 		return nil
 	}
 
-	if err := r.Play(t, path); err != nil {
+	if err := r.Play(t, path, true); err != nil {
 		utils.Log.Errorf("Play error: %v", err)
 		utils.EOR(c, statusMsg, F(chatID, "stream_play_fail"), nil)
 		u.Answer(c, F(chatID, "cb_skip_play_failed"), &td.CallbackAnswerOpts{ShowAlert: true})
