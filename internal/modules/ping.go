@@ -35,6 +35,7 @@ import (
 )
 
 func init() {
+	go cpu.Percent(0, false)
 	helpTexts["/ping"] = `<i>Check bot responsiveness and system stats.</i>
 
 <u>Usage:</u>
@@ -109,7 +110,7 @@ func pingHandler(c *td.Client, m *td.Message) error {
 		ramInfo = fmt.Sprintf("%.2f / %.2f GB", usedGB, totalGB)
 	}
 
-	if percentages, err := cpu.Percent(time.Second, false); err == nil &&
+	if percentages, err := cpu.Percent(0, false); err == nil &&
 		len(percentages) > 0 {
 		cpuUsage = fmt.Sprintf("%.2f%%", percentages[0])
 	}

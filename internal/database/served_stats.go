@@ -65,3 +65,14 @@ func RemoveServedChat(id int64) error {
 		return removed
 	})
 }
+
+func RemoveServedUser(id int64) error {
+	return modifyBotState(func(s *BotState) bool {
+		var removed bool
+		s.Served.Users, removed = removeElement(s.Served.Users, id)
+		if removed {
+			delete(s.servedUsersMap, id)
+		}
+		return removed
+	})
+}

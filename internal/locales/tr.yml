@@ -473,18 +473,25 @@ playmode_restricted: "{emoji:🚫} Oynatma modu etkin. Sadece yöneticiler ve ye
 # 🏓 Ping messages
 ping_start: "{emoji:🏓} Pingleniyor..."
 ping_result: |
-  <b>{emoji:🏓} PONG</b>: <code>{latency}ms</code>
-  
-  <b><u>{emoji:🤖} {bot} sistem istatistikleri:</u></b>
-  <b>Çalışma Süresi:</b> {uptime}
-  <b>RAM Kullanımı:</b> {ram_info}
-  <b>CPU Kullanımı:</b> {cpu_usage}
-  <b>Disk Kullanımı:</b> {disk_usage}
+  <b>{emoji:🏓} Pong!</b> • <code>{latency}ms</code>
+
+  <b>{emoji:🤖} {bot}</b>
+  <blockquote>{emoji:⏱️} <b>Çalışma Süresi:</b> <code>{uptime}</code>
+  {emoji:💾} <b>RAM:</b> <code>{ram_info}</code>
+  {emoji:🖥️} <b>CPU:</b> <code>{cpu_usage}</code>
+  {emoji:💽} <b>Disk:</b> <code>{disk_usage}</code></blockquote>
 
 position_now: |
-  {emoji:🎵} <b>{title}</b>
-  {emoji:📍} <code>{position} / {duration}</code>
-  {emoji:⚙️} Hız: <b>{speed}x</b>
+  <h3>{emoji:⏱️} Oynatma Konumu</h3>
+  <aside>
+  {track}
+  </aside>
+  <blockquote>
+  {emoji:⏱️} <b>Konum:</b> <code>{position} / {duration}</code><br>
+  {emoji:⏳} <b>Kalan:</b> <code>{remaining}</code><br>
+  {emoji:⚡} <b>Hız:</b> <code>{speed}x</code><br>
+  {emoji:👤} <b>İsteyen:</b> {requester}
+  </blockquote>
 
 queue_limit_reached: "{emoji:⚠️} Sıra sınırına ulaşıldı (maksimum {limit} parça). Sırayı temizlemek için /clear kullan."
 queue_no_active: "{emoji:⚠️} <b>Aktif oynatma yok.</b>\n\n<i>Şu anda sırada bir şey yok.</i>"

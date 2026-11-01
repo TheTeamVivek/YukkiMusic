@@ -22,6 +22,7 @@ import (
 
 	td "github.com/AshokShau/gotdbot"
 
+	"yukkimusic/internal/core"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
@@ -31,15 +32,13 @@ func init() {
 
 <u>Usage:</u>
 <b>/position</b> — Show position
+<b>/pos</b> — Alias for /position
 
 <b>📊 Information Displayed:</b>
-• Current track title
-• Current position (MM:SS)
-• Total duration (MM:SS)
-• Playback speed (if not 1.0x)
-
-<b>💡 Use Case:</b>
-Quick position check without full queue display.`
+• Current track title & link
+• Current playback position & duration
+• Playback speed
+• Requester`
 }
 
 func positionHandler(c *td.Client, m *td.Message) error {
@@ -67,17 +66,61 @@ func handlePosition(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	if !r.Active() || r.Track().ID == "" {
+	if !r.Active() || r.Track() == nil || r.Track().ID == "" {
 		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
 		return err
 	}
 
-	title := utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25))
-	_, rerr := m.ReplyText(c, F(chatID, "position_now", locales.Arg{
-		"title":    title,
-		"position": utils.FormatDuration(r.Position()),
-		"duration": utils.FormatDuration(r.Track().Duration),
-		"speed":    fmt.Sprintf("%.2f", r.Speed()),
-	}), nil)
+	track := r.Track()
+	dur := track.Duration
+	pos := r.Position()
+	if pos < 0 {
+		pos = 0
+	}
+
+	posStr, durStr, remStr := "N/A", "N/A", "N/A"
+	if dur > 0 {
+		if pos > dur {
+			pos = dur
+		}
+		posStr = utils.FormatTime(pos)
+		durStr = utils.FormatTime(dur)
+		remSec := max(dur-pos, 0)
+		remStr = "-" + utils.FormatTime(remSec)
+	}
+
+	safeTitle := utils.EscapeHTML(utils.ShortTitle(track.Title, 40))
+	var trackLink string
+	if track.URL != "" {
+		trackLink = `<b><a href="` + utils.EscapeHTML(track.URL) + `">` + safeTitle + `</a></b>`
+	} else {
+		trackLink = `<b>` + safeTitle + `</b>`
+	}
+
+	requester := track.Requester
+	if requester == "" {
+		requester = "Unknown"
+	}
+
+	speed := r.Speed()
+	var speedStr string
+	if speed == float64(int(speed)) {
+		speedStr = fmt.Sprintf("%.1f", speed)
+	} else {
+		speedStr = fmt.Sprintf("%.2f", speed)
+	}
+
+	msg := F(chatID, "position_now", locales.Arg{
+		"track":     trackLink,
+		"requester": requester,
+		"speed":     speedStr,
+		"position":  posStr,
+		"duration":  durStr,
+		"remaining": remStr,
+	})
+
+	_, rerr := m.ReplyRichMessageHTML(c, msg, &td.SendRichTextOpts{
+		ReplyMarkup: core.SuppMarkup(chatID),
+	})
 	return rerr
 }

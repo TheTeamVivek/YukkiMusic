@@ -24,6 +24,7 @@ import (
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
+	"yukkimusic/internal/database"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
@@ -85,6 +86,11 @@ func handleParticipantUpdate(c *td.Client, u *td.UpdateChatMember) error {
 	isBot := userID == c.Me().Id
 
 	if isBot && (newStatus == "left" || newStatus == "kicked") {
+		if chatID > 0 {
+			utils.Log.Infof("Bot was blocked by user: %d", chatID)
+			database.RemoveServedUser(chatID)
+			return nil
+		}
 		handleBotRemoved(c, u, chatID)
 		return nil
 	}

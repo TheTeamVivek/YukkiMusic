@@ -474,19 +474,25 @@ playmode_restricted: "{emoji:🚫} संगीत संचालन विध�
 # 🏓 Ping messages
 ping_start: "{emoji:🏓} पिंग किया जा रहा है..."
 ping_result: |
-  <b>{emoji:🏓} पोंग</b>: <code>{latency}मि.से.</code>
-  
-  <b><u>{emoji:🤖} {bot} प्रणाली आँकड़े:</u></b>
-  
-  <b>सक्रियता समय:</b> {uptime}
-  <b>मुख्य स्मृति प्रयोग:</b> {ram_info}
-  <b>प्रक्रमक प्रयोग:</b> {cpu_usage}
-  <b>डिस्क प्रयोग:</b> {disk_usage}
+  <b>{emoji:🏓} पोंग!</b> • <code>{latency}ms</code>
+
+  <b>{emoji:🤖} {bot}</b>
+  <blockquote>{emoji:⏱️} <b>सक्रियता:</b> <code>{uptime}</code>
+  {emoji:💾} <b>रैम:</b> <code>{ram_info}</code>
+  {emoji:🖥️} <b>सीपीयू:</b> <code>{cpu_usage}</code>
+  {emoji:💽} <b>डिस्क:</b> <code>{disk_usage}</code></blockquote>
 
 position_now: |
-  {emoji:🎵} <b>{title}</b>
-  {emoji:📍} <code>{position} / {duration}</code>
-  {emoji:⚙️} गति: <b>{speed}x</b>
+  <h3>{emoji:⏱️} प्लेबैक स्थिति</h3>
+  <aside>
+  {track}
+  </aside>
+  <blockquote>
+  {emoji:⏱️} <b>स्थिति:</b> <code>{position} / {duration}</code><br>
+  {emoji:⏳} <b>शेष समय:</b> <code>{remaining}</code><br>
+  {emoji:⚡} <b>गति:</b> <code>{speed}x</code><br>
+  {emoji:👤} <b>अनुरोधकर्ता:</b> {requester}
+  </blockquote>
 
 queue_limit_reached: "{emoji:⚠️} प्रतीक्षा सूची की सीमा पूर्ण ({limit} संगीत अधिकतम)। सूची रिक्त करने के लिए /clear का प्रयोग करें।"
 queue_no_active: "{emoji:⚠️} <b>कोई सक्रिय संगीत नहीं।</b>\n\n<i>वर्तमान में प्रतीक्षा सूची में कुछ भी नहीं है।</i>"

@@ -477,20 +477,26 @@ playmode_restricted: "{emoji:🚫} Play mode is enabled. Only admins and authori
 # 🏓 Ping messages
 ping_start: "{emoji:🏓} Pinging..."
 ping_result: |
-  <b>{emoji:🏓} PONG</b>: <code>{latency}ms</code>
-  
-  <b><u>{emoji:🤖} {bot} system stat's :</u></b>
-  
-  <b>Uptime:</b> {uptime}
-  <b>RAM Usage:</b> {ram_info}
-  <b>CPU Usage:</b> {cpu_usage}
-  <b>Disk Usage:</b> {disk_usage}
+  <b>{emoji:🏓} Pong!</b> • <code>{latency}ms</code>
+
+  <b>{emoji:🤖} {bot}</b>
+  <blockquote>{emoji:⏱️} <b>Uptime:</b> <code>{uptime}</code>
+  {emoji:💾} <b>RAM:</b> <code>{ram_info}</code>
+  {emoji:🖥️} <b>CPU:</b> <code>{cpu_usage}</code>
+  {emoji:💽} <b>Disk:</b> <code>{disk_usage}</code></blockquote>
   
 
 position_now: |
-  {emoji:🎵} <b>{title}</b>
-  {emoji:📍} <code>{position} / {duration}</code>
-  {emoji:⚙️} Speed: <b>{speed}x</b>
+  <h3>{emoji:⏱️} Playback Position</h3>
+  <aside>
+  {track}
+  </aside>
+  <blockquote>
+  {emoji:⏱️} <b>Position:</b> <code>{position} / {duration}</code><br>
+  {emoji:⏳} <b>Remaining:</b> <code>{remaining}</code><br>
+  {emoji:⚡} <b>Speed:</b> <code>{speed}x</code><br>
+  {emoji:👤} <b>Requested by:</b> {requester}
+  </blockquote>
 
 queue_limit_reached: "{emoji:⚠️} Queue limit reached ({limit} tracks max). Use /clear to clear queue."
 queue_no_active: "{emoji:⚠️} <b>No active playback.</b>\n\n<i>Nothing is queued right now.</i>"

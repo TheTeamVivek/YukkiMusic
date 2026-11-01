@@ -473,19 +473,25 @@ playmode_restricted: "{emoji:🚫} وضع التشغيل مفعّل. المشر�
 # 🏓 Ping messages
 ping_start: "{emoji:🏓} جاري الفحص..."
 ping_result: |
-  <b>{emoji:🏓} PONG</b>: <code>{latency}ms</code>
-  
-  <b><u>{emoji:🤖} إحصائيات نظام {bot}:</u></b>
+  <b>{emoji:🏓} بونغ!</b> • <code>{latency}ms</code>
 
-  <b>وقت التشغيل:</b> {uptime}
-  <b>استهلاك الرام:</b> {ram_info}
-  <b>استهلاك المعالج:</b> {cpu_usage}
-  <b>استهلاك القرص:</b> {disk_usage}
+  <b>{emoji:🤖} {bot}</b>
+  <blockquote>{emoji:⏱️} <b>مدة التشغيل:</b> <code>{uptime}</code>
+  {emoji:💾} <b>الرام:</b> <code>{ram_info}</code>
+  {emoji:🖥️} <b>المعالج:</b> <code>{cpu_usage}</code>
+  {emoji:💽} <b>القرص:</b> <code>{disk_usage}</code></blockquote>
 
 position_now: |
-  {emoji:🎵} <b>{title}</b>
-  {emoji:📍} <code>{position} / {duration}</code>
-  {emoji:⚙️} السرعة: <b>{speed}x</b>
+  <h3>{emoji:⏱️} موضع التشغيل</h3>
+  <aside>
+  {track}
+  </aside>
+  <blockquote>
+  {emoji:⏱️} <b>الموضع:</b> <code>{position} / {duration}</code><br>
+  {emoji:⏳} <b>المتبقي:</b> <code>{remaining}</code><br>
+  {emoji:⚡} <b>السرعة:</b> <code>{speed}x</code><br>
+  {emoji:👤} <b>طلب بواسطة:</b> {requester}
+  </blockquote>
 
 queue_limit_reached: "{emoji:⚠️} وصلت قائمة الانتظار للحد الأقصى ({limit} مقاطع كحد أقصى). استخدم /clear لتفريغ القائمة."
 queue_no_active: "{emoji:⚠️} <b>لا يوجد تشغيل نشط.</b>\n\n<i>لا يوجد شيء في قائمة الانتظار حالياً.</i>"
