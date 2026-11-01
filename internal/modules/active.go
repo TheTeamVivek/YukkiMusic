@@ -123,10 +123,10 @@ func activeHandler(c *td.Client, m *td.Message) error {
 }
 
 func activeStatusCell(s core.State) string {
-	if s.Muted {
+	switch s.Playback {
+	case core.PlaybackMuted:
 		return "<b>🔇 Muted</b>"
-	}
-	if s.Paused {
+	case core.PlaybackPaused:
 		return "<b>⏸ Paused</b>"
 	}
 	if t := s.Track; t != nil {

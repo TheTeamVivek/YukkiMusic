@@ -12,6 +12,10 @@ func (ctx *Context) Calls() (map[int64]ntgcalls.CallInfo, error) {
 	return ctx.binding.Calls()
 }
 
+func (ctx *Context) State(chatID int64) (ntgcalls.MediaState, error) {
+	return ctx.binding.GetState(chatID)
+}
+
 func (ctx *Context) Mute(chatID int64) (bool, error) {
 	return ctx.binding.Mute(chatID)
 }

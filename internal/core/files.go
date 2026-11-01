@@ -42,10 +42,10 @@ const (
 // playing or has queued the track.
 func isTrackUsed(trackID string, skipChatID int64) bool {
 	for _, room := range Rooms.rooms {
-		if room == nil || room.player.track == nil || room.ChatID == skipChatID {
+		if room == nil || room.track == nil || room.ChatID == skipChatID {
 			continue
 		}
-		if room.player.track.ID == trackID || isTrackInQueue(trackID, room.queue.tracks) {
+		if room.track.ID == trackID || isTrackInQueue(trackID, room.queue.tracks) {
 			return true
 		}
 	}
@@ -66,10 +66,10 @@ func isTrackInQueue(trackID string, tracks []*state.Track) bool {
 
 // releaseFile schedules the active track's file for delayed removal.
 func (r *Room) releaseFile() {
-	if r == nil || r.player.track == nil {
+	if r == nil || r.track == nil {
 		return
 	}
-	scheduleRemove(r.player.track, r.ChatID)
+	scheduleRemove(r.track, r.ChatID)
 }
 
 // cleanupFile schedules the active track and the next queued tracks for
@@ -80,8 +80,8 @@ func (r *Room) cleanupFile() {
 	}
 
 	tracks := make([]*state.Track, 0, queueScanLimit+1)
-	if r.player.track != nil {
-		tracks = append(tracks, r.player.track)
+	if r.track != nil {
+		tracks = append(tracks, r.track)
 	}
 	tracks = append(tracks, r.queue.tracks...)
 	if len(tracks) > queueScanLimit {

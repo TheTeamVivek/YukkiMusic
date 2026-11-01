@@ -40,7 +40,7 @@ func MonitorRooms() {
 				defer func() { <-sem }()
 
 				snap := r.Snapshot()
-				if !snap.Active() || snap.Paused {
+				if !snap.Active() || snap.Playback == core.PlaybackPaused {
 					return
 				}
 

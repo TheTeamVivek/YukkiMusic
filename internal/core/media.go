@@ -22,7 +22,6 @@ import (
 	jsonv2 "encoding/json/v2"
 	"fmt"
 	"os/exec"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -50,42 +49,29 @@ const (
 	ffprobeTimeout = 7 * time.Second
 )
 
-// Playback control
-
-// Play starts playback of a track
+// Play starts playback of a track, or queues it when something is playing.
 func (r *Room) Play(t *state.Track, path string, force ...bool) error {
-	if r.Destroyed() {
-		return ErrRoomDestroyed
-	}
-
 	forcePlay := len(force) > 0 && force[0]
 
 	r.mu.Lock()
-	shouldQueue := !forcePlay && r.player.playing && r.player.track != nil
-	if shouldQueue {
+	if !forcePlay && r.track != nil && r.playback() != PlaybackIdle {
 		r.queue.push(t)
 		r.mu.Unlock()
 		return nil
 	}
 
-	if r.player.track != t {
-		r.player.loop = 0
+	if r.track != t {
+		r.loop = 0
 	}
-	r.player.track = t
-	r.player.playing = true
-	r.player.filePath = path
-	r.player.position = 0
-	r.player.paused = false
-	r.player.muted = false
-	r.player.updatedAt = time.Now().Unix()
+	r.track = t
+	r.filePath = path
+	r.offset, r.anchor = 0, time.Time{}
 	r.mu.Unlock()
 
-	err := r.play()
-	if err != nil {
+	if err := r.play(); err != nil {
 		r.mu.Lock()
-		r.player.track = nil
-		r.player.playing = false
-		r.player.filePath = ""
+		r.track = nil
+		r.filePath = ""
 		r.mu.Unlock()
 		return err
 	}
@@ -95,15 +81,8 @@ func (r *Room) Play(t *state.Track, path string, force ...bool) error {
 
 // Pause pauses playback until Resume is called.
 func (r *Room) Pause() error {
-	if r.Destroyed() {
-		return ErrRoomDestroyed
-	}
-
-	r.mu.RLock()
-	alreadyPaused := r.player.paused
-	r.mu.RUnlock()
-
-	if alreadyPaused {
+	s := r.playback()
+	if s == PlaybackPaused {
 		return nil
 	}
 
@@ -111,229 +90,38 @@ func (r *Room) Pause() error {
 		return err
 	}
 
-	r.mu.RLock()
-	isMuted := r.player.muted
-	r.mu.RUnlock()
+	r.mu.Lock()
+	r.offset = r.position()
+	r.anchor = time.Time{}
+	r.mu.Unlock()
 
-	if isMuted {
+	if s == PlaybackMuted {
 		r.Unmute()
 	}
-
-	r.mu.Lock()
-	r.player.sync()
-	r.player.paused = true
-	r.player.muted = false
-	r.mu.Unlock()
-
 	return nil
 }
 
-// Resume resumes playback
+// Resume resumes a paused stream.
 func (r *Room) Resume() error {
-	if r.Destroyed() {
-		return ErrRoomDestroyed
-	}
-
-	if !r.Active() {
+	switch r.playback() {
+	case PlaybackIdle:
 		return fmt.Errorf("there are no active music playing")
-	}
+	case PlaybackPaused:
+		if _, err := r.Assistant.Ntg.Resume(r.ChatID); err != nil {
+			return err
+		}
 
-	r.mu.RLock()
-	alreadyPlaying := !r.player.paused
-	r.mu.RUnlock()
-
-	if alreadyPlaying {
-		return nil
-	}
-
-	if _, err := r.Assistant.Ntg.Resume(r.ChatID); err != nil {
-		return err
-	}
-
-	r.mu.Lock()
-	r.player.paused = false
-	r.player.muted = false
-	r.player.playing = true
-	r.player.updatedAt = time.Now().Unix()
-	r.mu.Unlock()
-
-	return nil
-}
-
-// Replay restarts the current track
-func (r *Room) Replay() error {
-	if r.Destroyed() {
-		return ErrRoomDestroyed
-	}
-
-	r.mu.RLock()
-	hasTrack := r.player.track != nil && r.player.filePath != ""
-	r.mu.RUnlock()
-
-	if !hasTrack {
-		return fmt.Errorf("no track to replay")
-	}
-
-	r.mu.Lock()
-	oldPos := r.player.position
-	r.player.position = 0
-	r.mu.Unlock()
-
-	err := r.play()
-	if err != nil {
 		r.mu.Lock()
-		r.player.position = oldPos
+		r.anchor = time.Now()
 		r.mu.Unlock()
-		return err
 	}
-
-	r.mu.Lock()
-	r.player.position = 0
-	r.player.paused = false
-	r.player.muted = false
-	r.player.playing = true
-	r.player.updatedAt = time.Now().Unix()
-	r.mu.Unlock()
-
 	return nil
 }
 
-// Stop stops playback completely
-func (r *Room) Stop() error {
-	if r.Destroyed() {
-		return ErrRoomDestroyed
-	}
-
-	_, file, line, _ := runtime.Caller(1)
-	utils.Log.Debugf("Stop Called from %s:%d", file, line)
-
-	err := r.Assistant.Ntg.Stop(r.ChatID)
-
-	r.mu.Lock()
-	r.player.track = nil
-	r.player.position = 0
-	r.player.playing = false
-	r.player.paused = false
-	r.player.muted = false
-	r.player.updatedAt = 0
-	r.mu.Unlock()
-
-	return err
-}
-
-// Seek moves playback position by specified seconds
-func (r *Room) Seek(seconds int) error {
-	if r.Destroyed() {
-		return ErrRoomDestroyed
-	}
-
-	r.mu.Lock()
-	if r.player.track == nil || r.player.filePath == "" {
-		r.mu.Unlock()
-		return fmt.Errorf("no track to seek")
-	}
-
-	r.player.sync()
-
-	if seconds > 0 && r.player.track.Duration-r.player.position <= seekEndThreshold {
-		r.mu.Unlock()
-		return fmt.Errorf("cannot seek, track is about to end")
-	}
-
-	snapshot := struct {
-		position int
-		paused   bool
-		muted    bool
-		updated  int64
-	}{
-		position: r.player.position,
-		paused:   r.player.paused,
-		muted:    r.player.muted,
-		updated:  r.player.updatedAt,
-	}
-
-	newPos := r.player.position + seconds
-	if newPos >= r.player.track.Duration {
-		newPos = r.player.track.Duration - seekSafetyMargin
-	}
-	if newPos < 0 {
-		newPos = 0
-	}
-
-	r.player.position = newPos
-	r.player.paused = false
-	r.player.muted = false
-	r.player.updatedAt = time.Now().Unix()
-	r.mu.Unlock()
-
-	err := r.play()
-	if err != nil {
-		r.mu.Lock()
-		r.player.position = snapshot.position
-		r.player.paused = snapshot.paused
-		r.player.muted = snapshot.muted
-		r.player.updatedAt = snapshot.updated
-		r.mu.Unlock()
-		return err
-	}
-
-	if snapshot.muted {
-		r.Assistant.Ntg.Unmute(r.ChatID)
-	}
-
-	return nil
-}
-
-// SetSpeed adjusts playback speed
-func (r *Room) SetSpeed(speed float64) error {
-	if r.Destroyed() {
-		return ErrRoomDestroyed
-	}
-
-	r.mu.RLock()
-	hasTrack := r.player.track != nil && r.player.filePath != ""
-	currentSpeed := r.player.speed
-	r.mu.RUnlock()
-
-	if !hasTrack {
-		return fmt.Errorf("no track to adjust speed")
-	}
-
-	if speed < minSpeed || speed > maxSpeed {
-		return fmt.Errorf(
-			"invalid speed: must be between %.2fx and %.1fx",
-			minSpeed,
-			maxSpeed,
-		)
-	}
-
-	if currentSpeed == speed {
-		return nil
-	}
-
-	r.mu.Lock()
-	r.player.sync()
-	r.player.speed = speed
-	r.player.playing = true
-	r.player.paused = false
-	r.player.muted = false
-	r.player.updatedAt = time.Now().Unix()
-	r.mu.Unlock()
-
-	return r.play()
-}
-
-// Mute mutes playback
+// Mute mutes the stream.
 func (r *Room) Mute() error {
-	if r.Destroyed() {
-		return ErrRoomDestroyed
-	}
-
-	r.mu.RLock()
-	alreadyMuted := r.player.muted
-	r.mu.RUnlock()
-
-	if alreadyMuted {
+	s := r.playback()
+	if s == PlaybackMuted {
 		return nil
 	}
 
@@ -341,46 +129,149 @@ func (r *Room) Mute() error {
 		return err
 	}
 
-	r.mu.RLock()
-	isPaused := r.player.paused
-	r.mu.RUnlock()
-
-	if isPaused {
+	if s == PlaybackPaused {
 		r.Resume()
-	} else {
-		r.Refresh()
 	}
-
-	r.mu.Lock()
-	r.player.muted = true
-	r.mu.Unlock()
-
 	return nil
 }
 
-// Unmute unmutes playback
+// Unmute unmutes the stream.
 func (r *Room) Unmute() error {
-	if r.Destroyed() {
-		return ErrRoomDestroyed
+	_, err := r.Assistant.Ntg.Unmute(r.ChatID)
+	return err
+}
+
+// Replay restarts the current track.
+func (r *Room) Replay() error {
+	r.mu.Lock()
+	if r.track == nil || r.filePath == "" {
+		r.mu.Unlock()
+		return fmt.Errorf("no track to replay")
+	}
+	prevOffset, prevAnchor := r.offset, r.anchor
+	r.offset, r.anchor = 0, time.Now()
+	r.mu.Unlock()
+
+	if err := r.play(); err != nil {
+		r.mu.Lock()
+		r.offset, r.anchor = prevOffset, prevAnchor
+		r.mu.Unlock()
+		return err
+	}
+	return nil
+}
+
+// Stop stops the stream and forgets the current track.
+func (r *Room) Stop() error {
+	err := r.Assistant.Ntg.Stop(r.ChatID)
+
+	r.mu.Lock()
+	r.track = nil
+	r.filePath = ""
+	r.offset = 0
+	r.anchor = time.Time{}
+	r.mu.Unlock()
+
+	return err
+}
+
+// Seek moves the playback position by the given number of seconds.
+func (r *Room) Seek(seconds int) error {
+	r.mu.Lock()
+	if r.track == nil || r.filePath == "" {
+		r.mu.Unlock()
+		return fmt.Errorf("no track to seek")
 	}
 
-	if _, err := r.Assistant.Ntg.Unmute(r.ChatID); err != nil {
+	pos := r.position()
+	if seconds > 0 && r.track.Duration-pos <= seekEndThreshold {
+		r.mu.Unlock()
+		return fmt.Errorf("cannot seek, track is about to end")
+	}
+
+	newPos := pos + seconds
+	if newPos >= r.track.Duration {
+		newPos = r.track.Duration - seekSafetyMargin
+	}
+	newPos = max(newPos, 0)
+
+	prevOffset, prevAnchor := r.offset, r.anchor
+	wasMuted := r.playback() == PlaybackMuted
+	r.offset, r.anchor = newPos, time.Now()
+	r.mu.Unlock()
+
+	if err := r.play(); err != nil {
+		r.mu.Lock()
+		r.offset, r.anchor = prevOffset, prevAnchor
+		r.mu.Unlock()
 		return err
 	}
 
-	r.mu.Lock()
-	r.player.sync()
-	r.player.muted = false
-	r.player.paused = false
-	r.mu.Unlock()
-
+	if wasMuted {
+		r.Unmute()
+	}
 	return nil
 }
 
-// play pushes the current track to the assistant's ntgcalls stream.
+// SetSpeed changes the playback speed, keeping the current position.
+func (r *Room) SetSpeed(speed float64) error {
+	r.mu.Lock()
+	if r.track == nil || r.filePath == "" {
+		r.mu.Unlock()
+		return fmt.Errorf("no track to adjust speed")
+	}
+
+	if speed < minSpeed || speed > maxSpeed {
+		r.mu.Unlock()
+		return fmt.Errorf(
+			"invalid speed: must be between %.2fx and %.1fx",
+			minSpeed,
+			maxSpeed,
+		)
+	}
+
+	if r.speed == speed {
+		r.mu.Unlock()
+		return nil
+	}
+
+	prevOffset, prevAnchor, prevSpeed := r.offset, r.anchor, r.speed
+	r.offset, r.anchor, r.speed = r.position(), time.Now(), speed
+	r.mu.Unlock()
+
+	if err := r.play(); err != nil {
+		r.mu.Lock()
+		r.offset, r.anchor, r.speed = prevOffset, prevAnchor, prevSpeed
+		r.mu.Unlock()
+		return err
+	}
+	return nil
+}
+
+// play (re)starts the current track from its offset. It refuses rooms that
+// are no longer registered, so a stale room can't rejoin the voice chat.
 func (r *Room) play() error {
-	desc := getMediaDescription(r.player.filePath, r.player.position, r.player.speed, r.player.track.Video)
-	return r.Assistant.Ntg.Play(r.ChatID, desc)
+	if cur, ok := Rooms.Get(r.ChatID); !ok || cur != r {
+		return ErrRoomClosed
+	}
+
+	r.mu.RLock()
+	desc := getMediaDescription(r.filePath, r.offset, r.speed, r.track.Video)
+	r.mu.RUnlock()
+
+	if err := r.Assistant.Ntg.Play(r.ChatID, desc); err != nil {
+		return err
+	}
+
+	paused := r.playback() == PlaybackPaused
+
+	r.mu.Lock()
+	r.anchor = time.Time{}
+	if !paused {
+		r.anchor = time.Now()
+	}
+	r.mu.Unlock()
+	return nil
 }
 
 // Media pipeline

@@ -46,7 +46,6 @@ func streamEndHandler(
 
 	c := core.Bot
 	cid := r.ControlChatID
-	r.Refresh()
 
 	var t *state.Track
 	var wasLooping bool

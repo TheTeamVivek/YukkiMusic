@@ -20,6 +20,7 @@ package core
 import (
 	"math/rand"
 	"slices"
+	"time"
 
 	state "yukkimusic/internal/core/models"
 )
@@ -104,10 +105,6 @@ func (q *queue) pop() *state.Track {
 
 // Queue returns a snapshot copy of the queued tracks.
 func (r *Room) Queue() []*state.Track {
-	if r.Destroyed() {
-		return nil
-	}
-
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.queue.all()
@@ -115,10 +112,6 @@ func (r *Room) Queue() []*state.Track {
 
 // QueueLen returns the number of queued tracks.
 func (r *Room) QueueLen() int {
-	if r.Destroyed() {
-		return 0
-	}
-
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.queue.len()
@@ -126,10 +119,6 @@ func (r *Room) QueueLen() int {
 
 // AddTracks appends the given tracks to the queue, skipping nil entries.
 func (r *Room) AddTracks(tracks ...*state.Track) {
-	if r.Destroyed() {
-		return
-	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.queue.push(tracks...)
@@ -138,10 +127,6 @@ func (r *Room) AddTracks(tracks ...*state.Track) {
 // RemoveTrack removes the queued track at the zero-based index. It is a no-op
 // when index is out of range.
 func (r *Room) RemoveTrack(index int) {
-	if r.Destroyed() {
-		return
-	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.queue.remove(index)
@@ -150,10 +135,6 @@ func (r *Room) RemoveTrack(index int) {
 // RemoveTrackByID removes the first queued track with the given ID.
 // It returns true if a track was found and removed, or false otherwise.
 func (r *Room) RemoveTrackByID(id string) bool {
-	if r.Destroyed() {
-		return false
-	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	return r.queue.removeByID(id)
@@ -162,10 +143,6 @@ func (r *Room) RemoveTrackByID(id string) bool {
 // MoveTrack moves the queued track at from to position to, where both indices
 // are 0-based. It is a no-op when either index is out of range or they match.
 func (r *Room) MoveTrack(from, to int) {
-	if r.Destroyed() {
-		return
-	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.queue.move(from, to)
@@ -173,10 +150,6 @@ func (r *Room) MoveTrack(from, to int) {
 
 // ClearQueue removes every queued track.
 func (r *Room) ClearQueue() {
-	if r.Destroyed() {
-		return
-	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.queue.clear()
@@ -189,17 +162,13 @@ func (r *Room) ClearQueue() {
 // repeat; otherwise it removes the next queued track (a random one when
 // shuffle is enabled) and makes it active.
 func (r *Room) NextTrack() *state.Track {
-	if r.Destroyed() {
-		return nil
-	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if r.player.track != nil && r.player.loop > 0 {
-		r.player.loop--
-		r.player.reset()
-		return r.player.track
+	if r.track != nil && r.loop > 0 {
+		r.loop--
+		r.offset, r.anchor = 0, time.Time{}
+		return r.track
 	}
 
 	r.releaseFile()
@@ -209,7 +178,7 @@ func (r *Room) NextTrack() *state.Track {
 		return nil
 	}
 
-	r.player.track = next
-	r.player.reset()
+	r.track = next
+	r.offset, r.anchor = 0, time.Time{}
 	return next
 }

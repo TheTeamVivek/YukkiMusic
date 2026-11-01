@@ -80,8 +80,6 @@ func handleShuffle(c *td.Client, m *td.Message, cplay bool) error {
 		return err
 	}
 
-	r.Refresh()
-
 	if arg == "" {
 		state := F(chatID, "disabled")
 		cmd := getCommand(m) + " on"

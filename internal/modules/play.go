@@ -224,7 +224,7 @@ func (p *playReq) show(text string) {
 }
 
 func (p *playReq) fail(err error) {
-	if errors.Is(err, core.ErrRoomDestroyed) {
+	if errors.Is(err, core.ErrRoomClosed) {
 		if p.status != nil {
 			p.status.Delete(p.c, &td.DeleteMessagesOpts{Revoke: true})
 		}
@@ -253,7 +253,6 @@ func (p *playReq) prepare() (err error) {
 	if p.room, err = getEffectiveRoom(p.chatID, p.CPlay); err != nil {
 		return err
 	}
-	p.room.Refresh()
 
 	if config.QueueLimit > 0 && p.room.QueueLen() >= config.QueueLimit {
 		return p.errf("queue_limit_reached", locales.Arg{"limit": config.QueueLimit})
@@ -487,7 +486,7 @@ func (p *playReq) onPlayError(err error) (wait time.Duration, stop error) {
 	flood := getFloodWait(err)
 
 	switch {
-	case errors.Is(err, core.ErrRoomDestroyed):
+	case errors.Is(err, core.ErrRoomClosed):
 		return 0, err
 	case flood > 0:
 		return time.Duration(flood) * time.Second, nil
