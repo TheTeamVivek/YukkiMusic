@@ -121,7 +121,7 @@ func Init(bot *td.Client, assistants *core.ClientManager) {
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(helpCB), callbackquery.Equal("help_cb"))
 	bot.OnUpdateNewCallbackQuery(WithBlacklistCallback(helpCallbackHandler), callbackquery.Regex("^help:(.+)$"))
 	bot.OnUpdateChatMember(handleParticipantUpdate, nil)
-	bot.OnMessage(WithBlacklistMessage(handleActions), actionFilter)
+	bot.OnMessage(WithBlacklistMessage(handleActions), nil)
 	bot.OnUpdateFile(downloadUpdateHandler, nil)
 
 	bot.OnUpdateMessageSendSucceeded(func(_ *td.Client, u *td.UpdateMessageSendSucceeded) error {
