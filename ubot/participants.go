@@ -5,7 +5,7 @@ import (
 	"slices"
 	"time"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/xAmarnath/gogram/telegram"
 )
 
 func (ctx *Context) GetParticipants(

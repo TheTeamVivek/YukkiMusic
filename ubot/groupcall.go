@@ -3,7 +3,7 @@ package ubot
 import (
 	"fmt"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/xAmarnath/gogram/telegram"
 )
 
 func (ctx *Context) GetInputGroupCall(chatID int64) (tg.InputGroupCall, error) {

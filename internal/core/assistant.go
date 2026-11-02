@@ -27,7 +27,7 @@ import (
 	"yukkimusic/internal/database"
 	"yukkimusic/internal/utils"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	"github.com/xAmarnath/gogram/telegram"
 
 	"yukkimusic/config"
 	"yukkimusic/ubot"

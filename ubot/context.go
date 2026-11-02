@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/xAmarnath/gogram/telegram"
 
 	"yukkimusic/ntgcalls"
 )

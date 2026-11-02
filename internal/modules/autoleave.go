@@ -24,7 +24,7 @@ import (
 	"time"
 
 	td "github.com/AshokShau/gotdbot"
-	tg "github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/xAmarnath/gogram/telegram"
 
 	"yukkimusic/config"
 	"yukkimusic/internal/core"

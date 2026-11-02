@@ -28,7 +28,7 @@ import (
 	"yukkimusic/internal/utils"
 
 	td "github.com/AshokShau/gotdbot"
-	"github.com/amarnathcjd/gogram/telegram"
+	"github.com/xAmarnath/gogram/telegram"
 )
 
 // Flood-wait handling while the assistant joins a chat.
