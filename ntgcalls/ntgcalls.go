@@ -1,16 +1,22 @@
 package ntgcalls
 
-//#include "ntgcalls.h"
-//#include <stdlib.h>
-//extern void handleStreamEnd(uintptr_t ptr, int64_t chatID, ntg_stream_type_enum streamType, ntg_stream_device_enum streamDevice, void*);
-//extern void handleUpgrade(uintptr_t ptr, int64_t chatID, ntg_media_state_struct state, void*);
-//extern void handleConnectionChange(uintptr_t ptr, int64_t chatID, ntg_network_info_struct networkInfo, void*);
-//extern void handleSignal(uintptr_t ptr, int64_t chatID, uint8_t*, int, void*);
-//extern void handleFrames(uintptr_t ptr, int64_t chatID, ntg_stream_mode_enum streamMode, ntg_stream_device_enum streamDevice, ntg_frame_struct* frames, int size, void*);
-//extern void handleRemoteSourceChange(uintptr_t ptr, int64_t chatID, ntg_remote_source_struct remoteSource, void*);
-//extern void handleRequestBroadcastTimestamp(uintptr_t ptr, int64_t chatID, void*);
-//extern void handleRequestBroadcastPart(uintptr_t ptr, int64_t chatID, ntg_segment_part_request_struct segmentPartRequest, void*);
-//extern void handleLogs(ntg_log_message_struct logMessage);
+/*
+#include "ntgcalls.h"
+#include <stdlib.h>
+extern void handleStreamEnd(ntg_instance* handle, int64_t chatID, ntg_stream_type streamType, ntg_stream_device streamDevice, void* userData);
+extern void handleUpgrade(ntg_instance* handle, int64_t chatID, ntg_media_state state, void* userData);
+extern void handleConnectionChange(ntg_instance* handle, int64_t chatID, ntg_connection_info info, void* userData);
+extern void handleSignal(ntg_instance* handle, int64_t chatID, uint8_t* data, size_t size, void* userData);
+extern void handleFrames(ntg_instance* handle, int64_t chatID, ntg_stream_mode streamMode, ntg_stream_device streamDevice, ntg_frame* frames, size_t size, void* userData);
+extern void handleRemoteSourceChange(ntg_instance* handle, int64_t chatID, ntg_remote_source remoteSource, void* userData);
+extern void handleRequestBroadcastTimestamp(ntg_instance* handle, int64_t chatID, void* userData);
+extern void handleRequestBroadcastPart(ntg_instance* handle, int64_t chatID, ntg_segment_part_request request, void* userData);
+extern void handleUpdateEmojis(ntg_instance* handle, int64_t chatID, char* emojis, void* userData);
+extern void handleRequestParticipants(ntg_instance* handle, int64_t chatID, ntg_participants_request request, void* userData);
+extern void handleOutboundBlock(ntg_instance* handle, int64_t chatID, uint8_t* block, size_t size, void* userData);
+extern void handleSubchainRequest(ntg_instance* handle, int64_t chatID, ntg_subchain_request request, void* userData);
+extern void handleLogs(ntg_log_message message, void* userData);
+*/
 import "C"
 
 import (
@@ -19,403 +25,338 @@ import (
 	"sync"
 	"unsafe"
 
-	"github.com/Laky-64/gologging"
+	"yukkimusic/internal/utils"
 )
 
 var clientRegistry = struct {
 	sync.RWMutex
-	clients map[uintptr]*Client
-}{clients: make(map[uintptr]*Client)}
+	clients map[*C.ntg_instance]*Client
+}{clients: make(map[*C.ntg_instance]*Client)}
+
+func lookupClient(handle *C.ntg_instance) *Client {
+	clientRegistry.RLock()
+	defer clientRegistry.RUnlock()
+	return clientRegistry.clients[handle]
+}
 
 func init() {
-	C.ntg_register_logger(
-		(C.ntg_log_message_callback)(unsafe.Pointer(C.handleLogs)),
-	)
+	C.ntg_set_log_callback(C.ntg_log_cb(unsafe.Pointer(C.handleLogs)), nil)
 }
 
-func NTgCalls() *Client {
-	instance := &Client{
-		ptr: uintptr(C.ntg_init()),
-	}
-
-	clientRegistry.Lock()
-	clientRegistry.clients[instance.ptr] = instance
-	clientRegistry.Unlock()
-
-	userDataToken := unsafe.Pointer(instance.ptr)
-
-	C.ntg_on_stream_end(
-		C.uintptr_t(instance.ptr),
-		(C.ntg_stream_callback)(unsafe.Pointer(C.handleStreamEnd)),
-		userDataToken,
-	)
-	C.ntg_on_upgrade(
-		C.uintptr_t(instance.ptr),
-		(C.ntg_upgrade_callback)(unsafe.Pointer(C.handleUpgrade)),
-		userDataToken,
-	)
-	C.ntg_on_signaling_data(
-		C.uintptr_t(instance.ptr),
-		(C.ntg_signaling_callback)(unsafe.Pointer(C.handleSignal)),
-		userDataToken,
-	)
-	C.ntg_on_connection_change(
-		C.uintptr_t(instance.ptr),
-		(C.ntg_connection_callback)(unsafe.Pointer(C.handleConnectionChange)),
-		userDataToken,
-	)
-	C.ntg_on_frames(
-		C.uintptr_t(instance.ptr),
-		(C.ntg_frame_callback)(unsafe.Pointer(C.handleFrames)),
-		userDataToken,
-	)
-	C.ntg_on_remote_source_change(
-		C.uintptr_t(instance.ptr),
-		(C.ntg_remote_source_callback)(
-			unsafe.Pointer(C.handleRemoteSourceChange),
-		),
-		userDataToken,
-	)
-	C.ntg_on_request_broadcast_timestamp(
-		C.uintptr_t(instance.ptr),
-		(C.ntg_broadcast_timestamp_callback)(
-			unsafe.Pointer(C.handleRequestBroadcastTimestamp),
-		),
-		userDataToken,
-	)
-	C.ntg_on_request_broadcast_part(
-		C.uintptr_t(instance.ptr),
-		(C.ntg_broadcast_part_callback)(
-			unsafe.Pointer(C.handleRequestBroadcastPart),
-		),
-		userDataToken,
-	)
-
-	runtime.SetFinalizer(instance, func(c *Client) {
-		if c.ptr != 0 {
-			c.Free()
-		}
-	})
-	return instance
+// Package-level utility functions
+func Version() string {
+	return C.GoString(C.ntg_get_version())
 }
 
-//export handleLogs
-func handleLogs(logMessage C.ntg_log_message_struct) {
-	message := fmt.Sprintf(
-		"(%s:%d) %s",
-		string(C.GoString(logMessage.file)),
-		uint32(logMessage.line),
-		string(C.GoString(logMessage.message)),
-	)
-	var loggerName string
-	if logMessage.source == C.NTG_LOG_WEBRTC {
-		loggerName = "webrtc"
-	} else {
-		loggerName = "ntgcalls"
+func GetProtocol() (Protocol, error) {
+	var buffer C.ntg_protocol
+	if err := parseResult(C.ntg_get_protocol(&buffer)); err != nil {
+		return Protocol{}, err
 	}
-	loggerInstance := gologging.GetLogger(loggerName)
-	switch logMessage.level {
-	case C.NTG_LOG_DEBUG:
-		loggerInstance.Debug(message)
-	case C.NTG_LOG_INFO:
-		loggerInstance.Info(message)
-	case C.NTG_LOG_WARNING:
-		loggerInstance.Warn(message)
-	case C.NTG_LOG_ERROR:
-		loggerInstance.Error(message)
-	}
-}
-
-//
-//export handleStreamEnd
-func handleStreamEnd(
-	_ C.uintptr_t,
-	chatID C.int64_t,
-	streamType C.ntg_stream_type_enum,
-	streamDevice C.ntg_stream_device_enum,
-	userData unsafe.Pointer,
-) {
-	self := getClientFromUserData(userData)
-	if self == nil {
-		return
-	}
-
-	goChatID := int64(chatID)
-	var goStreamType StreamType
-	if streamType == C.NTG_STREAM_AUDIO {
-		goStreamType = AudioStream
-	} else {
-		goStreamType = VideoStream
-	}
-	goStreamDevice := parseStreamDevice(streamDevice)
-
-	callbacks := self.getStreamEndCallbacks()
-	for _, callback := range callbacks {
-		go callback(goChatID, goStreamType, goStreamDevice)
-	}
-}
-
-//
-//export handleUpgrade
-func handleUpgrade(
-	_ C.uintptr_t,
-	chatID C.int64_t,
-	state C.ntg_media_state_struct,
-	userData unsafe.Pointer,
-) {
-	self := getClientFromUserData(userData)
-	if self == nil {
-		return
-	}
-
-	goChatID := int64(chatID)
-	goState := MediaState{
-		Muted:              bool(state.muted),
-		VideoPaused:        bool(state.videoPaused),
-		VideoStopped:       bool(state.videoStopped),
-		PresentationPaused: bool(state.presentationPaused),
-	}
-
-	callbacks := self.getUpgradeCallbacks()
-	for _, callback := range callbacks {
-		go callback(goChatID, goState)
-	}
-}
-
-//
-//export handleSignal
-func handleSignal(
-	_ C.uintptr_t,
-	chatID C.int64_t,
-	data *C.uint8_t,
-	size C.int,
-	userData unsafe.Pointer,
-) {
-	self := getClientFromUserData(userData)
-	if self == nil {
-		return
-	}
-
-	goChatID := int64(chatID)
-	goData := C.GoBytes(unsafe.Pointer(data), size)
-
-	callbacks := self.getSignalCallbacks()
-	for _, callback := range callbacks {
-		dataCopy := make([]byte, len(goData))
-		copy(dataCopy, goData)
-		go callback(goChatID, dataCopy)
-	}
-}
-
-//
-//export handleConnectionChange
-func handleConnectionChange(
-	_ C.uintptr_t,
-	chatID C.int64_t,
-	networkInfo C.ntg_network_info_struct,
-	userData unsafe.Pointer,
-) {
-	self := getClientFromUserData(userData)
-	if self == nil {
-		return
-	}
-
-	goChatID := int64(chatID)
-	var goCallState NetworkInfo
-	switch networkInfo.kind {
-	case C.NTG_KIND_NORMAL:
-		goCallState.Kind = NormalConnection
-	case C.NTG_KIND_PRESENTATION:
-		goCallState.Kind = PresentationConnection
-	}
-	goCallState.State = parseConnectionState(networkInfo.state)
-
-	callbacks := self.getConnectionChangeCallbacks()
-	for _, callback := range callbacks {
-		go callback(goChatID, goCallState)
-	}
-}
-
-//
-//export handleFrames
-func handleFrames(
-	_ C.uintptr_t,
-	chatID C.int64_t,
-	streamMode C.ntg_stream_mode_enum,
-	streamDevice C.ntg_stream_device_enum,
-	frames *C.ntg_frame_struct,
-	size C.int,
-	userData unsafe.Pointer,
-) {
-	self := getClientFromUserData(userData)
-	if self == nil {
-		return
-	}
-
-	goChatID := int64(chatID)
-	var goStreamMode StreamMode
-	switch streamMode {
-	case C.NTG_STREAM_CAPTURE:
-		goStreamMode = CaptureStream
-	case C.NTG_STREAM_PLAYBACK:
-		goStreamMode = PlaybackStream
-	}
-	goStreamDevice := parseStreamDevice(streamDevice)
-
-	rawFrames := make([]Frame, size)
-	for i := 0; i < int(size); i++ {
-		rawFrame := *(*C.ntg_frame_struct)(unsafe.Pointer(uintptr(unsafe.Pointer(frames)) + uintptr(i)*unsafe.Sizeof(C.ntg_frame_struct{})))
-
-		frameData := C.GoBytes(unsafe.Pointer(rawFrame.data), rawFrame.sizeData)
-
-		rawFrames[i] = Frame{
-			Ssrc: uint32(rawFrame.ssrc),
-			Data: frameData,
-			FrameData: FrameData{
-				AbsoluteCaptureTimestampMs: int64(
-					rawFrame.frameData.absoluteCaptureTimestampMs,
-				),
-				Width:    uint16(rawFrame.frameData.width),
-				Height:   uint16(rawFrame.frameData.height),
-				Rotation: uint16(rawFrame.frameData.rotation),
-			},
-		}
-	}
-
-	callbacks := self.getFrameCallbacks()
-	for _, callback := range callbacks {
-		framesCopy := make([]Frame, len(rawFrames))
-		copy(framesCopy, rawFrames)
-		go callback(goChatID, goStreamMode, goStreamDevice, framesCopy)
-	}
-}
-
-//
-//export handleRemoteSourceChange
-func handleRemoteSourceChange(
-	_ C.uintptr_t,
-	chatID C.int64_t,
-	remoteSource C.ntg_remote_source_struct,
-	userData unsafe.Pointer,
-) {
-	self := getClientFromUserData(userData)
-	if self == nil {
-		return
-	}
-
-	goChatID := int64(chatID)
-	goRemoteSource := RemoteSource{
-		Ssrc:   uint32(remoteSource.ssrc),
-		State:  parseStreamStatus(remoteSource.state),
-		Device: parseStreamDevice(remoteSource.device),
-	}
-
-	callbacks := self.getRemoteSourceCallbacks()
-	for _, callback := range callbacks {
-		go callback(goChatID, goRemoteSource)
-	}
-}
-
-//
-//export handleRequestBroadcastTimestamp
-func handleRequestBroadcastTimestamp(
-	_ C.uintptr_t,
-	chatID C.int64_t,
-	userData unsafe.Pointer,
-) {
-	self := getClientFromUserData(userData)
-	if self == nil {
-		return
-	}
-
-	goChatID := int64(chatID)
-	callbacks := self.getBroadcastTimestampCallbacks()
-	for _, callback := range callbacks {
-		go callback(goChatID)
-	}
-}
-
-//
-//export handleRequestBroadcastPart
-func handleRequestBroadcastPart(
-	_ C.uintptr_t,
-	chatID C.int64_t,
-	segmentPartRequest C.ntg_segment_part_request_struct,
-	userData unsafe.Pointer,
-) {
-	self := getClientFromUserData(userData)
-	if self == nil {
-		return
-	}
-
-	goChatID := int64(chatID)
-	var goSegmentQuality MediaSegmentQuality
-	switch segmentPartRequest.quality {
-	case C.NTG_MEDIA_SEGMENT_QUALITY_NONE:
-		goSegmentQuality = SegmentQualityNone
-	case C.NTG_MEDIA_SEGMENT_QUALITY_THUMBNAIL:
-		goSegmentQuality = SegmentQualityThumbnail
-	case C.NTG_MEDIA_SEGMENT_QUALITY_MEDIUM:
-		goSegmentQuality = SegmentQualityMedium
-	case C.NTG_MEDIA_SEGMENT_QUALITY_FULL:
-		goSegmentQuality = SegmentQualityFull
-	}
-
-	goSegmentPartRequest := SegmentPartRequest{
-		SegmentID:     int64(segmentPartRequest.segmentId),
-		PartID:        int32(segmentPartRequest.partId),
-		Limit:         int32(segmentPartRequest.limit),
-		Timestamp:     int64(segmentPartRequest.timestamp),
-		QualityUpdate: bool(segmentPartRequest.qualityUpdate),
-		ChannelID:     int32(segmentPartRequest.channelId),
-		Quality:       goSegmentQuality,
-	}
-
-	callbacks := self.getBroadcastPartCallbacks()
-	for _, callback := range callbacks {
-		go callback(goChatID, goSegmentPartRequest)
-	}
-}
-
-func (ctx *Client) GetState(chatId int64) (MediaState, error) {
-	f := CreateFuture()
-	var buffer C.ntg_media_state_struct
-	C.ntg_get_state(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		&buffer,
-		f.ParseToC(),
-	)
-	f.wait()
-	err := parseErrorCode(f)
-	if err != nil {
-		return MediaState{}, err
-	}
-	return MediaState{
-		Muted:              bool(buffer.muted),
-		VideoPaused:        bool(buffer.videoPaused),
-		VideoStopped:       bool(buffer.videoStopped),
-		PresentationPaused: bool(buffer.presentationPaused),
+	defer C.ntg_protocol_free(&buffer)
+	return Protocol{
+		MinLayer:     int32(buffer.min_layer),
+		MaxLayer:     int32(buffer.max_layer),
+		UDPP2P:       bool(buffer.udp_p2p),
+		UDPReflector: bool(buffer.udp_reflector),
+		Versions:     parseStringVector(buffer.library_versions, buffer.library_versions_len),
 	}, nil
 }
 
-func (ctx *Client) GetConnectionMode(chatId int64) (ConnectionMode, error) {
-	f := CreateFuture()
-	var buffer C.ntg_connection_mode_enum
-	C.ntg_get_connection_mode(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		&buffer,
-		f.ParseToC(),
+func GetMediaDevices() (MediaDevices, error) {
+	var buffer C.ntg_media_devices
+	if err := parseResult(C.ntg_get_media_devices(&buffer)); err != nil {
+		return MediaDevices{}, err
+	}
+	defer C.ntg_media_devices_free(&buffer)
+	return MediaDevices{
+		Microphone: parseDeviceInfoVector(buffer.microphone, buffer.microphone_len),
+		Speaker:    parseDeviceInfoVector(buffer.speaker, buffer.speaker_len),
+		Camera:     parseDeviceInfoVector(buffer.camera, buffer.camera_len),
+		Screen:     parseDeviceInfoVector(buffer.screen, buffer.screen_len),
+	}, nil
+}
+
+func EnableGLibLoop(enable bool) error {
+	return parseResult(C.ntg_enable_glib_loop(C.bool(enable)))
+}
+
+func Ping() (string, error) {
+	var buffer *C.char
+	if err := parseResult(C.ntg_ping(&buffer)); err != nil {
+		return "", err
+	}
+	defer C.ntg_string_free(buffer)
+	return C.GoString(buffer), nil
+}
+
+func NewClient() *Client {
+	client := &Client{
+		handle: C.ntg_instance_create(),
+	}
+
+	clientRegistry.Lock()
+	clientRegistry.clients[client.handle] = client
+	clientRegistry.Unlock()
+	C.ntg_on_stream_end_callback(client.handle, C.ntg_stream_end_callback_cb(unsafe.Pointer(C.handleStreamEnd)), nil)
+	C.ntg_on_upgrade_callback(client.handle, C.ntg_upgrade_callback_cb(unsafe.Pointer(C.handleUpgrade)), nil)
+	C.ntg_on_signaling_data_callback(client.handle, C.ntg_signaling_data_callback_cb(unsafe.Pointer(C.handleSignal)), nil)
+	C.ntg_on_connection_change_callback(client.handle, C.ntg_connection_change_callback_cb(unsafe.Pointer(C.handleConnectionChange)), nil)
+	C.ntg_on_frames_callback(client.handle, C.ntg_frames_callback_cb(unsafe.Pointer(C.handleFrames)), nil)
+	C.ntg_on_remote_source_change_callback(client.handle, C.ntg_remote_source_change_callback_cb(unsafe.Pointer(C.handleRemoteSourceChange)), nil)
+	C.ntg_on_request_broadcast_timestamp_callback(client.handle, C.ntg_request_broadcast_timestamp_callback_cb(unsafe.Pointer(C.handleRequestBroadcastTimestamp)), nil)
+	C.ntg_on_request_broadcast_part_callback(client.handle, C.ntg_request_broadcast_part_callback_cb(unsafe.Pointer(C.handleRequestBroadcastPart)), nil)
+	C.ntg_on_update_emojis_callback(client.handle, C.ntg_update_emojis_callback_cb(unsafe.Pointer(C.handleUpdateEmojis)), nil)
+	C.ntg_on_request_participants_callback(client.handle, C.ntg_request_participants_callback_cb(unsafe.Pointer(C.handleRequestParticipants)), nil)
+	C.ntg_on_outbound_block_callback(client.handle, C.ntg_outbound_block_callback_cb(unsafe.Pointer(C.handleOutboundBlock)), nil)
+	C.ntg_on_subchain_request_callback(client.handle, C.ntg_subchain_request_callback_cb(unsafe.Pointer(C.handleSubchainRequest)), nil)
+
+	runtime.SetFinalizer(client, func(c *Client) {
+		if c.handle != nil {
+			c.Free()
+		}
+	})
+	return client
+}
+
+//export handleLogs
+func handleLogs(message C.ntg_log_message, _ unsafe.Pointer) {
+	text := fmt.Sprintf(
+		"(%s:%d) %s",
+		C.GoString(message.file),
+		uint32(message.line),
+		C.GoString(message.message),
 	)
-	f.wait()
-	err := parseErrorCode(f)
-	if err != nil {
-		return ConnectionMode(0), err
+
+	switch message.level {
+	case C.NTG_LOG_ERROR:
+		utils.Log.Error(text)
+	}
+}
+
+//export handleStreamEnd
+func handleStreamEnd(handle *C.ntg_instance, chatID C.int64_t, streamType C.ntg_stream_type, streamDevice C.ntg_stream_device, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	goType := VideoStream
+	if streamType == C.NTG_STREAM_TYPE_AUDIO {
+		goType = AudioStream
+	}
+	goDevice := parseStreamDevice(streamDevice)
+	for _, callback := range client.getStreamEndCallbacks() {
+		go callback(int64(chatID), goType, goDevice)
+	}
+}
+
+//export handleUpgrade
+func handleUpgrade(handle *C.ntg_instance, chatID C.int64_t, state C.ntg_media_state, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	goState := parseMediaState(state)
+	for _, callback := range client.getUpgradeCallbacks() {
+		go callback(int64(chatID), goState)
+	}
+}
+
+//export handleSignal
+func handleSignal(handle *C.ntg_instance, chatID C.int64_t, data *C.uint8_t, size C.size_t, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	goData := C.GoBytes(unsafe.Pointer(data), C.int(size))
+	for _, callback := range client.getSignalCallbacks() {
+		go callback(int64(chatID), goData)
+	}
+}
+
+//export handleConnectionChange
+func handleConnectionChange(handle *C.ntg_instance, chatID C.int64_t, info C.ntg_connection_info, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	goInfo := NetworkInfo{
+		State: parseConnectionState(info.state),
+	}
+	switch info.kind {
+	case C.NTG_CONNECTION_KIND_NORMAL:
+		goInfo.Kind = NormalConnection
+	case C.NTG_CONNECTION_KIND_PRESENTATION:
+		goInfo.Kind = PresentationConnection
+	}
+	for _, callback := range client.getConnectionChangeCallbacks() {
+		go callback(int64(chatID), goInfo)
+	}
+}
+
+//export handleFrames
+func handleFrames(handle *C.ntg_instance, chatID C.int64_t, streamMode C.ntg_stream_mode, streamDevice C.ntg_stream_device, frames *C.ntg_frame, size C.size_t, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	goMode := PlaybackStream
+	if streamMode == C.NTG_STREAM_MODE_CAPTURE {
+		goMode = CaptureStream
+	}
+	raw := unsafe.Slice(frames, int(size))
+	goFrames := make([]Frame, len(raw))
+	for i, rawFrame := range raw {
+		goFrames[i] = Frame{
+			SSRC: uint32(rawFrame.ssrc),
+			Data: C.GoBytes(unsafe.Pointer(rawFrame.data), C.int(rawFrame.data_len)),
+			FrameData: FrameData{
+				AbsoluteCaptureTimestampMs: int64(rawFrame.frame_data.absolute_capture_timestamp_ms),
+				Width:                      uint16(rawFrame.frame_data.width),
+				Height:                     uint16(rawFrame.frame_data.height),
+				Rotation:                   uint16(rawFrame.frame_data.rotation),
+			},
+		}
+	}
+	goDevice := parseStreamDevice(streamDevice)
+	for _, callback := range client.getFrameCallbacks() {
+		go callback(int64(chatID), goMode, goDevice, goFrames)
+	}
+}
+
+//export handleRemoteSourceChange
+func handleRemoteSourceChange(handle *C.ntg_instance, chatID C.int64_t, remoteSource C.ntg_remote_source, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	goSource := RemoteSource{
+		SSRC:   uint32(remoteSource.ssrc),
+		State:  parseStreamStatus(remoteSource.state),
+		Device: parseStreamDevice(remoteSource.device),
+	}
+	for _, callback := range client.getRemoteSourceCallbacks() {
+		go callback(int64(chatID), goSource)
+	}
+}
+
+//export handleRequestBroadcastTimestamp
+func handleRequestBroadcastTimestamp(handle *C.ntg_instance, chatID C.int64_t, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	for _, callback := range client.getBroadcastTimestampCallbacks() {
+		go callback(int64(chatID))
+	}
+}
+
+//export handleRequestBroadcastPart
+func handleRequestBroadcastPart(handle *C.ntg_instance, chatID C.int64_t, request C.ntg_segment_part_request, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	var goQuality MediaSegmentQuality
+	switch request.quality {
+	case C.NTG_MEDIA_SEGMENT_QUALITY_NONE:
+		goQuality = SegmentQualityNone
+	case C.NTG_MEDIA_SEGMENT_QUALITY_THUMBNAIL:
+		goQuality = SegmentQualityThumbnail
+	case C.NTG_MEDIA_SEGMENT_QUALITY_MEDIUM:
+		goQuality = SegmentQualityMedium
+	case C.NTG_MEDIA_SEGMENT_QUALITY_FULL:
+		goQuality = SegmentQualityFull
+	}
+	goRequest := SegmentPartRequest{
+		SegmentID:     int64(request.segment_id),
+		PartID:        int32(request.part_id),
+		Limit:         int32(request.limit),
+		Timestamp:     int64(request.timestamp),
+		QualityUpdate: bool(request.quality_update),
+		ChannelID:     int32(request.channel_id),
+		Quality:       goQuality,
+	}
+	for _, callback := range client.getBroadcastPartCallbacks() {
+		go callback(int64(chatID), goRequest)
+	}
+}
+
+//export handleUpdateEmojis
+func handleUpdateEmojis(handle *C.ntg_instance, chatID C.int64_t, emojis *C.char, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	goEmojis := C.GoString(emojis)
+	for _, callback := range client.getEmojisCallbacks() {
+		go callback(int64(chatID), goEmojis)
+	}
+}
+
+//export handleRequestParticipants
+func handleRequestParticipants(handle *C.ntg_instance, chatID C.int64_t, request C.ntg_participants_request, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	raw := unsafe.Slice(request.ssrcs, int(request.ssrcs_len))
+	goRequest := ParticipantsRequest{
+		SSRCs: make([]uint32, len(raw)),
+	}
+	for i, ssrc := range raw {
+		goRequest.SSRCs[i] = uint32(ssrc)
+	}
+	for _, callback := range client.getRequestParticipantsCallbacks() {
+		go callback(int64(chatID), goRequest)
+	}
+}
+
+//export handleOutboundBlock
+func handleOutboundBlock(handle *C.ntg_instance, chatID C.int64_t, block *C.uint8_t, size C.size_t, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	goBlock := C.GoBytes(unsafe.Pointer(block), C.int(size))
+	for _, callback := range client.getOutboundBlockCallbacks() {
+		go callback(int64(chatID), goBlock)
+	}
+}
+
+//export handleSubchainRequest
+func handleSubchainRequest(handle *C.ntg_instance, chatID C.int64_t, request C.ntg_subchain_request, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	goRequest := SubchainRequest{
+		Subchain: int32(request.subchain),
+		Height:   int32(request.height),
+		Limit:    int32(request.limit),
+	}
+	for _, callback := range client.getSubchainRequestCallbacks() {
+		go callback(int64(chatID), goRequest)
+	}
+}
+
+func (c *Client) GetState(chatID int64) (MediaState, error) {
+	var buffer C.ntg_media_state
+	if err := parseResult(C.ntg_get_state(c.handle, C.int64_t(chatID), &buffer)); err != nil {
+		return MediaState{}, err
+	}
+	defer C.ntg_media_state_free(&buffer)
+	return parseMediaState(buffer), nil
+}
+
+func (c *Client) GetConnectionMode(chatID int64) (ConnectionMode, error) {
+	var buffer C.ntg_connection_mode
+	if err := parseResult(C.ntg_get_connection_mode(c.handle, C.int64_t(chatID), &buffer)); err != nil {
+		return 0, err
 	}
 	switch buffer {
 	case C.NTG_CONNECTION_MODE_RTC:
-		return RtcConnection, nil
+		return RTCConnection, nil
 	case C.NTG_CONNECTION_MODE_STREAM:
 		return StreamConnection, nil
 	case C.NTG_CONNECTION_MODE_RTMP:
@@ -425,450 +366,265 @@ func (ctx *Client) GetConnectionMode(chatId int64) (ConnectionMode, error) {
 	}
 }
 
-func (ctx *Client) CreateCall(chatId int64) (string, error) {
+func (c *Client) GetEmojisFingerprint(chatID int64) (string, error) {
 	var buffer *C.char
-	f := CreateFuture()
-	C.ntg_create(C.uintptr_t(ctx.ptr), C.int64_t(chatId), &buffer, f.ParseToC())
-	f.wait()
-	defer C.free(unsafe.Pointer(buffer))
-	return C.GoString(buffer), parseErrorCode(f)
+	if err := parseResult(C.ntg_get_emojis_fingerprint(c.handle, C.int64_t(chatID), &buffer)); err != nil {
+		return "", err
+	}
+	defer C.ntg_string_free(buffer)
+	return C.GoString(buffer), nil
 }
 
-func (ctx *Client) InitPresentation(chatId int64) (string, error) {
+func (c *Client) GetCallType(chatID int64) (CallType, error) {
+	var buffer C.ntg_call_type
+	if err := parseResult(C.ntg_get_call_type(c.handle, C.int64_t(chatID), &buffer)); err != nil {
+		return CallType(0), err
+	}
+	switch buffer {
+	case C.NTG_CALL_TYPE_GROUP:
+		return GroupCallType, nil
+	case C.NTG_CALL_TYPE_P2P:
+		return P2PCallType, nil
+	case C.NTG_CALL_TYPE_CONFERENCE:
+		return ConferenceCallType, nil
+	default:
+		return CallType(0), fmt.Errorf("unknown call type")
+	}
+}
+
+func (c *Client) CreateCall(chatID int64) (string, error) {
 	var buffer *C.char
-	f := CreateFuture()
-	C.ntg_init_presentation(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		&buffer,
-		f.ParseToC(),
-	)
-	f.wait()
-	defer C.free(unsafe.Pointer(buffer))
-	return C.GoString(buffer), parseErrorCode(f)
+	if err := parseResult(C.ntg_create_call(c.handle, C.int64_t(chatID), &buffer)); err != nil {
+		return "", err
+	}
+	defer C.ntg_string_free(buffer)
+	return C.GoString(buffer), nil
 }
 
-func (ctx *Client) StopPresentation(chatId int64) error {
-	f := CreateFuture()
-	C.ntg_stop_presentation(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		f.ParseToC(),
-	)
-	f.wait()
-	return parseErrorCode(f)
+func (c *Client) InitPresentation(chatID int64) (string, error) {
+	var buffer *C.char
+	if err := parseResult(C.ntg_init_presentation(c.handle, C.int64_t(chatID), &buffer)); err != nil {
+		return "", err
+	}
+	defer C.ntg_string_free(buffer)
+	return C.GoString(buffer), nil
 }
 
-func (ctx *Client) AddIncomingVideo(
-	chatId int64,
-	endpoint string,
-	ssrcGroups []SsrcGroup,
-) (uint32, error) {
-	buffer := new(C.uint32_t)
-	f := CreateFuture()
+func (c *Client) InitConference(chatID int64, userID int64, lastBlock []byte) (ConferenceJoinParams, error) {
+	lastBlockC, lastBlockSize := parseBytes(lastBlock)
+	defer freeBytes(lastBlockC)
+	var buffer C.ntg_conference_join_params
+	if err := parseResult(C.ntg_init_conference(c.handle, C.int64_t(chatID), C.int64_t(userID), lastBlockC, lastBlockSize, &buffer)); err != nil {
+		return ConferenceJoinParams{}, err
+	}
+	defer C.ntg_conference_join_params_free(&buffer)
+	return ConferenceJoinParams{
+		Payload:   C.GoString(buffer.payload),
+		PublicKey: C.GoBytes(unsafe.Pointer(buffer.public_key), C.int(buffer.public_key_len)),
+		Block:     C.GoBytes(unsafe.Pointer(buffer.block), C.int(buffer.block_len)),
+	}, nil
+}
+
+func (c *Client) StopPresentation(chatID int64) error {
+	return parseResult(C.ntg_stop_presentation(c.handle, C.int64_t(chatID)))
+}
+
+func (c *Client) AddIncomingVideo(chatID, userID int64, endpoint string, ssrcGroups []SSRCGroup) (uint32, error) {
 	endpointC := C.CString(endpoint)
-	ssrcGroupsC := parseSsrcGroups(ssrcGroups)
-	C.ntg_add_incoming_video(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		endpointC,
-		ssrcGroupsC,
-		C.int(len(ssrcGroups)),
-		buffer,
-		f.ParseToC(),
-	)
-	f.wait()
-	C.free(unsafe.Pointer(endpointC))
-	freeSsrcGroups(ssrcGroupsC, C.int(len(ssrcGroups)))
-	return uint32(*buffer), parseErrorCode(f)
+	defer C.free(unsafe.Pointer(endpointC))
+	rawGroups := parseSSRCGroups(ssrcGroups)
+	defer freeSSRCGroups(rawGroups)
+	var buffer C.uint32_t
+	if err := parseResult(C.ntg_add_incoming_video(c.handle, C.int64_t(chatID), C.int64_t(userID), endpointC, slicePtr(rawGroups), C.size_t(len(rawGroups)), &buffer)); err != nil {
+		return 0, err
+	}
+	return uint32(buffer), nil
 }
 
-func (ctx *Client) RemoveIncomingVideo(chatId int64, endpoint string) error {
-	f := CreateFuture()
+func (c *Client) RemoveIncomingVideo(chatID int64, endpoint string) (bool, error) {
 	endpointC := C.CString(endpoint)
-	C.ntg_remove_incoming_video(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		endpointC,
-		f.ParseToC(),
-	)
-	f.wait()
-	C.free(unsafe.Pointer(endpointC))
-	return parseErrorCode(f)
+	defer C.free(unsafe.Pointer(endpointC))
+	var buffer C.bool
+	if err := parseResult(C.ntg_remove_incoming_video(c.handle, C.int64_t(chatID), endpointC, &buffer)); err != nil {
+		return false, err
+	}
+	return bool(buffer), nil
 }
 
-func (ctx *Client) CreateP2PCall(chatId int64) error {
-	f := CreateFuture()
-	C.ntg_create_p2p(C.uintptr_t(ctx.ptr), C.int64_t(chatId), f.ParseToC())
-	f.wait()
-	return parseErrorCode(f)
+func (c *Client) CreateP2PCall(userID int64) error {
+	return parseResult(C.ntg_create_p2p_call(c.handle, C.int64_t(userID)))
 }
 
-func (ctx *Client) InitExchange(
-	chatId int64,
-	dhConfig DhConfig,
-	gAHash []byte,
-) ([]byte, error) {
-	var buffer *C.uint8_t
-	var size C.int
-	gAHashC, gAHashSize := parseBytes(gAHash)
+func (c *Client) InitExchange(userID int64, dhConfig DhConfig, gAHash []byte) ([]byte, error) {
 	dhConfigC := dhConfig.ParseToC()
-	f := CreateFuture()
-	C.ntg_init_exchange(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		&dhConfigC,
-		gAHashC,
-		gAHashSize,
-		&buffer,
-		&size,
-		f.ParseToC(),
-	)
-	f.wait()
-	defer C.free(unsafe.Pointer(buffer))
-	defer C.free(unsafe.Pointer(gAHashC))
 	defer freeDhConfig(&dhConfigC)
-	return C.GoBytes(unsafe.Pointer(buffer), size), parseErrorCode(f)
+	gAHashC, gAHashSize := parseBytes(gAHash)
+	defer freeBytes(gAHashC)
+	var buffer *C.uint8_t
+	var size C.size_t
+	if err := parseResult(C.ntg_init_exchange(c.handle, C.int64_t(userID), dhConfigC, gAHashC, gAHashSize, &buffer, &size)); err != nil {
+		return nil, err
+	}
+	defer C.ntg_bytes_free(unsafe.Pointer(buffer))
+	return C.GoBytes(unsafe.Pointer(buffer), C.int(size)), nil
 }
 
-func (ctx *Client) ExchangeKeys(
-	chatId int64,
-	gAB []byte,
-	fingerprint int64,
-) (AuthParams, error) {
-	f := CreateFuture()
-	var buffer C.ntg_auth_params_struct
+func (c *Client) ExchangeKeys(userID int64, gAB []byte, fingerprint int64) (AuthParams, error) {
 	gABC, gABSize := parseBytes(gAB)
-	C.ntg_exchange_keys(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		gABC,
-		gABSize,
-		C.int64_t(fingerprint),
-		&buffer,
-		f.ParseToC(),
-	)
-	f.wait()
-	defer C.free(unsafe.Pointer(gABC))
-	defer C.free(unsafe.Pointer(buffer.g_a_or_b))
+	defer freeBytes(gABC)
+	var buffer C.ntg_auth_params
+	if err := parseResult(C.ntg_exchange_keys(c.handle, C.int64_t(userID), gABC, gABSize, C.int64_t(fingerprint), &buffer)); err != nil {
+		return AuthParams{}, err
+	}
+	defer C.ntg_auth_params_free(&buffer)
 	return AuthParams{
-		GAOrB: C.GoBytes(
-			unsafe.Pointer(buffer.g_a_or_b),
-			buffer.sizeGAB,
-		),
+		GAOrB:          C.GoBytes(unsafe.Pointer(buffer.g_a_or_b), C.int(buffer.g_a_or_b_len)),
 		KeyFingerprint: int64(buffer.key_fingerprint),
-	}, parseErrorCode(f)
+	}, nil
 }
 
-func (ctx *Client) SkipExchange(
-	chatId int64,
-	encryptionKey []byte,
-	isOutgoing bool,
-) error {
-	f := CreateFuture()
+func (c *Client) SkipExchange(userID int64, encryptionKey []byte, isOutgoing bool) error {
 	encryptionKeyC, encryptionKeySize := parseBytes(encryptionKey)
-	C.ntg_skip_exchange(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		encryptionKeyC,
-		encryptionKeySize,
-		C.bool(isOutgoing),
-		f.ParseToC(),
-	)
-	f.wait()
-	defer C.free(unsafe.Pointer(encryptionKeyC))
-	return parseErrorCode(f)
+	defer freeBytes(encryptionKeyC)
+	return parseResult(C.ntg_skip_exchange(c.handle, C.int64_t(userID), encryptionKeyC, encryptionKeySize, C.bool(isOutgoing)))
 }
 
-func (ctx *Client) ConnectP2P(
-	chatId int64,
-	rtcServers []RTCServer,
-	versions []string,
-	P2PAllowed bool,
-) error {
-	f := CreateFuture()
-	versionsC, sizeVersions := parseStringVectorC(versions)
-	rtcServersC := parseRtcServers(rtcServers)
-	C.ntg_connect_p2p(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		rtcServersC,
-		C.int(len(rtcServers)),
-		versionsC,
-		C.int(sizeVersions),
-		C.bool(P2PAllowed),
-		f.ParseToC(),
-	)
-	f.wait()
-	freeStringVectorC(versionsC, sizeVersions)
-	freeRtcServers(rtcServersC, C.int(len(rtcServers)))
-	return parseErrorCode(f)
-}
-
-func (ctx *Client) SendSignalingData(chatId int64, data []byte) error {
-	f := CreateFuture()
-	dataC, dataSize := parseBytes(data)
-	C.ntg_send_signaling_data(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		dataC,
-		dataSize,
-		f.ParseToC(),
-	)
-	f.wait()
-	defer C.free(unsafe.Pointer(dataC))
-	return parseErrorCode(f)
-}
-
-//goland:noinspection GoUnusedExportedFunction
-func GetProtocol() Protocol {
-	var buffer C.ntg_protocol_struct
-	C.ntg_get_protocol(&buffer)
-	return Protocol{
-		MinLayer:     int32(buffer.minLayer),
-		MaxLayer:     int32(buffer.maxLayer),
-		UdpP2P:       bool(buffer.udpP2P),
-		UdpReflector: bool(buffer.udpReflector),
-		Versions: parseStringVector(
-			unsafe.Pointer(buffer.libraryVersions),
-			buffer.libraryVersionsSize,
-		),
+func (c *Client) ConnectP2P(userID int64, rtcServers []RTCServer, versions []string, p2pAllowed bool, customParameters string) error {
+	rawServers := parseRtcServers(rtcServers)
+	defer freeRtcServers(rawServers)
+	rawVersions := parseStringVectorC(versions)
+	defer freeStringVectorC(rawVersions)
+	var customParametersC *C.char
+	if len(customParameters) > 0 {
+		customParametersC = C.CString(customParameters)
+		defer C.free(unsafe.Pointer(customParametersC))
 	}
+	return parseResult(C.ntg_connect_p2p(c.handle, C.int64_t(userID), slicePtr(rawServers), C.size_t(len(rawServers)), slicePtr(rawVersions), C.size_t(len(rawVersions)), C.bool(p2pAllowed), customParametersC))
 }
 
-func (ctx *Client) Connect(
-	chatId int64,
-	params string,
-	isPresentation bool,
-) error {
-	f := CreateFuture()
+func (c *Client) SendSignalingData(chatID int64, data []byte) error {
+	dataC, dataSize := parseBytes(data)
+	defer freeBytes(dataC)
+	return parseResult(C.ntg_send_signaling_data(c.handle, C.int64_t(chatID), dataC, dataSize))
+}
+
+func (c *Client) Connect(chatID int64, params string, isPresentation bool) error {
 	paramsC := C.CString(params)
-	C.ntg_connect(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		paramsC,
-		C.bool(isPresentation),
-		f.ParseToC(),
-	)
-	f.wait()
-	C.free(unsafe.Pointer(paramsC))
-	return parseErrorCode(f)
+	defer C.free(unsafe.Pointer(paramsC))
+	return parseResult(C.ntg_connect(c.handle, C.int64_t(chatID), paramsC, C.bool(isPresentation)))
 }
 
-func (ctx *Client) SetStreamSources(
-	chatId int64,
-	streamMode StreamMode,
-	desc MediaDescription,
-) error {
-	f := CreateFuture()
-	cDesc := desc.ParseToC()
-	defer freeMediaDescriptionC(cDesc)
-
-	C.ntg_set_stream_sources(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		streamMode.ParseToC(),
-		cDesc,
-		f.ParseToC(),
-	)
-	f.wait()
-	return parseErrorCode(f)
+func (c *Client) SetStreamSources(chatID int64, streamMode StreamMode, desc MediaDescription) error {
+	descC := desc.ParseToC()
+	defer freeMediaDescriptionC(descC)
+	return parseResult(C.ntg_set_stream_sources(c.handle, C.int64_t(chatID), streamMode.ParseToC(), descC))
 }
 
-func (ctx *Client) SendExternalFrame(
-	chatId int64,
-	streamDevice StreamDevice,
-	data []byte,
-	frameData FrameData,
-) error {
-	f := CreateFuture()
+func (c *Client) SendExternalFrame(chatID int64, streamDevice StreamDevice, data []byte, frameData FrameData) error {
 	dataC, dataSize := parseBytes(data)
-	C.ntg_send_external_frame(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		streamDevice.ParseToC(),
-		dataC,
-		dataSize,
-		frameData.ParseToC(),
-		f.ParseToC(),
-	)
-	f.wait()
-	defer C.free(unsafe.Pointer(dataC))
-	return parseErrorCode(f)
+	defer freeBytes(dataC)
+	return parseResult(C.ntg_send_external_frame(c.handle, C.int64_t(chatID), streamDevice.ParseToC(), dataC, dataSize, frameData.ParseToC()))
 }
 
-func (ctx *Client) SendBroadcastTimestamp(chatId, timestamp int64) error {
-	f := CreateFuture()
-	C.ntg_send_broadcast_timestamp(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		C.int64_t(timestamp),
-		f.ParseToC(),
-	)
-	f.wait()
-	return parseErrorCode(f)
+func (c *Client) SendBroadcastTimestamp(chatID int64, timestamp int64) error {
+	return parseResult(C.ntg_send_broadcast_timestamp(c.handle, C.int64_t(chatID), C.int64_t(timestamp)))
 }
 
-func (ctx *Client) SendBroadcastPart(
-	chatId, segmentID int64,
-	partID int32,
-	status MediaSegmentStatus,
-	qualityUpdate bool,
-	data []byte,
-) error {
-	f := CreateFuture()
+func (c *Client) SendBroadcastPart(chatID int64, segmentID int64, partID int32, status MediaSegmentStatus, qualityUpdate bool, data []byte) error {
 	dataC, dataSize := parseBytes(data)
-	C.ntg_send_broadcast_part(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		C.int64_t(segmentID),
-		C.int32_t(partID),
-		status.ParseToC(),
-		C.bool(qualityUpdate),
-		dataC,
-		dataSize,
-		f.ParseToC(),
-	)
-	f.wait()
-	defer C.free(unsafe.Pointer(dataC))
-	return parseErrorCode(f)
+	defer freeBytes(dataC)
+	return parseResult(C.ntg_send_broadcast_part(c.handle, C.int64_t(chatID), C.int64_t(segmentID), C.int32_t(partID), status.ParseToC(), C.bool(qualityUpdate), dataC, dataSize))
 }
 
-func (ctx *Client) Pause(chatId int64) (bool, error) {
-	f := CreateFuture()
-	C.ntg_pause(C.uintptr_t(ctx.ptr), C.int64_t(chatId), f.ParseToC())
-	f.wait()
-	return parseBool(f)
+func (c *Client) UpdateAudioSSRCMappings(chatID int64, mappings []SSRCMapping) error {
+	rawMappings := parseSSRCMappings(mappings)
+	return parseResult(C.ntg_update_audio_ssrc_mappings(c.handle, C.int64_t(chatID), slicePtr(rawMappings), C.size_t(len(rawMappings))))
 }
 
-func (ctx *Client) Resume(chatId int64) (bool, error) {
-	f := CreateFuture()
-	C.ntg_resume(C.uintptr_t(ctx.ptr), C.int64_t(chatId), f.ParseToC())
-	f.wait()
-	return parseBool(f)
+func (c *Client) ApplyBlocks(chatID int64, subchain int32, nextOffset int32, blocks [][]byte, fromShortPoll bool) error {
+	rawBlocks := parseBlocks(blocks)
+	defer freeBlocks(rawBlocks)
+	return parseResult(C.ntg_apply_blocks(c.handle, C.int64_t(chatID), C.int32_t(subchain), C.int32_t(nextOffset), slicePtr(rawBlocks), C.size_t(len(rawBlocks)), C.bool(fromShortPoll)))
 }
 
-func (ctx *Client) Mute(chatId int64) (bool, error) {
-	f := CreateFuture()
-	C.ntg_mute(C.uintptr_t(ctx.ptr), C.int64_t(chatId), f.ParseToC())
-	f.wait()
-	return parseBool(f)
+func (c *Client) FinishSubchainRequest(chatID int64, subchain int32) error {
+	return parseResult(C.ntg_finish_subchain_request(c.handle, C.int64_t(chatID), C.int32_t(subchain)))
 }
 
-func (ctx *Client) Unmute(chatId int64) (bool, error) {
-	f := CreateFuture()
-	C.ntg_unmute(C.uintptr_t(ctx.ptr), C.int64_t(chatId), f.ParseToC())
-	f.wait()
-	return parseBool(f)
-}
-
-func (ctx *Client) Stop(chatId int64) error {
-	f := CreateFuture()
-	C.ntg_stop(C.uintptr_t(ctx.ptr), C.int64_t(chatId), f.ParseToC())
-	f.wait()
-	return parseErrorCode(f)
-}
-
-func (ctx *Client) Time(chatId int64, streamMode StreamMode) (uint64, error) {
-	f := CreateFuture()
-	var buffer C.int64_t
-	C.ntg_time(
-		C.uintptr_t(ctx.ptr),
-		C.int64_t(chatId),
-		streamMode.ParseToC(),
-		&buffer,
-		f.ParseToC(),
-	)
-	f.wait()
-	return uint64(buffer), parseErrorCode(f)
-}
-
-//goland:noinspection GoUnusedExportedFunction
-func GetMediaDevices() MediaDevices {
-	var buffer C.ntg_media_devices_struct
-	C.ntg_get_media_devices(&buffer)
-	return MediaDevices{
-		Microphone: parseDeviceInfoVector(
-			unsafe.Pointer(buffer.microphone),
-			buffer.sizeMicrophone,
-		),
-		Speaker: parseDeviceInfoVector(
-			unsafe.Pointer(buffer.speaker),
-			buffer.sizeSpeaker,
-		),
-		Camera: parseDeviceInfoVector(
-			unsafe.Pointer(buffer.camera),
-			buffer.sizeCamera,
-		),
-		Screen: parseDeviceInfoVector(
-			unsafe.Pointer(buffer.screen),
-			buffer.sizeScreen,
-		),
+func (c *Client) Pause(chatID int64) (bool, error) {
+	var buffer C.bool
+	if err := parseResult(C.ntg_pause(c.handle, C.int64_t(chatID), &buffer)); err != nil {
+		return false, err
 	}
+	return bool(buffer), nil
 }
 
-func (ctx *Client) CpuUsage() (float64, error) {
-	f := CreateFuture()
+func (c *Client) Resume(chatID int64) (bool, error) {
+	var buffer C.bool
+	if err := parseResult(C.ntg_resume(c.handle, C.int64_t(chatID), &buffer)); err != nil {
+		return false, err
+	}
+	return bool(buffer), nil
+}
+
+func (c *Client) Mute(chatID int64) (bool, error) {
+	var buffer C.bool
+	if err := parseResult(C.ntg_mute(c.handle, C.int64_t(chatID), &buffer)); err != nil {
+		return false, err
+	}
+	return bool(buffer), nil
+}
+
+func (c *Client) Unmute(chatID int64) (bool, error) {
+	var buffer C.bool
+	if err := parseResult(C.ntg_unmute(c.handle, C.int64_t(chatID), &buffer)); err != nil {
+		return false, err
+	}
+	return bool(buffer), nil
+}
+
+func (c *Client) Stop(chatID int64) error {
+	return parseResult(C.ntg_stop(c.handle, C.int64_t(chatID)))
+}
+
+func (c *Client) Time(chatID int64, streamMode StreamMode) (uint64, error) {
+	var buffer C.uint64_t
+	if err := parseResult(C.ntg_time(c.handle, C.int64_t(chatID), streamMode.ParseToC(), &buffer)); err != nil {
+		return 0, err
+	}
+	return uint64(buffer), nil
+}
+
+func (c *Client) CpuUsage() (float64, error) {
 	var buffer C.double
-	C.ntg_cpu_usage(C.uintptr_t(ctx.ptr), &buffer, f.ParseToC())
-	f.wait()
-	return float64(buffer), parseErrorCode(f)
+	if err := parseResult(C.ntg_cpu_usage(c.handle, &buffer)); err != nil {
+		return 0, err
+	}
+	return float64(buffer), nil
 }
 
-func (ctx *Client) EnableGLibLoop(enable bool) {
-	C.ntg_enable_g_lib_loop(C.bool(enable))
-}
-
-func (ctx *Client) Calls() map[int64]*CallInfo {
-	mapReturn := make(map[int64]*CallInfo)
-	f := CreateFuture()
-	var buffer *C.ntg_call_info_struct
-	var size C.int
-	C.ntg_calls(C.uintptr_t(ctx.ptr), &buffer, &size, f.ParseToC())
-	f.wait()
-	for i := 0; i < int(size); i++ {
-		rawCall := *(*C.ntg_call_info_struct)(unsafe.Pointer(uintptr(unsafe.Pointer(buffer)) + uintptr(i)*unsafe.Sizeof(C.ntg_call_info_struct{})))
-		mapReturn[int64(rawCall.chatId)] = &CallInfo{
-			Playback: parseStreamStatus(rawCall.playback),
-			Capture:  parseStreamStatus(rawCall.capture),
+func (c *Client) Calls() (map[int64]CallInfo, error) {
+	var buffer *C.ntg_call_info_entry
+	var size C.size_t
+	if err := parseResult(C.ntg_calls(c.handle, &buffer, &size)); err != nil {
+		return nil, err
+	}
+	defer C.ntg_call_info_entry_free(buffer, size)
+	raw := unsafe.Slice(buffer, int(size))
+	result := make(map[int64]CallInfo, len(raw))
+	for _, entry := range raw {
+		result[int64(entry.key)] = CallInfo{
+			Playback: parseStreamStatus(entry.value.playback),
+			Capture:  parseStreamStatus(entry.value.capture),
 		}
 	}
-	defer C.free(unsafe.Pointer(buffer))
-	return mapReturn
+	return result, nil
 }
 
-//goland:noinspection GoUnusedExportedFunction
-func Version() string {
-	var buffer *C.char
-	C.ntg_get_version(&buffer)
-	defer C.free(unsafe.Pointer(buffer))
-	return C.GoString(buffer)
-}
-
-func (ctx *Client) Free() {
-	if ctx.ptr == 0 {
-		return
-	}
-
-	C.ntg_destroy(C.uintptr_t(ctx.ptr))
-
+func (c *Client) Free() {
 	clientRegistry.Lock()
-	delete(clientRegistry.clients, ctx.ptr)
+	delete(clientRegistry.clients, c.handle)
 	clientRegistry.Unlock()
-
-	ctx.ptr = 0
-}
-
-func getClientFromUserData(userData unsafe.Pointer) *Client {
-	if userData == nil {
-		return nil
-	}
-
-	ptr := uintptr(userData)
-
-	clientRegistry.RLock()
-	client := clientRegistry.clients[ptr]
-	clientRegistry.RUnlock()
-
-	return client
+	C.ntg_instance_destroy(c.handle)
+	c.handle = nil
 }

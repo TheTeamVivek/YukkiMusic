@@ -22,12 +22,14 @@ import (
 	"fmt"
 	"path"
 	"sort"
+	"strconv"
 	"strings"
 
-	"github.com/Laky-64/gologging"
+	"yukkimusic/internal/utils"
+
 	"gopkg.in/yaml.v3"
 
-	"main/internal/config"
+	"yukkimusic/config"
 )
 
 //go:embed *.yml
@@ -93,18 +95,68 @@ func Get(lang, key string, values Arg) string {
 	}
 
 	if !found {
-		gologging.ErrorF("Missing translation → lang=%s key=%s", lang, key)
+		utils.Log.Errorf("Missing translation → lang=%s key=%s", lang, key)
 
 		return fmt.Sprintf("[%s]", key)
 	}
 
-	if values != nil {
-		for k, v := range values {
-			val = strings.ReplaceAll(val, "{"+k+"}", fmt.Sprint(v))
+	for k, v := range values {
+		val = strings.ReplaceAll(val, "{"+k+"}", fmt.Sprint(v))
+	}
+
+	return expandEmojis(val)
+}
+
+func GetButton(lang, key string, values Arg) (string, int64) {
+	tryLangs := []string{
+		lang,
+		config.DefaultLang,
+		baseLang,
+	}
+
+	var val string
+	var found bool
+
+	for _, l := range tryLangs {
+		if locale, ok := loadedLocales[l]; ok {
+			if v, ok := locale[key]; ok {
+				val = v
+				found = true
+				break
+			}
 		}
 	}
 
-	return val
+	if !found {
+		utils.Log.Errorf("Missing translation → lang=%s key=%s", lang, key)
+
+		return fmt.Sprintf("[%s]", key), 0
+	}
+
+	for k, v := range values {
+		val = strings.ReplaceAll(val, "{"+k+"}", fmt.Sprint(v))
+	}
+
+	if !config.HasPremium {
+		return unknownEmojiRe.ReplaceAllString(val, "$1"), 0
+	}
+
+	m := unknownEmojiRe.FindStringSubmatchIndex(val)
+	if m == nil {
+		return val, 0
+	}
+
+	emojiChar := val[m[2]:m[3]]
+
+	if id, ok := emojiTokens[emojiChar]; ok && id != "" {
+		n, err := strconv.ParseInt(id, 10, 64)
+		if err == nil {
+			rest := unknownEmojiRe.ReplaceAllString(val[:m[0]]+val[m[1]:], "$1")
+			return strings.TrimSpace(rest), n
+		}
+	}
+
+	return unknownEmojiRe.ReplaceAllString(val, "$1"), 0
 }
 
 func GetAvailableLanguages() []string {

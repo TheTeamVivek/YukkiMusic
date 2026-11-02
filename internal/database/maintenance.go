@@ -17,39 +17,20 @@
 
 package database
 
-func SetMaintenance(enabled bool, reason ...string) error {
+func SetMaintenance(enabled bool) error {
 	return modifyBotState(func(s *BotState) bool {
-		changed := false
-		if s.Maintenance.Enabled != enabled {
-			s.Maintenance.Enabled = enabled
-			changed = true
+		if s.Maintenance == enabled {
+			return false
 		}
-
-		newReason := ""
-		if enabled && len(reason) > 0 {
-			newReason = reason[0]
-		}
-
-		if s.Maintenance.Reason != newReason {
-			s.Maintenance.Reason = newReason
-			changed = true
-		}
-		return changed
+		s.Maintenance = enabled
+		return true
 	})
 }
 
-func MaintenanceReason() (string, error) {
-	state, err := getBotState()
-	if err != nil {
-		return "", err
-	}
-	return state.Maintenance.Reason, nil
-}
-
-func IsMaintenanceEnabled() (bool, error) {
+func GetMaintenance() (bool, error) {
 	state, err := getBotState()
 	if err != nil {
 		return false, err
 	}
-	return state.Maintenance.Enabled, nil
+	return state.Maintenance, nil
 }

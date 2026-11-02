@@ -23,154 +23,164 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Laky-64/gologging"
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
-	"main/internal/config"
-	"main/internal/database"
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/config"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/utils"
 )
 
-func handleAddSudo(m *telegram.NewMessage) error {
-	chatID := m.ChannelID()
+func handleAddSudo(c *td.Client, m *td.Message) error {
+	if !checkOwner(c, m) {
+		return nil
+	}
+	chatID := m.ChatID()
 
 	// No args + no reply -> ask for user
-	if m.Args() == "" && !m.IsReply() {
-		m.Reply(F(chatID, "auth_no_user", locales.Arg{
+	if m.Args() == "" && m.ReplyToMessageID() == 0 {
+		_, err := m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
 			"cmd": getCommand(m),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	// Extract target user
-	targetID, err := utils.ExtractUser(m)
+	targetID, err := utils.ExtractUser(c, m)
 	if err != nil {
-		m.Reply(F(chatID, "user_extract_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	// Owner trying to self
 	if targetID == config.OwnerID {
-		m.Reply(F(chatID, "sudo_owner_self"))
-		return telegram.ErrEndGroup
+		_, err := m.ReplyText(c, F(chatID, "sudo_owner_self"), nil)
+		return err
 	}
 
 	// Trying to add the bot itself
-	if targetID == m.Client.Me().ID {
-		m.Reply(F(chatID, "sudo_bot_self"))
-		return telegram.ErrEndGroup
+	if targetID == c.Me().Id {
+		_, err := m.ReplyText(c, F(chatID, "sudo_bot_self"), nil)
+		return err
 	}
 
 	// Fetch user info
-	user, err := m.Client.GetUser(targetID)
+	user, err := c.GetUser(targetID)
 	if err != nil {
-		m.Reply(F(chatID, "sudo_fetch_user_fail", locales.Arg{
+		if _, err := m.ReplyText(c, F(chatID, "sudo_fetch_user_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		gologging.Error("Failed to get user: " + err.Error())
-		return telegram.ErrEndGroup
+		}), nil); err != nil {
+			return err
+		}
+		utils.Log.Error("Failed to get user: " + err.Error())
+		return nil
 	}
 
 	// Bots cannot be sudoers
-	if user.Bot {
-		m.Reply(F(chatID, "sudo_bot_user"))
-		return telegram.ErrEndGroup
+	if user.Type != nil {
+		if _, isBot := user.Type.(*td.UserTypeBot); isBot {
+			_, err := m.ReplyText(c, F(chatID, "sudo_bot_user"), nil)
+			return err
+		}
 	}
 
 	// Username / mention
-	uname := utils.MentionHTML(user)
-	if user.Username != "" {
-		uname = "@" + user.Username
+	uname := mention(user, targetID)
+	if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
+		uname = "@" + user.Usernames.ActiveUsernames[0]
 	}
 	idStr := strconv.FormatInt(targetID, 10)
 
 	// Check if already sudo
 	exists, err := database.IsSudo(targetID)
 	if err != nil {
-		m.Reply(F(chatID, "sudo_check_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "sudo_check_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	if exists {
-		m.Reply(F(chatID, "sudo_already", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "sudo_already", locales.Arg{
 			"user": uname,
 			"id":   idStr,
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	// Add to sudo
 	if err := database.AddSudo(targetID); err != nil {
-		m.Reply(F(chatID, "sudo_add_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "sudo_add_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
-
-	m.Reply(F(chatID, "sudo_add_success", locales.Arg{
+	if _, err := m.ReplyText(c, F(chatID, "sudo_add_success", locales.Arg{
 		"user": uname,
 		"id":   idStr,
-	}))
+	}), nil); err != nil {
+		return err
+	}
 
 	if config.SetCmds {
 		// Update commands for this sudo user
-		sudoCommands := append(
+		sudoCommands := concatCommands(
 			AllCommands.PrivateUserCommands,
-			AllCommands.PrivateSudoCommands...)
+			AllCommands.PrivateSudoCommands,
+		)
 
-		if _, err := m.Client.BotsSetBotCommands(
-			&telegram.BotCommandScopePeer{
-				Peer: &telegram.InputPeerUser{UserID: targetID, AccessHash: 0},
-			},
-			"",
+		if err := c.SetCommands(
 			sudoCommands,
+			&td.SetCommandsOpts{
+				Scope: &td.BotCommandScopeChat{ChatId: targetID},
+			},
 		); err != nil {
-			gologging.Error("Failed to set PrivateSudoCommands " + err.Error())
+			utils.Log.Error("Failed to set PrivateSudoCommands " + err.Error())
 		}
 	}
 
-	return telegram.ErrEndGroup
+	return nil
 }
 
-func handleDelSudo(m *telegram.NewMessage) error {
-	chatID := m.ChannelID()
+func handleDelSudo(c *td.Client, m *td.Message) error {
+	if !checkOwner(c, m) {
+		return nil
+	}
+	chatID := m.ChatID()
 
 	// No args + no reply -> ask for user
-	if m.Args() == "" && !m.IsReply() {
-		m.Reply(F(chatID, "auth_no_user", locales.Arg{
+	if m.Args() == "" && m.ReplyToMessageID() == 0 {
+		_, err := m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
 			"cmd": getCommand(m),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	// Extract target user
-	targetID, err := utils.ExtractUser(m)
+	targetID, err := utils.ExtractUser(c, m)
 	if err != nil {
-		m.Reply(F(chatID, "user_extract_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	// Cannot remove owner
 	if targetID == config.OwnerID {
-		m.Reply(F(chatID, "sudo_owner_remove_block"))
-		return telegram.ErrEndGroup
+		_, err := m.ReplyText(c, F(chatID, "sudo_owner_remove_block"), nil)
+		return err
 	}
 
 	// Fetch user info
-	user, _ := m.Client.GetUser(targetID)
+	user, _ := c.GetUser(targetID)
 
 	var uname string
 	if user != nil {
-		uname = utils.MentionHTML(user)
-		if user.Username != "" {
-			uname = "@" + user.Username
+		uname = mention(user, user.Id)
+		if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
+			uname = "@" + user.Usernames.ActiveUsernames[0]
 		}
 	} else {
 		uname = "User"
@@ -180,68 +190,67 @@ func handleDelSudo(m *telegram.NewMessage) error {
 	// Check if sudo
 	exists, err := database.IsSudo(targetID)
 	if err != nil {
-		m.Reply(F(chatID, "sudo_check_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "sudo_check_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	if !exists {
-		m.Reply(F(chatID, "sudo_not_exists", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "sudo_not_exists", locales.Arg{
 			"user": uname,
 			"id":   idStr,
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	// Reset that user's bot commands
-	if _, err := m.Client.BotsResetBotCommands(
-		&telegram.BotCommandScopePeer{
-			Peer: &telegram.InputPeerUser{UserID: targetID, AccessHash: 0},
+	if err := c.DeleteCommands(
+		&td.DeleteCommandsOpts{
+			Scope: &td.BotCommandScopeChat{ChatId: targetID},
 		},
-		"",
 	); err != nil {
-		gologging.Error("Failed to reset sudo commands: " + err.Error())
+		utils.Log.Error("Failed to reset sudo commands: " + err.Error())
 	}
 
 	// Delete from DB
 	if err := database.RemoveSudo(targetID); err != nil {
-		m.Reply(F(chatID, "sudo_remove_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "sudo_remove_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
+	_, rerr :=
 
-	// Success
-	m.Reply(F(chatID, "sudo_remove_success", locales.Arg{
-		"user": uname,
-		"id":   idStr,
-	}))
-
-	return telegram.ErrEndGroup
+		// Success
+		m.ReplyText(c, F(chatID, "sudo_remove_success", locales.Arg{
+			"user": uname,
+			"id":   idStr,
+		}), nil)
+	return rerr
 }
 
-func handleGetSudoers(m *telegram.NewMessage) error {
-	chatID := m.ChannelID()
+func handleGetSudoers(c *td.Client, m *td.Message) error {
+	chatID := m.ChatID()
 
 	floodKey := fmt.Sprintf("sudoers:%d%d", chatID, m.SenderID())
 	if remaining := utils.GetFlood(floodKey); remaining > 0 {
-		m.Reply(F(chatID, "flood_seconds", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "flood_seconds", locales.Arg{
 			"duration": int(remaining.Seconds()),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 	utils.SetFlood(floodKey, 30*time.Second)
 
 	// "⏳ Fetching sudoers list..."
-	statusMsg, _ := m.Reply(F(chatID, "sudo_list_fetching"))
+	statusMsg, _ := m.ReplyText(c, F(chatID, "sudo_list_fetching"), nil)
 
 	list, err := database.Sudoers()
 	if err != nil {
-		utils.EOR(statusMsg, F(chatID, "sudo_list_fetch_fail", locales.Arg{
+		_, _ = utils.EOR(c, statusMsg, F(chatID, "sudo_list_fetch_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		return telegram.ErrEndGroup
+		}), &td.EditMessageTextOpts{ParseMode: td.ParseModeHTML})
+		return nil
 	}
 
 	var sb strings.Builder
@@ -255,11 +264,11 @@ func handleGetSudoers(m *telegram.NewMessage) error {
 	ownerIDStr := strconv.FormatInt(ownerID, 10)
 
 	ownerStr := "<code>" + ownerIDStr + "</code>"
-	if user, err := m.Client.GetUser(ownerID); err == nil {
-		if user.Username != "" {
-			ownerStr = "@" + user.Username + " (ID: <code>" + ownerIDStr + "</code>)"
+	if user, err := c.GetUser(ownerID); err == nil {
+		if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
+			ownerStr = "@" + user.Usernames.ActiveUsernames[0] + " (ID: <code>" + ownerIDStr + "</code>)"
 		} else {
-			ownerStr = utils.MentionHTML(user) + " (ID: <code>" + ownerIDStr + "</code>)"
+			ownerStr = mention(user, ownerID) + " (ID: <code>" + ownerIDStr + "</code>)"
 		}
 	}
 
@@ -279,11 +288,11 @@ func handleGetSudoers(m *telegram.NewMessage) error {
 		idStr := strconv.FormatInt(id, 10)
 		userStr := "<code>" + idStr + "</code>" // fallback
 
-		if user, err := m.Client.GetUser(id); err == nil {
-			if user.Username != "" {
-				userStr = "@" + user.Username + " (ID: <code>" + idStr + "</code>)"
+		if user, err := c.GetUser(id); err == nil {
+			if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
+				userStr = "@" + user.Usernames.ActiveUsernames[0] + " (ID: <code>" + idStr + "</code>)"
 			} else {
-				userStr = utils.MentionHTML(user) + " (ID: <code>" + idStr + "</code>)"
+				userStr = mention(user, id) + " (ID: <code>" + idStr + "</code>)"
 			}
 		}
 
@@ -302,6 +311,8 @@ func handleGetSudoers(m *telegram.NewMessage) error {
 		sb.WriteString("\n")
 	}
 
-	utils.EOR(statusMsg, sb.String())
-	return telegram.ErrEndGroup
+	_, _ = utils.EOR(c, statusMsg, sb.String(), &td.EditMessageTextOpts{
+		ParseMode: td.ParseModeHTML,
+	})
+	return nil
 }

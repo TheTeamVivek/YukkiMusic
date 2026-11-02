@@ -21,11 +21,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
-	"main/internal/core"
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/utils"
 )
 
 const stopConfirmSuggestionCooldown = 4 * time.Second
@@ -49,32 +49,44 @@ This action cannot be undone. Use <code>/pause</code> for temporary stops.`
 	helpTexts["/stop"] = helpTexts["/end"]
 }
 
-func stopHandler(m *telegram.NewMessage) error {
-	return handleStop(m, false)
+func stopHandler(c *td.Client, m *td.Message) error {
+	if m.Args() != "" {
+		return nil
+	}
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
+	return handleStop(c, m, false)
 }
 
-func cstopHandler(m *telegram.NewMessage) error {
-	return handleStop(m, true)
+func cstopHandler(c *td.Client, m *td.Message) error {
+	if m.Args() != "" {
+		return nil
+	}
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
+	return handleStop(c, m, true)
 }
 
-func handleStop(m *telegram.NewMessage, cplay bool) error {
-	r, err := getEffectiveRoom(m, cplay)
+func handleStop(c *td.Client, m *td.Message, cplay bool) error {
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return telegram.ErrEndGroup
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
-	if !r.IsActiveChat() {
-		m.Reply(F(m.ChannelID(), "room_no_active"))
-		return telegram.ErrEndGroup
+	if !r.Active() {
+		_, err := m.ReplyText(c, F(m.ChatID(), "room_no_active"), nil)
+		return err
 	}
 
-	isPaused := r.IsPaused()
-	isMuted := r.IsMuted()
+	isPaused := r.Paused()
+	isMuted := r.Muted()
 
 	if isPaused || isMuted {
 		stopSuggestFloodKey := fmt.Sprintf(
 			"stop_suggest:%d",
-			r.ID,
+			r.ChatID,
 		)
 		if utils.GetFlood(stopSuggestFloodKey) <= 0 {
 			utils.SetFlood(stopSuggestFloodKey, stopConfirmSuggestionCooldown)
@@ -82,21 +94,23 @@ func handleStop(m *telegram.NewMessage, cplay bool) error {
 			if isMuted {
 				msgKey = "stop_confirm_muted"
 			}
-			m.Reply(F(m.ChannelID(), msgKey), &telegram.SendOptions{
-				ReplyMarkup: core.GetStopConfirmMarkup(m.ChannelID(), r, isPaused),
+			_, err := m.ReplyText(c, F(m.ChatID(), msgKey), &td.SendMessageOpts{
+				ReplyMarkup: core.GetStopConfirmMarkup(m.ChatID(), r, isPaused),
 			})
-			return telegram.ErrEndGroup
+			return err
 		}
 	}
 
-	scheduleOldPlayingMessage(r)
-	core.DeleteRoom(r.ID)
-	m.Reply(
+	core.Rooms.Delete(r.ChatID)
+	sender, _ := m.GetUser(c)
+	_, rerr := m.ReplyText(
+		c,
 		F(
-			m.ChannelID(),
+			m.ChatID(),
 			"stopped",
-			locales.Arg{"user": utils.MentionHTML(m.Sender)},
+			locales.Arg{"user": mention(sender, m.SenderID())},
 		),
+		nil,
 	)
-	return telegram.ErrEndGroup
+	return rerr
 }

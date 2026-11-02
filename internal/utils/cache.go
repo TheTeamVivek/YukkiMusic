@@ -22,8 +22,6 @@ import (
 	"time"
 )
 
-const NoExpiry = time.Duration(-1)
-
 type CacheItem[V any] struct {
 	Value      V
 	Expiration time.Time
@@ -89,22 +87,23 @@ func (c *Cache[K, V]) Delete(key K) {
 	c.mu.Unlock()
 }
 
-func (c *Cache[K, V]) LoadAndDelete(key K) (V, bool) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+// floodCache stores cooldown expiry times keyed by an arbitrary string.
+var floodCache = NewCache[string, time.Time](0)
 
-	item, ok := c.items[key]
+// GetFlood returns remaining cooldown for a key, or 0 if unset/expired.
+func GetFlood(key string) time.Duration {
+	exp, ok := floodCache.Get(key)
 	if !ok {
-		var zero V
-		return zero, false
+		return 0
 	}
-
-	delete(c.items, key)
-
-	if item.Expired() {
-		var zero V
-		return zero, false
+	if remaining := time.Until(exp); remaining > 0 {
+		return remaining
 	}
+	floodCache.Delete(key)
+	return 0
+}
 
-	return item.Value, true
+// SetFlood sets cooldown duration for a key.
+func SetFlood(key string, duration time.Duration) {
+	floodCache.Set(key, time.Now().Add(duration))
 }

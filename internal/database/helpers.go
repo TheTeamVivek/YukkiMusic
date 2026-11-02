@@ -19,6 +19,7 @@ package database
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -33,10 +34,8 @@ func ctx() (context.Context, context.CancelFunc) {
 // addUnique adds an element to a slice if it's not already present.
 // Returns the new slice and true if the element was added.
 func addUnique[T comparable](slice []T, element T) ([]T, bool) {
-	for _, v := range slice {
-		if v == element {
-			return slice, false
-		}
+	if slices.Contains(slice, element) {
+		return slice, false
 	}
 	return append(slice, element), true
 }
@@ -54,10 +53,5 @@ func removeElement[T comparable](slice []T, element T) ([]T, bool) {
 
 // contains checks if a slice contains an element.
 func contains[T comparable](slice []T, element T) bool {
-	for _, v := range slice {
-		if v == element {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, element)
 }

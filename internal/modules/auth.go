@@ -22,12 +22,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
-	"main/internal/config"
-	"main/internal/database"
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/config"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/utils"
 )
 
 func init() {
@@ -68,188 +68,264 @@ For related commands, see <code>/delauth</code> and <code>/authlist</code>.`,
 • Shows only manually added auth users — the Owner, Assistant, and Sudoers are not listed but are always authorized.`
 }
 
-func addAuthHandler(m *telegram.NewMessage) error {
-	chatID := m.ChannelID()
+func addAuthHandler(c *td.Client, m *td.Message) error {
+	chatID := m.ChatID()
 
-	if m.Args() == "" && !m.IsReply() {
-		m.Reply(F(chatID, "auth_no_user", locales.Arg{
+	if !canManageAuth(c, chatID, m.SenderID()) {
+		_, err := m.ReplyRichMessageHTML(c, F(chatID, "only_admin"), nil)
+		return err
+	}
+
+	if m.Args() == "" && m.ReplyToMessageID() == 0 {
+		_, err := m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
 			"cmd": getCommand(m),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	if au, _ := database.AuthorizedUsers(chatID); len(
 		au,
 	) >= config.MaxAuthUsers {
-		m.Reply(F(chatID, "auth_limit_reached", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "auth_limit_reached", locales.Arg{
 			"limit": config.MaxAuthUsers,
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
-	userID, err := utils.ExtractUser(m)
+	userID, err := utils.ExtractUser(c, m)
 	if err != nil {
-		m.Reply(F(chatID, "user_extract_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	// owner, bot, self, already auth, or admin — all treated the same
-	if userID == config.OwnerID || userID == m.Client.Me().ID ||
+	if userID == config.OwnerID || userID == c.Me().Id ||
 		userID == m.SenderID() {
-		m.Reply(F(chatID, "cannot_authorize_user"))
-		return telegram.ErrEndGroup
+		_, err := m.ReplyText(c, F(chatID, "cannot_authorize_user"), nil)
+		return err
 	}
 
 	if ok, _ := database.IsAuthorized(chatID, userID); ok {
-		m.Reply(F(chatID, "already_authed"))
-		return telegram.ErrEndGroup
+		_, err := m.ReplyText(c, F(chatID, "already_authed"), nil)
+		return err
 	}
 
-	if ok, _ := utils.IsChatAdmin(m.Client, chatID, userID); ok {
-		m.Reply(F(chatID, "addauth_user_is_admin"))
-		return telegram.ErrEndGroup
+	if ok, _ := utils.IsChatAdmin(c, chatID, userID); ok {
+		_, err := m.ReplyText(c, F(chatID, "addauth_user_is_admin"), nil)
+		return err
 	}
 
-	user, err := m.Client.GetUser(userID)
+	user, err := c.GetUser(userID)
 	if err != nil || user == nil {
-		m.Reply(F(chatID, "user_extract_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
 			"error": utils.IfElse(err != nil, err.Error(), ""),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
-	if user.Bot {
-		m.Reply(F(chatID, "addauth_bot_user"))
-		return telegram.ErrEndGroup
+	if user.Type != nil {
+		if _, isBot := user.Type.(*td.UserTypeBot); isBot {
+			_, err := m.ReplyText(c, F(chatID, "addauth_bot_user"), nil)
+			return err
+		}
 	}
 
 	if err := database.Authorize(chatID, userID); err != nil {
-		m.Reply(F(chatID, "addauth_add_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "addauth_add_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
-	uname := utils.MentionHTML(user)
-	if user.Username != "" {
-		uname += " (@" + user.Username + ")"
+	uname := mention(user, userID)
+	if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
+		uname += " (@" + user.Usernames.ActiveUsernames[0] + ")"
 	}
 
 	if au, _ := database.AuthorizedUsers(chatID); len(au) > 0 {
-		m.Reply(F(chatID, "addauth_success_with_count", locales.Arg{
+		if _, err := m.ReplyText(c, F(chatID, "addauth_success_with_count", locales.Arg{
 			"user":  uname,
 			"count": len(au),
 			"limit": config.MaxAuthUsers,
-		}))
+		}), nil); err != nil {
+			return err
+		}
 	} else {
-		m.Reply(F(chatID, "addauth_success", locales.Arg{
+		if _, err := m.ReplyText(c, F(chatID, "addauth_success", locales.Arg{
 			"user": uname,
-		}))
+		}), nil); err != nil {
+			return err
+		}
 	}
 
-	return telegram.ErrEndGroup
+	return nil
 }
 
-func delAuthHandler(m *telegram.NewMessage) error {
-	chatID := m.ChannelID()
+func delAuthHandler(c *td.Client, m *td.Message) error {
+	chatID := m.ChatID()
 
-	if m.Args() == "" && !m.IsReply() {
-		m.Reply(F(chatID, "auth_no_user", locales.Arg{
-			"cmd": getCommand(m),
-		}))
-		return telegram.ErrEndGroup
+	if !canManageAuth(c, chatID, m.SenderID()) {
+		_, err := m.ReplyRichMessageHTML(c, F(chatID, "only_admin"), nil)
+		return err
 	}
 
-	userID, err := utils.ExtractUser(m)
+	if m.Args() == "" && m.ReplyToMessageID() == 0 {
+		_, err := m.ReplyText(c, F(chatID, "auth_no_user", locales.Arg{
+			"cmd": getCommand(m),
+		}), nil)
+		return err
+	}
+
+	userID, err := utils.ExtractUser(c, m)
 	if err != nil {
-		m.Reply(F(chatID, "user_extract_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "user_extract_fail", locales.Arg{
 			"error": utils.IfElse(err != nil, err.Error(), "unknown error"),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	if ok, err := database.IsAuthorized(chatID, userID); !ok && err == nil {
-		m.Reply(F(chatID, "del_auth_not_authorized", nil))
-		return telegram.ErrEndGroup
+		_, err := m.ReplyText(c, F(chatID, "del_auth_not_authorized", nil), nil)
+		return err
 	}
 
-	user, _ := m.Client.GetUser(userID)
+	user, _ := c.GetUser(userID)
 
 	if err := database.Unauthorize(chatID, userID); err != nil {
-		m.Reply(F(chatID, "del_auth_remove_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "del_auth_remove_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	var uname string
 	if user != nil {
-		uname = utils.MentionHTML(user)
-		if user.Username != "" {
-			uname += " (@" + user.Username + ")"
+		uname = mention(user, userID)
+		if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
+			uname += " (@" + user.Usernames.ActiveUsernames[0] + ")"
 		}
 	} else {
 		uname = "User (<code>" + strconv.FormatInt(userID, 10) + "</code>)"
 	}
-
-	m.Reply(F(chatID, "del_auth_success", locales.Arg{
+	_, rerr := m.ReplyText(c, F(chatID, "del_auth_success", locales.Arg{
 		"user": uname,
-	}))
-	return telegram.ErrEndGroup
+	}), nil)
+	return rerr
 }
 
-func authListHandler(m *telegram.NewMessage) error {
-	chatID := m.ChannelID()
+func authListHandler(c *td.Client, m *td.Message) error {
+	chatID := m.ChatID()
 
 	authUsers, err := database.AuthorizedUsers(chatID)
 	if err != nil {
-		m.Reply(F(chatID, "authlist_fetch_fail", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "authlist_fetch_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		return nil
-	}
-
-	if len(authUsers) == 0 {
-		m.Reply(F(chatID, "authlist_empty", nil))
-		return nil
-	}
-
-	statusMsg, err := m.Reply(F(chatID, "authlist_fetching", nil))
-	if err != nil {
+		}), nil)
 		return err
 	}
 
-	var sb strings.Builder
-	sb.WriteString(F(chatID, "authlist_header", nil) + "\n")
+	_, err = m.ReplyRichMessage(c, authRich(c, chatID, authUsers), nil)
+	return err
+}
 
-	for i, userID := range authUsers {
-		user, err := m.Client.GetUser(userID)
-		if err != nil || user == nil {
-			sb.WriteString(F(chatID, "authlist_user_fail", locales.Arg{
-				"index":   i + 1,
-				"user_id": userID,
-			}) + "\n")
-			continue
+// authRich builds the rich "authorized users" card. Each row carries a danger
+// button that revokes that user's authorization and refreshes the card.
+func authRich(c *td.Client, chatID int64, users []int64) *td.InputRichMessage {
+	var b strings.Builder
+
+	fmt.Fprintf(&b, "<h3>%s</h3>\n", F(chatID, "authlist_title"))
+
+	if len(users) == 0 {
+		fmt.Fprintf(&b, "<p>%s</p>\n", F(chatID, "authlist_empty"))
+		return &td.InputRichMessage{
+			Source: &td.RichMessageSourceHtml{Text: b.String()},
 		}
-
-		uname := utils.MentionHTML(user)
-		if user.Username != "" {
-			uname += " (@" + user.Username + ")"
-		}
-
-		sb.WriteString(F(chatID, "authlist_user_entry", locales.Arg{
-			"index":   i + 1,
-			"user":    uname,
-			"user_id": user.ID,
-		}) + "\n")
 	}
 
-	sb.WriteString("\n" + F(chatID, "authlist_total", locales.Arg{
-		"count": len(authUsers),
+	fmt.Fprintf(&b, "<p>%s</p>\n", F(chatID, "authlist_count", locales.Arg{
+		"count": len(users),
+		"limit": config.MaxAuthUsers,
 	}))
+	b.WriteString("<table bordered striped compact>\n")
+	fmt.Fprintf(
+		&b,
+		"<tr><th>%s</th><th>%s</th><th>\U0001F5D1\uFE0F</th></tr>\n",
+		F(chatID, "authlist_col_user"),
+		F(chatID, "authlist_col_id"),
+	)
 
-	utils.EOR(statusMsg, sb.String())
-	return telegram.ErrEndGroup
+	for _, userID := range users {
+		name := F(chatID, "authlist_unknown_user")
+		if user, err := c.GetUser(userID); err == nil && user != nil {
+			name = mention(user, userID)
+			if user.Usernames != nil && len(user.Usernames.ActiveUsernames) > 0 {
+				name += " (@" + user.Usernames.ActiveUsernames[0] + ")"
+			}
+		}
+		fmt.Fprintf(
+			&b,
+			"<tr><td>%s</td><td><code>%d</code></td>"+
+				"<td><tg-button type=\"callback_data\" style=\"danger\" data=\"authdel:%d:%d\">\u2a2f</tg-button></td></tr>\n",
+			name,
+			userID,
+			chatID,
+			userID,
+		)
+	}
+	b.WriteString("</table>\n")
+	fmt.Fprintf(&b, "<footer>%s</footer>\n", F(chatID, "authlist_hint"))
+
+	return &td.InputRichMessage{
+		Source: &td.RichMessageSourceHtml{Text: b.String()},
+	}
+}
+
+func authDeleteHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
+	chatID := u.ChatId
+
+	parts := strings.Split(u.DataString(), ":")
+	if len(parts) != 3 || parts[0] != "authdel" {
+		utils.Log.Warnf("Invalid auth delete payload: %s", u.DataString())
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
+		return nil
+	}
+
+	targetID, err := strconv.ParseInt(parts[2], 10, 64)
+	if err != nil {
+		u.Answer(c, F(chatID, "invalid_request"), &td.CallbackAnswerOpts{ShowAlert: true})
+		return nil
+	}
+
+	if !canManageAuth(c, chatID, u.SenderUserId) {
+		u.Answer(c, F(chatID, "only_admin_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
+		return nil
+	}
+
+	if ok, err := database.IsAuthorized(chatID, targetID); !ok || err != nil {
+		u.Answer(c, F(chatID, "del_auth_not_authorized"), &td.CallbackAnswerOpts{ShowAlert: true})
+		return nil
+	}
+
+	if err := database.Unauthorize(chatID, targetID); err != nil {
+		u.Answer(c, F(chatID, "del_auth_remove_fail", locales.Arg{
+			"error": err.Error(),
+		}), &td.CallbackAnswerOpts{ShowAlert: true})
+		return nil
+	}
+
+	users, err := database.AuthorizedUsers(chatID)
+	if err != nil {
+		users = nil
+	}
+
+	if _, err := c.EditContent(u.ChatId, u.MessageId, &td.InputMessageRichMessage{
+		Message: authRich(c, chatID, users),
+	}, nil); err != nil {
+		utils.Log.Errorf("Failed to edit auth list: %v", err)
+	}
+
+	u.Answer(c, F(chatID, "authlist_delete_success"), &td.CallbackAnswerOpts{ShowAlert: true})
+	return nil
 }

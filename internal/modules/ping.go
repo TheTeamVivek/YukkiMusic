@@ -21,20 +21,21 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Laky-64/gologging"
-	tg "github.com/amarnathcjd/gogram/telegram"
+	"yukkimusic/internal/utils"
+
+	td "github.com/AshokShau/gotdbot"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/mem"
 
-	"main/internal/config"
-	"main/internal/core"
-	"main/internal/database"
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/config"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/locales"
 )
 
 func init() {
+	go cpu.Percent(0, false)
 	helpTexts["/ping"] = `<i>Check bot responsiveness and system stats.</i>
 
 <u>Usage:</u>
@@ -74,16 +75,22 @@ func formatUptime(d time.Duration) string {
 	return result
 }
 
-func pingHandler(m *tg.NewMessage) error {
+func pingHandler(c *td.Client, m *td.Message) error {
+	if isChannel(c, m) {
+		return nil
+	}
+
+	chatID := m.ChatID()
+
 	if m.IsPrivate() {
-		m.Delete()
-		database.AddServedUser(m.ChannelID())
+		m.Delete(c, &td.DeleteMessagesOpts{Revoke: true})
+		database.AddServedUser(chatID)
 	} else {
-		database.AddServedChat(m.ChannelID())
+		database.AddServedChat(chatID)
 	}
 
 	start := time.Now()
-	reply, err := m.Reply(F(m.ChannelID(), "ping_start"))
+	reply, err := m.ReplyText(c, F(chatID, "ping_start"), nil)
 	if err != nil {
 		return err
 	}
@@ -95,13 +102,6 @@ func pingHandler(m *tg.NewMessage) error {
 	cpuUsage := "N/A"
 	diskUsage := "N/A"
 
-	opt := &tg.SendOptions{
-		ReplyMarkup: core.SuppMarkup(m.ChannelID()),
-	}
-	if config.PingImage != "" {
-		opt.Media = config.PingImage
-	}
-
 	v, err := mem.VirtualMemory()
 	if err == nil {
 		usedGB := float64(v.Used) / 1024 / 1024 / 1024
@@ -110,7 +110,7 @@ func pingHandler(m *tg.NewMessage) error {
 		ramInfo = fmt.Sprintf("%.2f / %.2f GB", usedGB, totalGB)
 	}
 
-	if percentages, err := cpu.Percent(time.Second, false); err == nil &&
+	if percentages, err := cpu.Percent(0, false); err == nil &&
 		len(percentages) > 0 {
 		cpuUsage = fmt.Sprintf("%.2f%%", percentages[0])
 	}
@@ -121,27 +121,55 @@ func pingHandler(m *tg.NewMessage) error {
 		diskUsage = fmt.Sprintf("%.2f / %.2f GB", usedGB, totalGB)
 	}
 
-	msg := F(m.ChannelID(), "ping_result", locales.Arg{
+	msg := F(chatID, "ping_result", locales.Arg{
 		"latency":    latency,
-		"bot":        utils.MentionHTML(m.Client.Me()),
+		"bot":        c.Me().Mention(td.ParseModeHTML),
 		"uptime":     uptimeStr,
 		"ram_info":   ramInfo,
 		"cpu_usage":  cpuUsage,
 		"disk_usage": diskUsage,
 	})
 
-	_, err = reply.Edit(msg, opt)
-	if err != nil {
-		gologging.ErrorF("[ping] edit failed: %v", err)
+	markup := core.SuppMarkup(chatID)
+
+	edit := func() error {
+		if config.PingImage == "" {
+			_, err := reply.EditText(c, msg, &td.EditMessageTextOpts{
+				ParseMode:   td.ParseModeHTML,
+				ReplyMarkup: markup,
+			})
+			return err
+		}
+
+		caption, err := c.GetFormattedText(msg, nil, td.ParseModeHTML)
+		if err != nil {
+			return err
+		}
+
+		_, err = reply.EditMedia(c, &td.InputMessagePhoto{
+			Photo: &td.InputPhoto{
+				Photo: td.InputFileRemote{Id: config.PingImage},
+			},
+			Caption: caption,
+		}, &td.EditMessageMediaOpts{
+			ReplyMarkup: markup,
+		})
+		return err
+	}
+
+	if err := edit(); err != nil {
+		utils.Log.Errorf("[ping] edit failed: %v", err)
 
 		if config.PingImage != "" {
-			opt.Media = ""
-			_, err = reply.Edit(msg, opt)
+			_, err = reply.EditText(c, msg, &td.EditMessageTextOpts{
+				ParseMode:   td.ParseModeHTML,
+				ReplyMarkup: markup,
+			})
 			if err != nil {
-				gologging.ErrorF("[ping] fallback text edit failed: %v", err)
+				utils.Log.Errorf("[ping] fallback text edit failed: %v", err)
 				return err
 			}
 		}
 	}
-	return tg.ErrEndGroup
+	return nil
 }

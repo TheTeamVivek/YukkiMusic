@@ -18,123 +18,109 @@
 package modules
 
 import (
-	"github.com/Laky-64/gologging"
-	tg "github.com/amarnathcjd/gogram/telegram"
+	"html"
 
-	"main/internal/config"
-	"main/internal/core"
-	"main/internal/database"
-	"main/internal/locales"
-	"main/internal/utils"
+	td "github.com/AshokShau/gotdbot"
+
+	"yukkimusic/config"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/locales"
 )
 
-func init() {
-	helpTexts["/start"] = `<i>Start the bot and show main menu.</i>`
-}
-
-func startHandler(m *tg.NewMessage) error {
-	if m.ChatType() != tg.EntityUser {
-		database.AddServedChat(m.ChannelID())
-		m.Reply(
-			F(m.ChannelID(), "start_group"),
-		)
-		return tg.ErrEndGroup
+func startHandler(c *td.Client, m *td.Message) error {
+	if isChannel(c, m) {
+		return nil
 	}
 
-	arg := m.Args()
-	database.AddServedUser(m.ChannelID())
-
-	if arg != "" {
-		gologging.Info(
-			"Got Start parameter: " + arg + " in ChatID: " + utils.IntToStr(
-				m.ChannelID(),
-			),
-		)
-	}
-
-	switch arg {
-	case "pm_help":
-		gologging.Info("User requested help via start param")
-		helpHandler(m)
-
-	default:
-		caption := F(m.ChannelID(), "start_private", locales.Arg{
-			"user": utils.MentionHTML(m.Sender),
-			"bot":  utils.MentionHTML(m.Client.Me()),
+	if !m.IsPrivate() {
+		database.AddServedChat(m.ChatID())
+		text := F(m.ChatID(), "start_group", locales.Arg{
+			"bot":             c.Me().Mention(td.ParseModeHTML),
+			"support_chat":    html.EscapeString(config.SupportChat),
+			"support_channel": html.EscapeString(config.SupportChannel),
 		})
+		_, err := m.ReplyRichMessageHTML(c, text, nil)
+		return err
+	}
 
-		if err := sendStartResponse(m, caption); err != nil {
+	database.AddServedUser(m.ChatID())
+	sender, _ := m.GetUser(c)
+
+	if m.Args() == "pm_help" {
+		if err := helpHandler(c, m); err != nil {
+			return err
+		}
+	} else {
+		chatID := m.ChatID()
+		if _, err := c.SendRichMessage(chatID, startRich(c, chatID, sender, m.SenderID()), &td.SendMessageOpts{
+			ReplyMarkup: core.GetStartMarkup(chatID),
+		}); err != nil {
 			return err
 		}
 	}
 
-	if config.LoggerID != 0 && isLoggerEnabled() && m.SenderID() != config.OwnerID {
-		uName := "N/A"
-		if m.Sender.Username != "" {
-			uName = "@" + m.Sender.Username
-		}
-
-		msg := F(config.LoggerID, "logger_bot_started", locales.Arg{
-			"mention":       utils.MentionHTML(m.Sender),
-			"user_id":       m.SenderID(),
-			"user_username": uName,
-		})
-
-		var err error
-		_, err = m.Client.SendMessage(config.LoggerID, msg)
-		if err != nil {
-			gologging.ErrorF("[start] logger send failed: %v", err)
-		}
-	}
-
-	return tg.ErrEndGroup
-}
-
-func sendStartResponse(m *tg.NewMessage, caption string) error {
-	sendOpt := &tg.SendOptions{ReplyMarkup: core.GetStartMarkup(m.ChannelID())}
-	if effectID := config.GetRandomEffectID(); effectID != 0 {
-		sendOpt.Effect = effectID
-	}
-	if startImage := config.GetRandomStartImage(); startImage != "" {
-		sendOpt.Media = startImage
-	}
-
-	_, err := m.Respond(caption, sendOpt)
-	if err != nil && sendOpt.Effect != 0 && tg.MatchError(err, "EFFECT_ID_INVALID") {
-		gologging.WarnF("[start] invalid effect id %d, retrying without effect", sendOpt.Effect)
-		sendOpt.Effect = 0
-		_, err = m.Respond(caption, sendOpt)
-	}
-	if err == nil {
-		return nil
-	}
-	if sendOpt.Media == "" {
-		gologging.ErrorF("[start] text send failed: %v", err)
-		return err
-	}
-
-	gologging.ErrorF("[start] image send failed: %v", err)
-	sendOpt.Media = ""
-	_, textErr := m.Respond(caption, sendOpt)
-	if textErr != nil {
-		gologging.ErrorF("[start] text send failed: %v", textErr)
-		return textErr
-	}
+	logStart(c, m, sender)
 	return nil
 }
 
-func startCB(cb *tg.CallbackQuery) error {
-	cb.Answer("")
-
-	caption := F(cb.ChannelID(), "start_private", locales.Arg{
-		"user": utils.MentionHTML(cb.Sender),
-		"bot":  utils.MentionHTML(cb.Client.Me()),
+// startRich builds the rich-formatted private start message, embedding the
+// configured start image (if any) as a media block.
+func startRich(c *td.Client, chatID int64, sender *td.User, fallbackID int64) *td.InputRichMessage {
+	text := F(chatID, "start_private", locales.Arg{
+		"user": mention(sender, fallbackID),
+		"bot":  c.Me().Mention(td.ParseModeHTML),
 	})
 
-	sendOpt := &tg.SendOptions{
-		ReplyMarkup: core.GetStartMarkup(cb.ChannelID()),
+	if image := config.StartImage(); image != "" {
+		text = `<figure><img src="` + html.EscapeString(image) + `"/></figure>` + "\n" + text
 	}
 
-	cb.Edit(caption, sendOpt)
-	return tg.ErrEndGroup
+	return &td.InputRichMessage{
+		Source: &td.RichMessageSourceHtml{Text: text},
+	}
+}
+
+func startCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
+	cb.Answer(c, "", nil)
+
+	msg, err := cb.GetMessage(c)
+	if err != nil {
+		return err
+	}
+
+	chatID := cb.ChatId
+	user, _ := c.GetUser(cb.SenderUserId)
+
+	rich := &td.InputMessageRichMessage{Message: startRich(c, chatID, user, cb.SenderUserId)}
+
+	_, err = c.EditContent(chatID, msg.Id, rich, &td.EditMessageMediaOpts{ReplyMarkup: core.GetStartMarkup(chatID)})
+	return err
+}
+
+func isPhotoMessage(m *td.Message) bool {
+	_, ok := m.Content.(*td.MessagePhoto)
+	return ok
+}
+
+// logStart reports a bot start to the configured logger chat, if enabled.
+func logStart(c *td.Client, m *td.Message, sender *td.User) {
+	if config.LoggerID == 0 || !isLoggerEnabled() || m.SenderID() == config.OwnerID {
+		return
+	}
+
+	uName := "N/A"
+	if sender != nil && sender.Usernames != nil && len(sender.Usernames.ActiveUsernames) > 0 {
+		uName = "@" + sender.Usernames.ActiveUsernames[0]
+	}
+
+	msg := F(config.LoggerID, "logger_bot_started", locales.Arg{
+		"mention":       mention(sender, m.SenderID()),
+		"user_id":       m.SenderID(),
+		"user_username": uName,
+	})
+
+	if _, err := c.SendMessage(config.LoggerID, msg, nil); err != nil {
+		c.Logger.Error("Logger send failed", "error", err)
+	}
 }

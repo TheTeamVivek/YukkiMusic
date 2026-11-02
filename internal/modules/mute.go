@@ -18,14 +18,13 @@
 package modules
 
 import (
-	"strconv"
-	"strings"
-	"time"
+	"fmt"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/utils"
 )
 
 func init() {
@@ -33,101 +32,80 @@ func init() {
 
 <u>Usage:</u>
 <b>/mute</b> — Mute indefinitely
-<b>/mute [seconds]</b> — Mute with auto-unmute timer
 
 <b>⚙️ Features:</b>
 • Audio continues playing (progress tracked)
-• Auto-unmute timer support (5-3600 seconds)
 
 <b>💡 Examples:</b>
 <code>/mute</code> — Mute until manual unmute
-<code>/mute 60</code> — Mute for 60 seconds
 
 <b>⚠️ Notes:</b>
 • Track continues playing in background
 • Use <code>/unmute</code> to restore audio`
 }
 
-func muteHandler(m *tg.NewMessage) error {
-	return handleMute(m, false)
+func muteHandler(c *td.Client, m *td.Message) error {
+	return handleMute(c, m, false)
 }
 
-func cmuteHandler(m *tg.NewMessage) error {
-	return handleMute(m, true)
+func cmuteHandler(c *td.Client, m *td.Message) error {
+	return handleMute(c, m, true)
 }
 
-func handleMute(m *tg.NewMessage, cplay bool) error {
-	chatID := m.ChannelID()
-	r, err := getEffectiveRoom(m, cplay)
+func handleMute(c *td.Client, m *td.Message, cplay bool) error {
+	if m.Args() != "" || m.ReplyToMessageID() != 0 || !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
+
+	chatID := m.ChatID()
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
-	if !r.IsActiveChat() {
-		m.Reply(F(chatID, "room_no_active"))
-		return tg.ErrEndGroup
+	if !r.Active() {
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return err
 	}
 
-	if r.IsMuted() {
-		remaining := r.RemainingUnmuteDuration()
-		if remaining > 0 {
-			m.Reply(F(chatID, "mute_already_muted_with_time", locales.Arg{
-				"duration": utils.FormatDuration(int(remaining.Seconds())),
-			}))
-		} else {
-			m.Reply(F(chatID, "mute_already_muted"))
-		}
-		return tg.ErrEndGroup
+	if r.Muted() {
+		_, err := m.ReplyRichMessageHTML(c, F(chatID, "mute_already_muted"), &td.SendRichTextOpts{
+			ReplyMarkup: core.GetMuteToggle(chatID, r),
+		})
+		return err
 	}
 
-	mention := utils.MentionHTML(m.Sender)
-	args := strings.Fields(m.Text())
-	var autoUnmuteDuration time.Duration
+	sender, _ := m.GetUser(c)
+	mention := mention(sender, m.SenderID())
 
-	if len(args) >= 2 {
-		rawDuration := strings.ToLower(strings.TrimSpace(args[1]))
-		rawDuration = strings.TrimSuffix(rawDuration, "s")
-
-		if seconds, err := strconv.Atoi(rawDuration); err == nil {
-			if seconds < 5 || seconds > 3600 {
-				m.Reply(F(chatID, "mute_invalid_duration"))
-				return tg.ErrEndGroup
-			}
-			autoUnmuteDuration = time.Duration(seconds) * time.Second
-		} else {
-			m.Reply(F(chatID, "mute_invalid_format", locales.Arg{
-				"cmd": getCommand(m),
-			}))
-			return tg.ErrEndGroup
-		}
-	}
-
-	var muteErr error
-	if autoUnmuteDuration > 0 {
-		_, muteErr = r.Mute(autoUnmuteDuration)
-	} else {
-		_, muteErr = r.Mute()
-	}
+	muteErr := r.Mute()
 
 	if muteErr != nil {
-		m.Reply(F(chatID, "mute_failed", locales.Arg{
-			"error": muteErr.Error(),
-		}))
-		return tg.ErrEndGroup
+		_, err := m.ReplyRichMessageHTML(c, F(chatID, "mute_failed", locales.Arg{
+			"error": utils.EscapeHTML(muteErr.Error()),
+		}), nil)
+		return err
+	}
+	speedLine := ""
+	if sp := r.Speed(); sp != 1.0 {
+		speedLine = `<tr><td colspan="2">` + F(chatID, "speed_line", locales.Arg{
+			"speed": fmt.Sprintf("%.2f", sp),
+		}) + `</td></tr>`
 	}
 
-	msgArgs := locales.Arg{
-		"title": utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25)),
-		"user":  mention,
+	_, rerr := m.ReplyRichMessageHTML(c, F(chatID, "mute_success", locales.Arg{
+		"title":      utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25)),
+		"url":        utils.EscapeHTML(r.Track().URL),
+		"user":       mention,
+		"speed_line": speedLine,
+	}), &td.SendRichTextOpts{
+		ReplyMarkup: core.GetMuteToggle(chatID, r),
+	})
+	if rerr != nil {
+		return rerr
 	}
 
-	if autoUnmuteDuration > 0 {
-		msgArgs["duration"] = int(autoUnmuteDuration.Seconds())
-		m.Reply(F(chatID, "mute_success_with_time", msgArgs))
-	} else {
-		m.Reply(F(chatID, "mute_success", msgArgs))
-	}
-
-	return tg.ErrEndGroup
+	updatePlaybackMessageFor(c, r.StatusMsg(), m.SenderID(), r, "muted")
+	return nil
 }

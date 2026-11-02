@@ -1,4 +1,4 @@
-FROM golang:1.26.5-bookworm AS builder
+FROM golang:1.27-bookworm AS builder
 
 WORKDIR /build
 
@@ -13,10 +13,13 @@ RUN apt-get update && \
 COPY go.mod go.sum ./
 RUN go mod tidy
 
+RUN go run github.com/AshokShau/gotdbot/scripts/tools@v0.10.1
+
 COPY install.sh ./
 COPY . .
 
-RUN chmod +x install.sh && \
+RUN mkdir -p /build/config/cookies && \
+    chmod +x install.sh && \
     ./install.sh -n --quiet --skip-summary && \
     CGO_ENABLED=1 go build -v -trimpath -ldflags="-w -s" -o app ./cmd/app/
 
@@ -50,8 +53,9 @@ RUN useradd -r -u 10001 appuser && \
 WORKDIR /app
 
 COPY --from=builder /build/app /app/app
-RUN chown appuser:appuser /app/app
+COPY --from=builder /build/config/cookies /app/config/cookies
+COPY --from=builder /build/libtdjson.so* /app/
+RUN chown -R appuser:appuser /app
 
 USER appuser
-
 ENTRYPOINT ["/app/app"]

@@ -3,23 +3,23 @@ package ubot
 import (
 	"time"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/xAmarnath/gogram/telegram"
 
-	"main/ntgcalls"
+	"yukkimusic/ntgcalls"
 )
 
 type (
 	CallParticipantsCache struct {
-		CallParticipants  map[int64]*tg.GroupCallParticipant
-		LastMtprotoUpdate time.Time
+		Participants map[int64]*tg.GroupCallParticipant
+		lastUpdate   time.Time
 	}
 
 	CallSources struct {
-		CameraSources, ScreenSources map[int64]string
+		Camera, Screen map[int64]string
 	}
 
 	P2PConfig struct {
-		DhConfig       *tg.MessagesDhConfigObj
+		DHConfig       *tg.MessagesDhConfigObj
 		PhoneCall      *tg.PhoneCallObj
 		IsOutgoing     bool
 		KeyFingerprint int64

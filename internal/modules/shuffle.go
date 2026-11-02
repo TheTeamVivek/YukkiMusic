@@ -20,10 +20,9 @@ package modules
 import (
 	"strings"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/internal/locales"
 )
 
 func init() {
@@ -50,30 +49,36 @@ func init() {
 Shuffle only affects queue order, not currently playing track.`
 }
 
-func shuffleHandler(m *telegram.NewMessage) error {
-	return handleShuffle(m, false)
+func shuffleHandler(c *td.Client, m *td.Message) error {
+	return handleShuffle(c, m, false)
 }
 
-func cshuffleHandler(m *telegram.NewMessage) error {
-	return handleShuffle(m, true)
+func cshuffleHandler(c *td.Client, m *td.Message) error {
+	return handleShuffle(c, m, true)
 }
 
-func handleShuffle(m *telegram.NewMessage, cplay bool) error {
+func handleShuffle(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroup(c, m) {
+		return nil
+	}
+
+	if !filterAuthUsers(c, m) {
+		return nil
+	}
+
 	arg := strings.ToLower(m.Args())
 
-	r, err := getEffectiveRoom(m, cplay)
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return telegram.ErrEndGroup
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 
-	if !r.IsActiveChat() {
-		m.Reply(F(chatID, "room_no_active"))
-		return telegram.ErrEndGroup
+	if !r.Active() {
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return err
 	}
-
-	r.Parse()
 
 	if arg == "" {
 		state := F(chatID, "disabled")
@@ -82,18 +87,18 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 			state = F(chatID, "enabled")
 			cmd = getCommand(m) + " off"
 		}
-
-		m.Reply(F(chatID, "shuffle_current_state", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "shuffle_current_state", locales.Arg{
 			"state": state,
 			"cmd":   cmd,
-		}))
-		return telegram.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	var newState bool
-	if arg == "on" || arg == "enable" || arg == "true" || arg == "1" {
+	switch arg {
+	case "on", "enable", "true", "1":
 		newState = true
-	} else if arg == "off" || arg == "disable" || arg == "false" || arg == "0" {
+	case "off", "disable", "false", "0":
 		newState = false
 	}
 
@@ -104,10 +109,11 @@ func handleShuffle(m *telegram.NewMessage, cplay bool) error {
 		state = F(chatID, "enabled")
 	}
 
-	m.Reply(F(chatID, "shuffle_updated", locales.Arg{
+	sender, _ := m.GetUser(c)
+	mention := mention(sender, m.SenderID())
+	_, rerr := m.ReplyText(c, F(chatID, "shuffle_updated", locales.Arg{
 		"state": state,
-		"user":  utils.MentionHTML(m.Sender),
-	}))
-
-	return telegram.ErrEndGroup
+		"user":  mention,
+	}), nil)
+	return rerr
 }

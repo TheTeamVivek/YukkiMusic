@@ -19,14 +19,16 @@ package database
 
 import (
 	"context"
+	"sort"
 	"time"
 
-	"github.com/Laky-64/gologging"
+	"yukkimusic/config"
+
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
-	"main/internal/utils"
+	"yukkimusic/internal/utils"
 )
 
 var (
@@ -35,22 +37,22 @@ var (
 	settingsColl     *mongo.Collection
 	chatSettingsColl *mongo.Collection
 
-	logger            = gologging.GetLogger("Database")
+	logr              = utils.Log.With("logger", "database")
 	dbCache           = utils.NewCache[string, any](60 * time.Minute)
 	chatSettingsCache = utils.NewCache[int64, *ChatSettings](60 * time.Minute)
 )
 
 func Init(mongoURL string) (func(), error) {
 	var err error
-	logger.Debug("Initializing MongoDB...")
+	logr.Debug("Initializing MongoDB...")
 	client, err = mongo.Connect(options.Client().ApplyURI(mongoURL))
 	if err != nil {
 		return nil, err
 	}
 
-	logger.Debug("Successfully connected to MongoDB.")
+	logr.Debug("Successfully connected to MongoDB.")
 
-	database = client.Database("YukkiMusic")
+	database = client.Database(config.DBName)
 	settingsColl = database.Collection("bot_settings")
 	chatSettingsColl = database.Collection("chat_settings")
 
@@ -60,17 +62,89 @@ func Init(mongoURL string) (func(), error) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		if err := client.Disconnect(ctx); err != nil {
-			logger.Error("Error while disconnecting MongoDB: %v", err)
+			logr.Errorf("Error while disconnecting MongoDB: %v", err)
 		} else {
-			logger.Info("MongoDB disconnected successfully")
+			logr.Info("MongoDB disconnected successfully")
 		}
 	}, nil
 }
 
-func GetMongoDBStats() (bson.M, error) {
+// MongoDatabaseStats holds the on-disk size of a single database.
+type MongoDatabaseStats struct {
+	Name       string
+	SizeOnDisk int64
+}
+
+// MongoCollectionStats holds usage of a single collection.
+type MongoCollectionStats struct {
+	Name        string
+	Objects     int64
+	StorageSize int64
+}
+
+// MongoStats is a display-ready snapshot of MongoDB usage.
+type MongoStats struct {
+	Databases       []MongoDatabaseStats
+	TotalDatabases  int
+	CollectionStats []MongoCollectionStats
+}
+
+// GetMongoDBStats collects MongoDB usage. Each part is best-effort: a command
+// that fails (e.g. missing privileges) simply leaves that part empty.
+func GetMongoDBStats() *MongoStats {
 	ctx, cancel := ctx()
 	defer cancel()
-	var result bson.M
-	err := database.RunCommand(ctx, bson.D{{Key: "dbStats", Value: 1}}).Decode(&result)
-	return result, err
+
+	s := &MongoStats{}
+
+	var list struct {
+		Databases []struct {
+			Name       string `bson:"name"`
+			SizeOnDisk int64  `bson:"sizeOnDisk"`
+		} `bson:"databases"`
+	}
+	if err := client.Database("admin").RunCommand(ctx, bson.D{{Key: "listDatabases", Value: 1}}).Decode(&list); err == nil {
+		for _, db := range list.Databases {
+			if db.SizeOnDisk > 0 && !isInternalDatabase(db.Name) {
+				s.Databases = append(s.Databases, MongoDatabaseStats{Name: db.Name, SizeOnDisk: db.SizeOnDisk})
+			}
+		}
+		sort.Slice(s.Databases, func(i, j int) bool {
+			return s.Databases[i].SizeOnDisk > s.Databases[j].SizeOnDisk
+		})
+		s.TotalDatabases = len(s.Databases)
+	}
+
+	if names, err := database.ListCollectionNames(ctx, bson.D{}); err == nil {
+		for _, name := range names {
+			var coll struct {
+				Count       int64 `bson:"count"`
+				StorageSize int64 `bson:"storageSize"`
+			}
+			if err := database.RunCommand(ctx, bson.D{{Key: "collStats", Value: name}}).Decode(&coll); err != nil {
+				continue
+			}
+			s.CollectionStats = append(s.CollectionStats, MongoCollectionStats{
+				Name:        name,
+				Objects:     coll.Count,
+				StorageSize: coll.StorageSize,
+			})
+		}
+		sort.Slice(s.CollectionStats, func(i, j int) bool {
+			return s.CollectionStats[i].StorageSize > s.CollectionStats[j].StorageSize
+		})
+	}
+
+	return s
+}
+
+// isInternalDatabase reports whether name is a MongoDB-managed database that
+// should not be counted or displayed.
+func isInternalDatabase(name string) bool {
+	switch name {
+	case "admin", "local", "config":
+		return true
+	default:
+		return false
+	}
 }

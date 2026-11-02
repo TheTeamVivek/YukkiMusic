@@ -20,10 +20,11 @@ package modules
 import (
 	"fmt"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/utils"
 )
 
 func init() {
@@ -31,49 +32,95 @@ func init() {
 
 <u>Usage:</u>
 <b>/position</b> — Show position
+<b>/pos</b> — Alias for /position
 
 <b>📊 Information Displayed:</b>
-• Current track title
-• Current position (MM:SS)
-• Total duration (MM:SS)
-• Playback speed (if not 1.0x)
-
-<b>💡 Use Case:</b>
-Quick position check without full queue display.`
+• Current track title & link
+• Current playback position & duration
+• Playback speed
+• Requester`
 }
 
-func positionHandler(m *tg.NewMessage) error {
-	return handlePosition(m, false)
+func positionHandler(c *td.Client, m *td.Message) error {
+	return handlePosition(c, m, false)
 }
 
-func cpositionHandler(m *tg.NewMessage) error {
-	return handlePosition(m, true)
+func cpositionHandler(c *td.Client, m *td.Message) error {
+	return handlePosition(c, m, true)
 }
 
-func handlePosition(m *tg.NewMessage, cplay bool) error {
-	chatID := m.ChannelID()
+func handlePosition(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroup(c, m) {
+		return nil
+	}
 
-	r, err := getEffectiveRoom(m, cplay)
+	if cplay && !filterAuthUsers(c, m) {
+		return nil
+	}
+
+	chatID := m.ChatID()
+
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
-	if !r.IsActiveChat() || r.Track().ID == "" {
-		m.Reply(F(chatID, "room_no_active"))
-		return tg.ErrEndGroup
+	if !r.Active() || r.Track() == nil || r.Track().ID == "" {
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return err
 	}
 
-	r.Parse()
+	track := r.Track()
+	dur := track.Duration
+	pos := r.Position()
+	if pos < 0 {
+		pos = 0
+	}
 
-	title := utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25))
+	posStr, durStr, remStr := "N/A", "N/A", "N/A"
+	if dur > 0 {
+		if pos > dur {
+			pos = dur
+		}
+		posStr = utils.FormatTime(pos)
+		durStr = utils.FormatTime(dur)
+		remSec := max(dur-pos, 0)
+		remStr = "-" + utils.FormatTime(remSec)
+	}
 
-	m.Reply(F(chatID, "position_now", locales.Arg{
-		"title":    title,
-		"position": utils.FormatDuration(r.Position()),
-		"duration": utils.FormatDuration(r.Track().Duration),
-		"speed":    fmt.Sprintf("%.2f", r.Speed()),
-	}))
+	safeTitle := utils.EscapeHTML(utils.ShortTitle(track.Title, 40))
+	var trackLink string
+	if track.URL != "" {
+		trackLink = `<b><a href="` + utils.EscapeHTML(track.URL) + `">` + safeTitle + `</a></b>`
+	} else {
+		trackLink = `<b>` + safeTitle + `</b>`
+	}
 
-	return tg.ErrEndGroup
+	requester := track.Requester
+	if requester == "" {
+		requester = "Unknown"
+	}
+
+	speed := r.Speed()
+	var speedStr string
+	if speed == float64(int(speed)) {
+		speedStr = fmt.Sprintf("%.1f", speed)
+	} else {
+		speedStr = fmt.Sprintf("%.2f", speed)
+	}
+
+	msg := F(chatID, "position_now", locales.Arg{
+		"track":     trackLink,
+		"requester": requester,
+		"speed":     speedStr,
+		"position":  posStr,
+		"duration":  durStr,
+		"remaining": remStr,
+	})
+
+	_, rerr := m.ReplyRichMessageHTML(c, msg, &td.SendRichTextOpts{
+		ReplyMarkup: core.SuppMarkup(chatID),
+	})
+	return rerr
 }

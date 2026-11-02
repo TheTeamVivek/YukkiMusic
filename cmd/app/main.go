@@ -33,68 +33,65 @@ import "C"
 import (
 	"fmt"
 	"net/http"
-	"net/http/pprof"
+	_ "net/http/pprof"
 	"os"
-	"time"
 
-	"github.com/Laky-64/gologging"
-
-	"main/internal/config"
-	"main/internal/core"
-	"main/internal/database"
-	"main/internal/locales"
-	"main/internal/modules"
-	"main/internal/platforms"
+	"yukkimusic/config"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/modules"
+	"yukkimusic/internal/utils"
 )
 
 func main() {
-	cfgCleanup, err := config.Load()
-	if err != nil {
-		gologging.FatalF(err.Error())
-		return
+	if err := run(); err != nil {
+		utils.Log.Errorf("fatal: %v", err)
+		os.Exit(1)
 	}
-	defer cfgCleanup()
-	initLogger()
+}
 
-	shutdownPlatforms, err := platforms.Init()
-	if err != nil {
-		gologging.Fatal("Failed to initialize platforms: " + err.Error())
+func run() error {
+	defer utils.CloseLog()
+
+	if err := config.Load(); err != nil {
+		return fmt.Errorf("failed to load config: %w", err)
 	}
-	defer shutdownPlatforms()
 
-	checkFFmpegAndFFprobe()
+	if err := checkDependencies(); err != nil {
+		return fmt.Errorf("dependency check failed: %w", err)
+	}
 
 	if err := refreshDirs(); err != nil {
-		gologging.Fatal("Failed to refresh directories: " + err.Error())
+		return fmt.Errorf("failed to refresh directories: %w", err)
 	}
 
-	gologging.Debug("Initializing MongoDB...")
+	utils.Log.Debug("Initializing MongoDB...")
 
 	closeDB, err := database.Init(config.MongoURI)
 	if err != nil {
-		gologging.Fatal("Failed to initialize database: " + err.Error())
+		return fmt.Errorf("failed to initialize database: %w", err)
 	}
 	defer closeDB()
 
-	gologging.Info("Database connected successfully")
+	utils.Log.Info("Database connected successfully")
 
 	if err := locales.Load(); err != nil {
-		gologging.Fatal("Failed to load locales: " + err.Error())
+		return fmt.Errorf("failed to load locales: %w", err)
 	}
 
-	gologging.Debug("Initializing clients...")
+	utils.Log.Debug("Initializing clients...")
 
 	shutdownCore, err := core.Init()
 	if err != nil {
-		gologging.Fatal("Failed to initialize core: " + err.Error())
+		return fmt.Errorf("failed to initialize core: %w", err)
 	}
 	defer shutdownCore()
 
-	core.GetAssistantIndexFunc = database.AssistantIndex
 	core.F = modules.F
 
-	if err := database.RebalanceAssistantIndexes(core.Assistants.Count()); err != nil {
-		gologging.Fatal("Failed to rebalance Assistants: " + err.Error())
+	if err := database.InitAssistantIndexes(core.Assistants.Count()); err != nil {
+		return fmt.Errorf("failed to init assistants: %w", err)
 	}
 
 	modules.Init(core.Bot, core.Assistants)
@@ -102,58 +99,19 @@ func main() {
 	startHTTPServer()
 
 	core.Bot.Idle()
+	return nil
 }
 
 func startHTTPServer() {
 	go func() {
 		addr := "0.0.0.0:" + config.Port
-		mux := http.NewServeMux()
 
-		mux.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte("ok"))
-		})
+		utils.Log.Infof("HTTP server listening on %s", addr)
 
-		if config.EnablePprof {
-			gologging.Warn("pprof endpoints enabled - do not expose publicly")
-			mux.HandleFunc("/debug/pprof/", pprof.Index)
-			mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
-			mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
-			mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
-			mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
-			mux.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
-			mux.Handle("/debug/pprof/heap", pprof.Handler("heap"))
-			mux.Handle("/debug/pprof/threadcreate", pprof.Handler("threadcreate"))
-			mux.Handle("/debug/pprof/block", pprof.Handler("block"))
-			mux.Handle("/debug/pprof/mutex", pprof.Handler("mutex"))
-		}
-
-		server := &http.Server{
-			Addr:              addr,
-			Handler:           mux,
-			ReadHeaderTimeout: 5 * time.Second,
-		}
-
-		gologging.Info(fmt.Sprintf("HTTP server listening on %s", addr))
-		if err := server.ListenAndServe(); err != nil {
-			gologging.Error("HTTP server error: " + err.Error())
+		if err := http.ListenAndServe(addr, nil); err != nil {
+			utils.Log.Errorf("HTTP server failed: %v", err)
 		}
 	}()
-}
-
-func initLogger() {
-	gologging.SetLevel(gologging.DebugLevel)
-	gologging.SetOutput(config.LogWriter)
-
-	l := gologging.GetLogger("ntgcalls")
-	l.SetLevel(gologging.ErrorLevel)
-	l.SetOutput(config.LogWriter)
-
-	l = gologging.GetLogger("webrtc")
-	l.SetLevel(gologging.ErrorLevel)
-	l.SetOutput(config.LogWriter)
-
-	gologging.GetLogger("Database").SetOutput(config.LogWriter)
 }
 
 func refreshDirs() error {

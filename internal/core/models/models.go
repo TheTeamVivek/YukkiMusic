@@ -15,15 +15,17 @@
  * Repository: https://github.com/TheTeamVivek/YukkiMusic
  */
 
-package state
+package models
 
 import (
 	"context"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 )
 
 type (
+	PlatformName string
+
 	Track struct {
 		ID        string       // track unique id
 		Title     string       // title
@@ -34,15 +36,28 @@ type (
 		Video     bool         // whether this track will be played as video
 		Source    PlatformName // unique PlatformName
 	}
-	PlatformName string
-	// Platform defines a common contract for all supported platforms
-	// (e.g. YouTube, SoundCloud, Spotify, etc.).
-	//
-	// Each platform is responsible for determining whether it can
-	// search, resolve, or download tracks from a given query or source.
+
+	// Platform defines the common contract for all supported platforms
+	// (e.g. YouTube, Spotify, Telegram). Each platform is responsible for
+	// deciding whether it can resolve and download tracks from a query.
 	Platform interface {
 		// Name returns the unique identifier of the platform.
 		Name() PlatformName
+
+		// Priority returns the priority of this platform when multiple
+		// platforms could handle the same query. Higher values take precedence.
+		Priority() int
+
+		// CanGet reports whether this platform can resolve
+		// tracks from the given query or search term.
+		CanGet(query string) bool
+
+		// Get fetches track metadata for the given query.
+		//
+		// video indicates whether video playback is requested.
+		// Platforms that do not support video should still return tracks,
+		// but must leave Track.Video false.
+		Get(query string, video bool) ([]*Track, error)
 
 		// CanDownload reports whether this platform can download tracks
 		// originating from the given source platform.
@@ -52,23 +67,7 @@ type (
 		//
 		// ctx is used for cancellation and timeouts.
 		// track is the track to download.
-		// statusMsg used to send progress updates (if not nil).
-		// if your platform support video playback so return local path of video when track.Video is true
-		Download(
-			ctx context.Context,
-			track *Track,
-			statusMsg *telegram.NewMessage,
-		) (string, error)
-
-		// CanGetTracks reports whether this platform can resolve
-		// tracks from the given query search term.
-		CanGetTracks(query string) bool
-
-		// GetTracks fetches track metadata for the given query.
-		//
-		// video indicates whether video playback is requested.
-		// Platforms that do not support video should still return tracks,
-		// but must set Track.Video = false.
-		GetTracks(query string, video bool) ([]*Track, error)
+		// msg is used to send progress updates (if not nil).
+		Download(ctx context.Context, track *Track, msg *td.Message) (string, error)
 	}
 )

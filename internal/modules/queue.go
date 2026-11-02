@@ -18,458 +18,343 @@
 package modules
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
-	state "main/internal/core/models"
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/internal/core"
+	models "yukkimusic/internal/core/models"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/utils"
 )
 
-func init() {
-	helpTexts["/queue"] = `<i>Display the current playback queue.</i>
-
-<u>Usage:</u>
-<b>/queue</b> — Show queue
-
-<b>📋 Display Format:</b>
-• Now Playing - Current track with position
-• Up Next - Next 10 tracks in queue
-• Track info: Title, requester, duration
-
-<b>⚙️ Features:</b>
-• Real-time queue status
-• Requester attribution
-• Duration display
-• Queue length indicator
-
-<b>💡 Related Commands:</b>
-• <code>/position</code> - Current track position only
-• <code>/remove</code> - Remove specific track
-• <code>/clear</code> - Clear all tracks
-• <code>/move</code> - Reorder tracks`
-
-	helpTexts["/restore"] = `<i>Restore a previously cleared music queue.</i>
-
-<u>Usage:</u>
-<b>/restore</b> — Recover tracks
-
-<b>⚙️ Behavior:</b>
-• Recovers tracks cleared by the last <code>/clear</code> command
-• Only works if no new songs have been added since the clear
-• Restored tracks are appended to the current queue
-
-<b>🔒 Restrictions:</b>
-• Only <b>chat admins</b> or <b>authorized users</b> can use this`
-
-	helpTexts["/remove"] = `<i>Remove a specific track from the queue.</i>
-
-<u>Usage:</u>
-<b>/remove [index]</b> — Remove track at position
-
-<b>⚙️ Behavior:</b>
-• Index starts from 1 (first track in queue)
-• Cannot remove currently playing track
-• Queue positions update automatically
-
-<b>🔒 Restrictions:</b>
-• Only <b>chat admins</b> or <b>authorized users</b> can use this
-
-<b>💡 Examples:</b>
-<code>/remove 1</code> — Remove first track in queue
-<code>/remove 5</code> — Remove 5th track
-
-<b>⚠️ Notes:</b>
-• Use <code>/queue</code> to see track indices
-• Invalid index shows error with queue length
-• Use <code>/clear</code> to remove all tracks`
-
-	helpTexts["/clear"] = `<i>Clear all tracks from the queue.</i>
-
-<u>Usage:</u>
-<b>/clear</b> — Remove all queued tracks
-
-<b>⚙️ Behavior:</b>
-• Removes all tracks from queue
-• Current playing track continues
-• Queue becomes empty after current track ends
-
-<b>🔒 Restrictions:</b>
-• Only <b>chat admins</b> or <b>authorized users</b> can use this
-
-<b>💡 Tips:</b>
-If you cleared the queue by mistake, use <code>/restore</code> or <code>/crestore</code> immediately to recover it (before adding any new songs).`
-
-	helpTexts["/move"] = `<i>Reorder tracks in the queue.</i>
-
-<u>Usage:</u>
-<b>/move [from] [to]</b> — Move track from position to position
-
-<b>⚙️ Behavior:</b>
-• Moves track at index 'from' to index 'to'
-• Other tracks shift positions accordingly
-• Indices start from 1
-
-<b>🔒 Restrictions:</b>
-• Only <b>chat admins</b> or <b>authorized users</b> can use this
-
-<b>💡 Examples:</b>
-<code>/move 3 1</code> — Move 3rd track to 1st position
-<code>/move 1 5</code> — Move 1st track to 5th position
-
-<b>⚠️ Notes:</b>
-• Both positions must be valid queue indices
-• Use <code>/queue</code> to see current order
-• Cannot move currently playing track`
+func queueHandler(c *td.Client, m *td.Message) error {
+	return handleQueue(c, m, false)
 }
 
-func queueHandler(m *tg.NewMessage) error {
-	return handleQueue(m, false)
+func cqueueHandler(c *td.Client, m *td.Message) error {
+	return handleQueue(c, m, true)
 }
 
-func cqueueHandler(m *tg.NewMessage) error {
-	return handleQueue(m, true)
+func removeHandler(c *td.Client, m *td.Message) error {
+	return handleRemove(c, m, false)
 }
 
-func removeHandler(m *tg.NewMessage) error {
-	return handleRemove(m, false)
+func cremoveHandler(c *td.Client, m *td.Message) error {
+	return handleRemove(c, m, true)
 }
 
-func cremoveHandler(m *tg.NewMessage) error {
-	return handleRemove(m, true)
+func moveHandler(c *td.Client, m *td.Message) error {
+	return handleMove(c, m, false)
 }
 
-func moveHandler(m *tg.NewMessage) error {
-	return handleMove(m, false)
+func cmoveHandler(c *td.Client, m *td.Message) error {
+	return handleMove(c, m, true)
 }
 
-func cmoveHandler(m *tg.NewMessage) error {
-	return handleMove(m, true)
+func clearHandler(c *td.Client, m *td.Message) error {
+	return handleClear(c, m, false)
 }
 
-func clearHandler(m *tg.NewMessage) error {
-	return handleClear(m, false)
+func cclearHandler(c *td.Client, m *td.Message) error {
+	return handleClear(c, m, true)
 }
 
-func cclearHandler(m *tg.NewMessage) error {
-	return handleClear(m, true)
-}
+func handleQueue(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroup(c, m) {
+		return nil
+	}
 
-func restoreHandler(m *tg.NewMessage) error {
-	return handleRestoreQueue(m, false)
-}
+	if cplay && !filterAuthUsers(c, m) {
+		return nil
+	}
 
-func crestoreHandler(m *tg.NewMessage) error {
-	return handleRestoreQueue(m, true)
-}
+	chatID := m.ChatID()
 
-func handleQueue(m *tg.NewMessage, cplay bool) error {
-	chatID := m.ChannelID()
-
-	r, err := getEffectiveRoom(m, cplay)
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
 	t := r.Track()
-	if !r.IsActiveChat() || t == nil {
-		m.Reply(F(chatID, "queue_no_active"))
-		return tg.ErrEndGroup
+	if !r.Active() || t == nil {
+		_, err := m.ReplyText(c, F(chatID, "queue_no_active"), nil)
+		return err
+	}
+
+	_, rerr := m.ReplyRichMessage(c, queueRich(r, queueFirstPage), nil)
+	return rerr
+}
+
+// trackDeleteToken returns a safe callback identifier for a track.
+// For short, safe IDs (like YouTube video IDs), it returns track.ID as-is.
+// For long IDs (e.g. Telegram files) or IDs with special characters, it returns "tok_<hash>".
+func trackDeleteToken(t *models.Track) string {
+	if t == nil {
+		return ""
+	}
+	id := t.ID
+	if id == "" {
+		id = t.URL
+	}
+	if len(id) > 0 && len(id) <= 20 && !strings.Contains(id, ":") {
+		return id
+	}
+	h := sha256.Sum256([]byte(id))
+	return "tok_" + hex.EncodeToString(h[:10])
+}
+
+// queueFirstPage is how many up-next tracks the first page shows before the
+// "show more" button reveals the whole remaining queue.
+const queueFirstPage = 15
+
+// queueRich builds the rich "current queue" card. It renders the first `shown`
+// up-next tracks, each with a danger delete button. When tracks remain hidden a
+// "more" callback button is appended to reveal the rest.
+func queueRich(r *core.Room, shown int) *td.InputRichMessage {
+	chatID := r.ControlChatID
+	t := r.Track()
+	queue := r.Queue()
+	q := len(queue)
+
+	if shown < 1 {
+		shown = queueFirstPage
+	}
+	if shown > q {
+		shown = q
 	}
 
 	var b strings.Builder
 
-	b.WriteString(F(chatID, "queue_header"))
-	b.WriteString("\n\n")
-
-	b.WriteString(F(chatID, "queue_now_playing"))
-	b.WriteString("\n")
-
+	fmt.Fprintf(&b, "<h3>%s</h3>\n", F(chatID, "queue_header"))
 	fmt.Fprintf(
 		&b,
-		"🎧 <a href=\"%s\">%s</a> — %s [%s]\n\n",
+		"<aside><b>%s</b><br><a href=\"%s\">%s</a><br>\u23f1\ufe0f %s  \u2022  \U0001F464 %s</aside>\n",
+		F(chatID, "queue_now_playing"),
 		t.URL,
-		utils.EscapeHTML(utils.ShortTitle(t.Title, 35)),
-		t.Requester,
+		utils.EscapeHTML(utils.ShortTitle(t.Title, 40)),
 		utils.FormatDuration(t.Duration),
+		t.Requester,
 	)
 
-	queue := r.Queue()
-	q := len(queue)
-	useQuote := q >= 3
-
 	if q > 0 {
-		b.WriteString(F(chatID, "queue_up_next"))
-		n := "\n"
-		if !useQuote {
-			n += "\n"
-		}
-		b.WriteString(n)
+		fmt.Fprintf(&b, "<p><b>%s</b></p>\n", F(chatID, "queue_up_next", locales.Arg{"count": q}))
+		b.WriteString("<table bordered striped compact>\n")
+		b.WriteString("<tr><th>#</th><th>\U0001F3B5 Track</th><th>\u23f1\ufe0f</th><th>\U0001F464</th><th>\U0001F5D1\ufe0f</th></tr>\n")
 
-		if useQuote {
-			b.WriteString("<blockquote>")
-		}
-
-		for i, track := range queue {
-			if i >= 10 {
-				break
+		for i := 0; i < shown; i++ {
+			track := queue[i]
+			delID := trackDeleteToken(track)
+			if delID == "" {
+				delID = strconv.Itoa(i + 1)
 			}
-
 			fmt.Fprintf(
 				&b,
-				"%d. 🎵 <a href=\"%s\">%s</a> — %s [%s]\n",
+				"<tr><td>%d</td><td><a href=\"%s\">%s</a></td><td>%s</td><td>%s</td>"+
+					"<td><tg-button type=\"callback_data\" style=\"danger\" data=\"qdel:%d:%s:%d\">\u2a2f</tg-button></td></tr>\n",
 				i+1,
 				track.URL,
-				utils.EscapeHTML(utils.ShortTitle(track.Title, 35)),
-				track.Requester,
+				utils.EscapeHTML(utils.ShortTitle(track.Title, 40)),
 				utils.FormatDuration(track.Duration),
+				track.Requester,
+				r.ChatID,
+				delID,
+				shown,
 			)
 		}
+		b.WriteString("</table>\n")
 
-		if useQuote {
-			b.WriteString("</blockquote>")
-		}
-
-		if q > 10 {
-			var full strings.Builder
-
-			full.WriteString(F(chatID, "queue_header"))
-			full.WriteString("\n\n")
-
-			full.WriteString(F(chatID, "queue_now_playing"))
-			full.WriteString("\n")
-
+		if more := q - shown; more > 0 {
 			fmt.Fprintf(
-				&full,
-				"🎧 %s — %s [%s]\n\n",
-				t.Title,
-				t.Requester,
-				utils.FormatDuration(t.Duration),
+				&b,
+				"<tg-button-row align=\"center\">"+
+					"<tg-button type=\"callback_data\" data=\"qmore:%d\">%s</tg-button>"+
+					"</tg-button-row>\n",
+				r.ChatID,
+				F(chatID, "queue_more_button", locales.Arg{"count": more}),
 			)
-
-			full.WriteString(F(chatID, "queue_up_next"))
-			full.WriteString("\n\n")
-
-			for i, track := range queue {
-				fmt.Fprintf(
-					&full,
-					"%d. %s — %s [%s]\n",
-					i+1,
-					track.Title,
-					track.Requester,
-					utils.FormatDuration(track.Duration),
-				)
-			}
-
-			link, err := utils.CreatePaste(full.String())
-			remaining := q - 10
-
-			if err == nil && link != "" {
-				more := fmt.Sprintf("<a href=\"%s\">%d</a>", link, remaining)
-
-				b.WriteString(F(chatID, "queue_more_line", locales.Arg{
-					"remaining": more,
-				}))
-			} else {
-				b.WriteString(F(chatID, "queue_more_line", locales.Arg{
-					"remaining": remaining,
-				}))
-			}
 		}
 	} else {
-		b.WriteString(F(chatID, "queue_empty_tail"))
+		fmt.Fprintf(&b, "<footer>%s</footer>\n", F(chatID, "queue_empty_tail"))
 	}
 
-	m.Reply(b.String())
-	return tg.ErrEndGroup
+	return &td.InputRichMessage{
+		Source: &td.RichMessageSourceHtml{Text: b.String()},
+	}
 }
 
-func handleRemove(m *tg.NewMessage, cplay bool) error {
-	chatID := m.ChannelID()
+func handleRemove(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroup(c, m) {
+		return nil
+	}
 
-	r, err := getEffectiveRoom(m, cplay)
+	if !filterAuthUsers(c, m) {
+		return nil
+	}
+
+	chatID := m.ChatID()
+
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 	t := r.Track()
-	if !r.IsActiveChat() || t == nil {
-		m.Reply(F(chatID, "queue_no_active"))
-		return tg.ErrEndGroup
+	if !r.Active() || t == nil {
+		_, err := m.ReplyText(c, F(chatID, "queue_no_active"), nil)
+		return err
 	}
 
-	if len(r.Queue()) == 0 {
-		m.Reply(F(chatID, "queue_empty"))
-		return tg.ErrEndGroup
+	if r.QueueLen() == 0 {
+		_, err := m.ReplyText(c, F(chatID, "queue_empty"), nil)
+		return err
 	}
 
 	args := strings.Fields(m.Text())
 	if len(args) < 2 {
-		m.Reply(F(chatID, "remove_usage", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "remove_usage", locales.Arg{
 			"cmd": getCommand(m),
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	index, err := strconv.Atoi(args[1])
 	if err != nil {
-		m.Reply(F(chatID, "remove_invalid_index"))
-		return tg.ErrEndGroup
+		_, err := m.ReplyText(c, F(chatID, "remove_invalid_index"), nil)
+		return err
 	}
 
 	if index <= 0 {
-		m.Reply(F(chatID, "remove_index_too_small"))
-		return tg.ErrEndGroup
+		_, err := m.ReplyText(c, F(chatID, "remove_index_too_small"), nil)
+		return err
 	}
 
-	total := len(r.Queue())
+	total := r.QueueLen()
 	if index > total {
-		m.Reply(F(chatID, "remove_index_too_big", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "remove_index_too_big", locales.Arg{
 			"total": total,
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return err
 	}
 
-	r.RemoveFromQueue(index - 1)
+	r.RemoveTrack(index - 1)
 
-	m.Reply(F(chatID, "remove_success", locales.Arg{
+	sender, _ := m.GetUser(c)
+	mention := mention(sender, m.SenderID())
+	_, rerr := m.ReplyText(c, F(chatID, "remove_success", locales.Arg{
 		"index": index,
-		"user":  utils.MentionHTML(m.Sender),
-	}))
-
-	return tg.ErrEndGroup
+		"user":  mention,
+	}), nil)
+	return rerr
 }
 
-func handleRestoreQueue(m *tg.NewMessage, cplay bool) error {
-	chatID := m.ChannelID()
-	if !filterAuthUsers(m) {
-		return tg.ErrEndGroup
+func handleClear(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroup(c, m) {
+		return nil
 	}
 
-	r, err := getEffectiveRoom(m, cplay)
+	if !filterAuthUsers(c, m) {
+		return nil
+	}
+
+	chatID := m.ChatID()
+
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
-	}
-
-	ok, v := r.GetData("last_queue")
-	if !ok || v == nil {
-		m.Reply(F(chatID, "queue_restore_no_data"))
-		return tg.ErrEndGroup
-	}
-
-	tracks, ok := v.([]*state.Track)
-	if !ok {
-		r.DeleteData("last_queue")
-		m.Reply(F(chatID, "queue_restore_no_data"))
-		return tg.ErrEndGroup
-	}
-
-	r.AddTracksToQueue(tracks)
-	r.DeleteData("last_queue")
-
-	m.Reply(F(chatID, "queue_restored", locales.Arg{
-		"count": len(tracks),
-	}))
-
-	return tg.ErrEndGroup
-}
-
-func handleClear(m *tg.NewMessage, cplay bool) error {
-	chatID := m.ChannelID()
-
-	r, err := getEffectiveRoom(m, cplay)
-	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 	t := r.Track()
-	if !r.IsActiveChat() || t == nil {
-		m.Reply(F(chatID, "clear_no_active"))
-		return tg.ErrEndGroup
+	if !r.Active() || t == nil {
+		_, err := m.ReplyText(c, F(chatID, "clear_no_active"), nil)
+		return err
 	}
 
-	if len(r.Queue()) == 0 {
-		m.Reply(F(chatID, "queue_empty"))
-		return tg.ErrEndGroup
+	if r.QueueLen() == 0 {
+		_, err := m.ReplyText(c, F(chatID, "queue_empty"), nil)
+		return err
 	}
 
-	r.SetData("last_queue", r.Queue())
-	r.RemoveFromQueue(-1)
+	r.ClearQueue()
 
-	restoreCmd := "restore"
-	if cplay {
-		restoreCmd = "crestore"
-	}
-
-	m.Reply(F(chatID, "clear_success", locales.Arg{
-		"user": utils.MentionHTML(m.Sender),
-		"cmd":  restoreCmd,
-	}))
-
-	return tg.ErrEndGroup
+	sender, _ := m.GetUser(c)
+	mention := mention(sender, m.SenderID())
+	_, rerr := m.ReplyText(c, F(chatID, "clear_success", locales.Arg{
+		"user": mention,
+	}), nil)
+	return rerr
 }
 
-func handleMove(m *tg.NewMessage, cplay bool) error {
-	chatID := m.ChannelID()
+func handleMove(c *td.Client, m *td.Message, cplay bool) error {
+	if !isSuperGroup(c, m) {
+		return nil
+	}
 
-	r, err := getEffectiveRoom(m, cplay)
+	if !filterAuthUsers(c, m) {
+		return nil
+	}
+
+	chatID := m.ChatID()
+
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
-	if !r.IsActiveChat() || r.Track() == nil {
-		m.Reply(F(chatID, "queue_no_active"))
-		return tg.ErrEndGroup
+	if !r.Active() || r.Track() == nil {
+		_, err := m.ReplyText(c, F(chatID, "queue_no_active"), nil)
+		return err
 	}
 
-	if len(r.Queue()) == 0 {
-		m.Reply(F(chatID, "queue_empty"))
-		return tg.ErrEndGroup
+	if r.QueueLen() == 0 {
+		_, err := m.ReplyText(c, F(chatID, "queue_empty"), nil)
+		return err
 	}
 
 	args := strings.Fields(m.Text())
 	if len(args) < 3 {
-		m.Reply(F(chatID, "move_usage", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "move_usage", locales.Arg{
 			"cmd": getCommand(m),
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	from, err1 := strconv.Atoi(args[1])
 	to, err2 := strconv.Atoi(args[2])
 	if err1 != nil || err2 != nil {
-		m.Reply(F(chatID, "move_invalid_numbers", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "move_invalid_numbers", locales.Arg{
 			"cmd": getCommand(m),
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return err
 	}
 
 	if from <= 0 || to <= 0 {
-		m.Reply(F(chatID, "move_invalid_indexes_min"))
-		return tg.ErrEndGroup
+		_, err := m.ReplyText(c, F(chatID, "move_invalid_indexes_min"), nil)
+		return err
 	}
 
-	queueLen := len(r.Queue())
+	queueLen := r.QueueLen()
 	if from > queueLen || to > queueLen {
-		m.Reply(F(chatID, "move_invalid_indexes_max", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "move_invalid_indexes_max", locales.Arg{
 			"queue_len": queueLen,
-		}))
-		return tg.ErrEndGroup
+		}), nil)
+		return err
 	}
 
-	r.MoveInQueue(from-1, to-1)
+	r.MoveTrack(from-1, to-1)
 
-	m.Reply(F(chatID, "move_success", locales.Arg{
+	sender, _ := m.GetUser(c)
+	mention := mention(sender, m.SenderID())
+	_, rerr := m.ReplyText(c, F(chatID, "move_success", locales.Arg{
 		"from": from,
 		"to":   to,
-		"user": utils.MentionHTML(m.Sender),
-	}))
-
-	return tg.ErrEndGroup
+		"user": mention,
+	}), nil)
+	return rerr
 }

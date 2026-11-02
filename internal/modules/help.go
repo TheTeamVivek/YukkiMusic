@@ -22,10 +22,11 @@ import (
 	"html"
 	"strings"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
-	"main/internal/config"
-	"main/internal/core"
+	"yukkimusic/config"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/locales"
 )
 
 var helpTexts = map[string]string{}
@@ -41,7 +42,11 @@ func init() {
 For more info, visit our <a href="%s">Support Chat</a>.`, config.SupportChat)
 }
 
-func helpHandler(m *tg.NewMessage) error {
+func helpHandler(c *td.Client, m *td.Message) error {
+	if isChannel(c, m) {
+		return nil
+	}
+
 	args := strings.Fields(m.Text())
 	if len(args) > 1 {
 		cmd := args[1]
@@ -49,70 +54,99 @@ func helpHandler(m *tg.NewMessage) error {
 			if !strings.HasPrefix(cmd, "/") {
 				cmd = "/" + cmd
 			}
-			return showHelpFor(m, cmd)
+			return showHelpFor(c, m, cmd)
 		}
 	}
 
-	if m.ChatType() != tg.EntityUser {
-		m.Reply(
-			F(m.ChannelID(), "help_private_only"),
-			&tg.SendOptions{
-				ReplyMarkup: core.GetGroupHelpKeyboard(m.ChannelID()),
-			},
-		)
-		return tg.ErrEndGroup
+	if !m.IsPrivate() {
+		_, err := m.ReplyText(c, F(m.ChatID(), "help_private_only"), &td.SendMessageOpts{
+			ReplyMarkup: core.GetGroupHelpKeyboard(m.ChatID()),
+		})
+		return err
 	}
 
-	m.Reply(
-		F(m.ChannelID(), "help_main"),
-		&tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard(m.ChannelID())},
-	)
-	return tg.ErrEndGroup
+	_, err := m.ReplyRichMessage(c, helpRich(m.ChatID(), "help_main"), &td.SendMessageOpts{
+		ReplyMarkup: core.GetHelpKeyboard(m.ChatID()),
+	})
+	return err
 }
 
-func helpCB(c *tg.CallbackQuery) error {
-	c.Edit(
-		F(c.ChannelID(), "help_main"),
-		&tg.SendOptions{ReplyMarkup: core.GetHelpKeyboard(c.ChannelID())},
-	)
-	c.Answer("")
-	return tg.ErrEndGroup
+// helpRich builds a rich help message for the given locale key. On the main
+// help menu it links the support chat.
+func helpRich(chatID int64, key string) *td.InputRichMessage {
+	var args locales.Arg
+
+	if key == "help_main" {
+		support := config.SupportChat
+		if support == "" {
+			support = config.SupportChannel
+		}
+		if support == "" {
+			support = "https://t.me/TheTeamVk"
+		}
+		args = locales.Arg{"support": html.EscapeString(support)}
+	}
+
+	text := F(chatID, key, args)
+
+	return &td.InputRichMessage{
+		Source: &td.RichMessageSourceHtml{Text: text},
+	}
 }
 
-func helpCallbackHandler(c *tg.CallbackQuery) error {
-	data := c.DataString()
-	c.Answer("")
+func helpCB(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
+	cb.Answer(c, "", nil)
+
+	msg, err := cb.GetMessage(c)
+	if err != nil {
+		return err
+	}
+
+	rich := &td.InputMessageRichMessage{Message: helpRich(cb.ChatId, "help_main")}
+	_, err = c.EditContent(cb.ChatId, msg.Id, rich, &td.EditMessageMediaOpts{ReplyMarkup: core.GetHelpKeyboard(cb.ChatId)})
+	return err
+}
+
+func helpCallbackHandler(c *td.Client, cb *td.UpdateNewCallbackQuery) error {
+	data := cb.DataString()
+	cb.Answer(c, "", nil)
 	if data == "" {
-		return tg.ErrEndGroup
+		return nil
 	}
-	chatID := c.ChannelID()
+	chatID := cb.ChatId
 	parts := strings.SplitN(data, ":", 2)
 	if len(parts) < 2 {
-		return tg.ErrEndGroup
+		return nil
 	}
 
-	var text string
+	key := ""
 	btn := core.GetBackKeyboard(chatID)
 
 	switch parts[1] {
 	case "admins":
-		text = F(chatID, "help_admin")
+		key = "help_admin"
 	case "sudoers":
-		text = F(chatID, "help_sudo")
+		key = "help_sudo"
 	case "owner":
-		text = F(chatID, "help_owner")
+		key = "help_owner"
 	case "public":
-		text = F(chatID, "help_public")
+		key = "help_public"
 	case "main":
-		text = F(chatID, "help_main")
+		key = "help_main"
 		btn = core.GetHelpKeyboard(chatID)
 	}
 
-	c.Edit(text, &tg.SendOptions{ReplyMarkup: btn})
-	return tg.ErrEndGroup
+	msg, err := cb.GetMessage(c)
+	if err != nil {
+		return err
+	}
+
+	rich := &td.InputMessageRichMessage{Message: helpRich(chatID, key)}
+	_, err = c.EditContent(cb.ChatId, msg.Id, rich, &td.EditMessageMediaOpts{ReplyMarkup: btn})
+	return err
 }
 
-func showHelpFor(m *tg.NewMessage, cmd string) error {
+func showHelpFor(c *td.Client, m *td.Message, cmd string) error {
 	helpText, ok := helpTexts[cmd]
 	if !ok {
 		trimmed := strings.TrimPrefix(cmd, "/")
@@ -122,22 +156,20 @@ func showHelpFor(m *tg.NewMessage, cmd string) error {
 	}
 
 	if helpText == "" {
-		_, err := m.Reply(
-			"⚠️ <i>No help found for command <code>" +
-				html.EscapeString(cmd) +
+		_, err := m.ReplyText(
+			c,
+			"⚠️ <i>No help found for command <code>"+
+				html.EscapeString(cmd)+
 				"</code></i>",
+			nil,
 		)
-		if err != nil {
-			return err
-		}
-		return tg.ErrEndGroup
-	}
-
-	_, err := m.Reply(
-		"📘 <b>Help for</b> <code>" + cmd + "</code>:\n\n" + helpText,
-	)
-	if err != nil {
 		return err
 	}
-	return tg.ErrEndGroup
+
+	_, err := m.ReplyText(
+		c,
+		"📘 <b>Help for</b> <code>"+cmd+"</code>:\n\n"+helpText,
+		nil,
+	)
+	return err
 }

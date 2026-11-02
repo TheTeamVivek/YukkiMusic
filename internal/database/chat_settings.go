@@ -24,24 +24,18 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-type RTMPConfig struct {
-	URL string `bson:"rtmp_url"`
-	Key string `bson:"rtmp_key"`
-}
-
 type ChatSettings struct {
-	ChatID                int64      `bson:"_id"`
-	ChannelPlayID         int64      `bson:"cplay_id"`
-	AuthUsers             []int64    `bson:"auth_users"`
-	AdminMode             AdminMode  `bson:"admin_mode,omitempty"`
-	Language              string     `bson:"language"`
-	RTMP                  RTMPConfig `bson:"rtmp_config"`
-	AssistantIndex        int        `bson:"ass_index,omitempty"`
-	ThumbnailsDisabled    bool       `bson:"no_thumb"`
-	PlayModeAdminsOnly    bool       `bson:"play_mode"`
-	CommandDelete         bool       `bson:"cmd_delete"`
-	CleanMode             bool       `bson:"clean_mode"`
-	CleanModeDurationMins int        `bson:"clean_mode_duration_mins"`
+	ChatID                int64     `bson:"_id"`
+	ChannelPlayID         int64     `bson:"cplay_id"`
+	AuthUsers             []int64   `bson:"auth_users"`
+	AdminMode             AdminMode `bson:"admin_mode,omitempty"`
+	Language              string    `bson:"language"`
+	AssistantIndex        int       `bson:"ass_index,omitempty"`
+	ThumbnailsDisabled    bool      `bson:"no_thumb"`
+	PlayModeAdminsOnly    bool      `bson:"play_mode"`
+	CommandDelete         bool      `bson:"cmd_delete"`
+	CleanMode             bool      `bson:"clean_mode"`
+	CleanModeDurationMins int       `bson:"clean_mode_duration_mins"`
 }
 
 func defaultChatSettings(chatID int64) *ChatSettings {

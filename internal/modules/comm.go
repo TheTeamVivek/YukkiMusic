@@ -18,178 +18,190 @@
 package modules
 
 import (
-	"log"
+	"yukkimusic/internal/utils"
 
-	"github.com/Laky-64/gologging"
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
-	"main/internal/config"
-	"main/internal/database"
+	"yukkimusic/config"
+	"yukkimusic/internal/database"
 )
 
 // BotCommands holds all bot commands separated by user type and chat type.
 type BotCommands struct {
-	PrivateUserCommands  []*telegram.BotCommand
-	PrivateSudoCommands  []*telegram.BotCommand
-	PrivateOwnerCommands []*telegram.BotCommand
-	GroupUserCommands    []*telegram.BotCommand
-	GroupAdminCommands   []*telegram.BotCommand
+	PrivateUserCommands  []td.BotCommand
+	PrivateSudoCommands  []td.BotCommand
+	PrivateOwnerCommands []td.BotCommand
+	GroupUserCommands    []td.BotCommand
+	GroupAdminCommands   []td.BotCommand
 }
 
-func cmd(command, description string) *telegram.BotCommand {
-	return &telegram.BotCommand{Command: command, Description: description}
+func cmd(command, description string) td.BotCommand {
+	return td.BotCommand{Command: command, Description: description}
 }
 
 var AllCommands = BotCommands{
-	PrivateUserCommands: []*telegram.BotCommand{
-		cmd("start", "Start the bot."),
-		cmd("help", "Show help menu."),
-		cmd("ping", "Check if the bot is alive."),
+	PrivateUserCommands: []td.BotCommand{
+		cmd("start", "🚀 Start the bot"),
+		cmd("help", "📖 Show the help menu"),
+		cmd("language", "🌐 Change the bot language"),
+		cmd("ping", "🏓 Check if the bot is alive"),
 	},
 
-	PrivateSudoCommands: []*telegram.BotCommand{
-		cmd("ac", "Show active voice chats."),
-		cmd("stats", "Show bot stats."),
-		cmd("logger", "Enable/disable logger channel."),
-		cmd("autoleave", "Enable/disable auto leave."),
+	PrivateSudoCommands: []td.BotCommand{
+		cmd("ac", "📡 Show active voice chats"),
+		cmd("stats", "📊 Show bot stats"),
+		cmd("logger", "📝 Enable/disable logger channel"),
+		cmd("autoleave", "⏳ Enable/disable auto leave"),
 	},
 
-	PrivateOwnerCommands: []*telegram.BotCommand{
-		cmd("addsudo", "Add a sudo user."),
-		cmd("delsudo", "Remove a sudo user."),
-		cmd("blockuser", "Block a user."),
-		cmd("unblockuser", "Unblock a user."),
-		cmd("blockchat", "Block a chat."),
-		cmd("unblockchat", "Unblock a chat."),
-		cmd("blacklisted", "List blacklisted chats and users."),
-		cmd("maintenance", "Enable/disable maintenance mode."),
+	PrivateOwnerCommands: []td.BotCommand{
+		cmd("addsudo", "➕ Add a sudo user"),
+		cmd("delsudo", "➖ Remove a sudo user"),
+		cmd("blockuser", "🚫 Block a user"),
+		cmd("unblockuser", "✅ Unblock a user"),
+		cmd("blockchat", "⛔ Block a chat"),
+		cmd("unblockchat", "✅ Unblock a chat"),
+		cmd("blacklisted", "📛 List blacklisted chats and users"),
+		cmd("maintenance", "🛠️ Enable/disable maintenance mode"),
 	},
 
-	GroupUserCommands: []*telegram.BotCommand{
-		cmd("play", "Play a song."),
-		cmd("queue", "Show the queue."),
-		cmd("position", "Show the current position of the song."),
-		cmd("reload", "Reload the admin cache."),
-		cmd("authlist", "List authorized users."),
+	GroupUserCommands: []td.BotCommand{
+		cmd("play", "🎵 Play a song"),
+		cmd("queue", "📜 Show the queue"),
+		cmd("position", "⏱️ Show the current position of the song"),
+		cmd("reload", "🔄 Reload the admin cache"),
+		cmd("authlist", "👥 List authorized users"),
 	},
 
-	GroupAdminCommands: []*telegram.BotCommand{
+	GroupAdminCommands: []td.BotCommand{
 		// Playback
-		cmd("play", "Play a song."),
-		cmd("cplay", "Play a song in the linked channel."),
-		cmd("fplay", "Force play a song."),
-		cmd("cfplay", "Force play a song in the linked channel."),
+		cmd("play", "🎵 Play a song"),
+		cmd("cplay", "🎵 Play in the linked channel"),
+		cmd("fplay", "⏩ Force play a song"),
+		cmd("cfplay", "⏩ Force play in the linked channel"),
 
 		// Pause / Resume
-		cmd("pause", "Pause the current song."),
-		cmd("cpause", "Pause the current song in the linked channel."),
-		cmd("resume", "Resume the current song."),
-		cmd("cresume", "Resume the current song in the linked channel."),
+		cmd("pause", "⏸️ Pause the current song"),
+		cmd("cpause", "⏸️ Pause in the linked channel"),
+		cmd("resume", "▶️ Resume the current song"),
+		cmd("cresume", "▶️ Resume in the linked channel"),
 
 		// Skip
-		cmd("skip", "Skip the current song."),
-		cmd("cskip", "Skip the current song in the linked channel."),
+		cmd("skip", "⏭️ Skip the current song"),
+		cmd("cskip", "⏭️ Skip in the linked channel"),
 
 		// Replay
-		cmd("replay", "Replay the current song."),
-		cmd("creplay", "Replay the current song in the linked channel."),
+		cmd("replay", "🔁 Replay the current song"),
+		cmd("creplay", "🔁 Replay in the linked channel"),
 
 		// End / Stop
-		cmd("end", "Stop the song and leave voice chat."),
-		cmd("cstop", "Stop the song and leave the linked channel's voice chat."),
+		cmd("end", "⏹️ Stop the song and leave voice chat"),
+		cmd("cstop", "⏹️ Stop and leave the linked channel's voice chat"),
 
 		// Mute / Unmute
-		cmd("mute", "Mute the bot in the voice chat."),
-		cmd("unmute", "Unmute the bot in the voice chat."),
-		cmd("cmute", "Mute the bot in the linked channel's voice chat."),
-		cmd("cunmute", "Unmute the bot in the linked channel's voice chat."),
+		cmd("mute", "🔇 Mute the bot in the voice chat"),
+		cmd("unmute", "🔊 Unmute the bot in the voice chat"),
+		cmd("cmute", "🔇 Mute in the linked channel's voice chat"),
+		cmd("cunmute", "🔊 Unmute in the linked channel's voice chat"),
 
 		// Seek
-		cmd("seek", "Seek to a specific position in the song."),
-		cmd("seekback", "Seek back in the song."),
-		cmd("cseek", "Seek to a position in the linked channel's song."),
-		cmd("cseekback", "Seek back in the linked channel's song."),
+		cmd("seek", "⏩ Seek to a specific position"),
+		cmd("seekback", "⏪ Seek back in the song"),
+		cmd("cseek", "⏩ Seek in the linked channel's song"),
+		cmd("cseekback", "⏪ Seek back in the linked channel's song"),
 
 		// Speed
-		cmd("speed", "Set the playback speed."),
-		cmd("cspeed", "Set the playback speed in the linked channel."),
+		cmd("speed", "⚡ Set the playback speed"),
+		cmd("cspeed", "⚡ Set the playback speed in the linked channel"),
 
 		// Queue management
-		cmd("queue", "Show the queue."),
-		cmd("cqueue", "Show the linked channel's queue."),
-		cmd("position", "Show the current position of the song."),
-		cmd("cposition", "Show the current position in the linked channel."),
-		cmd("jump", "Jump to a specific song in the queue."),
-		cmd("cjump", "Jump to a song in the linked channel's queue."),
-		cmd("remove", "Remove a song from the queue."),
-		cmd("cremove", "Remove a song from the linked channel's queue."),
-		cmd("move", "Move a song in the queue."),
-		cmd("cmove", "Move a song in the linked channel's queue."),
-		cmd("clear", "Clear the queue."),
-		cmd("cclear", "Clear the linked channel's queue."),
-		cmd("shuffle", "Shuffle the queue."),
-		cmd("cshuffle", "Shuffle the linked channel's queue."),
-		cmd("loop", "Loop the current song."),
-		cmd("cloop", "Loop the current song in the linked channel."),
+		cmd("queue", "📜 Show the queue"),
+		cmd("cqueue", "📜 Show the linked channel's queue"),
+		cmd("position", "⏱️ Show the current position of the song"),
+		cmd("cposition", "⏱️ Show the current position in the linked channel"),
+		cmd("jump", "🎯 Jump to a specific song in the queue"),
+		cmd("cjump", "🎯 Jump to a song in the linked channel's queue"),
+		cmd("remove", "🗑️ Remove a song from the queue"),
+		cmd("cremove", "🗑️ Remove a song from the linked channel's queue"),
+		cmd("move", "🔄 Move a song in the queue"),
+		cmd("cmove", "🔄 Move a song in the linked channel's queue"),
+		cmd("clear", "🧹 Clear the queue"),
+		cmd("cclear", "🧹 Clear the linked channel's queue"),
+		cmd("shuffle", "🔀 Shuffle the queue"),
+		cmd("cshuffle", "🔀 Shuffle the linked channel's queue"),
+		cmd("loop", "🔁 Loop the current song"),
+		cmd("cloop", "🔁 Loop the current song in the linked channel"),
 
-		cmd("setcplay", "Configure channelplay for your chat."),
+		cmd("setcplay", "⚙️ Configure channelplay for your chat"),
 
 		// Settings & access
-		cmd("playmode", "Control who can use /play."),
-		cmd("adminmode", "Control who can use admin music commands."),
-		cmd("cmddelete", "Toggle automatic deletion of bot commands."),
-		cmd("settings", "Configure chat settings."),
-		cmd("addauth", "Add a user to the authorized list."),
-		cmd("delauth", "Remove a user from the authorized list."),
-		cmd("reload", "Reload the admin cache."),
-		cmd("creload", "Reload the admin cache in the linked channel."),
+		cmd("playmode", "🎛️ Control who can use /play"),
+		cmd("adminmode", "🛡️ Control who can use admin music commands"),
+		cmd("cmddelete", "🧽 Toggle automatic deletion of bot commands"),
+		cmd("autoplay", "🔁 Toggle autoplay recommendations"),
+		cmd("settings", "⚙️ Configure chat settings"),
+		cmd("addauth", "➕ Add a user to the authorized list"),
+		cmd("delauth", "➖ Remove a user from the authorized list"),
+		cmd("reload", "🔄 Reload the admin cache"),
+		cmd("creload", "🔄 Reload the admin cache in the linked channel"),
 	},
 }
 
-func setBotCommands(bot *telegram.Client) {
+// concatCommands returns a new slice containing all commands from the given
+// groups. It never appends into the backing array of the source slices.
+func concatCommands(groups ...[]td.BotCommand) []td.BotCommand {
+	var n int
+	for _, g := range groups {
+		n += len(g)
+	}
+	out := make([]td.BotCommand, 0, n)
+	for _, g := range groups {
+		out = append(out, g...)
+	}
+	return out
+}
+
+func setBotCommands(bot *td.Client) {
 	type scopedCmds struct {
-		scope telegram.BotCommandScope
-		cmds  []*telegram.BotCommand
+		scope td.BotCommandScope
+		cmds  []td.BotCommand
 	}
 
 	entries := []scopedCmds{
-		{&telegram.BotCommandScopeUsers{}, AllCommands.PrivateUserCommands},
-		{&telegram.BotCommandScopeChats{}, AllCommands.GroupUserCommands},
+		{&td.BotCommandScopeAllPrivateChats{}, AllCommands.PrivateUserCommands},
+		{&td.BotCommandScopeAllGroupChats{}, AllCommands.GroupUserCommands},
 		{
-			&telegram.BotCommandScopeChatAdmins{},
-			append(AllCommands.GroupUserCommands, AllCommands.GroupAdminCommands...),
+			&td.BotCommandScopeAllChatAdministrators{},
+			concatCommands(AllCommands.GroupUserCommands, AllCommands.GroupAdminCommands),
 		},
 		{
-			&telegram.BotCommandScopePeer{
-				Peer: &telegram.InputPeerUser{UserID: config.OwnerID},
-			},
-			append(
-				append(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands...),
-				AllCommands.PrivateOwnerCommands...,
+			&td.BotCommandScopeChat{ChatId: config.OwnerID},
+			concatCommands(
+				AllCommands.PrivateUserCommands,
+				AllCommands.PrivateSudoCommands,
+				AllCommands.PrivateOwnerCommands,
 			),
 		},
 	}
 
 	for _, e := range entries {
-		if _, err := bot.BotsSetBotCommands(e.scope, "", e.cmds); err != nil {
-			gologging.Error("Failed to set bot commands: " + err.Error())
+		if err := bot.SetCommands(e.cmds, &td.SetCommandsOpts{Scope: e.scope}); err != nil {
+			utils.Log.Errorf("Failed to set bot commands(Scope: %T): %v", e.scope, err)
 		}
 	}
 
 	// Sudo users get their own command scope in private.
 	sudoers, err := database.Sudoers()
 	if err != nil {
-		log.Printf("Failed to fetch sudoers: %v", err)
+		utils.Log.Error("Failed to fetch sudoers: " + err.Error())
 		return
 	}
 
-	sudoCmds := append(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands...)
+	sudoCmds := concatCommands(AllCommands.PrivateUserCommands, AllCommands.PrivateSudoCommands)
 	for _, id := range sudoers {
-		peer := &telegram.BotCommandScopePeer{
-			Peer: &telegram.InputPeerUser{UserID: id},
-		}
-		if _, err := bot.BotsSetBotCommands(peer, "", sudoCmds); err != nil {
-			gologging.Error("Failed to set sudo commands: " + err.Error())
+		scope := &td.BotCommandScopeChat{ChatId: id}
+		if err := bot.SetCommands(sudoCmds, &td.SetCommandsOpts{Scope: scope}); err != nil {
+			utils.Log.Error("Failed to set sudo commands: " + err.Error())
 		}
 	}
 }

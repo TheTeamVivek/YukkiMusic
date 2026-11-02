@@ -22,8 +22,6 @@ import (
 	"html"
 	"strconv"
 	"strings"
-
-	tg "github.com/amarnathcjd/gogram/telegram"
 )
 
 func ShortTitle(title string, max ...int) string {
@@ -53,20 +51,6 @@ func EscapeHTML(s string) string {
 func CleanURL(raw string) string {
 	before, _, _ := strings.Cut(raw, "?")
 	return before
-}
-
-func MentionHTML(u *tg.UserObj) string {
-	if u == nil {
-		return "Unknown"
-	}
-
-	fullName := strings.TrimSpace(u.FirstName + " " + u.LastName)
-	if fullName == "" {
-		fullName = "User"
-	}
-	fullName = EscapeHTML(ShortTitle(fullName, 15))
-
-	return fmt.Sprintf("<a href=\"tg://user?id=%d\">%s</a>", u.ID, fullName)
 }
 
 // IfElse returns `a` if condition is true, else returns `b`.

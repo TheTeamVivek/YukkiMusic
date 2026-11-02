@@ -20,10 +20,11 @@ package modules
 import (
 	"fmt"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/utils"
 )
 
 func init() {
@@ -34,64 +35,73 @@ func init() {
 
 <b>⚙️ Behavior:</b>
 • Restores audio immediately
-• Cancels auto-unmute timer if active
 • Shows current playback info`
 }
 
-func unmuteHandler(m *tg.NewMessage) error {
-	return handleUnmute(m, false)
+func unmuteHandler(c *td.Client, m *td.Message) error {
+	return handleUnmute(c, m, false)
 }
 
-func cunmuteHandler(m *tg.NewMessage) error {
-	return handleUnmute(m, true)
+func cunmuteHandler(c *td.Client, m *td.Message) error {
+	return handleUnmute(c, m, true)
 }
 
-func handleUnmute(m *tg.NewMessage, cplay bool) error {
-	if m.Args() != "" {
-		return tg.ErrEndGroup
+func handleUnmute(c *td.Client, m *td.Message, cplay bool) error {
+	if m.Args() != "" || m.ReplyToMessageID() != 0 || !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
 	}
-	r, err := getEffectiveRoom(m, cplay)
+
+	r, err := getEffectiveRoom(m.ChatID(), cplay)
 	if err != nil {
-		m.Reply(err.Error())
-		return tg.ErrEndGroup
+		_, err := m.ReplyText(c, err.Error(), nil)
+		return err
 	}
 
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 
-	if !r.IsActiveChat() {
-		m.Reply(F(chatID, "room_no_active"))
-		return tg.ErrEndGroup
+	if !r.Active() {
+		_, err := m.ReplyText(c, F(chatID, "room_no_active"), nil)
+		return err
 	}
 
-	if !r.IsMuted() {
-		m.Reply(F(chatID, "unmute_already"))
-		return tg.ErrEndGroup
+	if !r.Muted() {
+		_, err := m.ReplyRichMessageHTML(c, F(chatID, "unmute_already"), &td.SendRichTextOpts{
+			ReplyMarkup: core.GetMuteToggle(chatID, r),
+		})
+		return err
 	}
 
 	title := utils.EscapeHTML(utils.ShortTitle(r.Track().Title, 25))
-	mention := utils.MentionHTML(m.Sender)
+	sender, _ := m.GetUser(c)
+	mention := mention(sender, m.SenderID())
 
-	if _, err := r.Unmute(); err != nil {
-		m.Reply(F(chatID, "unmute_failed", locales.Arg{
-			"error": err.Error(),
-		}))
-		return tg.ErrEndGroup
+	if err := r.Unmute(); err != nil {
+		_, rerr := m.ReplyRichMessageHTML(c, F(chatID, "unmute_failed", locales.Arg{
+			"error": utils.EscapeHTML(err.Error()),
+		}), nil)
+		return rerr
 	}
 
-	// optional speed line
-	var speedOpt string
+	speedLine := ""
 	if sp := r.Speed(); sp != 1.0 {
-		speedOpt = F(chatID, "speed_line", locales.Arg{
+		speedLine = `<tr><td colspan="2">` + F(chatID, "speed_line", locales.Arg{
 			"speed": fmt.Sprintf("%.2f", sp),
-		})
+		}) + `</td></tr>`
 	}
 
 	msg := F(chatID, "unmute_success", locales.Arg{
 		"title":      title,
+		"url":        utils.EscapeHTML(r.Track().URL),
 		"user":       mention,
-		"speed_line": speedOpt,
+		"speed_line": speedLine,
 	})
+	_, rerr := m.ReplyRichMessageHTML(c, msg, &td.SendRichTextOpts{
+		ReplyMarkup: core.GetMuteToggle(chatID, r),
+	})
+	if rerr != nil {
+		return rerr
+	}
 
-	m.Reply(msg)
-	return tg.ErrEndGroup
+	updatePlaybackMessageFor(c, r.StatusMsg(), m.SenderID(), r, "unmuted")
+	return nil
 }

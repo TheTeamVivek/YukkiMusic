@@ -20,44 +20,29 @@ package modules
 import (
 	"fmt"
 	"strings"
-	"sync"
+	"sync/atomic"
 	"time"
 
-	"github.com/Laky-64/gologging"
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
+	tg "github.com/xAmarnath/gogram/telegram"
 
-	"main/internal/config"
-	"main/internal/core"
-	"main/internal/database"
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/config"
+	"yukkimusic/internal/core"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/utils"
 )
 
-var (
-	limit        = 50
-	autoLeaveSvc = newAutoLeaveService(limit, 10*time.Minute, 3*time.Second)
+const (
+	autoLeaveInterval = 10 * time.Minute
+	autoLeaveLimit    = 50
+	autoLeaveDelay    = 3 * time.Second
 )
+
+// autoLeaveSvc makes the assistants periodically leave chats that are not playing.
+var autoLeaveSvc = &autoLeaveService{}
 
 type autoLeaveService struct {
-	mu          sync.Mutex
-	loopRunning bool
-	stopCh      chan struct{}
-
-	limit         int
-	interval      time.Duration
-	preLeaveDelay time.Duration
-}
-
-func newAutoLeaveService(
-	limit int,
-	interval time.Duration,
-	preLeaveDelay time.Duration,
-) *autoLeaveService {
-	return &autoLeaveService{
-		limit:         limit,
-		interval:      interval,
-		preLeaveDelay: preLeaveDelay,
-	}
+	enabled atomic.Bool
 }
 
 func init() {
@@ -74,181 +59,148 @@ Once enabled, the bot checks all joined groups/channels every <b>10 minutes</b> 
 
 <b>⚠️ Restrictions:</b>
 This command can only be used by <b>owners</b> or <b>sudo users</b>.`,
-		limit,
+		autoLeaveLimit,
 	)
+
+	dashboards["autoleave"] = dashboardDef{
+		title:       func(chatID int64) string { return F(chatID, "autoleave_title") },
+		description: func(chatID int64) string { return F(chatID, "autoleave_desc") },
+		canUse: func(c *td.Client, u *td.UpdateNewCallbackQuery) bool {
+			if isOwnerOrSudo(u.SenderUserId) {
+				return true
+			}
+			u.Answer(c, F(u.ChatId, "only_sudo_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
+			return false
+		},
+		get: func(int64) (bool, error) { return database.AutoLeave() },
+		set: func(_ int64, on bool) error {
+			if err := database.SetAutoLeave(on); err != nil {
+				return err
+			}
+			autoLeaveSvc.SetEnabled(on)
+			return nil
+		},
+	}
 }
 
-func autoLeaveHandler(m *tg.NewMessage) error {
+func autoLeaveHandler(c *td.Client, m *td.Message) error {
+	if !checkSudo(c, m) {
+		return nil
+	}
+	chatID := m.ChatID()
+
 	args := strings.Fields(m.Text())
-	chatID := m.ChannelID()
-
-	currentState, err := database.AutoLeave()
-	if err != nil {
-		m.Reply(F(chatID, "autoleave_fetch_fail"))
-		return tg.ErrEndGroup
-	}
-
-	status := F(chatID, utils.IfElse(currentState, "enabled", "disabled"))
-
 	if len(args) < 2 {
-		m.Reply(F(chatID, "autoleave_status", locales.Arg{
-			"cmd":    getCommand(m),
-			"action": status,
-		}))
-		return tg.ErrEndGroup
+		return sendDashboard(c, m, "autoleave")
 	}
 
-	newState, err := utils.ParseBool(args[1])
+	current, err := database.AutoLeave()
 	if err != nil {
-		m.Reply(F(chatID, "invalid_bool"))
-		return tg.ErrEndGroup
+		_, err := m.ReplyText(c, F(chatID, "autoleave_fetch_fail"), nil)
+		return err
 	}
 
-	if newState == currentState {
-		m.Reply(F(chatID, "autoleave_already", locales.Arg{
-			"action": status,
-		}))
-		return tg.ErrEndGroup
+	enabled, err := utils.ParseBool(args[1])
+	if err == nil && enabled != current {
+		if err := database.SetAutoLeave(enabled); err != nil {
+			_, err := m.ReplyText(c, F(chatID, "autoleave_update_fail"), nil)
+			return err
+		}
+		autoLeaveSvc.SetEnabled(enabled)
 	}
 
-	if err := database.SetAutoLeave(newState); err != nil {
-		m.Reply(F(chatID, "autoleave_update_fail"))
-		return tg.ErrEndGroup
-	}
-
-	newStatus := F(chatID, utils.IfElse(newState, "enabled", "disabled"))
-	m.Reply(F(chatID, "autoleave_updated", locales.Arg{
-		"action": newStatus,
-	}))
-
-	autoLeaveSvc.SetEnabled(newState)
-
-	return tg.ErrEndGroup
+	return sendDashboard(c, m, "autoleave")
 }
 
+// Start restores the auto-leave state from the database and launches the loop.
 func (s *autoLeaveService) Start() {
-	enabled, err := database.AutoLeave()
-	if err != nil || !enabled {
-		return
+	if on, err := database.AutoLeave(); err == nil {
+		s.enabled.Store(on)
 	}
-
-	s.SetEnabled(true)
+	go s.loop()
 }
 
-func (s *autoLeaveService) SetEnabled(enabled bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *autoLeaveService) SetEnabled(on bool) {
+	s.enabled.Store(on)
+}
 
-	if enabled {
-		if s.loopRunning {
-			return
+func (s *autoLeaveService) loop() {
+	ticker := time.NewTicker(autoLeaveInterval)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		if !s.enabled.Load() {
+			continue
 		}
-		s.loopRunning = true
-		s.stopCh = make(chan struct{})
-		go s.runLoop()
-		return
-	}
 
-	if s.stopCh != nil {
-		close(s.stopCh)
-		s.stopCh = nil
-	}
-}
-
-func (s *autoLeaveService) runLoop() {
-	s.mu.Lock()
-	stopCh := s.stopCh
-	s.mu.Unlock()
-
-	timer := time.NewTimer(s.interval)
-	defer timer.Stop()
-
-	for {
-		select {
-		case <-stopCh:
-			s.mu.Lock()
-			s.stopCh = nil
-			s.loopRunning = false
-			s.mu.Unlock()
-			return
-		case <-timer.C:
-			s.runCycle()
-			timer.Reset(s.interval)
-		}
+		// Scan every assistant's chats and leave the inactive ones.
+		activeRooms := core.Rooms.All()
+		core.Assistants.ForEach(func(a *core.Assistant) {
+			if a == nil || a.Client == nil {
+				return
+			}
+			go s.leaveInactiveChats(a, activeRooms)
+		})
 	}
 }
 
-func (s *autoLeaveService) runCycle() {
-	activeRooms := core.GetAllRooms()
-	core.Assistants.ForEach(func(a *core.Assistant) {
-		if a == nil || a.Client == nil {
-			return
-		}
-		go s.autoLeaveAssistant(a, activeRooms)
-	})
-}
-
-func (s *autoLeaveService) autoLeaveAssistant(
+func (s *autoLeaveService) leaveInactiveChats(
 	ass *core.Assistant,
-	activeRooms map[int64]*core.RoomState,
+	activeRooms map[int64]*core.Room,
 ) {
-	leaveCount := 0
+	left := 0
+
 	err := ass.Client.IterDialogs(func(d *tg.TLDialog) error {
-		if d.IsUser() {
-			return nil
-		}
-		chatID := d.GetChannelID()
-
-		if chatID == 0 || chatID == config.LoggerID ||
-			d.GetID() == config.LoggerID {
-			return nil
-		}
-
-		if _, ok := activeRooms[chatID]; ok {
-			return nil
-		}
-
-		time.Sleep(s.preLeaveDelay)
-		if err := ass.Client.LeaveChannel(chatID); err != nil {
-			if wait := tg.GetFloodWait(err); wait > 0 {
-				gologging.ErrorF(
-					"FloodWait detected (%ds). Sleeping...", wait,
-				)
-				time.Sleep(time.Duration(wait) * time.Second)
-				return nil
-			}
-
-			if strings.Contains(err.Error(), "USER_NOT_PARTICIPANT") ||
-				strings.Contains(err.Error(), "CHANNEL_PRIVATE") {
-				return nil
-			}
-
-			gologging.WarnF(
-				"AutoLeave (Assistant %d) failed to leave %d: %v",
-				ass.Index, chatID, err,
-			)
-			return nil
-		}
-
-		leaveCount++
-		gologging.InfoF(
-			"AutoLeave: Assistant %d left %d (%d/%d)",
-			ass.Index, chatID, leaveCount, s.limit,
-		)
-
-		if leaveCount >= s.limit {
+		if !s.enabled.Load() {
 			return tg.ErrStopIteration
 		}
 
+		chatID := d.GetChannelID()
+		if d.IsUser() || chatID == 0 || chatID == config.LoggerID {
+			return nil
+		}
+		if _, playing := activeRooms[chatID]; playing {
+			return nil
+		}
+
+		time.Sleep(autoLeaveDelay)
+		if err := ass.Client.LeaveChannel(chatID); err != nil {
+			if wait := tg.GetFloodWait(err); wait > 0 {
+				utils.Log.Errorf("FloodWait detected (%ds). Sleeping...", wait)
+				time.Sleep(time.Duration(wait) * time.Second)
+				return nil
+			}
+			if !isLeaveSafeError(err) {
+				utils.Log.Warnf(
+					"AutoLeave (Assistant %d) failed to leave %d: %v",
+					ass.Index, chatID, err,
+				)
+			}
+			return nil
+		}
+
+		left++
+		utils.Log.Infof(
+			"AutoLeave: Assistant %d left %d (%d/%d)",
+			ass.Index, chatID, left, autoLeaveLimit,
+		)
+		if left >= autoLeaveLimit {
+			return tg.ErrStopIteration
+		}
 		return nil
-	}, &tg.DialogOptions{
-		Limit: 0,
-	})
+	}, &tg.DialogOptions{})
 
 	if err != nil && err != tg.ErrStopIteration {
-		gologging.WarnF(
+		utils.Log.Warnf(
 			"AutoLeave: IterDialogs error (assistant %d): %v",
-			ass.Index, err,
+			ass.Index,
+			err,
 		)
 	}
+}
+
+// isLeaveSafeError reports leave errors that can be safely ignored.
+func isLeaveSafeError(err error) bool {
+	return strings.Contains(err.Error(), "USER_NOT_PARTICIPANT") ||
+		strings.Contains(err.Error(), "CHANNEL_PRIVATE")
 }

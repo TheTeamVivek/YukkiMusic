@@ -21,34 +21,8 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/Laky-64/gologging"
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 )
-
-func EOR(
-	msg *telegram.NewMessage,
-	text string,
-	opts ...*telegram.SendOptions,
-) (m *telegram.NewMessage, err error) {
-	if msg == nil {
-		gologging.Error("[EOR] nil msg at " + callerInfo(2))
-		return nil, nil
-	}
-
-	m, err = msg.Edit(text, opts...)
-	if err != nil {
-		msg.Delete()
-		m, err = msg.Respond(text, opts...)
-	}
-
-	if err != nil {
-		gologging.Error(
-			"[EOR] " + err.Error() +
-				" | called from " + callerInfo(2),
-		)
-	}
-	return m, err
-}
 
 func callerInfo(skip int) string {
 	_, file, line, ok := runtime.Caller(skip)
@@ -56,4 +30,36 @@ func callerInfo(skip int) string {
 		return "unknown:0"
 	}
 	return fmt.Sprintf("%s:%d", file, line)
+}
+
+// EOR edits a message, falling back to delete + reply on edit failure.
+func EOR(
+	c *td.Client,
+	msg *td.Message,
+	text string,
+	opts *td.EditMessageTextOpts,
+) (*td.Message, error) {
+	if msg == nil {
+		Log.Error("[EOR] nil msg at " + callerInfo(2))
+		return nil, nil
+	}
+
+	m, err := msg.EditText(c, text, opts)
+	if err != nil {
+		_ = msg.Delete(c, &td.DeleteMessagesOpts{Revoke: true})
+		replyOpts := &td.SendMessageOpts{}
+		if opts != nil {
+			replyOpts.ParseMode = opts.ParseMode
+			replyOpts.ReplyMarkup = opts.ReplyMarkup
+			replyOpts.DisableWebPagePreview = opts.DisableWebPagePreview
+		}
+		m, err = msg.ReplyText(c, text, replyOpts)
+	}
+
+	if err != nil {
+		Log.Error(
+			"[EOR] " + err.Error() + " | called from " + callerInfo(2),
+		)
+	}
+	return m, err
 }

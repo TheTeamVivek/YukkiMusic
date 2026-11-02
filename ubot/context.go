@@ -4,16 +4,15 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/Laky-64/gologging"
-	tg "github.com/amarnathcjd/gogram/telegram"
+	tg "github.com/xAmarnath/gogram/telegram"
 
-	"main/ntgcalls"
+	"yukkimusic/ntgcalls"
 )
 
 type Context struct {
 	binding *ntgcalls.Client
 	app     *tg.Client
-	self    *tg.UserObj
+	me      *tg.UserObj
 
 	mutedByAdminMutex sync.RWMutex
 	mutedByAdmin      []int64
@@ -46,14 +45,14 @@ type Context struct {
 	waitConnect      map[int64]chan error
 
 	callbacksMutex        sync.RWMutex
-	incomingCallCallbacks []func(client *Context, chatId int64)
+	incomingCallCallbacks []func(client *Context, chatID int64)
 	streamEndCallbacks    []ntgcalls.StreamEndCallback
 	frameCallbacks        []ntgcalls.FrameCallback
 }
 
-func NewContext(app *tg.Client) *Context {
+func NewContext(app *tg.Client) (*Context, error) {
 	client := &Context{
-		binding: ntgcalls.NTgCalls(),
+		binding: ntgcalls.NewClient(),
 		app:     app,
 
 		pendingPresentation: make(map[int64]bool),
@@ -72,122 +71,19 @@ func NewContext(app *tg.Client) *Context {
 			var err error
 			me, err = app.GetMe()
 			if err != nil {
-				gologging.Fatal(err)
+				return nil, fmt.Errorf("fetching own identity: %w", err)
 			}
 		}
 
-		client.self = me
+		client.me = me
 	}
 
-	client.handleUpdates()
-	return client
-}
-
-func (ctx *Context) Calls() map[int64]*ntgcalls.CallInfo {
-	return ctx.binding.Calls()
-}
-
-func (ctx *Context) Mute(chatID int64) (bool, error) {
-	return ctx.binding.Mute(chatID)
-}
-
-func (ctx *Context) Pause(chatID int64) (bool, error) {
-	return ctx.binding.Pause(chatID)
-}
-
-func (ctx *Context) Resume(chatID int64) (bool, error) {
-	return ctx.binding.Resume(chatID)
-}
-
-func (ctx *Context) Unmute(chatID int64) (bool, error) {
-	return ctx.binding.Unmute(chatID)
-}
-
-func (ctx *Context) Play(
-	chatID int64,
-	mediaDescription ntgcalls.MediaDescription,
-) error {
-	if ctx.binding.Calls()[chatID] != nil {
-		return ctx.binding.SetStreamSources(
-			chatID,
-			ntgcalls.CaptureStream,
-			mediaDescription,
-		)
-	}
-
-	err := ctx.connectCall(chatID, mediaDescription, "")
-	if err != nil {
-		return err
-	}
-
-	if chatID < 0 {
-		err = ctx.joinPresentation(chatID, mediaDescription.Screen != nil)
-		if err != nil {
-			return err
-		}
-		return ctx.updateSources(chatID)
-	}
-
-	return nil
-}
-
-func (ctx *Context) Record(
-	chatID int64,
-	mediaDescription ntgcalls.MediaDescription,
-) error {
-	if ctx.binding.Calls()[chatID] != nil {
-		return ctx.binding.SetStreamSources(
-			chatID,
-			ntgcalls.PlaybackStream,
-			mediaDescription,
-		)
-	}
-
-	return ctx.Play(chatID, ntgcalls.MediaDescription{})
-}
-
-func (ctx *Context) Stop(chatID int64) error {
-	// Clean up presentations
-	ctx.presentationsMutex.Lock()
-	ctx.presentations = stdRemove(ctx.presentations, chatID)
-	ctx.presentationsMutex.Unlock()
-
-	ctx.callSourcesMutex.Lock()
-	delete(ctx.callSources, chatID)
-	ctx.callSourcesMutex.Unlock()
-
-	ctx.waitConnectMutex.Lock()
-	if waitChan, exists := ctx.waitConnect[chatID]; exists {
-		select {
-		case waitChan <- fmt.Errorf("call stopped"):
-		default:
-		}
-		delete(ctx.waitConnect, chatID)
-	}
-	ctx.waitConnectMutex.Unlock()
-
-	err := ctx.binding.Stop(chatID)
-	if err != nil {
-		return err
-	}
-
-	ctx.inputGroupCallsMutex.RLock()
-	inputGroupCall, ok := ctx.inputGroupCalls[chatID]
-	ctx.inputGroupCallsMutex.RUnlock()
-
-	if !ok {
-		return nil
-	}
-
-	_, err = ctx.app.PhoneLeaveGroupCall(inputGroupCall, 0)
-	if err != nil {
-		return err
-	}
-	return nil
+	client.registerHandlers()
+	return client, nil
 }
 
 func (ctx *Context) OnIncomingCall(
-	callback func(client *Context, chatId int64),
+	callback func(client *Context, chatID int64),
 ) {
 	ctx.callbacksMutex.Lock()
 	defer ctx.callbacksMutex.Unlock()
@@ -211,8 +107,10 @@ func (ctx *Context) Close() {
 		return
 	}
 
-	for chatId := range ctx.binding.Calls() {
-		ctx.binding.Stop(chatId)
+	if calls, err := ctx.binding.Calls(); err == nil {
+		for chatID := range calls {
+			ctx.binding.Stop(chatID)
+		}
 	}
 
 	ctx.p2pConfigsMutex.Lock()

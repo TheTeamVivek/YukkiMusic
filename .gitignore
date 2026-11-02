@@ -4,14 +4,18 @@
 *.so
 *.dylib
 libntgcalls.*
-
+libtdjson.*
 .env
 
 /app
+/yukkimusic
+/yukkimusic.log
 downloads/
+database/
 *.db
 *.dat
 *.session
+*.log
 
 ntgcalls/*.h
 ntgcalls.zip
@@ -20,3 +24,4 @@ tmp/
 x
 index.html
 *.txt
+**/x.go

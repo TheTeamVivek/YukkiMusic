@@ -18,13 +18,14 @@
 package modules
 
 import (
+	"html"
 	"strings"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
-	"main/internal/database"
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/utils"
 )
 
 func init() {
@@ -49,6 +50,30 @@ func init() {
 	helpTexts["/cmddelete"] = cmdDeleteHelp
 	helpTexts["/commanddelete"] = cmdDeleteHelp
 
+	dashboards["cmddelete"] = dashboardDef{
+		title:       func(chatID int64) string { return F(chatID, "cmddelete_title") },
+		description: func(chatID int64) string { return F(chatID, "cmddelete_desc") },
+		canUse:      canUseAdminCallback,
+		get:         func(chatID int64) (bool, error) { return database.CommandDelete(chatID) },
+		set:         func(chatID int64, on bool) error { return database.SetCommandDelete(chatID, on) },
+	}
+
+	dashboards["cleanmode"] = dashboardDef{
+		title:       func(chatID int64) string { return F(chatID, "cleanmode_title") },
+		description: func(chatID int64) string { return F(chatID, "cleanmode_desc") },
+		canUse:      canUseAdminCallback,
+		get:         func(chatID int64) (bool, error) { return database.CleanMode(chatID) },
+		set: func(chatID int64, on bool) error {
+			if err := database.SetCleanMode(chatID, on); err != nil {
+				return err
+			}
+			if !on {
+				cleaner.Clear(chatID)
+			}
+			return nil
+		},
+	}
+
 	cleanModeHelp := `<i>Enable timed cleanup for command/service messages in this chat.</i>
 
 <u>Usage:</u>
@@ -69,129 +94,81 @@ func init() {
 • <b>admin</b> — Only chat admins can use admin commands
 • <b>adminauth</b> — Chat admins + authorized users can use admin commands (default)
 • <b>everyone</b> — Everyone can use admin commands`
+	dashboards["playmode"] = dashboardDef{
+		title:       func(chatID int64) string { return F(chatID, "playmode_title") },
+		description: func(chatID int64) string { return F(chatID, "playmode_desc") },
+		canUse:      canUseAdminCallback,
+		get:         func(chatID int64) (bool, error) { return database.PlayModeAdminsOnly(chatID) },
+		set:         func(chatID int64, on bool) error { return database.SetPlayModeAdminsOnly(chatID, on) },
+	}
 }
 
-func playmodeHandler(m *tg.NewMessage) error {
-	args := strings.Fields(m.Text())
-	chatID := m.ChannelID()
-
-	current, err := database.PlayModeAdminsOnly(chatID)
-	if err != nil {
-		return err
+func playmodeHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
 	}
+	chatID := m.ChatID()
 
-	if len(args) < 2 {
-		statusKey := "playmode_status_everyone"
-		if current {
-			statusKey = "playmode_status_admins"
+	if args := strings.Fields(m.Text()); len(args) > 1 {
+		if enabled, err := utils.ParseBool(args[1]); err == nil {
+			if current, cerr := database.PlayModeAdminsOnly(chatID); cerr == nil && enabled != current {
+				if err := database.SetPlayModeAdminsOnly(chatID, enabled); err != nil {
+					return err
+				}
+			}
 		}
-
-		m.Reply(F(chatID, "playmode_help", locales.Arg{
-			"status": F(chatID, statusKey),
-		}), &tg.SendOptions{ParseMode: "HTML"})
-		return tg.ErrEndGroup
 	}
 
-	adminsOnly, err := utils.ParseBool(args[1])
-	if err != nil {
-		m.Reply(F(chatID, "invalid_bool"))
-		return tg.ErrEndGroup
-	}
-
-	if err := database.SetPlayModeAdminsOnly(chatID, adminsOnly); err != nil {
-		return err
-	}
-
-	successKey := "playmode_success_everyone"
-	if adminsOnly {
-		successKey = "playmode_success_admins"
-	}
-
-	m.Reply(F(chatID, successKey), &tg.SendOptions{ParseMode: "HTML"})
-	return tg.ErrEndGroup
+	return sendDashboard(c, m, "playmode")
 }
 
-func cmdDeleteHandler(m *tg.NewMessage) error {
-	args := strings.Fields(m.Text())
-	chatID := m.ChannelID()
-	cmd := getCommand(m)
-
-	current, err := database.CommandDelete(chatID)
-	if err != nil {
-		return err
+func cmdDeleteHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
 	}
+	chatID := m.ChatID()
 
-	if len(args) < 2 {
-		actionKey := "disabled"
-		if current {
-			actionKey = "enabled"
+	if args := strings.Fields(m.Text()); len(args) > 1 {
+		if enabled, err := utils.ParseBool(args[1]); err == nil {
+			if current, cerr := database.CommandDelete(chatID); cerr == nil && enabled != current {
+				if err := database.SetCommandDelete(chatID, enabled); err != nil {
+					return err
+				}
+			}
 		}
-
-		m.Reply(F(chatID, "cmddelete_status", locales.Arg{
-			"cmd":    cmd,
-			"action": F(chatID, actionKey),
-		}), &tg.SendOptions{ParseMode: "HTML"})
-		return tg.ErrEndGroup
 	}
 
-	enabled, err := utils.ParseBool(args[1])
-	if err != nil {
-		m.Reply(F(chatID, "invalid_bool"))
-		return tg.ErrEndGroup
-	}
-
-	if err := database.SetCommandDelete(chatID, enabled); err != nil {
-		return err
-	}
-
-	actionKey := "disabled"
-	if enabled {
-		actionKey = "enabled"
-	}
-
-	m.Reply(F(chatID, "cmddelete_updated", locales.Arg{
-		"action": F(chatID, actionKey),
-	}), &tg.SendOptions{ParseMode: "HTML"})
-	return tg.ErrEndGroup
+	return sendDashboard(c, m, "cmddelete")
 }
 
-func cleanModeHandler(m *tg.NewMessage) error {
-	args := strings.Fields(m.Text())
-	chatID := m.ChannelID()
+func cleanModeHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
+	chatID := m.ChatID()
 
-	current, err := database.CleanMode(chatID)
-	if err != nil {
-		return err
+	if args := strings.Fields(m.Text()); len(args) > 1 {
+		if enabled, err := utils.ParseBool(args[1]); err == nil {
+			if current, cerr := database.CleanMode(chatID); cerr == nil && enabled != current {
+				if err := database.SetCleanMode(chatID, enabled); err != nil {
+					return err
+				}
+				if !enabled {
+					cleaner.Clear(chatID)
+				}
+			}
+		}
 	}
 
-	if len(args) < 2 {
-		m.Reply(
-			cleanModeStatusText(chatID, current)+"\n\n"+F(chatID, "cleanmode_hint"),
-			&tg.SendOptions{ParseMode: "HTML"},
-		)
-		return tg.ErrEndGroup
-	}
-
-	enabled, err := utils.ParseBool(args[1])
-	if err != nil {
-		m.Reply(F(chatID, "invalid_bool"))
-		return tg.ErrEndGroup
-	}
-
-	if err := database.SetCleanMode(chatID, enabled); err != nil {
-		return err
-	}
-	if !enabled {
-		cleanScheduler.cancel(chatID)
-	}
-
-	m.Reply(cleanModeStatusText(chatID, enabled)+"\n\n"+F(chatID, "cleanmode_hint"), &tg.SendOptions{ParseMode: "HTML"})
-	return tg.ErrEndGroup
+	return sendDashboard(c, m, "cleanmode")
 }
 
-func adminModeHandler(m *tg.NewMessage) error {
+func adminModeHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
 	args := strings.Fields(m.Text())
-	chatID := m.ChannelID()
+	chatID := m.ChatID()
 
 	current, err := database.GetAdminMode(chatID)
 	if err != nil {
@@ -199,26 +176,25 @@ func adminModeHandler(m *tg.NewMessage) error {
 	}
 
 	if len(args) < 2 {
-		m.Reply(F(chatID, "adminmode_help", locales.Arg{
+		_, err := m.ReplyText(c, F(chatID, "adminmode_help", locales.Arg{
 			"status": F(chatID, adminModeStatusKey(current)),
-		}), &tg.SendOptions{ParseMode: "HTML"})
-		return tg.ErrEndGroup
+		}), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
+		return err
 	}
 
 	mode, ok := parseAdminMode(args[1])
 	if !ok {
-		m.Reply(F(chatID, "adminmode_invalid"))
-		return tg.ErrEndGroup
+		_, err := m.ReplyText(c, F(chatID, "adminmode_invalid"), nil)
+		return err
 	}
 
 	if err := database.SetAdminMode(chatID, mode); err != nil {
 		return err
 	}
-
-	m.Reply(F(chatID, "adminmode_updated", locales.Arg{
+	_, rerr := m.ReplyText(c, F(chatID, "adminmode_updated", locales.Arg{
 		"status": F(chatID, adminModeStatusKey(mode)),
-	}), &tg.SendOptions{ParseMode: "HTML"})
-	return tg.ErrEndGroup
+	}), &td.SendMessageOpts{ParseMode: td.ParseModeHTML})
+	return rerr
 }
 
 func adminModeStatusKey(mode database.AdminMode) string {
@@ -245,33 +221,39 @@ func parseAdminMode(input string) (database.AdminMode, bool) {
 	}
 }
 
-func settingsHandler(m *tg.NewMessage) error {
-	chatID := m.ChannelID()
+func settingsHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
+	chatID := m.ChatID()
 	settings, err := database.GetChatSettings(chatID)
 	if err != nil {
 		return err
 	}
 
 	title := "Chat"
-	if m.Channel != nil {
-		title = m.Channel.Title
+	if chat, err := c.GetChat(chatID); err == nil && chat != nil && chat.Title != "" {
+		title = chat.Title
 	}
 
-	kb := buildSettingsMarkup(chatID, settings)
-	_, err = m.Reply(F(chatID, "settings_main", locales.Arg{
-		"title": title,
+	text := F(chatID, "settings_main", locales.Arg{
+		"title": html.EscapeString(title),
 		"id":    chatID,
-	}), &tg.SendOptions{ParseMode: "HTML", ReplyMarkup: kb})
+	})
+	kb := buildSettingsMarkup(chatID, settings)
+	_, err = m.ReplyRichMessage(c, &td.InputRichMessage{
+		Source: &td.RichMessageSourceHtml{Text: text},
+	}, &td.SendMessageOpts{ReplyMarkup: kb})
 	return err
 }
 
-func settingsCallbackHandler(cb *tg.CallbackQuery) error {
-	chatID := cb.ChannelID()
-	data := cb.DataString()
+func settingsCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
+	chatID := u.ChatId
+	data := u.DataString()
 	parts := strings.Split(data, ":")
 	title := "Chat"
-	if cb.Channel != nil {
-		title = cb.Channel.Title
+	if chat, err := c.GetChat(chatID); err == nil && chat != nil && chat.Title != "" {
+		title = chat.Title
 	}
 
 	if len(parts) < 2 {
@@ -279,28 +261,31 @@ func settingsCallbackHandler(cb *tg.CallbackQuery) error {
 	}
 
 	// Check permissions
-	if isAdmin, err := utils.IsChatAdmin(cb.Client, chatID, cb.SenderID); err != nil ||
+	if isAdmin, err := utils.IsChatAdmin(c, chatID, u.SenderUserId); err != nil ||
 		!isAdmin {
-		cb.Answer(F(chatID, "only_admin_cb"), &tg.CallbackOptions{Alert: true})
+		_ = u.Answer(c, F(chatID, "only_admin_cb"), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 
 	settings, err := database.GetChatSettings(chatID)
 	if err != nil {
-		return err
+		return nil
 	}
+
+	panel := F(chatID, "settings_main", locales.Arg{
+		"title": html.EscapeString(title),
+		"id":    chatID,
+	})
 
 	action := parts[1]
 	if strings.HasPrefix(data, "info:") {
-		cb.Answer(F(chatID, "settings_info_"+action), &tg.CallbackOptions{Alert: true})
+		_ = u.Answer(c, F(chatID, "settings_info_"+action), &td.CallbackAnswerOpts{ShowAlert: true})
 		return nil
 	}
 	if action == "main" {
-		kb := buildSettingsMarkup(chatID, settings)
-		cb.Edit(F(chatID, "settings_main", locales.Arg{
-			"title": title,
-			"id":    chatID,
-		}), &tg.SendOptions{ParseMode: "HTML", ReplyMarkup: kb})
+		_, _ = c.EditContent(chatID, u.MessageId, &td.InputMessageRichMessage{
+			Message: &td.InputRichMessage{Source: &td.RichMessageSourceHtml{Text: panel}},
+		}, &td.EditMessageMediaOpts{ReplyMarkup: buildSettingsMarkup(chatID, settings)})
 		return nil
 	}
 	switch action {
@@ -320,7 +305,7 @@ func settingsCallbackHandler(cb *tg.CallbackQuery) error {
 	case "cleanmode":
 		settings.CleanMode = !settings.CleanMode
 		if !settings.CleanMode {
-			cleanScheduler.cancel(chatID)
+			cleaner.Clear(chatID)
 		}
 	case "cleanduration":
 		next := cleanModeDurationOptions[0]
@@ -336,28 +321,31 @@ func settingsCallbackHandler(cb *tg.CallbackQuery) error {
 	}
 
 	if err := database.UpdateChatSettings(settings); err != nil {
-		return err
+		return nil
 	}
 
-	cb.Answer(F(chatID, "settings_updated"))
-	kb := buildSettingsMarkup(chatID, settings)
-
-	cb.Edit(F(chatID, "settings_main", locales.Arg{
-		"title": title,
-		"id":    chatID,
-	}), &tg.SendOptions{ParseMode: "HTML", ReplyMarkup: kb})
+	_ = u.Answer(c, F(chatID, "settings_updated"), nil)
+	_, _ = c.EditContent(chatID, u.MessageId, &td.InputMessageRichMessage{
+		Message: &td.InputRichMessage{Source: &td.RichMessageSourceHtml{Text: panel}},
+	}, &td.EditMessageMediaOpts{ReplyMarkup: buildSettingsMarkup(chatID, settings)})
 	return nil
 }
 
-func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *tg.ReplyInlineMarkup {
-	kb := tg.NewKeyboard()
+func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *td.ReplyMarkupInlineKeyboard {
+	rows := make([][]td.InlineKeyboardButton, 0, 6)
 
 	// Admin Mode
 	adminModeStatus := F(chatID, adminModeStatusKey(s.AdminMode))
-	kb.AddRow(
-		tg.Button.Data(F(chatID, "settings_btn_adminmode"), "info:adminmode"),
-		tg.Button.Data(adminModeStatus, "set:adminmode"),
-	)
+	rows = append(rows, []td.InlineKeyboardButton{
+		{
+			Text: F(chatID, "settings_btn_adminmode"),
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:adminmode")},
+		},
+		{
+			Text: adminModeStatus,
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:adminmode")},
+		},
+	})
 
 	// Play Mode
 	playModeStatus := F(
@@ -369,49 +357,90 @@ func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *tg.ReplyInline
 		),
 	)
 
-	kb.AddRow(
-		tg.Button.Data(F(chatID, "settings_btn_playmode"), "info:playmode"),
-		tg.Button.Data(playModeStatus, "set:playmode"),
-	)
+	rows = append(rows, []td.InlineKeyboardButton{
+		{
+			Text: F(chatID, "settings_btn_playmode"),
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:playmode")},
+		},
+		{
+			Text: playModeStatus,
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:playmode")},
+		},
+	})
 
 	// Cmd Delete
 	cmdDeleteStatus := utils.IfElse(s.CommandDelete, "enabled", "disabled")
-	kb.AddRow(
-		tg.Button.Data(F(chatID, "settings_btn_cmddelete"), "info:cmddelete"),
-		tg.Button.Data(F(chatID, cmdDeleteStatus), "set:cmddelete"),
-	)
+	rows = append(rows, []td.InlineKeyboardButton{
+		{
+			Text: F(chatID, "settings_btn_cmddelete"),
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:cmddelete")},
+		},
+		{
+			Text: F(chatID, cmdDeleteStatus),
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:cmddelete")},
+		},
+	})
 
 	// Clean Mode
 	cleanModeStatus := utils.IfElse(s.CleanMode, "enabled", "disabled")
-	kb.AddRow(
-		tg.Button.Data(F(chatID, "settings_btn_cleanmode"), "info:cleanmode"),
-		tg.Button.Data(F(chatID, cleanModeStatus), "set:cleanmode"),
-	)
+	rows = append(rows, []td.InlineKeyboardButton{
+		{
+			Text: F(chatID, "settings_btn_cleanmode"),
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:cleanmode")},
+		},
+		{
+			Text: F(chatID, cleanModeStatus),
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:cleanmode")},
+		},
+	})
 
 	cleanDuration := s.CleanModeDurationMins
 	if cleanDuration <= 0 {
 		cleanDuration = 15
 	}
-	kb.AddRow(
-		tg.Button.Data(F(chatID, "settings_btn_cleanduration"), "info:cleanduration"),
-		tg.Button.Data(utils.IntToStr(cleanDuration)+"m", "set:cleanduration"),
-	)
+	rows = append(rows, []td.InlineKeyboardButton{
+		{
+			Text: F(chatID, "settings_btn_cleanduration"),
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:cleanduration")},
+		},
+		{
+			Text: utils.IntToStr(cleanDuration) + "m",
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:cleanduration")},
+		},
+	})
 
 	// Thumbnails
 	thumbStatus := utils.IfElse(!s.ThumbnailsDisabled, "enabled", "disabled")
 
-	kb.AddRow(
-		tg.Button.Data(F(chatID, "settings_btn_nothumb"), "info:nothumb"),
-		tg.Button.Data(F(chatID, thumbStatus), "set:nothumb"),
-	)
+	rows = append(rows, []td.InlineKeyboardButton{
+		{
+			Text: F(chatID, "settings_btn_nothumb"),
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:nothumb")},
+		},
+		{
+			Text: F(chatID, thumbStatus),
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:nothumb")},
+		},
+	})
 
 	// Language
-	kb.AddRow(
-		tg.Button.Data(F(chatID, "settings_btn_lang"), "info:lang"),
-		tg.Button.Data(F(chatID, "name"), "lang:select"),
-	)
+	rows = append(rows, []td.InlineKeyboardButton{
+		{
+			Text: F(chatID, "settings_btn_lang"),
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:lang")},
+		},
+		{
+			Text: F(chatID, "name"),
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("lang:select")},
+		},
+	})
 
-	kb.AddRow(tg.Button.Data(F(chatID, "CLOSE_BTN"), "close"))
+	rows = append(rows, []td.InlineKeyboardButton{
+		{
+			Text: F(chatID, "CLOSE_BTN"),
+			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("close")},
+		},
+	})
 
-	return kb.Build()
+	return &td.ReplyMarkupInlineKeyboard{Rows: rows}
 }

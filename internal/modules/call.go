@@ -20,15 +20,12 @@ package modules
 import (
 	"context"
 
-	"github.com/Laky-64/gologging"
-	"github.com/amarnathcjd/gogram/telegram"
-
-	"main/internal/core"
-	state "main/internal/core/models"
-	"main/internal/locales"
-	"main/internal/platforms"
-	"main/internal/utils"
-	"main/ntgcalls"
+	"yukkimusic/internal/core"
+	state "yukkimusic/internal/core/models"
+	"yukkimusic/internal/locales"
+	"yukkimusic/internal/platforms"
+	"yukkimusic/internal/utils"
+	"yukkimusic/ntgcalls"
 )
 
 func streamEndHandler(
@@ -37,56 +34,50 @@ func streamEndHandler(
 	_ ntgcalls.StreamDevice,
 ) {
 	if streamType == ntgcalls.VideoStream {
-		gologging.Debug("[onStreamEndHandler] Video stream ended, returning")
+		utils.Log.Debug("[onStreamEndHandler] Video stream ended, returning")
 		return
 	}
 
-	gologging.DebugF("[onStreamEndHandler] Stream ended in chat %d", chatID)
-	ass, err := core.Assistants.ForChat(chatID)
-	if err != nil {
-		gologging.ErrorF("Failed to get Assistant for %d: %v", chatID, err)
-		return
-	}
-	r, ok := core.GetRoom(chatID, ass, false)
+	utils.Log.Debugf("[onStreamEndHandler] Stream ended in chat %d", chatID)
+	r, ok := core.Rooms.Get(chatID)
 	if !ok {
 		return
 	}
-	scheduleOldPlayingMessage(r)
 
-	if ok, v := r.GetData("is_transitioning"); ok {
-		if ok, v := v.(bool); ok && v {
+	c := core.Bot
+	cid := r.ControlChatID
+
+	var t *state.Track
+	var wasLooping bool
+	if r.QueueLen() == 0 && r.Loop() == 0 {
+		if autoplay := pickAutoplayTrack(r, r.Track()); autoplay != nil {
+			r.AddTracks(autoplay)
+		}
+
+		if r.QueueLen() == 0 {
+			core.Rooms.Delete(chatID)
+			if _, err := c.SendMessage(cid, F(cid, "stream_queue_finished"), nil); err != nil {
+				utils.Log.Error(err.Error())
+			}
 			return
 		}
 	}
 
-	r.SetData("is_transitioning", true)
-	defer r.DeleteData("is_transitioning")
-
-	cid := r.ChatID
-	r.Parse()
-
-	var t *state.Track
-	var wasLooping bool
-	if len(r.Queue()) == 0 && r.Loop() == 0 {
-		core.DeleteRoom(chatID)
-		core.Bot.SendMessage(cid, F(cid, "stream_queue_finished"))
-		return
-	} else {
-		wasLooping = r.Loop() > 0
-		t = r.NextTrack()
-	}
+	wasLooping = r.Loop() > 0
+	t = r.NextTrack()
 
 	statusText := F(cid, "stream_downloading_next")
 	if wasLooping && t != nil && r.FilePath() != "" {
 		statusText = F(cid, "cb_replaying")
+	} else if t != nil && t.Requester == F(cid, "autoplay_requester") {
+		statusText = F(cid, "stream_autoplay_next", locales.Arg{
+			"title": utils.EscapeHTML(utils.ShortTitle(t.Title, 25)),
+		})
 	}
 
-	statusMsg, err := core.Bot.SendMessage(
-		cid,
-		statusText,
-	)
+	statusMsg, err := c.SendMessage(cid, statusText, nil)
 	if err != nil {
-		gologging.ErrorF("[call.go] Failed to send msg: %v", err)
+		utils.Log.Errorf("[call.go] Failed to send msg: %v", err)
 	}
 
 	var filePath string
@@ -97,50 +88,31 @@ func streamEndHandler(
 	}
 
 	if err != nil {
-		gologging.ErrorF(
+		utils.Log.Errorf(
 			"[onStreamEndHandler] Download failed for %s: %v",
 			t.URL,
 			err,
 		)
-		utils.EOR(statusMsg, F(cid, "stream_download_fail", locales.Arg{
+		utils.EOR(c, statusMsg, F(cid, "stream_download_fail", locales.Arg{
 			"error": err.Error(),
-		}))
-		core.DeleteRoom(chatID)
+		}), nil)
+		core.Rooms.Delete(chatID)
 
 		return
 	}
 
 	if err := r.Play(t, filePath, true); err != nil {
-		gologging.ErrorF(
+		utils.Log.Errorf(
 			"[onStreamEndHandler] Play failed for %s: %v",
 			t.URL,
 			err,
 		)
-		utils.EOR(statusMsg, F(cid, "stream_play_fail"))
-		core.DeleteRoom(chatID)
+		utils.EOR(c, statusMsg, F(cid, "stream_play_fail"), nil)
+		core.Rooms.Delete(chatID)
 
 		return
 	}
 
-	title := utils.ShortTitle(t.Title, 25)
-	safeTitle := utils.EscapeHTML(title)
-
-	msgText := F(cid, "stream_now_playing", locales.Arg{
-		"url":      t.URL,
-		"title":    safeTitle,
-		"duration": utils.FormatDuration(t.Duration),
-		"by":       t.Requester,
-	})
-
-	opt := &telegram.SendOptions{
-		ParseMode:   "HTML",
-		ReplyMarkup: core.GetPlayMarkup(cid, r, false),
-	}
-
-	if t.Artwork != "" && shouldShowThumb(chatID) {
-		opt.Media = utils.CleanURL(t.Artwork)
-	}
-
-	statusMsg, _ = utils.EOR(statusMsg, msgText, opt)
+	statusMsg = sendNowPlaying(c, statusMsg, cid, r, t)
 	r.SetStatusMsg(statusMsg)
 }

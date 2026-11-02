@@ -5,239 +5,224 @@ package ntgcalls
 import "C"
 
 import (
+	"errors"
 	"fmt"
 	"unsafe"
 )
 
-func parseConnectionState(state C.ntg_connection_state_enum) ConnectionState {
+func slicePtr[T any](data []T) *T {
+	if len(data) == 0 {
+		return nil
+	}
+	return &data[0]
+}
+
+func parseResult(result C.ntg_result) error {
+	if result == C.NTG_OK {
+		return nil
+	}
+	if message := C.GoString(C.ntg_last_error()); len(message) > 0 {
+		return errors.New(message)
+	}
+	return fmt.Errorf("error code: %d", int32(result))
+}
+
+func parseConnectionState(state C.ntg_connection_state) ConnectionState {
 	switch state {
-	case C.NTG_STATE_CONNECTING:
+	case C.NTG_CONNECTION_STATE_CONNECTING:
 		return Connecting
-	case C.NTG_STATE_CONNECTED:
+	case C.NTG_CONNECTION_STATE_CONNECTED:
 		return Connected
-	case C.NTG_STATE_FAILED:
+	case C.NTG_CONNECTION_STATE_FAILED:
 		return Failed
-	case C.NTG_STATE_TIMEOUT:
+	case C.NTG_CONNECTION_STATE_TIMEOUT:
 		return Timeout
-	case C.NTG_STATE_CLOSED:
+	case C.NTG_CONNECTION_STATE_CLOSED:
 		return Closed
 	}
 	return Connecting
 }
 
-func parseStreamDevice(device C.ntg_stream_device_enum) StreamDevice {
-	var goDevice StreamDevice
+func parseStreamDevice(device C.ntg_stream_device) StreamDevice {
 	switch device {
-	case C.NTG_STREAM_MICROPHONE:
-		goDevice = MicrophoneStream
-	case C.NTG_STREAM_SPEAKER:
-		goDevice = SpeakerStream
-	case C.NTG_STREAM_CAMERA:
-		goDevice = CameraStream
-	case C.NTG_STREAM_SCREEN:
-		goDevice = ScreenStream
+	case C.NTG_STREAM_DEVICE_MICROPHONE:
+		return MicrophoneStream
+	case C.NTG_STREAM_DEVICE_SPEAKER:
+		return SpeakerStream
+	case C.NTG_STREAM_DEVICE_CAMERA:
+		return CameraStream
+	case C.NTG_STREAM_DEVICE_SCREEN:
+		return ScreenStream
 	}
-	return goDevice
+	return MicrophoneStream
 }
 
-func parseBool(futureResult *Future) (bool, error) {
-	return *futureResult.errCode == 0, parseErrorCode(futureResult)
-}
-
-func parseBytes(data []byte) (*C.uint8_t, C.int) {
-	if len(data) > 0 {
-		return (*C.uint8_t)(C.CBytes(data)), C.int(len(data))
-	}
-	return nil, 0
-}
-
-func parseStringVector(data unsafe.Pointer, size C.int) []string {
-	result := make([]string, size)
-	for i := 0; i < int(size); i++ {
-		pointer := *(**C.char)(unsafe.Pointer(uintptr(data) + uintptr(i)*unsafe.Sizeof(uintptr(0))))
-		result[i] = C.GoString(pointer)
-		C.free(unsafe.Pointer(pointer))
-	}
-	C.free(data)
-	return result
-}
-
-func parseUint32VectorC(data []uint32) (*C.uint32_t, C.int) {
-	if len(data) > 0 {
-		cData := C.malloc(
-			C.size_t(len(data)) * C.size_t(unsafe.Sizeof(C.uint32_t(0))),
-		)
-		if cData == nil {
-			return nil, 0
-		}
-		ssrcs := (*C.uint32_t)(cData)
-		for i, v := range data {
-			*(*C.uint32_t)(unsafe.Pointer(uintptr(unsafe.Pointer(ssrcs)) + uintptr(i)*unsafe.Sizeof(C.uint32_t(0)))) = C.uint32_t(
-				v,
-			)
-		}
-		return ssrcs, C.int(len(data))
-	}
-	return nil, 0
-}
-
-func parseStringVectorC(data []string) (**C.char, C.int) {
-	if len(data) == 0 {
-		return nil, 0
-	}
-	cArray := C.malloc(
-		C.size_t(len(data)) * C.size_t(unsafe.Sizeof(uintptr(0))),
-	)
-	goSlice := (*[1 << 30]*C.char)(cArray)[:len(data):len(data)]
-	for i, v := range data {
-		goSlice[i] = C.CString(v)
-	}
-	return (**C.char)(cArray), C.int(len(data))
-}
-
-func freeStringVectorC(data **C.char, size C.int) {
-	if data == nil {
-		return
-	}
-	goSlice := (*[1 << 30]*C.char)(unsafe.Pointer(data))[:size:size]
-	for i := 0; i < int(size); i++ {
-		C.free(unsafe.Pointer(goSlice[i]))
-	}
-	C.free(unsafe.Pointer(data))
-}
-
-func parseErrorCode(futureResult *Future) error {
-	errorCode := int32(*futureResult.errCode)
-	var message string
-	if futureResult.errMessage != nil {
-		cMessage := *futureResult.errMessage
-		if cMessage != nil {
-			message = C.GoString(cMessage)
-			C.free(unsafe.Pointer(cMessage))
-			*futureResult.errMessage = nil
-		}
-	}
-
-	if errorCode < 0 {
-		if len(message) == 0 {
-			message = fmt.Sprintf("Error code: %d", errorCode)
-		}
-		return fmt.Errorf("%s", message)
-	}
-	return nil
-}
-
-func parseStreamStatus(status C.ntg_stream_status_enum) StreamStatus {
+func parseStreamStatus(status C.ntg_stream_status) StreamStatus {
 	switch status {
-	case C.NTG_ACTIVE:
+	case C.NTG_STREAM_STATUS_ACTIVE:
 		return ActiveStream
-	case C.NTG_PAUSED:
+	case C.NTG_STREAM_STATUS_PAUSED:
 		return PausedStream
-	case C.NTG_IDLING:
+	case C.NTG_STREAM_STATUS_IDLING:
 		return IdlingStream
 	}
 	return ActiveStream
 }
 
-func parseRtcServers(rtcServers []RTCServer) *C.ntg_rtc_server_struct {
-	if len(rtcServers) == 0 {
+func parseMediaState(state C.ntg_media_state) MediaState {
+	return MediaState{
+		Muted:               bool(state.muted),
+		VideoPaused:         bool(state.video_paused),
+		VideoStopped:        bool(state.video_stopped),
+		PresentationPaused:  bool(state.presentation_paused),
+		PresentationStopped: bool(state.presentation_stopped),
+	}
+}
+
+func parseBytes(data []byte) (*C.uint8_t, C.size_t) {
+	if len(data) == 0 {
+		return nil, 0
+	}
+	return (*C.uint8_t)(C.CBytes(data)), C.size_t(len(data))
+}
+
+func freeBytes(data *C.uint8_t) {
+	if data != nil {
+		C.free(unsafe.Pointer(data))
+	}
+}
+
+func parseStringVector(data **C.char, size C.size_t) []string {
+	raw := unsafe.Slice(data, int(size))
+	result := make([]string, len(raw))
+	for i, pointer := range raw {
+		result[i] = C.GoString(pointer)
+	}
+	return result
+}
+
+func parseStringVectorC(data []string) []*C.char {
+	if len(data) == 0 {
 		return nil
 	}
-	cArray := C.malloc(
-		C.size_t(
-			len(rtcServers),
-		) * C.size_t(
-			unsafe.Sizeof(C.ntg_rtc_server_struct{}),
-		),
-	)
-	goSlice := (*[1 << 30]C.ntg_rtc_server_struct)(cArray)[:len(rtcServers):len(rtcServers)]
+	raw := make([]*C.char, len(data))
+	for i, value := range data {
+		raw[i] = C.CString(value)
+	}
+	return raw
+}
+
+func freeStringVectorC(data []*C.char) {
+	for _, value := range data {
+		C.free(unsafe.Pointer(value))
+	}
+}
+
+func parseUint32VectorC(data []uint32) (*C.uint32_t, C.size_t) {
+	if len(data) == 0 {
+		return nil, 0
+	}
+	cData := C.malloc(C.size_t(len(data)) * C.size_t(unsafe.Sizeof(C.uint32_t(0))))
+	if cData == nil {
+		return nil, 0
+	}
+	value := unsafe.Slice((*C.uint32_t)(cData), len(data))
+	for i, item := range data {
+		value[i] = C.uint32_t(item)
+	}
+	return (*C.uint32_t)(cData), C.size_t(len(data))
+}
+
+func parseRtcServers(rtcServers []RTCServer) []C.ntg_rtc_server {
+	rawServers := make([]C.ntg_rtc_server, len(rtcServers))
 	for i, server := range rtcServers {
-		goSlice[i] = C.ntg_rtc_server_struct{
-			ipv4:        C.CString(server.Ipv4),
-			ipv6:        C.CString(server.Ipv6),
-			username:    C.CString(server.Username),
-			password:    C.CString(server.Password),
-			port:        C.uint16_t(server.Port),
-			turn:        C.bool(server.Turn),
-			stun:        C.bool(server.Stun),
-			tcp:         C.bool(server.Tcp),
-			peerTag:     nil,
-			peerTagSize: 0,
-		}
-		if len(server.PeerTag) > 0 {
-			peerTagC, peerTagSize := parseBytes(server.PeerTag)
-			goSlice[i].peerTag = peerTagC
-			goSlice[i].peerTagSize = peerTagSize
+		peerTagC, peerTagSize := parseBytes(server.PeerTag)
+		rawServers[i] = C.ntg_rtc_server{
+			id:           C.uint64_t(server.ID),
+			ipv4:         C.CString(server.IPv4),
+			ipv6:         C.CString(server.IPv6),
+			username:     C.CString(server.Username),
+			password:     C.CString(server.Password),
+			port:         C.uint16_t(server.Port),
+			turn:         C.bool(server.TURN),
+			stun:         C.bool(server.STUN),
+			tcp:          C.bool(server.TCP),
+			peer_tag:     peerTagC,
+			peer_tag_len: peerTagSize,
 		}
 	}
-	return (*C.ntg_rtc_server_struct)(cArray)
+	return rawServers
 }
 
-func freeRtcServers(servers *C.ntg_rtc_server_struct, size C.int) {
-	if servers == nil {
-		return
+func freeRtcServers(rawServers []C.ntg_rtc_server) {
+	for _, server := range rawServers {
+		C.free(unsafe.Pointer(server.ipv4))
+		C.free(unsafe.Pointer(server.ipv6))
+		C.free(unsafe.Pointer(server.username))
+		C.free(unsafe.Pointer(server.password))
+		freeBytes(server.peer_tag)
 	}
-	goSlice := (*[1 << 30]C.ntg_rtc_server_struct)(unsafe.Pointer(servers))[:size:size]
-	for i := 0; i < int(size); i++ {
-		C.free(unsafe.Pointer(goSlice[i].ipv4))
-		C.free(unsafe.Pointer(goSlice[i].ipv6))
-		C.free(unsafe.Pointer(goSlice[i].username))
-		C.free(unsafe.Pointer(goSlice[i].password))
-		if goSlice[i].peerTag != nil {
-			C.free(unsafe.Pointer(goSlice[i].peerTag))
-		}
-	}
-	C.free(unsafe.Pointer(servers))
 }
 
-func parseSsrcGroups(ssrcGroups []SsrcGroup) *C.ntg_ssrc_group_struct {
-	if len(ssrcGroups) == 0 {
-		return nil
-	}
-	cArray := C.malloc(
-		C.size_t(
-			len(ssrcGroups),
-		) * C.size_t(
-			unsafe.Sizeof(C.ntg_ssrc_group_struct{}),
-		),
-	)
-	goSlice := (*[1 << 30]C.ntg_ssrc_group_struct)(cArray)[:len(ssrcGroups):len(ssrcGroups)]
-	for i, group := range ssrcGroups {
-		ssrcsC, sizeSsrcs := parseUint32VectorC(group.Ssrcs)
-		goSlice[i] = C.ntg_ssrc_group_struct{
+func parseSSRCGroups(groups []SSRCGroup) []C.ntg_ssrc_group {
+	rawGroups := make([]C.ntg_ssrc_group, len(groups))
+	for i, group := range groups {
+		ssrcs, ssrcsLen := parseUint32VectorC(group.SSRCs)
+		rawGroups[i] = C.ntg_ssrc_group{
 			semantics: C.CString(group.Semantics),
-			ssrcs:     ssrcsC,
-			sizeSsrcs: sizeSsrcs,
+			ssrcs:     ssrcs,
+			ssrcs_len: ssrcsLen,
 		}
 	}
-	return (*C.ntg_ssrc_group_struct)(cArray)
+	return rawGroups
 }
 
-func freeSsrcGroups(groups *C.ntg_ssrc_group_struct, size C.int) {
-	if groups == nil {
-		return
-	}
-	goSlice := (*[1 << 30]C.ntg_ssrc_group_struct)(unsafe.Pointer(groups))[:size:size]
-	for i := 0; i < int(size); i++ {
-		C.free(unsafe.Pointer(goSlice[i].semantics))
-		if goSlice[i].ssrcs != nil {
-			C.free(unsafe.Pointer(goSlice[i].ssrcs))
+func freeSSRCGroups(groups []C.ntg_ssrc_group) {
+	for _, group := range groups {
+		C.free(unsafe.Pointer(group.semantics))
+		if group.ssrcs != nil {
+			C.free(unsafe.Pointer(group.ssrcs))
 		}
 	}
-	C.free(unsafe.Pointer(groups))
 }
 
-func parseDeviceInfoVector(devices unsafe.Pointer, size C.int) []DeviceInfo {
-	rawDevices := make([]DeviceInfo, size)
-	for i := 0; i < int(size); i++ {
-		device := *(*C.ntg_device_info_struct)(unsafe.Pointer(uintptr(devices) + uintptr(i)*unsafe.Sizeof(C.ntg_device_info_struct{})))
-		rawDevices[i] = DeviceInfo{
+func parseSSRCMappings(mappings []SSRCMapping) []C.ntg_ssrc_mapping {
+	rawMappings := make([]C.ntg_ssrc_mapping, len(mappings))
+	for i, mapping := range mappings {
+		rawMappings[i] = C.ntg_ssrc_mapping{
+			user_id: C.int64_t(mapping.UserID),
+			ssrc:    C.int32_t(mapping.SSRC),
+		}
+	}
+	return rawMappings
+}
+
+func parseBlocks(blocks [][]byte) []C.ntg_bytes {
+	rawBlocks := make([]C.ntg_bytes, len(blocks))
+	for i, block := range blocks {
+		data, size := parseBytes(block)
+		rawBlocks[i] = C.ntg_bytes{
+			data: data,
+			len:  size,
+		}
+	}
+	return rawBlocks
+}
+
+func freeBlocks(blocks []C.ntg_bytes) {
+	for _, block := range blocks {
+		freeBytes(block.data)
+	}
+}
+
+func parseDeviceInfoVector(devices *C.ntg_device_info, size C.size_t) []DeviceInfo {
+	raw := unsafe.Slice(devices, int(size))
+	result := make([]DeviceInfo, len(raw))
+	for i, device := range raw {
+		result[i] = DeviceInfo{
 			Name:     C.GoString(device.name),
 			Metadata: C.GoString(device.metadata),
 		}
-		C.free(unsafe.Pointer(device.name))
-		C.free(unsafe.Pointer(device.metadata))
 	}
-	defer C.free(devices)
-	return rawDevices
+	return result
 }

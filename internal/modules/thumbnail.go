@@ -20,11 +20,10 @@ package modules
 import (
 	"strings"
 
-	tg "github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
-	"main/internal/database"
-	"main/internal/locales"
-	"main/internal/utils"
+	"yukkimusic/internal/database"
+	"yukkimusic/internal/utils"
 )
 
 func init() {
@@ -44,50 +43,30 @@ func init() {
 
 <b>⚠️ Note:</b>
 This setting affects all future playback messages in this chat.`
+	dashboards["nothumb"] = dashboardDef{
+		title:       func(chatID int64) string { return F(chatID, "nothumb_title") },
+		description: func(chatID int64) string { return F(chatID, "nothumb_desc") },
+		canUse:      canUseAdminCallback,
+		get:         func(chatID int64) (bool, error) { return database.ThumbnailsDisabled(chatID) },
+		set:         func(chatID int64, on bool) error { return database.SetThumbnailsDisabled(chatID, on) },
+	}
 }
 
-func nothumbHandler(m *tg.NewMessage) error {
-	chatID := m.ChannelID()
-	args := strings.Fields(m.Text())
+func nothumbHandler(c *td.Client, m *td.Message) error {
+	if !isSuperGroup(c, m) || !filterAuthUsers(c, m) {
+		return nil
+	}
+	chatID := m.ChatID()
 
-	current, err := database.ThumbnailsDisabled(chatID)
-	if err != nil {
-		m.Reply(F(chatID, "nothumb_fetch_fail"))
-		return tg.ErrEndGroup
+	if args := strings.Fields(m.Text()); len(args) > 1 {
+		if enabled, err := utils.ParseBool(args[1]); err == nil {
+			if current, cerr := database.ThumbnailsDisabled(chatID); cerr == nil && enabled != current {
+				if err := database.SetThumbnailsDisabled(chatID, enabled); err != nil {
+					return err
+				}
+			}
+		}
 	}
 
-	if len(args) < 2 {
-		action := utils.IfElse(!current, "enabled", "disabled")
-		m.Reply(F(chatID, "nothumb_status", locales.Arg{
-			"cmd":    getCommand(m),
-			"action": action,
-		}))
-		return tg.ErrEndGroup
-	}
-
-	value, err := utils.ParseBool(args[1])
-	if err != nil {
-		m.Reply(F(chatID, "invalid_bool"))
-		return tg.ErrEndGroup
-	}
-
-	if current == value {
-		action := utils.IfElse(!value, "enabled", "disabled")
-		m.Reply(F(chatID, "nothumb_already", locales.Arg{
-			"action": action,
-		}))
-		return tg.ErrEndGroup
-	}
-
-	if err := database.SetThumbnailsDisabled(chatID, value); err != nil {
-		m.Reply(F(chatID, "nothumb_update_fail"))
-		return tg.ErrEndGroup
-	}
-
-	action := utils.IfElse(!value, "enabled", "disabled")
-
-	m.Reply(F(chatID, "nothumb_updated", locales.Arg{
-		"action": action,
-	}))
-	return tg.ErrEndGroup
+	return sendDashboard(c, m, "nothumb")
 }

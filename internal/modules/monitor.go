@@ -20,9 +20,9 @@ package modules
 import (
 	"time"
 
-	"github.com/amarnathcjd/gogram/telegram"
+	td "github.com/AshokShau/gotdbot"
 
-	"main/internal/core"
+	"yukkimusic/internal/core"
 )
 
 func MonitorRooms() {
@@ -32,43 +32,41 @@ func MonitorRooms() {
 	sem := make(chan struct{}, 20)
 
 	for range ticker.C {
-		for chatID, room := range core.GetAllRooms() {
+		for _, room := range core.Rooms.All() {
 
 			sem <- struct{}{}
 
-			go func(chatID int64, r *core.RoomState) {
+			go func(r *core.Room) {
 				defer func() { <-sem }()
 
-				if !r.IsActiveChat() {
-					/*
-						// TODO: TEST IT AND INCREASE SLEEP TIME
-						time.Sleep(5 * time.Second)
-
-						if !r.IsActiveChat() {
-							core.DeleteRoom(chatID)
-							return
-						}
-					*/
+				snap := r.Snapshot()
+				if !snap.Active() || snap.Playback == core.PlaybackPaused {
 					return
 				}
 
-				if r.IsPaused() {
-					return
-				}
-
-				r.Parse()
+				track := snap.Track
 				statusMsg := r.StatusMsg()
 				if statusMsg == nil {
 					return
 				}
 
-				markup := core.GetPlayMarkup(r.ChatID, r, false)
-				opts := &telegram.SendOptions{
-					ReplyMarkup: markup,
-					Entities:    statusMsg.Message.Entities,
+				text := nowPlayingText(r.ControlChatID, track)
+				markup := core.GetPlayMarkup(r.ControlChatID, r, false)
+
+				switch statusMsg.Content.(type) {
+				case *td.MessagePhoto:
+					_, _ = statusMsg.EditCaption(core.Bot, text, &td.EditMessageCaptionOpts{
+						ParseMode:   td.ParseModeHTML,
+						ReplyMarkup: markup,
+					})
+				default:
+					_, _ = statusMsg.EditText(core.Bot, text, &td.EditMessageTextOpts{
+						ParseMode:             td.ParseModeHTML,
+						ReplyMarkup:           markup,
+						DisableWebPagePreview: true,
+					})
 				}
-				statusMsg.Edit(statusMsg.Text(), opts)
-			}(chatID, room)
+			}(room)
 		}
 	}
 }
