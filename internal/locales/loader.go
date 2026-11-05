@@ -21,6 +21,7 @@ import (
 	"embed"
 	"fmt"
 	"path"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -34,7 +35,10 @@ import (
 //go:embed *.yml
 var localesFS embed.FS
 
-var loadedLocales = make(map[string]map[string]string)
+var (
+	loadedLocales = make(map[string]map[string]string)
+	placeholderRe = regexp.MustCompile(`\{(\w+)\}`)
+)
 
 const baseLang = "en"
 
@@ -73,36 +77,44 @@ func Load() error {
 	return nil
 }
 
-func lookup(lang, key string, values Arg) (string, bool) {
+func lookup(lang, key string) (string, bool) {
 	for _, l := range []string{lang, config.DefaultLang, baseLang} {
-		val, ok := loadedLocales[l][key]
-		if !ok {
-			continue
+		if val, ok := loadedLocales[l][key]; ok {
+			return val, true
 		}
-		for k, v := range values {
-			val = strings.ReplaceAll(val, "{"+k+"}", fmt.Sprint(v))
-		}
-		return val, true
 	}
 
 	utils.Log.Errorf("Missing translation → lang=%s key=%s", lang, key)
 	return "", false
 }
 
+func fill(s string, values Arg) string {
+	if len(values) == 0 {
+		return s
+	}
+	return placeholderRe.ReplaceAllStringFunc(s, func(m string) string {
+		if v, ok := values[m[1:len(m)-1]]; ok {
+			return fmt.Sprint(v)
+		}
+		return m
+	})
+}
+
 func Get(lang, key string, values Arg) string {
-	val, ok := lookup(lang, key, values)
+	val, ok := lookup(lang, key)
 	if !ok {
 		return fmt.Sprintf("[%s]", key)
 	}
-	return expandEmojis(val)
+	return fill(expandEmojis(val), values)
 }
 
 func GetButton(lang, key string, values Arg) (string, int64) {
-	val, ok := lookup(lang, key, values)
+	val, ok := lookup(lang, key)
 	if !ok {
 		return fmt.Sprintf("[%s]", key), 0
 	}
-	return buttonEmoji(val)
+	text, icon := buttonEmoji(val)
+	return fill(text, values), icon
 }
 
 func GetAvailableLanguages() []string {
