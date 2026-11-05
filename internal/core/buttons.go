@@ -86,35 +86,50 @@ func styleBtn(text, cb, colour string) td.InlineKeyboardButton {
 	return b
 }
 
+func DataBtnT(chatID int64, key, data string) td.InlineKeyboardButton {
+	text, icon := buttonText(chatID, key)
+	btn := dataBtn(text, data)
+	btn.IconCustomEmojiId = icon
+	return btn
+}
+
+func urlBtnT(chatID int64, key, url string) td.InlineKeyboardButton {
+	text, icon := buttonText(chatID, key)
+	btn := urlBtn(text, url)
+	btn.IconCustomEmojiId = icon
+	return btn
+}
+
+func styleBtnT(chatID int64, key, data, colour string) td.InlineKeyboardButton {
+	text, icon := buttonText(chatID, key)
+	btn := styleBtn(text, data, colour)
+	btn.IconCustomEmojiId = icon
+	return btn
+}
+
+func row(btns ...td.InlineKeyboardButton) []td.InlineKeyboardButton {
+	return btns
+}
+
+func keyboard(rows ...[]td.InlineKeyboardButton) td.ReplyMarkup {
+	return &td.ReplyMarkupInlineKeyboard{Rows: rows}
+}
+
 func GetCancelKeyboard(chatID int64) td.ReplyMarkup {
-	text, iconID := buttonText(chatID, "DOWNLOAD_CANCEL_BTN")
-	btn := dataBtn(text, "cancel")
-	btn.IconCustomEmojiId = iconID
-	return &td.ReplyMarkupInlineKeyboard{
-		Rows: [][]td.InlineKeyboardButton{{btn}},
-	}
+	return keyboard(row(DataBtnT(chatID, "DOWNLOAD_CANCEL_BTN", "cancel")))
 }
 
 func GetBroadcastCancelKeyboard(chatID int64) td.ReplyMarkup {
-	text, iconID := buttonText(chatID, "BROADCAST_CANCEL_BTN")
-	btn := dataBtn(text, "bcast_cancel")
-	btn.IconCustomEmojiId = iconID
-	return &td.ReplyMarkupInlineKeyboard{
-		Rows: [][]td.InlineKeyboardButton{{btn}},
-	}
+	return keyboard(row(DataBtnT(chatID, "BROADCAST_CANCEL_BTN", "bcast_cancel")))
 }
 
 func SuppMarkup(chatID int64) td.ReplyMarkup {
-	text, iconID := buttonText(chatID, "SUPPORT_BTN")
-	btn := urlBtn(text, config.SupportChat)
-	btn.IconCustomEmojiId = iconID
+	btn := urlBtnT(chatID, "SUPPORT_BTN", config.SupportChat)
 	if !config.DisableColour {
 		btn.Style = td.ButtonStylePrimary{}
 	}
 
-	return &td.ReplyMarkupInlineKeyboard{
-		Rows: [][]td.InlineKeyboardButton{{btn}},
-	}
+	return keyboard(row(btn))
 }
 
 // getActionToggle returns a single-button keyboard that toggles the given
@@ -129,13 +144,7 @@ func getActionToggle(chatID int64, r *Room, action string) td.ReplyMarkup {
 		key, action = "UNMUTE_BTN", "unmute"
 	}
 
-	text, iconID := buttonText(chatID, key)
-	btn := dataBtn(text, fmt.Sprintf("room:%d:%s", r.ChatID, action))
-	btn.IconCustomEmojiId = iconID
-
-	return &td.ReplyMarkupInlineKeyboard{
-		Rows: [][]td.InlineKeyboardButton{{btn}},
-	}
+	return keyboard(row(DataBtnT(chatID, key, fmt.Sprintf("room:%d:%s", r.ChatID, action))))
 }
 
 // GetPauseToggle returns a pause/resume toggle keyboard for the room.
@@ -155,26 +164,16 @@ func GetStopConfirmMarkup(
 ) td.ReplyMarkup {
 	prefix := fmt.Sprintf("room:%d:", r.ChatID)
 
-	text, cb := "CONFIRM_UNMUTE_BTN", prefix+"unmute"
+	key, cb := "CONFIRM_UNMUTE_BTN", prefix+"unmute"
 
 	if isPaused {
-		text, cb = "CONFIRM_RESUME_BTN", prefix+"resume"
+		key, cb = "CONFIRM_RESUME_BTN", prefix+"resume"
 	}
 
-	resumeText, resumeIcon := buttonText(chatID, text)
-	stopText, stopIcon := buttonText(chatID, "CONFIRM_STOP_BTN")
-
-	resumeBtn := styleBtn(resumeText, cb, "green")
-	resumeBtn.IconCustomEmojiId = resumeIcon
-
-	stopBtn := styleBtn(stopText, prefix+"stop", "red")
-	stopBtn.IconCustomEmojiId = stopIcon
-
-	return &td.ReplyMarkupInlineKeyboard{
-		Rows: [][]td.InlineKeyboardButton{
-			{resumeBtn, stopBtn},
-		},
-	}
+	return keyboard(row(
+		styleBtnT(chatID, key, cb, "green"),
+		styleBtnT(chatID, "CONFIRM_STOP_BTN", prefix+"stop", "red"),
+	))
 }
 
 func GetPlayMarkup(chatID int64, r *Room, queued bool) td.ReplyMarkup {
@@ -220,101 +219,76 @@ func GetPlayMarkup(chatID int64, r *Room, queued bool) td.ReplyMarkup {
 }
 
 func GetGroupHelpKeyboard(chatID int64) td.ReplyMarkup {
-	text, iconID := buttonText(chatID, "GC_HELP_BTN")
-	btn := urlBtn(text, "https://t.me/"+botUsername()+"?start=pm_help")
-	btn.IconCustomEmojiId = iconID
-	return &td.ReplyMarkupInlineKeyboard{
-		Rows: [][]td.InlineKeyboardButton{{btn}},
-	}
+	return keyboard(row(urlBtnT(chatID, "GC_HELP_BTN", "https://t.me/"+botUsername()+"?start=pm_help")))
 }
 
 func GetStartMarkup(chatID int64) td.ReplyMarkup {
-	addMeText, addMeIcon := buttonText(chatID, "ADD_ME_BTN")
-	addMeBtn := urlBtn(addMeText, "https://t.me/"+botUsername()+"?startgroup&admin=invite_users")
-	addMeBtn.IconCustomEmojiId = addMeIcon
-
-	helpText, helpIcon := buttonText(chatID, "START_HELP_BTN")
-	helpBtn := dataBtn(helpText, "help_cb")
-	helpBtn.IconCustomEmojiId = helpIcon
-
-	langText, langIcon := buttonText(chatID, "settings_btn_lang")
-	langBtn := dataBtn(langText, "lang:select")
-	langBtn.IconCustomEmojiId = langIcon
-
-	updatesText, updatesIcon := buttonText(chatID, "UPDATES_BTN")
-	updatesBtn := urlBtn(updatesText, config.SupportChannel)
-	updatesBtn.IconCustomEmojiId = updatesIcon
-
-	supportText, supportIcon := buttonText(chatID, "SUPPORT_BTN")
-	supportBtn := urlBtn(supportText, config.SupportChat)
-	supportBtn.IconCustomEmojiId = supportIcon
-
-	sourceText, sourceIcon := buttonText(chatID, "SOURCE_BTN")
-	sourceBtn := urlBtn(sourceText, "https://github.com/TheTeamVivek/YukkiMusic")
-	sourceBtn.IconCustomEmojiId = sourceIcon
-
-	return &td.ReplyMarkupInlineKeyboard{
-		Rows: [][]td.InlineKeyboardButton{
-			{addMeBtn},
-			{helpBtn},
-			{updatesBtn, supportBtn},
-			{langBtn, sourceBtn},
-		},
-	}
+	return keyboard(
+		row(urlBtnT(chatID, "ADD_ME_BTN", "https://t.me/"+botUsername()+"?startgroup&admin=invite_users")),
+		row(DataBtnT(chatID, "START_HELP_BTN", "help_cb")),
+		row(
+			urlBtnT(chatID, "UPDATES_BTN", config.SupportChannel),
+			urlBtnT(chatID, "SUPPORT_BTN", config.SupportChat),
+		),
+		row(
+			DataBtnT(chatID, "settings_btn_lang", "lang:select"),
+			urlBtnT(chatID, "SOURCE_BTN", "https://github.com/TheTeamVivek/YukkiMusic"),
+		),
+	)
 }
 
 func GetHelpKeyboard(chatID int64) td.ReplyMarkup {
-	adminsText, adminsIcon := buttonText(chatID, "HELP_ADMINS_BTN")
-	adminsBtn := dataBtn(adminsText, "help:admins")
-	adminsBtn.IconCustomEmojiId = adminsIcon
-
-	publicText, publicIcon := buttonText(chatID, "HELP_PUBLIC_BTN")
-	publicBtn := dataBtn(publicText, "help:public")
-	publicBtn.IconCustomEmojiId = publicIcon
-
-	ownerText, ownerIcon := buttonText(chatID, "HELP_OWNER_BTN")
-	ownerBtn := dataBtn(ownerText, "help:owner")
-	ownerBtn.IconCustomEmojiId = ownerIcon
-
-	sudoersText, sudoersIcon := buttonText(chatID, "HELP_SUDOERS_BTN")
-	sudoersBtn := dataBtn(sudoersText, "help:sudoers")
-	sudoersBtn.IconCustomEmojiId = sudoersIcon
-
-	backText, backIcon := buttonText(chatID, "BACK_BTN")
-	backBtn := styleBtn(backText, "start", "")
-	backBtn.IconCustomEmojiId = backIcon
-
-	return &td.ReplyMarkupInlineKeyboard{
-		Rows: [][]td.InlineKeyboardButton{
-			{adminsBtn, publicBtn},
-			{ownerBtn, sudoersBtn},
-			{backBtn},
-		},
-	}
+	return keyboard(
+		row(
+			DataBtnT(chatID, "HELP_ADMINS_BTN", "help:admins"),
+			DataBtnT(chatID, "HELP_PUBLIC_BTN", "help:public"),
+		),
+		row(
+			DataBtnT(chatID, "HELP_OWNER_BTN", "help:owner"),
+			DataBtnT(chatID, "HELP_SUDOERS_BTN", "help:sudoers"),
+		),
+		row(styleBtnT(chatID, "BACK_BTN", "start", "")),
+	)
 }
 
 func GetBackKeyboard(chatID int64) td.ReplyMarkup {
-	text, iconID := buttonText(chatID, "BACK_BTN")
-	btn := styleBtn(text, "help:main", "blue")
-	btn.IconCustomEmojiId = iconID
-	return &td.ReplyMarkupInlineKeyboard{
-		Rows: [][]td.InlineKeyboardButton{{btn}},
-	}
+	return keyboard(row(styleBtnT(chatID, "BACK_BTN", "help:main", "blue")))
 }
 
 func GetRestartConfirmMarkup(chatID int64) td.ReplyMarkup {
-	botText, botIcon := buttonText(chatID, "restart_btn_bot")
-	replayText, replayIcon := buttonText(chatID, "restart_btn_replay")
+	return keyboard(row(
+		styleBtnT(chatID, "restart_btn_bot", "restart:bot", "red"),
+		styleBtnT(chatID, "restart_btn_replay", "restart:replay", "green"),
+	))
+}
 
-	botBtn := styleBtn(botText, "restart:bot", "red")
-	botBtn.IconCustomEmojiId = botIcon
+// GetLangKeyboard lists the available languages two per row, marking lang as
+// selected. A non-empty back adds a back button with that callback data.
+func GetLangKeyboard(lang, back string) td.ReplyMarkup {
+	var rows [][]td.InlineKeyboardButton
+	var cur []td.InlineKeyboardButton
 
-	replayBtn := styleBtn(replayText, "restart:replay", "green")
-	replayBtn.IconCustomEmojiId = replayIcon
-
-	return &td.ReplyMarkupInlineKeyboard{
-		Rows: [][]td.InlineKeyboardButton{
-			{botBtn, replayBtn},
-		},
+	for _, l := range locales.GetAvailableLanguages() {
+		name := locales.Get(l, "name", nil)
+		if l == lang {
+			name = "✔️ " + name
+		}
+		cur = append(cur, dataBtn(name, "lang:"+l))
+		if len(cur) == 2 {
+			rows = append(rows, cur)
+			cur = nil
+		}
 	}
+	if len(cur) > 0 {
+		rows = append(rows, cur)
+	}
+
+	if back != "" {
+		text, icon := locales.GetButton(lang, "BACK_BTN", nil)
+		btn := dataBtn(text, back)
+		btn.IconCustomEmojiId = icon
+		rows = append(rows, row(btn))
+	}
+
+	return keyboard(rows...)
 }

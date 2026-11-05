@@ -23,8 +23,7 @@ import (
 
 	td "github.com/AshokShau/gotdbot"
 
-	"yukkimusic/config"
-	"yukkimusic/internal/database"
+	"yukkimusic/internal/core"
 	"yukkimusic/internal/locales"
 	"yukkimusic/internal/utils"
 )
@@ -64,22 +63,9 @@ func dashboardRich(
 
 // dashboardMarkup builds the toggle button and the close button for a dashboard.
 func dashboardMarkup(chatID int64, name string, enabled bool) td.ReplyMarkup {
-	lang, err := database.Language(chatID)
-	if err != nil {
-		lang = config.DefaultLang
-	}
-	label, iconID := locales.GetButton(lang, utils.IfElse(enabled, "dashboard_enabled", "dashboard_disabled"), nil)
-
-	toggle := td.InlineKeyboardButton{
-		Text: label,
-		Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("dashboard:" + name)},
-	}
-	toggle.IconCustomEmojiId = iconID
-
-	closeBtn := td.InlineKeyboardButton{
-		Text: F(chatID, "CLOSE_BTN"),
-		Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("close")},
-	}
+	key := utils.IfElse(enabled, "dashboard_enabled", "dashboard_disabled")
+	toggle := core.DataBtnT(chatID, key, "dashboard:"+name)
+	closeBtn := cbBtn(F(chatID, "CLOSE_BTN"), "close")
 
 	return &td.ReplyMarkupInlineKeyboard{
 		Rows: [][]td.InlineKeyboardButton{{closeBtn, toggle}},

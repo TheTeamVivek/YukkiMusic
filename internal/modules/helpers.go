@@ -308,6 +308,13 @@ func showTrackMessage(
 	return m
 }
 
+func cbBtn(text, data string) td.InlineKeyboardButton {
+	return td.InlineKeyboardButton{
+		Text: text,
+		Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte(data)},
+	}
+}
+
 func F(chatID int64, key string, values ...locales.Arg) string {
 	lang, err := database.Language(chatID)
 	if err != nil {

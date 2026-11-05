@@ -331,116 +331,56 @@ func settingsCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 	return nil
 }
 
+func settingRow(label, status, name string) []td.InlineKeyboardButton {
+	return []td.InlineKeyboardButton{
+		cbBtn(label, "info:"+name),
+		cbBtn(status, "set:"+name),
+	}
+}
+
 func buildSettingsMarkup(chatID int64, s *database.ChatSettings) *td.ReplyMarkupInlineKeyboard {
-	rows := make([][]td.InlineKeyboardButton, 0, 6)
-
-	// Admin Mode
-	adminModeStatus := F(chatID, adminModeStatusKey(s.AdminMode))
-	rows = append(rows, []td.InlineKeyboardButton{
-		{
-			Text: F(chatID, "settings_btn_adminmode"),
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:adminmode")},
-		},
-		{
-			Text: adminModeStatus,
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:adminmode")},
-		},
-	})
-
-	// Play Mode
-	playModeStatus := F(
-		chatID,
-		utils.IfElse(
-			s.PlayModeAdminsOnly,
-			"playmode_status_admins",
-			"playmode_status_everyone",
-		),
-	)
-
-	rows = append(rows, []td.InlineKeyboardButton{
-		{
-			Text: F(chatID, "settings_btn_playmode"),
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:playmode")},
-		},
-		{
-			Text: playModeStatus,
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:playmode")},
-		},
-	})
-
-	// Cmd Delete
-	cmdDeleteStatus := utils.IfElse(s.CommandDelete, "enabled", "disabled")
-	rows = append(rows, []td.InlineKeyboardButton{
-		{
-			Text: F(chatID, "settings_btn_cmddelete"),
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:cmddelete")},
-		},
-		{
-			Text: F(chatID, cmdDeleteStatus),
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:cmddelete")},
-		},
-	})
-
-	// Clean Mode
-	cleanModeStatus := utils.IfElse(s.CleanMode, "enabled", "disabled")
-	rows = append(rows, []td.InlineKeyboardButton{
-		{
-			Text: F(chatID, "settings_btn_cleanmode"),
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:cleanmode")},
-		},
-		{
-			Text: F(chatID, cleanModeStatus),
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:cleanmode")},
-		},
-	})
-
 	cleanDuration := s.CleanModeDurationMins
 	if cleanDuration <= 0 {
 		cleanDuration = 15
 	}
-	rows = append(rows, []td.InlineKeyboardButton{
-		{
-			Text: F(chatID, "settings_btn_cleanduration"),
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:cleanduration")},
-		},
-		{
-			Text: utils.IntToStr(cleanDuration) + "m",
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:cleanduration")},
-		},
-	})
 
-	// Thumbnails
-	thumbStatus := utils.IfElse(!s.ThumbnailsDisabled, "enabled", "disabled")
-
-	rows = append(rows, []td.InlineKeyboardButton{
+	rows := [][]td.InlineKeyboardButton{
+		settingRow(
+			F(chatID, "settings_btn_adminmode"),
+			F(chatID, adminModeStatusKey(s.AdminMode)),
+			"adminmode",
+		),
+		settingRow(
+			F(chatID, "settings_btn_playmode"),
+			F(chatID, utils.IfElse(s.PlayModeAdminsOnly, "playmode_status_admins", "playmode_status_everyone")),
+			"playmode",
+		),
+		settingRow(
+			F(chatID, "settings_btn_cmddelete"),
+			F(chatID, utils.IfElse(s.CommandDelete, "enabled", "disabled")),
+			"cmddelete",
+		),
+		settingRow(
+			F(chatID, "settings_btn_cleanmode"),
+			F(chatID, utils.IfElse(s.CleanMode, "enabled", "disabled")),
+			"cleanmode",
+		),
+		settingRow(
+			F(chatID, "settings_btn_cleanduration"),
+			utils.IntToStr(cleanDuration)+"m",
+			"cleanduration",
+		),
+		settingRow(
+			F(chatID, "settings_btn_nothumb"),
+			F(chatID, utils.IfElse(!s.ThumbnailsDisabled, "enabled", "disabled")),
+			"nothumb",
+		),
 		{
-			Text: F(chatID, "settings_btn_nothumb"),
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:nothumb")},
+			cbBtn(F(chatID, "settings_btn_lang"), "info:lang"),
+			cbBtn(F(chatID, "name"), "lang:select"),
 		},
-		{
-			Text: F(chatID, thumbStatus),
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("set:nothumb")},
-		},
-	})
-
-	// Language
-	rows = append(rows, []td.InlineKeyboardButton{
-		{
-			Text: F(chatID, "settings_btn_lang"),
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("info:lang")},
-		},
-		{
-			Text: F(chatID, "name"),
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("lang:select")},
-		},
-	})
-
-	rows = append(rows, []td.InlineKeyboardButton{
-		{
-			Text: F(chatID, "CLOSE_BTN"),
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("close")},
-		},
-	})
+		{cbBtn(F(chatID, "CLOSE_BTN"), "close")},
+	}
 
 	return &td.ReplyMarkupInlineKeyboard{Rows: rows}
 }

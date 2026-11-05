@@ -55,48 +55,13 @@ func showLangMenu(c *td.Client, m *td.Message) error {
 		back = "start"
 	}
 
-	markup := buildLangMarkup(chatID, lang, back)
+	markup := core.GetLangKeyboard(lang, back)
 
 	_, err = m.ReplyText(c, F(chatID, "lang_select"), &td.SendMessageOpts{
 		ParseMode:   td.ParseModeHTML,
 		ReplyMarkup: markup,
 	})
 	return err
-}
-
-func buildLangMarkup(chatID int64, lang string, back string) *td.ReplyMarkupInlineKeyboard {
-	var rows [][]td.InlineKeyboardButton
-	row := make([]td.InlineKeyboardButton, 0, 2)
-
-	for _, l := range locales.GetAvailableLanguages() {
-		name := locales.Get(l, "name", nil)
-		if l == lang {
-			name = "✔️ " + name
-		}
-		row = append(row, td.InlineKeyboardButton{
-			Text: name,
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte("lang:" + l)},
-		})
-		if len(row) == 2 {
-			rows = append(rows, row)
-			row = nil
-		}
-	}
-	if len(row) > 0 {
-		rows = append(rows, row)
-	}
-
-	if back != "" {
-		backText, backIcon := locales.GetButton(lang, "BACK_BTN", nil)
-		backBtn := td.InlineKeyboardButton{
-			Text: backText,
-			Type: &td.InlineKeyboardButtonTypeCallback{Data: []byte(back)},
-		}
-		backBtn.IconCustomEmojiId = backIcon
-		rows = append(rows, []td.InlineKeyboardButton{backBtn})
-	}
-
-	return &td.ReplyMarkupInlineKeyboard{Rows: rows}
 }
 
 func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
@@ -123,7 +88,7 @@ func langCallbackHandler(c *td.Client, u *td.UpdateNewCallbackQuery) error {
 		if err != nil {
 			cur = config.DefaultLang
 		}
-		markup := buildLangMarkup(chatID, cur, "set:main")
+		markup := core.GetLangKeyboard(cur, "set:main")
 		_, _ = c.EditRichMessageHTML(chatID, u.MessageId, F(chatID, "lang_select"), &td.EditRichTextOpts{
 			ReplyMarkup: markup,
 		})
@@ -159,7 +124,7 @@ func privateLangCallback(c *td.Client, u *td.UpdateNewCallbackQuery, lang string
 		if err != nil {
 			cur = config.DefaultLang
 		}
-		markup := buildLangMarkup(chatID, cur, "start")
+		markup := core.GetLangKeyboard(cur, "start")
 		_, _ = c.EditRichMessageHTML(chatID, u.MessageId, F(chatID, "lang_select"), &td.EditRichTextOpts{
 			ReplyMarkup: markup,
 		})
