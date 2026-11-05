@@ -701,7 +701,7 @@ speed_reset_success: "{emoji:✅} Playback speed reset to <b>1.0x</b> by {user}"
 speed_set: "{emoji:🚀} Playback speed set to <b>{speed}x</b> by {user}."
 
 start_private: |
-  <h3>{emoji:🎵} {bot}</h3>
+  <h3>{emoji:5470135030393090150|🎵} {bot}</h3>
   <p>Hey {user} — I stream music in your Telegram voice &amp; video chats from YouTube, Spotify, SoundCloud, Apple Music and more. Queue, loop, shuffle, seek and control speed with a live queue.</p>
   <p><b>Enjoy high-quality audio, fast downloads and smooth playback everywhere.</b></p>
   <footer><i>Tap the buttons below to add me or explore commands.</i></footer>

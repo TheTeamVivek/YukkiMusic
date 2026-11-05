@@ -59,22 +59,47 @@ addauth_success_with_count: "{emoji:✅} Added {user}.\nNow {count}/{limit} auth
 Don't paste raw emojis directly — use `{emoji:X}` tokens instead.
 
 **Case 1 — Predefined emoji**
-If the emoji is already listed in the [`emojiTokens`](../locales/emoji.go) map, just put that emoji inside the token:
+If the emoji is listed in the [`emojiTokens`](./emoji.go) map, put that emoji inside the token:
 
 ```yaml
 btn: "{emoji:▶️} Resume"
 ```
 
 **Case 2 — Any other (custom/premium) emoji**
-If the emoji is **not** in that map, use its Telegram custom-emoji ID directly:
+Use its Telegram custom-emoji ID followed by a fallback emoji:
 
 ```yaml
-btn: "{emoji:5234567890123456789} Resume"
+btn: "{emoji:5234567890123456789|▶️} Resume"
+```
+
+### How tokens are rendered
+
+| | Bot can send premium emoji | Bot cannot |
+| :--- | :--- | :--- |
+| **Messages** | `<tg-emoji>` with the custom emoji | Telegram shows the fallback emoji |
+| **Buttons** | custom emoji as the button icon | the fallback emoji in the text |
+
+**Messages** always get `<tg-emoji>` and Telegram applies the fallback itself, so every token is safe to use anywhere in the text.
+
+**Buttons** have no fallback and can show only **one** custom emoji icon, so:
+
+- With premium, the **leftmost** token that has an ID becomes the icon. If the first token has no ID, the next one that does is used.
+- The icon is taken out of the text, and every other token in that button is removed.
+- Without premium, or if no token has an ID, tokens become plain emojis in the text.
+
+```yaml
+# premium:    icon = ▶️ id,  text = "Resume"
+# no premium: no icon,       text = "▶️ Resume"
+btn: "{emoji:▶️} Resume"
+
+# premium:    icon = ⚡ id,  text = "Add Me"   (✅ has no id, so it is removed too)
+# no premium: no icon,       text = "✅ ⚡ Add Me"
+btn: "{emoji:✅} {emoji:⚡} Add Me"
 ```
 
 > [!IMPORTANT]
 > - Tokens are **language independent** — use the same token in every `.yml`.
-> - Predefined tokens auto-expand to premium `<tg-emoji>` where mapped, otherwise plain emoji.
+> - Always add a fallback to raw IDs: `{emoji:ID|🎵}`. A bare `{emoji:ID}` has no fallback to show.
 
 **Example**
 ```yaml

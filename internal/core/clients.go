@@ -49,6 +49,8 @@ func Init() (func(), error) {
 
 	Assistants = cm
 
+	detectPremium(cm)
+
 	shutdown := func() {
 		utils.Log.Info("Stopping bot...")
 		Bot.Close()
@@ -205,4 +207,51 @@ func initAssistants(cm *ClientManager) error {
 	}
 
 	return nil
+}
+
+func detectPremium(cm *ClientManager) {
+	if cm == nil || cm.Count() == 0 {
+		return
+	}
+	ass, err := cm.Get(1)
+	if err != nil || ass.Self == nil {
+		return
+	}
+
+	const testEmojiID int64 = 5859691201250201986
+	testMsg := fmt.Sprintf(`<tg-emoji emoji-id="%d">👋</tg-emoji>`, testEmojiID)
+
+	msg, err := Bot.SendMessage(ass.Self.ID, testMsg, &td.SendMessageOpts{
+		ParseMode: td.ParseModeHTML,
+	})
+	if err != nil {
+		utils.Log.Warnf("Failed to send premium emoji test message: %v", err)
+		return
+	}
+
+	time.AfterFunc(30*time.Second, func() {
+		_ = msg.Delete(Bot, nil)
+	})
+
+	for _, ent := range msg.GetEntities() {
+		switch t := ent.Type.(type) {
+		case *td.TextEntityTypeCustomEmoji:
+			if t.CustomEmojiId == testEmojiID {
+				config.HasPremium = true
+			}
+		case td.TextEntityTypeCustomEmoji:
+			if t.CustomEmojiId == testEmojiID {
+				config.HasPremium = true
+			}
+		}
+		if config.HasPremium {
+			break
+		}
+	}
+
+	if config.HasPremium {
+		utils.Log.Info("Bot premium status: detected (custom emojis enabled)")
+	} else {
+		utils.Log.Info("Bot premium status: not detected (custom emojis disabled)")
+	}
 }
