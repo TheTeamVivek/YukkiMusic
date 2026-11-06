@@ -8,7 +8,8 @@ PAUSE_BTN: "{emoji:⏸️} Pause"
 RESUME_BTN: "{emoji:▶️} Resume"
 MUTE_BTN: "{emoji:🔇} Mute"
 UNMUTE_BTN: "{emoji:🔊} Unmute"
-ADD_ME_BTN: "{emoji:⚡} Add Me to Your group"
+ADD_ME_BTN: "{emoji:⚡} Add Me to Your Group"
+
 BROADCAST_CANCEL_BTN: "{emoji:🚫} Cancel Broadcast"
 CLOSE_BTN: "Close"
 DOWNLOAD_CANCEL_BTN: "{emoji:🚦} Cancel Downloading"
@@ -52,13 +53,16 @@ assistant_restricted_warning: |
 # 🧩 Common auth messages
 auth_no_user: "{emoji:⚠️} Please provide a user — use:\n{cmd} [user_id] or reply to a user's message."
 user_extract_fail: "{emoji:⚠️} Unable to get that user: <i>{error}</i>"
-auth_limit_reached: "{emoji:⚠️} This chat has reached the maximum authorized users limit ({limit}). Please remove someone before adding a new one."
+auth_limit_reached: "{emoji:⚠️} This chat has reached the maximum authorized user limit ({limit}). Please remove someone before adding a new one."
+
 already_authed: "{emoji:⚠️} That user is already authorized — no need to add them again."
 
 # 🤖 Add auth
-cannot_authorize_user: "{emoji:⚠️} This user cannot be authorized.\nThe bot owner, the bot itself, or yourself do not require authorization."
+cannot_authorize_user: "{emoji:⚠️} This user cannot be authorized.\nThe bot owner, the bot itself, or you do not require authorization."
+
 addauth_user_is_admin: "{emoji:⚠️} This user is already a chat administrator. No authorization is required."
-addauth_bot_user: "{emoji:🤖} You can’t add a bot to the auth list — authusers must be human!"
+addauth_bot_user: "{emoji:🤖} You can’t add a bot to the auth list — authorized users must be human!"
+
 addauth_add_fail: "{emoji:❌} Failed to add authorized user: {error}"
 addauth_success_with_count: "{emoji:✅} Added {user}.\nNow {count}/{limit} authorized users."
 addauth_success: "{emoji:✅} Successfully added {user} to the authorized users list."
@@ -121,7 +125,8 @@ cplay_usage: "<b>Usage:</b> <code>/setcplay &lt;channel_id | @username | linked 
 cplay_resolve_peer_fail: "<b>Failed to resolve peer:</b> Could not fetch channel details. Ensure I can access this channel."
 cplay_invalid_target: "<b>Invalid Target:</b> The provided ID is not a valid channel."
 cplay_channel_not_accessible: "<b>Channel Not Accessible:</b> Could not retrieve channel information. Please ensure I am an administrator in the target channel."
-cplay_bot_invite_permission_missing: "{emoji:⚠️} <b>Missing Permission:</b> I am admin in target channel but <code>Invite Users</code> permission is disabled. Please enable it and try again."
+cplay_bot_invite_permission_missing: "{emoji:⚠️} <b>Missing Permission:</b> I am an administrator in the target channel, but the <code>Invite Users</code> permission is disabled. Please enable it and try again."
+
 cplay_channel_not_linked: "{emoji:⚠️} <b>Linked channel not found:</b> This chat is not linked to any channel/group."
 cplay_save_error: "<b>Error:</b> Failed to save CPlay settings."
 cplay_enabled: "{emoji:✅} <b>Channel Play enabled.</b> All channel-play commands (like <code>/cplay</code>, <code>/cskip</code>) will now work in channel <code>{channel_id}</code>."
@@ -165,7 +170,7 @@ cb_skip_queue_empty: "⏹️ Playback stopped — queue empty."
 cb_skip_download_failed: "❌ Failed to download next track."
 cb_skip_play_failed: "❌ Failed to play next track."
 cb_skip_success: "⏭️ Track skipped."
-cb_skip_edited: "{emoji:⏭️} Skipped by {user}"
+cb_skip_edited: "{emoji:⏭️} Skipped by {user}."
 
 # Stop callback
 cb_stop_success: "⏹️ Playback stopped."
@@ -233,7 +238,7 @@ err_assistant_banned: |
 err_admin_permission_required: |
   {emoji:⚠️} <b>Admin Permission Required</b>
 
-  I need admin access with Invite Users permission to manage and invite assistant in this chat.
+  I need admin access with <i>Invite Users</i> permission to manage and invite the assistant in this chat.
 
 err_assistant_get_failed: |
   {emoji:⚠️} The system could not assign an assistant to this chat.
@@ -357,12 +362,13 @@ logger_playback_template: "<b>{emoji:🎧} Track:</b> <a href=\"{track_url}\">{t
 loop_usage: "{emoji:🔁} <b>Loop Control</b>\n\nUsage: {cmd} [count]\n• 0 - Disable loop\n• 1-10 - Loop count\n\n<i>{count_line}</i>"
 loop_invalid: "{emoji:⚠️} <b>Invalid loop count.</b>\nUse 0 to disable or 1-10 to set loop count."
 loop_already_set: "{emoji:⚠️} Loop count is already set to <b>{count}</b> time(s)."
-loop_disabled: "{emoji:🔁} Loop has been <b>disabled</b> by {user}"
+loop_disabled: "{emoji:🔁} Loop has been <b>disabled</b> by {user}."
+
 loop_set: "{emoji:🔁} Set to loop <b>{count}</b> time(s)\n└ Changed by: {user}"
 loop_current: "• Current loop: <b>{count}</b> time(s)"
 
 # Logs module
-logs_empty: "No logs found"
+logs_empty: "No logs found."
 
 maint: "⚠️ I'm under maintenance at the moment and temporarily unavailable. Please check back later."
 maint_title: "{emoji:🛠️} Maintenance"
@@ -416,9 +422,11 @@ cmddelete_title: "{emoji:🗑️} Command Delete"
 cmddelete_desc: "When enabled, I will automatically delete command messages after handling."
 
 only_admin: "<h4>{emoji:🚫} Access Denied</h4>\n<aside>{emoji:🔒} This action is limited to <b>chat admins</b>.</aside>\n<p>You can still <code>/play</code> songs and enjoy the music.</p>\n<footer><i>{emoji:💡} Admin? Run <code>/reload</code> to refresh permissions.</i></footer>"
-only_admin_cb: "⚠️ Only admins can do these actions."
+only_admin_cb: "⚠️ Only admins can perform this action."
+
 only_admin_or_auth: "<h4>{emoji:🚫} Access Denied</h4>\n<aside>{emoji:🔒} This action requires <b>admin</b> or <b>authorized user</b> rights.</aside>\n<p>You can still <code>/play</code> songs and enjoy the music.</p>"
-only_admin_or_auth_cb: "⚠️ Only admins or authorized users can do these actions."
+only_admin_or_auth_cb: "⚠️ Only admins or authorized users can perform this action."
+
 only_supergroup: |
   <h2>⚠️ Supergroup Required</h2>
 
@@ -448,7 +456,7 @@ pause_success: |
   </table>
 
 play_single_track_too_long: |
-  {emoji:⚠️} You can't play songs longer than {limit_mins} minutes.
+  {emoji:⚠️} Songs longer than {limit_mins} minutes cannot be played.
   <i>{title}</i> was skipped.
 
 play_download_failed: "{emoji:❌} Download failed. Please try again."
@@ -465,13 +473,15 @@ play_multiple_tracks_too_long_item: "— <i>{title}</i>"
 play_multiple_tracks_too_long_more: "... and {remaining} more."
 play_all_tracks_skipped: "{emoji:❌} All found tracks were skipped due to duration limits."
 play_failed: "{emoji:❌} Failed to play\nError: {error}"
-play_unable: "<b> {emoji:❌} Unable to Play </b>\n\n<i>Please <b>restart the voice</b> chat.</i>"
+play_unable: "<b>{emoji:❌} Unable to Play</b>\n\n<i>Please <b>restart the voice chat</b>.</i>"
+
 rtmp_play_unsupported: "{emoji:⚠️} <b>Can't play in an RTMP/live-stream voice chat.</b>\n\n<i>Playback stopped.</i>"
 play_downloading_song: "{emoji:📥} Downloading song \"{title}\""
 play_download_canceled: "{emoji:⚠️} Download canceled by {user}."
 play_already_in_queue: "{emoji:✅} <b>Track already added!</b>\n\n<i>{title}</i> is already playing or in the queue."
 play_already_playing: "{emoji:⚠️} <b>A song is already playing.</b>\n\nPlease wait for it to finish or use <code>/stop</code> to stop it first."
-play_added_multiple_header: "{emoji:➕} <b>Added {count} tracks</b> by {user}"
+play_added_multiple_header: "{emoji:➕} <b>Added {count} tracks</b> by {user}."
+
 play_queue_limit_hint: "{emoji:⚠️} <i>Queue limit reached — some tracks were skipped.</i>"
 play_queue_view_hint: "<i>Use /queue to view full list.</i>"
 
@@ -546,7 +556,7 @@ resume_failed: |
   <p><b>Error:</b> <code>{error}</code></p>
 
 resume_success: |
-  <h3>{emoji:▶️} Resuming playback</h3>
+  <h3>{emoji:▶️} Resumed playback</h3>
   <table bordered striped compact>
   <tr><td>{emoji:🎵} Title</td><td><a href="{url}">{title}</a></td></tr>
   <tr><td>{emoji:📍} Position</td><td>{position} / {duration}</td></tr>
