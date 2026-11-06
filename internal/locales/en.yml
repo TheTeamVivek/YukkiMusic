@@ -398,7 +398,14 @@ no_song_query: |
 
   <i>Send <b>{cmd} [song name or link]</b>, or reply to a <b>media</b> message to start the music.</i>
 
-no_song_found: "{emoji:❌} No tracks found."
+no_song_found: |
+  {emoji:❌} <b>No tracks found.</b>
+
+  <i>Try a different song name, or send a direct link.</i>
+play_reply_not_media: |
+  {emoji:🎧} <b>That's not playable media.</b>
+
+  <i>Reply to an <b>audio</b> or <b>video</b> file, or send <b>{cmd} [song name or link]</b>.</i>
 
 nothumb_title: "{emoji:🖼️} Thumbnails"
 nothumb_desc: "When enabled, playback messages will not show artwork/thumbnails."

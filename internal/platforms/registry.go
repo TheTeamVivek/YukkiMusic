@@ -20,6 +20,7 @@ package platforms
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -31,6 +32,13 @@ import (
 
 	state "yukkimusic/internal/core/models"
 	"yukkimusic/internal/utils"
+)
+
+var (
+	// ErrNoTracks means the search ran fine but found nothing playable.
+	ErrNoTracks = errors.New("no tracks found")
+	// ErrNotMedia means the replied message holds no audio or video.
+	ErrNotMedia = errors.New("replied message is not playable media")
 )
 
 type reg struct {
@@ -104,10 +112,14 @@ func GetTracks(c *td.Client, m *td.Message, video bool) ([]*state.Track, error) 
 		}
 	}
 
+	var searchErr error
 	if q := m.Args(); q != "" {
 		tracks, err := searchQuery(q, video)
 		if err == nil && len(tracks) > 0 {
 			return tracks, nil
+		}
+		if !errors.Is(err, ErrNoTracks) {
+			searchErr = err
 		}
 	}
 
@@ -115,7 +127,10 @@ func GetTracks(c *td.Client, m *td.Message, video bool) ([]*state.Track, error) 
 		return fromReply(c, m)
 	}
 
-	return nil, errors.New("no tracks found")
+	if searchErr != nil {
+		return nil, fmt.Errorf("search failed: %w", searchErr)
+	}
+	return nil, ErrNoTracks
 }
 
 func Download(
@@ -218,7 +233,7 @@ func searchQuery(q string, video bool) ([]*state.Track, error) {
 func fromReply(c *td.Client, m *td.Message) ([]*state.Track, error) {
 	target, isVideo, _ := playableMedia(c, m)
 	if target == nil {
-		return nil, errors.New("⚠️ Reply with a valid media (audio/video)")
+		return nil, ErrNotMedia
 	}
 
 	tgp, ok := GetPlatform(PlatformTelegram)

@@ -397,7 +397,14 @@ no_song_query: |
 
   <i>Müziği başlatmak için <b>{cmd} [şarkı adı veya bağlantı]</b> gönder ya da bir <b>medya</b> mesajını yanıtla.</i>
 
-no_song_found: "{emoji:❌} Parça bulunamadı."
+no_song_found: |
+  {emoji:❌} <b>Parça bulunamadı.</b>
+
+  <i>Farklı bir şarkı adı deneyin veya doğrudan bağlantı gönderin.</i>
+play_reply_not_media: |
+  {emoji:🎧} <b>Bu oynatılabilir bir medya değil.</b>
+
+  <i>Bir <b>ses</b> veya <b>video</b> dosyasını yanıtlayın ya da <b>{cmd} [şarkı adı veya bağlantı]</b> gönderin.</i>
 
 nothumb_title: "{emoji:🖼️} Küçük Resimler"
 nothumb_desc: "Etkinleştirildiğinde, oynatma mesajlarında kapak görseli/küçük resim gösterilmez."

@@ -207,7 +207,7 @@ func (t *TelegramPlatform) GetTracksByMessage(c *td.Client, msg *td.Message) (*s
 	}
 
 	if msg.RemoteFileID() == "" {
-		return nil, fmt.Errorf("⚠️ This message doesn't contain any media")
+		return nil, ErrNotMedia
 	}
 
 	title := "Telegram File"

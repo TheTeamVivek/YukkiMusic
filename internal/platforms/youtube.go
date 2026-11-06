@@ -102,7 +102,7 @@ func (p *YouTubePlatform) Get(input string, video bool) ([]*state.Track, error) 
 		return nil, err
 	}
 	if len(tracks) == 0 {
-		return nil, errors.New("no tracks found")
+		return nil, ErrNoTracks
 	}
 
 	return withVideo(tracks, video), nil
@@ -148,7 +148,7 @@ func (p *YouTubePlatform) VideoSearch(query string) ([]*state.Track, error) {
 		return nil, fmt.Errorf("ytsearch failed: %w", err)
 	}
 	if len(tracks) == 0 {
-		return nil, errors.New("no tracks found")
+		return nil, ErrNoTracks
 	}
 
 	p.cache.Set(cacheKey, tracks)

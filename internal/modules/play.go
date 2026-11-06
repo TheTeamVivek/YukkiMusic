@@ -193,6 +193,8 @@ type playReq struct {
 	by     string // mention of the requester
 	active bool   // something was already playing
 	full   bool   // the queue limit cut the request short
+
+	cause error // failure hidden from the user, returned for the error handler to log
 }
 
 func handlePlay(c *td.Client, m *td.Message, o playOpts) error {
@@ -204,7 +206,7 @@ func handlePlay(c *td.Client, m *td.Message, o playOpts) error {
 	for _, step := range []func() error{p.allow, p.prepare, p.fetch, p.admit, p.start} {
 		if err := step(); err != nil {
 			p.fail(err)
-			return nil
+			return p.cause
 		}
 	}
 	return nil
@@ -273,8 +275,15 @@ func (p *playReq) prepare() (err error) {
 
 // fetch looks the tracks up and makes sure the assistant can join the call.
 func (p *playReq) fetch() (err error) {
-	if p.tracks, err = platforms.GetTracks(p.c, p.m, p.Video); err != nil {
-		return err
+	p.tracks, err = platforms.GetTracks(p.c, p.m, p.Video)
+	switch {
+	case errors.Is(err, platforms.ErrNoTracks):
+		return p.errf("no_song_found")
+	case errors.Is(err, platforms.ErrNotMedia):
+		return p.errf("play_reply_not_media", locales.Arg{"cmd": getCommand(p.m)})
+	case err != nil:
+		p.cause = err
+		return p.errf("no_song_found")
 	}
 	if len(p.tracks) == 0 {
 		return p.errf("no_song_found")
