@@ -19,13 +19,13 @@ package platforms
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	jsonv2 "encoding/json/v2"
 	"errors"
 	"fmt"
 	"net/url"
 	"os/exec"
-	"regexp"
 	"strings"
 	"time"
 
@@ -75,9 +75,6 @@ var (
 	audioOnlyExtractors = map[string]bool{
 		"soundcloud": true,
 	}
-	ytURLPatterns = []*regexp.Regexp{
-		regexp.MustCompile(`(?i)(youtube\.com|youtu\.be|music\.youtube\.com)`),
-	}
 )
 
 func init() {
@@ -88,24 +85,27 @@ func (y *YtdlpPlatform) Name() state.PlatformName { return PlatformYtDlp }
 func (y *YtdlpPlatform) Priority() int            { return 60 }
 
 func (y *YtdlpPlatform) CanGet(query string) bool {
-	if _, err := sanitizeMediaURL(query); err != nil {
-		return false
-	}
-	parsed, err := url.Parse(query)
+	safeURL, err := sanitizeMediaURL(query)
 	if err != nil {
 		return false
 	}
-	host := strings.ToLower(parsed.Host)
-	return host != "t.me" &&
-		host != "telegram.me" &&
-		host != "telegram.dog" &&
-		!strings.HasSuffix(host, ".t.me")
+	parsed, err := url.Parse(safeURL)
+	if err != nil {
+		return false
+	}
+
+	host := strings.ToLower(parsed.Hostname())
+	switch host {
+	case "t.me", "telegram.me", "telegram.dog":
+		return false
+	}
+	return !strings.HasSuffix(host, ".t.me")
 }
 
 func (y *YtdlpPlatform) Get(query string, video bool) ([]*state.Track, error) {
 	safeURL, err := sanitizeMediaURL(query)
 	if err != nil {
-		return nil, errUnsafeURL
+		return nil, err
 	}
 
 	info, err := y.extractMetadata(safeURL)
@@ -114,25 +114,23 @@ func (y *YtdlpPlatform) Get(query string, video bool) ([]*state.Track, error) {
 	}
 
 	if info.IsLive {
-		return nil, errors.New("live streams are not supported")
+		return nil, errLiveStream
 	}
-
 	if bannedExtractors[strings.ToLower(info.Extractor)] {
 		return nil, errors.New("adult content is not allowed")
 	}
 
-	var tracks []*state.Track
-	if len(info.Entries) > 0 {
-		for _, entry := range info.Entries {
-			if entry.IsLive || bannedExtractors[strings.ToLower(entry.Extractor)] {
-				continue
-			}
-			tracks = append(tracks, y.toTrack(&entry, video))
-		}
-	} else {
-		tracks = []*state.Track{y.toTrack(info, video)}
+	if len(info.Entries) == 0 {
+		return []*state.Track{y.toTrack(info, video)}, nil
 	}
 
+	var tracks []*state.Track
+	for _, entry := range info.Entries {
+		if entry.IsLive || bannedExtractors[strings.ToLower(entry.Extractor)] {
+			continue
+		}
+		tracks = append(tracks, y.toTrack(&entry, video))
+	}
 	return tracks, nil
 }
 
@@ -152,7 +150,7 @@ func (y *YtdlpPlatform) Download(
 
 	safeURL, err := sanitizeMediaURL(track.URL)
 	if err != nil {
-		return "", errUnsafeURL
+		return "", err
 	}
 
 	args := []string{
@@ -162,7 +160,7 @@ func (y *YtdlpPlatform) Download(
 		"--ignore-errors",
 		"--no-check-certificate",
 		"-q",
-		"-o", getPath(track, ".%(ext)s"),
+		"-o", trackFile(track, ".%(ext)s"),
 	}
 
 	if track.Video {
@@ -177,122 +175,110 @@ func (y *YtdlpPlatform) Download(
 		)
 	}
 
-	if y.isYouTubeURL(track.URL) {
-		if cookieFile, err := cookies.GetRandomCookieFile(); err == nil && cookieFile != "" {
-			args = append(args, "--cookies", cookieFile)
-		}
-	}
-
+	args = append(args, cookieArgs(track.URL)...)
 	args = append(args, "--", safeURL)
 
-	var stdout, stderr bytes.Buffer
-	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		findAndRemove(track)
-		if isDownloadCancelled(err) || (ctx != nil && ctx.Err() != nil) {
+	stdout, stderr, err := runYtDlp(ctx, args...)
+	if err != nil {
+		removeFiles(track)
+		if canceled(ctx, err) {
 			return "", context.Canceled
 		}
-		return "", fmt.Errorf(
-			"yt-dlp failed: %w\nstdout: %s\nstderr: %s",
-			err, strings.TrimSpace(stdout.String()), strings.TrimSpace(stderr.String()),
-		)
+		return "", fmt.Errorf("yt-dlp failed: %w\nstdout: %s\nstderr: %s", err, stdout, stderr)
 	}
 
-	p := findFile(track)
-	if p == "" {
-		return "", errors.New("yt-dlp produced no output file")
+	path := findFile(track)
+	if path == "" {
+		return "", fmt.Errorf("yt-dlp produced no output file\nstderr: %s", stderr)
 	}
 
-	utils.Log.Infof("YtDlp: downloaded %s", p)
-	return p, nil
+	utils.Log.Infof("YtDlp: downloaded %s", path)
+	return path, nil
 }
 
 func (y *YtdlpPlatform) extractMetadata(urlStr string) (*ytdlpInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
-	args := []string{
-		"-j", "--flat-playlist",
-		"--no-warnings", "--no-check-certificate",
-	}
-
-	if y.isYouTubeURL(urlStr) {
-		if cf, err := cookies.GetRandomCookieFile(); err == nil && cf != "" {
-			args = append(args, "--cookies", cf)
-		}
-	}
-
+	args := []string{"-j", "--flat-playlist", "--no-warnings", "--no-check-certificate"}
+	args = append(args, cookieArgs(urlStr)...)
 	args = append(args, "--", urlStr)
 
-	var stdout, stderr bytes.Buffer
-	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		return nil, fmt.Errorf("metadata extraction failed: %w\n%s", err, stderr.String())
+	stdout, stderr, err := runYtDlp(ctx, args...)
+	if err != nil {
+		return nil, fmt.Errorf("metadata extraction failed: %w\n%s", err, stderr)
 	}
-
-	trimmed := strings.TrimSpace(stdout.String())
-	if trimmed == "" {
+	if stdout == "" {
 		return nil, errors.New("yt-dlp produced empty metadata")
 	}
 
-	lines := strings.Split(trimmed, "\n")
-	if len(lines) > 1 {
+	// A playlist prints one JSON object per line, a single item prints one.
+	lines := strings.Split(stdout, "\n")
+	if len(lines) == 1 {
 		var info ytdlpInfo
-		for _, line := range lines {
-			line = strings.TrimSpace(line)
-			if line == "" {
-				continue
-			}
-			var entry ytdlpInfo
-			if err := jsonv2.Unmarshal([]byte(line), &entry); err != nil {
-				utils.Log.Debugf("YtDlp: skip bad entry: %v", err)
-				continue
-			}
-			info.Entries = append(info.Entries, entry)
-		}
-		if len(info.Entries) == 0 {
-			return nil, errors.New("no valid entries in playlist")
+		if err := jsonv2.Unmarshal([]byte(lines[0]), &info); err != nil {
+			return nil, fmt.Errorf("failed to parse metadata JSON: %w", err)
 		}
 		return &info, nil
 	}
 
 	var info ytdlpInfo
-	if err := jsonv2.Unmarshal([]byte(lines[0]), &info); err != nil {
-		return nil, fmt.Errorf("failed to parse metadata JSON: %w", err)
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		var entry ytdlpInfo
+		if err := jsonv2.Unmarshal([]byte(line), &entry); err != nil {
+			utils.Log.Debugf("YtDlp: skip bad entry: %v", err)
+			continue
+		}
+		info.Entries = append(info.Entries, entry)
+	}
+	if len(info.Entries) == 0 {
+		return nil, errors.New("no valid entries in playlist")
 	}
 	return &info, nil
 }
 
 func (y *YtdlpPlatform) toTrack(info *ytdlpInfo, video bool) *state.Track {
-	if video && audioOnlyExtractors[strings.ToLower(info.Extractor)] {
-		video = false
-	}
-	title := info.Title
-	if title == "" {
-		title = "Audio Stream"
-	}
 	return &state.Track{
 		ID:       info.ID,
-		Title:    title,
+		Title:    cmp.Or(info.Title, "Audio Stream"),
 		Duration: int(info.Duration),
 		Artwork:  info.Thumbnail,
-		URL:      firstNonEmpty(info.OriginalURL, info.URL, info.DirectURL),
+		URL:      cmp.Or(info.OriginalURL, info.URL, info.DirectURL),
 		Source:   PlatformYtDlp,
-		Video:    video,
+		Video:    video && !audioOnlyExtractors[strings.ToLower(info.Extractor)],
 	}
 }
 
-func (y *YtdlpPlatform) isYouTubeURL(urlStr string) bool {
-	for _, p := range ytURLPatterns {
-		if p.MatchString(urlStr) {
-			return true
-		}
+func runYtDlp(ctx context.Context, args ...string) (stdout, stderr string, err error) {
+	var out, errOut bytes.Buffer
+	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
+	cmd.Stdout, cmd.Stderr = &out, &errOut
+
+	err = cmd.Run()
+	return strings.TrimSpace(out.String()), strings.TrimSpace(errOut.String()), err
+}
+
+// cookieArgs returns the cookie flags for YouTube links, if cookies are configured.
+func cookieArgs(rawURL string) []string {
+	if !isYouTubeURL(rawURL) {
+		return nil
 	}
-	return false
+	if file, err := cookies.GetRandomCookieFile(); err == nil && file != "" {
+		return []string{"--cookies", file}
+	}
+	return nil
+}
+
+func isYouTubeURL(rawURL string) bool {
+	parsed, err := url.Parse(rawURL)
+	if err != nil {
+		return false
+	}
+	host := strings.ToLower(parsed.Hostname())
+	return host == "youtu.be" || host == "youtube.com" || strings.HasSuffix(host, ".youtube.com")
 }

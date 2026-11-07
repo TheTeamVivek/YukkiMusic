@@ -30,7 +30,6 @@ import (
 	"yukkimusic/config"
 	"yukkimusic/internal/core"
 	state "yukkimusic/internal/core/models"
-	"yukkimusic/internal/utils"
 )
 
 const PlatformFallenApi state.PlatformName = "FallenApi"
@@ -38,9 +37,7 @@ const PlatformFallenApi state.PlatformName = "FallenApi"
 type FallenApiPlatform struct{}
 
 var (
-	telegramDLRegex = regexp.MustCompile(
-		`https:\/\/t\.me\/([a-zA-Z0-9_]{5,})\/(\d+)`,
-	)
+	telegramDLRegex = regexp.MustCompile(`^https://t\.me/([a-zA-Z0-9_]{5,})/(\d+)`)
 
 	// fallenAPIURLRe matches URLs of the platforms the Fallen API can resolve
 	// and download. YouTube and Telegram are excluded because they have their
@@ -61,20 +58,12 @@ var (
 	}
 )
 
-type fallenAPITrack struct {
+type fallenTrack struct {
 	Title     string `json:"title"`
 	ID        string `json:"id"`
 	URL       string `json:"url"`
 	Thumbnail string `json:"thumbnail"`
 	Duration  int    `json:"duration"`
-}
-
-type fallenAPIResults struct {
-	Results []fallenAPITrack `json:"results"`
-}
-
-type fallenAPIResponse struct {
-	CdnUrl string `json:"cdnurl"`
 }
 
 func init() {
@@ -84,8 +73,12 @@ func init() {
 func (f *FallenApiPlatform) Name() state.PlatformName { return PlatformFallenApi }
 func (f *FallenApiPlatform) Priority() int            { return 80 }
 
+func fallenConfigured() bool {
+	return config.FallenAPIURL != "" && config.FallenAPIKey != ""
+}
+
 func (f *FallenApiPlatform) CanGet(query string) bool {
-	if config.FallenAPIURL == "" || config.FallenAPIKey == "" {
+	if !fallenConfigured() {
 		return false
 	}
 	for _, re := range fallenAPIURLRe {
@@ -99,45 +92,28 @@ func (f *FallenApiPlatform) CanGet(query string) bool {
 // Get resolves a supported platform URL (Apple Music, Spotify, Deezer,
 // SoundCloud, etc.) through the Fallen API into one or more tracks.
 func (f *FallenApiPlatform) Get(query string, _ bool) ([]*state.Track, error) {
-	if config.FallenAPIURL == "" || config.FallenAPIKey == "" {
+	if !fallenConfigured() {
 		return nil, errors.New("FALLEN_API_KEY not configured")
 	}
 
-	var resp fallenAPIResults
-	apiURL := fmt.Sprintf(
-		"%s/api/get_url?api_key=%s&url=%s",
-		config.FallenAPIURL,
-		config.FallenAPIKey,
-		url.QueryEscape(query),
-	)
-
-	r, err := rc.R().
-		SetHeader("X-API-Key", config.FallenAPIKey).
-		SetResult(&resp).
-		Get(apiURL)
-	if err != nil {
-		return nil, sanitizeAPIError(
-			fmt.Errorf("API request failed: %w", err),
-			config.FallenAPIKey,
-		)
+	var resp struct {
+		Results []fallenTrack `json:"results"`
 	}
-	if r.IsStatusFailure() {
-		return nil, sanitizeAPIError(fmt.Errorf(
-			"API returned %d: %s", r.StatusCode(), r.String(),
-		), config.FallenAPIKey)
+	if _, err := fallenRequest(context.Background(), "get_url", query, &resp); err != nil {
+		return nil, err
 	}
 
 	tracks := make([]*state.Track, 0, len(resp.Results))
-	for _, mt := range resp.Results {
-		if mt.Title == "" || mt.URL == "" {
+	for _, t := range resp.Results {
+		if t.Title == "" || t.URL == "" {
 			continue
 		}
 		tracks = append(tracks, &state.Track{
-			ID:       mt.ID,
-			Title:    mt.Title,
-			Duration: mt.Duration,
-			Artwork:  mt.Thumbnail,
-			URL:      mt.URL,
+			ID:       t.ID,
+			Title:    t.Title,
+			Duration: t.Duration,
+			Artwork:  t.Thumbnail,
+			URL:      t.URL,
 			Source:   PlatformFallenApi,
 		})
 	}
@@ -148,116 +124,127 @@ func (f *FallenApiPlatform) Get(query string, _ bool) ([]*state.Track, error) {
 }
 
 func (f *FallenApiPlatform) CanDownload(source state.PlatformName) bool {
-	if config.FallenAPIURL == "" || config.FallenAPIKey == "" {
-		return false
-	}
-	return source == PlatformFallenApi || source == PlatformYouTube
+	return fallenConfigured() && (source == PlatformFallenApi || source == PlatformYouTube)
 }
 
+// Download always fetches audio. The track is flipped to audio only once that
+// worked, so a failure leaves the video request intact for the next platform.
 func (f *FallenApiPlatform) Download(
 	ctx context.Context,
 	track *state.Track,
 	statusMsg *td.Message,
 ) (string, error) {
-	track.Video = false
+	audio := *track
+	audio.Video = false
 
-	if p := findFile(track); p != "" {
-		utils.Log.Debug("FallenApi: cache hit " + p)
-		return p, nil
-	}
-
-	dlURL, err := f.getDownloadURL(ctx, track.URL)
+	path, err := f.download(ctx, &audio, statusMsg)
 	if err != nil {
 		return "", err
 	}
 
-	path := getPath(track, ".mp3")
-
-	if telegramDLRegex.MatchString(dlURL) {
-		return f.downloadFromTelegram(ctx, dlURL, path, statusMsg)
-	}
-
-	if err := f.downloadFromURL(ctx, dlURL, path); err != nil {
-		return "", err
-	}
-
-	if !fileExists(path) {
-		return "", errors.New("API returned empty file")
-	}
-
+	track.Video = false
 	return path, nil
 }
 
-func (f *FallenApiPlatform) getDownloadURL(ctx context.Context, mediaURL string) (string, error) {
+func (f *FallenApiPlatform) download(
+	ctx context.Context,
+	track *state.Track,
+	statusMsg *td.Message,
+) (string, error) {
+	if path := findFile(track); path != "" {
+		return path, nil
+	}
+
+	var resp struct {
+		CdnURL string `json:"cdnurl"`
+	}
+	body, err := fallenRequest(ctx, "track", track.URL, &resp)
+	if err != nil {
+		return "", err
+	}
+	if resp.CdnURL == "" {
+		return "", sanitizeAPIError(
+			fmt.Errorf("empty cdnurl in response: %s", body),
+			config.FallenAPIKey,
+		)
+	}
+
+	path := trackFile(track, ".mp3")
+	if telegramDLRegex.MatchString(resp.CdnURL) {
+		return downloadFromTelegram(ctx, resp.CdnURL, path, statusMsg)
+	}
+
+	if err := downloadFromURL(ctx, resp.CdnURL, path); err != nil {
+		return "", err
+	}
+	if !fileExists(path) {
+		return "", errors.New("API returned empty file")
+	}
+	return path, nil
+}
+
+// fallenRequest calls an API endpoint for mediaURL, decodes the JSON reply into
+// out and returns the raw body.
+func fallenRequest(ctx context.Context, endpoint, mediaURL string, out any) (string, error) {
 	apiURL := fmt.Sprintf(
-		"%s/api/track?api_key=%s&url=%s",
+		"%s/api/%s?api_key=%s&url=%s",
 		config.FallenAPIURL,
+		endpoint,
 		config.FallenAPIKey,
 		url.QueryEscape(mediaURL),
 	)
 
-	var resp fallenAPIResponse
 	r, err := rc.R().
 		SetContext(ctx).
 		SetHeader("X-API-Key", config.FallenAPIKey).
-		SetResult(&resp).
+		SetResult(out).
 		Get(apiURL)
 	if err != nil {
-		if isDownloadCancelled(err) || (ctx != nil && ctx.Err() != nil) {
+		if canceled(ctx, err) {
 			return "", context.Canceled
 		}
-		return "", sanitizeAPIError(
-			fmt.Errorf("API request failed: %w", err),
-			config.FallenAPIKey,
-		)
+		return "", sanitizeAPIError(fmt.Errorf("API request failed: %w", err), config.FallenAPIKey)
 	}
-
 	if r.IsStatusFailure() {
-		return "", sanitizeAPIError(fmt.Errorf(
-			"API returned %d: %s", r.StatusCode(), r.String(),
-		), config.FallenAPIKey)
-	}
-
-	if resp.CdnUrl == "" {
 		return "", sanitizeAPIError(
-			fmt.Errorf("empty cdnurl in response: %s", r.String()),
+			fmt.Errorf("API returned %d: %s", r.StatusCode(), r.String()),
 			config.FallenAPIKey,
 		)
 	}
-
-	return resp.CdnUrl, nil
+	return r.String(), nil
 }
 
-func (f *FallenApiPlatform) downloadFromURL(ctx context.Context, dlURL, path string) error {
-	r, err := rc.R().
+func downloadFromURL(ctx context.Context, dlURL, path string) error {
+	r, err := dl.R().
 		SetContext(ctx).
 		SetResponseSaveFileName(path).
 		Get(dlURL)
+	if err == nil && r.IsStatusFailure() {
+		err = fmt.Errorf("download returned %d", r.StatusCode())
+	} else if err != nil {
+		if canceled(ctx, err) {
+			err = context.Canceled
+		} else {
+			err = fmt.Errorf("http download failed: %w", err)
+		}
+	}
+
 	if err != nil {
 		_ = os.Remove(path)
-		if isDownloadCancelled(err) || (ctx != nil && ctx.Err() != nil) {
-			return context.Canceled
-		}
-		return fmt.Errorf("http download failed: %w", err)
 	}
-	if r.IsStatusFailure() {
-		_ = os.Remove(path)
-		return fmt.Errorf("download returned %d", r.StatusCode())
-	}
-	return nil
+	return err
 }
 
-func (f *FallenApiPlatform) downloadFromTelegram(
+func downloadFromTelegram(
 	ctx context.Context,
 	dlURL, path string,
 	statusMsg *td.Message,
 ) (string, error) {
-	if !telegramDLRegex.MatchString(dlURL) {
-		return "", fmt.Errorf("invalid telegram download url: %s", dlURL)
-	}
-
 	info, err := core.Bot.GetMessageLinkInfo(dlURL)
-	if err != nil || info == nil || info.Message == nil {
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch Telegram message: %w", err)
+	}
+	if info == nil || info.Message == nil {
 		return "", errors.New("failed to fetch Telegram message")
 	}
 

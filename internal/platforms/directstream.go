@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"hash/fnv"
+	"net/http"
 	"net/url"
 	"path"
 	"regexp"
@@ -37,19 +38,19 @@ import (
 	"yukkimusic/internal/utils"
 )
 
-const PlatformDirectStream state.PlatformName = "DirectStream"
+const (
+	PlatformDirectStream state.PlatformName = "DirectStream"
+
+	streamUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+)
 
 type DirectStreamPlatform struct {
 	cache *utils.Cache[string, *streamInfo]
 }
 
 type streamInfo struct {
-	URL         string
-	ContentType string
-	Size        int64
-	IsAudio     bool
-	IsVideo     bool
-	Duration    int
+	IsVideo  bool
+	Duration int
 }
 
 var (
@@ -58,13 +59,7 @@ var (
 		".wav", ".flac", ".aac", ".opus", ".mkv", ".avi",
 		".mov", ".ts", ".mpd",
 	}
-	streamPatterns = []*regexp.Regexp{
-		regexp.MustCompile(`(?i)\.m3u8(\?|$)`),
-		regexp.MustCompile(`(?i)\.mpd(\?|$)`),
-		regexp.MustCompile(`(?i)/hls/`),
-		regexp.MustCompile(`(?i)/dash/`),
-		regexp.MustCompile(`(?i)/stream/`),
-	}
+	streamPathRe    = regexp.MustCompile(`(?i)\.(?:m3u8|mpd)(?:\?|$)|/(?:hls|dash|stream)/`)
 	streamMimeTypes = []string{
 		"audio/", "video/",
 		"application/vnd.apple.mpegurl",
@@ -88,43 +83,30 @@ func (d *DirectStreamPlatform) CanGet(query string) bool {
 	if _, err := sanitizeMediaURL(query); err != nil {
 		return false
 	}
-	return d.looksLikeStream(query)
+	return looksLikeStream(query)
 }
 
 func (d *DirectStreamPlatform) Get(query string, video bool) ([]*state.Track, error) {
 	safeURL, err := sanitizeMediaURL(query)
 	if err != nil {
-		return nil, errUnsafeURL
+		return nil, err
 	}
 
-	info, err := d.getStreamInfo(safeURL)
+	info, err := d.lookup(safeURL)
 	if err != nil {
 		return nil, fmt.Errorf("stream validation failed: %w", err)
 	}
 
 	track := &state.Track{
-		ID:       d.generateID(safeURL),
-		Title:    d.extractTitle(safeURL),
+		ID:       streamID(safeURL),
+		Title:    streamTitle(safeURL),
 		Duration: info.Duration,
 		URL:      safeURL,
 		Source:   PlatformDirectStream,
 		Video:    video || info.IsVideo,
 	}
 
-	if info.Size > 0 && track.Duration == 0 {
-		bitrate := int64(128000)
-		if info.IsVideo {
-			bitrate = 500000
-		}
-		dur := int((info.Size * 8) / bitrate)
-		if dur <= 3600 {
-			track.Duration = dur
-		}
-	}
-
-	utils.Log.Infof("DirectStream: %s (audio:%v video:%v size:%d dur:%d)",
-		track.Title, info.IsAudio, info.IsVideo, info.Size, track.Duration)
-
+	utils.Log.Infof("DirectStream: %s (video:%v dur:%d)", track.Title, track.Video, track.Duration)
 	return []*state.Track{track}, nil
 }
 
@@ -141,120 +123,129 @@ func (d *DirectStreamPlatform) Download(
 	return track.URL, nil
 }
 
-func (d *DirectStreamPlatform) getStreamInfo(urlStr string) (*streamInfo, error) {
-	if info, ok := d.cache.Get(urlStr); ok && info != nil {
+func (d *DirectStreamPlatform) lookup(rawURL string) (*streamInfo, error) {
+	if info, ok := d.cache.Get(rawURL); ok && info != nil {
 		return info, nil
 	}
 
-	info, err := d.validateStream(urlStr)
+	info, err := validateStream(rawURL)
 	if err != nil {
 		return nil, err
 	}
 
-	d.cache.Set(urlStr, info)
+	d.cache.Set(rawURL, info)
 	return info, nil
 }
 
-func (d *DirectStreamPlatform) looksLikeStream(urlStr string) bool {
-	parsed, _ := url.Parse(urlStr)
-	ext := strings.ToLower(path.Ext(parsed.Path))
-	if slices.Contains(streamExtensions, ext) {
+func looksLikeStream(rawURL string) bool {
+	parsed, err := url.Parse(rawURL)
+	if err != nil {
+		return false
+	}
+
+	if slices.Contains(streamExtensions, strings.ToLower(path.Ext(parsed.Path))) ||
+		streamPathRe.MatchString(rawURL) {
 		return true
 	}
-	for _, p := range streamPatterns {
-		if p.MatchString(urlStr) {
-			return true
-		}
-	}
+
 	host := strings.ToLower(parsed.Host)
-	for _, sh := range streamHosts {
-		if strings.Contains(host, sh) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(streamHosts, func(h string) bool {
+		return strings.Contains(host, h)
+	})
 }
 
-func (d *DirectStreamPlatform) validateStream(urlStr string) (*streamInfo, error) {
+// validateStream probes the URL and checks that it serves audio or video.
+func validateStream(rawURL string) (*streamInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	req := rc.R().
-		SetContext(ctx).
-		SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-
-	resp, err := req.Head(urlStr)
-	if err != nil || resp.StatusCode() >= 400 {
-		resp, err = req.
-			SetHeader("Range", "bytes=0-1024").
-			Get(urlStr)
+	// Only the headers are read, so a server that ignores Range and streams
+	// forever cannot stall the GET fallback.
+	probe := func(method string) (*http.Response, error) {
+		req, err := http.NewRequestWithContext(ctx, method, rawURL, nil)
 		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("User-Agent", streamUserAgent)
+		if method == http.MethodGet {
+			req.Header.Set("Range", "bytes=0-1024")
+		}
+		return http.DefaultClient.Do(req)
+	}
+
+	resp, err := probe(http.MethodHead)
+	if err != nil || resp.StatusCode >= 400 {
+		if err == nil {
+			resp.Body.Close()
+		}
+		if resp, err = probe(http.MethodGet); err != nil {
 			return nil, fmt.Errorf("failed to validate URL: %w", err)
 		}
 	}
+	defer resp.Body.Close()
 
-	if resp.StatusCode() >= 400 {
-		return nil, fmt.Errorf("URL returned status %d", resp.StatusCode())
+	if resp.StatusCode >= 400 {
+		return nil, fmt.Errorf("URL returned status %d", resp.StatusCode)
 	}
 
-	ct := strings.ToLower(resp.Header().Get("Content-Type"))
-	isAudio, isVideo := false, false
-
-	for _, mt := range streamMimeTypes {
-		if strings.HasPrefix(ct, mt) {
-			switch {
-			case strings.HasPrefix(mt, "audio/"):
-				isAudio = true
-			case strings.HasPrefix(mt, "video/"):
-				isVideo = true
-			default:
-				isAudio = true
-			}
-			break
-		}
-	}
-
-	if !isAudio && !isVideo {
+	ct := strings.ToLower(resp.Header.Get("Content-Type"))
+	if !slices.ContainsFunc(streamMimeTypes, func(mt string) bool {
+		return strings.HasPrefix(ct, mt)
+	}) {
 		return nil, fmt.Errorf("not audio/video (content-type: %s)", ct)
 	}
 
-	size := int64(0)
-	if cl := resp.Header().Get("Content-Length"); cl != "" {
-		size, _ = strconv.ParseInt(cl, 10, 64)
+	info := &streamInfo{IsVideo: strings.HasPrefix(ct, "video/")}
+
+	// Playlists and manifests are tiny, so their size says nothing about length.
+	isFile := info.IsVideo || strings.HasPrefix(ct, "audio/")
+	if size := contentSize(resp.Header); isFile && size > 0 {
+		bitrate := int64(128000)
+		if info.IsVideo {
+			bitrate = 500000
+		}
+		if dur := int(size * 8 / bitrate); dur <= 3600 {
+			info.Duration = dur
+		}
 	}
 
-	return &streamInfo{
-		URL:         urlStr,
-		ContentType: ct,
-		Size:        size,
-		IsAudio:     isAudio,
-		IsVideo:     isVideo,
-	}, nil
+	return info, nil
 }
 
-func (d *DirectStreamPlatform) generateID(urlStr string) string {
+// contentSize returns the full resource size; a ranged reply carries it in
+// Content-Range, not Content-Length.
+func contentSize(h http.Header) int64 {
+	if _, total, ok := strings.Cut(h.Get("Content-Range"), "/"); ok {
+		size, _ := strconv.ParseInt(total, 10, 64)
+		return size
+	}
+	size, _ := strconv.ParseInt(h.Get("Content-Length"), 10, 64)
+	return size
+}
+
+func streamID(rawURL string) string {
 	h := fnv.New64a()
-	_, _ = h.Write([]byte(urlStr))
+	_, _ = h.Write([]byte(rawURL))
 	return fmt.Sprintf("direct_%x", h.Sum64())
 }
 
-func (d *DirectStreamPlatform) extractTitle(urlStr string) string {
-	parsed, err := url.Parse(urlStr)
+func streamTitle(rawURL string) string {
+	parsed, err := url.Parse(rawURL)
 	if err != nil {
 		return "Direct Stream"
 	}
+
 	name := path.Base(parsed.Path)
 	if before, _, found := strings.CutLast(name, "."); found && before != "" {
 		name = before
 	}
-	name = strings.NewReplacer("_", " ", "-", " ").Replace(name)
-	name = strings.TrimSpace(name)
+	name = strings.TrimSpace(strings.NewReplacer("_", " ", "-", " ").Replace(name))
 	if name == "" || name == "." || name == "index" || name == "stream" {
 		name = parsed.Host
 	}
-	if len(name) > 0 {
-		r, sz := utf8.DecodeRuneInString(name)
-		name = string(unicode.ToUpper(r)) + name[sz:]
+
+	if r, size := utf8.DecodeRuneInString(name); size > 0 {
+		name = string(unicode.ToUpper(r)) + name[size:]
 	}
 	return name
 }

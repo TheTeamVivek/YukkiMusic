@@ -18,6 +18,7 @@
 package platforms
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
@@ -38,6 +39,8 @@ const PlatformTelegram state.PlatformName = "Telegram"
 type TelegramPlatform struct{}
 
 var (
+	telegram = &TelegramPlatform{}
+
 	telegramLinkRegex = regexp.MustCompile(
 		`^(?:(?:https?://)?t\.me/((c/)?[\w\d_-]+/\d+|[\w\d_-]+)|@[\w\d_-]+)$`,
 	)
@@ -51,7 +54,7 @@ var (
 )
 
 func init() {
-	Register(&TelegramPlatform{})
+	Register(telegram)
 }
 
 func (t *TelegramPlatform) Name() state.PlatformName { return PlatformTelegram }
@@ -64,26 +67,26 @@ func (t *TelegramPlatform) CanGet(query string) bool {
 func (t *TelegramPlatform) Get(query string, _ bool) ([]*state.Track, error) {
 	query = strings.TrimSpace(query)
 
-	if telegramExtractRegex.MatchString(query) {
+	switch {
+	case telegramExtractRegex.MatchString(query):
 		msg, err := fetchTelegramMessage(query)
 		if err != nil {
 			return nil, err
 		}
 
-		_, isVideo, isAudio := playableMedia(core.Bot, msg)
-		if !isVideo && !isAudio {
+		target, isVideo, _ := playableMedia(core.Bot, msg)
+		if target == nil {
 			return nil, errors.New("message does not contain playable media")
 		}
 
-		track, err := t.GetTracksByMessage(core.Bot, msg)
+		track, err := t.GetTracksByMessage(core.Bot, target)
 		if err != nil {
 			return nil, err
 		}
 		track.Video = isVideo
 		return []*state.Track{track}, nil
-	}
 
-	if matches := telegramProfileRegex.FindStringSubmatch(query); len(matches) >= 2 {
+	case telegramProfileRegex.MatchString(query):
 		return nil, errors.New("telegram profile music is not supported")
 	}
 
@@ -119,42 +122,38 @@ func (t *TelegramPlatform) Download(
 	if track.Video {
 		ext = ".mp4"
 	}
-	path := getPath(track, ext)
+	path := trackFile(track, ext)
 
-	if fileExists(path) {
-		t.ensureDuration(track, path)
-		return path, nil
-	}
+	if !fileExists(path) {
+		msg, ok := telegramMsgCache.Get(track.ID)
+		if !ok {
+			var err error
+			if msg, err = fetchTelegramMessage(track.URL); err != nil {
+				return "", errors.New("failed to locate file")
+			}
+		}
 
-	msg, msgOk := telegramMsgCache.Get(track.ID)
-	if !msgOk {
-		fetched, fetchErr := fetchTelegramMessage(track.URL)
-		if fetchErr == nil {
-			msg = fetched
-			msgOk = true
+		var err error
+		if path, err = downloadTDLibMessage(ctx, msg, path, statusMsg); err != nil {
+			return "", err
 		}
 	}
-	if !msgOk {
-		return "", errors.New("failed to locate file")
-	}
 
-	outPath, err := downloadTDLibMessage(ctx, msg, path, statusMsg)
-	if err != nil {
-		return "", err
-	}
-
-	t.ensureDuration(track, outPath)
-	return outPath, nil
+	ensureDuration(track, path)
+	return path, nil
 }
 
-func (t *TelegramPlatform) ensureDuration(track *state.Track, path string) {
-	if track.Duration == 0 {
-		if dur, err := utils.GetDurationByFFProbe(path); err == nil {
-			track.Duration = dur
-		} else {
-			utils.Log.Errorf("GetDurationByFFProbe failed for %q: %v", path, err)
-		}
+func ensureDuration(track *state.Track, path string) {
+	if track.Duration != 0 {
+		return
 	}
+
+	dur, err := utils.GetDurationByFFProbe(path)
+	if err != nil {
+		utils.Log.Errorf("GetDurationByFFProbe failed for %q: %v", path, err)
+		return
+	}
+	track.Duration = dur
 }
 
 func downloadTDLibMessage(
@@ -163,19 +162,14 @@ func downloadTDLibMessage(
 	dstPath string,
 	statusMsg *td.Message,
 ) (string, error) {
-	if msg == nil {
-		return "", errors.New("nil message")
-	}
-
-	fileID := msg.RemoteFileID()
 	if OnDownloadStart != nil {
-		OnDownloadStart(fileID, statusMsg)
+		OnDownloadStart(msg.RemoteFileID(), statusMsg)
 	}
 
 	file, err := msg.Download(core.Bot, 1, &td.DownloadFileOpts{Synchronous: true})
 	if err != nil {
 		_ = os.Remove(dstPath)
-		if isDownloadCancelled(err) || (ctx != nil && ctx.Err() != nil) {
+		if canceled(ctx, err) {
 			return "", context.Canceled
 		}
 		return "", fmt.Errorf("download failed: %w", err)
@@ -194,19 +188,9 @@ func downloadTDLibMessage(
 	return dstPath, nil
 }
 
+// GetTracksByMessage builds a track from a message that carries audio or video.
 func (t *TelegramPlatform) GetTracksByMessage(c *td.Client, msg *td.Message) (*state.Track, error) {
-	if msg == nil {
-		return nil, errors.New("nil message")
-	}
-
-	if msg.RemoteFileID() == "" && msg.ReplyToMessageID() > 0 {
-		r, err := msg.GetRepliedMessage(c)
-		if err == nil && r.RemoteFileID() != "" {
-			msg = r
-		}
-	}
-
-	if msg.RemoteFileID() == "" {
+	if msg == nil || msg.RemoteFileID() == "" {
 		return nil, ErrNotMedia
 	}
 
@@ -214,17 +198,17 @@ func (t *TelegramPlatform) GetTracksByMessage(c *td.Client, msg *td.Message) (*s
 	switch content := msg.Content.(type) {
 	case *td.MessageAudio:
 		if content.Audio != nil {
-			title = firstNonEmpty(content.Audio.Title, content.Audio.FileName, title)
+			title = cmp.Or(content.Audio.Title, content.Audio.FileName, title)
 		}
 	case *td.MessageVideo:
 		if content.Video != nil {
-			title = firstNonEmpty(content.Video.FileName, title)
+			title = cmp.Or(content.Video.FileName, title)
 		}
 	case *td.MessageVoiceNote:
 		title = "Voice Note"
 	case *td.MessageDocument:
 		if content.Document != nil {
-			title = firstNonEmpty(content.Document.FileName, title)
+			title = cmp.Or(content.Document.FileName, title)
 		}
 	}
 

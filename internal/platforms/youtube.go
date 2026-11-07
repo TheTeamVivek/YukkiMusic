@@ -18,9 +18,11 @@
 package platforms
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"regexp"
 	"slices"
 	"strings"
@@ -35,9 +37,9 @@ import (
 
 const (
 	PlatformYouTube        state.PlatformName = "YouTube"
-	innerTubeKey           string             = "AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"
-	innerTubeClientVersion string             = "2.20250101.01.00"
-	innerTubeClientName    string             = "WEB"
+	innerTubeKey                              = "AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"
+	innerTubeClientVersion                    = "2.20250101.01.00"
+	innerTubeClientName                       = "WEB"
 )
 
 type YouTubePlatform struct {
@@ -45,23 +47,23 @@ type YouTubePlatform struct {
 }
 
 var (
+	youtube = &YouTubePlatform{
+		cache: utils.NewCache[string, []*state.Track](time.Hour),
+	}
+
+	errLiveStream = errors.New("live streams are not supported")
+
 	youtubeLinkRe = regexp.MustCompile(
 		`(?i)^(?:https?:\/\/)?(?:www\.|m\.|music\.)?(?:youtube\.com|youtu\.be)\/\S+`,
 	)
-	videoIDRe1 = regexp.MustCompile(
-		`(?i)(?:youtube\.com/(?:watch\?v=|embed/|shorts/|live/)|youtu\.be/)([A-Za-z0-9_-]{11})`,
+	videoIDRe = regexp.MustCompile(
+		`(?i)(?:youtu\.be/|youtube\.com/(?:embed|shorts|live|v|e|vi)/|[?&]v=)([A-Za-z0-9_-]{11})`,
 	)
-	videoIDRe2    = regexp.MustCompile(`(?:v=|\/)([0-9A-Za-z_-]{11})`)
-	playlistIDRe1 = regexp.MustCompile(
-		`(?i)(?:youtube\.com|music\.youtube\.com).*(?:\?|&)list=([A-Za-z0-9_-]+)`,
-	)
-	playlistIDRe2 = regexp.MustCompile(`list=([0-9A-Za-z_-]+)`)
+	playlistIDRe = regexp.MustCompile(`[?&]list=([A-Za-z0-9_-]+)`)
 )
 
 func init() {
-	Register(&YouTubePlatform{
-		cache: utils.NewCache[string, []*state.Track](1 * time.Hour),
-	})
+	Register(youtube)
 }
 
 func (p *YouTubePlatform) Name() state.PlatformName { return PlatformYouTube }
@@ -85,12 +87,11 @@ func (p *YouTubePlatform) Get(input string, video bool) ([]*state.Track, error) 
 	if !youtubeLinkRe.MatchString(query) {
 		tracks, err = p.VideoSearch(query)
 	} else {
-		playlistID := p.extractPlaylistID(query)
-		videoID := p.extractVideoID(query)
+		playlistID, videoID := extractPlaylistID(query), extractVideoID(query)
 
 		switch {
 		case playlistID != "" && videoID != "":
-			tracks, err = p.handleCombined(query, videoID)
+			tracks, err = p.handleCombined(query)
 		case playlistID != "":
 			tracks, err = p.handlePlaylist(query)
 		default:
@@ -117,9 +118,6 @@ func (p *YouTubePlatform) Download(_ context.Context, _ *state.Track, _ *td.Mess
 func withVideo(tracks []*state.Track, video bool) []*state.Track {
 	out := make([]*state.Track, 0, len(tracks))
 	for _, t := range tracks {
-		if t == nil {
-			continue
-		}
 		clone := *t
 		clone.Video = video
 		out = append(out, &clone)
@@ -127,15 +125,33 @@ func withVideo(tracks []*state.Track, video bool) []*state.Track {
 	return out
 }
 
+func ytTrack(id, title, artwork string, duration int) *state.Track {
+	return &state.Track{
+		ID:       id,
+		Title:    title,
+		Artwork:  artwork,
+		Duration: duration,
+		URL:      "https://www.youtube.com/watch?v=" + id,
+		Source:   PlatformYouTube,
+	}
+}
+
+// remember caches a track under its id so a later link to it skips the lookup.
+func (p *YouTubePlatform) remember(t *state.Track) []*state.Track {
+	out := []*state.Track{t}
+	p.cache.Set("track:"+t.ID, out)
+	return out
+}
+
 func (p *YouTubePlatform) VideoSearch(query string) ([]*state.Track, error) {
-	cleanQuery := strings.TrimSpace(query)
-	if cleanQuery == "" {
+	query = strings.TrimSpace(query)
+	if query == "" {
 		return nil, errors.New("empty search query")
 	}
 
-	cacheKey := "search:" + strings.ToLower(cleanQuery)
-	if arr, ok := p.cache.Get(cacheKey); ok && len(arr) > 0 {
-		return arr, nil
+	key := "search:" + strings.ToLower(query)
+	if tracks, ok := p.cache.Get(key); ok && len(tracks) > 0 {
+		return tracks, nil
 	}
 
 	limit := config.QueueLimit
@@ -143,7 +159,7 @@ func (p *YouTubePlatform) VideoSearch(query string) ([]*state.Track, error) {
 		limit = 10
 	}
 
-	tracks, err := p.performSearch(cleanQuery, limit)
+	tracks, err := p.performSearch(query, limit)
 	if err != nil {
 		return nil, fmt.Errorf("ytsearch failed: %w", err)
 	}
@@ -151,19 +167,19 @@ func (p *YouTubePlatform) VideoSearch(query string) ([]*state.Track, error) {
 		return nil, ErrNoTracks
 	}
 
-	p.cache.Set(cacheKey, tracks)
+	p.cache.Set(key, tracks)
 	return tracks, nil
 }
 
 func (p *YouTubePlatform) handlePlaylist(rawURL string) ([]*state.Track, error) {
-	cacheKey := "playlist:" + strings.ToLower(rawURL)
-	if cached, ok := p.cache.Get(cacheKey); ok {
-		return cached, nil
+	id := extractPlaylistID(rawURL)
+	if id == "" {
+		return nil, errors.New("invalid playlist url")
 	}
 
-	playlistID := p.extractPlaylistID(rawURL)
-	if playlistID == "" {
-		return nil, errors.New("invalid playlist url")
+	key := "playlist:" + id
+	if cached, ok := p.cache.Get(key); ok {
+		return cached, nil
 	}
 
 	limit := config.QueueLimit
@@ -171,177 +187,141 @@ func (p *YouTubePlatform) handlePlaylist(rawURL string) ([]*state.Track, error) 
 		limit = 24
 	}
 
-	var (
-		tracks []*state.Track
-		err    error
-	)
-
-	if strings.HasPrefix(playlistID, "RD") {
-		tracks, err = p.fetchMixPlaylist(playlistID, limit)
-	} else {
-		tracks, err = p.fetchPlaylist(playlistID, limit)
+	fetch := p.fetchPlaylist
+	if strings.HasPrefix(id, "RD") {
+		fetch = p.fetchMixPlaylist
 	}
 
+	tracks, err := fetch(id, limit)
 	if err != nil {
 		return nil, fmt.Errorf("playlist fetch failed: %w", err)
 	}
 
 	if len(tracks) > 0 {
-		p.cache.Set(cacheKey, tracks)
+		p.cache.Set(key, tracks)
 	}
 	return tracks, nil
 }
 
-func (p *YouTubePlatform) handleCombined(rawURL, videoID string) ([]*state.Track, error) {
+// handleCombined serves a watch link that also carries a list: the video
+// first, then the rest of the playlist.
+func (p *YouTubePlatform) handleCombined(rawURL string) ([]*state.Track, error) {
 	vTracks, vErr := p.handleTrackURL(rawURL)
 	pTracks, pErr := p.handlePlaylist(rawURL)
 
-	if vErr == nil && pErr == nil && len(vTracks) > 0 {
-		vid := vTracks[0].ID
+	switch {
+	case vErr == nil && pErr == nil && len(vTracks) > 0:
 		out := []*state.Track{vTracks[0]}
 		for _, t := range pTracks {
-			if t.ID != vid {
+			if t.ID != out[0].ID {
 				out = append(out, t)
 			}
 		}
 		return out, nil
-	}
-	if vErr == nil {
+	case vErr == nil:
 		return vTracks, nil
-	}
-	if pErr == nil {
-		utils.Log.Warnf("[YouTube] video fetch failed for %s: %v", videoID, vErr)
+	case pErr == nil:
+		utils.Log.Warnf("[YouTube] video fetch failed for %s: %v", rawURL, vErr)
 		return pTracks, nil
 	}
 	return nil, fmt.Errorf("video (%v) and playlist (%v) both failed", vErr, pErr)
 }
 
 func (p *YouTubePlatform) handleTrackURL(rawURL string) ([]*state.Track, error) {
-	videoID := p.extractVideoID(rawURL)
-	if videoID == "" {
+	id := extractVideoID(rawURL)
+	if id == "" {
 		return nil, errors.New("invalid video url")
 	}
 
-	if cached, ok := p.cache.Get("track:" + videoID); ok && len(cached) > 0 {
+	if cached, ok := p.cache.Get("track:" + id); ok && len(cached) > 0 {
 		return cached, nil
 	}
 
-	track, err := p.fetchVideo(videoID)
-	if err == nil && track != nil {
-		p.cache.Set("track:"+videoID, []*state.Track{track})
-		return []*state.Track{track}, nil
+	track, err := p.fetchVideo(id)
+	if err == nil {
+		return p.remember(track), nil
+	}
+	if errors.Is(err, errLiveStream) {
+		return nil, err
 	}
 
-	for _, q := range []string{videoID, rawURL} {
-		results, err := p.VideoSearch(q)
-		if err != nil {
-			continue
-		}
-		for _, t := range results {
-			if t.ID == videoID {
-				p.cache.Set("track:"+videoID, []*state.Track{t})
-				return []*state.Track{t}, nil
-			}
-		}
+	if t := p.searchByID(id, id, rawURL); t != nil {
+		return p.remember(t), nil
 	}
 
-	if t, err := p.fetchTrackViaOEmbed(videoID); err == nil && t != nil {
-		p.cache.Set("track:"+videoID, []*state.Track{t})
-		return []*state.Track{t}, nil
+	if title, err := oembedTitle(id); err == nil {
+		queries := []string{title}
+		if runes := []rune(title); len(runes) > 35 {
+			queries = append(queries, string(runes[:35]))
+		}
+		if t := p.searchByID(id, queries...); t != nil {
+			return p.remember(t), nil
+		}
 	}
 
 	return nil, errors.New("track not found")
 }
 
-func (p *YouTubePlatform) fetchTrackViaOEmbed(videoID string) (*state.Track, error) {
-	utils.Log.Debugf("[YouTube] oembed fallback: %s", videoID)
+// searchByID runs the queries in turn and returns the result with the given video id.
+func (p *YouTubePlatform) searchByID(id string, queries ...string) *state.Track {
+	for _, q := range queries {
+		results, err := p.VideoSearch(q)
+		if err != nil {
+			continue
+		}
+		for _, t := range results {
+			if t.ID == id {
+				return t
+			}
+		}
+	}
+	return nil
+}
+
+func oembedTitle(videoID string) (string, error) {
 	var result map[string]any
 
-	oembedURL := fmt.Sprintf(
-		"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=%s&format=json",
-		videoID,
+	resp, err := rc.R().SetResult(&result).Get(
+		"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=" + videoID + "&format=json",
 	)
-	resp, err := rc.R().SetResult(&result).Get(oembedURL)
 	if err != nil {
-		utils.Log.Errorf("[YouTube] oembed request failed for %s: %v", videoID, err)
-		return nil, fmt.Errorf("oembed request failed: %w", err)
+		return "", fmt.Errorf("oembed request failed: %w", err)
 	}
 	if resp.IsStatusFailure() {
-		utils.Log.Errorf("[YouTube] oembed returned status %d for %s", resp.StatusCode(), videoID)
-		return nil, fmt.Errorf("oembed error: %d", resp.StatusCode())
+		return "", fmt.Errorf("oembed error: %d", resp.StatusCode())
 	}
 
 	title := safeStr(result["title"])
 	if title == "" {
-		utils.Log.Warnf("[YouTube] oembed: empty title for %s", videoID)
-		return nil, errors.New("oembed: title not found")
+		return "", errors.New("oembed: title not found")
 	}
-	utils.Log.Debugf("[YouTube] oembed title for %s: %q", videoID, title)
-
-	queries := []string{title}
-	runes := []rune(title)
-	if len(runes) > 35 {
-		queries = append(queries, string(runes[:35]))
-	}
-
-	for _, q := range queries {
-		utils.Log.Debugf("[YouTube] oembed fallback search query: %q", q)
-		tracks, err := p.VideoSearch(q)
-		if err != nil {
-			utils.Log.Warnf("[YouTube] oembed fallback search failed for %q: %v", q, err)
-			continue
-		}
-		for _, t := range tracks {
-			if t.ID == videoID {
-				utils.Log.Debugf("[YouTube] oembed fallback matched %s via query %q", videoID, q)
-				return t, nil
-			}
-		}
-		utils.Log.Debugf("[YouTube] oembed fallback: no id match for %s in query %q results", videoID, q)
-	}
-
-	utils.Log.Warnf("[YouTube] oembed fallback exhausted, no match for %s", videoID)
-	return nil, errors.New("no track found")
+	return title, nil
 }
 
-func (p *YouTubePlatform) extractPlaylistID(input string) string {
-	if m := playlistIDRe1.FindStringSubmatch(input); len(m) > 1 {
-		return m[1]
-	}
-	if m := playlistIDRe2.FindStringSubmatch(input); len(m) > 1 {
+func extractPlaylistID(input string) string {
+	if m := playlistIDRe.FindStringSubmatch(input); m != nil {
 		return m[1]
 	}
 	return ""
 }
 
-func (p *YouTubePlatform) extractVideoID(u string) string {
-	if m := videoIDRe1.FindStringSubmatch(u); len(m) > 1 {
-		return m[1]
-	}
-	if m := videoIDRe2.FindStringSubmatch(u); len(m) > 1 {
+func extractVideoID(input string) string {
+	if m := videoIDRe.FindStringSubmatch(input); m != nil {
 		return m[1]
 	}
 	return ""
 }
 
 func (p *YouTubePlatform) performSearch(query string, limit int) ([]*state.Track, error) {
-	utils.Log.Debugf("[YouTube] search: %s", query)
 	var result map[string]any
 
-	payload := map[string]any{
-		"context": map[string]any{
-			"client": map[string]any{
-				"clientName":    innerTubeClientName,
-				"clientVersion": innerTubeClientVersion,
-				"hl":            "en-IN",
-				"gl":            "IN",
-			},
-		},
-		"query":  query,
-		"params": "CAASAhAB",
-	}
-
-	if err := p.callInnerTube("search", payload, &result); err != nil {
+	err := p.callInnerTube(
+		"search",
+		map[string]any{"hl": "en-IN", "gl": "IN"},
+		map[string]any{"query": query, "params": "CAASAhAB"},
+		&result,
+	)
+	if err != nil {
 		return nil, err
 	}
 
@@ -360,20 +340,10 @@ func (p *YouTubePlatform) performSearch(query string, limit int) ([]*state.Track
 }
 
 func (p *YouTubePlatform) fetchVideo(videoID string) (*state.Track, error) {
-	utils.Log.Debugf("[YouTube] fetchVideo: %s", videoID)
 	var result map[string]any
 
-	payload := map[string]any{
-		"context": map[string]any{
-			"client": map[string]any{
-				"clientName":    innerTubeClientName,
-				"clientVersion": innerTubeClientVersion,
-			},
-		},
-		"videoId": videoID,
-	}
-
-	if err := p.callInnerTube("player", payload, &result); err != nil {
+	err := p.callInnerTube("player", nil, map[string]any{"videoId": videoID}, &result)
+	if err != nil {
 		return nil, err
 	}
 
@@ -381,20 +351,19 @@ func (p *YouTubePlatform) fetchVideo(videoID string) (*state.Track, error) {
 	if !ok {
 		return nil, errors.New("videoDetails not found")
 	}
+	if live, _ := details["isLive"].(bool); live {
+		return nil, errLiveStream
+	}
 
-	id := safeStr(details["videoId"])
-	return &state.Track{
-		URL:      "https://www.youtube.com/watch?v=" + id,
-		Title:    safeStr(details["title"]),
-		ID:       id,
-		Artwork:  getThumbnailURL(result),
-		Duration: atoi(safeStr(details["lengthSeconds"])),
-		Source:   PlatformYouTube,
-	}, nil
+	return ytTrack(
+		safeStr(details["videoId"]),
+		safeStr(details["title"]),
+		thumbnailURL(result),
+		atoi(safeStr(details["lengthSeconds"])),
+	), nil
 }
 
 func (p *YouTubePlatform) fetchPlaylist(playlistID string, limit int) ([]*state.Track, error) {
-	utils.Log.Debugf("[YouTube] fetchPlaylist: %s", playlistID)
 	var result map[string]any
 
 	browseID := playlistID
@@ -402,17 +371,8 @@ func (p *YouTubePlatform) fetchPlaylist(playlistID string, limit int) ([]*state.
 		browseID = "VL" + playlistID
 	}
 
-	payload := map[string]any{
-		"context": map[string]any{
-			"client": map[string]any{
-				"clientName":    innerTubeClientName,
-				"clientVersion": innerTubeClientVersion,
-			},
-		},
-		"browseId": browseID,
-	}
-
-	if err := p.callInnerTube("browse", payload, &result); err != nil {
+	err := p.callInnerTube("browse", nil, map[string]any{"browseId": browseID}, &result)
+	if err != nil {
 		return nil, err
 	}
 
@@ -422,20 +382,10 @@ func (p *YouTubePlatform) fetchPlaylist(playlistID string, limit int) ([]*state.
 }
 
 func (p *YouTubePlatform) fetchMixPlaylist(playlistID string, limit int) ([]*state.Track, error) {
-	utils.Log.Debugf("[YouTube] fetchMix: %s", playlistID)
 	var result map[string]any
 
-	payload := map[string]any{
-		"context": map[string]any{
-			"client": map[string]any{
-				"clientName":    innerTubeClientName,
-				"clientVersion": innerTubeClientVersion,
-			},
-		},
-		"playlistId": playlistID,
-	}
-
-	if err := p.callInnerTube("next", payload, &result); err != nil {
+	err := p.callInnerTube("next", nil, map[string]any{"playlistId": playlistID}, &result)
+	if err != nil {
 		return nil, err
 	}
 
@@ -449,44 +399,28 @@ func (p *YouTubePlatform) fetchMixPlaylist(playlistID string, limit int) ([]*sta
 	}
 
 	var tracks []*state.Track
-	for _, item := range items {
-		if limit > 0 && len(tracks) >= limit {
-			break
-		}
-		vid, ok := dig(item, "playlistPanelVideoRenderer").(map[string]any)
-		if !ok {
-			continue
-		}
-		id := safeStr(vid["videoId"])
-		if id == "" {
-			continue
-		}
-		t := &state.Track{
-			URL:      "https://www.youtube.com/watch?v=" + id,
-			Title:    extractText(dig(vid, "title")),
-			ID:       id,
-			Artwork:  getThumbnailURL(vid),
-			Duration: parseDuration(extractText(dig(vid, "lengthText"))),
-			Source:   PlatformYouTube,
-		}
-		tracks = append(tracks, t)
-		p.cache.Set("track:"+id, []*state.Track{t})
-	}
-
+	p.parseNodes(items, &tracks, limit, "playlistPanelVideoRenderer")
 	return tracks, nil
 }
 
-func (p *YouTubePlatform) callInnerTube(endpoint string, body, result any) error {
-	apiURL := fmt.Sprintf(
-		"https://m.youtube.com/youtubei/v1/%s?key=%s",
-		endpoint, innerTubeKey,
-	)
+// callInnerTube posts fields to an InnerTube endpoint; client adds to the
+// default client context.
+func (p *YouTubePlatform) callInnerTube(endpoint string, client, fields map[string]any, result any) error {
+	clientCtx := map[string]any{
+		"clientName":    innerTubeClientName,
+		"clientVersion": innerTubeClientVersion,
+	}
+	maps.Copy(clientCtx, client)
+
+	body := map[string]any{"context": map[string]any{"client": clientCtx}}
+	maps.Copy(body, fields)
+
 	resp, err := rc.R().
 		SetBody(body).
 		SetResult(result).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("User-Agent", "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36").
-		Post(apiURL)
+		Post(fmt.Sprintf("https://m.youtube.com/youtubei/v1/%s?key=%s", endpoint, innerTubeKey))
 	if err != nil {
 		return fmt.Errorf("innertube request failed: %w", err)
 	}
@@ -496,6 +430,7 @@ func (p *YouTubePlatform) callInnerTube(endpoint string, body, result any) error
 	return nil
 }
 
+// parseNodes collects every rendererKey node under node, up to limit tracks.
 func (p *YouTubePlatform) parseNodes(node any, tracks *[]*state.Track, limit int, rendererKey string) {
 	if limit > 0 && len(*tracks) >= limit {
 		return
@@ -507,111 +442,85 @@ func (p *YouTubePlatform) parseNodes(node any, tracks *[]*state.Track, limit int
 			p.parseNodes(item, tracks, limit, rendererKey)
 		}
 	case map[string]any:
-		if vid, ok := v[rendererKey].(map[string]any); ok {
-			if rendererKey == "videoRenderer" && isLiveVideo(vid) {
-				return
-			}
-			id := safeStr(vid["videoId"])
-			if id == "" {
-				return
-			}
-			durationText := extractText(dig(vid, "lengthText"))
-			if durationText == "" {
-				return
-			}
-			title := extractText(dig(vid, "title"))
-			if title == "" {
-				title = "YouTube Track"
-			}
-			t := &state.Track{
-				URL:      "https://www.youtube.com/watch?v=" + id,
-				Title:    title,
-				ID:       id,
-				Artwork:  getThumbnailURL(vid),
-				Duration: parseDuration(durationText),
-				Source:   PlatformYouTube,
-			}
-			*tracks = append(*tracks, t)
-			p.cache.Set("track:"+id, []*state.Track{t})
-		} else {
+		vid, ok := v[rendererKey].(map[string]any)
+		if !ok {
 			for _, val := range v {
 				p.parseNodes(val, tracks, limit, rendererKey)
 			}
+			return
+		}
+
+		if t := parseRenderer(vid, rendererKey); t != nil {
+			*tracks = append(*tracks, t)
+			p.remember(t)
 		}
 	}
 }
 
-func extractText(node any) string {
-	if node == nil {
-		return ""
+func parseRenderer(vid map[string]any, rendererKey string) *state.Track {
+	if rendererKey == "videoRenderer" && isLiveVideo(vid) {
+		return nil
 	}
+
+	id := safeStr(vid["videoId"])
+	duration := extractText(dig(vid, "lengthText"))
+	if id == "" || duration == "" {
+		return nil
+	}
+
+	title := cmp.Or(extractText(dig(vid, "title")), "YouTube Track")
+	return ytTrack(id, title, thumbnailURL(vid), parseDuration(duration))
+}
+
+func extractText(node any) string {
 	switch v := node.(type) {
 	case string:
 		return v
 	case map[string]any:
-		if st := safeStr(v["simpleText"]); st != "" {
-			return st
+		if s := cmp.Or(safeStr(v["simpleText"]), safeStr(v["text"])); s != "" {
+			return s
 		}
-		if text := safeStr(v["text"]); text != "" {
-			return text
+		runs, _ := v["runs"].([]any)
+		var sb strings.Builder
+		for _, r := range runs {
+			sb.WriteString(safeStr(dig(r, "text")))
 		}
-		if runs, ok := v["runs"].([]any); ok {
-			var sb strings.Builder
-			for _, r := range runs {
-				if rm, ok := r.(map[string]any); ok {
-					sb.WriteString(safeStr(rm["text"]))
-				}
-			}
-			return sb.String()
-		}
+		return sb.String()
 	}
 	return ""
 }
 
 func isLiveVideo(vid map[string]any) bool {
-	if badges, ok := dig(vid, "badges").([]any); ok {
-		for _, b := range badges {
-			if safeStr(dig(b, "metadataBadgeRenderer", "style")) == "BADGE_STYLE_TYPE_LIVE_NOW" {
-				return true
-			}
+	badges, _ := dig(vid, "badges").([]any)
+	for _, b := range badges {
+		if safeStr(dig(b, "metadataBadgeRenderer", "style")) == "BADGE_STYLE_TYPE_LIVE_NOW" {
+			return true
 		}
 	}
 	viewCount := strings.ToLower(extractText(dig(vid, "viewCountText")))
 	return strings.Contains(viewCount, "watching")
 }
 
-func getThumbnailURL(vid map[string]any) string {
+func thumbnailURL(vid map[string]any) string {
 	thumbs, ok := dig(vid, "thumbnail", "thumbnails").([]any)
 	if !ok {
-		thumbs, ok = dig(vid, "videoDetails", "thumbnail", "thumbnails").([]any)
+		thumbs, _ = dig(vid, "videoDetails", "thumbnail", "thumbnails").([]any)
 	}
-	if ok && len(thumbs) > 0 {
-		if last, ok := thumbs[len(thumbs)-1].(map[string]any); ok {
-			return safeStr(last["url"])
-		}
+	if len(thumbs) == 0 {
+		return ""
 	}
-	return ""
+	return safeStr(dig(thumbs[len(thumbs)-1], "url"))
 }
 
-func dig(m any, path ...any) any {
-	curr := m
+func dig(m any, path ...string) any {
 	for _, key := range path {
-		switch k := key.(type) {
-		case string:
-			mm, ok := curr.(map[string]any)
-			if !ok {
-				return nil
-			}
-			curr = mm[k]
-		case int:
-			arr, ok := curr.([]any)
-			if !ok || k >= len(arr) {
-				return nil
-			}
-			curr = arr[k]
+		mm, ok := m.(map[string]any)
+		if !ok {
+			return nil
 		}
+		m = mm[key]
 	}
-	return curr
+	return m
 }
 
 func safeStr(v any) string {
@@ -620,9 +529,8 @@ func safeStr(v any) string {
 }
 
 func parseDuration(s string) int {
-	parts := strings.Split(strings.TrimSpace(s), ":")
 	total, mult := 0, 1
-	for _, part := range slices.Backward(parts) {
+	for _, part := range slices.Backward(strings.Split(strings.TrimSpace(s), ":")) {
 		total += atoi(part) * mult
 		mult *= 60
 	}

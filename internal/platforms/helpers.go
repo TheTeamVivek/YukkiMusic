@@ -25,23 +25,27 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"unicode"
 
 	td "github.com/AshokShau/gotdbot"
 
 	state "yukkimusic/internal/core/models"
-	"yukkimusic/internal/utils"
 )
 
 var errUnsafeURL = errors.New("invalid or unsafe url")
 
-// Download progress hooks, registered by the modules package.
+// OnDownloadStart is set by the modules package and runs right before a
+// TDLib download starts.
+var OnDownloadStart func(fileID string, statusMsg *td.Message)
+
 var (
-	OnDownloadStart func(fileID string, statusMsg *td.Message)
+	audioExts = []string{".mp3", ".wav", ".flac", ".ogg", ".m4a", ".aac", ".opus"}
+	videoExts = []string{".mp4", ".mkv", ".webm", ".avi", ".mov"}
 )
 
-func isDownloadCancelled(err error) bool {
+func isCancelled(err error) bool {
 	if err == nil {
 		return false
 	}
@@ -51,37 +55,34 @@ func isDownloadCancelled(err error) bool {
 	if tdErr, ok := errors.AsType[*td.Error](err); ok {
 		return strings.Contains(strings.ToLower(tdErr.Message), "cancel")
 	}
-	msg := strings.ToLower(err.Error())
-	return strings.Contains(msg, "cancel") || strings.Contains(msg, "killed")
+	return strings.Contains(strings.ToLower(err.Error()), "cancel")
 }
 
-func getPath(track *state.Track, ext string) string {
-	if ext != "" && !strings.HasPrefix(ext, ".") {
-		ext = "." + ext
-	}
-	t := "audio"
+// canceled tells a user-cancelled download apart from a failed one.
+func canceled(ctx context.Context, err error) bool {
+	return ctx.Err() != nil || isCancelled(err)
+}
+
+func trackFile(track *state.Track, ext string) string {
+	kind := "audio"
 	if track.Video {
-		t = "video"
+		kind = "video"
 	}
-	return filepath.Join("downloads", t+"_"+track.ID+ext)
+	return filepath.Join("downloads", kind+"_"+track.ID+ext)
+}
+
+func trackFiles(track *state.Track) []string {
+	files, _ := filepath.Glob(trackFile(track, ".*"))
+	return files
 }
 
 func fileExists(path string) bool {
 	info, err := os.Stat(path)
-	if err != nil {
-		utils.Log.Debug("fileExists: " + path + " not found")
-		return false
-	}
-	return info.Size() > 0
+	return err == nil && info.Size() > 0
 }
 
 func findFile(track *state.Track) string {
-	t := "audio"
-	if track.Video {
-		t = "video"
-	}
-	files, _ := filepath.Glob(filepath.Join("downloads", t+"_"+track.ID+".*"))
-	for _, f := range files {
+	for _, f := range trackFiles(track) {
 		if !strings.HasSuffix(f, ".part") && fileExists(f) {
 			return f
 		}
@@ -89,13 +90,8 @@ func findFile(track *state.Track) string {
 	return ""
 }
 
-func findAndRemove(track *state.Track) {
-	t := "audio"
-	if track.Video {
-		t = "video"
-	}
-	files, _ := filepath.Glob(filepath.Join("downloads", t+"_"+track.ID+".*"))
-	for _, f := range files {
+func removeFiles(track *state.Track) {
+	for _, f := range trackFiles(track) {
 		_ = os.Remove(f)
 	}
 }
@@ -105,15 +101,6 @@ func sanitizeAPIError(err error, apiKey string) error {
 		return err
 	}
 	return errors.New(strings.ReplaceAll(err.Error(), apiKey, "***REDACTED***"))
-}
-
-func firstNonEmpty(vals ...string) string {
-	for _, v := range vals {
-		if v != "" {
-			return v
-		}
-	}
-	return ""
 }
 
 func copyFile(src, dst string) error {
@@ -127,49 +114,44 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	defer out.Close()
-
 	if _, err := io.Copy(out, in); err != nil {
+		out.Close()
 		return err
 	}
 	return out.Close()
 }
 
-func playableMedia(c *td.Client, m *td.Message) (msg *td.Message, isVideo, isAudio bool) {
-	check := func(msg *td.Message) (bool, bool) {
-		if msg == nil || msg.Content == nil {
-			return false, false
-		}
-		switch content := msg.Content.(type) {
-		case *td.MessageAudio, *td.MessageVoiceNote:
-			return false, true
-		case *td.MessageVideo, *td.MessageAnimation, *td.MessageVideoNote:
-			return true, false
-		case *td.MessageDocument:
-			if content.Document == nil {
-				return false, false
-			}
-			mt := strings.ToLower(content.Document.MimeType)
-			switch {
-			case strings.HasPrefix(mt, "audio/"):
-				return false, true
-			case strings.HasPrefix(mt, "video/"):
-				return true, false
-			}
-			ext := strings.ToLower(filepath.Ext(content.Document.FileName))
-			switch ext {
-			case ".mp3", ".wav", ".flac", ".ogg", ".m4a", ".aac", ".opus":
-				return false, true
-			case ".mp4", ".mkv", ".webm", ".avi", ".mov":
-				return true, false
-			}
-		}
+// messageMedia reports whether msg itself carries video or audio.
+func messageMedia(msg *td.Message) (video, audio bool) {
+	if msg == nil {
 		return false, false
 	}
 
-	curr := m
-	for curr != nil {
-		if v, a := check(curr); v || a {
+	switch content := msg.Content.(type) {
+	case *td.MessageAudio, *td.MessageVoiceNote:
+		return false, true
+	case *td.MessageVideo, *td.MessageAnimation, *td.MessageVideoNote:
+		return true, false
+	case *td.MessageDocument:
+		if content.Document == nil {
+			return false, false
+		}
+		mime := strings.ToLower(content.Document.MimeType)
+		ext := strings.ToLower(filepath.Ext(content.Document.FileName))
+		switch {
+		case strings.HasPrefix(mime, "audio/"), slices.Contains(audioExts, ext):
+			return false, true
+		case strings.HasPrefix(mime, "video/"), slices.Contains(videoExts, ext):
+			return true, false
+		}
+	}
+	return false, false
+}
+
+// playableMedia walks up the reply chain from m to the first audio or video message.
+func playableMedia(c *td.Client, m *td.Message) (msg *td.Message, isVideo, isAudio bool) {
+	for curr := m; curr != nil; {
+		if v, a := messageMedia(curr); v || a {
 			return curr, v, a
 		}
 		if curr.ReplyToMessageID() <= 0 {
@@ -186,39 +168,26 @@ func playableMedia(c *td.Client, m *td.Message) (msg *td.Message, isVideo, isAud
 
 func sanitizeMediaURL(raw string) (string, error) {
 	u := strings.TrimSpace(raw)
-	if u == "" {
+	if u == "" || strings.ContainsFunc(u, func(r rune) bool {
+		return unicode.IsControl(r) || unicode.IsSpace(r)
+	}) {
 		return "", errUnsafeURL
-	}
-
-	for _, r := range u {
-		if unicode.IsControl(r) || unicode.IsSpace(r) {
-			return "", errUnsafeURL
-		}
 	}
 
 	parsed, err := url.Parse(u)
-	if err != nil {
-		return "", errUnsafeURL
-	}
-
-	if parsed.Scheme != "http" && parsed.Scheme != "https" {
+	if err != nil || (parsed.Scheme != "http" && parsed.Scheme != "https") {
 		return "", errUnsafeURL
 	}
 
 	host := parsed.Hostname()
-	if host == "" || parsed.User != nil {
+	if host == "" || parsed.User != nil || strings.EqualFold(host, "localhost") {
 		return "", errUnsafeURL
 	}
 
-	if strings.EqualFold(host, "localhost") {
+	if ip := net.ParseIP(host); ip != nil &&
+		(ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() ||
+			ip.IsPrivate() || ip.IsUnspecified()) {
 		return "", errUnsafeURL
-	}
-
-	if ip := net.ParseIP(host); ip != nil {
-		if ip.IsLoopback() || ip.IsLinkLocalUnicast() ||
-			ip.IsLinkLocalMulticast() || ip.IsPrivate() || ip.IsUnspecified() {
-			return "", errUnsafeURL
-		}
 	}
 
 	return parsed.String(), nil

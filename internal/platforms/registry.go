@@ -21,8 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sort"
-	"strconv"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -39,70 +38,47 @@ var (
 	ErrNoTracks = errors.New("no tracks found")
 	// ErrNotMedia means the replied message holds no audio or video.
 	ErrNotMedia = errors.New("replied message is not playable media")
-)
 
-type reg struct {
-	mu     sync.RWMutex
-	sorted []state.Platform
-	byName map[state.PlatformName]state.Platform
-}
-
-var (
-	global = &reg{
-		byName: make(map[state.PlatformName]state.Platform),
-	}
+	// rc serves API calls; dl serves file downloads, which can outlast any
+	// fixed timeout and are stopped through their context instead.
 	rc = resty.New().SetTimeout(20 * time.Second)
+	dl = resty.New()
+
+	mu         sync.RWMutex
+	registered []state.Platform // highest priority first
 )
 
 func Register(p state.Platform) {
-	global.mu.Lock()
-	defer global.mu.Unlock()
+	mu.Lock()
+	defer mu.Unlock()
 
-	if _, ok := global.byName[p.Name()]; ok {
-		for i, existing := range global.sorted {
-			if existing.Name() == p.Name() {
-				global.sorted[i] = p
-				break
-			}
-		}
-	} else {
-		global.sorted = append(global.sorted, p)
-	}
-
-	global.byName[p.Name()] = p
-	sort.Slice(global.sorted, func(i, j int) bool {
-		return global.sorted[i].Priority() > global.sorted[j].Priority()
+	registered = slices.DeleteFunc(registered, func(q state.Platform) bool {
+		return q.Name() == p.Name()
+	})
+	registered = append(registered, p)
+	slices.SortStableFunc(registered, func(a, b state.Platform) int {
+		return b.Priority() - a.Priority()
 	})
 }
 
 func GetPlatform(name state.PlatformName) (state.Platform, bool) {
-	global.mu.RLock()
-	defer global.mu.RUnlock()
-	p, ok := global.byName[name]
-	return p, ok
+	for _, p := range ordered() {
+		if p.Name() == name {
+			return p, true
+		}
+	}
+	return nil, false
 }
 
 func ordered() []state.Platform {
-	global.mu.RLock()
-	defer global.mu.RUnlock()
-	out := make([]state.Platform, len(global.sorted))
-	copy(out, global.sorted)
-	return out
-}
-
-func findFor(query string) state.Platform {
-	for _, p := range ordered() {
-		if p.CanGet(query) {
-			return p
-		}
-	}
-	return nil
+	mu.RLock()
+	defer mu.RUnlock()
+	return slices.Clone(registered)
 }
 
 func GetTracks(c *td.Client, m *td.Message, video bool) ([]*state.Track, error) {
-	utils.Log.Debug("GetTracks | video:" + strconv.FormatBool(video))
-
-	if urls, _ := utils.ExtractURLs(c, m); len(urls) > 0 {
+	urls, _ := utils.ExtractURLs(c, m)
+	if len(urls) > 0 {
 		tracks, errs := fetchFromURLs(urls, video)
 		if len(tracks) > 0 {
 			return tracks, nil
@@ -112,13 +88,16 @@ func GetTracks(c *td.Client, m *td.Message, video bool) ([]*state.Track, error) 
 		}
 	}
 
+	// A query that is just a failed link would only turn into a junk text search.
 	var searchErr error
-	if q := m.Args(); q != "" {
+	if q := m.Args(); q != "" && !slices.ContainsFunc(urls, func(u string) bool {
+		return strings.Contains(q, u)
+	}) {
 		tracks, err := searchQuery(q, video)
 		if err == nil && len(tracks) > 0 {
 			return tracks, nil
 		}
-		if !errors.Is(err, ErrNoTracks) {
+		if err != nil && !errors.Is(err, ErrNoTracks) {
 			searchErr = err
 		}
 	}
@@ -145,17 +124,14 @@ func Download(
 			continue
 		}
 
-		utils.Log.Debug("Download attempt: " + string(p.Name()))
 		path, err := p.Download(ctx, track, msg)
 		if err == nil {
 			utils.Log.Info("Download ok via " + string(p.Name()) + " -> " + path)
 			return path, nil
 		}
-
-		if isDownloadCancelled(err) {
+		if errors.Is(err, context.Canceled) {
 			return "", err
 		}
-
 		errs = append(errs, string(p.Name())+": "+err.Error())
 	}
 
@@ -165,69 +141,66 @@ func Download(
 	return "", errors.New("no downloader for source: " + string(track.Source))
 }
 
-func fetchFromURLs(urls []string, video bool) ([]*state.Track, []string) {
-	var tracks []*state.Track
-	var errs []string
-
-	for _, u := range urls {
-		p := findFor(u)
-		if p == nil {
-			errs = append(errs, "no platform for: "+u)
-			continue
-		}
-
-		utils.Log.Debug("URL matched " + string(p.Name()) + ": " + u)
-		got, err := p.Get(u, video)
-		if err != nil {
-			if strings.Contains(err.Error(), "failed to extract metadata") {
-				continue
-			}
-			errs = append(errs, string(p.Name())+": "+err.Error())
-			continue
-		}
-		tracks = append(tracks, got...)
-	}
-
-	return tracks, errs
-}
-
 func AutoplayTracks(last *state.Track, limit int) ([]*state.Track, error) {
 	if last == nil || last.ID == "" || last.Source != PlatformYouTube {
 		return nil, errors.New("autoplay requires a YouTube track")
 	}
 
-	yt, ok := GetPlatform(PlatformYouTube)
-	if !ok {
-		return nil, errors.New("youtube platform not registered")
-	}
-
-	tracks, err := yt.(*YouTubePlatform).fetchMixPlaylist("RD"+last.ID, limit)
+	tracks, err := youtube.fetchMixPlaylist("RD"+last.ID, limit)
 	if err != nil {
 		return nil, err
 	}
 	return withVideo(tracks, last.Video), nil
 }
 
-func searchQuery(q string, video bool) ([]*state.Track, error) {
-	if p := findFor(q); p != nil && p.Name() != PlatformYouTube {
-		if got, err := p.Get(q, video); err == nil && len(got) > 0 {
+// getFromURL asks every platform that accepts the link, best first, until one
+// resolves it. errs stays empty when no platform accepted the link.
+func getFromURL(link string, video bool) (tracks []*state.Track, errs []string) {
+	for _, p := range ordered() {
+		if !p.CanGet(link) {
+			continue
+		}
+
+		got, err := p.Get(link, video)
+		if err != nil {
+			errs = append(errs, string(p.Name())+": "+err.Error())
+			continue
+		}
+		if len(got) > 0 {
 			return got, nil
 		}
 	}
+	return nil, errs
+}
 
-	yt, ok := GetPlatform(PlatformYouTube)
-	if !ok {
-		return nil, errors.New("youtube platform not registered")
+func fetchFromURLs(urls []string, video bool) (tracks []*state.Track, errs []string) {
+	for _, u := range urls {
+		got, e := getFromURL(u, video)
+		if len(got) == 0 && len(e) == 0 {
+			e = []string{"no platform for: " + u}
+		}
+		tracks = append(tracks, got...)
+		errs = append(errs, e...)
+	}
+	return tracks, errs
+}
+
+// searchQuery resolves a link typed as the query, or runs a YouTube text
+// search and keeps the first hit.
+func searchQuery(q string, video bool) ([]*state.Track, error) {
+	tracks, errs := getFromURL(q, video)
+	if len(tracks) > 0 {
+		return tracks, nil
+	}
+	if len(errs) > 0 {
+		return nil, errors.New(strings.Join(errs, "; "))
 	}
 
-	tracks, err := yt.Get(q, video)
+	tracks, err := youtube.Get(q, video)
 	if err != nil {
 		return nil, err
 	}
-	if len(tracks) == 0 {
-		return nil, nil
-	}
-	return []*state.Track{tracks[0]}, nil
+	return tracks[:1], nil
 }
 
 func fromReply(c *td.Client, m *td.Message) ([]*state.Track, error) {
@@ -236,12 +209,7 @@ func fromReply(c *td.Client, m *td.Message) ([]*state.Track, error) {
 		return nil, ErrNotMedia
 	}
 
-	tgp, ok := GetPlatform(PlatformTelegram)
-	if !ok {
-		return nil, errors.New("telegram platform not registered")
-	}
-
-	track, err := tgp.(*TelegramPlatform).GetTracksByMessage(c, target)
+	track, err := telegram.GetTracksByMessage(c, target)
 	if err != nil {
 		return nil, err
 	}
