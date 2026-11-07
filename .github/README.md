@@ -94,7 +94,7 @@ All settings are managed via environment variables in your `.env` file.
 | `API_ID` / `API_HASH` | From [my.telegram.org](https://my.telegram.org) |
 | `BOT_TOKEN` | Bot token from [@BotFather](https://t.me/BotFather) (alias: `TOKEN`) |
 | `MONGO_DB_URI` | MongoDB Atlas or local connection string |
-| `STRING_SESSIONS` | Assistant account session strings |
+| `STRING_SESSIONS` | Assistant account session strings (auto-detects Pyrogram, Telethon, GramJS, mtcute, MTKruto, gotgproto, mtgo, gogram) |
 
 > [!IMPORTANT]
 > 📖 **Docs you'll need**

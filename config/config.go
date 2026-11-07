@@ -34,7 +34,6 @@ var (
 	StringSessions = getEnvStrings("STRING_SESSIONS")
 
 	// Optional
-	SessionType   = getEnv("SESSION_TYPE", "pyrogram")
 	DBName        = getEnv("DB_NAME", "Yukki")
 	LoggerID      = getEnvInt64("LOGGER_ID", 0)
 	OwnerID       = getEnvInt64("OWNER_ID", 0)

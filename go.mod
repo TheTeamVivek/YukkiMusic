@@ -5,6 +5,7 @@ go 1.27
 require (
 	github.com/AshokShau/gotdbot v0.10.2-0.20261023123153-33c7e2898d89
 	github.com/joho/godotenv v1.5.1
+	github.com/mtgo-labs/session-converter v0.6.0
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/xAmarnath/gogram v1.8.0-beta.14
 	go.mongodb.org/mongo-driver/v2 v2.9.2

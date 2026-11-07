@@ -24,7 +24,7 @@ Variable names are **case-insensitive** and **underscores are optional** —
 | `API_HASH` | Telegram API Hash from [my.telegram.org](https://my.telegram.org) |
 | `BOT_TOKEN` | Bot token from [@BotFather](https://t.me/BotFather) · alias `TOKEN` |
 | `MONGO_DB_URI` | MongoDB connection string (e.g. `mongodb+srv://...`) |
-| `STRING_SESSIONS` | Assistant session strings (space/comma/semicolon separated) · alias `STRING_SESSION` |
+| `STRING_SESSIONS` | Assistant session strings (space/comma/semicolon separated) · alias `STRING_SESSION`. **Universal Auto-Detection**: Supports all session formats automatically (Pyrogram v1/v2, Telethon, GramJS, mtcute, MTKruto, gotgproto, mtgo, gogram). Mixed formats are supported. |
 
 ---
 
@@ -40,7 +40,6 @@ Variable names are **case-insensitive** and **underscores are optional** —
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
-| `SESSION_TYPE` | `pyrogram` | Session type for assistant accounts |
 | `DB_NAME` | `Yukki` | MongoDB database name |
 | `DEFAULT_LANG` | `en` | Default language (`en`, `hi`, `ar`, `tr`) |
 | `DURATION_LIMIT` | `4200` | Max track duration in seconds (70 min) |
