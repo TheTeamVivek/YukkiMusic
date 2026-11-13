@@ -1,5 +1,5 @@
-github.com/AshokShau/gotdbot v0.10.2-0.20261023123153-33c7e2898d89 h1:FteUNQhHTZrO6GTSRfRKE0WGHBZHad+5/Y0Mw9HZV6c=
-github.com/AshokShau/gotdbot v0.10.2-0.20261023123153-33c7e2898d89/go.mod h1:cEYJKWDex2Bsxe6APquTsP1bsDSCxdhrXEu/ZPPRvjk=
+github.com/AshokShau/gotdbot v0.10.2 h1:X4QwC53lg+PQzJExvw+BOf7Wtuc47OhJKa+M3JKizXk=
+github.com/AshokShau/gotdbot v0.10.2/go.mod h1:cEYJKWDex2Bsxe6APquTsP1bsDSCxdhrXEu/ZPPRvjk=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
