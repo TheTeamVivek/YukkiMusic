@@ -7,7 +7,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/mtgo-labs/session-converter v0.6.0
 	github.com/shirou/gopsutil/v3 v3.24.5
-	github.com/xAmarnath/gogram v1.8.0-beta.14
+	github.com/xAmarnath/gogram v1.8.0-beta.15
 	go.mongodb.org/mongo-driver/v2 v2.9.2
 	gopkg.in/yaml.v3 v3.0.1
 	resty.dev/v3 v3.0.0-rc.4
