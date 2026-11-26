@@ -72,6 +72,9 @@ Debugging and development.`
 }
 
 func logsHandler(c *td.Client, m *td.Message) error {
+	if !checkSudo(c, m) {
+		return nil
+	}
 	chatID := m.ChatID()
 	logFile := "logs.txt"
 
