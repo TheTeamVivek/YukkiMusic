@@ -215,6 +215,8 @@ func handleFrames(handle *C.ntg_instance, chatID C.int64_t, streamMode C.ntg_str
 				Width:                      uint16(rawFrame.frame_data.width),
 				Height:                     uint16(rawFrame.frame_data.height),
 				Rotation:                   uint16(rawFrame.frame_data.rotation),
+				Codec:                      parseCodec(rawFrame.frame_data.codec),
+				Keyframe:                   bool(rawFrame.frame_data.keyframe),
 			},
 		}
 	}
@@ -383,6 +385,10 @@ func (c *Client) GetCallType(chatID int64) (CallType, error) {
 	switch buffer {
 	case C.NTG_CALL_TYPE_GROUP:
 		return GroupCallType, nil
+	case C.NTG_CALL_TYPE_OUTGOING:
+		return OutgoingCallType, nil
+	case C.NTG_CALL_TYPE_INCOMING:
+		return IncomingCallType, nil
 	case C.NTG_CALL_TYPE_P2P:
 		return P2PCallType, nil
 	case C.NTG_CALL_TYPE_CONFERENCE:
@@ -390,6 +396,15 @@ func (c *Client) GetCallType(chatID int64) (CallType, error) {
 	default:
 		return CallType(0), fmt.Errorf("unknown call type")
 	}
+}
+
+func (c *Client) Rejoin(chatID int64) (string, error) {
+	var buffer *C.char
+	if err := parseResult(C.ntg_rejoin(c.handle, C.int64_t(chatID), &buffer)); err != nil {
+		return "", err
+	}
+	defer C.ntg_string_free(buffer)
+	return C.GoString(buffer), nil
 }
 
 func (c *Client) CreateCall(chatID int64) (string, error) {

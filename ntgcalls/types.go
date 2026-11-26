@@ -14,6 +14,8 @@ type (
 	StreamMode      int
 	StreamDevice    int
 	MediaSource     int
+	Format          int
+	Codec           int
 )
 
 const (
@@ -31,10 +33,26 @@ const (
 const (
 	MediaSourceFile MediaSource = 1 << iota
 	MediaSourceShell
-	MediaSourceFFmpeg
 	MediaSourceDevice
 	MediaSourceDesktop
 	MediaSourceExternal
+)
+
+const (
+	FormatPCM Format = iota
+	FormatOgg
+	FormatI420
+	FormatMatroska
+)
+
+const (
+	CodecPCM Codec = iota
+	CodecOpus
+	CodecI420
+	CodecH264
+	CodecVP8
+	CodecVP9
+	CodecAV1
 )
 
 const (
@@ -81,6 +99,7 @@ type MediaSegmentStatus int
 const (
 	SegmentStatusNotReady MediaSegmentStatus = iota
 	SegmentStatusResyncNeeded
+	SegmentStatusDownloading
 	SegmentStatusSuccess
 )
 
@@ -88,6 +107,8 @@ type CallType int
 
 const (
 	GroupCallType CallType = iota
+	OutgoingCallType
+	IncomingCallType
 	P2PCallType
 	ConferenceCallType
 )
@@ -132,6 +153,8 @@ type FrameData struct {
 	Width                      uint16
 	Height                     uint16
 	Rotation                   uint16
+	Codec                      Codec
+	Keyframe                   bool
 }
 
 type MediaDescription struct {
@@ -147,6 +170,9 @@ type AudioDescription struct {
 	SampleRate   uint32
 	ChannelCount uint8
 	KeepOpen     bool
+	Bitrate      *uint32
+	Format       *Format
+	MaxDelayMs   *uint32
 }
 
 type VideoDescription struct {
@@ -155,6 +181,7 @@ type VideoDescription struct {
 	Width, Height int16
 	FPS           uint8
 	KeepOpen      bool
+	Format        *Format
 }
 
 type DhConfig struct {
@@ -248,8 +275,6 @@ func (m MediaSource) ParseToC() C.ntg_media_source {
 		return C.NTG_MEDIA_SOURCE_FILE
 	case MediaSourceShell:
 		return C.NTG_MEDIA_SOURCE_SHELL
-	case MediaSourceFFmpeg:
-		return C.NTG_MEDIA_SOURCE_FFMPEG
 	case MediaSourceDevice:
 		return C.NTG_MEDIA_SOURCE_DEVICE
 	case MediaSourceDesktop:
@@ -258,6 +283,57 @@ func (m MediaSource) ParseToC() C.ntg_media_source {
 		return C.NTG_MEDIA_SOURCE_EXTERNAL
 	default:
 		return C.NTG_MEDIA_SOURCE_FILE
+	}
+}
+
+func (f Format) ParseToC() C.ntg_format {
+	switch f {
+	case FormatOgg:
+		return C.NTG_FORMAT_OGG
+	case FormatI420:
+		return C.NTG_FORMAT_I420
+	case FormatMatroska:
+		return C.NTG_FORMAT_MATROSKA
+	default:
+		return C.NTG_FORMAT_PCM
+	}
+}
+
+func (c Codec) ParseToC() C.ntg_codec {
+	switch c {
+	case CodecOpus:
+		return C.NTG_CODEC_OPUS
+	case CodecI420:
+		return C.NTG_CODEC_I420
+	case CodecH264:
+		return C.NTG_CODEC_H264
+	case CodecVP8:
+		return C.NTG_CODEC_VP8
+	case CodecVP9:
+		return C.NTG_CODEC_VP9
+	case CodecAV1:
+		return C.NTG_CODEC_AV1
+	default:
+		return C.NTG_CODEC_PCM
+	}
+}
+
+func parseCodec(codec C.ntg_codec) Codec {
+	switch codec {
+	case C.NTG_CODEC_OPUS:
+		return CodecOpus
+	case C.NTG_CODEC_I420:
+		return CodecI420
+	case C.NTG_CODEC_H264:
+		return CodecH264
+	case C.NTG_CODEC_VP8:
+		return CodecVP8
+	case C.NTG_CODEC_VP9:
+		return CodecVP9
+	case C.NTG_CODEC_AV1:
+		return CodecAV1
+	default:
+		return CodecPCM
 	}
 }
 
@@ -293,6 +369,8 @@ func (s MediaSegmentStatus) ParseToC() C.ntg_media_segment_part_status {
 		return C.NTG_MEDIA_SEGMENT_PART_STATUS_NOT_READY
 	case SegmentStatusResyncNeeded:
 		return C.NTG_MEDIA_SEGMENT_PART_STATUS_RESYNC_NEEDED
+	case SegmentStatusDownloading:
+		return C.NTG_MEDIA_SEGMENT_PART_STATUS_DOWNLOADING
 	case SegmentStatusSuccess:
 		return C.NTG_MEDIA_SEGMENT_PART_STATUS_SUCCESS
 	default:
@@ -334,23 +412,31 @@ func (d *MediaDescription) ParseToC() C.ntg_media_description {
 	return x
 }
 
+func freeAudioDescriptionC(desc *C.ntg_audio_description) {
+	if desc == nil {
+		return
+	}
+	C.free(unsafe.Pointer(desc.input))
+	C.free(unsafe.Pointer(desc.bitrate))
+	C.free(unsafe.Pointer(desc.format))
+	C.free(unsafe.Pointer(desc.max_delay_ms))
+	C.free(unsafe.Pointer(desc))
+}
+
+func freeVideoDescriptionC(desc *C.ntg_video_description) {
+	if desc == nil {
+		return
+	}
+	C.free(unsafe.Pointer(desc.input))
+	C.free(unsafe.Pointer(desc.format))
+	C.free(unsafe.Pointer(desc))
+}
+
 func freeMediaDescriptionC(desc C.ntg_media_description) {
-	if desc.microphone != nil {
-		C.free(unsafe.Pointer(desc.microphone.input))
-		C.free(unsafe.Pointer(desc.microphone))
-	}
-	if desc.speaker != nil {
-		C.free(unsafe.Pointer(desc.speaker.input))
-		C.free(unsafe.Pointer(desc.speaker))
-	}
-	if desc.camera != nil {
-		C.free(unsafe.Pointer(desc.camera.input))
-		C.free(unsafe.Pointer(desc.camera))
-	}
-	if desc.screen != nil {
-		C.free(unsafe.Pointer(desc.screen.input))
-		C.free(unsafe.Pointer(desc.screen))
-	}
+	freeAudioDescriptionC(desc.microphone)
+	freeAudioDescriptionC(desc.speaker)
+	freeVideoDescriptionC(desc.camera)
+	freeVideoDescriptionC(desc.screen)
 }
 
 func (d *AudioDescription) ParseToC() C.ntg_audio_description {
@@ -360,6 +446,24 @@ func (d *AudioDescription) ParseToC() C.ntg_audio_description {
 	x.sample_rate = C.uint32_t(d.SampleRate)
 	x.channel_count = C.uint8_t(d.ChannelCount)
 	x.keep_open = C.bool(d.KeepOpen)
+	if d.Bitrate != nil {
+		if ptr := C.malloc(C.size_t(unsafe.Sizeof(C.uint32_t(0)))); ptr != nil {
+			*(*C.uint32_t)(ptr) = C.uint32_t(*d.Bitrate)
+			x.bitrate = (*C.uint32_t)(ptr)
+		}
+	}
+	if d.Format != nil {
+		if ptr := C.malloc(C.size_t(unsafe.Sizeof(C.ntg_format(0)))); ptr != nil {
+			*(*C.ntg_format)(ptr) = d.Format.ParseToC()
+			x.format = (*C.ntg_format)(ptr)
+		}
+	}
+	if d.MaxDelayMs != nil {
+		if ptr := C.malloc(C.size_t(unsafe.Sizeof(C.uint32_t(0)))); ptr != nil {
+			*(*C.uint32_t)(ptr) = C.uint32_t(*d.MaxDelayMs)
+			x.max_delay_ms = (*C.uint32_t)(ptr)
+		}
+	}
 	return x
 }
 
@@ -371,6 +475,12 @@ func (d *VideoDescription) ParseToC() C.ntg_video_description {
 	x.height = C.int16_t(d.Height)
 	x.fps = C.uint8_t(d.FPS)
 	x.keep_open = C.bool(d.KeepOpen)
+	if d.Format != nil {
+		if ptr := C.malloc(C.size_t(unsafe.Sizeof(C.ntg_format(0)))); ptr != nil {
+			*(*C.ntg_format)(ptr) = d.Format.ParseToC()
+			x.format = (*C.ntg_format)(ptr)
+		}
+	}
 	return x
 }
 
@@ -393,5 +503,7 @@ func (d FrameData) ParseToC() C.ntg_frame_data {
 	x.width = C.uint16_t(d.Width)
 	x.height = C.uint16_t(d.Height)
 	x.rotation = C.ntg_video_rotation(d.Rotation)
+	x.codec = d.Codec.ParseToC()
+	x.keyframe = C.bool(d.Keyframe)
 	return x
 }

@@ -41,9 +41,12 @@ func parseVideoSources(
 ) []ntgcalls.SSRCGroup {
 	var ssrcGroups []ntgcalls.SSRCGroup
 	for _, source := range sources {
-		var sourceIDs []uint32
-		for _, sourceID := range source.Sources {
-			sourceIDs = append(sourceIDs, uint32(sourceID))
+		if source == nil || len(source.Sources) == 0 {
+			continue
+		}
+		sourceIDs := make([]uint32, len(source.Sources))
+		for i, sourceID := range source.Sources {
+			sourceIDs[i] = uint32(sourceID)
 		}
 		ssrcGroups = append(ssrcGroups, ntgcalls.SSRCGroup{
 			Semantics: source.Semantics,

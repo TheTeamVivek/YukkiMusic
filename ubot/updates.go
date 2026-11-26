@@ -254,33 +254,41 @@ func (ctx *Context) registerHandlers() {
 
 			for _, update := range updates {
 				if update.cameraEndpoint != "" {
-					_, _ = ctx.binding.AddIncomingVideo(
+					if _, err := ctx.binding.AddIncomingVideo(
 						chatID,
 						update.participantID,
 						update.cameraEndpoint,
 						parseVideoSources(update.cameraSourceGroups),
-					)
+					); err != nil {
+						fmt.Printf("AddIncomingVideo camera (%d, %s): %v\n", chatID, update.cameraEndpoint, err)
+					}
 				}
 				if update.oldCameraEndpoint != "" {
-					_, _ = ctx.binding.RemoveIncomingVideo(
+					if _, err := ctx.binding.RemoveIncomingVideo(
 						chatID,
 						update.oldCameraEndpoint,
-					)
+					); err != nil {
+						fmt.Printf("RemoveIncomingVideo camera (%d, %s): %v\n", chatID, update.oldCameraEndpoint, err)
+					}
 				}
 
 				if update.screenEndpoint != "" {
-					_, _ = ctx.binding.AddIncomingVideo(
+					if _, err := ctx.binding.AddIncomingVideo(
 						chatID,
 						update.participantID,
 						update.screenEndpoint,
 						parseVideoSources(update.screenSourceGroups),
-					)
+					); err != nil {
+						fmt.Printf("AddIncomingVideo screen (%d, %s): %v\n", chatID, update.screenEndpoint, err)
+					}
 				}
 				if update.oldScreenEndpoint != "" {
-					_, _ = ctx.binding.RemoveIncomingVideo(
+					if _, err := ctx.binding.RemoveIncomingVideo(
 						chatID,
 						update.oldScreenEndpoint,
-					)
+					); err != nil {
+						fmt.Printf("RemoveIncomingVideo screen (%d, %s): %v\n", chatID, update.oldScreenEndpoint, err)
+					}
 				}
 			}
 
