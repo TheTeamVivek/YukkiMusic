@@ -334,7 +334,7 @@ func getAudioPipeline(
 		if probe.audioChannels == 1 || probe.audioChannels == 2 {
 			channels = uint8(probe.audioChannels)
 		}
-		if !isStreamURL(url) && pos == 0 && hasMediaExt(url, ".ogg", ".opus") {
+		if !isStreamURL(url) && pos == 0 && hasFormat(probe.formatName, "ogg") {
 			return &ntgcalls.AudioDescription{
 				MediaSource:  ntgcalls.MediaSourceFile,
 				Input:        url,
@@ -440,6 +440,7 @@ func normalizeVideo(probe mediaProbe, speed float64) (int, int, int, string) {
 }
 
 type mediaProbe struct {
+	formatName    string
 	hasAudio      bool
 	audioCodec    string
 	audioChannels int
@@ -453,6 +454,9 @@ type mediaProbe struct {
 }
 
 type ffprobeOutput struct {
+	Format struct {
+		FormatName string `json:"format_name"`
+	} `json:"format"`
 	Streams []struct {
 		CodecType    string `json:"codec_type"`
 		CodecName    string `json:"codec_name"`
@@ -466,7 +470,7 @@ type ffprobeOutput struct {
 	} `json:"streams"`
 }
 
-// probeMedia probes audio and video stream metadata with ffprobe.
+// probeMedia probes container format, audio, and video stream metadata with ffprobe.
 func probeMedia(filePath string) mediaProbe {
 	ctx, cancel := context.WithTimeout(context.Background(), ffprobeTimeout)
 	defer cancel()
@@ -476,6 +480,7 @@ func probeMedia(filePath string) mediaProbe {
 		"ffprobe",
 		"-v", "quiet",
 		"-print_format", "json",
+		"-show_format",
 		"-show_streams",
 		filePath,
 	)
@@ -500,7 +505,9 @@ func probeMedia(filePath string) mediaProbe {
 		return mediaProbe{}
 	}
 
-	var result mediaProbe
+	result := mediaProbe{
+		formatName: strings.ToLower(probe.Format.FormatName),
+	}
 	for _, s := range probe.Streams {
 		switch s.CodecType {
 		case "audio":
@@ -578,6 +585,15 @@ func canVideoPassthrough(speed float64, probe mediaProbe) bool {
 	default:
 		return false
 	}
+}
+
+func hasFormat(formatName, target string) bool {
+	for part := range strings.SplitSeq(strings.ToLower(formatName), ",") {
+		if strings.TrimSpace(part) == target {
+			return true
+		}
+	}
+	return false
 }
 
 func hasMediaExt(path string, exts ...string) bool {
