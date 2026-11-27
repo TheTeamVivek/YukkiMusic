@@ -48,6 +48,11 @@ type Context struct {
 	incomingCallCallbacks []func(client *Context, chatID int64)
 	streamEndCallbacks    []ntgcalls.StreamEndCallback
 	frameCallbacks        []ntgcalls.FrameCallback
+	emojisCallbacks       []ntgcalls.EmojisCallback
+	callMessageCallbacks  []CallMessageCallback
+
+	messagesMutex sync.Mutex
+	callMessages  map[int64]*CallMessagesCache
 }
 
 func NewContext(app *tg.Client) (*Context, error) {
@@ -63,6 +68,7 @@ func NewContext(app *tg.Client) (*Context, error) {
 		callParticipants:    make(map[int64]*CallParticipantsCache),
 		callSources:         make(map[int64]*CallSources),
 		waitConnect:         make(map[int64]chan error),
+		callMessages:        make(map[int64]*CallMessagesCache),
 	}
 	if app.IsConnected() {
 		me := app.Me()
@@ -100,6 +106,41 @@ func (ctx *Context) OnFrame(callback ntgcalls.FrameCallback) {
 	ctx.callbacksMutex.Lock()
 	defer ctx.callbacksMutex.Unlock()
 	ctx.frameCallbacks = append(ctx.frameCallbacks, callback)
+}
+
+func (ctx *Context) OnUpdateEmojis(callback ntgcalls.EmojisCallback) {
+	ctx.callbacksMutex.Lock()
+	defer ctx.callbacksMutex.Unlock()
+	ctx.emojisCallbacks = append(ctx.emojisCallbacks, callback)
+}
+
+func (ctx *Context) OnCallMessage(callback CallMessageCallback) {
+	ctx.callbacksMutex.Lock()
+	defer ctx.callbacksMutex.Unlock()
+	ctx.callMessageCallbacks = append(ctx.callMessageCallbacks, callback)
+}
+
+func (ctx *Context) getSelf() *tg.UserObj {
+	if ctx.me != nil && ctx.me.ID != 0 {
+		return ctx.me
+	}
+	if ctx.app != nil && ctx.app.IsConnected() {
+		if me := ctx.app.Me(); me != nil && me.ID != 0 {
+			ctx.me = me
+			return me
+		}
+	}
+	return nil
+}
+
+func (ctx *Context) selfInputPeer() tg.InputPeer {
+	if me := ctx.getSelf(); me != nil {
+		return &tg.InputPeerUser{
+			UserID:     me.ID,
+			AccessHash: me.AccessHash,
+		}
+	}
+	return &tg.InputPeerUser{}
 }
 
 func (ctx *Context) Close() {
@@ -140,6 +181,10 @@ func (ctx *Context) Close() {
 	ctx.waitConnectMutex.Lock()
 	ctx.waitConnect = nil
 	ctx.waitConnectMutex.Unlock()
+
+	ctx.messagesMutex.Lock()
+	ctx.callMessages = nil
+	ctx.messagesMutex.Unlock()
 
 	ctx.binding.Free()
 	ctx.binding = nil

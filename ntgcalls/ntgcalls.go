@@ -15,6 +15,8 @@ extern void handleUpdateEmojis(ntg_instance* handle, int64_t chatID, char* emoji
 extern void handleRequestParticipants(ntg_instance* handle, int64_t chatID, ntg_participants_request request, void* userData);
 extern void handleOutboundBlock(ntg_instance* handle, int64_t chatID, uint8_t* block, size_t size, void* userData);
 extern void handleSubchainRequest(ntg_instance* handle, int64_t chatID, ntg_subchain_request request, void* userData);
+extern void handleE2EFailure(ntg_instance* handle, int64_t chatID, void* userData);
+extern void handleE2EParticipants(ntg_instance* handle, int64_t chatID, int64_t* participants, size_t size, void* userData);
 extern void handleLogs(ntg_log_message message, void* userData);
 */
 import "C"
@@ -77,6 +79,17 @@ func GetMediaDevices() (MediaDevices, error) {
 	}, nil
 }
 
+func GetMediaInfo(path string, streamMode StreamMode) (MediaInfo, error) {
+	pathC := C.CString(path)
+	defer C.free(unsafe.Pointer(pathC))
+	var buffer C.ntg_media_info
+	if err := parseResult(C.ntg_get_media_info(pathC, streamMode.ParseToC(), &buffer)); err != nil {
+		return MediaInfo{}, err
+	}
+	defer C.ntg_media_info_free(&buffer)
+	return parseMediaInfo(buffer), nil
+}
+
 func EnableGLibLoop(enable bool) error {
 	return parseResult(C.ntg_enable_glib_loop(C.bool(enable)))
 }
@@ -110,6 +123,8 @@ func NewClient() *Client {
 	C.ntg_on_request_participants_callback(client.handle, C.ntg_request_participants_callback_cb(unsafe.Pointer(C.handleRequestParticipants)), nil)
 	C.ntg_on_outbound_block_callback(client.handle, C.ntg_outbound_block_callback_cb(unsafe.Pointer(C.handleOutboundBlock)), nil)
 	C.ntg_on_subchain_request_callback(client.handle, C.ntg_subchain_request_callback_cb(unsafe.Pointer(C.handleSubchainRequest)), nil)
+	C.ntg_on_e2e_failure_callback(client.handle, C.ntg_e2e_failure_callback_cb(unsafe.Pointer(C.handleE2EFailure)), nil)
+	C.ntg_on_e2e_participants_callback(client.handle, C.ntg_e2e_participants_callback_cb(unsafe.Pointer(C.handleE2EParticipants)), nil)
 
 	runtime.SetFinalizer(client, func(c *Client) {
 		if c.handle != nil {
@@ -342,6 +357,29 @@ func handleSubchainRequest(handle *C.ntg_instance, chatID C.int64_t, request C.n
 	}
 }
 
+//export handleE2EFailure
+func handleE2EFailure(handle *C.ntg_instance, chatID C.int64_t, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	for _, callback := range client.getE2EFailureCallbacks() {
+		go callback(int64(chatID))
+	}
+}
+
+//export handleE2EParticipants
+func handleE2EParticipants(handle *C.ntg_instance, chatID C.int64_t, participants *C.int64_t, size C.size_t, _ unsafe.Pointer) {
+	client := lookupClient(handle)
+	if client == nil {
+		return
+	}
+	goParticipants := parseInt64Vector(participants, size)
+	for _, callback := range client.getE2EParticipantsCallbacks() {
+		go callback(int64(chatID), goParticipants)
+	}
+}
+
 func (c *Client) GetState(chatID int64) (MediaState, error) {
 	var buffer C.ntg_media_state
 	if err := parseResult(C.ntg_get_state(c.handle, C.int64_t(chatID), &buffer)); err != nil {
@@ -375,6 +413,30 @@ func (c *Client) GetEmojisFingerprint(chatID int64) (string, error) {
 	}
 	defer C.ntg_string_free(buffer)
 	return C.GoString(buffer), nil
+}
+
+func (c *Client) EncryptMessage(chatID int64, data []byte) ([]byte, error) {
+	dataC, dataSize := parseBytes(data)
+	defer freeBytes(dataC)
+	var buffer *C.uint8_t
+	var size C.size_t
+	if err := parseResult(C.ntg_encrypt_message(c.handle, C.int64_t(chatID), dataC, dataSize, &buffer, &size)); err != nil {
+		return nil, err
+	}
+	defer C.ntg_bytes_free(unsafe.Pointer(buffer))
+	return C.GoBytes(unsafe.Pointer(buffer), C.int(size)), nil
+}
+
+func (c *Client) DecryptMessage(chatID int64, userID int64, data []byte) ([]byte, error) {
+	dataC, dataSize := parseBytes(data)
+	defer freeBytes(dataC)
+	var buffer *C.uint8_t
+	var size C.size_t
+	if err := parseResult(C.ntg_decrypt_message(c.handle, C.int64_t(chatID), C.int64_t(userID), dataC, dataSize, &buffer, &size)); err != nil {
+		return nil, err
+	}
+	defer C.ntg_bytes_free(unsafe.Pointer(buffer))
+	return C.GoBytes(unsafe.Pointer(buffer), C.int(size)), nil
 }
 
 func (c *Client) GetCallType(chatID int64) (CallType, error) {
@@ -433,11 +495,39 @@ func (c *Client) InitConference(chatID int64, userID int64, lastBlock []byte) (C
 		return ConferenceJoinParams{}, err
 	}
 	defer C.ntg_conference_join_params_free(&buffer)
-	return ConferenceJoinParams{
-		Payload:   C.GoString(buffer.payload),
-		PublicKey: C.GoBytes(unsafe.Pointer(buffer.public_key), C.int(buffer.public_key_len)),
-		Block:     C.GoBytes(unsafe.Pointer(buffer.block), C.int(buffer.block_len)),
-	}, nil
+	return parseConferenceJoinParams(buffer), nil
+}
+
+func (c *Client) RejoinConference(chatID int64, lastBlock []byte) (ConferenceJoinParams, error) {
+	lastBlockC, lastBlockSize := parseBytes(lastBlock)
+	defer freeBytes(lastBlockC)
+	var buffer C.ntg_conference_join_params
+	if err := parseResult(C.ntg_rejoin_conference(c.handle, C.int64_t(chatID), lastBlockC, lastBlockSize, &buffer)); err != nil {
+		return ConferenceJoinParams{}, err
+	}
+	defer C.ntg_conference_join_params_free(&buffer)
+	return parseConferenceJoinParams(buffer), nil
+}
+
+func (c *Client) GetE2EParticipants(chatID int64) ([]int64, error) {
+	var buffer *C.int64_t
+	var size C.size_t
+	if err := parseResult(C.ntg_get_e2e_participants(c.handle, C.int64_t(chatID), &buffer, &size)); err != nil {
+		return nil, err
+	}
+	defer C.ntg_bytes_free(unsafe.Pointer(buffer))
+	return parseInt64Vector(buffer, size), nil
+}
+
+func (c *Client) CreateRemoveBlock(chatID int64, userIDs []int64) ([]byte, error) {
+	userIDsC, userIDsSize := parseInt64VectorC(userIDs)
+	var buffer *C.uint8_t
+	var size C.size_t
+	if err := parseResult(C.ntg_create_remove_block(c.handle, C.int64_t(chatID), userIDsC, userIDsSize, &buffer, &size)); err != nil {
+		return nil, err
+	}
+	defer C.ntg_bytes_free(unsafe.Pointer(buffer))
+	return C.GoBytes(unsafe.Pointer(buffer), C.int(size)), nil
 }
 
 func (c *Client) StopPresentation(chatID int64) error {

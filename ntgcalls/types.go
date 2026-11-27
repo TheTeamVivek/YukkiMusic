@@ -43,6 +43,11 @@ const (
 	FormatOgg
 	FormatI420
 	FormatMatroska
+	FormatAuto
+	FormatWebm
+	FormatMP4
+	FormatWAV
+	FormatFLAC
 )
 
 const (
@@ -126,6 +131,8 @@ type (
 	RequestParticipantsCallback func(chatID int64, request ParticipantsRequest)
 	OutboundBlockCallback       func(chatID int64, block []byte)
 	SubchainRequestCallback     func(chatID int64, request SubchainRequest)
+	E2EFailureCallback          func(chatID int64)
+	E2EParticipantsCallback     func(chatID int64, participants []int64)
 )
 
 type AuthParams struct {
@@ -140,6 +147,31 @@ type CallInfo struct {
 type DeviceInfo struct {
 	Name     string
 	Metadata string
+}
+
+type AudioInfo struct {
+	Codec       string
+	SampleRate  uint32
+	Channels    uint8
+	Supported   bool
+	Passthrough bool
+}
+
+type VideoInfo struct {
+	Codec       string
+	Width       uint16
+	Height      uint16
+	FrameRate   float64
+	BFrames     bool
+	Supported   bool
+	Passthrough bool
+}
+
+type MediaInfo struct {
+	Container  string
+	DurationMs int64
+	Audio      *AudioInfo
+	Video      *VideoInfo
 }
 
 type Frame struct {
@@ -294,6 +326,16 @@ func (f Format) ParseToC() C.ntg_format {
 		return C.NTG_FORMAT_I420
 	case FormatMatroska:
 		return C.NTG_FORMAT_MATROSKA
+	case FormatAuto:
+		return C.NTG_FORMAT_AUTO
+	case FormatWebm:
+		return C.NTG_FORMAT_WEBM
+	case FormatMP4:
+		return C.NTG_FORMAT_MP4
+	case FormatWAV:
+		return C.NTG_FORMAT_WAV
+	case FormatFLAC:
+		return C.NTG_FORMAT_FLAC
 	default:
 		return C.NTG_FORMAT_PCM
 	}

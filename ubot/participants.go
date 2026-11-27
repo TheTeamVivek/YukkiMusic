@@ -83,6 +83,10 @@ func (ctx *Context) addIncomingSources(chatID int64) error {
 
 	var pendingVideos []pendingVideo
 	var shouldAddToMutedByAdmin bool
+	var selfID int64
+	if self := ctx.getSelf(); self != nil {
+		selfID = self.ID
+	}
 
 	ctx.callSourcesMutex.Lock()
 	if ctx.callSources[chatID] == nil {
@@ -116,7 +120,7 @@ func (ctx *Context) addIncomingSources(chatID int64) error {
 			})
 		}
 
-		if participantID == ctx.me.ID && !participant.CanSelfUnmute {
+		if selfID != 0 && participantID == selfID && !participant.CanSelfUnmute {
 			shouldAddToMutedByAdmin = true
 		}
 	}

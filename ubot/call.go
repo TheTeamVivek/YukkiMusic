@@ -46,17 +46,9 @@ func (ctx *Context) Play(
 		}
 	}
 
-	err := ctx.connectCall(chatID, mediaDescription, "")
+	err := ctx.connectCall(chatID, mediaDescription, "", false, nil)
 	if err != nil {
 		return err
-	}
-
-	if chatID < 0 {
-		err = ctx.joinPresentation(chatID, mediaDescription.Screen != nil)
-		if err != nil {
-			return err
-		}
-		return ctx.addIncomingSources(chatID)
 	}
 
 	return nil
@@ -87,6 +79,10 @@ func (ctx *Context) Stop(chatID int64) error {
 	ctx.callSourcesMutex.Lock()
 	delete(ctx.callSources, chatID)
 	ctx.callSourcesMutex.Unlock()
+
+	ctx.messagesMutex.Lock()
+	delete(ctx.callMessages, chatID)
+	ctx.messagesMutex.Unlock()
 
 	ctx.waitConnectMutex.Lock()
 	if waitChan, exists := ctx.waitConnect[chatID]; exists {
@@ -124,11 +120,8 @@ func (ctx *Context) setCallStatus(
 ) error {
 	_, err := ctx.app.PhoneEditGroupCallParticipant(
 		&tg.PhoneEditGroupCallParticipantParams{
-			Call: call,
-			Participant: &tg.InputPeerUser{
-				UserID:     ctx.me.ID,
-				AccessHash: ctx.me.AccessHash,
-			},
+			Call:               call,
+			Participant:        ctx.selfInputPeer(),
 			Muted:              state.Muted,
 			VideoPaused:        state.VideoPaused,
 			VideoStopped:       state.VideoStopped,

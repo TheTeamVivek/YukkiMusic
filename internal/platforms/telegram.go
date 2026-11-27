@@ -31,6 +31,7 @@ import (
 	"yukkimusic/internal/core"
 	state "yukkimusic/internal/core/models"
 	"yukkimusic/internal/utils"
+	"yukkimusic/ntgcalls"
 )
 
 const PlatformTelegram state.PlatformName = "Telegram"
@@ -148,12 +149,17 @@ func (t *TelegramPlatform) Download(
 }
 
 func (t *TelegramPlatform) ensureDuration(track *state.Track, path string) {
-	if track.Duration == 0 {
-		if dur, err := utils.GetDurationByFFProbe(path); err == nil {
-			track.Duration = dur
-		} else {
-			utils.Log.Errorf("GetDurationByFFProbe failed for %q: %v", path, err)
-		}
+	if track.Duration != 0 {
+		return
+	}
+	if info, err := ntgcalls.GetMediaInfo(path, ntgcalls.CaptureStream); err == nil && info.DurationMs > 0 {
+		track.Duration = int(info.DurationMs / 1000)
+		return
+	}
+	if dur, err := utils.GetDurationByFFProbe(path); err == nil {
+		track.Duration = dur
+	} else {
+		utils.Log.Errorf("GetDurationByFFProbe failed for %q: %v", path, err)
 	}
 }
 

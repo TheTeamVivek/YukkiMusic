@@ -19,6 +19,8 @@ type Client struct {
 	requestParticipantsCallbacks []RequestParticipantsCallback
 	outboundBlockCallbacks       []OutboundBlockCallback
 	subchainRequestCallbacks     []SubchainRequestCallback
+	e2eFailureCallbacks          []E2EFailureCallback
+	e2eParticipantsCallbacks     []E2EParticipantsCallback
 }
 
 func (c *Client) OnStreamEnd(callback StreamEndCallback) {
@@ -93,6 +95,18 @@ func (c *Client) OnSubchainRequest(callback SubchainRequestCallback) {
 	c.subchainRequestCallbacks = append(c.subchainRequestCallbacks, callback)
 }
 
+func (c *Client) OnE2EFailure(callback E2EFailureCallback) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.e2eFailureCallbacks = append(c.e2eFailureCallbacks, callback)
+}
+
+func (c *Client) OnE2EParticipants(callback E2EParticipantsCallback) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.e2eParticipantsCallbacks = append(c.e2eParticipantsCallbacks, callback)
+}
+
 // getCallbacks returns a snapshot copy of a callback slice under the client
 // lock. It is a generic method, a language feature introduced in Go 1.27.
 func (c *Client) getCallbacks[T any](src *[]T) []T {
@@ -150,4 +164,12 @@ func (c *Client) getOutboundBlockCallbacks() []OutboundBlockCallback {
 
 func (c *Client) getSubchainRequestCallbacks() []SubchainRequestCallback {
 	return c.getCallbacks(&c.subchainRequestCallbacks)
+}
+
+func (c *Client) getE2EFailureCallbacks() []E2EFailureCallback {
+	return c.getCallbacks(&c.e2eFailureCallbacks)
+}
+
+func (c *Client) getE2EParticipantsCallbacks() []E2EParticipantsCallback {
+	return c.getCallbacks(&c.e2eParticipantsCallbacks)
 }

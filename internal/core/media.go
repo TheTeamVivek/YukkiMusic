@@ -292,6 +292,13 @@ func getMediaDescription(
 		speed = maxSpeed
 	}
 
+	var mediaInfo *ntgcalls.MediaInfo
+	if !isStreamURL(url) && pos == 0 && speed == 1.0 {
+		if info, err := ntgcalls.GetMediaInfo(url, ntgcalls.CaptureStream); err == nil {
+			mediaInfo = &info
+		}
+	}
+
 	baseCmd := "ffmpeg "
 	if isStreamURL(url) {
 		baseCmd += "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 "
@@ -302,11 +309,13 @@ func getMediaDescription(
 	baseCmd += "-v error -i \"" + url + "\" "
 
 	var probe mediaProbe
-	if isVideo || (speed == 1.0 && !isStreamURL(url)) {
+	needVideoProbe := isVideo && (mediaInfo == nil || mediaInfo.Video == nil || !mediaInfo.Video.Supported)
+	needAudioProbe := !isVideo && !isStreamURL(url) && speed == 1.0 && mediaInfo == nil
+	if needVideoProbe || needAudioProbe {
 		probe = probeMedia(url)
 	}
 
-	audio := getAudioPipeline(baseCmd, url, pos, speed, probe)
+	audio := getAudioPipeline(baseCmd, url, pos, speed, mediaInfo, probe)
 	if !isVideo {
 		return ntgcalls.MediaDescription{
 			Microphone: audio,
@@ -315,19 +324,38 @@ func getMediaDescription(
 
 	return ntgcalls.MediaDescription{
 		Microphone: audio,
-		Camera:     getVideoPipeline(baseCmd, speed, probe),
+		Camera:     getVideoPipeline(baseCmd, url, speed, mediaInfo, probe),
 	}
 }
 
-// getAudioPipeline builds an Opus passthrough pipeline when possible,
-// otherwise falling back to decoded PCM at the requested speed and bitrate.
+// getAudioPipeline uses ntgcalls MediaSourceFile + FormatAuto for supported
+// local files at normal speed from position 0, and otherwise builds an ffmpeg
+// Opus passthrough or PCM pipeline.
 func getAudioPipeline(
 	baseCmd string,
 	url string,
 	pos int,
 	speed float64,
+	mediaInfo *ntgcalls.MediaInfo,
 	probe mediaProbe,
 ) *ntgcalls.AudioDescription {
+	if mediaInfo != nil && mediaInfo.Audio != nil && mediaInfo.Audio.Supported {
+		channels := uint8(audioChannels)
+		if mediaInfo.Audio.Channels == 1 {
+			channels = 1
+		}
+		bitrate := audioBitrate
+		format := ntgcalls.FormatAuto
+		return &ntgcalls.AudioDescription{
+			MediaSource:  ntgcalls.MediaSourceFile,
+			Input:        url,
+			SampleRate:   opusSampleRate,
+			ChannelCount: channels,
+			Bitrate:      &bitrate,
+			Format:       &format,
+		}
+	}
+
 	if canAudioPassthrough(url, speed, probe) {
 		format := ntgcalls.FormatOgg
 		channels := uint8(audioChannels)
@@ -369,13 +397,30 @@ func getAudioPipeline(
 	return audio
 }
 
-// getVideoPipeline builds a Matroska passthrough pipeline for compatible
-// codecs/resolutions at normal speed, or falls back to scaled raw I420 video.
+// getVideoPipeline uses ntgcalls MediaSourceFile + FormatAuto for supported
+// local files at normal speed from position 0, or falls back to ffmpeg
+// Matroska passthrough / scaled raw I420 video.
 func getVideoPipeline(
 	baseCmd string,
+	url string,
 	speed float64,
+	mediaInfo *ntgcalls.MediaInfo,
 	probe mediaProbe,
 ) *ntgcalls.VideoDescription {
+	if mediaInfo != nil && mediaInfo.Video != nil && mediaInfo.Video.Supported {
+		w, h := clampVideoDimensions(int(mediaInfo.Video.Width), int(mediaInfo.Video.Height))
+		fps := clampVideoFPS(mediaInfo.Video.FrameRate)
+		format := ntgcalls.FormatAuto
+		return &ntgcalls.VideoDescription{
+			MediaSource: ntgcalls.MediaSourceFile,
+			Input:       url,
+			Width:       int16(w),
+			Height:      int16(h),
+			FPS:         uint8(fps),
+			Format:      &format,
+		}
+	}
+
 	if canVideoPassthrough(speed, probe) {
 		format := ntgcalls.FormatMatroska
 		fps := probe.fps
@@ -408,17 +453,9 @@ func getVideoPipeline(
 	return video
 }
 
-// normalizeVideo returns the scaled size, fps and the ffmpeg filter that
-// applies the playback speed from a probed video stream.
-func normalizeVideo(probe mediaProbe, speed float64) (int, int, int, string) {
-	if speed <= 0 {
-		speed = 1.0
-	}
-
-	w, h := probe.width, probe.height
+func clampVideoDimensions(w, h int) (int, int) {
 	if w <= 0 || h <= 0 {
-		w = defaultVideoWidth
-		h = defaultVideoHeight
+		return defaultVideoWidth, defaultVideoHeight
 	}
 	if w > defaultVideoWidth {
 		h = h * defaultVideoWidth / w
@@ -434,7 +471,34 @@ func normalizeVideo(probe mediaProbe, speed float64) (int, int, int, string) {
 	if h%2 != 0 {
 		h--
 	}
+	if w <= 0 || h <= 0 {
+		return defaultVideoWidth, defaultVideoHeight
+	}
+	return w, h
+}
 
+func clampVideoFPS(fps float64) int {
+	if fps <= 0 {
+		return defaultVideoFPS
+	}
+	rounded := int(fps + 0.5)
+	if rounded <= 0 {
+		return defaultVideoFPS
+	}
+	if rounded > defaultVideoFPS {
+		return defaultVideoFPS
+	}
+	return rounded
+}
+
+// normalizeVideo returns the scaled size, fps and the ffmpeg filter that
+// applies the playback speed from a probed video stream.
+func normalizeVideo(probe mediaProbe, speed float64) (int, int, int, string) {
+	if speed <= 0 {
+		speed = 1.0
+	}
+
+	w, h := clampVideoDimensions(probe.width, probe.height)
 	filter := fmt.Sprintf("setpts=%.4f*PTS,scale=%d:%d", 1.0/speed, w, h)
 	return w, h, defaultVideoFPS, filter
 }
@@ -467,6 +531,9 @@ type ffprobeOutput struct {
 		HasBFrames   int    `json:"has_b_frames"`
 		AvgFrameRate string `json:"avg_frame_rate"`
 		RFrameRate   string `json:"r_frame_rate"`
+		Disposition  struct {
+			AttachedPic int `json:"attached_pic"`
+		} `json:"disposition"`
 	} `json:"streams"`
 }
 
@@ -517,7 +584,7 @@ func probeMedia(filePath string) mediaProbe {
 				result.audioChannels = s.Channels
 			}
 		case "video":
-			if !result.hasVideo && s.Width > 0 && s.Height > 0 {
+			if !result.hasVideo && s.Disposition.AttachedPic == 0 && s.Width > 0 && s.Height > 0 {
 				result.hasVideo = true
 				result.videoCodec = strings.ToLower(s.CodecName)
 				result.pixFmt = strings.ToLower(s.PixFmt)

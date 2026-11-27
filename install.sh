@@ -6,7 +6,7 @@ set -u
 # YukkiMusic Dependency & Environment Installer
 # -----------------------------------------------------------------------------
 
-NTGCALLS_VERSION="v4.0.0-beta02"
+NTGCALLS_VERSION="v4.0.0-beta03"
 GO_REQUIRED="1.27.0"
 GO_TARGET="1.27.0"
 GOTDBOT_TOOLS_VERSION="v0.10.1"

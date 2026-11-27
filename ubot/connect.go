@@ -13,6 +13,8 @@ func (ctx *Context) connectCall(
 	chatID int64,
 	mediaDescription ntgcalls.MediaDescription,
 	jsonParams string,
+	conference bool,
+	lastBlock []byte,
 ) error {
 	ctx.waitConnectMutex.Lock()
 	waitChan := make(chan error)
@@ -23,9 +25,136 @@ func (ctx *Context) connectCall(
 		ctx.waitConnectMutex.Lock()
 		delete(ctx.waitConnect, chatID)
 		ctx.waitConnectMutex.Unlock()
+
+		ctx.pendingConnectionsMutex.Lock()
+		delete(ctx.pendingConnections, chatID)
+		ctx.pendingConnectionsMutex.Unlock()
 	}()
 
-	if chatID >= 0 {
+	if conference {
+		self := ctx.getSelf()
+		if self == nil {
+			return fmt.Errorf("self user unavailable")
+		}
+		if lastBlock == nil {
+			if err := ctx.binding.CreateP2PCall(chatID); err != nil {
+				return err
+			}
+		}
+		conferenceParams, err := ctx.binding.InitConference(chatID, self.ID, lastBlock)
+		if err != nil {
+			_ = ctx.binding.Stop(chatID)
+			return err
+		}
+		if lastBlock == nil {
+			if err = ctx.binding.SetStreamSources(chatID, ntgcalls.CaptureStream, mediaDescription); err != nil {
+				_ = ctx.binding.Stop(chatID)
+				return err
+			}
+		}
+		state, err := ctx.binding.GetState(chatID)
+		if err != nil {
+			_ = ctx.binding.Stop(chatID)
+			return err
+		}
+
+		var rawUpdates []tg.Update
+		if lastBlock == nil {
+			params := &tg.PhoneCreateConferenceCallParams{
+				Muted:        false,
+				VideoStopped: state.VideoStopped,
+				Join:         true,
+				RandomID:     int32(tg.GenRandInt()),
+				Block:        conferenceParams.Block,
+				Params: &tg.DataJson{
+					Data: conferenceParams.Payload,
+				},
+			}
+			if len(conferenceParams.PublicKey) > 0 {
+				params.PublicKey = tg.NewInt256(conferenceParams.PublicKey)
+			}
+			callResRaw, err := ctx.app.PhoneCreateConferenceCall(params)
+			if err != nil {
+				_ = ctx.binding.Stop(chatID)
+				return err
+			}
+			if callRes, ok := callResRaw.(*tg.UpdatesObj); ok {
+				rawUpdates = callRes.Updates
+			}
+		} else {
+			inputCall, err := ctx.GetInputGroupCall(chatID)
+			if err != nil {
+				_ = ctx.binding.Stop(chatID)
+				return err
+			}
+			params := &tg.PhoneJoinGroupCallParams{
+				Muted:        false,
+				VideoStopped: state.VideoStopped,
+				Call:         inputCall,
+				JoinAs:       ctx.selfInputPeer(),
+				Block:        conferenceParams.Block,
+				Params: &tg.DataJson{
+					Data: conferenceParams.Payload,
+				},
+			}
+			if len(conferenceParams.PublicKey) > 0 {
+				params.PublicKey = tg.NewInt256(conferenceParams.PublicKey)
+			}
+			callResRaw, err := ctx.app.PhoneJoinGroupCall(params)
+			if err != nil {
+				_ = ctx.binding.Stop(chatID)
+				return err
+			}
+			if callRes, ok := callResRaw.(*tg.UpdatesObj); ok {
+				rawUpdates = callRes.Updates
+			}
+		}
+
+		resultParams := "{\"transport\": null}"
+		for _, u := range rawUpdates {
+			switch update := u.(type) {
+			case *tg.UpdateGroupCall:
+				if groupCall, ok := update.Call.(*tg.GroupCallObj); ok {
+					ctx.inputGroupCallsMutex.Lock()
+					ctx.inputGroupCalls[chatID] = &tg.InputGroupCallObj{
+						ID:         groupCall.ID,
+						AccessHash: groupCall.AccessHash,
+					}
+					ctx.inputGroupCallsMutex.Unlock()
+				}
+			case *tg.UpdateGroupCallConnection:
+				resultParams = update.Params.Data
+			case *tg.UpdateGroupCallEncryptedMessage:
+				ctx.encryptedCallMessageReceived(chatID, update.FromID, update.EncryptedMessage)
+			}
+		}
+
+		if lastBlock == nil {
+			inputCall, err := ctx.GetInputGroupCall(chatID)
+			if err != nil {
+				_ = ctx.binding.Stop(chatID)
+				return err
+			}
+			inputUser, err := ctx.app.GetSendableUser(chatID)
+			if err != nil {
+				_ = ctx.binding.Stop(chatID)
+				return err
+			}
+			if _, err = ctx.app.PhoneInviteConferenceCallParticipant(
+				!state.VideoStopped,
+				inputCall,
+				inputUser,
+			); err != nil {
+				_ = ctx.binding.Stop(chatID)
+				return err
+			}
+		}
+
+		if err = ctx.binding.Connect(chatID, resultParams, false); err != nil {
+			return err
+		}
+
+	} else if chatID >= 0 {
 		// P2P call handling
 		defer func() {
 			ctx.p2pConfigsMutex.Lock()
@@ -231,6 +360,8 @@ func (ctx *Context) connectCall(
 			switch update := u.(type) {
 			case *tg.UpdateGroupCallConnection:
 				resultParams = update.Params.Data
+			case *tg.UpdateGroupCallMessage:
+				ctx.callMessageReceived(chatID, update.Message)
 			}
 		}
 
@@ -256,8 +387,22 @@ func (ctx *Context) connectCall(
 
 	select {
 	case err := <-waitChan:
-		return err
+		if err != nil {
+			return err
+		}
 	case <-time.After(20 * time.Second):
 		return fmt.Errorf("connection timeout: no response from ntgcalls")
 	}
+
+	if conference || chatID < 0 {
+		state, err := ctx.binding.GetState(chatID)
+		if err != nil {
+			return err
+		}
+		if err = ctx.joinPresentation(chatID, !state.PresentationStopped); err != nil {
+			return err
+		}
+		return ctx.addIncomingSources(chatID)
+	}
+	return nil
 }

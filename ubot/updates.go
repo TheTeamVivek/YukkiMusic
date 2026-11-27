@@ -105,6 +105,28 @@ func (ctx *Context) registerHandlers() {
 
 				}
 			case *tg.PhoneCallDiscarded:
+				if migrate, ok := call.Reason.(*tg.PhoneCallDiscardReasonMigrateConferenceCall); ok {
+					ctx.inputGroupCallsMutex.Lock()
+					ctx.inputGroupCalls[userID] = &tg.InputGroupCallSlug{Slug: migrate.Slug}
+					ctx.inputGroupCallsMutex.Unlock()
+
+					ctx.inputCallsMutex.Lock()
+					delete(ctx.inputCalls, userID)
+					ctx.inputCallsMutex.Unlock()
+
+					go func() {
+						lastBlock, err := ctx.getConferenceLastBlock(userID)
+						if err != nil {
+							fmt.Printf("migrate getConferenceLastBlock (%d): %v\n", userID, err)
+							return
+						}
+						if err = ctx.connectCall(userID, ntgcalls.MediaDescription{}, "", true, lastBlock); err != nil {
+							fmt.Printf("migrate connectCall (%d): %v\n", userID, err)
+						}
+					}()
+					return nil
+				}
+
 				var reasonMessage string
 
 				switch call.Reason.(type) {
@@ -159,6 +181,10 @@ func (ctx *Context) registerHandlers() {
 
 			var updates []participantUpdate
 			var selfUpdate *tg.GroupCallParticipant
+			var selfID int64
+			if me := ctx.getSelf(); me != nil {
+				selfID = me.ID
+			}
 
 			ctx.participantsMutex.Lock()
 			if ctx.callParticipants[chatID] == nil {
@@ -243,7 +269,7 @@ func (ctx *Context) registerHandlers() {
 					updates = append(updates, update)
 				}
 
-				if participantID == ctx.me.ID {
+				if selfID != 0 && participantID == selfID {
 					selfUpdate = participant
 				}
 			}
@@ -305,10 +331,12 @@ func (ctx *Context) registerHandlers() {
 					ctx.pendingConnectionsMutex.RUnlock()
 
 					if pending != nil {
-						ctx.connectCall(
+						_ = ctx.connectCall(
 							chatID,
 							pending.MediaDescription,
 							pending.Payload,
+							false,
+							nil,
 						)
 					}
 
@@ -372,6 +400,82 @@ func (ctx *Context) registerHandlers() {
 			return nil
 		},
 	)
+
+	ctx.app.AddRawHandler(
+		&tg.UpdateMessageID{},
+		func(m tg.Update, _ *tg.Client) error {
+			ctx.handleCallMessageUpdate(m)
+			return nil
+		},
+	)
+
+	ctx.app.AddRawHandler(
+		&tg.UpdateGroupCallMessage{},
+		func(m tg.Update, _ *tg.Client) error {
+			ctx.handleCallMessageUpdate(m)
+			return nil
+		},
+	)
+
+	ctx.app.AddRawHandler(
+		&tg.UpdateDeleteGroupCallMessages{},
+		func(m tg.Update, _ *tg.Client) error {
+			ctx.handleCallMessageUpdate(m)
+			return nil
+		},
+	)
+
+	ctx.app.AddRawHandler(
+		&tg.UpdateGroupCallEncryptedMessage{},
+		func(m tg.Update, _ *tg.Client) error {
+			ctx.handleCallMessageUpdate(m)
+			return nil
+		},
+	)
+
+	ctx.app.AddRawHandler(
+		&tg.UpdateGroupCallChainBlocks{},
+		func(m tg.Update, _ *tg.Client) error {
+			u := m.(*tg.UpdateGroupCallChainBlocks)
+			if chatID, ok := ctx.chatIDFromInputCall(u.Call); ok {
+				_ = ctx.binding.ApplyBlocks(
+					chatID,
+					u.SubChainID,
+					u.NextOffset,
+					u.Blocks,
+					false,
+				)
+			}
+			return nil
+		},
+	)
+
+	ctx.binding.OnOutboundBlock(func(chatID int64, block []byte) {
+		ctx.sendConferenceCallBroadcast(chatID, block)
+	})
+
+	ctx.binding.OnSubchainRequest(func(chatID int64, request ntgcalls.SubchainRequest) {
+		blocks, nextOffset, err := ctx.getSubchainBlocks(chatID, request)
+		if err == nil && len(blocks) > 0 {
+			_ = ctx.binding.ApplyBlocks(chatID, request.Subchain, nextOffset, blocks, true)
+		}
+		_ = ctx.binding.FinishSubchainRequest(chatID, request.Subchain)
+	})
+
+	ctx.binding.OnRequestParticipants(func(chatID int64, _ ntgcalls.ParticipantsRequest) {
+		_, _ = ctx.GetParticipants(chatID)
+	})
+
+	ctx.binding.OnUpdateEmojis(func(chatID int64, emojis string) {
+		ctx.callbacksMutex.RLock()
+		callbacks := make([]ntgcalls.EmojisCallback, len(ctx.emojisCallbacks))
+		copy(callbacks, ctx.emojisCallbacks)
+		ctx.callbacksMutex.RUnlock()
+
+		for _, callback := range callbacks {
+			go callback(chatID, emojis)
+		}
+	})
 
 	ctx.binding.OnRequestBroadcastTimestamp(func(chatID int64) {
 		ctx.inputGroupCallsMutex.RLock()
