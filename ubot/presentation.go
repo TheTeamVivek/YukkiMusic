@@ -91,7 +91,9 @@ func (ctx *Context) joinPresentation(chatID int64, join bool) error {
 		ctx.presentationsMutex.Lock()
 		isPresenting := slices.Contains(ctx.presentations, chatID)
 		if isPresenting {
-			ctx.presentations = stdRemove(ctx.presentations, chatID)
+			ctx.presentations = slices.DeleteFunc(ctx.presentations, func(id int64) bool {
+				return id == chatID
+			})
 		}
 		ctx.presentationsMutex.Unlock()
 

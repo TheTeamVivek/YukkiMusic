@@ -167,12 +167,11 @@ func (y *YtdlpPlatform) Download(
 
 	if track.Video {
 		args = append(args,
-			"-f", "(b[height>=360][height<=1080]/bv*[height>=360][height<=1080]/bv*)+(ba[abr>=180][abr<=360]/ba)/b",
+			"-f", "(bv*[height>=360][height<=720]/bv*[height<=1080]/bv*)+(ba[acodec=opus]/ba)/b",
 		)
 	} else {
 		args = append(args,
-			"-f", "ba[abr>=180][abr<=360]/ba",
-			"-x",
+			"-f", "ba[acodec=opus]/ba/b",
 			"--concurrent-fragments", "4",
 		)
 	}

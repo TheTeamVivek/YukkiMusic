@@ -2,6 +2,7 @@ package ubot
 
 import (
 	"fmt"
+	"slices"
 
 	tg "github.com/xAmarnath/gogram/telegram"
 
@@ -73,7 +74,9 @@ func (ctx *Context) Record(
 
 func (ctx *Context) Stop(chatID int64) error {
 	ctx.presentationsMutex.Lock()
-	ctx.presentations = stdRemove(ctx.presentations, chatID)
+	ctx.presentations = slices.DeleteFunc(ctx.presentations, func(id int64) bool {
+		return id == chatID
+	})
 	ctx.presentationsMutex.Unlock()
 
 	ctx.callSourcesMutex.Lock()

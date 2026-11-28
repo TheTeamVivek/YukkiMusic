@@ -351,7 +351,9 @@ func (ctx *Context) registerHandlers() {
 					ctx.mutedByAdminMutex.Lock()
 					wasMuted := slices.Contains(ctx.mutedByAdmin, chatID)
 					if wasMuted {
-						ctx.mutedByAdmin = stdRemove(ctx.mutedByAdmin, chatID)
+						ctx.mutedByAdmin = slices.DeleteFunc(ctx.mutedByAdmin, func(id int64) bool {
+							return id == chatID
+						})
 					}
 					ctx.mutedByAdminMutex.Unlock()
 
