@@ -154,10 +154,10 @@ func (s *ChatState) Assistant() *Assistant {
 	return s.assistant
 }
 
-// Status returns the cached status, looking it up first if the assistant's
-// presence is not known yet.
+// Status returns the cached status, refreshing from Telegram only when either
+// the assistant's presence or the voice chat state is still unknown.
 func (s *ChatState) Status() (Status, error) {
-	if st := s.cached(); st.Presence != PresenceUnknown {
+	if st := s.cached(); st.Presence != PresenceUnknown && st.Voice != VoiceUnknown {
 		return st, nil
 	}
 	return s.Refresh()

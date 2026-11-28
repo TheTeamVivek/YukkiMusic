@@ -51,7 +51,7 @@ func MonitorRooms() {
 				}
 
 				text := nowPlayingText(r.ControlChatID, track)
-				markup := core.GetPlayMarkup(r.ControlChatID, r, false)
+				markup := core.GetPlayMarkup(r.ControlChatID, r.ChatID, snap, false)
 
 				switch statusMsg.Content.(type) {
 				case *td.MessagePhoto:

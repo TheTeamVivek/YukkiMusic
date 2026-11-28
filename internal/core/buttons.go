@@ -176,20 +176,15 @@ func GetStopConfirmMarkup(
 	))
 }
 
-func GetPlayMarkup(chatID int64, r *Room, queued bool) td.ReplyMarkup {
-	prefix := fmt.Sprintf("room:%d:", r.ChatID)
-	track := r.Track()
+func GetPlayMarkup(chatID, roomChatID int64, snap RoomState, queued bool) td.ReplyMarkup {
+	prefix := fmt.Sprintf("room:%d:", roomChatID)
 	duration := 0
-	if track != nil {
-		duration = track.Duration
+	if snap.Track != nil {
+		duration = snap.Track.Duration
 	}
 
-	progress := utils.GetProgressBar(r.Position(), duration)
-	progress = utils.FormatTime(
-		r.Position(),
-	) + " " + progress + " " + utils.FormatTime(
-		duration,
-	)
+	bar := utils.GetProgressBar(snap.Position, duration)
+	progress := utils.FormatTime(snap.Position) + " " + bar + " " + utils.FormatTime(duration)
 
 	rows := make([][]td.InlineKeyboardButton, 0, 4)
 
@@ -200,7 +195,7 @@ func GetPlayMarkup(chatID int64, r *Room, queued bool) td.ReplyMarkup {
 	}
 	// Toggle: show play when paused, pause while playing.
 	toggle, toggleCB := "II", prefix+"pause"
-	if r.Paused() {
+	if snap.Playback == PlaybackPaused {
 		toggle, toggleCB = "▷", prefix+"resume"
 	}
 

@@ -72,13 +72,12 @@ func creloadHandler(c *td.Client, m *td.Message) error {
 }
 
 func handleReload(c *td.Client, m *td.Message, cplay bool) error {
-	r, err := getEffectiveRoom(m.ChatID(), cplay)
+	chatID := m.ChatID()
+	roomID, err := resolveTargetChat(chatID, cplay)
 	if err != nil {
 		_, err := m.ReplyText(c, err.Error(), nil)
 		return err
 	}
-
-	chatID, roomID := m.ChatID(), r.ChatID
 
 	floodKey := fmt.Sprintf("reload:%d%d", roomID, m.SenderID())
 	if remaining := utils.GetFlood(floodKey); remaining > 0 {

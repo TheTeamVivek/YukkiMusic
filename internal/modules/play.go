@@ -226,6 +226,9 @@ func (p *playReq) show(text string) {
 }
 
 func (p *playReq) fail(err error) {
+	if !p.active && p.room != nil && p.room.Track() == nil {
+		core.Rooms.DeleteIf(p.room.ChatID, p.room)
+	}
 	if errors.Is(err, core.ErrRoomClosed) {
 		if p.status != nil {
 			p.status.Delete(p.c, &td.DeleteMessagesOpts{Revoke: true})
@@ -252,7 +255,7 @@ func (p *playReq) allow() error {
 
 // prepare resolves the room and sends the "searching" message.
 func (p *playReq) prepare() (err error) {
-	if p.room, err = getEffectiveRoom(p.chatID, p.CPlay); err != nil {
+	if p.room, err = createRoom(p.chatID, p.CPlay); err != nil {
 		return err
 	}
 

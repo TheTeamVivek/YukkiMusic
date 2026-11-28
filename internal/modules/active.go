@@ -59,7 +59,7 @@ func activeHandler(c *td.Client, m *td.Message) error {
 
 	// Only truly active sessions are reported: skip destroyed rooms and
 	// rooms that are not actively playing anything.
-	states := make(map[int64]core.State)
+	states := make(map[int64]core.RoomState)
 	for id, r := range core.Rooms.All() {
 		if r == nil {
 			continue
@@ -122,7 +122,7 @@ func activeHandler(c *td.Client, m *td.Message) error {
 	return err
 }
 
-func activeStatusCell(s core.State) string {
+func activeStatusCell(s core.RoomState) string {
 	switch s.Playback {
 	case core.PlaybackMuted:
 		return "<b>🔇 Muted</b>"
@@ -138,7 +138,7 @@ func activeStatusCell(s core.State) string {
 	return "<b>⏹ Idle</b>"
 }
 
-func activeTrackCell(s core.State) string {
+func activeTrackCell(s core.RoomState) string {
 	t := s.Track
 	if t == nil {
 		return "<i>🔇 No song playing.</i>"
@@ -155,7 +155,7 @@ func activeTrackCell(s core.State) string {
 	return fmt.Sprintf("%s <i>(%s)</i>", title, utils.FormatDuration(t.Duration))
 }
 
-func activeQueueCell(s core.State) string {
+func activeQueueCell(s core.RoomState) string {
 	n := s.QueueLen
 	if n == 0 {
 		return "<i>Empty</i>"

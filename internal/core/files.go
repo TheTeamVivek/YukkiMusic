@@ -42,14 +42,23 @@ const (
 // playing or has queued the track.
 func isTrackUsed(trackID string, skipChatID int64) bool {
 	for _, room := range Rooms.rooms {
-		if room == nil || room.track == nil || room.ChatID == skipChatID {
+		if room == nil || room.ChatID == skipChatID {
 			continue
 		}
-		if room.track.ID == trackID || isTrackInQueue(trackID, room.queue.tracks) {
+		if room.usesTrack(trackID) {
 			return true
 		}
 	}
 	return false
+}
+
+func (r *Room) usesTrack(trackID string) bool {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if r.track == nil {
+		return false
+	}
+	return r.track.ID == trackID || isTrackInQueue(trackID, r.queue.tracks)
 }
 
 // isTrackInQueue reports whether the next queueScanLimit queued tracks contain
@@ -79,11 +88,14 @@ func (r *Room) cleanupFile() {
 		return
 	}
 
+	r.mu.RLock()
 	tracks := make([]*state.Track, 0, queueScanLimit+1)
 	if r.track != nil {
 		tracks = append(tracks, r.track)
 	}
 	tracks = append(tracks, r.queue.tracks...)
+	r.mu.RUnlock()
+
 	if len(tracks) > queueScanLimit {
 		tracks = tracks[:queueScanLimit]
 	}

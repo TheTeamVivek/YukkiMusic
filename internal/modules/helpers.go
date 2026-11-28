@@ -166,25 +166,41 @@ func isOwnerOrSudo(userID int64) bool {
 	return err == nil && isSudo
 }
 
-func getEffectiveRoom(chatID int64, cplay bool) (*core.Room, error) {
-	origChatID := chatID
-
-	if cplay {
-		cplayID, err := database.LinkedChannel(chatID)
-		if err != nil || cplayID == 0 {
-			return nil, errors.New(F(chatID, "cplay_id_not_set"))
-		}
-		chatID = cplayID
+func resolveTargetChat(chatID int64, cplay bool) (int64, error) {
+	if !cplay {
+		return chatID, nil
 	}
-	ass, err := core.Assistants.ForChat(chatID)
+	cplayID, err := database.LinkedChannel(chatID)
+	if err != nil || cplayID == 0 {
+		return 0, errors.New(F(chatID, "cplay_id_not_set"))
+	}
+	return cplayID, nil
+}
+
+// createRoom resolves or allocates a Room for starting playback (/play).
+func createRoom(chatID int64, cplay bool) (*core.Room, error) {
+	targetID, err := resolveTargetChat(chatID, cplay)
+	if err != nil {
+		return nil, err
+	}
+	ass, err := core.Assistants.ForChat(targetID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get assistant for your chat: %w", err)
 	}
-	r := core.Rooms.GetOrCreate(chatID, ass)
-
+	r := core.Rooms.GetOrCreate(targetID, ass)
 	if cplay {
-		r.ControlChatID = origChatID
+		r.ControlChatID = chatID
 	}
+	return r, nil
+}
+
+// getEffectiveRoom looks up an existing Room for chatID without creating one.
+func getEffectiveRoom(chatID int64, cplay bool) (*core.Room, error) {
+	targetID, err := resolveTargetChat(chatID, cplay)
+	if err != nil {
+		return nil, err
+	}
+	r, _ := core.Rooms.Get(targetID)
 	return r, nil
 }
 
@@ -247,7 +263,7 @@ func showTrackMessage(
 	msgText string,
 	queued bool,
 ) *td.Message {
-	markup := core.GetPlayMarkup(chatID, r, queued)
+	markup := core.GetPlayMarkup(chatID, r.ChatID, r.Snapshot(), queued)
 
 	opts := &td.SendMessageOpts{
 		ParseMode:             "HTML",

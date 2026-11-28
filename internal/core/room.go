@@ -79,14 +79,20 @@ func (reg *Registry) GetOrCreate(chatID int64, ass *Assistant) *Room {
 
 // Delete removes the room for a chat and stops its stream.
 func (reg *Registry) Delete(chatID int64) bool {
+	return reg.DeleteIf(chatID, nil)
+}
+
+// DeleteIf removes the room for a chat only when expected is nil or still the
+// currently registered room, preventing stale timers from deleting a newer room.
+func (reg *Registry) DeleteIf(chatID int64, expected *Room) bool {
 	reg.mu.Lock()
 	room, ok := reg.rooms[chatID]
-	delete(reg.rooms, chatID)
-	reg.mu.Unlock()
-
-	if !ok {
+	if !ok || (expected != nil && room != expected) {
+		reg.mu.Unlock()
 		return false
 	}
+	delete(reg.rooms, chatID)
+	reg.mu.Unlock()
 
 	room.cleanupFile()
 	room.Stop()
@@ -141,34 +147,62 @@ const (
 	PlaybackMuted
 )
 
-// State is a point-in-time view of a room.
-type State struct {
+// RoomState is a point-in-time view of a room.
+type RoomState struct {
 	Track    *state.Track
 	Playback Playback
 	Position int
 	QueueLen int
 }
 
-func (s State) Active() bool {
+func (s RoomState) Active() bool {
 	return s.Playback != PlaybackIdle
 }
 
 // Snapshot returns the current state of the room.
-func (r *Room) Snapshot() State {
+func (r *Room) Snapshot() RoomState {
+	if r == nil {
+		return RoomState{}
+	}
+
+	r.mu.RLock()
+	track := r.track
+	queueLen := r.queue.len()
+	pos := 0
+	if track != nil {
+		pos = r.position()
+	}
+	r.mu.RUnlock()
+
+	if track == nil {
+		return RoomState{QueueLen: queueLen}
+	}
+
+	return RoomState{
+		Track:    track,
+		Playback: r.playback(),
+		Position: pos,
+		QueueLen: queueLen,
+	}
+}
+
+func (r *Room) assistant() *Assistant {
+	if r == nil {
+		return nil
+	}
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-
-	s := State{Track: r.track, QueueLen: r.queue.len()}
-	if r.track != nil {
-		s.Playback = r.playback()
-		s.Position = r.position()
-	}
-	return s
+	return r.Assistant
 }
 
 // playback reads the stream status from ntgcalls.
 func (r *Room) playback() Playback {
-	calls, err := r.Assistant.Ntg.Calls()
+	ass := r.assistant()
+	if ass == nil || ass.Ntg == nil {
+		return PlaybackIdle
+	}
+
+	calls, err := ass.Ntg.Calls()
 	if err != nil {
 		return PlaybackIdle
 	}
@@ -185,7 +219,7 @@ func (r *Room) playback() Playback {
 		return PlaybackPaused
 	}
 
-	if st, err := r.Assistant.Ntg.State(r.ChatID); err == nil && st.Muted {
+	if st, err := ass.Ntg.State(r.ChatID); err == nil && st.Muted {
 		return PlaybackMuted
 	}
 	return PlaybackPlaying
@@ -229,24 +263,36 @@ func (r *Room) Position() int {
 }
 
 func (r *Room) Track() *state.Track {
+	if r == nil {
+		return nil
+	}
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.track
 }
 
 func (r *Room) FilePath() string {
+	if r == nil {
+		return ""
+	}
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.filePath
 }
 
 func (r *Room) Speed() float64 {
+	if r == nil {
+		return 1.0
+	}
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.speed
 }
 
 func (r *Room) Loop() int {
+	if r == nil {
+		return 0
+	}
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.loop

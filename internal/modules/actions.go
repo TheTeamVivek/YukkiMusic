@@ -82,16 +82,16 @@ func isOwnerBlacklisted(c *td.Client, chatID int64) bool {
 }
 
 func handleVoiceChatAction(c *td.Client, chatID int64, isActive bool, duration int32) error {
-	if maintenance, _ := database.GetMaintenance(); maintenance {
-		return nil
-	}
-
 	s, err := core.ChatStateFor(chatID)
 	if err != nil {
 		utils.Log.Errorf("Failed to get chat state for %d: %v", chatID, err)
 		return nil
 	}
 	s.SetVoice(utils.IfElse(isActive, core.VoiceActive, core.VoiceInactive))
+
+	if maintenance, _ := database.GetMaintenance(); maintenance {
+		return nil
+	}
 
 	msgKey := utils.IfElse(isActive, "voicechat_started", "voicechat_ended")
 	text := F(chatID, msgKey, locales.Arg{"duration": utils.FormatDuration(int(duration))})
@@ -101,10 +101,13 @@ func handleVoiceChatAction(c *td.Client, chatID int64, isActive bool, duration i
 	utils.Log.Debugf("Voice chat %s in %d", msgKey, chatID)
 
 	if !isActive {
-		time.AfterFunc(500*time.Millisecond, func() {
-			core.Rooms.Delete(chatID)
-			utils.Log.Debugf("Room destroyed for ended voice chat in %d", chatID)
-		})
+		if room, ok := core.Rooms.Get(chatID); ok {
+			time.AfterFunc(500*time.Millisecond, func() {
+				if core.Rooms.DeleteIf(chatID, room) {
+					utils.Log.Debugf("Room destroyed for ended voice chat in %d", chatID)
+				}
+			})
+		}
 	}
 	return nil
 }

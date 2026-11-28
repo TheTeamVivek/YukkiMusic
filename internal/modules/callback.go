@@ -534,7 +534,7 @@ func updatePlaybackMessageFor(c *td.Client, msg *td.Message, userID int64, r *co
 		})
 	}
 
-	markup := core.GetPlayMarkup(chatID, r, false)
+	markup := core.GetPlayMarkup(chatID, r.ChatID, r.Snapshot(), false)
 
 	var err error
 	switch {

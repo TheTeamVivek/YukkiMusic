@@ -75,13 +75,14 @@ func handleStop(c *td.Client, m *td.Message, cplay bool) error {
 		_, err := m.ReplyText(c, err.Error(), nil)
 		return err
 	}
-	if !r.Active() {
+	snap := r.Snapshot()
+	if !snap.Active() {
 		_, err := m.ReplyText(c, F(m.ChatID(), "room_no_active"), nil)
 		return err
 	}
 
-	isPaused := r.Paused()
-	isMuted := r.Muted()
+	isPaused := snap.Playback == core.PlaybackPaused
+	isMuted := snap.Playback == core.PlaybackMuted
 
 	if isPaused || isMuted {
 		stopSuggestFloodKey := fmt.Sprintf(

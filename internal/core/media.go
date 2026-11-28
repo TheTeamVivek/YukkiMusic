@@ -82,12 +82,17 @@ func (r *Room) Play(t *state.Track, path string, force ...bool) error {
 
 // Pause pauses playback until Resume is called.
 func (r *Room) Pause() error {
+	ass := r.assistant()
+	if ass == nil || ass.Ntg == nil {
+		return ErrRoomClosed
+	}
+
 	s := r.playback()
 	if s == PlaybackPaused {
 		return nil
 	}
 
-	if _, err := r.Assistant.Ntg.Pause(r.ChatID); err != nil {
+	if _, err := ass.Ntg.Pause(r.ChatID); err != nil {
 		return err
 	}
 
@@ -104,11 +109,16 @@ func (r *Room) Pause() error {
 
 // Resume resumes a paused stream.
 func (r *Room) Resume() error {
+	ass := r.assistant()
+	if ass == nil || ass.Ntg == nil {
+		return ErrRoomClosed
+	}
+
 	switch r.playback() {
 	case PlaybackIdle:
 		return fmt.Errorf("there are no active music playing")
 	case PlaybackPaused:
-		if _, err := r.Assistant.Ntg.Resume(r.ChatID); err != nil {
+		if _, err := ass.Ntg.Resume(r.ChatID); err != nil {
 			return err
 		}
 
@@ -121,12 +131,17 @@ func (r *Room) Resume() error {
 
 // Mute mutes the stream.
 func (r *Room) Mute() error {
+	ass := r.assistant()
+	if ass == nil || ass.Ntg == nil {
+		return ErrRoomClosed
+	}
+
 	s := r.playback()
 	if s == PlaybackMuted {
 		return nil
 	}
 
-	if _, err := r.Assistant.Ntg.Mute(r.ChatID); err != nil {
+	if _, err := ass.Ntg.Mute(r.ChatID); err != nil {
 		return err
 	}
 
@@ -138,7 +153,11 @@ func (r *Room) Mute() error {
 
 // Unmute unmutes the stream.
 func (r *Room) Unmute() error {
-	_, err := r.Assistant.Ntg.Unmute(r.ChatID)
+	ass := r.assistant()
+	if ass == nil || ass.Ntg == nil {
+		return ErrRoomClosed
+	}
+	_, err := ass.Ntg.Unmute(r.ChatID)
 	return err
 }
 
@@ -164,7 +183,10 @@ func (r *Room) Replay() error {
 
 // Stop stops the stream and forgets the current track.
 func (r *Room) Stop() error {
-	err := r.Assistant.Ntg.Stop(r.ChatID)
+	var err error
+	if ass := r.assistant(); ass != nil && ass.Ntg != nil {
+		err = ass.Ntg.Stop(r.ChatID)
+	}
 
 	r.mu.Lock()
 	r.track = nil
@@ -257,10 +279,15 @@ func (r *Room) play() error {
 	}
 
 	r.mu.RLock()
+	ass := r.Assistant
 	desc := getMediaDescription(r.filePath, r.offset, r.speed, r.track.Video)
 	r.mu.RUnlock()
 
-	if err := r.Assistant.Ntg.Play(r.ChatID, desc); err != nil {
+	if ass == nil || ass.Ntg == nil {
+		return ErrRoomClosed
+	}
+
+	if err := ass.Ntg.Play(r.ChatID, desc); err != nil {
 		return err
 	}
 
