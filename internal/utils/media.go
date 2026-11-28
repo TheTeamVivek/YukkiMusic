@@ -83,21 +83,6 @@ func GetDuration(m *td.Message) int {
 		if c.VideoNote != nil {
 			return int(c.VideoNote.Duration)
 		}
-	case *td.MessageDocument:
-		if c.Document != nil {
-			if c.Document.FileName == "" {
-				return 0
-			}
-			dur, err := GetDurationByFFProbe(c.Document.FileName)
-			if err != nil {
-				Log.Errorf(
-					"GetDurationByFFProbe failed for %q: %v",
-					c.Document.FileName, err,
-				)
-				return 0
-			}
-			return dur
-		}
 	}
 	return 0
 }

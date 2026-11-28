@@ -727,9 +727,18 @@ func (c *Client) Calls() (map[int64]CallInfo, error) {
 }
 
 func (c *Client) Free() {
-	clientRegistry.Lock()
-	delete(clientRegistry.clients, c.handle)
-	clientRegistry.Unlock()
-	C.ntg_instance_destroy(c.handle)
+	if c == nil {
+		return
+	}
+	c.freeMu.Lock()
+	defer c.freeMu.Unlock()
+	if c.handle == nil {
+		return
+	}
+	handle := c.handle
 	c.handle = nil
+	clientRegistry.Lock()
+	delete(clientRegistry.clients, handle)
+	clientRegistry.Unlock()
+	C.ntg_instance_destroy(handle)
 }

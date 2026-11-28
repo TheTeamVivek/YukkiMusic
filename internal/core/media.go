@@ -306,17 +306,18 @@ func getMediaDescription(
 	if pos > 0 {
 		baseCmd += "-ss " + strconv.Itoa(pos) + " "
 	}
-	baseCmd += "-v error -i \"" + url + "\" "
+	baseCmd += "-v error -i " + shellQuote(url) + " "
 
 	var probe mediaProbe
-	needVideoProbe := isVideo && (mediaInfo == nil || mediaInfo.Video == nil || !mediaInfo.Video.Supported)
+	needVideoProbe := isVideo && (mediaInfo == nil || (mediaInfo.Video != nil && !mediaInfo.Video.Supported))
 	needAudioProbe := !isVideo && !isStreamURL(url) && speed == 1.0 && mediaInfo == nil
 	if needVideoProbe || needAudioProbe {
 		probe = probeMedia(url)
 	}
 
 	audio := getAudioPipeline(baseCmd, url, pos, speed, mediaInfo, probe)
-	if !isVideo {
+	hasNoVideo := (mediaInfo != nil && mediaInfo.Video == nil) || (probe.hasAudio && !probe.hasVideo)
+	if !isVideo || hasNoVideo {
 		return ntgcalls.MediaDescription{
 			Microphone: audio,
 		}
@@ -681,4 +682,8 @@ func hasMediaExt(path string, exts ...string) bool {
 func isStreamURL(path string) bool {
 	return strings.HasPrefix(path, "http://") ||
 		strings.HasPrefix(path, "https://")
+}
+
+func shellQuote(value string) string {
+	return "'" + strings.ReplaceAll(value, "'", `'\''`) + "'"
 }

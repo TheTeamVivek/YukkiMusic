@@ -6,6 +6,7 @@ import "sync"
 
 type Client struct {
 	handle                       *C.ntg_instance
+	freeMu                       sync.Mutex
 	mu                           sync.RWMutex // Protects all callback slices
 	connectionChangeCallbacks    []ConnectionChangeCallback
 	streamEndCallbacks           []StreamEndCallback
